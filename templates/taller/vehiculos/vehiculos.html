@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+{% block extra_head %}
+<link href="/static/css/estilo_futurista.css" rel="stylesheet">
+<link href="/static/css/galaxy_theme.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  tsParticles.load("tsparticles", {
+    fullScreen: { enable: false },
+    background: { color: { value: "transparent" } },
+    particles: {
+      number: { value: 100 },
+      color: { value: "#00ffff" },
+      size: { value: 2 },
+      move: { enable: true, speed: 0.7 },
+      links: { enable: true, color: "#00e6d0", opacity: 0.3 }
+    }
+  });
+});
+</script>
+<style>
+body {
+  background: linear-gradient(120deg, #0f2027 0%, #2c5364 100%) fixed;
+  min-height: 100vh;
+}
+#tsparticles {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+}
+.cuadro {
+  position: relative;
+  z-index: 2;
+}
+</style>
+{% endblock %}
+{% block fondo_extra %}
+<div id="tsparticles" class="fixed inset-0 -z-10"></div>
+{% endblock %}
+{% block content %}
+<div class="max-w-6xl mx-auto cuadro">
+  <!-- Cabecera premium/futurista -->
+  <div class="flex flex-col md:flex-row items-center justify-between mb-8 mt-10 gap-4 premium-header">
+    <div class="flex items-center gap-4">
+      <img src="/media/TallerPro_logo.png" alt="E-Garage Logo" class="logo-egarage-header animate-logo" style="width:64px;height:64px;filter:drop-shadow(0 0 12px #00e6d0cc);">
+      <span class="text-3xl font-bold font-orbitron text-[#00e6d0] tracking-wide">E-Garage</span>
+    </div>
+    <div class="flex flex-wrap gap-2 justify-center">
+      <a href="/inicio-usuarios/" class="btn-premium-nav">Inicio usuario</a>
+      <a href="/dashboard/" class="btn-premium-nav">Dashboard</a>
+      <a href="/vehiculos/" class="btn-premium-nav">Mis vehículos</a>
+      <a href="/account/email/" class="btn-premium-nav">Correos</a>
+    </div>
+    <div class="flex items-center gap-2 mt-2 md:mt-0">
+      <span class="text-[#00e6d0] font-semibold">{{ user.username }}</span>
+      <a href="/account/logout/" class="btn-premium-nav px-3 py-1">Salir</a>
+    </div>
+  </div>
+<style>
+    .cuadro, .cuadro *, table, thead, tbody, th, td {
+      color: #fff !important;
+    }
+    input[type="text"] {
+      background: #222 !important;
+      color: #fff !important;
+      border: 1px solid #4fd1c5 !important;
+    }
+    input[type="text"]::placeholder {
+      color: #b2f5ea !important;
+    }
+    .translucent-card {
+      background: rgba(0,0,0,0.6) !important;
+      color: #fff !important;
+    }
+    .logo-egarage-header {
+      width: 64px;
+      height: 64px;
+      display: block;
+      filter: drop-shadow(0 0 12px #00e6d0cc);
+    }
+    .animate-logo {
+      animation: logoPulse 2.5s infinite alternate;
+    }
+    @keyframes logoPulse {
+      0% { transform: scale(1) rotate(-6deg); filter: drop-shadow(0 0 8px #00e6d0cc); }
+      100% { transform: scale(1.08) rotate(6deg); filter: drop-shadow(0 0 24px #00e6d0); }
+    }
+    .btn-premium-nav {
+      background: linear-gradient(90deg, #00e6d0 0%, #00bfff 100%);
+      color: #18191a;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 20px;
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0 4px 4px 0;
+      cursor: pointer;
+      transition: background 0.2s, box-shadow 0.2s;
+      box-shadow: 0 2px 8px 0 rgba(0,230,208,0.10);
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-premium-nav:hover {
+      background: linear-gradient(90deg, #00bfa3 0%, #0099cc 100%);
+      color: #fff;
+      box-shadow: 0 4px 16px 0 rgba(0,230,208,0.18);
+    }
+    .premium-header {
+      background: rgba(24,25,26,0.18);
+      border-radius: 18px;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.22);
+      padding: 18px 32px;
+      margin-bottom: 32px;
+      backdrop-filter: blur(8px) saturate(120%);
+      -webkit-backdrop-filter: blur(8px) saturate(120%);
+      border: 1.5px solid rgba(0,230,208,0.12);
+    }
+    .font-orbitron {
+      font-family: 'Orbitron', 'Arial', sans-serif;
+    }
+  </style>
+<div class="flex justify-between items-center mb-4">
+<h1 class="text-2xl font-bold">Vehículos Registrados</h1>
+<a class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow" href="{% url 'vehiculos:crear_vehiculo' %}">
+      + Agregar Vehículo
+    </a>
+</div>
+<div class="mb-4">
+<input class="w-full rounded px-4 py-2 text-black" id="busqueda-vehiculo" placeholder="Buscar vehículo por patente, modelo, VIN o marca..." type="text"/>
+</div>
+<div class="overflow-x-auto">
+<table class="min-w-full text-sm text-left">
+<thead class="bg-gray-700 text-white">
+<tr>
+<th class="px-4 py-2">Patente</th>
+<th class="px-4 py-2">Marca</th>
+<th class="px-4 py-2">Modelo</th>
+<th class="px-4 py-2">Año</th>
+<th class="px-4 py-2">VIN</th>
+<th class="px-4 py-2">Acciones</th>
+</tr>
+</thead>
+<tbody class="translucent-card text-black" id="tabla-vehiculos">
+        {% for vehiculo in vehiculos %}
+        <tr class="border-b border-gray-300">
+<td class="px-4 py-2">{{ vehiculo.patente }}</td>
+<td class="px-4 py-2">{{ vehiculo.marca }}</td>
+<td class="px-4 py-2">{{ vehiculo.modelo }}</td>
+<td class="px-4 py-2">{{ vehiculo.anio }}</td>
+<td class="px-4 py-2">{{ vehiculo.vin }}</td>
+<td class="px-4 py-2 space-x-2">
+<a class="text-blue-600 hover:underline" href="{% url 'vehiculos:ver_vehiculo' vehiculo.id %}" title="Ver">👁️</a>
+<a class="text-yellow-600 hover:underline" href="{% url 'vehiculos:editar_vehiculo' vehiculo.id %}" title="Editar">✏️</a>
+<a class="text-red-600 hover:underline btn-eliminar btn-futuristic" href="{% url 'vehiculos:eliminar_vehiculo' vehiculo.id %}" title="Eliminar">🗑️</a>
+</td>
+</tr>
+        {% empty %}
+        <tr><td class="px-4 py-4 text-center text-gray-500" colspan="6">Sin vehículos</td></tr>
+        {% endfor %}
+      </tbody>
+</table>
+</div>
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const input = document.getElementById('busqueda-vehiculo');
+    const filas = document.querySelectorAll('#tabla-vehiculos tr');
+    input.addEventListener('input', function() {
+      const filtro = this.value.toLowerCase();
+      filas.forEach(fila => {
+        const texto = fila.textContent.toLowerCase();
+        fila.style.display = texto.includes(filtro) ? '' : 'none';
+      });
+    });
+    // Confirmación al eliminar
+    document.querySelectorAll('.btn-eliminar').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        if(!confirm('¿Estás seguro de que deseas eliminar este vehículo? Esta acción no se puede deshacer.')) {
+          e.preventDefault();
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}

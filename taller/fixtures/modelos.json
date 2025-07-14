@@ -1,0 +1,9314 @@
+[
+  {
+    "model": "taller.modelo",
+    "pk": 1,
+    "fields": {
+      "nombre": "Integra",
+      "marca": 1
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 2,
+    "fields": {
+      "nombre": "Legend",
+      "marca": 1
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 3,
+    "fields": {
+      "nombre": "RL",
+      "marca": 1
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 4,
+    "fields": {
+      "nombre": "TL",
+      "marca": 1
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 5,
+    "fields": {
+      "nombre": "RSX",
+      "marca": 1
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 6,
+    "fields": {
+      "nombre": "MDX",
+      "marca": 1
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 7,
+    "fields": {
+      "nombre": "RDX",
+      "marca": 1
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 8,
+    "fields": {
+      "nombre": "TSX",
+      "marca": 1
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 9,
+    "fields": {
+      "nombre": "ILX",
+      "marca": 1
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 10,
+    "fields": {
+      "nombre": "NSX",
+      "marca": 1
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 11,
+    "fields": {
+      "nombre": "ZDX",
+      "marca": 1
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 12,
+    "fields": {
+      "nombre": "TLX",
+      "marca": 1
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 13,
+    "fields": {
+      "nombre": "RLX",
+      "marca": 1
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 14,
+    "fields": {
+      "nombre": "Alfasud",
+      "marca": 2
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 15,
+    "fields": {
+      "nombre": "Alfetta",
+      "marca": 2
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 16,
+    "fields": {
+      "nombre": "Giulietta",
+      "marca": 2
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 17,
+    "fields": {
+      "nombre": "33",
+      "marca": 2
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 18,
+    "fields": {
+      "nombre": "75",
+      "marca": 2
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 19,
+    "fields": {
+      "nombre": "164",
+      "marca": 2
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 20,
+    "fields": {
+      "nombre": "Spider",
+      "marca": 2
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 21,
+    "fields": {
+      "nombre": "GTV",
+      "marca": 2
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 22,
+    "fields": {
+      "nombre": "145",
+      "marca": 2
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 23,
+    "fields": {
+      "nombre": "146",
+      "marca": 2
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 24,
+    "fields": {
+      "nombre": "156",
+      "marca": 2
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 25,
+    "fields": {
+      "nombre": "166",
+      "marca": 2
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 26,
+    "fields": {
+      "nombre": "147",
+      "marca": 2
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 27,
+    "fields": {
+      "nombre": "GT",
+      "marca": 2
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 28,
+    "fields": {
+      "nombre": "Brera",
+      "marca": 2
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 29,
+    "fields": {
+      "nombre": "MiTo",
+      "marca": 2
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 30,
+    "fields": {
+      "nombre": "Giulietta",
+      "marca": 2
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 31,
+    "fields": {
+      "nombre": "Giulia",
+      "marca": 2
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 32,
+    "fields": {
+      "nombre": "Stelvio",
+      "marca": 2
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 33,
+    "fields": {
+      "nombre": "Gremlin",
+      "marca": 3
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 34,
+    "fields": {
+      "nombre": "Pacer",
+      "marca": 3
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 35,
+    "fields": {
+      "nombre": "Hornet",
+      "marca": 3
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 36,
+    "fields": {
+      "nombre": "Concord",
+      "marca": 3
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 37,
+    "fields": {
+      "nombre": "Spirit",
+      "marca": 3
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 38,
+    "fields": {
+      "nombre": "Eagle",
+      "marca": 3
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 39,
+    "fields": {
+      "nombre": "Javelin",
+      "marca": 3
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 40,
+    "fields": {
+      "nombre": "Matador",
+      "marca": 3
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 41,
+    "fields": {
+      "nombre": "Rebel",
+      "marca": 3
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 42,
+    "fields": {
+      "nombre": "AMX",
+      "marca": 3
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 43,
+    "fields": {
+      "nombre": "Rocsta",
+      "marca": 4
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 44,
+    "fields": {
+      "nombre": "Towner",
+      "marca": 4
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 45,
+    "fields": {
+      "nombre": "Topic",
+      "marca": 4
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 46,
+    "fields": {
+      "nombre": "Retona",
+      "marca": 4
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 47,
+    "fields": {
+      "nombre": "Combi",
+      "marca": 4
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 48,
+    "fields": {
+      "nombre": "AM825",
+      "marca": 4
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 49,
+    "fields": {
+      "nombre": "50",
+      "marca": 5
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 50,
+    "fields": {
+      "nombre": "80",
+      "marca": 5
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 51,
+    "fields": {
+      "nombre": "90",
+      "marca": 5
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 52,
+    "fields": {
+      "nombre": "100",
+      "marca": 5
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 53,
+    "fields": {
+      "nombre": "200",
+      "marca": 5
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 54,
+    "fields": {
+      "nombre": "A1",
+      "marca": 5
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 55,
+    "fields": {
+      "nombre": "A3",
+      "marca": 5
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 56,
+    "fields": {
+      "nombre": "A4",
+      "marca": 5
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 57,
+    "fields": {
+      "nombre": "A5",
+      "marca": 5
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 58,
+    "fields": {
+      "nombre": "A6",
+      "marca": 5
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 59,
+    "fields": {
+      "nombre": "A7",
+      "marca": 5
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 60,
+    "fields": {
+      "nombre": "A8",
+      "marca": 5
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 61,
+    "fields": {
+      "nombre": "Q2",
+      "marca": 5
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 62,
+    "fields": {
+      "nombre": "Q3",
+      "marca": 5
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 63,
+    "fields": {
+      "nombre": "Q5",
+      "marca": 5
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 64,
+    "fields": {
+      "nombre": "Q7",
+      "marca": 5
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 65,
+    "fields": {
+      "nombre": "Q8",
+      "marca": 5
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 66,
+    "fields": {
+      "nombre": "TT",
+      "marca": 5
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 67,
+    "fields": {
+      "nombre": "R8",
+      "marca": 5
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 68,
+    "fields": {
+      "nombre": "e-tron",
+      "marca": 5
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 69,
+    "fields": {
+      "nombre": "RS3",
+      "marca": 5
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 70,
+    "fields": {
+      "nombre": "RS4",
+      "marca": 5
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 71,
+    "fields": {
+      "nombre": "RS5",
+      "marca": 5
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 72,
+    "fields": {
+      "nombre": "RS6",
+      "marca": 5
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 73,
+    "fields": {
+      "nombre": "RS7",
+      "marca": 5
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 74,
+    "fields": {
+      "nombre": "S3",
+      "marca": 5
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 75,
+    "fields": {
+      "nombre": "S4",
+      "marca": 5
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 76,
+    "fields": {
+      "nombre": "S5",
+      "marca": 5
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 77,
+    "fields": {
+      "nombre": "S6",
+      "marca": 5
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 78,
+    "fields": {
+      "nombre": "S7",
+      "marca": 5
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 79,
+    "fields": {
+      "nombre": "S8",
+      "marca": 5
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 80,
+    "fields": {
+      "nombre": "Mini",
+      "marca": 6
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 81,
+    "fields": {
+      "nombre": "Allegro",
+      "marca": 6
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 82,
+    "fields": {
+      "nombre": "Maestro",
+      "marca": 6
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 83,
+    "fields": {
+      "nombre": "Montego",
+      "marca": 6
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 84,
+    "fields": {
+      "nombre": "Maxi",
+      "marca": 6
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 85,
+    "fields": {
+      "nombre": "Metro",
+      "marca": 6
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 86,
+    "fields": {
+      "nombre": "Princess",
+      "marca": 6
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 87,
+    "fields": {
+      "nombre": "1100",
+      "marca": 6
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 88,
+    "fields": {
+      "nombre": "1300",
+      "marca": 6
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 89,
+    "fields": {
+      "nombre": "1800",
+      "marca": 6
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 90,
+    "fields": {
+      "nombre": "Healey",
+      "marca": 6
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 91,
+    "fields": {
+      "nombre": "A40",
+      "marca": 6
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 92,
+    "fields": {
+      "nombre": "A50",
+      "marca": 6
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 93,
+    "fields": {
+      "nombre": "A60",
+      "marca": 6
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 94,
+    "fields": {
+      "nombre": "A90",
+      "marca": 6
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 95,
+    "fields": {
+      "nombre": "A99",
+      "marca": 6
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 96,
+    "fields": {
+      "nombre": "A135",
+      "marca": 6
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 97,
+    "fields": {
+      "nombre": "Seven",
+      "marca": 6
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 98,
+    "fields": {
+      "nombre": "Cambridge",
+      "marca": 6
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 99,
+    "fields": {
+      "nombre": "X25",
+      "marca": 7
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 100,
+    "fields": {
+      "nombre": "X35",
+      "marca": 7
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 101,
+    "fields": {
+      "nombre": "X55",
+      "marca": 7
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 102,
+    "fields": {
+      "nombre": "X65",
+      "marca": 7
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 103,
+    "fields": {
+      "nombre": "BJ20",
+      "marca": 7
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 104,
+    "fields": {
+      "nombre": "BJ40",
+      "marca": 7
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 105,
+    "fields": {
+      "nombre": "BJ80",
+      "marca": 7
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 106,
+    "fields": {
+      "nombre": "D20",
+      "marca": 7
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 107,
+    "fields": {
+      "nombre": "EU5",
+      "marca": 7
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 108,
+    "fields": {
+      "nombre": "EX360",
+      "marca": 7
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 109,
+    "fields": {
+      "nombre": "M20",
+      "marca": 7
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 110,
+    "fields": {
+      "nombre": "M50S",
+      "marca": 7
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 111,
+    "fields": {
+      "nombre": "Arnage",
+      "marca": 8
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 112,
+    "fields": {
+      "nombre": "Azure",
+      "marca": 8
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 113,
+    "fields": {
+      "nombre": "Bentayga",
+      "marca": 8
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 114,
+    "fields": {
+      "nombre": "Brooklands",
+      "marca": 8
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 115,
+    "fields": {
+      "nombre": "Continental GT",
+      "marca": 8
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 116,
+    "fields": {
+      "nombre": "Continental Flying Spur",
+      "marca": 8
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 117,
+    "fields": {
+      "nombre": "Flying Spur",
+      "marca": 8
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 118,
+    "fields": {
+      "nombre": "Mulsanne",
+      "marca": 8
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 119,
+    "fields": {
+      "nombre": "Turbo R",
+      "marca": 8
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 120,
+    "fields": {
+      "nombre": "Serie 1",
+      "marca": 9
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 121,
+    "fields": {
+      "nombre": "Serie 2",
+      "marca": 9
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 122,
+    "fields": {
+      "nombre": "Serie 3",
+      "marca": 9
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 123,
+    "fields": {
+      "nombre": "Serie 4",
+      "marca": 9
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 124,
+    "fields": {
+      "nombre": "Serie 5",
+      "marca": 9
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 125,
+    "fields": {
+      "nombre": "Serie 6",
+      "marca": 9
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 126,
+    "fields": {
+      "nombre": "Serie 7",
+      "marca": 9
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 127,
+    "fields": {
+      "nombre": "Serie 8",
+      "marca": 9
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 128,
+    "fields": {
+      "nombre": "X1",
+      "marca": 9
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 129,
+    "fields": {
+      "nombre": "X2",
+      "marca": 9
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 130,
+    "fields": {
+      "nombre": "X3",
+      "marca": 9
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 131,
+    "fields": {
+      "nombre": "X4",
+      "marca": 9
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 132,
+    "fields": {
+      "nombre": "X5",
+      "marca": 9
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 133,
+    "fields": {
+      "nombre": "X6",
+      "marca": 9
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 134,
+    "fields": {
+      "nombre": "X7",
+      "marca": 9
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 135,
+    "fields": {
+      "nombre": "Z3",
+      "marca": 9
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 136,
+    "fields": {
+      "nombre": "Z4",
+      "marca": 9
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 137,
+    "fields": {
+      "nombre": "Z8",
+      "marca": 9
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 138,
+    "fields": {
+      "nombre": "M2",
+      "marca": 9
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 139,
+    "fields": {
+      "nombre": "M3",
+      "marca": 9
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 140,
+    "fields": {
+      "nombre": "M4",
+      "marca": 9
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 141,
+    "fields": {
+      "nombre": "M5",
+      "marca": 9
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 142,
+    "fields": {
+      "nombre": "M6",
+      "marca": 9
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 143,
+    "fields": {
+      "nombre": "M8",
+      "marca": 9
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 144,
+    "fields": {
+      "nombre": "i3",
+      "marca": 9
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 145,
+    "fields": {
+      "nombre": "i4",
+      "marca": 9
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 146,
+    "fields": {
+      "nombre": "i8",
+      "marca": 9
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 147,
+    "fields": {
+      "nombre": "iX",
+      "marca": 9
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 148,
+    "fields": {
+      "nombre": "iX3",
+      "marca": 9
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 149,
+    "fields": {
+      "nombre": "FRV",
+      "marca": 10
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 150,
+    "fields": {
+      "nombre": "FSV",
+      "marca": 10
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 151,
+    "fields": {
+      "nombre": "H230",
+      "marca": 10
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 152,
+    "fields": {
+      "nombre": "H320",
+      "marca": 10
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 153,
+    "fields": {
+      "nombre": "H530",
+      "marca": 10
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 154,
+    "fields": {
+      "nombre": "M1",
+      "marca": 10
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 155,
+    "fields": {
+      "nombre": "M2",
+      "marca": 10
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 156,
+    "fields": {
+      "nombre": "V3",
+      "marca": 10
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 157,
+    "fields": {
+      "nombre": "V5",
+      "marca": 10
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 158,
+    "fields": {
+      "nombre": "V6",
+      "marca": 10
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 159,
+    "fields": {
+      "nombre": "EB110",
+      "marca": 11
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 160,
+    "fields": {
+      "nombre": "Veyron",
+      "marca": 11
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 161,
+    "fields": {
+      "nombre": "Chiron",
+      "marca": 11
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 162,
+    "fields": {
+      "nombre": "Divo",
+      "marca": 11
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 163,
+    "fields": {
+      "nombre": "Centodieci",
+      "marca": 11
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 164,
+    "fields": {
+      "nombre": "Bolide",
+      "marca": 11
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 165,
+    "fields": {
+      "nombre": "Mistral",
+      "marca": 11
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 166,
+    "fields": {
+      "nombre": "Century",
+      "marca": 12
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 167,
+    "fields": {
+      "nombre": "Electra",
+      "marca": 12
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 168,
+    "fields": {
+      "nombre": "Enclave",
+      "marca": 12
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 169,
+    "fields": {
+      "nombre": "Encore",
+      "marca": 12
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 170,
+    "fields": {
+      "nombre": "Envision",
+      "marca": 12
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 171,
+    "fields": {
+      "nombre": "Invicta",
+      "marca": 12
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 172,
+    "fields": {
+      "nombre": "Lacrosse",
+      "marca": 12
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 173,
+    "fields": {
+      "nombre": "LeSabre",
+      "marca": 12
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 174,
+    "fields": {
+      "nombre": "Park Avenue",
+      "marca": 12
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 175,
+    "fields": {
+      "nombre": "Regal",
+      "marca": 12
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 176,
+    "fields": {
+      "nombre": "Rendezvous",
+      "marca": 12
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 177,
+    "fields": {
+      "nombre": "Reatta",
+      "marca": 12
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 178,
+    "fields": {
+      "nombre": "Roadmaster",
+      "marca": 12
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 179,
+    "fields": {
+      "nombre": "Riviera",
+      "marca": 12
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 180,
+    "fields": {
+      "nombre": "Skylark",
+      "marca": 12
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 181,
+    "fields": {
+      "nombre": "Special",
+      "marca": 12
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 182,
+    "fields": {
+      "nombre": "Verano",
+      "marca": 12
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 183,
+    "fields": {
+      "nombre": "Wildcat",
+      "marca": 12
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 184,
+    "fields": {
+      "nombre": "F0",
+      "marca": 13
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 185,
+    "fields": {
+      "nombre": "F3",
+      "marca": 13
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 186,
+    "fields": {
+      "nombre": "F6",
+      "marca": 13
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 187,
+    "fields": {
+      "nombre": "G3",
+      "marca": 13
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 188,
+    "fields": {
+      "nombre": "G5",
+      "marca": 13
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 189,
+    "fields": {
+      "nombre": "G6",
+      "marca": 13
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 190,
+    "fields": {
+      "nombre": "S6",
+      "marca": 13
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 191,
+    "fields": {
+      "nombre": "S7",
+      "marca": 13
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 192,
+    "fields": {
+      "nombre": "Tang",
+      "marca": 13
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 193,
+    "fields": {
+      "nombre": "Qin",
+      "marca": 13
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 194,
+    "fields": {
+      "nombre": "Yuan",
+      "marca": 13
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 195,
+    "fields": {
+      "nombre": "Song",
+      "marca": 13
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 196,
+    "fields": {
+      "nombre": "Han",
+      "marca": 13
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 197,
+    "fields": {
+      "nombre": "Dolphin",
+      "marca": 13
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 198,
+    "fields": {
+      "nombre": "Seal",
+      "marca": 13
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 199,
+    "fields": {
+      "nombre": "e2",
+      "marca": 13
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 200,
+    "fields": {
+      "nombre": "e3",
+      "marca": 13
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 201,
+    "fields": {
+      "nombre": "e5",
+      "marca": 13
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 202,
+    "fields": {
+      "nombre": "T3",
+      "marca": 13
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 203,
+    "fields": {
+      "nombre": "ATS",
+      "marca": 14
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 204,
+    "fields": {
+      "nombre": "CT4",
+      "marca": 14
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 205,
+    "fields": {
+      "nombre": "CT5",
+      "marca": 14
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 206,
+    "fields": {
+      "nombre": "CT6",
+      "marca": 14
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 207,
+    "fields": {
+      "nombre": "CTS",
+      "marca": 14
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 208,
+    "fields": {
+      "nombre": "DeVille",
+      "marca": 14
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 209,
+    "fields": {
+      "nombre": "DTS",
+      "marca": 14
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 210,
+    "fields": {
+      "nombre": "Eldorado",
+      "marca": 14
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 211,
+    "fields": {
+      "nombre": "Escalade",
+      "marca": 14
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 212,
+    "fields": {
+      "nombre": "Lyriq",
+      "marca": 14
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 213,
+    "fields": {
+      "nombre": "Seville",
+      "marca": 14
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 214,
+    "fields": {
+      "nombre": "SRX",
+      "marca": 14
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 215,
+    "fields": {
+      "nombre": "STS",
+      "marca": 14
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 216,
+    "fields": {
+      "nombre": "XT4",
+      "marca": 14
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 217,
+    "fields": {
+      "nombre": "XT5",
+      "marca": 14
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 218,
+    "fields": {
+      "nombre": "XT6",
+      "marca": 14
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 219,
+    "fields": {
+      "nombre": "XTS",
+      "marca": 14
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 220,
+    "fields": {
+      "nombre": "Alsvin",
+      "marca": 15
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 221,
+    "fields": {
+      "nombre": "Benni",
+      "marca": 15
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 222,
+    "fields": {
+      "nombre": "CS15",
+      "marca": 15
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 223,
+    "fields": {
+      "nombre": "CS35",
+      "marca": 15
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 224,
+    "fields": {
+      "nombre": "CS55",
+      "marca": 15
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 225,
+    "fields": {
+      "nombre": "CS75",
+      "marca": 15
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 226,
+    "fields": {
+      "nombre": "CS85",
+      "marca": 15
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 227,
+    "fields": {
+      "nombre": "CS95",
+      "marca": 15
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 228,
+    "fields": {
+      "nombre": "Eado",
+      "marca": 15
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 229,
+    "fields": {
+      "nombre": "Hunter",
+      "marca": 15
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 230,
+    "fields": {
+      "nombre": "Raeton",
+      "marca": 15
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 231,
+    "fields": {
+      "nombre": "UNI-K",
+      "marca": 15
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 232,
+    "fields": {
+      "nombre": "UNI-T",
+      "marca": 15
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 233,
+    "fields": {
+      "nombre": "QQ",
+      "marca": 16
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 234,
+    "fields": {
+      "nombre": "Tiggo 2",
+      "marca": 16
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 235,
+    "fields": {
+      "nombre": "Tiggo 3",
+      "marca": 16
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 236,
+    "fields": {
+      "nombre": "Tiggo 4",
+      "marca": 16
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 237,
+    "fields": {
+      "nombre": "Tiggo 7",
+      "marca": 16
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 238,
+    "fields": {
+      "nombre": "Tiggo 8",
+      "marca": 16
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 239,
+    "fields": {
+      "nombre": "Arrizo 3",
+      "marca": 16
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 240,
+    "fields": {
+      "nombre": "Arrizo 5",
+      "marca": 16
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 241,
+    "fields": {
+      "nombre": "Arrizo 6",
+      "marca": 16
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 242,
+    "fields": {
+      "nombre": "Arrizo 7",
+      "marca": 16
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 243,
+    "fields": {
+      "nombre": "Fulwin",
+      "marca": 16
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 244,
+    "fields": {
+      "nombre": "Cowin",
+      "marca": 16
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 245,
+    "fields": {
+      "nombre": "A1",
+      "marca": 16
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 246,
+    "fields": {
+      "nombre": "A3",
+      "marca": 16
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 247,
+    "fields": {
+      "nombre": "E5",
+      "marca": 16
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 248,
+    "fields": {
+      "nombre": "Aveo",
+      "marca": 17
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 249,
+    "fields": {
+      "nombre": "Blazer",
+      "marca": 17
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 250,
+    "fields": {
+      "nombre": "Camaro",
+      "marca": 17
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 251,
+    "fields": {
+      "nombre": "Captiva",
+      "marca": 17
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 252,
+    "fields": {
+      "nombre": "Cavalier",
+      "marca": 17
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 253,
+    "fields": {
+      "nombre": "Celta",
+      "marca": 17
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 254,
+    "fields": {
+      "nombre": "Cobalt",
+      "marca": 17
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 255,
+    "fields": {
+      "nombre": "Colorado",
+      "marca": 17
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 256,
+    "fields": {
+      "nombre": "Corvette",
+      "marca": 17
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 257,
+    "fields": {
+      "nombre": "Cruze",
+      "marca": 17
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 258,
+    "fields": {
+      "nombre": "Equinox",
+      "marca": 17
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 259,
+    "fields": {
+      "nombre": "Grand Vitara",
+      "marca": 17
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 260,
+    "fields": {
+      "nombre": "Impala",
+      "marca": 17
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 261,
+    "fields": {
+      "nombre": "Malibu",
+      "marca": 17
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 262,
+    "fields": {
+      "nombre": "Montana",
+      "marca": 17
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 263,
+    "fields": {
+      "nombre": "Onix",
+      "marca": 17
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 264,
+    "fields": {
+      "nombre": "Orlando",
+      "marca": 17
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 265,
+    "fields": {
+      "nombre": "S10",
+      "marca": 17
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 266,
+    "fields": {
+      "nombre": "Sail",
+      "marca": 17
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 267,
+    "fields": {
+      "nombre": "Silverado",
+      "marca": 17
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 268,
+    "fields": {
+      "nombre": "Sonic",
+      "marca": 17
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 269,
+    "fields": {
+      "nombre": "Spark",
+      "marca": 17
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 270,
+    "fields": {
+      "nombre": "Spin",
+      "marca": 17
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 271,
+    "fields": {
+      "nombre": "Suburban",
+      "marca": 17
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 272,
+    "fields": {
+      "nombre": "Tahoe",
+      "marca": 17
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 273,
+    "fields": {
+      "nombre": "Tracker",
+      "marca": 17
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 274,
+    "fields": {
+      "nombre": "Trailblazer",
+      "marca": 17
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 275,
+    "fields": {
+      "nombre": "Traverse",
+      "marca": 17
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 276,
+    "fields": {
+      "nombre": "Trax",
+      "marca": 17
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 277,
+    "fields": {
+      "nombre": "Vectra",
+      "marca": 17
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 278,
+    "fields": {
+      "nombre": "Zafira",
+      "marca": 17
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 279,
+    "fields": {
+      "nombre": "300",
+      "marca": 18
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 280,
+    "fields": {
+      "nombre": "300C",
+      "marca": 18
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 281,
+    "fields": {
+      "nombre": "Aspen",
+      "marca": 18
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 282,
+    "fields": {
+      "nombre": "Cirrus",
+      "marca": 18
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 283,
+    "fields": {
+      "nombre": "Concorde",
+      "marca": 18
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 284,
+    "fields": {
+      "nombre": "Crossfire",
+      "marca": 18
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 285,
+    "fields": {
+      "nombre": "Imperial",
+      "marca": 18
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 286,
+    "fields": {
+      "nombre": "LeBaron",
+      "marca": 18
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 287,
+    "fields": {
+      "nombre": "Neon",
+      "marca": 18
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 288,
+    "fields": {
+      "nombre": "New Yorker",
+      "marca": 18
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 289,
+    "fields": {
+      "nombre": "Pacifica",
+      "marca": 18
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 290,
+    "fields": {
+      "nombre": "PT Cruiser",
+      "marca": 18
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 291,
+    "fields": {
+      "nombre": "Sebring",
+      "marca": 18
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 292,
+    "fields": {
+      "nombre": "Stratus",
+      "marca": 18
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 293,
+    "fields": {
+      "nombre": "Town & Country",
+      "marca": 18
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 294,
+    "fields": {
+      "nombre": "Voyager",
+      "marca": 18
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 295,
+    "fields": {
+      "nombre": "Ateca",
+      "marca": 19
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 296,
+    "fields": {
+      "nombre": "Born",
+      "marca": 19
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 297,
+    "fields": {
+      "nombre": "Formentor",
+      "marca": 19
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 298,
+    "fields": {
+      "nombre": "Leon",
+      "marca": 19
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 299,
+    "fields": {
+      "nombre": "Tavascan",
+      "marca": 19
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 300,
+    "fields": {
+      "nombre": "Terramar",
+      "marca": 19
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 301,
+    "fields": {
+      "nombre": "1300",
+      "marca": 20
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 302,
+    "fields": {
+      "nombre": "Dokker",
+      "marca": 20
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 303,
+    "fields": {
+      "nombre": "Duster",
+      "marca": 20
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 304,
+    "fields": {
+      "nombre": "Jogger",
+      "marca": 20
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 305,
+    "fields": {
+      "nombre": "Lodgy",
+      "marca": 20
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 306,
+    "fields": {
+      "nombre": "Logan",
+      "marca": 20
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 307,
+    "fields": {
+      "nombre": "Sandero",
+      "marca": 20
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 308,
+    "fields": {
+      "nombre": "Spring",
+      "marca": 20
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 309,
+    "fields": {
+      "nombre": "Cielo",
+      "marca": 21
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 310,
+    "fields": {
+      "nombre": "Espero",
+      "marca": 21
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 311,
+    "fields": {
+      "nombre": "Evanda",
+      "marca": 21
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 312,
+    "fields": {
+      "nombre": "Kalos",
+      "marca": 21
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 313,
+    "fields": {
+      "nombre": "Lacetti",
+      "marca": 21
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 314,
+    "fields": {
+      "nombre": "Lanos",
+      "marca": 21
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 315,
+    "fields": {
+      "nombre": "Leganza",
+      "marca": 21
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 316,
+    "fields": {
+      "nombre": "LeMans",
+      "marca": 21
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 317,
+    "fields": {
+      "nombre": "Matiz",
+      "marca": 21
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 318,
+    "fields": {
+      "nombre": "Musso",
+      "marca": 21
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 319,
+    "fields": {
+      "nombre": "Nexia",
+      "marca": 21
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 320,
+    "fields": {
+      "nombre": "Nubira",
+      "marca": 21
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 321,
+    "fields": {
+      "nombre": "Prince",
+      "marca": 21
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 322,
+    "fields": {
+      "nombre": "Racer",
+      "marca": 21
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 323,
+    "fields": {
+      "nombre": "Rezzo",
+      "marca": 21
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 324,
+    "fields": {
+      "nombre": "Tacuma",
+      "marca": 21
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 325,
+    "fields": {
+      "nombre": "Tico",
+      "marca": 21
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 326,
+    "fields": {
+      "nombre": "Applause",
+      "marca": 22
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 327,
+    "fields": {
+      "nombre": "Charade",
+      "marca": 22
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 328,
+    "fields": {
+      "nombre": "Copen",
+      "marca": 22
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 329,
+    "fields": {
+      "nombre": "Cuore",
+      "marca": 22
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 330,
+    "fields": {
+      "nombre": "Feroza",
+      "marca": 22
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 331,
+    "fields": {
+      "nombre": "Gran Move",
+      "marca": 22
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 332,
+    "fields": {
+      "nombre": "Hijet",
+      "marca": 22
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 333,
+    "fields": {
+      "nombre": "Materia",
+      "marca": 22
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 334,
+    "fields": {
+      "nombre": "Mira",
+      "marca": 22
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 335,
+    "fields": {
+      "nombre": "Rocky",
+      "marca": 22
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 336,
+    "fields": {
+      "nombre": "Sirion",
+      "marca": 22
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 337,
+    "fields": {
+      "nombre": "Terios",
+      "marca": 22
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 338,
+    "fields": {
+      "nombre": "YRV",
+      "marca": 22
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 339,
+    "fields": {
+      "nombre": "120Y",
+      "marca": 23
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 340,
+    "fields": {
+      "nombre": "160J",
+      "marca": 23
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 341,
+    "fields": {
+      "nombre": "240Z",
+      "marca": 23
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 342,
+    "fields": {
+      "nombre": "280ZX",
+      "marca": 23
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 343,
+    "fields": {
+      "nombre": "510",
+      "marca": 23
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 344,
+    "fields": {
+      "nombre": "720",
+      "marca": 23
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 345,
+    "fields": {
+      "nombre": "Bluebird",
+      "marca": 23
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 346,
+    "fields": {
+      "nombre": "Cherry",
+      "marca": 23
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 347,
+    "fields": {
+      "nombre": "GO",
+      "marca": 23
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 348,
+    "fields": {
+      "nombre": "Laurel",
+      "marca": 23
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 349,
+    "fields": {
+      "nombre": "Stanza",
+      "marca": 23
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 350,
+    "fields": {
+      "nombre": "Sunny",
+      "marca": 23
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 351,
+    "fields": {
+      "nombre": "Violet",
+      "marca": 23
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 352,
+    "fields": {
+      "nombre": "Attitude",
+      "marca": 24
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 353,
+    "fields": {
+      "nombre": "Avenger",
+      "marca": 24
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 354,
+    "fields": {
+      "nombre": "Caliber",
+      "marca": 24
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 355,
+    "fields": {
+      "nombre": "Caravan",
+      "marca": 24
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 356,
+    "fields": {
+      "nombre": "Challenger",
+      "marca": 24
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 357,
+    "fields": {
+      "nombre": "Charger",
+      "marca": 24
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 358,
+    "fields": {
+      "nombre": "Dakota",
+      "marca": 24
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 359,
+    "fields": {
+      "nombre": "Dart",
+      "marca": 24
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 360,
+    "fields": {
+      "nombre": "Durango",
+      "marca": 24
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 361,
+    "fields": {
+      "nombre": "Grand Caravan",
+      "marca": 24
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 362,
+    "fields": {
+      "nombre": "Journey",
+      "marca": 24
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 363,
+    "fields": {
+      "nombre": "Magnum",
+      "marca": 24
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 364,
+    "fields": {
+      "nombre": "Neon",
+      "marca": 24
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 365,
+    "fields": {
+      "nombre": "Nitro",
+      "marca": 24
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 366,
+    "fields": {
+      "nombre": "Ram",
+      "marca": 24
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 367,
+    "fields": {
+      "nombre": "Stratus",
+      "marca": 24
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 368,
+    "fields": {
+      "nombre": "Viper",
+      "marca": 24
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 369,
+    "fields": {
+      "nombre": "AX4",
+      "marca": 25
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 370,
+    "fields": {
+      "nombre": "AX5",
+      "marca": 25
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 371,
+    "fields": {
+      "nombre": "AX7",
+      "marca": 25
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 372,
+    "fields": {
+      "nombre": "DX3",
+      "marca": 25
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 373,
+    "fields": {
+      "nombre": "DX7",
+      "marca": 25
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 374,
+    "fields": {
+      "nombre": "Rich",
+      "marca": 25
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 375,
+    "fields": {
+      "nombre": "S30",
+      "marca": 25
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 376,
+    "fields": {
+      "nombre": "T5 Evo",
+      "marca": 25
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 377,
+    "fields": {
+      "nombre": "Aojun",
+      "marca": 26
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 378,
+    "fields": {
+      "nombre": "Plutus",
+      "marca": 26
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 379,
+    "fields": {
+      "nombre": "V22",
+      "marca": 26
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 380,
+    "fields": {
+      "nombre": "V25",
+      "marca": 26
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 381,
+    "fields": {
+      "nombre": "Cargo Van",
+      "marca": 26
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 382,
+    "fields": {
+      "nombre": "Pick-Up",
+      "marca": 26
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 383,
+    "fields": {
+      "nombre": "Besturn B50",
+      "marca": 27
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 384,
+    "fields": {
+      "nombre": "Besturn X40",
+      "marca": 27
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 385,
+    "fields": {
+      "nombre": "J6",
+      "marca": 27
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 386,
+    "fields": {
+      "nombre": "Oley",
+      "marca": 27
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 387,
+    "fields": {
+      "nombre": "T77",
+      "marca": 27
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 388,
+    "fields": {
+      "nombre": "V2",
+      "marca": 27
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 389,
+    "fields": {
+      "nombre": "V5",
+      "marca": 27
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 390,
+    "fields": {
+      "nombre": "X-PV",
+      "marca": 27
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 391,
+    "fields": {
+      "nombre": "296 GTB",
+      "marca": 28
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 392,
+    "fields": {
+      "nombre": "348",
+      "marca": 28
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 393,
+    "fields": {
+      "nombre": "355",
+      "marca": 28
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 394,
+    "fields": {
+      "nombre": "360 Modena",
+      "marca": 28
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 395,
+    "fields": {
+      "nombre": "430 Scuderia",
+      "marca": 28
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 396,
+    "fields": {
+      "nombre": "458 Italia",
+      "marca": 28
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 397,
+    "fields": {
+      "nombre": "488 GTB",
+      "marca": 28
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 398,
+    "fields": {
+      "nombre": "512 TR",
+      "marca": 28
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 399,
+    "fields": {
+      "nombre": "550 Maranello",
+      "marca": 28
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 400,
+    "fields": {
+      "nombre": "575M",
+      "marca": 28
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 401,
+    "fields": {
+      "nombre": "599 GTB Fiorano",
+      "marca": 28
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 402,
+    "fields": {
+      "nombre": "612 Scaglietti",
+      "marca": 28
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 403,
+    "fields": {
+      "nombre": "California",
+      "marca": 28
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 404,
+    "fields": {
+      "nombre": "F12berlinetta",
+      "marca": 28
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 405,
+    "fields": {
+      "nombre": "F40",
+      "marca": 28
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 406,
+    "fields": {
+      "nombre": "F50",
+      "marca": 28
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 407,
+    "fields": {
+      "nombre": "F8 Tributo",
+      "marca": 28
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 408,
+    "fields": {
+      "nombre": "GTC4Lusso",
+      "marca": 28
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 409,
+    "fields": {
+      "nombre": "LaFerrari",
+      "marca": 28
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 410,
+    "fields": {
+      "nombre": "Portofino",
+      "marca": 28
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 411,
+    "fields": {
+      "nombre": "Roma",
+      "marca": 28
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 412,
+    "fields": {
+      "nombre": "SF90 Stradale",
+      "marca": 28
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 413,
+    "fields": {
+      "nombre": "500",
+      "marca": 29
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 414,
+    "fields": {
+      "nombre": "500X",
+      "marca": 29
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 415,
+    "fields": {
+      "nombre": "Argo",
+      "marca": 29
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 416,
+    "fields": {
+      "nombre": "Bravo",
+      "marca": 29
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 417,
+    "fields": {
+      "nombre": "Cronos",
+      "marca": 29
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 418,
+    "fields": {
+      "nombre": "Ducato",
+      "marca": 29
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 419,
+    "fields": {
+      "nombre": "Fiorino",
+      "marca": 29
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 420,
+    "fields": {
+      "nombre": "Grand Siena",
+      "marca": 29
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 421,
+    "fields": {
+      "nombre": "Idea",
+      "marca": 29
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 422,
+    "fields": {
+      "nombre": "Marea",
+      "marca": 29
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 423,
+    "fields": {
+      "nombre": "Palio",
+      "marca": 29
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 424,
+    "fields": {
+      "nombre": "Panda",
+      "marca": 29
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 425,
+    "fields": {
+      "nombre": "Punto",
+      "marca": 29
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 426,
+    "fields": {
+      "nombre": "Qubo",
+      "marca": 29
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 427,
+    "fields": {
+      "nombre": "Siena",
+      "marca": 29
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 428,
+    "fields": {
+      "nombre": "Strada",
+      "marca": 29
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 429,
+    "fields": {
+      "nombre": "Tipo",
+      "marca": 29
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 430,
+    "fields": {
+      "nombre": "Uno",
+      "marca": 29
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 431,
+    "fields": {
+      "nombre": "Sauvana",
+      "marca": 30
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 432,
+    "fields": {
+      "nombre": "Tunland",
+      "marca": 30
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 433,
+    "fields": {
+      "nombre": "View CS2",
+      "marca": 30
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 434,
+    "fields": {
+      "nombre": "View CS2L",
+      "marca": 30
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 435,
+    "fields": {
+      "nombre": "View V5",
+      "marca": 30
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 436,
+    "fields": {
+      "nombre": "View V7",
+      "marca": 30
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 437,
+    "fields": {
+      "nombre": "CK",
+      "marca": 31
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 438,
+    "fields": {
+      "nombre": "Emgrand 7",
+      "marca": 31
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 439,
+    "fields": {
+      "nombre": "Emgrand X7",
+      "marca": 31
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 440,
+    "fields": {
+      "nombre": "GC6",
+      "marca": 31
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 441,
+    "fields": {
+      "nombre": "GX3",
+      "marca": 31
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 442,
+    "fields": {
+      "nombre": "MK",
+      "marca": 31
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 443,
+    "fields": {
+      "nombre": "Monjaro",
+      "marca": 31
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 444,
+    "fields": {
+      "nombre": "Okavango",
+      "marca": 31
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 445,
+    "fields": {
+      "nombre": "Tugella",
+      "marca": 31
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 446,
+    "fields": {
+      "nombre": "G70",
+      "marca": 32
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 447,
+    "fields": {
+      "nombre": "G80",
+      "marca": 32
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 448,
+    "fields": {
+      "nombre": "G90",
+      "marca": 32
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 449,
+    "fields": {
+      "nombre": "GV60",
+      "marca": 32
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 450,
+    "fields": {
+      "nombre": "GV70",
+      "marca": 32
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 451,
+    "fields": {
+      "nombre": "GV80",
+      "marca": 32
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 452,
+    "fields": {
+      "nombre": "Acadia",
+      "marca": 33
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 453,
+    "fields": {
+      "nombre": "Canyon",
+      "marca": 33
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 454,
+    "fields": {
+      "nombre": "Envoy",
+      "marca": 33
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 455,
+    "fields": {
+      "nombre": "Savana",
+      "marca": 33
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 456,
+    "fields": {
+      "nombre": "Sierra",
+      "marca": 33
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 457,
+    "fields": {
+      "nombre": "Terrain",
+      "marca": 33
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 458,
+    "fields": {
+      "nombre": "Yukon",
+      "marca": 33
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 459,
+    "fields": {
+      "nombre": "Coolbear",
+      "marca": 34
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 460,
+    "fields": {
+      "nombre": "Florid",
+      "marca": 34
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 461,
+    "fields": {
+      "nombre": "Haval H1",
+      "marca": 34
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 462,
+    "fields": {
+      "nombre": "Haval H2",
+      "marca": 34
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 463,
+    "fields": {
+      "nombre": "Haval H6",
+      "marca": 34
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 464,
+    "fields": {
+      "nombre": "Haval H9",
+      "marca": 34
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 465,
+    "fields": {
+      "nombre": "Poer",
+      "marca": 34
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 466,
+    "fields": {
+      "nombre": "Steed 5",
+      "marca": 34
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 467,
+    "fields": {
+      "nombre": "Steed 6",
+      "marca": 34
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 468,
+    "fields": {
+      "nombre": "Steed 7",
+      "marca": 34
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 469,
+    "fields": {
+      "nombre": "Voleex C30",
+      "marca": 34
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 470,
+    "fields": {
+      "nombre": "Wingle 5",
+      "marca": 34
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 471,
+    "fields": {
+      "nombre": "Wingle 6",
+      "marca": 34
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 472,
+    "fields": {
+      "nombre": "Wingle 7",
+      "marca": 34
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 473,
+    "fields": {
+      "nombre": "2",
+      "marca": 35
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 474,
+    "fields": {
+      "nombre": "3",
+      "marca": 35
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 475,
+    "fields": {
+      "nombre": "7X",
+      "marca": 35
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 476,
+    "fields": {
+      "nombre": "M3",
+      "marca": 35
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 477,
+    "fields": {
+      "nombre": "S5",
+      "marca": 35
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 478,
+    "fields": {
+      "nombre": "H1",
+      "marca": 36
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 479,
+    "fields": {
+      "nombre": "H2",
+      "marca": 36
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 480,
+    "fields": {
+      "nombre": "H6",
+      "marca": 36
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 481,
+    "fields": {
+      "nombre": "H6 Coupé",
+      "marca": 36
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 482,
+    "fields": {
+      "nombre": "H7",
+      "marca": 36
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 483,
+    "fields": {
+      "nombre": "H8",
+      "marca": 36
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 484,
+    "fields": {
+      "nombre": "H9",
+      "marca": 36
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 485,
+    "fields": {
+      "nombre": "Jolion",
+      "marca": 36
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 486,
+    "fields": {
+      "nombre": "Big Dog",
+      "marca": 36
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 487,
+    "fields": {
+      "nombre": "Accord",
+      "marca": 37
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 488,
+    "fields": {
+      "nombre": "BR-V",
+      "marca": 37
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 489,
+    "fields": {
+      "nombre": "City",
+      "marca": 37
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 490,
+    "fields": {
+      "nombre": "Civic",
+      "marca": 37
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 491,
+    "fields": {
+      "nombre": "CR-V",
+      "marca": 37
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 492,
+    "fields": {
+      "nombre": "Fit",
+      "marca": 37
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 493,
+    "fields": {
+      "nombre": "HR-V",
+      "marca": 37
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 494,
+    "fields": {
+      "nombre": "Integra",
+      "marca": 37
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 495,
+    "fields": {
+      "nombre": "Legend",
+      "marca": 37
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 496,
+    "fields": {
+      "nombre": "Odyssey",
+      "marca": 37
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 497,
+    "fields": {
+      "nombre": "Passport",
+      "marca": 37
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 498,
+    "fields": {
+      "nombre": "Pilot",
+      "marca": 37
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 499,
+    "fields": {
+      "nombre": "Prelude",
+      "marca": 37
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 500,
+    "fields": {
+      "nombre": "Ridgeline",
+      "marca": 37
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 501,
+    "fields": {
+      "nombre": "S2000",
+      "marca": 37
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 502,
+    "fields": {
+      "nombre": "Stream",
+      "marca": 37
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 503,
+    "fields": {
+      "nombre": "Accent",
+      "marca": 38
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 504,
+    "fields": {
+      "nombre": "Atos",
+      "marca": 38
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 505,
+    "fields": {
+      "nombre": "Avante",
+      "marca": 38
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 506,
+    "fields": {
+      "nombre": "Creta",
+      "marca": 38
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 507,
+    "fields": {
+      "nombre": "Elantra",
+      "marca": 38
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 508,
+    "fields": {
+      "nombre": "Galloper",
+      "marca": 38
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 509,
+    "fields": {
+      "nombre": "Genesis",
+      "marca": 38
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 510,
+    "fields": {
+      "nombre": "Grand i10",
+      "marca": 38
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 511,
+    "fields": {
+      "nombre": "H1",
+      "marca": 38
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 512,
+    "fields": {
+      "nombre": "i10",
+      "marca": 38
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 513,
+    "fields": {
+      "nombre": "i20",
+      "marca": 38
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 514,
+    "fields": {
+      "nombre": "i30",
+      "marca": 38
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 515,
+    "fields": {
+      "nombre": "i40",
+      "marca": 38
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 516,
+    "fields": {
+      "nombre": "Kona",
+      "marca": 38
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 517,
+    "fields": {
+      "nombre": "Palisade",
+      "marca": 38
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 518,
+    "fields": {
+      "nombre": "Santa Fe",
+      "marca": 38
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 519,
+    "fields": {
+      "nombre": "Sonata",
+      "marca": 38
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 520,
+    "fields": {
+      "nombre": "Staria",
+      "marca": 38
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 521,
+    "fields": {
+      "nombre": "Tucson",
+      "marca": 38
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 522,
+    "fields": {
+      "nombre": "Veloster",
+      "marca": 38
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 523,
+    "fields": {
+      "nombre": "Venue",
+      "marca": 38
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 524,
+    "fields": {
+      "nombre": "EX35",
+      "marca": 39
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 525,
+    "fields": {
+      "nombre": "FX35",
+      "marca": 39
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 526,
+    "fields": {
+      "nombre": "FX50",
+      "marca": 39
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 527,
+    "fields": {
+      "nombre": "G35",
+      "marca": 39
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 528,
+    "fields": {
+      "nombre": "JX35",
+      "marca": 39
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 529,
+    "fields": {
+      "nombre": "M37",
+      "marca": 39
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 530,
+    "fields": {
+      "nombre": "Q30",
+      "marca": 39
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 531,
+    "fields": {
+      "nombre": "Q50",
+      "marca": 39
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 532,
+    "fields": {
+      "nombre": "Q60",
+      "marca": 39
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 533,
+    "fields": {
+      "nombre": "Q70",
+      "marca": 39
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 534,
+    "fields": {
+      "nombre": "QX30",
+      "marca": 39
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 535,
+    "fields": {
+      "nombre": "QX50",
+      "marca": 39
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 536,
+    "fields": {
+      "nombre": "QX56",
+      "marca": 39
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 537,
+    "fields": {
+      "nombre": "QX60",
+      "marca": 39
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 538,
+    "fields": {
+      "nombre": "QX70",
+      "marca": 39
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 539,
+    "fields": {
+      "nombre": "QX80",
+      "marca": 39
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 540,
+    "fields": {
+      "nombre": "D-Max",
+      "marca": 40
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 541,
+    "fields": {
+      "nombre": "MU-X",
+      "marca": 40
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 542,
+    "fields": {
+      "nombre": "Rodeo",
+      "marca": 40
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 543,
+    "fields": {
+      "nombre": "Trooper",
+      "marca": 40
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 544,
+    "fields": {
+      "nombre": "VehiCROSS",
+      "marca": 40
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 545,
+    "fields": {
+      "nombre": "Wizard",
+      "marca": 40
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 546,
+    "fields": {
+      "nombre": "Daily",
+      "marca": 41
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 547,
+    "fields": {
+      "nombre": "Eurocargo",
+      "marca": 41
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 548,
+    "fields": {
+      "nombre": "Stralis",
+      "marca": 41
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 549,
+    "fields": {
+      "nombre": "Trakker",
+      "marca": 41
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 550,
+    "fields": {
+      "nombre": "J2",
+      "marca": 42
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 551,
+    "fields": {
+      "nombre": "J3",
+      "marca": 42
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 552,
+    "fields": {
+      "nombre": "J4",
+      "marca": 42
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 553,
+    "fields": {
+      "nombre": "J5",
+      "marca": 42
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 554,
+    "fields": {
+      "nombre": "Refine",
+      "marca": 42
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 555,
+    "fields": {
+      "nombre": "S2",
+      "marca": 42
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 556,
+    "fields": {
+      "nombre": "S3",
+      "marca": 42
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 557,
+    "fields": {
+      "nombre": "S4",
+      "marca": 42
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 558,
+    "fields": {
+      "nombre": "S5",
+      "marca": 42
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 559,
+    "fields": {
+      "nombre": "S7",
+      "marca": 42
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 560,
+    "fields": {
+      "nombre": "T6",
+      "marca": 42
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 561,
+    "fields": {
+      "nombre": "T8",
+      "marca": 42
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 562,
+    "fields": {
+      "nombre": "E-Pace",
+      "marca": 43
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 563,
+    "fields": {
+      "nombre": "F-Pace",
+      "marca": 43
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 564,
+    "fields": {
+      "nombre": "F-Type",
+      "marca": 43
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 565,
+    "fields": {
+      "nombre": "I-Pace",
+      "marca": 43
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 566,
+    "fields": {
+      "nombre": "S-Type",
+      "marca": 43
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 567,
+    "fields": {
+      "nombre": "X-Type",
+      "marca": 43
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 568,
+    "fields": {
+      "nombre": "XE",
+      "marca": 43
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 569,
+    "fields": {
+      "nombre": "XF",
+      "marca": 43
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 570,
+    "fields": {
+      "nombre": "XJ",
+      "marca": 43
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 571,
+    "fields": {
+      "nombre": "XK",
+      "marca": 43
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 572,
+    "fields": {
+      "nombre": "Cherokee",
+      "marca": 44
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 573,
+    "fields": {
+      "nombre": "Commander",
+      "marca": 44
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 574,
+    "fields": {
+      "nombre": "Compass",
+      "marca": 44
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 575,
+    "fields": {
+      "nombre": "Gladiator",
+      "marca": 44
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 576,
+    "fields": {
+      "nombre": "Grand Cherokee",
+      "marca": 44
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 577,
+    "fields": {
+      "nombre": "Patriot",
+      "marca": 44
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 578,
+    "fields": {
+      "nombre": "Renegade",
+      "marca": 44
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 579,
+    "fields": {
+      "nombre": "Wagoneer",
+      "marca": 44
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 580,
+    "fields": {
+      "nombre": "Wrangler",
+      "marca": 44
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 581,
+    "fields": {
+      "nombre": "Dashing",
+      "marca": 45
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 582,
+    "fields": {
+      "nombre": "X70",
+      "marca": 45
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 583,
+    "fields": {
+      "nombre": "X70 Plus",
+      "marca": 45
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 584,
+    "fields": {
+      "nombre": "X90",
+      "marca": 45
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 585,
+    "fields": {
+      "nombre": "Baodian",
+      "marca": 46
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 586,
+    "fields": {
+      "nombre": "Conquer",
+      "marca": 46
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 587,
+    "fields": {
+      "nombre": "Vigus",
+      "marca": 46
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 588,
+    "fields": {
+      "nombre": "Yuhu",
+      "marca": 46
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 589,
+    "fields": {
+      "nombre": "Teshun",
+      "marca": 46
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 590,
+    "fields": {
+      "nombre": "A380",
+      "marca": 47
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 591,
+    "fields": {
+      "nombre": "Mistral",
+      "marca": 47
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 592,
+    "fields": {
+      "nombre": "UFO",
+      "marca": 47
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 593,
+    "fields": {
+      "nombre": "Carens",
+      "marca": 48
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 594,
+    "fields": {
+      "nombre": "Carnival",
+      "marca": 48
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 595,
+    "fields": {
+      "nombre": "Ceed",
+      "marca": 48
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 596,
+    "fields": {
+      "nombre": "Cerato",
+      "marca": 48
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 597,
+    "fields": {
+      "nombre": "EV6",
+      "marca": 48
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 598,
+    "fields": {
+      "nombre": "K2700",
+      "marca": 48
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 599,
+    "fields": {
+      "nombre": "Mohave",
+      "marca": 48
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 600,
+    "fields": {
+      "nombre": "Morning",
+      "marca": 48
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 601,
+    "fields": {
+      "nombre": "Niro",
+      "marca": 48
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 602,
+    "fields": {
+      "nombre": "Opirus",
+      "marca": 48
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 603,
+    "fields": {
+      "nombre": "Optima",
+      "marca": 48
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 604,
+    "fields": {
+      "nombre": "Picanto",
+      "marca": 48
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 605,
+    "fields": {
+      "nombre": "Rio",
+      "marca": 48
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 606,
+    "fields": {
+      "nombre": "Seltos",
+      "marca": 48
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 607,
+    "fields": {
+      "nombre": "Sorento",
+      "marca": 48
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 608,
+    "fields": {
+      "nombre": "Soul",
+      "marca": 48
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 609,
+    "fields": {
+      "nombre": "Sportage",
+      "marca": 48
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 610,
+    "fields": {
+      "nombre": "Stinger",
+      "marca": 48
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 611,
+    "fields": {
+      "nombre": "Stonic",
+      "marca": 48
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 612,
+    "fields": {
+      "nombre": "Telluride",
+      "marca": 48
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 613,
+    "fields": {
+      "nombre": "Kingwin",
+      "marca": 49
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 614,
+    "fields": {
+      "nombre": "XMQ6129",
+      "marca": 49
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 615,
+    "fields": {
+      "nombre": "XMQ6900",
+      "marca": 49
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 616,
+    "fields": {
+      "nombre": "XMQ6996",
+      "marca": 49
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 617,
+    "fields": {
+      "nombre": "Agera",
+      "marca": 50
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 618,
+    "fields": {
+      "nombre": "CC8S",
+      "marca": 50
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 619,
+    "fields": {
+      "nombre": "CCGT",
+      "marca": 50
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 620,
+    "fields": {
+      "nombre": "CCR",
+      "marca": 50
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 621,
+    "fields": {
+      "nombre": "CCX",
+      "marca": 50
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 622,
+    "fields": {
+      "nombre": "Gemera",
+      "marca": 50
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 623,
+    "fields": {
+      "nombre": "Jesko",
+      "marca": 50
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 624,
+    "fields": {
+      "nombre": "One:1",
+      "marca": 50
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 625,
+    "fields": {
+      "nombre": "Regera",
+      "marca": 50
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 626,
+    "fields": {
+      "nombre": "2101",
+      "marca": 51
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 627,
+    "fields": {
+      "nombre": "2104",
+      "marca": 51
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 628,
+    "fields": {
+      "nombre": "2105",
+      "marca": 51
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 629,
+    "fields": {
+      "nombre": "2107",
+      "marca": 51
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 630,
+    "fields": {
+      "nombre": "Granta",
+      "marca": 51
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 631,
+    "fields": {
+      "nombre": "Kalina",
+      "marca": 51
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 632,
+    "fields": {
+      "nombre": "Largus",
+      "marca": 51
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 633,
+    "fields": {
+      "nombre": "Niva",
+      "marca": 51
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 634,
+    "fields": {
+      "nombre": "Samara",
+      "marca": 51
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 635,
+    "fields": {
+      "nombre": "Vesta",
+      "marca": 51
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 636,
+    "fields": {
+      "nombre": "XRAY",
+      "marca": 51
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 637,
+    "fields": {
+      "nombre": "Aventador",
+      "marca": 52
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 638,
+    "fields": {
+      "nombre": "Countach",
+      "marca": 52
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 639,
+    "fields": {
+      "nombre": "Diablo",
+      "marca": 52
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 640,
+    "fields": {
+      "nombre": "Espada",
+      "marca": 52
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 641,
+    "fields": {
+      "nombre": "Gallardo",
+      "marca": 52
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 642,
+    "fields": {
+      "nombre": "Huracán",
+      "marca": 52
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 643,
+    "fields": {
+      "nombre": "Miura",
+      "marca": 52
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 644,
+    "fields": {
+      "nombre": "Murciélago",
+      "marca": 52
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 645,
+    "fields": {
+      "nombre": "Reventón",
+      "marca": 52
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 646,
+    "fields": {
+      "nombre": "Sian",
+      "marca": 52
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 647,
+    "fields": {
+      "nombre": "Urus",
+      "marca": 52
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 648,
+    "fields": {
+      "nombre": "Veneno",
+      "marca": 52
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 649,
+    "fields": {
+      "nombre": "Beta",
+      "marca": 53
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 650,
+    "fields": {
+      "nombre": "Dedra",
+      "marca": 53
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 651,
+    "fields": {
+      "nombre": "Delta",
+      "marca": 53
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 652,
+    "fields": {
+      "nombre": "Fulvia",
+      "marca": 53
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 653,
+    "fields": {
+      "nombre": "Gamma",
+      "marca": 53
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 654,
+    "fields": {
+      "nombre": "Kappa",
+      "marca": 53
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 655,
+    "fields": {
+      "nombre": "Lybra",
+      "marca": 53
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 656,
+    "fields": {
+      "nombre": "Musa",
+      "marca": 53
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 657,
+    "fields": {
+      "nombre": "Prisma",
+      "marca": 53
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 658,
+    "fields": {
+      "nombre": "Stratos",
+      "marca": 53
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 659,
+    "fields": {
+      "nombre": "Thema",
+      "marca": 53
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 660,
+    "fields": {
+      "nombre": "Thesis",
+      "marca": 53
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 661,
+    "fields": {
+      "nombre": "Voyager",
+      "marca": 53
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 662,
+    "fields": {
+      "nombre": "Ypsilon",
+      "marca": 53
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 663,
+    "fields": {
+      "nombre": "Zeta",
+      "marca": 53
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 664,
+    "fields": {
+      "nombre": "Defender",
+      "marca": 54
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 665,
+    "fields": {
+      "nombre": "Discovery",
+      "marca": 54
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 666,
+    "fields": {
+      "nombre": "Discovery Sport",
+      "marca": 54
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 667,
+    "fields": {
+      "nombre": "Freelander",
+      "marca": 54
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 668,
+    "fields": {
+      "nombre": "Range Rover",
+      "marca": 54
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 669,
+    "fields": {
+      "nombre": "Range Rover Evoque",
+      "marca": 54
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 670,
+    "fields": {
+      "nombre": "Range Rover Sport",
+      "marca": 54
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 671,
+    "fields": {
+      "nombre": "Range Rover Velar",
+      "marca": 54
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 672,
+    "fields": {
+      "nombre": "CT",
+      "marca": 55
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 673,
+    "fields": {
+      "nombre": "ES",
+      "marca": 55
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 674,
+    "fields": {
+      "nombre": "GS",
+      "marca": 55
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 675,
+    "fields": {
+      "nombre": "GX",
+      "marca": 55
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 676,
+    "fields": {
+      "nombre": "IS",
+      "marca": 55
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 677,
+    "fields": {
+      "nombre": "LC",
+      "marca": 55
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 678,
+    "fields": {
+      "nombre": "LS",
+      "marca": 55
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 679,
+    "fields": {
+      "nombre": "LX",
+      "marca": 55
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 680,
+    "fields": {
+      "nombre": "NX",
+      "marca": 55
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 681,
+    "fields": {
+      "nombre": "RC",
+      "marca": 55
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 682,
+    "fields": {
+      "nombre": "RX",
+      "marca": 55
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 683,
+    "fields": {
+      "nombre": "SC",
+      "marca": 55
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 684,
+    "fields": {
+      "nombre": "UX",
+      "marca": 55
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 685,
+    "fields": {
+      "nombre": "320",
+      "marca": 56
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 686,
+    "fields": {
+      "nombre": "520",
+      "marca": 56
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 687,
+    "fields": {
+      "nombre": "530",
+      "marca": 56
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 688,
+    "fields": {
+      "nombre": "620",
+      "marca": 56
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 689,
+    "fields": {
+      "nombre": "720",
+      "marca": 56
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 690,
+    "fields": {
+      "nombre": "Foison",
+      "marca": 56
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 691,
+    "fields": {
+      "nombre": "M7",
+      "marca": 56
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 692,
+    "fields": {
+      "nombre": "X50",
+      "marca": 56
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 693,
+    "fields": {
+      "nombre": "X60",
+      "marca": 56
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 694,
+    "fields": {
+      "nombre": "X70",
+      "marca": 56
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 695,
+    "fields": {
+      "nombre": "Aviator",
+      "marca": 57
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 696,
+    "fields": {
+      "nombre": "Continental",
+      "marca": 57
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 697,
+    "fields": {
+      "nombre": "Corsair",
+      "marca": 57
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 698,
+    "fields": {
+      "nombre": "LS",
+      "marca": 57
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 699,
+    "fields": {
+      "nombre": "MKC",
+      "marca": 57
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 700,
+    "fields": {
+      "nombre": "MKS",
+      "marca": 57
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 701,
+    "fields": {
+      "nombre": "MKT",
+      "marca": 57
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 702,
+    "fields": {
+      "nombre": "MKX",
+      "marca": 57
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 703,
+    "fields": {
+      "nombre": "MKZ",
+      "marca": 57
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 704,
+    "fields": {
+      "nombre": "Navigator",
+      "marca": 57
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 705,
+    "fields": {
+      "nombre": "Town Car",
+      "marca": 57
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 706,
+    "fields": {
+      "nombre": "Elise",
+      "marca": 58
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 707,
+    "fields": {
+      "nombre": "Emira",
+      "marca": 58
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 708,
+    "fields": {
+      "nombre": "Esprit",
+      "marca": 58
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 709,
+    "fields": {
+      "nombre": "Evija",
+      "marca": 58
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 710,
+    "fields": {
+      "nombre": "Evora",
+      "marca": 58
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 711,
+    "fields": {
+      "nombre": "Exige",
+      "marca": 58
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 712,
+    "fields": {
+      "nombre": "Bolero",
+      "marca": 59
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 713,
+    "fields": {
+      "nombre": "KUV100",
+      "marca": 59
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 714,
+    "fields": {
+      "nombre": "Marazzo",
+      "marca": 59
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 715,
+    "fields": {
+      "nombre": "Scorpio",
+      "marca": 59
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 716,
+    "fields": {
+      "nombre": "Thar",
+      "marca": 59
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 717,
+    "fields": {
+      "nombre": "TUV300",
+      "marca": 59
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 718,
+    "fields": {
+      "nombre": "XUV300",
+      "marca": 59
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 719,
+    "fields": {
+      "nombre": "XUV500",
+      "marca": 59
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 720,
+    "fields": {
+      "nombre": "XUV700",
+      "marca": 59
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 721,
+    "fields": {
+      "nombre": "3200 GT",
+      "marca": 60
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 722,
+    "fields": {
+      "nombre": "Ghibli",
+      "marca": 60
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 723,
+    "fields": {
+      "nombre": "GranCabrio",
+      "marca": 60
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 724,
+    "fields": {
+      "nombre": "GranTurismo",
+      "marca": 60
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 725,
+    "fields": {
+      "nombre": "Levante",
+      "marca": 60
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 726,
+    "fields": {
+      "nombre": "MC12",
+      "marca": 60
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 727,
+    "fields": {
+      "nombre": "MC20",
+      "marca": 60
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 728,
+    "fields": {
+      "nombre": "Quattroporte",
+      "marca": 60
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 729,
+    "fields": {
+      "nombre": "121",
+      "marca": 61
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 730,
+    "fields": {
+      "nombre": "2",
+      "marca": 61
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 731,
+    "fields": {
+      "nombre": "3",
+      "marca": 61
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 732,
+    "fields": {
+      "nombre": "6",
+      "marca": 61
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 733,
+    "fields": {
+      "nombre": "626",
+      "marca": 61
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 734,
+    "fields": {
+      "nombre": "929",
+      "marca": 61
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 735,
+    "fields": {
+      "nombre": "Atenza",
+      "marca": 61
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 736,
+    "fields": {
+      "nombre": "BT-50",
+      "marca": 61
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 737,
+    "fields": {
+      "nombre": "CX-3",
+      "marca": 61
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 738,
+    "fields": {
+      "nombre": "CX-30",
+      "marca": 61
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 739,
+    "fields": {
+      "nombre": "CX-5",
+      "marca": 61
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 740,
+    "fields": {
+      "nombre": "CX-7",
+      "marca": 61
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 741,
+    "fields": {
+      "nombre": "CX-9",
+      "marca": 61
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 742,
+    "fields": {
+      "nombre": "CX-90",
+      "marca": 61
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 743,
+    "fields": {
+      "nombre": "MX-3",
+      "marca": 61
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 744,
+    "fields": {
+      "nombre": "MX-5",
+      "marca": 61
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 745,
+    "fields": {
+      "nombre": "MX-6",
+      "marca": 61
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 746,
+    "fields": {
+      "nombre": "RX-7",
+      "marca": 61
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 747,
+    "fields": {
+      "nombre": "RX-8",
+      "marca": 61
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 748,
+    "fields": {
+      "nombre": "540C",
+      "marca": 62
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 749,
+    "fields": {
+      "nombre": "570S",
+      "marca": 62
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 750,
+    "fields": {
+      "nombre": "600LT",
+      "marca": 62
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 751,
+    "fields": {
+      "nombre": "620R",
+      "marca": 62
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 752,
+    "fields": {
+      "nombre": "650S",
+      "marca": 62
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 753,
+    "fields": {
+      "nombre": "675LT",
+      "marca": 62
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 754,
+    "fields": {
+      "nombre": "720S",
+      "marca": 62
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 755,
+    "fields": {
+      "nombre": "765LT",
+      "marca": 62
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 756,
+    "fields": {
+      "nombre": "Artura",
+      "marca": 62
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 757,
+    "fields": {
+      "nombre": "Elva",
+      "marca": 62
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 758,
+    "fields": {
+      "nombre": "GT",
+      "marca": 62
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 759,
+    "fields": {
+      "nombre": "P1",
+      "marca": 62
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 760,
+    "fields": {
+      "nombre": "Senna",
+      "marca": 62
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 761,
+    "fields": {
+      "nombre": "Speedtail",
+      "marca": 62
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 762,
+    "fields": {
+      "nombre": "A-Class",
+      "marca": 63
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 763,
+    "fields": {
+      "nombre": "AMG GT",
+      "marca": 63
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 764,
+    "fields": {
+      "nombre": "B-Class",
+      "marca": 63
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 765,
+    "fields": {
+      "nombre": "C-Class",
+      "marca": 63
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 766,
+    "fields": {
+      "nombre": "CL-Class",
+      "marca": 63
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 767,
+    "fields": {
+      "nombre": "CLA-Class",
+      "marca": 63
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 768,
+    "fields": {
+      "nombre": "CLK-Class",
+      "marca": 63
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 769,
+    "fields": {
+      "nombre": "CLS-Class",
+      "marca": 63
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 770,
+    "fields": {
+      "nombre": "E-Class",
+      "marca": 63
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 771,
+    "fields": {
+      "nombre": "G-Class",
+      "marca": 63
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 772,
+    "fields": {
+      "nombre": "GL-Class",
+      "marca": 63
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 773,
+    "fields": {
+      "nombre": "GLA-Class",
+      "marca": 63
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 774,
+    "fields": {
+      "nombre": "GLB-Class",
+      "marca": 63
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 775,
+    "fields": {
+      "nombre": "GLC-Class",
+      "marca": 63
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 776,
+    "fields": {
+      "nombre": "GLE-Class",
+      "marca": 63
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 777,
+    "fields": {
+      "nombre": "GLK-Class",
+      "marca": 63
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 778,
+    "fields": {
+      "nombre": "GLS-Class",
+      "marca": 63
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 779,
+    "fields": {
+      "nombre": "M-Class",
+      "marca": 63
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 780,
+    "fields": {
+      "nombre": "R-Class",
+      "marca": 63
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 781,
+    "fields": {
+      "nombre": "S-Class",
+      "marca": 63
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 782,
+    "fields": {
+      "nombre": "SL-Class",
+      "marca": 63
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 783,
+    "fields": {
+      "nombre": "SLK-Class",
+      "marca": 63
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 784,
+    "fields": {
+      "nombre": "SLS AMG",
+      "marca": 63
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 785,
+    "fields": {
+      "nombre": "Sprinter",
+      "marca": 63
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 786,
+    "fields": {
+      "nombre": "V-Class",
+      "marca": 63
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 787,
+    "fields": {
+      "nombre": "3",
+      "marca": 64
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 788,
+    "fields": {
+      "nombre": "5",
+      "marca": 64
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 789,
+    "fields": {
+      "nombre": "6",
+      "marca": 64
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 790,
+    "fields": {
+      "nombre": "350",
+      "marca": 64
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 791,
+    "fields": {
+      "nombre": "550",
+      "marca": 64
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 792,
+    "fields": {
+      "nombre": "750",
+      "marca": 64
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 793,
+    "fields": {
+      "nombre": "ZS",
+      "marca": 64
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 794,
+    "fields": {
+      "nombre": "HS",
+      "marca": 64
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 795,
+    "fields": {
+      "nombre": "RX5",
+      "marca": 64
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 796,
+    "fields": {
+      "nombre": "Marvel R",
+      "marca": 64
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 797,
+    "fields": {
+      "nombre": "Extender",
+      "marca": 64
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 798,
+    "fields": {
+      "nombre": "Cooper",
+      "marca": 65
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 799,
+    "fields": {
+      "nombre": "Cooper S",
+      "marca": 65
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 800,
+    "fields": {
+      "nombre": "Clubman",
+      "marca": 65
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 801,
+    "fields": {
+      "nombre": "Countryman",
+      "marca": 65
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 802,
+    "fields": {
+      "nombre": "Paceman",
+      "marca": 65
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 803,
+    "fields": {
+      "nombre": "Roadster",
+      "marca": 65
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 804,
+    "fields": {
+      "nombre": "3000GT",
+      "marca": 66
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 805,
+    "fields": {
+      "nombre": "ASX",
+      "marca": 66
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 806,
+    "fields": {
+      "nombre": "Colt",
+      "marca": 66
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 807,
+    "fields": {
+      "nombre": "Eclipse",
+      "marca": 66
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 808,
+    "fields": {
+      "nombre": "Eclipse Cross",
+      "marca": 66
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 809,
+    "fields": {
+      "nombre": "Galant",
+      "marca": 66
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 810,
+    "fields": {
+      "nombre": "Grandis",
+      "marca": 66
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 811,
+    "fields": {
+      "nombre": "L200",
+      "marca": 66
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 812,
+    "fields": {
+      "nombre": "Lancer",
+      "marca": 66
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 813,
+    "fields": {
+      "nombre": "Mirage",
+      "marca": 66
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 814,
+    "fields": {
+      "nombre": "Montero",
+      "marca": 66
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 815,
+    "fields": {
+      "nombre": "Outlander",
+      "marca": 66
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 816,
+    "fields": {
+      "nombre": "Pajero",
+      "marca": 66
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 817,
+    "fields": {
+      "nombre": "Space Star",
+      "marca": 66
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 818,
+    "fields": {
+      "nombre": "Eight",
+      "marca": 67
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 819,
+    "fields": {
+      "nombre": "Isis",
+      "marca": 67
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 820,
+    "fields": {
+      "nombre": "Marina",
+      "marca": 67
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 821,
+    "fields": {
+      "nombre": "Minor",
+      "marca": 67
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 822,
+    "fields": {
+      "nombre": "Oxford",
+      "marca": 67
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 823,
+    "fields": {
+      "nombre": "370Z",
+      "marca": 68
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 824,
+    "fields": {
+      "nombre": "Altima",
+      "marca": 68
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 825,
+    "fields": {
+      "nombre": "Armada",
+      "marca": 68
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 826,
+    "fields": {
+      "nombre": "Cube",
+      "marca": 68
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 827,
+    "fields": {
+      "nombre": "Frontier",
+      "marca": 68
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 828,
+    "fields": {
+      "nombre": "GT-R",
+      "marca": 68
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 829,
+    "fields": {
+      "nombre": "Juke",
+      "marca": 68
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 830,
+    "fields": {
+      "nombre": "Kicks",
+      "marca": 68
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 831,
+    "fields": {
+      "nombre": "Leaf",
+      "marca": 68
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 832,
+    "fields": {
+      "nombre": "March",
+      "marca": 68
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 833,
+    "fields": {
+      "nombre": "Maxima",
+      "marca": 68
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 834,
+    "fields": {
+      "nombre": "Murano",
+      "marca": 68
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 835,
+    "fields": {
+      "nombre": "Navara",
+      "marca": 68
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 836,
+    "fields": {
+      "nombre": "Note",
+      "marca": 68
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 837,
+    "fields": {
+      "nombre": "NP300",
+      "marca": 68
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 838,
+    "fields": {
+      "nombre": "Pathfinder",
+      "marca": 68
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 839,
+    "fields": {
+      "nombre": "Patrol",
+      "marca": 68
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 840,
+    "fields": {
+      "nombre": "Qashqai",
+      "marca": 68
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 841,
+    "fields": {
+      "nombre": "Rogue",
+      "marca": 68
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 842,
+    "fields": {
+      "nombre": "Sentra",
+      "marca": 68
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 843,
+    "fields": {
+      "nombre": "Tiida",
+      "marca": 68
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 844,
+    "fields": {
+      "nombre": "Versa",
+      "marca": 68
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 845,
+    "fields": {
+      "nombre": "X-Trail",
+      "marca": 68
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 846,
+    "fields": {
+      "nombre": "Xterra",
+      "marca": 68
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 847,
+    "fields": {
+      "nombre": "Astra",
+      "marca": 69
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 848,
+    "fields": {
+      "nombre": "Corsa",
+      "marca": 69
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 849,
+    "fields": {
+      "nombre": "Grandland",
+      "marca": 69
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 850,
+    "fields": {
+      "nombre": "Insignia",
+      "marca": 69
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 851,
+    "fields": {
+      "nombre": "Kadett",
+      "marca": 69
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 852,
+    "fields": {
+      "nombre": "Mokka",
+      "marca": 69
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 853,
+    "fields": {
+      "nombre": "Vectra",
+      "marca": 69
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 854,
+    "fields": {
+      "nombre": "Zafira",
+      "marca": 69
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 855,
+    "fields": {
+      "nombre": "104",
+      "marca": 70
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 856,
+    "fields": {
+      "nombre": "106",
+      "marca": 70
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 857,
+    "fields": {
+      "nombre": "107",
+      "marca": 70
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 858,
+    "fields": {
+      "nombre": "2008",
+      "marca": 70
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 859,
+    "fields": {
+      "nombre": "205",
+      "marca": 70
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 860,
+    "fields": {
+      "nombre": "206",
+      "marca": 70
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 861,
+    "fields": {
+      "nombre": "207",
+      "marca": 70
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 862,
+    "fields": {
+      "nombre": "208",
+      "marca": 70
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 863,
+    "fields": {
+      "nombre": "3008",
+      "marca": 70
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 864,
+    "fields": {
+      "nombre": "301",
+      "marca": 70
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 865,
+    "fields": {
+      "nombre": "306",
+      "marca": 70
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 866,
+    "fields": {
+      "nombre": "307",
+      "marca": 70
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 867,
+    "fields": {
+      "nombre": "308",
+      "marca": 70
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 868,
+    "fields": {
+      "nombre": "309",
+      "marca": 70
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 869,
+    "fields": {
+      "nombre": "405",
+      "marca": 70
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 870,
+    "fields": {
+      "nombre": "406",
+      "marca": 70
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 871,
+    "fields": {
+      "nombre": "407",
+      "marca": 70
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 872,
+    "fields": {
+      "nombre": "5008",
+      "marca": 70
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 873,
+    "fields": {
+      "nombre": "508",
+      "marca": 70
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 874,
+    "fields": {
+      "nombre": "607",
+      "marca": 70
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 875,
+    "fields": {
+      "nombre": "806",
+      "marca": 70
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 876,
+    "fields": {
+      "nombre": "807",
+      "marca": 70
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 877,
+    "fields": {
+      "nombre": "Partner",
+      "marca": 70
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 878,
+    "fields": {
+      "nombre": "Rifter",
+      "marca": 70
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 879,
+    "fields": {
+      "nombre": "1",
+      "marca": 71
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 880,
+    "fields": {
+      "nombre": "2",
+      "marca": 71
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 881,
+    "fields": {
+      "nombre": "3",
+      "marca": 71
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 882,
+    "fields": {
+      "nombre": "4",
+      "marca": 71
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 883,
+    "fields": {
+      "nombre": "5",
+      "marca": 71
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 884,
+    "fields": {
+      "nombre": "Bonneville",
+      "marca": 72
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 885,
+    "fields": {
+      "nombre": "Fiero",
+      "marca": 72
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 886,
+    "fields": {
+      "nombre": "Firebird",
+      "marca": 72
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 887,
+    "fields": {
+      "nombre": "G3",
+      "marca": 72
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 888,
+    "fields": {
+      "nombre": "G5",
+      "marca": 72
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 889,
+    "fields": {
+      "nombre": "G6",
+      "marca": 72
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 890,
+    "fields": {
+      "nombre": "G8",
+      "marca": 72
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 891,
+    "fields": {
+      "nombre": "Grand Am",
+      "marca": 72
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 892,
+    "fields": {
+      "nombre": "Grand Prix",
+      "marca": 72
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 893,
+    "fields": {
+      "nombre": "Solstice",
+      "marca": 72
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 894,
+    "fields": {
+      "nombre": "Sunfire",
+      "marca": 72
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 895,
+    "fields": {
+      "nombre": "Torrent",
+      "marca": 72
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 896,
+    "fields": {
+      "nombre": "Trans Am",
+      "marca": 72
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 897,
+    "fields": {
+      "nombre": "Vibe",
+      "marca": 72
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 898,
+    "fields": {
+      "nombre": "356",
+      "marca": 73
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 899,
+    "fields": {
+      "nombre": "718 Boxster",
+      "marca": 73
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 900,
+    "fields": {
+      "nombre": "718 Cayman",
+      "marca": 73
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 901,
+    "fields": {
+      "nombre": "911",
+      "marca": 73
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 902,
+    "fields": {
+      "nombre": "918 Spyder",
+      "marca": 73
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 903,
+    "fields": {
+      "nombre": "924",
+      "marca": 73
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 904,
+    "fields": {
+      "nombre": "928",
+      "marca": 73
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 905,
+    "fields": {
+      "nombre": "944",
+      "marca": 73
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 906,
+    "fields": {
+      "nombre": "959",
+      "marca": 73
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 907,
+    "fields": {
+      "nombre": "968",
+      "marca": 73
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 908,
+    "fields": {
+      "nombre": "Cayenne",
+      "marca": 73
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 909,
+    "fields": {
+      "nombre": "Macan",
+      "marca": 73
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 910,
+    "fields": {
+      "nombre": "Panamera",
+      "marca": 73
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 911,
+    "fields": {
+      "nombre": "Taycan",
+      "marca": 73
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 912,
+    "fields": {
+      "nombre": "Exora",
+      "marca": 74
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 913,
+    "fields": {
+      "nombre": "Gen-2",
+      "marca": 74
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 914,
+    "fields": {
+      "nombre": "Impian",
+      "marca": 74
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 915,
+    "fields": {
+      "nombre": "Persona",
+      "marca": 74
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 916,
+    "fields": {
+      "nombre": "Preve",
+      "marca": 74
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 917,
+    "fields": {
+      "nombre": "Saga",
+      "marca": 74
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 918,
+    "fields": {
+      "nombre": "Satria Neo",
+      "marca": 74
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 919,
+    "fields": {
+      "nombre": "Waja",
+      "marca": 74
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 920,
+    "fields": {
+      "nombre": "Wira",
+      "marca": 74
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 921,
+    "fields": {
+      "nombre": "700",
+      "marca": 75
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 922,
+    "fields": {
+      "nombre": "1000",
+      "marca": 75
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 923,
+    "fields": {
+      "nombre": "1200",
+      "marca": 75
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 924,
+    "fields": {
+      "nombre": "1500",
+      "marca": 75
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 925,
+    "fields": {
+      "nombre": "2500",
+      "marca": 75
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 926,
+    "fields": {
+      "nombre": "3500",
+      "marca": 75
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 927,
+    "fields": {
+      "nombre": "ProMaster",
+      "marca": 75
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 928,
+    "fields": {
+      "nombre": "4",
+      "marca": 76
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 929,
+    "fields": {
+      "nombre": "5",
+      "marca": 76
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 930,
+    "fields": {
+      "nombre": "9",
+      "marca": 76
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 931,
+    "fields": {
+      "nombre": "11",
+      "marca": 76
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 932,
+    "fields": {
+      "nombre": "12",
+      "marca": 76
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 933,
+    "fields": {
+      "nombre": "18",
+      "marca": 76
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 934,
+    "fields": {
+      "nombre": "19",
+      "marca": 76
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 935,
+    "fields": {
+      "nombre": "21",
+      "marca": 76
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 936,
+    "fields": {
+      "nombre": "Clio",
+      "marca": 76
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 937,
+    "fields": {
+      "nombre": "Duster",
+      "marca": 76
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 938,
+    "fields": {
+      "nombre": "Espace",
+      "marca": 76
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 939,
+    "fields": {
+      "nombre": "Fluence",
+      "marca": 76
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 940,
+    "fields": {
+      "nombre": "Kadjar",
+      "marca": 76
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 941,
+    "fields": {
+      "nombre": "Kangoo",
+      "marca": 76
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 942,
+    "fields": {
+      "nombre": "Koleos",
+      "marca": 76
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 943,
+    "fields": {
+      "nombre": "Laguna",
+      "marca": 76
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 944,
+    "fields": {
+      "nombre": "Logan",
+      "marca": 76
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 945,
+    "fields": {
+      "nombre": "Megane",
+      "marca": 76
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 946,
+    "fields": {
+      "nombre": "Safrane",
+      "marca": 76
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 947,
+    "fields": {
+      "nombre": "Sandero",
+      "marca": 76
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 948,
+    "fields": {
+      "nombre": "Scenic",
+      "marca": 76
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 949,
+    "fields": {
+      "nombre": "Symbol",
+      "marca": 76
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 950,
+    "fields": {
+      "nombre": "Talisman",
+      "marca": 76
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 951,
+    "fields": {
+      "nombre": "Twingo",
+      "marca": 76
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 952,
+    "fields": {
+      "nombre": "Corniche",
+      "marca": 77
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 953,
+    "fields": {
+      "nombre": "Cullinan",
+      "marca": 77
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 954,
+    "fields": {
+      "nombre": "Dawn",
+      "marca": 77
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 955,
+    "fields": {
+      "nombre": "Ghost",
+      "marca": 77
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 956,
+    "fields": {
+      "nombre": "Phantom",
+      "marca": 77
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 957,
+    "fields": {
+      "nombre": "Silver Cloud",
+      "marca": 77
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 958,
+    "fields": {
+      "nombre": "Silver Shadow",
+      "marca": 77
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 959,
+    "fields": {
+      "nombre": "Silver Spur",
+      "marca": 77
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 960,
+    "fields": {
+      "nombre": "Spectre",
+      "marca": 77
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 961,
+    "fields": {
+      "nombre": "Wraith",
+      "marca": 77
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 962,
+    "fields": {
+      "nombre": "25",
+      "marca": 78
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 963,
+    "fields": {
+      "nombre": "45",
+      "marca": 78
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 964,
+    "fields": {
+      "nombre": "75",
+      "marca": 78
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 965,
+    "fields": {
+      "nombre": "100",
+      "marca": 78
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 966,
+    "fields": {
+      "nombre": "200",
+      "marca": 78
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 967,
+    "fields": {
+      "nombre": "400",
+      "marca": 78
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 968,
+    "fields": {
+      "nombre": "600",
+      "marca": 78
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 969,
+    "fields": {
+      "nombre": "800",
+      "marca": 78
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 970,
+    "fields": {
+      "nombre": "Metro",
+      "marca": 78
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 971,
+    "fields": {
+      "nombre": "Maestro",
+      "marca": 78
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 972,
+    "fields": {
+      "nombre": "Montego",
+      "marca": 78
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 973,
+    "fields": {
+      "nombre": "Streetwise",
+      "marca": 78
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 974,
+    "fields": {
+      "nombre": "Maxus T60",
+      "marca": 79
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 975,
+    "fields": {
+      "nombre": "Maxus T90",
+      "marca": 79
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 976,
+    "fields": {
+      "nombre": "Maxus D60",
+      "marca": 79
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 977,
+    "fields": {
+      "nombre": "Maxus Euniq 5",
+      "marca": 79
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 978,
+    "fields": {
+      "nombre": "Maxus V80",
+      "marca": 79
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 979,
+    "fields": {
+      "nombre": "Maxus G10",
+      "marca": 79
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 980,
+    "fields": {
+      "nombre": "Alhambra",
+      "marca": 80
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 981,
+    "fields": {
+      "nombre": "Altea",
+      "marca": 80
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 982,
+    "fields": {
+      "nombre": "Arosa",
+      "marca": 80
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 983,
+    "fields": {
+      "nombre": "Cordoba",
+      "marca": 80
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 984,
+    "fields": {
+      "nombre": "Exeo",
+      "marca": 80
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 985,
+    "fields": {
+      "nombre": "Ibiza",
+      "marca": 80
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 986,
+    "fields": {
+      "nombre": "Leon",
+      "marca": 80
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 987,
+    "fields": {
+      "nombre": "Mii",
+      "marca": 80
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 988,
+    "fields": {
+      "nombre": "Tarraco",
+      "marca": 80
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 989,
+    "fields": {
+      "nombre": "Toledo",
+      "marca": 80
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 990,
+    "fields": {
+      "nombre": "P-Series",
+      "marca": 81
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 991,
+    "fields": {
+      "nombre": "G-Series",
+      "marca": 81
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 992,
+    "fields": {
+      "nombre": "R-Series",
+      "marca": 81
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 993,
+    "fields": {
+      "nombre": "S-Series",
+      "marca": 81
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 994,
+    "fields": {
+      "nombre": "F-Series",
+      "marca": 81
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 995,
+    "fields": {
+      "nombre": "K-Series",
+      "marca": 81
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 996,
+    "fields": {
+      "nombre": "L-Series",
+      "marca": 81
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 997,
+    "fields": {
+      "nombre": "Citigo",
+      "marca": 82
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 998,
+    "fields": {
+      "nombre": "Fabia",
+      "marca": 82
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 999,
+    "fields": {
+      "nombre": "Kamiq",
+      "marca": 82
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1000,
+    "fields": {
+      "nombre": "Karoq",
+      "marca": 82
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1001,
+    "fields": {
+      "nombre": "Kodiaq",
+      "marca": 82
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1002,
+    "fields": {
+      "nombre": "Octavia",
+      "marca": 82
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1003,
+    "fields": {
+      "nombre": "Rapid",
+      "marca": 82
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1004,
+    "fields": {
+      "nombre": "Roomster",
+      "marca": 82
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1005,
+    "fields": {
+      "nombre": "Scala",
+      "marca": 82
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1006,
+    "fields": {
+      "nombre": "Superb",
+      "marca": 82
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1007,
+    "fields": {
+      "nombre": "Yeti",
+      "marca": 82
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1008,
+    "fields": {
+      "nombre": "City-Coupe",
+      "marca": 83
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1009,
+    "fields": {
+      "nombre": "ForFour",
+      "marca": 83
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1010,
+    "fields": {
+      "nombre": "ForTwo",
+      "marca": 83
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1011,
+    "fields": {
+      "nombre": "Roadster",
+      "marca": 83
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1012,
+    "fields": {
+      "nombre": "Actyon",
+      "marca": 84
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1013,
+    "fields": {
+      "nombre": "Korando",
+      "marca": 84
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1014,
+    "fields": {
+      "nombre": "Kyron",
+      "marca": 84
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1015,
+    "fields": {
+      "nombre": "Musso",
+      "marca": 84
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1016,
+    "fields": {
+      "nombre": "Rexton",
+      "marca": 84
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1017,
+    "fields": {
+      "nombre": "Rodius",
+      "marca": 84
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1018,
+    "fields": {
+      "nombre": "Stavic",
+      "marca": 84
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1019,
+    "fields": {
+      "nombre": "Tivoli",
+      "marca": 84
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1020,
+    "fields": {
+      "nombre": "XLV",
+      "marca": 84
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1021,
+    "fields": {
+      "nombre": "Baja",
+      "marca": 85
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1022,
+    "fields": {
+      "nombre": "BRZ",
+      "marca": 85
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1023,
+    "fields": {
+      "nombre": "Forester",
+      "marca": 85
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1024,
+    "fields": {
+      "nombre": "Impreza",
+      "marca": 85
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1025,
+    "fields": {
+      "nombre": "Justy",
+      "marca": 85
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1026,
+    "fields": {
+      "nombre": "Legacy",
+      "marca": 85
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1027,
+    "fields": {
+      "nombre": "Leone",
+      "marca": 85
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1028,
+    "fields": {
+      "nombre": "Levorg",
+      "marca": 85
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1029,
+    "fields": {
+      "nombre": "Outback",
+      "marca": 85
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1030,
+    "fields": {
+      "nombre": "SVX",
+      "marca": 85
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1031,
+    "fields": {
+      "nombre": "Tribeca",
+      "marca": 85
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1032,
+    "fields": {
+      "nombre": "WRX",
+      "marca": 85
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1033,
+    "fields": {
+      "nombre": "XT",
+      "marca": 85
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1034,
+    "fields": {
+      "nombre": "Alto",
+      "marca": 86
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1035,
+    "fields": {
+      "nombre": "Baleno",
+      "marca": 86
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1036,
+    "fields": {
+      "nombre": "Celerio",
+      "marca": 86
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1037,
+    "fields": {
+      "nombre": "Ciaz",
+      "marca": 86
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1038,
+    "fields": {
+      "nombre": "Ertiga",
+      "marca": 86
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1039,
+    "fields": {
+      "nombre": "Esteem",
+      "marca": 86
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1040,
+    "fields": {
+      "nombre": "Forenza",
+      "marca": 86
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1041,
+    "fields": {
+      "nombre": "Grand Nomade",
+      "marca": 86
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1042,
+    "fields": {
+      "nombre": "Ignis",
+      "marca": 86
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1043,
+    "fields": {
+      "nombre": "Jimny",
+      "marca": 86
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1044,
+    "fields": {
+      "nombre": "Kizashi",
+      "marca": 86
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1045,
+    "fields": {
+      "nombre": "Liana",
+      "marca": 86
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1046,
+    "fields": {
+      "nombre": "Maruti",
+      "marca": 86
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1047,
+    "fields": {
+      "nombre": "S-Cross",
+      "marca": 86
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1048,
+    "fields": {
+      "nombre": "Samurai",
+      "marca": 86
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1049,
+    "fields": {
+      "nombre": "Splash",
+      "marca": 86
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1050,
+    "fields": {
+      "nombre": "Super Carry",
+      "marca": 86
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1051,
+    "fields": {
+      "nombre": "Swift",
+      "marca": 86
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1052,
+    "fields": {
+      "nombre": "SX4",
+      "marca": 86
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1053,
+    "fields": {
+      "nombre": "Vitara",
+      "marca": 86
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1054,
+    "fields": {
+      "nombre": "XL7",
+      "marca": 86
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1055,
+    "fields": {
+      "nombre": "Indica",
+      "marca": 87
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1056,
+    "fields": {
+      "nombre": "Indigo",
+      "marca": 87
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1057,
+    "fields": {
+      "nombre": "Nano",
+      "marca": 87
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1058,
+    "fields": {
+      "nombre": "Safari",
+      "marca": 87
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1059,
+    "fields": {
+      "nombre": "Sumo",
+      "marca": 87
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1060,
+    "fields": {
+      "nombre": "Telcoline",
+      "marca": 87
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1061,
+    "fields": {
+      "nombre": "Tiago",
+      "marca": 87
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1062,
+    "fields": {
+      "nombre": "Tigor",
+      "marca": 87
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1063,
+    "fields": {
+      "nombre": "Xenon",
+      "marca": 87
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1064,
+    "fields": {
+      "nombre": "Zest",
+      "marca": 87
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1065,
+    "fields": {
+      "nombre": "Model 3",
+      "marca": 88
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1066,
+    "fields": {
+      "nombre": "Model S",
+      "marca": 88
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1067,
+    "fields": {
+      "nombre": "Model X",
+      "marca": 88
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1068,
+    "fields": {
+      "nombre": "Model Y",
+      "marca": 88
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1069,
+    "fields": {
+      "nombre": "Cybertruck",
+      "marca": 88
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1070,
+    "fields": {
+      "nombre": "Roadster",
+      "marca": 88
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1071,
+    "fields": {
+      "nombre": "Semi",
+      "marca": 88
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1072,
+    "fields": {
+      "nombre": "4Runner",
+      "marca": 89
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1073,
+    "fields": {
+      "nombre": "86",
+      "marca": 89
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1074,
+    "fields": {
+      "nombre": "Agya",
+      "marca": 89
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1075,
+    "fields": {
+      "nombre": "Avanza",
+      "marca": 89
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1076,
+    "fields": {
+      "nombre": "Avalon",
+      "marca": 89
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1077,
+    "fields": {
+      "nombre": "Camry",
+      "marca": 89
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1078,
+    "fields": {
+      "nombre": "Celica",
+      "marca": 89
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1079,
+    "fields": {
+      "nombre": "Corolla",
+      "marca": 89
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1080,
+    "fields": {
+      "nombre": "Cressida",
+      "marca": 89
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1081,
+    "fields": {
+      "nombre": "Etios",
+      "marca": 89
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1082,
+    "fields": {
+      "nombre": "FJ Cruiser",
+      "marca": 89
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1083,
+    "fields": {
+      "nombre": "Fortuner",
+      "marca": 89
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1084,
+    "fields": {
+      "nombre": "Hiace",
+      "marca": 89
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1085,
+    "fields": {
+      "nombre": "Highlander",
+      "marca": 89
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1086,
+    "fields": {
+      "nombre": "Hilux",
+      "marca": 89
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1087,
+    "fields": {
+      "nombre": "Land Cruiser",
+      "marca": 89
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1088,
+    "fields": {
+      "nombre": "MR2",
+      "marca": 89
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1089,
+    "fields": {
+      "nombre": "Paseo",
+      "marca": 89
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1090,
+    "fields": {
+      "nombre": "Prius",
+      "marca": 89
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1091,
+    "fields": {
+      "nombre": "RAV4",
+      "marca": 89
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1092,
+    "fields": {
+      "nombre": "Sequoia",
+      "marca": 89
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1093,
+    "fields": {
+      "nombre": "Sienna",
+      "marca": 89
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1094,
+    "fields": {
+      "nombre": "Supra",
+      "marca": 89
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1095,
+    "fields": {
+      "nombre": "Tacoma",
+      "marca": 89
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1096,
+    "fields": {
+      "nombre": "Tercel",
+      "marca": 89
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1097,
+    "fields": {
+      "nombre": "Tundra",
+      "marca": 89
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1098,
+    "fields": {
+      "nombre": "Venza",
+      "marca": 89
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1099,
+    "fields": {
+      "nombre": "Yaris",
+      "marca": 89
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1100,
+    "fields": {
+      "nombre": "Amarok",
+      "marca": 90
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1101,
+    "fields": {
+      "nombre": "Arteon",
+      "marca": 90
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1102,
+    "fields": {
+      "nombre": "Beetle",
+      "marca": 90
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1103,
+    "fields": {
+      "nombre": "Bora",
+      "marca": 90
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1104,
+    "fields": {
+      "nombre": "Caddy",
+      "marca": 90
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1105,
+    "fields": {
+      "nombre": "Caravelle",
+      "marca": 90
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1106,
+    "fields": {
+      "nombre": "CC",
+      "marca": 90
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1107,
+    "fields": {
+      "nombre": "Crafter",
+      "marca": 90
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1108,
+    "fields": {
+      "nombre": "EOS",
+      "marca": 90
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1109,
+    "fields": {
+      "nombre": "Fox",
+      "marca": 90
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1110,
+    "fields": {
+      "nombre": "Gol",
+      "marca": 90
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1111,
+    "fields": {
+      "nombre": "Golf",
+      "marca": 90
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1112,
+    "fields": {
+      "nombre": "ID.3",
+      "marca": 90
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1113,
+    "fields": {
+      "nombre": "ID.4",
+      "marca": 90
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1114,
+    "fields": {
+      "nombre": "ID.5",
+      "marca": 90
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1115,
+    "fields": {
+      "nombre": "ID. Buzz",
+      "marca": 90
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1116,
+    "fields": {
+      "nombre": "Jetta",
+      "marca": 90
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1117,
+    "fields": {
+      "nombre": "Kombi",
+      "marca": 90
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1118,
+    "fields": {
+      "nombre": "Lamando",
+      "marca": 90
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1119,
+    "fields": {
+      "nombre": "Lavida",
+      "marca": 90
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1120,
+    "fields": {
+      "nombre": "Multivan",
+      "marca": 90
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1121,
+    "fields": {
+      "nombre": "Parati",
+      "marca": 90
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1122,
+    "fields": {
+      "nombre": "Passat",
+      "marca": 90
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1123,
+    "fields": {
+      "nombre": "Phaeton",
+      "marca": 90
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1124,
+    "fields": {
+      "nombre": "Polo",
+      "marca": 90
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1125,
+    "fields": {
+      "nombre": "Santana",
+      "marca": 90
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1126,
+    "fields": {
+      "nombre": "Saveiro",
+      "marca": 90
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1127,
+    "fields": {
+      "nombre": "Scirocco",
+      "marca": 90
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1128,
+    "fields": {
+      "nombre": "Sharan",
+      "marca": 90
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1129,
+    "fields": {
+      "nombre": "T-Cross",
+      "marca": 90
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1130,
+    "fields": {
+      "nombre": "Taigo",
+      "marca": 90
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1131,
+    "fields": {
+      "nombre": "Tiguan",
+      "marca": 90
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1132,
+    "fields": {
+      "nombre": "Touareg",
+      "marca": 90
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1133,
+    "fields": {
+      "nombre": "Touran",
+      "marca": 90
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1134,
+    "fields": {
+      "nombre": "Up!",
+      "marca": 90
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1135,
+    "fields": {
+      "nombre": "Vento",
+      "marca": 90
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1136,
+    "fields": {
+      "nombre": "Virtus",
+      "marca": 90
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1137,
+    "fields": {
+      "nombre": "240",
+      "marca": 91
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1138,
+    "fields": {
+      "nombre": "740",
+      "marca": 91
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1139,
+    "fields": {
+      "nombre": "850",
+      "marca": 91
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1140,
+    "fields": {
+      "nombre": "940",
+      "marca": 91
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1141,
+    "fields": {
+      "nombre": "960",
+      "marca": 91
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1142,
+    "fields": {
+      "nombre": "C30",
+      "marca": 91
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1143,
+    "fields": {
+      "nombre": "C40",
+      "marca": 91
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1144,
+    "fields": {
+      "nombre": "C70",
+      "marca": 91
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1145,
+    "fields": {
+      "nombre": "S40",
+      "marca": 91
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1146,
+    "fields": {
+      "nombre": "S60",
+      "marca": 91
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1147,
+    "fields": {
+      "nombre": "S70",
+      "marca": 91
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1148,
+    "fields": {
+      "nombre": "S80",
+      "marca": 91
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1149,
+    "fields": {
+      "nombre": "S90",
+      "marca": 91
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1150,
+    "fields": {
+      "nombre": "V40",
+      "marca": 91
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1151,
+    "fields": {
+      "nombre": "V50",
+      "marca": 91
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1152,
+    "fields": {
+      "nombre": "V60",
+      "marca": 91
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1153,
+    "fields": {
+      "nombre": "V70",
+      "marca": 91
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1154,
+    "fields": {
+      "nombre": "V90",
+      "marca": 91
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1155,
+    "fields": {
+      "nombre": "XC40",
+      "marca": 91
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1156,
+    "fields": {
+      "nombre": "XC60",
+      "marca": 91
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1157,
+    "fields": {
+      "nombre": "XC70",
+      "marca": 91
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1158,
+    "fields": {
+      "nombre": "XC90",
+      "marca": 91
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1159,
+    "fields": {
+      "nombre": "Air EV",
+      "marca": 92
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1160,
+    "fields": {
+      "nombre": "Hongguang Mini EV",
+      "marca": 92
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1161,
+    "fields": {
+      "nombre": "Victory",
+      "marca": 92
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1162,
+    "fields": {
+      "nombre": "Cortez",
+      "marca": 92
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1163,
+    "fields": {
+      "nombre": "Almaz",
+      "marca": 92
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1164,
+    "fields": {
+      "nombre": "Formo",
+      "marca": 92
+    }
+  }
+]

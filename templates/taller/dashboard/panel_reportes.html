@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}Panel de Reportes | TallerPro{% endblock %}
+
+{% block content %}
+<div class="container mx-auto py-10 text-white">
+  <h1 class="text-3xl font-bold text-center mb-8 text-cyan-400">Panel de Reportes</h1>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <a href="{% url 'reportes:reporte_repuestos' %}" class="block translucent-card/10 text-white rounded-lg shadow-lg p-8 text-center hover:translucent-card/20 transition">Reporte de Repuestos</a>
+    <a href="{% url 'reportes:reporte_servicios' %}" class="block translucent-card/10 text-white rounded-lg shadow-lg p-8 text-center hover:translucent-card/20 transition">Reporte de Servicios</a>
+  </div>
+</div>
+{% endblock %}

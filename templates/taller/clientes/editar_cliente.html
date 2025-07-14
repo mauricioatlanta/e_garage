@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto mt-12 translucent-card p-8 rounded-xl shadow-md" style="color: #111 !important; background: #fff !important; -webkit-text-fill-color: #111 !important;">
+<h1 class="text-3xl font-bold mb-6" style="color: #111 !important; -webkit-text-fill-color: #111 !important;">Editar Cliente</h1>
+<form class="space-y-6" method="POST" style="color: #111 !important; background: #fff !important; -webkit-text-fill-color: #111 !important;">
+    {% csrf_token %}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div>
+<label class="block text-sm font-medium" for="id_nombre" style="color: #111 !important;">Nombre</label>
+        {{ form.nombre }}
+      </div>
+<div>
+<label class="block text-sm font-medium" for="id_apellido" style="color: #111 !important;">Apellido</label>
+        {{ form.apellido }}
+      </div>
+<div>
+<label class="block text-sm font-medium" for="id_email" style="color: #111 !important;">Correo electrónico</label>
+        {{ form.email }}
+      </div>
+<div>
+<label class="block text-sm font-medium" for="id_telefono" style="color: #111 !important;">Teléfono</label>
+        {{ form.telefono }}
+      </div>
+<div>
+<label class="block text-sm font-medium" for="id_region" style="color: #111 !important;">Región</label>
+        {{ form.region }}
+      </div>
+<div>
+<label class="block text-sm font-medium" for="id_ciudad" style="color: #111 !important;">Ciudad</label>
+        {{ form.ciudad }}
+      </div>
+<div class="md:col-span-2">
+<label class="block text-sm font-medium" for="id_direccion" style="color: #111 !important;">Dirección</label>
+        {{ form.direccion }}
+      </div>
+</div>
+<div class="flex justify-end gap-4 mt-6">
+<a class="bg-gray-300 text-gray-800 px-6 py-2 rounded hover:bg-gray-400 transition" href="{% url 'clientes:lista_clientes' %}">
+        Cancelar
+      </a>
+<button class="bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700 transition btn-futuristic" type="submit">
+        Guardar Cambios
+      </button>
+</div>
+</form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Pasa el valor actual de ciudad al JS para mantener la selección
+  window.CIUDAD_ACTUAL = '{{ form.ciudad.value|default_if_none:"" }}';
+</script>
+<script src="{% static 'js/cliente_region_ciudad.js' %}"></script>
+{% endblock %}

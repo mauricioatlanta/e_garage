@@ -1,0 +1,310 @@
+[
+    {
+        "model": "taller.marca",
+        "pk": 1,
+        "fields": {
+            "nombre": "Acura"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 2,
+        "fields": {
+            "nombre": "Alfa Romeo"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 3,
+        "fields": {
+            "nombre": "AMC"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 4,
+        "fields": {
+            "nombre": "Asia Motors"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 5,
+        "fields": {
+            "nombre": "Audi"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 6,
+        "fields": {
+            "nombre": "Austin"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 7,
+        "fields": {
+            "nombre": "BAIC"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 8,
+        "fields": {
+            "nombre": "Bentley"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 9,
+        "fields": {
+            "nombre": "BMW"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 10,
+        "fields": {
+            "nombre": "Brilliance"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 11,
+        "fields": {
+            "nombre": "Bugatti"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 12,
+        "fields": {
+            "nombre": "Buick"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 13,
+        "fields": {
+            "nombre": "BYD"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 14,
+        "fields": {
+            "nombre": "Cadillac"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 15,
+        "fields": {
+            "nombre": "Changan"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 16,
+        "fields": {
+            "nombre": "Chery"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 17,
+        "fields": {
+            "nombre": "Chevrolet"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 18,
+        "fields": {
+            "nombre": "Chrysler"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 19,
+        "fields": {
+            "nombre": "Citroën"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 20,
+        "fields": {
+            "nombre": "Cupra"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 21,
+        "fields": {
+            "nombre": "Dacia"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 22,
+        "fields": {
+            "nombre": "Daewoo"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 23,
+        "fields": {
+            "nombre": "Daihatsu"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 24,
+        "fields": {
+            "nombre": "Datsun"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 25,
+        "fields": {
+            "nombre": "Dodge"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 26,
+        "fields": {
+            "nombre": "Dongfeng"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 27,
+        "fields": {
+            "nombre": "Effa"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 28,
+        "fields": {
+            "nombre": "FAW"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 29,
+        "fields": {
+            "nombre": "Ferrari"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 30,
+        "fields": {
+            "nombre": "Fiat"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 31,
+        "fields": {
+            "nombre": "Ford"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 32,
+        "fields": {
+            "nombre": "Foton"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 33,
+        "fields": {
+            "nombre": "Geely"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 34,
+        "fields": {
+            "nombre": "Genesis"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 35,
+        "fields": {
+            "nombre": "GMC"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 36,
+        "fields": {
+            "nombre": "Great Wall"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 37,
+        "fields": {
+            "nombre": "Haima"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 38,
+        "fields": {
+            "nombre": "Haval"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 39,
+        "fields": {
+            "nombre": "Honda"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 40,
+        "fields": {
+            "nombre": "Hyundai"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 41,
+        "fields": {
+            "nombre": "Infiniti"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 42,
+        "fields": {
+            "nombre": "Isuzu"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 43,
+        "fields": {
+            "nombre": "Iveco"
+        }
+    },
+    {
+        "model": "taller.marca",
+        "pk": 44,
+        "fields": {
+            "nombre": "JAC"
+        }
+    }
+]

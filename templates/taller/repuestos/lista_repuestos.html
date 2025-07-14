@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+  <style>
+    body, .cuadro, .cuadro *, table, thead, tbody, th, td, label, input, select, textarea, option, h1, h2, h3, h4, h5, h6, .text-white, .text-slate-800, .text-blue-400, .text-emerald-500, .text-emerald-600, .text-black, .text-gray-500, .text-right, .text-center {
+      color: #111 !important;
+      background-color: #fff !important;
+      -webkit-text-fill-color: #111 !important;
+    }
+    input[type="text"]::placeholder, textarea::placeholder {
+      color: #444 !important;
+    }
+    .bg-slate-800, .bg-black, .bg-emerald-500, .bg-emerald-600, .translucent-card {
+      background-color: #fff !important;
+    }
+  </style>
+
+<div class="relative min-h-screen bg-black overflow-hidden">
+  <!-- Fondo animado -->
+  <video autoplay muted loop class="absolute inset-0 w-full h-full object-cover z-0">
+    <source src="{% static 'videos/fondo_autotech.mp4' %}" type="video/mp4">
+  </video>
+  <div class="absolute inset-0 bg-black bg-opacity-60 z-10"></div>
+
+  <div class="relative z-20 container mx-auto px-4 py-12">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-4xl font-bold text-white flex items-center gap-3">
+        <i class="fas fa-cogs text-blue-400"></i> Repuestos Inteligentes
+      </h1>
+      <a href="{% url 'repuestos:crear_repuesto' %}" class="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-2 rounded-lg shadow-lg transition">
+        <i class="fas fa-plus mr-1"></i> Agregar Repuesto
+      </a>
+    </div>    <div class="mb-6">
+      <input type="text" id="busqueda-repuesto" placeholder="Buscar por nombre, part number, tienda..."
+        class="w-full p-3 rounded-lg shadow translucent-card text-black placeholder-gray-500">
+    </div>
+
+    <div class="overflow-x-auto translucent-card rounded-xl shadow-xl">
+      <table class="min-w-full divide-y divide-gray-200 text-sm text-black">
+        <thead class="bg-slate-800 text-white">
+          <tr>
+            <th class="px-4 py-3 text-left">Nombre</th>
+            <th class="px-4 py-3 text-left">Part #</th>
+            <th class="px-4 py-3 text-left">Tienda</th>
+            <th class="px-4 py-3 text-right">Compra</th>
+            <th class="px-4 py-3 text-right">Venta</th>
+            <th class="px-4 py-3 text-right">Stock</th>
+            <th class="px-4 py-3 text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-repuestos">
+          {% for repuesto in repuestos %}
+          <tr class="hover:bg-slate-100 transition">
+            <td class="px-4 py-3 font-medium">{{ repuesto.nombre_repuesto }}</td>
+            <td class="px-4 py-3">{{ repuesto.part_number }}</td>
+            <td class="px-4 py-3">{{ repuesto.tienda }}</td>
+            <td class="px-4 py-3 text-right">${{ repuesto.precio_compra|floatformat:0|intcomma }}</td>
+            <td class="px-4 py-3 text-right">${{ repuesto.precio_venta|floatformat:0|intcomma }}</td>
+            <td class="px-4 py-3 text-right">{{ repuesto.stock }}</td>
+            <td class="px-4 py-3 text-center">
+              <a href="{% url 'repuestos:editar_repuesto' repuesto.id %}" class="text-blue-600 hover:underline">Editar</a>
+              <span class="mx-1 text-gray-400">|</span>
+              <a href="{% url 'repuestos:eliminar_repuesto' repuesto.id %}" class="text-red-600 hover:underline">Eliminar</a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" class="px-4 py-6 text-center text-gray-500">No hay repuestos registrados.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById("busqueda-repuesto").addEventListener("keyup", function () {
+    const filtro = this.value.toLowerCase();
+    const filas = document.querySelectorAll("#tabla-repuestos tr");
+
+    filas.forEach(fila => {
+      const texto = fila.textContent.toLowerCase();
+      fila.style.display = texto.includes(filtro) ? "" : "none";
+    });
+  });
+</script>
+{% endblock %}

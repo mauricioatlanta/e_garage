@@ -1,0 +1,280 @@
+[
+    {
+        "model": "taller.categoriaservicio",
+        "pk": 1,
+        "fields": {
+            "nombre": "1. Mantenimiento Preventivo y Servicios Periódicos"
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 1,
+        "fields": {
+            "nombre": "Afinamiento completo (bujías, filtros, inyectores, sensores)",
+            "subcategoria": null
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 2,
+        "fields": {
+            "nombre": "Alineación y balanceo computarizado de ruedas",
+            "subcategoria": null
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 3,
+        "fields": {
+            "nombre": "Cambio de aceite y filtro (motor)",
+            "subcategoria": null
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 4,
+        "fields": {
+            "nombre": "Cambio de correas (distribución, alternador, accesorios)",
+            "subcategoria": null
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 5,
+        "fields": {
+            "nombre": "Cambio de filtro de aire",
+            "subcategoria": null
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 6,
+        "fields": {
+            "nombre": "Cambio de filtro de combustible",
+            "subcategoria": null
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 7,
+        "fields": {
+            "nombre": "Cambio de filtro de cabina (habitáculo)",
+            "subcategoria": null
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 8,
+        "fields": {
+            "nombre": "Chequeo y cambio de líquidos (refrigerante, frenos, hidráulico, transmisión)",
+            "subcategoria": null
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 9,
+        "fields": {
+            "nombre": "Diagnóstico computarizado con escáner OBD-II",
+            "subcategoria": null
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 10,
+        "fields": {
+            "nombre": "Inspección de suspensión, rótulas y amortiguadores",
+            "subcategoria": null
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 11,
+        "fields": {
+            "nombre": "Lubricación de bisagras, cerraduras y componentes móviles",
+            "subcategoria": null
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 12,
+        "fields": {
+            "nombre": "Revisión y ajuste del sistema de frenos",
+            "subcategoria": null
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 13,
+        "fields": {
+            "nombre": "Revisión de presión y estado de neumáticos",
+            "subcategoria": null
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 14,
+        "fields": {
+            "nombre": "Revisión del sistema de escape y catalizador",
+            "subcategoria": null
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 15,
+        "fields": {
+            "nombre": "Rotación cruzada de neumáticos",
+            "subcategoria": null
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 16,
+        "fields": {
+            "nombre": "Test de batería y sistema de carga eléctrica",
+            "subcategoria": null
+        }
+    },
+    {
+        "model": "taller.categoriaservicio",
+        "pk": 2,
+        "fields": {
+            "nombre": "2. Reparaciones Mecánicas Generales"
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 17,
+        "fields": {
+            "nombre": "Ajuste y sincronización electrónica del motor",
+            "subcategoria": null
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 18,
+        "fields": {
+            "nombre": "Cambio de alternador",
+            "subcategoria": null
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 19,
+        "fields": {
+            "nombre": "Cambio de bomba de agua",
+            "subcategoria": null
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 20,
+        "fields": {
+            "nombre": "Cambio de cadena o correa de distribución",
+            "subcategoria": null
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 21,
+        "fields": {
+            "nombre": "Cambio de empaquetadura de culata",
+            "subcategoria": null
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 22,
+        "fields": {
+            "nombre": "Cambio de empaquetaduras y retenes generales",
+            "subcategoria": null
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 23,
+        "fields": {
+            "nombre": "Cambio de motor de arranque",
+            "subcategoria": null
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 24,
+        "fields": {
+            "nombre": "Cambio de pistones, anillos y metales",
+            "subcategoria": null
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 25,
+        "fields": {
+            "nombre": "Cambio de radiador y componentes de refrigeración",
+            "subcategoria": null
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 26,
+        "fields": {
+            "nombre": "Cambio de sensores (MAP, MAF, O2, temperatura, cigüeñal, etc.)",
+            "subcategoria": null
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 27,
+        "fields": {
+            "nombre": "Cambio de soportes de motor",
+            "subcategoria": null
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 28,
+        "fields": {
+            "nombre": "Diagnóstico y reparación de fallas de motor",
+            "subcategoria": null
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 29,
+        "fields": {
+            "nombre": "Limpieza ultrasónica de inyectores",
+            "subcategoria": null
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 30,
+        "fields": {
+            "nombre": "Rectificación de culata y prueba hidráulica",
+            "subcategoria": null
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 31,
+        "fields": {
+            "nombre": "Reparación de fugas de aceite y refrigerante",
+            "subcategoria": null
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 32,
+        "fields": {
+            "nombre": "Reparación de sistema de inyección (common rail, TBI)",
+            "subcategoria": null
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 33,
+        "fields": {
+            "nombre": "Revisión y reparación de sistema de escape (flexibles, catalizador)",
+            "subcategoria": null
+        }
+    }
+]

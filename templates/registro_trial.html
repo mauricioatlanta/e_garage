@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-cyan-900 via-gray-900 to-fuchsia-900 py-12 px-4">
+  <div class="bg-black bg-opacity-80 rounded-2xl shadow-2xl p-8 max-w-md w-full">
+    <div class="flex flex-col items-center mb-6">
+      <img src="{% static 'img/TallerPro_logo.png' %}" alt="Logo" class="h-16 mb-2">
+      <h2 class="text-3xl font-extrabold text-yellow-400 mb-2 tracking-widest">Prueba 30 días gratis</h2>
+      <p class="text-gray-300 text-center">Regístrate para recibir tu código de instalación seguro por correo electrónico.</p>
+    </div>
+    <form method="post" autocomplete="off" class="space-y-6">
+      {% csrf_token %}
+      <div>
+        <label for="nombre" class="block text-sm font-bold text-yellow-300">Nombre completo</label>
+        <input type="text" name="nombre" id="nombre" required maxlength="100" class="mt-1 block w-full rounded-lg border-2 border-yellow-400 bg-gray-900 text-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+      </div>
+      <div>
+        <label for="email" class="block text-sm font-bold text-yellow-300">Correo electrónico</label>
+        <input type="email" name="email" id="email" required maxlength="100" class="mt-1 block w-full rounded-lg border-2 border-yellow-400 bg-gray-900 text-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+      </div>
+      <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-yellow-400 to-fuchsia-500 text-black font-extrabold text-lg shadow-lg hover:from-fuchsia-500 hover:to-yellow-400 transition-all">Recibir código de instalación</button>
+    </form>
+    {% if mensaje %}
+      <div class="mt-4 text-center text-green-400 font-bold">{{ mensaje }}</div>
+    {% endif %}
+    {% if error %}
+      <div class="mt-4 text-center text-red-400 font-bold">{{ error }}</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

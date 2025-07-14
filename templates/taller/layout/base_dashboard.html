@@ -1,0 +1,30 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Panel - TallerPro{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/a2e0e9d62f.js" crossorigin="anonymous"></script>
+  {% block extrahead %}{% endblock %}
+</head>
+<body class="bg-gray-950 text-white font-sans min-h-screen">
+  {% block header %}
+  <header class="bg-gray-900 shadow p-4 flex justify-between items-center">
+    <div class="flex items-center gap-4">
+      <img src="{% static 'img/TallerPro_logo.png' %}" class="h-8" alt="Logo TallerPro">
+      <span class="text-xl font-bold font-orbitron">TallerPro Panel</span>
+    </div>
+    <nav class="flex gap-6 text-sm">
+      <a href="{% url 'dashboard' %}" class="hover:text-cyan-400">Dashboard</a>
+      <a href="{% url 'logout' %}" class="hover:text-red-400">Cerrar sesión</a>
+    </nav>
+  </header>
+  {% endblock %}
+  <main class="p-6">
+    {% block content %}{% endblock %}
+  </main>
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

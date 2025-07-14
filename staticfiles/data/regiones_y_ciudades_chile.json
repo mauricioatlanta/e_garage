@@ -1,0 +1,50 @@
+ {
+    "Región de Arica y Parinacota": [
+        "Arica", "Putre", "General Lagos", "Camarones"
+    ],
+    "Región de Tarapacá": [
+        "Iquique", "Alto Hospicio", "Pozo Almonte", "Pica", "Huara", "Camiña", "Colchane"
+    ],
+    "Región de Antofagasta": [
+        "Antofagasta", "Calama", "Tocopilla", "Mejillones", "Taltal", "María Elena", "Sierra Gorda", "San Pedro de Atacama", "Ollagüe"
+    ],
+    "Región de Atacama": [
+        "Copiapó", "Vallenar", "Chañaral", "Caldera", "Tierra Amarilla", "Diego de Almagro", "Freirina", "Huasco", "Alto del Carmen"
+    ],
+    "Región de Coquimbo": [
+        "La Serena", "Coquimbo", "Ovalle", "Illapel", "Vicuña", "Salamanca", "Monte Patria", "Andacollo", "Combarbalá", "Los Vilos", "Punitaqui", "Río Hurtado", "La Higuera", "Canela", "Paihuano"
+    ],
+    "Región de Valparaíso": [
+        "Valparaíso", "Viña del Mar", "San Antonio", "Quillota", "Villa Alemana", "Quilpué", "La Calera", "San Felipe", "Los Andes", "La Ligua", "Petorca", "Casablanca", "Putaendo", "Concón", "Hijuelas"
+    ],
+    "Región Metropolitana de Santiago": [
+        "Santiago", "Puente Alto", "Maipú", "San Bernardo", "La Florida", "Pudahuel", "Las Condes", "Peñalolén", "Lo Barnechea", "El Bosque", "Estación Central", "Recoleta", "Independencia", "Providencia", "Quilicura"
+    ],
+    "Región del Libertador General Bernardo O’Higgins": [
+        "Rancagua", "San Fernando", "Rengo", "Santa Cruz", "Machalí", "San Vicente", "Pichilemu", "Doñihue", "Graneros", "Requínoa", "Chimbarongo", "Peumo", "Las Cabras", "Nancagua", "Coinco"
+    ],
+    "Región del Maule": [
+        "Talca", "Curicó", "Linares", "Constitución", "Parral", "San Javier", "Maule", "Longaví", "Villa Alegre", "Cauquenes", "San Clemente", "Yerbas Buenas", "Rauco", "Hualañé", "Empedrado"
+    ],
+    "Región de Ñuble": [
+        "Chillán", "San Carlos", "Quirihue", "Bulnes", "Yungay", "Cobquecura", "Coelemu", "El Carmen", "Ninhue", "Pemuco", "San Ignacio", "San Nicolás", "Treguaco", "Portezuelo", "Ránquil"
+    ],
+    "Región del Biobío": [
+        "Concepción", "Los Ángeles", "Talcahuano", "Coronel", "San Pedro de la Paz", "Hualpén", "Lota", "Chiguayante", "Tomé", "Cabrero", "Laja", "Nacimiento", "Mulchén", "Yumbel", "Arauco"
+    ],
+    "Región de La Araucanía": [
+        "Temuco", "Villarrica", "Angol", "Padre Las Casas", "Lautaro", "Nueva Imperial", "Pitrufquén", "Carahue", "Collipulli", "Victoria", "Freire", "Gorbea", "Cunco", "Toltén", "Curacautín"
+    ],
+    "Región de Los Ríos": [
+        "Valdivia", "La Unión", "Río Bueno", "Panguipulli", "Lanco", "Paillaco", "Los Lagos", "Futrono", "Máfil", "Corral"
+    ],
+    "Región de Los Lagos": [
+        "Puerto Montt", "Osorno", "Castro", "Ancud", "Puerto Varas", "Quellón", "Calbuco", "Fresia", "Frutillar", "Llanquihue", "Purranque", "Chonchi", "Puqueldón", "Maullín", "Quemchi"
+    ],
+    "Región de Aysén del General Carlos Ibáñez del Campo": [
+        "Coyhaique", "Puerto Aysén", "Chile Chico", "Cochrane", "Puerto Cisnes", "Río Ibáñez", "Lago Verde", "Tortel", "Guaitecas"
+    ],
+    "Región de Magallanes y de la Antártica Chilena": [
+        "Punta Arenas", "Puerto Natales", "Porvenir", "Puerto Williams", "Primavera", "San Gregorio", "Laguna Blanca", "Timaukel"
+    ]
+}

@@ -1,0 +1,442 @@
+[
+  {
+    "model": "taller.region",
+    "pk": 1,
+    "fields": {
+      "nombre": "Región de Arica y Parinacota"
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 1,
+    "fields": {
+      "nombre": "Arica",
+      "region": 1
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 2,
+    "fields": {
+      "nombre": "Putre",
+      "region": 1
+    }
+  },
+  {
+    "model": "taller.region",
+    "pk": 2,
+    "fields": {
+      "nombre": "Región de Tarapacá"
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 3,
+    "fields": {
+      "nombre": "Iquique",
+      "region": 2
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 4,
+    "fields": {
+      "nombre": "Alto Hospicio",
+      "region": 2
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 5,
+    "fields": {
+      "nombre": "Pozo Almonte",
+      "region": 2
+    }
+  },
+  {
+    "model": "taller.region",
+    "pk": 3,
+    "fields": {
+      "nombre": "Región de Antofagasta"
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 6,
+    "fields": {
+      "nombre": "Antofagasta",
+      "region": 3
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 7,
+    "fields": {
+      "nombre": "Calama",
+      "region": 3
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 8,
+    "fields": {
+      "nombre": "Tocopilla",
+      "region": 3
+    }
+  },
+  {
+    "model": "taller.region",
+    "pk": 4,
+    "fields": {
+      "nombre": "Región de Atacama"
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 9,
+    "fields": {
+      "nombre": "Copiapó",
+      "region": 4
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 10,
+    "fields": {
+      "nombre": "Vallenar",
+      "region": 4
+    }
+  },
+  {
+    "model": "taller.region",
+    "pk": 5,
+    "fields": {
+      "nombre": "Región de Coquimbo"
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 11,
+    "fields": {
+      "nombre": "La Serena",
+      "region": 5
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 12,
+    "fields": {
+      "nombre": "Coquimbo",
+      "region": 5
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 13,
+    "fields": {
+      "nombre": "Ovalle",
+      "region": 5
+    }
+  },
+  {
+    "model": "taller.region",
+    "pk": 6,
+    "fields": {
+      "nombre": "Región de Valparaíso"
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 14,
+    "fields": {
+      "nombre": "Valparaíso",
+      "region": 6
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 15,
+    "fields": {
+      "nombre": "Viña del Mar",
+      "region": 6
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 16,
+    "fields": {
+      "nombre": "Quillota",
+      "region": 6
+    }
+  },
+  {
+    "model": "taller.region",
+    "pk": 7,
+    "fields": {
+      "nombre": "Región Metropolitana"
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 17,
+    "fields": {
+      "nombre": "Santiago",
+      "region": 7
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 18,
+    "fields": {
+      "nombre": "Puente Alto",
+      "region": 7
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 19,
+    "fields": {
+      "nombre": "Maipú",
+      "region": 7
+    }
+  },
+  {
+    "model": "taller.region",
+    "pk": 8,
+    "fields": {
+      "nombre": "Región del Libertador General Bernardo O’Higgins"
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 20,
+    "fields": {
+      "nombre": "Rancagua",
+      "region": 8
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 21,
+    "fields": {
+      "nombre": "San Fernando",
+      "region": 8
+    }
+  },
+  {
+    "model": "taller.region",
+    "pk": 9,
+    "fields": {
+      "nombre": "Región del Maule"
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 22,
+    "fields": {
+      "nombre": "Talca",
+      "region": 9
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 23,
+    "fields": {
+      "nombre": "Curicó",
+      "region": 9
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 24,
+    "fields": {
+      "nombre": "Linares",
+      "region": 9
+    }
+  },
+  {
+    "model": "taller.region",
+    "pk": 10,
+    "fields": {
+      "nombre": "Región de Ñuble"
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 25,
+    "fields": {
+      "nombre": "Chillán",
+      "region": 10
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 26,
+    "fields": {
+      "nombre": "Bulnes",
+      "region": 10
+    }
+  },
+  {
+    "model": "taller.region",
+    "pk": 11,
+    "fields": {
+      "nombre": "Región del Biobío"
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 27,
+    "fields": {
+      "nombre": "Concepción",
+      "region": 11
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 28,
+    "fields": {
+      "nombre": "Los Ángeles",
+      "region": 11
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 29,
+    "fields": {
+      "nombre": "Coronel",
+      "region": 11
+    }
+  },
+  {
+    "model": "taller.region",
+    "pk": 12,
+    "fields": {
+      "nombre": "Región de La Araucanía"
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 30,
+    "fields": {
+      "nombre": "Temuco",
+      "region": 12
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 31,
+    "fields": {
+      "nombre": "Villarrica",
+      "region": 12
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 32,
+    "fields": {
+      "nombre": "Angol",
+      "region": 12
+    }
+  },
+  {
+    "model": "taller.region",
+    "pk": 13,
+    "fields": {
+      "nombre": "Región de Los Ríos"
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 33,
+    "fields": {
+      "nombre": "Valdivia",
+      "region": 13
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 34,
+    "fields": {
+      "nombre": "La Unión",
+      "region": 13
+    }
+  },
+  {
+    "model": "taller.region",
+    "pk": 14,
+    "fields": {
+      "nombre": "Región de Los Lagos"
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 35,
+    "fields": {
+      "nombre": "Puerto Montt",
+      "region": 14
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 36,
+    "fields": {
+      "nombre": "Osorno",
+      "region": 14
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 37,
+    "fields": {
+      "nombre": "Castro",
+      "region": 14
+    }
+  },
+  {
+    "model": "taller.region",
+    "pk": 15,
+    "fields": {
+      "nombre": "Región de Aysén"
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 38,
+    "fields": {
+      "nombre": "Coyhaique",
+      "region": 15
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 39,
+    "fields": {
+      "nombre": "Puerto Aysén",
+      "region": 15
+    }
+  },
+  {
+    "model": "taller.region",
+    "pk": 16,
+    "fields": {
+      "nombre": "Región de Magallanes"
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 40,
+    "fields": {
+      "nombre": "Punta Arenas",
+      "region": 16
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 41,
+    "fields": {
+      "nombre": "Puerto Natales",
+      "region": 16
+    }
+  }
+]

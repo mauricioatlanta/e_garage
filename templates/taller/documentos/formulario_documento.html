@@ -1,0 +1,448 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_head %}
+  {{ form.media }}
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(120deg, #d90429 0%, #000 60%, #ffd700 100%);
+      min-height: 100vh;
+      font-family: 'Orbitron', 'Share Tech Mono', 'Montserrat', Arial, sans-serif;
+      color: #fff;
+      overflow-x: hidden;
+    }
+    #particles-js {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .formulario-documento-container {
+      background: rgba(20, 0, 0, 0.85);
+      border-radius: 2.5rem;
+      box-shadow: 0 0 64px 8px #d90429cc, 0 0 0 3px #ffd700, 0 0 80px 10px #000 inset;
+      border: 3px solid #ffd700;
+      position: relative;
+      z-index: 1;
+      backdrop-filter: blur(8px) saturate(1.2);
+      -webkit-backdrop-filter: blur(8px) saturate(1.2);
+      overflow: hidden;
+      transition: box-shadow 0.3s;
+    }
+    .formulario-documento-container:before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 10px;
+      background: linear-gradient(90deg, #ffd700 0%, #d90429 100%);
+      border-radius: 10px 10px 0 0;
+      box-shadow: 0 0 32px #ffd70099;
+      z-index: 2;
+      filter: blur(1px);
+    }
+    .formulario-documento-container:after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0; height: 10px;
+      background: linear-gradient(90deg, #d90429 0%, #ffd700 100%);
+      border-radius: 0 0 10px 10px;
+      box-shadow: 0 0 32px #d9042999;
+      z-index: 2;
+      filter: blur(1px);
+    }
+    h1, h2 {
+      font-family: 'Orbitron', 'Share Tech Mono', Arial, sans-serif;
+      color: #ffd700;
+      text-shadow: 0 0 24px #d90429, 0 0 8px #ffd700, 0 0 2px #fff;
+      letter-spacing: 3px;
+      font-size: 2.2rem;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(90deg, #ffd700 30%, #d90429 70%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    label {
+      color: #ffd700;
+      font-weight: bold;
+      letter-spacing: 1.5px;
+      text-shadow: 0 0 4px #d90429, 0 0 2px #ffd700;
+      font-family: 'Share Tech Mono', 'Orbitron', Arial, sans-serif;
+    }
+    input, select, textarea {
+      background: rgba(30,0,0,0.85);
+      color: #fff;
+      border: 2px solid #d90429;
+      border-radius: 0.7rem;
+      padding: 0.7rem;
+      font-family: 'Share Tech Mono', 'Montserrat', Arial, sans-serif;
+      box-shadow: 0 0 12px #ffd70033, 0 0 2px #d90429;
+      transition: border 0.2s, box-shadow 0.2s;
+      font-size: 1.1rem;
+    }
+    input:focus, select:focus, textarea:focus {
+      border: 2px solid #ffd700;
+      box-shadow: 0 0 24px #ffd70099, 0 0 8px #d90429;
+      outline: none;
+    }
+    .select2-container--default .select2-selection--single {
+      background-color: #1a0000;
+      color: #fff;
+      border-radius: 0.7rem;
+      border: 2px solid #d90429;
+      box-shadow: 0 0 12px #ffd70033;
+      font-family: 'Share Tech Mono', Arial, sans-serif;
+      font-size: 1.1rem;
+    }
+    .select2-container--default .select2-results__option {
+      color: #d90429;
+      font-family: 'Share Tech Mono', Arial, sans-serif;
+    }
+    table {
+      background: rgba(60, 0, 0, 0.92);
+      border-radius: 1.5rem;
+      overflow: hidden;
+      box-shadow: 0 0 32px #ffd70033, 0 0 8px #d90429;
+      margin-bottom: 2rem;
+    }
+    th, td {
+      border-bottom: 1px solid #ffd70044;
+      padding: 0.7rem 1.1rem;
+      font-size: 1.08rem;
+    }
+    th {
+      background: linear-gradient(90deg, #d90429 0%, #ffd700 100%);
+      color: #fff;
+      text-shadow: 0 0 8px #ffd700, 0 0 2px #d90429;
+      letter-spacing: 1.5px;
+      font-family: 'Orbitron', Arial, sans-serif;
+      font-size: 1.15rem;
+    }
+    .btn-futuristic, .btn-premium {
+      background: linear-gradient(90deg, #d90429 0%, #ffd700 100%);
+      color: #000;
+      border: none;
+      border-radius: 2.5rem;
+      padding: 0.8rem 2.5rem;
+      font-family: 'Orbitron', 'Share Tech Mono', Arial, sans-serif;
+      font-size: 1.2rem;
+      font-weight: bold;
+      box-shadow: 0 0 32px #ffd70099, 0 0 8px #d90429;
+      transition: background 0.3s, box-shadow 0.3s, transform 0.2s;
+      cursor: pointer;
+      margin-top: 0.7rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      border: 2px solid #ffd700;
+    }
+    .btn-futuristic:hover, .btn-premium:hover {
+      background: linear-gradient(90deg, #ffd700 0%, #d90429 100%);
+      box-shadow: 0 0 48px #d90429cc, 0 0 16px #ffd700;
+      transform: scale(1.07);
+      color: #fff;
+      border: 2px solid #d90429;
+    }
+    .glass {
+      background: rgba(255,255,255,0.07);
+      border-radius: 1.5rem;
+      box-shadow: 0 0 32px #ffd70033, 0 0 8px #d90429;
+      backdrop-filter: blur(6px) saturate(1.2);
+      -webkit-backdrop-filter: blur(6px) saturate(1.2);
+      border: 1.5px solid #ffd70055;
+      padding: 1.2rem;
+      margin-bottom: 1.5rem;
+    }
+    .text-xl, .font-bold {
+      color: #ffd700;
+      text-shadow: 0 0 8px #d90429, 0 0 2px #fff;
+    }
+    .hidden { display: none; }
+    .text-red-600 { color: #d90429; }
+    .text-center { text-align: center; }
+    .text-sm { font-size: 1.05rem; }
+    .max-w-xl { max-width: 40rem; }
+    .mx-auto { margin-left: auto; margin-right: auto; }
+    .mt-8 { margin-top: 2rem; }
+    .mt-6 { margin-top: 1.5rem; }
+    .mt-10 { margin-top: 2.5rem; }
+    .mb-6 { margin-bottom: 1.5rem; }
+    .mb-2 { margin-bottom: 0.5rem; }
+    .gap-2 { gap: 0.5rem; }
+    .gap-4 { gap: 1rem; }
+    .rounded-xl { border-radius: 1.5rem; }
+    .rounded { border-radius: 0.7rem; }
+    .shadow { box-shadow: 0 0 32px #ffd70044; }
+    .w-full { width: 100%; }
+    .flex { display: flex; }
+    .flex-col { flex-direction: column; }
+    .items-end { align-items: flex-end; }
+    .justify-end { justify-content: flex-end; }
+    /* Detalles racing */
+    .racing-stripe {
+      position: absolute;
+      left: 0; right: 0; top: 30px;
+      height: 6px;
+      background: repeating-linear-gradient(90deg, #ffd700 0 20px, #d90429 20px 40px);
+      opacity: 0.7;
+      z-index: 3;
+      border-radius: 3px;
+      filter: blur(0.5px);
+    }
+    .formulario-documento-container .racing-stripe {
+      top: 0;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/particles.js"></script>
+{% endblock %}
+
+{% block content %}
+<div id="particles-js"></div>
+<div class="formulario-documento-container max-w-6xl mx-auto mt-10 p-6" id="form-doc-container">
+  <div class="racing-stripe"></div>
+  <h1 class="text-2xl font-bold mb-6 text-center">📄 Editar Documento</h1>
+  <form method="post">
+    {% csrf_token %}
+    <input type="hidden" id="json_items" name="json_items" value="" />
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div><label for="id_tipo_documento">Tipo de Documento</label>{{ form.tipo_documento }}</div>
+      <div><label for="id_numero_documento">Número</label>{{ form.numero_documento }}</div>
+      <div><label for="id_fecha">Fecha</label>{{ form.fecha }}</div>
+      <div>
+        <label for="id_cliente">Cliente</label>
+        {{ form.cliente }}
+      </div>
+      <div>
+        <label for="id_vehiculo">Vehículo</label>
+        {{ form.vehiculo }}
+      </div>
+      <div><label for="id_kilometraje">Kilometraje</label>{{ form.kilometraje }}</div>
+      <div><label for="id_mecanico">Mecánico</label>
+        {{ form.mecanico }}
+      </div>
+    </div>
+
+    <div class="mt-8">
+      <h2 class="text-lg font-bold mb-2">Repuestos</h2>
+      <table class="w-full text-sm mb-4" id="tabla-repuestos">
+        <thead>
+          <tr>
+            <th>Partnumber</th>
+            <th>Nombre</th>
+            <th>Cantidad</th>
+            <th>Precio unitario</th>
+            <th>Total</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for repuesto in repuestos %}
+          <tr>
+            <td><input type="text" class="partnumber-input w-full border p-1" value="{{ repuesto.codigo }}" /></td>
+            <td><input type="text" class="nombre-input w-full border p-1" value="{{ repuesto.nombre }}" /></td>
+            <td><input type="text" inputmode="numeric" pattern="[0-9.]*" class="cantidad-input w-20 border p-1 text-right" min="1" value="{{ repuesto.cantidad }}" /></td>
+            <td class="relative">
+              <span class="absolute left-2 top-1.5 text-gray-500">$</span>
+              <input type="text" inputmode="numeric" pattern="[0-9.]*" class="precio-input w-24 border p-1 pl-5 text-right" min="0" value="{{ repuesto.precio }}" />
+            </td>
+            <td class="font-bold total-repuesto text-right">${{ repuesto.total }}</td>
+            <td><button type="button" class="text-red-600 font-bold remove-repuesto">✕</button></td>
+          </tr>
+        {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td class="text-right font-bold" colspan="3">Total repuestos</td>
+            <td class="font-bold" id="total-repuestos">$0</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+      <button class="btn-futuristic" onclick="agregarRepuesto()" type="button">Agregar repuesto</button>
+    </div>
+
+    <div class="mt-8">
+      <h2 class="text-lg font-bold mb-2">Servicios</h2>
+      <table class="w-full text-sm mb-4" id="tabla-servicios">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Precio</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for servicio in servicios %}
+          <tr>
+            <td>
+              <select class="nombre-servicio-input w-full border p-1">
+                <option value="{{ servicio.id }}" selected>{{ servicio.nombre }}</option>
+              </select>
+            </td>
+            <td><input type="text" inputmode="numeric" pattern="[0-9.]*" class="precio-servicio-input w-24 border p-1 text-right" value="{{ servicio.precio|default_if_none:0 }}" /></td>
+            <td><button type="button" class="text-red-600 font-bold remove-servicio">✕</button></td>
+          </tr>
+        {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td class="text-right font-bold" colspan="1">Total servicios</td>
+            <td class="font-bold" id="total-servicios">$0</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+      <button class="btn-futuristic" onclick="agregarServicio()" type="button">Agregar servicio</button>
+    </div>
+
+    <div class="mt-8 max-w-xl mx-auto">
+      <label class="block text-sm font-medium mb-1" for="id_observaciones">Observaciones</label>
+      {{ form.observaciones }}
+    </div>
+
+    <div class="mt-8 flex flex-col items-end gap-2">
+      <div><span class="font-bold">Total repuestos:</span> <span id="total-repuestos-resumen">$0</span></div>
+      <div><span class="font-bold">Total servicios:</span> <span id="total-servicios-resumen">$0</span></div>
+      <div><span class="font-bold">Subtotal:</span> <span id="subtotal-doc">$0</span></div>
+      <div><span class="font-bold">IVA (19%):</span> <span id="iva-doc">$0</span></div>
+      <div class="text-xl"><span class="font-bold">Gran Total:</span> <span id="gran-total-doc">$0</span></div>
+    </div>
+
+    <div class="mt-6 flex justify-end">
+      <button class="btn-futuristic" type="submit">Guardar Cambios</button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+$(document).ready(function () {
+  const $cliente = $('#id_cliente');
+  const $vehiculo = $('#id_vehiculo');
+  const $vehiculoWrapper = $('#vehiculo-wrapper');
+  const $vehiculoAlerta = $('#vehiculo-alerta');
+
+  // Inicializar select2 en cliente SOLO UNA VEZ
+  $cliente.select2({
+    ajax: {
+      url: '/autocomplete/cliente/',
+      dataType: 'json',
+      delay: 250,
+      data: function(params) {
+        return { q: params.term };
+      },
+      processResults: function(data) {
+        return { results: data.results };
+      },
+      cache: true
+    },
+    placeholder: 'Buscar cliente...',
+    allowClear: true,
+    minimumInputLength: 0,
+    width: '100%'
+  });
+
+  // Si hay valor inicial, forzar mostrarlo en select2
+  var clienteId = $cliente.val();
+  if (clienteId) {
+    $.ajax({
+      type: 'GET',
+      url: '/autocomplete/cliente/',
+      data: {q: ''},
+      dataType: 'json'
+    }).then(function (data) {
+      var option = null;
+      for (var i = 0; i < data.results.length; i++) {
+        if (data.results[i].id == clienteId) {
+          option = new Option(data.results[i].text, data.results[i].id, true, true);
+          break;
+        }
+      }
+      if (option) {
+        $cliente.append(option).trigger('change');
+      }
+    });
+  }
+
+  // Función para inicializar select2 en vehículo según cliente
+  function initVehiculoSelect2(clienteId) {
+    $vehiculo.select2({
+      ajax: {
+        url: '/autocomplete/vehiculo/',
+        dataType: 'json',
+        delay: 250,
+        data: function(params) {
+          return {
+            q: params.term,
+            cliente: clienteId
+          };
+        },
+        processResults: function(data) {
+          return { results: data.results };
+        },
+        cache: true
+      },
+      placeholder: 'Buscar vehículo...',
+      allowClear: true,
+      minimumInputLength: 0,
+      width: '100%'
+    });
+  }
+
+  // Inicializar vehículo con el cliente actual
+  initVehiculoSelect2($cliente.val());
+
+  // Al cambiar cliente, resetear y recargar vehículo
+  $cliente.on('change', function () {
+    var clienteId = $(this).val();
+    $vehiculo.val(null).trigger('change');
+    $vehiculo.select2('destroy');
+    initVehiculoSelect2(clienteId);
+    if (clienteId) {
+      $vehiculoWrapper.removeClass('hidden');
+    } else {
+      $vehiculoWrapper.addClass('hidden');
+    }
+  });
+
+  $vehiculo.on('select2:opening', function (e) {
+    const clienteId = $cliente.val();
+    if (!clienteId) {
+      e.preventDefault();
+      $vehiculoAlerta.removeClass('hidden');
+      setTimeout(() => {
+        $vehiculoAlerta.addClass('hidden');
+      }, 3000);
+    }
+  });
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (window.particlesJS) {
+    particlesJS('particles-js', {
+      "particles": {
+        "number": {"value": 120},
+        "color": {"value": ["#d90429", "#ffd700", "#fff", "#111"]},
+        "shape": {"type": ["circle", "edge", "polygon"]},
+        "opacity": {"value": 0.8, "random": true},
+        "size": {"value": 5, "random": true},
+        "line_linked": {"enable": true, "distance": 140, "color": "#ffd700", "opacity": 0.5, "width": 2.5},
+        "move": {"enable": true, "speed": 4, "direction": "none", "random": true, "straight": false, "out_mode": "out"}
+      },
+      "interactivity": {
+        "detect_on": "canvas",
+        "events": {"onhover": {"enable": true, "mode": "grab"}, "onclick": {"enable": true, "mode": "push"}},
+        "modes": {"grab": {"distance": 180, "line_linked": {"opacity": 0.8}}, "push": {"particles_nb": 6}}
+      },
+      "retina_detect": true
+    });
+  }
+});
+</script>
+<script src="{% static 'js/formulario_documento.js' %}"></script>
+{% endblock %}

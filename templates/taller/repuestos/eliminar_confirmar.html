@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+
+{% block title %}Confirmar Eliminación{% endblock %}
+{% block content %}
+  <style>
+    body, .cuadro, .cuadro *, table, thead, tbody, th, td, label, input, select, textarea, option {
+      color: #111 !important;
+    }
+    input[type="text"]::placeholder, textarea::placeholder {
+      color: #444 !important;
+    }
+  </style>
+<div class="max-w-md mx-auto mt-20 translucent-card border border-slate-200 rounded-lg shadow px-6 py-8">
+<h1 class="text-xl font-semibold text-red-600 mb-4">¿Estás seguro?</h1>
+<p class="text-slate-600 mb-6">Esta acción eliminará el objeto <strong>{{ object }}</strong>. ¿Deseas continuar?</p>
+<form method="post">
+    {% csrf_token %}
+    <div class="flex justify-between">
+<a class="px-4 py-2 rounded bg-slate-200 text-slate-700 hover:bg-slate-300" href="javascript:history.back()">Cancelar</a>
+<button class="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700 btn-futuristic" type="submit">Eliminar</button>
+</div>
+</form>
+</div>
+{% endblock %}

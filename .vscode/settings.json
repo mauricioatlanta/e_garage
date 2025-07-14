@@ -1,0 +1,30 @@
+{
+    "python.testing.pytestArgs": [
+        "gestion_taller"
+    ],
+    
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "python.analysis.extraPaths": ["./taller"]
+
+
+    "sqltools.connections": [
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 5432,
+            "driver": "MySQL",
+            "name": "e-garage PostgreSQL",
+            "database": "egarage",
+            "username": "mauricio"
+        }
+    ],
+    "files.exclude": {
+        "": true,
+        "from taller.views.repuesto import lista_repuestos": true
+    }
+}

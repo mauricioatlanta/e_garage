@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: Arial, sans-serif; font-size: 14px; margin: 20px; }
+    .header { text-align: center; margin-bottom: 20px; }
+    .header h1 { margin: 0; }
+    .section { margin-bottom: 15px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid #333; padding: 6px; text-align: left; }
+    th { background-color: #f0f0f0; }
+    .totales { text-align: right; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>{{ documento.tipo|title }} N°{{ documento.numero }}</h1>
+  <p><strong>Fecha:</strong> {{ documento.fecha }}</p>
+</div>
+
+<div class="section">
+  <strong>Cliente:</strong> {{ documento.cliente }}<br>
+  <strong>Vehículo:</strong> {{ documento.vehiculo }}<br>
+  <strong>Kilometraje:</strong> {{ documento.kilometraje }} km<br>
+  <strong>Mecánico:</strong> {{ documento.mecanico }}
+</div>
+
+<div class="section">
+  <strong>Repuestos Utilizados:</strong>
+  <table>
+    <tr><th>Nombre</th><th>Cantidad</th><th>Precio Compra</th><th>Precio Venta</th><th>Total Venta</th></tr>
+    {% for rep in documento.repuestos.all %}
+    <tr>
+      <td>{{ rep.nombre }}</td>
+      <td>{{ rep.cantidad }}</td>
+      <td>${{ rep.precio_compra }}</td>
+      <td>${{ rep.precio_venta }}</td>
+      <td>${{ rep.precio_venta|floatformat:0|add:""|add:rep.cantidad|floatformat:0 }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+
+<div class="section">
+  <strong>Servicios Realizados:</strong>
+  <table>
+    <tr><th>Servicio</th><th>Valor</th></tr>
+    {% for srv in documento.servicios.all %}
+    <tr>
+      <td>{{ srv.nombre }}</td>
+      <td>${{ srv.valor }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+
+<div class="section totales">
+  <p><strong>Total Repuestos:</strong> ${{ documento.total_repuestos }}</p>
+  <p><strong>Total Servicios:</strong> ${{ documento.total_servicios }}</p>
+  <p><strong>IVA:</strong> ${{ documento.iva }}</p>
+  <p><strong>Gran Total:</strong> ${{ documento.gran_total }}</p>
+</div>
+
+<div class="section">
+  <strong>Observaciones:</strong><br>
+  <p>{{ documento.observaciones }}</p>
+</div>
+
+</body>
+</html>

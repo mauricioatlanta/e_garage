@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Clientes | e-Garage{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4">
+  <div class="bg-black/30 backdrop-blur p-6 rounded-xl shadow-lg mb-10 border border-green-400">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-3xl font-bold text-lime-400 flex items-center gap-2">🧬 Registro de Clientes</h2>
+      <a href="{% url 'clientes:crear_cliente' %}" class="bg-lime-500 text-black font-bold py-2 px-4 rounded hover:bg-lime-400 transition">+ Nuevo Cliente</a>
+    </div>
+    <form method="get" class="mb-4" id="busqueda-clientes-form" autocomplete="off">
+      <input type="text" name="q" value="{{ q }}" placeholder="🔍 Buscar por nombre, correo, RUT..." class="w-full px-4 py-2 rounded bg-black/40 text-white border border-lime-500 focus:outline-none focus:ring-2 focus:ring-lime-300" id="busqueda-clientes-input">
+    </form>
+    <div id="tabla-clientes">
+      {% include 'taller/clientes/_tabla_clientes.html' with clientes=clientes %}
+    </div>
+    <script>
+      const input = document.getElementById('busqueda-clientes-input');
+      let timeout = null;
+      input.addEventListener('input', function() {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+          const q = input.value;
+          fetch(`ajax/buscar/?q=${encodeURIComponent(q)}`)
+            .then(r => r.json())
+            .then(data => {
+              document.getElementById('tabla-clientes').innerHTML = data.html;
+            });
+        }, 350);
+      });
+    </script>
+  </div>
+</div>
+{% endblock %}

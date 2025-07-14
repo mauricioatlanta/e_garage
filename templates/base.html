@@ -1,0 +1,56 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}e-Garage{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Estilos principales -->
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+  <!-- TailwindCSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Autocomplete Light (DAL) -->
+  <script src="{% static 'autocomplete_light/jquery.init.js' %}"></script>
+  <script src="{% static 'autocomplete_light/select2.js' %}"></script>
+  <script src="{% static 'autocomplete_light/autocomplete_light.js' %}"></script>
+  <script src="{% static 'autocomplete_light/autocomplete.init.js' %}"></script>
+
+  {% block extra_head %}{% endblock %}
+</head>
+
+<body class="bg-[#0d1117] text-white font-sans min-h-screen relative">
+
+
+<nav class="w-full bg-black/60 backdrop-blur border-b border-cyan-700/40 shadow-lg py-3 px-6 flex items-center justify-between z-50 relative">
+  <div class="flex items-center gap-8">
+    <a href="/" class="text-2xl font-extrabold text-cyan-300 tracking-widest hover:text-lime-300 transition">E-Garage</a>
+    <a href="/clientes/" class="hover:text-lime-400 transition">Clientes</a>
+    <a href="/repuestos-info/" class="hover:text-lime-400 transition">Repuestos</a>
+    <a href="/servicios-info/" class="hover:text-lime-400 transition">Servicios</a>
+    <a href="/reportes-info/" class="hover:text-lime-400 transition">Reportes</a>
+    <a href="/ia-info/" class="hover:text-lime-400 transition">IA</a>
+  </div>
+  <div class="flex items-center gap-4">
+    {% if user.is_authenticated %}
+      <span class="font-semibold text-cyan-200"><i class="fas fa-user-circle mr-1"></i> {{ user.get_full_name|default:user.username }}</span>
+      <a href="/accounts/logout/" class="bg-fuchsia-500 hover:bg-fuchsia-400 text-white font-bold px-4 py-2 rounded-xl transition shadow">Salir</a>
+    {% else %}
+      <a href="/accounts/login/" class="bg-cyan-500 hover:bg-cyan-400 text-white font-bold px-4 py-2 rounded-xl transition shadow">Iniciar sesión</a>
+    {% endif %}
+  </div>
+</nav>
+
+{% block fondo_extra %}{% endblock %}
+
+{% block content %}{% endblock %}
+
+{% block extra_js %}{% endblock %}
+
+</body>
+</html>

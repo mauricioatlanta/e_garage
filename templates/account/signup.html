@@ -1,0 +1,68 @@
+
+{% extends "base.html" %}
+{% load i18n %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}Crea tu cuenta | E-Garage{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto mt-16 bg-gray-900 bg-opacity-80 rounded-2xl shadow-2xl p-10">
+    <div class="flex flex-col items-center mb-6">
+        <img src="{% static 'img/TallerPro_logo.png' %}" alt="E-Garage Logo" class="h-16 mb-3 drop-shadow-lg animate-pulse">
+        <h1 class="text-4xl md:text-5xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-lime-400 to-fuchsia-500 mb-2 tracking-tight futuristic-glow">Crea tu cuenta</h1>
+        <p class="text-center text-base text-cyan-100 mb-2 max-w-xs font-semibold">Accede a la plataforma premium de gestión de talleres.</p>
+    </div>
+    <form method="post" action="" class="space-y-6">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div>
+            <label for="id_email" class="block text-cyan-100 font-bold mb-1">Correo electrónico</label>
+            {{ form.email|add_class:'input-dark' }}
+            {{ form.email.errors }}
+        </div>
+        <div>
+            <label for="id_username" class="block text-cyan-100 font-bold mb-1">Nombre de usuario</label>
+            {{ form.username|add_class:'input-dark' }}
+            {{ form.username.errors }}
+        </div>
+        <div>
+            <label for="id_password1" class="block text-cyan-100 font-bold mb-1">Contraseña</label>
+            {{ form.password1|add_class:'input-dark' }}
+            {{ form.password1.errors }}
+        </div>
+        <div>
+            <label for="id_password2" class="block text-cyan-100 font-bold mb-1">Repite tu contraseña</label>
+            {{ form.password2|add_class:'input-dark' }}
+            {{ form.password2.errors }}
+        </div>
+        <button type="submit" class="w-full py-3 mt-4 rounded-lg bg-gradient-to-r from-cyan-400 to-lime-400 text-gray-900 font-bold text-lg shadow-lg hover:from-lime-400 hover:to-cyan-400 transition">Registrarme</button>
+    </form>
+    <p class="text-center text-cyan-200 mt-6 text-sm">¿Ya tienes cuenta? <a href="{% url 'account_login' %}" class="text-lime-400 hover:underline">Inicia sesión</a></p>
+</div>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+<style>
+  .futuristic-glow {
+    text-shadow: 0 0 24px #00ffe7, 0 0 8px #00ffe7, 0 0 2px #fff;
+    letter-spacing: 2px;
+  }
+  .input-dark {
+    background: #181c1f;
+    color: #fff;
+    border: 1.5px solid #00ffe7aa;
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    width: 100%;
+    font-size: 1.1rem;
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+    box-shadow: 0 2px 8px 0 #00ffe733;
+    outline: none;
+    transition: border 0.2s, box-shadow 0.2s;
+  }
+  .input-dark:focus {
+    border: 2px solid #a3ff12;
+    box-shadow: 0 0 16px 0 #a3ff12cc;
+  }
+</style>
+{% endblock %}

@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto py-12 text-lime-200">
+<h1 class="text-4xl font-bold mb-8 text-center tracking-widest">🤖 Crear Cliente</h1>
+<style>
+  input, select, textarea {
+    background: #111 !important;
+    color: #fff !important;
+    border: 1.5px solid #4fd1c5 !important;
+    font-family: 'Segoe UI', 'Arial', sans-serif !important;
+  }
+  input::placeholder, textarea::placeholder {
+    color: #b2f5ea !important;
+  }
+</style>
+<form class="space-y-6" method="post">
+    {% csrf_token %}
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div>
+<label class="block mb-2" for="id_nombre">Nombre:</label>
+        {{ form.nombre|add_class:'!text-white !bg-black !border-white placeholder-white' }}
+      </div>
+<div>
+<label class="block mb-2" for="id_apellido">Apellido:</label>
+        {{ form.apellido|add_class:'!text-white !bg-black !border-white placeholder-white' }}
+      </div>
+<div>
+<label class="block mb-2" for="id_telefono">Teléfono:</label>
+        {{ form.telefono|add_class:'!text-white !bg-black !border-white placeholder-white' }}
+      </div>
+<div>
+<label class="block mb-2" for="id_direccion">Dirección:</label>
+        {{ form.direccion|add_class:'!text-white !bg-black !border-white placeholder-white' }}
+      </div>
+<div>
+<label class="block mb-2" for="id_email">Correo electrónico:</label>
+        {{ form.email|add_class:'!text-white !bg-black !border-white placeholder-white' }}
+      </div>
+<div>
+<label class="block mb-2" for="id_region">Región:</label>
+        {{ form.region|add_class:'!text-white !bg-black !border-white' }}
+      </div>
+<div>
+<label class="block mb-2" for="id_ciudad">Ciudad:</label>
+        {{ form.ciudad|add_class:'!text-white !bg-black !border-white' }}
+      </div>
+</div>
+<div class="text-center pt-6">
+<button class="bg-gradient-to-r from-lime-400 to-cyan-500 text-black px-6 py-3 rounded-xl shadow-lg hover:scale-105 transition font-bold btn-futuristic" type="submit">
+        Guardar Cliente
+      </button>
+</div>
+</form>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const regionSelect = document.getElementById('id_region');
+  const ciudadSelect = document.getElementById('id_ciudad');
+
+  if(regionSelect && ciudadSelect) {
+    function cargarCiudades(regionId, selectedCiudadId = null) {
+      ciudadSelect.innerHTML = '<option value="">---------</option>';
+      if(regionId) {
+        fetch(`/api/ciudades/?region_id=${regionId}`)
+          .then(response => response.json())
+          .then(data => {
+            data.forEach(function(ciudad) {
+              const option = document.createElement('option');
+              option.value = ciudad.id;
+              option.textContent = ciudad.nombre;
+              if (selectedCiudadId && ciudad.id == selectedCiudadId) {
+                option.selected = true;
+              }
+              ciudadSelect.appendChild(option);
+            });
+          });
+      }
+    }
+
+    // Cargar ciudades si ya hay una región seleccionada (por ejemplo, al editar)
+    if(regionSelect.value) {
+      cargarCiudades(regionSelect.value, ciudadSelect.getAttribute('data-selected'));
+    }
+
+    regionSelect.addEventListener('change', function() {
+      cargarCiudades(this.value);
+    });
+  }
+});
+</script>
+{% endblock %}

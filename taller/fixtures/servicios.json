@@ -1,0 +1,104 @@
+[
+    {
+        "model": "taller.categoriaservicio",
+        "pk": 1,
+        "fields": {
+            "nombre": "Mantenimiento"
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 1,
+        "fields": {
+            "nombre": "Cambio de aceite",
+            "categoria": 1,
+            "precio_venta": 15000
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 2,
+        "fields": {
+            "nombre": "Cambio de filtro de aire",
+            "categoria": 1,
+            "precio_venta": 15000
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 3,
+        "fields": {
+            "nombre": "Revisión general",
+            "categoria": 1,
+            "precio_venta": 15000
+        }
+    },
+    {
+        "model": "taller.categoriaservicio",
+        "pk": 2,
+        "fields": {
+            "nombre": "Sistema de Frenos"
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 4,
+        "fields": {
+            "nombre": "Cambio de pastillas de freno",
+            "categoria": 2,
+            "precio_venta": 15000
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 5,
+        "fields": {
+            "nombre": "Cambio de discos de freno",
+            "categoria": 2,
+            "precio_venta": 15000
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 6,
+        "fields": {
+            "nombre": "Purgado de frenos",
+            "categoria": 2,
+            "precio_venta": 15000
+        }
+    },
+    {
+        "model": "taller.categoriaservicio",
+        "pk": 3,
+        "fields": {
+            "nombre": "Sistema Eléctrico"
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 7,
+        "fields": {
+            "nombre": "Cambio de batería",
+            "categoria": 3,
+            "precio_venta": 15000
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 8,
+        "fields": {
+            "nombre": "Revisión de alternador",
+            "categoria": 3,
+            "precio_venta": 15000
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 9,
+        "fields": {
+            "nombre": "Instalación de luces LED",
+            "categoria": 3,
+            "precio_venta": 15000
+        }
+    }
+]

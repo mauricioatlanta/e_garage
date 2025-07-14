@@ -1,0 +1,43 @@
+
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<section class="text-center mt-12">
+  <h1 class="text-4xl font-extrabold text-white mb-2">Panel Principal</h1>
+  <p class="text-cyan-300">Accede rápidamente a los módulos del sistema</p>
+</section>
+
+<section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 max-w-6xl mx-auto mt-10 px-6 pb-20">
+  <a href="/clientes/" class="card">
+    <div class="emoji">👥</div>
+    <div class="label">Clientes</div>
+    <div class="desc">Gestión completa de clientes.</div>
+  </a>
+  <a href="/vehiculos/" class="card">
+    <div class="emoji">🚗</div>
+    <div class="label">Vehículos</div>
+    <div class="desc">Listado por cliente y detalles.</div>
+  </a>
+  <a href="/servicios/" class="card">
+    <div class="emoji">🧰</div>
+    <div class="label">Servicios</div>
+    <div class="desc">Catálogo de servicios ofrecidos.</div>
+  </a>
+  <a href="/repuestos/" class="card">
+    <div class="emoji">🧩</div>
+    <div class="label">Repuestos</div>
+    <div class="desc">Precios, stock y categorías.</div>
+  </a>
+  <a href="/documentos/" class="card">
+    <div class="emoji">📄</div>
+    <div class="label">Documentos</div>
+    <div class="desc">Presupuestos, órdenes, facturas.</div>
+  </a>
+  <a href="/reportes/" class="card">
+    <div class="emoji">📊</div>
+    <div class="label">Reportes</div>
+    <div class="desc">Indicadores clave de productividad.</div>
+  </a>
+</section>
+{% endblock %}

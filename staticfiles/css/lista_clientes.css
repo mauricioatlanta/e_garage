@@ -1,0 +1,45 @@
+/* Forzar todos los textos a negro */
+* {
+    color: black !important;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f0f9ff;
+    color: black !important;
+}
+
+input#buscador {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    width: 100%;
+    margin-bottom: 1rem;
+    color: black !important;
+}
+
+.table thead {
+    background-color: #0ea5e9;
+    color: white !important;
+}
+
+/* Asegura que el texto de las filas de la tabla de clientes sea negro */
+tr, td, th, .cliente-row, .cliente-cell {
+  color: black !important;
+}
+
+/* Excepciones para encabezados de tabla */
+.table thead th {
+    color: white !important;
+}
+
+/* Forzar el texto de la tabla de clientes a negro, incluyendo el mensaje de vacío */
+.table-clientes th,
+.table-clientes td,
+.table-clientes {
+  color: black !important;
+}
+
+/* Mensaje de vacío */
+.table-clientes .text-gray-500 {
+  color: black !important;
+}

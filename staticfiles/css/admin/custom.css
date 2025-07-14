@@ -1,0 +1,18 @@
+/* Estilos para los selectores de región y ciudad */
+.field-region select,
+.field-ciudad select {
+    width: 100%;
+    max-width: 400px;
+}
+
+/* Estilo para el select de ciudad cuando está deshabilitado */
+.field-ciudad select:disabled {
+    background-color: #f8f9fa;
+    cursor: not-allowed;
+}
+
+/* Estilo para el mensaje de carga */
+.loading-message {
+    color: #666;
+    font-style: italic;
+}

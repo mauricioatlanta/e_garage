@@ -1,0 +1,153 @@
+
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto cuadro mt-8 p-8 rounded shadow">
+  <style>
+    .cuadro, .cuadro * {
+      color: #fff !important;
+    }
+    input, select, .select2-container--default .select2-selection--single, .select2-dropdown, .select2-results__option {
+      background: #111 !important;
+      color: #fff !important;
+      border: 1.5px solid #4fd1c5 !important;
+      font-family: 'Segoe UI', 'Arial', sans-serif !important;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered,
+    .select2-container--default .select2-results__option {
+      color: #fff !important;
+      font-weight: 500;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow b {
+      border-top-color: #4fd1c5 !important;
+    }
+    input::placeholder {
+      color: #b2f5ea !important;
+    }
+    .translucent-card {
+      background: rgba(0,0,0,0.6) !important;
+      color: #fff !important;
+    }
+  </style>
+
+  <div class="flex justify-between items-center mb-4">
+    <h1 class="text-2xl font-bold">Crear Vehículo</h1>
+    <a class="bg-gradient-to-r from-cyan-400 to-emerald-500 text-black px-6 py-2 rounded-xl shadow-lg hover:scale-105 transition font-bold btn-futuristic" href="{% url 'vehiculos:lista_vehiculos' %}">Volver a la lista</a>
+  </div>
+
+  <form class="space-y-6" method="post">
+    {% csrf_token %}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <label class="block font-semibold mb-1" for="id_cliente">Cliente</label>
+        {{ form.cliente }}
+        {{ form.cliente.errors }}
+      </div>
+      <div>
+        <label class="block font-semibold mb-1" for="id_patente">Patente</label>
+        {{ form.patente }}
+        {{ form.patente.errors }}
+      </div>
+      <div>
+        <label class="block font-semibold mb-1" for="id_marca">Marca</label>
+        {{ form.marca }}
+        {{ form.marca.errors }}
+      </div>
+      <div>
+        <label class="block font-semibold mb-1" for="id_modelo">Modelo</label>
+        {{ form.modelo }}
+        {{ form.modelo.errors }}
+      </div>
+      <div>
+        <label class="block font-semibold mb-1" for="id_anio">Año</label>
+        {{ form.anio }}
+        {{ form.anio.errors }}
+      </div>
+      <div>
+        <label class="block font-semibold mb-1" for="id_color">Color</label>
+        {{ form.color }}
+        {{ form.color.errors }}
+      </div>
+      <div>
+        <label class="block font-semibold mb-1" for="id_vin">VIN</label>
+        {{ form.vin }}
+        {{ form.vin.errors }}
+      </div>
+      <div>
+        <label class="block font-semibold mb-1" for="id_motor">Motor</label>
+        {{ form.motor }}
+        {{ form.motor.errors }}
+      </div>
+      <div>
+        <label class="block font-semibold mb-1" for="id_caja">Caja</label>
+        {{ form.caja }}
+        {{ form.caja.errors }}
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-4 pt-6">
+      <a href="{% url 'vehiculos:lista_vehiculos' %}" class="bg-gradient-to-r from-cyan-400 to-emerald-500 text-black px-6 py-2 rounded-xl shadow-lg hover:scale-105 transition font-bold btn-futuristic">Cancelar</a>
+      <button class="bg-gradient-to-r from-cyan-400 to-emerald-500 text-black px-6 py-2 rounded-xl shadow-lg hover:scale-105 transition font-bold btn-futuristic" type="submit">
+        Guardar Vehículo
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+  {{ form.media }}
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const initDAL = () => {
+        if (window.dal && window.dal.init) {
+          window.dal.init();
+          console.log("✅ DAL inicializado");
+        } else {
+          console.warn("❌ DAL no disponible, reintentando...");
+          setTimeout(initDAL, 300);
+        }
+      };
+      initDAL();
+    });
+
+    document.addEventListener('dal-init-function', function () {
+      if (!yl.functions.select2) {
+        yl.registerFunction('select2', function ($, element) {
+          $(element).select2({ width: 'style' });
+          $(element).on('select2:open', function () {
+            var $input = $('.select2-search__field');
+            if ($input.val() === '') {
+              $input.trigger('input');
+            }
+          });
+        });
+      }
+    });
+
+    // Toast para feedback de errores de creación dinámica
+    function showToast(message) {
+      // Elimina cualquier toast previo
+      $("#dal-toast-feedback").remove();
+      const toast = $(`
+        <div id="dal-toast-feedback" class="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg text-lg font-semibold animate-fade-in-up" style="min-width: 300px; text-align: center;">
+          ${message}
+        </div>
+      `);
+      $("body").append(toast);
+      setTimeout(() => {
+        toast.fadeOut(400, function() { $(this).remove(); });
+      }, 3500);
+    }
+
+    // Intercepta el error de creación de DAL y muestra el toast
+    $(document).on('dal-select2:createmessage', function(e) {
+      const msg = e.originalEvent.detail && e.originalEvent.detail.message;
+      if (msg) {
+        showToast(msg);
+      }
+    });
+  </script>
+{% endblock %}

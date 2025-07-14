@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% block extra_head %}
+<link href="/static/css/estilo_futurista.css" rel="stylesheet">
+<link href="/static/css/galaxy_theme.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
+{% endblock %}
+{% block fondo_extra %}
+<div id="tsparticles" class="fixed inset-0 -z-10"></div>
+{% endblock %}
+{% block content %}
+<div class="min-h-screen flex flex-col items-center justify-center px-4 premium-container">
+  <div class="premium-card w-full max-w-2xl p-8 mt-16">
+    <div class="logo-header flex flex-col items-center mb-4">
+      <img src="/media/TallerPro_logo.png" alt="E-Garage Logo" class="logo-egarage-header animate-logo mb-2">
+      <h2 class="premium-title text-3xl font-bold text-center mb-2">Reportes del Taller</h2>
+    </div>
+    <div class="flex flex-wrap justify-center gap-3 mb-8">
+      <a href="/dashboard/" class="btn-futuristic-nav"><span>Dashboard</span><span class="glow"></span></a>
+      <a href="/vehiculos/" class="btn-futuristic-nav"><span>Mis vehículos</span><span class="glow"></span></a>
+      <a href="/account/email/" class="btn-futuristic-nav"><span>Correos</span><span class="glow"></span></a>
+      <a href="/account/logout/" class="btn-futuristic-nav"><span>Salir</span><span class="glow"></span></a>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <a href="/reportes/servicios/" class="reporte-card">
+        <div class="icon-report">🛠️</div>
+        <div class="reporte-title">Servicios realizados</div>
+        <div class="reporte-desc">Estadísticas de servicios, ingresos, frecuencia y tipos más solicitados.</div>
+      </a>
+      <a href="/reportes/repuestos/" class="reporte-card">
+        <div class="icon-report">🔩</div>
+        <div class="reporte-title">Repuestos</div>
+        <div class="reporte-desc">Repuestos vendidos, stock, categorías y tendencias de consumo.</div>
+      </a>
+      <a href="/reportes/servicios/?enfoque=vehiculos" class="reporte-card">
+        <div class="icon-report">🚗</div>
+        <div class="reporte-title">Vehículos atendidos</div>
+        <div class="reporte-desc">Ranking de modelos, marcas, años y clientes frecuentes.</div>
+      </a>
+      <a href="/reportes/servicios/?enfoque=clientes" class="reporte-card">
+        <div class="icon-report">👤</div>
+        <div class="reporte-title">Clientes</div>
+        <div class="reporte-desc">Clientes activos, nuevos, históricos y su recurrencia.</div>
+      </a>
+      <a href="/reportes/servicios/?enfoque=facturacion_total" class="reporte-card">
+        <div class="icon-report">💸</div>
+        <div class="reporte-title">Facturación</div>
+        <div class="reporte-desc">Ingresos totales, por periodo, por servicio y por clientes.</div>
+      </a>
+      <a href="/reportes/servicios/?enfoque=agenda" class="reporte-card">
+        <div class="icon-report">📅</div>
+        <div class="reporte-title">Agenda y turnos</div>
+        <div class="reporte-desc">Historial de turnos, ocupación y eficiencia del taller.</div>
+      </a>
+    </div>
+  </div>
+</div>
+<style>
+.reporte-card {
+  background: rgba(24,25,26,0.22);
+  border-radius: 18px;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.22);
+  color: #fff;
+  text-align: center;
+  z-index: 3;
+  backdrop-filter: blur(8px) saturate(120%);
+  -webkit-backdrop-filter: blur(8px) saturate(120%);
+  border: 1.5px solid rgba(0,230,208,0.12);
+  padding: 28px 18px 18px 18px;
+  transition: box-shadow 0.2s, border 0.2s, transform 0.2s;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.reporte-card:hover {
+  box-shadow: 0 0 32px #00fff7cc, 0 0 8px #00e6d0;
+  border: 1.5px solid #00fff7;
+  transform: translateY(-4px) scale(1.03);
+}
+.reporte-card.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+.icon-report {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  text-shadow: 0 0 12px #00e6d0cc;
+}
+.reporte-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #00e6d0;
+  margin-bottom: 4px;
+}
+.reporte-desc {
+  font-size: 1rem;
+  color: #b0b3b8;
+}
+</style>
+{% endblock %}

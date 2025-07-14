@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mx-auto py-10">
+<h1 class="text-3xl font-bold text-center mb-8">Reporte de Servicios</h1>
+<form class="mb-6 flex gap-4 justify-center" method="get">
+<input class="border border-gray-300 rounded px-4 py-2" name="fecha_inicio" required="" type="date"/>
+<input class="border border-gray-300 rounded px-4 py-2" name="fecha_fin" required="" type="date"/>
+<button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 btn-futuristic" type="submit">Filtrar</button>
+</form>
+
+  {% if servicios %}
+    <table class="min-w-full translucent-card rounded-lg shadow overflow-hidden">
+<thead class="translucent-card text-gray-800">
+<tr>
+<th class="px-4 py-2 text-left">Fecha</th>
+<th class="px-4 py-2 text-left">Cliente</th>
+<th class="px-4 py-2 text-left">Total</th>
+</tr>
+</thead>
+<tbody>
+        {% for servicio in servicios %}
+        <tr class="border-t">
+<td class="px-4 py-2">{{ servicio.fecha }}</td>
+<td class="px-4 py-2">{{ servicio.cliente }}</td>
+<td class="px-4 py-2 text-right">${{ servicio.total|floatformat:0 }}</td>
+</tr>
+        {% endfor %}
+      </tbody>
+<tfoot class="translucent-card">
+<tr>
+<td colspan="2"><strong>Total General</strong></td>
+<td><strong>${{ total_general|floatformat:0 }}</strong></td>
+</tr>
+</tfoot>
+</table>
+  {% elif fecha_inicio and fecha_fin %}
+    <div class="alert alert-warning mt-3">⚠️ No se encontraron servicios en ese rango de fechas.</div>
+  {% endif %}
+
+  <link href="{% static 'css/reportes.css' %}" rel="stylesheet"/>
+</div>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+
+{% block content %}
+  <style>
+    body, .cuadro, .cuadro *, table, thead, tbody, th, td, label, input, select, textarea, option {
+      color: #111 !important;
+    }
+    input[type="text"]::placeholder, textarea::placeholder {
+      color: #444 !important;
+    }
+  </style>
+
+<div class="max-w-6xl mx-auto cuadro">
+  <div class="flex justify-between items-center mb-4">
+    <h1 class="text-2xl font-bold">Repuestos Inteligentes</h1>
+    <a href="{% url 'repuestos:crear_repuesto' %}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow">
+      Agregar Repuesto
+    </a>
+  </div>
+  <form method="get" class="mb-4">
+    <input type="text" name="q" placeholder="Buscar por nombre, part number, tienda..."
+      class="w-full rounded px-4 py-2 text-black">
+  </form>
+  <div class="overflow-x-auto">
+    <table class="min-w-full text-sm text-left">
+      <thead class="bg-gray-700 text-white">
+        <tr>
+          <th class="px-4 py-2">Nombre</th>
+          <th class="px-4 py-2">Part #</th>
+          <th class="px-4 py-2">Tienda</th>
+          <th class="px-4 py-2">Compra</th>
+          <th class="px-4 py-2">Venta</th>
+          <th class="px-4 py-2">Stock</th>
+          <th class="px-4 py-2">Acciones</th>
+        </tr>
+      </thead>
+      <tbody class="translucent-card text-black">
+        {% for repuesto in repuestos %}
+        <tr class="border-b border-gray-300">
+          <td class="px-4 py-2">{{ repuesto.nombre }}</td>
+          <td class="px-4 py-2">{{ repuesto.part_number }}</td>
+          <td class="px-4 py-2">{{ repuesto.tienda }}</td>
+          <td class="px-4 py-2">{{ repuesto.precio_compra }}</td>
+          <td class="px-4 py-2">{{ repuesto.precio_venta }}</td>
+          <td class="px-4 py-2">{{ repuesto.stock }}</td>
+          <td class="px-4 py-2 space-x-2">
+            <a href="#">👁️</a>
+            <a href="#">✏️</a>
+            <a href="#">🗑️</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" class="px-4 py-4 text-center text-gray-500">Sin repuestos</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

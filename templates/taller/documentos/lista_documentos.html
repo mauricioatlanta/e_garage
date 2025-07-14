@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block extra_head %}
+  <style>
+    body {
+      background: linear-gradient(120deg, #181818 0%, #232323 60%, #ffd600 100%);
+      min-height: 100vh;
+      font-family: 'Orbitron', 'Montserrat', Arial, sans-serif;
+    }
+    .renault-pit-card {
+      background: rgba(30, 30, 30, 0.98);
+      border-radius: 1.5rem;
+      box-shadow: 0 0 32px 4px #ffd60099, 0 0 0 1px #181818;
+      border: 2px solid #ffd600;
+      color: #fff;
+    }
+    .renault-title {
+      color: #ffd600;
+      font-family: 'Orbitron', 'Montserrat', Arial, sans-serif;
+      text-shadow: 0 0 8px #ffd600, 0 0 2px #181818;
+      letter-spacing: 2px;
+    }
+    .renault-btn {
+      background: linear-gradient(90deg, #ffd600 0%, #181818 100%);
+      color: #181818;
+      border: none;
+      border-radius: 2rem;
+      padding: 0.6rem 2rem;
+      font-family: 'Orbitron', 'Montserrat', Arial, sans-serif;
+      font-size: 1.1rem;
+      font-weight: bold;
+      box-shadow: 0 0 16px #ffd60099, 0 0 4px #181818;
+      transition: background 0.3s, box-shadow 0.3s, transform 0.2s;
+      cursor: pointer;
+    }
+    .renault-btn:hover {
+      background: linear-gradient(90deg, #181818 0%, #ffd600 100%);
+      color: #ffd600;
+      box-shadow: 0 0 32px #ffd600cc, 0 0 8px #181818;
+      transform: scale(1.05);
+    }
+    .renault-table th {
+      background: #ffd600;
+      color: #181818;
+      font-family: 'Orbitron', 'Montserrat', Arial, sans-serif;
+      text-shadow: 0 0 4px #181818;
+      font-size: 1rem;
+      border-bottom: 2px solid #181818;
+    }
+    .renault-table td {
+      background: rgba(24, 24, 24, 0.95);
+      color: #fff;
+      border-bottom: 1px solid #ffd60044;
+      font-size: 0.98rem;
+    }
+    .renault-table tr:hover td {
+      background: #232323;
+      color: #ffd600;
+      transition: background 0.2s, color 0.2s;
+    }
+    .renault-action {
+      color: #ffd600;
+      font-weight: bold;
+      text-shadow: 0 0 4px #181818;
+      margin: 0 0.2rem;
+    }
+    .renault-action:hover {
+      color: #fff;
+      text-shadow: 0 0 8px #ffd600;
+    }
+    .renault-search {
+      background: #232323;
+      color: #ffd600;
+      border: 2px solid #ffd600;
+      border-radius: 1rem;
+      padding: 0.5rem 1rem;
+      font-family: 'Orbitron', 'Montserrat', Arial, sans-serif;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+    .renault-empty {
+      color: #ffd600;
+      text-align: center;
+      padding: 2rem;
+      font-size: 1.1rem;
+      font-family: 'Orbitron', 'Montserrat', Arial, sans-serif;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+<!-- Barra de navegación futurista -->
+<nav class="w-full flex items-center justify-between px-6 py-3 mb-8 bg-[#181818] bg-opacity-90 rounded-2xl shadow-lg border-b-4 border-yellow-400" style="backdrop-filter: blur(4px);">
+  <div class="flex items-center gap-4">
+    <img src="{% static 'img/TallerPro_logo.png' %}" alt="Logo" class="h-12 w-12 rounded-full shadow-lg border-2 border-yellow-400 bg-white">
+    <span class="text-2xl font-extrabold renault-title tracking-widest" style="letter-spacing:2px;">e-Garage</span>
+  </div>
+  <div class="flex gap-2">
+    <a href="/" class="renault-btn">🏠 Inicio</a>
+    <a href="/documentos/" class="renault-btn">📄 Documentos</a>
+    <a href="/reportes/" class="renault-btn">📊 Reportes</a>
+    <a href="/clientes/" class="renault-btn">👤 Clientes</a>
+    <a href="/vehiculos/" class="renault-btn">🚗 Vehículos</a>
+  </div>
+</nav>
+<div class="max-w-5xl mx-auto mt-4 p-6 renault-pit-card">
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-bold renault-title">Pit Renault F1 - Documentos</h2>
+    <a href="{% url 'documentos:crear_documento' %}" class="renault-btn">+ Agregar Documento</a>
+  </div>
+  <div class="mb-4">
+    <input id="busqueda-documento" type="text" placeholder="Buscar por tipo, número, cliente, vehículo..." class="w-full renault-search">
+  </div>
+  <table class="w-full text-sm renault-table">
+    <thead>
+      <tr>
+        <th class="p-2 text-left">Tipo</th>
+        <th class="p-2 text-left">Número</th>
+        <th class="p-2 text-left">Fecha</th>
+        <th class="p-2 text-left">Cliente</th>
+        <th class="p-2 text-left">Vehículo</th>
+        <th class="p-2 text-center">Acciones</th>
+      </tr>
+    </thead>
+    <tbody id="tabla-documentos">
+      {% for doc in documentos %}
+      <tr>
+        <td class="p-2">{{ doc.tipo_documento }}</td>
+        <td class="p-2">{{ doc.numero_documento }}</td>
+        <td class="p-2">{{ doc.fecha }}</td>
+        <td class="p-2">{{ doc.cliente }}</td>
+        <td class="p-2">{{ doc.vehiculo }}</td>
+        <td class="p-2 text-center">
+          <a href="{% url 'documentos:ver_documento' doc.id %}" class="renault-action">Ver</a>
+          |
+          <a href="{% url 'documentos:editar_documento' doc.id %}" class="renault-action">Editar</a>
+          |
+          <a href="{% url 'documentos:eliminar_documento' doc.id %}" class="renault-action" onclick="return confirm('¿Eliminar este documento?')">Eliminar</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="6" class="renault-empty">No hay documentos registrados.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const input = document.getElementById('busqueda-documento');
+    const filas = document.querySelectorAll('#tabla-documentos tr');
+    input.addEventListener('input', function() {
+      const filtro = this.value.toLowerCase();
+      filas.forEach(fila => {
+        const texto = fila.textContent.toLowerCase();
+        fila.style.display = texto.includes(filtro) ? '' : 'none';
+      });
+    });
+  });
+</script>
+{% endblock %}

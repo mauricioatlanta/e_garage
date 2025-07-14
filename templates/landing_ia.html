@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block fondo_extra %}
+<div id="star-bg" class="fixed inset-0 -z-20"></div>
+<div id="tsparticles" class="fixed inset-0 -z-10"></div>
+{% endblock %}
+{% block extra_head %}
+<script>
+// Fondo de estrellas titilando para IA
+// ...existing code...
+document.addEventListener("DOMContentLoaded", function() {
+  const canvas = document.createElement('canvas');
+  canvas.style.position = 'fixed';
+  canvas.style.top = 0;
+  canvas.style.left = 0;
+  canvas.style.width = '100vw';
+  canvas.style.height = '100vh';
+  canvas.style.zIndex = '-20';
+  canvas.style.pointerEvents = 'none';
+  canvas.id = 'star-canvas';
+  document.getElementById('star-bg').appendChild(canvas);
+  const ctx = canvas.getContext('2d');
+  let w = window.innerWidth, h = window.innerHeight;
+  canvas.width = w;
+  canvas.height = h;
+  let stars = Array.from({length: 120}, () => ({
+    x: Math.random() * w,
+    y: Math.random() * h,
+    r: Math.random() * 1.2 + 0.3,
+    o: Math.random(),
+    d: Math.random() * 2 * Math.PI
+  }));
+  function drawStars() {
+    ctx.clearRect(0,0,w,h);
+    for(const s of stars) {
+      ctx.save();
+      ctx.globalAlpha = 0.6 + 0.4 * Math.sin(Date.now()/600 + s.d);
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, 2*Math.PI);
+      ctx.fillStyle = '#fff';
+      ctx.shadowColor = '#ff00ea';
+      ctx.shadowBlur = 8;
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+  function animate() {
+    drawStars();
+    requestAnimationFrame(animate);
+  }
+  animate();
+  window.addEventListener('resize', function() {
+    w = window.innerWidth;
+    h = window.innerHeight;
+    canvas.width = w;
+    canvas.height = h;
+    stars.forEach(s => {
+      s.x = Math.random() * w;
+      s.y = Math.random() * h;
+    });
+  });
+});
+</script>
+{% endblock %}
+{% block content %}
+<main class="max-w-4xl mx-auto py-16">
+  <div class="flex flex-col items-center mb-10">
+    <img src="{% static 'img/TallerPro_logo.png' %}" alt="E-Garage Logo" class="h-20 mb-6 drop-shadow-2xl animate-pulse">
+    <h1 class="text-5xl md:text-6xl font-black text-center text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-lime-400 to-fuchsia-500 mb-4 tracking-tight futuristic-glow">IA y automatización</h1>
+    <p class="text-center text-xl text-cyan-100 mb-2 max-w-2xl font-semibold">
+      <span class="block mb-2 text-lime-300 font-bold">Automatiza y potencia tu gestión.</span>
+      Sugerencias inteligentes, tareas automáticas y ahorro de tiempo real.<br>
+      <span class="block mt-4 text-fuchsia-400 font-bold text-2xl">Haz que tu taller trabaje para ti, no al revés.</span>
+    </p>
+    <a href="#suscripcion" class="cta-btn-premium pulse py-4 px-10 rounded-2xl font-extrabold text-2xl shadow-2xl transition-all mt-8">Quiero IA en mi taller</a>
+  </div>
+  <section class="bg-gray-900 bg-opacity-90 rounded-2xl p-8 shadow-2xl mb-10">
+    <h2 class="text-2xl font-bold text-cyan-300 mb-4 flex items-center"><i class="fas fa-robot mr-2"></i> ¿Por qué elegir esta función?</h2>
+    <ul class="grid grid-cols-1 md:grid-cols-2 gap-4 text-cyan-100 text-lg">
+      <li class="flex items-center"><i class="fas fa-bolt text-lime-400 mr-2"></i> Automatiza tareas repetitivas y ahorra tiempo.</li>
+      <li class="flex items-center"><i class="fas fa-lightbulb text-lime-400 mr-2"></i> Sugerencias inteligentes para cada proceso.</li>
+      <li class="flex items-center"><i class="fas fa-chart-line text-lime-400 mr-2"></i> Análisis predictivo y recomendaciones.</li>
+      <li class="flex items-center"><i class="fas fa-cogs text-lime-400 mr-2"></i> Integración total con el resto de la plataforma.</li>
+      <li class="flex items-center"><i class="fas fa-trophy text-lime-400 mr-2"></i> Lleva tu taller a la vanguardia tecnológica.</li>
+    </ul>
+  </section>
+  <section id="suscripcion" class="bg-gray-900 bg-opacity-90 rounded-2xl p-8 shadow-2xl mb-10 mt-12 text-center">
+    <h2 class="text-2xl font-bold text-yellow-300 mb-4 flex items-center justify-center"><i class="fas fa-gem mr-2"></i> Suscríbete y accede a la IA y automatización</h2>
+    <p class="text-lg text-cyan-100 mb-6">Lleva tu taller al siguiente nivel con inteligencia artificial, automatización y recomendaciones.<br>¡Invierte en la eficiencia de tu negocio!</p>
+    <a href="#" class="cta-btn-premium py-4 px-10 rounded-2xl font-extrabold text-2xl shadow-2xl transition-all inline-block">💳 Suscribirse (próximamente)</a>
+    <div class="mt-6 text-cyan-200 text-base">¿Prefieres probar antes? <a href="{% url 'registro_trial' %}" class="underline text-lime-400 hover:text-fuchsia-400 transition-all">Solicita tu prueba gratis de 30 días aquí</a>.</div>
+  </section>
+</main>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+{% endblock %}
+
+<style>
+.futuristic-glow {
+  text-shadow: 0 0 24px #00ffe7, 0 0 8px #00ffe7, 0 0 2px #fff;
+  letter-spacing: 2px;
+}
+.cta-btn-premium {
+  background: linear-gradient(90deg, #00ffe7 0%, #a3ff12 50%, #ff00ea 100%);
+  color: #181c1f;
+  font-weight: 900;
+  letter-spacing: 1px;
+  box-shadow: 0 0 32px 0 #00ffe7aa, 0 2px 8px 0 #000a;
+  border: none;
+  outline: none;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.cta-btn-premium:hover {
+  background: linear-gradient(90deg, #ff00ea 0%, #a3ff12 50%, #00ffe7 100%);
+  color: #000;
+  box-shadow: 0 0 48px 0 #ff00ea99, 0 2px 8px 0 #000a;
+}
+.pulse {
+  animation: pulse 1.5s infinite;
+}
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 #00ffe7aa; }
+  70% { box-shadow: 0 0 0 16px #00ffe700; }
+  100% { box-shadow: 0 0 0 0 #00ffe7aa; }
+}
+</style>

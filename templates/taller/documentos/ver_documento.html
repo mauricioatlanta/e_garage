@@ -1,0 +1,224 @@
+
+{% extends 'base.html' %}
+{% block extra_head %}
+<style>
+  body {
+    background: linear-gradient(120deg, #0f2027 0%, #2c5364 50%, #7f00ff 100%);
+    min-height: 100vh;
+    font-family: 'Orbitron', 'Montserrat', Arial, sans-serif;
+  }
+  .futurista-container {
+    background: rgba(20, 20, 40, 0.97);
+    border-radius: 1.5rem;
+    box-shadow: 0 0 32px 4px #7f00ff99, 0 0 0 1px #00f2fe;
+    border: 1px solid #7f00ff;
+    color: #fff;
+    padding: 2.5rem 2rem 2rem 2rem;
+    margin-top: 3rem;
+    max-width: 52rem;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    overflow: hidden;
+  }
+  .futurista-container:before {
+    content: '';
+    position: absolute;
+    top: -80px; left: -80px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, #00f2fe55 0%, transparent 80%);
+    z-index: 0;
+  }
+  .futurista-container:after {
+    content: '';
+    position: absolute;
+    bottom: -60px; right: -60px;
+    width: 160px; height: 160px;
+    background: radial-gradient(circle, #7f00ff55 0%, transparent 80%);
+    z-index: 0;
+  }
+  .futurista-title {
+    font-family: 'Orbitron', 'Montserrat', Arial, sans-serif;
+    color: #00f2fe;
+    text-shadow: 0 0 8px #7f00ff, 0 0 2px #00f2fe;
+    font-size: 2.2rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+    letter-spacing: 2px;
+    z-index: 1;
+    position: relative;
+    text-align: center;
+  }
+  .futurista-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem 2.5rem;
+    margin-bottom: 2.5rem;
+    z-index: 1;
+    position: relative;
+  }
+  .futurista-label {
+    color: #00f2fe;
+    font-weight: bold;
+    letter-spacing: 1px;
+    font-size: 1.08rem;
+  }
+  .futurista-table {
+    width: 100%;
+    background: rgba(30, 30, 60, 0.95);
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 0 16px #00f2fe33;
+    margin-bottom: 2.5rem;
+    z-index: 1;
+    position: relative;
+  }
+  .futurista-table th, .futurista-table td {
+    border-bottom: 1px solid #7f00ff44;
+    padding: 0.7rem 1.1rem;
+    font-size: 1.05rem;
+  }
+  .futurista-table th {
+    background: linear-gradient(90deg, #7f00ff 0%, #00f2fe 100%);
+    color: #fff;
+    text-shadow: 0 0 4px #00f2fe;
+    font-weight: bold;
+    letter-spacing: 1px;
+  }
+  .futurista-table tr:hover td {
+    background: #181828cc;
+    transition: background 0.2s;
+  }
+  .futurista-resumen {
+    background: linear-gradient(90deg, #7f00ff33 0%, #00f2fe33 100%);
+    border-radius: 1rem;
+    padding: 1.5rem 2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 0 12px #00f2fe44;
+    z-index: 1;
+    position: relative;
+  }
+  .futurista-resumen p {
+    font-size: 1.15rem;
+    margin-bottom: 0.5rem;
+    color: #fff;
+  }
+  .futurista-resumen .total {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #00f2fe;
+    text-shadow: 0 0 4px #7f00ff;
+  }
+  .futurista-actions {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+    z-index: 1;
+    position: relative;
+  }
+  .futurista-btn {
+    background: linear-gradient(90deg, #7f00ff 0%, #00f2fe 100%);
+    color: #fff;
+    border: none;
+    border-radius: 2rem;
+    padding: 0.7rem 2.2rem;
+    font-family: 'Orbitron', 'Montserrat', Arial, sans-serif;
+    font-size: 1.1rem;
+    font-weight: bold;
+    box-shadow: 0 0 16px #00f2fe99, 0 0 4px #7f00ff;
+    transition: background 0.3s, box-shadow 0.3s, transform 0.2s;
+    cursor: pointer;
+    margin-left: auto;
+    margin-right: 0;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .futurista-btn:hover {
+    background: linear-gradient(90deg, #00f2fe 0%, #7f00ff 100%);
+    box-shadow: 0 0 32px #7f00ffcc, 0 0 8px #00f2fe;
+    transform: scale(1.05);
+  }
+  .futurista-link {
+    color: #00f2fe;
+    text-decoration: underline;
+    font-weight: bold;
+    font-size: 1.08rem;
+    margin-top: 0.5rem;
+    transition: color 0.2s;
+  }
+  .futurista-link:hover {
+    color: #fff;
+  }
+</style>
+{% endblock %}
+{% block content %}
+<div class="futurista-container">
+  <div class="futurista-title">Detalle del Documento</div>
+  <div class="futurista-grid">
+    <div><span class="futurista-label">Tipo:</span> {{ documento.tipo_documento }}</div>
+    <div><span class="futurista-label">N°:</span> {{ documento.numero_documento }}</div>
+    <div><span class="futurista-label">Fecha:</span> {{ documento.fecha }}</div>
+    <div><span class="futurista-label">Cliente:</span> {{ documento.cliente }}</div>
+    <div><span class="futurista-label">Vehículo:</span> {{ documento.vehiculo }}</div>
+    <div><span class="futurista-label">Kilometraje:</span> {{ documento.kilometraje }} km</div>
+  </div>
+  <h3 class="text-lg font-semibold mb-4" style="color:#00f2fe;text-shadow:0 0 4px #7f00ff;">Repuestos</h3>
+  <table class="futurista-table">
+    <thead>
+      <tr>
+        <th>Código</th>
+        <th>Nombre</th>
+        <th>Cantidad</th>
+        <th class="text-right">Precio unitario</th>
+        <th class="text-right">Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for repuesto in repuestos %}
+      <tr>
+        <td>{{ repuesto.codigo }}</td>
+        <td>{{ repuesto.nombre }}</td>
+        <td>{{ repuesto.cantidad }}</td>
+        <td class="text-right">${{ repuesto.precio|floatformat:0 }}</td>
+        <td class="text-right">${{ repuesto.total|floatformat:0 }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="5" class="text-center text-gray-400">Sin repuestos</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h3 class="text-lg font-semibold mb-4 mt-8" style="color:#00f2fe;text-shadow:0 0 4px #7f00ff;">Servicios</h3>
+  <table class="futurista-table">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th class="text-right">Precio</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for servicio in servicios %}
+      <tr>
+        <td>{{ servicio.nombre }}</td>
+        <td class="text-right">${{ servicio.precio|floatformat:0 }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="2" class="text-center text-gray-400">Sin servicios</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="futurista-resumen">
+    <p><strong>Subtotal:</strong> ${{ subtotal|floatformat:0 }}</p>
+    <p><strong>IVA (19%):</strong> ${{ iva|floatformat:0 }}</p>
+    <p class="total">Total: ${{ total|floatformat:0 }}</p>
+  </div>
+  <div class="futurista-actions">
+    <a href="{% url 'documentos:lista_documentos' %}" class="futurista-link">← Volver al listado</a>
+    <a href="{% url 'documentos:exportar_documento_pdf' documento.id %}"
+       class="futurista-btn"
+       target="_blank">
+      🧾 Exportar a PDF
+    </a>
+  </div>
+</div>
+{% endblock %}

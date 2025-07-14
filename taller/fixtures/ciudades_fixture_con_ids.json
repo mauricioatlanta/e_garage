@@ -1,0 +1,130 @@
+[
+  {
+    "model": "taller.ciudad",
+    "pk": 1,
+    "fields": {
+      "nombre": "Santiago",
+      "region": 1
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 2,
+    "fields": {
+      "nombre": "Puente Alto",
+      "region": 1
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 3,
+    "fields": {
+      "nombre": "Maipú",
+      "region": 1
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 4,
+    "fields": {
+      "nombre": "La Florida",
+      "region": 1
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 5,
+    "fields": {
+      "nombre": "Valparaíso",
+      "region": 2
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 6,
+    "fields": {
+      "nombre": "Viña del Mar",
+      "region": 2
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 7,
+    "fields": {
+      "nombre": "Quilpué",
+      "region": 2
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 8,
+    "fields": {
+      "nombre": "San Antonio",
+      "region": 2
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 9,
+    "fields": {
+      "nombre": "Concepción",
+      "region": 3
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 10,
+    "fields": {
+      "nombre": "Talcahuano",
+      "region": 3
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 11,
+    "fields": {
+      "nombre": "Chiguayante",
+      "region": 3
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 12,
+    "fields": {
+      "nombre": "Los Ángeles",
+      "region": 3
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 13,
+    "fields": {
+      "nombre": "Talca",
+      "region": 4
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 14,
+    "fields": {
+      "nombre": "Curicó",
+      "region": 4
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 15,
+    "fields": {
+      "nombre": "Linares",
+      "region": 4
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 16,
+    "fields": {
+      "nombre": "Cauquenes",
+      "region": 4
+    }
+  }
+]

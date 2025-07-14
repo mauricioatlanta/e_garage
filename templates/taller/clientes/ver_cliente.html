@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto mt-16 relative">
+  <div class="absolute inset-0 -z-10 flex items-center justify-center pointer-events-none">
+    <div class="w-96 h-96 rounded-full bg-gradient-to-tr from-cyan-400 via-fuchsia-500 to-lime-300 opacity-30 blur-3xl animate-spin-slow"></div>
+  </div>
+  <div class="bg-white/10 backdrop-blur-2xl border border-cyan-400/40 shadow-2xl rounded-3xl p-10 relative overflow-hidden futuristic-glass">
+    <h1 class="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-lime-400 to-fuchsia-500 mb-8 tracking-tight futuristic-glow flex items-center gap-3">
+      <i class="fas fa-user-astronaut text-cyan-300"></i> Cliente
+    </h1>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-lg text-cyan-100">
+      <div class="flex items-center gap-3"><i class="fas fa-id-card text-lime-300"></i> <span class="font-bold">Nombre:</span> {{ cliente.nombre }}</div>
+      <div class="flex items-center gap-3"><i class="fas fa-user-tag text-fuchsia-300"></i> <span class="font-bold">Apellido:</span> {{ cliente.apellido }}</div>
+      <div class="flex items-center gap-3"><i class="fas fa-envelope text-cyan-300"></i> <span class="font-bold">Email:</span> {{ cliente.email }}</div>
+      <div class="flex items-center gap-3"><i class="fas fa-phone text-lime-300"></i> <span class="font-bold">Teléfono:</span> {{ cliente.telefono }}</div>
+      <div class="flex items-center gap-3"><i class="fas fa-map-marker-alt text-fuchsia-300"></i> <span class="font-bold">Dirección:</span> {{ cliente.direccion }}</div>
+      <div class="flex items-center gap-3"><i class="fas fa-globe-americas text-cyan-300"></i> <span class="font-bold">Región:</span> {% if cliente.region %}{{ cliente.region.nombre }}{% endif %}</div>
+      <div class="flex items-center gap-3"><i class="fas fa-city text-lime-300"></i> <span class="font-bold">Ciudad:</span> {% if cliente.ciudad %}{{ cliente.ciudad.nombre }}{% endif %}</div>
+    </div>
+    <div class="mt-10 flex justify-end">
+      <a href="{% url 'clientes:lista_clientes' %}" class="cta-btn-premium px-8 py-3 rounded-2xl font-bold text-lg shadow-xl transition-all hover:scale-105">
+        <i class="fas fa-arrow-left mr-2"></i> Volver a la lista
+      </a>
+    </div>
+  </div>
+</div>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+<style>
+  .futuristic-glass {
+    box-shadow: 0 8px 48px 0 #00ffe7cc, 0 2px 8px 0 #000a;
+    border-radius: 2rem;
+    border: 2px solid #00ffe7cc;
+    background: linear-gradient(120deg, rgba(0,255,231,0.08) 0%, rgba(163,255,18,0.08) 50%, rgba(255,0,234,0.08) 100%);
+  }
+  .futuristic-glow {
+    text-shadow: 0 0 24px #00ffe7, 0 0 8px #00ffe7, 0 0 2px #fff;
+    letter-spacing: 2px;
+  }
+  @keyframes spin-slow {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  .animate-spin-slow {
+    animation: spin-slow 18s linear infinite;
+  }
+</style>
+{% endblock %}

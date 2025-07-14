@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="p-6 rounded-xl shadow-md max-w-4xl mx-auto mt-8 bg-yellow-50">
+<h2 class="text-2xl font-semibold mb-4">Editar Documento</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="bg-yellow-600 hover:bg-yellow-800 text-white py-2 px-4 rounded btn-futuristic" type="submit">Guardar Cambios</button>
+</form>
+</div>
+{% endblock %}

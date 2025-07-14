@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+  <style>
+    body, .cuadro, .cuadro *, table, thead, tbody, th, td, label, input, select, textarea, option {
+      color: #111 !important;
+    }
+    input[type="text"]::placeholder, textarea::placeholder {
+      color: #444 !important;
+    }
+  </style>
+
+<div class="relative min-h-screen bg-black overflow-hidden">
+  <video autoplay muted loop class="absolute inset-0 w-full h-full object-cover z-0">
+    <source src="{% static 'videos/fondo_autotech.mp4' %}" type="video/mp4">
+  </video>
+  <div class="absolute inset-0 bg-black/80 z-10"></div>
+
+  <div class="relative z-20 max-w-7xl mx-auto py-16 px-6">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-4xl font-bold text-white">🔩 Dashboard de Repuestos</h1>
+      <a href="{% url 'repuestos:crear_repuesto' %}" class="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2 rounded shadow-lg">
+        ➕ Agregar Repuesto
+      </a>
+    </div>
+
+    <input type="text" id="buscar-repuesto" placeholder="Buscar por nombre o código..."
+      class="w-full mb-6 px-4 py-2 rounded shadow text-black placeholder-gray-600">
+
+    <div class="overflow-x-auto translucent-card rounded-lg shadow">
+      <table class="min-w-full text-sm text-gray-800">
+        <thead class="bg-slate-800 text-white">
+          <tr>
+            <th class="px-4 py-2 text-left">Nombre</th>
+            <th class="px-4 py-2 text-left">Código</th>
+            <th class="px-4 py-2 text-right">Stock</th>
+            <th class="px-4 py-2 text-right">Precio</th>
+            <th class="px-4 py-2 text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-repuestos">
+          {% for repuesto in repuestos %}
+          <tr class="border-b hover:bg-slate-100">
+            <td class="px-4 py-2 font-semibold">{{ repuesto.nombre_repuesto }}</td>
+            <td class="px-4 py-2">{{ repuesto.part_number }}</td>
+            <td class="px-4 py-2 text-right">{{ repuesto.stock }}</td>
+            <td class="px-4 py-2 text-right">${{ repuesto.precio_venta|floatformat:0|intcomma }}</td>
+            <td class="px-4 py-2 text-center">
+              <a href="{% url 'repuestos:editar_repuesto' repuesto.id %}" class="text-blue-600 hover:underline">✏️</a>
+              <a href="{% url 'repuestos:eliminar_repuesto' repuesto.id %}" class="text-red-600 hover:underline ml-2">🗑️</a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5" class="text-center px-4 py-8 text-gray-500">No hay repuestos registrados.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const input = document.getElementById("buscar-repuesto");
+    input.addEventListener("input", () => {
+      const query = input.value.toLowerCase();
+      document.querySelectorAll("#tabla-repuestos tr").forEach(fila => {
+        const texto = fila.textContent.toLowerCase();
+        fila.style.display = texto.includes(query) ? "" : "none";
+      });
+    });
+  });
+</script>
+{% endblock %}

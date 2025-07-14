@@ -1,0 +1,35 @@
+[
+    {
+        "model": "taller.repuesto",
+        "pk": 1,
+        "fields": {
+            "nombre": "Filtro de Aceite",
+            "part_number": "A1001",
+            "precio_compra": 4000,
+            "precio_venta": 7000,
+            "stock": 15
+        }
+    },
+    {
+        "model": "taller.repuesto",
+        "pk": 2,
+        "fields": {
+            "nombre": "Filtro de Aire",
+            "part_number": "A2002",
+            "precio_compra": 3000,
+            "precio_venta": 6000,
+            "stock": 20
+        }
+    },
+    {
+        "model": "taller.repuesto",
+        "pk": 3,
+        "fields": {
+            "nombre": "Bujía NGK",
+            "part_number": "NGK-B123",
+            "precio_compra": 2500,
+            "precio_venta": 5000,
+            "stock": 40
+        }
+    }
+]

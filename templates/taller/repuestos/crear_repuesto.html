@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto bg-transparent p-10 rounded-2xl shadow-2xl ring-1 ring-gray-300 space-y-6 animate-fade-in">
+<h1 class="text-3xl font-extrabold text-center text-black mb-6">🧩 Crear Repuesto</h1>
+<form class="grid grid-cols-1 md:grid-cols-2 gap-6 text-black" method="post">
+    {% csrf_token %}
+    <div class="col-span-2">
+      {{ form.tienda.label_tag|add_class:"text-black" }}
+      <div class="flex gap-2 items-center">
+        {{ form.tienda|add_class:"w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring focus:ring-emerald-400 text-black" }}
+        <button class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1 rounded shadow btn-futuristic" id="agregar-tienda-btn" type="button">+ Nueva Tienda</button>
+</div>
+</div>
+<div>
+      {{ form.nombre_repuesto.label_tag|add_class:"text-black" }}
+      {{ form.nombre_repuesto|add_class:"w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring focus:ring-indigo-300 text-black" }}
+    </div>
+<div>
+      {{ form.part_number.label_tag|add_class:"text-black" }}
+      {{ form.part_number|add_class:"w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring focus:ring-indigo-300 text-black" }}
+    </div>
+<div>
+      {{ form.precio_compra.label_tag|add_class:"text-black" }}
+      {{ form.precio_compra|add_class:"w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring focus:ring-indigo-300 text-black" }}
+    </div>
+<div>
+      {{ form.precio_venta.label_tag|add_class:"text-black" }}
+      {{ form.precio_venta|add_class:"w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring focus:ring-indigo-300 text-black" }}
+    </div>
+<div>
+      {{ form.stock.label_tag|add_class:"text-black" }}
+      {{ form.stock|add_class:"w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring focus:ring-indigo-300 text-black" }}
+    </div>
+<div class="col-span-2 flex justify-end gap-4">
+<a class="bg-gray-300 text-gray-700 px-5 py-2 rounded hover:bg-gray-400 shadow" href="{% url 'repuestos:lista_repuestos' %}">Cancelar</a>
+<button class="bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700 shadow btn-futuristic" type="submit">Guardar</button>
+</div>
+</form>
+<div class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50" id="modal-tienda">
+<div class="translucent-card p-6 rounded-xl shadow-xl w-full max-w-md">
+<h2 class="text-xl font-bold mb-4 text-center text-black">Agregar Nueva Tienda</h2>
+<form class="space-y-3 text-black" id="form-nueva-tienda">
+<div>
+<label class="block font-semibold text-sm mb-1 text-black">Nombre</label>
+<input class="w-full border border-gray-300 rounded px-3 py-2 text-black" name="nombre" required="" type="text"/>
+</div>
+<div>
+<label class="block font-semibold text-sm mb-1 text-black">Dirección</label>
+<input class="w-full border border-gray-300 rounded px-3 py-2 text-black" name="direccion" type="text"/>
+</div>
+<div>
+<label class="block font-semibold text-sm mb-1 text-black">Teléfono</label>
+<input class="w-full border border-gray-300 rounded px-3 py-2 text-black" name="telefono" type="text"/>
+</div>
+<div class="flex justify-end gap-3 pt-2">
+<button class="bg-gray-300 text-gray-800 px-4 py-1 rounded btn-futuristic" id="cancelar-tienda" type="button">Cancelar</button>
+<button class="bg-emerald-600 text-white px-4 py-1 rounded btn-futuristic" type="submit">Guardar</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Modal lógica
+  const modal = document.getElementById('modal-tienda');
+  document.getElementById('agregar-tienda-btn').onclick = () => { modal.style.display = 'flex'; };
+  document.getElementById('cancelar-tienda').onclick = () => { modal.style.display = 'none'; };
+  document.getElementById('form-nueva-tienda').onsubmit = async function(e) {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(this));
+    const resp = await fetch("/api/tiendas/crear/", {
+      method: "POST",
+      headers: {"Content-Type": "application/json", "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value},
+      body: JSON.stringify(data)
+    });
+    if (resp.ok) {
+      const tienda = await resp.json();
+      // Agregar la nueva tienda al select
+      const select = document.getElementById("id_tienda");
+      const option = document.createElement("option");
+      option.value = tienda.id;
+      option.textContent = tienda.nombre;
+      option.selected = true;
+      select.appendChild(option);
+      modal.style.display = 'none';
+      this.reset();
+    } else {
+      alert("Error al crear la tienda");
+    }
+  };
+</script>
+{% endblock %}

@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  tsParticles.load("tsparticles", {
+    fullScreen: { enable: false },
+    background: { color: { value: "#0d1117" } },
+    particles: {
+      number: { value: 90 },
+      color: { value: "#00ffff" },
+      shape: { type: "circle" },
+      opacity: { value: 0.2 },
+      size: { value: 2 },
+      move: { enable: true, speed: 1 }
+    }
+  });
+});
+</script>
+{% endblock %}
+
+{% block body_class %}landing-saas{% endblock %}
+
+<script src="{% static 'js/navbar.js' %}"></script>
+
+
+{% block fondo_extra %}
+<div id="tsparticles" class="absolute inset-0 z-0"></div>
+{% endblock %}
+
+{% block content %}
+<nav class="sticky-nav">
+  <div class="font-bold text-white text-xl">e-Garage</div>
+  <div>
+    <a href="#planes">Planes</a>
+    <a href="#beneficios">Beneficios</a>
+    <a href="#testimonios">Testimonios</a>
+    <a href="/login/" class="btn-outline ml-6">Iniciar Sesión</a>
+  </div>
+</nav>
+
+<div class="min-h-screen relative z-10 text-white pt-32 px-6">
+
+  <!-- HERO -->
+  <section class="text-center mb-20">
+    <h1 class="text-5xl font-extrabold mb-6 leading-tight">Gestiona tu taller con <span class="text-cyan-400">tecnología de otro nivel</span></h1>
+    <p class="text-lg text-gray-300 mb-6">Control total de órdenes, repuestos, mecánicos, métricas y trazabilidad.</p>
+    <div class="flex justify-center gap-4">
+      <a href="/registro/" class="btn-glow">Probar Demo</a>
+      <a href="/dashboard/" class="btn-outline">Ir al Dashboard</a>
+    </div>
+  </section>
+
+  <!-- FRASES -->
+  <section class="text-center text-cyan-300 text-lg mb-20 h-8">
+    <span id="rotating-phrases" class="transition-opacity duration-500"></span>
+  </section>
+
+  <!-- MÉTRICAS -->
+  <section class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center mb-20">
+    <div class="metric-card"><h2 class="text-4xl font-bold text-cyan-300 counter" data-target="423">0</h2><p>Órdenes gestionadas</p></div>
+    <div class="metric-card"><h2 class="text-4xl font-bold text-cyan-300 counter" data-target="38">0</h2><p>Talleres activos</p></div>
+    <div class="metric-card"><h2 class="text-4xl font-bold text-cyan-300 counter" data-target="17">0</h2><p>% de rentabilidad</p></div>
+  </section>
+
+  <!-- PLANES -->
+  <section id="planes" class="py-16 bg-black/30">
+    <h2 class="text-4xl font-bold text-center mb-10">Planes de Suscripción</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto text-center">
+      <div class="plan-card">
+        <h3 class="text-2xl font-bold mb-2">Básico</h3>
+        <p class="text-gray-300 mb-4">Para talleres pequeños</p>
+        <p class="text-3xl font-bold mb-4">$9.900 CLP</p>
+        <ul class="text-sm text-gray-300 mb-6">
+          <li>✔️ 1 usuario</li>
+          <li>✔️ Hasta 50 vehículos</li>
+          <li>❌ Sin reportes</li>
+        </ul>
+        <a href="#" class="btn-outline">Elegir</a>
+      </div>
+      <div class="plan-card border-2 border-cyan-400 scale-105">
+        <h3 class="text-2xl font-bold mb-2">Profesional ⭐</h3>
+        <p class="text-gray-300 mb-4">Ideal para crecer</p>
+        <p class="text-3xl font-bold mb-4">$19.900 CLP</p>
+        <ul class="text-sm text-gray-300 mb-6">
+          <li>✔️ 3 usuarios</li>
+          <li>✔️ Vehículos ilimitados</li>
+          <li>✔️ Reportes y trazabilidad</li>
+        </ul>
+        <a href="#" class="btn-glow">Elegir</a>
+      </div>
+      <div class="plan-card">
+        <h3 class="text-2xl font-bold mb-2">Empresarial</h3>
+        <p class="text-gray-300 mb-4">Talleres con sucursales</p>
+        <p class="text-3xl font-bold mb-4">$39.900 CLP</p>
+        <ul class="text-sm text-gray-300 mb-6">
+          <li>✔️ Usuarios ilimitados</li>
+          <li>✔️ Sedes múltiples</li>
+          <li>✔️ Integración contable</li>
+        </ul>
+        <a href="#" class="btn-outline">Elegir</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- BENEFICIOS -->
+  <section id="beneficios" class="py-20">
+    <h2 class="text-3xl font-bold text-center mb-10">¿Por qué elegir e-Garage?</h2>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
+      <div><i class="fas fa-cloud text-3xl text-cyan-400 mb-2"></i><p>100% en la nube</p></div>
+      <div><i class="fas fa-shield-alt text-3xl text-cyan-400 mb-2"></i><p>Seguridad</p></div>
+      <div><i class="fas fa-sync-alt text-3xl text-cyan-400 mb-2"></i><p>Actualizaciones</p></div>
+      <div><i class="fas fa-headset text-3xl text-cyan-400 mb-2"></i><p>Soporte humano</p></div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIOS -->
+  <section id="testimonios" class="py-16 bg-black/30">
+    <h2 class="text-4xl font-bold text-center mb-10">Testimonios reales</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center max-w-6xl mx-auto">
+      <div class="plan-card">
+        <p>"Control total de órdenes y repuestos. ¡Excelente herramienta!"</p>
+        <p class="mt-4 font-bold text-cyan-300">🚗 Juan Herrera</p>
+      </div>
+      <div class="plan-card">
+        <p>"El ranking de mecánicos nos ayudó a mejorar productividad."</p>
+        <p class="mt-4 font-bold text-cyan-300">🔧 Carla Fuentes</p>
+      </div>
+      <div class="plan-card">
+        <p>"Muy útil en temas de trazabilidad y postventa."</p>
+        <p class="mt-4 font-bold text-cyan-300">🧰 Esteban López</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="text-center py-8 text-sm text-gray-400 border-t border-cyan-800 bg-black/20">
+    <p>© 2025 e-Garage. Todos los derechos reservados.</p>
+    <p><a href="#" class="hover:underline">Términos</a> · <a href="#" class="hover:underline">Política</a> · <a href="#" class="hover:underline">Contacto</a></p>
+  </footer>
+</div>
+
+<script>
+const frases = [
+  "💡 Automatiza presupuestos y órdenes",
+  "📈 Visualiza ganancias por repuesto",
+  "🧠 Administra mecánicos en tiempo real",
+  "🔧 Controla stock y trazabilidad",
+  "🌐 Accede desde cualquier lugar"
+];
+let fraseIdx = 0;
+const fraseSpan = document.getElementById("rotating-phrases");
+function rotarFrases() {
+  fraseSpan.style.opacity = 0;
+  setTimeout(() => {
+    fraseSpan.textContent = frases[fraseIdx];
+    fraseSpan.style.opacity = 1;
+    fraseIdx = (fraseIdx + 1) % frases.length;
+  }, 500);
+}
+setInterval(rotarFrases, 4000);
+rotarFrases();
+
+document.querySelectorAll('.counter').forEach(counter => {
+  const update = () => {
+    const target = +counter.ge

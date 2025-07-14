@@ -1,0 +1,434 @@
+[
+  {
+    "model": "taller.ciudad",
+    "pk": 1,
+    "fields": {
+      "nombre": "Valparaíso",
+      "region": 2
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 2,
+    "fields": {
+      "nombre": "Viña del Mar",
+      "region": 2
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 3,
+    "fields": {
+      "nombre": "Quilpué",
+      "region": 2
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 4,
+    "fields": {
+      "nombre": "Villa Alemana",
+      "region": 2
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 5,
+    "fields": {
+      "nombre": "San Antonio",
+      "region": 2
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 6,
+    "fields": {
+      "nombre": "Quillota",
+      "region": 2
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 7,
+    "fields": {
+      "nombre": "La Calera",
+      "region": 2
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 8,
+    "fields": {
+      "nombre": "Los Andes",
+      "region": 2
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 9,
+    "fields": {
+      "nombre": "San Felipe",
+      "region": 2
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 10,
+    "fields": {
+      "nombre": "Llaillay",
+      "region": 2
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 11,
+    "fields": {
+      "nombre": "Santiago",
+      "region": 1
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 12,
+    "fields": {
+      "nombre": "Puente Alto",
+      "region": 1
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 13,
+    "fields": {
+      "nombre": "Maipú",
+      "region": 1
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 14,
+    "fields": {
+      "nombre": "La Florida",
+      "region": 1
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 15,
+    "fields": {
+      "nombre": "Las Condes",
+      "region": 1
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 16,
+    "fields": {
+      "nombre": "San Bernardo",
+      "region": 1
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 17,
+    "fields": {
+      "nombre": "Peñalolén",
+      "region": 1
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 18,
+    "fields": {
+      "nombre": "Quilicura",
+      "region": 1
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 19,
+    "fields": {
+      "nombre": "La Pintana",
+      "region": 1
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 20,
+    "fields": {
+      "nombre": "Pudahuel",
+      "region": 1
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 21,
+    "fields": {
+      "nombre": "El Bosque",
+      "region": 1
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 22,
+    "fields": {
+      "nombre": "Recoleta",
+      "region": 1
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 23,
+    "fields": {
+      "nombre": "Independencia",
+      "region": 1
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 24,
+    "fields": {
+      "nombre": "Lo Prado",
+      "region": 1
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 25,
+    "fields": {
+      "nombre": "Estación Central",
+      "region": 1
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 26,
+    "fields": {
+      "nombre": "Macul",
+      "region": 1
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 27,
+    "fields": {
+      "nombre": "Ñuñoa",
+      "region": 1
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 28,
+    "fields": {
+      "nombre": "Providencia",
+      "region": 1
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 29,
+    "fields": {
+      "nombre": "Huechuraba",
+      "region": 1
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 30,
+    "fields": {
+      "nombre": "La Reina",
+      "region": 1
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 31,
+    "fields": {
+      "nombre": "Cerrillos",
+      "region": 1
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 32,
+    "fields": {
+      "nombre": "Renca",
+      "region": 1
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 33,
+    "fields": {
+      "nombre": "Conchalí",
+      "region": 1
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 34,
+    "fields": {
+      "nombre": "Colina",
+      "region": 1
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 35,
+    "fields": {
+      "nombre": "Lampa",
+      "region": 1
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 36,
+    "fields": {
+      "nombre": "Talagante",
+      "region": 1
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 37,
+    "fields": {
+      "nombre": "Melipilla",
+      "region": 1
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 38,
+    "fields": {
+      "nombre": "Buin",
+      "region": 1
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 39,
+    "fields": {
+      "nombre": "Paine",
+      "region": 1
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 40,
+    "fields": {
+      "nombre": "Iquique",
+      "region": 3
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 41,
+    "fields": {
+      "nombre": "Antofagasta",
+      "region": 4
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 42,
+    "fields": {
+      "nombre": "Copiapó",
+      "region": 5
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 43,
+    "fields": {
+      "nombre": "La Serena",
+      "region": 6
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 44,
+    "fields": {
+      "nombre": "Ovalle",
+      "region": 6
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 45,
+    "fields": {
+      "nombre": "Rancagua",
+      "region": 7
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 46,
+    "fields": {
+      "nombre": "Talca",
+      "region": 8
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 47,
+    "fields": {
+      "nombre": "Chillán",
+      "region": 9
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 48,
+    "fields": {
+      "nombre": "Concepción",
+      "region": 10
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 49,
+    "fields": {
+      "nombre": "Los Ángeles",
+      "region": 10
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 50,
+    "fields": {
+      "nombre": "Temuco",
+      "region": 11
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 51,
+    "fields": {
+      "nombre": "Valdivia",
+      "region": 12
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 52,
+    "fields": {
+      "nombre": "Puerto Montt",
+      "region": 13
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 53,
+    "fields": {
+      "nombre": "Coyhaique",
+      "region": 14
+    }
+  },
+  {
+    "model": "taller.ciudad",
+    "pk": 54,
+    "fields": {
+      "nombre": "Punta Arenas",
+      "region": 15
+    }
+  }
+]

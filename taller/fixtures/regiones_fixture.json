@@ -1,0 +1,107 @@
+[
+  {
+    "model": "taller.region",
+    "pk": 1,
+    "fields": {
+      "nombre": "Región Metropolitana de Santiago"
+    }
+  },
+  {
+    "model": "taller.region",
+    "pk": 2,
+    "fields": {
+      "nombre": "Región de Valparaíso"
+    }
+  },
+  {
+    "model": "taller.region",
+    "pk": 3,
+    "fields": {
+      "nombre": "Región de Tarapacá"
+    }
+  },
+  {
+    "model": "taller.region",
+    "pk": 4,
+    "fields": {
+      "nombre": "Región de Antofagasta"
+    }
+  },
+  {
+    "model": "taller.region",
+    "pk": 5,
+    "fields": {
+      "nombre": "Región de Atacama"
+    }
+  },
+  {
+    "model": "taller.region",
+    "pk": 6,
+    "fields": {
+      "nombre": "Región de Coquimbo"
+    }
+  },
+  {
+    "model": "taller.region",
+    "pk": 7,
+    "fields": {
+      "nombre": "Región del Libertador General Bernardo O'Higgins"
+    }
+  },
+  {
+    "model": "taller.region",
+    "pk": 8,
+    "fields": {
+      "nombre": "Región del Maule"
+    }
+  },
+  {
+    "model": "taller.region",
+    "pk": 9,
+    "fields": {
+      "nombre": "Región de Ñuble"
+    }
+  },
+  {
+    "model": "taller.region",
+    "pk": 10,
+    "fields": {
+      "nombre": "Región del Biobío"
+    }
+  },
+  {
+    "model": "taller.region",
+    "pk": 11,
+    "fields": {
+      "nombre": "Región de La Araucanía"
+    }
+  },
+  {
+    "model": "taller.region",
+    "pk": 12,
+    "fields": {
+      "nombre": "Región de Los Ríos"
+    }
+  },
+  {
+    "model": "taller.region",
+    "pk": 13,
+    "fields": {
+      "nombre": "Región de Los Lagos"
+    }
+  },
+  {
+    "model": "taller.region",
+    "pk": 14,
+    "fields": {
+      "nombre": "Región de Aysén del General Carlos Ibáñez del Campo"
+    }
+  },
+  {
+    "model": "taller.region",
+    "pk": 15,
+    "fields": {
+      "nombre": "Región de Magallanes y de la Antártica Chilena"
+    }
+  }
+]

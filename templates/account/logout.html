@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#0f2027] via-[#2c5364] to-[#f7971e] py-12 px-4">
+  <div class="bg-black bg-opacity-80 rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
+    <img src="{% static 'img/TallerPro_logo.png' %}" alt="Logo" class="h-16 mx-auto mb-4 animate-pulse">
+    <h2 class="text-4xl font-extrabold text-yellow-400 mb-2 tracking-widest futuristic-glow">¡Sesión cerrada!</h2>
+    <p class="text-lg text-cyan-100 mb-6">Has salido de E-Garage.<br>Gracias por usar nuestra plataforma futurista.</p>
+    <div class="flex flex-col items-center gap-4 mt-6">
+      <a href="/" class="futurista-btn px-8 py-3 text-lg font-bold rounded-xl bg-gradient-to-r from-yellow-400 to-fuchsia-500 text-black shadow-lg hover:from-fuchsia-500 hover:to-yellow-400 transition-all">Volver al inicio</a>
+      <a href="/login/" class="futurista-btn px-8 py-3 text-lg font-bold rounded-xl bg-gradient-to-r from-cyan-400 to-lime-400 text-black shadow-lg hover:from-lime-400 hover:to-cyan-400 transition-all">Iniciar sesión</a>
+    </div>
+    <canvas id="logoutFuturisticChart" width="320" height="120" class="mt-8 rounded-xl shadow-lg"></canvas>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Gráfica futurista de despedida
+const ctx = document.getElementById('logoutFuturisticChart').getContext('2d');
+new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: ['Adiós', 'Hasta pronto', '¡Vuelve!', 'E-Garage', 'Futuro'],
+    datasets: [{
+      label: 'Energía Futurista',
+      data: [10, 7, 12, 20, 30],
+      borderColor: '#ffd700',
+      backgroundColor: 'rgba(217,4,41,0.3)',
+      borderWidth: 4,
+      pointBackgroundColor: '#d90429',
+      pointBorderColor: '#ffd700',
+      pointRadius: 10,
+      pointHoverRadius: 16,
+      tension: 0.5,
+      fill: true,
+      shadowOffsetX: 0,
+      shadowOffsetY: 0,
+      shadowBlur: 30,
+      shadowColor: '#ffd700',
+    }]
+  },
+  options: {
+    plugins: {
+      legend: { display: false },
+      title: {
+        display: true,
+        text: '¡Gracias por confiar en la tecnología 2100!',
+        color: '#ffd700',
+        font: { size: 22, family: 'Orbitron' }
+      }
+    },
+    scales: {
+      x: {
+        grid: { color: '#ffd70033' },
+        ticks: { color: '#ffd700', font: { family: 'Share Tech Mono', size: 16 } }
+      },
+      y: {
+        grid: { color: '#ffd70033' },
+        beginAtZero: true,
+        ticks: { color: '#ffd700', font: { family: 'Share Tech Mono', size: 16 } }
+      }
+    },
+    elements: {
+      line: {
+        borderDash: [8, 8],
+        borderJoinStyle: 'round',
+        borderCapStyle: 'round',
+      }
+    },
+    layout: {
+      padding: 30
+    },
+    animation: {
+      duration: 1800,
+      easing: 'easeInOutQuart'
+    }
+  }
+});
+</script>
+{% endblock %}

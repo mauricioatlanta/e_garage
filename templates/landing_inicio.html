@@ -1,0 +1,248 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<style>
+@keyframes holo-float {
+  0% { transform: translateY(0) scale(1); filter: drop-shadow(0 0 24px #00ffe799); }
+  60% { transform: translateY(-10px) scale(1.03); filter: drop-shadow(0 0 32px #a3ff1299); }
+  100% { transform: translateY(0) scale(1); filter: drop-shadow(0 0 24px #00ffe799); }
+}
+#intro-logo {
+  will-change: transform, opacity, border-color;
+  opacity: 1;
+  transition: transform 1.6s cubic-bezier(.4,0,.2,1), opacity 0.7s cubic-bezier(.4,0,.2,1), border-color 0.5s linear;
+}
+#intro-logo.color1 { border-color: #00ffe7; }
+#intro-logo.color2 { border-color: #a3ff12; }
+#intro-logo.color3 { border-color: #ff00ea; }
+#intro-logo.color4 { border-color: #ffae00; }
+#intro-logo.color5 { border-color: #ff0000; }
+#intro-logo.explode {
+  animation: logo-explode 1.1s forwards;
+}
+@keyframes logo-explode {
+  0% { transform: scale(4.5); opacity: 1; filter: blur(0px); }
+  60% { transform: scale(6.5); opacity: 0.7; filter: blur(2px); }
+  100% { transform: scale(10); opacity: 0; filter: blur(16px); }
+}
+</style>
+{% endblock %}
+
+{% block fondo_extra %}
+<div id="intro-logo-bg" class="fixed inset-0 -z-20 flex items-center justify-center bg-[#0d1117]">
+  <img id="intro-logo" src="{% static 'img/TallerPro_logo.png' %}" alt="E-Garage Logo" class="transition-transform duration-1000 ease-in-out" style="width: 96px; opacity:1; border: 8px solid #00ffe7; border-radius: 32px; box-shadow: 0 0 48px #00ffe7cc;">
+</div>
+<div id="tsparticles" class="fixed inset-0 -z-10 hidden"></div>
+{% endblock %}
+
+{% block body_class %}landing-saas{% endblock %}
+
+{% block content %}
+
+<main class="max-w-5xl mx-auto py-12">
+  <div class="flex flex-col items-center mb-12">
+    <!-- Logo eliminado de la cabecera -->
+    <h1 class="text-6xl md:text-7xl font-black text-center text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-lime-400 to-fuchsia-500 mb-4 tracking-tight futuristic-glow animated-glitch">E-Garage</h1>
+    <p class="text-center text-2xl text-cyan-100 mb-2 max-w-2xl font-semibold animated-phrase">
+      La plataforma donde la eficiencia se convierte en tu mayor ventaja.<br>
+      <span class="block mt-2">Gestiona, analiza y conquista tu mercado.</span>
+      <span class="block mt-2 text-lime-300 font-bold">Haz que tu taller sea el referente.</span>
+    </p>
+    <div class="flex flex-col md:flex-row gap-4 mt-4">
+      <a href="#suscripcion" class="cta-btn-premium pulse py-4 px-10 rounded-2xl font-extrabold text-2xl shadow-2xl transition-all">Impulsa mi negocio</a>
+      <a href="{% url 'registro_trial' %}" class="cta-btn-outline text-lg py-4 px-8 rounded-2xl font-bold shadow-lg transition-all">Probar 30 días gratis</a>
+      <a href="/login/" class="cta-btn-outline text-lg py-4 px-8 rounded-2xl font-bold shadow-lg transition-all">Ya soy parte</a>
+    </div>
+  </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+        <button id="btn-mecanicos" class="interactive-btn glass-btn-premium text-cyan-100 font-bold py-10 px-8 rounded-3xl shadow-2xl text-xl flex flex-col items-center hover:scale-105 transition-all mb-4">
+            <i class="fas fa-user-cog text-5xl mb-3"></i>
+            <span class="text-2xl mb-1">Mecánicos y responsables</span>
+            <span class="text-base font-normal mt-2">Sigue el historial de cada trabajo, asigna responsables y mide desempeño.</span>
+        </button>
+        <button id="btn-repuestos" class="interactive-btn glass-btn-premium text-cyan-100 font-bold py-10 px-8 rounded-3xl shadow-2xl text-xl flex flex-col items-center hover:scale-105 transition-all mb-4">
+            <i class="fas fa-shopping-bag text-5xl mb-3"></i>
+            <span class="text-2xl mb-1">Repuestos y costos</span>
+            <span class="text-base font-normal mt-2">Controla compras, proveedores, márgenes y stock en tiempo real.</span>
+        </button>
+        <button id="btn-servicios" class="interactive-btn glass-btn-premium text-cyan-100 font-bold py-10 px-8 rounded-3xl shadow-2xl text-xl flex flex-col items-center hover:scale-105 transition-all mb-4">
+            <i class="fas fa-tachometer-alt text-5xl mb-3"></i>
+            <span class="text-2xl mb-1">Kilometraje y servicios</span>
+            <span class="text-base font-normal mt-2">Registra el kilometraje y el tipo de servicio para cada vehículo.</span>
+        </button>
+        <button id="btn-reportes" class="interactive-btn glass-btn-premium text-cyan-100 font-bold py-10 px-8 rounded-3xl shadow-2xl text-xl flex flex-col items-center hover:scale-105 transition-all mb-4">
+            <i class="fas fa-chart-bar text-5xl mb-3"></i>
+            <span class="text-2xl mb-1">Reportes premium</span>
+            <span class="text-base font-normal mt-2">Visualiza ingresos, gastos, utilidades y proyecciones con dashboards avanzados.</span>
+        </button>
+        <button id="btn-clientes" class="interactive-btn glass-btn-premium text-cyan-100 font-bold py-10 px-8 rounded-3xl shadow-2xl text-xl flex flex-col items-center hover:scale-105 transition-all mb-4">
+            <i class="fas fa-users text-5xl mb-3"></i>
+            <span class="text-2xl mb-1">Clientes y CRM</span>
+            <span class="text-base font-normal mt-2">Gestiona clientes, recordatorios, historial y comunicación digital.</span>
+        </button>
+        <button id="btn-ia" class="interactive-btn glass-btn-premium text-cyan-100 font-bold py-10 px-8 rounded-3xl shadow-2xl text-xl flex flex-col items-center hover:scale-105 transition-all mb-4">
+            <i class="fas fa-robot text-5xl mb-3"></i>
+            <span class="text-2xl mb-1">IA y automatización</span>
+            <span class="text-base font-normal mt-2">Automatiza tareas, recibe sugerencias inteligentes y ahorra tiempo.</span>
+        </button>
+    </div>
+
+    <section class="bg-gray-900 bg-opacity-90 rounded-2xl p-8 shadow-2xl mb-10">
+        <h2 class="text-3xl font-bold text-cyan-300 mb-4 flex items-center"><i class="fas fa-robot mr-2"></i> Tecnología que Impresiona</h2>
+        <ul class="grid grid-cols-1 md:grid-cols-2 gap-4 text-cyan-100 text-lg">
+            <li class="flex items-center"><i class="fas fa-bolt text-lime-400 mr-2"></i> Inteligencia artificial para análisis de datos y predicción de necesidades.</li>
+            <li class="flex items-center"><i class="fas fa-eye text-lime-400 mr-2"></i> Visualiza el historial completo de cada vehículo y cliente.</li>
+            <li class="flex items-center"><i class="fas fa-database text-lime-400 mr-2"></i> Toda la información centralizada y segura en la nube.</li>
+            <li class="flex items-center"><i class="fas fa-chart-pie text-lime-400 mr-2"></i> Reportes visuales y exportables en un clic.</li>
+            <li class="flex items-center"><i class="fas fa-mobile-alt text-lime-400 mr-2"></i> Acceso desde cualquier dispositivo, en cualquier momento.</li>
+            <li class="flex items-center"><i class="fas fa-lock text-lime-400 mr-2"></i> Seguridad de nivel bancario y respaldo automático.</li>
+        </ul>
+    </section>
+
+    <section id="suscripcion" class="bg-gray-900 bg-opacity-90 rounded-2xl p-8 shadow-2xl mb-10 mt-12 text-center">
+      <h2 class="text-3xl font-bold text-yellow-300 mb-4 flex items-center justify-center"><i class="fas fa-gem mr-2"></i> Suscríbete a E-Garage</h2>
+      <p class="text-lg text-cyan-100 mb-6">Accede a todas las funciones premium, soporte prioritario y actualizaciones automáticas.<br>¡Invierte en el futuro de tu taller!</p>
+      <a href="#" class="cta-btn-premium py-4 px-10 rounded-2xl font-extrabold text-2xl shadow-2xl transition-all inline-block">💳 Suscribirse (próximamente)</a>
+      <div class="mt-6 text-cyan-200 text-base">¿Prefieres probar antes? <a href="{% url 'registro_trial' %}" class="underline text-lime-400 hover:text-fuchsia-400 transition-all">Solicita tu prueba gratis de 30 días aquí</a>.</div>
+    </section>
+</main>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+<style>
+  .animated-glitch {
+    animation: glitch 2.5s infinite alternate;
+    position: relative;
+  }
+  @keyframes glitch {
+    0% { text-shadow: 0 0 24px #00ffe7, 0 0 8px #00ffe7, 0 0 2px #fff; }
+    20% { text-shadow: 2px 0 #ff00ea, -2px 0 #00ffe7, 0 0 8px #fff; }
+    40% { text-shadow: -2px 0 #a3ff12, 2px 0 #00ffe7, 0 0 16px #fff; }
+    60% { text-shadow: 0 2px #ff00ea, 0 -2px #a3ff12, 0 0 24px #fff; }
+    80% { text-shadow: 2px 2px #00ffe7, -2px -2px #ff00ea, 0 0 32px #fff; }
+    100% { text-shadow: 0 0 24px #00ffe7, 0 0 8px #00ffe7, 0 0 2px #fff; }
+  }
+  .animated-phrase {
+    animation: phrasefade 6s infinite alternate;
+  }
+  @keyframes phrasefade {
+    0% { opacity: 1; filter: blur(0px); }
+    40% { opacity: 0.7; filter: blur(1.5px); }
+    60% { opacity: 1; filter: blur(0px); }
+    100% { opacity: 1; filter: blur(0px); }
+  }
+  .glass-btn-premium {
+    background: rgba(20, 30, 40, 0.18);
+    backdrop-filter: blur(12px) saturate(200%);
+    border: 2px solid #00ffe7cc;
+    box-shadow: 0 8px 40px 0 #00ffe755, 0 2px 8px 0 #000a;
+    transition: border 0.2s, box-shadow 0.2s;
+  }
+  .glass-btn-premium:hover {
+    border: 2.5px solid #fff;
+    box-shadow: 0 12px 48px 0 #00ffe7cc, 0 4px 16px 0 #000a;
+  }
+  .cta-btn-premium {
+    background: linear-gradient(90deg, #00ffe7 0%, #a3ff12 50%, #ff00ea 100%);
+    color: #181c1f;
+    font-weight: 900;
+    letter-spacing: 1px;
+    box-shadow: 0 0 32px 0 #00ffe7aa, 0 2px 8px 0 #000a;
+    border: none;
+    outline: none;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  }
+  .cta-btn-premium:hover {
+    background: linear-gradient(90deg, #ff00ea 0%, #a3ff12 50%, #00ffe7 100%);
+    color: #000;
+    box-shadow: 0 0 48px 0 #ff00ea99, 0 2px 8px 0 #000a;
+  }
+  .cta-btn-outline {
+    background: transparent;
+    color: #a3ff12;
+    border: 2px solid #a3ff12;
+    font-weight: 700;
+    letter-spacing: 1px;
+    box-shadow: 0 0 12px 0 #a3ff1299;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  }
+  .cta-btn-outline:hover {
+    background: #a3ff12;
+    color: #181c1f;
+    box-shadow: 0 0 24px 0 #a3ff12cc;
+  }
+  .futuristic-glow {
+    text-shadow: 0 0 24px #00ffe7, 0 0 8px #00ffe7, 0 0 2px #fff;
+    letter-spacing: 2px;
+  }
+  .interactive-btn {
+    cursor: pointer;
+    border: none;
+    outline: none;
+    transition: box-shadow 0.2s, transform 0.2s;
+    box-shadow: 0 0 24px 0 #00ffe7, 0 2px 8px 0 #000a;
+  }
+  .interactive-btn:active {
+    transform: scale(0.97);
+    box-shadow: 0 0 8px 0 #00ffe7, 0 1px 4px 0 #000a;
+  }
+  .pulse {
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 #00ffe7aa; }
+    70% { box-shadow: 0 0 0 16px #00ffe700; }
+    100% { box-shadow: 0 0 0 0 #00ffe7aa; }
+  }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const logo = document.getElementById('intro-logo');
+  const logoBg = document.getElementById('intro-logo-bg');
+  const particles = document.getElementById('tsparticles');
+
+  // Paso 1: Logo pequeño
+  logo.style.transform = 'scale(1)';
+  setTimeout(() => {
+    // Paso 2: Agrandar (más grande y más lento)
+    logo.style.transform = 'scale(4.5)';
+    // Secuencia de colores del borde
+    setTimeout(() => logo.classList.add('color2'), 700);
+    setTimeout(() => logo.classList.add('color3'), 1400);
+    setTimeout(() => logo.classList.add('color4'), 2100);
+    setTimeout(() => logo.classList.add('color5'), 2800); // Rojo
+    setTimeout(() => {
+      // Paso 3: Explosión
+      logo.classList.add('explode');
+      setTimeout(() => {
+        // Paso 4: Ocultar logo, mostrar partículas
+        logoBg.style.display = 'none';
+        particles.classList.remove('hidden');
+        // Iniciar partículas
+        tsParticles.load('tsparticles', {
+          background: { color: '#0d1117' },
+          fpsLimit: 60,
+          particles: {
+            number: { value: 120, density: { enable: true, value_area: 800 } },
+            color: { value: ['#00ffe7', '#a3ff12', '#ff00ea'] },
+            shape: { type: 'circle' },
+            opacity: { value: 0.7, random: true },
+            size: { value: 3, random: true },
+            move: { enable: true, speed: 2, direction: 'none', outModes: 'out' }
+          },
+          interactivity: {
+            events: { onHover: { enable: true, mode: 'repulse' }, resize: true },
+            modes: { repulse: { distance: 80, duration: 0.4 } }
+          },
+          detectRetina: true
+        });
+      }, 1100); // Duración de la explosión
+    }, 3200); // Tiempo antes de explotar
+  }, 600); // Tiempo inicial pequeño
+});
+</script>
+{% endblock %}

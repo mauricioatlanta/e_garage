@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="container mx-auto py-10 px-2 md:px-8">
+  <h1 class="text-4xl font-extrabold text-center mb-8" style="font-family: 'Orbitron', 'Share Tech Mono', Arial, sans-serif; color: #ffd700; text-shadow: 0 0 24px #d90429, 0 0 8px #ffd700, 0 0 2px #fff; letter-spacing: 3px;">🤖 Reporte Futurista de Repuestos</h1>
+  <div class="flex flex-wrap justify-center gap-4 mb-8">
+    <button class="enfoque-btn" data-enfoque="ventas">Top Ventas</button>
+    <button class="enfoque-btn" data-enfoque="margen">Mayor Margen</button>
+    <button class="enfoque-btn" data-enfoque="stock">Bajo Stock</button>
+    <button class="enfoque-btn" data-enfoque="historico">Histórico Mensual</button>
+    <button class="enfoque-btn" data-enfoque="nunca">Nunca Vendidos</button>
+  </div>
+
+  <div id="panel-ventas" class="enfoque-panel">
+    <h2 class="text-xl font-bold mb-2 text-center">Top 10 Repuestos Más Vendidos</h2>
+    <table class="w-full text-sm mb-4 futuristic-table">
+      <thead><tr><th>Partnumber</th><th>Nombre</th><th>Cantidad Total</th><th>Ingresos</th></tr></thead>
+      <tbody>
+        {% for r in top_repuestos %}
+        <tr>
+          <td>{{ r.codigo }}</td>
+          <td>{{ r.nombre }}</td>
+          <td class="ai-highlight">{{ r.cantidad_total }}</td>
+          <td>${{ r.ingresos|floatformat:0|intcomma }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">No hay datos.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div id="panel-margen" class="enfoque-panel" style="display:none;">
+    <h2 class="text-xl font-bold mb-2 text-center">Repuestos con Mayor Margen de Ganancia</h2>
+    <table class="w-full text-sm mb-4 futuristic-table">
+      <thead><tr><th>Partnumber</th><th>Nombre</th><th>Margen (%)</th><th>Ingresos</th></tr></thead>
+      <tbody>
+        {% for r in top_margen %}
+        <tr>
+          <td>{{ r.codigo }}</td>
+          <td>{{ r.nombre }}</td>
+          <td class="ai-highlight">{{ r.margen|floatformat:2 }}%</td>
+          <td>${{ r.ingresos|floatformat:0|intcomma }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">No hay datos.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div id="panel-stock" class="enfoque-panel" style="display:none;">
+    <h2 class="text-xl font-bold mb-2 text-center">Repuestos con Bajo Stock (Alerta)</h2>
+    <table class="w-full text-sm mb-4 futuristic-table">
+      <thead><tr><th>Partnumber</th><th>Nombre</th><th>Stock Actual</th></tr></thead>
+      <tbody>
+        {% for r in bajo_stock %}
+        <tr>
+          <td>{{ r.codigo }}</td>
+          <td>{{ r.nombre }}</td>
+          <td class="ai-highlight">{{ r.stock }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="3">No hay repuestos con bajo stock.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div id="panel-historico" class="enfoque-panel" style="display:none;">
+    <h2 class="text-xl font-bold mb-2 text-center">Histórico de Ventas Mensuales</h2>
+    <canvas id="ventasMensualesChart" height="100"></canvas>
+  </div>
+
+  <div id="panel-nunca" class="enfoque-panel" style="display:none;">
+    <h2 class="text-xl font-bold mb-2 text-center">Repuestos Nunca Vendidos</h2>
+    <ul class="list-disc pl-8">
+      {% for r in nunca_vendidos %}
+        <li>{{ r.codigo }} - {{ r.nombre }}</li>
+      {% empty %}
+        <li>Todos los repuestos han sido vendidos al menos una vez.</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+<style>
+  .enfoque-btn {
+    background: linear-gradient(90deg, #ffd700 0%, #d90429 100%);
+    color: #111;
+    font-family: 'Orbitron', 'Share Tech Mono', Arial, sans-serif;
+    font-weight: bold;
+    border: none;
+    border-radius: 1.5rem;
+    padding: 0.7rem 2.2rem;
+    font-size: 1.1rem;
+    box-shadow: 0 0 16px #ffd70099, 0 0 0 2px #d90429;
+    transition: background 0.2s, box-shadow 0.2s, color 0.2s;
+    cursor: pointer;
+    margin-bottom: 0.5rem;
+  }
+  .enfoque-btn:hover, .enfoque-btn.active {
+    background: linear-gradient(90deg, #d90429 0%, #ffd700 100%);
+    color: #ffd700;
+    box-shadow: 0 0 32px #d90429cc, 0 0 0 2px #ffd700;
+  }
+  .futuristic-table {
+    background: rgba(20,0,0,0.85);
+    border-radius: 1.5rem;
+    box-shadow: 0 0 32px #d90429cc, 0 0 0 2px #ffd700;
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden;
+  }
+  .futuristic-table th, .futuristic-table td {
+    border-bottom: 1px solid #ffd70033;
+    padding: 0.5rem 1rem;
+    color: #fff;
+    text-shadow: 0 0 4px #000, 0 0 2px #ffd700;
+  }
+  .futuristic-table th {
+    color: #ffd700;
+    font-size: 1.1rem;
+    background: #181830;
+    border-top: 2px solid #ffd700;
+  }
+  .ai-highlight { color: #d90429; font-weight: bold; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // Paneles de enfoque
+  document.querySelectorAll('.enfoque-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.enfoque-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      document.querySelectorAll('.enfoque-panel').forEach(p => p.style.display = 'none');
+      document.getElementById('panel-' + this.dataset.enfoque).style.display = '';
+      if(this.dataset.enfoque === 'historico') {
+        setTimeout(renderFuturisticChart, 100);
+      }
+    });
+  });
+  // Mostrar por defecto el panel de ventas
+  document.querySelector('.enfoque-btn[data-enfoque="ventas"]').classList.add('active');
+  // Gráfica futurista
+  function renderFuturisticChart() {
+    const ventasMensuales = {{ ventas_mensuales|safe }};
+    const ctx = document.getElementById('ventasMensualesChart').getContext('2d');
+    if(window.ventasChart) window.ventasChart.destroy();
+    window.ventasChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ventasMensuales.labels,
+        datasets: [{
+          label: 'Ventas de Repuestos',
+          data: ventasMensuales.data,
+          borderColor: '#ffd700',
+          backgroundColor: 'rgba(217,4,41,0.3)',
+          borderWidth: 4,
+          pointBackgroundColor: '#d90429',
+          pointBorderColor: '#ffd700',
+          pointRadius: 8,
+          pointHoverRadius: 12,
+          tension: 0.45,
+          fill: true,
+          shadowOffsetX: 0,
+          shadowOffsetY: 0,
+          shadowBlur: 30,
+          shadowColor: '#ffd700',
+        }]
+      },
+      options: {
+        plugins: {
+          legend: { display: false },
+          title: {
+            display: true,
+            text: 'Ventas Mensuales (IA 2100)',
+            color: '#ffd700',
+            font: { size: 22, family: 'Orbitron' }
+          }
+        },
+        scales: {
+          x: {
+            grid: { color: '#ffd70033' },
+            ticks: { color: '#ffd700', font: { family: 'Share Tech Mono', size: 16 } }
+          },
+          y: {
+            grid: { color: '#ffd70033' },
+            beginAtZero: true,
+            ticks: { color: '#ffd700', font: { family: 'Share Tech Mono', size: 16 } }
+          }
+        },
+        elements: {
+          line: {
+            borderDash: [8, 8],
+            borderJoinStyle: 'round',
+            borderCapStyle: 'round',
+          }
+        },
+        layout: {
+          padding: 30
+        },
+        animation: {
+          duration: 1800,
+          easing: 'easeInOutQuart'
+        }
+      }
+    });
+  }
+</script>
+{% endblock %}

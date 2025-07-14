@@ -1,0 +1,21 @@
+{% extends 'taller/base.html' %}
+{% block title %}Confirmar Eliminación{% endblock %}
+{% block content %}
+<div class="max-w-lg mx-auto mt-20 translucent-card border border-slate-200 rounded-lg shadow px-6 py-8">
+<h1 class="text-xl font-bold text-red-600 mb-4">⚠️ Confirmar Eliminación</h1>
+<p class="text-slate-600 mb-4">Estás a punto de eliminar el siguiente registro:</p>
+<ul class="mb-6 space-y-2 text-sm text-slate-700">
+    {% if object.patente %}<li><strong>Patente:</strong> {{ object.patente }}</li>{% endif %}
+    {% if object.modelo %}<li><strong>Modelo:</strong> {{ object.modelo }}</li>{% endif %}
+    {% if object.anio %}<li><strong>Año:</strong> {{ object.anio }}</li>{% endif %}
+  </ul>
+<p class="text-sm text-slate-500 mb-6">Esta acción no se puede deshacer.</p>
+<form method="post">
+    {% csrf_token %}
+    <div class="flex justify-between">
+<a class="px-4 py-2 rounded bg-slate-200 text-slate-700 hover:bg-slate-300" href="javascript:history.back()">Cancelar</a>
+<button class="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700 btn-futuristic" type="submit">Eliminar</button>
+</div>
+</form>
+</div>
+{% endblock %}

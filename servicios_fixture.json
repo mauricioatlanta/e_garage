@@ -1,0 +1,960 @@
+[
+    {
+        "model": "taller.categoriaservicio",
+        "pk": 1,
+        "fields": {
+            "nombre": "1. Mantenimiento Preventivo y Servicios Periódicos"
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 1,
+        "fields": {
+            "nombre": "Afinamiento completo (bujías, filtros, inyectores, sensores)",
+            "subcategoria": 1
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 2,
+        "fields": {
+            "nombre": "Alineación y balanceo computarizado de ruedas",
+            "subcategoria": 1
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 3,
+        "fields": {
+            "nombre": "Cambio de aceite y filtro (motor)",
+            "subcategoria": 1
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 4,
+        "fields": {
+            "nombre": "Cambio de correas (distribución, alternador, accesorios)",
+            "subcategoria": 1
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 5,
+        "fields": {
+            "nombre": "Cambio de filtro de aire",
+            "subcategoria": 1
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 6,
+        "fields": {
+            "nombre": "Cambio de filtro de combustible",
+            "subcategoria": 1
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 7,
+        "fields": {
+            "nombre": "Cambio de filtro de cabina (habitáculo)",
+            "subcategoria": 1
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 8,
+        "fields": {
+            "nombre": "Chequeo y cambio de líquidos (refrigerante, frenos, hidráulico, transmisión)",
+            "subcategoria": 1
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 9,
+        "fields": {
+            "nombre": "Diagnóstico computarizado con escáner OBD-II",
+            "subcategoria": 1
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 10,
+        "fields": {
+            "nombre": "Inspección de suspensión, rótulas y amortiguadores",
+            "subcategoria": 1
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 11,
+        "fields": {
+            "nombre": "Lubricación de bisagras, cerraduras y componentes móviles",
+            "subcategoria": 1
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 12,
+        "fields": {
+            "nombre": "Revisión y ajuste del sistema de frenos",
+            "subcategoria": 1
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 13,
+        "fields": {
+            "nombre": "Revisión de presión y estado de neumáticos",
+            "subcategoria": 1
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 14,
+        "fields": {
+            "nombre": "Revisión del sistema de escape y catalizador",
+            "subcategoria": 1
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 15,
+        "fields": {
+            "nombre": "Rotación cruzada de neumáticos",
+            "subcategoria": 1
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 16,
+        "fields": {
+            "nombre": "Test de batería y sistema de carga eléctrica",
+            "subcategoria": 1
+        }
+    },
+    {
+        "model": "taller.categoriaservicio",
+        "pk": 2,
+        "fields": {
+            "nombre": "2. Reparaciones Mecánicas Generales"
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 17,
+        "fields": {
+            "nombre": "Ajuste y sincronización electrónica del motor",
+            "subcategoria": 2
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 18,
+        "fields": {
+            "nombre": "Cambio de alternador",
+            "subcategoria": 2
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 19,
+        "fields": {
+            "nombre": "Cambio de bomba de agua",
+            "subcategoria": 2
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 20,
+        "fields": {
+            "nombre": "Cambio de cadena o correa de distribución",
+            "subcategoria": 2
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 21,
+        "fields": {
+            "nombre": "Cambio de empaquetadura de culata",
+            "subcategoria": 2
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 22,
+        "fields": {
+            "nombre": "Cambio de empaquetaduras y retenes generales",
+            "subcategoria": 2
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 23,
+        "fields": {
+            "nombre": "Cambio de motor de arranque",
+            "subcategoria": 2
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 24,
+        "fields": {
+            "nombre": "Cambio de pistones, anillos y metales",
+            "subcategoria": 2
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 25,
+        "fields": {
+            "nombre": "Cambio de radiador y componentes de refrigeración",
+            "subcategoria": 2
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 26,
+        "fields": {
+            "nombre": "Cambio de sensores (MAP, MAF, O2, temperatura, cigüeñal, etc.)",
+            "subcategoria": 2
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 27,
+        "fields": {
+            "nombre": "Cambio de soportes de motor",
+            "subcategoria": 2
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 28,
+        "fields": {
+            "nombre": "Diagnóstico y reparación de fallas de motor",
+            "subcategoria": 2
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 29,
+        "fields": {
+            "nombre": "Limpieza ultrasónica de inyectores",
+            "subcategoria": 2
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 30,
+        "fields": {
+            "nombre": "Rectificación de culata y prueba hidráulica",
+            "subcategoria": 2
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 31,
+        "fields": {
+            "nombre": "Reparación de fugas de aceite y refrigerante",
+            "subcategoria": 2
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 32,
+        "fields": {
+            "nombre": "Reparación de sistema de inyección (common rail, TBI)",
+            "subcategoria": 2
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 33,
+        "fields": {
+            "nombre": "Revisión y reparación de sistema de escape (flexibles, catalizador)",
+            "subcategoria": 2
+        }
+    },
+    {
+        "model": "taller.categoriaservicio",
+        "pk": 3,
+        "fields": {
+            "nombre": "3. Sistema de Frenos"
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 34,
+        "fields": {
+            "nombre": "Cambio de cilindro maestro de frenos",
+            "subcategoria": 3
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 35,
+        "fields": {
+            "nombre": "Cambio de discos ventilados o sólidos",
+            "subcategoria": 3
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 36,
+        "fields": {
+            "nombre": "Cambio y purgado de líquido de frenos",
+            "subcategoria": 3
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 37,
+        "fields": {
+            "nombre": "Cambio de mangueras y líneas de freno",
+            "subcategoria": 3
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 38,
+        "fields": {
+            "nombre": "Cambio de pastillas de freno",
+            "subcategoria": 3
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 39,
+        "fields": {
+            "nombre": "Cambio de tambores y zapatas",
+            "subcategoria": 3
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 40,
+        "fields": {
+            "nombre": "Purgado y sangrado del sistema de frenos",
+            "subcategoria": 3
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 41,
+        "fields": {
+            "nombre": "Diagnóstico y reparación de ABS",
+            "subcategoria": 3
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 42,
+        "fields": {
+            "nombre": "Revisión y ajuste del freno de mano",
+            "subcategoria": 3
+        }
+    },
+    {
+        "model": "taller.categoriaservicio",
+        "pk": 4,
+        "fields": {
+            "nombre": "4. Sistema de Transmisión y Embrague"
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 43,
+        "fields": {
+            "nombre": "Cambio de aceite de transmisión automática (ATF)",
+            "subcategoria": 4
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 44,
+        "fields": {
+            "nombre": "Cambio de aceite de caja mecánica",
+            "subcategoria": 4
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 45,
+        "fields": {
+            "nombre": "Cambio de cardán y crucetas",
+            "subcategoria": 4
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 46,
+        "fields": {
+            "nombre": "Cambio de convertidor de par",
+            "subcategoria": 4
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 47,
+        "fields": {
+            "nombre": "Cambio de kit de embrague (disco, prensa y rodamiento)",
+            "subcategoria": 4
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 48,
+        "fields": {
+            "nombre": "Cambio de homocinéticas internas y externas",
+            "subcategoria": 4
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 49,
+        "fields": {
+            "nombre": "Cambio de retenes de transmisión",
+            "subcategoria": 4
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 50,
+        "fields": {
+            "nombre": "Cambio de volante de inercia (bimasa o sólido)",
+            "subcategoria": 4
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 51,
+        "fields": {
+            "nombre": "Reparación o reemplazo de caja de cambios",
+            "subcategoria": 4
+        }
+    },
+    {
+        "model": "taller.categoriaservicio",
+        "pk": 5,
+        "fields": {
+            "nombre": "5. Sistema de Suspensión y Dirección"
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 52,
+        "fields": {
+            "nombre": "Ajuste y calibración de dirección hidráulica o EPS",
+            "subcategoria": 5
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 53,
+        "fields": {
+            "nombre": "Cambio de amortiguadores (gas o aceite)",
+            "subcategoria": 5
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 54,
+        "fields": {
+            "nombre": "Cambio de axiales y terminales de dirección",
+            "subcategoria": 5
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 55,
+        "fields": {
+            "nombre": "Cambio de bieletas estabilizadoras",
+            "subcategoria": 5
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 56,
+        "fields": {
+            "nombre": "Cambio de brazos de suspensión (trapecios)",
+            "subcategoria": 5
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 57,
+        "fields": {
+            "nombre": "Cambio de bujes de suspensión",
+            "subcategoria": 5
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 58,
+        "fields": {
+            "nombre": "Cambio de cremallera o caja de dirección",
+            "subcategoria": 5
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 59,
+        "fields": {
+            "nombre": "Cambio de espirales o resortes",
+            "subcategoria": 5
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 60,
+        "fields": {
+            "nombre": "Reparación de sistema de dirección asistida",
+            "subcategoria": 5
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 61,
+        "fields": {
+            "nombre": "Revisión general de alineación y geometría",
+            "subcategoria": 5
+        }
+    },
+    {
+        "model": "taller.categoriaservicio",
+        "pk": 6,
+        "fields": {
+            "nombre": "6. Sistema Eléctrico y Electrónico"
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 62,
+        "fields": {
+            "nombre": "Cambio de focos, ampolletas halógenas y LED",
+            "subcategoria": 6
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 63,
+        "fields": {
+            "nombre": "Cambio de batería y limpieza de bornes",
+            "subcategoria": 6
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 64,
+        "fields": {
+            "nombre": "Reparación o cambio de cableado eléctrico",
+            "subcategoria": 6
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 65,
+        "fields": {
+            "nombre": "Cambio de fusibles, relés y cajas eléctricas",
+            "subcategoria": 6
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 66,
+        "fields": {
+            "nombre": "Cambio de motor de partida (starter)",
+            "subcategoria": 6
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 67,
+        "fields": {
+            "nombre": "Cambio de sensores de ABS, velocidad, reversa",
+            "subcategoria": 6
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 68,
+        "fields": {
+            "nombre": "Diagnóstico y reparación de alternador",
+            "subcategoria": 6
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 69,
+        "fields": {
+            "nombre": "Diagnóstico y reparación de ECU o módulos electrónicos",
+            "subcategoria": 6
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 70,
+        "fields": {
+            "nombre": "Instalación de alarma, cierre centralizado y GPS",
+            "subcategoria": 6
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 71,
+        "fields": {
+            "nombre": "Instalación de cámara de retroceso y sensores",
+            "subcategoria": 6
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 72,
+        "fields": {
+            "nombre": "Instalación de luces LED o xenón",
+            "subcategoria": 6
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 73,
+        "fields": {
+            "nombre": "Instalación de pantallas, radios y multimedia",
+            "subcategoria": 6
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 74,
+        "fields": {
+            "nombre": "Reparación de alzavidrios eléctricos",
+            "subcategoria": 6
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 75,
+        "fields": {
+            "nombre": "Detección y solución de cortocircuitos",
+            "subcategoria": 6
+        }
+    },
+    {
+        "model": "taller.categoriaservicio",
+        "pk": 7,
+        "fields": {
+            "nombre": "7. Aire Acondicionado y Climatización"
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 76,
+        "fields": {
+            "nombre": "Cambio de compresor de aire acondicionado",
+            "subcategoria": 7
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 77,
+        "fields": {
+            "nombre": "Cambio de condensador y válvula de expansión",
+            "subcategoria": 7
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 78,
+        "fields": {
+            "nombre": "Cambio de evaporador",
+            "subcategoria": 7
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 79,
+        "fields": {
+            "nombre": "Cambio de filtro de cabina (polen)",
+            "subcategoria": 7
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 80,
+        "fields": {
+            "nombre": "Carga y reciclado de gas refrigerante R134a o R1234yf",
+            "subcategoria": 7
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 81,
+        "fields": {
+            "nombre": "Detección de fugas con nitrógeno o UV",
+            "subcategoria": 7
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 82,
+        "fields": {
+            "nombre": "Limpieza interna del sistema de climatización",
+            "subcategoria": 7
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 83,
+        "fields": {
+            "nombre": "Revisión y cambio de ventiladores interiores o radiador",
+            "subcategoria": 7
+        }
+    },
+    {
+        "model": "taller.categoriaservicio",
+        "pk": 8,
+        "fields": {
+            "nombre": "8. Desabolladura y Pintura"
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 84,
+        "fields": {
+            "nombre": "Eliminación de rayones y microarañazos",
+            "subcategoria": 8
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 85,
+        "fields": {
+            "nombre": "Pintura completa profesional con horno",
+            "subcategoria": 8
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 86,
+        "fields": {
+            "nombre": "Pintura de calipers y detalles deportivos",
+            "subcategoria": 8
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 87,
+        "fields": {
+            "nombre": "Pintura y restauración de llantas",
+            "subcategoria": 8
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 88,
+        "fields": {
+            "nombre": "Pintura parcial de piezas (capó, parachoques, puertas)",
+            "subcategoria": 8
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 89,
+        "fields": {
+            "nombre": "Aplicación de cerámico o film PPF",
+            "subcategoria": 8
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 90,
+        "fields": {
+            "nombre": "Pulido, abrillantado y encerado profesional",
+            "subcategoria": 8
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 91,
+        "fields": {
+            "nombre": "Reparación de golpes leves y abolladuras",
+            "subcategoria": 8
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 92,
+        "fields": {
+            "nombre": "Reparación y pintura de parachoques plásticos",
+            "subcategoria": 8
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 93,
+        "fields": {
+            "nombre": "Cambio o reparación de molduras externas",
+            "subcategoria": 8
+        }
+    },
+    {
+        "model": "taller.categoriaservicio",
+        "pk": 9,
+        "fields": {
+            "nombre": "9. Vidrios y Accesorios"
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 94,
+        "fields": {
+            "nombre": "Cambio de luneta trasera con desempañador",
+            "subcategoria": 9
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 95,
+        "fields": {
+            "nombre": "Cambio de parabrisas con instalación profesional",
+            "subcategoria": 9
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 96,
+        "fields": {
+            "nombre": "Cambio de vidrios laterales (manuales o eléctricos)",
+            "subcategoria": 9
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 97,
+        "fields": {
+            "nombre": "Instalación de barras de techo y portaequipajes",
+            "subcategoria": 9
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 98,
+        "fields": {
+            "nombre": "Instalación de estribos y accesorios exteriores",
+            "subcategoria": 9
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 99,
+        "fields": {
+            "nombre": "Cambio de plumillas y sistema de limpiaparabrisas",
+            "subcategoria": 9
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 100,
+        "fields": {
+            "nombre": "Polarizado de vidrios con lámina certificada",
+            "subcategoria": 9
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 101,
+        "fields": {
+            "nombre": "Reparación y mantenimiento de sunroof",
+            "subcategoria": 9
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 102,
+        "fields": {
+            "nombre": "Reparación de trizaduras con resina",
+            "subcategoria": 9
+        }
+    },
+    {
+        "model": "taller.categoriaservicio",
+        "pk": 10,
+        "fields": {
+            "nombre": "10. Inspecciones y Certificaciones"
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 103,
+        "fields": {
+            "nombre": "Certificación de conversión a gas vehicular (GLP/GNC)",
+            "subcategoria": 10
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 104,
+        "fields": {
+            "nombre": "Medición y certificación de gases contaminantes",
+            "subcategoria": 10
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 105,
+        "fields": {
+            "nombre": "Inspección de frenos en banco dinamométrico",
+            "subcategoria": 10
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 106,
+        "fields": {
+            "nombre": "Inspección de seguridad (airbags, cinturones, ISOFIX)",
+            "subcategoria": 10
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 107,
+        "fields": {
+            "nombre": "Chequeo completo de suspensión y dirección",
+            "subcategoria": 10
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 108,
+        "fields": {
+            "nombre": "Inspección de sistema eléctrico y luces",
+            "subcategoria": 10
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 109,
+        "fields": {
+            "nombre": "Inspección pre-compra para autos usados",
+            "subcategoria": 10
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 110,
+        "fields": {
+            "nombre": "Pre-chequeo técnico para Revisión Técnica",
+            "subcategoria": 10
+        }
+    },
+    {
+        "model": "taller.servicio",
+        "pk": 111,
+        "fields": {
+            "nombre": "Revisión de sistema de emisiones y catalizador",
+            "subcategoria": 10
+        }
+    }
+]

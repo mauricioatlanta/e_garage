@@ -1,0 +1,52 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: Arial, sans-serif; font-size: 13px; color: #000; }
+    h1 { text-align: center; font-size: 20px; margin-bottom: 20px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 6px; text-align: left; }
+    th { background-color: #f2f2f2; }
+    .totales td { border: none; text-align: right; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <h1>{{ documento.tipo_documento }} N°{{ documento.numero_documento }}</h1>
+
+  <p><strong>Fecha:</strong> {{ documento.fecha }}</p>
+  <p><strong>Cliente:</strong> {{ documento.cliente }}</p>
+  <p><strong>Vehículo:</strong> {{ documento.vehiculo }}</p>
+  <p><strong>Kilometraje:</strong> {{ documento.kilometraje }} km</p>
+  <p><strong>Observaciones:</strong> {{ documento.observaciones }}</p>
+
+  <h2>Detalle</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Tipo</th>
+        <th>Nombre</th>
+        <th>Precio</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in documento.detalles.all %}
+      <tr>
+        <td>{{ item.tipo_item }}</td>
+        <td>{{ item.nombre }}</td>
+        <td>${{ item.precio_venta|floatformat:0 }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <table class="totales" style="margin-top: 30px;">
+    <tr><td>Subtotal:</td><td>${{ documento.total_repuestos|add:documento.total_servicios|floatformat:0 }}</td></tr>
+    <tr><td>IVA (19%):</td><td>${{ documento.iva|floatformat:0 }}</td></tr>
+    <tr><td>Total:</td><td>${{ documento.total_general|floatformat:0 }}</td></tr>
+  </table>
+
+</body>
+</html>

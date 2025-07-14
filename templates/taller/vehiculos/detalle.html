@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Detalle del Vehículo - TallerPro{% endblock %}
+{% block content %}
+<div class="container mt-5">
+  <style>
+    .translucent-card {
+      background: rgba(0,0,0,0.7) !important;
+      color: #fff !important;
+    }
+    .translucent-card strong {
+      color: #4fd1c5 !important;
+    }
+    .translucent-card ul, .translucent-card li {
+      color: #fff !important;
+    }
+  </style>
+  <div class="max-w-xl mx-auto translucent-card p-6 rounded shadow">
+    <h2 class="text-2xl font-bold text-cyan-400 mb-4">🔍 Detalle del Vehículo</h2>
+    <ul class="space-y-2">
+      <li><strong>Cliente:</strong> {{ vehiculo.cliente.nombre }} {{ vehiculo.cliente.apellido }}</li>
+      <li><strong>Marca:</strong> {{ vehiculo.modelo.marca.nombre }}</li>
+      <li><strong>Modelo:</strong> {{ vehiculo.modelo.nombre }}</li>
+      <li><strong>Año:</strong> {{ vehiculo.anio }}</li>
+      <li><strong>Patente:</strong> {{ vehiculo.patente }}</li>
+      <li><strong>VIN:</strong> {{ vehiculo.vin }}</li>
+    </ul>
+    <div class="mt-6 text-center">
+      <a href="{% url 'vehiculos:lista_vehiculos' %}" class="bg-sky-600 text-white px-6 py-2 rounded hover:bg-sky-700">⬅️ Volver</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

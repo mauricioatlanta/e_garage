@@ -1,0 +1,361 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block content %}
+<div class="container mx-auto py-10 px-2 md:px-8">
+  <h1 class="text-4xl font-extrabold text-center mb-8" style="font-family: 'Orbitron', 'Share Tech Mono', Arial, sans-serif; color: #ffd700; text-shadow: 0 0 24px #d90429, 0 0 8px #ffd700, 0 0 2px #fff; letter-spacing: 3px;">🤖 Reporte Futurista de Servicios</h1>
+  <div class="flex flex-wrap justify-center gap-4 mb-8">
+    <button class="enfoque-btn" data-enfoque="facturacion_total">💸 Facturación</button>
+</div>
+
+  <div id="panel-facturacion_total" class="enfoque-panel" style="display:none;">
+    <h2 class="text-xl font-bold mb-2 text-center">Facturación: total, por periodo, por servicio y por clientes</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <h3 class="text-lg font-semibold mb-1">Ingresos totales</h3>
+        <div class="text-2xl ai-highlight mb-2">${{ facturacion_total|floatformat:0|intcomma }}</div>
+      </div>
+      <div>
+        <h3 class="text-lg font-semibold mb-1">Facturación por periodo (últimos 6 meses)</h3>
+        <ul class="list-decimal pl-6">
+          {% for f in facturacion_periodo %}
+            <li>{{ f.mes }}: <span class="ai-highlight">${{ f.total|floatformat:0|intcomma }}</span></li>
+          {% empty %}
+            <li>No hay datos.</li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div>
+        <h3 class="text-lg font-semibold mb-1">Facturación por servicio</h3>
+        <ul class="list-decimal pl-6">
+          {% for f in facturacion_servicio %}
+            <li>{{ f.nombre }}: <span class="ai-highlight">${{ f.total|floatformat:0|intcomma }}</span></li>
+          {% empty %}
+            <li>No hay datos.</li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div>
+        <h3 class="text-lg font-semibold mb-1">Facturación por cliente</h3>
+        <ul class="list-decimal pl-6">
+          {% for f in facturacion_cliente %}
+            <li>{{ f.cliente }}: <span class="ai-highlight">${{ f.total|floatformat:0|intcomma }}</span></li>
+          {% empty %}
+            <li>No hay datos.</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+    <button class="enfoque-btn" data-enfoque="ventas">Top Servicios</button>
+    <button class="enfoque-btn" data-enfoque="facturacion">Mayor Facturación</button>
+    <button class="enfoque-btn" data-enfoque="historico">Histórico Mensual</button>
+    <button class="enfoque-btn" data-enfoque="nunca">Nunca Vendidos</button>
+    <button class="enfoque-btn" data-enfoque="vehiculos">🚗 Vehículos atendidos</button>
+    <button class="enfoque-btn" data-enfoque="clientes">👤 Clientes</button>
+    <button class="enfoque-btn" data-enfoque="agenda">📅 Agenda y turnos</button>
+  <div id="panel-agenda" class="enfoque-panel" style="display:none;">
+    <h2 class="text-xl font-bold mb-2 text-center">Agenda y próximos turnos</h2>
+    <table class="w-full text-sm mb-4 futuristic-table">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Cliente</th>
+          <th>Vehículo</th>
+          <th>Tipo de documento</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for t in turnos_proximos %}
+        <tr>
+          <td class="ai-highlight">{{ t.fecha|date:'d/m/Y' }}</td>
+          <td>{{ t.cliente }}</td>
+          <td>{{ t.vehiculo }}</td>
+          <td>{{ t.tipo_documento }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">No hay turnos agendados.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <div class="text-center text-xs text-gray-400 mt-2">Solo se muestran los próximos 20 turnos agendados.</div>
+  </div>
+</div>
+
+  <div id="panel-clientes" class="enfoque-panel" style="display:none;">
+    <h2 class="text-xl font-bold mb-2 text-center">Clientes activos, nuevos, históricos y su recurrencia</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <h3 class="text-lg font-semibold mb-1">Clientes más activos</h3>
+        <ul class="list-decimal pl-6">
+          {% for c in clientes_activos %}
+            <li>{{ c.nombre }} <span class="ai-highlight">({{ c.cantidad }})</span></li>
+          {% empty %}
+            <li>No hay datos.</li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div>
+        <h3 class="text-lg font-semibold mb-1">Clientes nuevos (últimos 3 meses)</h3>
+        <ul class="list-decimal pl-6">
+          {% for c in clientes_nuevos %}
+            <li>{{ c.nombre }} <span class="ai-highlight">({{ c.fecha_alta|date:'d/m/Y' }})</span></li>
+          {% empty %}
+            <li>No hay datos.</li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div>
+        <h3 class="text-lg font-semibold mb-1">Clientes históricos</h3>
+        <ul class="list-decimal pl-6">
+          {% for c in clientes_historicos %}
+            <li>{{ c.nombre }} <span class="ai-highlight">({{ c.cantidad }})</span></li>
+          {% empty %}
+            <li>No hay datos.</li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div>
+        <h3 class="text-lg font-semibold mb-1">Clientes con mayor recurrencia</h3>
+        <ul class="list-decimal pl-6">
+          {% for c in clientes_recurrentes %}
+            <li>{{ c.nombre }} <span class="ai-highlight">({{ c.cantidad }})</span></li>
+          {% empty %}
+            <li>No hay datos.</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div id="panel-vehiculos" class="enfoque-panel" style="display:none;">
+    <h2 class="text-xl font-bold mb-2 text-center">Ranking de Vehículos Atendidos</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <h3 class="text-lg font-semibold mb-1">Modelos más frecuentes</h3>
+        <ul class="list-decimal pl-6">
+          {% for m in ranking_modelos %}
+            <li>{{ m.modelo }} <span class="ai-highlight">({{ m.cantidad }})</span></li>
+          {% empty %}
+            <li>No hay datos.</li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div>
+        <h3 class="text-lg font-semibold mb-1">Marcas más frecuentes</h3>
+        <ul class="list-decimal pl-6">
+          {% for m in ranking_marcas %}
+            <li>{{ m.marca }} <span class="ai-highlight">({{ m.cantidad }})</span></li>
+          {% empty %}
+            <li>No hay datos.</li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div>
+        <h3 class="text-lg font-semibold mb-1">Años más frecuentes</h3>
+        <ul class="list-decimal pl-6">
+          {% for a in ranking_anios %}
+            <li>{{ a.anio }} <span class="ai-highlight">({{ a.cantidad }})</span></li>
+          {% empty %}
+            <li>No hay datos.</li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div>
+        <h3 class="text-lg font-semibold mb-1">Clientes frecuentes</h3>
+        <ul class="list-decimal pl-6">
+          {% for c in ranking_clientes %}
+            <li>{{ c.cliente }} <span class="ai-highlight">({{ c.cantidad }})</span></li>
+          {% empty %}
+            <li>No hay datos.</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <div id="panel-ventas" class="enfoque-panel">
+    <h2 class="text-xl font-bold mb-2 text-center">Top 10 Servicios Más Solicitados</h2>
+    <table class="w-full text-sm mb-4 futuristic-table">
+      <thead><tr><th>Servicio</th><th>Veces Realizado</th><th>Total Facturado</th></tr></thead>
+      <tbody>
+        {% for s in top_servicios %}
+        <tr>
+          <td>{{ s.nombre }}</td>
+          <td class="ai-highlight">{{ s.cantidad }}</td>
+          <td>${{ s.total|floatformat:0|intcomma }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="3">No hay datos.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div id="panel-facturacion" class="enfoque-panel" style="display:none;">
+    <h2 class="text-xl font-bold mb-2 text-center">Servicios con Mayor Facturación</h2>
+    <table class="w-full text-sm mb-4 futuristic-table">
+      <thead><tr><th>Servicio</th><th>Total Facturado</th><th>Veces Realizado</th></tr></thead>
+      <tbody>
+        {% for s in top_facturacion %}
+        <tr>
+          <td>{{ s.nombre }}</td>
+          <td class="ai-highlight">${{ s.total|floatformat:0|intcomma }}</td>
+          <td>{{ s.cantidad }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="3">No hay datos.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div id="panel-historico" class="enfoque-panel" style="display:none;">
+    <h2 class="text-xl font-bold mb-2 text-center">Histórico de Servicios Mensuales</h2>
+    <canvas id="serviciosMensualesChart" height="100"></canvas>
+  </div>
+
+  <div id="panel-nunca" class="enfoque-panel" style="display:none;">
+    <h2 class="text-xl font-bold mb-2 text-center">Servicios Nunca Vendidos</h2>
+    <ul class="list-disc pl-8">
+      {% for s in nunca_vendidos %}
+        <li>{{ s.nombre }}</li>
+      {% empty %}
+        <li>Todos los servicios han sido realizados al menos una vez.</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+<style>
+  .enfoque-btn {
+    background: linear-gradient(90deg, #ffd700 0%, #d90429 100%);
+    color: #111;
+    font-family: 'Orbitron', 'Share Tech Mono', Arial, sans-serif;
+    font-weight: bold;
+    border: none;
+    border-radius: 1.5rem;
+    padding: 0.7rem 2.2rem;
+    font-size: 1.1rem;
+    box-shadow: 0 0 16px #ffd70099, 0 0 0 2px #d90429;
+    transition: background 0.2s, box-shadow 0.2s, color 0.2s;
+    cursor: pointer;
+    margin-bottom: 0.5rem;
+  }
+  .enfoque-btn:hover, .enfoque-btn.active {
+    background: linear-gradient(90deg, #d90429 0%, #ffd700 100%);
+    color: #ffd700;
+    box-shadow: 0 0 32px #d90429cc, 0 0 0 2px #ffd700;
+  }
+  .futuristic-table {
+    background: rgba(20,0,0,0.85);
+    border-radius: 1.5rem;
+    box-shadow: 0 0 32px #d90429cc, 0 0 0 2px #ffd700;
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden;
+  }
+  .futuristic-table th, .futuristic-table td {
+    border-bottom: 1px solid #ffd70033;
+    padding: 0.5rem 1rem;
+    color: #fff;
+    text-shadow: 0 0 4px #000, 0 0 2px #ffd700;
+  }
+  .futuristic-table th {
+    color: #ffd700;
+    font-size: 1.1rem;
+    background: #181830;
+    border-top: 2px solid #ffd700;
+  }
+  .ai-highlight { color: #d90429; font-weight: bold; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // Paneles de enfoque
+  document.querySelectorAll('.enfoque-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.enfoque-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      document.querySelectorAll('.enfoque-panel').forEach(p => p.style.display = 'none');
+      var panel = document.getElementById('panel-' + this.dataset.enfoque);
+      if(panel) panel.style.display = '';
+      if(this.dataset.enfoque === 'historico') {
+        setTimeout(renderFuturisticChart, 100);
+      }
+    });
+  });
+  // Mostrar el panel según el parámetro enfoque en la URL, o ventas por defecto
+  function getEnfoqueFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('enfoque') || 'ventas';
+  }
+  const enfoqueInicial = getEnfoqueFromURL();
+  const btnInicial = document.querySelector('.enfoque-btn[data-enfoque="' + enfoqueInicial + '"]');
+  if(btnInicial) btnInicial.click();
+  // Gráfica futurista
+  function renderFuturisticChart() {
+    const historico = {{ historico_servicios|safe }};
+    const ctx = document.getElementById('serviciosMensualesChart').getContext('2d');
+    if(window.serviciosChart) window.serviciosChart.destroy();
+    window.serviciosChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: historico.labels,
+        datasets: [{
+          label: 'Facturación de Servicios',
+          data: historico.data,
+          borderColor: '#ffd700',
+          backgroundColor: 'rgba(217,4,41,0.3)',
+          borderWidth: 4,
+          pointBackgroundColor: '#d90429',
+          pointBorderColor: '#ffd700',
+          pointRadius: 8,
+          pointHoverRadius: 12,
+          tension: 0.45,
+          fill: true,
+          shadowOffsetX: 0,
+          shadowOffsetY: 0,
+          shadowBlur: 30,
+          shadowColor: '#ffd700',
+        }]
+      },
+      options: {
+        plugins: {
+          legend: { display: false },
+          title: {
+            display: true,
+            text: 'Facturación Mensual (IA 2100)',
+            color: '#ffd700',
+            font: { size: 22, family: 'Orbitron' }
+          }
+        },
+        scales: {
+          x: {
+            grid: { color: '#ffd70033' },
+            ticks: { color: '#ffd700', font: { family: 'Share Tech Mono', size: 16 } }
+          },
+          y: {
+            grid: { color: '#ffd70033' },
+            beginAtZero: true,
+            ticks: { color: '#ffd700', font: { family: 'Share Tech Mono', size: 16 } }
+          }
+        },
+        elements: {
+          line: {
+            borderDash: [8, 8],
+            borderJoinStyle: 'round',
+            borderCapStyle: 'round',
+          }
+        },
+        layout: {
+          padding: 30
+        },
+        animation: {
+          duration: 1800,
+          easing: 'easeInOutQuart'
+        }
+      }
+    });
+  }
+ </script>
+{% endblock %}

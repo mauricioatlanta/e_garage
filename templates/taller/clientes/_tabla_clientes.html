@@ -1,0 +1,34 @@
+<table class="w-full table-auto text-left text-white">
+  <thead class="text-lime-300 border-b border-lime-400">
+    <tr>
+      <th class="py-2 px-2">Nombre</th>
+      <th class="py-2 px-2">Correo</th>
+      <th class="py-2 px-2">Teléfono</th>
+      <th class="py-2 px-2">Dirección</th>
+      <th class="py-2 px-2">Región</th>
+      <th class="py-2 px-2">Ciudad</th>
+      <th class="py-2 px-2 text-center">Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for cliente in clientes %}
+    <tr class="border-b border-white/20 hover:bg-white/10">
+      <td class="py-2 px-2">{{ cliente.nombre }}{% if cliente.apellido %} {{ cliente.apellido }}{% endif %}</td>
+      <td class="py-2 px-2">{{ cliente.email }}</td>
+      <td class="py-2 px-2">{{ cliente.telefono }}</td>
+      <td class="py-2 px-2">{{ cliente.direccion }}</td>
+      <td class="py-2 px-2">{% if cliente.region %}{{ cliente.region.nombre }}{% endif %}</td>
+      <td class="py-2 px-2">{% if cliente.ciudad %}{{ cliente.ciudad.nombre }}{% endif %}</td>
+      <td class="py-2 px-2 text-center">
+        <a href="{% url 'clientes:ver_cliente' cliente.id %}" class="text-cyan-300 hover:underline">Ver</a> |
+        <a href="{% url 'clientes:editar_cliente' cliente.id %}" class="text-yellow-300 hover:underline">Editar</a> |
+        <a href="{% url 'clientes:eliminar_cliente' cliente.id %}" class="text-red-400 hover:underline">Eliminar</a>
+      </td>
+    </tr>
+    {% empty %}
+    <tr>
+      <td colspan="7" class="text-center py-4 text-gray-300">No hay clientes registrados.</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>

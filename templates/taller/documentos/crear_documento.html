@@ -1,0 +1,408 @@
+
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block extra_head %}
+  {{ form.media }}
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
+  <link href="/static/css/estilo_futurista.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(120deg, #0f2027 0%, #2c5364 50%, #7f00ff 100%);
+      min-height: 100vh;
+      font-family: 'Orbitron', 'Montserrat', Arial, sans-serif;
+    }
+    .futurista-form {
+      background: rgba(20, 20, 40, 0.97);
+      border-radius: 1.5rem;
+      box-shadow: 0 0 32px 4px #7f00ff99, 0 0 0 1px #00f2fe;
+      border: 1px solid #7f00ff;
+      color: #fff;
+      padding: 2.5rem 2rem 2rem 2rem;
+      margin-top: 3rem;
+      max-width: 60rem;
+      margin-left: auto;
+      margin-right: auto;
+      position: relative;
+      overflow: hidden;
+    }
+    .futurista-form:before {
+      content: '';
+      position: absolute;
+      top: -80px; left: -80px;
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, #00f2fe55 0%, transparent 80%);
+      z-index: 0;
+    }
+    .futurista-form:after {
+      content: '';
+      position: absolute;
+      bottom: -60px; right: -60px;
+      width: 160px; height: 160px;
+      background: radial-gradient(circle, #7f00ff55 0%, transparent 80%);
+      z-index: 0;
+    }
+    .futurista-title {
+      font-family: 'Orbitron', 'Montserrat', Arial, sans-serif;
+      color: #00f2fe;
+      text-shadow: 0 0 8px #7f00ff, 0 0 2px #00f2fe;
+      font-size: 2.2rem;
+      font-weight: bold;
+      margin-bottom: 2rem;
+      letter-spacing: 2px;
+      z-index: 1;
+      position: relative;
+      text-align: center;
+    }
+    .futurista-label {
+      color: #00f2fe;
+      font-weight: bold;
+      letter-spacing: 1px;
+      font-size: 1.08rem;
+    }
+    .futurista-table {
+      width: 100%;
+      background: rgba(30, 30, 60, 0.95);
+      border-radius: 1rem;
+      overflow: hidden;
+      box-shadow: 0 0 16px #00f2fe33;
+      margin-bottom: 2.5rem;
+      z-index: 1;
+      position: relative;
+    }
+    .futurista-table th, .futurista-table td {
+      border-bottom: 1px solid #7f00ff44;
+      padding: 0.7rem 1.1rem;
+      font-size: 1.05rem;
+    }
+    .futurista-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+    .futurista-table th {
+      background: linear-gradient(90deg, #7f00ff 0%, #00f2fe 100%);
+      color: #fff;
+      text-shadow: 0 0 4px #00f2fe;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+    .futurista-table tr:hover td {
+      background: #181828cc;
+      transition: background 0.2s;
+    }
+    .futurista-btn {
+      background: linear-gradient(90deg, #7f00ff 0%, #00f2fe 100%);
+      color: #fff;
+      border: none;
+      border-radius: 2rem;
+      padding: 0.7rem 2.2rem;
+      font-family: 'Orbitron', 'Montserrat', Arial, sans-serif;
+      font-size: 1.1rem;
+      font-weight: bold;
+      box-shadow: 0 0 16px #00f2fe99, 0 0 4px #7f00ff;
+      transition: background 0.3s, box-shadow 0.3s, transform 0.2s;
+      cursor: pointer;
+      margin-left: auto;
+      margin-right: 0;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .futurista-btn:hover {
+      background: linear-gradient(90deg, #00f2fe 0%, #7f00ff 100%);
+      box-shadow: 0 0 32px #7f00ffcc, 0 0 8px #00f2fe;
+      transform: scale(1.05);
+    }
+    .futurista-input, .futurista-select, .select2-container--default .select2-selection--single {
+      background: #181828;
+      color: #00f2fe;
+      border: 1.5px solid #7f00ff;
+      border-radius: 0.7rem;
+      padding: 0.5rem 1rem;
+      font-size: 1.08rem;
+      margin-bottom: 0.5rem;
+      width: 100%;
+      box-shadow: 0 0 8px #7f00ff33;
+      transition: border 0.2s, box-shadow 0.2s;
+    }
+    .futurista-input:focus, .futurista-select:focus, .select2-container--default .select2-selection--single:focus {
+      border-color: #00f2fe;
+      box-shadow: 0 0 16px #00f2fe99;
+      outline: none;
+    }
+    .btn-premium {
+      @apply futurista-btn;
+      margin-top: 0.5rem;
+    }
+    .formulario-documento-container {
+      background: none !important;
+      box-shadow: none !important;
+      color: inherit;
+      padding: 0;
+      margin: 0;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+<div class="futurista-form" id="form-doc-container">
+  <div class="flex items-center justify-between mb-8">
+    <div class="flex items-center gap-4">
+      <img src="/media/TallerPro_logo.png" alt="Logo" class="h-14 w-14 rounded-full shadow-lg border-2 border-cyan-400 bg-white" style="background:#fff;">
+      <span class="futurista-title">🪐 Nuevo Documento Futurista</span>
+    </div>
+    <div class="flex gap-3">
+      <a href="/" class="futurista-btn">🏠 Dashboard</a>
+      <a href="/documentos/" class="futurista-btn">📄 Documentos</a>
+    </div>
+  </div>
+  <form method="post">
+    {% csrf_token %}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <div><label class="futurista-label" for="id_tipo_documento">Tipo de Documento</label>{{ form.tipo_documento|add_class:'futurista-input' }}</div>
+      <div><label class="futurista-label" for="id_numero_documento">Número</label>{{ form.numero_documento|add_class:'futurista-input' }}</div>
+      <div><label class="futurista-label" for="id_fecha">Fecha</label>{{ form.fecha|add_class:'futurista-input' }}</div>
+      <div>
+        <label class="futurista-label" for="id_cliente">Cliente</label>
+        <select id="id_cliente" name="cliente" class="select2-ajax futurista-input"></select>
+      </div>
+      <div id="vehiculo-wrapper" class="hidden">
+        <label class="futurista-label" for="id_vehiculo">Vehículo</label>
+        <select id="id_vehiculo" name="vehiculo" class="select2-ajax futurista-input">
+          <option value="">Seleccione cliente primero</option>
+        </select>
+        <div id="vehiculo-alerta" class="mt-1 text-sm text-red-600 hidden">
+          ⚠️ Selecciona un cliente para ver sus vehículos.
+        </div>
+      </div>
+      <div><label class="futurista-label" for="id_kilometraje">Kilometraje</label>{{ form.kilometraje|add_class:'futurista-input' }}</div>
+      <div><label class="futurista-label" for="id_mecanico">Mecánico</label>
+        <select id="id_mecanico" name="mecanico" class="futurista-input"></select>
+      </div>
+    </div>
+
+
+    <div class="mt-8">
+      <h2 class="futurista-label text-xl mb-2">Repuestos</h2>
+      <table class="futurista-table mb-4" id="tabla-repuestos">
+        <thead>
+          <tr>
+            <th>Partnumber</th>
+            <th>Nombre</th>
+            <th>Cantidad</th>
+            <th>Precio unitario</th>
+            <th>Total</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+        <tfoot>
+          <tr>
+            <td class="text-right font-bold futurista-label" colspan="3">Total repuestos</td>
+            <td class="font-bold futurista-label" id="total-repuestos">$0</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+      <button class="btn-premium" onclick="agregarRepuesto()" type="button">Agregar repuesto</button>
+    </div>
+
+
+    <div class="mt-8">
+      <h2 class="futurista-label text-xl mb-2">Servicios</h2>
+      <table class="futurista-table mb-4" id="tabla-servicios">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Precio</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+        <tfoot>
+          <tr>
+            <td class="text-right font-bold futurista-label" colspan="1">Total servicios</td>
+            <td class="font-bold futurista-label" id="total-servicios">$0</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+      <button class="btn-premium" type="button" id="btn-agregar-servicio">Agregar servicio</button>
+    </div>
+
+    <div class="mt-8 max-w-xl mx-auto">
+      <label class="block text-sm font-medium text-gray-700 mb-1" for="id_observaciones">Observaciones</label>
+      {{ form.observaciones }}
+    </div>
+
+
+    <div class="mt-8 flex flex-col items-end gap-2">
+      <div><span class="font-bold futurista-label">Subtotal:</span> <span class="futurista-label" id="subtotal-doc">$0</span></div>
+      <div><span class="font-bold futurista-label">IVA (19%):</span> <span class="futurista-label" id="iva-doc">$0</span></div>
+      <div class="text-xl"><span class="font-bold futurista-label">Gran Total:</span> <span class="futurista-label" id="gran-total-doc">$0</span></div>
+    </div>
+
+    <input type="hidden" id="json_items" name="json_items" value="[]">
+    <div class="mt-6 flex justify-end">
+      <button class="bg-blue-600 hover:bg-blue-800 text-white font-bold py-2 px-6 rounded btn-futuristic" type="submit">Guardar Documento</button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+<script>
+$(document).ready(function () {
+  // MECÁNICO: Autocomplete AJAX manual con creación
+  $('#id_mecanico').select2({
+    placeholder: 'Buscar o crear mecánico...',
+    tags: true,
+    allowClear: true,
+    minimumInputLength: 1,
+    ajax: {
+      url: '/autocomplete/mecanico/',
+      dataType: 'json',
+      delay: 250,
+      data: function (params) {
+        return { q: params.term };
+      },
+      processResults: function (data) {
+        return {
+          results: data.results.map(function (item) {
+            return { id: item.id, text: item.nombre };
+          })
+        };
+      },
+      cache: true
+    },
+    createTag: function (params) {
+      return {
+        id: params.term,
+        text: params.term,
+        newTag: true
+      };
+    }
+  });
+
+  // Al seleccionar un nuevo mecánico (no existente), crearlo vía AJAX
+  $('#id_mecanico').on('select2:select', function (e) {
+    var data = e.params.data;
+    if (data.newTag) {
+      $.ajax({
+        url: '/api/crear_mecanico/',
+        method: 'POST',
+        data: { nombre: data.text },
+        headers: { 'X-CSRFToken': $('[name=csrfmiddlewaretoken]').val() },
+        success: function (resp) {
+          // Elimina la opción temporal (texto plano)
+          $('#id_mecanico option[value="' + data.id + '"]').remove();
+          // Agrega la opción real con el ID de la base de datos
+          var newOption = new Option(resp.nombre, resp.id, true, true);
+          $('#id_mecanico').append(newOption).trigger('change');
+        }
+      });
+    }
+  });
+// ...existing code...
+  const $cliente = $('#id_cliente');
+  const $vehiculo = $('#id_vehiculo');
+  const $vehiculoWrapper = $('#vehiculo-wrapper');
+  const $vehiculoAlerta = $('#vehiculo-alerta');
+
+
+  // Forzar el mismo alto y color que los inputs futuristas
+  function estilizarSelect2() {
+    $('.select2-selection--single').css({
+      'background': '#181828',
+      'color': '#00f2fe',
+      'border': '1.5px solid #7f00ff',
+      'border-radius': '0.7rem',
+      'padding': '0.5rem 1rem',
+      'font-size': '1.08rem',
+      'box-shadow': '0 0 8px #7f00ff33',
+      'min-height': '44px',
+      'height': '44px',
+      'display': 'flex',
+      'align-items': 'center'
+    });
+    $('.select2-selection__rendered').css({
+      'color': '#00f2fe',
+      'line-height': '44px',
+      'font-family': 'Orbitron, Montserrat, Arial, sans-serif'
+    });
+    $('.select2-selection__arrow').css({
+      'height': '44px'
+    });
+  }
+
+  $cliente.select2({
+    placeholder: 'Buscar cliente...',
+    ajax: {
+      url: '/autocomplete/cliente/',
+      dataType: 'json',
+      delay: 250,
+      data: function (params) {
+        return { q: params.term };
+      },
+      processResults: function (data) {
+        return { results: data.results };
+      },
+      cache: true
+    },
+    minimumInputLength: 1,
+    width: '100%'
+  });
+  $cliente.on('select2:open select2:close', estilizarSelect2);
+  estilizarSelect2();
+
+  $vehiculo.select2({
+    placeholder: 'Buscar vehículo...',
+    ajax: {
+      url: '/autocomplete/vehiculo/',
+      dataType: 'json',
+      delay: 250,
+      data: function (params) {
+        return {
+          q: params.term,
+          cliente: $cliente.val()
+        };
+      },
+      processResults: function (data) {
+        return { results: data.results };
+      },
+      cache: true
+    },
+    minimumInputLength: 0,
+    width: '100%'
+  });
+  $vehiculo.on('select2:open select2:close', estilizarSelect2);
+  estilizarSelect2();
+
+  $cliente.on('change', function () {
+    const clienteId = $(this).val();
+    $vehiculo.val(null).trigger('change');
+    $vehiculo.empty();
+    if (clienteId) {
+      $vehiculoWrapper.removeClass('hidden');
+    } else {
+      $vehiculoWrapper.addClass('hidden');
+    }
+  });
+
+  $vehiculo.on('select2:opening', function (e) {
+    const clienteId = $cliente.val();
+    if (!clienteId) {
+      e.preventDefault();
+      $vehiculoAlerta.removeClass('hidden');
+      setTimeout(() => {
+        $vehiculoAlerta.addClass('hidden');
+      }, 3000);
+    }
+  });
+});
+</script>
+<script src="{% static 'js/formulario_documento.js' %}"></script>
+{% endblock %}

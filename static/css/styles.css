@@ -1,0 +1,127 @@
+body {
+  font-family: 'Orbitron', sans-serif;
+  color: black !important;
+}
+
+/* Forzar todo el texto a negro */
+*, *::before, *::after {
+  color: black !important;
+}
+
+/* Excepciones para elementos que necesitan colores específicos */
+button, .btn, .bg-blue-600, .bg-green-600, .bg-red-600, 
+.bg-indigo-600, .bg-slate-700, .bg-cyan-900,
+.text-white {
+  color: white !important;
+}
+@keyframes flicker {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.1); }
+}
+@keyframes stars {
+  from { background-position: 0 0; }
+  to { background-position: 1000px 0; }
+}
+.modo-galaxia {
+  background-image: url('/static/img/stars_twinkling.svg');
+  background-size: cover;
+  background-repeat: repeat;
+  animation: stars 120s linear infinite;
+}
+select, .form-select {
+  color: black !important;
+}
+
+#galactic-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -10;
+  overflow: hidden;
+  background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+}
+
+.stars, .stars2, .stars3 {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-repeat: repeat;
+  background-size: contain;
+  animation: moveStars 100s linear infinite;
+  opacity: 0.4;
+}
+
+.stars {
+  background-image: url('https://raw.githubusercontent.com/VincentGarreau/particles.js/master/demo/media/star1.png');
+  animation-duration: 200s;
+}
+
+.stars2 {
+  background-image: url('https://raw.githubusercontent.com/VincentGarreau/particles.js/master/demo/media/star2.png');
+  animation-duration: 300s;
+  opacity: 0.2;
+}
+
+.stars3 {
+  background-image: url('https://raw.githubusercontent.com/VincentGarreau/particles.js/master/demo/media/star3.png');
+  animation-duration: 400s;
+  opacity: 0.15;
+}
+
+@keyframes moveStars {
+  from { transform: translateY(0); }
+  to { transform: translateY(-1000px); }
+}
+
+/* Sombra animada para formularios */
+.form-animated-shadow {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+  animation: pulseShadow 3s infinite ease-in-out;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease-in-out;
+}
+
+@keyframes pulseShadow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(0, 255, 255, 0.7);
+  }
+}
+
+/* Logo flotando */
+.logo-floating {
+  animation: floatLogo 6s ease-in-out infinite;
+  transform-origin: center;
+  transition: transform 0.3s ease;
+}
+
+@keyframes floatLogo {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(1deg);
+  }
+}
+
+#flash-effect {
+  animation: flash 0.4s ease-out forwards;
+}
+
+@keyframes flash {
+  0% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+    display: none;
+  }
+}
