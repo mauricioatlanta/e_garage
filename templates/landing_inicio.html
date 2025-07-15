@@ -40,19 +40,22 @@
 
 {% block content %}
 
-<main class="max-w-5xl mx-auto py-12">
-  <div class="flex flex-col items-center mb-12">
-    <!-- Logo eliminado de la cabecera -->
-    <h1 class="text-6xl md:text-7xl font-black text-center text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-lime-400 to-fuchsia-500 mb-4 tracking-tight futuristic-glow animated-glitch">E-Garage</h1>
-    <p class="text-center text-2xl text-cyan-100 mb-2 max-w-2xl font-semibold animated-phrase">
-      La plataforma donde la eficiencia se convierte en tu mayor ventaja.<br>
-      <span class="block mt-2">Gestiona, analiza y conquista tu mercado.</span>
-      <span class="block mt-2 text-lime-300 font-bold">Haz que tu taller sea el referente.</span>
+<main class="max-w-6xl mx-auto py-16 relative">
+  <div class="absolute inset-0 -z-10 flex items-center justify-center pointer-events-none">
+    <div class="w-[600px] h-[600px] rounded-full bg-gradient-to-tr from-cyan-400 via-fuchsia-500 to-lime-300 opacity-20 blur-3xl animate-spin-slow"></div>
+  </div>
+  <div class="flex flex-col items-center mb-16">
+    <h1 class="text-7xl md:text-8xl font-black text-center text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-lime-400 to-fuchsia-500 mb-6 tracking-tight futuristic-glow animated-glitch drop-shadow-xl">
+      Plataforma Inteligente de Gestión Automotriz
+    </h1>
+    <p class="text-center text-3xl text-cyan-100 mb-4 max-w-3xl font-semibold animated-phrase drop-shadow-lg">
+      La plataforma más avanzada para talleres del futuro.<br>
+      <span class="block mt-2 text-lime-300 font-bold text-2xl">Automatiza, analiza y crece con tecnología real.</span>
     </p>
-    <div class="flex flex-col md:flex-row gap-4 mt-4">
-      <a href="#suscripcion" class="cta-btn-premium pulse py-4 px-10 rounded-2xl font-extrabold text-2xl shadow-2xl transition-all">Impulsa mi negocio</a>
-      <a href="{% url 'registro_trial' %}" class="cta-btn-outline text-lg py-4 px-8 rounded-2xl font-bold shadow-lg transition-all">Probar 30 días gratis</a>
-      <a href="/login/" class="cta-btn-outline text-lg py-4 px-8 rounded-2xl font-bold shadow-lg transition-all">Ya soy parte</a>
+    <div class="flex flex-col md:flex-row gap-6 mt-6">
+      <button onclick="document.getElementById('modal-planes').classList.remove('hidden')" class="cta-btn-premium pulse py-5 px-14 rounded-2xl font-extrabold text-3xl shadow-2xl transition-all border-4 border-fuchsia-400/60 hover:border-lime-400/80">Ver planes de suscripción</button>
+      <a href="{% url 'registro_trial' %}" class="cta-btn-outline text-xl py-5 px-12 rounded-2xl font-bold shadow-lg transition-all">Probar 30 días gratis</a>
+      <a href="/login/" class="cta-btn-outline text-xl py-5 px-12 rounded-2xl font-bold shadow-lg transition-all">Ya soy parte</a>
     </div>
   </div>
 
@@ -104,9 +107,36 @@
     <section id="suscripcion" class="bg-gray-900 bg-opacity-90 rounded-2xl p-8 shadow-2xl mb-10 mt-12 text-center">
       <h2 class="text-3xl font-bold text-yellow-300 mb-4 flex items-center justify-center"><i class="fas fa-gem mr-2"></i> Suscríbete a E-Garage</h2>
       <p class="text-lg text-cyan-100 mb-6">Accede a todas las funciones premium, soporte prioritario y actualizaciones automáticas.<br>¡Invierte en el futuro de tu taller!</p>
-      <a href="#" class="cta-btn-premium py-4 px-10 rounded-2xl font-extrabold text-2xl shadow-2xl transition-all inline-block">💳 Suscribirse (próximamente)</a>
+      <a href="#" class="cta-btn-premium py-4 px-10 rounded-2xl font-extrabold text-2xl shadow-2xl transition-all inline-block">💳 Suscríbete</a>
       <div class="mt-6 text-cyan-200 text-base">¿Prefieres probar antes? <a href="{% url 'registro_trial' %}" class="underline text-lime-400 hover:text-fuchsia-400 transition-all">Solicita tu prueba gratis de 30 días aquí</a>.</div>
     </section>
+
+    <div id="modal-planes" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden">
+      <div class="bg-[#181c1f] rounded-3xl shadow-2xl border-4 border-cyan-400/40 p-10 max-w-lg w-full relative animate-fade-in">
+        <button onclick="document.getElementById('modal-planes').classList.add('hidden')" class="absolute top-4 right-4 text-cyan-200 hover:text-fuchsia-400 text-2xl font-bold">&times;</button>
+        <h2 class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-lime-400 to-fuchsia-500 mb-6 text-center futuristic-glow"><i class="fas fa-gem mr-2"></i>Planes de Suscripción</h2>
+        <div class="flex flex-col gap-8">
+          <div class="bg-gradient-to-br from-cyan-900/60 via-fuchsia-900/40 to-lime-900/30 rounded-2xl p-6 border-2 border-cyan-400/30 shadow-lg flex flex-col items-center">
+            <div class="text-3xl font-bold text-cyan-200 mb-2">Mensual</div>
+            <div class="text-5xl font-extrabold text-lime-300 mb-2">$20.000</div>
+            <div class="text-cyan-100 mb-4">Acceso total a todas las funciones premium, IA, reportes y soporte prioritario.</div>
+            <button class="cta-btn-premium py-3 px-10 rounded-xl font-bold text-xl shadow-xl transition-all">Suscribirme mensual</button>
+          </div>
+          <div class="bg-gradient-to-br from-fuchsia-900/60 via-cyan-900/40 to-lime-900/30 rounded-2xl p-6 border-2 border-fuchsia-400/30 shadow-lg flex flex-col items-center">
+            <div class="text-3xl font-bold text-fuchsia-200 mb-2">Anual</div>
+            <div class="text-5xl font-extrabold text-lime-300 mb-2">$200.000</div>
+            <div class="text-cyan-100 mb-4">Ahorra 2 meses. Acceso total, IA, reportes, soporte prioritario y actualizaciones automáticas.</div>
+            <button class="cta-btn-premium py-3 px-10 rounded-xl font-bold text-xl shadow-xl transition-all">Suscribirme anual</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  <style>
+    @keyframes fade-in { from { opacity: 0; transform: scale(0.95);} to { opacity: 1; transform: scale(1);} }
+    .animate-fade-in { animation: fade-in 0.5s cubic-bezier(.4,0,.2,1); }
+    @keyframes spin-slow { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);} }
+    .animate-spin-slow { animation: spin-slow 18s linear infinite; }
+  </style>
 </main>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 <style>
