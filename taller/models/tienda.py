@@ -1,7 +1,9 @@
 from django.db import models
+from .empresa import Empresa
 
 class Tienda(models.Model):
-    nombre = models.CharField(max_length=100, unique=True)
+    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name='tiendas')
+    nombre = models.CharField(max_length=100)
     direccion = models.CharField(max_length=255, blank=True, null=True)
     telefono = models.CharField(max_length=20, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)

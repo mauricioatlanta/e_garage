@@ -1,0 +1,412 @@
+{
+  "empresa": {
+    "id": 14,
+    "nombre_taller": "Taller AutoFix",
+    "empresa": "AutoFix SpA",
+    "direccion": "Av. Principal 123",
+    "telefono": "+56912345678",
+    "email": "",
+    "fecha_inicio": "2025-07-21T17:57:41.499055+00:00",
+    "suscripcion_activa": true
+  },
+  "timestamp": "20250722_203340",
+  "version": "1.0",
+  "datos": {
+    "perfiles_usuario": [
+      {
+        "model": "taller.perfilusuario",
+        "pk": 3,
+        "fields": {
+          "user": 14,
+          "empresa": 14,
+          "rol": "admin"
+        }
+      }
+    ],
+    "clientes": [
+      {
+        "model": "taller.cliente",
+        "pk": 2,
+        "fields": {
+          "empresa": 14,
+          "nombre": "Mauricio",
+          "apellido": "Alvarado",
+          "telefono": "963607348",
+          "direccion": "Del Manzano 3058",
+          "region": 31,
+          "ciudad": 308,
+          "email": "mauricioatlanta@gmail.com"
+        }
+      },
+      {
+        "model": "taller.cliente",
+        "pk": 3,
+        "fields": {
+          "empresa": 14,
+          "nombre": "Damari",
+          "apellido": "Suez",
+          "telefono": "56999999",
+          "direccion": "Pje 30",
+          "region": 21,
+          "ciudad": 205,
+          "email": "q@q.cl"
+        }
+      },
+      {
+        "model": "taller.cliente",
+        "pk": 4,
+        "fields": {
+          "empresa": 14,
+          "nombre": "Alexander",
+          "apellido": "Alvarado",
+          "telefono": "569 99999 99999",
+          "direccion": "Pje 50",
+          "region": 22,
+          "ciudad": 220,
+          "email": "rusi@aldaroca.pro"
+        }
+      },
+      {
+        "model": "taller.cliente",
+        "pk": 9,
+        "fields": {
+          "empresa": 14,
+          "nombre": "Cliente Test 2",
+          "apellido": "Empresa Taller AutoFix",
+          "telefono": "123456781",
+          "direccion": null,
+          "region": null,
+          "ciudad": null,
+          "email": "cliente1@tallerautofix.com"
+        }
+      },
+      {
+        "model": "taller.cliente",
+        "pk": 11,
+        "fields": {
+          "empresa": 14,
+          "nombre": "Cliente Test 2",
+          "apellido": "Empresa Taller AutoFix",
+          "telefono": "123456781",
+          "direccion": null,
+          "region": null,
+          "ciudad": null,
+          "email": "cliente1@tallerautofix.com"
+        }
+      }
+    ],
+    "vehiculos": [
+      {
+        "model": "taller.vehiculo",
+        "pk": 2,
+        "fields": {
+          "empresa": 14,
+          "cliente": 2,
+          "marca": 9,
+          "modelo": 142,
+          "patente": "RWHB13",
+          "anio": 2026,
+          "color": 2,
+          "vin": "aafd32af1b32fb1",
+          "motor": 4,
+          "caja": null
+        }
+      },
+      {
+        "model": "taller.vehiculo",
+        "pk": 1,
+        "fields": {
+          "empresa": 14,
+          "cliente": 2,
+          "marca": 17,
+          "modelo": 249,
+          "patente": "CCWH63",
+          "anio": 2026,
+          "color": 1,
+          "vin": "AFAF{M}{213213RE2",
+          "motor": 1,
+          "caja": 1
+        }
+      },
+      {
+        "model": "taller.vehiculo",
+        "pk": 3,
+        "fields": {
+          "empresa": 14,
+          "cliente": 3,
+          "marca": 45,
+          "modelo": 600,
+          "patente": "wwww222",
+          "anio": 2024,
+          "color": 3,
+          "vin": "sdaf1fda32a32a1vv",
+          "motor": 5,
+          "caja": null
+        }
+      },
+      {
+        "model": "taller.vehiculo",
+        "pk": 4,
+        "fields": {
+          "empresa": 14,
+          "cliente": 4,
+          "marca": 49,
+          "modelo": 620,
+          "patente": "rtrf22",
+          "anio": 2026,
+          "color": 4,
+          "vin": "12321FEG32ERG1211",
+          "motor": 6,
+          "caja": 4
+        }
+      }
+    ],
+    "mecanicos": [],
+    "documentos": [
+      {
+        "model": "taller.documento",
+        "pk": 15,
+        "fields": {
+          "empresa": 14,
+          "tipo_documento": "Factura",
+          "numero_documento": "F-329",
+          "fecha": "2025-07-21",
+          "cliente": 2,
+          "vehiculo": 1,
+          "kilometraje": 125000,
+          "observaciones": "",
+          "mecanico": 16
+        }
+      },
+      {
+        "model": "taller.documento",
+        "pk": 16,
+        "fields": {
+          "empresa": 14,
+          "tipo_documento": "Factura",
+          "numero_documento": "F-882",
+          "fecha": "2025-07-21",
+          "cliente": 4,
+          "vehiculo": 4,
+          "kilometraje": 222222,
+          "observaciones": "",
+          "mecanico": null
+        }
+      },
+      {
+        "model": "taller.documento",
+        "pk": 19,
+        "fields": {
+          "empresa": 14,
+          "tipo_documento": "Presupuesto",
+          "numero_documento": "TEST-14-003",
+          "fecha": "2025-07-22",
+          "cliente": 2,
+          "vehiculo": null,
+          "kilometraje": 100000,
+          "observaciones": null,
+          "mecanico": 18
+        }
+      },
+      {
+        "model": "taller.documento",
+        "pk": 22,
+        "fields": {
+          "empresa": 14,
+          "tipo_documento": "Presupuesto",
+          "numero_documento": "TEST-14-004",
+          "fecha": "2025-07-22",
+          "cliente": 2,
+          "vehiculo": null,
+          "kilometraje": 100000,
+          "observaciones": null,
+          "mecanico": 18
+        }
+      }
+    ],
+    "repuestos": [
+      {
+        "model": "taller.repuesto",
+        "pk": 7,
+        "fields": {
+          "empresa": 14,
+          "tienda": 6,
+          "nombre_repuesto": "Aceite de Motor 10/40w",
+          "part_number": "10",
+          "precio_venta": 18500,
+          "precio_compra": 12500,
+          "stock": 99,
+          "observaciones": null
+        }
+      },
+      {
+        "model": "taller.repuesto",
+        "pk": 6,
+        "fields": {
+          "empresa": 14,
+          "tienda": 7,
+          "nombre_repuesto": "Filtro de AceIte",
+          "part_number": "of",
+          "precio_venta": 13500,
+          "precio_compra": 3500,
+          "stock": 49,
+          "observaciones": null
+        }
+      }
+    ],
+    "repuestos_documento": [
+      {
+        "model": "taller.repuestodocumento",
+        "pk": 5,
+        "fields": {
+          "documento": 15,
+          "repuesto": null,
+          "codigo": "FIL001",
+          "nombre": "Filtro de aceite Toyota",
+          "cantidad": 2,
+          "precio": 15000
+        }
+      },
+      {
+        "model": "taller.repuestodocumento",
+        "pk": 6,
+        "fields": {
+          "documento": 15,
+          "repuesto": null,
+          "codigo": "ACE001",
+          "nombre": "Aceite 5W30 4L",
+          "cantidad": 1,
+          "precio": 35000
+        }
+      },
+      {
+        "model": "taller.repuestodocumento",
+        "pk": 7,
+        "fields": {
+          "documento": 15,
+          "repuesto": null,
+          "codigo": "FIL001",
+          "nombre": "Filtro de aceite Toyota",
+          "cantidad": 2,
+          "precio": 15000
+        }
+      },
+      {
+        "model": "taller.repuestodocumento",
+        "pk": 8,
+        "fields": {
+          "documento": 15,
+          "repuesto": null,
+          "codigo": "ACE001",
+          "nombre": "Aceite 5W30 4L",
+          "cantidad": 1,
+          "precio": 35000
+        }
+      },
+      {
+        "model": "taller.repuestodocumento",
+        "pk": 10,
+        "fields": {
+          "documento": 16,
+          "repuesto": null,
+          "codigo": "FIL001",
+          "nombre": "Filtro de aceite Toyota",
+          "cantidad": 1,
+          "precio": 15000
+        }
+      },
+      {
+        "model": "taller.repuestodocumento",
+        "pk": 12,
+        "fields": {
+          "documento": 19,
+          "repuesto": null,
+          "codigo": "TEST001",
+          "nombre": "Repuesto Test Taller AutoFix",
+          "cantidad": 1,
+          "precio": 25000
+        }
+      },
+      {
+        "model": "taller.repuestodocumento",
+        "pk": 15,
+        "fields": {
+          "documento": 22,
+          "repuesto": null,
+          "codigo": "TEST001",
+          "nombre": "Repuesto Test Taller AutoFix",
+          "cantidad": 1,
+          "precio": 25000
+        }
+      }
+    ],
+    "servicios_documento": [
+      {
+        "model": "taller.serviciodocumento",
+        "pk": 5,
+        "fields": {
+          "empresa": 14,
+          "documento": 15,
+          "nombre": "Cambio de aceite completo",
+          "precio": 25000
+        }
+      },
+      {
+        "model": "taller.serviciodocumento",
+        "pk": 6,
+        "fields": {
+          "empresa": 14,
+          "documento": 15,
+          "nombre": "Revisión de frenos",
+          "precio": 15000
+        }
+      },
+      {
+        "model": "taller.serviciodocumento",
+        "pk": 7,
+        "fields": {
+          "empresa": 14,
+          "documento": 15,
+          "nombre": "Cambio de aceite completo",
+          "precio": 25000
+        }
+      },
+      {
+        "model": "taller.serviciodocumento",
+        "pk": 8,
+        "fields": {
+          "empresa": 14,
+          "documento": 15,
+          "nombre": "Revisión de frenos",
+          "precio": 15000
+        }
+      },
+      {
+        "model": "taller.serviciodocumento",
+        "pk": 10,
+        "fields": {
+          "empresa": 14,
+          "documento": 19,
+          "nombre": "Servicio Test Taller AutoFix",
+          "precio": 35000
+        }
+      },
+      {
+        "model": "taller.serviciodocumento",
+        "pk": 13,
+        "fields": {
+          "empresa": 14,
+          "documento": 22,
+          "nombre": "Servicio Test Taller AutoFix",
+          "precio": 35000
+        }
+      }
+    ]
+  },
+  "estadisticas": {
+    "total_registros": 29,
+    "total_documentos": 4,
+    "total_logs": 0,
+    "size_mb": 0.01
+  }
+}

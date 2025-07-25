@@ -11,7 +11,7 @@
 <div class="min-h-screen flex flex-col items-center justify-center px-4 premium-container">
   <div class="premium-card w-full max-w-2xl p-8 mt-16">
     <div class="logo-header flex flex-col items-center mb-4">
-      <img src="/media/TallerPro_logo.png" alt="E-Garage Logo" class="logo-egarage-header animate-logo mb-2">
+      <img src="/media/TallerPro_logo.png" alt="E-Garage Logo" class="logo-egarage-header animate-logo mb-2" style="width:48px;height:48px;filter:drop-shadow(0 0 8px #00e6d0cc);">
       <h2 class="premium-title text-3xl font-bold text-center mb-2">Reportes del Taller</h2>
     </div>
     <div class="flex flex-wrap justify-center gap-3 mb-8">
@@ -21,6 +21,24 @@
       <a href="/account/logout/" class="btn-futuristic-nav"><span>Salir</span><span class="glow"></span></a>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      
+      <!-- 🚀 NUEVO: Dashboard de Inteligencia Operativa -->
+      <a href="/reportes/inteligencia/" class="reporte-card nuevo-reporte pulse-glow" style="grid-column: span 2;">
+        <div class="icon-report">🚀</div>
+        <div class="reporte-title">Centro de Inteligencia Operativa</div>
+        <div class="reporte-desc">Dashboard Futurista 360° con IA predictiva, KPIs avanzados, gráficos interactivos y análisis en tiempo real</div>
+        <span class="badge-nuevo">🚀 FUTURISTA</span>
+      </a>
+      
+      <!-- 🧠 SÚPER NUEVO: Reportes por Mecánico con IA -->
+      <a href="{% url 'reportes:reportes_mecanicos' %}" class="reporte-card nuevo-reporte pulse-glow" style="grid-column: span 2;">
+        <div class="icon-report">🧠</div>
+        <div class="reporte-title">📊 Reportes por Mecánico</div>
+        <div class="reporte-desc">Análisis inteligente de rendimiento con IA predictiva, métricas individuales, proyecciones y WhatsApp automático</div>
+        <span class="badge-nuevo">🧠 IA POWERED</span>
+      </a>
+      
+      <!-- Reportes Básicos -->
       <a href="/reportes/servicios/" class="reporte-card">
         <div class="icon-report">🛠️</div>
         <div class="reporte-title">Servicios realizados</div>
@@ -31,6 +49,34 @@
         <div class="reporte-title">Repuestos</div>
         <div class="reporte-desc">Repuestos vendidos, stock, categorías y tendencias de consumo.</div>
       </a>
+      
+      <!-- 🚀 NUEVOS REPORTES AVANZADOS -->
+      <a href="/reportes/dashboard-rentabilidad/" class="reporte-card nuevo-reporte">
+        <div class="icon-report">📈</div>
+        <div class="reporte-title">Dashboard Rentabilidad</div>
+        <div class="reporte-desc">Análisis completo de rentabilidad y servicios subcontratados</div>
+        <span class="badge-nuevo">NUEVO</span>
+      </a>
+      <a href="/reportes/rentabilidad/" class="reporte-card nuevo-reporte">
+        <div class="icon-report">📊</div>
+        <div class="reporte-title">Análisis de Rentabilidad</div>
+        <div class="reporte-desc">Rentabilidad por tipo de servicio interno vs. externo</div>
+        <span class="badge-nuevo">NUEVO</span>
+      </a>
+      <a href="/reportes/comparativo-precios/" class="reporte-card nuevo-reporte">
+        <div class="icon-report">💰</div>
+        <div class="reporte-title">Comparativo de Precios</div>
+        <div class="reporte-desc">Precio cliente vs. costo proveedor con análisis de márgenes</div>
+        <span class="badge-nuevo">NUEVO</span>
+      </a>
+      <a href="/reportes/servicios-subcontratados/" class="reporte-card nuevo-reporte">
+        <div class="icon-report">🔧</div>
+        <div class="reporte-title">Servicios Subcontratados</div>
+        <div class="reporte-desc">Análisis de servicios externos más frecuentes y tendencias</div>
+        <span class="badge-nuevo">NUEVO</span>
+      </a>
+      
+      <!-- Reportes Tradicionales -->
       <a href="/reportes/servicios/?enfoque=vehiculos" class="reporte-card">
         <div class="icon-report">🚗</div>
         <div class="reporte-title">Vehículos atendidos</div>
@@ -94,6 +140,50 @@
 .reporte-desc {
   font-size: 1rem;
   color: #b0b3b8;
+}
+
+/* 🚀 Estilos para reportes nuevos */
+.nuevo-reporte {
+  position: relative;
+}
+
+.badge-nuevo {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: linear-gradient(45deg, #ff6b6b, #feca57);
+  color: white;
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: bold;
+  text-shadow: none;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.nuevo-reporte:hover .badge-nuevo {
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.pulse-glow {
+  animation: pulseGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes pulseGlow {
+  from { 
+    box-shadow: 0 0 20px #00fff7cc, 0 0 8px #00e6d0;
+    border: 1.5px solid #00fff7;
+  }
+  to { 
+    box-shadow: 0 0 40px #00fff7ff, 0 0 15px #00e6d0;
+    border: 1.5px solid #00fff7;
+  }
 }
 </style>
 {% endblock %}

@@ -1,0 +1,334 @@
+{% extends "taller/base.html" %}
+{% load static %}
+
+{% block title %}Enviar por Email - {{ documento.tipo_documento }} #{{ documento.numero_documento }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    
+    .form-header {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        color: white;
+        padding: 2rem;
+        text-align: center;
+    }
+    
+    .document-info {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-left: 4px solid #007bff;
+        margin: 1.5rem 0;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        color: white;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+    }
+    
+    .btn-secondary {
+        background: #6c757d;
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        color: white;
+        text-decoration: none;
+        display: inline-block;
+        transition: transform 0.2s ease;
+    }
+    
+    .btn-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .loading-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 9999;
+    }
+    
+    .loading-content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        text-align: center;
+    }
+    
+    .spinner {
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #007bff;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .alert {
+        padding: 1rem;
+        margin: 1rem 0;
+        border-radius: 8px;
+        border: 1px solid transparent;
+    }
+    
+    .alert-success {
+        color: #155724;
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+    }
+    
+    .alert-error {
+        color: #721c24;
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="form-container">
+        <div class="form-header">
+            <h2 class="mb-0">📧 Enviar por Email</h2>
+            <p class="mb-0 mt-2 opacity-90">{{ documento.tipo_documento }} #{{ documento.numero_documento }}</p>
+        </div>
+        
+        <div class="p-4">
+            <!-- Información del Documento -->
+            <div class="document-info">
+                <h5 class="text-primary mb-3">📋 Información del Documento</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Cliente:</strong> {{ documento.cliente.nombre }}</p>
+                        <p><strong>Fecha:</strong> {{ documento.fecha|date:"d/m/Y" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        {% if documento.vehiculo %}
+                        <p><strong>Vehículo:</strong> {{ documento.vehiculo.marca }} {{ documento.vehiculo.modelo }}</p>
+                        <p><strong>Patente:</strong> {{ documento.vehiculo.patente }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Formulario de Email -->
+            <form id="emailForm" method="post">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label class="form-label" for="email">✉️ Email del destinatario *</label>
+                    <input 
+                        type="email" 
+                        class="form-control" 
+                        id="email" 
+                        name="email" 
+                        value="{{ email_sugerido }}"
+                        placeholder="cliente@ejemplo.com"
+                        required
+                    >
+                    <small class="text-muted">Se enviará el documento en formato PDF adjunto</small>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="mensaje">💬 Mensaje personalizado (opcional)</label>
+                    <textarea 
+                        class="form-control" 
+                        id="mensaje" 
+                        name="mensaje" 
+                        rows="4"
+                        placeholder="Escribe un mensaje personalizado para acompañar el documento..."
+                    ></textarea>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <a href="{{ request.META.HTTP_REFERER|default:'/taller/documentos/' }}" class="btn-secondary">
+                        ⬅️ Volver
+                    </a>
+                    <button type="submit" class="btn-primary" id="enviarBtn">
+                        📤 Enviar Email
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-content">
+        <div class="spinner"></div>
+        <h5>Enviando email...</h5>
+        <p class="text-muted">Por favor espera mientras se envía el documento</p>
+    </div>
+</div>
+
+<!-- Modal de Resultado -->
+<div class="modal fade" id="resultModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="resultModalTitle">Resultado del Envío</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="resultModalBody">
+                <!-- Contenido dinámico -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('emailForm');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const enviarBtn = document.getElementById('enviarBtn');
+    
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Mostrar loading
+        loadingOverlay.style.display = 'block';
+        enviarBtn.disabled = true;
+        
+        // Enviar formulario
+        const formData = new FormData(form);
+        
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Ocultar loading
+            loadingOverlay.style.display = 'none';
+            enviarBtn.disabled = false;
+            
+            // Mostrar resultado
+            const modal = new bootstrap.Modal(document.getElementById('resultModal'));
+            const modalTitle = document.getElementById('resultModalTitle');
+            const modalBody = document.getElementById('resultModalBody');
+            
+            if (data.success) {
+                modalTitle.textContent = '✅ Email Enviado';
+                modalBody.innerHTML = `
+                    <div class="alert alert-success">
+                        <h6>¡Éxito!</h6>
+                        <p>${data.message}</p>
+                        <small class="text-muted">El documento ha sido enviado como archivo adjunto PDF.</small>
+                    </div>
+                `;
+                
+                // Limpiar formulario después del éxito
+                setTimeout(() => {
+                    modal.hide();
+                    window.history.back();
+                }, 2000);
+            } else {
+                modalTitle.textContent = '❌ Error al Enviar';
+                modalBody.innerHTML = `
+                    <div class="alert alert-error">
+                        <h6>Error</h6>
+                        <p>${data.error}</p>
+                        <small class="text-muted">Por favor verifica los datos e intenta nuevamente.</small>
+                    </div>
+                `;
+            }
+            
+            modal.show();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            
+            // Ocultar loading
+            loadingOverlay.style.display = 'none';
+            enviarBtn.disabled = false;
+            
+            // Mostrar error
+            const modal = new bootstrap.Modal(document.getElementById('resultModal'));
+            const modalTitle = document.getElementById('resultModalTitle');
+            const modalBody = document.getElementById('resultModalBody');
+            
+            modalTitle.textContent = '❌ Error de Conexión';
+            modalBody.innerHTML = `
+                <div class="alert alert-error">
+                    <h6>Error de conexión</h6>
+                    <p>No se pudo conectar con el servidor. Por favor intenta nuevamente.</p>
+                </div>
+            `;
+            
+            modal.show();
+        });
+    });
+});
+</script>
+{% endblock %}

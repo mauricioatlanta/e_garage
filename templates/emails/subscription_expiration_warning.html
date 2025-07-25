@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tu suscripción a eGarage está por vencer</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .content {
+            padding: 30px;
+        }
+        .warning-box {
+            background-color: #fff8e1;
+            border: 1px solid #ffcc02;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .warning-icon {
+            font-size: 48px;
+            color: #f39c12;
+            margin-bottom: 10px;
+        }
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            margin: 20px 10px;
+            text-align: center;
+            font-size: 16px;
+        }
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .secondary-button {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #dee2e6;
+            font-size: 14px;
+            color: #6c757d;
+        }
+        .payment-methods {
+            background-color: #f8f9ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .renewal-steps {
+            background-color: #e8f5e8;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .renewal-steps ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .stats-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⏰ eGarage</h1>
+            <p>Renovación de suscripción</p>
+        </div>
+        
+        <div class="content">
+            <h2>Hola {{ user_name }},</h2>
+            
+            <div class="warning-box">
+                <div class="warning-icon">⏰</div>
+                <h3>Tu suscripción vence en {{ days_remaining }} día{{ days_remaining|pluralize:",s" }}</h3>
+                <p><strong>{{ empresa_name }}</strong></p>
+                <p><strong>Fecha de vencimiento:</strong> {{ expiration_date|date:"d/m/Y" }}</p>
+            </div>
+            
+            <p>Tu suscripción a eGarage está próxima a vencer. Para mantener el acceso completo a todas las funcionalidades, renueva antes de la fecha de vencimiento.</p>
+            
+            <div class="stats-box">
+                <h3>📊 Tu Progreso con eGarage</h3>
+                <p><strong>¡Tu taller ha crecido desde que usas eGarage!</strong></p>
+                <p>Mantén el impulso renovando tu suscripción</p>
+            </div>
+            
+            <div class="renewal-steps">
+                <h4>🔄 Cómo renovar (es muy fácil):</h4>
+                <ol>
+                    <li><strong>Ingresa a tu cuenta</strong> con tu usuario y contraseña</li>
+                    <li><strong>Ve a "Suscripciones"</strong> en el menú principal</li>
+                    <li><strong>Sube tu comprobante de pago</strong> o realiza el pago online</li>
+                    <li><strong>¡Listo!</strong> Tu suscripción se renovará automáticamente</li>
+                </ol>
+            </div>
+            
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="{{ renewal_url }}" class="cta-button">💳 Renovar Ahora</a>
+                <a href="{{ login_url }}" class="cta-button secondary-button">🔐 Ir a mi Cuenta</a>
+            </div>
+            
+            <div class="payment-methods">
+                <h4>💰 Métodos de Pago Disponibles:</h4>
+                <ul>
+                    <li>💳 <strong>Tarjeta de crédito/débito</strong> (Visa, MasterCard, American Express)</li>
+                    <li>🏦 <strong>Transferencia bancaria</strong> (sube tu comprobante)</li>
+                    <li>📱 <strong>PSE</strong> (débito desde tu cuenta bancaria)</li>
+                    <li>💰 <strong>Efecty/Baloto</strong> (paga en puntos físicos)</li>
+                </ul>
+            </div>
+            
+            <h4>🤔 ¿Por qué mantener tu suscripción activa?</h4>
+            <ul>
+                <li>🚀 <strong>Sin interrupciones:</strong> Tu taller sigue funcionando sin parar</li>
+                <li>📊 <strong>Reportes continuos:</strong> Mantén el análisis de tu negocio</li>
+                <li>☁️ <strong>Backup seguro:</strong> Tus datos siempre protegidos</li>
+                <li>🔧 <strong>Nuevas funciones:</strong> Acceso a todas las actualizaciones</li>
+                <li>📞 <strong>Soporte 24/7:</strong> Ayuda cuando la necesites</li>
+            </ul>
+            
+            <div style="background-color: #fff3cd; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ffc107;">
+                <p><strong>💡 Tip:</strong> Si renuevas antes del vencimiento, no pierdes acceso y tu facturación continúa sin interrupciones.</p>
+            </div>
+            
+            <p><strong>¿Tienes preguntas sobre la renovación?</strong> Nuestro equipo de soporte está disponible para ayudarte en el proceso.</p>
+        </div>
+        
+        <div class="footer">
+            <p>📧 <strong>Soporte:</strong> {{ support_email }}</p>
+            <p>📞 <strong>WhatsApp:</strong> +57 300 123 4567</p>
+            <p>🕒 <strong>Horario:</strong> Lun-Vie 8am-6pm, Sáb 9am-2pm</p>
+            <p>© {{ today.year }} eGarage - Tu socio tecnológico de confianza</p>
+            <p><small>Renueva antes del {{ expiration_date|date:"d/m/Y" }} para mantener tu acceso sin interrupciones.</small></p>
+        </div>
+    </div>
+</body>
+</html>

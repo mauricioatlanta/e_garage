@@ -12,6 +12,25 @@ def formatear_pesos(valor):
         return valor
 
 @register.filter
+def formatear_pesos_compacto(valor):
+    """
+    Formatea números grandes de manera compacta para KPIs.
+    Ejemplo: 10181720 -> $10.2M
+    """
+    try:
+        valor = float(valor)
+        if valor >= 1000000000:
+            return f"${valor/1000000000:.1f}B"
+        elif valor >= 1000000:
+            return f"${valor/1000000:.1f}M"
+        elif valor >= 1000:
+            return f"${valor/1000:.0f}K"
+        else:
+            return f"${valor:.0f}"
+    except (ValueError, TypeError):
+        return valor
+
+@register.filter
 def sumar_campo(lista, campo):
     """
     Suma los valores de un campo específico en una lista de diccionarios.

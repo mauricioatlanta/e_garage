@@ -31,14 +31,116 @@ document.addEventListener("DOMContentLoaded", () => {
 <div class="min-h-screen flex items-center justify-center relative text-white">
   <div class="z-10 text-center px-8 py-10 futuristic-card max-w-2xl border-2 border-cyan-400/40">
     <div class="flex flex-col items-center mb-4">
-      <img src="/media/TallerPro_logo.png" alt="E-Garage Logo" class="logo-egarage-header animate-logo mb-2">
-      <h1 class="text-5xl font-extrabold text-cyan-300 mb-4 tracking-tight futuristic-glow" style="font-family: 'Orbitron', sans-serif;">¡Hola, {{ user.username }}!</h1>
+      <a href="/" class="btn btn-outline mb-4">Volver a la página principal</a>
+      {% if usuario.is_authenticated %}
+        <p>Empresa: {{ empresa.nombre }}</p>
+        <!-- Botón de cerrar sesión eliminado -->
+      {% else %}
+        <h2 class="premium-title text-2xl font-bold text-center mb-6">Iniciar sesión</h2>
+        <form class="space-y-5" method="POST" action="/accounts/login/">
+          {% csrf_token %}
+          <div>
+            <label class="block text-sm font-semibold text-gray-300" for="id_login">Nombre de usuario</label>
+            <input type="text" name="login" id="id_login" class="w-full rounded px-3 py-2 text-black" required>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-300" for="id_password">Contraseña</label>
+            <input type="password" name="password" id="id_password" class="w-full rounded px-3 py-2 text-black" required>
+          </div>
+          <button type="submit" class="w-full btn-premium">Iniciar sesión</button>
+        </form>
+        <div class="mt-4">
+          <a class="text-blue-400 hover:underline" href="{% url 'account_reset_password' %}">¿Olvidaste tu contraseña?</a>
+        </div>
+      {% endif %}
     </div>
     <p class="text-xl text-cyan-100 mb-6 frase-cambiante">Gestiona tu taller con tecnología de punta 🚀</p>
-    <div class="flex flex-col md:flex-row items-center justify-center gap-4 mb-4">
-      <a href="{% url 'dashboard' %}" class="cta-btn-premium pulse py-3 px-8 rounded-2xl font-bold text-lg shadow-2xl transition-all">Ir al Dashboard</a>
-      <a href="{% url 'account_logout' %}" class="cta-btn-outline text-lg py-3 px-8 rounded-2xl font-bold shadow-lg transition-all">Cerrar sesión</a>
+    <div class="mt-6 text-sm text-cyan-200">
+      <p>¿Necesitas ayuda? <a href="mailto:soporte@tallerpro.com" class="underline hover:text-cyan-100">Contáctanos</a></p>
     </div>
+  </div>
+</div>
+<style>
+/* Styles omitted for brevity */
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const frases = [
+    "¡Bienvenido de nuevo!",
+    "Gestiona clientes, vehículos y repuestos en un solo lugar.",
+    "Tu taller, tu control, tu futuro.",
+    "Automatiza y ahorra tiempo todos los días.",
+    "Soporte y actualizaciones constantes.",
+    "Tecnología premium para talleres inteligentes.",
+    "Visualiza todo con dashboards futuristas.",
+    "E-Garage: Donde la innovación es tu herramienta."
+  ];
+  let i = 0;
+  setInterval(() => {
+    document.querySelector('.frase-cambiante').textContent = frases[i];
+    i = (i + 1) % frases.length;
+  }, 4000);
+</script>
+{% endblock %}
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Bienvenido | e-Garage{% endblock %}
+
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  tsParticles.load("tsparticles", {
+    fullScreen: { enable: false },
+    background: { color: { value: "transparent" } },
+    particles: {
+      number: { value: 90 },
+      color: { value: ["#00ffff", "#00e6d0", "#007bff"] },
+      size: { value: 2.5 },
+      move: { enable: true, speed: 0.7 },
+      links: { enable: true, color: "#00e6d0", distance: 120 }
+    }
+  });
+});
+</script>
+{% endblock %}
+
+{% block fondo_extra %}
+<div id="tsparticles" class="fixed inset-0 -z-10"></div>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center relative text-white">
+  <div class="z-10 text-center px-8 py-10 futuristic-card max-w-2xl border-2 border-cyan-400/40">
+    <div class="flex flex-col items-center mb-4">
+      <a href="/" class="btn btn-outline mb-4">Volver a la página principal</a>
+      {% if usuario.is_authenticated %}
+        <p>Empresa: {{ empresa.nombre }}</p>
+        <!-- Botón de cerrar sesión eliminado -->
+      {% else %}
+        <h2 class="premium-title text-2xl font-bold text-center mb-6">Iniciar sesión</h2>
+        <form class="space-y-5" method="POST" action="/accounts/login/">
+          {% csrf_token %}
+          <div>
+            <label class="block text-sm font-semibold text-gray-300" for="id_login">Nombre de usuario</label>
+            <input type="text" name="login" id="id_login" class="w-full rounded px-3 py-2 text-black" required>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-300" for="id_password">Contraseña</label>
+            <input type="password" name="password" id="id_password" class="w-full rounded px-3 py-2 text-black" required>
+          </div>
+          <button type="submit" class="w-full btn-premium">Iniciar sesión</button>
+        </form>
+        <div class="mt-4">
+          <a class="text-blue-400 hover:underline" href="{% url 'account_reset_password' %}">¿Olvidaste tu contraseña?</a>
+        </div>
+      {% endif %}
+    </div>
+    <p class="text-xl text-cyan-100 mb-6 frase-cambiante">Gestiona tu taller con tecnología de punta 🚀</p>
     <div class="mt-6 text-sm text-cyan-200">
       <p>¿Necesitas ayuda? <a href="mailto:soporte@tallerpro.com" class="underline hover:text-cyan-100">Contáctanos</a></p>
     </div>

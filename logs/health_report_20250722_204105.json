@@ -1,0 +1,17 @@
+{
+  "timestamp": "2025-07-22T20:41:05.140452",
+  "health_score": 66.66666666666666,
+  "checks": {
+    "database": true,
+    "empresas": true,
+    "usuarios": true,
+    "documentos_recientes": false,
+    "espacio_disco": false,
+    "logs_auditoria": true
+  },
+  "problemas": [
+    "Error documentos: Cannot resolve keyword 'created_at' into field. Choices are: cliente, cliente_id, empresa, empresa_id, fecha, id, kilometraje, mecanico, mecanico_id, numero_documento, observaciones, repuestos, servicios, tipo_documento, vehiculo, vehiculo_id, venta",
+    "Poco espacio en disco: 3.2% libre"
+  ],
+  "status": "critical"
+}

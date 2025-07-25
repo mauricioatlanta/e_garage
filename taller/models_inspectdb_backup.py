@@ -1,16 +1,6 @@
 
 from django.db import models
 
-# Proxy para compatibilidad con código que usa 'Cliente'
-class Cliente(models.Model):
-    class Meta:
-        proxy = True
-        verbose_name = 'Cliente'
-        verbose_name_plural = 'Clientes'
-
-    def __new__(cls, *args, **kwargs):
-        from .models import TallerCliente
-        return TallerCliente(*args, **kwargs)
 
 
 class AccountEmailaddress(models.Model):
@@ -240,28 +230,8 @@ class TallerCitataller(models.Model):
         db_table = 'taller_citataller'
 
 
-class TallerCiudad(models.Model):
-    nombre = models.CharField(max_length=100)
-    region = models.ForeignKey('Region', models.DO_NOTHING)
-
-    class Meta:
-        managed = False
-        db_table = 'taller_ciudad'
 
 
-class TallerCliente(models.Model):
-    nombre = models.CharField(max_length=100)
-    apellido = models.CharField(max_length=100, blank=True, null=True)
-    telefono = models.CharField(max_length=15, blank=True, null=True)
-    correo = models.CharField(max_length=254, blank=True, null=True)
-    direccion = models.CharField(max_length=255, blank=True, null=True)
-    ciudad = models.ForeignKey('Ciudad', models.DO_NOTHING, blank=True, null=True)
-    region = models.ForeignKey('Region', models.DO_NOTHING, blank=True, null=True)
-    email = models.CharField(max_length=254, blank=True, null=True)
-
-    class Meta:
-        managed = True
-        db_table = 'taller_cliente'
 
 
 class TallerDetalledocumento(models.Model):
@@ -284,13 +254,6 @@ class TallerDetalledocumento(models.Model):
         db_table = 'taller_detalledocumento'
 
 
-class Documento(models.Model):
-    tipo_documento = models.CharField(max_length=50)
-    fecha = models.DateField()
-
-    class Meta:
-        managed = False
-        db_table = 'taller_documentotaller'
 
 
 class TallerMarca(models.Model):
@@ -310,90 +273,9 @@ class TallerModelo(models.Model):
         db_table = 'taller_modelo'
 
 
-class TallerPlantillaservicio(models.Model):
-    nombre = models.CharField(unique=True, max_length=100)
-    descripcion = models.TextField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'taller_plantillaservicio'
-
-
-class TallerPlantillaservicioServicios(models.Model):
-    plantillaservicio = models.ForeignKey(TallerPlantillaservicio, models.DO_NOTHING)
-    servicio = models.ForeignKey('TallerServicio', models.DO_NOTHING)
-
-    class Meta:
-        managed = False
-        db_table = 'taller_plantillaservicio_servicios'
-        unique_together = (('plantillaservicio', 'servicio'),)
-
-
-class Region(models.Model):
-    nombre = models.CharField(unique=True, max_length=100)
-
-    class Meta:
-        managed = False
-        db_table = 'taller_region'
-
-
-class TallerRepuesto(models.Model):
-    nombre_repuesto = models.CharField(max_length=100)
-    part_number = models.CharField(max_length=100)
-    precio_venta = models.DecimalField(max_digits=10, decimal_places=5)  # max_digits and decimal_places have been guessed, as this database handles decimal fields as float
-    precio_compra = models.DecimalField(max_digits=10, decimal_places=5)  # max_digits and decimal_places have been guessed, as this database handles decimal fields as float
-    stock = models.IntegerField()
-    tienda = models.ForeignKey('Tienda', models.DO_NOTHING)
-
-    class Meta:
-        managed = False
-        db_table = 'taller_repuesto'
-        unique_together = (('tienda', 'part_number'),)
-
-
-class TallerServicio(models.Model):
-    nombre = models.CharField(max_length=255)
-    precio = models.DecimalField(max_digits=10, decimal_places=5)  # max_digits and decimal_places have been guessed, as this database handles decimal fields as float
-    categoria = models.ForeignKey(TallerCategoriaservicio, models.DO_NOTHING)
-
-    class Meta:
-        managed = False
-        db_table = 'taller_servicio'
-
-
-class TallerSuscripcion(models.Model):
-    plan = models.CharField(max_length=50)
-    fecha_inicio = models.DateField()
-    fecha_vencimiento = models.DateField()
-    estado = models.CharField(max_length=20)
-    cliente = models.ForeignKey('TallerCliente', models.DO_NOTHING)
-
     class Meta:
         managed = False
         db_table = 'taller_suscripcion'
 
 
-class Tienda(models.Model):
-    nombre = models.CharField(unique=True, max_length=100)
-    direccion = models.CharField(max_length=255, blank=True, null=True)
-    telefono = models.CharField(max_length=20, blank=True, null=True)
-    activo = models.BooleanField()
 
-    class Meta:
-        managed = False
-        db_table = 'taller_tienda'
-
-
-class Vehiculo(models.Model):
-    anio = models.PositiveIntegerField()
-    patente = models.CharField(unique=True, max_length=10)
-    motor = models.CharField(max_length=100, blank=True, null=True)
-    caja = models.CharField(max_length=100, blank=True, null=True)
-    vin = models.CharField(unique=True, max_length=50, blank=True, null=True)
-    color = models.CharField(max_length=50, blank=True, null=True)
-    cliente = models.ForeignKey('TallerCliente', models.DO_NOTHING)
-    modelo = models.ForeignKey(TallerModelo, models.DO_NOTHING)
-
-    class Meta:
-        managed = False
-        db_table = 'taller_vehiculo'

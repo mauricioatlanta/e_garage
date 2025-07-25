@@ -1,0 +1,471 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block extra_head %}
+<style>
+    /* Variables del tema futurista */
+    :root {
+        --cyber-blue: #00d4ff;
+        --matrix-green: #39ff14;
+        --neon-purple: #b347d9;
+        --dark-bg: #0a0a0f;
+        --glow-cyan: #00ffff;
+        --accent-pink: #ff1493;
+    }
+
+    body {
+        background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+        color: var(--glow-cyan);
+        font-family: 'Orbitron', 'Courier New', monospace;
+        min-height: 100vh;
+    }
+
+    /* Header futurista */
+    .cyber-header {
+        background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(179, 71, 217, 0.1) 100%);
+        border: 1px solid var(--cyber-blue);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cyber-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.1), transparent);
+        animation: scan 3s infinite;
+    }
+
+    @keyframes scan {
+        0% { left: -100%; }
+        100% { left: 100%; }
+    }
+
+    .cyber-title {
+        font-size: 2.5rem;
+        font-weight: bold;
+        text-align: center;
+        background: linear-gradient(45deg, var(--matrix-green), var(--cyber-blue), var(--neon-purple));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 0 30px var(--cyber-blue);
+        margin-bottom: 0.5rem;
+    }
+
+    .cyber-subtitle {
+        text-align: center;
+        color: var(--glow-cyan);
+        opacity: 0.8;
+        font-size: 1.1rem;
+    }
+
+    /* Formulario futurista */
+    .cyber-form {
+        background: rgba(10, 10, 15, 0.8);
+        border: 1px solid var(--matrix-green);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 0 40px rgba(57, 255, 20, 0.2);
+        backdrop-filter: blur(10px);
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        align-items: end;
+    }
+
+    .input-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .input-label {
+        color: var(--matrix-green);
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .cyber-input, .cyber-select {
+        background: rgba(0, 0, 0, 0.6);
+        border: 2px solid var(--cyber-blue);
+        border-radius: 10px;
+        color: var(--glow-cyan);
+        padding: 12px 16px;
+        font-family: inherit;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .cyber-input:focus, .cyber-select:focus {
+        outline: none;
+        border-color: var(--matrix-green);
+        box-shadow: 0 0 20px rgba(57, 255, 20, 0.5);
+        transform: translateY(-2px);
+    }
+
+    .cyber-select option {
+        background: var(--dark-bg);
+        color: var(--glow-cyan);
+    }
+
+    .btn-cyber {
+        background: linear-gradient(45deg, var(--matrix-green), var(--cyber-blue));
+        border: none;
+        border-radius: 12px;
+        color: #000;
+        padding: 14px 28px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: inherit;
+        box-shadow: 0 5px 15px rgba(0, 212, 255, 0.4);
+    }
+
+    .btn-cyber:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(57, 255, 20, 0.6);
+        filter: brightness(1.2);
+    }
+
+    /* Resultados */
+    .results-container {
+        background: rgba(10, 10, 15, 0.9);
+        border: 1px solid var(--neon-purple);
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 0 30px rgba(179, 71, 217, 0.3);
+    }
+
+    .results-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--neon-purple);
+    }
+
+    .results-title {
+        font-size: 1.5rem;
+        color: var(--matrix-green);
+        font-weight: bold;
+    }
+
+    .results-count {
+        background: var(--neon-purple);
+        color: #fff;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: bold;
+    }
+
+    /* Tabla futurista */
+    .cyber-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+    }
+
+    .cyber-table th {
+        background: linear-gradient(45deg, var(--matrix-green), var(--cyber-blue));
+        color: #000;
+        padding: 15px;
+        text-align: left;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .cyber-table td {
+        padding: 15px;
+        border-bottom: 1px solid rgba(0, 212, 255, 0.3);
+        color: var(--glow-cyan);
+    }
+
+    .cyber-table tr:hover {
+        background: rgba(57, 255, 20, 0.1);
+        transform: scale(1.01);
+        transition: all 0.3s ease;
+    }
+
+    /* Cards para tipos de documento */
+    .tipo-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .tipo-card {
+        background: rgba(0, 0, 0, 0.6);
+        border: 2px solid var(--cyber-blue);
+        border-radius: 15px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .tipo-card:hover {
+        border-color: var(--matrix-green);
+        box-shadow: 0 0 25px rgba(57, 255, 20, 0.4);
+        transform: translateY(-5px);
+    }
+
+    .tipo-icon {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    .tipo-name {
+        font-weight: bold;
+        color: var(--glow-cyan);
+        margin-bottom: 0.5rem;
+    }
+
+    .tipo-count {
+        color: var(--matrix-green);
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+
+    /* Efectos de partículas */
+    .particles-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        background: radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 20%, rgba(179, 71, 217, 0.1) 0%, transparent 50%),
+                    radial-gradient(circle at 40% 80%, rgba(57, 255, 20, 0.1) 0%, transparent 50%);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .cyber-title {
+            font-size: 2rem;
+        }
+        
+        .tipo-cards {
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="particles-bg"></div>
+
+<div class="container mx-auto px-4 py-8">
+    <!-- Header Principal -->
+    <div class="cyber-header">
+        <h1 class="cyber-title">📊 Reportes por Fecha</h1>
+        <p class="cyber-subtitle">Sistema unificado de análisis temporal con filtros inteligentes</p>
+    </div>
+
+    <!-- Formulario de Búsqueda -->
+    <div class="cyber-form">
+        <form method="GET" class="form-grid">
+            <div class="input-group">
+                <label class="input-label">📅 Fecha Desde</label>
+                <input type="date" name="desde" value="{{ request.GET.desde }}" required class="cyber-input" />
+            </div>
+            
+            <div class="input-group">
+                <label class="input-label">📅 Fecha Hasta</label>
+                <input type="date" name="hasta" value="{{ request.GET.hasta }}" required class="cyber-input" />
+            </div>
+            
+            <div class="input-group">
+                <label class="input-label">🔍 Tipo de Reporte</label>
+                <select name="tipo" class="cyber-select">
+                    <option value="">🌟 Todos los Tipos</option>
+                    <option value="factura" {% if request.GET.tipo == 'factura' %}selected{% endif %}>💰 Facturas</option>
+                    <option value="orden" {% if request.GET.tipo == 'orden' %}selected{% endif %}>🔧 Órdenes de Trabajo</option>
+                    <option value="presupuesto" {% if request.GET.tipo == 'presupuesto' %}selected{% endif %}>📋 Presupuestos</option>
+                    <option value="repuesto" {% if request.GET.tipo == 'repuesto' %}selected{% endif %}>⚙️ Repuestos</option>
+                    <option value="servicio" {% if request.GET.tipo == 'servicio' %}selected{% endif %}>🛠️ Servicios</option>
+                    <option value="otros" {% if request.GET.tipo == 'otros' %}selected{% endif %}>📦 Otros Servicios</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <button type="submit" class="btn-cyber">🚀 Generar Reporte</button>
+            </div>
+        </form>
+    </div>
+
+    {% if documentos is not None %}
+    <!-- Resultados -->
+    <div class="results-container">
+        <div class="results-header">
+            <h2 class="results-title">📈 Resultados del Análisis</h2>
+            <span class="results-count">{{ documentos.count }} registros</span>
+        </div>
+
+        {% if documentos %}
+        <!-- Resumen por Tipos -->
+        <div class="tipo-cards">
+            {% for tipo, datos in resumen_tipos.items %}
+            <div class="tipo-card">
+                <div class="tipo-icon">{{ datos.icon }}</div>
+                <div class="tipo-name">{{ datos.nombre }}</div>
+                <div class="tipo-count">{{ datos.count }}</div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Tabla de Documentos -->
+        <table class="cyber-table">
+            <thead>
+                <tr>
+                    <th>📄 Número</th>
+                    <th>📋 Tipo</th>
+                    <th>📅 Fecha</th>
+                    <th>👤 Cliente</th>
+                    <th>🔧 Mecánico</th>
+                    <th>💰 Total</th>
+                    <th>🎯 Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for doc in documentos %}
+                <tr>
+                    <td>{{ doc.numero_documento|default:"Sin número" }}</td>
+                    <td>
+                        <span style="color: var(--matrix-green);">{{ doc.tipo_documento }}</span>
+                    </td>
+                    <td>{{ doc.fecha|date:"d/m/Y" }}</td>
+                    <td>{{ doc.cliente.nombre }} {{ doc.cliente.apellido|default:"" }}</td>
+                    <td>{{ doc.mecanico.nombre|default:"Sin asignar" }}</td>
+                    <td>
+                        <span style="color: var(--cyber-blue); font-weight: bold;">
+                            ${{ doc.calcular_total|floatformat:0|default:"0" }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{% url 'documentos:ver_documento' doc.id %}" 
+                           style="color: var(--matrix-green); text-decoration: none;">
+                            👁️ Ver
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Totales -->
+        <div style="margin-top: 2rem; padding: 1rem; background: rgba(57, 255, 20, 0.1); border-radius: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="color: var(--matrix-green); font-weight: bold;">💰 TOTAL GENERAL:</span>
+                <span style="color: var(--cyber-blue); font-size: 1.5rem; font-weight: bold;">
+                    ${{ total_general|floatformat:0 }}
+                </span>
+            </div>
+        </div>
+
+        {% else %}
+        <div style="text-align: center; padding: 3rem; color: var(--glow-cyan);">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">📭</div>
+            <h3>No se encontraron documentos</h3>
+            <p>No hay registros en el rango de fechas seleccionado</p>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Información adicional -->
+    {% if not request.GET.desde %}
+    <div style="background: rgba(179, 71, 217, 0.1); border: 1px solid var(--neon-purple); border-radius: 15px; padding: 2rem; margin-top: 2rem;">
+        <h3 style="color: var(--neon-purple); margin-bottom: 1rem;">💡 Tipos de Reportes Disponibles</h3>
+        <div class="tipo-cards">
+            <div class="tipo-card">
+                <div class="tipo-icon">💰</div>
+                <div class="tipo-name">Facturas</div>
+                <div style="color: var(--glow-cyan); font-size: 0.9rem;">Ingresos confirmados</div>
+            </div>
+            <div class="tipo-card">
+                <div class="tipo-icon">🔧</div>
+                <div class="tipo-name">Órdenes</div>
+                <div style="color: var(--glow-cyan); font-size: 0.9rem;">Trabajos en proceso</div>
+            </div>
+            <div class="tipo-card">
+                <div class="tipo-icon">📋</div>
+                <div class="tipo-name">Presupuestos</div>
+                <div style="color: var(--glow-cyan); font-size: 0.9rem;">Cotizaciones enviadas</div>
+            </div>
+            <div class="tipo-card">
+                <div class="tipo-icon">⚙️</div>
+                <div class="tipo-name">Repuestos</div>
+                <div style="color: var(--glow-cyan); font-size: 0.9rem;">Análisis de inventario</div>
+            </div>
+            <div class="tipo-card">
+                <div class="tipo-icon">🛠️</div>
+                <div class="tipo-name">Servicios</div>
+                <div style="color: var(--glow-cyan); font-size: 0.9rem;">Mano de obra</div>
+            </div>
+            <div class="tipo-card">
+                <div class="tipo-icon">📦</div>
+                <div class="tipo-name">Otros</div>
+                <div style="color: var(--glow-cyan); font-size: 0.9rem;">Servicios externos</div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+// Efectos adicionales de interactividad
+document.addEventListener('DOMContentLoaded', function() {
+    // Efecto de typing para el título
+    const title = document.querySelector('.cyber-title');
+    if (title && !document.querySelector('.cyber-title').dataset.animated) {
+        const text = title.textContent;
+        title.textContent = '';
+        title.dataset.animated = 'true';
+        let i = 0;
+        function typeWriter() {
+            if (i < text.length) {
+                title.textContent += text.charAt(i);
+                i++;
+                setTimeout(typeWriter, 100);
+            }
+        }
+        setTimeout(typeWriter, 500);
+    }
+
+    // Animación de las cards
+    const cards = document.querySelectorAll('.tipo-card');
+    cards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+            card.style.transition = 'all 0.5s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, index * 200);
+    });
+});
+</script>
+{% endblock %}

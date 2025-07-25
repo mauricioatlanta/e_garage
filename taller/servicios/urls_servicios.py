@@ -6,8 +6,8 @@ from rest_framework.routers import DefaultRouter
 from .views import ServicioViewSet, CategoriaServicioViewSet
 
 router = DefaultRouter()
-router.register(r'categorias', CategoriaServicioViewSet)
-router.register(r'servicios', ServicioViewSet)
+router.register(r'categorias', CategoriaServicioViewSet, basename='categorias')
+router.register(r'servicios', ServicioViewSet, basename='servicios')
 
 app_name = "servicios"
 

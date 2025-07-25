@@ -1,0 +1,51 @@
+# Translation file for eGarage
+# English translations
+msgid ""
+msgstr ""
+"Project-Id-Version: eGarage 1.0\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Iniciar sesion"
+msgstr "Sign In"
+
+msgid "Olvidaste tu contrasena?"
+msgstr "Forgot your password?"
+
+msgid "No tienes cuenta?"
+msgstr "Don't have an account?"
+
+msgid "Registrate aqui"
+msgstr "Sign up here"
+
+msgid "Email"
+msgstr "Email"
+
+msgid "Contrasena"
+msgstr "Password"
+
+msgid "Recordarme"
+msgstr "Remember me"
+
+msgid "ACCESO RESTRINGIDO"
+msgstr "ACCESS RESTRICTED"
+
+msgid "Esta cuenta ya tiene un usuario asignado."
+msgstr "This account already has a user assigned."
+
+msgid "No es posible registrar otro usuario para esta suscripcion."
+msgstr "It is not possible to register another user for this subscription."
+
+msgid "Cada taller/empresa puede tener unicamente"
+msgstr "Each workshop/company can only have"
+
+msgid "UN USUARIO ACTIVO"
+msgstr "ONE ACTIVE USER"
+
+msgid "Si necesitas cambiar el usuario principal, contacta al administrador del sistema."
+msgstr "If you need to change the main user, contact the system administrator."
+
+msgid "Volver al Registro"
+msgstr "Back to Registration"

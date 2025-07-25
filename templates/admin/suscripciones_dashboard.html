@@ -1,0 +1,125 @@
+<!-- Panel de administración de suscripciones -->
+{% extends 'base.html' %}
+{% block content %}
+<style>
+body {
+  background: linear-gradient(120deg, #0d1117 0%, #181c1f 100%) fixed;
+}
+.futuristic-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: linear-gradient(120deg, #181c1f 60%, #23263a 100%);
+  border-radius: 2rem;
+  box-shadow: 0 0 32px 0 #00ffe7aa, 0 2px 8px 0 #000a;
+  overflow: hidden;
+}
+.futuristic-table th, .futuristic-table td {
+  padding: 1rem;
+  color: #eafcff;
+  border-bottom: 1.5px solid #00ffe7cc;
+  text-align: center;
+}
+.futuristic-table th {
+  background: linear-gradient(90deg, #00ffe7 0%, #a3ff12 50%, #ff00ea 100%);
+  color: #181c1f;
+  font-weight: 900;
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+}
+.futuristic-table tr:last-child td {
+  border-bottom: none;
+}
+.futuristic-table tr {
+  transition: background 0.2s;
+}
+.futuristic-table tr:hover {
+  background: #23263a;
+}
+.badge-plan {
+  padding: 0.4em 1em;
+  border-radius: 1em;
+  font-weight: bold;
+  font-size: 1em;
+  background: linear-gradient(90deg, #00ffe7 0%, #a3ff12 50%, #ff00ea 100%);
+  color: #181c1f;
+  box-shadow: 0 0 12px #00ffe7cc;
+  border: 2px solid #a3ff12cc;
+}
+.badge-plan.trial { background: #23263a; color: #a3ff12; border-color: #a3ff12cc; }
+.badge-plan.mensual { background: #00ffe7; color: #181c1f; border-color: #00ffe7cc; }
+.badge-plan.semestral { background: #ff00ea; color: #fff; border-color: #ff00eacc; }
+.badge-plan.anual { background: #a3ff12; color: #181c1f; border-color: #a3ff12cc; }
+.estado-vencida { color: #ff3b3b; font-weight: bold; }
+.estado-por-vencer { color: #ffe600; font-weight: bold; }
+.estado-activa { color: #00ffe7; font-weight: bold; }
+.btn-renovar {
+  background: linear-gradient(90deg, #00ffe7 0%, #a3ff12 50%, #ff00ea 100%);
+  color: #181c1f;
+  font-weight: bold;
+  border: none;
+  border-radius: 1em;
+  padding: 0.5em 1.5em;
+  box-shadow: 0 0 12px #00ffe7cc;
+  transition: background 0.2s, color 0.2s;
+  cursor: pointer;
+}
+.btn-renovar:hover {
+  background: linear-gradient(90deg, #ff00ea 0%, #a3ff12 50%, #00ffe7 100%);
+  color: #fff;
+}
+</style>
+<div class="max-w-6xl mx-auto mt-10 p-6 glass-3d rounded-3xl shadow-2xl animate-fade-in">
+  <h1 class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-lime-400 to-fuchsia-500 mb-8 text-center futuristic-glow"><i class="fas fa-gem mr-2"></i> Suscripciones activas</h1>
+  <table class="futuristic-table">
+    <thead>
+      <tr>
+        <th>Empresa</th>
+        <th>Usuario admin</th>
+        <th>Plan</th>
+        <th>Fecha de inicio</th>
+        <th>Expira</th>
+        <th>Días restantes</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in empresas_con_taller %}
+      <tr>
+        <td class="font-semibold">{{ item.empresa.nombre }}</td>
+        <td>{{ item.empresa.usuario_admin.username }}</td>
+        <td>
+          {% with plan=item.empresa.usuario_admin.suscripcion.plan %}
+            <span class="badge-plan {{ plan }}">{{ plan|title }}</span>
+          {% endwith %}
+        </td>
+        <td>{{ item.empresa.fecha_inicio|date:"d M Y" }}</td>
+        <td>{{ item.empresa.fecha_expiracion|date:"d M Y" }}</td>
+        <td>{{ item.empresa.dias_restantes }}</td>
+        <td>
+          {% if item.empresa.debe_bloquear %}
+            <span class="estado-vencida">Vencida</span>
+          {% elif item.empresa.dias_restantes <= 5 %}
+            <span class="estado-por-vencer">Por vencer</span>
+          {% else %}
+            <span class="estado-activa">Activa</span>
+          {% endif %}
+        </td>
+        <td>
+          <form method="post" action="{% url 'taller:renovar_empresa' item.empresa.id %}">
+            {% csrf_token %}
+            <button class="btn-renovar">Renovar</button>
+          </form>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="8" style="text-align:left; color:#a3ff12; font-size:1.1em; padding-left:2em;">
+          <strong>Nombre del taller:</strong> {{ item.nombre_taller|default:'-' }}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

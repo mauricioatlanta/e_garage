@@ -1,7 +1,7 @@
 import os
 import django
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'e_garage.settings')
 django.setup()
 
 from taller.models.marca import Marca

@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% block extra_head %}
+<style>
+  body {
+    background: linear-gradient(120deg, #0d1117 0%, #181c1f 100%) fixed;
+    font-family: 'Orbitron', 'Montserrat', 'Segoe UI', Arial, sans-serif;
+  }
+  .futuristic-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -10;
+    background: radial-gradient(ellipse at 60% 40%, #00ffe7 0%, #181c1f 60%, #0d1117 100%);
+    overflow: hidden;
+  }
+  .neon-glow {
+    text-shadow: 0 0 32px #00ffe7, 0 0 12px #a3ff12, 0 0 2px #fff;
+    letter-spacing: 2.5px;
+    font-family: 'Orbitron', 'Montserrat', 'Segoe UI', Arial, sans-serif;
+  }
+  .animated-circles {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: -1;
+  }
+  .circle {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.13;
+    filter: blur(12px);
+    animation: move 12s linear infinite alternate;
+  }
+  .circle1 { width: 480px; height: 480px; background: #00ffe7; left: 8%; top: 8%; animation-delay: 0s; }
+  .circle2 { width: 340px; height: 340px; background: #a3ff12; right: 10%; top: 32%; animation-delay: 2s; }
+  .circle3 { width: 300px; height: 300px; background: #ff00ea; left: 32%; bottom: 6%; animation-delay: 4s; }
+  @keyframes move {
+    0% { transform: translateY(0) scale(1); }
+    100% { transform: translateY(-40px) scale(1.08); }
+  }
+  .futuristic-form {
+    background: linear-gradient(120deg, #23263a 60%, #181c1f 100%);
+    border-radius: 2.5rem;
+    box-shadow: 0 0 32px 0 #00ffe7aa, 0 2px 8px 0 #000a;
+    border: 3px solid #00ffe7cc;
+    padding: 3rem 2.5rem 2.5rem 2.5rem;
+    margin-top: 3rem;
+    position: relative;
+    overflow: hidden;
+    color: #eafcff;
+    font-size: 1.1rem;
+  }
+  .futuristic-form label {
+    color: #a3ff12;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-shadow: 0 0 8px #00ffe7, 0 0 2px #fff;
+  }
+  .futuristic-form input, .futuristic-form select, .futuristic-form textarea {
+    background: #0d1117;
+    border: 2px solid #00ffe7cc;
+    color: #00ffe7;
+    border-radius: 1em;
+    padding: 0.7em 1.2em;
+    margin-bottom: 1.2em;
+    font-size: 1.1em;
+    font-family: 'Orbitron', 'Montserrat', 'Segoe UI', Arial, sans-serif;
+    box-shadow: 0 0 8px #00ffe744;
+    transition: border 0.2s, box-shadow 0.2s;
+  }
+  .futuristic-form input:focus, .futuristic-form select:focus, .futuristic-form textarea:focus {
+    border: 2px solid #a3ff12cc;
+    box-shadow: 0 0 16px #a3ff12cc;
+    outline: none;
+  }
+  .cta-btn-premium {
+    background: linear-gradient(90deg, #00ffe7 0%, #a3ff12 50%, #ff00ea 100%);
+    color: #181c1f !important;
+    font-weight: bold;
+    border: none;
+    border-radius: 1em;
+    padding: 0.8em 2.2em;
+    box-shadow: 0 0 16px #00ffe7cc;
+    font-size: 1.2em;
+    letter-spacing: 1px;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    margin-bottom: 0.5em;
+  }
+  .cta-btn-premium:hover {
+    background: linear-gradient(90deg, #ff00ea 0%, #a3ff12 50%, #00ffe7 100%);
+    color: #fff !important;
+    box-shadow: 0 0 24px #ff00eacc;
+  }
+  .futuristic-form ::placeholder {
+    color: #a3ff12cc;
+    opacity: 1;
+    font-style: italic;
+  }
+  .futuristic-form .errorlist {
+    color: #ff3b3b;
+    font-weight: bold;
+    margin-bottom: 1em;
+    text-shadow: 0 0 8px #ff00ea;
+  }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="futuristic-bg">
+  <div class="animated-circles">
+    <div class="circle circle1"></div>
+    <div class="circle circle2"></div>
+    <div class="circle circle3"></div>
+  </div>
+</div>
+<div class="max-w-xl mx-auto futuristic-form">
+  <h2 class="text-4xl font-extrabold mb-8 text-center neon-glow tracking-widest">Registro de Taller</h2>
+  <form method="post" class="space-y-4">
+    {% csrf_token %}
+    <div>
+      {{ form.as_p }}
+    </div>
+    <div class="flex flex-col md:flex-row gap-4 mt-8 justify-center">
+      <button type="submit" name="tipo_registro" value="trial" class="cta-btn-premium">🚀 Prueba gratuita 30 días</button>
+      <button type="submit" name="tipo_registro" value="pago" class="cta-btn-premium">Suscripción pagada</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

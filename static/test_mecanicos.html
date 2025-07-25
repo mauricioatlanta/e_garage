@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Crear Mecánico</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Test Crear Mecánico - E-Garage</h1>
+    
+    <div id="test-results">
+        <h2>Resultados del Test:</h2>
+        <div id="output"></div>
+    </div>
+    
+    <hr>
+    
+    <h2>Test Manual:</h2>
+    <input type="text" id="nombreMecanico" placeholder="Nombre del mecánico" value="Test Mecánico Manual">
+    <button onclick="testCrearMecanico()">Crear Mecánico</button>
+    
+    <script>
+        function log(message) {
+            $('#output').append('<p>' + message + '</p>');
+            console.log(message);
+        }
+        
+        function testCrearMecanico() {
+            const nombre = $('#nombreMecanico').val();
+            
+            log('🧪 Iniciando test de creación de mecánico: ' + nombre);
+            
+            // Obtener CSRF token de la cookie
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+            
+            const csrftoken = getCookie('csrftoken');
+            log('🔑 CSRF Token: ' + (csrftoken ? csrftoken.substring(0, 10) + '...' : 'NO ENCONTRADO'));
+            
+            // Realizar petición AJAX
+            $.ajaxSetup({
+                beforeSend: function(xhr, settings) {
+                    if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    }
+                }
+            });
+            
+            $.post('/documentos/api/crear_mecanico/', {
+                'nombre': nombre,
+                'csrfmiddlewaretoken': csrftoken
+            })
+            .done(function(data) {
+                log('✅ Éxito: ' + JSON.stringify(data));
+                log('📊 Mecánico creado - ID: ' + data.id + ', Nombre: ' + data.nombre);
+            })
+            .fail(function(xhr, status, error) {
+                log('❌ Error: ' + status + ' - ' + error);
+                log('📄 Response: ' + xhr.responseText);
+                log('📊 Status Code: ' + xhr.status);
+            });
+        }
+        
+        // Auto-ejecutar test al cargar
+        $(document).ready(function() {
+            log('🚀 Página cargada, iniciando tests automáticos...');
+            
+            // Test 1: Verificar que jQuery funciona
+            log('✅ jQuery cargado: ' + $.fn.jquery);
+            
+            // Test 2: Verificar CSRF token
+            const csrftoken = function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }('csrftoken');
+            
+            if (csrftoken) {
+                log('✅ CSRF Token disponible');
+            } else {
+                log('❌ CSRF Token no encontrado - redirecting...');
+                // Redirigir para obtener token
+                window.location.href = '/documentos/nuevo/';
+                return;
+            }
+            
+            // Test 3: Crear mecánico automático
+            setTimeout(function() {
+                $('#nombreMecanico').val('Test Automático ' + new Date().getTime());
+                testCrearMecanico();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

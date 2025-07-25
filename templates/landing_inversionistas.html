@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-4xl mx-auto py-12 px-6">
+  <h1 class="text-5xl font-extrabold text-center mb-8 bg-gradient-to-r from-cyan-400 via-lime-400 to-fuchsia-500 text-transparent bg-clip-text">Visión & Oportunidad</h1>
+  <div class="mb-10 text-xl text-gray-200 text-center">
+    <p>En <span class="font-bold text-lime-400">E-Garage</span> revolucionamos la gestión de talleres automotrices en Latinoamérica, digitalizando procesos, conectando clientes y potenciando el crecimiento de la industria.</p>
+    <p class="mt-4">Buscamos socios estratégicos e inversionistas para escalar nuestra plataforma y liderar el mercado SaaS automotriz.</p>
+  </div>
+
+  <div class="mb-12">
+    <h2 class="text-3xl font-bold mb-4 text-cyan-300">Roadmap</h2>
+    <ol class="relative border-l-4 border-lime-400 ml-4">
+      <li class="mb-8 ml-6">
+        <span class="absolute -left-4 flex items-center justify-center w-8 h-8 bg-lime-400 rounded-full text-gray-900 font-bold">1</span>
+        <h3 class="font-bold text-xl">2025: Consolidación en Chile</h3>
+        <p>+100 talleres, integración con marketplaces de repuestos, facturación electrónica, IA para diagnóstico.</p>
+      </li>
+      <li class="mb-8 ml-6">
+        <span class="absolute -left-4 flex items-center justify-center w-8 h-8 bg-cyan-400 rounded-full text-gray-900 font-bold">2</span>
+        <h3 class="font-bold text-xl">2026: Expansión regional</h3>
+        <p>Lanzamiento en Perú, Colombia y México. Alianzas con aseguradoras y flotas.</p>
+      </li>
+      <li class="ml-6">
+        <span class="absolute -left-4 flex items-center justify-center w-8 h-8 bg-fuchsia-500 rounded-full text-white font-bold">3</span>
+        <h3 class="font-bold text-xl">2027: Plataforma líder LATAM</h3>
+        <p>+2.000 talleres, API pública, ecosistema de apps, analítica avanzada y expansión a nuevos verticales.</p>
+      </li>
+    </ol>
+  </div>
+
+  <div class="mb-12">
+    <h2 class="text-3xl font-bold mb-4 text-fuchsia-400">Métricas Clave</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+      <div class="glass-3d p-8 rounded-2xl shadow-xl">
+        <div class="text-5xl font-extrabold text-lime-400 mb-2">{{ talleres_count }}</div>
+        <div class="text-lg text-cyan-100">Talleres registrados</div>
+      </div>
+      <div class="glass-3d p-8 rounded-2xl shadow-xl">
+        <div class="text-5xl font-extrabold text-cyan-400 mb-2">{{ clientes_count }}</div>
+        <div class="text-lg text-cyan-100">Clientes atendidos</div>
+      </div>
+      <div class="glass-3d p-8 rounded-2xl shadow-xl">
+        <div class="text-5xl font-extrabold text-fuchsia-400 mb-2">{{ ingresos_ultimo_mes }}</div>
+        <div class="text-lg text-cyan-100">Ingresos último mes (USD)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-10 text-center">
+    <a href="mailto:socios@e-garage.com" class="inline-block px-8 py-4 rounded-full bg-gradient-to-r from-cyan-400 via-lime-400 to-fuchsia-500 text-gray-900 font-bold text-xl shadow-lg hover:scale-105 transition">Contáctanos para invertir</a>
+  </div>
+</div>
+{% endblock %}

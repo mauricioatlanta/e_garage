@@ -96,13 +96,32 @@
     <span class="text-2xl font-extrabold renault-title tracking-widest" style="letter-spacing:2px;">e-Garage</span>
   </div>
   <div class="flex gap-2">
-    <a href="/" class="renault-btn">🏠 Inicio</a>
+    <a href="/dashboard/" class="renault-btn">🏠 Inicio</a>
     <a href="/documentos/" class="renault-btn">📄 Documentos</a>
     <a href="/reportes/" class="renault-btn">📊 Reportes</a>
     <a href="/clientes/" class="renault-btn">👤 Clientes</a>
     <a href="/vehiculos/" class="renault-btn">🚗 Vehículos</a>
   </div>
 </nav>
+
+<!-- Mensajes flash -->
+{% if messages %}
+  <div class="max-w-5xl mx-auto mt-4 mb-4">
+    {% for message in messages %}
+      <div class="p-4 mb-2 rounded-lg border-l-4 {% if message.tags == 'success' %}bg-green-900 border-green-400 text-green-100{% elif message.tags == 'error' %}bg-red-900 border-red-400 text-red-100{% else %}bg-yellow-900 border-yellow-400 text-yellow-100{% endif %}" style="background: rgba(30, 60, 30, 0.9); border-color: #ffd600; color: #ffd600;">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            {% if message.tags == 'success' %}✅{% elif message.tags == 'error' %}❌{% else %}ℹ️{% endif %}
+          </div>
+          <div class="ml-3">
+            <p class="text-sm font-medium">{{ message }}</p>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
 <div class="max-w-5xl mx-auto mt-4 p-6 renault-pit-card">
   <div class="flex justify-between items-center mb-6">
     <h2 class="text-2xl font-bold renault-title">Pit Renault F1 - Documentos</h2>
@@ -131,9 +150,9 @@
         <td class="p-2">{{ doc.cliente }}</td>
         <td class="p-2">{{ doc.vehiculo }}</td>
         <td class="p-2 text-center">
-          <a href="{% url 'documentos:ver_documento' doc.id %}" class="renault-action">Ver</a>
+          <a href="{% url 'documentos:ver_documento_nuevo' doc.id %}" class="renault-action" style="background: #00aa00;">Ver 🆕</a>
           |
-          <a href="{% url 'documentos:editar_documento' doc.id %}" class="renault-action">Editar</a>
+          <a href="{% url 'documentos:editar_documento_nuevo' doc.id %}" class="renault-action" style="background: #0066ff;">Editar 🆕</a>
           |
           <a href="{% url 'documentos:eliminar_documento' doc.id %}" class="renault-action" onclick="return confirm('¿Eliminar este documento?')">Eliminar</a>
         </td>

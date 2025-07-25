@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-lg mx-auto mt-20 p-8 bg-white text-black rounded-xl shadow-2xl text-center">
+  <h1 class="text-3xl font-extrabold text-cyan-700 mb-4">Confirma tu correo electrónico</h1>
+  <p class="mb-6 text-lg">Haz clic en el enlace que te enviamos a tu correo para activar tu cuenta.<br>
+  Si no ves el correo, revisa tu carpeta de spam o solicita un nuevo enlace.</p>
+  <a href="/accounts/resend-email/" class="inline-block mt-4 px-6 py-2 bg-cyan-600 text-white rounded-xl font-bold hover:bg-cyan-700 transition">Reenviar correo de confirmación</a>
+</div>
+{% endblock %}

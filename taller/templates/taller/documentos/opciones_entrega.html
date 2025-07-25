@@ -1,0 +1,525 @@
+{% extends "taller/base.html" %}
+{% load static %}
+
+{% block title %}Opciones de Entrega - {{ documento.tipo_documento }} #{{ documento.numero_documento }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .delivery-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .document-header {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        color: white;
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .delivery-option {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+    
+    .delivery-option:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        border-color: #007bff;
+    }
+    
+    .option-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+    
+    .option-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+    
+    .option-description {
+        color: #6c757d;
+        margin-bottom: 1rem;
+        line-height: 1.5;
+    }
+    
+    .option-status {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-bottom: 1rem;
+    }
+    
+    .status-available {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .status-unavailable {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .status-partial {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .btn-delivery {
+        display: inline-block;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        color: white;
+        text-decoration: none;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+    }
+    
+    .btn-success {
+        background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+        color: white;
+    }
+    
+    .btn-success:hover {
+        color: white;
+        text-decoration: none;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    }
+    
+    .btn-warning {
+        background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+        color: #212529;
+    }
+    
+    .btn-warning:hover {
+        color: #212529;
+        text-decoration: none;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+    }
+    
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+    }
+    
+    .btn-secondary:hover {
+        color: white;
+        text-decoration: none;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+    }
+    
+    .document-info {
+        background: #f8f9fa;
+        border-left: 4px solid #007bff;
+        padding: 1.5rem;
+        border-radius: 0 8px 8px 0;
+        margin-bottom: 2rem;
+    }
+    
+    .contact-info {
+        background: #e7f3ff;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-top: 1rem;
+    }
+    
+    .modal-header {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        color: white;
+    }
+    
+    .whatsapp-preview {
+        background: #25D366;
+        color: white;
+        padding: 1rem;
+        border-radius: 8px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        white-space: pre-line;
+        margin: 1rem 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="delivery-container">
+        <!-- Header del Documento -->
+        <div class="document-header">
+            <h2 class="mb-2">📋 {{ documento.tipo_documento }} #{{ documento.numero_documento }}</h2>
+            <p class="mb-1 opacity-90">Cliente: {{ cliente.nombre }}</p>
+            <p class="mb-0 opacity-90">Fecha: {{ documento.fecha|date:"d/m/Y" }}</p>
+        </div>
+        
+        <!-- Información del Documento -->
+        <div class="document-info">
+            <h5 class="text-primary mb-3">Información del Documento</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Empresa:</strong> {{ empresa.nombre }}</p>
+                    <p><strong>Cliente:</strong> {{ cliente.nombre }}</p>
+                    {% if cliente.rut %}
+                    <p><strong>RUT:</strong> {{ cliente.rut }}</p>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    {% if documento.vehiculo %}
+                    <p><strong>Vehículo:</strong> {{ documento.vehiculo.marca }} {{ documento.vehiculo.modelo }}</p>
+                    <p><strong>Patente:</strong> {{ documento.vehiculo.patente }}</p>
+                    {% endif %}
+                    <p><strong>Fecha Creación:</strong> {{ documento.fecha_creacion|date:"d/m/Y H:i" }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Opciones de Entrega -->
+        <div class="row">
+            <!-- Descargar PDF -->
+            <div class="col-md-6 mb-4">
+                <div class="delivery-option text-center">
+                    <div class="option-icon">📥</div>
+                    <div class="option-title">Descargar PDF</div>
+                    <div class="option-description">
+                        Descarga el documento directamente en formato PDF para imprimir o guardar.
+                    </div>
+                    <div class="option-status status-available">
+                        ✅ Siempre disponible
+                    </div>
+                    <a href="{{ pdf_url }}" class="btn-delivery btn-primary" target="_blank">
+                        📄 Descargar PDF
+                    </a>
+                    <button class="btn-delivery btn-secondary" onclick="previsualizarDocumento()">
+                        👁️ Vista Previa
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Enviar por Email -->
+            <div class="col-md-6 mb-4">
+                <div class="delivery-option text-center">
+                    <div class="option-icon">📧</div>
+                    <div class="option-title">Enviar por Email</div>
+                    <div class="option-description">
+                        Envía el documento directamente al email del cliente con PDF adjunto.
+                    </div>
+                    {% if tiene_email %}
+                    <div class="option-status status-available">
+                        ✅ Email disponible: {{ cliente.email }}
+                    </div>
+                    <a href="{{ email_url }}" class="btn-delivery btn-success">
+                        ✉️ Enviar Email
+                    </a>
+                    {% else %}
+                    <div class="option-status status-partial">
+                        ⚠️ Email no registrado
+                    </div>
+                    <a href="{{ email_url }}" class="btn-delivery btn-warning">
+                        ✏️ Especificar Email
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Enviar por WhatsApp -->
+            <div class="col-md-6 mb-4">
+                <div class="delivery-option text-center">
+                    <div class="option-icon">📱</div>
+                    <div class="option-title">Enviar por WhatsApp</div>
+                    <div class="option-description">
+                        Genera un enlace de WhatsApp con el mensaje y documento listo para enviar.
+                    </div>
+                    {% if tiene_telefono %}
+                    <div class="option-status status-available">
+                        ✅ Teléfono: {{ cliente.telefono }}
+                    </div>
+                    <button class="btn-delivery btn-success" onclick="generarWhatsApp('{{ cliente.telefono }}')">
+                        📲 Enviar WhatsApp
+                    </button>
+                    {% else %}
+                    <div class="option-status status-partial">
+                        ⚠️ Teléfono no registrado
+                    </div>
+                    <button class="btn-delivery btn-warning" onclick="solicitarTelefono()">
+                        📞 Especificar Teléfono
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Imprimir -->
+            <div class="col-md-6 mb-4">
+                <div class="delivery-option text-center">
+                    <div class="option-icon">🖨️</div>
+                    <div class="option-title">Imprimir Documento</div>
+                    <div class="option-description">
+                        Abre el documento en una nueva ventana optimizada para impresión.
+                    </div>
+                    <div class="option-status status-available">
+                        ✅ Listo para imprimir
+                    </div>
+                    <button class="btn-delivery btn-primary" onclick="imprimirDocumento()">
+                        🖨️ Imprimir
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Información de Contacto -->
+        {% if not tiene_email or not tiene_telefono %}
+        <div class="contact-info">
+            <h6 class="text-primary">💡 Consejo</h6>
+            <p class="mb-0">
+                Para una mejor experiencia, considera actualizar la información de contacto del cliente 
+                (email y teléfono) para tener todas las opciones de entrega disponibles.
+            </p>
+        </div>
+        {% endif %}
+        
+        <!-- Botón Volver -->
+        <div class="text-center mt-4">
+            <a href="{{ request.META.HTTP_REFERER|default:'/taller/documentos/' }}" class="btn-delivery btn-secondary">
+                ⬅️ Volver a Documentos
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para WhatsApp -->
+<div class="modal fade" id="whatsappModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">📱 Enviar por WhatsApp</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="whatsappModalBody">
+                <!-- Contenido dinámico -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Teléfono -->
+<div class="modal fade" id="telefonoModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">📞 Especificar Teléfono</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="telefonoInput" class="form-label">Número de teléfono (incluye código país)</label>
+                    <input type="tel" class="form-control" id="telefonoInput" placeholder="+56987654321">
+                    <small class="text-muted">Ejemplo: +56987654321 (Chile)</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" onclick="confirmarWhatsApp()">
+                    📲 Generar WhatsApp
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Vista Previa -->
+<div class="modal fade" id="previsualizacionModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">👁️ Vista Previa del Documento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="previsualizacionContent">
+                <!-- Contenido dinámico -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <a href="{{ pdf_url }}" class="btn btn-primary" target="_blank">
+                    📄 Descargar PDF
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const documentoId = {{ documento.id }};
+const whatsappUrl = "{{ whatsapp_url }}";
+
+function generarWhatsApp(telefono) {
+    const url = `${whatsappUrl}?telefono=${encodeURIComponent(telefono)}`;
+    
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                mostrarWhatsApp(data);
+            } else {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error de conexión');
+        });
+}
+
+function solicitarTelefono() {
+    const modal = new bootstrap.Modal(document.getElementById('telefonoModal'));
+    modal.show();
+}
+
+function confirmarWhatsApp() {
+    const telefono = document.getElementById('telefonoInput').value.trim();
+    if (!telefono) {
+        alert('Por favor ingresa un número de teléfono');
+        return;
+    }
+    
+    bootstrap.Modal.getInstance(document.getElementById('telefonoModal')).hide();
+    generarWhatsApp(telefono);
+}
+
+function mostrarWhatsApp(data) {
+    const modalBody = document.getElementById('whatsappModalBody');
+    modalBody.innerHTML = `
+        <div class="text-center mb-3">
+            <h6>📱 Mensaje generado para WhatsApp</h6>
+            <p class="text-muted">Teléfono: ${data.telefono}</p>
+        </div>
+        
+        <div class="whatsapp-preview">
+            ${data.mensaje}
+        </div>
+        
+        <div class="text-center">
+            <a href="${data.whatsapp_link}" target="_blank" class="btn btn-success btn-lg">
+                📲 Abrir WhatsApp
+            </a>
+            <p class="text-muted mt-2">
+                <small>Se abrirá WhatsApp con el mensaje pre-cargado</small>
+            </p>
+        </div>
+    `;
+    
+    const modal = new bootstrap.Modal(document.getElementById('whatsappModal'));
+    modal.show();
+}
+
+function imprimirDocumento() {
+    window.open("{{ pdf_url }}", '_blank');
+}
+
+function previsualizarDocumento() {
+    fetch(`/taller/documentos/${documentoId}/vista-previa/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value || '',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            mostrarVistaPrevia(data.data);
+        } else {
+            alert('Error: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error de conexión');
+    });
+}
+
+function mostrarVistaPrevia(data) {
+    const content = document.getElementById('previsualizacionContent');
+    content.innerHTML = `
+        <div class="row">
+            <div class="col-md-6">
+                <h6 class="text-primary">📋 Información del Documento</h6>
+                <p><strong>Tipo:</strong> ${data.documento.tipo}</p>
+                <p><strong>Número:</strong> ${data.documento.numero}</p>
+                <p><strong>Fecha:</strong> ${data.documento.fecha}</p>
+            </div>
+            <div class="col-md-6">
+                <h6 class="text-primary">👤 Cliente</h6>
+                <p><strong>Nombre:</strong> ${data.cliente.nombre}</p>
+                ${data.cliente.rut ? `<p><strong>RUT:</strong> ${data.cliente.rut}</p>` : ''}
+                ${data.cliente.telefono ? `<p><strong>Teléfono:</strong> ${data.cliente.telefono}</p>` : ''}
+            </div>
+        </div>
+        
+        ${data.vehiculo ? `
+        <div class="mt-3">
+            <h6 class="text-primary">🚗 Vehículo</h6>
+            <p><strong>Marca:</strong> ${data.vehiculo.marca}</p>
+            <p><strong>Modelo:</strong> ${data.vehiculo.modelo}</p>
+            <p><strong>Patente:</strong> ${data.vehiculo.patente}</p>
+        </div>
+        ` : ''}
+        
+        <div class="mt-3">
+            <h6 class="text-primary">💰 Totales</h6>
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Repuestos:</strong> $${data.totales.repuestos.toLocaleString()}</p>
+                    <p><strong>Servicios:</strong> $${data.totales.servicios.toLocaleString()}</p>
+                    <p><strong>Otros Servicios:</strong> $${data.totales.otros_servicios.toLocaleString()}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Subtotal:</strong> $${data.totales.subtotal.toLocaleString()}</p>
+                    <p><strong>IVA:</strong> $${data.totales.iva.toLocaleString()}</p>
+                    <p class="h5 text-success"><strong>Total:</strong> $${data.totales.total.toLocaleString()}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-3">
+            <h6 class="text-primary">📊 Resumen de Items</h6>
+            <p>Repuestos: ${data.items.repuestos_count} | Servicios: ${data.items.servicios_count} | Otros: ${data.items.otros_servicios_count}</p>
+        </div>
+    `;
+    
+    const modal = new bootstrap.Modal(document.getElementById('previsualizacionModal'));
+    modal.show();
+}
+</script>
+{% endblock %}

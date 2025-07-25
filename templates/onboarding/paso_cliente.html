@@ -1,0 +1,460 @@
+{% extends 'base.html' %}
+
+{% block title %}Paso 1: Agregar tu primer cliente{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<style>
+    :root {
+        --cyber-blue: #00d4ff;
+        --matrix-green: #39ff14;
+        --neon-purple: #b347d9;
+        --dark-bg: #0a0a0f;
+        --glow-cyan: #00ffff;
+    }
+
+    body {
+        background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+        color: var(--glow-cyan);
+        font-family: 'Orbitron', 'Courier New', monospace;
+    }
+
+    #particles-js {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: -1;
+    }
+
+    .onboarding-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .progress-bar {
+        background: rgba(10, 10, 15, 0.9);
+        border: 1px solid var(--cyber-blue);
+        border-radius: 25px;
+        padding: 1rem;
+        margin-bottom: 2rem;
+        backdrop-filter: blur(10px);
+    }
+
+    .progress-track {
+        background: rgba(0, 212, 255, 0.2);
+        height: 10px;
+        border-radius: 10px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        background: linear-gradient(90deg, var(--matrix-green), var(--cyber-blue));
+        height: 100%;
+        border-radius: 10px;
+        width: {{ progreso }}%;
+        transition: width 0.5s ease;
+        position: relative;
+    }
+
+    .progress-fill::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+    }
+
+    .progress-text {
+        text-align: center;
+        margin-top: 0.5rem;
+        color: var(--glow-cyan);
+        font-weight: bold;
+    }
+
+    .step-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        align-items: start;
+    }
+
+    .tutorial-panel {
+        background: rgba(10, 10, 15, 0.9);
+        border: 1px solid var(--matrix-green);
+        border-radius: 20px;
+        padding: 2rem;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 0 30px rgba(57, 255, 20, 0.2);
+    }
+
+    .action-panel {
+        background: rgba(10, 10, 15, 0.9);
+        border: 1px solid var(--cyber-blue);
+        border-radius: 20px;
+        padding: 2rem;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 0 30px rgba(0, 212, 255, 0.2);
+    }
+
+    .step-title {
+        font-size: 2rem;
+        font-weight: bold;
+        color: var(--matrix-green);
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+
+    .step-description {
+        color: var(--glow-cyan);
+        font-size: 1.1rem;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+    }
+
+    .tip-box {
+        background: rgba(57, 255, 20, 0.1);
+        border: 1px solid var(--matrix-green);
+        border-radius: 10px;
+        padding: 1rem;
+        margin: 1rem 0;
+    }
+
+    .tip-title {
+        color: var(--matrix-green);
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        color: var(--cyber-blue);
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+    }
+
+    .form-control {
+        width: 100%;
+        background: rgba(0, 20, 40, 0.8);
+        border: 1px solid var(--cyber-blue);
+        border-radius: 8px;
+        color: var(--glow-cyan);
+        padding: 12px;
+        font-family: 'Orbitron', monospace;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--matrix-green);
+        box-shadow: 0 0 15px rgba(57, 255, 20, 0.5);
+    }
+
+    .btn-next {
+        background: linear-gradient(45deg, var(--matrix-green), var(--cyber-blue));
+        border: none;
+        border-radius: 10px;
+        color: #000;
+        padding: 15px 30px;
+        font-weight: bold;
+        font-family: 'Orbitron', monospace;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+        margin-top: 1rem;
+    }
+
+    .btn-next:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(57, 255, 20, 0.5);
+    }
+
+    .btn-skip {
+        background: transparent;
+        border: 1px solid var(--neon-purple);
+        border-radius: 10px;
+        color: var(--neon-purple);
+        padding: 10px 20px;
+        font-weight: bold;
+        font-family: 'Orbitron', monospace;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+        margin-top: 0.5rem;
+    }
+
+    .btn-skip:hover {
+        background: rgba(179, 71, 217, 0.2);
+    }
+
+    .floating-tip {
+        position: fixed;
+        bottom: 30px;
+        left: 30px;
+        background: rgba(255, 255, 0, 0.9);
+        color: #000;
+        padding: 15px 20px;
+        border-radius: 25px;
+        font-weight: bold;
+        box-shadow: 0 4px 20px rgba(255, 255, 0, 0.4);
+        z-index: 1000;
+        animation: float 3s ease-in-out infinite;
+        max-width: 300px;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+
+    .example-data {
+        background: rgba(0, 212, 255, 0.1);
+        border: 1px solid var(--cyber-blue);
+        border-radius: 10px;
+        padding: 1rem;
+        margin: 1rem 0;
+    }
+
+    .example-title {
+        color: var(--cyber-blue);
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+
+    @media (max-width: 768px) {
+        .step-content {
+            grid-template-columns: 1fr;
+        }
+        
+        .floating-tip {
+            position: relative;
+            bottom: auto;
+            left: auto;
+            margin: 1rem 0;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="particles-js"></div>
+
+<div class="floating-tip">
+    💡 <strong>Tip:</strong> Comienza con datos reales de un cliente frecuente. ¡Lo agradecerás después!
+</div>
+
+<div class="onboarding-container">
+    <!-- Barra de progreso -->
+    <div class="progress-bar">
+        <div class="progress-track">
+            <div class="progress-fill"></div>
+        </div>
+        <div class="progress-text">
+            Paso {{ paso_actual }} de {{ total_pasos }} - {{ progreso|floatformat:0 }}% completado
+        </div>
+    </div>
+
+    <div class="step-content">
+        <!-- Panel Tutorial -->
+        <div class="tutorial-panel">
+            <h1 class="step-title">👥 {{ paso_info.titulo }}</h1>
+            
+            <div class="step-description">
+                Los clientes son el corazón de tu taller. Aquí registrarás toda la información 
+                importante: nombre, contacto, historial de servicios.
+            </div>
+
+            <div class="tip-box">
+                <div class="tip-title">💡 ¿Por qué es importante?</div>
+                <ul style="color: var(--glow-cyan); margin-left: 1rem;">
+                    <li>Historial completo de servicios</li>
+                    <li>Comunicación directa por WhatsApp</li>
+                    <li>Recordatorios automáticos de mantenimiento</li>
+                    <li>Análisis de rentabilidad por cliente</li>
+                </ul>
+            </div>
+
+            <div class="example-data">
+                <div class="example-title">📋 Ejemplo de datos:</div>
+                <p style="color: var(--glow-cyan); margin: 0;">
+                    <strong>Nombre:</strong> Juan Pérez<br>
+                    <strong>Teléfono:</strong> +56 9 1234 5678<br>
+                    <strong>Email:</strong> juan@email.com<br>
+                    <strong>Dirección:</strong> Las Condes 123, Santiago
+                </p>
+            </div>
+
+            <div class="tip-box">
+                <div class="tip-title">🚀 Después podrás:</div>
+                <ul style="color: var(--glow-cyan); margin-left: 1rem;">
+                    <li>Buscar clientes instantáneamente</li>
+                    <li>Ver todo su historial de un vistazo</li>
+                    <li>Enviar cotizaciones por email</li>
+                    <li>Generar reportes personalizados</li>
+                </ul>
+            </div>
+
+            <div class="tip-box" style="background: rgba(255, 107, 53, 0.1); border-color: var(--ai-orange);">
+                <div class="tip-title">🤖 IA Incluida GRATIS</div>
+                <p style="color: var(--glow-cyan); margin-bottom: 1rem;">
+                    Nuestro sistema de IA analiza cada cliente y sugiere servicios automáticamente.
+                </p>
+                <a href="{% url 'taller:ia:demo_vehiculo' %}" 
+                   style="background: linear-gradient(45deg, var(--ai-orange), var(--electric-yellow)); 
+                          color: #000; padding: 8px 16px; border-radius: 8px; text-decoration: none; 
+                          font-weight: bold; display: inline-block; transition: all 0.3s ease;"
+                   onmouseover="this.style.transform='scale(1.05)'"
+                   onmouseout="this.style.transform='scale(1)'">
+                    🎯 Ver Demo de IA en Acción
+                </a>
+            </div>
+        </div>
+
+        <!-- Panel de Acción -->
+        <div class="action-panel">
+            <h2 style="color: var(--cyber-blue); text-align: center; margin-bottom: 1.5rem;">
+                🎯 Agregar tu primer cliente
+            </h2>
+
+            <form id="clienteForm">
+                <div class="form-group">
+                    <label for="nombre">👤 Nombre completo</label>
+                    <input type="text" id="nombre" name="nombre" class="form-control" 
+                           placeholder="Ej: Juan Pérez González" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="telefono">📱 Teléfono</label>
+                    <input type="tel" id="telefono" name="telefono" class="form-control" 
+                           placeholder="Ej: +56 9 1234 5678" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">📧 Email</label>
+                    <input type="email" id="email" name="email" class="form-control" 
+                           placeholder="Ej: cliente@email.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="direccion">🏠 Dirección</label>
+                    <input type="text" id="direccion" name="direccion" class="form-control" 
+                           placeholder="Ej: Las Condes 123, Santiago">
+                </div>
+
+                <button type="submit" class="btn-next">
+                    ✅ Crear Cliente y Continuar
+                </button>
+                
+                <button type="button" class="btn-skip" onclick="saltarPaso()">
+                    ⏭️ Saltar este paso
+                </button>
+            </form>
+
+            <div style="text-align: center; margin-top: 1.5rem; color: var(--glow-cyan); opacity: 0.8;">
+                <small>💡 Tip: Usa datos reales para aprovechar al máximo la demo</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Configuración de partículas
+particlesJS("particles-js", {
+    "particles": {
+        "number": { "value": 30, "density": { "enable": true, "value_area": 800 } },
+        "color": { "value": ["#39ff14", "#00d4ff"] },
+        "shape": { "type": "circle" },
+        "opacity": { "value": 0.4, "random": false },
+        "size": { "value": 3, "random": true },
+        "line_linked": {
+            "enable": true, "distance": 150, "color": "#39ff14", "opacity": 0.4, "width": 1
+        },
+        "move": { "enable": true, "speed": 1, "direction": "none", "random": false, "straight": false, "out_mode": "out", "bounce": false }
+    },
+    "interactivity": {
+        "detect_on": "canvas",
+        "events": { "onhover": { "enable": true, "mode": "repulse" }, "onclick": { "enable": true, "mode": "push" }, "resize": true }
+    },
+    "retina_detect": true
+});
+
+// Manejo del formulario
+document.getElementById('clienteForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const data = {
+        nombre: formData.get('nombre'),
+        telefono: formData.get('telefono'),
+        email: formData.get('email'),
+        direccion: formData.get('direccion')
+    };
+    
+    // Validar datos mínimos
+    if (!data.nombre || !data.telefono) {
+        alert('Por favor completa al menos el nombre y teléfono');
+        return;
+    }
+    
+    // Simular creación de cliente (en implementación real, enviar a backend)
+    const btn = document.querySelector('.btn-next');
+    btn.innerHTML = '⏳ Creando cliente...';
+    btn.disabled = true;
+    
+    setTimeout(() => {
+        // Analytics
+        gtag('event', 'onboarding_cliente_created', {
+            'event_category': 'onboarding',
+            'event_label': 'paso_1_completado'
+        });
+        
+        // Ir al siguiente paso
+        window.location.href = '/onboarding/paso/2/';
+    }, 1500);
+});
+
+function saltarPaso() {
+    if (confirm('¿Estás seguro de que quieres saltar este paso?\n\nPuedes agregar clientes después desde el menú principal.')) {
+        gtag('event', 'onboarding_step_skipped', {
+            'event_category': 'onboarding',
+            'event_label': 'paso_1_saltado'
+        });
+        
+        window.location.href = '/onboarding/paso/2/';
+    }
+}
+
+// Auto-completar ejemplo
+document.getElementById('nombre').addEventListener('focus', function() {
+    if (!this.value) {
+        setTimeout(() => {
+            if (confirm('¿Quieres usar datos de ejemplo para esta demo?')) {
+                document.getElementById('nombre').value = 'Juan Pérez González';
+                document.getElementById('telefono').value = '+56 9 8765 4321';
+                document.getElementById('email').value = 'juan.perez@email.com';
+                document.getElementById('direccion').value = 'Las Condes 123, Santiago';
+            }
+        }, 500);
+    }
+});
+</script>
+{% endblock %}

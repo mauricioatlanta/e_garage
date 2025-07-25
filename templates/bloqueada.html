@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-fuchsia-900 via-cyan-900 to-lime-900">
+  <div class="glass-3d p-12 rounded-3xl shadow-2xl text-center animate-fade-in">
+    <h1 class="text-5xl font-extrabold text-fuchsia-400 mb-6 futuristic-glow"><i class="fas fa-lock mr-2"></i>{% trans "Acceso Denegado" %}</h1>
+    <p class="text-2xl text-cyan-100 mb-8">{% trans "Tu suscripción está" %} <span class="text-red-400 font-bold">{% trans "vencida" %}</span> {% trans "o" %} <span class="text-yellow-300 font-bold">{% trans "inactiva" %}</span>.<br>{% trans "Renueva tu plan para recuperar el acceso a todas las funciones premium de E-Garage." %}</p>
+    <div class="flex flex-col md:flex-row gap-6 justify-center mb-4">
+      <a href="/admin/suscripciones/" class="cta-btn-premium py-4 px-12 rounded-2xl font-extrabold text-2xl shadow-2xl transition-all inline-block">{% trans "Renovar en línea" %}</a>
+      <a href="https://wa.me/56963607348?text=Hola,%20quiero%20renovar%20mi%20plan%20E-Garage" target="_blank" class="cta-btn-outline py-4 px-12 rounded-2xl font-extrabold text-2xl shadow-2xl transition-all inline-block">{% trans "Contactar por WhatsApp" %}</a>
+    </div>
+    <div class="text-cyan-200 text-lg mt-2">{% trans "O escríbenos a" %} <a href="mailto:suscripcion@atlantareciclajes.cl" class="underline text-lime-400 hover:text-fuchsia-400 transition-all">suscripcion@atlantareciclajes.cl</a></div>
+    </div>
+    <a href="/login/" class="cta-btn-outline py-3 px-10 rounded-xl font-bold text-xl shadow-xl transition-all">{% trans "Iniciar sesión" %}</a>
+  </div>
+</div>
+{% endblock %}

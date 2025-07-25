@@ -1,0 +1,11 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"label": "Migraciones Django",
+			"command": "python manage.py makemigrations && python manage.py migrate",
+			"group": "build"
+		}
+	]
+}

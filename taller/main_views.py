@@ -22,7 +22,11 @@ def crear_documento(request):
     return render(request, 'taller/documentos/crear_documento.html', {'form': form})
 
 def landing_inicio(request):
-    return render(request, 'landing_inicio.html')
+    return render(request, 'public/landing_inicio.html')
+
+def landing_premium(request):
+    """Vista para la landing page premium de eGarage"""
+    return render(request, 'landing.html')
 
 def contacto_tailwind(request):
     return render(request, 'public/contacto_tailwind.html')

@@ -1,0 +1,685 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Fira+Code:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  body {
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 30%, #16213e  60%, #0f3460 100%);
+    min-height: 100vh;
+    font-family: 'Fira Code', 'Orbitron', monospace;
+    color: #e0e6ff;
+    overflow-x: hidden;
+  }
+
+  /* Fondo animado con partículas */
+  .ai-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+      radial-gradient(circle at 20% 50%, rgba(0, 255, 255, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(255, 0, 255, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 40% 80%, rgba(0, 255, 0, 0.1) 0%, transparent 50%);
+    animation: aiPulse 15s infinite ease-in-out;
+    z-index: -1;
+  }
+
+  @keyframes aiPulse {
+    0%, 100% { opacity: 0.7; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.1); }
+  }
+
+  /* Grid principal */
+  .ai-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  /* Header principal */
+  .ai-header {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 3rem 2rem;
+    background: linear-gradient(135deg, rgba(0, 255, 255, 0.1) 0%, rgba(255, 0, 255, 0.1) 100%);
+    border-radius: 2rem;
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    box-shadow: 
+      0 0 50px rgba(0, 255, 255, 0.2),
+      inset 0 0 50px rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    position: relative;
+  }
+
+  .ai-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 3.5rem;
+    font-weight: 900;
+    background: linear-gradient(45deg, #00ffff, #ff00ff, #00ff00, #ffff00);
+    background-size: 400% 400%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradientFlow 4s ease-in-out infinite;
+    text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+  }
+
+  @keyframes gradientFlow {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  .ai-subtitle {
+    font-size: 1.2rem;
+    margin-top: 1rem;
+    color: #a0a0ff;
+    font-weight: 300;
+  }
+
+  /* Panel base */
+  .ai-panel {
+    background: linear-gradient(135deg, rgba(20, 20, 40, 0.9) 0%, rgba(30, 30, 60, 0.8) 100%);
+    border-radius: 1.5rem;
+    padding: 2rem;
+    border: 1px solid rgba(0, 255, 255, 0.2);
+    box-shadow: 
+      0 10px 40px rgba(0, 0, 0, 0.5),
+      0 0 20px rgba(0, 255, 255, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(15px);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .ai-panel:hover {
+    transform: translateY(-5px);
+    box-shadow: 
+      0 20px 60px rgba(0, 0, 0, 0.7),
+      0 0 40px rgba(0, 255, 255, 0.3);
+  }
+
+  .ai-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    animation: shimmer 3s infinite;
+  }
+
+  @keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+  }
+
+  /* Títulos de sección */
+  .ai-section-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #00ffff;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+  }
+
+  .ai-section-title::before {
+    content: '';
+    width: 4px;
+    height: 25px;
+    background: linear-gradient(180deg, #00ffff, #0080ff);
+    border-radius: 2px;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+  }
+
+  /* Lista de elementos */
+  .ai-list-item {
+    background: rgba(0, 20, 40, 0.6);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid #00ff00;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .ai-list-item:hover {
+    background: rgba(0, 30, 60, 0.8);
+    border-left-color: #00ffff;
+    transform: translateX(5px);
+  }
+
+  .ai-list-item.decline {
+    border-left-color: #ff4444;
+  }
+
+  .ai-list-item.warning {
+    border-left-color: #ffaa00;
+  }
+
+  /* Métricas principales */
+  .ai-metric {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .ai-metric-label {
+    color: #a0a0ff;
+    font-size: 0.9rem;
+  }
+
+  .ai-metric-value {
+    color: #00ffff;
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+
+  .ai-metric-value.positive {
+    color: #00ff00;
+  }
+
+  .ai-metric-value.negative {
+    color: #ff4444;
+  }
+
+  /* Recomendaciones especiales */
+  .ai-recommendation {
+    background: linear-gradient(135deg, rgba(0, 255, 255, 0.1) 0%, rgba(0, 0, 255, 0.1) 100%);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ai-recommendation::before {
+    content: '🔮';
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    font-size: 3rem;
+    opacity: 0.3;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .ai-rec-title {
+    font-weight: 600;
+    color: #00ffff;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+  }
+
+  .ai-rec-message {
+    color: #e0e6ff;
+    line-height: 1.4;
+    margin-bottom: 1rem;
+  }
+
+  .ai-rec-impact {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .ai-rec-impact.alto {
+    background: rgba(255, 0, 100, 0.2);
+    color: #ff6b9d;
+    border: 1px solid rgba(255, 0, 100, 0.3);
+  }
+
+  .ai-rec-impact.medio {
+    background: rgba(255, 200, 0, 0.2);
+    color: #ffd700;
+    border: 1px solid rgba(255, 200, 0, 0.3);
+  }
+
+  /* Alertas críticas */
+  .ai-alert {
+    padding: 1rem;
+    border-radius: 0.75rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid;
+    animation: alertPulse 2s infinite ease-in-out;
+  }
+
+  .ai-alert.critica {
+    background: rgba(255, 0, 0, 0.1);
+    border-left-color: #ff0000;
+    color: #ffcccc;
+  }
+
+  .ai-alert.advertencia {
+    background: rgba(255, 165, 0, 0.1);
+    border-left-color: #ffaa00;
+    color: #ffeacc;
+  }
+
+  .ai-alert.oportunidad {
+    background: rgba(0, 255, 0, 0.1);
+    border-left-color: #00ff00;
+    color: #ccffcc;
+  }
+
+  @keyframes alertPulse {
+    0%, 100% { box-shadow: 0 0 5px rgba(255, 0, 0, 0.3); }
+    50% { box-shadow: 0 0 20px rgba(255, 0, 0, 0.6); }
+  }
+
+  /* Insights con efecto de escritura */
+  .ai-insight {
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.9rem;
+    border: 1px solid rgba(0, 255, 0, 0.2);
+    position: relative;
+  }
+
+  .ai-insight::after {
+    content: '▋';
+    color: #00ff00;
+    animation: blink 1s infinite;
+  }
+
+  @keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+  }
+
+  /* Predicciones con gráfico visual */
+  .ai-prediction {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background: rgba(0, 50, 100, 0.2);
+    border-radius: 0.75rem;
+    margin-bottom: 0.75rem;
+    border: 1px solid rgba(0, 150, 255, 0.3);
+  }
+
+  .ai-prediction-month {
+    font-weight: 600;
+    color: #00aaff;
+  }
+
+  .ai-prediction-amount {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #00ffaa;
+  }
+
+  .ai-confidence {
+    font-size: 0.8rem;
+    color: #aaccff;
+  }
+
+  /* Tabla comparativa */
+  .ai-comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+  }
+
+  .ai-comparison-table th,
+  .ai-comparison-table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+  }
+
+  .ai-comparison-table th {
+    background: rgba(0, 255, 255, 0.1);
+    color: #00ffff;
+    font-weight: 600;
+  }
+
+  .ai-comparison-table td {
+    color: #e0e6ff;
+  }
+
+  .precio-subir {
+    color: #ff6b6b;
+  }
+
+  .precio-mantener {
+    color: #51cf66;
+  }
+
+  .precio-equilibrado {
+    color: #74c0fc;
+  }
+
+  /* Navegación mejorada */
+  .ai-nav {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.9) 0%, rgba(20, 20, 40, 0.9) 100%);
+    backdrop-filter: blur(20px);
+    border-radius: 2rem;
+    padding: 1rem 2rem;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(0, 255, 255, 0.2);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  }
+
+  .ai-nav-btn {
+    background: linear-gradient(45deg, #00ffff, #0080ff);
+    color: #000;
+    border: none;
+    border-radius: 1.5rem;
+    padding: 0.75rem 1.5rem;
+    font-family: 'Orbitron', monospace;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+    margin: 0 0.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 255, 255, 0.3);
+  }
+
+  .ai-nav-btn:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 10px 25px rgba(0, 255, 255, 0.5);
+    background: linear-gradient(45deg, #ff00ff, #ff6b9d);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .ai-grid {
+      grid-template-columns: 1fr;
+      padding: 1rem;
+      gap: 1rem;
+    }
+    
+    .ai-title {
+      font-size: 2.5rem;
+    }
+    
+    .ai-header {
+      padding: 2rem 1rem;
+    }
+    
+    .ai-panel {
+      padding: 1.5rem;
+    }
+  }
+
+  /* Animación de entrada */
+  .ai-panel {
+    animation: slideInUp 0.6s ease-out forwards;
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  .ai-panel:nth-child(1) { animation-delay: 0.1s; }
+  .ai-panel:nth-child(2) { animation-delay: 0.2s; }
+  .ai-panel:nth-child(3) { animation-delay: 0.3s; }
+  .ai-panel:nth-child(4) { animation-delay: 0.4s; }
+  .ai-panel:nth-child(5) { animation-delay: 0.5s; }
+  .ai-panel:nth-child(6) { animation-delay: 0.6s; }
+
+  @keyframes slideInUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Efecto de texto tipeado */
+  .typing-effect {
+    overflow: hidden;
+    border-right: 2px solid #00ff00;
+    white-space: nowrap;
+    animation: typing 3s steps(40, end), blink-caret 0.75s step-end infinite;
+  }
+
+  @keyframes typing {
+    from { width: 0; }
+    to { width: 100%; }
+  }
+
+  @keyframes blink-caret {
+    from, to { border-color: transparent; }
+    50% { border-color: #00ff00; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ai-background"></div>
+
+<!-- Navegación -->
+<nav class="ai-nav max-w-6xl mx-auto flex items-center justify-between">
+  <div class="flex items-center gap-4">
+    <img src="{% static 'img/TallerPro_logo.png' %}" alt="Logo" class="h-10 w-10 rounded-full border-2 border-cyan-400">
+    <span class="text-xl font-bold text-cyan-400" style="font-family: 'Orbitron', monospace;">eGarage AI</span>
+  </div>
+  <div class="flex gap-2">
+    <a href="/dashboard/" class="ai-nav-btn">🏠 Dashboard</a>
+    <a href="/reportes/" class="ai-nav-btn">📊 Reportes</a>
+    <a href="/reportes/inteligencia/" class="ai-nav-btn">🔮 Inteligencia</a>
+  </div>
+</nav>
+
+<div class="ai-grid">
+  <!-- Header principal -->
+  <div class="ai-header">
+    <h1 class="ai-title">DIAGNÓSTICO IA</h1>
+    <p class="ai-subtitle typing-effect">Sistema de Análisis Predictivo Avanzado</p>
+    <div class="text-sm mt-4 text-cyan-300">
+      📅 Análisis realizado: {{ fecha_analisis }} | 📊 Documentos procesados: {{ total_documentos }}
+    </div>
+  </div>
+
+  <!-- Servicios en Crecimiento -->
+  <div class="ai-panel">
+    <h2 class="ai-section-title">🚀 Servicios en Ascenso</h2>
+    {% for servicio in servicios_crecimiento %}
+    <div class="ai-list-item">
+      <div class="ai-metric">
+        <span class="ai-metric-label">{{ servicio.servicio }}</span>
+        <span class="ai-metric-value positive">+{{ servicio.crecimiento }}%</span>
+      </div>
+      <div class="text-sm text-cyan-300 mb-2">
+        Ingresos: ${{ servicio.ingresos_ultimo_mes|floatformat:0 }} → Proyección: ${{ servicio.prediccion|floatformat:0 }}
+      </div>
+      <div class="text-xs text-green-400">{{ servicio.recomendacion }}</div>
+    </div>
+    {% empty %}
+    <div class="ai-list-item">
+      <div class="text-center text-cyan-400">🔄 Analizando patrones de crecimiento...</div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Servicios en Declive -->
+  <div class="ai-panel">
+    <h2 class="ai-section-title">📉 Servicios en Declive</h2>
+    {% for servicio in servicios_declive %}
+    <div class="ai-list-item decline">
+      <div class="ai-metric">
+        <span class="ai-metric-label">{{ servicio.servicio }}</span>
+        <span class="ai-metric-value negative">-{{ servicio.declive }}%</span>
+      </div>
+      <div class="text-sm text-red-300 mb-2">
+        Pérdida estimada: ${{ servicio.ingresos_perdidos|floatformat:0 }}
+      </div>
+      <div class="text-xs text-orange-400">{{ servicio.accion_recomendada }}</div>
+    </div>
+    {% empty %}
+    <div class="ai-list-item">
+      <div class="text-center text-cyan-400">✅ No se detectaron servicios en declive crítico</div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Análisis Estacional -->
+  <div class="ai-panel">
+    <h2 class="ai-section-title">🌟 Patrones Estacionales</h2>
+    {% for patron in estacionalidad %}
+    <div class="ai-list-item">
+      <div class="ai-metric">
+        <span class="ai-metric-label">{{ patron.servicio }}</span>
+        <span class="ai-metric-value">{{ patron.mejor_estacion }}</span>
+      </div>
+      <div class="text-sm text-cyan-300 mb-2">
+        Pico de ingresos: ${{ patron.ingresos_estacion|floatformat:0 }}
+      </div>
+      <div class="text-xs text-blue-400">{{ patron.recomendacion_estacional }}</div>
+    </div>
+    {% empty %}
+    <div class="ai-list-item">
+      <div class="text-center text-cyan-400">📊 Procesando datos estacionales...</div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Comparativa de Mercado -->
+  <div class="ai-panel">
+    <h2 class="ai-section-title">📊 Comparativa de Mercado</h2>
+    <table class="ai-comparison-table">
+      <thead>
+        <tr>
+          <th>Servicio</th>
+          <th>Nuestro Precio</th>
+          <th>Mercado</th>
+          <th>Diferencia</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for comp in comparativa_mercado %}
+        <tr>
+          <td>{{ comp.servicio }}</td>
+          <td>${{ comp.nuestro_precio|floatformat:0 }}</td>
+          <td>${{ comp.precio_mercado|floatformat:0 }}</td>
+          <td class="{% if comp.diferencia < 0 %}precio-subir{% elif comp.diferencia > 5 %}precio-mantener{% else %}precio-equilibrado{% endif %}">
+            {{ comp.diferencia|floatformat:1 }}%
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Recomendaciones de IA -->
+  <div class="ai-panel">
+    <h2 class="ai-section-title">🔮 Recomendaciones IA</h2>
+    {% for rec in recomendaciones_ia %}
+    <div class="ai-recommendation">
+      <div class="ai-rec-title">{{ rec.icono }} {{ rec.titulo }}</div>
+      <div class="ai-rec-message">{{ rec.mensaje }}</div>
+      <div class="flex justify-between items-center">
+        <span class="ai-rec-impact {{ rec.impacto|lower }}">{{ rec.impacto }} Impacto</span>
+        <span class="text-xs text-cyan-400">Confianza: {{ rec.probabilidad }}%</span>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Predicciones de Ingresos -->
+  <div class="ai-panel">
+    <h2 class="ai-section-title">💰 Predicciones de Ingresos</h2>
+    {% for pred in predicciones_ingresos %}
+    <div class="ai-prediction">
+      <div>
+        <div class="ai-prediction-month">{{ pred.mes }}</div>
+        <div class="ai-confidence">Confianza: {{ pred.confianza }}%</div>
+      </div>
+      <div class="ai-prediction-amount">${{ pred.ingreso_predicho|floatformat:0 }}</div>
+    </div>
+    <div class="text-xs text-gray-400 mb-3">
+      Rango: ${{ pred.rango_min|floatformat:0 }} - ${{ pred.rango_max|floatformat:0 }}
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Alertas Críticas -->
+  <div class="ai-panel">
+    <h2 class="ai-section-title">🚨 Alertas del Sistema</h2>
+    {% for alerta in alertas_criticas %}
+    <div class="ai-alert {{ alerta.nivel }}">
+      <div class="font-semibold mb-2">{{ alerta.icono }} {{ alerta.titulo }}</div>
+      <div class="text-sm mb-2">{{ alerta.mensaje }}</div>
+      <div class="text-xs font-semibold">Acción: {{ alerta.accion }}</div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Insights Automáticos -->
+  <div class="ai-panel">
+    <h2 class="ai-section-title">💡 Insights Automáticos</h2>
+    {% for insight in insights_ai %}
+    <div class="ai-insight">{{ insight }}</div>
+    {% endfor %}
+    <div class="text-xs text-center text-cyan-400 mt-4">
+      🤖 Análisis generado por IA en tiempo real
+    </div>
+  </div>
+</div>
+
+<script>
+// Efecto de typing para insights
+document.addEventListener('DOMContentLoaded', function() {
+  const insights = document.querySelectorAll('.ai-insight');
+  
+  insights.forEach((insight, index) => {
+    setTimeout(() => {
+      insight.style.animation = 'slideInUp 0.5s ease-out forwards';
+    }, index * 500);
+  });
+  
+  // Actualización automática cada 30 segundos (simulada)
+  setInterval(() => {
+    const indicators = document.querySelectorAll('.ai-metric-value');
+    indicators.forEach(indicator => {
+      indicator.style.animation = 'flash 0.5s ease-in-out';
+    });
+  }, 30000);
+  
+  // Efecto de hover para paneles
+  const panels = document.querySelectorAll('.ai-panel');
+  panels.forEach(panel => {
+    panel.addEventListener('mouseenter', function() {
+      this.style.transform = 'translateY(-5px) scale(1.02)';
+    });
+    
+    panel.addEventListener('mouseleave', function() {
+      this.style.transform = 'translateY(0) scale(1)';
+    });
+  });
+});
+
+// Animación de flash
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes flash {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %}

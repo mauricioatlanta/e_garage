@@ -1,0 +1,443 @@
+{
+  "empresa": {
+    "id": 13,
+    "nombre_taller": "Administración E-Garage",
+    "empresa": "E-Garage Admin",
+    "direccion": "",
+    "telefono": "",
+    "email": "",
+    "fecha_inicio": "2025-07-21T17:57:40.554920+00:00",
+    "suscripcion_activa": true
+  },
+  "timestamp": "20250722_203339",
+  "version": "1.0",
+  "datos": {
+    "perfiles_usuario": [
+      {
+        "model": "taller.perfilusuario",
+        "pk": 2,
+        "fields": {
+          "user": 13,
+          "empresa": 13,
+          "rol": "admin"
+        }
+      }
+    ],
+    "clientes": [
+      {
+        "model": "taller.cliente",
+        "pk": 8,
+        "fields": {
+          "empresa": 13,
+          "nombre": "Cliente Test 1",
+          "apellido": "Empresa Administración E-Garage",
+          "telefono": "123456780",
+          "direccion": null,
+          "region": null,
+          "ciudad": null,
+          "email": "cliente0@administracióne-garage.com"
+        }
+      },
+      {
+        "model": "taller.cliente",
+        "pk": 10,
+        "fields": {
+          "empresa": 13,
+          "nombre": "Cliente Test 1",
+          "apellido": "Empresa Administración E-Garage",
+          "telefono": "123456780",
+          "direccion": null,
+          "region": null,
+          "ciudad": null,
+          "email": "cliente0@administracióne-garage.com"
+        }
+      },
+      {
+        "model": "taller.cliente",
+        "pk": 12,
+        "fields": {
+          "empresa": 13,
+          "nombre": "Cliente Web Test",
+          "apellido": null,
+          "telefono": "123456789",
+          "direccion": null,
+          "region": null,
+          "ciudad": null,
+          "email": "test@test.com"
+        }
+      },
+      {
+        "model": "taller.cliente",
+        "pk": 13,
+        "fields": {
+          "empresa": 13,
+          "nombre": "Cliente Prueba",
+          "apellido": "Test",
+          "telefono": "987654321",
+          "direccion": null,
+          "region": null,
+          "ciudad": null,
+          "email": "cliente@test.com"
+        }
+      }
+    ],
+    "vehiculos": [
+      {
+        "model": "taller.vehiculo",
+        "pk": 8,
+        "fields": {
+          "empresa": 13,
+          "cliente": 2,
+          "marca": 90,
+          "modelo": 1099,
+          "patente": "ABC123",
+          "anio": 2020,
+          "color": null,
+          "vin": null,
+          "motor": null,
+          "caja": null
+        }
+      },
+      {
+        "model": "taller.vehiculo",
+        "pk": 9,
+        "fields": {
+          "empresa": 13,
+          "cliente": 12,
+          "marca": 90,
+          "modelo": 1099,
+          "patente": "WEB123",
+          "anio": 2020,
+          "color": null,
+          "vin": null,
+          "motor": null,
+          "caja": null
+        }
+      }
+    ],
+    "mecanicos": [],
+    "documentos": [
+      {
+        "model": "taller.documento",
+        "pk": 11,
+        "fields": {
+          "empresa": 13,
+          "tipo_documento": "Presupuesto",
+          "numero_documento": "TEST-001",
+          "fecha": "2025-07-21",
+          "cliente": 2,
+          "vehiculo": null,
+          "kilometraje": null,
+          "observaciones": null,
+          "mecanico": null
+        }
+      },
+      {
+        "model": "taller.documento",
+        "pk": 14,
+        "fields": {
+          "empresa": 13,
+          "tipo_documento": "Presupuesto",
+          "numero_documento": "TEST-COMPLETO-001",
+          "fecha": "2025-07-21",
+          "cliente": 2,
+          "vehiculo": null,
+          "kilometraje": 50000,
+          "observaciones": "Documento de prueba para testing de edición",
+          "mecanico": null
+        }
+      },
+      {
+        "model": "taller.documento",
+        "pk": 18,
+        "fields": {
+          "empresa": 13,
+          "tipo_documento": "Presupuesto",
+          "numero_documento": "TEST-13-003",
+          "fecha": "2025-07-22",
+          "cliente": 8,
+          "vehiculo": null,
+          "kilometraje": 100000,
+          "observaciones": null,
+          "mecanico": 17
+        }
+      },
+      {
+        "model": "taller.documento",
+        "pk": 21,
+        "fields": {
+          "empresa": 13,
+          "tipo_documento": "Presupuesto",
+          "numero_documento": "TEST-13-004",
+          "fecha": "2025-07-22",
+          "cliente": 8,
+          "vehiculo": null,
+          "kilometraje": 100000,
+          "observaciones": null,
+          "mecanico": 17
+        }
+      },
+      {
+        "model": "taller.documento",
+        "pk": 28,
+        "fields": {
+          "empresa": 13,
+          "tipo_documento": "Presupuesto",
+          "numero_documento": "TEST-00001",
+          "fecha": "2025-07-22",
+          "cliente": 2,
+          "vehiculo": 8,
+          "kilometraje": 50000,
+          "observaciones": "Documento de prueba",
+          "mecanico": 21
+        }
+      },
+      {
+        "model": "taller.documento",
+        "pk": 39,
+        "fields": {
+          "empresa": 13,
+          "tipo_documento": "Orden de trabajo",
+          "numero_documento": "TEST-DOC-001",
+          "fecha": "2025-07-22",
+          "cliente": 13,
+          "vehiculo": null,
+          "kilometraje": null,
+          "observaciones": "Documento de prueba para detectar errores",
+          "mecanico": null
+        }
+      }
+    ],
+    "repuestos": [],
+    "repuestos_documento": [
+      {
+        "model": "taller.repuestodocumento",
+        "pk": 1,
+        "fields": {
+          "documento": 11,
+          "repuesto": null,
+          "codigo": "REP001",
+          "nombre": "Filtro de aceite",
+          "cantidad": 2,
+          "precio": 15000
+        }
+      },
+      {
+        "model": "taller.repuestodocumento",
+        "pk": 2,
+        "fields": {
+          "documento": 14,
+          "repuesto": null,
+          "codigo": "FIL001",
+          "nombre": "Filtro de aceite",
+          "cantidad": 2,
+          "precio": 15000
+        }
+      },
+      {
+        "model": "taller.repuestodocumento",
+        "pk": 3,
+        "fields": {
+          "documento": 14,
+          "repuesto": null,
+          "codigo": "FIL002",
+          "nombre": "Filtro de aire",
+          "cantidad": 1,
+          "precio": 12000
+        }
+      },
+      {
+        "model": "taller.repuestodocumento",
+        "pk": 4,
+        "fields": {
+          "documento": 14,
+          "repuesto": null,
+          "codigo": "ACE001",
+          "nombre": "Aceite 5W30",
+          "cantidad": 4,
+          "precio": 8000
+        }
+      },
+      {
+        "model": "taller.repuestodocumento",
+        "pk": 11,
+        "fields": {
+          "documento": 18,
+          "repuesto": null,
+          "codigo": "TEST001",
+          "nombre": "Repuesto Test Administración E-Garage",
+          "cantidad": 1,
+          "precio": 25000
+        }
+      },
+      {
+        "model": "taller.repuestodocumento",
+        "pk": 14,
+        "fields": {
+          "documento": 21,
+          "repuesto": null,
+          "codigo": "TEST001",
+          "nombre": "Repuesto Test Administración E-Garage",
+          "cantidad": 1,
+          "precio": 25000
+        }
+      },
+      {
+        "model": "taller.repuestodocumento",
+        "pk": 19,
+        "fields": {
+          "documento": 28,
+          "repuesto": null,
+          "codigo": "REP001",
+          "nombre": "Filtro de aceite",
+          "cantidad": 1,
+          "precio": 15000
+        }
+      },
+      {
+        "model": "taller.repuestodocumento",
+        "pk": 20,
+        "fields": {
+          "documento": 28,
+          "repuesto": null,
+          "codigo": "REP002",
+          "nombre": "Pastillas de freno",
+          "cantidad": 2,
+          "precio": 45000
+        }
+      },
+      {
+        "model": "taller.repuestodocumento",
+        "pk": 24,
+        "fields": {
+          "documento": 39,
+          "repuesto": null,
+          "codigo": "FLT-001",
+          "nombre": "Filtro de aceite",
+          "cantidad": 1,
+          "precio": 15000
+        }
+      },
+      {
+        "model": "taller.repuestodocumento",
+        "pk": 25,
+        "fields": {
+          "documento": 39,
+          "repuesto": null,
+          "codigo": "OIL-001",
+          "nombre": "Aceite motor 5W30",
+          "cantidad": 4,
+          "precio": 8000
+        }
+      }
+    ],
+    "servicios_documento": [
+      {
+        "model": "taller.serviciodocumento",
+        "pk": 1,
+        "fields": {
+          "empresa": 13,
+          "documento": 11,
+          "nombre": "Cambio de aceite",
+          "precio": 25000
+        }
+      },
+      {
+        "model": "taller.serviciodocumento",
+        "pk": 2,
+        "fields": {
+          "empresa": 13,
+          "documento": 14,
+          "nombre": "Cambio de aceite",
+          "precio": 25000
+        }
+      },
+      {
+        "model": "taller.serviciodocumento",
+        "pk": 3,
+        "fields": {
+          "empresa": 13,
+          "documento": 14,
+          "nombre": "Cambio de filtros",
+          "precio": 15000
+        }
+      },
+      {
+        "model": "taller.serviciodocumento",
+        "pk": 4,
+        "fields": {
+          "empresa": 13,
+          "documento": 14,
+          "nombre": "Revisión general",
+          "precio": 35000
+        }
+      },
+      {
+        "model": "taller.serviciodocumento",
+        "pk": 9,
+        "fields": {
+          "empresa": 13,
+          "documento": 18,
+          "nombre": "Servicio Test Administración E-Garage",
+          "precio": 35000
+        }
+      },
+      {
+        "model": "taller.serviciodocumento",
+        "pk": 12,
+        "fields": {
+          "empresa": 13,
+          "documento": 21,
+          "nombre": "Servicio Test Administración E-Garage",
+          "precio": 35000
+        }
+      },
+      {
+        "model": "taller.serviciodocumento",
+        "pk": 17,
+        "fields": {
+          "empresa": 13,
+          "documento": 28,
+          "nombre": "Cambio de aceite",
+          "precio": 25000
+        }
+      },
+      {
+        "model": "taller.serviciodocumento",
+        "pk": 18,
+        "fields": {
+          "empresa": 13,
+          "documento": 28,
+          "nombre": "Alineación",
+          "precio": 35000
+        }
+      },
+      {
+        "model": "taller.serviciodocumento",
+        "pk": 22,
+        "fields": {
+          "empresa": 13,
+          "documento": 39,
+          "nombre": "Cambio de aceite",
+          "precio": 25000
+        }
+      },
+      {
+        "model": "taller.serviciodocumento",
+        "pk": 23,
+        "fields": {
+          "empresa": 13,
+          "documento": 39,
+          "nombre": "Revisión de frenos",
+          "precio": 35000
+        }
+      }
+    ]
+  },
+  "estadisticas": {
+    "total_registros": 33,
+    "total_documentos": 6,
+    "total_logs": 0,
+    "size_mb": 0.01
+  }
+}

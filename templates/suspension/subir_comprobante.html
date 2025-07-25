@@ -1,0 +1,172 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subir Comprobante - eGarage</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
+                <i class="fas fa-upload text-blue-600 text-2xl"></i>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Subir Comprobante de Pago</h1>
+            <p class="text-gray-600">{{ empresa.nombre_taller }}</p>
+        </div>
+
+        <!-- Formulario -->
+        <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="bg-blue-600 text-white p-6">
+                <h2 class="text-xl font-bold mb-2">
+                    <i class="fas fa-file-invoice-dollar mr-2"></i>
+                    Información del Pago
+                </h2>
+                <p class="text-blue-100">Completa todos los campos para procesar tu pago más rápido</p>
+            </div>
+            
+            <form method="post" enctype="multipart/form-data" class="p-6">
+                {% csrf_token %}
+                
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="mb-4 p-4 rounded-lg {% if message.tags == 'success' %}bg-green-50 border border-green-200 text-green-700{% else %}bg-red-50 border border-red-200 text-red-700{% endif %}">
+                            <div class="flex items-center">
+                                <i class="fas {% if message.tags == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %} mr-2"></i>
+                                {{ message }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Plan y Monto -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.plan_solicitado.label }}
+                        </label>
+                        {{ form.plan_solicitado }}
+                        {% if form.plan_solicitado.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.plan_solicitado.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.monto.label }}
+                        </label>
+                        {{ form.monto }}
+                        {% if form.monto.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.monto.errors.0 }}</p>
+                        {% endif %}
+                        <p class="mt-1 text-xs text-gray-500">{{ form.monto.help_text }}</p>
+                    </div>
+                    
+                    <!-- Método de Pago -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.metodo_pago.label }}
+                        </label>
+                        {{ form.metodo_pago }}
+                        {% if form.metodo_pago.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.metodo_pago.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Número de Transacción -->
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            {{ form.numero_transaccion.label }}
+                        </label>
+                        {{ form.numero_transaccion }}
+                        {% if form.numero_transaccion.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.numero_transaccion.errors.0 }}</p>
+                        {% endif %}
+                        <p class="mt-1 text-xs text-gray-500">{{ form.numero_transaccion.help_text }}</p>
+                    </div>
+                </div>
+                
+                <!-- Archivo de Comprobante -->
+                <div class="mt-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.comprobante.label }}
+                    </label>
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
+                        {{ form.comprobante }}
+                        {% if form.comprobante.errors %}
+                            <p class="mt-1 text-sm text-red-600">{{ form.comprobante.errors.0 }}</p>
+                        {% endif %}
+                        <div class="mt-2">
+                            <i class="fas fa-cloud-upload-alt text-gray-400 text-3xl mb-2"></i>
+                            <p class="text-sm text-gray-600">{{ form.comprobante.help_text }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Comentarios -->
+                <div class="mt-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.descripcion.label }}
+                    </label>
+                    {{ form.descripcion }}
+                    {% if form.descripcion.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.descripcion.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Botones -->
+                <div class="mt-8 flex space-x-4">
+                    <button type="submit" 
+                            class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors">
+                        <i class="fas fa-upload mr-2"></i>
+                        Subir Comprobante
+                    </button>
+                    
+                    <a href="{% url 'suspension' %}" 
+                       class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 font-bold py-3 px-4 rounded-lg transition-colors text-center">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Volver
+                    </a>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Información adicional -->
+        <div class="max-w-2xl mx-auto mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <h3 class="font-semibold text-blue-800 mb-3">
+                <i class="fas fa-info-circle mr-2"></i>
+                Información Importante
+            </h3>
+            <ul class="text-sm text-blue-700 space-y-2">
+                <li><i class="fas fa-check mr-2"></i>Los comprobantes son revisados en 24-48 horas</li>
+                <li><i class="fas fa-check mr-2"></i>Recibirás notificación por email del estado</li>
+                <li><i class="fas fa-check mr-2"></i>Archivos permitidos: PDF, JPG, PNG (máx. 5MB)</li>
+                <li><i class="fas fa-check mr-2"></i>Incluye toda la información visible del pago</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        // Preview del archivo seleccionado
+        document.querySelector('input[type="file"]').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const fileInfo = document.createElement('p');
+                fileInfo.className = 'mt-2 text-sm text-green-600';
+                fileInfo.innerHTML = `<i class="fas fa-file mr-2"></i>Archivo seleccionado: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+                
+                // Remover info previa si existe
+                const existingInfo = e.target.parentNode.querySelector('.file-info');
+                if (existingInfo) existingInfo.remove();
+                
+                fileInfo.classList.add('file-info');
+                e.target.parentNode.appendChild(fileInfo);
+            }
+        });
+    </script>
+</body>
+</html>

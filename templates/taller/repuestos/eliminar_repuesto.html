@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Eliminar Repuesto{% endblock %}
+
+{% block content %}
+<style>
+    body, .cuadro, .cuadro *, table, thead, tbody, th, td, label, input, select, textarea, option {
+        color: #111 !important;
+    }
+    input[type="text"]::placeholder, textarea::placeholder {
+        color: #444 !important;
+    }
+    .danger-card {
+        background: linear-gradient(135deg, #fee2e2 0%, #fef2f2 100%);
+        border: 2px solid #f87171;
+    }
+    .repuesto-info {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 1rem;
+        margin: 1rem 0;
+    }
+</style>
+
+<div class="max-w-2xl mx-auto mt-10 p-6">
+    <div class="danger-card rounded-lg shadow-lg p-8">
+        <!-- Título de advertencia -->
+        <div class="flex items-center mb-6">
+            <svg class="w-8 h-8 text-red-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 15.5c-.77.833.192 2.5 1.732 2.5z"></path>
+            </svg>
+            <h1 class="text-2xl font-bold text-red-600">¡Atención! Eliminación de Repuesto</h1>
+        </div>
+
+        <!-- Información del repuesto -->
+        {% if repuesto %}
+        <div class="repuesto-info">
+            <h3 class="text-lg font-semibold text-gray-800 mb-3">Información del repuesto a eliminar:</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div>
+                    <span class="font-medium text-gray-600">Nombre:</span>
+                    <span class="text-gray-800 ml-2">{{ repuesto.nombre_repuesto }}</span>
+                </div>
+                <div>
+                    <span class="font-medium text-gray-600">Part Number:</span>
+                    <span class="text-gray-800 ml-2">{{ repuesto.part_number|default:"No especificado" }}</span>
+                </div>
+                <div>
+                    <span class="font-medium text-gray-600">Precio Compra:</span>
+                    <span class="text-gray-800 ml-2">${{ repuesto.precio_compra|floatformat:0|default:"0" }}</span>
+                </div>
+                <div>
+                    <span class="font-medium text-gray-600">Precio Venta:</span>
+                    <span class="text-gray-800 ml-2">${{ repuesto.precio_venta|floatformat:0|default:"0" }}</span>
+                </div>
+                <div>
+                    <span class="font-medium text-gray-600">Stock:</span>
+                    <span class="text-gray-800 ml-2">{{ repuesto.stock|default:"0" }} unidades</span>
+                </div>
+                <div>
+                    <span class="font-medium text-gray-600">Tienda:</span>
+                    <span class="text-gray-800 ml-2">{{ repuesto.tienda|default:"No asignada" }}</span>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Mensaje de advertencia -->
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-yellow-700">
+                        <strong>Esta acción no se puede deshacer.</strong> Al eliminar este repuesto:
+                    </p>
+                    <ul class="mt-2 text-sm text-yellow-700 list-disc list-inside">
+                        <li>Se perderá toda la información del repuesto</li>
+                        <li>Se eliminará de todos los registros asociados</li>
+                        <li>No podrá ser utilizado en futuras órdenes de trabajo</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mensaje de error si no se encuentra el repuesto -->
+        {% if not repuesto %}
+        <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-red-700">
+                        <strong>Error:</strong> No se encontró el repuesto con ID {{ repuesto_id }}.
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Formulario de confirmación -->
+        {% if repuesto %}
+        <form method="post" class="mt-6">
+            {% csrf_token %}
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <!-- Botón Cancelar -->
+                <a href="/repuestos/" 
+                   class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 rounded-md shadow-sm text-base font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    Cancelar
+                </a>
+
+                <!-- Botón Eliminar -->
+                <button type="submit" 
+                        class="inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200"
+                        onclick="return confirm('¿Está completamente seguro de que desea eliminar este repuesto? Esta acción NO se puede deshacer.')">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                    Sí, Eliminar Repuesto
+                </button>
+            </div>
+        </form>
+        {% else %}
+        <!-- Botón para volver si no se encuentra el repuesto -->
+        <div class="flex justify-center mt-6">
+            <a href="/repuestos/" 
+               class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 rounded-md shadow-sm text-base font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                Volver a Repuestos
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

@@ -21,6 +21,8 @@ class AuditModelMixin(models.Model):
 
 
 class Cliente(models.Model):
+    # Este campo conecta cada registro con la empresa dueña del dato
+    empresa = models.ForeignKey('taller.Empresa', on_delete=models.CASCADE)  # Campo obligatorio
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=100, blank=True, null=True)
     telefono = models.CharField(max_length=15, blank=True, null=True)

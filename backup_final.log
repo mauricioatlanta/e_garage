@@ -1,0 +1,42 @@
+2025-07-22 20:33:39,538 - INFO - === INICIANDO BACKUP FINAL ===
+2025-07-22 20:33:39,574 - INFO - Empresas a respaldar: 6
+2025-07-22 20:33:39,578 - INFO - Iniciando backup para empresa: Administración E-Garage
+2025-07-22 20:33:39,729 - INFO -   - perfiles_usuario: 1 registros
+2025-07-22 20:33:39,733 - INFO -   - clientes: 4 registros
+2025-07-22 20:33:39,739 - INFO -   - vehiculos: 2 registros
+2025-07-22 20:33:39,745 - INFO -   - documentos: 6 registros
+2025-07-22 20:33:39,763 - INFO -   - repuestos_documento: 10 registros
+2025-07-22 20:33:39,765 - INFO -   - servicios_documento: 10 registros
+2025-07-22 20:33:39,826 - INFO - Backup completado: backup_Administración E-Garage_20250722_203339.json (0.01 MB)
+2025-07-22 20:33:40,052 - INFO - Iniciando backup para empresa: Taller AutoFix
+2025-07-22 20:33:40,054 - INFO -   - perfiles_usuario: 1 registros
+2025-07-22 20:33:40,056 - INFO -   - clientes: 5 registros
+2025-07-22 20:33:40,058 - INFO -   - vehiculos: 4 registros
+2025-07-22 20:33:40,061 - INFO -   - documentos: 4 registros
+2025-07-22 20:33:40,089 - INFO -   - repuestos: 2 registros
+2025-07-22 20:33:40,103 - INFO -   - repuestos_documento: 7 registros
+2025-07-22 20:33:40,108 - INFO -   - servicios_documento: 6 registros
+2025-07-22 20:33:40,120 - INFO - Backup completado: backup_Taller AutoFix_20250722_203340.json (0.01 MB)
+2025-07-22 20:33:40,194 - INFO - Iniciando backup para empresa: Mecánica Express
+2025-07-22 20:33:40,202 - INFO -   - perfiles_usuario: 1 registros
+2025-07-22 20:33:40,204 - INFO -   - clientes: 3 registros
+2025-07-22 20:33:40,207 - INFO -   - vehiculos: 3 registros
+2025-07-22 20:33:40,223 - INFO -   - mecanicos: 2 registros
+2025-07-22 20:33:40,225 - INFO -   - documentos: 2 registros
+2025-07-22 20:33:40,227 - INFO -   - repuestos: 2 registros
+2025-07-22 20:33:40,234 - INFO -   - repuestos_documento: 1 registros
+2025-07-22 20:33:40,234 - INFO -   - servicios_documento: 1 registros
+2025-07-22 20:33:40,244 - INFO - Backup completado: backup_Mecánica Express_20250722_203340.json (0.01 MB)
+2025-07-22 20:33:40,295 - INFO - Iniciando backup para empresa: Taller de test_totales
+2025-07-22 20:33:40,307 - INFO -   - perfiles_usuario: 1 registros
+2025-07-22 20:33:40,316 - INFO - Backup completado: backup_Taller de test_totales_20250722_203340.json (0.00 MB)
+2025-07-22 20:33:40,361 - INFO - Iniciando backup para empresa: Taller de test_campos
+2025-07-22 20:33:40,367 - INFO -   - perfiles_usuario: 1 registros
+2025-07-22 20:33:40,382 - INFO - Backup completado: backup_Taller de test_campos_20250722_203340.json (0.00 MB)
+2025-07-22 20:33:40,426 - INFO - Iniciando backup para empresa: Taller de test_mecanicos
+2025-07-22 20:33:40,428 - INFO -   - perfiles_usuario: 1 registros
+2025-07-22 20:33:40,440 - INFO - Backup completado: backup_Taller de test_mecanicos_20250722_203340.json (0.00 MB)
+2025-07-22 20:33:40,545 - INFO - === BACKUP COMPLETADO ===
+2025-07-22 20:33:40,545 - INFO - Tiempo total: 0:00:01.006549
+2025-07-22 20:33:40,546 - INFO - Backups exitosos: 6
+2025-07-22 20:33:40,547 - INFO - Backups fallidos: 0

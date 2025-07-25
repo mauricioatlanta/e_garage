@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Información de Usuarios de Prueba - eGarage</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; 
+            margin: 0; 
+            padding: 40px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 30px; 
+            border-radius: 15px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .header h1 {
+            margin: 0;
+            color: #333;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+            margin: 10px 0;
+        }
+        .usuario-card { 
+            border: 2px solid #e0e0e0; 
+            margin: 25px 0; 
+            padding: 25px; 
+            border-radius: 12px; 
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .usuario-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+        .usuario-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .chile { border-color: #0033A0; }
+        .chile::before { background: linear-gradient(90deg, #0033A0, #FF0000); }
+        .usa { border-color: #B22234; }
+        .usa::before { background: linear-gradient(90deg, #B22234, #3C3B6E); }
+        .gratuito { background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%); }
+        .pagado { background: linear-gradient(135deg, #f0fff0 0%, #e6ffe6 100%); }
+        .credential { 
+            background: #2d3748; 
+            color: white;
+            padding: 15px; 
+            border-radius: 8px; 
+            font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
+            margin: 15px 0;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .credential strong {
+            color: #68d391;
+        }
+        .login-section {
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin: 25px 0;
+            text-align: center;
+        }
+        .login-section h3 {
+            margin: 0 0 15px 0;
+            font-size: 1.5rem;
+        }
+        .login-link {
+            display: inline-block;
+            background: white;
+            color: #3182ce;
+            padding: 12px 25px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        .login-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .usuario-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .usuario-title h2 {
+            margin: 0;
+            color: #2d3748;
+            font-size: 1.5rem;
+        }
+        .plan-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .plan-gratuito {
+            background: #bee3f8;
+            color: #2b6cb0;
+        }
+        .plan-pagado {
+            background: #c6f6d5;
+            color: #276749;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .info-item {
+            background: rgba(255,255,255,0.7);
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #4299e1;
+        }
+        .info-item strong {
+            color: #2d3748;
+            display: block;
+            margin-bottom: 5px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .pruebas-section {
+            background: linear-gradient(135deg, #faf089 0%, #f6e05e 100%);
+            padding: 25px;
+            border-radius: 12px;
+            margin: 30px 0;
+        }
+        .pruebas-section h3 {
+            margin: 0 0 15px 0;
+            color: #744210;
+            font-size: 1.5rem;
+        }
+        .pruebas-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .pruebas-list li {
+            padding: 8px 0;
+            color: #744210;
+            font-weight: 500;
+        }
+        .pruebas-list li::before {
+            content: '🎯 ';
+            margin-right: 8px;
+        }
+        .pruebas-list a {
+            color: #744210;
+            text-decoration: underline;
+        }
+        .stats-section {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .stat-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #4299e1;
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .no-users {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        @media (max-width: 768px) {
+            body { padding: 20px; }
+            .container { padding: 20px; }
+            .header h1 { font-size: 2rem; }
+            .usuario-title { flex-direction: column; align-items: flex-start; }
+            .info-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 Usuarios de Prueba - eGarage</h1>
+            <p><strong>Generado:</strong> {{ timestamp|date:"d/m/Y H:i:s" }}</p>
+            <p>Sistema de validación de suscripciones por país</p>
+        </div>
+        
+        <div class="login-section">
+            <h3>🔐 URL de Login Principal</h3>
+            <a href="https://atlantareciclajes.pythonanywhere.com/accounts/login/" target="_blank" class="login-link">
+                🌐 Acceder al Sistema
+            </a>
+            <p style="margin-top: 15px; font-size: 14px; opacity: 0.9;">
+                Usa cualquiera de las credenciales mostradas abajo
+            </p>
+        </div>
+        
+        {% if usuarios_prueba %}
+            <div class="stats-section">
+                <h3>📊 Resumen de Datos de Prueba</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number">{{ usuarios_prueba|length }}</div>
+                        <div class="stat-label">Usuarios</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">2</div>
+                        <div class="stat-label">Países</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">2</div>
+                        <div class="stat-label">Planes</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">100%</div>
+                        <div class="stat-label">Funcional</div>
+                    </div>
+                </div>
+            </div>
+            
+            {% for usuario in usuarios_prueba %}
+                <div class="usuario-card {% if usuario.empresa.pais == 'CL' %}chile{% else %}usa{% endif %} {% if usuario.empresa.plan_suscripcion == 'gratuito' %}gratuito{% else %}pagado{% endif %}">
+                    <div class="usuario-title">
+                        <h2>
+                            {% if usuario.empresa.pais == 'CL' %}🇨🇱{% else %}🇺🇸{% endif %}
+                            {{ usuario.empresa.nombre }}
+                        </h2>
+                        <span class="plan-badge {% if usuario.empresa.plan_suscripcion == 'gratuito' %}plan-gratuito{% else %}plan-pagado{% endif %}">
+                            {{ usuario.empresa.plan_suscripcion }}
+                        </span>
+                    </div>
+                    
+                    <div class="credential">
+                        <strong>📧 Email:</strong> {{ usuario.email }}<br>
+                        <strong>🔑 Contraseña:</strong> test1234<br>
+                        <strong>👤 Usuario:</strong> {{ usuario.username }}
+                    </div>
+                    
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <strong>📍 Ciudad</strong>
+                            {{ usuario.empresa.ciudad }}
+                        </div>
+                        <div class="info-item">
+                            <strong>📞 Teléfono</strong>
+                            {{ usuario.empresa.telefono }}
+                        </div>
+                        <div class="info-item">
+                            <strong>🆔 Estado</strong>
+                            {{ usuario.empresa.estado|title }}
+                        </div>
+                        <div class="info-item">
+                            <strong>📅 Expira</strong>
+                            {{ usuario.empresa.fecha_expiracion|date:"d/m/Y" }}
+                        </div>
+                        <div class="info-item">
+                            <strong>🌎 País</strong>
+                            {% if usuario.empresa.pais == 'CL' %}Chile 🇨🇱{% else %}Estados Unidos 🇺🇸{% endif %}
+                        </div>
+                        <div class="info-item">
+                            <strong>💰 Plan</strong>
+                            {{ usuario.empresa.plan_suscripcion|title }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-users">
+                <h3>⚠️ No se encontraron usuarios de prueba</h3>
+                <p>Ejecuta el script de regeneración para crear los datos de prueba.</p>
+                <div class="credential">
+                    python limpieza_regeneracion_completa.py
+                </div>
+            </div>
+        {% endif %}
+        
+        <div class="pruebas-section">
+            <h3>🎯 Guía de Pruebas Recomendadas</h3>
+            <ul class="pruebas-list">
+                <li>Login con cada usuario y verificar acceso por país</li>
+                <li>Comprobar diferencias entre planes gratuito y pagado</li>
+                <li>Verificar datos específicos por país (Chile vs USA)</li>
+                <li>Probar dashboard analytics: <a href="/analytics/dashboard/" target="_blank">/analytics/dashboard/</a></li>
+                <li>Probar dashboard admin: <a href="/analytics/admin/dashboard/" target="_blank">/analytics/admin/dashboard/</a></li>
+                <li>Verificar dashboard avanzado: <a href="/analytics/admin/dashboard/avanzado/" target="_blank">/analytics/admin/dashboard/avanzado/</a></li>
+                <li>Validar diferencias de moneda y precios por país</li>
+                <li>Comprobar limitaciones del plan gratuito vs pagado</li>
+            </ul>
+        </div>
+        
+        <div style="background: #e2e8f0; padding: 20px; border-radius: 12px; margin: 20px 0; text-align: center;">
+            <p style="margin: 0; color: #4a5568; font-size: 14px;">
+                <strong>📝 Nota:</strong> Esta vista es temporal y solo accesible para usuarios staff/admin.<br>
+                Todos los usuarios de prueba tienen la contraseña <code style="background: #cbd5e0; padding: 2px 6px; border-radius: 4px;">test1234</code>
+            </p>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0; color: #666; font-size: 12px;">
+            <p>🤖 Generado automáticamente por eGarage Test Data Generator</p>
+            <p>📅 {{ timestamp|date:"d/m/Y H:i:s" }}</p>
+        </div>
+    </div>
+</body>
+</html>

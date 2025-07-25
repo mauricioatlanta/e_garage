@@ -1,0 +1,17 @@
+Estimado/a {{ cliente.nombre }},
+
+Esperamos que se encuentre muy bien.
+
+Le adjuntamos el {{ documento.tipo_documento|lower }} #{{ documento.numero_documento }} correspondiente a los servicios realizados en su vehículo {{ documento.vehiculo.marca }} {{ documento.vehiculo.modelo }} ({{ documento.vehiculo.patente }}).
+
+Detalles del documento:
+- Fecha: {{ documento.fecha|date:"d/m/Y" }}
+- Total: ${{ total|floatformat:0 }}
+
+Si tiene alguna consulta sobre este documento, no dude en contactarnos.
+
+Saludos cordiales,
+{{ empresa.nombre }}
+Teléfono: {{ empresa.telefono }}
+Email: {{ empresa.email }}
+Dirección: {{ empresa.direccion }}

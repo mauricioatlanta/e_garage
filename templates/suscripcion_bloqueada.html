@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Suscripción Bloqueada{% endblock %}
+{% block content %}
+<div class="min-h-screen flex flex-col items-center justify-center">
+  <div class="bg-red-900/80 border-2 border-red-400 rounded-xl p-10 shadow-xl text-center max-w-lg mt-24">
+<h1 class="text-3xl font-bold text-red-300 mb-4">😕 {% trans "Tu periodo de prueba ha finalizado" %}</h1>
+<p class="text-lg text-white mb-2">{% trans "La suscripción de" %} <span class="font-bold text-lime-300">{{ empresa.nombre }}</span> {% trans "ha expirado." %}</p>
+<p class="text-lg text-white mb-2">💳 {% trans "Activa tu suscripción para continuar usando eGarage." %}</p>
+<p class="text-md text-cyan-200 mb-4">{% trans "Contacta soporte para pagar y reactivar tu acceso." %}</p>
+<div class="mt-6">
+  <a href="mailto:soporte@tallerpro.com" class="bg-cyan-500 hover:bg-cyan-400 text-white font-bold px-6 py-2 rounded-xl transition shadow">{% trans "Contactar soporte" %}</a>
+</div>
+  </div>
+</div>
+{% endblock %}

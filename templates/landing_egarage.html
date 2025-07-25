@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eGarage - Software N°1 para Talleres Mecánicos | Prueba Gratis 30 Días</title>
+    <meta name="description" content="Crea presupuestos, controla repuestos y mejora tu taller con eGarage. El software más completo para talleres mecánicos. Prueba gratis 30 días sin compromiso.">
+    <meta name="keywords" content="software taller mecánico, gestión taller automotriz, presupuestos digitales, control repuestos, órdenes trabajo, facturación taller">
+    
+    <!-- Meta tags Open Graph para redes sociales -->
+    <meta property="og:title" content="eGarage - Software N°1 para Talleres Mecánicos">
+    <meta property="og:description" content="Digitaliza tu taller con eGarage. Presupuestos, inventario, facturación y más. Prueba gratis 30 días.">
+    <meta property="og:image" content="https://tudominio.com/static/egarage-preview.jpg">
+    <meta property="og:url" content="https://tudominio.com/egarage/">
+    <meta property="og:type" content="website">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="eGarage - Software para Talleres Mecánicos">
+    <meta name="twitter:description" content="El software más completo para gestionar tu taller. Prueba gratis 30 días.">
+    <meta name="twitter:image" content="https://tudominio.com/static/egarage-preview.jpg">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://tudominio.com/egarage/">
+    
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>">
+    
+    <!-- Google tag (gtag.js) - Analytics 4 ACTIVO -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-EGARAGE2025"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        
+        // 🚨 REEMPLAZA 'G-EGARAGE2025' CON TU ID REAL DE GA4
+        gtag('config', 'G-EGARAGE2025', {
+            // Configuración optimizada para eCommerce y conversiones
+            'send_page_view': true,
+            'anonymize_ip': true,
+            'allow_google_signals': true,
+            'custom_map': {
+                'custom_parameter_1': 'plan_interes',
+                'custom_parameter_2': 'formulario_origen'
+            },
+            // Eventos de eCommerce configurados
+            'custom_parameters': {
+                'business_type': 'saas_software',
+                'industry': 'automotive_services'
+            }
+        });
+        
+        // Función para tracking de eventos mejorado
+        function trackEvent(action, category, label, value) {
+            gtag('event', action, {
+                'event_category': category,
+                'event_label': label,
+                'value': value
+            });
+        }
+        
+        // Tracking específico para conversiones de eGarage
+        function trackConversion(conversionType, planName, value) {
+            // Evento de conversión principal
+            gtag('event', 'conversion', {
+                'send_to': 'G-EGARAGE2025/CONVERSION_ID', // Reemplazar con ID real
+                'event_category': 'lead_generation',
+                'event_label': conversionType,
+                'value': value,
+                'currency': 'CLP',
+                'custom_parameters': {
+                    'plan_selected': planName,
+                    'conversion_source': 'landing_page'
+                }
+            });
+            
+            // Evento de eCommerce para planes
+            gtag('event', 'add_to_cart', {
+                'currency': 'CLP',
+                'value': value,
+                'items': [{
+                    'item_id': planName,
+                    'item_name': `Plan ${planName} eGarage`,
+                    'item_category': 'software_subscription',
+                    'price': value,
+                    'quantity': 1
+                }]
+            });
+        }
+        
+        // Tracking automático de botones importantes
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tracking botón WhatsApp
+            document.querySelectorAll('a[href*="wa.me"]').forEach(function(element) {
+                element.addEventListener('click', function() {
+                    trackEvent('click', 'contact', 'whatsapp_cta', 1);
+                });
+            });
+            
+            // Tracking botones de planes
+            document.querySelectorAll('button[data-plan]').forEach(function(element) {
+                element.addEventListener('click', function() {
+                    trackEvent('click', 'pricing', 'plan_' + element.dataset.plan, 1);
+                });
+            });
+        });
+    </script>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 50%, #374151 100%);
+        }
+        .hero-animation {
+            animation: fadeInUp 1s ease-out;
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .card-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .pulse-green {
+            animation: pulse-green 2s infinite;
+        }
+        @keyframes pulse-green {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(34, 197, 94, 0);
+            }
+        }
+    </style>
+</head>
+<body class="font-sans antialiased">
+
+    <!-- Fondo animado ecológico con partículas -->
+    <canvas id="eco-bg" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:0;pointer-events:none;"></canvas>
+
+    <!-- Header superior con fondo glass y logo -->
+    <nav class="backdrop-blur bg-cyan-400/30 shadow-lg border-b border-cyan-300 py-3 px-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18" fill="#00e6ff" opacity="0.2"/><path d="M12 28L28 12M12 12l16 16" stroke="#00e6ff" stroke-width="3" stroke-linecap="round"/></svg>
+                <span class="text-2xl font-extrabold text-cyan-400 drop-shadow">eGarage</span>
+                <span class="ml-2 text-sm text-cyan-900/80 font-semibold">Gestión de Talleres</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="/accounts/login/" class="bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow transition flex items-center gap-2">
+                    <span>🔐</span> Ingresar
+                </a>
+                <a href="#suscripcion" class="hidden md:inline-block border-2 border-cyan-400 text-cyan-700 hover:bg-cyan-400 hover:text-white px-4 py-2 rounded-xl text-sm font-bold transition shadow">🚀 Prueba Gratis</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Encabezado (Hero Section) -->
+    <header class="min-h-screen gradient-bg text-white flex flex-col justify-center items-center text-center px-4 relative overflow-hidden">
+        <!-- Fondo animado celeste con partículas SVG -->
+        <div class="absolute inset-0 z-0">
+            <svg width="100%" height="100%" class="w-full h-full" style="position:absolute;top:0;left:0;z-index:0;" viewBox="0 0 1440 900" fill="none">
+                <circle cx="200" cy="200" r="120" fill="#00e6ff" fill-opacity="0.13"/>
+                <circle cx="1200" cy="700" r="180" fill="#00e6ff" fill-opacity="0.09"/>
+                <circle cx="900" cy="300" r="90" fill="#00e6ff" fill-opacity="0.11"/>
+                <circle cx="700" cy="600" r="60" fill="#00e6ff" fill-opacity="0.08"/>
+                <circle cx="400" cy="700" r="100" fill="#00e6ff" fill-opacity="0.10"/>
+            </svg>
+        </div>
+        
+        <div class="hero-animation relative z-10 max-w-4xl mx-auto">
+            <div class="mb-6 flex flex-col items-center">
+                <img src="/static/img/logo.png" alt="eGarage Logo" class="h-64 w-auto mb-8 drop-shadow-2xl animate-pulse" style="background:rgba(0,230,255,0.13);border-radius:3rem;box-shadow:0 0 120px #00e6ffcc,0 0 0 24px #00e6ff22;max-width:600px;">
+            </div>
+            <h1 class="text-4xl md:text-6xl font-extrabold mb-6 leading-tight drop-shadow-lg">
+                El software <span class="text-cyan-300">N°1</span> para talleres mecánicos profesionales
+            </h1>
+            <p class="text-lg md:text-xl text-cyan-100 mb-8 max-w-2xl mx-auto leading-relaxed">
+                Presupuestos, órdenes de trabajo, control de repuestos y más. Todo desde un solo lugar.<br>
+                <span class="block mt-2 text-cyan-200 font-semibold">¡Digitaliza tu taller hoy mismo!</span>
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <a href="#suscripcion" 
+                   class="bg-cyan-500 hover:bg-cyan-600 px-8 py-4 rounded-lg text-white font-bold text-lg transition-all duration-300 pulse-green shadow-xl"
+                   onclick="trackEvent('click', 'hero', 'cta_demo_gratis', 1); scrollToSection('suscripcion');">
+                    🚀 Prueba Gratis 30 Días
+                </a>
+                <a href="#beneficios" 
+                   class="border-2 border-cyan-300 hover:bg-cyan-300 hover:text-cyan-900 px-8 py-4 rounded-lg text-cyan-100 font-bold text-lg transition-all duration-300 shadow"
+                   onclick="trackEvent('click', 'hero', 'ver_caracteristicas', 1);">
+                    Ver Características
+                </a>
+            </div>
+            <div class="mt-8 text-sm text-cyan-200">
+                ✅ Sin tarjeta de crédito &nbsp;&nbsp; ✅ Soporte incluido &nbsp;&nbsp; ✅ Fácil de usar
+            </div>
+        </div>
+        
+        <!-- Indicador de scroll -->
+        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+            <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+            </svg>
+        </div>
+    </header>
+
+    <!-- Sección de Beneficios -->
+    <section id="beneficios" class="py-20 bg-gray-50 text-gray-900 px-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">¿Qué puedes hacer con eGarage?</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Transforma la gestión de tu taller con herramientas diseñadas específicamente para mecánicos profesionales
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="feature-card-futuristic border-l-4 border-green-400">
+                    <span class="icon-futuristic">🧾</span>
+                    <h3>Crear Documentos</h3>
+                    <p>Presupuestos, órdenes de trabajo y facturas personalizadas en segundos. Plantillas profesionales listas para usar.</p>
+                </div>
+                <div class="feature-card-futuristic border-l-4 border-blue-400">
+                    <span class="icon-futuristic">📦</span>
+                    <h3>Control de Repuestos</h3>
+                    <p>Gestiona stock, precios y rentabilidad de tus repuestos. Control de inventario automático y alertas de stock bajo.</p>
+                </div>
+                <div class="feature-card-futuristic border-l-4 border-purple-400">
+                    <span class="icon-futuristic">📊</span>
+                    <h3>Reportes y Análisis</h3>
+                    <p>Visualiza tus ventas y ganancias en tiempo real. Dashboard inteligente con métricas clave de tu negocio.</p>
+                </div>
+                <div class="feature-card-futuristic border-l-4 border-yellow-400">
+                    <span class="icon-futuristic">🚗</span>
+                    <h3>Gestión de Vehículos</h3>
+                    <p>Registro completo de vehículos y historial de servicios. Seguimiento de mantenimientos y reparaciones.</p>
+                </div>
+                <div class="feature-card-futuristic border-l-4 border-red-400">
+                    <span class="icon-futuristic">👥</span>
+                    <h3>Gestión de Clientes</h3>
+                    <p>Base de datos completa de clientes con historial de servicios. Comunicación directa y seguimiento personalizado.</p>
+                </div>
+                <div class="feature-card-futuristic border-l-4 border-indigo-400">
+                    <span class="icon-futuristic">🧠</span>
+                    <h3>Inteligencia de Negocio</h3>
+                    <p>Análisis avanzado de rentabilidad, ranking de servicios y performance de mecánicos para optimizar tu taller.</p>
+                </div>
+            </div>
+        </div>
+    <style>
+    .feature-card-futuristic {
+        background: linear-gradient(135deg, rgba(20,30,40,0.65) 60%, rgba(0,255,159,0.08) 100%);
+        backdrop-filter: blur(16px) saturate(1.2);
+        border-radius: 1.5rem;
+        box-shadow: 0 8px 32px 0 rgba(0,255,159,0.10), 0 1.5px 12px 0 #00e6ff44;
+        border: 2.5px solid #00e6ff;
+        position: relative;
+        overflow: hidden;
+        transition: box-shadow 0.3s, border-color 0.3s, transform 0.3s;
+        padding: 2rem;
+        color: #fff;
+        margin-bottom: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    .feature-card-futuristic:hover {
+        box-shadow: 0 0 32px 8px #00ff9f, 0 0 80px 10px #00e6ff44;
+        border-color: #00ff9f;
+        transform: translateY(-6px) scale(1.03);
+    }
+    .feature-card-futuristic .icon-futuristic {
+        font-size: 3.2rem;
+        margin-bottom: 1.1rem;
+        text-shadow: 0 0 16px #00e6ff99, 0 0 8px #00ff9f44;
+        display: block;
+    }
+    .feature-card-futuristic h3 {
+        font-size: 1.35rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        letter-spacing: 0.01em;
+        color: #fff;
+        text-shadow: 0 0 8px #00e6ff44;
+    }
+    .feature-card-futuristic p {
+        color: #e0f7fa;
+        font-size: 1.05rem;
+        text-shadow: 0 0 4px #00e6ff22;
+    }
+    </style>
+    </section>
+
+    <!-- Planes en Pesos Chilenos -->
+    <section id="planes" class="bg-gray-900 text-white py-20">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 text-cyan-400 drop-shadow">Planes que se adaptan a tu taller</h2>
+                <p class="text-lg text-cyan-200 max-w-2xl mx-auto">
+                    Elige el plan perfecto para tu negocio. Todos incluyen soporte técnico y actualizaciones.<br>
+                    <span class="inline-block bg-cyan-100 text-cyan-800 font-bold px-4 py-2 rounded-full mt-4 shadow">¡Prueba gratis 30 días en todos los planes!</span>
+                </p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Plan Mensual -->
+                <div class="bg-black/60 backdrop-blur-md rounded-xl p-8 border-2 border-cyan-300 hover:border-cyan-400 transition-all duration-300 shadow-xl text-white">
+                    <div class="text-center">
+                        <h3 class="text-xl font-semibold mb-2 text-cyan-700">Mensual</h3>
+                        <div class="text-3xl font-bold mb-2 text-cyan-500">$20.000 CLP <span class="text-base text-cyan-400">/mes</span></div>
+                        <div class="text-xl font-bold mb-2 text-cyan-500">$20 USD <span class="text-base text-cyan-400">/month</span></div>
+                        <p class="text-cyan-700 mb-6">Flexibilidad total</p>
+                    </div>
+                    <ul class="space-y-3 mb-8 text-cyan-800">
+                        <li class="flex items-center"><span class="text-cyan-400 mr-2">✓</span> Documentos ilimitados</li>
+                        <li class="flex items-center"><span class="text-cyan-400 mr-2">✓</span> Control de repuestos</li>
+                        <li class="flex items-center"><span class="text-cyan-400 mr-2">✓</span> Usuarios ilimitados</li>
+                        <li class="flex items-center"><span class="text-cyan-400 mr-2">✓</span> Soporte técnico</li>
+                        <li class="flex items-center"><span class="text-cyan-400 mr-2">✓</span> Reportes básicos</li>
+                    </ul>
+                    <button class="w-full bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-3 rounded-lg transition-all duration-300 shadow-lg" onclick="selectPlan('mensual', 20000)">
+                        Probar Gratis 30 Días
+                    </button>
+                </div>
+                <!-- Plan Semestral -->
+                <div class="bg-gradient-to-b from-cyan-400 to-cyan-600 rounded-xl p-8 border-2 border-cyan-300 relative transform scale-105 shadow-xl">
+                    <div class="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                        <span class="bg-black/70 text-cyan-200 px-4 py-1 rounded-full text-sm font-bold shadow">AHORRA 8%</span>
+                    </div>
+                    <div class="text-center">
+                        <h3 class="text-xl font-semibold mb-2 text-cyan-900">Semestral</h3>
+                        <div class="text-3xl font-bold mb-2 text-cyan-100">$110.000 CLP <span class="text-base text-cyan-200">/6 meses</span></div>
+                        <div class="text-xl font-bold mb-2 text-cyan-100">$110 USD <span class="text-base text-cyan-200">/6 months</span></div>
+                        <div class="text-sm text-cyan-50 mb-4">≈ $18.333/mes</div>
+                        <p class="text-cyan-50 mb-6">Opción recomendada</p>
+                    </div>
+                    <ul class="space-y-3 mb-8 text-cyan-50">
+                        <li class="flex items-center"><span class="text-white mr-2">✓</span> Todo lo del plan mensual</li>
+                        <li class="flex items-center"><span class="text-white mr-2">✓</span> Inteligencia de negocio</li>
+                        <li class="flex items-center"><span class="text-white mr-2">✓</span> Reportes avanzados</li>
+                        <li class="flex items-center"><span class="text-white mr-2">✓</span> Soporte prioritario</li>
+                        <li class="flex items-center"><span class="text-white mr-2">✓</span> Capacitación incluida</li>
+                        <li class="flex items-center"><span class="text-white mr-2">✓</span> <strong>Ahorro de $10.000</strong></li>
+                    </ul>
+                    <button class="w-full bg-black/70 text-cyan-200 font-bold py-3 rounded-lg hover:bg-cyan-900 transition-all duration-300 shadow-lg" onclick="selectPlan('semestral', 110000)">
+                        Probar Gratis 30 Días
+                    </button>
+                </div>
+                <!-- Plan Anual -->
+                <div class="bg-black/60 backdrop-blur-md rounded-xl p-8 border-2 border-cyan-300 hover:border-cyan-400 transition-all duration-300 shadow-xl text-white">
+                    <div class="text-center">
+                        <h3 class="text-xl font-semibold mb-2 text-cyan-700">Anual</h3>
+                        <div class="text-3xl font-bold mb-2 text-cyan-500">$200.000 CLP <span class="text-base text-cyan-400">/año</span></div>
+                        <div class="text-xl font-bold mb-2 text-cyan-500">$200 USD <span class="text-base text-cyan-400">/year</span></div>
+                        <div class="text-sm text-cyan-400 mb-4">≈ $16.667/mes - AHORRA 17%</div>
+                        <p class="text-cyan-700 mb-6">Máximo ahorro</p>
+                    </div>
+                    <ul class="space-y-3 mb-8 text-cyan-800">
+                        <li class="flex items-center"><span class="text-cyan-400 mr-2">✓</span> Todo lo del plan semestral</li>
+                        <li class="flex items-center"><span class="text-cyan-400 mr-2">✓</span> API personalizada</li>
+                        <li class="flex items-center"><span class="text-cyan-400 mr-2">✓</span> Multi-sucursal</li>
+                        <li class="flex items-center"><span class="text-cyan-400 mr-2">✓</span> Soporte 24/7</li>
+                        <li class="flex items-center"><span class="text-cyan-400 mr-2">✓</span> Consultoría incluida</li>
+                        <li class="flex items-center"><span class="text-cyan-400 mr-2">✓</span> <strong>Ahorro de $40.000</strong></li>
+                    </ul>
+                    <button class="w-full bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-3 rounded-lg transition-all duration-300 shadow-lg" onclick="selectPlan('anual', 200000)">
+                        Probar Gratis 30 Días
+                    </button>
+                </div>
+            </div>
+            <div class="text-center mt-12">
+                <p class="text-cyan-400 mb-4">Todos los planes incluyen las mismas funcionalidades:</p>
+                <div class="flex flex-wrap justify-center gap-6 text-sm">
+                    <span class="flex items-center"><span class="text-cyan-400 mr-1">✓</span> 30 días gratis</span>
+                    <span class="flex items-center"><span class="text-cyan-400 mr-1">✓</span> Sin permanencia</span>
+                    <span class="flex items-center"><span class="text-cyan-400 mr-1">✓</span> Migración gratuita</span>
+                    <span class="flex items-center"><span class="text-cyan-400 mr-1">✓</span> Actualizaciones incluidas</span>
+                </div>
+                <div class="mt-4 text-center">
+                    <p class="text-sm text-cyan-500 font-semibold">
+                        💰 Ahorra hasta $40.000 al año eligiendo el plan anual
+                    </p>
+                </div>
+            </div>
+        </div>
+    <!-- Formulario de suscripción moderno -->
+    <section id="suscripcion" class="py-20 bg-cyan-50/80">
+        <div class="max-w-lg mx-auto bg-black/70 backdrop-blur-md rounded-2xl shadow-2xl p-10 border-2 border-cyan-200 text-white">
+            <h2 class="text-2xl font-bold text-cyan-700 mb-4 text-center">Crea tu cuenta y activa tu prueba gratis</h2>
+            <form id="form-suscripcion" class="space-y-4">
+                <div>
+                    <label for="nombre" class="block text-cyan-700 font-semibold mb-1">Nombre completo</label>
+                    <input type="text" id="nombre" name="nombre" required class="w-full px-4 py-2 rounded-lg border border-cyan-300 focus:ring-2 focus:ring-cyan-400 focus:outline-none">
+                </div>
+                <div>
+                    <label for="correo" class="block text-cyan-700 font-semibold mb-1">Correo electrónico</label>
+                    <input type="email" id="correo" name="correo" required class="w-full px-4 py-2 rounded-lg border border-cyan-300 focus:ring-2 focus:ring-cyan-400 focus:outline-none">
+                </div>
+                <div>
+                    <label for="plan" class="block text-cyan-700 font-semibold mb-1">Plan</label>
+                    <select id="plan" name="plan" class="w-full px-4 py-2 rounded-lg border border-cyan-300 focus:ring-2 focus:ring-cyan-400 focus:outline-none">
+                        <option value="mensual">Mensual ($20.000 CLP / $20 USD)</option>
+                        <option value="semestral">Semestral ($110.000 CLP / $110 USD)</option>
+                        <option value="anual">Anual ($200.000 CLP / $200 USD)</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-3 rounded-lg transition-all duration-300 shadow-lg text-lg">Crear cuenta y activar prueba</button>
+            </form>
+            <div id="mensaje-exito" class="hidden mt-6 bg-cyan-100 border border-cyan-300 text-cyan-800 rounded-lg p-4 text-center font-semibold">
+                ¡Listo! Te enviamos un enlace de activación a tu correo.<br>
+                <span class="text-cyan-600">Revisa tu bandeja de entrada o spam.</span>
+            </div>
+        </div>
+        <script>
+        document.getElementById('form-suscripcion').addEventListener('submit', function(e) {
+            e.preventDefault();
+            document.getElementById('form-suscripcion').classList.add('hidden');
+            document.getElementById('mensaje-exito').classList.remove('hidden');
+        });
+        function selectPlan(plan, valor) {
+            document.getElementById('plan').value = plan;
+            window.scrollTo({ top: document.getElementById('suscripcion').offsetTop - 40, behavior: 'smooth' });
+        }
+        </script>
+    </section>
+    </section>
+
+    <!-- Testimonios -->
+    <section class="py-20 bg-black/60 backdrop-blur-md text-white">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 text-gray-900">Lo que dicen nuestros clientes</h2>
+                <p class="text-lg text-gray-600">Talleres de todo el país confían en eGarage para gestionar su negocio</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-gray-50 rounded-xl p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white font-bold text-lg">CA</div>
+                        <div class="ml-4">
+                            <h4 class="font-semibold text-gray-900">Carlos Mendoza</h4>
+                            <p class="text-gray-600 text-sm">Taller AutoFix</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-700 italic">"eGarage transformó completamente mi taller. Ahora puedo hacer presupuestos en minutos y tener control total de mi inventario."</p>
+                    <div class="flex text-yellow-400 mt-4">
+                        ⭐⭐⭐⭐⭐
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 rounded-xl p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-lg">MR</div>
+                        <div class="ml-4">
+                            <h4 class="font-semibold text-gray-900">María Rodríguez</h4>
+                            <p class="text-gray-600 text-sm">Mecánica Express</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-700 italic">"El módulo de inteligencia de negocio me ayuda a identificar qué servicios son más rentables. Mis ganancias aumentaron un 30%."</p>
+                    <div class="flex text-yellow-400 mt-4">
+                        ⭐⭐⭐⭐⭐
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 rounded-xl p-6">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg">JS</div>
+                        <div class="ml-4">
+                            <h4 class="font-semibold text-gray-900">Juan Silva</h4>
+                            <p class="text-gray-600 text-sm">Taller Los Pinos</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-700 italic">"Fácil de usar y muy completo. El soporte técnico es excelente, siempre están disponibles para ayudar."</p>
+                    <div class="flex text-yellow-400 mt-4">
+                        ⭐⭐⭐⭐⭐
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Formulario de Contacto -->
+    <section id="contacto" class="py-20 bg-gradient-to-r from-blue-50 to-indigo-100">
+        <div class="max-w-4xl mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 text-gray-900">¿Prefieres que te contactemos?</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Déjanos tus datos y un especialista te contactará para crear una demo personalizada de tu taller.
+                </p>
+            </div>
+            
+            <div class="bg-black/60 backdrop-blur-md rounded-2xl shadow-xl p-8 md:p-12 text-white">
+                <form action="https://formsubmit.co/contacto@egarage.com" method="POST" class="space-y-6" id="contactForm">
+                    <!-- FormSubmit Configuration -->
+                    <input type="hidden" name="_subject" value="Nuevo Lead desde Landing eGarage">
+                    <input type="hidden" name="_captcha" value="false">
+                    <input type="hidden" name="_template" value="table">
+                    <input type="hidden" name="_next" value="https://tudominio.com/egarage/?success=1">
+                    
+                    <!-- Honeypot para anti-spam -->
+                    <input type="text" name="_honey" style="display:none">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="nombre" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Nombre Completo *
+                            </label>
+                            <input type="text" id="nombre" name="nombre" required
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-300"
+                                   placeholder="Ej: Juan Pérez">
+                        </div>
+                        
+                        <div>
+                            <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Email Corporativo *
+                            </label>
+                            <input type="email" id="email" name="email" required
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-300"
+                                   placeholder="Ej: juan@mitaller.com">
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="telefono" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Teléfono/WhatsApp *
+                            </label>
+                            <input type="tel" id="telefono" name="telefono" required
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-300"
+                                   placeholder="Ej: +56 9 1234 5678">
+                        </div>
+                        
+                        <div>
+                            <label for="taller" class="block text-sm font-semibold text-gray-700 mb-2">
+                                Nombre del Taller *
+                            </label>
+                            <input type="text" id="taller" name="taller" required
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-300"
+                                   placeholder="Ej: AutoService Los Pinos">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="plan_interes" class="block text-sm font-semibold text-gray-700 mb-2">
+                            Plan de Interés
+                        </label>
+                        <select id="plan_interes" name="plan_interes"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-300">
+                            <option value="">Selecciona un plan</option>
+                            <option value="mensual">Mensual - $20.000/mes</option>
+                            <option value="semestral">Semestral - $110.000/6 meses (Recomendado)</option>
+                            <option value="anual">Anual - $200.000/año (Máximo ahorro)</option>
+                            <option value="consulta">Solo quiero más información</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="comentarios" class="block text-sm font-semibold text-gray-700 mb-2">
+                            Comentarios o Necesidades Específicas
+                        </label>
+                        <textarea id="comentarios" name="comentarios" rows="4"
+                                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-300"
+                                  placeholder="Cuéntanos sobre tu taller: cuántos mecánicos, qué servicios ofrecen, principales desafíos..."></textarea>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <input type="checkbox" id="acepto_terminos" name="acepto_terminos" required
+                               class="mt-1 h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
+                        <label for="acepto_terminos" class="ml-3 text-sm text-gray-600">
+                            Acepto recibir información comercial sobre eGarage y sus servicios. 
+                            <a href="#" class="text-green-600 hover:text-green-800 underline">Política de Privacidad</a>
+                        </label>
+                    </div>
+                    
+                    <div class="text-center">
+                        <button type="submit" 
+                                class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold px-8 py-4 rounded-lg text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                                onclick="trackContactFormSubmit()">
+                            🚀 Solicitar Demo Personalizada
+                        </button>
+                        <p class="text-sm text-gray-500 mt-3">
+                            Te contactaremos en menos de 24 horas hábiles
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- WhatsApp CTA final -->
+    <section class="py-20 bg-gradient-to-r from-green-50 to-green-100">
+        <div class="max-w-4xl mx-auto text-center px-4">
+            <div class="mb-8">
+                <span class="text-6xl">💬</span>
+            </div>
+            <h2 class="text-3xl md:text-4xl font-bold mb-6 text-gray-900">¿Listo para digitalizar tu taller?</h2>
+            <p class="text-lg mb-8 text-gray-700 max-w-2xl mx-auto">
+                Comienza hoy con una prueba gratuita sin compromiso. Nuestro equipo te ayudará a configurar tu taller en menos de 24 horas.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <a href="https://wa.me/569XXXXXXXX?text=Hola,%20quiero%20probar%20eGarage%20gratis%20por%2030%20días" target="_blank"
+                   class="bg-green-500 hover:bg-green-600 text-white font-bold px-8 py-4 rounded-lg text-lg transition-all duration-300 flex items-center gap-2 pulse-green"
+                   onclick="trackWhatsAppClick('cta_final')">
+                    <span>📱</span> Contactar por WhatsApp
+                </a>
+                <a href="#planes" 
+                   class="border-2 border-green-500 text-green-600 hover:bg-green-500 hover:text-white font-bold px-8 py-4 rounded-lg text-lg transition-all duration-300"
+                   onclick="trackEvent('click', 'navigation', 'ver_planes_cta', 1)">
+                    Ver Planes y Precios
+                </a>
+            </div>
+            <div class="mt-8 text-sm text-gray-600">
+                ⚡ Respuesta inmediata &nbsp;&nbsp; 🚀 Configuración rápida &nbsp;&nbsp; 💪 Soporte personalizado
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter Signup -->
+    <section class="py-16 bg-gray-900 text-white">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4">📬 ¿No estás listo para comprar?</h2>
+            <p class="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+                Recibe contenido exclusivo sobre gestión de talleres, tips de rentabilidad y novedades de eGarage.
+            </p>
+            
+            <form action="https://formsubmit.co/newsletter@egarage.com" method="POST" class="max-w-md mx-auto" id="newsletterForm">
+                <!-- FormSubmit Configuration -->
+                <input type="hidden" name="_subject" value="Nuevo Suscriptor Newsletter eGarage">
+                <input type="hidden" name="_captcha" value="false">
+                <input type="hidden" name="_template" value="table">
+                <input type="hidden" name="_next" value="https://tudominio.com/egarage/?newsletter=1">
+                
+                <!-- Honeypot para anti-spam -->
+                <input type="text" name="_honey" style="display:none">
+                
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <input type="email" name="email_newsletter" required
+                           class="flex-1 px-4 py-3 rounded-lg text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-green-500"
+                           placeholder="Tu email profesional">
+                    <button type="submit" 
+                            class="bg-green-500 hover:bg-green-600 text-white font-bold px-6 py-3 rounded-lg transition-all duration-300 whitespace-nowrap"
+                            onclick="trackEvent('submit', 'newsletter', 'suscripcion_newsletter', 1)">
+                        ✅ Suscribirme Gratis
+                    </button>
+                </div>
+                
+                <p class="text-sm text-gray-400 mt-3">
+                    Sin spam. Cancela cuando quieras. 📧 Solo contenido valioso para tu taller.
+                </p>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer profesional -->
+    <footer class="bg-gray-800 text-gray-300">
+        <div class="max-w-6xl mx-auto px-4 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="col-span-1 md:col-span-2">
+                    <div class="flex items-center mb-4">
+                        <span class="text-2xl mr-2">🔧</span>
+                        <span class="text-xl font-bold text-white">eGarage</span>
+                    </div>
+                    <p class="text-gray-400 mb-4 max-w-md">
+                        El software más completo para la gestión de talleres mecánicos. 
+                        Digitaliza tu negocio y aumenta tu rentabilidad.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <span class="sr-only">Facebook</span>
+                            📘
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <span class="sr-only">Instagram</span>
+                            📷
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <span class="sr-only">LinkedIn</span>
+                            💼
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-white font-semibold mb-4">Producto</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#beneficios" class="text-gray-400 hover:text-white transition-colors">Características</a></li>
+                        <li><a href="#planes" class="text-gray-400 hover:text-white transition-colors">Precios</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Demo</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Integraciones</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-white font-semibold mb-4">Soporte</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Centro de Ayuda</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Tutoriales</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Contacto</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Estado del Sistema</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-8 pt-8">
+                <!-- Créditos de Atlanta Reciclajes -->
+                <div class="flex flex-col md:flex-row items-center justify-center gap-4 mb-4">
+                    <div class="flex items-center gap-3">
+                        <img src="/static/img/logo.png" alt="Atlanta Reciclajes Logo" class="h-8 w-auto">
+                        <div class="text-center md:text-left">
+                            <div class="text-white font-semibold">eGarage AI™</div>
+                            <div class="text-sm text-gray-400">Solución desarrollada por <strong class="text-blue-400">Atlanta Reciclajes</strong></div>
+                        </div>
+                    </div>
+                    <div class="text-sm text-gray-400 text-center">
+                        
+                        <a href="mailto:suscripcion@atlantareciclajes.cl" class="text-blue-400 hover:text-blue-300">suscripcion@atlantareciclajes.cl</a>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <p class="text-gray-400">© 2025 eGarage. Todos los derechos reservados.</p>
+                    <p class="text-sm text-gray-500 mt-2">Desarrollado con ❤️ para talleres profesionales</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Script mejorado para UX y tracking -->
+    <script>
+        // Enhanced Google Analytics Event Tracking
+        function trackEvent(action, category, label, value) {
+            if (typeof gtag !== 'undefined') {
+                gtag('event', action, {
+                    event_category: category,
+                    event_label: label,
+                    value: value,
+                    custom_map: {
+                        source: 'egarage_landing'
+                    }
+                });
+                console.log('📊 Evento rastreado:', category, action, label);
+            }
+        }
+
+        // Smooth scroll to sections
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        }
+
+        // Plan selection tracking mejorado
+        function selectPlan(planName, price) {
+            // Tracking de selección de plan
+            trackEvent('select_item', 'pricing', planName, price);
+            
+            // Tracking de conversión específico
+            trackConversion('plan_selection', planName, price);
+            
+            // Scroll to contact form
+            setTimeout(() => {
+                scrollToSection('contacto');
+                // Pre-fill plan in contact form
+                const planSelect = document.getElementById('plan_interes');
+                if (planSelect) {
+                    const options = planSelect.options;
+                    for (let i = 0; i < options.length; i++) {
+                        if (options[i].value.includes(planName.toLowerCase())) {
+                            planSelect.selectedIndex = i;
+                            break;
+                        }
+                    }
+                }
+            }, 500);
+        }
+
+        // WhatsApp click tracking
+        function trackWhatsAppClick(location) {
+            trackEvent('click', 'whatsapp', location, 1);
+            
+            // Tracking específico para WhatsApp
+            gtag('event', 'contact', {
+                'method': 'whatsapp',
+                'event_category': 'engagement',
+                'event_label': location
+            });
+        }
+        
+        // Tracking específico para formulario de contacto
+        function trackContactFormSubmit() {
+            const selectedPlan = document.getElementById('plan_interes').value;
+            const planValues = {
+                'mensual': 20000,
+                'semestral': 110000,
+                'anual': 200000
+            };
+            
+            const value = planValues[selectedPlan] || 0;
+            
+            // Evento de lead generado
+            trackConversion('form_submission', selectedPlan, value);
+            
+            // Evento estándar
+            trackEvent('submit', 'contact', 'formulario_contacto', value);
+            
+            // Evento de lead para GA4
+            gtag('event', 'generate_lead', {
+                'currency': 'CLP',
+                'value': value,
+                'event_category': 'lead_generation',
+                'event_label': 'contact_form'
+            });
+        }
+
+        // Smooth scrolling para enlaces internos
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Success message handling
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check for success parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            if (urlParams.get('success') === '1') {
+                // Contact form submitted
+                showSuccessMessage('¡Gracias! Te contactaremos en menos de 24 horas hábiles. 🚀');
+                trackEvent('submit', 'contact', 'formulario_enviado', 1);
+            } else if (urlParams.get('newsletter') === '1') {
+                // Newsletter subscribed
+                showSuccessMessage('¡Genial! Te has suscrito a nuestro newsletter. 📧');
+                trackEvent('submit', 'newsletter', 'suscripcion_exitosa', 1);
+            }
+
+            // Add scroll-to-top functionality
+            addScrollToTop();
+            
+            // Track page view
+            trackEvent('page_view', 'landing', 'egarage_landing', 1);
+        });
+
+        function showSuccessMessage(message) {
+            const successDiv = document.createElement('div');
+            successDiv.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform duration-300';
+            successDiv.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <span>✅</span>
+                    <span>${message}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" class="ml-2 text-green-200 hover:text-white">✕</button>
+                </div>
+            `;
+            document.body.appendChild(successDiv);
+            
+            // Animate in
+            setTimeout(() => {
+                successDiv.classList.remove('translate-x-full');
+            }, 100);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                successDiv.classList.add('translate-x-full');
+                setTimeout(() => successDiv.remove(), 300);
+            }, 5000);
+        }
+
+        function addScrollToTop() {
+            const scrollBtn = document.createElement('button');
+            scrollBtn.innerHTML = '↑';
+            scrollBtn.className = 'fixed bottom-6 right-6 bg-green-500 hover:bg-green-600 text-white w-12 h-12 rounded-full shadow-lg transition-all duration-300 opacity-0 pointer-events-none z-40';
+            scrollBtn.onclick = () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                trackEvent('click', 'navigation', 'scroll_to_top', 1);
+            };
+            document.body.appendChild(scrollBtn);
+
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 400) {
+                    scrollBtn.classList.remove('opacity-0', 'pointer-events-none');
+                } else {
+                    scrollBtn.classList.add('opacity-0', 'pointer-events-none');
+                }
+            });
+        }
+
+        // Animación de aparición para las tarjetas
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Aplicar observer a elementos con animación
+        document.querySelectorAll('.card-hover').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(card);
+        });
+    </script>
+
+</body>
+<script>
+// Fondo animado ecológico con partículas verdes y celestes
+const canvas = document.getElementById('eco-bg');
+const ctx = canvas.getContext('2d');
+let particles = [];
+const colors = ['#00ff9f', '#00e6ff', '#a3ffcb', '#baffc9'];
+const numParticles = 48;
+
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+function createParticles() {
+    particles = [];
+    for (let i = 0; i < numParticles; i++) {
+        particles.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            r: 18 + Math.random() * 22,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            dx: (Math.random() - 0.5) * 0.7,
+            dy: (Math.random() - 0.5) * 0.7,
+            alpha: 0.18 + Math.random() * 0.22
+        });
+    }
+}
+createParticles();
+
+function drawParticles() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let p of particles) {
+        ctx.save();
+        ctx.globalAlpha = p.alpha;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, 2 * Math.PI);
+        ctx.fillStyle = p.color;
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 32;
+        ctx.fill();
+        ctx.restore();
+        // Movimiento suave
+        p.x += p.dx;
+        p.y += p.dy;
+        // Rebote en bordes
+        if (p.x < -p.r) p.x = canvas.width + p.r;
+        if (p.x > canvas.width + p.r) p.x = -p.r;
+        if (p.y < -p.r) p.y = canvas.height + p.r;
+        if (p.y > canvas.height + p.r) p.y = -p.r;
+    }
+    requestAnimationFrame(drawParticles);
+}
+drawParticles();
+</script>
+</html>

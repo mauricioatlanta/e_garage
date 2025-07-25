@@ -1,70 +1,147 @@
+
 {% extends 'base.html' %}
 {% load widget_tweaks %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto py-12 text-lime-200">
-<h1 class="text-4xl font-bold mb-8 text-center tracking-widest">🤖 Crear Cliente</h1>
 <style>
-  input, select, textarea {
-    background: #111 !important;
-    color: #fff !important;
-    border: 1.5px solid #4fd1c5 !important;
-    font-family: 'Segoe UI', 'Arial', sans-serif !important;
-  }
-  input::placeholder, textarea::placeholder {
-    color: #b2f5ea !important;
-  }
+body {
+  background: radial-gradient(ellipse at center, #0f2027 0%, #2c5364 100%);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+.futuristic-bg {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  z-index: -1;
+  background: url('https://www.transparenttextures.com/patterns/stardust.png'), linear-gradient(135deg, #0f2027 0%, #2c5364 100%);
+  animation: stars 20s linear infinite;
+}
+@keyframes stars {
+  0% {background-position: 0 0, 0 0;}
+  100% {background-position: 1000px 1000px, 0 0;}
+}
+.futuristic-form {
+  background: rgba(20, 30, 60, 0.95);
+  border-radius: 2rem;
+  box-shadow: 0 0 40px 10px #00ffe7a0, 0 0 0 2px #00ffe7;
+  padding: 2.5rem;
+  margin-top: 3rem;
+  color: #e0e0ff;
+  font-family: 'Orbitron', 'Share Tech Mono', 'Segoe UI', Arial, sans-serif;
+}
+.futuristic-label {
+  color: #00ffe7;
+  font-weight: bold;
+  letter-spacing: 2px;
+  text-shadow: 0 0 8px #00ffe7a0;
+}
+input.futuristic-input,
+select.futuristic-input,
+textarea.futuristic-input {
+  background: #181f2a !important;
+  color: #00ffe7 !important;
+  border: 2px solid #00ffe7 !important;
+  border-radius: 0.7rem !important;
+  font-family: 'Share Tech Mono', 'Orbitron', monospace !important;
+  font-size: 1.1rem !important;
+  box-shadow: 0 0 10px #00ffe7a0;
+}
+input.futuristic-input::placeholder,
+textarea.futuristic-input::placeholder {
+  color: #00ffe7a0 !important;
+}
+.futuristic-btn {
+  background: linear-gradient(90deg, #00ffe7 0%, #1e90ff 100%);
+  color: #181f2a;
+  font-family: 'Orbitron', 'Share Tech Mono', Arial, sans-serif;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border-radius: 1rem;
+  box-shadow: 0 0 20px #00ffe7a0;
+  padding: 0.8rem 2.5rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.futuristic-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 40px #00ffe7a0;
+}
+.futuristic-title {
+  font-family: 'Orbitron', 'Share Tech Mono', Arial, sans-serif;
+  font-size: 3rem;
+  color: #00ffe7;
+  text-align: center;
+  margin-bottom: 2rem;
+  text-shadow: 0 0 20px #00ffe7a0, 0 0 2px #fff;
+  letter-spacing: 0.2em;
+}
 </style>
-<form class="space-y-6" method="post">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<div class="futuristic-bg"></div>
+<div class="max-w-4xl mx-auto futuristic-form">
+  <h1 class="futuristic-title">🪐 Crear Cliente Espacial</h1>
+  <form class="space-y-6" method="post">
     {% csrf_token %}
-
+    
+    {% if form.errors %}
+      <div class="bg-red-900 border border-red-500 rounded p-4 mb-4">
+        <h3 class="text-red-300 font-bold mb-2">⚠️ Errores en el formulario:</h3>
+        {% for field, errors in form.errors.items %}
+          <div class="mb-2">
+            <strong class="text-red-200">{{ field }}:</strong>
+            {% for error in errors %}
+              <span class="text-red-100">{{ error }}</span>
+            {% endfor %}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+    
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-<div>
-<label class="block mb-2" for="id_nombre">Nombre:</label>
-        {{ form.nombre|add_class:'!text-white !bg-black !border-white placeholder-white' }}
+      <div>
+        <label class="futuristic-label mb-2" for="id_nombre">Nombre:</label>
+        {{ form.nombre|add_class:'futuristic-input' }}
       </div>
-<div>
-<label class="block mb-2" for="id_apellido">Apellido:</label>
-        {{ form.apellido|add_class:'!text-white !bg-black !border-white placeholder-white' }}
+      <div>
+        <label class="futuristic-label mb-2" for="id_apellido">Apellido:</label>
+        {{ form.apellido|add_class:'futuristic-input' }}
       </div>
-<div>
-<label class="block mb-2" for="id_telefono">Teléfono:</label>
-        {{ form.telefono|add_class:'!text-white !bg-black !border-white placeholder-white' }}
+      <div>
+        <label class="futuristic-label mb-2" for="id_telefono">Teléfono:</label>
+        {{ form.telefono|add_class:'futuristic-input' }}
       </div>
-<div>
-<label class="block mb-2" for="id_direccion">Dirección:</label>
-        {{ form.direccion|add_class:'!text-white !bg-black !border-white placeholder-white' }}
+      <div>
+        <label class="futuristic-label mb-2" for="id_direccion">Dirección:</label>
+        {{ form.direccion|add_class:'futuristic-input' }}
       </div>
-<div>
-<label class="block mb-2" for="id_email">Correo electrónico:</label>
-        {{ form.email|add_class:'!text-white !bg-black !border-white placeholder-white' }}
+      <div>
+        <label class="futuristic-label mb-2" for="id_email">Correo electrónico:</label>
+        {{ form.email|add_class:'futuristic-input' }}
       </div>
-<div>
-<label class="block mb-2" for="id_region">Región:</label>
-        {{ form.region|add_class:'!text-white !bg-black !border-white' }}
+      <div>
+        <label class="futuristic-label mb-2" for="id_region">Región:</label>
+        {{ form.region|add_class:'futuristic-input' }}
       </div>
-<div>
-<label class="block mb-2" for="id_ciudad">Ciudad:</label>
-        {{ form.ciudad|add_class:'!text-white !bg-black !border-white' }}
+      <div>
+        <label class="futuristic-label mb-2" for="id_ciudad">Ciudad:</label>
+        {{ form.ciudad|add_class:'futuristic-input' }}
       </div>
-</div>
-<div class="text-center pt-6">
-<button class="bg-gradient-to-r from-lime-400 to-cyan-500 text-black px-6 py-3 rounded-xl shadow-lg hover:scale-105 transition font-bold btn-futuristic" type="submit">
-        Guardar Cliente
+    </div>
+    <div class="text-center pt-6">
+      <button class="futuristic-btn" type="submit">
+        🚀 Guardar Cliente
       </button>
-</div>
-</form>
+    </div>
+  </form>
 </div>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const regionSelect = document.getElementById('id_region');
   const ciudadSelect = document.getElementById('id_ciudad');
-
   if(regionSelect && ciudadSelect) {
     function cargarCiudades(regionId, selectedCiudadId = null) {
       ciudadSelect.innerHTML = '<option value="">---------</option>';
       if(regionId) {
-        fetch(`/api/ciudades/?region_id=${regionId}`)
+        fetch(`/clientes/ajax/ciudades/?region_id=${regionId}`)
           .then(response => response.json())
           .then(data => {
             data.forEach(function(ciudad) {
@@ -79,12 +156,9 @@ document.addEventListener('DOMContentLoaded', function() {
           });
       }
     }
-
-    // Cargar ciudades si ya hay una región seleccionada (por ejemplo, al editar)
     if(regionSelect.value) {
       cargarCiudades(regionSelect.value, ciudadSelect.getAttribute('data-selected'));
     }
-
     regionSelect.addEventListener('change', function() {
       cargarCiudades(this.value);
     });

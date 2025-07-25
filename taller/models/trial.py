@@ -4,6 +4,7 @@ from django.utils import timezone
 class TrialRegistro(models.Model):
     nombre = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
+    telefono = models.CharField(max_length=20, unique=True, default="Sin teléfono")
     codigo = models.CharField(max_length=32, unique=True)
     fecha_registro = models.DateTimeField(default=timezone.now)
     fecha_activacion = models.DateTimeField(null=True, blank=True)

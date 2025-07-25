@@ -1,0 +1,637 @@
+{% load static %}
+{% load simple_i18n %}
+<!DOCTYPE html>
+<html lang="{% if is_usa %}en{% else %}es{% endif %}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if is_usa %}AI Analytics Dashboard{% else %}Dashboard AI Analytics{% endif %} - {{ user.empresa.nombre }}</title>
+    
+    <!-- Futuristic CSS Framework -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-glow: #00f5ff;
+            --secondary-glow: #ff00ff;
+            --accent-glow: #00ff88;
+            --danger-glow: #ff0066;
+            --bg-dark: #0a0a0a;
+            --bg-panel: rgba(15, 15, 35, 0.9);
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Exo 2', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 20% 80%, var(--primary-glow) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, var(--secondary-glow) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, var(--accent-glow) 0%, transparent 50%);
+            background-attachment: fixed;
+            animation: backgroundPulse 20s ease-in-out infinite;
+        }
+
+        @keyframes backgroundPulse {
+            0%, 100% { filter: brightness(0.3); }
+            50% { filter: brightness(0.5); }
+        }
+
+        .dashboard-container {
+            min-height: 100vh;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            backdrop-filter: blur(20px);
+        }
+
+        .header-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, var(--primary-glow), var(--secondary-glow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px var(--primary-glow);
+            animation: titleGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            from { text-shadow: 0 0 20px var(--primary-glow); }
+            to { text-shadow: 0 0 40px var(--primary-glow), 0 0 60px var(--secondary-glow); }
+        }
+
+        .country-badge {
+            padding: 10px 20px;
+            border-radius: 25px;
+            background: linear-gradient(135deg, var(--accent-glow), var(--primary-glow));
+            color: var(--bg-dark);
+            font-weight: 600;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .metric-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(20px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, var(--primary-glow), transparent);
+            transform: rotate(45deg);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .metric-card:hover::before {
+            opacity: 0.1;
+            animation: cardScan 2s linear infinite;
+        }
+
+        @keyframes cardScan {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 245, 255, 0.2);
+            border-color: var(--primary-glow);
+        }
+
+        .metric-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .metric-icon {
+            font-size: 2rem;
+            margin-right: 15px;
+            background: linear-gradient(45deg, var(--primary-glow), var(--accent-glow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .metric-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px currentColor;
+        }
+
+        .metric-growth {
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .growth-positive {
+            color: var(--accent-glow);
+        }
+
+        .growth-negative {
+            color: var(--danger-glow);
+        }
+
+        .charts-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .chart-container {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(20px);
+            position: relative;
+        }
+
+        .chart-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: var(--primary-glow);
+            text-align: center;
+        }
+
+        .ai-insights-section {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(20px);
+            margin-bottom: 30px;
+        }
+
+        .insights-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.5rem;
+            color: var(--secondary-glow);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .insights-title::before {
+            content: '🤖';
+            margin-right: 10px;
+            font-size: 1.8rem;
+        }
+
+        .insight-item {
+            background: rgba(255, 255, 255, 0.02);
+            border-left: 3px solid var(--accent-glow);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .insight-item:hover {
+            background: rgba(0, 255, 136, 0.1);
+            transform: translateX(5px);
+        }
+
+        .insight-type {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: var(--accent-glow);
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+
+        .insight-title-text {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .insight-description {
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .insight-confidence {
+            display: inline-block;
+            background: linear-gradient(90deg, var(--primary-glow), var(--accent-glow));
+            color: var(--bg-dark);
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .real-time-section {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 15px;
+            backdrop-filter: blur(20px);
+            min-width: 200px;
+            z-index: 1000;
+        }
+
+        .real-time-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.9rem;
+            color: var(--primary-glow);
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .real-time-metric {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .pulse-indicator {
+            width: 10px;
+            height: 10px;
+            background: var(--accent-glow);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(0, 255, 136, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(0, 255, 136, 0);
+            }
+        }
+
+        .loading-skeleton {
+            background: linear-gradient(90deg, 
+                rgba(255, 255, 255, 0.1) 25%, 
+                rgba(255, 255, 255, 0.2) 50%, 
+                rgba(255, 255, 255, 0.1) 75%
+            );
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 4px;
+            height: 20px;
+        }
+
+        @keyframes loading {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        @media (max-width: 768px) {
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-title {
+                font-size: 1.8rem;
+            }
+            
+            .real-time-section {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header Section -->
+        <div class="header-section">
+            <h1 class="header-title">
+                {% if is_usa %}AI Analytics{% else %}Analytics IA{% endif %}
+            </h1>
+            <div class="country-badge">
+                <i class="fas fa-flag"></i>
+                {% if is_usa %}United States{% else %}Chile{% endif %}
+            </div>
+        </div>
+
+        <!-- Real-time Metrics Panel -->
+        <div class="real-time-section">
+            <div class="real-time-title">
+                {% if is_usa %}Live Metrics{% else %}Métricas en Vivo{% endif %}
+                <span class="pulse-indicator"></span>
+            </div>
+            <div id="realTimeMetrics">
+                <div class="loading-skeleton"></div>
+                <div class="loading-skeleton" style="margin-top: 5px;"></div>
+                <div class="loading-skeleton" style="margin-top: 5px;"></div>
+            </div>
+        </div>
+
+        <!-- Key Metrics Grid -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-header">
+                    <i class="metric-icon fas fa-chart-line"></i>
+                    <span class="metric-title">{% if is_usa %}Total Revenue{% else %}Ingresos Totales{% endif %}</span>
+                </div>
+                <div class="metric-value">{{ analytics.revenue.total }}</div>
+                <div class="metric-growth {% if analytics.revenue.growth >= 0 %}growth-positive{% else %}growth-negative{% endif %}">
+                    <i class="fas fa-arrow-{% if analytics.revenue.growth >= 0 %}up{% else %}down{% endif %}"></i>
+                    {{ analytics.revenue.growth }}%
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <i class="metric-icon fas fa-file-invoice"></i>
+                    <span class="metric-title">{% if is_usa %}Documents{% else %}Documentos{% endif %}</span>
+                </div>
+                <div class="metric-value">{{ analytics.operations.documentos_total }}</div>
+                <div class="metric-growth">
+                    <i class="fas fa-clock"></i>
+                    {% if is_usa %}Last 30 days{% else %}Últimos 30 días{% endif %}
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <i class="metric-icon fas fa-car"></i>
+                    <span class="metric-title">{% if is_usa %}Active Vehicles{% else %}Vehículos Activos{% endif %}</span>
+                </div>
+                <div class="metric-value">{{ analytics.operations.vehiculos_activos }}</div>
+                <div class="metric-growth growth-positive">
+                    <i class="fas fa-users"></i>
+                    {{ analytics.operations.clientes_activos }} {% if is_usa %}clients{% else %}clientes{% endif %}
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <i class="metric-icon fas fa-cogs"></i>
+                    <span class="metric-title">{% if is_usa %}Efficiency{% else %}Eficiencia{% endif %}</span>
+                </div>
+                <div class="metric-value">{{ analytics.operations.efficiency }}%</div>
+                <div class="metric-growth {% if analytics.operations.efficiency >= 80 %}growth-positive{% else %}growth-negative{% endif %}">
+                    <i class="fas fa-target"></i>
+                    {% if is_usa %}Operational{% else %}Operacional{% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="charts-section">
+            <div class="chart-container">
+                <h3 class="chart-title">{% if is_usa %}Revenue Timeline{% else %}Línea de Tiempo de Ingresos{% endif %}</h3>
+                <canvas id="revenueChart" height="300"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <h3 class="chart-title">{% if is_usa %}Vehicle Distribution{% else %}Distribución de Vehículos{% endif %}</h3>
+                <canvas id="vehicleChart" height="300"></canvas>
+            </div>
+        </div>
+
+        <!-- AI Insights Section -->
+        <div class="ai-insights-section">
+            <h2 class="insights-title">{% if is_usa %}AI Insights{% else %}Insights de IA{% endif %}</h2>
+            <div id="aiInsights">
+                {% for insight in analytics.ai_insights %}
+                <div class="insight-item">
+                    <div class="insight-type">{{ insight.type }}</div>
+                    <div class="insight-title-text">{{ insight.title }}</div>
+                    <div class="insight-description">{{ insight.description }}</div>
+                    <span class="insight-confidence">{{ insight.confidence|floatformat:0 }}% {% if is_usa %}confidence{% else %}confianza{% endif %}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Configuración global
+        const isUSA = {{ is_usa|yesno:"true,false" }};
+        const currency = '{{ analytics.config.moneda }}';
+        const symbol = '{{ analytics.config.simbolo }}';
+
+        // Función para actualizar métricas en tiempo real
+        function updateRealTimeMetrics() {
+            fetch('/analytics/real-time/')
+                .then(response => response.json())
+                .then(data => {
+                    const container = document.getElementById('realTimeMetrics');
+                    container.innerHTML = `
+                        <div class="real-time-metric">
+                            <span>${isUSA ? 'Today' : 'Hoy'}:</span>
+                            <span>${symbol}${data.today_revenue.toLocaleString()}</span>
+                        </div>
+                        <div class="real-time-metric">
+                            <span>${isUSA ? 'Documents' : 'Docs'}:</span>
+                            <span>${data.today_documents}</span>
+                        </div>
+                        <div class="real-time-metric">
+                            <span>${isUSA ? 'Active' : 'Activos'}:</span>
+                            <span>${data.active_services}</span>
+                        </div>
+                    `;
+                })
+                .catch(error => console.error('Error updating metrics:', error));
+        }
+
+        // Gráfica de ingresos
+        function createRevenueChart() {
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            
+            fetch('/analytics/revenue-api/')
+                .then(response => response.json())
+                .then(data => {
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: data.revenue_timeline.map(item => new Date(item.date).toLocaleDateString()),
+                            datasets: [{
+                                label: isUSA ? 'Revenue' : 'Ingresos',
+                                data: data.revenue_timeline.map(item => item.revenue),
+                                borderColor: '#00f5ff',
+                                backgroundColor: 'rgba(0, 245, 255, 0.1)',
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    labels: {
+                                        color: '#ffffff'
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    ticks: {
+                                        color: '#b3b3b3'
+                                    },
+                                    grid: {
+                                        color: 'rgba(255, 255, 255, 0.1)'
+                                    }
+                                },
+                                y: {
+                                    ticks: {
+                                        color: '#b3b3b3',
+                                        callback: function(value) {
+                                            return symbol + value.toLocaleString();
+                                        }
+                                    },
+                                    grid: {
+                                        color: 'rgba(255, 255, 255, 0.1)'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                });
+        }
+
+        // Gráfica de vehículos
+        function createVehicleChart() {
+            const ctx = document.getElementById('vehicleChart').getContext('2d');
+            
+            fetch('/analytics/vehicle-api/')
+                .then(response => response.json())
+                .then(data => {
+                    new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: data.distribution.map(item => item.marca__nombre),
+                            datasets: [{
+                                data: data.distribution.map(item => item.count),
+                                backgroundColor: [
+                                    '#00f5ff', '#ff00ff', '#00ff88', '#ffff00', 
+                                    '#ff8800', '#8800ff', '#ff0088', '#88ff00'
+                                ],
+                                borderWidth: 2,
+                                borderColor: '#0a0a0a'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        color: '#ffffff',
+                                        padding: 20
+                                    }
+                                }
+                            }
+                        }
+                    });
+                });
+        }
+
+        // Cargar insights adicionales
+        function loadAIInsights() {
+            fetch('/analytics/ai-insights/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    type: 'predictive',
+                    timeframe: 30
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const container = document.getElementById('aiInsights');
+                    data.insights.forEach(insight => {
+                        const insightElement = document.createElement('div');
+                        insightElement.className = 'insight-item';
+                        insightElement.innerHTML = `
+                            <div class="insight-type">${insight.type}</div>
+                            <div class="insight-title-text">${insight.title}</div>
+                            <div class="insight-description">${insight.description}</div>
+                            <span class="insight-confidence">${Math.round(insight.confidence * 100)}% ${isUSA ? 'confidence' : 'confianza'}</span>
+                        `;
+                        container.appendChild(insightElement);
+                    });
+                }
+            });
+        }
+
+        // Inicializar dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            createRevenueChart();
+            createVehicleChart();
+            updateRealTimeMetrics();
+            loadAIInsights();
+
+            // Actualizar métricas cada 30 segundos
+            setInterval(updateRealTimeMetrics, 30000);
+        });
+    </script>
+</body>
+</html>

@@ -137,7 +137,7 @@ body {
 <th class="px-4 py-2">Marca</th>
 <th class="px-4 py-2">Modelo</th>
 <th class="px-4 py-2">Año</th>
-<th class="px-4 py-2">VIN</th>
+<th class="px-4 py-2">Cliente</th>
 <th class="px-4 py-2">Acciones</th>
 </tr>
 </thead>
@@ -148,7 +148,7 @@ body {
 <td class="px-4 py-2">{{ vehiculo.marca }}</td>
 <td class="px-4 py-2">{{ vehiculo.modelo }}</td>
 <td class="px-4 py-2">{{ vehiculo.anio }}</td>
-<td class="px-4 py-2">{{ vehiculo.vin }}</td>
+<td class="px-4 py-2">{{ vehiculo.cliente.nombre }} {{ vehiculo.cliente.apellido }}</td>
 <td class="px-4 py-2 space-x-2">
 <a class="text-blue-600 hover:underline" href="{% url 'vehiculos:ver_vehiculo' vehiculo.id %}" title="Ver">👁️</a>
 <a class="text-yellow-600 hover:underline" href="{% url 'vehiculos:editar_vehiculo' vehiculo.id %}" title="Editar">✏️</a>

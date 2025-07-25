@@ -3,151 +3,504 @@
 {% load widget_tweaks %}
 
 {% block content %}
-<div class="max-w-6xl mx-auto cuadro mt-8 p-8 rounded shadow">
+<div class="max-w-5xl mx-auto bg-gradient-to-br from-[#0f2027] via-[#2c5364] to-[#1a2980] p-10 rounded-3xl shadow-2xl relative border border-cyan-400 backdrop-blur-xl" style="box-shadow: 0 0 60px 10px #00ffe7, 0 0 8px 2px #1a2980 inset;">
+  <!-- Barra de navegación superior -->
+  <nav class="flex flex-wrap justify-between items-center px-8 py-4 bg-gradient-to-r from-[#0f2027] via-[#2c5364] to-[#1a2980] rounded-xl shadow-xl mb-8 border border-cyan-400" style="backdrop-filter: blur(8px);">
+    <div class="flex items-center gap-8">
+      <a href="/" class="text-cyan-400 font-extrabold text-2xl tracking-widest futuristic-logo animate-pulse">E-Garage</a>
+    </div>
+    <div class="flex flex-wrap gap-3">
+      <a href="/dashboard/" class="btn-cine-future">Inicio</a>
+      <a href="{% url 'vehiculos:lista_vehiculos' %}" class="btn-cine-future">Vehículos</a>
+      <a href="/documentos/" class="btn-cine-future">Documentos</a>
+      <a href="/repuestos/" class="btn-cine-future">Repuestos</a>
+      <a href="/clientes/" class="btn-cine-future">Clientes</a>
+      <a href="/dashboard/" class="btn-cine-future">Dashboard</a>
+    </div>
+  </nav>
   <style>
-    .cuadro, .cuadro * {
-      color: #fff !important;
+    /* Unificación de formato futurista y tecnológico para todos los campos */
+    select, input[type="text"], input[type="number"], input, textarea {
+      background: linear-gradient(135deg, #111 60%, #1a2980 100%) !important;
+      color: #00ffe7 !important;
+      font-family: 'Orbitron', 'Segoe UI', sans-serif !important;
+      border: 2.5px solid #00ffe7;
+      font-size: 1.18em;
+      font-weight: bold;
+      border-radius: 1em;
+      padding: 1em 1.4em;
+      margin-bottom: 1.2em;
+      width: 100%;
+      box-sizing: border-box;
+      box-shadow: 0 0 24px 6px #00ffe7 inset, 0 0 12px 3px #1a2980;
+      transition: border 0.2s, box-shadow 0.2s, background 0.3s;
+      display: block;
+      opacity: 1;
+      position: static;
+      pointer-events: auto;
+      z-index: auto;
+      letter-spacing: 2.5px;
+      outline: none;
+      backdrop-filter: blur(2px);
     }
-    input, select, .select2-container--default .select2-selection--single, .select2-dropdown, .select2-results__option {
-      background: #111 !important;
-      color: #fff !important;
-      border: 1.5px solid #4fd1c5 !important;
-      font-family: 'Segoe UI', 'Arial', sans-serif !important;
+    select option {
+      background: #1a2980;
+      color: #00ffe7;
+      font-family: 'Orbitron', 'Segoe UI', sans-serif !important;
+      font-weight: bold;
+      font-size: 1.08em;
+      border-bottom: 1px solid #00ffe7;
+      padding: 0.6em 1em;
     }
-    .select2-container--default .select2-selection--single .select2-selection__rendered,
-    .select2-container--default .select2-results__option {
-      color: #fff !important;
-      font-weight: 500;
+    label {
+      color: #00ffe7 !important;
+      font-family: 'Orbitron', 'Segoe UI', sans-serif !important;
+      letter-spacing: 2.5px;
+      font-size: 1.12em;
+      font-weight: bold;
+      text-shadow: 0 0 8px #00ffe7, 0 0 2px #1a2980;
+      margin-bottom: 0.5em;
+      display: block;
     }
-    .select2-container--default .select2-selection--single .select2-selection__arrow b {
-      border-top-color: #4fd1c5 !important;
+    .glassmorphism-box {
+      background: rgba(15,32,39,0.65);
+      box-shadow: 0 0 32px 8px #00ffe7, 0 0 8px 2px #1a2980 inset;
+      border-radius: 2em;
+      border: 2.5px solid #00ffe7;
+      backdrop-filter: blur(8px);
+      padding: 2em 1.5em;
+      margin-bottom: 1.5em;
     }
-    input::placeholder {
-      color: #b2f5ea !important;
+    .btn-cine-future {
+      background: linear-gradient(90deg, #00ffe7 0%, #1a2980 100%);
+      color: #111;
+      font-family: 'Orbitron', 'Segoe UI', sans-serif;
+      font-weight: bold;
+      font-size: 1.15em;
+      border-radius: 1em;
+      padding: 0.8em 2em;
+      box-shadow: 0 0 16px 4px #00ffe7, 0 0 8px 2px #1a2980 inset;
+      border: none;
+      transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+      letter-spacing: 2px;
+      text-transform: uppercase;
     }
-    .translucent-card {
-      background: rgba(0,0,0,0.6) !important;
-      color: #fff !important;
+    .btn-cine-future:hover {
+      background: linear-gradient(90deg, #1a2980 0%, #00ffe7 100%);
+      color: #00ffe7;
+      box-shadow: 0 0 32px 8px #00ffe7, 0 0 8px 2px #1a2980 inset;
+    }
+    /* Mejorar el input de búsqueda y sugerencias */
+    #busqueda-cliente-ajax, #busqueda-marca-ajax, #busqueda-modelo-ajax {
+      box-shadow: 0 0 24px 4px #00ffe7 inset;
+      border-radius: 1em;
+      font-size: 1.08em;
+      background: rgba(44,83,100,0.25);
+      color: #00ffe7 !important;
+      border: none;
+      outline: none;
+      z-index: 10;
+    }
+    #sugerencias-clientes,
+    #sugerencias-marcas,
+    #sugerencias-modelos {
+      background: #0f2027;
+      color: #fff;
+      font-weight: bold;
+      border-radius: 1em;
+      box-shadow: 0 0 32px 8px #00ffe7;
+      margin-top: 0.2em;
+      padding: 0.2em 0;
+      z-index: 100;
+      border: 2px solid #00ffe7;
+    }
+    #sugerencias-clientes li,
+    #sugerencias-marcas li,
+    #sugerencias-modelos li {
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      font-size: 1.12em;
+      font-weight: bold;
+      padding: 0.7em 1.2em;
+      border-bottom: 1px solid #00ffe7;
+      color: #fff;
+      background: #1a2980;
+      border-radius: 0.5em;
+    }
+    #sugerencias-clientes li:hover,
+    #sugerencias-marcas li:hover,
+    #sugerencias-modelos li:hover {
+      background: #00ffe7;
+      color: #0f2027;
+    }
+    /* Mejorar el título */
+    .futuristic-title {
+      font-size: 3.2em;
+      font-weight: 900;
+      letter-spacing: 4px;
+      color: #00ffe7;
+      text-shadow: 0 0 32px #00ffe7, 0 0 8px #1a2980;
+      background: linear-gradient(90deg, #00ffe7 0%, #1a2980 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-fill-color: transparent;
+      animation: gradient-move 2s infinite linear alternate;
+    }
+    @keyframes gradient-move {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 100% 50%; }
     }
   </style>
 
   <div class="flex justify-between items-center mb-4">
-    <h1 class="text-2xl font-bold">Crear Vehículo</h1>
-    <a class="bg-gradient-to-r from-cyan-400 to-emerald-500 text-black px-6 py-2 rounded-xl shadow-lg hover:scale-105 transition font-bold btn-futuristic" href="{% url 'vehiculos:lista_vehiculos' %}">Volver a la lista</a>
+    <h1 class="text-5xl font-black tracking-widest text-cyan-300 futuristic-title animate-gradient" style="font-family: 'Orbitron', 'Segoe UI', sans-serif; letter-spacing: 4px; text-shadow: 0 0 32px #00ffe7, 0 0 8px #1a2980;">Crear Vehículo</h1>
+    <a class="btn-cine-future" href="{% url 'vehiculos:lista_vehiculos' %}">Volver a la lista</a>
   </div>
 
   <form class="space-y-6" method="post">
     {% csrf_token %}
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div class="glassmorphism-box p-6 rounded-2xl shadow-xl border border-cyan-300">
         <label class="block font-semibold mb-1" for="id_cliente">Cliente</label>
-        {{ form.cliente }}
-        {{ form.cliente.errors }}
+        <div class="relative">
+          <input type="text" id="busqueda-cliente-ajax" class="w-full px-4 py-2 rounded-xl bg-black/70 text-cyan-200 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400" placeholder="Buscar cliente por nombre, apellido, email..." autocomplete="off">
+          <ul id="sugerencias-clientes" class="absolute left-0 right-0 bg-[#1a202c] rounded-xl shadow-lg mt-2 z-50 hidden max-h-60 overflow-y-auto"></ul>
+<select id="id_cliente" name="cliente">
+            <option value="">---------</option>
+            {% for cliente in clientes %}
+              <option value="{{ cliente.id }}">{{ cliente.nombre }} {{ cliente.apellido }} - {{ cliente.email }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div id="error-cliente" class="text-red-400 font-bold mt-2"></div>
       </div>
-      <div>
+      <div class="glassmorphism-box p-6 rounded-2xl shadow-xl border border-cyan-300">
         <label class="block font-semibold mb-1" for="id_patente">Patente</label>
-        {{ form.patente }}
+        <div class="relative">
+          {% render_field form.patente class="w-full px-4 py-2 rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400" placeholder="Patente..." style="background:#111 !important;color:#00ffe7 !important;" %}
+        </div>
         {{ form.patente.errors }}
       </div>
-      <div>
-        <label class="block font-semibold mb-1" for="id_marca">Marca</label>
-        {{ form.marca }}
-        {{ form.marca.errors }}
+      <div class="glassmorphism-box p-6 rounded-2xl shadow-xl border border-cyan-300">
+        <label class="block font-semibold mb-1" for="busqueda-marca-ajax">Marca</label>
+        <div class="relative">
+          <input type="text" id="busqueda-marca-ajax" class="w-full px-4 py-2 rounded-xl bg-black/70 text-cyan-200 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400" placeholder="Buscar marca..." autocomplete="off">
+          <ul id="sugerencias-marcas" class="absolute left-0 right-0 bg-[#1a202c] rounded-xl shadow-lg mt-2 z-50 hidden max-h-60 overflow-y-auto"></ul>
+          <select id="id_marca" name="marca" class="w-full px-4 py-2 rounded-xl bg-black/70 text-cyan-200 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400">
+            <option value="">---------</option>
+            {% for marca in marcas %}
+              <option value="{{ marca.id }}">{{ marca.nombre }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div id="error-marca" class="text-red-400 font-bold mt-2"></div>
       </div>
-      <div>
-        <label class="block font-semibold mb-1" for="id_modelo">Modelo</label>
-        {{ form.modelo }}
-        {{ form.modelo.errors }}
+      <div class="glassmorphism-box p-6 rounded-2xl shadow-xl border border-cyan-300">
+        <label class="block font-semibold mb-1" for="busqueda-modelo-ajax">Modelo</label>
+        <div class="relative">
+          <input type="text" id="busqueda-modelo-ajax" class="w-full px-4 py-2 rounded-xl bg-black/70 text-cyan-200 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400" placeholder="Buscar modelo..." autocomplete="off">
+          <ul id="sugerencias-modelos" class="absolute left-0 right-0 bg-[#1a202c] rounded-xl shadow-lg mt-2 z-50 hidden max-h-60 overflow-y-auto"></ul>
+          <select id="id_modelo" name="modelo" class="w-full px-4 py-2 rounded-xl bg-black/70 text-cyan-200 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400">
+            <option value="">---------</option>
+          </select>
+        </div>
+        <div id="error-modelo" class="text-red-400 font-bold mt-2"></div>
       </div>
-      <div>
+      <div class="glassmorphism-box p-6 rounded-2xl shadow-xl border border-cyan-300">
         <label class="block font-semibold mb-1" for="id_anio">Año</label>
-        {{ form.anio }}
+        <div class="relative">
+          {% render_field form.anio class="w-full px-4 py-2 rounded-xl bg-black/70 text-cyan-200 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400" placeholder="Año..." %}
+        </div>
         {{ form.anio.errors }}
       </div>
-      <div>
+      <div class="glassmorphism-box p-6 rounded-2xl shadow-xl border border-cyan-300">
         <label class="block font-semibold mb-1" for="id_color">Color</label>
-        {{ form.color }}
+        <div class="relative">
+          <select id="id_color" name="color" class="w-full px-4 py-2 rounded-xl bg-black/70 text-cyan-200 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400">
+            <option value="">---------</option>
+            {% for color in colores %}
+              <option value="{{ color.id }}">{{ color.nombre }}</option>
+            {% endfor %}
+            <option value="__nuevo__">Agregar nuevo color...</option>
+          </select>
+          <input type="text" name="color_nuevo" id="input_color_nuevo" class="w-full px-4 py-2 rounded-xl bg-black/70 text-cyan-200 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400 mt-2 hidden" placeholder="Escribe el nuevo color...">
+        </div>
         {{ form.color.errors }}
       </div>
-      <div>
+      <div class="glassmorphism-box p-6 rounded-2xl shadow-xl border border-cyan-300">
         <label class="block font-semibold mb-1" for="id_vin">VIN</label>
-        {{ form.vin }}
+        <div class="relative">
+          {% render_field form.vin class="w-full px-4 py-2 rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400" placeholder="VIN..." style="background:#111 !important;color:#00ffe7 !important;" %}
+        </div>
         {{ form.vin.errors }}
       </div>
-      <div>
+      <div class="glassmorphism-box p-6 rounded-2xl shadow-xl border border-cyan-300">
         <label class="block font-semibold mb-1" for="id_motor">Motor</label>
-        {{ form.motor }}
+        <div class="relative">
+          <select id="id_motor" name="motor" class="w-full px-4 py-2 rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400">
+            <option value="">---------</option>
+            <option value="__nuevo__">Agregar nuevo motor...</option>
+          </select>
+          <input type="text" name="motor_nuevo" id="input_motor_nuevo" class="w-full px-4 py-2 rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400 mt-2 hidden" placeholder="Escribe el nuevo motor...">
+        </div>
         {{ form.motor.errors }}
       </div>
-      <div>
+      <div class="glassmorphism-box p-6 rounded-2xl shadow-xl border border-cyan-300">
         <label class="block font-semibold mb-1" for="id_caja">Caja</label>
-        {{ form.caja }}
+        <div class="relative">
+          <select id="id_caja" name="caja" class="w-full px-4 py-2 rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400">
+            <option value="">---------</option>
+            <option value="__nuevo__">Agregar nueva caja...</option>
+          </select>
+          <input type="text" name="caja_nueva" id="input_caja_nueva" class="w-full px-4 py-2 rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400 mt-2 hidden" placeholder="Escribe la nueva caja...">
+        </div>
         {{ form.caja.errors }}
       </div>
     </div>
 
     <div class="flex justify-end gap-4 pt-6">
-      <a href="{% url 'vehiculos:lista_vehiculos' %}" class="bg-gradient-to-r from-cyan-400 to-emerald-500 text-black px-6 py-2 rounded-xl shadow-lg hover:scale-105 transition font-bold btn-futuristic">Cancelar</a>
-      <button class="bg-gradient-to-r from-cyan-400 to-emerald-500 text-black px-6 py-2 rounded-xl shadow-lg hover:scale-105 transition font-bold btn-futuristic" type="submit">
-        Guardar Vehículo
+      <a href="{% url 'vehiculos:lista_vehiculos' %}" class="btn-cine-future">Cancelar</a>
+      <button class="btn-cine-future" type="submit">
+        <span class="glow-text-future">Guardar Vehículo</span>
       </button>
     </div>
   </form>
+  <!-- AJAX búsqueda de clientes -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Seleccionar automáticamente el nuevo color si viene en la URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const nuevoColorId = urlParams.get('nuevo_color');
+      if (nuevoColorId) {
+        const selectColor = document.getElementById('id_color');
+        selectColor.value = nuevoColorId;
+        const inputColorNuevo = document.getElementById('input_color_nuevo');
+        if (inputColorNuevo) {
+          inputColorNuevo.value = '';
+          inputColorNuevo.classList.add('hidden');
+          inputColorNuevo.required = false;
+        }
+      }
+      // --- Cliente ---
+      const inputCliente = document.getElementById('busqueda-cliente-ajax');
+      const sugerenciasCliente = document.getElementById('sugerencias-clientes');
+      const selectCliente = document.getElementById('id_cliente');
+      const errorCliente = document.getElementById('error-cliente');
+      inputCliente.addEventListener('input', function () {
+        const query = inputCliente.value.trim();
+        if (query.length < 2) {
+          sugerenciasCliente.innerHTML = '';
+          sugerenciasCliente.classList.add('hidden');
+          return;
+        }
+        fetch(`/api/clientes/?q=${encodeURIComponent(query)}`)
+          .then(res => res.json())
+          .then(data => {
+            sugerenciasCliente.innerHTML = '';
+            if (data.length === 0) {
+              sugerenciasCliente.classList.add('hidden');
+              errorCliente.textContent = 'No se encontraron clientes.';
+              return;
+            }
+            errorCliente.textContent = '';
+            sugerenciasCliente.classList.remove('hidden');
+            data.forEach(cliente => {
+              const li = document.createElement('li');
+              li.textContent = `${cliente.nombre} ${cliente.apellido} - ${cliente.email}`;
+              li.className = 'px-4 py-2 hover:bg-cyan-700 cursor-pointer rounded';
+              li.onclick = () => {
+                selectCliente.value = cliente.id;
+                inputCliente.value = `${cliente.nombre} ${cliente.apellido}`;
+                sugerenciasCliente.classList.add('hidden');
+              };
+              sugerenciasCliente.appendChild(li);
+            });
+          })
+          .catch(() => {
+            errorCliente.textContent = 'Error al buscar clientes.';
+          });
+      });
+      // --- Marca y Modelo ---
+      const selectMarca = document.getElementById('id_marca');
+      const selectModelo = document.getElementById('id_modelo');
+      const selectMotor = document.getElementById('id_motor');
+      const selectCaja = document.getElementById('id_caja');
+      selectMarca.addEventListener('change', function () {
+        const marcaId = selectMarca.value;
+        selectModelo.innerHTML = '<option value="">---------</option>';
+        selectMotor.innerHTML = '<option value="">---------</option>';
+        selectCaja.innerHTML = '<option value="">---------</option>';
+        if (!marcaId) return;
+        fetch(`/api/modelos/?marca_id=${marcaId}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data.length === 0) {
+              selectModelo.innerHTML = '<option value="">No hay modelos para esta marca</option>';
+              return;
+            }
+            data.forEach(modelo => {
+              const option = document.createElement('option');
+              option.value = modelo.id;
+              option.textContent = modelo.nombre;
+              selectModelo.appendChild(option);
+            });
+          })
+          .catch(() => {
+            selectModelo.innerHTML = '<option value="">Error al cargar modelos</option>';
+          });
+      });
+      selectModelo.addEventListener('change', function () {
+        const modeloId = selectModelo.value;
+        selectMotor.innerHTML = '<option value="">---------</option>';
+        selectCaja.innerHTML = '<option value="">---------</option>';
+        selectMotor.innerHTML += '<option value="__nuevo__">Agregar nuevo motor...</option>';
+        selectCaja.innerHTML += '<option value="__nuevo__">Agregar nueva caja...</option>';
+        if (!modeloId) return;
+        fetch(`/api/motores/?modelo_id=${modeloId}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data.length === 0) {
+              selectMotor.innerHTML = '<option value="">No hay motores para este modelo</option><option value="__nuevo__">Agregar nuevo motor...</option>';
+              return;
+            }
+            data.forEach(motor => {
+              const option = document.createElement('option');
+              option.value = motor.id;
+              option.textContent = motor.nombre;
+              selectMotor.appendChild(option);
+            });
+            selectMotor.appendChild(Object.assign(document.createElement('option'), {value: '__nuevo__', textContent: 'Agregar nuevo motor...'}));
+          })
+          .catch(() => {
+            selectMotor.innerHTML = '<option value="">Error al cargar motores</option><option value="__nuevo__">Agregar nuevo motor...</option>';
+          });
+        fetch(`/api/cajas/?modelo_id=${modeloId}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data.length === 0) {
+              selectCaja.innerHTML = '<option value="">No hay cajas para este modelo</option><option value="__nuevo__">Agregar nueva caja...</option>';
+              return;
+            }
+            data.forEach(caja => {
+              const option = document.createElement('option');
+              option.value = caja.id;
+              option.textContent = caja.nombre;
+              selectCaja.appendChild(option);
+            });
+            selectCaja.appendChild(Object.assign(document.createElement('option'), {value: '__nuevo__', textContent: 'Agregar nueva caja...'}));
+          })
+          .catch(() => {
+            selectCaja.innerHTML = '<option value="">Error al cargar cajas</option><option value="__nuevo__">Agregar nueva caja...</option>';
+          });
+      });
+      // Mostrar input manual si se selecciona "Agregar nuevo" en motor/caja
+      selectMotor.addEventListener('change', function () {
+        const inputMotorNuevo = document.getElementById('input_motor_nuevo');
+        if (selectMotor.value === '__nuevo__') {
+          inputMotorNuevo.classList.remove('hidden');
+          inputMotorNuevo.required = true;
+          inputMotorNuevo.focus();
+        } else {
+          inputMotorNuevo.classList.add('hidden');
+          inputMotorNuevo.required = false;
+          inputMotorNuevo.value = '';
+        }
+      });
+      selectCaja.addEventListener('change', function () {
+        const inputCajaNueva = document.getElementById('input_caja_nueva');
+        if (selectCaja.value === '__nuevo__') {
+          inputCajaNueva.classList.remove('hidden');
+          inputCajaNueva.required = true;
+          inputCajaNueva.focus();
+        } else {
+          inputCajaNueva.classList.add('hidden');
+          inputCajaNueva.required = false;
+          inputCajaNueva.value = '';
+        }
+      });
+      const selectColor = document.getElementById('id_color');
+      const inputColorNuevo = document.getElementById('input_color_nuevo');
+      selectColor.addEventListener('change', function () {
+        if (selectColor.value === '__nuevo__') {
+          inputColorNuevo.classList.remove('hidden');
+          inputColorNuevo.required = true;
+          inputColorNuevo.focus();
+        } else {
+          inputColorNuevo.classList.add('hidden');
+          inputColorNuevo.required = false;
+          inputColorNuevo.value = '';
+        }
+      });
+
+      // --- Foco automático en part number al agregar repuesto ---
+      // Si tienes un botón para agregar repuesto, por ejemplo:
+      // <button id="btn-agregar-repuesto">Agregar repuesto</button>
+      // Y un input para part number:
+      // <input type="text" id="input-partnumber" ...>
+      // Agrega este JS:
+      const btnAgregarRepuesto = document.getElementById('btn-agregar-repuesto');
+      if (btnAgregarRepuesto) {
+        btnAgregarRepuesto.addEventListener('click', function(e) {
+          setTimeout(function() {
+            const inputPartnumber = document.getElementById('input-partnumber');
+            if (inputPartnumber) {
+              inputPartnumber.focus();
+              inputPartnumber.select();
+            }
+          }, 120); // Espera breve para asegurar que el campo exista
+        });
+      }
+      // ...existing code...
+    });
+  </script>
+  <style>
+    #busqueda-cliente-ajax {
+      box-shadow: 0 0 16px 2px #00ffe7 inset;
+      border-radius: 0.8em;
+      font-size: 1em;
+      background: rgba(44,83,100,0.2);
+      color: #111 !important;
+      border: none;
+      outline: none;
+      z-index: 10;
+    }
+    #sugerencias-clientes,
+    #sugerencias-marcas,
+    #sugerencias-modelos {
+      background: #0f2027;
+      color: #fff;
+      font-weight: bold;
+      border-radius: 0.8em;
+      box-shadow: 0 0 32px 8px #00ffe7;
+      margin-top: 0.2em;
+      padding: 0.2em 0;
+      z-index: 100;
+      border: 2px solid #00ffe7;
+    }
+    #sugerencias-clientes li,
+    #sugerencias-marcas li,
+    #sugerencias-modelos li {
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      font-size: 1.08em;
+      font-weight: bold;
+      padding: 0.5em 1em;
+      border-bottom: 1px solid #00ffe7;
+      color: #fff;
+      background: #1a2980;
+    }
+    #sugerencias-clientes li:hover,
+    #sugerencias-marcas li:hover,
+    #sugerencias-modelos li:hover {
+      background: #00ffe7;
+      color: #0f2027;
+    }
+  </style>
+  <!-- Eliminado JS de búsqueda manual, Select2/DAL ya provee búsqueda avanzada -->
 </div>
 {% endblock %}
 
 {% block extra_js %}
   {{ form.media }}
-
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const initDAL = () => {
-        if (window.dal && window.dal.init) {
-          window.dal.init();
-          console.log("✅ DAL inicializado");
-        } else {
-          console.warn("❌ DAL no disponible, reintentando...");
-          setTimeout(initDAL, 300);
-        }
-      };
-      initDAL();
-    });
-
-    document.addEventListener('dal-init-function', function () {
-      if (!yl.functions.select2) {
-        yl.registerFunction('select2', function ($, element) {
-          $(element).select2({ width: 'style' });
-          $(element).on('select2:open', function () {
-            var $input = $('.select2-search__field');
-            if ($input.val() === '') {
-              $input.trigger('input');
-            }
-          });
-        });
-      }
-    });
-
-    // Toast para feedback de errores de creación dinámica
-    function showToast(message) {
-      // Elimina cualquier toast previo
-      $("#dal-toast-feedback").remove();
-      const toast = $(`
-        <div id="dal-toast-feedback" class="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg text-lg font-semibold animate-fade-in-up" style="min-width: 300px; text-align: center;">
-          ${message}
-        </div>
-      `);
-      $("body").append(toast);
-      setTimeout(() => {
-        toast.fadeOut(400, function() { $(this).remove(); });
-      }, 3500);
-    }
-
-    // Intercepta el error de creación de DAL y muestra el toast
-    $(document).on('dal-select2:createmessage', function(e) {
-      const msg = e.originalEvent.detail && e.originalEvent.detail.message;
-      if (msg) {
-        showToast(msg);
-      }
-    });
-  </script>
 {% endblock %}

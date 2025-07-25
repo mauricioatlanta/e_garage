@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}Sesión cerrada{% endblock %}
+{% block content %}
+<div class="min-h-screen flex flex-col items-center justify-center">
+  <div class="bg-cyan-900/80 border-2 border-cyan-400 rounded-xl p-10 shadow-xl text-center max-w-lg mt-24">
+    <h1 class="text-3xl font-bold text-cyan-200 mb-4">¡Sesión cerrada!</h1>
+    <p class="text-lg text-white mb-2">Has salido correctamente de e-Garage.</p>
+    <a href="/login/" class="bg-cyan-500 hover:bg-cyan-400 text-white font-bold px-6 py-2 rounded-xl transition shadow mt-6 inline-block">Iniciar sesión de nuevo</a>
+    <a href="/" class="ml-4 text-cyan-300 underline hover:text-white">Volver a la página principal</a>
+  </div>
+</div>
+{% endblock %}

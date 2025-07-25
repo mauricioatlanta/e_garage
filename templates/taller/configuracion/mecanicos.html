@@ -1,0 +1,1129 @@
+{% extends 'taller/base.html' %}
+{% load static %}
+
+{% block title %}👨‍🔧 Gestión de Mecánicos - E-Garage{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Estilos futuristas heredados de configuración principal */
+:root {
+    --neon-blue: #00f5ff;
+    --neon-purple: #bf00ff;
+    --neon-green: #39ff14;
+    --neon-orange: #ff6b00;
+    --neon-red: #ff0040;
+    --dark-bg: #0a0a0f;
+    --darker-bg: #050508;
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --border-glow: rgba(0, 245, 255, 0.3);
+}
+
+body {
+    background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+    color: #ffffff;
+    font-family: 'Orbitron', 'Segoe UI', monospace;
+    min-height: 100vh;
+}
+
+.mecanicos-container {
+    backdrop-filter: blur(20px);
+    background: linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+    border-radius: 20px;
+    border: 1px solid var(--border-glow);
+    box-shadow: 
+        0 8px 32px rgba(0, 245, 255, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    padding: 2rem;
+    margin: 2rem auto;
+    max-width: 1400px;
+    position: relative;
+    overflow: hidden;
+}
+
+.mecanicos-container::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(57, 255, 20, 0.05) 0%, transparent 70%);
+    animation: rotate 25s linear infinite;
+    z-index: -1;
+}
+
+@keyframes rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    position: relative;
+}
+
+.page-title {
+    font-size: 2.8rem;
+    font-weight: 900;
+    background: linear-gradient(45deg, var(--neon-green), var(--neon-blue), var(--neon-purple));
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradient-shift 4s ease-in-out infinite;
+    text-shadow: 0 0 30px rgba(57, 255, 20, 0.5);
+    margin-bottom: 1rem;
+}
+
+@keyframes gradient-shift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    color: #8a8a8a;
+    font-size: 1rem;
+    margin-bottom: 2rem;
+}
+
+.breadcrumb a {
+    color: var(--neon-blue);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.breadcrumb a:hover {
+    color: var(--neon-green);
+    text-shadow: 0 0 10px currentColor;
+}
+
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.stat-badge {
+    background: linear-gradient(145deg, rgba(0, 245, 255, 0.15) 0%, rgba(57, 255, 20, 0.15) 100%);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stat-badge:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(57, 255, 20, 0.2);
+    border-color: var(--neon-green);
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: var(--neon-green);
+    text-shadow: 0 0 15px currentColor;
+    margin-bottom: 0.5rem;
+}
+
+.stat-name {
+    font-size: 0.8rem;
+    color: #cccccc;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.add-mecanico-section {
+    background: linear-gradient(145deg, rgba(57, 255, 20, 0.1) 0%, rgba(0, 245, 255, 0.1) 100%);
+    border-radius: 20px;
+    border: 1px solid rgba(57, 255, 20, 0.3);
+    padding: 2.5rem;
+    margin-bottom: 3rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.add-mecanico-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.8s;
+}
+
+.add-mecanico-section:hover::before {
+    left: 100%;
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--neon-green);
+    margin-bottom: 2rem;
+}
+
+.section-icon {
+    font-size: 2.5rem;
+    filter: drop-shadow(0 0 15px currentColor);
+    animation: pulse 3s infinite ease-in-out;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.form-field {
+    position: relative;
+}
+
+.field-label {
+    display: block;
+    color: #cccccc;
+    font-weight: 600;
+    margin-bottom: 0.8rem;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.field-input {
+    width: 100%;
+    padding: 1.2rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 1rem;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.field-input:focus {
+    outline: none;
+    border-color: var(--neon-green);
+    box-shadow: 
+        0 0 25px rgba(57, 255, 20, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transform: translateY(-3px);
+}
+
+.field-input::placeholder {
+    color: #666;
+}
+
+.btn-add {
+    background: linear-gradient(45deg, var(--neon-green), var(--neon-blue));
+    border: none;
+    border-radius: 15px;
+    color: white;
+    font-weight: 700;
+    padding: 1.2rem 3rem;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    position: relative;
+    overflow: hidden;
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+.btn-add::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.6s;
+}
+
+.btn-add:hover::before {
+    left: 100%;
+}
+
+.btn-add:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 20px 40px rgba(57, 255, 20, 0.4);
+}
+
+.mecanicos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.mecanico-card {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 2rem;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.mecanico-card.activo {
+    border-color: rgba(57, 255, 20, 0.5);
+    box-shadow: 0 0 20px rgba(57, 255, 20, 0.1);
+}
+
+.mecanico-card.inactivo {
+    border-color: rgba(255, 0, 64, 0.5);
+    box-shadow: 0 0 20px rgba(255, 0, 64, 0.1);
+    opacity: 0.7;
+}
+
+.mecanico-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+}
+
+.mecanico-card.activo:hover {
+    box-shadow: 0 25px 50px rgba(57, 255, 20, 0.2);
+}
+
+.mecanico-card.inactivo:hover {
+    box-shadow: 0 25px 50px rgba(255, 0, 64, 0.2);
+}
+
+.mecanico-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.mecanico-nombre {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+}
+
+.mecanico-estado {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.estado-activo {
+    background: linear-gradient(45deg, rgba(57, 255, 20, 0.2), rgba(0, 245, 255, 0.2));
+    color: var(--neon-green);
+    border: 1px solid rgba(57, 255, 20, 0.3);
+}
+
+.estado-inactivo {
+    background: linear-gradient(45deg, rgba(255, 0, 64, 0.2), rgba(255, 107, 0, 0.2));
+    color: var(--neon-red);
+    border: 1px solid rgba(255, 0, 64, 0.3);
+}
+
+.mecanico-info {
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.8rem;
+    color: #cccccc;
+}
+
+.info-icon {
+    font-size: 1.2rem;
+    color: var(--neon-blue);
+    width: 20px;
+    text-align: center;
+}
+
+.mecanico-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.btn-action {
+    flex: 1;
+    min-width: 120px;
+    padding: 0.8rem 1.2rem;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-edit {
+    background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
+    color: white;
+}
+
+.btn-edit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0, 245, 255, 0.3);
+}
+
+.btn-toggle {
+    background: linear-gradient(45deg, var(--neon-orange), var(--neon-red));
+    color: white;
+}
+
+.btn-toggle:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(255, 107, 0, 0.3);
+}
+
+.btn-activate {
+    background: linear-gradient(45deg, var(--neon-green), var(--neon-blue));
+    color: white;
+}
+
+.btn-activate:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(57, 255, 20, 0.3);
+}
+
+.btn-delete {
+    background: linear-gradient(45deg, var(--neon-red), #990000);
+    color: white;
+}
+
+.btn-delete:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(255, 0, 64, 0.4);
+}
+
+/* Modal de edición */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 3rem;
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    color: #ccc;
+    font-size: 2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.modal-close:hover {
+    color: var(--neon-red);
+    transform: scale(1.2);
+}
+
+/* Animaciones de carga */
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: var(--neon-blue);
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .page-title {
+        font-size: 2rem;
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .mecanicos-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .mecanico-actions {
+        flex-direction: column;
+    }
+    
+    .btn-action {
+        min-width: auto;
+    }
+}
+
+/* Efectos de hover mejorados */
+.mecanico-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+    transition: left 0.8s;
+    z-index: 0;
+}
+
+.mecanico-card:hover::before {
+    left: 100%;
+}
+
+.mecanico-card > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* Partículas flotantes específicas para mecánicos */
+.mechanic-particle {
+    position: absolute;
+    background: var(--neon-green);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: float-mechanic 8s infinite ease-in-out;
+}
+
+@keyframes float-mechanic {
+    0%, 100% {
+        transform: translateY(0px) rotate(0deg);
+        opacity: 0.8;
+    }
+    33% {
+        transform: translateY(-15px) rotate(120deg);
+        opacity: 1;
+    }
+    66% {
+        transform: translateY(-5px) rotate(240deg);
+        opacity: 0.6;
+    }
+}
+
+/* Mensajes de alerta futuristas */
+.alert-message {
+    background: linear-gradient(145deg, rgba(57, 255, 20, 0.15), rgba(0, 245, 255, 0.15));
+    border: 1px solid rgba(57, 255, 20, 0.3);
+    border-radius: 15px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--neon-green);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.alert-error {
+    background: linear-gradient(145deg, rgba(255, 0, 64, 0.15), rgba(255, 107, 0, 0.15));
+    border-color: rgba(255, 0, 64, 0.3);
+    color: var(--neon-red);
+}
+
+.alert-warning {
+    background: linear-gradient(145deg, rgba(255, 107, 0, 0.15), rgba(255, 255, 0, 0.15));
+    border-color: rgba(255, 107, 0, 0.3);
+    color: var(--neon-orange);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mecanicos-container">
+    <div class="page-header">
+        <div class="breadcrumb">
+            <a href="{% url 'configuracion_principal' %}">⚙️ Configuración</a>
+            <span>→</span>
+            <span>👨‍🔧 Mecánicos</span>
+        </div>
+        <h1 class="page-title">👨‍🔧 GESTIÓN DE MECÁNICOS</h1>
+    </div>
+
+    <!-- Mensajes de feedback -->
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert-message {% if message.tags == 'error' %}alert-error{% elif message.tags == 'warning' %}alert-warning{% endif %}">
+            <span style="font-size: 1.5rem;">
+                {% if message.tags == 'success' %}✅
+                {% elif message.tags == 'error' %}❌
+                {% elif message.tags == 'warning' %}⚠️
+                {% else %}ℹ️{% endif %}
+            </span>
+            {{ message }}
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Estadísticas -->
+    <div class="stats-row">
+        <div class="stat-badge">
+            <div class="stat-value">{{ stats.total }}</div>
+            <div class="stat-name">Total</div>
+        </div>
+        <div class="stat-badge">
+            <div class="stat-value">{{ stats.activos }}</div>
+            <div class="stat-name">Activos</div>
+        </div>
+        <div class="stat-badge">
+            <div class="stat-value">{{ stats.inactivos }}</div>
+            <div class="stat-name">Inactivos</div>
+        </div>
+    </div>
+
+    <!-- Formulario para agregar mecánico -->
+    <div class="add-mecanico-section">
+        <h2 class="section-title">
+            <span class="section-icon">➕</span>
+            Agregar Nuevo Mecánico
+        </h2>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-field">
+                    <label class="field-label" for="nombre_nuevo_mecanico">👤 Nombre Completo</label>
+                    <input type="text" 
+                           id="nombre_nuevo_mecanico" 
+                           name="nombre_nuevo_mecanico" 
+                           class="field-input" 
+                           placeholder="Ingresa el nombre del mecánico"
+                           required>
+                </div>
+                
+                <div class="form-field">
+                    <label class="field-label" for="telefono_nuevo_mecanico">📞 Teléfono</label>
+                    <input type="tel" 
+                           id="telefono_nuevo_mecanico" 
+                           name="telefono_nuevo_mecanico" 
+                           class="field-input" 
+                           placeholder="+56 9 XXXX XXXX">
+                </div>
+                
+                <div class="form-field" style="grid-column: 1 / -1;">
+                    <label class="field-label" for="direccion_nuevo_mecanico">📍 Dirección</label>
+                    <input type="text" 
+                           id="direccion_nuevo_mecanico" 
+                           name="direccion_nuevo_mecanico" 
+                           class="field-input" 
+                           placeholder="Dirección del mecánico (opcional)">
+                </div>
+            </div>
+            
+            <div style="text-align: center;">
+                <button type="submit" name="crear_mecanico" class="btn-add">
+                    ➕ Agregar Mecánico
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Lista de mecánicos -->
+    <div class="mecanicos-grid">
+        {% for mecanico in mecanicos %}
+        <div class="mecanico-card {% if mecanico.activo %}activo{% else %}inactivo{% endif %}">
+            <div class="mecanico-header">
+                <h3 class="mecanico-nombre">{{ mecanico.nombre }}</h3>
+                <span class="mecanico-estado {% if mecanico.activo %}estado-activo{% else %}estado-inactivo{% endif %}">
+                    {% if mecanico.activo %}
+                        ✅ Activo
+                    {% else %}
+                        ❌ Inactivo
+                    {% endif %}
+                </span>
+            </div>
+            
+            <div class="mecanico-info">
+                {% if mecanico.telefono %}
+                <div class="info-item">
+                    <span class="info-icon">📞</span>
+                    <span>{{ mecanico.telefono }}</span>
+                </div>
+                {% endif %}
+                
+                {% if mecanico.direccion %}
+                <div class="info-item">
+                    <span class="info-icon">📍</span>
+                    <span>{{ mecanico.direccion }}</span>
+                </div>
+                {% endif %}
+                
+                <div class="info-item">
+                    <span class="info-icon">📅</span>
+                    <span>ID: {{ mecanico.id }}</span>
+                </div>
+            </div>
+            
+            <div class="mecanico-actions">
+                <button class="btn-action btn-edit" onclick="editarMecanico({{ mecanico.id }}, '{{ mecanico.nombre }}', '{{ mecanico.telefono }}', '{{ mecanico.direccion }}')">
+                    ✏️ Editar
+                </button>
+                
+                {% if mecanico.activo %}
+                    <form method="post" style="flex: 1;">
+                        {% csrf_token %}
+                        <input type="hidden" name="mecanico_id" value="{{ mecanico.id }}">
+                        <button type="submit" name="desactivar_mecanico" class="btn-action btn-toggle" 
+                                onclick="return confirm('¿Desactivar a {{ mecanico.nombre }}? Ya no aparecerá en formularios nuevos.')">
+                            ⏸️ Desactivar
+                        </button>
+                    </form>
+                {% else %}
+                    <form method="post" style="flex: 1;">
+                        {% csrf_token %}
+                        <input type="hidden" name="mecanico_id" value="{{ mecanico.id }}">
+                        <button type="submit" name="activar_mecanico" class="btn-action btn-activate">
+                            ▶️ Activar
+                        </button>
+                    </form>
+                {% endif %}
+                
+                <form method="post" style="flex: 1;">
+                    {% csrf_token %}
+                    <input type="hidden" name="mecanico_id" value="{{ mecanico.id }}">
+                    <button type="submit" name="eliminar_mecanico" class="btn-action btn-delete" 
+                            onclick="return confirm('⚠️ ¿Eliminar permanentemente a {{ mecanico.nombre }}?\n\nEsta acción no se puede deshacer.')">
+                        🗑️ Eliminar
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% empty %}
+        <div style="grid-column: 1 / -1; text-align: center; padding: 4rem; color: #666;">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">🔧</div>
+            <h3>No hay mecánicos registrados</h3>
+            <p>Agrega el primer mecánico usando el formulario de arriba.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Modal de edición -->
+<div class="modal-overlay" id="editModal">
+    <div class="modal-content">
+        <button class="modal-close" onclick="cerrarModal()">&times;</button>
+        <h2 class="section-title">
+            <span class="section-icon">✏️</span>
+            Editar Mecánico
+        </h2>
+        
+        <form method="post" id="editForm">
+            {% csrf_token %}
+            <input type="hidden" name="mecanico_id" id="edit_mecanico_id">
+            
+            <div class="form-grid">
+                <div class="form-field">
+                    <label class="field-label" for="edit_nombre">👤 Nombre Completo</label>
+                    <input type="text" 
+                           id="edit_nombre" 
+                           name="nuevo_nombre" 
+                           class="field-input" 
+                           required>
+                </div>
+                
+                <div class="form-field">
+                    <label class="field-label" for="edit_telefono">📞 Teléfono</label>
+                    <input type="tel" 
+                           id="edit_telefono" 
+                           name="nuevo_telefono" 
+                           class="field-input">
+                </div>
+                
+                <div class="form-field" style="grid-column: 1 / -1;">
+                    <label class="field-label" for="edit_direccion">📍 Dirección</label>
+                    <input type="text" 
+                           id="edit_direccion" 
+                           name="nueva_direccion" 
+                           class="field-input">
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 2rem;">
+                <button type="submit" name="editar_mecanico" class="btn-add">
+                    💾 Guardar Cambios
+                </button>
+                <button type="button" onclick="cerrarModal()" class="btn-action btn-toggle" style="margin-left: 1rem;">
+                    ❌ Cancelar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// JavaScript para efectos y funcionalidad
+document.addEventListener('DOMContentLoaded', function() {
+    // Crear partículas específicas para mecánicos
+    function createMechanicParticle() {
+        const particle = document.createElement('div');
+        particle.className = 'mechanic-particle';
+        particle.style.left = Math.random() * 100 + 'vw';
+        particle.style.width = Math.random() * 3 + 1 + 'px';
+        particle.style.height = particle.style.width;
+        particle.style.animationDuration = (Math.random() * 4 + 3) + 's';
+        particle.style.animationDelay = Math.random() * 3 + 's';
+        document.body.appendChild(particle);
+        
+        setTimeout(() => {
+            particle.remove();
+        }, 7000);
+    }
+    
+    // Crear partículas periódicamente
+    setInterval(createMechanicParticle, 3000);
+    
+    // Efectos de hover mejorados
+    const cards = document.querySelectorAll('.mecanico-card');
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.zIndex = '10';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.zIndex = '1';
+        });
+    });
+    
+    // Animaciones de entrada
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry, index) => {
+            if (entry.isIntersecting) {
+                setTimeout(() => {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }, index * 100);
+            }
+        });
+    });
+    
+    document.querySelectorAll('.mecanico-card, .stat-badge').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(30px)';
+        el.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+        observer.observe(el);
+    });
+    
+    // Validación del formulario
+    const addForm = document.querySelector('form');
+    if (addForm) {
+        addForm.addEventListener('submit', function(e) {
+            const nombreInput = this.querySelector('input[name="nombre_nuevo_mecanico"]');
+            if (nombreInput && nombreInput.value.trim().length < 2) {
+                e.preventDefault();
+                alert('❌ El nombre debe tener al menos 2 caracteres.');
+                nombreInput.focus();
+                return false;
+            }
+            
+            const submitBtn = this.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.innerHTML = '<span class="loading-spinner"></span> Agregando...';
+                submitBtn.disabled = true;
+            }
+        });
+    }
+});
+
+// Funciones del modal de edición
+function editarMecanico(id, nombre, telefono, direccion) {
+    document.getElementById('edit_mecanico_id').value = id;
+    document.getElementById('edit_nombre').value = nombre;
+    document.getElementById('edit_telefono').value = telefono || '';
+    document.getElementById('edit_direccion').value = direccion || '';
+    document.getElementById('editModal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function cerrarModal() {
+    document.getElementById('editModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+// Cerrar modal al hacer clic fuera
+document.getElementById('editModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        cerrarModal();
+    }
+});
+
+// Cerrar modal con ESC
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        cerrarModal();
+    }
+});
+
+
+  <!-- Formulario para agregar mecánico -->
+  <div class="bg-gray-50 rounded-lg p-6 mb-8">
+    <h3 class="text-lg font-semibold text-gray-800 mb-4">➕ Agregar Nuevo Mecánico</h3>
+    <form method="post" class="flex gap-3 items-end">
+      {% csrf_token %}
+      <div class="flex-1">
+        <label for="nombre_nuevo_mecanico" class="block text-sm font-medium text-gray-700 mb-1">Nombre completo</label>
+        <input 
+          type="text" 
+          name="nombre_nuevo_mecanico" 
+          id="nombre_nuevo_mecanico"
+          placeholder="Ej: Juan Carlos Pérez" 
+          class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          required
+        >
+      </div>
+      <button 
+        type="submit" 
+        name="crear_mecanico" 
+        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
+      >
+        ➕ Agregar
+      </button>
+    </form>
+  </div>
+
+  <!-- Lista de mecánicos -->
+  <div class="bg-white rounded-lg border border-gray-200">
+    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 rounded-t-lg">
+      <h3 class="text-lg font-semibold text-gray-800">📋 Lista de Mecánicos</h3>
+      <p class="text-sm text-gray-600 mt-1">
+        Gestiona los mecánicos de tu taller. Solo los mecánicos activos aparecerán en los formularios de documentos.
+      </p>
+    </div>
+    
+    {% if mecanicos %}
+      <div class="divide-y divide-gray-200">
+        {% for mecanico in mecanicos %}
+          <div class="p-6 {% if not mecanico.activo %}bg-gray-50{% endif %}">
+            <div class="flex justify-between items-center">
+              <div class="flex items-center gap-3">
+                <div class="flex-shrink-0">
+                  {% if mecanico.activo %}
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      ✅ Activo
+                    </span>
+                  {% else %}
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                      ❌ Inactivo
+                    </span>
+                  {% endif %}
+                </div>
+                <div>
+                  <h4 class="text-lg font-medium text-gray-900 {% if not mecanico.activo %}opacity-60{% endif %}">
+                    {{ mecanico.nombre }}
+                  </h4>
+                  <p class="text-sm text-gray-500">
+                    ID: #{{ mecanico.id }}
+                    {% if not mecanico.activo %}
+                      • No aparecerá en formularios nuevos
+                    {% endif %}
+                  </p>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <!-- Botón para editar nombre -->
+                <button 
+                  onclick="editarMecanico({{ mecanico.id }}, '{{ mecanico.nombre|escapejs }}')"
+                  class="text-blue-600 hover:text-blue-800 font-medium text-sm px-3 py-1 rounded border border-blue-200 hover:border-blue-300 transition-colors"
+                >
+                  ✏️ Editar
+                </button>
+
+                <!-- Botón para activar/desactivar -->
+                <form method="post" class="inline">
+                  {% csrf_token %}
+                  <input type="hidden" name="mecanico_id" value="{{ mecanico.id }}">
+                  {% if mecanico.activo %}
+                    <button 
+                      type="submit" 
+                      name="desactivar_mecanico" 
+                      class="text-red-600 hover:text-red-800 font-medium text-sm px-3 py-1 rounded border border-red-200 hover:border-red-300 transition-colors"
+                      onclick="return confirm('¿Está seguro de desactivar a {{ mecanico.nombre }}?')"
+                    >
+                      ❌ Desactivar
+                    </button>
+                  {% else %}
+                    <button 
+                      type="submit" 
+                      name="activar_mecanico" 
+                      class="text-green-600 hover:text-green-800 font-medium text-sm px-3 py-1 rounded border border-green-200 hover:border-green-300 transition-colors"
+                    >
+                      ✅ Activar
+                    </button>
+                  {% endif %}
+                </form>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="p-8 text-center text-gray-500">
+        <div class="mb-4">
+          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 mb-1">No hay mecánicos registrados</h3>
+        <p class="text-gray-500">Agrega tu primer mecánico usando el formulario de arriba.</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Información adicional -->
+  <div class="mt-8 p-4 bg-blue-50 rounded-lg border border-blue-200">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+        </svg>
+      </div>
+      <div class="ml-3">
+        <h3 class="text-sm font-medium text-blue-800">
+          📌 Información importante
+        </h3>
+        <div class="mt-2 text-sm text-blue-700">
+          <ul class="list-disc list-inside space-y-1">
+            <li>Solo los mecánicos <strong>activos</strong> aparecerán en los formularios de creación de documentos</li>
+            <li>Los documentos antiguos conservarán la referencia al mecánico aunque esté desactivado</li>
+            <li>Puedes reactivar un mecánico en cualquier momento</li>
+            <li>Los nombres de mecánicos deben ser únicos dentro de tu taller</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botones de navegación -->
+  <div class="mt-8 flex justify-between">
+    <a 
+      href="{% url 'documentos:lista_documentos' %}" 
+      class="text-gray-600 hover:text-gray-800 font-medium"
+    >
+      ← Volver a Documentos
+    </a>
+    <a 
+      href="/admin/" 
+      class="text-blue-600 hover:text-blue-800 font-medium"
+      target="_blank"
+    >
+      Administración Avanzada →
+    </a>
+  </div>
+</div>
+
+<!-- Modal para editar mecánico -->
+<div id="editModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+  <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+    <h3 class="text-lg font-bold text-gray-900 mb-4">✏️ Editar Mecánico</h3>
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" id="edit_mecanico_id" name="mecanico_id" value="">
+      <div class="mb-4">
+        <label for="edit_nombre" class="block text-sm font-medium text-gray-700 mb-2">Nombre:</label>
+        <input 
+          type="text" 
+          id="edit_nombre" 
+          name="nuevo_nombre" 
+          class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+          required
+        >
+      </div>
+      <div class="flex justify-end gap-3">
+        <button 
+          type="button" 
+          onclick="cerrarModal()" 
+          class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors"
+        >
+          Cancelar
+        </button>
+        <button 
+          type="submit" 
+          name="editar_mecanico" 
+          class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+        >
+          💾 Guardar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function editarMecanico(id, nombre) {
+  document.getElementById('edit_mecanico_id').value = id;
+  document.getElementById('edit_nombre').value = nombre;
+  document.getElementById('editModal').classList.remove('hidden');
+}
+
+function cerrarModal() {
+  document.getElementById('editModal').classList.add('hidden');
+}
+
+// Cerrar modal al hacer clic fuera de él
+window.onclick = function(event) {
+  const modal = document.getElementById('editModal');
+  if (event.target == modal) {
+    modal.classList.add('hidden');
+  }
+}
+</script>
+{% endblock %}

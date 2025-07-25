@@ -7,6 +7,7 @@ from taller.repuestos.views import (
     crear_repuesto,
     validar_part_number,
     api_autocomplete_repuesto,
+    crear_tienda,
 )
 
 app_name = "repuestos"
@@ -19,4 +20,5 @@ urlpatterns = [
     path('eliminar/<int:repuesto_id>/', eliminar_repuesto, name='eliminar_repuesto'),
     path('api/validar_part_number/', validar_part_number, name='validar_part_number'),
     path('api/autocomplete_repuesto/', api_autocomplete_repuesto, name='autocomplete_repuesto'),
+    path('api/crear_tienda/', crear_tienda, name='crear_tienda'),
 ]

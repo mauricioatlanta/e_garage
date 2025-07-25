@@ -9,23 +9,23 @@
   <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
   <link href="/static/css/estilo_futurista.css" rel="stylesheet">
   <style>
-    body {
-      background: linear-gradient(120deg, #0f2027 0%, #2c5364 50%, #7f00ff 100%);
-      min-height: 100vh;
-      font-family: 'Orbitron', 'Montserrat', Arial, sans-serif;
-    }
-    .futurista-form {
-      background: rgba(20, 20, 40, 0.97);
-      border-radius: 1.5rem;
-      box-shadow: 0 0 32px 4px #7f00ff99, 0 0 0 1px #00f2fe;
-      border: 1px solid #7f00ff;
-      color: #fff;
-      padding: 2.5rem 2rem 2rem 2rem;
-      margin-top: 3rem;
-      max-width: 60rem;
-      margin-left: auto;
-      margin-right: auto;
-      position: relative;
+    ajax: {
+      url: '/autocomplete/vehiculo/',
+      dataType: 'json',
+      delay: 250,
+      data: function (params) {
+        const clienteId = $cliente.val();
+        console.log('Solicitando vehículos para cliente:', clienteId, 'término:', params.term);
+        return {
+          q: params.term,
+          cliente: clienteId
+        };
+      },
+      processResults: function (data) {
+        return { results: data.results };
+      },
+      cache: true
+    },
       overflow: hidden;
     }
     .futurista-form:before {
@@ -130,6 +130,25 @@
       box-shadow: 0 0 16px #00f2fe99;
       outline: none;
     }
+    /* Estilos específicos para inputs dentro de tablas */
+    .futurista-table input {
+      background: #0a0a1a !important;
+      color: #00f2fe !important;
+      border: 1px solid #7f00ff !important;
+      border-radius: 0.4rem !important;
+      padding: 0.3rem 0.6rem !important;
+      font-size: 0.95rem !important;
+      margin: 0 !important;
+      width: 100% !important;
+    }
+    .futurista-table input:focus {
+      border-color: #00f2fe !important;
+      box-shadow: 0 0 8px #00f2fe66 !important;
+      outline: none !important;
+    }
+    .futurista-table input::placeholder {
+      color: #7f00ff88 !important;
+    }
     .btn-premium {
       @apply futurista-btn;
       margin-top: 0.5rem;
@@ -146,22 +165,66 @@
 
 {% block content %}
 <div class="futurista-form" id="form-doc-container">
+  {% if form.errors %}
+    <div class="mb-6 p-4 rounded-xl bg-red-900/80 border border-red-400 text-red-200 shadow-xl">
+      <h3 class="font-bold text-lg mb-2">Errores en el formulario:</h3>
+      <ul class="list-disc ml-6">
+          {% for field, errors in form.errors.items %}
+            <li><strong>{{ field|capfirst }}:</strong> {{ errors|striptags }}</li>
+          {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+  <!-- Barra de navegación superior -->
+  <nav class="flex justify-between items-center px-8 py-4 bg-gradient-to-r from-[#0f2027] via-[#2c5364] to-[#1a2980] rounded-xl shadow-xl mb-8 border border-cyan-400" style="backdrop-filter: blur(8px);">
+    <div class="flex items-center gap-8">
+      <a href="/" class="text-cyan-400 font-extrabold text-2xl tracking-widest futuristic-logo animate-pulse">E-Garage</a>
+      <a href="/vehiculos/" class="nav-btn-future">Vehículos</a>
+      <a href="/clientes/" class="nav-btn-future">Clientes</a>
+      <a href="/dashboard/" class="nav-btn-future">Dashboard</a>
+      <a href="/documentos/" class="nav-btn-future">Documentos</a>
+    </div>
+    <div class="flex gap-4">
+      <a href="/vehiculos/" class="btn-cine-future">Lista Vehículos</a>
+      <a href="/repuestos/" class="btn-cine-future">Repuestos</a>
+      <a href="/clientes/" class="btn-cine-future">Clientes</a>
+      <a href="/dashboard/" class="btn-cine-future">Dashboard</a>
+      <a href="/documentos/" class="btn-cine-future">Documentos</a>
+    </div>
+  </nav>
   <div class="flex items-center justify-between mb-8">
     <div class="flex items-center gap-4">
       <img src="/media/TallerPro_logo.png" alt="Logo" class="h-14 w-14 rounded-full shadow-lg border-2 border-cyan-400 bg-white" style="background:#fff;">
-      <span class="futurista-title">🪐 Nuevo Documento Futurista</span>
+      <span class="futurista-title">
+        {% if editando and documento %}
+          🔧 Editar Documento {{ documento.tipo_documento }} #{{ documento.numero_documento }}
+        {% else %}
+          🪐 Nuevo Documento Futurista
+        {% endif %}
+      </span>
     </div>
     <div class="flex gap-3">
       <a href="/" class="futurista-btn">🏠 Dashboard</a>
       <a href="/documentos/" class="futurista-btn">📄 Documentos</a>
     </div>
   </div>
-  <form method="post">
+<form method="post" id="form-crear-documento">
     {% csrf_token %}
+    <input type="hidden" id="json_items" name="json_items" value="[]">
+    <div id="json-items-alert" style="background:#222;color:#0ff;padding:8px 12px;border-radius:8px;margin-bottom:10px;display:none;font-size:0.95rem;"></div>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-      <div><label class="futurista-label" for="id_tipo_documento">Tipo de Documento</label>{{ form.tipo_documento|add_class:'futurista-input' }}</div>
-      <div><label class="futurista-label" for="id_numero_documento">Número</label>{{ form.numero_documento|add_class:'futurista-input' }}</div>
-      <div><label class="futurista-label" for="id_fecha">Fecha</label>{{ form.fecha|add_class:'futurista-input' }}</div>
+      <div>
+        <label class="futurista-label" for="id_tipo_documento">Tipo de Documento</label>
+        {{ form.tipo_documento|add_class:'futurista-input' }}
+      </div>
+      <div>
+        <label class="futurista-label" for="id_numero_documento">Número</label>
+        {{ form.numero_documento|add_class:'futurista-input' }}
+      </div>
+      <div>
+        <label class="futurista-label" for="id_fecha">Fecha</label>
+        {{ form.fecha|add_class:'futurista-input' }}
+      </div>
       <div>
         <label class="futurista-label" for="id_cliente">Cliente</label>
         <select id="id_cliente" name="cliente" class="select2-ajax futurista-input"></select>
@@ -177,25 +240,36 @@
       </div>
       <div><label class="futurista-label" for="id_kilometraje">Kilometraje</label>{{ form.kilometraje|add_class:'futurista-input' }}</div>
       <div><label class="futurista-label" for="id_mecanico">Mecánico</label>
-        <select id="id_mecanico" name="mecanico" class="futurista-input"></select>
+        <select id="id_mecanico" name="mecanico" class="futurista-input">
+          <option value="">-- Seleccionar mecánico --</option>
+          {% for mec in mecanicos %}
+            <option value="{{ mec.id }}" {% if form.instance.mecanico and form.instance.mecanico.id == mec.id %}selected{% endif %}>
+              {{ mec.nombre }}
+            </option>
+          {% endfor %}
+        </select>
       </div>
     </div>
 
 
     <div class="mt-8">
       <h2 class="futurista-label text-xl mb-2">Repuestos</h2>
-      <table class="futurista-table mb-4" id="tabla-repuestos">
+      
+      <!-- Banner informativo -->
+      <!-- Sección de Repuestos -->      <table class="futurista-table mb-4" id="tabla-repuestos">
         <thead>
           <tr>
-            <th>Partnumber</th>
-            <th>Nombre</th>
-            <th>Cantidad</th>
-            <th>Precio unitario</th>
-            <th>Total</th>
+            <th class="futurista-label">Partnumber</th>
+            <th class="futurista-label">Nombre</th>
+            <th class="futurista-label">Cantidad</th>
+            <th class="futurista-label">Precio unitario</th>
+            <th class="futurista-label">Subtotal</th>
             <th></th>
           </tr>
         </thead>
-        <tbody></tbody>
+        <tbody>
+          <!-- Las filas se agregan dinámicamente por JS, aseguro que el JS use las clases correctas -->
+        </tbody>
         <tfoot>
           <tr>
             <td class="text-right font-bold futurista-label" colspan="3">Total repuestos</td>
@@ -204,21 +278,29 @@
           </tr>
         </tfoot>
       </table>
-      <button class="btn-premium" onclick="agregarRepuesto()" type="button">Agregar repuesto</button>
+      <div class="flex gap-2 mt-4">
+        <button class="btn-premium" onclick="agregarRepuesto()" type="button">➕ Agregar repuesto</button>
+        <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded" onclick="agregarRepuestoEjemplo()" type="button">📋 Ejemplo</button>
+      </div>
     </div>
 
 
     <div class="mt-8">
       <h2 class="futurista-label text-xl mb-2">Servicios</h2>
+      
+      <!-- Banner informativo -->
+      <!-- Sección de Servicios -->
       <table class="futurista-table mb-4" id="tabla-servicios">
         <thead>
           <tr>
-            <th>Nombre</th>
+            <th>Nombre del Servicio</th>
             <th>Precio</th>
-            <th></th>
+            <th>Acción</th>
           </tr>
         </thead>
-        <tbody></tbody>
+        <tbody>
+          <!-- Los servicios se agregan dinámicamente -->
+        </tbody>
         <tfoot>
           <tr>
             <td class="text-right font-bold futurista-label" colspan="1">Total servicios</td>
@@ -227,7 +309,11 @@
           </tr>
         </tfoot>
       </table>
-      <button class="btn-premium" type="button" id="btn-agregar-servicio">Agregar servicio</button>
+      
+      <div class="flex gap-2 mt-4">
+        <button class="btn-premium" onclick="agregarServicio()" type="button">🔧 Agregar Servicio</button>
+        <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded" onclick="agregarServicioEjemplo()" type="button">📋 Ejemplo</button>
+      </div>
     </div>
 
     <div class="mt-8 max-w-xl mx-auto">
@@ -236,13 +322,52 @@
     </div>
 
 
-    <div class="mt-8 flex flex-col items-end gap-2">
-      <div><span class="font-bold futurista-label">Subtotal:</span> <span class="futurista-label" id="subtotal-doc">$0</span></div>
-      <div><span class="font-bold futurista-label">IVA (19%):</span> <span class="futurista-label" id="iva-doc">$0</span></div>
-      <div class="text-xl"><span class="font-bold futurista-label">Gran Total:</span> <span class="futurista-label" id="gran-total-doc">$0</span></div>
+    <div class="mt-8 bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl p-6 border border-cyan-400 shadow-2xl">
+      <h3 class="text-xl font-bold text-cyan-400 mb-4 text-center">💰 Resumen de Totales</h3>
+      
+      <!-- Totales por categoría -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div class="bg-gray-800 rounded-lg p-4 border border-gray-600">
+          <h4 class="font-semibold text-yellow-400 mb-2">🔧 Servicios</h4>
+          <div class="flex justify-between">
+            <span class="futurista-label">Total servicios:</span>
+            <span class="futurista-label font-bold" id="total-servicios-resumen">$0</span>
+          </div>
+        </div>
+        
+        <div class="bg-gray-800 rounded-lg p-4 border border-gray-600">
+          <h4 class="font-semibold text-blue-400 mb-2">🔩 Repuestos</h4>
+          <div class="flex justify-between">
+            <span class="futurista-label">Total repuestos:</span>
+            <span class="futurista-label font-bold" id="total-repuestos-resumen">$0</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Totales finales -->
+      <div class="border-t border-gray-600 pt-4 space-y-3">
+        <div class="flex justify-between text-lg">
+          <span class="font-bold futurista-label">Subtotal (Sin IVA):</span>
+          <span class="futurista-label font-bold" id="subtotal-doc">$0</span>
+        </div>
+        
+        <div class="flex justify-between items-center">
+          <label class="flex items-center gap-2 futurista-label" for="lleva_iva">
+            <input type="checkbox" id="lleva_iva" name="lleva_iva" checked class="accent-cyan-400 scale-125">
+            <span class="font-semibold">Incluir IVA (19%)</span>
+          </label>
+          <span class="futurista-label font-bold" id="iva-doc">$0</span>
+        </div>
+        
+        <div class="bg-cyan-900 bg-opacity-50 rounded-lg p-4 border border-cyan-400">
+          <div class="flex justify-between items-center text-2xl">
+            <span class="font-bold text-cyan-300">💵 GRAN TOTAL:</span>
+            <span class="font-bold text-cyan-300" id="gran-total-doc">$0</span>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <input type="hidden" id="json_items" name="json_items" value="[]">
     <div class="mt-6 flex justify-end">
       <button class="bg-blue-600 hover:bg-blue-800 text-white font-bold py-2 px-6 rounded btn-futuristic" type="submit">Guardar Documento</button>
     </div>
@@ -256,32 +381,48 @@
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 <script>
 $(document).ready(function () {
-  // MECÁNICO: Autocomplete AJAX manual con creación
+  /* 
+  // MECÁNICO: COMENTADO - Ahora usamos select clásico en lugar de Select2
   $('#id_mecanico').select2({
-    placeholder: 'Buscar o crear mecánico...',
+    placeholder: 'Seleccionar mecánico existente o escribir nuevo...',
     tags: true,
     allowClear: true,
-    minimumInputLength: 1,
+    minimumInputLength: 0,  // Mostrar opciones sin escribir
     ajax: {
       url: '/autocomplete/mecanico/',
       dataType: 'json',
-      delay: 250,
+      delay: 150,
       data: function (params) {
-        return { q: params.term };
+        return { 
+          q: params.term || '',  // Permitir búsqueda vacía para mostrar todos
+          existing_only: false 
+        };
       },
       processResults: function (data) {
-        return {
-          results: data.results.map(function (item) {
-            return { id: item.id, text: item.nombre };
-          })
-        };
+        var results = data.results.map(function (item) {
+          return { id: item.id, text: item.nombre };
+        });
+        
+        // Si no hay término de búsqueda, mostrar mensaje informativo
+        if (!params.term) {
+          results.unshift({
+            id: '',
+            text: 'Seleccione un mecánico existente o escriba un nombre nuevo',
+            disabled: true
+          });
+        }
+        
+        return { results: results };
       },
       cache: true
     },
     createTag: function (params) {
+      var term = $.trim(params.term);
+      if (term === '') return null;
+      
       return {
-        id: params.term,
-        text: params.term,
+        id: term,
+        text: term + ' ✨ (crear nuevo)',
         newTag: true
       };
     }
@@ -291,21 +432,33 @@ $(document).ready(function () {
   $('#id_mecanico').on('select2:select', function (e) {
     var data = e.params.data;
     if (data.newTag) {
+      // Extraer solo el nombre (quitar " ✨ (crear nuevo)")
+      var nombreLimpio = data.text.replace(' ✨ (crear nuevo)', '');
+      
       $.ajax({
-        url: '/api/crear_mecanico/',
+        url: '/documentos/api/crear_mecanico/',
         method: 'POST',
-        data: { nombre: data.text },
+        data: { nombre: nombreLimpio },
         headers: { 'X-CSRFToken': $('[name=csrfmiddlewaretoken]').val() },
         success: function (resp) {
+          console.log('[MECÁNICO] Creado exitosamente:', resp);
           // Elimina la opción temporal (texto plano)
           $('#id_mecanico option[value="' + data.id + '"]').remove();
           // Agrega la opción real con el ID de la base de datos
           var newOption = new Option(resp.nombre, resp.id, true, true);
           $('#id_mecanico').append(newOption).trigger('change');
+        },
+        error: function (xhr, status, error) {
+          console.error('[MECÁNICO] Error al crear:', error);
+          alert('Error al crear el mecánico: ' + (xhr.responseJSON?.error || error));
+          // Revertir la selección en caso de error
+          $('#id_mecanico').val(null).trigger('change');
         }
       });
     }
   });
+  */
+  
 // ...existing code...
   const $cliente = $('#id_cliente');
   const $vehiculo = $('#id_vehiculo');
@@ -361,16 +514,19 @@ $(document).ready(function () {
   $vehiculo.select2({
     placeholder: 'Buscar vehículo...',
     ajax: {
-      url: '/autocomplete/vehiculo/',
+      url: '/documentos/autocomplete/vehiculo/',
       dataType: 'json',
       delay: 250,
       data: function (params) {
+        const clienteId = $cliente.val();
+        console.log('Solicitando vehículos para cliente:', clienteId, 'término:', params.term);
         return {
           q: params.term,
-          cliente: $cliente.val()
+          cliente: clienteId
         };
       },
       processResults: function (data) {
+        console.log('Resultados de vehículos:', data);
         return { results: data.results };
       },
       cache: true
@@ -383,12 +539,18 @@ $(document).ready(function () {
 
   $cliente.on('change', function () {
     const clienteId = $(this).val();
+    console.log('Cliente cambiado a:', clienteId);
+    
+    // Limpiar selección de vehículo
     $vehiculo.val(null).trigger('change');
     $vehiculo.empty();
+    
     if (clienteId) {
       $vehiculoWrapper.removeClass('hidden');
+      console.log('Mostrando selector de vehículos');
     } else {
       $vehiculoWrapper.addClass('hidden');
+      console.log('Ocultando selector de vehículos');
     }
   });
 
@@ -404,5 +566,475 @@ $(document).ready(function () {
   });
 });
 </script>
+
+<script>
+// Variables globales para el modal de servicios
+// Variables para carga inicial
+// serviciosSeleccionados ya no se necesita - eliminado modal complejo
+
+// Buscador de servicios
+let timeoutBusqueda;
+// JavaScript simplificado - ya no se necesitan funciones complejas de modal
+
+// Eventos para cálculos de totales
+actualizarTotalesDocumento();
+
+// Cargar servicios por categorías
+function cargarServicios() {
+  $.get('/documentos/api/servicios-categorias/')
+    .done(function(data) {
+      todosLosServicios = data.categorias;
+      mostrarServicios(data.categorias);
+    })
+    .fail(function() {
+      alert('Error al cargar los servicios');
+    });
+}
+
+// Función para agregar datos de ejemplo (solo en creación)
+function agregarEjemplos() {
+  {% if not editando %}
+  console.log('[EJEMPLO] Agregando datos de ejemplo...');
+  
+  // Agregar repuesto de ejemplo
+  if (typeof window.agregarRepuesto === 'function') {
+    window.agregarRepuesto();
+    const lastRepuestoRow = document.querySelector('#tabla-repuestos tbody tr:last-child');
+    if (lastRepuestoRow) {
+      lastRepuestoRow.querySelector('.partnumber-input').value = 'EJ-001';
+      lastRepuestoRow.querySelector('.nombre-input').value = 'Filtro de aceite (ejemplo)';
+      lastRepuestoRow.querySelector('.cantidad-input').value = 1;
+      lastRepuestoRow.querySelector('.precio-input').value = 15000;
+      if (window.actualizarTotalRepuestos) window.actualizarTotalRepuestos();
+    }
+  }
+  
+  // Agregar servicio de ejemplo  
+  if (typeof window.agregarServicio === 'function') {
+    window.agregarServicio();
+    const lastServicioRow = document.querySelector('#tabla-servicios tbody tr:last-child');
+    if (lastServicioRow) {
+      lastServicioRow.querySelector('.nombre-servicio-input').value = 'Cambio de aceite (ejemplo)';
+      lastServicioRow.querySelector('.precio-servicio-input').value = 25000;
+      if (window.actualizarTotalServicios) window.actualizarTotalServicios();
+    }
+  }
+  
+  console.log('[EJEMPLO] Datos de ejemplo agregados');
+  {% endif %}
+}
+
+// Mostrar servicios en el acordeón
+function mostrarServicios(categorias) {
+  const $acordeon = $('#acordeon-categorias');
+  $acordeon.empty();
+  
+  categorias.forEach(categoria => {
+    const $categoria = $(`
+      <div class="border border-gray-600 rounded-lg overflow-hidden">
+        <button class="w-full p-4 bg-gray-700 hover:bg-gray-600 text-left flex justify-between items-center categoria-toggle" 
+                data-categoria="${categoria.id}">
+          <span class="font-semibold text-cyan-300">${categoria.nombre}</span>
+          <span class="text-cyan-400">▼</span>
+        </button>
+        <div class="categoria-contenido hidden p-4 bg-gray-800">
+          ${categoria.subcategorias.map(sub => `
+            <div class="mb-4">
+              <h5 class="font-medium text-yellow-300 mb-2">${sub.nombre}</h5>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                ${sub.servicios.map(servicio => `
+                  <label class="flex items-center p-2 bg-gray-700 rounded hover:bg-gray-600 cursor-pointer servicio-item" 
+                         data-servicio-id="${servicio.id}">
+                    <input type="checkbox" class="mr-3 accent-cyan-400 servicio-checkbox" 
+                           value="${servicio.id}" data-nombre="${servicio.nombre}">
+                    <span class="text-white text-sm">${servicio.nombre}</span>
+                  </label>
+                `).join('')}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `);
+    
+    $acordeon.append($categoria);
+  });
+  
+  // Toggle de categorías
+  $('.categoria-toggle').on('click', function() {
+    const $contenido = $(this).next('.categoria-contenido');
+    const $icono = $(this).find('span:last');
+    
+    $contenido.toggleClass('hidden');
+    $icono.text($contenido.hasClass('hidden') ? '▼' : '▲');
+  });
+  
+  // Manejar selección de servicios
+  $('.servicio-checkbox').on('change', function() {
+    const servicioId = $(this).val();
+    const servicioNombre = $(this).data('nombre');
+    
+    if ($(this).is(':checked')) {
+      if (!serviciosSeleccionados.find(s => s.id === servicioId)) {
+        serviciosSeleccionados.push({
+          id: servicioId,
+          nombre: servicioNombre
+        });
+      }
+    } else {
+      serviciosSeleccionados = serviciosSeleccionados.filter(s => s.id !== servicioId);
+    }
+    
+    actualizarContadorServicios();
+  });
+}
+
+// Buscar servicios
+function buscarServicios(query) {
+  $.get('/documentos/api/buscar-servicios/', { q: query })
+    .done(function(data) {
+      mostrarResultadosBusqueda(data.servicios);
+    })
+    .fail(function() {
+      alert('Error al buscar servicios');
+    });
+}
+
+// Mostrar resultados de búsqueda
+function mostrarResultadosBusqueda(servicios) {
+  const $resultados = $('#lista-resultados');
+  $resultados.empty();
+  
+  if (servicios.length === 0) {
+    $resultados.html('<p class="text-gray-400">No se encontraron servicios</p>');
+  } else {
+    servicios.forEach(servicio => {
+      const $servicio = $(`
+        <label class="flex items-center p-3 bg-gray-700 rounded hover:bg-gray-600 cursor-pointer">
+          <input type="checkbox" class="mr-3 accent-cyan-400 servicio-checkbox-busqueda" 
+                 value="${servicio.id}" data-nombre="${servicio.nombre}">
+          <div>
+            <span class="text-white font-medium">${servicio.nombre}</span>
+            <div class="text-sm text-gray-400">${servicio.categoria} > ${servicio.subcategoria}</div>
+          </div>
+        </label>
+      `);
+      $resultados.append($servicio);
+    });
+    
+    // Manejar selección en resultados de búsqueda
+    $('.servicio-checkbox-busqueda').on('change', function() {
+      const servicioId = $(this).val();
+      const servicioNombre = $(this).data('nombre');
+      
+      if ($(this).is(':checked')) {
+        if (!serviciosSeleccionados.find(s => s.id === servicioId)) {
+          serviciosSeleccionados.push({
+            id: servicioId,
+            nombre: servicioNombre
+          });
+        }
+      } else {
+        serviciosSeleccionados = serviciosSeleccionados.filter(s => s.id !== servicioId);
+      }
+      
+      actualizarContadorServicios();
+    });
+  }
+  
+  $('#resultados-busqueda').removeClass('hidden');
+  $('#servicios-categorias').addClass('hidden');
+}
+
+// Crear servicio personalizado
+$('#btn-crear-servicio').on('click', function() {
+  const nombre = $('#nuevo-servicio-nombre').val().trim();
+  
+  if (!nombre) {
+    alert('Por favor ingrese el nombre del servicio');
+    return;
+  }
+  
+  $.ajax({
+    url: '/documentos/api/crear-servicio/',
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': $('[name=csrfmiddlewaretoken]').val(),
+      'Content-Type': 'application/json'
+    },
+    data: JSON.stringify({ nombre: nombre }),
+    success: function(data) {
+      if (data.success) {
+        // Agregar a seleccionados
+        serviciosSeleccionados.push({
+          id: data.servicio.id,
+          nombre: data.servicio.nombre
+        });
+        
+        $('#nuevo-servicio-nombre').val('');
+        actualizarContadorServicios();
+        
+        if (data.mensaje) {
+          alert(data.mensaje);
+        } else {
+          alert('Servicio creado exitosamente');
+        }
+      }
+    },
+    error: function() {
+      alert('Error al crear el servicio');
+    }
+  });
+});
+
+// Limpiar selección
+$('#limpiar-seleccion').on('click', function() {
+  serviciosSeleccionados = [];
+  $('.servicio-checkbox, .servicio-checkbox-busqueda').prop('checked', false);
+  actualizarContadorServicios();
+});
+
+// Confirmar selección
+$('#confirmar-servicios').on('click', function() {
+  serviciosSeleccionados.forEach(servicio => {
+    agregarServicioATabla(servicio.nombre);
+  });
+  
+  serviciosSeleccionados = [];
+  $('#modal-servicios').addClass('hidden');
+  $('#buscar-servicios').val('');
+  $('#resultados-busqueda').addClass('hidden');
+  $('#servicios-categorias').removeClass('hidden');
+});
+
+// Actualizar contador de servicios seleccionados
+function actualizarContadorServicios() {
+  $('#contador-servicios').text(serviciosSeleccionados.length);
+}
+
+// Función para agregar servicio a la tabla (modificar la función existente)
+function agregarServicioATabla(nombre, precio = 0) {
+  const $tbody = $('#tabla-servicios tbody');
+  const servicioId = 'servicio_' + Date.now();
+  
+  const $fila = $(`
+    <tr data-id="${servicioId}">
+      <td><input type="text" name="servicios_nombre[]" value="${nombre}" class="futurista-input w-full nombre-servicio-input"></td>
+      <td><input type="number" name="servicios_precio[]" value="${precio}" class="futurista-input w-full precio-servicio-input" step="1"></td>
+      <td><button type="button" class="btn-eliminar-servicio text-red-400 hover:text-red-600">🗑️</button></td>
+    </tr>
+  `);
+  
+  $tbody.append($fila);
+  
+  // Manejar eliminación
+  $fila.find('.btn-eliminar-servicio').on('click', function() {
+    $fila.remove();
+    if (window.actualizarTotalesDocumento) {
+      window.actualizarTotalesDocumento();
+    }
+  });
+  
+  // Manejar cambio de precio
+  $fila.find('.precio-servicio-input').on('input', function() {
+    if (window.actualizarTotalesDocumento) {
+      window.actualizarTotalesDocumento();
+    }
+  });
+  
+  if (window.actualizarTotalesDocumento) {
+    window.actualizarTotalesDocumento();
+  }
+  
+  // Cargar datos existentes en modo edición
+  {% if editando and documento %}
+  console.log('[EDICIÓN] Modo edición activado');
+  console.log('[EDICIÓN] Documento ID: {{ documento.id }}');
+  console.log('[EDICIÓN] Repuestos disponibles: {{ repuestos|length }}');
+  console.log('[EDICIÓN] Servicios disponibles: {{ servicios|length }}');
+  
+  // Cargar repuestos existentes
+  {% for repuesto in repuestos %}
+  setTimeout(function() {
+    console.log('[EDICIÓN] Cargando repuesto {{ forloop.counter }}: {{ repuesto.nombre|escapejs }}');
+    window.agregarRepuesto();
+    const lastRow = document.querySelector('#tabla-repuestos tbody tr:last-child');
+    if (lastRow) {
+      lastRow.querySelector('.partnumber-input').value = '{{ repuesto.codigo|escapejs }}';
+      lastRow.querySelector('.nombre-input').value = '{{ repuesto.nombre|escapejs }}';
+      lastRow.querySelector('.cantidad-input').value = {{ repuesto.cantidad }};
+      lastRow.querySelector('.precio-input').value = {{ repuesto.precio }};
+      if (window.actualizarTotalRepuestos) window.actualizarTotalRepuestos();
+      console.log('[EDICIÓN] Repuesto cargado:', '{{ repuesto.nombre|escapejs }}');
+    } else {
+      console.error('[EDICIÓN] No se encontró la fila de repuesto');
+    }
+  }, {{ forloop.counter0 }}00);
+  {% endfor %}
+  
+  // Cargar servicios existentes
+  {% for servicio in servicios %}
+  setTimeout(function() {
+    console.log('[EDICIÓN] Cargando servicio {{ forloop.counter }}: {{ servicio.nombre|escapejs }}');
+    window.agregarServicio();
+    const lastRow = document.querySelector('#tabla-servicios tbody tr:last-child');
+    if (lastRow) {
+      lastRow.querySelector('.nombre-servicio-input').value = '{{ servicio.nombre|escapejs }}';
+      lastRow.querySelector('.precio-servicio-input').value = {{ servicio.precio }};
+      if (window.actualizarTotalServicios) window.actualizarTotalServicios();
+      console.log('[EDICIÓN] Servicio cargado:', '{{ servicio.nombre|escapejs }}');
+    } else {
+      console.error('[EDICIÓN] No se encontró la fila de servicio');
+    }
+  }, {{ forloop.counter0|add:repuestos|length }}00);
+  {% endfor %}
+  
+  // Actualizar totales finales después de cargar todo
+  setTimeout(function() {
+    if (window.actualizarTotalRepuestos) window.actualizarTotalRepuestos();
+    if (window.actualizarTotalServicios) window.actualizarTotalServicios();
+    if (window.actualizarTotalesDocumento) window.actualizarTotalesDocumento();
+    console.log('[EDICIÓN] Totales actualizados');
+  }, {{ repuestos|length|add:servicios|length|add:1 }}00);
+  
+  console.log('[EDICIÓN] Carga de datos programada: {{ repuestos|length }} repuestos, {{ servicios|length }} servicios');
+  {% else %}
+  console.log('[EDICIÓN] Modo creación (no hay datos existentes)');
+  {% endif %}
+}
+
+// Event listener para cambios en IVA
+$('#lleva_iva').on('change', function() {
+  if (window.actualizarTotalesDocumento) {
+    window.actualizarTotalesDocumento();
+  }
+});
+
+// SERIALIZACIÓN DE DATOS DINÁMICOS ANTES DEL ENVÍO
+$('form').on('submit', function (e) {
+  console.log('[SUBMIT] Procesando datos dinámicos...');
+  
+  const items = []; // Array unificado con tipo de item
+  
+  // Procesar repuestos
+  $('#tabla-repuestos tbody tr').each(function () {
+    const partnumber = $(this).find('.partnumber-input').val() || '';
+    const nombre = $(this).find('.nombre-input').val() || '';
+    const cantidad = parseFloat($(this).find('.cantidad-input').val()) || 0;
+    const precio = parseFloat($(this).find('.precio-input').val()) || 0;
+    
+    if (nombre.trim() && precio > 0 && cantidad > 0) {
+      items.push({
+        tipo: 'repuesto',
+        partnumber: partnumber.trim(),
+        nombre: nombre.trim(),
+        cantidad: cantidad,
+        precio: precio,
+      });
+      console.log('[SUBMIT] Repuesto agregado:', { partnumber, nombre, cantidad, precio });
+    }
+  });
+
+  // Procesar servicios
+  $('#tabla-servicios tbody tr').each(function () {
+    const nombre = $(this).find('.nombre-servicio-input').val() || '';
+    const precio = parseFloat($(this).find('.precio-servicio-input').val()) || 0;
+    
+    if (nombre.trim() && precio > 0) {
+      items.push({
+        tipo: 'servicio',
+        nombre: nombre.trim(),
+        precio: precio,
+      });
+      console.log('[SUBMIT] Servicio agregado:', { nombre, precio });
+    }
+  });
+
+  const jsonData = JSON.stringify(items);
+  $('#json_items').val(jsonData);
+  
+  console.log('[SUBMIT] Datos serializados:', jsonData);
+  console.log('[SUBMIT] Total items:', items.length);
+  
+  // Validación: advertir si no hay items
+  if (items.length === 0) {
+    // Mostrar alerta visual más prominente
+    const alertaDiv = document.createElement('div');
+    alertaDiv.style.cssText = `
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: linear-gradient(45deg, #ff4444, #ff6666);
+      color: white;
+      padding: 30px;
+      border-radius: 15px;
+      z-index: 10000;
+      text-align: center;
+      box-shadow: 0 0 30px rgba(255, 68, 68, 0.5);
+      border: 3px solid #ff8888;
+      font-family: 'Orbitron', monospace;
+      max-width: 500px;
+    `;
+    alertaDiv.innerHTML = `
+      <h3 style="margin-top: 0; font-size: 1.5em;">⚠️ DOCUMENTO VACÍO</h3>
+      <p>No hay repuestos ni servicios agregados al documento.</p>
+      <p><strong>Para agregar items:</strong></p>
+      <p>1. Use los botones "📋 Ejemplo" para ver cómo funciona</p>
+      <p>2. Use los botones "➕ Agregar Repuesto" y "➕ Agregar Servicio"</p>
+      <p>3. Complete los campos y precios</p>
+      <br>
+      <button id="continuar-sin-items" style="background: #666; color: white; padding: 10px 20px; border: none; border-radius: 5px; margin-right: 10px; cursor: pointer;">Continuar sin items</button>
+      <button id="cancelar-envio" style="background: #00f2fe; color: black; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">Cancelar y agregar items</button>
+    `;
+    
+    document.body.appendChild(alertaDiv);
+    
+    // Manejar botones de la alerta
+    const continuarBtn = alertaDiv.querySelector('#continuar-sin-items');
+    const cancelarBtn = alertaDiv.querySelector('#cancelar-envio');
+    
+    return new Promise((resolve) => {
+      continuarBtn.onclick = () => {
+        document.body.removeChild(alertaDiv);
+        resolve(true); // Continuar con el envío
+      };
+      
+      cancelarBtn.onclick = () => {
+        document.body.removeChild(alertaDiv);
+        resolve(false); // Cancelar el envío
+      };
+    }).then(continuar => {
+      if (!continuar) {
+        e.preventDefault();
+        console.log('[SUBMIT] Envío cancelado por usuario');
+        return false;
+      }
+      console.log('[SUBMIT] Usuario confirmó continuar sin items');
+      return true;
+    });
+  }
+  
+  console.log('[SUBMIT] Formulario listo para envío');
+});
+</script>
+
 <script src="{% static 'js/formulario_documento.js' %}"></script>
+<script>
+// Mostrar alerta visual con el contenido de json_items antes de enviar
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('form-crear-documento');
+  if (!form) return;
+  form.addEventListener('submit', function(e) {
+    const jsonInput = document.getElementById('json_items');
+    const alertDiv = document.getElementById('json-items-alert');
+    if (jsonInput && alertDiv) {
+      alertDiv.style.display = 'block';
+      alertDiv.textContent = '[DEBUG] json_items a enviar: ' + jsonInput.value;
+      // También mostrar por 3 segundos y luego ocultar
+      setTimeout(() => { alertDiv.style.display = 'none'; }, 3000);
+    }
+  });
+});
+</script>
 {% endblock %}

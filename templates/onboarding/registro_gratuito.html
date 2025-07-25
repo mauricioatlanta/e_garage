@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Únete a E-Garage - Gratis para siempre</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Sistema de gestión para talleres mecánicos. Gratis para siempre. Clientes, vehículos, documentos, reportes con IA.">
+    <meta name="keywords" content="taller mecánico, gestión automotriz, software taller, gratis, IA">
+    <meta property="og:title" content="E-Garage - Gestión de Talleres Gratis">
+    <meta property="og:description" content="El sistema más completo para talleres mecánicos. Gratis para siempre.">
+    <meta property="og:image" content="/static/img/og-image.jpg">
+    
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-XXXXXXXXXX');
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --cyber-blue: #00d4ff;
+            --matrix-green: #39ff14;
+            --neon-purple: #b347d9;
+            --dark-bg: #0a0a0f;
+            --glow-cyan: #00ffff;
+            --electric-yellow: #ffff00;
+            --success-green: #00ff7f;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+            color: var(--glow-cyan);
+            font-family: 'Orbitron', 'Courier New', monospace;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .registro-card {
+            background: rgba(10, 10, 15, 0.95);
+            border: 2px solid var(--cyber-blue);
+            border-radius: 20px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 500px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 0 50px rgba(0, 212, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .registro-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--matrix-green), var(--cyber-blue), var(--neon-purple));
+            border-radius: 20px;
+            z-index: -1;
+            animation: borderGlow 3s linear infinite;
+        }
+
+        @keyframes borderGlow {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo h1 {
+            font-size: 3rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, var(--matrix-green), var(--cyber-blue), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+        }
+
+        .logo p {
+            color: var(--glow-cyan);
+            opacity: 0.8;
+            font-size: 1.1rem;
+        }
+
+        .badge-gratis {
+            background: linear-gradient(45deg, var(--success-green), var(--electric-yellow));
+            color: #000;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            margin: 1rem auto;
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            color: var(--matrix-green);
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            width: 100%;
+            background: rgba(0, 20, 40, 0.8);
+            border: 1px solid var(--cyber-blue);
+            border-radius: 10px;
+            color: var(--glow-cyan);
+            padding: 15px;
+            font-family: 'Orbitron', monospace;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--matrix-green);
+            box-shadow: 0 0 20px rgba(57, 255, 20, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .btn-registro {
+            width: 100%;
+            background: linear-gradient(45deg, var(--matrix-green), var(--cyber-blue));
+            border: none;
+            border-radius: 15px;
+            color: #000;
+            padding: 18px;
+            font-weight: bold;
+            font-family: 'Orbitron', monospace;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .btn-registro:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(57, 255, 20, 0.5);
+        }
+
+        .btn-registro:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-registro::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-registro:hover::before {
+            left: 100%;
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(0, 0, 0, 0.3);
+            border-radius: 50%;
+            border-top-color: #000;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid #ff0000;
+            color: #ff6666;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .features {
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .features h3 {
+            color: var(--cyber-blue);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .feature-item {
+            background: rgba(57, 255, 20, 0.1);
+            border: 1px solid var(--matrix-green);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .feature-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-text {
+            font-size: 0.9rem;
+            color: var(--glow-cyan);
+        }
+
+        .whatsapp-float {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #25d366;
+            color: white;
+            border-radius: 50px;
+            padding: 15px 20px;
+            text-decoration: none;
+            font-weight: bold;
+            box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .whatsapp-float:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(37, 211, 102, 0.6);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .registro-card {
+                padding: 2rem;
+            }
+            
+            .logo h1 {
+                font-size: 2.5rem;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+    
+    <!-- WhatsApp Float Button -->
+    <a href="https://wa.me/56912345678?text=Hola%2C%20necesito%20ayuda%20con%20E-Garage" 
+       class="whatsapp-float" target="_blank">
+        📲 ¿Necesitas ayuda?
+    </a>
+
+    <div class="container">
+        <div class="registro-card">
+            <div class="logo">
+                <h1>🚗 E-GARAGE</h1>
+                <p>Gestión inteligente para talleres</p>
+                <div class="badge-gratis">✨ GRATIS PARA SIEMPRE ✨</div>
+            </div>
+
+            <div class="error-message" id="errorMessage"></div>
+
+            <form id="registroForm">
+                <div class="form-group">
+                    <label for="nombre_taller">🏢 Nombre de tu taller</label>
+                    <input type="text" id="nombre_taller" name="nombre_taller" class="form-control" 
+                           placeholder="Ej: Taller San Miguel" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="nombre_usuario">👤 Tu nombre</label>
+                    <input type="text" id="nombre_usuario" name="nombre_usuario" class="form-control" 
+                           placeholder="Ej: Juan Pérez" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">📧 Email</label>
+                    <input type="email" id="email" name="email" class="form-control" 
+                           placeholder="tu@email.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">🔒 Contraseña</label>
+                    <input type="password" id="password" name="password" class="form-control" 
+                           placeholder="Mínimo 6 caracteres" required minlength="6">
+                </div>
+
+                <button type="submit" class="btn-registro" id="btnRegistro">
+                    <span class="loading-spinner" id="loadingSpinner"></span>
+                    🚀 Crear mi taller gratis
+                </button>
+            </form>
+
+            <div class="features">
+                <h3>🎯 Todo incluido sin límites:</h3>
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <div class="feature-icon">👥</div>
+                        <div class="feature-text">Clientes ilimitados</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">🚗</div>
+                        <div class="feature-text">Vehículos sin límite</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">📋</div>
+                        <div class="feature-text">Documentos infinitos</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">🧠</div>
+                        <div class="feature-text">IA incluida</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuración de partículas
+        particlesJS("particles-js", {
+            "particles": {
+                "number": {
+                    "value": 50,
+                    "density": { "enable": true, "value_area": 800 }
+                },
+                "color": { "value": ["#00d4ff", "#39ff14", "#b347d9"] },
+                "shape": { "type": "circle" },
+                "opacity": { "value": 0.5, "random": false },
+                "size": { "value": 3, "random": true },
+                "line_linked": {
+                    "enable": true,
+                    "distance": 150,
+                    "color": "#00d4ff",
+                    "opacity": 0.4,
+                    "width": 1
+                },
+                "move": {
+                    "enable": true,
+                    "speed": 2,
+                    "direction": "none",
+                    "random": false,
+                    "straight": false,
+                    "out_mode": "out",
+                    "bounce": false
+                }
+            },
+            "interactivity": {
+                "detect_on": "canvas",
+                "events": {
+                    "onhover": { "enable": true, "mode": "repulse" },
+                    "onclick": { "enable": true, "mode": "push" },
+                    "resize": true
+                }
+            },
+            "retina_detect": true
+        });
+
+        // Manejo del formulario
+        document.getElementById('registroForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = {
+                nombre_taller: formData.get('nombre_taller'),
+                nombre_usuario: formData.get('nombre_usuario'),
+                email: formData.get('email'),
+                password: formData.get('password')
+            };
+            
+            // Validaciones
+            if (!data.nombre_taller || !data.email || !data.password) {
+                showError('Todos los campos son obligatorios');
+                return;
+            }
+            
+            if (data.password.length < 6) {
+                showError('La contraseña debe tener al menos 6 caracteres');
+                return;
+            }
+            
+            // Mostrar loading
+            const btn = document.getElementById('btnRegistro');
+            const spinner = document.getElementById('loadingSpinner');
+            btn.disabled = true;
+            spinner.style.display = 'inline-block';
+            btn.innerHTML = '<span class="loading-spinner"></span> Creando tu taller...';
+            
+            // Enviar datos
+            fetch('/registro-gratuito/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken()
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    // Analytics
+                    gtag('event', 'registro_exitoso', {
+                        'event_category': 'user_engagement',
+                        'event_label': 'registro_gratuito'
+                    });
+                    
+                    // Redireccionar
+                    window.location.href = result.redirect_url;
+                } else {
+                    showError(result.error);
+                    resetButton();
+                }
+            })
+            .catch(error => {
+                showError('Error de conexión. Inténtalo nuevamente.');
+                resetButton();
+            });
+        });
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function resetButton() {
+            const btn = document.getElementById('btnRegistro');
+            btn.disabled = false;
+            btn.innerHTML = '🚀 Crear mi taller gratis';
+        }
+
+        function getCSRFToken() {
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                const [name, value] = cookie.trim().split('=');
+                if (name === 'csrftoken') return value;
+            }
+            return '';
+        }
+
+        // Analytics para tracking de eventos
+        document.getElementById('nombre_taller').addEventListener('focus', () => {
+            gtag('event', 'form_start', {
+                'event_category': 'user_engagement',
+                'event_label': 'registro_form'
+            });
+        });
+    </script>
+</body>
+</html>

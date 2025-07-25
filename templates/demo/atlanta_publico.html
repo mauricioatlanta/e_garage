@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% load i18n %}{% trans "TallerPro Atlanta - Live Demo | Professional Auto Shop Software" %}</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="{% trans 'Experience TallerPro live - the complete auto shop management software built for Atlanta mechanics. Try our demo with real features, AI recommendations, and Georgia tax calculations.' %}">
+    <meta name="keywords" content="{% trans 'auto shop software Atlanta, mechanic management system, automotive software Georgia, shop management demo' %}">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="{% trans 'TallerPro Atlanta Demo - Auto Shop Software' %}">
+    <meta property="og:description" content="{% trans 'Try the complete auto shop management system built for Atlanta. See real features, AI recommendations, and Georgia tax calculations.' %}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://tallerpro.com/demo/atlanta/">
+    
+    <style>
+        :root {
+            --atlanta-peach: #ffcb9a;
+            --atlanta-blue: #003366;
+            --georgia-red: #cc0000;
+            --primary-green: #00ff9f;
+            --bg-dark: #0a0a0a;
+            --bg-card: #1a1a1a;
+            --text-light: #ffffff;
+            --shadow-glow: 0 0 20px rgba(0, 255, 159, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--atlanta-blue) 50%, #1a1a2e 100%);
+            color: var(--text-light);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--primary-green);
+            border-radius: 50%;
+            animation: float 8s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 1; }
+            50% { transform: translateY(-30px) rotate(180deg); opacity: 0.5; }
+        }
+
+        /* Header */
+        .header {
+            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(15px);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 2px solid var(--atlanta-peach);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--atlanta-peach);
+            text-shadow: 0 0 15px var(--atlanta-peach);
+        }
+
+        .demo-badge {
+            background: linear-gradient(45deg, var(--georgia-red), var(--atlanta-peach));
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            font-weight: bold;
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 3rem 2rem;
+            background: rgba(255, 203, 154, 0.1);
+            border-radius: 20px;
+            border: 2px solid var(--atlanta-peach);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '🍑';
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 4rem;
+            opacity: 0.3;
+            animation: bounce 3s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, var(--atlanta-peach), var(--primary-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(255, 203, 154, 0.5);
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            color: var(--text-light);
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            line-height: 1.6;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .cta-btn {
+            background: linear-gradient(45deg, var(--atlanta-blue), var(--primary-green));
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-glow);
+            border: none;
+            cursor: pointer;
+        }
+
+        .cta-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(0, 255, 159, 0.5);
+        }
+
+        .cta-btn.secondary {
+            background: linear-gradient(45deg, var(--georgia-red), var(--atlanta-peach));
+        }
+
+        /* Demo Grid */
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .demo-card {
+            background: rgba(26, 26, 26, 0.9);
+            border: 2px solid var(--atlanta-peach);
+            border-radius: 15px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .demo-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 203, 154, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .demo-card:hover::before {
+            left: 100%;
+        }
+
+        .demo-card:hover {
+            border-color: var(--primary-green);
+            box-shadow: var(--shadow-glow);
+            transform: translateY(-5px);
+        }
+
+        .demo-card h3 {
+            color: var(--atlanta-peach);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        /* Customer Demo */
+        .customer-info {
+            background: rgba(0, 51, 102, 0.3);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .customer-info h4 {
+            color: var(--primary-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding: 0.3rem 0;
+            border-bottom: 1px solid rgba(255, 203, 154, 0.2);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        /* Vehicle Info */
+        .vehicle-badge {
+            background: linear-gradient(45deg, var(--atlanta-blue), var(--primary-green));
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            color: white;
+            font-weight: bold;
+            display: inline-block;
+            margin: 0.5rem;
+        }
+
+        /* AI Recommendations */
+        .ai-recommendations {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .recommendation {
+            background: rgba(0, 255, 159, 0.1);
+            border: 1px solid var(--primary-green);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .recommendation.high {
+            border-color: var(--georgia-red);
+            background: rgba(204, 0, 0, 0.1);
+        }
+
+        .recommendation.medium {
+            border-color: var(--atlanta-peach);
+            background: rgba(255, 203, 154, 0.1);
+        }
+
+        .priority {
+            font-weight: bold;
+            padding: 0.2rem 0.5rem;
+            border-radius: 5px;
+            font-size: 0.8rem;
+        }
+
+        .priority.high {
+            background: var(--georgia-red);
+            color: white;
+        }
+
+        .priority.medium {
+            background: var(--atlanta-peach);
+            color: var(--bg-dark);
+        }
+
+        .priority.low {
+            background: var(--primary-green);
+            color: var(--bg-dark);
+        }
+
+        /* Quote Builder */
+        .quote-builder {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .service-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .service-item {
+            background: rgba(26, 26, 26, 0.8);
+            border: 1px solid var(--atlanta-peach);
+            border-radius: 8px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .service-item:hover {
+            border-color: var(--primary-green);
+            box-shadow: 0 0 15px rgba(0, 255, 159, 0.3);
+        }
+
+        .service-item.selected {
+            border-color: var(--primary-green);
+            background: rgba(0, 255, 159, 0.2);
+        }
+
+        .service-price {
+            color: var(--primary-green);
+            font-weight: bold;
+        }
+
+        /* Quote Result */
+        .quote-result {
+            background: linear-gradient(135deg, rgba(255, 203, 154, 0.1), rgba(0, 51, 102, 0.1));
+            border: 2px solid var(--atlanta-peach);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .quote-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem 0;
+        }
+
+        .quote-row.total {
+            border-top: 2px solid var(--atlanta-peach);
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: var(--primary-green);
+        }
+
+        /* Metrics */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .metric-card {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid var(--primary-green);
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-green);
+        }
+
+        .metric-label {
+            color: var(--text-light);
+            margin-top: 0.5rem;
+        }
+
+        /* Code Input */
+        .code-section {
+            background: rgba(204, 0, 0, 0.1);
+            border: 2px solid var(--georgia-red);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 3rem;
+            text-align: center;
+        }
+
+        .code-input {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            align-items: center;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .code-input input {
+            background: rgba(26, 26, 26, 0.8);
+            border: 2px solid var(--atlanta-peach);
+            border-radius: 10px;
+            padding: 1rem;
+            color: var(--text-light);
+            font-size: 1.1rem;
+            text-align: center;
+            width: 200px;
+        }
+
+        .code-input input:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            box-shadow: 0 0 15px rgba(0, 255, 159, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .demo-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .service-selector {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animations */
+        .fadeInUp {
+            animation: fadeInUp 0.6s ease forwards;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Tooltips */
+        .tooltip {
+            position: relative;
+            cursor: help;
+        }
+
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-card);
+            color: var(--text-light);
+            padding: 0.5rem;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid var(--atlanta-peach);
+        }
+
+        .tooltip:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-animation" id="bgAnimation"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">TallerPro Atlanta 🍑</div>
+            <div class="demo-badge">🚀 {% trans "LIVE DEMO - Try Everything!" %}</div>
+            <div style="margin-left:2rem;">
+                <a href="?lang=es" style="padding:0.4rem 1rem; border-radius:20px; font-weight:bold; background:rgba(0,255,159,0.12); color:#fff; margin-right:0.5rem; text-decoration:none; border:2px solid #ffcb9a;">Español</a>
+                <a href="?lang=en" style="padding:0.4rem 1rem; border-radius:20px; font-weight:bold; background:rgba(0,255,159,0.12); color:#fff; text-decoration:none; border:2px solid #ffcb9a;">English</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1>{% trans "Experience TallerPro Live!" %}</h1>
+            <p>
+                {% trans "This is a fully functional demo of TallerPro built specifically for Atlanta auto shops. Try all features with real data, AI recommendations, and Georgia tax calculations. No login required - just explore and see how it works!" %}
+            </p>
+            <div class="cta-buttons">
+                <button class="cta-btn" onclick="scrollToSection('demo-features')">
+                    🔧 {% trans "Try Features Now" %}
+                </button>
+                <button class="cta-btn secondary" onclick="scrollToSection('atlanta-code')">
+                    🎟️ {% trans "Get Atlanta Code" %}
+                </button>
+            </div>
+        </section>
+
+        <!-- Shop Info -->
+        <section class="demo-card" style="margin-bottom: 2rem;">
+            <h3>📍 {% trans "Demo Shop:" %} {{ taller_info.nombre }}</h3>
+            <div class="customer-info">
+                <div class="info-row">
+                    <span>{% trans "Address:" %}</span>
+                    <span>{{ taller_info.direccion }}</span>
+                </div>
+                <div class="info-row">
+                    <span>{% trans "Phone:" %}</span>
+                    <span>{{ taller_info.telefono }}</span>
+                </div>
+                <div class="info-row">
+                    <span>{% trans "Email:" %}</span>
+                    <span>{{ taller_info.email }}</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Demo Features Grid -->
+        <div class="demo-grid" id="demo-features">
+            <!-- Customer Demo -->
+            <div class="demo-card fadeInUp">
+                <h3>👤 {% trans "Customer Management" %}</h3>
+                <div class="customer-info">
+                    <h4>{% trans "Current Customer:" %} {{ cliente_demo.nombre }}</h4>
+                    <div class="info-row">
+                        <span>{% trans "Phone:" %}</span>
+                        <span>{{ cliente_demo.telefono }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span>{% trans "Email:" %}</span>
+                        <span>{{ cliente_demo.email }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span>{% trans "Address:" %}</span>
+                        <span>{{ cliente_demo.direccion }}</span>
+                    </div>
+                </div>
+                
+                <h4 style="color: var(--primary-green); margin: 1rem 0;">{% trans "Vehicle on File:" %}</h4>
+                <div class="vehicle-badge">
+                    🚗 {{ vehiculo_demo.año }} {{ vehiculo_demo.marca }} {{ vehiculo_demo.modelo }}
+                </div>
+                <div style="margin-top: 1rem; color: var(--text-light);">
+                    <div>📋 {% trans "Plate:" %} {{ vehiculo_demo.placa }}</div>
+                    <div>🔢 {% trans "Mileage:" %} {{ vehiculo_demo.kilometraje|floatformat:0 }} mi</div>
+                    <div>🎨 {% trans "Color:" %} {{ vehiculo_demo.color }}</div>
+                </div>
+            </div>
+
+            <!-- AI Recommendations -->
+            <div class="demo-card fadeInUp">
+                <h3>🧠 {% trans "AI-Powered Recommendations" %}</h3>
+                <div class="ai-recommendations">
+                    {% for rec in reportes_ia.servicios_recomendados %}
+                    <div class="recommendation {{ rec.prioridad|lower }}">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <strong>{{ rec.servicio }}</strong>
+                            <span class="priority {{ rec.prioridad|lower }}">{{ rec.prioridad }}</span>
+                        </div>
+                        <div style="color: var(--text-light); margin-bottom: 0.5rem;">
+                            {{ rec.descripcion }}
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>Due in: {{ rec.debido_en }}</span>
+                            <span style="color: var(--primary-green); font-weight: bold;">
+                                ${{ rec.precio_estimado|floatformat:2 }}
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Live Quote Builder -->
+            <div class="demo-card fadeInUp" style="grid-column: 1 / -1;">
+                <h3>💰 Interactive Quote Builder</h3>
+                <p style="color: var(--text-light); margin-bottom: 1rem;">
+                    Select services to build a quote in real-time with Georgia tax calculations:
+                </p>
+                
+                <div class="service-selector">
+                    <div class="service-item" data-service="oil_change">
+                        <span>🛢️ Full Service Oil Change</span>
+                        <span class="service-price">$65.00</span>
+                    </div>
+                    <div class="service-item" data-service="brake_service">
+                        <span>🚙 Complete Brake Service</span>
+                        <span class="service-price">$125.00</span>
+                    </div>
+                    <div class="service-item" data-service="ac_service">
+                        <span>❄️ A/C System Service</span>
+                        <span class="service-price">$95.00</span>
+                    </div>
+                    <div class="service-item" data-service="transmission_service">
+                        <span>⚙️ Transmission Service</span>
+                        <span class="service-price">$245.00</span>
+                    </div>
+                    <div class="service-item" data-service="tire_rotation">
+                        <span>🔄 Tire Rotation & Balance</span>
+                        <span class="service-price">$35.00</span>
+                    </div>
+                    <div class="service-item" data-service="diagnostic">
+                        <span>🔍 Computer Diagnostic</span>
+                        <span class="service-price">$110.00</span>
+                    </div>
+                </div>
+
+                <div style="text-align: center;">
+                    <button class="cta-btn" onclick="updateQuote()">
+                        📊 Calculate Quote
+                    </button>
+                </div>
+
+                <div class="quote-result" id="quoteResult" style="display: none;">
+                    <h4 style="color: var(--atlanta-peach); margin-bottom: 1rem;">
+                        Quote for {{ cliente_demo.nombre }} - {{ vehiculo_demo.año }} {{ vehiculo_demo.marca }} {{ vehiculo_demo.modelo }}
+                    </h4>
+                    <div id="quoteDetails"></div>
+                </div>
+            </div>
+
+            <!-- Shop Metrics -->
+            <div class="demo-card fadeInUp">
+                <h3>📊 Real-Time Shop Metrics</h3>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">${{ metricas_taller.ventas_hoy|floatformat:0 }}</div>
+                        <div class="metric-label">Today's Sales</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">${{ metricas_taller.ventas_semana|floatformat:0 }}</div>
+                        <div class="metric-label">This Week</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">${{ metricas_taller.ventas_mes|floatformat:0 }}</div>
+                        <div class="metric-label">This Month</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">{{ metricas_taller.clientes_atendidos_mes }}</div>
+                        <div class="metric-label">Customers</div>
+                    </div>
+                </div>
+
+                <h4 style="color: var(--primary-green); margin: 1.5rem 0 1rem;">Most Popular Services:</h4>
+                {% for servicio in metricas_taller.servicios_mas_populares %}
+                <div class="info-row">
+                    <span>{{ servicio.nombre }} ({{ servicio.cantidad }}x)</span>
+                    <span style="color: var(--primary-green); font-weight: bold;">
+                        ${{ servicio.ingresos|floatformat:0 }}
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Inventory Alerts -->
+            <div class="demo-card fadeInUp">
+                <h3>📦 Smart Inventory Alerts</h3>
+                <div style="color: var(--text-light);">
+                    <p style="margin-bottom: 1rem;">AI-powered inventory management with predictive alerts:</p>
+                    {% for alerta in reportes_ia.alertas_inventario %}
+                    <div style="background: rgba(204, 0, 0, 0.2); padding: 0.8rem; border-radius: 8px; margin-bottom: 0.5rem; border-left: 4px solid var(--georgia-red);">
+                        🚨 {{ alerta }}
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <div style="margin-top: 1rem; padding: 1rem; background: rgba(0, 255, 159, 0.1); border-radius: 8px; border-left: 4px solid var(--primary-green);">
+                    <strong style="color: var(--primary-green);">Growth Projection:</strong>
+                    <div>Next month: ${{ reportes_ia.predicciones_ingresos.proximo_mes|floatformat:0 }} ({{ reportes_ia.predicciones_ingresos.crecimiento }})</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Atlanta Special Code Section -->
+        <section class="code-section" id="atlanta-code">
+            <h2 style="color: var(--georgia-red); margin-bottom: 1rem;">
+                🎟️ Exclusive Atlanta Auto Shop Offer
+            </h2>
+            <p style="color: var(--text-light); font-size: 1.2rem; margin-bottom: 1.5rem;">
+                <strong>Limited Time:</strong> Free 3-month access for the first 10 Atlanta auto shops!
+                Enter the special code below to unlock your extended trial.
+            </p>
+            
+            <div class="code-input">
+                <input type="text" id="atlantaCode" placeholder="Enter Code (e.g., ATLANTA2025)" maxlength="20">
+                <button class="cta-btn" onclick="verifyCode()">
+                    ✅ Verify Code
+                </button>
+            </div>
+            
+            <div id="codeResult" style="margin-top: 1rem;"></div>
+            
+            <div style="margin-top: 2rem; color: var(--atlanta-peach);">
+                <p><strong>💡 Hint:</strong> Ask about our Atlanta launch special!</p>
+                <p>Valid codes include: <code>ATLANTA2025</code>, <code>GEORGIA2025</code>, <code>PEACHTREE</code></p>
+            </div>
+        </section>
+
+        <!-- Call to Action -->
+        <section style="text-align: center; margin: 3rem 0; padding: 3rem; background: rgba(0, 51, 102, 0.3); border-radius: 20px; border: 2px solid var(--atlanta-blue);">
+            <h2 style="color: var(--atlanta-peach); margin-bottom: 1rem;">
+                Ready to Transform Your Auto Shop?
+            </h2>
+            <p style="color: var(--text-light); font-size: 1.2rem; margin-bottom: 2rem;">
+                Join the Atlanta auto shops already using TallerPro to increase efficiency and profits.
+            </p>
+            <div class="cta-buttons">
+                <a href="/registro/" class="cta-btn">
+                    🚀 Start Free Trial
+                </a>
+                <a href="tel:+14045550123" class="cta-btn secondary">
+                    📞 Call (404) 555-0123
+                </a>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Create animated particles
+        function createParticles() {
+            const bgAnimation = document.getElementById('bgAnimation');
+            const particleCount = 60;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 8 + 's';
+                particle.style.animationDuration = (Math.random() * 6 + 6) + 's';
+                bgAnimation.appendChild(particle);
+            }
+        }
+
+        // Service selection for quote builder
+        let selectedServices = [];
+
+        function toggleService(serviceId) {
+            const serviceElement = document.querySelector(`[data-service="${serviceId}"]`);
+            
+            if (selectedServices.includes(serviceId)) {
+                selectedServices = selectedServices.filter(s => s !== serviceId);
+                serviceElement.classList.remove('selected');
+            } else {
+                selectedServices.push(serviceId);
+                serviceElement.classList.add('selected');
+            }
+        }
+
+        // Add click listeners to service items
+        document.addEventListener('DOMContentLoaded', function() {
+            const serviceItems = document.querySelectorAll('.service-item');
+            serviceItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const serviceId = this.getAttribute('data-service');
+                    toggleService(serviceId);
+                });
+            });
+        });
+
+        // Update quote calculation
+        async function updateQuote() {
+            if (selectedServices.length === 0) {
+                alert('Please select at least one service to calculate a quote.');
+                return;
+            }
+
+            try {
+                const response = await fetch('/demo/atlanta/quote/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        servicios: selectedServices
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayQuote(data.cotizacion);
+                } else {
+                    alert('Error calculating quote: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error calculating quote. Please try again.');
+            }
+        }
+
+        function displayQuote(cotizacion) {
+            const quoteResult = document.getElementById('quoteResult');
+            const quoteDetails = document.getElementById('quoteDetails');
+            
+            let html = '';
+            
+            // Services
+            cotizacion.servicios.forEach(servicio => {
+                html += `
+                    <div class="quote-row">
+                        <span>${servicio.nombre}</span>
+                        <span style="color: var(--primary-green); font-weight: bold;">$${servicio.precio.toFixed(2)}</span>
+                    </div>
+                `;
+            });
+            
+            // Totals
+            html += `
+                <div class="quote-row" style="border-top: 1px solid var(--atlanta-peach); margin-top: 1rem; padding-top: 1rem;">
+                    <span>Subtotal:</span>
+                    <span style="color: var(--primary-green); font-weight: bold;">$${cotizacion.subtotal.toFixed(2)}</span>
+                </div>
+                <div class="quote-row">
+                    <span>Georgia Sales Tax (${cotizacion.tax_rate}%):</span>
+                    <span style="color: var(--primary-green); font-weight: bold;">$${cotizacion.tax_amount.toFixed(2)}</span>
+                </div>
+                <div class="quote-row total">
+                    <span>Total Amount:</span>
+                    <span>$${cotizacion.total.toFixed(2)}</span>
+                </div>
+            `;
+            
+            quoteDetails.innerHTML = html;
+            quoteResult.style.display = 'block';
+            
+            // Scroll to result
+            quoteResult.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Verify Atlanta code
+        async function verifyCode() {
+            const codeInput = document.getElementById('atlantaCode');
+            const resultDiv = document.getElementById('codeResult');
+            const codigo = codeInput.value.trim();
+            
+            if (!codigo) {
+                resultDiv.innerHTML = '<div style="color: var(--georgia-red); padding: 1rem;">Please enter a code to verify.</div>';
+                return;
+            }
+
+            try {
+                const response = await fetch('/demo/atlanta/verify-code/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ codigo: codigo })
+                });
+
+                const data = await response.json();
+                
+                if (data.success && data.codigo_valido) {
+                    let benefitsHtml = '';
+                    data.beneficios.forEach(beneficio => {
+                        benefitsHtml += `<li>✅ ${beneficio}</li>`;
+                    });
+                    
+                    resultDiv.innerHTML = `
+                        <div style="background: rgba(0, 255, 159, 0.2); border: 2px solid var(--primary-green); border-radius: 10px; padding: 1.5rem; margin-top: 1rem;">
+                            <h3 style="color: var(--primary-green); margin-bottom: 1rem;">🎉 Code Valid!</h3>
+                            <p style="color: var(--text-light); margin-bottom: 1rem;"><strong>${data.descripcion}</strong></p>
+                            <p style="color: var(--text-light); margin-bottom: 1rem;">Duration: <strong>${data.duracion_meses} months FREE</strong></p>
+                            <h4 style="color: var(--primary-green); margin-bottom: 0.5rem;">Included Benefits:</h4>
+                            <ul style="color: var(--text-light); margin-left: 1rem;">${benefitsHtml}</ul>
+                            <div style="margin-top: 1.5rem;">
+                                <a href="/registro/?codigo=${codigo}" class="cta-btn">🚀 Activate Now</a>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div style="background: rgba(204, 0, 0, 0.2); border: 2px solid var(--georgia-red); border-radius: 10px; padding: 1.5rem; margin-top: 1rem;">
+                            <h3 style="color: var(--georgia-red); margin-bottom: 1rem;">❌ Invalid Code</h3>
+                            <p style="color: var(--text-light);">${data.mensaje}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                resultDiv.innerHTML = '<div style="color: var(--georgia-red); padding: 1rem;">Error verifying code. Please try again.</div>';
+            }
+        }
+
+        // Smooth scrolling
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // Enter key support for code input
+        document.addEventListener('DOMContentLoaded', function() {
+            const codeInput = document.getElementById('atlantaCode');
+            codeInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    verifyCode();
+                }
+            });
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+            
+            // Animate elements on scroll
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animationDelay = '0s';
+                        entry.target.classList.add('fadeInUp');
+                    }
+                });
+            });
+
+            document.querySelectorAll('.demo-card').forEach(card => {
+                observer.observe(card);
+            });
+        });
+    </script>
+</body>
+</html>

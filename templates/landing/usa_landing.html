@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ seo_title }}</title>
+    <meta name="description" content="{{ seo_description }}">
+    <meta property="og:title" content="{{ seo_title }}">
+    <meta property="og:description" content="{{ seo_description }}">
+    <meta property="og:image" content="{{ og_image }}">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="en_US">
+    <meta name="robots" content="index, follow">
+    <!-- GA4 (opcional) -->
+    <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXX"></script>
+    <script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', 'G-XXXXXXX');</script> -->
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            color: #fff;
+            margin: 0;
+            min-height: 100vh;
+        }
+        .hero {
+            background: linear-gradient(90deg, #002868 0%, #fff 50%, #bf0a30 100%);
+            color: #002868;
+            padding: 3rem 1rem 2rem 1rem;
+            text-align: center;
+            position: relative;
+        }
+        .hero h1 {
+            font-size: 2.7rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            letter-spacing: 1px;
+        }
+        .hero h2 {
+            font-size: 2.1rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #bf0a30;
+        }
+        .hero p {
+            font-size: 1.2rem;
+            color: #222;
+            margin-bottom: 1.5rem;
+        }
+        .lang-switch {
+            position: absolute;
+            top: 1rem;
+            right: 2rem;
+        }
+        .lang-btn {
+            background: #fff;
+            color: #002868;
+            border: 1px solid #002868;
+            border-radius: 20px;
+            padding: 0.3rem 1.2rem;
+            font-weight: bold;
+            margin-left: 0.5rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .lang-btn.active, .lang-btn:hover {
+            background: #bf0a30;
+            color: #fff;
+            border-color: #bf0a30;
+        }
+        .demo-preview {
+            margin: 2rem auto 1rem auto;
+            max-width: 540px;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 0 30px #00286844;
+            border: 4px solid #bf0a30;
+            background: #fff;
+        }
+        .benefits {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2.5rem 0 1.5rem 0;
+        }
+        .benefit {
+            background: #002868;
+            color: #fff;
+            border-radius: 14px;
+            padding: 1.2rem 1.5rem;
+            min-width: 220px;
+            max-width: 320px;
+            box-shadow: 0 0 10px #bf0a3040;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.1rem;
+        }
+        .benefit i {
+            font-size: 2rem;
+            color: #bf0a30;
+        }
+        .cta-btn {
+            background: linear-gradient(90deg, #002868 0%, #bf0a30 100%);
+            color: #fff;
+            border: none;
+            border-radius: 30px;
+            padding: 1rem 2.5rem;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-top: 2rem;
+            cursor: pointer;
+            box-shadow: 0 0 20px #00286844;
+            transition: background 0.2s, transform 0.2s;
+        }
+        .cta-btn:hover {
+            background: linear-gradient(90deg, #bf0a30 0%, #002868 100%);
+            transform: scale(1.04);
+        }
+        .footer {
+            text-align: center;
+            color: #aaa;
+            font-size: 0.95rem;
+            margin: 2.5rem 0 1rem 0;
+        }
+        @media (max-width: 900px) {
+            .benefits { flex-direction: column; align-items: center; }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="hero">
+        <div class="lang-switch">
+            <button class="lang-btn active" id="btn-en" onclick="setLang('en')">EN</button>
+            <button class="lang-btn" id="btn-es" onclick="setLang('es')">ES</button>
+        </div>
+        <h1 id="hero-title-en">{{ hero_title_en }}</h1>
+        <h2 id="hero-title-es" style="display:none;">{{ hero_title_es }}</h2>
+        <p id="hero-subtitle-en">{{ hero_subtitle_en }}</p>
+        <p id="hero-subtitle-es" style="display:none;">{{ hero_subtitle_es }}</p>
+        <a href="{{ register_url }}" class="cta-btn" id="cta-btn-en">Try eGarage Free</a>
+        <a href="{{ register_url }}" class="cta-btn" id="cta-btn-es" style="display:none;">Probar eGarage Gratis</a>
+    </div>
+    <div class="demo-preview">
+        <img src="{{ demo_gif }}" alt="Demo Preview" style="width:100%; display:block;">
+    </div>
+    <div class="benefits" id="benefits-en">
+        {% for b in benefits %}
+        <div class="benefit"><i class="{{ b.icon }}"></i> {{ b.en }}</div>
+        {% endfor %}
+    </div>
+    <div class="benefits" id="benefits-es" style="display:none;">
+        {% for b in benefits %}
+        <div class="benefit"><i class="{{ b.icon }}"></i> {{ b.es }}</div>
+        {% endfor %}
+    </div>
+    <div class="footer">
+        <span>🇺🇸 eGarage USA &copy; 2025 | <a href="/" style="color:#bf0a30;">Home</a></span>
+    </div>
+    <script>
+    function setLang(lang) {
+        if(lang === 'en') {
+            document.getElementById('hero-title-en').style.display = '';
+            document.getElementById('hero-title-es').style.display = 'none';
+            document.getElementById('hero-subtitle-en').style.display = '';
+            document.getElementById('hero-subtitle-es').style.display = 'none';
+            document.getElementById('cta-btn-en').style.display = '';
+            document.getElementById('cta-btn-es').style.display = 'none';
+            document.getElementById('benefits-en').style.display = 'flex';
+            document.getElementById('benefits-es').style.display = 'none';
+            document.getElementById('btn-en').classList.add('active');
+            document.getElementById('btn-es').classList.remove('active');
+        } else {
+            document.getElementById('hero-title-en').style.display = 'none';
+            document.getElementById('hero-title-es').style.display = '';
+            document.getElementById('hero-subtitle-en').style.display = 'none';
+            document.getElementById('hero-subtitle-es').style.display = '';
+            document.getElementById('cta-btn-en').style.display = 'none';
+            document.getElementById('cta-btn-es').style.display = '';
+            document.getElementById('benefits-en').style.display = 'none';
+            document.getElementById('benefits-es').style.display = 'flex';
+            document.getElementById('btn-en').classList.remove('active');
+            document.getElementById('btn-es').classList.add('active');
+        }
+    }
+    </script>
+</body>
+</html>

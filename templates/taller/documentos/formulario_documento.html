@@ -238,15 +238,12 @@
         <tbody>
         {% for repuesto in repuestos %}
           <tr>
-            <td><input type="text" class="partnumber-input w-full border p-1" value="{{ repuesto.codigo }}" /></td>
-            <td><input type="text" class="nombre-input w-full border p-1" value="{{ repuesto.nombre }}" /></td>
-            <td><input type="text" inputmode="numeric" pattern="[0-9.]*" class="cantidad-input w-20 border p-1 text-right" min="1" value="{{ repuesto.cantidad }}" /></td>
-            <td class="relative">
-              <span class="absolute left-2 top-1.5 text-gray-500">$</span>
-              <input type="text" inputmode="numeric" pattern="[0-9.]*" class="precio-input w-24 border p-1 pl-5 text-right" min="0" value="{{ repuesto.precio }}" />
-            </td>
-            <td class="font-bold total-repuesto text-right">${{ repuesto.total }}</td>
-            <td><button type="button" class="text-red-600 font-bold remove-repuesto">✕</button></td>
+            <td><input type="text" class="partnumber-input futurista-input border p-1 rounded w-full" value="{{ repuesto.codigo }}" placeholder="Partnumber" /></td>
+            <td><input type="text" class="nombre-input futurista-input border p-1 rounded w-full" value="{{ repuesto.nombre }}" placeholder="Nombre" /></td>
+            <td><input type="number" class="cantidad-input futurista-input border p-1 rounded w-20" min="1" value="{{ repuesto.cantidad }}" /></td>
+            <td><input type="number" class="precio-input futurista-input border p-1 rounded w-24" min="0" value="{{ repuesto.precio }}" /></td>
+            <td class="subtotal-repuesto font-semibold">$0</td>
+            <td><button type="button" class="text-red-600 font-bold remove-repuesto">✖</button></td>
           </tr>
         {% endfor %}
         </tbody>
@@ -258,7 +255,7 @@
           </tr>
         </tfoot>
       </table>
-      <button class="btn-futuristic" onclick="agregarRepuesto()" type="button">Agregar repuesto</button>
+      <button class="btn-premium" onclick="agregarRepuesto()" type="button">Agregar repuesto</button>
     </div>
 
     <div class="mt-8">
@@ -274,13 +271,9 @@
         <tbody>
         {% for servicio in servicios %}
           <tr>
-            <td>
-              <select class="nombre-servicio-input w-full border p-1">
-                <option value="{{ servicio.id }}" selected>{{ servicio.nombre }}</option>
-              </select>
-            </td>
-            <td><input type="text" inputmode="numeric" pattern="[0-9.]*" class="precio-servicio-input w-24 border p-1 text-right" value="{{ servicio.precio|default_if_none:0 }}" /></td>
-            <td><button type="button" class="text-red-600 font-bold remove-servicio">✕</button></td>
+            <td><input type="text" class="nombre-servicio-input futurista-input p-1 rounded w-full" value="{{ servicio.nombre }}" placeholder="Nombre del servicio" /></td>
+            <td><input type="number" class="precio-servicio-input futurista-input p-1 rounded w-24" value="{{ servicio.precio|default_if_none:0 }}" min="0" /></td>
+            <td><button type="button" class="text-red-600 font-bold remove-servicio">✖</button></td>
           </tr>
         {% endfor %}
         </tbody>
@@ -292,7 +285,7 @@
           </tr>
         </tfoot>
       </table>
-      <button class="btn-futuristic" onclick="agregarServicio()" type="button">Agregar servicio</button>
+      <button class="btn-premium" type="button" id="btn-agregar-servicio">🔧 Seleccionar Servicios</button>
     </div>
 
     <div class="mt-8 max-w-xl mx-auto">
@@ -304,10 +297,17 @@
       <div><span class="font-bold">Total repuestos:</span> <span id="total-repuestos-resumen">$0</span></div>
       <div><span class="font-bold">Total servicios:</span> <span id="total-servicios-resumen">$0</span></div>
       <div><span class="font-bold">Subtotal:</span> <span id="subtotal-doc">$0</span></div>
-      <div><span class="font-bold">IVA (19%):</span> <span id="iva-doc">$0</span></div>
+      <div class="flex items-center gap-2">
+        <label class="flex items-center gap-2" for="lleva_iva">
+          <input type="checkbox" id="lleva_iva" name="lleva_iva" checked>
+          <span class="font-bold">IVA (19%)</span>
+        </label>
+        <span id="iva-doc">$0</span>
+      </div>
       <div class="text-xl"><span class="font-bold">Gran Total:</span> <span id="gran-total-doc">$0</span></div>
     </div>
 
+    <input type="hidden" id="json_items" name="json_items" value="[]">
     <div class="mt-6 flex justify-end">
       <button class="btn-futuristic" type="submit">Guardar Cambios</button>
     </div>
@@ -421,6 +421,55 @@ $(document).ready(function () {
   });
 });
 </script>
+<script>
+// Inicializar eventos para los cálculos de totales
+$(document).ready(function() {
+  // Agregar event listeners para cambios en repuestos
+  $(document).on('input', '.cantidad-input, .precio-input', function() {
+    if (window.actualizarTotalRepuestos) {
+      window.actualizarTotalRepuestos();
+    }
+  });
+  
+  // Agregar event listeners para cambios en servicios
+  $(document).on('input', '.precio-servicio-input', function() {
+    if (window.actualizarTotalServicios) {
+      window.actualizarTotalServicios();
+    }
+  });
+  
+  // Event listener para el checkbox de IVA
+  $('#lleva_iva').on('change', function() {
+    if (window.actualizarTotalesDocumento) {
+      window.actualizarTotalesDocumento();
+    }
+  });
+  
+  // Event listeners para eliminar repuestos
+  $(document).on('click', '.remove-repuesto', function() {
+    $(this).closest('tr').remove();
+    if (window.actualizarTotalRepuestos) {
+      window.actualizarTotalRepuestos();
+    }
+  });
+  
+  // Event listeners para eliminar servicios
+  $(document).on('click', '.remove-servicio', function() {
+    $(this).closest('tr').remove();
+    if (window.actualizarTotalServicios) {
+      window.actualizarTotalServicios();
+    }
+  });
+  
+
+  // Calcular totales iniciales cuando la página se carga
+  setTimeout(function() {
+    if (window.actualizarTotalesDocumento) {
+      window.actualizarTotalesDocumento();
+    }
+  }, 500);
+
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   if (window.particlesJS) {

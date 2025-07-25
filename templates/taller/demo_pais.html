@@ -1,0 +1,112 @@
+{% extends "taller/base.html" %}
+{% load simple_i18n %}
+
+{% block title %}🌎 Demo Localización por País{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-6">
+    <div class="bg-gray-800 rounded-lg p-6 mb-6">
+        <h1 class="text-2xl font-bold text-cyan-400 mb-4">
+            🌎 Demostración: Localización por País
+        </h1>
+        
+        <!-- Información del país del usuario -->
+        <div class="grid md:grid-cols-2 gap-6 mb-6">
+            <div class="bg-gray-900 p-4 rounded">
+                <h3 class="text-lg font-semibold text-yellow-400 mb-2">📍 Información de País</h3>
+                {% if user.empresa %}
+                    <p class="text-white">País: <span class="text-cyan-400">{{ user.empresa.get_pais_display }}</span></p>
+                    <p class="text-white">Moneda: <span class="text-cyan-400">{{ user.empresa.moneda }}</span></p>
+                    <p class="text-white">Zona Horaria: <span class="text-cyan-400">{{ user.empresa.zona_horaria }}</span></p>
+                    
+                    {% if user|es_usa %}
+                        <div class="mt-2 p-2 bg-blue-900 rounded">
+                            <span class="text-blue-300">🇺🇸 Configuración USA activa</span>
+                        </div>
+                    {% else %}
+                        <div class="mt-2 p-2 bg-red-900 rounded">
+                            <span class="text-red-300">🇨🇱 Configuración Chile activa</span>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <p class="text-gray-400">No hay empresa asociada</p>
+                {% endif %}
+            </div>
+            
+            <div class="bg-gray-900 p-4 rounded">
+                <h3 class="text-lg font-semibold text-yellow-400 mb-2">💰 Ejemplos de Precios</h3>
+                <div class="space-y-2">
+                    <p class="text-white">Servicio básico: {% precio_pais 50000 %}</p>
+                    <p class="text-white">Cambio de aceite: {% precio_pais 25000 %}</p>
+                    <p class="text-white">Revisión completa: {% precio_pais 150000 %}</p>
+                    <p class="text-white">Reparación mayor: {% precio_pais 500000 %}</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Ejemplos de condiciones por país -->
+        <div class="bg-gray-900 p-4 rounded mb-6">
+            <h3 class="text-lg font-semibold text-yellow-400 mb-3">🔧 Configuraciones específicas por país</h3>
+            
+            {% if user|es_usa %}
+                <div class="space-y-3">
+                    <div class="border-l-4 border-blue-500 pl-4">
+                        <h4 class="text-blue-400 font-semibold">🇺🇸 Configuración Estados Unidos</h4>
+                        <ul class="text-gray-300 mt-2 space-y-1">
+                            <li>• Precios mostrados en USD con 2 decimales</li>
+                            <li>• Catálogo de vehículos estadounidenses (1980-2025)</li>
+                            <li>• Formato de fecha: MM/DD/YYYY</li>
+                            <li>• Validación de placas formato USA</li>
+                            <li>• Sales Tax por estado</li>
+                            <li>• Interfaz bilingüe (EN/ES)</li>
+                        </ul>
+                    </div>
+                </div>
+            {% else %}
+                <div class="space-y-3">
+                    <div class="border-l-4 border-red-500 pl-4">
+                        <h4 class="text-red-400 font-semibold">🇨🇱 Configuración Chile</h4>
+                        <ul class="text-gray-300 mt-2 space-y-1">
+                            <li>• Precios mostrados en CLP sin decimales</li>
+                            <li>• Catálogo de vehículos chilenos</li>
+                            <li>• Formato de fecha: DD/MM/YYYY</li>
+                            <li>• Validación de patentes formato chileno (AA1234)</li>
+                            <li>• IVA 19%</li>
+                            <li>• Regiones y ciudades de Chile</li>
+                        </ul>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Ejemplo de cambio de idioma -->
+        <div class="bg-gray-900 p-4 rounded">
+            <h3 class="text-lg font-semibold text-yellow-400 mb-3">🌐 Traducción automática</h3>
+            <div class="grid md:grid-cols-2 gap-4">
+                <div>
+                    <h4 class="text-cyan-400 mb-2">Texto original (ES):</h4>
+                    <div class="bg-gray-800 p-2 rounded">
+                        <p class="text-white">"Iniciar sesion"</p>
+                        <p class="text-white">"No tienes cuenta?"</p>
+                        <p class="text-white">"Olvidaste tu contrasena?"</p>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-cyan-400 mb-2">Traducción automática:</h4>
+                    <div class="bg-gray-800 p-2 rounded">
+                        <p class="text-white">{% trans "Iniciar sesion" %}</p>
+                        <p class="text-white">{% trans "No tienes cuenta?" %}</p>
+                        <p class="text-white">{% trans "Olvidaste tu contrasena?" %}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Botones de idioma -->
+            <div class="mt-4 flex gap-2">
+                <a href="?lang=es" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">🇪🇸 Español</a>
+                <a href="?lang=en" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">🇺🇸 English</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

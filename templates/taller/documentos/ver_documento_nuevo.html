@@ -1,0 +1,340 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<style>
+  body {
+    background: linear-gradient(120deg, #0f2027 0%, #2c5364 50%, #7f00ff 100%);
+    min-height: 100vh;
+    font-family: 'Orbitron', 'Montserrat', Arial, sans-serif;
+  }
+  .documento-container {
+    background: rgba(20, 20, 40, 0.97);
+    border-radius: 1.5rem;
+    box-shadow: 0 0 32px 4px #7f00ff99, 0 0 0 1px #00f2fe;
+    border: 1px solid #7f00ff;
+    color: #fff;
+    padding: 2.5rem;
+    margin: 2rem auto;
+    max-width: 900px;
+    position: relative;
+    overflow: hidden;
+  }
+  .documento-title {
+    color: #00f2fe;
+    text-shadow: 0 0 8px #7f00ff;
+    font-size: 2.2rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+    background: rgba(30, 30, 60, 0.8);
+    padding: 1.5rem;
+    border-radius: 1rem;
+  }
+  .info-item {
+    display: flex;
+    align-items: center;
+  }
+  .info-label {
+    color: #00f2fe;
+    font-weight: bold;
+    min-width: 120px;
+    margin-right: 10px;
+  }
+  .info-value {
+    color: #fff;
+    font-size: 1.1rem;
+  }
+  .seccion-title {
+    color: #00f2fe;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 2rem 0 1rem 0;
+    text-shadow: 0 0 4px #7f00ff;
+  }
+  .items-table {
+    width: 100%;
+    background: rgba(30, 30, 60, 0.95);
+    border-radius: 1rem;
+    overflow: hidden;
+    margin-bottom: 2rem;
+    box-shadow: 0 0 16px rgba(0, 242, 254, 0.3);
+  }
+  .items-table th {
+    background: linear-gradient(90deg, #7f00ff 0%, #00f2fe 100%);
+    color: #fff;
+    padding: 1rem;
+    text-align: left;
+    font-weight: bold;
+    font-size: 1.1rem;
+  }
+  .items-table td {
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid rgba(127, 0, 255, 0.3);
+    color: #fff;
+  }
+  .items-table tr:last-child td {
+    border-bottom: none;
+  }
+  .items-table tr:hover {
+    background: rgba(127, 0, 255, 0.1);
+  }
+  .precio {
+    text-align: right;
+    font-weight: bold;
+    color: #00f2fe;
+  }
+  .cantidad {
+    text-align: center;
+    font-weight: bold;
+  }
+  .total-section {
+    background: linear-gradient(90deg, #7f00ff33 0%, #00f2fe33 100%);
+    border-radius: 1rem;
+    padding: 2rem;
+    margin: 2rem 0;
+    border: 1px solid rgba(0, 242, 254, 0.5);
+  }
+  .total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+  }
+  .total-final {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #00f2fe;
+    text-shadow: 0 0 8px #7f00ff;
+    border-top: 2px solid #00f2fe;
+    padding-top: 1rem;
+    margin-top: 1rem;
+  }
+  .acciones {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+  }
+  .btn-accion {
+    background: linear-gradient(90deg, #7f00ff 0%, #00f2fe 100%);
+    color: #fff;
+    border: none;
+    border-radius: 2rem;
+    padding: 0.8rem 2rem;
+    font-weight: bold;
+    text-decoration: none;
+    transition: all 0.3s;
+    box-shadow: 0 0 16px rgba(0, 242, 254, 0.5);
+  }
+  .btn-accion:hover {
+    background: linear-gradient(90deg, #00f2fe 0%, #7f00ff 100%);
+    transform: scale(1.05);
+    color: #fff;
+    text-decoration: none;
+  }
+  .estado-documento {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(0, 255, 0, 0.8);
+    color: #000;
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+    font-weight: bold;
+  }
+  .empty-message {
+    text-align: center;
+    color: #888;
+    font-style: italic;
+    padding: 2rem;
+    background: rgba(40, 40, 80, 0.5);
+    border-radius: 0.5rem;
+    margin: 1rem 0;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="documento-container">
+  <div class="estado-documento">✅ Guardado</div>
+  
+  <h1 class="documento-title">
+    {{ documento.tipo_documento }} #{{ documento.numero_documento }}
+  </h1>
+  
+  <!-- Información del documento -->
+  <div class="info-grid">
+    <div class="info-item">
+      <span class="info-label">📅 Fecha:</span>
+      <span class="info-value">{{ documento.fecha|date:"d/m/Y" }}</span>
+    </div>
+    <div class="info-item">
+      <span class="info-label">👤 Cliente:</span>
+      <span class="info-value">{{ documento.cliente.nombre }}</span>
+    </div>
+    <div class="info-item">
+      <span class="info-label">🚗 Vehículo:</span>
+      <span class="info-value">
+        {% if documento.vehiculo %}
+          {{ documento.vehiculo.patente }} - {{ documento.vehiculo.marca.nombre }} {{ documento.vehiculo.modelo.nombre }}
+        {% else %}
+          No especificado
+        {% endif %}
+      </span>
+    </div>
+    <div class="info-item">
+      <span class="info-label">🔧 Mecánico:</span>
+      <span class="info-value">
+        {% if documento.mecanico %}
+          {{ documento.mecanico.nombre }}
+        {% else %}
+          No asignado
+        {% endif %}
+      </span>
+    </div>
+    {% if documento.kilometraje %}
+    <div class="info-item">
+      <span class="info-label">🛣️ Kilometraje:</span>
+      <span class="info-value">{{ documento.kilometraje|floatformat:0 }} km</span>
+    </div>
+    {% endif %}
+    <div class="info-item">
+      <span class="info-label">🏢 Empresa:</span>
+      <span class="info-value">{{ documento.empresa.nombre_taller }}</span>
+    </div>
+  </div>
+
+  <!-- REPUESTOS -->
+  <h2 class="seccion-title">🔧 Repuestos Utilizados</h2>
+  {% if repuestos %}
+    <table class="items-table">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Descripción</th>
+          <th>Cantidad</th>
+          <th>Precio Unitario</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for repuesto in repuestos %}
+        <tr>
+          <td><strong>{{ repuesto.codigo }}</strong></td>
+          <td>{{ repuesto.nombre }}</td>
+          <td class="cantidad">{{ repuesto.cantidad }}</td>
+          <td class="precio">${{ repuesto.precio|floatformat:0 }}</td>
+          <td class="precio">${{ repuesto.total|floatformat:0 }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <div class="empty-message">
+      📦 No se utilizaron repuestos en este documento
+    </div>
+  {% endif %}
+
+  <!-- SERVICIOS -->
+  <h2 class="seccion-title">⚙️ Servicios Realizados</h2>
+  {% if servicios %}
+    <table class="items-table">
+      <thead>
+        <tr>
+          <th>Descripción del Servicio</th>
+          <th>Precio</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for servicio in servicios %}
+        <tr>
+          <td>{{ servicio.nombre }}</td>
+          <td class="precio">${{ servicio.precio|floatformat:0 }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <div class="empty-message">
+      🔧 No se realizaron servicios en este documento
+    </div>
+  {% endif %}
+
+  <!-- TOTALES -->
+  <div class="total-section">
+    <div class="total-row">
+      <span>💰 Subtotal Repuestos:</span>
+      <span class="precio">${{ subtotal_repuestos|floatformat:0 }}</span>
+    </div>
+    <div class="total-row">
+      <span>🔧 Subtotal Servicios:</span>
+      <span class="precio">${{ subtotal_servicios|floatformat:0 }}</span>
+    </div>
+    <div class="total-row">
+      <span>📊 Subtotal:</span>
+      <span class="precio">${{ subtotal|floatformat:0 }}</span>
+    </div>
+    <div class="total-row">
+      <span>📋 IVA (19%):</span>
+      <span class="precio">${{ iva|floatformat:0 }}</span>
+    </div>
+    <div class="total-row total-final">
+      <span>🏆 TOTAL GENERAL:</span>
+      <span>${{ total|floatformat:0 }}</span>
+    </div>
+  </div>
+
+  <!-- Observaciones -->
+  {% if documento.observaciones %}
+  <div style="background: rgba(40, 40, 80, 0.8); padding: 1.5rem; border-radius: 1rem; margin: 2rem 0;">
+    <h3 style="color: #00f2fe; margin-bottom: 1rem;">📝 Observaciones:</h3>
+    <p style="line-height: 1.6;">{{ documento.observaciones }}</p>
+  </div>
+  {% endif %}
+
+  <!-- Acciones -->
+  <div class="acciones">
+    <a href="{% url 'documentos:lista_documentos' %}" class="btn-accion">
+      ← Volver al Listado
+    </a>
+    <a href="{% url 'documentos:editar_documento_nuevo' documento.id %}" class="btn-accion">
+      ✏️ Editar Documento
+    </a>
+    <a href="{% url 'documentos:exportar_documento_pdf' documento.id %}" class="btn-accion" target="_blank">
+      📄 Exportar PDF
+    </a>
+  </div>
+</div>
+
+<script>
+// Debug info en consola
+console.log('=== DOCUMENTO CARGADO ===');
+console.log('ID:', {{ documento.id }});
+console.log('Número:', '{{ documento.numero_documento }}');
+console.log('Repuestos encontrados:', {{ repuestos|length }});
+console.log('Servicios encontrados:', {{ servicios|length }});
+console.log('Total general:', {{ total|floatformat:0 }});
+
+{% if repuestos %}
+console.log('=== REPUESTOS ===');
+{% for repuesto in repuestos %}
+console.log('- {{ repuesto.nombre }}: ${{ repuesto.precio }} x {{ repuesto.cantidad }} = ${{ repuesto.total }}');
+{% endfor %}
+{% endif %}
+
+{% if servicios %}
+console.log('=== SERVICIOS ===');
+{% for servicio in servicios %}
+console.log('- {{ servicio.nombre }}: ${{ servicio.precio }}');
+{% endfor %}
+{% endif %}
+</script>
+{% endblock %}

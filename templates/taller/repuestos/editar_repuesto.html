@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto bg-transparent p-10 rounded-2xl shadow-2xl ring-1 ring-gray-300 space-y-6 animate-fade-in">
+<h1 class="text-3xl font-extrabold text-center text-white mb-6">✏️ Editar Repuesto</h1>
+<form class="grid grid-cols-1 md:grid-cols-2 gap-6 text-black" method="post">
+    {% csrf_token %}
+    <div class="col-span-2">
+      <label for="id_tienda" class="text-white">Tienda</label>
+      <div class="flex gap-2">
+        {{ form.tienda|add_class:"flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring focus:ring-emerald-400 text-black" }}
+        <button type="button" id="agregar-tienda-btn" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 whitespace-nowrap">+ Nueva</button>
+      </div>
+      {% if form.tienda.errors %}
+        <div class="text-red-400 text-sm mt-1">
+          {% for error in form.tienda.errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+    <div>
+      <label for="id_nombre_repuesto" class="text-white">Nombre del repuesto</label>
+      {{ form.nombre_repuesto|add_class:"w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring focus:ring-indigo-300 text-black" }}
+      {% if form.nombre_repuesto.errors %}
+        <div class="text-red-400 text-sm mt-1">
+          {% for error in form.nombre_repuesto.errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+    <div>
+      <label for="id_part_number" class="text-white">Part Number</label>
+      {{ form.part_number|add_class:"w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring focus:ring-indigo-300 text-black" }}
+      {% if form.part_number.errors %}
+        <div class="text-red-400 text-sm mt-1">
+          {% for error in form.part_number.errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+    <div>
+      <label for="id_precio_compra" class="text-white">Precio Compra</label>
+      {{ form.precio_compra|add_class:"w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring focus:ring-indigo-300 text-black" }}
+      {% if form.precio_compra.errors %}
+        <div class="text-red-400 text-sm mt-1">
+          {% for error in form.precio_compra.errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+    <div>
+      <label for="id_precio_venta" class="text-white">Precio Venta</label>
+      {{ form.precio_venta|add_class:"w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring focus:ring-indigo-300 text-black" }}
+      {% if form.precio_venta.errors %}
+        <div class="text-red-400 text-sm mt-1">
+          {% for error in form.precio_venta.errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+    <div>
+      <label for="id_stock" class="text-white">Stock</label>
+      {{ form.stock|add_class:"w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring focus:ring-indigo-300 text-black" }}
+      {% if form.stock.errors %}
+        <div class="text-red-400 text-sm mt-1">
+          {% for error in form.stock.errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+    
+    {% if repuesto.observaciones or form.observaciones %}
+    <div class="col-span-2">
+      <label for="id_observaciones" class="text-white">Observaciones</label>
+      <textarea id="id_observaciones" name="observaciones" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring focus:ring-indigo-300 text-black">{{ repuesto.observaciones|default:'' }}</textarea>
+    </div>
+    {% endif %}
+    
+    {% if form.non_field_errors %}
+    <div class="col-span-2 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+        <strong>Errores:</strong>
+        <ul class="mt-2">
+            {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    
+    <div class="col-span-2 flex justify-end gap-4">
+      <a class="bg-gray-300 text-gray-700 px-5 py-2 rounded hover:bg-gray-400 shadow" href="{% url 'repuestos:lista_repuestos' %}">Cancelar</a>
+      <button class="bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700 shadow btn-futuristic" type="submit">Actualizar</button>
+    </div>
+</form>
+</div>
+
+<!-- Modal para crear nueva tienda -->
+<div id="modal-nueva-tienda" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white p-6 rounded-lg max-w-md w-full mx-4">
+    <h3 class="text-lg font-bold mb-4">Crear Nueva Tienda</h3>
+    <form id="form-nueva-tienda">
+      {% csrf_token %}
+      <div class="mb-4">
+        <label for="nombre-tienda" class="block text-sm font-medium text-gray-700">Nombre de la Tienda</label>
+        <input type="text" id="nombre-tienda" name="nombre" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
+      </div>
+      <div class="mb-4">
+        <label for="direccion-tienda" class="block text-sm font-medium text-gray-700">Dirección</label>
+        <input type="text" id="direccion-tienda" name="direccion" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+      </div>
+      <div class="mb-4">
+        <label for="telefono-tienda" class="block text-sm font-medium text-gray-700">Teléfono</label>
+        <input type="text" id="telefono-tienda" name="telefono" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+      </div>
+      <div class="flex justify-end gap-2">
+        <button type="button" id="cancelar-nueva-tienda" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">Cancelar</button>
+        <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">Crear</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('modal-nueva-tienda');
+    const btnAbrirModal = document.getElementById('agregar-tienda-btn');
+    const btnCancelar = document.getElementById('cancelar-nueva-tienda');
+    const formNuevaTienda = document.getElementById('form-nueva-tienda');
+    const selectTienda = document.getElementById('id_tienda');
+
+    // Verificar si el botón existe antes de agregar el event listener
+    if (btnAbrirModal) {
+        btnAbrirModal.addEventListener('click', function() {
+            modal.classList.remove('hidden');
+        });
+    }
+
+    btnCancelar.addEventListener('click', function() {
+        modal.classList.add('hidden');
+        formNuevaTienda.reset();
+    });
+
+    formNuevaTienda.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(formNuevaTienda);
+        
+        fetch('{% url "repuestos:crear_tienda" %}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('input[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Agregar nueva opción al select
+                const option = new Option(data.tienda.nombre, data.tienda.id, true, true);
+                selectTienda.add(option);
+                
+                // Cerrar modal y limpiar formulario
+                modal.classList.add('hidden');
+                formNuevaTienda.reset();
+            } else {
+                alert('Error al crear la tienda: ' + (data.error || 'Error desconocido'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al crear la tienda');
+        });
+    });
+
+    // Cerrar modal al hacer click fuera
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            modal.classList.add('hidden');
+            formNuevaTienda.reset();
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>👤 Detalle Suscriptor - {{ empresa.nombre_taller }}</title>
+    
+    <!-- Fuentes futuristas -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        :root {
+            --neon-cyan: #00f5ff;
+            --neon-pink: #ff00ff;
+            --neon-green: #00ff88;
+            --neon-blue: #0066ff;
+            --neon-purple: #b347d9;
+            --dark-bg: #0a0a0f;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+        
+        body {
+            font-family: 'Exo 2', sans-serif;
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+        }
+        
+        .orbitron {
+            font-family: 'Orbitron', monospace;
+        }
+        
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .glass-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(0, 245, 255, 0.1);
+        }
+        
+        .info-card {
+            background: linear-gradient(135deg, var(--glass-bg) 0%, rgba(0, 245, 255, 0.05) 100%);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(0, 245, 255, 0.2);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-activa {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+            border: 1px solid #00ff88;
+        }
+        
+        .status-vencida {
+            background: rgba(255, 68, 68, 0.2);
+            color: #ff4444;
+            border: 1px solid #ff4444;
+        }
+        
+        .status-trial {
+            background: rgba(255, 170, 0, 0.2);
+            color: #ffaa00;
+            border: 1px solid #ffaa00;
+        }
+        
+        .futurista-btn {
+            background: linear-gradient(45deg, var(--neon-cyan), var(--neon-blue));
+            border: none;
+            border-radius: 12px;
+            color: #000;
+            font-weight: 700;
+            padding: 12px 24px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+        }
+        
+        .futurista-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 245, 255, 0.4);
+            background: linear-gradient(45deg, var(--neon-green), var(--neon-cyan));
+        }
+        
+        .futurista-btn-danger {
+            background: linear-gradient(45deg, #ff4444, #ff0066);
+        }
+        
+        .futurista-btn-danger:hover {
+            background: linear-gradient(45deg, #ff6666, #ff0088);
+            box-shadow: 0 10px 25px rgba(255, 68, 68, 0.4);
+        }
+        
+        .data-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 1rem;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .data-label {
+            font-weight: 600;
+            color: var(--neon-cyan);
+            font-family: 'Orbitron', monospace;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .data-value {
+            color: #ffffff;
+            font-weight: 500;
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-left: 2rem;
+            padding-bottom: 1.5rem;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0.5rem;
+            top: 0.5rem;
+            width: 0.75rem;
+            height: 0.75rem;
+            background: var(--neon-cyan);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+        
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: 0.8125rem;
+            top: 1.25rem;
+            width: 2px;
+            height: calc(100% - 1rem);
+            background: linear-gradient(to bottom, var(--neon-cyan), transparent);
+        }
+        
+        .timeline-item:last-child::after {
+            display: none;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .glow-text {
+            text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="glass-card mx-4 mt-4 p-6 fade-in">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="orbitron text-3xl font-bold glow-text">
+                    👤 Detalle de Suscriptor
+                </h1>
+                <p class="text-gray-300 text-lg mt-2">
+                    Información completa de {{ empresa.nombre_taller }}
+                </p>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="history.back()" class="futurista-btn">
+                    ← Volver
+                </button>
+                <button onclick="enviarRecordatorio()" class="futurista-btn">
+                    📧 Recordatorio
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mx-auto px-4 py-6">
+        
+        <!-- Información principal -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            
+            <!-- Datos básicos -->
+            <div class="info-card fade-in">
+                <h3 class="orbitron text-xl font-bold mb-4 glow-text">
+                    📋 Información Básica
+                </h3>
+                
+                <div class="data-grid">
+                    <span class="data-label">Usuario:</span>
+                    <span class="data-value">{{ empresa.user.username }}</span>
+                </div>
+                
+                <div class="data-grid">
+                    <span class="data-label">Email:</span>
+                    <span class="data-value">{{ empresa.user.email }}</span>
+                </div>
+                
+                <div class="data-grid">
+                    <span class="data-label">Nombre Taller:</span>
+                    <span class="data-value">{{ empresa.nombre_taller }}</span>
+                </div>
+                
+                <div class="data-grid">
+                    <span class="data-label">Empresa:</span>
+                    <span class="data-value">{{ empresa.empresa|default:"No especificada" }}</span>
+                </div>
+                
+                <div class="data-grid">
+                    <span class="data-label">País:</span>
+                    <span class="data-value">
+                        {% if empresa.pais == 'CL' %}
+                            🇨🇱 Chile
+                        {% else %}
+                            🇺🇸 United States
+                        {% endif %}
+                    </span>
+                </div>
+                
+                <div class="data-grid">
+                    <span class="data-label">Zona Horaria:</span>
+                    <span class="data-value">{{ empresa.zona_horaria }}</span>
+                </div>
+                
+                <div class="data-grid">
+                    <span class="data-label">Teléfono:</span>
+                    <span class="data-value">{{ empresa.telefono|default:"No especificado" }}</span>
+                </div>
+                
+                <div class="data-grid">
+                    <span class="data-label">Dirección:</span>
+                    <span class="data-value">{{ empresa.direccion|default:"No especificada" }}</span>
+                </div>
+            </div>
+            
+            <!-- Estado de suscripción -->
+            <div class="info-card fade-in">
+                <h3 class="orbitron text-xl font-bold mb-4 glow-text">
+                    🎯 Estado de Suscripción
+                </h3>
+                
+                <div class="text-center mb-6">
+                    {% if empresa.suscripcion_activa %}
+                        <span class="status-badge status-activa">✅ ACTIVA</span>
+                    {% else %}
+                        <span class="status-badge status-vencida">❌ INACTIVA</span>
+                    {% endif %}
+                </div>
+                
+                <div class="data-grid">
+                    <span class="data-label">Plan:</span>
+                    <span class="data-value">
+                        <span class="status-badge {% if empresa.plan == 'trial' %}status-trial{% else %}status-activa{% endif %}">
+                            {{ empresa.get_plan_display }}
+                        </span>
+                    </span>
+                </div>
+                
+                <div class="data-grid">
+                    <span class="data-label">Fecha Inicio:</span>
+                    <span class="data-value">{{ empresa.fecha_inicio|date:"d/m/Y H:i" }}</span>
+                </div>
+                
+                <div class="data-grid">
+                    <span class="data-label">Fecha Fin:</span>
+                    <span class="data-value">
+                        {% if empresa.fecha_fin %}
+                            {{ empresa.fecha_fin|date:"d/m/Y H:i" }}
+                        {% else %}
+                            No definida
+                        {% endif %}
+                    </span>
+                </div>
+                
+                <div class="data-grid">
+                    <span class="data-label">Días Restantes:</span>
+                    <span class="data-value">
+                        {% if empresa.dias_restantes > 0 %}
+                            <span class="text-green-400 font-bold">{{ empresa.dias_restantes }} días</span>
+                        {% else %}
+                            <span class="text-red-400 font-bold">VENCIDA</span>
+                        {% endif %}
+                    </span>
+                </div>
+                
+                <div class="data-grid">
+                    <span class="data-label">Valor Mensual:</span>
+                    <span class="data-value">${{ empresa.valor_mensual }} {{ empresa.moneda }}</span>
+                </div>
+                
+                <div class="data-grid">
+                    <span class="data-label">Último Pago:</span>
+                    <span class="data-value">
+                        {% if empresa.ultimo_pago %}
+                            {{ empresa.ultimo_pago|date:"d/m/Y" }}
+                        {% else %}
+                            Sin registros
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+            
+            <!-- Estadísticas del usuario -->
+            <div class="info-card fade-in">
+                <h3 class="orbitron text-xl font-bold mb-4 glow-text">
+                    📊 Estadísticas de Usuario
+                </h3>
+                
+                <div class="data-grid">
+                    <span class="data-label">Fecha Registro:</span>
+                    <span class="data-value">{{ info_adicional.fecha_registro|date:"d/m/Y H:i" }}</span>
+                </div>
+                
+                <div class="data-grid">
+                    <span class="data-label">Último Login:</span>
+                    <span class="data-value">
+                        {% if info_adicional.ultimo_login %}
+                            {{ info_adicional.ultimo_login|date:"d/m/Y H:i" }}
+                        {% else %}
+                            Nunca
+                        {% endif %}
+                    </span>
+                </div>
+                
+                <div class="data-grid">
+                    <span class="data-label">Días como Cliente:</span>
+                    <span class="data-value">
+                        <span class="text-cyan-400 font-bold">{{ info_adicional.dias_desde_registro }} días</span>
+                    </span>
+                </div>
+                
+                <div class="data-grid">
+                    <span class="data-label">Es Staff:</span>
+                    <span class="data-value">
+                        {% if info_adicional.es_staff %}
+                            <span class="text-green-400">✅ Sí</span>
+                        {% else %}
+                            <span class="text-gray-400">❌ No</span>
+                        {% endif %}
+                    </span>
+                </div>
+                
+                <div class="data-grid">
+                    <span class="data-label">Email Verificado:</span>
+                    <span class="data-value">
+                        {% if empresa.user.is_active %}
+                            <span class="text-green-400">✅ Verificado</span>
+                        {% else %}
+                            <span class="text-red-400">❌ No verificado</span>
+                        {% endif %}
+                    </span>
+                </div>
+                
+                <!-- Acciones rápidas -->
+                <div class="mt-6 space-y-3">
+                    <button onclick="extenderSuscripcion({{ empresa.id }}, 30)" 
+                            class="futurista-btn w-full">
+                        🔄 Extender 30 días
+                    </button>
+                    <button onclick="extenderSuscripcion({{ empresa.id }}, 60)" 
+                            class="futurista-btn w-full">
+                        🔄 Extender 60 días
+                    </button>
+                    {% if empresa.suscripcion_activa %}
+                    <button onclick="suspenderSuscripcion({{ empresa.id }})" 
+                            class="futurista-btn futurista-btn-danger w-full">
+                        ⛔ Suspender
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Historial de comprobantes -->
+        {% if info_adicional.comprobantes_recientes %}
+        <div class="info-card fade-in">
+            <h3 class="orbitron text-xl font-bold mb-4 glow-text">
+                💳 Historial de Pagos Recientes
+            </h3>
+            
+            <div class="space-y-4">
+                {% for comprobante in info_adicional.comprobantes_recientes %}
+                <div class="timeline-item">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <div class="font-semibold text-cyan-400">
+                                ${{ comprobante.monto }} {{ comprobante.moneda }}
+                            </div>
+                            <div class="text-sm text-gray-300">
+                                {{ comprobante.get_plan_solicitado_display }}
+                            </div>
+                            <div class="text-xs text-gray-400">
+                                {{ comprobante.fecha_subida|date:"d/m/Y H:i" }}
+                            </div>
+                        </div>
+                        <div>
+                            <span class="status-badge 
+                                {% if comprobante.estado == 'aprobado' %}status-activa
+                                {% elif comprobante.estado == 'rechazado' %}status-vencida
+                                {% else %}status-trial{% endif %}">
+                                {{ comprobante.get_estado_display }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Notificaciones -->
+        <div class="info-card fade-in">
+            <h3 class="orbitron text-xl font-bold mb-4 glow-text">
+                🔔 Estado de Notificaciones
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="text-center p-4 bg-yellow-500/20 rounded-lg">
+                    <div class="text-2xl mb-2">
+                        {% if empresa.notificacion_5_dias %}✅{% else %}❌{% endif %}
+                    </div>
+                    <div class="text-sm text-yellow-300">Notificación 5 días</div>
+                </div>
+                
+                <div class="text-center p-4 bg-orange-500/20 rounded-lg">
+                    <div class="text-2xl mb-2">
+                        {% if empresa.notificacion_1_dia %}✅{% else %}❌{% endif %}
+                    </div>
+                    <div class="text-sm text-orange-300">Notificación 1 día</div>
+                </div>
+                
+                <div class="text-center p-4 bg-red-500/20 rounded-lg">
+                    <div class="text-2xl mb-2">
+                        {% if empresa.notificacion_vencido %}✅{% else %}❌{% endif %}
+                    </div>
+                    <div class="text-sm text-red-300">Notificación vencido</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript para funcionalidad -->
+    <script>
+        function extenderSuscripcion(empresaId, dias) {
+            if (confirm(`¿Confirma extender la suscripción ${dias} días?`)) {
+                // Aquí implementarías la llamada AJAX al backend
+                alert(`Funcionalidad de extensión ${dias} días para empresa ${empresaId} - Implementar en backend`);
+                // fetch(`/admin/dashboard/empresa/${empresaId}/extender/${dias}/`, {method: 'POST'})
+            }
+        }
+        
+        function suspenderSuscripcion(empresaId) {
+            if (confirm('⚠️ ¿Confirma suspender esta suscripción?')) {
+                // Aquí implementarías la llamada AJAX al backend
+                alert(`Funcionalidad de suspensión para empresa ${empresaId} - Implementar en backend`);
+                // fetch(`/admin/dashboard/empresa/${empresaId}/suspender/`, {method: 'POST'})
+            }
+        }
+        
+        function enviarRecordatorio() {
+            // Aquí implementarías el envío de recordatorio por email
+            alert('Funcionalidad de recordatorio por email - Implementar en backend');
+            // fetch(`/admin/dashboard/empresa/{{ empresa.id }}/recordatorio/`, {method: 'POST'})
+        }
+        
+        // Efectos visuales al cargar
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.info-card');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+            });
+        });
+    </script>
+</body>
+</html>

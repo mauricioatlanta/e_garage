@@ -9,7 +9,8 @@
     <div class="col-span-2">
       <label for="id_tienda" class="text-white">Tienda</label>
       <div class="flex gap-2 items-center">
-        <select id="id_tienda" name="tienda" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring focus:ring-emerald-400 text-black">
+        <select id="id_tienda" name="tienda" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring focus:ring-emerald-400 text-black" required>
+          <option value="">-- Seleccionar Tienda --</option>
           {% for tienda in tiendas %}
             <option value="{{ tienda.id }}">{{ tienda.nombre }}</option>
           {% endfor %}

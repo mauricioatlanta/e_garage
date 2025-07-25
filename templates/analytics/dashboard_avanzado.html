@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Dashboard Avanzado - eGarage Admin</title>
+    
+    <!-- Fuentes futuristas -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js y Leaflet para mapas -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        :root {
+            --neon-cyan: #00f5ff;
+            --neon-pink: #ff00ff;
+            --neon-green: #00ff88;
+            --neon-blue: #0066ff;
+            --neon-purple: #b347d9;
+            --neon-orange: #ff6600;
+            --dark-bg: #0a0a0f;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+        
+        body {
+            font-family: 'Exo 2', sans-serif;
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+        }
+        
+        .orbitron {
+            font-family: 'Orbitron', monospace;
+        }
+        
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .glass-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(0, 245, 255, 0.1);
+        }
+        
+        /* Widgets de métricas */
+        .metric-widget {
+            background: linear-gradient(135deg, var(--glass-bg) 0%, rgba(0, 245, 255, 0.1) 100%);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .metric-number {
+            font-family: 'Orbitron', monospace;
+            font-size: 2rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, var(--neon-cyan), var(--neon-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        /* Alertas */
+        .alerta-critica {
+            background: linear-gradient(45deg, rgba(255, 68, 68, 0.3), rgba(255, 0, 255, 0.1));
+            border: 2px solid #ff4444;
+            animation: pulse-alert 2s infinite;
+        }
+        
+        .alerta-alta {
+            background: linear-gradient(45deg, rgba(255, 170, 0, 0.3), rgba(255, 255, 0, 0.1));
+            border: 2px solid #ffaa00;
+        }
+        
+        .alerta-media {
+            background: linear-gradient(45deg, rgba(0, 245, 255, 0.2), rgba(0, 102, 255, 0.1));
+            border: 2px solid var(--neon-cyan);
+        }
+        
+        @keyframes pulse-alert {
+            0%, 100% { box-shadow: 0 0 10px rgba(255, 68, 68, 0.5); }
+            50% { box-shadow: 0 0 25px rgba(255, 68, 68, 0.8), 0 0 35px rgba(255, 68, 68, 0.6); }
+        }
+        
+        /* Mapa */
+        #map {
+            height: 400px;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        
+        /* Botones de acción */
+        .action-btn {
+            background: linear-gradient(45deg, var(--neon-green), var(--neon-cyan));
+            border: none;
+            border-radius: 8px;
+            color: #000;
+            font-weight: 600;
+            padding: 8px 16px;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.4);
+        }
+        
+        .action-btn-danger {
+            background: linear-gradient(45deg, #ff4444, #ff0066);
+        }
+        
+        .action-btn-danger:hover {
+            box-shadow: 0 5px 15px rgba(255, 68, 68, 0.4);
+        }
+        
+        /* Indicadores de tendencia */
+        .trend-up {
+            color: var(--neon-green);
+        }
+        
+        .trend-down {
+            color: #ff4444;
+        }
+        
+        .trend-stable {
+            color: var(--neon-cyan);
+        }
+        
+        /* Loading spinner futurista */
+        .loading-spinner {
+            border: 3px solid rgba(0, 245, 255, 0.1);
+            border-top: 3px solid var(--neon-cyan);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .metric-number { font-size: 1.5rem; }
+            #map { height: 300px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="glass-card mx-4 mt-4 p-6">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+            <div>
+                <h1 class="orbitron text-4xl font-bold text-cyan-400 mb-2">
+                    🚀 Dashboard Avanzado
+                </h1>
+                <p class="text-gray-300 text-lg">
+                    Funcionalidades Adicionales - eGarage Admin
+                </p>
+            </div>
+            <div class="flex gap-3 mt-4 md:mt-0">
+                <button onclick="location.href='/analytics/admin/dashboard/'" class="action-btn">
+                    ← Dashboard Principal
+                </button>
+                <button onclick="actualizarTodo()" class="action-btn">
+                    🔄 Actualizar Todo
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mx-auto px-4 py-6">
+        
+        <!-- Métricas en tiempo real -->
+        <div class="glass-card p-6 mb-8">
+            <h3 class="orbitron text-2xl font-bold mb-4 text-center text-cyan-400">
+                ⚡ Métricas en Tiempo Real
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6" id="metricas-tiempo-real">
+                <div class="metric-widget">
+                    <div class="loading-spinner mx-auto mb-2"></div>
+                    <div class="text-sm text-gray-300">Cargando...</div>
+                </div>
+                <div class="metric-widget">
+                    <div class="loading-spinner mx-auto mb-2"></div>
+                    <div class="text-sm text-gray-300">Cargando...</div>
+                </div>
+                <div class="metric-widget">
+                    <div class="loading-spinner mx-auto mb-2"></div>
+                    <div class="text-sm text-gray-300">Cargando...</div>
+                </div>
+                <div class="metric-widget">
+                    <div class="loading-spinner mx-auto mb-2"></div>
+                    <div class="text-sm text-gray-300">Cargando...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Predicciones IA y Mapa -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            
+            <!-- Predicciones con IA -->
+            <div class="glass-card p-6">
+                <h3 class="orbitron text-xl font-bold mb-4 text-center text-purple-400">
+                    🔮 Predicciones con IA
+                </h3>
+                <div id="predicciones-container">
+                    <div class="flex justify-center items-center h-40">
+                        <div class="loading-spinner"></div>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <canvas id="chartPredicciones" width="400" height="200"></canvas>
+                </div>
+            </div>
+
+            <!-- Mapa Geográfico -->
+            <div class="glass-card p-6">
+                <h3 class="orbitron text-xl font-bold mb-4 text-center text-green-400">
+                    🗺️ Distribución Geográfica
+                </h3>
+                <div id="map"></div>
+                <div class="mt-4 grid grid-cols-2 gap-4 text-center">
+                    <div class="p-3 bg-green-500/20 rounded-lg">
+                        <div class="text-xl font-bold text-green-400" id="total-chile">-</div>
+                        <div class="text-sm text-green-300">Chile 🇨🇱</div>
+                    </div>
+                    <div class="p-3 bg-blue-500/20 rounded-lg">
+                        <div class="text-xl font-bold text-blue-400" id="total-usa">-</div>
+                        <div class="text-sm text-blue-300">USA 🇺🇸</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sistema de Alertas -->
+        <div class="glass-card p-6 mb-8">
+            <h3 class="orbitron text-xl font-bold mb-4 text-center text-red-400">
+                ⚠️ Sistema de Alertas Avanzado
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="text-center p-4 bg-red-500/20 rounded-lg">
+                    <div class="text-2xl font-bold text-red-400" id="alertas-criticas">-</div>
+                    <div class="text-sm text-red-300">Críticas</div>
+                </div>
+                <div class="text-center p-4 bg-orange-500/20 rounded-lg">
+                    <div class="text-2xl font-bold text-orange-400" id="alertas-altas">-</div>
+                    <div class="text-sm text-orange-300">Altas</div>
+                </div>
+                <div class="text-center p-4 bg-yellow-500/20 rounded-lg">
+                    <div class="text-2xl font-bold text-yellow-400" id="alertas-medias">-</div>
+                    <div class="text-sm text-yellow-300">Medias</div>
+                </div>
+            </div>
+            <div id="lista-alertas" class="space-y-4">
+                <div class="flex justify-center items-center h-20">
+                    <div class="loading-spinner"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel de Comportamiento -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            
+            <!-- Actividad de Usuarios -->
+            <div class="glass-card p-6">
+                <h3 class="orbitron text-xl font-bold mb-4 text-center text-blue-400">
+                    👥 Actividad de Usuarios
+                </h3>
+                <div id="actividad-usuarios">
+                    <div class="flex justify-center items-center h-32">
+                        <div class="loading-spinner"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Usuarios Activos -->
+            <div class="glass-card p-6">
+                <h3 class="orbitron text-xl font-bold mb-4 text-center text-cyan-400">
+                    🏆 Top Usuarios Activos
+                </h3>
+                <div id="top-usuarios" class="space-y-3">
+                    <div class="flex justify-center items-center h-32">
+                        <div class="loading-spinner"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript para funcionalidad avanzada -->
+    <script>
+        // Variables globales
+        let map = null;
+        let chartPredicciones = null;
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeMap();
+            cargarDatos();
+            
+            // Auto-refresh cada 60 segundos
+            setInterval(cargarMetricasTimepoReal, 60000);
+        });
+
+        // Inicializar mapa
+        function initializeMap() {
+            map = L.map('map').setView([-15, -60], 3); // Vista centrada en América
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+        }
+
+        // Cargar todos los datos
+        async function cargarDatos() {
+            await Promise.all([
+                cargarMetricasTimepoReal(),
+                cargarPredicciones(),
+                cargarDatosGeograficos(),
+                cargarAlertas(),
+                cargarComportamientoUsuarios()
+            ]);
+        }
+
+        // Métricas en tiempo real
+        async function cargarMetricasTimepoReal() {
+            try {
+                const response = await fetch('/analytics/admin/dashboard/realtime/');
+                const data = await response.json();
+                
+                const container = document.getElementById('metricas-tiempo-real');
+                container.innerHTML = `
+                    <div class="metric-widget">
+                        <div class="metric-number">${data.metricas_tiempo_real.nuevos_suscriptores_hoy}</div>
+                        <div class="text-sm text-gray-300">Nuevos Hoy</div>
+                    </div>
+                    <div class="metric-widget">
+                        <div class="metric-number">${data.metricas_tiempo_real.nuevos_trials_hoy}</div>
+                        <div class="text-sm text-gray-300">Trials Hoy</div>
+                    </div>
+                    <div class="metric-widget">
+                        <div class="metric-number">${data.metricas_tiempo_real.actividad_ultima_hora}</div>
+                        <div class="text-sm text-gray-300">Activos Última Hora</div>
+                    </div>
+                    <div class="metric-widget">
+                        <div class="metric-number ${data.metricas_tiempo_real.alertas_urgentes > 0 ? 'text-red-400' : ''}">${data.metricas_tiempo_real.alertas_urgentes}</div>
+                        <div class="text-sm text-gray-300">Alertas Urgentes</div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error cargando métricas:', error);
+            }
+        }
+
+        // Predicciones IA
+        async function cargarPredicciones() {
+            try {
+                const response = await fetch('/analytics/admin/dashboard/predictive/');
+                const data = await response.json();
+                
+                const container = document.getElementById('predicciones-container');
+                const trendClass = data.tendencia === 'crecimiento' ? 'trend-up' : 
+                                  data.tendencia === 'decrecimiento' ? 'trend-down' : 'trend-stable';
+                
+                container.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-purple-400">${data.prediccion_suscriptores}</div>
+                            <div class="text-sm text-gray-300">Predicción Próximo Mes</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold ${trendClass}">${data.porcentaje_crecimiento}%</div>
+                            <div class="text-sm text-gray-300">Tendencia</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 space-y-2">
+                        ${data.insights.map(insight => `
+                            <div class="text-sm text-cyan-300 bg-cyan-500/10 p-2 rounded">
+                                💡 ${insight}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+
+                // Crear gráfico de predicciones
+                const ctx = document.getElementById('chartPredicciones').getContext('2d');
+                if (chartPredicciones) chartPredicciones.destroy();
+                
+                chartPredicciones = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.datos_historicos.meses,
+                        datasets: [{
+                            label: 'Histórico',
+                            data: data.datos_historicos.suscriptores,
+                            borderColor: '#00f5ff',
+                            backgroundColor: 'rgba(0, 245, 255, 0.1)',
+                            borderWidth: 2,
+                            fill: true
+                        }, {
+                            label: 'Predicción',
+                            data: [...data.datos_historicos.suscriptores.slice(-1), data.prediccion_suscriptores],
+                            borderColor: '#b347d9',
+                            backgroundColor: 'rgba(179, 71, 217, 0.1)',
+                            borderWidth: 3,
+                            borderDash: [5, 5]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: { beginAtZero: true, ticks: { color: '#ffffff' } },
+                            x: { ticks: { color: '#ffffff' } }
+                        },
+                        plugins: {
+                            legend: { labels: { color: '#ffffff' } }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error cargando predicciones:', error);
+            }
+        }
+
+        // Datos geográficos
+        async function cargarDatosGeograficos() {
+            try {
+                const response = await fetch('/analytics/admin/dashboard/geographic/');
+                const data = await response.json();
+                
+                // Limpiar marcadores existentes
+                map.eachLayer(layer => {
+                    if (layer instanceof L.Marker) {
+                        map.removeLayer(layer);
+                    }
+                });
+                
+                // Agregar marcadores
+                data.markers.forEach(marker => {
+                    const popup = `
+                        <div class="text-center">
+                            <strong>${marker.ciudad}</strong><br>
+                            Suscriptores: ${marker.suscriptores}<br>
+                            Zona: ${marker.zona_horaria}
+                        </div>
+                    `;
+                    
+                    L.marker([marker.lat, marker.lng])
+                        .addTo(map)
+                        .bindPopup(popup);
+                });
+                
+                // Actualizar totales por país
+                const chileSubs = data.paises.find(p => p.pais === 'CL')?.total || 0;
+                const usaSubs = data.paises.find(p => p.pais === 'US')?.total || 0;
+                
+                document.getElementById('total-chile').textContent = chileSubs;
+                document.getElementById('total-usa').textContent = usaSubs;
+                
+            } catch (error) {
+                console.error('Error cargando datos geográficos:', error);
+            }
+        }
+
+        // Sistema de alertas
+        async function cargarAlertas() {
+            try {
+                const response = await fetch('/analytics/admin/dashboard/alertas/');
+                const data = await response.json();
+                
+                // Actualizar contadores
+                document.getElementById('alertas-criticas').textContent = data.resumen.criticas;
+                document.getElementById('alertas-altas').textContent = data.resumen.altas;
+                document.getElementById('alertas-medias').textContent = data.resumen.medias;
+                
+                // Mostrar alertas
+                const container = document.getElementById('lista-alertas');
+                if (data.alertas.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center text-green-400 p-8">
+                            ✅ No hay alertas pendientes
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = data.alertas.slice(0, 5).map(alerta => `
+                        <div class="alerta-${alerta.gravedad} p-4 rounded-lg">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <div class="font-bold text-lg">
+                                        ${alerta.tipo === 'expiracion_proxima' ? '⏰' : 
+                                          alerta.tipo === 'vencida' ? '🚨' : '🧪'} 
+                                        ${alerta.empresa_nombre || alerta.nombre}
+                                    </div>
+                                    <div class="text-sm opacity-80">
+                                        ${alerta.email} | Plan: ${alerta.plan || 'Trial'}
+                                    </div>
+                                    <div class="text-sm">
+                                        ${alerta.dias_restantes !== undefined ? 
+                                          `Expira en ${alerta.dias_restantes} días` :
+                                          alerta.dias_vencida !== undefined ?
+                                          `Vencida hace ${alerta.dias_vencida} días` :
+                                          `Trial activo ${alerta.dias_activo} días`}
+                                    </div>
+                                </div>
+                                <div class="flex gap-2">
+                                    ${alerta.acciones.includes('enviar_recordatorio') ? 
+                                      `<button onclick="enviarRecordatorio(${alerta.empresa_id})" class="action-btn">📧</button>` : ''}
+                                    ${alerta.acciones.includes('extender_suscripcion') ? 
+                                      `<button onclick="extenderSuscripcion(${alerta.empresa_id})" class="action-btn">⏰</button>` : ''}
+                                    ${alerta.acciones.includes('suspender_acceso') ? 
+                                      `<button onclick="suspenderAcceso(${alerta.empresa_id})" class="action-btn action-btn-danger">⛔</button>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error cargando alertas:', error);
+            }
+        }
+
+        // Comportamiento de usuarios
+        async function cargarComportamientoUsuarios() {
+            try {
+                const response = await fetch('/analytics/admin/dashboard/behavior/');
+                const data = await response.json();
+                
+                // Actividad de usuarios
+                const actividadContainer = document.getElementById('actividad-usuarios');
+                actividadContainer.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div class="text-center p-3 bg-green-500/20 rounded-lg">
+                            <div class="text-2xl font-bold text-green-400">${data.resumen.usuarios_activos}</div>
+                            <div class="text-sm text-green-300">Activos (30 días)</div>
+                        </div>
+                        <div class="text-center p-3 bg-red-500/20 rounded-lg">
+                            <div class="text-2xl font-bold text-red-400">${data.resumen.usuarios_inactivos}</div>
+                            <div class="text-sm text-red-300">Inactivos</div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-lg font-semibold text-cyan-400">
+                            Tasa de Actividad: ${data.resumen.tasa_actividad}%
+                        </div>
+                    </div>
+                `;
+                
+                // Top usuarios activos
+                const topContainer = document.getElementById('top-usuarios');
+                topContainer.innerHTML = data.top_usuarios_activos.slice(0, 5).map((usuario, index) => `
+                    <div class="flex justify-between items-center p-3 bg-white/5 rounded-lg">
+                        <div>
+                            <div class="font-semibold">${usuario.empresa}</div>
+                            <div class="text-sm text-gray-400">${usuario.usuario}</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-sm text-cyan-400">${usuario.ultimo_login}</div>
+                            <div class="text-xs text-gray-400">${usuario.plan}</div>
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Error cargando comportamiento:', error);
+            }
+        }
+
+        // Funciones de acción
+        async function enviarRecordatorio(empresaId) {
+            try {
+                const response = await fetch(`/analytics/admin/dashboard/recordatorio/${empresaId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || '',
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert(`✅ Recordatorio enviado a ${data.empresa}`);
+                    cargarAlertas(); // Recargar alertas
+                } else {
+                    alert(`❌ Error: ${data.error}`);
+                }
+            } catch (error) {
+                alert('❌ Error enviando recordatorio');
+                console.error(error);
+            }
+        }
+
+        function extenderSuscripcion(empresaId) {
+            if (confirm('¿Extender suscripción 30 días?')) {
+                alert(`Funcionalidad de extensión para empresa ${empresaId} - Por implementar en backend`);
+            }
+        }
+
+        function suspenderAcceso(empresaId) {
+            if (confirm('⚠️ ¿Suspender acceso de esta empresa?')) {
+                alert(`Funcionalidad de suspensión para empresa ${empresaId} - Por implementar en backend`);
+            }
+        }
+
+        function actualizarTodo() {
+            cargarDatos();
+            alert('🔄 Actualizando todos los datos...');
+        }
+
+        // CSRF Token para requests POST
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+</body>
+</html>

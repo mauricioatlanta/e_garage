@@ -1,0 +1,656 @@
+{% extends 'base.html' %}
+
+{% block title %}💬 Contacto Directo - WhatsApp Integrado{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/confetti-js@0.0.18/dist/index.min.js"></script>
+<style>
+    :root {
+        --cyber-blue: #00d4ff;
+        --matrix-green: #39ff14;
+        --neon-purple: #b347d9;
+        --dark-bg: #0a0a0f;
+        --glow-cyan: #00ffff;
+        --ai-orange: #ff6b35;
+        --electric-yellow: #ffff00;
+        --whatsapp-green: #25d366;
+    }
+
+    body {
+        background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+        color: var(--glow-cyan);
+        font-family: 'Orbitron', 'Courier New', monospace;
+    }
+
+    #particles-js {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: -1;
+    }
+
+    #confetti-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1000;
+    }
+
+    .final-header {
+        background: linear-gradient(135deg, rgba(37, 211, 102, 0.15) 0%, rgba(255, 255, 0, 0.15) 100%);
+        border: 2px solid var(--whatsapp-green);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 0 40px rgba(37, 211, 102, 0.3);
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .final-header::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(45deg, var(--whatsapp-green), var(--electric-yellow), var(--matrix-green));
+        border-radius: 20px;
+        z-index: -1;
+        animation: borderGlow 2s linear infinite;
+    }
+
+    @keyframes borderGlow {
+        0%, 100% { opacity: 0.6; }
+        50% { opacity: 1; }
+    }
+
+    .final-title {
+        font-size: 3rem;
+        font-weight: bold;
+        background: linear-gradient(45deg, var(--whatsapp-green), var(--electric-yellow), var(--matrix-green));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 1rem;
+        animation: textGlow 3s ease-in-out infinite;
+    }
+
+    @keyframes textGlow {
+        0%, 100% { text-shadow: 0 0 20px rgba(37, 211, 102, 0.5); }
+        50% { text-shadow: 0 0 40px rgba(37, 211, 102, 0.8); }
+    }
+
+    .whatsapp-panel {
+        background: rgba(37, 211, 102, 0.1);
+        border: 1px solid var(--whatsapp-green);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        backdrop-filter: blur(10px);
+    }
+
+    .whatsapp-preview {
+        background: #128c7e;
+        color: white;
+        border-radius: 10px;
+        padding: 1rem;
+        margin: 1rem 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        position: relative;
+        max-width: 300px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .whatsapp-header {
+        background: #075e54;
+        padding: 1rem;
+        margin: -1rem -1rem 1rem -1rem;
+        border-radius: 10px 10px 0 0;
+        display: flex;
+        align-items: center;
+    }
+
+    .whatsapp-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--matrix-green);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        font-size: 1.2rem;
+    }
+
+    .whatsapp-info h4 {
+        margin: 0;
+        font-size: 1rem;
+    }
+
+    .whatsapp-info p {
+        margin: 0;
+        font-size: 0.8rem;
+        opacity: 0.8;
+    }
+
+    .whatsapp-message {
+        background: #dcf8c6;
+        color: #000;
+        padding: 0.8rem;
+        border-radius: 0 10px 10px 10px;
+        margin-bottom: 0.5rem;
+        position: relative;
+        margin-left: 2rem;
+    }
+
+    .whatsapp-message::before {
+        content: '';
+        position: absolute;
+        left: -10px;
+        top: 0;
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-width: 0 10px 10px 0;
+        border-color: transparent #dcf8c6 transparent transparent;
+    }
+
+    .whatsapp-time {
+        font-size: 0.7rem;
+        opacity: 0.6;
+        text-align: right;
+        margin-top: 0.3rem;
+    }
+
+    .features-showcase {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .feature-card {
+        background: rgba(10, 10, 15, 0.9);
+        border: 1px solid var(--cyber-blue);
+        border-radius: 15px;
+        padding: 2rem;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 0 25px rgba(0, 212, 255, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--whatsapp-green);
+        box-shadow: 0 10px 30px rgba(37, 211, 102, 0.3);
+    }
+
+    .feature-icon {
+        font-size: 3rem;
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+
+    .feature-title {
+        color: var(--whatsapp-green);
+        font-size: 1.3rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+
+    .feature-description {
+        color: var(--glow-cyan);
+        text-align: center;
+        line-height: 1.6;
+    }
+
+    .completion-stats {
+        background: rgba(255, 107, 53, 0.1);
+        border: 1px solid var(--ai-orange);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .completion-circle {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        background: conic-gradient(var(--matrix-green) 0deg 360deg, rgba(57, 255, 20, 0.1) 360deg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 2rem;
+        font-weight: bold;
+        color: #000;
+        animation: spin 2s ease-in-out;
+    }
+
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-whatsapp {
+        background: linear-gradient(45deg, var(--whatsapp-green), #128c7e);
+        border: none;
+        border-radius: 10px;
+        color: white;
+        padding: 15px 30px;
+        font-weight: bold;
+        font-family: 'Orbitron', monospace;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-whatsapp:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 20px rgba(37, 211, 102, 0.5);
+        color: white;
+        text-decoration: none;
+    }
+
+    .btn-dashboard {
+        background: linear-gradient(45deg, var(--cyber-blue), var(--neon-purple));
+        color: #000;
+    }
+
+    .btn-dashboard:hover {
+        box-shadow: 0 5px 20px rgba(0, 212, 255, 0.5);
+        color: #000;
+    }
+
+    .success-message {
+        background: rgba(57, 255, 20, 0.1);
+        border: 1px solid var(--matrix-green);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .checkmark {
+        font-size: 4rem;
+        color: var(--matrix-green);
+        animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+        40% { transform: translateY(-10px); }
+        60% { transform: translateY(-5px); }
+    }
+
+    .next-steps {
+        background: rgba(179, 71, 217, 0.1);
+        border: 1px solid var(--neon-purple);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .step-item {
+        background: rgba(179, 71, 217, 0.2);
+        border: 1px solid var(--neon-purple);
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .step-number {
+        background: var(--neon-purple);
+        color: #000;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        margin-right: 1rem;
+    }
+
+    @media (max-width: 768px) {
+        .features-showcase {
+            grid-template-columns: 1fr;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .final-title {
+            font-size: 2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="particles-js"></div>
+<canvas id="confetti-canvas"></canvas>
+
+<div class="container mx-auto px-4 py-8">
+    <div class="final-header">
+        <h1 class="final-title">💬 ¡ONBOARDING COMPLETADO!</h1>
+        <p style="color: var(--glow-cyan); font-size: 1.2rem; margin-bottom: 1rem;">
+            WhatsApp Business integrado - Contacto directo con clientes
+        </p>
+        <div style="background: linear-gradient(45deg, var(--whatsapp-green), var(--electric-yellow)); color: #000; padding: 8px 16px; border-radius: 25px; font-weight: bold; display: inline-block;">
+            ✅ Sistema completamente configurado y listo para usar ✅
+        </div>
+    </div>
+
+    <!-- Mensaje de Éxito -->
+    <div class="success-message">
+        <div class="checkmark">✅</div>
+        <h2 style="color: var(--matrix-green); margin-bottom: 1rem;">
+            ¡Felicitaciones! Tu taller está digitalizado
+        </h2>
+        <p style="color: var(--glow-cyan); font-size: 1.1rem;">
+            Has completado exitosamente todos los módulos del onboarding. 
+            Tu sistema está listo para revolucionar tu taller.
+        </p>
+    </div>
+
+    <!-- Estadísticas de Completitud -->
+    <div class="completion-stats">
+        <h3 style="color: var(--ai-orange); margin-bottom: 1.5rem;">
+            📊 Progreso Completado
+        </h3>
+        <div class="completion-circle">
+            100%
+        </div>
+        <p style="color: var(--glow-cyan); margin-bottom: 1rem;">
+            <strong>7 de 7 módulos completados</strong>
+        </p>
+        <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+            <span style="background: rgba(57, 255, 20, 0.2); padding: 5px 10px; border-radius: 15px; color: var(--matrix-green); font-size: 0.9rem;">✅ Registro</span>
+            <span style="background: rgba(57, 255, 20, 0.2); padding: 5px 10px; border-radius: 15px; color: var(--matrix-green); font-size: 0.9rem;">✅ Clientes</span>
+            <span style="background: rgba(57, 255, 20, 0.2); padding: 5px 10px; border-radius: 15px; color: var(--matrix-green); font-size: 0.9rem;">✅ Vehículos</span>
+            <span style="background: rgba(57, 255, 20, 0.2); padding: 5px 10px; border-radius: 15px; color: var(--matrix-green); font-size: 0.9rem;">✅ Reportes</span>
+            <span style="background: rgba(57, 255, 20, 0.2); padding: 5px 10px; border-radius: 15px; color: var(--matrix-green); font-size: 0.9rem;">✅ IA</span>
+            <span style="background: rgba(57, 255, 20, 0.2); padding: 5px 10px; border-radius: 15px; color: var(--matrix-green); font-size: 0.9rem;">✅ SEO</span>
+            <span style="background: rgba(57, 255, 20, 0.2); padding: 5px 10px; border-radius: 15px; color: var(--matrix-green); font-size: 0.9rem;">✅ WhatsApp</span>
+        </div>
+    </div>
+
+    <!-- WhatsApp Integration -->
+    <div class="whatsapp-panel">
+        <h3 style="color: var(--whatsapp-green); font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem; text-align: center;">
+            💬 WhatsApp Business Integrado
+        </h3>
+        
+        <div class="whatsapp-preview">
+            <div class="whatsapp-header">
+                <div class="whatsapp-avatar">🔧</div>
+                <div class="whatsapp-info">
+                    <h4>Mi Taller Pro</h4>
+                    <p>En línea</p>
+                </div>
+            </div>
+            
+            <div class="whatsapp-message">
+                ¡Hola! 👋 Gracias por contactarnos. 
+                <br><br>
+                🔧 Servicios disponibles:
+                <br>• Diagnóstico computarizado
+                <br>• Mantenimiento preventivo  
+                <br>• Reparaciones especializadas
+                <br><br>
+                ¿En qué podemos ayudarte hoy?
+                <div class="whatsapp-time">12:34 ✓✓</div>
+            </div>
+        </div>
+        
+        <p style="color: var(--glow-cyan); text-align: center; margin-top: 1rem;">
+            Respuesta automática configurada para nuevos clientes
+        </p>
+    </div>
+
+    <!-- Características Finales -->
+    <div class="features-showcase">
+        <div class="feature-card">
+            <div class="feature-icon">📱</div>
+            <h3 class="feature-title">Comunicación Directa</h3>
+            <p class="feature-description">
+                Conecta instantáneamente con clientes a través de WhatsApp Business. 
+                Envía cotizaciones, recordatorios y actualizaciones en tiempo real.
+            </p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">🤖</div>
+            <h3 class="feature-title">Respuestas Automáticas</h3>
+            <p class="feature-description">
+                Configuración automática de mensajes de bienvenida, horarios de atención
+                y respuestas frecuentes para optimizar tu tiempo.
+            </p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">📋</div>
+            <h3 class="feature-title">Cotizaciones por WhatsApp</h3>
+            <p class="feature-description">
+                Envía cotizaciones profesionales directamente por WhatsApp con un click.
+                Aumenta conversiones con comunicación inmediata.
+            </p>
+        </div>
+    </div>
+
+    <!-- Próximos Pasos -->
+    <div class="next-steps">
+        <h3 style="color: var(--neon-purple); font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem; text-align: center;">
+            🚀 Próximos Pasos Recomendados
+        </h3>
+        
+        <div class="step-item">
+            <div class="step-number">1</div>
+            <div>
+                <strong style="color: var(--neon-purple);">Configura tu información de empresa</strong>
+                <br>
+                <span style="color: var(--glow-cyan);">Completa datos de contacto, logo y servicios principales</span>
+            </div>
+        </div>
+        
+        <div class="step-item">
+            <div class="step-number">2</div>
+            <div>
+                <strong style="color: var(--neon-purple);">Agrega tus primeros clientes reales</strong>
+                <br>
+                <span style="color: var(--glow-cyan);">Migra información de clientes existentes al sistema</span>
+            </div>
+        </div>
+        
+        <div class="step-item">
+            <div class="step-number">3</div>
+            <div>
+                <strong style="color: var(--neon-purple);">Conecta WhatsApp Business</strong>
+                <br>
+                <span style="color: var(--glow-cyan);">Vincula tu número comercial para comunicación directa</span>
+            </div>
+        </div>
+        
+        <div class="step-item">
+            <div class="step-number">4</div>
+            <div>
+                <strong style="color: var(--neon-purple);">Explora reportes avanzados</strong>
+                <br>
+                <span style="color: var(--glow-cyan);">Descubre insights y oportunidades de crecimiento</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botones de Acción Final -->
+    <div class="action-buttons">
+        <a href="https://wa.me/56912345678?text=¡Hola!%20Completé%20el%20onboarding%20de%20e-Garage%20y%20necesito%20ayuda%20para%20conectar%20mi%20WhatsApp%20Business" 
+           target="_blank" class="btn-whatsapp">
+            💬 Conectar WhatsApp Business
+        </a>
+        
+        <a href="{% url 'taller:dashboard_suscripciones' %}" class="btn-whatsapp btn-dashboard">
+            🏠 Ir al Dashboard Principal
+        </a>
+        
+        <a href="{% url 'taller:ia:sugerencias_basicas' %}" class="btn-whatsapp" style="background: linear-gradient(45deg, var(--ai-orange), var(--electric-yellow));">
+            🧠 Explorar IA Avanzada
+        </a>
+    </div>
+</div>
+
+<script>
+// Configuración de partículas celebratorias
+particlesJS("particles-js", {
+    "particles": {
+        "number": { "value": 50, "density": { "enable": true, "value_area": 800 } },
+        "color": { "value": ["#25d366", "#ffff00", "#39ff14", "#00d4ff"] },
+        "shape": { "type": "circle" },
+        "opacity": { "value": 0.8, "random": false },
+        "size": { "value": 4, "random": true },
+        "line_linked": {
+            "enable": true, "distance": 150, "color": "#25d366", "opacity": 0.4, "width": 1
+        },
+        "move": { "enable": true, "speed": 3, "direction": "none", "random": false, "straight": false, "out_mode": "out", "bounce": false }
+    },
+    "interactivity": {
+        "detect_on": "canvas",
+        "events": { "onhover": { "enable": true, "mode": "repulse" }, "onclick": { "enable": true, "mode": "push" }, "resize": true }
+    },
+    "retina_detect": true
+});
+
+// Confetti celebratorio
+const confettiSettings = {
+    target: 'confetti-canvas',
+    max: 100,
+    size: 1,
+    animate: true,
+    props: ['circle', 'square', 'triangle', 'line'],
+    colors: [[37, 211, 102], [255, 255, 0], [57, 255, 20], [0, 212, 255], [179, 71, 217]],
+    clock: 25,
+    rotate: true,
+    width: window.innerWidth,
+    height: window.innerHeight
+};
+
+const confetti = new ConfettiGenerator(confettiSettings);
+confetti.render();
+
+// Detener confetti después de 10 segundos
+setTimeout(() => {
+    confetti.clear();
+}, 10000);
+
+// Efectos de sonido (opcional)
+function playSuccessSound() {
+    // Crear un contexto de audio simple
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
+    oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1); // E5
+    oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2); // G5
+    
+    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+    
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 0.5);
+}
+
+// Animación del círculo de progreso
+function animarProgreso() {
+    const circle = document.querySelector('.completion-circle');
+    let progress = 0;
+    
+    const interval = setInterval(() => {
+        progress += 2;
+        if (progress <= 100) {
+            circle.style.background = `conic-gradient(var(--matrix-green) 0deg ${progress * 3.6}deg, rgba(57, 255, 20, 0.1) ${progress * 3.6}deg)`;
+        } else {
+            clearInterval(interval);
+        }
+    }, 30);
+}
+
+// Inicializar efectos al cargar
+window.addEventListener('load', function() {
+    setTimeout(() => {
+        playSuccessSound();
+        animarProgreso();
+    }, 1000);
+    
+    // Analytics de finalización
+    gtag('event', 'onboarding_completado', {
+        'event_category': 'conversion',
+        'event_label': 'onboarding_completo',
+        'value': 1,
+        'custom_parameters': {
+            'modulos_completados': 7,
+            'tiempo_total': Date.now(),
+            'usuario_id': '{{ request.user.id }}',
+            'empresa': '{{ request.user.empresa.nombre_taller }}'
+        }
+    });
+    
+    // Evento especial de conversión
+    gtag('event', 'purchase', {
+        'transaction_id': 'onboarding_{{ request.user.id }}',
+        'value': 0,
+        'currency': 'CLP',
+        'items': [{
+            'item_id': 'onboarding_completo',
+            'item_name': 'Onboarding Completado',
+            'category': 'Conversion',
+            'quantity': 1,
+            'price': 0
+        }]
+    });
+});
+
+// Efectos de hover mejorados
+document.querySelectorAll('.feature-card').forEach(card => {
+    card.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-5px) scale(1.02)';
+        this.style.borderColor = 'var(--whatsapp-green)';
+    });
+    
+    card.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0) scale(1)';
+        this.style.borderColor = 'var(--cyber-blue)';
+    });
+});
+</script>
+{% endblock %}

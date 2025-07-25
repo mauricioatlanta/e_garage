@@ -1,0 +1,1082 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block extra_head %}
+{{ form.media }}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
+<link href="/static/css/estilo_futurista.css" rel="stylesheet">
+<script src="/static/js/formulario_documento.js" defer></script>
+
+<style>
+  body {
+    background: linear-gradient(120deg, #0f2027 0%, #2c5364 50%, #7f00ff 100%);
+    min-height: 100vh;
+    font-family: 'Orbitron', 'Montserrat', Arial, sans-serif;
+  }
+  .editar-container {
+    background: rgba(20, 20, 40, 0.97);
+    border-radius: 1.5rem;
+    box-shadow: 0 0 32px 4px #7f00ff99, 0 0 0 1px #00f2fe;
+    border: 1px solid #7f00ff;
+    color: #fff;
+    padding: 2.5rem;
+    margin: 2rem auto;
+    max-width: 1000px;
+    position: relative;
+    overflow: hidden;
+  }
+  .editar-title {
+    color: #00f2fe;
+    text-shadow: 0 0 8px #7f00ff;
+    font-size: 2.2rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+  .seccion-card {
+    background: rgba(30, 30, 60, 0.8);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(0, 242, 254, 0.3);
+  }
+  .seccion-title {
+    color: #00f2fe;
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 4px #7f00ff;
+  }
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+  .form-label {
+    color: #00f2fe;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+  }
+  .form-input {
+    background: rgba(40, 40, 80, 0.9) !important;
+    border: 1px solid rgba(0, 242, 254, 0.5) !important;
+    border-radius: 0.5rem;
+    padding: 0.8rem;
+    color: #fff !important;
+    font-size: 1rem;
+  }
+  .form-input:focus {
+    outline: none;
+    border-color: #00f2fe !important;
+    box-shadow: 0 0 8px rgba(0, 242, 254, 0.5);
+  }
+  
+  /* Estilos específicos para campos de fecha y select */
+  input[type="date"].form-input {
+    background: rgba(40, 40, 80, 0.95) !important;
+    color: #ffffff !important;
+    color-scheme: dark;
+  }
+  
+  select.form-input {
+    background: rgba(40, 40, 80, 0.95) !important;
+    color: #ffffff !important;
+  }
+  
+  select.form-input option {
+    background: rgba(20, 20, 40, 0.95) !important;
+    color: #ffffff !important;
+  }
+  .btn-agregar {
+    background: linear-gradient(90deg, #00ff88 0%, #00f2fe 100%);
+    color: #000;
+    border: none;
+    border-radius: 1rem;
+    padding: 0.8rem 1.5rem;
+    font-weight: bold;
+    margin: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .btn-agregar:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 16px rgba(0, 255, 136, 0.5);
+  }
+  .btn-ejemplo {
+    background: linear-gradient(90deg, #ffaa00 0%, #ff6600 100%);
+    color: #fff;
+    border: none;
+    border-radius: 1rem;
+    padding: 0.8rem 1.5rem;
+    font-weight: bold;
+    margin: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .btn-ejemplo:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 16px rgba(255, 170, 0, 0.5);
+  }
+  .items-table {
+    width: 100%;
+    background: rgba(30, 30, 60, 0.95);
+    border-radius: 1rem;
+    overflow: hidden;
+    margin: 1rem 0;
+  }
+  .items-table th {
+    background: linear-gradient(90deg, #7f00ff 0%, #00f2fe 100%);
+    color: #fff;
+    padding: 1rem;
+    text-align: left;
+    font-weight: bold;
+  }
+  .items-table td {
+    padding: 0.5rem;
+    border-bottom: 1px solid rgba(127, 0, 255, 0.3);
+  }
+  .items-table input {
+    background: rgba(40, 40, 80, 0.9);
+    border: 1px solid rgba(0, 242, 254, 0.3);
+    border-radius: 0.25rem;
+    padding: 0.5rem;
+    color: #fff;
+    width: 100%;
+  }
+  .btn-eliminar {
+    background: #ff4444;
+    color: #fff;
+    border: none;
+    border-radius: 0.25rem;
+    padding: 0.5rem;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  .btn-eliminar:hover {
+    background: #ff0000;
+  }
+  .total-display {
+    color: #00f2fe;
+    font-weight: bold;
+    font-size: 1.2rem;
+    text-align: right;
+    margin: 1rem 0;
+  }
+  .btn-guardar {
+    background: linear-gradient(90deg, #7f00ff 0%, #00f2fe 100%);
+    color: #fff;
+    border: none;
+    border-radius: 2rem;
+    padding: 1rem 3rem;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: block;
+    margin: 2rem auto;
+  }
+  .btn-guardar:hover {
+    background: linear-gradient(90deg, #00f2fe 0%, #7f00ff 100%);
+    transform: scale(1.05);
+  }
+  .alerta-info {
+    background: rgba(0, 170, 255, 0.2);
+    border: 1px solid #00aaff;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin: 1rem 0;
+    color: #00ccff;
+  }
+  
+  /* ESTILOS ESPECIALES PARA EL CAMPO CLIENTE */
+  .cliente-especial {
+    grid-column: span 2; /* Ocupa toda la fila */
+    background: rgba(0, 255, 136, 0.1);
+    border: 2px solid rgba(0, 255, 136, 0.3);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    position: relative;
+  }
+  
+  .cliente-label {
+    color: #00ff88 !important;
+    font-size: 1.2rem !important;
+    font-weight: bold;
+    text-shadow: 0 0 8px rgba(0, 255, 136, 0.5);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .cliente-info-hint {
+    font-size: 0.9rem;
+    color: rgba(0, 255, 136, 0.7);
+    font-weight: normal;
+    margin-left: auto;
+  }
+  
+  .cliente-select {
+    font-size: 1.1rem !important;
+    padding: 1rem !important;
+    background: rgba(0, 50, 25, 0.8) !important;
+    border: 2px solid rgba(0, 255, 136, 0.5) !important;
+    color: #00ff88 !important;
+    font-weight: bold;
+  }
+  
+  .cliente-select:focus {
+    border-color: #00ff88 !important;
+    box-shadow: 0 0 16px rgba(0, 255, 136, 0.6) !important;
+    background: rgba(0, 50, 25, 0.9) !important;
+  }
+  
+  .cliente-info-panel {
+    background: rgba(0, 255, 136, 0.15);
+    border: 1px solid rgba(0, 255, 136, 0.3);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-top: 0.5rem;
+    animation: fadeIn 0.3s ease;
+  }
+  
+  .cliente-datos {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .cliente-nombre {
+    color: #00ff88;
+    font-weight: bold;
+    font-size: 1.1rem;
+  }
+  
+  .cliente-contacto {
+    color: rgba(0, 255, 136, 0.8);
+    font-size: 0.9rem;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  /* Mejorar Select2 para el cliente */
+  .select2-container--default .select2-selection--single {
+    background: rgba(0, 50, 25, 0.8) !important;
+    border: 2px solid rgba(0, 255, 136, 0.5) !important;
+    border-radius: 0.5rem !important;
+    height: 3rem !important;
+    line-height: 3rem !important;
+  }
+  
+  .select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: #00ff88 !important;
+    font-weight: bold !important;
+    padding-left: 1rem !important;
+    line-height: 3rem !important;
+  }
+  
+  .select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 3rem !important;
+    right: 1rem !important;
+  }
+  
+  /* DROPDOWN MEJORADO - FONDO OSCURO CON CONTRASTE */
+  .select2-dropdown {
+    background: rgba(10, 10, 30, 0.98) !important;
+    border: 2px solid #00ff88 !important;
+    border-radius: 0.8rem !important;
+    box-shadow: 0 8px 32px rgba(0, 255, 136, 0.3) !important;
+    backdrop-filter: blur(10px);
+  }
+  
+  .select2-container--default .select2-search--dropdown {
+    background: rgba(10, 10, 30, 0.9) !important;
+    border-bottom: 2px solid rgba(0, 255, 136, 0.3) !important;
+    padding: 0.5rem !important;
+  }
+  
+  .select2-container--default .select2-search--dropdown .select2-search__field {
+    background: rgba(0, 50, 25, 0.9) !important;
+    border: 1px solid rgba(0, 255, 136, 0.5) !important;
+    border-radius: 0.5rem !important;
+    color: #00ff88 !important;
+    font-weight: bold !important;
+    padding: 0.8rem !important;
+    font-size: 1rem !important;
+  }
+  
+  .select2-container--default .select2-search--dropdown .select2-search__field:focus {
+    border-color: #00ff88 !important;
+    box-shadow: 0 0 8px rgba(0, 255, 136, 0.5) !important;
+    outline: none !important;
+  }
+  
+  .select2-results {
+    background: rgba(10, 10, 30, 0.95) !important;
+  }
+  
+  .select2-results__options {
+    max-height: 300px !important;
+    background: rgba(10, 10, 30, 0.95) !important;
+  }
+  
+  .select2-results__option {
+    background: rgba(15, 15, 35, 0.9) !important;
+    color: #00ff88 !important;
+    padding: 1rem 1.5rem !important;
+    border-bottom: 1px solid rgba(0, 255, 136, 0.2) !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease !important;
+  }
+  
+  .select2-results__option:hover,
+  .select2-results__option--highlighted {
+    background: rgba(0, 255, 136, 0.25) !important;
+    color: #ffffff !important;
+    font-weight: bold !important;
+    border-left: 4px solid #00ff88 !important;
+    padding-left: 1.2rem !important;
+  }
+  
+  .select2-results__option[aria-selected="true"] {
+    background: rgba(0, 255, 136, 0.4) !important;
+    color: #ffffff !important;
+    font-weight: bold !important;
+    border-left: 4px solid #ffffff !important;
+  }
+  
+  /* Mensaje cuando no hay resultados */
+  .select2-results__option--loading,
+  .select2-results__message {
+    background: rgba(15, 15, 35, 0.9) !important;
+    color: rgba(0, 255, 136, 0.8) !important;
+    padding: 1rem !important;
+    text-align: center !important;
+    font-style: italic !important;
+  }
+  
+  /* Placeholder del campo de búsqueda */
+  .select2-container--default .select2-selection--single .select2-selection__placeholder {
+    color: rgba(0, 255, 136, 0.7) !important;
+    font-style: italic !important;
+  }
+  
+  /* Scrollbar del dropdown */
+  .select2-results__options::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .select2-results__options::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+  }
+  
+  .select2-results__options::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 136, 0.6);
+    border-radius: 4px;
+  }
+  
+  .select2-results__options::-webkit-scrollbar-thumb:hover {
+    background: #00ff88;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="editar-container">
+  <h1 class="editar-title">
+    ✏️ Editando: {{ documento.tipo_documento }} #{{ documento.numero_documento }}
+  </h1>
+
+  <form method="post" id="form-documento">
+    {% csrf_token %}
+    <input type="hidden" id="json_items" name="json_items" value="[]">
+
+    <!-- Información básica del documento -->
+    <div class="seccion-card">
+      <h2 class="seccion-title">📋 Información del Documento</h2>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Tipo de Documento:</label>
+          {{ form.tipo_documento|add_class:"form-input" }}
+        </div>
+        <div class="form-group">
+          <label class="form-label">Número de Documento:</label>
+          {{ form.numero_documento|add_class:"form-input" }}
+        </div>
+        <div class="form-group">
+          <label class="form-label">Fecha:</label>
+          {{ form.fecha|add_class:"form-input" }}
+        </div>
+        <div class="form-group cliente-especial">
+          <label class="form-label cliente-label">
+            👤 Cliente:
+            <span class="cliente-info-hint">Seleccione o busque un cliente</span>
+          </label>
+          {{ form.cliente|add_class:"form-input cliente-select" }}
+          <div class="cliente-info-panel" id="cliente-info-panel" style="display: none;">
+            <div class="cliente-datos">
+              <span class="cliente-nombre" id="cliente-nombre">Nombre del cliente</span>
+              <span class="cliente-contacto" id="cliente-contacto">Contacto</span>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Vehículo:</label>
+          {{ form.vehiculo|add_class:"form-input" }}
+        </div>
+        <div class="form-group">
+          <label class="form-label">Mecánico:</label>
+          {{ form.mecanico|add_class:"form-input" }}
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Kilometraje:</label>
+        {{ form.kilometraje|add_class:"form-input" }}
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Observaciones:</label>
+        {{ form.observaciones|add_class:"form-input" }}
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">
+          {{ form.incluir_iva }}
+          Incluir IVA (19%)
+        </label>
+      </div>
+    </div>
+
+    <!-- REPUESTOS -->
+    <div class="seccion-card">
+      <h2 class="seccion-title">🔧 Repuestos</h2>
+      <div class="alerta-info">
+        💡 <strong>Editando repuestos:</strong> Modifique los datos existentes o agregue nuevos repuestos usando los botones de abajo.
+      </div>
+      
+      <table class="items-table" id="tabla-repuestos">
+        <thead>
+          <tr>
+            <th>Código/Part Number</th>
+            <th>Descripción</th>
+            <th>Cantidad</th>
+            <th>Precio Unitario</th>
+            <th>Subtotal</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for repuesto in repuestos %}
+          <tr>
+            <td><input type="text" class="partnumber-input" value="{{ repuesto.codigo }}" placeholder="Partnumber"></td>
+            <td><input type="text" class="nombre-input" value="{{ repuesto.nombre }}" placeholder="Nombre"></td>
+            <td><input type="number" class="cantidad-input" value="{{ repuesto.cantidad }}" min="1"></td>
+            <td><input type="number" class="precio-input" value="{{ repuesto.precio }}" min="0"></td>
+            <td class="subtotal-repuesto">${{ repuesto.total|floatformat:0 }}</td>
+            <td><button type="button" class="btn-eliminar" onclick="this.closest('tr').remove(); actualizarTotalRepuestos();">✖</button></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="4" class="total-display">Total Repuestos:</td>
+            <td class="total-display" id="total-repuestos">${{ subtotal_repuestos|floatformat:0 }}</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+      
+      <div style="text-align: center;">
+        <button type="button" class="btn-agregar" onclick="agregarRepuesto()">➕ Agregar Repuesto</button>
+        <button type="button" class="btn-ejemplo" onclick="agregarRepuestoEjemplo()">📋 Ejemplo</button>
+      </div>
+    </div>
+
+    <!-- SERVICIOS -->
+    <div class="seccion-card">
+      <h2 class="seccion-title">⚙️ Servicios</h2>
+      <div class="alerta-info">
+        🔧 <strong>Editando servicios:</strong> Modifique los servicios existentes o agregue nuevos usando los botones de abajo.
+      </div>
+      
+      <table class="items-table" id="tabla-servicios">
+        <thead>
+          <tr>
+            <th>Descripción del Servicio</th>
+            <th>Precio</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for servicio in servicios %}
+          <tr>
+            <td><input type="text" class="nombre-servicio-input" value="{{ servicio.nombre }}" placeholder="Nombre del servicio"></td>
+            <td><input type="number" class="precio-servicio-input" value="{{ servicio.precio }}" min="0"></td>
+            <td><button type="button" class="btn-eliminar" onclick="this.closest('tr').remove(); actualizarTotalServicios();">✖</button></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td class="total-display">Total Servicios:</td>
+            <td class="total-display" id="total-servicios">${{ subtotal_servicios|floatformat:0 }}</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+      
+      <div style="text-align: center;">
+        <button type="button" class="btn-agregar" onclick="agregarServicio()">🔧 Agregar Servicio</button>
+        <button type="button" class="btn-ejemplo" onclick="agregarServicioEjemplo()">📋 Ejemplo</button>
+      </div>
+    </div>
+
+    <!-- OTROS SERVICIOS (EMPRESAS EXTERNAS) -->
+    <div class="seccion-card">
+      <h2 class="seccion-title">🏢 Otros Servicios (Empresas Externas)</h2>
+      <table class="w-full text-sm mb-4" id="tabla-otros-servicios">
+        <thead>
+          <tr>
+            <th>Servicio</th>
+            <th>Empresa Externa</th>
+            <th>Costo Interno</th>
+            <th>Precio Cliente</th>
+            <th>Ganancia</th>
+            <th>Observaciones</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for otro in otros_servicios %}
+          <tr>
+            <td><input type="text" class="nombre-otro-servicio-input" value="{{ otro.nombre_servicio }}"></td>
+            <td><input type="text" class="empresa-externa-input" value="{{ otro.empresa_externa }}"></td>
+            <td><input type="number" class="costo-interno-input" value="{{ otro.costo_interno }}" min="0"></td>
+            <td><input type="number" class="precio-otro-servicio-input" value="{{ otro.precio_cliente }}" min="0"></td>
+            <td class="ganancia-otro-servicio">${{ otro.ganancia|floatformat:0 }}</td>
+            <td><input type="text" class="observaciones-otro-input" value="{{ otro.observaciones|default:'' }}"></td>
+            <td><button type="button" class="btn-eliminar" onclick="this.closest('tr').remove(); actualizarTotalOtrosServicios();">✖</button></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3" class="total-display">Total Otros Servicios:</td>
+            <td class="total-display" id="total-otros-servicios">$0</td>
+            <td colspan="3"></td>
+          </tr>
+        </tfoot>
+      </table>
+      
+      <div style="text-align: center;">
+        <button type="button" class="btn-agregar" onclick="agregarOtroServicio()">🏢 Agregar Otro Servicio</button>
+        <button type="button" class="btn-ejemplo" onclick="agregarOtroServicioEjemplo()">📋 Ejemplo</button>
+      </div>
+    </div>
+
+    <!-- TOTALES -->
+    <div class="seccion-card">
+      <h2 class="seccion-title">💰 Resumen de Totales</h2>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 1.2rem;">
+        <div>Subtotal Repuestos:</div>
+        <div class="total-display" id="display-total-repuestos">${{ subtotal_repuestos|floatformat:0 }}</div>
+        <div>Subtotal Servicios:</div>
+        <div class="total-display" id="display-total-servicios">${{ subtotal_servicios|floatformat:0 }}</div>
+        <div>Subtotal Otros Servicios:</div>
+        <div class="total-display" id="display-total-otros-servicios">$0</div>
+        <div>Subtotal:</div>
+        <div class="total-display" id="display-subtotal">${{ subtotal|floatformat:0 }}</div>
+        <div id="iva-label">IVA (19%):</div>
+        <div class="total-display" id="display-iva">${{ iva|floatformat:0 }}</div>
+        <div style="font-size: 1.5rem; font-weight: bold; color: #00f2fe;">TOTAL:</div>
+        <div style="font-size: 1.5rem; font-weight: bold; color: #00f2fe;" id="display-total">${{ total|floatformat:0 }}</div>
+      </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div style="text-align: center; margin-top: 3rem;">
+      <a href="{% url 'documentos:ver_documento' documento.id %}" 
+         style="background: #666; color: #fff; padding: 1rem 2rem; border-radius: 1rem; text-decoration: none; margin-right: 1rem;">
+        ← Cancelar
+      </a>
+      <button type="submit" class="btn-guardar">💾 Guardar Cambios</button>
+    </div>
+  </form>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+
+<script>
+$(document).ready(function() {
+  console.log('=== MODO EDICIÓN ACTIVADO ===');
+  console.log('Documento ID:', {{ documento.id }});
+  console.log('Repuestos cargados:', {{ repuestos|length }});
+  console.log('Servicios cargados:', {{ servicios|length }});
+  
+  // Inicializar Select2 para los campos de selección
+  $('#id_mecanico').select2({
+    placeholder: 'Seleccionar mecánico...',
+    allowClear: true,
+    width: '100%',
+    theme: 'default'
+  });
+  
+  // Asegurar que el mecánico select sea visible
+  $('#id_mecanico').next('.select2-container').css({
+    'background': 'rgba(40, 40, 80, 0.95)',
+    'border': '1px solid rgba(0, 242, 254, 0.5)',
+    'border-radius': '0.5rem'
+  });
+  
+  $('#id_mecanico').next('.select2-container').find('.select2-selection').css({
+    'background': 'rgba(40, 40, 80, 0.95)',
+    'color': '#ffffff',
+    'border': 'none',
+    'height': '3rem',
+    'line-height': '3rem'
+  });
+  
+  // Configuración especial para el cliente con información detallada
+  $('#id_cliente').select2({
+    placeholder: '🔍 Buscar cliente por nombre o teléfono...',
+    allowClear: true,
+    width: '100%',
+    minimumInputLength: 2,
+    ajax: {
+      url: '/documentos/autocomplete/cliente/',
+      dataType: 'json',
+      delay: 250,
+      data: function (params) {
+        return {
+          q: params.term,
+          page: params.page
+        };
+      },
+      processResults: function (data, params) {
+        console.log('Clientes recibidos:', data);
+        return {
+          results: data.results.map(cliente => ({
+            id: cliente.id,
+            text: `${cliente.nombre} ${cliente.apellido || ''} - ${cliente.telefono || 'Sin teléfono'}`,
+            nombre: cliente.nombre,
+            apellido: cliente.apellido,
+            telefono: cliente.telefono,
+            email: cliente.email
+          }))
+        };
+      },
+      cache: true
+    }
+  });
+  
+  // Configuración especial para el vehículo que depende del cliente
+  $('#id_vehiculo').select2({
+    placeholder: '🚗 Selecciona un cliente primero...',
+    allowClear: true,
+    width: '100%',
+    disabled: true,
+    ajax: {
+      url: '/documentos/autocomplete/vehiculo/',
+      dataType: 'json',
+      delay: 250,
+      data: function (params) {
+        const clienteId = $('#id_cliente').val();
+        if (!clienteId) {
+          return null; // No hacer llamada si no hay cliente seleccionado
+        }
+        return {
+          q: params.term,
+          cliente: clienteId,
+          page: params.page
+        };
+      },
+      processResults: function (data, params) {
+        return {
+          results: data.results.map(vehiculo => ({
+            id: vehiculo.id,
+            text: `${vehiculo.patente} - ${vehiculo.marca} ${vehiculo.modelo}`,
+            patente: vehiculo.patente,
+            marca: vehiculo.marca,
+            modelo: vehiculo.modelo
+          }))
+        };
+      },
+      cache: true
+    }
+  });
+  
+  // Mostrar información del cliente cuando se selecciona Y actualizar vehículos
+  $('#id_cliente').on('select2:select', function (e) {
+    const cliente = e.params.data;
+    console.log('Cliente seleccionado:', cliente);
+    
+    // Mostrar información del cliente
+    if (cliente.nombre) {
+      const panel = document.getElementById('cliente-info-panel');
+      const nombreEl = document.getElementById('cliente-nombre');
+      const contactoEl = document.getElementById('cliente-contacto');
+      
+      nombreEl.textContent = `${cliente.nombre} ${cliente.apellido || ''}`;
+      contactoEl.innerHTML = `
+        📞 ${cliente.telefono || 'No disponible'} | 
+        📧 ${cliente.email || 'No disponible'}
+      `;
+      
+      panel.style.display = 'block';
+    }
+    
+    // Habilitar y actualizar vehículos
+    $('#id_vehiculo').prop('disabled', false);
+    $('#id_vehiculo').val(null).trigger('change');
+    $('#id_vehiculo').select2('destroy').select2({
+      placeholder: '🚗 Buscar vehículo por patente...',
+      allowClear: true,
+      width: '100%',
+      ajax: {
+        url: '/documentos/autocomplete/vehiculo/',
+        dataType: 'json',
+        delay: 250,
+        data: function (params) {
+          return {
+            q: params.term,
+            cliente: cliente.id,
+            page: params.page
+          };
+        },
+        processResults: function (data, params) {
+          console.log('Vehículos recibidos para cliente', cliente.id, ':', data);
+          return {
+            results: data.results.map(vehiculo => ({
+              id: vehiculo.id,
+              text: `${vehiculo.patente} - ${vehiculo.marca} ${vehiculo.modelo}`,
+              patente: vehiculo.patente,
+              marca: vehiculo.marca,
+              modelo: vehiculo.modelo
+            }))
+          };
+        },
+        cache: true
+      }
+    });
+  });
+  
+  // Ocultar información cuando se limpia la selección Y deshabilitar vehículo
+  $('#id_cliente').on('select2:clear', function (e) {
+    document.getElementById('cliente-info-panel').style.display = 'none';
+    // Limpiar y deshabilitar el campo de vehículo
+    $('#id_vehiculo').val(null).trigger('change');
+    $('#id_vehiculo').prop('disabled', true).select2({
+      placeholder: '🚗 Selecciona un cliente primero...',
+      allowClear: true,
+      width: '100%',
+      disabled: true
+    });
+  });
+  
+  // Si ya hay un cliente seleccionado, mostrar su información y habilitar vehículos
+  const clienteActual = $('#id_cliente').val();
+  if (clienteActual) {
+    console.log('Cliente ya seleccionado:', clienteActual);
+    const clienteTexto = $('#id_cliente option:selected').text();
+    if (clienteTexto && clienteTexto !== '') {
+      const panel = document.getElementById('cliente-info-panel');
+      const nombreEl = document.getElementById('cliente-nombre');
+      const contactoEl = document.getElementById('cliente-contacto');
+      
+      nombreEl.textContent = clienteTexto.split(' - ')[0] || 'Cliente seleccionado';
+      contactoEl.textContent = '✅ Cliente asignado al documento';
+      panel.style.display = 'block';
+    }
+    
+    // Habilitar y configurar vehículos para el cliente actual
+    $('#id_vehiculo').prop('disabled', false);
+    $('#id_vehiculo').select2('destroy').select2({
+      placeholder: '🚗 Buscar vehículo por patente...',
+      allowClear: true,
+      width: '100%',
+      ajax: {
+        url: '/documentos/autocomplete/vehiculo/',
+        dataType: 'json',
+        delay: 250,
+        data: function (params) {
+          return {
+            q: params.term,
+            cliente: clienteActual,
+            page: params.page
+          };
+        },
+        processResults: function (data, params) {
+          console.log('Vehículos para cliente actual:', data);
+          return {
+            results: data.results.map(vehiculo => ({
+              id: vehiculo.id,
+              text: `${vehiculo.patente} - ${vehiculo.marca} ${vehiculo.modelo}`,
+              patente: vehiculo.patente,
+              marca: vehiculo.marca,
+              modelo: vehiculo.modelo
+            }))
+          };
+        },
+        cache: true
+      }
+    });
+  }
+  
+  // Activar autocompletar para filas existentes
+  $('#tabla-repuestos tbody tr').each(function() {
+    activarAutocompleteRepuesto(this);
+  });
+  
+  $('#tabla-servicios tbody tr').each(function() {
+    activarAutocompleteServicio(this);
+  });
+  
+  // Conectar eventos de cálculo a inputs existentes y recalcular totales generales
+  function recalcularTotales() {
+    let totalRepuestos = 0;
+    let totalServicios = 0;
+    let totalOtrosServicios = 0;
+    
+    // Calcular total repuestos y actualizar subtotales por fila
+    $('#tabla-repuestos tbody tr').each(function() {
+      const cantidad = parseInt($(this).find('.cantidad-input').val() || '1');
+      const precio = parseInt($(this).find('.precio-input').val() || '0');
+      const subtotal = cantidad * precio;
+      $(this).find('.subtotal-repuesto').text('$' + subtotal.toLocaleString());
+      totalRepuestos += subtotal;
+    });
+    
+    // Calcular total servicios
+    $('#tabla-servicios tbody tr').each(function() {
+      const precio = parseInt($(this).find('.precio-servicio-input').val() || '0');
+      totalServicios += precio;
+    });
+    
+    // Calcular total otros servicios
+    $('#tabla-otros-servicios tbody tr').each(function() {
+      const precio = parseInt($(this).find('.precio-otro-servicio-input').val() || '0');
+      totalOtrosServicios += precio;
+      // Actualizar ganancia en cada fila
+      actualizarGananciaOtroServicio(this);
+    });
+    
+    const subtotal = totalRepuestos + totalServicios + totalOtrosServicios;
+    
+    // Verificar si debe incluir IVA
+    const incluirIva = $('#id_incluir_iva').is(':checked');
+    const iva = incluirIva ? Math.round(subtotal * 0.19) : 0;
+    const total = subtotal + iva;
+    
+    // Actualizar displays
+    $('#display-total-repuestos').text('$' + totalRepuestos.toLocaleString());
+    $('#display-total-servicios').text('$' + totalServicios.toLocaleString());
+    $('#display-total-otros-servicios').text('$' + totalOtrosServicios.toLocaleString());
+    $('#display-subtotal').text('$' + subtotal.toLocaleString());
+    $('#display-iva').text('$' + iva.toLocaleString());
+    $('#display-total').text('$' + total.toLocaleString());
+    
+    // Mostrar/ocultar fila del IVA
+    if (incluirIva) {
+      $('#iva-label').show();
+      $('#display-iva').show();
+    } else {
+      $('#iva-label').hide();
+      $('#display-iva').hide();
+    }
+    
+    // También actualizar el total en el pie de tabla
+    $('#total-repuestos').text('$' + totalRepuestos.toLocaleString());
+    $('#total-servicios').text('$' + totalServicios.toLocaleString());
+    $('#total-otros-servicios').text('$' + totalOtrosServicios.toLocaleString());
+    console.log('Totales actualizados - Repuestos:', totalRepuestos, 'Servicios:', totalServicios, 'Otros Servicios:', totalOtrosServicios, 'Total:', total, 'IVA incluido:', incluirIva);
+  }
+  // Eventos para recalcular totales
+  $(document).on('input', '.cantidad-input, .precio-input, .precio-servicio-input', recalcularTotales);
+  $(document).on('input', '.costo-interno-input, .precio-otro-servicio-input', recalcularTotales);
+  $(document).on('change', '#id_incluir_iva', recalcularTotales);
+  // Recalcular al eliminar filas
+  $(document).on('click', '.btn-eliminar', function() {
+    setTimeout(recalcularTotales, 100);
+  });
+  
+  // === FUNCIONES PARA OTROS SERVICIOS ===
+  
+  // Autocompletado inteligente para otros servicios
+  function activarAutocompleteOtroServicio(tr) {
+    const nombreInput = tr.querySelector('.nombre-otro-servicio-input');
+    if (!nombreInput) return;
+    
+    $(nombreInput).autocomplete({
+      source: function(request, response) {
+        $.getJSON('/autocomplete/servicio/', {q: request.term}, function(data) {
+          response(data.results.map(s => ({
+            label: s.text,
+            value: s.text
+          })));
+        });
+      },
+      minLength: 2
+    });
+  }
+  
+  // Función para agregar otros servicios
+  window.agregarOtroServicio = function() {
+    const tbody = document.querySelector('#tabla-otros-servicios tbody');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input type="text" class="nombre-otro-servicio-input futurista-input p-1 rounded w-full" placeholder="Nombre del servicio"></td>
+      <td><input type="text" class="empresa-externa-input futurista-input p-1 rounded w-full" placeholder="Empresa externa"></td>
+      <td><input type="number" class="costo-interno-input futurista-input p-1 rounded w-24" value="0" min="0"></td>
+      <td><input type="number" class="precio-otro-servicio-input futurista-input p-1 rounded w-24" value="0" min="0"></td>
+      <td class="ganancia-otro-servicio font-semibold">$0</td>
+      <td><input type="text" class="observaciones-otro-input futurista-input p-1 rounded w-full" placeholder="Observaciones"></td>
+      <td><button type="button" class="btn-eliminar" onclick="this.closest('tr').remove(); actualizarTotalOtrosServicios();">✖</button></td>
+    `;
+    tbody.appendChild(tr);
+    
+    // Activar autocompletado
+    activarAutocompleteOtroServicio(tr);
+    
+    // Eventos para calcular ganancia
+    $(tr).find('.costo-interno-input, .precio-otro-servicio-input').on('input', function() {
+      actualizarGananciaOtroServicio(tr);
+      recalcularTotales();
+    });
+    
+    // Enfocar en el campo de nombre
+    tr.querySelector('.nombre-otro-servicio-input').focus();
+  };
+  
+  // Función para agregar ejemplo de otro servicio
+  window.agregarOtroServicioEjemplo = function() {
+    agregarOtroServicio();
+    const lastRow = document.querySelector('#tabla-otros-servicios tbody tr:last-child');
+    if (lastRow) {
+      lastRow.querySelector('.nombre-otro-servicio-input').value = 'Alineación completa';
+      lastRow.querySelector('.empresa-externa-input').value = 'Alineados Express';
+      lastRow.querySelector('.costo-interno-input').value = 12000;
+      lastRow.querySelector('.precio-otro-servicio-input').value = 18000;
+      lastRow.querySelector('.observaciones-otro-input').value = 'Incluye balanceo';
+      actualizarGananciaOtroServicio(lastRow);
+      recalcularTotales();
+    }
+  };
+  
+  // Actualizar ganancia de un otro servicio
+  function actualizarGananciaOtroServicio(tr) {
+    const costo = parseInt(tr.querySelector('.costo-interno-input').value || '0');
+    const precio = parseInt(tr.querySelector('.precio-otro-servicio-input').value || '0');
+    const ganancia = precio - costo;
+    tr.querySelector('.ganancia-otro-servicio').textContent = '$' + ganancia.toLocaleString();
+  }
+  
+  // Actualizar total de otros servicios
+  function actualizarTotalOtrosServicios() {
+    let total = 0;
+    $('#tabla-otros-servicios tbody tr').each(function() {
+      const precio = parseInt($(this).find('.precio-otro-servicio-input').val() || '0');
+      total += precio;
+    });
+    $('#total-otros-servicios').text('$' + total.toLocaleString());
+    $('#display-total-otros-servicios').text('$' + total.toLocaleString());
+  }
+  
+  // Activar autocompletado en filas existentes
+  $('#tabla-otros-servicios tbody tr').each(function() {
+    const tr = this;
+    activarAutocompleteOtroServicio(tr);
+    $(tr).find('.costo-interno-input, .precio-otro-servicio-input').on('input', function() {
+      actualizarGananciaOtroServicio(tr);
+    });
+  });
+  
+  // Recalcular al agregar filas (debería llamarse después de agregar)
+  window.recalcularTotales = recalcularTotales;
+  // Calcular totales iniciales
+  recalcularTotales();
+  
+  // === ENVÍO DEL FORMULARIO ===
+  $('form').on('submit', function(e) {
+    console.log('[SUBMIT] Preparando envío del formulario');
+    
+    const items = [];
+    
+    // Procesar repuestos
+    $('#tabla-repuestos tbody tr').each(function() {
+      const partnumber = $(this).find('.partnumber-input').val() || '';
+      const nombre = $(this).find('.nombre-input').val() || '';
+      const cantidad = parseInt($(this).find('.cantidad-input').val() || '1');
+      const precio = parseInt($(this).find('.precio-input').val() || '0');
+      
+      if (nombre.trim() && precio > 0 && cantidad > 0) {
+        items.push({
+          tipo: 'repuesto',
+          partnumber: partnumber.trim(),
+          nombre: nombre.trim(),
+          cantidad: cantidad,
+          precio: precio
+        });
+        console.log('[SUBMIT] Repuesto agregado:', { partnumber, nombre, cantidad, precio });
+      }
+    });
+    
+    // Procesar servicios
+    $('#tabla-servicios tbody tr').each(function() {
+      const nombre = $(this).find('.nombre-servicio-input').val() || '';
+      const precio = parseInt($(this).find('.precio-servicio-input').val() || '0');
+      
+      if (nombre.trim() && precio > 0) {
+        items.push({
+          tipo: 'servicio',
+          nombre: nombre.trim(),
+          precio: precio
+        });
+        console.log('[SUBMIT] Servicio agregado:', { nombre, precio });
+      }
+    });
+    
+    // Procesar otros servicios
+    $('#tabla-otros-servicios tbody tr').each(function() {
+      const nombre = $(this).find('.nombre-otro-servicio-input').val() || '';
+      const empresa = $(this).find('.empresa-externa-input').val() || '';
+      const costo = parseInt($(this).find('.costo-interno-input').val() || '0');
+      const precio = parseInt($(this).find('.precio-otro-servicio-input').val() || '0');
+      const observaciones = $(this).find('.observaciones-otro-input').val() || '';
+      
+      if (nombre.trim() && precio > 0) {
+        items.push({
+          tipo: 'otro_servicio',
+          nombre: nombre.trim(),
+          empresa: empresa.trim(),
+          costo: costo,
+          precio: precio,
+          observaciones: observaciones.trim()
+        });
+        console.log('[SUBMIT] Otro servicio agregado:', { nombre, empresa, costo, precio, observaciones });
+      }
+    });
+    
+    // Guardar JSON en el campo oculto
+    $('#json_items').val(JSON.stringify(items));
+    console.log('[SUBMIT] json_items generado:', JSON.stringify(items, null, 2));
+    
+    return true; // Permitir envío
+  });
+});
+</script>
+{% endblock %}

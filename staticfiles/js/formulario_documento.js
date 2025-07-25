@@ -1,4 +1,150 @@
+// --- AUTOCOMPLETADO INTELIGENTE DE REPUESTOS Y SERVICIOS ---
+function activarAutocompleteRepuesto(tr) {
+    const partInput = tr.querySelector('.partnumber-input');
+    const nombreInput = tr.querySelector('.nombre-input');
+    const precioInput = tr.querySelector('.precio-input');
+    if (!partInput) return;
+    // Mostrar mensaje si el partnumber no existe
+    partInput.addEventListener('blur', function() {
+        const valor = partInput.value.trim();
+        if (!valor) return;
+        $.getJSON('/documentos/autocomplete_repuesto/', {q: valor}, function(data) {
+            const existe = data.results.some(r => r.partnumber === valor);
+            if (!existe) {
+                partInput.classList.add('border-red-500');
+                if (!tr.querySelector('.msg-noexiste')) {
+                    const msg = document.createElement('div');
+                    msg.textContent = '⚠️ Repuesto no existe';
+                    msg.className = 'msg-noexiste text-red-600 text-xs mt-1';
+                    partInput.parentNode.appendChild(msg);
+                }
+            } else {
+                partInput.classList.remove('border-red-500');
+                const msg = tr.querySelector('.msg-noexiste');
+                if (msg) msg.remove();
+            }
+        });
+    });
+    $(partInput).autocomplete({
+        source: function(request, response) {
+            $.getJSON('/documentos/autocomplete_repuesto/', {q: request.term}, function(data) {
+                response(data.results.map(r => ({
+                    label: r.partnumber + ' - ' + r.nombre + ' ($' + r.precio + ')',
+                    value: r.partnumber,
+                    nombre: r.nombre,
+                    precio: r.precio
+                })));
+            });
+        },
+        minLength: 2,
+        select: function(event, ui) {
+            if (nombreInput) nombreInput.value = ui.item.nombre;
+            if (precioInput) precioInput.value = ui.item.precio;
+            setTimeout(() => actualizarTotalRepuestos(), 100);
+        }
+    });
+}
+
+function activarAutocompleteServicio(tr) {
+    const nombreInput = tr.querySelector('.nombre-servicio-input');
+    if (!nombreInput) return;
+    $(nombreInput).autocomplete({
+        source: function(request, response) {
+            $.getJSON('/documentos/autocomplete_servicio_nombre/', {q: request.term}, function(data) {
+                response(data.results.map(s => ({
+                    label: s.nombre,
+                    value: s.nombre
+                })));
+            });
+        },
+        minLength: 2
+    });
+}
+// --- FUNCIONES PARA AGREGAR REPUESTOS Y SERVICIOS ---
+window.agregarRepuesto = function() {
+    const tbody = document.querySelector('#tabla-repuestos tbody');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+        <td><input type="text" class="partnumber-input futurista-input border p-1 rounded w-full" placeholder="Partnumber"></td>
+        <td><input type="text" class="nombre-input futurista-input border p-1 rounded w-full" placeholder="Nombre"></td>
+        <td><input type="number" class="cantidad-input futurista-input border p-1 rounded w-20" value="1" min="1"></td>
+        <td><input type="number" class="precio-input futurista-input border p-1 rounded w-24" value="0" min="0"></td>
+        <td class="subtotal-repuesto font-semibold">$0</td>
+        <td><button type="button" class="text-red-600 font-bold" onclick="this.closest('tr').remove(); actualizarTotalRepuestos();">✖</button></td>
+    `;
+    tbody.appendChild(tr);
+    activarAutocompleteRepuesto(tr);
+    actualizarTotalRepuestos();
+    tr.querySelector('.cantidad-input').addEventListener('input', actualizarTotalRepuestos);
+    tr.querySelector('.precio-input').addEventListener('input', actualizarTotalRepuestos);
+};
+
+window.agregarServicio = function() {
+    const tbody = document.querySelector('#tabla-servicios tbody');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+        <td><input type="text" class="nombre-servicio-input futurista-input p-1 rounded w-full" placeholder="Nombre del servicio"></td>
+        <td><input type="number" class="precio-servicio-input futurista-input p-1 rounded w-24" value="0" min="0"></td>
+        <td><button type="button" class="text-red-600 font-bold" onclick="this.closest('tr').remove(); actualizarTotalServicios();">✖</button></td>
+    `;
+    tbody.appendChild(tr);
+    activarAutocompleteServicio(tr);
+    actualizarTotalServicios();
+    tr.querySelector('.precio-servicio-input').addEventListener('input', actualizarTotalServicios);
+    // Poner el foco en el campo de nombre de servicio
+    const inputNombre = tr.querySelector('.nombre-servicio-input');
+    if (inputNombre) {
+        inputNombre.focus();
+    }
+};
+
+function actualizarTotalRepuestos() {
+    let total = 0;
+    document.querySelectorAll('#tabla-repuestos tbody tr').forEach((row) => {
+        const cantidad = parseInt(row.querySelector('.cantidad-input')?.value || '1');
+        const precio = parseInt(row.querySelector('.precio-input')?.value || '0');
+        const subtotal = cantidad * precio;
+        row.querySelector('.subtotal-repuesto').textContent = `$${subtotal}`;
+        total += subtotal;
+    });
+    document.getElementById('total-repuestos').textContent = `$${total}`;
+    actualizarTotalesDocumento();
+}
+
+function actualizarTotalServicios() {
+    let total = 0;
+    document.querySelectorAll('#tabla-servicios tbody tr').forEach((row) => {
+        const precio = parseInt(row.querySelector('.precio-servicio-input')?.value || '0');
+        total += precio;
+    });
+    document.getElementById('total-servicios').textContent = `$${total}`;
+    actualizarTotalesDocumento();
+}
+
+function actualizarTotalesDocumento() {
+    // Sumar totales de repuestos y servicios
+    let totalRepuestos = 0;
+    let totalServicios = 0;
+    document.querySelectorAll('#tabla-repuestos tbody tr').forEach((row) => {
+        const cantidad = parseInt(row.querySelector('.cantidad-input')?.value || '1');
+        const precio = parseInt(row.querySelector('.precio-input')?.value || '0');
+        totalRepuestos += cantidad * precio;
+    });
+    document.querySelectorAll('#tabla-servicios tbody tr').forEach((row) => {
+        const precio = parseInt(row.querySelector('.precio-servicio-input')?.value || '0');
+        totalServicios += precio;
+    });
+    const subtotal = totalRepuestos + totalServicios;
+    const iva = Math.round(totalRepuestos * 0.19);
+    const granTotal = subtotal + iva;
+    document.getElementById('subtotal-doc').textContent = `$${subtotal}`;
+    document.getElementById('iva-doc').textContent = `$${iva}`;
+    document.getElementById('gran-total-doc').textContent = `$${granTotal}`;
+}
+
+// Requiere jQuery y jQuery UI para el autocompletado dinámico de partnumber
 console.log('[DEBUG] formulario_documento.js cargado');
+
 document.addEventListener('DOMContentLoaded', function () {
     const tipoDocSelect = document.getElementById('id_tipo_documento');
     const numeroInput = document.getElementById('id_numero_documento');
@@ -10,10 +156,8 @@ document.addEventListener('DOMContentLoaded', function () {
         'Presupuesto': { color: 'bg-purple-100 border-purple-400', style: 'background:rgba(128,0,255,0.12);border:2px solid #b39ddb;', prefijo: 'P-' },
     };
 
-    // Genera un número tipo F-001, OT-001, P-001
     const generarNumero = (tipo) => {
         const conf = configPorTipo[tipo] || { prefijo: 'X-' };
-        // Generar un número aleatorio de 3 dígitos, siempre con ceros a la izquierda
         const rnd = Math.floor(Math.random() * 999) + 1;
         const num = rnd.toString().padStart(3, '0');
         return conf.prefijo + num;
@@ -21,156 +165,78 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function actualizarColor(tipo) {
         if (formContainer) {
-            // Quitar colores previos y estilos inline
-            formContainer.classList.remove('bg-yellow-100', 'bg-blue-100', 'bg-purple-100', 'border-yellow-400', 'border-blue-400', 'border-purple-400');
-            formContainer.style.background = 'transparent';
-            formContainer.style.border = 'none';
-            // Agregar el nuevo color solo si no es transparente
-            if (configPorTipo[tipo]) {
-                formContainer.removeAttribute('style');
-                formContainer.setAttribute('style', configPorTipo[tipo].style);
-            }
+            formContainer.removeAttribute('style');
+            formContainer.setAttribute('style', configPorTipo[tipo]?.style || '');
         }
     }
 
     if (tipoDocSelect) {
         tipoDocSelect.addEventListener('change', function () {
             const tipo = tipoDocSelect.value;
-            const texto = tipoDocSelect.options[tipoDocSelect.selectedIndex].text.trim();
-            console.log('[DEBUG tipo_documento] value:', tipo, '| text:', texto);
-            if (numeroInput) {
-                numeroInput.value = generarNumero(tipo);
-            }
+            numeroInput.value = generarNumero(tipo);
             actualizarColor(tipo);
         });
-        // Inicializar color y número al cargar
-        const tipoInicial = tipoDocSelect.value;
-        const textoInicial = tipoDocSelect.options[tipoDocSelect.selectedIndex].text.trim();
-        console.log('[DEBUG tipo_documento] value inicial:', tipoInicial, '| text inicial:', textoInicial);
-        actualizarColor(tipoInicial);
-        if (numeroInput) {
-            numeroInput.value = generarNumero(tipoInicial);
-        }
+
+        actualizarColor(tipoDocSelect.value);
+        numeroInput.value = generarNumero(tipoDocSelect.value);
     }
 
-    setTimeout(() => {
-        if (window.dal?.widgets?.init) {
-            console.log("✅ DAL forzado");
-            window.dal.widgets.init();
+    // Fallback por si no engancha el onclick
+    const btnRepuesto = document.querySelector('button[onclick="agregarRepuesto()"]');
+    if (btnRepuesto) {
+        btnRepuesto.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.agregarRepuesto();
+        });
+    }
+
+    const btnServicio = document.getElementById('btn-agregar-servicio');
+    if (btnServicio) {
+        btnServicio.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.agregarServicio();
+        });
+    }
+
+    document.querySelector('form').addEventListener('submit', function (e) {
+        const items = [];
+
+        document.querySelectorAll('#tabla-repuestos tbody tr').forEach((row) => {
+            const partnumber = row.querySelector('.partnumber-input')?.value || '';
+            const nombre = row.querySelector('.nombre-input')?.value || '';
+            const cantidad = parseInt((row.querySelector('.cantidad-input')?.value || '1').replace(/[^\d]/g, '')) || 1;
+            const precio = parseInt((row.querySelector('.precio-input')?.value || '0').replace(/[^\d]/g, '')) || 0;
+
+            if (nombre && precio > 0) {
+                items.push({
+                    tipo: 'repuesto',
+                    partnumber: partnumber,
+                    nombre: nombre,
+                    cantidad: cantidad,
+                    precio: precio
+                });
+            }
+        });
+
+        document.querySelectorAll('#tabla-servicios tbody tr').forEach((row) => {
+            const nombre = row.querySelector('.nombre-servicio-input')?.value || '';
+            const precio = parseInt((row.querySelector('.precio-servicio-input')?.value || '0').replace(/[^\d]/g, '')) || 0;
+
+            if (nombre && precio > 0) {
+                items.push({
+                    tipo: 'servicio',
+                    nombre: nombre,
+                    precio: precio
+                });
+            }
+        });
+
+        const jsonInput = document.getElementById('json_items');
+        if (jsonInput) {
+            jsonInput.value = JSON.stringify(items);
+            console.log('[DEBUG] json_items generado:', jsonInput.value);
         } else {
-            console.warn("❌ DAL no disponible");
+            console.warn('⚠️ No se encontró input#json_items en el formulario.');
         }
-    }, 300);
-
-    // Simulación de base de datos de repuestos (puedes reemplazar por AJAX en producción)
-    const REPUESTOS_DB = [
-        { partnumber: 'A123', nombre: 'Filtro de Aceite', precio: 8000 },
-        { partnumber: 'B456', nombre: 'Bujía NGK', precio: 3500 },
-        { partnumber: 'C789', nombre: 'Pastilla de Freno', precio: 12000 },
-        { partnumber: 'D111', nombre: 'Aceite 10W40', precio: 15000 },
-    ];
-
-    function buscarRepuestoPorPartnumber(partnumber) {
-        return REPUESTOS_DB.find(r => r.partnumber.toUpperCase() === partnumber.toUpperCase());
-    }
-
-    // Formatea un número como CLP: 120000 => $120.000
-    function formatCLP(num) {
-        if (isNaN(num)) return '';
-        return '$' + num.toLocaleString('es-CL');
-    }
-
-window.agregarRepuesto = function() {
-    console.log('[DEBUG] agregarRepuesto() ejecutado');
-        const tbody = document.querySelector('#tabla-repuestos tbody');
-        if (!tbody) return;
-        // Crear fila con inputs
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td><input type="text" class="partnumber-input w-full border p-1" placeholder="Partnumber" /></td>
-            <td><input type="text" class="nombre-input w-full border p-1" placeholder="Nombre" readonly /></td>
-            <td><input type="text" inputmode="numeric" pattern="[0-9.]*" class="cantidad-input w-20 border p-1 text-right" min="1" value="1" /></td>
-            <td class="relative">
-              <span class="absolute left-2 top-1.5 text-gray-500">$</span>
-              <input type="text" inputmode="numeric" pattern="[0-9.]*" class="precio-input w-24 border p-1 pl-5 text-right" min="0" value="0" readonly />
-            </td>
-            <td class="font-bold total-repuesto text-right">$0</td>
-            <td><button type="button" class="text-red-600 font-bold remove-repuesto">✕</button></td>
-        `;
-        tbody.appendChild(tr);
-        console.log('[DEBUG] Fila de repuesto agregada al DOM');
-
-        const partInput = tr.querySelector('.partnumber-input');
-        const nombreInput = tr.querySelector('.nombre-input');
-        const cantidadInput = tr.querySelector('.cantidad-input');
-        const precioInput = tr.querySelector('.precio-input');
-        const totalTd = tr.querySelector('.total-repuesto');
-        const removeBtn = tr.querySelector('.remove-repuesto');
-
-        // Autocompletar nombre y precio al ingresar partnumber
-        partInput.addEventListener('input', function() {
-            let valor = partInput.value.trim().toUpperCase();
-            console.log('[DEBUG] Valor partnumber ingresado:', valor);
-            const rep = buscarRepuestoPorPartnumber(valor);
-            if (rep) {
-                console.log('[DEBUG] Repuesto encontrado:', rep);
-                nombreInput.value = rep.nombre;
-                precioInput.value = rep.precio;
-                precioInput.dispatchEvent(new Event('input'));
-                calcularTotal();
-            } else {
-                console.log('[DEBUG] No se encontró repuesto para:', valor);
-                if(valor.length > 0) alert('No se encontró repuesto para: ' + valor);
-                nombreInput.value = '';
-                precioInput.value = 0;
-                totalTd.textContent = '$0';
-                calcularGranTotal();
-            }
-        });
-
-        // Formatear cantidad y precio al escribir
-        cantidadInput.addEventListener('input', function() {
-            this.value = this.value.replace(/[^\d]/g, '');
-            if (this.value) {
-                this.value = parseInt(this.value, 10).toLocaleString('es-CL');
-            }
-            calcularTotal();
-        });
-        precioInput.addEventListener('input', function() {
-            this.value = this.value.replace(/[^\d]/g, '');
-            if (this.value) {
-                this.value = parseInt(this.value, 10).toLocaleString('es-CL');
-            }
-            calcularTotal();
-        });
-
-        function getIntFromCLP(str) {
-            return parseInt((str || '').replace(/[^\d]/g, '')) || 0;
-        }
-
-        function calcularTotal() {
-            const cantidad = getIntFromCLP(cantidadInput.value);
-            const precio = getIntFromCLP(precioInput.value);
-            const total = cantidad * precio;
-            totalTd.textContent = formatCLP(total);
-            calcularGranTotal();
-        }
-
-        // Eliminar fila
-        removeBtn.addEventListener('click', function() {
-            tr.remove();
-            calcularGranTotal();
-        });
-
-        calcularTotal();
-    }
-
-    function calcularGranTotal() {
-        let granTotal = 0;
-        document.querySelectorAll('.total-repuesto').forEach(td => {
-            const valor = parseInt(td.textContent.replace(/[^\d]/g, '')) || 0;
-            granTotal += valor;
-        });
-        document.getElementById('total-repuestos').textContent = formatCLP(granTotal);
-    }
+    });
 });

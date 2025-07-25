@@ -1,7 +1,9 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load simple_i18n %}
 
 {% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/force_black_text.css' %}">
 <script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
@@ -26,13 +28,16 @@ document.addEventListener("DOMContentLoaded", () => {
 {% block content %}
 <div class="min-h-screen flex items-center justify-center px-4 premium-container">
   <div class="premium-card w-full max-w-md p-8 mt-24">
-    <img src="/media/TallerPro_logo.png" alt="E-Garage Logo" class="logo-egarage mb-6 animate-logo">
-    <h2 class="premium-title text-2xl font-bold text-center mb-6">Iniciar sesión</h2>
+    <div class="flex flex-col items-center justify-center mb-8">
+      <img src="{% static 'img/TallerPro_logo.png' %}" alt="E-Garage Logo" class="w-40 h-40 mx-auto mb-4 shadow-2xl border-4 border-cyan-400 bg-[#181c1f]">
+      <span class="block text-4xl font-extrabold text-cyan-300 tracking-widest text-center">E-Garage</span>
+    </div>
+    <h2 class="premium-title text-2xl font-bold text-center mb-6">{% trans "Iniciar sesion" %}</h2>
     <form class="space-y-5" method="POST">
       {% csrf_token %}
       {% for field in form %}
         <div>
-          <label class="block text-sm font-semibold text-gray-300" for="{{ field.id_for_label }}">{{ field.label }}</label>
+          <label class="block text-sm font-semibold text-cyan-300" for="{{ field.id_for_label }}">{% trans field.label %}</label>
           {{ field }}
           {% if field.errors %}
             <p class="text-sm text-red-400 mt-1">{{ field.errors|striptags }}</p>
@@ -40,17 +45,30 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
       {% endfor %}
       <div class="flex items-center justify-between text-sm">
-        <label class="inline-flex items-center">
-          {{ form.remember }} Recordarme
-        </label>
-        <a class="text-blue-400 hover:underline" href="{% url 'account_reset_password' %}">¿Olvidaste tu contraseña?</a>
+        <div></div>
+        <a class="text-blue-400 hover:underline" href="{% url 'account_reset_password' %}">{% trans "Olvidaste tu contrasena?" %}</a>
       </div>
-      <button type="submit" class="w-full btn-premium">Iniciar sesión</button>
+      <button type="submit" class="w-full btn-premium">{% trans "Iniciar sesion" %}</button>
     </form>
     <p class="text-center text-sm text-gray-400 mt-6">
-      ¿No tienes cuenta?
-      <a class="text-blue-400 hover:underline" href="{% url 'account_signup' %}">Regístrate aquí</a>
+      {% trans "No tienes cuenta?" %}
+      <a class="text-blue-400 hover:underline" href="{% url 'account_signup' %}">{% trans "Registrate aqui" %}</a>
     </p>
+    
+    <!-- Botones de idioma -->
+    <div class="flex justify-center gap-4 mt-4">
+      <a href="?lang=es" class="text-xs px-3 py-1 rounded-full border border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black transition">🇪🇸 ESP</a>
+      <a href="?lang=en" class="text-xs px-3 py-1 rounded-full border border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black transition">🇺🇸 ENG</a>
+    </div>
+    
+    <!-- Créditos de Atlanta Reciclajes -->
+    <div class="mt-8 pt-4 border-t border-cyan-700/30">
+      <p class="text-center text-gray-500 text-xs">
+        <strong class="text-cyan-400">eGarage AI™</strong> desarrollado por <strong class="text-cyan-400">Atlanta Reciclajes</strong><br>
+        <a href="mailto:suscripcion@atlantareciclajes.cl" class="text-cyan-400 hover:text-cyan-300 transition">suscripcion@atlantareciclajes.cl</a><br>
+        <a href="http://www.atlantareciclajes.cl" class="text-cyan-400 hover:text-cyan-300 transition">www.atlantareciclajes.cl</a>
+      </p>
+    </div>
   </div>
 </div>
 <style>
@@ -68,15 +86,31 @@ body {
     padding: 40px 0;
 }
 .premium-card {
-    background: rgba(24,25,26,0.18);
-    border-radius: 18px;
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    background: linear-gradient(135deg, rgba(24,30,40,0.85) 0%, rgba(0,230,255,0.1) 100%);
+    border-radius: 24px;
+    box-shadow: 0 12px 48px 0 rgba(0,230,255,0.3), 0 0 0 2px #00e6ff44;
     color: #fff;
     text-align: center;
     z-index: 3;
-    backdrop-filter: blur(8px) saturate(120%);
-    -webkit-backdrop-filter: blur(8px) saturate(120%);
-    border: 1.5px solid rgba(0,230,208,0.12);
+    backdrop-filter: blur(16px) saturate(150%);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    border: 2px solid rgba(0,230,255,0.4);
+    position: relative;
+    overflow: hidden;
+}
+.premium-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0,230,255,0.1), transparent);
+    animation: shimmer 3s infinite;
+}
+@keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
 }
 .logo-egarage {
     width: 90px;
@@ -93,26 +127,77 @@ body {
     100% { transform: scale(1.08) rotate(6deg); filter: drop-shadow(0 0 24px #00e6d0); }
 }
 .premium-title {
-    font-size: 2.2rem;
-    font-weight: 700;
-    margin-bottom: 10px;
-    color: #00e6d0;
-    letter-spacing: 1px;
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    color: #00e6ff;
+    letter-spacing: 2px;
+    text-shadow: 0 0 20px #00e6ffaa, 0 0 40px #00e6ff44;
+    background: linear-gradient(45deg, #00e6ff, #ffffff, #00e6ff);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: textGlow 3s ease-in-out infinite alternate;
+}
+@keyframes textGlow {
+    0% { 
+        background-position: 0% 50%; 
+        text-shadow: 0 0 20px #00e6ffaa, 0 0 40px #00e6ff44;
+    }
+    100% { 
+        background-position: 100% 50%; 
+        text-shadow: 0 0 30px #00e6ffcc, 0 0 60px #00e6ff66;
+    }
 }
 .btn-premium {
-    background: #00e6d0;
-    color: #18191a;
+    background: linear-gradient(45deg, #00e6ff, #0099cc);
+    color: #ffffff;
     border: none;
-    border-radius: 8px;
-    padding: 10px 24px;
-    font-size: 1rem;
-    font-weight: 600;
-    margin-top: 10px;
+    border-radius: 12px;
+    padding: 12px 24px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-top: 15px;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0,230,255,0.4);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 .btn-premium:hover {
-    background: #00bfa3;
+    background: linear-gradient(45deg, #0099cc, #00e6ff);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,230,255,0.6);
+}
+
+/* Sobrescribir force_black_text.css para login */
+.premium-card label,
+.premium-card h1,
+.premium-card h2,
+.premium-card h3,
+.premium-card form label,
+.premium-card input,
+.premium-card select,
+.premium-card textarea {
+    color: #00e6ff !important;
+}
+
+.premium-card input {
+    background: rgba(0,20,30,0.8) !important;
+    border: 2px solid #00e6ff44 !important;
+    border-radius: 8px !important;
+    padding: 12px !important;
+    color: #ffffff !important;
+    transition: all 0.3s ease !important;
+}
+
+.premium-card input:focus {
+    border-color: #00e6ff !important;
+    box-shadow: 0 0 15px rgba(0,230,255,0.5) !important;
+    outline: none !important;
+}
+
+.premium-card input::placeholder {
+    color: #66ccdd !important;
 }
 </style>
 {% endblock %}

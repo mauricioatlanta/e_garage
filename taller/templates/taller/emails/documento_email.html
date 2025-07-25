@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ documento.tipo_documento }} - {{ empresa.nombre }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+        }
+        .content {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 0 0 10px 10px;
+        }
+        .empresa-logo {
+            max-height: 60px;
+            margin-bottom: 15px;
+        }
+        .documento-info {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #007bff;
+        }
+        .info-row {
+            margin-bottom: 10px;
+        }
+        .label {
+            font-weight: bold;
+            color: #495057;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .social-links {
+            margin-top: 20px;
+        }
+        .social-links a {
+            margin: 0 10px;
+            color: #007bff;
+            text-decoration: none;
+        }
+        .info-box {
+            background: white;
+            padding: 15px;
+            border-left: 4px solid #667eea;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            border-top: 1px solid #ddd;
+        }
+        .btn {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 12px 25px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>{{ empresa.nombre }}</h1>
+        <h2>{{ documento.tipo_documento }} #{{ documento.numero_documento }}</h2>
+    </div>
+
+    <div class="content">
+        <p>Estimado/a <strong>{{ cliente.nombre }}</strong>,</p>
+        
+        <p>Esperamos que se encuentre muy bien.</p>
+        
+        <p>Le adjuntamos el {{ documento.tipo_documento|lower }} correspondiente a los servicios realizados en su vehículo.</p>
+
+        <div class="info-box">
+            <h3>Detalles del Servicio</h3>
+            <p><strong>Vehículo:</strong> {{ documento.vehiculo.marca }} {{ documento.vehiculo.modelo }} ({{ documento.vehiculo.patente }})</p>
+            <p><strong>Fecha:</strong> {{ documento.fecha|date:"d/m/Y" }}</p>
+            {% if documento.mecanico %}
+            <p><strong>Mecánico:</strong> {{ documento.mecanico.nombre }}</p>
+            {% endif %}
+            <p><strong>Total:</strong> ${{ total|floatformat:0 }}</p>
+        </div>
+
+        <p>Si tiene alguna consulta sobre este documento, no dude en contactarnos.</p>
+        
+        <p>¡Gracias por confiar en nosotros!</p>
+    </div>
+
+    <div class="footer">
+        <h3>{{ empresa.nombre }}</h3>
+        <p>
+            📞 {{ empresa.telefono }}<br>
+            📧 {{ empresa.email }}<br>
+            📍 {{ empresa.direccion }}
+        </p>
+        <p><small>Este es un email automático generado por eGarage</small></p>
+    </div>
+</body>
+</html>

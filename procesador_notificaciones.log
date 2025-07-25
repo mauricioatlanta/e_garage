@@ -1,0 +1,26 @@
+2025-07-22 20:50:03,834 - INFO - ============================================================
+2025-07-22 20:50:03,847 - INFO - ============================================================
+2025-07-22 20:50:03,848 - INFO - Procesando cola de notificaciones pendientes...
+2025-07-22 20:50:03,867 - INFO - Verificando suscripciones próximas a vencer...
+2025-07-22 20:50:03,873 - INFO - Verificando recordatorios de mantenimiento...
+2025-07-22 20:50:04,081 - ERROR - Error creando notificación MANTENIMIENTO_RECORDATORIO: NOT NULL constraint failed: taller_logauditoria.usuario_id
+2025-07-22 20:50:04,132 - ERROR - Error creando notificación MANTENIMIENTO_RECORDATORIO: NOT NULL constraint failed: taller_logauditoria.usuario_id
+2025-07-22 20:50:04,139 - INFO - Generando reporte de notificaciones...
+2025-07-22 20:50:04,173 - INFO -       - PENDIENTE: 3
+2025-07-22 20:50:04,178 - INFO -       - Email - Recordatorio Mantenimiento: 2
+2025-07-22 20:50:04,179 - INFO -       - Email - Documento Creado: 1
+2025-07-22 20:50:04,180 - INFO - ============================================================
+2025-07-22 20:50:04,186 - INFO - ============================================================
+2025-07-22 21:02:55,883 - INFO - ============================================================
+2025-07-22 21:02:55,893 - INFO - ============================================================
+2025-07-22 21:02:55,894 - INFO - Procesando cola de notificaciones pendientes...
+2025-07-22 21:02:55,920 - INFO - Verificando suscripciones próximas a vencer...
+2025-07-22 21:02:55,925 - INFO - Verificando recordatorios de mantenimiento...
+2025-07-22 21:02:56,035 - ERROR - Error creando notificación MANTENIMIENTO_RECORDATORIO: NOT NULL constraint failed: taller_logauditoria.usuario_id
+2025-07-22 21:02:56,056 - ERROR - Error creando notificación MANTENIMIENTO_RECORDATORIO: NOT NULL constraint failed: taller_logauditoria.usuario_id
+2025-07-22 21:02:56,061 - INFO - Generando reporte de notificaciones...
+2025-07-22 21:02:56,092 - INFO -       - PENDIENTE: 6
+2025-07-22 21:02:56,102 - INFO -       - Email - Recordatorio Mantenimiento: 4
+2025-07-22 21:02:56,103 - INFO -       - Email - Documento Creado: 2
+2025-07-22 21:02:56,104 - INFO - ============================================================
+2025-07-22 21:02:56,108 - INFO - ============================================================

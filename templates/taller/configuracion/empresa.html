@@ -1,0 +1,1317 @@
+{% extends 'taller/base.html' %}
+{% load static %}
+
+{% block title %}🚀 Configuración del Taller - E-Garage{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Estilos futuristas y tecnológicos para la configuración */
+:root {
+    --neon-blue: #00f5ff;
+    --neon-purple: #bf00ff;
+    --neon-green: #39ff14;
+    --dark-bg: #0a0a0f;
+    --darker-bg: #050508;
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --border-glow: rgba(0, 245, 255, 0.3);
+}
+
+body {
+    background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+    color: #ffffff;
+    font-family: 'Orbitron', 'Segoe UI', monospace;
+    min-height: 100vh;
+}
+
+.config-container {
+    backdrop-filter: blur(20px);
+    background: linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+    border-radius: 20px;
+    border: 1px solid var(--border-glow);
+    box-shadow: 
+        0 8px 32px rgba(0, 245, 255, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    padding: 2rem;
+    margin: 2rem auto;
+    max-width: 1200px;
+    position: relative;
+    overflow: hidden;
+}
+
+.config-container::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(0, 245, 255, 0.05) 0%, transparent 70%);
+    animation: rotate 20s linear infinite;
+    z-index: -1;
+}
+
+@keyframes rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.config-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    position: relative;
+}
+
+.config-title {
+    font-size: 3rem;
+    font-weight: 900;
+    background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple), var(--neon-green));
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradient-shift 3s ease-in-out infinite;
+    text-shadow: 0 0 30px rgba(0, 245, 255, 0.5);
+    margin-bottom: 1rem;
+}
+
+@keyframes gradient-shift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+.config-subtitle {
+    color: #8a8a8a;
+    font-size: 1.2rem;
+    font-weight: 300;
+    letter-spacing: 2px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.stat-card {
+    background: linear-gradient(145deg, rgba(0, 245, 255, 0.1) 0%, rgba(191, 0, 255, 0.1) 100%);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.5s;
+}
+
+.stat-card:hover::before {
+    left: 100%;
+}
+
+.stat-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0, 245, 255, 0.2);
+    border-color: var(--neon-blue);
+}
+
+.stat-number {
+    font-size: 3rem;
+    font-weight: 900;
+    color: var(--neon-blue);
+    text-shadow: 0 0 20px currentColor;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: #cccccc;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.config-sections {
+    display: grid;
+    gap: 2rem;
+}
+
+.section-card {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 2rem;
+    transition: all 0.3s ease;
+}
+
+.section-card:hover {
+    border-color: var(--neon-purple);
+    box-shadow: 0 10px 30px rgba(191, 0, 255, 0.1);
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--neon-green);
+    margin-bottom: 1.5rem;
+}
+
+.section-icon {
+    font-size: 2rem;
+    filter: drop-shadow(0 0 10px currentColor);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    color: #cccccc;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.form-input {
+    width: 100%;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.file-input-wrapper {
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+    width: 100%;
+}
+
+.file-input {
+    position: absolute;
+    left: -9999px;
+    opacity: 0;
+}
+
+.file-input-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: linear-gradient(45deg, var(--neon-purple), var(--neon-blue));
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.file-input-label:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(191, 0, 255, 0.4);
+}
+
+.btn-futuristic {
+    background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-weight: 700;
+    padding: 1rem 2rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    position: relative;
+    overflow: hidden;
+    font-family: inherit;
+}
+
+.btn-futuristic::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.btn-futuristic:hover::before {
+    left: 100%;
+}
+
+.btn-futuristic:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px rgba(0, 245, 255, 0.4);
+}
+
+.btn-secondary {
+    background: linear-gradient(45deg, #666, #999);
+}
+
+.btn-secondary:hover {
+    box-shadow: 0 15px 35px rgba(153, 153, 153, 0.3);
+}
+
+.current-logo {
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: 15px;
+    border: 2px solid var(--neon-blue);
+    box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
+    margin-bottom: 1rem;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+}
+
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.action-card {
+    background: linear-gradient(145deg, rgba(57, 255, 20, 0.1) 0%, rgba(0, 245, 255, 0.1) 100%);
+    border-radius: 15px;
+    border: 1px solid rgba(57, 255, 20, 0.3);
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+}
+
+.action-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--neon-green);
+    box-shadow: 0 15px 30px rgba(57, 255, 20, 0.2);
+    text-decoration: none;
+    color: inherit;
+}
+
+.action-icon {
+    font-size: 3rem;
+    color: var(--neon-green);
+    margin-bottom: 1rem;
+    filter: drop-shadow(0 0 15px currentColor);
+}
+
+.action-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.action-description {
+    color: #aaaaaa;
+    font-size: 0.9rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .config-title {
+        font-size: 2rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+    
+    .quick-actions {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+}
+
+/* Animaciones adicionales */
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+.loading {
+    animation: pulse 2s infinite;
+}
+
+/* Efectos de partículas */
+.particle {
+    position: absolute;
+    background: var(--neon-blue);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: float 6s infinite ease-in-out;
+}
+
+.particle:nth-child(odd) {
+    background: var(--neon-green);
+    animation-delay: -2s;
+}
+
+.particle:nth-child(3n) {
+    background: var(--neon-purple);
+    animation-delay: -4s;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px) rotate(0deg);
+        opacity: 1;
+    }
+    25% {
+        transform: translateY(-20px) rotate(90deg);
+        opacity: 0.8;
+    }
+    50% {
+        transform: translateY(-40px) rotate(180deg);
+        opacity: 0.6;
+    }
+    75% {
+        transform: translateY(-20px) rotate(270deg);
+        opacity: 0.8;
+    }
+}
+
+/* Efecto de escaneo láser */
+.scan-line {
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--neon-blue), transparent);
+    top: 0;
+    left: 0;
+    animation: scan 4s infinite;
+}
+
+@keyframes scan {
+    0% {
+        top: 0;
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.8;
+    }
+    100% {
+        top: 100%;
+        opacity: 0;
+    }
+}
+
+/* Efecto holográfico en las tarjetas */
+.hologram-effect {
+    position: relative;
+    overflow: hidden;
+}
+
+.hologram-effect::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(0, 245, 255, 0.1),
+        rgba(191, 0, 255, 0.1),
+        rgba(57, 255, 20, 0.1),
+        transparent
+    );
+    animation: hologram-sweep 3s infinite;
+}
+
+@keyframes hologram-sweep {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+/* Efecto de escritura de máquina para títulos */
+.typewriter {
+    overflow: hidden;
+    border-right: 3px solid var(--neon-blue);
+    white-space: nowrap;
+    animation: 
+        typing 3.5s steps(40, end),
+        blink-caret 0.75s step-end infinite;
+}
+
+@keyframes typing {
+    from { width: 0 }
+    to { width: 100% }
+}
+
+@keyframes blink-caret {
+    from, to { border-color: transparent }
+    50% { border-color: var(--neon-blue) }
+}
+
+/* Circuitos animados de fondo */
+.circuit-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.1;
+    pointer-events: none;
+    background-image: 
+        linear-gradient(90deg, var(--neon-blue) 1px, transparent 1px),
+        linear-gradient(180deg, var(--neon-green) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: circuit-move 20s linear infinite;
+}
+
+@keyframes circuit-move {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: 50px 50px;
+    }
+}
+
+/* Pulso de energía en botones */
+.energy-pulse {
+    position: relative;
+    overflow: hidden;
+}
+
+.energy-pulse::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(57, 255, 20, 0.5), transparent);
+    transition: all 0.5s ease;
+    transform: translate(-50%, -50%);
+}
+
+.energy-pulse:hover::before {
+    width: 200%;
+    height: 200%;
+}
+
+/* Matriz digital de fondo */
+.matrix-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -2;
+    opacity: 0.05;
+}
+
+.matrix-column {
+    position: absolute;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    color: var(--neon-green);
+    animation: matrix-fall linear infinite;
+}
+
+@keyframes matrix-fall {
+    0% {
+        transform: translateY(-100vh);
+    }
+    100% {
+        transform: translateY(100vh);
+    }
+}
+
+/* Indicadores de estado activos */
+.status-indicator {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--neon-green);
+    box-shadow: 0 0 10px var(--neon-green);
+    animation: status-blink 2s infinite;
+}
+
+@keyframes status-blink {
+    0%, 50% {
+        opacity: 1;
+    }
+    51%, 100% {
+        opacity: 0.3;
+    }
+}
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(var(--neon-blue), var(--neon-purple));
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(var(--neon-purple), var(--neon-green));
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="config-container">
+    <div class="config-header">
+        <h1 class="config-title">⚙️ CONFIGURACIÓN AVANZADA</h1>
+        <p class="config-subtitle">Sistema de Gestión Tecnológica E-Garage</p>
+    </div>
+
+    <!-- Estadísticas en tiempo real -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.mecanicos_total }}</div>
+            <div class="stat-label">Mecánicos Totales</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.mecanicos_activos }}</div>
+            <div class="stat-label">Mecánicos Activos</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.documentos_total }}</div>
+            <div class="stat-label">Documentos Procesados</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ empresa.dias_restantes }}</div>
+            <div class="stat-label">Días de Prueba</div>
+        </div>
+    </div>
+
+    <!-- Configuración de Empresa -->
+    <div class="config-sections">
+        <div class="section-card">
+            <h2 class="section-title">
+                <span class="section-icon">🏢</span>
+                Información de la Empresa
+            </h2>
+            
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                    <div>
+                        <div class="form-group">
+                            <label class="form-label" for="nombre_taller">🏷️ Nombre del Taller</label>
+                            <input type="text" id="nombre_taller" name="nombre_taller" class="form-input" 
+                                   value="{{ empresa.nombre_taller }}" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="empresa_nombre">🏢 Nombre de la Empresa</label>
+                            <input type="text" id="empresa_nombre" name="empresa_nombre" class="form-input" 
+                                   value="{{ empresa.empresa }}">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="telefono">📞 Teléfono</label>
+                            <input type="tel" id="telefono" name="telefono" class="form-input" 
+                                   value="{{ empresa.telefono }}">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="email">📧 Email</label>
+                            <input type="email" id="email" name="email" class="form-input" 
+                                   value="{{ empresa.email }}" placeholder="contacto@empresa.com">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="direccion">📍 Dirección</label>
+                            <textarea id="direccion" name="direccion" class="form-input" rows="3">{{ empresa.direccion }}</textarea>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="form-group">
+                            <label class="form-label">📷 Logo Actual</label>
+                            {% if empresa.logo %}
+                                <div style="text-align: center;">
+                                    <img src="{{ empresa.logo.url }}" alt="Logo" class="current-logo">
+                                </div>
+                            {% else %}
+                                <div style="text-align: center; padding: 2rem; border: 2px dashed #666; border-radius: 15px; color: #666;">
+                                    <div style="font-size: 3rem; margin-bottom: 1rem;">📷</div>
+                                    <div>Sin logo configurado</div>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="logo">🎨 Cambiar Logo</label>
+                            <div class="file-input-wrapper">
+                                <input type="file" id="logo" name="logo" accept="image/*" class="file-input">
+                                <label for="logo" class="file-input-label">
+                                    <span>📤</span>
+                                    Seleccionar Nueva Imagen
+                                </label>
+                            </div>
+                            <small style="color: #aaa; display: block; margin-top: 0.5rem;">
+                                Formatos: JPG, PNG, GIF. Máximo 5MB.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button type="submit" name="actualizar_empresa" class="btn-futuristic">
+                        💾 Actualizar Información
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Acciones Rápidas -->
+    <div class="quick-actions">
+        <a href="{% url 'configuracion_mecanicos' %}" class="action-card">
+            <div class="action-icon">👨‍🔧</div>
+            <div class="action-title">Gestión de Mecánicos</div>
+            <div class="action-description">Agregar, editar y gestionar mecánicos del taller</div>
+        </a>
+        
+        <a href="{% url 'documentos:lista_documentos' %}" class="action-card">
+            <div class="action-icon">📋</div>
+            <div class="action-title">Documentos</div>
+            <div class="action-description">Ver y gestionar todos los documentos</div>
+        </a>
+        
+        <div class="action-card" onclick="location.reload()">
+            <div class="action-icon">🔄</div>
+            <div class="action-title">Actualizar Sistema</div>
+            <div class="action-description">Refrescar datos y estadísticas</div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Efectos adicionales de JavaScript
+document.addEventListener('DOMContentLoaded', function() {
+    // Crear partículas flotantes
+    function createParticle() {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + 'vw';
+        particle.style.width = Math.random() * 4 + 2 + 'px';
+        particle.style.height = particle.style.width;
+        particle.style.animationDuration = (Math.random() * 4 + 3) + 's';
+        particle.style.animationDelay = Math.random() * 2 + 's';
+        document.body.appendChild(particle);
+        
+        setTimeout(() => {
+            particle.remove();
+        }, 8000);
+    }
+    
+    // Crear partículas periódicamente
+    setInterval(createParticle, 1500);
+    
+    // Crear líneas de escaneo láser
+    function createScanLine() {
+        const sections = document.querySelectorAll('.section-card');
+        sections.forEach(section => {
+            const scanLine = document.createElement('div');
+            scanLine.className = 'scan-line';
+            section.appendChild(scanLine);
+            
+            setTimeout(() => {
+                scanLine.remove();
+            }, 4000);
+        });
+    }
+    
+    // Activar escaneo cada 10 segundos
+    setInterval(createScanLine, 10000);
+    
+    // Crear efecto matriz digital de fondo
+    function createMatrixEffect() {
+        const matrixContainer = document.createElement('div');
+        matrixContainer.className = 'matrix-bg';
+        document.body.appendChild(matrixContainer);
+        
+        for (let i = 0; i < 20; i++) {
+            const column = document.createElement('div');
+            column.className = 'matrix-column';
+            column.style.left = Math.random() * 100 + 'vw';
+            column.style.animationDuration = (Math.random() * 10 + 5) + 's';
+            column.style.animationDelay = Math.random() * 5 + 's';
+            
+            // Caracteres aleatorios para el efecto matriz
+            const chars = '0123456789ABCDEF';
+            let text = '';
+            for (let j = 0; j < 30; j++) {
+                text += chars[Math.floor(Math.random() * chars.length)] + '\n';
+            }
+            column.textContent = text;
+            
+            matrixContainer.appendChild(column);
+        }
+    }
+    
+    // Inicializar efecto matriz
+    createMatrixEffect();
+    
+    // Efecto de hover en las tarjetas de estadísticas
+    const statCards = document.querySelectorAll('.stat-card');
+    statCards.forEach(card => {
+        // Agregar efecto holográfico
+        card.classList.add('hologram-effect');
+        
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-15px) scale(1.05) rotateY(5deg)';
+            this.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+            
+            // Crear efecto de pulso de energía
+            const energyRing = document.createElement('div');
+            energyRing.style.position = 'absolute';
+            energyRing.style.top = '50%';
+            energyRing.style.left = '50%';
+            energyRing.style.width = '0';
+            energyRing.style.height = '0';
+            energyRing.style.border = '2px solid var(--neon-blue)';
+            energyRing.style.borderRadius = '50%';
+            energyRing.style.transform = 'translate(-50%, -50%)';
+            energyRing.style.animation = 'energy-expand 0.6s ease-out forwards';
+            energyRing.style.opacity = '0.7';
+            
+            this.appendChild(energyRing);
+            
+            setTimeout(() => {
+                if (energyRing.parentNode) {
+                    energyRing.remove();
+                }
+            }, 600);
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1) rotateY(0deg)';
+        });
+    });
+    
+    // Agregar animación de energía expansiva
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes energy-expand {
+            0% {
+                width: 0;
+                height: 0;
+                opacity: 0.7;
+            }
+            100% {
+                width: 200%;
+                height: 200%;
+                opacity: 0;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // Validación del formulario con efectos visuales
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const nombreTaller = this.querySelector('input[name="nombre_taller"]');
+            if (nombreTaller && nombreTaller.value.trim().length < 2) {
+                e.preventDefault();
+                
+                // Efecto de error visual
+                nombreTaller.style.border = '2px solid var(--neon-red)';
+                nombreTaller.style.boxShadow = '0 0 20px rgba(255, 0, 64, 0.5)';
+                nombreTaller.style.animation = 'shake 0.5s ease-in-out';
+                
+                setTimeout(() => {
+                    nombreTaller.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+                    nombreTaller.style.boxShadow = 'none';
+                    nombreTaller.style.animation = 'none';
+                }, 2000);
+                
+                // Mostrar mensaje de error futurista
+                const errorMsg = document.createElement('div');
+                errorMsg.innerHTML = '⚠️ ERROR: El nombre del taller debe tener al menos 2 caracteres';
+                errorMsg.style.position = 'fixed';
+                errorMsg.style.top = '20px';
+                errorMsg.style.right = '20px';
+                errorMsg.style.padding = '1rem 2rem';
+                errorMsg.style.background = 'linear-gradient(45deg, var(--neon-red), rgba(255, 0, 64, 0.8))';
+                errorMsg.style.color = 'white';
+                errorMsg.style.borderRadius = '10px';
+                errorMsg.style.zIndex = '9999';
+                errorMsg.style.animation = 'slide-in 0.3s ease-out';
+                document.body.appendChild(errorMsg);
+                
+                setTimeout(() => {
+                    errorMsg.remove();
+                }, 4000);
+                
+                nombreTaller.focus();
+                return false;
+            }
+            
+            const submitBtn = this.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.innerHTML = '⏳ <span class="loading-effect">Procesando</span>...';
+                submitBtn.disabled = true;
+                submitBtn.style.background = 'linear-gradient(45deg, var(--neon-orange), var(--neon-red))';
+                
+                // Efecto de loading animado
+                const loadingDots = submitBtn.querySelector('.loading-effect');
+                let dotCount = 0;
+                const loadingInterval = setInterval(() => {
+                    dotCount = (dotCount + 1) % 4;
+                    loadingDots.textContent = 'Procesando' + '.'.repeat(dotCount);
+                }, 500);
+                
+                // Limpiar intervalo si el formulario se envía
+                setTimeout(() => {
+                    clearInterval(loadingInterval);
+                }, 10000);
+            }
+        });
+    }
+    
+    // Efectos de entrada animados mejorados
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry, index) => {
+            if (entry.isIntersecting) {
+                setTimeout(() => {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0) rotateX(0deg)';
+                    
+                    // Efecto de materialización
+                    entry.target.style.filter = 'blur(0px)';
+                    
+                    // Agregar indicador de estado
+                    const statusIndicator = document.createElement('div');
+                    statusIndicator.className = 'status-indicator';
+                    statusIndicator.style.position = 'absolute';
+                    statusIndicator.style.top = '10px';
+                    statusIndicator.style.right = '10px';
+                    entry.target.style.position = 'relative';
+                    entry.target.appendChild(statusIndicator);
+                    
+                }, index * 150);
+            }
+        });
+    });
+    
+    document.querySelectorAll('.section-card, .stat-card, .action-card').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(30px) rotateX(10deg)';
+        el.style.filter = 'blur(5px)';
+        el.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+        observer.observe(el);
+    });
+    
+    // Efecto de distorsión en el título principal
+    const title = document.querySelector('.config-title');
+    if (title) {
+        title.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.1) skewX(-5deg)';
+            this.style.textShadow = '0 0 50px rgba(0, 245, 255, 0.8)';
+        });
+        
+        title.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1) skewX(0deg)';
+            this.style.textShadow = '0 0 30px rgba(0, 245, 255, 0.5)';
+        });
+    }
+    
+    // Agregar efecto de glitch ocasional al título
+    function glitchEffect() {
+        if (title) {
+            title.style.animation = 'glitch 0.5s ease-in-out';
+            setTimeout(() => {
+                title.style.animation = 'gradient-shift 3s ease-in-out infinite';
+            }, 500);
+        }
+    }
+    
+    // Activar glitch aleatoriamente
+    setInterval(() => {
+        if (Math.random() < 0.1) { // 10% de probabilidad
+            glitchEffect();
+        }
+    }, 5000);
+    
+    // Agregar animación de glitch
+    const glitchStyle = document.createElement('style');
+    glitchStyle.textContent = `
+        @keyframes glitch {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-5px) skewX(5deg); }
+            40% { transform: translateX(5px) skewX(-5deg); }
+            60% { transform: translateX(-2px) skewX(2deg); }
+            80% { transform: translateX(2px) skewX(-2deg); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        @keyframes slide-in {
+            0% {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            100% {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    `;
+    document.head.appendChild(glitchStyle);
+    
+    // Sistema de notificaciones futuristas
+    function showFuturisticNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.style.position = 'fixed';
+        notification.style.top = '20px';
+        notification.style.right = '20px';
+        notification.style.padding = '1rem 2rem';
+        notification.style.borderRadius = '15px';
+        notification.style.color = 'white';
+        notification.style.fontWeight = 'bold';
+        notification.style.zIndex = '9999';
+        notification.style.backdropFilter = 'blur(10px)';
+        notification.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+        notification.style.animation = 'slide-in 0.5s ease-out';
+        
+        // Estilos según el tipo
+        switch(type) {
+            case 'success':
+                notification.style.background = 'linear-gradient(45deg, var(--neon-green), rgba(57, 255, 20, 0.8))';
+                notification.innerHTML = '✅ ' + message;
+                break;
+            case 'error':
+                notification.style.background = 'linear-gradient(45deg, var(--neon-red), rgba(255, 0, 64, 0.8))';
+                notification.innerHTML = '❌ ' + message;
+                break;
+            case 'warning':
+                notification.style.background = 'linear-gradient(45deg, var(--neon-orange), rgba(255, 107, 0, 0.8))';
+                notification.innerHTML = '⚠️ ' + message;
+                break;
+            default:
+                notification.style.background = 'linear-gradient(45deg, var(--neon-blue), rgba(0, 245, 255, 0.8))';
+                notification.innerHTML = 'ℹ️ ' + message;
+        }
+        
+        document.body.appendChild(notification);
+        
+        // Auto-remove después de 4 segundos
+        setTimeout(() => {
+            notification.style.animation = 'slide-out 0.5s ease-in';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 500);
+        }, 4000);
+    }
+    
+    // Crear sistema de ondas de energía de fondo
+    function createEnergyWaves() {
+        const waveContainer = document.createElement('div');
+        waveContainer.style.position = 'fixed';
+        waveContainer.style.top = '0';
+        waveContainer.style.left = '0';
+        waveContainer.style.width = '100%';
+        waveContainer.style.height = '100%';
+        waveContainer.style.pointerEvents = 'none';
+        waveContainer.style.zIndex = '-1';
+        waveContainer.style.overflow = 'hidden';
+        
+        for (let i = 0; i < 5; i++) {
+            const wave = document.createElement('div');
+            wave.style.position = 'absolute';
+            wave.style.width = '200px';
+            wave.style.height = '200px';
+            wave.style.borderRadius = '50%';
+            wave.style.border = '1px solid rgba(0, 245, 255, 0.1)';
+            wave.style.left = Math.random() * 100 + '%';
+            wave.style.top = Math.random() * 100 + '%';
+            wave.style.animation = `energy-wave ${5 + Math.random() * 10}s infinite linear`;
+            wave.style.animationDelay = Math.random() * 5 + 's';
+            
+            waveContainer.appendChild(wave);
+        }
+        
+        document.body.appendChild(waveContainer);
+    }
+    
+    // Crear efecto de campo de fuerza
+    function createForceField() {
+        const container = document.querySelector('.config-container');
+        if (container) {
+            const forceField = document.createElement('div');
+            forceField.style.position = 'absolute';
+            forceField.style.top = '-2px';
+            forceField.style.left = '-2px';
+            forceField.style.right = '-2px';
+            forceField.style.bottom = '-2px';
+            forceField.style.border = '2px solid transparent';
+            forceField.style.borderRadius = '20px';
+            forceField.style.background = 'linear-gradient(45deg, var(--neon-blue), var(--neon-purple), var(--neon-green), var(--neon-blue))';
+            forceField.style.backgroundSize = '400% 400%';
+            forceField.style.animation = 'force-field-pulse 3s ease-in-out infinite';
+            forceField.style.zIndex = '-1';
+            forceField.style.filter = 'blur(1px)';
+            
+            container.style.position = 'relative';
+            container.appendChild(forceField);
+        }
+    }
+    
+    // Sistema de constelaciones interactivas
+    function createConstellation() {
+        const constellation = document.createElement('div');
+        constellation.style.position = 'fixed';
+        constellation.style.top = '0';
+        constellation.style.left = '0';
+        constellation.style.width = '100%';
+        constellation.style.height = '100%';
+        constellation.style.pointerEvents = 'none';
+        constellation.style.zIndex = '-3';
+        
+        // Crear estrellas
+        for (let i = 0; i < 50; i++) {
+            const star = document.createElement('div');
+            star.style.position = 'absolute';
+            star.style.width = Math.random() * 3 + 1 + 'px';
+            star.style.height = star.style.width;
+            star.style.background = ['var(--neon-blue)', 'var(--neon-green)', 'var(--neon-purple)'][Math.floor(Math.random() * 3)];
+            star.style.borderRadius = '50%';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.boxShadow = `0 0 ${Math.random() * 20 + 5}px currentColor`;
+            star.style.animation = `twinkle ${Math.random() * 4 + 2}s infinite ease-in-out`;
+            star.style.animationDelay = Math.random() * 4 + 's';
+            
+            constellation.appendChild(star);
+        }
+        
+        document.body.appendChild(constellation);
+    }
+    
+    // Efecto de terminal hacker
+    function createHackerTerminal() {
+        const terminal = document.createElement('div');
+        terminal.style.position = 'fixed';
+        terminal.style.bottom = '20px';
+        terminal.style.left = '20px';
+        terminal.style.width = '300px';
+        terminal.style.height = '150px';
+        terminal.style.background = 'rgba(0, 20, 0, 0.9)';
+        terminal.style.border = '1px solid var(--neon-green)';
+        terminal.style.borderRadius = '10px';
+        terminal.style.padding = '10px';
+        terminal.style.fontFamily = 'Courier New, monospace';
+        terminal.style.fontSize = '10px';
+        terminal.style.color = 'var(--neon-green)';
+        terminal.style.overflow = 'hidden';
+        terminal.style.zIndex = '1000';
+        terminal.style.backdropFilter = 'blur(10px)';
+        terminal.style.boxShadow = '0 0 20px rgba(57, 255, 20, 0.3)';
+        terminal.style.cursor = 'pointer';
+        terminal.style.transition = 'all 0.3s ease';
+        
+        const terminalContent = document.createElement('div');
+        terminalContent.innerHTML = `
+            <div style="color: var(--neon-blue);">[SYSTEM] E-Garage v2.5 Initialized</div>
+            <div>[INFO] Loading quantum processors... OK</div>
+            <div>[INFO] Establishing neural connections... OK</div>
+            <div>[SECURITY] Firewall active - All systems secured</div>
+            <div>[NETWORK] Satellite link established</div>
+            <div style="color: var(--neon-purple);">[AI] Assistant ready for deployment</div>
+            <div style="animation: blink-cursor 1s infinite;">█ System ready_</div>
+        `;
+        
+        terminal.appendChild(terminalContent);
+        
+        // Minimizar/maximizar al hacer clic
+        let isMinimized = false;
+        terminal.addEventListener('click', function() {
+            if (isMinimized) {
+                this.style.height = '150px';
+                terminalContent.style.display = 'block';
+                isMinimized = false;
+            } else {
+                this.style.height = '30px';
+                terminalContent.style.display = 'none';
+                isMinimized = true;
+            }
+        });
+        
+        document.body.appendChild(terminal);
+        
+        // Simular actividad del terminal
+        setInterval(() => {
+            if (!isMinimized) {
+                const activities = [
+                    '[SCAN] Monitoring system integrity... OK',
+                    '[BACKUP] Data synchronization complete',
+                    '[UPDATE] System optimization in progress...',
+                    '[SECURITY] No threats detected',
+                    '[PERFORMANCE] All systems optimal',
+                    '[NETWORK] Connection stable - 1000Mbps'
+                ];
+                
+                const newLine = document.createElement('div');
+                newLine.textContent = activities[Math.floor(Math.random() * activities.length)];
+                newLine.style.animation = 'fade-in 0.5s ease-in';
+                
+                terminalContent.insertBefore(newLine, terminalContent.lastElementChild);
+                
+                // Mantener solo las últimas 6 líneas
+                const lines = terminalContent.children;
+                if (lines.length > 7) {
+                    terminalContent.removeChild(lines[0]);
+                }
+            }
+        }, 3000 + Math.random() * 2000);
+    }
+    
+    // Inicializar todos los efectos avanzados
+    createEnergyWaves();
+    createForceField();
+    createConstellation();
+    createHackerTerminal();
+    
+    // Agregar estilos adicionales para los nuevos efectos
+    const advancedStyles = document.createElement('style');
+    advancedStyles.textContent = `
+        @keyframes energy-wave {
+            0% {
+                transform: scale(1) rotate(0deg);
+                opacity: 0.3;
+            }
+            50% {
+                transform: scale(1.5) rotate(180deg);
+                opacity: 0.6;
+            }
+            100% {
+                transform: scale(2) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes force-field-pulse {
+            0%, 100% {
+                background-position: 0% 50%;
+                opacity: 0.5;
+            }
+            50% {
+                background-position: 100% 50%;
+                opacity: 0.8;
+            }
+        }
+        
+        @keyframes twinkle {
+            0%, 100% {
+                opacity: 0.3;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.5);
+            }
+        }
+        
+        @keyframes blink-cursor {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        @keyframes fade-in {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slide-out {
+            0% {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+    `;
+    document.head.appendChild(advancedStyles);
+    
+    // Ejemplo de uso de notificaciones (pueden ser activadas por eventos del servidor)
+    setTimeout(() => {
+        showFuturisticNotification('Sistema de configuración inicializado correctamente', 'success');
+    }, 2000);
+    
+    setTimeout(() => {
+        showFuturisticNotification('Efectos visuales avanzados activados', 'info');
+    }, 4000);
+    
+    console.log('🚀 Sistema de configuración E-Garage v2.5 cargado con efectos futuristas avanzados activados');
+    console.log('🔮 Efectos incluidos: Partículas, Ondas de energía, Campo de fuerza, Constelaciones, Terminal hacker');
+});
+</script>
+{% endblock %}

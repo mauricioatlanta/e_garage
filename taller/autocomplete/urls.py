@@ -2,6 +2,7 @@ from django.urls import path
 
 
 from taller.autocomplete.views_autocomplete import ClienteAutocomplete, VehiculoAutocomplete, MecanicoAutocomplete, MarcaAutocomplete, ModeloAutocomplete
+from taller.views_autocomplete import ServicioAutocomplete
 
 app_name = "autocomplete" 
 
@@ -16,4 +17,5 @@ urlpatterns = [
     # path('caja/', CajaAutocomplete.as_view(), name='autocomplete_caja'),
     path('vehiculo/', VehiculoAutocomplete.as_view(), name='autocomplete_vehiculo'),
     path('mecanico/', MecanicoAutocomplete.as_view(), name='autocomplete_mecanico'),
+    path('servicio/', ServicioAutocomplete.as_view(), name='autocomplete_servicio'),
 ]

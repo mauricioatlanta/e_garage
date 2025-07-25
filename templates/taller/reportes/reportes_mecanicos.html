@@ -1,0 +1,905 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load custom_filters %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+<style>
+    /* Variables de tema IA futurista */
+    :root {
+        --ai-primary: #00ff88;
+        --ai-secondary: #0066ff;
+        --ai-accent: #ff0080;
+        --ai-glow: #00ffff;
+        --neural-bg: #0a0a0f;
+        --matrix-green: #39ff14;
+        --cyber-purple: #b347d9;
+        --hologram-blue: #00d4ff;
+        --quantum-orange: #ff6b35;
+        --neon-pink: #ff1493;
+    }
+
+    /* Fondo con efecto de neural network */
+    body {
+        background: radial-gradient(ellipse at center, #0a0a0f 0%, #000000 100%);
+        position: relative;
+        overflow-x: hidden;
+        font-family: 'Orbitron', 'Courier New', monospace;
+        color: var(--ai-glow);
+    }
+
+    /* Canvas de partículas de fondo */
+    #particles-js {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+    }
+
+    /* Efecto de matriz animada */
+    .matrix-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: 
+            linear-gradient(90deg, transparent 98%, rgba(57, 255, 20, 0.1) 100%),
+            linear-gradient(0deg, transparent 98%, rgba(57, 255, 20, 0.1) 100%);
+        background-size: 30px 30px;
+        animation: matrix-scroll 20s linear infinite;
+        z-index: -1;
+        opacity: 0.3;
+    }
+
+    @keyframes matrix-scroll {
+        0% { transform: translateY(0); }
+        100% { transform: translateY(30px); }
+    }
+
+    /* Header AI-powered */
+    .ai-header {
+        background: linear-gradient(135deg, 
+            rgba(0, 255, 136, 0.1) 0%, 
+            rgba(0, 102, 255, 0.1) 50%, 
+            rgba(255, 0, 128, 0.1) 100%);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(0, 255, 136, 0.3);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .ai-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, 
+            transparent, 
+            rgba(0, 255, 136, 0.1), 
+            transparent);
+        animation: scan 3s ease-in-out infinite;
+    }
+
+    @keyframes scan {
+        0% { left: -100%; }
+        50% { left: 100%; }
+        100% { left: 100%; }
+    }
+
+    .ai-title {
+        font-size: 3rem;
+        font-weight: 900;
+        text-align: center;
+        background: linear-gradient(45deg, 
+            var(--matrix-green), 
+            var(--hologram-blue), 
+            var(--quantum-orange));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: glow-pulse 2s ease-in-out infinite alternate;
+        text-shadow: 0 0 30px rgba(0, 255, 136, 0.5);
+    }
+
+    @keyframes glow-pulse {
+        from { filter: brightness(1) saturate(1); }
+        to { filter: brightness(1.2) saturate(1.3); }
+    }
+
+    .ai-subtitle {
+        text-align: center;
+        color: var(--ai-glow);
+        font-size: 1.2rem;
+        margin-top: 1rem;
+        opacity: 0.8;
+    }
+
+    /* Filtros futuristas */
+    .ai-filters {
+        background: rgba(10, 10, 15, 0.9);
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(0, 255, 136, 0.2);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 
+            0 0 30px rgba(0, 255, 136, 0.1),
+            inset 0 0 30px rgba(0, 255, 136, 0.05);
+    }
+
+    .filter-group {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        align-items: end;
+    }
+
+    .filter-input {
+        background: rgba(0, 255, 136, 0.1);
+        border: 1px solid rgba(0, 255, 136, 0.3);
+        border-radius: 8px;
+        padding: 0.75rem;
+        color: var(--ai-glow);
+        font-family: 'Share Tech Mono', monospace;
+        transition: all 0.3s ease;
+    }
+
+    .filter-input:focus {
+        outline: none;
+        border-color: var(--matrix-green);
+        box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+        background: rgba(0, 255, 136, 0.15);
+    }
+
+    .ai-button {
+        background: linear-gradient(135deg, var(--matrix-green), var(--hologram-blue));
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        color: #000;
+        font-weight: bold;
+        font-family: 'Orbitron', sans-serif;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .ai-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0, 255, 136, 0.3);
+    }
+
+    .ai-button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .ai-button:hover::before {
+        left: 100%;
+    }
+
+    /* Métricas con hologramas */
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .metric-card {
+        background: rgba(10, 10, 15, 0.8);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(0, 255, 136, 0.3);
+        border-radius: 15px;
+        padding: 1.5rem;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .metric-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--matrix-green);
+        box-shadow: 
+            0 15px 35px rgba(0, 255, 136, 0.2),
+            inset 0 0 30px rgba(0, 255, 136, 0.1);
+    }
+
+    .metric-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, 
+            transparent, 
+            rgba(0, 255, 136, 0.1), 
+            transparent);
+        transform: rotate(45deg);
+        animation: hologram-rotate 4s linear infinite;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .metric-card:hover::before {
+        opacity: 1;
+    }
+
+    @keyframes hologram-rotate {
+        0% { transform: rotate(45deg) translateX(-100%); }
+        100% { transform: rotate(45deg) translateX(100%); }
+    }
+
+    .metric-icon {
+        font-size: 2.5rem;
+        text-align: center;
+        margin-bottom: 1rem;
+        filter: drop-shadow(0 0 10px currentColor);
+    }
+
+    .metric-value {
+        font-size: 2rem;
+        font-weight: bold;
+        text-align: center;
+        background: linear-gradient(45deg, var(--matrix-green), var(--hologram-blue));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.5rem;
+    }
+
+    .metric-label {
+        text-align: center;
+        color: var(--ai-glow);
+        font-size: 0.9rem;
+        opacity: 0.8;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    /* Tabla de mecánicos con efectos cyber */
+    .mechanics-table {
+        background: rgba(10, 10, 15, 0.9);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(0, 255, 136, 0.3);
+        border-radius: 15px;
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+
+    .table-header {
+        background: linear-gradient(135deg, 
+            rgba(0, 255, 136, 0.2), 
+            rgba(0, 102, 255, 0.2));
+        padding: 1rem;
+        border-bottom: 1px solid rgba(0, 255, 136, 0.3);
+    }
+
+    .table-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: var(--matrix-green);
+        text-align: center;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: 'Share Tech Mono', monospace;
+    }
+
+    .data-table th {
+        background: rgba(0, 255, 136, 0.1);
+        padding: 1rem;
+        text-align: left;
+        font-weight: bold;
+        color: var(--matrix-green);
+        border-bottom: 1px solid rgba(0, 255, 136, 0.3);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .data-table td {
+        padding: 1rem;
+        border-bottom: 1px solid rgba(0, 255, 136, 0.1);
+        color: var(--ai-glow);
+        transition: all 0.3s ease;
+    }
+
+    .data-table tr:hover td {
+        background: rgba(0, 255, 136, 0.05);
+        color: var(--matrix-green);
+    }
+
+    /* Gráficos con efectos AI */
+    .charts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .chart-container {
+        background: rgba(10, 10, 15, 0.9);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(0, 255, 136, 0.3);
+        border-radius: 15px;
+        padding: 1.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .chart-title {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: var(--matrix-green);
+        text-align: center;
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    /* IA Insights Panel */
+    .ia-insights {
+        background: linear-gradient(135deg, 
+            rgba(255, 0, 128, 0.1), 
+            rgba(179, 71, 217, 0.1));
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 0, 128, 0.3);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        position: relative;
+    }
+
+    .ia-insights::before {
+        content: '🧠';
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        font-size: 2rem;
+        animation: brain-pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes brain-pulse {
+        0%, 100% { transform: scale(1); opacity: 0.7; }
+        50% { transform: scale(1.1); opacity: 1; }
+    }
+
+    .insights-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: var(--neon-pink);
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    .insight-category {
+        margin-bottom: 1.5rem;
+    }
+
+    .insight-category h4 {
+        color: var(--cyber-purple);
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .insight-item {
+        background: rgba(255, 0, 128, 0.1);
+        border-left: 3px solid var(--neon-pink);
+        padding: 0.75rem;
+        margin-bottom: 0.5rem;
+        border-radius: 0 8px 8px 0;
+        color: var(--ai-glow);
+        font-family: 'Share Tech Mono', monospace;
+    }
+
+    /* Botones de acción */
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin: 2rem 0;
+        flex-wrap: wrap;
+    }
+
+    .action-button {
+        background: linear-gradient(135deg, var(--cyber-purple), var(--neon-pink));
+        border: none;
+        border-radius: 25px;
+        padding: 1rem 2rem;
+        color: white;
+        font-weight: bold;
+        font-family: 'Orbitron', sans-serif;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .action-button:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 15px 30px rgba(255, 0, 128, 0.3);
+        color: white;
+        text-decoration: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .ai-title { font-size: 2rem; }
+        .filter-group { grid-template-columns: 1fr; }
+        .metrics-grid { grid-template-columns: 1fr; }
+        .charts-grid { grid-template-columns: 1fr; }
+        .action-buttons { flex-direction: column; }
+    }
+
+    /* Animaciones adicionales */
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    .floating { animation: float 3s ease-in-out infinite; }
+
+    /* Efectos de carga */
+    .loading-shimmer {
+        background: linear-gradient(90deg, 
+            rgba(0, 255, 136, 0.1) 0%, 
+            rgba(0, 255, 136, 0.3) 50%, 
+            rgba(0, 255, 136, 0.1) 100%);
+        background-size: 200% 100%;
+        animation: shimmer 2s ease-in-out infinite;
+    }
+
+    @keyframes shimmer {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+    }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<!-- Canvas de partículas neurales -->
+<div id="particles-js"></div>
+<div class="matrix-overlay"></div>
+
+<div class="container mx-auto px-4 py-8">
+    
+    <!-- Header AI-powered -->
+    <div class="ai-header">
+        <h1 class="ai-title">🧠 REPORTES POR MECÁNICO</h1>
+        <p class="ai-subtitle">Análisis inteligente de rendimiento con IA predictiva</p>
+    </div>
+
+    <!-- Filtros futuristas -->
+    <div class="ai-filters">
+        <form method="GET" action="{% url 'reportes:reportes_mecanicos' %}">
+            <div class="filter-group">
+                <div>
+                    <label for="fecha_desde" class="block text-sm font-medium mb-2 text-ai-glow">📅 Desde</label>
+                    <input type="date" id="fecha_desde" name="fecha_desde" 
+                           value="{{ fecha_desde }}" class="filter-input w-full">
+                </div>
+                <div>
+                    <label for="fecha_hasta" class="block text-sm font-medium mb-2 text-ai-glow">📅 Hasta</label>
+                    <input type="date" id="fecha_hasta" name="fecha_hasta" 
+                           value="{{ fecha_hasta }}" class="filter-input w-full">
+                </div>
+                <div>
+                    <label for="mecanico_id" class="block text-sm font-medium mb-2 text-ai-glow">🔧 Mecánico</label>
+                    <select name="mecanico_id" id="mecanico_id" class="filter-input w-full">
+                        <option value="todos" {% if mecanico_seleccionado == 'todos' %}selected{% endif %}>📊 Todos los mecánicos</option>
+                        {% for mecanico in todos_mecanicos %}
+                            <option value="{{ mecanico.id }}" {% if mecanico_seleccionado == mecanico.id|stringformat:"s" %}selected{% endif %}>
+                                {{ mecanico.nombre }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <button type="submit" class="ai-button w-full">🚀 ANALIZAR</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Métricas principales -->
+    <div class="metrics-grid">
+        <div class="metric-card floating">
+            <div class="metric-icon">📋</div>
+            <div class="metric-value">{{ total_documentos }}</div>
+            <div class="metric-label">Documentos Totales</div>
+        </div>
+        <div class="metric-card floating" style="animation-delay: 0.5s;">
+            <div class="metric-icon">💰</div>
+            <div class="metric-value">${{ total_generado|formatear_pesos }}</div>
+            <div class="metric-label">Total Generado</div>
+        </div>
+        <div class="metric-card floating" style="animation-delay: 1s;">
+            <div class="metric-icon">📊</div>
+            <div class="metric-value">${{ promedio_por_documento|formatear_pesos }}</div>
+            <div class="metric-label">Promedio por Documento</div>
+        </div>
+        <div class="metric-card floating" style="animation-delay: 1.5s;">
+            <div class="metric-icon">⚡</div>
+            <div class="metric-value">{{ servicios_frecuentes|length }}</div>
+            <div class="metric-label">Servicios Activos</div>
+        </div>
+    </div>
+
+    <!-- IA Insights Panel -->
+    {% if ia_insights %}
+    <div class="ia-insights">
+        <h2 class="insights-title">🧠 ANÁLISIS INTELIGENTE</h2>
+        
+        {% if ia_insights.predicciones %}
+        <div class="insight-category">
+            <h4>🔮 Predicciones</h4>
+            {% for prediccion in ia_insights.predicciones %}
+            <div class="insight-item">
+                📈 <strong>{{ prediccion.mecanico }}</strong>: Proyección mensual de <strong>${{ prediccion.proyeccion_mensual|formatear_pesos }}</strong> 
+                ({{ prediccion.docs_proyectados }} documentos)
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if ia_insights.alertas %}
+        <div class="insight-category">
+            <h4>🚨 Alertas</h4>
+            {% for alerta in ia_insights.alertas %}
+            <div class="insight-item">
+                ⚠️ {{ alerta.mensaje }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if ia_insights.sugerencias %}
+        <div class="insight-category">
+            <h4>💡 Sugerencias</h4>
+            {% for sugerencia in ia_insights.sugerencias %}
+            <div class="insight-item">
+                🎯 {{ sugerencia.mensaje }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if ia_insights.comparativas %}
+        <div class="insight-category">
+            <h4>📊 Comparativas</h4>
+            {% for comparativa in ia_insights.comparativas %}
+            <div class="insight-item">
+                🏆 {{ comparativa.mensaje }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Gráficos -->
+    <div class="charts-grid">
+        <div class="chart-container">
+            <h3 class="chart-title">📊 Rendimiento por Mecánico</h3>
+            <canvas id="chartMecanicos" width="400" height="300"></canvas>
+        </div>
+        <div class="chart-container">
+            <h3 class="chart-title">📈 Evolución Semanal</h3>
+            <canvas id="chartEvolucion" width="400" height="300"></canvas>
+        </div>
+    </div>
+
+    <!-- Tabla de mecánicos -->
+    <div class="mechanics-table">
+        <div class="table-header">
+            <h2 class="table-title">🔧 RENDIMIENTO DETALLADO POR MECÁNICO</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>🔧 Mecánico</th>
+                        <th>📋 Documentos</th>
+                        <th>⚙️ Servicios</th>
+                        <th>💰 Total Generado</th>
+                        <th>📊 Promedio/Doc</th>
+                        <th>🏆 Top Servicios</th>
+                        <th>📲 Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for data in mecanicos_data %}
+                    <tr>
+                        <td><strong>{{ data.mecanico.nombre }}</strong></td>
+                        <td>{{ data.total_documentos }}</td>
+                        <td>{{ data.total_servicios }}</td>
+                        <td><strong>${{ data.total_generado|formatear_pesos }}</strong></td>
+                        <td>${{ data.promedio_por_documento|formatear_pesos }}</td>
+                        <td>
+                            {% for servicio in data.servicios_top %}
+                                <span class="inline-block bg-blue-900 text-blue-300 px-2 py-1 rounded text-xs mr-1 mb-1">
+                                    {{ servicio.nombre|truncatechars:15 }} ({{ servicio.cantidad }})
+                                </span>
+                            {% endfor %}
+                        </td>
+                        <td>
+                            <div class="flex gap-1">
+                                <button onclick="generarWhatsApp({{ data.mecanico.id }})" 
+                                        class="ai-button text-xs px-2 py-1" title="Enviar resumen por WhatsApp">
+                                    📲
+                                </button>
+                                <a href="{% url 'reportes:generar_pdf_mecanico' data.mecanico.id %}?{{ request.GET.urlencode }}" 
+                                   class="ai-button text-xs px-2 py-1" title="Descargar PDF individual">
+                                    📄
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-8">
+                            🤖 No hay datos de mecánicos en el período seleccionado
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Servicios más frecuentes -->
+    {% if servicios_frecuentes %}
+    <div class="mechanics-table">
+        <div class="table-header">
+            <h2 class="table-title">🏆 SERVICIOS MÁS FRECUENTES</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>🏅 Ranking</th>
+                        <th>⚙️ Servicio</th>
+                        <th>🔢 Cantidad</th>
+                        <th>💰 Ingresos Totales</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for servicio in servicios_frecuentes %}
+                    <tr>
+                        <td><strong>#{{ forloop.counter }}</strong></td>
+                        <td>{{ servicio.nombre }}</td>
+                        <td>{{ servicio.cantidad }}</td>
+                        <td><strong>${{ servicio.total_ingresos|formatear_pesos }}</strong></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Botones de acción -->
+    <div class="action-buttons">
+        <a href="{% url 'reportes:exportar_mecanicos_excel' %}?{{ request.GET.urlencode }}" 
+           class="action-button">
+            📊 Exportar Excel
+        </a>
+        <button onclick="window.print()" class="action-button">
+            🖨️ Imprimir Reporte
+        </button>
+        <a href="{% url 'reportes:reportes_dashboard' %}" class="action-button">
+            🔙 Volver a Reportes
+        </a>
+    </div>
+
+</div>
+
+<script>
+// Inicializar partículas
+particlesJS('particles-js', {
+    particles: {
+        number: { value: 80 },
+        color: { value: ['#00ff88', '#0066ff', '#ff0080'] },
+        shape: { type: 'circle' },
+        opacity: { value: 0.6, random: true },
+        size: { value: 3, random: true },
+        line_linked: {
+            enable: true,
+            distance: 150,
+            color: '#00ff88',
+            opacity: 0.4,
+            width: 1
+        },
+        move: {
+            enable: true,
+            speed: 2,
+            direction: 'none',
+            random: false,
+            straight: false,
+            out_mode: 'out',
+            bounce: false
+        }
+    },
+    interactivity: {
+        detect_on: 'canvas',
+        events: {
+            onhover: { enable: true, mode: 'repulse' },
+            onclick: { enable: true, mode: 'push' }
+        }
+    },
+    retina_detect: true
+});
+
+// Cargar datos para gráficos
+fetch('{% url "reportes:api_mecanicos_chart_data" %}?' + new URLSearchParams({{ request.GET.urlencode|safe }}))
+    .then(response => response.json())
+    .then(data => {
+        // Gráfico de mecánicos
+        const ctxMecanicos = document.getElementById('chartMecanicos').getContext('2d');
+        new Chart(ctxMecanicos, {
+            type: 'bar',
+            data: {
+                labels: data.mecanicos.map(m => m.nombre),
+                datasets: [{
+                    label: 'Total Generado',
+                    data: data.mecanicos.map(m => m.total),
+                    backgroundColor: 'rgba(0, 255, 136, 0.3)',
+                    borderColor: '#00ff88',
+                    borderWidth: 2,
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    title: {
+                        display: true,
+                        text: 'Ingresos por Mecánico (IA Analytics)',
+                        color: '#00ffff',
+                        font: { size: 16, family: 'Orbitron' }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { color: '#00ff8833' },
+                        ticks: { 
+                            color: '#00ffff', 
+                            font: { family: 'Share Tech Mono', size: 12 },
+                            maxRotation: 45
+                        }
+                    },
+                    y: {
+                        grid: { color: '#00ff8833' },
+                        beginAtZero: true,
+                        ticks: { 
+                            color: '#00ffff', 
+                            font: { family: 'Share Tech Mono', size: 12 },
+                            callback: function(value) {
+                                return '$' + value.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                animation: {
+                    duration: 2000,
+                    easing: 'easeInOutQuart'
+                }
+            }
+        });
+
+        // Gráfico de evolución
+        const ctxEvolucion = document.getElementById('chartEvolucion').getContext('2d');
+        new Chart(ctxEvolucion, {
+            type: 'line',
+            data: {
+                labels: data.evolucion.map(e => e.fecha),
+                datasets: [{
+                    label: 'Ingresos Diarios',
+                    data: data.evolucion.map(e => e.total),
+                    borderColor: '#ff0080',
+                    backgroundColor: 'rgba(255, 0, 128, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#ff0080',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    title: {
+                        display: true,
+                        text: 'Tendencia Semanal (Análisis Temporal)',
+                        color: '#00ffff',
+                        font: { size: 16, family: 'Orbitron' }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { color: '#ff008033' },
+                        ticks: { color: '#00ffff', font: { family: 'Share Tech Mono', size: 12 } }
+                    },
+                    y: {
+                        grid: { color: '#ff008033' },
+                        beginAtZero: true,
+                        ticks: { 
+                            color: '#00ffff', 
+                            font: { family: 'Share Tech Mono', size: 12 },
+                            callback: function(value) {
+                                return '$' + value.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                animation: {
+                    duration: 2500,
+                    easing: 'easeInOutQuart'
+                }
+            }
+        });
+    })
+    .catch(error => console.error('Error cargando datos:', error));
+
+// Función para generar resumen WhatsApp
+function generarWhatsApp(mecanicoId) {
+    fetch(`{% url 'reportes:generar_resumen_whatsapp_mecanico' 0 %}`.replace('0', mecanicoId))
+        .then(response => response.json())
+        .then(data => {
+            if (data.whatsapp_url) {
+                window.open(data.whatsapp_url, '_blank');
+            } else {
+                // Mostrar el mensaje en un modal o alerta
+                alert('Mensaje generado:\n\n' + data.mensaje);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al generar el resumen de WhatsApp');
+        });
+}
+
+// Efectos adicionales de carga
+document.addEventListener('DOMContentLoaded', function() {
+    // Animar entrada de elementos
+    const cards = document.querySelectorAll('.metric-card, .mechanics-table, .chart-container');
+    cards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(50px)';
+        setTimeout(() => {
+            card.style.transition = 'all 0.6s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, index * 200);
+    });
+});
+</script>
+{% endblock %}

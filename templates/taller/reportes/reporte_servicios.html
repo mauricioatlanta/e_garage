@@ -1,11 +1,567 @@
 {% extends 'base.html' %}
 {% load humanize %}
+{% load custom_filters %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+<style>
+    /* Variables de tema IA futurista */
+    :root {
+        --ai-primary: #00ff88;
+        --ai-secondary: #0066ff;
+        --ai-accent: #ff0080;
+        --ai-glow: #00ffff;
+        --neural-bg: #0a0a0f;
+        --matrix-green: #39ff14;
+        --cyber-purple: #b347d9;
+        --hologram-blue: #00d4ff;
+        --quantum-orange: #ff6b35;
+    }
+
+    /* Fondo con efecto de neural network */
+    body {
+        background: radial-gradient(ellipse at center, #0a0a0f 0%, #000000 100%);
+        position: relative;
+        overflow-x: hidden;
+        font-family: 'Orbitron', 'Courier New', monospace;
+    }
+
+    /* Canvas de partículas de fondo */
+    #particles-js {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+    }
+
+    /* Efecto de matriz animada */
+    .neural-grid {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: 
+            linear-gradient(rgba(0, 255, 136, 0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0, 255, 136, 0.1) 1px, transparent 1px);
+        background-size: 20px 20px;
+        animation: neural-pulse 4s ease-in-out infinite;
+        z-index: -1;
+        pointer-events: none;
+    }
+
+    @keyframes neural-pulse {
+        0%, 100% { opacity: 0.3; }
+        50% { opacity: 0.6; }
+    }
+
+    /* Contenedor principal con efecto holográfico */
+    .ai-container {
+        background: linear-gradient(135deg, 
+            rgba(0, 255, 136, 0.05) 0%, 
+            rgba(0, 102, 255, 0.05) 50%, 
+            rgba(255, 0, 128, 0.05) 100%);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(0, 255, 136, 0.2);
+        border-radius: 20px;
+        padding: 30px;
+        margin: 20px auto;
+        max-width: 1400px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 
+            0 0 50px rgba(0, 255, 136, 0.1),
+            inset 0 0 50px rgba(0, 255, 136, 0.05);
+    }
+
+    .ai-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, 
+            transparent, 
+            rgba(0, 255, 136, 0.1), 
+            transparent);
+        animation: ai-scan 3s infinite;
+    }
+
+    @keyframes ai-scan {
+        0% { left: -100%; }
+        100% { left: 100%; }
+    }
+
+    /* Título con efecto de IA */
+    .ai-title {
+        font-family: 'Orbitron', monospace;
+        font-size: 3rem;
+        font-weight: 900;
+        text-align: center;
+        background: linear-gradient(45deg, 
+            var(--ai-primary), 
+            var(--ai-secondary), 
+            var(--ai-accent), 
+            var(--ai-glow));
+        background-size: 400% 400%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: ai-gradient 3s ease infinite;
+        text-shadow: 0 0 30px rgba(0, 255, 136, 0.5);
+        margin-bottom: 10px;
+    }
+
+    @keyframes ai-gradient {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+
+    .ai-subtitle {
+        color: rgba(0, 255, 136, 0.8);
+        text-align: center;
+        font-size: 1.2rem;
+        margin-bottom: 40px;
+        animation: glow-pulse 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow-pulse {
+        0% { text-shadow: 0 0 5px rgba(0, 255, 136, 0.5); }
+        100% { text-shadow: 0 0 20px rgba(0, 255, 136, 0.8); }
+    }
+
+    /* Botones de enfoque mejorados */
+    .ai-nav-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+
+    .enfoque-btn {
+        background: linear-gradient(135deg, 
+            rgba(0, 255, 136, 0.2) 0%, 
+            rgba(0, 102, 255, 0.2) 100%);
+        border: 1px solid rgba(0, 255, 136, 0.4);
+        color: var(--ai-primary);
+        padding: 15px 25px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .enfoque-btn:hover {
+        transform: translateY(-3px);
+        background: linear-gradient(135deg, 
+            rgba(0, 255, 136, 0.4) 0%, 
+            rgba(0, 102, 255, 0.4) 100%);
+        box-shadow: 0 15px 30px rgba(0, 255, 136, 0.3);
+        color: white;
+    }
+
+    .enfoque-btn.active {
+        background: linear-gradient(135deg, var(--ai-primary), var(--ai-glow));
+        color: #000;
+        box-shadow: 0 10px 25px rgba(0, 255, 136, 0.5);
+    }
+
+    /* Paneles de contenido */
+    .enfoque-panel {
+        background: linear-gradient(135deg, 
+            rgba(255, 255, 255, 0.08) 0%, 
+            rgba(255, 255, 255, 0.04) 100%);
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(0, 255, 136, 0.3);
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 25px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .enfoque-panel::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, 
+            var(--ai-primary), 
+            var(--ai-glow), 
+            var(--ai-accent));
+        animation: data-flow 2s ease infinite;
+    }
+
+    @keyframes data-flow {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+    }
+
+    /* Tabla futurista */
+    .futuristic-table {
+        background: rgba(0, 0, 0, 0.7);
+        border-radius: 15px;
+        overflow: hidden;
+        border: 1px solid rgba(0, 255, 136, 0.3);
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .futuristic-table thead th {
+        background: linear-gradient(135deg, 
+            rgba(0, 255, 136, 0.3) 0%, 
+            rgba(0, 102, 255, 0.3) 100%);
+        color: var(--ai-primary);
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+        letter-spacing: 1px;
+        padding: 15px;
+        border: none;
+    }
+
+    .futuristic-table tbody tr {
+        border-bottom: 1px solid rgba(0, 255, 136, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .futuristic-table tbody tr:hover {
+        background: rgba(0, 255, 136, 0.1);
+        transform: scale(1.01);
+    }
+
+    .futuristic-table tbody td {
+        color: rgba(255, 255, 255, 0.9);
+        padding: 12px 15px;
+        border: none;
+    }
+
+    /* Highlights AI */
+    .ai-highlight {
+        color: var(--ai-glow);
+        font-weight: 700;
+        text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        animation: highlight-pulse 2s ease infinite;
+    }
+
+    @keyframes highlight-pulse {
+        0%, 100% { opacity: 0.8; }
+        50% { opacity: 1; }
+    }
+
+    /* Grid responsivo */
+    .ai-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+
+    .ai-card {
+        background: linear-gradient(135deg, 
+            rgba(0, 255, 136, 0.1) 0%, 
+            rgba(0, 102, 255, 0.1) 100%);
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(0, 255, 136, 0.3);
+        border-radius: 15px;
+        padding: 25px;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .ai-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0, 255, 136, 0.2);
+    }
+
+    .ai-card h3 {
+        color: var(--ai-primary);
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .ai-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .ai-list li {
+        color: rgba(255, 255, 255, 0.9);
+        padding: 8px 0;
+        border-bottom: 1px solid rgba(0, 255, 136, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .ai-list li:last-child {
+        border-bottom: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .ai-container { margin: 10px; padding: 20px; }
+        .ai-title { font-size: 2rem; }
+        .ai-nav-grid { grid-template-columns: 1fr; }
+    }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+{% endblock %}
+
 {% block content %}
-<div class="container mx-auto py-10 px-2 md:px-8">
-  <h1 class="text-4xl font-extrabold text-center mb-8" style="font-family: 'Orbitron', 'Share Tech Mono', Arial, sans-serif; color: #ffd700; text-shadow: 0 0 24px #d90429, 0 0 8px #ffd700, 0 0 2px #fff; letter-spacing: 3px;">🤖 Reporte Futurista de Servicios</h1>
-  <div class="flex flex-wrap justify-center gap-4 mb-8">
-    <button class="enfoque-btn" data-enfoque="facturacion_total">💸 Facturación</button>
+<!-- Canvas de partículas neurales -->
+<div id="particles-js"></div>
+
+<!-- Grid neural de fondo -->
+<div class="neural-grid"></div>
+
+<!-- Contenedor principal AI -->
+<div class="ai-container">
+    <!-- Título principal futurista -->
+    <h1 class="ai-title">🤖 SISTEMA AI - ANÁLISIS DE SERVICIOS</h1>
+    <p class="ai-subtitle">🔬 Inteligencia Artificial para Reportes Avanzados de Servicios</p>
+
+    <!-- Navegación AI -->
+    <div class="ai-nav-grid">
+        <button class="enfoque-btn" data-enfoque="facturacion_total">💸 Facturación Total</button>
+        <button class="enfoque-btn" data-enfoque="ventas">🏆 Top Servicios</button>
+        <button class="enfoque-btn" data-enfoque="facturacion">💰 Mayor Facturación</button>
+        <button class="enfoque-btn" data-enfoque="historico">📈 Histórico Mensual</button>
+        <button class="enfoque-btn" data-enfoque="nunca">🚫 Nunca Vendidos</button>
+        <button class="enfoque-btn" data-enfoque="vehiculos">🚗 Vehículos Atendidos</button>
+        <button class="enfoque-btn" data-enfoque="clientes">👤 Análisis de Clientes</button>
+        <button class="enfoque-btn" data-enfoque="agenda">📅 Agenda y Turnos</button>
+    </div>
+
+    <!-- Panel Facturación Total -->
+    <div id="panel-facturacion_total" class="enfoque-panel" style="display:none;">
+        <h2 style="color: var(--ai-primary); font-size: 1.5rem; font-weight: 700; text-align: center; margin-bottom: 20px;">💸 ANÁLISIS DE FACTURACIÓN TOTAL</h2>
+        <div class="ai-grid">
+            <div class="ai-card">
+                <h3>💎 Ingresos Totales</h3>
+                <div style="font-size: 2.5rem; color: var(--ai-glow); font-weight: 900; text-align: center;">
+                    ${{ facturacion_total|floatformat:0|intcomma }}
+                </div>
+            </div>
+            <div class="ai-card">
+                <h3>📊 Facturación por Período</h3>
+                <ul class="ai-list">
+                    {% for f in facturacion_periodo %}
+                    <li>
+                        <span>{{ f.mes }}</span>
+                        <span class="ai-highlight">${{ f.total|floatformat:0|intcomma }}</span>
+                    </li>
+                    {% empty %}
+                    <li>No hay datos disponibles</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="ai-card">
+                <h3>🔧 Facturación por Servicio</h3>
+                <ul class="ai-list">
+                    {% for f in facturacion_servicio %}
+                    <li>
+                        <span>{{ f.nombre|truncatechars:20 }}</span>
+                        <span class="ai-highlight">${{ f.total|floatformat:0|intcomma }}</span>
+                    </li>
+                    {% empty %}
+                    <li>No hay datos disponibles</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="ai-card">
+                <h3>👥 Facturación por Cliente</h3>
+                <ul class="ai-list">
+                    {% for f in facturacion_cliente %}
+                    <li>
+                        <span>{{ f.cliente|truncatechars:20 }}</span>
+                        <span class="ai-highlight">${{ f.total|floatformat:0|intcomma }}</span>
+                    </li>
+                    {% empty %}
+                    <li>No hay datos disponibles</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel Agenda -->
+    <div id="panel-agenda" class="enfoque-panel" style="display:none;">
+        <h2 style="color: var(--ai-accent); font-size: 1.5rem; font-weight: 700; text-align: center; margin-bottom: 20px;">📅 AGENDA Y PRÓXIMOS TURNOS</h2>
+        <table class="futuristic-table">
+            <thead>
+                <tr>
+                    <th>🗓️ Fecha</th>
+                    <th>👤 Cliente</th>
+                    <th>🚗 Vehículo</th>
+                    <th>📄 Tipo de Documento</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in turnos_proximos %}
+                <tr>
+                    <td class="ai-highlight">{{ t.fecha|date:'d/m/Y' }}</td>
+                    <td>{{ t.cliente }}</td>
+                    <td>{{ t.vehiculo }}</td>
+                    <td>{{ t.tipo_documento }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" style="text-align: center; color: rgba(255,255,255,0.6);">No hay turnos agendados</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div style="text-align: center; color: rgba(0, 255, 136, 0.6); margin-top: 15px; font-size: 0.9rem;">
+            🤖 Solo se muestran los próximos 20 turnos agendados
+        </div>
+    </div>
+
+    <!-- Panel Clientes -->
+    <div id="panel-clientes" class="enfoque-panel" style="display:none;">
+        <h2 style="color: var(--hologram-blue); font-size: 1.5rem; font-weight: 700; text-align: center; margin-bottom: 20px;">👤 ANÁLISIS INTELIGENTE DE CLIENTES</h2>
+        <div class="ai-grid">
+            <div class="ai-card">
+                <h3>🏆 Clientes Más Activos</h3>
+                <ul class="ai-list">
+                    {% for c in clientes_activos %}
+                    <li>
+                        <span>{{ c.nombre }}</span>
+                        <span class="ai-highlight">({{ c.cantidad }})</span>
+                    </li>
+                    {% empty %}
+                    <li>No hay datos disponibles</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="ai-card">
+                <h3>🆕 Clientes Nuevos</h3>
+                <ul class="ai-list">
+                    {% for c in clientes_nuevos %}
+                    <li>
+                        <span>{{ c.nombre }}</span>
+                        <span class="ai-highlight">{{ c.fecha_primer_servicio|date:'d/m/Y' }}</span>
+                    </li>
+                    {% empty %}
+                    <li>No hay datos disponibles</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Paneles adicionales para otros enfoques -->
+    <div id="panel-ventas" class="enfoque-panel" style="display:none;">
+        <h2 style="color: var(--matrix-green); font-size: 1.5rem; font-weight: 700; text-align: center; margin-bottom: 20px;">🏆 TOP SERVICIOS MÁS VENDIDOS</h2>
+        <div class="ai-grid">
+            {% for servicio in top_servicios %}
+            <div class="ai-card">
+                <h3>{{ servicio.nombre }}</h3>
+                <div style="color: var(--ai-glow); font-size: 2rem; font-weight: 700; text-align: center;">
+                    {{ servicio.cantidad }}
+                </div>
+                <div style="color: rgba(255,255,255,0.7); text-align: center;">unidades vendidas</div>
+            </div>
+            {% empty %}
+            <div class="ai-card">
+                <h3>🔍 Sin Datos</h3>
+                <p style="color: rgba(255,255,255,0.6);">No hay información de servicios disponible</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Agregar más paneles según sea necesario -->
+    
 </div>
+
+<script>
+// Inicializar partículas neurales
+particlesJS('particles-js', {
+    particles: {
+        number: { value: 100, density: { enable: true, value_area: 800 } },
+        color: { value: '#00ff88' },
+        shape: { type: 'circle' },
+        opacity: { value: 0.4, random: false },
+        size: { value: 3, random: true },
+        line_linked: {
+            enable: true,
+            distance: 150,
+            color: '#00ff88',
+            opacity: 0.3,
+            width: 1
+        },
+        move: {
+            enable: true,
+            speed: 4,
+            direction: 'none',
+            random: false,
+            straight: false,
+            out_mode: 'out',
+            bounce: false
+        }
+    },
+    interactivity: {
+        detect_on: 'canvas',
+        events: {
+            onhover: { enable: true, mode: 'repulse' },
+            onclick: { enable: true, mode: 'push' },
+            resize: true
+        }
+    },
+    retina_detect: true
+});
+
+// Funcionalidad de navegación entre paneles
+document.addEventListener('DOMContentLoaded', function() {
+    const buttons = document.querySelectorAll('.enfoque-btn');
+    const panels = document.querySelectorAll('.enfoque-panel');
+    
+    // Mostrar panel por defecto
+    document.getElementById('panel-facturacion_total').style.display = 'block';
+    document.querySelector('[data-enfoque="facturacion_total"]').classList.add('active');
+    
+    buttons.forEach(button => {
+        button.addEventListener('click', function() {
+            const enfoque = this.getAttribute('data-enfoque');
+            
+            // Ocultar todos los paneles
+            panels.forEach(panel => {
+                panel.style.display = 'none';
+            });
+            
+            // Quitar clase active de todos los botones
+            buttons.forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Mostrar panel seleccionado
+            const targetPanel = document.getElementById('panel-' + enfoque);
+            if (targetPanel) {
+                targetPanel.style.display = 'block';
+            }
+            
+            // Agregar clase active al botón seleccionado
+            this.classList.add('active');
+        });
+    });
+});
+</script>
+{% endblock %}
 
   <div id="panel-facturacion_total" class="enfoque-panel" style="display:none;">
     <h2 class="text-xl font-bold mb-2 text-center">Facturación: total, por periodo, por servicio y por clientes</h2>
@@ -358,4 +914,3 @@
     });
   }
  </script>
-{% endblock %}

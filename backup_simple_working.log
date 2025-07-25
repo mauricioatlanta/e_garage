@@ -1,0 +1,4 @@
+2025-07-22 20:32:15,557 - INFO - === INICIANDO BACKUP SIMPLIFICADO ===
+2025-07-22 20:32:15,563 - INFO - Empresas a respaldar: 6
+2025-07-22 20:32:15,565 - ERROR - Error crítico durante backup: 'Empresa' object has no attribute 'nombre'
+2025-07-22 20:32:15,566 - ERROR - Error al registrar auditoría: LogAuditoria() got unexpected keyword arguments: 'detalles'

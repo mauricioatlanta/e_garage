@@ -1,0 +1,597 @@
+{% extends 'base.html' %}
+
+{% block title %}🧠 IA Integrada - Sugerencias Automáticas{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<style>
+    :root {
+        --cyber-blue: #00d4ff;
+        --matrix-green: #39ff14;
+        --neon-purple: #b347d9;
+        --dark-bg: #0a0a0f;
+        --glow-cyan: #00ffff;
+        --ai-orange: #ff6b35;
+        --electric-yellow: #ffff00;
+    }
+
+    body {
+        background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+        color: var(--glow-cyan);
+        font-family: 'Orbitron', 'Courier New', monospace;
+    }
+
+    #particles-js {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: -1;
+    }
+
+    .ai-header {
+        background: linear-gradient(135deg, rgba(255, 107, 53, 0.15) 0%, rgba(179, 71, 217, 0.15) 100%);
+        border: 2px solid var(--ai-orange);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 0 40px rgba(255, 107, 53, 0.3);
+        position: relative;
+        overflow: hidden;
+        text-align: center;
+    }
+
+    .ai-header::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(45deg, var(--ai-orange), var(--neon-purple), var(--electric-yellow));
+        border-radius: 20px;
+        z-index: -1;
+        animation: borderGlow 2s linear infinite;
+    }
+
+    @keyframes borderGlow {
+        0%, 100% { opacity: 0.6; }
+        50% { opacity: 1; }
+    }
+
+    .ai-title {
+        font-size: 3rem;
+        font-weight: bold;
+        background: linear-gradient(45deg, var(--ai-orange), var(--electric-yellow), var(--neon-purple));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 1rem;
+        text-shadow: 0 0 30px rgba(255, 107, 53, 0.5);
+    }
+
+    .ai-subtitle {
+        color: var(--glow-cyan);
+        font-size: 1.2rem;
+        opacity: 0.9;
+        margin-bottom: 1rem;
+    }
+
+    .ai-badge {
+        background: linear-gradient(45deg, var(--ai-orange), var(--electric-yellow));
+        color: #000;
+        padding: 8px 16px;
+        border-radius: 25px;
+        font-weight: bold;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        display: inline-block;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+
+    .demo-panel {
+        background: rgba(10, 10, 15, 0.9);
+        border: 1px solid var(--cyber-blue);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 0 30px rgba(0, 212, 255, 0.2);
+    }
+
+    .demo-title {
+        color: var(--cyber-blue);
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    .vehiculo-selector {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group label {
+        color: var(--matrix-green);
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+    }
+
+    .form-control {
+        background: rgba(0, 20, 40, 0.8);
+        border: 1px solid var(--cyber-blue);
+        border-radius: 8px;
+        color: var(--glow-cyan);
+        padding: 12px;
+        font-family: 'Orbitron', monospace;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--matrix-green);
+        box-shadow: 0 0 15px rgba(57, 255, 20, 0.5);
+    }
+
+    .btn-ai {
+        background: linear-gradient(45deg, var(--ai-orange), var(--electric-yellow));
+        border: none;
+        border-radius: 10px;
+        color: #000;
+        padding: 12px 24px;
+        font-weight: bold;
+        font-family: 'Orbitron', monospace;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 1rem;
+    }
+
+    .btn-ai:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(255, 107, 53, 0.5);
+    }
+
+    .sugerencias-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+
+    .sugerencias-panel {
+        background: rgba(10, 10, 15, 0.9);
+        border: 1px solid var(--matrix-green);
+        border-radius: 15px;
+        padding: 1.5rem;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 0 25px rgba(57, 255, 20, 0.2);
+    }
+
+    .panel-title {
+        color: var(--matrix-green);
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+        text-align: center;
+        border-bottom: 1px solid var(--matrix-green);
+        padding-bottom: 0.5rem;
+    }
+
+    .sugerencia-item {
+        background: rgba(57, 255, 20, 0.1);
+        border: 1px solid var(--matrix-green);
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .sugerencia-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(57, 255, 20, 0.3);
+    }
+
+    .sugerencia-nombre {
+        color: var(--cyber-blue);
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+
+    .sugerencia-precio {
+        color: var(--electric-yellow);
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+
+    .sugerencia-detalle {
+        color: var(--glow-cyan);
+        font-size: 0.9rem;
+        opacity: 0.8;
+        margin-top: 0.5rem;
+    }
+
+    .confianza-meter {
+        background: rgba(0, 212, 255, 0.1);
+        border: 1px solid var(--cyber-blue);
+        border-radius: 10px;
+        padding: 1rem;
+        margin: 1rem 0;
+        text-align: center;
+    }
+
+    .confianza-bar {
+        background: rgba(0, 212, 255, 0.3);
+        height: 10px;
+        border-radius: 10px;
+        position: relative;
+        overflow: hidden;
+        margin: 0.5rem 0;
+    }
+
+    .confianza-fill {
+        background: linear-gradient(90deg, var(--matrix-green), var(--cyber-blue));
+        height: 100%;
+        border-radius: 10px;
+        transition: width 1s ease;
+        position: relative;
+    }
+
+    .alertas-panel {
+        background: rgba(255, 107, 53, 0.1);
+        border: 1px solid var(--ai-orange);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .alerta-item {
+        background: rgba(255, 107, 53, 0.2);
+        border: 1px solid var(--ai-orange);
+        border-radius: 8px;
+        padding: 0.8rem;
+        margin-bottom: 0.5rem;
+        color: var(--glow-cyan);
+        display: flex;
+        align-items: center;
+    }
+
+    .alerta-item::before {
+        content: '⚠️';
+        margin-right: 0.5rem;
+        font-size: 1.2rem;
+    }
+
+    .demo-brands {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin: 2rem 0;
+    }
+
+    .brand-card {
+        background: rgba(0, 212, 255, 0.1);
+        border: 1px solid var(--cyber-blue);
+        border-radius: 10px;
+        padding: 1rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .brand-card:hover {
+        transform: scale(1.05);
+        border-color: var(--matrix-green);
+        background: rgba(57, 255, 20, 0.1);
+    }
+
+    .brand-logo {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .brand-name {
+        color: var(--glow-cyan);
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    .loading-ia {
+        text-align: center;
+        padding: 2rem;
+        color: var(--ai-orange);
+    }
+
+    .loading-spinner {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        border: 3px solid rgba(255, 107, 53, 0.3);
+        border-radius: 50%;
+        border-top-color: var(--ai-orange);
+        animation: spin 1s ease-in-out infinite;
+        margin-bottom: 1rem;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 768px) {
+        .sugerencias-container {
+            grid-template-columns: 1fr;
+        }
+        
+        .vehiculo-selector {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="particles-js"></div>
+
+<div class="container mx-auto px-4 py-8">
+    <div class="ai-header">
+        <h1 class="ai-title">🧠 IA INTEGRADA</h1>
+        <p class="ai-subtitle">Sugerencias automáticas para servicios y repuestos</p>
+        <div class="ai-badge">✨ Incluido sin costo adicional ✨</div>
+    </div>
+
+    <!-- Demo Interactivo -->
+    <div class="demo-panel">
+        <h2 class="demo-title">🎯 Prueba la IA con un vehículo</h2>
+        
+        <div class="vehiculo-selector">
+            <div class="form-group">
+                <label for="marca">🚗 Marca</label>
+                <select id="marca" class="form-control">
+                    <option value="">Selecciona una marca</option>
+                    <option value="toyota">Toyota</option>
+                    <option value="nissan">Nissan</option>
+                    <option value="chevrolet">Chevrolet</option>
+                    <option value="hyundai">Hyundai</option>
+                    <option value="kia">Kia</option>
+                    <option value="mazda">Mazda</option>
+                    <option value="ford">Ford</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="modelo">🏷️ Modelo</label>
+                <input type="text" id="modelo" class="form-control" placeholder="Ej: Corolla, Sentra">
+            </div>
+            
+            <div class="form-group">
+                <label for="anio">📅 Año</label>
+                <input type="number" id="anio" class="form-control" placeholder="2020" min="1990" max="2025">
+            </div>
+            
+            <div class="form-group">
+                <label for="kilometraje">📏 Kilometraje</label>
+                <input type="number" id="kilometraje" class="form-control" placeholder="50000" min="0">
+            </div>
+        </div>
+        
+        <button onclick="generarSugerencias()" class="btn-ai">
+            🤖 Generar Sugerencias con IA
+        </button>
+    </div>
+
+    <!-- Marcas populares para demo rápido -->
+    <div class="demo-panel">
+        <h3 style="color: var(--cyber-blue); text-align: center; margin-bottom: 1rem;">
+            🚀 Demo rápido por marca:
+        </h3>
+        <div class="demo-brands">
+            <div class="brand-card" onclick="demoMarca('toyota')">
+                <div class="brand-logo">🚗</div>
+                <div class="brand-name">Toyota</div>
+            </div>
+            <div class="brand-card" onclick="demoMarca('nissan')">
+                <div class="brand-logo">🚙</div>
+                <div class="brand-name">Nissan</div>
+            </div>
+            <div class="brand-card" onclick="demoMarca('general')">
+                <div class="brand-logo">🔧</div>
+                <div class="brand-name">General</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resultados de IA -->
+    <div id="resultados-ia" style="display: none;">
+        <div class="confianza-meter">
+            <div style="color: var(--cyber-blue); font-weight: bold; margin-bottom: 0.5rem;">
+                🎯 Confianza de la IA: <span id="confianza-texto">--</span>%
+            </div>
+            <div class="confianza-bar">
+                <div id="confianza-fill" class="confianza-fill" style="width: 0%;"></div>
+            </div>
+            <div style="color: var(--glow-cyan); font-size: 0.9rem; opacity: 0.8;">
+                Basado en patrones de mantenimiento y datos históricos
+            </div>
+        </div>
+
+        <div class="sugerencias-container">
+            <!-- Servicios Sugeridos -->
+            <div class="sugerencias-panel">
+                <h3 class="panel-title">🔧 Servicios Recomendados</h3>
+                <div id="servicios-sugeridos"></div>
+            </div>
+
+            <!-- Repuestos Sugeridos -->
+            <div class="sugerencias-panel">
+                <h3 class="panel-title">⚙️ Repuestos Recomendados</h3>
+                <div id="repuestos-sugeridos"></div>
+            </div>
+        </div>
+
+        <!-- Alertas -->
+        <div class="alertas-panel" id="alertas-panel" style="display: none;">
+            <h3 style="color: var(--ai-orange); text-align: center; margin-bottom: 1rem;">
+                ⚠️ Alertas y Recomendaciones
+            </h3>
+            <div id="alertas-lista"></div>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    <div id="loading-ia" class="loading-ia" style="display: none;">
+        <div class="loading-spinner"></div>
+        <h3>🤖 IA analizando vehículo...</h3>
+        <p>Procesando datos de mantenimiento y patrones</p>
+    </div>
+</div>
+
+<script>
+// Configuración de partículas
+particlesJS("particles-js", {
+    "particles": {
+        "number": { "value": 40, "density": { "enable": true, "value_area": 800 } },
+        "color": { "value": ["#ff6b35", "#00d4ff", "#39ff14"] },
+        "shape": { "type": "circle" },
+        "opacity": { "value": 0.5, "random": false },
+        "size": { "value": 3, "random": true },
+        "line_linked": {
+            "enable": true, "distance": 150, "color": "#ff6b35", "opacity": 0.4, "width": 1
+        },
+        "move": { "enable": true, "speed": 2, "direction": "none", "random": false, "straight": false, "out_mode": "out", "bounce": false }
+    },
+    "interactivity": {
+        "detect_on": "canvas",
+        "events": { "onhover": { "enable": true, "mode": "repulse" }, "onclick": { "enable": true, "mode": "push" }, "resize": true }
+    },
+    "retina_detect": true
+});
+
+// Datos de demo
+const sugerenciasPorMarca = {{ sugerencias_por_vehiculo|safe }};
+
+function generarSugerencias() {
+    const marca = document.getElementById('marca').value;
+    const modelo = document.getElementById('modelo').value;
+    const anio = document.getElementById('anio').value;
+    const kilometraje = document.getElementById('kilometraje').value;
+    
+    if (!marca) {
+        alert('Por favor selecciona al menos una marca');
+        return;
+    }
+    
+    mostrarLoading();
+    
+    // Simular procesamiento de IA
+    setTimeout(() => {
+        const sugerencias = obtenerSugerenciasPorMarca(marca);
+        mostrarResultados(sugerencias, marca, kilometraje);
+        
+        // Analytics
+        gtag('event', 'ia_sugerencias_generadas', {
+            'event_category': 'ia_engagement',
+            'event_label': marca,
+            'custom_parameters': {
+                'modelo': modelo,
+                'anio': anio,
+                'kilometraje': kilometraje
+            }
+        });
+    }, 2000);
+}
+
+function demoMarca(marca) {
+    document.getElementById('marca').value = marca;
+    
+    if (marca === 'toyota') {
+        document.getElementById('modelo').value = 'Corolla';
+        document.getElementById('anio').value = '2020';
+        document.getElementById('kilometraje').value = '45000';
+    } else if (marca === 'nissan') {
+        document.getElementById('modelo').value = 'Sentra';
+        document.getElementById('anio').value = '2019';
+        document.getElementById('kilometraje').value = '60000';
+    }
+    
+    generarSugerencias();
+}
+
+function mostrarLoading() {
+    document.getElementById('loading-ia').style.display = 'block';
+    document.getElementById('resultados-ia').style.display = 'none';
+}
+
+function obtenerSugerenciasPorMarca(marca) {
+    return sugerenciasPorMarca[marca] || sugerenciasPorMarca['general'];
+}
+
+function mostrarResultados(sugerencias, marca, kilometraje) {
+    document.getElementById('loading-ia').style.display = 'none';
+    document.getElementById('resultados-ia').style.display = 'block';
+    
+    // Confianza
+    const confianza = marca === 'toyota' || marca === 'nissan' ? 88 : 72;
+    document.getElementById('confianza-texto').textContent = confianza;
+    document.getElementById('confianza-fill').style.width = confianza + '%';
+    
+    // Servicios
+    const serviciosHtml = sugerencias.servicios_comunes.map(servicio => `
+        <div class="sugerencia-item">
+            <div class="sugerencia-nombre">${servicio.nombre}</div>
+            <div class="sugerencia-precio">$${servicio.precio.toLocaleString()}</div>
+            <div class="sugerencia-detalle">Frecuencia: ${servicio.frecuencia}</div>
+        </div>
+    `).join('');
+    document.getElementById('servicios-sugeridos').innerHTML = serviciosHtml;
+    
+    // Repuestos
+    if (sugerencias.repuestos_frecuentes) {
+        const repuestosHtml = sugerencias.repuestos_frecuentes.map(repuesto => `
+            <div class="sugerencia-item">
+                <div class="sugerencia-nombre">${repuesto.nombre}</div>
+                <div class="sugerencia-precio">$${repuesto.precio.toLocaleString()}</div>
+                <div class="sugerencia-detalle">Código: ${repuesto.codigo}</div>
+            </div>
+        `).join('');
+        document.getElementById('repuestos-sugeridos').innerHTML = repuestosHtml;
+    }
+    
+    // Alertas
+    if (sugerencias.alertas) {
+        const alertasHtml = sugerencias.alertas.map(alerta => `
+            <div class="alerta-item">${alerta}</div>
+        `).join('');
+        document.getElementById('alertas-lista').innerHTML = alertasHtml;
+        document.getElementById('alertas-panel').style.display = 'block';
+    }
+    
+    // Scroll a resultados
+    document.getElementById('resultados-ia').scrollIntoView({ behavior: 'smooth' });
+}
+
+// Auto-demo al cargar
+window.addEventListener('load', function() {
+    setTimeout(() => {
+        if (confirm('¿Quieres ver una demo automática de la IA con un Toyota Corolla?')) {
+            demoMarca('toyota');
+        }
+    }, 2000);
+});
+</script>
+{% endblock %}

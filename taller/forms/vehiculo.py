@@ -1,7 +1,7 @@
 
 from django import forms
 from dal import autocomplete
-from dal.widgets import ModelSelect2, ModelSelect2TagWidget
+from dal_select2.widgets import ModelSelect2
 
 from taller.models.vehiculos import Vehiculo
 from taller.models.clientes import Cliente

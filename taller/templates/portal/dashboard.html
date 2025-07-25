@@ -1,0 +1,193 @@
+{% extends 'portal/base.html' %}
+
+{% block title %}Dashboard - Portal de Clientes{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-tachometer-alt"></i> Dashboard
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <small class="text-muted">
+            Último acceso: 
+            {% if cliente.usuario_portal.ultimo_acceso %}
+                {{ cliente.usuario_portal.ultimo_acceso|date:"d/m/Y H:i" }}
+            {% else %}
+                Primera vez
+            {% endif %}
+        </small>
+    </div>
+</div>
+
+{% if portal_config and portal_config.mensaje_bienvenida %}
+    <div class="alert alert-primary">
+        <i class="fas fa-info-circle"></i> {{ portal_config.mensaje_bienvenida }}
+    </div>
+{% endif %}
+
+<!-- Tarjetas de resumen -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-car fa-2x"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <div class="h4 mb-0">{{ vehiculos.count }}</div>
+                        <div>Vehículo{{ vehiculos.count|pluralize }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-file-alt fa-2x"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <div class="h4 mb-0">{{ documentos_recientes.count }}</div>
+                        <div>Documento{{ documentos_recientes.count|pluralize }} reciente{{ documentos_recientes.count|pluralize }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-clock fa-2x"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <div class="h4 mb-0">{{ solicitudes_pendientes }}</div>
+                        <div>Solicitud{{ solicitudes_pendientes|pluralize }} pendiente{{ solicitudes_pendientes|pluralize }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card text-white bg-info">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-tools fa-2x"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <div class="h4 mb-0">{{ cliente.empresa.nombre_taller|truncatechars:10 }}</div>
+                        <div>Taller</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Vehículos -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-car"></i> Mis Vehículos
+                <a href="{% url 'portal_vehiculos' %}" class="btn btn-sm btn-light float-end">Ver todos</a>
+            </div>
+            <div class="card-body">
+                {% if vehiculos %}
+                    <div class="list-group list-group-flush">
+                        {% for vehiculo in vehiculos %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ vehiculo.marca }} {{ vehiculo.modelo }}</strong><br>
+                                    <small class="text-muted">{{ vehiculo.patente }} - {{ vehiculo.año }}</small>
+                                </div>
+                                <span class="badge bg-primary rounded-pill">{{ vehiculo.color }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">No hay vehículos registrados.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Documentos recientes -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-file-alt"></i> Documentos Recientes
+                <a href="{% url 'portal_documentos' %}" class="btn btn-sm btn-light float-end">Ver todos</a>
+            </div>
+            <div class="card-body">
+                {% if documentos_recientes %}
+                    <div class="list-group list-group-flush">
+                        {% for documento in documentos_recientes %}
+                            <div class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ documento.numero_documento }}</h6>
+                                    <small>{{ documento.fecha_documento|date:"d/m/Y" }}</small>
+                                </div>
+                                <p class="mb-1">{{ documento.tipo_documento }}</p>
+                                <small class="text-muted">
+                                    {{ documento.id_vehiculo.marca }} {{ documento.id_vehiculo.modelo }} - 
+                                    ${{ documento.total|floatformat:0 }}
+                                </small>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">No hay documentos recientes.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Acciones rápidas -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-rocket"></i> Acciones Rápidas
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'portal_solicitar_presupuesto' %}" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-plus-circle"></i><br>
+                            Solicitar Presupuesto
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'portal_documentos' %}" class="btn btn-outline-success w-100">
+                            <i class="fas fa-file-alt"></i><br>
+                            Ver Documentos
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'portal_vehiculos' %}" class="btn btn-outline-info w-100">
+                            <i class="fas fa-car"></i><br>
+                            Mis Vehículos
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'portal_mis_solicitudes' %}" class="btn btn-outline-warning w-100">
+                            <i class="fas fa-list"></i><br>
+                            Mis Solicitudes
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

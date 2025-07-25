@@ -1,0 +1,26 @@
+{
+  "empresa": {
+    "nombre_taller": "Mecánica Express",
+    "direccion": "Calle Secundaria 456",
+    "telefono": "+56987654321",
+    "email": ""
+  },
+  "estadisticas": {
+    "total_documentos": 2
+  },
+  "fecha_backup": "20250722_201505",
+  "documentos": [
+    {
+      "numero_documento": "F-732",
+      "tipo_documento": "Factura",
+      "fecha": "2025-07-22",
+      "observaciones": ""
+    },
+    {
+      "numero_documento": "T2-WEB-001",
+      "tipo_documento": "Presupuesto",
+      "fecha": "2025-07-22",
+      "observaciones": "Test documento web taller2"
+    }
+  ]
+}

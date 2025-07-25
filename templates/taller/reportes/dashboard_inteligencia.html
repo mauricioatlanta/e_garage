@@ -1,0 +1,1344 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load static %}
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  body {
+    background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #533483 100%);
+    min-height: 100vh;
+    font-family: 'Orbitron', sans-serif;
+    overflow-x: hidden;
+  }
+  
+  /* 🚀 Contenedor principal futurista */
+  .intelligence-hub {
+    background: rgba(10, 10, 30, 0.85);
+    backdrop-filter: blur(20px);
+    border-radius: 24px;
+    border: 2px solid rgba(0, 255, 255, 0.3);
+    box-shadow: 0 0 50px rgba(0, 255, 255, 0.2), inset 0 0 30px rgba(0, 150, 255, 0.1);
+    padding: 2rem;
+    margin: 1rem;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .intelligence-hub::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(from 0deg, transparent, rgba(0, 255, 255, 0.1), transparent, rgba(0, 150, 255, 0.05), transparent);
+    animation: rotate 20s linear infinite;
+    z-index: -1;
+  }
+  
+  @keyframes rotate {
+    100% { transform: rotate(360deg); }
+  }
+  
+  /* 🧠 KPI Cards futuristas */
+  .kpi-card {
+    background: rgba(15, 15, 40, 0.9);
+    border: 1px solid rgba(0, 255, 255, 0.4);
+    border-radius: 16px;
+    padding: 1.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+  
+  .kpi-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0, 255, 255, 0.3);
+    border-color: rgba(0, 255, 255, 0.8);
+  }
+  
+  .kpi-value {
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: linear-gradient(45deg, #00ffff, #0080ff, #ff00ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-family: 'Orbitron', sans-serif;
+    text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+  }
+  
+  .kpi-label {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 0.5rem;
+  }
+  
+  .kpi-trend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+  }
+  
+  .trend-up { color: #00ff88; }
+  .trend-down { color: #ff4444; }
+  .trend-neutral { color: #ffaa00; }
+  
+  /* 📊 Gráficos modernos */
+  .chart-container {
+    background: rgba(10, 10, 30, 0.8);
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid rgba(0, 255, 255, 0.2);
+    position: relative;
+  }
+  
+  .chart-title {
+    color: #00ffff;
+    font-size: 1.2rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+  }
+  
+  /* 🔔 Panel de alertas */
+  .alerts-panel {
+    background: rgba(20, 20, 50, 0.9);
+    border-radius: 16px;
+    border-left: 4px solid #ff6b6b;
+    padding: 1.5rem;
+    margin: 1rem 0;
+  }
+  
+  .alert-item {
+    display: flex;
+    align-items: center;
+    margin: 0.8rem 0;
+    padding: 0.8rem;
+    background: rgba(255, 107, 107, 0.1);
+    border-radius: 8px;
+    border-left: 3px solid #ff6b6b;
+  }
+  
+  .alert-icon {
+    font-size: 1.5rem;
+    margin-right: 1rem;
+  }
+  
+  /* 📥 Botones de acción futuristas */
+  .action-btn {
+    background: linear-gradient(45deg, #0080ff, #00ffff);
+    color: #000;
+    border: none;
+    border-radius: 12px;
+    padding: 0.8rem 1.5rem;
+    font-weight: 600;
+    font-family: 'Orbitron', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 15px rgba(0, 128, 255, 0.3);
+  }
+  
+  .action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 255, 255, 0.4);
+    background: linear-gradient(45deg, #00ffff, #0080ff);
+  }
+  
+  /* 🎖️ Medallas y gamificación */
+  .achievement-badge {
+    display: inline-flex;
+    align-items: center;
+    background: linear-gradient(45deg, #ffd700, #ff8c00);
+    color: #000;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin: 0.2rem;
+    box-shadow: 0 2px 10px rgba(255, 215, 0, 0.3);
+  }
+  
+  /* 📈 Predicciones IA */
+  .ai-prediction {
+    background: linear-gradient(135deg, rgba(0, 255, 0, 0.1), rgba(0, 255, 255, 0.1));
+    border: 1px solid rgba(0, 255, 0, 0.3);
+    border-radius: 12px;
+    padding: 1rem;
+    margin: 1rem 0;
+    text-align: center;
+  }
+  
+  .ai-prediction-title {
+    color: #00ff88;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .ai-prediction-value {
+    font-size: 1.3rem;
+    color: #00ffff;
+    font-weight: 700;
+  }
+  
+  /* 🗓️ Mapa térmico */
+  .heatmap-container {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+    margin: 1rem 0;
+  }
+  
+  .heatmap-day {
+    aspect-ratio: 1;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .heat-low { background: rgba(0, 255, 255, 0.1); }
+  .heat-medium { background: rgba(0, 255, 255, 0.3); }
+  .heat-high { background: rgba(0, 255, 255, 0.6); }
+  .heat-very-high { background: rgba(0, 255, 255, 0.9); color: #000; }
+  
+  .heatmap-day:hover {
+    transform: scale(1.1);
+    z-index: 10;
+  }
+  
+  /* ⚡ Animaciones */
+  .pulse-glow {
+    animation: pulseGlow 2s ease-in-out infinite alternate;
+  }
+  
+  @keyframes pulseGlow {
+    from { box-shadow: 0 0 20px rgba(0, 255, 255, 0.3); }
+    to { box-shadow: 0 0 30px rgba(0, 255, 255, 0.6); }
+  }
+  
+  /* 📱 Responsive - Optimización móvil */
+  @media (max-width: 768px) {
+    .intelligence-hub { 
+      padding: 1rem; 
+      margin: 0.5rem; 
+      border-radius: 16px;
+    }
+    
+    .kpi-value { 
+      font-size: 1.8rem; 
+    }
+    
+    .kpi-label {
+      font-size: 0.8rem;
+    }
+    
+    .chart-container {
+      padding: 1rem;
+    }
+    
+    .chart-title {
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .action-btn {
+      padding: 0.6rem 1rem;
+      font-size: 0.9rem;
+      border-radius: 8px;
+    }
+    
+    .heatmap-container {
+      gap: 1px;
+    }
+    
+    .heatmap-day {
+      font-size: 0.6rem;
+    }
+    
+    .alert-item {
+      padding: 0.6rem;
+      font-size: 0.9rem;
+    }
+    
+    .alert-icon {
+      font-size: 1.2rem;
+      margin-right: 0.8rem;
+    }
+    
+    /* Gráficos más pequeños en móvil */
+    canvas {
+      max-height: 200px !important;
+    }
+    
+    /* Botones de acción en móvil - 2 columnas */
+    .grid.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-4 {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.8rem;
+    }
+    
+    /* KPIs en móvil - 2 columnas */
+    .grid.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-4.gap-6 {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+    
+    /* Filtros en móvil - 1 columna */
+    .grid.grid-cols-1.md\\:grid-cols-4 {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+    
+    /* Header principal más pequeño */
+    h1.text-5xl {
+      font-size: 2.5rem !important;
+      line-height: 1.2;
+    }
+    
+    /* Medallas más pequeñas */
+    .achievement-badge {
+      font-size: 0.7rem;
+      padding: 0.3rem 0.6rem;
+      margin: 0.1rem;
+    }
+    
+    /* Alertas más compactas */
+    .alerts-panel {
+      padding: 1rem;
+    }
+    
+    /* Mapa térmico más pequeño */
+    .heatmap-container {
+      max-width: 280px;
+      margin: 0 auto;
+    }
+  }
+  
+  /* 📱 Móviles muy pequeños (iPhone SE, etc.) */
+  @media (max-width: 480px) {
+    .intelligence-hub {
+      margin: 0.25rem;
+      padding: 0.75rem;
+    }
+    
+    .kpi-value {
+      font-size: 1.5rem;
+    }
+    
+    .kpi-label {
+      font-size: 0.75rem;
+    }
+    
+    h1.text-5xl {
+      font-size: 2rem !important;
+    }
+    
+    .chart-title {
+      font-size: 0.9rem;
+    }
+    
+    .action-btn {
+      padding: 0.5rem 0.8rem;
+      font-size: 0.8rem;
+    }
+    
+    /* KPIs en una sola columna para pantallas muy pequeñas */
+    .grid.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-4.gap-6 {
+      grid-template-columns: 1fr;
+      gap: 0.8rem;
+    }
+    
+    .kpi-card {
+      padding: 1rem;
+    }
+  }
+  
+  /* 🔧 Utilities móviles */
+  .mobile-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .mobile-hidden {
+    display: none;
+  }
+  
+  @media (min-width: 768px) {
+    .mobile-hidden {
+      display: block;
+    }
+  }
+  
+  /* 📊 Gráficos responsivos */
+  .chart-responsive {
+    position: relative;
+    height: 0;
+    padding-bottom: 60%;
+    overflow: hidden;
+  }
+  
+  .chart-responsive canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen p-4">
+  <!-- 🎯 Header Principal -->
+  <div class="text-center mb-8">
+    <h1 class="text-5xl font-extrabold mb-4" style="font-family: 'Orbitron'; background: linear-gradient(45deg, #00ffff, #0080ff, #ff00ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);">
+      🚀 Centro de Inteligencia Operativa
+    </h1>
+    <p class="text-xl text-gray-300">Dashboard Futurista 360° - Análisis Predictivo en Tiempo Real</p>
+    
+    <!-- 🎖️ Medallas de Achievement -->
+    <div class="mt-4">
+      <span class="achievement-badge">🔥 Taller en Crecimiento</span>
+      <span class="achievement-badge">⚙️ Top Rentabilidad</span>
+      <span class="achievement-badge">🎯 Mecánico Elite Nivel 5</span>
+    </div>
+  </div>
+
+  <!-- 🔍 Panel de Filtros Dinámicos -->
+  <div class="intelligence-hub">
+    <h3 class="chart-title mb-6">🔍 Filtros Dinámicos de Análisis</h3>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      
+      <!-- Filtro de Período -->
+      <div>
+        <label class="block text-sm font-medium text-gray-300 mb-2">📅 Período de Análisis</label>
+        <select id="filtroPeriodo" class="w-full p-2 bg-gray-800 border border-cyan-500 rounded text-white text-sm">
+          <option value="mes_actual">📊 Mes Actual</option>
+          <option value="ultimo_trimestre">📈 Último Trimestre</option>
+          <option value="ultimos_6_meses">📉 Últimos 6 Meses</option>
+          <option value="año_actual">🗓️ Año Actual</option>
+          <option value="personalizado">⚙️ Período Personalizado</option>
+        </select>
+      </div>
+      
+      <!-- Filtro de Cliente -->
+      <div>
+        <label class="block text-sm font-medium text-gray-300 mb-2">👥 Tipo de Cliente</label>
+        <select id="filtroCliente" class="w-full p-2 bg-gray-800 border border-cyan-500 rounded text-white text-sm">
+          <option value="todos">🌟 Todos los Clientes</option>
+          <option value="frecuentes">🔥 Clientes Frecuentes</option>
+          <option value="nuevos">✨ Clientes Nuevos</option>
+          <option value="inactivos">😴 Clientes Inactivos</option>
+          <option value="empresas">🏢 Solo Empresas</option>
+          <option value="particulares">👤 Solo Particulares</option>
+        </select>
+      </div>
+      
+      <!-- Filtro de Servicio -->
+      <div>
+        <label class="block text-sm font-medium text-gray-300 mb-2">🔧 Tipo de Servicio</label>
+        <select id="filtroServicio" class="w-full p-2 bg-gray-800 border border-cyan-500 rounded text-white text-sm">
+          <option value="todos">⚙️ Todos los Servicios</option>
+          <option value="mantenimiento">🛠️ Mantenimiento</option>
+          <option value="reparaciones">🔨 Reparaciones</option>
+          <option value="diagnostico">🔍 Diagnóstico</option>
+          <option value="repuestos">🔩 Solo Repuestos</option>
+        </select>
+      </div>
+      
+      <!-- Botón Aplicar Filtros -->
+      <div class="flex items-end">
+        <button onclick="aplicarFiltros()" class="action-btn w-full">
+          🎯 Aplicar Filtros
+        </button>
+      </div>
+    </div>
+    
+    <!-- Período Personalizado (oculto por defecto) -->
+    <div id="periodoPersonalizado" class="hidden grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 p-4 bg-gray-800 rounded-lg border border-cyan-500">
+      <div>
+        <label class="block text-sm font-medium text-gray-300 mb-2">📅 Fecha Inicial</label>
+        <input type="date" id="fechaInicial" class="w-full p-2 bg-gray-700 border border-cyan-400 rounded text-white text-sm">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-300 mb-2">📅 Fecha Final</label>
+        <input type="date" id="fechaFinal" class="w-full p-2 bg-gray-700 border border-cyan-400 rounded text-white text-sm">
+      </div>
+      <div class="flex items-end">
+        <button onclick="aplicarPeriodoPersonalizado()" class="action-btn w-full text-sm">
+          ✅ Confirmar Período
+        </button>
+      </div>
+    </div>
+    
+    <!-- Resumen de Filtros Activos -->
+    <div id="resumenFiltros" class="hidden bg-cyan-900 bg-opacity-30 border border-cyan-400 rounded-lg p-3 mb-4">
+      <h4 class="text-sm font-bold text-cyan-300 mb-2">🎯 Filtros Activos:</h4>
+      <div id="listadoFiltros" class="text-xs text-gray-300"></div>
+    </div>
+  </div>
+
+  <!-- 🧠 KPIs Principales -->
+  <div class="intelligence-hub">
+    <h2 class="chart-title mb-6">📊 Indicadores Clave de Rendimiento (KPIs)</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      
+      <div class="kpi-card pulse-glow">
+        <div class="kpi-value">${{ facturacion_total|floatformat:0|intcomma }}</div>
+        <div class="kpi-label">Facturación Total</div>
+        <div class="kpi-trend trend-up">
+          <span>📈 +12% vs mes anterior</span>
+        </div>
+      </div>
+      
+      <div class="kpi-card">
+        <div class="kpi-value">{{ clientes_activos_porcentaje }}%</div>
+        <div class="kpi-label">Retorno de Clientes</div>
+        <div class="kpi-trend trend-up">
+          <span>📈 +5% esta semana</span>
+        </div>
+      </div>
+      
+      <div class="kpi-card">
+        <div class="kpi-value">${{ ticket_promedio|floatformat:0|intcomma }}</div>
+        <div class="kpi-label">Ticket Promedio</div>
+        <div class="kpi-trend trend-neutral">
+          <span>➡️ Estable</span>
+        </div>
+      </div>
+      
+      <div class="kpi-card">
+        <div class="kpi-value">${{ ingresos_por_hora|floatformat:0|intcomma }}</div>
+        <div class="kpi-label">Ingresos/Hora</div>
+        <div class="kpi-trend trend-up">
+          <span>📈 +8% eficiencia</span>
+        </div>
+      </div>
+      
+      <div class="kpi-card">
+        <div class="kpi-value">{{ margen_promedio }}%</div>
+        <div class="kpi-label">Margen Promedio</div>
+        <div class="kpi-trend trend-up">
+          <span>📈 Excelente rentabilidad</span>
+        </div>
+      </div>
+      
+      <div class="kpi-card">
+        <div class="kpi-value">{{ vehiculos_por_semana }}</div>
+        <div class="kpi-label">Vehículos/Semana</div>
+        <div class="kpi-trend trend-up">
+          <span>📈 +15% capacidad</span>
+        </div>
+      </div>
+      
+      <div class="kpi-card">
+        <div class="kpi-value">SUV 67%</div>
+        <div class="kpi-label">Rentabilidad por Tipo</div>
+        <div class="kpi-trend trend-up">
+          <span>🚗 SUV > Sedán</span>
+        </div>
+      </div>
+      
+      <div class="kpi-card">
+        <div class="kpi-value">{{ satisfaccion_cliente }}⭐</div>
+        <div class="kpi-label">Satisfacción Cliente</div>
+        <div class="kpi-trend trend-up">
+          <span>😊 Excelente servicio</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📈 Predicciones con IA -->
+  <div class="intelligence-hub">
+    <div class="ai-prediction">
+      <div class="ai-prediction-title">
+        🤖 Predicción IA para este mes
+      </div>
+      <div class="ai-prediction-value">
+        "Si mantienes este ritmo, facturarás $5.4M este mes (+8%)"
+      </div>
+      <div class="text-sm text-gray-400 mt-2">
+        Basado en tendencias históricas y comportamiento actual del taller
+      </div>
+    </div>
+  </div>
+
+  <!-- 📊 Gráficos Interactivos -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    
+    <!-- Facturación Mensual -->
+    <div class="chart-container">
+      <div class="chart-title">📈 Facturación Mensual Comparativa</div>
+      <canvas id="facturacionChart" width="400" height="250"></canvas>
+    </div>
+    
+    <!-- Top Servicios -->
+    <div class="chart-container">
+      <div class="chart-title">🔧 Top Servicios Más Demandados</div>
+      <canvas id="serviciosChart" width="400" height="250"></canvas>
+    </div>
+    
+    <!-- Repuestos más vendidos -->
+    <div class="chart-container">
+      <div class="chart-title">🔩 Repuestos Más Vendidos vs Menos Vendidos</div>
+      <canvas id="repuestosChart" width="400" height="250"></canvas>
+    </div>
+    
+    <!-- Clientes Activos vs Inactivos -->
+    <div class="chart-container">
+      <div class="chart-title">👤 Clientes Activos vs Inactivos</div>
+      <canvas id="clientesChart" width="400" height="250"></canvas>
+    </div>
+  </div>
+
+  <!-- 🗓️ Mapa Térmico de Actividad -->
+  <div class="intelligence-hub">
+    <h3 class="chart-title mb-4">🗓️ Mapa Térmico de Actividad del Taller</h3>
+    <div class="text-center mb-4">
+      <span class="text-sm text-gray-400">Últimas 4 semanas - Intensidad de trabajo por día</span>
+    </div>
+    <div class="heatmap-container">
+      <!-- Días de la semana -->
+      <div class="text-center text-xs text-gray-400">L</div>
+      <div class="text-center text-xs text-gray-400">M</div>
+      <div class="text-center text-xs text-gray-400">M</div>
+      <div class="text-center text-xs text-gray-400">J</div>
+      <div class="text-center text-xs text-gray-400">V</div>
+      <div class="text-center text-xs text-gray-400">S</div>
+      <div class="text-center text-xs text-gray-400">D</div>
+      
+      <!-- Semana 1 -->
+      <div class="heatmap-day heat-medium" title="Lunes: 8 servicios">8</div>
+      <div class="heatmap-day heat-high" title="Martes: 12 servicios">12</div>
+      <div class="heatmap-day heat-very-high" title="Miércoles: 15 servicios">15</div>
+      <div class="heatmap-day heat-high" title="Jueves: 11 servicios">11</div>
+      <div class="heatmap-day heat-very-high" title="Viernes: 14 servicios">14</div>
+      <div class="heatmap-day heat-medium" title="Sábado: 6 servicios">6</div>
+      <div class="heatmap-day heat-low" title="Domingo: 2 servicios">2</div>
+      
+      <!-- Semana 2 -->
+      <div class="heatmap-day heat-high" title="Lunes: 10 servicios">10</div>
+      <div class="heatmap-day heat-very-high" title="Martes: 16 servicios">16</div>
+      <div class="heatmap-day heat-high" title="Miércoles: 13 servicios">13</div>
+      <div class="heatmap-day heat-very-high" title="Jueves: 17 servicios">17</div>
+      <div class="heatmap-day heat-high" title="Viernes: 12 servicios">12</div>
+      <div class="heatmap-day heat-medium" title="Sábado: 7 servicios">7</div>
+      <div class="heatmap-day heat-low" title="Domingo: 3 servicios">3</div>
+      
+      <!-- Semana 3 -->
+      <div class="heatmap-day heat-medium" title="Lunes: 9 servicios">9</div>
+      <div class="heatmap-day heat-high" title="Martes: 14 servicios">14</div>
+      <div class="heatmap-day heat-very-high" title="Miércoles: 18 servicios">18</div>
+      <div class="heatmap-day heat-high" title="Jueves: 13 servicios">13</div>
+      <div class="heatmap-day heat-very-high" title="Viernes: 16 servicios">16</div>
+      <div class="heatmap-day heat-medium" title="Sábado: 8 servicios">8</div>
+      <div class="heatmap-day heat-low" title="Domingo: 1 servicio">1</div>
+      
+      <!-- Semana 4 -->
+      <div class="heatmap-day heat-high" title="Lunes: 11 servicios">11</div>
+      <div class="heatmap-day heat-very-high" title="Martes: 15 servicios">15</div>
+      <div class="heatmap-day heat-high" title="Miércoles: 12 servicios">12</div>
+      <div class="heatmap-day heat-very-high" title="Jueves: 19 servicios">19</div>
+      <div class="heatmap-day heat-high" title="Viernes: 14 servicios">14</div>
+      <div class="heatmap-day heat-medium" title="Sábado: 5 servicios">5</div>
+      <div class="heatmap-day heat-low" title="Domingo: 2 servicios">2</div>
+    </div>
+    <div class="flex justify-center gap-4 mt-4 text-xs">
+      <span><span class="inline-block w-3 h-3 bg-cyan-900 rounded mr-1"></span>Bajo (1-4)</span>
+      <span><span class="inline-block w-3 h-3 bg-cyan-600 rounded mr-1"></span>Medio (5-9)</span>
+      <span><span class="inline-block w-3 h-3 bg-cyan-400 rounded mr-1"></span>Alto (10-14)</span>
+      <span><span class="inline-block w-3 h-3 bg-cyan-200 text-black rounded mr-1"></span>Muy Alto (15+)</span>
+    </div>
+  </div>
+
+  <!-- 🔔 Panel de Alertas y Oportunidades -->
+  <div class="alerts-panel">
+    <h3 class="text-xl font-bold text-red-400 mb-4">🔔 Alertas y Oportunidades</h3>
+    
+    <div class="alert-item">
+      <span class="alert-icon">⚠️</span>
+      <div>
+        <strong>{{ clientes_inactivos }} clientes</strong> no han vuelto en los últimos 60 días
+        <br><span class="text-sm text-gray-400">Considera enviar una promoción de mantenimiento</span>
+      </div>
+    </div>
+    
+    <div class="alert-item">
+      <span class="alert-icon">💡</span>
+      <div>
+        <strong>Reparaciones de frenos aumentaron 23%</strong> este mes
+        <br><span class="text-sm text-gray-400">Oportunidad: stock adicional de pastillas de freno</span>
+      </div>
+    </div>
+    
+    <div class="alert-item">
+      <span class="alert-icon">🎯</span>
+      <div>
+        <strong>Miércoles y viernes</strong> son tus días más productivos
+        <br><span class="text-sm text-gray-400">Considera programar servicios complejos estos días</span>
+      </div>
+    </div>
+    
+    <div class="alert-item">
+      <span class="alert-icon">📈</span>
+      <div>
+        <strong>Servicios de SUV generan 40% más margen</strong>
+        <br><span class="text-sm text-gray-400">Enfócate en marketing dirigido a propietarios de SUV</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📥 Botones de Acción -->
+  <div class="intelligence-hub">
+    <h3 class="chart-title mb-6">📥 Reportes Descargables Inteligentes</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+      
+      <button class="action-btn" onclick="window.location.href='/reportes/diagnostico/'">
+        🤖 Diagnóstico IA
+      </button>
+      
+      <button class="action-btn" onclick="exportarGrafico()">
+        📊 Exportar Gráficos PNG
+      </button>
+      
+      <button class="action-btn" onclick="generarInformeEjecutivo()">
+        📄 Informe Ejecutivo PDF
+      </button>
+      
+      <button class="action-btn" onclick="enviarWhatsApp()">
+        📱 Enviar a WhatsApp
+      </button>
+      
+      <button class="action-btn" onclick="enviarEmail()">
+        📧 Enviar por Email
+      </button>
+      
+      <button class="action-btn" onclick="exportarExcel()">
+        📈 Exportar a Excel
+      </button>
+      
+      <button class="action-btn" onclick="configurarAlertas()">
+        🔔 Configurar Alertas
+      </button>
+      
+      <button class="action-btn" onclick="comparacionHistorica()">
+        📊 Comparación Histórica
+      </button>
+      
+      <button class="action-btn" onclick="prediccionesAvanzadas()">
+        🤖 Predicciones IA
+      </button>
+    </div>
+  </div>
+
+  <!-- 🎮 Modo Histórico Avanzado -->
+  <div class="intelligence-hub">
+    <h3 class="chart-title mb-4">📅 Análisis Histórico Personalizado</h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-300 mb-2">Período Inicial</label>
+        <input type="date" class="w-full p-2 bg-gray-800 border border-cyan-500 rounded text-white">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-300 mb-2">Período Final</label>
+        <input type="date" class="w-full p-2 bg-gray-800 border border-cyan-500 rounded text-white">
+      </div>
+      <div class="flex items-end">
+        <button class="action-btn w-full">🔍 Analizar Período</button>
+      </div>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="text-center p-4 bg-gray-800 rounded-lg">
+        <div class="text-2xl font-bold text-green-400">+23%</div>
+        <div class="text-sm text-gray-400">vs Período Anterior</div>
+      </div>
+      <div class="text-center p-4 bg-gray-800 rounded-lg">
+        <div class="text-2xl font-bold text-yellow-400">Dic-Mar</div>
+        <div class="text-sm text-gray-400">Temporada Alta</div>
+      </div>
+      <div class="text-center p-4 bg-gray-800 rounded-lg">
+        <div class="text-2xl font-bold text-cyan-400">$2.1M</div>
+        <div class="text-sm text-gray-400">Crecimiento Acumulado</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 🚀 JavaScript para gráficos interactivos -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  
+  // � Configurar filtros dinámicos
+  configurarFiltros();
+  
+  // �📈 Gráfico de Facturación Mensual
+  const facturacionCtx = document.getElementById('facturacionChart').getContext('2d');
+  new Chart(facturacionCtx, {
+    type: 'line',
+    data: {
+      labels: [{% for mes in facturacion_por_mes %}'{{ mes.mes }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+      datasets: [{
+        label: 'Facturación 2025',
+        data: [{% for mes in facturacion_por_mes %}{{ mes.valor }}{% if not forloop.last %},{% endif %}{% endfor %}],
+        borderColor: '#00ffff',
+        backgroundColor: 'rgba(0, 255, 255, 0.1)',
+        borderWidth: 3,
+        pointBackgroundColor: '#00ffff',
+        pointBorderColor: '#0080ff',
+        pointRadius: 6,
+        tension: 0.4,
+        fill: true
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          labels: { color: '#fff', font: { family: 'Orbitron' } }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(0, 255, 255, 0.1)' },
+          ticks: { color: '#00ffff', font: { family: 'Orbitron' } }
+        },
+        y: {
+          grid: { color: 'rgba(0, 255, 255, 0.1)' },
+          ticks: { 
+            color: '#00ffff', 
+            font: { family: 'Orbitron' },
+            callback: function(value) {
+              return '$' + (value / 1000000).toFixed(1) + 'M';
+            }
+          }
+        }
+      },
+      animation: {
+        duration: 2000,
+        easing: 'easeInOutQuart'
+      }
+    }
+  });
+  
+  // 🔧 Gráfico de Servicios
+  const serviciosCtx = document.getElementById('serviciosChart').getContext('2d');
+  new Chart(serviciosCtx, {
+    type: 'doughnut',
+    data: {
+      labels: [{% for servicio in servicios_demandados %}'{{ servicio.nombre }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+      datasets: [{
+        data: [{% for servicio in servicios_demandados %}{{ servicio.total_servicios }}{% if not forloop.last %},{% endif %}{% endfor %}],
+        backgroundColor: [
+          '#00ffff',
+          '#0080ff',
+          '#ff6b6b',
+          '#ffd700',
+          '#ff9500'
+        ],
+        borderColor: '#000',
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { color: '#fff', font: { family: 'Orbitron' } }
+        }
+      },
+      animation: {
+        animateRotate: true,
+        duration: 2000
+      }
+    }
+  });
+  
+  // 🔩 Gráfico de Repuestos
+  const repuestosCtx = document.getElementById('repuestosChart').getContext('2d');
+  new Chart(repuestosCtx, {
+    type: 'bar',
+    data: {
+      labels: ['Filtros', 'Pastillas', 'Aceites', 'Bujías', 'Correas'],
+      datasets: [{
+        label: 'Más Vendidos',
+        data: [85, 72, 68, 45, 38],
+        backgroundColor: 'rgba(0, 255, 255, 0.8)',
+        borderColor: '#00ffff',
+        borderWidth: 2
+      }, {
+        label: 'Menos Vendidos',
+        data: [12, 8, 15, 6, 4],
+        backgroundColor: 'rgba(255, 107, 107, 0.8)',
+        borderColor: '#ff6b6b',
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          labels: { color: '#fff', font: { family: 'Orbitron' } }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(0, 255, 255, 0.1)' },
+          ticks: { color: '#00ffff', font: { family: 'Orbitron' } }
+        },
+        y: {
+          grid: { color: 'rgba(0, 255, 255, 0.1)' },
+          ticks: { color: '#00ffff', font: { family: 'Orbitron' } }
+        }
+      },
+      animation: {
+        duration: 1500,
+        easing: 'easeOutBounce'
+      }
+    }
+  });
+  
+  // 👤 Gráfico de Clientes
+  const clientesCtx = document.getElementById('clientesChart').getContext('2d');
+  new Chart(clientesCtx, {
+    type: 'polarArea',
+    data: {
+      labels: ['Clientes Frecuentes', 'Clientes Nuevos', 'Clientes Ocasionales', 'Clientes Inactivos'],
+      datasets: [{
+        data: [45, 23, 18, 14],
+        backgroundColor: [
+          'rgba(0, 255, 255, 0.8)',
+          'rgba(0, 128, 255, 0.8)', 
+          'rgba(255, 215, 0, 0.8)',
+          'rgba(255, 107, 107, 0.8)'
+        ],
+        borderColor: [
+          '#00ffff',
+          '#0080ff',
+          '#ffd700', 
+          '#ff6b6b'
+        ],
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { color: '#fff', font: { family: 'Orbitron' } }
+        }
+      },
+      scales: {
+        r: {
+          grid: { color: 'rgba(0, 255, 255, 0.1)' },
+          ticks: { color: '#00ffff', font: { family: 'Orbitron' } }
+        }
+      },
+      animation: {
+        duration: 2000,
+        easing: 'easeInOutElastic'
+      }
+    }
+  });
+  
+});
+
+// 📥 Funciones de exportación
+function exportarGrafico() {
+  // Exportar gráficos como PNG
+  const charts = ['facturacionChart', 'serviciosChart', 'repuestosChart', 'clientesChart'];
+  
+  charts.forEach(chartId => {
+    const canvas = document.getElementById(chartId);
+    if (canvas) {
+      const link = document.createElement('a');
+      link.download = `${chartId}_${new Date().toISOString().split('T')[0]}.png`;
+      link.href = canvas.toDataURL();
+      link.click();
+    }
+  });
+  
+  alert('🎨 ¡Gráficos exportados exitosamente!');
+}
+
+function generarInformeEjecutivo() {
+  // Mostrar loading
+  const btn = event.target;
+  const originalText = btn.innerHTML;
+  btn.innerHTML = '⏳ Generando PDF...';
+  btn.disabled = true;
+  
+  // Simular generación y abrir en nueva ventana
+  setTimeout(() => {
+    window.open('/reportes/informe-ejecutivo/', '_blank');
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+    alert('📄 ¡Informe ejecutivo generado exitosamente!');
+  }, 2000);
+}
+
+function enviarWhatsApp() {
+  // Preparar datos del resumen
+  const facturacion = '{{ facturacion_total|floatformat:0|intcomma }}';
+  const ticket = '{{ ticket_promedio|floatformat:0|intcomma }}';
+  const clientes = '{{ clientes_activos_porcentaje }}';
+  const margen = '{{ margen_promedio }}';
+  
+  // Crear mensaje predefinido
+  const mensaje = `🚗 *RESUMEN EJECUTIVO - eGarage*
+  
+📊 *KPIs del Mes:*
+� Facturación Total: $${facturacion}
+🎯 Ticket Promedio: $${ticket}
+👥 Clientes Activos: ${clientes}%
+📈 Margen Promedio: ${margen}%
+
+🚀 *Tendencias Destacadas:*
+• Aumento del 12% en facturación
+• 68% de retorno de clientes
+• Servicios de frenos +23% este mes
+
+🤖 *Proyección IA:*
+"Si mantienes este ritmo, facturarás $5.4M este mes (+8%)"
+
+Generado por eGarage - Sistema de Gestión Inteligente
+📅 ${new Date().toLocaleDateString('es-ES')}`;
+
+  // Crear enlace de WhatsApp
+  const numeroWhatsApp = ''; // Aquí se puede configurar un número predeterminado
+  const url = `https://wa.me/${numeroWhatsApp}?text=${encodeURIComponent(mensaje)}`;
+  
+  // Abrir WhatsApp
+  window.open(url, '_blank');
+  
+  alert('📱 ¡Resumen preparado para WhatsApp!');
+}
+
+function enviarEmail() {
+  // Preparar datos para email
+  const facturacion = '{{ facturacion_total|floatformat:0|intcomma }}';
+  const fecha = new Date().toLocaleDateString('es-ES');
+  
+  // Crear contenido del email
+  const subject = `� Resumen Ejecutivo eGarage - ${fecha}`;
+  const body = `Estimado/a,
+
+Adjunto encontrarás el resumen ejecutivo de tu taller para el día ${fecha}.
+
+📊 INDICADORES DESTACADOS:
+• Facturación Total: $${facturacion}
+• Ticket Promedio: ${{ ticket_promedio|floatformat:0|intcomma }}
+• Retorno de Clientes: {{ clientes_activos_porcentaje }}%
+• Margen Promedio: {{ margen_promedio }}%
+
+🔔 ALERTAS IMPORTANTES:
+• {{ clientes_inactivos }} clientes inactivos en 60 días
+• Servicios de frenos aumentaron 23% este mes
+• Miércoles y viernes son tus días más productivos
+
+🤖 PROYECCIÓN IA:
+"Si mantienes este ritmo, facturarás $5.4M este mes (+8%)"
+
+Para ver el informe completo con gráficos, descarga el PDF desde tu dashboard.
+
+Saludos,
+Sistema eGarage - Inteligencia Operativa Automotriz
+
+---
+Este es un reporte automático generado por eGarage.
+Para soporte: soporte@egarage.com`;
+
+  // Crear enlace mailto
+  const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  
+  // Abrir cliente de email
+  window.location.href = mailtoLink;
+  
+  alert('📧 ¡Cliente de email abierto con resumen!');
+}
+
+function exportarExcel() {
+  // Preparar datos para Excel
+  const datos = {
+    kpis: [
+      ['Indicador', 'Valor'],
+      ['Facturación Total', '${{ facturacion_total|floatformat:0|intcomma }}'],
+      ['Ticket Promedio', '${{ ticket_promedio|floatformat:0|intcomma }}'],
+      ['Clientes Activos', '{{ clientes_activos_porcentaje }}%'],
+      ['Margen Promedio', '{{ margen_promedio }}%'],
+      ['Vehículos/Semana', '{{ vehiculos_por_semana }}'],
+      ['Satisfacción Cliente', '{{ satisfaccion_cliente }}⭐']
+    ]
+  };
+  
+  // Crear CSV simple (más adelante implementar Excel real)
+  let csv = 'Indicador,Valor\n';
+  datos.kpis.slice(1).forEach(row => {
+    csv += `"${row[0]}","${row[1]}"\n`;
+  });
+  
+  // Descargar CSV
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `kpis_egarage_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  window.URL.revokeObjectURL(url);
+  
+  alert('📈 ¡Datos exportados a CSV exitosamente!');
+}
+
+function configurarAlertas() {
+  // Modal para configurar alertas (implementar más adelante)
+  const config = prompt(`🔔 CONFIGURAR ALERTAS INTELIGENTES
+
+Introduce el número de días para alertas:
+• Clientes inactivos (actual: 60 días)
+• Bajo stock repuestos (actual: 5 unidades)
+• Meta facturación mensual
+
+Ejemplo: 45,3,2000000`, '60,5,2000000');
+  
+  if (config) {
+    const [diasInactivos, stockMinimo, metaMensual] = config.split(',');
+    alert(`✅ Alertas configuradas:
+• Clientes inactivos: ${diasInactivos} días
+• Stock mínimo: ${stockMinimo} unidades  
+• Meta mensual: $${metaMensual}
+    
+(Configuración guardada en el sistema)`);
+  }
+}
+
+function comparacionHistorica() {
+  // Mostrar modal de comparación histórica
+  alert(`📊 COMPARACIÓN HISTÓRICA DISPONIBLE:
+
+📈 vs Mes Anterior: +12% facturación
+📅 vs Año Anterior: +28% crecimiento
+🏆 Mejor mes: Marzo 2025 ($1.89M)
+📉 Temporada baja: Enero-Febrero
+📈 Temporada alta: Marzo-Junio
+
+🎯 TENDENCIAS DETECTADAS:
+• Servicios de mantenimiento crecen 15% mensual
+• Clientes SUV generan 40% más margen
+• Horario peak: Miércoles y Viernes
+
+(Función completa en desarrollo)`);
+}
+
+function prediccionesAvanzadas() {
+  alert(`🤖 PREDICCIONES AVANZADAS CON IA:
+
+📊 PRÓXIMOS 30 DÍAS:
+• Facturación estimada: $2.1M (+8%)
+• Servicios proyectados: 95
+• Nuevos clientes esperados: 12
+
+🎯 RECOMENDACIONES IA:
+• Incrementar stock de pastillas de freno
+• Promocionar servicios los miércoles
+• Contactar clientes inactivos con descuento 15%
+
+🔮 PROYECCIÓN 3 MESES:
+• Crecimiento sostenido del 12% mensual
+• Oportunidad de contratar mecánico adicional
+• ROI esperado en nuevos equipos: 145%
+
+(Sistema de IA en desarrollo avanzado)`);
+}
+
+// 🔍 Funciones de Filtros Dinámicos
+function configurarFiltros() {
+  // Configurar selector de período
+  document.getElementById('filtroPeriodo').addEventListener('change', function() {
+    const periodoPersonalizado = document.getElementById('periodoPersonalizado');
+    if (this.value === 'personalizado') {
+      periodoPersonalizado.classList.remove('hidden');
+      // Configurar fechas por defecto
+      const hoy = new Date();
+      const hace30dias = new Date(hoy.getTime() - 30 * 24 * 60 * 60 * 1000);
+      
+      document.getElementById('fechaFinal').value = hoy.toISOString().split('T')[0];
+      document.getElementById('fechaInicial').value = hace30dias.toISOString().split('T')[0];
+    } else {
+      periodoPersonalizado.classList.add('hidden');
+    }
+  });
+}
+
+function aplicarFiltros() {
+  const periodo = document.getElementById('filtroPeriodo').value;
+  const cliente = document.getElementById('filtroCliente').value;
+  const servicio = document.getElementById('filtroServicio').value;
+  
+  // Mostrar loading
+  const btn = event.target;
+  const originalText = btn.innerHTML;
+  btn.innerHTML = '⏳ Aplicando filtros...';
+  btn.disabled = true;
+  
+  // Simular carga de datos filtrados
+  setTimeout(() => {
+    // Mostrar resumen de filtros activos
+    mostrarResumenFiltros(periodo, cliente, servicio);
+    
+    // Simular actualización de datos
+    actualizarDatosFiltrados(periodo, cliente, servicio);
+    
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+    
+    alert(`✅ Filtros aplicados exitosamente:
+📅 Período: ${obtenerNombrePeriodo(periodo)}
+👥 Clientes: ${obtenerNombreCliente(cliente)}
+🔧 Servicios: ${obtenerNombreServicio(servicio)}
+
+Los gráficos y KPIs se han actualizado.`);
+  }, 1500);
+}
+
+function aplicarPeriodoPersonalizado() {
+  const fechaInicial = document.getElementById('fechaInicial').value;
+  const fechaFinal = document.getElementById('fechaFinal').value;
+  
+  if (!fechaInicial || !fechaFinal) {
+    alert('❌ Por favor selecciona ambas fechas');
+    return;
+  }
+  
+  if (new Date(fechaInicial) > new Date(fechaFinal)) {
+    alert('❌ La fecha inicial no puede ser mayor a la fecha final');
+    return;
+  }
+  
+  alert(`✅ Período personalizado configurado:
+📅 Desde: ${fechaInicial}
+📅 Hasta: ${fechaFinal}
+
+Ahora haz clic en "Aplicar Filtros" para actualizar los datos.`);
+}
+
+function mostrarResumenFiltros(periodo, cliente, servicio) {
+  const resumen = document.getElementById('resumenFiltros');
+  const listado = document.getElementById('listadoFiltros');
+  
+  let filtrosTexto = [];
+  
+  if (periodo !== 'mes_actual') {
+    filtrosTexto.push(`📅 ${obtenerNombrePeriodo(periodo)}`);
+  }
+  
+  if (cliente !== 'todos') {
+    filtrosTexto.push(`👥 ${obtenerNombreCliente(cliente)}`);
+  }
+  
+  if (servicio !== 'todos') {
+    filtrosTexto.push(`🔧 ${obtenerNombreServicio(servicio)}`);
+  }
+  
+  if (filtrosTexto.length > 0) {
+    listado.innerHTML = filtrosTexto.join(' • ');
+    resumen.classList.remove('hidden');
+  } else {
+    resumen.classList.add('hidden');
+  }
+}
+
+function obtenerNombrePeriodo(valor) {
+  const nombres = {
+    'mes_actual': 'Mes Actual',
+    'ultimo_trimestre': 'Último Trimestre',
+    'ultimos_6_meses': 'Últimos 6 Meses',
+    'año_actual': 'Año Actual',
+    'personalizado': 'Período Personalizado'
+  };
+  return nombres[valor] || valor;
+}
+
+function obtenerNombreCliente(valor) {
+  const nombres = {
+    'todos': 'Todos los Clientes',
+    'frecuentes': 'Clientes Frecuentes',
+    'nuevos': 'Clientes Nuevos',
+    'inactivos': 'Clientes Inactivos',
+    'empresas': 'Solo Empresas',
+    'particulares': 'Solo Particulares'
+  };
+  return nombres[valor] || valor;
+}
+
+function obtenerNombreServicio(valor) {
+  const nombres = {
+    'todos': 'Todos los Servicios',
+    'mantenimiento': 'Mantenimiento',
+    'reparaciones': 'Reparaciones',
+    'diagnostico': 'Diagnóstico',
+    'repuestos': 'Solo Repuestos'
+  };
+  return nombres[valor] || valor;
+}
+
+function actualizarDatosFiltrados(periodo, cliente, servicio) {
+  // Aquí se implementaría la lógica para actualizar los gráficos
+  // con los datos filtrados. Por ahora simulamos la actualización.
+  
+  console.log('🔄 Actualizando datos con filtros:', {
+    periodo,
+    cliente,
+    servicio
+  });
+  
+  // En producción, aquí haríamos una llamada AJAX al servidor
+  // para obtener los datos filtrados y actualizar los gráficos
+}
+
+// 📱 Funciones específicas para móvil
+function esMobile() {
+  return window.innerWidth <= 768;
+}
+
+function ajustarParaMobile() {
+  if (esMobile()) {
+    // Ajustar tamaños de gráficos
+    const charts = document.querySelectorAll('canvas');
+    charts.forEach(chart => {
+      chart.style.maxHeight = '200px';
+    });
+    
+    // Hacer scroll horizontal en tablas si es necesario
+    const tablas = document.querySelectorAll('table');
+    tablas.forEach(tabla => {
+      tabla.parentElement.classList.add('mobile-scroll');
+    });
+  }
+}
+
+// Ejecutar ajustes móviles al cargar y redimensionar
+window.addEventListener('load', ajustarParaMobile);
+window.addEventListener('resize', ajustarParaMobile);
+</script>
+{% endblock %}

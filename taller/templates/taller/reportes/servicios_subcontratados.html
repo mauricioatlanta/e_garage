@@ -1,0 +1,1632 @@
+{% extends "taller/base.html" %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}🔧 Servicios Subcontratados{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+<style>
+    /* Variables de tema IA futurista */
+    :root {
+        --ai-primary: #00ff88;
+        --ai-secondary: #0066ff;
+        --ai-accent: #ff0080;
+        --ai-glow: #00ffff;
+        --neural-bg: #0a0a0f;
+        --matrix-green: #39ff14;
+        --cyber-purple: #b347d9;
+        --hologram-blue: #00d4ff;
+        --quantum-orange: #ff6b35;
+    }
+
+    /* Fondo con efecto de neural network */
+    body {
+        background: radial-gradient(ellipse at center, #0a0a0f 0%, #000000 100%);
+        position: relative;
+        overflow-x: hidden;
+    }
+
+    /* Canvas de partículas de fondo */
+    #particles-js {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+    }
+
+    /* Efecto de matriz animada */
+    .neural-grid {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: 
+            linear-gradient(rgba(0, 255, 136, 0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0, 255, 136, 0.1) 1px, transparent 1px);
+        background-size: 20px 20px;
+        animation: neural-pulse 4s ease-in-out infinite;
+        z-index: -1;
+        pointer-events: none;
+    }
+
+    @keyframes neural-pulse {
+        0%, 100% { opacity: 0.3; }
+        50% { opacity: 0.6; }
+    }
+
+    /* Contenedor principal con efecto holográfico */
+    .ai-container {
+        background: linear-gradient(135deg, 
+            rgba(0, 255, 136, 0.05) 0%, 
+            rgba(0, 102, 255, 0.05) 50%, 
+            rgba(255, 0, 128, 0.05) 100%);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(0, 255, 136, 0.2);
+        border-radius: 20px;
+        padding: 30px;
+        margin: 20px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 
+            0 0 50px rgba(0, 255, 136, 0.1),
+            inset 0 0 50px rgba(0, 255, 136, 0.05);
+    }
+
+    .ai-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, 
+            transparent, 
+            rgba(0, 255, 136, 0.1), 
+            transparent);
+        animation: ai-scan 3s infinite;
+    }
+
+    @keyframes ai-scan {
+        0% { left: -100%; }
+        100% { left: 100%; }
+    }
+
+    /* Título con efecto de IA */
+    .ai-title {
+        font-family: 'Orbitron', monospace;
+        font-size: 2.5rem;
+        font-weight: 900;
+        text-align: center;
+        background: linear-gradient(45deg, 
+            var(--ai-primary), 
+            var(--ai-secondary), 
+            var(--ai-accent), 
+            var(--ai-glow));
+        background-size: 400% 400%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: ai-gradient 3s ease infinite;
+        text-shadow: 0 0 30px rgba(0, 255, 136, 0.5);
+        margin-bottom: 10px;
+    }
+
+    @keyframes ai-gradient {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+
+    .ai-subtitle {
+        color: rgba(0, 255, 136, 0.8);
+        text-align: center;
+        font-size: 1.1rem;
+        margin-bottom: 30px;
+        animation: glow-pulse 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow-pulse {
+        0% { text-shadow: 0 0 5px rgba(0, 255, 136, 0.5); }
+        100% { text-shadow: 0 0 20px rgba(0, 255, 136, 0.8); }
+    }
+
+    /* Tarjetas de datos con IA */
+    .ai-data-card {
+        background: linear-gradient(135deg, 
+            rgba(0, 255, 136, 0.1) 0%, 
+            rgba(0, 102, 255, 0.1) 100%);
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(0, 255, 136, 0.3);
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 20px;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .ai-data-card:hover {
+        transform: translateY(-5px) scale(1.02);
+        box-shadow: 
+            0 20px 40px rgba(0, 255, 136, 0.2),
+            0 0 50px rgba(0, 255, 136, 0.1);
+        border-color: var(--ai-glow);
+    }
+
+    .ai-data-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, 
+            var(--ai-primary), 
+            var(--ai-glow), 
+            var(--ai-accent));
+        animation: data-flow 2s ease infinite;
+    }
+
+    @keyframes data-flow {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+    }
+
+    /* Gráficos mejorados con IA */
+    .ai-chart-container {
+        background: linear-gradient(135deg, 
+            rgba(255, 255, 255, 0.95) 0%, 
+            rgba(240, 248, 255, 0.95) 100%);
+        border: 2px solid rgba(0, 255, 136, 0.3);
+        border-radius: 20px;
+        padding: 30px;
+        margin-bottom: 25px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 
+            0 15px 35px rgba(0, 0, 0, 0.1),
+            0 0 25px rgba(0, 255, 136, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .ai-chart-container:hover {
+        transform: translateY(-3px);
+        box-shadow: 
+            0 25px 50px rgba(0, 0, 0, 0.15),
+            0 0 40px rgba(0, 255, 136, 0.2);
+    }
+
+    .ai-chart-title {
+        font-family: 'Orbitron', monospace;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        text-align: center;
+        margin-bottom: 20px;
+        background: linear-gradient(45deg, #1a1a1a, var(--ai-secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* Navegación futurista mejorada */
+    .ai-nav {
+        background: linear-gradient(135deg, 
+            rgba(0, 0, 0, 0.9) 0%, 
+            rgba(0, 255, 136, 0.1) 100%);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(0, 255, 136, 0.3);
+        padding: 15px 0;
+        position: relative;
+    }
+
+    .ai-nav-btn {
+        background: linear-gradient(135deg, 
+            rgba(0, 255, 136, 0.2) 0%, 
+            rgba(0, 102, 255, 0.2) 100%);
+        border: 1px solid rgba(0, 255, 136, 0.4);
+        color: var(--ai-primary);
+        padding: 10px 20px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        margin: 0 5px;
+    }
+
+    .ai-nav-btn:hover {
+        transform: translateY(-2px);
+        background: linear-gradient(135deg, 
+            rgba(0, 255, 136, 0.4) 0%, 
+            rgba(0, 102, 255, 0.4) 100%);
+        box-shadow: 0 10px 25px rgba(0, 255, 136, 0.3);
+        color: white;
+        text-decoration: none;
+    }
+
+    /* Badges con efecto AI */
+    .ai-badge {
+        background: linear-gradient(45deg, var(--ai-primary), var(--ai-glow));
+        color: #000;
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 5px 15px rgba(0, 255, 136, 0.3);
+        animation: badge-pulse 2s ease infinite;
+        display: inline-block;
+        margin: 2px;
+    }
+
+    @keyframes badge-pulse {
+        0%, 100% { 
+            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.3);
+            transform: scale(1);
+        }
+        50% { 
+            box-shadow: 0 8px 25px rgba(0, 255, 136, 0.5);
+            transform: scale(1.05);
+        }
+    }
+
+    .ai-badge-success {
+        background: linear-gradient(45deg, var(--matrix-green), #00ff44);
+    }
+
+    .ai-badge-warning {
+        background: linear-gradient(45deg, var(--quantum-orange), #ffaa00);
+    }
+
+    .ai-badge-info {
+        background: linear-gradient(45deg, var(--hologram-blue), #0088ff);
+    }
+
+    /* Tabla futurista mejorada */
+    .ai-table {
+        background: rgba(0, 0, 0, 0.8);
+        border-radius: 15px;
+        overflow: hidden;
+        border: 1px solid rgba(0, 255, 136, 0.3);
+    }
+
+    .ai-table thead th {
+        background: linear-gradient(135deg, 
+            rgba(0, 255, 136, 0.2) 0%, 
+            rgba(0, 102, 255, 0.2) 100%);
+        color: var(--ai-primary);
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 1px;
+        padding: 15px;
+        border: none;
+    }
+
+    .ai-table tbody tr {
+        border-bottom: 1px solid rgba(0, 255, 136, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .ai-table tbody tr:hover {
+        background: rgba(0, 255, 136, 0.1);
+        transform: scale(1.01);
+    }
+
+    .ai-table tbody td {
+        color: rgba(255, 255, 255, 0.9);
+        padding: 12px 15px;
+        border: none;
+    }
+
+    /* Efectos de carga AI */
+    .ai-loading {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 2px solid rgba(0, 255, 136, 0.3);
+        border-radius: 50%;
+        border-top-color: var(--ai-primary);
+        animation: ai-spin 1s ease-in-out infinite;
+    }
+
+    @keyframes ai-spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* Responsive mejorado */
+    @media (max-width: 768px) {
+        .ai-container { margin: 10px; padding: 20px; }
+        .ai-title { font-size: 2rem; }
+        .ai-nav-btn { margin: 2px; padding: 8px 15px; }
+    }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+{% endblock %}
+
+    /* Animaciones futuristas */
+    @keyframes pulse-neon {
+        0% { box-shadow: 0 0 5px var(--accent-cyan), 0 0 10px var(--accent-cyan), 0 0 15px var(--accent-cyan); }
+        50% { box-shadow: 0 0 10px var(--accent-cyan), 0 0 20px var(--accent-cyan), 0 0 30px var(--accent-cyan); }
+        100% { box-shadow: 0 0 5px var(--accent-cyan), 0 0 10px var(--accent-cyan), 0 0 15px var(--accent-cyan); }
+    }
+
+    @keyframes data-flow {
+        0% { transform: translateX(-100%); opacity: 0; }
+        50% { opacity: 1; }
+        100% { transform: translateX(100%); opacity: 0; }
+    }
+
+    @keyframes hologram {
+        0% { opacity: 0.8; }
+        50% { opacity: 1; }
+        100% { opacity: 0.8; }
+    }
+
+    /* Efecto de matrix en el fondo */
+    .matrix-bg::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: 
+            linear-gradient(90deg, transparent 98%, rgba(0, 212, 255, 0.1) 100%),
+            linear-gradient(0deg, transparent 98%, rgba(139, 92, 246, 0.1) 100%);
+        background-size: 20px 20px;
+        animation: matrix-scroll 20s linear infinite;
+        pointer-events: none;
+    }
+
+    @keyframes matrix-scroll {
+        0% { background-position: 0 0; }
+        100% { background-position: 20px 20px; }
+    }
+
+    .frequency-card {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 50%, #581c87 100%);
+        color: var(--text-primary);
+        border-radius: 20px;
+        padding: 24px;
+        margin-bottom: 15px;
+        box-shadow: 
+            0 12px 40px rgba(0, 0, 0, 0.4),
+            0 0 0 1px rgba(59, 130, 246, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1),
+            0 0 20px rgba(0, 212, 255, 0.1);
+        border: 2px solid rgba(59, 130, 246, 0.4);
+        backdrop-filter: blur(15px);
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .frequency-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+        animation: data-flow 3s infinite;
+    }
+
+    .frequency-card:hover {
+        transform: translateY(-5px);
+        animation: pulse-neon 2s infinite;
+    }
+    
+    .provider-card {
+        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 50%, #991b1b 100%);
+        color: var(--text-primary);
+        border-radius: 20px;
+        padding: 24px;
+        margin-bottom: 15px;
+        box-shadow: 
+            0 12px 40px rgba(0, 0, 0, 0.4),
+            0 0 0 1px rgba(239, 68, 68, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1),
+            0 0 20px rgba(239, 68, 68, 0.1);
+        border: 2px solid rgba(239, 68, 68, 0.4);
+        backdrop-filter: blur(15px);
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .provider-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #ff6b6b, transparent);
+        animation: data-flow 3s infinite 1s;
+    }
+
+    .provider-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 
+            0 16px 50px rgba(0, 0, 0, 0.5),
+            0 0 30px rgba(239, 68, 68, 0.3);
+    }
+    
+    .chart-container {
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        color: #1f2937;
+        border-radius: 20px;
+        padding: 28px;
+        box-shadow: 
+            0 25px 50px -12px rgba(0, 0, 0, 0.15),
+            0 0 0 1px rgba(0, 212, 255, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        margin-bottom: 20px;
+        border: 2px solid rgba(0, 212, 255, 0.2);
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        animation: hologram 4s infinite;
+    }
+    
+    .chart-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--tech-blue), var(--accent-cyan), var(--accent-purple));
+        animation: data-flow 4s infinite;
+    }
+
+    .chart-container::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: 
+            radial-gradient(circle at 20% 80%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+        pointer-events: none;
+    }
+
+    .chart-container:hover {
+        transform: translateY(-3px);
+        box-shadow: 
+            0 35px 60px -12px rgba(0, 0, 0, 0.2),
+            0 0 30px rgba(0, 212, 255, 0.2);
+    }
+    
+    .chart-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+    }
+    
+    .stats-badge {
+        background: linear-gradient(135deg, rgba(0, 212, 255, 0.3), rgba(139, 92, 246, 0.3));
+        color: var(--text-primary);
+        padding: 8px 14px;
+        border-radius: 25px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        margin: 3px;
+        display: inline-block;
+        border: 1.5px solid rgba(0, 212, 255, 0.5);
+        backdrop-filter: blur(8px);
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        box-shadow: 
+            0 4px 15px rgba(0, 0, 0, 0.2),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stats-badge::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .stats-badge:hover::before {
+        left: 100%;
+    }
+    
+    .chart-canvas {
+        max-height: 320px !important;
+        height: 320px !important;
+        filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+    }
+    
+    .small-chart {
+        max-height: 280px !important;
+        height: 280px !important;
+        filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+    }
+
+    /* Mejoras para tablas con alto contraste */
+    .table-dark-theme {
+        background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid rgba(0, 212, 255, 0.2);
+    }
+    
+    .table-dark-theme thead th {
+        background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+        color: var(--text-primary);
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        padding: 16px 12px;
+        border: none;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+    
+    .table-dark-theme tbody td {
+        background: rgba(31, 41, 55, 0.8);
+        color: var(--text-secondary);
+        padding: 12px;
+        border: 1px solid rgba(75, 85, 99, 0.3);
+        font-size: 0.875rem;
+    }
+    
+    .table-dark-theme tbody tr:hover td {
+        background: rgba(55, 65, 81, 0.8);
+        color: var(--text-primary);
+    }
+
+    /* Badges mejorados */
+    .badge-futuristic {
+        background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+        color: var(--text-primary);
+        font-weight: 700;
+        padding: 6px 12px;
+        border-radius: 15px;
+        font-size: 0.75rem;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        box-shadow: 
+            0 3px 6px rgba(0, 0, 0, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(0, 212, 255, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .badge-futuristic:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 15px rgba(0, 212, 255, 0.6);
+    }
+
+    .badge-success-futuristic {
+        background: linear-gradient(135deg, var(--accent-green), #059669);
+        color: var(--text-primary);
+        font-weight: 700;
+        padding: 6px 12px;
+        border-radius: 15px;
+        font-size: 0.75rem;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        box-shadow: 
+            0 3px 6px rgba(0, 0, 0, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .badge-success-futuristic:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 15px rgba(16, 185, 129, 0.6);
+    }
+
+    .badge-warning-futuristic {
+        background: linear-gradient(135deg, var(--accent-yellow), #d97706);
+        color: var(--text-primary);
+        font-weight: 700;
+        padding: 6px 12px;
+        border-radius: 15px;
+        font-size: 0.75rem;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        box-shadow: 
+            0 3px 6px rgba(0, 0, 0, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(245, 158, 11, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .badge-warning-futuristic:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 15px rgba(245, 158, 11, 0.6);
+    }
+
+    /* Efectos de glow para elementos importantes */
+    .glow-effect {
+        box-shadow: 
+            0 0 5px rgba(0, 212, 255, 0.3),
+            0 0 10px rgba(0, 212, 255, 0.2),
+            0 0 15px rgba(0, 212, 255, 0.1);
+    }
+
+    /* Mejoras de contraste para texto */
+    .high-contrast-text {
+        color: var(--text-primary);
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        font-weight: 600;
+    }
+
+    .secondary-contrast-text {
+        color: var(--text-secondary);
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Canvas de partículas neurales -->
+<div id="particles-js"></div>
+
+<!-- Grid neural de fondo -->
+<div class="neural-grid"></div>
+
+<!-- Contenedor principal AI -->
+<div class="ai-container">
+    <!-- Título principal futurista -->
+    <h1 class="ai-title">🔧 SISTEMA AI - SERVICIOS SUBCONTRATADOS</h1>
+    <p class="ai-subtitle">🤖 Análisis Inteligente de Patrones y Tendencias de Servicios Externos</p>
+
+    <!-- Navegación AI -->
+    <div class="text-center mb-4">
+        <a href="{% url 'reportes_dashboard' %}" class="ai-nav-btn">🏠 Dashboard</a>
+        <a href="{% url 'reportes_rentabilidad' %}" class="ai-nav-btn">📈 Rentabilidad</a>
+        <a href="{% url 'reporte_comparativo_precios' %}" class="ai-nav-btn">💰 Precios</a>
+        <a href="{% url 'dashboard_rentabilidad' %}" class="ai-nav-btn">📊 Analytics</a>
+    </div>
+
+    <!-- Tarjetas de datos AI -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="ai-data-card">
+                <h5 style="color: var(--ai-primary); font-family: 'Orbitron', monospace; font-weight: 700; margin-bottom: 20px;">
+                    🚀 SERVICIOS MÁS FRECUENTES
+                </h5>
+                {% for servicio in servicios_frecuentes|slice:":5" %}
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span style="color: rgba(255,255,255,0.9); font-weight: 600;">{{ servicio.nombre_servicio|truncatechars:25 }}</span>
+                    <div>
+                        <span class="ai-badge">{{ servicio.frecuencia }} veces</span>
+                        <span class="ai-badge-success">{{ servicio.volumen_total|formatear_pesos }}</span>
+                    </div>
+                </div>
+                {% empty %}
+                <p style="color: rgba(255,255,255,0.6);">🔍 No hay servicios subcontratados registrados</p>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="ai-data-card">
+                <h5 style="color: var(--ai-accent); font-family: 'Orbitron', monospace; font-weight: 700; margin-bottom: 20px;">
+                    🤝 PROVEEDORES ESTRATÉGICOS
+                </h5>
+                {% for proveedor in proveedores_frecuentes|slice:":5" %}
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span style="color: rgba(255,255,255,0.9); font-weight: 600;">{{ proveedor.empresa_externa|truncatechars:20 }}</span>
+                    <div>
+                        <span class="ai-badge-info">{{ proveedor.servicios_realizados }} servicios</span>
+                        <span class="ai-badge-warning">{{ proveedor.volumen_total|formatear_pesos }}</span>
+                    </div>
+                </div>
+                {% empty %}
+                <p style="color: rgba(255,255,255,0.6);">🔍 No hay proveedores registrados</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficos AI avanzados -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="ai-chart-container">
+                <h5 class="ai-chart-title">📈 IA PREDICTIVA - TENDENCIA DE CANTIDAD</h5>
+                <canvas id="chartTendenciaCantidad" style="height: 300px !important;"></canvas>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="ai-chart-container">
+                <h5 class="ai-chart-title">💎 IA FINANCIERA - TENDENCIA DE VOLUMEN</h5>
+                <canvas id="chartTendenciaVolumen" style="height: 300px !important;"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráfico principal AI -->
+    <div class="ai-chart-container">
+        <h5 class="ai-chart-title">🎯 ALGORITMO DE ANÁLISIS - FRECUENCIA DE SERVICIOS</h5>
+        <canvas id="chartServiciosFrecuentes" style="height: 400px !important;"></canvas>
+    </div>
+
+    <!-- Tabla de análisis AI -->
+    <div class="ai-data-card">
+        <h5 style="color: var(--ai-glow); font-family: 'Orbitron', monospace; font-weight: 700; margin-bottom: 20px;">
+            👥 ANÁLISIS DE CLIENTES - SERVICIOS EXTERNOS
+        </h5>
+        <div class="table-responsive">
+            <table class="ai-table table">
+                <thead>
+                    <tr>
+                        <th>CLIENTE</th>
+                        <th>SERVICIOS</th>
+                        <th>GASTO TOTAL</th>
+                        <th>ESTADO AI</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cliente in clientes_externos %}
+                    <tr>
+                        <td style="font-weight: 600;">{{ cliente.nombre_completo }}</td>
+                        <td><span class="ai-badge-warning">{{ cliente.servicios_externos }}</span></td>
+                        <td><span class="ai-badge-success">{{ cliente.gasto_total|formatear_pesos }}</span></td>
+                        <td>
+                            {% if cliente.servicios_externos >= 10 %}
+                                <span class="ai-badge">VIP</span>
+                            {% elif cliente.servicios_externos >= 5 %}
+                                <span class="ai-badge-info">ACTIVO</span>
+                            {% else %}
+                                <span class="ai-badge-warning">REGULAR</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: rgba(255,255,255,0.6);">🔍 No hay datos de clientes externos</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+// Inicializar partículas neurales
+particlesJS('particles-js', {
+    particles: {
+        number: { value: 80, density: { enable: true, value_area: 800 } },
+        color: { value: '#00ff88' },
+        shape: { type: 'circle' },
+        opacity: { value: 0.5, random: false },
+        size: { value: 3, random: true },
+        line_linked: {
+            enable: true,
+            distance: 150,
+            color: '#00ff88',
+            opacity: 0.4,
+            width: 1
+        },
+        move: {
+            enable: true,
+            speed: 6,
+            direction: 'none',
+            random: false,
+            straight: false,
+            out_mode: 'out',
+            bounce: false
+        }
+    },
+    interactivity: {
+        detect_on: 'canvas',
+        events: {
+            onhover: { enable: true, mode: 'repulse' },
+            onclick: { enable: true, mode: 'push' },
+            resize: true
+        }
+    },
+    retina_detect: true
+});
+
+// Configuración global de Chart.js para IA
+Chart.defaults.font.family = "'Orbitron', monospace";
+Chart.defaults.color = '#1a1a1a';
+Chart.defaults.maintainAspectRatio = false;
+
+// Paleta de colores AI
+const aiColors = [
+    'rgba(0, 255, 136, 0.8)',    // AI Primary
+    'rgba(0, 102, 255, 0.8)',    // AI Secondary  
+    'rgba(255, 0, 128, 0.8)',    // AI Accent
+    'rgba(0, 255, 255, 0.8)',    // AI Glow
+    'rgba(57, 255, 20, 0.8)',    // Matrix Green
+    'rgba(179, 71, 217, 0.8)',   // Cyber Purple
+    'rgba(0, 212, 255, 0.8)',    // Hologram Blue
+    'rgba(255, 107, 53, 0.8)',   // Quantum Orange
+    'rgba(255, 20, 147, 0.8)',   // Deep Pink
+    'rgba(50, 205, 50, 0.8)',    // Lime Green
+    'rgba(138, 43, 226, 0.8)',   // Blue Violet
+    'rgba(0, 191, 255, 0.8)',    // Deep Sky Blue
+    'rgba(255, 140, 0, 0.8)',    // Dark Orange
+    'rgba(148, 0, 211, 0.8)',    // Dark Violet
+    'rgba(0, 255, 127, 0.8)'     // Spring Green
+];
+
+// Gráfico de Tendencia Cantidad - IA Enhanced
+const ctxCantidad = document.getElementById('chartTendenciaCantidad').getContext('2d');
+
+// Crear gradiente para el área
+const gradientCantidad = ctxCantidad.createLinearGradient(0, 0, 0, 400);
+gradientCantidad.addColorStop(0, 'rgba(0, 255, 136, 0.4)');
+gradientCantidad.addColorStop(1, 'rgba(0, 255, 136, 0.05)');
+
+new Chart(ctxCantidad, {
+    type: 'line',
+    data: {
+        labels: [{% for mes in tendencia_meses %}'{{ mes }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+        datasets: [{
+            label: 'Predicción AI - Cantidad',
+            data: [{% for cantidad in tendencia_cantidades %}{{ cantidad }}{% if not forloop.last %},{% endif %}{% endfor %}],
+            borderColor: '#00ff88',
+            backgroundColor: gradientCantidad,
+            fill: true,
+            tension: 0.4,
+            borderWidth: 4,
+            pointBackgroundColor: '#00ffff',
+            pointBorderColor: '#000000',
+            pointBorderWidth: 3,
+            pointRadius: 8,
+            pointHoverRadius: 12,
+            pointHoverBackgroundColor: '#ff0080',
+            pointHoverBorderColor: '#ffffff',
+            pointHoverBorderWidth: 4,
+            shadowOffsetX: 3,
+            shadowOffsetY: 3,
+            shadowBlur: 10,
+            shadowColor: 'rgba(0, 255, 136, 0.3)'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: true,
+                labels: {
+                    color: '#1a1a1a',
+                    font: { size: 14, weight: 'bold', family: "'Orbitron', monospace" },
+                    usePointStyle: true
+                }
+            },
+            tooltip: {
+                backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                titleColor: '#00ff88',
+                bodyColor: '#ffffff',
+                borderColor: '#00ffff',
+                borderWidth: 2,
+                cornerRadius: 10,
+                titleFont: { size: 14, weight: 'bold' },
+                bodyFont: { size: 12 },
+                callbacks: {
+                    title: function() { return '🤖 Análisis AI'; },
+                    label: function(context) {
+                        return `📊 Cantidad: ${context.parsed.y} servicios`;
+                    }
+                }
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    stepSize: 1,
+                    color: '#374151',
+                    font: { weight: 'bold', size: 12 }
+                },
+                grid: {
+                    color: 'rgba(0, 255, 136, 0.2)',
+                    borderDash: [5, 5]
+                }
+            },
+            x: {
+                ticks: {
+                    color: '#374151',
+                    font: { weight: 'bold', size: 12 }
+                },
+                grid: {
+                    color: 'rgba(0, 255, 136, 0.2)',
+                    borderDash: [5, 5]
+                }
+            }
+        },
+        animation: {
+            duration: 2000,
+            easing: 'easeOutCubic'
+        }
+    }
+});
+
+// Gráfico de Tendencia Volumen - IA Enhanced
+const ctxVolumen = document.getElementById('chartTendenciaVolumen').getContext('2d');
+
+const gradientVolumen = ctxVolumen.createLinearGradient(0, 0, 0, 400);
+gradientVolumen.addColorStop(0, 'rgba(0, 102, 255, 0.4)');
+gradientVolumen.addColorStop(1, 'rgba(0, 102, 255, 0.05)');
+
+new Chart(ctxVolumen, {
+    type: 'line',
+    data: {
+        labels: [{% for mes in tendencia_meses %}'{{ mes }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+        datasets: [{
+            label: 'Predicción AI - Volumen ($)',
+            data: [{% for volumen in tendencia_volumenes %}{{ volumen }}{% if not forloop.last %},{% endif %}{% endfor %}],
+            borderColor: '#0066ff',
+            backgroundColor: gradientVolumen,
+            fill: true,
+            tension: 0.4,
+            borderWidth: 4,
+            pointBackgroundColor: '#ff0080',
+            pointBorderColor: '#000000',
+            pointBorderWidth: 3,
+            pointRadius: 8,
+            pointHoverRadius: 12,
+            pointHoverBackgroundColor: '#00ffff',
+            pointHoverBorderColor: '#ffffff',
+            pointHoverBorderWidth: 4
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: true,
+                labels: {
+                    color: '#1a1a1a',
+                    font: { size: 14, weight: 'bold', family: "'Orbitron', monospace" },
+                    usePointStyle: true
+                }
+            },
+            tooltip: {
+                backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                titleColor: '#0066ff',
+                bodyColor: '#ffffff',
+                borderColor: '#ff0080',
+                borderWidth: 2,
+                cornerRadius: 10,
+                callbacks: {
+                    title: function() { return '💎 Análisis Financiero AI'; },
+                    label: function(context) {
+                        return `💰 Volumen: $${context.parsed.y.toLocaleString()}`;
+                    }
+                }
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    color: '#374151',
+                    font: { weight: 'bold', size: 12 },
+                    callback: function(value) {
+                        return '$' + value.toLocaleString();
+                    }
+                },
+                grid: {
+                    color: 'rgba(0, 102, 255, 0.2)',
+                    borderDash: [5, 5]
+                }
+            },
+            x: {
+                ticks: {
+                    color: '#374151',
+                    font: { weight: 'bold', size: 12 }
+                },
+                grid: {
+                    color: 'rgba(0, 102, 255, 0.2)',
+                    borderDash: [5, 5]
+                }
+            }
+        },
+        animation: {
+            duration: 2000,
+            easing: 'easeOutCubic'
+        }
+    }
+});
+
+// Gráfico Principal - Servicios Frecuentes AI
+const ctxFrecuentes = document.getElementById('chartServiciosFrecuentes').getContext('2d');
+
+new Chart(ctxFrecuentes, {
+    type: 'bar',
+    data: {
+        labels: [{% for servicio in servicios_frecuentes %}'{{ servicio.nombre_servicio|truncatechars:25 }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+        datasets: [{
+            label: 'Frecuencia Analizada por IA',
+            data: [{% for servicio in servicios_frecuentes %}{{ servicio.frecuencia }}{% if not forloop.last %},{% endif %}{% endfor %}],
+            backgroundColor: function(context) {
+                const index = context.dataIndex;
+                return aiColors[index % aiColors.length];
+            },
+            borderColor: '#000000',
+            borderWidth: 2,
+            borderRadius: 10,
+            borderSkipped: false,
+            hoverBackgroundColor: function(context) {
+                return '#00ffff';
+            },
+            hoverBorderColor: '#ffffff',
+            hoverBorderWidth: 4
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        indexAxis: 'y',
+        plugins: {
+            legend: {
+                display: true,
+                labels: {
+                    color: '#1a1a1a',
+                    font: { size: 14, weight: 'bold', family: "'Orbitron', monospace" }
+                }
+            },
+            tooltip: {
+                backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                titleColor: '#00ff88',
+                bodyColor: '#ffffff',
+                borderColor: '#ff0080',
+                borderWidth: 2,
+                cornerRadius: 10,
+                callbacks: {
+                    title: function(context) {
+                        return `🎯 ${context[0].label}`;
+                    },
+                    label: function(context) {
+                        return `🔢 Frecuencia: ${context.parsed.x} veces`;
+                    }
+                }
+            }
+        },
+        scales: {
+            x: {
+                beginAtZero: true,
+                ticks: {
+                    stepSize: 1,
+                    color: '#374151',
+                    font: { weight: 'bold', size: 12 }
+                },
+                grid: {
+                    color: 'rgba(0, 255, 136, 0.2)',
+                    borderDash: [5, 5]
+                }
+            },
+            y: {
+                ticks: {
+                    color: '#374151',
+                    font: { weight: 'bold', size: 11 }
+                },
+                grid: {
+                    display: false
+                }
+            }
+        },
+        animation: {
+            duration: 2500,
+            easing: 'easeOutElastic'
+        }
+    }
+});
+</script>
+{% endblock %}
+    <!-- Navegación horizontal inteligente -->
+    <div class="bg-gradient-to-r from-gray-900 via-black to-gray-900 border-b border-cyan-400/40 shadow-2xl relative overflow-hidden">
+        <!-- Efecto de partículas de fondo -->
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-cyan-500/20 via-transparent to-purple-500/20 animate-pulse"></div>
+        </div>
+        
+        <div class="container-fluid px-4 py-3 relative z-10">
+            <div class="flex items-center justify-between">
+                <!-- Logo/Título -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-4 h-4 bg-gradient-to-br from-cyan-400 to-purple-500 rounded-md flex items-center justify-center shadow-lg border border-cyan-300/20">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-2.5 w-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                    </div>
+                    <h1 class="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">🔧 Servicios Subcontratados</h1>
+                </div>
+                
+                <!-- Navegación horizontal -->
+                <div class="flex items-center space-x-2">
+                    <a href="{% url 'reportes_dashboard' %}" class="px-3 py-2 rounded-xl bg-gradient-to-r from-cyan-600/30 to-purple-600/30 hover:from-cyan-500/50 hover:to-purple-500/50 border border-cyan-400/40 hover:border-cyan-300/60 transition-all duration-300 group backdrop-blur-sm relative overflow-hidden" title="Dashboard Principal">
+                        <div class="absolute inset-0 bg-gradient-to-r from-cyan-400/10 to-purple-400/10 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500"></div>
+                        <div class="flex items-center space-x-2 relative z-10">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-cyan-300 group-hover:text-cyan-200 transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v3H8V5z" />
+                            </svg>
+                            <span class="text-sm text-cyan-300 group-hover:text-cyan-200 hidden md:inline font-medium">Dashboard</span>
+                        </div>
+                    </a>
+                    
+                    <a href="{% url 'reportes_rentabilidad' %}" class="px-3 py-2 rounded-xl bg-gradient-to-r from-green-600/30 to-emerald-600/30 hover:from-green-500/50 hover:to-emerald-500/50 border border-green-400/40 hover:border-green-300/60 transition-all duration-300 group backdrop-blur-sm relative overflow-hidden" title="Análisis Rentabilidad">
+                        <div class="absolute inset-0 bg-gradient-to-r from-green-400/10 to-emerald-400/10 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500"></div>
+                        <div class="flex items-center space-x-2 relative z-10">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-300 group-hover:text-green-200 transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                            </svg>
+                            <span class="text-sm text-green-300 group-hover:text-green-200 hidden lg:inline font-medium">Rentabilidad</span>
+                        </div>
+                    </a>
+                    
+                    <a href="{% url 'reporte_comparativo_precios' %}" class="px-3 py-2 rounded-xl bg-gradient-to-r from-yellow-600/30 to-orange-600/30 hover:from-yellow-500/50 hover:to-orange-500/50 border border-yellow-400/40 hover:border-yellow-300/60 transition-all duration-300 group backdrop-blur-sm relative overflow-hidden" title="Comparativo Precios">
+                        <div class="absolute inset-0 bg-gradient-to-r from-yellow-400/10 to-orange-400/10 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500"></div>
+                        <div class="flex items-center space-x-2 relative z-10">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-yellow-300 group-hover:text-yellow-200 transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                            </svg>
+                            <span class="text-sm text-yellow-300 group-hover:text-yellow-200 hidden xl:inline font-medium">Precios</span>
+                        </div>
+                    </a>
+                    
+                    <a href="{% url 'dashboard_rentabilidad' %}" class="px-3 py-2 rounded-xl bg-gradient-to-r from-purple-600/30 to-pink-600/30 hover:from-purple-500/50 hover:to-pink-500/50 border border-purple-400/40 hover:border-purple-300/60 transition-all duration-300 group backdrop-blur-sm relative overflow-hidden" title="Dashboard Rentabilidad">
+                        <div class="absolute inset-0 bg-gradient-to-r from-purple-400/10 to-pink-400/10 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500"></div>
+                        <div class="flex items-center space-x-2 relative z-10">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-purple-300 group-hover:text-purple-200 transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                            <span class="text-sm text-purple-300 group-hover:text-purple-200 hidden xl:inline font-medium">Analytics</span>
+                        </div>
+                    </a>
+
+                    <!-- Indicador activo -->
+                    <div class="px-3 py-2 rounded-xl bg-gradient-to-r from-blue-600/40 to-indigo-600/40 border border-blue-300/50 backdrop-blur-sm relative">
+                        <div class="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-indigo-400/20 rounded-xl animate-pulse"></div>
+                        <div class="flex items-center space-x-2 relative z-10">
+                            <div class="w-2 h-2 bg-blue-400 rounded-full animate-pulse shadow-lg"></div>
+                            <span class="text-sm text-blue-300 hidden sm:inline font-medium">Activo</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenido principal -->
+    <div class="container-fluid p-4">
+        <!-- Subtítulo con información adicional -->
+        <div class="mb-4">
+            <p class="text-gray-400 text-sm">� Análisis detallado de servicios externos más frecuentes y tendencias de rentabilidad</p>
+        </div>
+
+    <!-- Servicios Más Frecuentes -->
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <div class="frequency-card glow-effect">
+                <h5 class="text-sm font-bold mb-3 high-contrast-text"><i class="fas fa-chart-bar"></i> Servicios Más Frecuentes</h5>
+                {% for servicio in servicios_frecuentes|slice:":5" %}
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-sm high-contrast-text">{{ servicio.nombre_servicio|truncatechars:25 }}</span>
+                    <div>
+                        <span class="stats-badge">{{ servicio.frecuencia }} veces</span>
+                        <span class="stats-badge">{{ servicio.volumen_total|formatear_pesos }}</span>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-sm secondary-contrast-text">No hay servicios subcontratados registrados</p>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="provider-card glow-effect">
+                <h5 class="text-sm font-bold mb-3 high-contrast-text"><i class="fas fa-handshake"></i> Proveedores Más Activos</h5>
+                {% for proveedor in proveedores_frecuentes|slice:":5" %}
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-sm high-contrast-text">{{ proveedor.empresa_externa|truncatechars:20 }}</span>
+                    <div>
+                        <span class="stats-badge">{{ proveedor.servicios_realizados }} servicios</span>
+                        <span class="stats-badge">{{ proveedor.volumen_total|formatear_pesos }}</span>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-sm secondary-contrast-text">No hay proveedores registrados</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficos de Tendencias -->
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <div class="chart-container">
+                <h5 class="text-sm font-semibold mb-2">📈 Tendencia Mensual - Cantidad de Servicios</h5>
+                <canvas id="chartTendenciaCantidad" class="small-chart"></canvas>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="chart-container">
+                <h5 class="text-sm font-semibold mb-2">💰 Tendencia Mensual - Volumen de Facturación</h5>
+                <canvas id="chartTendenciaVolumen" class="small-chart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráfico de Servicios Frecuentes -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="chart-container">
+                <h5 class="text-sm font-semibold mb-2">🔧 Top 15 Servicios Subcontratados por Frecuencia</h5>
+                <canvas id="chartServiciosFrecuentes" class="chart-canvas"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tablas Detalladas -->
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <div class="chart-container glow-effect">
+                <h5 class="text-lg font-bold mb-4 text-gray-900">🏆 Ranking Completo de Servicios</h5>
+                <div class="table-responsive">
+                    <table class="table table-dark-theme">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Servicio</th>
+                                <th>Frecuencia</th>
+                                <th>Volumen</th>
+                                <th>Ganancia</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for servicio in servicios_frecuentes %}
+                            <tr>
+                                <td class="font-bold">{{ forloop.counter }}</td>
+                                <td>{{ servicio.nombre_servicio|truncatechars:30 }}</td>
+                                <td><span class="badge-futuristic">{{ servicio.frecuencia }}</span></td>
+                                <td class="font-semibold">{{ servicio.volumen_total|formatear_pesos }}</td>
+                                <td><span class="badge-success-futuristic">{{ servicio.ganancia_total|formatear_pesos }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="chart-container glow-effect">
+                <h5 class="text-lg font-bold mb-4 text-gray-900">🏢 Detalle de Proveedores</h5>
+                <div class="table-responsive">
+                    <table class="table table-dark-theme">
+                        <thead>
+                            <tr>
+                                <th>Proveedor</th>
+                                <th>Servicios</th>
+                                <th>Tipos</th>
+                                <th>Volumen</th>
+                                <th>Ganancia</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for proveedor in proveedores_frecuentes %}
+                            <tr>
+                                <td class="font-semibold">{{ proveedor.empresa_externa|truncatechars:20 }}</td>
+                                <td><span class="badge-futuristic">{{ proveedor.servicios_realizados }}</span></td>
+                                <td><span class="badge-warning-futuristic">{{ proveedor.tipos_servicios }}</span></td>
+                                <td class="font-semibold">{{ proveedor.volumen_total|formatear_pesos }}</td>
+                                <td><span class="badge-success-futuristic">{{ proveedor.ganancia_generada|formatear_pesos }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Análisis por Vehículo y Cliente -->
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <div class="chart-container glow-effect">
+                <h5 class="text-lg font-bold mb-4 text-gray-900">🚗 Servicios Externos por Tipo de Vehículo</h5>
+                <div class="table-responsive">
+                    <table class="table table-dark-theme">
+                        <thead>
+                            <tr>
+                                <th>Marca/Modelo</th>
+                                <th>Servicios</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for vehiculo in vehiculos_servicios %}
+                            <tr>
+                                <td class="font-semibold">{{ vehiculo.documento__vehiculo__marca__nombre }} {{ vehiculo.documento__vehiculo__modelo__nombre }}</td>
+                                <td><span class="badge-futuristic">{{ vehiculo.cantidad }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="chart-container glow-effect">
+                <h5 class="text-lg font-bold mb-4 text-gray-900">👥 Clientes que Más Usan Servicios Externos</h5>
+                <div class="table-responsive">
+                    <table class="table table-dark-theme">
+                        <thead>
+                            <tr>
+                                <th>Cliente</th>
+                                <th>Servicios</th>
+                                <th>Gasto Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cliente in clientes_externos %}
+                            <tr>
+                                <td class="font-semibold">{{ cliente.nombre_completo }}</td>
+                                <td><span class="badge-warning-futuristic">{{ cliente.servicios_externos }}</span></td>
+                                <td><span class="badge-success-futuristic">{{ cliente.gasto_total|formatear_pesos }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Configuración global para gráficos futuristas
+Chart.defaults.maintainAspectRatio = false;
+Chart.defaults.font.family = "'Inter', 'system-ui', sans-serif";
+Chart.defaults.color = '#374151';
+
+// Paleta de colores futurista
+const futuristicColors = [
+    'rgba(0, 212, 255, 0.8)',
+    'rgba(139, 92, 246, 0.8)',
+    'rgba(16, 185, 129, 0.8)',
+    'rgba(245, 158, 11, 0.8)',
+    'rgba(239, 68, 68, 0.8)',
+    'rgba(99, 102, 241, 0.8)',
+    'rgba(236, 72, 153, 0.8)',
+    'rgba(14, 165, 233, 0.8)',
+    'rgba(168, 85, 247, 0.8)',
+    'rgba(34, 197, 94, 0.8)',
+    'rgba(251, 146, 60, 0.8)',
+    'rgba(248, 113, 113, 0.8)',
+    'rgba(129, 140, 248, 0.8)',
+    'rgba(244, 114, 182, 0.8)',
+    'rgba(56, 189, 248, 0.8)'
+];
+
+// Gráfico de Tendencia - Cantidad
+const ctxCantidad = document.getElementById('chartTendenciaCantidad').getContext('2d');
+new Chart(ctxCantidad, {
+    type: 'line',
+    data: {
+        labels: [{% for mes in tendencia_meses %}'{{ mes }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+        datasets: [{
+            label: 'Cantidad de Servicios',
+            data: [{% for cantidad in tendencia_cantidades %}{{ cantidad }}{% if not forloop.last %},{% endif %}{% endfor %}],
+            borderColor: '#00d4ff',
+            backgroundColor: 'rgba(0, 212, 255, 0.1)',
+            fill: true,
+            tension: 0.4,
+            borderWidth: 3,
+            pointBackgroundColor: '#00d4ff',
+            pointBorderColor: '#ffffff',
+            pointBorderWidth: 2,
+            pointRadius: 6,
+            pointHoverRadius: 8,
+            pointHoverBackgroundColor: '#8b5cf6',
+            pointHoverBorderColor: '#ffffff',
+            pointHoverBorderWidth: 3
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    stepSize: 1,
+                    color: '#6b7280',
+                    font: {
+                        weight: 600
+                    }
+                },
+                grid: {
+                    color: 'rgba(107, 114, 128, 0.2)',
+                    borderDash: [5, 5]
+                }
+            },
+            x: {
+                ticks: {
+                    color: '#6b7280',
+                    font: {
+                        weight: 600
+                    }
+                },
+                grid: {
+                    color: 'rgba(107, 114, 128, 0.2)',
+                    borderDash: [5, 5]
+                }
+            }
+        }
+    }
+});
+
+// Gráfico de Tendencia - Volumen
+const ctxVolumen = document.getElementById('chartTendenciaVolumen').getContext('2d');
+new Chart(ctxVolumen, {
+    type: 'line',
+    data: {
+        labels: [{% for mes in tendencia_meses %}'{{ mes }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+        datasets: [{
+            label: 'Volumen de Facturación ($)',
+            data: [{% for volumen in tendencia_volumenes %}{{ volumen }}{% if not forloop.last %},{% endif %}{% endfor %}],
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            fill: true,
+            tension: 0.4,
+            borderWidth: 3,
+            pointBackgroundColor: '#10b981',
+            pointBorderColor: '#ffffff',
+            pointBorderWidth: 2,
+            pointRadius: 6,
+            pointHoverRadius: 8,
+            pointHoverBackgroundColor: '#f59e0b',
+            pointHoverBorderColor: '#ffffff',
+            pointHoverBorderWidth: 3
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
+            },
+            tooltip: {
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                titleColor: '#ffffff',
+                bodyColor: '#e5e7eb',
+                borderColor: '#00d4ff',
+                borderWidth: 1,
+                cornerRadius: 8,
+                displayColors: false,
+                callbacks: {
+                    label: function(context) {
+                        return 'Volumen: $' + context.parsed.y.toLocaleString();
+                    }
+                }
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    color: '#6b7280',
+                    font: {
+                        weight: 600
+                    },
+                    callback: function(value) {
+                        return '$' + value.toLocaleString();
+                    }
+                },
+                grid: {
+                    color: 'rgba(107, 114, 128, 0.2)',
+                    borderDash: [5, 5]
+                }
+            },
+            x: {
+                ticks: {
+                    color: '#6b7280',
+                    font: {
+                        weight: 600
+                    }
+                },
+                grid: {
+                    color: 'rgba(107, 114, 128, 0.2)',
+                    borderDash: [5, 5]
+                }
+            }
+        }
+    }
+});
+
+// Gráfico de Servicios Frecuentes
+const ctxFrecuentes = document.getElementById('chartServiciosFrecuentes').getContext('2d');
+new Chart(ctxFrecuentes, {
+    type: 'bar',
+    data: {
+        labels: [{% for servicio in servicios_frecuentes %}'{{ servicio.nombre_servicio|truncatechars:25 }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+        datasets: [{
+            label: 'Frecuencia',
+            data: [{% for servicio in servicios_frecuentes %}{{ servicio.frecuencia }}{% if not forloop.last %},{% endif %}{% endfor %}],
+            backgroundColor: futuristicColors,
+            borderColor: '#ffffff',
+            borderWidth: 2,
+            borderRadius: 8,
+            borderSkipped: false,
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        indexAxis: 'y',
+        plugins: {
+            legend: {
+                display: false
+            },
+            tooltip: {
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                titleColor: '#ffffff',
+                bodyColor: '#e5e7eb',
+                borderColor: '#00d4ff',
+                borderWidth: 1,
+                cornerRadius: 8,
+                displayColors: false,
+            }
+        },
+        scales: {
+            x: {
+                beginAtZero: true,
+                ticks: {
+                    stepSize: 1,
+                    color: '#6b7280',
+                    font: {
+                        weight: 600
+                    }
+                },
+                grid: {
+                    color: 'rgba(107, 114, 128, 0.2)',
+                    borderDash: [5, 5]
+                }
+            },
+            y: {
+                ticks: {
+                    color: '#6b7280',
+                    font: {
+                        weight: 600,
+                        size: 11
+                    }
+                },
+                grid: {
+                    display: false
+                }
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

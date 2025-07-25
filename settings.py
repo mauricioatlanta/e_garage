@@ -1,3 +1,5 @@
+# Configuración para django.contrib.sites
+SITE_ID = 1
 import os
 from pathlib import Path
 from django.core.management.utils import get_random_secret_key
@@ -32,7 +34,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # Allauth y dependencias
+    'django.contrib.sites',
+    
+    # Allauth y dependencias
+    'allauth', 
+    'allauth.account', 
+    'allauth.socialaccount', 
 ]
+
+# Configuración de sitios para allauth
+SITE_ID = 1
 
 # 🧱 Middleware
 MIDDLEWARE = [
@@ -41,8 +54,11 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'taller.middleware.verificar_suscripcion.VerificarSuscripcionMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'taller.middleware.empresa_middleware.EmpresaMiddleware',
+    'taller.middleware.suscripcion.SuscripcionMiddleware',
 ]
 
 # 🌐 URLs
@@ -81,11 +97,14 @@ DATABASES = {
 }
 
 # 🌍 Internacionalización
+
 LANGUAGE_CODE = 'es-cl'
 TIME_ZONE = 'America/Santiago'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
+THOUSAND_SEPARATOR = '.'
+USE_THOUSAND_SEPARATOR = True
 
 # 📁 Archivos estáticos y media
 STATIC_URL = '/static/'
@@ -100,9 +119,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 APPEND_SLASH = True
 
 # ✅ Redirecciones de autenticación
-LOGIN_URL = '/accounts/login/'
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = 'login'
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/dashboard/'
+LOGOUT_REDIRECT_URL = '/'
 
 # 🐞 Para desarrollo (solo cuando DEBUG es True)
 if DEBUG:
@@ -127,9 +146,6 @@ LOGGING = {
     },
 }
 
-# ✅ Redirecciones de autenticación
-LOGIN_URL = '/accounts/login/'
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = 'login'
+
 
 

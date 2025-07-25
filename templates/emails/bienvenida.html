@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenido a eGarage</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px 30px;
+        }
+        
+        .welcome-message {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            color: #555;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 16px;
+            margin: 20px 0;
+            transition: transform 0.3s ease;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .info-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 4px;
+        }
+        
+        .footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+            font-size: 14px;
+        }
+        
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 10px;
+        }
+        
+        .social-links {
+            margin-top: 20px;
+        }
+        
+        .social-links a {
+            display: inline-block;
+            margin: 0 10px;
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        @media (max-width: 600px) {
+            .content {
+                padding: 20px 15px;
+            }
+            
+            .header {
+                padding: 30px 15px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">🚗 eGarage</div>
+            <h1>¡Bienvenido a eGarage!</h1>
+            <p>Tu plataforma de gestión automotriz</p>
+        </div>
+        
+        <!-- Content -->
+        <div class="content">
+            <div class="welcome-message">
+                <p>Hola <strong>{{ first_name }}</strong>,</p>
+                
+                <p>¡Nos alegra darte la bienvenida a <strong>eGarage</strong>! Has dado el primer paso para revolucionar la gestión de tu taller mecánico.</p>
+                
+                <p>Para completar tu registro y activar tu cuenta, necesitas hacer clic en el siguiente botón:</p>
+            </div>
+            
+            <!-- CTA Button -->
+            <div style="text-align: center;">
+                <a href="{{ enlace }}" class="cta-button">
+                    🔓 Activar mi cuenta
+                </a>
+            </div>
+            
+            <!-- Info Box -->
+            <div class="info-box">
+                <h3>🎯 ¿Qué puedes hacer con eGarage?</h3>
+                <ul>
+                    <li><strong>Gestionar clientes y vehículos</strong> de forma inteligente</li>
+                    <li><strong>Crear documentos y cotizaciones</strong> profesionales</li>
+                    <li><strong>Controlar inventario</strong> de repuestos</li>
+                    <li><strong>Analizar reportes</strong> con inteligencia artificial</li>
+                    <li><strong>Administrar citas y servicios</strong> eficientemente</li>
+                </ul>
+            </div>
+            
+            <div class="welcome-message">
+                <p><strong>Datos de tu cuenta:</strong></p>
+                <ul>
+                    <li>Usuario: <strong>{{ usuario.username }}</strong></li>
+                    <li>Email: <strong>{{ usuario.email }}</strong></li>
+                </ul>
+                
+                <p>Si no solicitaste esta cuenta o tienes alguna pregunta, puedes contactarnos respondiendo a este email.</p>
+                
+                <p>¡Esperamos que disfrutes usando eGarage!</p>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>eGarage</strong> - Gestión Inteligente para Talleres Mecánicos</p>
+            <p>© 2025 eGarage. Todos los derechos reservados.</p>
+            
+            <div class="social-links">
+                <a href="mailto:contacto@atlantareciclajes.cl">📧 Contacto</a>
+                <a href="#">🌐 Sitio Web</a>
+                <a href="#">📱 Soporte</a>
+            </div>
+            
+            <p style="margin-top: 20px; font-size: 12px; opacity: 0.7;">
+                Este correo fue enviado a {{ usuario.email }}.<br>
+                Si no deseas recibir estos correos, puedes darte de baja en tu perfil.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

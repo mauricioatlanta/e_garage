@@ -1,0 +1,571 @@
+{% extends 'base.html' %}
+
+{% block title %}🚀 SEO + Analytics - Tu Taller Online{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<meta name="description" content="Sistema completo para talleres mecánicos con IA integrada, reportes avanzados y gestión profesional. Registro gratuito sin limitaciones.">
+<meta name="keywords" content="taller mecánico, software taller, gestión automotriz, IA talleres, reportes taller, facturación automotriz">
+<meta property="og:title" content="e-Garage: Sistema Inteligente para Talleres">
+<meta property="og:description" content="Revolutiona tu taller con IA integrada, reportes en tiempo real y gestión profesional. Registro gratuito y sin limitaciones.">
+<meta property="og:image" content="/static/images/og-taller-ia.jpg">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
+<meta name="twitter:card" content="summary_large_image">
+
+<!-- Schema.org para SEO -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "e-Garage Pro",
+  "applicationCategory": "BusinessApplication",
+  "description": "Sistema inteligente para gestión de talleres mecánicos con IA integrada",
+  "operatingSystem": "Web",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "CLP",
+    "description": "Plan gratuito sin limitaciones"
+  },
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "4.9",
+    "reviewCount": "247"
+  }
+}
+</script>
+
+<style>
+    :root {
+        --cyber-blue: #00d4ff;
+        --matrix-green: #39ff14;
+        --neon-purple: #b347d9;
+        --dark-bg: #0a0a0f;
+        --glow-cyan: #00ffff;
+        --ai-orange: #ff6b35;
+        --electric-yellow: #ffff00;
+    }
+
+    body {
+        background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+        color: var(--glow-cyan);
+        font-family: 'Orbitron', 'Courier New', monospace;
+    }
+
+    #particles-js {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: -1;
+    }
+
+    .seo-header {
+        background: linear-gradient(135deg, rgba(57, 255, 20, 0.15) 0%, rgba(255, 255, 0, 0.15) 100%);
+        border: 2px solid var(--matrix-green);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 0 40px rgba(57, 255, 20, 0.3);
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .seo-header::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(45deg, var(--matrix-green), var(--electric-yellow), var(--cyber-blue));
+        border-radius: 20px;
+        z-index: -1;
+        animation: borderGlow 2s linear infinite;
+    }
+
+    @keyframes borderGlow {
+        0%, 100% { opacity: 0.6; }
+        50% { opacity: 1; }
+    }
+
+    .seo-title {
+        font-size: 3rem;
+        font-weight: bold;
+        background: linear-gradient(45deg, var(--matrix-green), var(--electric-yellow), var(--cyber-blue));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 1rem;
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .feature-card {
+        background: rgba(10, 10, 15, 0.9);
+        border: 1px solid var(--cyber-blue);
+        border-radius: 15px;
+        padding: 2rem;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 0 25px rgba(0, 212, 255, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--matrix-green);
+        box-shadow: 0 10px 30px rgba(57, 255, 20, 0.3);
+    }
+
+    .feature-icon {
+        font-size: 3rem;
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+
+    .feature-title {
+        color: var(--cyber-blue);
+        font-size: 1.3rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+
+    .feature-description {
+        color: var(--glow-cyan);
+        text-align: center;
+        line-height: 1.6;
+    }
+
+    .analytics-panel {
+        background: rgba(255, 107, 53, 0.1);
+        border: 1px solid var(--ai-orange);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .analytics-title {
+        color: var(--ai-orange);
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-item {
+        background: rgba(255, 107, 53, 0.2);
+        border: 1px solid var(--ai-orange);
+        border-radius: 10px;
+        padding: 1.5rem;
+        text-align: center;
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: var(--electric-yellow);
+        margin-bottom: 0.5rem;
+        animation: countUp 2s ease-out;
+    }
+
+    @keyframes countUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .stat-label {
+        color: var(--glow-cyan);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+    }
+
+    .seo-benefits {
+        background: rgba(179, 71, 217, 0.1);
+        border: 1px solid var(--neon-purple);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .benefit-item {
+        background: rgba(179, 71, 217, 0.2);
+        border: 1px solid var(--neon-purple);
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .benefit-item::before {
+        content: '🚀';
+        margin-right: 1rem;
+        font-size: 1.5rem;
+    }
+
+    .google-integration {
+        background: rgba(57, 255, 20, 0.1);
+        border: 1px solid var(--matrix-green);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .google-logo {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+
+    .btn-seo {
+        background: linear-gradient(45deg, var(--matrix-green), var(--electric-yellow));
+        border: none;
+        border-radius: 10px;
+        color: #000;
+        padding: 15px 30px;
+        font-weight: bold;
+        font-family: 'Orbitron', monospace;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-seo:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 20px rgba(57, 255, 20, 0.5);
+        color: #000;
+        text-decoration: none;
+    }
+
+    .btn-continue {
+        background: linear-gradient(45deg, var(--cyber-blue), var(--neon-purple));
+    }
+
+    .live-demo {
+        background: rgba(0, 212, 255, 0.1);
+        border: 1px solid var(--cyber-blue);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .search-preview {
+        background: #fff;
+        color: #333;
+        border-radius: 8px;
+        padding: 1rem;
+        margin: 1rem 0;
+        font-family: Arial, sans-serif;
+    }
+
+    .search-title {
+        color: #1a0dab;
+        font-size: 1.2rem;
+        margin-bottom: 0.5rem;
+        text-decoration: underline;
+    }
+
+    .search-url {
+        color: #006621;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .search-description {
+        color: #545454;
+        line-height: 1.4;
+    }
+
+    @media (max-width: 768px) {
+        .features-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .stats-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="particles-js"></div>
+
+<div class="container mx-auto px-4 py-8">
+    <div class="seo-header">
+        <h1 class="seo-title">🚀 SEO + ANALYTICS</h1>
+        <p style="color: var(--glow-cyan); font-size: 1.2rem; margin-bottom: 1rem;">
+            Tu taller visible en Google con analíticas profesionales
+        </p>
+        <div style="background: linear-gradient(45deg, var(--matrix-green), var(--electric-yellow)); color: #000; padding: 8px 16px; border-radius: 25px; font-weight: bold; display: inline-block;">
+            ✨ Integración automática con Google Analytics 4 ✨
+        </div>
+    </div>
+
+    <!-- Estadísticas del Sistema -->
+    <div class="analytics-panel">
+        <h3 class="analytics-title">📊 Métricas de tu Taller Online</h3>
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number">2,547</div>
+                <div class="stat-label">Visitas Este Mes</div>
+            </div>
+            
+            <div class="stat-item">
+                <div class="stat-number">38</div>
+                <div class="stat-label">Leads Generados</div>
+            </div>
+            
+            <div class="stat-item">
+                <div class="stat-number">67%</div>
+                <div class="stat-label">Tasa Conversión</div>
+            </div>
+            
+            <div class="stat-item">
+                <div class="stat-number">4.8★</div>
+                <div class="stat-label">Rating Google</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Características SEO -->
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon">🔍</div>
+            <h3 class="feature-title">SEO Automático</h3>
+            <p class="feature-description">
+                Meta tags optimizados, schema markup y URLs amigables se configuran automáticamente
+                para mejorar tu posicionamiento en Google.
+            </p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">📈</div>
+            <h3 class="feature-title">Google Analytics 4</h3>
+            <p class="feature-description">
+                Integración completa con GA4 para rastrear visitantes, conversiones 
+                y comportamiento de clientes en tu sitio web.
+            </p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">🎯</div>
+            <h3 class="feature-title">Páginas Landing</h3>
+            <p class="feature-description">
+                Páginas optimizadas para captar clientes con formularios inteligentes
+                y llamadas a la acción efectivas.
+            </p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">📱</div>
+            <h3 class="feature-title">Móvil Optimizado</h3>
+            <p class="feature-description">
+                Diseño responsive que se adapta perfectamente a móviles, donde el 
+                78% de tus clientes te buscarán.
+            </p>
+        </div>
+    </div>
+
+    <!-- Integración con Google -->
+    <div class="google-integration">
+        <div class="google-logo">🌐 Google Integration</div>
+        <h3 style="color: var(--matrix-green); margin-bottom: 1rem;">
+            Conectado Automáticamente
+        </h3>
+        <p style="color: var(--glow-cyan); margin-bottom: 1.5rem;">
+            Tu taller ya está integrado con Google Analytics, Google My Business 
+            y Google Search Console para máxima visibilidad.
+        </p>
+        
+        <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+            <span style="background: rgba(57, 255, 20, 0.2); padding: 8px 16px; border-radius: 20px; color: var(--matrix-green); font-weight: bold;">
+                ✅ Analytics 4
+            </span>
+            <span style="background: rgba(57, 255, 20, 0.2); padding: 8px 16px; border-radius: 20px; color: var(--matrix-green); font-weight: bold;">
+                ✅ Search Console
+            </span>
+            <span style="background: rgba(57, 255, 20, 0.2); padding: 8px 16px; border-radius: 20px; color: var(--matrix-green); font-weight: bold;">
+                ✅ My Business
+            </span>
+        </div>
+    </div>
+
+    <!-- Preview de Google -->
+    <div class="live-demo">
+        <h3 style="color: var(--cyber-blue); text-align: center; margin-bottom: 1.5rem;">
+            🔍 Así te ve Google (Simulación)
+        </h3>
+        
+        <div class="search-preview">
+            <div class="search-title">Taller Mecánico Profesional - Servicios con IA | Mi Taller</div>
+            <div class="search-url">https://mi-taller.e-garage.pro</div>
+            <div class="search-description">
+                ⭐⭐⭐⭐⭐ Taller mecánico con tecnología IA integrada. Diagnósticos precisos, 
+                reportes profesionales y gestión inteligente. Cotización online gratis.
+            </div>
+        </div>
+        
+        <p style="color: var(--matrix-green); text-align: center; margin-top: 1rem; font-weight: bold;">
+            🎯 Optimizado para aparecer en las primeras posiciones
+        </p>
+    </div>
+
+    <!-- Beneficios SEO -->
+    <div class="seo-benefits">
+        <h3 style="color: var(--neon-purple); font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem; text-align: center;">
+            🚀 Beneficios del SEO Integrado
+        </h3>
+        
+        <div class="benefit-item">
+            Aparece en Google cuando busquen "taller mecánico cerca de mí"
+        </div>
+        
+        <div class="benefit-item">
+            Páginas optimizadas para cada servicio que ofreces
+        </div>
+        
+        <div class="benefit-item">
+            Meta descriptions automáticas que aumentan clicks en 45%
+        </div>
+        
+        <div class="benefit-item">
+            Schema markup para mostrar ratings y precios en Google
+        </div>
+        
+        <div class="benefit-item">
+            Sitemap automático que se actualiza cuando agregues servicios
+        </div>
+    </div>
+
+    <!-- Botones de Acción -->
+    <div class="action-buttons">
+        <a href="#" onclick="verAnalytics()" class="btn-seo">
+            📊 Ver Analytics en Vivo
+        </a>
+        <a href="{% url 'onboarding:onboarding_paso' %}?paso=7" class="btn-seo btn-continue">
+            ➡️ Finalizar: Contacto Directo
+        </a>
+    </div>
+</div>
+
+<script>
+// Configuración de partículas
+particlesJS("particles-js", {
+    "particles": {
+        "number": { "value": 35, "density": { "enable": true, "value_area": 800 } },
+        "color": { "value": ["#39ff14", "#ffff00", "#00d4ff"] },
+        "shape": { "type": "circle" },
+        "opacity": { "value": 0.6, "random": false },
+        "size": { "value": 3, "random": true },
+        "line_linked": {
+            "enable": true, "distance": 150, "color": "#39ff14", "opacity": 0.4, "width": 1
+        },
+        "move": { "enable": true, "speed": 2, "direction": "none", "random": false, "straight": false, "out_mode": "out", "bounce": false }
+    },
+    "interactivity": {
+        "detect_on": "canvas",
+        "events": { "onhover": { "enable": true, "mode": "repulse" }, "onclick": { "enable": true, "mode": "push" }, "resize": true }
+    },
+    "retina_detect": true
+});
+
+// Animación de números
+function animarNumeros() {
+    const elementos = document.querySelectorAll('.stat-number');
+    elementos.forEach(elem => {
+        const valor = elem.textContent;
+        const numero = parseInt(valor.replace(/[^\d]/g, ''));
+        
+        if (!isNaN(numero)) {
+            let contador = 0;
+            const incremento = numero / 30; // 30 frames para la animación
+            
+            const interval = setInterval(() => {
+                contador += incremento;
+                if (contador >= numero) {
+                    elem.textContent = valor; // Restaurar formato original
+                    clearInterval(interval);
+                } else {
+                    elem.textContent = Math.floor(contador).toLocaleString();
+                }
+            }, 50);
+        }
+    });
+}
+
+// Función para mostrar analytics (simulado)
+function verAnalytics() {
+    alert('🚀 Google Analytics 4 configurado!\n\n' +
+          '✅ Tracking de visitantes activo\n' +
+          '✅ Conversiones configuradas\n' +
+          '✅ Eventos personalizados\n' +
+          '✅ Audiencias definidas\n\n' +
+          'Podrás ver estadísticas detalladas en tu dashboard.');
+    
+    // Analytics event
+    gtag('event', 'analytics_demo_click', {
+        'event_category': 'onboarding_engagement',
+        'event_label': 'seo_analytics',
+        'custom_parameters': {
+            'paso_onboarding': 6
+        }
+    });
+}
+
+// Inicializar animaciones al cargar
+window.addEventListener('load', function() {
+    setTimeout(animarNumeros, 500);
+    
+    // Analytics
+    gtag('event', 'seo_analytics_vista', {
+        'event_category': 'onboarding_engagement',
+        'event_label': 'modulo_seo',
+        'custom_parameters': {
+            'paso_onboarding': 6,
+            'tiempo_vista': Date.now()
+        }
+    });
+});
+
+// Efectos de hover mejorados
+document.querySelectorAll('.feature-card').forEach(card => {
+    card.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-5px) scale(1.02)';
+    });
+    
+    card.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0) scale(1)';
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte Individual - {{ mecanico.nombre }}</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 32px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header .subtitle {
+            font-size: 16px;
+            margin-top: 10px;
+            opacity: 0.9;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .info-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #667eea;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .info-card .label {
+            color: #6c757d;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .info-card .value {
+            color: #2c3e50;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .metric-box {
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 8px 25px rgba(132, 250, 176, 0.3);
+        }
+        
+        .metric-box .metric-value {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .metric-box .metric-label {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.9;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section-title {
+            color: #2c3e50;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title .icon {
+            margin-right: 10px;
+            font-size: 24px;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 12px;
+        }
+        
+        .table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e9ecef;
+            color: #495057;
+        }
+        
+        .table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .table tr:hover {
+            background: #e8f4f8;
+            transform: scale(1.01);
+            transition: all 0.2s ease;
+        }
+        
+        .highlight {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #ff6b6b;
+            margin: 20px 0;
+        }
+        
+        .highlight strong {
+            color: #c0392b;
+        }
+        
+        .footer {
+            margin-top: 60px;
+            text-align: center;
+            color: #6c757d;
+            font-size: 12px;
+            padding: 20px;
+            border-top: 2px solid #e9ecef;
+        }
+        
+        .footer .logo {
+            font-size: 18px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            background: #667eea;
+            color: white;
+            border-radius: 15px;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-right: 5px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 5px;
+            transition: width 0.3s ease;
+        }
+        
+        @media print {
+            body { margin: 0; padding: 15px; }
+            .header { page-break-inside: avoid; }
+            .section { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- Header -->
+    <div class="header">
+        <h1>📊 REPORTE INDIVIDUAL</h1>
+        <div class="subtitle">{{ mecanico.nombre }} | {{ fecha_desde }} - {{ fecha_hasta }}</div>
+    </div>
+
+    <!-- Información básica -->
+    <div class="info-grid">
+        <div class="info-card">
+            <div class="label">📅 Período</div>
+            <div class="value">{{ fecha_desde|date:"d/m/Y" }} - {{ fecha_hasta|date:"d/m/Y" }}</div>
+        </div>
+        <div class="info-card">
+            <div class="label">🔧 Mecánico</div>
+            <div class="value">{{ mecanico.nombre }}</div>
+        </div>
+        <div class="info-card">
+            <div class="label">📋 Documentos</div>
+            <div class="value">{{ total_documentos }}</div>
+        </div>
+        <div class="info-card">
+            <div class="label">⚙️ Servicios</div>
+            <div class="value">{{ total_servicios }}</div>
+        </div>
+    </div>
+
+    <!-- Métricas principales -->
+    <div class="metrics-grid">
+        <div class="metric-box">
+            <div class="metric-value">${{ total_generado|floatformat:0 }}</div>
+            <div class="metric-label">💰 Total Generado</div>
+        </div>
+        <div class="metric-box">
+            <div class="metric-value">${{ promedio_documento|floatformat:0 }}</div>
+            <div class="metric-label">📊 Promedio por Documento</div>
+        </div>
+    </div>
+
+    <!-- Servicios más realizados -->
+    {% if servicios_top %}
+    <div class="section">
+        <h2 class="section-title">
+            <span class="icon">🏆</span>
+            Servicios Más Realizados
+        </h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>🏅 Ranking</th>
+                    <th>⚙️ Servicio</th>
+                    <th>🔢 Cantidad</th>
+                    <th>💰 Ingresos</th>
+                    <th>📊 % del Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for servicio in servicios_top %}
+                <tr>
+                    <td><span class="badge">#{{ forloop.counter }}</span></td>
+                    <td><strong>{{ servicio.nombre }}</strong></td>
+                    <td>{{ servicio.cantidad }}</td>
+                    <td>${{ servicio.total_ingresos|floatformat:0 }}</td>
+                    <td>
+                        {% widthratio servicio.total_ingresos total_generado 100 %}%
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: {% widthratio servicio.total_ingresos total_generado 100 %}%"></div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <!-- Documentos por tipo -->
+    {% if docs_por_tipo %}
+    <div class="section">
+        <h2 class="section-title">
+            <span class="icon">📋</span>
+            Distribución por Tipo de Documento
+        </h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>📄 Tipo de Documento</th>
+                    <th>🔢 Cantidad</th>
+                    <th>💰 Total</th>
+                    <th>📊 Promedio</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tipo in docs_por_tipo %}
+                <tr>
+                    <td><strong>{{ tipo.tipo_documento }}</strong></td>
+                    <td>{{ tipo.cantidad }}</td>
+                    <td>${{ tipo.total|floatformat:0 }}</td>
+                    <td>${{ tipo.total|div:tipo.cantidad|floatformat:0 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <!-- Análisis de rendimiento -->
+    <div class="highlight">
+        <h3>🎯 Análisis de Rendimiento</h3>
+        <p><strong>Productividad:</strong> 
+            {% if total_documentos > 0 %}
+                {{ total_servicios|div:total_documentos|floatformat:1 }} servicios por documento
+            {% else %}
+                Sin datos disponibles
+            {% endif %}
+        </p>
+        <p><strong>Especialización:</strong> 
+            {% if servicios_top %}
+                Tu servicio principal es "{{ servicios_top.0.nombre }}" con {{ servicios_top.0.cantidad }} realizaciones
+            {% else %}
+                Datos insuficientes para análisis
+            {% endif %}
+        </p>
+        <p><strong>Eficiencia:</strong> 
+            {% if total_generado > 0 and total_servicios > 0 %}
+                ${{ total_generado|div:total_servicios|floatformat:0 }} promedio por servicio
+            {% else %}
+                Sin datos de eficiencia
+            {% endif %}
+        </p>
+    </div>
+
+    <!-- Recomendaciones -->
+    <div class="section">
+        <h2 class="section-title">
+            <span class="icon">💡</span>
+            Recomendaciones Inteligentes
+        </h2>
+        <div style="background: #e8f5e8; padding: 20px; border-radius: 10px; border-left: 5px solid #28a745;">
+            <h4 style="color: #155724; margin-top: 0;">🎯 Oportunidades de Mejora:</h4>
+            <ul style="color: #155724;">
+                {% if total_documentos < 10 %}
+                <li>Considera aumentar tu productividad diaria para procesar más documentos</li>
+                {% endif %}
+                {% if servicios_top|length < 3 %}
+                <li>Diversifica tus servicios para ampliar tu experiencia</li>
+                {% endif %}
+                <li>Mantén la calidad en "{{ servicios_top.0.nombre|default:"tus servicios principales" }}" - es tu fortaleza</li>
+                <li>Explora servicios de mayor valor agregado para aumentar ingresos</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="logo">⚡ eGarage Pro</div>
+        <p>Reporte generado automáticamente el {{ fecha_generacion }}</p>
+        <p>Sistema de Gestión Inteligente para Talleres</p>
+        <p style="font-style: italic;">Este reporte contiene información confidencial del taller</p>
+    </div>
+
+</body>
+</html>

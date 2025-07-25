@@ -7,6 +7,8 @@ from .extras_vehiculo import ColorVehiculo, MotorVehiculo, CajaVehiculo
 
 
 class Vehiculo(models.Model):
+    # Este campo conecta cada registro con la empresa dueña del dato
+    empresa = models.ForeignKey('taller.Empresa', on_delete=models.CASCADE)  # Campo obligatorio
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
     marca = models.ForeignKey(Marca, on_delete=models.CASCADE)
     modelo = models.ForeignKey(Modelo, on_delete=models.SET_NULL, null=True)

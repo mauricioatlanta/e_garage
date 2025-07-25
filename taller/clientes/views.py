@@ -8,11 +8,24 @@ from taller.models.clientes import Cliente
 from django.template.loader import render_to_string
 from django.views.decorators.http import require_GET
 from django.db.models import Q
+from django.contrib.auth.decorators import login_required
 
 
+@login_required
 def lista_clientes(request):
+    # Obtener empresa del usuario
+    try:
+        empresa = request.user.empresa
+    except AttributeError:
+        from taller.models.empresa import Empresa
+        empresa, created = Empresa.objects.get_or_create(
+            user=request.user,
+            defaults={'nombre_taller': f'Taller de {request.user.username}'}
+        )
+    
     q = request.GET.get("q", "").strip()
-    clientes = Cliente.objects.all()
+    # Filtrar clientes solo de la empresa del usuario
+    clientes = Cliente.objects.filter(empresa=empresa)
 
     if q:
         clientes = clientes.filter(
@@ -21,7 +34,8 @@ def lista_clientes(request):
             Q(telefono__icontains=q) |
             Q(email__icontains=q) |
             Q(direccion__icontains=q) |
-            Q(ciudad__nombre__icontains=q)
+            Q(ciudad__nombre__icontains=q) |
+            Q(region__nombre__icontains=q)
         )
 
     paginator = Paginator(clientes, 10)
@@ -35,13 +49,48 @@ def lista_clientes(request):
     })
 
 
+@login_required
 def crear_cliente(request):
+    # Obtener empresa del usuario
+    try:
+        empresa = request.user.empresa
+    except AttributeError:
+        from taller.models.empresa import Empresa
+        empresa, created = Empresa.objects.get_or_create(
+            user=request.user,
+            defaults={'nombre_taller': f'Taller de {request.user.username}'}
+        )
+    
     if request.method == 'POST':
         form = ClienteForm(request.POST)
+        print(f"🔍 POST Data recibido:")
+        for key, value in request.POST.items():
+            print(f"   {key}: {value}")
+        
+        print(f"🔍 Form valid: {form.is_valid()}")
+        
+        if not form.is_valid():
+            print(f"❌ Form errors: {form.errors}")
+            for field, errors in form.errors.items():
+                print(f"   {field}: {errors}")
+                for error in errors:
+                    messages.error(request, f'{field}: {error}')
+        
         if form.is_valid():
-            form.save()
-            messages.success(request, '✅ Cliente creado exitosamente.')
-            return redirect('clientes:lista_clientes')
+            try:
+                cliente = form.save(commit=False)
+                cliente.empresa = empresa  # Asignar empresa del usuario
+                print(f"💾 Guardando cliente: {cliente.nombre} {cliente.apellido}")
+                print(f"   Empresa: {cliente.empresa}")
+                print(f"   Región: {cliente.region}")
+                print(f"   Ciudad: {cliente.ciudad}")
+                cliente.save()
+                print(f"✅ Cliente guardado con ID: {cliente.pk}")
+                messages.success(request, '✅ Cliente creado exitosamente.')
+                return redirect('clientes:lista_clientes')
+            except Exception as e:
+                print(f"❌ Error al guardar cliente: {e}")
+                messages.error(request, f'Error al guardar cliente: {e}')
     else:
         form = ClienteForm()
 
@@ -80,24 +129,55 @@ def eliminar_cliente(request, pk):
     return redirect('clientes:lista_clientes')
 
 
+@login_required
 def ver_cliente(request, pk):
-    cliente = get_object_or_404(Cliente, pk=pk)
+    # Obtener empresa del usuario
+    try:
+        empresa = request.user.empresa
+    except AttributeError:
+        from taller.models.empresa import Empresa
+        empresa, created = Empresa.objects.get_or_create(
+            user=request.user,
+            defaults={'nombre_taller': f'Taller de {request.user.username}'}
+        )
+    
+    # Verificar que el cliente pertenece a la empresa del usuario
+    cliente = get_object_or_404(Cliente, pk=pk, empresa=empresa)
     return render(request, 'taller/clientes/ver_cliente.html', {'cliente': cliente})
 
 
 def api_ciudades(request):
     region_id = request.GET.get('region_id')
+    print(f"🔍 API Ciudades - region_id recibido: {region_id}")
     ciudades = []
     if region_id:
-        ciudades_qs = Ciudad.objects.filter(region_id=region_id).order_by('nombre')
-        ciudades = [{"id": c.id, "nombre": c.nombre} for c in ciudades_qs]
+        try:
+            ciudades_qs = TallerCiudad.objects.filter(region_id=region_id).order_by('nombre')
+            ciudades = [{"id": c.pk, "nombre": c.nombre} for c in ciudades_qs]
+            print(f"✅ Ciudades encontradas: {len(ciudades)}")
+        except Exception as e:
+            print(f"❌ Error en API ciudades: {e}")
+    else:
+        print("⚠️ No se proporcionó region_id")
     return JsonResponse({"ciudades": ciudades})
 
 
 @require_GET
+@login_required
 def ajax_buscar_clientes(request):
+    # Obtener empresa del usuario
+    try:
+        empresa = request.user.empresa
+    except AttributeError:
+        from taller.models.empresa import Empresa
+        empresa, created = Empresa.objects.get_or_create(
+            user=request.user,
+            defaults={'nombre_taller': f'Taller de {request.user.username}'}
+        )
+    
     q = request.GET.get("q", "").strip()
-    clientes = Cliente.objects.all()
+    # Filtrar solo clientes de la empresa del usuario
+    clientes = Cliente.objects.filter(empresa=empresa)
     if q:
         clientes = clientes.filter(
             Q(nombre__icontains=q) |
@@ -105,7 +185,8 @@ def ajax_buscar_clientes(request):
             Q(telefono__icontains=q) |
             Q(email__icontains=q) |
             Q(direccion__icontains=q) |
-            Q(ciudad__nombre__icontains=q)
+            Q(ciudad__nombre__icontains=q) |
+            Q(region__nombre__icontains=q)
         )
     paginator = Paginator(clientes, 10)
     page_number = request.GET.get("page")

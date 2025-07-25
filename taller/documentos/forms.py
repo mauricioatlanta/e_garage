@@ -10,7 +10,7 @@ class DocumentoForm(forms.ModelForm):
         queryset=Cliente.objects.all(),
         required=True,
         widget=autocomplete.ModelSelect2(
-            url='autocomplete:autocomplete_cliente',
+            url='documentos:autocomplete_cliente',
             attrs={'data-placeholder': 'Buscar cliente...'}
         )
     )
@@ -18,23 +18,20 @@ class DocumentoForm(forms.ModelForm):
         queryset=Vehiculo.objects.all(),
         required=False,
         widget=autocomplete.ModelSelect2(
-            url='autocomplete:autocomplete_vehiculo',
+            url='documentos:autocomplete_vehiculo',
             forward=['cliente'],
             attrs={'data-placeholder': 'Filtrar vehículo por cliente'}
         )
     )
     mecanico = forms.ModelChoiceField(
-        queryset=Mecanico.objects.all(),
+        queryset=None,  # Se establecerá dinámicamente en el __init__
+        label='Mecánico',
         required=False,
-        widget=autocomplete.ModelSelect2(
-            url='autocomplete:autocomplete_mecanico',
-            attrs={
-                'data-placeholder': 'Buscar o crear mecánico...',
-                'data-tags': 'true',  # Permite crear nuevos
-                'data-allow-clear': 'true',
-                'data-minimum-input-length': '1',
-            }
-        ),
+        widget=forms.Select(attrs={
+            'class': 'futurista-input',
+            'data-placeholder': 'Seleccionar mecánico...'
+        }),
+        empty_label='-- Seleccionar mecánico --'
     )
 
     observaciones = forms.CharField(
@@ -46,12 +43,28 @@ class DocumentoForm(forms.ModelForm):
         required=False
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, empresa=None, **kwargs):
         super().__init__(*args, **kwargs)
+        
+        # Configurar queryset de mecánicos según la empresa
+        if empresa:
+            from taller.models.mecanico import Mecanico
+            self.fields['mecanico'].queryset = Mecanico.objects.filter(
+                empresa=empresa, 
+                activo=True
+            )
+        else:
+            # Si no hay empresa, no mostrar mecánicos
+            from taller.models.mecanico import Mecanico
+            self.fields['mecanico'].queryset = Mecanico.objects.none()
+        
+        # Solo establecer la fecha por defecto si es un formulario nuevo (no edición)
         from datetime import date
-        if not self.initial.get('fecha') and not self.data:
+        if not self.initial.get('fecha') and not self.data and not self.instance.pk:
             self.initial['fecha'] = date.today().strftime('%Y-%m-%d')
-
+        
+        # NO establecer valor por defecto para tipo_documento - dejarlo en blanco
+        
         # Filtrar vehículos por cliente seleccionado
         cliente_id = None
         # Si es edición, obtener de la instancia
@@ -74,8 +87,9 @@ class DocumentoForm(forms.ModelForm):
         model = Documento
         fields = [
             'tipo_documento', 'numero_documento', 'fecha',
-            'cliente', 'vehiculo', 'kilometraje', 'observaciones', 'mecanico',
+            'cliente', 'vehiculo', 'kilometraje', 'observaciones', 'mecanico', 'incluir_iva',
         ]
         widgets = {
             'fecha': forms.DateInput(attrs={'type': 'date', 'class': 'w-full p-2 border rounded'}),
+            'incluir_iva': forms.CheckboxInput(attrs={'class': 'mr-2'}),
         }

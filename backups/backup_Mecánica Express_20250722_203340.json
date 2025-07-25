@@ -1,0 +1,243 @@
+{
+  "empresa": {
+    "id": 15,
+    "nombre_taller": "Mecánica Express",
+    "empresa": "Express Motors Ltda",
+    "direccion": "Calle Secundaria 456",
+    "telefono": "+56987654321",
+    "email": "",
+    "fecha_inicio": "2025-07-21T17:57:42.443029+00:00",
+    "suscripcion_activa": true
+  },
+  "timestamp": "20250722_203340",
+  "version": "1.0",
+  "datos": {
+    "perfiles_usuario": [
+      {
+        "model": "taller.perfilusuario",
+        "pk": 1,
+        "fields": {
+          "user": 15,
+          "empresa": 15,
+          "rol": "vendedor"
+        }
+      }
+    ],
+    "clientes": [
+      {
+        "model": "taller.cliente",
+        "pk": 5,
+        "fields": {
+          "empresa": 15,
+          "nombre": "Ricardo",
+          "apellido": "Lunari",
+          "telefono": "567777777",
+          "direccion": "Pje 44",
+          "region": 25,
+          "ciudad": 241,
+          "email": "t@g.com"
+        }
+      },
+      {
+        "model": "taller.cliente",
+        "pk": 6,
+        "fields": {
+          "empresa": 15,
+          "nombre": "Fernando",
+          "apellido": "Zampedri",
+          "telefono": "569 2222 2222",
+          "direccion": "Pasaje 1 5555",
+          "region": 23,
+          "ciudad": 226,
+          "email": "v@e.com"
+        }
+      },
+      {
+        "model": "taller.cliente",
+        "pk": 7,
+        "fields": {
+          "empresa": 15,
+          "nombre": "Alberto",
+          "apellido": "Acosta",
+          "telefono": "569 3333 3333",
+          "direccion": "Pje 1 2020",
+          "region": 26,
+          "ciudad": 259,
+          "email": "r@t.vl"
+        }
+      }
+    ],
+    "vehiculos": [
+      {
+        "model": "taller.vehiculo",
+        "pk": 5,
+        "fields": {
+          "empresa": 15,
+          "cliente": 5,
+          "marca": 9,
+          "modelo": 129,
+          "patente": "qaqa111",
+          "anio": 2026,
+          "color": 5,
+          "vin": "SWRFER98ER7G98ER7|",
+          "motor": 7,
+          "caja": null
+        }
+      },
+      {
+        "model": "taller.vehiculo",
+        "pk": 7,
+        "fields": {
+          "empresa": 15,
+          "cliente": 7,
+          "marca": 26,
+          "modelo": 383,
+          "patente": "rrrr777",
+          "anio": 2026,
+          "color": 6,
+          "vin": "arfea8g7r6eg8qre97g",
+          "motor": 8,
+          "caja": 5
+        }
+      },
+      {
+        "model": "taller.vehiculo",
+        "pk": 6,
+        "fields": {
+          "empresa": 15,
+          "cliente": 6,
+          "marca": 26,
+          "modelo": 383,
+          "patente": "wdwd121",
+          "anio": 2026,
+          "color": 6,
+          "vin": "dsfgakjvqr214553654",
+          "motor": 8,
+          "caja": 5
+        }
+      }
+    ],
+    "mecanicos": [
+      {
+        "model": "taller.mecanico",
+        "pk": 23,
+        "fields": {
+          "empresa": 15,
+          "nombre": "juan xx",
+          "telefono": "444444444",
+          "direccion": "wef",
+          "activo": true,
+          "fecha_creacion": "2025-07-22T15:48:37.129Z",
+          "fecha_modificacion": "2025-07-22T15:48:37.129Z"
+        }
+      },
+      {
+        "model": "taller.mecanico",
+        "pk": 24,
+        "fields": {
+          "empresa": 15,
+          "nombre": "robert0",
+          "telefono": "888888888",
+          "direccion": "psu 40",
+          "activo": true,
+          "fecha_creacion": "2025-07-22T15:49:01.963Z",
+          "fecha_modificacion": "2025-07-22T15:49:01.963Z"
+        }
+      }
+    ],
+    "documentos": [
+      {
+        "model": "taller.documento",
+        "pk": 40,
+        "fields": {
+          "empresa": 15,
+          "tipo_documento": "Factura",
+          "numero_documento": "F-732",
+          "fecha": "2025-07-22",
+          "cliente": 6,
+          "vehiculo": 6,
+          "kilometraje": 444442,
+          "observaciones": "",
+          "mecanico": null
+        }
+      },
+      {
+        "model": "taller.documento",
+        "pk": 41,
+        "fields": {
+          "empresa": 15,
+          "tipo_documento": "Presupuesto",
+          "numero_documento": "T2-WEB-001",
+          "fecha": "2025-07-22",
+          "cliente": 5,
+          "vehiculo": null,
+          "kilometraje": 75000,
+          "observaciones": "Test documento web taller2",
+          "mecanico": null
+        }
+      }
+    ],
+    "repuestos": [
+      {
+        "model": "taller.repuesto",
+        "pk": 8,
+        "fields": {
+          "empresa": 15,
+          "tienda": 8,
+          "nombre_repuesto": "Antifreeze",
+          "part_number": "ant",
+          "precio_venta": 12500,
+          "precio_compra": 5500,
+          "stock": 10,
+          "observaciones": null
+        }
+      },
+      {
+        "model": "taller.repuesto",
+        "pk": 9,
+        "fields": {
+          "empresa": 15,
+          "tienda": 8,
+          "nombre_repuesto": "Liquido de transmision",
+          "part_number": "tf",
+          "precio_venta": 13500,
+          "precio_compra": 4500,
+          "stock": 20,
+          "observaciones": null
+        }
+      }
+    ],
+    "repuestos_documento": [
+      {
+        "model": "taller.repuestodocumento",
+        "pk": 26,
+        "fields": {
+          "documento": 41,
+          "repuesto": null,
+          "codigo": "TEST-REP-T2",
+          "nombre": "Repuesto Test Taller2",
+          "cantidad": 1,
+          "precio": 12000
+        }
+      }
+    ],
+    "servicios_documento": [
+      {
+        "model": "taller.serviciodocumento",
+        "pk": 24,
+        "fields": {
+          "empresa": 15,
+          "documento": 41,
+          "nombre": "Servicio Test Taller2",
+          "precio": 20000
+        }
+      }
+    ]
+  },
+  "estadisticas": {
+    "total_registros": 15,
+    "total_documentos": 2,
+    "total_logs": 0,
+    "size_mb": 0.01
+  }
+}

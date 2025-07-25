@@ -1,3 +1,12 @@
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'mail.atlantareciclajes.cl'
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True
+EMAIL_USE_TLS = False
+
+EMAIL_HOST_USER = 'suscripcion@atlantareciclajes.cl'
+EMAIL_HOST_PASSWORD = ')+y-k+[tY6w&'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 from pathlib import Path
 import os
 from django.core.management.utils import get_random_secret_key
@@ -36,13 +45,16 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'taller.middleware.simple_translation.SimpleTranslationMiddleware',  # Simple translation middleware
+    'django.middleware.locale.LocaleMiddleware',  # Para internacionalización
+    'taller.middleware.rate_limiting.RateLimitMiddleware',  # Rate limiting temprano
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
-    'taller.middleware.trial_middleware.TrialAccessMiddleware',
+    'taller.middleware.empresa_middleware.EmpresaMiddleware',
 ]
 
 # Configuración de URLs
@@ -63,6 +75,7 @@ TEMPLATES = [
                 'django.template.context_processors.static',
                 'django.template.context_processors.tz',
                 'django.contrib.messages.context_processors.messages',
+                'taller.context_processors.empresa_contexto',
             ],
         },
     },
@@ -85,6 +98,17 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
+# Idiomas disponibles
+LANGUAGES = [
+    ('es', 'Español'),
+    ('en', 'English'),
+]
+
+# Directorio de traducciones
+LOCALE_PATHS = [
+    BASE_DIR / 'locale',
+]
+
 # Archivos estáticos
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
@@ -95,15 +119,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# Configuración de email para envío real (Gmail SMTP)
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'atlantareciclajes.cl'
-EMAIL_PORT = 465
-EMAIL_HOST_USER = 'subcripcion@atlantareciclajes.cl'
-EMAIL_HOST_PASSWORD = 'laila2013'
-EMAIL_USE_TLS = False
-EMAIL_USE_SSL = True
-DEFAULT_FROM_EMAIL = 'subcripcion@atlantareciclajes.cl'
+
 
 # Configuración general
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -133,14 +149,17 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 )
-LOGIN_REDIRECT_URL = '/inicio-usuarios/'
-ACCOUNT_LOGOUT_REDIRECT_URL = '/'
-ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+LOGIN_REDIRECT_URL = '/dashboard/'
+ACCOUNT_LOGOUT_REDIRECT_URL = '/login/'
+ACCOUNT_LOGIN_METHODS = {"username", "email"}
+ACCOUNT_EMAIL_VERIFICATION = 'none'  # Cambiado de 'mandatory' a 'none' para desarrollo
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 2
-ACCOUNT_EMAIL_CONFIRMATION_COOLDOWN = 180
+ACCOUNT_RATE_LIMITS = {
+    "confirm_email": "1/m",
+}
+
+ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
 
 # Login default (no usado si usas Allauth)
 LOGIN_URL = '/admin/login/'

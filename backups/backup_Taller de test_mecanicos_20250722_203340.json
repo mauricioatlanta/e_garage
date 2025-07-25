@@ -1,0 +1,38 @@
+{
+  "empresa": {
+    "id": 18,
+    "nombre_taller": "Taller de test_mecanicos",
+    "empresa": "test_mecanicos",
+    "direccion": "",
+    "telefono": "",
+    "email": "",
+    "fecha_inicio": "2025-07-22T13:49:01.123142+00:00",
+    "suscripcion_activa": true
+  },
+  "timestamp": "20250722_203340",
+  "version": "1.0",
+  "datos": {
+    "perfiles_usuario": [
+      {
+        "model": "taller.perfilusuario",
+        "pk": 6,
+        "fields": {
+          "user": 18,
+          "empresa": 18,
+          "rol": "admin"
+        }
+      }
+    ],
+    "clientes": [],
+    "vehiculos": [],
+    "mecanicos": [],
+    "documentos": [],
+    "repuestos": []
+  },
+  "estadisticas": {
+    "total_registros": 1,
+    "total_documentos": 0,
+    "total_logs": 0,
+    "size_mb": 0.0
+  }
+}

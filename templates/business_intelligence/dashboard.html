@@ -1,0 +1,425 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Inteligencia de Negocio - {{ empresa.nombre_taller }}{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.css" rel="stylesheet">
+<style>
+    .stats-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .chart-container {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    }
+    
+    .metric-value {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+    
+    .metric-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+    
+    .table-container {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    }
+    
+    .filter-section {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .profit-positive {
+        color: #28a745;
+        font-weight: bold;
+    }
+    
+    .profit-negative {
+        color: #dc3545;
+        font-weight: bold;
+    }
+    
+    .progress-bar-custom {
+        height: 8px;
+        border-radius: 4px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="h3 mb-0">🧠 Inteligencia de Negocio</h1>
+            <p class="text-muted">Dashboard analítico para {{ empresa.nombre_taller }}</p>
+        </div>
+    </div>
+
+    <!-- Filtros de fecha -->
+    <div class="filter-section">
+        <div class="row">
+            <div class="col-md-4">
+                <label for="fecha_inicio" class="form-label">Fecha Inicio</label>
+                <input type="date" class="form-control" id="fecha_inicio" value="{{ fecha_inicio|date:'Y-m-d' }}">
+            </div>
+            <div class="col-md-4">
+                <label for="fecha_fin" class="form-label">Fecha Fin</label>
+                <input type="date" class="form-control" id="fecha_fin" value="{{ fecha_fin|date:'Y-m-d' }}">
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <button class="btn btn-primary" id="btn-actualizar">
+                    <i class="fas fa-sync-alt"></i> Actualizar
+                </button>
+                <button class="btn btn-outline-secondary ms-2" id="btn-exportar">
+                    <i class="fas fa-download"></i> Exportar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Métricas generales -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="metric-value">{{ resumen_general.total_documentos }}</div>
+                <div class="metric-label">Total Documentos</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="metric-value">${{ resumen_general.ingresos_totales|floatformat:0 }}</div>
+                <div class="metric-label">Ingresos Totales</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="metric-value">{{ resumen_general.total_servicios_realizados }}</div>
+                <div class="metric-label">Servicios Realizados</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="metric-value">${{ resumen_general.promedio_diario|floatformat:0 }}</div>
+                <div class="metric-label">Promedio Diario</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficos principales -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="chart-container">
+                <h5 class="mb-3">🏆 Top Servicios Más Vendidos</h5>
+                <canvas id="serviciosChart" height="300"></canvas>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="chart-container">
+                <h5 class="mb-3">💰 Utilidad por Repuestos</h5>
+                <canvas id="utilidadChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ranking de servicios -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="table-container">
+                <h5 class="mb-3">📊 Ranking de Servicios</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Servicio</th>
+                                <th>Ventas</th>
+                                <th>Ingresos</th>
+                                <th>Promedio</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for servicio in servicios_ranking %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ servicio.nombre }}</td>
+                                <td>
+                                    <span class="badge bg-primary">{{ servicio.cantidad_vendida }}</span>
+                                </td>
+                                <td>${{ servicio.ingresos_totales|floatformat:0 }}</td>
+                                <td>${{ servicio.precio_promedio|floatformat:0 }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">No hay datos disponibles</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Utilidad de repuestos -->
+        <div class="col-md-6">
+            <div class="table-container">
+                <h5 class="mb-3">🔧 Análisis de Utilidad - Repuestos</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Repuesto</th>
+                                <th>Vendidos</th>
+                                <th>Utilidad</th>
+                                <th>Margen %</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for repuesto in repuestos_utilidad %}
+                            <tr>
+                                <td>
+                                    <div class="fw-bold">{{ repuesto.nombre }}</div>
+                                    <small class="text-muted">{{ repuesto.part_number }}</small>
+                                </td>
+                                <td>{{ repuesto.cantidad_vendida }}</td>
+                                <td>
+                                    <span class="{% if repuesto.utilidad_bruta > 0 %}profit-positive{% else %}profit-negative{% endif %}">
+                                        ${{ repuesto.utilidad_bruta|floatformat:0 }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <span class="me-2">{{ repuesto.margen_utilidad }}%</span>
+                                        <div class="progress flex-grow-1 progress-bar-custom">
+                                            <div class="progress-bar bg-success" 
+                                                 style="width: {{ repuesto.margen_utilidad|floatformat:0 }}%"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted">No hay datos disponibles</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard por mecánico -->
+    <div class="row">
+        <div class="col-12">
+            <div class="table-container">
+                <h5 class="mb-3">👨‍🔧 Performance por Mecánico</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Mecánico</th>
+                                <th>Documentos</th>
+                                <th>Repuestos</th>
+                                <th>Servicios</th>
+                                <th>Ingresos Totales</th>
+                                <th>Promedio/Doc</th>
+                                <th>Performance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for mecanico in mecanicos_stats %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-sm bg-primary rounded-circle d-flex align-items-center justify-content-center text-white me-2">
+                                            {{ mecanico.mecanico.nombre|first }}
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold">{{ mecanico.mecanico.nombre }}</div>
+                                            <small class="text-muted">{{ mecanico.mecanico.telefono|default:"Sin teléfono" }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">{{ mecanico.total_documentos }}</span>
+                                </td>
+                                <td>{{ mecanico.repuestos_vendidos }}</td>
+                                <td>{{ mecanico.servicios_realizados }}</td>
+                                <td>
+                                    <span class="fw-bold text-success">${{ mecanico.ingresos_totales|floatformat:0 }}</span>
+                                </td>
+                                <td>${{ mecanico.promedio_por_documento|floatformat:0 }}</td>
+                                <td>
+                                    {% if mecanico.ingresos_totales > 0 %}
+                                        <div class="progress progress-bar-custom">
+                                            <div class="progress-bar bg-success" 
+                                                 style="width: {% widthratio mecanico.ingresos_totales mecanicos_stats.0.ingresos_totales 100 %}%"></div>
+                                        </div>
+                                    {% else %}
+                                        <span class="text-muted">Sin datos</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center text-muted">No hay mecánicos activos</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script>
+// Configuración de Chart.js
+Chart.defaults.responsive = true;
+Chart.defaults.maintainAspectRatio = false;
+
+// Datos de servicios para el gráfico
+const serviciosData = {{ servicios_ranking|safe }};
+const serviciosLabels = serviciosData.map(item => item.nombre.length > 20 ? 
+    item.nombre.substring(0, 20) + '...' : item.nombre);
+const serviciosValues = serviciosData.map(item => item.cantidad_vendida);
+
+// Gráfico de servicios más vendidos
+const serviciosCtx = document.getElementById('serviciosChart').getContext('2d');
+new Chart(serviciosCtx, {
+    type: 'bar',
+    data: {
+        labels: serviciosLabels,
+        datasets: [{
+            label: 'Cantidad Vendida',
+            data: serviciosValues,
+            backgroundColor: 'rgba(54, 162, 235, 0.8)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        plugins: {
+            legend: {
+                display: false
+            },
+            title: {
+                display: true,
+                text: 'Top 10 Servicios Más Vendidos'
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    stepSize: 1
+                }
+            }
+        }
+    }
+});
+
+// Datos de utilidad de repuestos
+const utilidadData = {{ repuestos_utilidad|safe }};
+const utilidadLabels = utilidadData.map(item => item.nombre.length > 15 ? 
+    item.nombre.substring(0, 15) + '...' : item.nombre);
+const utilidadValues = utilidadData.map(item => item.utilidad_bruta);
+
+// Gráfico de utilidad por repuestos
+const utilidadCtx = document.getElementById('utilidadChart').getContext('2d');
+new Chart(utilidadCtx, {
+    type: 'doughnut',
+    data: {
+        labels: utilidadLabels,
+        datasets: [{
+            data: utilidadValues,
+            backgroundColor: [
+                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', 
+                '#9966FF', '#FF9F40', '#FF6384', '#C9CBCF',
+                '#4BC0C0', '#FF6384'
+            ],
+            borderWidth: 2
+        }]
+    },
+    options: {
+        plugins: {
+            title: {
+                display: true,
+                text: 'Distribución de Utilidad por Repuesto'
+            },
+            legend: {
+                position: 'bottom',
+                labels: {
+                    generateLabels: function(chart) {
+                        const data = chart.data;
+                        if (data.labels.length && data.datasets.length) {
+                            return data.labels.map((label, i) => {
+                                const value = data.datasets[0].data[i];
+                                return {
+                                    text: `${label}: $${value.toLocaleString()}`,
+                                    fillStyle: data.datasets[0].backgroundColor[i],
+                                    strokeStyle: data.datasets[0].backgroundColor[i],
+                                    lineWidth: 2,
+                                    hidden: false,
+                                    index: i
+                                };
+                            });
+                        }
+                        return [];
+                    }
+                }
+            }
+        }
+    }
+});
+
+// Funcionalidad de actualización
+document.getElementById('btn-actualizar').addEventListener('click', function() {
+    const fechaInicio = document.getElementById('fecha_inicio').value;
+    const fechaFin = document.getElementById('fecha_fin').value;
+    
+    if (fechaInicio && fechaFin) {
+        const url = new URL(window.location);
+        url.searchParams.set('fecha_inicio', fechaInicio);
+        url.searchParams.set('fecha_fin', fechaFin);
+        window.location.href = url.toString();
+    } else {
+        alert('Por favor selecciona ambas fechas');
+    }
+});
+
+// Funcionalidad de exportación (placeholder)
+document.getElementById('btn-exportar').addEventListener('click', function() {
+    alert('Funcionalidad de exportación en desarrollo');
+    // Aquí se puede implementar la exportación a Excel/PDF
+});
+
+// Auto-refresh cada 5 minutos
+setTimeout(function() {
+    location.reload();
+}, 300000);
+</script>
+{% endblock %}

@@ -1,3 +1,4 @@
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
@@ -24,24 +25,58 @@
   {% block extra_head %}{% endblock %}
 </head>
 
-<body class="bg-[#0d1117] text-white font-sans min-h-screen relative">
+<body class="bg-[#0d1117] text-white font-sans min-h-screen flex flex-col relative">
 
+<!-- Cabecera con logo y nombre del taller -->
+<header class="flex items-center gap-4 p-4 bg-white shadow-md">
+  {% if request.user.is_authenticated and logo_taller %}
+    <img src="{{ logo_taller }}" alt="Logo del Taller" class="h-12 w-auto rounded-lg shadow-md">
+  {% else %}
+    <div class="h-12 w-12 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-lg flex items-center justify-center">
+      <span class="text-white font-bold text-lg">🚗</span>
+    </div>
+  {% endif %}
+  <div class="flex flex-col">
+    <h1 class="text-xl font-bold text-gray-800">{{ nombre_taller|default:"eGarage" }}</h1>
+    {% if request.user.is_authenticated %}
+      <span class="text-sm text-gray-600">Sistema de Gestión de Taller</span>
+    {% endif %}
+  </div>
+</header>
 
 <nav class="w-full bg-black/60 backdrop-blur border-b border-cyan-700/40 shadow-lg py-3 px-6 flex items-center justify-between z-50 relative">
   <div class="flex items-center gap-8">
-    <a href="/" class="text-2xl font-extrabold text-cyan-300 tracking-widest hover:text-lime-300 transition">E-Garage</a>
-    <a href="/clientes/" class="hover:text-lime-400 transition">Clientes</a>
-    <a href="/repuestos-info/" class="hover:text-lime-400 transition">Repuestos</a>
-    <a href="/servicios-info/" class="hover:text-lime-400 transition">Servicios</a>
-    <a href="/reportes-info/" class="hover:text-lime-400 transition">Reportes</a>
-    <a href="/ia-info/" class="hover:text-lime-400 transition">IA</a>
+    {% if request.user.is_authenticated %}
+      <a href="{% url 'dashboard' %}" class="text-2xl font-extrabold text-cyan-300 tracking-widest hover:text-lime-300 transition">E-Garage</a>
+    {% else %}
+      <a href="/" class="text-2xl font-extrabold text-cyan-300 tracking-widest hover:text-lime-300 transition">E-Garage</a>
+    {% endif %}
+    {% if request.user.is_authenticated and empresa_usuario %}
+      <span class="ml-4 text-lg font-semibold text-lime-300">{{ empresa_usuario.nombre_taller }}</span>
+    {% endif %}
+    <!-- Enlaces de prueba a landings -->
+    <a href="/chile/" class="text-sm text-cyan-400 hover:text-yellow-300 transition font-bold border border-cyan-700 rounded px-2 py-1 ml-2">Landing Chile</a>
+    <a href="/usa/" class="text-sm text-red-400 hover:text-blue-300 transition font-bold border border-red-700 rounded px-2 py-1 ml-2">Landing USA</a>
   </div>
   <div class="flex items-center gap-4">
-    {% if user.is_authenticated %}
-      <span class="font-semibold text-cyan-200"><i class="fas fa-user-circle mr-1"></i> {{ user.get_full_name|default:user.username }}</span>
-      <a href="/accounts/logout/" class="bg-fuchsia-500 hover:bg-fuchsia-400 text-white font-bold px-4 py-2 rounded-xl transition shadow">Salir</a>
+    <!-- Selector de idioma global -->
+    <div class="ml-4 flex gap-2">
+      <a href="{{ request.path }}?lang=es" class="px-3 py-1 rounded-full text-xs font-bold transition-all shadow-md bg-cyan-500/80 text-white hover:bg-cyan-700 {% if request.GET.lang == 'es' or not request.GET.lang %}ring-2 ring-yellow-300{% endif %}">Español</a>
+      <a href="{{ request.path }}?lang=en" class="px-3 py-1 rounded-full text-xs font-bold transition-all shadow-md bg-cyan-100 text-cyan-900 hover:bg-cyan-300 {% if request.GET.lang == 'en' %}ring-2 ring-fuchsia-400{% endif %}">English</a>
+    </div>
+    {% if request.user.is_authenticated %}
+      <a href="{% url 'taller:configuracion' %}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
+        <span>⚙️</span>
+        <span class="hidden md:inline">Configuración</span>
+      </a>
+      <span class="text-cyan-200 font-semibold">{{ request.user.username }}</span>
+      <form action="{% url 'logout' %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" class="bg-red-500 hover:bg-red-400 text-white font-bold px-4 py-2 rounded-xl transition shadow">Cerrar sesión</button>
+      </form>
     {% else %}
-      <a href="/accounts/login/" class="bg-cyan-500 hover:bg-cyan-400 text-white font-bold px-4 py-2 rounded-xl transition shadow">Iniciar sesión</a>
+      <!-- No mostrar nombre ni botón de logout si no está autenticado -->
+      <a href="/login/" class="bg-cyan-500 hover:bg-cyan-400 text-white font-bold px-4 py-2 rounded-xl transition shadow">Ingresar o Registrarse</a>
     {% endif %}
   </div>
 </nav>
@@ -49,6 +84,28 @@
 {% block fondo_extra %}{% endblock %}
 
 {% block content %}{% endblock %}
+
+<!-- Footer con créditos de Atlanta Reciclajes -->
+<footer class="bg-black/80 border-t border-cyan-700/40 py-4 mt-auto">
+  <div class="container mx-auto px-4">
+    <div class="flex flex-col md:flex-row items-center justify-center gap-2 text-center">
+      <div class="flex items-center gap-2">
+        <img src="{% static 'img/logo.png' %}" alt="Atlanta Reciclajes Logo" class="h-6 w-auto">
+        <span class="text-xs text-gray-400">
+          © 2025 <strong class="text-cyan-300">Atlanta Reciclajes</strong> — Todos los derechos reservados.
+        </span>
+      </div>
+      <div class="text-xs text-gray-400">
+        Sistema eGarage AI™ desarrollado por Atlanta Reciclajes • RUT: 77.350.892-5
+      </div>
+    </div>
+    <div class="text-center mt-1">
+      <span class="text-xs text-gray-500">
+        Contacto: <a href="mailto:suscripcion@atlantareciclajes.cl" class="text-cyan-400 hover:text-cyan-300">suscripcion@atlantareciclajes.cl</a>
+      </span>
+    </div>
+  </div>
+</footer>
 
 {% block extra_js %}{% endblock %}
 

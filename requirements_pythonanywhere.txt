@@ -1,0 +1,60 @@
+# ============================================================
+# 📋 REQUIREMENTS.TXT OPTIMIZADO PARA PYTHONANYWHERE
+# ============================================================
+# Archivo: requirements_pythonanywhere.txt
+# Dependencias esenciales para producción en PythonAnywhere
+
+# Django Framework
+Django==5.1.6
+djangorestframework==3.16.0
+
+# Base de datos MySQL para PythonAnywhere
+mysqlclient==2.2.0
+
+# Django Extensions
+django-allauth==65.8.0
+django-autocomplete-light==3.12.1
+django-crispy-forms==2.4
+crispy-bootstrap4==2024.10
+crispy-bootstrap5==2025.6
+django-widget-tweaks==1.5.0
+django-extensions==4.1
+
+# Servidor web
+gunicorn==23.0.0
+whitenoise==6.9.0
+
+# Procesamiento de archivos
+Pillow==11.2.1
+reportlab==4.4.0
+xhtml2pdf==0.2.17
+weasyprint==65.1
+
+# Excel y documentos
+openpyxl==3.1.5
+pandas==2.3.1
+
+# QR Codes
+qrcode==8.2
+
+# Utilidades
+python-dateutil==2.9.0.post0
+python-dotenv==1.1.0
+pytz==2025.2
+beautifulsoup4==4.13.4
+requests==2.32.3
+
+# Desarrollo y testing (opcional)
+# selenium==4.33.0
+
+# Dependencias básicas
+asgiref==3.8.1
+sqlparse==0.5.3
+tzdata==2025.1
+certifi==2025.4.26
+charset-normalizer==3.4.2
+idna==3.10
+urllib3==2.4.0
+six==1.17.0
+packaging==25.0
+typing_extensions==4.13.2

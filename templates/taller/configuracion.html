@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+<style>
+body {
+  background: radial-gradient(ellipse at center, #0f2027 0%, #2c5364 100%);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+.futuristic-bg {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  z-index: -1;
+  background: url('https://www.transparenttextures.com/patterns/stardust.png'), linear-gradient(135deg, #0f2027 0%, #2c5364 100%);
+  animation: stars 20s linear infinite;
+}
+@keyframes stars {
+  0% {background-position: 0 0, 0 0;}
+  100% {background-position: 1000px 1000px, 0 0;}
+}
+.futuristic-form {
+  background: rgba(20, 30, 60, 0.95);
+  border-radius: 2rem;
+  box-shadow: 0 0 40px 10px #00ffe7a0, 0 0 0 2px #00ffe7;
+  padding: 2.5rem;
+  margin-top: 3rem;
+  color: #e0e0ff;
+  font-family: 'Orbitron', 'Share Tech Mono', 'Segoe UI', Arial, sans-serif;
+}
+.futuristic-label {
+  color: #00ffe7;
+  font-weight: bold;
+  letter-spacing: 2px;
+  text-shadow: 0 0 8px #00ffe7a0;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+input.futuristic-input,
+select.futuristic-input,
+textarea.futuristic-input {
+  background: #181f2a !important;
+  color: #00ffe7 !important;
+  border: 2px solid #00ffe7 !important;
+  border-radius: 0.7rem !important;
+  font-family: 'Share Tech Mono', 'Orbitron', monospace !important;
+  font-size: 1.1rem !important;
+  box-shadow: 0 0 10px #00ffe7a0;
+  padding: 0.8rem !important;
+  width: 100% !important;
+}
+input.futuristic-input::placeholder,
+textarea.futuristic-input::placeholder {
+  color: #00ffe7a0 !important;
+}
+.futuristic-btn {
+  background: linear-gradient(90deg, #00ffe7 0%, #1e90ff 100%);
+  color: #181f2a;
+  font-family: 'Orbitron', 'Share Tech Mono', Arial, sans-serif;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border-radius: 1rem;
+  box-shadow: 0 0 20px #00ffe7a0;
+  padding: 0.8rem 2.5rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: none;
+  cursor: pointer;
+}
+.futuristic-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 40px #00ffe7a0;
+}
+.futuristic-btn-secondary {
+  background: linear-gradient(90deg, #ff6b6b 0%, #ff8e53 100%);
+  color: #181f2a;
+  font-family: 'Orbitron', 'Share Tech Mono', Arial, sans-serif;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border-radius: 1rem;
+  box-shadow: 0 0 20px #ff6b6ba0;
+  padding: 0.8rem 2.5rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: none;
+  cursor: pointer;
+}
+.futuristic-btn-secondary:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 40px #ff6b6ba0;
+}
+.futuristic-title {
+  font-family: 'Orbitron', 'Share Tech Mono', Arial, sans-serif;
+  font-size: 3rem;
+  color: #00ffe7;
+  text-align: center;
+  margin-bottom: 2rem;
+  text-shadow: 0 0 20px #00ffe7a0, 0 0 2px #fff;
+  letter-spacing: 0.2em;
+}
+.config-section {
+  background: rgba(30, 40, 70, 0.8);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid #00ffe750;
+}
+.personal-section {
+  background: rgba(70, 30, 40, 0.8);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid #ff6b6b50;
+}
+.info-box {
+  background: rgba(0, 255, 231, 0.1);
+  border-left: 4px solid #00ffe7;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 0.5rem;
+}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<div class="futuristic-bg"></div>
+<div class="max-w-6xl mx-auto futuristic-form">
+  <h1 class="futuristic-title">⚙️ Configuración del Taller</h1>
+  
+  {% if created %}
+  <div class="info-box">
+    <h3 class="text-lg font-bold text-cyan-300 mb-2">🆕 Bienvenido a TallerPro</h3>
+    <p class="text-cyan-100">Esta es tu primera vez configurando el taller. Completa los datos para personalizar tu experiencia.</p>
+  </div>
+  {% endif %}
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <!-- Formulario de Datos Personales -->
+    <div class="personal-section">
+      <h3 class="futuristic-label text-xl mb-4" style="color: #ff6b6b;">👤 Datos Personales</h3>
+      <form method="post" class="space-y-4">
+        {% csrf_token %}
+        <input type="hidden" name="datos_form" value="1">
+        
+        <div>
+          <label class="futuristic-label" style="color: #ff6b6b;" for="id_first_name">{{ datos_form.first_name.label }}:</label>
+          {{ datos_form.first_name|add_class:'futuristic-input' }}
+        </div>
+        
+        <div>
+          <label class="futuristic-label" style="color: #ff6b6b;" for="id_last_name">{{ datos_form.last_name.label }}:</label>
+          {{ datos_form.last_name|add_class:'futuristic-input' }}
+        </div>
+        
+        <div>
+          <label class="futuristic-label" style="color: #ff6b6b;" for="id_email">{{ datos_form.email.label }}:</label>
+          {{ datos_form.email|add_class:'futuristic-input' }}
+        </div>
+        
+        <div class="text-center pt-4">
+          <button class="futuristic-btn-secondary" type="submit">
+            💾 Guardar Datos Personales
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Formulario de Empresa -->
+    <div class="config-section">
+      <h3 class="futuristic-label text-xl mb-4">🏢 Datos de la Empresa</h3>
+      <form method="post" enctype="multipart/form-data" class="space-y-4">
+        {% csrf_token %}
+        <input type="hidden" name="empresa_form" value="1">
+        
+        <div>
+          <label class="futuristic-label" for="id_nombre_taller">{{ empresa_form.nombre_taller.label }}:</label>
+          {{ empresa_form.nombre_taller|add_class:'futuristic-input' }}
+        </div>
+        
+        <div>
+          <label class="futuristic-label" for="id_empresa">{{ empresa_form.empresa.label }}:</label>
+          {{ empresa_form.empresa|add_class:'futuristic-input' }}
+        </div>
+        
+        <div>
+          <label class="futuristic-label" for="id_direccion">{{ empresa_form.direccion.label }}:</label>
+          {{ empresa_form.direccion|add_class:'futuristic-input' }}
+        </div>
+        
+        <div>
+          <label class="futuristic-label" for="id_telefono">{{ empresa_form.telefono.label }}:</label>
+          {{ empresa_form.telefono|add_class:'futuristic-input' }}
+        </div>
+        
+        <div>
+          <label class="futuristic-label" for="id_logo">{{ empresa_form.logo.label }}:</label>
+          {{ empresa_form.logo|add_class:'futuristic-input' }}
+          {% if empresa.logo %}
+          <div class="mt-4">
+            <p class="text-cyan-300 mb-2">Logo actual:</p>
+            <img src="{{ empresa.logo.url }}" alt="Logo actual" class="max-w-xs h-auto border-2 border-cyan-400 rounded-lg">
+          </div>
+          {% endif %}
+        </div>
+        
+        <div class="text-center pt-4">
+          <button class="futuristic-btn" type="submit">
+            💾 Guardar Datos de la Empresa
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Estado de la Cuenta -->
+  <div class="config-section mt-8">
+    <h3 class="futuristic-label text-xl mb-4">📊 Estado de la Cuenta</h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+      <div class="bg-gradient-to-r from-green-500 to-green-600 p-4 rounded-lg">
+        <div class="text-2xl font-bold">{{ empresa.dias_restantes }}</div>
+        <div class="text-sm">Días restantes</div>
+      </div>
+      <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-4 rounded-lg">
+        <div class="text-2xl font-bold">{{ empresa.suscripcion_activa|yesno:"✅,❌" }}</div>
+        <div class="text-sm">Suscripción</div>
+      </div>
+      <div class="bg-gradient-to-r from-purple-500 to-purple-600 p-4 rounded-lg">
+        <div class="text-2xl font-bold">{{ empresa.fecha_inicio|date:"d/m/Y" }}</div>
+        <div class="text-sm">Fecha de inicio</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botón volver -->
+  <div class="text-center pt-6">
+    <a href="{% url 'dashboard' %}" class="futuristic-btn" style="background: linear-gradient(90deg, #666 0%, #999 100%);">
+      🔙 Volver al Dashboard
+    </a>
+  </div>
+</div>
+{% endblock %}

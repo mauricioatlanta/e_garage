@@ -1,0 +1,13 @@
+Hola {{ user.username }},
+
+Gracias por registrarte en E-Garage.
+
+Por favor confirma tu correo electrónico haciendo clic en el siguiente enlace:
+
+{{ activate_url }}
+
+Si no creaste esta cuenta, ignora este mensaje.
+
+¡Bienvenido al futuro de los talleres!
+
+El equipo de E-Garage

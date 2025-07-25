@@ -1,0 +1,13 @@
+{
+  "empresa": {
+    "nombre_taller": "Taller de test_mecanicos",
+    "direccion": "",
+    "telefono": "",
+    "email": ""
+  },
+  "estadisticas": {
+    "total_documentos": 0
+  },
+  "fecha_backup": "20250722_201505",
+  "documentos": []
+}

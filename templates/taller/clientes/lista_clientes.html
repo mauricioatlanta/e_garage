@@ -1,18 +1,128 @@
+
 {% extends 'base.html' %}
 {% load static %}
 
 {% block title %}Clientes | e-Garage{% endblock %}
 
+{% block fondo_extra %}
+<style>
+body {
+  background: linear-gradient(135deg, #0f2027 0%, #2c5364 100%);
+}
+.ultratech-header {
+  background: linear-gradient(120deg, #232526 0%, #0f2027 100%);
+  box-shadow: 0 8px 32px 0 #00ffe7a0;
+  border-bottom: 2px solid #00ffe7;
+  padding: 2.5rem 0 1.5rem 0;
+  position: relative;
+  overflow: hidden;
+  border-radius: 0 0 2rem 2rem;
+  backdrop-filter: blur(8px);
+}
+.futuristic-nav {
+  display: flex;
+  justify-content: center;
+  gap: 2.5rem;
+  margin-bottom: 1.5rem;
+}
+.futuristic-nav a {
+  color: #00ffe7;
+  font-family: 'Orbitron', 'Share Tech Mono', Arial, sans-serif;
+  font-size: 1.2rem;
+  font-weight: bold;
+  letter-spacing: 2px;
+  padding: 0.7rem 2rem;
+  border-radius: 1rem;
+  background: rgba(20,30,60,0.7);
+  box-shadow: 0 0 20px #00ffe7a0;
+  transition: background 0.2s, color 0.2s, transform 0.2s;
+}
+.futuristic-nav a:hover {
+  background: linear-gradient(90deg, #00ffe7 0%, #1e90ff 100%);
+  color: #181f2a;
+  transform: scale(1.08);
+}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<div class="ultratech-header">
+  <nav class="futuristic-nav">
+    <a href="/dashboard/" class="nav-cool"><span>🏠</span> Inicio</a>
+    <a href="/clientes/" class="nav-cool"><span>👥</span> Clientes</a>
+    <a href="/servicios/" class="nav-cool"><span>🛠️</span> Servicios</a>
+    <a href="/reportes/" class="nav-cool"><span>📊</span> Reportes</a>
+    <a href="/configuracion/" class="nav-cool"><span>⚙️</span> Configuración</a>
+  </nav>
+  <h2 class="text-4xl font-bold text-center text-[#00ffe7] tracking-widest mb-2" style="font-family:'Orbitron', 'Share Tech Mono', Arial, sans-serif; text-shadow:0 0 30px #00ffe7, 0 0 2px #fff; letter-spacing:0.25em;">🧬 Registro de Clientes</h2>
+</div>
+{% endblock %}
+
 {% block content %}
 <div class="max-w-5xl mx-auto px-4">
-  <div class="bg-black/30 backdrop-blur p-6 rounded-xl shadow-lg mb-10 border border-green-400">
+  <div class="bg-black/40 backdrop-blur p-6 rounded-2xl shadow-2xl mb-10 border border-[#00ffe7]">
     <div class="flex justify-between items-center mb-4">
-      <h2 class="text-3xl font-bold text-lime-400 flex items-center gap-2">🧬 Registro de Clientes</h2>
-      <a href="{% url 'clientes:crear_cliente' %}" class="bg-lime-500 text-black font-bold py-2 px-4 rounded hover:bg-lime-400 transition">+ Nuevo Cliente</a>
+      <a href="{% url 'clientes:crear_cliente' %}" class="btn-cool"><span>➕</span> Nuevo Cliente</a>
+      <form method="get" class="mb-0" id="busqueda-clientes-form" autocomplete="off">
+        <input type="text" name="q" value="{{ q }}" placeholder="🔍 Buscar por nombre, correo, RUT..." class="w-full px-4 py-2 rounded search-cool border border-[#00ffe7] focus:outline-none focus:ring-2 focus:ring-[#00ffe7]" id="busqueda-clientes-input">
+      </form>
+<style>
+.nav-cool {
+  background: #181f2a;
+  color: #fff !important;
+  font-family: 'Orbitron', 'Share Tech Mono', Arial, sans-serif;
+  font-size: 1.15rem;
+  font-weight: bold;
+  letter-spacing: 2px;
+  padding: 0.7rem 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 0 24px 4px #00ffe7, 0 0 8px #ff00cc inset;
+  border: 2px solid #00ffe7;
+  margin-right: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.2s, color 0.2s, transform 0.2s, box-shadow 0.2s, border 0.2s;
+}
+.nav-cool:hover {
+  background: linear-gradient(90deg, #00ffe7 0%, #1e90ff 100%);
+  color: #181f2a !important;
+  border: 2px solid #ff00cc;
+  transform: scale(1.08);
+  box-shadow: 0 0 40px 10px #ff00cc, 0 0 60px 10px #00ffe7;
+}
+.btn-cool {
+  background: linear-gradient(90deg, #00ffe7 0%, #1e90ff 100%);
+  color: #181f2a !important;
+  font-family: 'Orbitron', 'Share Tech Mono', Arial, sans-serif;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border-radius: 1rem;
+  box-shadow: 0 0 20px #00ffe7a0;
+  padding: 0.7rem 2rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.btn-cool:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 40px #00ffe7a0;
+}
+.search-cool {
+  background: #fff !important;
+  color: #181f2a !important;
+  font-family: 'Share Tech Mono', 'Orbitron', monospace !important;
+  font-size: 1.1rem !important;
+  border: 2px solid #00ffe7 !important;
+  border-radius: 0.7rem !important;
+  box-shadow: 0 0 10px #00ffe7a0;
+}
+.search-cool::placeholder {
+  color: #00ffe7a0 !important;
+}
+</style>
     </div>
-    <form method="get" class="mb-4" id="busqueda-clientes-form" autocomplete="off">
-      <input type="text" name="q" value="{{ q }}" placeholder="🔍 Buscar por nombre, correo, RUT..." class="w-full px-4 py-2 rounded bg-black/40 text-white border border-lime-500 focus:outline-none focus:ring-2 focus:ring-lime-300" id="busqueda-clientes-input">
-    </form>
     <div id="tabla-clientes">
       {% include 'taller/clientes/_tabla_clientes.html' with clientes=clientes %}
     </div>

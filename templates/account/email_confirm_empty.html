@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-xl mx-auto mt-24 p-8 bg-[#181c1f] text-white rounded-2xl shadow-2xl text-center">
+  <h2 class="text-3xl font-bold text-fuchsia-400 mb-4">Enlace de confirmación inválido</h2>
+  <p class="text-lg text-cyan-100 mb-6">No se encontró un token de confirmación de correo electrónico.<br>
+    Por favor, revisa el enlace que recibiste en tu correo o solicita un nuevo correo de activación.</p>
+  <a href="/accounts/login/" class="cta-btn-premium py-3 px-8 rounded-xl font-bold text-xl shadow-xl transition-all">Ir a iniciar sesión</a>
+</div>
+{% endblock %}

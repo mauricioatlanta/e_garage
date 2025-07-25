@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demasiados Intentos - eGarage</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 500px;
+            margin: 20px;
+        }
+        .icon {
+            font-size: 80px;
+            color: #e74c3c;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+        p {
+            color: #7f8c8d;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .countdown {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 25px 0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .countdown-timer {
+            font-size: 32px;
+            margin: 10px 0;
+        }
+        .security-info {
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 20px;
+            margin: 25px 0;
+            text-align: left;
+            border-radius: 0 10px 10px 0;
+        }
+        .security-info h3 {
+            color: #2980b9;
+            margin-top: 0;
+        }
+        .back-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 25px;
+            margin-top: 20px;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+        }
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .tips {
+            background-color: #e8f5e8;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 25px 0;
+            text-align: left;
+        }
+        .tips h4 {
+            color: #27ae60;
+            margin-top: 0;
+        }
+        .tips ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .tips li {
+            margin: 8px 0;
+            color: #2d3436;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">🛡️</div>
+        <h1>Demasiados Intentos</h1>
+        <p>Por tu seguridad, hemos bloqueado temporalmente el acceso desde tu ubicación debido a múltiples intentos de {{ action }}.</p>
+        
+        <div class="countdown">
+            <div>⏰ Tiempo Restante</div>
+            <div class="countdown-timer" id="countdown">
+                <span id="minutes">{{ remaining_minutes }}</span>:<span id="seconds">{{ remaining_seconds|stringformat:"02d" }}</span>
+            </div>
+            <small>Podrás intentar nuevamente cuando termine este tiempo</small>
+        </div>
+        
+        <div class="security-info">
+            <h3>🔒 ¿Por qué veo esto?</h3>
+            <p>Este mensaje aparece cuando:</p>
+            <ul>
+                <li>Se realizan demasiados intentos de acceso en poco tiempo</li>
+                <li>Detectamos actividad que podría ser automatizada</li>
+                <li>Como medida preventiva contra ataques de seguridad</li>
+            </ul>
+        </div>
+        
+        <div class="tips">
+            <h4>💡 Consejos para evitar este bloqueo:</h4>
+            <ul>
+                <li><strong>Verifica tu contraseña</strong> antes de intentar varias veces</li>
+                <li><strong>Usa "Recordar contraseña"</strong> en tu navegador</li>
+                <li><strong>Espera entre intentos</strong> si no estás seguro de tus datos</li>
+                <li><strong>Restablece tu contraseña</strong> si la has olvidado</li>
+            </ul>
+        </div>
+        
+        <a href="/" class="back-button">🏠 Volver al Inicio</a>
+        
+        <p style="margin-top: 30px; font-size: 14px; color: #95a5a6;">
+            Si necesitas ayuda inmediata, contacta a nuestro soporte:<br>
+            📧 soporte@egarage.com | 📞 +57 300 123 4567
+        </p>
+    </div>
+
+    <script>
+        // Countdown timer
+        let totalSeconds = {{ remaining_time }};
+        
+        function updateCountdown() {
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            
+            document.getElementById('minutes').textContent = minutes;
+            document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+            
+            if (totalSeconds <= 0) {
+                // Tiempo agotado, recargar página
+                location.reload();
+            } else {
+                totalSeconds--;
+            }
+        }
+        
+        // Actualizar cada segundo
+        setInterval(updateCountdown, 1000);
+        
+        // Auto-reload cuando termine el tiempo
+        setTimeout(() => {
+            location.reload();
+        }, {{ remaining_time }} * 1000);
+    </script>
+</body>
+</html>

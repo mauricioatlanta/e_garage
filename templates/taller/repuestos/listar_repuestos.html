@@ -1,35 +1,170 @@
+
 {% extends 'base.html' %}
+{% load humanize %}
 {% block content %}
-<div class="max-w-5xl mx-auto mt-10 p-8 bg-black/70 rounded shadow">
-  <h1 class="text-2xl font-bold mb-6">Listado de Repuestos</h1>
-  <a href="{% url 'repuestos:crear_repuesto' %}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow mb-4 inline-block">+ Agregar Repuesto</a>
-  <div class="overflow-x-auto">
-    <table class="min-w-full text-sm text-left bg-black/60 rounded">
-      <thead class="bg-gray-700 text-white">
+<div class="max-w-6xl mx-auto bg-gradient-to-br from-[#0f2027] via-[#2c5364] to-[#1a2980] p-10 rounded-3xl shadow-2xl relative border border-cyan-400 backdrop-blur-xl" style="box-shadow: 0 0 60px 10px #00ffe7, 0 0 8px 2px #1a2980 inset;">
+  <!-- Barra de navegación superior -->
+  <nav class="flex justify-between items-center px-8 py-4 bg-gradient-to-r from-[#0f2027] via-[#2c5364] to-[#1a2980] rounded-xl shadow-xl mb-8 border border-cyan-400" style="backdrop-filter: blur(8px);">
+    <div class="flex items-center gap-8">
+      <a href="/" class="text-cyan-400 font-extrabold text-2xl tracking-widest futuristic-logo animate-pulse">E-Garage</a>
+      <a href="{% url 'vehiculos:lista_vehiculos' %}" class="nav-btn-future">Vehículos</a>
+      <a href="/clientes/" class="nav-btn-future">Clientes</a>
+      <a href="/dashboard/" class="nav-btn-future">Dashboard</a>
+    </div>
+    <div class="flex gap-4">
+      <a href="/" class="btn-cine-future">Inicio</a>
+      <a href="{% url 'vehiculos:lista_vehiculos' %}" class="btn-cine-future">Lista Vehículos</a>
+      <a href="/repuestos/" class="btn-cine-future">Repuestos</a>
+      <a href="/clientes/" class="btn-cine-future">Clientes</a>
+      <a href="/dashboard/" class="btn-cine-future">Dashboard</a>
+    </div>
+  </nav>
+  <style>
+    select, input[type="text"], input[type="number"], input, textarea {
+      background: #111 !important;
+      color: #00ffe7 !important;
+      font-family: 'Orbitron', 'Segoe UI', sans-serif !important;
+      border: 2.5px solid #00ffe7;
+      font-size: 1.15em;
+      font-weight: bold;
+      border-radius: 0.8em;
+      padding: 0.8em 1.2em;
+      margin-bottom: 1em;
+      width: 100%;
+      box-sizing: border-box;
+      box-shadow: 0 0 16px 4px #00ffe7 inset, 0 0 8px 2px #1a2980;
+      transition: border 0.2s, box-shadow 0.2s;
+      display: block;
+      opacity: 1;
+      position: static;
+      pointer-events: auto;
+      z-index: auto;
+      letter-spacing: 2px;
+      outline: none;
+    }
+    select option {
+      background: #1a2980;
+      color: #00ffe7;
+      font-family: 'Orbitron', 'Segoe UI', sans-serif !important;
+      font-weight: bold;
+      font-size: 1em;
+      border-bottom: 1px solid #00ffe7;
+    }
+    label {
+      color: #00ffe7 !important;
+      font-family: 'Orbitron', 'Segoe UI', sans-serif !important;
+      letter-spacing: 2px;
+    }
+    .futuristic-title {
+      font-family: 'Orbitron', 'Segoe UI', sans-serif;
+      letter-spacing: 4px;
+      text-shadow: 0 0 32px #00ffe7, 0 0 8px #1a2980;
+    }
+    .btn-cine-future {
+      background: linear-gradient(90deg, #00ffe7 0%, #1a2980 100%);
+      color: #111;
+      font-weight: bold;
+      border-radius: 0.8em;
+      padding: 0.7em 1.4em;
+      font-size: 1.1em;
+      box-shadow: 0 0 16px 2px #00ffe7;
+      transition: background 0.2s, color 0.2s;
+      border: none;
+      outline: none;
+      margin-right: 0.5em;
+    }
+    .btn-cine-future:hover {
+      background: linear-gradient(90deg, #1a2980 0%, #00ffe7 100%);
+      color: #00ffe7;
+    }
+    .nav-btn-future {
+      color: #00ffe7;
+      font-weight: bold;
+      font-size: 1.1em;
+      padding: 0.5em 1em;
+      border-radius: 0.8em;
+      transition: background 0.2s, color 0.2s;
+      margin-right: 0.5em;
+    }
+    .nav-btn-future:hover {
+      background: #00ffe7;
+      color: #111;
+    }
+    .glassmorphism-box {
+      background: rgba(44,83,100,0.18);
+      box-shadow: 0 0 32px 8px #00ffe7;
+      border-radius: 1.2em;
+      border: 2px solid #00ffe7;
+      padding: 2em;
+      margin-bottom: 2em;
+    }
+    table.futuristic-table {
+      background: rgba(44,83,100,0.18);
+      border-radius: 1em;
+      box-shadow: 0 0 32px 8px #00ffe7;
+      border: 2px solid #00ffe7;
+      width: 100%;
+      margin-bottom: 2em;
+      overflow: hidden;
+    }
+    table.futuristic-table th, table.futuristic-table td {
+      padding: 1em 1.2em;
+      font-size: 1.08em;
+      font-weight: bold;
+      color: #00ffe7;
+      border-bottom: 1px solid #00ffe7;
+      background: rgba(17,17,17,0.8);
+    }
+    table.futuristic-table th {
+      background: #1a2980;
+      color: #00ffe7;
+      font-size: 1.15em;
+      text-shadow: 0 0 8px #00ffe7;
+    }
+    table.futuristic-table tr:last-child td {
+      border-bottom: none;
+    }
+    .futuristic-action {
+      color: #00ffe7;
+      font-size: 1.3em;
+      margin-right: 0.5em;
+      transition: color 0.2s;
+    }
+    .futuristic-action:hover {
+      color: #1a2980;
+    }
+  </style>
+  <h1 class="text-5xl font-black tracking-widest text-cyan-300 futuristic-title animate-gradient mb-8">Listado de Repuestos</h1>
+  <a href="{% url 'repuestos:crear_repuesto' %}" class="btn-cine-future mb-6">+ Agregar Repuesto</a>
+  <div class="overflow-x-auto glassmorphism-box">
+    <table class="futuristic-table">
+      <thead>
         <tr>
-          <th class="px-4 py-2">Nombre</th>
-          <th class="px-4 py-2">Part Number</th>
-          <th class="px-4 py-2">Precio Venta</th>
-          <th class="px-4 py-2">Stock</th>
-          <th class="px-4 py-2">Tienda</th>
-          <th class="px-4 py-2">Acciones</th>
+          <th>Nombre</th>
+          <th>Part Number</th>
+          <th>Precio Compra</th>
+          <th>Precio Venta</th>
+          <th>Stock</th>
+          <th>Tienda</th>
+          <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
         {% for repuesto in repuestos %}
-        <tr class="border-b border-gray-600">
-          <td class="px-4 py-2">{{ repuesto.nombre_repuesto }}</td>
-          <td class="px-4 py-2">{{ repuesto.part_number }}</td>
-          <td class="px-4 py-2">${{ repuesto.precio_venta }}</td>
-          <td class="px-4 py-2">{{ repuesto.stock }}</td>
-          <td class="px-4 py-2">{{ repuesto.tienda }}</td>
-          <td class="px-4 py-2 space-x-2">
-            <a href="{% url 'repuestos:editar_repuesto' repuesto.id %}" class="text-yellow-400 hover:underline" title="Editar">✏️</a>
-            <a href="{% url 'repuestos:eliminar_repuesto' repuesto.id %}" class="text-red-500 hover:underline" title="Eliminar">🗑️</a>
+        <tr>
+          <td>{{ repuesto.nombre_repuesto }}</td>
+          <td>{{ repuesto.part_number }}</td>
+          <td>${{ repuesto.precio_compra|floatformat:0|intcomma }}</td>
+          <td>${{ repuesto.precio_venta|floatformat:0|intcomma }}</td>
+          <td>{{ repuesto.stock }}</td>
+          <td>{{ repuesto.tienda }}</td>
+          <td>
+            <a href="{% url 'repuestos:editar_repuesto' repuesto.id %}" class="futuristic-action" title="Editar">✏️</a>
+            <a href="{% url 'repuestos:eliminar_repuesto' repuesto.id %}" class="futuristic-action" title="Eliminar">🗑️</a>
           </td>
         </tr>
         {% empty %}
-        <tr><td colspan="5" class="text-center text-gray-400 py-4">No hay repuestos registrados.</td></tr>
+        <tr><td colspan="7" class="text-center text-cyan-400 py-4">No hay repuestos registrados.</td></tr>
         {% endfor %}
       </tbody>
     </table>

@@ -1,0 +1,38 @@
+{
+  "empresa": {
+    "nombre_taller": "Taller AutoFix",
+    "direccion": "Av. Principal 123",
+    "telefono": "+56912345678",
+    "email": ""
+  },
+  "estadisticas": {
+    "total_documentos": 4
+  },
+  "fecha_backup": "20250722_201505",
+  "documentos": [
+    {
+      "numero_documento": "F-329",
+      "tipo_documento": "Factura",
+      "fecha": "2025-07-21",
+      "observaciones": ""
+    },
+    {
+      "numero_documento": "F-882",
+      "tipo_documento": "Factura",
+      "fecha": "2025-07-21",
+      "observaciones": ""
+    },
+    {
+      "numero_documento": "TEST-14-003",
+      "tipo_documento": "Presupuesto",
+      "fecha": "2025-07-22",
+      "observaciones": null
+    },
+    {
+      "numero_documento": "TEST-14-004",
+      "tipo_documento": "Presupuesto",
+      "fecha": "2025-07-22",
+      "observaciones": null
+    }
+  ]
+}

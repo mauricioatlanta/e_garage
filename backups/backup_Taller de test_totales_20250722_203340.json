@@ -1,0 +1,38 @@
+{
+  "empresa": {
+    "id": 16,
+    "nombre_taller": "Taller de test_totales",
+    "empresa": "test_totales",
+    "direccion": "",
+    "telefono": "",
+    "email": "",
+    "fecha_inicio": "2025-07-22T13:30:57.404577+00:00",
+    "suscripcion_activa": true
+  },
+  "timestamp": "20250722_203340",
+  "version": "1.0",
+  "datos": {
+    "perfiles_usuario": [
+      {
+        "model": "taller.perfilusuario",
+        "pk": 4,
+        "fields": {
+          "user": 16,
+          "empresa": 16,
+          "rol": "admin"
+        }
+      }
+    ],
+    "clientes": [],
+    "vehiculos": [],
+    "mecanicos": [],
+    "documentos": [],
+    "repuestos": []
+  },
+  "estadisticas": {
+    "total_registros": 1,
+    "total_documentos": 0,
+    "total_logs": 0,
+    "size_mb": 0.0
+  }
+}

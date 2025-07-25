@@ -1,0 +1,303 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-7xl mx-auto p-8">
+  
+  <!-- Alerta de suscripción -->
+  {% include 'components/alerta_suscripcion.html' %}
+  
+  <!-- 🇺🇸 BANNER USA MARKET - NUEVA FUNCIONALIDAD -->
+  <section class="glass-card p-6 mb-8 rounded-3xl shadow-xl bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#0f2027] border border-blue-400 relative overflow-hidden">
+    <!-- Bandera animada de fondo -->
+    <div class="absolute top-0 right-0 text-6xl opacity-20 animate-pulse">🇺🇸</div>
+    
+    <div class="relative z-10">
+      <h2 class="text-2xl font-bold text-blue-400 mb-2 flex items-center gap-2">
+        🚀 <span class="bg-gradient-to-r from-blue-400 to-red-400 bg-clip-text text-transparent">¡NUEVO! TallerPro USA Market Ready</span>
+      </h2>
+      <p class="text-blue-200 text-lg mb-4">
+        Localización completa para el mercado estadounidense: 25 estados, 29 marcas de vehículos, cálculos fiscales automáticos y más.
+      </p>
+      
+      <div class="flex flex-wrap gap-4">
+        <a href="/demo-usa/" class="bg-gradient-to-r from-blue-500 to-blue-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center gap-2">
+          🌎 <span>Ver Demo USA</span>
+        </a>
+        <a href="/demo-atlanta/" class="bg-gradient-to-r from-red-500 to-red-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center gap-2">
+          🍑 <span>Demo Atlanta</span>
+        </a>
+        <div class="bg-green-500/20 text-green-300 px-4 py-3 rounded-xl border border-green-400 flex items-center gap-2">
+          ✅ <span class="font-semibold">67% Completado</span>
+        </div>
+      </div>
+      
+      <div class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+        <div class="text-center">
+          <div class="text-2xl font-bold text-blue-400">25</div>
+          <div class="text-blue-200">Estados USA</div>
+        </div>
+        <div class="text-center">
+          <div class="text-2xl font-bold text-blue-400">29</div>
+          <div class="text-blue-200">Marcas Vehículos</div>
+        </div>
+        <div class="text-center">
+          <div class="text-2xl font-bold text-blue-400">52</div>
+          <div class="text-blue-200">Modelos</div>
+        </div>
+        <div class="text-center">
+          <div class="text-2xl font-bold text-green-400">6</div>
+          <div class="text-green-200">APIs Activas</div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Bienvenida IA -->
+  <section class="glass-card p-6 mb-8 rounded-3xl shadow-xl bg-gradient-to-br from-[#0f2027] via-[#2c5364] to-[#1a2980] border border-cyan-400">
+    <h2 class="text-3xl font-bold text-cyan-400 mb-2 animate-pulse">{{ bienvenida }}</h2>
+    <div class="flex flex-wrap gap-4 mt-4">
+      <div class="bg-black/60 rounded-xl p-4 shadow-lg border border-cyan-400">
+        <span class="text-lg text-cyan-300 font-bold">Ventas hoy</span>
+        <div class="text-2xl text-cyan-400 font-extrabold">${{ ventas_hoy|floatformat:0 }}</div>
+      </div>
+      <div class="bg-black/60 rounded-xl p-4 shadow-lg border border-cyan-400">
+        <span class="text-lg text-cyan-300 font-bold">Ventas semana</span>
+        <div class="text-2xl text-cyan-400 font-extrabold">${{ ventas_semana|floatformat:0 }}</div>
+      </div>
+      <div class="bg-black/60 rounded-xl p-4 shadow-lg border border-cyan-400">
+        <span class="text-lg text-cyan-300 font-bold">Ventas mes</span>
+        <div class="text-2xl text-cyan-400 font-extrabold">${{ ventas_mes|floatformat:0 }}</div>
+      </div>
+    </div>
+    <div class="mt-6 text-cyan-200 text-xl font-semibold">{{ prediccion }}</div>
+    {% if alertas %}
+      <div class="mt-4">
+        <h3 class="text-cyan-400 font-bold text-lg mb-2">Alertas inteligentes</h3>
+        <ul class="list-disc ml-6 text-cyan-200">
+          {% for alerta in alertas %}
+            <li>{{ alerta }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+  </section>
+
+  <!-- KPIs visuales -->
+  <section class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+    <div class="glass-card p-6 rounded-3xl shadow-xl bg-gradient-to-br from-[#1a2980] via-[#2c5364] to-[#0f2027] border border-cyan-400">
+      <h3 class="text-xl text-cyan-400 font-bold mb-4">Top 5 Repuestos Más Vendidos</h3>
+      <ul>
+        {% for r in top_repuestos %}
+          <li class="mb-2 text-cyan-200 font-semibold">{{ r.nombre_repuesto }} <span class="text-cyan-400">({{ r.vendidos }})</span> - Ganancia: <span class="text-green-400">${{ r.ganancia|floatformat:0 }}</span></li>
+        {% empty %}
+          <li class="text-cyan-200">No hay datos.</li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="glass-card p-6 rounded-3xl shadow-xl bg-gradient-to-br from-[#1a2980] via-[#2c5364] to-[#0f2027] border border-cyan-400">
+      <h3 class="text-xl text-cyan-400 font-bold mb-4">Top 5 Servicios Más Solicitados</h3>
+      <ul>
+        {% for s in top_servicios %}
+          <li class="mb-2 text-cyan-200 font-semibold">{{ s.nombre }} <span class="text-cyan-400">({{ s.cantidad }})</span></li>
+        {% empty %}
+          <li class="text-cyan-200">No hay datos.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </section>
+
+  <!-- Actividad usuarios -->
+  <section class="glass-card p-6 rounded-3xl shadow-xl bg-gradient-to-br from-[#2c5364] via-[#1a2980] to-[#0f2027] border border-cyan-400 mb-8">
+    <h3 class="text-xl text-cyan-400 font-bold mb-4">Top 3 Mecánicos/Usuarios Más Activos</h3>
+    <ul>
+      {% for u in actividad_usuarios %}
+        <li class="mb-2 text-cyan-200 font-semibold">{{ u.mecanico__nombre }} <span class="text-cyan-400">({{ u.cantidad }})</span></li>
+      {% empty %}
+        <li class="text-cyan-200">No hay datos.</li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <!-- Área de gráficos (puedes integrar Chart.js aquí) -->
+  <section class="glass-card p-6 rounded-3xl shadow-xl bg-gradient-to-br from-[#0f2027] via-[#2c5364] to-[#1a2980] border border-cyan-400 mb-8">
+    <h3 class="text-xl text-cyan-400 font-bold mb-4">Gráficos de desempeño</h3>
+    <canvas id="grafico-ventas" class="w-full h-64"></canvas>
+    <!-- Aquí puedes agregar más gráficos -->
+  </section>
+
+  <!-- Acciones rápidas -->
+  <section class="flex flex-wrap gap-4 justify-center mt-8">
+    <button class="btn-cine-future" onclick="openModal('vehiculo')">➕ Registrar vehículo</button>
+    <button class="btn-cine-future" onclick="openModal('venta')">💼 Crear venta</button>
+    <button class="btn-cine-future" onclick="openModal('documento')">🧾 Emitir documento</button>
+    <button class="btn-cine-future" onclick="openModal('compra')">🛒 Registrar compra</button>
+    <a href="{% url 'taller:business_intelligence:dashboard' %}" class="btn-cine-future">🧠 Inteligencia de Negocio</a>
+  </section>
+
+  <!-- Modales (estructura básica, puedes personalizar con JS) -->
+  <!-- 🚗 Modal para crear vehículo -->
+  <div id="modal-vehiculo" class="fixed inset-0 z-50 bg-black/60 flex justify-center items-center hidden">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-xl shadow-lg">
+      <h2 class="text-xl font-bold mb-4 text-center">🚗 Registrar Vehículo</h2>
+      <form id="form-vehiculo">
+        {% csrf_token %}
+        <div class="grid grid-cols-2 gap-4">
+          <input name="patente" type="text" class="input" placeholder="Patente" required>
+          <input name="modelo" type="text" class="input" placeholder="Modelo" required>
+          <input name="marca" type="text" class="input" placeholder="Marca" required>
+          <input name="anio" type="number" class="input" placeholder="Año" min="1900" max="2099">
+          <input name="color" type="text" class="input" placeholder="Color">
+          <input name="vin" type="text" class="input" placeholder="VIN">
+        </div>
+        <div class="flex justify-end mt-6 gap-2">
+          <button type="button" onclick="closeModal('vehiculo')" class="btn-azul bg-gray-500 hover:bg-gray-600">Cerrar</button>
+          <button type="submit" class="btn-azul">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 📄 Modal para crear documento -->
+  <div id="modal-documento" class="fixed inset-0 z-50 bg-black/60 flex justify-center items-center hidden">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-xl shadow-lg">
+      <h2 class="text-xl font-bold mb-4 text-center">🧾 Crear Documento</h2>
+      <form id="form-documento">
+        {% csrf_token %}
+        <div class="grid grid-cols-2 gap-4">
+          <input name="cliente" type="text" class="input" placeholder="Cliente" required>
+          <input name="tipo" type="text" class="input" placeholder="Tipo (Boleta, Factura)">
+          <input name="total" type="number" class="input" placeholder="Total" required>
+          <input name="fecha" type="date" class="input" placeholder="Fecha" required>
+        </div>
+        <div class="flex justify-end mt-6 gap-2">
+          <button type="button" onclick="closeModal('documento')" class="btn-azul bg-gray-500 hover:bg-gray-600">Cerrar</button>
+          <button type="submit" class="btn-azul">Crear</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 💼 Modal para registrar venta -->
+  <div id="modal-venta" class="fixed inset-0 z-50 bg-black/60 flex justify-center items-center hidden">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-xl shadow-lg">
+      <h2 class="text-xl font-bold mb-4 text-center">💰 Registrar Venta</h2>
+      <form id="form-venta">
+        {% csrf_token %}
+        <div class="grid grid-cols-2 gap-4">
+          <input name="cliente" type="text" class="input" placeholder="Cliente" required>
+          <input name="repuesto" type="text" class="input" placeholder="Repuesto vendido">
+          <input name="cantidad" type="number" class="input" placeholder="Cantidad" required>
+          <input name="total" type="number" class="input" placeholder="Total venta" required>
+          <input name="fecha" type="date" class="input" placeholder="Fecha" required>
+        </div>
+        <div class="flex justify-end mt-6 gap-2">
+          <button type="button" onclick="closeModal('venta')" class="btn-azul bg-gray-500 hover:bg-gray-600">Cerrar</button>
+          <button type="submit" class="btn-azul">Registrar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+function openModal(tipo) {
+  document.getElementById('modal-' + tipo).classList.remove('hidden');
+}
+function closeModal(tipo) {
+  document.getElementById('modal-' + tipo).classList.add('hidden');
+}
+// Ejemplo Chart.js
+window.onload = function() {
+  if (window.Chart) {
+    var ctx = document.getElementById('grafico-ventas').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+        datasets: [{
+          label: 'Ventas',
+          data: [120, 190, 300, 250, 220, 170, 90], // Reemplaza con tus datos
+          backgroundColor: 'rgba(0,255,231,0.6)',
+          borderColor: '#00ffe7',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { labels: { color: '#00ffe7' } } },
+        scales: { x: { ticks: { color: '#00ffe7' } }, y: { ticks: { color: '#00ffe7' } } }
+      }
+    });
+  }
+}
+</script>
+<!-- Bloques AJAX para formularios -->
+<script>
+// 🚗 AJAX para crear vehículo
+document.getElementById('form-vehiculo')?.addEventListener('submit', async function (e) {
+  e.preventDefault();
+  const formData = new FormData(this);
+  const response = await fetch('/dashboard/ajax/vehiculo/', {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+    },
+    body: formData
+  });
+  const data = await response.json();
+  if (data.success) {
+    alert('✅ Vehículo registrado con éxito');
+    this.reset();
+    // cerrar modal, recargar datos, etc.
+  } else {
+    alert('❌ Error al registrar vehículo:\n' + Object.values(data.errors).join('\n'));
+  }
+});
+
+// 📄 AJAX para crear documento
+document.getElementById('form-documento')?.addEventListener('submit', async function (e) {
+  e.preventDefault();
+  const formData = new FormData(this);
+  const response = await fetch('/dashboard/ajax/documento/', {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+    },
+    body: formData
+  });
+  const data = await response.json();
+  if (data.success) {
+    alert('📄 Documento creado correctamente');
+    this.reset();
+  } else {
+    alert('❌ Error al crear documento:\n' + Object.values(data.errors).join('\n'));
+  }
+});
+
+// 💼 AJAX para crear venta
+document.getElementById('form-venta')?.addEventListener('submit', async function (e) {
+  e.preventDefault();
+  const formData = new FormData(this);
+  const response = await fetch('/dashboard/ajax/venta/', {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+    },
+    body: formData
+  });
+  const data = await response.json();
+  if (data.success) {
+    alert('💰 Venta registrada con éxito');
+    this.reset();
+  } else {
+    alert('❌ Error al registrar venta:\n' + Object.values(data.errors).join('\n'));
+  }
+});
+</script>
+<style>
+  .input {
+    @apply border px-3 py-2 rounded-lg w-full bg-white text-black focus:outline-none focus:ring-2 focus:ring-blue-500;
+  }
+  .btn-azul {
+    @apply bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition;
+  }
+</style>
+{% endblock %}

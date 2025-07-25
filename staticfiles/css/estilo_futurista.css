@@ -1,4 +1,22 @@
 
+.futurista-input {
+  background: #181828;
+  color: #00f2fe;
+  border: 1.5px solid #7f00ff;
+  border-radius: 0.7rem;
+  padding: 0.5rem 1rem;
+  font-size: 1.08rem;
+  margin-bottom: 0.5rem;
+  width: 100%;
+  box-shadow: 0 0 8px #7f00ff33;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+.futurista-input:focus {
+  border-color: #00f2fe;
+  box-shadow: 0 0 16px #00f2fe99;
+  outline: none;
+}
+
 body, html {
   margin: 0;
   padding: 0;

@@ -1,0 +1,50 @@
+{
+  "empresa": {
+    "nombre_taller": "Administración E-Garage",
+    "direccion": "",
+    "telefono": "",
+    "email": ""
+  },
+  "estadisticas": {
+    "total_documentos": 6
+  },
+  "fecha_backup": "20250722_201505",
+  "documentos": [
+    {
+      "numero_documento": "TEST-001",
+      "tipo_documento": "Presupuesto",
+      "fecha": "2025-07-21",
+      "observaciones": null
+    },
+    {
+      "numero_documento": "TEST-COMPLETO-001",
+      "tipo_documento": "Presupuesto",
+      "fecha": "2025-07-21",
+      "observaciones": "Documento de prueba para testing de edición"
+    },
+    {
+      "numero_documento": "TEST-13-003",
+      "tipo_documento": "Presupuesto",
+      "fecha": "2025-07-22",
+      "observaciones": null
+    },
+    {
+      "numero_documento": "TEST-13-004",
+      "tipo_documento": "Presupuesto",
+      "fecha": "2025-07-22",
+      "observaciones": null
+    },
+    {
+      "numero_documento": "TEST-00001",
+      "tipo_documento": "Presupuesto",
+      "fecha": "2025-07-22",
+      "observaciones": "Documento de prueba"
+    },
+    {
+      "numero_documento": "TEST-DOC-001",
+      "tipo_documento": "Orden de trabajo",
+      "fecha": "2025-07-22",
+      "observaciones": "Documento de prueba para detectar errores"
+    }
+  ]
+}

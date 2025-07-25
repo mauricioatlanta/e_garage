@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load simple_i18n %}
+
+{% block extra_head %}
+<style>
+body {
+  background: linear-gradient(120deg, #181818 0%, #232323 60%, #ffd600 100%);
+  min-height: 100vh;
+  font-family: 'Orbitron', 'Montserrat', Arial, sans-serif;
+}
+.error-card {
+  background: rgba(30, 30, 30, 0.98);
+  border-radius: 1.5rem;
+  box-shadow: 0 0 32px 4px #ff000099, 0 0 0 1px #181818;
+  border: 2px solid #ff4444;
+  color: #fff;
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 2rem;
+}
+.error-title {
+  color: #ff4444;
+  font-family: 'Orbitron', 'Montserrat', Arial, sans-serif;
+  text-shadow: 0 0 8px #ff4444, 0 0 2px #181818;
+  letter-spacing: 2px;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.error-message {
+  color: #fff;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.btn-back {
+  background: linear-gradient(90deg, #ffd600 0%, #181818 100%);
+  color: #181818;
+  border: none;
+  border-radius: 2rem;
+  padding: 0.8rem 2rem;
+  font-family: 'Orbitron', 'Montserrat', Arial, sans-serif;
+  font-size: 1.1rem;
+  font-weight: bold;
+  box-shadow: 0 0 16px #ffd60099, 0 0 4px #181818;
+  transition: all 0.3s;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  margin: 0 auto;
+}
+.btn-back:hover {
+  background: linear-gradient(90deg, #181818 0%, #ffd600 100%);
+  color: #ffd600;
+  box-shadow: 0 0 32px #ffd600cc, 0 0 8px #181818;
+  transform: scale(1.05);
+}
+.icon {
+  font-size: 4rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="error-card">
+  <div class="icon">❌</div>
+  <h1 class="error-title">{% trans "ACCESO RESTRINGIDO" %}</h1>
+  <div class="error-message">
+    <p><strong>{% trans "Esta cuenta ya tiene un usuario asignado." %}</strong></p>
+    <p>{% trans "No es posible registrar otro usuario para esta suscripcion." %}</p>
+    <br>
+    <p>🔒 {% trans "Cada taller/empresa puede tener unicamente" %} <strong>{% trans "UN USUARIO ACTIVO" %}</strong>.</p>
+    <p>💡 {% trans "Si necesitas cambiar el usuario principal, contacta al administrador del sistema." %}</p>
+  </div>
+  <div style="text-align: center;">
+    <a href="{% url 'registro' %}" class="btn-back">{% trans "Volver al Registro" %}</a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ documento.tipo_documento }} #{{ documento.numero_documento }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 1.5cm;
+            @bottom-center {
+                content: "Página " counter(page) " de " counter(pages) " | Generado el {{ fecha_generacion|date:'d/m/Y H:i' }}";
+                font-size: 9pt;
+                color: #666;
+            }
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            font-size: 11pt;
+            line-height: 1.4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .logo {
+            max-height: 80px;
+            max-width: 250px;
+            margin-bottom: 10px;
+        }
+        
+        .empresa-nombre {
+            font-size: 24pt;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 5px;
+        }
+        
+        .empresa-datos {
+            font-size: 10pt;
+            color: #666;
+            line-height: 1.2;
+        }
+        
+        .documento-header {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        
+        .documento-titulo {
+            font-size: 20pt;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .documento-numero {
+            font-size: 16pt;
+            margin-bottom: 10px;
+        }
+        
+        .info-grid {
+            display: table;
+            width: 100%;
+            margin-bottom: 30px;
+        }
+        
+        .info-row {
+            display: table-row;
+        }
+        
+        .info-cell {
+            display: table-cell;
+            width: 50%;
+            vertical-align: top;
+            padding: 0 10px;
+        }
+        
+        .info-box {
+            border: 2px solid #e9ecef;
+            padding: 15px;
+            border-radius: 8px;
+            background: #f8f9fa;
+            margin-bottom: 15px;
+        }
+        
+        .info-titulo {
+            font-weight: bold;
+            color: #007bff;
+            font-size: 12pt;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 5px;
+        }
+        
+        .info-campo {
+            margin-bottom: 5px;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #495057;
+            display: inline-block;
+            width: 100px;
+        }
+        
+        .tabla-items {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+            border: 2px solid #007bff;
+        }
+        
+        .tabla-items thead {
+            background: #007bff;
+            color: white;
+        }
+        
+        .tabla-items th {
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: bold;
+            border: 1px solid #0056b3;
+            font-size: 10pt;
+        }
+        
+        .tabla-items td {
+            padding: 10px 8px;
+            border: 1px solid #dee2e6;
+            font-size: 10pt;
+        }
+        
+        .tabla-items tbody tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .texto-derecha {
+            text-align: right;
+        }
+        
+        .texto-centro {
+            text-align: center;
+        }
+        
+        .subtitulo {
+            font-size: 14pt;
+            font-weight: bold;
+            color: #007bff;
+            margin: 25px 0 15px 0;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 5px;
+        }
+        
+        .totales {
+            background: #e3f2fd;
+            border: 2px solid #007bff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 25px;
+            float: right;
+            width: 350px;
+        }
+        
+        .total-fila {
+            display: table;
+            width: 100%;
+            margin-bottom: 8px;
+        }
+        
+        .total-label {
+            display: table-cell;
+            font-weight: bold;
+            color: #495057;
+        }
+        
+        .total-valor {
+            display: table-cell;
+            text-align: right;
+            font-weight: bold;
+            width: 120px;
+        }
+        
+        .total-final {
+            border-top: 2px solid #007bff;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+        
+        .total-final .total-label {
+            font-size: 14pt;
+            color: #007bff;
+        }
+        
+        .total-final .total-valor {
+            font-size: 16pt;
+            color: #007bff;
+        }
+        
+        .observaciones {
+            margin-top: 30px;
+            clear: both;
+        }
+        
+        .observaciones-box {
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            border-radius: 5px;
+            background: #f8f9fa;
+            min-height: 60px;
+        }
+        
+        .firma-seccion {
+            margin-top: 50px;
+            clear: both;
+        }
+        
+        .firma-grid {
+            display: table;
+            width: 100%;
+            margin-top: 30px;
+        }
+        
+        .firma-cell {
+            display: table-cell;
+            width: 50%;
+            text-align: center;
+            vertical-align: bottom;
+            padding: 20px;
+        }
+        
+        .firma-linea {
+            border-top: 1px solid #333;
+            margin-bottom: 5px;
+            height: 40px;
+        }
+        
+        .firma-texto {
+            font-size: 10pt;
+            color: #666;
+        }
+        
+        .servicio-externo {
+            background-color: #fff3cd !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header con logo y datos de la empresa -->
+    <div class="header">
+        {% if empresa.logo %}
+        <img src="{{ empresa.logo.url }}" alt="Logo {{ empresa.nombre }}" class="logo">
+        {% endif %}
+        <div class="empresa-nombre">{{ empresa.nombre }}</div>
+        <div class="empresa-datos">
+            {% if empresa.direccion %}{{ empresa.direccion }}<br>{% endif %}
+            {% if empresa.telefono %}Tel: {{ empresa.telefono }}{% endif %}
+            {% if empresa.email %} | Email: {{ empresa.email }}{% endif %}
+            {% if empresa.rut %}<br>RUT: {{ empresa.rut }}{% endif %}
+        </div>
+    </div>
+
+    <!-- Título del documento -->
+    <div class="documento-header">
+        <div class="documento-titulo">{{ documento.tipo_documento|upper }}</div>
+        <div class="documento-numero"># {{ documento.numero_documento }}</div>
+        <div>{{ documento.fecha|date:"d \d\e F \d\e Y" }}</div>
+    </div>
+
+    <!-- Información del cliente y vehículo -->
+    <div class="info-grid">
+        <div class="info-row">
+            <div class="info-cell">
+                <div class="info-box">
+                    <div class="info-titulo">👤 Datos del Cliente</div>
+                    <div class="info-campo">
+                        <span class="info-label">Nombre:</span> {{ documento.cliente.nombre }}
+                    </div>
+                    {% if documento.cliente.rut %}
+                    <div class="info-campo">
+                        <span class="info-label">RUT:</span> {{ documento.cliente.rut }}
+                    </div>
+                    {% endif %}
+                    {% if documento.cliente.telefono %}
+                    <div class="info-campo">
+                        <span class="info-label">Teléfono:</span> {{ documento.cliente.telefono }}
+                    </div>
+                    {% endif %}
+                    {% if documento.cliente.email %}
+                    <div class="info-campo">
+                        <span class="info-label">Email:</span> {{ documento.cliente.email }}
+                    </div>
+                    {% endif %}
+                    {% if documento.cliente.direccion %}
+                    <div class="info-campo">
+                        <span class="info-label">Dirección:</span> {{ documento.cliente.direccion }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="info-cell">
+                {% if documento.vehiculo %}
+                <div class="info-box">
+                    <div class="info-titulo">🚗 Datos del Vehículo</div>
+                    <div class="info-campo">
+                        <span class="info-label">Marca:</span> {{ documento.vehiculo.marca }}
+                    </div>
+                    <div class="info-campo">
+                        <span class="info-label">Modelo:</span> {{ documento.vehiculo.modelo }}
+                    </div>
+                    {% if documento.vehiculo.año %}
+                    <div class="info-campo">
+                        <span class="info-label">Año:</span> {{ documento.vehiculo.año }}
+                    </div>
+                    {% endif %}
+                    {% if documento.vehiculo.patente %}
+                    <div class="info-campo">
+                        <span class="info-label">Patente:</span> {{ documento.vehiculo.patente }}
+                    </div>
+                    {% endif %}
+                    {% if documento.kilometraje %}
+                    <div class="info-campo">
+                        <span class="info-label">Kilometraje:</span> {{ documento.kilometraje|floatformat:0 }} km
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+                
+                {% if documento.mecanico %}
+                <div class="info-box" style="margin-top: 15px;">
+                    <div class="info-titulo">🔧 Mecánico Asignado</div>
+                    <div class="info-campo">
+                        <span class="info-label">Nombre:</span> {{ documento.mecanico.nombre }}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Repuestos -->
+    {% if repuestos %}
+    <div class="subtitulo">🔩 Repuestos</div>
+    <table class="tabla-items">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Descripción</th>
+                <th class="texto-centro">Cantidad</th>
+                <th class="texto-derecha">Precio Unit.</th>
+                <th class="texto-derecha">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for repuesto in repuestos %}
+            <tr>
+                <td>{{ repuesto.codigo }}</td>
+                <td>{{ repuesto.nombre }}</td>
+                <td class="texto-centro">{{ repuesto.cantidad }}</td>
+                <td class="texto-derecha">${{ repuesto.precio|floatformat:0 }}</td>
+                <td class="texto-derecha">${{ repuesto.total|floatformat:0 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    <!-- Servicios Internos -->
+    {% if servicios %}
+    <div class="info-section">
+        <h3>Servicios Internos</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Descripción</th>
+                    <th>Precio</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for servicio in servicios %}
+                <tr>
+                    <td>{{ servicio.nombre }}</td>
+                    <td>${{ servicio.precio|floatformat:0 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <!-- Servicios Externos -->
+    {% if otros_servicios %}
+    <div class="info-section">
+        <h3>Servicios Subcontratados</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Servicio</th>
+                    <th>Empresa</th>
+                    <th>Precio</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for servicio in otros_servicios %}
+                <tr>
+                    <td>{{ servicio.nombre_servicio }}</td>
+                    <td>{{ servicio.empresa_externa }}</td>
+                    <td>${{ servicio.precio_cliente|floatformat:0 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <!-- Observaciones -->
+    {% if documento.observaciones %}
+    <div class="info-section">
+        <h3>Observaciones</h3>
+        <p>{{ documento.observaciones|linebreaks }}</p>
+    </div>
+    {% endif %}
+
+    <!-- Totales -->
+    <div class="totals">
+        <table class="table">
+            <tr>
+                <td><strong>Subtotal:</strong></td>
+                <td style="text-align: right;"><strong>${{ subtotal|floatformat:0 }}</strong></td>
+            </tr>
+            {% if documento.incluir_iva %}
+            <tr>
+                <td>IVA (19%):</td>
+                <td style="text-align: right;">${{ iva|floatformat:0 }}</td>
+            </tr>
+            {% endif %}
+            <tr style="border-top: 2px solid #000;">
+                <td><strong>TOTAL:</strong></td>
+                <td style="text-align: right; font-size: 16px;"><strong>${{ total|floatformat:0 }}</strong></td>
+            </tr>
+        </table>
+    </div>
+
+    <div style="clear: both;"></div>
+
+    <!-- Firmas -->
+    <div style="margin-top: 80px;">
+        <div style="display: flex; justify-content: space-between;">
+            <div style="text-align: center; width: 45%;">
+                <div style="border-top: 1px solid #000; margin-top: 50px; padding-top: 5px;">
+                    <strong>Firma del Cliente</strong><br>
+                    {{ documento.cliente.nombre }}
+                </div>
+            </div>
+            <div style="text-align: center; width: 45%;">
+                <div style="border-top: 1px solid #000; margin-top: 50px; padding-top: 5px;">
+                    <strong>Firma Autorizada</strong><br>
+                    {{ empresa.nombre }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>Documento generado el {{ fecha_generacion|date:"d/m/Y H:i" }} por {{ empresa.nombre }}</p>
+        <p>{{ empresa.direccion }} | Tel: {{ empresa.telefono }} | {{ empresa.email }}</p>
+        
+        <!-- Créditos de Atlanta Reciclajes -->
+        <div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #ddd; text-align: center;">
+            <p style="font-size: 9pt; color: #888; margin: 5px 0;">
+                <strong>eGarage AI™</strong> - Sistema desarrollado por 
+                <strong style="color: #007bff;">Atlanta Reciclajes</strong> | 
+                RUT: 77.350.892-5 | 
+                <a href="mailto:suscripcion@atlantareciclajes.cl" style="color: #007bff;">suscripcion@atlantareciclajes.cl</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

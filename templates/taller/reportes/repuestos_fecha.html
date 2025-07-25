@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block extra_head %}
+<style>
+    :root {
+        --cyber-blue: #00d4ff;
+        --matrix-green: #39ff14;
+        --neon-purple: #b347d9;
+        --dark-bg: #0a0a0f;
+        --glow-cyan: #00ffff;
+    }
+
+    body {
+        background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+        color: var(--glow-cyan);
+        font-family: 'Orbitron', 'Courier New', monospace;
+    }
+
+    .cyber-header {
+        background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(179, 71, 217, 0.1) 100%);
+        border: 1px solid var(--cyber-blue);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+    }
+
+    .cyber-title {
+        font-size: 2.5rem;
+        font-weight: bold;
+        text-align: center;
+        background: linear-gradient(45deg, var(--matrix-green), var(--cyber-blue), var(--neon-purple));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.5rem;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: rgba(10, 10, 15, 0.8);
+        border: 1px solid var(--matrix-green);
+        border-radius: 15px;
+        padding: 1.5rem;
+        text-align: center;
+        box-shadow: 0 0 20px rgba(57, 255, 20, 0.2);
+    }
+
+    .stat-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .stat-value {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: var(--cyber-blue);
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: var(--matrix-green);
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+    }
+
+    .cyber-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: rgba(10, 10, 15, 0.9);
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 0 30px rgba(179, 71, 217, 0.3);
+    }
+
+    .cyber-table th {
+        background: linear-gradient(45deg, var(--matrix-green), var(--cyber-blue));
+        color: #000;
+        padding: 15px;
+        text-align: left;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    .cyber-table td {
+        padding: 15px;
+        border-bottom: 1px solid rgba(0, 212, 255, 0.3);
+        color: var(--glow-cyan);
+    }
+
+    .cyber-table tr:hover {
+        background: rgba(57, 255, 20, 0.1);
+    }
+
+    .btn-back {
+        background: linear-gradient(45deg, var(--neon-purple), var(--cyber-blue));
+        border: none;
+        border-radius: 10px;
+        color: #fff;
+        padding: 12px 24px;
+        text-decoration: none;
+        font-weight: bold;
+        display: inline-block;
+        margin-bottom: 2rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-back:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(179, 71, 217, 0.5);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <a href="{% url 'reportes:reportes_por_fecha' %}?desde={{ desde }}&hasta={{ hasta }}" class="btn-back">
+        ← Volver a Reportes por Fecha
+    </a>
+
+    <div class="cyber-header">
+        <h1 class="cyber-title">⚙️ Reporte de Repuestos</h1>
+        <p style="text-align: center; color: var(--glow-cyan); opacity: 0.8;">
+            Análisis de repuestos del {{ desde }} al {{ hasta }}
+        </p>
+    </div>
+
+    <!-- Estadísticas Generales -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">📦</div>
+            <div class="stat-value">{{ repuestos.count }}</div>
+            <div class="stat-label">Total Repuestos</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">🔢</div>
+            <div class="stat-value">{{ total_repuestos.cantidad_total|default:0 }}</div>
+            <div class="stat-label">Cantidad Vendida</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">💰</div>
+            <div class="stat-value">${{ total_repuestos.valor_total|floatformat:0|default:0 }}</div>
+            <div class="stat-label">Valor Total</div>
+        </div>
+    </div>
+
+    <!-- Top Repuestos -->
+    {% if top_repuestos %}
+    <div style="background: rgba(10, 10, 15, 0.9); border: 1px solid var(--neon-purple); border-radius: 15px; padding: 2rem; margin-bottom: 2rem;">
+        <h3 style="color: var(--neon-purple); margin-bottom: 1.5rem;">🏆 Top 10 Repuestos Más Vendidos</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
+            {% for repuesto in top_repuestos %}
+            <div style="background: rgba(57, 255, 20, 0.1); border: 1px solid var(--matrix-green); border-radius: 10px; padding: 1rem;">
+                <div style="font-weight: bold; color: var(--cyber-blue);">{{ repuesto.nombre }}</div>
+                <div style="color: var(--matrix-green); font-size: 0.9rem;">{{ repuesto.part_number|default:"Sin código" }}</div>
+                <div style="margin-top: 0.5rem;">
+                    <span style="color: var(--glow-cyan);">Cantidad: {{ repuesto.cantidad_total }}</span> |
+                    <span style="color: var(--cyber-blue);">${{ repuesto.valor_total|floatformat:0 }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Tabla Detallada -->
+    <div style="background: rgba(10, 10, 15, 0.9); border: 1px solid var(--cyber-blue); border-radius: 15px; padding: 2rem;">
+        <h3 style="color: var(--cyber-blue); margin-bottom: 1.5rem;">📋 Detalle de Repuestos</h3>
+        
+        {% if repuestos %}
+        <table class="cyber-table">
+            <thead>
+                <tr>
+                    <th>📄 Documento</th>
+                    <th>📅 Fecha</th>
+                    <th>⚙️ Repuesto</th>
+                    <th>🔢 Part Number</th>
+                    <th>📊 Cantidad</th>
+                    <th>💰 Precio Unit.</th>
+                    <th>💵 Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for repuesto in repuestos %}
+                <tr>
+                    <td>{{ repuesto.documento.numero_documento|default:"Sin número" }}</td>
+                    <td>{{ repuesto.documento.fecha|date:"d/m/Y" }}</td>
+                    <td style="color: var(--matrix-green); font-weight: bold;">{{ repuesto.nombre }}</td>
+                    <td>{{ repuesto.part_number|default:"N/A" }}</td>
+                    <td style="text-align: center;">{{ repuesto.cantidad }}</td>
+                    <td style="color: var(--cyber-blue);">${{ repuesto.precio|floatformat:0 }}</td>
+                    <td style="color: var(--matrix-green); font-weight: bold;">${{ repuesto.total|floatformat:0 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div style="text-align: center; padding: 3rem; color: var(--glow-cyan);">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">📭</div>
+            <h3>No se encontraron repuestos</h3>
+            <p>No hay ventas de repuestos en el período seleccionado</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

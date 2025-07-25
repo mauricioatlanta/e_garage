@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Configuración del Taller{% if empresa %} - {{ empresa.nombre_taller }}{% endif %}{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto mt-10 p-8">
+  <div class="mb-8">
+    <h1 class="text-4xl font-bold text-gray-800 mb-2">⚙️ Configuración del Taller</h1>
+    {% if empresa %}
+      <p class="text-xl text-gray-600">{{ empresa.nombre_taller }}</p>
+    {% else %}
+      <p class="text-xl text-yellow-600">⚠️ No se encontró información de la empresa</p>
+    {% endif %}
+  </div>
+
+  <!-- Grid de configuraciones -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    
+    <!-- Configuración de Mecánicos -->
+    <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow">
+      <div class="flex items-center gap-4 mb-4">
+        <div class="bg-blue-100 p-3 rounded-lg">
+          <span class="text-2xl">🧑‍🔧</span>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold text-gray-800">Mecánicos</h3>
+          <p class="text-sm text-gray-600">Gestionar personal del taller</p>
+        </div>
+      </div>
+      
+      <div class="mb-4 space-y-1">
+        <div class="flex justify-between text-sm">
+          <span class="text-gray-600">Total:</span>
+          <span class="font-medium">{{ stats.total_mecanicos }}</span>
+        </div>
+        <div class="flex justify-between text-sm">
+          <span class="text-green-600">Activos:</span>
+          <span class="font-medium text-green-700">{{ stats.mecanicos_activos }}</span>
+        </div>
+        {% if stats.mecanicos_inactivos > 0 %}
+        <div class="flex justify-between text-sm">
+          <span class="text-gray-500">Inactivos:</span>
+          <span class="font-medium text-gray-600">{{ stats.mecanicos_inactivos }}</span>
+        </div>
+        {% endif %}
+      </div>
+      
+      <a 
+        href="{% url 'taller:configuracion_mecanicos' %}" 
+        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg inline-block text-center transition-colors"
+      >
+        Gestionar Mecánicos →
+      </a>
+    </div>
+
+    <!-- Configuración de Empresa (placeholder) -->
+    <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow">
+      <div class="flex items-center gap-4 mb-4">
+        <div class="bg-green-100 p-3 rounded-lg">
+          <span class="text-2xl">🏢</span>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold text-gray-800">Datos del Taller</h3>
+          <p class="text-sm text-gray-600">Información de la empresa</p>
+        </div>
+      </div>
+      
+      <div class="mb-4 space-y-1">
+        <div class="text-sm text-gray-600">
+          <div>{{ empresa.nombre_taller }}</div>
+          {% if empresa.telefono %}
+          <div>📞 {{ empresa.telefono }}</div>
+          {% endif %}
+          {% if empresa.email %}
+          <div>📧 {{ empresa.email }}</div>
+          {% endif %}
+        </div>
+      </div>
+      
+      <button 
+        class="w-full bg-gray-400 text-white font-medium py-3 px-4 rounded-lg cursor-not-allowed"
+        disabled
+      >
+        Próximamente
+      </button>
+    </div>
+
+    <!-- Configuración de Servicios (placeholder) -->
+    <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow">
+      <div class="flex items-center gap-4 mb-4">
+        <div class="bg-purple-100 p-3 rounded-lg">
+          <span class="text-2xl">🔧</span>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold text-gray-800">Servicios</h3>
+          <p class="text-sm text-gray-600">Catálogo de servicios</p>
+        </div>
+      </div>
+      
+      <div class="mb-4">
+        <p class="text-sm text-gray-600">Configura los servicios que ofrece tu taller</p>
+      </div>
+      
+      <button 
+        class="w-full bg-gray-400 text-white font-medium py-3 px-4 rounded-lg cursor-not-allowed"
+        disabled
+      >
+        Próximamente
+      </button>
+    </div>
+
+    <!-- Configuración de Reportes (placeholder) -->
+    <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow">
+      <div class="flex items-center gap-4 mb-4">
+        <div class="bg-yellow-100 p-3 rounded-lg">
+          <span class="text-2xl">📊</span>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold text-gray-800">Reportes</h3>
+          <p class="text-sm text-gray-600">Análisis y estadísticas</p>
+        </div>
+      </div>
+      
+      <div class="mb-4">
+        <p class="text-sm text-gray-600">Visualiza el rendimiento de tu taller</p>
+      </div>
+      
+      <button 
+        class="w-full bg-gray-400 text-white font-medium py-3 px-4 rounded-lg cursor-not-allowed"
+        disabled
+      >
+        Próximamente
+      </button>
+    </div>
+
+    <!-- Configuración de Admin -->
+    <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow">
+      <div class="flex items-center gap-4 mb-4">
+        <div class="bg-red-100 p-3 rounded-lg">
+          <span class="text-2xl">⚙️</span>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold text-gray-800">Administración</h3>
+          <p class="text-sm text-gray-600">Panel de admin completo</p>
+        </div>
+      </div>
+      
+      <div class="mb-4">
+        <p class="text-sm text-gray-600">Acceso completo a configuraciones avanzadas</p>
+      </div>
+      
+      <a 
+        href="/admin/" 
+        target="_blank"
+        class="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-3 px-4 rounded-lg inline-block text-center transition-colors"
+      >
+        Panel Admin →
+      </a>
+    </div>
+
+    <!-- Configuración de Documentos -->
+    <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow">
+      <div class="flex items-center gap-4 mb-4">
+        <div class="bg-indigo-100 p-3 rounded-lg">
+          <span class="text-2xl">📄</span>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold text-gray-800">Documentos</h3>
+          <p class="text-sm text-gray-600">Gestión de documentos</p>
+        </div>
+      </div>
+      
+      <div class="mb-4">
+        <p class="text-sm text-gray-600">Ver y gestionar todos los documentos</p>
+      </div>
+      
+      <a 
+        href="{% url 'documentos:lista_documentos' %}" 
+        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg inline-block text-center transition-colors"
+      >
+        Ver Documentos →
+      </a>
+    </div>
+  </div>
+
+  <!-- Navegación -->
+  <div class="mt-12 text-center">
+    <a 
+      href="{% url 'taller:dashboard_suscripciones' %}" 
+      class="text-gray-600 hover:text-gray-800 font-medium"
+    >
+      ← Volver al Dashboard
+    </a>
+  </div>
+</div>
+{% endblock %}
