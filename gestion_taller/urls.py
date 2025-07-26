@@ -10,7 +10,9 @@ from taller.main_views_mkt import landing_mecanicos, landing_repuestos, landing_
 from taller.views.views_landing import landing_egarage  # Importar la vista de la landing page
 from taller.reportes.views import reportes_dashboard, reporte_servicios, reporte_repuestos, dashboard_inteligencia_operativa, diagnostico_ia  # Importar vistas de reportes directamente
 from taller.reportes.reportes_avanzados import dashboard_rentabilidad, reportes_rentabilidad, reporte_comparativo_precios, reporte_servicios_subcontratados  # Importar dashboard y reportes de rentabilidad
+
 from demo_reportes_views import demo_reportes_por_fecha
+from views_signup import signup_country_select, signup_chile, signup_usa
 
 
 from django.views.generic import TemplateView
@@ -27,6 +29,9 @@ from django.views.generic import TemplateView
 
 urlpatterns = [
     path('usa/', landing_usa, name='landing_usa_short'),
+    path('signup/', signup_country_select, name='signup_country_select'),
+    path('signup/chile/', signup_chile, name='signup_chile'),
+    path('signup/usa/', signup_usa, name='signup_usa'),
     # Landings internacionales
     path('chile/', TemplateView.as_view(template_name='public/landing_chile.html'), name='landing_chile'),
     path('landing-bilingue/', TemplateView.as_view(template_name='public/landing_inicio_en.html'), name='landing_bilingue'),

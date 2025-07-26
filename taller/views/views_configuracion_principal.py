@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
-from taller.models.perfilusuario import PerfilUsuario
+from taller.models.perfil_usuario import PerfilUsuario
 from taller.models.mecanico import Mecanico
 
 @login_required

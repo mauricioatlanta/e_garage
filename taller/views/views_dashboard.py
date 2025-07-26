@@ -12,7 +12,7 @@ def registrar_vehiculo(request):
     form = VehiculoForm(request.POST)
     if form.is_valid():
         vehiculo = form.save(commit=False)
-        from taller.models.perfilusuario import PerfilUsuario
+        from taller.models.perfil_usuario import PerfilUsuario
         perfil = PerfilUsuario.objects.get(user=request.user)
         vehiculo.empresa = perfil.empresa
         vehiculo.save()
@@ -26,7 +26,7 @@ def registrar_documento(request):
     form = DocumentoForm(request.POST)
     if form.is_valid():
         documento = form.save(commit=False)
-        from taller.models.perfilusuario import PerfilUsuario
+        from taller.models.perfil_usuario import PerfilUsuario
         perfil = PerfilUsuario.objects.get(user=request.user)
         documento.empresa = perfil.empresa
         documento.save()
@@ -40,7 +40,7 @@ def registrar_venta(request):
     form = VentaForm(request.POST)
     if form.is_valid():
         venta = form.save(commit=False)
-        from taller.models.perfilusuario import PerfilUsuario
+        from taller.models.perfil_usuario import PerfilUsuario
         perfil = PerfilUsuario.objects.get(user=request.user)
         venta.empresa = perfil.empresa
         venta.save()

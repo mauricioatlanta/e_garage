@@ -1,7 +1,7 @@
 from django import forms
 from taller.models.repuesto import Repuesto
 from taller.models.tienda import Tienda
-from taller.utils.pais_utils import formatear_precio, get_configuracion_pais
+from utils.pais import formatear_precio, get_configuracion_pais
 
 class RepuestoForm(forms.ModelForm):
     tienda = forms.ModelChoiceField(

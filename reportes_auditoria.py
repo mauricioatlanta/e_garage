@@ -12,7 +12,7 @@ django.setup()
 from django.contrib.auth.models import User
 from taller.models.empresa import Empresa
 from taller.models.auditoria import LogAuditoria
-from taller.models.perfilusuario import PerfilUsuario
+from taller.models.perfil_usuario import PerfilUsuario
 
 
 class ReporteAuditoria:

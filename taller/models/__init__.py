@@ -2,7 +2,7 @@ from .repuesto import Repuesto
 from .empresa import Empresa
 from .trial import TrialRegistro
 from .comprobante_pago import ComprobantePago
-from .perfilusuario import PerfilUsuario
+from .perfil_usuario import PerfilUsuario
 from .mecanico import Mecanico
 
 from .clientes import Cliente

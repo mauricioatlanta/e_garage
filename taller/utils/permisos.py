@@ -1,7 +1,7 @@
 # utils/permisos.py
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
-from taller.models.perfilusuario import PerfilUsuario
+from taller.models.perfil_usuario import PerfilUsuario
 from taller.models.auditoria import LogAuditoria
 from functools import wraps
 

@@ -13,7 +13,7 @@ import json
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings_sqlite')
 django.setup()
 
-from taller.models.perfilusuario import PerfilUsuario
+from taller.models.perfil_usuario import PerfilUsuario
 from taller.models.empresa import Empresa
 from taller.models.documento import Documento, RepuestoDocumento, ServicioDocumento
 from taller.models.cliente import Cliente

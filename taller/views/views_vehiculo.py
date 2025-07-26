@@ -3,7 +3,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from taller.models.vehiculos import Vehiculo
 from taller.forms.vehiculo import VehiculoForm
-from taller.models.perfilusuario import PerfilUsuario
+from taller.models.perfil_usuario import PerfilUsuario
 
 def lista_vehiculos(request):
 

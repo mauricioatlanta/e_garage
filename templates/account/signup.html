@@ -4,8 +4,7 @@
 {% load static %}
 {% load widget_tweaks %}
 
-{% block title %}Crea tu cuenta | E-Garage{% endblock %}
-
+{% block content %}
 <div class="relative min-h-screen flex items-center justify-center overflow-hidden">
   <!-- Fondo animado de puntos -->
   <canvas id="particles-bg" class="fixed inset-0 w-full h-full z-0"></canvas>
@@ -13,8 +12,20 @@
     <div class="bg-gradient-to-br from-[#0d1117cc] via-[#1a2233cc] to-[#0d1117cc] rounded-2xl shadow-2xl p-10 border-2 border-cyan-400/40 backdrop-blur-xl">
       <div class="flex flex-col items-center mb-6">
         <img src="{% static 'img/TallerPro_logo.png' %}" alt="E-Garage Logo" class="h-16 mb-3 drop-shadow-lg animate-pulse">
-        <h1 class="text-4xl md:text-5xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-fuchsia-400 to-yellow-300 mb-2 tracking-tight futuristic-glow">Crea tu cuenta</h1>
-        <p class="text-center text-base text-cyan-100 mb-2 max-w-xs font-semibold">Accede a la plataforma premium de gestión de talleres.</p>
+<div class="flex justify-end w-full mb-2">
+  <form method="get" action="" id="lang-switcher">
+    <select name="lang" class="input-futurista py-1 px-2 text-sm" onchange="this.form.submit()">
+      <option value="en" {% if LANGUAGE_CODE == 'en' %}selected{% endif %}>English</option>
+      <option value="es" {% if LANGUAGE_CODE == 'es' %}selected{% endif %}>Español</option>
+    </select>
+  </form>
+</div>
+<h1 class="text-4xl md:text-5xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-fuchsia-400 to-yellow-300 mb-2 tracking-tight futuristic-glow">
+  {% if LANGUAGE_CODE == 'en' %}Create your account{% else %}Crea tu cuenta{% endif %}
+</h1>
+<p class="text-center text-base text-cyan-100 mb-2 max-w-xs font-semibold">
+  {% if LANGUAGE_CODE == 'en' %}Access the premium workshop management platform.{% else %}Accede a la plataforma premium de gestión de talleres.{% endif %}
+</p>
       </div>
       {% if messages %}
         <ul class="mb-4">
@@ -32,23 +43,57 @@
           {{ form.email.errors }}
         </div>
         <div>
-          <label for="id_username" class="block text-cyan-200 font-bold mb-1">Nombre de usuario</label>
+          <label for="id_username" class="block text-cyan-200 font-bold mb-1">{% if LANGUAGE_CODE == 'en' %}Username{% else %}Nombre de usuario{% endif %}</label>
           {{ form.username|add_class:'input-futurista' }}
           {{ form.username.errors }}
         </div>
         <div>
-          <label for="id_password1" class="block text-cyan-200 font-bold mb-1">Contraseña</label>
+          <label for="id_password1" class="block text-cyan-200 font-bold mb-1">{% if LANGUAGE_CODE == 'en' %}Password{% else %}Contraseña{% endif %}</label>
           {{ form.password1|add_class:'input-futurista' }}
           {{ form.password1.errors }}
         </div>
         <div>
-          <label for="id_password2" class="block text-cyan-200 font-bold mb-1">Repite tu contraseña</label>
+          <label for="id_password2" class="block text-cyan-200 font-bold mb-1">{% if LANGUAGE_CODE == 'en' %}Repeat your password{% else %}Repite tu contraseña{% endif %}</label>
           {{ form.password2|add_class:'input-futurista' }}
           {{ form.password2.errors }}
         </div>
+
+        {# Campos dinámicos según país #}
+        {% if country == 'cl' %}
+          <div>
+            <label for="id_region" class="block text-cyan-200 font-bold mb-1">Región</label>
+            {{ form.region|add_class:'input-futurista'|attr:'onchange:this.form.submit()' }}
+            {{ form.region.errors }}
+          </div>
+          <div>
+            <label for="id_ciudad" class="block text-cyan-200 font-bold mb-1">Ciudad</label>
+            {{ form.ciudad|add_class:'input-futurista' }}
+            {{ form.ciudad.errors }}
+          </div>
+        {% elif country == 'us' %}
+          <div>
+            <label for="id_state" class="block text-cyan-200 font-bold mb-1">{% if LANGUAGE_CODE == 'en' %}State{% else %}Estado{% endif %}</label>
+            {{ form.state|add_class:'input-futurista'|attr:'id:id_state' }}
+            {{ form.state.errors }}
+          </div>
+          <div>
+            <label for="id_city" class="block text-cyan-200 font-bold mb-1">{% if LANGUAGE_CODE == 'en' %}City{% else %}Ciudad{% endif %}</label>
+            {{ form.city|add_class:'input-futurista'|attr:'id:id_city' }}
+            {{ form.city.errors }}
+            <input type="text" id="input_otra_ciudad" name="otra_ciudad" style="display:none; margin-top:8px;" class="input-futurista" placeholder="Otra ciudad..." />
+          </div>
+          <div>
+            <label for="id_zipcode" class="block text-cyan-200 font-bold mb-1">{% if LANGUAGE_CODE == 'en' %}Zip Code{% else %}Código Postal{% endif %}</label>
+            {{ form.zipcode|add_class:'input-futurista' }}
+            {{ form.zipcode.errors }}
+          </div>
+        {% endif %}
+
         <button type="submit" class="w-full py-3 mt-4 rounded-lg bg-gradient-to-r from-cyan-400 via-fuchsia-400 to-yellow-300 text-gray-900 font-bold text-lg shadow-lg hover:from-yellow-300 hover:to-cyan-400 transition-all duration-300 animate-pulse border-2 border-cyan-400/40">Registrarme</button>
       </form>
-      <p class="text-center text-cyan-200 mt-6 text-sm">¿Ya tienes cuenta? <a href="{% url 'account_login' %}" class="text-lime-400 hover:underline">Inicia sesión</a></p>
+      <p class="text-center text-cyan-200 mt-6 text-sm">
+        {% if LANGUAGE_CODE == 'en' %}Already have an account? <a href="{% url 'account_login' %}" class="text-lime-400 hover:underline">Sign in</a>{% else %}¿Ya tienes cuenta? <a href="{% url 'account_login' %}" class="text-lime-400 hover:underline">Inicia sesión</a>{% endif %}
+      </p>
     </div>
   </div>
 </div>
@@ -98,6 +143,50 @@
     transition: background-color 5000s ease-in-out 0s;
   }
 </style>
+<script>
+// Selects dependientes para USA (y Chile si se desea)
+document.addEventListener('DOMContentLoaded', function() {
+    var stateSelect = document.getElementById('id_state');
+    var citySelect = document.getElementById('id_city');
+    var otraCiudadInput = document.getElementById('input_otra_ciudad');
+    if (stateSelect && citySelect) {
+        stateSelect.addEventListener('change', function() {
+            var estado = stateSelect.value;
+            fetch('/taller/ajax/ciudades/?pais=US&region=' + encodeURIComponent(estado))
+                .then(response => response.json())
+                .then(data => {
+                    citySelect.innerHTML = '';
+                    if (data.ciudades && data.ciudades.length > 0) {
+                        data.ciudades.forEach(function(ciudad) {
+                            var option = document.createElement('option');
+                            option.value = ciudad;
+                            option.text = ciudad;
+                            citySelect.appendChild(option);
+                        });
+                        // Opción para "Otra ciudad"
+                        var optionOtra = document.createElement('option');
+                        optionOtra.value = '__otra__';
+                        optionOtra.text = 'Otra ciudad...';
+                        citySelect.appendChild(optionOtra);
+                    } else {
+                        var option = document.createElement('option');
+                        option.value = '';
+                        option.text = 'Sin ciudades';
+                        citySelect.appendChild(option);
+                    }
+                    otraCiudadInput.style.display = 'none';
+                });
+        });
+        citySelect.addEventListener('change', function() {
+            if (citySelect.value === '__otra__') {
+                otraCiudadInput.style.display = 'block';
+            } else {
+                otraCiudadInput.style.display = 'none';
+            }
+        });
+    }
+});
+</script>
 <script>
 // Animación de puntos tipo "espacio futurista"
 const canvas = document.getElementById('particles-bg');

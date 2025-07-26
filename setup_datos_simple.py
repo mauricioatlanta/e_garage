@@ -21,7 +21,7 @@ empresa, created = Empresa.objects.get_or_create(usuario=user, defaults={'nombre
 print(f"{'✅ Empresa creada' if created else 'ℹ️ Empresa ya existe'}: {empresa.nombre_taller}")
 
 # 3. Crear perfil
-from taller.models.perfilusuario import PerfilUsuario
+from taller.models.perfil_usuario import PerfilUsuario
 perfil, created = PerfilUsuario.objects.get_or_create(user=user, defaults={'empresa': empresa})
 print(f"{'✅ Perfil creado' if created else 'ℹ️ Perfil ya existe'}")
 

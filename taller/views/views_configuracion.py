@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from taller.models.perfilusuario import PerfilUsuario
+from taller.models.perfil_usuario import PerfilUsuario
 from taller.models.mecanico import Mecanico
 from taller.models.empresa import Empresa
 from django.core.exceptions import ValidationError

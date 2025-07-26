@@ -3,7 +3,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from taller.models.inspeccion import Inspeccion
 from taller.forms import InspeccionForm
-from taller.models.perfilusuario import PerfilUsuario
+from taller.models.perfil_usuario import PerfilUsuario
 
 @login_required
 def listar_inspecciones(request):

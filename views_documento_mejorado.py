@@ -5,7 +5,7 @@ from django.core.exceptions import PermissionDenied
 from django.contrib import messages
 from taller.models.documento import Documento, RepuestoDocumento, ServicioDocumento
 from taller.models.mecanico import Mecanico
-from taller.models.perfilusuario import PerfilUsuario
+from taller.models.perfil_usuario import PerfilUsuario
 from taller.models.auditoria import LogAuditoria
 from taller.forms import DocumentoForm
 import json
@@ -33,23 +33,17 @@ def lista_documentos(request):
         messages.error(request, "Usuario sin perfil de empresa configurado")
         return redirect('dashboard')
     
-    # Control de acceso por empresa
-    if perfil.es_superadmin:
-        documentos = Documento.objects.all()
-        descripcion = "Acceso a lista completa de documentos (superadmin)"
-    else:
-        documentos = Documento.objects.filter(empresa=perfil.empresa)
-        descripcion = f"Acceso a lista de documentos de {perfil.empresa.nombre_taller}"
-    
-    # Log de auditoría
+    # Nueva lógica: mostrar solo documentos del usuario
+    documentos = Documento.objects.filter(user=request.user)
+    descripcion = "Acceso a lista de documentos del usuario"
+    # Log de auditoría (sin empresa)
     log_auditoria_documento(
         usuario=request.user,
-        empresa=perfil.empresa,
+        empresa=None,
         accion='VIEW',
         descripcion=descripcion,
         request=request
     )
-    
     return render(request, 'taller/documentos/lista_documentos.html', {
         'documentos': documentos,
         'total_documentos': documentos.count()
@@ -65,16 +59,7 @@ def crear_documento(request):
         messages.error(request, "Usuario sin perfil de empresa configurado")
         return redirect('dashboard')
     
-    # Verificar permisos de rol
-    if perfil.rol not in ['admin', 'vendedor'] and not perfil.es_superadmin:
-        log_auditoria_documento(
-            usuario=request.user,
-            empresa=perfil.empresa,
-            accion='CREATE',
-            descripcion=f"Intento de creación de documento sin permisos (rol: {perfil.rol})",
-            request=request
-        )
-        raise PermissionDenied("Su rol no tiene permisos para crear documentos")
+    # Lógica moderna: cualquier usuario autenticado puede crear documento
 
     if request.method == 'POST':
         form = DocumentoForm(request.POST)
@@ -84,7 +69,7 @@ def crear_documento(request):
             
             # Crear documento
             documento = form.save(commit=False)
-            documento.empresa = perfil.empresa
+            documento.user = request.user
             documento.save()
             
             # Datos después de crear
@@ -123,7 +108,6 @@ def crear_documento(request):
                             
                         elif item['tipo'] == 'servicio':
                             servicio = ServicioDocumento.objects.create(
-                                empresa=perfil.empresa,
                                 documento=documento,
                                 nombre=item['nombre'],
                                 precio=item['precio'],
@@ -143,7 +127,7 @@ def crear_documento(request):
                     # Log del error
                     log_auditoria_documento(
                         usuario=request.user,
-                        empresa=perfil.empresa,
+                        empresa=None,
                         accion='CREATE',
                         documento=documento,
                         descripcion=f"Error al procesar items JSON: {e}",
@@ -157,7 +141,7 @@ def crear_documento(request):
             
             log_auditoria_documento(
                 usuario=request.user,
-                empresa=perfil.empresa,
+                empresa=None,
                 accion='CREATE',
                 documento=documento,
                 descripcion=descripcion,
@@ -171,7 +155,7 @@ def crear_documento(request):
             errores = "; ".join([f"{campo}: {error}" for campo, error in form.errors.items()])
             log_auditoria_documento(
                 usuario=request.user,
-                empresa=perfil.empresa,
+                empresa=None,
                 accion='CREATE',
                 descripcion=f"Intento fallido de crear documento. Errores: {errores}",
                 request=request
@@ -183,14 +167,14 @@ def crear_documento(request):
         # Log de acceso a formulario
         log_auditoria_documento(
             usuario=request.user,
-            empresa=perfil.empresa,
+            empresa=None,
             accion='VIEW',
             descripcion="Acceso a formulario de crear documento",
             request=request
         )
 
     # Cargar mecánicos activos del taller
-    mecanicos = Mecanico.objects.filter(empresa=perfil.empresa, activo=True)
+    mecanicos = Mecanico.objects.filter(activo=True)
 
     return render(request, 'taller/documentos/crear_documento.html', {
         'form': form,
@@ -207,11 +191,8 @@ def editar_documento(request, documento_id):
         messages.error(request, "Usuario sin perfil de empresa configurado")
         return redirect('dashboard')
 
-    # Obtener documento con control de empresa
-    if perfil.es_superadmin:
-        documento = get_object_or_404(Documento, id=documento_id)
-    else:
-        documento = get_object_or_404(Documento, id=documento_id, empresa=perfil.empresa)
+    # Obtener documento solo si pertenece al usuario
+    documento = get_object_or_404(Documento, id=documento_id, user=request.user)
 
     # Datos antes de editar
     datos_antes = {
@@ -253,7 +234,6 @@ def editar_documento(request, documento_id):
                             )
                         elif item['tipo'] == 'servicio':
                             ServicioDocumento.objects.create(
-                                empresa=perfil.empresa,
                                 documento=documento,
                                 nombre=item['nombre'],
                                 precio=item['precio'],
@@ -280,7 +260,7 @@ def editar_documento(request, documento_id):
             descripcion = f"Documento editado: {documento.numero_documento}"
             log_auditoria_documento(
                 usuario=request.user,
-                empresa=perfil.empresa,
+                empresa=None,
                 accion='UPDATE',
                 documento=documento,
                 descripcion=descripcion,
@@ -295,7 +275,7 @@ def editar_documento(request, documento_id):
         # Log de acceso a edición
         log_auditoria_documento(
             usuario=request.user,
-            empresa=perfil.empresa,
+            empresa=None,
             accion='VIEW',
             documento=documento,
             descripcion=f"Acceso a editar documento: {documento.numero_documento}",
@@ -303,7 +283,7 @@ def editar_documento(request, documento_id):
         )
 
     # Cargar mecánicos activos del taller
-    mecanicos = Mecanico.objects.filter(empresa=perfil.empresa, activo=True)
+    mecanicos = Mecanico.objects.filter(activo=True)
 
     return render(request, 'taller/documentos/crear_documento.html', {
         'form': form,
@@ -324,16 +304,13 @@ def detalle_documento(request, documento_id):
         messages.error(request, "Usuario sin perfil de empresa configurado")
         return redirect('dashboard')
 
-    # Control de acceso por empresa
-    if perfil.es_superadmin:
-        documento = get_object_or_404(Documento, id=documento_id)
-    else:
-        documento = get_object_or_404(Documento, id=documento_id, empresa=perfil.empresa)
+    # Obtener documento solo si pertenece al usuario
+    documento = get_object_or_404(Documento, id=documento_id, user=request.user)
     
     # Log de auditoría
     log_auditoria_documento(
         usuario=request.user,
-        empresa=perfil.empresa,
+        empresa=None,
         accion='VIEW',
         documento=documento,
         descripcion=f"Visualización de documento: {documento.numero_documento}",
@@ -354,22 +331,10 @@ def eliminar_documento(request, documento_id):
         messages.error(request, "Usuario sin perfil de empresa configurado")
         return redirect('dashboard')
 
-    # Verificar permisos de rol
-    if perfil.rol not in ['admin'] and not perfil.es_superadmin:
-        log_auditoria_documento(
-            usuario=request.user,
-            empresa=perfil.empresa,
-            accion='DELETE',
-            descripcion=f"Intento de eliminación sin permisos (rol: {perfil.rol})",
-            request=request
-        )
-        raise PermissionDenied("Su rol no tiene permisos para eliminar documentos")
+    # Lógica moderna: cualquier usuario autenticado puede eliminar su propio documento
 
-    # Control de acceso por empresa
-    if perfil.es_superadmin:
-        documento = get_object_or_404(Documento, id=documento_id)
-    else:
-        documento = get_object_or_404(Documento, id=documento_id, empresa=perfil.empresa)
+    # Obtener documento solo si pertenece al usuario
+    documento = get_object_or_404(Documento, id=documento_id, user=request.user)
 
     if request.method == 'POST':
         # Datos antes de eliminar
@@ -388,7 +353,7 @@ def eliminar_documento(request, documento_id):
         # Log de auditoría
         log_auditoria_documento(
             usuario=request.user,
-            empresa=perfil.empresa,
+            empresa=None,
             accion='DELETE',
             descripcion=f"Documento eliminado: {numero_doc}",
             request=request

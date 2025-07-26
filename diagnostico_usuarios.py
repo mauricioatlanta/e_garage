@@ -9,7 +9,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings_sqlite')
 django.setup()
 
 from django.contrib.auth.models import User
-from taller.models.perfilusuario import PerfilUsuario
+from taller.models.perfil_usuario import PerfilUsuario
 from taller.models.empresa import Empresa
 from taller.models.documento import Documento, RepuestoDocumento, ServicioDocumento
 

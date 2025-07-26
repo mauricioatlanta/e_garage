@@ -4,7 +4,7 @@ from taller.models.compra import Compra
 from taller.forms import CompraForm
 
 @login_required
-from taller.models.perfilusuario import PerfilUsuario
+from taller.models.perfil_usuario import PerfilUsuario
 
 @login_required
 def listar_compras(request):

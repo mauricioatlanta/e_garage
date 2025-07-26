@@ -8,7 +8,7 @@ from taller.models.clientes import Cliente
 from taller.models.documento import Documento
 from taller.models.mecanico import Mecanico
 from taller.models.empresa import Empresa
-from taller.models.perfilusuario import PerfilUsuario
+from taller.models.perfil_usuario import PerfilUsuario
 from taller.models.comprobante_pago import ComprobantePago
 from taller.servicios.models import CategoriaServicio, SubcategoriaServicio  # y Servicio si aún existe
 
@@ -106,9 +106,8 @@ class EmpresaAdmin(admin.ModelAdmin):
 
 @admin.register(PerfilUsuario, site=admin_site)
 class PerfilUsuarioAdmin(admin.ModelAdmin):
-    list_display = ('user', 'empresa', 'rol')
-    list_filter = ('rol',)
-    search_fields = ('user__username', 'empresa__nombre_taller')
+    list_display = ('user',)
+    search_fields = ('user__username',)
     
     def has_add_permission(self, request):
         """

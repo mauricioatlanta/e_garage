@@ -9,7 +9,7 @@ class RepuestoAutocomplete(autocomplete.Select2QuerySetView):
         if not self.request.user.is_authenticated:
             return Repuesto.objects.none()
 
-        from taller.models.perfilusuario import PerfilUsuario
+        from taller.models.perfil_usuario import PerfilUsuario
         try:
             perfil = PerfilUsuario.objects.get(user=self.request.user)
             if perfil.es_superadmin:
@@ -28,7 +28,7 @@ class VehiculoAutocomplete(autocomplete.Select2QuerySetView):
         if not self.request.user.is_authenticated:
             return Vehiculo.objects.none()
 
-        from taller.models.perfilusuario import PerfilUsuario
+        from taller.models.perfil_usuario import PerfilUsuario
         try:
             perfil = PerfilUsuario.objects.get(user=self.request.user)
             cliente_id = self.forwarded.get('cliente')
@@ -55,7 +55,7 @@ class ClienteAutocomplete(autocomplete.Select2QuerySetView):
         if not self.request.user.is_authenticated:
             return Cliente.objects.none()
 
-        from taller.models.perfilusuario import PerfilUsuario
+        from taller.models.perfil_usuario import PerfilUsuario
         try:
             perfil = PerfilUsuario.objects.get(user=self.request.user)
             if perfil.es_superadmin:

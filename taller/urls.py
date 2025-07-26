@@ -3,6 +3,7 @@ from django.urls import path, include
 from . import taller_views
 from .taller_views import debug_cliente_autocomplete, dashboard_suscripciones, renovar_empresa
 from .views import editar_empresa
+from .views.ajax import ciudades_por_region
 from taller.registro_views import registro_unificado
 from django.shortcuts import render
 from taller.models.taller_info import TallerInfo
@@ -77,6 +78,9 @@ urlpatterns = [
     path('chile/', TemplateView.as_view(template_name='public/landing_chile.html'), name='landing_chile'),
     # USA: acceso directo
     path('usa/', landing_usa, name='landing_usa'),
+
+    # Endpoint AJAX para selects dependientes de ciudad
+    path('ajax/ciudades/', ciudades_por_region, name='ajax_ciudades'),
 
     # ...existing code...
     path('dashboard/', dashboard_suscripciones, name='dashboard_suscripciones'),

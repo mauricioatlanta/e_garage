@@ -2,7 +2,7 @@ from django import forms
 from django.forms import ModelForm, TextInput, EmailInput, Select
 from taller.models.clientes import Cliente
 from taller.models.region_ciudad import TallerRegion, TallerCiudad
-from taller.utils.pais_utils import get_regiones_por_pais, validar_telefono_por_pais
+from utils.pais import get_regiones, get_ciudades, validar_telefono_por_pais
 
 
 class ClienteForm(forms.ModelForm):
@@ -29,11 +29,13 @@ class ClienteForm(forms.ModelForm):
             })
             self.fields['region'].label = 'State'
             self.fields['ciudad'].label = 'City'
-            
-            # Para USA, usar lista de estados
-            regiones_choices = get_regiones_por_pais('US')
+            regiones_choices = [(r, r) for r in get_regiones('US')]
             self.fields['region'].widget = forms.Select(choices=[('', 'Select State')] + regiones_choices)
-            self.fields['ciudad'].widget.attrs.update({'placeholder': 'Enter city name'})
+            self.fields['ciudad'].widget = forms.Select(choices=[('', 'Select City')])
+            if 'region' in self.data:
+                region = self.data.get('region')
+                ciudades_choices = [(c, c) for c in get_ciudades('US', region)]
+                self.fields['ciudad'].widget = forms.Select(choices=[('', 'Select City')] + ciudades_choices)
         else:
             self.fields['telefono'].widget.attrs.update({
                 'placeholder': '+56912345678',
@@ -41,21 +43,13 @@ class ClienteForm(forms.ModelForm):
             })
             self.fields['region'].label = 'Región'
             self.fields['ciudad'].label = 'Ciudad'
-            
-            # Para Chile, usar el sistema tradicional de regiones/ciudades
-            self.fields['region'].queryset = TallerRegion.objects.all()
-            self.fields['ciudad'].queryset = TallerCiudad.objects.none()
-
+            regiones_choices = [(r, r) for r in get_regiones('CL')]
+            self.fields['region'].widget = forms.Select(choices=[('', 'Seleccione Región')] + regiones_choices)
+            self.fields['ciudad'].widget = forms.Select(choices=[('', 'Seleccione Ciudad')])
             if 'region' in self.data:
-                try:
-                    region_id = int(self.data.get('region'))
-                    self.fields['ciudad'].queryset = TallerCiudad.objects.filter(region_id=region_id)
-                except (ValueError, TypeError):
-                    pass
-            elif self.instance.pk and self.instance.region:
-                self.fields['ciudad'].queryset = TallerCiudad.objects.filter(region=self.instance.region)
-            elif self.initial.get('region'):
-                self.fields['ciudad'].queryset = TallerCiudad.objects.filter(region=self.initial['region'])
+                region = self.data.get('region')
+                ciudades_choices = [(c, c) for c in get_ciudades('CL', region)]
+                self.fields['ciudad'].widget = forms.Select(choices=[('', 'Seleccione Ciudad')] + ciudades_choices)
 
     def clean_telefono(self):
         telefono = self.cleaned_data.get('telefono')

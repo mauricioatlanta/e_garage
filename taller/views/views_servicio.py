@@ -3,7 +3,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from taller.models.documento import ServicioDocumento
 from taller.forms import ServicioForm
-from taller.models.perfilusuario import PerfilUsuario
+from taller.models.perfil_usuario import PerfilUsuario
 
 @login_required
 def lista_servicios(request):

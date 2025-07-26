@@ -11,7 +11,7 @@ from django.utils import timezone
 from taller.models.documento import Documento, RepuestoDocumento, ServicioDocumento
 from taller.models.repuesto import Repuesto
 from taller.models.mecanico import Mecanico
-from taller.models.perfilusuario import PerfilUsuario
+from taller.models.perfil_usuario import PerfilUsuario
 
 
 @login_required

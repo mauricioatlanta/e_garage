@@ -35,7 +35,7 @@ else:
     print(f"ℹ️ Empresa ya existe: {empresa.nombre_taller}")
 
 # Crear perfil
-from taller.models.perfilusuario import PerfilUsuario
+from taller.models.perfil_usuario import PerfilUsuario
 perfil, created = PerfilUsuario.objects.get_or_create(
     user=user,
     defaults={
