@@ -893,11 +893,14 @@ def generar_resumen_whatsapp_mecanico(request, mecanico_id):
     
     mensaje += f"\n\n💪 ¡Excelente trabajo!\n_Generado por eGarage IA_"
     
+    # Preparar mensaje para WhatsApp (sin backslashes en f-string)
+    mensaje_encoded = mensaje.replace(' ', '%20').replace('\n', '%0A')
+    
     return JsonResponse({
         'mensaje': mensaje,
         'mecanico': mecanico.nombre,
         'telefono': getattr(mecanico, 'telefono', ''),  # Si tienes campo teléfono
-        'whatsapp_url': f"https://wa.me/?text={mensaje.replace(' ', '%20').replace('\n', '%0A')}"
+        'whatsapp_url': f"https://wa.me/?text={mensaje_encoded}"
     })
 
 
