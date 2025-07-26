@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <label class="block text-sm font-semibold text-cyan-300" for="{{ field.id_for_label }}">{% trans field.label %}</label>
           {{ field }}
           {% if field.errors %}
-            <p class="text-sm text-red-400 mt-1">{{ field.errors|striptags }}</p>
+            <p class="text-sm text-cyan-300 mt-1">{{ field.errors|striptags }}</p>
           {% endif %}
         </div>
       {% endfor %}
@@ -50,9 +50,9 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
       <button type="submit" class="w-full btn-premium">{% trans "Iniciar sesion" %}</button>
     </form>
-    <p class="text-center text-sm text-gray-400 mt-6">
+    <p class="text-center text-sm text-cyan-300 mt-6">
       {% trans "No tienes cuenta?" %}
-      <a class="text-blue-400 hover:underline" href="{% url 'account_signup' %}">{% trans "Registrate aqui" %}</a>
+      <a class="text-cyan-300 hover:underline" href="{% url 'account_signup' %}">{% trans "Registrate aqui" %}</a>
     </p>
     
     <!-- Botones de idioma -->
