@@ -25,10 +25,10 @@
   <div id="bienvenida" class="hidden fixed inset-0 z-10 flex flex-col justify-center items-center text-center">
     <div style="display:flex; justify-content:center; align-items:center;">
       <img src="{% static 'img/logo.png' %}" alt="E-Garage Logo" 
-        class="animate-pulse mb-6 w-60 h-60 mx-auto"
+        class="animate-pulse mb-6 w-32 h-32 md:w-48 md:h-48 mx-auto"
         style="border: 6px solid #f500ff; border-radius: 50%; box-shadow: 0 0 32px 8px #f500ff, 0 0 80px 10px #f500ff44; background:rgba(0,0,0,0.15);" />
     </div>
-    <p class="text-3xl font-bold tracking-wide mb-6 font-[Orbitron] text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-fuchsia-500 to-yellow-300">
+    <p class="text-2xl md:text-3xl font-bold tracking-wide mb-6 font-[Orbitron] text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-fuchsia-500 to-yellow-300">
       {% trans "Bienvenido a eGarage" %}
     </p>
     <a href="{% url 'account_login' %}" class="bg-gradient-to-r from-cyan-400 via-fuchsia-500 to-yellow-300 text-gray-900 font-bold py-3 px-10 rounded-xl shadow-xl text-xl tracking-wide border-2 border-fuchsia-400 hover:scale-105 transition-all duration-300 animate-bounce">
@@ -37,16 +37,40 @@
   </div>
 
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
+    function showMainContent() {
       const videoIntro = document.getElementById("intro-video");
       const bgParticles = document.getElementById("bg-particles");
       const bienvenida = document.getElementById("bienvenida");
 
-      setTimeout(() => {
-        videoIntro.classList.add("hidden");
-        bgParticles.classList.remove("hidden");
-        bienvenida.classList.remove("hidden");
-      }, 6000); // espera 6 segundos
+      videoIntro.classList.add("hidden");
+      bgParticles.classList.remove("hidden");
+      bienvenida.classList.remove("hidden");
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const videoIntro = document.getElementById("intro-video");
+
+      // Show content after 6 seconds
+      setTimeout(showMainContent, 6000);
+      
+      // Also show content immediately if video fails to load
+      videoIntro.addEventListener('error', function() {
+        console.log('Video failed to load, showing content immediately');
+        showMainContent();
+      });
+      
+      // Show content if video ends
+      videoIntro.addEventListener('ended', function() {
+        showMainContent();
+      });
+      
+      // Fallback: if video doesn't start playing in 2 seconds, show content
+      setTimeout(function() {
+        if (videoIntro.currentTime === 0) {
+          console.log('Video not playing, showing content as fallback');
+          showMainContent();
+        }
+      }, 2000);
     });
   </script>
 </body>
