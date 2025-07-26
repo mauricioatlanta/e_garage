@@ -131,8 +131,8 @@ us_patterns = [
     # Panel administrativo de monitoreo
     path('admin/monitoring/', include('taller.urls_modules.admin_monitoring')),
     
-    # 📊 Sistema de Analytics AI
-    path('analytics/', include('taller.analytics.urls')),
+    # 📊 Sistema de Analytics AI (Temporalmente deshabilitado)
+    # path('analytics/', include('taller.analytics.urls')),
     
     # 📧 Sistema de Emails
     path('emails/', include('taller.emails.urls')),

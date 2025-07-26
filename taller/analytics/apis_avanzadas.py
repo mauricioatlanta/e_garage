@@ -17,8 +17,11 @@ import json
 import random
 import logging
 
+# Django imports
+from django.contrib.auth.models import User
+
 # Modelos necesarios
-from taller.models import Empresa, Usuario, TrialRegistro, ComprobantePago
+from taller.models import Empresa, PerfilUsuario, TrialRegistro, ComprobantePago
 
 logger = logging.getLogger(__name__)
 

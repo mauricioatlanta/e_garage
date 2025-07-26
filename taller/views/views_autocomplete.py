@@ -1,8 +1,8 @@
 from dal import autocomplete
 from django.db.models import Q
-from .models.repuesto import Repuesto
-from .models.vehiculos import Vehiculo
-from .models.clientes import Cliente
+from taller.models.repuesto import Repuesto
+from taller.models.vehiculos import Vehiculo
+from taller.models.clientes import Cliente
 
 class RepuestoAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):

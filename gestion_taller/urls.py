@@ -3,11 +3,11 @@ from django.contrib import admin
 from taller.admin import admin_site
 from django.urls import path, include
 from taller.main_views import landing_inicio, landing_premium  # Corregido: importar desde main_views
-from taller.views_trial import registro_trial
-from taller.views_trial_activate import activar_trial
+from taller.views.views_trial import registro_trial
+from taller.views.views_trial_activate import activar_trial
 from taller.dashboard_views import dashboard_view
 from taller.main_views_mkt import landing_mecanicos, landing_repuestos, landing_servicios, landing_reportes, landing_clientes, landing_ia
-from taller.views_landing import landing_egarage  # Importar la vista de la landing page
+from taller.views.views_landing import landing_egarage  # Importar la vista de la landing page
 from taller.reportes.views import reportes_dashboard, reporte_servicios, reporte_repuestos, dashboard_inteligencia_operativa, diagnostico_ia  # Importar vistas de reportes directamente
 from taller.reportes.reportes_avanzados import dashboard_rentabilidad, reportes_rentabilidad, reporte_comparativo_precios, reporte_servicios_subcontratados  # Importar dashboard y reportes de rentabilidad
 from demo_reportes_views import demo_reportes_por_fecha

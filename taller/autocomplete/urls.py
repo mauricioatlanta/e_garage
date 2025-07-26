@@ -2,7 +2,7 @@ from django.urls import path
 
 
 from taller.autocomplete.views_autocomplete import ClienteAutocomplete, VehiculoAutocomplete, MecanicoAutocomplete, MarcaAutocomplete, ModeloAutocomplete
-from taller.views_autocomplete import ServicioAutocomplete
+from taller.views.views_autocomplete import ServicioAutocomplete
 
 app_name = "autocomplete" 
 

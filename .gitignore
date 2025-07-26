@@ -1,0 +1,35 @@
+# Archivos de entorno
+.env
+*.sqlite3
+
+# Archivos de compilación Python
+*.pyc
+__pycache__/
+
+/staticfiles/
+/media/
+
+# Archivos de VSCode y sistema
+.vscode/
+.DS_Store
+*.zip
+
+# Archivos temporales
+*.log
+*.bak
+*.tmp
+
+# Archivos específicos del proyecto
+egarage_update_*.zip
+backup_*.log
+*_working.log
+
+# Directorios de despliegue
+deploy_pythonanywhere/
+
+# Archivos de desarrollo
+debug_*.py
+test_*.py
+crear_*.py
+cargar_*.py
+verificar_*.py
