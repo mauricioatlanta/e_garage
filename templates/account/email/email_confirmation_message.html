@@ -9,3 +9,21 @@
   <hr style="border:none;border-top:1px solid #333;margin:32px 0;">
   <div style="text-align:center;color:#888;font-size:0.95rem;">El equipo de E-Garage</div>
 </div>
+<html>
+  <body style="background: #181c1f; color: #e0f7fa; font-family: 'Segoe UI', Arial, sans-serif; padding: 2em;">
+    <div style="max-width: 480px; margin: auto; background: #232b3a; border-radius: 1.2em; box-shadow: 0 0 24px #00ffe7; padding: 2em; border: 2px solid #00ffe7cc;">
+      <h2 style="color: #00ffe7; text-align: center;">¡Bienvenido a E-Garage!</h2>
+      <p>Hola <b>{{ user_display }}</b>,</p>
+      <p>Gracias por registrarte en nuestra plataforma.</p>
+      <p>Para activar tu cuenta, haz clic en el siguiente botón:</p>
+      <div style="text-align: center; margin: 2em 0;">
+        <a href="{{ activate_url }}" style="background: linear-gradient(90deg,#00ffe7,#f500ff,#ffe600); color: #181c1f; font-weight: bold; padding: 1em 2em; border-radius: 0.7em; text-decoration: none; font-size: 1.1em; box-shadow: 0 2px 16px #00ffe755;">Confirmar correo</a>
+      </div>
+      <p>O copia y pega este enlace en tu navegador:</p>
+      <p style="word-break: break-all;"><a href="{{ activate_url }}" style="color: #00ffe7;">{{ activate_url }}</a></p>
+      <hr style="border: none; border-top: 1px solid #00ffe7cc; margin: 2em 0;">
+      <p style="font-size: 0.95em; color: #b2ebf2;">Si no solicitaste esta cuenta, puedes ignorar este mensaje.</p>
+      <p style="font-size: 0.95em; color: #b2ebf2;">El equipo de E-Garage</p>
+    </div>
+  </body>
+</html>
