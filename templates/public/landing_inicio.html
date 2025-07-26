@@ -22,7 +22,7 @@
   </video>
 
   <!-- 🚗 LOGO + TEXTO -->
-  <div id="bienvenida" class="hidden fixed inset-0 z-10 flex flex-col justify-center items-center text-center">
+  <div id="bienvenida" class="fixed inset-0 z-10 flex flex-col justify-center items-center text-center">
     <div style="display:flex; justify-content:center; align-items:center;">
       <img src="{% static 'img/logo.png' %}" alt="E-Garage Logo" 
         class="animate-pulse mb-6 w-32 h-32 md:w-48 md:h-48 mx-auto"
@@ -37,40 +37,15 @@
   </div>
 
   <script>
-    function showMainContent() {
+    document.addEventListener("DOMContentLoaded", function () {
       const videoIntro = document.getElementById("intro-video");
       const bgParticles = document.getElementById("bg-particles");
       const bienvenida = document.getElementById("bienvenida");
 
+      // Hide video and show content immediately for testing
       videoIntro.classList.add("hidden");
       bgParticles.classList.remove("hidden");
-      bienvenida.classList.remove("hidden");
-    }
-
-    document.addEventListener("DOMContentLoaded", function () {
-      const videoIntro = document.getElementById("intro-video");
-
-      // Show content after 6 seconds
-      setTimeout(showMainContent, 6000);
-      
-      // Also show content immediately if video fails to load
-      videoIntro.addEventListener('error', function() {
-        console.log('Video failed to load, showing content immediately');
-        showMainContent();
-      });
-      
-      // Show content if video ends
-      videoIntro.addEventListener('ended', function() {
-        showMainContent();
-      });
-      
-      // Fallback: if video doesn't start playing in 2 seconds, show content
-      setTimeout(function() {
-        if (videoIntro.currentTime === 0) {
-          console.log('Video not playing, showing content as fallback');
-          showMainContent();
-        }
-      }, 2000);
+      // bienvenida is already visible (no 'hidden' class)
     });
   </script>
 </body>
