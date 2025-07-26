@@ -182,7 +182,7 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 # ============================================================
 # 📧 CONFIGURACIÓN DE EMAIL PARA PRODUCCIÓN
 # ============================================================
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_HOST = 'mail.atlantareciclajes.cl'
 EMAIL_PORT = 465
 EMAIL_USE_SSL = True

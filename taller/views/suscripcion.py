@@ -48,12 +48,20 @@ def registro(request):
             
             user = form.save()
             
-            # Crear empresa automáticamente para el usuario
-            empresa = Empresa.objects.create(
+            # Crear o actualizar empresa automáticamente para el usuario
+            empresa, created = Empresa.objects.get_or_create(
                 user=user,
-                nombre_taller=nombre_taller,
-                email=email
+                defaults={
+                    'nombre_taller': nombre_taller,
+                    'email': email
+                }
             )
+            
+            # Si ya existía, actualizar los datos
+            if not created:
+                empresa.nombre_taller = nombre_taller
+                empresa.email = email
+                empresa.save()
             
             ha_usado_prueba = (tipo_registro == 'trial')
             TallerInfo.objects.create(user=user, nombre_taller=nombre_taller, telefono=telefono, ha_usado_prueba=ha_usado_prueba)

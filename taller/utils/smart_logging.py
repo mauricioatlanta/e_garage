@@ -226,4 +226,4 @@ def ensure_log_directories():
 
 # Inicialización automática
 ensure_log_directories()
-setup_smart_loggers()
+# setup_smart_loggers()  # Temporalmente deshabilitado para deployment

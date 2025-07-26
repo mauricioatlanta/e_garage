@@ -7,8 +7,10 @@ from .models.empresa import Empresa
 @receiver(post_save, sender=User)
 def crear_empresa_al_crear_usuario(sender, instance, created, **kwargs):
     if created:
-        Empresa.objects.create(
-            nombre_taller=f"Taller de {instance.username}",
-            empresa=instance.username,
-            user=instance
+        Empresa.objects.get_or_create(
+            user=instance,
+            defaults={
+                'nombre_taller': f"Taller de {instance.username}",
+                'empresa': instance.username,
+            }
         )

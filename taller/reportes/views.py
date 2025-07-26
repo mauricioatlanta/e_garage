@@ -891,7 +891,7 @@ def generar_resumen_whatsapp_mecanico(request, mecanico_id):
     for i, servicio in enumerate(servicios_top, 1):
         mensaje += f"\n{i}. {servicio['nombre']} ({servicio['cantidad']} veces)"
     
-    mensaje += f"\n\n💪 ¡Excelente trabajo!\n_Generado por eGarage IA_"
+    mensaje += "\n\n💪 ¡Excelente trabajo!\n_Generado por eGarage IA_"
     
     # Preparar mensaje para WhatsApp (sin backslashes en f-string)
     mensaje_encoded = mensaje.replace(' ', '%20').replace('\n', '%0A')

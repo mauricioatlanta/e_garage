@@ -10,3 +10,7 @@
 2025-07-25 02:00:02,922 - INFO - Empresas a respaldar: 7
 2025-07-25 02:00:02,923 - ERROR - Error crítico durante backup programado: 'Empresa' object has no attribute 'nombre'
 2025-07-25 02:00:02,925 - ERROR - Error al registrar auditoría: LogAuditoria() got unexpected keyword arguments: 'detalles'
+2025-07-26 02:00:02,283 - INFO - === INICIANDO BACKUP PROGRAMADO ===
+2025-07-26 02:00:02,288 - INFO - Empresas a respaldar: 7
+2025-07-26 02:00:02,290 - ERROR - Error crítico durante backup programado: 'Empresa' object has no attribute 'nombre'
+2025-07-26 02:00:02,291 - ERROR - Error al registrar auditoría: LogAuditoria() got unexpected keyword arguments: 'detalles'
