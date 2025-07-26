@@ -33,8 +33,7 @@ def signup_chile(request):
                     region=region,
                     ciudad=ciudad
                 )
-                messages.success(request, 'Registro exitoso. Ahora puedes iniciar sesión.')
-                return redirect('account_login')
+                return render(request, 'account/signup_success.html')
     else:
         form = SignupChileForm()
     return render(request, 'account/signup.html', {'form': form, 'country': 'cl'})
@@ -70,8 +69,7 @@ def signup_usa(request):
                     ciudad=city,
                     zipcode=zipcode
                 )
-                messages.success(request, 'Registration successful. You can now log in.')
-                return redirect('account_login')
+                return render(request, 'account/signup_success.html')
     else:
         form = SignupUSAForm()
     return render(request, 'account/signup.html', {'form': form, 'country': 'us'})
