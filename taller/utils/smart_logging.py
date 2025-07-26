@@ -16,9 +16,14 @@ from taller.models import Empresa, TrialRegistro
 def setup_smart_loggers():
     """Configura loggers especializados para diferentes eventos"""
     
+    # Crear directorio de logs si no existe
+    import os
+    log_dir = os.path.expanduser('~/logs')
+    os.makedirs(log_dir, exist_ok=True)
+    
     # Logger de autenticación
     auth_logger = logging.getLogger('egarage.auth')
-    auth_handler = logging.FileHandler('logs/authentication.log')
+    auth_handler = logging.FileHandler(os.path.join(log_dir, 'authentication.log'))
     auth_formatter = logging.Formatter(
         '%(asctime)s | %(levelname)s | AUTH | %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S'
@@ -29,7 +34,7 @@ def setup_smart_loggers():
     
     # Logger de pagos
     payment_logger = logging.getLogger('egarage.payments')
-    payment_handler = logging.FileHandler('logs/payments.log')
+    payment_handler = logging.FileHandler(os.path.join(log_dir, 'payments.log'))
     payment_formatter = logging.Formatter(
         '%(asctime)s | %(levelname)s | PAYMENT | %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S'
@@ -40,7 +45,7 @@ def setup_smart_loggers():
     
     # Logger de suscripciones
     subs_logger = logging.getLogger('egarage.subscriptions')
-    subs_handler = logging.FileHandler('logs/subscriptions.log')
+    subs_handler = logging.FileHandler(os.path.join(log_dir, 'subscriptions.log'))
     subs_formatter = logging.Formatter(
         '%(asctime)s | %(levelname)s | SUBS | %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S'
