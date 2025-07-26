@@ -67,6 +67,22 @@
     outline: none;
     transition: border 0.2s, box-shadow 0.2s;
   }
+
+  /* Forzar color en autocompletado y placeholder en móviles */
+  .input-dark,
+  .input-dark:-webkit-autofill,
+  .input-dark:-webkit-autofill:focus,
+  .input-dark:-webkit-autofill:hover,
+  .input-dark:-webkit-autofill:active {
+    -webkit-text-fill-color: #e0f7fa !important;
+    color: #e0f7fa !important;
+    background: #181c1f !important;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+  .input-dark::placeholder {
+    color: #b2ebf2 !important;
+    opacity: 1;
+  }
   .input-dark:focus {
     border: 2px solid #a3ff12;
     box-shadow: 0 0 16px 0 #a3ff12cc;
