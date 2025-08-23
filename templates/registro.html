@@ -54,7 +54,8 @@
         <a href="/activar/" class="text-cyan-300 hover:text-lime-400 underline text-sm"><i class="fas fa-key mr-1"></i>{% trans "¿Ya tienes tu código? Activa tu cuenta aquí" %}</a>
       </div>
     </form>
-    <p class="text-center text-cyan-200 mt-8 text-sm">{% trans "¿Ya tienes cuenta?" %} <a href="/login/" class="text-lime-400 hover:underline">{% trans "Inicia sesión" %}</a></p>
+  {% load country_url %}
+  <p class="text-center text-cyan-200 mt-8 text-sm">{% trans "¿Ya tienes cuenta?" %} <a href="{% country_url 'account_login' %}" class="text-lime-400 hover:underline">{% trans "Inicia sesión" %}</a></p>
   </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">

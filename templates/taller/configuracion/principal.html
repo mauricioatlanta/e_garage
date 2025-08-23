@@ -17,14 +17,14 @@
   <!-- Grid de configuraciones -->
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     
-    <!-- Configuración de Mecánicos -->
+    <!-- Configuración de Técnicos -->
     <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow">
       <div class="flex items-center gap-4 mb-4">
         <div class="bg-blue-100 p-3 rounded-lg">
           <span class="text-2xl">🧑‍🔧</span>
         </div>
         <div>
-          <h3 class="text-lg font-semibold text-gray-800">Mecánicos</h3>
+          <h3 class="text-lg font-semibold text-gray-800">Técnicos</h3>
           <p class="text-sm text-gray-600">Gestionar personal del taller</p>
         </div>
       </div>
@@ -32,25 +32,26 @@
       <div class="mb-4 space-y-1">
         <div class="flex justify-between text-sm">
           <span class="text-gray-600">Total:</span>
-          <span class="font-medium">{{ stats.total_mecanicos }}</span>
+          <span class="font-medium">{{ stats.tecnicos_total }}</span>
         </div>
         <div class="flex justify-between text-sm">
           <span class="text-green-600">Activos:</span>
-          <span class="font-medium text-green-700">{{ stats.mecanicos_activos }}</span>
+          <span class="font-medium text-green-700">{{ stats.tecnicos_activos }}</span>
         </div>
-        {% if stats.mecanicos_inactivos > 0 %}
+        {% if stats.tecnicos_inactivos > 0 %}
         <div class="flex justify-between text-sm">
           <span class="text-gray-500">Inactivos:</span>
-          <span class="font-medium text-gray-600">{{ stats.mecanicos_inactivos }}</span>
+          <span class="font-medium text-gray-600">{{ stats.tecnicos_inactivos }}</span>
         </div>
         {% endif %}
       </div>
       
       <a 
-        href="{% url 'taller:configuracion_mecanicos' %}" 
+  {% url 'taller:configuracion_tecnicos' as url_config_tecnicos %}
+  href="{{ url_config_tecnicos|default:'#' }}" 
         class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg inline-block text-center transition-colors"
       >
-        Gestionar Mecánicos →
+        Gestionar Técnicos →
       </a>
     </div>
 
@@ -187,7 +188,8 @@
   <!-- Navegación -->
   <div class="mt-12 text-center">
     <a 
-      href="{% url 'taller:dashboard_suscripciones' %}" 
+  {% url 'taller:dashboard_suscripciones' as url_dashboard_suscripciones %}
+  href="{{ url_dashboard_suscripciones|default:'#' }}" 
       class="text-gray-600 hover:text-gray-800 font-medium"
     >
       ← Volver al Dashboard

@@ -1,0 +1,26 @@
+54 objects imported automatically (use -v 2 for details).
+
+admin,admin@egarage.com,True,True
+we,x@x.vl,True,False
+weffff,t@g.com,True,False
+qqq,q@q.cl,True,False
+qqqqq,y@w.rt,True,False
+eeeeee,po4@ht.po,True,False
+mauricio,mauricioatlanta@gmail.com,True,False
+mauricio1,test@atlantareciclajes.cl,True,False
+test_user,test@example.com,True,False
+test_user_unified,test_unified@example.com,True,False
+test_reportes,test@reportes.com,True,False
+test_cl,test@cl.com,True,False
+test_us,test@us.com,True,False
+test_val_cl_bc72352c,test@cl.com,True,False
+test_val_us_bc72352c,test@us.com,True,False
+demo_taller_santiago,contacto@tallerperez.cl,True,False
+demo_mecanica_valparaiso,contacto@mecanicaporteña.cl,True,False
+demo_automotriz_concepcion,gerencia@autosur.cl,True,False
+demo_mikes_auto_miami,mike@mikesauto.com,True,False
+demo_pacific_motors_la,info@pacificmotors.com,True,False
+demo_texas_automotive_dallas,service@texasauto.com,True,False
+contacto@atlantareciclajes.cl,contacto@atlantareciclajes.cl,True,False
+testuser,test@example.com,True,False
+testuser_usa,testuser@usa-garage.com,True,False

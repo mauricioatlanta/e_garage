@@ -6,7 +6,8 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings_sqlite')
 django.setup()
 
 from taller.models.empresa import Empresa
-from taller.models.documento import Documento, RepuestoDocumento, ServicioDocumento
+from taller.models.documento import Documento, RepuestoDocumento
+from taller.models.lineas_documento import LineaServicio
 
 def encontrar_documento_vacio_taller2():
     """Encontrar el documento vacío específico en Mecánica Express"""
@@ -29,7 +30,7 @@ def encontrar_documento_vacio_taller2():
     # Analizar cada documento
     for doc in documentos:
         repuestos = RepuestoDocumento.objects.filter(documento=doc)
-        servicios = ServicioDocumento.objects.filter(documento=doc)
+        servicios = LineaServicio.objects.filter(documento=doc)
         
         tiene_datos = repuestos.exists() or servicios.exists()
         estado = "✅ CON DATOS" if tiene_datos else "❌ VACÍO"
@@ -37,7 +38,7 @@ def encontrar_documento_vacio_taller2():
         print(f"\n📋 Doc #{doc.id}: {doc.tipo_documento} {doc.numero_documento}")
         print(f"   📅 Fecha: {doc.fecha}")
         print(f"   👤 Cliente: {doc.cliente.nombre if doc.cliente else 'Sin cliente'}")
-        print(f"   🔧 Mecánico: {doc.mecanico.nombre if doc.mecanico else 'Sin mecánico'}")
+        print(f"   🔧 Técnico: {doc.tecnico.nombre if doc.tecnico else 'Sin técnico'}")
         print(f"   🔩 Repuestos: {repuestos.count()}")
         print(f"   ⚙️ Servicios: {servicios.count()}")
         print(f"   🎯 Estado: {estado}")

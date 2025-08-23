@@ -6,7 +6,8 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings_sqlite')
 django.setup()
 
 from django.contrib.auth.models import User
-from taller.models import Documento, RepuestoDocumento, ServicioDocumento, Cliente
+from taller.models import Documento, Cliente
+from taller.models.lineas_documento import LineaRepuesto, LineaServicio
 from taller.models.empresa import Empresa
 from datetime import date
 
@@ -36,12 +37,13 @@ try:
     ]
     
     for rep_data in repuestos_data:
-        repuesto = RepuestoDocumento.objects.create(
+        repuesto = LineaRepuesto.objects.create(
+            empresa=empresa,
             documento=documento,
             codigo=rep_data['codigo'],
             nombre=rep_data['nombre'],
             cantidad=rep_data['cantidad'],
-            precio=rep_data['precio']
+            precio_unitario=rep_data['precio']
         )
         print(f"🔧 Repuesto: {repuesto.nombre} x{repuesto.cantidad} = ${repuesto.total}")
     
@@ -53,17 +55,17 @@ try:
     ]
     
     for serv_data in servicios_data:
-        servicio = ServicioDocumento.objects.create(
+        servicio = LineaServicio.objects.create(
             empresa=empresa,
             documento=documento,
             nombre=serv_data['nombre'],
-            precio=serv_data['precio']
+            precio_unitario=serv_data['precio']
         )
         print(f"⚙️ Servicio: {servicio.nombre} = ${servicio.precio}")
     
     # Calcular totales
-    total_repuestos = sum(r.total for r in documento.repuestos.all())
-    total_servicios = sum(s.precio for s in documento.servicios.all())
+    total_repuestos = sum(getattr(r, 'precio_unitario', getattr(r, 'precio', 0)) * getattr(r, 'cantidad', 1) for r in documento.lineas_repuesto.all())
+    total_servicios = sum(getattr(s, 'precio_unitario', getattr(s, 'precio', 0)) for s in documento.lineas_servicio.all())
     subtotal = total_repuestos + total_servicios
     iva = subtotal * 0.19
     total = subtotal + iva

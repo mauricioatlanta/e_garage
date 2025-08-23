@@ -4,13 +4,19 @@ from django.utils.html import format_html
 from django.urls import reverse
 from django.contrib import messages
 from django.utils import timezone
+from django.db import models
 from taller.models.clientes import Cliente
 from taller.models.documento import Documento
-from taller.models.mecanico import Mecanico
+from taller.models.tecnico import Tecnico
 from taller.models.empresa import Empresa
 from taller.models.perfil_usuario import PerfilUsuario
 from taller.models.comprobante_pago import ComprobantePago
-from taller.servicios.models import CategoriaServicio, SubcategoriaServicio  # y Servicio si aún existe
+from taller.models.precio_suscripcion import PrecioSuscripcion
+from taller.models.catalogo import CatalogoModeloAuto
+from taller.servicios.models import (
+    CategoriaServicio, SubcategoriaServicio, Servicio,
+    CategoriaServicioName, SubcategoriaServicioName, ServicioName
+)
 
 class MyAdminSite(AdminSite):
     site_header = 'Panel de Administración de eGarage'
@@ -141,22 +147,71 @@ class ClienteAdmin(admin.ModelAdmin):
 
 @admin.register(Documento, site=admin_site)
 class DocumentoAdmin(admin.ModelAdmin):
-    list_display = ('tipo_documento', 'numero_documento', 'cliente', 'vehiculo', 'fecha')
+    list_display = ('id', 'tipo', 'numero', 'estado', 'fecha_emision', 'cliente', 'vehiculo', 'moneda', 'total')
 
-@admin.register(Mecanico, site=admin_site)
-class MecanicoAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'empresa', 'activo')
-    list_filter = ('activo', 'empresa')
+@admin.register(Tecnico, site=admin_site)
+class TecnicoAdmin(admin.ModelAdmin):
+    list_display = ('nombre', 'empresa')
+    list_filter = ('empresa',)
     search_fields = ('nombre',)
-    list_editable = ('activo',)
+    list_editable = ()
+
+# === ADMINISTRACIÓN DE SERVICIOS MULTILENGUAJE ===
+
+class CategoriaServicioNameInline(admin.TabularInline):
+    model = CategoriaServicioName
+    extra = 2
+    fields = ['language', 'label', 'aliases', 'is_default']
 
 @admin.register(CategoriaServicio, site=admin_site)
 class CategoriaServicioAdmin(admin.ModelAdmin):
-    list_display = ('id', 'nombre')
+    list_display = ('id', 'code', 'country', 'get_label_es', 'get_label_en')
+    list_filter = ('country',)
+    search_fields = ('code', 'names__label')
+    inlines = [CategoriaServicioNameInline]
+    
+    def get_label_es(self, obj):
+        return obj.get_label('es')
+    get_label_es.short_description = 'Nombre (ES)'
+    
+    def get_label_en(self, obj):
+        return obj.get_label('en')
+    get_label_en.short_description = 'Nombre (EN)'
+
+class SubcategoriaServicioNameInline(admin.TabularInline):
+    model = SubcategoriaServicioName
+    extra = 2
+    fields = ['language', 'label', 'aliases', 'is_default']
 
 @admin.register(SubcategoriaServicio, site=admin_site)
 class SubcategoriaServicioAdmin(admin.ModelAdmin):
-    list_display = ('id', 'nombre', 'categoria')
+    list_display = ('id', 'code', 'country', 'categoria', 'get_label_es', 'get_label_en')
+    list_filter = ('country', 'categoria')
+    search_fields = ('code', 'names__label')
+    inlines = [SubcategoriaServicioNameInline]
+    
+    def get_label_es(self, obj):
+        return obj.get_label('es')
+    get_label_es.short_description = 'Nombre (ES)'
+    
+    def get_label_en(self, obj):
+        return obj.get_label('en')
+    get_label_en.short_description = 'Nombre (EN)'
+
+class ServicioNameInline(admin.TabularInline):
+    model = ServicioName
+    extra = 2
+    fields = ['language', 'label', 'aliases', 'is_default']
+
+@admin.register(Servicio, site=admin_site)
+class ServicioAdmin(admin.ModelAdmin):
+    list_display = ('id', 'nombre', 'categoria', 'subcategoria')
+    list_filter = ('categoria', 'subcategoria')
+    search_fields = ('nombre',)
+    autocomplete_fields = ('categoria', 'subcategoria')
+    ordering = ('nombre', 'id')
+    list_editable = ()
+    inlines = [ServicioNameInline]
 
 
 @admin.register(ComprobantePago, site=admin_site)
@@ -225,4 +280,126 @@ class ComprobantePagoAdmin(admin.ModelAdmin):
             comprobante.save()
             count += 1
         self.message_user(request, f'Se rechazaron {count} comprobantes.')
+
+
+@admin.register(PrecioSuscripcion, site=admin_site)
+class PrecioSuscripcionAdmin(admin.ModelAdmin):
+    list_display = ('nombre_plan', 'tipo_plan', 'pais_display', 'precio_formateado', 'activo', 'caracteristicas_preview')
+    list_filter = ('pais', 'tipo_plan', 'activo', 'moneda')
+    search_fields = ('nombre_plan', 'descripcion')
+    ordering = ('pais', 'tipo_plan')
+    
+    fieldsets = (
+        ('Información Básica', {
+            'fields': ('nombre_plan', 'tipo_plan', 'pais', 'precio', 'moneda', 'activo')
+        }),
+        ('Descripción', {
+            'fields': ('descripcion',)
+        }),
+        ('Características del Plan', {
+            'fields': (
+                'documentos_ilimitados', 'usuarios_incluidos', 'soporte_prioritario',
+                'reportes_avanzados', 'diagnostico_ia', 'api_incluida', 'multisucursal'
+            ),
+            'classes': ('wide',)
+        }),
+    )
+    
+    def pais_display(self, obj):
+        flag = '🇨🇱' if obj.pais == 'CL' else '🇺🇸'
+        return f"{flag} {obj.get_pais_display()}"
+    pais_display.short_description = 'País'
+    
+    def caracteristicas_preview(self, obj):
+        caracteristicas = obj.caracteristicas_list()
+        if len(caracteristicas) > 3:
+            return f"{', '.join(caracteristicas[:3])}... (+{len(caracteristicas)-3} más)"
+        return ', '.join(caracteristicas)
+    caracteristicas_preview.short_description = 'Características'
+    
+    actions = ['duplicar_para_otro_pais']
+    
+    def duplicar_para_otro_pais(self, request, queryset):
+        """Duplica precios para el otro país"""
+        for precio in queryset:
+            nuevo_pais = 'US' if precio.pais == 'CL' else 'CL'
+            # Calcular precio convertido (aproximado)
+            if precio.pais == 'CL' and nuevo_pais == 'US':
+                nuevo_precio = precio.precio / 1000  # Conversión aproximada CLP a USD
+            else:
+                nuevo_precio = precio.precio * 1000  # Conversión aproximada USD a CLP
+            
+            nueva_moneda = 'USD' if nuevo_pais == 'US' else 'CLP'
+            nuevo_nombre = precio.nombre_plan.replace('Plan', 'Monthly Plan' if nuevo_pais == 'US' else 'Plan')
+            
+            PrecioSuscripcion.objects.get_or_create(
+                tipo_plan=precio.tipo_plan,
+                pais=nuevo_pais,
+                defaults={
+                    'precio': nuevo_precio,
+                    'moneda': nueva_moneda,
+                    'nombre_plan': nuevo_nombre,
+                    'descripcion': precio.descripcion,
+                    'documentos_ilimitados': precio.documentos_ilimitados,
+                    'usuarios_incluidos': precio.usuarios_incluidos,
+                    'soporte_prioritario': precio.soporte_prioritario,
+                    'reportes_avanzados': precio.reportes_avanzados,
+                    'diagnostico_ia': precio.diagnostico_ia,
+                    'api_incluida': precio.api_incluida,
+                    'multisucursal': precio.multisucursal,
+                }
+            )
+        self.message_user(request, f'Duplicados {len(queryset)} precios para el otro país.')
+    duplicar_para_otro_pais.short_description = 'Duplicar para otro país'
+
+
+@admin.register(CatalogoModeloAuto, site=admin_site)
+class CatalogoModeloAutoAdmin(admin.ModelAdmin):
+    """Administración del catálogo de marcas y modelos"""
+    list_display = ('marca', 'modelo', 'activo', 'fecha_creacion')
+    list_filter = ('activo', 'marca', 'fecha_creacion')
+    search_fields = ('marca', 'modelo')
+    list_editable = ('activo',)
+    list_per_page = 50
+    ordering = ('marca', 'modelo')
+    
+    # Agrupación por marca en el formulario
+    fieldsets = (
+        ('Información del Vehículo', {
+            'fields': ('marca', 'modelo')
+        }),
+        ('Control', {
+            'fields': ('activo',),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    # Filtros por sidebar
+    list_filter = ('activo', 'fecha_creacion')
+    
+    # Acciones personalizadas
+    actions = ['activar_seleccionados', 'desactivar_seleccionados', 'estadisticas_marcas']
+    
+    def activar_seleccionados(self, request, queryset):
+        count = queryset.update(activo=True)
+        self.message_user(request, f'{count} modelos activados.')
+    activar_seleccionados.short_description = 'Activar modelos seleccionados'
+    
+    def desactivar_seleccionados(self, request, queryset):
+        count = queryset.update(activo=False)
+        self.message_user(request, f'{count} modelos desactivados.')
+    desactivar_seleccionados.short_description = 'Desactivar modelos seleccionados'
+    
+    def estadisticas_marcas(self, request, queryset):
+        from django.db.models import Count
+        stats = CatalogoModeloAuto.objects.values('marca').annotate(
+            total=Count('id'),
+            activos=Count('id', filter=models.Q(activo=True))
+        ).order_by('-total')[:10]
+        
+        mensaje = "Top 10 marcas:\n" + "\n".join([
+            f"• {s['marca']}: {s['activos']}/{s['total']}" for s in stats
+        ])
+        self.message_user(request, mensaje)
+    estadisticas_marcas.short_description = 'Ver estadísticas de marcas'
 

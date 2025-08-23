@@ -1,12 +1,15 @@
+# Adaptador personalizado para redirección según país
+ACCOUNT_ADAPTER = 'taller.views_extra.account_adapter.CountryAwareAccountAdapter'
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'mail.atlantareciclajes.cl'
 EMAIL_PORT = 465
 EMAIL_USE_SSL = True
 EMAIL_USE_TLS = False
-
 EMAIL_HOST_USER = 'suscripcion@atlantareciclajes.cl'
-EMAIL_HOST_PASSWORD = ')+y-k+[tY6w&'
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+import os
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD', ',*naHZ0xIFO')
+DEFAULT_FROM_EMAIL = 'eGarage <suscripcion@atlantareciclajes.cl>'
 from pathlib import Path
 import os
 from django.core.management.utils import get_random_secret_key
@@ -39,14 +42,17 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'django.contrib.sites',
     'rest_framework',
+    'ubicacion.apps.UbicacionConfig',
 ]
 
 # Middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'taller.middleware.simple_translation.SimpleTranslationMiddleware',  # Simple translation middleware
-    'django.middleware.locale.LocaleMiddleware',  # Para internacionalización
+    'taller.middleware.country_url_migration.CountryURLRedirectMiddleware',  # Redirects legados /es/→/cl/
+    'taller.middleware.country_context.CountryContextMiddleware',  # Detección de país
+    'taller.middleware.i18n_country_middleware.CountryLanguageMiddleware',  # 🌐 Idioma por país
+    'django.middleware.locale.LocaleMiddleware',  # Solo este para idioma
     'taller.middleware.rate_limiting.RateLimitMiddleware',  # Rate limiting temprano
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -55,6 +61,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
     'taller.middleware.empresa_middleware.EmpresaMiddleware',
+    'taller.middlewares.activate_language',  # 👈 Activación de idioma por país/usuario
 ]
 
 # Configuración de URLs
@@ -75,7 +82,8 @@ TEMPLATES = [
                 'django.template.context_processors.static',
                 'django.template.context_processors.tz',
                 'django.contrib.messages.context_processors.messages',
-                'taller.context_processors.empresa_contexto',
+                'taller.context_processors.empresa_contexto.empresa_contexto',
+                'taller.context_processors.namespaces.ui_namespaces',
             ],
         },
     },
@@ -91,14 +99,14 @@ DATABASES = {
     }
 }
 
-# Localización
-LANGUAGE_CODE = 'es-cl'
+# 🌍 INTERNACIONALIZACIÓN Y LOCALIZACIÓN
+LANGUAGE_CODE = 'es'  # Español por defecto (Chile)
 TIME_ZONE = 'America/Santiago'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
-# Idiomas disponibles
+# Idiomas soportados
 LANGUAGES = [
     ('es', 'Español'),
     ('en', 'English'),
@@ -108,6 +116,9 @@ LANGUAGES = [
 LOCALE_PATHS = [
     BASE_DIR / 'locale',
 ]
+
+# Formatos por idioma (opcional)
+FORMAT_MODULE_PATH = ['gestion_taller.formats']
 
 # Archivos estáticos
 STATIC_URL = '/static/'
@@ -149,10 +160,10 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 )
-LOGIN_REDIRECT_URL = '/dashboard/'
-ACCOUNT_LOGOUT_REDIRECT_URL = '/login/'
+LOGIN_REDIRECT_URL = '/login/'  # Redirige a la vista country-aware después del login
+ACCOUNT_LOGOUT_REDIRECT_URL = '/login/'  # Redirige a la vista country-aware después del logout
 ACCOUNT_LOGIN_METHODS = {"username", "email"}
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'  # Ahora requiere verificación de email para activar la cuenta
+ACCOUNT_EMAIL_VERIFICATION = 'none'  # Sin verificación de email para desarrollo
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 2
 ACCOUNT_RATE_LIMITS = {
@@ -161,5 +172,19 @@ ACCOUNT_RATE_LIMITS = {
 
 ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
 
-# Login default (no usado si usas Allauth)
-LOGIN_URL = '/admin/login/'
+# Configuración de sesiones para "recordar credenciales"
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 30  # 30 días por defecto
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Las sesiones persisten al cerrar el navegador
+
+# Configuración para recordar login (allauth)
+ACCOUNT_SESSION_REMEMBER = True  # Habilitar funcionalidad "recordar"
+ACCOUNT_SESSION_COOKIE_AGE = 60 * 60 * 24 * 30  # 30 días cuando se marca "recordar"
+
+# Formulario personalizado de login
+ACCOUNT_FORMS = {
+    'login': 'taller.forms.custom_login.CustomLoginForm',
+}
+
+# Login default (actualizado para sistema multi-país con allauth global)
+LOGIN_URL = '/accounts/login/'

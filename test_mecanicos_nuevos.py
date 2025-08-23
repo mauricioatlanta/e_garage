@@ -14,7 +14,7 @@ django.setup()
 from django.test import Client
 from django.contrib.auth.models import User
 from taller.models.empresa import Empresa
-from taller.models.mecanico import Mecanico
+from taller.models.tecnico import Mecanico
 
 print("=== PRUEBA DE MECÁNICOS NUEVOS ===")
 
@@ -55,7 +55,7 @@ try:
     print(f"✅ Login exitoso para: {user.username}")
 
     # Contar mecánicos antes
-    mecanicos_antes = Mecanico.objects.count()
+    mecanicos_antes = Tecnico.objects.count()
     print(f"📊 Mecánicos en BD antes: {mecanicos_antes}")
 
     # Probar autocompletado de mecánicos

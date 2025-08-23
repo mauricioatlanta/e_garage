@@ -7,8 +7,9 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 from taller.models.empresa import Empresa
 from taller.models.clientes import Cliente
-from taller.models.mecanico import Mecanico
-from taller.models.documento import Documento, RepuestoDocumento, ServicioDocumento
+from taller.models.tecnico import Tecnico
+from taller.models.documento import Documento
+from taller.models.lineas_documento import LineaRepuesto as RepuestoDocumento, LineaServicio
 from taller.models.repuesto import Repuesto
 from taller.models.tienda import Tienda
 
@@ -77,7 +78,7 @@ class Command(BaseCommand):
 
     def verificar_mecanicos(self, empresa):
         """Verifica que existan mecánicos o los crea"""
-        mecanicos = Mecanico.objects.filter(empresa=empresa, activo=True)
+        mecanicos = Tecnico.objects.filter(empresa=empresa, activo=True)
         
         if mecanicos.count() < 3:
             nombres_mecanicos = [
@@ -86,7 +87,7 @@ class Command(BaseCommand):
             ]
             
             for nombre in nombres_mecanicos[:3]:
-                mecanico, created = Mecanico.objects.get_or_create(
+                mecanico, created = Tecnico.objects.get_or_create(
                     empresa=empresa,
                     nombre=nombre,
                     defaults={
@@ -97,7 +98,7 @@ class Command(BaseCommand):
                 if created:
                     self.stdout.write(f'  ✓ Mecánico creado: {nombre}')
             
-            mecanicos = Mecanico.objects.filter(empresa=empresa, activo=True)
+            mecanicos = Tecnico.objects.filter(empresa=empresa, activo=True)
         
         self.stdout.write(f'  👨‍🔧 Mecánicos disponibles: {mecanicos.count()}')
         return list(mecanicos)
@@ -244,7 +245,7 @@ class Command(BaseCommand):
                     codigo=repuesto.part_number,
                     nombre=repuesto.nombre_repuesto,
                     cantidad=cantidad,
-                    precio=precio_final
+                    precio_unitario=precio_final
                 )
             
             # Agregar servicios (1-3 servicios por documento)
@@ -256,11 +257,11 @@ class Command(BaseCommand):
                 variacion = random.uniform(0.85, 1.15)
                 precio_final = int(precio_base * variacion)
                 
-                ServicioDocumento.objects.create(
+                LineaServicio.objects.create(
                     empresa=empresa,
                     documento=documento,
                     nombre=nombre_servicio,
-                    precio=precio_final
+                    precio_unitario=precio_final
                 )
             
             if (i + 1) % 10 == 0:

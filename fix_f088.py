@@ -11,14 +11,14 @@ if doc:
     print(f"Documento encontrado: {doc.numero}")
     print(f"Empresa: {doc.empresa.nombre_taller}")
     print(f"Cliente: {doc.cliente.nombre}")
-    print(f"Repuestos: {doc.repuestodocumento_set.count()}")
-    print(f"Servicios: {doc.serviciodocumento_set.count()}")
+    print(f"Repuestos: {doc.lineas_repuesto.count()}")
+    print(f"Servicios: {doc.lineas_servicio.count()}")
     
     # Intentar recrear los datos que deberia tener
-    from taller.models.documento import RepuestoDocumento, ServicioDocumento
+    from taller.models.lineas_documento import LineaRepuesto as RepuestoDocumento, LineaServicio
     
     # Verificar si el documento tiene datos
-    if doc.repuestodocumento_set.count() == 0 and doc.serviciodocumento_set.count() == 0:
+    if doc.lineas_repuesto.count() == 0 and doc.lineas_servicio.count() == 0:
         print("DOCUMENTO VACIO - Agregando datos de prueba...")
         
         # Agregar un repuesto
@@ -27,20 +27,20 @@ if doc:
             codigo='REPAIR-001',
             nombre='Repuesto Reparacion F-088',
             cantidad=1,
-            precio=15000
+            subtotal=15000
         )
         
         # Agregar un servicio
-        ServicioDocumento.objects.create(
+        LineaServicio.objects.create(
             empresa=doc.empresa,
             documento=doc,
             nombre='Servicio Reparacion F-088',
-            precio=25000
+            precio_unitario=25000
         )
-        
+
         print("Datos agregados manualmente")
-        print(f"Repuestos: {doc.repuestodocumento_set.count()}")
-        print(f"Servicios: {doc.serviciodocumento_set.count()}")
+        print(f"Repuestos: {doc.lineas_repuesto.count()}")
+        print(f"Servicios: {doc.lineas_servicio.count()}")
     else:
         print("El documento ya tiene datos")
 else:

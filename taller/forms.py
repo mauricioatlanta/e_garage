@@ -22,11 +22,11 @@ class VentaForm(forms.ModelForm):
     class Meta:
         model = Venta
         exclude = ['empresa']  # El campo empresa se asigna automáticamente en la vista
-from taller.models.documento import ServicioDocumento
+from taller.models.lineas_documento import LineaServicio
 
 class ServicioForm(forms.ModelForm):
     class Meta:
-        model = ServicioDocumento
+        model = LineaServicio
         exclude = ['empresa']  # El campo empresa se asigna automáticamente en la vista
 from taller.models.repuesto import Repuesto
 
@@ -84,12 +84,12 @@ class ClienteForm(forms.ModelForm):
     class Meta:
         model = Cliente
         exclude = ['empresa']  # El campo empresa se asigna automáticamente en la vista
-from taller.models.mecanico import Mecanico
+from taller.models.tecnico import Tecnico
 
 
 class DocumentoForm(forms.ModelForm):
     cliente = forms.ModelChoiceField(
-        queryset=Cliente.objects.none(),  # lo maneja DAL por AJAX
+        queryset=Cliente.objects.none(),  # Se configura en __init__
         widget=autocomplete.ModelSelect2(
             url='autocomplete-cliente',
             attrs={
@@ -99,11 +99,9 @@ class DocumentoForm(forms.ModelForm):
             }
         )
     )
-    def __init__(self, *args, **kwargs):
-        self.request = kwargs.pop('request', None)
-        super().__init__(*args, **kwargs)
+    
     vehiculo = forms.ModelChoiceField(
-        queryset=Vehiculo.objects.none(),
+        queryset=Vehiculo.objects.none(),  # Se configura en __init__
         widget=autocomplete.ModelSelect2(
             url='autocomplete-vehiculo',
             forward=['cliente'],
@@ -114,24 +112,42 @@ class DocumentoForm(forms.ModelForm):
             }
         )
     )
+    
     mecanico = forms.CharField(
         label='Mecánico',
         required=False,
         widget=forms.TextInput(attrs={'placeholder': 'Nombre del mecánico'})
     )
 
+    def __init__(self, *args, **kwargs):
+        self.empresa = kwargs.pop('empresa', None)
+        super().__init__(*args, **kwargs)
+        
+        if self.empresa:
+            self.fields['cliente'].queryset = Cliente.objects.filter(empresa=self.empresa)
+            self.fields['vehiculo'].queryset = Vehiculo.objects.filter(empresa=self.empresa)
+            
+            # Configurar valores por defecto para USA
+            if hasattr(self.empresa, 'pais') and self.empresa.pais == 'US':
+                self.fields['moneda'].initial = 'USD'
+                self.fields['country'].initial = 'US'
+
     class Meta:
         model = Documento
-        exclude = ['empresa']  # El campo empresa se asigna automáticamente en la vista
+        fields = ['tipo', 'numero', 'fecha_emision', 'cliente', 'vehiculo', 'estado', 'moneda', 'country']
         widgets = {
-            'fecha': forms.DateInput(attrs={'type': 'date'}),
+            'fecha_emision': forms.DateInput(attrs={'type': 'date'}),
+            'tipo': forms.Select(attrs={'class': 'futurista-input'}),
+            'estado': forms.Select(attrs={'class': 'futurista-input'}),
+            'moneda': forms.Select(attrs={'class': 'futurista-input'}),
+            'country': forms.Select(attrs={'class': 'futurista-input'}),
         }
 
     def save(self, commit=True):
         instance = super().save(commit=False)
         mecanico_nombre = self.cleaned_data.get('mecanico')
         if mecanico_nombre:
-            mecanico_obj, _ = Mecanico.objects.get_or_create(nombre=mecanico_nombre)
+            mecanico_obj, _ = Tecnico.objects.get_or_create(nombre=mecanico_nombre)
             instance.mecanico = mecanico_obj
         if commit:
             instance.save()

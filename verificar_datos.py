@@ -7,18 +7,18 @@ import django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings')
 django.setup()
 
-from taller.models.mecanico import Mecanico
+from taller.models.tecnico import Mecanico
 from taller.models.documento import Documento
 from taller.models.empresa import Empresa
 
 print("🔍 VERIFICANDO DATOS DEL SISTEMA...")
 print(f"📊 Empresas: {Empresa.objects.count()}")
-print(f"🔧 Mecánicos: {Mecanico.objects.count()}")
+print(f"🔧 Mecánicos: {Tecnico.objects.count()}")
 print(f"📄 Documentos: {Documento.objects.count()}")
 
-if Mecanico.objects.exists():
+if Tecnico.objects.exists():
     print("\n👨‍🔧 MECÁNICOS ENCONTRADOS:")
-    for mecanico in Mecanico.objects.all()[:5]:
+    for mecanico in Tecnico.objects.all()[:5]:
         print(f"  - {mecanico.nombre} (Empresa: {mecanico.empresa.nombre_taller if mecanico.empresa else 'Sin empresa'})")
 
 if Documento.objects.exists():

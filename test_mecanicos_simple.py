@@ -5,7 +5,7 @@ sys.path.append('.')
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings_sqlite')
 django.setup()
 
-from taller.models.mecanico import Mecanico
+from taller.models.tecnico import Mecanico
 from django.contrib.auth.models import User
 import requests
 
@@ -15,11 +15,11 @@ def test_crear_mecanico_directo():
     print("🧪 TESTING: Crear Mecánico Directo")
     
     # Test 1: Verificar mecánicos existentes
-    print(f"📊 Mecánicos existentes: {Mecanico.objects.count()}")
+    print(f"📊 Mecánicos existentes: {Tecnico.objects.count()}")
     
     # Test 2: Crear mecánico directamente
     try:
-        mecanico, created = Mecanico.objects.get_or_create(
+        mecanico, created = Tecnico.objects.get_or_create(
             nombre="Test Mecánico API"
         )
         
@@ -63,8 +63,8 @@ def test_crear_mecanico_directo():
         print(f"❌ Error en test HTTP: {e}")
     
     # Test 4: Listar todos los mecánicos finales
-    print(f"\n📋 TOTAL MECÁNICOS: {Mecanico.objects.count()}")
-    for mec in Mecanico.objects.all()[:10]:  # Solo los primeros 10
+    print(f"\n📋 TOTAL MECÁNICOS: {Tecnico.objects.count()}")
+    for mec in Tecnico.objects.all()[:10]:  # Solo los primeros 10
         print(f"   - ID {mec.id}: {mec.nombre}")
 
 if __name__ == "__main__":

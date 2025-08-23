@@ -81,7 +81,7 @@ for tipo, count in sorted(tipos_usados.items(), key=lambda x: x[1], reverse=True
 print()
 print('🚀 === INTEGRACIÓN CON DOCUMENTOS ===')
 # Verificar documentos recientes que podrían haber generado notificaciones
-docs_recientes = Documento.objects.filter(fecha__gte=timezone.now().date() - timedelta(days=1))
+docs_recientes = Documento.objects.filter(fecha_emision__gte=timezone.now().date() - timedelta(days=1))
 print(f'Documentos creados hoy: {docs_recientes.count()}')
 
 # Verificar si hay notificaciones asociadas a estos documentos

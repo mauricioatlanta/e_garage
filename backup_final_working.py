@@ -76,7 +76,8 @@ class BackupFinal:
             
             # Recopilar datos de la empresa
             from django.core import serializers
-            from taller.models import RepuestoDocumento, ServicioDocumento
+            # Use canonical line-item models for compatibility
+            from taller.models.lineas_documento import LineaRepuesto as RepuestoDocumento, LineaServicio as ServicioDocumento
             
             backup_data = {
                 'empresa': {
@@ -99,7 +100,7 @@ class BackupFinal:
                 ('perfiles_usuario', PerfilUsuario.objects.filter(empresa=empresa)),
                 ('clientes', Cliente.objects.filter(empresa=empresa)),
                 ('vehiculos', Vehiculo.objects.filter(empresa=empresa)),
-                ('mecanicos', Mecanico.objects.filter(empresa=empresa)),
+                ('mecanicos', Tecnico.objects.filter(empresa=empresa)),
                 ('documentos', Documento.objects.filter(empresa=empresa)),
                 ('repuestos', Repuesto.objects.filter(empresa=empresa)),
             ]

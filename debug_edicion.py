@@ -75,7 +75,7 @@ def crear_documento_test_completo():
     print("\n🧪 CREANDO DOCUMENTO TEST COMPLETO")
     
     from taller.models.cliente import Cliente
-    from taller.models.mecanico import Mecanico
+    from taller.models.tecnico import Mecanico
     from taller.models.vehiculos import Vehiculo
     from taller.models.empresa import Empresa
     from django.contrib.auth.models import User
@@ -102,7 +102,7 @@ def crear_documento_test_completo():
         return
     
     # Obtener o crear mecánico
-    mecanico, _ = Mecanico.objects.get_or_create(nombre="Mecánico Test Completo")
+    mecanico, _ = Tecnico.objects.get_or_create(nombre="Mecánico Test Completo")
     
     # Obtener vehículo
     vehiculo = Vehiculo.objects.first()

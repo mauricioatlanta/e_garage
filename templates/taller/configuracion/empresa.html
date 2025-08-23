@@ -623,12 +623,12 @@ body {
     <!-- Estadísticas en tiempo real -->
     <div class="stats-grid">
         <div class="stat-card">
-            <div class="stat-number">{{ stats.mecanicos_total }}</div>
-            <div class="stat-label">Mecánicos Totales</div>
+            <div class="stat-number">{{ stats.tecnicos_total }}</div>
+            <div class="stat-label">Técnicos Totales</div>
         </div>
         <div class="stat-card">
-            <div class="stat-number">{{ stats.mecanicos_activos }}</div>
-            <div class="stat-label">Mecánicos Activos</div>
+            <div class="stat-number">{{ stats.tecnicos_activos }}</div>
+            <div class="stat-label">Técnicos Activos</div>
         </div>
         <div class="stat-card">
             <div class="stat-number">{{ stats.documentos_total }}</div>
@@ -724,10 +724,11 @@ body {
 
     <!-- Acciones Rápidas -->
     <div class="quick-actions">
-        <a href="{% url 'configuracion_mecanicos' %}" class="action-card">
+    {% url 'taller:configuracion_tecnicos' as url_config_tecnicos %}
+    <a href="{{ url_config_tecnicos|default:'#' }}" class="action-card">
             <div class="action-icon">👨‍🔧</div>
-            <div class="action-title">Gestión de Mecánicos</div>
-            <div class="action-description">Agregar, editar y gestionar mecánicos del taller</div>
+            <div class="action-title">Gestión de Técnicos</div>
+            <div class="action-description">Agregar, editar y gestionar técnicos del taller</div>
         </a>
         
         <a href="{% url 'documentos:lista_documentos' %}" class="action-card">

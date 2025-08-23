@@ -3,8 +3,10 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from taller.models.documento import Documento, RepuestoDocumento, ServicioDocumento
+from taller.models.documento import Documento
+from taller.models.lineas_documento import LineaRepuesto, LineaServicio
 from taller.documentos.forms import DocumentoForm
+from decimal import Decimal
 import json
 
 # ===== VIEWS NUEVAS Y MEJORADAS =====
@@ -33,22 +35,22 @@ def ver_documento_nuevo(request, documento_id):
     print(f"[VER_NUEVO] Documento encontrado: {documento.numero_documento} ({documento.tipo_documento})")
     
     # Obtener repuestos y servicios
-    repuestos = RepuestoDocumento.objects.filter(documento=documento).order_by('id')
-    servicios = ServicioDocumento.objects.filter(documento=documento).order_by('id')
+    repuestos = LineaRepuesto.objects.filter(documento=documento).order_by('id')
+    servicios = LineaServicio.objects.filter(documento=documento).order_by('id')
     
     print(f"[VER_NUEVO] Repuestos encontrados: {repuestos.count()}")
     for i, rep in enumerate(repuestos, 1):
-        print(f"[VER_NUEVO]   {i}. {rep.nombre} - ${rep.precio} x {rep.cantidad} = ${rep.total}")
+        print(f"[VER_NUEVO]   {i}. {rep.nombre} - ${rep.precio_unitario} x {rep.cantidad} = ${rep.subtotal}")
     
     print(f"[VER_NUEVO] Servicios encontrados: {servicios.count()}")
     for i, serv in enumerate(servicios, 1):
-        print(f"[VER_NUEVO]   {i}. {serv.nombre} - ${serv.precio}")
+        print(f"[VER_NUEVO]   {i}. {serv.nombre} - ${serv.precio_unitario}")
     
     # Calcular totales
-    subtotal_repuestos = sum(rep.total for rep in repuestos)
-    subtotal_servicios = sum(serv.precio for serv in servicios)
+    subtotal_repuestos = sum(rep.subtotal for rep in repuestos)
+    subtotal_servicios = sum(serv.precio_unitario * serv.cantidad for serv in servicios)
     subtotal = subtotal_repuestos + subtotal_servicios
-    iva = int(subtotal * 0.19)
+    iva = int(subtotal * Decimal('0.19'))
     total = subtotal + iva
     
     print(f"[VER_NUEVO] CÁLCULOS:")
@@ -74,18 +76,22 @@ def ver_documento_nuevo(request, documento_id):
 
 
 @login_required
+@login_required
 def editar_documento_nuevo(request, documento_id):
     """Vista nueva y mejorada para editar documentos con repuestos y servicios"""
+    print("🔥 VISTA EDITAR_DOCUMENTO_NUEVO EJECUTÁNDOSE 🔥")
     print(f"[EDITAR_NUEVO] ===== INICIANDO EDITAR DOCUMENTO NUEVO =====")
     print(f"[EDITAR_NUEVO] Usuario: {request.user.username}")
     print(f"[EDITAR_NUEVO] Documento ID: {documento_id}")
     print(f"[EDITAR_NUEVO] Método: {request.method}")
+    print(f"[EDITAR_NUEVO] URL llamada: {request.path}")
     
     # Obtener empresa del usuario
     try:
         empresa = request.user.empresa
         print(f"[EDITAR_NUEVO] Empresa del usuario: {empresa.nombre_taller}")
-    except AttributeError:
+    except AttributeError as e:
+        print(f"[EDITAR_NUEVO] Error obteniendo empresa: {e}")
         from taller.models.empresa import Empresa
         empresa, created = Empresa.objects.get_or_create(
             user=request.user,
@@ -94,8 +100,12 @@ def editar_documento_nuevo(request, documento_id):
         print(f"[EDITAR_NUEVO] Empresa {'creada' if created else 'obtenida'}: {empresa.nombre_taller}")
     
     # Obtener documento con filtro de empresa
-    documento = get_object_or_404(Documento, id=documento_id, empresa=empresa)
-    print(f"[EDITAR_NUEVO] Documento encontrado: {documento.numero_documento}")
+    try:
+        documento = get_object_or_404(Documento, id=documento_id, empresa=empresa)
+        print(f"[EDITAR_NUEVO] Documento encontrado: {documento.numero_documento}")
+    except Exception as e:
+        print(f"[EDITAR_NUEVO] ERROR obteniendo documento: {e}")
+        raise
     
     if request.method == 'POST':
         print(f"[EDITAR_NUEVO] ===== PROCESANDO POST =====")
@@ -118,7 +128,7 @@ def editar_documento_nuevo(request, documento_id):
                 # ELIMINAR TODOS LOS REPUESTOS Y SERVICIOS ANTERIORES
                 repuestos_eliminados = documento.repuestos.count()
                 servicios_eliminados = documento.servicios.count()
-                
+
                 documento.repuestos.all().delete()
                 documento.servicios.all().delete()
                 
@@ -146,23 +156,24 @@ def editar_documento_nuevo(request, documento_id):
                     
                     if item.get('tipo') == 'repuesto':
                         # Crear repuesto
-                        repuesto = RepuestoDocumento.objects.create(
+                        repuesto = LineaRepuesto.objects.create(
                             documento=documento,
                             codigo=item.get('partnumber', '').strip() or f'EDIT-{i+1:03d}',
                             nombre=nombre,
                             cantidad=int(item.get('cantidad', 1)),
-                            precio=precio
+                            precio_unitario=precio
                         )
                         repuestos_creados += 1
                         print(f"[EDITAR_NUEVO] ✅ Repuesto creado: {repuesto.nombre} (${repuesto.precio} x {repuesto.cantidad})")
                         
                     elif item.get('tipo') == 'servicio':
                         # Crear servicio
-                        servicio = ServicioDocumento.objects.create(
+                        servicio = LineaServicio.objects.create(
                             empresa=empresa,
                             documento=documento,
                             nombre=nombre,
-                            precio=precio
+                            precio_unitario=precio,
+                            cantidad=1
                         )
                         servicios_creados += 1
                         print(f"[EDITAR_NUEVO] ✅ Servicio creado: {servicio.nombre} (${servicio.precio})")
@@ -189,17 +200,40 @@ def editar_documento_nuevo(request, documento_id):
         form = DocumentoForm(instance=documento, empresa=empresa)
     
     # Obtener repuestos y servicios actuales
-    repuestos = RepuestoDocumento.objects.filter(documento=documento).order_by('id')
-    servicios = ServicioDocumento.objects.filter(documento=documento).order_by('id')
+    repuestos = LineaRepuesto.objects.filter(documento=documento).order_by('id')
+    servicios = LineaServicio.objects.filter(documento=documento).order_by('id')
     
+    print(f"[EDITAR_NUEVO] ===== DEBUG DATOS =====")
+    print(f"[EDITAR_NUEVO] Documento ID: {documento.id}")
     print(f"[EDITAR_NUEVO] Repuestos actuales: {repuestos.count()}")
     print(f"[EDITAR_NUEVO] Servicios actuales: {servicios.count()}")
     
+    # Debug adicional - listar todos los repuestos y servicios
+    for i, rep in enumerate(repuestos, 1):
+        print(f"[EDITAR_NUEVO] Repuesto {i}: {rep.nombre} - ${rep.precio_unitario} x {rep.cantidad}")
+    
+    for i, serv in enumerate(servicios, 1):
+        print(f"[EDITAR_NUEVO] Servicio {i}: {serv.nombre} - ${serv.precio_unitario}")
+    
+    # También verificar las tablas directas de la DB
+    from django.db import connection
+    cursor = connection.cursor()
+    
+    cursor.execute("SELECT COUNT(*) FROM taller_lineaservicio WHERE documento_id = %s", [documento.id])
+    count_lineaservicio = cursor.fetchone()[0]
+    print(f"[EDITAR_NUEVO] Servicios en taller_lineaservicio: {count_lineaservicio}")
+    
+    cursor.execute("SELECT COUNT(*) FROM taller_lineaotroservicio WHERE documento_id = %s", [documento.id])
+    count_otroservicio = cursor.fetchone()[0]
+    print(f"[EDITAR_NUEVO] Otros servicios en taller_lineaotroservicio: {count_otroservicio}")
+    
+    print(f"[EDITAR_NUEVO] ===== FIN DEBUG =====")
+    
     # Calcular totales
-    subtotal_repuestos = sum(rep.total for rep in repuestos)
-    subtotal_servicios = sum(serv.precio for serv in servicios)
+    subtotal_repuestos = sum(rep.subtotal for rep in repuestos)
+    subtotal_servicios = sum(serv.precio_unitario * serv.cantidad for serv in servicios)
     subtotal = subtotal_repuestos + subtotal_servicios
-    iva = int(subtotal * 0.19)
+    iva = int(subtotal * Decimal('0.19'))
     total = subtotal + iva
     
     context = {
@@ -215,8 +249,8 @@ def editar_documento_nuevo(request, documento_id):
         'editando': True,
     }
     
-    print(f"[EDITAR_NUEVO] ===== RENDERIZANDO TEMPLATE DE EDICIÓN NUEVO =====")
-    return render(request, 'taller/documentos/editar_documento_nuevo.html', context)
+    print(f"[EDITAR_NUEVO] ===== RENDERIZANDO TEMPLATE DE CREACIÓN (MODO EDICIÓN) =====")
+    return render(request, 'taller/documentos/crear_documento.html', context)
 
 
 @login_required
@@ -238,11 +272,12 @@ def test_documento_datos(request, documento_id):
     documento = get_object_or_404(Documento, id=documento_id, empresa=empresa)
     
     # Test directo en base de datos
+    from taller.models.lineas_documento import LineaRepuesto as RepuestoDocumento, LineaServicio as ServicioLinea
     repuestos_count = RepuestoDocumento.objects.filter(documento=documento).count()
-    servicios_count = ServicioDocumento.objects.filter(documento=documento).count()
+    servicios_count = ServicioLinea.objects.filter(documento=documento).count()
     
     repuestos = list(RepuestoDocumento.objects.filter(documento=documento).values())
-    servicios = list(ServicioDocumento.objects.filter(documento=documento).values())
+    servicios = list(ServicioLinea.objects.filter(documento=documento).values())
     
     test_data = {
         'documento_id': documento.id,

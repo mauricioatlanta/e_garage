@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>eGarage - Software N°1 para Talleres Mecánicos | Prueba Gratis 30 Días</title>
-    <meta name="description" content="Crea presupuestos, controla repuestos y mejora tu taller con eGarage. El software más completo para talleres mecánicos. Prueba gratis 30 días sin compromiso.">
-    <meta name="keywords" content="software taller mecánico, gestión taller automotriz, presupuestos digitales, control repuestos, órdenes trabajo, facturación taller">
+    <title>eGarage - Software N°1 para Talleres Técnicos | Prueba Gratis 30 Días</title>
+    <meta name="description" content="Crea presupuestos, controla repuestos y mejora tu taller con eGarage. El software más completo para talleres técnicos. Prueba gratis 30 días sin compromiso.">
+    <meta name="keywords" content="software taller técnico, gestión taller automotriz, presupuestos digitales, control repuestos, órdenes trabajo, facturación taller">
     
     <!-- Meta tags Open Graph para redes sociales -->
-    <meta property="og:title" content="eGarage - Software N°1 para Talleres Mecánicos">
+    <meta property="og:title" content="eGarage - Software N°1 para Talleres Técnicos">
     <meta property="og:description" content="Digitaliza tu taller con eGarage. Presupuestos, inventario, facturación y más. Prueba gratis 30 días.">
     <meta property="og:image" content="https://tudominio.com/static/egarage-preview.jpg">
     <meta property="og:url" content="https://tudominio.com/egarage/">
@@ -16,7 +16,7 @@
     
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="eGarage - Software para Talleres Mecánicos">
+    <meta name="twitter:title" content="eGarage - Software para Talleres Técnicos">
     <meta name="twitter:description" content="El software más completo para gestionar tu taller. Prueba gratis 30 días.">
     <meta name="twitter:image" content="https://tudominio.com/static/egarage-preview.jpg">
     
@@ -105,7 +105,6 @@
         });
     </script>
     
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .gradient-bg {
             background: linear-gradient(135deg, #1f2937 0%, #111827 50%, #374151 100%);
@@ -157,8 +156,8 @@
                 <span class="ml-2 text-sm text-cyan-900/80 font-semibold">Gestión de Talleres</span>
             </div>
             <div class="flex items-center gap-4">
-                <a href="/accounts/login/" class="bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow transition flex items-center gap-2">
-                    <span>🔐</span> Ingresar
+<a href="{% if debug %}http://127.0.0.1:8080/selector-pais-egarage/{% else %}https://www.egarage.cl/selector-pais-egarage/{% endif %}" class="bg-gradient-to-r from-blue-700 via-white to-red-600 px-6 py-2 rounded-xl text-blue-900 font-extrabold text-sm transition-all duration-300 shadow-xl border-2 border-blue-700 flex items-center gap-2">
+                    <span>🌎</span> Entrar
                 </a>
                 <a href="#suscripcion" class="hidden md:inline-block border-2 border-cyan-400 text-cyan-700 hover:bg-cyan-400 hover:text-white px-4 py-2 rounded-xl text-sm font-bold transition shadow">🚀 Prueba Gratis</a>
             </div>
@@ -183,7 +182,7 @@
                 <img src="/static/img/logo.png" alt="eGarage Logo" class="h-64 w-auto mb-8 drop-shadow-2xl animate-pulse" style="background:rgba(0,230,255,0.13);border-radius:3rem;box-shadow:0 0 120px #00e6ffcc,0 0 0 24px #00e6ff22;max-width:600px;">
             </div>
             <h1 class="text-4xl md:text-6xl font-extrabold mb-6 leading-tight drop-shadow-lg">
-                El software <span class="text-cyan-300">N°1</span> para talleres mecánicos profesionales
+                El software <span class="text-cyan-300">N°1</span> para talleres técnicos profesionales
             </h1>
             <p class="text-lg md:text-xl text-cyan-100 mb-8 max-w-2xl mx-auto leading-relaxed">
                 Presupuestos, órdenes de trabajo, control de repuestos y más. Todo desde un solo lugar.<br>
@@ -199,6 +198,9 @@
                    class="border-2 border-cyan-300 hover:bg-cyan-300 hover:text-cyan-900 px-8 py-4 rounded-lg text-cyan-100 font-bold text-lg transition-all duration-300 shadow"
                    onclick="trackEvent('click', 'hero', 'ver_caracteristicas', 1);">
                     Ver Características
+                </a>
+<a href="{% if debug %}http://127.0.0.1:8080/selector-pais-egarage/{% else %}https://www.egarage.cl/selector-pais-egarage/{% endif %}" class="bg-gradient-to-r from-blue-700 via-white to-red-600 px-8 py-4 rounded-lg text-blue-900 font-extrabold text-lg transition-all duration-300 shadow-xl border-2 border-blue-700 flex items-center gap-2" style="margin-top:8px;">
+                    <span>🌎</span> Entrar
                 </a>
             </div>
             <div class="mt-8 text-sm text-cyan-200">
@@ -220,7 +222,7 @@
             <div class="text-center mb-16">
                 <h2 class="text-3xl md:text-4xl font-bold mb-4">¿Qué puedes hacer con eGarage?</h2>
                 <p class="text-lg text-gray-600 max-w-2xl mx-auto">
-                    Transforma la gestión de tu taller con herramientas diseñadas específicamente para mecánicos profesionales
+                    Transforma la gestión de tu taller con herramientas diseñadas específicamente para técnicos profesionales
                 </p>
             </div>
             
@@ -253,7 +255,7 @@
                 <div class="feature-card-futuristic border-l-4 border-indigo-400">
                     <span class="icon-futuristic">🧠</span>
                     <h3>Inteligencia de Negocio</h3>
-                    <p>Análisis avanzado de rentabilidad, ranking de servicios y performance de mecánicos para optimizar tu taller.</p>
+                    <p>Análisis avanzado de rentabilidad, ranking de servicios y performance de técnicos para optimizar tu taller.</p>
                 </div>
             </div>
         </div>
@@ -570,7 +572,7 @@
                         </label>
                         <textarea id="comentarios" name="comentarios" rows="4"
                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-300"
-                                  placeholder="Cuéntanos sobre tu taller: cuántos mecánicos, qué servicios ofrecen, principales desafíos..."></textarea>
+                                  placeholder="Cuéntanos sobre tu taller: cuántos técnicos, qué servicios ofrecen, principales desafíos..."></textarea>
                     </div>
                     
                     <div class="flex items-start">
@@ -671,7 +673,7 @@
                         <span class="text-xl font-bold text-white">eGarage</span>
                     </div>
                     <p class="text-gray-400 mb-4 max-w-md">
-                        El software más completo para la gestión de talleres mecánicos. 
+                        El software más completo para la gestión de talleres técnicos. 
                         Digitaliza tu negocio y aumenta tu rentabilidad.
                     </p>
                     <div class="flex space-x-4">
@@ -985,5 +987,51 @@ function drawParticles() {
     requestAnimationFrame(drawParticles);
 }
 drawParticles();
+</script>
+<script>
+    // CSRF helper
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Mejorar cambio de idioma
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('a[href*="?lang="]').forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                var lang = this.href.split('lang=')[1];
+                var csrftoken = getCookie('csrftoken');
+                fetch('/cambiar-idioma/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken
+                    },
+                    body: JSON.stringify({ idioma: lang })
+                })
+                .then(function(resp) {
+                    if (resp.ok) {
+                        window.location.search = '?lang=' + lang;
+                    } else {
+                        alert('Error cambiando idioma');
+                    }
+                })
+                .catch(function() {
+                    alert('Error de red al cambiar idioma');
+                });
+            });
+        });
+    });
 </script>
 </html>

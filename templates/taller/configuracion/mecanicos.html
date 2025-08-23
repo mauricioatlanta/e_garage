@@ -1,7 +1,7 @@
 {% extends 'taller/base.html' %}
 {% load static %}
 
-{% block title %}👨‍🔧 Gestión de Mecánicos - E-Garage{% endblock %}
+{% block title %}👨‍🔧 Gestión de Técnicos - E-Garage{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -536,7 +536,7 @@ body {
     z-index: 1;
 }
 
-/* Partículas flotantes específicas para mecánicos */
+/* Partículas flotantes específicas para técnicos */
 .mechanic-particle {
     position: absolute;
     background: var(--neon-green);
@@ -594,9 +594,9 @@ body {
         <div class="breadcrumb">
             <a href="{% url 'configuracion_principal' %}">⚙️ Configuración</a>
             <span>→</span>
-            <span>👨‍🔧 Mecánicos</span>
+            <span>👨‍🔧 Técnicos</span>
         </div>
-        <h1 class="page-title">👨‍🔧 GESTIÓN DE MECÁNICOS</h1>
+        <h1 class="page-title">👨‍🔧 GESTIÓN DE TÉCNICOS</h1>
     </div>
 
     <!-- Mensajes de feedback -->
@@ -630,11 +630,11 @@ body {
         </div>
     </div>
 
-    <!-- Formulario para agregar mecánico -->
+    <!-- Formulario para agregar técnico -->
     <div class="add-mecanico-section">
         <h2 class="section-title">
             <span class="section-icon">➕</span>
-            Agregar Nuevo Mecánico
+            Agregar Nuevo Técnico
         </h2>
         
         <form method="post">
@@ -646,7 +646,7 @@ body {
                            id="nombre_nuevo_mecanico" 
                            name="nombre_nuevo_mecanico" 
                            class="field-input" 
-                           placeholder="Ingresa el nombre del mecánico"
+                           placeholder="Ingresa el nombre del técnico"
                            required>
                 </div>
                 
@@ -665,19 +665,19 @@ body {
                            id="direccion_nuevo_mecanico" 
                            name="direccion_nuevo_mecanico" 
                            class="field-input" 
-                           placeholder="Dirección del mecánico (opcional)">
+                           placeholder="Dirección del técnico (opcional)">
                 </div>
             </div>
             
             <div style="text-align: center;">
-                <button type="submit" name="crear_mecanico" class="btn-add">
-                    ➕ Agregar Mecánico
+                <button type="submit" name="crear_tecnico" class="btn-add">
+                    ➕ Agregar Técnico
                 </button>
             </div>
         </form>
     </div>
 
-    <!-- Lista de mecánicos -->
+    <!-- Lista de técnicos -->
     <div class="mecanicos-grid">
         {% for mecanico in mecanicos %}
         <div class="mecanico-card {% if mecanico.activo %}activo{% else %}inactivo{% endif %}">
@@ -721,7 +721,7 @@ body {
                 {% if mecanico.activo %}
                     <form method="post" style="flex: 1;">
                         {% csrf_token %}
-                        <input type="hidden" name="mecanico_id" value="{{ mecanico.id }}">
+                        <input type="hidden" name="tecnico_id" value="{{ mecanico.id }}">
                         <button type="submit" name="desactivar_mecanico" class="btn-action btn-toggle" 
                                 onclick="return confirm('¿Desactivar a {{ mecanico.nombre }}? Ya no aparecerá en formularios nuevos.')">
                             ⏸️ Desactivar
@@ -730,7 +730,7 @@ body {
                 {% else %}
                     <form method="post" style="flex: 1;">
                         {% csrf_token %}
-                        <input type="hidden" name="mecanico_id" value="{{ mecanico.id }}">
+                        <input type="hidden" name="tecnico_id" value="{{ mecanico.id }}">
                         <button type="submit" name="activar_mecanico" class="btn-action btn-activate">
                             ▶️ Activar
                         </button>
@@ -739,7 +739,7 @@ body {
                 
                 <form method="post" style="flex: 1;">
                     {% csrf_token %}
-                    <input type="hidden" name="mecanico_id" value="{{ mecanico.id }}">
+                    <input type="hidden" name="tecnico_id" value="{{ mecanico.id }}">
                     <button type="submit" name="eliminar_mecanico" class="btn-action btn-delete" 
                             onclick="return confirm('⚠️ ¿Eliminar permanentemente a {{ mecanico.nombre }}?\n\nEsta acción no se puede deshacer.')">
                         🗑️ Eliminar
@@ -750,8 +750,8 @@ body {
         {% empty %}
         <div style="grid-column: 1 / -1; text-align: center; padding: 4rem; color: #666;">
             <div style="font-size: 4rem; margin-bottom: 1rem;">🔧</div>
-            <h3>No hay mecánicos registrados</h3>
-            <p>Agrega el primer mecánico usando el formulario de arriba.</p>
+            <h3>No hay técnicos registrados</h3>
+            <p>Agrega el primer técnico usando el formulario de arriba.</p>
         </div>
         {% endfor %}
     </div>
@@ -763,12 +763,12 @@ body {
         <button class="modal-close" onclick="cerrarModal()">&times;</button>
         <h2 class="section-title">
             <span class="section-icon">✏️</span>
-            Editar Mecánico
+            Editar Técnico
         </h2>
         
         <form method="post" id="editForm">
             {% csrf_token %}
-            <input type="hidden" name="mecanico_id" id="edit_mecanico_id">
+            <input type="hidden" name="tecnico_id" id="edit_tecnico_id">
             
             <div class="form-grid">
                 <div class="form-field">
@@ -812,7 +812,7 @@ body {
 <script>
 // JavaScript para efectos y funcionalidad
 document.addEventListener('DOMContentLoaded', function() {
-    // Crear partículas específicas para mecánicos
+    // Crear partículas específicas para técnicos
     function createMechanicParticle() {
         const particle = document.createElement('div');
         particle.className = 'mechanic-particle';
@@ -885,7 +885,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Funciones del modal de edición
 function editarMecanico(id, nombre, telefono, direccion) {
-    document.getElementById('edit_mecanico_id').value = id;
+    document.getElementById('edit_tecnico_id').value = id;
     document.getElementById('edit_nombre').value = nombre;
     document.getElementById('edit_telefono').value = telefono || '';
     document.getElementById('edit_direccion').value = direccion || '';
@@ -913,9 +913,9 @@ document.addEventListener('keydown', function(e) {
 });
 
 
-  <!-- Formulario para agregar mecánico -->
+  <!-- Formulario para agregar técnico -->
   <div class="bg-gray-50 rounded-lg p-6 mb-8">
-    <h3 class="text-lg font-semibold text-gray-800 mb-4">➕ Agregar Nuevo Mecánico</h3>
+    <h3 class="text-lg font-semibold text-gray-800 mb-4">➕ Agregar Nuevo Técnico</h3>
     <form method="post" class="flex gap-3 items-end">
       {% csrf_token %}
       <div class="flex-1">
@@ -931,7 +931,7 @@ document.addEventListener('keydown', function(e) {
       </div>
       <button 
         type="submit" 
-        name="crear_mecanico" 
+        name="crear_tecnico" 
         class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
       >
         ➕ Agregar
@@ -939,12 +939,12 @@ document.addEventListener('keydown', function(e) {
     </form>
   </div>
 
-  <!-- Lista de mecánicos -->
+  <!-- Lista de técnicos -->
   <div class="bg-white rounded-lg border border-gray-200">
     <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 rounded-t-lg">
-      <h3 class="text-lg font-semibold text-gray-800">📋 Lista de Mecánicos</h3>
+      <h3 class="text-lg font-semibold text-gray-800">📋 Lista de Técnicos</h3>
       <p class="text-sm text-gray-600 mt-1">
-        Gestiona los mecánicos de tu taller. Solo los mecánicos activos aparecerán en los formularios de documentos.
+        Gestiona los técnicos de tu taller. Solo los técnicos activos aparecerán en los formularios de documentos.
       </p>
     </div>
     
@@ -990,7 +990,7 @@ document.addEventListener('keydown', function(e) {
                 <!-- Botón para activar/desactivar -->
                 <form method="post" class="inline">
                   {% csrf_token %}
-                  <input type="hidden" name="mecanico_id" value="{{ mecanico.id }}">
+                  <input type="hidden" name="tecnico_id" value="{{ mecanico.id }}">
                   {% if mecanico.activo %}
                     <button 
                       type="submit" 
@@ -1022,8 +1022,8 @@ document.addEventListener('keydown', function(e) {
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
           </svg>
         </div>
-        <h3 class="text-lg font-medium text-gray-900 mb-1">No hay mecánicos registrados</h3>
-        <p class="text-gray-500">Agrega tu primer mecánico usando el formulario de arriba.</p>
+        <h3 class="text-lg font-medium text-gray-900 mb-1">No hay técnicos registrados</h3>
+        <p class="text-gray-500">Agrega tu primer técnico usando el formulario de arriba.</p>
       </div>
     {% endif %}
   </div>
@@ -1042,10 +1042,10 @@ document.addEventListener('keydown', function(e) {
         </h3>
         <div class="mt-2 text-sm text-blue-700">
           <ul class="list-disc list-inside space-y-1">
-            <li>Solo los mecánicos <strong>activos</strong> aparecerán en los formularios de creación de documentos</li>
-            <li>Los documentos antiguos conservarán la referencia al mecánico aunque esté desactivado</li>
-            <li>Puedes reactivar un mecánico en cualquier momento</li>
-            <li>Los nombres de mecánicos deben ser únicos dentro de tu taller</li>
+            <li>Solo los técnicos <strong>activos</strong> aparecerán en los formularios de creación de documentos</li>
+            <li>Los documentos antiguos conservarán la referencia al técnico aunque esté desactivado</li>
+            <li>Puedes reactivar un técnico en cualquier momento</li>
+            <li>Los nombres de técnicos deben ser únicos dentro de tu taller</li>
           </ul>
         </div>
       </div>
@@ -1070,13 +1070,13 @@ document.addEventListener('keydown', function(e) {
   </div>
 </div>
 
-<!-- Modal para editar mecánico -->
+<!-- Modal para editar técnico -->
 <div id="editModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
   <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-    <h3 class="text-lg font-bold text-gray-900 mb-4">✏️ Editar Mecánico</h3>
+    <h3 class="text-lg font-bold text-gray-900 mb-4">✏️ Editar Técnico</h3>
     <form method="post">
       {% csrf_token %}
-      <input type="hidden" id="edit_mecanico_id" name="mecanico_id" value="">
+      <input type="hidden" id="edit_tecnico_id" name="tecnico_id" value="">
       <div class="mb-4">
         <label for="edit_nombre" class="block text-sm font-medium text-gray-700 mb-2">Nombre:</label>
         <input 
@@ -1109,7 +1109,7 @@ document.addEventListener('keydown', function(e) {
 
 <script>
 function editarMecanico(id, nombre) {
-  document.getElementById('edit_mecanico_id').value = id;
+  document.getElementById('edit_tecnico_id').value = id;
   document.getElementById('edit_nombre').value = nombre;
   document.getElementById('editModal').classList.remove('hidden');
 }

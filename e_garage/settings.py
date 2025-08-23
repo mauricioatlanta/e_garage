@@ -19,6 +19,7 @@ ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '').split(',') if not DEBUG el
 # ============================================================
 INSTALLED_APPS = [
     'widget_tweaks',
+    'ubicacion.apps.UbicacionConfig',
     'dal',
     'dal_select2',
     'crispy_forms',  # ✅ ¡Agrega esta línea!
@@ -35,7 +36,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',  # ✅ Necesario para allauth
-    'django_extensions',
+        'documentos',
+        'django_extensions',
     'django.contrib.humanize',
 ]
 
@@ -45,11 +47,14 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'taller.middleware.country_url_migration.CountryURLRedirectMiddleware',  # 🔄 Redirecciones /es/ → /cl/
     'django.middleware.locale.LocaleMiddleware',  # ✅ Middleware de idioma
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'taller.middleware.empresa_middleware.EmpresaMiddleware',
+    'taller.middleware.country_context.CountryContextMiddleware',  # 🌍 Detección de país
+    'taller.middleware.country_context.LanguageContextMiddleware',  # 🗣️ Detección de idioma
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',  # Añadido para django-allauth
@@ -58,7 +63,7 @@ MIDDLEWARE = [
 # ============================================================
 # 🔗 CONFIGURACIÓN DE URLS
 # ============================================================
-ROOT_URLCONF = 'gestion_taller.urls'
+ROOT_URLCONF = 'e_garage.urls'
 
 # ============================================================
 # 📐 TEMPLATES (con builtins de humanize)
@@ -75,6 +80,10 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'taller.context_processors.empresa_contexto',
+                'taller.context_processors.company_branding',
+                'django.template.context_processors.static',
+                'egarage.context_processors.branding',
+                'gestion_taller.context_processors.debug_flags',
             ],
         },
     },
@@ -82,6 +91,8 @@ TEMPLATES = [
 
 
 # ============================================================
+# Reexporta la versión para acceso en settings.APP_VERSION
+from egarage.version import APP_VERSION
 # 🚀 WSGI
 # ============================================================
 WSGI_APPLICATION = 'gestion_taller.wsgi.application'
@@ -176,32 +187,28 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 # 📧 CONFIGURACIÓN DE EMAIL PARA DESARROLLO
 # ============================================================
 # Para desarrollo: usar console backend (emails aparecen en la consola)
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 # ============================================================
 # 📧 CONFIGURACIÓN DE EMAILS - eGarage
 # ============================================================
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'mail.atlantareciclajes.cl'
-EMAIL_PORT = 465
-EMAIL_USE_SSL = True
-EMAIL_USE_TLS = False
-EMAIL_HOST_USER = 'contacto@atlantareciclajes.cl'
-EMAIL_HOST_PASSWORD = 'laila2013@'
-DEFAULT_FROM_EMAIL = 'eGarage <contacto@atlantareciclajes.cl>'
+
+# Para depuración: ver los correos en la consola
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Para desarrollo - desactivar emails reales (descomenta la siguiente línea si es necesario):
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Para producción (comentado):
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'mail.atlantareciclajes.cl'
-# EMAIL_PORT = 465
-# EMAIL_USE_SSL = True
-# EMAIL_USE_TLS = False
-# EMAIL_HOST_USER = 'suscripcion@atlantareciclajes.cl'
-# EMAIL_HOST_PASSWORD = ')+y-k+[tY6w&'
-# DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+# Configuración para envío real desde soporte
+EMAIL_HOST = 'mail.atlantareciclajes.cl'
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True
+EMAIL_USE_TLS = False
+EMAIL_HOST_USER = 'support@atlantareciclajes.cl'
+EMAIL_HOST_PASSWORD = ''  # <--- PON AQUÍ LA CONTRASEÑA REAL
+DEFAULT_FROM_EMAIL = 'support@atlantareciclajes.cl'
 
 # ============================================================
 # 🔐 CONFIGURACIÓN DE ALLAUTH
@@ -219,6 +226,9 @@ ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = True
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/'
 
+# Forzar template personalizado para confirmación de email
+ACCOUNT_EMAIL_CONFIRMATION_TEMPLATE = "account/email_confirm.html"
+
 # Backend de autenticación
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
@@ -227,5 +237,12 @@ AUTHENTICATION_BACKENDS = [
 
 # ID del sitio para allauth
 SITE_ID = 1
+
+# ============================================================
+# 🌍 CONFIGURACIÓN MULTILENGUAJE Y PAÍS
+# ============================================================
+DEFAULT_COUNTRY = 'CL'  # País por defecto
+SUPPORTED_COUNTRIES = ['CL', 'US']  # Países soportados
+SUPPORTED_LANGUAGES = ['es', 'en']  # Idiomas soportados
 
 

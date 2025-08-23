@@ -3,8 +3,9 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.contrib import messages
-from taller.models.documento import Documento, RepuestoDocumento, ServicioDocumento
-from taller.models.mecanico import Mecanico
+from taller.models.documento import Documento
+from taller.models.lineas_documento import LineaRepuesto, LineaServicio
+from taller.models.tecnico import Tecnico
 from taller.models.perfil_usuario import PerfilUsuario
 from taller.models.auditoria import LogAuditoria
 from taller.forms import DocumentoForm
@@ -76,8 +77,8 @@ def crear_documento(request):
             datos_despues = {
                 'id': documento.pk,
                 'numero_documento': documento.numero_documento,
-                'tipo_documento': documento.tipo_documento,
-                'fecha': str(documento.fecha),
+                'tipo_documento': documento.tipo,
+                'fecha': str(documento.fecha_emision),
                 'cliente_id': documento.cliente.pk if documento.cliente else None,
                 'vehiculo_id': documento.vehiculo.pk if documento.vehiculo else None,
             }
@@ -92,29 +93,30 @@ def crear_documento(request):
                     data = json.loads(json_items)
                     for item in data:
                         if item['tipo'] == 'repuesto':
-                            repuesto = RepuestoDocumento.objects.create(
+                            repuesto = LineaRepuesto.objects.create(
                                 documento=documento,
                                 codigo=item['partnumber'],
                                 nombre=item['nombre'],
-                                cantidad=item['cantidad'],
-                                precio=item['precio'],
+                                cantidad=item.get('cantidad', 1),
+                                precio_unitario=item['precio'],
                             )
                             repuestos_creados.append({
                                 'codigo': repuesto.codigo,
                                 'nombre': repuesto.nombre,
                                 'cantidad': repuesto.cantidad,
-                                'precio': repuesto.precio
+                                'precio': repuesto.precio_unitario
                             })
                             
                         elif item['tipo'] == 'servicio':
-                            servicio = ServicioDocumento.objects.create(
+                            servicio = LineaServicio.objects.create(
                                 documento=documento,
                                 nombre=item['nombre'],
-                                precio=item['precio'],
+                                precio_unitario=item['precio'],
+                                cantidad=item.get('cantidad', 1)
                             )
                             servicios_creados.append({
                                 'nombre': servicio.nombre,
-                                'precio': servicio.precio
+                                'precio': servicio.precio_unitario
                             })
                     
                     # Agregar items a datos después
@@ -173,12 +175,12 @@ def crear_documento(request):
             request=request
         )
 
-    # Cargar mecánicos activos del taller
-    mecanicos = Mecanico.objects.filter(activo=True)
+    # Cargar técnicos activos del taller
+    tecnicos = Tecnico.objects.filter(activo=True)
 
     return render(request, 'taller/documentos/crear_documento.html', {
         'form': form,
-        'mecanicos': mecanicos,
+        'tecnicos': tecnicos,
     })
 
 
@@ -200,12 +202,12 @@ def editar_documento(request, documento_id):
         'tipo_documento': documento.tipo_documento,
         'fecha': str(documento.fecha),
         'observaciones': documento.observaciones,
-        'repuestos': list(RepuestoDocumento.objects.filter(documento=documento).values()),
-        'servicios': list(ServicioDocumento.objects.filter(documento=documento).values())
+        'repuestos': list(LineaRepuesto.objects.filter(documento=documento).values()),
+    'servicios': list(LineaServicio.objects.filter(documento=documento).values())
     }
 
-    repuestos = RepuestoDocumento.objects.filter(documento=documento)
-    servicios = ServicioDocumento.objects.filter(documento=documento)
+    repuestos = LineaRepuesto.objects.filter(documento=documento)
+    servicios = LineaServicio.objects.filter(documento=documento)
     
     if request.method == 'POST':
         form = DocumentoForm(request.POST, instance=documento)
@@ -219,29 +221,29 @@ def editar_documento(request, documento_id):
                     data = json.loads(json_items)
 
                     # Eliminar ítems anteriores
-                    RepuestoDocumento.objects.filter(documento=documento).delete()
-                    ServicioDocumento.objects.filter(documento=documento).delete()
+                    LineaRepuesto.objects.filter(documento=documento).delete()
+                    LineaServicio.objects.filter(documento=documento).delete()
 
                     # Crear nuevos ítems
                     for item in data:
                         if item['tipo'] == 'repuesto':
-                            RepuestoDocumento.objects.create(
+                            LineaRepuesto.objects.create(
                                 documento=documento,
                                 codigo=item['partnumber'],
                                 nombre=item['nombre'],
                                 cantidad=item['cantidad'],
-                                precio=item['precio'],
+                                precio_unitario=item['precio'],
                             )
                         elif item['tipo'] == 'servicio':
-                            ServicioDocumento.objects.create(
+                            LineaServicio.objects.create(
                                 documento=documento,
                                 nombre=item['nombre'],
                                 precio=item['precio'],
                             )
                             
                     # Recargar repuestos y servicios después de guardar
-                    repuestos = RepuestoDocumento.objects.filter(documento=documento)
-                    servicios = ServicioDocumento.objects.filter(documento=documento)
+                    repuestos = LineaRepuesto.objects.filter(documento=documento)
+                    servicios = LineaServicio.objects.filter(documento=documento)
                     
                 except json.JSONDecodeError as e:
                     messages.error(request, f"Error procesando items: {e}")
@@ -252,8 +254,8 @@ def editar_documento(request, documento_id):
                 'tipo_documento': documento.tipo_documento,
                 'fecha': str(documento.fecha),
                 'observaciones': documento.observaciones,
-                'repuestos': list(RepuestoDocumento.objects.filter(documento=documento).values()),
-                'servicios': list(ServicioDocumento.objects.filter(documento=documento).values())
+                'repuestos': list(LineaRepuesto.objects.filter(documento=documento).values()),
+                'servicios': list(LineaServicio.objects.filter(documento=documento).values())
             }
 
             # Log de auditoría con cambios
@@ -282,8 +284,8 @@ def editar_documento(request, documento_id):
             request=request
         )
 
-    # Cargar mecánicos activos del taller
-    mecanicos = Mecanico.objects.filter(activo=True)
+    # Cargar técnicos activos del taller
+    tecnicos = Tecnico.objects.filter(activo=True)
 
     return render(request, 'taller/documentos/crear_documento.html', {
         'form': form,
@@ -291,7 +293,7 @@ def editar_documento(request, documento_id):
         'documento': documento,
         'repuestos': repuestos,
         'servicios': servicios,
-        'mecanicos': mecanicos,
+        'tecnicos': tecnicos,
     })
 
 
@@ -343,8 +345,8 @@ def eliminar_documento(request, documento_id):
             'tipo_documento': documento.tipo_documento,
             'fecha': str(documento.fecha),
             'cliente': str(documento.cliente) if documento.cliente else None,
-            'repuestos_count': RepuestoDocumento.objects.filter(documento=documento).count(),
-            'servicios_count': ServicioDocumento.objects.filter(documento=documento).count()
+            'repuestos_count': LineaRepuesto.objects.filter(documento=documento).count(),
+            'servicios_count': LineaServicio.objects.filter(documento=documento).count()
         }
 
         numero_doc = documento.numero_documento

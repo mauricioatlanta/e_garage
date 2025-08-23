@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba Vista Previa de Imágenes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .futuristic-input {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            border: 2px solid #444;
+            border-radius: 8px;
+            color: #fff;
+            padding: 12px;
+            transition: all 0.3s ease;
+        }
+        .futuristic-input:focus {
+            border-color: #00ff88;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+            outline: none;
+        }
+        .futuristic-bg {
+            background: linear-gradient(135deg, #050505 0%, #1a1a1a 100%);
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body class="futuristic-bg text-white">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold mb-8 text-center text-cyan-300">
+            🖼️ Prueba de Vista Previa de Imágenes
+        </h1>
+        
+        <div class="max-w-2xl mx-auto bg-gray-900 p-8 rounded-lg border border-gray-700">
+            <div class="mb-6">
+                <label class="block text-cyan-300 mb-2 font-semibold" for="logo">
+                    🖼️ Logo del Taller:
+                </label>
+                <input 
+                    type="file" 
+                    id="logo" 
+                    accept="image/*"
+                    class="futuristic-input w-full"
+                >
+            </div>
+            
+            <!-- Vista previa de la nueva imagen seleccionada -->
+            <div id="image-preview-container" class="mt-4 hidden">
+                <p class="text-cyan-300 mb-2">🆕 Nueva imagen seleccionada:</p>
+                <div class="flex items-center space-x-4">
+                    <img id="image-preview" src="" alt="Vista previa" class="max-w-xs max-h-48 h-auto border-2 border-green-400 rounded-lg">
+                    <div id="file-info" class="text-cyan-300 text-sm">
+                        <p>📁 <span id="file-name"></span></p>
+                        <p>📏 <span id="file-size"></span></p>
+                        <p class="text-green-400 mt-2">✅ Listo para subir</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-6 text-center">
+                <button class="bg-gradient-to-r from-cyan-500 to-blue-500 px-6 py-3 rounded-lg font-semibold hover:from-cyan-600 hover:to-blue-600 transition-all duration-300">
+                    💾 Guardar Logo
+                </button>
+            </div>
+        </div>
+        
+        <div class="max-w-2xl mx-auto mt-8 bg-gray-800 p-6 rounded-lg border border-gray-600">
+            <h3 class="text-xl font-bold text-yellow-300 mb-4">🧪 Instrucciones de Prueba:</h3>
+            <ol class="list-decimal list-inside space-y-2 text-gray-300">
+                <li>Haz clic en el campo "Logo del Taller"</li>
+                <li>Selecciona cualquier archivo de imagen (PNG, JPG, etc.)</li>
+                <li>Observa que aparece inmediatamente:
+                    <ul class="list-disc list-inside ml-4 mt-2 space-y-1">
+                        <li>Vista previa de la imagen</li>
+                        <li>Nombre del archivo</li>
+                        <li>Tamaño del archivo</li>
+                        <li>Mensaje "Listo para subir"</li>
+                    </ul>
+                </li>
+                <li>Prueba con archivos grandes (>5MB) para ver las validaciones</li>
+                <li>Prueba con archivos que no sean imágenes para ver los errores</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // Vista previa y validación de archivos para logo
+        document.addEventListener('DOMContentLoaded', function() {
+            const logoInput = document.getElementById('logo');
+            const previewContainer = document.getElementById('image-preview-container');
+            const imagePreview = document.getElementById('image-preview');
+            const fileName = document.getElementById('file-name');
+            const fileSize = document.getElementById('file-size');
+            
+            if (logoInput) {
+                logoInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    
+                    if (file) {
+                        console.log('🖼️ Archivo seleccionado:', file);
+                        console.log('📁 Nombre:', file.name);
+                        console.log('📏 Tamaño:', file.size);
+                        console.log('🔍 Tipo:', file.type);
+                        
+                        // Validaciones
+                        if (file.size > 5 * 1024 * 1024) { // 5MB
+                            alert('❌ El archivo es muy grande. Máximo 5MB.');
+                            logoInput.value = '';
+                            previewContainer.classList.add('hidden');
+                            return;
+                        }
+                        
+                        if (!file.type.startsWith('image/')) {
+                            alert('❌ Solo se permiten archivos de imagen.');
+                            logoInput.value = '';
+                            previewContainer.classList.add('hidden');
+                            return;
+                        }
+                        
+                        // Mostrar información del archivo
+                        fileName.textContent = file.name;
+                        fileSize.textContent = (file.size / 1024).toFixed(1) + ' KB';
+                        
+                        // Crear vista previa de la imagen
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            imagePreview.src = e.target.result;
+                            previewContainer.classList.remove('hidden');
+                            
+                            // Agregar animación de aparición
+                            previewContainer.style.opacity = '0';
+                            previewContainer.style.transform = 'translateY(20px)';
+                            previewContainer.style.transition = 'all 0.3s ease';
+                            
+                            setTimeout(() => {
+                                previewContainer.style.opacity = '1';
+                                previewContainer.style.transform = 'translateY(0)';
+                            }, 50);
+                            
+                            console.log('✅ Vista previa cargada correctamente');
+                        };
+                        
+                        reader.onerror = function() {
+                            alert('❌ Error al cargar la vista previa de la imagen.');
+                            previewContainer.classList.add('hidden');
+                        };
+                        
+                        reader.readAsDataURL(file);
+                        console.log('✅ Archivo válido y vista previa en proceso...');
+                        
+                    } else {
+                        console.log('❌ No se seleccionó archivo');
+                        previewContainer.classList.add('hidden');
+                    }
+                });
+                
+                // Efecto visual al hacer hover sobre el input de archivo
+                logoInput.addEventListener('mouseover', function() {
+                    this.style.borderColor = '#00ff88';
+                    this.style.boxShadow = '0 0 10px rgba(0, 255, 136, 0.3)';
+                });
+                
+                logoInput.addEventListener('mouseout', function() {
+                    this.style.borderColor = '';
+                    this.style.boxShadow = '';
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -12,7 +12,7 @@ from taller.models.documento import Documento, RepuestoDocumento, ServicioDocume
 from taller.models.empresa import Empresa
 from taller.models.clientes import Cliente
 from taller.models.vehiculos import Vehiculo
-from taller.models.mecanico import Mecanico
+from taller.models.tecnico import Mecanico
 from django.contrib.auth.models import User
 import json
 
@@ -61,7 +61,7 @@ if not vehiculo:
 print(f"🚗 Vehículo: {vehiculo.patente}")
 
 # 4. Obtener o crear mecánico
-mecanico, _ = Mecanico.objects.get_or_create(nombre="Mecánico Prueba")
+mecanico, _ = Tecnico.objects.get_or_create(nombre="Mecánico Prueba")
 print(f"🔧 Mecánico: {mecanico.nombre}")
 
 # 5. Crear documento

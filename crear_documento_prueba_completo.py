@@ -14,7 +14,7 @@ from taller.models.clientes import Cliente
 from taller.models.vehiculos import Vehiculo
 from taller.models.marca import Marca
 from taller.models.modelo import Modelo
-from taller.models.mecanico import Mecanico
+from taller.models.tecnico import Mecanico
 from django.contrib.auth.models import User
 
 print("=== CREAR DOCUMENTO DE PRUEBA COMPLETO ===")
@@ -33,7 +33,7 @@ cliente = Cliente.objects.filter(empresa=empresa).first()
 vehiculo = Vehiculo.objects.filter(empresa=empresa).first()
 
 # 4. Obtener mecánico
-mecanico = Mecanico.objects.first()
+mecanico = Tecnico.objects.first()
 
 print(f"✅ Usuario: {user.username}")
 print(f"✅ Empresa: {empresa.nombre_taller}")

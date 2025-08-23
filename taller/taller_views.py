@@ -27,9 +27,7 @@ def dashboard_suscripciones(request):
     empresas = sorted(Empresa.objects.all(), key=lambda e: e.fecha_expiracion)
     empresas_con_taller = []
     for empresa in empresas:
-        nombre_taller = None
-        if hasattr(empresa.usuario_admin, 'taller_info'):
-            nombre_taller = empresa.usuario_admin.taller_info.nombre_taller
+        nombre_taller = empresa.nombre_taller  # Usar directamente el campo nombre_taller
         empresas_con_taller.append({
             'empresa': empresa,
             'nombre_taller': nombre_taller

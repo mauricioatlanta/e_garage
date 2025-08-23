@@ -85,7 +85,7 @@ urlpatterns = [
     # rutas de apps
     path('taller/', include(('taller.urls', 'taller'), namespace='taller')),
     path('clientes/', include(('taller.clientes.urls', 'clientes'), namespace='clientes')),
-    path('vehiculos/', include(('taller.vehiculos.urls', 'vehiculos'), namespace='vehiculos')),
+    # path('vehiculos/', include(('taller.vehiculos.urls', 'vehiculos'), namespace='vehiculos')),
     path('repuestos/', include(('taller.repuestos.urls', 'repuestos'), namespace='repuestos')),
     path('reportes/', include(('taller.reportes.urls', 'reportes'), namespace='reportes')),
     # Demo URL sin autenticación

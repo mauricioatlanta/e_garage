@@ -1,6 +1,6 @@
 import json
 from django.core.management.base import BaseCommand
-	from taller.models.region_ciudad import TallerRegion, TallerCiudad
+from taller.models.region_ciudad import TallerRegion, TallerCiudad
 from pathlib import Path
 
 class Command(BaseCommand):
@@ -19,7 +19,7 @@ class Command(BaseCommand):
         nuevas_ciudades = 0
 
         for nombre_region, ciudades in datos.items():
-            region, region_creada = Region.objects.get_or_create(nombre=nombre_region)
+            region, region_creada = TallerRegion.objects.get_or_create(nombre=nombre_region)
             if region_creada:
                 nuevas_regiones += 1
 

@@ -1,6 +1,6 @@
 import json
 from django.core.management.base import BaseCommand
-	from taller.models.region_ciudad import TallerRegion, TallerCiudad
+from taller.models.region_ciudad import TallerRegion, TallerCiudad
 
 class Command(BaseCommand):
     help = "Carga regiones y ciudades desde el archivo regiones_ciudades.json"

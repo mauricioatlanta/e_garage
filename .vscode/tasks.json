@@ -6,6 +6,60 @@
 			"label": "Migraciones Django",
 			"command": "python manage.py makemigrations && python manage.py migrate",
 			"group": "build"
+		},
+		{
+			"label": "Aplicar Migraciones",
+			"type": "shell",
+			"command": "python manage.py migrate",
+			"group": "build"
+		},
+		{
+			"label": "Corregir Documentos",
+			"type": "shell",
+			"command": "python fix_docs_complete.py",
+			"group": "build"
+		},
+		{
+			"label": "Corregir Documentos v2",
+			"type": "shell",
+			"command": "python fix_docs_complete.py",
+			"group": "build"
+		},
+		{
+			"label": "Aplicar Migración Millas",
+			"type": "shell",
+			"command": "python manage.py migrate",
+			"group": "build"
+		},
+		{
+			"label": "Corregir Datos Final",
+			"type": "shell",
+			"command": "python fix_docs_complete.py",
+			"group": "build"
+		},
+		{
+			"label": "Agregar Servicios a Documentos",
+			"type": "shell",
+			"command": "python agregar_servicios_docs.py",
+			"group": "build"
+		},
+		{
+			"label": "Agregar Servicios v2",
+			"type": "shell",
+			"command": "python agregar_servicios_docs.py",
+			"group": "build"
+		},
+		{
+			"label": "Test Currency Filters",
+			"type": "shell",
+			"command": "python test_currency_filters.py",
+			"group": "build"
+		},
+		{
+			"label": "Test Final Currency",
+			"type": "shell",
+			"command": "python test_currency_filters.py",
+			"group": "build"
 		}
 	]
 }

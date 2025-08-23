@@ -10,7 +10,8 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone as django_timezone
-from taller.models import Empresa, TrialRegistro
+from taller.models.empresa import Empresa
+from taller.models.trial import TrialRegistro
 
 # Configuración de loggers especializados
 def setup_smart_loggers():

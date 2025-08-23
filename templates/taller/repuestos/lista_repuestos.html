@@ -29,7 +29,7 @@
       <h1 class="text-4xl font-bold text-white flex items-center gap-3">
         <i class="fas fa-cogs text-blue-400"></i> Repuestos Inteligentes
       </h1>
-      <a href="{% url 'repuestos:crear_repuesto' %}" class="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-2 rounded-lg shadow-lg transition">
+      <a href="{% url 'taller:repuestos:crear_repuesto' %}" class="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-2 rounded-lg shadow-lg transition">
         <i class="fas fa-plus mr-1"></i> Agregar Repuesto
       </a>
     </div>    <div class="mb-6">
@@ -60,9 +60,11 @@
             <td class="px-4 py-3 text-right">${{ repuesto.precio_venta|floatformat:0|intcomma }}</td>
             <td class="px-4 py-3 text-right">{{ repuesto.stock }}</td>
             <td class="px-4 py-3 text-center">
-              <a href="{% url 'repuestos:editar_repuesto' repuesto.id %}" class="text-blue-600 hover:underline">Editar</a>
+              {% url 'taller:repuestos:editar_repuesto' repuesto.id as url_editar_repuesto %}
+              {% url 'taller:repuestos:eliminar_repuesto' repuesto.id as url_eliminar_repuesto %}
+              <a href="{{ url_editar_repuesto|default:'#' }}" class="text-blue-600 hover:underline">Editar</a>
               <span class="mx-1 text-gray-400">|</span>
-              <a href="{% url 'repuestos:eliminar_repuesto' repuesto.id %}" class="text-red-600 hover:underline">Eliminar</a>
+              <a href="{{ url_eliminar_repuesto|default:'#' }}" class="text-red-600 hover:underline">Eliminar</a>
             </td>
           </tr>
           {% empty %}

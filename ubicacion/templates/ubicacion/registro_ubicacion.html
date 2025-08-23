@@ -1,0 +1,28 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registro de Ubicación</title>
+    <link href="{% static 'css/output.css' %}" rel="stylesheet">
+    <script src="{% static 'ubicacion/js/ubicacion.js' %}" defer></script>
+</head>
+<body class="bg-black text-white min-h-screen flex justify-center items-center">
+    <form method="post" class="bg-gray-900 p-8 rounded-lg shadow-lg w-full max-w-md space-y-4">
+        {% csrf_token %}
+        <div>
+            <label for="id_estado">Estado:</label>
+            {{ form.estado }}
+        </div>
+        <div>
+            <label for="id_ciudad">Ciudad:</label>
+            {{ form.ciudad }}
+            <datalist id="ciudades-list"></datalist>
+        </div>
+        <div>
+            <label for="id_zip_code">Código Postal:</label>
+            {{ form.zip_code }}
+        </div>
+        <button type="submit" class="bg-cyan-500 text-black px-4 py-2 rounded hover:bg-cyan-400">Guardar</button>
+    </form>
+</body>
+</html>

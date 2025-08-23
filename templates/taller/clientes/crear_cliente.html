@@ -17,7 +17,6 @@ body {
   animation: stars 20s linear infinite;
 }
 @keyframes stars {
-  0% {background-position: 0 0, 0 0;}
   100% {background-position: 1000px 1000px, 0 0;}
 }
 .futuristic-form {
@@ -48,7 +47,7 @@ textarea.futuristic-input {
 }
 input.futuristic-input::placeholder,
 textarea.futuristic-input::placeholder {
-  color: #00ffe7a0 !important;
+  <script>
 }
 .futuristic-btn {
   background: linear-gradient(90deg, #00ffe7 0%, #1e90ff 100%);
@@ -78,6 +77,14 @@ textarea.futuristic-input::placeholder {
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <div class="futuristic-bg"></div>
 <div class="max-w-4xl mx-auto futuristic-form">
+  <div style="margin-bottom:8px;">
+    <span style="color:gray; font-size:12px;">[DEBUG pais: {{ form.pais }}]</span>
+    {% if form.pais == 'US' %}
+      <img src="https://flagcdn.com/us.svg" alt="USA" style="width:40px; display:inline; vertical-align:middle; margin-right:8px;">
+    {% elif form.pais == 'CL' %}
+      <img src="https://flagcdn.com/cl.svg" alt="Chile" style="width:40px; display:inline; vertical-align:middle; margin-right:8px;">
+    {% endif %}
+  </div>
   <h1 class="futuristic-title">🪐 Crear Cliente Espacial</h1>
   <form class="space-y-6" method="post">
     {% csrf_token %}
@@ -102,6 +109,7 @@ textarea.futuristic-input::placeholder {
         {{ form.nombre|add_class:'futuristic-input' }}
       </div>
       <div>
+  </script>
         <label class="futuristic-label mb-2" for="id_apellido">Apellido:</label>
         {{ form.apellido|add_class:'futuristic-input' }}
       </div>
@@ -117,14 +125,75 @@ textarea.futuristic-input::placeholder {
         <label class="futuristic-label mb-2" for="id_email">Correo electrónico:</label>
         {{ form.email|add_class:'futuristic-input' }}
       </div>
-      <div>
-        <label class="futuristic-label mb-2" for="id_region">Región:</label>
-        {{ form.region|add_class:'futuristic-input' }}
-      </div>
-      <div>
-        <label class="futuristic-label mb-2" for="id_ciudad">Ciudad:</label>
-        {{ form.ciudad|add_class:'futuristic-input' }}
-      </div>
+      {% if form.pais == 'US' %}
+        <div>
+          <label class="futuristic-label mb-2" for="id_estado_usa">State:</label>
+          {{ form.estado_usa|add_class:'futuristic-input' }}
+        </div>
+        <div>
+          <label class="futuristic-label mb-2" for="id_ciudad_usa">City:</label>
+          {{ form.ciudad_usa|add_class:'futuristic-input' }}
+        </div>
+        <div>
+          <label class="futuristic-label mb-2" for="id_zipcode">Zip Code:</label>
+          {{ form.zipcode|add_class:'futuristic-input' }}
+        </div>
+      {% else %}
+        <div>
+          <label class="futuristic-label mb-2" for="id_region">Región:</label>
+          {{ form.region|add_class:'futuristic-input' }}
+        </div>
+        <div>
+          <label class="futuristic-label mb-2" for="id_ciudad">Ciudad:</label>
+          {{ form.ciudad|add_class:'futuristic-input' }}
+        </div>
+      {% endif %}
+        {% if form.pais == 'US' %}
+          <script>
+          document.addEventListener('DOMContentLoaded', function() {
+            const estadoSelect = document.getElementById('id_estado_usa');
+            const ciudadUsaSelect = document.getElementById('id_ciudad_usa');
+            if(estadoSelect && ciudadUsaSelect) {
+              function cargarCiudadesUsa(estadoId, selectedCiudadId = null) {
+                ciudadUsaSelect.innerHTML = '<option value="">---------</option>';
+                if(estadoId) {
+                  console.log('Solicitando ciudades USA para estado:', estadoId);
+                  fetch(`{% url 'taller:clientes:obtener_ciudades_usa' %}?estado_id=${estadoId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                      console.log('Ciudades USA recibidas:', data);
+                      if(data.length === 0) {
+                        const option = document.createElement('option');
+                        option.value = '';
+                        option.textContent = 'No hay ciudades para este estado';
+                        ciudadUsaSelect.appendChild(option);
+                      } else {
+                        data.forEach(function(ciudad) {
+                          const option = document.createElement('option');
+                          option.value = ciudad.id;
+                          option.textContent = ciudad.nombre;
+                          if (selectedCiudadId && ciudad.id == selectedCiudadId) {
+                            option.selected = true;
+                          }
+                          ciudadUsaSelect.appendChild(option);
+                        });
+                      }
+                    })
+                    .catch(err => {
+                      console.error('Error al cargar ciudades USA:', err);
+                    });
+                }
+              }
+              if(estadoSelect.value) {
+                cargarCiudadesUsa(estadoSelect.value, ciudadUsaSelect.getAttribute('data-selected'));
+              }
+              estadoSelect.addEventListener('change', function() {
+                cargarCiudadesUsa(this.value);
+              });
+            }
+          });
+          </script>
+        {% endif %}
     </div>
     <div class="text-center pt-6">
       <button class="futuristic-btn" type="submit">
@@ -141,7 +210,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function cargarCiudades(regionId, selectedCiudadId = null) {
       ciudadSelect.innerHTML = '<option value="">---------</option>';
       if(regionId) {
-        fetch(`/clientes/ajax/ciudades/?region_id=${regionId}`)
+        fetch(`{% url 'taller:clientes:obtener_ciudades' %}?region_id=${regionId}`)
           .then(response => response.json())
           .then(data => {
             data.forEach(function(ciudad) {

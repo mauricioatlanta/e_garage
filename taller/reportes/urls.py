@@ -21,6 +21,9 @@ urlpatterns = [
     path('mecanicos/whatsapp/<int:mecanico_id>/', views.generar_resumen_whatsapp_mecanico, name='generar_resumen_whatsapp_mecanico'),
     path('api/mecanicos/chart-data/', views.api_mecanicos_chart_data, name='api_mecanicos_chart_data'),
     
+    # === API PARA DASHBOARD DE REPUESTOS ===
+    path('api/repuestos/chart-data/', views.api_repuestos_chart_data, name='api_repuestos_chart_data'),
+    
     # === NUEVAS RUTAS PARA REPORTES POR FECHA ===
     path('por-fecha/', views.reportes_por_fecha, name='reportes_por_fecha'),
     path('repuestos-fecha/<str:desde>/<str:hasta>/', views.reportes_repuestos_fecha, name='reportes_repuestos_fecha'),

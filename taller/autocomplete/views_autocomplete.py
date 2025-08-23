@@ -5,18 +5,18 @@ from taller.models.clientes import Cliente
 from taller.models.vehiculos import Vehiculo
 from taller.models.marca import Marca
 from taller.models.modelo import Modelo
-from taller.models.mecanico import Mecanico
+from taller.models.tecnico import Tecnico
 
-class MecanicoAutocomplete(autocomplete.Select2QuerySetView):
+class TecnicoAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
-        # Los mecánicos pueden ser globales o podríamos filtrarlos por empresa si se requiere
-        qs = Mecanico.objects.all()
+        # Los técnicos pueden ser globales o podríamos filtrarlos por empresa si se requiere
+        qs = Tecnico.objects.all()
         if self.q:
             qs = qs.filter(nombre__icontains=self.q)
         return qs
 
     def create(self, text):
-        # Permitir crear un nuevo mecánico desde el widget select2 (soporte oficial DAL)
+        # Permitir crear un nuevo técnico desde el widget select2 (soporte oficial DAL)
         return self.get_queryset().model.objects.create(nombre=text)
     
     def get_result_label(self, result):
@@ -35,12 +35,12 @@ class ClienteAutocomplete(autocomplete.Select2QuerySetView):
             return Cliente.objects.none()
             
         try:
-            empresa = self.request.user.empresa_usuario
+            empresa = self.request.user.empresa
         except AttributeError:
             # Si no tiene empresa asociada, buscar o crear una
             from taller.models.empresa import Empresa
             empresa, created = Empresa.objects.get_or_create(
-                usuario=self.request.user,
+                user=self.request.user,
                 defaults={'nombre_taller': f'Taller de {self.request.user.username}'}
             )
         
@@ -66,12 +66,12 @@ class VehiculoAutocomplete(autocomplete.Select2QuerySetView):
 
         # Obtener empresa del usuario
         try:
-            empresa = self.request.user.empresa_usuario
+            empresa = self.request.user.empresa
         except AttributeError:
             # Si no tiene empresa asociada, buscar o crear una
             from taller.models.empresa import Empresa
             empresa, created = Empresa.objects.get_or_create(
-                usuario=self.request.user,
+                user=self.request.user,
                 defaults={'nombre_taller': f'Taller de {self.request.user.username}'}
             )
 
@@ -120,6 +120,13 @@ class ModeloAutocomplete(autocomplete.Select2QuerySetView):
         marca_id = self.forwarded.get('marca')
         if marca_id:
             qs = qs.filter(marca_id=marca_id)
+
+        # Filtrar por país de la empresa del usuario
+        user = self.request.user
+        if hasattr(user, 'empresa') and user.empresa and hasattr(user.empresa, 'pais'):
+            pais = user.empresa.pais
+            qs = qs.filter(country=pais)
+
         if self.q:
             qs = qs.filter(nombre__icontains=self.q)
         return qs.order_by('nombre')

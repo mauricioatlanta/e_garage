@@ -95,7 +95,8 @@
     {% endif %}
     
     <div class="col-span-2 flex justify-end gap-4">
-      <a class="bg-gray-300 text-gray-700 px-5 py-2 rounded hover:bg-gray-400 shadow" href="{% url 'repuestos:lista_repuestos' %}">Cancelar</a>
+  {% url 'taller:repuestos:lista_repuestos' as url_lista_repuestos %}
+  <a class="bg-gray-300 text-gray-700 px-5 py-2 rounded hover:bg-gray-400 shadow" href="{{ url_lista_repuestos|default:'#' }}">Cancelar</a>
       <button class="bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700 shadow btn-futuristic" type="submit">Actualizar</button>
     </div>
 </form>

@@ -13,5 +13,9 @@ class Modelo(models.Model):
     class Meta:
         unique_together = ('nombre', 'marca')
 
+
     def __str__(self):
         return f"{self.nombre} ({self.marca.nombre})"
+
+# Importar Cliente para que Django lo registre
+from .models.clientes import Cliente

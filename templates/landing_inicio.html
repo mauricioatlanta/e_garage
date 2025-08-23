@@ -188,13 +188,14 @@ body.landing-saas .glass-cta {
     </h1>
     <div class="neon-divider"></div>
     <p class="text-center text-4xl text-cyan-100 mb-6 max-w-4xl font-semibold animated-phrase drop-shadow-xl">
-      La plataforma <span class="text-lime-300 font-bold">más avanzada</span> y <span class="text-fuchsia-400 font-bold">futurista</span> para talleres mecánicos.<br>
+      La plataforma <span class="text-lime-300 font-bold">más avanzada</span> y <span class="text-fuchsia-400 font-bold">futurista</span> para talleres técnicos.<br>
       <span class="block mt-2 text-lime-300 font-bold text-2xl">Automatiza, analiza y crece con tecnología real.</span>
     </p>
     <div class="flex flex-col md:flex-row gap-8 mt-10">
       <a href="/registro/" class="cta-btn-premium pulse py-6 px-16 rounded-3xl font-extrabold text-4xl shadow-2xl transition-all border-4 border-lime-400/80 hover:border-fuchsia-400/80">🚀 Prueba gratis 30 días</a>
       <button onclick="document.getElementById('modal-planes').classList.remove('hidden')" class="glass-cta py-6 px-16 rounded-3xl font-extrabold text-4xl shadow-2xl transition-all border-4 border-fuchsia-400/60 hover:border-lime-400/80">Ver planes de suscripción</button>
-      <a href="/login/" class="cta-btn-outline text-2xl py-6 px-14 rounded-3xl font-bold shadow-lg transition-all">Ingresar</a>
+  {% load country_url %}
+  <a href="{% country_url 'account_login' %}" class="cta-btn-outline text-2xl py-6 px-14 rounded-3xl font-bold shadow-lg transition-all">Ingresar</a>
     </div>
     <p class="mt-8 text-cyan-200 text-2xl text-center max-w-3xl">Gestiona tu taller desde cualquier lugar, con reportes inteligentes, historial de clientes, facturación, IA y mucho más. <span class="text-lime-300 font-bold">¡Sin compromiso!</span></p>
   </section>
@@ -231,19 +232,19 @@ body.landing-saas .glass-cta {
       <div class="flex flex-col gap-8">
         <div class="bg-gradient-to-br from-cyan-900/60 via-fuchsia-900/40 to-lime-900/30 rounded-2xl p-6 border-2 border-cyan-400/30 shadow-lg flex flex-col items-center">
           <div class="text-3xl font-bold text-cyan-200 mb-2">Mensual</div>
-          <div class="text-5xl font-extrabold text-lime-300 mb-2">$20.000</div>
+          <div class="text-5xl font-extrabold text-lime-300 mb-2">$20,000 CLP</div>
           <div class="text-cyan-100 mb-4">Acceso total a todas las funciones premium, IA, reportes y soporte prioritario.</div>
           <a href="/registro/?plan=mensual" class="cta-btn-premium py-3 px-10 rounded-xl font-bold text-xl shadow-xl transition-all">Suscribirme mensual</a>
         </div>
         <div class="bg-gradient-to-br from-yellow-900/60 via-cyan-900/40 to-lime-900/30 rounded-2xl p-6 border-2 border-yellow-400/30 shadow-lg flex flex-col items-center">
           <div class="text-3xl font-bold text-yellow-200 mb-2">6 meses</div>
-          <div class="text-5xl font-extrabold text-lime-300 mb-2">$110.000</div>
+          <div class="text-5xl font-extrabold text-lime-300 mb-2">$110,000 CLP</div>
           <div class="text-cyan-100 mb-4">Ahorra respecto al plan mensual. Acceso total, IA, reportes, soporte prioritario y actualizaciones automáticas.</div>
           <a href="/registro/?plan=semestral" class="cta-btn-premium py-3 px-10 rounded-xl font-bold text-xl shadow-xl transition-all">Suscribirme 6 meses</a>
         </div>
         <div class="bg-gradient-to-br from-fuchsia-900/60 via-cyan-900/40 to-lime-900/30 rounded-2xl p-6 border-2 border-fuchsia-400/30 shadow-lg flex flex-col items-center">
           <div class="text-3xl font-bold text-fuchsia-200 mb-2">Anual</div>
-          <div class="text-5xl font-extrabold text-lime-300 mb-2">$200.000</div>
+          <div class="text-5xl font-extrabold text-lime-300 mb-2">$200,000 CLP</div>
           <div class="text-cyan-100 mb-4">Ahorra 2 meses. Acceso total, IA, reportes, soporte prioritario y actualizaciones automáticas.</div>
           <a href="/registro/?plan=anual" class="cta-btn-premium py-3 px-10 rounded-xl font-bold text-xl shadow-xl transition-all">Suscribirme anual</a>
         </div>

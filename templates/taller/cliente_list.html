@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+  <div class="flex items-center gap-3 mb-4">
+    <h1 class="text-2xl font-bold text-white">Lista de Clientes</h1>
+    {% if empresa and empresa.pais == 'US' %}
+      <img src="https://flagcdn.com/us.svg" alt="USA" style="width:32px;vertical-align:middle;">
+    {% elif empresa and empresa.pais == 'CL' %}
+      <img src="https://flagcdn.com/cl.svg" alt="Chile" style="width:32px;vertical-align:middle;">
+    {% endif %}
+  </div>
+
+  <a href="{% url 'taller:clientes:crear_cliente' %}" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg shadow bg-gradient-to-r from-cyan-500 to-fuchsia-500 text-white font-semibold hover:from-fuchsia-500 hover:to-cyan-500 transition-all duration-200 border border-cyan-400/60 mb-4">➕ Agregar Cliente</a>
+
+  {% if object_list %}
+  <div class="bg-black/60 backdrop-blur border border-cyan-400/30 rounded-lg overflow-hidden">
+    <table class="min-w-full table-auto">
+      <thead class="bg-black/80">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-medium text-cyan-300 uppercase tracking-wider">Nombre</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-cyan-300 uppercase tracking-wider">Apellido</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-cyan-300 uppercase tracking-wider">Email</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-cyan-300 uppercase tracking-wider">Teléfono</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-cyan-300 uppercase tracking-wider">Dirección</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-cyan-300 uppercase tracking-wider">Ciudad</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-cyan-300 uppercase tracking-wider">Acciones</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-cyan-700/30">
+        {% for cliente in object_list %}
+        <tr class="hover:bg-cyan-900/20">
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">{{ cliente.nombre }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-white">{{ cliente.apellido|default:"-" }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-white">{{ cliente.email|default:"-" }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-white">{{ cliente.telefono|default:"-" }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-white">{{ cliente.direccion|default:"-" }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-white">{{ cliente.ciudad|default:"-" }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+            <a href="{% url 'taller:clientes:ver_cliente' cliente.pk %}" class="text-cyan-400 hover:text-cyan-300 mr-3">Ver</a>
+            <a href="{% url 'taller:clientes:editar_cliente' cliente.pk %}" class="text-green-400 hover:text-green-300 mr-3">Editar</a>
+            <a href="{% url 'taller:clientes:eliminar_cliente' cliente.pk %}" class="text-red-400 hover:text-red-300">Eliminar</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="bg-yellow-900/50 border border-yellow-600/50 rounded-lg p-4">
+    <p class="text-yellow-200">No hay clientes registrados para esta empresa. <a href="{% url 'taller:clientes:crear_cliente' %}" class="underline text-cyan-400">Agregar el primero</a></p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

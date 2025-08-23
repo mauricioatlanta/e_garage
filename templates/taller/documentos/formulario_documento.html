@@ -217,7 +217,7 @@
         {{ form.vehiculo }}
       </div>
       <div><label for="id_kilometraje">Kilometraje</label>{{ form.kilometraje }}</div>
-      <div><label for="id_mecanico">Mecánico</label>
+      <div><label for="id_mecanico">Técnico</label>
         {{ form.mecanico }}
       </div>
     </div>
@@ -329,7 +329,7 @@ $(document).ready(function () {
   // Inicializar select2 en cliente SOLO UNA VEZ
   $cliente.select2({
     ajax: {
-      url: '/autocomplete/cliente/',
+      url: '/documentos/autocomplete/cliente/',
       dataType: 'json',
       delay: 250,
       data: function(params) {
@@ -351,7 +351,7 @@ $(document).ready(function () {
   if (clienteId) {
     $.ajax({
       type: 'GET',
-      url: '/autocomplete/cliente/',
+      url: '/documentos/autocomplete/cliente/',
       data: {q: ''},
       dataType: 'json'
     }).then(function (data) {

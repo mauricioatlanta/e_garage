@@ -161,9 +161,10 @@ function actualizarTotalServicios() {
 }
 
 function actualizarTotalesDocumento() {
-    // Sumar totales de repuestos y servicios
+    // Sumar totales de repuestos, servicios y otros servicios
     let totalRepuestos = 0;
     let totalServicios = 0;
+    let totalOtrosServicios = 0;
     
     document.querySelectorAll('#tabla-repuestos tbody tr').forEach((row) => {
         const cantidad = parseInt(row.querySelector('.cantidad-input')?.value || '1');
@@ -176,10 +177,15 @@ function actualizarTotalesDocumento() {
         totalServicios += precio;
     });
     
-    const subtotal = totalRepuestos + totalServicios;
+    document.querySelectorAll('#tabla-otros-servicios tbody tr').forEach((row) => {
+        const precio = parseInt(row.querySelector('.precio-otro-servicio-input')?.value || '0');
+        totalOtrosServicios += precio;
+    });
+    
+    const subtotal = totalRepuestos + totalServicios + totalOtrosServicios;
     const llevaIVA = document.getElementById('lleva_iva')?.checked || false;
     const iva = llevaIVA ? Math.round(totalRepuestos * 0.19) : 0;
-    const granTotal = subtotal + iva;
+    const granTotal = totalRepuestos + iva + totalServicios + totalOtrosServicios;
     
     // Actualizar totales principales
     const subtotalElement = document.getElementById('subtotal-doc');
@@ -187,22 +193,28 @@ function actualizarTotalesDocumento() {
     const granTotalElement = document.getElementById('gran-total-doc');
     const totalRepuestosElement = document.getElementById('total-repuestos');
     const totalServiciosElement = document.getElementById('total-servicios');
+    const totalOtrosServiciosElement = document.getElementById('total-otros-servicios');
     
     if (subtotalElement) subtotalElement.textContent = formatoSCL(subtotal);
     if (ivaElement) ivaElement.textContent = formatoSCL(iva);
     if (granTotalElement) granTotalElement.textContent = formatoSCL(granTotal);
     if (totalRepuestosElement) totalRepuestosElement.textContent = formatoSCL(totalRepuestos);
     if (totalServiciosElement) totalServiciosElement.textContent = formatoSCL(totalServicios);
+    if (totalOtrosServiciosElement) totalOtrosServiciosElement.textContent = formatoSCL(totalOtrosServicios);
     
     // Actualizar resumen en los paneles de totales
     const totalRepuestosResumen = document.getElementById('total-repuestos-resumen');
     const totalServiciosResumen = document.getElementById('total-servicios-resumen');
+    const totalOtrosServiciosResumen = document.getElementById('total-otros-servicios-resumen');
     
     if (totalRepuestosResumen) {
         totalRepuestosResumen.textContent = formatoSCL(totalRepuestos);
     }
     if (totalServiciosResumen) {
         totalServiciosResumen.textContent = formatoSCL(totalServicios);
+    }
+    if (totalOtrosServiciosResumen) {
+        totalOtrosServiciosResumen.textContent = formatoSCL(totalOtrosServicios);
     }
 }
 

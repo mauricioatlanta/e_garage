@@ -3,21 +3,17 @@
 {% load widget_tweaks %}
 
 {% block content %}
+<div style="margin-bottom:16px;">
+  {% if SHOW_DEBUG %}
+    <span style="color:gray; font-size:12px;">[DEBUG country: {{ country }}]{% if debug_empresa_pais %} | {{ debug_empresa_pais }}{% endif %}</span>
+  {% endif %}
+  {% if country == 'US' %}
+    <img src="https://flagcdn.com/us.svg" alt="USA" style="width:40px; display:inline; vertical-align:middle; margin-right:8px;">
+  {% elif country == 'CL' %}
+    <img src="https://flagcdn.com/cl.svg" alt="Chile" style="width:40px; display:inline; vertical-align:middle; margin-right:8px;">
+  {% endif %}
+</div>
 <div class="max-w-5xl mx-auto bg-gradient-to-br from-[#0f2027] via-[#2c5364] to-[#1a2980] p-10 rounded-3xl shadow-2xl relative border border-cyan-400 backdrop-blur-xl" style="box-shadow: 0 0 60px 10px #00ffe7, 0 0 8px 2px #1a2980 inset;">
-  <!-- Barra de navegación superior -->
-  <nav class="flex flex-wrap justify-between items-center px-8 py-4 bg-gradient-to-r from-[#0f2027] via-[#2c5364] to-[#1a2980] rounded-xl shadow-xl mb-8 border border-cyan-400" style="backdrop-filter: blur(8px);">
-    <div class="flex items-center gap-8">
-      <a href="/" class="text-cyan-400 font-extrabold text-2xl tracking-widest futuristic-logo animate-pulse">E-Garage</a>
-    </div>
-    <div class="flex flex-wrap gap-3">
-      <a href="/dashboard/" class="btn-cine-future">Inicio</a>
-      <a href="{% url 'vehiculos:lista_vehiculos' %}" class="btn-cine-future">Vehículos</a>
-      <a href="/documentos/" class="btn-cine-future">Documentos</a>
-      <a href="/repuestos/" class="btn-cine-future">Repuestos</a>
-      <a href="/clientes/" class="btn-cine-future">Clientes</a>
-      <a href="/dashboard/" class="btn-cine-future">Dashboard</a>
-    </div>
-  </nav>
   <style>
     /* Unificación de formato futurista y tecnológico para todos los campos */
     select, input[type="text"], input[type="number"], input, textarea {
@@ -155,29 +151,49 @@
 
   <div class="flex justify-between items-center mb-4">
     <h1 class="text-5xl font-black tracking-widest text-cyan-300 futuristic-title animate-gradient" style="font-family: 'Orbitron', 'Segoe UI', sans-serif; letter-spacing: 4px; text-shadow: 0 0 32px #00ffe7, 0 0 8px #1a2980;">Crear Vehículo</h1>
-    <a class="btn-cine-future" href="{% url 'vehiculos:lista_vehiculos' %}">Volver a la lista</a>
+  {% url 'taller:vehiculos:lista_vehiculos' as url_lista_vehiculos %}
+  <a class="btn-cine-future" href="{{ url_lista_vehiculos|default:'#' }}">Volver a la lista</a>
   </div>
 
   <form class="space-y-6" method="post">
     {% csrf_token %}
+    
+    <!-- 🔧 DEBUG TEMPORAL - Mostrar errores del formulario -->
+    {% if form.errors %}
+      <div class="bg-red-900/50 border border-red-400 rounded-xl p-4 mb-6">
+        <h3 class="text-red-400 font-bold text-lg mb-2">Errores de Validación:</h3>
+        <pre class="text-red-300 text-sm whitespace-pre-wrap">{{ form.errors }}</pre>
+        {% if form.non_field_errors %}
+          <h4 class="text-red-400 font-bold mt-4 mb-2">Errores Generales:</h4>
+          <pre class="text-red-300 text-sm whitespace-pre-wrap">{{ form.non_field_errors }}</pre>
+        {% endif %}
+      </div>
+    {% endif %}
+
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
       <div class="glassmorphism-box p-6 rounded-2xl shadow-xl border border-cyan-300">
         <label class="block font-semibold mb-1" for="id_cliente">Cliente</label>
         <div class="relative">
-          <input type="text" id="busqueda-cliente-ajax" class="w-full px-4 py-2 rounded-xl bg-black/70 text-cyan-200 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400" placeholder="Buscar cliente por nombre, apellido, email..." autocomplete="off">
+          <input type="text" id="busqueda-cliente-ajax" class="w-full px-4 py-2 rounded-xl bg-black/70 text-white font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400" style="color:#fff !important;" placeholder="Buscar cliente por nombre, apellido, email..." autocomplete="off">
           <ul id="sugerencias-clientes" class="absolute left-0 right-0 bg-[#1a202c] rounded-xl shadow-lg mt-2 z-50 hidden max-h-60 overflow-y-auto"></ul>
-<select id="id_cliente" name="cliente">
+          <select id="id_cliente" name="cliente">
             <option value="">---------</option>
             {% for cliente in clientes %}
-              <option value="{{ cliente.id }}">{{ cliente.nombre }} {{ cliente.apellido }} - {{ cliente.email }}</option>
+              <option value="{{ cliente.id }}"
+                data-email="{{ cliente.email|default_if_none:'' }}"
+                data-telefono="{{ cliente.telefono|default_if_none:'' }}"
+                {% if form.cliente.value == cliente.id or form.data.cliente == cliente.id|stringformat:"s" %}selected{% endif %}>
+                {{ cliente.nombre }} {{ cliente.apellido }} - {{ cliente.email }}
+              </option>
             {% endfor %}
           </select>
+          <div id="cliente-detalles" class="mt-2 text-sm text-cyan-200" aria-live="polite"></div>
         </div>
         <div id="error-cliente" class="text-red-400 font-bold mt-2"></div>
       </div>
       <div class="glassmorphism-box p-6 rounded-2xl shadow-xl border border-cyan-300">
-        <label class="block font-semibold mb-1" for="id_patente">Patente</label>
-        <div class="relative">
+  <label class="block font-semibold mb-1" for="id_patente">Patente</label>
+  <div class="relative">
           {% render_field form.patente class="w-full px-4 py-2 rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400" placeholder="Patente..." style="background:#111 !important;color:#00ffe7 !important;" %}
         </div>
         {{ form.patente.errors }}
@@ -185,27 +201,56 @@
       <div class="glassmorphism-box p-6 rounded-2xl shadow-xl border border-cyan-300">
         <label class="block font-semibold mb-1" for="busqueda-marca-ajax">Marca</label>
         <div class="relative">
-          <input type="text" id="busqueda-marca-ajax" class="w-full px-4 py-2 rounded-xl bg-black/70 text-cyan-200 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400" placeholder="Buscar marca..." autocomplete="off">
-          <ul id="sugerencias-marcas" class="absolute left-0 right-0 bg-[#1a202c] rounded-xl shadow-lg mt-2 z-50 hidden max-h-60 overflow-y-auto"></ul>
-          <select id="id_marca" name="marca" class="w-full px-4 py-2 rounded-xl bg-black/70 text-cyan-200 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400">
-            <option value="">---------</option>
-            {% for marca in marcas %}
-              <option value="{{ marca.id }}">{{ marca.nombre }}</option>
-            {% endfor %}
-          </select>
+            {% if country == 'US' %}
+              {% if form.marca_usa %}
+                {# Mostrar etiqueta explícita para asegurar accesibilidad y permitir test que busca el texto #}
+                <label for="{{ form.marca_usa.id_for_label }}">{{ form.marca_usa.label }}</label>
+                {{ form.marca_usa }}
+              {% else %}
+                <select id="id_marca_usa" name="marca_usa" class="w-full px-4 py-2 rounded-xl bg-black/70 text-cyan-200 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400">
+                  <option value="">---------</option>
+                  {% for mu in marcas_usa %}
+                    <option value="{{ mu.id }}">{{ mu.nombre }}</option>
+                  {% endfor %}
+                </select>
+              {% endif %}
+              <input type="hidden" id="id_marca" name="marca" value="{{ form.data.marca|default:'' }}">
+            {% else %}
+              <select id="id_marca" name="marca" class="w-full px-4 py-2 rounded-xl bg-black/70 text-cyan-200 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400">
+                <option value="">---------</option>
+                {% for marca in marcas %}
+                  <option value="{{ marca.id }}"
+                    {% if form.marca.value == marca.id or form.data.marca == marca.id|stringformat:"s" %}selected{% endif %}>
+                    {{ marca.nombre }}
+                  </option>
+                {% endfor %}
+                <option value="__nueva__" {% if form.data.marca == "__nueva__" %}selected{% endif %}>Agregar nueva marca...</option>
+              </select>
+              <input type="text" name="marca_nueva" id="input_marca_nueva" value="{{ form.data.marca_nueva|default:'' }}"
+                class="w-full px-4 py-2 rounded-xl bg-black/70 text-cyan-200 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400 mt-2 {% if form.data.marca != '__nueva__' %}hidden{% endif %}"
+                placeholder="Escribe la nueva marca...">
+            {% endif %}
         </div>
         <div id="error-marca" class="text-red-400 font-bold mt-2"></div>
       </div>
       <div class="glassmorphism-box p-6 rounded-2xl shadow-xl border border-cyan-300">
-        <label class="block font-semibold mb-1" for="busqueda-modelo-ajax">Modelo</label>
+        <label class="block font-semibold mb-1" for="id_modelo">Modelo</label>
         <div class="relative">
-          <input type="text" id="busqueda-modelo-ajax" class="w-full px-4 py-2 rounded-xl bg-black/70 text-cyan-200 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400" placeholder="Buscar modelo..." autocomplete="off">
-          <ul id="sugerencias-modelos" class="absolute left-0 right-0 bg-[#1a202c] rounded-xl shadow-lg mt-2 z-50 hidden max-h-60 overflow-y-auto"></ul>
-          <select id="id_modelo" name="modelo" class="w-full px-4 py-2 rounded-xl bg-black/70 text-cyan-200 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400">
-            <option value="">---------</option>
-          </select>
+          {% if country == 'US' %}
+            {% if form.modelo_usa %}
+              <label for="{{ form.modelo_usa.id_for_label }}">{{ form.modelo_usa.label }}</label>
+              {{ form.modelo_usa }}
+              {{ form.modelo_usa.errors }}
+            {% else %}
+              <select id="id_modelo_usa" name="modelo_usa" class="w-full px-4 py-2 rounded-xl bg-black/70 text-cyan-200 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400">
+                <option value="">---------</option>
+              </select>
+            {% endif %}
+          {% else %}
+            {{ form.modelo }}
+            {{ form.modelo.errors }}
+          {% endif %}
         </div>
-        <div id="error-modelo" class="text-red-400 font-bold mt-2"></div>
       </div>
       <div class="glassmorphism-box p-6 rounded-2xl shadow-xl border border-cyan-300">
         <label class="block font-semibold mb-1" for="id_anio">Año</label>
@@ -220,11 +265,20 @@
           <select id="id_color" name="color" class="w-full px-4 py-2 rounded-xl bg-black/70 text-cyan-200 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400">
             <option value="">---------</option>
             {% for color in colores %}
-              <option value="{{ color.id }}">{{ color.nombre }}</option>
+              <option value="{{ color.id }}"
+                {% if form.color.value == color.id or form.data.color == color.id|stringformat:"s" %}selected{% endif %}>
+                {{ color.nombre }}
+              </option>
             {% endfor %}
-            <option value="__nuevo__">Agregar nuevo color...</option>
+            <option value="__nuevo__"
+              {% if form.data.color == "__nuevo__" %}selected{% endif %}>
+              Agregar nuevo color...
+            </option>
           </select>
-          <input type="text" name="color_nuevo" id="input_color_nuevo" class="w-full px-4 py-2 rounded-xl bg-black/70 text-cyan-200 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400 mt-2 hidden" placeholder="Escribe el nuevo color...">
+          <input type="text" name="color_nuevo" id="input_color_nuevo" 
+                 value="{{ form.data.color_nuevo|default:'' }}"
+                 class="w-full px-4 py-2 rounded-xl bg-black/70 text-cyan-200 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400 mt-2 {% if form.data.color != '__nuevo__' %}hidden{% endif %}" 
+                 placeholder="Escribe el nuevo color...">
         </div>
         {{ form.color.errors }}
       </div>
@@ -240,9 +294,15 @@
         <div class="relative">
           <select id="id_motor" name="motor" class="w-full px-4 py-2 rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400">
             <option value="">---------</option>
-            <option value="__nuevo__">Agregar nuevo motor...</option>
+            <option value="__nuevo__"
+              {% if form.data.motor == "__nuevo__" %}selected{% endif %}>
+              Agregar nuevo motor...
+            </option>
           </select>
-          <input type="text" name="motor_nuevo" id="input_motor_nuevo" class="w-full px-4 py-2 rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400 mt-2 hidden" placeholder="Escribe el nuevo motor...">
+          <input type="text" name="motor_nuevo" id="input_motor_nuevo" 
+                 value="{{ form.data.motor_nuevo|default:'' }}"
+                 class="w-full px-4 py-2 rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400 mt-2 {% if form.data.motor != '__nuevo__' %}hidden{% endif %}" 
+                 placeholder="Escribe el nuevo motor...">
         </div>
         {{ form.motor.errors }}
       </div>
@@ -251,209 +311,222 @@
         <div class="relative">
           <select id="id_caja" name="caja" class="w-full px-4 py-2 rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400">
             <option value="">---------</option>
-            <option value="__nuevo__">Agregar nueva caja...</option>
+            <option value="__nuevo__"
+              {% if form.data.caja == "__nuevo__" %}selected{% endif %}>
+              Agregar nueva caja...
+            </option>
           </select>
-          <input type="text" name="caja_nueva" id="input_caja_nueva" class="w-full px-4 py-2 rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400 mt-2 hidden" placeholder="Escribe la nueva caja...">
+          <input type="text" name="caja_nueva" id="input_caja_nueva" 
+                 value="{{ form.data.caja_nueva|default:'' }}"
+                 class="w-full px-4 py-2 rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400 mt-2 {% if form.data.caja != '__nuevo__' %}hidden{% endif %}" 
+                 placeholder="Escribe la nueva caja...">
         </div>
         {{ form.caja.errors }}
       </div>
     </div>
 
     <div class="flex justify-end gap-4 pt-6">
-      <a href="{% url 'vehiculos:lista_vehiculos' %}" class="btn-cine-future">Cancelar</a>
+  {% url 'taller:vehiculos:lista_vehiculos' as url_lista_vehiculos %}
+  <a href="{{ url_lista_vehiculos|default:'#' }}" class="btn-cine-future">Cancelar</a>
       <button class="btn-cine-future" type="submit">
         <span class="glow-text-future">Guardar Vehículo</span>
       </button>
     </div>
   </form>
   <!-- AJAX búsqueda de clientes -->
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      // Seleccionar automáticamente el nuevo color si viene en la URL
-      const urlParams = new URLSearchParams(window.location.search);
-      const nuevoColorId = urlParams.get('nuevo_color');
-      if (nuevoColorId) {
-        const selectColor = document.getElementById('id_color');
-        selectColor.value = nuevoColorId;
-        const inputColorNuevo = document.getElementById('input_color_nuevo');
-        if (inputColorNuevo) {
-          inputColorNuevo.value = '';
-          inputColorNuevo.classList.add('hidden');
-          inputColorNuevo.required = false;
-        }
-      }
-      // --- Cliente ---
-      const inputCliente = document.getElementById('busqueda-cliente-ajax');
-      const sugerenciasCliente = document.getElementById('sugerencias-clientes');
-      const selectCliente = document.getElementById('id_cliente');
-      const errorCliente = document.getElementById('error-cliente');
-      inputCliente.addEventListener('input', function () {
-        const query = inputCliente.value.trim();
-        if (query.length < 2) {
-          sugerenciasCliente.innerHTML = '';
-          sugerenciasCliente.classList.add('hidden');
-          return;
-        }
-        fetch(`/api/clientes/?q=${encodeURIComponent(query)}`)
-          .then(res => res.json())
-          .then(data => {
-            sugerenciasCliente.innerHTML = '';
-            if (data.length === 0) {
-              sugerenciasCliente.classList.add('hidden');
-              errorCliente.textContent = 'No se encontraron clientes.';
-              return;
-            }
-            errorCliente.textContent = '';
-            sugerenciasCliente.classList.remove('hidden');
-            data.forEach(cliente => {
-              const li = document.createElement('li');
-              li.textContent = `${cliente.nombre} ${cliente.apellido} - ${cliente.email}`;
-              li.className = 'px-4 py-2 hover:bg-cyan-700 cursor-pointer rounded';
-              li.onclick = () => {
-                selectCliente.value = cliente.id;
-                inputCliente.value = `${cliente.nombre} ${cliente.apellido}`;
-                sugerenciasCliente.classList.add('hidden');
-              };
-              sugerenciasCliente.appendChild(li);
-            });
-          })
-          .catch(() => {
-            errorCliente.textContent = 'Error al buscar clientes.';
-          });
-      });
-      // --- Marca y Modelo ---
-      const selectMarca = document.getElementById('id_marca');
-      const selectModelo = document.getElementById('id_modelo');
-      const selectMotor = document.getElementById('id_motor');
-      const selectCaja = document.getElementById('id_caja');
-      selectMarca.addEventListener('change', function () {
-        const marcaId = selectMarca.value;
-        selectModelo.innerHTML = '<option value="">---------</option>';
-        selectMotor.innerHTML = '<option value="">---------</option>';
-        selectCaja.innerHTML = '<option value="">---------</option>';
-        if (!marcaId) return;
-        fetch(`/api/modelos/?marca_id=${marcaId}`)
-          .then(res => res.json())
-          .then(data => {
-            if (data.length === 0) {
-              selectModelo.innerHTML = '<option value="">No hay modelos para esta marca</option>';
-              return;
-            }
-            data.forEach(modelo => {
-              const option = document.createElement('option');
-              option.value = modelo.id;
-              option.textContent = modelo.nombre;
-              selectModelo.appendChild(option);
-            });
-          })
-          .catch(() => {
-            selectModelo.innerHTML = '<option value="">Error al cargar modelos</option>';
-          });
-      });
-      selectModelo.addEventListener('change', function () {
-        const modeloId = selectModelo.value;
-        selectMotor.innerHTML = '<option value="">---------</option>';
-        selectCaja.innerHTML = '<option value="">---------</option>';
-        selectMotor.innerHTML += '<option value="__nuevo__">Agregar nuevo motor...</option>';
-        selectCaja.innerHTML += '<option value="__nuevo__">Agregar nueva caja...</option>';
-        if (!modeloId) return;
-        fetch(`/api/motores/?modelo_id=${modeloId}`)
-          .then(res => res.json())
-          .then(data => {
-            if (data.length === 0) {
-              selectMotor.innerHTML = '<option value="">No hay motores para este modelo</option><option value="__nuevo__">Agregar nuevo motor...</option>';
-              return;
-            }
-            data.forEach(motor => {
-              const option = document.createElement('option');
-              option.value = motor.id;
-              option.textContent = motor.nombre;
-              selectMotor.appendChild(option);
-            });
-            selectMotor.appendChild(Object.assign(document.createElement('option'), {value: '__nuevo__', textContent: 'Agregar nuevo motor...'}));
-          })
-          .catch(() => {
-            selectMotor.innerHTML = '<option value="">Error al cargar motores</option><option value="__nuevo__">Agregar nuevo motor...</option>';
-          });
-        fetch(`/api/cajas/?modelo_id=${modeloId}`)
-          .then(res => res.json())
-          .then(data => {
-            if (data.length === 0) {
-              selectCaja.innerHTML = '<option value="">No hay cajas para este modelo</option><option value="__nuevo__">Agregar nueva caja...</option>';
-              return;
-            }
-            data.forEach(caja => {
-              const option = document.createElement('option');
-              option.value = caja.id;
-              option.textContent = caja.nombre;
-              selectCaja.appendChild(option);
-            });
-            selectCaja.appendChild(Object.assign(document.createElement('option'), {value: '__nuevo__', textContent: 'Agregar nueva caja...'}));
-          })
-          .catch(() => {
-            selectCaja.innerHTML = '<option value="">Error al cargar cajas</option><option value="__nuevo__">Agregar nueva caja...</option>';
-          });
-      });
-      // Mostrar input manual si se selecciona "Agregar nuevo" en motor/caja
-      selectMotor.addEventListener('change', function () {
-        const inputMotorNuevo = document.getElementById('input_motor_nuevo');
-        if (selectMotor.value === '__nuevo__') {
-          inputMotorNuevo.classList.remove('hidden');
-          inputMotorNuevo.required = true;
-          inputMotorNuevo.focus();
-        } else {
-          inputMotorNuevo.classList.add('hidden');
-          inputMotorNuevo.required = false;
-          inputMotorNuevo.value = '';
-        }
-      });
-      selectCaja.addEventListener('change', function () {
-        const inputCajaNueva = document.getElementById('input_caja_nueva');
-        if (selectCaja.value === '__nuevo__') {
-          inputCajaNueva.classList.remove('hidden');
-          inputCajaNueva.required = true;
-          inputCajaNueva.focus();
-        } else {
-          inputCajaNueva.classList.add('hidden');
-          inputCajaNueva.required = false;
-          inputCajaNueva.value = '';
-        }
-      });
-      const selectColor = document.getElementById('id_color');
-      const inputColorNuevo = document.getElementById('input_color_nuevo');
-      selectColor.addEventListener('change', function () {
-        if (selectColor.value === '__nuevo__') {
-          inputColorNuevo.classList.remove('hidden');
-          inputColorNuevo.required = true;
-          inputColorNuevo.focus();
-        } else {
-          inputColorNuevo.classList.add('hidden');
-          inputColorNuevo.required = false;
-          inputColorNuevo.value = '';
-        }
-      });
+<script>
+// === Utilidades (primero) ===
+function setOptions(el, html) { if (el) el.innerHTML = html; }
+const qs = (s) => document.querySelector(s);
 
-      // --- Foco automático en part number al agregar repuesto ---
-      // Si tienes un botón para agregar repuesto, por ejemplo:
-      // <button id="btn-agregar-repuesto">Agregar repuesto</button>
-      // Y un input para part number:
-      // <input type="text" id="input-partnumber" ...>
-      // Agrega este JS:
-      const btnAgregarRepuesto = document.getElementById('btn-agregar-repuesto');
-      if (btnAgregarRepuesto) {
-        btnAgregarRepuesto.addEventListener('click', function(e) {
-          setTimeout(function() {
-            const inputPartnumber = document.getElementById('input-partnumber');
-            if (inputPartnumber) {
-              inputPartnumber.focus();
-              inputPartnumber.select();
-            }
-          }, 120); // Espera breve para asegurar que el campo exista
-        });
-      }
-      // ...existing code...
+// === Declaración de referencias ===
+const inputCliente       = qs('#busqueda-cliente-ajax');
+const sugerenciasCliente = qs('#sugerencias-clientes');
+const selectCliente      = qs('#id_cliente');
+const errorCliente       = qs('#error-cliente');
+const selectMarca        = qs('#id_marca');
+const selectMarcaUsa     = document.getElementById('id_marca_usa');
+// --- Dinámica USA: cargar modelos al elegir marca ---
+{# Namespace correcto para la API de modelos USA #}
+{% url 'taller:vehiculos:api_modelos_usa' as url_api_modelos_usa %}
+const selectModeloUsa = document.getElementById('id_modelo_usa');  // Select de modelo USA
+const hiddenMarca     = document.getElementById('id_marca');       // Campo oculto (opcional)
+const MODELOS_USA_URL = "{{ url_api_modelos_usa|default:'#' }}";
+if(MODELOS_USA_URL === '#') { console.warn('[DEBUG] No se resolvió URL api_modelos_usa'); }
+
+// --- Carga modelos USA simplificada ---
+async function cargarModelosUsa(marcaId, preselectId = null) {
+  if (!selectModeloUsa || !MODELOS_USA_URL || MODELOS_USA_URL === '#') return;
+  if (!marcaId) { 
+    setOptions(selectModeloUsa, '<option value="">---------</option>'); 
+    return; 
+  }
+
+  // Estado cargando
+  selectModeloUsa.disabled = true;
+  setOptions(selectModeloUsa, '<option value="">Cargando…</option>');
+
+  try {
+    const res = await fetch(`${MODELOS_USA_URL}?marca=${encodeURIComponent(marcaId)}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    let json = await res.json();
+
+    // Normalizar respuesta
+    let items = Array.isArray(json) ? json : (json.results || []);
+    const data = items.map(m => {
+      if (typeof m === 'string') return { id: m, nombre: m };
+      return { 
+        id: String(m.id ?? m.value ?? m.slug ?? m.nombre ?? m.text),
+        nombre: String(m.nombre ?? m.text ?? m.label ?? m.modelo ?? m.name ?? m.id)
+      };
     });
-  </script>
+
+    // Construir options
+    let html = '<option value="">---------</option>';
+    for (const m of data) html += `<option value="${m.id}">${m.nombre}</option>`;
+    setOptions(selectModeloUsa, html);
+
+    // Preselección si se especifica
+    if (preselectId) selectModeloUsa.value = String(preselectId);
+    
+    console.log(`✅ Modelos cargados: ${data.length}`);
+  } catch (err) {
+    console.error('Error cargando modelos USA:', err);
+    setOptions(selectModeloUsa, '<option value="">Error al cargar modelos</option>');
+  } finally {
+    selectModeloUsa.disabled = false;
+  }
+}
+
+// --- Eventos USA ---
+if (selectMarcaUsa) {
+  selectMarcaUsa.addEventListener('change', (e) => {
+    cargarModelosUsa(e.target.value);
+  });
+  
+  // Pre-carga si ya viene una marca seleccionada
+  if (selectMarcaUsa.value) {
+    const preselectModelo = "{{ form.data.modelo_usa|default:'' }}";
+    cargarModelosUsa(selectMarcaUsa.value, preselectModelo || null);
+  }
+}
+const selectModelo       = qs('#id_modelo');
+const selectMotor        = qs('#id_motor');
+const selectCaja         = qs('#id_caja');
+const inputMarcaNueva    = qs('#input_marca_nueva');
+const inputModeloNuevo   = qs('#input_modelo_nuevo');
+const selectColor        = qs('#id_color');
+const inputColorNuevo    = qs('#input_color_nuevo');
+
+// === USA: Sincronizar marca_usa con campo oculto marca ===
+if (selectMarcaUsa && selectMarca) {
+  selectMarcaUsa.addEventListener('change', function() {
+    selectMarca.value = this.value;
+    // Disparar evento para que DAL/Select2 recargue modelos si es necesario
+    const event = new Event('change', { bubbles: true });
+    selectMarca.dispatchEvent(event);
+  });
+  // Inicializar valor al cargar
+  if (selectMarcaUsa.value) {
+    selectMarca.value = selectMarcaUsa.value;
+  }
+}
+
+// === CLIENTE: búsqueda en tiempo real ===
+{% url 'taller:vehiculos:api_busqueda_clientes' as url_api_clientes %}
+const CLIENTES_API_URL = "{{ url_api_clientes|default:'#' }}";
+let timer = null, aborter = null;
+function limpiarSug() {
+  if (!sugerenciasCliente) return;
+  sugerenciasCliente.innerHTML = '';
+  sugerenciasCliente.classList.add('hidden');
+}
+function setErrorCliente(msg) {
+  if (errorCliente) errorCliente.textContent = msg || '';
+}
+function renderClientes(list) {
+  limpiarSug();
+  if (!Array.isArray(list) || list.length === 0) {
+    setErrorCliente('No se encontraron clientes.');
+    return;
+  }
+  setErrorCliente('');
+  sugerenciasCliente.classList.remove('hidden');
+  list.forEach(c => {
+    const li = document.createElement('li');
+    li.innerHTML = `<div class="font-bold">${c.nombre} ${c.apellido}</div><div class="text-xs text-cyan-200">${c.email || ''} • ${c.telefono || ''}</div>`;
+    li.className = 'px-4 py-2 hover:bg-cyan-700 cursor-pointer rounded';
+    li.onclick = () => {
+      // rellenar select y mostrar detalles
+      selectCliente.value = c.id;
+      inputCliente.value  = `${c.nombre} ${c.apellido}`;
+      const detalles = document.getElementById('cliente-detalles');
+      if(detalles) detalles.innerHTML = `<strong>${c.nombre} ${c.apellido}</strong><br>${c.email||''} • ${c.telefono||''}`;
+      limpiarSug();
+    };
+    sugerenciasCliente.appendChild(li);
+  });
+}
+// Si ya hay un cliente seleccionado al cargar la página, mostrar detalles
+document.addEventListener('DOMContentLoaded', function(){
+  try{
+    const sel = document.getElementById('id_cliente');
+    const detalles = document.getElementById('cliente-detalles');
+    if(sel && sel.value){
+      const opt = sel.options[sel.selectedIndex];
+      if(opt && detalles){
+        const email = opt.getAttribute('data-email') || '';
+        const tel = opt.getAttribute('data-telefono') || '';
+        detalles.innerHTML = `<strong>${opt.text}</strong><br>${email} • ${tel}`;
+      }
+    }
+  }catch(e){console.warn('No mostrar detalles cliente:', e);}
+});
+if (inputCliente && sugerenciasCliente && selectCliente && errorCliente) {
+  document.addEventListener('click', (e) => {
+    if (!sugerenciasCliente.contains(e.target) && e.target !== inputCliente) limpiarSug();
+  });
+  inputCliente.addEventListener('input', () => {
+    const q = inputCliente.value.trim();
+    if (q.length < 2) { limpiarSug(); setErrorCliente(''); return; }
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(async () => {
+      try {
+        if (aborter) aborter.abort();
+        aborter = new AbortController();
+        const res = await fetch(`${CLIENTES_API_URL}?q=${encodeURIComponent(q)}`, { signal: aborter.signal });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        renderClientes(await res.json());
+      } catch (err) {
+        if (err.name === 'AbortError') return;
+        setErrorCliente('Error al buscar clientes.');
+        limpiarSug();
+      }
+    }, 220);
+  });
+}
+
+// ...el resto de la lógica de Select2/DAL y búsqueda de clientes permanece...
+
+// === COLOR: input manual si "__nuevo__" ===
+if (selectColor && inputColorNuevo) {
+  selectColor.addEventListener('change', () => {
+    if (selectColor.value === '__nuevo__') {
+      inputColorNuevo.classList.remove('hidden'); inputColorNuevo.required = true; inputColorNuevo.focus();
+    } else {
+      inputColorNuevo.classList.add('hidden'); inputColorNuevo.required = false; inputColorNuevo.value = '';
+    }
+  });
+  // Autoselección por ?nuevo_color=ID
+  const nuevoColorId = new URLSearchParams(location.search).get('nuevo_color');
+  if (nuevoColorId) {
+    selectColor.value = nuevoColorId;
+    inputColorNuevo.value = '';
+    inputColorNuevo.classList.add('hidden');
+    inputColorNuevo.required = false;
+  }
+}
+</script>
   <style>
     #busqueda-cliente-ajax {
       box-shadow: 0 0 16px 2px #00ffe7 inset;
@@ -503,4 +576,108 @@
 
 {% block extra_js %}
   {{ form.media }}
+  <style>
+  /* Caja del control */
+  .select2-container .select2-selection--single{
+    background:#0f0f10 !important;
+    border:2px solid #00ffe7 !important;
+    border-radius:14px !important;
+    min-height:48px;
+    box-shadow:0 0 12px rgba(0,255,231,.25) inset;
+  }
+  .select2-container--default .select2-selection--single .select2-selection__rendered{
+    color:#00ffe7 !important;
+    font-weight:700; letter-spacing:.5px; padding-left:14px !important;
+  }
+  .select2-container--default .select2-selection--single .select2-selection__arrow b{
+    border-color:#00ffe7 transparent transparent transparent !important;
+  }
+  .select2-dropdown{
+    background:#0f2027 !important;
+    border:2px solid #00ffe7 !important;
+    border-radius:12px !important;
+    box-shadow:0 0 24px rgba(0,255,231,.35);
+  }
+  .select2-results__option{
+    color:#c5fffb !important;
+    font-weight:600;
+  }
+  .select2-results__option--highlighted.select2-results__option--selectable{
+    background:#00ffe7 !important; color:#0f2027 !important;
+  }
+  .select2-container .select2-selection__placeholder{
+    color:#46f5e4 !important; opacity:.8;
+  }
+  </style>
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const $m  = window.jQuery ? jQuery('#id_marca_usa')  : null;
+    const $mo = window.jQuery ? jQuery('#id_modelo_usa') : null;
+
+    console.log('jQuery:', !!window.jQuery, 'Select2:', !!(window.jQuery && jQuery.fn && jQuery.fn.select2));
+
+    // INICIALIZAR SELECT2 MANUALMENTE para campos USA dinámicos
+    if (window.jQuery && jQuery.fn && jQuery.fn.select2) {
+      // Inicializar marca_usa
+      if ($m && $m.length && !$m.data('select2')) {
+        $m.select2({
+          placeholder: 'Select brand...',
+          allowClear: true,
+          width: '100%'
+        });
+        console.log('✅ Select2 inicializado para marca_usa');
+      }
+      
+      // Inicializar modelo_usa
+      if ($mo && $mo.length && !$mo.data('select2')) {
+        $mo.select2({
+          placeholder: 'First select a brand...',
+          allowClear: true,
+          width: '100%'
+        });
+        console.log('✅ Select2 inicializado para modelo_usa');
+      }
+    }
+
+    if ($m && $m.length)  console.log('MarcaUSA Select2 init:', !!$m.data('select2'));
+    if ($mo && $mo.length) console.log('ModeloUSA Select2 init:', !!$mo.data('select2'));
+
+    // Log de apertura y escritura
+    if ($m) {
+      $m.on('select2:open',  () => console.log('[DAL] MarcaUSA opened'));
+      $m.on('select2:select', (e) => {
+        console.log('[DAL] MarcaUSA select:', e.params.data);
+        // CARGAR MODELOS cuando se selecciona una marca
+        const marcaSeleccionada = e.params.data.id;
+        if (marcaSeleccionada && selectModeloUsa) {
+          console.log('🔄 Cargando modelos para marca:', marcaSeleccionada);
+          cargarModelosUsa(marcaSeleccionada);
+          
+          // Habilitar el campo de modelo
+          if ($mo && $mo.length) {
+            $mo.prop('disabled', false);
+            $mo.select2('destroy').select2({
+              placeholder: 'Select model...',
+              allowClear: true,
+              width: '100%'
+            });
+          }
+        }
+      });
+    }
+    if ($mo) {
+      $mo.on('select2:open',  () => console.log('[DAL] ModeloUSA opened (debería incluir forward marca_usa)'));
+      $mo.on('select2:select', (e) => console.log('[DAL] ModeloUSA select:', e.params.data));
+    }
+
+    // Extra: forzar apertura al foco (útil para verificar top-50 sin teclear)
+    if ($m) $m.on('focus', () => {
+      if ($m.length && typeof $m.data === 'function' && $m.data('select2')) {
+        $m.select2('open');
+      } else {
+        console.warn('Select2 aún no está inicializado para $m (marca_usa)');
+      }
+    });
+  });
+  </script>
 {% endblock %}

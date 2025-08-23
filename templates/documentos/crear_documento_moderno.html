@@ -1,0 +1,1641 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+{% load documento_filters %}
+
+{% block title %}{% trans "Crear Documento" %} - eGarage{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --presupuesto-color: #4CAF50;
+        --orden-trabajo-color: #FF9800;
+        --factura-color: #F44336;
+        --boleta-color: #2196F3;
+        --cyber-blue: #00d4ff;
+        --cyber-purple: #8a2be2;
+        --cyber-green: #39ff14;
+        --dark-bg: #0a0a0a;
+        --glass-bg: rgba(255, 255, 255, 0.05);
+        --current-doc-color: var(--cyber-blue); /* Color por defecto */
+    }
+
+    body {
+        background: linear-gradient(135deg, var(--dark-bg) 0%, #1a1a2e 50%, #16213e 100%);
+        color: #ffffff;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        min-height: 100vh;
+    }
+
+    .documento-container {
+        background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(138, 43, 226, 0.1) 100%);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--current-doc-color);
+        border-radius: 20px;
+        padding: 2rem;
+        margin: 2rem 0;
+        box-shadow: 0 0 30px rgba(0, 212, 255, 0.2);
+        position: relative;
+        overflow: hidden;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .documento-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        transition: left 0.5s;
+    }
+
+    .documento-container:hover::before {
+        left: 100%;
+    }
+
+    .documento-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .documento-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(45deg, var(--current-doc-color), var(--cyber-purple));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: 0 0 30px var(--current-doc-color);
+        transition: text-shadow 0.3s ease;
+    }
+
+    .tipo-documento-selector {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .tipo-btn {
+        padding: 1rem 1.5rem;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 15px;
+        background: transparent;
+        color: rgba(255, 255, 255, 0.7);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        backdrop-filter: blur(5px);
+        min-width: 150px;
+        text-align: center;
+    }
+
+    .tipo-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .tipo-nombre {
+        font-size: 0.95rem;
+        font-weight: 600;
+    }
+
+    .tipo-numero {
+        font-size: 0.8rem;
+        opacity: 0.8;
+        font-family: 'Courier New', monospace;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 0.2rem 0.5rem;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .tipo-btn:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .tipo-btn.active {
+        color: white;
+        box-shadow: 0 0 20px currentColor;
+        border-color: currentColor;
+    }
+
+    .tipo-btn.presupuesto.active {
+        border-color: var(--presupuesto-color);
+        color: var(--presupuesto-color);
+        background: rgba(76, 175, 80, 0.1);
+    }
+
+    .tipo-btn.orden-trabajo.active {
+        border-color: var(--orden-trabajo-color);
+        color: var(--orden-trabajo-color);
+        background: rgba(255, 152, 0, 0.1);
+    }
+
+    .tipo-btn.factura.active {
+        border-color: var(--factura-color);
+        color: var(--factura-color);
+        background: rgba(244, 67, 54, 0.1);
+    }
+
+    .tipo-btn.boleta.active {
+        border-color: var(--boleta-color);
+        color: var(--boleta-color);
+        background: rgba(33, 150, 243, 0.1);
+    }
+
+    .form-section {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        backdrop-filter: blur(10px);
+    }
+
+    .form-section h3 {
+        color: var(--cyber-blue);
+        margin-bottom: 1rem;
+        font-weight: 600;
+        border-bottom: 2px solid rgba(0, 212, 255, 0.3);
+        padding-bottom: 0.5rem;
+    }
+
+    .form-control {
+        background: rgba(0, 0, 0, 0.7) !important;
+        border: 1px solid rgba(0, 212, 255, 0.4) !important;
+        border-radius: 10px;
+        color: #ffffff !important;
+        padding: 0.75rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        background: rgba(0, 0, 0, 0.8) !important;
+        border-color: var(--cyber-blue) !important;
+        box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+        color: #ffffff !important;
+        outline: none;
+    }
+
+    .form-control::placeholder {
+        color: rgba(255, 255, 255, 0.6) !important;
+    }
+
+    .form-control option {
+        background: #000000 !important;
+        color: #ffffff !important;
+    }
+
+    .btn-cyber {
+        background: linear-gradient(45deg, var(--current-doc-color), var(--cyber-purple));
+        border: none;
+        border-radius: 10px;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .btn-cyber:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px var(--current-doc-color);
+    }
+
+    .linea-item {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        position: relative;
+    }
+
+    .remove-item {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(244, 67, 54, 0.2);
+        border: 1px solid #F44336;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: #F44336;
+        transition: all 0.3s ease;
+    }
+
+    .remove-item:hover {
+        background: rgba(244, 67, 54, 0.4);
+        transform: scale(1.1);
+    }
+
+    .totales-section {
+        background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(138, 43, 226, 0.1));
+        border: 2px solid rgba(0, 212, 255, 0.3);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-top: 2rem;
+    }
+
+    .search-container {
+        position: relative;
+    }
+
+    .search-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: rgba(0, 0, 0, 0.9);
+        border: 1px solid rgba(0, 212, 255, 0.4);
+        border-radius: 10px;
+        max-height: 200px;
+        overflow-y: auto;
+        z-index: 1000;
+        margin-top: 2px;
+    }
+
+    .dropdown-item {
+        padding: 0.75rem;
+        cursor: pointer;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        color: white;
+        transition: background 0.2s ease;
+    }
+
+    .dropdown-item:hover {
+        background: rgba(0, 212, 255, 0.2);
+    }
+
+    .search-result-item {
+        padding: 0.75rem;
+        cursor: pointer;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        color: white;
+        transition: background 0.2s ease;
+    }
+
+    .search-result-item:hover {
+        background: rgba(0, 212, 255, 0.2);
+    }
+
+    .search-result-item:last-child {
+        border-bottom: none;
+    }
+
+    .dropdown-item:last-child {
+        border-bottom: none;
+    }
+
+    .total-line {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .total-line:last-child {
+        border-bottom: none;
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--cyber-green);
+    }
+
+    .numero-preview {
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: all 0.3s ease;
+    }
+
+    .numero-preview.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .numero-preview .alert {
+        background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(138, 43, 226, 0.1));
+        border: 1px solid rgba(0, 212, 255, 0.3);
+        color: var(--cyber-blue);
+        border-radius: 10px;
+        backdrop-filter: blur(10px);
+    }
+
+    .tipo-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .tipo-numero {
+        font-size: 0.8rem;
+        opacity: 0.7;
+        font-weight: 500;
+    }
+
+    .search-results {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: rgba(0, 0, 0, 0.9);
+        border: 1px solid rgba(0, 212, 255, 0.3);
+        border-radius: 10px;
+        max-height: 200px;
+        overflow-y: auto;
+        z-index: 1000;
+        display: none;
+    }
+
+    .search-result-item {
+        padding: 0.75rem;
+        cursor: pointer;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        transition: background 0.3s ease;
+    }
+
+    .search-result-item:hover {
+        background: rgba(0, 212, 255, 0.2);
+    }
+    
+    .search-result-item .badge {
+        font-size: 0.7rem;
+    }
+    
+    .linea-item {
+        position: relative;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 0.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .linea-item:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(0, 212, 255, 0.3);
+    }
+    
+    .remove-item {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background: rgba(220, 53, 69, 0.8);
+        color: white;
+        border-radius: 50%;
+        width: 25px;
+        height: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 0.8rem;
+        transition: background 0.3s ease;
+    }
+    
+    .remove-item:hover {
+        background: rgba(220, 53, 69, 1);
+    }
+
+    .kilometraje-input {
+        position: relative;
+    }
+
+    .kilometraje-input::after {
+        content: attr(data-unit);
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: rgba(255, 255, 255, 0.5);
+        pointer-events: none;
+    }
+
+    .numero-preview {
+        transition: all 0.3s ease;
+    }
+
+    .numero-preview .alert {
+        background: rgba(0, 212, 255, 0.1);
+        border: 1px solid rgba(0, 212, 255, 0.3);
+        border-left: 4px solid var(--cyber-blue);
+        color: white;
+        border-radius: 10px;
+        padding: 1rem;
+        margin: 0;
+    }
+
+    .numero-preview .alert i {
+        color: var(--cyber-blue);
+    }
+
+    @media (max-width: 768px) {
+        .tipo-documento-selector {
+            flex-direction: column;
+        }
+        
+        .tipo-btn {
+            min-width: auto;
+        }
+        
+        .documento-title {
+            font-size: 2rem;
+        }
+    }
+
+    /* Estilos para campos de repuestos en línea horizontal */
+    .repuestos-row {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        gap: 8px;
+    }
+
+    .repuestos-row .col-lg-1,
+    .repuestos-row .col-lg-2,
+    .repuestos-row .col-md-2,
+    .repuestos-row .col-md-3,
+    .repuestos-row .col-md-4 {
+        flex: 0 0 auto !important;
+        min-width: 0;
+        padding: 0 4px;
+    }
+
+    .repuestos-row .form-control-sm {
+        font-size: 0.875rem;
+        padding: 0.25rem 0.5rem;
+        height: calc(1.5em + 0.5rem + 2px);
+    }
+
+    .repuestos-row .form-label {
+        margin-bottom: 0.25rem;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    /* Estilos específicos para las filas de repuestos agregados */
+    .repuestos-row.align-items-center {
+        background: rgba(255, 255, 255, 0.05) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px !important;
+        margin-bottom: 4px !important;
+        padding: 8px 4px !important;
+        transition: all 0.3s ease;
+    }
+
+    .repuestos-row.align-items-center:hover {
+        background: rgba(255, 255, 255, 0.08) !important;
+        border-color: rgba(0, 212, 255, 0.3);
+    }
+
+    /* Estilos para campos de precio compactos */
+    input[type="number"][maxlength="3"],
+    input[type="number"][maxlength="5"],
+    input[type="number"][maxlength="6"] {
+        text-align: center;
+        font-size: 0.875rem;
+        padding: 0.25rem 0.5rem;
+    }
+
+    /* Estilos para campos en servicios */
+    .linea-item input[type="number"] {
+        font-size: 0.875rem;
+        padding: 0.25rem 0.5rem;
+    }
+
+    @media (max-width: 1199px) {
+        .repuestos-row {
+            flex-wrap: wrap !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="documento-container">
+        <div class="documento-header">
+            <h1 class="documento-title">
+                <i class="fas fa-file-invoice me-3"></i>
+                {% trans "Crear Documento" %}
+            </h1>
+            <p style="color: rgba(255, 255, 255, 0.7);">
+                {% trans "Sistema integral de documentación para talleres" %}
+            </p>
+        </div>
+
+        {% if request.path|slice:":3" == "/cl" %}
+        <form id="documentoForm" method="post" action="{% url 'documentos_cl:procesar_documento' %}">
+        {% else %}
+        <form id="documentoForm" method="post" action="{% url 'documentos_us:procesar_documento' %}">
+        {% endif %}
+            {% csrf_token %}
+            
+            <!-- Selector de Tipo de Documento -->
+            <div class="form-section">
+                <h3><i class="fas fa-tags me-2"></i>{% trans "Tipo de Documento" %}</h3>
+                <div class="tipo-documento-selector">
+                    {% for tipo in tipos_documento %}
+                    <div class="tipo-btn" 
+                         data-tipo="{{ tipo.value }}" 
+                         data-color="{{ tipo.color }}"
+                         data-numero="{{ tipo.numero_preview }}">
+                        <div class="tipo-content">
+                            <i class="fas fa-file-alt me-2"></i>
+                            <span class="tipo-nombre">{{ tipo.label }}</span>
+                            <small class="tipo-numero">{{ tipo.numero_preview }}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <input type="hidden" name="tipo" id="tipoDocumento" required>
+                <div id="numeroDocumentoPreview" class="numero-preview mt-3" style="display: none;">
+                    <div class="alert alert-info">
+                        <i class="fas fa-hashtag me-2"></i>
+                        <span>{% trans "Número de documento:" %}</span>
+                        <strong id="numeroDocumentoText"></strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información Básica -->
+            <div class="form-section">
+                <h3><i class="fas fa-info-circle me-2"></i>{% trans "Información Básica" %}</h3>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">{% trans "Fecha" %}</label>
+                        <input type="date" name="fecha" class="form-control" 
+                               value="{% now 'Y-m-d' %}" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">{% trans "Cliente" %}</label>
+                        <div class="search-container">
+                            <input type="text" class="form-control" id="clienteSearch" 
+                                   placeholder="🔍 Buscar cliente..." autocomplete="off">
+                            <select name="cliente" class="form-control" id="clienteSelect" required>
+                                <option value="">{% trans "Seleccionar cliente..." %}</option>
+                                {% for cliente in clientes %}
+                                <option value="{{ cliente.id }}" data-search="{{ cliente.nombre|lower }} {{ cliente.apellido|lower }}">
+                                    {{ cliente.nombre }} {{ cliente.apellido }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <div id="clienteDropdown" class="search-dropdown" style="display: none;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">{% trans "Vehículo" %}</label>
+                        <select name="vehiculo" class="form-control" id="vehiculoSelect">
+                            <option value="">{% trans "Seleccionar vehículo..." %}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">
+                            {% if empresa.pais == 'US' %}
+                                {% trans "Millaje" %}
+                            {% else %}
+                                {% trans "Kilometraje" %}
+                            {% endif %}
+                        </label>
+                        <div class="kilometraje-input" 
+                             data-unit="{% if empresa.pais == 'US' %}miles{% else %}km{% endif %}">
+                            <input type="number" name="kilometraje" class="form-control" 
+                                   placeholder="0" min="0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Repuestos -->
+            <div class="form-section">
+                <h3><i class="fas fa-cogs me-2"></i>{% trans "Repuestos" %}</h3>
+                
+                <!-- Formulario para agregar repuesto -->
+                                <div class="mb-3">
+                                    <table class="table table-borderless align-middle mb-1" style="margin-bottom: 0;">
+                                        <thead>
+                                            <tr>
+                                                <th style="width:16%"><small class="text-muted fw-bold">{% trans "Part Number" %}</small></th>
+                                                <th style="width:16%"><small class="text-muted fw-bold">{% trans "Nombre" %}</small></th>
+                                                <th style="width:8%"><small class="text-muted fw-bold">{% trans "P.Compra" %}</small></th>
+                                                <th style="width:8%"><small class="text-muted fw-bold">{% trans "P.Venta" %}</small></th>
+                                                <th style="width:8%"><small class="text-muted fw-bold">{% trans "Stock" %}</small></th>
+                                                <th style="width:8%"><small class="text-muted fw-bold">{% trans "Cantidad" %}</small></th>
+                                                <th style="width:16%"><small class="text-muted fw-bold">{% trans "Total" %}</small></th>
+                                                <th style="width:20%"><small class="text-muted fw-bold">{% trans "Acción" %}</small></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <div class="position-relative">
+                                                        <input type="text" class="form-control form-control-sm" id="buscarRepuesto" 
+                                                                     placeholder="{% trans 'Buscar...' %}">
+                                                        <div class="search-results" id="repuestosResults"></div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control form-control-sm" id="nombreRepuesto" readonly>
+                                                </td>
+                                                <td>
+                                                    <input type="number" class="form-control form-control-sm" id="precioCompra" step="0.01" readonly 
+                                                                 maxlength="5" style="max-width: 80px;">
+                                                </td>
+                                                <td>
+                                                    <input type="number" class="form-control form-control-sm" id="precioVenta" step="0.01"
+                                                                 maxlength="5" style="max-width: 80px;">
+                                                </td>
+                                                <td>
+                                                    <input type="number" class="form-control form-control-sm" id="stockRepuesto" readonly
+                                                                 maxlength="3" style="max-width: 60px;">
+                                                </td>
+                                                <td>
+                                                    <input type="number" class="form-control form-control-sm" id="cantidadRepuesto" value="1" min="1"
+                                                                 maxlength="3" style="max-width: 60px;">
+                                                </td>
+                                                <td>
+                                                    <input type="number" class="form-control form-control-sm" id="totalRepuesto" readonly 
+                                                                 maxlength="6" style="max-width: 90px;">
+                                                </td>
+                                                <td>
+                                                    <button type="button" class="btn btn-cyber btn-sm me-1" id="agregarRepuesto" disabled>
+                                                        <i class="fas fa-plus"></i> {% trans "Agregar" %}
+                                                    </button>
+                                                    <button type="button" class="btn btn-secondary btn-sm" id="limpiarRepuesto">
+                                                        <i class="fas fa-eraser"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                
+                <!-- Lista de repuestos agregados -->
+                <div id="repuestosContainer"></div>
+            </div>
+
+            <!-- Técnico Responsable -->
+            <div class="form-section">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">{% trans "Técnico Responsable" %}</label>
+                        <select name="tecnico" class="form-control" id="tecnicoSelect">
+                            <option value="">{% trans "Seleccionar técnico..." %}</option>
+                            {% for tecnico in tecnicos %}
+                            <option value="{{ tecnico.id }}">{{ tecnico.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Servicios Internos -->
+            <div class="form-section">
+                <h3><i class="fas fa-wrench me-2"></i>{% trans "Servicios Internos" %}</h3>
+                <div class="row mb-3">
+                    <div class="col-md-5">
+                        <label class="form-label">{% trans "Servicio" %}</label>
+                        <div class="position-relative">
+                            <input type="text" class="form-control" id="buscarServicio" 
+                                   placeholder="{% trans 'Buscar servicio o escribir nuevo...' %}">
+                            <div class="search-results" id="serviciosResults"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">{% trans "Valor Servicio" %}</label>
+                        <input type="number" class="form-control" id="valorServicio" step="0.01" placeholder="0.00"
+                               maxlength="5" style="max-width: 90px;">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">&nbsp;</label>
+                        <div>
+                            <button type="button" class="btn btn-cyber me-2" id="agregarServicio">
+                                <i class="fas fa-plus me-2"></i>{% trans "Agregar" %}
+                            </button>
+                            <button type="button" class="btn btn-success" id="nuevoServicio">
+                                <i class="fas fa-plus-circle me-2"></i>{% trans "Nuevo" %}
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">{% trans "Categoría" %}</label>
+                        <select class="form-control" id="categoriaServicio" style="display: none;">
+                            <option value="">{% trans "Seleccionar..." %}</option>
+                            {% for categoria in categorias_servicios %}
+                            <option value="{{ categoria.id }}">{{ categoria.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                    </div>
+                </div>
+                <div id="serviciosContainer"></div>
+            </div>
+
+            <!-- Servicios Externos -->
+            <div class="form-section">
+                <h3><i class="fas fa-handshake me-2"></i>{% trans "Servicios Externos" %}</h3>
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label">{% trans "Servicio Externo" %}</label>
+                        <select class="form-control" id="servicioExternoSelect">
+                            <option value="">{% trans "Seleccionar servicio externo..." %}</option>
+                            {% for servicio in servicios_externos %}
+                            <option value="{{ servicio.id }}" 
+                                    data-nombre="{{ servicio.nombre }}"
+                                    data-empresa="{{ servicio.empresa_externa }}"
+                                    data-precio="{{ servicio.precio_cliente }}"
+                                    data-costo="{{ servicio.costo_servicio }}">
+                                {{ servicio.nombre }} - {{ servicio.empresa_externa }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">{% trans "Compañía" %}</label>
+                        <input type="text" class="form-control" id="companiaExterna" readonly>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">{% trans "Valor Servicio" %}</label>
+                        <input type="number" class="form-control" id="valorServicioExterno" step="0.01" placeholder="0.00"
+                               maxlength="5" style="max-width: 90px;">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">{% trans "Precio Usuario" %}</label>
+                        <input type="number" class="form-control" id="precioUsuarioExterno" step="0.01"
+                               maxlength="5" style="max-width: 90px;">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">&nbsp;</label>
+                        <div>
+                            <button type="button" class="btn btn-cyber w-100" id="agregarServicioExterno">
+                                <i class="fas fa-plus me-2"></i>{% trans "Agregar" %}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="serviciosExternosContainer"></div>
+            </div>
+
+            <!-- Totales -->
+            <div class="totales-section">
+                <h3><i class="fas fa-calculator me-2"></i>{% trans "Resumen de Totales" %}</h3>
+                <div class="total-line">
+                    <span>{% trans "Subtotal Repuestos:" %}</span>
+                    <span id="subtotalRepuestos">$0.00</span>
+                </div>
+                <div class="total-line">
+                    <span>{% trans "Subtotal Servicios Internos:" %}</span>
+                    <span id="subtotalServicios">$0.00</span>
+                </div>
+                <div class="total-line">
+                    <span>{% trans "Subtotal Servicios Externos:" %}</span>
+                    <span id="subtotalServiciosExternos">$0.00</span>
+                </div>
+                <div class="total-line">
+                    <span>{% trans "Subtotal:" %}</span>
+                    <span id="subtotal">$0.00</span>
+                </div>
+                <!-- Checkbox para incluir impuestos -->
+                <div class="total-line">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="incluir_impuestos" name="incluir_impuestos" onchange="calcularTotales()">
+                        <label class="form-check-label" for="incluir_impuestos">
+                            {% if empresa.pais == 'US' %}
+                                {% trans "Incluir Tax" %}
+                            {% else %}
+                                {% trans "Incluir IVA" %}
+                            {% endif %}
+                        </label>
+                    </div>
+                </div>
+                <div class="total-line" id="impuestoLine">
+                    <span>
+                        {% if empresa.pais == 'US' %}
+                            {% trans "Tax (8.5%):" %}
+                        {% else %}
+                            {% trans "IVA (19%):" %}
+                        {% endif %}
+                    </span>
+                    <span id="impuesto">$0.00</span>
+                </div>
+                <div class="total-line">
+                    <span><strong>{% trans "TOTAL:" %}</strong></span>
+                    <span id="total"><strong>$0.00</strong></span>
+                </div>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-cyber me-3">
+                    <i class="fas fa-save me-2"></i>{% trans "Crear Documento" %}
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="history.back()">
+                    <i class="fas fa-times me-2"></i>{% trans "Cancelar" %}
+                </button>
+            </div>
+
+            <!-- Hidden inputs para datos JSON -->
+            <input type="hidden" name="repuestos_data" id="repuestosData">
+            <input type="hidden" name="servicios_data" id="serviciosData">
+            <input type="hidden" name="otros_servicios_data" id="otrosServiciosData">
+        </form>
+    </div>
+</div>
+
+<!-- Hidden inputs para datos JSON -->
+<input type="hidden" name="repuestos_data" id="repuestosData">
+<input type="hidden" name="servicios_data" id="serviciosData">
+<input type="hidden" name="otros_servicios_data" id="otrosServiciosData">
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Función para obtener el token CSRF
+    function getCSRFToken() {
+        const token = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        return token;
+    }
+
+    // Headers por defecto para requests con CSRF
+    function getHeaders(isJson = false) {
+        const headers = {
+            'X-CSRFToken': getCSRFToken(),
+        };
+        if (isJson) {
+            headers['Content-Type'] = 'application/json';
+        }
+        return headers;
+    }
+
+    // Variables globales
+    let repuestosSeleccionados = [];
+    let serviciosSeleccionados = [];
+    let serviciosExternosSeleccionados = [];
+    let selectedRepuesto = null;
+    
+    // Elementos del DOM
+    const tipoButtons = document.querySelectorAll('.tipo-btn');
+    const tipoInput = document.getElementById('tipoDocumento');
+    const clienteSelect = document.getElementById('clienteSelect');
+    const vehiculoSelect = document.getElementById('vehiculoSelect');
+    const incluirImpuestoCheck = document.getElementById('incluir_impuestos');
+    
+    // Selector de tipo de documento
+    tipoButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            tipoButtons.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            tipoInput.value = this.dataset.tipo;
+            
+            // Cambiar colores del tema
+            const color = this.dataset.color;
+            document.documentElement.style.setProperty('--current-doc-color', color);
+            
+            // Obtener número de documento via AJAX
+            obtenerNumeroDocumento(this.dataset.tipo, color);
+        });
+    });
+    
+    // Función para obtener el número de documento
+    function obtenerNumeroDocumento(tipo, color) {
+        const numeroText = document.getElementById('numeroDocumentoText');
+        const numeroContainer = document.getElementById('numeroDocumentoPreview');
+        
+        // Mostrar loading
+        numeroText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> {% trans "Generando..." %}';
+        numeroContainer.style.display = 'block';
+        
+        const countryPrefix = '{{ empresa.pais|lower }}';
+        fetch(`/${countryPrefix}/documentos/api/obtener-numero-documento/?tipo=${encodeURIComponent(tipo)}`, {
+            headers: getHeaders()
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.numero) {
+                    numeroText.textContent = data.numero;
+                    numeroContainer.classList.add('show');
+                    numeroContainer.style.borderColor = color;
+                    numeroContainer.querySelector('.alert').style.borderLeftColor = color;
+                } else if (data.error) {
+                    numeroText.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error';
+                    console.error('Error obteniendo número:', data.error);
+                }
+            })
+            .catch(error => {
+                numeroText.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error de conexión';
+                console.error('Error en la petición:', error);
+            });
+    }
+
+    // Funcionalidad del buscador de clientes
+    const clienteSearch = document.getElementById('clienteSearch');
+    const clienteDropdown = document.getElementById('clienteDropdown');
+    
+    // Obtener todas las opciones de clientes
+    const clienteOptions = Array.from(clienteSelect.options).slice(1); // Saltar la primera opción vacía
+    
+    clienteSearch.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase().trim();
+        
+        if (searchTerm.length === 0) {
+            clienteDropdown.style.display = 'none';
+            return;
+        }
+        
+        // Filtrar clientes
+        const filteredClientes = clienteOptions.filter(option => {
+            const searchData = option.getAttribute('data-search');
+            return searchData && searchData.includes(searchTerm);
+        });
+        
+        // Mostrar resultados
+        if (filteredClientes.length > 0) {
+            clienteDropdown.innerHTML = filteredClientes.map(option => `
+                <div class="search-result-item" data-value="${option.value}">
+                    <i class="fas fa-user me-2"></i>${option.text}
+                </div>
+            `).join('');
+            clienteDropdown.style.display = 'block';
+        } else {
+            clienteDropdown.innerHTML = '<div class="search-result-item">No se encontraron clientes</div>';
+            clienteDropdown.style.display = 'block';
+        }
+    });
+    
+    // Manejar selección de cliente
+    clienteDropdown.addEventListener('click', function(e) {
+        const item = e.target.closest('.search-result-item');
+        if (item && item.dataset.value) {
+            const clienteId = item.dataset.value;
+            const clienteText = item.textContent.replace('👤', '').trim();
+            
+            // Actualizar campos
+            clienteSearch.value = clienteText;
+            clienteSelect.value = clienteId;
+            clienteDropdown.style.display = 'none';
+            
+            // Cargar vehículos del cliente
+            cargarVehiculos(clienteId);
+        }
+    });
+    
+    // Ocultar dropdown al hacer clic fuera
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.search-container')) {
+            clienteDropdown.style.display = 'none';
+        }
+    });
+    
+    // Función para cargar vehículos del cliente seleccionado
+    function cargarVehiculos(clienteId) {
+        vehiculoSelect.innerHTML = '<option value="">{% trans "Cargando vehículos..." %}</option>';
+        
+        if (clienteId) {
+            const countryPrefix = '{{ empresa.pais|lower }}';
+            fetch(`/${countryPrefix}/documentos/api/vehiculos-cliente/?cliente_id=${clienteId}`, {
+                headers: getHeaders()
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    vehiculoSelect.innerHTML = '<option value="">{% trans "Seleccionar vehículo..." %}</option>';
+                    if (data && data.vehiculos && Array.isArray(data.vehiculos)) {
+                        data.vehiculos.forEach(vehiculo => {
+                            const option = document.createElement('option');
+                            option.value = vehiculo.id;
+                            option.textContent = `${vehiculo.marca} ${vehiculo.modelo} ${vehiculo.año} - ${vehiculo.patente}`;
+                            vehiculoSelect.appendChild(option);
+                        });
+                    } else {
+                        vehiculoSelect.innerHTML = '<option value="">{% trans "No hay vehículos registrados" %}</option>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error cargando vehículos:', error);
+                    vehiculoSelect.innerHTML = '<option value="">{% trans "Error cargando vehículos" %}</option>';
+                });
+        } else {
+            vehiculoSelect.innerHTML = '<option value="">{% trans "Seleccionar vehículo..." %}</option>';
+        }
+    }
+    
+    // Cargar vehículos cuando se selecciona cliente
+    clienteSelect.addEventListener('change', function() {
+        const clienteId = this.value;
+        cargarVehiculos(clienteId);
+    });
+    
+    // Búsqueda de repuestos mejorada
+    const buscarRepuesto = document.getElementById('buscarRepuesto');
+    const repuestosResults = document.getElementById('repuestosResults');
+    const nombreRepuesto = document.getElementById('nombreRepuesto');
+    const precioCompra = document.getElementById('precioCompra');
+    const precioVenta = document.getElementById('precioVenta');
+    const stockRepuesto = document.getElementById('stockRepuesto');
+    const cantidadRepuesto = document.getElementById('cantidadRepuesto');
+    const totalRepuesto = document.getElementById('totalRepuesto');
+    const agregarRepuestoBtn = document.getElementById('agregarRepuesto');
+    const limpiarRepuestoBtn = document.getElementById('limpiarRepuesto');
+    
+    // Función para calcular total del repuesto
+    function calcularTotalRepuesto() {
+        const precio = parseFloat(precioVenta.value) || 0;
+        const cantidad = parseInt(cantidadRepuesto.value) || 0;
+        const total = precio * cantidad;
+        totalRepuesto.value = total.toFixed(2);
+    }
+    
+    // Event listeners para calcular total automáticamente
+    precioVenta.addEventListener('input', calcularTotalRepuesto);
+    cantidadRepuesto.addEventListener('input', calcularTotalRepuesto);
+    
+    // Limpiar formulario de repuesto
+    limpiarRepuestoBtn.addEventListener('click', function() {
+        buscarRepuesto.value = '';
+        nombreRepuesto.value = '';
+        precioCompra.value = '';
+        precioVenta.value = '';
+        stockRepuesto.value = '';
+        cantidadRepuesto.value = '1';
+        totalRepuesto.value = '';
+        selectedRepuesto = null;
+        agregarRepuestoBtn.disabled = true;
+        repuestosResults.style.display = 'none';
+        // Enfocar el campo de búsqueda para facilitar la entrada del siguiente repuesto
+        buscarRepuesto.focus();
+    });
+    
+    buscarRepuesto.addEventListener('input', function() {
+        const query = this.value;
+        if (query.length < 2) {
+            repuestosResults.style.display = 'none';
+            return;
+        }
+        
+        const countryPrefix = '{{ empresa.pais|lower }}';
+        fetch(`/${countryPrefix}/documentos/api/buscar-repuestos/?q=${encodeURIComponent(query)}`, {
+            headers: getHeaders()
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                repuestosResults.innerHTML = '';
+                if (data && data.repuestos && Array.isArray(data.repuestos)) {
+                    data.repuestos.forEach(repuesto => {
+                        const item = document.createElement('div');
+                        item.className = 'search-result-item';
+                        item.innerHTML = `
+                            <div>
+                                <strong>${repuesto.nombre}</strong>
+                                ${repuesto.part_number ? `<span class="badge bg-secondary ms-2">${repuesto.part_number}</span>` : ''}
+                            </div>
+                            <small class="text-muted">
+                                Compra: $${repuesto.precio_compra} | Venta: $${repuesto.precio_venta} | Stock: ${repuesto.cantidad_stock}
+                                ${repuesto.proveedor ? ` | ${repuesto.proveedor}` : ''}
+                            </small>
+                        `;
+                        item.addEventListener('click', function() {
+                            selectedRepuesto = repuesto;
+                            buscarRepuesto.value = repuesto.part_number || repuesto.nombre;
+                            nombreRepuesto.value = repuesto.nombre;
+                            precioCompra.value = repuesto.precio_compra;
+                            precioVenta.value = repuesto.precio_venta;
+                            stockRepuesto.value = repuesto.cantidad_stock;
+                            cantidadRepuesto.value = '1';
+                            calcularTotalRepuesto();
+                            agregarRepuestoBtn.disabled = false;
+                            repuestosResults.style.display = 'none';
+                        });
+                        repuestosResults.appendChild(item);
+                    });
+                    repuestosResults.style.display = data.repuestos.length > 0 ? 'block' : 'none';
+                } else {
+                    repuestosResults.innerHTML = '<div class="search-result-item">No se encontraron repuestos</div>';
+                    repuestosResults.style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Error buscando repuestos:', error);
+                repuestosResults.innerHTML = '<div class="search-result-item text-danger">Error al buscar repuestos</div>';
+                repuestosResults.style.display = 'block';
+            });
+    });
+    
+    // Agregar repuesto mejorado
+    agregarRepuestoBtn.addEventListener('click', function() {
+        if (!selectedRepuesto) return;
+        
+        const cantidad = parseInt(cantidadRepuesto.value) || 1;
+        const precio = parseFloat(precioVenta.value) || 0;
+        
+        // Verificar stock disponible
+        if (cantidad > selectedRepuesto.cantidad_stock) {
+            alert(`No hay suficiente stock. Disponible: ${selectedRepuesto.cantidad_stock}`);
+            return;
+        }
+        
+        const item = {
+            id: selectedRepuesto.id,
+            part_number: selectedRepuesto.part_number,
+            nombre: selectedRepuesto.nombre,
+            precio_compra: selectedRepuesto.precio_compra,
+            precio_venta: precio,
+            cantidad: cantidad,
+            total: precio * cantidad,
+            stock_disponible: selectedRepuesto.cantidad_stock
+        };
+        
+        repuestosSeleccionados.push(item);
+        renderRepuestos();
+        limpiarRepuestoBtn.click(); // Limpiar formulario
+        calcularTotales();
+    });
+    
+    // Búsqueda de servicios
+    const buscarServicio = document.getElementById('buscarServicio');
+    const serviciosResults = document.getElementById('serviciosResults');
+    let selectedServicio = null;
+    
+    buscarServicio.addEventListener('input', function() {
+        const query = this.value;
+        if (query.length < 2) {
+            serviciosResults.style.display = 'none';
+            return;
+        }
+        
+        const countryPrefix = '{{ empresa.pais|lower }}';
+        fetch(`/${countryPrefix}/documentos/api/buscar-servicios-internos/?q=${encodeURIComponent(query)}`, {
+            headers: getHeaders()
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                serviciosResults.innerHTML = '';
+                if (data && data.servicios && Array.isArray(data.servicios)) {
+                    data.servicios.forEach(servicio => {
+                        const item = document.createElement('div');
+                        item.className = 'search-result-item';
+                        item.innerHTML = `
+                            <strong>${servicio.nombre}</strong><br>
+                            <small>Categoría: ${servicio.categoria__get_label || 'N/A'}</small>
+                        `;
+                        item.addEventListener('click', function() {
+                            selectedServicio = servicio;
+                            buscarServicio.value = servicio.nombre;
+                            serviciosResults.style.display = 'none';
+                        });
+                        serviciosResults.appendChild(item);
+                    });
+                    serviciosResults.style.display = data.servicios.length > 0 ? 'block' : 'none';
+                } else {
+                    // Mostrar opción para crear nuevo servicio
+                    serviciosResults.innerHTML = `
+                        <div class="search-result-item text-muted">
+                            <i class="fas fa-search me-2"></i>No se encontraron servicios
+                        </div>
+                        <div class="search-result-item" style="background: rgba(40, 167, 69, 0.1); border-left: 3px solid #28a745;">
+                            <i class="fas fa-plus-circle me-2" style="color: #28a745;"></i>
+                            <strong style="color: #28a745;">Crear nuevo servicio: "${query}"</strong>
+                            <br><small>Haga clic para usar este nombre como nuevo servicio</small>
+                        </div>
+                    `;
+                    
+                    // Agregar event listener para crear nuevo servicio
+                    const nuevoServicioItem = serviciosResults.querySelector('.search-result-item:last-child');
+                    nuevoServicioItem.addEventListener('click', function() {
+                        buscarServicio.value = query;
+                        selectedServicio = null; // No hay servicio seleccionado, es nuevo
+                        serviciosResults.style.display = 'none';
+                        document.getElementById('valorServicio').focus();
+                    });
+                    
+                    serviciosResults.style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Error buscando servicios:', error);
+                serviciosResults.innerHTML = '<div class="search-result-item text-danger">Error al buscar servicios</div>';
+                serviciosResults.style.display = 'block';
+            });
+    });
+    
+    // Agregar servicio
+    document.getElementById('agregarServicio').addEventListener('click', function() {
+        const servicioInput = document.getElementById('buscarServicio');
+        const valorField = document.getElementById('valorServicio');
+        const servicioNombre = servicioInput.value.trim();
+        const valor = parseFloat(valorField.value);
+        
+        if (!servicioNombre) {
+            alert('{% trans "Por favor ingrese el nombre del servicio" %}');
+            return;
+        }
+        
+        if (!valor || isNaN(valor) || valor <= 0) {
+            alert('{% trans "Por favor ingrese un valor válido para el servicio" %}');
+            return;
+        }
+        
+        const item = {
+            id: selectedServicio ? selectedServicio.id : `new_${Date.now()}`, // ID temporal para servicios nuevos
+            nombre: servicioNombre,
+            precio: valor,
+            cantidad: 1,
+            es_nuevo: !selectedServicio // Marcar si es un servicio nuevo
+        };
+        
+        serviciosSeleccionados.push(item);
+        renderServicios();
+        servicioInput.value = '';
+        valorField.value = '';
+        selectedServicio = null;
+        calcularTotales();
+    });
+    
+    // Botón para nuevo servicio
+    document.getElementById('nuevoServicio').addEventListener('click', function() {
+        const servicioInput = document.getElementById('buscarServicio');
+        const categoriaSelect = document.getElementById('categoriaServicio');
+        
+        // Mostrar/ocultar campo de categoría
+        if (categoriaSelect.style.display === 'none') {
+            categoriaSelect.style.display = 'block';
+            servicioInput.placeholder = '{% trans "Escribir nombre del nuevo servicio..." %}';
+            selectedServicio = null; // Limpiar selección existente
+            servicioInput.focus();
+        } else {
+            categoriaSelect.style.display = 'none';
+            servicioInput.placeholder = '{% trans "Buscar servicio o escribir nuevo..." %}';
+            categoriaSelect.value = '';
+        }
+    });
+    
+    // Agregar servicio externo
+    document.getElementById('agregarServicioExterno').addEventListener('click', function() {
+        const select = document.getElementById('servicioExternoSelect');
+        const companiaField = document.getElementById('companiaExterna');
+        const valorField = document.getElementById('valorServicioExterno');
+        const precioField = document.getElementById('precioUsuarioExterno');
+        const option = select.options[select.selectedIndex];
+        
+        if (!option.value || !valorField.value || !precioField.value) {
+            alert('{% trans "Por favor complete todos los campos" %}');
+            return;
+        }
+        
+        const item = {
+            id: option.value,
+            nombre: option.dataset.nombre,
+            empresa: option.dataset.empresa,
+            valorServicio: parseFloat(valorField.value),
+            precio: parseFloat(precioField.value),
+            cantidad: 1
+        };
+        
+        serviciosExternosSeleccionados.push(item);
+        renderServiciosExternos();
+        
+        // Limpiar campos
+        select.selectedIndex = 0;
+        companiaField.value = '';
+        valorField.value = '';
+        precioField.value = '';
+        calcularTotales();
+    });
+    
+    // Event listener para cambio en select de servicio externo
+    document.getElementById('servicioExternoSelect').addEventListener('change', function() {
+        const companiaField = document.getElementById('companiaExterna');
+        const valorField = document.getElementById('valorServicioExterno');
+        const precioField = document.getElementById('precioUsuarioExterno');
+        const option = this.options[this.selectedIndex];
+        
+        if (option.value) {
+            companiaField.value = option.dataset.empresa || '';
+            valorField.value = option.dataset.costo || '';
+            precioField.value = option.dataset.precio || '';
+        } else {
+            companiaField.value = '';
+            valorField.value = '';
+            precioField.value = '';
+        }
+    });
+    
+    // Render functions
+    function renderRepuestos() {
+        const container = document.getElementById('repuestosContainer');
+        container.innerHTML = '';
+        
+        if (repuestosSeleccionados.length === 0) {
+            container.innerHTML = '<div class="text-muted text-center py-3">No hay repuestos agregados</div>';
+            return;
+        }
+        
+        // Encabezado de la tabla que coincida con los campos de búsqueda
+        const header = document.createElement('div');
+        header.className = 'row bg-dark text-light py-2 mb-2 rounded repuestos-row';
+        header.innerHTML = `
+            <div class="col-lg-2 col-md-3"><strong>Part Number</strong></div>
+            <div class="col-lg-2 col-md-3"><strong>Nombre</strong></div>
+            <div class="col-lg-1 col-md-2 text-center"><strong>P.Compra</strong></div>
+            <div class="col-lg-1 col-md-2 text-center"><strong>P.Venta</strong></div>
+            <div class="col-lg-1 col-md-2 text-center"><strong>Stock</strong></div>
+            <div class="col-lg-1 col-md-3 text-center"><strong>Cantidad</strong></div>
+            <div class="col-lg-2 col-md-3 text-center"><strong>Total</strong></div>
+            <div class="col-lg-2 col-md-4 text-center"><strong>Acción</strong></div>
+        `;
+        container.appendChild(header);
+        
+        repuestosSeleccionados.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'row repuestos-row align-items-center py-2 border-bottom';
+            div.style.background = 'rgba(255, 255, 255, 0.05)';
+            div.style.borderRadius = '8px';
+            div.style.marginBottom = '4px';
+            div.style.position = 'relative';
+            
+            div.innerHTML = `
+                <div class="col-lg-2 col-md-3">
+                    <span class="badge bg-secondary">${item.part_number || 'N/A'}</span>
+                </div>
+                <div class="col-lg-2 col-md-3">
+                    <strong>${item.nombre}</strong>
+                </div>
+                <div class="col-lg-1 col-md-2 text-center">
+                    <small class="text-muted">$${parseFloat(item.precio_compra).toFixed(2)}</small>
+                </div>
+                <div class="col-lg-1 col-md-2">
+                    <input type="number" class="form-control form-control-sm" 
+                           value="${item.precio_venta}" 
+                           onchange="actualizarPrecioRepuesto(${index}, this.value)" 
+                           step="0.01" min="0" maxlength="5" style="max-width: 80px;">
+                </div>
+                <div class="col-lg-1 col-md-2 text-center">
+                    <small class="text-info">${item.stock_disponible}</small>
+                </div>
+                <div class="col-lg-1 col-md-3">
+                    <input type="number" class="form-control form-control-sm text-center" 
+                           value="${item.cantidad}" 
+                           onchange="actualizarCantidadRepuesto(${index}, this.value)" 
+                           min="1" max="${item.stock_disponible}" maxlength="3" style="max-width: 60px;">
+                </div>
+                <div class="col-lg-2 col-md-3 text-center">
+                    <strong class="text-success">$${(item.cantidad * item.precio_venta).toFixed(2)}</strong>
+                </div>
+                <div class="col-lg-2 col-md-4 text-center">
+                    <button class="btn btn-danger btn-sm" onclick="eliminarRepuesto(${index})" title="Eliminar repuesto">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+        
+        document.getElementById('repuestosData').value = JSON.stringify(repuestosSeleccionados);
+    }
+    
+    function renderServicios() {
+        const container = document.getElementById('serviciosContainer');
+        container.innerHTML = '';
+        
+        if (serviciosSeleccionados.length === 0) {
+            container.innerHTML = '<div class="text-muted text-center py-3">No hay servicios agregados</div>';
+            return;
+        }
+        
+        serviciosSeleccionados.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'linea-item';
+            const nuevoIcon = item.es_nuevo ? '<i class="fas fa-plus-circle me-1" style="color: #28a745;" title="Servicio nuevo"></i>' : '';
+            div.innerHTML = `
+                <div class="remove-item" onclick="eliminarServicio(${index})">
+                    <i class="fas fa-times"></i>
+                </div>
+                <div class="row">
+                    <div class="col-md-5">
+                        ${nuevoIcon}<strong>${item.nombre}</strong>
+                        ${item.es_nuevo ? '<br><small style="color: #28a745;">Servicio nuevo</small>' : ''}
+                    </div>
+                    <div class="col-md-2">
+                        <small>Cantidad:</small>
+                        <input type="number" class="form-control" value="${item.cantidad}" 
+                               onchange="actualizarCantidadServicio(${index}, this.value)" min="1" 
+                               maxlength="3" style="max-width: 60px;">
+                    </div>
+                    <div class="col-md-2">
+                        <small>Precio:</small>
+                        <input type="number" class="form-control" value="${item.precio}" 
+                               onchange="actualizarPrecioServicio(${index}, this.value)" step="0.01" min="0"
+                               maxlength="5" style="max-width: 90px;">
+                    </div>
+                    <div class="col-md-3 text-end">
+                        <small>Total:</small><br>
+                        <strong>$${(item.cantidad * item.precio).toFixed(2)}</strong>
+                    </div>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+        
+        document.getElementById('serviciosData').value = JSON.stringify(serviciosSeleccionados);
+    }
+    
+    function renderServiciosExternos() {
+        const container = document.getElementById('serviciosExternosContainer');
+        container.innerHTML = '';
+        
+        if (serviciosExternosSeleccionados.length === 0) {
+            container.innerHTML = '<div class="text-muted text-center py-3">No hay servicios externos agregados</div>';
+            return;
+        }
+        
+        serviciosExternosSeleccionados.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'linea-item';
+            div.innerHTML = `
+                <div class="remove-item" onclick="eliminarServicioExterno(${index})">
+                    <i class="fas fa-times"></i>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <strong>${item.nombre}</strong><br>
+                        <small style="color: var(--cyber-blue);"><i class="fas fa-building me-1"></i>${item.empresa}</small>
+                    </div>
+                    <div class="col-md-2">
+                        <small>Valor Servicio:</small><br>
+                        <strong>$${item.valorServicio.toFixed(2)}</strong>
+                    </div>
+                    <div class="col-md-2">
+                        <small>Precio Usuario:</small><br>
+                        <strong>$${item.precio.toFixed(2)}</strong>
+                    </div>
+                    <div class="col-md-2">
+                        <small>Cantidad:</small><br>
+                        <input type="number" class="form-control" value="${item.cantidad}" 
+                               onchange="actualizarCantidadServicioExterno(${index}, this.value)" min="1"
+                               maxlength="3" style="max-width: 60px;">
+                    </div>
+                    <div class="col-md-2 text-end">
+                        <small>Total:</small><br>
+                        <strong>$${(item.cantidad * item.precio).toFixed(2)}</strong>
+                    </div>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+        
+        document.getElementById('otrosServiciosData').value = JSON.stringify(serviciosExternosSeleccionados);
+    }
+    
+    // Funciones globales para eliminar y actualizar
+    window.eliminarRepuesto = function(index) {
+        repuestosSeleccionados.splice(index, 1);
+        renderRepuestos();
+        calcularTotales();
+    };
+    
+    window.eliminarServicio = function(index) {
+        serviciosSeleccionados.splice(index, 1);
+        renderServicios();
+        calcularTotales();
+    };
+    
+    window.eliminarServicioExterno = function(index) {
+        serviciosExternosSeleccionados.splice(index, 1);
+        renderServiciosExternos();
+        calcularTotales();
+    };
+    
+    window.actualizarCantidadRepuesto = function(index, cantidad) {
+        const nuevaCantidad = parseInt(cantidad) || 1;
+        const item = repuestosSeleccionados[index];
+        
+        // Verificar stock disponible
+        if (nuevaCantidad > item.stock_disponible) {
+            alert(`No hay suficiente stock. Disponible: ${item.stock_disponible}`);
+            renderRepuestos(); // Restaurar valor anterior
+            return;
+        }
+        
+        item.cantidad = nuevaCantidad;
+        item.total = item.cantidad * item.precio_venta;
+        renderRepuestos();
+        calcularTotales();
+    };
+    
+    window.actualizarPrecioRepuesto = function(index, precio) {
+        const nuevoPrecio = parseFloat(precio) || 0;
+        const item = repuestosSeleccionados[index];
+        item.precio_venta = nuevoPrecio;
+        item.total = item.cantidad * item.precio_venta;
+        renderRepuestos();
+        calcularTotales();
+    };
+    
+    window.actualizarCantidadServicio = function(index, cantidad) {
+        serviciosSeleccionados[index].cantidad = parseInt(cantidad) || 1;
+        renderServicios();
+        calcularTotales();
+    };
+    
+    window.actualizarPrecioServicio = function(index, precio) {
+        serviciosSeleccionados[index].precio = parseFloat(precio) || 0;
+        renderServicios();
+        calcularTotales();
+    };
+    
+    window.actualizarCantidadServicioExterno = function(index, cantidad) {
+        serviciosExternosSeleccionados[index].cantidad = parseInt(cantidad) || 1;
+        renderServiciosExternos();
+        calcularTotales();
+    };
+    
+    // Calcular totales
+    function calcularTotales() {
+        const subtotalRepuestos = repuestosSeleccionados.reduce((sum, item) => 
+            sum + (item.cantidad * item.precio_venta), 0);
+        
+        const subtotalServicios = serviciosSeleccionados.reduce((sum, item) => 
+            sum + (item.cantidad * item.precio), 0);
+        
+        const subtotalServiciosExternos = serviciosExternosSeleccionados.reduce((sum, item) => 
+            sum + (item.cantidad * item.precio), 0);
+        
+        const subtotal = subtotalRepuestos + subtotalServicios + subtotalServiciosExternos;
+        
+        const incluirImpuesto = incluirImpuestoCheck.checked;
+        const tasaImpuesto = {% if empresa.pais == 'US' %}0.085{% else %}0.19{% endif %};
+        const impuesto = incluirImpuesto ? subtotal * tasaImpuesto : 0;
+        const total = subtotal + impuesto;
+        
+        // Actualizar interfaz
+        document.getElementById('subtotalRepuestos').textContent = `$${subtotalRepuestos.toFixed(2)}`;
+        document.getElementById('subtotalServicios').textContent = `$${subtotalServicios.toFixed(2)}`;
+        document.getElementById('subtotalServiciosExternos').textContent = `$${subtotalServiciosExternos.toFixed(2)}`;
+        document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`;
+        document.getElementById('impuesto').textContent = `$${impuesto.toFixed(2)}`;
+        document.getElementById('total').textContent = `$${total.toFixed(2)}`;
+        
+        // Mostrar/ocultar línea de impuesto
+        document.getElementById('impuestoLine').style.display = incluirImpuesto ? 'flex' : 'none';
+    }
+    
+    // Event listener para cambio de impuesto
+    incluirImpuestoCheck.addEventListener('change', calcularTotales);
+    
+    // Ocultar resultados de búsqueda al hacer clic fuera
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.position-relative')) {
+            document.querySelectorAll('.search-results').forEach(el => {
+                el.style.display = 'none';
+            });
+        }
+    });
+    
+    // Al enviar el formulario, asegurarse de que los campos ocultos estén actualizados
+    const form = document.getElementById('documentoForm');
+    form.addEventListener('submit', function() {
+        document.getElementById('repuestosData').value = JSON.stringify(repuestosSeleccionados);
+        document.getElementById('serviciosData').value = JSON.stringify(serviciosSeleccionados);
+        document.getElementById('otrosServiciosData').value = JSON.stringify(serviciosExternosSeleccionados);
+    });
+    
+    // Enfocar automáticamente el campo de búsqueda de repuesto al cargar la página
+    buscarRepuesto.focus();
+});
+</script>
+{% endblock %}

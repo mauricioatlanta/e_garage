@@ -19,7 +19,8 @@
       <div class="flex items-center gap-3"><i class="fas fa-city text-lime-300"></i> <span class="font-bold">Ciudad:</span> {% if cliente.ciudad %}{{ cliente.ciudad.nombre }}{% endif %}</div>
     </div>
     <div class="mt-10 flex justify-end">
-      <a href="{% url 'clientes:lista_clientes' %}" class="cta-btn-premium px-8 py-3 rounded-2xl font-bold text-lg shadow-xl transition-all hover:scale-105">
+  {% url 'taller:clientes:lista_clientes' as url_lista_clientes %}
+  <a href="{{ url_lista_clientes|default:'#' }}" class="cta-btn-premium px-8 py-3 rounded-2xl font-bold text-lg shadow-xl transition-all hover:scale-105">
         <i class="fas fa-arrow-left mr-2"></i> Volver a la lista
       </a>
     </div>

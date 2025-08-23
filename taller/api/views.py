@@ -1,8 +1,9 @@
 from taller.models.extras_vehiculo import MotorVehiculo, CajaVehiculo
+from taller.models.marcas_usa import ModeloVehiculo
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 
 # Endpoint para búsqueda AJAX de motores por modelo
-@login_required
 def buscar_motores_api(request):
     # 🔒 FILTRO POR EMPRESA - Los motores no necesitan filtro por empresa (son globales)
     modelo_id = request.GET.get('modelo_id')
@@ -18,7 +19,6 @@ def buscar_motores_api(request):
     return JsonResponse(data, safe=False)
 
 # Endpoint para búsqueda AJAX de cajas por modelo
-@login_required
 def buscar_cajas_api(request):
     # 🔒 FILTRO POR EMPRESA - Las cajas no necesitan filtro por empresa (son globales)
     modelo_id = request.GET.get('modelo_id')
@@ -32,13 +32,11 @@ def buscar_cajas_api(request):
         } for c in cajas.order_by('nombre')[:100]
     ]
     return JsonResponse(data, safe=False)
-from taller.models.modelo import Modelo
 # Endpoint para búsqueda AJAX de modelos por marca
-@login_required
 def buscar_modelos_api(request):
     # 🔒 FILTRO POR EMPRESA - Los modelos no necesitan filtro por empresa (son globales)
     marca_id = request.GET.get('marca_id')
-    modelos = Modelo.objects.all()
+    modelos = ModeloVehiculo.objects.all()
     if marca_id:
         modelos = modelos.filter(marca_id=marca_id)
     data = [
@@ -61,7 +59,6 @@ def api_status(request):
     return JsonResponse({'status': 'ok', 'user': request.user.username})
 
 @csrf_exempt
-@require_POST
 @login_required
 def crear_tienda_api(request):
     # Obtener empresa del usuario
@@ -74,21 +71,39 @@ def crear_tienda_api(request):
             defaults={'nombre_taller': f'Taller de {request.user.username}'}
         )
     
-    data = json.loads(request.body)
-    nombre = data.get('nombre')
-    direccion = data.get('direccion', '')
-    telefono = data.get('telefono', '')
-    if not nombre:
-        return JsonResponse({'error': 'El nombre es obligatorio'}, status=400)
+    if request.method == 'GET':
+        # Devolver información sobre el endpoint para requests GET
+        return JsonResponse({
+            'message': 'API para crear tiendas',
+            'method': 'POST',
+            'required_fields': ['nombre'],
+            'optional_fields': ['direccion', 'telefono'],
+            'example': {
+                'nombre': 'Mi Tienda',
+                'direccion': 'Calle 123',
+                'telefono': '555-1234'
+            }
+        })
     
-    # Crear tienda asociada a la empresa del usuario
-    tienda = Tienda.objects.create(
-        nombre=nombre, 
-        direccion=direccion, 
-        telefono=telefono,
-        empresa=empresa  # 🔒 FILTRO EMPRESA
-    )
-    return JsonResponse({'id': tienda.pk, 'nombre': tienda.nombre})
+    elif request.method == 'POST':
+        data = json.loads(request.body)
+        nombre = data.get('nombre')
+        direccion = data.get('direccion', '')
+        telefono = data.get('telefono', '')
+        if not nombre:
+            return JsonResponse({'error': 'El nombre es obligatorio'}, status=400)
+        
+        # Crear tienda asociada a la empresa del usuario
+        tienda = Tienda.objects.create(
+            nombre=nombre, 
+            direccion=direccion, 
+            telefono=telefono,
+            empresa=empresa  # 🔒 FILTRO EMPRESA
+        )
+        return JsonResponse({'id': tienda.pk, 'nombre': tienda.nombre})
+    
+    else:
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
 
 # Endpoint para búsqueda AJAX de clientes
 @login_required

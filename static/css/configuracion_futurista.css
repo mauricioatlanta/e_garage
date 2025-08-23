@@ -1,0 +1,10 @@
+/* Estilos recuperados y sanitizados para la plantilla de configuración */
+body { background: linear-gradient(135deg,#050505 0%,#111111 100%); min-height:100vh; }
+.futuristic-bg { position: fixed; inset:0; z-index:-1; background: radial-gradient(circle at 20% 30%, rgba(80,80,80,0.08), transparent 50%), linear-gradient(135deg,#000,#121212); }
+.futuristic-form{ background:rgba(8,8,8,0.96); border-radius:1.5rem; padding:2rem; color:#ddd; font-family:'Orbitron', 'Share Tech Mono', sans-serif; }
+.futuristic-label{ color:#a8a8a8; font-weight:700; margin-bottom:0.4rem; display:block; }
+.futuristic-input{ background:#0d0d0d; color:#e8e8e8; border:1px solid #444; padding:0.7rem; border-radius:0.6rem; width:100%; }
+.futuristic-btn{ background:linear-gradient(135deg,#3b3b3b,#6b6b6b); color:#fff; padding:0.7rem 1.6rem; border-radius:0.7rem; border:none; cursor:pointer; }
+.config-section{ background:rgba(12,12,12,0.9); padding:1rem; border-radius:0.8rem; }
+.info-box{ background:rgba(18,18,18,0.85); padding:0.8rem; border-left:3px solid #5f5f5f; border-radius:0.5rem; }
+.preview img{ max-width:100%; max-height:220px; border-radius:8px; }

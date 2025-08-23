@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load i18n %}
+{% load widget_tweaks %}
 
 {% block content %}
 <div class="min-h-screen flex flex-col items-center justify-center bg-[#0d1117] py-12">
@@ -9,7 +10,8 @@
         <img src="{% static 'img/logo.png' %}" alt="E-Garage Logo" class="w-28 h-28 rounded-2xl shadow-2xl border-4 border-cyan-400 bg-[#181c1f] mb-2">
       <span class="text-3xl font-extrabold text-cyan-300 tracking-widest text-center">E-Garage</span>
     </div>
-    <p class="text-cyan-100 mb-6 text-center">{% trans "Accede a tu cuenta para gestionar tu taller con tecnología de punta." %}</p>
+  <p class="text-cyan-100 mb-6 text-center">{% trans "Accede a tu cuenta para gestionar tu taller con tecnología de punta." %}</p>
+  <p class="text-xs text-gray-500 mb-6 text-center">Versión: {{ APP_VERSION }}</p>
     <form method="post" class="w-full flex flex-col gap-4">
       {% csrf_token %}
       {{ form.non_field_errors }}
@@ -28,12 +30,15 @@
     <div class="mt-6 text-cyan-200 text-sm text-center">
       {% trans "¿No tienes cuenta?" %} <a href="/accounts/signup/" class="underline text-lime-400 hover:text-fuchsia-400 transition-all">{% trans "Regístrate aquí" %}</a>.
     </div>
+    <div class="mt-2 text-center">
+      <a href="/accounts/signup/" class="text-xs text-cyan-400 hover:underline">Solicita tu plan gratuito de 30 días</a>
+    </div>
     
     <!-- Créditos de Atlanta Reciclajes -->
     <div class="mt-8 pt-4 border-t border-cyan-700/30">
       <p class="text-center text-gray-500 text-xs">
         <strong class="text-cyan-400">eGarage AI™</strong> {% trans "desarrollado por" %} <strong class="text-cyan-400">Atlanta Reciclajes</strong><br>
-        RUT: 77.350.892-5 • <a href="mailto:suscripcion@atlantareciclajes.cl" class="text-cyan-400 hover:text-cyan-300 transition">suscripcion@atlantareciclajes.cl</a><br>
+  <a href="mailto:suscripcion@atlantareciclajes.cl" class="text-cyan-400 hover:text-cyan-300 transition">suscripcion@atlantareciclajes.cl</a><br>
         <a href="http://www.atlantareciclajes.cl" class="text-cyan-400 hover:text-cyan-300 transition">www.atlantareciclajes.cl</a>
       </p>
     </div>

@@ -1,7 +1,19 @@
+
+import re
 from django import template
 from django.forms.boundfield import BoundField
 
 register = template.Library()
+
+@register.filter(name='sin_pais')
+def sin_pais(value):
+    """
+    Elimina cualquier sufijo ' (País)' al final de la cadena, sin importar el país ni mayúsculas/minúsculas.
+    Ejemplo: 'Cadillac (Chile)' -> 'Cadillac', 'Ford (USA)' -> 'Ford'
+    """
+    if not isinstance(value, str):
+        return value
+    return re.sub(r'\s*\([^)]+\)$', '', value).strip()
 
 @register.filter
 def formatear_pesos(valor):
@@ -43,3 +55,61 @@ def add_class(field, css_class):
     if isinstance(field, BoundField):  # Verifica si el objeto es un campo de formulario
         return field.as_widget(attrs={"class": css_class})
     return field  # Devuelve el valor original si no es un campo de formulario
+
+@register.filter(name='add_thousands_separator')
+def add_thousands_separator(value):
+    """
+    Agrega separadores de miles a un número.
+    Ejemplo: 1234567 -> 1.234.567
+    """
+    try:
+        # Convertir a entero si es posible
+        if isinstance(value, (int, float)):
+            num = int(value)
+        else:
+            num = int(float(str(value)))
+        
+        # Formatear con separadores de miles usando punto
+        return "{:,}".format(num).replace(',', '.')
+    except (ValueError, TypeError):
+        return value
+
+@register.filter
+def currency_format(value, country_code='US'):
+    """
+    Formatea valores monetarios según el país:
+    - US: $2,000.25
+    - CL: $2.000 (sin decimales)
+    """
+    if value is None:
+        return "$0"
+    
+    try:
+        # Convertir a Decimal si no lo es
+        from decimal import Decimal
+        if isinstance(value, str):
+            value = Decimal(value)
+        elif not isinstance(value, Decimal):
+            value = Decimal(str(value))
+        
+        if country_code == 'US':
+            # Formato US: $2,000.25
+            return f"${value:,.2f}"
+        else:
+            # Formato CL: $2.000 (sin decimales)
+            return f"${value:,.0f}".replace(',', '.')
+    except (ValueError, TypeError):
+        return "$0"
+
+@register.filter
+def mileage_label(country_code, language='es'):
+    """
+    Retorna la etiqueta correcta para kilometraje/millas según país e idioma:
+    - US + es: Millas
+    - US + en: Miles  
+    - CL + cualquier: Kilometraje
+    """
+    if country_code == 'US':
+        return 'Miles' if language == 'en' else 'Millas'
+    else:
+        return 'Kilometraje'

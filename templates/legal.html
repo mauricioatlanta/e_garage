@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 py-10 text-gray-200">
+  <h1 class="text-2xl font-bold mb-6">Términos y Condiciones & Política de Privacidad</h1>
+  <p class="mb-6 text-sm text-gray-400">eGarage {{ APP_VERSION }} — {{ COPYRIGHT_TEXT }}</p>
+  <p class="mb-8 text-xs text-gray-400">Titular de los derechos: <strong>AtlantaReciclajes</strong></p>
+  <div class="space-y-8">
+    <section>
+      <h2 class="text-xl font-semibold text-cyan-300 mb-2">Términos y Condiciones</h2>
+      <p class="text-gray-300 text-sm mb-2">El uso de eGarage implica la aceptación de estos términos. El servicio se provee "tal cual" y puede cambiar sin previo aviso. El usuario es responsable de la veracidad de los datos ingresados y del uso adecuado de la plataforma.</p>
+      <ul class="list-disc list-inside text-gray-400 text-sm">
+        <li>No se permite el uso para actividades ilícitas.</li>
+        <li>La información ingresada es responsabilidad del usuario.</li>
+        <li>Nos reservamos el derecho de suspender cuentas por mal uso.</li>
+      </ul>
+    </section>
+    <section>
+      <h2 class="text-xl font-semibold text-cyan-300 mb-2">Política de Privacidad</h2>
+      <p class="text-gray-300 text-sm mb-2">Respetamos tu privacidad. Los datos personales se usan solo para la operación del sistema y no se comparten con terceros salvo obligación legal. Puedes solicitar la eliminación de tu cuenta y datos en cualquier momento.</p>
+      <ul class="list-disc list-inside text-gray-400 text-sm">
+        <li>Solo recolectamos datos necesarios para el funcionamiento.</li>
+        <li>No vendemos ni compartimos datos con terceros.</li>
+        <li>Puedes contactarnos para ejercer tus derechos ARCO.</li>
+      </ul>
+    </section>
+    <section>
+      <h2 class="text-lg font-semibold text-cyan-300 mb-2">Contacto Legal</h2>
+      <p class="text-gray-400 text-sm">Para consultas legales, escribe a <a href="mailto:suscripcion@atlantareciclajes.cl" class="text-cyan-400 hover:underline">suscripcion@atlantareciclajes.cl</a>.</p>
+    </section>
+  </div>
+</div>
+{% endblock %}

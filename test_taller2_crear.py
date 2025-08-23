@@ -90,25 +90,29 @@ def test_crear_documento_taller2():
     
     if response.status_code == 302:  # Redirect después de crear
         print(f"✅ Documento creado (redirect)")
-        
+
         # Verificar que el documento se creó con datos
-        from taller.models.documento import Documento, RepuestoDocumento, ServicioDocumento
+        from taller.models.documento import Documento
+        from taller.models.lineas_documento import LineaRepuesto, LineaServicio
+
         documento_creado = Documento.objects.filter(empresa=empresa_taller2).order_by('-id').first()
-        
+
         if documento_creado:
             print(f"📋 Documento creado: #{documento_creado.id} - {documento_creado.numero_documento}")
-            
-            repuestos = RepuestoDocumento.objects.filter(documento=documento_creado)
-            servicios = ServicioDocumento.objects.filter(documento=documento_creado)
-            
+
+            repuestos = LineaRepuesto.objects.filter(documento=documento_creado)
+            servicios = LineaServicio.objects.filter(documento=documento_creado)
+
             print(f"🔩 Repuestos: {repuestos.count()}")
             for rep in repuestos:
-                print(f"   - {rep.nombre}: ${rep.precio}")
-            
+                precio_r = getattr(rep, 'precio_unitario', getattr(rep, 'precio', 0))
+                print(f"   - {rep.nombre}: ${precio_r}")
+
             print(f"⚙️ Servicios: {servicios.count()}")
             for serv in servicios:
-                print(f"   - {serv.nombre}: ${serv.precio}")
-            
+                precio_s = getattr(serv, 'precio_unitario', getattr(serv, 'precio', 0))
+                print(f"   - {serv.nombre}: ${precio_s}")
+
             if repuestos.exists() or servicios.exists():
                 print(f"✅ ÉXITO: Documento tiene datos")
                 print(f"🔗 URL: http://127.0.0.1:8000/documentos/{documento_creado.id}/")

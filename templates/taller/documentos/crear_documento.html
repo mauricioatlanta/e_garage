@@ -114,21 +114,24 @@
       transform: scale(1.05);
     }
     .futurista-input, .futurista-select, .select2-container--default .select2-selection--single {
-      background: #181828;
-      color: #00f2fe;
-      border: 1.5px solid #7f00ff;
-      border-radius: 0.7rem;
-      padding: 0.5rem 1rem;
-      font-size: 1.08rem;
+      background: #1a1a2e !important;
+      color: #ffffff !important;
+      border: 2px solid #00f2fe !important;
+      border-radius: 0.7rem !important;
+      padding: 0.5rem 1rem !important;
+      font-size: 1.1rem !important;
+      font-weight: 600 !important;
       margin-bottom: 0.5rem;
       width: 100%;
-      box-shadow: 0 0 8px #7f00ff33;
-      transition: border 0.2s, box-shadow 0.2s;
+      box-shadow: 0 0 12px rgba(0, 242, 254, 0.4) !important;
+      transition: all 0.3s ease !important;
+      text-shadow: 0 0 4px rgba(0, 242, 254, 0.5) !important;
     }
     .futurista-input:focus, .futurista-select:focus, .select2-container--default .select2-selection--single:focus {
-      border-color: #00f2fe;
-      box-shadow: 0 0 16px #00f2fe99;
-      outline: none;
+      border-color: #ffffff !important;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.6) !important;
+      outline: none !important;
+      transform: scale(1.02) !important;
     }
     /* Estilos específicos para inputs dentro de tablas */
     .futurista-table input {
@@ -160,6 +163,50 @@
       padding: 0;
       margin: 0;
     }
+    
+    /* Estilos específicos para mejorar contraste del campo cliente */
+    #id_cliente + .select2-container .select2-selection--single {
+      background: #0d1421 !important;
+      border: 3px solid #00f2fe !important;
+      box-shadow: 0 0 15px rgba(0, 242, 254, 0.6) !important;
+      font-size: 1.2rem !important;
+      font-weight: 700 !important;
+      color: #ffffff !important;
+    }
+    
+    #id_cliente + .select2-container .select2-selection__rendered {
+      color: #ffffff !important;
+      font-weight: 700 !important;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8) !important;
+    }
+    
+    #id_cliente + .select2-container .select2-selection--single:hover {
+      border-color: #ffffff !important;
+      box-shadow: 0 0 25px rgba(255, 255, 255, 0.8) !important;
+      transform: scale(1.02) !important;
+    }
+    
+    /* Mejorar el dropdown del cliente */
+    .select2-dropdown {
+      background: #0d1421 !important;
+      border: 2px solid #00f2fe !important;
+      border-radius: 0.7rem !important;
+      box-shadow: 0 0 25px rgba(0, 242, 254, 0.7) !important;
+    }
+    
+    .select2-results__option {
+      background: #0d1421 !important;
+      color: #ffffff !important;
+      padding: 12px 16px !important;
+      font-weight: 600 !important;
+      border-bottom: 1px solid rgba(0, 242, 254, 0.2) !important;
+    }
+    
+    .select2-results__option--highlighted {
+      background: rgba(0, 242, 254, 0.3) !important;
+      color: #ffffff !important;
+      font-weight: 700 !important;
+    }
   </style>
 {% endblock %}
 
@@ -175,23 +222,7 @@
       </ul>
     </div>
   {% endif %}
-  <!-- Barra de navegación superior -->
-  <nav class="flex justify-between items-center px-8 py-4 bg-gradient-to-r from-[#0f2027] via-[#2c5364] to-[#1a2980] rounded-xl shadow-xl mb-8 border border-cyan-400" style="backdrop-filter: blur(8px);">
-    <div class="flex items-center gap-8">
-      <a href="/" class="text-cyan-400 font-extrabold text-2xl tracking-widest futuristic-logo animate-pulse">E-Garage</a>
-      <a href="/vehiculos/" class="nav-btn-future">Vehículos</a>
-      <a href="/clientes/" class="nav-btn-future">Clientes</a>
-      <a href="/dashboard/" class="nav-btn-future">Dashboard</a>
-      <a href="/documentos/" class="nav-btn-future">Documentos</a>
-    </div>
-    <div class="flex gap-4">
-      <a href="/vehiculos/" class="btn-cine-future">Lista Vehículos</a>
-      <a href="/repuestos/" class="btn-cine-future">Repuestos</a>
-      <a href="/clientes/" class="btn-cine-future">Clientes</a>
-      <a href="/dashboard/" class="btn-cine-future">Dashboard</a>
-      <a href="/documentos/" class="btn-cine-future">Documentos</a>
-    </div>
-  </nav>
+
   <div class="flex items-center justify-between mb-8">
     <div class="flex items-center gap-4">
       <img src="/media/TallerPro_logo.png" alt="Logo" class="h-14 w-14 rounded-full shadow-lg border-2 border-cyan-400 bg-white" style="background:#fff;">
@@ -214,34 +245,32 @@
     <div id="json-items-alert" style="background:#222;color:#0ff;padding:8px 12px;border-radius:8px;margin-bottom:10px;display:none;font-size:0.95rem;"></div>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
       <div>
-        <label class="futurista-label" for="id_tipo_documento">Tipo de Documento</label>
-        {{ form.tipo_documento|add_class:'futurista-input' }}
+        <label class="futurista-label" for="id_tipo">Tipo de Documento</label>
+        {{ form.tipo|add_class:'futurista-input' }}
       </div>
       <div>
-        <label class="futurista-label" for="id_numero_documento">Número</label>
-        {{ form.numero_documento|add_class:'futurista-input' }}
+        <label class="futurista-label" for="id_numero">Número</label>
+        {{ form.numero|add_class:'futurista-input' }}
       </div>
       <div>
-        <label class="futurista-label" for="id_fecha">Fecha</label>
-        {{ form.fecha|add_class:'futurista-input' }}
+        <label class="futurista-label" for="id_fecha_emision">Fecha</label>
+        {{ form.fecha_emision|add_class:'futurista-input' }}
       </div>
       <div>
         <label class="futurista-label" for="id_cliente">Cliente</label>
-        <select id="id_cliente" name="cliente" class="select2-ajax futurista-input"></select>
+        {{ form.cliente }}
       </div>
-      <div id="vehiculo-wrapper" class="hidden">
+      <div id="vehiculo-wrapper">
         <label class="futurista-label" for="id_vehiculo">Vehículo</label>
-        <select id="id_vehiculo" name="vehiculo" class="select2-ajax futurista-input">
-          <option value="">Seleccione cliente primero</option>
-        </select>
+        {{ form.vehiculo }}
         <div id="vehiculo-alerta" class="mt-1 text-sm text-red-600 hidden">
           ⚠️ Selecciona un cliente para ver sus vehículos.
         </div>
       </div>
       <div><label class="futurista-label" for="id_kilometraje">Kilometraje</label>{{ form.kilometraje|add_class:'futurista-input' }}</div>
-      <div><label class="futurista-label" for="id_mecanico">Mecánico</label>
+      <div><label class="futurista-label" for="id_mecanico">Técnico</label>
         <select id="id_mecanico" name="mecanico" class="futurista-input">
-          <option value="">-- Seleccionar mecánico --</option>
+          <option value="">-- Seleccionar técnico --</option>
           {% for mec in mecanicos %}
             <option value="{{ mec.id }}" {% if form.instance.mecanico and form.instance.mecanico.id == mec.id %}selected{% endif %}>
               {{ mec.nombre }}
@@ -316,6 +345,73 @@
       </div>
     </div>
 
+    <!-- Sección de Otros Servicios -->
+    <div class="mt-8">
+      <h2 class="futurista-label text-xl mb-2">Otros Servicios</h2>
+      
+      <table class="futurista-table mb-4" id="tabla-otros-servicios">
+        <thead>
+          <tr>
+            <th>Nombre del Servicio</th>
+            <th>Precio</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Los otros servicios se agregan dinámicamente -->
+        </tbody>
+        <tfoot>
+          <tr>
+            <td class="text-right font-bold futurista-label" colspan="1">Total otros servicios</td>
+            <td class="font-bold futurista-label" id="total-otros-servicios">$0</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+      
+      <div class="flex gap-2 mt-4">
+        <button class="btn-premium" onclick="agregarOtroServicio()" type="button">⚙️ Agregar Otro Servicio</button>
+        <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded" onclick="agregarOtroServicioEjemplo()" type="button">📋 Ejemplo</button>
+      </div>
+<script>
+// --- LÓGICA PARA OTROS SERVICIOS (igual a servicios) ---
+function agregarOtroServicio(nombre = '', precio = 0) {
+  const $tbody = $('#tabla-otros-servicios tbody');
+  const servicioId = 'otro_servicio_' + Date.now();
+  const $fila = $(`
+    <tr data-id="${servicioId}">
+      <td><input type="text" name="otros_servicios_nombre[]" value="${nombre}" class="futurista-input w-full nombre-otro-servicio-input bg-gray-900 text-white" autocomplete="off"></td>
+      <td><input type="number" name="otros_servicios_precio[]" value="${precio}" class="futurista-input w-full precio-otro-servicio-input bg-gray-900 text-white" step="1"></td>
+      <td><button type="button" class="btn-eliminar-otro-servicio text-red-400 hover:text-red-600">🗑️</button></td>
+    </tr>
+  `);
+  $tbody.append($fila);
+  // Eliminar fila
+  $fila.find('.btn-eliminar-otro-servicio').on('click', function() {
+    $fila.remove();
+    if (window.actualizarTotalesDocumento) window.actualizarTotalesDocumento();
+  });
+  // Actualizar totales al cambiar precio
+  $fila.find('.precio-otro-servicio-input').on('input', function() {
+    if (window.actualizarTotalesDocumento) window.actualizarTotalesDocumento();
+  });
+  // Autocompletado AJAX igual a servicios
+  $fila.find('.nombre-otro-servicio-input').autocomplete({
+    source: function(request, response) {
+      $.get('/documentos/api/buscar-otros-servicios/', { q: request.term }, function(data) {
+        response(data.servicios.map(s => s.nombre));
+      });
+    },
+    minLength: 2
+  });
+  if (window.actualizarTotalesDocumento) window.actualizarTotalesDocumento();
+}
+function agregarOtroServicioEjemplo() {
+  agregarOtroServicio('Asesoría Técnica', 25000);
+}
+</script>
+    </div>
+
     <div class="mt-8 max-w-xl mx-auto">
       <label class="block text-sm font-medium text-gray-700 mb-1" for="id_observaciones">Observaciones</label>
       {{ form.observaciones }}
@@ -326,12 +422,20 @@
       <h3 class="text-xl font-bold text-cyan-400 mb-4 text-center">💰 Resumen de Totales</h3>
       
       <!-- Totales por categoría -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div class="bg-gray-800 rounded-lg p-4 border border-gray-600">
           <h4 class="font-semibold text-yellow-400 mb-2">🔧 Servicios</h4>
           <div class="flex justify-between">
             <span class="futurista-label">Total servicios:</span>
             <span class="futurista-label font-bold" id="total-servicios-resumen">$0</span>
+          </div>
+        </div>
+        
+        <div class="bg-gray-800 rounded-lg p-4 border border-gray-600">
+          <h4 class="font-semibold text-purple-400 mb-2">⚙️ Otros Servicios</h4>
+          <div class="flex justify-between">
+            <span class="futurista-label">Total otros servicios:</span>
+            <span class="futurista-label font-bold" id="total-otros-servicios-resumen">$0</span>
           </div>
         </div>
         
@@ -382,9 +486,9 @@
 <script>
 $(document).ready(function () {
   /* 
-  // MECÁNICO: COMENTADO - Ahora usamos select clásico en lugar de Select2
+  // TÉCNICO: COMENTADO - Ahora usamos select clásico en lugar de Select2
   $('#id_mecanico').select2({
-    placeholder: 'Seleccionar mecánico existente o escribir nuevo...',
+    placeholder: 'Seleccionar técnico existente o escribir nuevo...',
     tags: true,
     allowClear: true,
     minimumInputLength: 0,  // Mostrar opciones sin escribir
@@ -407,7 +511,7 @@ $(document).ready(function () {
         if (!params.term) {
           results.unshift({
             id: '',
-            text: 'Seleccione un mecánico existente o escriba un nombre nuevo',
+            text: 'Seleccione un técnico existente o escriba un nombre nuevo',
             disabled: true
           });
         }
@@ -428,7 +532,7 @@ $(document).ready(function () {
     }
   });
 
-  // Al seleccionar un nuevo mecánico (no existente), crearlo vía AJAX
+  // Al seleccionar un nuevo técnico (no existente), crearlo vía AJAX
   $('#id_mecanico').on('select2:select', function (e) {
     var data = e.params.data;
     if (data.newTag) {
@@ -436,12 +540,12 @@ $(document).ready(function () {
       var nombreLimpio = data.text.replace(' ✨ (crear nuevo)', '');
       
       $.ajax({
-        url: '/documentos/api/crear_mecanico/',
+        url: '/documentos/api/crear_tecnico/',
         method: 'POST',
         data: { nombre: nombreLimpio },
         headers: { 'X-CSRFToken': $('[name=csrfmiddlewaretoken]').val() },
         success: function (resp) {
-          console.log('[MECÁNICO] Creado exitosamente:', resp);
+          console.log('[TÉCNICO] Creado exitosamente:', resp);
           // Elimina la opción temporal (texto plano)
           $('#id_mecanico option[value="' + data.id + '"]').remove();
           // Agrega la opción real con el ID de la base de datos
@@ -449,8 +553,8 @@ $(document).ready(function () {
           $('#id_mecanico').append(newOption).trigger('change');
         },
         error: function (xhr, status, error) {
-          console.error('[MECÁNICO] Error al crear:', error);
-          alert('Error al crear el mecánico: ' + (xhr.responseJSON?.error || error));
+          console.error('[TÉCNICO] Error al crear:', error);
+          alert('Error al crear el técnico: ' + (xhr.responseJSON?.error || error));
           // Revertir la selección en caso de error
           $('#id_mecanico').val(null).trigger('change');
         }
@@ -469,32 +573,57 @@ $(document).ready(function () {
   // Forzar el mismo alto y color que los inputs futuristas
   function estilizarSelect2() {
     $('.select2-selection--single').css({
-      'background': '#181828',
-      'color': '#00f2fe',
-      'border': '1.5px solid #7f00ff',
-      'border-radius': '0.7rem',
-      'padding': '0.5rem 1rem',
-      'font-size': '1.08rem',
-      'box-shadow': '0 0 8px #7f00ff33',
-      'min-height': '44px',
-      'height': '44px',
-      'display': 'flex',
-      'align-items': 'center'
+      'background': '#1a1a2e !important',
+      'color': '#ffffff !important',
+      'border': '2px solid #00f2fe !important',
+      'border-radius': '0.7rem !important',
+      'padding': '0.5rem 1rem !important',
+      'font-size': '1.1rem !important',
+      'font-weight': '600 !important',
+      'box-shadow': '0 0 12px rgba(0, 242, 254, 0.4) !important',
+      'min-height': '48px !important',
+      'height': '48px !important',
+      'display': 'flex !important',
+      'align-items': 'center !important'
     });
     $('.select2-selection__rendered').css({
-      'color': '#00f2fe',
-      'line-height': '44px',
-      'font-family': 'Orbitron, Montserrat, Arial, sans-serif'
+      'color': '#ffffff !important',
+      'line-height': '48px !important',
+      'font-family': 'Orbitron, Montserrat, Arial, sans-serif !important',
+      'font-weight': '600 !important',
+      'text-shadow': '0 0 4px rgba(0, 242, 254, 0.5) !important'
     });
     $('.select2-selection__arrow').css({
-      'height': '44px'
+      'height': '48px !important'
+    });
+    $('.select2-selection__arrow b').css({
+      'border-color': '#00f2fe transparent transparent transparent !important',
+      'border-width': '6px 6px 0 6px !important'
+    });
+    
+    // Mejorar dropdown
+    $('.select2-dropdown').css({
+      'background': '#1a1a2e !important',
+      'border': '2px solid #00f2fe !important',
+      'border-radius': '0.7rem !important',
+      'box-shadow': '0 0 20px rgba(0, 242, 254, 0.5) !important'
+    });
+    $('.select2-results__option').css({
+      'background': '#1a1a2e !important',
+      'color': '#ffffff !important',
+      'padding': '10px 15px !important',
+      'font-weight': '500 !important'
+    });
+    $('.select2-results__option--highlighted').css({
+      'background': 'rgba(0, 242, 254, 0.2) !important',
+      'color': '#00f2fe !important'
     });
   }
 
   $cliente.select2({
-    placeholder: 'Buscar cliente...',
+    placeholder: '🔍 Buscar cliente por nombre o teléfono...',
     ajax: {
-      url: '/autocomplete/cliente/',
+      url: '/documentos/autocomplete/cliente/',
       dataType: 'json',
       delay: 250,
       data: function (params) {
@@ -508,7 +637,18 @@ $(document).ready(function () {
     minimumInputLength: 1,
     width: '100%'
   });
-  $cliente.on('select2:open select2:close', estilizarSelect2);
+  $cliente.on('select2:open select2:close', function() {
+    estilizarSelect2();
+    // Aplicar estilos específicos del cliente
+    setTimeout(function() {
+      $('#id_cliente + .select2-container .select2-selection--single').css({
+        'background': '#0d1421 !important',
+        'border': '3px solid #00f2fe !important',
+        'box-shadow': '0 0 15px rgba(0, 242, 254, 0.6) !important',
+        'color': '#ffffff !important'
+      });
+    }, 50);
+  });
   estilizarSelect2();
 
   $vehiculo.select2({
@@ -547,7 +687,39 @@ $(document).ready(function () {
     
     if (clienteId) {
       $vehiculoWrapper.removeClass('hidden');
-      console.log('Mostrando selector de vehículos');
+      console.log('Mostrando selector de vehículos y cargando lista...');
+      
+      // Cargar vehículos del cliente seleccionado usando URL relativa
+      const apiUrl = `api/vehiculos-cliente/?cliente_id=${clienteId}`;
+      
+      console.log('Calling relative API URL:', apiUrl);
+      
+      $.get(apiUrl)
+        .done(function(data) {
+          console.log('Vehículos recibidos:', data);
+          
+          // Limpiar y agregar opciones de vehículos
+          $vehiculo.empty();
+          $vehiculo.append('<option value="">Seleccione un vehículo</option>');
+          
+          if (data.vehiculos && data.vehiculos.length > 0) {
+            data.vehiculos.forEach(function(vehiculo) {
+              const texto = `${vehiculo.patente} - ${vehiculo.marca} ${vehiculo.modelo} (${vehiculo.anio})`;
+              $vehiculo.append(`<option value="${vehiculo.id}">${texto}</option>`);
+            });
+            console.log(`${data.vehiculos.length} vehículos cargados`);
+          } else {
+            $vehiculo.append('<option value="">No hay vehículos registrados</option>');
+            console.log('No se encontraron vehículos para este cliente');
+          }
+        })
+        .fail(function(xhr, status, error) {
+          console.error('Error al cargar vehículos:', error);
+          console.error('Status:', status);
+          console.error('Response:', xhr.responseText);
+          $vehiculo.empty();
+          $vehiculo.append('<option value="">Error al cargar vehículos</option>');
+        });
     } else {
       $vehiculoWrapper.addClass('hidden');
       console.log('Ocultando selector de vehículos');
@@ -863,7 +1035,7 @@ function agregarServicioATabla(nombre, precio = 0) {
       lastRow.querySelector('.partnumber-input').value = '{{ repuesto.codigo|escapejs }}';
       lastRow.querySelector('.nombre-input').value = '{{ repuesto.nombre|escapejs }}';
       lastRow.querySelector('.cantidad-input').value = {{ repuesto.cantidad }};
-      lastRow.querySelector('.precio-input').value = {{ repuesto.precio }};
+      lastRow.querySelector('.precio-input').value = {{ repuesto.precio_unitario }};
       if (window.actualizarTotalRepuestos) window.actualizarTotalRepuestos();
       console.log('[EDICIÓN] Repuesto cargado:', '{{ repuesto.nombre|escapejs }}');
     } else {
@@ -880,7 +1052,7 @@ function agregarServicioATabla(nombre, precio = 0) {
     const lastRow = document.querySelector('#tabla-servicios tbody tr:last-child');
     if (lastRow) {
       lastRow.querySelector('.nombre-servicio-input').value = '{{ servicio.nombre|escapejs }}';
-      lastRow.querySelector('.precio-servicio-input').value = {{ servicio.precio }};
+      lastRow.querySelector('.precio-servicio-input').value = {{ servicio.precio_unitario }};
       if (window.actualizarTotalServicios) window.actualizarTotalServicios();
       console.log('[EDICIÓN] Servicio cargado:', '{{ servicio.nombre|escapejs }}');
     } else {
@@ -947,6 +1119,21 @@ $('form').on('submit', function (e) {
         precio: precio,
       });
       console.log('[SUBMIT] Servicio agregado:', { nombre, precio });
+    }
+  });
+
+  // Procesar otros servicios
+  $('#tabla-otros-servicios tbody tr').each(function () {
+    const nombre = $(this).find('.nombre-otro-servicio-input').val() || '';
+    const precio = parseFloat($(this).find('.precio-otro-servicio-input').val()) || 0;
+    
+    if (nombre.trim() && precio > 0) {
+      items.push({
+        tipo: 'otro_servicio',
+        nombre: nombre.trim(),
+        precio: precio,
+      });
+      console.log('[SUBMIT] Otro servicio agregado:', { nombre, precio });
     }
   });
 
@@ -1017,6 +1204,151 @@ $('form').on('submit', function (e) {
   
   console.log('[SUBMIT] Formulario listo para envío');
 });
+
+
+// --- MODAL Y LÓGICA PARA OTROS SERVICIOS ---
+let otrosServiciosSeleccionados = [];
+
+function abrirModalOtrosServicios() {
+  $('#modal-otros-servicios').removeClass('hidden');
+  $('#buscar-otros-servicios').val('');
+  $('#resultados-busqueda-otros').empty();
+  otrosServiciosSeleccionados = [];
+}
+
+function cerrarModalOtrosServicios() {
+  $('#modal-otros-servicios').addClass('hidden');
+}
+
+$('#buscar-otros-servicios').on('input', function() {
+  const query = $(this).val();
+  if (query.length < 2) {
+    $('#resultados-busqueda-otros').empty();
+    return;
+  }
+  $.get('/documentos/api/buscar-otros-servicios/', { q: query })
+    .done(function(data) {
+      mostrarResultadosBusquedaOtros(data.servicios);
+    })
+    .fail(function() {
+      $('#resultados-busqueda-otros').html('<p class="text-red-400">Error al buscar otros servicios</p>');
+    });
+});
+
+function mostrarResultadosBusquedaOtros(servicios) {
+  const $resultados = $('#resultados-busqueda-otros');
+  $resultados.empty();
+  if (servicios.length === 0) {
+    $resultados.html('<p class="text-gray-400">No se encontraron otros servicios</p>');
+  } else {
+    servicios.forEach(servicio => {
+      const $servicio = $(`
+        <label class="flex items-center p-3 bg-gray-700 rounded hover:bg-gray-600 cursor-pointer">
+          <input type="checkbox" class="mr-3 accent-purple-400 otro-servicio-checkbox-busqueda" 
+                 value="${servicio.id}" data-nombre="${servicio.nombre}">
+          <div>
+            <span class="text-white font-medium">${servicio.nombre}</span>
+            <div class="text-sm text-gray-400">${servicio.subcategoria}</div>
+          </div>
+        </label>
+      `);
+      $resultados.append($servicio);
+    });
+    // Manejar selección
+    $('.otro-servicio-checkbox-busqueda').on('change', function() {
+      const servicioId = $(this).val();
+      const servicioNombre = $(this).data('nombre');
+      if ($(this).is(':checked')) {
+        if (!otrosServiciosSeleccionados.find(s => s.id === servicioId)) {
+          otrosServiciosSeleccionados.push({ id: servicioId, nombre: servicioNombre });
+        }
+      } else {
+        otrosServiciosSeleccionados = otrosServiciosSeleccionados.filter(s => s.id !== servicioId);
+      }
+    });
+  }
+}
+
+$('#confirmar-otros-servicios').off('click').on('click', function(e) {
+  e.preventDefault();
+  otrosServiciosSeleccionados.forEach(servicio => {
+    agregarOtroServicioATabla(servicio.nombre);
+  });
+  otrosServiciosSeleccionados = [];
+  cerrarModalOtrosServicios();
+});
+
+$('#crear-otro-servicio-rapido').off('click').on('click', function(e) {
+  e.preventDefault();
+  const nombre_es = prompt('Nombre del otro servicio (Español):');
+  if (!nombre_es) return;
+  const nombre_en = prompt('Nombre del otro servicio (Inglés):', nombre_es) || nombre_es;
+  const country = 'CL';
+  const subcat_code = 'especiales';
+  $.ajax({
+    url: '/documentos/api/crear-otro-servicio/',
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': $('[name=csrfmiddlewaretoken]').val(),
+      'Content-Type': 'application/json'
+    },
+    data: JSON.stringify({ nombre_es: nombre_es, nombre_en: nombre_en, country: country, subcat_code: subcat_code }),
+    success: function(data) {
+      if (data.success) {
+        agregarOtroServicioATabla(data.servicio.nombre);
+        alert('Otro servicio creado exitosamente');
+        cerrarModalOtrosServicios();
+      } else if (data.mensaje) {
+        agregarOtroServicioATabla(data.servicio.nombre);
+        alert(data.mensaje);
+        cerrarModalOtrosServicios();
+      } else if (data.error) {
+        alert(data.error);
+      }
+    },
+    error: function() {
+      alert('Error al crear el otro servicio');
+    }
+  });
+});
+
+function agregarOtroServicioEjemplo() {
+  agregarOtroServicioATabla('Asesoría Técnica', 25000);
+}
+
+function agregarOtroServicioATabla(nombre, precio = 0) {
+  const $tbody = $('#tabla-otros-servicios tbody');
+  const servicioId = 'otro_servicio_' + Date.now();
+  
+  const $fila = $(`
+    <tr data-id="${servicioId}">
+      <td><input type="text" name="otros_servicios_nombre[]" value="${nombre}" class="futurista-input w-full nombre-otro-servicio-input bg-gray-900 text-white" autocomplete="off"></td>
+      <td><input type="number" name="otros_servicios_precio[]" value="${precio}" class="futurista-input w-full precio-otro-servicio-input bg-gray-900 text-white" step="1"></td>
+      <td><button type="button" class="btn-eliminar-otro-servicio text-red-400 hover:text-red-600">🗑️</button></td>
+    </tr>
+  `);
+  
+  $tbody.append($fila);
+  
+  // Manejar eliminación
+  $fila.find('.btn-eliminar-otro-servicio').on('click', function() {
+    $fila.remove();
+    if (window.actualizarTotalesDocumento) {
+      window.actualizarTotalesDocumento();
+    }
+  });
+  
+  // Manejar cambio de precio
+  $fila.find('.precio-otro-servicio-input').on('input', function() {
+    if (window.actualizarTotalesDocumento) {
+      window.actualizarTotalesDocumento();
+    }
+  });
+  
+  if (window.actualizarTotalesDocumento) {
+    window.actualizarTotalesDocumento();
+  }
+}
 </script>
 
 <script src="{% static 'js/formulario_documento.js' %}"></script>

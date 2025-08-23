@@ -13,26 +13,22 @@ def api_servicios_por_categoria(request):
     
     for categoria in CategoriaServicio.objects.all().prefetch_related('subcategorias__servicios'):
         categoria_data = {
-            'id': categoria.id,
-            'nombre': categoria.nombre,
+            'id': categoria.pk,
+            'nombre': categoria.get_label('es'),
             'subcategorias': []
         }
-        
-        for subcategoria in categoria.subcategorias.all():
+        for subcategoria in getattr(categoria, 'subcategorias').all():
             subcategoria_data = {
-                'id': subcategoria.id,
-                'nombre': subcategoria.nombre,
+                'id': subcategoria.pk,
+                'nombre': subcategoria.get_label('es'),
                 'servicios': []
             }
-            
-            for servicio in subcategoria.servicios.all():
+            for servicio in getattr(subcategoria, 'servicios').all():
                 subcategoria_data['servicios'].append({
-                    'id': servicio.id,
-                    'nombre': servicio.nombre
+                    'id': servicio.pk,
+                    'nombre': servicio.get_label('es')
                 })
-            
             categoria_data['subcategorias'].append(subcategoria_data)
-        
         servicios_data.append(categoria_data)
     
     return JsonResponse({'categorias': servicios_data})
@@ -49,16 +45,17 @@ def api_buscar_servicios(request):
         return JsonResponse({'servicios': []})
     
     servicios = Servicio.objects.filter(
-        nombre__icontains=query
-    ).select_related('subcategoria__categoria')[:20]
+        names__label__icontains=query
+    ).select_related('subcategoria__categoria').distinct()[:20]
     
     servicios_data = []
     for servicio in servicios:
+        nombre = servicio.get_label('es')
         servicios_data.append({
             'id': servicio.id,
-            'nombre': servicio.nombre,
-            'subcategoria': servicio.subcategoria.nombre,
-            'categoria': servicio.subcategoria.categoria.nombre
+            'nombre': nombre,
+            'subcategoria': servicio.subcategoria.get_label('es'),
+            'categoria': servicio.subcategoria.categoria.get_label('es')
         })
     
     return JsonResponse({'servicios': servicios_data})
@@ -100,18 +97,18 @@ def api_crear_servicio_rapido(request):
             return JsonResponse({
                 'success': True,
                 'servicio': {
-                    'id': servicio.id,
-                    'nombre': servicio.nombre,
-                    'subcategoria': servicio.subcategoria.nombre
+                    'id': servicio.pk,
+                    'nombre': servicio.get_label('es'),
+                    'subcategoria': servicio.subcategoria.get_label('es')
                 }
             })
         else:
             return JsonResponse({
                 'success': True,
                 'servicio': {
-                    'id': servicio.id,
-                    'nombre': servicio.nombre,
-                    'subcategoria': servicio.subcategoria.nombre
+                    'id': servicio.pk,
+                    'nombre': servicio.get_label('es'),
+                    'subcategoria': servicio.subcategoria.get_label('es')
                 },
                 'mensaje': 'El servicio ya existía'
             })

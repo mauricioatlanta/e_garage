@@ -3,7 +3,7 @@ Views para Dashboard AI con visualizaciones futuristas
 Diferenciación por país con tecnología avanzada
 """
 
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -298,3 +298,12 @@ def real_time_metrics_api(request):
     }
     
     return JsonResponse(metrics)
+
+# Vista para el dashboard de suscriptor
+# Si tu modelo se llama Empresa, Cliente, Usuario, etc. cambia el nombre aquí
+
+def suscriptor_dashboard(request, pk):
+    # suscriptor = get_object_or_404(Suscriptor, pk=pk)
+    # return render(request, 'taller/suscriptor_dashboard.html', {'suscriptor': suscriptor})
+    # Ejemplo genérico:
+    return render(request, 'taller/suscriptor_dashboard.html', {'suscriptor_id': pk})

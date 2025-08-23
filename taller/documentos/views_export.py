@@ -24,7 +24,17 @@ from taller.utils.export_utils import (
 @require_http_methods(["GET"])
 def exportar_documento_pdf(request, documento_id):
     """Exporta un documento individual a PDF"""
-    documento = get_object_or_404(Documento, id=documento_id, empresa=request.user.perfilusuario.empresa)
+    # Obtener empresa del usuario a través del middleware
+    try:
+        empresa = request.user.empresa
+    except AttributeError:
+        from taller.models.empresa import Empresa
+        empresa, created = Empresa.objects.get_or_create(
+            user=request.user,
+            defaults={'nombre_taller': f'Taller de {request.user.username}'}
+        )
+    
+    documento = get_object_or_404(Documento, id=documento_id, empresa=empresa)
     
     try:
         exporter = DocumentoPDFExporter(documento)
@@ -48,7 +58,15 @@ def exportar_documento_pdf(request, documento_id):
 @require_http_methods(["GET"])
 def exportar_rentabilidad_excel(request):
     """Exporta reporte de rentabilidad a Excel"""
-    empresa = request.user.perfilusuario.empresa
+    # Obtener empresa del usuario a través del middleware
+    try:
+        empresa = request.user.empresa
+    except AttributeError:
+        from taller.models.empresa import Empresa
+        empresa, created = Empresa.objects.get_or_create(
+            user=request.user,
+            defaults={'nombre_taller': f'Taller de {request.user.username}'}
+        )
     
     # Obtener parámetros de fecha
     fecha_inicio = request.GET.get('fecha_inicio')
@@ -74,7 +92,17 @@ def exportar_rentabilidad_excel(request):
 @require_http_methods(["POST"])
 def enviar_documento_whatsapp(request, documento_id):
     """Genera enlace de WhatsApp para enviar documento"""
-    documento = get_object_or_404(Documento, id=documento_id, empresa=request.user.perfilusuario.empresa)
+    # Obtener empresa del usuario a través del middleware
+    try:
+        empresa = request.user.empresa
+    except AttributeError:
+        from taller.models.empresa import Empresa
+        empresa, created = Empresa.objects.get_or_create(
+            user=request.user,
+            defaults={'nombre_taller': f'Taller de {request.user.username}'}
+        )
+    
+    documento = get_object_or_404(Documento, id=documento_id, empresa=empresa)
     
     try:
         # Verificar que el cliente tenga teléfono
@@ -123,7 +151,17 @@ Vehículo: {vehiculo_info}
 @require_http_methods(["POST"])
 def enviar_documento_email(request, documento_id):
     """Envía documento por email"""
-    documento = get_object_or_404(Documento, id=documento_id, empresa=request.user.perfilusuario.empresa)
+    # Obtener empresa del usuario a través del middleware
+    try:
+        empresa = request.user.empresa
+    except AttributeError:
+        from taller.models.empresa import Empresa
+        empresa, created = Empresa.objects.get_or_create(
+            user=request.user,
+            defaults={'nombre_taller': f'Taller de {request.user.username}'}
+        )
+    
+    documento = get_object_or_404(Documento, id=documento_id, empresa=empresa)
     
     try:
         data = json.loads(request.body)
@@ -182,7 +220,17 @@ def vista_impresion_documento(request, documento_id):
     """Vista optimizada para impresión de documento"""
     from django.shortcuts import render
     
-    documento = get_object_or_404(Documento, id=documento_id, empresa=request.user.perfilusuario.empresa)
+    # Obtener empresa del usuario a través del middleware
+    try:
+        empresa = request.user.empresa
+    except AttributeError:
+        from taller.models.empresa import Empresa
+        empresa, created = Empresa.objects.get_or_create(
+            user=request.user,
+            defaults={'nombre_taller': f'Taller de {request.user.username}'}
+        )
+    
+    documento = get_object_or_404(Documento, id=documento_id, empresa=empresa)
     
     # Calcular totales
     total_repuestos = sum(r.total for r in documento.repuestos.all())

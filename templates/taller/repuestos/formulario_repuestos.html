@@ -16,7 +16,8 @@
 <div class="max-w-6xl mx-auto cuadro">
   <div class="flex justify-between items-center mb-4">
     <h1 class="text-2xl font-bold">Repuestos Inteligentes</h1>
-    <a href="{% url 'repuestos:crear_repuesto' %}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow">
+  {% url 'taller:repuestos:crear_repuesto' as url_crear_repuesto %}
+  <a href="{{ url_crear_repuesto|default:'#' }}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow">
       Agregar Repuesto
     </a>
   </div>

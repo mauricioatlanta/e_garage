@@ -8,7 +8,8 @@ import django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings_sqlite')
 django.setup()
 
-from taller.models.documento import Documento, RepuestoDocumento, ServicioDocumento
+from taller.models.documento import Documento
+from taller.models.lineas_documento import LineaRepuesto, LineaServicio
 
 print('🔍 === VERIFICAR DOCUMENTO 41 ===')
 
@@ -23,20 +24,22 @@ try:
     print(f'   - Observaciones: {doc.observaciones}')
     
     # Verificar repuestos
-    repuestos = RepuestoDocumento.objects.filter(documento=doc)
+    repuestos = LineaRepuesto.objects.filter(documento=doc)
     print(f'\n📦 Repuestos ({repuestos.count()}):')
     for rep in repuestos:
-        print(f'   - {rep.codigo}: {rep.nombre} x{rep.cantidad} = ${rep.precio:,}')
+        precio_rep = getattr(rep, 'precio_unitario', getattr(rep, 'precio', 0))
+        print(f'   - {rep.codigo}: {rep.nombre} x{rep.cantidad} = ${precio_rep:,}')
     
     # Verificar servicios
-    servicios = ServicioDocumento.objects.filter(documento=doc)
+    servicios = LineaServicio.objects.filter(documento=doc)
     print(f'\n🔧 Servicios ({servicios.count()}):')
     for serv in servicios:
-        print(f'   - {serv.nombre} = ${serv.precio:,}')
+        precio_serv = getattr(serv, 'precio_unitario', getattr(serv, 'precio', 0))
+        print(f'   - {serv.nombre} = ${precio_serv:,}')
     
     # Calcular total
-    total_repuestos = sum(r.total for r in repuestos)
-    total_servicios = sum(s.precio for s in servicios)
+    total_repuestos = sum(getattr(r, 'precio_unitario', getattr(r, 'precio', 0)) * getattr(r, 'cantidad', 1) for r in repuestos)
+    total_servicios = sum(getattr(s, 'precio_unitario', getattr(s, 'precio', 0)) for s in servicios)
     total_documento = total_repuestos + total_servicios
     
     print(f'\n💰 Totales:')

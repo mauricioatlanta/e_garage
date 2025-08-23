@@ -12,7 +12,7 @@ from django.contrib.auth.models import User
 from taller.models.empresa import Empresa
 from taller.models.clientes import Cliente
 from taller.models.documento import Documento, RepuestoDocumento, ServicioDocumento
-from taller.models.mecanico import Mecanico
+from taller.models.tecnico import Mecanico
 from datetime import date
 import json
 
@@ -41,7 +41,7 @@ def crear_documento_taller2_directo():
     print(f"👤 Cliente: {cliente.nombre}")
     
     # 3. Obtener o crear mecánico
-    mecanico, _ = Mecanico.objects.get_or_create(nombre="Mecánico Taller2")
+    mecanico, _ = Tecnico.objects.get_or_create(nombre="Mecánico Taller2")
     print(f"🔧 Mecánico: {mecanico.nombre}")
     
     # 4. Crear documento

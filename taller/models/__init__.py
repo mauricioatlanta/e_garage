@@ -1,23 +1,22 @@
-from .repuesto import Repuesto
-from .empresa import Empresa
-from .trial import TrialRegistro
-from .comprobante_pago import ComprobantePago
-from .perfil_usuario import PerfilUsuario
-from .mecanico import Mecanico
+# Branding y configuración avanzada
+from .company_settings import CompanySettings, CompanySettingsHistory
 
-from .clientes import Cliente
-from .vehiculos import Vehiculo
+# Modelos base y mixins
+from .mixins import AuditMixin
+from .tecnico import Tecnico
+# from .tecnico import Tecnico as Mecanico  # alias legacy si es necesario
 
-# Modelos de ubicación USA
-from .ubicacion import Estado, Ciudad
+# Catálogo global
+from .catalogo import CatalogoModeloAuto
 
-# Modelos de vehículos USA  
-from .marcas_usa import MarcaVehiculo, ModeloVehiculo
+# Modelos principales
+from .documento import Documento
+from .configuracion import ConfiguracionEmpresa
+from .empresa import Empresa  # re-export para importaciones simples en tests
 
-# Exponer modelos principales para importación directa
-from .documento import Documento, RepuestoDocumento, ServicioDocumento
-from .auditoria import LogAuditoria
-from .notificacion import TipoNotificacion, NotificacionEnviada, ConfiguracionNotificacion, RecordatorioMantenimiento
+# Repuestos
+from .repuesto import Repuesto, CategoriaRepuesto
 
-from .venta import Venta
+# Líneas de documento
+from .lineas_documento import LineaRepuesto, LineaServicio, LineaOtroServicio
 

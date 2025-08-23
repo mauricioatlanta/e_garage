@@ -7,7 +7,7 @@ django.setup()
 
 from django.test import Client
 from django.contrib.auth.models import User
-from taller.models.mecanico import Mecanico
+from taller.models.tecnico import Mecanico
 import json
 
 def test_crear_mecanico_api():
@@ -37,7 +37,7 @@ def test_crear_mecanico_api():
         print(f"✅ Mecánico creado: ID {data['id']}, Nombre: {data['nombre']}")
         
         # Verificar que existe en base de datos
-        mecanico = Mecanico.objects.filter(id=data['id']).first()
+        mecanico = Tecnico.objects.filter(id=data['id']).first()
         if mecanico:
             print(f"✅ Verificado en BD: {mecanico.nombre}")
         else:
@@ -64,14 +64,14 @@ def test_crear_mecanico_api():
     print(f"📄 Response: {response3.content.decode()}")
     
     print("\n📋 RESUMEN:")
-    print(f"   Total mecánicos en BD: {Mecanico.objects.count()}")
-    for mec in Mecanico.objects.all():
+    print(f"   Total mecánicos en BD: {Tecnico.objects.count()}")
+    for mec in Tecnico.objects.all():
         print(f"   - ID {mec.id}: {mec.nombre}")
 
 def test_mecanicos_existentes():
     """Listar mecánicos existentes"""
     print("\n🔍 MECÁNICOS EXISTENTES:")
-    mecanicos = Mecanico.objects.all()
+    mecanicos = Tecnico.objects.all()
     if mecanicos.exists():
         for mec in mecanicos:
             print(f"   - ID {mec.id}: {mec.nombre}")

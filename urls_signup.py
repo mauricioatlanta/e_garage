@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views_signup
+import views_signup
 
 urlpatterns = [
     path('signup/', views_signup.signup_country_select, name='signup_country_select'),

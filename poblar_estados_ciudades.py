@@ -1,0 +1,127 @@
+import os
+import django
+
+# Inicializar Django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings')
+django.setup()
+
+from taller.models.ubicacion import Estado, Ciudad
+
+estados = [
+    {'nombre': 'California', 'codigo': 'CA'},
+    {'nombre': 'Texas', 'codigo': 'TX'},
+    {'nombre': 'Florida', 'codigo': 'FL'},
+    {'nombre': 'Georgia', 'codigo': 'GA'},
+    {'nombre': 'New York', 'codigo': 'NY'},
+    {'nombre': 'Illinois', 'codigo': 'IL'},
+    {'nombre': 'North Carolina', 'codigo': 'NC'},
+    {'nombre': 'Ohio', 'codigo': 'OH'},
+    {'nombre': 'Pennsylvania', 'codigo': 'PA'},
+    {'nombre': 'Arizona', 'codigo': 'AZ'},
+    {'nombre': 'Michigan', 'codigo': 'MI'},
+    {'nombre': 'New Jersey', 'codigo': 'NJ'},
+    {'nombre': 'Virginia', 'codigo': 'VA'},
+    {'nombre': 'Washington', 'codigo': 'WA'},
+    {'nombre': 'Massachusetts', 'codigo': 'MA'},
+    {'nombre': 'Tennessee', 'codigo': 'TN'},
+    {'nombre': 'Indiana', 'codigo': 'IN'},
+    {'nombre': 'Missouri', 'codigo': 'MO'},
+    {'nombre': 'Maryland', 'codigo': 'MD'},
+    {'nombre': 'Wisconsin', 'codigo': 'WI'},
+    {'nombre': 'Colorado', 'codigo': 'CO'},
+    {'nombre': 'Minnesota', 'codigo': 'MN'},
+    {'nombre': 'South Carolina', 'codigo': 'SC'},
+    {'nombre': 'Alabama', 'codigo': 'AL'},
+    {'nombre': 'Louisiana', 'codigo': 'LA'},
+    {'nombre': 'Kentucky', 'codigo': 'KY'},
+    {'nombre': 'Oregon', 'codigo': 'OR'},
+    {'nombre': 'Oklahoma', 'codigo': 'OK'},
+    {'nombre': 'Connecticut', 'codigo': 'CT'},
+    {'nombre': 'Iowa', 'codigo': 'IA'},
+]
+
+ciudades_por_estado = {
+    'California': ['Los Angeles', 'San Francisco', 'San Diego', 'Sacramento', 'San Jose', 'Fresno', 'Oakland', 'Long Beach', 'Bakersfield', 'Anaheim'],
+    'Texas': ['Houston', 'Dallas', 'Austin', 'San Antonio', 'Fort Worth', 'El Paso', 'Arlington', 'Corpus Christi', 'Plano', 'Laredo'],
+    'Florida': ['Miami', 'Orlando', 'Tampa', 'Jacksonville', 'St. Petersburg', 'Hialeah', 'Tallahassee', 'Fort Lauderdale', 'Port St. Lucie', 'Cape Coral'],
+    'Georgia': [
+        'Atlanta', 'Augusta', 'Columbus', 'Macon', 'Savannah', 'Athens', 'Sandy Springs', 'Roswell', 'Albany', 'Johns Creek',
+        'Warner Robins', 'Alpharetta', 'Marietta', 'Valdosta', 'Smyrna', 'Brookhaven', 'Dunwoody', 'Peachtree Corners', 'Gainesville', 'Newnan',
+        'Milton', 'Woodstock', 'Douglasville', 'Kennesaw', 'Stonecrest', 'East Point', 'Rome', 'Statesboro', 'Dalton', 'Griffin',
+        'Canton', 'LaGrange', 'Hinesville', 'Snellville', 'Pooler', 'Forest Park', 'Acworth', 'Cartersville', 'Sugar Hill', 'Conyers',
+        'Chamblee', 'Doraville', 'Norcross', 'Dacula', 'Decatur'
+    ],
+    'New York': ['New York City', 'Buffalo', 'Rochester', 'Yonkers', 'Syracuse', 'Albany', 'New Rochelle', 'Mount Vernon', 'Schenectady', 'Utica'],
+    'Illinois': ['Chicago', 'Aurora', 'Naperville', 'Joliet', 'Rockford', 'Springfield', 'Elgin', 'Peoria', 'Champaign', 'Waukegan'],
+    'North Carolina': ['Charlotte', 'Raleigh', 'Greensboro', 'Durham', 'Winston-Salem', 'Fayetteville', 'Cary', 'Wilmington', 'High Point', 'Concord'],
+    'Ohio': ['Columbus', 'Cleveland', 'Cincinnati', 'Toledo', 'Akron', 'Dayton', 'Parma', 'Canton', 'Youngstown', 'Lorain'],
+    'Pennsylvania': ['Philadelphia', 'Pittsburgh', 'Allentown', 'Erie', 'Reading', 'Scranton', 'Bethlehem', 'Lancaster', 'Harrisburg', 'York'],
+    'Arizona': ['Phoenix', 'Tucson', 'Mesa', 'Chandler', 'Scottsdale', 'Glendale', 'Gilbert', 'Tempe', 'Peoria', 'Surprise'],
+    'Michigan': ['Detroit', 'Grand Rapids', 'Warren', 'Sterling Heights', 'Ann Arbor', 'Lansing', 'Flint', 'Dearborn', 'Livonia', 'Troy'],
+    'New Jersey': ['Newark', 'Jersey City', 'Paterson', 'Elizabeth', 'Edison', 'Woodbridge', 'Lakewood', 'Toms River', 'Hamilton', 'Trenton'],
+    'Virginia': ['Virginia Beach', 'Norfolk', 'Chesapeake', 'Richmond', 'Newport News', 'Alexandria', 'Hampton', 'Roanoke', 'Portsmouth', 'Suffolk'],
+    'Washington': ['Seattle', 'Spokane', 'Tacoma', 'Vancouver', 'Bellevue', 'Kent', 'Everett', 'Renton', 'Yakima', 'Federal Way'],
+    'Massachusetts': ['Boston', 'Worcester', 'Springfield', 'Cambridge', 'Lowell', 'Brockton', 'New Bedford', 'Quincy', 'Lynn', 'Fall River'],
+    'Tennessee': ['Memphis', 'Nashville', 'Knoxville', 'Chattanooga', 'Clarksville', 'Murfreesboro', 'Jackson', 'Franklin', 'Johnson City', 'Bartlett'],
+    'Indiana': ['Indianapolis', 'Fort Wayne', 'Evansville', 'South Bend', 'Carmel', 'Fishers', 'Bloomington', 'Hammond', 'Gary', 'Lafayette'],
+    'Missouri': ['Kansas City', 'St. Louis', 'Springfield', 'Columbia', 'Independence', "Lee's Summit", "O'Fallon", 'St. Joseph', 'St. Charles', 'Blue Springs'],
+    'Maryland': ['Baltimore', 'Columbia', 'Germantown', 'Silver Spring', 'Waldorf', 'Glen Burnie', 'Ellicott City', 'Frederick', 'Dundalk', 'Rockville'],
+    'Wisconsin': ['Milwaukee', 'Madison', 'Green Bay', 'Kenosha', 'Racine', 'Appleton', 'Waukesha', 'Oshkosh', 'Eau Claire', 'West Allis'],
+    'Colorado': ['Denver', 'Colorado Springs', 'Aurora', 'Fort Collins', 'Lakewood', 'Thornton', 'Arvada', 'Westminster', 'Pueblo', 'Centennial'],
+    'Minnesota': ['Minneapolis', 'St. Paul', 'Rochester', 'Duluth', 'Bloomington', 'Brooklyn Park', 'Plymouth', 'St. Cloud', 'Eagan', 'Woodbury'],
+    'South Carolina': ['Charleston', 'Columbia', 'North Charleston', 'Mount Pleasant', 'Rock Hill', 'Greenville', 'Summerville', 'Sumter', 'Goose Creek', 'Hilton Head Island'],
+    'Alabama': ['Birmingham', 'Montgomery', 'Mobile', 'Huntsville', 'Tuscaloosa', 'Hoover', 'Dothan', 'Auburn', 'Decatur', 'Madison'],
+    'Louisiana': ['New Orleans', 'Baton Rouge', 'Shreveport', 'Lafayette', 'Lake Charles', 'Kenner', 'Bossier City', 'Monroe', 'Alexandria', 'Houma'],
+    'Kentucky': ['Louisville', 'Lexington', 'Bowling Green', 'Owensboro', 'Covington', 'Richmond', 'Georgetown', 'Florence', 'Hopkinsville', 'Elizabethtown'],
+    'Oregon': ['Portland', 'Eugene', 'Salem', 'Gresham', 'Hillsboro', 'Beaverton', 'Bend', 'Medford', 'Springfield', 'Corvallis'],
+    'Oklahoma': ['Oklahoma City', 'Tulsa', 'Norman', 'Broken Arrow', 'Lawton', 'Edmond', 'Moore', 'Midwest City', 'Enid', 'Stillwater'],
+    'Connecticut': ['Bridgeport', 'New Haven', 'Stamford', 'Hartford', 'Waterbury', 'Norwalk', 'Danbury', 'New Britain', 'West Hartford', 'Greenwich'],
+    'Iowa': ['Des Moines', 'Cedar Rapids', 'Davenport', 'Sioux City', 'Iowa City', 'Waterloo', 'Council Bluffs', 'Ames', 'West Des Moines', 'Dubuque'],
+}
+
+# Agregar más estados y ciudades
+ciudades_por_estado.update({
+    'Michigan': ['Detroit', 'Grand Rapids', 'Warren', 'Sterling Heights', 'Ann Arbor', 'Lansing', 'Flint', 'Dearborn', 'Livonia', 'Troy'],
+    'New Jersey': ['Newark', 'Jersey City', 'Paterson', 'Elizabeth', 'Edison', 'Woodbridge', 'Lakewood', 'Toms River', 'Hamilton', 'Trenton'],
+    'Virginia': ['Virginia Beach', 'Norfolk', 'Chesapeake', 'Richmond', 'Newport News', 'Alexandria', 'Hampton', 'Roanoke', 'Portsmouth', 'Suffolk'],
+    'Washington': ['Seattle', 'Spokane', 'Tacoma', 'Vancouver', 'Bellevue', 'Kent', 'Everett', 'Renton', 'Yakima', 'Federal Way'],
+    'Massachusetts': ['Boston', 'Worcester', 'Springfield', 'Cambridge', 'Lowell', 'Brockton', 'New Bedford', 'Quincy', 'Lynn', 'Fall River'],
+    'Tennessee': ['Memphis', 'Nashville', 'Knoxville', 'Chattanooga', 'Clarksville', 'Murfreesboro', 'Jackson', 'Franklin', 'Johnson City', 'Bartlett'],
+    'Indiana': ['Indianapolis', 'Fort Wayne', 'Evansville', 'South Bend', 'Carmel', 'Fishers', 'Bloomington', 'Hammond', 'Gary', 'Lafayette'],
+    'Missouri': ['Kansas City', 'St. Louis', 'Springfield', 'Columbia', 'Independence', "Lee's Summit", "O'Fallon", 'St. Joseph', 'St. Charles', 'Blue Springs'],
+    'Maryland': ['Baltimore', 'Columbia', 'Germantown', 'Silver Spring', 'Waldorf', 'Glen Burnie', 'Ellicott City', 'Frederick', 'Dundalk', 'Rockville'],
+    'Wisconsin': ['Milwaukee', 'Madison', 'Green Bay', 'Kenosha', 'Racine', 'Appleton', 'Waukesha', 'Oshkosh', 'Eau Claire', 'West Allis'],
+    'Colorado': ['Denver', 'Colorado Springs', 'Aurora', 'Fort Collins', 'Lakewood', 'Thornton', 'Arvada', 'Westminster', 'Pueblo', 'Centennial'],
+    'Minnesota': ['Minneapolis', 'St. Paul', 'Rochester', 'Duluth', 'Bloomington', 'Brooklyn Park', 'Plymouth', 'St. Cloud', 'Eagan', 'Woodbury'],
+    'South Carolina': ['Charleston', 'Columbia', 'North Charleston', 'Mount Pleasant', 'Rock Hill', 'Greenville', 'Summerville', 'Sumter', 'Goose Creek', 'Hilton Head Island'],
+    'Alabama': ['Birmingham', 'Montgomery', 'Mobile', 'Huntsville', 'Tuscaloosa', 'Hoover', 'Dothan', 'Auburn', 'Decatur', 'Madison'],
+    'Louisiana': ['New Orleans', 'Baton Rouge', 'Shreveport', 'Lafayette', 'Lake Charles', 'Kenner', 'Bossier City', 'Monroe', 'Alexandria', 'Houma'],
+    'Kentucky': ['Louisville', 'Lexington', 'Bowling Green', 'Owensboro', 'Covington', 'Richmond', 'Georgetown', 'Florence', 'Hopkinsville', 'Elizabethtown'],
+    'Oregon': ['Portland', 'Eugene', 'Salem', 'Gresham', 'Hillsboro', 'Beaverton', 'Bend', 'Medford', 'Springfield', 'Corvallis'],
+    'Oklahoma': ['Oklahoma City', 'Tulsa', 'Norman', 'Broken Arrow', 'Lawton', 'Edmond', 'Moore', 'Midwest City', 'Enid', 'Stillwater'],
+    'Connecticut': ['Bridgeport', 'New Haven', 'Stamford', 'Hartford', 'Waterbury', 'Norwalk', 'Danbury', 'New Britain', 'West Hartford', 'Greenwich'],
+    'Iowa': ['Des Moines', 'Cedar Rapids', 'Davenport', 'Sioux City', 'Iowa City', 'Waterloo', 'Council Bluffs', 'Ames', 'West Des Moines', 'Dubuque'],
+})
+
+def poblar_estados_ciudades():
+    # Crear estados
+    estado_objs = {}
+    for e in estados:
+        obj, created = Estado.objects.get_or_create(nombre=e['nombre'], codigo=e['codigo'])
+        estado_objs[e['nombre']] = obj
+    # Crear ciudades
+    for estado_nombre, ciudades in ciudades_por_estado.items():
+        estado_obj = estado_objs[estado_nombre]
+        for ciudad in ciudades:
+            Ciudad.objects.get_or_create(nombre=ciudad, estado=estado_obj)
+    print('Estados y ciudades creados correctamente.')
+
+# Para agregar una ciudad desde el frontend si no está en la lista:
+#
+# def agregar_ciudad(nombre_ciudad, estado_id):
+#     estado = Estado.objects.get(pk=estado_id)
+#     ciudad, created = Ciudad.objects.get_or_create(nombre=nombre_ciudad, estado=estado)
+#     return ciudad
+
+if __name__ == '__main__':
+    poblar_estados_ciudades()

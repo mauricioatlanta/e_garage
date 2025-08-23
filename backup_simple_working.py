@@ -14,7 +14,14 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings')
 django.setup()
 
 from django.contrib.auth.models import User
-from taller.models import Empresa, LogAuditoria, Documento, PerfilUsuario, Cliente, Vehiculo, Mecanico, Repuesto
+from taller.models.empresa import Empresa
+from taller.models.log import LogAuditoria
+from taller.models.documento import Documento
+from taller.models.perfil import PerfilUsuario
+from taller.models.cliente import Cliente
+from taller.models.vehiculo import Vehiculo
+from taller.models.tecnico import Tecnico
+from taller.models.repuesto import Repuesto
 
 # Configurar logging
 logging.basicConfig(
@@ -60,7 +67,7 @@ class BackupSimplificado:
             
             # Recopilar datos de la empresa
             from django.core import serializers
-            from taller.models import RepuestoDocumento, ServicioDocumento
+            from taller.models.lineas_documento import LineaRepuesto, LineaServicio
             
             backup_data = {
                 'empresa': {
@@ -82,7 +89,7 @@ class BackupSimplificado:
                 ('perfiles_usuario', PerfilUsuario.objects.filter(empresa=empresa)),
                 ('clientes', Cliente.objects.filter(empresa=empresa)),
                 ('vehiculos', Vehiculo.objects.filter(empresa=empresa)),
-                ('mecanicos', Mecanico.objects.filter(empresa=empresa)),
+                ('mecanicos', Tecnico.objects.filter(empresa=empresa)),
                 ('documentos', Documento.objects.filter(empresa=empresa)),
                 ('repuestos', Repuesto.objects.filter(empresa=empresa)),
             ]

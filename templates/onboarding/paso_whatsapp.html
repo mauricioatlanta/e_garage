@@ -516,11 +516,13 @@
             💬 Conectar WhatsApp Business
         </a>
         
-        <a href="{% url 'taller:dashboard_suscripciones' %}" class="btn-whatsapp btn-dashboard">
+    {% url 'taller:dashboard_suscripciones' as url_dashboard_suscripciones %}
+    <a href="{{ url_dashboard_suscripciones|default:'#' }}" class="btn-whatsapp btn-dashboard">
             🏠 Ir al Dashboard Principal
         </a>
         
-        <a href="{% url 'taller:ia:sugerencias_basicas' %}" class="btn-whatsapp" style="background: linear-gradient(45deg, var(--ai-orange), var(--electric-yellow));">
+    {% url 'taller:ia:sugerencias_basicas' as url_sugerencias_basicas %}
+    <a href="{{ url_sugerencias_basicas|default:'#' }}" class="btn-whatsapp" style="background: linear-gradient(45deg, var(--ai-orange), var(--electric-yellow));">
             🧠 Explorar IA Avanzada
         </a>
     </div>

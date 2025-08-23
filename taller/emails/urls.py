@@ -3,7 +3,7 @@ URLs para el sistema de emails de eGarage
 """
 
 from django.urls import path
-from taller.views.email_views import test_email_view, verificar_smtp_api
+from taller.views_extra.email_views import test_email_view, verificar_smtp_api
 
 app_name = 'emails'
 

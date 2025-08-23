@@ -1,0 +1,1146 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+{% load documento_filters %}
+
+{% block title %}{% trans "Crear Documento" %} - eGarage{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --presupuesto-color: #4CAF50;
+        --orden-trabajo-color: #FF9800;
+        --factura-color: #F44336;
+        --boleta-color: #2196F3;
+        --cyber-blue: #00d4ff;
+        --cyber-purple: #8a2be2;
+        --cyber-green: #39ff14;
+        --dark-bg: #0a0a0a;
+        --glass-bg: rgba(255, 255, 255, 0.05);
+    }
+
+    body {
+        background: linear-gradient(135deg, var(--dark-bg) 0%, #1a1a2e 50%, #16213e 100%);
+        color: #ffffff;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        min-height: 100vh;
+    }
+
+    .documento-container {
+        background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(138, 43, 226, 0.1) 100%);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(0, 212, 255, 0.3);
+        border-radius: 20px;
+        padding: 2rem;
+        margin: 2rem 0;
+        box-shadow: 0 0 30px rgba(0, 212, 255, 0.2);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .documento-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        transition: left 0.5s;
+    }
+
+    .documento-container:hover::before {
+        left: 100%;
+    }
+
+    .documento-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .documento-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(45deg, var(--cyber-blue), var(--cyber-purple));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+    }
+
+    .tipo-documento-selector {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .tipo-btn {
+        padding: 1rem 1.5rem;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 15px;
+        background: transparent;
+        color: rgba(255, 255, 255, 0.7);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        backdrop-filter: blur(5px);
+        min-width: 150px;
+        text-align: center;
+    }
+
+    .tipo-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .tipo-nombre {
+        font-size: 0.95rem;
+        font-weight: 600;
+    }
+
+    .tipo-numero {
+        font-size: 0.8rem;
+        opacity: 0.8;
+        font-family: 'Courier New', monospace;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 0.2rem 0.5rem;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .tipo-btn:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .tipo-btn.active {
+        color: white;
+        box-shadow: 0 0 20px currentColor;
+        border-color: currentColor;
+    }
+
+    .tipo-btn.presupuesto.active {
+        border-color: var(--presupuesto-color);
+        color: var(--presupuesto-color);
+        background: rgba(76, 175, 80, 0.1);
+    }
+
+    .tipo-btn.orden-trabajo.active {
+        border-color: var(--orden-trabajo-color);
+        color: var(--orden-trabajo-color);
+        background: rgba(255, 152, 0, 0.1);
+    }
+
+    .tipo-btn.factura.active {
+        border-color: var(--factura-color);
+        color: var(--factura-color);
+        background: rgba(244, 67, 54, 0.1);
+    }
+
+    .tipo-btn.boleta.active {
+        border-color: var(--boleta-color);
+        color: var(--boleta-color);
+        background: rgba(33, 150, 243, 0.1);
+    }
+
+    .form-section {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        backdrop-filter: blur(10px);
+    }
+
+    .form-section h3 {
+        color: var(--cyber-blue);
+        margin-bottom: 1rem;
+        font-weight: 600;
+        border-bottom: 2px solid rgba(0, 212, 255, 0.3);
+        padding-bottom: 0.5rem;
+    }
+
+    .form-control {
+        background: rgba(0, 0, 0, 0.7) !important;
+        border: 1px solid rgba(0, 212, 255, 0.4) !important;
+        border-radius: 10px;
+        color: #ffffff !important;
+        padding: 0.75rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        background: rgba(0, 0, 0, 0.8) !important;
+        border-color: var(--cyber-blue) !important;
+        box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+        color: #ffffff !important;
+        outline: none;
+    }
+
+    .form-control::placeholder {
+        color: rgba(255, 255, 255, 0.6) !important;
+    }
+
+    .form-control option {
+        background: #000000 !important;
+        color: #ffffff !important;
+    }
+
+    .btn-cyber {
+        background: linear-gradient(45deg, var(--cyber-blue), var(--cyber-purple));
+        border: none;
+        border-radius: 10px;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .btn-cyber:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 212, 255, 0.4);
+    }
+
+    .linea-item {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        position: relative;
+    }
+
+    .remove-item {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(244, 67, 54, 0.2);
+        border: 1px solid #F44336;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: #F44336;
+        transition: all 0.3s ease;
+    }
+
+    .remove-item:hover {
+        background: rgba(244, 67, 54, 0.4);
+        transform: scale(1.1);
+    }
+
+    .totales-section {
+        background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(138, 43, 226, 0.1));
+        border: 2px solid rgba(0, 212, 255, 0.3);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-top: 2rem;
+    }
+
+    .search-container {
+        position: relative;
+    }
+
+    .search-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: rgba(0, 0, 0, 0.9);
+        border: 1px solid rgba(0, 212, 255, 0.4);
+        border-radius: 10px;
+        max-height: 200px;
+        overflow-y: auto;
+        z-index: 1000;
+        margin-top: 2px;
+    }
+
+    .dropdown-item {
+        padding: 0.75rem;
+        cursor: pointer;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        color: white;
+        transition: background 0.2s ease;
+    }
+
+    .dropdown-item:hover {
+        background: rgba(0, 212, 255, 0.2);
+    }
+
+    .search-result-item {
+        padding: 0.75rem;
+        cursor: pointer;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        color: white;
+        transition: background 0.2s ease;
+    }
+
+    .search-result-item:hover {
+        background: rgba(0, 212, 255, 0.2);
+    }
+
+    .search-result-item:last-child {
+        border-bottom: none;
+    }
+
+    .dropdown-item:last-child {
+        border-bottom: none;
+    }
+
+    .total-line {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .total-line:last-child {
+        border-bottom: none;
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--cyber-green);
+    }
+
+    .numero-preview {
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: all 0.3s ease;
+    }
+
+    .numero-preview.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .numero-preview .alert {
+        background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(138, 43, 226, 0.1));
+        border: 1px solid rgba(0, 212, 255, 0.3);
+        color: var(--cyber-blue);
+        border-radius: 10px;
+        backdrop-filter: blur(10px);
+    }
+
+    .tipo-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .tipo-numero {
+        font-size: 0.8rem;
+        opacity: 0.7;
+        font-weight: 500;
+    }
+
+    .search-results {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: rgba(0, 0, 0, 0.9);
+        border: 1px solid rgba(0, 212, 255, 0.3);
+        border-radius: 10px;
+        max-height: 200px;
+        overflow-y: auto;
+        z-index: 1000;
+        display: none;
+    }
+
+    .search-result-item {
+        padding: 0.75rem;
+        cursor: pointer;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        transition: background 0.3s ease;
+    }
+
+    .search-result-item:hover {
+        background: rgba(0, 212, 255, 0.2);
+    }
+
+    .kilometraje-input {
+        position: relative;
+    }
+
+    .kilometraje-input::after {
+        content: attr(data-unit);
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: rgba(255, 255, 255, 0.5);
+        pointer-events: none;
+    }
+
+    .numero-preview {
+        transition: all 0.3s ease;
+    }
+
+    .numero-preview .alert {
+        background: rgba(0, 212, 255, 0.1);
+        border: 1px solid rgba(0, 212, 255, 0.3);
+        border-left: 4px solid var(--cyber-blue);
+        color: white;
+        border-radius: 10px;
+        padding: 1rem;
+        margin: 0;
+    }
+
+    .numero-preview .alert i {
+        color: var(--cyber-blue);
+    }
+
+    @media (max-width: 768px) {
+        .tipo-documento-selector {
+            flex-direction: column;
+        }
+        
+        .tipo-btn {
+            min-width: auto;
+        }
+        
+        .documento-title {
+            font-size: 2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="documento-container">
+        <div class="documento-header">
+            <h1 class="documento-title">
+                <i class="fas fa-file-invoice me-3"></i>
+                {% trans "Crear Documento" %}
+            </h1>
+            <p style="color: rgba(255, 255, 255, 0.7);">
+                {% trans "Sistema integral de documentación para talleres" %}
+            </p>
+        </div>
+
+        <form id="documentoForm" method="post">
+            {% csrf_token %}
+            
+            <!-- Selector de Tipo de Documento -->
+            <div class="form-section">
+                <h3><i class="fas fa-tags me-2"></i>{% trans "Tipo de Documento" %}</h3>
+                <div class="tipo-documento-selector">
+                    {% for tipo in tipos_documento %}
+                    <div class="tipo-btn" 
+                         data-tipo="{{ tipo.value }}" 
+                         data-color="{{ tipo.color }}"
+                         data-numero="{{ tipo.numero_preview }}">
+                        <div class="tipo-content">
+                            <i class="fas fa-file-alt me-2"></i>
+                            <span class="tipo-nombre">{{ tipo.label }}</span>
+                            <small class="tipo-numero">{{ tipo.numero_preview }}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <input type="hidden" name="tipo" id="tipoDocumento" required>
+                <div id="numeroDocumentoPreview" class="numero-preview mt-3" style="display: none;">
+                    <div class="alert alert-info">
+                        <i class="fas fa-hashtag me-2"></i>
+                        <span>{% trans "Número de documento:" %}</span>
+                        <strong id="numeroDocumentoText"></strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información Básica -->
+            <div class="form-section">
+                <h3><i class="fas fa-info-circle me-2"></i>{% trans "Información Básica" %}</h3>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">{% trans "Fecha" %}</label>
+                        <input type="date" name="fecha" class="form-control" 
+                               value="{% now 'Y-m-d' %}" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">{% trans "Cliente" %}</label>
+                        <div class="search-container">
+                            <input type="text" class="form-control" id="clienteSearch" 
+                                   placeholder="🔍 Buscar cliente..." autocomplete="off">
+                            <select name="cliente" class="form-control" id="clienteSelect" required>
+                                <option value="">{% trans "Seleccionar cliente..." %}</option>
+                                {% for cliente in clientes %}
+                                <option value="{{ cliente.id }}" data-search="{{ cliente.nombre|lower }} {{ cliente.apellido|lower }}">
+                                    {{ cliente.nombre }} {{ cliente.apellido }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <div id="clienteDropdown" class="search-dropdown" style="display: none;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">{% trans "Técnico Responsable" %}</label>
+                        <select name="tecnico" class="form-control" id="tecnicoSelect">
+                            <option value="">{% trans "Seleccionar técnico..." %}</option>
+                            {% for tecnico in tecnicos %}
+                            <option value="{{ tecnico.id }}">{{ tecnico.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">{% trans "Vehículo" %}</label>
+                        <select name="vehiculo" class="form-control" id="vehiculoSelect">
+                            <option value="">{% trans "Seleccionar vehículo..." %}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">
+                            {% if empresa.pais == 'US' %}
+                                {% trans "Millaje" %}
+                            {% else %}
+                                {% trans "Kilometraje" %}
+                            {% endif %}
+                        </label>
+                        <div class="kilometraje-input" 
+                             data-unit="{% if empresa.pais == 'US' %}miles{% else %}km{% endif %}">
+                            <input type="number" name="kilometraje" class="form-control" 
+                                   placeholder="0" min="0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Repuestos -->
+            <div class="form-section">
+                <h3><i class="fas fa-cogs me-2"></i>{% trans "Repuestos" %}</h3>
+                <div class="row mb-3">
+                    <div class="col-md-8">
+                        <div class="position-relative">
+                            <input type="text" class="form-control" id="buscarRepuesto" 
+                                   placeholder="{% trans 'Buscar repuesto...' %}">
+                            <div class="search-results" id="repuestosResults"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="button" class="btn btn-cyber w-100" id="agregarRepuesto">
+                            <i class="fas fa-plus me-2"></i>{% trans "Agregar" %}
+                        </button>
+                    </div>
+                </div>
+                <div id="repuestosContainer"></div>
+            </div>
+
+            <!-- Servicios Internos -->
+            <div class="form-section">
+                <h3><i class="fas fa-wrench me-2"></i>{% trans "Servicios Internos" %}</h3>
+                <div class="row mb-3">
+                    <div class="col-md-8">
+                        <div class="position-relative">
+                            <input type="text" class="form-control" id="buscarServicio" 
+                                   placeholder="{% trans 'Buscar servicio...' %}">
+                            <div class="search-results" id="serviciosResults"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="button" class="btn btn-cyber w-100" id="agregarServicio">
+                            <i class="fas fa-plus me-2"></i>{% trans "Agregar" %}
+                        </button>
+                    </div>
+                </div>
+                <div id="serviciosContainer"></div>
+            </div>
+
+            <!-- Servicios Externos -->
+            <div class="form-section">
+                <h3><i class="fas fa-handshake me-2"></i>{% trans "Servicios Externos" %}</h3>
+                <div class="row mb-3">
+                    <div class="col-md-8">
+                        <select class="form-control" id="servicioExternoSelect">
+                            <option value="">{% trans "Seleccionar servicio externo..." %}</option>
+                            {% for servicio in servicios_externos %}
+                            <option value="{{ servicio.id }}" 
+                                    data-nombre="{{ servicio.nombre }}"
+                                    data-empresa="{{ servicio.empresa_externa }}"
+                                    data-precio="{{ servicio.precio_cliente }}">
+                                {{ servicio.nombre }} - {{ servicio.empresa_externa }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="button" class="btn btn-cyber w-100" id="agregarServicioExterno">
+                            <i class="fas fa-plus me-2"></i>{% trans "Agregar" %}
+                        </button>
+                    </div>
+                </div>
+                <div id="serviciosExternosContainer"></div>
+            </div>
+
+            <!-- Totales -->
+            <div class="totales-section">
+                <h3><i class="fas fa-calculator me-2"></i>{% trans "Resumen de Totales" %}</h3>
+                <div class="total-line">
+                    <span>{% trans "Subtotal Repuestos:" %}</span>
+                    <span id="subtotalRepuestos">$0.00</span>
+                </div>
+                <div class="total-line">
+                    <span>{% trans "Subtotal Servicios Internos:" %}</span>
+                    <span id="subtotalServicios">$0.00</span>
+                </div>
+                <div class="total-line">
+                    <span>{% trans "Subtotal Servicios Externos:" %}</span>
+                    <span id="subtotalServiciosExternos">$0.00</span>
+                </div>
+                <div class="total-line">
+                    <span>{% trans "Subtotal:" %}</span>
+                    <span id="subtotal">$0.00</span>
+                </div>
+                <!-- Checkbox para incluir impuestos -->
+                <div class="total-line">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="incluir_impuestos" name="incluir_impuestos" onchange="calcularTotales()">
+                        <label class="form-check-label" for="incluir_impuestos">
+                            {% if empresa.pais == 'US' %}
+                                {% trans "Incluir Tax" %}
+                            {% else %}
+                                {% trans "Incluir IVA" %}
+                            {% endif %}
+                        </label>
+                    </div>
+                </div>
+                <div class="total-line" id="impuestoLine">
+                    <span>
+                        {% if empresa.pais == 'US' %}
+                            {% trans "Tax (8.5%):" %}
+                        {% else %}
+                            {% trans "IVA (19%):" %}
+                        {% endif %}
+                    </span>
+                    <span id="impuesto">$0.00</span>
+                </div>
+                <div class="total-line">
+                    <span><strong>{% trans "TOTAL:" %}</strong></span>
+                    <span id="total"><strong>$0.00</strong></span>
+                </div>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-cyber me-3">
+                    <i class="fas fa-save me-2"></i>{% trans "Crear Documento" %}
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="history.back()">
+                    <i class="fas fa-times me-2"></i>{% trans "Cancelar" %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Hidden inputs para datos JSON -->
+<input type="hidden" name="repuestos_data" id="repuestosData">
+<input type="hidden" name="servicios_data" id="serviciosData">
+<input type="hidden" name="otros_servicios_data" id="otrosServiciosData">
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Variables globales
+    let repuestosSeleccionados = [];
+    let serviciosSeleccionados = [];
+    let serviciosExternosSeleccionados = [];
+    let selectedRepuesto = null;
+    
+    // Elementos del DOM
+    const tipoButtons = document.querySelectorAll('.tipo-btn');
+    const tipoInput = document.getElementById('tipoDocumento');
+    const clienteSelect = document.getElementById('clienteSelect');
+    const vehiculoSelect = document.getElementById('vehiculoSelect');
+    const incluirImpuestoCheck = document.getElementById('incluir_impuestos');
+    
+    // Selector de tipo de documento
+    tipoButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            tipoButtons.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            tipoInput.value = this.dataset.tipo;
+            
+            // Cambiar colores del tema
+            const color = this.dataset.color;
+            document.documentElement.style.setProperty('--current-doc-color', color);
+            
+            // Obtener número de documento via AJAX
+            obtenerNumeroDocumento(this.dataset.tipo, color);
+        });
+    });
+    
+    // Función para obtener el número de documento
+    function obtenerNumeroDocumento(tipo, color) {
+        const numeroText = document.getElementById('numeroDocumentoText');
+        const numeroContainer = document.getElementById('numeroDocumentoPreview');
+        
+        // Mostrar loading
+        numeroText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> {% trans "Generando..." %}';
+        numeroContainer.style.display = 'block';
+        
+        const countryPrefix = '{{ empresa.pais|lower }}';
+        fetch(`/${countryPrefix}/taller/documentos/api/obtener-numero-documento/?tipo=${encodeURIComponent(tipo)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.numero) {
+                    numeroText.textContent = data.numero;
+                    numeroContainer.classList.add('show');
+                    numeroContainer.style.borderColor = color;
+                    numeroContainer.querySelector('.alert').style.borderLeftColor = color;
+                } else if (data.error) {
+                    numeroText.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error';
+                    console.error('Error obteniendo número:', data.error);
+                }
+            })
+            .catch(error => {
+                numeroText.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error de conexión';
+                console.error('Error en la petición:', error);
+            });
+    }
+
+    // Funcionalidad del buscador de clientes
+    const clienteSearch = document.getElementById('clienteSearch');
+    const clienteDropdown = document.getElementById('clienteDropdown');
+    
+    // Obtener todas las opciones de clientes
+    const clienteOptions = Array.from(clienteSelect.options).slice(1); // Saltar la primera opción vacía
+    
+    clienteSearch.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase().trim();
+        
+        if (searchTerm.length === 0) {
+            clienteDropdown.style.display = 'none';
+            return;
+        }
+        
+        // Filtrar clientes
+        const filteredClientes = clienteOptions.filter(option => {
+            const searchData = option.getAttribute('data-search');
+            return searchData && searchData.includes(searchTerm);
+        });
+        
+        // Mostrar resultados
+        if (filteredClientes.length > 0) {
+            clienteDropdown.innerHTML = filteredClientes.map(option => `
+                <div class="search-result-item" data-value="${option.value}">
+                    <i class="fas fa-user me-2"></i>${option.text}
+                </div>
+            `).join('');
+            clienteDropdown.style.display = 'block';
+        } else {
+            clienteDropdown.innerHTML = '<div class="search-result-item">No se encontraron clientes</div>';
+            clienteDropdown.style.display = 'block';
+        }
+    });
+    
+    // Manejar selección de cliente
+    clienteDropdown.addEventListener('click', function(e) {
+        const item = e.target.closest('.search-result-item');
+        if (item && item.dataset.value) {
+            const clienteId = item.dataset.value;
+            const clienteText = item.textContent.replace('👤', '').trim();
+            
+            // Actualizar campos
+            clienteSearch.value = clienteText;
+            clienteSelect.value = clienteId;
+            clienteDropdown.style.display = 'none';
+            
+            // Cargar vehículos del cliente
+            cargarVehiculos(clienteId);
+        }
+    });
+    
+    // Ocultar dropdown al hacer clic fuera
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.search-container')) {
+            clienteDropdown.style.display = 'none';
+        }
+    });
+    
+    // Función para cargar vehículos del cliente seleccionado
+    function cargarVehiculos(clienteId) {
+        vehiculoSelect.innerHTML = '<option value="">{% trans "Cargando vehículos..." %}</option>';
+        
+        if (clienteId) {
+            const countryPrefix = '{{ empresa.pais|lower }}';
+            fetch(`/${countryPrefix}/taller/documentos/api/vehiculos-cliente/?cliente_id=${clienteId}`)
+                .then(response => response.json())
+                .then(data => {
+                    vehiculoSelect.innerHTML = '<option value="">{% trans "Seleccionar vehículo..." %}</option>';
+                    data.vehiculos.forEach(vehiculo => {
+                        const option = document.createElement('option');
+                        option.value = vehiculo.id;
+                        option.textContent = `${vehiculo.marca} ${vehiculo.modelo} ${vehiculo.año} - ${vehiculo.patente}`;
+                        vehiculoSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    vehiculoSelect.innerHTML = '<option value="">{% trans "Error cargando vehículos" %}</option>';
+                });
+        } else {
+            vehiculoSelect.innerHTML = '<option value="">{% trans "Seleccionar vehículo..." %}</option>';
+        }
+    }
+    
+    // Cargar vehículos cuando se selecciona cliente
+    clienteSelect.addEventListener('change', function() {
+        const clienteId = this.value;
+        vehiculoSelect.innerHTML = '<option value="">{% trans "Seleccionar vehículo..." %}</option>';
+        
+        if (clienteId) {
+            const countryPrefix = '{{ empresa.pais|lower }}';
+            fetch(`/${countryPrefix}/taller/documentos/api/vehiculos-cliente/?cliente_id=${clienteId}`)
+                .then(response => response.json())
+                .then(data => {
+                    data.vehiculos.forEach(vehiculo => {
+                        const option = document.createElement('option');
+                        option.value = vehiculo.id;
+                        option.textContent = `${vehiculo.marca} ${vehiculo.modelo} ${vehiculo.año} - ${vehiculo.patente}`;
+                        vehiculoSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    });
+    
+    // Búsqueda de repuestos
+    const buscarRepuesto = document.getElementById('buscarRepuesto');
+    const repuestosResults = document.getElementById('repuestosResults');
+    
+    buscarRepuesto.addEventListener('input', function() {
+        const query = this.value;
+        if (query.length < 2) {
+            repuestosResults.style.display = 'none';
+            return;
+        }
+        
+        fetch(`/taller/documentos/api/buscar-repuestos/?q=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(data => {
+                repuestosResults.innerHTML = '';
+                data.repuestos.forEach(repuesto => {
+                    const item = document.createElement('div');
+                    item.className = 'search-result-item';
+                    item.innerHTML = `
+                        <strong>${repuesto.nombre}</strong><br>
+                        <small>Precio: $${repuesto.precio_venta} | Stock: ${repuesto.stock}</small>
+                    `;
+                    item.addEventListener('click', function() {
+                        selectedRepuesto = repuesto;
+                        buscarRepuesto.value = repuesto.nombre;
+                        repuestosResults.style.display = 'none';
+                    });
+                    repuestosResults.appendChild(item);
+                });
+                repuestosResults.style.display = data.repuestos.length > 0 ? 'block' : 'none';
+            })
+            .catch(error => console.error('Error:', error));
+    });
+    
+    // Agregar repuesto
+    document.getElementById('agregarRepuesto').addEventListener('click', function() {
+        if (!selectedRepuesto) return;
+        
+        const item = {
+            id: selectedRepuesto.id,
+            nombre: selectedRepuesto.nombre,
+            precio: selectedRepuesto.precio_venta,
+            cantidad: 1
+        };
+        
+        repuestosSeleccionados.push(item);
+        renderRepuestos();
+        buscarRepuesto.value = '';
+        selectedRepuesto = null;
+        calcularTotales();
+    });
+    
+    // Búsqueda de servicios
+    const buscarServicio = document.getElementById('buscarServicio');
+    const serviciosResults = document.getElementById('serviciosResults');
+    let selectedServicio = null;
+    
+    buscarServicio.addEventListener('input', function() {
+        const query = this.value;
+        if (query.length < 2) {
+            serviciosResults.style.display = 'none';
+            return;
+        }
+        
+        fetch(`/taller/documentos/api/buscar-servicios-internos/?q=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(data => {
+                serviciosResults.innerHTML = '';
+                data.servicios.forEach(servicio => {
+                    const item = document.createElement('div');
+                    item.className = 'search-result-item';
+                    item.innerHTML = `
+                        <strong>${servicio.nombre}</strong><br>
+                        <small>Categoría: ${servicio.categoria__get_label || 'N/A'}</small>
+                    `;
+                    item.addEventListener('click', function() {
+                        selectedServicio = servicio;
+                        buscarServicio.value = servicio.nombre;
+                        serviciosResults.style.display = 'none';
+                    });
+                    serviciosResults.appendChild(item);
+                });
+                serviciosResults.style.display = data.servicios.length > 0 ? 'block' : 'none';
+            })
+            .catch(error => console.error('Error:', error));
+    });
+    
+    // Agregar servicio
+    document.getElementById('agregarServicio').addEventListener('click', function() {
+        if (!selectedServicio) return;
+        
+        const precio = prompt('Ingrese el precio del servicio:', '0');
+        if (!precio || isNaN(precio)) return;
+        
+        const item = {
+            id: selectedServicio.id,
+            nombre: selectedServicio.nombre,
+            precio: parseFloat(precio),
+            cantidad: 1
+        };
+        
+        serviciosSeleccionados.push(item);
+        renderServicios();
+        buscarServicio.value = '';
+        selectedServicio = null;
+        calcularTotales();
+    });
+    
+    // Agregar servicio externo
+    document.getElementById('agregarServicioExterno').addEventListener('click', function() {
+        const select = document.getElementById('servicioExternoSelect');
+        const option = select.options[select.selectedIndex];
+        
+        if (!option.value) return;
+        
+        const item = {
+            id: option.value,
+            nombre: option.dataset.nombre,
+            empresa: option.dataset.empresa,
+            precio: parseFloat(option.dataset.precio),
+            cantidad: 1
+        };
+        
+        serviciosExternosSeleccionados.push(item);
+        renderServiciosExternos();
+        select.selectedIndex = 0;
+        calcularTotales();
+    });
+    
+    // Render functions
+    function renderRepuestos() {
+        const container = document.getElementById('repuestosContainer');
+        container.innerHTML = '';
+        
+        repuestosSeleccionados.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'linea-item';
+            div.innerHTML = `
+                <div class="remove-item" onclick="eliminarRepuesto(${index})">
+                    <i class="fas fa-times"></i>
+                </div>
+                <div class="row">
+                    <div class="col-md-5">
+                        <strong>${item.nombre}</strong>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="number" class="form-control" value="${item.cantidad}" 
+                               onchange="actualizarCantidadRepuesto(${index}, this.value)" min="1">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="number" class="form-control" value="${item.precio}" 
+                               onchange="actualizarPrecioRepuesto(${index}, this.value)" step="0.01" min="0">
+                    </div>
+                    <div class="col-md-3 text-end">
+                        <strong>$${(item.cantidad * item.precio).toFixed(2)}</strong>
+                    </div>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+        
+        document.getElementById('repuestosData').value = JSON.stringify(repuestosSeleccionados);
+    }
+    
+    function renderServicios() {
+        const container = document.getElementById('serviciosContainer');
+        container.innerHTML = '';
+        
+        serviciosSeleccionados.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'linea-item';
+            div.innerHTML = `
+                <div class="remove-item" onclick="eliminarServicio(${index})">
+                    <i class="fas fa-times"></i>
+                </div>
+                <div class="row">
+                    <div class="col-md-5">
+                        <strong>${item.nombre}</strong>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="number" class="form-control" value="${item.cantidad}" 
+                               onchange="actualizarCantidadServicio(${index}, this.value)" min="1">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="number" class="form-control" value="${item.precio}" 
+                               onchange="actualizarPrecioServicio(${index}, this.value)" step="0.01" min="0">
+                    </div>
+                    <div class="col-md-3 text-end">
+                        <strong>$${(item.cantidad * item.precio).toFixed(2)}</strong>
+                    </div>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+        
+        document.getElementById('serviciosData').value = JSON.stringify(serviciosSeleccionados);
+    }
+    
+    function renderServiciosExternos() {
+        const container = document.getElementById('serviciosExternosContainer');
+        container.innerHTML = '';
+        
+        serviciosExternosSeleccionados.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'linea-item';
+            div.innerHTML = `
+                <div class="remove-item" onclick="eliminarServicioExterno(${index})">
+                    <i class="fas fa-times"></i>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <strong>${item.nombre}</strong><br>
+                        <small style="color: var(--cyber-blue);">${item.empresa}</small>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="number" class="form-control" value="${item.cantidad}" 
+                               onchange="actualizarCantidadServicioExterno(${index}, this.value)" min="1">
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <strong>$${(item.cantidad * item.precio).toFixed(2)}</strong>
+                    </div>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+        
+        document.getElementById('otrosServiciosData').value = JSON.stringify(serviciosExternosSeleccionados);
+    }
+    
+    // Funciones globales para eliminar y actualizar
+    window.eliminarRepuesto = function(index) {
+        repuestosSeleccionados.splice(index, 1);
+        renderRepuestos();
+        calcularTotales();
+    };
+    
+    window.eliminarServicio = function(index) {
+        serviciosSeleccionados.splice(index, 1);
+        renderServicios();
+        calcularTotales();
+    };
+    
+    window.eliminarServicioExterno = function(index) {
+        serviciosExternosSeleccionados.splice(index, 1);
+        renderServiciosExternos();
+        calcularTotales();
+    };
+    
+    window.actualizarCantidadRepuesto = function(index, cantidad) {
+        repuestosSeleccionados[index].cantidad = parseInt(cantidad) || 1;
+        renderRepuestos();
+        calcularTotales();
+    };
+    
+    window.actualizarPrecioRepuesto = function(index, precio) {
+        repuestosSeleccionados[index].precio = parseFloat(precio) || 0;
+        renderRepuestos();
+        calcularTotales();
+    };
+    
+    window.actualizarCantidadServicio = function(index, cantidad) {
+        serviciosSeleccionados[index].cantidad = parseInt(cantidad) || 1;
+        renderServicios();
+        calcularTotales();
+    };
+    
+    window.actualizarPrecioServicio = function(index, precio) {
+        serviciosSeleccionados[index].precio = parseFloat(precio) || 0;
+        renderServicios();
+        calcularTotales();
+    };
+    
+    window.actualizarCantidadServicioExterno = function(index, cantidad) {
+        serviciosExternosSeleccionados[index].cantidad = parseInt(cantidad) || 1;
+        renderServiciosExternos();
+        calcularTotales();
+    };
+    
+    // Calcular totales
+    function calcularTotales() {
+        const subtotalRepuestos = repuestosSeleccionados.reduce((sum, item) => 
+            sum + (item.cantidad * item.precio), 0);
+        
+        const subtotalServicios = serviciosSeleccionados.reduce((sum, item) => 
+            sum + (item.cantidad * item.precio), 0);
+        
+        const subtotalServiciosExternos = serviciosExternosSeleccionados.reduce((sum, item) => 
+            sum + (item.cantidad * item.precio), 0);
+        
+        const subtotal = subtotalRepuestos + subtotalServicios + subtotalServiciosExternos;
+        
+        const incluirImpuesto = incluirImpuestoCheck.checked;
+        const tasaImpuesto = {% if empresa.pais == 'US' %}0.085{% else %}0.19{% endif %};
+        const impuesto = incluirImpuesto ? subtotal * tasaImpuesto : 0;
+        const total = subtotal + impuesto;
+        
+        // Actualizar interfaz
+        document.getElementById('subtotalRepuestos').textContent = `$${subtotalRepuestos.toFixed(2)}`;
+        document.getElementById('subtotalServicios').textContent = `$${subtotalServicios.toFixed(2)}`;
+        document.getElementById('subtotalServiciosExternos').textContent = `$${subtotalServiciosExternos.toFixed(2)}`;
+        document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`;
+        document.getElementById('impuesto').textContent = `$${impuesto.toFixed(2)}`;
+        document.getElementById('total').textContent = `$${total.toFixed(2)}`;
+        
+        // Mostrar/ocultar línea de impuesto
+        document.getElementById('impuestoLine').style.display = incluirImpuesto ? 'flex' : 'none';
+    }
+    
+    // Event listener para cambio de impuesto
+    incluirImpuestoCheck.addEventListener('change', calcularTotales);
+    
+    // Ocultar resultados de búsqueda al hacer clic fuera
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.position-relative')) {
+            document.querySelectorAll('.search-results').forEach(el => {
+                el.style.display = 'none';
+            });
+        }
+    });
+});
+</script>
+{% endblock %}

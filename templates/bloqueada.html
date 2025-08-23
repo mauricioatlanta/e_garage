@@ -10,7 +10,8 @@
     </div>
     <div class="text-cyan-200 text-lg mt-2">{% trans "O escríbenos a" %} <a href="mailto:suscripcion@atlantareciclajes.cl" class="underline text-lime-400 hover:text-fuchsia-400 transition-all">suscripcion@atlantareciclajes.cl</a></div>
     </div>
-    <a href="/login/" class="cta-btn-outline py-3 px-10 rounded-xl font-bold text-xl shadow-xl transition-all">{% trans "Iniciar sesión" %}</a>
+  {% load country_url %}
+  <a href="{% country_url 'account_login' %}" class="cta-btn-outline py-3 px-10 rounded-xl font-bold text-xl shadow-xl transition-all">{% trans "Iniciar sesión" %}</a>
   </div>
 </div>
 {% endblock %}

@@ -437,7 +437,7 @@
           {{ form.vehiculo|add_class:"form-input" }}
         </div>
         <div class="form-group">
-          <label class="form-label">Mecánico:</label>
+          <label class="form-label">Técnico:</label>
           {{ form.mecanico|add_class:"form-input" }}
         </div>
       </div>
@@ -608,10 +608,17 @@
 
     <!-- Botones de acción -->
     <div style="text-align: center; margin-top: 3rem;">
-      <a href="{% url 'documentos:ver_documento' documento.id %}" 
+  {% if request.path|slice:":3" == "/cl" %}
+  <a href="{% url 'documentos_cl:ver_documento' documento_id=documento.id %}" 
          style="background: #666; color: #fff; padding: 1rem 2rem; border-radius: 1rem; text-decoration: none; margin-right: 1rem;">
         ← Cancelar
       </a>
+  {% else %}
+  <a href="{% url 'documentos_us:ver_documento' documento_id=documento.id %}" 
+         style="background: #666; color: #fff; padding: 1rem 2rem; border-radius: 1rem; text-decoration: none; margin-right: 1rem;">
+        ← Cancelar
+      </a>
+  {% endif %}
       <button type="submit" class="btn-guardar">💾 Guardar Cambios</button>
     </div>
   </form>
@@ -630,13 +637,13 @@ $(document).ready(function() {
   
   // Inicializar Select2 para los campos de selección
   $('#id_mecanico').select2({
-    placeholder: 'Seleccionar mecánico...',
+    placeholder: 'Seleccionar técnico...',
     allowClear: true,
     width: '100%',
     theme: 'default'
   });
   
-  // Asegurar que el mecánico select sea visible
+  // Asegurar que el técnico select sea visible
   $('#id_mecanico').next('.select2-container').css({
     'background': 'rgba(40, 40, 80, 0.95)',
     'border': '1px solid rgba(0, 242, 254, 0.5)',

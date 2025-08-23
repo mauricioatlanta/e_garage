@@ -2,133 +2,140 @@ from dal import autocomplete
 from django import forms
 from taller.models.vehiculos import Vehiculo
 from taller.models.extras_vehiculo import ColorVehiculo, MotorVehiculo, CajaVehiculo
-from taller.utils.pais_utils import get_marcas_por_pais, validar_patente_por_pais
+from django.urls import reverse_lazy
 
 
 class VehiculoForm(forms.ModelForm):
+
+    # Campos personalizados para USA (no ligados al modelo)
+    marca_usa = None
+    modelo_usa = None
+
+    def add_usa_fields(self):
+        """Agregar campos específicos para usuarios de USA"""
+        try:
+            from taller.models.catalogo import CatalogoModeloAuto
+            
+            # Verificar que el catálogo esté disponible
+            if CatalogoModeloAuto:
+                print('DEBUG: Agregando campos USA usando catálogo')
+                
+                # Obtener marcas del catálogo (get_marcas_activas retorna strings directamente)
+                marcas_list = list(CatalogoModeloAuto.get_marcas_activas())
+                marcas_choices = [(m, m) for m in marcas_list]
+                
+                # Campo de marca USA con Select2
+                self.fields['marca_usa'] = forms.ChoiceField(
+                    choices=[('', 'Select Brand...')] + marcas_choices,
+                    required=True,
+                    label='Brand (USA)',
+                    widget=forms.Select(attrs={
+                        'class': 'form-control select2',
+                        'id': 'id_marca_usa',
+                        'data-placeholder': 'Select brand...',
+                        'data-allow-clear': 'true'
+                    })
+                )
+                
+                # Campo de modelo USA (se carga dinámicamente via AJAX)
+                self.fields['modelo_usa'] = forms.CharField(
+                    required=True,
+                    label='Model (USA)',
+                    widget=forms.Select(attrs={
+                        'class': 'form-control select2',
+                        'id': 'id_modelo_usa',
+                        'data-placeholder': 'First select a brand...',
+                        'disabled': 'disabled',
+                        'data-allow-clear': 'true'
+                    })
+                )
+                
+                print(f'DEBUG: USA fields added - {len(marcas_choices)} marcas disponibles')
+            else:
+                print('DEBUG: CatalogoModeloAuto no disponible')
+                
+        except ImportError as e:
+            print(f'DEBUG: Error importing CatalogoModeloAuto: {e}')
+            # Fallback - podrías implementar campos básicos aquí si es necesario
+
+    # Años 2026 -> 1970 (pedido del usuario) 
     anio = forms.TypedChoiceField(
-        choices=[(str(y), str(y)) for y in range(2026, 1959, -1)],
+        choices=[(str(y), str(y)) for y in range(2026, 1969, -1)],
         coerce=int,
         label="Año"
     )
 
+
     def __init__(self, *args, **kwargs):
-        # Extraer el usuario del contexto
         self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
+        assert self.user is not None, "VehiculoForm requiere user=..."
+        empresa = getattr(self.user, 'empresa', None)
+        pais = (getattr(empresa, 'pais', None) or 'CL').strip().upper()
+
+        # Modificar el campo color para incluir la opción "Agregar nuevo"
+        from taller.models.extras_vehiculo import ColorVehiculo
+        colores_choices = [(str(c.id), c.nombre) for c in ColorVehiculo.objects.all()]
+        colores_choices.append(('__nuevo__', 'Agregar nuevo color...'))
         
-        # 🌎 Filtrar marcas según país del usuario
-        if self.user and hasattr(self.user, 'empresa'):
-            # Configurar queryset de marcas según país
-            if self.user.empresa.pais == 'US':
-                # Para USA, usar MarcaVehiculo
-                from taller.models.marcas_usa import MarcaVehiculo
-                marcas_disponibles = MarcaVehiculo.objects.filter(
-                    pais_origen='USA', 
-                    activa=True
-                ).order_by('nombre')
-                
-                # Actualizar widget para usar las marcas USA
-                self.fields['marca'].widget = autocomplete.ModelSelect2(
-                    url='vehiculos:autocomplete_marca_usa',
-                    attrs={
-                        'data-placeholder': 'Select a US vehicle brand...',
-                        'data-minimum-input-length': 0
-                    }
-                )
-            else:
-                # Para Chile, usar Marca tradicional
-                self.fields['marca'].widget = autocomplete.ModelSelect2(
-                    url='autocomplete:autocomplete_marca',
-                    attrs={
-                        'data-placeholder': 'Selecciona una marca chilena...',
-                        'data-minimum-input-length': 0
-                    }
-                )
-            
-            # 📋 Personalizar placeholder de patente según país
-            if self.user.empresa.pais == 'US':
-                self.fields['patente'].widget.attrs.update({
-                    'placeholder': 'License plate (e.g., ABC123)',
-                    'pattern': '[A-Z0-9]{2,8}',
-                    'title': 'US license plate format'
-                })
-            else:
-                self.fields['patente'].widget.attrs.update({
-                    'placeholder': 'Patente (ej: AA1234)',
-                    'pattern': '[A-Z]{2,4}[0-9]{2,4}',
-                    'title': 'Formato patente chilena'
-                })
+        # Cambiar a ChoiceField para permitir opciones personalizadas
+        from django import forms
+        self.fields['color'] = forms.ChoiceField(
+            choices=[('', '---------')] + colores_choices,
+            required=False,
+            widget=forms.Select(attrs={
+                'class': 'w-full px-4 py-2 rounded-xl bg-black/70 text-cyan-200 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400'
+            })
+        )
+
+        if pais == 'US':
+            self.add_usa_fields()
+            # Campos marca/modelo ya están excluidos del Meta, no necesitamos widgets
+        else:
+            # Chile: podríamos agregar campos marca/modelo dinámicamente aquí si fuera necesario
+            pass
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if self.user and hasattr(self.user, 'empresa') and self.user.empresa.pais == 'US':
+            # Asignar los valores seleccionados en los campos personalizados a los campos reales
+            marca_usa = cleaned_data.get('marca_usa')
+            modelo_usa = cleaned_data.get('modelo_usa')
+            if marca_usa:
+                cleaned_data['marca'] = marca_usa
+            if modelo_usa:
+                cleaned_data['modelo'] = modelo_usa
+        return cleaned_data
 
     def clean_patente(self):
-        """Validar formato de patente según país"""
-        patente = self.cleaned_data.get('patente', '').upper()
-        
-        if self.user and hasattr(self.user, 'empresa'):
-            pais = self.user.empresa.pais
-            if not validar_patente_por_pais(patente, pais):
-                if pais == 'US':
-                    raise forms.ValidationError(
-                        "Invalid US license plate format. Use letters and numbers (2-8 characters)."
-                    )
-                else:
-                    raise forms.ValidationError(
-                        "Formato de patente chilena inválido. Use formato AA1234 o ABCD12."
-                    )
-        
+        """Permitir cualquier formato de patente (sin restricción por país)"""
+        patente = self.cleaned_data.get('patente', '')
         return patente
+
+    def clean_color(self):
+        """Permitir la opción especial '__nuevo__' para agregar un color personalizado"""
+        color = self.cleaned_data.get('color')
+        
+        # Si es la opción especial para agregar nuevo color, validar que se proporcionó el nombre
+        if color == '__nuevo__':
+            return color  # Permitir esta opción especial
+        
+        return color
 
     class Meta:
         model = Vehiculo
-        fields = ['cliente', 'patente', 'marca', 'modelo', 'anio', 'color', 'vin', 'motor', 'caja']
+        # Excluir 'marca', 'modelo', 'empresa' y 'color' del ModelForm 
+        # Se manejan manualmente en la vista para permitir opciones personalizadas
+        exclude = ('marca', 'modelo', 'empresa', 'color')
         widgets = {
             'cliente': autocomplete.ModelSelect2(
-                url='vehiculos:autocomplete_cliente',
+                url=reverse_lazy('vehiculos:autocomplete_cliente'),
                 attrs={
                     'data-placeholder': 'Escribe para buscar o ver sugerencias...',
                     'data-minimum-input-length': 0
                 }
             ),
-            'marca': autocomplete.ModelSelect2(
-                url='autocomplete:autocomplete_marca',
-                attrs={
-                    'data-placeholder': 'Escribe para buscar o ver sugerencias...',
-                    'data-minimum-input-length': 0
-                }
-            ),
-            'modelo': autocomplete.ModelSelect2(
-                url='autocomplete:autocomplete_modelo',
-                forward=['marca'],
-                attrs={
-                    'data-placeholder': 'Escribe para buscar o ver sugerencias...',
-                    'data-minimum-input-length': 0
-                }
-            ),
-            'color': autocomplete.ModelSelect2(
-                url='vehiculos:autocomplete_color',
-                attrs={
-                    'data-placeholder': 'Selecciona o escribe un color...',
-                    'data-tags': 'true',
-                    'data-allow-clear': 'true',
-                    'data-minimum-input-length': 0
-                }
-            ),
-            'motor': autocomplete.ModelSelect2(
-                url='vehiculos:autocomplete_motor',
-                forward=['modelo'],
-                attrs={
-                    'data-placeholder': 'Escribe para buscar o agregar un nuevo motor...',
-                    'data-minimum-input-length': 0,
-                    'data-tags': 'true'
-                }
-            ),
-            'caja': autocomplete.ModelSelect2(
-                url='vehiculos:autocomplete_caja',
-                forward=['modelo'],
-                attrs={
-                    'data-placeholder': 'Escribe para buscar o agregar una nueva caja...',
-                    'data-minimum-input-length': 0,
-                    'data-tags': 'true'
-                }
-            ),
+            # Widgets simplificados para motor/caja (evita dependencias DAL en entorno Chile básico)
+            'motor': forms.Select(),
+            'caja': forms.Select(),
         }

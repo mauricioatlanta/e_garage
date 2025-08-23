@@ -12,7 +12,7 @@ from email.mime.multipart import MIMEMultipart
 EMAIL_HOST = 'mail.atlantareciclajes.cl'
 EMAIL_PORT = 465
 EMAIL_HOST_USER = 'contacto@atlantareciclajes.cl'
-EMAIL_HOST_PASSWORD = 'laila2013@'
+EMAIL_HOST_PASSWORD = ''  # Pega aquí la contraseña correcta del correo
 EMAIL_USE_SSL = True
 
 print("=" * 60)

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Lista de Documentos{% endblock %}
+{% block content %}
+<div class="container mx-auto py-8">
+  <h1 class="text-2xl font-bold mb-6">Lista de Documentos</h1>
+  <p>Este es un placeholder para la vista de lista de documentos. Personaliza este template según tus necesidades.</p>
+  <div class="mt-8 flex justify-end">
+    {% url 'documentos:crear_documento' as url_crear_doc %}
+    {% if not url_crear_doc %}
+      {% url 'taller:documentos:crear_documento' as url_crear_doc %}
+    {% endif %}
+    {% if not url_crear_doc %}
+      {% url 'chile:documentos:crear_documento' as url_crear_doc %}
+    {% endif %}
+    {% if url_crear_doc %}
+      <a href="{{ url_crear_doc }}" class="bg-cyan-500 hover:bg-lime-400 text-white font-bold px-6 py-3 rounded-xl shadow transition text-lg">
+        ➕ Crear Documento
+      </a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

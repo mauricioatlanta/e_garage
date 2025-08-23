@@ -13,7 +13,8 @@ django.setup()
 from django.contrib.auth.models import User
 from taller.models.perfilusuario import PerfilUsuario
 from taller.models.empresa import Empresa
-from taller.models.documento import Documento, RepuestoDocumento, ServicioDocumento
+from taller.models.documento import Documento
+from taller.models.lineas_documento import LineaRepuesto, LineaServicio
 
 print('🧪 === TEST CREACIÓN DOCUMENTOS TALLER2 ===')
 print()
@@ -35,21 +36,21 @@ try:
     print(f'✅ Documento creado: {doc_test.pk}')
     
     # Agregar repuesto
-    repuesto_test = RepuestoDocumento.objects.create(
+    repuesto_test = LineaRepuesto.objects.create(
         documento=doc_test,
         codigo="TEST001",
         nombre="Repuesto Test",
         cantidad=1,
-        precio=10000
+        precio_unitario=10000
     )
     print(f'✅ Repuesto creado: {repuesto_test.nombre}')
     
     # Agregar servicio
-    servicio_test = ServicioDocumento.objects.create(
+    servicio_test = LineaServicio.objects.create(
         empresa=perfil_taller2.empresa,
         documento=doc_test,
         nombre="Servicio Test",
-        precio=15000
+        precio_unitario=15000
     )
     print(f'✅ Servicio creado: {servicio_test.nombre}')
     
@@ -144,8 +145,8 @@ try:
                     docs_after = Documento.objects.filter(empresa__nombre_taller='Mecánica Express').order_by('-pk')
                     if docs_after.exists():
                         ultimo_doc = docs_after.first()
-                        repuestos = RepuestoDocumento.objects.filter(documento=ultimo_doc)
-                        servicios = ServicioDocumento.objects.filter(documento=ultimo_doc)
+                        repuestos = LineaRepuesto.objects.filter(documento=ultimo_doc)
+                        servicios = LineaServicio.objects.filter(documento=ultimo_doc)
                         print(f'   ✅ Último doc: {ultimo_doc.pk} - R:{repuestos.count()} S:{servicios.count()}')
                     else:
                         print('   ⚠️ No se encontraron documentos')
@@ -168,8 +169,8 @@ print()
 print('3️⃣ Verificar estado final...')
 docs_taller2 = Documento.objects.filter(empresa__nombre_taller='Mecánica Express').order_by('-pk')[:3]
 for doc in docs_taller2:
-    repuestos = RepuestoDocumento.objects.filter(documento=doc)
-    servicios = ServicioDocumento.objects.filter(documento=doc)
+    repuestos = LineaRepuesto.objects.filter(documento=doc)
+    servicios = LineaServicio.objects.filter(documento=doc)
     print(f'   Doc {doc.pk}: {doc.trabajo_solicitado[:20]} - R:{repuestos.count()} S:{servicios.count()}')
 
 print()

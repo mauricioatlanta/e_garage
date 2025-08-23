@@ -15,8 +15,9 @@ from taller.models.clientes import Cliente
 from taller.models.vehiculos import Vehiculo
 from taller.models.marca import Marca
 from taller.models.modelo import Modelo
-from taller.models.mecanico import Mecanico
-from taller.models.documento import Documento, RepuestoDocumento, ServicioDocumento
+from taller.models.tecnico import Tecnico
+from taller.models.documento import Documento
+from taller.models.lineas_documento import LineaRepuesto, LineaServicio
 import json
 
 print("=== TEST CREAR DOCUMENTO VÍA WEB ===")
@@ -68,7 +69,7 @@ vehiculo, _ = Vehiculo.objects.get_or_create(
     }
 )
 
-mecanico, _ = Mecanico.objects.get_or_create(nombre="Mecánico Web")
+mecanico, _ = Tecnico.objects.get_or_create(nombre="Mecánico Web")
 
 print(f"🏢 Empresa: {empresa.nombre_taller}")
 print(f"👤 Cliente: {cliente.nombre}")
@@ -118,20 +119,23 @@ if response.status_code == 302:
     # Verificar que se creó el documento
     ultimo_doc = Documento.objects.order_by('-id').first()
     if ultimo_doc:
-        print(f"   📄 Último documento: {ultimo_doc.numero_documento}")
-        
+        titulo = getattr(ultimo_doc, 'numero_documento', getattr(ultimo_doc, 'numero', str(ultimo_doc.pk)))
+        print(f"   📄 Último documento: {titulo}")
+
         # Verificar repuestos y servicios
-        repuestos = RepuestoDocumento.objects.filter(documento=ultimo_doc)
-        servicios = ServicioDocumento.objects.filter(documento=ultimo_doc)
-        
+        repuestos = LineaRepuesto.objects.filter(documento=ultimo_doc)
+        servicios = LineaServicio.objects.filter(documento=ultimo_doc)
+
         print(f"   🔧 Repuestos creados: {repuestos.count()}")
         for rep in repuestos:
-            print(f"      - {rep.nombre}: ${rep.precio} x {rep.cantidad}")
-            
+            precio_r = getattr(rep, 'precio_unitario', getattr(rep, 'precio', 0))
+            print(f"      - {rep.nombre}: ${precio_r} x {rep.cantidad}")
+
         print(f"   ⚙️ Servicios creados: {servicios.count()}")
         for serv in servicios:
-            print(f"      - {serv.nombre}: ${serv.precio}")
-            
+            precio_s = getattr(serv, 'precio_unitario', getattr(serv, 'precio', 0))
+            print(f"      - {serv.nombre}: ${precio_s}")
+
         if repuestos.count() == 0 and servicios.count() == 0:
             print("   ❌ PROBLEMA: Documento creado VACÍO")
         else:

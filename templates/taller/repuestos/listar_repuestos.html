@@ -3,22 +3,6 @@
 {% load humanize %}
 {% block content %}
 <div class="max-w-6xl mx-auto bg-gradient-to-br from-[#0f2027] via-[#2c5364] to-[#1a2980] p-10 rounded-3xl shadow-2xl relative border border-cyan-400 backdrop-blur-xl" style="box-shadow: 0 0 60px 10px #00ffe7, 0 0 8px 2px #1a2980 inset;">
-  <!-- Barra de navegación superior -->
-  <nav class="flex justify-between items-center px-8 py-4 bg-gradient-to-r from-[#0f2027] via-[#2c5364] to-[#1a2980] rounded-xl shadow-xl mb-8 border border-cyan-400" style="backdrop-filter: blur(8px);">
-    <div class="flex items-center gap-8">
-      <a href="/" class="text-cyan-400 font-extrabold text-2xl tracking-widest futuristic-logo animate-pulse">E-Garage</a>
-      <a href="{% url 'vehiculos:lista_vehiculos' %}" class="nav-btn-future">Vehículos</a>
-      <a href="/clientes/" class="nav-btn-future">Clientes</a>
-      <a href="/dashboard/" class="nav-btn-future">Dashboard</a>
-    </div>
-    <div class="flex gap-4">
-      <a href="/" class="btn-cine-future">Inicio</a>
-      <a href="{% url 'vehiculos:lista_vehiculos' %}" class="btn-cine-future">Lista Vehículos</a>
-      <a href="/repuestos/" class="btn-cine-future">Repuestos</a>
-      <a href="/clientes/" class="btn-cine-future">Clientes</a>
-      <a href="/dashboard/" class="btn-cine-future">Dashboard</a>
-    </div>
-  </nav>
   <style>
     select, input[type="text"], input[type="number"], input, textarea {
       background: #111 !important;
@@ -135,7 +119,8 @@
     }
   </style>
   <h1 class="text-5xl font-black tracking-widest text-cyan-300 futuristic-title animate-gradient mb-8">Listado de Repuestos</h1>
-  <a href="{% url 'repuestos:crear_repuesto' %}" class="btn-cine-future mb-6">+ Agregar Repuesto</a>
+  {% url 'taller:repuestos:crear_repuesto' as url_crear_repuesto %}
+  <a href="{{ url_crear_repuesto|default:'#' }}" class="btn-cine-future mb-6">+ Agregar Repuesto</a>
   <div class="overflow-x-auto glassmorphism-box">
     <table class="futuristic-table">
       <thead>
@@ -159,8 +144,10 @@
           <td>{{ repuesto.stock }}</td>
           <td>{{ repuesto.tienda }}</td>
           <td>
-            <a href="{% url 'repuestos:editar_repuesto' repuesto.id %}" class="futuristic-action" title="Editar">✏️</a>
-            <a href="{% url 'repuestos:eliminar_repuesto' repuesto.id %}" class="futuristic-action" title="Eliminar">🗑️</a>
+            {% url 'taller:repuestos:editar_repuesto' repuesto.id as url_editar_repuesto %}
+            {% url 'taller:repuestos:eliminar_repuesto' repuesto.id as url_eliminar_repuesto %}
+            <a href="{{ url_editar_repuesto|default:'#' }}" class="futuristic-action" title="Editar">✏️</a>
+            <a href="{{ url_eliminar_repuesto|default:'#' }}" class="futuristic-action" title="Eliminar">🗑️</a>
           </td>
         </tr>
         {% empty %}

@@ -11,7 +11,8 @@ django.setup()
 from django.contrib.auth.models import User
 from taller.models.perfil_usuario import PerfilUsuario
 from taller.models.empresa import Empresa
-from taller.models.documento import Documento, RepuestoDocumento, ServicioDocumento
+from taller.models.documento import Documento, RepuestoDocumento
+from taller.models.lineas_documento import LineaServicio
 
 print('🔍 === DIAGNÓSTICO USUARIOS Y CONFIGURACIONES ===')
 print()
@@ -57,7 +58,7 @@ print('📄 === DOCUMENTOS RECIENTES ===')
 documentos = Documento.objects.all().order_by('-id')[:5]
 for doc in documentos:
     repuestos_count = RepuestoDocumento.objects.filter(documento=doc).count()
-    servicios_count = ServicioDocumento.objects.filter(documento=doc).count()
+    servicios_count = LineaServicio.objects.filter(documento=doc).count()
     print(f'  - Doc {doc.id}: {doc.empresa.nombre_taller} - R:{repuestos_count} S:{servicios_count}')
 
 print()

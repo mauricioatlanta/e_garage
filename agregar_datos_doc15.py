@@ -5,8 +5,9 @@ sys.path.append('.')
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings_sqlite')
 django.setup()
 
-from taller.models.documento import Documento, RepuestoDocumento, ServicioDocumento
-from taller.models.mecanico import Mecanico
+from taller.models.documento import Documento
+from taller.models.lineas_documento import LineaRepuesto, LineaServicio
+from taller.models.tecnico import Tecnico
 
 def agregar_datos_documento_15():
     """Agregar datos al documento #15 para testing de edición"""
@@ -17,11 +18,11 @@ def agregar_datos_documento_15():
         documento = Documento.objects.get(id=15)
         print(f"📋 Documento encontrado: {documento.tipo_documento} #{documento.numero_documento}")
         
-        # Agregar mecánico
-        mecanico, _ = Mecanico.objects.get_or_create(nombre="Juan Pérez")
-        documento.mecanico = mecanico
+        # Agregar técnico
+        tecnico, _ = Tecnico.objects.get_or_create(nombre="Juan Pérez")
+        documento.tecnico = tecnico
         documento.save()
-        print(f"🔧 Mecánico asignado: {mecanico.nombre}")
+        print(f"🔧 Técnico asignado: {tecnico.nombre}")
         
         # Agregar repuestos
         repuestos_data = [
@@ -30,12 +31,12 @@ def agregar_datos_documento_15():
         ]
         
         for rep_data in repuestos_data:
-            repuesto = RepuestoDocumento.objects.create(
+            repuesto = LineaRepuesto.objects.create(
                 documento=documento,
                 codigo=rep_data["codigo"],
                 nombre=rep_data["nombre"],
                 cantidad=rep_data["cantidad"],
-                precio=rep_data["precio"]
+                precio_unitario=rep_data["precio"]
             )
             print(f"🔩 Repuesto agregado: {repuesto.nombre}")
         
@@ -47,31 +48,35 @@ def agregar_datos_documento_15():
         
         empresa = documento.empresa
         for serv_data in servicios_data:
-            servicio = ServicioDocumento.objects.create(
-                empresa=empresa,
+            servicio = LineaServicio.objects.create(
                 documento=documento,
                 nombre=serv_data["nombre"],
-                precio=serv_data["precio"]
+                precio_unitario=serv_data["precio"]
             )
             print(f"⚙️ Servicio agregado: {servicio.nombre}")
         
-        # Verificar totales
-        repuestos = RepuestoDocumento.objects.filter(documento=documento)
-        servicios = ServicioDocumento.objects.filter(documento=documento)
-        
-        total_repuestos = sum(r.total for r in repuestos)
-        total_servicios = sum(s.precio for s in servicios)
+        # Verificar totales (accesos defensivos a nombres de campo)
+        repuestos = LineaRepuesto.objects.filter(documento=documento)
+        servicios = LineaServicio.objects.filter(documento=documento)
+
+        total_repuestos = sum(
+            (getattr(r, 'precio_unitario', getattr(r, 'precio', 0)) * getattr(r, 'cantidad', 1))
+            for r in repuestos
+        )
+        total_servicios = sum(
+            getattr(s, 'precio_unitario', getattr(s, 'precio', 0)) for s in servicios
+        )
         total_general = total_repuestos + total_servicios
-        
+
         print(f"\n💰 TOTALES CALCULADOS:")
         print(f"   Repuestos: ${total_repuestos}")
         print(f"   Servicios: ${total_servicios}")
         print(f"   TOTAL: ${total_general}")
-        
+
         print(f"\n🔗 URL para probar edición: http://127.0.0.1:8000/documentos/editar/15/")
-        
+
         return True
-        
+
     except Documento.DoesNotExist:
         print("❌ Documento #15 no encontrado")
         return False

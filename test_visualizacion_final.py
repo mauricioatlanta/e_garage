@@ -5,7 +5,8 @@ sys.path.append('.')
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings_sqlite')
 django.setup()
 
-from taller.models.documento import Documento, RepuestoDocumento, ServicioDocumento
+from taller.models.documento import Documento
+from taller.models.lineas_documento import LineaRepuesto, LineaServicio
 
 def test_final_visualizacion():
     """Test final para verificar que los datos se muestran correctamente"""
@@ -23,33 +24,39 @@ def test_final_visualizacion():
         print(f"   Empresa: {documento.empresa.nombre_taller}")
         
         # Verificar repuestos usando consulta directa
-        repuestos = RepuestoDocumento.objects.filter(documento=documento)
+        repuestos = LineaRepuesto.objects.filter(documento=documento)
         print(f"\n🔩 REPUESTOS ({repuestos.count()}):")
         for rep in repuestos:
+            precio_r = getattr(rep, 'precio_unitario', getattr(rep, 'precio', 0))
+            subtotal_r = getattr(rep, 'subtotal', precio_r * getattr(rep, 'cantidad', 1))
             print(f"   - {rep.codigo}: {rep.nombre}")
-            print(f"     Cantidad: {rep.cantidad}, Precio: ${rep.precio}")
-            print(f"     Total: ${rep.total}")
-        
+            print(f"     Cantidad: {rep.cantidad}, Precio: ${precio_r}")
+            print(f"     Total: ${subtotal_r}")
+
         # Verificar servicios usando consulta directa
-        servicios = ServicioDocumento.objects.filter(documento=documento)
+        servicios = LineaServicio.objects.filter(documento=documento)
         print(f"\n⚙️ SERVICIOS ({servicios.count()}):")
         for serv in servicios:
-            print(f"   - {serv.nombre}: ${serv.precio}")
-        
+            precio_s = getattr(serv, 'precio_unitario', getattr(serv, 'precio', 0))
+            print(f"   - {serv.nombre}: ${precio_s}")
+
         # Calcular totales
-        total_repuestos = sum(r.total for r in repuestos)
-        total_servicios = sum(s.precio for s in servicios)
+        total_repuestos = sum(
+            getattr(r, 'subtotal', getattr(r, 'precio_unitario', getattr(r, 'precio', 0)) * getattr(r, 'cantidad', 1))
+            for r in repuestos
+        )
+        total_servicios = sum(getattr(s, 'precio_unitario', getattr(s, 'precio', 0)) for s in servicios)
         subtotal = total_repuestos + total_servicios
         iva = subtotal * 0.19
         total_con_iva = subtotal + iva
-        
+
         print(f"\n💰 CÁLCULOS:")
         print(f"   Subtotal repuestos: ${total_repuestos}")
         print(f"   Subtotal servicios: ${total_servicios}")
         print(f"   Subtotal total: ${subtotal}")
         print(f"   IVA (19%): ${iva:.0f}")
         print(f"   TOTAL CON IVA: ${total_con_iva:.0f}")
-        
+
         # Verificar si el problema es con related_name
         print(f"\n🔗 TESTING RELATED_NAME:")
         try:
@@ -57,30 +64,30 @@ def test_final_visualizacion():
             print(f"   ✅ documento.repuestos.all() funciona: {repuestos_related.count()} items")
         except Exception as e:
             print(f"   ❌ documento.repuestos.all() falla: {e}")
-        
+
         try:
             servicios_related = documento.servicios.all()
             print(f"   ✅ documento.servicios.all() funciona: {servicios_related.count()} items")
         except Exception as e:
             print(f"   ❌ documento.servicios.all() falla: {e}")
-        
+
         # URLs de testing
         print(f"\n🌐 URLs PARA VERIFICACIÓN MANUAL:")
         print(f"   📄 Ver documento: http://127.0.0.1:8000/documentos/{documento.id}/")
         print(f"   ✏️ Editar documento: http://127.0.0.1:8000/documentos/editar/{documento.id}/")
-        
+
         # Estado esperado vs real
         print(f"\n📊 RESUMEN:")
         if repuestos.exists():
             print(f"   ✅ Documento TIENE repuestos en BD")
         else:
             print(f"   ❌ Documento NO TIENE repuestos en BD")
-        
+
         if servicios.exists():
             print(f"   ✅ Documento TIENE servicios en BD")
         else:
             print(f"   ❌ Documento NO TIENE servicios en BD")
-        
+
         return True
         
     except Documento.DoesNotExist:
@@ -95,7 +102,7 @@ def verificar_otros_documentos():
     # Buscar documentos con repuestos
     documentos_con_repuestos = []
     for doc in Documento.objects.all():
-        repuestos_count = RepuestoDocumento.objects.filter(documento=doc).count()
+        repuestos_count = LineaRepuesto.objects.filter(documento=doc).count()
         if repuestos_count > 0:
             documentos_con_repuestos.append((doc, repuestos_count))
     

@@ -17,9 +17,12 @@
         <td class="px-4 py-2">{{ v.anio }}</td>
         <td class="px-4 py-2">{{ v.patente }}</td>
         <td class="px-4 py-2 text-center space-x-2">
-          <a href="{% url 'vehiculos:detalle_vehiculo' v.id %}" class="text-blue-600 hover:underline" title="Ver">👁️</a>
-          <a href="{% url 'vehiculos:editar_vehiculo' v.id %}" class="text-orange-600 hover:underline" title="Editar">✏️</a>
-          <a href="{% url 'vehiculos:eliminar_vehiculo' v.id %}" class="text-red-600 hover:underline ml-2" title="Eliminar" onclick="return confirm('¿Eliminar este vehículo?')">🗑️</a>
+          {% url 'taller:vehiculos:detalle_vehiculo' v.id as url_detalle_vehiculo %}
+          {% url 'taller:vehiculos:editar_vehiculo' v.id as url_editar_vehiculo %}
+          {% url 'taller:vehiculos:eliminar_vehiculo' v.id as url_eliminar_vehiculo %}
+          <a href="{{ url_detalle_vehiculo|default:'#' }}" class="text-blue-600 hover:underline" title="Ver">👁️</a>
+          <a href="{{ url_editar_vehiculo|default:'#' }}" class="text-orange-600 hover:underline" title="Editar">✏️</a>
+          <a href="{{ url_eliminar_vehiculo|default:'#' }}" class="text-red-600 hover:underline ml-2" title="Eliminar">🗑️</a>
         </td>
       </tr>
       {% endfor %}

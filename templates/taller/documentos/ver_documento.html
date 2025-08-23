@@ -1,11 +1,14 @@
 
 {% extends 'base.html' %}
+{% load custom_filters %}
 {% block extra_head %}
 <style>
   body {
     background: linear-gradient(120deg, #0f2027 0%, #2c5364 50%, #7f00ff 100%);
     min-height: 100vh;
-    font-family: 'Orbitron', 'Montserrat', Arial, sans-serif;
+    font-family: 'Orbitron', 'Montserr    <p><strong>Subtotal:</strong> {{ subtotal|currency_format:country }}</p>
+    <p><strong>IVA:</strong> {{ iva|currency_format:country }}</p>
+    <p class="total">Total: {{ total|currency_format:country }}</p>, Arial, sans-serif;
   }
   .futurista-container {
     background: rgba(20, 20, 40, 0.97);
@@ -160,7 +163,7 @@
     <div><span class="futurista-label">Fecha:</span> {{ documento.fecha }}</div>
     <div><span class="futurista-label">Cliente:</span> {{ documento.cliente }}</div>
     <div><span class="futurista-label">Vehículo:</span> {{ documento.vehiculo }}</div>
-    <div><span class="futurista-label">Kilometraje:</span> {{ documento.kilometraje }} km</div>
+    <div><span class="futurista-label">{{ country|mileage_label:request.LANGUAGE_CODE }}:</span> {{ documento.vehiculo.millas|default:"No especificado" }}{% if country == 'US' %} miles{% else %} km{% endif %}</div>
   </div>
   <h3 class="text-lg font-semibold mb-4" style="color:#00f2fe;text-shadow:0 0 4px #7f00ff;">Repuestos</h3>
   <table class="futurista-table">
@@ -179,8 +182,8 @@
         <td>{{ repuesto.codigo }}</td>
         <td>{{ repuesto.nombre }}</td>
         <td>{{ repuesto.cantidad }}</td>
-        <td class="text-right">${{ repuesto.precio|floatformat:0 }}</td>
-        <td class="text-right">${{ repuesto.total|floatformat:0 }}</td>
+  <td class="text-right">{{ repuesto.precio_unitario|currency_format:country }}</td>
+  <td class="text-right">{{ repuesto.subtotal|currency_format:country }}</td>
       </tr>
       {% empty %}
       <tr><td colspan="5" class="text-center text-gray-400">Sin repuestos</td></tr>
@@ -200,25 +203,59 @@
       {% for servicio in servicios %}
       <tr>
         <td>{{ servicio.nombre }}</td>
-        <td class="text-right">${{ servicio.precio|floatformat:0 }}</td>
+  <td class="text-right">{{ servicio.precio_unitario|currency_format:country }}</td>
       </tr>
       {% empty %}
       <tr><td colspan="2" class="text-center text-gray-400">Sin servicios</td></tr>
       {% endfor %}
     </tbody>
   </table>
+
+  <h3 class="text-lg font-semibold mb-4 mt-8" style="color:#00f2fe;text-shadow:0 0 4px #7f00ff;">Otros Servicios</h3>
+  <table class="futurista-table">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Empresa Externa</th>
+        <th class="text-right">Precio</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for otro_servicio in otros_servicios %}
+      <tr>
+        <td>{{ otro_servicio.nombre }}</td>
+        <td>{{ otro_servicio.empresa_externa|default:"No especificada" }}</td>
+        <td class="text-right">{{ otro_servicio.precio_cliente|currency_format:country }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="3" class="text-center text-gray-400">Sin otros servicios</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
   <div class="futurista-resumen">
+    <p><strong>Subtotal Repuestos:</strong> {{ subtotal_repuestos|currency_format:country }}</p>
+    <p><strong>Subtotal Servicios:</strong> {{ subtotal_servicios|currency_format:country }}</p>
+    <p><strong>Subtotal Otros Servicios:</strong> {{ subtotal_otros_servicios|currency_format:country }}</p>
     <p><strong>Subtotal:</strong> ${{ subtotal|floatformat:0 }}</p>
     <p><strong>IVA (19%):</strong> ${{ iva|floatformat:0 }}</p>
     <p class="total">Total: ${{ total|floatformat:0 }}</p>
   </div>
   <div class="futurista-actions">
-    <a href="{% url 'documentos:lista_documentos' %}" class="futurista-link">← Volver al listado</a>
-    <a href="{% url 'documentos:exportar_documento_pdf' documento.id %}"
-       class="futurista-btn"
-       target="_blank">
-      🧾 Exportar a PDF
-    </a>
+  {% if request.path|slice:":3" == "/cl" %}
+    <a href="{% url 'documentos_cl:lista_documentos' %}" class="futurista-link">← Volver al listado</a>
+    <a href="{% url 'documentos_cl:exportar_documento_pdf' documento_id=documento.id %}"
+         class="futurista-btn"
+         target="_blank">
+        🧾 Exportar a PDF
+      </a>
+  {% else %}
+    <a href="{% url 'documentos_us:lista_documentos' %}" class="futurista-link">← Volver al listado</a>
+    <a href="{% url 'documentos_us:exportar_documento_pdf' documento_id=documento.id %}"
+         class="futurista-btn"
+         target="_blank">
+        🧾 Exportar a PDF
+      </a>
+  {% endif %}
   </div>
 </div>
 {% endblock %}

@@ -1,157 +1,103 @@
-# gestion_taller/urls.py o e_garage/urls.py
+from django.views.generic import RedirectView
+# gestion_taller/urls.py — archivo raíz de URLs con migración a países
+
 from django.contrib import admin
-from taller.admin import admin_site
 from django.urls import path, include
-from taller.main_views import landing_inicio, landing_premium  # Corregido: importar desde main_views
-from taller.views.views_trial import registro_trial
-from taller.views.views_trial_activate import activar_trial
-from taller.dashboard_views import dashboard_view
-from taller.main_views_mkt import landing_mecanicos, landing_repuestos, landing_servicios, landing_reportes, landing_clientes, landing_ia
-from taller.views.views_landing import landing_egarage  # Importar la vista de la landing page
-from taller.reportes.views import reportes_dashboard, reporte_servicios, reporte_repuestos, dashboard_inteligencia_operativa, diagnostico_ia  # Importar vistas de reportes directamente
-from taller.reportes.reportes_avanzados import dashboard_rentabilidad, reportes_rentabilidad, reporte_comparativo_precios, reporte_servicios_subcontratados  # Importar dashboard y reportes de rentabilidad
-
-from demo_reportes_views import demo_reportes_por_fecha
-from views_signup import signup_country_select, signup_chile, signup_usa
-
-
+from django.shortcuts import redirect
+from urllib.parse import urlencode
+from taller.views_extra.login_redirector import login_redirector
 from django.views.generic import TemplateView
-from django.contrib.auth import views as auth_views
-from taller.clientes.views import obtener_ciudades
-from taller.views.suscripcion import suscripcion_bloqueada, registro
-from taller.views.views_suscripciones import suspension, subir_comprobante, estado_suscripcion, precios
 from django.conf import settings
 from django.conf.urls.static import static
-from django.conf.urls.i18n import i18n_patterns
+from django.views.i18n import JavaScriptCatalog  # 👈 Para catálogo JS
+from taller.views.country_aware_auth import country_aware_login
 
-from taller.views.landing_usa import landing_usa
-from django.views.generic import TemplateView
+
+def redirect_to_home(request):
+    """Redirige a la página principal basada en el usuario o configuración"""
+    # Por defecto redirigir a USA para nuevos usuarios
+    return redirect('/us/')
+
+
+def redirect_qs(to):
+    def view(request, **kwargs):
+        params = request.GET.copy()
+        # Si hay kwargs (por ejemplo, uidb36, key), formatear la URL
+        url = to.format(**kwargs) if kwargs else to
+        if params:
+            url = f"{url}?{urlencode(params, doseq=True)}"
+        return redirect(url)
+    return view
 
 urlpatterns = [
-    path('usa/', landing_usa, name='landing_usa_short'),
-    path('signup/', signup_country_select, name='signup_country_select'),
-    path('signup/chile/', signup_chile, name='signup_chile'),
-    path('signup/usa/', signup_usa, name='signup_usa'),
-    # Landings internacionales
-    path('chile/', TemplateView.as_view(template_name='public/landing_chile.html'), name='landing_chile'),
-    path('landing-bilingue/', TemplateView.as_view(template_name='public/landing_inicio_en.html'), name='landing_bilingue'),
+    # Página de inicio - redirige según el usuario
+    path('', redirect_to_home, name='home'),
     
-    # URLs de bienvenida por país
-    path('bienvenida/cl/', TemplateView.as_view(template_name='onboarding/bienvenida_chile.html'), name='bienvenida_chile'),
-    path('bienvenida/usa/', TemplateView.as_view(template_name='onboarding/bienvenida_usa.html'), name='bienvenida_usa'),
-    path('welcome/us/', TemplateView.as_view(template_name='onboarding/bienvenida_usa.html'), name='welcome_usa'),
+    path('admin/', admin.site.urls),
+    # Vista temporal para verificar documentos
+    path('verificar-docs/', lambda request: __import__('verificar_docs_view').verificar_documentos(request), name='verificar_docs'),
     
-    path('registro/', registro, name='registro'),
-    path('suscripcion-bloqueada/', suscripcion_bloqueada, name='suscripcion_bloqueada'),
-    
-    # Sistema de suscripciones
-    path('suspension/', suspension, name='suspension'),
-    path('comprobante-pago/', subir_comprobante, name='subir_comprobante'),
-    path('api/estado-suscripcion/', estado_suscripcion, name='estado_suscripcion'),
-    path('precios/', precios, name='precios'),
-    
-    path('', landing_inicio, name='inicio'),
-    path('landing/', landing_premium, name='landing_premium'),  # Nueva ruta para landing.html
-    path('egarage/', landing_egarage, name='landing_egarage'),  # Landing page profesional de eGarage
-    path('egarage-pro/', landing_egarage, name='landing_egarage_pro'),  # Alternativa en /egarage-pro/
-    path('registro-trial/', registro_trial, name='registro_trial'),
-    path('activar-trial/', activar_trial, name='activar_trial'),
-    path('activar/', activar_trial),
-    path('admin/', admin_site.urls),
-    # API principal de la app (incluye tiendas/crear)
-    path('api/', include('taller.api.urls')),
-    # Otras rutas API (servicios)
-    path("api/", include("taller.servicios.api_urls")),
-    path("logout/", auth_views.LogoutView.as_view(), name="logout"),
-    # Ruta directa para login
-    path('login/', auth_views.LoginView.as_view(template_name='account/login.html'), name='login'),
-    # path('accounts/', include(('taller.urls', 'taller'))),  # Eliminado para evitar duplicidad de namespace
+    # Login personalizado con contexto de país
+    path('accounts/login/', country_aware_login, name='account_login'),
+    # Allauth para el resto de funcionalidades
     path('accounts/', include('allauth.urls')),
-    path('dashboard/', dashboard_view, name='dashboard'),
-    path('mecanicos/', landing_mecanicos, name='landing_mecanicos'),
-    path('repuestos-info/', landing_repuestos, name='landing_repuestos'),
-    path('servicios-info/', landing_servicios, name='landing_servicios'),
-    path('reportes-info/', landing_reportes, name='landing_reportes'),
-    path('clientes-info/', landing_clientes, name='landing_clientes'),
-    path('ia-info/', landing_ia, name='landing_ia'),
-    path('landing/usa/', landing_usa, name='landing_usa'),
-    
-    # Rutas de reportes (directas para evitar imports circulares) - COMENTADAS: Ahora se usan con namespace
-    # path('reportes/', reportes_dashboard, name='reportes_dashboard'),
-    # path('reportes/servicios/', reporte_servicios, name='reporte_servicios'),
-    # path('reportes/repuestos/', reporte_repuestos, name='reporte_repuestos'),
-    # path('reportes/inteligencia/', dashboard_inteligencia_operativa, name='inteligencia_operativa'),
-    # path('reportes/diagnostico/', diagnostico_ia, name='diagnostico_ia'),
-    # path('reportes/dashboard-rentabilidad/', dashboard_rentabilidad, name='dashboard_rentabilidad'),
-    # path('reportes/rentabilidad/', reportes_rentabilidad, name='reportes_rentabilidad'),
-    # path('reportes/comparativo-precios/', reporte_comparativo_precios, name='reporte_comparativo_precios'),
-    # path('reportes/servicios-subcontratados/', reporte_servicios_subcontratados, name='reporte_servicios_subcontratados'),
 
-    # rutas de apps
+    # Wrappers country-aware para login y signup
+    path('cl/accounts/login/',  redirect_qs('/accounts/login/')),
+    path('us/accounts/login/',  redirect_qs('/accounts/login/')),
+    path('cl/accounts/signup/', redirect_qs('/accounts/signup/')),
+    path('us/accounts/signup/', redirect_qs('/accounts/signup/')),
+
+    # Redirects amigables para login
+    path('cl/login/',  redirect_qs('/cl/accounts/login/')),
+    path('us/login/',  redirect_qs('/us/accounts/login/')),
+
+    # Logout
+    path('cl/accounts/logout/', redirect_qs('/accounts/logout/')),
+    path('us/accounts/logout/', redirect_qs('/accounts/logout/')),
+
+    # Password reset (solicitud + enviado + confirm + completo)
+    path('cl/accounts/password/reset/',            redirect_qs('/accounts/password/reset/')),
+    path('us/accounts/password/reset/',            redirect_qs('/accounts/password/reset/')),
+    path('cl/accounts/password/reset/done/',       redirect_qs('/accounts/password/reset/done/')),
+    path('us/accounts/password/reset/done/',       redirect_qs('/accounts/password/reset/done/')),
+    path('cl/accounts/password/reset/key/<uidb36>/<key>/', redirect_qs('/accounts/password/reset/key/{uidb36}/{key}/')),
+    path('us/accounts/password/reset/key/<uidb36>/<key>/', redirect_qs('/accounts/password/reset/key/{uidb36}/{key}/')),
+    path('cl/accounts/password/reset/key/done/',   redirect_qs('/accounts/password/reset/key/done/')),
+    path('us/accounts/password/reset/key/done/',   redirect_qs('/accounts/password/reset/key/done/')),
+
+    # Password change
+    path('cl/accounts/password/change/',      redirect_qs('/accounts/password/change/')),
+    path('us/accounts/password/change/',      redirect_qs('/accounts/password/change/')),
+    path('cl/accounts/password/change/done/', redirect_qs('/accounts/password/change/done/')),
+    path('us/accounts/password/change/done/', redirect_qs('/accounts/password/change/done/')),
+
+    path('i18n/', include('django.conf.urls.i18n')),  # Selector de idioma
+    path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),  # 👈 Catálogo JS para gettext
+    path('changelog/', TemplateView.as_view(template_name='changelog.html'), name='changelog'),
+    path('cl/', include('taller.urls_extra.chile')),
+    path('us/centro-operaciones-espacial/', TemplateView.as_view(template_name='us/centro_operaciones_espacial.html'), name='us-centro-operaciones-espacial'),
+    path('us/', include('taller.urls_extra.usa')),
     path('taller/', include(('taller.urls', 'taller'), namespace='taller')),
-    path('clientes/', include(('taller.clientes.urls', 'clientes'), namespace='clientes')),
-    path('vehiculos/', include(('taller.vehiculos.urls', 'vehiculos'), namespace='vehiculos')),
-    path('repuestos/', include(('taller.repuestos.urls', 'repuestos'), namespace='repuestos')),
-    path('reportes/', include(('taller.reportes.urls', 'reportes'), namespace='reportes')),
-    # Demo URL sin autenticación
-    path('demo/reportes/', demo_reportes_por_fecha, name='demo_reportes'),
-    path('documentos/', include('taller.documentos.urls')),
-    path('autocomplete/', include('taller.autocomplete.urls', namespace='autocomplete')),
-    path('servicios/', include(('taller.servicios.urls_servicios', 'servicios'), namespace='servicios')),
-    path('configuracion/', include('taller.configuracion_urls')),
-    path('api/ciudades/', obtener_ciudades, name='ciudades_por_region'),
-    path('api/', include(('taller.servicios.urls_servicios', 'servicios_api'), namespace='servicios_api')),
-]
-
-# 🇺🇸 URLs DIRECTAS PARA LOCALIZACIÓN USA (acceso fácil)
-from taller.views.us_views import (
-    USLocalizationView,
-    demo_atlanta_personalization,
-    api_estados_usa,
-    api_ciudades_por_estado,
-    api_marcas_vehiculos_usa,
-    api_modelos_por_marca,
-    api_calcular_impuestos_usa,
-    api_traducir_servicios,
-    cambiar_idioma
-)
-
-# 🎯 DEMO PÚBLICO ATLANTA (para marketing)
-from taller.views.demo_publico import (
-    demo_atlanta_publico,
-    demo_cotizacion_ajax,
-    verificar_codigo_atlanta
-)
-
-usa_patterns = [
-    # Demos principales con acceso directo
-    path('demo-usa/', USLocalizationView.as_view(), name='demo_usa_directo'),
-    path('demo-atlanta/', demo_atlanta_personalization, name='demo_atlanta_directo'),
+    # Namespace global directo para tests y consumo unificado
+    path('vehiculos-core/', include(('taller.vehiculos.urls', 'vehiculos'), namespace='vehiculos')),
+    # Redirección de documentos sin país a Chile por defecto
+    path('documentos/', RedirectView.as_view(url='/cl/documentos/', permanent=False), name='documentos_redirect_root'),
     
-    # 🎯 Demo público Atlanta (SIN LOGIN - para marketing)
-    path('demo/atlanta/', demo_atlanta_publico, name='demo_atlanta_publico_directo'),
-    path('demo/atlanta/quote/', demo_cotizacion_ajax, name='demo_atlanta_quote_directo'),
-    path('demo/atlanta/verify-code/', verificar_codigo_atlanta, name='demo_atlanta_verify_directo'),
+    # Redirecciones de compatibilidad para URLs antiguas con patrón duplicado
+    path('cl/documentos/cl/', RedirectView.as_view(url='/cl/documentos/', permanent=True)),
+    path('us/documentos/us/', RedirectView.as_view(url='/us/documentos/', permanent=True)),
     
-    # APIs USA con acceso directo
-    path('api-usa/estados/', api_estados_usa, name='api_estados_usa'),
-    path('api-usa/ciudades/<int:estado_id>/', api_ciudades_por_estado, name='api_ciudades_usa'),
-    path('api-usa/marcas/', api_marcas_vehiculos_usa, name='api_marcas_usa'),
-    path('api-usa/modelos/<int:marca_id>/', api_modelos_por_marca, name='api_modelos_usa'),
-    path('api-usa/impuestos/', api_calcular_impuestos_usa, name='api_impuestos_usa'),
-    path('api-usa/servicios/', api_traducir_servicios, name='api_servicios_usa'),
-    path('cambiar-idioma/', cambiar_idioma, name='cambiar_idioma_usa'),
+    # URLs con prefijo de país específico - EVITAR GRUPOS REGEX DUPLICADOS
+    path('cl/documentos/', include(('taller.documentos.urls', 'documentos'), namespace='documentos_cl')),
+    path('us/documentos/', include(('taller.documentos.urls', 'documentos'), namespace='documentos_us')),
+    path('cl/reportes/', RedirectView.as_view(pattern_name='taller:reportes_dashboard'), name='reportes_alias_cl'),
+    path('us/reportes/', RedirectView.as_view(pattern_name='taller:reportes_dashboard'), name='reportes_alias_us'),
+    # Ruta de seguridad para /login/ global
+    path('login/', login_redirector, name='login_redirector'),
 ]
 
-urlpatterns += usa_patterns
-
-# URLs de internacionalización
-urlpatterns += [
-    path('i18n/', include('django.conf.urls.i18n')),
-]
-
-# Servir archivos de media en desarrollo
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    # Servir archivos estáticos en desarrollo
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    """Redirige registro al nivel global (alias para signup)"""
+

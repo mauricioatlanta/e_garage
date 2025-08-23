@@ -18,7 +18,8 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings')
 django.setup()
 
 from django.contrib.auth.models import User
-from taller.models import Empresa, LogAuditoria
+from taller.models.empresa import Empresa
+from taller.models.auditoria import LogAuditoria
 
 # Configurar logging
 logging.basicConfig(
@@ -61,28 +62,40 @@ class BackupScheduler:
         """Crear backup completo de una empresa"""
         try:
             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-            backup_filename = f"backup_{empresa.nombre}_{timestamp}.json"
+            empresa_name = getattr(empresa, 'nombre_taller', getattr(empresa, 'empresa', 'empresa'))
+            backup_filename = f"backup_{empresa_name}_{timestamp}.json"
             backup_path = self.backup_dir / backup_filename
-            
-            logger.info(f"Iniciando backup para empresa: {empresa.nombre}")
+
+            logger.info(f"Iniciando backup para empresa: {empresa_name}")
             
             # Recopilar datos de la empresa
             from django.core import serializers
-            from taller.models import (
-                PerfilUsuario, Cliente, Vehiculo, Mecanico, 
-                Documento, RepuestoDocumento, ServicioDocumento,
-                Repuesto, Servicio, Categoria
-            )
+            from taller.models.perfil_usuario import PerfilUsuario
+            from taller.models.clientes import Cliente
+            from taller.models.vehiculos import Vehiculo
+            from taller.models.tecnico import Tecnico
+            from taller.models.documento import Documento
+            from taller.models.repuesto import Repuesto
+            from taller.servicios.models import Servicio
+            # Categoria model can be in servicios.models or repuesto models depending on type
+            try:
+                from taller.servicios.models import CategoriaServicio as Categoria
+            except Exception:
+                try:
+                    from taller.models.repuesto import CategoriaRepuesto as Categoria
+                except Exception:
+                    Categoria = None
+            from taller.models.lineas_documento import LineaRepuesto, LineaServicio
             
             backup_data = {
                 'empresa': {
-                    'id': empresa.id,
-                    'nombre': empresa.nombre,
-                    'rut': empresa.rut,
-                    'direccion': empresa.direccion,
-                    'telefono': empresa.telefono,
-                    'email': empresa.email,
-                    'created_at': empresa.created_at.isoformat() if hasattr(empresa, 'created_at') else None
+                    'id': getattr(empresa, 'id', None),
+                    'nombre': getattr(empresa, 'nombre_taller', getattr(empresa, 'empresa', None)),
+                    'rut': getattr(empresa, 'rut', None),
+                    'direccion': getattr(empresa, 'direccion', None),
+                    'telefono': getattr(empresa, 'telefono', None),
+                    'email': getattr(empresa, 'email', None),
+                    'created_at': getattr(getattr(empresa, 'created_at', None), 'isoformat', lambda: None)()
                 },
                 'timestamp': timestamp,
                 'version': '1.0',
@@ -94,12 +107,13 @@ class BackupScheduler:
                 ('perfiles_usuario', PerfilUsuario.objects.filter(empresa=empresa)),
                 ('clientes', Cliente.objects.filter(empresa=empresa)),
                 ('vehiculos', Vehiculo.objects.filter(empresa=empresa)),
-                ('mecanicos', Mecanico.objects.filter(empresa=empresa)),
+                ('mecanicos', Tecnico.objects.filter(empresa=empresa)),
                 ('documentos', Documento.objects.filter(empresa=empresa)),
                 ('repuestos', Repuesto.objects.filter(empresa=empresa)),
                 ('servicios', Servicio.objects.filter(empresa=empresa)),
-                ('categorias', Categoria.objects.filter(empresa=empresa)),
             ]
+            if Categoria is not None:
+                modelos_a_respaldar.append(('categorias', Categoria.objects.filter(empresa=empresa)))
             
             total_registros = 0
             for nombre_modelo, queryset in modelos_a_respaldar:
@@ -121,11 +135,11 @@ class BackupScheduler:
             if documentos_empresa.exists():
                 backup_data['datos']['repuestos_documento'] = json.loads(
                     serializers.serialize('json', 
-                        RepuestoDocumento.objects.filter(documento__in=documentos_empresa))
+                        LineaRepuesto.objects.filter(documento__in=documentos_empresa))
                 )
                 backup_data['datos']['servicios_documento'] = json.loads(
                     serializers.serialize('json', 
-                        ServicioDocumento.objects.filter(documento__in=documentos_empresa))
+                        LineaServicio.objects.filter(documento__in=documentos_empresa))
                 )
             
             # Logs de auditoría de la empresa (últimos 90 días)
@@ -172,7 +186,7 @@ class BackupScheduler:
             return backup_path
             
         except Exception as e:
-            logger.error(f"Error al crear backup para {empresa.nombre}: {e}")
+            logger.error(f"Error al crear backup para {empresa_name}: {e}")
             self.log_auditoria(
                 accion='BACKUP_ERROR',
                 detalles=f"Error al crear backup: {str(e)}",
@@ -219,8 +233,9 @@ class BackupScheduler:
             empresas = Empresa.objects.all()
             
             for empresa in empresas:
+                empresa_name = getattr(empresa, 'nombre_taller', getattr(empresa, 'empresa', 'empresa'))
                 # Buscar backups de esta empresa
-                patron = f"backup_{empresa.nombre}_*.json"
+                patron = f"backup_{empresa_name}_*.json"
                 backups_empresa = list(self.backup_dir.glob(patron))
                 
                 if len(backups_empresa) > self.max_backups_per_empresa:
@@ -281,6 +296,7 @@ class BackupScheduler:
             logger.info(f"Empresas a respaldar: {total_empresas}")
             
             for empresa in empresas:
+                empresa_name = getattr(empresa, 'nombre_taller', getattr(empresa, 'empresa', 'empresa'))
                 backup_path = self.crear_backup_empresa(empresa)
                 
                 if backup_path:
@@ -289,7 +305,7 @@ class BackupScheduler:
                     if valido:
                         backups_exitosos += 1
                     else:
-                        logger.error(f"Backup inválido para {empresa.nombre}: {mensaje}")
+                        logger.error(f"Backup inválido para {empresa_name}: {mensaje}")
                         backups_fallidos += 1
                 else:
                     backups_fallidos += 1

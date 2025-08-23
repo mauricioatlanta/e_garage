@@ -53,6 +53,8 @@ def signup_usa(request):
             state = form.cleaned_data['state']
             city = form.cleaned_data['city']
             zipcode = form.cleaned_data['zipcode']
+            otra_ciudad = request.POST.get('otra_ciudad', '').strip()
+            from taller.models.ubicacion import Ciudad, Estado
             if password1 != password2:
                 form.add_error('password2', 'Passwords do not match')
             elif User.objects.filter(username=username).exists():
@@ -60,13 +62,23 @@ def signup_usa(request):
             elif User.objects.filter(email=email).exists():
                 form.add_error('email', 'Email already registered')
             else:
+                # Si el usuario seleccionó "Otra" y escribió una ciudad nueva
+                if (city == 'otra' or city == 'other') and otra_ciudad:
+                    estado_obj = Estado.objects.filter(pk=state).first()
+                    if estado_obj:
+                        nueva_ciudad = Ciudad.objects.create(nombre=otra_ciudad, estado=estado_obj)
+                        ciudad_obj = nueva_ciudad
+                    else:
+                        ciudad_obj = None
+                else:
+                    ciudad_obj = Ciudad.objects.filter(pk=city).first() if city else None
                 user = User.objects.create_user(username=username, email=email, password=password1)
                 user.save()
                 PerfilUsuario.objects.create(
                     user=user,
                     pais='US',
                     state=state,
-                    ciudad=city,
+                    ciudad=ciudad_obj,
                     zipcode=zipcode
                 )
                 return render(request, 'account/signup_success.html')

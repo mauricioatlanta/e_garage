@@ -48,28 +48,28 @@ if created:
 else:
     print(f"ℹ️ Perfil ya existe")
 
-# Crear mecánicos
-from taller.models.mecanico import Mecanico
-mecanicos_datos = [
-    'Juan Pérez - Mecánico Jefe',
+# Crear técnicos
+from taller.models.tecnico import Tecnico
+tecnicos_datos = [
+    'Juan Pérez - Técnico Jefe',
     'María González - Especialista en Frenos', 
     'Carlos López - Electricista',
     'Ana Martínez - Diagnóstico',
     'Luis Rodríguez - Suspensión'
 ]
 
-for i, nombre in enumerate(mecanicos_datos):
+for i, nombre in enumerate(tecnicos_datos):
     activo = i < 4  # Los primeros 4 activos, el último inactivo
-    mecanico, created = Mecanico.objects.get_or_create(
+    tecnico, created = Tecnico.objects.get_or_create(
         empresa=empresa,
         nombre=nombre,
         defaults={'activo': activo}
     )
     if created:
-        status = "✅ ACTIVO" if mecanico.activo else "❌ INACTIVO" 
-        print(f"{status} Mecánico: {mecanico.nombre}")
+        status = "✅ ACTIVO" if tecnico.activo else "❌ INACTIVO" 
+        print(f"{status} Técnico: {tecnico.nombre}")
 
 print("\n🎉 ¡Datos creados! Ahora puedes:")
 print("1. Ingresar a http://127.0.0.1:8000/admin/ con admin / admin123")
 print("2. Probar http://127.0.0.1:8000/configuracion/")
-print("3. Probar http://127.0.0.1:8000/configuracion/mecanicos/")
+print("3. Probar http://127.0.0.1:8000/configuracion/tecnicos/")

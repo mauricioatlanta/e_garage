@@ -1,0 +1,13 @@
+# Namespace para las URLs de servicios
+app_name = 'servicios'
+# taller/servicios/urls.py
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('', views.servicios_menu, name='servicios_menu'),
+    path('api/buscar/', views.buscar_servicios_api, name='buscar_servicios_api'),
+    path('crear/', views.crear_servicio, name='crear_servicio'),
+    path('otros-servicios/', views.otros_servicios_menu, name='otros_servicios_menu'),
+    path('otros-servicios/crear/', views.crear_otro_servicio, name='crear_otro_servicio'),
+]

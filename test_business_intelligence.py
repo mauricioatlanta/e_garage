@@ -67,7 +67,7 @@ try:
     print()
     
     # Resumen general
-    total_documentos = Documento.objects.filter(empresa=empresa, fecha__range=[fecha_inicio, fecha_fin]).count()
+    total_documentos = Documento.objects.filter(empresa=empresa, fecha_emision__range=[fecha_inicio, fecha_fin]).count()
     total_repuestos = RepuestoDocumento.objects.filter(
         documento__empresa=empresa,
         documento__fecha__range=[fecha_inicio, fecha_fin]

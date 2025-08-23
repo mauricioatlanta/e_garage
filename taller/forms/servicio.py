@@ -1,7 +1,7 @@
 from django import forms
-from taller.models.documento import ServicioDocumento
+from taller.models.lineas_documento import LineaServicio
 
 class ServicioForm(forms.ModelForm):
     class Meta:
-        model = ServicioDocumento
+        model = LineaServicio
         fields = '__all__'

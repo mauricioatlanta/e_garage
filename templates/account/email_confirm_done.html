@@ -13,7 +13,8 @@
       <div class="text-cyan-100 text-center text-lg mb-4">
         <p>Se ha enviado un enlace de confirmación a tu correo electrónico.<br>Por favor, revisa tu bandeja de entrada y sigue las instrucciones para activar tu cuenta.</p>
       </div>
-      <a href="/accounts/login/" class="block text-center text-lime-400 hover:underline mt-6">Ir a iniciar sesión</a>
+  {% load country_url %}
+  <a href="{% country_url 'account_login' %}" class="block text-center text-lime-400 hover:underline mt-6">Ir a iniciar sesión</a>
     </div>
   </div>
 </div>

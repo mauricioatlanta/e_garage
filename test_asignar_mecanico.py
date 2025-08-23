@@ -10,7 +10,7 @@ django.setup()
 from django.test import Client
 from django.contrib.auth.models import User
 from taller.models.documento import Documento
-from taller.models.mecanico import Mecanico
+from taller.models.tecnico import Mecanico
 
 # Crear cliente de prueba
 client = Client()
@@ -25,7 +25,7 @@ if user:
         # Obtener empresa y documento
         empresa = user.empresa_usuario
         documento = Documento.objects.get(id=41, empresa=empresa)
-        mecanicos = Mecanico.objects.filter(empresa=empresa, activo=True)
+        mecanicos = Tecnico.objects.filter(empresa=empresa, activo=True)
         
         print(f'📄 Documento: {documento.numero_documento}')
         print(f'📅 Fecha actual: {documento.fecha}')

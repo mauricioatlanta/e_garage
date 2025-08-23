@@ -12,8 +12,8 @@ from collections import defaultdict
 from datetime import date, timedelta
 from django.db import models
 
-from taller.models.documento import (
-    Documento, ServicioDocumento, OtroServicioDocumento, RepuestoDocumento
+from taller.models.lineas_documento import (
+    LineaServicio, LineaOtroServicio, LineaRepuesto,
 )
 from taller.models.clientes import Cliente
 from taller.models.vehiculos import Vehiculo
@@ -23,58 +23,53 @@ def reportes_rentabilidad(request):
     """
     🎯 Reporte de rentabilidad por tipo de servicio
     """
-    # Servicios internos - rentabilidad
+    # Servicios internos - rentabilidad (usamos LineaServicio)
     servicios_internos = (
-        ServicioDocumento.objects
-        .filter(documento__tipo_documento='Factura')
-        .values('nombre')
+        LineaServicio.objects
+        .filter(documento__tipo='FAC')
+        .values('servicio')
         .annotate(
             cantidad=Count('id'),
-            ingresos_totales=Sum('precio'),
-            precio_promedio=Avg('precio')
+            ingresos_totales=Sum('precio_unitario'),
+            precio_promedio=Avg('precio_unitario')
         )
         .order_by('-ingresos_totales')[:15]
     )
-    
-    # Servicios subcontratados - análisis de rentabilidad
+
+    # Servicios subcontratados - análisis de rentabilidad (LineaOtroServicio)
     servicios_externos = (
-        OtroServicioDocumento.objects
-        .filter(documento__tipo_documento='Factura')
+        LineaOtroServicio.objects
+        .filter(documento__tipo='FAC')
         .values('nombre_servicio', 'empresa_externa')
         .annotate(
             cantidad=Count('id'),
-            costos_totales=Sum('costo_interno'),
             ingresos_totales=Sum('precio_cliente'),
+            costos_totales=Sum('costo_interno'),
             ganancia_total=Sum(F('precio_cliente') - F('costo_interno')),
-            margen_promedio=Avg(
-                ExpressionWrapper(
-                    (F('precio_cliente') - F('costo_interno')) * 100.0 / F('precio_cliente'),
-                    output_field=FloatField()
-                )
-            )
+            precio_promedio=Avg('precio_cliente')
         )
         .order_by('-ganancia_total')[:15]
     )
     
     # Comparativa rentabilidad: interno vs externo
-    total_interno = ServicioDocumento.objects.filter(
-        documento__tipo_documento='Factura'
-    ).aggregate(total=Sum('precio'))['total'] or 0
-    
-    total_externo_ingresos = OtroServicioDocumento.objects.filter(
-        documento__tipo_documento='Factura'
+    total_interno = LineaServicio.objects.filter(
+        documento__tipo='FAC'
+    ).aggregate(total=Sum('precio_unitario'))['total'] or 0
+
+    total_externo_ingresos = LineaOtroServicio.objects.filter(
+        documento__tipo='FAC'
     ).aggregate(total=Sum('precio_cliente'))['total'] or 0
-    
-    total_externo_costos = OtroServicioDocumento.objects.filter(
-        documento__tipo_documento='Factura'
+
+    total_externo_costos = LineaOtroServicio.objects.filter(
+        documento__tipo='FAC'
     ).aggregate(total=Sum('costo_interno'))['total'] or 0
     
     ganancia_externa = total_externo_ingresos - total_externo_costos
     
     # Top proveedores externos por volumen
     top_proveedores = (
-        OtroServicioDocumento.objects
-        .filter(documento__tipo_documento='Factura')
+        LineaOtroServicio.objects
+        .filter(documento__tipo='FAC')
         .values('empresa_externa')
         .annotate(
             cantidad_servicios=Count('id'),
@@ -87,17 +82,20 @@ def reportes_rentabilidad(request):
     
     # Servicios más rentables (margen %)
     servicios_alto_margen = []
-    for servicio in OtroServicioDocumento.objects.filter(documento__tipo_documento='Factura'):
-        if servicio.precio_cliente > 0:
-            margen = ((servicio.precio_cliente - servicio.costo_interno) / servicio.precio_cliente) * 100
-            servicios_alto_margen.append({
-                'nombre': servicio.nombre_servicio,
-                'proveedor': servicio.empresa_externa,
-                'margen': round(margen, 2),
-                'ganancia': servicio.ganancia,
-                'precio_cliente': servicio.precio_cliente,
-                'costo_interno': servicio.costo_interno
-            })
+    for servicio in LineaOtroServicio.objects.filter(documento__tipo='FAC'):
+        precio_cliente = getattr(servicio, 'precio_cliente', None)
+        costo_interno = getattr(servicio, 'costo_interno', None)
+        if not precio_cliente:
+            continue
+        margen = ((precio_cliente - (costo_interno or 0)) / precio_cliente) * 100
+        servicios_alto_margen.append({
+            'nombre': getattr(servicio, 'nombre_servicio', 'N/A'),
+            'proveedor': getattr(servicio, 'empresa_externa', 'N/A'),
+            'margen': round(margen, 2),
+            'ganancia': (precio_cliente - (costo_interno or 0)),
+            'precio_cliente': precio_cliente,
+            'costo_interno': costo_interno,
+        })
     
     servicios_alto_margen = sorted(servicios_alto_margen, key=lambda x: x['margen'], reverse=True)[:10]
     
@@ -123,18 +121,15 @@ def reporte_comparativo_precios(request):
     analisis_servicios = []
     
     servicios_unicos = (
-        OtroServicioDocumento.objects
-        .filter(documento__tipo_documento='Factura')
+        LineaOtroServicio.objects
+        .filter(documento__tipo='FAC')
         .values('nombre_servicio')
         .distinct()
     )
     
     for servicio in servicios_unicos:
         nombre = servicio['nombre_servicio']
-        registros = OtroServicioDocumento.objects.filter(
-            nombre_servicio=nombre,
-            documento__tipo_documento='Factura'
-        )
+        registros = LineaOtroServicio.objects.filter(nombre_servicio=nombre)
         
         stats = registros.aggregate(
             cantidad=Count('id'),
@@ -171,17 +166,16 @@ def reporte_comparativo_precios(request):
     hace_6_meses = hoy - timedelta(days=180)
     
     evolucion_mensual = (
-        OtroServicioDocumento.objects
+        LineaOtroServicio.objects
         .filter(
-            documento__tipo_documento='Factura',
-            documento__fecha__gte=hace_6_meses
+            documento__tipo='FAC',
+            documento__fecha_emision__gte=hace_6_meses
         )
-        .annotate(mes=F('documento__fecha__year') * 100 + F('documento__fecha__month'))
+        .annotate(mes=F('documento__fecha_emision__year') * 100 + F('documento__fecha_emision__month'))
         .values('mes')
         .annotate(
             ingresos=Sum('precio_cliente'),
             costos=Sum('costo_interno'),
-            ganancia=Sum(F('precio_cliente') - F('costo_interno'))
         )
         .order_by('mes')
     )
@@ -201,7 +195,7 @@ def reporte_servicios_subcontratados(request):
     """
     # Servicios más frecuentes
     servicios_frecuentes = (
-        OtroServicioDocumento.objects
+        LineaOtroServicio.objects
         .values('nombre_servicio')
         .annotate(
             frecuencia=Count('id'),
@@ -210,10 +204,9 @@ def reporte_servicios_subcontratados(request):
         )
         .order_by('-frecuencia')[:15]
     )
-    
-    # Proveedores más utilizados
+
     proveedores_frecuentes = (
-        OtroServicioDocumento.objects
+        LineaOtroServicio.objects
         .values('empresa_externa')
         .annotate(
             servicios_realizados=Count('id'),
@@ -223,19 +216,18 @@ def reporte_servicios_subcontratados(request):
         )
         .order_by('-servicios_realizados')[:10]
     )
-    
     # Análisis temporal - últimos 6 meses
     hoy = date.today()
     hace_6_meses = hoy - timedelta(days=180)
     
     tendencia_mensual = defaultdict(lambda: {'cantidad': 0, 'volumen': 0})
     
-    servicios_periodo = OtroServicioDocumento.objects.filter(
-        documento__fecha__gte=hace_6_meses
+    servicios_periodo = LineaOtroServicio.objects.filter(
+        documento__fecha_emision__gte=hace_6_meses
     )
     
     for servicio in servicios_periodo:
-        mes_key = servicio.documento.fecha.strftime('%Y-%m') if servicio.documento.fecha else 'Sin fecha'
+        mes_key = servicio.documento.fecha_emision.strftime('%Y-%m') if servicio.documento.fecha_emision else 'Sin fecha'
         tendencia_mensual[mes_key]['cantidad'] += 1
         tendencia_mensual[mes_key]['volumen'] += servicio.precio_cliente
     
@@ -246,7 +238,7 @@ def reporte_servicios_subcontratados(request):
     
     # Distribución por tipo de vehículo
     vehiculos_servicios = (
-        OtroServicioDocumento.objects
+        LineaOtroServicio.objects
         .filter(documento__vehiculo__isnull=False)
         .values('documento__vehiculo__marca__nombre', 'documento__vehiculo__modelo__nombre')
         .annotate(cantidad=Count('id'))
@@ -255,18 +247,18 @@ def reporte_servicios_subcontratados(request):
     
     # Clientes que más usan servicios externos
     clientes_externos = (
-        OtroServicioDocumento.objects
-        .values('documento__cliente__nombre', 'documento__cliente__apellido')
+        LineaOtroServicio.objects
+        .values('documento__cliente__id', 'documento__cliente__nombre', 'documento__cliente__apellido')
         .annotate(
             servicios_externos=Count('id'),
             gasto_total=Sum('precio_cliente')
         )
-        .order_by('-servicios_externos')[:10]
+        .order_by('-gasto_total')[:10]
     )
-    
+
     for cliente in clientes_externos:
-        nombre = cliente['documento__cliente__nombre'] or ''
-        apellido = cliente['documento__cliente__apellido'] or ''
+        nombre = cliente.get('documento__cliente__nombre') or ''
+        apellido = cliente.get('documento__cliente__apellido') or ''
         cliente['nombre_completo'] = f"{nombre} {apellido}".strip()
     
     context = {
@@ -288,34 +280,25 @@ def dashboard_rentabilidad(request):
     """
     # KPIs principales
     total_facturado = (
-        ServicioDocumento.objects.filter(documento__tipo_documento='Factura')
-        .aggregate(total=Sum('precio'))['total'] or 0
+        LineaServicio.objects.filter(documento__tipo='FAC')
+        .aggregate(total=Sum('precio_unitario'))['total'] or 0
     ) + (
-        OtroServicioDocumento.objects.filter(documento__tipo_documento='Factura')
+        LineaOtroServicio.objects.filter(documento__tipo='FAC')
         .aggregate(total=Sum('precio_cliente'))['total'] or 0
     )
-    
-    costos_externos = (
-        OtroServicioDocumento.objects.filter(documento__tipo_documento='Factura')
-        .aggregate(total=Sum('costo_interno'))['total'] or 0
-    )
-    
+
+    costos_externos = LineaOtroServicio.objects.filter(documento__tipo='FAC').aggregate(total=Sum('costo_interno'))['total'] or 0
+
     ganancia_neta = total_facturado - costos_externos
-    margen_general = (ganancia_neta / total_facturado * 100) if total_facturado > 0 else 0
-    
+
     # Distribución de ingresos
-    ingresos_internos = ServicioDocumento.objects.filter(
-        documento__tipo_documento='Factura'
-    ).aggregate(total=Sum('precio'))['total'] or 0
-    
-    ingresos_externos = OtroServicioDocumento.objects.filter(
-        documento__tipo_documento='Factura'
-    ).aggregate(total=Sum('precio_cliente'))['total'] or 0
-    
-    # Mejores y peores márgenes
-    mejor_proveedor = (
-        OtroServicioDocumento.objects
-        .filter(documento__tipo_documento='Factura')
+    ingresos_internos = LineaServicio.objects.filter(documento__tipo='FAC').aggregate(total=Sum('precio_unitario'))['total'] or 0
+    ingresos_externos = LineaOtroServicio.objects.filter(documento__tipo='FAC').aggregate(total=Sum('precio_cliente'))['total'] or 0
+
+    # Mejores y peores márgenes por proveedor
+    proveedor_margenes = (
+        LineaOtroServicio.objects
+        .filter(documento__tipo='FAC')
         .values('empresa_externa')
         .annotate(
             margen_promedio=Avg(
@@ -325,26 +308,13 @@ def dashboard_rentabilidad(request):
                 )
             )
         )
-        .order_by('-margen_promedio')
-        .first()
     )
-    
-    peor_proveedor = (
-        OtroServicioDocumento.objects
-        .filter(documento__tipo_documento='Factura')
-        .values('empresa_externa')
-        .annotate(
-            margen_promedio=Avg(
-                ExpressionWrapper(
-                    (F('precio_cliente') - F('costo_interno')) * 100.0 / F('precio_cliente'),
-                    output_field=FloatField()
-                )
-            )
-        )
-        .order_by('margen_promedio')
-        .first()
-    )
-    
+
+    mejor_proveedor = proveedor_margenes.order_by('-margen_promedio').first() if proveedor_margenes else None
+    peor_proveedor = proveedor_margenes.order_by('margen_promedio').first() if proveedor_margenes else None
+
+    margen_general = (ganancia_neta * 100.0 / total_facturado) if total_facturado else 0
+
     context = {
         'total_facturado': total_facturado,
         'costos_externos': costos_externos,
@@ -355,5 +325,5 @@ def dashboard_rentabilidad(request):
         'mejor_proveedor': mejor_proveedor,
         'peor_proveedor': peor_proveedor,
     }
-    
+
     return render(request, 'taller/reportes/dashboard_rentabilidad.html', context)

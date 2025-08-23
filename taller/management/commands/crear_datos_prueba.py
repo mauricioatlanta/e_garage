@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from taller.models.empresa import Empresa
-from taller.models.mecanico import Mecanico
+from taller.models.tecnico import Mecanico
 from taller.models.perfilusuario import PerfilUsuario
 
 class Command(BaseCommand):
@@ -69,7 +69,7 @@ class Command(BaseCommand):
         ]
         
         for mec_data in mecanicos_datos:
-            mecanico, created = Mecanico.objects.get_or_create(
+            mecanico, created = Tecnico.objects.get_or_create(
                 empresa=empresa,
                 nombre=mec_data['nombre'],
                 defaults={'activo': mec_data['activo']}

@@ -1,4 +1,5 @@
 from django import forms
+from taller.models.ubicacion import Estado, Ciudad
 from utils.pais import get_regiones, get_ciudades
 
 class SignupChileForm(forms.Form):
@@ -29,9 +30,15 @@ class SignupUSAForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['state'].choices = [(r, r) for r in get_regiones('US')]
-        state = self.data.get('state') or (self.initial.get('state') if self.initial else None)
-        if state:
-            self.fields['city'].choices = [(c, c) for c in get_ciudades('US', state)]
+        # Obtener queryset de estados
+        estados = Estado.objects.all().order_by('nombre')
+        self.fields['state'].choices = [(e.pk, e.nombre) for e in estados]
+        state_id = self.data.get('state') or (self.initial.get('state') if self.initial else None)
+        if state_id:
+            ciudades = Ciudad.objects.filter(estado_id=state_id).order_by('nombre')
+            choices = [(c.pk, c.nombre) for c in ciudades]
+            choices.append(('otra', 'Otra'))
+            choices.append(('other', 'Other'))
+            self.fields['city'].choices = choices
         else:
-            self.fields['city'].choices = [('', '---------')]
+            self.fields['city'].choices = [('', '---------'), ('otra', 'Otra'), ('other', 'Other')]

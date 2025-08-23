@@ -2,8 +2,10 @@
 SITE_ID = 1
 import os
 from pathlib import Path
+
 from django.core.management.utils import get_random_secret_key
 from decouple import config
+from django.utils.translation import gettext_lazy as _
 
 # BASE DIR
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -51,6 +53,8 @@ SITE_ID = 1
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
+    'taller.middleware.force_english_usa.ForceEnglishUSA',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -62,7 +66,7 @@ MIDDLEWARE = [
 ]
 
 # 🌐 URLs
-ROOT_URLCONF = 'gestion_taller.urls'
+ROOT_URLCONF = 'e_garage.urls'
 
 # 🧠 Plantillas
 TEMPLATES = [
@@ -96,9 +100,16 @@ DATABASES = {
     }
 }
 
-# 🌍 Internacionalización
 
-LANGUAGE_CODE = 'es-cl'
+# 🌍 Internacionalización
+LANGUAGE_CODE = 'en-us'
+LANGUAGES = [
+    ('en', 'English'),
+    ('es', 'Español'),
+]
+LOCALE_PATHS = [
+    BASE_DIR / 'locale',
+]
 TIME_ZONE = 'America/Santiago'
 USE_I18N = True
 USE_L10N = True
@@ -123,11 +134,16 @@ LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/'
 
-# 🐞 Para desarrollo (solo cuando DEBUG es True)
-if DEBUG:
-    import mimetypes
-    mimetypes.add_type("text/css", ".css", True)
-    mimetypes.add_type("application/javascript", ".js", True)
+
+# Configuración de correo para pruebas con Gmail
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "mail.atlantareciclajes.cl"
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True
+EMAIL_USE_TLS = False
+EMAIL_HOST_USER = "suscripcion@atlantareciclajes.cl"
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_PASSWORD")  # pon la clave en .env
+DEFAULT_FROM_EMAIL = "eGarage <suscripcion@atlantareciclajes.cl>"
 
   
 

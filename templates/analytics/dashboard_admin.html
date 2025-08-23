@@ -12,7 +12,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
     
     <style>
         :root {
@@ -286,7 +285,7 @@
                     🌍 Distribución por País
                 </h3>
                 <div class="flex justify-center mb-4">
-                    <canvas id="chartPaises" width="300" height="300"></canvas>
+                    <canvas id="chartPaises" width="75" height="75"></canvas>
                 </div>
                 <div class="grid grid-cols-2 gap-4 text-center">
                     <div>
@@ -408,7 +407,7 @@
                     </thead>
                     <tbody>
                         {% for empresa in ultimos_registros %}
-                        <tr>
+                        <tr data-empresa-id="{{ empresa.id }}" data-empresa-pais="{{ empresa.pais|lower }}">
                             <td>
                                 <div class="font-semibold">{{ empresa.user.username }}</div>
                                 <div class="text-sm text-gray-400">{{ empresa.user.email }}</div>
@@ -627,7 +626,13 @@
         }
 
         function verDetalle(empresaId) {
-            window.open(`/admin/dashboard/suscriptor/${empresaId}/`, '_blank');
+            // Buscar el país de la empresa en la tabla
+            const fila = document.querySelector(`tr[data-empresa-id='${empresaId}']`);
+            let pais = 'cl';
+            if (fila) {
+                pais = fila.getAttribute('data-empresa-pais') || 'cl';
+            }
+            window.open(`/${pais}/dashboard/suscriptor/${empresaId}/`, '_blank');
         }
 
         // Efectos visuales al cargar

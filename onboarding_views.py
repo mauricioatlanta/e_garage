@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from taller.models.empresa import Empresa
-from taller.models.usuario import PerfilUsuario
+from taller.models.perfil_usuario import PerfilUsuario
 import json
 
 def registro_gratuito(request):

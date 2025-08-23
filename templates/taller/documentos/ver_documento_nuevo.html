@@ -191,7 +191,7 @@
       </span>
     </div>
     <div class="info-item">
-      <span class="info-label">🔧 Mecánico:</span>
+      <span class="info-label">🔧 Técnico:</span>
       <span class="info-value">
         {% if documento.mecanico %}
           {{ documento.mecanico.nombre }}
@@ -302,15 +302,27 @@
 
   <!-- Acciones -->
   <div class="acciones">
-    <a href="{% url 'documentos:lista_documentos' %}" class="btn-accion">
-      ← Volver al Listado
-    </a>
-    <a href="{% url 'documentos:editar_documento_nuevo' documento.id %}" class="btn-accion">
-      ✏️ Editar Documento
-    </a>
-    <a href="{% url 'documentos:exportar_documento_pdf' documento.id %}" class="btn-accion" target="_blank">
-      📄 Exportar PDF
-    </a>
+  {% if request.path|slice:":3" == "/cl" %}
+    <a href="{% url 'documentos_cl:lista_documentos' %}" class="btn-accion">
+        ← Volver al Listado
+      </a>
+    <a href="{% url 'documentos_cl:editar_documento_nuevo' documento_id=documento.id %}" class="btn-accion">
+        ✏️ Editar Documento
+      </a>
+    <a href="{% url 'documentos_cl:exportar_documento_pdf' documento_id=documento.id %}" class="btn-accion" target="_blank">
+        📄 Exportar PDF
+      </a>
+  {% else %}
+    <a href="{% url 'documentos_us:lista_documentos' %}" class="btn-accion">
+        ← Volver al Listado
+      </a>
+    <a href="{% url 'documentos_us:editar_documento_nuevo' documento_id=documento.id %}" class="btn-accion">
+        ✏️ Editar Documento
+      </a>
+    <a href="{% url 'documentos_us:exportar_documento_pdf' documento_id=documento.id %}" class="btn-accion" target="_blank">
+        📄 Exportar PDF
+      </a>
+  {% endif %}
   </div>
 </div>
 

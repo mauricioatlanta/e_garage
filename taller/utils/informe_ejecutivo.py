@@ -343,13 +343,14 @@ def generar_informe_ejecutivo_view(request):
     
     # Obtener datos del contexto
     # Simulamos llamar a la vista pero solo necesitamos el contexto
-    from taller.models.documento import ServicioDocumento, Documento
+    from taller.models.lineas_documento import LineaServicio
+    from taller.models.documento import Documento
     from taller.models.clientes import Cliente
     from django.db.models import Sum, F
     
     # Datos básicos para el informe
     contexto = {
-        'facturacion_total': ServicioDocumento.objects.filter(
+    'facturacion_total': LineaServicio.objects.filter(
             documento__tipo_documento='Factura'
         ).aggregate(total=Sum(F('cantidad') * F('precio')))['total'] or 0,
         'ticket_promedio': 135000,

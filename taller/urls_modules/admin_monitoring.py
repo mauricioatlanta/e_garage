@@ -3,7 +3,7 @@ URLs para el panel administrativo de monitoreo de suscripciones
 """
 
 from django.urls import path
-from taller.views import admin_monitoring
+from taller.views_extra import admin_monitoring
 
 app_name = 'admin_monitoring'
 

@@ -24,7 +24,8 @@ from django.contrib.auth.models import User
 from taller.models.perfil_usuario import PerfilUsuario
 from taller.models.clientes import Cliente
 from taller.models.vehiculos import Vehiculo
-from taller.models.documento import Documento, RepuestoDocumento, ServicioDocumento
+from taller.models.documento import Documento, RepuestoDocumento
+from taller.models.lineas_documento import LineaServicio
 
 def diagnostico_final():
     print("🔧 === DIAGNÓSTICO FINAL - TALLER2 DOCUMENTOS ===\n")
@@ -47,12 +48,12 @@ def diagnostico_final():
     
     for doc in docs:
         repuestos = RepuestoDocumento.objects.filter(documento=doc).count()
-        servicios = ServicioDocumento.objects.filter(documento=doc).count()
+        servicios = LineaServicio.objects.filter(documento=doc).count()
         total_items = repuestos + servicios
-        
+
         status = "✅ CON ITEMS" if total_items > 0 else "❌ SIN ITEMS"
         print(f"   - {doc.numero_documento} ({doc.tipo_documento}): {status} ({repuestos}R + {servicios}S)")
-        
+
         if total_items > 0:
             docs_con_items += 1
         else:

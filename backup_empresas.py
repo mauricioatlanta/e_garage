@@ -14,7 +14,8 @@ django.setup()
 
 from django.core import serializers
 from taller.models.empresa import Empresa
-from taller.models.documento import Documento, RepuestoDocumento, ServicioDocumento
+from taller.models.documento import Documento
+from taller.models.lineas_documento import LineaServicio, LineaRepuesto
 from taller.models.clientes import Cliente
 from taller.models.vehiculos import Vehiculo
 from taller.models.auditoria import LogAuditoria
@@ -105,13 +106,15 @@ class BackupEmpresa:
         """Backup vehículos de la empresa"""
         try:
             vehiculos = Vehiculo.objects.filter(empresa=empresa)
-        if vehiculos.exists():
-            data = serializers.serialize('json', vehiculos, indent=2)
-            with open(os.path.join(backup_path, 'vehiculos.json'), 'w', encoding='utf-8') as f:
-                f.write(data)
-            print(f"   🚗 {vehiculos.count()} vehículos exportados")
-        else:
-            print(f"   🚗 No hay vehículos para exportar")
+            if vehiculos.exists():
+                data = serializers.serialize('json', vehiculos, indent=2)
+                with open(os.path.join(backup_path, 'vehiculos.json'), 'w', encoding='utf-8') as f:
+                    f.write(data)
+                print(f"   🚗 {vehiculos.count()} vehículos exportados")
+            else:
+                print(f"   🚗 No hay vehículos para exportar")
+        except Exception as e:
+            print(f"   ⚠️ Error exportando vehículos: {e}")
     
     def _backup_documentos(self, empresa, backup_path):
         """Backup documentos y sus items"""
@@ -123,14 +126,14 @@ class BackupEmpresa:
                 f.write(data)
             
             # Exportar repuestos de documentos
-            repuestos = RepuestoDocumento.objects.filter(documento__empresa=empresa)
+            repuestos = LineaRepuesto.objects.filter(documento__empresa=empresa)
             if repuestos.exists():
                 data = serializers.serialize('json', repuestos, indent=2)
                 with open(os.path.join(backup_path, 'repuestos_documentos.json'), 'w', encoding='utf-8') as f:
                     f.write(data)
             
             # Exportar servicios de documentos
-            servicios = ServicioDocumento.objects.filter(empresa=empresa)
+            servicios = LineaServicio.objects.filter(documento__empresa=empresa)
             if servicios.exists():
                 data = serializers.serialize('json', servicios, indent=2)
                 with open(os.path.join(backup_path, 'servicios_documentos.json'), 'w', encoding='utf-8') as f:
@@ -172,8 +175,8 @@ class BackupEmpresa:
                 'clientes': Cliente.objects.filter(empresa=empresa).count(),
                 'vehiculos': Vehiculo.objects.filter(empresa=empresa).count(),
                 'documentos': Documento.objects.filter(empresa=empresa).count(),
-                'repuestos': RepuestoDocumento.objects.filter(documento__empresa=empresa).count(),
-                'servicios': ServicioDocumento.objects.filter(empresa=empresa).count(),
+                'repuestos': LineaRepuesto.objects.filter(documento__empresa=empresa).count(),
+                'servicios': LineaServicio.objects.filter(documento__empresa=empresa).count(),
                 'logs_auditoria': LogAuditoria.objects.filter(empresa=empresa).count()
             }
         }

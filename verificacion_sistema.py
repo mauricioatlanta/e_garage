@@ -12,7 +12,8 @@ django.setup()
 from django.contrib.auth.models import User
 from taller.models.empresa import Empresa
 from taller.models.perfil_usuario import PerfilUsuario
-from taller.models.documento import Documento, RepuestoDocumento, ServicioDocumento
+from taller.models.documento import Documento
+from taller.models.lineas_documento import LineaRepuesto as RepuestoDocumento, LineaServicio
 
 print("🔍 === VERIFICACIÓN SISTEMA E-GARAGE ===")
 print(f"📅 Fecha: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}")
@@ -52,7 +53,7 @@ print("3️⃣ ESTADO POR EMPRESA:")
 for empresa in Empresa.objects.all():
     docs = Documento.objects.filter(empresa=empresa)
     repuestos_total = RepuestoDocumento.objects.filter(documento__empresa=empresa).count()
-    servicios_total = ServicioDocumento.objects.filter(empresa=empresa).count()
+    servicios_total = LineaServicio.objects.filter(documento__empresa=empresa).count()
     
     print(f"   🏢 {empresa.nombre_taller}:")
     print(f"      📄 Documentos: {docs.count()}")
@@ -65,7 +66,7 @@ print("4️⃣ DOCUMENTOS SIN ITEMS:")
 docs_vacios = 0
 for doc in Documento.objects.all():
     repuestos = RepuestoDocumento.objects.filter(documento=doc).count()
-    servicios = ServicioDocumento.objects.filter(documento=doc).count()
+    servicios = LineaServicio.objects.filter(documento=doc).count()
     if repuestos == 0 and servicios == 0:
         docs_vacios += 1
 
@@ -80,7 +81,7 @@ print("5️⃣ ÚLTIMOS DOCUMENTOS CREADOS:")
 docs_recientes = Documento.objects.all().order_by('-pk')[:5]
 for doc in docs_recientes:
     repuestos = RepuestoDocumento.objects.filter(documento=doc).count()
-    servicios = ServicioDocumento.objects.filter(documento=doc).count()
+    servicios = LineaServicio.objects.filter(documento=doc).count()
     estado = "✅" if (repuestos > 0 and servicios > 0) else "⚠️" if (repuestos > 0 or servicios > 0) else "❌"
     print(f"   {estado} Doc {doc.pk}: {doc.numero_documento} ({doc.empresa.nombre_taller})")
 

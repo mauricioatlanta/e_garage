@@ -25,17 +25,17 @@ from taller.models.perfil_usuario import PerfilUsuario
 perfil, created = PerfilUsuario.objects.get_or_create(user=user, defaults={'empresa': empresa})
 print(f"{'✅ Perfil creado' if created else 'ℹ️ Perfil ya existe'}")
 
-# 4. Crear mecánicos
-from taller.models.mecanico import Mecanico
+# 4. Crear técnicos
+from taller.models.tecnico import Tecnico
 nombres = ['Juan Pérez', 'María López', 'Carlos García', 'Ana Martínez', 'Luis Inactivo']
 for i, nombre in enumerate(nombres):
     activo = i < 4  # Los primeros 4 activos, el último inactivo
-    mecanico, created = Mecanico.objects.get_or_create(empresa=empresa, nombre=nombre, defaults={'activo': activo})
+    tecnico, created = Tecnico.objects.get_or_create(empresa=empresa, nombre=nombre, defaults={'activo': activo})
     if created:
-        status = "✅ ACTIVO" if mecanico.activo else "❌ INACTIVO"
-        print(f"{status} {mecanico.nombre}")
+        status = "✅ ACTIVO" if tecnico.activo else "❌ INACTIVO"
+        print(f"{status} {tecnico.nombre}")
 
 print("\n🎉 ¡Listo! Ahora prueba:")
 print("http://127.0.0.1:8000/configuracion/")  
-print("http://127.0.0.1:8000/configuracion/mecanicos/")
+print("http://127.0.0.1:8000/configuracion/tecnicos/")
 print("Usuario: admin / admin123")

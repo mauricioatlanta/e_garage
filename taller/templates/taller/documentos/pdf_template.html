@@ -7,50 +7,56 @@
     <style>
         @page {
             size: A4;
-            margin: 1.5cm;
-            @bottom-center {
-                content: "Página " counter(page) " de " counter(pages) " | Generado el {{ fecha_generacion|date:'d/m/Y H:i' }}";
-                font-size: 9pt;
-                color: #666;
-            }
-        }
-        
-        body {
-            font-family: 'Arial', sans-serif;
-            font-size: 11pt;
-            line-height: 1.4;
-            color: #333;
-            margin: 0;
-            padding: 0;
-        }
-        
-        .header {
-            text-align: center;
-            border-bottom: 3px solid #007bff;
-            padding-bottom: 15px;
-            margin-bottom: 25px;
-        }
-        
-        .logo {
-            max-height: 80px;
-            max-width: 250px;
-            margin-bottom: 10px;
-        }
-        
-        .empresa-nombre {
-            font-size: 24pt;
-            font-weight: bold;
-            color: #007bff;
-            margin-bottom: 5px;
-        }
-        
-        .empresa-datos {
-            font-size: 10pt;
-            color: #666;
-            line-height: 1.2;
-        }
-        
-        .documento-header {
+            <style>
+                @page {
+                    size: A4;
+                    margin: 1.5cm;
+                    @bottom-center {
+                        content: "Página " counter(page) " de " counter(pages) " | Generado el {{ fecha_generacion|date:'d/m/Y H:i' }}";
+                        font-size: 9pt;
+                        color: #666;
+                    }
+                }
+                body {
+                    font-family: 'Arial', sans-serif;
+                    font-size: 11pt;
+                    line-height: 1.4;
+                    color: #333;
+                    margin: 0;
+                    padding: 0;
+                }
+                .header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: flex-start;
+                    border-bottom: 3px solid #007bff;
+                    padding-bottom: 15px;
+                    margin-bottom: 25px;
+                }
+                .header-logo {
+                    flex: 0 0 auto;
+                    margin-right: 24px;
+                }
+                .logo {
+                    max-height: 80px;
+                    max-width: 180px;
+                    margin-bottom: 0;
+                }
+                .header-info {
+                    flex: 1 1 0%;
+                    text-align: center;
+                }
+                .empresa-nombre {
+                    font-size: 1.7em;
+                    font-weight: bold;
+                    color: #007bff;
+                    margin-bottom: 2px;
+                }
+                .empresa-datos {
+                    font-size: 1em;
+                    color: #444;
+                    margin-bottom: 2px;
+                }
             background: linear-gradient(135deg, #007bff, #0056b3);
             color: white;
             padding: 20px;
@@ -259,14 +265,18 @@
     <!-- Header con logo y datos de la empresa -->
     <div class="header">
         {% if empresa.logo %}
-        <img src="{{ empresa.logo.url }}" alt="Logo {{ empresa.nombre }}" class="logo">
+        <div class="header-logo">
+            <img src="{{ empresa.logo.url }}" alt="Logo {{ empresa.nombre }}" class="logo">
+        </div>
         {% endif %}
-        <div class="empresa-nombre">{{ empresa.nombre }}</div>
-        <div class="empresa-datos">
-            {% if empresa.direccion %}{{ empresa.direccion }}<br>{% endif %}
-            {% if empresa.telefono %}Tel: {{ empresa.telefono }}{% endif %}
-            {% if empresa.email %} | Email: {{ empresa.email }}{% endif %}
-            {% if empresa.rut %}<br>RUT: {{ empresa.rut }}{% endif %}
+        <div class="header-info">
+            <div class="empresa-nombre">{{ empresa.nombre }}</div>
+            <div class="empresa-datos">
+                {% if empresa.direccion %}{{ empresa.direccion }}<br>{% endif %}
+                {% if empresa.telefono %}Tel: {{ empresa.telefono }}{% endif %}
+                {% if empresa.email %} | Email: {{ empresa.email }}{% endif %}
+                {% if empresa.rut %}<br>RUT: {{ empresa.rut }}{% endif %}
+            </div>
         </div>
     </div>
 
@@ -378,93 +388,105 @@
 
     <!-- Servicios Internos -->
     {% if servicios %}
-    <div class="info-section">
-        <h3>Servicios Internos</h3>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Descripción</th>
-                    <th>Precio</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for servicio in servicios %}
-                <tr>
-                    <td>{{ servicio.nombre }}</td>
-                    <td>${{ servicio.precio|floatformat:0 }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+    <div class="subtitulo">⚙️ Servicios</div>
+    <table class="tabla-items">
+        <thead>
+            <tr>
+                <th>Descripción del Servicio</th>
+                <th class="texto-derecha">Precio</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for servicio in servicios %}
+            <tr>
+                <td>{{ servicio.nombre }}</td>
+                <td class="texto-derecha">${{ servicio.precio|floatformat:0 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
     {% endif %}
 
     <!-- Servicios Externos -->
     {% if otros_servicios %}
-    <div class="info-section">
-        <h3>Servicios Subcontratados</h3>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Servicio</th>
-                    <th>Empresa</th>
-                    <th>Precio</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for servicio in otros_servicios %}
-                <tr>
-                    <td>{{ servicio.nombre_servicio }}</td>
-                    <td>{{ servicio.empresa_externa }}</td>
-                    <td>${{ servicio.precio_cliente|floatformat:0 }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+    <div class="subtitulo">🏢 Servicios Subcontratados</div>
+    <table class="tabla-items">
+        <thead>
+            <tr>
+                <th>Servicio</th>
+                <th>Empresa Externa</th>
+                <th class="texto-derecha">Precio</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for servicio in otros_servicios %}
+            <tr class="servicio-externo">
+                <td>{{ servicio.nombre_servicio }}</td>
+                <td>{{ servicio.empresa_externa }}</td>
+                <td class="texto-derecha">${{ servicio.precio_cliente|floatformat:0 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
     {% endif %}
 
     <!-- Observaciones -->
     {% if documento.observaciones %}
-    <div class="info-section">
-        <h3>Observaciones</h3>
-        <p>{{ documento.observaciones|linebreaks }}</p>
+    <div class="observaciones">
+        <div class="subtitulo">📝 Observaciones</div>
+        <div class="observaciones-box">
+            {{ documento.observaciones|linebreaks }}
+        </div>
     </div>
     {% endif %}
 
     <!-- Totales -->
-    <div class="totals">
-        <table class="table">
-            <tr>
-                <td><strong>Subtotal:</strong></td>
-                <td style="text-align: right;"><strong>${{ subtotal|floatformat:0 }}</strong></td>
-            </tr>
-            {% if documento.incluir_iva %}
-            <tr>
-                <td>IVA (19%):</td>
-                <td style="text-align: right;">${{ iva|floatformat:0 }}</td>
-            </tr>
-            {% endif %}
-            <tr style="border-top: 2px solid #000;">
-                <td><strong>TOTAL:</strong></td>
-                <td style="text-align: right; font-size: 16px;"><strong>${{ total|floatformat:0 }}</strong></td>
-            </tr>
-        </table>
+    <div class="totales">
+        <div class="total-fila">
+            <div class="total-label">Subtotal Repuestos:</div>
+            <div class="total-valor">${{ total_repuestos|floatformat:0 }}</div>
+        </div>
+        <div class="total-fila">
+            <div class="total-label">Subtotal Servicios:</div>
+            <div class="total-valor">${{ total_servicios|floatformat:0 }}</div>
+        </div>
+        {% if total_otros_servicios %}
+        <div class="total-fila">
+            <div class="total-label">Subtotal Otros Servicios:</div>
+            <div class="total-valor">${{ total_otros_servicios|floatformat:0 }}</div>
+        </div>
+        {% endif %}
+        <div class="total-fila">
+            <div class="total-label">Subtotal:</div>
+            <div class="total-valor">${{ subtotal|floatformat:0 }}</div>
+        </div>
+        {% if documento.incluir_iva %}
+        <div class="total-fila">
+            <div class="total-label">IVA (19%):</div>
+            <div class="total-valor">${{ iva|floatformat:0 }}</div>
+        </div>
+        {% endif %}
+        <div class="total-fila total-final">
+            <div class="total-label">TOTAL:</div>
+            <div class="total-valor">${{ total|floatformat:0 }}</div>
+        </div>
     </div>
 
     <div style="clear: both;"></div>
 
     <!-- Firmas -->
-    <div style="margin-top: 80px;">
-        <div style="display: flex; justify-content: space-between;">
-            <div style="text-align: center; width: 45%;">
-                <div style="border-top: 1px solid #000; margin-top: 50px; padding-top: 5px;">
+    <div class="firma-seccion">
+        <div class="firma-grid">
+            <div class="firma-cell">
+                <div class="firma-linea"></div>
+                <div class="firma-texto">
                     <strong>Firma del Cliente</strong><br>
                     {{ documento.cliente.nombre }}
                 </div>
             </div>
-            <div style="text-align: center; width: 45%;">
-                <div style="border-top: 1px solid #000; margin-top: 50px; padding-top: 5px;">
+            <div class="firma-cell">
+                <div class="firma-linea"></div>
+                <div class="firma-texto">
                     <strong>Firma Autorizada</strong><br>
                     {{ empresa.nombre }}
                 </div>
@@ -482,7 +504,7 @@
             <p style="font-size: 9pt; color: #888; margin: 5px 0;">
                 <strong>eGarage AI™</strong> - Sistema desarrollado por 
                 <strong style="color: #007bff;">Atlanta Reciclajes</strong> | 
-                RUT: 77.350.892-5 | 
+
                 <a href="mailto:suscripcion@atlantareciclajes.cl" style="color: #007bff;">suscripcion@atlantareciclajes.cl</a>
             </p>
         </div>

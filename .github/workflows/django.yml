@@ -1,0 +1,75 @@
+name: Django CI
+
+on:
+  push:
+    branches: [ main, master, cleanup/** ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+  django-version: ["5.0.*", "5.1.*"]
+        exclude:
+          - python-version: "3.11"
+            django-version: "5.1.*"  # ejemplo si incompatibilidad
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: testdb
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd="pg_isready -U postgres" --health-interval=10s --health-timeout=5s --health-retries=5
+    env:
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/testdb
+      PYTHONWARNINGS: ignore::DeprecationWarning
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('requirements.txt', 'requirements-dev.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-${{ matrix.python-version }}-
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt "Django==${{ matrix.django-version }}" psycopg[binary]
+      - name: Chequeos Django
+        run: |
+          python manage.py check
+          python manage.py makemigrations --check --dry-run
+      - name: Migraciones
+        run: python manage.py migrate --noinput
+      - name: Collectstatic
+        run: python manage.py collectstatic --noinput
+      - name: Lint (ruff)
+        run: ruff check .
+      - name: Formato (black --check)
+        run: black --check .
+      - name: Tests (pytest + coverage)
+        run: pytest
+      - name: Bandit (seguridad básica)
+        run: bandit -r taller || true
+      - name: Subir coverage.xml
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ matrix.python-version }}-${{ matrix.django-version }}
+          path: coverage.xml
+      # - name: Codecov
+      #   uses: codecov/codecov-action@v4
+      #   with:
+      #     files: coverage.xml
+      #     token: ${{ secrets.CODECOV_TOKEN }}

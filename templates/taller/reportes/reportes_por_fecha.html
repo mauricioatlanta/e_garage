@@ -344,7 +344,7 @@
                     <th>📋 Tipo</th>
                     <th>📅 Fecha</th>
                     <th>👤 Cliente</th>
-                    <th>🔧 Mecánico</th>
+                    <th>🔧 Técnico</th>
                     <th>💰 Total</th>
                     <th>🎯 Acciones</th>
                 </tr>
@@ -358,7 +358,7 @@
                     </td>
                     <td>{{ doc.fecha|date:"d/m/Y" }}</td>
                     <td>{{ doc.cliente.nombre }} {{ doc.cliente.apellido|default:"" }}</td>
-                    <td>{{ doc.mecanico.nombre|default:"Sin asignar" }}</td>
+                    <td>{{ doc.tecnico.nombre|default:"Sin asignar" }}</td>
                     <td>
                         <span style="color: var(--cyber-blue); font-weight: bold;">
                             ${{ doc.calcular_total|floatformat:0|default:"0" }}

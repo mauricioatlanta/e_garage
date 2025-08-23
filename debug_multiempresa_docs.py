@@ -88,7 +88,7 @@ def crear_documento_test_empresa():
             continue
             
         from taller.models.clientes import Cliente
-        from taller.models.mecanico import Mecanico
+        from taller.models.tecnico import Mecanico
         from datetime import date
         
         # Obtener o crear cliente para esta empresa
@@ -102,7 +102,7 @@ def crear_documento_test_empresa():
             )
         
         # Obtener o crear mecánico
-        mecanico, _ = Mecanico.objects.get_or_create(
+        mecanico, _ = Tecnico.objects.get_or_create(
             nombre=f"Mecánico Test {empresa.nombre_taller[:10]}"
         )
         

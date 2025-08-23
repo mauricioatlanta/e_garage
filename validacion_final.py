@@ -6,8 +6,9 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings_sqlite')
 django.setup()
 
 from django.contrib.auth.models import User
-from taller.models.mecanico import Mecanico
-from taller.models.documento import Documento, RepuestoDocumento, ServicioDocumento
+from taller.models.tecnico import Tecnico
+from taller.models.documento import Documento
+from taller.models.lineas_documento import LineaServicio, LineaRepuesto, LineaOtroServicio
 from taller.models.empresa import Empresa
 
 def validacion_final_sistema():
@@ -23,7 +24,7 @@ def validacion_final_sistema():
     print(f"🏢 Empresas registradas: {empresas.count()}")
     
     # 2. Verificar mecánicos
-    mecanicos = Mecanico.objects.all()
+    mecanicos = Tecnico.objects.all()
     print(f"\n🔧 Mecánicos en sistema: {mecanicos.count()}")
     for mec in mecanicos[:5]:  # Mostrar solo los primeros 5
         print(f"   - ID {mec.id}: {mec.nombre}")
@@ -49,32 +50,35 @@ def validacion_final_sistema():
     
     for doc in documentos_recientes:
         print(f"\n📋 Documento #{doc.id} ({doc.tipo_documento})")
-        print(f"   📅 Fecha: {doc.fecha}")
+        print(f"   📅 Fecha: {getattr(doc, 'fecha', 'N/A')}")
         print(f"   👤 Cliente: {doc.cliente.nombre if doc.cliente else 'Sin cliente'}")
-        print(f"   🔧 Mecánico: {doc.mecanico.nombre if doc.mecanico else 'Sin mecánico'}")
+        print(f"   🔧 Técnico: {doc.tecnico.nombre if doc.tecnico else 'Sin técnico'}")
         print(f"   🚗 Vehículo: {doc.vehiculo.patente if doc.vehiculo else 'Sin vehículo'}")
-        
+
         # Verificar repuestos
-        repuestos = RepuestoDocumento.objects.filter(documento=doc)
+        repuestos = LineaRepuesto.objects.filter(documento=doc)
         print(f"   🔩 Repuestos: {repuestos.count()}")
         for rep in repuestos[:2]:  # Mostrar solo los primeros 2
-            print(f"      - {rep.nombre}: ${rep.precio} x {rep.cantidad}")
-        
+            precio = getattr(rep, 'precio_unitario', getattr(rep, 'precio', 'N/A'))
+            cantidad = getattr(rep, 'cantidad', 'N/A')
+            print(f"      - {getattr(rep, 'nombre', 'Repuesto')}: ${precio} x {cantidad}")
+
         # Verificar servicios
-        servicios = ServicioDocumento.objects.filter(documento=doc)
+        servicios = LineaServicio.objects.filter(documento=doc)
         print(f"   ⚙️ Servicios: {servicios.count()}")
         for serv in servicios[:2]:  # Mostrar solo los primeros 2
-            print(f"      - {serv.nombre}: ${serv.precio}")
-        
+            precio_s = getattr(serv, 'precio_unitario', getattr(serv, 'precio', 'N/A'))
+            print(f"      - {getattr(serv, 'nombre', 'Servicio')}: ${precio_s}")
+
         # Calcular totales
-        total_repuestos = sum(r.total for r in repuestos)
-        total_servicios = sum(s.precio for s in servicios)
+        total_repuestos = sum(getattr(r, 'precio_unitario', getattr(r, 'precio', 0)) * getattr(r, 'cantidad', 0) for r in repuestos)
+        total_servicios = sum(getattr(s, 'precio_unitario', getattr(s, 'precio', 0)) for s in servicios)
         subtotal = total_repuestos + total_servicios
-        
+
         print(f"   💰 Subtotal: ${subtotal}")
-        
+
         # Estado del documento
-        tiene_datos = bool(doc.cliente and doc.mecanico and (repuestos.exists() or servicios.exists()))
+        tiene_datos = bool(doc.cliente and doc.tecnico and (repuestos.exists() or servicios.exists()))
         print(f"   ✅ Documento completo: {'Sí' if tiene_datos else 'No'}")
     
     # 5. Verificar URLs críticas
@@ -95,7 +99,7 @@ def validacion_final_sistema():
         'templates/taller/documentos/crear_documento.html',
         'static/js/formulario_documento.js',
         'taller/models/documento.py',
-        'taller/models/mecanico.py'
+        'taller/models/tecnico.py'
     ]
     
     for archivo in archivos_criticos:
@@ -117,10 +121,10 @@ def test_crear_mecanico_simple():
     """Test básico de creación de mecánico"""
     print("\n🧪 TEST: Crear mecánico programáticamente")
     
-    nombre_test = f"Mecánico Test {len(Mecanico.objects.all()) + 1}"
+    nombre_test = f"Mecánico Test {len(Tecnico.objects.all()) + 1}"
     
     try:
-        mecanico, created = Mecanico.objects.get_or_create(nombre=nombre_test)
+        mecanico, created = Tecnico.objects.get_or_create(nombre=nombre_test)
         if created:
             print(f"✅ Mecánico creado: {mecanico.nombre} (ID: {mecanico.id})")
         else:

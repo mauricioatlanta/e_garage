@@ -11,7 +11,8 @@ django.setup()
 from django.contrib.auth.models import User
 from taller.models.perfil_usuario import PerfilUsuario
 from taller.models.empresa import Empresa
-from taller.models.documento import Documento, RepuestoDocumento, ServicioDocumento
+from taller.models.documento import Documento
+from taller.models.lineas_documento import LineaRepuesto as RepuestoDocumento, LineaServicio
 
 print('📋 === RESUMEN FINAL - DIAGNÓSTICO Y REPARACIÓN ===')
 print()
@@ -53,7 +54,7 @@ print('\n3️⃣ DOCUMENTOS RECIENTES CON ITEMS')
 documentos_recientes = Documento.objects.all().order_by('-pk')[:5]
 for doc in documentos_recientes:
     repuestos = RepuestoDocumento.objects.filter(documento=doc).count()
-    servicios = ServicioDocumento.objects.filter(documento=doc).count()
+    servicios = LineaServicio.objects.filter(documento=doc).count()
     estado = "✅" if (repuestos > 0 and servicios > 0) else "⚠️" if (repuestos > 0 or servicios > 0) else "❌"
     print(f'   {estado} Doc {doc.pk} ({doc.empresa.nombre_taller}): R:{repuestos} S:{servicios}')
 
@@ -62,19 +63,25 @@ print('\n4️⃣ DOCUMENTOS DE TALLER2')
 docs_taller2 = Documento.objects.filter(empresa__nombre_taller='Mecánica Express').order_by('-pk')[:3]
 for doc in docs_taller2:
     repuestos = RepuestoDocumento.objects.filter(documento=doc)
-    servicios = ServicioDocumento.objects.filter(documento=doc)
-    
-    total_rep = sum(r.total for r in repuestos)
-    total_serv = sum(s.precio for s in servicios)
+    servicios = LineaServicio.objects.filter(documento=doc)
+
+    def _subtotal_rep(r):
+        return getattr(r, 'subtotal', getattr(r, 'precio_unitario', getattr(r, 'precio', 0)) * getattr(r, 'cantidad', 1))
+
+    def _precio_serv(s):
+        return getattr(s, 'precio_unitario', getattr(s, 'precio', 0))
+
+    total_rep = sum(_subtotal_rep(r) for r in repuestos)
+    total_serv = sum(_precio_serv(s) for s in servicios)
     total_doc = total_rep + total_serv
-    
+
     estado = "✅" if (repuestos.count() > 0 and servicios.count() > 0) else "⚠️" if (repuestos.count() > 0 or servicios.count() > 0) else "❌"
     print(f'   {estado} Doc {doc.pk}: {doc.numero_documento} - Total: ${total_doc:,}')
-    
+
     for rep in repuestos:
-        print(f'       📦 {rep.nombre} x{rep.cantidad} = ${rep.total:,}')
+        print(f'       📦 {rep.nombre} x{getattr(rep, "cantidad", 1)} = ${_subtotal_rep(rep):,}')
     for serv in servicios:
-        print(f'       🔧 {serv.nombre} = ${serv.precio:,}')
+        print(f'       🔧 {serv.nombre} = ${_precio_serv(serv):,}')
 
 # 5. Verificación archivos críticos
 print('\n5️⃣ ARCHIVOS CRÍTICOS')

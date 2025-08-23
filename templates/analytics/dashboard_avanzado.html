@@ -14,7 +14,6 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
     <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
     
     <style>
         :root {
@@ -178,7 +177,7 @@
                 </p>
             </div>
             <div class="flex gap-3 mt-4 md:mt-0">
-                <button onclick="location.href='/analytics/admin/dashboard/'" class="action-btn">
+                <button onclick="location.href='/dashboard/'" class="action-btn">
                     ← Dashboard Principal
                 </button>
                 <button onclick="actualizarTodo()" class="action-btn">
@@ -345,7 +344,7 @@
         // Métricas en tiempo real
         async function cargarMetricasTimepoReal() {
             try {
-                const response = await fetch('/analytics/admin/dashboard/realtime/');
+                const response = await fetch('/dashboard/realtime/');
                 const data = await response.json();
                 
                 const container = document.getElementById('metricas-tiempo-real');
@@ -375,7 +374,7 @@
         // Predicciones IA
         async function cargarPredicciones() {
             try {
-                const response = await fetch('/analytics/admin/dashboard/predictive/');
+                const response = await fetch('/dashboard/predictive/');
                 const data = await response.json();
                 
                 const container = document.getElementById('predicciones-container');
@@ -445,7 +444,7 @@
         // Datos geográficos
         async function cargarDatosGeograficos() {
             try {
-                const response = await fetch('/analytics/admin/dashboard/geographic/');
+                const response = await fetch('/dashboard/geographic/');
                 const data = await response.json();
                 
                 // Limpiar marcadores existentes
@@ -485,7 +484,7 @@
         // Sistema de alertas
         async function cargarAlertas() {
             try {
-                const response = await fetch('/analytics/admin/dashboard/alertas/');
+                const response = await fetch('/dashboard/alertas/');
                 const data = await response.json();
                 
                 // Actualizar contadores
@@ -542,7 +541,7 @@
         // Comportamiento de usuarios
         async function cargarComportamientoUsuarios() {
             try {
-                const response = await fetch('/analytics/admin/dashboard/behavior/');
+                const response = await fetch('/dashboard/behavior/');
                 const data = await response.json();
                 
                 // Actividad de usuarios
@@ -588,7 +587,7 @@
         // Funciones de acción
         async function enviarRecordatorio(empresaId) {
             try {
-                const response = await fetch(`/analytics/admin/dashboard/recordatorio/${empresaId}/`, {
+                const response = await fetch(`/dashboard/recordatorio/${empresaId}/`, {
                     method: 'POST',
                     headers: {
                         'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || '',

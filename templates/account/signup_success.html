@@ -23,7 +23,8 @@
           {% endif %}
         </p>
       </div>
-      <a href="/accounts/login/" class="block text-center text-lime-400 hover:underline mt-6">{% trans "Ir a iniciar sesión" %}</a>
+  {% load country_url %}
+  <a href="{% country_url 'account_login' %}" class="block text-center text-lime-400 hover:underline mt-6">{% trans "Ir a iniciar sesión" %}</a>
     </div>
   </div>
 </div>

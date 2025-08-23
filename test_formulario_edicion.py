@@ -10,7 +10,7 @@ django.setup()
 from django.test import Client
 from django.contrib.auth.models import User
 from taller.models.documento import Documento
-from taller.models.mecanico import Mecanico
+from taller.models.tecnico import Mecanico
 from taller.documentos.forms import DocumentoForm
 
 # Crear cliente de prueba
@@ -43,7 +43,7 @@ if user:
             print(f'      - {mecanico.nombre} (ID: {mecanico.pk})')
             
         # Verificar si hay mecánicos activos para la empresa
-        mecanicos_empresa = Mecanico.objects.filter(empresa=empresa, activo=True)
+        mecanicos_empresa = Tecnico.objects.filter(empresa=empresa, activo=True)
         print(f'   📊 Mecánicos activos en empresa: {mecanicos_empresa.count()}')
         
         # Probar la vista de edición

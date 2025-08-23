@@ -28,24 +28,46 @@
       <tr>
         <th>Tipo</th>
         <th>Nombre</th>
+        <th>Cantidad</th>
         <th>Precio</th>
+        <th>Total</th>
       </tr>
     </thead>
     <tbody>
-      {% for item in documento.detalles.all %}
+      {% for repuesto in documento.repuestos.all %}
       <tr>
-        <td>{{ item.tipo_item }}</td>
-        <td>{{ item.nombre }}</td>
-        <td>${{ item.precio_venta|floatformat:0 }}</td>
+        <td>Repuesto</td>
+        <td>{{ repuesto.nombre }}</td>
+        <td>{{ repuesto.cantidad }}</td>
+        <td>${{ repuesto.precio|floatformat:0 }}</td>
+        <td>${{ repuesto.total|floatformat:0 }}</td>
+      </tr>
+      {% endfor %}
+      {% for servicio in documento.servicios.all %}
+      <tr>
+        <td>Servicio</td>
+        <td>{{ servicio.nombre }}</td>
+        <td>1</td>
+        <td>${{ servicio.precio|floatformat:0 }}</td>
+        <td>${{ servicio.precio|floatformat:0 }}</td>
+      </tr>
+      {% endfor %}
+      {% for otro_servicio in documento.otros_servicios.all %}
+      <tr>
+        <td>Servicio Externo</td>
+        <td>{{ otro_servicio.nombre_servicio }}</td>
+        <td>1</td>
+        <td>${{ otro_servicio.precio_cliente|floatformat:0 }}</td>
+        <td>${{ otro_servicio.precio_cliente|floatformat:0 }}</td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
 
   <table class="totales" style="margin-top: 30px;">
-    <tr><td>Subtotal:</td><td>${{ documento.total_repuestos|add:documento.total_servicios|floatformat:0 }}</td></tr>
-    <tr><td>IVA (19%):</td><td>${{ documento.iva|floatformat:0 }}</td></tr>
-    <tr><td>Total:</td><td>${{ documento.total_general|floatformat:0 }}</td></tr>
+    <tr><td>Subtotal:</td><td>${{ subtotal|floatformat:0 }}</td></tr>
+    <tr><td>IVA (19%):</td><td>${{ iva|floatformat:0 }}</td></tr>
+    <tr><td>Total:</td><td>${{ total_general|floatformat:0 }}</td></tr>
   </table>
 
 </body>

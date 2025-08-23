@@ -1,5 +1,5 @@
 from django.urls import path, include
-from . import onboarding_views
+import onboarding_views
 
 app_name = 'onboarding'
 

@@ -1,0 +1,368 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load custom_filters %}
+{% load i18n %}  {# 👈 Cargar i18n #}
+
+{% block title %}{% trans "Reportes de Mecánicos" %} - {{ block.super }}{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    /* Variables de tema IA futurista */
+    :root {
+        --ai-primary: #00ff88;
+        --ai-secondary: #0066ff;
+        --ai-accent: #ff0080;
+        --ai-glow: #00ffff;
+        --neural-bg: #0a0a0f;
+        --matrix-green: #39ff14;
+        --cyber-purple: #b347d9;
+        --hologram-blue: #00d4ff;
+        --quantum-orange: #ff6b35;
+        --neon-pink: #ff1493;
+    }
+
+    /* Fondo con efecto de neural network */
+    body {
+        background: radial-gradient(ellipse at center, #0a0a0f 0%, #000000 100%);
+        position: relative;
+        overflow-x: hidden;
+        font-family: 'Orbitron', 'Courier New', monospace;
+        color: var(--ai-glow);
+    }
+
+    /* Contenedor principal futurista */
+    .ai-dashboard {
+        background: linear-gradient(135deg, rgba(0,255,136,0.1) 0%, rgba(0,102,255,0.1) 50%, rgba(255,0,128,0.1) 100%);
+        border: 2px solid var(--ai-glow);
+        border-radius: 20px;
+        box-shadow: 
+            0 0 50px rgba(0,255,255,0.3),
+            inset 0 0 30px rgba(0,255,136,0.1);
+        backdrop-filter: blur(10px);
+        margin: 20px;
+        padding: 30px;
+        position: relative;
+    }
+
+    /* Encabezado con efecto holográfico */
+    .ai-header {
+        text-align: center;
+        margin-bottom: 40px;
+        position: relative;
+    }
+
+    .ai-title {
+        font-size: 3rem;
+        font-weight: bold;
+        background: linear-gradient(45deg, var(--ai-primary), var(--hologram-blue), var(--neon-pink));
+        background-size: 300% 300%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: gradientShift 3s ease-in-out infinite;
+        text-shadow: 0 0 30px rgba(0,255,255,0.5);
+        margin-bottom: 10px;
+    }
+
+    @keyframes gradientShift {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+
+    /* Formulario de filtros futurista */
+    .ai-filters {
+        background: rgba(0,0,0,0.6);
+        border: 1px solid var(--ai-glow);
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 30px;
+        box-shadow: 0 0 20px rgba(0,255,255,0.2);
+    }
+
+    .filter-input {
+        background: rgba(0,20,40,0.8);
+        border: 2px solid var(--ai-secondary);
+        border-radius: 10px;
+        color: var(--ai-glow);
+        padding: 12px 16px;
+        font-family: 'Courier New', monospace;
+        transition: all 0.3s ease;
+    }
+
+    .filter-input:focus {
+        border-color: var(--ai-primary);
+        box-shadow: 0 0 15px rgba(0,255,136,0.4);
+        outline: none;
+    }
+
+    .ai-button {
+        background: linear-gradient(45deg, var(--ai-primary), var(--ai-secondary));
+        border: none;
+        border-radius: 12px;
+        color: black;
+        font-weight: bold;
+        padding: 12px 24px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: 'Orbitron', sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .ai-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,255,136,0.4);
+    }
+
+    /* Tabla de datos futurista */
+    .ai-table {
+        background: rgba(0,0,0,0.7);
+        border-radius: 15px;
+        overflow: hidden;
+        border: 1px solid var(--ai-glow);
+        margin-top: 20px;
+    }
+
+    .ai-table th {
+        background: linear-gradient(90deg, var(--ai-secondary), var(--cyber-purple));
+        color: white;
+        font-weight: bold;
+        padding: 15px;
+        text-align: center;
+        font-family: 'Orbitron', sans-serif;
+    }
+
+    .ai-table td {
+        padding: 12px 15px;
+        border-bottom: 1px solid rgba(0,255,255,0.2);
+        color: var(--ai-glow);
+    }
+
+    .ai-table tr:hover {
+        background: rgba(0,255,136,0.1);
+    }
+
+    /* Gráfico contenedor */
+    .chart-container {
+        background: rgba(0,0,0,0.8);
+        border-radius: 15px;
+        padding: 20px;
+        margin: 20px 0;
+        border: 1px solid var(--hologram-blue);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ai-dashboard">
+    <!-- Encabezado holográfico -->
+    <div class="ai-header">
+        <h1 class="ai-title">{% trans "Reportes de Mecánicos" %}</h1>
+        <p class="text-lg text-cyan-300">
+            {% blocktrans %}Sistema de análisis de rendimiento técnico{% endblocktrans %}
+        </p>
+    </div>
+
+    <!-- Formulario de filtros -->
+    <div class="ai-filters">
+        <form method="get" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+            <!-- Selector de técnico -->
+            <div>
+                <label class="block text-sm font-bold mb-2 text-cyan-300">
+                    {% trans "Técnico" %}
+                </label>
+                <select name="tecnico_id" id="tecnico_id" class="filter-input w-full">
+                    <option value="todos" {% if mecanico_seleccionado == 'todos' %}selected{% endif %}>
+                        📊 {% trans "Todos los técnicos" %}
+                    </option>
+                    {% for mecanico in todos_mecanicos %}
+                        <option value="{{ mecanico.id }}" {% if mecanico_seleccionado == mecanico.id|stringformat:"s" %}selected{% endif %}>
+                            🔧 {{ mecanico.nombre }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Fecha inicio -->
+            <div>
+                <label class="block text-sm font-bold mb-2 text-cyan-300">
+                    {% trans "Fecha inicio" %}
+                </label>
+                <input type="date" name="fecha_inicio" value="{{ fecha_inicio }}" 
+                       class="filter-input w-full">
+            </div>
+
+            <!-- Fecha fin -->
+            <div>
+                <label class="block text-sm font-bold mb-2 text-cyan-300">
+                    {% trans "Fecha fin" %}
+                </label>
+                <input type="date" name="fecha_fin" value="{{ fecha_fin }}" 
+                       class="filter-input w-full">
+            </div>
+
+            <!-- Botón filtrar -->
+            <div>
+                <button type="submit" class="ai-button w-full">
+                    🔍 {% trans "Filtrar" %}
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Botón de exportar Excel -->
+    {% if reportes_data %}
+    <div class="text-center mb-6">
+        <a href="{% url 'taller:reportes:exportar_mecanicos_excel' %}?{{ request.GET.urlencode }}" 
+           class="ai-button">
+            📊 {% trans "Exportar a Excel" %}
+        </a>
+    </div>
+    {% endif %}
+
+    <!-- Resultados -->
+    {% if reportes_data %}
+        <!-- Gráfico de rendimiento -->
+        <div class="chart-container">
+            <h3 class="text-xl font-bold text-center mb-4 text-cyan-300">
+                {% trans "Rendimiento por Técnico" %}
+            </h3>
+            <canvas id="chartRendimiento" width="400" height="200"></canvas>
+        </div>
+
+        <!-- Tabla de datos -->
+        <div class="ai-table">
+            <table class="w-full">
+                <thead>
+                    <tr>
+                        <th>{% trans "Técnico" %}</th>
+                        <th>{% trans "Documentos" %}</th>
+                        <th>{% trans "Total Servicios" %}</th>
+                        <th>{% trans "Total Repuestos" %}</th>
+                        <th>{% trans "Total General" %}</th>
+                        <th>{% trans "Promedio por Doc" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reporte in reportes_data %}
+                    <tr>
+                        <td class="font-bold">🔧 {{ reporte.tecnico__nombre }}</td>
+                        <td class="text-center">{{ reporte.total_documentos }}</td>
+                        <td class="text-right">
+                            {% if empresa.es_usa %}
+                                ${{ reporte.total_servicios|floatformat:2 }}
+                            {% else %}
+                                ${{ reporte.total_servicios|floatformat:0 }}
+                            {% endif %}
+                        </td>
+                        <td class="text-right">
+                            {% if empresa.es_usa %}
+                                ${{ reporte.total_repuestos|floatformat:2 }}
+                            {% else %}
+                                ${{ reporte.total_repuestos|floatformat:0 }}
+                            {% endif %}
+                        </td>
+                        <td class="text-right font-bold">
+                            {% if empresa.es_usa %}
+                                ${{ reporte.total_general|floatformat:2 }}
+                            {% else %}
+                                ${{ reporte.total_general|floatformat:0 }}
+                            {% endif %}
+                        </td>
+                        <td class="text-right">
+                            {% if empresa.es_usa %}
+                                ${{ reporte.promedio_por_documento|floatformat:2 }}
+                            {% else %}
+                                ${{ reporte.promedio_por_documento|floatformat:0 }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="text-center py-12">
+            <p class="text-xl text-cyan-300">
+                {% trans "No hay datos para mostrar en el período seleccionado" %}
+            </p>
+            <p class="text-gray-400 mt-2">
+                {% trans "Intenta ajustar los filtros o el rango de fechas" %}
+            </p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- JavaScript para el gráfico -->
+{% if reportes_data %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('chartRendimiento').getContext('2d');
+    
+    // Datos del gráfico
+    const labels = [
+        {% for reporte in reportes_data %}
+            '{{ reporte.tecnico__nombre }}',
+        {% endfor %}
+    ];
+    
+    const totalData = [
+        {% for reporte in reportes_data %}
+            {{ reporte.total_general|default:0 }},
+        {% endfor %}
+    ];
+    
+    // Crear gráfico
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: '{% trans "Total Facturado" %}',
+                data: totalData,
+                backgroundColor: 'rgba(0, 255, 136, 0.6)',
+                borderColor: 'rgba(0, 255, 136, 1)',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#00ffff'
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: '#00ffff',
+                        callback: function(value) {
+                            return '{% if empresa.es_usa %}${% else %}${% endif %}' + value.toLocaleString();
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(0, 255, 255, 0.2)'
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: '#00ffff'
+                    },
+                    grid: {
+                        color: 'rgba(0, 255, 255, 0.2)'
+                    }
+                }
+            }
+        }
+    });
+});
+
+// Usar gettext en JavaScript
+console.log(gettext('Datos cargados correctamente'));
+</script>
+{% endif %}
+{% endblock %}

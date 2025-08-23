@@ -3,9 +3,10 @@ from django.http import JsonResponse
 from django.core.paginator import Paginator
 from taller.forms.clientes import ClienteForm
 from taller.models.clientes import Cliente
-from taller.models.region_ciudad import TallerRegion, TallerCiudad
+from taller.models.region_ciudad import TallerRegion, TallerCiudad  # noqa: F401
 from django.contrib import messages
 from taller.vehiculos.forms import VehiculoForm
+from taller.models.modelo import Modelo  # Modelo estándar de vehículos
 
 def lista_clientes(request):
     q = request.GET.get("q", "").strip()
@@ -59,11 +60,16 @@ def editar_cliente(request, pk):
         'cliente': cliente,
     })
 
-def eliminar_cliente(request, pk):
-    cliente = get_object_or_404(Cliente, pk=pk)
-    cliente.delete()
-    messages.success(request, '🗑️ Cliente eliminado exitosamente.')
-    return redirect('clientes:lista_clientes')
+"""Vista legacy de eliminación eliminada.
+
+Se delega ahora en ``taller.clientes.views.eliminar_cliente`` que acepta
+``pk`` o ``cliente_id``. Si en algún punto se estaba importando esta
+función desde aquí, puede hacerse:
+
+    from taller.clientes.views import eliminar_cliente
+
+Esto evita mantener dos implementaciones divergentes.
+"""
 
 def ver_cliente(request, pk):
     cliente = get_object_or_404(Cliente, pk=pk)
@@ -74,7 +80,8 @@ def api_ciudades(request):
     ciudades = []
     if region_id:
         ciudades_qs = TallerCiudad.objects.filter(region_id=region_id).order_by('nombre')
-        ciudades = [{"id": c.id, "nombre": c.nombre} for c in ciudades_qs]
+    # Atributos id y nombre existen en el modelo; comentario para linters dinámicos
+    ciudades = [{"id": c.id, "nombre": c.nombre} for c in ciudades_qs]  # noqa: B009
     return JsonResponse({"ciudades": ciudades})
 
 def obtener_modelos_por_marca(request):
@@ -82,7 +89,7 @@ def obtener_modelos_por_marca(request):
     modelos = []
     if marca_id:
         modelos_qs = Modelo.objects.filter(marca_id=marca_id).order_by('nombre')
-        modelos = [{"id": m.id, "nombre": m.nombre} for m in modelos_qs]
+    modelos = [{"id": m.id, "nombre": m.nombre} for m in modelos_qs]  # noqa: B009
     return JsonResponse(modelos, safe=False)
 
 def test_autocomplete_minimal(request):

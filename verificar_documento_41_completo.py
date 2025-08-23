@@ -8,7 +8,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings')
 django.setup()
 
 from taller.models.documento import Documento
-from taller.models.mecanico import Mecanico
+from taller.models.tecnico import Mecanico
 
 try:
     doc = Documento.objects.get(id=41)
@@ -22,7 +22,7 @@ try:
     print(f'🔧 Mecánico Nombre: {doc.mecanico.nombre if doc.mecanico else "None"}')
     
     # Listar mecánicos disponibles para la empresa
-    mecanicos = Mecanico.objects.filter(empresa=doc.empresa)
+    mecanicos = Tecnico.objects.filter(empresa=doc.empresa)
     print(f'\n🔧 Mecánicos disponibles para {doc.empresa}:')
     for m in mecanicos:
         print(f'   - {m.nombre} (ID: {m.id})')

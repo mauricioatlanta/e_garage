@@ -31,16 +31,24 @@ CATALOGOS_CIUDADES = {
 
  # Cargar estados y ciudades de USA desde el JSON externo
 _json_path = os.path.join(os.path.dirname(__file__), 'estados_ciudades_usa.json')
+def _notificar_error_json_usa(msg):
+    print(f"\033[91m[ERROR JSON USA]\033[0m {msg}")  # Rojo en consola
+    try:
+        with open(os.path.join(os.path.dirname(__file__), 'json_usa_error.log'), 'a', encoding='utf-8') as log:
+            log.write(msg + '\n')
+    except Exception as logerr:
+        print(f"No se pudo escribir en el log de errores: {logerr}")
+
 try:
     with open(_json_path, encoding='utf-8') as f:
         data_us = json.load(f)
         if isinstance(data_us, dict) and data_us:
             CATALOGOS_CIUDADES['US'] = data_us
         else:
-            print("Advertencia: El JSON de USA está vacío o malformado.")
+            _notificar_error_json_usa("Advertencia: El JSON de USA está vacío o malformado.")
             CATALOGOS_CIUDADES['US'] = {}
 except Exception as e:
-    print(f"Error cargando estados_ciudades_usa.json: {e}")
+    _notificar_error_json_usa(f"Error cargando estados_ciudades_usa.json: {e}")
     CATALOGOS_CIUDADES['US'] = {}
 
 

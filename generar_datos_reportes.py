@@ -10,7 +10,8 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings')
 django.setup()
 
 from taller.models.empresa import Empresa
-from taller.models.documento import Documento, ServicioDocumento, RepuestoDocumento
+from taller.models.documento import Documento
+from taller.models.lineas_documento import LineaServicio, LineaRepuesto
 from taller.models.vehiculos import Vehiculo, Marca, Modelo
 from taller.models.clientes import Cliente
 from django.contrib.auth.models import User
@@ -133,14 +134,17 @@ for i, fecha in enumerate(fechas, 1):
         ]
         
         for j, (nombre, precio) in enumerate(servicios[:3]):  # Solo 3 servicios por doc
-            servicio, _ = ServicioDocumento.objects.get_or_create(
-                documento=doc,
-                nombre=nombre,
-                defaults={
-                    'precio': precio,
-                    'empresa': empresa
-                }
-            )
+            # Crear línea de servicio (modelo canónico)
+            try:
+                servicio, _ = LineaServicio.objects.get_or_create(
+                    documento=doc,
+                    nombre=nombre,
+                    defaults={
+                        'precio_unitario': precio,
+                    }
+                )
+            except Exception:
+                LineaServicio.objects.create(documento=doc, nombre=nombre, precio_unitario=precio)
             
         # Agregar repuestos
         repuestos = [
@@ -152,21 +156,24 @@ for i, fecha in enumerate(fechas, 1):
         ]
         
         for k, (nombre, precio, codigo, cantidad) in enumerate(repuestos[:3]):  # Solo 3 repuestos
-            repuesto, _ = RepuestoDocumento.objects.get_or_create(
-                documento=doc,
-                nombre=nombre,
-                codigo=codigo,
-                defaults={
-                    'precio': precio,
-                    'cantidad': cantidad
-                }
-            )
+            try:
+                repuesto, _ = LineaRepuesto.objects.get_or_create(
+                    documento=doc,
+                    nombre=nombre,
+                    codigo=codigo,
+                    defaults={
+                        'precio_unitario': precio,
+                        'cantidad': cantidad
+                    }
+                )
+            except Exception:
+                LineaRepuesto.objects.create(documento=doc, nombre=nombre, codigo=codigo, precio_unitario=precio, cantidad=cantidad)
 
 print(f"✅ Proceso completado!")
 print(f"📊 Documentos creados: {documentos_creados}")
 print(f"🚗 Vehículos: {Vehiculo.objects.count()}")
 print(f"👥 Clientes: {Cliente.objects.count()}")
-print(f"🔧 Servicios: {ServicioDocumento.objects.count()}")
-print(f"⚙️ Repuestos: {RepuestoDocumento.objects.count()}")
+print(f"🔧 Servicios: {LineaServicio.objects.count()}")
+print(f"⚙️ Repuestos: {LineaRepuesto.objects.count()}")
 print("\n🎯 Ahora puedes probar los reportes por fecha!")
 print("📅 Rango sugerido: últimos 30 días")

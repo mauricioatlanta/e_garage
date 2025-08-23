@@ -1,6 +1,6 @@
 from django import forms
 from dal import autocomplete
-	from taller.models.region_ciudad import TallerRegion, TallerCiudad
+from taller.models.region_ciudad import TallerRegion, TallerCiudad
 
 # Alias para compatibilidad con el resto del código
 Region = TallerRegion

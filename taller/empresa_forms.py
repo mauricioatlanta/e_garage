@@ -10,57 +10,23 @@ from dal import autocomplete
 from taller.models.documento import Documento
 from taller.models.vehiculos import Vehiculo
 from taller.models.clientes import Cliente
-from taller.models.mecanico import Mecanico
+from taller.models.tecnico import Tecnico
 
 
 class DocumentoForm(forms.ModelForm):
-    cliente = forms.ModelChoiceField(
-        queryset=Cliente.objects.all(),
-        widget=autocomplete.ModelSelect2(
-            url='autocomplete_cliente',
-            attrs={'data-placeholder': 'Buscar cliente...'}
-        )
-    )
-    vehiculo = forms.ModelChoiceField(
-        queryset=Vehiculo.objects.all(),
-        widget=autocomplete.ModelSelect2(
-            url='autocomplete_vehiculo',
-            forward=['cliente'],
-            attrs={'data-placeholder': 'Filtrar vehículo por cliente'}
-        )
-    )
-    mecanico = forms.CharField(
-        label='Mecánico',
-        required=False,
-        widget=forms.TextInput(attrs={'placeholder': 'Nombre del mecánico'})
-    )
-
     class Meta:
         model = Documento
-        fields = [
-            'tipo_documento',
-            'numero_documento',
-            'fecha',
-            'cliente',
-            'vehiculo',
-            'kilometraje',
-            'observaciones',
-            # 'mecanico',  # No incluir aquí, lo manejamos manualmente
-        ]
+        # Solo lo que el usuario puede editar en DRAFT:
+        fields = ["tipo", "cliente", "vehiculo", "moneda", "country", "descuento"]
         widgets = {
-            'fecha': forms.DateInput(attrs={'type': 'date'}),
+            "descuento": forms.NumberInput(attrs={"step": "0.01", "min": "0"}),
         }
 
-    def save(self, commit=True):
-        instance = super().save(commit=False)
-        mecanico_nombre = self.cleaned_data.get('mecanico')
-        if mecanico_nombre:
-            mecanico_obj, _ = Mecanico.objects.get_or_create(nombre=mecanico_nombre)
-            instance.mecanico = mecanico_obj
-        if commit:
-            instance.save()
-            self.save_m2m()
-        return instance
+    def clean(self):
+        cleaned = super().clean()
+        if self.instance and self.instance.pk and self.instance.estado != "DRAFT":
+            raise forms.ValidationError("No puedes editar un documento emitido/anulado.")
+        return cleaned
 
 def landing_inicio(request):
     return render(request, "landing_inicio.html")
