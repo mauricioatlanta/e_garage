@@ -884,9 +884,10 @@ $(document).ready(function() {
     
     const subtotal = totalRepuestos + totalServicios + totalOtrosServicios;
     
-    // Verificar si debe incluir IVA
+    // IVA solo sobre repuestos (regla de negocio Chile)
+    const baseIVA = totalRepuestos; // 19% SOLO sobre repuestos (CL)
     const incluirIva = $('#id_incluir_iva').is(':checked');
-    const iva = incluirIva ? Math.round(subtotal * 0.19) : 0;
+    const iva = incluirIva ? Math.round(baseIVA * 0.19) : 0;
     const total = subtotal + iva;
     
     // Actualizar displays

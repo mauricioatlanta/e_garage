@@ -159,6 +159,29 @@ class Documento(AuditMixin, models.Model):
 	def total_general(self):
 		return (self.total_repuestos() or 0) + (self.total_servicios() or 0) + (self.total_otros_servicios() or 0)
 
+	def recalcular_totales(self):
+		"""Recalcula y actualiza los totales del documento aplicando IVA solo a repuestos"""
+		from decimal import Decimal
+		
+		# Calcular subtotales
+		self.neto_repuestos = Decimal(str(self.total_repuestos() or 0))
+		self.neto_servicios = Decimal(str(self.total_servicios() or 0))
+		self.neto_otros_servicios = Decimal(str(self.total_otros_servicios() or 0))
+		
+		# Subtotal antes de IVA
+		subtotal_antes_iva = self.neto_repuestos + self.neto_servicios + self.neto_otros_servicios - self.descuento
+		
+		# IVA solo sobre repuestos (regla de negocio)
+		base_iva = self.neto_repuestos
+		self.tax_rate_applied = Decimal('19.00')  # 19% IVA en Chile
+		self.tax_amount = base_iva * self.tax_rate_applied / Decimal('100')
+		
+		# Total final
+		self.total = subtotal_antes_iva + self.tax_amount
+		
+		# Guardar cambios
+		self.save(update_fields=['neto_repuestos', 'neto_servicios', 'neto_otros_servicios', 'tax_rate_applied', 'tax_amount', 'total'])
+
 	# Propiedades retrocompatibles para compatibilidad con código y plantillas antiguas
 	@property
 	def repuestos(self):
