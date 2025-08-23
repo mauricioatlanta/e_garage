@@ -23,7 +23,7 @@ class Documento(AuditMixin, models.Model):
 	], db_index=True)
 	numero = models.PositiveIntegerField(null=True, blank=True, db_index=True)
 	estado = models.CharField(max_length=12, default="DRAFT", db_index=True)
-	fecha_emision = models.DateField(auto_now_add=True, db_index=True)
+	fecha_emision = models.DateField(default=timezone.now, editable=True, db_index=True)
 	cliente  = models.ForeignKey(Cliente, on_delete=models.PROTECT, related_name="documentos", db_index=True)
 	vehiculo = models.ForeignKey(Vehiculo, on_delete=models.SET_NULL, null=True, blank=True, related_name="documentos")
 	moneda  = models.CharField(max_length=3, default="CLP")

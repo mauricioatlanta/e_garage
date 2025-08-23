@@ -396,7 +396,7 @@
 {% block content %}
 <div class="editar-container">
   <h1 class="editar-title">
-    ✏️ Editando: {{ documento.tipo_documento }} #{{ documento.numero_documento }}
+    ✏️ Editando: {{ documento.tipo }} #{{ documento.numero_documento }}
   </h1>
 
   <form method="post" id="form-documento">
@@ -409,15 +409,15 @@
       <div class="form-grid">
         <div class="form-group">
           <label class="form-label">Tipo de Documento:</label>
-          {{ form.tipo_documento|add_class:"form-input" }}
+          {{ form.tipo|add_class:"form-input" }}
         </div>
         <div class="form-group">
           <label class="form-label">Número de Documento:</label>
-          {{ form.numero_documento|add_class:"form-input" }}
+          {{ form.numero|add_class:"form-input" }}
         </div>
         <div class="form-group">
           <label class="form-label">Fecha:</label>
-          {{ form.fecha|add_class:"form-input" }}
+          {{ form.fecha_emision|add_class:"form-input" }}
         </div>
         <div class="form-group cliente-especial">
           <label class="form-label cliente-label">
@@ -438,7 +438,7 @@
         </div>
         <div class="form-group">
           <label class="form-label">Técnico:</label>
-          {{ form.mecanico|add_class:"form-input" }}
+          {{ form.tecnico_responsable|add_class:"form-input" }}
         </div>
       </div>
       
@@ -454,7 +454,7 @@
       
       <div class="form-group">
         <label class="form-label">
-          {{ form.incluir_iva }}
+          <input type="checkbox" id="id_incluir_iva" name="incluir_iva" {% if documento.incluir_iva %}checked{% endif %}>
           Incluir IVA (19%)
         </label>
       </div>
