@@ -1,0 +1,22 @@
+<!-- Campos específicos para Chile -->
+<div class="seccion-card">
+  <h3 class="seccion-title">🇨🇱 Información Chile</h3>
+  
+  <div class="form-grid">
+    {% if form.kilometraje %}
+    <div class="form-group">
+      <label class="form-label" for="{{ form.kilometraje.id_for_label }}">{{ doc_unit_label|default:"Kilometraje" }}</label>
+      {{ form.kilometraje|add_class:"form-input input-number" }}
+      <small style="color: #00f2fe; margin-top: 0.25rem;">Ingrese el kilometraje actual del vehículo</small>
+    </div>
+    {% endif %}
+    
+    <div class="form-group">
+      <label class="form-label">
+        <input type="checkbox" id="id_incluir_iva" name="incluir_iva" style="margin-right: 0.5rem;">
+        {{ doc_tax_label|default:"IVA (19%)" }}
+      </label>
+      <small style="color: #00f2fe; margin-top: 0.25rem;">Se aplica solo sobre repuestos</small>
+    </div>
+  </div>
+</div>

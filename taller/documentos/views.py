@@ -744,7 +744,7 @@ def enviar_por_whatsapp(request, documento_id):
     documento = get_object_or_404(Documento, id=documento_id)
 
     # Renderizar PDF y guardar archivo
-    template = get_template("documentos/documento_pdf.html")
+    template = get_template("taller/documentos/documento_pdf.html")
     html_string = template.render({"documento": documento})
     pdf = HTML(string=html_string, base_url=request.build_absolute_uri()).write_pdf()
 

@@ -84,6 +84,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'taller.context_processors.empresa_contexto.empresa_contexto',
                 'taller.context_processors.namespaces.ui_namespaces',
+                'taller.context_processors.company_country',
             ],
         },
     },

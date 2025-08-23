@@ -35,6 +35,7 @@ class DocumentoDetailView(LoginRequiredMixin, TenantViewMixin, DetailView):
 class DocumentoCreateView(LoginRequiredMixin, TenantViewMixin, CreateView):
     model = Documento
     form_class = DocumentoForm
+    template_name = "taller/documentos/crear_documento.html"
 
 class DocumentoUpdateView(LoginRequiredMixin, TenantViewMixin, UpdateView):
     model = Documento

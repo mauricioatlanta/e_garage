@@ -1,0 +1,28 @@
+<!-- Campos específicos para USA -->
+<div class="seccion-card">
+  <h3 class="seccion-title">🇺🇸 USA Information</h3>
+  
+  <div class="form-grid">
+    {% if form.millas %}
+    <div class="form-group">
+      <label class="form-label" for="{{ form.millas.id_for_label }}">{{ doc_unit_label|default:"Miles" }}</label>
+      {{ form.millas|add_class:"form-input input-number" }}
+      <small style="color: #00f2fe; margin-top: 0.25rem;">Enter current vehicle mileage</small>
+    </div>
+    {% elif form.kilometraje %}
+    <div class="form-group">
+      <label class="form-label" for="{{ form.kilometraje.id_for_label }}">{{ doc_unit_label|default:"Miles" }}</label>
+      {{ form.kilometraje|add_class:"form-input input-number" }}
+      <small style="color: #00f2fe; margin-top: 0.25rem;">Enter current vehicle mileage</small>
+    </div>
+    {% endif %}
+    
+    <div class="form-group">
+      <label class="form-label">
+        <input type="checkbox" id="id_incluir_iva" name="incluir_iva" style="margin-right: 0.5rem;" checked>
+        {{ doc_tax_label|default:"Sales Tax" }}
+      </label>
+      <small style="color: #00f2fe; margin-top: 0.25rem;">Applied to total subtotal</small>
+    </div>
+  </div>
+</div>

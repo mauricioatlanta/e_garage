@@ -1,0 +1,145 @@
+<!-- Tablas de items (repuestos, servicios, otros) -->
+<div class="seccion-card">
+  <h3 class="seccion-title">🛠️ Repuestos</h3>
+  
+  <div style="margin-bottom: 1rem;">
+    <button type="button" id="btn-agregar-repuesto" class="btn-secondary">+ Agregar Repuesto</button>
+  </div>
+  
+  <table class="table-futurista" id="tabla-repuestos">
+    <thead>
+      <tr>
+        <th>Código</th>
+        <th>Descripción</th>
+        <th>Cantidad</th>
+        <th>Precio Unit.</th>
+        <th>Total</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for repuesto in repuestos %}
+      <tr>
+        <td>{{ repuesto.codigo }}</td>
+        <td>{{ repuesto.nombre }}</td>
+        <td>{{ repuesto.cantidad }}</td>
+        <td>{{ doc_currency_symbol }}{{ repuesto.precio }}</td>
+        <td>{{ doc_currency_symbol }}{{ repuesto.total }}</td>
+        <td>
+          <button type="button" class="btn-secondary btn-eliminar" onclick="eliminarFila(this)">🗑️</button>
+        </td>
+      </tr>
+      {% empty %}
+      <tr id="no-repuestos">
+        <td colspan="6" style="text-align: center; color: #6c757d;">No hay repuestos agregados</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  
+  <div style="text-align: right; margin-top: 1rem;">
+    <strong style="color: #00f2fe;">Subtotal Repuestos: <span id="subtotal-repuestos">{{ doc_currency_symbol }}{{ subtotal_repuestos|default:0 }}</span></strong>
+  </div>
+</div>
+
+<div class="seccion-card">
+  <h3 class="seccion-title">⚙️ Servicios</h3>
+  
+  <div style="margin-bottom: 1rem;">
+    <button type="button" id="btn-agregar-servicio" class="btn-secondary">+ Agregar Servicio</button>
+  </div>
+  
+  <table class="table-futurista" id="tabla-servicios">
+    <thead>
+      <tr>
+        <th>Descripción</th>
+        <th>Precio</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for servicio in servicios %}
+      <tr>
+        <td>{{ servicio.nombre }}</td>
+        <td>{{ doc_currency_symbol }}{{ servicio.precio }}</td>
+        <td>
+          <button type="button" class="btn-secondary btn-eliminar" onclick="eliminarFila(this)">🗑️</button>
+        </td>
+      </tr>
+      {% empty %}
+      <tr id="no-servicios">
+        <td colspan="3" style="text-align: center; color: #6c757d;">No hay servicios agregados</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  
+  <div style="text-align: right; margin-top: 1rem;">
+    <strong style="color: #00f2fe;">Subtotal Servicios: <span id="subtotal-servicios">{{ doc_currency_symbol }}{{ subtotal_servicios|default:0 }}</span></strong>
+  </div>
+</div>
+
+<div class="seccion-card">
+  <h3 class="seccion-title">🏢 Otros Servicios</h3>
+  
+  <div style="margin-bottom: 1rem;">
+    <button type="button" id="btn-agregar-otro" class="btn-secondary">+ Agregar Otro Servicio</button>
+  </div>
+  
+  <table class="table-futurista" id="tabla-otros">
+    <thead>
+      <tr>
+        <th>Servicio</th>
+        <th>Empresa Externa</th>
+        <th>Costo Interno</th>
+        <th>Precio Cliente</th>
+        <th>Ganancia</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for otro in otros_servicios %}
+      <tr>
+        <td>{{ otro.nombre_servicio }}</td>
+        <td>{{ otro.empresa_externa }}</td>
+        <td>{{ doc_currency_symbol }}{{ otro.costo_interno }}</td>
+        <td>{{ doc_currency_symbol }}{{ otro.precio_cliente }}</td>
+        <td>{{ doc_currency_symbol }}{{ otro.ganancia }}</td>
+        <td>
+          <button type="button" class="btn-secondary btn-eliminar" onclick="eliminarFila(this)">🗑️</button>
+        </td>
+      </tr>
+      {% empty %}
+      <tr id="no-otros">
+        <td colspan="6" style="text-align: center; color: #6c757d;">No hay otros servicios agregados</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  
+  <div style="text-align: right; margin-top: 1rem;">
+    <strong style="color: #00f2fe;">Subtotal Otros: <span id="subtotal-otros">{{ doc_currency_symbol }}{{ subtotal_otros|default:0 }}</span></strong>
+  </div>
+</div>
+
+<!-- Totales -->
+<div class="seccion-card">
+  <h3 class="seccion-title">💰 Resumen de Totales</h3>
+  
+  <table class="table-futurista">
+    <tbody>
+      <tr>
+        <td><strong>Subtotal:</strong></td>
+        <td style="text-align: right;"><strong id="subtotal-general">{{ doc_currency_symbol }}{{ subtotal|default:0 }}</strong></td>
+      </tr>
+      <tr>
+        <td><strong>{{ doc_tax_label|default:"IVA" }}:</strong></td>
+        <td style="text-align: right;"><strong id="iva-total">{{ doc_currency_symbol }}{{ iva|default:0 }}</strong></td>
+      </tr>
+      <tr class="total-row">
+        <td><strong>TOTAL:</strong></td>
+        <td style="text-align: right;"><strong id="total-general">{{ doc_currency_symbol }}{{ total|default:0 }}</strong></td>
+      </tr>
+    </tbody>
+  </table>
+</div>

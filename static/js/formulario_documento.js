@@ -1,10 +1,43 @@
-// --- FORMATO CHILENO DE MONEDA ---
+// --- CONFIGURACIÓN GLOBAL DEL DOCUMENTO ---
+let documentConfig = {
+    country: 'CL',
+    taxBase: 'parts_only',
+    taxRate: 0.19,
+    currencySymbol: '$',
+    currencyDecimals: 0
+};
+
+// Inicializar configuración desde el DOM
+function initDocumentConfig() {
+    const form = document.getElementById('form-documento');
+    if (form) {
+        documentConfig.country = form.dataset.country || 'CL';
+        documentConfig.taxBase = form.dataset.taxBase || 'parts_only';
+        documentConfig.taxRate = parseFloat(form.dataset.taxRate || '0.19');
+    }
+    console.log('Document config initialized:', documentConfig);
+}
+
+// --- FORMATO DE MONEDA DINÁMICO ---
+function formatoMoneda(valor) {
+    if (isNaN(valor)) return documentConfig.currencySymbol + '0';
+    
+    if (documentConfig.currencyDecimals > 0) {
+        return documentConfig.currencySymbol + valor.toLocaleString('en-US', {
+            minimumFractionDigits: documentConfig.currencyDecimals,
+            maximumFractionDigits: documentConfig.currencyDecimals
+        });
+    } else {
+        return documentConfig.currencySymbol + valor.toLocaleString('es-CL', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        });
+    }
+}
+
+// Mantener compatibilidad con código existente
 function formatoSCL(valor) {
-    if (isNaN(valor)) return '$0';
-    return '$' + valor.toLocaleString('es-CL', {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
-    });
+    return formatoMoneda(valor);
 }
 
 // --- AUTOCOMPLETADO INTELIGENTE DE REPUESTOS Y SERVICIOS ---
@@ -183,24 +216,49 @@ function actualizarTotalesDocumento() {
     });
     
     const subtotal = totalRepuestos + totalServicios + totalOtrosServicios;
-    const llevaIVA = document.getElementById('lleva_iva')?.checked || false;
-    const iva = llevaIVA ? Math.round(totalRepuestos * 0.19) : 0;
-    const granTotal = totalRepuestos + iva + totalServicios + totalOtrosServicios;
     
-    // Actualizar totales principales
-    const subtotalElement = document.getElementById('subtotal-doc');
-    const ivaElement = document.getElementById('iva-doc');
-    const granTotalElement = document.getElementById('gran-total-doc');
-    const totalRepuestosElement = document.getElementById('total-repuestos');
-    const totalServiciosElement = document.getElementById('total-servicios');
-    const totalOtrosServiciosElement = document.getElementById('total-otros-servicios');
+    // LÓGICA DE IMPUESTOS POR PAÍS
+    const incluirIva = document.getElementById('id_incluir_iva')?.checked || false;
+    let base = 0;
+    let iva = 0;
     
-    if (subtotalElement) subtotalElement.textContent = formatoSCL(subtotal);
-    if (ivaElement) ivaElement.textContent = formatoSCL(iva);
-    if (granTotalElement) granTotalElement.textContent = formatoSCL(granTotal);
-    if (totalRepuestosElement) totalRepuestosElement.textContent = formatoSCL(totalRepuestos);
-    if (totalServiciosElement) totalServiciosElement.textContent = formatoSCL(totalServicios);
-    if (totalOtrosServiciosElement) totalOtrosServiciosElement.textContent = formatoSCL(totalOtrosServicios);
+    if (incluirIva) {
+        if (documentConfig.taxBase === "parts_only") {
+            // Chile: IVA solo sobre repuestos
+            base = totalRepuestos;
+        } else {
+            // USA: Sales Tax sobre subtotal completo
+            base = subtotal;
+        }
+        iva = Math.round(base * documentConfig.taxRate);
+    }
+    
+    const granTotal = subtotal + iva;
+    
+    // Actualizar elementos del DOM usando IDs unificados
+    updateElementText('subtotal-repuestos', formatoMoneda(totalRepuestos));
+    updateElementText('subtotal-servicios', formatoMoneda(totalServicios)); 
+    updateElementText('subtotal-otros', formatoMoneda(totalOtrosServicios));
+    updateElementText('subtotal-general', formatoMoneda(subtotal));
+    updateElementText('iva-total', formatoMoneda(iva));
+    updateElementText('total-general', formatoMoneda(granTotal));
+    
+    // Compatibilidad con IDs antiguos
+    updateElementText('subtotal-doc', formatoMoneda(subtotal));
+    updateElementText('iva-doc', formatoMoneda(iva));
+    updateElementText('gran-total-doc', formatoMoneda(granTotal));
+    updateElementText('total-repuestos', formatoMoneda(totalRepuestos));
+    updateElementText('total-servicios', formatoMoneda(totalServicios));
+    updateElementText('total-otros-servicios', formatoMoneda(totalOtrosServicios));
+}
+
+// Función auxiliar para actualizar texto de elementos
+function updateElementText(id, text) {
+    const element = document.getElementById(id);
+    if (element) {
+        element.textContent = text;
+    }
+}
     
     // Actualizar resumen en los paneles de totales
     const totalRepuestosResumen = document.getElementById('total-repuestos-resumen');
@@ -438,4 +496,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+    
+    // Inicializar configuración del documento
+    initDocumentConfig();
 });

@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
+<link href="/static/css/estilo_futurista.css" rel="stylesheet">
+
+<style>
+  body {
+    background: linear-gradient(120deg, #0f2027 0%, #2c5364 50%, #7f00ff 100%);
+    min-height: 100vh;
+    font-family: 'Orbitron', 'Montserrat', Arial, sans-serif;
+  }
+  
+  .documento-container {
+    background: rgba(20, 20, 40, 0.97);
+    border-radius: 1.5rem;
+    box-shadow: 0 0 32px 4px #7f00ff99, 0 0 0 1px #00f2fe;
+    border: 1px solid #7f00ff;
+    color: #fff;
+    padding: 2.5rem;
+    margin: 2rem auto;
+    max-width: 1200px;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .documento-title {
+    color: #00f2fe;
+    text-shadow: 0 0 8px #7f00ff;
+    font-size: 2.2rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+  
+  .seccion-card {
+    background: rgba(30, 30, 60, 0.8);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(0, 242, 254, 0.3);
+  }
+  
+  .seccion-title {
+    color: #00f2fe;
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 4px #7f00ff;
+  }
+  
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .form-label {
+    color: #00f2fe;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 2px #7f00ff;
+  }
+  
+  .form-input {
+    background: rgba(40, 40, 80, 0.9);
+    border: 1px solid #7f00ff;
+    border-radius: 0.5rem;
+    color: #fff;
+    padding: 0.75rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+  
+  .form-input:focus {
+    outline: none;
+    border-color: #00f2fe;
+    box-shadow: 0 0 8px #7f00ff;
+  }
+  
+  .btn-primary {
+    background: linear-gradient(45deg, #7f00ff, #00f2fe);
+    border: none;
+    border-radius: 0.75rem;
+    color: #fff;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(127, 0, 255, 0.4);
+  }
+  
+  .btn-secondary {
+    background: rgba(108, 117, 125, 0.8);
+    border: 1px solid #6c757d;
+    border-radius: 0.5rem;
+    color: #fff;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-secondary:hover {
+    background: rgba(108, 117, 125, 1);
+    transform: translateY(-1px);
+  }
+  
+  .table-futurista {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    background: rgba(20, 20, 40, 0.6);
+    border-radius: 0.5rem;
+    overflow: hidden;
+  }
+  
+  .table-futurista th {
+    background: linear-gradient(45deg, #7f00ff, #00f2fe);
+    color: #fff;
+    padding: 1rem;
+    text-align: left;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .table-futurista td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid rgba(127, 0, 255, 0.3);
+    color: #fff;
+  }
+  
+  .table-futurista tr:hover {
+    background: rgba(127, 0, 255, 0.1);
+  }
+  
+  .input-number {
+    text-align: right;
+  }
+  
+  .total-row {
+    background: rgba(127, 0, 255, 0.2) !important;
+    font-weight: bold;
+  }
+  
+  .total-row td {
+    border-top: 2px solid #00f2fe;
+    color: #00f2fe;
+    text-shadow: 0 0 4px #7f00ff;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="documento-container">
+  {% block documento_title %}
+  <h1 class="documento-title">📄 Documento</h1>
+  {% endblock %}
+
+  {% block documento_content %}
+  <!-- Content will be provided by child templates -->
+  {% endblock %}
+</div>
+{% endblock %}
