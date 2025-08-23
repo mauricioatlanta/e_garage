@@ -115,9 +115,8 @@ def editar_documento_nuevo(request, documento_id):
         
         if form.is_valid():
             print(f"[EDITAR_NUEVO] Formulario válido")
-            documento = form.save()
             
-            # Procesar items JSON
+            # Procesar items JSON con transacción atómica
             json_items = request.POST.get('json_items', '[]')
             print(f"[EDITAR_NUEVO] json_items recibido: {json_items}")
             
@@ -125,60 +124,86 @@ def editar_documento_nuevo(request, documento_id):
                 items = json.loads(json_items)
                 print(f"[EDITAR_NUEVO] Items parseados: {len(items)} items")
                 
-                # ELIMINAR TODOS LOS REPUESTOS Y SERVICIOS ANTERIORES
-                repuestos_eliminados = documento.repuestos.count()
-                servicios_eliminados = documento.servicios.count()
-
-                documento.repuestos.all().delete()
-                documento.servicios.all().delete()
+                # TRANSACCIÓN ATÓMICA: guardar documento y reemplazar líneas
+                from django.db import transaction
+                from taller.models.lineas_documento import LineaOtroServicio
                 
-                print(f"[EDITAR_NUEVO] Eliminados {repuestos_eliminados} repuestos y {servicios_eliminados} servicios anteriores")
-                
-                # CREAR NUEVOS REPUESTOS Y SERVICIOS
-                repuestos_creados = 0
-                servicios_creados = 0
-                
-                for i, item in enumerate(items):
-                    print(f"[EDITAR_NUEVO] Procesando item {i+1}: {item}")
+                with transaction.atomic():
+                    # Guardar el documento
+                    documento = form.save()
                     
-                    # Validar datos básicos
-                    nombre = item.get('nombre', '').strip()
-                    precio = item.get('precio', 0)
+                    # ELIMINAR TODAS LAS LÍNEAS EXISTENTES
+                    repuestos_eliminados = documento.lineas_repuesto.count()
+                    servicios_eliminados = documento.lineas_servicio.count()
+                    otros_eliminados = LineaOtroServicio.objects.filter(documento=documento).count()
                     
-                    if isinstance(precio, str):
-                        precio = int(precio.replace('$', '').replace(',', '') or 0)
-                    else:
-                        precio = int(precio or 0)
+                    documento.lineas_repuesto.all().delete()
+                    documento.lineas_servicio.all().delete()
+                    LineaOtroServicio.objects.filter(documento=documento).delete()
                     
-                    if not nombre or precio <= 0:
-                        print(f"[EDITAR_NUEVO] Item {i+1} rechazado - nombre: '{nombre}', precio: {precio}")
-                        continue
+                    print(f"[EDITAR_NUEVO] Eliminados: {repuestos_eliminados} repuestos, {servicios_eliminados} servicios, {otros_eliminados} otros")
                     
-                    if item.get('tipo') == 'repuesto':
-                        # Crear repuesto
-                        repuesto = LineaRepuesto.objects.create(
-                            documento=documento,
-                            codigo=item.get('partnumber', '').strip() or f'EDIT-{i+1:03d}',
-                            nombre=nombre,
-                            cantidad=int(item.get('cantidad', 1)),
-                            precio_unitario=precio
-                        )
-                        repuestos_creados += 1
-                        print(f"[EDITAR_NUEVO] ✅ Repuesto creado: {repuesto.nombre} (${repuesto.precio} x {repuesto.cantidad})")
+                    # CREAR NUEVAS LÍNEAS DESDE json_items
+                    repuestos_creados = 0
+                    servicios_creados = 0
+                    otros_creados = 0
+                    
+                    for i, item in enumerate(items):
+                        print(f"[EDITAR_NUEVO] Procesando item {i+1}: {item}")
                         
-                    elif item.get('tipo') == 'servicio':
-                        # Crear servicio
-                        servicio = LineaServicio.objects.create(
-                            empresa=empresa,
-                            documento=documento,
-                            nombre=nombre,
-                            precio_unitario=precio,
-                            cantidad=1
-                        )
-                        servicios_creados += 1
-                        print(f"[EDITAR_NUEVO] ✅ Servicio creado: {servicio.nombre} (${servicio.precio})")
-                
-                print(f"[EDITAR_NUEVO] RESUMEN: {repuestos_creados} repuestos, {servicios_creados} servicios creados")
+                        # Validar datos básicos
+                        nombre = item.get('nombre', '').strip()
+                        precio = item.get('precio', 0)
+                        
+                        if isinstance(precio, str):
+                            precio = int(precio.replace('$', '').replace(',', '') or 0)
+                        else:
+                            precio = int(precio or 0)
+                        
+                        if not nombre or precio <= 0:
+                            print(f"[EDITAR_NUEVO] Item {i+1} rechazado - nombre: '{nombre}', precio: {precio}")
+                            continue
+                        
+                        if item.get('tipo') == 'repuesto':
+                            # Crear repuesto
+                            repuesto = LineaRepuesto.objects.create(
+                                documento=documento,
+                                codigo=item.get('partnumber', '').strip() or f'EDIT-{i+1:03d}',
+                                nombre=nombre,
+                                cantidad=int(item.get('cantidad', 1)),
+                                precio_unitario=precio
+                            )
+                            repuestos_creados += 1
+                            print(f"[EDITAR_NUEVO] ✅ Repuesto creado: {repuesto.nombre} (${repuesto.precio_unitario} x {repuesto.cantidad})")
+                            
+                        elif item.get('tipo') == 'servicio':
+                            # Crear servicio interno
+                            servicio = LineaServicio.objects.create(
+                                documento=documento,
+                                nombre=nombre,
+                                precio_unitario=precio,
+                                cantidad=int(item.get('cantidad', 1))
+                            )
+                            servicios_creados += 1
+                            print(f"[EDITAR_NUEVO] ✅ Servicio creado: {servicio.nombre} (${servicio.precio_unitario})")
+                            
+                        elif item.get('tipo') == 'otro_servicio':
+                            # Crear otro servicio (externo)
+                            otro = LineaOtroServicio.objects.create(
+                                documento=documento,
+                                nombre_servicio=nombre,
+                                empresa_externa=item.get('empresa', '').strip(),
+                                costo_interno=int(item.get('costo', 0)),
+                                precio_cliente=precio,
+                                observaciones=item.get('observaciones', '').strip()
+                            )
+                            otros_creados += 1
+                            print(f"[EDITAR_NUEVO] ✅ Otro servicio creado: {otro.nombre_servicio} - {otro.empresa_externa} (${precio})")
+                    
+                    print(f"[EDITAR_NUEVO] RESUMEN: {repuestos_creados} repuestos, {servicios_creados} servicios, {otros_creados} otros creados")
+                    
+                    # Recalcular totales del documento
+                    documento.recalcular_totales()
                 
             except json.JSONDecodeError as e:
                 print(f"[EDITAR_NUEVO] ❌ Error JSON: {e}")
@@ -200,40 +225,57 @@ def editar_documento_nuevo(request, documento_id):
         form = DocumentoForm(instance=documento, empresa=empresa)
     
     # Obtener repuestos y servicios actuales
-    repuestos = LineaRepuesto.objects.filter(documento=documento).order_by('id')
-    servicios = LineaServicio.objects.filter(documento=documento).order_by('id')
+    repuestos_query = LineaRepuesto.objects.filter(documento=documento).order_by('id')
+    servicios_query = LineaServicio.objects.filter(documento=documento).order_by('id')
+    
+    # Importar LineaOtroServicio
+    from taller.models.lineas_documento import LineaOtroServicio
+    otros_servicios_query = LineaOtroServicio.objects.filter(documento=documento).order_by('id')
     
     print(f"[EDITAR_NUEVO] ===== DEBUG DATOS =====")
     print(f"[EDITAR_NUEVO] Documento ID: {documento.id}")
-    print(f"[EDITAR_NUEVO] Repuestos actuales: {repuestos.count()}")
-    print(f"[EDITAR_NUEVO] Servicios actuales: {servicios.count()}")
+    print(f"[EDITAR_NUEVO] Repuestos actuales: {repuestos_query.count()}")
+    print(f"[EDITAR_NUEVO] Servicios actuales: {servicios_query.count()}")
+    print(f"[EDITAR_NUEVO] Otros servicios actuales: {otros_servicios_query.count()}")
     
-    # Debug adicional - listar todos los repuestos y servicios
-    for i, rep in enumerate(repuestos, 1):
-        print(f"[EDITAR_NUEVO] Repuesto {i}: {rep.nombre} - ${rep.precio_unitario} x {rep.cantidad}")
-    
-    for i, serv in enumerate(servicios, 1):
-        print(f"[EDITAR_NUEVO] Servicio {i}: {serv.nombre} - ${serv.precio_unitario}")
-    
-    # También verificar las tablas directas de la DB
-    from django.db import connection
-    cursor = connection.cursor()
-    
-    cursor.execute("SELECT COUNT(*) FROM taller_lineaservicio WHERE documento_id = %s", [documento.id])
-    count_lineaservicio = cursor.fetchone()[0]
-    print(f"[EDITAR_NUEVO] Servicios en taller_lineaservicio: {count_lineaservicio}")
-    
-    cursor.execute("SELECT COUNT(*) FROM taller_lineaotroservicio WHERE documento_id = %s", [documento.id])
-    count_otroservicio = cursor.fetchone()[0]
-    print(f"[EDITAR_NUEVO] Otros servicios en taller_lineaotroservicio: {count_otroservicio}")
-    
-    print(f"[EDITAR_NUEVO] ===== FIN DEBUG =====")
-    
+    # Pre-cargar datos en formato para el template
+    repuestos = []
+    for rep in repuestos_query:
+        repuestos.append({
+            'codigo': rep.codigo,
+            'nombre': rep.nombre,
+            'cantidad': rep.cantidad,
+            'precio': rep.precio_unitario,
+            'total': rep.subtotal
+        })
+        print(f"[EDITAR_NUEVO] Repuesto: {rep.nombre} - ${rep.precio_unitario} x {rep.cantidad}")
+
+    servicios = []
+    for serv in servicios_query:
+        servicios.append({
+            'nombre': serv.nombre,
+            'precio': serv.precio_unitario
+        })
+        print(f"[EDITAR_NUEVO] Servicio: {serv.nombre} - ${serv.precio_unitario}")
+
+    otros_servicios = []
+    for otro in otros_servicios_query:
+        otros_servicios.append({
+            'nombre_servicio': otro.nombre_servicio,
+            'empresa_externa': getattr(otro, 'empresa_externa', ''),
+            'costo_interno': getattr(otro, 'costo_interno', 0),
+            'precio_cliente': getattr(otro, 'precio_cliente', otro.precio_unitario if hasattr(otro, 'precio_unitario') else 0),
+            'ganancia': getattr(otro, 'ganancia', 0),
+            'observaciones': getattr(otro, 'observaciones', '')
+        })
+        print(f"[EDITAR_NUEVO] Otro servicio: {otro.nombre_servicio}")
+
     # Calcular totales
-    subtotal_repuestos = sum(rep.subtotal for rep in repuestos)
-    subtotal_servicios = sum(serv.precio_unitario * serv.cantidad for serv in servicios)
-    subtotal = subtotal_repuestos + subtotal_servicios
-    iva = int(subtotal * Decimal('0.19'))
+    subtotal_repuestos = sum(rep['precio'] * rep['cantidad'] for rep in repuestos)
+    subtotal_servicios = sum(serv['precio'] for serv in servicios)
+    subtotal_otros = sum(otro['precio_cliente'] for otro in otros_servicios)
+    subtotal = subtotal_repuestos + subtotal_servicios + subtotal_otros
+    iva = int(subtotal_repuestos * Decimal('0.19'))  # IVA solo en repuestos
     total = subtotal + iva
     
     context = {
@@ -241,8 +283,10 @@ def editar_documento_nuevo(request, documento_id):
         'documento': documento,
         'repuestos': repuestos,
         'servicios': servicios,
+        'otros_servicios': otros_servicios,
         'subtotal_repuestos': subtotal_repuestos,
         'subtotal_servicios': subtotal_servicios,
+        'subtotal_otros': subtotal_otros,
         'subtotal': subtotal,
         'iva': iva,
         'total': total,
