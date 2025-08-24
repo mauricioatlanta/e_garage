@@ -4,6 +4,7 @@ from taller.repuestos.views import (
     ver_repuesto,
     editar_repuesto,
     crear_repuesto,
+    buscar_repuestos_ajax,
 )
 
 app_name = "repuestos"
@@ -13,4 +14,5 @@ urlpatterns = [
     path('crear/', crear_repuesto, name='crear_repuesto'),
     path('<int:pk>/', ver_repuesto, name='ver_repuesto'),
     path('editar/<int:pk>/', editar_repuesto, name='editar_repuesto'),
+    path('ajax/buscar/', buscar_repuestos_ajax, name='buscar_repuestos_ajax'),
 ]

@@ -1,5 +1,8 @@
 from django.shortcuts import redirect
 from decimal import Decimal
+from django.http import JsonResponse
+from django.db import models
+import json
 # Vista wrapper para lista de documentos de Chile sin requerir parámetro country
 def lista_documentos_cl(request):
     return redirect('documentos:lista_documentos', country='cl')
@@ -29,25 +32,120 @@ from taller.models.repuesto import Repuesto
 def autocomplete_repuesto(request):
     q = request.GET.get("q", "").strip()
     if not q:
-        return JsonResponse([], safe=False)
+        return JsonResponse({"results": []}, safe=False)
     repuestos = Repuesto.objects.filter(
         models.Q(nombre__icontains=q) |
         models.Q(part_number__icontains=q)
     )[:20]
-    data = [
-        {
-            "id": r.pk,
-            "nombre": r.nombre,
-            "part_number": getattr(r, 'part_number', None),
-        }
-        for r in repuestos
-    ]
+    data = {
+        "results": [
+            {
+                "id": r.pk,
+                "nombre": r.nombre,
+                "partnumber": getattr(r, 'part_number', None),
+                "precio": float(getattr(r, 'precio_venta', 0)),
+                "precio_venta": float(getattr(r, 'precio_venta', 0)),
+                "precio_compra": float(getattr(r, 'precio_compra', 0)),
+            }
+            for r in repuestos
+        ]
+    }
     return JsonResponse(data, safe=False)
 from taller.servicios.models import Servicio
 
 # Autocompletado de servicios para documentos
 def autocomplete_servicio(request):
     q = request.GET.get("q", "").strip()
+    if not q:
+        return JsonResponse([], safe=False)
+    
+    servicios = Servicio.objects.filter(
+        models.Q(nombre__icontains=q) |
+        models.Q(descripcion__icontains=q)
+    ).order_by('nombre')[:20]
+    
+    data = [
+        {
+            "id": s.pk,
+            "nombre": s.nombre,
+            "descripcion": getattr(s, 'descripcion', ''),
+            "precio": float(getattr(s, 'precio', 0)),
+        }
+        for s in servicios
+    ]
+    return JsonResponse(data, safe=False)
+
+# Autocompletado de otros servicios (servicios externos)
+def autocomplete_otro_servicio(request):
+    q = request.GET.get("q", "").strip()
+    if not q:
+        return JsonResponse([], safe=False)
+    
+    # Buscar en líneas de otros servicios existentes para sugerir
+    from taller.models.lineas_documento import LineaOtroServicio
+    lineas_existentes = LineaOtroServicio.objects.filter(
+        models.Q(nombre__icontains=q) |
+        models.Q(empresa_externa__icontains=q)
+    ).values('nombre', 'empresa_externa', 'costo_interno', 'precio_cliente').distinct()[:20]
+    
+    data = []
+    for linea in lineas_existentes:
+        data.append({
+            "id": f"existing_{len(data)}",
+            "nombre": linea['nombre'],
+            "empresa_externa": linea['empresa_externa'] or '',
+            "costo_interno": float(linea['costo_interno'] or 0),
+            "precio_cliente": float(linea['precio_cliente'] or 0),
+            "tipo": "existing"
+        })
+    
+    return JsonResponse(data, safe=False)
+
+# API para crear servicios sobre la marcha
+@csrf_exempt
+def api_crear_servicio(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Solo se permite POST"}, status=405)
+    
+    try:
+        data = json.loads(request.body.decode())
+        nombre = data.get("nombre", "").strip()
+        precio = data.get("precio", 0)
+        descripcion = data.get("descripcion", "").strip()
+        
+        if not nombre:
+            return JsonResponse({"error": "El nombre del servicio es obligatorio"}, status=400)
+        
+        # Verificar si ya existe
+        servicio_existente = Servicio.objects.filter(nombre__iexact=nombre).first()
+        if servicio_existente:
+            return JsonResponse({
+                "id": servicio_existente.pk,
+                "nombre": servicio_existente.nombre,
+                "precio": float(getattr(servicio_existente, 'precio', 0)),
+                "descripcion": getattr(servicio_existente, 'descripcion', ''),
+                "creado": False,
+                "mensaje": "El servicio ya existía"
+            })
+        
+        # Crear nuevo servicio
+        servicio = Servicio.objects.create(
+            nombre=nombre,
+            precio=precio,
+            descripcion=descripcion
+        )
+        
+        return JsonResponse({
+            "id": servicio.pk,
+            "nombre": servicio.nombre,
+            "precio": float(getattr(servicio, 'precio', 0)),
+            "descripcion": getattr(servicio, 'descripcion', ''),
+            "creado": True,
+            "mensaje": "Servicio creado exitosamente"
+        })
+        
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=400)
     if not q:
         return JsonResponse([], safe=False)
     servicios = Servicio.objects.filter(nombre__icontains=q)[:20]
@@ -295,6 +393,8 @@ def crear_documento(request):
     return render(request, 'taller/documentos/crear_documento.html', {
         'form': form,
         'mecanicos': mecanicos,
+        'es_edicion': False,
+        'company_country': getattr(request, 'company_country', None),  # viene del middleware
     })
 
 def _country_from_request(request):
@@ -374,23 +474,32 @@ def ver_documento(request, documento_id):
         precio_otro = getattr(otro, 'precio_cliente', getattr(otro, 'precio', 0))
         print(f"[DEBUG VER]   - {nombre_otro} ({getattr(otro, 'empresa_externa', '')}): ${precio_otro}")
     
-    # Usar los totales guardados en el documento y calcular otros servicios
-    subtotal_repuestos = documento.neto_repuestos or Decimal('0.00')
-    subtotal_servicios = documento.neto_servicios or Decimal('0.00')
+    # Calcular subtotales dinámicamente
+    subtotal_repuestos = sum(
+        (getattr(rep, 'precio_unitario', Decimal('0.00')) * getattr(rep, 'cantidad', 1))
+        for rep in repuestos
+    )
+    
+    subtotal_servicios = sum(
+        (getattr(serv, 'precio_unitario', Decimal('0.00')) * getattr(serv, 'cantidad', 1))
+        for serv in servicios
+    )
     
     # Calcular otros servicios dinámicamente
     subtotal_otros_servicios = sum(
         getattr(otro, 'precio_cliente', Decimal('0.00')) 
         for otro in otros_servicios
-    ) or Decimal('0.00')
+    )
     
     subtotal = subtotal_repuestos + subtotal_servicios + subtotal_otros_servicios
-    iva = documento.tax_amount or Decimal('0.00')
-    total = documento.total or Decimal('0.00')
+    
+    # Calcular IVA (19% solo sobre repuestos según la lógica de negocio)
+    iva = subtotal_repuestos * Decimal('0.19')
+    total = subtotal + iva
     
     print(f"[DEBUG VER] Totales calculados - Repuestos: ${subtotal_repuestos}, Servicios: ${subtotal_servicios}, Otros: ${subtotal_otros_servicios}, IVA: ${iva}, Total: ${total}")
 
-    return render(request, 'taller/documentos/ver_documento.html', {
+    return render(request, 'taller/documentos/ver_documento_nuevo.html', {
         'documento': documento,
         'lineas_repuesto': repuestos,
         'lineas_servicio': servicios, 
@@ -624,6 +733,8 @@ def editar_documento(request, documento_id):
         'total': total,
         'editando': True,  # Indicar que estamos editando
         'mecanicos': mecanicos,
+        'es_edicion': bool(documento.pk),
+        'company_country': getattr(request, 'company_country', None),  # viene del middleware
     })
 
 

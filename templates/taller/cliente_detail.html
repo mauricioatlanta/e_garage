@@ -33,23 +33,42 @@
               <label class="text-sm font-medium text-cyan-400">Dirección:</label>
               <p class="text-white">{{ object.direccion|default:"-" }}</p>
             </div>
-            {% if object.ciudad %}
-            <div>
-              <label class="text-sm font-medium text-cyan-400">Ciudad:</label>
-              <p class="text-white">{{ object.ciudad }}</p>
-            </div>
-            {% endif %}
-            {% if object.estado %}
-            <div>
-              <label class="text-sm font-medium text-cyan-400">Estado:</label>
-              <p class="text-white">{{ object.estado }}</p>
-            </div>
-            {% endif %}
-            {% if object.zipcode %}
-            <div>
-              <label class="text-sm font-medium text-cyan-400">Código Postal:</label>
-              <p class="text-white">{{ object.zipcode }}</p>
-            </div>
+            
+            <!-- Campos específicos según país -->
+            {% if object.empresa.pais == 'US' %}
+              <!-- Campos USA -->
+              {% if object.estado_usa %}
+              <div>
+                <label class="text-sm font-medium text-cyan-400">State:</label>
+                <p class="text-white">{{ object.estado_usa.nombre }}</p>
+              </div>
+              {% endif %}
+              {% if object.ciudad_usa %}
+              <div>
+                <label class="text-sm font-medium text-cyan-400">City:</label>
+                <p class="text-white">{{ object.ciudad_usa.nombre }}</p>
+              </div>
+              {% endif %}
+              {% if object.zipcode %}
+              <div>
+                <label class="text-sm font-medium text-cyan-400">ZIP Code:</label>
+                <p class="text-white">{{ object.zipcode }}</p>
+              </div>
+              {% endif %}
+            {% else %}
+              <!-- Campos Chile -->
+              {% if object.region %}
+              <div>
+                <label class="text-sm font-medium text-cyan-400">Región:</label>
+                <p class="text-white">{{ object.region.nombre }}</p>
+              </div>
+              {% endif %}
+              {% if object.ciudad %}
+              <div>
+                <label class="text-sm font-medium text-cyan-400">Ciudad:</label>
+                <p class="text-white">{{ object.ciudad.nombre }}</p>
+              </div>
+              {% endif %}
             {% endif %}
           </div>
         </div>

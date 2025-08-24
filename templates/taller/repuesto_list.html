@@ -2,9 +2,25 @@
 {% block content %}
 <div class="container mx-auto px-4 py-8">
   <h1 class="text-2xl font-bold mb-4 text-white">Lista de Repuestos</h1>
+  
+  <!-- Campo de búsqueda inteligente -->
+  <div class="mb-6">
+    <div class="relative">
+      <input type="text" id="busqueda-repuesto" placeholder="Buscar por nombre, part number, categoría, proveedor..."
+        class="w-full p-3 pl-10 rounded-lg shadow bg-black/60 backdrop-blur border border-cyan-400/30 text-white placeholder-gray-400">
+      <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-cyan-400"></i>
+      <div id="loading-spinner" class="absolute right-3 top-1/2 transform -translate-y-1/2 hidden">
+        <i class="fas fa-spinner fa-spin text-cyan-500"></i>
+      </div>
+    </div>
+    <div id="resultados-info" class="mt-2 text-sm text-cyan-300 hidden">
+      <i class="fas fa-info-circle mr-1"></i>
+      <span id="total-resultados"></span>
+    </div>
+  </div>
+  
   <a href="{% url 'taller:repuestos:crear_repuesto' %}" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg shadow bg-gradient-to-r from-cyan-500 to-fuchsia-500 text-white font-semibold hover:from-fuchsia-500 hover:to-cyan-500 transition-all duration-200 border border-cyan-400/60 mb-4">➕ Agregar Repuesto</a>
 
-  {% if object_list %}
   <div class="bg-black/60 backdrop-blur border border-cyan-400/30 rounded-lg overflow-hidden">
     <table class="min-w-full table-auto">
       <thead class="bg-black/80">
@@ -19,7 +35,7 @@
           <th class="px-6 py-3 text-left text-xs font-medium text-cyan-300 uppercase tracking-wider">Acciones</th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-cyan-700/30">
+      <tbody id="tabla-repuestos" class="divide-y divide-cyan-700/30">
         {% for repuesto in object_list %}
         <tr class="hover:bg-cyan-900/20">
           <td class="px-6 py-4 whitespace-nowrap text-sm text-white">{{ repuesto.part_number|default:"-" }}</td>
@@ -34,14 +50,105 @@
             <a href="{% url 'taller:repuestos:editar_repuesto' repuesto.pk %}" class="text-green-400 hover:text-green-300">Editar</a>
           </td>
         </tr>
+        {% empty %}
+        <tr>
+          <td colspan="8" class="px-6 py-8 text-center text-gray-400">
+            <i class="fas fa-search text-gray-500 text-3xl mb-3 block"></i>
+            No hay repuestos registrados. <a href="{% url 'taller:repuestos:crear_repuesto' %}" class="underline text-cyan-400">Agregar el primero</a>
+          </td>
+        </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
-  {% else %}
-  <div class="bg-yellow-900/50 border border-yellow-600/50 rounded-lg p-4">
-    <p class="text-yellow-200">No hay repuestos registrados. <a href="{% url 'taller:repuestos:crear_repuesto' %}" class="underline text-cyan-400">Agregar el primero</a></p>
-  </div>
-  {% endif %}
 </div>
+
+<script>
+  // Variables para la búsqueda AJAX
+  let timeoutId;
+  const searchInput = document.getElementById("busqueda-repuesto");
+  const tablaRepuestos = document.getElementById("tabla-repuestos");
+  const loadingSpinner = document.getElementById("loading-spinner");
+  const resultadosInfo = document.getElementById("resultados-info");
+  const totalResultados = document.getElementById("total-resultados");
+
+  // Función para realizar búsqueda AJAX
+  function buscarRepuestos(query) {
+    // Mostrar loading
+    loadingSpinner.classList.remove('hidden');
+    console.log('Iniciando búsqueda AJAX para:', query);
+    
+    fetch('{% url "taller:repuestos:buscar_repuestos_ajax" %}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value || 
+                       document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+      },
+      body: JSON.stringify({ 'query': query })
+    })
+    .then(response => {
+      console.log('Respuesta recibida:', response.status);
+      return response.json();
+    })
+    .then(data => {
+      console.log('Datos recibidos:', data);
+      // Actualizar tabla con resultados
+      tablaRepuestos.innerHTML = data.html;
+      
+      // Mostrar información de resultados
+      if (query.trim() === '') {
+        resultadosInfo.classList.add('hidden');
+      } else {
+        totalResultados.textContent = `${data.total} repuesto${data.total !== 1 ? 's' : ''} encontrado${data.total !== 1 ? 's' : ''}`;
+        resultadosInfo.classList.remove('hidden');
+      }
+      
+      // Ocultar loading
+      loadingSpinner.classList.add('hidden');
+    })
+    .catch(error => {
+      console.error('Error en búsqueda:', error);
+      loadingSpinner.classList.add('hidden');
+      
+      // Mostrar mensaje de error en la tabla
+      tablaRepuestos.innerHTML = `
+        <tr>
+          <td colspan="8" class="px-6 py-8 text-center text-red-400">
+            <i class="fas fa-exclamation-triangle text-3xl mb-3 block"></i>
+            Error al realizar la búsqueda. Intente nuevamente.
+          </td>
+        </tr>
+      `;
+    });
+  }
+
+  // Evento de búsqueda con delay para evitar demasiadas peticiones
+  searchInput.addEventListener("input", function() {
+    const query = this.value.trim();
+    
+    // Limpiar timeout anterior
+    clearTimeout(timeoutId);
+    
+    // Establecer nuevo timeout para búsqueda (300ms delay)
+    timeoutId = setTimeout(() => {
+      buscarRepuestos(query);
+    }, 300);
+  });
+
+  // Búsqueda inicial si hay contenido en el campo
+  document.addEventListener('DOMContentLoaded', function() {
+    if (searchInput.value.trim() !== '') {
+      buscarRepuestos(searchInput.value.trim());
+    }
+  });
+
+  // Agregar token CSRF si no existe
+  if (!document.querySelector('[name=csrfmiddlewaretoken]') && !document.querySelector('meta[name="csrf-token"]')) {
+    const csrfMeta = document.createElement('meta');
+    csrfMeta.name = 'csrf-token';
+    csrfMeta.content = '{{ csrf_token }}';
+    document.head.appendChild(csrfMeta);
+  }
+</script>
 {% endblock %}

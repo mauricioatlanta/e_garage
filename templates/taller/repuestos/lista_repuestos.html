@@ -33,8 +33,18 @@
         <i class="fas fa-plus mr-1"></i> Agregar Repuesto
       </a>
     </div>    <div class="mb-6">
-      <input type="text" id="busqueda-repuesto" placeholder="Buscar por nombre, part number, tienda..."
-        class="w-full p-3 rounded-lg shadow translucent-card text-black placeholder-gray-500">
+      <div class="relative">
+        <input type="text" id="busqueda-repuesto" placeholder="Buscar por nombre, part number, tienda, observaciones..."
+          class="w-full p-3 pl-10 rounded-lg shadow translucent-card text-black placeholder-gray-500">
+        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+        <div id="loading-spinner" class="absolute right-3 top-1/2 transform -translate-y-1/2 hidden">
+          <i class="fas fa-spinner fa-spin text-blue-500"></i>
+        </div>
+      </div>
+      <div id="resultados-info" class="mt-2 text-sm text-gray-400 hidden">
+        <i class="fas fa-info-circle mr-1"></i>
+        <span id="total-resultados"></span>
+      </div>
     </div>
 
     <div class="overflow-x-auto translucent-card rounded-xl shadow-xl">
@@ -52,24 +62,46 @@
         </thead>
         <tbody id="tabla-repuestos">
           {% for repuesto in repuestos %}
-          <tr class="hover:bg-slate-100 transition">
-            <td class="px-4 py-3 font-medium">{{ repuesto.nombre_repuesto }}</td>
-            <td class="px-4 py-3">{{ repuesto.part_number }}</td>
-            <td class="px-4 py-3">{{ repuesto.tienda }}</td>
-            <td class="px-4 py-3 text-right">${{ repuesto.precio_compra|floatformat:0|intcomma }}</td>
-            <td class="px-4 py-3 text-right">${{ repuesto.precio_venta|floatformat:0|intcomma }}</td>
-            <td class="px-4 py-3 text-right">{{ repuesto.stock }}</td>
-            <td class="px-4 py-3 text-center">
-              {% url 'taller:repuestos:editar_repuesto' repuesto.id as url_editar_repuesto %}
-              {% url 'taller:repuestos:eliminar_repuesto' repuesto.id as url_eliminar_repuesto %}
-              <a href="{{ url_editar_repuesto|default:'#' }}" class="text-blue-600 hover:underline">Editar</a>
-              <span class="mx-1 text-gray-400">|</span>
-              <a href="{{ url_eliminar_repuesto|default:'#' }}" class="text-red-600 hover:underline">Eliminar</a>
+          <tr class="hover:bg-gray-50 transition">
+            <td class="px-4 py-2 font-medium">{{ repuesto.nombre_repuesto }}</td>
+            <td class="px-4 py-2 text-blue-600 font-mono">{{ repuesto.part_number|default:"-" }}</td>
+            <td class="px-4 py-2">
+              {% if repuesto.tienda %}
+                <span class="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
+                  {{ repuesto.tienda.nombre }}
+                </span>
+              {% else %}
+                <span class="text-gray-400">-</span>
+              {% endif %}
+            </td>
+            <td class="px-4 py-2 text-right font-mono">${{ repuesto.precio_compra|floatformat:0|intcomma }}</td>
+            <td class="px-4 py-2 text-right font-mono text-emerald-600 font-bold">${{ repuesto.precio_venta|floatformat:0|intcomma }}</td>
+            <td class="px-4 py-2 text-right">
+              {% if repuesto.stock > 10 %}
+                <span class="text-emerald-500 font-bold">{{ repuesto.stock }}</span>
+              {% elif repuesto.stock > 0 %}
+                <span class="text-yellow-500 font-bold">{{ repuesto.stock }}</span>
+              {% else %}
+                <span class="text-red-500 font-bold">{{ repuesto.stock }}</span>
+              {% endif %}
+            </td>
+            <td class="px-4 py-2 text-center">
+              <a href="{% url 'taller:repuestos:ver_repuesto' repuesto.pk %}" 
+                 class="text-blue-500 hover:text-blue-700 mx-1" title="Ver">
+                <i class="fas fa-eye"></i>
+              </a>
+              <a href="{% url 'taller:repuestos:editar_repuesto' repuesto.pk %}" 
+                 class="text-emerald-500 hover:text-emerald-700 mx-1" title="Editar">
+                <i class="fas fa-edit"></i>
+              </a>
             </td>
           </tr>
           {% empty %}
           <tr>
-            <td colspan="7" class="px-4 py-6 text-center text-gray-500">No hay repuestos registrados.</td>
+            <td colspan="7" class="px-4 py-6 text-center text-gray-500">
+              <i class="fas fa-search text-gray-300 text-2xl mb-2 block"></i>
+              No hay repuestos registrados.
+            </td>
           </tr>
           {% endfor %}
         </tbody>
@@ -79,14 +111,91 @@
 </div>
 
 <script>
-  document.getElementById("busqueda-repuesto").addEventListener("keyup", function () {
-    const filtro = this.value.toLowerCase();
-    const filas = document.querySelectorAll("#tabla-repuestos tr");
+  // Variables para la búsqueda AJAX
+  let timeoutId;
+  const searchInput = document.getElementById("busqueda-repuesto");
+  const tablaRepuestos = document.getElementById("tabla-repuestos");
+  const loadingSpinner = document.getElementById("loading-spinner");
+  const resultadosInfo = document.getElementById("resultados-info");
+  const totalResultados = document.getElementById("total-resultados");
 
-    filas.forEach(fila => {
-      const texto = fila.textContent.toLowerCase();
-      fila.style.display = texto.includes(filtro) ? "" : "none";
+  // Función para realizar búsqueda AJAX
+  function buscarRepuestos(query) {
+    // Mostrar loading
+    loadingSpinner.classList.remove('hidden');
+    console.log('Iniciando búsqueda AJAX para:', query);
+    
+    fetch('{% url "taller:repuestos:buscar_repuestos_ajax" %}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value || 
+                       document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+      },
+      body: JSON.stringify({ 'query': query })
+    })
+    .then(response => {
+      console.log('Respuesta recibida:', response.status);
+      return response.json();
+    })
+    .then(data => {
+      console.log('Datos recibidos:', data);
+      // Actualizar tabla con resultados
+      tablaRepuestos.innerHTML = data.html;
+      
+      // Mostrar información de resultados
+      if (query.trim() === '') {
+        resultadosInfo.classList.add('hidden');
+      } else {
+        totalResultados.textContent = `${data.total} repuesto${data.total !== 1 ? 's' : ''} encontrado${data.total !== 1 ? 's' : ''}`;
+        resultadosInfo.classList.remove('hidden');
+      }
+      
+      // Ocultar loading
+      loadingSpinner.classList.add('hidden');
+    })
+    .catch(error => {
+      console.error('Error en búsqueda:', error);
+      loadingSpinner.classList.add('hidden');
+      
+      // Mostrar mensaje de error en la tabla
+      tablaRepuestos.innerHTML = `
+        <tr>
+          <td colspan="7" class="px-4 py-6 text-center text-red-500">
+            <i class="fas fa-exclamation-triangle text-2xl mb-2 block"></i>
+            Error al realizar la búsqueda. Intente nuevamente.
+          </td>
+        </tr>
+      `;
     });
+  }
+
+  // Evento de búsqueda con delay para evitar demasiadas peticiones
+  searchInput.addEventListener("input", function() {
+    const query = this.value.trim();
+    
+    // Limpiar timeout anterior
+    clearTimeout(timeoutId);
+    
+    // Establecer nuevo timeout para búsqueda (300ms delay)
+    timeoutId = setTimeout(() => {
+      buscarRepuestos(query);
+    }, 300);
   });
+
+  // Búsqueda inicial si hay contenido en el campo
+  document.addEventListener('DOMContentLoaded', function() {
+    if (searchInput.value.trim() !== '') {
+      buscarRepuestos(searchInput.value.trim());
+    }
+  });
+
+  // Agregar token CSRF si no existe
+  if (!document.querySelector('[name=csrfmiddlewaretoken]') && !document.querySelector('meta[name="csrf-token"]')) {
+    const csrfMeta = document.createElement('meta');
+    csrfMeta.name = 'csrf-token';
+    csrfMeta.content = '{{ csrf_token }}';
+    document.head.appendChild(csrfMeta);
+  }
 </script>
 {% endblock %}

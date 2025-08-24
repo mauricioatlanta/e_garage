@@ -3,12 +3,16 @@ from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
+from django.db import models
+from django.template.loader import render_to_string
 import json
 import logging
 
 from taller.models.repuesto import Repuesto
 from taller.models.tienda import Tienda
+from taller.models.empresa import Empresa
 
 from .views_cbv import (
     RepuestoListView, RepuestoDetailView, RepuestoCreateView, RepuestoUpdateView,
@@ -31,3 +35,69 @@ def crear_repuesto(request, *args, **kwargs):
 def editar_repuesto(request, *args, **kwargs):
     log.info("FBV shim: editar_repuesto")
     return RepuestoUpdateView.as_view()(request, *args, **kwargs)
+
+from django.contrib.auth.decorators import login_required
+@login_required
+@login_required
+@csrf_exempt
+def buscar_repuestos_ajax(request):
+    """Búsqueda inteligente en tiempo real de repuestos"""
+    try:
+        log.info(f"Búsqueda AJAX iniciada - Método: {request.method}")
+        log.info(f"Usuario: {request.user}")
+        
+        # Verificar que sea método POST
+        if request.method != 'POST':
+            log.error(f"Método no permitido: {request.method}")
+            return JsonResponse({'error': 'Método no permitido'}, status=405)
+        
+        # Obtener empresa del usuario
+        try:
+            empresa = Empresa.objects.get(user=request.user)
+            log.info(f"Empresa encontrada: {empresa}")
+        except Empresa.DoesNotExist:
+            empresa, created = Empresa.objects.get_or_create(
+                user=request.user,
+                defaults={'nombre_taller': f'Taller de {request.user.username}'}
+            )
+            log.info(f"Empresa {'creada' if created else 'encontrada'}: {empresa}")
+        
+        # Obtener query desde el JSON del request
+        data = json.loads(request.body)
+        query = data.get('query', '').strip()
+        log.info(f"Query recibida: '{query}'")
+        
+        # Filtrar repuestos por empresa del usuario
+        repuestos = Repuesto.objects.select_related('categoria').filter(empresa=empresa)
+        log.info(f"Repuestos base encontrados: {repuestos.count()}")
+        
+        # Si hay query, filtrar por múltiples campos
+        if query:
+            repuestos = repuestos.filter(
+                models.Q(nombre__icontains=query) |
+                models.Q(part_number__icontains=query) |
+                models.Q(categoria__nombre__icontains=query) |
+                models.Q(proveedor__icontains=query)
+            )
+            log.info(f"Repuestos después del filtro: {repuestos.count()}")
+        
+        # Ordenar por nombre
+        repuestos = repuestos.order_by('nombre')[:50]  # Limitar a 50 resultados
+        
+        # Renderizar template parcial
+        html = render_to_string('taller/repuestos/tabla_repuestos_ajax.html', {
+            'repuestos': repuestos
+        })
+        
+        result = {
+            'html': html,
+            'total': repuestos.count()
+        }
+        log.info(f"Enviando respuesta con {result['total']} resultados")
+        return JsonResponse(result)
+        
+    except Exception as e:
+        log.error(f"Error en búsqueda AJAX: {str(e)}")
+        import traceback
+        log.error(f"Traceback: {traceback.format_exc()}")
+        return JsonResponse({'error': 'Error interno del servidor'}, status=500)

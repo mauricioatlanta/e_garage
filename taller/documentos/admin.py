@@ -12,15 +12,15 @@ except Exception:
 @admin.register(Documento)
 class DocumentoAdmin(TenantAdminMixin, admin.ModelAdmin):
     form = DocumentoForm
-    list_display   = ("id", "tipo", "numero", "estado", "fecha_emision", "cliente", "vehiculo", "moneda", "total")
-    list_filter    = ("tipo", "estado", "moneda", "country", "fecha_emision")
+    list_display   = ("id", "tipo", "numero", "estado", "fecha_emision", "cliente", "vehiculo", "pagado", "total")
+    list_filter    = ("tipo", "estado", "pagado", "estado_pago", "moneda", "country", "fecha_emision")
     search_fields  = ("numero", "cliente__nombre", "cliente__apellido", "vehiculo__patente", "vehiculo__vin")
     readonly_fields = ("empresa", "numero", "estado",
                        "neto_repuestos", "neto_servicios",
                        "tax_rate_applied", "tax_amount", "total")
     autocomplete_fields = ("cliente", "vehiculo",)
     ordering = ("-fecha_emision", "-id")
-    list_editable = ()
+    list_editable = ("pagado",)
 
 
 # Registrar los modelos de líneas de documento

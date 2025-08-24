@@ -1,8 +1,17 @@
+{% load widget_tweaks %}
 <!-- Campos comunes del formulario de documento -->
 <div class="seccion-card">
   <h3 class="seccion-title">📋 Información del Documento</h3>
   
   <div class="form-grid">
+    <div class="form-group">
+      <label class="form-label" for="{{ form.estado_pago.id_for_label }}">Estado de Pago</label>
+      {{ form.estado_pago|add_class:"form-select" }}
+      {% if form.estado_pago.errors %}
+        <div class="error-message">{{ form.estado_pago.errors }}</div>
+      {% endif %}
+    </div>
+    
     <div class="form-group">
       <label class="form-label" for="{{ form.tipo.id_for_label }}">Tipo de Documento</label>
       {{ form.tipo|add_class:"form-input" }}
@@ -20,7 +29,10 @@
     
     <div class="form-group">
       <label class="form-label" for="{{ form.tecnico_responsable.id_for_label }}">Técnico Responsable</label>
-      {{ form.tecnico_responsable|add_class:"form-input" }}
+      {{ form.tecnico_responsable|add_class:"form-select" }}
+      {% if form.tecnico_responsable.errors %}
+        <div class="error-message">{{ form.tecnico_responsable.errors }}</div>
+      {% endif %}
     </div>
   </div>
 </div>

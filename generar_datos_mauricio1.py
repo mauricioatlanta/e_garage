@@ -129,7 +129,7 @@ def crear_documentos_mauricio1():
                     tecnico=tecnico,
                     kilometraje=random.randint(5000, 200000),
                     observaciones=f"Documento de prueba {tipo} #{i+1}. Cliente: {cliente.nombre} {cliente.apellido or ''}. Vehículo: {vehiculo.marca.nombre if vehiculo.marca else 'N/A'} {vehiculo.modelo.nombre if vehiculo.modelo else 'N/A'}.",
-                    incluir_iva=random.choice([True, False]),
+                    tax_rate_applied=Decimal('19.00') if random.choice([True, False]) else Decimal('0.00'),
                     fecha=datetime.now().date() - timedelta(days=random.randint(0, 30))
                 )
                 

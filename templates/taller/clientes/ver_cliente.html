@@ -15,8 +15,38 @@
       <div class="flex items-center gap-3"><i class="fas fa-envelope text-cyan-300"></i> <span class="font-bold">Email:</span> {{ cliente.email }}</div>
       <div class="flex items-center gap-3"><i class="fas fa-phone text-lime-300"></i> <span class="font-bold">Teléfono:</span> {{ cliente.telefono }}</div>
       <div class="flex items-center gap-3"><i class="fas fa-map-marker-alt text-fuchsia-300"></i> <span class="font-bold">Dirección:</span> {{ cliente.direccion }}</div>
-      <div class="flex items-center gap-3"><i class="fas fa-globe-americas text-cyan-300"></i> <span class="font-bold">Región:</span> {% if cliente.region %}{{ cliente.region.nombre }}{% endif %}</div>
-      <div class="flex items-center gap-3"><i class="fas fa-city text-lime-300"></i> <span class="font-bold">Ciudad:</span> {% if cliente.ciudad %}{{ cliente.ciudad.nombre }}{% endif %}</div>
+      
+      <!-- Campos específicos según país -->
+      {% if cliente.empresa.pais == 'US' %}
+        <!-- Campos USA -->
+        {% if cliente.estado_usa %}
+        <div class="flex items-center gap-3"><i class="fas fa-flag-usa text-cyan-300"></i> <span class="font-bold">State:</span> {{ cliente.estado_usa.nombre }}</div>
+        {% else %}
+        <div class="flex items-center gap-3"><i class="fas fa-flag-usa text-gray-400"></i> <span class="font-bold text-gray-400">State:</span> <span class="text-gray-400 italic">Not specified</span></div>
+        {% endif %}
+        {% if cliente.ciudad_usa %}
+        <div class="flex items-center gap-3"><i class="fas fa-city text-lime-300"></i> <span class="font-bold">City:</span> {{ cliente.ciudad_usa.nombre }}</div>
+        {% else %}
+        <div class="flex items-center gap-3"><i class="fas fa-city text-gray-400"></i> <span class="font-bold text-gray-400">City:</span> <span class="text-gray-400 italic">Not specified</span></div>
+        {% endif %}
+        {% if cliente.zipcode %}
+        <div class="flex items-center gap-3"><i class="fas fa-mail-bulk text-fuchsia-300"></i> <span class="font-bold">ZIP Code:</span> {{ cliente.zipcode }}</div>
+        {% else %}
+        <div class="flex items-center gap-3"><i class="fas fa-mail-bulk text-gray-400"></i> <span class="font-bold text-gray-400">ZIP Code:</span> <span class="text-gray-400 italic">Not specified</span></div>
+        {% endif %}
+      {% else %}
+        <!-- Campos Chile -->
+        {% if cliente.region %}
+        <div class="flex items-center gap-3"><i class="fas fa-globe-americas text-cyan-300"></i> <span class="font-bold">Región:</span> {{ cliente.region.nombre }}</div>
+        {% else %}
+        <div class="flex items-center gap-3"><i class="fas fa-globe-americas text-gray-400"></i> <span class="font-bold text-gray-400">Región:</span> <span class="text-gray-400 italic">No especificada</span></div>
+        {% endif %}
+        {% if cliente.ciudad %}
+        <div class="flex items-center gap-3"><i class="fas fa-city text-lime-300"></i> <span class="font-bold">Ciudad:</span> {{ cliente.ciudad.nombre }}</div>
+        {% else %}
+        <div class="flex items-center gap-3"><i class="fas fa-city text-gray-400"></i> <span class="font-bold text-gray-400">Ciudad:</span> <span class="text-gray-400 italic">No especificada</span></div>
+        {% endif %}
+      {% endif %}
     </div>
     <div class="mt-10 flex justify-end">
   {% url 'taller:clientes:lista_clientes' as url_lista_clientes %}

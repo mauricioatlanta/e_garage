@@ -25,6 +25,9 @@ class ClienteListView(LoginRequiredMixin, TenantViewMixin, ListView):
 
 class ClienteDetailView(LoginRequiredMixin, TenantViewMixin, DetailView):
     model = Cliente
+    
+    def get_queryset(self):
+        return super().get_queryset().select_related('empresa', 'estado_usa', 'ciudad_usa', 'region', 'ciudad')
 
 class ClienteCreateView(LoginRequiredMixin, TenantViewMixin, CreateView):
     def get_success_url(self):
@@ -62,4 +65,20 @@ class ClienteCreateView(LoginRequiredMixin, TenantViewMixin, CreateView):
 
 class ClienteUpdateView(LoginRequiredMixin, TenantViewMixin, UpdateView):
     model = Cliente
-    fields = '__all__'  # Ajusta según tu formulario
+    form_class = None  # Se setea en get_form_class
+    template_name = "taller/clientes/editar_cliente.html"
+
+    def get_form_class(self):
+        from taller.clientes.forms import ClienteForm
+        return ClienteForm
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        empresa = getattr(self.request.user, 'empresa', None)
+        if empresa:
+            kwargs['empresa'] = empresa
+        return kwargs
+
+    def get_success_url(self):
+        from django.urls import reverse
+        return reverse('taller:clientes:lista_clientes')

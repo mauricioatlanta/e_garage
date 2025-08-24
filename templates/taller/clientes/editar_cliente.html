@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% load widget_tweaks %}
 
 {% block title %}{% if LANGUAGE_CODE == 'es' %}Editar Cliente{% else %}Edit Client{% endif %}{% endblock %}
 
@@ -45,32 +46,50 @@
         <div class="flex flex-col gap-2 group">
           <label for="id_nombre" class="text-xs font-semibold uppercase tracking-wider text-cyan-300/90 group-hover:text-lime-300 transition">{% if LANGUAGE_CODE == 'es' %}Nombre{% else %}First Name{% endif %}</label>
           <div class="relative">
-            {{ form.nombre|add_class:'w-full rounded-xl bg-[#0f172a] border border-cyan-600/40 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/40 px-4 py-3 text-cyan-100 placeholder-gray-500 shadow-md outline-none transition font-medium' }}
+            {{ form.nombre|add_class:'w-full rounded-xl bg-white border border-cyan-600/40 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/40 px-4 py-3 text-gray-900 placeholder-gray-500 shadow-md outline-none transition font-medium' }}
           </div>
         </div>
         <div class="flex flex-col gap-2 group">
           <label for="id_apellido" class="text-xs font-semibold uppercase tracking-wider text-cyan-300/90 group-hover:text-lime-300 transition">{% if LANGUAGE_CODE == 'es' %}Apellido{% else %}Last Name{% endif %}</label>
-          {{ form.apellido|add_class:'w-full rounded-xl bg-[#0f172a] border border-cyan-600/40 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/40 px-4 py-3 text-cyan-100 placeholder-gray-500 shadow-md outline-none transition font-medium' }}
+          {{ form.apellido|add_class:'w-full rounded-xl bg-white border border-cyan-600/40 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/40 px-4 py-3 text-gray-900 placeholder-gray-500 shadow-md outline-none transition font-medium' }}
         </div>
         <div class="flex flex-col gap-2 group">
           <label for="id_email" class="text-xs font-semibold uppercase tracking-wider text-cyan-300/90 group-hover:text-lime-300 transition">Email</label>
-          {{ form.email|add_class:'w-full rounded-xl bg-[#0f172a] border border-cyan-600/40 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/40 px-4 py-3 text-cyan-100 placeholder-gray-500 shadow-md outline-none transition font-medium' }}
+          {{ form.email|add_class:'w-full rounded-xl bg-white border border-cyan-600/40 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/40 px-4 py-3 text-gray-900 placeholder-gray-500 shadow-md outline-none transition font-medium' }}
         </div>
         <div class="flex flex-col gap-2 group">
           <label for="id_telefono" class="text-xs font-semibold uppercase tracking-wider text-cyan-300/90 group-hover:text-lime-300 transition">{% if LANGUAGE_CODE == 'es' %}Teléfono{% else %}Phone{% endif %}</label>
-          {{ form.telefono|add_class:'w-full rounded-xl bg-[#0f172a] border border-cyan-600/40 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/40 px-4 py-3 text-cyan-100 placeholder-gray-500 shadow-md outline-none transition font-medium' }}
+          {{ form.telefono|add_class:'w-full rounded-xl bg-white border border-cyan-600/40 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/40 px-4 py-3 text-gray-900 placeholder-gray-500 shadow-md outline-none transition font-medium' }}
         </div>
+        
+        <!-- Campos Chile: región/ciudad -->
+        {% if form.pais != 'US' %}
         <div class="flex flex-col gap-2 group">
           <label for="id_region" class="text-xs font-semibold uppercase tracking-wider text-cyan-300/90 group-hover:text-lime-300 transition">{% if LANGUAGE_CODE == 'es' %}Región{% else %}Region{% endif %}</label>
-          {{ form.region|add_class:'w-full rounded-xl bg-[#0f172a] border border-cyan-600/40 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/40 px-4 py-3 text-cyan-100 placeholder-gray-500 shadow-md outline-none transition font-medium' }}
+          {{ form.region|add_class:'w-full rounded-xl bg-white border border-cyan-600/40 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/40 px-4 py-3 text-gray-900 placeholder-gray-500 shadow-md outline-none transition font-medium' }}
         </div>
         <div class="flex flex-col gap-2 group">
           <label for="id_ciudad" class="text-xs font-semibold uppercase tracking-wider text-cyan-300/90 group-hover:text-lime-300 transition">{% if LANGUAGE_CODE == 'es' %}Ciudad{% else %}City{% endif %}</label>
-          {{ form.ciudad|add_class:'w-full rounded-xl bg-[#0f172a] border border-cyan-600/40 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/40 px-4 py-3 text-cyan-100 placeholder-gray-500 shadow-md outline-none transition font-medium' }}
+          {{ form.ciudad|add_class:'w-full rounded-xl bg-white border border-cyan-600/40 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/40 px-4 py-3 text-gray-900 placeholder-gray-500 shadow-md outline-none transition font-medium' }}
         </div>
+        {% else %}
+        <!-- Campos USA: estado/ciudad/zipcode -->
+        <div class="flex flex-col gap-2 group">
+          <label for="id_estado_usa" class="text-xs font-semibold uppercase tracking-wider text-cyan-300/90 group-hover:text-lime-300 transition">State</label>
+          {{ form.estado_usa|add_class:'w-full rounded-xl bg-white border border-cyan-600/40 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/40 px-4 py-3 text-gray-900 placeholder-gray-500 shadow-md outline-none transition font-medium' }}
+        </div>
+        <div class="flex flex-col gap-2 group">
+          <label for="id_ciudad_usa" class="text-xs font-semibold uppercase tracking-wider text-cyan-300/90 group-hover:text-lime-300 transition">City</label>
+          {{ form.ciudad_usa|add_class:'w-full rounded-xl bg-white border border-cyan-600/40 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/40 px-4 py-3 text-gray-900 placeholder-gray-500 shadow-md outline-none transition font-medium' }}
+        </div>
+        <div class="flex flex-col gap-2 group">
+          <label for="id_zipcode" class="text-xs font-semibold uppercase tracking-wider text-cyan-300/90 group-hover:text-lime-300 transition">ZIP Code</label>
+          {{ form.zipcode|add_class:'w-full rounded-xl bg-white border border-cyan-600/40 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/40 px-4 py-3 text-gray-900 placeholder-gray-500 shadow-md outline-none transition font-medium' }}
+        </div>
+        {% endif %}
         <div class="md:col-span-2 flex flex-col gap-2 group">
           <label for="id_direccion" class="text-xs font-semibold uppercase tracking-wider text-cyan-300/90 group-hover:text-lime-300 transition">{% if LANGUAGE_CODE == 'es' %}Dirección{% else %}Address{% endif %}</label>
-          {{ form.direccion|add_class:'w-full rounded-xl bg-[#0f172a] border border-cyan-600/40 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/40 px-4 py-3 text-cyan-100 placeholder-gray-500 shadow-md outline-none transition font-medium' }}
+          {{ form.direccion|add_class:'w-full rounded-xl bg-white border border-cyan-600/40 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/40 px-4 py-3 text-gray-900 placeholder-gray-500 shadow-md outline-none transition font-medium' }}
         </div>
       </div>
       <div class="flex flex-col sm:flex-row justify-end gap-4 pt-4">
@@ -97,9 +116,11 @@
 {% block extra_js %}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
+    // Manejo para Chile (región/ciudad)
     const regionSelect = document.getElementById('id_region');
     const ciudadSelect = document.getElementById('id_ciudad');
     const ciudadActual = '{{ form.ciudad.value|default_if_none:"" }}';
+    
     if(regionSelect && ciudadSelect){
       function cargarCiudades(regionId, pre){
         ciudadSelect.innerHTML = '<option value="">---------</option>';
@@ -116,6 +137,29 @@
       }
       if(regionSelect.value){ cargarCiudades(regionSelect.value, ciudadActual); }
       regionSelect.addEventListener('change', e=>cargarCiudades(e.target.value));
+    }
+
+    // Manejo para USA (estado/ciudad)
+    const estadoSelect = document.getElementById('id_estado_usa');
+    const ciudadUsaSelect = document.getElementById('id_ciudad_usa');
+    const ciudadUsaActual = '{{ form.ciudad_usa.value|default_if_none:"" }}';
+    
+    if(estadoSelect && ciudadUsaSelect){
+      function cargarCiudadesUsa(estadoId, pre){
+        ciudadUsaSelect.innerHTML = '<option value="">Select City</option>';
+        if(estadoId){
+          fetch(`{% url 'taller:clientes:obtener_ciudades_usa' %}?estado_id=${estadoId}`)
+            .then(r=>r.json())
+            .then(data=>{
+              data.forEach(c=>{
+                const o=document.createElement('option');
+                o.value=c.id; o.textContent=c.nombre; if(pre && pre==c.id) o.selected=true; ciudadUsaSelect.appendChild(o);
+              });
+            });
+        }
+      }
+      if(estadoSelect.value){ cargarCiudadesUsa(estadoSelect.value, ciudadUsaActual); }
+      estadoSelect.addEventListener('change', e=>cargarCiudadesUsa(e.target.value));
     }
   });
 </script>

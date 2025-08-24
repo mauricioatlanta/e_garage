@@ -1,0 +1,936 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+{% if es_edicion %}
+Editando: {{ documento.tipo }} #{{ documento.numero_documento }}
+{% else %}
+Nuevo Documento
+{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/documento_form.css' %}">
+<script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
+<style>
+    /* Fondo futurista con partículas */
+    body {
+        background: linear-gradient(135deg, #0f2027 0%, #203a43 20%, #2c5364 100%);
+        min-height: 100vh;
+        position: relative;
+    }
+
+    #tsparticles {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+    }
+
+    .container-fluid {
+        max-width: 1400px;
+        position: relative;
+        z-index: 2;
+    }
+    
+    .form-section {
+        background: linear-gradient(135deg, rgba(24,30,40,0.85) 0%, rgba(0,230,255,0.1) 100%);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 12px 48px 0 rgba(0,230,255,0.3), 0 0 0 2px #00e6ff44;
+        border: 2px solid rgba(0,230,255,0.4);
+        backdrop-filter: blur(16px) saturate(150%);
+        -webkit-backdrop-filter: blur(16px) saturate(150%);
+        position: relative;
+        overflow: hidden;
+        color: #ffffff;
+        transition: all 0.3s ease;
+    }
+
+    .form-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(0,230,255,0.1), transparent);
+        animation: shimmer 4s infinite;
+    }
+
+    @keyframes shimmer {
+        0% { left: -100%; }
+        100% { left: 100%; }
+    }
+
+    .form-section:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 60px 0 rgba(0,230,255,0.4);
+    }
+    
+    .form-section h3 {
+        color: #00e6ff;
+        margin-bottom: 1.5rem;
+        font-size: 1.3rem;
+        font-weight: 700;
+        text-shadow: 0 0 20px #00e6ffaa;
+        border-bottom: 2px solid #00e6ff;
+        padding-bottom: 0.8rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, rgba(24,30,40,0.95) 0%, rgba(0,230,255,0.2) 100%);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 15px 60px 0 rgba(0,230,255,0.4), 0 0 0 3px #00e6ff55;
+        border: 3px solid rgba(0,230,255,0.5);
+        backdrop-filter: blur(20px) saturate(180%);
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .page-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(0,230,255,0.2), transparent);
+        animation: shimmer 3s infinite;
+    }
+
+    .page-header h1 {
+        color: #00e6ff;
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 0 30px #00e6ffcc, 0 0 60px #00e6ff66;
+        background: linear-gradient(45deg, #00e6ff, #ffffff, #00e6ff);
+        background-size: 200% 200%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: textGlow 3s ease-in-out infinite alternate;
+        letter-spacing: 2px;
+    }
+
+    @keyframes textGlow {
+        0% { 
+            background-position: 0% 50%; 
+            text-shadow: 0 0 20px #00e6ffaa, 0 0 40px #00e6ff44;
+        }
+        100% { 
+            background-position: 100% 50%; 
+            text-shadow: 0 0 30px #00e6ffcc, 0 0 60px #00e6ff66;
+        }
+    }
+    
+    .badge-pagado {
+        font-size: 0.9rem;
+        padding: 0.6rem 1.2rem;
+        border-radius: 25px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border: 2px solid;
+    }
+    
+    .badge-no-pagado {
+        background: linear-gradient(45deg, #ff416c, #ff4757);
+        color: white;
+        border-color: #ff4757;
+        box-shadow: 0 4px 15px rgba(255, 65, 108, 0.4);
+    }
+    
+    .badge-pagado-si {
+        background: linear-gradient(45deg, #00d2ff, #3a7bd5);
+        color: white;
+        border-color: #00d2ff;
+        box-shadow: 0 4px 15px rgba(0, 210, 255, 0.4);
+    }
+    
+    .form-control, .form-select {
+        background: rgba(0,20,30,0.8) !important;
+        border: 2px solid #00e6ff44 !important;
+        border-radius: 10px !important;
+        padding: 0.8rem !important;
+        color: #ffffff !important;
+        transition: all 0.3s ease !important;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #00e6ff !important;
+        box-shadow: 0 0 20px rgba(0,230,255,0.5) !important;
+        outline: none !important;
+        background: rgba(0,30,45,0.9) !important;
+    }
+
+    .form-control::placeholder {
+        color: #66ccdd !important;
+    }
+
+    .form-label {
+        color: #00e6ff !important;
+        font-weight: 600 !important;
+        margin-bottom: 0.8rem !important;
+        text-shadow: 0 0 10px #00e6ff66;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(45deg, #00e6ff, #0099cc) !important;
+        border: none !important;
+        border-radius: 12px !important;
+        padding: 0.8rem 2.5rem !important;
+        font-weight: 700 !important;
+        font-size: 1.1rem !important;
+        text-transform: uppercase !important;
+        letter-spacing: 1px !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 6px 20px rgba(0,230,255,0.4) !important;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;
+    }
+    
+    .btn-primary:hover {
+        background: linear-gradient(45deg, #0099cc, #00e6ff) !important;
+        transform: translateY(-3px) !important;
+        box-shadow: 0 10px 30px rgba(0,230,255,0.6) !important;
+    }
+
+    .btn-secondary {
+        background: linear-gradient(45deg, #667eea, #764ba2) !important;
+        border: none !important;
+        border-radius: 12px !important;
+        padding: 0.6rem 1.5rem !important;
+        font-weight: 600 !important;
+        color: white !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4) !important;
+    }
+
+    .btn-secondary:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6) !important;
+    }
+
+    .btn-danger {
+        background: linear-gradient(45deg, #ff416c, #ff4757) !important;
+        border: none !important;
+        border-radius: 12px !important;
+        padding: 0.6rem 1.5rem !important;
+        font-weight: 600 !important;
+        color: white !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 4px 15px rgba(255, 65, 108, 0.4) !important;
+    }
+
+    .btn-danger:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 8px 25px rgba(255, 65, 108, 0.6) !important;
+    }
+    
+    .table-responsive {
+        background: rgba(0,20,30,0.6);
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid #00e6ff44;
+        backdrop-filter: blur(10px);
+    }
+    
+    .table {
+        margin-bottom: 0;
+        color: #ffffff;
+    }
+
+    .table th {
+        background: linear-gradient(135deg, rgba(0,230,255,0.3), rgba(0,150,200,0.3));
+        border: none;
+        font-weight: 700;
+        color: #00e6ff !important;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.9rem;
+        padding: 1rem;
+    }
+    
+    .table td {
+        vertical-align: middle;
+        border-color: #00e6ff22;
+        padding: 1rem;
+        background: rgba(0,20,30,0.4);
+    }
+
+    .table tbody tr:hover {
+        background: rgba(0,230,255,0.1);
+    }
+    
+    .total-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);
+        border: 2px solid rgba(118, 75, 162, 0.5);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .total-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+        animation: shimmer 5s infinite;
+    }
+
+    .total-card h4 {
+        font-size: 1.5rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        text-shadow: 0 0 20px rgba(255,255,255,0.5);
+    }
+
+    .total-amount {
+        font-size: 2.5rem;
+        font-weight: 900;
+        text-shadow: 0 0 30px rgba(255,255,255,0.7);
+        margin: 0;
+    }
+    
+    .total-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+        padding: 0.25rem 0;
+    }
+    
+    .total-row.final {
+        border-top: 2px solid rgba(255,255,255,0.3);
+        padding-top: 0.75rem;
+        margin-top: 0.75rem;
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+
+    /* Efectos para inputs de búsqueda */
+    .search-container {
+        position: relative;
+    }
+
+    .search-container::after {
+        content: '🔍';
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.2rem;
+        opacity: 0.7;
+    }
+
+    /* Animación para elementos que aparecen */
+    .fade-in {
+        animation: fadeIn 0.5s ease-in;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Estilos para USA específicos */
+    .usa-flag::before {
+        content: '🇺🇸';
+        margin-right: 0.5rem;
+        font-size: 1.2rem;
+    }
+</style>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  // Configuración de partículas futuristas
+  tsParticles.load("tsparticles", {
+    fullScreen: { enable: false },
+    background: { color: { value: "transparent" } },
+    particles: {
+      number: { value: 120 },
+      color: { value: ["#00ffff", "#00e6ff", "#0099cc", "#ffffff"] },
+      size: { 
+        value: { min: 1, max: 3 },
+        animation: {
+          enable: true,
+          speed: 2,
+          minimumValue: 0.5
+        }
+      },
+      move: { 
+        enable: true, 
+        speed: { min: 0.3, max: 1.2 },
+        direction: "none",
+        outModes: { default: "out" }
+      },
+      links: { 
+        enable: true, 
+        color: "#00e6d0", 
+        opacity: 0.2,
+        distance: 150,
+        width: 1
+      },
+      opacity: {
+        value: { min: 0.3, max: 0.8 },
+        animation: {
+          enable: true,
+          speed: 1,
+          minimumValue: 0.1
+        }
+      }
+    },
+    interactivity: {
+      events: {
+        onHover: {
+          enable: true,
+          mode: "repulse"
+        },
+        onClick: {
+          enable: true,
+          mode: "push"
+        }
+      },
+      modes: {
+        repulse: {
+          distance: 100,
+          duration: 0.4
+        },
+        push: {
+          quantity: 4
+        }
+      }
+    }
+  });
+
+  // Añadir clase fade-in a elementos que aparecen
+  const sections = document.querySelectorAll('.form-section');
+  sections.forEach((section, index) => {
+    setTimeout(() => {
+      section.classList.add('fade-in');
+    }, index * 100);
+  });
+});
+</script>
+{% endblock %}
+
+{% block fondo_extra %}
+<div id="tsparticles" class="fixed inset-0 -z-10"></div>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- Header -->
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                {% if es_edicion %}
+                    <h1 class="mb-2">
+                        <i class="fas fa-edit"></i>
+                        ✏️ Editando: {{ documento.tipo }} #{{ documento.numero_documento }}
+                    </h1>
+                    <p style="color: #00ccee; margin: 0;">Modificar información del documento</p>
+                {% else %}
+                    <h1 class="mb-2">
+                        <i class="fas fa-plus-circle"></i>
+                        ➕ Nuevo Documento
+                    </h1>
+                    <p style="color: #00ccee; margin: 0;">Complete la información del documento</p>
+                {% endif %}
+            </div>
+            <div class="d-flex align-items-center gap-3">
+            {% if es_edicion %}
+                <span id="badge-pago" class="badge badge-pagado {% if documento.pagado %}badge-pagado-si{% else %}badge-no-pagado{% endif %}">
+                    {% if documento.pagado %}✅ Pagado{% else %}❌ No Pagado{% endif %}
+                </span>
+            {% endif %}
+            <a href="{% url 'documentos_cl:lista_documentos' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mensajes -->
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Formulario -->
+    <form method="post" id="documentoForm">
+        {% csrf_token %}
+        
+        <div class="row">
+            <!-- Información del Documento -->
+            <div class="col-lg-6">
+                <div class="form-section">
+                    <h3><i class="fas fa-file-alt text-primary"></i> Información del Documento</h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Tipo de Documento</label>
+                        {{ form.tipo }}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Número de Documento</label>
+                        {{ form.numero }}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Fecha</label>
+                        {{ form.fecha_emision }}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Estado de Pago</label>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="pagado" id="switchPagado" 
+                                   {% if documento.pagado %}checked{% endif %} onchange="actualizarBadgePago()">
+                            <label class="form-check-label" for="switchPagado">
+                                Documento Pagado
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Información del Cliente -->
+            <div class="col-lg-6">
+                <div class="form-section">
+                    <h3><i class="fas fa-user text-primary"></i> Cliente y Vehículo</h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Cliente</label>
+                        {{ form.cliente }}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Vehículo</label>
+                        {{ form.vehiculo }}
+                    </div>
+                    
+                    {% if country == 'US' %}
+                    <div class="form-group">
+                        <label class="form-label">Mileage</label>
+                        <input type="number" name="millas" class="form-control" placeholder="0" 
+                               value="{% if documento.millas %}{{ documento.millas }}{% endif %}">
+                    </div>
+                    {% endif %}
+                    
+                    <div class="form-group">
+                        <label class="form-label">Técnico Asignado</label>
+                        {{ form.tecnico_responsable }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Observaciones -->
+        <div class="form-section">
+            <h3><i class="fas fa-comment-alt text-primary"></i> Observaciones</h3>
+            <div class="form-group">
+                {{ form.observaciones }}
+            </div>
+        </div>
+        
+        <!-- Tablas de Items -->
+        <div class="row">
+            <div class="col-12">
+                <!-- Repuestos -->
+                <div class="form-section">
+                    <h3><i class="fas fa-cogs text-primary"></i> Repuestos</h3>
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="tabla-repuestos">
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Descripción</th>
+                                    <th>Cantidad</th>
+                                    <th>Precio Unit.</th>
+                                    <th>Descuento %</th>
+                                    <th>Subtotal</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="repuestos-tbody">
+                                <!-- Filas se cargan con JS -->
+                            </tbody>
+                        </table>
+                        <button type="button" class="btn btn-success btn-sm" onclick="agregarRepuesto()">
+                            <i class="fas fa-plus"></i> Agregar Repuesto
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Servicios -->
+                <div class="form-section">
+                    <h3><i class="fas fa-wrench text-primary"></i> Servicios</h3>
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="tabla-servicios">
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Descripción</th>
+                                    <th>Cantidad</th>
+                                    <th>Precio Unit.</th>
+                                    <th>Descuento %</th>
+                                    <th>Subtotal</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="servicios-tbody">
+                                <!-- Filas se cargan con JS -->
+                            </tbody>
+                        </table>
+                        <button type="button" class="btn btn-success btn-sm" onclick="agregarServicio()">
+                            <i class="fas fa-plus"></i> Agregar Servicio
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Otros Servicios -->
+                <div class="form-section">
+                    <h3><i class="fas fa-external-link-alt text-primary"></i> Servicios Externos</h3>
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="tabla-otros">
+                            <thead>
+                                <tr>
+                                    <th>Servicio</th>
+                                    <th>Empresa Externa</th>
+                                    <th>Cantidad</th>
+                                    <th>Costo Interno</th>
+                                    <th>Precio Cliente</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="otros-tbody">
+                                <!-- Filas se cargan con JS -->
+                            </tbody>
+                        </table>
+                        <button type="button" class="btn btn-success btn-sm" onclick="agregarOtroServicio()">
+                            <i class="fas fa-plus"></i> Agregar Servicio Externo
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Resumen de Totales -->
+        <div class="row">
+            <div class="col-lg-8"></div>
+            <div class="col-lg-4">
+                <div class="total-card">
+                    <h4 class="mb-3"><i class="fas fa-calculator"></i> Resumen de Facturación</h4>
+                    
+                    <div class="total-row">
+                        <span>Subtotal Repuestos:</span>
+                        <span id="subtotal-repuestos">$0.00</span>
+                    </div>
+                    
+                    <div class="total-row">
+                        <span>Subtotal Servicios:</span>
+                        <span id="subtotal-servicios">$0.00</span>
+                    </div>
+                    
+                    <div class="total-row">
+                        <span>Subtotal Externos:</span>
+                        <span id="subtotal-otros">$0.00</span>
+                    </div>
+                    
+                    {% if country == 'US' %}
+                    <div class="total-row">
+                        <span>
+                            <input type="checkbox" id="aplicar-tax" onchange="recalcularTotales()"> 
+                            Sales Tax:
+                        </span>
+                        <span id="tax-amount">$0.00</span>
+                    </div>
+                    {% else %}
+                    <div class="total-row">
+                        <span>IVA (19%):</span>
+                        <span id="iva-amount">$0.00</span>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="total-row final">
+                        <span>TOTAL:</span>
+                        <span id="total-final">$0.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Botones -->
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary btn-lg me-2">
+                <i class="fas fa-save"></i> 
+                {% if es_edicion %}Guardar Cambios{% else %}Crear Documento{% endif %}
+            </button>
+            <a href="{% url 'documentos_cl:lista_documentos' %}" class="btn btn-secondary btn-lg">
+                <i class="fas fa-times"></i> Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- Bootstrap de datos para JS -->
+<script id="bootstrap-lineas" type="application/json">
+{{ lineas_json|safe }}
+</script>
+
+<script>
+// Variables globales
+window.ES_EDICION = {{ es_edicion|yesno:"true,false" }};
+window.COUNTRY = "{{ country|upper }}";
+
+// Datos de líneas cargadas
+let lineasData = JSON.parse(document.getElementById('bootstrap-lineas').textContent);
+
+// Inicializar
+document.addEventListener('DOMContentLoaded', function() {
+    if (window.ES_EDICION) {
+        cargarLineasExistentes();
+    }
+    recalcularTotales();
+});
+
+function actualizarBadgePago() {
+    const checkbox = document.getElementById('switchPagado');
+    const badge = document.getElementById('badge-pago');
+    
+    if (badge) {
+        if (checkbox.checked) {
+            badge.className = 'badge badge-pagado badge-pagado-si';
+            badge.textContent = '✅ Pagado';
+        } else {
+            badge.className = 'badge badge-pagado badge-no-pagado';
+            badge.textContent = '❌ No Pagado';
+        }
+    }
+}
+
+function cargarLineasExistentes() {
+    // Cargar repuestos
+    lineasData.repuestos.forEach(repuesto => {
+        agregarRepuesto(repuesto);
+    });
+    
+    // Cargar servicios
+    lineasData.servicios.forEach(servicio => {
+        agregarServicio(servicio);
+    });
+    
+    // Cargar otros servicios
+    lineasData.otros.forEach(otro => {
+        agregarOtroServicio(otro);
+    });
+}
+
+function agregarRepuesto(data = null) {
+    const tbody = document.getElementById('repuestos-tbody');
+    const row = tbody.insertRow();
+    const index = tbody.children.length - 1;
+    
+    row.innerHTML = `
+        <td>
+            <input type="hidden" name="lineas_repuesto[repuesto_id][]" value="${data?.repuesto_id || ''}">
+            <input type="text" class="form-control" name="lineas_repuesto[codigo][]" 
+                   value="${data?.codigo || ''}" placeholder="Código">
+        </td>
+        <td>
+            <input type="text" class="form-control" name="lineas_repuesto[nombre][]" 
+                   value="${data?.nombre || ''}" placeholder="Descripción" required>
+        </td>
+        <td>
+            <input type="number" class="form-control" name="lineas_repuesto[cantidad][]" 
+                   value="${data?.cantidad || '1'}" min="1" step="1" onchange="recalcularTotales()">
+        </td>
+        <td>
+            <input type="number" class="form-control" name="lineas_repuesto[precio][]" 
+                   value="${data?.precio || '0'}" min="0" step="0.01" onchange="recalcularTotales()">
+        </td>
+        <td>
+            <input type="number" class="form-control" name="lineas_repuesto[descuento][]" 
+                   value="${data?.descuento || '0'}" min="0" max="100" step="0.01" onchange="recalcularTotales()">
+        </td>
+        <td>
+            <span class="subtotal-repuesto">$0.00</span>
+        </td>
+        <td>
+            <button type="button" class="btn btn-danger btn-sm" onclick="eliminarFila(this)">
+                <i class="fas fa-trash"></i>
+            </button>
+        </td>
+    `;
+    
+    recalcularTotales();
+}
+
+function agregarServicio(data = null) {
+    const tbody = document.getElementById('servicios-tbody');
+    const row = tbody.insertRow();
+    
+    row.innerHTML = `
+        <td>
+            <input type="hidden" name="lineas_servicio[servicio_id][]" value="${data?.servicio_id || ''}">
+            <input type="text" class="form-control" name="lineas_servicio[codigo][]" 
+                   value="${data?.codigo || ''}" placeholder="Código">
+        </td>
+        <td>
+            <input type="text" class="form-control" name="lineas_servicio[descripcion][]" 
+                   value="${data?.descripcion || ''}" placeholder="Descripción" required>
+        </td>
+        <td>
+            <input type="number" class="form-control" name="lineas_servicio[cantidad][]" 
+                   value="${data?.cantidad || '1'}" min="1" step="1" onchange="recalcularTotales()">
+        </td>
+        <td>
+            <input type="number" class="form-control" name="lineas_servicio[precio][]" 
+                   value="${data?.precio || '0'}" min="0" step="0.01" onchange="recalcularTotales()">
+        </td>
+        <td>
+            <input type="number" class="form-control" name="lineas_servicio[descuento][]" 
+                   value="${data?.descuento || '0'}" min="0" max="100" step="0.01" onchange="recalcularTotales()">
+        </td>
+        <td>
+            <span class="subtotal-servicio">$0.00</span>
+        </td>
+        <td>
+            <button type="button" class="btn btn-danger btn-sm" onclick="eliminarFila(this)">
+                <i class="fas fa-trash"></i>
+            </button>
+        </td>
+    `;
+    
+    recalcularTotales();
+}
+
+function agregarOtroServicio(data = null) {
+    const tbody = document.getElementById('otros-tbody');
+    const row = tbody.insertRow();
+    
+    row.innerHTML = `
+        <td>
+            <input type="text" class="form-control" name="lineas_otro[servicio][]" 
+                   value="${data?.servicio || ''}" placeholder="Servicio" required>
+        </td>
+        <td>
+            <input type="text" class="form-control" name="lineas_otro[empresa_externa][]" 
+                   value="${data?.empresa_externa || ''}" placeholder="Empresa">
+        </td>
+        <td>
+            <input type="number" class="form-control" name="lineas_otro[cantidad][]" 
+                   value="${data?.cantidad || '1'}" min="1" step="1" onchange="recalcularTotales()">
+        </td>
+        <td>
+            <input type="number" class="form-control" name="lineas_otro[costo_interno][]" 
+                   value="${data?.costo_interno || '0'}" min="0" step="0.01">
+        </td>
+        <td>
+            <input type="number" class="form-control" name="lineas_otro[precio_cliente][]" 
+                   value="${data?.precio_cliente || '0'}" min="0" step="0.01" onchange="recalcularTotales()">
+        </td>
+        <td>
+            <button type="button" class="btn btn-danger btn-sm" onclick="eliminarFila(this)">
+                <i class="fas fa-trash"></i>
+            </button>
+        </td>
+    `;
+    
+    recalcularTotales();
+}
+
+function eliminarFila(button) {
+    button.closest('tr').remove();
+    recalcularTotales();
+}
+
+function recalcularTotales() {
+    let subtotalRepuestos = 0;
+    let subtotalServicios = 0;
+    let subtotalOtros = 0;
+    
+    // Calcular repuestos
+    document.querySelectorAll('#repuestos-tbody tr').forEach(row => {
+        const cantidad = parseFloat(row.querySelector('[name="lineas_repuesto[cantidad][]"]').value) || 0;
+        const precio = parseFloat(row.querySelector('[name="lineas_repuesto[precio][]"]').value) || 0;
+        const descuento = parseFloat(row.querySelector('[name="lineas_repuesto[descuento][]"]').value) || 0;
+        
+        const subtotal = cantidad * precio * (1 - descuento / 100);
+        subtotalRepuestos += subtotal;
+        
+        row.querySelector('.subtotal-repuesto').textContent = `$${subtotal.toFixed(2)}`;
+    });
+    
+    // Calcular servicios
+    document.querySelectorAll('#servicios-tbody tr').forEach(row => {
+        const cantidad = parseFloat(row.querySelector('[name="lineas_servicio[cantidad][]"]').value) || 0;
+        const precio = parseFloat(row.querySelector('[name="lineas_servicio[precio][]"]').value) || 0;
+        const descuento = parseFloat(row.querySelector('[name="lineas_servicio[descuento][]"]').value) || 0;
+        
+        const subtotal = cantidad * precio * (1 - descuento / 100);
+        subtotalServicios += subtotal;
+        
+        row.querySelector('.subtotal-servicio').textContent = `$${subtotal.toFixed(2)}`;
+    });
+    
+    // Calcular otros servicios
+    document.querySelectorAll('#otros-tbody tr').forEach(row => {
+        const cantidad = parseFloat(row.querySelector('[name="lineas_otro[cantidad][]"]').value) || 0;
+        const precio = parseFloat(row.querySelector('[name="lineas_otro[precio_cliente][]"]').value) || 0;
+        
+        const subtotal = cantidad * precio;
+        subtotalOtros += subtotal;
+    });
+    
+    // Calcular impuestos
+    let impuesto = 0;
+    if (window.COUNTRY === 'US') {
+        const aplicarTax = document.getElementById('aplicar-tax')?.checked || false;
+        if (aplicarTax) {
+            impuesto = (subtotalRepuestos + subtotalServicios + subtotalOtros) * 0.08; // 8% sales tax
+        }
+        if (document.getElementById('tax-amount')) {
+            document.getElementById('tax-amount').textContent = `$${impuesto.toFixed(2)}`;
+        }
+    } else {
+        // IVA 19% solo sobre repuestos en Chile
+        impuesto = subtotalRepuestos * 0.19;
+        if (document.getElementById('iva-amount')) {
+            document.getElementById('iva-amount').textContent = `$${impuesto.toFixed(2)}`;
+        }
+    }
+    
+    // Actualizar totales en la UI
+    if (document.getElementById('subtotal-repuestos')) {
+        document.getElementById('subtotal-repuestos').textContent = `$${subtotalRepuestos.toFixed(2)}`;
+    }
+    if (document.getElementById('subtotal-servicios')) {
+        document.getElementById('subtotal-servicios').textContent = `$${subtotalServicios.toFixed(2)}`;
+    }
+    if (document.getElementById('subtotal-otros')) {
+        document.getElementById('subtotal-otros').textContent = `$${subtotalOtros.toFixed(2)}`;
+    }
+    
+    const total = subtotalRepuestos + subtotalServicios + subtotalOtros + impuesto;
+    if (document.getElementById('total-final')) {
+        document.getElementById('total-final').textContent = `$${total.toFixed(2)}`;
+    }
+}
+</script>
+{% endblock %}

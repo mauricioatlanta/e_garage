@@ -16,6 +16,7 @@ from .namespaces import ui_namespaces  # útil para otros settings
 __all__ = [
 	'empresa_contexto',
 	'company_branding',
+	'company_country',
 	'invalidate_company_cache',
 	'ui_namespaces',
 ]
@@ -89,3 +90,79 @@ def invalidate_company_cache(user_id: int):
 	"""Invalida caché de branding para un usuario."""
 	cache_key = f"company_settings_{user_id}"
 	cache.delete(cache_key)
+
+
+def company_country(request):
+	"""
+	Context processor para datos específicos del país de la empresa
+	"""
+	if not getattr(request, 'user', None) or not request.user.is_authenticated:
+		return {}
+		
+	try:
+		from taller.models.empresa import Empresa
+		from taller.utils.pais_utils import get_configuracion_pais
+		
+		# Obtener empresa del usuario
+		try:
+			empresa = Empresa.objects.get(user=request.user)
+		except Empresa.DoesNotExist:
+			# Fallback: buscar empresa por campo legacy usuario
+			empresa = Empresa.objects.filter(usuario=request.user).first()
+			if not empresa:
+				# Crear empresa básica si no existe
+				empresa = Empresa.objects.create(
+					user=request.user,
+					nombre_taller=f'Taller de {request.user.username}',
+					pais='CL'  # Default Chile
+				)
+	except Exception as e:
+		print(f"Error en company_country context processor: {e}")
+		return {}
+	
+	if not empresa:
+		return {}
+	
+	# Obtener configuración del país
+	config = get_configuracion_pais(empresa)
+	
+	# Determinar configuración de impuestos
+	country = empresa.pais
+	
+	# Configuración específica por país
+	if country == 'CL':
+		# Chile: IVA 19% solo sobre repuestos
+		tax_rate = 0.19
+		tax_label = "IVA (19%)"
+		tax_base = "parts_only"
+		unit_label = "Kilometraje"
+		distance_field = "kilometraje"
+	else:
+		# USA: Sales Tax configurable sobre subtotal completo
+		tax_rate = config.get('impuesto_default', 0.08)
+		tax_label = "Sales Tax"
+		tax_base = "subtotal"
+		unit_label = "Miles"
+		distance_field = "millas"
+	
+	return {
+		'company_country': country,
+		'company_config': config,
+		'empresa_context': empresa,
+		
+		# Configuración de impuestos
+		'doc_tax_rate': tax_rate,
+		'doc_tax_label': tax_label,
+		'doc_tax_base': tax_base,
+		
+		# Configuración de unidades
+		'doc_unit_label': unit_label,
+		'doc_distance_field': distance_field,
+		
+		# Configuración de moneda
+		'doc_currency_symbol': config.get('simbolo_moneda', '$'),
+		'doc_currency_decimals': config.get('decimales', 0),
+		
+		# Configuración de fecha
+		'doc_date_format': config.get('formato_fecha', '%d/%m/%Y'),
+	}

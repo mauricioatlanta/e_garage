@@ -1,0 +1,40 @@
+{% extends "taller/documentos/base_documento.html" %}
+{% load widget_tweaks %}
+
+{% block extra_head %}
+{{ block.super }}
+<script src="/static/js/formulario_documento.js" defer></script>
+<script src="{% static 'taller/documentos/totales.js' %}" defer></script>
+<script src="{% static 'taller/documentos/integracion_totales.js' %}" defer></script>
+{% endblock %}
+
+{% block documento_title %}
+<h1 class="documento-title">📝 Crear Documento</h1>
+{% endblock %}
+
+{% block documento_content %}
+<form method="post" id="form-documento"
+      data-country="{{ company_country }}"
+      data-locale="{% if company_country == 'US' %}en-US{% else %}es-CL{% endif %}"
+      data-currency="{% if company_country == 'US' %}USD{% else %}CLP{% endif %}"
+      data-tax-base="{{ doc_tax_base }}"
+      data-tax-rate="{{ doc_tax_rate }}">
+  {% csrf_token %}
+  <input type="hidden" id="json_items" name="json_items" value="[]">
+
+  {% include "taller/documentos/_form_common.html" %}
+  
+  {% if company_country == "CL" %}
+    {% include "taller/documentos/_form_country_cl.html" %}
+  {% else %}
+    {% include "taller/documentos/_form_country_us.html" %}
+  {% endif %}
+
+  {% include "taller/documentos/_tables_items.html" %}
+
+  <div style="text-align: center; margin-top: 2rem;">
+    <button type="submit" class="btn-primary">💾 Crear Documento</button>
+    <a href="{% url 'documentos:lista_documentos' %}" class="btn-secondary" style="margin-left: 1rem;">❌ Cancelar</a>
+  </div>
+</form>
+{% endblock %}

@@ -6,7 +6,15 @@ class TenantViewMixin:
     paginate_by = 50  # ajusta por vista si necesitas
 
     def get_queryset(self):
-        qs = self.model.objects.for_request(self.request)
+        # Verificar si el manager tiene el método for_request
+        if hasattr(self.model.objects, 'for_request'):
+            qs = self.model.objects.for_request(self.request)
+        else:
+            # Fallback: usar queryset base y filtrar por empresa si existe
+            qs = self.model.objects.all()
+            if hasattr(self.model, 'empresa') and hasattr(self.request, 'empresa'):
+                qs = qs.filter(empresa=self.request.empresa)
+        
         if self.select_related_fields:
             qs = qs.select_related(*self.select_related_fields)
         if self.prefetch_related_fields:
@@ -17,6 +25,7 @@ class TenantViewMixin:
         context = super().get_context_data(**kwargs)
         # Agregar country al contexto
         context['country'] = getattr(self.request, 'country', 'cl')
+        context['company_country'] = getattr(self.request, 'company_country', None)  # viene del middleware
         return context
 
     def form_valid(self, form):

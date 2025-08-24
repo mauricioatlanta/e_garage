@@ -40,7 +40,7 @@ urlpatterns = [
     path('taller/ajax/load-motores-cajas/', ajax_views.load_motores_cajas, name='ajax_load_motores_cajas'),
     
     # Módulos principales (incluir cuando estén funcionando)
-    path('vehiculos/', include('taller.vehiculos.urls')),
+    path('vehiculos/', include(('taller.vehiculos.urls', 'vehiculos'), namespace='vehiculos')),
     path('clientes/', include('taller.clientes.urls')),
     path('repuestos/', include('taller.repuestos.urls')),
     

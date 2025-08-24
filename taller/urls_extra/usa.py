@@ -37,8 +37,7 @@ urlpatterns = [
     
     # Servicios y documentos con namespace
     path('servicios/', include(('taller.servicios.urls', 'servicios'), namespace='servicios')),
-    # DOCUMENTOS MOVIDO A gestion_taller/urls.py para evitar duplicación
-    # path('documentos/', include(('taller.documentos.urls', 'documentos'), namespace='documentos')),
+    path('documentos/', include(('taller.documentos.urls', 'documentos'), namespace='documentos')),
     path('taller/reportes/', include(('taller.reportes.urls', 'reportes_usa'), namespace='reportes_usa')),
     path('reports/', include('taller.reportes.urls')),
     # Dashboard de suscriptor

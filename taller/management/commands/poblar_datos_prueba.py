@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
+from decimal import Decimal
 from taller.models.empresa import Empresa
 from taller.models.clientes import Cliente
 from taller.models.vehiculos import Vehiculo
@@ -107,7 +108,7 @@ class Command(BaseCommand):
                     vehiculo=vehiculo,
                     kilometraje=random.randint(10000, 90000),
                     tecnico=tecnico,
-                    incluir_iva=True
+                    tax_rate_applied=Decimal('19.00')  # Para incluir IVA en Chile
                 )
                 # Agregar repuestos
                 for _ in range(3):

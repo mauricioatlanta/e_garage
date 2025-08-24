@@ -37,6 +37,33 @@ class Documento(AuditMixin, models.Model):
 	total            = models.DecimalField(max_digits=14, decimal_places=2, default=Decimal('0.00'))
 	created_at = models.DateTimeField(default=timezone.now)
 
+	# Campos nuevos para tracking de pagos y observaciones
+	estado_pago = models.CharField(
+		max_length=10, 
+		choices=[
+			('PAGADO', _('Pagado')),
+			('NO_PAGADO', _('No Pagado')),
+			('PARCIAL', _('Pago Parcial'))
+		], 
+		default='NO_PAGADO',
+		db_index=True,
+		help_text=_('Estado del pago del documento')
+	)
+	pagado = models.BooleanField(
+		default=False,
+		help_text=_('Indica si el documento está pagado completamente')
+	)
+	millas = models.PositiveIntegerField(
+		null=True, 
+		blank=True,
+		help_text=_('Millaje del vehículo (solo para USA)')
+	)
+	observaciones = models.TextField(
+		blank=True, 
+		null=True,
+		help_text=_('Notas u observaciones sobre el documento')
+	)
+
 	def clean(self):
 		super().clean()
 		empresa_id = getattr(self, 'empresa_id', None)
@@ -44,6 +71,10 @@ class Documento(AuditMixin, models.Model):
 		tecnico_empresa_id = getattr(tecnico, 'empresa_id', None) if tecnico else None
 		if empresa_id is not None and tecnico_empresa_id is not None and empresa_id != tecnico_empresa_id:
 			raise ValidationError("El técnico responsable debe pertenecer a la misma empresa del documento.")
+			
+		# Validar que millas solo se use en USA
+		if self.millas is not None and self.country != 'US':
+			raise ValidationError("El campo millas solo puede usarse en documentos de USA")
 
 	@property
 	def numero_documento(self):

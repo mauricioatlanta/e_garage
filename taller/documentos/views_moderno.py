@@ -9,8 +9,11 @@ from django.db import transaction
 from django.db.models import Q, F, ExpressionWrapper, DecimalField
 from decimal import Decimal
 import json
+import logging
 from datetime import datetime
 from django.utils.timezone import now
+
+logger = logging.getLogger(__name__)
 
 # Helper para obtener el parámetro country del request
 def _country_from_request(request):
@@ -171,6 +174,7 @@ def obtener_datos_formulario(empresa):
         'servicios_externos': servicios_externos,
         'repuestos': repuestos,
         'tipos_documento': tipos_documento,
+        'today': now(),
     }
 
 @login_required
@@ -662,3 +666,135 @@ def api_obtener_numero_documento(request):
         
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+
+# === VISTA UNIFICADA CREAR/EDITAR ===
+
+# === VISTA UNIFICADA CREAR/EDITAR ===
+
+def _to_decimal_pct(txt: str) -> Decimal | None:
+    """
+    Convierte '8.5' o '8,5' o '8.5%' en Decimal 0.085, o None si vacío/no válido.
+    """
+    if not txt:
+        return None
+    s = txt.strip().replace("%", "").replace(",", ".")
+    if not s:
+        return None
+    try:
+        return (Decimal(s) / Decimal("100")).quantize(Decimal("0.0001"))
+    except (InvalidOperation, ValueError):
+        return None
+
+
+@login_required
+@transaction.atomic
+def documento_form(request, pk=None):
+    """Vista unificada para crear y editar documentos"""
+    from taller.documentos.forms import DocumentoForm
+    from decimal import InvalidOperation
+    from django.db.models import Sum, ExpressionWrapper, DecimalField
+    
+    # Obtener empresa del usuario
+    try:
+        empresa = request.user.empresa
+    except AttributeError:
+        empresa, created = Empresa.objects.get_or_create(
+            user=request.user,
+            defaults={'nombre_taller': f'Taller de {request.user.username}'}
+        )
+    
+    # Obtener el documento si estamos editando
+    documento = get_object_or_404(Documento, pk=pk, empresa=empresa) if pk else None
+    
+    # Obtener país desde el contexto de la empresa o request
+    company_country = getattr(request, "company_country", getattr(empresa, "pais", None))
+    if not company_country:
+        # Fallback desde la URL
+        path = request.path
+        if path.startswith('/cl/'):
+            company_country = 'CL'
+        elif path.startswith('/us/'):
+            company_country = 'US'
+        else:
+            company_country = 'CL'
+
+    if request.method == "POST":
+        form = DocumentoForm(request.POST, request.FILES or None, instance=documento, user=request.user)
+        if form.is_valid():
+            doc = form.save()  # Documento + lógica del form (kilometraje→vehiculo.millas, pagado, etc.)
+
+            # ------------------------
+            # Recalcular netos desde líneas (campos 'subtotal' existentes)
+            # ------------------------
+            neto_rep = doc.lineas_repuesto.aggregate(s=Sum("subtotal"))["s"] or Decimal("0")
+            neto_serv = doc.lineas_servicio.aggregate(s=Sum("subtotal"))["s"] or Decimal("0")
+            neto_otros = doc.lineas_otro_servicio.aggregate(
+                s=Sum(ExpressionWrapper(F("precio_cliente") * F("cantidad"),
+                                        output_field=DecimalField(max_digits=12, decimal_places=2)))
+            )["s"] or Decimal("0")
+
+            # ------------------------
+            # Impuestos por país
+            #   CL: IVA 19% SOLO sobre repuestos
+            #   US: Sales tax opcional (checkbox) sobre repuestos + servicios (si aplica)
+            # ------------------------
+            if company_country == "CL":
+                tax_base = neto_rep
+                tax_rate = Decimal("0.19")
+            else:
+                apply_sales_tax = bool(request.POST.get("apply_sales_tax"))
+                rate = _to_decimal_pct((request.POST.get("sales_tax_rate") or "").strip())
+                # fallback si no se envía tasa: conserva o 0
+                tax_rate = rate if (rate is not None and rate >= 0) else (doc.tax_rate_applied or Decimal("0"))
+                tax_base = (neto_rep + neto_serv) if apply_sales_tax else Decimal("0")
+
+            tax_amount = (tax_base * tax_rate).quantize(Decimal("0.01"))
+            total = (neto_rep + neto_serv + neto_otros + tax_amount).quantize(Decimal("0.01"))
+
+            # Persistir totales
+            doc.neto_repuestos = neto_rep
+            doc.neto_servicios = neto_serv
+            doc.neto_otros = neto_otros
+            doc.tax_rate_applied = tax_rate
+            doc.tax_amount = tax_amount
+            doc.total = total
+            doc.save(update_fields=[
+                "neto_repuestos", "neto_servicios", "neto_otros",
+                "tax_rate_applied", "tax_amount", "total"
+            ])
+
+            messages.success(request, "Cambios guardados.")
+            return redirect("documentos:ver_documento_cbv", pk=doc.pk)
+
+        # Form inválido → Diagnosticar y registrar errores detallados
+        # POST keys y valores relevantes
+        posted = {k: request.POST.get(k) for k in ("tipo","numero","fecha_emision","cliente","vehiculo","tecnico_responsable","pagado")}
+        logger.error("DOC_EDIT_INVALID pk=%s POST_KEYS=%s POST_CORE=%s", getattr(documento, "pk", None), list(request.POST.keys()), posted)
+
+        # Errores detallados
+        logger.error("DOC_EDIT_ERRORS non_field=%s fields=%s",
+                     form.non_field_errors(),
+                     form.errors.as_json())
+
+        # Detección de campos deshabilitados (no llegan en POST)
+        missing = [name for name in form.fields.keys() if name not in request.POST and form.fields[name].required]
+        logger.error("DOC_EDIT_MISSING_REQUIRED_FIELDS=%s", missing)
+
+        # NO redirigir; render con errores visibles
+        messages.error(request, "Corrige los errores del formulario.")
+        return render(request, "taller/documentos/documento_form.html", {
+            "form": form,
+            "documento": documento,
+            "es_edicion": bool(pk),
+            "company_country": company_country,
+        }, status=422)
+
+    # GET
+    form = DocumentoForm(instance=documento, user=request.user)
+    return render(request, "taller/documentos/documento_form.html", {
+        "form": form,
+        "documento": documento,
+        "es_edicion": bool(pk),
+        "company_country": company_country,
+    })

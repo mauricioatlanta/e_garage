@@ -2,6 +2,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from .region_ciudad import TallerRegion, TallerCiudad
+from .ubicacion import Estado as EstadoUSA, Ciudad as CiudadUSA
 from django.utils import timezone
 
 
@@ -32,8 +33,16 @@ class Cliente(AuditModelMixin, TenantScoped):
     apellido = models.CharField(max_length=100, blank=True, null=True)
     telefono = models.CharField(max_length=15, blank=True, null=True, db_index=True)
     direccion = models.CharField(max_length=255, blank=True, null=True)
+    
+    # Campos para Chile
     region = models.ForeignKey(TallerRegion, models.DO_NOTHING, blank=True, null=True)
     ciudad = models.ForeignKey(TallerCiudad, models.DO_NOTHING, blank=True, null=True)
+    
+    # Campos para USA
+    estado_usa = models.ForeignKey(EstadoUSA, models.DO_NOTHING, blank=True, null=True, help_text="Estado para clientes de USA")
+    ciudad_usa = models.ForeignKey(CiudadUSA, models.DO_NOTHING, blank=True, null=True, help_text="Ciudad para clientes de USA")
+    zipcode = models.CharField(max_length=10, blank=True, null=True, help_text="Código postal para USA")
+    
     email = models.EmailField(blank=True, null=True, db_index=True)
     tax_id = models.CharField(max_length=32, blank=True, null=True, db_index=True, help_text="RUT/SSN/EIN")
 

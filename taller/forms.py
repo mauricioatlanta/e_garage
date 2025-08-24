@@ -87,7 +87,7 @@ class ClienteForm(forms.ModelForm):
 from taller.models.tecnico import Tecnico
 
 
-class DocumentoForm(forms.ModelForm):
+class DocumentoFormOld(forms.ModelForm):
     cliente = forms.ModelChoiceField(
         queryset=Cliente.objects.none(),  # Se configura en __init__
         widget=autocomplete.ModelSelect2(

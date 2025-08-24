@@ -1,0 +1,127 @@
+{% extends "taller/documentos/base_documento.html" %}
+{% load i18n widget_tweaks static %}
+
+{% block content %}
+
+<h1 class="text-xl font-bold text-cyan-200 mb-4">
+  {% if es_edicion %}✏️ Editando Documento #{{ documento.numero }}{% else %}➕ Nuevo Documento{% endif %}
+</h1>
+
+<form method="post" novalidate>
+  {% csrf_token %}
+
+  {% if form.non_field_errors %}
+    <div class="mb-4 rounded border border-red-500/40 bg-red-900/30 p-3 text-red-200">
+      <strong>{% trans "Errores" %}:</strong>
+      <ul class="list-disc ml-5">
+        {% for e in form.non_field_errors %}<li>{{ e }}</li>{% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+    <!-- Tipo de documento -->
+    <div>
+      <label for="{{ form.tipo.id_for_label }}" class="block text-sm font-medium text-cyan-200 mb-1">
+        {% trans "Tipo de documento" %}
+      </label>
+      {{ form.tipo|add_class:"bg-slate-800 border border-cyan-500/30 text-cyan-100 rounded px-3 py-2 w-full focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400" }}
+      {% if form.tipo.errors %}
+        <div class="text-red-400 text-sm mt-1">{{ form.tipo.errors.0 }}</div>
+      {% endif %}
+    </div>
+
+    <!-- Fecha -->
+    <div>
+      <label for="{{ form.fecha_emision.id_for_label }}" class="block text-sm font-medium text-cyan-200 mb-1">
+        {% trans "Fecha" %}
+      </label>
+      {{ form.fecha_emision|add_class:"bg-slate-800 border border-cyan-500/30 text-cyan-100 rounded px-3 py-2 w-full focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400" }}
+      {% if form.fecha_emision.errors %}
+        <div class="text-red-400 text-sm mt-1">{{ form.fecha_emision.errors.0 }}</div>
+      {% endif %}
+    </div>
+
+    <!-- Cliente -->
+    <div>
+      <label for="{{ form.cliente.id_for_label }}" class="block text-sm font-medium text-cyan-200 mb-1">
+        {% trans "Cliente" %}
+      </label>
+      {{ form.cliente|add_class:"bg-slate-800 border border-cyan-500/30 text-cyan-100 rounded px-3 py-2 w-full focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400" }}
+      {% if form.cliente.errors %}
+        <div class="text-red-400 text-sm mt-1">{{ form.cliente.errors.0 }}</div>
+      {% endif %}
+    </div>
+
+    <!-- Vehículo -->
+    <div>
+      <label for="{{ form.vehiculo.id_for_label }}" class="block text-sm font-medium text-cyan-200 mb-1">
+        {% trans "Vehículo" %}
+      </label>
+      {{ form.vehiculo|add_class:"bg-slate-800 border border-cyan-500/30 text-cyan-100 rounded px-3 py-2 w-full focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400" }}
+      {% if form.vehiculo.errors %}
+        <div class="text-red-400 text-sm mt-1">{{ form.vehiculo.errors.0 }}</div>
+      {% endif %}
+    </div>
+
+    <!-- Técnico -->
+    <div>
+      <label for="{{ form.tecnico_responsable.id_for_label }}" class="block text-sm font-medium text-cyan-200 mb-1">
+        {% trans "Técnico" %}
+      </label>
+      {{ form.tecnico_responsable|add_class:"bg-slate-800 border border-cyan-500/30 text-cyan-100 rounded px-3 py-2 w-full focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400" }}
+      {% if form.tecnico_responsable.errors %}
+        <div class="text-red-400 text-sm mt-1">{{ form.tecnico_responsable.errors.0 }}</div>
+      {% endif %}
+    </div>
+
+    <!-- Pagado -->
+    <div class="flex items-center">
+      <label for="{{ form.pagado.id_for_label }}" class="flex items-center text-cyan-200">
+        {{ form.pagado|add_class:"mr-2 text-cyan-400" }}
+        {% trans "Pagado" %}
+      </label>
+    </div>
+  </div>
+
+  {# Bloque country-aware #}
+  {% if company_country == 'CL' %}
+    {% include "taller/documentos/_form_country_cl.html" %}
+  {% else %}
+    {% include "taller/documentos/_form_country_us.html" %}
+  {% endif %}
+
+  {# Zona de ítems y totales: asegúrate de las clases/ids #}
+  <div class="mt-6">
+    <h3 class="font-semibold text-cyan-200 mb-2">{% trans "Resumen" %}</h3>
+    <div class="grid gap-2">
+      <div class="flex justify-between"><span>Neto repuestos</span><strong id="neto-repuestos">0,00</strong></div>
+      <div class="flex justify-between"><span>Neto servicios</span><strong id="neto-servicios">0,00</strong></div>
+      <div class="flex justify-between"><span>Neto otros</span><strong id="neto-otros">0,00</strong></div>
+      <div class="flex justify-between"><span>Impuesto</span><strong id="tax-amount">0,00</strong></div>
+      <hr class="border-cyan-500/20 my-1">
+      <div class="flex justify-between text-lg"><span>Total</span><strong id="total-doc">0,00</strong></div>
+    </div>
+  </div>
+
+  <div class="mt-6 flex items-center gap-2">
+    <button type="submit" class="px-4 py-2 rounded bg-cyan-600 hover:bg-cyan-700 text-white">
+      {% if es_edicion %}{% trans "Guardar cambios" %}{% else %}{% trans "Crear documento" %}{% endif %}
+    </button>
+    <a href="{% url 'documentos:lista_documentos' %}" class="px-4 py-2 rounded border border-cyan-500/30 text-cyan-200 hover:bg-cyan-800/20">
+      {% trans "Cancelar" %}
+    </a>
+  </div>
+</form>
+
+{% endblock content %}
+
+{% block extra_js %}
+  <script>
+    // Guard para evitar doble inicialización si incluyes varios bundles
+    if (!window.__eg_totales_init__) { window.__eg_totales_init__ = true; }
+  </script>
+  <script src="{% static 'taller/documentos/totales.js' %}"></script>
+  {# si usas integracion_totales.js, inclúyelo después #}
+  {# <script src="{% static 'taller/documentos/integracion_totales.js' %}"></script> #}
+{% endblock extra_js %}

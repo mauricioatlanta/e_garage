@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% load country_url %}
+{% load widget_tweaks %}
+
+{% block extra_head %}
+<style>
+.form-group {
+  margin-bottom: 20px;
+}
+.form-group label {
+  display: block;
+  font-weight: 600;
+  color: #00e6d0 !important;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+.form-control, input[type="text"], input[type="number"], input[type="email"], select, textarea {
+  width: 100%;
+  padding: 12px;
+  background: rgba(0,230,208,0.1) !important;
+  border: 1px solid rgba(0,230,208,0.3) !important;
+  border-radius: 6px;
+  color: #fff !important;
+  font-size: 16px;
+}
+.form-control:focus, input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: #00e6d0 !important;
+  background: rgba(0,230,208,0.15) !important;
+  box-shadow: 0 0 0 2px rgba(0,230,208,0.2);
+  color: #fff !important;
+}
+select option {
+  background: #2c5364;
+  color: #fff;
+}
+.grid-2-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.grid-3-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px;
+}
+@media (max-width: 768px) {
+  .grid-2-cols, .grid-3-cols {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+  
+  <!-- Header -->
+  <div class="bg-black/60 backdrop-blur border border-cyan-400/30 rounded-lg p-6 text-center mb-8">
+    <h1 class="text-3xl font-bold text-white font-mono mb-2">
+      {% if object %}
+        🔧 Editar Repuesto
+      {% else %}
+        ➕ Nuevo Repuesto
+      {% endif %}
+    </h1>
+    <p class="text-lg text-gray-300">
+      {% if object %}
+        Modifica los datos del repuesto {{ object.nombre }}
+      {% else %}
+        Completa la información del nuevo repuesto
+      {% endif %}
+    </p>
+  </div>
+
+  <!-- Form -->
+  <div class="bg-black/60 backdrop-blur border border-cyan-400/30 rounded-lg p-6 max-w-4xl mx-auto">
+    <form method="post" novalidate>
+      {% csrf_token %}
+      
+      <!-- Información Básica -->
+      <div class="mb-8">
+        <h3 class="text-xl font-semibold text-white mb-4 border-b border-cyan-400 pb-2">
+          📋 Información Básica
+        </h3>
+        
+        <div class="grid-2-cols">
+          <div class="form-group">
+            <label for="{{ form.nombre.id_for_label }}">{{ form.nombre.label }}</label>
+            {{ form.nombre|add_class:"form-control" }}
+            {% if form.nombre.help_text %}
+              <div class="text-gray-400 text-sm mt-1">{{ form.nombre.help_text }}</div>
+            {% endif %}
+            {% if form.nombre.errors %}
+              <div class="text-red-400 text-sm mt-1">{{ form.nombre.errors.0 }}</div>
+            {% endif %}
+          </div>
+          
+          <div class="form-group">
+            <label for="{{ form.part_number.id_for_label }}">{{ form.part_number.label }}</label>
+            {{ form.part_number|add_class:"form-control" }}
+            {% if form.part_number.help_text %}
+              <div class="text-gray-400 text-sm mt-1">{{ form.part_number.help_text }}</div>
+            {% endif %}
+            {% if form.part_number.errors %}
+              <div class="text-red-400 text-sm mt-1">{{ form.part_number.errors.0 }}</div>
+            {% endif %}
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="{{ form.categoria.id_for_label }}">{{ form.categoria.label }}</label>
+          {{ form.categoria|add_class:"form-control" }}
+          {% if form.categoria.help_text %}
+            <div class="text-gray-400 text-sm mt-1">{{ form.categoria.help_text }}</div>
+          {% endif %}
+          {% if form.categoria.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.categoria.errors.0 }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Información Comercial -->
+      <div class="mb-8">
+        <h3 class="text-xl font-semibold text-white mb-4 border-b border-cyan-400 pb-2">
+          💰 Información Comercial
+        </h3>
+        
+        <div class="grid-3-cols">
+          <div class="form-group">
+            <label for="{{ form.precio_compra.id_for_label }}">{{ form.precio_compra.label }}</label>
+            {{ form.precio_compra|add_class:"form-control" }}
+            {% if form.precio_compra.help_text %}
+              <div class="text-gray-400 text-sm mt-1">{{ form.precio_compra.help_text }}</div>
+            {% endif %}
+            {% if form.precio_compra.errors %}
+              <div class="text-red-400 text-sm mt-1">{{ form.precio_compra.errors.0 }}</div>
+            {% endif %}
+          </div>
+          
+          <div class="form-group">
+            <label for="{{ form.precio_venta.id_for_label }}">{{ form.precio_venta.label }}</label>
+            {{ form.precio_venta|add_class:"form-control" }}
+            {% if form.precio_venta.help_text %}
+              <div class="text-gray-400 text-sm mt-1">{{ form.precio_venta.help_text }}</div>
+            {% endif %}
+            {% if form.precio_venta.errors %}
+              <div class="text-red-400 text-sm mt-1">{{ form.precio_venta.errors.0 }}</div>
+            {% endif %}
+          </div>
+          
+          <div class="form-group">
+            <label for="{{ form.cantidad_stock.id_for_label }}">{{ form.cantidad_stock.label }}</label>
+            {{ form.cantidad_stock|add_class:"form-control" }}
+            {% if form.cantidad_stock.help_text %}
+              <div class="text-gray-400 text-sm mt-1">{{ form.cantidad_stock.help_text }}</div>
+            {% endif %}
+            {% if form.cantidad_stock.errors %}
+              <div class="text-red-400 text-sm mt-1">{{ form.cantidad_stock.errors.0 }}</div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Información del Proveedor -->
+      <div class="mb-8">
+        <h3 class="text-xl font-semibold text-white mb-4 border-b border-cyan-400 pb-2">
+          🏪 Información del Proveedor
+        </h3>
+        
+        <div class="form-group">
+          <label for="{{ form.proveedor.id_for_label }}">{{ form.proveedor.label }}</label>
+          {{ form.proveedor|add_class:"form-control" }}
+          {% if form.proveedor.help_text %}
+            <div class="text-gray-400 text-sm mt-1">{{ form.proveedor.help_text }}</div>
+          {% endif %}
+          {% if form.proveedor.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.proveedor.errors.0 }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Botones de Acción -->
+      <div class="text-center mt-8">
+        <button type="submit" class="bg-cyan-500 hover:bg-cyan-400 text-white font-bold px-6 py-3 rounded-lg transition shadow mr-4">
+          {% if object %}
+            💾 Actualizar Repuesto
+          {% else %}
+            ➕ Crear Repuesto
+          {% endif %}
+        </button>
+        
+        <a href="{% url 'taller:repuestos:lista_repuestos' %}" class="inline-flex items-center px-4 py-2 border border-cyan-400/60 rounded-lg shadow-sm text-sm font-medium text-white bg-black/60 hover:bg-cyan-900/30 transition-all duration-200">
+          ← Volver a la lista
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

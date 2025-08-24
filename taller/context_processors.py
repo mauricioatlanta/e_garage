@@ -110,24 +110,23 @@ def company_country(request):
         
     try:
         from taller.models.empresa import Empresa
-        from taller.models.perfil_usuario import PerfilUsuario  
         from taller.utils.pais_utils import get_configuracion_pais
         
         # Obtener empresa del usuario
         try:
-            perfil = PerfilUsuario.objects.get(user=request.user)
-            empresa = perfil.empresa
-        except PerfilUsuario.DoesNotExist:
-            # Fallback: buscar empresa por usuario (modelo legacy)
+            empresa = Empresa.objects.get(user=request.user)
+        except Empresa.DoesNotExist:
+            # Fallback: buscar empresa por campo legacy usuario
             empresa = Empresa.objects.filter(usuario=request.user).first()
             if not empresa:
                 # Crear empresa básica si no existe
                 empresa = Empresa.objects.create(
-                    usuario=request.user,
+                    user=request.user,
                     nombre_taller=f'Taller de {request.user.username}',
                     pais='CL'  # Default Chile
                 )
-    except Exception:
+    except Exception as e:
+        print(f"Error en company_country context processor: {e}")
         return {}
     
     if not empresa:

@@ -98,12 +98,12 @@ class LineaOtroServicio(models.Model):
         related_name='lineas_otro_servicio'
     )
     # Referencia al servicio externo
-    servicio_externo = models.ForeignKey(
-        'taller.ServicioExterno',
-        on_delete=models.PROTECT,
-        null=True, blank=True,
-        help_text="Servicio externo configurado"
-    )
+    # servicio_externo = models.ForeignKey(
+    #     'taller.ServicioExterno',
+    #     on_delete=models.PROTECT,
+    #     null=True, blank=True,
+    #     help_text="Servicio externo configurado"
+    # )
     # Campos manuales (legacy support)
     servicio = models.ForeignKey(
         Servicio, 
@@ -129,19 +129,9 @@ class LineaOtroServicio(models.Model):
     
     def clean(self):
         """Validaciones de consistencia para LineaOtroServicio"""
-        # Validar que al menos uno de los servicios esté configurado
-        if not self.servicio_externo and not self.servicio:
-            raise ValidationError("Debe especificar un servicio externo o servicio legacy")
-        
-        # Si hay servicio externo, sincronizar datos
-        if self.servicio_externo:
-            self.nombre = self.servicio_externo.nombre
-            self.empresa_externa = self.servicio_externo.empresa_externa
-            # Mantener precios del servicio externo como default si no se especifican
-            if not self.costo_interno:
-                self.costo_interno = self.servicio_externo.costo_taller
-            if not self.precio_cliente:
-                self.precio_cliente = self.servicio_externo.precio_cliente
+        # Validar que al menos un servicio esté configurado o campos manuales
+        if not self.servicio and not self.nombre:
+            raise ValidationError("Debe especificar un servicio o un nombre de servicio")
         
         # Validar country consistency si hay servicio legacy
         if self.documento and self.servicio:

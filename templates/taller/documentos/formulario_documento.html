@@ -216,11 +216,17 @@
         <label for="id_vehiculo">Vehículo</label>
         {{ form.vehiculo }}
       </div>
-      <div><label for="id_kilometraje">Kilometraje</label>{{ form.kilometraje }}</div>
       <div><label for="id_mecanico">Técnico</label>
         {{ form.mecanico }}
       </div>
     </div>
+
+    <!-- Sección específica por país -->
+    {% if company_country == 'CL' %}
+      {% include "taller/documentos/_form_country_cl.html" %}
+    {% else %}
+      {% include "taller/documentos/_form_country_us.html" %}
+    {% endif %}
 
     <div class="mt-8">
       <h2 class="text-lg font-bold mb-2">Repuestos</h2>
@@ -237,12 +243,12 @@
         </thead>
         <tbody>
         {% for repuesto in repuestos %}
-          <tr>
+          <tr class="js-line" data-kind="repuesto">
             <td><input type="text" class="partnumber-input futurista-input border p-1 rounded w-full" value="{{ repuesto.codigo }}" placeholder="Partnumber" /></td>
             <td><input type="text" class="nombre-input futurista-input border p-1 rounded w-full" value="{{ repuesto.nombre }}" placeholder="Nombre" /></td>
             <td><input type="number" class="cantidad-input futurista-input border p-1 rounded w-20" min="1" value="{{ repuesto.cantidad }}" /></td>
             <td><input type="number" class="precio-input futurista-input border p-1 rounded w-24" min="0" value="{{ repuesto.precio }}" /></td>
-            <td class="subtotal-repuesto font-semibold">$0</td>
+            <td class="subtotal-repuesto font-semibold js-subtotal" data-subtotal>$0</td>
             <td><button type="button" class="text-red-600 font-bold remove-repuesto">✖</button></td>
           </tr>
         {% endfor %}
@@ -270,9 +276,9 @@
         </thead>
         <tbody>
         {% for servicio in servicios %}
-          <tr>
+          <tr class="js-line" data-kind="servicio">
             <td><input type="text" class="nombre-servicio-input futurista-input p-1 rounded w-full" value="{{ servicio.nombre }}" placeholder="Nombre del servicio" /></td>
-            <td><input type="number" class="precio-servicio-input futurista-input p-1 rounded w-24" value="{{ servicio.precio|default_if_none:0 }}" min="0" /></td>
+            <td><input type="number" class="precio-servicio-input futurista-input p-1 rounded w-24 js-subtotal" data-subtotal value="{{ servicio.precio|default_if_none:0 }}" min="0" /></td>
             <td><button type="button" class="text-red-600 font-bold remove-servicio">✖</button></td>
           </tr>
         {% endfor %}
@@ -294,17 +300,25 @@
     </div>
 
     <div class="mt-8 flex flex-col items-end gap-2">
-      <div><span class="font-bold">Total repuestos:</span> <span id="total-repuestos-resumen">$0</span></div>
-      <div><span class="font-bold">Total servicios:</span> <span id="total-servicios-resumen">$0</span></div>
+      <div><span class="font-bold">Total repuestos:</span> <span id="neto-repuestos">$0</span></div>
+      <div><span class="font-bold">Total servicios:</span> <span id="neto-servicios">$0</span></div>
+      <div><span class="font-bold">Otros:</span> <span id="neto-otros">$0</span></div>
       <div><span class="font-bold">Subtotal:</span> <span id="subtotal-doc">$0</span></div>
-      <div class="flex items-center gap-2">
-        <label class="flex items-center gap-2" for="lleva_iva">
-          <input type="checkbox" id="lleva_iva" name="lleva_iva" checked>
-          <span class="font-bold">IVA (19%)</span>
-        </label>
-        <span id="iva-doc">$0</span>
-      </div>
-      <div class="text-xl"><span class="font-bold">Gran Total:</span> <span id="gran-total-doc">$0</span></div>
+      
+      <!-- Sección de impuestos específica por país -->
+      {% if company_country == 'CL' %}
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-cyan-200">IVA (19% solo repuestos):</span>
+          <span id="tax-amount">$0</span>
+        </div>
+      {% else %}
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-emerald-200">Sales Tax:</span>
+          <span id="tax-amount">$0</span>
+        </div>
+      {% endif %}
+      
+      <div class="text-xl"><span class="font-bold">Gran Total:</span> <span id="total-doc">$0</span></div>
     </div>
 
     <input type="hidden" id="json_items" name="json_items" value="[]">
@@ -494,4 +508,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <script src="{% static 'js/formulario_documento.js' %}"></script>
+<script src="{% static 'taller/documentos/totales.js' %}"></script>
+<script src="{% static 'taller/documentos/integracion_totales.js' %}"></script>
 {% endblock %}
