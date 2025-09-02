@@ -36,6 +36,7 @@ class LineaServicio(models.Model):
     servicio = models.ForeignKey(
         Servicio, 
         on_delete=models.PROTECT,
+        null=True, blank=True,
         help_text="Servicio interno del taller"
     )
     nombre = models.CharField(max_length=255, help_text="Nombre del servicio")
@@ -52,14 +53,14 @@ class LineaServicio(models.Model):
     def clean(self):
         """Validaciones de consistencia para LineaServicio"""
         # Validar country consistency
-        if self.documento and self.servicio:
+        if hasattr(self, 'documento') and self.documento and self.servicio:
             ValidacionConsistencia.assert_same_country(
                 self.documento, self.servicio,
                 "Servicio de otro país no puede usarse en este documento"
             )
         
         # Validar que sea servicio interno
-        if self.servicio:
+        if hasattr(self, 'servicio') and self.servicio:
             # Temporalmente desactivado hasta agregar campo tipo
             # ValidacionConsistencia.assert_correct_tipo(
             #     self.servicio, 'interno',
@@ -134,7 +135,7 @@ class LineaOtroServicio(models.Model):
             raise ValidationError("Debe especificar un servicio o un nombre de servicio")
         
         # Validar country consistency si hay servicio legacy
-        if self.documento and self.servicio:
+        if hasattr(self, 'documento') and self.documento and self.servicio:
             ValidacionConsistencia.assert_same_country(
                 self.documento, self.servicio,
                 "Otro servicio de otro país no puede usarse en este documento"
@@ -203,8 +204,8 @@ class LineaRepuesto(models.Model):
     
     def clean(self):
         """Validaciones de consistencia para LineaRepuesto"""
-        # Solo validar country si el repuesto tiene field country
-        if self.documento and self.repuesto and hasattr(self.repuesto, 'country'):
+        # Solo validar country si el documento existe y el repuesto tiene field country
+        if hasattr(self, 'documento') and self.documento and self.repuesto and hasattr(self.repuesto, 'country'):
             ValidacionConsistencia.assert_same_country(
                 self.documento, self.repuesto,
                 "Repuesto de otro país no puede usarse en este documento"

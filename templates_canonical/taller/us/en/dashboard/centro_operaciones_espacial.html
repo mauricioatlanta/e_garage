@@ -1,0 +1,891 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ empresa.nombre_taller }} - Command Center{% endblock %}
+
+{% block extra_css %}
+<style>
+/* 🚀 Space Station Style for Dashboard */
+:root {
+    --space-blue: #00d4ff;
+    --space-cyan: #00ffff;
+    --space-green: #00ff88;
+    --space-gold: #ffd700;
+    --space-red: #ff3b3b;
+    --space-purple: #8a2be2;
+    --dark-space: #0a0a0f;
+    --panel-bg: rgba(5, 15, 25, 0.95);
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --holo-glow: 0 0 20px;
+}
+
+body {
+    background: 
+        radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(120, 200, 255, 0.2) 0%, transparent 50%),
+        linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+    color: #ffffff;
+    font-family: 'Orbitron', 'Segoe UI', monospace;
+    overflow-x: hidden;
+}
+
+.space-container {
+    background: var(--panel-bg);
+    border: 2px solid var(--space-cyan);
+    border-radius: 20px;
+    backdrop-filter: blur(15px);
+    box-shadow: 
+        var(--holo-glow) var(--space-cyan),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.space-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--space-cyan), transparent);
+    animation: scan-line 3s infinite;
+}
+
+@keyframes scan-line {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 1; }
+}
+
+.command-panel {
+    background: var(--glass-bg);
+    border: 1px solid var(--space-purple);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.command-panel:hover {
+    border-color: var(--space-gold);
+    transform: translateY(-8px) rotateX(5deg);
+    box-shadow: 
+        var(--holo-glow) var(--space-gold),
+        0 15px 35px rgba(255, 215, 0, 0.2),
+        inset 0 0 15px rgba(255, 255, 255, 0.1);
+}
+
+.nav-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+/* 🚀 SUPER UNIFIED PANEL STYLES */
+.super-unified-panel {
+    grid-column: span 2;
+    grid-row: span 2;
+    background: linear-gradient(135deg, 
+        rgba(0, 212, 255, 0.1) 0%, 
+        rgba(138, 43, 226, 0.1) 50%, 
+        rgba(255, 215, 0, 0.1) 100%);
+    border: 2px solid var(--space-cyan);
+    position: relative;
+    overflow: hidden;
+    min-height: 280px;
+}
+
+.super-unified-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 20% 80%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(138, 43, 226, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.unified-header {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.unified-icons {
+    display: flex;
+    gap: 10px;
+}
+
+.icon-trio {
+    font-size: 1.5rem;
+    animation: icon-pulse 2s infinite;
+    animation-delay: calc(var(--i, 0) * 0.5s);
+}
+
+.icon-trio:nth-child(1) { --i: 0; }
+.icon-trio:nth-child(2) { --i: 1; }
+.icon-trio:nth-child(3) { --i: 2; }
+
+.unified-pulse {
+    width: 20px;
+    height: 20px;
+    background: var(--space-gold);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+.unified-title {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.main-title {
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: var(--space-cyan);
+    text-shadow: 0 0 15px rgba(0, 212, 255, 0.7);
+    margin-bottom: 5px;
+    font-family: 'Orbitron', monospace;
+    letter-spacing: 2px;
+}
+
+.sub-title {
+    font-size: 0.9rem;
+    color: var(--space-purple);
+    font-family: 'Courier New', monospace;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    opacity: 0.8;
+}
+
+.unified-features {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.feature-tag {
+    background: rgba(0, 212, 255, 0.2);
+    border: 1px solid var(--space-cyan);
+    border-radius: 15px;
+    padding: 5px 12px;
+    font-size: 0.7rem;
+    color: var(--space-cyan);
+    font-family: 'Courier New', monospace;
+    letter-spacing: 1px;
+    animation: tag-glow 3s infinite;
+}
+
+.unified-description {
+    text-align: left;
+    font-size: 0.8rem;
+    color: #b0c4de;
+    font-family: 'Courier New', monospace;
+    line-height: 1.4;
+}
+
+.desc-line {
+    margin-bottom: 5px;
+    padding-left: 10px;
+    position: relative;
+}
+
+.desc-line::before {
+    content: '>';
+    color: var(--space-green);
+    position: absolute;
+    left: 0;
+    animation: blink 1.5s infinite;
+}
+
+/* Animations */
+@keyframes icon-pulse {
+    0%, 100% { 
+        transform: scale(1);
+        opacity: 0.8;
+    }
+    50% { 
+        transform: scale(1.2);
+        opacity: 1;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% { 
+        box-shadow: 0 0 5px currentColor;
+        transform: scale(1);
+    }
+    50% { 
+        box-shadow: 0 0 15px currentColor;
+        transform: scale(1.05);
+    }
+}
+
+@keyframes tag-glow {
+    0%, 100% { 
+        box-shadow: 0 0 5px var(--space-cyan);
+    }
+    50% { 
+        box-shadow: 0 0 15px var(--space-cyan);
+    }
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+/* Responsive for super panel */
+@media (max-width: 768px) {
+    .super-unified-panel {
+        grid-column: span 1 !important;
+        min-height: 180px;
+    }
+    
+    .main-title {
+        font-size: 1.1rem;
+    }
+    
+    .unified-features {
+        gap: 5px;
+    }
+    
+    .feature-tag {
+        font-size: 0.6rem;
+        padding: 3px 8px;
+    }
+}
+
+/* 🚀 MODERN MODULE STYLES */
+.modern-panel {
+    background: linear-gradient(135deg, 
+        rgba(0, 212, 255, 0.08) 0%, 
+        rgba(138, 43, 226, 0.08) 50%, 
+        rgba(255, 215, 0, 0.08) 100%);
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    padding: 1.2rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.modern-panel:hover {
+    border-color: var(--space-gold);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 
+        0 0 25px rgba(255, 215, 0, 0.4),
+        0 15px 35px rgba(0, 212, 255, 0.2),
+        inset 0 0 15px rgba(255, 255, 255, 0.1);
+}
+
+.modern-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, 
+        transparent, 
+        var(--space-cyan), 
+        var(--space-purple), 
+        var(--space-gold), 
+        transparent);
+    animation: modern-scan 3s infinite;
+}
+
+.modern-icon-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 15px;
+    height: 60px;
+}
+
+.main-icon {
+    font-size: 2.5rem;
+    z-index: 2;
+    animation: main-icon-float 3s ease-in-out infinite;
+}
+
+.secondary-icon {
+    position: absolute;
+    font-size: 1.2rem;
+    bottom: 0;
+    right: 0;
+    opacity: 0.7;
+    animation: secondary-icon-pulse 2s infinite;
+    color: var(--space-gold);
+}
+
+.modern-title {
+    font-size: 1rem;
+    font-weight: 900;
+    color: var(--space-cyan);
+    text-align: center;
+    font-family: 'Orbitron', monospace;
+    letter-spacing: 1.5px;
+    text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+    margin-bottom: 5px;
+}
+
+.modern-subtitle {
+    font-size: 0.75rem;
+    color: var(--space-purple);
+    text-align: center;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    opacity: 0.9;
+}
+
+.modern-description {
+    font-size: 0.7rem;
+    color: #b0c4de;
+    text-align: center;
+    font-family: 'Courier New', monospace;
+    opacity: 0.8;
+    line-height: 1.3;
+}
+
+/* Modern module animations */
+@keyframes modern-scan {
+    0% { 
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    50% { 
+        opacity: 1;
+    }
+    100% { 
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+@keyframes main-icon-float {
+    0%, 100% { 
+        transform: translateY(0) scale(1);
+    }
+    50% { 
+        transform: translateY(-5px) scale(1.05);
+    }
+}
+
+@keyframes secondary-icon-pulse {
+    0%, 100% { 
+        opacity: 0.7;
+        transform: scale(1);
+    }
+    50% { 
+        opacity: 1;
+        transform: scale(1.2);
+    }
+}
+
+.console-text {
+    font-family: 'Courier New', monospace;
+    color: var(--space-green);
+    font-size: 0.9rem;
+}
+
+.chart-hologram {
+    background: var(--dark-space);
+    border: 1px solid var(--space-blue);
+    border-radius: 12px;
+    padding: 1.5rem;
+    height: 350px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* 🪟 Windows Mosaic Style */
+.windows-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: repeat(4, 140px);
+    gap: 15px;
+    height: 580px;
+    margin-top: 20px;
+}
+
+.windows-tile {
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(138, 43, 226, 0.1) 100%);
+    border: 1px solid var(--space-cyan);
+    border-radius: 8px;
+    padding: 15px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    cursor: pointer;
+}
+
+.windows-tile:hover {
+    transform: scale(1.02) translateY(-2px);
+    border-color: var(--space-gold);
+    box-shadow: 
+        0 0 20px rgba(255, 215, 0, 0.3),
+        0 5px 15px rgba(0, 212, 255, 0.2);
+}
+
+.tile-large {
+    grid-column: span 3;
+    grid-row: span 2;
+}
+
+.tile-medium {
+    grid-column: span 2;
+    grid-row: span 2;
+}
+
+.tile-small {
+    grid-column: span 1;
+    grid-row: span 1;
+}
+
+.tile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 0.8rem;
+    color: var(--space-cyan);
+    font-family: 'Courier New', monospace;
+}
+
+.tile-title {
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.tile-live {
+    color: var(--space-green);
+    animation: live-pulse 2s infinite;
+}
+
+.tile-content {
+    height: calc(100% - 30px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.metric-tile {
+    text-align: center;
+}
+
+.metric-big {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--space-gold);
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    font-family: 'Orbitron', monospace;
+}
+
+@keyframes live-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+    .windows-grid {
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: repeat(6, 120px);
+        height: auto;
+    }
+    
+    .tile-large {
+        grid-column: span 2;
+        grid-row: span 2;
+    }
+    
+    .tile-medium {
+        grid-column: span 2;
+        grid-row: span 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .windows-grid {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(8, 100px);
+        gap: 10px;
+    }
+    
+    .tile-large, .tile-medium {
+        grid-column: span 2;
+        grid-row: span 1;
+    }
+    
+    .metric-big {
+        font-size: 2rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto p-6">
+
+    <!-- Language Selector -->
+    <div class="absolute top-6 right-8 z-20 flex gap-2">
+        <a href="?lang=en" class="px-3 py-1 rounded-full text-sm font-bold transition-all shadow-md bg-cyan-500/80 text-white hover:bg-cyan-700 {% if request.GET.lang == 'en' or not request.GET.lang %}ring-2 ring-yellow-300{% endif %}">{% trans "English" %}</a>
+        <a href="?lang=es" class="px-3 py-1 rounded-full text-sm font-bold transition-all shadow-md bg-cyan-100 text-cyan-900 hover:bg-cyan-300 {% if request.GET.lang == 'es' %}ring-2 ring-fuchsia-400{% endif %}">{% trans "Español" %}</a>
+    </div>
+
+    <!-- 🚀 Mission Command Panel -->
+    <div class="space-container p-6">
+        <h3 class="text-xl font-bold text-cyan-400 mb-4 console-text">🚀 MISSION COMMAND PANEL</h3>
+        <div class="nav-grid">
+            
+            <!-- SUPER UNIFIED CARD - TOTAL TACTICAL INTELLIGENCE -->
+            <a href="/cl/business-intelligence/dashboard/" class="command-panel super-unified-panel">
+                <div class="unified-header">
+                    <div class="unified-icons">
+                        <span class="icon-trio">🧠</span>
+                        <span class="icon-trio">⚡</span>
+                        <span class="icon-trio">💎</span>
+                    </div>
+                    <div class="unified-pulse"></div>
+                </div>
+                <div class="unified-title">
+                    <div class="main-title">TACTICAL INTELLIGENCE</div>
+                    <div class="sub-title">COMMAND CENTER</div>
+                </div>
+                <div class="unified-features">
+                    <span class="feature-tag">📊 REPORTS</span>
+                    <span class="feature-tag">🚀 ADVANCED AI</span>
+                    <span class="feature-tag">💎 BUSINESS INTEL</span>
+                </div>
+                <div class="unified-description">
+                    <div class="desc-line">• Unified strategic analysis</div>
+                    <div class="desc-line">• Predictive operational AI</div>
+                    <div class="desc-line">• Total strategic control</div>
+                </div>
+            </a>
+            
+            <a href="/cl/taller/reportes/mecanicos/" class="command-panel">
+                <div class="text-3xl mb-2">👨‍🔧</div>
+                <div class="font-semibold console-text">TECHNICAL STAFF</div>
+                <div class="text-sm text-gray-400 console-text">Individual analysis</div>
+            </a>
+            
+            <a href="/documentos/" class="command-panel modern-panel">
+                <div class="modern-icon-container">
+                    <div class="main-icon">📄</div>
+                    <div class="secondary-icon">🚀</div>
+                </div>
+                <div class="modern-title">DOC ENGINE</div>
+                <div class="modern-subtitle">Digital Workflow</div>
+                <div class="modern-description">AI document management</div>
+            </a>
+            
+            <a href="/cl/clientes/" class="command-panel modern-panel">
+                <div class="modern-icon-container">
+                    <div class="main-icon">🌐</div>
+                    <div class="secondary-icon">💫</div>
+                </div>
+                <div class="modern-title">CLIENT MATRIX</div>
+                <div class="modern-subtitle">360° Database</div>
+                <div class="modern-description">Relational ecosystem</div>
+            </a>
+            
+            <a href="/cl/vehiculos/" class="command-panel modern-panel">
+                <div class="modern-icon-container">
+                    <div class="main-icon">🚗</div>
+                    <div class="secondary-icon">⚡</div>
+                </div>
+                <div class="modern-title">FLEET CMD</div>
+                <div class="modern-subtitle">Vehicle Control</div>
+                <div class="modern-description">Smart vehicle system</div>
+            </a>
+            
+            {% url 'taller:configuracion' as url_configuracion %}
+            {% if url_configuracion %}
+                <a href="{{ url_configuracion }}" class="command-panel modern-panel">
+            {% else %}
+                <a href="#" class="command-panel modern-panel">
+            {% endif %}
+                <div class="modern-icon-container">
+                    <div class="main-icon">⚙️</div>
+                    <div class="secondary-icon">💎</div>
+                </div>
+                <div class="modern-title">SYSTEM CORE</div>
+                <div class="modern-subtitle">Config Center</div>
+                <div class="modern-description">Advanced configuration</div>
+            </a>
+        </div>
+    </div>
+
+    <!-- 📊 Windows Mosaic - Intelligent Dashboard -->
+    <div class="space-container p-6 mt-6">
+        <h3 class="text-xl font-bold text-cyan-400 mb-4 console-text">📊 INTELLIGENT MOSAIC - WINDOWS STYLE</h3>
+        
+        <!-- Windows-style Grid -->
+        <div class="windows-grid">
+            
+            <!-- Large Tile - Main Chart -->
+            <div class="windows-tile tile-large">
+                <div class="tile-header">
+                    <span class="tile-title">💹 OPERATIONAL INCOME</span>
+                    <span class="tile-live">●</span>
+                </div>
+                <div class="tile-content">
+                    <canvas id="chartIngresos" height="180"></canvas>
+                </div>
+            </div>
+            
+            <!-- Medium Tile - Services -->
+            <div class="windows-tile tile-medium">
+                <div class="tile-header">
+                    <span class="tile-title">⚙️ TOP SERVICES</span>
+                    <span class="tile-live">●</span>
+                </div>
+                <div class="tile-content">
+                    <canvas id="chartServicios" height="140"></canvas>
+                </div>
+            </div>
+            
+            <!-- Small Tile - Metrics -->
+            <div class="windows-tile tile-small">
+                <div class="tile-header">
+                    <span class="tile-title">📈 DOCS TODAY</span>
+                </div>
+                <div class="tile-content metric-tile">
+                    <div class="metric-big">{{ documentos_hoy|default:"24" }}</div>
+                </div>
+            </div>
+            
+            <!-- Small Tile - Clients -->
+            <div class="windows-tile tile-small">
+                <div class="tile-header">
+                    <span class="tile-title">👥 CLIENTS</span>
+                </div>
+                <div class="tile-content metric-tile">
+                    <div class="metric-big">{{ clientes_count|default:"156" }}</div>
+                </div>
+            </div>
+            
+            <!-- Small Tile - Vehicles -->
+            <div class="windows-tile tile-small">
+                <div class="tile-header">
+                    <span class="tile-title">🚗 VEHICLES</span>
+                </div>
+                <div class="tile-content metric-tile">
+                    <div class="metric-big">{{ vehiculos_count|default:"89" }}</div>
+                </div>
+            </div>
+            
+            <!-- Small Tile - Revenue -->
+            <div class="windows-tile tile-small">
+                <div class="tile-header">
+                    <span class="tile-title">💰 REVENUE</span>
+                </div>
+                <div class="tile-content metric-tile">
+                    <div class="metric-big">${{ ingresos_hoy|default:"2.4k" }}</div>
+                </div>
+            </div>
+            
+            <!-- Medium Tile - Performance -->
+            <div class="windows-tile tile-medium">
+                <div class="tile-header">
+                    <span class="tile-title">📊 PERFORMANCE</span>
+                    <span class="tile-live">●</span>
+                </div>
+                <div class="tile-content">
+                    <canvas id="chartPerformance" height="140"></canvas>
+                </div>
+            </div>
+            
+            <!-- Small Tile - Efficiency -->
+            <div class="windows-tile tile-small">
+                <div class="tile-header">
+                    <span class="tile-title">⚡ EFFICIENCY</span>
+                </div>
+                <div class="tile-content metric-tile">
+                    <div class="metric-big">{{ eficiencia|default:"94" }}%</div>
+                </div>
+            </div>
+            
+            <!-- Small Tile - Satisfaction -->
+            <div class="windows-tile tile-small">
+                <div class="tile-header">
+                    <span class="tile-title">⭐ SATISFACTION</span>
+                </div>
+                <div class="tile-content metric-tile">
+                    <div class="metric-big">{{ satisfaccion|default:"98" }}%</div>
+                </div>
+            </div>
+            
+            <!-- Small Tile - Pending -->
+            <div class="windows-tile tile-small">
+                <div class="tile-header">
+                    <span class="tile-title">⏳ PENDING</span>
+                </div>
+                <div class="tile-content metric-tile">
+                    <div class="metric-big">{{ pendientes|default:"7" }}</div>
+                </div>
+            </div>
+            
+            <!-- Small Tile - Completed -->
+            <div class="windows-tile tile-small">
+                <div class="tile-header">
+                    <span class="tile-title">✅ COMPLETED</span>
+                </div>
+                <div class="tile-content metric-tile">
+                    <div class="metric-big">{{ completados|default:"18" }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Income Chart
+const ctxIngresos = document.getElementById('chartIngresos').getContext('2d');
+new Chart(ctxIngresos, {
+    type: 'line',
+    data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        datasets: [{
+            label: 'Income',
+            data: [12000, 19000, 15000, 25000, 22000, 30000],
+            borderColor: '#00d4ff',
+            backgroundColor: 'rgba(0, 212, 255, 0.1)',
+            tension: 0.4,
+            fill: true
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            x: {
+                ticks: {
+                    color: '#00ffff',
+                    font: {
+                        family: 'Courier New'
+                    }
+                },
+                grid: {
+                    color: 'rgba(0, 212, 255, 0.1)'
+                }
+            },
+            y: {
+                ticks: {
+                    color: '#00ffff',
+                    font: {
+                        family: 'Courier New'
+                    }
+                },
+                grid: {
+                    color: 'rgba(0, 212, 255, 0.1)'
+                }
+            }
+        }
+    }
+});
+
+// Services Chart
+const ctxServicios = document.getElementById('chartServicios').getContext('2d');
+new Chart(ctxServicios, {
+    type: 'doughnut',
+    data: {
+        labels: ['Oil Change', 'Brake Service', 'Engine Repair', 'Tire Service'],
+        datasets: [{
+            data: [30, 25, 20, 25],
+            backgroundColor: [
+                '#00d4ff',
+                '#8a2be2',
+                '#ffd700',
+                '#00ff88'
+            ],
+            borderWidth: 0
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
+            }
+        }
+    }
+});
+
+// Performance Chart
+const ctxPerformance = document.getElementById('chartPerformance').getContext('2d');
+new Chart(ctxPerformance, {
+    type: 'bar',
+    data: {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+        datasets: [{
+            label: 'Performance',
+            data: [85, 92, 78, 95, 88, 96],
+            backgroundColor: 'rgba(0, 212, 255, 0.8)',
+            borderColor: '#00d4ff',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            x: {
+                ticks: {
+                    color: '#00ffff',
+                    font: {
+                        family: 'Courier New'
+                    }
+                },
+                grid: {
+                    color: 'rgba(0, 212, 255, 0.1)'
+                }
+            },
+            y: {
+                ticks: {
+                    color: '#00ffff',
+                    font: {
+                        family: 'Courier New'
+                    }
+                },
+                grid: {
+                    color: 'rgba(0, 212, 255, 0.1)'
+                }
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

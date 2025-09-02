@@ -3,34 +3,15 @@
 
 {% block title %}{{ page_title }} - {{ company_name }}{% endblock %}
 
+{% block nav_brand %}
+  {# Bloque vacío para eliminar el nombre amarillo en la página de configuración #}
+{% endblock %}
+
 {% block extra_css %}
 <style>
     .settings-container {
-        max-width: 1200px;
+        max-width: 800px;
         margin: 0 auto;
-    }
-    
-    .settings-nav {
-        background: #f8f9fa;
-        border-radius: 10px;
-        padding: 20px;
-        margin-bottom: 30px;
-    }
-    
-    .settings-nav .nav-link {
-        color: #495057;
-        font-weight: 500;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-    }
-    
-    .settings-nav .nav-link.active {
-        background: var(--company-primary, #0d6efd);
-        color: white;
-    }
-    
-    .settings-nav .nav-link:hover {
-        background: rgba(13, 110, 253, 0.1);
     }
     
     .form-section {
@@ -71,88 +52,10 @@
         object-fit: contain;
     }
     
-    .color-picker-group {
-        display: flex;
-        gap: 20px;
-        align-items: end;
-    }
-    
-    .color-picker-wrapper {
-        flex: 1;
-    }
-    
-    .form-control-color {
-        width: 100%;
-        height: 50px;
-        border-radius: 10px;
-    }
-    
-    .preview-section {
-        position: sticky;
-        top: 100px;
-    }
-    
-    .branding-preview {
-        background: white;
-        border-radius: 15px;
-        padding: 20px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    
-    .preview-navbar {
-        background: #f8f9fa;
-        border-radius: 10px;
-        padding: 15px;
-        margin-bottom: 20px;
-        display: flex;
-        align-items: center;
-        gap: 15px;
-    }
-    
-    .preview-logo {
-        width: 40px;
-        height: 40px;
-        object-fit: contain;
-    }
-    
-    .btn-group-custom {
-        gap: 10px;
-        display: flex;
-        flex-wrap: wrap;
-    }
-    
     .alert-settings {
         border-radius: 10px;
         border: none;
         padding: 20px;
-    }
-    
-    .card-stats {
-        background: linear-gradient(135deg, var(--company-primary, #0d6efd), var(--company-secondary, #6c757d));
-        color: white;
-        border-radius: 15px;
-        padding: 20px;
-        text-align: center;
-    }
-    
-    .stats-icon {
-        font-size: 2rem;
-        margin-bottom: 10px;
-    }
-    
-    @media (max-width: 768px) {
-        .color-picker-group {
-            flex-direction: column;
-        }
-        
-        .btn-group-custom {
-            flex-direction: column;
-        }
-        
-        .preview-section {
-            position: static;
-            margin-top: 30px;
-        }
     }
 </style>
 {% endblock %}
@@ -166,41 +69,8 @@
                 <i class="fas fa-cog text-primary me-2"></i>
                 Configuración de Empresa
             </h1>
-            <p class="text-muted mb-0">Personaliza el branding y datos de tu taller</p>
+            <p class="text-muted mb-0">Personaliza el branding de tu taller</p>
         </div>
-        
-        <div class="btn-group-custom">
-            <button type="button" class="btn btn-outline-primary" onclick="previewChanges()">
-                <i class="fas fa-eye"></i> Vista Previa
-            </button>
-            <button type="button" class="btn btn-outline-secondary" onclick="exportConfig()">
-                <i class="fas fa-download"></i> Exportar
-            </button>
-            <button type="button" class="btn btn-outline-danger" onclick="resetBranding()">
-                <i class="fas fa-undo"></i> Restablecer
-            </button>
-        </div>
-    </div>
-
-    <!-- Navigation Tabs -->
-    <div class="settings-nav">
-        <ul class="nav nav-pills" id="settingsTabs" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="branding-tab" data-bs-toggle="pill" data-bs-target="#branding" type="button" role="tab">
-                    <i class="fas fa-palette me-2"></i>Branding
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="company-tab" data-bs-toggle="pill" data-bs-target="#company" type="button" role="tab">
-                    <i class="fas fa-building me-2"></i>Información
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="documents-tab" data-bs-toggle="pill" data-bs-target="#documents" type="button" role="tab">
-                    <i class="fas fa-file-alt me-2"></i>Documentos
-                </button>
-            </li>
-        </ul>
     </div>
 
     <!-- Alert Messages -->
@@ -214,329 +84,143 @@
         {% endfor %}
     {% endif %}
 
-    <div class="row">
-        <!-- Main Form -->
-        <div class="col-lg-8">
-            <form method="post" enctype="multipart/form-data" id="settingsForm">
-                {% csrf_token %}
-                
-                <div class="tab-content" id="settingsTabsContent">
-                    <!-- Branding Tab -->
-                    <div class="tab-pane fade show active" id="branding" role="tabpanel">
-                        <div class="form-section">
-                            <h4>
-                                <i class="fas fa-image"></i>
-                                Logo y Colores
-                            </h4>
-                            
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <label class="form-label">Logo de la Empresa</label>
-                                    <div class="logo-preview" onclick="document.getElementById('{{ form.logo.id_for_label }}').click()">
-                                        {% if company_settings.logo %}
-                                            <img src="{{ company_settings.logo.url }}" alt="Logo actual" id="logoPreview">
-                                        {% else %}
-                                            <div id="logoPreview">
-                                                <i class="fas fa-upload fa-2x text-muted mb-2"></i>
-                                                <p class="text-muted mb-0">Clic para subir logo</p>
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                    {{ form.logo }}
-                                    {% if form.logo.help_text %}
-                                        <small class="form-text text-muted">{{ form.logo.help_text }}</small>
-                                    {% endif %}
-                                </div>
-                                
-                                <div class="col-md-6">
-                                    <div class="color-picker-group">
-                                        <div class="color-picker-wrapper">
-                                            <label class="form-label">{{ form.primary_color.label }}</label>
-                                            {{ form.primary_color }}
-                                            {% if form.primary_color.help_text %}
-                                                <small class="form-text text-muted">{{ form.primary_color.help_text }}</small>
-                                            {% endif %}
-                                        </div>
-                                        
-                                        <div class="color-picker-wrapper">
-                                            <label class="form-label">{{ form.secondary_color.label }}</label>
-                                            {{ form.secondary_color }}
-                                            {% if form.secondary_color.help_text %}
-                                                <small class="form-text text-muted">{{ form.secondary_color.help_text }}</small>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                </div>
+    <!-- Main Form -->
+    <form method="post" enctype="multipart/form-data" id="settingsForm">
+        {% csrf_token %}
+        
+        <!-- Logo Section -->
+        <div class="form-section">
+            <h4>
+                <i class="fas fa-image"></i>
+                Logo de la Empresa
+            </h4>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="logo-preview" onclick="document.getElementById('{{ form.logo.id_for_label }}').click()">
+                        {% if company_settings.logo %}
+                            <img src="{{ company_settings.logo.url }}" alt="Logo actual" id="logoPreview">
+                        {% else %}
+                            <div id="logoPreview">
+                                <i class="fas fa-upload fa-2x text-muted mb-2"></i>
+                                <p class="text-muted mb-0">Clic para subir logo</p>
                             </div>
-                        </div>
-                        
-                        <div class="form-section">
-                            <h4>
-                                <i class="fas fa-tag"></i>
-                                Nombre y Eslogan
-                            </h4>
-                            
-                            <div class="row">
-                                <div class="col-md-8">
-                                    <label class="form-label">{{ form.company_name.label }}</label>
-                                    {{ form.company_name }}
-                                    {% if form.company_name.help_text %}
-                                        <small class="form-text text-muted">{{ form.company_name.help_text }}</small>
-                                    {% endif %}
-                                </div>
-                                
-                                <div class="col-md-4">
-                                    <label class="form-label">{{ form.tagline.label }}</label>
-                                    {{ form.tagline }}
-                                    {% if form.tagline.help_text %}
-                                        <small class="form-text text-muted">{{ form.tagline.help_text }}</small>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
+                        {% endif %}
                     </div>
-
-                    <!-- Company Information Tab -->
-                    <div class="tab-pane fade" id="company" role="tabpanel">
-                        <div class="form-section">
-                            <h4>
-                                <i class="fas fa-map-marker-alt"></i>
-                                Datos de Contacto
-                            </h4>
-                            
-                            <div class="row">
-                                <div class="col-md-12 mb-3">
-                                    <label class="form-label">{{ form.address.label }}</label>
-                                    {{ form.address }}
-                                </div>
-                                
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">{{ form.phone.label }}</label>
-                                    {{ form.phone }}
-                                </div>
-                                
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">{{ form.email.label }}</label>
-                                    {{ form.email }}
-                                </div>
-                                
-                                <div class="col-md-12 mb-3">
-                                    <label class="form-label">{{ form.website.label }}</label>
-                                    {{ form.website }}
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="form-section">
-                            <h4>
-                                <i class="fas fa-receipt"></i>
-                                Información Fiscal
-                            </h4>
-                            
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">{{ form.tax_id.label }}</label>
-                                    {{ form.tax_id }}
-                                    {% if form.tax_id.help_text %}
-                                        <small class="form-text text-muted">{{ form.tax_id.help_text }}</small>
-                                    {% endif %}
-                                </div>
-                                
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">{{ form.business_license.label }}</label>
-                                    {{ form.business_license }}
-                                </div>
-                                
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">{{ form.currency.label }}</label>
-                                    {{ form.currency }}
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="form-section">
-                            <h4>
-                                <i class="fas fa-info-circle"></i>
-                                Acerca de Nosotros
-                            </h4>
-                            
-                            <div class="mb-3">
-                                <label class="form-label">{{ form.about_text.label }}</label>
-                                {{ form.about_text }}
-                                {% if form.about_text.help_text %}
-                                    <small class="form-text text-muted">{{ form.about_text.help_text }}</small>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Documents Tab -->
-                    <div class="tab-pane fade" id="documents" role="tabpanel">
-                        <div class="form-section">
-                            <h4>
-                                <i class="fas fa-file-invoice"></i>
-                                Prefijos de Documentos
-                            </h4>
-                            
-                            <div class="row">
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label">{{ form.invoice_prefix.label }}</label>
-                                    {{ form.invoice_prefix }}
-                                    {% if form.invoice_prefix.help_text %}
-                                        <small class="form-text text-muted">{{ form.invoice_prefix.help_text }}</small>
-                                    {% endif %}
-                                </div>
-                                
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label">{{ form.quote_prefix.label }}</label>
-                                    {{ form.quote_prefix }}
-                                    {% if form.quote_prefix.help_text %}
-                                        <small class="form-text text-muted">{{ form.quote_prefix.help_text }}</small>
-                                    {% endif %}
-                                </div>
-                                
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label">{{ form.work_order_prefix.label }}</label>
-                                    {{ form.work_order_prefix }}
-                                    {% if form.work_order_prefix.help_text %}
-                                        <small class="form-text text-muted">{{ form.work_order_prefix.help_text }}</small>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="form-section">
-                            <h4>
-                                <i class="fas fa-gavel"></i>
-                                Términos y Condiciones
-                            </h4>
-                            
-                            <div class="mb-3">
-                                <label class="form-label">{{ form.terms_and_conditions.label }}</label>
-                                {{ form.terms_and_conditions }}
-                                {% if form.terms_and_conditions.help_text %}
-                                    <small class="form-text text-muted">{{ form.terms_and_conditions.help_text }}</small>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
+                    {{ form.logo }}
+                    {% if form.logo.help_text %}
+                        <small class="form-text text-muted">{{ form.logo.help_text }}</small>
+                    {% endif %}
                 </div>
-
-                <!-- Submit Button -->
-                <div class="form-section">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="fas fa-save me-2"></i>
-                                Guardar Configuración
-                            </button>
-                            <button type="button" class="btn btn-outline-secondary btn-lg ms-2" onclick="resetForm()">
-                                <i class="fas fa-undo me-2"></i>
-                                Descartar Cambios
-                            </button>
-                        </div>
-                        
-                        <div class="text-muted">
-                            <small>
-                                <i class="fas fa-clock me-1"></i>
-                                Última actualización: {{ company_settings.updated_at|date:"d/m/Y H:i" }}
-                            </small>
-                        </div>
-                    </div>
+            </div>
+        </div>
+        
+        <!-- Company Name Section -->
+        <div class="form-section">
+            <h4>
+                <i class="fas fa-tag"></i>
+                Nombre de la Empresa
+            </h4>
+            
+            <div class="row">
+                <div class="col-md-12">
+                    <label class="form-label">{{ form.nombre_publico.label }}</label>
+                    {{ form.nombre_publico }}
+                    {% if form.nombre_publico.help_text %}
+                        <small class="form-text text-muted">{{ form.nombre_publico.help_text }}</small>
+                    {% endif %}
                 </div>
-            </form>
+            </div>
         </div>
 
-        <!-- Preview Sidebar -->
-        <div class="col-lg-4">
-            <div class="preview-section">
-                <div class="branding-preview">
-                    <h5 class="mb-3">
-                        <i class="fas fa-eye text-primary me-2"></i>
-                        Vista Previa
-                    </h5>
-                    
-                    <!-- Preview Navbar -->
-                    <div class="preview-navbar">
-                        <img src="{{ company_logo }}" alt="Logo" class="preview-logo" id="previewLogo">
-                        <div>
-                            <strong id="previewCompanyName">{{ company_name }}</strong>
-                            {% if company_settings.tagline %}
-                                <br><small class="text-muted" id="previewTagline">{{ company_settings.tagline }}</small>
+        <!-- Tagline / Slogan Section -->
+        <div class="form-section">
+            <h4>
+                <i class="fas fa-quote-left"></i>
+                Tagline / Slogan
+            </h4>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <label class="form-label">{{ form.tagline.label }}</label>
+                    {{ form.tagline }}
+                    {% if form.tagline.help_text %}
+                        <small class="form-text text-muted">{{ form.tagline.help_text }}</small>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Tax Configuration Section -->
+        <div class="form-section">
+            <h4>
+                <i class="fas fa-percentage"></i>
+                {% if user.empresa.pais == 'US' %}Tax Configuration{% else %}Configuración Fiscal{% endif %}
+            </h4>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <label class="form-label">{{ form.iva_porcentaje.label }}</label>
+                    {{ form.iva_porcentaje }}
+                    <small class="form-text text-muted">
+                        {% if user.empresa.pais == 'US' %}
+                            Tax rate applied to documents
+                        {% else %}
+                            Porcentaje de IVA aplicado a los documentos
+                        {% endif %}
+                    </small>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-check mt-4">
+                        {{ form.aplicar_iva_por_defecto }}
+                        <label class="form-check-label" for="{{ form.aplicar_iva_por_defecto.id_for_label }}">
+                            {{ form.aplicar_iva_por_defecto.label }}
+                        </label>
+                        <small class="form-text text-muted d-block">
+                            {% if user.empresa.pais == 'US' %}
+                                Documents will include tax automatically
+                            {% else %}
+                                Los documentos incluirán IVA automáticamente
                             {% endif %}
-                        </div>
+                        </small>
                     </div>
-                    
-                    <!-- Sample Buttons -->
-                    <div class="mb-3">
-                        <h6>Botones de Ejemplo:</h6>
-                        <button class="btn btn-primary btn-sm me-2" id="previewBtnPrimary">Primario</button>
-                        <button class="btn btn-secondary btn-sm" id="previewBtnSecondary">Secundario</button>
-                    </div>
-                    
-                    <!-- Stats Card -->
-                    <div class="card-stats">
-                        <div class="stats-icon">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                        <h6 class="mb-0">Vista con tus colores</h6>
-                        <small>Ejemplo de tarjeta personalizada</small>
-                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="form-section">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-save me-2"></i>
+                        💾 UPDATE PROFILE
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary btn-lg ms-2" onclick="resetForm()">
+                        <i class="fas fa-undo me-2"></i>
+                        Descartar Cambios
+                    </button>
                 </div>
                 
-                <!-- Quick Stats -->
-                {% if company_settings %}
-                <div class="mt-4">
-                    <div class="alert alert-info">
-                        <h6 class="mb-2">
-                            <i class="fas fa-info-circle me-2"></i>
-                            Estado de Configuración
-                        </h6>
-                        <ul class="mb-0 list-unstyled">
-                            <li><i class="fas fa-{{ company_settings.logo and 'check text-success' or 'times text-danger' }} me-2"></i>Logo personalizado</li>
-                            <li><i class="fas fa-{{ company_settings.company_name != 'eGarage' and 'check text-success' or 'times text-danger' }} me-2"></i>Nombre personalizado</li>
-                            <li><i class="fas fa-{{ company_settings.address and 'check text-success' or 'times text-danger' }} me-2"></i>Datos de contacto</li>
-                            <li><i class="fas fa-{{ company_settings.tax_id and 'check text-success' or 'times text-danger' }} me-2"></i>Información fiscal</li>
-                        </ul>
-                    </div>
+                <div class="text-muted">
+                    <small>
+                        <i class="fas fa-clock me-1"></i>
+                        Última actualización: {{ company_settings.updated_at|date:"d/m/Y H:i" }}
+                    </small>
                 </div>
-                {% endif %}
             </div>
         </div>
-    </div>
-</div>
-
-<!-- Loading Modal -->
-<div class="modal fade" id="loadingModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-sm modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-body text-center py-4">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Cargando...</span>
-                </div>
-                <div class="mt-3">Guardando configuración...</div>
-            </div>
-        </div>
-    </div>
+    </form>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-// Variables globales
-let originalFormData = null;
-
 document.addEventListener('DOMContentLoaded', function() {
-    // Guardar estado original del formulario
-    originalFormData = new FormData(document.getElementById('settingsForm'));
-    
     // Setup logo preview
     setupLogoPreview();
     
-    // Setup color pickers
-    setupColorPickers();
-    
-    // Setup form changes listener
+    // Setup form listeners
     setupFormListeners();
 });
 
@@ -550,12 +234,6 @@ function setupLogoPreview() {
                 reader.onload = function(e) {
                     const preview = document.getElementById('logoPreview');
                     preview.innerHTML = '<img src="' + e.target.result + '" alt="Logo preview">';
-                    
-                    // Update sidebar preview
-                    const sidebarLogo = document.getElementById('previewLogo');
-                    if (sidebarLogo) {
-                        sidebarLogo.src = e.target.result;
-                    }
                 };
                 reader.readAsDataURL(file);
             }
@@ -563,164 +241,21 @@ function setupLogoPreview() {
     }
 }
 
-function setupColorPickers() {
-    const primaryColorInput = document.getElementById('{{ form.primary_color.id_for_label }}');
-    const secondaryColorInput = document.getElementById('{{ form.secondary_color.id_for_label }}');
-    
-    if (primaryColorInput) {
-        primaryColorInput.addEventListener('change', updateColorPreview);
-        primaryColorInput.addEventListener('input', updateColorPreview);
-    }
-    
-    if (secondaryColorInput) {
-        secondaryColorInput.addEventListener('change', updateColorPreview);
-        secondaryColorInput.addEventListener('input', updateColorPreview);
-    }
-}
-
-function updateColorPreview() {
-    const primaryColor = document.getElementById('{{ form.primary_color.id_for_label }}').value;
-    const secondaryColor = document.getElementById('{{ form.secondary_color.id_for_label }}').value;
-    
-    // Update CSS variables
-    document.documentElement.style.setProperty('--company-primary', primaryColor);
-    document.documentElement.style.setProperty('--company-secondary', secondaryColor);
-    document.documentElement.style.setProperty('--bs-primary', primaryColor);
-    document.documentElement.style.setProperty('--bs-secondary', secondaryColor);
-    
-    // Update preview buttons
-    const primaryBtn = document.getElementById('previewBtnPrimary');
-    const secondaryBtn = document.getElementById('previewBtnSecondary');
-    
-    if (primaryBtn) {
-        primaryBtn.style.backgroundColor = primaryColor;
-        primaryBtn.style.borderColor = primaryColor;
-    }
-    
-    if (secondaryBtn) {
-        secondaryBtn.style.backgroundColor = secondaryColor;
-        secondaryBtn.style.borderColor = secondaryColor;
-    }
-}
-
 function setupFormListeners() {
-    const companyNameInput = document.getElementById('{{ form.company_name.id_for_label }}');
+    const nombrePublicoInput = document.getElementById('{{ form.nombre_publico.id_for_label }}');
     const taglineInput = document.getElementById('{{ form.tagline.id_for_label }}');
     
-    if (companyNameInput) {
-        companyNameInput.addEventListener('input', function() {
-            const previewName = document.getElementById('previewCompanyName');
-            if (previewName) {
-                previewName.textContent = this.value || 'eGarage';
-            }
+    if (nombrePublicoInput) {
+        nombrePublicoInput.addEventListener('input', function() {
+            console.log('Nombre público cambiado:', this.value);
         });
     }
     
     if (taglineInput) {
         taglineInput.addEventListener('input', function() {
-            const previewTagline = document.getElementById('previewTagline');
-            if (previewTagline) {
-                previewTagline.textContent = this.value;
-                previewTagline.style.display = this.value ? 'block' : 'none';
-            }
+            console.log('Tagline cambiado:', this.value);
         });
     }
-}
-
-function previewChanges() {
-    const formData = new FormData(document.getElementById('settingsForm'));
-    
-    {% url 'taller:preview_branding' as url_preview_branding %}
-    fetch('{{ url_preview_branding|default:'#' }}', {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            company_name: formData.get('company_name'),
-            primary_color: formData.get('primary_color'),
-            secondary_color: formData.get('secondary_color')
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Apply preview styles
-            const style = document.createElement('style');
-            style.innerHTML = data.preview_css;
-            style.id = 'preview-styles';
-            
-            // Remove previous preview styles
-            const existingPreview = document.getElementById('preview-styles');
-            if (existingPreview) {
-                existingPreview.remove();
-            }
-            
-            document.head.appendChild(style);
-            
-            // Show notification
-            showToast('Vista previa aplicada', 'success');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showToast('Error al aplicar vista previa', 'error');
-    });
-}
-
-function resetBranding() {
-    if (confirm('¿Está seguro de que desea restablecer toda la configuración de branding a los valores por defecto?')) {
-        const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
-        loadingModal.show();
-        
-    {% url 'taller:reset_branding' as url_reset_branding %}
-    fetch('{{ url_reset_branding|default:'#' }}', {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            loadingModal.hide();
-            if (data.success) {
-                location.reload();
-            } else {
-                showToast(data.error || 'Error al restablecer configuración', 'error');
-            }
-        })
-        .catch(error => {
-            loadingModal.hide();
-            console.error('Error:', error);
-            showToast('Error al restablecer configuración', 'error');
-        });
-    }
-}
-
-function exportConfig() {
-    {% url 'taller:export_branding' as url_export_branding %}
-    fetch('{{ url_export_branding|default:'#' }}')
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const blob = new Blob([JSON.stringify(data.config, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = data.filename;
-                a.click();
-                URL.revokeObjectURL(url);
-                showToast('Configuración exportada exitosamente', 'success');
-            } else {
-                showToast('Error al exportar configuración', 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showToast('Error al exportar configuración', 'error');
-        });
 }
 
 function resetForm() {
@@ -729,97 +264,5 @@ function resetForm() {
         location.reload();
     }
 }
-
-function showToast(message, type = 'info') {
-    // Create toast element
-    const toastHtml = `
-        <div class="toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0" role="alert">
-            <div class="d-flex">
-                <div class="toast-body">
-                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
-                    ${message}
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-            </div>
-        </div>
-    `;
-    
-    // Add to toast container
-    let toastContainer = document.getElementById('toast-container');
-    if (!toastContainer) {
-        toastContainer = document.createElement('div');
-        toastContainer.id = 'toast-container';
-        toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
-        toastContainer.style.zIndex = '9999';
-        document.body.appendChild(toastContainer);
-    }
-    
-    toastContainer.insertAdjacentHTML('beforeend', toastHtml);
-    
-    // Show toast
-    const toastElement = toastContainer.lastElementChild;
-    const toast = new bootstrap.Toast(toastElement);
-    toast.show();
-    
-    // Remove toast element after hiding
-    toastElement.addEventListener('hidden.bs.toast', () => {
-        toastElement.remove();
-    });
-}
-
-// Form submission with AJAX
-document.getElementById('settingsForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const formData = new FormData(this);
-    const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
-    
-    loadingModal.show();
-    
-    fetch(this.action || window.location.href, {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        loadingModal.hide();
-        
-        if (data.success) {
-            showToast(data.message, 'success');
-            
-            // Update preview elements
-            if (data.company_name) {
-                const previewName = document.getElementById('previewCompanyName');
-                if (previewName) previewName.textContent = data.company_name;
-            }
-            
-            if (data.logo_url) {
-                const previewLogo = document.getElementById('previewLogo');
-                if (previewLogo) previewLogo.src = data.logo_url;
-            }
-            
-            // Update page title
-            if (data.company_name) {
-                document.title = document.title.replace(/- .+$/, '- ' + data.company_name);
-            }
-            
-        } else {
-            // Show form errors
-            let errorMessage = 'Por favor corrija los errores en el formulario:\n';
-            for (const field in data.errors) {
-                errorMessage += `\n${field}: ${data.errors[field].join(', ')}`;
-            }
-            showToast(errorMessage, 'error');
-        }
-    })
-    .catch(error => {
-        loadingModal.hide();
-        console.error('Error:', error);
-        showToast('Error al guardar la configuración', 'error');
-    });
-});
 </script>
 {% endblock %}

@@ -1,0 +1,425 @@
+/* ===== FONDO DINÁMICO ESPACIAL - GEORGE AUTO REPAIR ===== */
+/* Estilos para el fondo espacial con estrellas, partículas y efectos */
+/* Sistema de gestión para George Auto Repair */
+
+@keyframes move-stars {
+  0% { transform: translateY(0px); }
+  100% { transform: translateY(-1000px); }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+@keyframes move-clouds {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100vw); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes explode {
+  0% { transform: scale(0); opacity: 1; }
+  100% { transform: scale(2); opacity: 0; }
+}
+
+/* Contenedor principal del fondo dinámico */
+.dynamic-background {
+  position: relative;
+  min-height: 100vh;
+  background: black;
+  overflow: hidden;
+}
+
+/* Fondo espacial con estrellas */
+.space-background {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.stars {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(2px 2px at 20px 30px, #eee, transparent),
+    radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
+    radial-gradient(1px 1px at 90px 40px, #fff, transparent),
+    radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.6), transparent),
+    radial-gradient(2px 2px at 160px 30px, #ddd, transparent);
+  background-repeat: repeat;
+  background-size: 200px 100px;
+  animation: move-stars 50s linear infinite;
+}
+
+.twinkling {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(1px 1px at 25px 5px, white, transparent),
+    radial-gradient(1px 1px at 50px 25px, white, transparent),
+    radial-gradient(1px 1px at 125px 20px, white, transparent),
+    radial-gradient(1px 1px at 150px 75px, white, transparent);
+  background-repeat: repeat;
+  background-size: 200px 100px;
+  animation: twinkle 3s ease-in-out infinite;
+}
+
+.clouds {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(20px 20px at 50px 50px, rgba(255,255,255,0.1), transparent),
+    radial-gradient(15px 15px at 150px 30px, rgba(255,255,255,0.1), transparent),
+    radial-gradient(25px 25px at 250px 70px, rgba(255,255,255,0.1), transparent);
+  background-repeat: repeat;
+  background-size: 300px 100px;
+  animation: move-clouds 30s linear infinite;
+}
+
+/* Partículas flotantes */
+.particles-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.particle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: #00ffff;
+  border-radius: 50%;
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Efectos de explosión */
+.explosion {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: radial-gradient(circle, #ff00ff, #00ffff, #ffff00);
+  border-radius: 50%;
+  animation: explode 0.5s ease-out forwards;
+}
+
+/* Contenedor de contenido principal */
+.content-container {
+  position: relative;
+  z-index: 10;
+  padding: 1rem;
+}
+
+/* ===== ESTILOS DE TARJETAS FUTURISTAS ===== */
+.futuristic-card {
+  position: relative;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(34, 211, 238, 0.3);
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+}
+
+.futuristic-card:hover {
+  border-color: rgba(34, 211, 238, 0.6);
+  transform: scale(1.02);
+  z-index: 10;
+}
+
+.futuristic-card .glow-effect {
+  position: absolute;
+  inset: -1px;
+  border-radius: 0.5rem;
+  background: linear-gradient(45deg, 
+    rgba(34, 211, 238, 0.2), 
+    rgba(236, 72, 153, 0.2), 
+    rgba(132, 204, 22, 0.2));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  filter: blur(8px);
+}
+
+.futuristic-card:hover .glow-effect {
+  opacity: 1;
+}
+
+/* ===== ESTILOS DE BOTONES FUTURISTAS ===== */
+.futuristic-btn {
+  position: relative;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(34, 211, 238, 0.4);
+  background: linear-gradient(45deg, 
+    rgba(34, 211, 238, 0.2), 
+    rgba(59, 130, 246, 0.2));
+  color: rgb(34, 211, 238);
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  text-align: center;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.futuristic-btn:hover {
+  background: linear-gradient(45deg, 
+    rgba(34, 211, 238, 0.3), 
+    rgba(59, 130, 246, 0.3));
+  border-color: rgba(34, 211, 238, 0.6);
+  color: rgb(34, 211, 238);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(34, 211, 238, 0.3);
+}
+
+.futuristic-btn .btn-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 0.5rem;
+  background: linear-gradient(45deg, 
+    rgba(34, 211, 238, 0.2), 
+    rgba(59, 130, 246, 0.2));
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.futuristic-btn:hover .btn-glow {
+  opacity: 1;
+}
+
+/* ===== ESTILOS DE HEADER FUTURISTA ===== */
+.futuristic-header {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.futuristic-header .glow-bg {
+  position: absolute;
+  inset: -1px;
+  border-radius: 0.75rem;
+  background: linear-gradient(45deg, 
+    rgba(34, 211, 238, 0.2), 
+    rgba(236, 72, 153, 0.2), 
+    rgba(132, 204, 22, 0.2));
+  opacity: 0.2;
+  filter: blur(16px);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.futuristic-header .content {
+  position: relative;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(34, 211, 238, 0.3);
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  padding: 1rem;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.4; }
+}
+
+/* ===== ESTILOS DE BÚSQUEDA FUTURISTA ===== */
+.futuristic-search {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.futuristic-search .glow-bg {
+  position: absolute;
+  inset: -0.5px;
+  border-radius: 0.5rem;
+  background: linear-gradient(45deg, 
+    rgba(34, 211, 238, 0.3), 
+    rgba(236, 72, 153, 0.3), 
+    rgba(132, 204, 22, 0.3));
+  opacity: 0.3;
+  filter: blur(4px);
+  transition: opacity 0.3s ease;
+}
+
+.futuristic-search:hover .glow-bg {
+  opacity: 0.5;
+}
+
+.futuristic-search .input-container {
+  position: relative;
+  display: flex;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(34, 211, 238, 0.3);
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  overflow: hidden;
+}
+
+.futuristic-search input {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  background: transparent;
+  color: rgb(229, 231, 235);
+  border: none;
+  outline: none;
+  font-size: 0.875rem;
+}
+
+.futuristic-search input::placeholder {
+  color: rgb(107, 114, 128);
+}
+
+.futuristic-search .search-icon {
+  position: absolute;
+  left: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgb(34, 211, 238);
+  font-size: 0.875rem;
+}
+
+.futuristic-search .search-btn {
+  padding: 0.5rem 1rem;
+  background: linear-gradient(45deg, 
+    rgba(34, 211, 238, 0.6), 
+    rgba(59, 130, 246, 0.6));
+  color: white;
+  font-weight: 600;
+  border: none;
+  font-size: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.futuristic-search .search-btn:hover {
+  background: linear-gradient(45deg, 
+    rgba(34, 211, 238, 0.8), 
+    rgba(59, 130, 246, 0.8));
+  box-shadow: 0 2px 8px rgba(34, 211, 238, 0.4);
+}
+
+/* ===== ESTILOS DE FILTROS FUTURISTAS ===== */
+.futuristic-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.futuristic-filters select {
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(34, 211, 238, 0.3);
+  color: rgb(34, 211, 238);
+  font-size: 0.875rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.futuristic-filters select:focus {
+  border-color: rgba(34, 211, 238, 0.6);
+  box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.5);
+}
+
+/* ===== ESTILOS DE PAGINACIÓN FUTURISTA ===== */
+.futuristic-pagination {
+  position: relative;
+  margin-top: 1.5rem;
+}
+
+.futuristic-pagination .glow-bg {
+  position: absolute;
+  inset: -1px;
+  border-radius: 0.75rem;
+  background: linear-gradient(45deg, 
+    rgba(34, 211, 238, 0.2), 
+    rgba(236, 72, 153, 0.2), 
+    rgba(132, 204, 22, 0.2));
+  opacity: 0.2;
+  filter: blur(16px);
+}
+
+.futuristic-pagination .content {
+  position: relative;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(34, 211, 238, 0.2);
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  padding: 1rem;
+}
+
+/* ===== ESTILOS DE MODAL FUTURISTA ===== */
+.futuristic-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: none;
+  z-index: 50;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.futuristic-modal.show {
+  display: flex;
+}
+
+.futuristic-modal .modal-content {
+  position: relative;
+  max-width: 28rem;
+  width: 100%;
+}
+
+.futuristic-modal .glow-bg {
+  position: absolute;
+  inset: -1px;
+  border-radius: 0.75rem;
+  background: linear-gradient(45deg, 
+    rgba(239, 68, 68, 0.3), 
+    rgba(236, 72, 153, 0.3), 
+    rgba(239, 68, 68, 0.3));
+  opacity: 0.3;
+  filter: blur(16px);
+}
+
+.futuristic-modal .content {
+  position: relative;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(8px);
+  padding: 1.5rem;
+  text-align: center;
+}
+
+/* ===== UTILIDADES ===== */
+.text-gradient {
+  background: linear-gradient(45deg, 
+    rgb(34, 211, 238), 
+    rgb(236, 72, 153), 
+    rgb(132, 204, 22));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.glow-text {
+  text-shadow: 0 0 10px currentColor;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-slow {
+  animation: pulse 2s ease-in-out infinite;
+}

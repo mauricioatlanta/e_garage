@@ -74,7 +74,7 @@ import json
 
 from taller.models.clientes import Cliente
 from taller.models.documento import Documento
-from taller.models.lineas_documento import LineaServicio
+from taller.models.lineas_documento import LineaServicio, LineaRepuesto, LineaOtroServicio
 from taller.models.marca import Marca
 from taller.models.modelo import Modelo
 from taller.models.tecnico import Tecnico
@@ -659,9 +659,33 @@ def reportes_mecanicos(request):
     
     # Métricas generales - YA FILTRADO POR EMPRESA
     total_documentos = documentos_qs.count()
-    total_generado = documentos_qs.aggregate(
-        total=Sum('lineas_servicio__precio_unitario')
+    
+    # Calcular total generado correctamente (incluyendo cantidad y descuentos)
+    from django.db.models import F, Sum, Count, Value, DecimalField, ExpressionWrapper
+    from django.db.models.functions import Coalesce
+    
+    # Total de servicios
+    total_servicios = documentos_qs.aggregate(
+        total=Sum(
+            F('lineas_servicio__cantidad') * F('lineas_servicio__precio_unitario') * (1 - F('lineas_servicio__descuento') / 100)
+        )
     )['total'] or 0
+    
+    # Total de repuestos
+    total_repuestos = documentos_qs.aggregate(
+        total=Sum(
+            F('lineas_repuesto__cantidad') * F('lineas_repuesto__precio_unitario') * (1 - F('lineas_repuesto__descuento') / 100)
+        )
+    )['total'] or 0
+    
+    # Total de otros servicios
+    total_otros = documentos_qs.aggregate(
+        total=Sum(
+            F('lineas_otro_servicio__cantidad') * F('lineas_otro_servicio__precio_cliente')
+        )
+    )['total'] or 0
+    
+    total_generado = total_servicios + total_repuestos + total_otros
     
     promedio_por_documento = round(
         total_generado / total_documentos if total_documentos > 0 else 0, 0
@@ -676,6 +700,101 @@ def reportes_mecanicos(request):
     
     print(f"DEBUG - Contexto todos_mecanicos: {[t.nombre for t in tecnicos]}")
     
+    # Generar datos detallados por mecánico
+    mecanicos_data = []
+    for tecnico in tecnicos:
+        # Documentos del técnico en el período
+        docs_tecnico = documentos_qs.filter(tecnico_responsable=tecnico)
+        total_docs_tecnico = docs_tecnico.count()
+        
+        if total_docs_tecnico == 0:
+            continue  # Saltar técnicos sin documentos
+        
+        # Servicios del técnico
+        servicios_tecnico = LineaServicio.objects.filter(documento__in=docs_tecnico)
+        total_servicios_count = servicios_tecnico.count()
+        
+        # Total generado por el técnico (incluyendo cantidad y descuentos)
+        # Servicios del técnico
+        total_servicios_tecnico = servicios_tecnico.aggregate(
+            total=Sum(
+                F('cantidad') * F('precio_unitario') * (1 - F('descuento') / 100)
+            )
+        )['total'] or 0
+        
+        # Repuestos del técnico
+        repuestos_tecnico = LineaRepuesto.objects.filter(documento__in=docs_tecnico)
+        total_repuestos_tecnico = repuestos_tecnico.aggregate(
+            total=Sum(
+                F('cantidad') * F('precio_unitario') * (1 - F('descuento') / 100)
+            )
+        )['total'] or 0
+        
+        # Otros servicios del técnico
+        otros_tecnico = LineaOtroServicio.objects.filter(documento__in=docs_tecnico)
+        total_otros_tecnico = otros_tecnico.aggregate(
+            total=Sum(
+                F('cantidad') * F('precio_cliente')
+            )
+        )['total'] or 0
+        
+        total_generado_tecnico = total_servicios_tecnico + total_repuestos_tecnico + total_otros_tecnico
+        
+        # Promedio por documento del técnico
+        promedio_tecnico = round(
+            total_generado_tecnico / total_docs_tecnico if total_docs_tecnico > 0 else 0, 0
+        )
+        
+        # Top servicios del técnico (simplificado para evitar errores de agregación)
+        servicios_top = servicios_tecnico.values('servicio__nombre').annotate(
+            cantidad=Count('id')
+        ).order_by('-cantidad')[:5]
+        
+        mecanicos_data.append({
+            'mecanico': tecnico,
+            'total_documentos': total_docs_tecnico,
+            'total_servicios': total_servicios_count,
+            'total_generado': total_generado_tecnico,
+            'promedio_por_documento': promedio_tecnico,
+            'servicios_top': servicios_top,
+        })
+    
+    # Preparar servicios detallados si se selecciona un técnico específico
+    servicios_detallados = []
+    tecnico_nombre = None
+    total_servicios_tecnico = 0
+    promedio_diario_tecnico = 0
+    eficiencia_tecnico = 95
+    
+    if mecanico_id and mecanico_id != 'todos':
+        try:
+            tecnico = Tecnico.objects.get(id=mecanico_id, empresa=empresa)
+            tecnico_nombre = tecnico.nombre
+            
+            # Obtener documentos del técnico
+            docs_tecnico = documentos_qs.filter(tecnico_responsable=tecnico)
+            
+            # Obtener todos los servicios del técnico con información del documento
+            servicios_detallados = LineaServicio.objects.filter(
+                documento__in=docs_tecnico
+            ).select_related(
+                'documento', 'documento__cliente', 'documento__vehiculo', 'documento__vehiculo__marca', 'documento__vehiculo__modelo'
+            ).annotate(
+                precio_total=F('cantidad') * F('precio_unitario') * (1 - F('descuento') / 100)
+            )
+            
+            # Calcular total de servicios del técnico
+            total_servicios_tecnico = servicios_detallados.aggregate(
+                total=Sum('precio_total')
+            )['total'] or 0
+            
+            # Calcular promedio diario
+            dias_periodo = (datetime.strptime(fecha_hasta, '%Y-%m-%d') - datetime.strptime(fecha_desde, '%Y-%m-%d')).days + 1
+            promedio_diario_tecnico = total_servicios_tecnico / dias_periodo if dias_periodo > 0 else 0
+            
+        except Tecnico.DoesNotExist:
+            pass
+    
     # Preparar contexto
     context = {
         'documentos': documentos_qs,
@@ -684,11 +803,18 @@ def reportes_mecanicos(request):
         'promedio_por_documento': promedio_por_documento,
         'tecnicos': tecnicos,
         'todos_mecanicos': tecnicos,  # Alias para el template
+        'mecanicos_data': mecanicos_data,  # Datos detallados por mecánico
         'fecha_desde': fecha_desde,
         'fecha_hasta': fecha_hasta,
         'mecanico_id': mecanico_id,
         'tecnico_seleccionado': mecanico_id or 'todos',
         'mecanico_seleccionado': mecanico_id or 'todos',
+        # Datos para vista detallada de técnico
+        'servicios_detallados': servicios_detallados,
+        'tecnico_nombre': tecnico_nombre,
+        'total_servicios_tecnico': total_servicios_tecnico,
+        'promedio_diario_tecnico': promedio_diario_tecnico,
+        'eficiencia_tecnico': eficiencia_tecnico,
     }
     
     return render(request, 'taller/reportes/reportes_mecanicos.html', context)

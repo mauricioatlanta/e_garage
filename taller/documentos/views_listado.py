@@ -1,13 +1,17 @@
 from django.views.generic import ListView
 from django.db.models import OuterRef, Subquery, Count, Sum, Value, IntegerField, DecimalField
 from django.db.models.functions import Coalesce
+from taller.mixins import CountryLangTemplateMixin  # Agregar import del mixin
 from taller.models import Documento, LineaRepuesto, LineaServicio, LineaOtroServicio
 
-class DocumentoListViewBase(ListView):
+class DocumentoListViewBase(CountryLangTemplateMixin, ListView):
     model = Documento
-    template_name = "taller/documentos/lista_documentos.html"  # usa el tuyo real
+    base_template_name = "documentos/lista_documentos.html"  # usa template resolution
     context_object_name = "documentos"  # ← fijamos el nombre para el template
     paginate_by = 50
+    
+    def render_to_response(self, context, **response_kwargs):
+        return self.render_country_lang(self.request, context)
 
     def get_queryset(self):
         empresa = getattr(self.request.user, "empresa", None)

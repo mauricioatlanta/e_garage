@@ -1,11 +1,22 @@
 from django import forms
 from .models import Documento
-from .lineas_documento import LineaDocumento
 from taller.models.tecnico import Tecnico
 from taller.models.clientes import Cliente
 from taller.models.vehiculos import Vehiculo
 
 class DocumentoForm(forms.ModelForm):
+    # Campo de búsqueda AJAX para clientes
+    cliente_busqueda = forms.CharField(
+        label="Buscar Cliente",
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Escribe para buscar clientes...',
+            'autocomplete': 'off',
+            'id': 'cliente-busqueda'
+        })
+    )
+    
     # Campo personalizado para millas/kilometraje del vehículo
     kilometraje = forms.CharField(
         label="Kilometraje/Millas",
@@ -27,12 +38,12 @@ class DocumentoForm(forms.ModelForm):
         # Configurar widgets con clases CSS
         widget_attrs = {'class': 'form-control'}
         for field_name, field in self.fields.items():
-            if field_name not in ['pagado']:  # Excepto campos que ya tienen widgets específicos
+            if field_name not in ['pagado', 'cliente_busqueda']:  # Excepto campos que ya tienen widgets específicos
                 if hasattr(field.widget, 'attrs'):
                     field.widget.attrs.update(widget_attrs)
         
         # Inicializar campo kilometraje con valor del vehículo
-        if self.instance and self.instance.vehiculo and self.instance.vehiculo.millas:
+        if self.instance and hasattr(self.instance, 'vehiculo') and self.instance.vehiculo and hasattr(self.instance.vehiculo, 'millas') and self.instance.vehiculo.millas:
             self.fields['kilometraje'].initial = self.instance.vehiculo.millas
         
         # Configurar queryset de técnicos incluyendo el actual
@@ -43,108 +54,43 @@ class DocumentoForm(forms.ModelForm):
         
         if empresa:
             # Configurar querysets por empresa para evitar "Select a valid choice"
-            # Cliente queryset
-            cliente_qs = Cliente.objects.filter(empresa=empresa)
-            if self.instance and self.instance.cliente_id:
-                cliente_qs = cliente_qs | Cliente.objects.filter(pk=self.instance.cliente_id)
-            self.fields["cliente"].queryset = cliente_qs.distinct().order_by("nombre")
+            self.fields['tecnico_responsable'].queryset = Tecnico.objects.filter(empresa=empresa)
+            self.fields['cliente'].queryset = Cliente.objects.filter(empresa=empresa)
             
-            # Vehículo queryset  
-            vehiculo_qs = Vehiculo.objects.filter(cliente__empresa=empresa)
-            if self.instance and self.instance.vehiculo_id:
-                vehiculo_qs = vehiculo_qs | Vehiculo.objects.filter(pk=self.instance.vehiculo_id)
-            self.fields["vehiculo"].queryset = vehiculo_qs.distinct().order_by("patente")
-            
-            # Técnico queryset (ya existía)
-            qs = Tecnico.objects.filter(empresa=empresa)
-            if self.instance and self.instance.tecnico_responsable_id:
-                # incluir el técnico actual aunque esté inactivo o filtrado
-                qs = qs | Tecnico.objects.filter(pk=self.instance.tecnico_responsable_id)
-                self.fields["tecnico_responsable"].initial = self.instance.tecnico_responsable_id
-            self.fields["tecnico_responsable"].queryset = qs.distinct().order_by("nombre")
-        else:
-            # Si no hay empresa, usar querysets vacíos
-            self.fields["cliente"].queryset = Cliente.objects.none()
-            self.fields["vehiculo"].queryset = Vehiculo.objects.none()
-            self.fields["tecnico_responsable"].queryset = Tecnico.objects.none()
+            # Para vehículos, mostrar solo los del cliente seleccionado o todos si no hay cliente
+            if self.instance and hasattr(self.instance, 'cliente') and self.instance.cliente:
+                self.fields['vehiculo'].queryset = Vehiculo.objects.filter(
+                    empresa=empresa, 
+                    cliente=self.instance.cliente
+                )
+            else:
+                self.fields['vehiculo'].queryset = Vehiculo.objects.filter(empresa=empresa)
         
-        # Inicializar el campo UI desde el vehículo
-        v = getattr(self.instance, "vehiculo", None)
-        if v:
-            if hasattr(v, "millas") and v.millas is not None:
-                self.fields["kilometraje"].initial = v.millas
-            elif hasattr(v, "kilometraje") and v.kilometraje is not None:
-                self.fields["kilometraje"].initial = v.kilometraje
-    
-    def clean_kilometraje(self):
-        """Validación personalizada para el campo kilometraje"""
-        valor = self.cleaned_data.get('kilometraje')
-        if valor:
-            valor = valor.strip()
-            if valor:
-                try:
-                    valor = int(valor)
-                    if valor < 0:
-                        raise forms.ValidationError("El kilometraje no puede ser negativo")
-                    if valor > 9999999:
-                        raise forms.ValidationError("El kilometraje no puede ser mayor a 9,999,999")
-                    return valor
-                except (ValueError, TypeError):
-                    raise forms.ValidationError("Ingrese un número válido")
-        return None
-    
-    def _norm_decimal(self, s):
-        """Normalizar string a decimal (maneja comas, puntos, espacios)"""
-        if s is None: 
-            return None
-        s = str(s).strip().replace(" ", "")
-        # Si tiene tanto coma como punto, asumir que coma es separador de miles
-        if s.count(",") and s.count("."):
-            s = s.replace(".", "").replace(",", ".")
-        elif s.count(",") == 1 and not s.count("."):
-            # Solo una coma, probablemente separador decimal
-            s = s.replace(",", ".")
-        return s
-    
-    def clean(self):
-        """Validación general del formulario con normalizacion de decimales"""
-        cleaned = super().clean()
-        
-        # Normalizar campos decimales si vienen del POST
-        for k in ("sales_tax_rate",):
-            if k in self.data:
-                try:
-                    normalized = self._norm_decimal(self.data.get(k))
-                    if normalized:
-                        cleaned[k] = normalized
-                except (ValueError, TypeError):
-                    pass  # Dejar que la validación normal maneje el error
-        
-        return cleaned
+        # Configurar widget para el campo pagado
+        self.fields['pagado'].widget = forms.CheckboxInput(attrs={
+            'class': 'form-check-input',
+            'id': 'switchPagado'
+        })
     
     def save(self, commit=True):
-        instance = super().save(commit=commit)
+        instance = super().save(commit=False)
         
-        # Persistir millas/kilometraje en el vehículo
-        v = getattr(instance, "vehiculo", None)
-        kilometraje_valor = self.cleaned_data.get("kilometraje")
-        
-        if v and kilometraje_valor is not None:
+        # Manejar el campo kilometraje personalizado
+        kilometraje_val = self.cleaned_data.get('kilometraje')
+        if kilometraje_val:
             try:
-                if isinstance(kilometraje_valor, str):
-                    val = int(kilometraje_valor.strip()) if kilometraje_valor.strip() else None
-                else:
-                    val = int(kilometraje_valor)
-                    
-                if val is not None:
-                    if hasattr(v, "millas"):
-                        v.millas = val
-                        if commit:
-                            v.save(update_fields=["millas"])
-                    elif hasattr(v, "kilometraje"):
-                        v.kilometraje = val  
-                        if commit:
-                            v.save(update_fields=["kilometraje"])
+                val = int(kilometraje_val)
+                if self.instance and hasattr(self.instance, 'vehiculo') and self.instance.vehiculo:
+                    v = self.instance.vehiculo
+                    if val is not None:
+                        if hasattr(v, "millas"):
+                            v.millas = val
+                            if commit:
+                                v.save(update_fields=["millas"])
+                        elif hasattr(v, "kilometraje"):
+                            v.kilometraje = val  
+                            if commit:
+                                v.save(update_fields=["kilometraje"])
             except (ValueError, TypeError) as e:
                 # Manejar errores de conversión de tipo
                 print(f"Error al guardar kilometraje: {e}")
@@ -153,20 +99,19 @@ class DocumentoForm(forms.ModelForm):
     
     class Meta:
         model = Documento
-        fields = ["tipo", "numero", "fecha_emision", "cliente", "vehiculo", "tecnico_responsable", "kilometraje", "moneda", "country", "descuento", "estado_pago", "pagado", "millas", "observaciones"]
+        exclude = ('numero', 'correlativo', 'moneda', 'country', 'estado_pago', 'empresa', 'neto_repuestos', 'neto_servicios', 'neto_otros_servicios', 'descuento', 'tax_rate_applied', 'tax_amount', 'total', 'created_at')
         widgets = {
+            'tipo': forms.Select(attrs={'class': 'form-select', 'id': 'id_tipo'}),
+            'numero': forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
+            'fecha_emision': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'cliente': forms.Select(attrs={'class': 'form-select', 'id': 'id_cliente'}),
+            'vehiculo': forms.Select(attrs={'class': 'form-select', 'id': 'id_vehiculo'}),
             'tecnico_responsable': forms.Select(attrs={'class': 'form-select'}),
-            'estado_pago': forms.Select(attrs={'class': 'form-select'}),
-            'pagado': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'millas': forms.NumberInput(attrs={'class': 'form-control', 'min': '0'}),
-            'observaciones': forms.Textarea(attrs={
-                'class': 'form-textarea',
-                'rows': 3,
-                'placeholder': 'Observaciones opcionales - Puede dejarse vacío si no hay información adicional...'
-            })
+            'kilometraje': forms.NumberInput(attrs={'class': 'form-control', 'min': '0'}),
+            'moneda': forms.Select(attrs={'class': 'form-select'}),
+            'pagado': forms.CheckboxInput(attrs={'class': 'form-check-input', 'id': 'switchPagado'}),
+            'apply_vat': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'observaciones': forms.Textarea(attrs={'class': 'form-control', 'rows': '4'}),
         }
 
-class LineaDocumentoForm(forms.ModelForm):
-    class Meta:
-        model = LineaDocumento
-        fields = ["item_type", "descripcion", "qty", "unit_price"]
+# LineaDocumentoForm removed - using formsets instead

@@ -1,0 +1,155 @@
+{% load i18n %}
+<!-- Debug info -->
+<!-- Servicios: {{ debug_servicios_count }}, Otros: {{ debug_otros_count }}, Repuestos: {{ debug_repuestos_count }} -->
+<!-- Debug Repuestos: {{ debug_repuestos_values }} -->
+<!-- Debug Servicios: {{ debug_servicios_values }} -->
+<!-- Debug Otros: {{ debug_otros_values }} -->
+<!-- Debug Totals: R={{ debug_subtotal_repuestos }}, S={{ debug_subtotal_servicios }}, O={{ debug_subtotal_otros }}, T={{ debug_subtotal }}, IVA={{ debug_iva }}, TOTAL={{ debug_total }} -->
+<!-- Tablas de items (repuestos, servicios, otros) -->
+<div class="seccion-card">
+  <h3 class="seccion-title">🛠️ Repuestos</h3>
+  
+  <div style="margin-bottom: 1rem;">
+    <div style="display: flex; gap: 0.5rem; align-items: center;">
+      <button type="button" id="btn-agregar-repuesto" class="btn-secondary">+ Agregar Repuesto</button>
+      <div class="autocomplete-container" style="flex: 1; max-width: 300px;">
+        <input type="text" id="buscar-repuesto" placeholder="🔍 Buscar repuesto..." class="form-input" style="width: 100%;">
+        <div id="resultados-repuesto" class="autocomplete-results"></div>
+      </div>
+    </div>
+  </div>
+  
+  <table class="table-futurista" id="tabla-repuestos">
+    <thead>
+      <tr>
+        <th>Código</th>
+        <th>Descripción</th>
+        <th>Cantidad</th>
+        <th style="color: transparent; background: transparent;">P. Compra</th>
+        <th>Precio Unit.</th>
+        <th>Total</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for repuesto in repuestos %}
+      <tr>
+        <td>{{ repuesto.codigo }}</td>
+        <td>{{ repuesto.nombre }}</td>
+        <td>{{ repuesto.cantidad }}</td>
+        <td style="color: transparent; background: black;">
+          <input type="number" class="precio-compra-input" 
+                 style="color: transparent; background: black; border: none; width: 80px;" 
+                 value="{{ repuesto.repuesto.precio_compra|default:0 }}" 
+                 min="0" step="0.01">
+        </td>
+        <td>${{ repuesto.precio_unitario|floatformat:0 }}</td>
+        <td>${{ repuesto.subtotal|floatformat:0 }}</td>
+        <td>
+          <button type="button" class="btn-secondary btn-eliminar" onclick="eliminarFila(this)">🗑️</button>
+        </td>
+      </tr>
+      {% empty %}
+      <tr id="no-repuestos">
+        <td colspan="7" style="text-align: center; color: #6c757d;">No hay repuestos agregados</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  
+  <div style="text-align: right; margin-top: 1rem;">
+    <strong style="color: #00f2fe;">Subtotal Repuestos: <span id="total-repuestos">${{ subtotal_repuestos|default:0|floatformat:0 }}</span></strong>
+  </div>
+</div>
+
+<div class="seccion-card">
+  <h3 class="seccion-title">⚙️ Servicios</h3>
+  
+  <div style="margin-bottom: 1rem;">
+    <div style="display: flex; gap: 0.5rem; align-items: center;">
+      <button type="button" id="btn-agregar-servicio" class="btn-secondary">+ Agregar Servicio</button>
+      <div class="autocomplete-container" style="flex: 1; max-width: 300px;">
+        <input type="text" id="buscar-servicio" placeholder="🔍 Buscar servicio..." class="form-input" style="width: 100%;">
+        <div id="resultados-servicio" class="autocomplete-results"></div>
+      </div>
+    </div>
+  </div>
+  
+  <table class="table-futurista" id="tabla-servicios">
+    <thead>
+      <tr>
+        <th>Descripción</th>
+        <th>Precio</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for servicio in servicios %}
+      <tr>
+        <td>{{ servicio.nombre }}</td>
+        <td>${{ servicio.precio_unitario|floatformat:0 }}</td>
+        <td>
+          <button type="button" class="btn-secondary btn-eliminar" onclick="eliminarFila(this)">🗑️</button>
+        </td>
+      </tr>
+      {% empty %}
+      <tr id="no-servicios">
+        <td colspan="3" style="text-align: center; color: #6c757d;">No hay servicios agregados</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  
+  <div style="text-align: right; margin-top: 1rem;">
+    <strong style="color: #00f2fe;">Subtotal Servicios: <span id="total-servicios">${{ subtotal_servicios|default:0|floatformat:0 }}</span></strong>
+  </div>
+</div>
+
+<div class="seccion-card">
+  <h3 class="seccion-title">🏢 Otros Servicios</h3>
+  
+  <div style="margin-bottom: 1rem;">
+    <div style="display: flex; gap: 0.5rem; align-items: center;">
+      <button type="button" id="btn-agregar-otro" class="btn-secondary">+ Agregar Otro Servicio</button>
+      <div class="autocomplete-container" style="flex: 1; max-width: 300px;">
+        <input type="text" id="buscar-otro-servicio" placeholder="🔍 Buscar servicio externo..." class="form-input" style="width: 100%;">
+        <div id="resultados-otro-servicio" class="autocomplete-results"></div>
+      </div>
+    </div>
+  </div>
+  
+  <table class="table-futurista" id="tabla-otros">
+    <thead>
+      <tr>
+        <th>Servicio</th>
+        <th>Empresa Externa</th>
+        <th>Costo Interno</th>
+        <th>Precio Cliente</th>
+        <th>Ganancia</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for otro in otros_servicios %}
+      <tr>
+        <td>{{ otro.nombre }}</td>
+        <td>{{ otro.empresa_externa }}</td>
+        <td>${{ otro.costo_interno|floatformat:0 }}</td>
+        <td>${{ otro.precio_cliente|floatformat:0 }}</td>
+        <td>${{ otro.ganancia|floatformat:0 }}</td>
+        <td>
+          <button type="button" class="btn-secondary btn-eliminar" onclick="eliminarFila(this)">🗑️</button>
+        </td>
+      </tr>
+      {% empty %}
+      <tr id="no-otros">
+        <td colspan="6" style="text-align: center; color: #6c757d;">No hay otros servicios agregados</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  
+  <div style="text-align: right; margin-top: 1rem;">
+    <strong style="color: #00f2fe;">Subtotal Otros: <span id="total-otros-servicios">${{ subtotal_otros_servicios|default:0|floatformat:0 }}</span></strong>
+  </div>
+</div>

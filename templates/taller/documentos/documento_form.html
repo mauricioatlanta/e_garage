@@ -1,127 +1,282 @@
 {% extends "taller/documentos/base_documento.html" %}
 {% load i18n widget_tweaks static %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/documento_form_futurista.css' %}?v={{ STATIC_VERSION|default:'dev' }}&t={% now 'U' %}">
+{% endblock %}
+
 {% block content %}
+<!-- DEBUG: DOC-FORM-LOADED -->
+<script>
+console.log("🚀 DOC-FORM-LOADED: {{ request.path }}");
+console.log("🏢 Empresa país:", "{{ user.empresa.pais|default:'NO_EMPRESA' }}");
+window.country = "{{ user.empresa.pais|default:'CL' }}";
+</script>
 
-<h1 class="text-xl font-bold text-cyan-200 mb-4">
-  {% if es_edicion %}✏️ Editando Documento #{{ documento.numero }}{% else %}➕ Nuevo Documento{% endif %}
-</h1>
-
-<form method="post" novalidate>
-  {% csrf_token %}
-
-  {% if form.non_field_errors %}
-    <div class="mb-4 rounded border border-red-500/40 bg-red-900/30 p-3 text-red-200">
-      <strong>{% trans "Errores" %}:</strong>
-      <ul class="list-disc ml-5">
-        {% for e in form.non_field_errors %}<li>{{ e }}</li>{% endfor %}
-      </ul>
+<body class="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white touch-lg">
+  <!-- CABECERA CON BOTONES DE TIPO -->
+  <div class="container mx-auto px-4 py-6">
+    <div class="text-center mb-8">
+      <h1 class="text-4xl font-bold mb-2">
+        {% if es_edicion %}✏️ Editando Documento #{{ documento.numero }}{% else %}🚀 Crear Documento{% endif %}
+      </h1>
+      {% include "components/country_badge.html" %}
+      
+      <div id="doc-type-switch" class="flex gap-3 justify-center p-4 mt-4">
+        <button type="button" data-tipo="FAC" class="btn-type">💸 Factura</button>
+        <button type="button" data-tipo="COT" class="btn-type active">📋 Cotización</button>
+        <button type="button" data-tipo="ORD" class="btn-type">🔧 Orden</button>
+        <input type="hidden" name="tipo" id="tipo" value="{{ form.instance.tipo|default:'COT' }}">
+      </div>
     </div>
-  {% endif %}
 
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-    <!-- Tipo de documento -->
-    <div>
-      <label for="{{ form.tipo.id_for_label }}" class="block text-sm font-medium text-cyan-200 mb-1">
-        {% trans "Tipo de documento" %}
-      </label>
-      {{ form.tipo|add_class:"bg-slate-800 border border-cyan-500/30 text-cyan-100 rounded px-3 py-2 w-full focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400" }}
-      {% if form.tipo.errors %}
-        <div class="text-red-400 text-sm mt-1">{{ form.tipo.errors.0 }}</div>
+    <!-- FORMULARIO PRINCIPAL -->
+    <form id="document-form" method="post" class="max-w-6xl mx-auto" novalidate>
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+        <div class="neon-card p-4 mb-6 border-red-500/40 bg-red-900/30">
+          <strong class="text-red-200">{% trans "Errores" %}:</strong>
+          <ul class="list-disc ml-5 text-red-200">
+            {% for e in form.non_field_errors %}<li>{{ e }}</li>{% endfor %}
+          </ul>
+        </div>
       {% endif %}
-    </div>
 
-    <!-- Fecha -->
-    <div>
-      <label for="{{ form.fecha_emision.id_for_label }}" class="block text-sm font-medium text-cyan-200 mb-1">
-        {% trans "Fecha" %}
-      </label>
-      {{ form.fecha_emision|add_class:"bg-slate-800 border border-cyan-500/30 text-cyan-100 rounded px-3 py-2 w-full focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400" }}
-      {% if form.fecha_emision.errors %}
-        <div class="text-red-400 text-sm mt-1">{{ form.fecha_emision.errors.0 }}</div>
-      {% endif %}
-    </div>
+      <!-- CLIENTE CON BÚSQUEDA AJAX -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <div class="neon-card p-4">
+          <label class="block mb-2 font-semibold text-cyan-200">🔍 Buscar cliente</label>
+          <input id="cliente-search" class="futurista-input w-full" 
+                 placeholder="Nombre, RUT/EIN, email...">
+          
+          <label class="block mt-4 mb-2 font-semibold text-cyan-200">👤 Cliente</label>
+          <select id="cliente" name="cliente" class="futurista-input w-full">
+            <option value="">Seleccione un cliente...</option>
+            {% for cliente in clientes %}
+            <option value="{{ cliente.id }}" {% if form.cliente.value == cliente.id %}selected{% endif %}>
+              {{ cliente.nombre }} — {{ cliente.identificador }}
+            </option>
+            {% endfor %}
+          </select>
 
-    <!-- Cliente -->
-    <div>
-      <label for="{{ form.cliente.id_for_label }}" class="block text-sm font-medium text-cyan-200 mb-1">
-        {% trans "Cliente" %}
-      </label>
-      {{ form.cliente|add_class:"bg-slate-800 border border-cyan-500/30 text-cyan-100 rounded px-3 py-2 w-full focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400" }}
-      {% if form.cliente.errors %}
-        <div class="text-red-400 text-sm mt-1">{{ form.cliente.errors.0 }}</div>
-      {% endif %}
-    </div>
+          <label class="block mt-4 mb-2 font-semibold text-cyan-200">🚗 Vehículo</label>
+          <select id="vehiculo" name="vehiculo" class="futurista-input w-full">
+            <option value="">Seleccione un cliente primero…</option>
+          </select>
+          {% if form.cliente.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.cliente.errors.0 }}</div>
+          {% endif %}
+        </div>
 
-    <!-- Vehículo -->
-    <div>
-      <label for="{{ form.vehiculo.id_for_label }}" class="block text-sm font-medium text-cyan-200 mb-1">
-        {% trans "Vehículo" %}
-      </label>
-      {{ form.vehiculo|add_class:"bg-slate-800 border border-cyan-500/30 text-cyan-100 rounded px-3 py-2 w-full focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400" }}
-      {% if form.vehiculo.errors %}
-        <div class="text-red-400 text-sm mt-1">{{ form.vehiculo.errors.0 }}</div>
-      {% endif %}
-    </div>
+        <!-- TÉCNICOS Y FECHA -->
+        <div class="neon-card p-4">
+          <label class="block mb-2 font-semibold text-cyan-200">👨‍🔧 Técnico/Vendedor</label>
+          <select name="tecnico_responsable" id="tecnico" class="futurista-input w-full">
+            <option value="">Seleccione técnico...</option>
+            {% for t in tecnicos %}
+            <option value="{{ t.id }}" {% if form.tecnico_responsable.value == t.id %}selected{% endif %}>
+              {{ t.nombre }}
+            </option>
+            {% endfor %}
+          </select>
+          {% if form.tecnico_responsable.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.tecnico_responsable.errors.0 }}</div>
+          {% endif %}
 
-    <!-- Técnico -->
-    <div>
-      <label for="{{ form.tecnico_responsable.id_for_label }}" class="block text-sm font-medium text-cyan-200 mb-1">
-        {% trans "Técnico" %}
-      </label>
-      {{ form.tecnico_responsable|add_class:"bg-slate-800 border border-cyan-500/30 text-cyan-100 rounded px-3 py-2 w-full focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400" }}
-      {% if form.tecnico_responsable.errors %}
-        <div class="text-red-400 text-sm mt-1">{{ form.tecnico_responsable.errors.0 }}</div>
-      {% endif %}
-    </div>
+          <label class="block mt-4 mb-2 font-semibold text-cyan-200">📅 Fecha</label>
+          <input type="date" name="fecha_emision" class="futurista-input w-full" 
+                 value="{{ form.fecha_emision.value|default:today|date:'Y-m-d' }}">
+          {% if form.fecha_emision.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.fecha_emision.errors.0 }}</div>
+          {% endif %}
+          
+          <div class="flex items-center mt-4">
+            <label for="{{ form.pagado.id_for_label }}" class="flex items-center text-cyan-200">
+              {{ form.pagado }}
+              {% trans "Pagado" %}
+            </label>
+          </div>
+          
+          <!-- Campo de kilometraje/millas -->
+          <label class="block mt-4 mb-2 font-semibold text-cyan-200">
+            {% if user.empresa.pais == 'US' %}🚗 Mileage (miles){% else %}🚗 Kilometraje{% endif %}
+          </label>
+          {{ form.kilometraje }}
+          {% if form.kilometraje.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.kilometraje.errors.0 }}</div>
+          {% endif %}
+        </div>
+      </div>
 
-    <!-- Pagado -->
-    <div class="flex items-center">
-      <label for="{{ form.pagado.id_for_label }}" class="flex items-center text-cyan-200">
-        {{ form.pagado|add_class:"mr-2 text-cyan-400" }}
-        {% trans "Pagado" %}
-      </label>
+      <!-- REPUESTOS -->
+      <div class="neon-card p-6 mb-6">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-2xl font-bold text-cyan-200">⚙️ Repuestos</h3>
+          <button type="button" id="add-repuesto" class="btn-type">+ Agregar repuesto (Alt+R)</button>
+        </div>
+        <div id="repuestos-container" class="space-y-3">
+          <!-- Las líneas de repuestos se agregarán aquí dinámicamente -->
+        </div>
+      </div>
+
+      <!-- SERVICIOS -->
+      <div class="neon-card p-6 mb-6">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-2xl font-bold text-cyan-200">🔧 Servicios</h3>
+          <button type="button" id="add-serv" class="btn-type">+ Agregar servicio (Alt+S)</button>
+        </div>
+        <div id="servicios-container" class="space-y-3">
+          <!-- Las líneas de servicios se agregarán aquí dinámicamente -->
+        </div>
+      </div>
+
+      <!-- OTROS SERVICIOS -->
+      <div class="neon-card p-6 mb-6">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-2xl font-bold text-cyan-200">🏢 Otros Servicios (Terceros)</h3>
+          <button type="button" id="add-otro-serv" class="btn-type">+ Agregar otro servicio</button>
+        </div>
+        <div id="otros-servicios-container" class="space-y-3">
+          <!-- Las líneas de otros servicios se agregarán aquí dinámicamente -->
+        </div>
+      </div>
+
+      <!-- OBSERVACIONES -->
+      <div class="neon-card p-4 mb-6">
+        <label class="block mb-2 font-semibold text-cyan-200">📝 Observaciones</label>
+        <textarea name="detalles" rows="4" class="futurista-input w-full" 
+                  placeholder="Notas para el cliente o internas…">{{ form.detalles.value|default:'' }}</textarea>
+      </div>
+
+      <!-- TOTALES + IVA/SALES TAX -->
+      <div class="neon-card p-6 mb-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div>
+            <label class="flex items-center gap-2 mb-4">
+              <input type="checkbox" id="include-tax" checked class="w-4 h-4 rounded">
+              <span class="font-semibold text-cyan-200">Incluir {% if user.empresa.pais == 'US' %}Sales Tax{% else %}IVA{% endif %}</span>
+            </label>
+            <div class="flex items-center gap-2">
+              <label class="font-semibold text-cyan-200">Tasa (%):</label>
+              <input id="tax-rate" class="futurista-input w-24" 
+                     value="19" type="number" step="0.01">
+            </div>
+          </div>
+          <div class="text-right space-y-2">
+            <div class="text-lg text-cyan-200">Subtotal repuestos: <span id="sum-rep" class="font-bold text-cyan-400">$0</span></div>
+            <div class="text-lg text-cyan-200">Subtotal servicios: <span id="sum-serv" class="font-bold text-cyan-400">$0</span></div>
+            <div class="text-lg text-cyan-200">Subtotal otros: <span id="sum-otros" class="font-bold text-cyan-400">$0</span></div>
+            <div class="text-lg opacity-70 text-cyan-200">Impuesto: <span id="tax-amt" class="font-bold text-cyan-400">$0</span></div>
+            <hr class="border-cyan-400/30">
+            <div class="text-3xl font-extrabold text-cyan-400 total-highlight p-2 rounded">
+              Total: <span id="grand-total">$0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTONES DE ACCIÓN -->
+      <div class="flex gap-4 justify-center mb-6">
+        <button type="submit" name="action" value="save" class="btn-type bg-emerald-800 hover:bg-emerald-700 px-8 py-3 text-xl">
+          💾 {% if es_edicion %}Guardar cambios{% else %}Crear documento{% endif %}
+        </button>
+        <button type="submit" name="action" value="save_print" class="btn-type bg-blue-800 hover:bg-blue-700 px-8 py-3 text-xl">
+          🖨️ Guardar e Imprimir
+        </button>
+        <a href="{% url 'documentos:lista_documentos' %}" class="btn-type bg-slate-800 hover:bg-slate-700 px-8 py-3 text-xl">
+          ❌ Cancelar
+        </a>
+      </div>
+    </form>
+
+    <!-- COMMAND PALETTE -->
+    <div id="command-palette" class="command-palette">
+      <div class="command-content">
+        <h3 class="text-xl font-bold mb-4 text-cyan-200">🔍 Búsqueda Universal (Ctrl+K)</h3>
+        <div class="flex gap-2 mb-4">
+          <button type="button" class="palette-tab active" data-tab="repuestos">⚙️ Repuestos</button>
+          <button type="button" class="palette-tab" data-tab="servicios">🔧 Servicios</button>
+          <button type="button" class="palette-tab" data-tab="otros">🏢 Otros</button>
+        </div>
+        <input id="palette-search" class="futurista-input w-full mb-4" 
+               placeholder="Buscar...">
+        <div id="palette-results" class="max-h-64 overflow-y-auto space-y-2">
+          <!-- Resultados dinámicos -->
+        </div>
+        <div class="text-right mt-4">
+          <button type="button" class="btn-type" onclick="closeCommandPalette()">Cerrar (Esc)</button>
+        </div>
+      </div>
     </div>
   </div>
-
-  {# Bloque country-aware #}
-  {% if company_country == 'CL' %}
-    {% include "taller/documentos/_form_country_cl.html" %}
-  {% else %}
-    {% include "taller/documentos/_form_country_us.html" %}
-  {% endif %}
-
-  {# Zona de ítems y totales: asegúrate de las clases/ids #}
-  <div class="mt-6">
-    <h3 class="font-semibold text-cyan-200 mb-2">{% trans "Resumen" %}</h3>
-    <div class="grid gap-2">
-      <div class="flex justify-between"><span>Neto repuestos</span><strong id="neto-repuestos">0,00</strong></div>
-      <div class="flex justify-between"><span>Neto servicios</span><strong id="neto-servicios">0,00</strong></div>
-      <div class="flex justify-between"><span>Neto otros</span><strong id="neto-otros">0,00</strong></div>
-      <div class="flex justify-between"><span>Impuesto</span><strong id="tax-amount">0,00</strong></div>
-      <hr class="border-cyan-500/20 my-1">
-      <div class="flex justify-between text-lg"><span>Total</span><strong id="total-doc">0,00</strong></div>
-    </div>
-  </div>
-
-  <div class="mt-6 flex items-center gap-2">
-    <button type="submit" class="px-4 py-2 rounded bg-cyan-600 hover:bg-cyan-700 text-white">
-      {% if es_edicion %}{% trans "Guardar cambios" %}{% else %}{% trans "Crear documento" %}{% endif %}
-    </button>
-    <a href="{% url 'documentos:lista_documentos' %}" class="px-4 py-2 rounded border border-cyan-500/30 text-cyan-200 hover:bg-cyan-800/20">
-      {% trans "Cancelar" %}
-    </a>
-  </div>
-</form>
+</body>
 
 {% endblock content %}
 
 {% block extra_js %}
-  <script>
-    // Guard para evitar doble inicialización si incluyes varios bundles
-    if (!window.__eg_totales_init__) { window.__eg_totales_init__ = true; }
-  </script>
-  <script src="{% static 'taller/documentos/totales.js' %}"></script>
-  {# si usas integracion_totales.js, inclúyelo después #}
-  {# <script src="{% static 'taller/documentos/integracion_totales.js' %}"></script> #}
+<script>
+// Guard para evitar doble inicialización si incluyes varios bundles
+if (!window.__eg_totales_init__) { window.__eg_totales_init__ = true; }
+console.log('🔧 DOC-JS-ATTACHED (extra_js block)');
+
+// 🧪 DEBUG: Botón temporal para probar búsqueda de clientes
+function debugTestClientes() {
+  console.log('🧪 TEST DEBUG: Verificando búsqueda de clientes...');
+  
+  // Verificar elementos
+  const clienteSearch = document.getElementById('cliente-search');
+  const clienteSelect = document.getElementById('cliente');
+  
+  console.log('🔍 Elementos:', {
+    'cliente-search': !!clienteSearch,
+    'cliente': !!clienteSelect
+  });
+  
+  if (!clienteSearch || !clienteSelect) {
+    console.error('❌ Elementos no encontrados');
+    return;
+  }
+  
+  // Test API
+  fetch('/api/v1/clientes/?q=juan')
+    .then(r => r.json())
+    .then(data => {
+      console.log('✅ API respuesta:', data);
+      if (data.results && data.results.length > 0) {
+        console.log('🎉 Clientes encontrados:', data.results.length);
+        
+        // Actualizar select manualmente
+        clienteSelect.innerHTML = '<option value="">Seleccione...</option>' + 
+          data.results.map(c => `<option value="${c.id}">${c.nombre} — ${c.identificador}</option>`).join('');
+        
+        console.log('✅ Select actualizado manualmente');
+      }
+    })
+    .catch(e => console.error('❌ Error API:', e));
+  
+  // Test event listener
+  setTimeout(() => {
+    console.log('⌨️ Simulando input...');
+    clienteSearch.value = 'juan';
+    clienteSearch.dispatchEvent(new Event('input', { bubbles: true }));
+  }, 1000);
+}
+
+// Crear botón de debug temporal
+setTimeout(() => {
+  const debugBtn = document.createElement('button');
+  debugBtn.type = 'button';
+  debugBtn.className = 'btn-type';
+  debugBtn.textContent = '🧪 Debug Clientes';
+  debugBtn.style.position = 'fixed';
+  debugBtn.style.top = '10px';
+  debugBtn.style.right = '10px';
+  debugBtn.style.zIndex = '9999';
+  debugBtn.onclick = debugTestClientes;
+  document.body.appendChild(debugBtn);
+  console.log('🧪 Botón debug agregado en esquina superior derecha');
+}, 2000);
+</script>
+<script src="{% static 'js/documento_form_futurista.js' %}?v={{ STATIC_VERSION|default:'dev' }}&t={% now 'U' %}"></script>
 {% endblock extra_js %}

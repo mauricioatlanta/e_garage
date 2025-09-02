@@ -1,0 +1,43 @@
+{% extends "taller/common/base_auth.html" %}
+{% load i18n static %}
+
+{% block title %}eGarage — {% trans "Iniciar sesión" %}{% endblock %}
+
+{% block content %}
+<section class="eg-card eg-glow">
+  <header class="eg-card-head">
+    <div class="eg-logo">eGarage</div>
+    <h1 class="eg-h1">{% trans "Iniciar sesión" %}</h1>
+    <p class="eg-sub">{% trans "Bienvenido de nuevo. Ingresa tus credenciales." %}</p>
+  </header>
+
+  <form method="post" class="eg-form" novalidate>
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    {# Render genérico de campos para que funcione con tu CustomLoginForm #}
+    {% for field in form %}
+      <label class="eg-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+      <div class="eg-input-wrap {% if field.errors %}eg-has-error{% endif %}">
+        {{ field }}
+      </div>
+      {% for err in field.errors %}
+        <div class="eg-error">{{ err }}</div>
+      {% endfor %}
+    {% endfor %}
+
+    <div class="eg-row">
+      <a class="eg-link" href="{% url 'account_reset_password' %}">{% trans "¿Has olvidado tu contraseña?" %}</a>
+    </div>
+
+    <button class="eg-btn eg-btn-primary" type="submit">{% trans "Iniciar sesión" %}</button>
+  </form>
+
+  <div class="eg-divider"><span>{% trans "o" %}</span></div>
+
+  <div class="eg-row eg-between">
+    <span class="eg-muted">{% trans "¿No tienes cuenta?" %}</span>
+    <a class="eg-btn eg-btn-ghost" href="{% url 'account_signup' %}">{% trans "Registrarse" %}</a>
+  </div>
+</section>
+{% endblock %}

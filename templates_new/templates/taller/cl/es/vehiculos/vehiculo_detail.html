@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% load country_url %}
+
+{% block extra_head %}
+<link href="/static/css/estilo_futurista.css" rel="stylesheet">
+<link href="/static/css/galaxy_theme.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  tsParticles.load("tsparticles", {
+    fullScreen: { enable: false },
+    background: { color: { value: "transparent" } },
+    particles: {
+      number: { value: 100 },
+      color: { value: "#00ffff" },
+      size: { value: 2 },
+      move: { enable: true, speed: 0.7 },
+      links: { enable: true, color: "#00e6d0", opacity: 0.3 }
+    }
+  });
+});
+</script>
+<style>
+body {
+  background: linear-gradient(120deg, #0f2027 0%, #2c5364 100%) fixed;
+  min-height: 100vh;
+}
+#tsparticles {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+}
+.cuadro {
+  position: relative;
+  z-index: 2;
+}
+.cuadro, .cuadro *, .detalle-card, .detalle-card * {
+  color: #fff !important;
+}
+.detalle-card {
+  background: rgba(0,0,0,0.6) !important;
+  color: #fff !important;
+  padding: 24px;
+  margin-bottom: 20px;
+  backdrop-filter: blur(8px) saturate(120%);
+  -webkit-backdrop-filter: blur(8px) saturate(120%);
+  border: 1.5px solid rgba(0,230,208,0.12);
+  border-radius: 8px;
+}
+.detalle-field {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: rgba(0,230,208,0.1);
+  border-radius: 6px;
+  border-left: 3px solid #00e6d0;
+}
+.detalle-field label {
+  font-weight: 600;
+  color: #00e6d0 !important;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.detalle-field .value {
+  font-size: 16px;
+  margin-top: 4px;
+  color: #fff !important;
+}
+.btn-futuristic {
+  background: linear-gradient(45deg, #00e6d0, #00b3a0);
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-block;
+  margin-right: 10px;
+  transition: all 0.3s ease;
+}
+.btn-futuristic:hover {
+  background: linear-gradient(45deg, #00b3a0, #008a7a);
+  color: white;
+  text-decoration: none;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0,230,208,0.3);
+}
+.btn-secondary {
+  background: linear-gradient(45deg, #6c757d, #545b62);
+}
+.btn-secondary:hover {
+  background: linear-gradient(45deg, #545b62, #495057);
+}
+.btn-warning {
+  background: linear-gradient(45deg, #ffc107, #e0a800);
+  color: #000 !important;
+}
+.btn-warning:hover {
+  background: linear-gradient(45deg, #e0a800, #c69500);
+  color: #000 !important;
+}
+.btn-danger {
+  background: linear-gradient(45deg, #dc3545, #c82333);
+}
+.btn-danger:hover {
+  background: linear-gradient(45deg, #c82333, #bd2130);
+}
+.font-orbitron {
+  font-family: 'Orbitron', 'Arial', sans-serif;
+}
+</style>
+{% endblock %}
+
+{% block fondo_extra %}
+<div id="tsparticles" class="fixed inset-0 -z-10"></div>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto cuadro">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold font-orbitron">Detalles del Vehículo</h1>
+    <a href="{% country_url 'lista_vehiculos' app_namespace='vehiculos' %}" 
+       class="btn-futuristic">← Volver a la lista</a>
+  </div>
+
+  <div class="detalle-card">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      
+      <!-- Información básica -->
+      <div class="detalle-field">
+        <label>Patente</label>
+        <div class="value">{{ object.patente }}</div>
+      </div>
+
+      <div class="detalle-field">
+        <label>VIN</label>
+        <div class="value">{{ object.vin|default:"No especificado" }}</div>
+      </div>
+
+      <div class="detalle-field">
+        <label>Marca</label>
+        <div class="value">{{ object.marca|sin_pais }}</div>
+      </div>
+
+      <div class="detalle-field">
+        <label>Modelo</label>
+        <div class="value">{{ object.modelo }}</div>
+      </div>
+
+      <div class="detalle-field">
+        <label>Año</label>
+        <div class="value">{{ object.anio }}</div>
+      </div>
+
+      <div class="detalle-field">
+        <label>Color</label>
+        <div class="value">{{ object.color|default:"No especificado" }}</div>
+      </div>
+
+      <div class="detalle-field">
+        <label>Motor</label>
+        <div class="value">{{ object.motor|default:"No especificado" }}</div>
+      </div>
+
+      <div class="detalle-field">
+        <label>Caja de cambios</label>
+        <div class="value">{{ object.caja|default:"No especificado" }}</div>
+      </div>
+
+      <div class="detalle-field">
+        <label>Kilometraje</label>
+        <div class="value">{{ object.kilometraje|default:"No especificado" }}</div>
+      </div>
+
+      <div class="detalle-field">
+        <label>Cliente</label>
+        <div class="value">{{ object.cliente.nombre }} {{ object.cliente.apellido }}</div>
+      </div>
+
+    </div>
+
+    {% if object.observaciones %}
+    <div class="detalle-field mt-6">
+      <label>Observaciones</label>
+      <div class="value">{{ object.observaciones }}</div>
+    </div>
+    {% endif %}
+
+    <!-- Acciones -->
+    <div class="flex flex-wrap gap-3 mt-8 pt-6 border-t border-gray-600">
+      <a href="{% url 'vehiculos:editar_vehiculo' vehiculo_id=object.id %}" 
+         class="btn-futuristic btn-warning">
+        ✏️ Editar
+      </a>
+      
+      <a href="{% url 'vehiculos:eliminar_vehiculo' vehiculo_id=object.id %}" 
+         class="btn-futuristic btn-danger">
+        🗑️ Eliminar
+      </a>
+      
+      <a href="{% country_url 'lista_vehiculos' app_namespace='vehiculos' %}" 
+         class="btn-futuristic btn-secondary">
+        📋 Ver todos los vehículos
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

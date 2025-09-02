@@ -28,19 +28,24 @@ def log_auditoria_documento(usuario, empresa, accion, documento=None, descripcio
 @login_required
 def lista_documentos(request):
     """Lista documentos con control de empresa y auditoría"""
-    try:
-        perfil = PerfilUsuario.objects.get(user=request.user)
-    except PerfilUsuario.DoesNotExist:
-        messages.error(request, "Usuario sin perfil de empresa configurado")
+    # BLINDAJE MULTI-TENANT: Verificar autenticación y empresa
+    if not request.user.is_authenticated:
+        messages.error(request, "Usuario no autenticado")
         return redirect('dashboard')
     
-    # Nueva lógica: mostrar solo documentos del usuario
-    documentos = Documento.objects.filter(user=request.user)
-    descripcion = "Acceso a lista de documentos del usuario"
-    # Log de auditoría (sin empresa)
+    empresa = getattr(request.user, 'empresa', None)
+    if not empresa:
+        messages.error(request, "Usuario sin empresa asignada")
+        return redirect('dashboard')
+    
+    # BLINDAJE: Mostrar solo documentos de la empresa del usuario
+    documentos = Documento.objects.filter(empresa=empresa)
+    descripcion = f"Acceso a lista de documentos de empresa {empresa.nombre}"
+    
+    # Log de auditoría
     log_auditoria_documento(
         usuario=request.user,
-        empresa=None,
+        empresa=empresa,
         accion='VIEW',
         descripcion=descripcion,
         request=request
@@ -175,8 +180,13 @@ def crear_documento(request):
             request=request
         )
 
-    # Cargar técnicos activos del taller
-    tecnicos = Tecnico.objects.filter(activo=True)
+    # BLINDAJE MULTI-TENANT: Cargar técnicos solo de la empresa del usuario
+    empresa = getattr(request.user, 'empresa', None)
+    if empresa and hasattr(Tecnico, 'empresa'):
+        tecnicos = Tecnico.objects.filter(activo=True, empresa=empresa)
+    else:
+        # Fallback si Tecnico no es multi-tenant
+        tecnicos = Tecnico.objects.filter(activo=True)
 
     return render(request, 'taller/documentos/crear_documento.html', {
         'form': form,
@@ -284,8 +294,13 @@ def editar_documento(request, documento_id):
             request=request
         )
 
-    # Cargar técnicos activos del taller
-    tecnicos = Tecnico.objects.filter(activo=True)
+    # BLINDAJE MULTI-TENANT: Cargar técnicos solo de la empresa del usuario
+    empresa = getattr(request.user, 'empresa', None)
+    if empresa and hasattr(Tecnico, 'empresa'):
+        tecnicos = Tecnico.objects.filter(activo=True, empresa=empresa)
+    else:
+        # Fallback si Tecnico no es multi-tenant
+        tecnicos = Tecnico.objects.filter(activo=True)
 
     return render(request, 'taller/documentos/crear_documento.html', {
         'form': form,

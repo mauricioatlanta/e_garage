@@ -61,6 +61,20 @@ def vehicle_analytics_api(request):
     
     return JsonResponse(data)
 
+@login_required 
+def clientes_analytics_api(request):
+    """API para analytics de clientes"""
+    
+    engine = AIReportEngine(request.user.empresa)
+    
+    data = {
+        'distribution': engine._get_clientes_distribution(),
+        'heatmap': engine._get_clientes_heatmap(),
+        'country': engine.empresa.pais
+    }
+    
+    return JsonResponse(data)
+
 @login_required
 def predictive_analytics_api(request):
     """API para predicciones con IA"""

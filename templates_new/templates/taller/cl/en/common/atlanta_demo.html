@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="{{ current_language|default:'en' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Atlanta 🍑 | TallerPro USA</title>
+    
+    <style>
+        :root {
+            --atlanta-peach: #ffcb9a;
+            --atlanta-blue: #003366;
+            --georgia-red: #cc0000;
+            --primary-green: #00ff9f;
+            --bg-dark: #0a0a0a;
+            --bg-card: #1a1a1a;
+            --text-light: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--atlanta-blue) 50%, #1a1a2e 100%);
+            color: var(--text-light);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: rgba(255, 203, 154, 0.1);
+            border-radius: 20px;
+            border: 2px solid var(--atlanta-peach);
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--atlanta-peach);
+            text-shadow: 0 0 20px rgba(255, 203, 154, 0.5);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .atlanta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .atlanta-card {
+            background: rgba(26, 26, 26, 0.9);
+            border: 1px solid var(--atlanta-peach);
+            border-radius: 15px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .atlanta-card:hover {
+            border-color: var(--primary-green);
+            box-shadow: 0 0 20px rgba(0, 255, 159, 0.3);
+            transform: translateY(-5px);
+        }
+
+        .atlanta-card h3 {
+            color: var(--atlanta-peach);
+            margin-bottom: 1rem;
+            font-size: 1.4rem;
+        }
+
+        .atlanta-info {
+            background: rgba(0, 51, 102, 0.3);
+            border: 1px solid var(--atlanta-blue);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255, 203, 154, 0.2);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: var(--atlanta-peach);
+            font-weight: bold;
+        }
+
+        .info-value {
+            color: var(--text-light);
+        }
+
+        .services-atlanta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .service-atlanta {
+            background: rgba(204, 0, 0, 0.1);
+            border: 1px solid var(--georgia-red);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .service-atlanta:hover {
+            border-color: var(--primary-green);
+            box-shadow: 0 0 15px rgba(0, 255, 159, 0.3);
+        }
+
+        .service-es {
+            color: var(--text-light);
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .service-en {
+            color: var(--atlanta-peach);
+            font-style: italic;
+        }
+
+        .brands-atlanta {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .brand-item {
+            background: rgba(0, 255, 159, 0.1);
+            border: 1px solid var(--primary-green);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            color: var(--primary-green);
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .brand-item:hover {
+            background: var(--primary-green);
+            color: var(--bg-dark);
+        }
+
+        .tax-calculator {
+            background: linear-gradient(135deg, rgba(255, 203, 154, 0.1), rgba(0, 51, 102, 0.1));
+            border: 2px solid var(--atlanta-peach);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .calc-input {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .calc-input input {
+            background: rgba(26, 26, 26, 0.8);
+            border: 1px solid var(--atlanta-peach);
+            border-radius: 5px;
+            padding: 0.8rem;
+            color: var(--text-light);
+            font-size: 1rem;
+            width: 150px;
+        }
+
+        .calc-input button {
+            background: var(--atlanta-peach);
+            color: var(--bg-dark);
+            border: none;
+            border-radius: 5px;
+            padding: 0.8rem 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .calc-input button:hover {
+            background: var(--primary-green);
+            box-shadow: 0 0 15px rgba(0, 255, 159, 0.5);
+        }
+
+        .calc-result {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .calc-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem 0;
+        }
+
+        .calc-row.total {
+            border-top: 2px solid var(--atlanta-peach);
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: var(--primary-green);
+        }
+
+        .currency {
+            color: var(--primary-green);
+            font-weight: bold;
+        }
+
+        .back-btn {
+            display: inline-block;
+            background: linear-gradient(45deg, var(--primary-green), var(--atlanta-blue));
+            color: var(--text-light);
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(0, 255, 159, 0.3);
+            margin-top: 2rem;
+        }
+
+        .back-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(0, 255, 159, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .atlanta-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .calc-input {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .calc-input input,
+            .calc-input button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1>🍑 Welcome to Atlanta!</h1>
+            <p>
+                Experience TallerPro customized for the Atlanta automotive market with local tax rates, 
+                popular vehicle brands, and services tailored for Georgia's automotive landscape.
+            </p>
+        </section>
+
+        <!-- Atlanta Information -->
+        {% if ciudad %}
+        <div class="atlanta-info">
+            <h3 style="color: var(--atlanta-peach); margin-bottom: 1rem;">📍 Atlanta Market Information</h3>
+            <div class="info-row">
+                <span class="info-label">City:</span>
+                <span class="info-value">{{ ciudad.nombre_completo }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Population:</span>
+                <span class="info-value">{{ ciudad.poblacion|floatformat:0|default:"500,000+" }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">State Sales Tax:</span>
+                <span class="info-value">{{ ciudad.estado.sales_tax }}%</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Local Sales Tax:</span>
+                <span class="info-value">{{ ciudad.sales_tax_local }}%</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Total Tax Rate:</span>
+                <span class="info-value currency">{{ ciudad.sales_tax_total }}%</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Timezone:</span>
+                <span class="info-value">{{ timezone_local }} (Eastern Time)</span>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Features Grid -->
+        <div class="atlanta-grid">
+            <!-- Popular Brands -->
+            <div class="atlanta-card">
+                <h3>🚗 Popular Brands in Atlanta</h3>
+                <p style="color: #cccccc; margin-bottom: 1rem;">
+                    Vehicle brands commonly serviced in the Atlanta metropolitan area.
+                </p>
+                <div class="brands-atlanta">
+                    {% for marca in marcas_populares_atlanta %}
+                    <div class="brand-item">{{ marca.nombre }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Atlanta Services -->
+            <div class="atlanta-card">
+                <h3>🔧 Atlanta-Specific Services</h3>
+                <p style="color: #cccccc; margin-bottom: 1rem;">
+                    Services adapted for Atlanta's climate and regulations.
+                </p>
+                <div class="services-atlanta">
+                    {% for servicio in servicios_atlanta %}
+                    <div class="service-atlanta">
+                        <div class="service-es">{{ servicio.es }}</div>
+                        <div class="service-en">{{ servicio.en }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Tax Calculator -->
+        <div class="tax-calculator">
+            <h3 style="color: var(--atlanta-peach); margin-bottom: 1rem;">💰 Atlanta Tax Calculator</h3>
+            <p style="color: #cccccc; margin-bottom: 1.5rem;">
+                Calculate total cost including Georgia state tax and Atlanta local tax.
+            </p>
+            
+            <div class="calc-input">
+                <input type="number" id="subtotalInput" placeholder="Enter amount ($)" value="250.00" step="0.01">
+                <button onclick="calcularImpuesto()">Calculate Tax</button>
+            </div>
+
+            <div class="calc-result" id="calcResult">
+                {% if tax_info %}
+                <div class="calc-row">
+                    <span>Subtotal:</span>
+                    <span class="currency">${{ tax_info.subtotal }}</span>
+                </div>
+                <div class="calc-row">
+                    <span>Georgia Sales Tax ({{ tax_info.tax_rate }}%):</span>
+                    <span class="currency">${{ tax_info.tax }}</span>
+                </div>
+                <div class="calc-row total">
+                    <span>Total Amount:</span>
+                    <span class="currency">${{ tax_info.total }}</span>
+                </div>
+                {% else %}
+                <div style="text-align: center; color: #cccccc;">
+                    Enter an amount to see tax calculation
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Back Button -->
+        <div style="text-align: center;">
+            <a href="/demo-usa/" class="back-btn">
+                ← Back to USA Demo
+            </a>
+        </div>
+    </div>
+
+    <script>
+        async function calcularImpuesto() {
+            const subtotal = document.getElementById('subtotalInput').value;
+            const resultDiv = document.getElementById('calcResult');
+            
+            if (!subtotal || subtotal <= 0) {
+                resultDiv.innerHTML = '<div style="text-align: center; color: #cc0000;">Please enter a valid amount</div>';
+                return;
+            }
+
+            try {
+                // Simulación de cálculo (en una implementación real usarías la API)
+                const subtotalNum = parseFloat(subtotal);
+                const taxRate = 8.90; // Atlanta tax rate
+                const taxAmount = subtotalNum * (taxRate / 100);
+                const total = subtotalNum + taxAmount;
+
+                resultDiv.innerHTML = `
+                    <div class="calc-row">
+                        <span>Subtotal:</span>
+                        <span class="currency">$${subtotalNum.toFixed(2)}</span>
+                    </div>
+                    <div class="calc-row">
+                        <span>Georgia Sales Tax (${taxRate}%):</span>
+                        <span class="currency">$${taxAmount.toFixed(2)}</span>
+                    </div>
+                    <div class="calc-row total">
+                        <span>Total Amount:</span>
+                        <span class="currency">$${total.toFixed(2)}</span>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = '<div style="text-align: center; color: #cc0000;">Error calculating tax</div>';
+            }
+        }
+
+        // Animación de entrada
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.atlanta-card').forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'all 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 200);
+            });
+        });
+    </script>
+</body>
+</html>

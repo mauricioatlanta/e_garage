@@ -36,6 +36,20 @@ def editar_repuesto(request, *args, **kwargs):
     log.info("FBV shim: editar_repuesto")
     return RepuestoUpdateView.as_view()(request, *args, **kwargs)
 
+def eliminar_repuesto(request, pk):
+    """Eliminar un repuesto"""
+    if request.method == 'POST':
+        try:
+            repuesto = get_object_or_404(Repuesto, pk=pk)
+            repuesto.delete()
+            messages.success(request, 'Repuesto eliminado exitosamente.')
+            return JsonResponse({'success': True})
+        except Exception as e:
+            log.error(f"Error al eliminar repuesto: {e}")
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
+    else:
+        return JsonResponse({'success': False, 'error': 'Método no permitido'}, status=405)
+
 from django.contrib.auth.decorators import login_required
 @login_required
 @login_required

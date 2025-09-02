@@ -306,8 +306,8 @@
           <td><strong>{{ repuesto.codigo }}</strong></td>
           <td>{{ repuesto.nombre }}</td>
           <td class="cantidad">{{ repuesto.cantidad }}</td>
-          <td class="precio">${{ repuesto.precio|floatformat:0 }}</td>
-          <td class="precio">${{ repuesto.total|floatformat:0 }}</td>
+          <td class="precio" data-money="{{ repuesto.precio }}"></td>
+          <td class="precio" data-money="{{ repuesto.total }}"></td>
         </tr>
         {% endfor %}
       </tbody>
@@ -332,7 +332,7 @@
         {% for servicio in servicios %}
         <tr>
           <td>{{ servicio.nombre }}</td>
-          <td class="precio">${{ servicio.precio|floatformat:0 }}</td>
+          <td class="precio" data-money="{{ servicio.precio }}"></td>
         </tr>
         {% endfor %}
       </tbody>
@@ -442,6 +442,11 @@
         📄 Exportar PDF
       </a>
   {% endif %}
+  
+  <!-- Botón de debug temporal -->
+  <button onclick="formatMoney()" class="btn-accion" style="background: #ff6b6b;">
+    🔧 Debug: Formatear Monedas
+  </button>
   </div>
 </div>
 
@@ -453,6 +458,9 @@ console.log('Número:', '{{ documento.numero_documento }}');
 console.log('Repuestos encontrados:', {{ repuestos|length }});
 console.log('Servicios encontrados:', {{ servicios|length }});
 console.log('Total general:', {{ total|floatformat:0 }});
+console.log('Company Country:', '{{ company_country }}');
+console.log('Data Locale:', '{% if company_country == 'US' %}en-US{% else %}es-CL{% endif %}');
+console.log('Data Currency:', '{% if company_country == 'US' %}USD{% else %}CLP{% endif %}');
 
 {% if repuestos %}
 console.log('=== REPUESTOS ===');
@@ -469,16 +477,53 @@ console.log('- {{ servicio.nombre }}: ${{ servicio.precio }}');
 {% endif %}
 
 // Formateo de monedas según país
-document.addEventListener('DOMContentLoaded', function () {
+function formatMoney() {
   const root = document.getElementById('doc-root');
-  const locale = root?.dataset.locale || 'es-CL';
-  const currency = root?.dataset.currency || 'CLP';
-  const fmt = new Intl.NumberFormat(locale, { style: 'currency', currency });
-
-  document.querySelectorAll('[data-money]').forEach(el => {
-    const raw = Number(el.getAttribute('data-money') || 0);
-    el.textContent = fmt.format(isNaN(raw) ? 0 : raw);
+  if (!root) {
+    console.log('No se encontró el elemento doc-root, reintentando...');
+    setTimeout(formatMoney, 100);
+    return;
+  }
+  
+  const locale = root.dataset.locale || 'es-CL';
+  const currency = root.dataset.currency || 'CLP';
+  
+  // Asegurar que el locale sea correcto para USA
+  let finalLocale = locale;
+  if (currency === 'USD') {
+    finalLocale = 'en-US';
+  } else if (currency === 'CLP') {
+    finalLocale = 'es-CL';
+  }
+  
+  console.log('Formateando monedas con:', { locale: finalLocale, currency });
+  
+  const fmt = new Intl.NumberFormat(finalLocale, { 
+    style: 'currency', 
+    currency: currency,
+    minimumFractionDigits: currency === 'USD' ? 2 : 0,
+    maximumFractionDigits: currency === 'USD' ? 2 : 0
   });
-});
+
+  const moneyElements = document.querySelectorAll('[data-money]');
+  console.log('Elementos encontrados con data-money:', moneyElements.length);
+  
+  moneyElements.forEach((el, index) => {
+    const raw = Number(el.getAttribute('data-money') || 0);
+    const formatted = fmt.format(isNaN(raw) ? 0 : raw);
+    el.textContent = formatted;
+    console.log(`[${index}] Formateado:`, raw, '→', formatted);
+  });
+}
+
+// Ejecutar cuando el DOM esté listo
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', formatMoney);
+} else {
+  formatMoney();
+}
+
+// También ejecutar después de un pequeño delay por si acaso
+setTimeout(formatMoney, 500);
 </script>
 {% endblock %}

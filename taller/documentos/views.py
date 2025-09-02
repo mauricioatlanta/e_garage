@@ -189,12 +189,24 @@ def autocomplete_cliente(request):
 from django.http import JsonResponse
 from taller.models.vehiculos import Vehiculo
 
-# Devuelve los vehículos asociados a un cliente (por cliente_id)
+# Devuelve los vehículos asociados a un cliente (por cliente_id) con filtrado de empresa
 def obtener_vehiculos_por_cliente(request):
     cliente_id = request.GET.get('cliente_id')
     if not cliente_id:
         return JsonResponse([], safe=False)
-    vehiculos = Vehiculo.objects.filter(cliente_id=cliente_id).values('id', 'patente', 'marca_id', 'modelo_id')
+    
+    # Obtener empresa del usuario autenticado
+    try:
+        empresa = request.user.empresa
+    except AttributeError:
+        return JsonResponse([], safe=False)
+    
+    # Filtrar vehículos por cliente y empresa
+    vehiculos = Vehiculo.objects.filter(
+        cliente_id=cliente_id,
+        cliente__empresa=empresa
+    ).values('id', 'patente', 'marca_id', 'modelo_id')
+    
     return JsonResponse(list(vehiculos), safe=False)
 
 import logging; log = logging.getLogger(__name__)
@@ -282,7 +294,7 @@ def crear_documento(request):
             post_data['mecanico'] = mecanico_obj.pk
             print(f"[DEBUG CREAR] Mecánico creado/encontrado: {mecanico_obj.nombre} (ID: {mecanico_obj.pk})")
             
-        form = DocumentoForm(post_data)
+        form = DocumentoForm(post_data, empresa=empresa, user=request.user)
         if form.is_valid():
             print(f"[DEBUG CREAR] Formulario válido")
             documento = form.save(commit=False)
@@ -384,13 +396,24 @@ def crear_documento(request):
         # GET: Mostrar formulario vacío
         from datetime import date
         hoy = date.today().strftime('%Y-%m-%d')
-        form = DocumentoForm(initial={'fecha': hoy})
+        form = DocumentoForm(initial={'fecha': hoy}, empresa=empresa, user=request.user)
 
     # Cargar mecánicos activos del taller
     from taller.models.tecnico import Tecnico
     mecanicos = Tecnico.objects.filter(empresa=empresa, activo=True)
 
-    return render(request, 'taller/documentos/crear_documento.html', {
+    # Usar template resolution en lugar de template hardcodeado
+    from taller.utils.templates import select_country_lang_template
+    from django.utils.translation import get_language
+    from django.template.response import TemplateResponse
+    
+    template_name = select_country_lang_template(
+        "documentos/crear_documento.html", 
+        getattr(empresa, 'pais', 'cl').lower(), 
+        get_language()
+    )
+
+    return TemplateResponse(request, template_name, {
         'form': form,
         'mecanicos': mecanicos,
         'es_edicion': False,
@@ -499,7 +522,18 @@ def ver_documento(request, documento_id):
     
     print(f"[DEBUG VER] Totales calculados - Repuestos: ${subtotal_repuestos}, Servicios: ${subtotal_servicios}, Otros: ${subtotal_otros_servicios}, IVA: ${iva}, Total: ${total}")
 
-    return render(request, 'taller/documentos/ver_documento_nuevo.html', {
+    # Usar template resolution en lugar de template hardcodeado
+    from taller.utils.templates import select_country_lang_template
+    from django.utils.translation import get_language
+    from django.template.response import TemplateResponse
+    
+    template_name = select_country_lang_template(
+        "documentos/ver_documento_nuevo.html", 
+        getattr(request.user.empresa, 'pais', 'cl').lower(), 
+        get_language()
+    )
+
+    return TemplateResponse(request, template_name, {
         'documento': documento,
         'lineas_repuesto': repuestos,
         'lineas_servicio': servicios, 
@@ -571,9 +605,29 @@ def lista_documentos(request):
         # Si no tiene empresa asociada, no mostrar documentos
         documentos = Documento.objects.none()
     
-    return render(request, 'taller/documentos/lista_documentos.html', {
+    # Usar template resolution en lugar de template hardcodeado
+    from taller.utils.templates import select_country_lang_template
+    from django.utils.translation import get_language
+    from django.template.response import TemplateResponse
+    
+    template_name = select_country_lang_template(
+        "documentos/lista_documentos.html", 
+        getattr(request.user.empresa, 'pais', 'cl').lower(), 
+        get_language()
+    )
+
+    # Calcular total de facturas (excluyendo órdenes de trabajo y presupuestos)
+    from django.db.models import Sum
+    facturas_stats = documentos.filter(tipo='FAC').aggregate(
+        total_facturas=Sum('total_general_anotado'),
+        count_facturas=Count('id')
+    )
+    
+    return TemplateResponse(request, template_name, {
         'documentos': documentos,
-        'country': country
+        'country': country,
+        'total_facturas': facturas_stats['total_facturas'] or 0,
+        'count_facturas': facturas_stats['count_facturas'] or 0
     })
 
 
@@ -719,7 +773,18 @@ def editar_documento(request, documento_id):
     from taller.models.tecnico import Tecnico
     mecanicos = Tecnico.objects.filter(empresa=empresa, activo=True)
 
-    return render(request, 'taller/documentos/editar_documento_nuevo.html', {
+    # Usar template resolution en lugar de template hardcodeado
+    from taller.utils.templates import select_country_lang_template
+    from django.utils.translation import get_language
+    from django.template.response import TemplateResponse
+    
+    template_name = select_country_lang_template(
+        "documentos/editar_documento_nuevo.html", 
+        getattr(empresa, 'pais', 'cl').lower(), 
+        get_language()
+    )
+
+    return TemplateResponse(request, template_name, {
         'form': form,
         'documento': documento,  # Pasar documento al template
         'servicios': servicios,
@@ -823,9 +888,9 @@ def exportar_documento_pdf(request, documento_id):
     doc = get_object_or_404(Documento, id=documento_id)
     
     # Calcular totales
-    total_repuestos = sum(r.total for r in doc.repuestos.all())
-    total_servicios = sum(s.precio for s in doc.servicios.all())
-    total_otros_servicios = sum(os.precio_cliente for os in doc.otros_servicios.all())
+    total_repuestos = sum(r.cantidad * r.precio_unitario for r in doc.lineas_repuesto.all())
+    total_servicios = sum(s.cantidad * s.precio_unitario for s in doc.lineas_servicio.all())
+    total_otros_servicios = sum(os.cantidad * os.precio_cliente for os in doc.lineas_otro_servicio.all())
     
     subtotal = total_repuestos + total_servicios + total_otros_servicios
     iva = subtotal * Decimal('0.19') if doc.incluir_iva else Decimal('0')

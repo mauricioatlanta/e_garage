@@ -33,6 +33,9 @@ urlpatterns = [
     # Login para suscriptores de Chile (redirige al login global, pero aquí puedes poner una vista personalizada si lo deseas)
     path('login/', TemplateView.as_view(template_name='registration/login.html'), name='account_login'),
     
+    # Registro para Chile (español por defecto)
+    path('registro/', include('onboarding_urls')),
+    
     # === AJAX JERÁRQUICO - VEHÍCULOS ===
     path('taller/ajax/load-modelos/', ajax_views.load_modelos, name='ajax_load_modelos'),
     path('taller/ajax/load-motores/', ajax_views.load_motores, name='ajax_load_motores'),

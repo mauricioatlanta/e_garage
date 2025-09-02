@@ -1,0 +1,162 @@
+{% extends "taller/cl/es/base.html" %}
+{% load static %}
+
+{% block title %}Configuración de Empresa{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-6 mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-white">⚙️ Configuración de Empresa</h1>
+                    <p class="text-blue-100 mt-2">Gestiona la configuración general de tu empresa</p>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="{% url 'taller:settings:ajustar_configuracion' %}" 
+                       class="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
+                        ✏️ Editar Configuración
+                    </a>
+                    <a href="{% url 'taller:tecnicos:lista_tecnicos' %}" 
+                       class="bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600 transition-colors">
+                        👥 Gestionar Técnicos
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configuración Actual -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Información General -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">📋 Información General</h2>
+                
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
+                            {% if cfg.logo %}
+                                <img src="{{ cfg.logo.url }}" alt="Logo" class="w-12 h-12 object-contain">
+                            {% else %}
+                                <span class="text-2xl">🏢</span>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">{{ cfg.nombre_publico|default:cfg.empresa.nombre }}</h3>
+                            <p class="text-gray-600">{{ cfg.empresa.nombre }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="border-t pt-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-sm font-medium text-gray-600">Moneda</label>
+                                <p class="text-lg font-semibold">{{ cfg.moneda }}</p>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-gray-600">IVA</label>
+                                <p class="text-lg font-semibold">{{ cfg.iva_porcentaje }}%</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configuración de Documentos -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">📄 Configuración de Documentos</h2>
+                
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div>
+                            <h4 class="font-semibold text-gray-800">Aplicar IVA por defecto</h4>
+                            <p class="text-sm text-gray-600">Los documentos incluirán IVA automáticamente</p>
+                        </div>
+                        <div class="flex items-center">
+                            {% if cfg.aplicar_iva_por_defecto %}
+                                <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">✅ Activado</span>
+                            {% else %}
+                                <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">❌ Desactivado</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div>
+                            <h4 class="font-semibold text-gray-800">Dividir por técnico</h4>
+                            <p class="text-sm text-gray-600">Asignar técnico responsable a líneas</p>
+                        </div>
+                        <div class="flex items-center">
+                            {% if cfg.dividir_por_tecnico_por_defecto %}
+                                <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">✅ Activado</span>
+                            {% else %}
+                                <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">❌ Desactivado</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    {% if cfg.tecnico_por_defecto %}
+                    <div class="p-3 bg-blue-50 rounded-lg">
+                        <h4 class="font-semibold text-gray-800">Técnico por defecto</h4>
+                        <p class="text-blue-600">{{ cfg.tecnico_por_defecto.nombre }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Técnicos -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mt-8">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">👥 Técnicos de la Empresa</h2>
+                <a href="{% url 'taller:tecnicos:crear_tecnico' %}" 
+                   class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                    ➕ Agregar Técnico
+                </a>
+            </div>
+            
+            {% if tecnicos %}
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {% for tecnico in tecnicos %}
+                    <div class="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                                <span class="text-blue-600 font-semibold">{{ tecnico.nombre|first|upper }}</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-800">{{ tecnico.nombre }}</h4>
+                                <p class="text-sm text-gray-600">{{ tecnico.especialidad|default:"Sin especialidad" }}</p>
+                            </div>
+                        </div>
+                        <div class="mt-3 flex space-x-2">
+                            <a href="{% url 'taller:tecnicos:editar_tecnico' tecnico.id %}" 
+                               class="text-blue-600 hover:text-blue-800 text-sm">✏️ Editar</a>
+                            <a href="{% url 'taller:tecnicos:detalle_tecnico' tecnico.id %}" 
+                               class="text-gray-600 hover:text-gray-800 text-sm">👁️ Ver</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-8">
+                    <div class="text-6xl mb-4">👥</div>
+                    <h3 class="text-xl font-semibold text-gray-600 mb-2">No hay técnicos registrados</h3>
+                    <p class="text-gray-500 mb-4">Agrega técnicos para poder asignarlos a los documentos</p>
+                    <a href="{% url 'taller:tecnicos:crear_tecnico' %}" 
+                       class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                        ➕ Agregar Primer Técnico
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Acciones -->
+        <div class="mt-8 flex justify-center space-x-4">
+            <a href="{% url 'taller:dashboard' %}" 
+               class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-colors">
+                ← Volver al Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

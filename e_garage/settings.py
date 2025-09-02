@@ -79,10 +79,11 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'taller.context_processors.empresa_contexto',
-                'taller.context_processors.company_branding',
+                'taller.context_processors.company_branding_context',  # ✅ NUESTRO - DEJAR SOLO ESTE
+                # 'taller.context_processors.empresa_contexto',  # ❌ DESHABILITADO - CONFLICTO
+                # 'taller.context_processors.company_branding',  # ❌ DESHABILITADO - CONFLICTO
                 'django.template.context_processors.static',
-                'egarage.context_processors.branding',
+                # 'egarage.context_processors.branding',  # ❌ DESHABILITADO - CONFLICTO
                 'gestion_taller.context_processors.debug_flags',
             ],
         },

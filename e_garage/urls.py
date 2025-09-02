@@ -8,6 +8,7 @@ from allauth.account import views as allauth_views
 from django.contrib.auth import views as auth_views
 from django.views.i18n import JavaScriptCatalog
 from taller.taller_main_urls import company_settings_view
+import urls_signup
 
 # Landing principal y patrones por país (MIGRACIÓN COMPLETA)
 urlpatterns = [
@@ -56,7 +57,8 @@ urlpatterns = [
     # Endpoints específicos
     path('ubicacion/', include('ubicacion.urls')),
     path('registro/', include('onboarding_urls')),
-    path('signup/', include('urls_signup')),
+    path('signup/', include(urls_signup)),
+    path('accounts/signup/', include(urls_signup)),  # Redirección para enlaces legacy
     
     # Selector de país (legacy)
     path('selector-pais-egarage/', TemplateView.as_view(template_name='selector-pais-egarage.html'), name='selector_pais_egarage'),

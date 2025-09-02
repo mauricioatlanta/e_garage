@@ -18,7 +18,7 @@ def crear_cliente(request):
             cliente = form.save(commit=False)
             cliente.user = request.user
             cliente.save()
-            return redirect('clientes:lista_clientes')
+            return redirect('taller:clientes:lista_clientes')
     else:
         form = ClienteForm()
     return render(request, 'clientes/crear_cliente.html', {'form': form})

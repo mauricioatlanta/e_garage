@@ -1,0 +1,176 @@
+{% extends "taller/cl/es/base.html" %}
+{% load static %}
+
+{% block title %}Editar Configuración de Empresa{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-6 mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-white">✏️ Editar Configuración</h1>
+                    <p class="text-blue-100 mt-2">Modifica la configuración de tu empresa</p>
+                </div>
+                <a href="{% url 'taller:settings:ver_configuracion' %}" 
+                   class="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
+                    ← Volver
+                </a>
+            </div>
+        </div>
+
+        <!-- Formulario -->
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <form method="post" enctype="multipart/form-data" class="space-y-8">
+                {% csrf_token %}
+                
+                <!-- Mensajes de error -->
+                {% if form.errors %}
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                        <h3 class="text-red-800 font-semibold mb-2">Errores en el formulario:</h3>
+                        <ul class="text-red-700 space-y-1">
+                            {% for field, errors in form.errors.items %}
+                                {% for error in errors %}
+                                    <li>• {{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                <!-- Información General -->
+                <div class="border-b pb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">📋 Información General</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="{{ form.nombre_publico.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                Nombre Público
+                            </label>
+                            {{ form.nombre_publico }}
+                            {% if form.nombre_publico.help_text %}
+                                <p class="text-sm text-gray-500 mt-1">{{ form.nombre_publico.help_text }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <div>
+                            <label for="{{ form.moneda.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                Moneda
+                            </label>
+                            {{ form.moneda }}
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6">
+                        <label for="{{ form.logo.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            Logo de la Empresa
+                        </label>
+                        <div class="flex items-center space-x-4">
+                            {% if cfg.logo %}
+                                <div class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
+                                    <img src="{{ cfg.logo.url }}" alt="Logo actual" class="w-12 h-12 object-contain">
+                                </div>
+                            {% endif %}
+                            <div class="flex-1">
+                                {{ form.logo }}
+                                <p class="text-sm text-gray-500 mt-1">Formatos: PNG, JPG, SVG. Máximo 2MB.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Configuración Fiscal -->
+                <div class="border-b pb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">💰 Configuración Fiscal</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="{{ form.iva_porcentaje.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                Porcentaje de IVA
+                            </label>
+                            {{ form.iva_porcentaje }}
+                            <p class="text-sm text-gray-500 mt-1">Porcentaje de IVA aplicado a los documentos</p>
+                        </div>
+                        
+                        <div class="flex items-center space-x-3">
+                            {{ form.aplicar_iva_por_defecto }}
+                            <div>
+                                <label for="{{ form.aplicar_iva_por_defecto.id_for_label }}" class="text-sm font-medium text-gray-700">
+                                    Aplicar IVA por defecto
+                                </label>
+                                <p class="text-sm text-gray-500">Los documentos incluirán IVA automáticamente</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Configuración de Técnicos -->
+                <div class="border-b pb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">👥 Configuración de Técnicos</h2>
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <label for="{{ form.tecnico_por_defecto.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                Técnico por Defecto
+                            </label>
+                            {{ form.tecnico_por_defecto }}
+                            <p class="text-sm text-gray-500 mt-1">Técnico asignado por defecto a nuevos documentos</p>
+                        </div>
+                        
+                        <div class="flex items-center space-x-3">
+                            {{ form.dividir_por_tecnico_por_defecto }}
+                            <div>
+                                <label for="{{ form.dividir_por_tecnico_por_defecto.id_for_label }}" class="text-sm font-medium text-gray-700">
+                                    Dividir por técnico
+                                </label>
+                                <p class="text-sm text-gray-500">Asignar técnico responsable a cada línea de documento</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Personalización -->
+                <div class="pb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">🎨 Personalización</h2>
+                    
+                    <div>
+                        <label for="{{ form.brand_color.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            Color de Marca
+                        </label>
+                        {{ form.brand_color }}
+                        <p class="text-sm text-gray-500 mt-1">Color principal para personalizar la interfaz</p>
+                    </div>
+                </div>
+
+                <!-- Botones -->
+                <div class="flex justify-end space-x-4 pt-6 border-t">
+                    <a href="{% url 'taller:settings:ver_configuracion' %}" 
+                       class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-colors">
+                        Cancelar
+                    </a>
+                    <button type="submit" 
+                            class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+                        💾 Guardar Configuración
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Estilos para mejorar la apariencia de los campos */
+.form-control, .form-select {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+}
+
+.form-check-input {
+    @apply w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500;
+}
+
+input[type="color"] {
+    @apply w-16 h-10 border border-gray-300 rounded-lg cursor-pointer;
+}
+</style>
+{% endblock %}

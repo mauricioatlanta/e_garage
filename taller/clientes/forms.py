@@ -17,6 +17,7 @@ class ClienteForm(forms.ModelForm):
             if qs.exists():
                 self.add_error('email', 'Ya existe un cliente con este email para esta empresa.')
         return cleaned_data
+    
     # Campos para Chile
     region = forms.ModelChoiceField(
         queryset=TallerRegion.objects.all(),
@@ -49,7 +50,6 @@ class ClienteForm(forms.ModelForm):
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Zipcode'})
     )
 
-
     class Meta:
         model = Cliente
         fields = ['nombre', 'apellido', 'telefono', 'direccion', 'region', 'ciudad', 'estado_usa', 'ciudad_usa', 'zipcode', 'email']
@@ -62,8 +62,15 @@ class ClienteForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-        empresa = kwargs.pop('empresa', None)  # pop antes de super()
+        self.empresa = kwargs.pop('empresa', None)  # Almacenar empresa
         super().__init__(*args, **kwargs)
+
+        # Debug logging
+        print(f"🔍 [ClienteForm] empresa: {self.empresa}")
+        if self.empresa:
+            print(f"🔍 [ClienteForm] empresa.pais: {getattr(self.empresa, 'pais', 'NO_HAY_PAIS')}")
+        else:
+            print(f"🔍 [ClienteForm] NO HAY EMPRESA")
 
         # Chile: región/ciudad
         if 'region' in self.data and self.data.get('region') not in [None, '']:
@@ -89,20 +96,36 @@ class ClienteForm(forms.ModelForm):
         else:
             self.fields['ciudad_usa'].queryset = CiudadUSA.objects.none()
 
-        # Ocultar campos según país
-
         # Exponer el país como atributo público para el template
         pais = None
-        if empresa:
-            pais = empresa.pais
+        if self.empresa:
+            pais = self.empresa.pais
         elif self.instance.pk and hasattr(self.instance, 'empresa') and self.instance.empresa:
             pais = self.instance.empresa.pais
         self.pais = pais
 
+        print(f"🔍 [ClienteForm] pais detectado: {self.pais}")
+
+        # Ocultar campos según el país
         if self.pais == 'US':
+            print(f"🔍 [ClienteForm] Ocultando campos de Chile para USA")
             self.fields['region'].widget = forms.HiddenInput()
             self.fields['ciudad'].widget = forms.HiddenInput()
         else:
+            print(f"🔍 [ClienteForm] Ocultando campos de USA para Chile")
             self.fields['estado_usa'].widget = forms.HiddenInput()
             self.fields['ciudad_usa'].widget = forms.HiddenInput()
             self.fields['zipcode'].widget = forms.HiddenInput()
+
+    def save(self, commit=True):
+        obj = super().save(commit=False)
+        
+        # BLINDAJE MULTI-TENANT: SIEMPRE asignar empresa
+        if self.empresa and not obj.empresa_id:
+            obj.empresa = self.empresa
+        
+        if commit:
+            obj.save()
+            self.save_m2m()
+        return obj
+

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test AJAX Modelos</title>
+</head>
+<body>
+    <h1>Test de Carga de Modelos</h1>
+    
+    <label for="marca">Marca:</label>
+    <select id="marca">
+        <option value="">---------</option>
+        <option value="6">Toyota</option>
+        <option value="8">Chevrolet</option>
+        <option value="9">Ford</option>
+    </select>
+    
+    <br><br>
+    
+    <label for="modelo">Modelo:</label>
+    <select id="modelo">
+        <option value="">Selecciona una marca primero...</option>
+    </select>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const marcaSelect = document.getElementById('marca');
+            const modeloSelect = document.getElementById('modelo');
+            
+            console.log('Elements found:', !!marcaSelect, !!modeloSelect);
+            
+            marcaSelect.addEventListener('change', function() {
+                const marcaId = this.value;
+                console.log('Marca seleccionada:', marcaId);
+                
+                // Limpiar modelos
+                modeloSelect.innerHTML = '<option value="">---------</option>';
+                
+                if (marcaId) {
+                    console.log('Fetching modelos for marca:', marcaId);
+                    
+                    fetch(`/vehiculos-core/api/modelos/?marca_id=${marcaId}`)
+                        .then(response => {
+                            console.log('Response status:', response.status);
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log('Modelos recibidos:', data);
+                            
+                            data.forEach(modelo => {
+                                const option = document.createElement('option');
+                                option.value = modelo.id;
+                                option.textContent = modelo.nombre;
+                                modeloSelect.appendChild(option);
+                            });
+                            
+                            console.log('Modelos agregados al select');
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

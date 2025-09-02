@@ -10,7 +10,11 @@ from taller.models.modelo import Modelo  # Modelo estándar de vehículos
 
 def lista_clientes(request):
     q = request.GET.get("q", "").strip()
-    clientes = Cliente.objects.all()
+    # BLINDAJE MULTI-TENANT: Filtrar por empresa del usuario
+    if hasattr(request.user, 'empresa'):
+        clientes = Cliente.objects.filter(empresa=request.user.empresa)
+    else:
+        clientes = Cliente.objects.none()
 
     if q:
         clientes = clientes.filter(nombre__icontains=q) | clientes.filter(apellido__icontains=q)
@@ -19,7 +23,18 @@ def lista_clientes(request):
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
-    return render(request, "taller/clientes/lista_clientes.html", {
+    # Usar template resolution en lugar de template hardcodeado
+    from taller.utils.templates import select_country_lang_template
+    from django.utils.translation import get_language
+    from django.template.response import TemplateResponse
+    
+    template_name = select_country_lang_template(
+        "clientes/lista_clientes.html", 
+        getattr(request.user.empresa, 'pais', 'cl').lower(), 
+        get_language()
+    )
+    
+    return TemplateResponse(request, template_name, {
         "page_obj": page_obj,
         "clientes": page_obj,
         "q": q,
@@ -27,15 +42,23 @@ def lista_clientes(request):
 
 def crear_cliente(request):
     if request.method == 'POST':
-        form = ClienteForm(request.POST)
+        form = ClienteForm(request.POST, empresa=request.user.empresa)
         if form.is_valid():
             form.save()
             messages.success(request, '✅ Cliente creado exitosamente.')
-            return redirect('clientes:lista_clientes')
+            return redirect('taller:clientes:lista_clientes')
     else:
-        form = ClienteForm()
+        form = ClienteForm(empresa=request.user.empresa)
 
-    return render(request, 'taller/clientes/crear_cliente.html', {
+    # Usar template resolution en lugar de template hardcodeado
+    from taller.utils.templates import select_country_lang_template
+    from django.utils.translation import get_language
+    from django.template.response import TemplateResponse
+    
+    # TEMPORAL: Usar template simple para testing mientras arreglamos la estructura
+    template_name = "taller/clientes/crear_cliente_simple.html"
+    
+    return TemplateResponse(request, template_name, {
         'form': form,
     })
 
@@ -47,15 +70,26 @@ def obtener_ciudades(request):
 def editar_cliente(request, pk):
     cliente = get_object_or_404(Cliente, pk=pk)
     if request.method == 'POST':
-        form = ClienteForm(request.POST, instance=cliente)
+        form = ClienteForm(request.POST, instance=cliente, empresa=request.user.empresa)
         if form.is_valid():
             form.save()
             messages.success(request, '✅ Cliente actualizado exitosamente.')
-            return redirect('clientes:lista_clientes')
+            return redirect('taller:clientes:lista_clientes')
     else:
-        form = ClienteForm(instance=cliente)
+        form = ClienteForm(instance=cliente, empresa=request.user.empresa)
 
-    return render(request, 'taller/clientes/editar_cliente.html', {
+    # Usar template resolution en lugar de template hardcodeado
+    from taller.utils.templates import select_country_lang_template
+    from django.utils.translation import get_language
+    from django.template.response import TemplateResponse
+    
+    template_name = select_country_lang_template(
+        "clientes/editar_cliente.html", 
+        getattr(request.user.empresa, 'pais', 'cl').lower(), 
+        get_language()
+    )
+    
+    return TemplateResponse(request, template_name, {
         'form': form,
         'cliente': cliente,
     })
@@ -73,7 +107,18 @@ Esto evita mantener dos implementaciones divergentes.
 
 def ver_cliente(request, pk):
     cliente = get_object_or_404(Cliente, pk=pk)
-    return render(request, 'taller/clientes/ver_cliente.html', {'cliente': cliente})
+    # Usar template resolution en lugar de template hardcodeado
+    from taller.utils.templates import select_country_lang_template
+    from django.utils.translation import get_language
+    from django.template.response import TemplateResponse
+    
+    template_name = select_country_lang_template(
+        "clientes/ver_cliente.html", 
+        getattr(request.user.empresa, 'pais', 'cl').lower(), 
+        get_language()
+    )
+    
+    return TemplateResponse(request, template_name, {'cliente': cliente})
 
 def api_ciudades(request):
     region_id = request.GET.get('region_id')
@@ -93,6 +138,17 @@ def obtener_modelos_por_marca(request):
     return JsonResponse(modelos, safe=False)
 
 def test_autocomplete_minimal(request):
-    form = VehiculoForm()
-    return render(request, 'taller/vehiculos/test_autocomplete_minimal.html', {'form': form})
+    form = VehiculoForm(user=request.user)
+    # Usar template resolution en lugar de template hardcodeado
+    from taller.utils.templates import select_country_lang_template
+    from django.utils.translation import get_language
+    from django.template.response import TemplateResponse
+    
+    template_name = select_country_lang_template(
+        "vehiculos/test_autocomplete_minimal.html", 
+        getattr(request.user.empresa, 'pais', 'cl').lower(), 
+        get_language()
+    )
+    
+    return TemplateResponse(request, template_name, {'form': form})
 

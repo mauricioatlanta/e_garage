@@ -1,0 +1,241 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Emails - eGarage</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+        
+        .test-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            padding: 40px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .test-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .test-header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .test-header p {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .btn-test {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+        }
+        
+        .btn-test:hover {
+            transform: translateY(-2px);
+            color: white;
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .status-check {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-left: 4px solid #28a745;
+        }
+        
+        .config-info {
+            background: #e3f2fd;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .config-info h5 {
+            color: #1976d2;
+            margin-bottom: 15px;
+        }
+        
+        .config-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #bbdefb;
+        }
+        
+        .config-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .alert {
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="test-container">
+            <!-- Header -->
+            <div class="test-header">
+                <h1><i class="fas fa-envelope"></i> Test de Emails</h1>
+                <p>Prueba el sistema de correos electrónicos de eGarage</p>
+            </div>
+            
+            <!-- Mostrar mensajes -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            <!-- Información de configuración -->
+            <div class="config-info">
+                <h5><i class="fas fa-cog"></i> Configuración SMTP Actual</h5>
+                <div class="config-item">
+                    <span><strong>Host:</strong></span>
+                    <span>mail.atlantareciclajes.cl</span>
+                </div>
+                <div class="config-item">
+                    <span><strong>Puerto:</strong></span>
+                    <span>465 (SSL)</span>
+                </div>
+                <div class="config-item">
+                    <span><strong>Usuario:</strong></span>
+                    <span>contacto@atlantareciclajes.cl</span>
+                </div>
+                <div class="config-item">
+                    <span><strong>Remitente:</strong></span>
+                    <span>eGarage &lt;contacto@atlantareciclajes.cl&gt;</span>
+                </div>
+            </div>
+            
+            <!-- Estado de conexión -->
+            <div class="status-check">
+                <h5><i class="fas fa-check-circle text-success"></i> Estado de Conexión</h5>
+                <p class="mb-2">✅ Configuración SMTP cargada correctamente</p>
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="verificarConexion()">
+                    <i class="fas fa-sync-alt"></i> Verificar Conexión SMTP
+                </button>
+                <div id="connection-status" class="mt-2"></div>
+            </div>
+            
+            <!-- Formulario de prueba -->
+            <form method="post" class="row g-3">
+                {% csrf_token %}
+                
+                <div class="col-12">
+                    <label for="email_destino" class="form-label">
+                        <i class="fas fa-at"></i> Email de Destino
+                    </label>
+                    <input type="email" class="form-control" id="email_destino" name="email_destino" 
+                           placeholder="tu-email@ejemplo.com" required
+                           value="{{ user.email }}">
+                    <div class="form-text">Ingresa el email donde quieres recibir la prueba</div>
+                </div>
+                
+                <div class="col-12">
+                    <label for="tipo_prueba" class="form-label">
+                        <i class="fas fa-paper-plane"></i> Tipo de Prueba
+                    </label>
+                    <select class="form-select" id="tipo_prueba" name="tipo_prueba">
+                        <option value="simple">Correo Simple</option>
+                        <option value="bienvenida">Correo de Bienvenida (HTML)</option>
+                    </select>
+                </div>
+                
+                <div class="col-12 text-center">
+                    <button type="submit" class="btn btn-test">
+                        <i class="fas fa-paper-plane"></i> Enviar Prueba
+                    </button>
+                </div>
+            </form>
+            
+            <!-- Instrucciones -->
+            <div class="mt-4">
+                <h5><i class="fas fa-info-circle"></i> Instrucciones</h5>
+                <ol>
+                    <li>Ingresa tu email personal en el campo de destino</li>
+                    <li>Selecciona el tipo de prueba que quieres realizar</li>
+                    <li>Haz clic en "Enviar Prueba"</li>
+                    <li>Revisa tu bandeja de entrada (y carpeta de spam)</li>
+                    <li>Si el correo llega → ✅ Sistema funcionando</li>
+                    <li>Si no llega → ❌ Revisar configuración SMTP</li>
+                </ol>
+            </div>
+            
+            <!-- Prueba desde consola -->
+            <div class="mt-4 p-3 bg-dark text-light rounded">
+                <h6><i class="fas fa-terminal"></i> Prueba desde Consola Django</h6>
+                <pre class="mb-0"><code>python manage.py shell
+
+from taller.views.email_views import test_smtp_connection
+test_smtp_connection()
+
+# O usando send_mail directamente:
+from django.core.mail import send_mail
+send_mail(
+    "Test de conexión SMTP",
+    "Este es un correo de prueba desde eGarage.",
+    "eGarage &lt;contacto@atlantareciclajes.cl&gt;",
+    ["tu-email@gmail.com"],  # reemplaza con tu correo real
+)</code></pre>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function verificarConexion() {
+            const statusDiv = document.getElementById('connection-status');
+            statusDiv.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"></div> Verificando...';
+            
+            fetch('/emails/verificar-smtp/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    statusDiv.innerHTML = `<div class="alert alert-success alert-sm mt-2">${data.mensaje}</div>`;
+                } else {
+                    statusDiv.innerHTML = `<div class="alert alert-danger alert-sm mt-2">${data.mensaje}</div>`;
+                }
+            })
+            .catch(error => {
+                statusDiv.innerHTML = '<div class="alert alert-danger alert-sm mt-2">❌ Error verificando conexión</div>';
+            });
+        }
+        
+        // Verificar conexión al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(verificarConexion, 1000);
+        });
+    </script>
+</body>
+</html>

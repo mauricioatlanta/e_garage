@@ -5,7 +5,13 @@ from . import views
 from . import api_servicios
 from .views_listado import DocumentoListViewBase
 from .views_cbv import DocumentoUpdateView, DocumentoDetailView
-from .api import lista_debug
+from .views_class_based import DocumentoFormView, DocumentoUpdateView as NewDocumentoUpdateView
+from .views_migrated import (
+    DocumentoListView, DocumentoCreateView, DocumentoDetailView as MigratedDetailView,
+    DocumentoUpdateView as MigratedUpdateView, DocumentoDeleteView
+)
+from .api import api_vehiculos_por_cliente, api_repuesto_por_codigo, api_next_number
+from .views_crear import crear_documento, buscar_clientes_ajax
 from . import views_nuevas
 import sys
 import os
@@ -16,12 +22,16 @@ from test_editar import test_editar_simple, fix_documento_data
 app_name = "documentos"
 
 urlpatterns = [
-    # Páginas - LISTA UNIFICADA CON SUBQUERY
-    path("", DocumentoListViewBase.as_view(), name="lista_documentos"),
+    # Páginas - LISTA UNIFICADA CON MIXIN PAÍS/IDIOMA
+    path("", DocumentoListView.as_view(), name="lista_documentos"),
     
-    # Pantalla unificada
-    path("form/", views_moderno.documento_form, name="documento_crear"),
-    path("form/<int:pk>/", views_moderno.documento_form, name="documento_editar"),
+    # Pantalla unificada - VISTAS MIGRADAS CON TEMPLATE RESOLUTION
+    path("form/", DocumentoCreateView.as_view(), name="documento_crear"),
+    path("form/<int:pk>/", MigratedUpdateView.as_view(), name="documento_editar"),
+    
+    # Detalle y eliminación con template resolution
+    path("ver/<int:pk>/", MigratedDetailView.as_view(), name="ver_documento"),
+    path("eliminar/<int:pk>/", DocumentoDeleteView.as_view(), name="eliminar_documento"),
     
     # Compatibilidad con rutas antiguas
     path("nuevo/", RedirectView.as_view(pattern_name="documentos:documento_crear", permanent=False), name="crear_documento"),
@@ -40,6 +50,8 @@ urlpatterns = [
     path("api/buscar-repuestos/", views_moderno.api_buscar_repuestos, name="api_buscar_repuestos"),
     path("api/buscar-servicios/", api_servicios.api_buscar_servicios, name="api_buscar_servicios"),
     path("api/vehiculos-cliente/", views_moderno.api_vehiculos_cliente, name="api_vehiculos_cliente"),
+    path("api/vehiculos-por-cliente/", api_vehiculos_por_cliente, name="api_vehiculos_por_cliente"),
+    path("api/next-number/", api_next_number, name="api_next_number"),
     path("api/buscar-servicios-internos/", views_moderno.api_buscar_servicios_internos, name="api_buscar_servicios_internos"),
     path("api/obtener-numero-documento/", views_moderno.api_obtener_numero_documento, name="api_obtener_numero_documento"),
     
@@ -49,6 +61,9 @@ urlpatterns = [
     path("api/autocomplete-repuesto/", views.autocomplete_repuesto, name="autocomplete_repuesto"),
     path("api/crear-servicio/", views.api_crear_servicio, name="api_crear_servicio"),
     
-    # Endpoint de diagnóstico
-    path("lista-debug/", lista_debug, name="lista_debug"),
+    # Nueva vista de creación de documentos
+    path("crear/", crear_documento, name="crear_documento"),
+    
+    # API de búsqueda AJAX
+    path("api/buscar-clientes/", buscar_clientes_ajax, name="buscar_clientes_ajax"),
 ]

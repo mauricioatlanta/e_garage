@@ -1,0 +1,494 @@
+{% extends 'base.html' %}
+
+{% block title %}🚗 Demo IA Vehicular{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<style>
+    :root {
+        --cyber-blue: #00d4ff;
+        --matrix-green: #39ff14;
+        --neon-purple: #b347d9;
+        --dark-bg: #0a0a0f;
+        --glow-cyan: #00ffff;
+        --ai-orange: #ff6b35;
+        --electric-yellow: #ffff00;
+    }
+
+    body {
+        background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+        color: var(--glow-cyan);
+        font-family: 'Orbitron', 'Courier New', monospace;
+    }
+
+    #particles-js {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: -1;
+    }
+
+    .demo-header {
+        background: linear-gradient(135deg, rgba(255, 107, 53, 0.15) 0%, rgba(179, 71, 217, 0.15) 100%);
+        border: 2px solid var(--ai-orange);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 0 40px rgba(255, 107, 53, 0.3);
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .demo-header::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(45deg, var(--ai-orange), var(--neon-purple), var(--electric-yellow));
+        border-radius: 20px;
+        z-index: -1;
+        animation: borderGlow 2s linear infinite;
+    }
+
+    @keyframes borderGlow {
+        0%, 100% { opacity: 0.6; }
+        50% { opacity: 1; }
+    }
+
+    .demo-title {
+        font-size: 3rem;
+        font-weight: bold;
+        background: linear-gradient(45deg, var(--ai-orange), var(--electric-yellow), var(--neon-purple));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 1rem;
+    }
+
+    .vehiculo-info {
+        background: rgba(0, 212, 255, 0.1);
+        border: 1px solid var(--cyber-blue);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        backdrop-filter: blur(10px);
+    }
+
+    .vehiculo-specs {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .spec-item {
+        background: rgba(57, 255, 20, 0.1);
+        border: 1px solid var(--matrix-green);
+        border-radius: 10px;
+        padding: 1rem;
+        text-align: center;
+    }
+
+    .spec-label {
+        color: var(--matrix-green);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        margin-bottom: 0.5rem;
+    }
+
+    .spec-value {
+        color: var(--glow-cyan);
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+
+    .analisis-panel {
+        background: rgba(10, 10, 15, 0.9);
+        border: 1px solid var(--ai-orange);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        backdrop-filter: blur(10px);
+    }
+
+    .panel-title {
+        color: var(--ai-orange);
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    .confianza-display {
+        background: rgba(255, 107, 53, 0.1);
+        border: 2px solid var(--ai-orange);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .confianza-numero {
+        font-size: 4rem;
+        font-weight: bold;
+        color: var(--electric-yellow);
+        text-shadow: 0 0 20px rgba(255, 255, 0, 0.5);
+    }
+
+    .confianza-label {
+        color: var(--ai-orange);
+        font-size: 1.2rem;
+        text-transform: uppercase;
+        margin-top: 0.5rem;
+    }
+
+    .servicios-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .servicio-card {
+        background: rgba(0, 212, 255, 0.1);
+        border: 1px solid var(--cyber-blue);
+        border-radius: 15px;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .servicio-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+        border-color: var(--matrix-green);
+    }
+
+    .servicio-nombre {
+        color: var(--glow-cyan);
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+    }
+
+    .servicio-precio {
+        color: var(--electric-yellow);
+        font-size: 1.8rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+
+    .servicio-margen {
+        color: var(--matrix-green);
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .servicio-probabilidad {
+        color: var(--ai-orange);
+        font-size: 0.9rem;
+    }
+
+    .valor-vida {
+        background: rgba(57, 255, 20, 0.1);
+        border: 1px solid var(--matrix-green);
+        border-radius: 10px;
+        padding: 0.8rem;
+        margin-top: 1rem;
+        text-align: center;
+    }
+
+    .valor-vida-numero {
+        color: var(--matrix-green);
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+
+    .predicciones-panel {
+        background: rgba(179, 71, 217, 0.1);
+        border: 1px solid var(--neon-purple);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .prediccion-item {
+        background: rgba(179, 71, 217, 0.2);
+        border: 1px solid var(--neon-purple);
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .prediccion-item::before {
+        content: '🔮';
+        margin-right: 1rem;
+        font-size: 1.5rem;
+    }
+
+    .comparativa-panel {
+        background: rgba(255, 255, 0, 0.1);
+        border: 1px solid var(--electric-yellow);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .comparativa-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: rgba(255, 255, 0, 0.1);
+        border: 1px solid var(--electric-yellow);
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .comparativa-sin {
+        color: #ff4444;
+        font-weight: bold;
+    }
+
+    .comparativa-con {
+        color: var(--matrix-green);
+        font-weight: bold;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+
+    .btn-demo {
+        background: linear-gradient(45deg, var(--ai-orange), var(--electric-yellow));
+        border: none;
+        border-radius: 10px;
+        color: #000;
+        padding: 15px 30px;
+        font-weight: bold;
+        font-family: 'Orbitron', monospace;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-demo:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 20px rgba(255, 107, 53, 0.5);
+        color: #000;
+        text-decoration: none;
+    }
+
+    .btn-secondary {
+        background: linear-gradient(45deg, var(--cyber-blue), var(--neon-purple));
+    }
+
+    @media (max-width: 768px) {
+        .servicios-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .vehiculo-specs {
+            grid-template-columns: 1fr 1fr;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="particles-js"></div>
+
+<div class="container mx-auto px-4 py-8">
+    <div class="demo-header">
+        <h1 class="demo-title">🚗 DEMO IA VEHICULAR</h1>
+        <p style="color: var(--glow-cyan); font-size: 1.2rem; margin-bottom: 1rem;">
+            Análisis inteligente en tiempo real
+        </p>
+        <div style="background: linear-gradient(45deg, var(--matrix-green), var(--cyber-blue)); color: #000; padding: 8px 16px; border-radius: 25px; font-weight: bold; display: inline-block;">
+            ✨ Sistema de IA incluido sin costo adicional ✨
+        </div>
+    </div>
+
+    <!-- Información del Vehículo -->
+    <div class="vehiculo-info">
+        <h2 style="color: var(--cyber-blue); text-align: center; margin-bottom: 2rem; font-size: 1.8rem;">
+            📋 Vehículo de Ejemplo
+        </h2>
+        <div class="vehiculo-specs">
+            <div class="spec-item">
+                <div class="spec-label">Marca</div>
+                <div class="spec-value">{{ demo_data.vehiculo_ejemplo.marca }}</div>
+            </div>
+            <div class="spec-item">
+                <div class="spec-label">Modelo</div>
+                <div class="spec-value">{{ demo_data.vehiculo_ejemplo.modelo }}</div>
+            </div>
+            <div class="spec-item">
+                <div class="spec-label">Kilometraje</div>
+                <div class="spec-value">{{ demo_data.vehiculo_ejemplo.kilometraje }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confianza del Análisis -->
+    <div class="confianza-display">
+        <div class="confianza-numero">{{ demo_data.analisis_ia.confianza }}%</div>
+        <div class="confianza-label">Confianza del Análisis IA</div>
+        <p style="color: var(--glow-cyan); margin-top: 1rem; opacity: 0.8;">
+            Basado en 50,000+ patrones de mantenimiento vehicular
+        </p>
+    </div>
+
+    <!-- Patrones Detectados -->
+    <div class="analisis-panel">
+        <h3 class="panel-title">🧠 Patrones Detectados por IA</h3>
+        <div style="display: grid; gap: 1rem;">
+            {% for patron in demo_data.analisis_ia.patrones_detectados %}
+            <div style="background: rgba(255, 107, 53, 0.1); border: 1px solid var(--ai-orange); border-radius: 10px; padding: 1rem; color: var(--glow-cyan);">
+                <strong style="color: var(--ai-orange);">🎯 </strong>{{ patron }}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Servicios Sugeridos -->
+    <div class="analisis-panel">
+        <h3 class="panel-title">💰 Servicios Sugeridos con Análisis de Valor</h3>
+        <div class="servicios-grid">
+            {% for servicio in demo_data.analisis_ia.servicios_sugeridos %}
+            <div class="servicio-card">
+                <div class="servicio-nombre">{{ servicio.nombre }}</div>
+                <div class="servicio-precio">${{ servicio.precio|floatformat:0 }}</div>
+                <div class="servicio-margen">💵 Margen: ${{ servicio.margen_estimado|floatformat:0 }}</div>
+                <div class="servicio-probabilidad">📈 Probabilidad venta: {{ servicio.probabilidad_venta }}%</div>
+                <div class="valor-vida">
+                    <div style="color: var(--matrix-green); font-size: 0.9rem; margin-bottom: 0.5rem;">Valor Vida Cliente</div>
+                    <div class="valor-vida-numero">${{ servicio.valor_vida_cliente|floatformat:0 }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Predicciones -->
+    <div class="predicciones-panel">
+        <h3 style="color: var(--neon-purple); font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem; text-align: center;">
+            🔮 Predicciones IA
+        </h3>
+        {% for prediccion in demo_data.analisis_ia.predicciones %}
+        <div class="prediccion-item">
+            {{ prediccion }}
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Comparativa Sin IA vs Con IA -->
+    <div class="comparativa-panel">
+        <h3 style="color: var(--electric-yellow); font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem; text-align: center;">
+            ⚡ Impacto de la IA en tu Taller
+        </h3>
+        
+        <div class="comparativa-item">
+            <span>🕐 Tiempo de Análisis:</span>
+            <div>
+                <span class="comparativa-sin">{{ demo_data.comparativa_sin_ia.tiempo_analisis|slice:":13" }}</span>
+                <span style="color: var(--glow-cyan);"> → </span>
+                <span class="comparativa-con">{{ demo_data.comparativa_sin_ia.tiempo_analisis|slice:"16:" }}</span>
+            </div>
+        </div>
+        
+        <div class="comparativa-item">
+            <span>🎯 Precisión Recomendaciones:</span>
+            <div>
+                <span class="comparativa-sin">{{ demo_data.comparativa_sin_ia.precision_recomendaciones|slice:":14" }}</span>
+                <span style="color: var(--glow-cyan);"> → </span>
+                <span class="comparativa-con">{{ demo_data.comparativa_sin_ia.precision_recomendaciones|slice:"17:" }}</span>
+            </div>
+        </div>
+        
+        <div class="comparativa-item">
+            <span>💸 Oportunidades Perdidas:</span>
+            <div>
+                <span class="comparativa-con">{{ demo_data.comparativa_sin_ia.oportunidades_perdidas }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botones de Acción -->
+    <div class="action-buttons">
+        <a href="{% url 'taller:ia:sugerencias_basicas' %}" class="btn-demo">
+            🤖 Probar IA Completa
+        </a>
+        <a href="{% url 'onboarding:onboarding_paso' %}?paso=2" class="btn-demo btn-secondary">
+            ➡️ Continuar Onboarding
+        </a>
+    </div>
+</div>
+
+<script>
+// Configuración de partículas para demo
+particlesJS("particles-js", {
+    "particles": {
+        "number": { "value": 50, "density": { "enable": true, "value_area": 800 } },
+        "color": { "value": ["#ff6b35", "#00d4ff", "#39ff14", "#ffff00"] },
+        "shape": { "type": "circle" },
+        "opacity": { "value": 0.6, "random": false },
+        "size": { "value": 4, "random": true },
+        "line_linked": {
+            "enable": true, "distance": 150, "color": "#ff6b35", "opacity": 0.4, "width": 1
+        },
+        "move": { "enable": true, "speed": 3, "direction": "none", "random": false, "straight": false, "out_mode": "out", "bounce": false }
+    },
+    "interactivity": {
+        "detect_on": "canvas",
+        "events": { "onhover": { "enable": true, "mode": "repulse" }, "onclick": { "enable": true, "mode": "push" }, "resize": true }
+    },
+    "retina_detect": true
+});
+
+// Animación de números
+window.addEventListener('load', function() {
+    // Animar confianza
+    const confianzaEl = document.querySelector('.confianza-numero');
+    const targetValue = {{ demo_data.analisis_ia.confianza }};
+    let currentValue = 0;
+    
+    const interval = setInterval(() => {
+        currentValue += 2;
+        confianzaEl.textContent = currentValue + '%';
+        
+        if (currentValue >= targetValue) {
+            confianzaEl.textContent = targetValue + '%';
+            clearInterval(interval);
+        }
+    }, 50);
+    
+    // Analytics
+    gtag('event', 'demo_ia_vehicular_vista', {
+        'event_category': 'onboarding_engagement',
+        'event_label': 'demo_completo',
+        'custom_parameters': {
+            'confianza_ia': {{ demo_data.analisis_ia.confianza }},
+            'vehiculo': '{{ demo_data.vehiculo_ejemplo.marca }} {{ demo_data.vehiculo_ejemplo.modelo }}'
+        }
+    });
+});
+</script>
+{% endblock %}

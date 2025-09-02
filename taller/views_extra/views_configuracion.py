@@ -112,28 +112,32 @@ def configuracion_tecnicos(request):
         messages.info(request, '✅ Se ha creado un perfil básico para tu usuario.')
 
     if request.method == 'POST':
-        if 'crear_tecnico' in request.POST:
+        if 'action' in request.POST and request.POST['action'] == 'add':
             nombre = request.POST.get('nombre', '').strip()
+            apellido = request.POST.get('apellido', '').strip()
+            email = request.POST.get('email', '').strip()
             telefono = request.POST.get('telefono', '').strip()
-            direccion = request.POST.get('direccion', '').strip()
+            especialidad = request.POST.get('especialidad', '').strip()
             
-            if nombre and len(nombre.strip()) >= 2:
-                # Validar formato de teléfono básico
-                if telefono and not re.match(r'^[\d\s\-\+\(\)]+$', telefono):
-                    messages.error(request, '❌ Formato de teléfono inválido.')
-                elif Tecnico.objects.filter(empresa=empresa, nombre__iexact=nombre).exists():
-                    messages.error(request, f'❌ Ya existe un técnico con el nombre "{nombre}" en tu taller.')
-                else:
-                    Tecnico.objects.create(
-                        empresa=empresa, 
-                        nombre=nombre, 
-                        telefono=telefono,
-                        direccion=direccion,
-                        activo=True
-                    )
-                    messages.success(request, f'✅ Técnico "{nombre}" agregado exitosamente.')
-            else:
+            # Combinar nombre y apellido
+            nombre_completo = f"{nombre} {apellido}".strip()
+            
+            # Validar campos obligatorios
+            if not nombre or len(nombre.strip()) < 2:
                 messages.error(request, '❌ El nombre del técnico debe tener al menos 2 caracteres.')
+            elif not apellido or len(apellido.strip()) < 2:
+                messages.error(request, '❌ El apellido del técnico debe tener al menos 2 caracteres.')
+            elif Tecnico.objects.filter(empresa=empresa, nombre__iexact=nombre_completo).exists():
+                messages.error(request, f'❌ Ya existe un técnico con el nombre "{nombre_completo}" en tu taller.')
+            else:
+                Tecnico.objects.create(
+                    empresa=empresa, 
+                    nombre=nombre_completo, 
+                    telefono=telefono,
+                    direccion=especialidad,  # Usar especialidad como dirección
+                    activo=True
+                )
+                messages.success(request, f'✅ Técnico "{nombre_completo}" agregado exitosamente.')
 
         elif 'desactivar_tecnico' in request.POST:
             tecnico_id = request.POST.get('tecnico_id')
@@ -158,23 +162,26 @@ def configuracion_tecnicos(request):
             nueva_direccion = request.POST.get('nueva_direccion', '').strip()
             tecnico = Tecnico.objects.filter(id=tecnico_id, empresa=empresa).first()
             
-            if tecnico and nuevo_nombre and len(nuevo_nombre) >= 2:
-                # Validar teléfono si se proporciona
-                if nuevo_telefono and not re.match(r'^[\d\s\-\+\(\)]+$', nuevo_telefono):
-                    messages.error(request, f'❌ Formato de teléfono inválido.')
-                elif Tecnico.objects.filter(empresa=empresa, nombre__iexact=nuevo_nombre).exclude(id=tecnico_id).exists():
-                    messages.error(request, f'❌ Ya existe otro técnico con el nombre "{nuevo_nombre}".')
-                else:
-                    nombre_anterior = tecnico.nombre
-                    tecnico.nombre = nuevo_nombre
-                    tecnico.telefono = nuevo_telefono
-                    tecnico.direccion = nueva_direccion
-                    tecnico.save()
-                    messages.success(request, f'✏️ Técnico "{nombre_anterior}" actualizado exitosamente.')
+            # Validar campos obligatorios
+            if not tecnico:
+                messages.error(request, '❌ Técnico no encontrado.')
             elif not nuevo_nombre or len(nuevo_nombre) < 2:
                 messages.error(request, '❌ El nombre debe tener al menos 2 caracteres.')
+            elif not nuevo_telefono or len(nuevo_telefono.strip()) < 8:
+                messages.error(request, '❌ El teléfono es obligatorio y debe tener al menos 8 caracteres.')
+            elif not re.match(r'^[\d\s\-\+\(\)]+$', nuevo_telefono):
+                messages.error(request, '❌ Formato de teléfono inválido. Solo números, espacios, guiones, + y paréntesis.')
+            elif Tecnico.objects.filter(empresa=empresa, nombre__iexact=nuevo_nombre).exclude(id=tecnico_id).exists():
+                messages.error(request, f'❌ Ya existe otro técnico con el nombre "{nuevo_nombre}".')
+            else:
+                nombre_anterior = tecnico.nombre
+                tecnico.nombre = nuevo_nombre
+                tecnico.telefono = nuevo_telefono
+                tecnico.direccion = nueva_direccion
+                tecnico.save()
+                messages.success(request, f'✏️ Técnico "{nombre_anterior}" actualizado exitosamente.')
 
-        elif 'eliminar_tecnico' in request.POST:
+        elif 'action' in request.POST and request.POST['action'] == 'delete':
             tecnico_id = request.POST.get('tecnico_id')
             tecnico = Tecnico.objects.filter(id=tecnico_id, empresa=empresa).first()
             if tecnico:
@@ -190,7 +197,12 @@ def configuracion_tecnicos(request):
                     tecnico.delete()
                     messages.success(request, f'🗑️ Técnico "{nombre}" eliminado completamente.')
 
-        return redirect('taller:configuracion_tecnicos')
+        # Redirección dinámica basada en el país del usuario
+        from django.shortcuts import redirect
+        if hasattr(request.user, 'empresa') and request.user.empresa.pais == 'US':
+            return redirect('/us/configuracion/tecnicos/')
+        else:
+            return redirect('/cl/taller/configuracion/tecnicos/')
 
     # Obtener técnicos ordenados: primero los activos, luego por nombre
     tecnicos = Tecnico.objects.filter(empresa=empresa).order_by('-activo', 'nombre')

@@ -155,7 +155,10 @@
   <a class="btn-cine-future" href="{{ url_lista_vehiculos|default:'#' }}">Volver a la lista</a>
   </div>
 
-  <form class="space-y-6" method="post">
+  <form id="form-crear-vehiculo"
+        class="space-y-6"
+        method="post"
+        action="{% url 'taller:vehiculos:crear_vehiculo' %}">
     {% csrf_token %}
     
     <!-- 🔧 DEBUG TEMPORAL - Mostrar errores del formulario -->
@@ -190,6 +193,7 @@
           <div id="cliente-detalles" class="mt-2 text-sm text-cyan-200" aria-live="polite"></div>
         </div>
         <div id="error-cliente" class="text-red-400 font-bold mt-2"></div>
+        {{ form.cliente.errors }}
       </div>
       <div class="glassmorphism-box p-6 rounded-2xl shadow-xl border border-cyan-300">
   <label class="block font-semibold mb-1" for="id_patente">Patente</label>
@@ -214,7 +218,7 @@
                   {% endfor %}
                 </select>
               {% endif %}
-              <input type="hidden" id="id_marca" name="marca" value="{{ form.data.marca|default:'' }}">
+              <input type="hidden" name="marca_hidden" value="{{ form.data.marca|default:'' }}">
             {% else %}
               <select id="id_marca" name="marca" class="w-full px-4 py-2 rounded-xl bg-black/70 text-cyan-200 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400">
                 <option value="">---------</option>
@@ -232,6 +236,7 @@
             {% endif %}
         </div>
         <div id="error-marca" class="text-red-400 font-bold mt-2"></div>
+        {{ form.marca.errors }}
       </div>
       <div class="glassmorphism-box p-6 rounded-2xl shadow-xl border border-cyan-300">
         <label class="block font-semibold mb-1" for="id_modelo">Modelo</label>
@@ -247,10 +252,53 @@
               </select>
             {% endif %}
           {% else %}
-            {{ form.modelo }}
-            {{ form.modelo.errors }}
+            <div class="flex space-x-2">
+              <select id="id_modelo" name="modelo" class="w-full px-4 py-2 rounded-xl bg-black/70 text-cyan-200 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400">
+                <option value="">Selecciona primero una marca...</option>
+              </select>
+              <button type="button" 
+                      onclick="abrirModalNuevoModelo()" 
+                      class="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-xl font-bold transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                      id="btn-nuevo-modelo" 
+                      disabled>
+                ➕
+              </button>
+            </div>
+            <!-- Modal para agregar nuevo modelo -->
+            <div id="modal-nuevo-modelo" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+              <div class="bg-gray-900 border border-cyan-400 rounded-xl p-6 w-96 max-w-md">
+                <h3 class="text-xl font-bold text-cyan-300 mb-4">Agregar Nuevo Modelo</h3>
+                <div class="mb-4">
+                  <label class="block text-sm font-medium text-gray-300 mb-2">Marca:</label>
+                  <span id="marca-seleccionada" class="text-cyan-200 font-bold"></span>
+                </div>
+                <div class="mb-4">
+                  <label for="nuevo-modelo-nombre" class="block text-sm font-medium text-gray-300 mb-2">Nombre del Modelo:</label>
+                  <input type="text" 
+                         id="nuevo-modelo-nombre" 
+                         class="w-full px-3 py-2 rounded-lg bg-black border border-cyan-500/30 text-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                         placeholder="Ej: Corolla, Civic, etc.">
+                </div>
+                <div class="flex justify-end space-x-3">
+                  <button type="button" 
+                          onclick="cerrarModalNuevoModelo()" 
+                          class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors duration-200">
+                    Cancelar
+                  </button>
+                  <button type="button" 
+                          onclick="guardarNuevoModelo()" 
+                          class="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg transition-colors duration-200">
+                    Guardar
+                  </button>
+                </div>
+              </div>
+            </div>
+            {% if form.modelo.errors %}
+              <div class="text-red-400 text-sm mt-1">{{ form.modelo.errors.0 }}</div>
+            {% endif %}
           {% endif %}
         </div>
+        {{ form.modelo.errors }}
       </div>
       <div class="glassmorphism-box p-6 rounded-2xl shadow-xl border border-cyan-300">
         <label class="block font-semibold mb-1" for="id_anio">Año</label>
@@ -333,6 +381,18 @@
       </button>
     </div>
   </form>
+
+<script>
+  // Logger simple para confirmar que el submit ocurre y NO se llama preventDefault()
+  (function () {
+    const f = document.getElementById('form-crear-vehiculo');
+    if (!f) return;
+    f.addEventListener('submit', function (e) {
+      console.log('[Crear Vehículo] submit disparado');
+      // No hacer e.preventDefault() aquí.
+    });
+  })();
+</script>
   <!-- AJAX búsqueda de clientes -->
 <script>
 // === Utilidades (primero) ===
@@ -349,9 +409,14 @@ const selectMarcaUsa     = document.getElementById('id_marca_usa');
 // --- Dinámica USA: cargar modelos al elegir marca ---
 {# Namespace correcto para la API de modelos USA #}
 {% url 'taller:vehiculos:api_modelos_usa' as url_api_modelos_usa %}
+{% url 'taller:vehiculos:api_motores_por_modelo' as url_api_motores %}
+{% url 'taller:vehiculos:api_cajas_por_modelo' as url_api_cajas %}
+
 const selectModeloUsa = document.getElementById('id_modelo_usa');  // Select de modelo USA
 const hiddenMarca     = document.getElementById('id_marca');       // Campo oculto (opcional)
 const MODELOS_USA_URL = "{{ url_api_modelos_usa|default:'#' }}";
+const MOTORES_API_URL = "{{ url_api_motores|default:'#' }}";
+const CAJAS_API_URL = "{{ url_api_cajas|default:'#' }}";
 if(MODELOS_USA_URL === '#') { console.warn('[DEBUG] No se resolvió URL api_modelos_usa'); }
 
 // --- Carga modelos USA simplificada ---
@@ -609,75 +674,225 @@ if (selectColor && inputColorNuevo) {
     color:#46f5e4 !important; opacity:.8;
   }
   </style>
+  
   <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const $m  = window.jQuery ? jQuery('#id_marca_usa')  : null;
-    const $mo = window.jQuery ? jQuery('#id_modelo_usa') : null;
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('🌍 País detectado: {{ country }}');
 
-    console.log('jQuery:', !!window.jQuery, 'Select2:', !!(window.jQuery && jQuery.fn && jQuery.fn.select2));
-
-    // INICIALIZAR SELECT2 MANUALMENTE para campos USA dinámicos
-    if (window.jQuery && jQuery.fn && jQuery.fn.select2) {
-      // Inicializar marca_usa
-      if ($m && $m.length && !$m.data('select2')) {
-        $m.select2({
-          placeholder: 'Select brand...',
-          allowClear: true,
-          width: '100%'
-        });
-        console.log('✅ Select2 inicializado para marca_usa');
-      }
-      
-      // Inicializar modelo_usa
-      if ($mo && $mo.length && !$mo.data('select2')) {
-        $mo.select2({
-          placeholder: 'First select a brand...',
-          allowClear: true,
-          width: '100%'
-        });
-        console.log('✅ Select2 inicializado para modelo_usa');
-      }
-    }
-
-    if ($m && $m.length)  console.log('MarcaUSA Select2 init:', !!$m.data('select2'));
-    if ($mo && $mo.length) console.log('ModeloUSA Select2 init:', !!$mo.data('select2'));
-
-    // Log de apertura y escritura
-    if ($m) {
-      $m.on('select2:open',  () => console.log('[DAL] MarcaUSA opened'));
-      $m.on('select2:select', (e) => {
-        console.log('[DAL] MarcaUSA select:', e.params.data);
-        // CARGAR MODELOS cuando se selecciona una marca
-        const marcaSeleccionada = e.params.data.id;
-        if (marcaSeleccionada && selectModeloUsa) {
-          console.log('🔄 Cargando modelos para marca:', marcaSeleccionada);
-          cargarModelosUsa(marcaSeleccionada);
-          
-          // Habilitar el campo de modelo
-          if ($mo && $mo.length) {
-            $mo.prop('disabled', false);
-            $mo.select2('destroy').select2({
-              placeholder: 'Select model...',
-              allowClear: true,
-              width: '100%'
+    {% if country == 'CL' %}
+    // FUNCIONALIDAD PARA CHILE
+    console.log('🇨🇱 Configurando carga de modelos para Chile...');
+    
+    const marcaSelect = document.getElementById('id_marca');
+    const modeloSelect = document.getElementById('id_modelo');
+    const btnNuevoModelo = document.getElementById('btn-nuevo-modelo');
+    
+    if (marcaSelect && modeloSelect) {
+      marcaSelect.addEventListener('change', function() {
+        const marcaId = this.value;
+        console.log('Marca seleccionada:', marcaId);
+        
+        // Limpiar modelos
+        modeloSelect.innerHTML = '<option value="">---------</option>';
+        
+        // Habilitar/deshabilitar botón de nuevo modelo
+        if (btnNuevoModelo) {
+          btnNuevoModelo.disabled = !marcaId;
+        }
+        
+        if (marcaId) {
+          fetch(`/taller/vehiculos/api/modelos/?marca_id=${marcaId}`)
+            .then(response => response.json())
+            .then(data => {
+              console.log('Modelos recibidos:', data);
+              data.forEach(modelo => {
+                const option = document.createElement('option');
+                option.value = modelo.id;
+                option.textContent = modelo.nombre;
+                modeloSelect.appendChild(option);
+              });
+            })
+            .catch(error => {
+              console.error('Error cargando modelos:', error);
             });
-          }
         }
       });
     }
-    if ($mo) {
-      $mo.on('select2:open',  () => console.log('[DAL] ModeloUSA opened (debería incluir forward marca_usa)'));
-      $mo.on('select2:select', (e) => console.log('[DAL] ModeloUSA select:', e.params.data));
+    {% endif %}
+  });
+  
+  // FUNCIONES PARA MANEJAR EL MODAL DE NUEVOS MODELOS
+  function abrirModalNuevoModelo() {
+    const marcaSelect = document.getElementById('id_marca');
+    const marcaSeleccionada = document.getElementById('marca-seleccionada');
+    const modal = document.getElementById('modal-nuevo-modelo');
+    
+    if (marcaSelect.value) {
+      const marcaOption = marcaSelect.options[marcaSelect.selectedIndex];
+      marcaSeleccionada.textContent = marcaOption.textContent;
+      modal.classList.remove('hidden');
+    } else {
+      alert('Por favor selecciona una marca primero');
+    }
+  }
+  
+  function cerrarModalNuevoModelo() {
+    const modal = document.getElementById('modal-nuevo-modelo');
+    const input = document.getElementById('nuevo-modelo-nombre');
+    modal.classList.add('hidden');
+    input.value = '';
+  }
+  
+  async function guardarNuevoModelo() {
+    const marcaSelect = document.getElementById('id_marca');
+    const input = document.getElementById('nuevo-modelo-nombre');
+    const modeloSelect = document.getElementById('id_modelo');
+    const modal = document.getElementById('modal-nuevo-modelo');
+    
+    const marcaId = marcaSelect.value;
+    const modeloNombre = input.value.trim();
+    
+    if (!modeloNombre) {
+      alert('Por favor ingresa el nombre del modelo');
+      return;
+    }
+    
+    try {
+      const response = await fetch('/taller/vehiculos/api/modelos/crear/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({
+          marca_id: marcaId,
+          nombre: modeloNombre
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        // Agregar el nuevo modelo al select
+        const option = document.createElement('option');
+        option.value = data.id;
+        option.textContent = data.nombre;
+        modeloSelect.appendChild(option);
+        
+        // Seleccionar el nuevo modelo
+        modeloSelect.value = data.id;
+        
+        // Cerrar modal
+        cerrarModalNuevoModelo();
+        
+        // Mostrar mensaje de éxito
+        alert('✅ Modelo agregado exitosamente');
+      } else {
+        alert('❌ Error: ' + (data.error || 'No se pudo crear el modelo'));
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('❌ Error de conexión');
+    }
+  }
+  
+  // Cerrar modal al hacer clic fuera de él
+  document.addEventListener('click', function(event) {
+    const modal = document.getElementById('modal-nuevo-modelo');
+    if (event.target === modal) {
+      cerrarModalNuevoModelo();
+    }
+  });
+  
+  // Cerrar modal con Escape
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+      cerrarModalNuevoModelo();
+    }
+  });
+  
+  // FUNCIONES PARA CARGAR MOTORES Y CAJAS DINÁMICAMENTE
+  function setOptions(el, html) { 
+    if (el) el.innerHTML = html; 
+  }
+
+  async function cargarOpciones(endpoint, modeloId) {
+    if (!endpoint || endpoint === '#' || !modeloId) return [];
+    try {
+      const r = await fetch(`${endpoint}?modelo_id=${encodeURIComponent(modeloId)}`);
+      if (!r.ok) return [];
+      return await r.json(); // [{id, nombre}, ...]
+    } catch (e) {
+      console.error('Error cargando opciones:', e);
+      return [];
+    }
+  }
+
+  async function recargarMotorYCaja(modeloId) {
+    const selMotor = document.getElementById('id_motor');
+    const selCaja = document.getElementById('id_caja');
+
+    // placeholders
+    setOptions(selMotor, '<option value="">---------</option>');
+    setOptions(selCaja, '<option value="">---------</option>');
+
+    // carga en paralelo
+    try {
+      const [motores, cajas] = await Promise.all([
+        cargarOpciones(MOTORES_API_URL, modeloId),
+        cargarOpciones(CAJAS_API_URL, modeloId)
+      ]);
+
+      // construir options para motor
+      let htmlMotor = '<option value="">---------</option>';
+      motores.forEach(m => { 
+        htmlMotor += `<option value="${m.id}">${m.nombre}</option>`; 
+      });
+      setOptions(selMotor, htmlMotor);
+
+      // construir options para caja
+      let htmlCaja = '<option value="">---------</option>';
+      cajas.forEach(c => { 
+        htmlCaja += `<option value="${c.id}">${c.nombre}</option>`; 
+      });
+      setOptions(selCaja, htmlCaja);
+
+      console.log(`✅ Motores cargados: ${motores.length}, Cajas cargadas: ${cajas.length}`);
+    } catch(e) { 
+      console.error('Error recargando motor/caja:', e); 
+    }
+  }
+
+  // Detectar cambio de modelo (Chile y USA)
+  document.addEventListener('DOMContentLoaded', () => {
+    const selModeloCL = document.getElementById('id_modelo');
+    const selModeloUS = document.getElementById('id_modelo_usa');
+
+    function onModeloChange(e) {
+      const modeloId = e.target.value;
+      // Limpia selección actual
+      const selMotor = document.getElementById('id_motor');
+      const selCaja = document.getElementById('id_caja');
+      if (selMotor) selMotor.value = '';
+      if (selCaja) selCaja.value = '';
+
+      if (modeloId) {
+        recargarMotorYCaja(modeloId);
+      } else {
+        // sin modelo -> reset a placeholder
+        setOptions(selMotor, '<option value="">---------</option>');
+        setOptions(selCaja, '<option value="">---------</option>');
+      }
     }
 
-    // Extra: forzar apertura al foco (útil para verificar top-50 sin teclear)
-    if ($m) $m.on('focus', () => {
-      if ($m.length && typeof $m.data === 'function' && $m.data('select2')) {
-        $m.select2('open');
-      } else {
-        console.warn('Select2 aún no está inicializado para $m (marca_usa)');
-      }
-    });
+    if (selModeloCL) selModeloCL.addEventListener('change', onModeloChange);
+    if (selModeloUS) selModeloUS.addEventListener('change', onModeloChange);
+
+    // precarga si ya viene un modelo seleccionado (edición o re-render con errores)
+    const preCL = selModeloCL?.value;
+    const preUS = selModeloUS?.value;
+    const pre = preCL || preUS;
+    if (pre) recargarMotorYCaja(pre);
   });
   </script>
 {% endblock %}

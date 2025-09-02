@@ -17,6 +17,7 @@ from taller.servicios.models import (
     CategoriaServicio, SubcategoriaServicio, Servicio,
     CategoriaServicioName, SubcategoriaServicioName, ServicioName
 )
+from .models import ConfiguracionEmpresa
 
 class MyAdminSite(AdminSite):
     site_header = 'Panel de Administración de eGarage'
@@ -402,4 +403,20 @@ class CatalogoModeloAutoAdmin(admin.ModelAdmin):
         ])
         self.message_user(request, mensaje)
     estadisticas_marcas.short_description = 'Ver estadísticas de marcas'
+
+
+@admin.register(ConfiguracionEmpresa, site=admin_site)
+class ConfigEmpresaAdmin(admin.ModelAdmin):
+    list_display = ('empresa', 'nombre_publico', 'moneda', 'iva_porcentaje', 'aplicar_iva_por_defecto', 'dividir_por_tecnico_por_defecto')
+    list_filter = ('moneda', 'aplicar_iva_por_defecto', 'dividir_por_tecnico_por_defecto')
+    search_fields = ('empresa__nombre', 'nombre_publico')
+    
+    def has_add_permission(self, request):
+        return request.user.is_staff
+    
+    def has_change_permission(self, request, obj=None):
+        return request.user.is_staff
+    
+    def has_view_permission(self, request, obj=None):
+        return request.user.is_staff
 

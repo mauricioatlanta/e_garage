@@ -14,6 +14,7 @@ from .views_extra.views_configuracion import configuracion_empresa, configuracio
 from .views_extra.timezone_views import configurar_timezone, cambiar_timezone_ajax, preview_timezone
 from .views_extra.landing_usa import landing_usa
 from taller.views_extra.bienvenida_usa import bienvenida_usa
+
 from . import ajax_views  # Importar vistas AJAX para formularios jerárquicos
 from .views_extra.company_settings_views import (
     company_settings_view, 
@@ -28,7 +29,18 @@ app_name = 'taller'
 
 # Vista temporal del diagnóstico IA
 def diagnostico_ia_temp(request):
-    return render(request, 'taller/reportes/diagnostico_ia.html', {
+    # Usar template resolution en lugar de template hardcodeado
+    from taller.utils.templates import select_country_lang_template
+    from django.utils.translation import get_language
+    from django.template.response import TemplateResponse
+    
+    template_name = select_country_lang_template(
+        "reportes/diagnostico_ia.html", 
+        getattr(request.user.empresa, 'pais', 'cl').lower(), 
+        get_language()
+    )
+    
+    return TemplateResponse(request, template_name, {
         'servicios_crecimiento': [
             {'nombre': 'Cambio de Aceite', 'tasa_crecimiento': 15.5, 'ingresos_mes': 125000},
         ],
@@ -71,6 +83,7 @@ urlpatterns = [
     path('repuestos/', include('taller.repuestos.urls')),
     path('servicios/', include(('taller.servicios.urls', 'servicios'), namespace='servicios')),
     path('business-intelligence/', include('taller.business_intelligence_urls', namespace='business_intelligence')),
+    path('settings/', include('taller.settings.urls', namespace='settings')),
     
     # === AJAX JERÁRQUICO - VEHÍCULOS ===
     # Importar vistas AJAX para formularios jerárquicos

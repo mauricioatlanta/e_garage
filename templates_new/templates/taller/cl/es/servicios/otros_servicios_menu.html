@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Otros Servicios{% endblock %}
+
+{% block content %}
+<div id="particles-js" class="fixed inset-0 z-0"></div>
+<div class="min-h-screen w-full relative flex items-center justify-center bg-black py-12 px-2 overflow-hidden">
+    <div class="w-full max-w-6xl mx-auto p-8 bg-gray-900/70 backdrop-blur-lg rounded-2xl shadow-2xl border-2 border-lime-400/30 relative z-10">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-center mb-10 metallic-black-title">
+                🛠️ Otros Servicios
+            </h1>
+        <div class="flex justify-center mb-8">
+            <div class="relative w-full max-w-md">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-cyan-400 text-xl"><i class="fas fa-search"></i></span>
+            <input type="text" id="busqueda-otros-servicio" placeholder="Buscar servicio..." class="w-full pl-10 pr-4 py-3 rounded-full bg-gray-800/80 text-black placeholder-gray-500 border-2 border-cyan-400/20 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/40 outline-none shadow transition focus:shadow-cyan-400/30 focus:bg-gray-900/80">
+            </div>
+        </div>
+        <div id="otros-servicios-lista" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for servicio in otros_servicios %}
+                <div class="servicio-card opacity-0 transform scale-95 transition duration-500 ease-out bg-gray-800/80 rounded-xl shadow-xl border-b-4 border-transparent hover:border-lime-400/80 hover:bg-gray-700/80 hover:scale-105 p-6 flex flex-col gap-3 group">
+                    <div>
+                        <div class="font-semibold text-lg text-white mb-1">{{ servicio.get_label }}</div>
+                        <div class="text-sm text-gray-400 mb-2">{{ servicio.subcategoria.categoria.get_label }}</div>
+                    </div>
+                    <div class="flex gap-2 mt-auto">
+                        <a href="/otros-servicios/editar/{{ servicio.id }}/" class="px-3 py-1 rounded-full text-sm font-semibold bg-gradient-to-r from-cyan-400 to-lime-400 text-gray-900 shadow hover:from-lime-400 hover:to-cyan-400 transition">✏️ Editar</a>
+                        <a href="/otros-servicios/eliminar/{{ servicio.id }}/" class="px-3 py-1 rounded-full text-sm font-semibold bg-gradient-to-r from-fuchsia-500 to-red-400 text-white shadow hover:from-red-400 hover:to-fuchsia-500 transition">🗑️ Eliminar</a>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-span-full text-center text-gray-400 py-8">No hay otros servicios registrados.</div>
+            {% endfor %}
+        </div>
+        <!-- Botón flotante -->
+        {% url 'servicios:crear_otro_servicio' as url_crear_otro %}
+        {% if not url_crear_otro %}
+            {% url 'taller:servicios:crear_otro_servicio' as url_crear_otro %}
+        {% endif %}
+        {% if not url_crear_otro %}
+            {% url 'chile:servicios:crear_otro_servicio' as url_crear_otro %}
+        {% endif %}
+        {% if url_crear_otro %}
+            <a href="{{ url_crear_otro }}" class="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-6 py-3 rounded-full font-bold text-lg bg-gradient-to-r from-lime-400 via-cyan-400 to-fuchsia-500 text-gray-900 shadow-2xl hover:from-fuchsia-500 hover:to-lime-400 transition-all drop-shadow-lg animate-bounce-float">
+                <i class="fas fa-plus"></i> <span class="hidden md:inline">Nuevo servicio</span>
+            </a>
+        {% endif %}
+    </div>
+</div>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+<style>
+    .futuristic-glow {
+        text-shadow: 0 0 24px #00ffe7, 0 0 8px #00ffe7, 0 0 2px #fff;
+        letter-spacing: 2px;
+    }
+    .metallic-black-title {
+        background: linear-gradient(90deg, #232526 0%, #414345 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 2px 8px #0008, 0 1px 0 #fff2;
+        letter-spacing: 2px;
+    }
+    #particles-js {
+        position: fixed;
+        inset: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 0;
+        background: #000;
+    }
+    .animate-bounce-float {
+        animation: bounce-float 2.2s infinite cubic-bezier(.68,-0.55,.27,1.55);
+    }
+    @keyframes bounce-float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if (window.particlesJS) {
+            particlesJS('particles-js', {
+                particles: {
+                    number: { value: 60, density: { enable: true, value_area: 800 } },
+                    color: { value: '#00ffe7' },
+                    shape: { type: 'circle' },
+                    opacity: { value: 0.3, random: true },
+                    size: { value: 3, random: true },
+                    line_linked: { enable: true, distance: 150, color: '#00ffe7', opacity: 0.2, width: 1 },
+                    move: { enable: true, speed: 1.2, direction: 'none', random: false, straight: false, out_mode: 'out', bounce: false }
+                },
+                interactivity: {
+                    detect_on: 'canvas',
+                    events: {
+                        onhover: { enable: true, mode: 'repulse' },
+                        onclick: { enable: true, mode: 'push' },
+                        resize: true
+                    },
+                    modes: {
+                        repulse: { distance: 80, duration: 0.4 },
+                        push: { particles_nb: 4 }
+                    }
+                },
+                retina_detect: true
+            });
+        }
+    });
+</script>
+<script>
+    // Fade-in animación para las tarjetas
+    document.addEventListener('DOMContentLoaded', () => {
+        const cards = document.querySelectorAll('.servicio-card');
+        cards.forEach((card, i) => {
+            setTimeout(() => {
+                card.classList.remove('opacity-0', 'scale-95');
+                card.classList.add('opacity-100', 'scale-100');
+            }, 80 * i);
+        });
+        // Buscador
+        const input = document.getElementById('busqueda-otros-servicio');
+        input.addEventListener('input', () => {
+            const q = input.value.toLowerCase();
+            document.querySelectorAll('.servicio-card').forEach(card => {
+                card.style.display = card.textContent.toLowerCase().includes(q) ? '' : 'none';
+            });
+        });
+    });
+</script>
+{% endblock %}

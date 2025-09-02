@@ -2,6 +2,11 @@ from taller.models.extras_vehiculo import MotorVehiculo, CajaVehiculo
 from taller.models.marcas_usa import ModeloVehiculo
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
+from django.db import models
+from taller.models.clientes import Cliente
+from taller.models.vehiculos import Vehiculo
+from taller.models.repuesto import Repuesto
+from taller.servicios.models import Servicio
 
 # Endpoint para búsqueda AJAX de motores por modelo
 def buscar_motores_api(request):
@@ -107,6 +112,7 @@ def crear_tienda_api(request):
 
 # Endpoint para búsqueda AJAX de clientes
 @login_required
+@login_required
 def buscar_clientes_api(request):
     # 🔒 FILTRO CRÍTICO POR EMPRESA
     try:
@@ -125,15 +131,216 @@ def buscar_clientes_api(request):
         clientes = clientes.filter(
             models.Q(nombre__icontains=q) |
             models.Q(apellido__icontains=q) |
-            models.Q(email__icontains=q)
+            models.Q(email__icontains=q) |
+            models.Q(tax_id__icontains=q)
         )
     data = [
         {
             'id': c.pk,
-            'nombre': c.nombre,
-            'apellido': c.apellido,
+            'nombre': f"{c.nombre} {c.apellido or ''}".strip(),
+            'identificador': c.tax_id or c.telefono or c.email or '',
             'email': c.email or ''
         }
         for c in clientes[:20]
     ]
-    return JsonResponse(data, safe=False)
+    return JsonResponse({'results': data})
+
+
+# === NUEVAS APIS PARA FORMULARIO FUTURISTA ===
+
+@login_required
+def vehiculos_cliente_api(request, cliente_id):
+    """Obtiene vehículos de un cliente específico filtrados por empresa"""
+    try:
+        empresa = request.user.empresa
+    except AttributeError:
+        return JsonResponse({'error': 'Usuario sin empresa'}, status=400)
+    
+    try:
+        vehiculos = Vehiculo.objects.filter(
+            cliente_id=cliente_id,
+            cliente__empresa=empresa  # 🔒 FILTRO CRÍTICO POR EMPRESA
+        )
+        
+        data = [
+            {
+                'id': v.pk,
+                'patente': getattr(v, 'patente', ''),
+                'vin': getattr(v, 'vin', ''),
+                'marca': getattr(v, 'marca', '') or str(getattr(v, 'marca_obj', '')),
+                'modelo': getattr(v, 'modelo', '') or str(getattr(v, 'modelo_obj', '')),
+                'año': getattr(v, 'año', ''),
+            }
+            for v in vehiculos[:20]
+        ]
+        return JsonResponse(data, safe=False)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@login_required
+def repuesto_by_code_api(request):
+    """Busca repuesto por código exacto"""
+    try:
+        empresa = request.user.empresa
+    except AttributeError:
+        return JsonResponse({'error': 'Usuario sin empresa'}, status=400)
+    
+    code = request.GET.get('code', '').strip()
+    if not code:
+        return JsonResponse({'error': 'Código requerido'}, status=400)
+    
+    try:
+        repuesto = Repuesto.objects.filter(
+            part_number__iexact=code,
+            empresa=empresa  # 🔒 FILTRO CRÍTICO POR EMPRESA
+        ).first()
+        
+        if not repuesto:
+            return JsonResponse({'error': 'Repuesto no encontrado'}, status=404)
+        
+        data = {
+            'id': repuesto.pk,
+            'codigo': repuesto.part_number,
+            'nombre': getattr(repuesto, 'nombre', ''),
+            'precio_compra': float(getattr(repuesto, 'precio_compra', 0)),
+            'precio_venta_sugerido': float(getattr(repuesto, 'precio_venta', 0)),
+            'stock': getattr(repuesto, 'cantidad_stock', 0),
+        }
+        return JsonResponse(data)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@login_required
+def buscar_repuestos_api(request):
+    """Busca repuestos por texto"""
+    try:
+        empresa = request.user.empresa
+    except AttributeError:
+        return JsonResponse({'error': 'Usuario sin empresa'}, status=400)
+    
+    q = request.GET.get('q', '').strip()
+    if len(q) < 2:
+        return JsonResponse({'results': []})
+    
+    try:
+        repuestos = Repuesto.objects.filter(
+            empresa=empresa  # 🔒 FILTRO CRÍTICO POR EMPRESA
+        )
+        
+        # Buscar por código o nombre
+        repuestos = repuestos.filter(
+            models.Q(part_number__icontains=q) |
+            models.Q(nombre__icontains=q)
+        )
+        
+        data = {
+            'results': [
+                {
+                    'id': r.pk,
+                    'codigo': r.part_number,
+                    'nombre': getattr(r, 'nombre', ''),
+                    'precio_compra': float(getattr(r, 'precio_compra', 0)),
+                    'precio_venta_sugerido': float(getattr(r, 'precio_venta', 0)),
+                    'stock': getattr(r, 'cantidad_stock', 0),
+                }
+                for r in repuestos[:20]
+            ]
+        }
+        return JsonResponse(data)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@login_required
+def buscar_servicios_api(request):
+    """Busca servicios por texto"""
+    try:
+        empresa = request.user.empresa
+    except AttributeError:
+        return JsonResponse({'error': 'Usuario sin empresa'}, status=400)
+    
+    q = request.GET.get('q', '').strip()
+    if len(q) < 2:
+        return JsonResponse({'results': []})
+    
+    try:
+        # Buscar en Servicio si existe
+        servicios = []
+        try:
+            servicios = Servicio.objects.filter(
+                empresa=empresa  # 🔒 FILTRO CRÍTICO POR EMPRESA
+            ).filter(
+                models.Q(nombre__icontains=q) |
+                models.Q(categoria__names__label__icontains=q)
+            ).distinct()
+        except Exception as e:
+            print(f"Error buscando servicios: {e}")
+            servicios = []
+        
+        data = {
+            'results': [
+                {
+                    'id': s.pk if hasattr(s, 'pk') else f'temp_{i}',
+                    'nombre': getattr(s, 'nombre', f'Servicio {i}'),
+                    'categoria': str(getattr(s, 'categoria', 'General')),
+                    'precio_sugerido': 0,  # El precio se ingresa manualmente
+                }
+                for i, s in enumerate(list(servicios)[:20])
+            ]
+        }
+        return JsonResponse(data)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@login_required
+def buscar_otros_servicios_api(request):
+    """Busca otros servicios (terceros)"""
+    q = request.GET.get('q', '').strip()
+    if len(q) < 2:
+        return JsonResponse({'results': []})
+    
+    # Servicios de terceros de ejemplo
+    servicios_ejemplo = [
+        {'nombre': 'Alineación', 'proveedor_tipico': 'Alineadora Central'},
+        {'nombre': 'Balanceado', 'proveedor_tipico': 'Alineadora Central'},
+        {'nombre': 'Rectificado', 'proveedor_tipico': 'Rectificadora Motors'},
+        {'nombre': 'Pintura', 'proveedor_tipico': 'Taller Pintura Pro'},
+        {'nombre': 'Tapicería', 'proveedor_tipico': 'Tapicería Express'},
+    ]
+    
+    # Filtrar por query
+    resultados = [
+        s for s in servicios_ejemplo 
+        if q.lower() in s['nombre'].lower()
+    ]
+    
+    data = {
+        'results': [
+            {
+                'id': f'ext_{i}',
+                'nombre': s['nombre'],
+                'proveedor_tipico': s['proveedor_tipico'],
+            }
+            for i, s in enumerate(resultados[:10])
+        ]
+    }
+    return JsonResponse(data)
+
+
+def api_status(request):
+    """Estado de la API"""
+    return JsonResponse({
+        'status': 'ok',
+        'message': 'API e_garage funcionando correctamente',
+        'endpoints': [
+            '/api/clientes/',
+            '/api/vehiculos/<cliente_id>/',
+            '/api/repuestos/by-code',
+            '/api/repuestos/',
+            '/api/servicios/',
+            '/api/otros-servicios/',
+        ]
+    })

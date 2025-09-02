@@ -1,0 +1,533 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Demo - Reportes por Fecha{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<style>
+    :root {
+        --cyber-blue: #00d4ff;
+        --matrix-green: #39ff14;
+        --neon-purple: #b347d9;
+        --dark-bg: #0a0a0f;
+        --glow-cyan: #00ffff;
+        --electric-yellow: #ffff00;
+    }
+
+    body {
+        background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+        color: var(--glow-cyan);
+        font-family: 'Orbitron', 'Courier New', monospace;
+    }
+
+    #particles-js {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: -1;
+    }
+
+    .cyber-header {
+        background: linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, rgba(179, 71, 217, 0.15) 100%);
+        border: 2px solid var(--cyber-blue);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 0 40px rgba(0, 212, 255, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cyber-header::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(45deg, var(--matrix-green), var(--cyber-blue), var(--neon-purple), var(--electric-yellow));
+        border-radius: 20px;
+        z-index: -1;
+        animation: borderGlow 3s linear infinite;
+    }
+
+    @keyframes borderGlow {
+        0%, 100% { opacity: 0.5; }
+        50% { opacity: 1; }
+    }
+
+    .cyber-title {
+        font-size: 3rem;
+        font-weight: bold;
+        text-align: center;
+        background: linear-gradient(45deg, var(--matrix-green), var(--cyber-blue), var(--neon-purple));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 1rem;
+        text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+    }
+
+    .cyber-form {
+        background: rgba(10, 10, 15, 0.9);
+        border: 1px solid var(--matrix-green);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 0 30px rgba(57, 255, 20, 0.2);
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        align-items: end;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group label {
+        color: var(--matrix-green);
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+    }
+
+    .form-control {
+        background: rgba(0, 20, 40, 0.8);
+        border: 1px solid var(--cyber-blue);
+        border-radius: 8px;
+        color: var(--glow-cyan);
+        padding: 12px;
+        font-family: 'Orbitron', monospace;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--matrix-green);
+        box-shadow: 0 0 15px rgba(57, 255, 20, 0.5);
+    }
+
+    .btn-cyber {
+        background: linear-gradient(45deg, var(--matrix-green), var(--cyber-blue));
+        border: none;
+        border-radius: 10px;
+        color: #000;
+        padding: 12px 24px;
+        font-weight: bold;
+        font-family: 'Orbitron', monospace;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-cyber:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(57, 255, 20, 0.5);
+    }
+
+    .btn-cyber::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .btn-cyber:hover::before {
+        left: 100%;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: rgba(10, 10, 15, 0.9);
+        border: 1px solid var(--matrix-green);
+        border-radius: 15px;
+        padding: 1.5rem;
+        text-align: center;
+        box-shadow: 0 0 20px rgba(57, 255, 20, 0.2);
+        backdrop-filter: blur(10px);
+        transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(57, 255, 20, 0.4);
+    }
+
+    .stat-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        filter: drop-shadow(0 0 10px currentColor);
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: bold;
+        color: var(--cyber-blue);
+        margin-bottom: 0.5rem;
+        text-shadow: 0 0 10px currentColor;
+    }
+
+    .stat-label {
+        color: var(--matrix-green);
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+    }
+
+    .results-section {
+        background: rgba(10, 10, 15, 0.9);
+        border: 1px solid var(--cyber-blue);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+    }
+
+    .results-title {
+        color: var(--cyber-blue);
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 1.5rem;
+        text-transform: uppercase;
+        border-bottom: 1px solid var(--cyber-blue);
+        padding-bottom: 0.5rem;
+    }
+
+    .top-items-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1rem;
+    }
+
+    .top-item {
+        background: rgba(57, 255, 20, 0.1);
+        border: 1px solid var(--matrix-green);
+        border-radius: 10px;
+        padding: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .top-item:hover {
+        background: rgba(57, 255, 20, 0.2);
+        transform: scale(1.02);
+    }
+
+    .top-item-name {
+        font-weight: bold;
+        color: var(--cyber-blue);
+        margin-bottom: 0.5rem;
+    }
+
+    .top-item-stats {
+        color: var(--glow-cyan);
+        font-size: 0.9rem;
+    }
+
+    .demo-badge {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(45deg, var(--neon-purple), var(--electric-yellow));
+        color: #000;
+        padding: 10px 20px;
+        border-radius: 25px;
+        font-weight: bold;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        z-index: 1000;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+
+    .loading {
+        text-align: center;
+        padding: 2rem;
+        color: var(--glow-cyan);
+    }
+
+    .loading-spinner {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        border: 3px solid rgba(0, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: var(--matrix-green);
+        animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="particles-js"></div>
+
+<div class="demo-badge">
+    🚀 DEMO MODE
+</div>
+
+<div class="container mx-auto px-4 py-8">
+    <div class="cyber-header">
+        <h1 class="cyber-title">📊 Reportes por Fecha</h1>
+        <p style="text-align: center; color: var(--glow-cyan); opacity: 0.8; font-size: 1.1rem;">
+            Sistema de reportes unificado con análisis temporal
+        </p>
+    </div>
+
+    <!-- Formulario de Búsqueda -->
+    <div class="cyber-form">
+        <form id="reporteForm" method="GET">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="desde">📅 Fecha Desde</label>
+                    <input type="date" id="desde" name="desde" class="form-control" value="{{ desde }}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="hasta">📅 Fecha Hasta</label>
+                    <input type="date" id="hasta" name="hasta" class="form-control" value="{{ hasta }}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="tipo">📈 Tipo de Reporte</label>
+                    <select id="tipo" name="tipo" class="form-control">
+                        <option value="resumen" {% if tipo_reporte == 'resumen' %}selected{% endif %}>Resumen General</option>
+                        <option value="servicios" {% if tipo_reporte == 'servicios' %}selected{% endif %}>Solo Servicios</option>
+                        <option value="repuestos" {% if tipo_reporte == 'repuestos' %}selected{% endif %}>Solo Repuestos</option>
+                        <option value="detallado" {% if tipo_reporte == 'detallado' %}selected{% endif %}>Detallado</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <button type="submit" class="btn-cyber">
+                        🔍 Generar Reporte
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Resultados -->
+    <div id="resultados">
+        <!-- Estadísticas Generales -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">📄</div>
+                <div class="stat-value">{{ total_documentos }}</div>
+                <div class="stat-label">Total Documentos</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">🔧</div>
+                <div class="stat-value">{{ total_servicios.cantidad|default:0 }}</div>
+                <div class="stat-label">Total Servicios</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">⚙️</div>
+                <div class="stat-value">{{ total_repuestos.cantidad_total|default:0 }}</div>
+                <div class="stat-label">Repuestos Vendidos</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-value">${{ total_servicios.valor_total|add:total_repuestos.valor_total|floatformat:0|default:0 }}</div>
+                <div class="stat-label">Valor Total</div>
+            </div>
+        </div>
+
+        <!-- Top Servicios -->
+        {% if top_servicios %}
+        <div class="results-section">
+            <h3 class="results-title">🏆 Top Servicios</h3>
+            <div class="top-items-grid">
+                {% for servicio in top_servicios %}
+                <div class="top-item">
+                    <div class="top-item-name">{{ servicio.nombre }}</div>
+                    <div class="top-item-stats">
+                        Veces: {{ servicio.total_veces }} | Valor: ${{ servicio.valor_total|floatformat:0 }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Top Repuestos -->
+        {% if top_repuestos %}
+        <div class="results-section">
+            <h3 class="results-title">🔧 Top Repuestos</h3>
+            <div class="top-items-grid">
+                {% for repuesto in top_repuestos %}
+                <div class="top-item">
+                    <div class="top-item-name">{{ repuesto.nombre }}</div>
+                    <div style="color: var(--matrix-green); font-size: 0.8rem; margin: 0.25rem 0;">
+                        {{ repuesto.codigo|default:"Sin código" }}
+                    </div>
+                    <div class="top-item-stats">
+                        Cantidad: {{ repuesto.cantidad_total }} | Valor: ${{ repuesto.valor_total|floatformat:0 }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Documentos Recientes -->
+        {% if docs_recientes %}
+        <div class="results-section">
+            <h3 class="results-title">📋 Documentos Recientes</h3>
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: rgba(57, 255, 20, 0.2); border: 1px solid var(--matrix-green);">
+                            <th style="padding: 12px; color: var(--matrix-green); font-weight: bold;">Documento</th>
+                            <th style="padding: 12px; color: var(--matrix-green); font-weight: bold;">Fecha</th>
+                            <th style="padding: 12px; color: var(--matrix-green); font-weight: bold;">Cliente</th>
+                            <th style="padding: 12px; color: var(--matrix-green); font-weight: bold;">Vehículo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for doc in docs_recientes %}
+                        <tr style="border-bottom: 1px solid rgba(0, 212, 255, 0.3);">
+                            <td style="padding: 12px; color: var(--cyber-blue);">{{ doc.numero_documento|default:"Sin número" }}</td>
+                            <td style="padding: 12px; color: var(--glow-cyan);">{{ doc.fecha|date:"d/m/Y" }}</td>
+                            <td style="padding: 12px; color: var(--glow-cyan);">{{ doc.cliente|default:"Sin cliente" }}</td>
+                            <td style="padding: 12px; color: var(--glow-cyan);">{{ doc.vehiculo.patente|default:"Sin patente" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+// Configuración de partículas
+particlesJS("particles-js", {
+    "particles": {
+        "number": {
+            "value": 50,
+            "density": {
+                "enable": true,
+                "value_area": 800
+            }
+        },
+        "color": {
+            "value": ["#00d4ff", "#39ff14", "#b347d9"]
+        },
+        "shape": {
+            "type": "circle"
+        },
+        "opacity": {
+            "value": 0.5,
+            "random": false
+        },
+        "size": {
+            "value": 3,
+            "random": true
+        },
+        "line_linked": {
+            "enable": true,
+            "distance": 150,
+            "color": "#00d4ff",
+            "opacity": 0.4,
+            "width": 1
+        },
+        "move": {
+            "enable": true,
+            "speed": 2,
+            "direction": "none",
+            "random": false,
+            "straight": false,
+            "out_mode": "out",
+            "bounce": false
+        }
+    },
+    "interactivity": {
+        "detect_on": "canvas",
+        "events": {
+            "onhover": {
+                "enable": true,
+                "mode": "repulse"
+            },
+            "onclick": {
+                "enable": true,
+                "mode": "push"
+            },
+            "resize": true
+        }
+    },
+    "retina_detect": true
+});
+
+// AJAX para formulario
+document.getElementById('reporteForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const params = new URLSearchParams(formData);
+    
+    // Mostrar loading
+    document.getElementById('resultados').innerHTML = `
+        <div class="loading">
+            <div class="loading-spinner"></div>
+            <p>Generando reporte...</p>
+        </div>
+    `;
+    
+    // Simular carga y recargar página con parámetros
+    setTimeout(() => {
+        window.location.href = '?' + params.toString();
+    }, 1000);
+});
+
+// Establecer fechas por defecto
+window.addEventListener('load', function() {
+    const desde = document.getElementById('desde');
+    const hasta = document.getElementById('hasta');
+    
+    if (!desde.value) {
+        const fecha30DiasAtras = new Date();
+        fecha30DiasAtras.setDate(fecha30DiasAtras.getDate() - 30);
+        desde.value = fecha30DiasAtras.toISOString().split('T')[0];
+    }
+    
+    if (!hasta.value) {
+        const hoy = new Date();
+        hasta.value = hoy.toISOString().split('T')[0];
+    }
+});
+</script>
+{% endblock %}

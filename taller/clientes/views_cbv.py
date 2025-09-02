@@ -3,12 +3,15 @@ from django.db import models
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from core.views import TenantViewMixin
 from taller.models.clientes import Cliente
+from taller.mixins import CountryLangTemplateMixin
 
-class ClienteListView(LoginRequiredMixin, TenantViewMixin, ListView):
+class ClienteListView(CountryLangTemplateMixin, LoginRequiredMixin, TenantViewMixin, ListView):
     model = Cliente
     paginate_by = 50
     ordering = ("apellido", "nombre", "id")
     select_related_fields = ()
+    template_name = 'clientes/cliente_list.html'
+    context_object_name = 'cliente_list'
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -29,10 +32,10 @@ class ClienteDetailView(LoginRequiredMixin, TenantViewMixin, DetailView):
     def get_queryset(self):
         return super().get_queryset().select_related('empresa', 'estado_usa', 'ciudad_usa', 'region', 'ciudad')
 
-class ClienteCreateView(LoginRequiredMixin, TenantViewMixin, CreateView):
+class ClienteCreateView(CountryLangTemplateMixin, LoginRequiredMixin, TenantViewMixin, CreateView):
     def get_success_url(self):
         from django.urls import reverse
-        return reverse('clientes:lista_clientes')
+        return reverse('taller:clientes:lista_clientes')
     def form_valid(self, form):
         from django.db import IntegrityError
         try:
@@ -45,6 +48,7 @@ class ClienteCreateView(LoginRequiredMixin, TenantViewMixin, CreateView):
 
     model = Cliente
     form_class = None  # Se setea en get_form_class
+    base_template_name = "clientes/cliente_form.html"
 
     def get_form_class(self):
         from taller.clientes.forms import ClienteForm
@@ -57,16 +61,20 @@ class ClienteCreateView(LoginRequiredMixin, TenantViewMixin, CreateView):
             kwargs['empresa'] = empresa
         return kwargs
 
-    def get_template_names(self):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
         empresa = getattr(self.request.user, 'empresa', None)
-        if empresa and getattr(empresa, 'pais', None) == 'US':
-            return ['taller/clientes/crear_cliente.html']  # Template específico para USA si existe
-        return ['taller/cliente_form.html']  # Template por defecto (Chile o global)
+        context['empresa'] = empresa
+        context['empresa_actual'] = empresa
+        return context
 
-class ClienteUpdateView(LoginRequiredMixin, TenantViewMixin, UpdateView):
+    def render_to_response(self, context, **response_kwargs):
+        return self.render_country_lang(self.request, context)
+
+class ClienteUpdateView(CountryLangTemplateMixin, LoginRequiredMixin, TenantViewMixin, UpdateView):
     model = Cliente
     form_class = None  # Se setea en get_form_class
-    template_name = "taller/clientes/editar_cliente.html"
+    base_template_name = "clientes/cliente_form.html"
 
     def get_form_class(self):
         from taller.clientes.forms import ClienteForm
@@ -78,6 +86,16 @@ class ClienteUpdateView(LoginRequiredMixin, TenantViewMixin, UpdateView):
         if empresa:
             kwargs['empresa'] = empresa
         return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        empresa = getattr(self.request.user, 'empresa', None)
+        context['empresa'] = empresa
+        context['empresa_actual'] = empresa
+        return context
+
+    def render_to_response(self, context, **response_kwargs):
+        return self.render_country_lang(self.request, context)
 
     def get_success_url(self):
         from django.urls import reverse

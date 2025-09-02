@@ -2,6 +2,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.http import JsonResponse
 from taller.models.clientes import Cliente
+from taller.models.vehiculos import Vehiculo
+from taller.models import Marca, Modelo
 from taller.vehiculos.forms import VehiculoForm
 from taller.forms.clientes import ClienteForm
 from dal import autocomplete
@@ -10,15 +12,15 @@ def crear_vehiculo_para_cliente(request, cliente_id):
     cliente = get_object_or_404(Cliente, id=cliente_id)
 
     if request.method == 'POST':
-        form = VehiculoForm(request.POST)
+        form = VehiculoForm(request.POST, user=request.user)  # BLINDAJE: Agregar user
         if form.is_valid():
             vehiculo = form.save(commit=False)
             vehiculo.cliente = cliente  # Asigna automáticamente el cliente
             vehiculo.save()
             messages.success(request, "🚗 Vehículo registrado correctamente.")
-            return redirect(' vehiculos:lista_vehiculos', cliente_id=cliente.id)
+            return redirect(' vehiculos:lista_vehiculos', cliente_id=cliente.pk)
     else:
-        form = VehiculoForm()
+        form = VehiculoForm(user=request.user)  # BLINDAJE: Agregar user
         form.fields.pop('cliente', None)  # Oculta cliente en el formulario
 
     return render(request, 'taller/vehiculos/formulario_vehiculo.html', {
@@ -29,7 +31,7 @@ def crear_vehiculo_para_cliente(request, cliente_id):
 def registrar_cliente_y_vehiculo(request):
     if request.method == 'POST':
         cliente_form = ClienteForm(request.POST)
-        vehiculo_form = VehiculoForm(request.POST)
+        vehiculo_form = VehiculoForm(request.POST, user=request.user)  # BLINDAJE: Agregar user
         if cliente_form.is_valid() and vehiculo_form.is_valid():
             cliente = cliente_form.save()
             vehiculo = vehiculo_form.save(commit=False)
@@ -38,7 +40,7 @@ def registrar_cliente_y_vehiculo(request):
             return redirect('vehiculos:lista_vehiculos')  # Ajusta la redirección según tu proyecto
     else:
         cliente_form = ClienteForm()
-        vehiculo_form = VehiculoForm()
+        vehiculo_form = VehiculoForm(user=request.user)  # BLINDAJE: Agregar user
     return render(request, 'vehiculos/registrar_cliente_y_vehiculo.html', {
         'cliente_form': cliente_form,
         'vehiculo_form': vehiculo_form
@@ -48,15 +50,26 @@ def editar_vehiculo(request, vehiculo_id):
     vehiculo = get_object_or_404(Vehiculo, id=vehiculo_id)
     
     if request.method == 'POST':
-        form = VehiculoForm(request.POST, instance=vehiculo)
+        form = VehiculoForm(request.POST, instance=vehiculo, user=request.user)  # BLINDAJE: Agregar user
         if form.is_valid():
             form.save()
             messages.success(request, "Vehículo actualizado correctamente 🛠️")
             return redirect('vehiculos:listar_vehiculos')
     else:
-        form = VehiculoForm(instance=vehiculo)
+        form = VehiculoForm(instance=vehiculo, user=request.user)  # BLINDAJE: Agregar user
 
-    return render(request, 'taller/vehiculos/crear_vehiculo.html', {
+    # Usar template resolution en lugar de template hardcodeado
+    from taller.utils.templates import select_country_lang_template
+    from django.utils.translation import get_language
+    from django.template.response import TemplateResponse
+    
+    template_name = select_country_lang_template(
+        "vehiculos/crear_vehiculo.html", 
+        getattr(request.user.empresa, 'pais', 'cl').lower(), 
+        get_language()
+    )
+    
+    return TemplateResponse(request, template_name, {
         'form': form,
         'titulo': 'Editar Vehículo',
         'modo': 'editar'
@@ -80,7 +93,18 @@ def agregar_vehiculo(request):
 def ver_cliente(request, cliente_id):
     cliente = get_object_or_404(Cliente, id=cliente_id)
     vehiculos = Vehiculo.objects.filter(cliente=cliente)
-    return render(request, 'taller/clientes/ver_cliente.html', {
+    # Usar template resolution en lugar de template hardcodeado
+    from taller.utils.templates import select_country_lang_template
+    from django.utils.translation import get_language
+    from django.template.response import TemplateResponse
+    
+    template_name = select_country_lang_template(
+        "clientes/ver_cliente.html", 
+        getattr(request.user.empresa, 'pais', 'cl').lower(), 
+        get_language()
+    )
+    
+    return TemplateResponse(request, template_name, {
         'cliente': cliente,
         'vehiculos': vehiculos
     })
@@ -96,7 +120,18 @@ def obtener_modelos(request):
 
 def ver_vehiculo(request, vehiculo_id):
     vehiculo = get_object_or_404(Vehiculo, id=vehiculo_id)
-    return render(request, 'taller/vehiculos/detalle.html', {'vehiculo': vehiculo})
+    # Usar template resolution en lugar de template hardcodeado
+    from taller.utils.templates import select_country_lang_template
+    from django.utils.translation import get_language
+    from django.template.response import TemplateResponse
+    
+    template_name = select_country_lang_template(
+        "vehiculos/detalle.html", 
+        getattr(request.user.empresa, 'pais', 'cl').lower(), 
+        get_language()
+    )
+    
+    return TemplateResponse(request, template_name, {'vehiculo': vehiculo})
 
 
 def obtener_modelos_por_marca(request):
@@ -110,6 +145,11 @@ def obtener_modelos_por_marca(request):
 
 class MarcaAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
+        # Marcas y modelos pueden ser globales (no multi-tenant)
+        # pero incluimos verificación de autenticación
+        if not self.request.user.is_authenticated:
+            return Marca.objects.none()
+            
         qs = Marca.objects.all()
         if self.q:
             qs = qs.filter(nombre__icontains=self.q)
@@ -117,6 +157,11 @@ class MarcaAutocomplete(autocomplete.Select2QuerySetView):
 
 class ModeloAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
+        # Marcas y modelos pueden ser globales (no multi-tenant)
+        # pero incluimos verificación de autenticación
+        if not self.request.user.is_authenticated:
+            return Modelo.objects.none()
+            
         qs = Modelo.objects.all()
         marca_id = self.forwarded.get('marca', None)
         if marca_id:

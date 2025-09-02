@@ -1,15 +1,21 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.db.models import Q, Count
+from django.utils.translation import get_language
 from .models import Servicio, CategoriaServicio, SubcategoriaServicio
+from taller.utils.templates import select_country_lang_template
 
 # Menú principal de servicios con diseño moderno
 def servicios_menu(request):
     # Obtener empresa del usuario
     empresa = getattr(request.user, 'empresa', None)
     
-    # Obtener servicios con filtros básicos
-    servicios = Servicio.objects.filter(empresa=empresa) if empresa else Servicio.objects.none()
+    # Obtener servicios - mostrar todos si no hay empresa específica
+    if empresa:
+        servicios = Servicio.objects.filter(empresa=empresa)
+    else:
+        # Para debugging o cuando no hay empresa específica, mostrar todos los servicios
+        servicios = Servicio.objects.all()
     categorias = CategoriaServicio.objects.all()
     subcategorias = SubcategoriaServicio.objects.all()
     
@@ -20,15 +26,22 @@ def servicios_menu(request):
         'total_subcategorias': subcategorias.count(),
     }
     
+    # Obtener país e idioma del request
+    country = getattr(request.user, 'empresa', None)
+    country_code = country.pais if country else 'CL'
+    lang = get_language() or 'es'
+    
     context = {
         'servicios': servicios[:50],  # Limitar para performance inicial
         'categorias': categorias,
         'subcategorias': subcategorias,
         'stats': stats,
         'empresa': empresa,
+        'country': country_code,  # Agregar country al contexto
     }
     
-    return render(request, 'servicios/servicios_menu.html', context)
+    template_name = select_country_lang_template('servicios/servicios_menu.html', country_code, lang)
+    return render(request, template_name, context)
 
 # API para búsqueda en tiempo real
 def buscar_servicios_api(request):
@@ -73,6 +86,7 @@ def otros_servicios_menu(request):
     
     # Obtener empresa del usuario
     empresa = getattr(request.user, 'empresa', None)
+    
     if empresa:
         # Obtener servicios externos de la empresa
         otros_servicios = ServicioExterno.objects.filter(
@@ -99,7 +113,13 @@ def otros_servicios_menu(request):
         'stats': stats,
     }
     
-    return render(request, 'servicios/otros_servicios_menu.html', context)
+    # Obtener país e idioma del request
+    country = getattr(request.user, 'empresa', None)
+    country_code = country.pais if country else 'CL'
+    lang = get_language() or 'es'
+    
+    template_name = select_country_lang_template('servicios/otros_servicios_menu.html', country_code, lang)
+    return render(request, template_name, context)
 
 # Crear otro servicio
 def crear_otro_servicio(request):
@@ -169,3 +189,37 @@ def crear_servicio(request, *args, **kwargs):
 def editar_servicio(request, *args, **kwargs):
     log.info("FBV shim: editar_servicio")
     return ServicioUpdateView.as_view()(request, *args, **kwargs)
+
+def eliminar_servicio(request, servicio_id):
+    """Vista para eliminar un servicio"""
+    from django.shortcuts import get_object_or_404, redirect
+    from django.contrib import messages
+    from django.http import JsonResponse
+    
+    try:
+        # Buscar el servicio sin filtrar por empresa para debugging
+        servicio = get_object_or_404(Servicio, id=servicio_id)
+        
+        if request.method == 'POST':
+            nombre_servicio = servicio.nombre
+            servicio.delete()
+            
+            if request.headers.get('Content-Type') == 'application/json':
+                return JsonResponse({'success': True, 'message': f'Servicio "{nombre_servicio}" eliminado exitosamente'})
+            else:
+                messages.success(request, f'Servicio "{nombre_servicio}" eliminado exitosamente')
+                return redirect('taller:servicios:servicios_menu')
+        else:
+            if request.headers.get('Content-Type') == 'application/json':
+                return JsonResponse({'success': False, 'message': 'Método no permitido'}, status=405)
+            else:
+                messages.error(request, 'Método no permitido')
+                return redirect('taller:servicios:servicios_menu')
+                
+    except Exception as e:
+        log.error(f"Error al eliminar servicio {servicio_id}: {str(e)}")
+        if request.headers.get('Content-Type') == 'application/json':
+            return JsonResponse({'success': False, 'message': f'Error al eliminar el servicio: {str(e)}'}, status=500)
+        else:
+            messages.error(request, f'Error al eliminar el servicio: {str(e)}')
+            return redirect('taller:servicios:servicios_menu')

@@ -9,7 +9,7 @@ from .forms import VehiculoForm, DocumentoForm, VentaForm
 @require_POST
 @login_required
 def registrar_vehiculo(request):
-    form = VehiculoForm(request.POST)
+    form = VehiculoForm(request.POST, user=request.user)
     if form.is_valid():
         vehiculo = form.save(commit=False)
         from taller.models.perfil_usuario import PerfilUsuario

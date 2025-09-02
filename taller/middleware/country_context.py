@@ -44,7 +44,7 @@ class CountryContextMiddleware(MiddlewareMixin):
         
         # Debug temporal
         if getattr(settings, 'DEBUG', False):
-            print(f"🌍 CountryContext: {country} (URL: {request.path})")
+            print(f"CountryContext: {country} (URL: {request.path})")
         
         return None
     

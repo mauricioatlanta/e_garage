@@ -2,6 +2,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from core.views import TenantViewMixin
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.db import models
+from taller.mixins import CountryLangTemplateMixin
 from taller.models.vehiculos import Vehiculo
 from .forms import VehiculoForm
 from taller.models.clientes import Cliente
@@ -16,12 +17,13 @@ except Exception:  # pragma: no cover - si no existen modelos USA
 
 class VehiculoListView(LoginRequiredMixin, TenantViewMixin, ListView):
     model = Vehiculo
-    template_name = 'taller/vehiculos/vehiculos.html'  # Template correcta con la tabla de vehículos
+    template_name = "taller/vehiculos/vehiculo_list.html"
     select_related_fields = ("cliente",)
     ordering = ("-id",)
     paginate_by = 50
     # Nombre explícito para que la plantilla 'vehiculos.html' que itera sobre 'vehiculos' funcione
     context_object_name = 'vehiculos'
+    
     def get_queryset(self):
         # Fallback: en tests puede que middleware no inyecte request.empresa; usar empresa de user
         if not getattr(self.request, 'empresa', None) and getattr(self.request.user, 'empresa', None):
@@ -98,8 +100,8 @@ class VehiculoCreateView(LoginRequiredMixin, TenantViewMixin, CreateView):
         ctx['debug_empresa_pais'] = f"empresa={getattr(empresa,'id',None)} pais={country} usuario={self.request.user.username}"
 
         # Listas auxiliares (fallback cuando no se usa DAL o para selects básicos)
-        ctx['clientes'] = Cliente.objects.all()[:500]
-        ctx['colores'] = ColorVehiculo.objects.all()
+        ctx['clientes'] = Cliente.objects.filter(empresa=empresa)[:500]  # BLINDAJE: Filtrado por empresa
+        ctx['colores'] = ColorVehiculo.get_colores_para_pais(country)  # CORREGIDO: Colores por país
         if country == 'US':
             # Usar nuestro catálogo importado para USA
             if CatalogoModeloAuto:
@@ -121,6 +123,8 @@ class VehiculoUpdateView(LoginRequiredMixin, TenantViewMixin, UpdateView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['user'] = self.request.user
+        # IMPORTANTE: Pasar request para que el formulario pueda acceder a la empresa
+        kwargs['request'] = self.request
         return kwargs
 
     def get_context_data(self, **kwargs):
@@ -128,8 +132,8 @@ class VehiculoUpdateView(LoginRequiredMixin, TenantViewMixin, UpdateView):
         empresa = getattr(self.request, 'empresa', getattr(self.request.user, 'empresa', None))
         country = getattr(empresa, 'pais', 'CL') if empresa else 'CL'
         ctx['country'] = country
-        ctx['clientes'] = Cliente.objects.all()[:500]
-        ctx['colores'] = ColorVehiculo.objects.all()
+        ctx['clientes'] = Cliente.objects.filter(empresa=empresa)[:500] if empresa else Cliente.objects.none()  # BLINDAJE: Filtrado por empresa
+        ctx['colores'] = ColorVehiculo.get_colores_para_pais(country)  # CORREGIDO: Colores por país
         if country == 'US' and MarcaVehiculoUSA:
             ctx['marcas_usa'] = MarcaVehiculoUSA.objects.filter(activa=True).order_by('nombre')
             ctx['modelos_usa'] = ModeloVehiculoUSA.objects.filter(activo=True).order_by('nombre') if ModeloVehiculoUSA else []

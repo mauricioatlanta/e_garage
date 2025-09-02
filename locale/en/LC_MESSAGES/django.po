@@ -1626,27 +1626,35 @@ msgstr "No data to display for the selected period"
 
 #: .\templates\taller\reportes\reportes_mecanicos_i18n.html:291
 msgid "Intenta ajustar los filtros o el rango de fechas"
-msgstr ""
+msgstr "Try adjusting the filters or date range"
 
 #: .\templates\taller\reportes\reportes_mecanicos_i18n.html:322
 msgid "Total Facturado"
-msgstr ""
+msgstr "Total Billed"
 
 #: .\templates\test_i18n.html:10
 msgid "Your account has been activated"
-msgstr ""
+msgstr "Your account has been activated"
 
 #: .\templates\test_i18n.html:11
 msgid "Create account"
-msgstr ""
+msgstr "Create account"
 
 #: .\templates\test_i18n.html:12
 msgid "Log in"
-msgstr ""
+msgstr "Log in"
 
 #: .\templates\test_i18n.html:13
 msgid "Settings"
-msgstr ""
+msgstr "Settings"
 
 #~ msgid "Recordarme"
 #~ msgstr "Remember me"
+
+#: templates_canonical/taller/us/en/dashboard/centro_operaciones_espacial.html:311
+msgid "English"
+msgstr "English"
+
+#: templates_canonical/taller/us/en/dashboard/centro_operaciones_espacial.html:312
+msgid "Español"
+msgstr "Spanish"

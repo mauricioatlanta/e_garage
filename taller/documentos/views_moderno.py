@@ -1,7 +1,7 @@
 from django.urls import reverse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET
 from django.contrib import messages
@@ -102,10 +102,21 @@ def crear_documento_moderno(request):
     if request.method == 'POST':
         return procesar_documento_moderno(request, empresa)
     
-    # GET: Mostrar formulario
+    # GET: Mostrar formulario usando template resolution
+    from taller.utils.templates import select_country_lang_template
+    from django.utils.translation import get_language
+    
     context = obtener_datos_formulario(empresa)
     context['country'] = country
-    return render(request, 'documentos/crear_documento_moderno.html', context)
+    
+    # Usar template resolution para documentos/documento_form.html
+    template_name = select_country_lang_template(
+        "documentos/documento_form.html", 
+        getattr(empresa, 'pais', 'cl').lower(), 
+        get_language()
+    )
+    
+    return render(request, template_name, context)
 
 def obtener_datos_formulario(empresa):
     """Obtener todos los datos necesarios para el formulario"""
@@ -705,7 +716,32 @@ def documento_form(request, pk=None):
         )
     
     # Obtener el documento si estamos editando
-    documento = get_object_or_404(Documento, pk=pk, empresa=empresa) if pk else None
+    if pk:
+        try:
+            documento = Documento.objects.get(pk=pk, empresa=empresa)
+        except Documento.DoesNotExist:
+            # Proporcionar información de debug para 404
+            from django.conf import settings
+            if settings.DEBUG:
+                # Verificar si el documento existe para otra empresa
+                documento_exists = Documento.objects.filter(pk=pk).first()
+                if documento_exists:
+                    from django.http import HttpResponseNotFound
+                    error_msg = f"""
+                    <h1>Documento no encontrado (404)</h1>
+                    <p><strong>El documento {pk} existe pero pertenece a otra empresa.</strong></p>
+                    <ul>
+                        <li>Tu empresa: {empresa.nombre_taller} (ID: {empresa.id})</li>
+                        <li>Empresa del documento: {documento_exists.empresa.nombre_taller} (ID: {documento_exists.empresa.id})</li>
+                        <li>Usuario del documento: {documento_exists.empresa.user.username}</li>
+                        <li>Tu usuario: {request.user.username}</li>
+                    </ul>
+                    <p><strong>Solución:</strong> Inicia sesión como el usuario correcto o accede a un documento de tu empresa.</p>
+                    """
+                    return HttpResponseNotFound(error_msg)
+            raise Http404(f"No se encontró el documento {pk} para la empresa {empresa.nombre_taller}")
+    else:
+        documento = None
     
     # Obtener país desde el contexto de la empresa o request
     company_country = getattr(request, "company_country", getattr(empresa, "pais", None))
@@ -783,18 +819,60 @@ def documento_form(request, pk=None):
 
         # NO redirigir; render con errores visibles
         messages.error(request, "Corrige los errores del formulario.")
-        return render(request, "taller/documentos/documento_form.html", {
+        
+        # URLs para navegación
+        from django.urls import reverse, NoReverseMatch
+        try:
+            settings_url = reverse('taller:company_settings')
+        except NoReverseMatch:
+            settings_url = ''
+        
+        # Usar template resolution en lugar de template hardcodeado
+    from taller.utils.templates import select_country_lang_template
+    from django.utils.translation import get_language
+    from django.template.response import TemplateResponse
+    
+    template_name = select_country_lang_template(
+        "documentos/documento_form.html", 
+        getattr(request.user.empresa, 'pais', 'cl').lower(), 
+        get_language()
+    )
+    
+    return render(request, template_name, {
             "form": form,
             "documento": documento,
             "es_edicion": bool(pk),
             "company_country": company_country,
+            "today": now().date(),
+            "settings_url": settings_url,
         }, status=422)
 
     # GET
     form = DocumentoForm(instance=documento, user=request.user)
-    return render(request, "taller/documentos/documento_form.html", {
+    
+    # URLs para navegación
+    from django.urls import reverse, NoReverseMatch
+    try:
+        settings_url = reverse('taller:company_settings')
+    except NoReverseMatch:
+        settings_url = ''
+    
+    # Usar template resolution en lugar de template hardcodeado
+    from taller.utils.templates import select_country_lang_template
+    from django.utils.translation import get_language
+    from django.template.response import TemplateResponse
+    
+    template_name = select_country_lang_template(
+        "documentos/documento_form.html", 
+        getattr(request.user.empresa, 'pais', 'cl').lower(), 
+        get_language()
+    )
+    
+    return render(request, template_name, {
         "form": form,
         "documento": documento,
         "es_edicion": bool(pk),
         "company_country": company_country,
+        "today": now().date(),
+        "settings_url": settings_url,
     })

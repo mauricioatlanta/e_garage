@@ -97,6 +97,29 @@ def dashboard_cl_view(request):
                 return redirect('/cl/centro-operaciones-espacial/')
     
     # Si no está autenticado, mostrar página de bienvenida
+    planes = [
+        {"nombre": "1 Mes", "precio": 20000, "detalle": "Menos de $700 diarios - IVA incluido, sin letra chica", "badge": None},
+        {"nombre": "6 Meses", "precio": 110000, "detalle": "Ahorra $10.000 CLP - IVA incluido, sin letra chica", "badge": "Más Popular"},
+        {"nombre": "1 Año", "precio": 200000, "detalle": "Ahorra $40.000 CLP - IVA incluido, sin letra chica", "badge": "Mejor Valor"},
+    ]
+    testimonios = [
+        {"nombre": "Carlos M.", "ciudad": "Valparaíso", "texto": "Antes no podía saber cuánto ganaba cada mecánico. Hoy sé en tiempo real quién rinde más.", "avatar": "avatars/carlos.png"},
+        {"nombre": "Paula R.", "ciudad": "Santiago", "texto": "Me sobraban repuestos sin vender. Ahora no pierdo stock ni plata.", "avatar": "avatars/paula.png"},
+        {"nombre": "Diego A.", "ciudad": "Viña del Mar", "texto": "Lo que hoy hago en 10 minutos, antes me tomaba 3 horas con libreta y lápiz.", "avatar": "avatars/diego.png"},
+    ]
+    diferenciales = [
+        {"icon":"chart-bar","titulo":"WhatsApp integrado","desc":"Envía presupuestos, recibos y recordatorios directamente a tus clientes con un clic."},
+        {"icon":"package","titulo":"100% accesible","desc":"$20.000 al mes → menos de $700 diarios. Pensado para talleres chicos y medianos."},
+        {"icon":"receipt","titulo":"Todo en uno","desc":"Clientes, vehículos, repuestos, servicios, facturación y reportes en una sola plataforma."},
+        {"icon":"bot","titulo":"Enfocado en rentabilidad","desc":"No solo gestiona, te muestra dónde ganas y dónde pierdes dinero."},
+        {"icon":"users","titulo":"Escalable para crecer","desc":"Si creces, eGarage crece contigo. Desde talleres familiares hasta grandes centros."},
+        {"icon":"store","titulo":"Para casas de repuestos","desc":"Digitaliza tu bodega, catálogos digitales y control de stock en tiempo real."},
+    ]
+    frases = {
+        "headline": "Deja atrás la libreta y el lápiz",
+        "sub": "Administra tu taller con tecnología de nivel mundial. Factura, estimados y recibos directo a WhatsApp 📲. Un precio accesible para que incluso el taller más pequeño pueda ser digital.",
+    }
+    
     context = {
         'current_country': 'CL',
         'country_name': 'Chile',
@@ -105,12 +128,35 @@ def dashboard_cl_view(request):
         'welcome_message': 'Bienvenido a eGarage Chile',
         'currency': 'CLP',
         'currency_symbol': '$',
+        'planes': planes,
+        'testimonios': testimonios,
+        'diferenciales': diferenciales,
+        'frases': frases,
+        'moneda': 'CLP',
+        'idioma': 'ES',
     }
     return render(request, 'onboarding/bienvenida_chile.html', context)
 
 
 def dashboard_us_view(request):
     """Dashboard simple para USA"""
+    # Si el usuario no está autenticado, mostrar página de bienvenida
+    if not request.user.is_authenticated:
+        # Usar el idioma detectado por el middleware
+        current_language = getattr(request, 'LANGUAGE_CODE', 'en')
+        
+        return render(request, 'onboarding/bienvenida_usa.html', {
+            'current_country': 'US',
+            'country_name': 'United States',
+            'LANGUAGE_CODE': current_language,  # Agregar LANGUAGE_CODE al contexto
+            'language': current_language,
+            'page_title': 'Welcome to eGarage USA',
+            'welcome_message': 'Welcome to eGarage USA',
+            'currency': 'USD',
+            'currency_symbol': '$',
+        })
+    
+    # Si está autenticado, mostrar dashboard
     context = {
         'current_country': 'US', 
         'country_name': 'United States',

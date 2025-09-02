@@ -1,7 +1,7 @@
 let _chart = null;
 async function fetchClientesStats(params = {}){
   const qs = new URLSearchParams(params).toString();
-  const res = await fetch('/taller/clientes/stats/?' + qs);
+  const res = await fetch('/analytics/clientes-api/?' + qs);
   return await res.json();
 }
 
@@ -11,8 +11,8 @@ async function initClientesChart(canvasId, legendContainerId, params = {}){
   const ctx = canvas.getContext('2d');
   try{
     const json = await fetchClientesStats(params);
-    const labels = json.labels || [];
-    const data = json.counts || [];
+    const labels = json.distribution.map(item => item.region__nombre) || [];
+    const data = json.distribution.map(item => item.count) || [];
 
   // generate neon palette
   const palette = labels.map((l,i)=>{

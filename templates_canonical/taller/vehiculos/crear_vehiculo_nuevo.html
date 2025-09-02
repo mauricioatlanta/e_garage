@@ -1,0 +1,1149 @@
+{% extends "base.html" %}
+{% load i18n static widget_tweaks %}
+
+{% block extra_css %}
+<style>
+:root {
+  --cyber-primary: #00ffff;
+  --cyber-secondary: #ff00ff;
+  --cyber-accent: #00ff00;
+  --cyber-dark: #0a0a0a;
+  --cyber-darker: #050505;
+  --cyber-glass: rgba(0, 255, 255, 0.05);
+  --cyber-border: rgba(0, 255, 255, 0.3);
+  --cyber-glow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+/* Fondo de partículas futuristas */
+.particles-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+  z-index: -2;
+}
+
+.particles-bg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(0, 255, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 0, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(0, 255, 0, 0.1) 0%, transparent 50%);
+  animation: particleFloat 10s ease-in-out infinite alternate;
+}
+
+@keyframes particleFloat {
+  0% { transform: translateY(0px) rotate(0deg); }
+  100% { transform: translateY(-20px) rotate(360deg); }
+}
+
+/* Título holográfico */
+.cyber-title {
+  font-size: clamp(2rem, 5vw, 4rem);
+  font-weight: 900;
+  text-align: center;
+  margin: 2rem 0 3rem 0;
+  background: linear-gradient(45deg, #00ffff, #ff00ff, #00ff00, #ffff00);
+  background-size: 400% 400%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: holographicText 3s ease-in-out infinite;
+  text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+  letter-spacing: 0.1em;
+  position: relative;
+}
+
+.cyber-title::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  background: linear-gradient(45deg, transparent, rgba(0, 255, 255, 0.1), transparent);
+  z-index: -1;
+  border-radius: 10px;
+}
+
+@keyframes holographicText {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Secciones tecnológicas */
+.tech-section {
+  background: linear-gradient(135deg, var(--cyber-glass), rgba(255, 255, 255, 0.02));
+  border: 1px solid var(--cyber-border);
+  border-radius: 20px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  backdrop-filter: blur(20px);
+  position: relative;
+  overflow: hidden;
+}
+
+.tech-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--cyber-primary), transparent);
+  animation: scanline 3s linear infinite;
+}
+
+@keyframes scanline {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+}
+
+.section-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, var(--cyber-primary), var(--cyber-secondary));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  box-shadow: var(--cyber-glow);
+  animation: iconPulse 2s ease-in-out infinite;
+}
+
+@keyframes iconPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--cyber-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* Inputs futuristas */
+.cyber-input {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(0, 255, 255, 0.05));
+  border: 2px solid transparent;
+  border-radius: 15px;
+  color: #ffffff;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  position: relative;
+  backdrop-filter: blur(10px);
+}
+
+.cyber-input:focus {
+  outline: none;
+  border-color: var(--cyber-primary);
+  box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(0, 255, 255, 0.1));
+}
+
+.cyber-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Labels futuristas */
+.cyber-label {
+  display: block;
+  color: var(--cyber-primary);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
+}
+
+.cyber-label.required::after {
+  content: ' *';
+  color: var(--cyber-secondary);
+}
+
+/* Botones cyber */
+.cyber-btn {
+  background: linear-gradient(45deg, var(--cyber-primary), var(--cyber-secondary));
+  border: none;
+  border-radius: 15px;
+  padding: 1rem 2rem;
+  color: black;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.cyber-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 255, 255, 0.4);
+}
+
+.cyber-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.cyber-btn:hover::before {
+  left: 100%;
+}
+
+.cyber-btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--cyber-border);
+  color: var(--cyber-primary);
+}
+
+/* Grid futurista */
+.cyber-grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.cyber-grid-2 {
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.cyber-grid-3 {
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+/* Contenedor de búsqueda de cliente */
+.client-search-container {
+  position: relative;
+}
+
+.client-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.95), rgba(0, 255, 255, 0.1));
+  border: 1px solid var(--cyber-border);
+  border-radius: 15px;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
+  backdrop-filter: blur(20px);
+}
+
+.client-suggestion-item {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(0, 255, 255, 0.1);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.client-suggestion-item:hover {
+  background: rgba(0, 255, 255, 0.1);
+  transform: translateX(5px);
+}
+
+.client-selected {
+  background: linear-gradient(135deg, rgba(0, 255, 0, 0.1), rgba(0, 255, 255, 0.1));
+  border: 1px solid var(--cyber-accent);
+  border-radius: 15px;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+/* Loading cyber */
+.cyber-loading {
+  width: 30px;
+  height: 30px;
+  border: 3px solid rgba(0, 255, 255, 0.3);
+  border-top: 3px solid var(--cyber-primary);
+  border-radius: 50%;
+  animation: cyberSpin 1s linear infinite;
+}
+
+@keyframes cyberSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Select futurista */
+.cyber-select {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(0, 255, 255, 0.05));
+  border: 2px solid transparent;
+  border-radius: 15px;
+  color: #ffffff;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2300ffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 1rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 3rem;
+}
+
+.cyber-select:focus {
+  outline: none;
+  border-color: var(--cyber-primary);
+  box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+}
+
+/* Modal futurista */
+.cyber-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  backdrop-filter: blur(10px);
+}
+
+.cyber-modal-content {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(0, 255, 255, 0.1));
+  border: 1px solid var(--cyber-border);
+  border-radius: 20px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 90%;
+  backdrop-filter: blur(20px);
+  position: relative;
+}
+
+.cyber-modal-content::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, var(--cyber-primary), var(--cyber-secondary), var(--cyber-accent));
+  z-index: -1;
+  border-radius: 20px;
+  opacity: 0.3;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .cyber-grid-2,
+  .cyber-grid-3 {
+    grid-template-columns: 1fr;
+  }
+  
+  .cyber-title {
+    font-size: 2rem;
+  }
+  
+  .tech-section {
+    padding: 1rem;
+  }
+}
+
+/* Utility classes */
+.hidden { display: none !important; }
+.text-center { text-align: center; }
+.mt-2 { margin-top: 0.5rem; }
+.mt-4 { margin-top: 1rem; }
+.mb-4 { margin-bottom: 1rem; }
+.ml-2 { margin-left: 0.5rem; }
+.px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+.py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+.text-sm { font-size: 0.875rem; }
+.text-lg { font-size: 1.125rem; }
+.font-bold { font-weight: 700; }
+.flex { display: flex; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.space-x-2 > * + * { margin-left: 0.5rem; }
+.space-y-4 > * + * { margin-top: 1rem; }
+.space-y-8 > * + * { margin-top: 2rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Fondo de partículas futuristas -->
+<div class="particles-bg"></div>
+
+<!-- Contenedor principal cyber -->
+<div class="min-h-screen py-8 px-4">
+  <div class="max-w-6xl mx-auto">
+    <!-- Título holográfico -->
+    <h1 class="cyber-title">
+      <span class="inline-block">🚗</span>
+      {% trans "NUEVO VEHÍCULO" %}
+      <span class="inline-block">⚡</span>
+    </h1>
+
+    <form method="post" class="space-y-8">
+      {% csrf_token %}
+      
+      <!-- Sección: Búsqueda de Cliente -->
+      <div class="tech-section">
+        <div class="section-header">
+          <div class="section-icon">
+            👤
+          </div>
+          <h2 class="section-title">{% trans "Cliente" %}</h2>
+        </div>
+        
+        <div class="client-search-container">
+          <label for="busqueda-cliente" class="cyber-label required">
+            {% trans "Buscar Cliente" %}
+          </label>
+          <input type="text" 
+                 id="busqueda-cliente" 
+                 class="cyber-input"
+                 placeholder="{% trans 'Escriba nombre, email o teléfono del cliente...' %}"
+                 autocomplete="off">
+          
+          <!-- Indicador de carga -->
+          <div id="loading-cliente" class="hidden mt-2">
+            <div class="cyber-loading"></div>
+            <span class="ml-2 text-sm">{% trans "Buscando clientes..." %}</span>
+          </div>
+          
+          <!-- Lista de sugerencias -->
+          <div id="sugerencias-clientes" class="client-suggestions hidden"></div>
+          
+          <!-- Cliente seleccionado -->
+          <div id="cliente-seleccionado" class="client-selected hidden">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="font-bold text-lg" id="cliente-nombre"></div>
+                <div class="text-sm" id="cliente-info"></div>
+              </div>
+              <button type="button" 
+                      id="limpiar-cliente"
+                      class="cyber-btn-secondary px-3 py-1 text-sm">
+                ✕ {% trans "Cambiar" %}
+              </button>
+            </div>
+          </div>
+          
+          <!-- Campo oculto para el ID del cliente -->
+          <select name="cliente" id="cliente-hidden" style="display: none;" required>
+            <option value="">{% trans "Seleccionar cliente" %}</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Sección: Información del Vehículo -->
+      <div class="tech-section">
+        <div class="section-header">
+          <div class="section-icon">
+            🔧
+          </div>
+          <h2 class="section-title">{% trans "Datos del Vehículo" %}</h2>
+        </div>
+        
+        <div class="cyber-grid cyber-grid-2 space-y-4">
+          <!-- Año -->
+          <div>
+            <label for="id_ano" class="cyber-label required">
+              {% trans "Año" %}
+            </label>
+            <select name="ano" id="id_ano" class="cyber-select" required>
+              <option value="">{% trans "Seleccionar año" %}</option>
+              <option value="2026">2026</option>
+              <option value="2025">2025</option>
+              <option value="2024">2024</option>
+              <option value="2023">2023</option>
+              <option value="2022">2022</option>
+              <option value="2021">2021</option>
+              <option value="2020">2020</option>
+              <option value="2019">2019</option>
+              <option value="2018">2018</option>
+              <option value="2017">2017</option>
+              <option value="2016">2016</option>
+              <option value="2015">2015</option>
+              <option value="2014">2014</option>
+              <option value="2013">2013</option>
+              <option value="2012">2012</option>
+              <option value="2011">2011</option>
+              <option value="2010">2010</option>
+              <option value="2009">2009</option>
+              <option value="2008">2008</option>
+              <option value="2007">2007</option>
+              <option value="2006">2006</option>
+              <option value="2005">2005</option>
+              <option value="2004">2004</option>
+              <option value="2003">2003</option>
+              <option value="2002">2002</option>
+              <option value="2001">2001</option>
+              <option value="2000">2000</option>
+              <option value="1999">1999</option>
+              <option value="1998">1998</option>
+              <option value="1997">1997</option>
+              <option value="1996">1996</option>
+              <option value="1995">1995</option>
+              <option value="1994">1994</option>
+              <option value="1993">1993</option>
+              <option value="1992">1992</option>
+              <option value="1991">1991</option>
+              <option value="1990">1990</option>
+              <option value="1989">1989</option>
+              <option value="1988">1988</option>
+              <option value="1987">1987</option>
+              <option value="1986">1986</option>
+              <option value="1985">1985</option>
+              <option value="1984">1984</option>
+              <option value="1983">1983</option>
+              <option value="1982">1982</option>
+              <option value="1981">1981</option>
+              <option value="1980">1980</option>
+              <option value="1979">1979</option>
+              <option value="1978">1978</option>
+              <option value="1977">1977</option>
+              <option value="1976">1976</option>
+              <option value="1975">1975</option>
+              <option value="1974">1974</option>
+              <option value="1973">1973</option>
+              <option value="1972">1972</option>
+              <option value="1971">1971</option>
+              <option value="1970">1970</option>
+            </select>
+          </div>
+
+          <!-- Marca -->
+          <div>
+            <label for="id_marca" class="cyber-label required">
+              {% trans "Marca" %}
+            </label>
+            <div class="flex space-x-2">
+              <select name="marca" id="id_marca" class="cyber-select" required style="flex: 1;">
+                <option value="">{% trans "Seleccionar marca" %}</option>
+              </select>
+              <button type="button" 
+                      onclick="abrirModalNuevaMarca()" 
+                      class="cyber-btn-secondary px-3">
+                ➕
+              </button>
+            </div>
+          </div>
+
+          <!-- Modelo -->
+          <div>
+            <label for="id_modelo" class="cyber-label required">
+              {% trans "Modelo" %}
+            </label>
+            <div class="flex space-x-2">
+              <select name="modelo" id="id_modelo" class="cyber-select" required style="flex: 1;">
+                <option value="">{% trans "Primero seleccione una marca" %}</option>
+              </select>
+              <button type="button" 
+                      onclick="abrirModalNuevoModelo()" 
+                      class="cyber-btn-secondary px-3" 
+                      id="btn-nuevo-modelo" 
+                      disabled>
+                ➕
+              </button>
+            </div>
+          </div>
+
+          <!-- Color -->
+          <div>
+            <label for="id_color" class="cyber-label required">
+              {% trans "Color" %}
+            </label>
+            <div class="flex space-x-2">
+              <select name="color" id="id_color" class="cyber-select" required style="flex: 1;">
+                <option value="">{% trans "Seleccionar color" %}</option>
+              </select>
+              <button type="button" 
+                      onclick="abrirModalNuevoColor()" 
+                      class="cyber-btn-secondary px-3">
+                ➕
+              </button>
+            </div>
+          </div>
+
+          <!-- Patente -->
+          <div>
+            <label for="id_patente" class="cyber-label required">
+              {% trans "Patente" %}
+            </label>
+            <input type="text" 
+                   name="patente" 
+                   id="id_patente" 
+                   class="cyber-input"
+                   placeholder="{% trans 'Ej: AA-BB-12 o ABCD-12' %}"
+                   required>
+          </div>
+
+          <!-- VIN -->
+          <div>
+            <label for="id_vin" class="cyber-label">
+              {% trans "VIN" %}
+            </label>
+            <input type="text" 
+                   name="vin" 
+                   id="id_vin" 
+                   class="cyber-input"
+                   placeholder="{% trans 'Número VIN (opcional)' %}"
+                   maxlength="17">
+          </div>
+
+          <!-- Motor -->
+          <div>
+            <label for="id_motor" class="cyber-label">
+              {% trans "Motor" %}
+            </label>
+            <div class="flex space-x-2">
+              <select name="motor" id="id_motor" class="cyber-select" style="flex: 1;">
+                <option value="">{% trans "Seleccionar motor (opcional)" %}</option>
+              </select>
+              <button type="button" 
+                      onclick="abrirModalNuevoMotor()" 
+                      class="cyber-btn-secondary px-3">
+                ➕
+              </button>
+            </div>
+          </div>
+
+          <!-- Transmisión -->
+          <div>
+            <label for="id_caja" class="cyber-label">
+              {% trans "Transmisión" %}
+            </label>
+            <div class="flex space-x-2">
+              <select name="caja" id="id_caja" class="cyber-select" style="flex: 1;">
+                <option value="">{% trans "Seleccionar transmisión (opcional)" %}</option>
+              </select>
+              <button type="button" 
+                      onclick="abrirModalNuevaCaja()" 
+                      class="cyber-btn-secondary px-3">
+                ➕
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botones de acción -->
+      <div class="text-center space-x-2">
+        <button type="submit" class="cyber-btn">
+          💾 {% trans "Crear Vehículo" %}
+        </button>
+        <a href="{% url 'taller:vehiculos:lista_vehiculos' %}" class="cyber-btn-secondary">
+          ↩️ {% trans "Cancelar" %}
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modales -->
+<!-- Modal Nueva Marca -->
+<div id="modal-nueva-marca" class="cyber-modal hidden">
+  <div class="cyber-modal-content">
+    <h3 class="text-lg font-bold mb-4">{% trans "Nueva Marca" %}</h3>
+    <input type="text" 
+           id="nueva-marca-nombre" 
+           class="cyber-input mb-4"
+           placeholder="{% trans 'Nombre de la marca' %}">
+    <div class="flex space-x-2">
+      <button type="button" onclick="guardarNuevaMarca()" class="cyber-btn">
+        {% trans "Guardar" %}
+      </button>
+      <button type="button" onclick="cerrarModal('modal-nueva-marca')" class="cyber-btn-secondary">
+        {% trans "Cancelar" %}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Nuevo Modelo -->
+<div id="modal-nuevo-modelo" class="cyber-modal hidden">
+  <div class="cyber-modal-content">
+    <h3 class="text-lg font-bold mb-4">{% trans "Nuevo Modelo" %}</h3>
+    <input type="text" 
+           id="nuevo-modelo-nombre" 
+           class="cyber-input mb-4"
+           placeholder="{% trans 'Nombre del modelo' %}">
+    <div class="flex space-x-2">
+      <button type="button" onclick="guardarNuevoModelo()" class="cyber-btn">
+        {% trans "Guardar" %}
+      </button>
+      <button type="button" onclick="cerrarModal('modal-nuevo-modelo')" class="cyber-btn-secondary">
+        {% trans "Cancelar" %}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Nuevo Color -->
+<div id="modal-nuevo-color" class="cyber-modal hidden">
+  <div class="cyber-modal-content">
+    <h3 class="text-lg font-bold mb-4">{% trans "Nuevo Color" %}</h3>
+    <input type="text" 
+           id="nuevo-color-nombre" 
+           class="cyber-input mb-4"
+           placeholder="{% trans 'Nombre del color' %}">
+    <div class="flex space-x-2">
+      <button type="button" onclick="guardarNuevoColor()" class="cyber-btn">
+        {% trans "Guardar" %}
+      </button>
+      <button type="button" onclick="cerrarModal('modal-nuevo-color')" class="cyber-btn-secondary">
+        {% trans "Cancelar" %}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Nuevo Motor -->
+<div id="modal-nuevo-motor" class="cyber-modal hidden">
+  <div class="cyber-modal-content">
+    <h3 class="text-lg font-bold mb-4">{% trans "Nuevo Motor" %}</h3>
+    <input type="text" 
+           id="nuevo-motor-nombre" 
+           class="cyber-input mb-4"
+           placeholder="{% trans 'Nombre del motor' %}">
+    <div class="flex space-x-2">
+      <button type="button" onclick="guardarNuevoMotor()" class="cyber-btn">
+        {% trans "Guardar" %}
+      </button>
+      <button type="button" onclick="cerrarModal('modal-nuevo-motor')" class="cyber-btn-secondary">
+        {% trans "Cancelar" %}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Nueva Caja -->
+<div id="modal-nueva-caja" class="cyber-modal hidden">
+  <div class="cyber-modal-content">
+    <h3 class="text-lg font-bold mb-4">{% trans "Nueva Transmisión" %}</h3>
+    <input type="text" 
+           id="nueva-caja-nombre" 
+           class="cyber-input mb-4"
+           placeholder="{% trans 'Nombre de la transmisión' %}">
+    <div class="flex space-x-2">
+      <button type="button" onclick="guardarNuevaCaja()" class="cyber-btn">
+        {% trans "Guardar" %}
+      </button>
+      <button type="button" onclick="cerrarModal('modal-nueva-caja')" class="cyber-btn-secondary">
+        {% trans "Cancelar" %}
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Variables globales
+let clienteTimeout;
+let currentSuggestions = [];
+
+// Cargar datos iniciales
+document.addEventListener('DOMContentLoaded', function() {
+    cargarMarcas();
+    cargarColores();
+    cargarMotores();
+    cargarCajas();
+    
+    // Configurar búsqueda de cliente
+    const busquedaInput = document.getElementById('busqueda-cliente');
+    if (busquedaInput) {
+        busquedaInput.addEventListener('input', buscarClientes);
+        busquedaInput.addEventListener('keydown', manejarTeclado);
+    }
+    
+    // Configurar cambio de marca
+    const marcaSelect = document.getElementById('id_marca');
+    if (marcaSelect) {
+        marcaSelect.addEventListener('change', cargarModelosPorMarca);
+    }
+    
+    // Configurar botón limpiar cliente
+    const limpiarBtn = document.getElementById('limpiar-cliente');
+    if (limpiarBtn) {
+        limpiarBtn.addEventListener('click', limpiarSeleccionCliente);
+    }
+});
+
+// Funciones de búsqueda de cliente
+function buscarClientes() {
+    const query = document.getElementById('busqueda-cliente').value.trim();
+    const loading = document.getElementById('loading-cliente');
+    const sugerencias = document.getElementById('sugerencias-clientes');
+    
+    clearTimeout(clienteTimeout);
+    
+    if (query.length < 2) {
+        sugerencias.classList.add('hidden');
+        loading.classList.add('hidden');
+        return;
+    }
+    
+    loading.classList.remove('hidden');
+    
+    clienteTimeout = setTimeout(() => {
+        fetch(`/taller/ajax/buscar-clientes/?q=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(data => {
+                loading.classList.add('hidden');
+                mostrarSugerenciasClientes(data.clientes || []);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                loading.classList.add('hidden');
+            });
+    }, 300);
+}
+
+function mostrarSugerenciasClientes(clientes) {
+    const container = document.getElementById('sugerencias-clientes');
+    currentSuggestions = clientes;
+    
+    if (clientes.length === 0) {
+        container.innerHTML = '<div class="client-suggestion-item">{% trans "No se encontraron clientes" %}</div>';
+        container.classList.remove('hidden');
+        return;
+    }
+    
+    const html = clientes.map((cliente, index) => `
+        <div class="client-suggestion-item" onclick="seleccionarCliente(${index})">
+            <div class="font-bold">${cliente.nombre}</div>
+            <div class="text-sm">${cliente.email || ''} ${cliente.telefono || ''}</div>
+        </div>
+    `).join('');
+    
+    container.innerHTML = html;
+    container.classList.remove('hidden');
+}
+
+function seleccionarCliente(index) {
+    const cliente = currentSuggestions[index];
+    
+    // Mostrar cliente seleccionado
+    document.getElementById('cliente-nombre').textContent = cliente.nombre;
+    document.getElementById('cliente-info').textContent = `${cliente.email || ''} ${cliente.telefono || ''}`;
+    document.getElementById('cliente-seleccionado').classList.remove('hidden');
+    
+    // Ocultar búsqueda y sugerencias
+    document.getElementById('busqueda-cliente').style.display = 'none';
+    document.getElementById('sugerencias-clientes').classList.add('hidden');
+    
+    // Establecer valor en el select oculto
+    const selectCliente = document.getElementById('cliente-hidden');
+    selectCliente.innerHTML = `<option value="${cliente.id}" selected>${cliente.nombre}</option>`;
+}
+
+function limpiarSeleccionCliente() {
+    document.getElementById('cliente-seleccionado').classList.add('hidden');
+    document.getElementById('busqueda-cliente').style.display = 'block';
+    document.getElementById('busqueda-cliente').value = '';
+    document.getElementById('cliente-hidden').innerHTML = '<option value="">{% trans "Seleccionar cliente" %}</option>';
+    document.getElementById('sugerencias-clientes').classList.add('hidden');
+}
+
+function manejarTeclado(event) {
+    // Implementar navegación con flechas si es necesario
+}
+
+// Funciones de carga de datos
+function cargarMarcas() {
+    fetch('/taller/ajax/marcas/')
+        .then(response => response.json())
+        .then(data => {
+            const select = document.getElementById('id_marca');
+            select.innerHTML = '<option value="">{% trans "Seleccionar marca" %}</option>';
+            
+            data.marcas.forEach(marca => {
+                const option = document.createElement('option');
+                option.value = marca.id;
+                option.textContent = marca.nombre;
+                select.appendChild(option);
+            });
+        })
+        .catch(error => console.error('Error cargando marcas:', error));
+}
+
+function cargarModelosPorMarca() {
+    const marcaId = document.getElementById('id_marca').value;
+    const modeloSelect = document.getElementById('id_modelo');
+    const btnNuevoModelo = document.getElementById('btn-nuevo-modelo');
+    
+    if (!marcaId) {
+        modeloSelect.innerHTML = '<option value="">{% trans "Primero seleccione una marca" %}</option>';
+        btnNuevoModelo.disabled = true;
+        return;
+    }
+    
+    btnNuevoModelo.disabled = false;
+    
+    fetch(`/taller/ajax/modelos/?marca_id=${marcaId}`)
+        .then(response => response.json())
+        .then(data => {
+            modeloSelect.innerHTML = '<option value="">{% trans "Seleccionar modelo" %}</option>';
+            
+            data.modelos.forEach(modelo => {
+                const option = document.createElement('option');
+                option.value = modelo.id;
+                option.textContent = modelo.nombre;
+                modeloSelect.appendChild(option);
+            });
+        })
+        .catch(error => console.error('Error cargando modelos:', error));
+}
+
+function cargarColores() {
+    fetch('/taller/ajax/colores/')
+        .then(response => response.json())
+        .then(data => {
+            const select = document.getElementById('id_color');
+            select.innerHTML = '<option value="">{% trans "Seleccionar color" %}</option>';
+            
+            data.colores.forEach(color => {
+                const option = document.createElement('option');
+                option.value = color.id;
+                option.textContent = color.nombre;
+                select.appendChild(option);
+            });
+        })
+        .catch(error => console.error('Error cargando colores:', error));
+}
+
+function cargarMotores() {
+    fetch('/taller/ajax/motores/')
+        .then(response => response.json())
+        .then(data => {
+            const select = document.getElementById('id_motor');
+            select.innerHTML = '<option value="">{% trans "Seleccionar motor (opcional)" %}</option>';
+            
+            data.motores.forEach(motor => {
+                const option = document.createElement('option');
+                option.value = motor.id;
+                option.textContent = motor.nombre;
+                select.appendChild(option);
+            });
+        })
+        .catch(error => console.error('Error cargando motores:', error));
+}
+
+function cargarCajas() {
+    fetch('/taller/ajax/cajas/')
+        .then(response => response.json())
+        .then(data => {
+            const select = document.getElementById('id_caja');
+            select.innerHTML = '<option value="">{% trans "Seleccionar transmisión (opcional)" %}</option>';
+            
+            data.cajas.forEach(caja => {
+                const option = document.createElement('option');
+                option.value = caja.id;
+                option.textContent = caja.nombre;
+                select.appendChild(option);
+            });
+        })
+        .catch(error => console.error('Error cargando cajas:', error));
+}
+
+// Funciones de modales
+function abrirModalNuevaMarca() {
+    document.getElementById('modal-nueva-marca').classList.remove('hidden');
+    document.getElementById('nueva-marca-nombre').focus();
+}
+
+function abrirModalNuevoModelo() {
+    const marcaId = document.getElementById('id_marca').value;
+    if (!marcaId) {
+        alert('{% trans "Primero debe seleccionar una marca" %}');
+        return;
+    }
+    document.getElementById('modal-nuevo-modelo').classList.remove('hidden');
+    document.getElementById('nuevo-modelo-nombre').focus();
+}
+
+function abrirModalNuevoColor() {
+    document.getElementById('modal-nuevo-color').classList.remove('hidden');
+    document.getElementById('nuevo-color-nombre').focus();
+}
+
+function abrirModalNuevoMotor() {
+    document.getElementById('modal-nuevo-motor').classList.remove('hidden');
+    document.getElementById('nuevo-motor-nombre').focus();
+}
+
+function abrirModalNuevaCaja() {
+    document.getElementById('modal-nueva-caja').classList.remove('hidden');
+    document.getElementById('nueva-caja-nombre').focus();
+}
+
+function cerrarModal(modalId) {
+    document.getElementById(modalId).classList.add('hidden');
+}
+
+// Funciones de guardado
+function guardarNuevaMarca() {
+    const nombre = document.getElementById('nueva-marca-nombre').value.trim();
+    if (!nombre) return;
+    
+    fetch('/taller/ajax/crear-marca/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({ nombre: nombre })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            cargarMarcas();
+            setTimeout(() => {
+                document.getElementById('id_marca').value = data.marca.id;
+                cargarModelosPorMarca();
+            }, 100);
+            cerrarModal('modal-nueva-marca');
+            document.getElementById('nueva-marca-nombre').value = '';
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function guardarNuevoModelo() {
+    const nombre = document.getElementById('nuevo-modelo-nombre').value.trim();
+    const marcaId = document.getElementById('id_marca').value;
+    
+    if (!nombre || !marcaId) return;
+    
+    fetch('/taller/ajax/crear-modelo/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({ nombre: nombre, marca_id: marcaId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            cargarModelosPorMarca();
+            setTimeout(() => {
+                document.getElementById('id_modelo').value = data.modelo.id;
+            }, 100);
+            cerrarModal('modal-nuevo-modelo');
+            document.getElementById('nuevo-modelo-nombre').value = '';
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function guardarNuevoColor() {
+    const nombre = document.getElementById('nuevo-color-nombre').value.trim();
+    if (!nombre) return;
+    
+    fetch('/taller/ajax/crear-color/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({ nombre: nombre })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            cargarColores();
+            setTimeout(() => {
+                document.getElementById('id_color').value = data.color.id;
+            }, 100);
+            cerrarModal('modal-nuevo-color');
+            document.getElementById('nuevo-color-nombre').value = '';
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function guardarNuevoMotor() {
+    const nombre = document.getElementById('nuevo-motor-nombre').value.trim();
+    if (!nombre) return;
+    
+    fetch('/taller/ajax/crear-motor/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({ nombre: nombre })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            cargarMotores();
+            setTimeout(() => {
+                document.getElementById('id_motor').value = data.motor.id;
+            }, 100);
+            cerrarModal('modal-nuevo-motor');
+            document.getElementById('nuevo-motor-nombre').value = '';
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function guardarNuevaCaja() {
+    const nombre = document.getElementById('nueva-caja-nombre').value.trim();
+    if (!nombre) return;
+    
+    fetch('/taller/ajax/crear-caja/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({ nombre: nombre })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            cargarCajas();
+            setTimeout(() => {
+                document.getElementById('id_caja').value = data.caja.id;
+            }, 100);
+            cerrarModal('modal-nueva-caja');
+            document.getElementById('nueva-caja-nombre').value = '';
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+// Cerrar modales al hacer clic fuera
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('cyber-modal')) {
+        e.target.classList.add('hidden');
+    }
+});
+</script>
+{% endblock %}

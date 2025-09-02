@@ -1,75 +1,99 @@
 """
 Middleware para configurar idioma automáticamente según el país
 Chile: español fijo
-USA: selector ES/EN (guarda en sesión)
+USA: selector ES/EN (guarda en cookie/sesión)
 """
 
+from django.conf import settings
+from django.shortcuts import redirect
 from django.utils import translation
 from django.utils.deprecation import MiddlewareMixin
-from django.shortcuts import redirect
-from django.urls import reverse
-import re
+# LANGUAGE_SESSION_KEY no está disponible en todas las versiones de Django
+LANGUAGE_SESSION_KEY = 'django_language'
+import logging
 
+logger = logging.getLogger(__name__)
+
+ALLOWED_LANGS = {code for code, _ in getattr(settings, "LANGUAGES", (("es", "Español"), ("en", "English")))}
 
 class CountryLanguageMiddleware(MiddlewareMixin):
     """
-    Middleware que configura el idioma automáticamente según el país
+    - /cl/...  => fuerza ES siempre
+    - /us/...  => respeta cookie/sesión; si llega ?lang=xx (o ?language=xx), persiste y redirige
+    - Expone request.country y request.LANGUAGE_CODE
+    - Asegura Content-Language y cookie django_language coherentes
     """
-    
-    COUNTRY_LANGUAGE_MAP = {
-        'cl': 'es',  # Chile: español fijo
-        'us': None,  # USA: usar selector de idioma
-    }
-    
-    def process_request(self, request):
-        """Configura el idioma según el país detectado en la URL"""
-        path = request.path.lower()
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        path = request.path or ""
         
-        # Detectar país desde URL
-        country = self.get_country_from_path(path)
+        # Determinar país basado en URL y usuario logueado
+        url_country = "CL" if path.startswith("/cl/") else ("US" if path.startswith("/us/") else None)
         
-        # Agregar el país detectado al request para uso en templates
-        if country == 'cl':
-            request.current_country = 'chile'
-        elif country == 'us':
-            request.current_country = 'usa'
+        # Si el usuario está logueado, usar su país de empresa
+        user_country = None
+        if hasattr(request, 'user') and request.user.is_authenticated:
+            try:
+                if hasattr(request.user, 'empresa') and request.user.empresa:
+                    user_country = request.user.empresa.pais
+                elif hasattr(request.user, 'perfilusuario') and request.user.perfilusuario:
+                    user_country = request.user.perfilusuario.pais
+            except:
+                pass
+        
+        # Priorizar el país del usuario sobre la URL
+        # Si no hay usuario logueado, usar el país de la URL como fallback
+        country = user_country if user_country else url_country
+        request.country = country
+        
+
+
+        # Lo que haya decidido LocaleMiddleware (cookie/sesión) antes de nosotros
+        lang = getattr(request, "LANGUAGE_CODE", None)
+
+        # ¿Viene conmutación manual por query?
+        lang_param = request.GET.get("lang") or request.GET.get("language")
+
+        # Manejar cambio de idioma por parámetro URL
+        if lang_param in ALLOWED_LANGS:
+            # Si viene un parámetro de idioma válido, permitir el cambio
+            lang = lang_param
+            # Guardar en sesión
+            if hasattr(request, "session"):
+                request.session[LANGUAGE_SESSION_KEY] = lang
         else:
-            request.current_country = None
+            # Verificar si hay una cookie establecida por el usuario
+            user_cookie = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME)
+            if user_cookie and user_cookie in ALLOWED_LANGS:
+                # Respetar la preferencia del usuario
+                lang = user_cookie
+            else:
+                # Por defecto según el país del usuario
+                if country == "US":
+                    lang = "en"  # Inglés para usuarios de USA
+                elif country == "CL":
+                    lang = "es"  # Español para usuarios de Chile
+                else:
+                    lang = getattr(settings, "LANGUAGE_CODE", "es")  # Fallback
+
+        # Activa lo que hayamos resuelto
+        lang = lang or "es"  # Fallback final
+        translation.activate(lang)
+        request.LANGUAGE_CODE = lang
+
+        response = self.get_response(request)
+        response.headers["Content-Language"] = lang
         
-        if country == 'cl':
-            # Chile: forzar español
-            translation.activate('es')
-            request.LANGUAGE_CODE = 'es'
-            
-        elif country == 'us':
-            # USA: usar selector de idioma (sesión/cookie)
-            # Si no hay idioma guardado en sesión, usar inglés por defecto
-            user_language = request.session.get('django_language', 'en')
-            
-            # Permitir cambio vía parámetro ?lang=
-            if 'lang' in request.GET:
-                requested_lang = request.GET['lang']
-                if requested_lang in ['es', 'en']:
-                    user_language = requested_lang
-                    request.session['django_language'] = user_language
-            
-            translation.activate(user_language)
-            request.LANGUAGE_CODE = user_language
-        
-        else:
-            # Rutas sin país: usar configuración por defecto
-            translation.activate('en')
-            request.LANGUAGE_CODE = 'en'
-    
-    def get_country_from_path(self, path):
-        """Extrae el código de país de la URL"""
-        # Buscar /cl/ o /us/ al inicio de la ruta
-        match = re.match(r'^/([a-z]{2})/', path)
-        if match:
-            return match.group(1)
-        return None
-    
-    def process_response(self, request, response):
-        """Limpia la configuración de idioma"""
-        translation.deactivate()
+        # No overwrites: sólo refuerza si no hay cookie
+        if not request.COOKIES.get(getattr(settings, "LANGUAGE_COOKIE_NAME", "django_language")):
+            response.set_cookie(
+                settings.LANGUAGE_COOKIE_NAME,
+                lang,
+                max_age=31536000,
+                samesite=getattr(settings, "LANGUAGE_COOKIE_SAMESITE", "Lax"),
+                secure=getattr(settings, "LANGUAGE_COOKIE_SECURE", False),
+                path=getattr(settings, "LANGUAGE_COOKIE_PATH", "/"),
+            )
         return response

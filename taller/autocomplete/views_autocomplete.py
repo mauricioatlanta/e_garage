@@ -105,6 +105,13 @@ class MarcaAutocomplete(autocomplete.Select2QuerySetView):
             return Marca.objects.none()
 
         qs = Marca.objects.all()
+        
+        # BLINDAJE MULTI-TENANT: Filtrar por país de la empresa del usuario
+        user = self.request.user
+        if hasattr(user, 'empresa') and user.empresa and hasattr(user.empresa, 'pais'):
+            pais = user.empresa.pais
+            qs = qs.filter(country=pais)
+        
         if self.q:
             qs = qs.filter(nombre__icontains=self.q)
         return qs.order_by('nombre')

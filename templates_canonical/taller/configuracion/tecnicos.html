@@ -1,0 +1,416 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}👨‍🔧 Manage Technicians - {{ company_name|default:"eGarage" }}{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* Futuristic Technicians Management Page */
+  .technicians-container {
+    background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 50%, #16213e 100%);
+    min-height: 100vh;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  /* Animated Background Circuit */
+  .circuit-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.08;
+    background-image: 
+      radial-gradient(circle at 25% 25%, #00ffff 2px, transparent 2px),
+      radial-gradient(circle at 75% 75%, #00ffff 2px, transparent 2px),
+      linear-gradient(90deg, transparent 48%, #00ffff 49%, #00ffff 51%, transparent 52%),
+      linear-gradient(0deg, transparent 48%, #00ffff 49%, #00ffff 51%, transparent 52%);
+    background-size: 100px 100px, 100px 100px, 50px 50px, 50px 50px;
+    animation: circuit-flow 15s linear infinite;
+  }
+  
+  @keyframes circuit-flow {
+    0% { transform: translate(0, 0) rotate(0deg); }
+    100% { transform: translate(50px, 50px) rotate(360deg); }
+  }
+  
+  /* Holographic Data Cards */
+  .tech-card {
+    background: rgba(0, 40, 80, 0.6);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    padding: 20px;
+    margin-bottom: 15px;
+    position: relative;
+    transition: all 0.3s ease;
+    overflow: hidden;
+  }
+  
+  .tech-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.1), transparent);
+    animation: data-scan 4s linear infinite;
+  }
+  
+  @keyframes data-scan {
+    0% { left: -100%; }
+    100% { left: 100%; }
+  }
+  
+  .tech-card:hover {
+    border-color: rgba(0, 255, 255, 0.8);
+    box-shadow: 0 15px 40px rgba(0, 255, 255, 0.2);
+    transform: translateY(-5px);
+  }
+  
+  /* Status Indicators */
+  .status-active {
+    color: #00ff88;
+    text-shadow: 0 0 10px #00ff88;
+  }
+  
+  .status-inactive {
+    color: #ff4444;
+    text-shadow: 0 0 10px #ff4444;
+  }
+  
+  /* Cyber Form Elements */
+  .cyber-form {
+    background: rgba(0, 20, 40, 0.8);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    border-radius: 12px;
+    padding: 24px;
+    backdrop-filter: blur(10px);
+  }
+  
+  .cyber-input {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(0, 255, 255, 0.5);
+    border-radius: 8px;
+    color: #00ffff;
+    padding: 12px 16px;
+    transition: all 0.3s ease;
+    width: 100%;
+  }
+  
+  .cyber-input:focus {
+    border-color: #00ffff;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+    outline: none;
+  }
+  
+  .cyber-label {
+    color: #00ffff;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    display: block;
+  }
+  
+  /* Action Buttons */
+  .action-btn {
+    background: linear-gradient(45deg, #ff4444, #ff6666);
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+  
+  .action-btn.edit {
+    background: linear-gradient(45deg, #ffaa00, #ffcc44);
+  }
+  
+  .action-btn.delete {
+    background: linear-gradient(45deg, #ff4444, #ff6666);
+  }
+  
+  .action-btn:hover {
+    box-shadow: 0 0 20px rgba(255, 68, 68, 0.6);
+    transform: translateY(-2px);
+  }
+  
+  .action-btn.edit:hover {
+    box-shadow: 0 0 20px rgba(255, 170, 0, 0.6);
+  }
+  
+  /* Data Grid */
+  .data-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr 1fr 150px;
+    gap: 15px;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(0, 255, 255, 0.1);
+  }
+  
+  .data-header {
+    background: rgba(0, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #00ffff;
+    text-align: center;
+  }
+  
+  /* Floating Elements */
+  .floating-element {
+    position: absolute;
+    background: rgba(0, 255, 255, 0.1);
+    border-radius: 50%;
+    animation: float-around 8s ease-in-out infinite;
+  }
+  
+  .floating-element:nth-child(1) { 
+    width: 8px; height: 8px; 
+    top: 15%; left: 10%; 
+    animation-delay: 0s; 
+  }
+  .floating-element:nth-child(2) { 
+    width: 12px; height: 12px; 
+    top: 70%; left: 85%; 
+    animation-delay: 2s; 
+  }
+  .floating-element:nth-child(3) { 
+    width: 6px; height: 6px; 
+    top: 40%; left: 90%; 
+    animation-delay: 4s; 
+  }
+  
+  @keyframes float-around {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(20px, -20px) rotate(90deg); }
+    50% { transform: translate(-20px, -40px) rotate(180deg); }
+    75% { transform: translate(-40px, 20px) rotate(270deg); }
+  }
+</style>
+
+<!-- Google Fonts for Futuristic Typography -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="technicians-container">
+  <!-- Animated Background -->
+  <div class="circuit-bg"></div>
+  
+  <!-- Floating Elements -->
+  <div class="floating-element"></div>
+  <div class="floating-element"></div>
+  <div class="floating-element"></div>
+  
+  <div class="container mx-auto px-6 py-12 relative z-10">
+    <!-- Header -->
+    <div class="text-center mb-12">
+      <h1 class="text-5xl font-bold text-cyan-300 mb-4" style="font-family: 'Orbitron', monospace; text-shadow: 0 0 20px #00ffff;">
+        👨‍🔧 TECHNICIAN MANAGEMENT SYSTEM
+      </h1>
+      <p class="text-xl text-cyan-400 opacity-80">
+        Advanced Personnel Control & Monitoring
+      </p>
+      <div class="w-40 h-1 bg-gradient-to-r from-cyan-400 to-blue-500 mx-auto mt-4 rounded-full"></div>
+    </div>
+    
+    <!-- Quick Stats Panel -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="tech-card text-center">
+        <div class="text-3xl font-bold text-green-400">{{ tecnicos.count }}</div>
+        <div class="text-cyan-300 uppercase text-sm">Total Technicians</div>
+      </div>
+      <div class="tech-card text-center">
+        <div class="text-3xl font-bold text-cyan-400">{{ active_count|default:tecnicos.count }}</div>
+        <div class="text-cyan-300 uppercase text-sm">Active Personnel</div>
+      </div>
+      <div class="tech-card text-center">
+        <div class="text-3xl font-bold text-cyan-400">{{ active_count|default:tecnicos.count }}</div>
+        <div class="text-cyan-300 uppercase text-sm">Active Personnel</div>
+      </div>
+    </div>
+    
+    <!-- Add New Technician Form -->
+    <div class="cyber-form mb-8">
+      <h2 class="text-2xl font-bold text-cyan-300 mb-6 flex items-center">
+        ➕ <span class="ml-3">ADD NEW TECHNICIAN</span>
+      </h2>
+      
+      <form method="post" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="add">
+        
+        <div>
+          <label class="cyber-label">First Name</label>
+          <input type="text" name="nombre" class="cyber-input" placeholder="Enter first name" required>
+        </div>
+        
+        <div>
+          <label class="cyber-label">Last Name</label>
+          <input type="text" name="apellido" class="cyber-input" placeholder="Enter last name" required>
+        </div>
+        
+        <div>
+          <label class="cyber-label">Email Address</label>
+          <input type="email" name="email" class="cyber-input" placeholder="technician@company.com">
+        </div>
+        
+        <div>
+          <label class="cyber-label">Phone Number</label>
+          <input type="tel" name="telefono" class="cyber-input" placeholder="+56 9 XXXX XXXX">
+        </div>
+        
+        <div class="md:col-span-2">
+          <label class="cyber-label">Specialization</label>
+          <input type="text" name="especialidad" class="cyber-input" placeholder="e.g., Engine Specialist, Electronics, etc.">
+        </div>
+        
+        <div class="md:col-span-2">
+          <button type="submit" class="cyber-btn w-full">
+            🚀 REGISTER TECHNICIAN
+          </button>
+        </div>
+      </form>
+    </div>
+    
+    <!-- Technicians Data Grid -->
+    <div class="tech-card">
+      <h2 class="text-2xl font-bold text-cyan-300 mb-6 flex items-center">
+        👥 <span class="ml-3">PERSONNEL DATABASE</span>
+      </h2>
+      
+      <!-- Grid Header -->
+      <div class="data-grid mb-4">
+        <div class="data-header">ID</div>
+        <div class="data-header">Technician Info</div>
+        <div class="data-header">Contact</div>
+        <div class="data-header">Status</div>
+        <div class="data-header">Actions</div>
+      </div>
+      
+      <!-- Technicians List -->
+      {% for tecnico in tecnicos %}
+      <div class="data-grid">
+        <div class="text-cyan-400 font-mono text-center">
+          #{{ tecnico.id|stringformat:"03d" }}
+        </div>
+        
+        <div>
+          <div class="text-cyan-300 font-semibold text-lg">
+            {{ tecnico.nombre }}
+          </div>
+          {% if tecnico.direccion %}
+            <div class="text-cyan-500 text-sm">
+              🔧 {{ tecnico.direccion }}
+            </div>
+          {% endif %}
+        </div>
+        
+        <div>
+          {% if tecnico.email %}
+            <div class="text-cyan-400 text-sm">📧 {{ tecnico.email }}</div>
+          {% endif %}
+          {% if tecnico.telefono %}
+            <div class="text-cyan-400 text-sm">📱 {{ tecnico.telefono }}</div>
+          {% endif %}
+        </div>
+        
+        <div class="text-center">
+          <span class="status-active">
+            ● ACTIVE
+          </span>
+        </div>
+        
+        <div class="flex gap-2 justify-center">
+          <button class="action-btn edit" onclick="editTechnician({{ tecnico.id }})">
+            ✏️ EDIT
+          </button>
+          <form method="post" style="display: inline;" onsubmit="return confirm('¿Delete this technician?')">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="delete">
+            <input type="hidden" name="tecnico_id" value="{{ tecnico.id }}">
+            <button type="submit" class="action-btn delete">
+              🗑️ DELETE
+            </button>
+          </form>
+        </div>
+      </div>
+      {% empty %}
+      <div class="text-center py-12">
+        <div class="text-6xl mb-4">🤖</div>
+        <div class="text-xl text-cyan-400 mb-2">No Technicians Found</div>
+        <div class="text-cyan-600">Add your first technician using the form above</div>
+      </div>
+      {% endfor %}
+    </div>
+    
+    <!-- Back to Settings -->
+    <div class="text-center mt-8">
+      <a href="/cl/taller/settings/" class="cyber-btn">
+        ⬅️ BACK TO SETTINGS
+      </a>
+    </div>
+    
+    <!-- Footer -->
+    <div class="text-center mt-12">
+      <p class="text-cyan-400 opacity-60">
+        🔧 Technician Management System v1.0
+      </p>
+      <p class="text-xs text-cyan-600 mt-2">
+        Secure Personnel Database
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+// Interactive effects
+document.addEventListener('DOMContentLoaded', function() {
+  // Add hover effects to tech cards
+  const techCards = document.querySelectorAll('.tech-card');
+  techCards.forEach(card => {
+    card.addEventListener('mouseenter', function() {
+      this.style.borderColor = 'rgba(0, 255, 255, 0.8)';
+    });
+    card.addEventListener('mouseleave', function() {
+      this.style.borderColor = 'rgba(0, 255, 255, 0.3)';
+    });
+  });
+  
+  // Form validation enhancements
+  const inputs = document.querySelectorAll('.cyber-input');
+  inputs.forEach(input => {
+    input.addEventListener('focus', function() {
+      this.style.boxShadow = '0 0 20px rgba(0, 255, 255, 0.4)';
+    });
+    input.addEventListener('blur', function() {
+      this.style.boxShadow = 'none';
+    });
+  });
+});
+
+function editTechnician(id) {
+  // Simple edit functionality - you can enhance this
+  const name = prompt('Enter new name for technician #' + id + ':');
+  if (name) {
+    // Here you would typically send an AJAX request to update
+    alert('Edit functionality - integrate with backend');
+  }
+}
+</script>
+{% endblock %}
+

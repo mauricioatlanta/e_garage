@@ -45,8 +45,8 @@ def crear_vehiculo(request):
     return render(request, 'taller/vehiculos/crear_vehiculo.html', {
         'form': form,
         'country': country,
-    'clientes': Cliente.objects.all(),
-    'marcas_usa': MarcaVehiculo.objects.filter(activa=True).order_by('nombre'),
-    'modelos_usa': ModeloVehiculo.objects.filter(activo=True).order_by('nombre'),
-    'colores': ColorVehiculo.objects.all(),
+        'clientes': Cliente.objects.filter(empresa=request.user.empresa),  # BLINDAJE: Filtrado por empresa
+        'marcas_usa': MarcaVehiculo.objects.filter(activa=True).order_by('nombre'),
+        'modelos_usa': ModeloVehiculo.objects.filter(activo=True).order_by('nombre'),
+        'colores': ColorVehiculo.get_colores_para_pais('US'),  # CORREGIDO: Colores por país
     })

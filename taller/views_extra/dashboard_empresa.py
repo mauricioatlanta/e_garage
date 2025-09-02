@@ -211,7 +211,18 @@ def dashboard_centro_operaciones(request):
         'mes_actual': hoy.strftime('%B %Y'),
     }
     
-    return render(request, 'taller/dashboard/centro_operaciones.html', context)
+    # Usar template resolution en lugar de template hardcodeado
+    from taller.utils.templates import select_country_lang_template
+    from django.utils.translation import get_language
+    from django.template.response import TemplateResponse
+    
+    template_name = select_country_lang_template(
+        "dashboard/centro_operaciones.html", 
+        getattr(request.user.empresa, 'pais', 'cl').lower(), 
+        get_language()
+    )
+    
+    return render(request, template_name, context)
 
 
 @login_required
@@ -252,6 +263,61 @@ def dashboard_centro_operaciones_espacial(request):
     facturas = Documento.objects.filter(empresa=empresa, tipo='FAC').count()
     ordenes = Documento.objects.filter(empresa=empresa, tipo='OT').count()
     
+    # 📊 DATOS PARA GRÁFICOS REALES
+    
+    # 1. Ingresos por mes (últimos 7 meses)
+    ingresos_por_mes = []
+    labels_meses = []
+    for i in range(6, -1, -1):  # Últimos 7 meses
+        fecha_inicio = hoy - timedelta(days=30*i)
+        fecha_fin = fecha_inicio + timedelta(days=30)
+        
+        ingresos_mes = LineaServicio.objects.filter(
+            documento__empresa=empresa,
+            documento__fecha_emision__gte=fecha_inicio,
+            documento__fecha_emision__lt=fecha_fin,
+            documento__tipo='FAC'
+        ).aggregate(total=Sum(F('precio_unitario') * F('cantidad')))['total'] or Decimal('0')
+        
+        ingresos_por_mes.append(float(ingresos_mes))
+        labels_meses.append(fecha_inicio.strftime('%b').upper())
+    
+    # 2. Servicios por categoría
+    from django.db.models import Count
+    servicios_por_categoria = LineaServicio.objects.filter(
+        documento__empresa=empresa,
+        documento__fecha_emision__gte=hace_30_dias
+    ).values('servicio__categoria__code').annotate(
+        total=Count('id')
+    ).order_by('-total')[:4]
+    
+    categorias_servicios = []
+    datos_servicios = []
+    for servicio in servicios_por_categoria:
+        categorias_servicios.append(servicio['servicio__categoria__code'] or 'Otros')
+        datos_servicios.append(servicio['total'])
+    
+    # Si no hay datos, usar valores por defecto
+    if not categorias_servicios:
+        categorias_servicios = ['Mecánica', 'Eléctrica', 'Pintura', 'Otros']
+        datos_servicios = [0, 0, 0, 0]
+    
+    # 3. Rendimiento de técnicos
+    tecnicos_rendimiento = Tecnico.objects.filter(empresa=empresa).annotate(
+        documentos_count=Count('documentos_responsables', filter=Q(documentos_responsables__fecha_emision__gte=hace_30_dias))
+    ).order_by('-documentos_count')[:4]
+    
+    nombres_tecnicos = []
+    rendimiento_tecnicos = []
+    for tecnico in tecnicos_rendimiento:
+        nombres_tecnicos.append(tecnico.nombre)
+        rendimiento_tecnicos.append(tecnico.documentos_count)
+    
+    # Si no hay técnicos, usar valores por defecto
+    if not nombres_tecnicos:
+        nombres_tecnicos = ['Sin datos']
+        rendimiento_tecnicos = [0]
+    
     contexto = {
         'empresa': empresa,
         'documentos_total': documentos_total,
@@ -264,8 +330,32 @@ def dashboard_centro_operaciones_espacial(request):
         'facturas': facturas,
         'ordenes': ordenes,
         'es_dashboard_espacial': True,
+        
+        # 📊 Datos para gráficos
+        'ingresos_por_mes': ingresos_por_mes,
+        'labels_meses': labels_meses,
+        'categorias_servicios': categorias_servicios,
+        'datos_servicios': datos_servicios,
+        'nombres_tecnicos': nombres_tecnicos,
+        'rendimiento_tecnicos': rendimiento_tecnicos,
     }
     
-    return render(request, 'taller/dashboard/centro_operaciones_espacial.html', contexto)
+    # Usar template resolution en lugar de template hardcodeado
+    from taller.utils.templates import select_country_lang_template
+    from django.utils.translation import get_language, activate
+    from django.template.response import TemplateResponse
+
+    # Manejar cambio de idioma
+    lang = request.GET.get('lang')
+    if lang in ['es', 'en']:
+        activate(lang)
+
+    template_name = select_country_lang_template(
+        "dashboard/centro_operaciones_espacial.html", 
+        getattr(request.user.empresa, 'pais', 'cl').lower(), 
+        get_language()
+    )
+
+    return render(request, template_name, contexto)
 
 

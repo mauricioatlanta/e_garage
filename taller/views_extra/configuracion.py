@@ -69,4 +69,15 @@ def configuracion(request):
         'empresa': empresa,
         'created': created
     }
-    return render(request, 'taller/configuracion.html', context)
+    # Usar template resolution en lugar de template hardcodeado
+    from taller.utils.templates import select_country_lang_template
+    from django.utils.translation import get_language
+    from django.template.response import TemplateResponse
+    
+    template_name = select_country_lang_template(
+        "configuracion.html", 
+        getattr(request.user.empresa, 'pais', 'cl').lower(), 
+        get_language()
+    )
+    
+    return TemplateResponse(request, template_name, context)

@@ -1,0 +1,19 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
+<head>
+    <meta charset="UTF-8">
+    <title>{% trans "Welcome to eGarage" %}</title>
+</head>
+<body>
+    <h1>{% trans "Welcome to eGarage" %}</h1>
+    <p>{% trans "Your account has been activated" %}</p>
+    <a href="#">{% trans "Create account" %}</a>
+    <a href="#">{% trans "Log in" %}</a>
+    <footer>{% trans "Settings" %}</footer>
+    <div style="margin-top:2em;">
+        <a href="/i18n/setlang/?next={{ request.path }}&language=en">English</a> |
+        <a href="/i18n/setlang/?next={{ request.path }}&language=es">Español</a>
+    </div>
+</body>
+</html>

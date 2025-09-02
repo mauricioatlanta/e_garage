@@ -27,6 +27,7 @@ SECURE_SSL_REDIRECT = not DEBUG
 INSTALLED_APPS = [
     'dal',
     'dal_select2',
+    'core',  # App para funcionalidades compartidas y commands
     'taller',
 
     # Apps Django
@@ -80,6 +81,9 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'core.context_processors.static_version',
+                'core.context_processors.empresa_info',
+                'taller.context_processors.empresa_context',
             ],
         },
     },

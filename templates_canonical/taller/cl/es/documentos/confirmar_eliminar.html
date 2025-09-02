@@ -1,0 +1,50 @@
+{% load static %}
+{% load i18n %}
+
+<!DOCTYPE html>
+<html lang="{{ request.LANGUAGE_CODE }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% trans "Confirmar Eliminación" %} | E-Garage</title>
+    <link href="{% static 'css/app.css' %}?v={{ STATIC_VERSION }}" rel="stylesheet">
+    <link href="{% static 'css/forms.css' %}?v={{ STATIC_VERSION }}" rel="stylesheet">
+</head>
+<body>
+    <div class="container mx-auto py-8">
+        <div class="max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-2xl font-bold mb-4 text-red-600">
+                {% trans "Confirmar Eliminación" %}
+            </h2>
+            
+            <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded">
+                <p class="text-red-800">
+                    {% trans "¿Estás seguro de que quieres eliminar este documento?" %}
+                </p>
+                <p class="mt-2 font-semibold">
+                    {{ object.tipo_documento.nombre }} #{{ object.numero }}
+                </p>
+                {% if object.cliente %}
+                <p class="text-sm text-gray-600">
+                    {% trans "Cliente" %}: {{ object.cliente.nombre }}
+                </p>
+                {% endif %}
+            </div>
+            
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+                <div class="flex space-x-4">
+                    <button type="submit" 
+                            class="flex-1 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                        {% trans "Sí, eliminar" %}
+                    </button>
+                    <a href="{% url 'documentos:lista_documentos' %}" 
+                       class="flex-1 bg-gray-300 text-gray-800 px-4 py-2 rounded text-center hover:bg-gray-400">
+                        {% trans "Cancelar" %}
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

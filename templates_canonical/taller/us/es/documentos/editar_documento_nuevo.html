@@ -1,0 +1,1052 @@
+{% extends "taller/us/es/documentos/base_documento.html" %}
+{% load widget_tweaks %}
+{% load i18n %}
+{% load static %}
+
+{% block extra_head %}
+{{ block.super }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<script src="{% static 'js/formulario_documento.js' %}?v={{ STATIC_VERSION }}" defer></script>
+<script src="{% static 'taller/documentos/totales.js' %}?v={{ STATIC_VERSION }}" defer></script>
+<script src="{% static 'taller/documentos/integracion_totales.js' %}?v={{ STATIC_VERSION }}" defer></script>
+{% endblock %}
+
+{% block documento_title %}
+<div class="documento-header-container">
+  <h1 class="documento-title">✏️ Editando: {{ documento.tipo }} #{{ documento.numero }}</h1>
+  
+  <!-- Indicador de Estado de Pago -->
+  <div class="estado-pago-indicator">
+    {% if documento.estado_pago == 'PAGADO' %}
+      <div class="estado-badge estado-pagado">
+        <i class="fas fa-check-circle"></i>
+        <span>{% trans "PAGADO" %}</span>
+      </div>
+    {% elif documento.estado_pago == 'PARCIAL' %}
+      <div class="estado-badge estado-parcial">
+        <i class="fas fa-clock"></i>
+        <span>{% trans "PAGO PARCIAL" %}</span>
+      </div>
+    {% else %}
+      <div class="estado-badge estado-no-pagado">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span>{% trans "NO PAGADO" %}</span>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<style>
+.documento-header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.estado-pago-indicator {
+  display: flex;
+  align-items: center;
+}
+
+.estado-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  border: 2px solid;
+  animation: pulse-glow 2s infinite;
+}
+
+.estado-pagado {
+  background: linear-gradient(135deg, #00ff88, #00cc66);
+  color: #003300;
+  border-color: #00ff88;
+  box-shadow: 0 4px 20px rgba(0, 255, 136, 0.4);
+}
+
+.estado-parcial {
+  background: linear-gradient(135deg, #ffaa00, #ff8800);
+  color: #330000;
+  border-color: #ffaa00;
+  box-shadow: 0 4px 20px rgba(255, 170, 0, 0.4);
+}
+
+.estado-no-pagado {
+  background: linear-gradient(135deg, #ff4444, #cc0000);
+  color: #ffffff;
+  border-color: #ff4444;
+  box-shadow: 0 4px 20px rgba(255, 68, 68, 0.4);
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.02);
+    opacity: 0.9;
+  }
+}
+
+.estado-badge i {
+  font-size: 1.2rem;
+}
+
+@media (max-width: 768px) {
+  .documento-header-container {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .documento-title {
+    font-size: 1.8rem;
+  }
+  
+  .estado-badge {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.8rem;
+  }
+}
+</style>
+{% endblock %}
+
+{% block documento_content %}
+<form method="post" id="form-documento"
+      data-country="{{ company_country }}"
+      data-locale="{% if company_country == 'US' %}en-US{% else %}es-CL{% endif %}"
+      data-currency="{% if company_country == 'US' %}USD{% else %}CLP{% endif %}"
+      data-tax-base="{{ doc_tax_base }}"
+      data-tax-rate="{{ doc_tax_rate }}">
+  {% csrf_token %}
+  <input type="hidden" id="json_items" name="json_items" value="[]">
+  <input type="hidden" id="id_incluir_iva" name="incluir_iva" value="{% if documento.incluir_iva %}on{% endif %}">
+
+  {% with country_code=company_country|default:"us" %}
+    {% include "taller/"|add:country_code|lower|add:"/es/documentos/_form_common.html" %}
+    
+    {% if country_code == "CL" %}
+      {% include "taller/"|add:country_code|lower|add:"/es/documentos/_form_country_cl.html" %}
+    {% else %}
+      {% include "taller/"|add:country_code|lower|add:"/es/documentos/_form_country_us.html" %}
+    {% endif %}
+
+    {% include "taller/"|add:country_code|lower|add:"/es/documentos/_tables_items.html" %}
+  {% endwith %}
+
+  <!-- Observaciones al final de la página -->
+  <div class="seccion-card" style="margin-top: 2rem;">
+    <h3 class="seccion-title">📝 Observaciones <span style="color: #999; font-size: 0.8rem; font-weight: normal;">(Opcional)</span></h3>
+    
+    <div class="form-group full-width">
+      <label class="form-label" for="{{ form.observaciones.id_for_label }}">
+        Notas y comentarios adicionales
+      </label>
+      {{ form.observaciones|add_class:"form-textarea" }}
+    </div>
+  </div>
+
+  <div style="text-align: center; margin-top: 2rem;">
+    <button type="submit" class="btn-primary">💾 Guardar Cambios</button>
+    <a href="{% url 'documentos:lista_documentos' %}" class="btn-secondary" style="margin-left: 1rem;">❌ Cancelar</a>
+  </div>
+</form>
+
+<!-- SECCIÓN DE FACTURACIÓN COMPLETA -->
+<div class="invoice-summary-section">  
+  <div class="invoice-card">
+    <div class="invoice-header">
+      <h3 class="invoice-title">📋 Resumen de Facturación</h3>
+    </div>
+    
+    <div class="invoice-content">
+      <!-- Subtotales por categoría -->
+      <div class="invoice-breakdown">
+        <div class="breakdown-item">
+          <span class="breakdown-label">Subtotal Repuestos:</span>
+          <span class="breakdown-value" id="subtotal-repuestos-invoice">{% if company_country == 'US' %}${% else %}${% endif %}{{ subtotal_repuestos|default:0|floatformat:0 }}</span>
+        </div>
+        <div class="breakdown-item">
+          <span class="breakdown-label">Subtotal Servicios:</span>
+          <span class="breakdown-value" id="subtotal-servicios-invoice">{% if company_country == 'US' %}${% else %}${% endif %}{{ subtotal_servicios|default:0|floatformat:0 }}</span>
+        </div>
+        <div class="breakdown-item">
+          <span class="breakdown-label">Subtotal Otros:</span>
+          <span class="breakdown-value" id="subtotal-otros-invoice">{% if company_country == 'US' %}${% else %}${% endif %}{{ subtotal_otros|default:0|floatformat:0 }}</span>
+        </div>
+        <div class="breakdown-divider"></div>
+      </div>
+      
+      <!-- Total Subtotal -->
+      <div class="invoice-subtotal">
+        <div class="subtotal-item">
+          <span class="subtotal-label">Subtotal General:</span>
+          <span class="subtotal-value" id="subtotal-invoice">{% if company_country == 'US' %}${% else %}${% endif %}{{ subtotal|default:0|floatformat:0 }}</span>
+        </div>
+      </div>
+      
+      <!-- Control de IVA -->
+      <div class="invoice-tax-control">
+        <div class="tax-checkbox-container">
+          <label class="tax-checkbox-label">
+            <input type="checkbox" id="invoice-incluir-iva" 
+                   class="tax-checkbox" 
+                   {% if documento.incluir_iva %}checked{% endif %}
+                   onchange="actualizarIvaFactura()">
+            <span class="checkbox-custom"></span>
+            <span class="checkbox-text">Aplicar {{ doc_tax_label|default:"IVA (19%)" }}</span>
+          </label>
+          <small class="tax-description">
+            {% if doc_tax_base == "parts_only" %}
+              Se aplica solo sobre repuestos
+            {% else %}
+              Se aplica al subtotal total
+            {% endif %}
+          </small>
+        </div>
+        
+        <div class="tax-amount-container">
+          <div class="tax-item">
+            <span class="tax-label">{{ doc_tax_label|default:"IVA" }}:</span>
+            <span class="tax-value" id="iva-invoice">{% if company_country == 'US' %}${% else %}${% endif %}{{ iva|default:0|floatformat:0 }}</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Total Final -->
+      <div class="invoice-total">
+        <div class="total-item">
+          <span class="total-label">TOTAL FINAL:</span>
+          <span class="total-value" id="total-invoice">{% if company_country == 'US' %}${% else %}${% endif %}{{ total|default:0|floatformat:0 }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.invoice-summary-section {
+  margin-top: 3rem;
+  padding: 2rem 0;
+  border-top: 3px solid #00f2fe;
+  background: linear-gradient(135deg, rgba(0, 242, 254, 0.03) 0%, rgba(0, 208, 255, 0.03) 100%);
+}
+
+.invoice-card {
+  max-width: 800px;
+  margin: 0 auto;
+  background: linear-gradient(135deg, rgba(13, 13, 13, 0.95) 0%, rgba(25, 25, 25, 0.95) 100%);
+  border: 2px solid #00f2fe;
+  border-radius: 20px;
+  box-shadow: 0 0 30px rgba(0, 242, 254, 0.4);
+  overflow: hidden;
+}
+
+.invoice-header {
+  background: linear-gradient(135deg, #00f2fe 0%, #00d0ff 100%);
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.invoice-title {
+  color: #0a0a0a;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0;
+  text-shadow: none;
+}
+
+.invoice-content {
+  padding: 2rem;
+}
+
+.invoice-breakdown {
+  margin-bottom: 1.5rem;
+}
+
+.breakdown-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 0;
+  border-bottom: 1px solid rgba(0, 242, 254, 0.2);
+}
+
+.breakdown-label {
+  color: #ccc;
+  font-size: 1rem;
+}
+
+.breakdown-value {
+  color: #00f2fe;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.breakdown-divider {
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, #00f2fe 50%, transparent 100%);
+  margin: 1rem 0;
+}
+
+.invoice-subtotal {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: rgba(0, 242, 254, 0.1);
+  border-radius: 10px;
+  border: 1px solid rgba(0, 242, 254, 0.3);
+}
+
+.subtotal-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.subtotal-label {
+  color: #ffffff;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.subtotal-value {
+  color: #00f2fe;
+  font-size: 1.4rem;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
+}
+
+.invoice-tax-control {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding: 1.2rem;
+  background: rgba(0, 242, 254, 0.05);
+  border-radius: 10px;
+  border: 1px solid rgba(0, 242, 254, 0.2);
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.tax-checkbox-container {
+  flex: 1;
+  min-width: 250px;
+}
+
+.tax-checkbox-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+}
+
+.tax-checkbox {
+  display: none;
+}
+
+.checkbox-custom {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #00f2fe;
+  border-radius: 4px;
+  margin-right: 12px;
+  position: relative;
+  transition: all 0.3s ease;
+  background: transparent;
+}
+
+.tax-checkbox:checked + .checkbox-custom {
+  background: #00f2fe;
+  box-shadow: 0 0 15px rgba(0, 242, 254, 0.5);
+}
+
+.tax-checkbox:checked + .checkbox-custom::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #0a0a0a;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.checkbox-text {
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.tax-description {
+  color: #999;
+  font-size: 0.9rem;
+  display: block;
+  margin-left: 36px;
+}
+
+.tax-amount-container {
+  flex: 0 0 auto;
+}
+
+.tax-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.tax-label {
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.tax-value {
+  color: #00f2fe;
+  font-weight: bold;
+  font-size: 1.3rem;
+  text-shadow: 0 0 8px rgba(0, 242, 254, 0.4);
+}
+
+.invoice-total {
+  background: linear-gradient(135deg, rgba(0, 242, 254, 0.2) 0%, rgba(0, 208, 255, 0.2) 100%);
+  border: 2px solid #00f2fe;
+  border-radius: 15px;
+  padding: 1.5rem;
+  box-shadow: 0 0 20px rgba(0, 242, 254, 0.3);
+}
+
+.total-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.total-label {
+  color: #ffffff;
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.total-value {
+  color: #00f2fe;
+  font-size: 2rem;
+  font-weight: bold;
+  text-shadow: 0 0 15px rgba(0, 242, 254, 0.6);
+}
+
+@media (max-width: 768px) {
+  .invoice-card {
+    margin: 0 1rem;
+  }
+  
+  .invoice-content {
+    padding: 1.5rem;
+  }
+  
+  .invoice-tax-control {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .tax-amount-container {
+    text-align: center;
+  }
+  
+  .breakdown-item {
+    font-size: 0.9rem;
+  }
+  
+  .total-label {
+    font-size: 1.2rem;
+  }
+  
+  .total-value {
+    font-size: 1.6rem;
+  }
+}
+</style>
+
+<script>
+function actualizarIvaFactura() {
+  const checkbox = document.getElementById('invoice-incluir-iva');
+  const hiddenInput = document.getElementById('id_incluir_iva');
+  
+  // Sincronizar con el input hidden del formulario
+  if (hiddenInput) {
+    hiddenInput.value = checkbox.checked ? 'on' : '';
+  }
+  
+  // Disparar actualización de totales
+  if (typeof actualizarTotalesDocumento === 'function') {
+    actualizarTotalesDocumento();
+  }
+}
+
+// Inicializar checkbox al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+  const checkbox = document.getElementById('invoice-incluir-iva');
+  const hiddenInput = document.getElementById('id_incluir_iva');
+  
+  // Sincronizar estado inicial
+  if (checkbox && hiddenInput) {
+    checkbox.checked = hiddenInput.value === 'on' || hiddenInput.value === 'true';
+  }
+  
+  // Configurar botones de agregar items
+  configurarBotonesAgregar();
+  
+  // Configurar autocompletado
+  configurarAutocompletado();
+  
+  // Ejecutar cálculo inicial de totales después de que todo esté cargado
+  setTimeout(function() {
+    if (typeof actualizarTotalesDocumento === 'function') {
+      console.log('Ejecutando cálculo inicial de totales...');
+      actualizarTotalesDocumento();
+    }
+  }, 500);
+});
+
+// Configurar event listeners para botones de agregar
+function configurarBotonesAgregar() {
+  // Botón agregar repuesto
+  const btnRepuesto = document.getElementById('btn-agregar-repuesto');
+  if (btnRepuesto) {
+    btnRepuesto.addEventListener('click', function() {
+      agregarFilaRepuesto();
+    });
+  }
+  
+  // Botón agregar servicio
+  const btnServicio = document.getElementById('btn-agregar-servicio');
+  if (btnServicio) {
+    btnServicio.addEventListener('click', function() {
+      agregarFilaServicio();
+    });
+  }
+  
+  // Botón agregar otro servicio
+  const btnOtro = document.getElementById('btn-agregar-otro');
+  if (btnOtro) {
+    btnOtro.addEventListener('click', function() {
+      agregarFilaOtroServicio();
+    });
+  }
+}
+
+// Función para agregar fila de repuesto
+function agregarFilaRepuesto() {
+  const tabla = document.getElementById('tabla-repuestos').getElementsByTagName('tbody')[0];
+  const noRepuestos = document.getElementById('no-repuestos');
+  
+  if (noRepuestos) {
+    noRepuestos.remove();
+  }
+  
+  const fila = tabla.insertRow();
+  fila.innerHTML = `
+    <td><input type="text" class="form-input" placeholder="Código" name="repuesto_codigo[]"></td>
+    <td><input type="text" class="form-input" placeholder="Descripción" name="repuesto_nombre[]"></td>
+    <td><input type="number" class="form-input input-number" placeholder="1" value="1" name="repuesto_cantidad[]" onchange="calcularTotalFila(this)"></td>
+    <td><input type="number" class="form-input input-number" placeholder="0.00" step="0.01" name="repuesto_precio[]" onchange="calcularTotalFila(this)"></td>
+    <td><span class="total-fila">$0.00</span></td>
+    <td><button type="button" class="btn-secondary btn-eliminar" onclick="eliminarFila(this)">🗑️</button></td>
+  `;
+}
+
+// Función para agregar fila de servicio
+function agregarFilaServicio() {
+  const tabla = document.getElementById('tabla-servicios').getElementsByTagName('tbody')[0];
+  const noServicios = document.getElementById('no-servicios');
+  
+  if (noServicios) {
+    noServicios.remove();
+  }
+  
+  const fila = tabla.insertRow();
+  fila.innerHTML = `
+    <td><input type="text" class="form-input" placeholder="Nombre del servicio" name="servicio_nombre[]"></td>
+    <td><input type="number" class="form-input input-number" placeholder="0.00" step="0.01" name="servicio_precio[]" onchange="actualizarTotalesDocumento()"></td>
+    <td><button type="button" class="btn-secondary btn-eliminar" onclick="eliminarFila(this)">🗑️</button></td>
+  `;
+}
+
+// Función para agregar fila de otro servicio
+function agregarFilaOtroServicio() {
+  const tabla = document.getElementById('tabla-otros').getElementsByTagName('tbody')[0];
+  const noOtros = document.getElementById('no-otros');
+  
+  if (noOtros) {
+    noOtros.remove();
+  }
+  
+  const fila = tabla.insertRow();
+  fila.innerHTML = `
+    <td><input type="text" class="form-input" placeholder="Nombre del servicio" name="otro_servicio[]"></td>
+    <td><input type="text" class="form-input" placeholder="Empresa externa" name="otro_empresa[]"></td>
+    <td><input type="number" class="form-input input-number" placeholder="0.00" step="0.01" name="otro_costo[]" onchange="calcularGananciaOtro(this)"></td>
+    <td><input type="number" class="form-input input-number" placeholder="0.00" step="0.01" name="otro_precio[]" onchange="calcularGananciaOtro(this)"></td>
+    <td><span class="ganancia-fila">$0.00</span></td>
+    <td><button type="button" class="btn-secondary btn-eliminar" onclick="eliminarFila(this)">🗑️</button></td>
+  `;
+}
+
+// Función para eliminar fila
+function eliminarFila(boton) {
+  const fila = boton.closest('tr');
+  const tabla = fila.closest('table');
+  
+  fila.remove();
+  
+  // Verificar si la tabla está vacía y agregar mensaje
+  const tbody = tabla.getElementsByTagName('tbody')[0];
+  if (tbody.children.length === 0) {
+    const tablaId = tabla.id;
+    let mensaje = '';
+    let id = '';
+    
+    if (tablaId === 'tabla-repuestos') {
+      mensaje = 'No hay repuestos agregados';
+      id = 'no-repuestos';
+    } else if (tablaId === 'tabla-servicios') {
+      mensaje = 'No hay servicios agregados';
+      id = 'no-servicios';
+    } else if (tablaId === 'tabla-otros') {
+      mensaje = 'No hay otros servicios agregados';
+      id = 'no-otros';
+    }
+    
+    if (mensaje) {
+      const filaVacia = tbody.insertRow();
+      filaVacia.id = id;
+      filaVacia.innerHTML = `<td colspan="6" style="text-align: center; color: #6c757d;">${mensaje}</td>`;
+    }
+  }
+  
+  // Recalcular totales
+  if (typeof actualizarTotalesDocumento === 'function') {
+    actualizarTotalesDocumento();
+  }
+}
+
+// Función para calcular total de fila de repuesto
+function calcularTotalFila(input) {
+  const fila = input.closest('tr');
+  const cantidad = parseFloat(fila.querySelector('[name*="cantidad"]').value) || 0;
+  const precio = parseFloat(fila.querySelector('[name*="precio"]').value) || 0;
+  const total = cantidad * precio;
+  
+  const spanTotal = fila.querySelector('.total-fila');
+  if (spanTotal) {
+    spanTotal.textContent = '{% if company_country == "US" %}${% else %}${% endif %}' + total.toFixed(2);
+  }
+  
+  // Recalcular totales del documento
+  if (typeof actualizarTotalesDocumento === 'function') {
+    actualizarTotalesDocumento();
+  }
+}
+
+// Función para calcular ganancia de otro servicio
+function calcularGananciaOtro(input) {
+  const fila = input.closest('tr');
+  const costo = parseFloat(fila.querySelector('[name*="costo"]').value) || 0;
+  const precio = parseFloat(fila.querySelector('[name*="precio"]').value) || 0;
+  const ganancia = precio - costo;
+  
+  const spanGanancia = fila.querySelector('.ganancia-fila');
+  if (spanGanancia) {
+    spanGanancia.textContent = '{% if company_country == "US" %}${% else %}${% endif %}' + ganancia.toFixed(2);
+    spanGanancia.style.color = ganancia >= 0 ? '#00f2fe' : '#ff4444';
+  }
+  
+  // Recalcular totales del documento
+  if (typeof actualizarTotalesDocumento === 'function') {
+    actualizarTotalesDocumento();
+  }
+}
+
+// Configurar autocompletado para servicios
+function configurarAutocompletado() {
+  // Autocompletado para repuestos
+  const inputRepuesto = document.getElementById('buscar-repuesto');
+  const resultadosRepuesto = document.getElementById('resultados-repuesto');
+  
+  if (inputRepuesto && resultadosRepuesto) {
+    let timeoutRepuesto;
+    
+    inputRepuesto.addEventListener('input', function() {
+      clearTimeout(timeoutRepuesto);
+      const query = this.value.trim();
+      
+      if (query.length < 2) {
+        resultadosRepuesto.style.display = 'none';
+        return;
+      }
+      
+      timeoutRepuesto = setTimeout(() => {
+        buscarRepuestos(query, resultadosRepuesto);
+      }, 300);
+    });
+    
+    // Ocultar resultados al hacer clic fuera
+    document.addEventListener('click', function(e) {
+      if (!inputRepuesto.contains(e.target) && !resultadosRepuesto.contains(e.target)) {
+        resultadosRepuesto.style.display = 'none';
+      }
+    });
+  }
+  
+  // Autocompletado para servicios
+  const inputServicio = document.getElementById('buscar-servicio');
+  const resultadosServicio = document.getElementById('resultados-servicio');
+  
+  if (inputServicio && resultadosServicio) {
+    let timeoutServicio;
+    
+    inputServicio.addEventListener('input', function() {
+      clearTimeout(timeoutServicio);
+      const query = this.value.trim();
+      
+      if (query.length < 2) {
+        resultadosServicio.style.display = 'none';
+        return;
+      }
+      
+      timeoutServicio = setTimeout(() => {
+        buscarServicios(query, resultadosServicio);
+      }, 300);
+    });
+    
+    // Ocultar resultados al hacer clic fuera
+    document.addEventListener('click', function(e) {
+      if (!inputServicio.contains(e.target) && !resultadosServicio.contains(e.target)) {
+        resultadosServicio.style.display = 'none';
+      }
+    });
+  }
+  
+  // Autocompletado para otros servicios
+  const inputOtroServicio = document.getElementById('buscar-otro-servicio');
+  const resultadosOtroServicio = document.getElementById('resultados-otro-servicio');
+  
+  if (inputOtroServicio && resultadosOtroServicio) {
+    let timeoutOtroServicio;
+    
+    inputOtroServicio.addEventListener('input', function() {
+      clearTimeout(timeoutOtroServicio);
+      const query = this.value.trim();
+      
+      if (query.length < 2) {
+        resultadosOtroServicio.style.display = 'none';
+        return;
+      }
+      
+      timeoutOtroServicio = setTimeout(() => {
+        buscarOtrosServicios(query, resultadosOtroServicio);
+      }, 300);
+    });
+    
+    // Ocultar resultados al hacer clic fuera
+    document.addEventListener('click', function(e) {
+      if (!inputOtroServicio.contains(e.target) && !resultadosOtroServicio.contains(e.target)) {
+        resultadosOtroServicio.style.display = 'none';
+      }
+    });
+  }
+}
+
+// Buscar repuestos via AJAX
+function buscarRepuestos(query, contenedor) {
+  fetch(`/taller/documentos/api/autocomplete-repuesto/?q=${encodeURIComponent(query)}`)
+    .then(response => response.json())
+    .then(data => {
+      mostrarResultadosRepuestos(data, contenedor, query);
+    })
+    .catch(error => {
+      console.error('Error al buscar repuestos:', error);
+      contenedor.style.display = 'none';
+    });
+}
+
+// Mostrar resultados de repuestos
+function mostrarResultadosRepuestos(repuestos, contenedor, query) {
+  contenedor.innerHTML = '';
+  
+  if (repuestos.length === 0) {
+    // Opción para crear nuevo repuesto
+    const itemCrear = document.createElement('div');
+    itemCrear.className = 'autocomplete-item autocomplete-create';
+    itemCrear.innerHTML = `<i class="fas fa-plus"></i> Crear repuesto "${query}"`;
+    itemCrear.onclick = () => crearNuevoRepuesto(query);
+    contenedor.appendChild(itemCrear);
+  } else {
+    // Mostrar repuestos encontrados
+    repuestos.forEach(repuesto => {
+      const item = document.createElement('div');
+      item.className = 'autocomplete-item';
+      item.innerHTML = `
+        <div class="autocomplete-item-name">${repuesto.nombre}</div>
+        <div class="autocomplete-item-details">
+          ${repuesto.part_number ? 'Código: ' + repuesto.part_number : 'Sin código'}
+        </div>
+      `;
+      item.onclick = () => agregarRepuestoSeleccionado(repuesto);
+      contenedor.appendChild(item);
+    });
+    
+    // Opción para crear nuevo repuesto
+    const itemCrear = document.createElement('div');
+    itemCrear.className = 'autocomplete-item autocomplete-create';
+    itemCrear.innerHTML = `<i class="fas fa-plus"></i> Crear nuevo repuesto`;
+    itemCrear.onclick = () => crearNuevoRepuesto(query);
+    contenedor.appendChild(itemCrear);
+  }
+  
+  contenedor.style.display = 'block';
+}
+
+// Agregar repuesto seleccionado a la tabla
+function agregarRepuestoSeleccionado(repuesto) {
+  const tabla = document.getElementById('tabla-repuestos').getElementsByTagName('tbody')[0];
+  const noRepuestos = document.getElementById('no-repuestos');
+  
+  if (noRepuestos) {
+    noRepuestos.remove();
+  }
+  
+  const fila = tabla.insertRow();
+  fila.innerHTML = `
+    <td><input type="text" class="form-input" value="${repuesto.part_number || ''}" placeholder="Código" name="repuesto_codigo[]"></td>
+    <td><input type="text" class="form-input" value="${repuesto.nombre}" placeholder="Descripción" name="repuesto_nombre[]"></td>
+    <td><input type="number" class="form-input input-number" placeholder="1" value="1" name="repuesto_cantidad[]" onchange="calcularTotalFila(this)"></td>
+    <td><input type="number" class="form-input input-number" placeholder="0.00" step="0.01" name="repuesto_precio[]" onchange="calcularTotalFila(this)"></td>
+    <td><span class="total-fila">$0.00</span></td>
+    <td><button type="button" class="btn-secondary btn-eliminar" onclick="eliminarFila(this)">🗑️</button></td>
+  `;
+  
+  // Limpiar campo de búsqueda
+  document.getElementById('buscar-repuesto').value = '';
+  document.getElementById('resultados-repuesto').style.display = 'none';
+  
+  // Recalcular totales
+  if (typeof actualizarTotalesDocumento === 'function') {
+    actualizarTotalesDocumento();
+  }
+}
+
+// Crear nuevo repuesto
+function crearNuevoRepuesto(nombre) {
+  const codigo = prompt('Ingrese el código del repuesto (opcional):', '');
+  if (codigo === null) return;
+  
+  // Agregar directamente a la tabla (sin crear en base de datos)
+  const repuesto = {
+    nombre: nombre.trim(),
+    part_number: codigo.trim()
+  };
+  
+  agregarRepuestoSeleccionado(repuesto);
+  
+  // Ocultar resultados
+  document.getElementById('resultados-repuesto').style.display = 'none';
+}
+
+// Buscar servicios via AJAX
+function buscarServicios(query, contenedor) {
+  fetch(`/taller/documentos/api/autocomplete-servicio/?q=${encodeURIComponent(query)}`)
+    .then(response => response.json())
+    .then(data => {
+      mostrarResultadosServicios(data, contenedor, query);
+    })
+    .catch(error => {
+      console.error('Error al buscar servicios:', error);
+      contenedor.style.display = 'none';
+    });
+}
+
+// Mostrar resultados de servicios
+function mostrarResultadosServicios(servicios, contenedor, query) {
+  contenedor.innerHTML = '';
+  
+  if (servicios.length === 0) {
+    // Opción para crear nuevo servicio
+    const itemCrear = document.createElement('div');
+    itemCrear.className = 'autocomplete-item autocomplete-create';
+    itemCrear.innerHTML = `<i class="fas fa-plus"></i> Crear servicio "${query}"`;
+    itemCrear.onclick = () => crearNuevoServicio(query);
+    contenedor.appendChild(itemCrear);
+  } else {
+    // Mostrar servicios encontrados
+    servicios.forEach(servicio => {
+      const item = document.createElement('div');
+      item.className = 'autocomplete-item';
+      item.innerHTML = `
+        <div class="autocomplete-item-name">${servicio.nombre}</div>
+        <div class="autocomplete-item-details">
+          ${servicio.descripcion || 'Sin descripción'}
+          <span class="autocomplete-item-precio">{% if company_country == "US" %}${% else %}${% endif %}${servicio.precio.toFixed(2)}</span>
+        </div>
+      `;
+      item.onclick = () => agregarServicioSeleccionado(servicio);
+      contenedor.appendChild(item);
+    });
+    
+    // Opción para crear nuevo servicio
+    const itemCrear = document.createElement('div');
+    itemCrear.className = 'autocomplete-item autocomplete-create';
+    itemCrear.innerHTML = `<i class="fas fa-plus"></i> Crear nuevo servicio`;
+    itemCrear.onclick = () => crearNuevoServicio(query);
+    contenedor.appendChild(itemCrear);
+  }
+  
+  contenedor.style.display = 'block';
+}
+
+// Buscar otros servicios via AJAX
+function buscarOtrosServicios(query, contenedor) {
+  fetch(`/taller/documentos/api/autocomplete-otro-servicio/?q=${encodeURIComponent(query)}`)
+    .then(response => response.json())
+    .then(data => {
+      mostrarResultadosOtrosServicios(data, contenedor, query);
+    })
+    .catch(error => {
+      console.error('Error al buscar otros servicios:', error);
+      contenedor.style.display = 'none';
+    });
+}
+
+// Mostrar resultados de otros servicios
+function mostrarResultadosOtrosServicios(servicios, contenedor, query) {
+  contenedor.innerHTML = '';
+  
+  if (servicios.length === 0) {
+    contenedor.innerHTML = '<div class="autocomplete-item" style="text-align: center; color: #999;">No se encontraron servicios externos</div>';
+  } else {
+    servicios.forEach(servicio => {
+      const item = document.createElement('div');
+      item.className = 'autocomplete-item';
+      item.innerHTML = `
+        <div class="autocomplete-item-name">${servicio.nombre}</div>
+        <div class="autocomplete-item-details">
+          ${servicio.empresa_externa || 'Sin empresa'}
+          <span class="autocomplete-item-precio">{% if company_country == "US" %}${% else %}${% endif %}${servicio.precio_cliente.toFixed(2)}</span>
+        </div>
+      `;
+      item.onclick = () => agregarOtroServicioSeleccionado(servicio);
+      contenedor.appendChild(item);
+    });
+  }
+  
+  contenedor.style.display = 'block';
+}
+
+// Agregar servicio seleccionado a la tabla
+function agregarServicioSeleccionado(servicio) {
+  const tabla = document.getElementById('tabla-servicios').getElementsByTagName('tbody')[0];
+  const noServicios = document.getElementById('no-servicios');
+  
+  if (noServicios) {
+    noServicios.remove();
+  }
+  
+  const fila = tabla.insertRow();
+  fila.innerHTML = `
+    <td><input type="text" class="form-input" value="${servicio.nombre}" name="servicio_nombre[]"></td>
+    <td><input type="number" class="form-input input-number" value="${servicio.precio}" step="0.01" name="servicio_precio[]" onchange="actualizarTotalesDocumento()"></td>
+    <td><button type="button" class="btn-secondary btn-eliminar" onclick="eliminarFila(this)">🗑️</button></td>
+  `;
+  
+  // Limpiar campo de búsqueda
+  document.getElementById('buscar-servicio').value = '';
+  document.getElementById('resultados-servicio').style.display = 'none';
+  
+  // Recalcular totales
+  if (typeof actualizarTotalesDocumento === 'function') {
+    actualizarTotalesDocumento();
+  }
+}
+
+// Agregar otro servicio seleccionado a la tabla
+function agregarOtroServicioSeleccionado(servicio) {
+  const tabla = document.getElementById('tabla-otros').getElementsByTagName('tbody')[0];
+  const noOtros = document.getElementById('no-otros');
+  
+  if (noOtros) {
+    noOtros.remove();
+  }
+  
+  const fila = tabla.insertRow();
+  fila.innerHTML = `
+    <td><input type="text" class="form-input" value="${servicio.nombre}" name="otro_servicio[]"></td>
+    <td><input type="text" class="form-input" value="${servicio.empresa_externa}" name="otro_empresa[]"></td>
+    <td><input type="number" class="form-input input-number" value="${servicio.costo_interno}" step="0.01" name="otro_costo[]" onchange="calcularGananciaOtro(this)"></td>
+    <td><input type="number" class="form-input input-number" value="${servicio.precio_cliente}" step="0.01" name="otro_precio[]" onchange="calcularGananciaOtro(this)"></td>
+    <td><span class="ganancia-fila">{% if company_country == "US" %}${% else %}${% endif %}${(servicio.precio_cliente - servicio.costo_interno).toFixed(2)}</span></td>
+    <td><button type="button" class="btn-secondary btn-eliminar" onclick="eliminarFila(this)">🗑️</button></td>
+  `;
+  
+  // Limpiar campo de búsqueda
+  document.getElementById('buscar-otro-servicio').value = '';
+  document.getElementById('resultados-otro-servicio').style.display = 'none';
+  
+  // Recalcular totales
+  if (typeof actualizarTotalesDocumento === 'function') {
+    actualizarTotalesDocumento();
+  }
+}
+
+// Crear nuevo servicio
+function crearNuevoServicio(nombre) {
+  const precio = prompt('Ingrese el precio del servicio:', '0.00');
+  if (precio === null) return;
+  
+  const descripcion = prompt('Ingrese una descripción (opcional):', '');
+  if (descripcion === null) return;
+  
+  const data = {
+    nombre: nombre.trim(),
+    precio: parseFloat(precio) || 0,
+    descripcion: descripcion.trim()
+  };
+  
+  fetch('/taller/documentos/api/crear-servicio/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+    },
+    body: JSON.stringify(data)
+  })
+  .then(response => response.json())
+  .then(result => {
+    if (result.error) {
+      alert('Error: ' + result.error);
+    } else {
+      alert(result.mensaje);
+      // Agregar el servicio a la tabla
+      agregarServicioSeleccionado(result);
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('Error al crear el servicio');
+  });
+  
+  // Ocultar resultados
+  document.getElementById('resultados-servicio').style.display = 'none';
+}
+</script>
+{% endblock %}

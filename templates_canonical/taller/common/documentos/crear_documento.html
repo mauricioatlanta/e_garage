@@ -1,0 +1,341 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% load humanize %}
+
+{% block content %}
+<!-- Futuristic space background -->
+<div class="fixed inset-0 bg-black z-0"></div>
+<div class="fixed inset-0 bg-gradient-to-br from-gray-900 via-blue-900/30 to-purple-900/40 z-0"></div>
+<canvas id="particleCanvas" class="fixed top-0 left-0 w-full h-full pointer-events-none z-10 opacity-40"></canvas>
+
+<!-- Futuristic grid -->
+<div class="fixed inset-0 z-5 opacity-10 grid-bg"></div>
+
+<div class="relative z-20 min-h-screen">
+  <div class="container mx-auto px-6 py-12 max-w-7xl">
+    
+    <!-- Hyper-futuristic header -->
+    <div class="relative mb-12">
+      <!-- Energy aura -->
+      <div class="absolute inset-0 bg-gradient-to-r from-cyan-500/20 via-purple-500/20 to-pink-500/20 rounded-3xl blur-2xl animate-pulse"></div>
+      
+      <div class="relative backdrop-blur-2xl bg-gradient-to-r from-gray-900/95 via-black/90 to-gray-900/95 border-4 border-cyan-400/60 rounded-3xl p-10 shadow-2xl shadow-cyan-500/30">
+        <!-- Energy lines -->
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent"></div>
+        <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-purple-400 to-transparent"></div>
+        
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-8">
+            <!-- Icon with advanced effects -->
+            <div class="relative">
+              <div class="absolute inset-0 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 rounded-2xl blur-xl opacity-70 animate-pulse"></div>
+              <div class="absolute inset-0 bg-gradient-to-r from-purple-600 via-pink-500 to-cyan-400 rounded-2xl blur-lg opacity-50 animate-pulse delayed-pulse"></div>
+              <div class="relative bg-gradient-to-br from-gray-800/90 to-black/90 p-6 rounded-2xl border-4 border-cyan-400/80 shadow-2xl backdrop-blur-xl">
+                <svg class="w-12 h-12 text-cyan-300 drop-shadow-lg filter drop-shadow-[0_0_10px_rgba(0,255,255,0.5)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+              </div>
+            </div>
+            
+            <div>
+              <h1 class="text-5xl font-black bg-gradient-to-r from-cyan-300 via-blue-300 to-purple-400 bg-clip-text text-transparent drop-shadow-2xl mb-3 tracking-tight">
+                {% if object.pk %}
+                  Editar Documento
+                {% else %}
+                  Nuevo Documento
+                {% endif %}
+              </h1>
+              <p class="text-cyan-200/80 text-xl font-medium tracking-wide">
+                {% if object.pk %}
+                  Actualizando información del documento
+                {% else %}
+                  Creando nuevo documento de trabajo
+                {% endif %}
+              </p>
+            </div>
+          </div>
+          
+          <!-- Back button -->
+          <a href="{% url 'taller:documentos:lista_documentos' %}" class="group relative overflow-hidden bg-gradient-to-r from-gray-800/90 to-gray-900/90 hover:from-red-600/90 hover:to-red-700/90 border-2 border-gray-600/60 hover:border-red-500/80 rounded-2xl p-4 shadow-2xl transition-all duration-300 backdrop-blur-xl">
+            <span class="relative z-10 flex items-center gap-3 text-gray-300 group-hover:text-white font-bold text-lg">
+              <svg class="w-6 h-6 transform group-hover:-translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+              </svg>
+              Volver
+            </span>
+            <div class="absolute inset-0 bg-gradient-to-r from-red-500/20 to-red-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Futuristic form -->
+    <form method="post" class="space-y-8">
+      {% csrf_token %}
+      
+      <!-- Main form panel -->
+      <div class="relative">
+        <!-- Background effects -->
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-cyan-500/10 rounded-3xl blur-xl"></div>
+        
+        <div class="relative backdrop-blur-xl bg-gradient-to-br from-gray-900/95 via-black/90 to-gray-800/95 border-2 border-cyan-400/50 rounded-3xl p-10 shadow-2xl shadow-blue-500/20">
+          
+          <!-- Document Information -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+            <h3 class="lg:col-span-2 text-3xl font-bold bg-gradient-to-r from-cyan-300 to-blue-300 bg-clip-text text-transparent mb-6 flex items-center gap-3">
+              <svg class="w-8 h-8 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+              Información del Documento
+            </h3>
+            
+            <!-- Client Selection -->
+            <div class="group">
+              <label class="block text-cyan-300 text-lg font-semibold mb-3 group-focus-within:text-cyan-200 transition-colors">
+                Cliente *
+              </label>
+              <div class="relative">
+                {{ form.cliente|add_class:"w-full p-4 bg-gray-800/60 border-2 border-gray-600/60 rounded-xl text-white text-lg focus:border-cyan-400 focus:ring-4 focus:ring-cyan-400/20 focus:bg-gray-800/80 transition-all duration-300 backdrop-blur-sm" }}
+                <div class="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-blue-400/20 rounded-xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+              </div>
+              {% if form.cliente.errors %}
+                <div class="mt-2 text-red-400 text-sm">{{ form.cliente.errors.0 }}</div>
+              {% endif %}
+            </div>
+            
+            <!-- Vehicle Selection -->
+            <div class="group">
+              <label class="block text-cyan-300 text-lg font-semibold mb-3 group-focus-within:text-cyan-200 transition-colors">
+                Vehículo *
+              </label>
+              <div class="relative">
+                {{ form.vehiculo|add_class:"w-full p-4 bg-gray-800/60 border-2 border-gray-600/60 rounded-xl text-white text-lg focus:border-cyan-400 focus:ring-4 focus:ring-cyan-400/20 focus:bg-gray-800/80 transition-all duration-300 backdrop-blur-sm" }}
+                <div class="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-blue-400/20 rounded-xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+              </div>
+              {% if form.vehiculo.errors %}
+                <div class="mt-2 text-red-400 text-sm">{{ form.vehiculo.errors.0 }}</div>
+              {% endif %}
+            </div>
+            
+            <!-- Technician -->
+            <div class="group">
+              <label class="block text-cyan-300 text-lg font-semibold mb-3 group-focus-within:text-cyan-200 transition-colors">
+                Técnico Responsable
+              </label>
+              <div class="relative">
+                {{ form.tecnico_responsable|add_class:"w-full p-4 bg-gray-800/60 border-2 border-gray-600/60 rounded-xl text-white text-lg focus:border-cyan-400 focus:ring-4 focus:ring-cyan-400/20 focus:bg-gray-800/80 transition-all duration-300 backdrop-blur-sm" }}
+                <div class="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-blue-400/20 rounded-xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+              </div>
+              {% if form.tecnico_responsable.errors %}
+                <div class="mt-2 text-red-400 text-sm">{{ form.tecnico_responsable.errors.0 }}</div>
+              {% endif %}
+            </div>
+            
+            <!-- Document Type -->
+            <div class="group">
+              <label class="block text-cyan-300 text-lg font-semibold mb-3 group-focus-within:text-cyan-200 transition-colors">
+                Tipo de Documento
+              </label>
+              <div class="relative">
+                {{ form.tipo_documento|add_class:"w-full p-4 bg-gray-800/60 border-2 border-gray-600/60 rounded-xl text-white text-lg focus:border-cyan-400 focus:ring-4 focus:ring-cyan-400/20 focus:bg-gray-800/80 transition-all duration-300 backdrop-blur-sm" }}
+                <div class="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-blue-400/20 rounded-xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+              </div>
+              {% if form.tipo_documento.errors %}
+                <div class="mt-2 text-red-400 text-sm">{{ form.tipo_documento.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Work Details -->
+          <div class="grid grid-cols-1 gap-8 mb-10">
+            <h3 class="text-3xl font-bold bg-gradient-to-r from-purple-300 to-pink-300 bg-clip-text text-transparent mb-6 flex items-center gap-3">
+              <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+              </svg>
+              Detalles del Trabajo
+            </h3>
+            
+            <!-- Description -->
+            <div class="group">
+              <label class="block text-purple-300 text-lg font-semibold mb-3 group-focus-within:text-purple-200 transition-colors">
+                Descripción del Trabajo
+              </label>
+              <div class="relative">
+                {{ form.descripcion_trabajo|add_class:"w-full p-4 bg-gray-800/60 border-2 border-gray-600/60 rounded-xl text-white text-lg placeholder-gray-400 focus:border-purple-400 focus:ring-4 focus:ring-purple-400/20 focus:bg-gray-800/80 transition-all duration-300 backdrop-blur-sm min-h-[120px] resize-y" }}
+                <div class="absolute inset-0 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+              </div>
+              {% if form.descripcion_trabajo.errors %}
+                <div class="mt-2 text-red-400 text-sm">{{ form.descripcion_trabajo.errors.0 }}</div>
+              {% endif %}
+            </div>
+            
+            <!-- Observations -->
+            <div class="group">
+              <label class="block text-purple-300 text-lg font-semibold mb-3 group-focus-within:text-purple-200 transition-colors">
+                Observaciones
+              </label>
+              <div class="relative">
+                {{ form.observaciones|add_class:"w-full p-4 bg-gray-800/60 border-2 border-gray-600/60 rounded-xl text-white text-lg placeholder-gray-400 focus:border-purple-400 focus:ring-4 focus:ring-purple-400/20 focus:bg-gray-800/80 transition-all duration-300 backdrop-blur-sm min-h-[100px] resize-y" }}
+                <div class="absolute inset-0 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+              </div>
+              {% if form.observaciones.errors %}
+                <div class="mt-2 text-red-400 text-sm">{{ form.observaciones.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Action buttons -->
+          <div class="flex gap-6 justify-center pt-8">
+            <!-- Cancel Button -->
+            <a href="{% url 'taller:documentos:lista_documentos' %}" class="group relative overflow-hidden bg-gradient-to-r from-gray-700/90 to-gray-800/90 hover:from-gray-600/90 hover:to-gray-700/90 border-2 border-gray-500/60 hover:border-gray-400/80 rounded-2xl px-8 py-4 shadow-xl transition-all duration-300 backdrop-blur-xl">
+              <span class="relative z-10 flex items-center gap-3 text-gray-300 group-hover:text-white font-bold text-lg">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+                Cancelar
+              </span>
+            </a>
+            
+            <!-- Save Button -->
+            <button type="submit" class="group relative overflow-hidden bg-gradient-to-r from-cyan-600/90 to-blue-700/90 hover:from-cyan-500/90 hover:to-blue-600/90 border-2 border-cyan-500/60 hover:border-cyan-400/80 rounded-2xl px-12 py-4 shadow-2xl shadow-cyan-500/30 transition-all duration-300 backdrop-blur-xl hover:scale-105 active:scale-95">
+              <span class="relative z-10 flex items-center gap-3 text-white font-bold text-lg">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                {% if object.pk %}Actualizar{% else %}Crear{% endif %} Documento
+              </span>
+              <div class="absolute inset-0 bg-gradient-to-r from-cyan-400/30 to-blue-500/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+.grid-bg {
+  background-image: 
+    linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+.delayed-pulse {
+  animation-delay: 0.5s;
+}
+</style>
+
+<!-- Particle effects script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const canvas = document.getElementById('particleCanvas');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    const particles = [];
+    const particleCount = 80;
+    
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    
+    function createParticle() {
+        return {
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            size: Math.random() * 3 + 1,
+            speedX: (Math.random() - 0.5) * 0.5,
+            speedY: (Math.random() - 0.5) * 0.5,
+            opacity: Math.random() * 0.8 + 0.2,
+            color: Math.random() > 0.5 ? '#00ffff' : '#ff00ff'
+        };
+    }
+    
+    function initParticles() {
+        particles.length = 0;
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(createParticle());
+        }
+    }
+    
+    function updateParticles() {
+        particles.forEach(particle => {
+            particle.x += particle.speedX;
+            particle.y += particle.speedY;
+            
+            if (particle.x < 0 || particle.x > canvas.width) particle.speedX *= -1;
+            if (particle.y < 0 || particle.y > canvas.height) particle.speedY *= -1;
+            
+            particle.opacity = Math.sin(Date.now() * 0.001 + particle.x * 0.01) * 0.5 + 0.5;
+        });
+    }
+    
+    function drawParticles() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        particles.forEach(particle => {
+            ctx.beginPath();
+            ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+            ctx.fillStyle = particle.color + Math.floor(particle.opacity * 255).toString(16).padStart(2, '0');
+            ctx.fill();
+            
+            // Connections between nearby particles
+            particles.forEach(otherParticle => {
+                const dx = particle.x - otherParticle.x;
+                const dy = particle.y - otherParticle.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < 100) {
+                    ctx.beginPath();
+                    ctx.moveTo(particle.x, particle.y);
+                    ctx.lineTo(otherParticle.x, otherParticle.y);
+                    ctx.strokeStyle = `rgba(0, 255, 255, ${(1 - distance / 100) * 0.3})`;
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                }
+            });
+        });
+    }
+    
+    function animate() {
+        updateParticles();
+        drawParticles();
+        requestAnimationFrame(animate);
+    }
+    
+    resizeCanvas();
+    initParticles();
+    animate();
+    
+    window.addEventListener('resize', () => {
+        resizeCanvas();
+        initParticles();
+    });
+});
+
+// Dynamic form interactions
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-hide placeholders on focus
+    const inputs = document.querySelectorAll('input, textarea, select');
+    inputs.forEach(input => {
+        const originalPlaceholder = input.placeholder;
+        
+        input.addEventListener('focus', function() {
+            if (this.placeholder) {
+                this.dataset.placeholder = this.placeholder;
+                this.placeholder = '';
+            }
+        });
+        
+        input.addEventListener('blur', function() {
+            if (this.dataset.placeholder && !this.value) {
+                this.placeholder = this.dataset.placeholder;
+            }
+        });
+    });
+});
+</script>
+
+{% endblock %}

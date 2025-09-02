@@ -1,0 +1,909 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+{% load widget_tweaks %}
+
+{% block title %}
+    {% trans "Servicios Externos del Taller" %} - eGarage
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --cyber-blue: #00d4ff;
+        --cyber-purple: #8a2be2;
+        --cyber-green: #39ff14;
+        --dark-bg: #0a0a0a;
+        --darker-bg: #050505;
+        --glass-bg: rgba(255, 255, 255, 0.05);
+        --neon-glow: 0 0 20px;
+    }
+
+    body {
+        background: linear-gradient(135deg, var(--dark-bg) 0%, #1a1a2e 50%, #16213e 100%);
+        color: #ffffff;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        min-height: 100vh;
+    }
+
+    .cyber-container {
+        background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(138, 43, 226, 0.1) 100%);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(0, 212, 255, 0.3);
+        border-radius: 15px;
+        padding: 2rem;
+        margin: 2rem 0;
+        box-shadow: var(--neon-glow) rgba(0, 212, 255, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cyber-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        transition: left 0.5s;
+    }
+
+    .cyber-container:hover::before {
+        left: 100%;
+    }
+
+    .cyber-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(45deg, var(--cyber-blue), var(--cyber-purple), var(--cyber-green));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-align: center;
+        margin-bottom: 1rem;
+        text-shadow: var(--neon-glow) rgba(0, 212, 255, 0.5);
+        animation: glow-pulse 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow-pulse {
+        from { filter: brightness(1); }
+        to { filter: brightness(1.2); }
+    }
+
+    .glitch-effect {
+        position: relative;
+        animation: glitch 3s infinite;
+    }
+
+    @keyframes glitch {
+        0%, 100% { transform: translate(0); }
+        20% { transform: translate(-2px, 2px); }
+        40% { transform: translate(-2px, -2px); }
+        60% { transform: translate(2px, 2px); }
+        80% { transform: translate(2px, -2px); }
+    }
+
+    .search-container {
+        background: var(--glass-bg);
+        border: 1px solid rgba(0, 212, 255, 0.3);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        backdrop-filter: blur(10px);
+    }
+
+    .search-input {
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--cyber-blue);
+        border-radius: 10px;
+        color: #ffffff;
+        padding: 12px 20px;
+        font-size: 1.1rem;
+        width: 100%;
+        transition: all 0.3s ease;
+        box-shadow: inset 0 0 10px rgba(0, 212, 255, 0.2);
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: var(--cyber-green);
+        box-shadow: var(--neon-glow) var(--cyber-green);
+        transform: scale(1.02);
+    }
+
+    .search-input::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .filter-controls {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-top: 1rem;
+    }
+
+    .filter-select {
+        background: rgba(0, 0, 0, 0.8);
+        border: 1px solid var(--cyber-purple);
+        border-radius: 8px;
+        color: #ffffff;
+        padding: 8px 15px;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .filter-select:focus {
+        outline: none;
+        border-color: var(--cyber-green);
+        box-shadow: 0 0 10px rgba(57, 255, 20, 0.3);
+        background: rgba(0, 0, 0, 0.9);
+    }
+
+    .filter-select option {
+        background: #1a1a1a;
+        color: #ffffff;
+        padding: 8px 15px;
+        border: none;
+    }
+
+    .filter-select option:hover {
+        background: var(--cyber-purple);
+        color: #ffffff;
+    }
+
+    .filter-select option:checked {
+        background: var(--cyber-green);
+        color: #000000;
+        font-weight: bold;
+    }
+
+    /* Estilos mejorados para mejor compatibilidad */
+    .filter-select {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2339ff14' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 16px;
+        padding-right: 40px;
+    }
+
+    /* Forzar contraste en navegadores */
+    .filter-select option {
+        background-color: #1a1a1a !important;
+        color: #ffffff !important;
+    }
+
+    .filter-select option:hover,
+    .filter-select option:focus {
+        background-color: var(--cyber-purple) !important;
+        color: #ffffff !important;
+    }
+
+    /* Estilos adicionales para WebKit (Chrome, Safari, Edge) */
+    @supports (-webkit-appearance: none) {
+        .filter-select option {
+            background: #1a1a1a;
+            color: #ffffff;
+        }
+    }
+
+    /* Estilos para Firefox */
+    @-moz-document url-prefix() {
+        .filter-select {
+            color-scheme: dark;
+        }
+        .filter-select option {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+    }
+
+    /* Asegurar contraste mínimo */
+    .filter-select {
+        color-scheme: dark;
+        font-weight: 500;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(138, 43, 226, 0.1));
+        border: 1px solid rgba(0, 212, 255, 0.3);
+        border-radius: 12px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--neon-glow) var(--cyber-blue);
+        border-color: var(--cyber-green);
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--cyber-green);
+        display: block;
+        text-shadow: var(--neon-glow) var(--cyber-green);
+        animation: counter 2s ease-out;
+    }
+
+    .stat-label {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    @keyframes counter {
+        from { opacity: 0; transform: scale(0.5); }
+        to { opacity: 1; transform: scale(1); }
+    }
+
+    .navigation-tabs {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .nav-tab {
+        background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(138, 43, 226, 0.2));
+        border: 1px solid rgba(0, 212, 255, 0.5);
+        border-radius: 10px;
+        color: #ffffff;
+        padding: 12px 20px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .nav-tab:hover, .nav-tab.active {
+        background: linear-gradient(135deg, var(--cyber-blue), var(--cyber-purple));
+        box-shadow: var(--neon-glow) var(--cyber-blue);
+        transform: translateY(-2px);
+        color: #ffffff;
+    }
+
+    .nav-tab i {
+        margin-right: 8px;
+    }
+
+    .services-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .service-card {
+        background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(138, 43, 226, 0.1));
+        border: 1px solid rgba(0, 212, 255, 0.3);
+        border-radius: 15px;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .service-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--neon-glow) var(--cyber-purple);
+        border-color: var(--cyber-green);
+    }
+
+    .service-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--cyber-blue), var(--cyber-purple), var(--cyber-green));
+    }
+
+    .service-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: var(--cyber-blue);
+        margin-bottom: 0.5rem;
+        text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+    }
+
+    .service-description {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.95rem;
+        line-height: 1.4;
+        margin-bottom: 1rem;
+    }
+
+    .service-provider {
+        color: var(--cyber-blue);
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+        padding: 0.5rem;
+        background: rgba(0, 212, 255, 0.1);
+        border-radius: 8px;
+        border-left: 3px solid var(--cyber-blue);
+    }
+
+    .service-pricing {
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 12px;
+        padding: 1rem;
+        margin: 1rem 0;
+        border: 1px solid rgba(0, 212, 255, 0.2);
+    }
+
+    .pricing-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+
+    .pricing-row:last-child {
+        margin-bottom: 0;
+        padding-top: 0.5rem;
+        border-top: 1px solid rgba(0, 212, 255, 0.3);
+    }
+
+    .pricing-row.gain {
+        background: rgba(57, 255, 20, 0.1);
+        padding: 0.5rem;
+        border-radius: 8px;
+        margin-top: 0.5rem;
+    }
+
+    .price-label {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .price-value {
+        font-weight: 700;
+        font-size: 1rem;
+    }
+
+    .price-value.cost {
+        color: #ff6b6b;
+        text-shadow: 0 0 8px rgba(255, 107, 107, 0.3);
+    }
+
+    .price-value.price {
+        color: var(--cyber-blue);
+        text-shadow: 0 0 8px rgba(0, 212, 255, 0.3);
+    }
+
+    .pricing-row.gain .price-value {
+        color: var(--cyber-green);
+        text-shadow: 0 0 8px rgba(57, 255, 20, 0.3);
+    }
+
+    .service-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(0, 212, 255, 0.2);
+    }
+
+    .service-time {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .service-category {
+        background: rgba(138, 43, 226, 0.2);
+        color: var(--cyber-purple);
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        border: 1px solid rgba(138, 43, 226, 0.3);
+    }
+
+    .service-price {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--cyber-green);
+        text-shadow: 0 0 10px rgba(57, 255, 20, 0.3);
+    }
+
+    .service-category {
+        background: rgba(138, 43, 226, 0.3);
+        color: var(--cyber-purple);
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        border: 1px solid var(--cyber-purple);
+    }
+
+    .service-provider {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+        font-style: italic;
+    }
+
+    .btn-futuristic {
+        background: linear-gradient(135deg, var(--cyber-blue), var(--cyber-purple));
+        border: none;
+        border-radius: 10px;
+        color: #ffffff;
+        padding: 12px 25px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: var(--neon-glow) rgba(0, 212, 255, 0.3);
+    }
+
+    .btn-futuristic:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--neon-glow) var(--cyber-green);
+        background: linear-gradient(135deg, var(--cyber-green), var(--cyber-blue));
+        color: #ffffff;
+    }
+
+    .no-results {
+        text-align: center;
+        padding: 3rem;
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .no-results i {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        color: var(--cyber-blue);
+        opacity: 0.5;
+    }
+
+    .loading-spinner {
+        border: 3px solid rgba(0, 212, 255, 0.3);
+        border-top: 3px solid var(--cyber-blue);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 20px auto;
+    }
+
+    .navigation-tabs {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .nav-tab {
+        padding: 0.8rem 1.5rem;
+        border: 2px solid rgba(0, 212, 255, 0.3);
+        border-radius: 12px;
+        background: transparent;
+        color: rgba(255, 255, 255, 0.7);
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        backdrop-filter: blur(5px);
+    }
+
+    .nav-tab:hover, .nav-tab.active {
+        border-color: var(--cyber-blue);
+        color: var(--cyber-blue);
+        background: rgba(0, 212, 255, 0.1);
+        text-decoration: none;
+        box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+        transform: translateY(-2px);
+    }
+
+    .nav-tab.active {
+        background: rgba(0, 212, 255, 0.2);
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .nav-tab.active::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .nav-tab.active:hover::before {
+        left: 100%;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .cyber-title {
+            font-size: 2rem;
+        }
+        
+        .services-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .navigation-tabs {
+            flex-direction: column;
+        }
+        
+        .filter-controls {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="cyber-container">
+        <h1 class="cyber-title glitch-effect">
+            <i class="fas fa-handshake me-3"></i>
+            {% trans "Servicios Externos" %}
+        </h1>
+        <p class="text-center mb-4" style="color: rgba(255, 255, 255, 0.7); font-size: 1.1rem;">
+            {% trans "Gestiona servicios subcontratados y proveedores externos" %}
+        </p>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <span class="stat-number">{{ stats.total_otros_servicios }}</span>
+            <div class="stat-label">{% trans "Servicios Externos" %}</div>
+        </div>
+        <div class="stat-card">
+            <span class="stat-number">{{ stats.total_empresas_externas }}</span>
+            <div class="stat-label">{% trans "Empresas Externas" %}</div>
+        </div>
+        <div class="stat-card">
+            <span class="stat-number">{{ stats.total_categorias }}</span>
+            <div class="stat-label">{% trans "Categorías" %}</div>
+        </div>
+        <div class="stat-card">
+            <span class="stat-number">{{ stats.total_subcategorias }}</span>
+            <div class="stat-label">{% trans "Subcategorías" %}</div>
+        </div>
+    </div>
+
+    <!-- Navegación -->
+    <div class="navigation-tabs">
+        <a href="{% if request.resolver_match.namespace == 'chile:servicios' or request.resolver_match.namespace == 'usa:servicios' %}{% url request.resolver_match.namespace|add:':servicios_menu' %}{% else %}{% url 'taller:servicios:servicios_menu' %}{% endif %}" class="nav-tab">
+            <i class="fas fa-cogs"></i> {% trans "Servicios Internos" %}
+        </a>
+        <a href="{% if request.resolver_match.namespace == 'chile:servicios' or request.resolver_match.namespace == 'usa:servicios' %}{% url request.resolver_match.namespace|add:':otros_servicios_menu' %}{% else %}{% url 'taller:servicios:otros_servicios_menu' %}{% endif %}" class="nav-tab active">
+            <i class="fas fa-handshake"></i> {% trans "Servicios Externos" %}
+        </a>
+        <a href="{% if request.resolver_match.namespace == 'chile:servicios' or request.resolver_match.namespace == 'usa:servicios' %}{% url request.resolver_match.namespace|add:':crear_otro_servicio' %}{% else %}{% url 'taller:servicios:crear_otro_servicio' %}{% endif %}" class="nav-tab">
+            <i class="fas fa-plus"></i> {% trans "Nuevo Servicio Externo" %}
+        </a>
+    </div>
+
+    <!-- Búsqueda y Filtros -->
+    <div class="search-container">
+        <div class="row">
+            <div class="col-md-5">
+                <input type="text" 
+                       id="search-input" 
+                       class="search-input" 
+                       placeholder="{% trans 'Buscar servicios externos...' %}"
+                       autocomplete="off">
+            </div>
+            <div class="col-md-5">
+                <div class="filter-controls">
+                    <select id="categoria-filter" class="filter-select">
+                        <option value="">{% trans "Todas las categorías" %}</option>
+                        {% for categoria in categorias %}
+                            <option value="{{ categoria.id }}">{{ categoria.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                    
+                    <select id="proveedor-filter" class="filter-select">
+                        <option value="">{% trans "Todos los proveedores" %}</option>
+                        {% for proveedor in proveedores %}
+                            <option value="{{ proveedor }}">{{ proveedor }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-2 text-end">
+                <button type="button" class="btn-futuristic btn-primary" data-bs-toggle="modal" data-bs-target="#createServiceModal">
+                    <i class="fas fa-plus"></i> {% trans "Crear" %}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenedor de resultados -->
+    <div id="services-container">
+        <div class="services-grid">
+            {% for servicio in otros_servicios %}
+            <div class="service-card" data-categoria="{{ servicio.categoria.id|default:'' }}" data-proveedor="{{ servicio.empresa_externa|default:'' }}">
+                <div class="service-title">
+                    <i class="fas fa-external-link-alt me-2"></i>
+                    {{ servicio.nombre }}
+                </div>
+                
+                <div class="service-description">
+                    {{ servicio.descripcion|default:""|truncatewords:20 }}
+                </div>
+                
+                <div class="service-provider">
+                    <i class="fas fa-building me-1"></i>
+                    {% trans "Empresa:" %} {{ servicio.empresa_externa }}
+                </div>
+                
+                <div class="service-pricing">
+                    <div class="pricing-row">
+                        <div class="price-label">{% trans "Costo Taller:" %}</div>
+                        <div class="price-value cost">${{ servicio.costo_taller|floatformat:0 }}</div>
+                    </div>
+                    <div class="pricing-row">
+                        <div class="price-label">{% trans "Precio Cliente:" %}</div>
+                        <div class="price-value price">${{ servicio.precio_cliente|floatformat:0 }}</div>
+                    </div>
+                    <div class="pricing-row gain">
+                        <div class="price-label">{% trans "Ganancia:" %}</div>
+                        <div class="price-value">${{ servicio.ganancia|floatformat:0 }}</div>
+                    </div>
+                </div>
+                
+                <div class="service-meta">
+                    {% if servicio.categoria %}
+                    <div class="service-category">
+                        <i class="fas fa-tag me-1"></i>
+                        {{ servicio.categoria.get_label }}
+                    </div>
+                    {% endif %}
+                    
+                    {% if servicio.tiempo_estimado %}
+                    <div class="service-time">
+                        <i class="fas fa-clock me-1"></i>
+                        {{ servicio.tiempo_estimado }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-5">
+                <i class="fas fa-handshake fa-3x mb-3 text-muted"></i>
+                <h4>{% trans "No hay servicios externos disponibles" %}</h4>
+                <p class="text-muted">{% trans "Comienza agregando servicios externos a tu taller." %}</p>
+                <button type="button" class="btn-futuristic btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#createServiceModal">
+                    <i class="fas fa-plus"></i> {% trans "Crear Primer Servicio Externo" %}
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal para crear servicio externo -->
+<div class="modal fade" id="createServiceModal" tabindex="-1" aria-labelledby="createServiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="background: var(--card-background); border: 1px solid var(--cyber-blue); box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);">
+            <div class="modal-header" style="border-bottom: 1px solid var(--cyber-blue);">
+                <h5 class="modal-title" id="createServiceModalLabel" style="color: var(--cyber-blue);">
+                    <i class="fas fa-external-link-alt me-2"></i>{% trans "Crear Servicio Externo" %}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1);"></button>
+            </div>
+            <form method="post" action="{% if request.resolver_match.namespace == 'chile:servicios' or request.resolver_match.namespace == 'usa:servicios' %}{% url request.resolver_match.namespace|add:':crear_otro_servicio' %}{% else %}{% url 'taller:servicios:crear_otro_servicio' %}{% endif %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="nombre" class="form-label" style="color: var(--cyber-blue);">{% trans "Nombre del Servicio" %}</label>
+                                <input type="text" class="form-control search-input" id="nombre" name="nombre" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="empresa_externa" class="form-label" style="color: var(--cyber-blue);">{% trans "Empresa Externa" %}</label>
+                                <input type="text" class="form-control search-input" id="empresa_externa" name="empresa_externa" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="categoria" class="form-label" style="color: var(--cyber-blue);">{% trans "Categoría" %}</label>
+                                <select class="form-control filter-select" id="categoria" name="categoria" required>
+                                    <option value="">{% trans "Seleccionar categoría" %}</option>
+                                    {% for categoria in categorias %}
+                                        <option value="{{ categoria.id }}">{{ categoria.get_label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="costo_taller" class="form-label" style="color: #ff6b6b;">{% trans "Costo al Taller" %}</label>
+                                <input type="number" class="form-control search-input" id="costo_taller" name="costo_taller" step="0.01" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="precio_cliente" class="form-label" style="color: var(--cyber-green);">{% trans "Precio al Cliente" %}</label>
+                                <input type="number" class="form-control search-input" id="precio_cliente" name="precio_cliente" step="0.01" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="tiempo_estimado" class="form-label" style="color: var(--cyber-blue);">{% trans "Tiempo Estimado" %}</label>
+                                <input type="text" class="form-control search-input" id="tiempo_estimado" name="tiempo_estimado" placeholder="{% trans 'ej: 2-3 horas' %}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="descripcion" class="form-label" style="color: var(--cyber-blue);">{% trans "Descripción" %}</label>
+                                <textarea class="form-control search-input" id="descripcion" name="descripcion" rows="3" placeholder="{% trans 'Descripción del servicio...' %}"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="border-top: 1px solid var(--cyber-blue);">
+                    <button type="button" class="btn-futuristic btn-secondary" data-bs-dismiss="modal">{% trans "Cancelar" %}</button>
+                    <button type="submit" class="btn-futuristic btn-primary">
+                        <i class="fas fa-save"></i> {% trans "Crear Servicio" %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('search-input');
+    const categoriaFilter = document.getElementById('categoria-filter');
+    const proveedorFilter = document.getElementById('proveedor-filter');
+    const servicesContainer = document.getElementById('services-container');
+
+    let debounceTimer;
+
+    function debounce(func, wait) {
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(debounceTimer);
+                func(...args);
+            };
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(later, wait);
+        };
+    }
+
+    function filterServices() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const selectedCategoria = categoriaFilter.value;
+        const selectedProveedor = proveedorFilter.value;
+
+        const serviceCards = document.querySelectorAll('.service-card');
+        let visibleCount = 0;
+
+        serviceCards.forEach(card => {
+            const title = card.querySelector('.service-title').textContent.toLowerCase();
+            const description = card.querySelector('.service-description').textContent.toLowerCase();
+            const categoria = card.dataset.categoria;
+            const proveedor = card.dataset.proveedor;
+
+            const matchesSearch = title.includes(searchTerm) || description.includes(searchTerm);
+            const matchesCategoria = !selectedCategoria || categoria === selectedCategoria;
+            const matchesProveedor = !selectedProveedor || proveedor === selectedProveedor;
+
+            if (matchesSearch && matchesCategoria && matchesProveedor) {
+                card.style.display = 'block';
+                card.style.animation = 'fadeIn 0.3s ease-in';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        // Mostrar mensaje de no resultados si es necesario
+        updateNoResultsMessage(visibleCount);
+    }
+
+    function updateNoResultsMessage(visibleCount) {
+        const existingMessage = document.querySelector('.no-results-message');
+        if (existingMessage) {
+            existingMessage.remove();
+        }
+
+        if (visibleCount === 0) {
+            const noResultsHTML = `
+                <div class="no-results no-results-message">
+                    <i class="fas fa-search"></i>
+                    <h4>${'{% trans "No se encontraron servicios" %}'}</h4>
+                    <p>${'{% trans "Intenta modificar los filtros de búsqueda" %}'}</p>
+                </div>
+            `;
+            servicesContainer.innerHTML = noResultsHTML;
+        }
+    }
+
+    // Event listeners
+    searchInput.addEventListener('input', debounce(filterServices, 300));
+    categoriaFilter.addEventListener('change', filterServices);
+    proveedorFilter.addEventListener('change', filterServices);
+
+    // Animación de entrada para las estadísticas
+    const statNumbers = document.querySelectorAll('.stat-number');
+    statNumbers.forEach(stat => {
+        const finalValue = parseInt(stat.textContent);
+        let currentValue = 0;
+        const increment = finalValue / 30;
+        
+        const counter = setInterval(() => {
+            currentValue += increment;
+            if (currentValue >= finalValue) {
+                currentValue = finalValue;
+                clearInterval(counter);
+            }
+            stat.textContent = Math.floor(currentValue);
+        }, 50);
+    });
+
+    // Efectos de hover mejorados
+    document.querySelectorAll('.service-card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-8px) scale(1.02)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+});
+
+// CSS para animaciones
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .service-card {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %}

@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="{{ current_language }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if current_language == 'en' %}USA Market Demo{% else %}Demo Mercado USA{% endif %} | TallerPro</title>
+    
+    <!-- Cyberpunk Theme CSS -->
+    <style>
+        :root {
+            --primary-color: #00ff9f;
+            --secondary-color: #0080ff;
+            --accent-color: #ff0080;
+            --bg-dark: #0a0a0a;
+            --bg-card: #1a1a1a;
+            --text-light: #ffffff;
+            --text-muted: #cccccc;
+            --border-neon: #00ff9f;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: var(--text-light);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            animation: float 6s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 1; }
+            50% { transform: translateY(-20px) rotate(180deg); opacity: 0.5; }
+        }
+
+        /* Header */
+        .header {
+            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-neon);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-shadow: 0 0 10px var(--primary-color);
+        }
+
+        .language-switcher {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .lang-btn {
+            background: rgba(0, 255, 159, 0.1);
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .lang-btn.active,
+        .lang-btn:hover {
+            background: var(--primary-color);
+            color: var(--bg-dark);
+            box-shadow: 0 0 15px var(--primary-color);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(0, 255, 159, 0.5);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Cards Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .feature-card {
+            background: rgba(26, 26, 26, 0.8);
+            border: 1px solid rgba(0, 255, 159, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 159, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .feature-card:hover::before {
+            left: 100%;
+        }
+
+        .feature-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 20px rgba(0, 255, 159, 0.3);
+            transform: translateY(-5px);
+        }
+
+        .feature-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 1.4rem;
+        }
+
+        .feature-card .description {
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        /* Data Lists */
+        .data-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid rgba(0, 255, 159, 0.2);
+            border-radius: 8px;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .data-item {
+            padding: 0.5rem;
+            border-bottom: 1px solid rgba(0, 255, 159, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .data-item:last-child {
+            border-bottom: none;
+        }
+
+        .data-item .name {
+            color: var(--text-light);
+        }
+
+        .data-item .meta {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Tax Calculator */
+        .tax-demo {
+            background: rgba(0, 128, 255, 0.1);
+            border: 1px solid var(--secondary-color);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .tax-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem 0;
+        }
+
+        .tax-row.total {
+            border-top: 1px solid var(--secondary-color);
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: var(--primary-color);
+        }
+
+        .currency {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        /* Services Grid */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .service-item {
+            background: rgba(255, 0, 128, 0.1);
+            border: 1px solid rgba(255, 0, 128, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .service-item:hover {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px rgba(255, 0, 128, 0.3);
+        }
+
+        .service-es {
+            color: var(--text-light);
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .service-en {
+            color: var(--accent-color);
+            font-style: italic;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-animation" id="bgAnimation"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">TallerPro USA 🇺🇸</div>
+            <div class="language-switcher">
+                <button class="lang-btn {% if current_language == 'es' %}active{% endif %}" onclick="cambiarIdioma('es')">
+                    🇪🇸 Español
+                </button>
+                <button class="lang-btn {% if current_language == 'en' %}active{% endif %}" onclick="cambiarIdioma('en')">
+                    🇺🇸 English
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1>
+                {% if current_language == 'en' %}
+                    🚀 USA Market Ready
+                {% else %}
+                    🚀 Listo para Mercado USA
+                {% endif %}
+            </h1>
+            <p>
+                {% if current_language == 'en' %}
+                    Complete localization system with US geography, vehicle database, tax calculations, and cultural adaptation for the American automotive market.
+                {% else %}
+                    Sistema completo de localización con geografía de EE.UU., base de datos de vehículos, cálculos de impuestos y adaptación cultural para el mercado automotriz estadounidense.
+                {% endif %}
+            </p>
+        </section>
+
+        <!-- Features Grid -->
+        <div class="features-grid">
+            <!-- Estados USA -->
+            <div class="feature-card">
+                <h3>
+                    {% if current_language == 'en' %}
+                        🏛️ US States & Cities
+                    {% else %}
+                        🏛️ Estados y Ciudades USA
+                    {% endif %}
+                </h3>
+                <div class="description">
+                    {% if current_language == 'en' %}
+                        25 US states with major cities, sales tax rates, and timezone information.
+                    {% else %}
+                        25 estados de EE.UU. con ciudades principales, tasas de impuestos y información de zonas horarias.
+                    {% endif %}
+                </div>
+                <div class="data-list">
+                    {% for estado in estados %}
+                    <div class="data-item">
+                        <span class="name">{{ estado.nombre }} ({{ estado.codigo }})</span>
+                        <span class="meta">{{ estado.sales_tax }}% tax</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Vehículos USA -->
+            <div class="feature-card">
+                <h3>
+                    {% if current_language == 'en' %}
+                        🚗 US Vehicle Database
+                    {% else %}
+                        🚗 Base Datos Vehículos USA
+                    {% endif %}
+                </h3>
+                <div class="description">
+                    {% if current_language == 'en' %}
+                        29 vehicle brands with models from 1980 onwards, including American, Japanese, and European brands popular in the US market.
+                    {% else %}
+                        29 marcas de vehículos con modelos desde 1980, incluyendo marcas americanas, japonesas y europeas populares en el mercado estadounidense.
+                    {% endif %}
+                </div>
+                <div class="data-list">
+                    <div style="margin-bottom: 1rem;">
+                        <strong style="color: var(--primary-color);">
+                            {% if current_language == 'en' %}American Brands:{% else %}Marcas Americanas:{% endif %}
+                        </strong>
+                        {% for marca in marcas_usa %}
+                        <div class="data-item">
+                            <span class="name">{{ marca.nombre }}</span>
+                            <span class="meta">{{ marca.anio_inicio }}+</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div>
+                        <strong style="color: var(--secondary-color);">
+                            {% if current_language == 'en' %}Japanese Brands:{% else %}Marcas Japonesas:{% endif %}
+                        </strong>
+                        {% for marca in marcas_japonesas %}
+                        <div class="data-item">
+                            <span class="name">{{ marca.nombre }}</span>
+                            <span class="meta">{{ marca.anio_inicio }}+</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sistema de Impuestos USA -->
+            <div class="feature-card">
+                <h3>
+                    {% if current_language == 'en' %}
+                        💰 US Tax System
+                    {% else %}
+                        💰 Sistema Impuestos USA
+                    {% endif %}
+                </h3>
+                <div class="description">
+                    {% if current_language == 'en' %}
+                        Automatic sales tax calculation by state and city, with USD currency formatting.
+                    {% else %}
+                        Cálculo automático de sales tax por estado y ciudad, con formato de moneda USD.
+                    {% endif %}
+                </div>
+                <div class="tax-demo">
+                    <div class="tax-row">
+                        <span>
+                            {% if current_language == 'en' %}Subtotal:{% else %}Subtotal:{% endif %}
+                        </span>
+                        <span class="currency">${{ tax_demo.subtotal }}</span>
+                    </div>
+                    <div class="tax-row">
+                        <span>
+                            {% if current_language == 'en' %}Sales Tax ({{ tax_demo.tax_rate }}%):{% else %}Impuesto Ventas ({{ tax_demo.tax_rate }}%):{% endif %}
+                        </span>
+                        <span class="currency">${{ tax_demo.tax }}</span>
+                    </div>
+                    <div class="tax-row total">
+                        <span>
+                            {% if current_language == 'en' %}Total:{% else %}Total:{% endif %}
+                        </span>
+                        <span class="currency">${{ tax_demo.total }}</span>
+                    </div>
+                </div>
+                <div style="margin-top: 1rem; color: var(--text-muted); font-size: 0.9rem;">
+                    {% if current_language == 'en' %}
+                        Example calculation for Atlanta, GA
+                    {% else %}
+                        Ejemplo de cálculo para Atlanta, GA
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Servicios Bilingües -->
+            <div class="feature-card">
+                <h3>
+                    {% if current_language == 'en' %}
+                        🔧 Bilingual Services
+                    {% else %}
+                        🔧 Servicios Bilingües
+                    {% endif %}
+                </h3>
+                <div class="description">
+                    {% if current_language == 'en' %}
+                        Automatic translation of automotive services and parts to American English.
+                    {% else %}
+                        Traducción automática de servicios automotrices y repuestos al inglés americano.
+                    {% endif %}
+                </div>
+                <div class="services-grid">
+                    {% for servicio in servicios_bilingue %}
+                    <div class="service-item">
+                        <div class="service-es">{{ servicio.es }}</div>
+                        <div class="service-en">{{ servicio.en }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Ejemplos de Moneda -->
+            <div class="feature-card">
+                <h3>
+                    {% if current_language == 'en' %}
+                        💵 USD Currency Formatting
+                    {% else %}
+                        💵 Formato Moneda USD
+                    {% endif %}
+                </h3>
+                <div class="description">
+                    {% if current_language == 'en' %}
+                        Proper USD formatting with commas for thousands and cent precision.
+                    {% else %}
+                        Formato USD apropiado con comas para miles y precisión de centavos.
+                    {% endif %}
+                </div>
+                <div class="data-list">
+                    {% for amount in currency_examples %}
+                    <div class="data-item">
+                        <span class="name">
+                            {% if current_language == 'en' %}Amount:{% else %}Cantidad:{% endif %}
+                        </span>
+                        <span class="currency">{{ amount }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Personalización Atlanta -->
+            <div class="feature-card">
+                <h3>
+                    {% if current_language == 'en' %}
+                        🍑 Atlanta Personalization
+                    {% else %}
+                        🍑 Personalización Atlanta
+                    {% endif %}
+                </h3>
+                <div class="description">
+                    {% if current_language == 'en' %}
+                        Specialized features for Atlanta market including local tax rates, timezone, and regional preferences.
+                    {% else %}
+                        Características especializadas para el mercado de Atlanta incluyendo tasas de impuestos locales, zona horaria y preferencias regionales.
+                    {% endif %}
+                </div>
+                <div style="text-align: center; padding: 1rem;">
+                    <a href="/demo-atlanta/" style="
+                        display: inline-block;
+                        background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+                        color: var(--bg-dark);
+                        padding: 1rem 2rem;
+                        border-radius: 25px;
+                        text-decoration: none;
+                        font-weight: bold;
+                        transition: all 0.3s ease;
+                        box-shadow: 0 0 20px rgba(0, 255, 159, 0.3);
+                    ">
+                        {% if current_language == 'en' %}
+                            🚀 Try Atlanta Demo
+                        {% else %}
+                            🚀 Probar Demo Atlanta
+                        {% endif %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Crear partículas animadas
+        function createParticles() {
+            const bgAnimation = document.getElementById('bgAnimation');
+            const particleCount = 50;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (Math.random() * 4 + 4) + 's';
+                bgAnimation.appendChild(particle);
+            }
+        }
+
+        // Cambiar idioma
+        async function cambiarIdioma(idioma) {
+            try {
+                const response = await fetch('/cambiar-idioma/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+                    },
+                    body: `idioma=${idioma}`
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    window.location.reload();
+                }
+            } catch (error) {
+                console.error('Error al cambiar idioma:', error);
+                // Fallback: recargar con parámetro de idioma
+                window.location.href = `?lang=${idioma}`;
+            }
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+            
+            // Animación de entrada
+            document.querySelectorAll('.feature-card').forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'all 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>

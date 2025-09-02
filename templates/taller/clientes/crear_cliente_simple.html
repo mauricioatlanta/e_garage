@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="container mt-4">
+  <h1>Crear Cliente</h1>
+  
+  <!-- Debug Info -->
+  <div class="alert alert-info">
+    <strong>DEBUG INFO:</strong><br>
+    País: {{ form.pais }}<br>
+    Empresa: {{ form.empresa }}<br>
+    Empresa País: {{ form.empresa.pais }}<br>
+    User Empresa País: {{ user.empresa.pais }}
+  </div>
+  
+  <form method="post">
+    {% csrf_token %}
+    
+    {% if form.errors %}
+      <div class="alert alert-danger">
+        <h4>Errores en el formulario:</h4>
+        {{ form.errors }}
+      </div>
+    {% endif %}
+    
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group">
+          <label for="{{ form.nombre.id_for_label }}">Nombre:</label>
+          {{ form.nombre|add_class:'form-control' }}
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="form-group">
+          <label for="{{ form.apellido.id_for_label }}">Apellido:</label>
+          {{ form.apellido|add_class:'form-control' }}
+        </div>
+      </div>
+    </div>
+    
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group">
+          <label for="{{ form.email.id_for_label }}">Email:</label>
+          {{ form.email|add_class:'form-control' }}
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="form-group">
+          <label for="{{ form.telefono.id_for_label }}">Teléfono:</label>
+          {{ form.telefono|add_class:'form-control' }}
+        </div>
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label for="{{ form.direccion.id_for_label }}">Dirección:</label>
+      {{ form.direccion|add_class:'form-control' }}
+    </div>
+    
+    {% if form.pais == 'US' %}
+      <!-- Campos USA -->
+      <div class="row">
+        <div class="col-md-4">
+          <div class="form-group">
+            <label for="{{ form.estado_usa.id_for_label }}">State:</label>
+            {{ form.estado_usa|add_class:'form-control' }}
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label for="{{ form.ciudad_usa.id_for_label }}">City:</label>
+            {{ form.ciudad_usa|add_class:'form-control' }}
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label for="{{ form.zipcode.id_for_label }}">Zip Code:</label>
+            {{ form.zipcode|add_class:'form-control' }}
+          </div>
+        </div>
+      </div>
+      
+      <!-- Campos Chile (deberían estar ocultos) -->
+      <div class="row" style="display: none;">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="{{ form.region.id_for_label }}">Región:</label>
+            {{ form.region|add_class:'form-control' }}
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="{{ form.ciudad.id_for_label }}">Ciudad:</label>
+            {{ form.ciudad|add_class:'form-control' }}
+          </div>
+        </div>
+      </div>
+    {% else %}
+      <!-- Campos Chile -->
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="{{ form.region.id_for_label }}">Región:</label>
+            {{ form.region|add_class:'form-control' }}
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="{{ form.ciudad.id_for_label }}">Ciudad:</label>
+            {{ form.ciudad|add_class:'form-control' }}
+          </div>
+        </div>
+      </div>
+      
+      <!-- Campos USA (deberían estar ocultos) -->
+      <div class="row" style="display: none;">
+        <div class="col-md-4">
+          <div class="form-group">
+            <label for="{{ form.estado_usa.id_for_label }}">State:</label>
+            {{ form.estado_usa|add_class:'form-control' }}
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label for="{{ form.ciudad_usa.id_for_label }}">City:</label>
+            {{ form.ciudad_usa|add_class:'form-control' }}
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label for="{{ form.zipcode.id_for_label }}">Zip Code:</label>
+            {{ form.zipcode|add_class:'form-control' }}
+          </div>
+        </div>
+      </div>
+    {% endif %}
+    
+    <div class="mt-3">
+      <button type="submit" class="btn btn-primary">Guardar Cliente</button>
+      <a href="{% url 'taller:clientes:lista_clientes' %}" class="btn btn-secondary">Cancelar</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

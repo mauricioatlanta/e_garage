@@ -2,7 +2,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import models
 from django.db.models import Sum, F, DecimalField, ExpressionWrapper
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
+from decimal import Decimal
 from core.views import TenantViewMixin
+from taller.mixins import CountryLangTemplateMixin  # Agregar import del mixin
 from .models import Documento
 from .forms import DocumentoForm
 
@@ -37,11 +39,14 @@ class DocumentoListView(LoginRequiredMixin, TenantViewMixin, ListView):
             qs = qs.filter(estado=estado)
         return qs
 
-class DocumentoDetailView(LoginRequiredMixin, TenantViewMixin, DetailView):
+class DocumentoDetailView(LoginRequiredMixin, TenantViewMixin, CountryLangTemplateMixin, DetailView):
     model = Documento
-    template_name = "taller/documentos/ver_documento_nuevo.html"
+    base_template_name = "documentos/ver_documento_nuevo.html"
     select_related_fields = ("cliente", "vehiculo", "tecnico_responsable")
     prefetch_related_fields = ("lineas_repuesto__repuesto", "lineas_servicio__servicio", "lineas_otro_servicio")
+    
+    def render_to_response(self, context, **response_kwargs):
+        return self.render_country_lang(self.request, context)
     
     def get_queryset(self):
         """Optimizar consultas con select_related y prefetch_related"""
@@ -78,7 +83,7 @@ class DocumentoDetailView(LoginRequiredMixin, TenantViewMixin, DetailView):
 
         # País y reglas (del context processor que ya tienes)
         tax_base = ctx.get("doc_tax_base", "parts_only")      # "parts_only" (CL) | "subtotal" (US)
-        rate = float(ctx.get("doc_tax_rate", 0.0))            # 0.19 CL | ej. 0.08 US
+        rate = Decimal(str(ctx.get("doc_tax_rate", 0.0)))     # 0.19 CL | ej. 0.08 US
         base = sum_rep if tax_base == "parts_only" else subtotal
         tax = round(base * rate, 2) if getattr(doc, "incluir_iva", True) else 0
         total = subtotal + tax
@@ -125,10 +130,13 @@ class DocumentoDetailView(LoginRequiredMixin, TenantViewMixin, DetailView):
         })
         return ctx
 
-class DocumentoCreateView(LoginRequiredMixin, TenantViewMixin, CreateView):
+class DocumentoCreateView(LoginRequiredMixin, TenantViewMixin, CountryLangTemplateMixin, CreateView):
     model = Documento
     form_class = DocumentoForm
-    template_name = "taller/documentos/crear_documento.html"
+    base_template_name = "documentos/crear_documento.html"
+    
+    def render_to_response(self, context, **response_kwargs):
+        return self.render_country_lang(self.request, context)
     
     def get_success_url(self):
         """Redirigir al listado de documentos después de crear"""
@@ -218,12 +226,15 @@ class DocumentoCreateView(LoginRequiredMixin, TenantViewMixin, CreateView):
                     precio_cliente=float(precio) if precio else 0.0
                 )
 
-class DocumentoUpdateView(LoginRequiredMixin, TenantViewMixin, UpdateView):
+class DocumentoUpdateView(LoginRequiredMixin, TenantViewMixin, CountryLangTemplateMixin, UpdateView):
     model = Documento
     form_class = DocumentoForm
-    template_name = "taller/documentos/editar_documento_nuevo.html"
+    base_template_name = "documentos/editar_documento_nuevo.html"
     select_related_fields = ("cliente", "vehiculo", "tecnico_responsable")
     prefetch_related_fields = ("lineas_repuesto__repuesto", "lineas_servicio__servicio", "lineas_otro_servicio")
+    
+    def render_to_response(self, context, **response_kwargs):
+        return self.render_country_lang(self.request, context)
     
     def get_queryset(self):
         """Optimizar consultas con select_related y prefetch_related"""
@@ -379,7 +390,7 @@ class DocumentoUpdateView(LoginRequiredMixin, TenantViewMixin, UpdateView):
 
         # País y reglas (del context processor que ya tienes)
         tax_base = ctx.get("doc_tax_base", "parts_only")      # "parts_only" (CL) | "subtotal" (US)
-        rate = float(ctx.get("doc_tax_rate", 0.0))            # 0.19 CL | ej. 0.08 US
+        rate = Decimal(str(ctx.get("doc_tax_rate", 0.0)))     # 0.19 CL | ej. 0.08 US
         base = sum_rep if tax_base == "parts_only" else subtotal
         tax = round(base * rate, 2) if getattr(doc, "incluir_iva", True) else 0
         total = subtotal + tax
@@ -423,5 +434,14 @@ class DocumentoUpdateView(LoginRequiredMixin, TenantViewMixin, UpdateView):
             "subtotal": subtotal,
             "iva": tax,            # en US lo mostrarás como Sales Tax (usa tu label dinámico)
             "total": total,
+            # Debug info
+            "debug_sum_rep": float(sum_rep) if sum_rep else 0,
+            "debug_sum_serv": float(sum_serv) if sum_serv else 0,
+            "debug_sum_otros": float(sum_otros) if sum_otros else 0,
+            "debug_subtotal": float(subtotal),
+            "debug_tax": float(tax),
+            "debug_total": float(total),
+            "debug_rate": float(rate),
+            "debug_tax_base": tax_base,
         })
         return ctx

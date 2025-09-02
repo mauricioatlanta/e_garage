@@ -5,10 +5,16 @@ from .forms_trial import TrialForm
 from .forms_subscription import PlanPagoForm
 from taller.models.trial import TrialRegistro
 from django.utils.crypto import get_random_string
+from django.utils.translation import activate
 import re
 from django.shortcuts import render
 
 def registro_unificado(request):
+    # Manejar cambio de idioma
+    lang = request.GET.get('lang')
+    if lang in ['es', 'en']:
+        activate(lang)
+    
     mensaje = error = None
     tipo = request.POST.get('tipo_registro', 'trial')
     form = None

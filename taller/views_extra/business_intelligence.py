@@ -144,12 +144,16 @@ def get_tecnicos_stats(empresa, fecha_inicio, fecha_fin):
             total_repuestos_valor = sum(r.cantidad * getattr(r, 'precio_unitario', getattr(r, 'precio', 0)) for r in repuestos_queryset)
 
             # Agregar servicios realizados
-            servicios_stats = LineaServicio.objects.filter(
-                documento__in=documentos
-            ).aggregate(
-                cantidad=Count('id'),
-                valor=Sum(F('precio_unitario') * F('cantidad'))
-            )
+            try:
+                servicios_stats = LineaServicio.objects.filter(
+                    documento__in=documentos
+                ).aggregate(
+                    cantidad=Count('id'),
+                    valor=Sum(F('precio_unitario') * F('cantidad'))
+                )
+            except Exception as e:
+                print(f"Error calculando servicios_stats: {e}")
+                servicios_stats = {'cantidad': 0, 'valor': 0}
 
             ingresos_totales = total_repuestos_valor + (servicios_stats['valor'] or 0)
 

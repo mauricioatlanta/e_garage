@@ -49,4 +49,7 @@ urlpatterns = [
     
     # Login para USA (plantilla reutilizable)
     path('login/', TemplateView.as_view(template_name='registration/login.html'), name='account_login'),
+    
+    # Registro para USA (inglés por defecto)
+    path('registro/', include('onboarding_urls')),
 ]

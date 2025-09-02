@@ -3,7 +3,16 @@ from taller.models.vehiculos import Vehiculo
 
 class VehiculoAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
-        qs = Vehiculo.objects.all()
+        # BLINDAJE MULTI-TENANT: Verificar autenticación y empresa
+        if not self.request.user.is_authenticated:
+            return Vehiculo.objects.none()
+        
+        empresa = getattr(self.request.user, 'empresa', None)
+        if not empresa:
+            return Vehiculo.objects.none()
+        
+        # BLINDAJE: Filtrar SOLO por empresa del usuario
+        qs = Vehiculo.objects.filter(empresa=empresa)
         
         # Log para depuración
         import logging
@@ -18,7 +27,8 @@ class VehiculoAutocomplete(autocomplete.Select2QuerySetView):
         if cliente_id:
             try:
                 cliente_id_int = int(cliente_id)
-                qs = qs.filter(cliente_id=cliente_id_int)
+                # BLINDAJE: Verificar que el cliente pertenece a la misma empresa
+                qs = qs.filter(cliente_id=cliente_id_int, cliente__empresa=empresa)
                 logger.info(f"[DAL] queryset filtrado por cliente_id={cliente_id_int}: {[v.patente for v in qs]}")
             except (ValueError, TypeError):
                 logger.warning(f"[DAL] cliente_id no es un entero válido: {cliente_id}")

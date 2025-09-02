@@ -20,11 +20,11 @@ def crear_vehiculo(request):
                 nombre=data['caja_nueva'], modelo_id=modelo_id
             )
             data['caja'] = caja_obj.pk
-        form = VehiculoForm(data)
+        form = VehiculoForm(data, user=request.user)  # BLINDAJE: Agregar user
         if form.is_valid():
             form.instance.empresa = request.empresa
             form.save()
             return redirect('vehiculos:lista_vehiculos')
     else:
-        form = VehiculoForm()
+        form = VehiculoForm(user=request.user)  # BLINDAJE: Agregar user
     return render(request, 'crear_vehiculo.html', {'form': form})

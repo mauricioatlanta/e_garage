@@ -1,0 +1,284 @@
+{% extends 'base_admin.html' %}
+{% load humanize %}
+
+{% block title %}Panel de Suscripciones - eGarage Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+        border: none;
+    }
+    .dashboard-card:hover {
+        transform: translateY(-5px);
+    }
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+    .stat-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .alert-item {
+        border-left: 4px solid #ffc107;
+        background-color: #fff8e1;
+        padding: 15px;
+        margin-bottom: 10px;
+        border-radius: 0 8px 8px 0;
+    }
+    .urgent-item {
+        border-left-color: #dc3545;
+        background-color: #f8d7da;
+    }
+    .status-badge {
+        font-size: 0.8rem;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-weight: bold;
+    }
+    .status-activa { background-color: #d4edda; color: #155724; }
+    .status-vencida { background-color: #fff3cd; color: #856404; }
+    .status-suspendida { background-color: #f8d7da; color: #721c24; }
+    .status-cancelada { background-color: #e2e3e5; color: #383d41; }
+    
+    .chart-container {
+        position: relative;
+        height: 300px;
+        margin: 20px 0;
+    }
+    
+    .quick-actions {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1000;
+    }
+    
+    .action-btn {
+        display: block;
+        margin: 10px 0;
+        padding: 15px 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 25px;
+        text-decoration: none;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        transition: transform 0.3s ease;
+    }
+    
+    .action-btn:hover {
+        transform: translateY(-2px);
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0">📊 Panel de Suscripciones</h1>
+                    <p class="text-muted">Monitoreo en tiempo real del estado de suscripciones</p>
+                </div>
+                <div>
+                    <span class="badge badge-info">Última actualización: {{ today|date:"d/m/Y H:i" }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas Principales -->
+    <div class="row mb-4">
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+            <div class="dashboard-card text-center">
+                <div class="stat-number text-primary">{{ stats.total_empresas|intcomma }}</div>
+                <div class="stat-label">Total Empresas</div>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+            <div class="dashboard-card text-center">
+                <div class="stat-number text-success">{{ stats.activas|intcomma }}</div>
+                <div class="stat-label">Activas</div>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+            <div class="dashboard-card text-center">
+                <div class="stat-number text-warning">{{ stats.vencidas|intcomma }}</div>
+                <div class="stat-label">Vencidas</div>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+            <div class="dashboard-card text-center">
+                <div class="stat-number text-danger">{{ stats.suspendidas|intcomma }}</div>
+                <div class="stat-label">Suspendidas</div>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+            <div class="dashboard-card text-center">
+                <div class="stat-number text-info">{{ stats.trials_activos|intcomma }}</div>
+                <div class="stat-label">Trials Activos</div>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+            <div class="dashboard-card text-center">
+                <div class="stat-number text-success">{{ current_month_revenue|floatformat:0|intcomma }}</div>
+                <div class="stat-label">Ingresos del Mes</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alertas y Notificaciones -->
+    <div class="row mb-4">
+        <!-- Suscripciones por Vencer -->
+        <div class="col-lg-6 mb-3">
+            <div class="dashboard-card">
+                <h5 class="mb-3">⚠️ Vencen en 15 días</h5>
+                {% if expiring_soon %}
+                    {% for empresa in expiring_soon %}
+                        <div class="alert-item {% if empresa.fecha_vencimiento_suscripcion <= today|add_days:3 %}urgent-item{% endif %}">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ empresa.nombre }}</strong><br>
+                                    <small class="text-muted">{{ empresa.usuario.email }}</small>
+                                </div>
+                                <div class="text-right">
+                                    <span class="badge badge-warning">{{ empresa.fecha_vencimiento_suscripcion|timeuntil }}</span><br>
+                                    <small>{{ empresa.fecha_vencimiento_suscripcion|date:"d/m/Y" }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    <div class="text-center mt-3">
+                        <a href="{% url 'admin_monitoring:subscription_list' %}?status=activa&sort=fecha_vencimiento_suscripcion" class="btn btn-outline-warning btn-sm">Ver Todas</a>
+                    </div>
+                {% else %}
+                    <div class="text-center text-muted py-3">
+                        <i class="fas fa-check-circle fa-2x mb-2"></i><br>
+                        No hay suscripciones próximas a vencer
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Trials por Expirar -->
+        <div class="col-lg-6 mb-3">
+            <div class="dashboard-card">
+                <h5 class="mb-3">🆓 Trials Expiran Pronto</h5>
+                {% if trials_expiring %}
+                    {% for trial in trials_expiring %}
+                        <div class="alert-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ trial.empresa.nombre }}</strong><br>
+                                    <small class="text-muted">{{ trial.user.email }}</small>
+                                </div>
+                                <div class="text-right">
+                                    <span class="badge badge-info">{{ trial.dias_restantes }} días</span><br>
+                                    <small>{{ trial.fecha_expiracion|date:"d/m/Y" }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    <div class="text-center mt-3">
+                        <a href="{% url 'admin_monitoring:subscription_list' %}?trial=active" class="btn btn-outline-info btn-sm">Ver Todos</a>
+                    </div>
+                {% else %}
+                    <div class="text-center text-muted py-3">
+                        <i class="fas fa-clock fa-2x mb-2"></i><br>
+                        No hay trials próximos a expirar
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficos y Métricas -->
+    <div class="row mb-4">
+        <div class="col-lg-6 mb-3">
+            <div class="dashboard-card">
+                <h5 class="mb-3">📈 Distribución de Estados</h5>
+                <div class="chart-container">
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 mb-3">
+            <div class="dashboard-card">
+                <h5 class="mb-3">📅 Nuevas Suscripciones (30 días)</h5>
+                <div class="chart-container">
+                    <canvas id="newSubscriptionsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Acciones Rápidas -->
+    <div class="quick-actions">
+        <a href="{% url 'admin_monitoring:subscription_list' %}" class="action-btn">
+            📋 Lista Completa
+        </a>
+        <a href="{% url 'admin_monitoring:subscription_analytics' %}" class="action-btn">
+            📊 Analytics
+        </a>
+        <a href="{% url 'admin_monitoring:export_subscriptions' %}" class="action-btn">
+            📥 Exportar CSV
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Gráfico de distribución de estados
+const statusCtx = document.getElementById('statusChart').getContext('2d');
+new Chart(statusCtx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Activas', 'Vencidas', 'Suspendidas', 'Canceladas'],
+        datasets: [{
+            data: [{{ stats.activas }}, {{ stats.vencidas }}, {{ stats.suspendidas }}, {{ stats.canceladas }}],
+            backgroundColor: ['#28a745', '#ffc107', '#dc3545', '#6c757d'],
+            borderWidth: 0
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+
+// Actualización automática cada 5 minutos
+setInterval(function() {
+    fetch('{% url "admin_monitoring:subscription_api_stats" %}')
+        .then(response => response.json())
+        .then(data => {
+            // Actualizar estadísticas en tiempo real
+            console.log('Datos actualizados:', data.last_updated);
+        });
+}, 300000); // 5 minutos
+
+// Notificaciones en tiempo real (opcional con WebSockets)
+function showNotification(message, type = 'info') {
+    // Implementar sistema de notificaciones toast
+    console.log(`[${type.toUpperCase()}] ${message}`);
+}
+</script>
+{% endblock %}

@@ -1,0 +1,614 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block content %}
+{% csrf_token %}
+<div class="min-h-screen bg-black relative overflow-hidden">
+  <!-- Fondo dinámico espacial -->
+  <div id="spaceBackground" class="absolute inset-0">
+    <div class="stars"></div>
+    <div class="twinkling"></div>
+    <div class="clouds"></div>
+  </div>
+  
+  <!-- Partículas flotantes -->
+  <div id="particles" class="absolute inset-0 pointer-events-none"></div>
+  
+  <div class="relative z-10 p-4">
+  <!-- Header Section with Glowing Effect -->
+  <div class="relative mb-6">
+    <div class="absolute -inset-1 rounded-xl bg-gradient-to-r from-cyan-500 via-fuchsia-500 to-lime-400 opacity-20 blur-xl animate-pulse"></div>
+    <div class="relative rounded-xl border border-cyan-400/30 bg-black/40 backdrop-blur-sm p-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-lg shadow-lg ring-2 ring-cyan-400/40">🚗</div>
+          <div>
+            <h1 class="text-2xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-cyan-300 via-lime-300 to-emerald-400">
+              {% trans "Vehículos" %}
+            </h1>
+            <p class="text-gray-400 text-xs">{% trans "Sistema de gestión vehicular avanzado" %}</p>
+          </div>
+        </div>
+        <div class="flex items-center space-x-4">
+          <div class="flex items-center space-x-2 text-xs text-cyan-300">
+            <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+            <span>{% trans "Sistema activo" %}</span>
+          </div>
+          <div class="relative group">
+            <div class="absolute -inset-1 rounded-lg bg-gradient-to-r from-emerald-500 via-lime-500 to-green-500 opacity-30 blur group-hover:opacity-50 transition-opacity"></div>
+            <a href="{% url 'taller:vehiculos:crear_vehiculo' %}" 
+               class="relative inline-flex items-center space-x-2 px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-600 via-lime-600 to-green-600 hover:from-emerald-500 hover:via-lime-500 hover:to-green-500 text-white font-bold text-sm shadow-lg shadow-emerald-800/40 transition-all duration-300 border border-emerald-400/40">
+              <div class="w-4 h-4 rounded-md bg-white/20 flex items-center justify-center">
+                <span class="text-sm">➕</span>
+              </div>
+              <span>{% trans "Agregar Vehículo" %}</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Section -->
+  <div class="mb-4">
+    <div class="relative group">
+      <div class="absolute -inset-0.5 rounded-lg bg-gradient-to-r from-cyan-600 via-fuchsia-600 to-lime-600 opacity-30 blur group-hover:opacity-50 transition-opacity"></div>
+      <div class="relative flex rounded-lg border border-cyan-500/30 bg-black/40 backdrop-blur-sm overflow-hidden">
+        <div class="flex-1 relative">
+          <input type="search" id="searchInput" name="q" value="{{ request.GET.q }}" 
+                 placeholder="{% trans 'Buscar por patente, cliente, marca o modelo...' %}" 
+                 class="w-full px-3 py-2 bg-transparent text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-400/50 text-sm">
+          <div class="absolute left-2 top-1/2 transform -translate-y-1/2 text-cyan-400 text-sm">🔍</div>
+        </div>
+        <button type="button" id="searchBtn" class="px-4 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold transition-all shadow-lg hover:shadow-cyan-500/25 text-xs">
+          {% trans "ESCANEAR" %}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vehicles Grid - Collage Style -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3" id="vehiclesContainer">
+    {% for vehiculo in vehiculos %}
+    <div class="group relative vehicle-card transform hover:scale-105 transition-all duration-300" data-patente="{{ vehiculo.patente|default:'' }}" data-cliente="{{ vehiculo.cliente.nombre|default:'' }} {{ vehiculo.cliente.apellido|default:'' }}" data-marca="{{ vehiculo.marca.nombre|default:'' }}" data-modelo="{{ vehiculo.modelo.nombre|default:'' }}">
+      <!-- Glow effect -->
+      <div class="absolute -inset-1 rounded-lg bg-gradient-to-r from-cyan-600/20 via-fuchsia-600/20 to-lime-600/20 opacity-0 group-hover:opacity-100 blur transition-all duration-300"></div>
+      
+             <!-- Main card -->
+       <div class="relative rounded-lg border border-gray-700/50 bg-black/40 backdrop-blur-sm hover:border-cyan-400/30 transition-all duration-300 h-48 flex flex-col">
+         <!-- Header with ID -->
+         <div class="p-3 border-b border-gray-700/30 flex-shrink-0">
+           <div class="flex items-center justify-between">
+             <div class="flex items-center space-x-2">
+               <div class="w-6 h-6 rounded-md bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border border-cyan-400/30 flex items-center justify-center">
+                 <span class="text-cyan-300 font-mono text-xs">🏷️</span>
+               </div>
+               <div>
+                 <p class="text-cyan-300 font-mono font-bold text-sm">{{ vehiculo.patente|default:vehiculo.vin|default:"-"|truncatechars:8 }}</p>
+                 <p class="text-gray-500 text-xs">ID: #{{ vehiculo.pk }}</p>
+               </div>
+             </div>
+             <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+           </div>
+         </div>
+         
+         <!-- Content -->
+         <div class="p-3 space-y-2 flex-1">
+           <!-- Cliente -->
+           <div class="space-y-1">
+             <p class="text-xs text-gray-500 uppercase tracking-wider">{% trans "Propietario" %}</p>
+             <p class="text-gray-200 font-medium text-sm truncate">{{ vehiculo.cliente.nombre|default:"-" }}</p>
+             <p class="text-gray-400 text-xs truncate">{{ vehiculo.cliente.apellido|default:"" }}</p>
+           </div>
+           
+           <!-- Marca y Modelo -->
+           <div class="grid grid-cols-2 gap-2">
+             <div class="space-y-1">
+               <p class="text-xs text-gray-500 uppercase tracking-wider">{% trans "Marca" %}</p>
+               <p class="text-emerald-300 font-bold text-xs truncate">{{ vehiculo.marca.nombre|default:"-" }}</p>
+             </div>
+             <div class="space-y-1">
+               <p class="text-xs text-gray-500 uppercase tracking-wider">{% trans "Modelo" %}</p>
+               <p class="text-lime-300 font-semibold text-xs truncate">{{ vehiculo.modelo.nombre|default:"-" }}</p>
+             </div>
+           </div>
+           
+           <!-- Año -->
+           <div class="flex items-center space-x-2">
+             <div class="w-5 h-5 rounded-md bg-gradient-to-br from-fuchsia-500/20 to-purple-500/20 border border-fuchsia-400/30 flex items-center justify-center">
+               <span class="text-fuchsia-300 text-xs">📅</span>
+             </div>
+             <div>
+               <p class="text-xs text-gray-500 uppercase tracking-wider">{% trans "Año" %}</p>
+               <p class="text-fuchsia-300 font-bold text-sm">{{ vehiculo.anio|default:"-" }}</p>
+             </div>
+           </div>
+         </div>
+         
+         <!-- Actions -->
+         <div class="p-3 border-t border-gray-700/30 flex-shrink-0">
+           <div class="flex justify-between space-x-1">
+             <a href="{% url 'taller:vehiculos:ver_vehiculo' vehiculo.pk %}" 
+                class="flex-1 group/btn relative px-2 py-1.5 rounded-md bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border border-cyan-400/40 text-cyan-300 hover:from-cyan-500/30 hover:to-blue-500/30 hover:text-cyan-200 transition-all duration-200 text-xs font-medium text-center">
+               <span class="relative z-10 flex items-center justify-center space-x-1">
+                 <span>👁️</span>
+                 <span>{% trans "Ver" %}</span>
+               </span>
+               <div class="absolute inset-0 rounded-md bg-gradient-to-r from-cyan-600 to-blue-600 opacity-0 group-hover/btn:opacity-20 transition-opacity"></div>
+             </a>
+             <a href="{% url 'taller:vehiculos:editar_vehiculo' vehiculo.pk %}" 
+                class="flex-1 group/btn relative px-2 py-1.5 rounded-md bg-gradient-to-r from-emerald-600/20 to-green-600/20 border border-emerald-400/40 text-emerald-300 hover:from-emerald-500/30 hover:to-green-500/30 hover:text-emerald-200 transition-all duration-200 text-xs font-medium text-center">
+               <span class="relative z-10 flex items-center justify-center space-x-1">
+                 <span>⚙️</span>
+                 <span>{% trans "Editar" %}</span>
+               </span>
+               <div class="absolute inset-0 rounded-md bg-gradient-to-r from-emerald-600 to-green-600 opacity-0 group-hover/btn:opacity-20 transition-opacity"></div>
+             </a>
+             <button onclick="confirmarEliminacion({{ vehiculo.pk }}, '{{ vehiculo.patente|default:vehiculo.vin|default:"Vehículo" }}')" 
+                     class="flex-1 group/btn relative px-2 py-1.5 rounded-md bg-gradient-to-r from-red-600/20 to-pink-600/20 border border-red-400/40 text-red-300 hover:from-red-500/30 hover:to-pink-500/30 hover:text-red-200 transition-all duration-200 text-xs font-medium text-center">
+               <span class="relative z-10 flex items-center justify-center space-x-1">
+                 <span>🗑️</span>
+                 <span>{% trans "Eliminar" %}</span>
+               </span>
+               <div class="absolute inset-0 rounded-md bg-gradient-to-r from-red-600 to-pink-600 opacity-0 group-hover/btn:opacity-20 transition-opacity"></div>
+             </button>
+           </div>
+         </div>
+       </div>
+    </div>
+    {% empty %}
+    <div class="col-span-full">
+      <div class="relative">
+        <div class="absolute -inset-1 rounded-xl bg-gradient-to-r from-gray-600 via-gray-500 to-gray-600 opacity-20 blur-xl"></div>
+        <div class="relative rounded-xl border border-gray-600/30 bg-black/40 backdrop-blur-sm p-8 text-center">
+          <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-gray-500/20 to-gray-600/20 border border-gray-400/30 flex items-center justify-center text-2xl">
+            🚗
+          </div>
+          <h3 class="text-lg font-bold text-gray-300 mb-2">{% trans "No hay vehículos registrados" %}</h3>
+          <p class="text-gray-500 text-sm">{% trans "Comienza agregando tu primer vehículo al sistema" %}</p>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Paginación Futurista -->
+  {% if is_paginated %}
+  <div class="mt-6">
+    <div class="relative">
+      <div class="absolute -inset-1 rounded-xl bg-gradient-to-r from-cyan-500/20 via-fuchsia-500/20 to-lime-500/20 blur-xl"></div>
+      <div class="relative rounded-xl border border-cyan-400/20 bg-black/40 backdrop-blur-sm p-4">
+        <div class="flex flex-col sm:flex-row items-center justify-between space-y-3 sm:space-y-0">
+          <div class="flex items-center space-x-2 text-gray-400 text-sm">
+            <span class="text-cyan-300">📊</span>
+            <span>{% trans "Página" %} {{ page_obj.number }} {% trans "de" %} {{ page_obj.paginator.num_pages }}</span>
+            <span class="text-gray-600">•</span>
+            <span>{{ paginator.count }} {% trans "registros" %}</span>
+          </div>
+          
+          <nav class="flex items-center space-x-2">
+            {% if page_obj.has_previous %}
+              <a href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" 
+                 class="group px-3 py-1.5 rounded-md bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border border-cyan-400/40 text-cyan-300 hover:from-cyan-500/30 hover:to-blue-500/30 transition-all duration-200 text-xs font-medium">
+                <span class="flex items-center space-x-1">
+                  <span>⏮️</span>
+                  <span class="hidden sm:inline">{% trans "Primera" %}</span>
+                </span>
+              </a>
+              <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" 
+                 class="group px-3 py-1.5 rounded-md bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border border-cyan-400/40 text-cyan-300 hover:from-cyan-500/30 hover:to-blue-500/30 transition-all duration-200 text-xs font-medium">
+                <span class="flex items-center space-x-1">
+                  <span>⬅️</span>
+                  <span class="hidden sm:inline">{% trans "Anterior" %}</span>
+                </span>
+              </a>
+            {% endif %}
+            
+            <div class="px-3 py-1.5 rounded-md bg-gradient-to-r from-fuchsia-600/30 to-purple-600/30 border border-fuchsia-400/50 text-fuchsia-200 font-bold text-xs">
+              {{ page_obj.number }}
+            </div>
+            
+            {% if page_obj.has_next %}
+              <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" 
+                 class="group px-3 py-1.5 rounded-md bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border border-cyan-400/40 text-cyan-300 hover:from-cyan-500/30 hover:to-blue-500/30 transition-all duration-200 text-xs font-medium">
+                <span class="flex items-center space-x-1">
+                  <span class="hidden sm:inline">{% trans "Siguiente" %}</span>
+                  <span>➡️</span>
+                </span>
+              </a>
+              <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" 
+                 class="group px-3 py-1.5 rounded-md bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border border-cyan-400/40 text-cyan-300 hover:from-cyan-500/30 hover:to-blue-500/30 transition-all duration-200 text-xs font-medium">
+                <span class="flex items-center space-x-1">
+                  <span class="hidden sm:inline">{% trans "Última" %}</span>
+                  <span>⏭️</span>
+                </span>
+              </a>
+            {% endif %}
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  
+
+  <!-- Status Footer -->
+  <div class="mt-6 text-center">
+    <div class="inline-flex items-center space-x-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-gray-800/50 to-gray-700/50 border border-gray-600/30 text-gray-400 text-xs">
+      <div class="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-pulse"></div>
+      <span>{% trans "Sistema de gestión vehicular" %} • {% trans "Versión" %} 2.0</span>
+      <div class="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmación de eliminación -->
+<div id="modalEliminacion" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50">
+  <div class="flex items-center justify-center min-h-screen p-4">
+    <div class="relative">
+      <div class="absolute -inset-1 rounded-xl bg-gradient-to-r from-red-500 via-pink-500 to-red-600 opacity-30 blur-xl"></div>
+      <div class="relative rounded-xl border border-red-400/30 bg-black/90 backdrop-blur-sm p-6 max-w-md w-full">
+        <div class="text-center">
+          <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-red-500/20 to-pink-500/20 border border-red-400/30 flex items-center justify-center text-2xl">
+            ⚠️
+          </div>
+          <h3 class="text-xl font-bold text-gray-200 mb-2">{% trans "Confirmar Eliminación" %}</h3>
+          <p class="text-gray-400 text-sm mb-6">
+            {% trans "¿Estás seguro de que quieres eliminar el vehículo" %} <span id="vehiculoNombre" class="text-red-300 font-semibold"></span>?
+          </p>
+          <p class="text-gray-500 text-xs mb-6">
+            {% trans "Esta acción no se puede deshacer." %}
+          </p>
+          <div class="flex space-x-3">
+            <button onclick="cerrarModal()" 
+                    class="flex-1 px-4 py-2 rounded-lg bg-gradient-to-r from-gray-600/20 to-gray-700/20 border border-gray-500/40 text-gray-300 hover:from-gray-500/30 hover:to-gray-600/30 transition-all duration-200 text-sm font-medium">
+              {% trans "Cancelar" %}
+            </button>
+            <button id="btnConfirmarEliminar" 
+                    class="flex-1 px-4 py-2 rounded-lg bg-gradient-to-r from-red-600/20 to-pink-600/20 border border-red-400/40 text-red-300 hover:from-red-500/30 hover:to-pink-500/30 transition-all duration-200 text-sm font-medium">
+              {% trans "Eliminar" %}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Estilos CSS para el fondo espacial -->
+<style>
+/* Fondo espacial animado */
+.stars {
+  background: #000 url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><circle cx="100" cy="100" r="1" fill="white" opacity="0.8"/><circle cx="300" cy="200" r="0.5" fill="white" opacity="0.6"/><circle cx="500" cy="300" r="1.5" fill="white" opacity="0.9"/><circle cx="700" cy="150" r="0.8" fill="white" opacity="0.7"/><circle cx="900" cy="400" r="1.2" fill="white" opacity="0.8"/><circle cx="200" cy="600" r="0.6" fill="white" opacity="0.5"/><circle cx="400" cy="700" r="1.1" fill="white" opacity="0.8"/><circle cx="600" cy="500" r="0.9" fill="white" opacity="0.6"/><circle cx="800" cy="800" r="1.3" fill="white" opacity="0.9"/><circle cx="150" cy="900" r="0.7" fill="white" opacity="0.7"/></svg>') repeat top center;
+  z-index: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  animation: move-stars 200s linear infinite;
+}
+
+.twinkling {
+  background: transparent url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><circle cx="50" cy="50" r="2" fill="cyan" opacity="0.3"/><circle cx="250" cy="150" r="1.5" fill="blue" opacity="0.4"/><circle cx="450" cy="250" r="2.5" fill="purple" opacity="0.3"/><circle cx="650" cy="100" r="1.8" fill="cyan" opacity="0.5"/><circle cx="850" cy="350" r="2.2" fill="blue" opacity="0.3"/><circle cx="150" cy="550" r="1.6" fill="purple" opacity="0.4"/><circle cx="350" cy="650" r="2.1" fill="cyan" opacity="0.3"/><circle cx="550" cy="450" r="1.9" fill="blue" opacity="0.5"/><circle cx="750" cy="750" r="2.3" fill="purple" opacity="0.3"/><circle cx="100" cy="850" r="1.7" fill="cyan" opacity="0.4"/></svg>') repeat top center;
+  z-index: 1;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  animation: twinkle 4s ease-in-out infinite alternate;
+}
+
+.clouds {
+  background: transparent url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><ellipse cx="200" cy="100" rx="80" ry="20" fill="rgba(0,0,0,0.1)"/><ellipse cx="600" cy="200" rx="60" ry="15" fill="rgba(0,0,0,0.1)"/><ellipse cx="400" cy="300" rx="70" ry="18" fill="rgba(0,0,0,0.1)"/><ellipse cx="800" cy="150" rx="50" ry="12" fill="rgba(0,0,0,0.1)"/></svg>') repeat top center;
+  z-index: 2;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  animation: move-clouds 150s linear infinite;
+}
+
+@keyframes move-stars {
+  from { transform: translateY(0px); }
+  to { transform: translateY(-2000px); }
+}
+
+@keyframes twinkle {
+  0% { opacity: 0.3; }
+  50% { opacity: 0.8; }
+  100% { opacity: 0.3; }
+}
+
+@keyframes move-clouds {
+  from { transform: translateX(0px); }
+  to { transform: translateX(-1000px); }
+}
+
+/* Partículas flotantes */
+.particle {
+  position: absolute;
+  background: radial-gradient(circle, rgba(0, 255, 255, 0.8) 0%, rgba(0, 255, 255, 0.2) 50%, transparent 100%);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) scale(1); opacity: 0.3; }
+  50% { transform: translateY(-20px) scale(1.2); opacity: 0.8; }
+}
+
+/* Efectos de explosión */
+.explosion {
+  position: absolute;
+  pointer-events: none;
+  animation: explode 2s ease-out forwards;
+}
+
+@keyframes explode {
+  0% { transform: scale(0); opacity: 1; }
+  50% { transform: scale(1.5); opacity: 0.8; }
+  100% { transform: scale(2); opacity: 0; }
+}
+
+/* Efectos hover mejorados para las tarjetas */
+.vehicle-card:hover {
+  transform: scale(1.05) translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 255, 255, 0.3);
+}
+
+.vehicle-card:hover .glow-effect {
+  opacity: 1;
+}
+</style>
+
+<!-- JavaScript para búsqueda en tiempo real y efectos espaciales -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const searchBtn = document.getElementById('searchBtn');
+    const vehiclesContainer = document.getElementById('vehiclesContainer');
+    const vehicleCards = document.querySelectorAll('.vehicle-card');
+    const particlesContainer = document.getElementById('particles');
+    let searchTimeout;
+
+    // Crear partículas flotantes
+    function createParticles() {
+        const particleCount = 15;
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.top = Math.random() * 100 + '%';
+            particle.style.width = Math.random() * 4 + 2 + 'px';
+            particle.style.height = particle.style.width;
+            particle.style.animationDelay = Math.random() * 6 + 's';
+            particle.style.animationDuration = (Math.random() * 3 + 4) + 's';
+            particlesContainer.appendChild(particle);
+        }
+    }
+
+    // Crear explosión de partículas
+    function createExplosion(x, y) {
+        const explosion = document.createElement('div');
+        explosion.className = 'explosion';
+        explosion.style.left = x + 'px';
+        explosion.style.top = y + 'px';
+        explosion.style.width = '20px';
+        explosion.style.height = '20px';
+        explosion.style.background = 'radial-gradient(circle, rgba(0, 255, 255, 0.8) 0%, rgba(255, 0, 255, 0.6) 50%, transparent 100%)';
+        explosion.style.borderRadius = '50%';
+        explosion.style.zIndex = '1000';
+        
+        document.body.appendChild(explosion);
+        
+        setTimeout(() => {
+            explosion.remove();
+        }, 2000);
+    }
+
+    // Función para realizar búsqueda en tiempo real
+    function performSearch() {
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        
+        vehicleCards.forEach(card => {
+            const patente = (card.dataset.patente || '').toLowerCase();
+            const cliente = (card.dataset.cliente || '').toLowerCase();
+            const marca = (card.dataset.marca || '').toLowerCase();
+            const modelo = (card.dataset.modelo || '').toLowerCase();
+            
+            const matches = patente.includes(searchTerm) || 
+                           cliente.includes(searchTerm) || 
+                           marca.includes(searchTerm) || 
+                           modelo.includes(searchTerm);
+            
+            if (searchTerm === '' || matches) {
+                card.style.display = 'block';
+                card.style.opacity = '1';
+                card.style.transform = 'scale(1)';
+            } else {
+                card.style.opacity = '0.3';
+                card.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    if (card.style.opacity === '0.3') {
+                        card.style.display = 'none';
+                    }
+                }, 300);
+            }
+        });
+        
+        // Mostrar mensaje si no hay resultados
+        const visibleCards = Array.from(vehicleCards).filter(card => card.style.display !== 'none');
+        const noResultsMsg = document.getElementById('noResultsMessage');
+        
+        if (visibleCards.length === 0 && searchTerm !== '') {
+            if (!noResultsMsg) {
+                const message = document.createElement('div');
+                message.id = 'noResultsMessage';
+                message.className = 'relative col-span-full';
+                message.innerHTML = `
+                    <div class="absolute -inset-1 rounded-lg bg-gradient-to-r from-gray-600 via-gray-500 to-gray-600 opacity-20 blur-xl"></div>
+                    <div class="relative rounded-lg border border-gray-600/30 bg-black/40 backdrop-blur-sm p-6 text-center">
+                        <div class="w-12 h-12 mx-auto mb-4 rounded-full bg-gradient-to-br from-gray-500/20 to-gray-600/20 border border-gray-400/30 flex items-center justify-center text-2xl">
+                            🔍
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-300 mb-2">No se encontraron resultados</h3>
+                        <p class="text-gray-500 text-sm">Intenta con otros términos de búsqueda</p>
+                    </div>
+                `;
+                vehiclesContainer.appendChild(message);
+            }
+        } else if (noResultsMsg) {
+            noResultsMsg.remove();
+        }
+    }
+
+    // Búsqueda en tiempo real con debounce
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(performSearch, 300);
+        
+        // Efecto visual en el input
+        if (this.value.trim() !== '') {
+            this.style.borderColor = 'rgb(34 197 94)';
+            this.style.boxShadow = '0 0 0 2px rgba(34, 197, 94, 0.2)';
+        } else {
+            this.style.borderColor = '';
+            this.style.boxShadow = '';
+        }
+    });
+
+    // Búsqueda al hacer clic en el botón
+    searchBtn.addEventListener('click', function() {
+        performSearch();
+        
+        // Efecto visual en el botón
+        this.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+            this.style.transform = 'scale(1)';
+        }, 150);
+    });
+
+    // Búsqueda al presionar Enter
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            performSearch();
+        }
+    });
+
+    // Limpiar búsqueda con Escape
+    searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            this.value = '';
+            performSearch();
+            this.blur();
+        }
+    });
+
+    // Efecto de focus en el input
+    searchInput.addEventListener('focus', function() {
+        this.parentElement.parentElement.style.transform = 'scale(1.02)';
+    });
+
+    searchInput.addEventListener('blur', function() {
+        this.parentElement.parentElement.style.transform = 'scale(1)';
+    });
+
+    // Efectos de explosión al hacer clic en las tarjetas
+    vehicleCards.forEach(card => {
+        card.addEventListener('click', function(e) {
+            if (!e.target.closest('a')) {
+                const rect = this.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                createExplosion(x, y);
+            }
+        });
+    });
+
+    // Inicializar partículas
+    createParticles();
+
+    // Crear explosiones aleatorias cada cierto tiempo
+    setInterval(() => {
+        if (Math.random() < 0.1) { // 10% de probabilidad cada intervalo
+            const x = Math.random() * window.innerWidth;
+            const y = Math.random() * window.innerHeight;
+            createExplosion(x, y);
+        }
+    }, 3000);
+
+    // Variables para el modal de eliminación
+    let vehiculoIdAEliminar = null;
+
+    // Función para confirmar eliminación
+    window.confirmarEliminacion = function(id, nombre) {
+        vehiculoIdAEliminar = id;
+        document.getElementById('vehiculoNombre').textContent = nombre;
+        document.getElementById('modalEliminacion').classList.remove('hidden');
+        
+        // Crear explosión en el modal
+        const modal = document.getElementById('modalEliminacion');
+        const rect = modal.getBoundingClientRect();
+        createExplosion(rect.width / 2, rect.height / 2);
+    };
+
+    // Función para cerrar modal
+    window.cerrarModal = function() {
+        document.getElementById('modalEliminacion').classList.add('hidden');
+        vehiculoIdAEliminar = null;
+    };
+
+    // Función para eliminar vehículo
+    window.eliminarVehiculo = function() {
+        if (!vehiculoIdAEliminar) return;
+        
+        const btn = document.getElementById('btnConfirmarEliminar');
+        const originalText = btn.textContent;
+        btn.textContent = 'Eliminando...';
+        btn.disabled = true;
+        
+        // Crear formulario CSRF y enviar POST
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/taller/vehiculos/${vehiculoIdAEliminar}/eliminar/`;
+        
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
+                         document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1];
+        
+        if (csrfToken) {
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = 'csrfmiddlewaretoken';
+            csrfInput.value = csrfToken;
+            form.appendChild(csrfInput);
+        }
+        
+        document.body.appendChild(form);
+        form.submit();
+    };
+
+    // Configurar botón de confirmar eliminación
+    document.getElementById('btnConfirmarEliminar').addEventListener('click', eliminarVehiculo);
+
+    // Cerrar modal con Escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            cerrarModal();
+        }
+    });
+
+    // Cerrar modal al hacer clic fuera
+    document.getElementById('modalEliminacion').addEventListener('click', function(e) {
+        if (e.target === this) {
+            cerrarModal();
+        }
+    });
+});
+</script>
+{% endblock %}

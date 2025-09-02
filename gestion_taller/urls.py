@@ -12,6 +12,12 @@ from django.conf.urls.static import static
 from django.views.i18n import JavaScriptCatalog  # 👈 Para catálogo JS
 from taller.views.country_aware_auth import country_aware_login
 
+# Importar vistas de trial
+from taller.views_extra.views_trial import registro_trial
+from taller.views_extra.views_trial_activate import activar_trial
+# Importar vista de registro general
+from taller.views_extra.suscripcion import registro
+
 
 def redirect_to_home(request):
     """Redirige a la página principal basada en el usuario o configuración"""
@@ -36,6 +42,14 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     # Vista temporal para verificar documentos
     path('verificar-docs/', lambda request: __import__('verificar_docs_view').verificar_documentos(request), name='verificar_docs'),
+    
+    # URLs de Trial - Sistema de 30 días
+    path('registro-trial/', registro_trial, name='registro_trial'),
+    path('activar-trial/', activar_trial, name='activar_trial'),
+    path('activar/', activar_trial, name='activar_trial_short'),
+    
+    # Registro general
+    path('registro/', registro, name='registro'),
     
     # Login personalizado con contexto de país
     path('accounts/login/', country_aware_login, name='account_login'),
@@ -79,6 +93,8 @@ urlpatterns = [
     path('us/centro-operaciones-espacial/', TemplateView.as_view(template_name='us/centro_operaciones_espacial.html'), name='us-centro-operaciones-espacial'),
     path('us/', include('taller.urls_extra.usa')),
     path('taller/', include(('taller.urls', 'taller'), namespace='taller')),
+    # APIs globales (sin prefijo de país)
+    path('api/v1/', include('taller.api.urls')),
     # Namespace global directo para tests y consumo unificado
     path('vehiculos-core/', include(('taller.vehiculos.urls', 'vehiculos'), namespace='vehiculos')),
     # Redirección de documentos sin país a Chile por defecto
@@ -99,5 +115,6 @@ urlpatterns = [
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     """Redirige registro al nivel global (alias para signup)"""
 

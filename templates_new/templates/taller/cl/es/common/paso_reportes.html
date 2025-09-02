@@ -1,0 +1,460 @@
+{% extends 'base.html' %}
+
+{% block title %}📊 Demo de Reportes Avanzados{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    :root {
+        --cyber-blue: #00d4ff;
+        --matrix-green: #39ff14;
+        --neon-purple: #b347d9;
+        --dark-bg: #0a0a0f;
+        --glow-cyan: #00ffff;
+        --ai-orange: #ff6b35;
+        --electric-yellow: #ffff00;
+    }
+
+    body {
+        background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+        color: var(--glow-cyan);
+        font-family: 'Orbitron', 'Courier New', monospace;
+    }
+
+    #particles-js {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: -1;
+    }
+
+    .demo-header {
+        background: linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, rgba(179, 71, 217, 0.15) 100%);
+        border: 2px solid var(--cyber-blue);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 0 40px rgba(0, 212, 255, 0.3);
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .demo-header::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(45deg, var(--cyber-blue), var(--neon-purple), var(--matrix-green));
+        border-radius: 20px;
+        z-index: -1;
+        animation: borderGlow 2s linear infinite;
+    }
+
+    @keyframes borderGlow {
+        0%, 100% { opacity: 0.6; }
+        50% { opacity: 1; }
+    }
+
+    .demo-title {
+        font-size: 3rem;
+        font-weight: bold;
+        background: linear-gradient(45deg, var(--cyber-blue), var(--electric-yellow), var(--neon-purple));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 1rem;
+    }
+
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .metric-card {
+        background: rgba(10, 10, 15, 0.9);
+        border: 1px solid var(--cyber-blue);
+        border-radius: 15px;
+        padding: 1.5rem;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 0 25px rgba(0, 212, 255, 0.2);
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+
+    .metric-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--matrix-green);
+        box-shadow: 0 10px 30px rgba(57, 255, 20, 0.3);
+    }
+
+    .metric-value {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: var(--electric-yellow);
+        text-shadow: 0 0 20px rgba(255, 255, 0, 0.5);
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+
+    .metric-label {
+        color: var(--glow-cyan);
+        font-size: 1rem;
+        text-transform: uppercase;
+        margin-top: 0.5rem;
+    }
+
+    .metric-change {
+        color: var(--matrix-green);
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+    }
+
+    .charts-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .chart-panel {
+        background: rgba(10, 10, 15, 0.9);
+        border: 1px solid var(--neon-purple);
+        border-radius: 15px;
+        padding: 1.5rem;
+        backdrop-filter: blur(10px);
+    }
+
+    .chart-title {
+        color: var(--neon-purple);
+        font-size: 1.3rem;
+        font-weight: bold;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    .insights-panel {
+        background: rgba(255, 107, 53, 0.1);
+        border: 1px solid var(--ai-orange);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .insight-item {
+        background: rgba(255, 107, 53, 0.2);
+        border: 1px solid var(--ai-orange);
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .insight-item::before {
+        content: '💡';
+        margin-right: 1rem;
+        font-size: 1.5rem;
+    }
+
+    .live-data {
+        background: rgba(57, 255, 20, 0.1);
+        border: 1px solid var(--matrix-green);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .live-indicator {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+    }
+
+    .live-dot {
+        width: 10px;
+        height: 10px;
+        background: var(--matrix-green);
+        border-radius: 50%;
+        margin-right: 0.5rem;
+        animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+        0%, 50% { opacity: 1; }
+        51%, 100% { opacity: 0.3; }
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+
+    .btn-demo {
+        background: linear-gradient(45deg, var(--cyber-blue), var(--neon-purple));
+        border: none;
+        border-radius: 10px;
+        color: #000;
+        padding: 15px 30px;
+        font-weight: bold;
+        font-family: 'Orbitron', monospace;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-demo:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 20px rgba(0, 212, 255, 0.5);
+        color: #000;
+        text-decoration: none;
+    }
+
+    .btn-continue {
+        background: linear-gradient(45deg, var(--matrix-green), var(--electric-yellow));
+    }
+
+    @media (max-width: 768px) {
+        .metrics-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+        
+        .charts-container {
+            grid-template-columns: 1fr;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="particles-js"></div>
+
+<div class="container mx-auto px-4 py-8">
+    <div class="demo-header">
+        <h1 class="demo-title">📊 REPORTES AVANZADOS</h1>
+        <p style="color: var(--glow-cyan); font-size: 1.2rem; margin-bottom: 1rem;">
+            Visualiza tu negocio en tiempo real con IA
+        </p>
+        <div style="background: linear-gradient(45deg, var(--matrix-green), var(--cyber-blue)); color: #000; padding: 8px 16px; border-radius: 25px; font-weight: bold; display: inline-block;">
+            ✨ Datos simulados realistas para tu demo ✨
+        </div>
+    </div>
+
+    <!-- Métricas en Tiempo Real -->
+    <div class="live-data">
+        <div class="live-indicator">
+            <div class="live-dot"></div>
+            <span style="color: var(--matrix-green); font-weight: bold; text-transform: uppercase;">
+                DATOS EN VIVO - ACTUALIZACIÓN AUTOMÁTICA
+            </span>
+        </div>
+    </div>
+
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-value" id="ingresos-mes">$2,450,000</div>
+            <div class="metric-label">Ingresos Este Mes</div>
+            <div class="metric-change">📈 +23% vs mes anterior</div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-value" id="servicios-realizados">147</div>
+            <div class="metric-label">Servicios Realizados</div>
+            <div class="metric-change">🔧 +15 esta semana</div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-value" id="clientes-nuevos">28</div>
+            <div class="metric-label">Clientes Nuevos</div>
+            <div class="metric-change">👥 +8 este mes</div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-value" id="eficiencia">94%</div>
+            <div class="metric-label">Eficiencia Operativa</div>
+            <div class="metric-change">⚡ Óptimo nivel</div>
+        </div>
+    </div>
+
+    <!-- Gráficos Interactivos -->
+    <div class="charts-container">
+        <div class="chart-panel">
+            <h3 class="chart-title">📈 Ingresos por Semana</h3>
+            <canvas id="ingresosChart" width="400" height="200"></canvas>
+        </div>
+
+        <div class="chart-panel">
+            <h3 class="chart-title">🔧 Servicios Más Rentables</h3>
+            <canvas id="serviciosChart" width="400" height="200"></canvas>
+        </div>
+    </div>
+
+    <!-- Insights de IA -->
+    <div class="insights-panel">
+        <h3 style="color: var(--ai-orange); font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem; text-align: center;">
+            🧠 Insights Generados por IA
+        </h3>
+        
+        <div class="insight-item">
+            Los martes son 34% más rentables - programa servicios premium ese día
+        </div>
+        
+        <div class="insight-item">
+            Clientes con Toyota gastan 67% más en promedio - enfócate en esta marca
+        </div>
+        
+        <div class="insight-item">
+            Servicios de frenos tienen mayor margen - promociona paquetes de seguridad
+        </div>
+        
+        <div class="insight-item">
+            El 78% de clientes retorna si recibe WhatsApp de seguimiento
+        </div>
+    </div>
+
+    <!-- Botones de Acción -->
+    <div class="action-buttons">
+        <a href="{% url 'taller:reportes_unificados' %}" class="btn-demo">
+            📊 Ver Reportes Completos
+        </a>
+        <a href="{% url 'onboarding:onboarding_paso' %}?paso=5" class="btn-demo btn-continue">
+            ➡️ Continuar: Descubrir IA
+        </a>
+    </div>
+</div>
+
+<script>
+// Configuración de partículas
+particlesJS("particles-js", {
+    "particles": {
+        "number": { "value": 40, "density": { "enable": true, "value_area": 800 } },
+        "color": { "value": ["#00d4ff", "#b347d9", "#39ff14"] },
+        "shape": { "type": "circle" },
+        "opacity": { "value": 0.6, "random": false },
+        "size": { "value": 3, "random": true },
+        "line_linked": {
+            "enable": true, "distance": 150, "color": "#00d4ff", "opacity": 0.4, "width": 1
+        },
+        "move": { "enable": true, "speed": 2, "direction": "none", "random": false, "straight": false, "out_mode": "out", "bounce": false }
+    },
+    "interactivity": {
+        "detect_on": "canvas",
+        "events": { "onhover": { "enable": true, "mode": "repulse" }, "onclick": { "enable": true, "mode": "push" }, "resize": true }
+    },
+    "retina_detect": true
+});
+
+// Gráfico de Ingresos
+const ctxIngresos = document.getElementById('ingresosChart').getContext('2d');
+new Chart(ctxIngresos, {
+    type: 'line',
+    data: {
+        labels: ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4'],
+        datasets: [{
+            label: 'Ingresos ($)',
+            data: [580000, 720000, 650000, 850000],
+            borderColor: '#00d4ff',
+            backgroundColor: 'rgba(0, 212, 255, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { labels: { color: '#00ffff' } }
+        },
+        scales: {
+            y: { 
+                ticks: { color: '#00ffff' },
+                grid: { color: 'rgba(0, 212, 255, 0.2)' }
+            },
+            x: { 
+                ticks: { color: '#00ffff' },
+                grid: { color: 'rgba(0, 212, 255, 0.2)' }
+            }
+        }
+    }
+});
+
+// Gráfico de Servicios
+const ctxServicios = document.getElementById('serviciosChart').getContext('2d');
+new Chart(ctxServicios, {
+    type: 'doughnut',
+    data: {
+        labels: ['Frenos', 'Aceite', 'Alineación', 'Otros'],
+        datasets: [{
+            data: [35, 28, 22, 15],
+            backgroundColor: ['#ff6b35', '#39ff14', '#b347d9', '#00d4ff'],
+            borderColor: '#ffffff',
+            borderWidth: 2
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { labels: { color: '#00ffff' } }
+        }
+    }
+});
+
+// Actualización en tiempo real simulada
+function actualizarMetricas() {
+    const elementos = [
+        { id: 'ingresos-mes', base: 2450000, variacion: 50000 },
+        { id: 'servicios-realizados', base: 147, variacion: 3 },
+        { id: 'clientes-nuevos', base: 28, variacion: 1 },
+        { id: 'eficiencia', base: 94, variacion: 2, sufijo: '%' }
+    ];
+    
+    elementos.forEach(elem => {
+        const elemento = document.getElementById(elem.id);
+        const variacion = Math.floor(Math.random() * elem.variacion * 2) - elem.variacion;
+        const nuevoValor = elem.base + variacion;
+        
+        if (elem.sufijo) {
+            elemento.textContent = nuevoValor + elem.sufijo;
+        } else if (elem.id === 'ingresos-mes') {
+            elemento.textContent = '$' + nuevoValor.toLocaleString();
+        } else {
+            elemento.textContent = nuevoValor;
+        }
+    });
+}
+
+// Actualizar cada 5 segundos para simular tiempo real
+setInterval(actualizarMetricas, 5000);
+
+// Analytics
+gtag('event', 'demo_reportes_vista', {
+    'event_category': 'onboarding_engagement',
+    'event_label': 'reportes_avanzados',
+    'custom_parameters': {
+        'paso_onboarding': 4,
+        'tiempo_vista': Date.now()
+    }
+});
+</script>
+{% endblock %}

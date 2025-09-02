@@ -31,8 +31,8 @@ def crear_vehiculo(request):
     context = {
         'form': form,
         'country': 'CL',
-        'clientes': Cliente.objects.all(),
+        'clientes': Cliente.objects.filter(empresa=request.user.empresa),  # BLINDAJE: Filtrado por empresa
         'marcas': Marca.objects.filter(country='CL').order_by('nombre'),
-        'colores': ColorVehiculo.objects.all(),
+        'colores': ColorVehiculo.get_colores_para_pais('CL'),  # CORREGIDO: Colores en español
     }
     return render(request, 'taller/vehiculos/crear_vehiculo.html', context)

@@ -4,12 +4,18 @@ from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.utils.translation import activate
 from taller.models.empresa import Empresa
 from taller.models.perfil_usuario import PerfilUsuario
 import json
 
 def registro_gratuito(request):
     """Vista para registro gratuito y automático"""
+    # Manejar cambio de idioma
+    lang = request.GET.get('lang')
+    if lang in ['es', 'en']:
+        activate(lang)
+    
     if request.method == 'POST':
         try:
             data = json.loads(request.body)

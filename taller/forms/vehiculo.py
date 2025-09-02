@@ -12,6 +12,18 @@ from taller.models.extras_vehiculo import ColorVehiculo, MotorVehiculo, CajaVehi
 
 
 class VehiculoForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        # BLINDAJE MULTI-TENANT: Extraer user y filtrar por empresa
+        self.user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        
+        if self.user and hasattr(self.user, 'empresa'):
+            # Filtrar clientes por empresa del usuario
+            self.fields['cliente'].queryset = Cliente.objects.filter(empresa=self.user.empresa)
+        else:
+            # Si no hay user o empresa, no mostrar clientes
+            self.fields['cliente'].queryset = Cliente.objects.none()
+    
     class Meta:
         model = Vehiculo
         fields = ['cliente', 'anio', 'marca', 'modelo', 'motor', 'caja', 'patente', 'vin', 'color']
@@ -40,13 +52,12 @@ class VehiculoForm(forms.ModelForm):
                 attrs={'data-placeholder': 'Filtrado por modelo...', 'data-minimum-input-length': 0}
             ),
             'color': autocomplete.ModelSelect2(
-    url=reverse_lazy('vehiculos:autocomplete_color'),
-    attrs={
-        'data-placeholder': 'Selecciona o escribe un color...',
-        'data-tags': 'true',  # Permite escribir uno nuevo
-        'data-allow-clear': 'true',
-        'data-minimum-input-length': 0
-    }
-)
-
+                url=reverse_lazy('vehiculos:autocomplete_color'),
+                attrs={
+                    'data-placeholder': 'Selecciona o escribe un color...',
+                    'data-tags': 'true',  # Permite escribir uno nuevo
+                    'data-allow-clear': 'true',
+                    'data-minimum-input-length': 0
+                }
+            )
         }

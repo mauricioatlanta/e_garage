@@ -4,7 +4,16 @@
 <html lang="{{ LANGUAGE_CODE }}">  {# 👈 Idioma dinámico #}
 <head>
   <meta charset="UTF-8">
-  <title>{% block title %}{{ company_name|default:"eGarage" }}{% endblock %}</title>
+  <title>{% block title %}{{ company_name|defaul      <!-- 🌐 Selector de idioma con bandera dinámica -->
+      {% include "components/country_badge.html" %}
+      <form action="{% url 'set_language' %}" method="post" class="inline-block mx-2">
+        {% csrf_token %}
+        <input name="next" type="hidden" value="{{ request.get_full_path }}">
+        <select name="language" onchange="this.form.submit()" class="bg-black/60 text-cyan-300 border border-cyan-700 rounded px-2 py-1 text-sm">
+          <option value="es" {% if LANGUAGE_CODE == 'es' %}selected{% endif %}>ES</option>
+          <option value="en" {% if LANGUAGE_CODE == 'en' %}selected{% endif %}>EN</option>
+        </select>
+      </form>{% endblock %}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- 🌐 Catálogo JavaScript para gettext -->
@@ -77,18 +86,34 @@
   </div>
 {% endif %}
 
+<!-- DEBUG: Context processor variables -->
+<!-- company_name: {{ company_name }} | company_logo_url: {{ company_logo_url }} -->
+<!-- DEBUG: empresa_usuario: {{ empresa_usuario }} -->
+<!-- DEBUG: empresa: {{ empresa }} -->
+<!-- DEBUG: company_settings: {{ company_settings }} -->
+<!-- DEBUG: Context processor ejecutándose: {{ company_name|default:"NO EJECUTADO" }} -->
+<!-- DEBUG: Logo URL: {{ company_logo_url|default:"NO LOGO" }} -->
+
 <!-- Header y navegación unificados (ahora con branding dinámico) -->
 <header class="flex items-center gap-4 p-4 bg-white shadow-md">
-  <img src="{{ company_logo|default:'/static/img/TallerPro_logo.png' }}" 
-       alt="{{ company_name|default:'eGarage' }} Logo" 
-       class="company-logo mx-auto">
+  {% if company_logo_url %}
+    <img src="{{ company_logo_url }}" 
+         alt="{{ company_name }} Logo" 
+         class="company-logo mx-auto h-8 w-auto">
+  {% else %}
+    <img src="{% load static %}{% static 'img/TallerPro_logo.png' %}" 
+         alt="{{ company_name }} Logo" 
+         class="company-logo mx-auto h-8 w-auto">
+  {% endif %}
   <div class="flex flex-col">
-    <h1 class="text-xl font-bold text-gray-800">{{ company_name|default:"eGarage" }}</h1>
-    {% if company_tagline %}
-      <span class="text-sm text-gray-600">{{ company_tagline }}</span>
-    {% elif request.user.is_authenticated %}
-      <span class="text-sm text-gray-600">{% if LANGUAGE_CODE == 'es' %}Sistema de Gestión de Talleres{% else %}Workshop Management System{% endif %}</span>
-    {% endif %}
+    {% block nav_brand %}
+      <h1 class="text-xl font-bold text-gray-800">{{ company_name }}</h1>
+      {% if company_tagline %}
+        <span class="text-sm text-gray-600">{{ company_tagline }}</span>
+      {% elif request.user.is_authenticated %}
+        <span class="text-sm text-gray-600">{% if LANGUAGE_CODE == 'es' %}Sistema de Gestión de Talleres{% else %}Workshop Management System{% endif %}</span>
+      {% endif %}
+    {% endblock %}
   </div>
   
   <div class="ml-auto flex items-center gap-4">
@@ -121,19 +146,7 @@
 
 <nav class="w-full bg-black/60 backdrop-blur border-b border-cyan-700/40 shadow-lg py-3 px-6 flex items-center justify-between z-50 relative">
   <div class="flex items-center gap-8">
-    {% if request.user.is_authenticated %}
-      {% url 'taller:dashboard_suscripciones' as dashboard_url %}
-      {% if dashboard_url %}
-        <a href="{{ dashboard_url }}" class="text-2xl font-extrabold text-cyan-300 tracking-widest hover:text-lime-300 transition">{{ company_name|default:"eGarage" }}</a>
-      {% endif %}
-      {% if empresa_usuario %}
-        <span class="ml-4 text-lg font-semibold text-lime-300">{{ empresa_usuario.nombre_taller }}</span>
-      {% elif company_settings.tagline %}
-        <span class="ml-4 text-lg font-semibold text-lime-300">{{ company_settings.tagline }}</span>
-      {% endif %}
-    {% else %}
-      <a href="/" class="text-2xl font-extrabold text-cyan-300 tracking-widest hover:text-lime-300 transition">{{ company_name|default:"eGarage" }}</a>
-    {% endif %}
+    {% comment %} Nombre de empresa removido - solo se mantiene junto al logo - Updated: 2025-08-31 23:10 {% endcomment %}
   </div>
   <div class="flex items-center gap-4">
     {% if request.user.is_authenticated %}
@@ -168,13 +181,18 @@
           <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Repuestos{% else %}Parts{% endif %}</span>
         </a>
       {% endif %}
-      {% url 'taller:centro_operaciones_espacial' as url_centro_espacial %}
-      {% if url_centro_espacial %}
-        <a href="{{ url_centro_espacial }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
-          <span>🛰️</span>
-          <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Centro Espacial{% else %}Space Center{% endif %}</span>
-        </a>
-      {% endif %}
+      
+      <!-- Centro Espacial -->
+      <a href="/cl/taller/centro-operaciones-espacial/" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
+        <span>🛰️</span>
+        <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Centro Espacial{% else %}Space Center{% endif %}</span>
+      </a>
+      
+      <!-- Settings -->
+      <a href="/cl/taller/settings/" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
+        <span>⚙️</span>
+        <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Settings{% else %}Settings{% endif %}</span>
+      </a>
   {% url 'servicios:servicios_menu' as url_servicios %}
   {% if not url_servicios %}
     {% url 'taller:servicios:servicios_menu' as url_servicios %}
@@ -210,6 +228,12 @@
         </a>
       {% endif %}
       
+      <!-- Reportes -->
+      <a href="/cl/taller/reportes/" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
+        <span>📊</span>
+        <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Reportes{% else %}Reports{% endif %}</span>
+      </a>
+      
       <!-- Separador visual -->
       <div class="h-6 w-px bg-cyan-700"></div>
       
@@ -227,8 +251,13 @@
         {% csrf_token %}
         <input name="next" type="hidden" value="{{ request.get_full_path }}">
         <select name="language" onchange="this.form.submit()" class="bg-black/60 text-cyan-300 border border-cyan-700 rounded px-2 py-1 text-sm">
-          <option value="es" {% if LANGUAGE_CODE == 'es' %}selected{% endif %}>🇨🇱 ES</option>
-          <option value="en" {% if LANGUAGE_CODE == 'en' %}selected{% endif %}>🇺🇸 EN</option>
+          {% if company_country == 'US' %}
+            <option value="es" {% if LANGUAGE_CODE == 'es' %}selected{% endif %}>🇺🇸 ES</option>
+            <option value="en" {% if LANGUAGE_CODE == 'en' %}selected{% endif %}>🇺🇸 EN</option>
+          {% else %}
+            <option value="es" {% if LANGUAGE_CODE == 'es' %}selected{% endif %}>🇨🇱 ES</option>
+            <option value="en" {% if LANGUAGE_CODE == 'en' %}selected{% endif %}>�� EN</option>
+          {% endif %}
         </select>
       </form>
       

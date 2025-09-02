@@ -87,7 +87,7 @@ document.addEventListener('dal-init-function', function () {
 
                     return data;
                 },
-                cache: true
+                cache: false  // BLINDAJE: Deshabilitar cache para evitar mezcla de datos entre empresas
             };
         }
         use_tags = false;

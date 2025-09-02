@@ -232,6 +232,41 @@ class AIReportEngine:
         
         return list(distribution)
     
+    def _get_clientes_distribution(self):
+        """Distribución de clientes por región"""
+        from taller.models.clientes import Cliente
+        
+        distribution = Cliente.objects.filter(
+            empresa=self.empresa
+        ).values('region__nombre').annotate(
+            count=Count('id'),
+            percentage=Count('id') * 100.0 / Cliente.objects.filter(empresa=self.empresa).count()
+        ).order_by('-count')[:10]
+        
+        # Convertir None a 'Sin región' para mejor visualización
+        for item in distribution:
+            if not item['region__nombre']:
+                item['region__nombre'] = 'Sin región'
+        
+        return list(distribution)
+    
+    def _get_clientes_heatmap(self):
+        """Mapa de calor de clientes por hora/día"""
+        from taller.models.clientes import Cliente
+        
+        heatmap = {}
+        for hour in range(24):
+            for day in range(7):  # 0=Monday, 6=Sunday
+                clientes = Cliente.objects.filter(
+                    empresa=self.empresa,
+                    created_at__hour=hour,
+                    created_at__week_day=day + 1  # Django uses 1=Sunday
+                ).count()
+                
+                heatmap[f"{day}-{hour}"] = clientes
+        
+        return heatmap
+    
     def _get_service_heatmap(self):
         """Mapa de calor de servicios por hora/día"""
         from taller.models.documento import Documento

@@ -24,6 +24,7 @@ urlpatterns = [
     # APIs para gráficas en tiempo real
     path('revenue-api/', views.revenue_analytics_api, name='revenue_api'),
     path('vehicle-api/', views.vehicle_analytics_api, name='vehicle_api'),
+    path('clientes-api/', views.clientes_analytics_api, name='clientes_api'),
     path('predictive-api/', views.predictive_analytics_api, name='predictive_api'),
     path('real-time/', views.real_time_metrics_api, name='real_time_api'),
     

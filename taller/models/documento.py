@@ -1,7 +1,7 @@
 
 from django.db import models
 from django.core.exceptions import ValidationError
-from django.db.models import Index
+from django.db.models import Index, Sum, F, ExpressionWrapper, DecimalField
 from decimal import Decimal
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _  # 👈 Para traducciones
@@ -21,8 +21,11 @@ class Documento(AuditMixin, models.Model):
 		("FAC",  _("Factura")),
 		("BOL",  _("Boleta"))
 	], db_index=True)
-	numero = models.PositiveIntegerField(null=True, blank=True, db_index=True)
-	estado = models.CharField(max_length=12, default="DRAFT", db_index=True)
+	numero = models.CharField(max_length=32, blank=True, default="", db_index=True)
+	correlativo = models.PositiveIntegerField(default=0, help_text=_('Número correlativo interno'))
+	# estado del documento (borrador/emitido/anulado, etc.)
+	ESTADOS_DOC = (('BORRADOR','Borrador'), ('EMITIDO','Emitido'), ('ANULADO','Anulado'))
+	estado = models.CharField(max_length=12, choices=ESTADOS_DOC, default='EMITIDO', blank=True, db_index=True)
 	fecha_emision = models.DateField(default=timezone.now, editable=True, db_index=True)
 	cliente  = models.ForeignKey(Cliente, on_delete=models.PROTECT, related_name="documentos", db_index=True)
 	vehiculo = models.ForeignKey(Vehiculo, on_delete=models.SET_NULL, null=True, blank=True, related_name="documentos")
@@ -53,6 +56,15 @@ class Documento(AuditMixin, models.Model):
 		default=False,
 		help_text=_('Indica si el documento está pagado completamente')
 	)
+	apply_vat = models.BooleanField(
+		default=True,
+		help_text=_('Aplicar IVA al documento')
+	)
+	kilometraje = models.PositiveIntegerField(
+		null=True, 
+		blank=True,
+		help_text=_('Kilometraje del vehículo')
+	)
 	millas = models.PositiveIntegerField(
 		null=True, 
 		blank=True,
@@ -82,6 +94,10 @@ class Documento(AuditMixin, models.Model):
 		if not self.numero:
 			return None
 		
+		# Si el número ya tiene prefijo (como "F001", "OT002"), devolverlo tal cual
+		if self.numero.startswith(('F', 'OT', 'P', 'E', 'WO', 'I')):
+			return self.numero
+		
 		# Prefijos para Chile (CL)
 		prefijos_cl = {
 			'PRES': 'E',    # Estimado
@@ -101,7 +117,13 @@ class Documento(AuditMixin, models.Model):
 		prefijos = prefijos_us if self.country == 'US' else prefijos_cl
 		prefijo = prefijos.get(self.tipo, self.tipo)
 		
-		return f"{prefijo}-{self.numero:03d}"
+		# Si el número es un string numérico, formatearlo
+		try:
+			numero_int = int(self.numero)
+			return f"{prefijo}{numero_int:03d}"
+		except (ValueError, TypeError):
+			# Si no es numérico, devolver el número tal cual con prefijo
+			return f"{prefijo}{self.numero}"
 
 	def generar_numero_documento(self):
 		"""Genera el próximo número secuencial para el tipo de documento"""
@@ -194,24 +216,33 @@ class Documento(AuditMixin, models.Model):
 		"""Recalcula y actualiza los totales del documento aplicando IVA solo a repuestos"""
 		from decimal import Decimal
 		
-		# Calcular subtotales
-		self.neto_repuestos = Decimal(str(self.total_repuestos() or 0))
-		self.neto_servicios = Decimal(str(self.total_servicios() or 0))
-		self.neto_otros_servicios = Decimal(str(self.total_otros_servicios() or 0))
-		
-		# Subtotal antes de IVA
-		subtotal_antes_iva = self.neto_repuestos + self.neto_servicios + self.neto_otros_servicios - self.descuento
-		
-		# IVA solo sobre repuestos (regla de negocio)
-		base_iva = self.neto_repuestos
-		self.tax_rate_applied = Decimal('19.00')  # 19% IVA en Chile
-		self.tax_amount = base_iva * self.tax_rate_applied / Decimal('100')
-		
-		# Total final
-		self.total = subtotal_antes_iva + self.tax_amount
-		
-		# Guardar cambios
-		self.save(update_fields=['neto_repuestos', 'neto_servicios', 'neto_otros_servicios', 'tax_rate_applied', 'tax_amount', 'total'])
+		# Subtotales "autoridad" en servidor
+		rep_sub = self.lineas_repuesto.annotate(
+			sub=ExpressionWrapper(F('cantidad')*F('precio_unitario'),
+								  output_field=DecimalField(max_digits=12, decimal_places=2))
+		).aggregate(total=Sum('sub'))['total'] or 0
+
+		serv_sub = self.lineas_servicio.annotate(
+			sub=ExpressionWrapper(F('cantidad')*F('precio_unitario'),
+								  output_field=DecimalField(max_digits=12, decimal_places=2))
+		).aggregate(total=Sum('sub'))['total'] or 0
+
+		otros_sub = self.lineas_otro_servicio.annotate(
+			sub=ExpressionWrapper(F('cantidad')*F('precio_cliente'),
+								  output_field=DecimalField(max_digits=12, decimal_places=2))
+		).aggregate(total=Sum('sub'))['total'] or 0
+
+		self.neto_repuestos = rep_sub
+		self.neto_servicios = serv_sub + otros_sub
+
+		# IVA Chile solo sobre repuestos
+		if self.country == 'CL' and (self.apply_vat or self.apply_vat is None):
+			self.tax_rate_applied = self.tax_rate_applied or 19
+			self.tax_amount = rep_sub * (self.tax_rate_applied/100)
+		else:
+			self.tax_amount = 0
+
+		self.total = self.neto_repuestos + self.neto_servicios + self.tax_amount
 
 	# Propiedades retrocompatibles para compatibilidad con código y plantillas antiguas
 	@property

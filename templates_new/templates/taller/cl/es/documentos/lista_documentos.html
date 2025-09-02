@@ -1,0 +1,810 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% load qs_tools %}
+{% block extra_head %}
+  <style>
+    body {
+      background: 
+        radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(120, 200, 255, 0.2) 0%, transparent 5          <th class="sortable-header" data-sort="vehiculo" onclick="sortTable('vehiculo')">
+            🚗 VEHÍCULO
+            <span class="sort-indicator" id="sort-vehiculo">⚡</span>
+          </th>
+          <th class="sortable-header" data-sort="estado_pago" onclick="sortTable('estado_pago')">
+            💳 ESTADO PAGO
+            <span class="sort-indicator" id="sort-estado_pago">⚡</span>
+          </th>
+          <th class="sortable-header" data-sort="total" onclick="sortTable('total')">
+            💰 TOTAL
+            <span class="sort-indicator" id="sort-total">⚡</span>
+          </th>       </th>
+          <th class="sortable-header" data-sort="total" onclick="sortTable('total')">
+            💰 TOTAL        <span class="sort-indicator" id="sort-total">⚡</span>
+          </th>
+          <th class="sortable-header">
+            ⚡ ACCIONES
+          </th>135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+      min-height: 100vh;
+      font-family: 'Orbitron', 'Segoe UI', monospace;
+      color: #ffffff;
+      overflow-x: hidden;
+    }
+
+    .futuristic-container {
+      background: rgba(5, 15, 25, 0.95);
+      border: 2px solid #00ffff;
+      border-radius: 20px;
+      backdrop-filter: blur(15px);
+      box-shadow: 
+        0 0 20px #00ffff,
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .futuristic-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #00ffff, transparent);
+      animation: scan-line 3s infinite;
+    }
+
+    @keyframes scan-line {
+      0%, 100% { opacity: 0; }
+      50% { opacity: 1; }
+    }
+
+    .logo-header {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 30px;
+      padding: 20px;
+      background: rgba(0, 255, 255, 0.05);
+      border-radius: 15px;
+      border: 1px solid rgba(0, 255, 255, 0.3);
+    }
+
+    .logo-display {
+      width: 80px;
+      height: 80px;
+      border-radius: 15px;
+      border: 2px solid #00ffff;
+      box-shadow: 0 0 20px #00ffff;
+      filter: brightness(1.1) contrast(1.1);
+    }
+
+    .space-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 2.5rem;
+      font-weight: 900;
+      background: linear-gradient(45deg, #00ffff, #8a2be2, #ffd700);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 0 20px #00ffff;
+      letter-spacing: 3px;
+    }
+
+    .command-panel-grid {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 30px;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .search-control {
+      position: relative;
+    }
+
+    .search-input {
+      background: rgba(0, 0, 0, 0.7);
+      border: 2px solid #00ffff;
+      border-radius: 25px;
+      padding: 15px 50px 15px 20px;
+      color: #00ffff;
+      font-family: 'Orbitron', monospace;
+      font-size: 14px;
+      width: 100%;
+      transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: #ffd700;
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+      color: #ffd700;
+    }
+
+    .search-icon {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #00ffff;
+      font-size: 18px;
+    }
+
+    .action-button {
+      background: linear-gradient(45deg, #00ffff, #8a2be2);
+      border: none;
+      border-radius: 15px;
+      padding: 15px 30px;
+      color: #ffffff;
+      font-family: 'Orbitron', monospace;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .action-button:hover {
+      background: linear-gradient(45deg, #ffd700, #00ff88);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(255, 215, 0, 0.3);
+      color: #000;
+    }
+
+    .futuristic-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 15px;
+      overflow: hidden;
+      margin-top: 20px;
+    }
+
+    .table-header {
+      background: linear-gradient(45deg, #00ffff, #8a2be2);
+      color: #000;
+    }
+
+    .sortable-header {
+      padding: 15px 20px;
+      font-family: 'Orbitron', monospace;
+      font-weight: bold;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.3s ease;
+      user-select: none;
+    }
+
+    .sortable-header:hover {
+      background: rgba(255, 215, 0, 0.3);
+      color: #ffd700;
+    }
+
+    .sort-indicator {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 12px;
+      opacity: 0.7;
+    }
+
+    .table-row {
+      background: rgba(0, 255, 255, 0.03);
+      border-bottom: 1px solid rgba(0, 255, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .table-row:hover {
+      background: rgba(0, 255, 255, 0.1);
+      transform: translateX(5px);
+      box-shadow: 5px 0 15px rgba(0, 255, 255, 0.2);
+    }
+
+    .table-cell {
+      padding: 15px 20px;
+      color: #ffffff;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      border-right: 1px solid rgba(0, 255, 255, 0.1);
+    }
+
+    .table-cell:last-child {
+      border-right: none;
+    }
+
+    .action-links {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .action-link {
+      background: rgba(0, 255, 255, 0.2);
+      border: 1px solid #00ffff;
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: #00ffff;
+      text-decoration: none;
+      font-size: 11px;
+      font-family: 'Orbitron', monospace;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+    }
+
+    .action-link:hover {
+      background: #00ffff;
+      color: #000;
+      transform: scale(1.1);
+      box-shadow: 0 0 15px #00ffff;
+    }
+
+    /* Estilos para estados de pago */
+    .estado-pago {
+      padding: 6px 12px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: bold;
+      font-family: 'Orbitron', monospace;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border: 2px solid;
+      display: inline-block;
+      min-width: 100px;
+      text-align: center;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+
+    .estado-pagado {
+      background: linear-gradient(45deg, #10b981, #059669);
+      color: white;
+      border-color: #10b981;
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+    }
+
+    .estado-no_pagado {
+      background: linear-gradient(45deg, #ef4444, #dc2626);
+      color: white;
+      border-color: #ef4444;
+      box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+    }
+
+    .estado-parcial {
+      background: linear-gradient(45deg, #f59e0b, #d97706);
+      color: white;
+      border-color: #f59e0b;
+      box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+    }
+
+    .action-link.edit {
+      border-color: #ffd700;
+      color: #ffd700;
+    }
+
+    .action-link.edit:hover {
+      background: #ffd700;
+      color: #000;
+      box-shadow: 0 0 15px #ffd700;
+    }
+
+    .action-link.delete {
+      border-color: #ff3b3b;
+      color: #ff3b3b;
+    }
+
+    .action-link.delete:hover {
+      background: #ff3b3b;
+      color: #fff;
+      box-shadow: 0 0 15px #ff3b3b;
+    }
+
+    .action-link.print {
+      border-color: #00ff88;
+      color: #00ff88;
+    }
+
+    .action-link.print:hover {
+      background: #00ff88;
+      color: #000;
+      box-shadow: 0 0 15px #00ff88;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #00ffff;
+      font-family: 'Orbitron', monospace;
+      font-size: 18px;
+      letter-spacing: 2px;
+    }
+
+    .glitch-effect {
+      position: relative;
+      animation: glitch 2s infinite;
+    }
+
+    @keyframes glitch {
+      0%, 100% { transform: translate(0); }
+      20% { transform: translate(-2px, 2px); }
+      40% { transform: translate(-2px, -2px); }
+      60% { transform: translate(2px, 2px); }
+      80% { transform: translate(2px, -2px); }
+    }
+
+    .hologram-effect {
+      position: relative;
+    }
+
+    .hologram-effect::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 255, 255, 0.03) 2px,
+        rgba(0, 255, 255, 0.03) 4px
+      );
+      pointer-events: none;
+      animation: hologram-scan 4s infinite;
+    }
+
+    @keyframes hologram-scan {
+      0% { transform: translateY(-100%); }
+      100% { transform: translateY(100%); }
+    }
+
+    .data-type {
+      display: inline-block;
+      background: rgba(0, 255, 255, 0.2);
+      border: 1px solid #00ffff;
+      border-radius: 15px;
+      padding: 4px 12px;
+      font-size: 10px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .highlight-number {
+      color: #ffd700;
+      font-weight: bold;
+      text-shadow: 0 0 10px #ffd700;
+    }
+
+    .highlight-date {
+      color: #00ff88;
+      font-family: 'Orbitron', monospace;
+    }
+
+    .currency {
+      color: #8a2be2;
+      font-family: 'Orbitron', monospace;
+      font-weight: 600;
+      text-align: right;
+    }
+
+    .highlight-currency {
+      color: #ffd700;
+      font-family: 'Orbitron', monospace;
+      font-weight: bold;
+      text-shadow: 0 0 10px #ffd700;
+      text-align: right;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto p-6">
+  
+  <!-- Header con Logo Personalizado -->
+  <div class="futuristic-container p-6 mb-6 hologram-effect">
+    <div class="logo-header">
+      {% if empresa.logo %}
+      <img src="{{ empresa.logo.url }}" alt="{{ empresa.nombre_taller }}" class="logo-display">
+      {% else %}
+      <div class="logo-display flex items-center justify-center bg-gradient-to-r from-blue-600 to-cyan-500">
+        <span class="text-2xl font-bold">🚀</span>
+      </div>
+      {% endif %}
+      <div>
+        <div class="flex items-center gap-3 mb-2">
+          <h1 class="space-title">{{ empresa.nombre_taller }}</h1>
+          {% include "components/country_badge.html" %}
+        </div>
+        <p class="text-xl text-blue-300" style="font-family: 'Courier New', monospace;">SISTEMA DE GESTIÓN DOCUMENTAL</p>
+        <p class="text-sm text-gray-400" style="font-family: 'Courier New', monospace;">MÓDULO ARCHIVOS DIGITALES - STATUS: OPERATIVO</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel de Control -->
+  <div class="futuristic-container p-6">
+    <div class="command-panel-grid">
+      <div class="search-control">
+        <input id="busqueda-documento" type="text" 
+               placeholder="🔍 BUSCAR DOCUMENTOS POR TIPO, CLIENTE, VEHÍCULO..." 
+               class="search-input">
+        <span class="search-icon">⚡</span>
+      </div>
+      <a href="{% if country == 'cl' %}{% url 'documentos_cl:crear_documento' %}{% else %}{% url 'documentos_us:crear_documento' %}{% endif %}" class="action-button glitch-effect">
+        ➕ CREAR DOCUMENTO
+      </a>
+    </div>
+
+    <!-- Tabla Futurista con Ordenamiento -->
+    <table class="futuristic-table">
+      <thead class="table-header">
+        <tr>
+          <th class="sortable-header" data-sort="tipo" onclick="sortTable('tipo')">
+            📄 TIPO
+            <span class="sort-indicator" id="sort-tipo">⚡</span>
+          </th>
+          <th class="sortable-header" data-sort="fecha" onclick="sortTable('fecha')">
+            � FECHA
+            <span class="sort-indicator" id="sort-fecha">⚡</span>
+          </th>
+          <th class="sortable-header" data-sort="numero" onclick="sortTable('numero')">
+            � NÚMERO
+            <span class="sort-indicator" id="sort-numero">⚡</span>
+          </th>
+          <th class="sortable-header" data-sort="cliente" onclick="sortTable('cliente')">
+            👤 CLIENTE
+            <span class="sort-indicator" id="sort-cliente">⚡</span>
+          </th>
+          <th class="sortable-header" data-sort="vehiculo" onclick="sortTable('vehiculo')">
+            🚗 VEHÍCULO
+            <span class="sort-indicator" id="sort-vehiculo">⚡</span>
+          </th>
+          <th class="sortable-header" data-sort="total" onclick="sortTable('total')">
+            � TOTAL
+            <span class="sort-indicator" id="sort-total">⚡</span>
+          </th>
+          <th class="sortable-header" data-sort="rep_count" onclick="sortTable('rep_count')">
+            🔧 # REP
+            <span class="sort-indicator" id="sort-rep_count">⚡</span>
+          </th>
+          <th class="sortable-header" data-sort="serv_count" onclick="sortTable('serv_count')">
+            🛠️ # SERV
+            <span class="sort-indicator" id="sort-serv_count">⚡</span>
+          </th>
+          <th class="sortable-header" data-sort="otros_count" onclick="sortTable('otros_count')">
+            ⚙️ # OTROS
+            <span class="sort-indicator" id="sort-otros_count">⚡</span>
+          </th>
+          <th class="sortable-header" data-sort="repuestos" onclick="sortTable('repuestos')">
+            � $ REP
+            <span class="sort-indicator" id="sort-repuestos">⚡</span>
+          </th>
+          <th class="sortable-header" data-sort="servicios" onclick="sortTable('servicios')">
+            � $ SERV
+            <span class="sort-indicator" id="sort-servicios">⚡</span>
+          </th>
+          <th class="sortable-header" data-sort="total" onclick="sortTable('total')">
+            💰 TOTAL
+            <span class="sort-indicator" id="sort-total">⚡</span>
+          </th>
+          <th class="sortable-header">
+            ⚡ ACCIONES
+          </th>
+        </tr>
+      </thead>
+      
+      <!-- DEBUG: ¿esta vista es la correcta? -->
+      <div style="display:none" id="view-sentinel">LIST_VIEW=DocumentoListViewBase</div>
+      
+      <tbody id="tabla-documentos">
+        {% for doc in documentos %}
+        <tr class="table-row" data-tipo="{{ doc.tipo }}" 
+            data-numero="{{ doc.numero_documento }}" 
+            data-fecha="{{ doc.fecha_emision|date:'Y-m-d' }}" 
+            data-cliente="{{ doc.cliente }}" 
+            data-vehiculo="{{ doc.vehiculo }}">
+          <td class="table-cell">
+            <span class="data-type">{{ doc.get_tipo_display }}</span>
+          </td>
+          <td class="table-cell">
+            <span class="highlight-date">{{ doc.fecha_emision|date:'d/m/Y' }}</span>
+          </td>
+          <td class="table-cell">
+            <span class="highlight-number">#{{ doc.numero_documento }}</span>
+          </td>
+          <td class="table-cell">{{ doc.cliente }}</td>
+          <td class="table-cell">{{ doc.vehiculo|default:"N/A" }}</td>
+          <td class="table-cell">
+            <span class="estado-pago estado-{{ doc.estado_pago|lower }}">
+              {% if doc.estado_pago == 'PAGADO' %}
+                ✅ PAGADO
+              {% elif doc.estado_pago == 'PARCIAL' %}
+                🟡 PARCIAL
+              {% else %}
+                ❌ NO PAGADO
+              {% endif %}
+            </span>
+          </td>
+          <td class="table-cell total">
+            <span class="highlight-currency">{{ doc.total_general_anotado|default:0|floatformat:2 }}</span>
+          </td>
+          <td class="table-cell">
+            <div class="action-links">
+              {% comment %}Indicador de documentos sin itemización{% endcomment %}
+              {% if doc.rep_count|default:0 == 0 and doc.serv_count|default:0 == 0 and doc.otros_count|default:0 == 0 %}
+                {% with total_monetario=doc.sum_rep|default:0|add:doc.sum_serv|default:0|add:doc.sum_out|default:0 %}
+                  {% if total_monetario > 0 %}
+                    <span class="badge badge-warning" style="background: #f59e0b; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-right: 4px;">
+                      ⚠️ SIN ITEMIZACIÓN
+                    </span>
+                  {% endif %}
+                {% endwith %}
+              {% endif %}
+              
+              <a href="{% if country == 'cl' %}{% url 'documentos_cl:ver_documento' documento_id=doc.id %}{% else %}{% url 'documentos_us:ver_documento' documento_id=doc.id %}{% endif %}" class="action-link view">VER</a>
+              <a href="{% if country == 'cl' %}{% url 'documentos_cl:editar_documento' pk=doc.id %}{% else %}{% url 'documentos_us:editar_documento' pk=doc.id %}{% endif %}" class="action-link edit">EDIT</a>
+              <a href="{% if country == 'cl' %}{% url 'documentos_cl:exportar_documento_pdf' documento_id=doc.id %}{% else %}{% url 'documentos_us:exportar_documento_pdf' documento_id=doc.id %}{% endif %}" class="action-link print" target="_blank">PDF</a>
+              <a href="/{{ country }}/documentos/eliminar/{{ doc.id }}/" class="action-link delete" 
+                 onclick="return confirm('⚠️ ELIMINAR DOCUMENTO? ESTA ACCIÓN NO SE PUEDE DESHACER')">DEL</a>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="8" class="empty-state">
+            🚀 NO HAY DOCUMENTOS EN EL SISTEMA<br>
+            <small style="font-size: 14px; opacity: 0.7;">CREAR PRIMER DOCUMENTO PARA COMENZAR</small>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Variables globales para ordenamiento
+  let currentSort = { column: null, direction: 'asc' };
+  let allRows = [];
+  
+  // Capturar todas las filas al cargar
+  const tableBody = document.getElementById('tabla-documentos');
+  allRows = Array.from(tableBody.querySelectorAll('tr'));
+  
+  // 🔍 Función de búsqueda avanzada
+  const searchInput = document.getElementById('busqueda-documento');
+  searchInput.addEventListener('input', function() {
+    const filtro = this.value.toLowerCase().trim();
+    
+    allRows.forEach(fila => {
+      if (fila.cells.length > 1) { // Evitar fila de "vacío"
+        const textoCompleto = Array.from(fila.cells).slice(0, -1).map(cell => 
+          cell.textContent.toLowerCase()
+        ).join(' ');
+        
+        if (textoCompleto.includes(filtro)) {
+          fila.style.display = '';
+          fila.style.animation = 'fadeIn 0.3s ease';
+        } else {
+          fila.style.display = 'none';
+        }
+      }
+    });
+    
+    // Efecto de búsqueda activa
+    if (filtro.length > 0) {
+      searchInput.style.borderColor = '#ffd700';
+      searchInput.style.boxShadow = '0 0 20px rgba(255, 215, 0, 0.5)';
+    } else {
+      searchInput.style.borderColor = '#00ffff';
+      searchInput.style.boxShadow = 'none';
+    }
+  });
+
+  // 📊 Función de ordenamiento inteligente
+  window.sortTable = function(column) {
+    console.log('Ordenando por:', column);
+    
+    // Determinar dirección del ordenamiento
+    if (currentSort.column === column) {
+      currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+    } else {
+      currentSort.column = column;
+      currentSort.direction = 'asc';
+    }
+    
+    // Actualizar indicadores visuales
+    updateSortIndicators(column, currentSort.direction);
+    
+    // Filtrar solo filas visibles con datos
+    const visibleRows = allRows.filter(row => 
+      row.style.display !== 'none' && row.cells.length > 1
+    );
+    
+    // Ordenar según el tipo de datos
+    visibleRows.sort((a, b) => {
+      let valueA, valueB;
+      
+      switch(column) {
+        case 'tipo':
+          valueA = a.dataset.tipo || '';
+          valueB = b.dataset.tipo || '';
+          break;
+        case 'numero':
+          valueA = parseInt(a.dataset.numero || '0');
+          valueB = parseInt(b.dataset.numero || '0');
+          break;
+        case 'fecha':
+          valueA = new Date(a.dataset.fecha || '1970-01-01');
+          valueB = new Date(b.dataset.fecha || '1970-01-01');
+          break;
+        case 'cliente':
+          valueA = (a.dataset.cliente || '').toLowerCase();
+          valueB = (b.dataset.cliente || '').toLowerCase();
+          break;
+        case 'vehiculo':
+          valueA = (a.dataset.vehiculo || '').toLowerCase();
+          valueB = (b.dataset.vehiculo || '').toLowerCase();
+          break;
+        default:
+          return 0;
+      }
+      
+      // Comparación según tipo de dato
+      if (typeof valueA === 'number' && typeof valueB === 'number') {
+        return currentSort.direction === 'asc' ? valueA - valueB : valueB - valueA;
+      } else if (valueA instanceof Date && valueB instanceof Date) {
+        return currentSort.direction === 'asc' ? valueA - valueB : valueB - valueA;
+      } else {
+        // Comparación de strings
+        if (currentSort.direction === 'asc') {
+          return valueA.localeCompare(valueB);
+        } else {
+          return valueB.localeCompare(valueA);
+        }
+      }
+    });
+    
+    // Limpiar tabla y volver a insertar filas ordenadas
+    tableBody.innerHTML = '';
+    
+    // Agregar filas ordenadas
+    visibleRows.forEach((row, index) => {
+      row.style.animation = `slideIn 0.3s ease ${index * 0.05}s`;
+      tableBody.appendChild(row);
+    });
+    
+    // Agregar filas ocultas al final
+    const hiddenRows = allRows.filter(row => 
+      row.style.display === 'none' || row.cells.length <= 1
+    );
+    hiddenRows.forEach(row => tableBody.appendChild(row));
+    
+    // Efecto visual de ordenamiento completado
+    const header = document.querySelector(`[data-sort="${column}"]`);
+    if (header) {
+      header.style.background = 'rgba(255, 215, 0, 0.3)';
+      setTimeout(() => {
+        header.style.background = '';
+      }, 500);
+    }
+  };
+  
+  // 🎯 Actualizar indicadores de ordenamiento
+  function updateSortIndicators(activeColumn, direction) {
+    // Limpiar todos los indicadores
+    document.querySelectorAll('.sort-indicator').forEach(indicator => {
+      indicator.textContent = '⚡';
+      indicator.style.opacity = '0.7';
+    });
+    
+    // Actualizar indicador activo
+    const activeIndicator = document.getElementById(`sort-${activeColumn}`);
+    if (activeIndicator) {
+      activeIndicator.textContent = direction === 'asc' ? '▲' : '▼';
+      activeIndicator.style.opacity = '1';
+      activeIndicator.style.color = '#ffd700';
+    }
+  }
+  
+  // ✨ Efectos visuales adicionales
+  const actionLinks = document.querySelectorAll('.action-link');
+  actionLinks.forEach(link => {
+    link.addEventListener('mouseenter', function() {
+      this.style.transform = 'scale(1.1) rotate(2deg)';
+    });
+    
+    link.addEventListener('mouseleave', function() {
+      this.style.transform = 'scale(1) rotate(0deg)';
+    });
+  });
+  
+  // 🎮 Atajos de teclado para ordenamiento
+  document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey) {
+      switch(e.key) {
+        case '1':
+          e.preventDefault();
+          sortTable('tipo');
+          break;
+        case '2':
+          e.preventDefault();
+          sortTable('numero');
+          break;
+        case '3':
+          e.preventDefault();
+          sortTable('fecha');
+          break;
+        case '4':
+          e.preventDefault();
+          sortTable('cliente');
+          break;
+        case '5':
+          e.preventDefault();
+          sortTable('vehiculo');
+          break;
+      }
+    }
+  });
+  
+  // 🚀 Animaciones CSS dinámicas
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    
+    .table-row {
+      animation: fadeIn 0.3s ease;
+    }
+  `;
+  document.head.appendChild(style);
+  
+  // 💡 Tooltip informativo para atajos
+  const tooltip = document.createElement('div');
+  tooltip.innerHTML = `
+    <div style="position: fixed; bottom: 20px; right: 20px; 
+                background: rgba(0, 0, 0, 0.9); color: #00ffff; 
+                padding: 15px; border-radius: 10px; 
+                border: 1px solid #00ffff; font-family: 'Courier New', monospace;
+                font-size: 11px; z-index: 1000; max-width: 250px;">
+      <strong>⚡ ATAJOS RÁPIDOS:</strong><br>
+      Ctrl+1: Ordenar por Tipo<br>
+      Ctrl+2: Ordenar por Número<br>
+      Ctrl+3: Ordenar por Fecha<br>
+      Ctrl+4: Ordenar por Cliente<br>
+      Ctrl+5: Ordenar por Vehículo
+    </div>
+  `;
+  
+  // Mostrar tooltip brevemente al cargar
+  document.body.appendChild(tooltip);
+  setTimeout(() => {
+    tooltip.style.opacity = '0.7';
+    tooltip.style.transition = 'opacity 0.3s ease';
+  }, 2000);
+  
+  setTimeout(() => {
+    tooltip.style.opacity = '0';
+    setTimeout(() => tooltip.remove(), 300);
+  }, 8000);
+});
+</script>
+{% endblock %}

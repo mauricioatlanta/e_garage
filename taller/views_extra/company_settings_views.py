@@ -5,9 +5,10 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.core.files.base import ContentFile
 from django.conf import settings
-from taller.models import CompanySettings
-from taller.forms.company_settings_forms import CompanySettingsForm, LogoUploadForm
-# from taller.context_processors import invalidate_company_cache
+from django.core.cache import cache
+from taller.models import ConfiguracionEmpresa
+from taller.forms.configuracion_forms import CompanyInfoForm
+from taller.context_processors import invalidate_company_branding_cache
 import json
 import base64
 
@@ -17,58 +18,64 @@ def company_settings_view(request):
     """Vista principal para configuración de empresa"""
     
     # Obtener o crear configuración de empresa
-    company_settings, created = CompanySettings.objects.get_or_create(
-        user=request.user,
+    if not hasattr(request.user, 'empresa') or not request.user.empresa:
+        messages.error(request, 'No tienes una empresa asociada.')
+        return redirect('/cl/dashboard/')
+    
+    company_settings, created = ConfiguracionEmpresa.objects.get_or_create(
+        empresa=request.user.empresa,
         defaults={
-            'company_name': 'Mi Taller',
-            'primary_color': '#0d6efd',
-            'secondary_color': '#6c757d',
+            'nombre_publico': request.user.empresa.nombre_taller,
+            'moneda': 'CLP',
+            'iva_porcentaje': 19,
+            'aplicar_iva_por_defecto': True,
+            'brand_color': '#00ffff',
         }
     )
     
     if request.method == 'POST':
-        form = CompanySettingsForm(request.POST, request.FILES, instance=company_settings)
-        
+        # Usar el formulario específico para información de empresa
+        form = CompanyInfoForm(request.POST, request.FILES, instance=company_settings)
         if form.is_valid():
-            # Guardar cambios
-            updated_settings = form.save(commit=False)
-            updated_settings.user = request.user
-            updated_settings.save()
+            # ⚠️ Forzar escritura del tagline incluso si viene vacío:
+            # (evita cualquier lógica previa que ignore falsy values)
+            obj = form.save(commit=False)
+            obj.tagline = form.cleaned_data.get("tagline") or ""
+            obj.save()
             
-            # Invalidar cache
-            # invalidate_company_cache(request.user.id)
+            # También actualizar el nombre en la empresa principal
+            if form.cleaned_data.get('nombre_publico') and hasattr(request.user.empresa, 'nombre_taller'):
+                request.user.empresa.nombre_taller = form.cleaned_data['nombre_publico']
+                request.user.empresa.save(update_fields=['nombre_taller'])
             
-            messages.success(request, '¡Configuración actualizada exitosamente!')
+            print("🔍 DEBUG: Configuración guardada")
+            print("🔍 DEBUG: Tagline guardado:", company_settings.tagline)
+            print("🔍 DEBUG: Logo en BD:", company_settings.logo)
+            print("🔍 DEBUG: Logo URL:", getattr(company_settings.logo, "url", None) if company_settings.logo else "None")
             
-            # Si es una petición AJAX, devolver JSON
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse({
-                    'success': True,
-                    'message': 'Configuración actualizada exitosamente',
-                    'company_name': updated_settings.get_company_name(),
-                    'logo_url': updated_settings.get_logo_url(),
-                    'primary_color': updated_settings.get_primary_color(),
-                    'secondary_color': updated_settings.get_secondary_color(),
-                })
+            # ✅ Invalidar cache del context processor para que se vea el cambio al tiro
+            invalidate_company_branding_cache(request.user.empresa.id, request)
             
-            return redirect('company_settings')
-        
+            # Invalidación adicional específica para company_settings
+            cache.delete(f"company_settings:{request.user.empresa.id}")
+            
+            messages.success(request, '🏢 Información de empresa actualizada exitosamente!')
         else:
-            messages.error(request, 'Por favor corrija los errores en el formulario')
-            
-            # Si es AJAX, devolver errores
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse({
-                    'success': False,
-                    'errors': form.errors
-                })
+            messages.error(request, 'Por favor corrige los errores en el formulario.')
+            print("🔍 DEBUG: Errores del formulario:", form.errors)
+        
+        return redirect('/cl/taller/settings/')
     
-    else:
-        form = CompanySettingsForm(instance=company_settings)
+    # GET request - preparar contexto
+    form = CompanyInfoForm(instance=company_settings)
+    
+    # DEBUG: Verificar campos del formulario
+    print("🔍 DEBUG: Campos del formulario:", list(form.fields.keys()))
+    print("🔍 DEBUG: Número de campos:", len(form.fields))
     
     context = {
-        'form': form,
         'company_settings': company_settings,
+        'form': form,  # Pasar el formulario específico para información de empresa
         'created': created,
         'page_title': 'Configuración de Empresa',
         'breadcrumbs': [
@@ -96,9 +103,9 @@ def upload_logo_ajax(request):
     if form.is_valid():
         try:
             # Obtener configuración existente
-            company_settings, created = CompanySettings.objects.get_or_create(
-                user=request.user,
-                defaults={'company_name': 'Mi Taller'}
+            company_settings, created = ConfiguracionEmpresa.objects.get_or_create(
+                empresa=request.user.empresa,
+                defaults={'nombre_publico': request.user.empresa.nombre_taller}
             )
             
             # Actualizar logo
@@ -186,7 +193,7 @@ def reset_branding(request):
     
     if request.method == 'POST':
         try:
-            company_settings = get_object_or_404(CompanySettings, user=request.user)
+            company_settings = get_object_or_404(ConfiguracionEmpresa, user=request.user)
             
             # Resetear a valores por defecto
             company_settings.company_name = 'eGarage'
@@ -230,7 +237,7 @@ def export_branding_config(request):
     """Vista para exportar configuración de branding"""
     
     try:
-        company_settings = get_object_or_404(CompanySettings, user=request.user)
+        company_settings = get_object_or_404(ConfiguracionEmpresa, user=request.user)
         
         config_data = {
             'company_name': company_settings.company_name,
@@ -264,7 +271,7 @@ def company_settings_api(request):
     """API para obtener configuración de empresa (para uso en JavaScript)"""
     
     try:
-        company_settings = CompanySettings.objects.get(user=request.user)
+        company_settings = ConfiguracionEmpresa.objects.get(user=request.user)
         
         data = {
             'company_name': company_settings.get_company_name(),
@@ -284,7 +291,7 @@ def company_settings_api(request):
             'settings': data
         })
         
-    except CompanySettings.DoesNotExist:
+    except ConfiguracionEmpresa.DoesNotExist:
         return JsonResponse({
             'success': True,
             'settings': {

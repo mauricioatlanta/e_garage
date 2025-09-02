@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load i18n %}
 
 {% block title %}{{ empresa.nombre_taller }} - Centro de Comandos{% endblock %}
 
@@ -621,6 +622,12 @@ body {
 {% block content %}
 <div class="max-w-7xl mx-auto p-6">
 
+    <!-- Selector de idioma -->
+    <div class="absolute top-6 right-8 z-20 flex gap-2">
+        <a href="?lang=es" class="px-3 py-1 rounded-full text-sm font-bold transition-all shadow-md bg-cyan-500/80 text-white hover:bg-cyan-700 {% if request.GET.lang == 'es' or not request.GET.lang %}ring-2 ring-yellow-300{% endif %}">{% trans "Español" %}</a>
+        <a href="?lang=en" class="px-3 py-1 rounded-full text-sm font-bold transition-all shadow-md bg-cyan-100 text-cyan-900 hover:bg-cyan-300 {% if request.GET.lang == 'en' %}ring-2 ring-fuchsia-400{% endif %}">{% trans "English" %}</a>
+    </div>
+
     <!-- 🚀 Panel de Comandos -->
     <div class="space-container p-6">
         <h3 class="text-xl font-bold text-cyan-400 mb-4 console-text">🚀 PANEL DE COMANDOS DE MISIÓN</h3>
@@ -638,7 +645,7 @@ body {
                 </div>
                 <div class="unified-title">
                     <div class="main-title">INTELIGENCIA TÁCTICA</div>
-                    <div class="sub-title">COMMAND CENTER</div>
+                    <div class="sub-title">CENTRO COMANDOS</div>
                 </div>
                 <div class="unified-features">
                     <span class="feature-tag">📊 REPORTES</span>
@@ -698,8 +705,8 @@ body {
                     <div class="main-icon">⚙️</div>
                     <div class="secondary-icon">💎</div>
                 </div>
-                <div class="modern-title">SYSTEM CORE</div>
-                <div class="modern-subtitle">Config Center</div>
+                <div class="modern-title">NÚCLEO SISTEMA</div>
+                <div class="modern-subtitle">Centro Ajustes</div>
                 <div class="modern-description">Configuración avanzada</div>
             </a>
         </div>

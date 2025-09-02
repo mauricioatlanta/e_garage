@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load static i18n widget_tweaks %}
+
+{% block title %}{% trans "Editar repuesto" %}{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Estilos específicos para formularios de repuestos */
+.form-group { margin-bottom: 20px; }
+.form-group label { display:block; font-weight:600; color:#00e6d0 !important; font-size:14px; }
+</style>
+{% endblock extra_css %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-6">
+  <div class="bg-slate-900/70 rounded-2xl p-6 shadow-xl border border-cyan-500/20">
+    <h1 class="text-xl font-bold text-cyan-200 mb-4">
+      {% if form.instance.pk %}✏️ Editar repuesto{% else %}➕ Nuevo repuesto{% endif %}
+    </h1>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+
+      <!-- Campos del formulario -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {% for field in form.visible_fields %}
+          <div class="form-group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {% render_field field class+="w-full bg-black/40 text-white border border-cyan-400/30 rounded-lg p-2" %}
+            {% if field.help_text %}<p class="text-cyan-300/80 text-xs mt-1">{{ field.help_text }}</p>{% endif %}
+            {% for e in field.errors %}<p class="text-red-400 text-xs mt-1">{{ e }}</p>{% endfor %}
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="mt-6 flex items-center gap-2">
+        <button type="submit" class="px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-700 text-white shadow">
+          {% if form.instance.pk %}Guardar cambios{% else %}Crear repuesto{% endif %}
+        </button>
+        <a href="{% url 'taller:repuestos:lista_repuestos' %}"
+           class="inline-flex items-center px-4 py-2 border border-cyan-400/60 rounded-lg text-white bg-black/60 hover:bg-cyan-900/30">
+          ← Volver a la lista
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock content %}
+
+{% block extra_js %}
+<script src="{% static 'taller/js/repuestos_form.js' %}"></script>
+{% endblock extra_js %}

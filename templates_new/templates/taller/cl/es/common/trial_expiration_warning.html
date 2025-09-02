@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tu trial de eGarage está por vencer</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .content {
+            padding: 30px;
+        }
+        .warning-box {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .warning-icon {
+            font-size: 48px;
+            color: #f39c12;
+            margin-bottom: 10px;
+        }
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            margin: 20px 10px;
+            text-align: center;
+        }
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #dee2e6;
+            font-size: 14px;
+            color: #6c757d;
+        }
+        .benefits {
+            background-color: #f8f9ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .benefits ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .benefits li {
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚠️ eGarage</h1>
+            <p>Tu trial está por vencer</p>
+        </div>
+        
+        <div class="content">
+            <h2>Hola {{ user_name }},</h2>
+            
+            <div class="warning-box">
+                <div class="warning-icon">⏰</div>
+                <h3>Tu trial expira en {{ days_remaining }} día{{ days_remaining|pluralize:",s" }}</h3>
+                <p><strong>{{ empresa_name }}</strong></p>
+            </div>
+            
+            <p>Tu período de prueba gratuito de eGarage está llegando a su fin. ¡No pierdas acceso a todas las funcionalidades que te ayudan a gestionar tu taller!</p>
+            
+            <div class="benefits">
+                <h4>🚀 Lo que perderás si no activas tu suscripción:</h4>
+                <ul>
+                    <li>✨ Inteligencia Artificial para diagnósticos</li>
+                    <li>📊 Reportes avanzados y analíticas</li>
+                    <li>🔧 Gestión completa de inventario</li>
+                    <li>💰 Facturación automática</li>
+                    <li>📱 App móvil</li>
+                    <li>☁️ Backup automático en la nube</li>
+                </ul>
+            </div>
+            
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="{{ upgrade_url }}" class="cta-button">🚀 Activar Suscripción</a>
+                <a href="{{ login_url }}" class="cta-button" style="background: #28a745;">🔐 Ingresar a mi Cuenta</a>
+            </div>
+            
+            <p><strong>¿Por qué elegir eGarage?</strong></p>
+            <p>Más de 10,000 talleres confían en nosotros para:</p>
+            <ul>
+                <li>Aumentar sus ventas hasta un 40%</li>
+                <li>Reducir tiempo de gestión en 60%</li>
+                <li>Mejorar satisfacción del cliente</li>
+            </ul>
+            
+            <p>¿Tienes preguntas? Nuestro equipo está listo para ayudarte.</p>
+        </div>
+        
+        <div class="footer">
+            <p>📧 <strong>¿Necesitas ayuda?</strong> Escríbenos a {{ support_email }}</p>
+            <p>© {{ today.year }} eGarage - La plataforma #1 para talleres</p>
+            <p><small>Este email fue enviado porque tu trial está próximo a vencer.</small></p>
+        </div>
+    </div>
+</body>
+</html>

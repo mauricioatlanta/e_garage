@@ -1,5 +1,6 @@
+{% load i18n %}
 <!DOCTYPE html>
-<html lang="es">
+<html lang="{% if request.GET.lang == 'en' %}en{% else %}es{% endif %}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -320,65 +321,71 @@
         📲 ¿Necesitas ayuda?
     </a>
 
+    <!-- Selector de idioma -->
+    <div class="absolute top-6 right-8 z-20 flex gap-2" style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
+        <a href="?lang=es" class="px-3 py-1 rounded-full text-sm font-bold transition-all shadow-md bg-cyan-500/80 text-white hover:bg-cyan-700 {% if request.GET.lang == 'es' or not request.GET.lang %}ring-2 ring-yellow-300{% endif %}" style="background: rgba(0, 212, 255, 0.8); color: white; padding: 8px 12px; border-radius: 20px; text-decoration: none; font-size: 14px; font-weight: bold; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.3); {% if request.GET.lang == 'es' or not request.GET.lang %}box-shadow: 0 0 0 2px #ffff00;{% endif %}">Español</a>
+        <a href="?lang=en" class="px-3 py-1 rounded-full text-sm font-bold transition-all shadow-md bg-cyan-100 text-cyan-900 hover:bg-cyan-300 {% if request.GET.lang == 'en' %}ring-2 ring-fuchsia-400{% endif %}" style="background: rgba(0, 212, 255, 0.1); color: #006666; padding: 8px 12px; border-radius: 20px; text-decoration: none; font-size: 14px; font-weight: bold; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.3); {% if request.GET.lang == 'en' %}box-shadow: 0 0 0 2px #ff00ff;{% endif %}">English</a>
+    </div>
+
     <div class="container">
         <div class="registro-card">
             <div class="logo">
                 <h1>🚗 E-GARAGE</h1>
-                <p>Gestión inteligente para talleres</p>
-                <div class="badge-gratis">✨ GRATIS PARA SIEMPRE ✨</div>
+                <p>{% trans "Gestión inteligente para talleres" %}</p>
+                <div class="badge-gratis">✨ {% trans "GRATIS PARA SIEMPRE" %} ✨</div>
             </div>
 
             <div class="error-message" id="errorMessage"></div>
 
             <form id="registroForm">
                 <div class="form-group">
-                    <label for="nombre_taller">🏢 Nombre de tu taller</label>
+                    <label for="nombre_taller">🏢 {% trans "Nombre de tu taller" %}</label>
                     <input type="text" id="nombre_taller" name="nombre_taller" class="form-control" 
-                           placeholder="Ej: Taller San Miguel" required>
+                           placeholder="{% trans 'Ej: Taller San Miguel' %}" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="nombre_usuario">👤 Tu nombre</label>
+                    <label for="nombre_usuario">👤 {% trans "Tu nombre" %}</label>
                     <input type="text" id="nombre_usuario" name="nombre_usuario" class="form-control" 
-                           placeholder="Ej: Juan Pérez" required>
+                           placeholder="{% trans 'Ej: Juan Pérez' %}" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="email">📧 Email</label>
+                    <label for="email">📧 {% trans "Email" %}</label>
                     <input type="email" id="email" name="email" class="form-control" 
-                           placeholder="tu@email.com" required>
+                           placeholder="{% trans 'tu@email.com' %}" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="password">🔒 Contraseña</label>
+                    <label for="password">🔒 {% trans "Contraseña" %}</label>
                     <input type="password" id="password" name="password" class="form-control" 
-                           placeholder="Mínimo 6 caracteres" required minlength="6">
+                           placeholder="{% trans 'Mínimo 6 caracteres' %}" required minlength="6">
                 </div>
 
                 <button type="submit" class="btn-registro" id="btnRegistro">
                     <span class="loading-spinner" id="loadingSpinner"></span>
-                    🚀 Crear mi taller gratis
+                    🚀 {% trans "Crear mi taller gratis" %}
                 </button>
             </form>
 
             <div class="features">
-                <h3>🎯 Todo incluido sin límites:</h3>
+                <h3>🎯 {% trans "Todo incluido sin límites:" %}</h3>
                 <div class="features-grid">
                     <div class="feature-item">
                         <div class="feature-icon">👥</div>
-                        <div class="feature-text">Clientes ilimitados</div>
+                        <div class="feature-text">{% trans "Clientes ilimitados" %}</div>
                     </div>
                     <div class="feature-item">
                         <div class="feature-icon">🚗</div>
-                        <div class="feature-text">Vehículos sin límite</div>
+                        <div class="feature-text">{% trans "Vehículos sin límite" %}</div>
                     </div>
                     <div class="feature-item">
                         <div class="feature-icon">📋</div>
-                        <div class="feature-text">Documentos infinitos</div>
+                        <div class="feature-text">{% trans "Documentos infinitos" %}</div>
                     </div>
                     <div class="feature-item">
                         <div class="feature-icon">🧠</div>
-                        <div class="feature-text">IA incluida</div>
+                        <div class="feature-text">{% trans "IA incluida" %}</div>
                     </div>
                 </div>
             </div>
