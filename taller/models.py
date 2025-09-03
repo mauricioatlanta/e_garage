@@ -1,4 +1,5 @@
 from django.db import models
+from taller.utils.query_scopes import ScopeManager
 
 class MarcaManager(ScopeManager):
     def get_queryset(self):
