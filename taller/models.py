@@ -2,6 +2,7 @@ from django.db import models
 
 class Marca(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
+    codigo = models.CharField(max_length=10, unique=True, blank=True)
 
     def __str__(self):
         return self.nombre
