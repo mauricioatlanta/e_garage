@@ -20,7 +20,6 @@ def generar_codigo_marca(apps, schema_editor):
 class Migration(migrations.Migration):
     dependencies = [
         ('taller', '0001_initial'),
-        ('taller', '0004_merge_20250902_2231'),  # Agregar dependencia del merge
     ]
 
     operations = [

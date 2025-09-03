@@ -41,3 +41,15 @@ class ScopeManager(models.Manager):
     
     def by_user_pais(self, user):
         return self.by_pais(user.empresa.pais)
+    
+    def by_empresa(self, empresa):
+        return self.get_queryset().filter(empresa=empresa)
+    
+    def by_user_empresa(self, user):
+        return self.by_empresa(user.empresa)
+    
+    def by_pais(self, pais):
+        return self.get_queryset().filter(pais=pais)
+    
+    def by_user_pais(self, user):
+        return self.by_pais(user.empresa.pais)
