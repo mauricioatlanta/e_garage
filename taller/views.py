@@ -62,7 +62,7 @@ def configuracion(request):
                 messages.success(request, f'Técnico "{nombre}" creado.')
         elif 'toggle_tecnico' in request.POST and Tecnico and empresa:
             tec_id = request.POST.get('toggle_tecnico')
-            tec = Tecnico.objects.filter(id=tec_id, empresa=empresa).first()
+            tec = Tecnico.objects.by_empresa(empresa).filter(id=tec_id).first()
             if tec:
                 tec.activo = not tec.activo
                 tec.save()

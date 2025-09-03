@@ -1,14 +1,19 @@
 from django.db import models
 
+class MarcaManager(ScopeManager):
+    def get_queryset(self):
+        return super().get_queryset().select_related('empresa')
+
 class Marca(models.Model):
     PAISES = (
-        ('CL', 'Chile'),
+        ('CL', 'Chile'), 
         ('US', 'Estados Unidos'),
         ('AR', 'Argentina'),
         ('BR', 'Brasil'),
         ('PE', 'Perú')
     )
     
+    objects = MarcaManager()
     empresa = models.ForeignKey('Empresa', on_delete=models.CASCADE, related_name='marcas')
     nombre = models.CharField(max_length=100)
     codigo = models.CharField(max_length=10, blank=True)
