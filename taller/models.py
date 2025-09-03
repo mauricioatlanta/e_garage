@@ -1,8 +1,21 @@
 from django.db import models
 
 class Marca(models.Model):
-    nombre = models.CharField(max_length=100, unique=True)
-    codigo = models.CharField(max_length=10, unique=True, blank=True)
+    PAISES = (
+        ('CL', 'Chile'),
+        ('US', 'Estados Unidos'),
+        ('AR', 'Argentina'),
+        ('BR', 'Brasil'),
+        ('PE', 'Perú')
+    )
+    
+    empresa = models.ForeignKey('Empresa', on_delete=models.CASCADE, related_name='marcas')
+    nombre = models.CharField(max_length=100)
+    codigo = models.CharField(max_length=10, blank=True)
+    pais = models.CharField(max_length=2, choices=PAISES, default='CL')
+
+    class Meta:
+        unique_together = ('nombre', 'pais', 'empresa')
 
     def __str__(self):
         return self.nombre
@@ -10,9 +23,10 @@ class Marca(models.Model):
 class Modelo(models.Model):
     nombre = models.CharField(max_length=100)
     marca = models.ForeignKey(Marca, on_delete=models.CASCADE, related_name='modelos')
+    empresa = models.ForeignKey('Empresa', on_delete=models.CASCADE, related_name='modelos')
 
     class Meta:
-        unique_together = ('nombre', 'marca')
+        unique_together = ('nombre', 'marca', 'empresa')
 
 
     def __str__(self):
