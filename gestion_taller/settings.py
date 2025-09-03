@@ -49,20 +49,20 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.locale.LocaleMiddleware',  # 🌐 Locale middleware PRIMERO
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',  # 🔐 AUTHENTICATION ANTES
     'taller.middleware.country_url_migration.CountryURLRedirectMiddleware',  # Redirects legados /es/→/cl/
     'taller.middleware.country_context.CountryContextMiddleware',  # Detección de país
-    'taller.middleware.i18n_country_middleware.CountryLanguageMiddleware',  # 🌐 Idioma por país DESPUÉS
+    'taller.middleware.i18n_country_middleware.CountryLanguageMiddleware',  # 🌐 Idioma por país
+    'django.middleware.locale.LocaleMiddleware',  # Solo este para idioma
     'taller.middleware.rate_limiting.RateLimitMiddleware',  # Rate limiting temprano
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
     'taller.middleware.company_country.CompanyCountryMiddleware',  # Nuevo middleware de tenant único
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
     'taller.middleware.empresa_middleware.EmpresaMiddleware',
-    # 'taller.middlewares.activate_language',  # ❌ DESHABILITADO - CONFLICTO CON CountryLanguageMiddleware
+    'taller.middlewares.activate_language',  # 👈 Activación de idioma por país/usuario
     # 'taller.middleware.trial_middleware.TrialAccessMiddleware',  # 🔒 Trial de 30 días (descomentar para activar)
 ]
 
@@ -73,7 +73,7 @@ ROOT_URLCONF = 'gestion_taller.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / "templates_canonical", BASE_DIR / "templates"],
+        'DIRS': [BASE_DIR / "templates_canonical"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -84,11 +84,9 @@ TEMPLATES = [
                 'django.template.context_processors.static',
                 'django.template.context_processors.tz',
                 'django.contrib.messages.context_processors.messages',
-                'django.template.context_processors.i18n',  # ✅ AGREGADO - Context processor de i18n
-                'taller.context_processors.company_branding_context',  # ✅ NUESTRO - DEJAR SOLO ESTE
-                # 'taller.context_processors.empresa_contexto',  # ❌ DESHABILITADO - CONFLICTO
-                # 'taller.context_processors.namespaces.ui_namespaces',  # ❌ DESHABILITADO - CONFLICTO
-                # 'taller.context_processors.company_branding',  # ❌ DESHABILITADO - CONFLICTO
+                'taller.context_processors.empresa_contexto',
+                'taller.context_processors.namespaces.ui_namespaces',
+                'taller.context_processors.company_context',  # Context processor unificado
             ],
         },
     },
@@ -124,12 +122,6 @@ LOCALE_PATHS = [
 
 # Formatos por idioma (opcional)
 FORMAT_MODULE_PATH = ['gestion_taller.formats']
-
-# Configuración de cookies de idioma
-LANGUAGE_COOKIE_NAME = 'django_language'
-LANGUAGE_COOKIE_SAMESITE = 'Lax'
-LANGUAGE_COOKIE_SECURE = False  # en local http
-LANGUAGE_COOKIE_PATH = '/'
 
 # Archivos estáticos
 STATIC_URL = '/static/'

@@ -10,11 +10,8 @@ class ClienteListView(CountryLangTemplateMixin, LoginRequiredMixin, TenantViewMi
     paginate_by = 50
     ordering = ("apellido", "nombre", "id")
     select_related_fields = ()
+    template_name = 'clientes/cliente_list.html'
     context_object_name = 'cliente_list'
-
-    def get_template_path(self):
-        """Implementación requerida por CountryLangTemplateMixin"""
-        return "clientes/cliente_list.html"
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -71,9 +68,8 @@ class ClienteCreateView(CountryLangTemplateMixin, LoginRequiredMixin, TenantView
         context['empresa_actual'] = empresa
         return context
 
-    def get_template_path(self):
-        """Implementación requerida por CountryLangTemplateMixin"""
-        return "clientes/cliente_form.html"
+    def render_to_response(self, context, **response_kwargs):
+        return self.render_country_lang(self.request, context)
 
 class ClienteUpdateView(CountryLangTemplateMixin, LoginRequiredMixin, TenantViewMixin, UpdateView):
     model = Cliente
@@ -98,9 +94,8 @@ class ClienteUpdateView(CountryLangTemplateMixin, LoginRequiredMixin, TenantView
         context['empresa_actual'] = empresa
         return context
 
-    def get_template_path(self):
-        """Implementación requerida por CountryLangTemplateMixin"""
-        return "clientes/cliente_form.html"
+    def render_to_response(self, context, **response_kwargs):
+        return self.render_country_lang(self.request, context)
 
     def get_success_url(self):
         from django.urls import reverse

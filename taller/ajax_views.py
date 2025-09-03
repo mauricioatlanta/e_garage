@@ -4,40 +4,33 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 import json
 
-# --- helper de país (reutilizable) ---
-def _resolve_country_from_request(request):
-    # 1) middleware: request.empresa.pais
-    empresa = getattr(request, "empresa", None)
-    pais = getattr(empresa, "pais", None)
-    if pais in ("CL", "US"):
-        return pais
-    # 2) perfil: request.user.empresa.pais
-    user_emp = getattr(getattr(request, "user", None), "empresa", None)
-    pais = getattr(user_emp, "pais", None)
-    if pais in ("CL", "US"):
-        return pais
-    # 3) prefijo de URL (cinturón y tirantes)
-    path = (request.path or "").lower()
-    if path.startswith("/us/"): 
-        return "US"
-    if path.startswith("/cl/"): 
-        return "CL"
-    return None
-
 @login_required
 @require_http_methods(["GET"])
 def ajax_marcas(request):
-    """Endpoint AJAX para obtener marcas de vehículos desde la base de datos"""
+    """Endpoint AJAX para obtener marcas de vehículos"""
     try:
-        from taller.models.marca import Marca
-        
-        # 🔴 PARCHE: Filtrar por país del usuario
-        country = _resolve_country_from_request(request)
-        qs = Marca.objects.filter(country=country).order_by("nombre") if country else Marca.objects.none()
-        
+        # Marcas predefinidas - en el futuro se puede obtener de BD
         marcas = [
-            {'id': marca.id, 'nombre': marca.nombre}
-            for marca in qs
+            {'id': 'Toyota', 'nombre': 'Toyota'},
+            {'id': 'Ford', 'nombre': 'Ford'},
+            {'id': 'Chevrolet', 'nombre': 'Chevrolet'},
+            {'id': 'Hyundai', 'nombre': 'Hyundai'},
+            {'id': 'Nissan', 'nombre': 'Nissan'},
+            {'id': 'Volkswagen', 'nombre': 'Volkswagen'},
+            {'id': 'Honda', 'nombre': 'Honda'},
+            {'id': 'Mazda', 'nombre': 'Mazda'},
+            {'id': 'Suzuki', 'nombre': 'Suzuki'},
+            {'id': 'Renault', 'nombre': 'Renault'},
+            {'id': 'Peugeot', 'nombre': 'Peugeot'},
+            {'id': 'Citroën', 'nombre': 'Citroën'},
+            {'id': 'BMW', 'nombre': 'BMW'},
+            {'id': 'Mercedes-Benz', 'nombre': 'Mercedes-Benz'},
+            {'id': 'Audi', 'nombre': 'Audi'},
+            {'id': 'Kia', 'nombre': 'Kia'},
+            {'id': 'Mitsubishi', 'nombre': 'Mitsubishi'},
+            {'id': 'Subaru', 'nombre': 'Subaru'},
+            {'id': 'Jeep', 'nombre': 'Jeep'},
+            {'id': 'Land Rover', 'nombre': 'Land Rover'},
         ]
         
         return JsonResponse({
@@ -54,36 +47,57 @@ def ajax_marcas(request):
 @login_required
 @require_http_methods(["GET"])
 def ajax_modelos(request):
-    """Endpoint AJAX para obtener modelos según marca desde la base de datos"""
+    """Endpoint AJAX para obtener modelos según marca"""
     try:
-        from taller.models.marca import Marca
-        from taller.models.modelo import Modelo
-        
-        # 🔴 PARCHE: Filtrar por país del usuario
-        country = _resolve_country_from_request(request)
-        qs = Modelo.objects.filter(country=country) if country else Modelo.objects.none()
-        
         marca_id = request.GET.get('marca_id', '')
         
-        if not marca_id:
-            return JsonResponse([])
+        # Modelos predefinidos por marca
+        modelos_por_marca = {
+            'Toyota': [
+                {'id': 'Corolla', 'nombre': 'Corolla'},
+                {'id': 'Yaris', 'nombre': 'Yaris'},
+                {'id': 'Hilux', 'nombre': 'Hilux'},
+                {'id': 'RAV4', 'nombre': 'RAV4'},
+                {'id': 'Camry', 'nombre': 'Camry'},
+                {'id': 'Prius', 'nombre': 'Prius'},
+                {'id': 'Land Cruiser', 'nombre': 'Land Cruiser'},
+            ],
+            'Ford': [
+                {'id': 'Fiesta', 'nombre': 'Fiesta'},
+                {'id': 'Focus', 'nombre': 'Focus'},
+                {'id': 'Ranger', 'nombre': 'Ranger'},
+                {'id': 'EcoSport', 'nombre': 'EcoSport'},
+                {'id': 'Escape', 'nombre': 'Escape'},
+                {'id': 'Mustang', 'nombre': 'Mustang'},
+                {'id': 'F-150', 'nombre': 'F-150'},
+            ],
+            'Chevrolet': [
+                {'id': 'Spark', 'nombre': 'Spark'},
+                {'id': 'Sail', 'nombre': 'Sail'},
+                {'id': 'Cruze', 'nombre': 'Cruze'},
+                {'id': 'Captiva', 'nombre': 'Captiva'},
+                {'id': 'Camaro', 'nombre': 'Camaro'},
+                {'id': 'Silverado', 'nombre': 'Silverado'},
+            ],
+            'Hyundai': [
+                {'id': 'Accent', 'nombre': 'Accent'},
+                {'id': 'Elantra', 'nombre': 'Elantra'},
+                {'id': 'Tucson', 'nombre': 'Tucson'},
+                {'id': 'Santa Fe', 'nombre': 'Santa Fe'},
+                {'id': 'i10', 'nombre': 'i10'},
+                {'id': 'i30', 'nombre': 'i30'},
+            ],
+            'Nissan': [
+                {'id': 'March', 'nombre': 'March'},
+                {'id': 'Versa', 'nombre': 'Versa'},
+                {'id': 'Sentra', 'nombre': 'Sentra'},
+                {'id': 'X-Trail', 'nombre': 'X-Trail'},
+                {'id': 'Altima', 'nombre': 'Altima'},
+                {'id': 'Frontier', 'nombre': 'Frontier'},
+            ],
+        }
         
-        # Si marca_id es un nombre de marca (string), buscar por nombre
-        if isinstance(marca_id, str) and not marca_id.isdigit():
-            try:
-                marca = Marca.objects.get(nombre=marca_id, country=country)
-                marca_id = marca.id
-            except Marca.DoesNotExist:
-                return JsonResponse([])
-        
-        # 🔴 PARCHE: Filtrar por marca y país
-        qs = qs.filter(marca_id=marca_id)
-        qs = qs.order_by("nombre")
-        
-        modelos = [
-            {'id': modelo.id, 'nombre': modelo.nombre}
-            for modelo in qs
-        ]
+        modelos = modelos_por_marca.get(marca_id, [])
         
         return JsonResponse({
             'success': True,

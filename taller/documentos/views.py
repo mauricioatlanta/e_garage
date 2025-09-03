@@ -616,18 +616,9 @@ def lista_documentos(request):
         get_language()
     )
 
-    # Calcular total de facturas (excluyendo órdenes de trabajo y presupuestos)
-    from django.db.models import Sum
-    facturas_stats = documentos.filter(tipo='FAC').aggregate(
-        total_facturas=Sum('total_general_anotado'),
-        count_facturas=Count('id')
-    )
-    
     return TemplateResponse(request, template_name, {
         'documentos': documentos,
-        'country': country,
-        'total_facturas': facturas_stats['total_facturas'] or 0,
-        'count_facturas': facturas_stats['count_facturas'] or 0
+        'country': country
     })
 
 
@@ -888,9 +879,9 @@ def exportar_documento_pdf(request, documento_id):
     doc = get_object_or_404(Documento, id=documento_id)
     
     # Calcular totales
-    total_repuestos = sum(r.cantidad * r.precio_unitario for r in doc.lineas_repuesto.all())
-    total_servicios = sum(s.cantidad * s.precio_unitario for s in doc.lineas_servicio.all())
-    total_otros_servicios = sum(os.cantidad * os.precio_cliente for os in doc.lineas_otro_servicio.all())
+    total_repuestos = sum(r.total for r in doc.repuestos.all())
+    total_servicios = sum(s.precio for s in doc.servicios.all())
+    total_otros_servicios = sum(os.precio_cliente for os in doc.otros_servicios.all())
     
     subtotal = total_repuestos + total_servicios + total_otros_servicios
     iva = subtotal * Decimal('0.19') if doc.incluir_iva else Decimal('0')

@@ -83,7 +83,6 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'core.context_processors.static_version',
                 'core.context_processors.empresa_info',
-                'taller.context_processors.empresa_context',
             ],
         },
     },

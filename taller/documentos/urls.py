@@ -10,8 +10,7 @@ from .views_migrated import (
     DocumentoListView, DocumentoCreateView, DocumentoDetailView as MigratedDetailView,
     DocumentoUpdateView as MigratedUpdateView, DocumentoDeleteView
 )
-from .api import api_vehiculos_por_cliente, api_repuesto_por_codigo, api_next_number
-from .views_crear import crear_documento, buscar_clientes_ajax
+# from .api import lista_debug  # Función no existe
 from . import views_nuevas
 import sys
 import os
@@ -50,8 +49,6 @@ urlpatterns = [
     path("api/buscar-repuestos/", views_moderno.api_buscar_repuestos, name="api_buscar_repuestos"),
     path("api/buscar-servicios/", api_servicios.api_buscar_servicios, name="api_buscar_servicios"),
     path("api/vehiculos-cliente/", views_moderno.api_vehiculos_cliente, name="api_vehiculos_cliente"),
-    path("api/vehiculos-por-cliente/", api_vehiculos_por_cliente, name="api_vehiculos_por_cliente"),
-    path("api/next-number/", api_next_number, name="api_next_number"),
     path("api/buscar-servicios-internos/", views_moderno.api_buscar_servicios_internos, name="api_buscar_servicios_internos"),
     path("api/obtener-numero-documento/", views_moderno.api_obtener_numero_documento, name="api_obtener_numero_documento"),
     
@@ -61,9 +58,6 @@ urlpatterns = [
     path("api/autocomplete-repuesto/", views.autocomplete_repuesto, name="autocomplete_repuesto"),
     path("api/crear-servicio/", views.api_crear_servicio, name="api_crear_servicio"),
     
-    # Nueva vista de creación de documentos
-    path("crear/", crear_documento, name="crear_documento"),
-    
-    # API de búsqueda AJAX
-    path("api/buscar-clientes/", buscar_clientes_ajax, name="buscar_clientes_ajax"),
+    # Endpoint de diagnóstico
+    # path("lista-debug/", lista_debug, name="lista_debug"),  # Función no existe
 ]

@@ -15,9 +15,9 @@ try:
 except Exception:  # pragma: no cover - si no existen modelos USA
     MarcaVehiculoUSA = ModeloVehiculoUSA = CatalogoModeloAuto = None
 
-class VehiculoListView(LoginRequiredMixin, TenantViewMixin, ListView):
+class VehiculoListView(CountryLangTemplateMixin, LoginRequiredMixin, TenantViewMixin, ListView):
     model = Vehiculo
-    template_name = "taller/vehiculos/vehiculo_list.html"
+    template_name = "vehiculos/vehiculo_list.html"
     select_related_fields = ("cliente",)
     ordering = ("-id",)
     paginate_by = 50
@@ -62,8 +62,13 @@ class VehiculoCreateView(LoginRequiredMixin, TenantViewMixin, CreateView):
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
         
-        # El formulario ya maneja la configuración por país en su __init__
-        # No necesitamos llamar a add_usa_fields() aquí
+        # Detectar país y agregar campos USA si es necesario
+        empresa = getattr(self.request, 'empresa', getattr(self.request.user, 'empresa', None))
+        country = getattr(empresa, 'pais', 'CL') if empresa else 'CL'
+        
+        if str(country).strip().upper() == 'US':
+            form.add_usa_fields()
+            
         return form
 
     def form_valid(self, form):
@@ -90,15 +95,6 @@ class VehiculoCreateView(LoginRequiredMixin, TenantViewMixin, CreateView):
             log.warning("[VehiculoCreateView] country desconocido '%s' normalizado a 'CL' (usuario=%s, empresa=%s)", country, self.request.user.username, getattr(empresa,'id',None))
             country = 'CL'
 
-        # FORZAR IDIOMA SEGÚN PAÍS
-        from django.utils import translation
-        if country == 'US':
-            translation.activate('en')
-            ctx['LANGUAGE_CODE'] = 'en'
-        else:
-            translation.activate('es')
-            ctx['LANGUAGE_CODE'] = 'es'
-
         ctx['country'] = country
         ctx['SHOW_DEBUG'] = True  # Para mostrar [DEBUG country: ...] en el template
         ctx['debug_empresa_pais'] = f"empresa={getattr(empresa,'id',None)} pais={country} usuario={self.request.user.username}"
@@ -106,19 +102,17 @@ class VehiculoCreateView(LoginRequiredMixin, TenantViewMixin, CreateView):
         # Listas auxiliares (fallback cuando no se usa DAL o para selects básicos)
         ctx['clientes'] = Cliente.objects.filter(empresa=empresa)[:500]  # BLINDAJE: Filtrado por empresa
         ctx['colores'] = ColorVehiculo.get_colores_para_pais(country)  # CORREGIDO: Colores por país
-        
-        # IMPORTANTE: NO enviar marcas al contexto - el formulario ya las filtra por país
-        # Esto evita duplicados y marcas cruzadas entre países
         if country == 'US':
-            # Solo información de debug para USA
+            # Usar nuestro catálogo importado para USA
             if CatalogoModeloAuto:
+                ctx['marcas_usa'] = CatalogoModeloAuto.get_marcas_activas()[:500]
                 ctx['usa_catalogo_disponible'] = True
-                ctx['debug_marcas_usa_count'] = len(list(CatalogoModeloAuto.get_marcas_activas()))
-            else:
-                ctx['usa_catalogo_disponible'] = False
+            elif MarcaVehiculoUSA:
+                ctx['marcas_usa'] = MarcaVehiculoUSA.objects.filter(activa=True).only('id','nombre').order_by('nombre')
+            if ModeloVehiculoUSA:
+                ctx['modelos_usa'] = ModeloVehiculoUSA.objects.filter(activo=True).only('id','nombre').order_by('nombre')
         else:
-            # Solo información de debug para Chile
-            ctx['debug_marcas_cl_count'] = Marca.objects.filter(country='CL').count()
+            ctx['marcas'] = Marca.objects.filter(country='CL').only('id','nombre').order_by('nombre')
         return ctx
 
 class VehiculoUpdateView(LoginRequiredMixin, TenantViewMixin, UpdateView):
@@ -129,8 +123,6 @@ class VehiculoUpdateView(LoginRequiredMixin, TenantViewMixin, UpdateView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['user'] = self.request.user
-        # IMPORTANTE: Pasar request para que el formulario pueda acceder a la empresa
-        kwargs['request'] = self.request
         return kwargs
 
     def get_context_data(self, **kwargs):

@@ -5,7 +5,6 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from core.views import TenantViewMixin
 from taller.mixins import CountryLangTemplateMixin
 from taller.models.repuesto import Repuesto
-from taller.forms.repuesto import RepuestoForm
 
 class RepuestoListView(CountryLangTemplateMixin, LoginRequiredMixin, TenantViewMixin, ListView):
     model = Repuesto
@@ -24,8 +23,6 @@ class RepuestoListView(CountryLangTemplateMixin, LoginRequiredMixin, TenantViewM
                 models.Q(categoria__nombre__icontains=q)
             )
         return qs
-    
-
 
 class RepuestoDetailView(LoginRequiredMixin, TenantViewMixin, DetailView):
     model = Repuesto
@@ -33,24 +30,12 @@ class RepuestoDetailView(LoginRequiredMixin, TenantViewMixin, DetailView):
 
 class RepuestoCreateView(LoginRequiredMixin, TenantViewMixin, CreateView):
     model = Repuesto
-    form_class = RepuestoForm
+    fields = ["part_number", "nombre", "categoria", "precio_compra", "precio_venta", "cantidad_stock", "proveedor"]
     template_name = 'taller/repuesto_form.html'
     success_url = reverse_lazy('taller:repuestos:lista_repuestos')
-    
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['user'] = self.request.user
-        return kwargs
-    
-
 
 class RepuestoUpdateView(LoginRequiredMixin, TenantViewMixin, UpdateView):
     model = Repuesto
-    form_class = RepuestoForm
+    fields = ["part_number", "nombre", "categoria", "precio_compra", "precio_venta", "cantidad_stock", "proveedor"]
     template_name = 'taller/repuesto_form.html'
     success_url = reverse_lazy('taller:repuestos:lista_repuestos')
-    
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['user'] = self.request.user
-        return kwargs

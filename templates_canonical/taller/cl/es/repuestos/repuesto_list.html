@@ -1,783 +1,96 @@
 {% extends "base.html" %}
-{% load i18n static humanize %}
+{% load i18n static %}
 
 {% block content %}
-{% csrf_token %}
-<style>
-  /* Estilos futuristas y tecnológicos */
-  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
-  
-  .futuristic-bg {
-    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #533483 100%);
-    background-size: 400% 400%;
-    animation: gradientShift 15s ease infinite;
-  }
-  
-  @keyframes gradientShift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
-  
-  .holographic-card {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(0, 255, 255, 0.2);
-    box-shadow: 
-      0 0 20px rgba(0, 255, 255, 0.3),
-      inset 0 0 20px rgba(0, 255, 255, 0.1);
-    transition: all 0.3s ease;
-  }
-  
-  .holographic-card:hover {
-    border-color: rgba(0, 255, 255, 0.5);
-    box-shadow: 
-      0 0 30px rgba(0, 255, 255, 0.5),
-      inset 0 0 30px rgba(0, 255, 255, 0.2);
-    transform: translateY(-2px);
-  }
-  
-  .neon-text {
-    text-shadow: 
-      0 0 5px currentColor,
-      0 0 10px currentColor,
-      0 0 15px currentColor,
-      0 0 20px currentColor;
-    animation: neonPulse 2s ease-in-out infinite alternate;
-  }
-  
-  @keyframes neonPulse {
-    from { opacity: 1; }
-    to { opacity: 0.8; }
-  }
-  
-  .cyber-button {
-    background: linear-gradient(45deg, #00ffff, #0080ff);
-    border: none;
-    border-radius: 8px;
-    padding: 12px 24px;
-    color: #000;
-    font-weight: bold;
-    font-family: 'Orbitron', monospace;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    box-shadow: 
-      0 0 20px rgba(0, 255, 255, 0.5),
-      inset 0 0 20px rgba(255, 255, 255, 0.2);
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-  }
-  
-  .cyber-button::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-    transition: left 0.5s;
-  }
-  
-  .cyber-button:hover::before {
-    left: 100%;
-  }
-  
-  .cyber-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 
-      0 0 30px rgba(0, 255, 255, 0.8),
-      inset 0 0 30px rgba(255, 255, 255, 0.3);
-  }
-  
-  .cyber-input {
-    background: rgba(0, 0, 0, 0.7);
-    border: 2px solid rgba(0, 255, 255, 0.3);
-    border-radius: 8px;
-    color: #00ffff;
-    font-family: 'Orbitron', monospace;
-    padding: 12px 16px;
-    transition: all 0.3s ease;
-  }
-  
-  .cyber-input:focus {
-    outline: none;
-    border-color: #00ffff;
-    box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
-  }
-  
-  .cyber-input::placeholder {
-    color: rgba(0, 255, 255, 0.5);
-  }
-  
-  .data-table {
-    background: rgba(0, 0, 0, 0.8);
-    border: 1px solid rgba(0, 255, 255, 0.3);
-    border-radius: 12px;
-    overflow: hidden;
-  }
-  
-  .data-table th {
-    background: linear-gradient(45deg, #00ffff, #0080ff);
-    color: #000;
-    font-family: 'Orbitron', monospace;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    padding: 16px 12px;
-    border-bottom: 2px solid rgba(0, 255, 255, 0.5);
-  }
-  
-  .data-table td {
-    padding: 16px 12px;
-    border-bottom: 1px solid rgba(0, 255, 255, 0.1);
-    color: #fff;
-    font-family: 'Orbitron', monospace;
-    vertical-align: middle;
-  }
-  
-  .data-table tr:hover {
-    background: rgba(0, 255, 255, 0.1);
-    box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.1);
-    transform: scale(1.01);
-    transition: all 0.3s ease;
-  }
-  
-  /* Mejorar visibilidad de la tabla */
-  .data-table {
-    box-shadow: 
-      0 0 30px rgba(0, 255, 255, 0.3),
-      inset 0 0 30px rgba(0, 255, 255, 0.1);
-  }
-  
-  /* Efecto de resaltado para filas */
-  .data-table tbody tr:nth-child(even) {
-    background: rgba(0, 255, 255, 0.02);
-  }
-  
-  .data-table tbody tr:nth-child(odd) {
-    background: rgba(0, 0, 0, 0.3);
-  }
-  
-  .status-indicator {
-    display: inline-block;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    margin-right: 8px;
-    animation: statusPulse 2s ease-in-out infinite;
-  }
-  
-  .status-high { background: #00ff00; box-shadow: 0 0 10px #00ff00; }
-  .status-medium { background: #ffff00; box-shadow: 0 0 10px #ffff00; }
-  .status-low { background: #ff0000; box-shadow: 0 0 10px #ff0000; }
-  
-  @keyframes statusPulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-  }
-  
-  .floating-particles {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 1;
-  }
-  
-  .particle {
-    position: absolute;
-    width: 2px;
-    height: 2px;
-    background: #00ffff;
-    border-radius: 50%;
-    animation: float 6s ease-in-out infinite;
-  }
-  
-  @keyframes float {
-    0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0; }
-    50% { transform: translateY(-20px) rotate(180deg); opacity: 1; }
-  }
-  
-  .scan-line {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, #00ffff, transparent);
-    animation: scan 3s linear infinite;
-  }
-  
-  @keyframes scan {
-    0% { transform: translateY(0); }
-    100% { transform: translateY(100vh); }
-  }
-  
-  .cyber-grid {
-    background-image: 
-      linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
-    background-size: 20px 20px;
-    animation: gridMove 20s linear infinite;
-  }
-  
-  @keyframes gridMove {
-    0% { transform: translate(0, 0); }
-    100% { transform: translate(20px, 20px); }
-  }
-  
-  .font-orbitron {
-    font-family: 'Orbitron', monospace;
-  }
-  
-  /* Botones de acción mejorados */
-  .cyber-action-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 12px;
-    border: none;
-    border-radius: 6px;
-    font-family: 'Orbitron', monospace;
-    font-size: 11px;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-    text-decoration: none;
-    min-width: 80px;
-    justify-content: center;
-  }
-  
-  .cyber-action-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-    transition: left 0.5s;
-  }
-  
-  .cyber-action-btn:hover::before {
-    left: 100%;
-  }
-  
-  .cyber-action-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  }
-  
-  /* Botón Ver */
-  .cyber-view-btn {
-    background: linear-gradient(45deg, #00bfff, #0080ff);
-    color: #000;
-    box-shadow: 
-      0 0 10px rgba(0, 191, 255, 0.5),
-      inset 0 0 10px rgba(255, 255, 255, 0.2);
-  }
-  
-  .cyber-view-btn:hover {
-    background: linear-gradient(45deg, #00d4ff, #0099ff);
-    box-shadow: 
-      0 0 20px rgba(0, 191, 255, 0.8),
-      inset 0 0 15px rgba(255, 255, 255, 0.3);
-  }
-  
-  /* Botón Editar */
-  .cyber-edit-btn {
-    background: linear-gradient(45deg, #00ff88, #00cc66);
-    color: #000;
-    box-shadow: 
-      0 0 10px rgba(0, 255, 136, 0.5),
-      inset 0 0 10px rgba(255, 255, 255, 0.2);
-  }
-  
-  .cyber-edit-btn:hover {
-    background: linear-gradient(45deg, #00ffaa, #00dd88);
-    box-shadow: 
-      0 0 20px rgba(0, 255, 136, 0.8),
-      inset 0 0 15px rgba(255, 255, 255, 0.3);
-  }
-  
-  /* Botón Eliminar */
-  .cyber-delete-btn {
-    background: linear-gradient(45deg, #ff4444, #cc0000);
-    color: #fff;
-    box-shadow: 
-      0 0 10px rgba(255, 68, 68, 0.5),
-      inset 0 0 10px rgba(255, 255, 255, 0.1);
-  }
-  
-  .cyber-delete-btn:hover {
-    background: linear-gradient(45deg, #ff6666, #dd2222);
-    box-shadow: 
-      0 0 20px rgba(255, 68, 68, 0.8),
-      inset 0 0 15px rgba(255, 255, 255, 0.2);
-  }
-  
-  /* Texto de los botones */
-  .btn-text {
-    font-weight: bold;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-  }
-  
-  /* Iconos de los botones */
-  .cyber-action-btn i {
-    font-size: 12px;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-  }
-  
-  /* Responsive para botones */
-  @media (max-width: 768px) {
-    .cyber-action-btn {
-      padding: 6px 8px;
-      font-size: 10px;
-      min-width: 60px;
-      gap: 4px;
-    }
-    
-    .btn-text {
-      display: none;
-    }
-    
-    .cyber-action-btn i {
-      font-size: 14px;
-    }
-  }
-</style>
+<div class="p-4">
+  <h1 class="text-2xl font-bold mb-4">{% trans "Repuestos" %}</h1>
 
-<div class="relative min-h-screen futuristic-bg overflow-hidden">
-  <!-- Grid cyber de fondo -->
-  <div class="absolute inset-0 cyber-grid opacity-20"></div>
-  
-  <!-- Efectos de partículas flotantes -->
-  <div class="floating-particles">
-    {% for i in "123456789" %}
-    <div class="particle" style="left: {{ forloop.counter|add:10 }}%; animation-delay: {{ forloop.counter|add:2 }}s;"></div>
-    {% endfor %}
+  <div class="mb-4">
+    <form method="get" class="flex gap-2">
+      <input type="search" name="q" value="{{ request.GET.q }}" 
+             placeholder="{% trans 'Buscar repuestos...' %}" 
+             class="px-3 py-2 border rounded-md flex-1">
+      <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+        {% trans "Buscar" %}
+      </button>
+    </form>
   </div>
-  
-  <!-- Línea de escaneo -->
-  <div class="scan-line"></div>
-  
-  <!-- Contenido principal -->
-  <div class="relative z-10 container mx-auto px-4 py-12">
-    <!-- Header futurista -->
-    <div class="flex justify-between items-center mb-8">
-      <div class="flex items-center gap-4">
-        <div class="w-16 h-16 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-full flex items-center justify-center shadow-lg">
-          <i class="fas fa-microchip text-2xl text-white"></i>
-        </div>
-        <div>
-          <h1 class="text-5xl font-black neon-text text-cyan-400 font-orbitron">
-            INVENTARIO CYBER
-          </h1>
-          <p class="text-cyan-300 font-orbitron text-sm tracking-wider">
-            SISTEMA DE GESTIÓN DE REPUESTOS
-          </p>
-        </div>
-      </div>
+
+  <div class="overflow-x-auto">
+    <table class="min-w-full text-sm bg-white rounded-lg shadow">
+      <thead class="bg-gray-50">
+        <tr class="text-left border-b">
+          <th class="py-3 px-4 font-medium">{% trans "Código" %}</th>
+          <th class="py-3 px-4 font-medium">{% trans "Nombre" %}</th>
+          <th class="py-3 px-4 font-medium">{% trans "Categoría" %}</th>
+          <th class="py-3 px-4 font-medium">{% trans "Stock" %}</th>
+          <th class="py-3 px-4 font-medium">{% trans "Precio Venta" %}</th>
+          <th class="py-3 px-4 font-medium">{% trans "Acciones" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for repuesto in object_list %}
+        <tr class="border-b hover:bg-gray-50">
+          <td class="py-3 px-4">{{ repuesto.part_number|default:"-" }}</td>
+          <td class="py-3 px-4 font-medium">{{ repuesto.nombre }}</td>
+          <td class="py-3 px-4">{{ repuesto.categoria.nombre|default:"-" }}</td>
+          <td class="py-3 px-4">{{ repuesto.cantidad_stock|default:"-" }}</td>
+          <td class="py-3 px-4">
+            {% if repuesto.precio_venta %}
+              ${{ repuesto.precio_venta|floatformat:0 }}
+            {% else %}
+              -
+            {% endif %}
+          </td>
+          <td class="py-3 px-4">
+            <a href="{% url 'taller:repuestos:ver_repuesto' repuesto.pk %}" 
+               class="text-blue-600 hover:text-blue-800 mr-2">{% trans "Ver" %}</a>
+            <a href="{% url 'taller:repuestos:editar_repuesto' repuesto.pk %}" 
+               class="text-green-600 hover:text-green-800">{% trans "Editar" %}</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6" class="py-8 px-4 text-center text-gray-500">
+            {% trans "No hay repuestos registrados" %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Paginación -->
+  {% if is_paginated %}
+  <div class="mt-6 flex justify-center">
+    <nav class="flex items-center space-x-2">
+      {% if page_obj.has_previous %}
+        <a href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" 
+           class="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300">{% trans "Primera" %}</a>
+        <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" 
+           class="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300">{% trans "Anterior" %}</a>
+      {% endif %}
       
-      <a href="{% url 'taller:repuestos:crear_repuesto' %}" class="cyber-button">
-        <i class="fas fa-plus mr-2"></i>
-        NUEVO REPUESTO
-      </a>
-    </div>
-    
-    <!-- Panel de búsqueda holográfico -->
-    <div class="holographic-card p-6 mb-8">
-      <div class="flex items-center gap-4">
-        <div class="flex-1 relative">
-          <input type="search" id="searchInput" name="q" value="{{ request.GET.q }}" 
-                 placeholder="ESCANEAR REPUESTO..."
-                 class="cyber-input w-full pl-12">
-          <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-cyan-400"></i>
-          <div id="loading-spinner" class="absolute right-4 top-1/2 transform -translate-y-1/2 hidden">
-            <i class="fas fa-spinner fa-spin text-cyan-400"></i>
-          </div>
-        </div>
-        <div class="text-cyan-300 font-orbitron text-sm">
-          <i class="fas fa-database mr-1"></i>
-          <span id="total-resultados">SINCRONIZADO</span>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Tabla de datos futurista -->
-    <div class="data-table">
-      <table class="w-full">
-                 <thead>
-           <tr>
-             <th><i class="fas fa-tag mr-2"></i>COMPONENTE</th>
-             <th><i class="fas fa-barcode mr-2"></i>PART #</th>
-             <th><i class="fas fa-store mr-2"></i>PROVEEDOR</th>
-             <th><i class="fas fa-dollar-sign mr-2"></i>COSTO</th>
-             <th><i class="fas fa-chart-line mr-2"></i>PRECIO</th>
-             <th><i class="fas fa-boxes mr-2"></i>STOCK</th>
-             <th class="text-center"><i class="fas fa-cogs mr-2"></i>ACCIONES</th>
-           </tr>
-         </thead>
-        <tbody id="tabla-repuestos">
-          {% for repuesto in object_list %}
-          <tr class="hover:bg-cyan-900/20 transition-all duration-300">
-            <td class="font-bold text-cyan-300">{{ repuesto.nombre|default:"N/A" }}</td>
-            <td class="font-mono text-blue-300">{{ repuesto.part_number|default:"N/A" }}</td>
-            <td>
-              {% if repuesto.proveedor %}
-                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs bg-cyan-900/50 text-cyan-300 border border-cyan-400/30">
-                  <i class="fas fa-store mr-1"></i>
-                  {{ repuesto.proveedor }}
-                </span>
-              {% else %}
-                <span class="text-gray-400">-</span>
-              {% endif %}
-            </td>
-            <td class="text-right font-mono text-yellow-400">
-              {% if repuesto.precio_compra %}
-                ${{ repuesto.precio_compra|floatformat:0|intcomma }}
-              {% else %}
-                -
-              {% endif %}
-            </td>
-            <td class="text-right font-mono text-green-400 font-bold">
-              {% if repuesto.precio_venta %}
-                ${{ repuesto.precio_venta|floatformat:0|intcomma }}
-              {% else %}
-                -
-              {% endif %}
-            </td>
-            <td class="text-right">
-              <div class="flex items-center justify-end">
-                {% if repuesto.cantidad_stock > 10 %}
-                  <span class="status-indicator status-high"></span>
-                  <span class="text-green-400 font-bold">{{ repuesto.cantidad_stock|default:0 }}</span>
-                {% elif repuesto.cantidad_stock > 0 %}
-                  <span class="status-indicator status-medium"></span>
-                  <span class="text-yellow-400 font-bold">{{ repuesto.cantidad_stock|default:0 }}</span>
-                {% else %}
-                  <span class="status-indicator status-low"></span>
-                  <span class="text-red-400 font-bold">{{ repuesto.cantidad_stock|default:0 }}</span>
-                {% endif %}
-              </div>
-            </td>
-                         <td class="text-center">
-               <div class="flex justify-center gap-3">
-                 <!-- Botón Ver -->
-                 <a href="{% url 'taller:repuestos:ver_repuesto' repuesto.pk %}" 
-                    class="cyber-action-btn cyber-view-btn"
-                    title="Ver detalles">
-                   <i class="fas fa-eye"></i>
-                   <span class="btn-text">VER</span>
-                 </a>
-                 
-                 <!-- Botón Editar -->
-                 <a href="{% url 'taller:repuestos:editar_repuesto' repuesto.pk %}" 
-                    class="cyber-action-btn cyber-edit-btn"
-                    title="Editar repuesto">
-                   <i class="fas fa-edit"></i>
-                   <span class="btn-text">EDITAR</span>
-                 </a>
-                 
-                 <!-- Botón Eliminar -->
-                 <button onclick="confirmarEliminacion({{ repuesto.pk }}, '{{ repuesto.nombre|escapejs }}')" 
-                         class="cyber-action-btn cyber-delete-btn"
-                         title="Eliminar repuesto">
-                   <i class="fas fa-trash"></i>
-                   <span class="btn-text">ELIMINAR</span>
-                 </button>
-               </div>
-             </td>
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="7" class="px-8 py-12 text-center">
-              <div class="flex flex-col items-center gap-4">
-                <div class="w-20 h-20 bg-cyan-900/50 rounded-full flex items-center justify-center">
-                  <i class="fas fa-search text-3xl text-cyan-400"></i>
-                </div>
-                <div class="text-cyan-300 font-orbitron">
-                  <p class="text-lg">SIN DATOS DETECTADOS</p>
-                  <p class="text-sm opacity-70">No hay repuestos registrados en el sistema</p>
-                </div>
-              </div>
-            </td>
-          </tr>
-          {% endfor %}
-                 </tbody>
-       </table>
-     </div>
-     
-     <!-- Paginación Futurista -->
-     {% if is_paginated %}
-     <div class="mt-8">
-       <div class="holographic-card p-6">
-         <nav class="flex items-center justify-center space-x-4">
-           {% if page_obj.has_previous %}
-             <a href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" 
-                class="cyber-button text-sm">
-                <i class="fas fa-angle-double-left mr-1"></i>
-                PRIMERA
-             </a>
-             <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" 
-                class="cyber-button text-sm">
-                <i class="fas fa-angle-left mr-1"></i>
-                ANTERIOR
-             </a>
-           {% endif %}
-           
-           <div class="text-cyan-300 font-orbitron text-sm">
-             <i class="fas fa-layer-group mr-1"></i>
-             PÁGINA {{ page_obj.number }} DE {{ page_obj.paginator.num_pages }}
-           </div>
-           
-           {% if page_obj.has_next %}
-             <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" 
-                class="cyber-button text-sm">
-                SIGUIENTE
-                <i class="fas fa-angle-right ml-1"></i>
-             </a>
-             <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" 
-                class="cyber-button text-sm">
-                ÚLTIMA
-                <i class="fas fa-angle-double-right ml-1"></i>
-             </a>
-           {% endif %}
-         </nav>
-       </div>
-     </div>
-     {% endif %}
-   </div>
- </div>
-
-<!-- JavaScript -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  // =================== VARIABLES GLOBALES ===================
-  const searchInput = document.getElementById('searchInput');
-  const tablaRepuestos = document.getElementById('tabla-repuestos');
-  const loadingSpinner = document.getElementById('loading-spinner');
-  const totalResultados = document.getElementById('total-resultados');
-  let repuestoAEliminar = null;
-  let searchTimeout;
-
-  // =================== FUNCIONES DE BÚSQUEDA FUTURISTA ===================
-  function performSearch() {
-    const query = searchInput.value.trim();
-    
-    // Limpiar timeout anterior
-    clearTimeout(searchTimeout);
-    
-    // Efectos visuales de búsqueda
-    if (query.length > 0) {
-      searchInput.style.borderColor = 'rgba(0, 255, 255, 0.8)';
-      searchInput.style.boxShadow = '0 0 20px rgba(0, 255, 255, 0.5)';
-      totalResultados.textContent = 'ESCANEANDO...';
-    } else {
-      searchInput.style.borderColor = 'rgba(0, 255, 255, 0.3)';
-      searchInput.style.boxShadow = 'none';
-      totalResultados.textContent = 'SINCRONIZADO';
-    }
-    
-    // Establecer nuevo timeout para evitar demasiadas peticiones
-    searchTimeout = setTimeout(() => {
-      if (query) {
-        window.location.href = `?q=${encodeURIComponent(query)}`;
-      } else {
-        window.location.href = window.location.pathname;
-      }
-    }, 500);
-  }
-
-  // =================== FUNCIONES DE PARTÍCULAS DINÁMICAS ===================
-  function createParticle() {
-    const particle = document.createElement('div');
-    particle.className = 'particle';
-    particle.style.left = Math.random() * 100 + '%';
-    particle.style.animationDelay = Math.random() * 6 + 's';
-    document.querySelector('.floating-particles').appendChild(particle);
-    
-    setTimeout(() => particle.remove(), 6000);
-  }
-
-  // =================== FUNCIONES DE ELIMINACIÓN ===================
-  window.confirmarEliminacion = function(id, nombre) {
-    repuestoAEliminar = id;
-    document.getElementById('nombreRepuesto').textContent = nombre;
-    document.getElementById('modalEliminacion').classList.remove('hidden');
-  };
-
-  window.cerrarModal = function() {
-    document.getElementById('modalEliminacion').classList.add('hidden');
-    repuestoAEliminar = null;
-  };
-
-  window.eliminarRepuesto = function() {
-    if (!repuestoAEliminar) return;
-    
-    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-    
-    // Mostrar indicador de carga
-    const deleteBtn = document.querySelector('.cyber-delete-btn');
-    const originalText = deleteBtn.innerHTML;
-    deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span class="btn-text">ELIMINANDO...</span>';
-    deleteBtn.disabled = true;
-    
-    fetch(`/taller/repuestos/${repuestoAEliminar}/eliminar/`, {
-      method: 'POST',
-      headers: {
-        'X-CSRFToken': csrfToken,
-        'Content-Type': 'application/json',
-      },
-    })
-    .then(response => {
-      if (response.ok) {
-        // Mostrar notificación de éxito
-        mostrarNotificacion('Repuesto eliminado exitosamente', 'success');
-        setTimeout(() => {
-          window.location.reload();
-        }, 1500);
-      } else {
-        mostrarNotificacion('Error al eliminar el repuesto', 'error');
-        deleteBtn.innerHTML = originalText;
-        deleteBtn.disabled = false;
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      mostrarNotificacion('Error al eliminar el repuesto', 'error');
-      deleteBtn.innerHTML = originalText;
-      deleteBtn.disabled = false;
-    });
-  };
-  
-  // Función para mostrar notificaciones
-  function mostrarNotificacion(mensaje, tipo) {
-    const notificacion = document.createElement('div');
-    notificacion.className = `fixed top-4 right-4 z-50 p-4 rounded-lg font-orbitron font-bold text-sm transition-all duration-500 transform translate-x-full`;
-    
-    if (tipo === 'success') {
-      notificacion.style.background = 'linear-gradient(45deg, #00ff88, #00cc66)';
-      notificacion.style.color = '#000';
-      notificacion.style.boxShadow = '0 0 20px rgba(0, 255, 136, 0.8)';
-    } else {
-      notificacion.style.background = 'linear-gradient(45deg, #ff4444, #cc0000)';
-      notificacion.style.color = '#fff';
-      notificacion.style.boxShadow = '0 0 20px rgba(255, 68, 68, 0.8)';
-    }
-    
-    notificacion.innerHTML = `
-      <div class="flex items-center gap-3">
-        <i class="fas ${tipo === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
-        <span>${mensaje}</span>
-      </div>
-    `;
-    
-    document.body.appendChild(notificacion);
-    
-    // Animar entrada
-    setTimeout(() => {
-      notificacion.style.transform = 'translateX(0)';
-    }, 100);
-    
-    // Animar salida
-    setTimeout(() => {
-      notificacion.style.transform = 'translateX(full)';
-      setTimeout(() => {
-        notificacion.remove();
-      }, 500);
-    }, 3000);
-  }
-
-  // =================== EVENT LISTENERS ===================
-  if (searchInput) {
-    searchInput.addEventListener('input', performSearch);
-    searchInput.addEventListener('focus', function() {
-      this.style.borderColor = 'rgba(0, 255, 255, 0.8)';
-      this.style.boxShadow = '0 0 20px rgba(0, 255, 255, 0.5)';
-    });
-    searchInput.addEventListener('blur', function() {
-      if (this.value.trim() === '') {
-        this.style.borderColor = 'rgba(0, 255, 255, 0.3)';
-        this.style.boxShadow = 'none';
-      }
-    });
-  }
-
-  // Event listeners para el modal
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-      cerrarModal();
-    }
-  });
-
-  // Cerrar modal al hacer clic fuera
-  document.getElementById('modalEliminacion').addEventListener('click', function(e) {
-    if (e.target === this) {
-      cerrarModal();
-    }
-  });
-
-  // =================== INICIALIZACIÓN ===================
-  console.log('🚀 SISTEMA CYBER INICIADO');
-  console.log('🔧 MÓDULO DE INVENTARIO ACTIVO');
-  
-  // Crear partículas adicionales cada 2 segundos
-  setInterval(createParticle, 2000);
-});
-</script>
-
-<!-- Modal de confirmación de eliminación futurista -->
-<div id="modalEliminacion" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50">
-  <div class="flex items-center justify-center min-h-screen p-4">
-    <div class="relative">
-      <!-- Efecto de borde holográfico -->
-      <div class="absolute -inset-2 rounded-xl bg-gradient-to-r from-red-500 via-pink-500 to-red-500 opacity-30 blur-xl animate-pulse"></div>
+      <span class="px-3 py-2">
+        {% trans "Página" %} {{ page_obj.number }} {% trans "de" %} {{ page_obj.paginator.num_pages }}
+      </span>
       
-      <!-- Contenido del modal -->
-      <div class="relative rounded-xl border border-red-400/50 bg-black/90 backdrop-blur-sm p-8 max-w-md w-full">
-        <div class="text-center">
-          <!-- Icono de advertencia -->
-          <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-red-600/20 to-pink-600/20 border border-red-400/40 flex items-center justify-center">
-            <i class="fas fa-exclamation-triangle text-3xl text-red-400"></i>
-          </div>
-          
-          <!-- Título -->
-          <h3 class="text-2xl font-black neon-text text-red-400 font-orbitron mb-4">
-            CONFIRMAR ELIMINACIÓN
-          </h3>
-          
-          <!-- Mensaje -->
-          <p class="text-gray-300 mb-8 font-orbitron">
-            ¿Está seguro de que desea eliminar el repuesto
-            <span id="nombreRepuesto" class="text-red-400 font-bold"></span>?
-          </p>
-          
-          <!-- Botones de acción -->
-          <div class="flex space-x-4">
-            <button onclick="cerrarModal()" 
-                    class="cyber-action-btn cyber-view-btn flex-1">
-              <i class="fas fa-times"></i>
-              <span class="btn-text">CANCELAR</span>
-            </button>
-            <button onclick="eliminarRepuesto()" 
-                    class="cyber-action-btn cyber-delete-btn flex-1">
-              <i class="fas fa-trash"></i>
-              <span class="btn-text">ELIMINAR</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" 
+           class="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300">{% trans "Siguiente" %}</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" 
+           class="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300">{% trans "Última" %}</a>
+      {% endif %}
+    </nav>
+  </div>
+  {% endif %}
+
+  <!-- Botón para agregar repuesto -->
+  <div class="mt-6">
+    <a href="{% url 'taller:repuestos:crear_repuesto' %}" 
+       class="inline-block px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+      {% trans "Agregar Repuesto" %}
+    </a>
   </div>
 </div>
-
 {% endblock %}

@@ -325,10 +325,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// AJAX para cargar ciudades según país del usuario
+// AJAX para cargar ciudades según región
 document.addEventListener('DOMContentLoaded', function() {
-    // Obtener el país del usuario desde el contexto de Django
-    const userCountry = '{{ request.user.empresa.pais|default:"CL" }}';
     const regionSelect = document.getElementById('id_region');
     const ciudadSelect = document.getElementById('id_ciudad');
     
@@ -340,17 +338,7 @@ document.addEventListener('DOMContentLoaded', function() {
             ciudadSelect.innerHTML = '<option value="">---------</option>';
             
             if (regionId) {
-                // Construir URL según el país del usuario
-                let url;
-                if (userCountry === 'US') {
-                    // Para USA: usar estado_id
-                    url = `/taller/clientes/ajax/ciudades/?estado_id=${regionId}`;
-                } else {
-                    // Para Chile: usar region_id
-                    url = `/taller/clientes/ajax/ciudades/?region_id=${regionId}`;
-                }
-                
-                fetch(url)
+                fetch(`/taller/clientes/ajax/ciudades/?region_id=${regionId}`)
                     .then(response => response.json())
                     .then(data => {
                         data.forEach(ciudad => {

@@ -140,23 +140,6 @@ def dashboard_cl_view(request):
 
 def dashboard_us_view(request):
     """Dashboard simple para USA"""
-    # Si el usuario no está autenticado, mostrar página de bienvenida
-    if not request.user.is_authenticated:
-        # Usar el idioma detectado por el middleware
-        current_language = getattr(request, 'LANGUAGE_CODE', 'en')
-        
-        return render(request, 'onboarding/bienvenida_usa.html', {
-            'current_country': 'US',
-            'country_name': 'United States',
-            'LANGUAGE_CODE': current_language,  # Agregar LANGUAGE_CODE al contexto
-            'language': current_language,
-            'page_title': 'Welcome to eGarage USA',
-            'welcome_message': 'Welcome to eGarage USA',
-            'currency': 'USD',
-            'currency_symbol': '$',
-        })
-    
-    # Si está autenticado, mostrar dashboard
     context = {
         'current_country': 'US', 
         'country_name': 'United States',

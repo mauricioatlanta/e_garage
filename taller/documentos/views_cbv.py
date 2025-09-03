@@ -2,7 +2,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import models
 from django.db.models import Sum, F, DecimalField, ExpressionWrapper
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
-from decimal import Decimal
 from core.views import TenantViewMixin
 from taller.mixins import CountryLangTemplateMixin  # Agregar import del mixin
 from .models import Documento
@@ -83,7 +82,7 @@ class DocumentoDetailView(LoginRequiredMixin, TenantViewMixin, CountryLangTempla
 
         # País y reglas (del context processor que ya tienes)
         tax_base = ctx.get("doc_tax_base", "parts_only")      # "parts_only" (CL) | "subtotal" (US)
-        rate = Decimal(str(ctx.get("doc_tax_rate", 0.0)))     # 0.19 CL | ej. 0.08 US
+        rate = float(ctx.get("doc_tax_rate", 0.0))            # 0.19 CL | ej. 0.08 US
         base = sum_rep if tax_base == "parts_only" else subtotal
         tax = round(base * rate, 2) if getattr(doc, "incluir_iva", True) else 0
         total = subtotal + tax
@@ -390,7 +389,7 @@ class DocumentoUpdateView(LoginRequiredMixin, TenantViewMixin, CountryLangTempla
 
         # País y reglas (del context processor que ya tienes)
         tax_base = ctx.get("doc_tax_base", "parts_only")      # "parts_only" (CL) | "subtotal" (US)
-        rate = Decimal(str(ctx.get("doc_tax_rate", 0.0)))     # 0.19 CL | ej. 0.08 US
+        rate = float(ctx.get("doc_tax_rate", 0.0))            # 0.19 CL | ej. 0.08 US
         base = sum_rep if tax_base == "parts_only" else subtotal
         tax = round(base * rate, 2) if getattr(doc, "incluir_iva", True) else 0
         total = subtotal + tax
@@ -434,14 +433,5 @@ class DocumentoUpdateView(LoginRequiredMixin, TenantViewMixin, CountryLangTempla
             "subtotal": subtotal,
             "iva": tax,            # en US lo mostrarás como Sales Tax (usa tu label dinámico)
             "total": total,
-            # Debug info
-            "debug_sum_rep": float(sum_rep) if sum_rep else 0,
-            "debug_sum_serv": float(sum_serv) if sum_serv else 0,
-            "debug_sum_otros": float(sum_otros) if sum_otros else 0,
-            "debug_subtotal": float(subtotal),
-            "debug_tax": float(tax),
-            "debug_total": float(total),
-            "debug_rate": float(rate),
-            "debug_tax_base": tax_base,
         })
         return ctx

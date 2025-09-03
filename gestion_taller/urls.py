@@ -15,8 +15,6 @@ from taller.views.country_aware_auth import country_aware_login
 # Importar vistas de trial
 from taller.views_extra.views_trial import registro_trial
 from taller.views_extra.views_trial_activate import activar_trial
-# Importar vista de registro general
-from taller.views_extra.suscripcion import registro
 
 
 def redirect_to_home(request):
@@ -47,9 +45,6 @@ urlpatterns = [
     path('registro-trial/', registro_trial, name='registro_trial'),
     path('activar-trial/', activar_trial, name='activar_trial'),
     path('activar/', activar_trial, name='activar_trial_short'),
-    
-    # Registro general
-    path('registro/', registro, name='registro'),
     
     # Login personalizado con contexto de país
     path('accounts/login/', country_aware_login, name='account_login'),
@@ -115,6 +110,5 @@ urlpatterns = [
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     """Redirige registro al nivel global (alias para signup)"""
 

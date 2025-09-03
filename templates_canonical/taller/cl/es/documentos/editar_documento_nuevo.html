@@ -1,13 +1,7 @@
-{% extends "taller/cl/es/documentos/base_documento.html" %}
+{% extends "taller/documentos/base_documento.html" %}
 {% load widget_tweaks %}
 {% load i18n %}
 {% load static %}
-{% load money %}
-
-<!-- Debug info -->
-<!-- Debug Sum Rep: {{ debug_sum_rep }}, Sum Serv: {{ debug_sum_serv }}, Sum Otros: {{ debug_sum_otros }} -->
-<!-- Debug Subtotal: {{ debug_subtotal }}, Tax: {{ debug_tax }}, Total: {{ debug_total }} -->
-<!-- Debug Rate: {{ debug_rate }}, Tax Base: {{ debug_tax_base }} -->
 
 {% block extra_head %}
 {{ block.super }}
@@ -128,18 +122,24 @@
 
 {% block documento_content %}
 <form method="post" id="form-documento"
-      data-country="CL"
-      data-locale="es-CL"
-      data-currency="CLP"
+      data-country="{{ company_country }}"
+      data-locale="{% if company_country == 'US' %}en-US{% else %}es-CL{% endif %}"
+      data-currency="{% if company_country == 'US' %}USD{% else %}CLP{% endif %}"
       data-tax-base="{{ doc_tax_base }}"
       data-tax-rate="{{ doc_tax_rate }}">
   {% csrf_token %}
   <input type="hidden" id="json_items" name="json_items" value="[]">
   <input type="hidden" id="id_incluir_iva" name="incluir_iva" value="{% if documento.incluir_iva %}on{% endif %}">
 
-  {% include "taller/cl/es/documentos/_form_common.html" %}
-  {% include "taller/cl/es/documentos/_form_country_cl.html" %}
-  {% include "taller/cl/es/documentos/_tables_items.html" %}
+  {% include "taller/documentos/_form_common.html" %}
+  
+  {% if company_country == "CL" %}
+    {% include "taller/documentos/_form_country_cl.html" %}
+  {% else %}
+    {% include "taller/documentos/_form_country_us.html" %}
+  {% endif %}
+
+  {% include "taller/documentos/_tables_items.html" %}
 
   <!-- Observaciones al final de la página -->
   <div class="seccion-card" style="margin-top: 2rem;">
@@ -171,15 +171,15 @@
       <div class="invoice-breakdown">
         <div class="breakdown-item">
           <span class="breakdown-label">Subtotal Repuestos:</span>
-          <span class="breakdown-value" id="subtotal-repuestos-invoice">{{ subtotal_repuestos|default:0|money_clp }}</span>
+          <span class="breakdown-value" id="subtotal-repuestos-invoice">{% if company_country == 'US' %}${% else %}${% endif %}{{ subtotal_repuestos|default:0|floatformat:0 }}</span>
         </div>
         <div class="breakdown-item">
           <span class="breakdown-label">Subtotal Servicios:</span>
-          <span class="breakdown-value" id="subtotal-servicios-invoice">{{ subtotal_servicios|default:0|money_clp }}</span>
+          <span class="breakdown-value" id="subtotal-servicios-invoice">{% if company_country == 'US' %}${% else %}${% endif %}{{ subtotal_servicios|default:0|floatformat:0 }}</span>
         </div>
         <div class="breakdown-item">
           <span class="breakdown-label">Subtotal Otros:</span>
-          <span class="breakdown-value" id="subtotal-otros-invoice">{{ subtotal_otros_servicios|default:0|money_clp }}</span>
+          <span class="breakdown-value" id="subtotal-otros-invoice">{% if company_country == 'US' %}${% else %}${% endif %}{{ subtotal_otros|default:0|floatformat:0 }}</span>
         </div>
         <div class="breakdown-divider"></div>
       </div>
@@ -188,7 +188,7 @@
       <div class="invoice-subtotal">
         <div class="subtotal-item">
           <span class="subtotal-label">Subtotal General:</span>
-          <span class="subtotal-value" id="subtotal-invoice">{{ subtotal|default:0|money_clp }}</span>
+          <span class="subtotal-value" id="subtotal-invoice">{% if company_country == 'US' %}${% else %}${% endif %}{{ subtotal|default:0|floatformat:0 }}</span>
         </div>
       </div>
       
@@ -215,7 +215,7 @@
         <div class="tax-amount-container">
           <div class="tax-item">
             <span class="tax-label">{{ doc_tax_label|default:"IVA" }}:</span>
-            <span class="tax-value" id="iva-invoice">{{ iva|default:0|money_clp }}</span>
+            <span class="tax-value" id="iva-invoice">{% if company_country == 'US' %}${% else %}${% endif %}{{ iva|default:0|floatformat:0 }}</span>
           </div>
         </div>
       </div>
@@ -224,7 +224,7 @@
       <div class="invoice-total">
         <div class="total-item">
           <span class="total-label">TOTAL FINAL:</span>
-          <span class="total-value" id="total-invoice">{{ total|default:0|money_clp }}</span>
+          <span class="total-value" id="total-invoice">{% if company_country == 'US' %}${% else %}${% endif %}{{ total|default:0|floatformat:0 }}</span>
         </div>
       </div>
     </div>
@@ -648,7 +648,7 @@ function calcularTotalFila(input) {
   
   const spanTotal = fila.querySelector('.total-fila');
   if (spanTotal) {
-         spanTotal.textContent = '$' + total.toFixed(2);
+    spanTotal.textContent = '{% if company_country == "US" %}${% else %}${% endif %}' + total.toFixed(2);
   }
   
   // Recalcular totales del documento
@@ -666,7 +666,7 @@ function calcularGananciaOtro(input) {
   
   const spanGanancia = fila.querySelector('.ganancia-fila');
   if (spanGanancia) {
-         spanGanancia.textContent = '$' + ganancia.toFixed(2);
+    spanGanancia.textContent = '{% if company_country == "US" %}${% else %}${% endif %}' + ganancia.toFixed(2);
     spanGanancia.style.color = ganancia >= 0 ? '#00f2fe' : '#ff4444';
   }
   
@@ -895,7 +895,7 @@ function mostrarResultadosServicios(servicios, contenedor, query) {
         <div class="autocomplete-item-name">${servicio.nombre}</div>
         <div class="autocomplete-item-details">
           ${servicio.descripcion || 'Sin descripción'}
-                     <span class="autocomplete-item-precio">$${servicio.precio.toFixed(2)}</span>
+          <span class="autocomplete-item-precio">{% if company_country == "US" %}${% else %}${% endif %}${servicio.precio.toFixed(2)}</span>
         </div>
       `;
       item.onclick = () => agregarServicioSeleccionado(servicio);
@@ -940,7 +940,7 @@ function mostrarResultadosOtrosServicios(servicios, contenedor, query) {
         <div class="autocomplete-item-name">${servicio.nombre}</div>
         <div class="autocomplete-item-details">
           ${servicio.empresa_externa || 'Sin empresa'}
-                     <span class="autocomplete-item-precio">$${servicio.precio_cliente.toFixed(2)}</span>
+          <span class="autocomplete-item-precio">{% if company_country == "US" %}${% else %}${% endif %}${servicio.precio_cliente.toFixed(2)}</span>
         </div>
       `;
       item.onclick = () => agregarOtroServicioSeleccionado(servicio);
@@ -992,7 +992,7 @@ function agregarOtroServicioSeleccionado(servicio) {
     <td><input type="text" class="form-input" value="${servicio.empresa_externa}" name="otro_empresa[]"></td>
     <td><input type="number" class="form-input input-number" value="${servicio.costo_interno}" step="0.01" name="otro_costo[]" onchange="calcularGananciaOtro(this)"></td>
     <td><input type="number" class="form-input input-number" value="${servicio.precio_cliente}" step="0.01" name="otro_precio[]" onchange="calcularGananciaOtro(this)"></td>
-         <td><span class="ganancia-fila">$${(servicio.precio_cliente - servicio.costo_interno).toFixed(2)}</span></td>
+    <td><span class="ganancia-fila">{% if company_country == "US" %}${% else %}${% endif %}${(servicio.precio_cliente - servicio.costo_interno).toFixed(2)}</span></td>
     <td><button type="button" class="btn-secondary btn-eliminar" onclick="eliminarFila(this)">🗑️</button></td>
   `;
   

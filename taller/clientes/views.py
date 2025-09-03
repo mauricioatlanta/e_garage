@@ -1,6 +1,11 @@
 # Búsqueda AJAX de clientes por nombre, apellido, email o teléfono
 from taller.models.clientes import Cliente
 from django.db import models
+from django.db.models import ProtectedError
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from django.http import JsonResponse
+from django.core.exceptions import PermissionDenied
 def ajax_buscar_clientes(request):
     q = request.GET.get("q", "").strip()
     if not q:
@@ -107,12 +112,8 @@ def editar_cliente(request, *args, **kwargs):
     log.info("FBV shim: editar_cliente")
     return ClienteUpdateView.as_view()(request, *args, **kwargs)
 
-from taller.models.clientes import Cliente
-from django.shortcuts import redirect, get_object_or_404
 from django.http import HttpResponse, HttpResponseBadRequest
-from django.http import JsonResponse
 from django.db.models import Count
-from django.core.exceptions import PermissionDenied
 
 def eliminar_cliente(request, cliente_id=None, pk=None, *args, **kwargs):
     """Elimina un cliente (confirmación con diseño futurista).
@@ -136,12 +137,36 @@ def eliminar_cliente(request, cliente_id=None, pk=None, *args, **kwargs):
     cliente = get_object_or_404(Cliente, pk=target_id, empresa=empresa)
     
     if request.method == "POST":
-        cliente.delete()
         try:
-            return redirect("taller:clientes:lista_clientes")
-        except Exception:
-            return redirect("clientes:lista_clientes")
-    from django.shortcuts import render
+            cliente.delete()
+            messages.success(request, f"Cliente {cliente.nombre} eliminado exitosamente.")
+            try:
+                return redirect("taller:clientes:lista_clientes")
+            except Exception:
+                return redirect("clientes:lista_clientes")
+        except ProtectedError as e:
+            # Obtener los objetos protegidos
+            protected_objects = e.args[1]
+            documentos = [obj for obj in protected_objects if obj.__class__.__name__ == 'Documento']
+            
+            # Crear mensaje de error informativo
+            if documentos:
+                doc_ids = [str(doc.id) for doc in documentos[:5]]  # Mostrar máximo 5 IDs
+                mensaje = f"No se puede eliminar el cliente {cliente.nombre} porque tiene {len(documentos)} documento(s) asociado(s)"
+                if len(documentos) <= 5:
+                    mensaje += f": {', '.join(doc_ids)}"
+                else:
+                    mensaje += f": {', '.join(doc_ids)} y {len(documentos) - 5} más"
+                mensaje += ". Elimine primero los documentos asociados."
+            else:
+                mensaje = f"No se puede eliminar el cliente {cliente.nombre} porque tiene datos relacionados que lo impiden."
+            
+            messages.error(request, mensaje)
+            return render(request, "taller/clientes/confirmar_eliminacion.html", {"cliente": cliente})
+        except Exception as e:
+            messages.error(request, f"Error inesperado al eliminar el cliente: {str(e)}")
+            return render(request, "taller/clientes/confirmar_eliminacion.html", {"cliente": cliente})
+    
     return render(request, "taller/clientes/confirmar_eliminacion.html", {"cliente": cliente})
 
 

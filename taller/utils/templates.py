@@ -1,95 +1,46 @@
 from django.template.loader import select_template, get_template
 from django.template import TemplateDoesNotExist
 
-def country_lang_template(path: str, country: str, lang: str):
-    """
-    Selecciona template basado en país e idioma con fallbacks usando la nueva estructura canónica.
-    
-    Args:
-        path: Ruta del template (ej: "clientes/crear_cliente.html")
-        country: Código de país (cl/us)
-        lang: Código de idioma (es/en)
-    
-    Returns:
-        Template seleccionado usando la jerarquía:
-        1. {country}/{lang}/{path}
-        2. {country}/{fallback_lang}/{path} (si country=us y lang=en, fallback a es)
-        3. common/{path}
-    """
-    country = (country or "cl").lower()
-    lang = (lang or "es").lower()
-    
-    candidates = []
-    
-    # Template específico del país e idioma
-    if country and lang:
-        candidates.append(f"{country}/{lang}/{path}")
-        
-        # Fallback dentro del país (solo para USA inglés → español)
-        if country == "us" and lang == "en":
-            candidates.append(f"{country}/es/{path}")
-    
-    # Fallback global
-    candidates.append(f"common/{path}")
-    
-    return select_template(candidates)
-
-def get_country_from_request(request):
-    """
-    Obtiene el país desde el request, con prioridad:
-    1. request.country (seteado por CountryContextMiddleware)
-    2. URL path (/cl/ o /us/)
-    3. Usuario/empresa
-    """
-    # Prioridad 1: País detectado por middleware
-    if hasattr(request, 'country') and request.country:
-        return request.country.lower()
-    
-    # Prioridad 2: País desde URL
-    path = request.path.lower()
-    if path.startswith('/cl/'):
-        return 'cl'
-    elif path.startswith('/us/'):
-        return 'us'
-    
-    # Prioridad 3: País del usuario/empresa
-    if hasattr(request, 'user') and request.user.is_authenticated:
-        if hasattr(request.user, 'empresa') and hasattr(request.user.empresa, 'pais'):
-            return request.user.empresa.pais.lower()
-    
-    return None
-
 def select_country_lang_template(base_path: str, country: str, lang: str, fallback_lang="es"):
     """
-    Función legacy mantenida para compatibilidad.
-    Devuelve la ruta del template como cadena, no el objeto Template.
+    Selecciona template basado en país e idioma con fallbacks.
+    
+    Args:
+        base_path: Ruta base del template (ej: "documentos/crear_documento.html")
+        country: Código de país (CL/US)
+        lang: Código de idioma (es/en)
+        fallback_lang: Idioma de fallback por defecto
+    
+    Returns:
+        Nombre del template seleccionado usando la jerarquía:
+        1. taller/{country}/{lang}/{base_path}
+        2. taller/{country}/{lang}/common/{base_path}
+        3. taller/{country}/{fallback_lang}/{base_path}
+        4. taller/{country}/{fallback_lang}/common/{base_path}
+        5. taller/cl/{lang}/{base_path}
+        6. taller/cl/{lang}/common/{base_path}
+        7. taller/common/{base_path}
     """
-    # Construir la ruta del template directamente
-    country = (country or "cl").lower()
-    lang = (lang or "es").lower()
+    country = (country or "CL").lower()
+    lang = (lang or fallback_lang).lower()
     
-    # Construir candidatos en orden de prioridad
-    candidates = []
+    candidates = [
+        f"taller/{country}/{lang}/{base_path}",
+        f"taller/{country}/{lang}/common/{base_path}",
+        f"taller/{country}/{fallback_lang}/{base_path}",
+        f"taller/{country}/{fallback_lang}/common/{base_path}",
+        f"taller/cl/{lang}/{base_path}",
+        f"taller/cl/{lang}/common/{base_path}",
+        f"taller/common/{base_path}",
+    ]
     
-    # Template específico del país e idioma
-    if country and lang:
-        candidates.append(f"{country}/{lang}/{base_path}")
-        
-        # Fallback dentro del país (solo para USA inglés → español)
-        if country == "us" and lang == "en":
-            candidates.append(f"{country}/es/{base_path}")
-    
-    # Fallback global
-    candidates.append(f"common/{base_path}")
-    
-    # Devolver la primera ruta que exista
-    from django.template.loader import get_template
+    # Intentar encontrar el primer template que existe
     for candidate in candidates:
         try:
             get_template(candidate)
             return candidate
-        except:
+        except TemplateDoesNotExist:
             continue
     
-    # Si no se encuentra ninguno, devolver el fallback común
-    return f"common/{base_path}"
+    # Si ninguno existe, retornar el último candidato como fallback
+    return candidates[-1]

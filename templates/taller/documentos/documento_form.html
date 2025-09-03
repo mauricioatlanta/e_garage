@@ -93,19 +93,10 @@ window.country = "{{ user.empresa.pais|default:'CL' }}";
           
           <div class="flex items-center mt-4">
             <label for="{{ form.pagado.id_for_label }}" class="flex items-center text-cyan-200">
-              {{ form.pagado }}
+              {{ form.pagado|add_class:"mr-2 text-cyan-400" }}
               {% trans "Pagado" %}
             </label>
           </div>
-          
-          <!-- Campo de kilometraje/millas -->
-          <label class="block mt-4 mb-2 font-semibold text-cyan-200">
-            {% if user.empresa.pais == 'US' %}🚗 Mileage (miles){% else %}🚗 Kilometraje{% endif %}
-          </label>
-          {{ form.kilometraje }}
-          {% if form.kilometraje.errors %}
-            <div class="text-red-400 text-sm mt-1">{{ form.kilometraje.errors.0 }}</div>
-          {% endif %}
         </div>
       </div>
 

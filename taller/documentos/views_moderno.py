@@ -116,7 +116,8 @@ def crear_documento_moderno(request):
         get_language()
     )
     
-    return render(request, template_name, context)
+    from django.template.response import TemplateResponse
+    return TemplateResponse(request, template_name, context)
 
 def obtener_datos_formulario(empresa):
     """Obtener todos los datos necesarios para el formulario"""
@@ -838,7 +839,7 @@ def documento_form(request, pk=None):
         get_language()
     )
     
-    return render(request, template_name, {
+    return TemplateResponse(request, template_name, {
             "form": form,
             "documento": documento,
             "es_edicion": bool(pk),
@@ -868,7 +869,7 @@ def documento_form(request, pk=None):
         get_language()
     )
     
-    return render(request, template_name, {
+    return TemplateResponse(request, template_name, {
         "form": form,
         "documento": documento,
         "es_edicion": bool(pk),

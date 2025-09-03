@@ -154,62 +154,48 @@
             </div>
           </div>
 
-          <!-- Ubicación USA -->
+          <!-- Ubicación -->
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
             <h3 class="lg:col-span-2 text-3xl font-bold bg-gradient-to-r from-purple-300 to-pink-300 bg-clip-text text-transparent mb-6 flex items-center gap-3">
               <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
               </svg>
-              Location
+              Ubicación
             </h3>
             
-            <!-- State -->
+            <!-- Región -->
             <div class="group">
               <label class="block text-purple-300 text-lg font-semibold mb-3 group-focus-within:text-purple-200 transition-colors">
-                State
+                Región
               </label>
               <div class="relative">
-                {{ form.estado_usa|add_class:"w-full p-4 bg-white border-2 border-gray-300 rounded-xl text-black text-lg focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 focus:bg-white transition-all duration-300" }}
+                {{ form.region|add_class:"w-full p-4 bg-white border-2 border-gray-300 rounded-xl text-black text-lg focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 focus:bg-white transition-all duration-300" }}
                 <div class="absolute inset-0 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
               </div>
-              {% if form.estado_usa.errors %}
-                <div class="mt-2 text-red-400 text-sm">{{ form.estado_usa.errors.0 }}</div>
+              {% if form.region.errors %}
+                <div class="mt-2 text-red-400 text-sm">{{ form.region.errors.0 }}</div>
               {% endif %}
             </div>
             
-            <!-- City -->
+            <!-- Ciudad -->
             <div class="group">
               <label class="block text-purple-300 text-lg font-semibold mb-3 group-focus-within:text-purple-200 transition-colors">
-                City
+                Ciudad
               </label>
               <div class="relative">
-                {{ form.ciudad_usa|add_class:"w-full p-4 bg-white border-2 border-gray-300 rounded-xl text-black text-lg focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 focus:bg-white transition-all duration-300" }}
+                {{ form.ciudad|add_class:"w-full p-4 bg-white border-2 border-gray-300 rounded-xl text-black text-lg focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 focus:bg-white transition-all duration-300" }}
                 <div class="absolute inset-0 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
               </div>
-              {% if form.ciudad_usa.errors %}
-                <div class="mt-2 text-red-400 text-sm">{{ form.ciudad_usa.errors.0 }}</div>
+              {% if form.ciudad.errors %}
+                <div class="mt-2 text-red-400 text-sm">{{ form.ciudad.errors.0 }}</div>
               {% endif %}
             </div>
             
-            <!-- Zip Code -->
-            <div class="group">
-              <label class="block text-purple-300 text-lg font-semibold mb-3 group-focus-within:text-purple-200 transition-colors">
-                Zip Code
-              </label>
-              <div class="relative">
-                {{ form.zipcode|add_class:"w-full p-4 bg-white border-2 border-gray-300 rounded-xl text-black text-lg placeholder-gray-500 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 focus:bg-white transition-all duration-300" }}
-                <div class="absolute inset-0 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-              </div>
-              {% if form.zipcode.errors %}
-                <div class="mt-2 text-red-400 text-sm">{{ form.zipcode.errors.0 }}</div>
-              {% endif %}
-            </div>
-            
-            <!-- Address -->
+            <!-- Dirección -->
             <div class="lg:col-span-2 group">
               <label class="block text-purple-300 text-lg font-semibold mb-3 group-focus-within:text-purple-200 transition-colors">
-                Address
+                Dirección
               </label>
               <div class="relative">
                 {{ form.direccion|add_class:"w-full p-4 bg-white border-2 border-gray-300 rounded-xl text-black text-lg placeholder-gray-500 focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 focus:bg-white transition-all duration-300" }}
@@ -339,31 +325,27 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// AJAX para cargar ciudades de USA
+// AJAX para cargar ciudades según región
 document.addEventListener('DOMContentLoaded', function() {
-    const stateSelect = document.getElementById('id_estado_usa');
-    const citySelect = document.getElementById('id_ciudad_usa');
+    const regionSelect = document.getElementById('id_region');
+    const ciudadSelect = document.getElementById('id_ciudad');
     
-    if (stateSelect && citySelect) {
-        stateSelect.addEventListener('change', function() {
-            const stateId = this.value;
+    if (regionSelect && ciudadSelect) {
+        regionSelect.addEventListener('change', function() {
+            const regionId = this.value;
             
             // Limpiar opciones de ciudad
-            citySelect.innerHTML = '<option value="">---------</option>';
+            ciudadSelect.innerHTML = '<option value="">---------</option>';
             
-            if (stateId) {
-                // Para USA: usar estado_id
-                const url = `/taller/clientes/ajax/ciudades/?estado_id=${stateId}`;
-                console.log('Loading USA cities for state:', stateId);
-                
-                fetch(url)
+            if (regionId) {
+                fetch(`/taller/clientes/ajax/ciudades/?region_id=${regionId}`)
                     .then(response => response.json())
                     .then(data => {
                         data.forEach(ciudad => {
                             const option = document.createElement('option');
                             option.value = ciudad.id;
                             option.textContent = ciudad.nombre;
-                            citySelect.appendChild(option);
+                            ciudadSelect.appendChild(option);
                         });
                     })
                     .catch(error => {

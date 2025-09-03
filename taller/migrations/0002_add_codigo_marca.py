@@ -1,4 +1,4 @@
-from django.db import migrations
+from django.db import migrations, models
 
 def generar_codigo_marca(apps, schema_editor):
     Marca = apps.get_model('taller', 'Marca')
@@ -23,5 +23,12 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        # Primero agregar el campo
+        migrations.AddField(
+            model_name='marca',
+            name='codigo',
+            field=models.CharField(max_length=10, unique=True, null=True, blank=True, help_text='Código único de la marca'),
+        ),
+        # Luego poblar el campo
         migrations.RunPython(generar_codigo_marca),
     ]

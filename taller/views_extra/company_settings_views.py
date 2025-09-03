@@ -8,7 +8,7 @@ from django.conf import settings
 from django.core.cache import cache
 from taller.models import ConfiguracionEmpresa
 from taller.forms.configuracion_forms import CompanyInfoForm
-from taller.context_processors import invalidate_company_branding_cache
+from taller.context_processors import invalidate_company_cache
 import json
 import base64
 
@@ -54,10 +54,11 @@ def company_settings_view(request):
             print("🔍 DEBUG: Logo URL:", getattr(company_settings.logo, "url", None) if company_settings.logo else "None")
             
             # ✅ Invalidar cache del context processor para que se vea el cambio al tiro
-            invalidate_company_branding_cache(request.user.empresa.id, request)
+            invalidate_company_cache(request.user.id)
             
             # Invalidación adicional específica para company_settings
             cache.delete(f"company_settings:{request.user.empresa.id}")
+            cache.delete(f"company_settings_{request.user.id}")
             
             messages.success(request, '🏢 Información de empresa actualizada exitosamente!')
         else:
@@ -113,7 +114,9 @@ def upload_logo_ajax(request):
             company_settings.save()
             
             # Invalidar cache
-            # invalidate_company_cache(request.user.id)
+            invalidate_company_cache(request.user.id)
+            cache.delete(f"company_settings_{request.user.id}")
+            cache.delete(f"company_settings:{request.user.empresa.id}")
             
             return JsonResponse({
                 'success': True,
@@ -206,7 +209,9 @@ def reset_branding(request):
             company_settings.save()
             
             # Invalidar cache
-            # invalidate_company_cache(request.user.id)
+            invalidate_company_cache(request.user.id)
+            cache.delete(f"company_settings_{request.user.id}")
+            cache.delete(f"company_settings:{request.user.empresa.id}")
             
             messages.success(request, 'Branding restablecido a valores por defecto')
             
