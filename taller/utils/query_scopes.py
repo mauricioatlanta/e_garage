@@ -1,5 +1,19 @@
 from django.db import models
 
+def scoped_qs(qs: models.QuerySet, request) -> models.QuerySet:
+    """Aplica scopes de seguridad basados en el usuario y empresa actual
+    
+    Args:
+        qs (QuerySet): QuerySet original a filtrar
+        request (HttpRequest): Objeto request con usuario autenticado
+    
+    Returns:
+        QuerySet: QuerySet filtrado según los permisos
+    """
+    if hasattr(qs.model, 'empresa') and hasattr(request.user, 'empresa'):
+        return qs.filter(empresa=request.user.empresa)
+    return qs
+
 class QueryScope:
     """Clase base para aplicar scopes de consulta por empresa y país"""
     
