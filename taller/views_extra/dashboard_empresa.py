@@ -350,9 +350,13 @@ def dashboard_centro_operaciones_espacial(request):
     if lang in ['es', 'en']:
         activate(lang)
 
+    # Detectar país desde la URL o del usuario
+    from taller.utils.templates import get_country_from_request
+    country = get_country_from_request(request) or getattr(request.user.empresa, 'pais', 'cl').lower()
+    
     template_name = select_country_lang_template(
         "dashboard/centro_operaciones_espacial.html", 
-        getattr(request.user.empresa, 'pais', 'cl').lower(), 
+        country, 
         get_language()
     )
 

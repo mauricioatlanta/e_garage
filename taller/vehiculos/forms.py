@@ -21,6 +21,9 @@ class VehiculoForm(forms.ModelForm):
         assert self.user is not None, "VehiculoForm requiere user=..."
         empresa = getattr(self.user, 'empresa', None)
         pais = (getattr(empresa, 'pais', None) or 'CL').strip().upper()
+        
+        # DEBUG: Log del país detectado
+        print(f'[DEBUG FORM] Usuario: {self.user.username}, Empresa: {getattr(empresa, "id", "None")}, País: {pais}')
 
         # Configurar campo color como CharField para mayor flexibilidad
         from taller.models.extras_vehiculo import ColorVehiculo
@@ -48,31 +51,33 @@ class VehiculoForm(forms.ModelForm):
 
         if pais == 'US':
             # Para usuarios de USA: usar catálogo USA
+            print(f'[DEBUG FORM] Configurando campos para USA (pais={pais})')
             try:
                 from taller.models.catalogo import CatalogoModeloAuto
                 
                 if CatalogoModeloAuto:
-                    print('DEBUG: Configurando campos USA usando catálogo')
+                    print('[DEBUG FORM] Configurando campos USA usando catálogo')
                     
                     # Obtener marcas del catálogo USA
                     marcas_usa = list(CatalogoModeloAuto.get_marcas_activas())
                     marcas_choices = [('', '---------')] + [(m, m) for m in marcas_usa]
+                    print(f'[DEBUG FORM] Configurando {len(marcas_usa)} marcas de USA')
                     
-                    # Campo marca para USA (usando catálogo)
-                    self.fields['marca'] = forms.ChoiceField(
+                    # Campo marca_texto para USA (usando catálogo)
+                    self.fields['marca_texto'] = forms.ChoiceField(
                         choices=marcas_choices,
                         required=True,
-                        label='Marca',
+                        label='Brand',
                         widget=forms.Select(attrs={
                             'class': 'w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400'
                         })
                     )
                     
-                    # Campo modelo para USA (se carga dinámicamente via AJAX)
-                    self.fields['modelo'] = forms.ChoiceField(
+                    # Campo modelo_texto para USA (se carga dinámicamente via AJAX)
+                    self.fields['modelo_texto'] = forms.ChoiceField(
                         choices=[('', '---------')],
                         required=True,
-                        label='Modelo',
+                        label='Model',
                         widget=forms.Select(attrs={
                             'class': 'w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400'
                         })
@@ -82,7 +87,7 @@ class VehiculoForm(forms.ModelForm):
                     self.fields['motor'] = forms.ChoiceField(
                         choices=[('', '---------')],
                         required=False,
-                        label='Motor',
+                        label='Engine',
                         widget=forms.Select(attrs={
                             'class': 'w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400'
                         })
@@ -91,7 +96,7 @@ class VehiculoForm(forms.ModelForm):
                     self.fields['caja'] = forms.ChoiceField(
                         choices=[('', '---------')],
                         required=False,
-                        label='Caja',
+                        label='Transmission',
                         widget=forms.Select(attrs={
                             'class': 'w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400'
                         })
@@ -99,17 +104,24 @@ class VehiculoForm(forms.ModelForm):
                     
                     # CLAVE: Configurar dependencia entre marca y modelo para USA
                     marca_inicial = None
-                    if self.instance and self.instance.pk and self.instance.marca_id:
-                        marca_inicial = self.instance.marca_id
+                    if self.instance and self.instance.pk and self.instance.marca_texto:
+                        marca_inicial = self.instance.marca_texto
+                    elif self.instance and self.instance.pk and self.instance.marca:
+                        # MIGRACIÓN: Si el vehículo tiene marca antigua (ForeignKey), migrarla a texto
+                        marca_inicial = str(self.instance.marca)
+                        # Actualizar el campo en la base de datos
+                        self.instance.marca_texto = marca_inicial
+                        self.instance.save(update_fields=['marca_texto'])
+                        print(f'[DEBUG FORM] Migrado marca antigua "{marca_inicial}" a marca_texto')
                     else:
-                        marca_inicial = (self.data.get('marca') or None)
+                        marca_inicial = (self.data.get('marca_texto') or None)
 
                     if marca_inicial:
                         # Para USA, la marca es un string del catálogo
                         try:
                             modelos = CatalogoModeloAuto.get_modelos_por_marca(marca_inicial)
                             modelos_choices = [('', '---------')] + [(m, m) for m in modelos]
-                            self.fields['modelo'].choices = modelos_choices
+                            self.fields['modelo_texto'].choices = modelos_choices
                         except Exception:
                             # Si hay error, dejar opciones vacías
                             pass
@@ -117,20 +129,44 @@ class VehiculoForm(forms.ModelForm):
                     # CLAVE: Establecer valores iniciales para vehículos existentes
                     if self.instance and self.instance.pk:
                         # Establecer marca inicial
-                        if self.instance.marca_id:
-                            self.fields['marca'].initial = self.instance.marca_id
+                        if self.instance.marca_texto:
+                            self.fields['marca_texto'].initial = self.instance.marca_texto
+                        elif self.instance.marca:
+                            # MIGRACIÓN: Usar marca antigua como inicial
+                            marca_migrada = str(self.instance.marca)
+                            self.fields['marca_texto'].initial = marca_migrada
+                            print(f'[DEBUG FORM] Usando marca migrada como inicial: {marca_migrada}')
                         
                         # Establecer modelo inicial
-                        if self.instance.modelo_id:
-                            self.fields['modelo'].initial = self.instance.modelo_id
+                        if self.instance.modelo_texto:
+                            self.fields['modelo_texto'].initial = self.instance.modelo_texto
+                        elif self.instance.modelo:
+                            # MIGRACIÓN: Usar modelo antiguo como inicial
+                            modelo_migrado = str(self.instance.modelo)
+                            self.fields['modelo_texto'].initial = modelo_migrado
+                            # Actualizar el campo en la base de datos
+                            self.instance.modelo_texto = modelo_migrado
+                            self.instance.save(update_fields=['modelo_texto'])
+                            print(f'[DEBUG FORM] Migrado modelo antiguo "{modelo_migrado}" a modelo_texto')
                         
                         # Establecer motor inicial
                         if self.instance.motor_id:
-                            self.fields['motor'].initial = self.instance.motor_id
+                            self.fields['motor'].initial = str(self.instance.motor_id)
                         
                         # Establecer caja inicial
                         if self.instance.caja_id:
-                            self.fields['caja'].initial = self.instance.caja_id
+                            self.fields['caja'].initial = str(self.instance.caja_id)
+                    
+                    # IMPORTANTE: Remover campos de Chile para evitar confusión
+                    if 'marca' in self.fields:
+                        del self.fields['marca']
+                        print('[DEBUG FORM] Campo marca (Chile) removido')
+                    if 'modelo' in self.fields:
+                        del self.fields['modelo']
+                        print('[DEBUG FORM] Campo modelo (Chile) removido')
+                    
+                else:
+                    print('[DEBUG FORM] Catálogo global no disponible')
                     
             except ImportError:
                 print('DEBUG: Error importing CatalogoModeloAuto')
@@ -138,12 +174,14 @@ class VehiculoForm(forms.ModelForm):
                 pass
         else:
             # Chile: agregar campos marca y modelo como ChoiceField
+            print(f'[DEBUG FORM] Configurando campos para Chile (pais={pais})')
             from taller.models.marca import Marca
             from taller.models.modelo import Modelo
             
             # Campo marca para Chile
             marcas = Marca.objects.filter(country='CL').order_by('nombre')
             marcas_choices = [('', '---------')] + [(str(m.id), m.nombre) for m in marcas]
+            print(f'[DEBUG FORM] Configurando {len(marcas)} marcas de Chile')
             self.fields['marca'] = forms.ChoiceField(
                 choices=marcas_choices,
                 required=True,
@@ -228,18 +266,76 @@ class VehiculoForm(forms.ModelForm):
                     if self.instance.caja_id:
                         self.fields['caja'].initial = str(self.instance.caja_id)
 
+    def add_usa_fields(self):
+        """Agregar campos específicos para usuarios de USA"""
+        try:
+            from taller.models.catalogo import CatalogoModeloAuto
+            
+            if CatalogoModeloAuto:
+                print('DEBUG: Configurando campos USA usando catálogo')
+                
+                # Obtener marcas del catálogo USA
+                marcas_usa = list(CatalogoModeloAuto.get_marcas_activas())
+                marcas_choices = [('', '---------')] + [(m, m) for m in marcas_usa]
+                
+                # Campo marca para USA (usando catálogo)
+                self.fields['marca'] = forms.ChoiceField(
+                    choices=marcas_choices,
+                    required=True,
+                    label='Marca',
+                    widget=forms.Select(attrs={
+                        'class': 'w-full px-4 py-2 rounded-xl bg-black/70 text-cyan-200 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400'
+                    })
+                )
+                
+                # Campo modelo para USA (se carga dinámicamente via AJAX)
+                self.fields['modelo'] = forms.ChoiceField(
+                    choices=[('', '---------')],
+                    required=True,
+                    label='Modelo',
+                    widget=forms.Select(attrs={
+                        'class': 'w-full px-4 py-2 rounded-xl bg-black/70 text-cyan-200 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400'
+                    })
+                )
+                
+                # Configurar campos motor y caja como ChoiceField
+                self.fields['motor'] = forms.ChoiceField(
+                    choices=[('', '---------')],
+                    required=False,
+                    label='Motor',
+                    widget=forms.Select(attrs={
+                        'class': 'w-full px-4 py-2 rounded-xl bg-black/70 text-cyan-200 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400'
+                    })
+                )
+                
+                self.fields['caja'] = forms.ChoiceField(
+                    choices=[('', '---------')],
+                    required=False,
+                    label='Caja',
+                    widget=forms.Select(attrs={
+                        'class': 'w-full px-4 py-2 rounded-xl bg-black/70 text-cyan-200 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400'
+                    })
+                )
+                
+                print(f'DEBUG: Campos USA configurados - {len(marcas_choices)-1} marcas disponibles')
+                
+        except ImportError:
+            print('DEBUG: Error importing CatalogoModeloAuto')
+            # Fallback si no se puede importar el catálogo
+            pass
+
     def clean(self):
         cleaned_data = super().clean()
         if self.user and hasattr(self.user, 'empresa') and self.user.empresa.pais == 'US':
             # Para usuarios de USA, los campos marca y modelo ya están configurados como ChoiceField
             # Solo validar que estén presentes
-            marca = cleaned_data.get('marca')
-            modelo = cleaned_data.get('modelo')
+            marca = cleaned_data.get('marca_texto')
+            modelo = cleaned_data.get('modelo_texto')
             
             if not marca:
-                self.add_error('marca', 'Debe seleccionar una marca')
+                self.add_error('marca_texto', 'Debe seleccionar una marca')
             if not modelo:
-                self.add_error('modelo', 'Debe seleccionar un modelo')
+                self.add_error('modelo_texto', 'Debe seleccionar un modelo')
             
             # Para USA, motor y caja son opcionales
             motor = cleaned_data.get('motor')

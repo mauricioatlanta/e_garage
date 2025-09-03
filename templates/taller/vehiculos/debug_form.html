@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto p-8">
+    <h1 class="text-3xl font-bold mb-6">🔍 DEBUG FORMULARIO VEHÍCULOS</h1>
+    
+    <div class="bg-gray-100 p-6 rounded-lg mb-6">
+        <h2 class="text-xl font-semibold mb-4">📊 INFORMACIÓN DEL USUARIO</h2>
+        <p><strong>Usuario:</strong> {{ user.username }}</p>
+        <p><strong>Empresa:</strong> {{ user.empresa.nombre_taller }}</p>
+        <p><strong>País:</strong> {{ user.empresa.pais }}</p>
+        <p><strong>Country (context):</strong> {{ country|default:"No definido" }}</p>
+    </div>
+
+    <div class="bg-blue-100 p-6 rounded-lg mb-6">
+        <h2 class="text-xl font-semibold mb-4">📋 CAMPOS DEL FORMULARIO</h2>
+        <p><strong>Total campos:</strong> {{ form.fields|length }}</p>
+        
+        <div class="grid grid-cols-2 gap-4">
+            {% for field_name, field in form.fields.items %}
+            <div class="bg-white p-4 rounded border">
+                <h3 class="font-semibold text-blue-800">{{ field_name }}</h3>
+                <p><strong>Tipo:</strong> {{ field|class_name }}</p>
+                <p><strong>Label:</strong> {{ field.label }}</p>
+                <p><strong>Required:</strong> {{ field.required }}</p>
+                {% if field.choices %}
+                    <p><strong>Choices:</strong> {{ field.choices|length }}</p>
+                    <details class="mt-2">
+                        <summary class="cursor-pointer text-sm text-blue-600">Ver opciones</summary>
+                        <div class="mt-2 text-sm">
+                            {% for value, label in field.choices|slice:":10" %}
+                                <div>{{ value }} -> {{ label }}</div>
+                            {% endfor %}
+                            {% if field.choices|length > 10 %}
+                                <div class="text-gray-500">... y {{ field.choices|length|add:"-10" }} más</div>
+                            {% endif %}
+                        </div>
+                    </details>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="bg-green-100 p-6 rounded-lg mb-6">
+        <h2 class="text-xl font-semibold mb-4">🎯 VERIFICACIÓN ESPECÍFICA</h2>
+        
+        <div class="space-y-4">
+            <div>
+                <h3 class="font-semibold">Campos USA:</h3>
+                <p>marca_texto: {% if 'marca_texto' in form.fields %}✅ PRESENTE{% else %}❌ AUSENTE{% endif %}</p>
+                <p>modelo_texto: {% if 'modelo_texto' in form.fields %}✅ PRESENTE{% else %}❌ AUSENTE{% endif %}</p>
+            </div>
+            
+            <div>
+                <h3 class="font-semibold">Campos Chile:</h3>
+                <p>marca: {% if 'marca' in form.fields %}✅ PRESENTE{% else %}❌ AUSENTE{% endif %}</p>
+                <p>modelo: {% if 'modelo' in form.fields %}✅ PRESENTE{% else %}❌ AUSENTE{% endif %}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-yellow-100 p-6 rounded-lg">
+        <h2 class="text-xl font-semibold mb-4">🧪 RENDERIZADO DE CAMPOS</h2>
+        
+        <div class="space-y-4">
+            <div>
+                <h3 class="font-semibold">Campo marca_texto (USA):</h3>
+                {% if 'marca_texto' in form.fields %}
+                    {{ form.marca_texto }}
+                {% else %}
+                    <p class="text-red-600">❌ Campo marca_texto no encontrado</p>
+                {% endif %}
+            </div>
+            
+            <div>
+                <h3 class="font-semibold">Campo marca (Chile):</h3>
+                {% if 'marca' in form.fields %}
+                    {{ form.marca }}
+                {% else %}
+                    <p class="text-green-600">✅ Campo marca removido correctamente</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

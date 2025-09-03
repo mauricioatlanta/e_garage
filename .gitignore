@@ -33,3 +33,6 @@ test_*.py
 crear_*.py
 cargar_*.py
 verificar_*.py
+.aider*
+.env
+.env

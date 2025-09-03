@@ -154,11 +154,26 @@ def _render_form_with_context(request, form, country, empresa):
 
 def editar_vehiculo(request, *args, **kwargs):
     log.info("FBV shim: editar_vehiculo")
-    # Normalizar nombre de argumento a 'pk' para compatibilidad con UpdateView
-    vehiculo_id = kwargs.pop('vehiculo_id', None)
-    if vehiculo_id is not None:
-        kwargs['pk'] = vehiculo_id
-    return VehiculoUpdateView.as_view()(request, *args, **kwargs)
+    
+    # Obtener empresa del usuario para detectar país
+    empresa = getattr(request.user, "empresa", None)
+    raw_country = getattr(empresa, 'pais', None) or 'CL'
+    country = str(raw_country).strip().upper()
+    
+    if country not in ('CL', 'US'):
+        log.warning("[editar_vehiculo] country desconocido '%s' normalizado a 'CL'", country)
+        country = 'CL'
+    
+    # 🔴 REDIRIGIR A LA VISTA ESPECÍFICA SEGÚN EL PAÍS
+    if country == 'US':
+        from taller.vehiculos.views_usa import editar_vehiculo as editar_vehiculo_usa
+        return editar_vehiculo_usa(request, **kwargs)
+    else:
+        # Normalizar nombre de argumento a 'pk' para compatibilidad con UpdateView
+        vehiculo_id = kwargs.pop('vehiculo_id', None)
+        if vehiculo_id is not None:
+            kwargs['pk'] = vehiculo_id
+        return VehiculoUpdateView.as_view()(request, *args, **kwargs)
 
 
 def eliminar_vehiculo(request, vehiculo_id, *args, **kwargs):

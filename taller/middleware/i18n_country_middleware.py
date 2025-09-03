@@ -46,6 +46,10 @@ class CountryLanguageMiddleware(MiddlewareMixin):
         # Priorizar el país del usuario sobre la URL
         # Si no hay usuario logueado, usar el país de la URL como fallback
         country = user_country if user_country else url_country
+        
+        # Debug logging
+        if getattr(settings, 'DEBUG', False):
+            logger.info(f"🌍 CountryLanguageMiddleware: URL={path}, user_country={user_country}, url_country={url_country}, final_country={country}")
         request.country = country
         
 
@@ -82,6 +86,11 @@ class CountryLanguageMiddleware(MiddlewareMixin):
         lang = lang or "es"  # Fallback final
         translation.activate(lang)
         request.LANGUAGE_CODE = lang
+        
+        # Debug logging
+        if getattr(settings, 'DEBUG', False):
+            username = getattr(request.user, 'username', 'anonymous') if hasattr(request, 'user') else 'no_user_yet'
+            logger.info(f"🗣️ CountryLanguageMiddleware: Final language={lang}, country={country}, user={username}")
 
         response = self.get_response(request)
         response.headers["Content-Language"] = lang

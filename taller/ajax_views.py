@@ -4,6 +4,26 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 import json
 
+# --- helper de país (reutilizable) ---
+def _resolve_country_from_request(request):
+    # 1) middleware: request.empresa.pais
+    empresa = getattr(request, "empresa", None)
+    pais = getattr(empresa, "pais", None)
+    if pais in ("CL", "US"):
+        return pais
+    # 2) perfil: request.user.empresa.pais
+    user_emp = getattr(getattr(request, "user", None), "empresa", None)
+    pais = getattr(user_emp, "pais", None)
+    if pais in ("CL", "US"):
+        return pais
+    # 3) prefijo de URL (cinturón y tirantes)
+    path = (request.path or "").lower()
+    if path.startswith("/us/"): 
+        return "US"
+    if path.startswith("/cl/"): 
+        return "CL"
+    return None
+
 @login_required
 @require_http_methods(["GET"])
 def ajax_marcas(request):
@@ -11,12 +31,13 @@ def ajax_marcas(request):
     try:
         from taller.models.marca import Marca
         
-        # Obtener marcas de la base de datos ordenadas alfabéticamente
-        marcas_qs = Marca.objects.filter(country='CL').order_by('nombre')
+        # 🔴 PARCHE: Filtrar por país del usuario
+        country = _resolve_country_from_request(request)
+        qs = Marca.objects.filter(country=country).order_by("nombre") if country else Marca.objects.none()
         
         marcas = [
             {'id': marca.id, 'nombre': marca.nombre}
-            for marca in marcas_qs
+            for marca in qs
         ]
         
         return JsonResponse({
@@ -38,6 +59,10 @@ def ajax_modelos(request):
         from taller.models.marca import Marca
         from taller.models.modelo import Modelo
         
+        # 🔴 PARCHE: Filtrar por país del usuario
+        country = _resolve_country_from_request(request)
+        qs = Modelo.objects.filter(country=country) if country else Modelo.objects.none()
+        
         marca_id = request.GET.get('marca_id', '')
         
         if not marca_id:
@@ -46,20 +71,18 @@ def ajax_modelos(request):
         # Si marca_id es un nombre de marca (string), buscar por nombre
         if isinstance(marca_id, str) and not marca_id.isdigit():
             try:
-                marca = Marca.objects.get(nombre=marca_id, country='CL')
+                marca = Marca.objects.get(nombre=marca_id, country=country)
                 marca_id = marca.id
             except Marca.DoesNotExist:
                 return JsonResponse([])
         
-        # Obtener modelos de la base de datos
-        modelos_qs = Modelo.objects.filter(
-            marca_id=marca_id,
-            country='CL'
-        ).order_by('nombre')
+        # 🔴 PARCHE: Filtrar por marca y país
+        qs = qs.filter(marca_id=marca_id)
+        qs = qs.order_by("nombre")
         
         modelos = [
             {'id': modelo.id, 'nombre': modelo.nombre}
-            for modelo in modelos_qs
+            for modelo in qs
         ]
         
         return JsonResponse({

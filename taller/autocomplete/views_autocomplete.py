@@ -98,23 +98,63 @@ class VehiculoAutocomplete(autocomplete.Select2QuerySetView):
         return qs.order_by('patente')
 
 
+def _resolve_country_from_request(request):
+    """
+    Resolución robusta del país:
+    1) middleware: request.empresa.pais (CL/US)
+    2) perfil: request.user.empresa.pais
+    3) sesión: empresa_actual_id → Empresa.pais (si la usas)
+    4) prefijo de la URL: '/us/' o '/cl/' como último recurso
+    """
+    # 1) middleware
+    empresa = getattr(request, "empresa", None)
+    pais = getattr(empresa, "pais", None)
+    if pais in ("CL", "US"):
+        return pais
+
+    # 2) perfil
+    user_emp = getattr(getattr(request, "user", None), "empresa", None)
+    pais = getattr(user_emp, "pais", None)
+    if pais in ("CL", "US"):
+        return pais
+
+    # 3) sesión (opcional, si usas empresa_actual_id en session)
+    empresa_id = request.session.get("empresa_actual_id")
+    if empresa_id:
+        from taller.models.empresa import Empresa
+        try:
+            e = Empresa.objects.only("pais").get(id=empresa_id)
+            if e.pais in ("CL", "US"):
+                return e.pais
+        except Empresa.DoesNotExist:
+            pass
+
+    # 4) prefijo URL
+    path = request.path.lower()
+    if path.startswith("/us/"):
+        return "US"
+    if path.startswith("/cl/"):
+        return "CL"
+
+    return None
+
+
 # --- AUTOCOMPLETE PARA MARCA ---
 class MarcaAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         if not self.request.user.is_authenticated:
             return Marca.objects.none()
 
-        qs = Marca.objects.all()
-        
-        # BLINDAJE MULTI-TENANT: Filtrar por país de la empresa del usuario
-        user = self.request.user
-        if hasattr(user, 'empresa') and user.empresa and hasattr(user.empresa, 'pais'):
-            pais = user.empresa.pais
-            qs = qs.filter(country=pais)
-        
+        country = _resolve_country_from_request(self.request)
+        if country not in ("CL", "US"):
+            # Falla cerrada: si no sabemos el país, no mostramos nada
+            return Marca.objects.none()
+
+        qs = Marca.objects.filter(country=country)
+
         if self.q:
             qs = qs.filter(nombre__icontains=self.q)
-        return qs.order_by('nombre')
+        return qs.order_by("nombre")
 
 
 # --- AUTOCOMPLETE PARA MODELO ---
@@ -123,17 +163,17 @@ class ModeloAutocomplete(autocomplete.Select2QuerySetView):
         if not self.request.user.is_authenticated:
             return Modelo.objects.none()
 
-        qs = Modelo.objects.select_related('marca')
-        marca_id = self.forwarded.get('marca')
+        country = _resolve_country_from_request(self.request)
+        if country not in ("CL", "US"):
+            return Modelo.objects.none()
+
+        qs = Modelo.objects.select_related('marca').filter(country=country)
+
+        # Si llega marca desde forward de Select2, respétala
+        marca_id = self.forwarded.get("marca")
         if marca_id:
             qs = qs.filter(marca_id=marca_id)
 
-        # Filtrar por país de la empresa del usuario
-        user = self.request.user
-        if hasattr(user, 'empresa') and user.empresa and hasattr(user.empresa, 'pais'):
-            pais = user.empresa.pais
-            qs = qs.filter(country=pais)
-
         if self.q:
             qs = qs.filter(nombre__icontains=self.q)
-        return qs.order_by('nombre')
+        return qs.order_by("nombre")

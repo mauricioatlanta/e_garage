@@ -50,13 +50,13 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',  # 🌐 Locale middleware PRIMERO
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',  # 🔐 AUTHENTICATION ANTES
     'taller.middleware.country_url_migration.CountryURLRedirectMiddleware',  # Redirects legados /es/→/cl/
     'taller.middleware.country_context.CountryContextMiddleware',  # Detección de país
     'taller.middleware.i18n_country_middleware.CountryLanguageMiddleware',  # 🌐 Idioma por país DESPUÉS
     'taller.middleware.rate_limiting.RateLimitMiddleware',  # Rate limiting temprano
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
     'taller.middleware.company_country.CompanyCountryMiddleware',  # Nuevo middleware de tenant único
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',

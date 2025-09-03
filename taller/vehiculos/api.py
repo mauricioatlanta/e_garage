@@ -9,9 +9,13 @@ from taller.models.extras_vehiculo import MotorVehiculo, CajaVehiculo
 
 try:
     from taller.models.marcas_usa import ModeloVehiculo
+except ImportError:
+    ModeloVehiculo = None
+
+try:
     from taller.models.catalogo import CatalogoModeloAuto  # Nuestro catálogo
 except ImportError:
-    ModeloVehiculo = CatalogoModeloAuto = None
+    CatalogoModeloAuto = None
 
 # Endpoint para modelos USA por marca (?marca=<id>)
 @require_GET
@@ -20,25 +24,29 @@ def api_modelos_usa(request):
     if not marca_param:
         return JsonResponse([], safe=False)
     
-    # Usar nuestro catálogo importado
-    if CatalogoModeloAuto:
-        # El parámetro marca viene como nombre de marca, no ID
-        modelos = CatalogoModeloAuto.get_modelos_por_marca(marca_param)[:100]
-        # CORREGIDO: get_modelos_por_marca retorna strings directamente, no diccionarios
-        data = [{'id': modelo, 'nombre': modelo} for modelo in modelos]
-        return JsonResponse(data, safe=False)
+    # Debug logging
+    print(f"[DEBUG API] api_modelos_usa: marca_param='{marca_param}', user={getattr(request.user, 'username', 'anonymous')}")
     
-    # Fallback al modelo antiguo si existe
-    elif ModeloVehiculo:
-        try:
-            marca_id = int(marca_param)
-            qs = ModeloVehiculo.objects.filter(marca_id=marca_id, activo=True).order_by('nombre')
-            data = [{'id': getattr(m, 'id', None), 'nombre': getattr(m, 'nombre', '')} for m in qs]
+    # Versión simplificada que funciona
+    try:
+        # Importar dinámicamente para evitar problemas
+        from taller.models.catalogo import CatalogoModeloAuto
+        
+        if CatalogoModeloAuto:
+            # Obtener modelos del catálogo
+            modelos = list(CatalogoModeloAuto.get_modelos_por_marca(marca_param))[:100]
+            data = [{'id': modelo, 'nombre': modelo} for modelo in modelos]
+            print(f"[DEBUG API] Retornando {len(data)} modelos del catálogo")
             return JsonResponse(data, safe=False)
-        except (ValueError, TypeError):
+        else:
+            print("[DEBUG API] CatalogoModeloAuto no disponible")
             return JsonResponse([], safe=False)
-    
-    return JsonResponse([], safe=False)
+            
+    except Exception as e:
+        print(f"[DEBUG API] Error en api_modelos_usa: {e}")
+        import traceback
+        traceback.print_exc()
+        return JsonResponse([], safe=False)
 from taller.models.modelo import Modelo
 
 def obtener_modelos(request):
