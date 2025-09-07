@@ -6,8 +6,10 @@
 *.pyc
 __pycache__/
 
+# Archivos estáticos y media
 /staticfiles/
 /media/
+/logs/
 
 # Archivos de VSCode y sistema
 .vscode/
@@ -34,15 +36,6 @@ crear_*.py
 cargar_*.py
 verificar_*.py
 .aider*
-.env
-.env
-.env
-.env
-.env
-.env
-.env
-.env
-.env
-.env
-.env
-.env
+
+# Archivos de configuración local
+gestion_taller/settings/local.py
