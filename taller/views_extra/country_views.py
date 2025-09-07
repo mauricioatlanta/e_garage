@@ -7,8 +7,7 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 
 from taller.auth.decorators import login_required_default
-from taller.middleware.country_url_migration import \
-    get_current_country_from_request
+from taller.middleware.country_url_migration import get_current_country_from_request
 
 
 class CountryBaseView(TemplateView):
@@ -103,12 +102,11 @@ def dashboard_usa_view(request):
             request.user.save()
 
         # Renderizar el Centro de Operaciones Espacial
-        from datetime import datetime, timedelta
+        from datetime import timedelta
 
         from django.shortcuts import render
         from django.utils import timezone
 
-        from taller.models.clientes import Cliente
         # Datos básicos para el dashboard - calcular métricas reales
         from taller.models.documento import Documento
 

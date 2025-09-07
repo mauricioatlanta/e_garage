@@ -20,7 +20,7 @@ def verificar_suscripciones():
             sus.save()
             send_mail(
                 "Tu suscripción ha expirado",
-                f"Tu acceso ha sido desactivado. Para renovarlo, realiza el pago y envía el comprobante.",
+                "Tu acceso ha sido desactivado. Para renovarlo, realiza el pago y envía el comprobante.",
                 settings.DEFAULT_FROM_EMAIL,
                 [sus.usuario.email],
             )

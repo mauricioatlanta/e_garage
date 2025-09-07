@@ -5,15 +5,9 @@ Maneja logs de autenticación, pagos, suscripciones y eventos críticos
 
 import json
 import logging
-from datetime import datetime, timezone
 
 from django.conf import settings
-from django.contrib.auth.models import User
-from django.db import models
 from django.utils import timezone as django_timezone
-
-from taller.models.empresa import Empresa
-from taller.models.trial import TrialRegistro
 
 
 # Configuración de loggers especializados

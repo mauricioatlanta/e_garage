@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Confirmación Final: Logo eGarage con Silueta Atrayente Implementado
 """

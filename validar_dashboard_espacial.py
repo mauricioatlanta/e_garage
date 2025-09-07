@@ -46,7 +46,7 @@ def validar_dashboard_espacial():
         print(f"   - Logo: {empresa.logo}")
         print(f"   - Plan: {empresa.plan}")
     except Empresa.DoesNotExist:
-        print(f"❌ No hay empresa asociada al usuario mauricio1")
+        print("❌ No hay empresa asociada al usuario mauricio1")
         return False
     except Exception as e:
         print(f"❌ Problema con empresa: {e}")
@@ -56,7 +56,7 @@ def validar_dashboard_espacial():
     documentos_count = Documento.objects.filter(empresa=empresa).count()
     clientes_count = Cliente.objects.filter(empresa=empresa).count()
 
-    print(f"✅ Datos operativos:")
+    print("✅ Datos operativos:")
     print(f"   - Documentos: {documentos_count}")
     print(f"   - Clientes: {clientes_count}")
 

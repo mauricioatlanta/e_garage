@@ -2,7 +2,6 @@ from decimal import Decimal
 
 from taller.documentos.models import *
 from taller.models import Empresa
-from taller.models.vehiculos import Vehiculo
 from taller.servicios.models import Servicio, ServicioExterno
 
 # Obtener datos
@@ -74,7 +73,7 @@ for i, doc in enumerate(docs):
         print(f"    Otros: ${doc.neto_otros_servicios}")
 
 # Verificar conteos finales
-print(f"\n🎯 Resumen final:")
+print("\n🎯 Resumen final:")
 for doc in docs:
     rep_count = doc.lineas_repuesto.count() if hasattr(doc, "lineas_repuesto") else 0
     serv_count = doc.lineas_servicio.count() if hasattr(doc, "lineas_servicio") else 0

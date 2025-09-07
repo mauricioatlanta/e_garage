@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Comando para corregir precios de GEORGE AUTO REPAIR a USD realistas.
 Convierte todos los precios de pesos chilenos a dólares americanos apropiados.
@@ -12,12 +11,15 @@ from decimal import Decimal
 
 from django.core.management.base import BaseCommand
 from django.db import transaction
-from django.utils import timezone
 
-from taller.models import (Empresa, LineaOtroServicio, LineaRepuesto,
-                           LineaServicio, Repuesto)
-from taller.servicios.models import (CategoriaServicio, Servicio,
-                                     SubcategoriaServicio)
+from taller.models import (
+    Empresa,
+    LineaOtroServicio,
+    LineaRepuesto,
+    LineaServicio,
+    Repuesto,
+)
+from taller.servicios.models import Servicio
 
 RND = random.Random(42)
 

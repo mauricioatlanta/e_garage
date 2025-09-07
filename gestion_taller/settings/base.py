@@ -5,8 +5,10 @@ Configuración común para todos los entornos (dev, prod, local)
 
 import os
 from pathlib import Path
-from django.core.management.utils import get_random_secret_key
+
 from dotenv import load_dotenv
+
+from django.core.management.utils import get_random_secret_key
 
 # Cargar variables de entorno desde .env
 load_dotenv()
@@ -169,7 +171,7 @@ EMAIL_HOST_USER = "suscripcion@atlantareciclajes.cl"
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_PASSWORD", ",*naHZ0xIFO")
 DEFAULT_FROM_EMAIL = "eGarage <suscripcion@atlantareciclajes.cl>"
 
-# Logging base
+# Logging útil (errores reales)
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -207,6 +209,17 @@ LOGGING = {
         "taller": {
             "handlers": ["console", "file"],
             "level": "DEBUG",
+            "propagate": False,
+        },
+        # Logging específico para errores críticos
+        "django.request": {
+            "handlers": ["console", "file"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+        "django.security": {
+            "handlers": ["console", "file"],
+            "level": "WARNING",
             "propagate": False,
         },
     },

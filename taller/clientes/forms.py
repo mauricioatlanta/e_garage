@@ -1,4 +1,5 @@
 import dal.forms
+
 from django import forms
 from django.forms.widgets import Select
 
@@ -142,7 +143,7 @@ class ClienteForm(forms.ModelForm):
                 f"🔍 [ClienteForm] empresa.pais: {getattr(self.empresa, 'pais', 'NO_HAY_PAIS')}"
             )
         else:
-            print(f"🔍 [ClienteForm] NO HAY EMPRESA")
+            print("🔍 [ClienteForm] NO HAY EMPRESA")
 
         # Chile: región/ciudad
         if "region" in self.data and self.data.get("region") not in [None, ""]:
@@ -203,11 +204,11 @@ class ClienteForm(forms.ModelForm):
 
         # Ocultar campos según el país
         if self.pais == "US":
-            print(f"🔍 [ClienteForm] Ocultando campos de Chile para USA")
+            print("🔍 [ClienteForm] Ocultando campos de Chile para USA")
             self.fields["region"].widget = forms.HiddenInput()
             self.fields["ciudad"].widget = forms.HiddenInput()
         else:
-            print(f"🔍 [ClienteForm] Ocultando campos de USA para Chile")
+            print("🔍 [ClienteForm] Ocultando campos de USA para Chile")
             self.fields["estado_usa"].widget = forms.HiddenInput()
             self.fields["ciudad_usa"].widget = forms.HiddenInput()
             self.fields["zipcode"].widget = forms.HiddenInput()

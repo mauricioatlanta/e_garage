@@ -1,6 +1,5 @@
 import logging
 
-from django.shortcuts import render
 from django.urls import include, path
 
 # Configuración de logging para este módulo
@@ -11,21 +10,27 @@ from django.views.generic import TemplateView
 from taller.views_extra.bienvenida_usa import bienvenida_usa
 
 from . import ajax_views  # Importar vistas AJAX para formularios jerárquicos
-from . import taller_views
-from .taller_views import (dashboard_suscripciones, debug_cliente_autocomplete,
-                           renovar_empresa)
-from .views_extra.ajax import (buscar_clientes, ciudades_por_region,
-                               vehiculos_por_cliente)
+from .taller_views import (
+    dashboard_suscripciones,
+    debug_cliente_autocomplete,
+    renovar_empresa,
+)
+from .views_extra.ajax import (
+    buscar_clientes,
+    ciudades_por_region,
+    vehiculos_por_cliente,
+)
 from .views_extra.company_settings_views import company_settings_view
 from .views_extra.dashboard_empresa import (
-    dashboard_centro_operaciones, dashboard_centro_operaciones_espacial)
-from .views_extra.landing_usa import landing_usa
+    dashboard_centro_operaciones,
+    dashboard_centro_operaciones_espacial,
+)
 from .views_extra.suscripcion import suscripcion_bloqueada
-from .views_extra.timezone_views import (cambiar_timezone_ajax,
-                                         configurar_timezone, preview_timezone)
 from .views_extra.views import dashboard
-from .views_extra.views_configuracion import (configuracion_empresa,
-                                              configuracion_tecnicos)
+from .views_extra.views_configuracion import (
+    configuracion_empresa,
+    configuracion_tecnicos,
+)
 
 app_name = "taller"
 
@@ -148,23 +153,28 @@ urlpatterns = [
 ]
 
 # Importar APIs del catálogo de vehículos
-from taller.api_catalogo_views import (api_estadisticas_catalogo, api_marcas,
-                                       api_modelos)
+from taller.api_catalogo_views import api_estadisticas_catalogo, api_marcas, api_modelos
+
 # Importar vista demo del catálogo
 from taller.demo_catalogo_views import demo_catalogo_vehiculos
-from taller.views_extra.demo_publico import (demo_atlanta_publico,
-                                             demo_cotizacion_ajax,
-                                             verificar_codigo_atlanta)
+from taller.views_extra.demo_publico import (
+    demo_atlanta_publico,
+    demo_cotizacion_ajax,
+    verificar_codigo_atlanta,
+)
+
 # URLs USA
-from taller.views_extra.us_views import (USLocalizationView,
-                                         api_calcular_impuestos_usa,
-                                         api_ciudades_por_estado,
-                                         api_estados_usa,
-                                         api_marcas_vehiculos_usa,
-                                         api_modelos_por_marca,
-                                         api_traducir_servicios,
-                                         cambiar_idioma,
-                                         demo_atlanta_personalization)
+from taller.views_extra.us_views import (
+    USLocalizationView,
+    api_calcular_impuestos_usa,
+    api_ciudades_por_estado,
+    api_estados_usa,
+    api_marcas_vehiculos_usa,
+    api_modelos_por_marca,
+    api_traducir_servicios,
+    cambiar_idioma,
+    demo_atlanta_personalization,
+)
 
 us_patterns = [
     path("demo-usa/", USLocalizationView.as_view(), name="demo_usa"),

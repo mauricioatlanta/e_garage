@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Portal de clientes - Configuracion simple
 
@@ -10,8 +9,10 @@ from django.contrib.auth.models import User
 
 from taller.models.cliente import Cliente
 from taller.models.empresa import Empresa
-from taller.models.portal_cliente import (ClienteUsuario, PortalConfiguracion,
-                                          SolicitudPresupuesto)
+from taller.models.portal_cliente import (
+    ClienteUsuario,
+    PortalConfiguracion,
+)
 
 
 def configurar_portal():
@@ -78,25 +79,25 @@ def configurar_portal():
         except Exception as e:
             print(f"  ERROR {cliente.nombre}: {str(e)}")
 
-    print(f"\nRESUMEN:")
+    print("\nRESUMEN:")
     print(f"  Empresas configuradas: {PortalConfiguracion.objects.count()}")
     print(f"  Usuarios creados: {usuarios_creados}")
     print(f"  Total clientes con email: {clientes_con_email.count()}")
-    print(f"  Password para todos: cliente123")
+    print("  Password para todos: cliente123")
 
     # Mostrar algunos usuarios de ejemplo
-    print(f"\nUSUARIOS DE PRUEBA:")
+    print("\nUSUARIOS DE PRUEBA:")
     usuarios = ClienteUsuario.objects.select_related("cliente", "user")[:3]
     for usuario in usuarios:
         print(f"  Email: {usuario.cliente.email_cliente}")
         print(f"  Username: {usuario.user.username}")
         print(f"  Empresa: {usuario.cliente.empresa.nombre_taller}")
-        print(f"  ---")
+        print("  ---")
 
-    print(f"\nACCESO AL PORTAL:")
-    print(f"  URL: http://localhost:8000/portal/")
-    print(f"  Username: (cualquiera de los mostrados arriba)")
-    print(f"  Password: cliente123")
+    print("\nACCESO AL PORTAL:")
+    print("  URL: http://localhost:8000/portal/")
+    print("  Username: (cualquiera de los mostrados arriba)")
+    print("  Password: cliente123")
 
 
 # Ejecutar configuracion

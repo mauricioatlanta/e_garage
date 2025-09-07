@@ -1,9 +1,6 @@
-from dal import autocomplete
 from django import forms
-from django.urls import reverse_lazy
 
-from taller.models.extras_vehiculo import (CajaVehiculo, ColorVehiculo,
-                                           MotorVehiculo)
+from taller.models.extras_vehiculo import CajaVehiculo, ColorVehiculo, MotorVehiculo
 from taller.models.vehiculos import Vehiculo
 
 
@@ -32,7 +29,6 @@ class VehiculoForm(forms.ModelForm):
         )
 
         # Configurar campo color como CharField para mayor flexibilidad
-        from taller.models.extras_vehiculo import ColorVehiculo
 
         # Obtener colores disponibles para mostrar como sugerencias
         colores_pais = ColorVehiculo.get_colores_para_pais(pais)

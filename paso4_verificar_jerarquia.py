@@ -8,7 +8,6 @@ import os
 import sys
 
 import django
-from django.conf import settings
 
 # Configurar Django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "taller.settings")
@@ -152,7 +151,7 @@ def generar_ejemplo_uso():
     if toyota:
         modelo = Modelo.objects.filter(marca=toyota).first()
         if modelo:
-            print(f"📋 **Ejemplo para testing:**")
+            print("📋 **Ejemplo para testing:**")
             print(f"1. Seleccionar Marca: {toyota.nombre} (ID: {toyota.id})")
             print(f"2. Debería cargar modelos incluyendo: {modelo.nombre}")
             print(f"3. Seleccionar Modelo: {modelo.nombre} (ID: {modelo.id})")
@@ -161,16 +160,16 @@ def generar_ejemplo_uso():
             cajas = CajaVehiculo.objects.filter(modelo=modelo)[:2]
 
             if motores:
-                print(f"4. Deberían cargar motores como:")
+                print("4. Deberían cargar motores como:")
                 for motor in motores:
                     print(f"   - {motor.cilindrada} {motor.tipo}")
 
             if cajas:
-                print(f"5. Deberían cargar cajas como:")
+                print("5. Deberían cargar cajas como:")
                 for caja in cajas:
                     print(f"   - {caja.tipo} {caja.velocidades}vel")
 
-    print(f"\n🌐 **URLs de Testing:**")
+    print("\n🌐 **URLs de Testing:**")
     print(f"- /ajax/load-modelos/?marca_id={toyota.id if toyota else 1}")
     print(
         f"- /ajax/load-motores-cajas/?modelo_id={modelo.id if toyota and modelo else 1}"
@@ -193,24 +192,24 @@ def main():
     # Generar ejemplo
     generar_ejemplo_uso()
 
-    print(f"\n🎯 **RESUMEN FINAL**")
+    print("\n🎯 **RESUMEN FINAL**")
     print("=" * 30)
     print(f"✅ Datos disponibles: {'Sí' if datos_ok else 'No'}")
     print(f"✅ Dependencias OK: {'Sí' if dependencias_ok else 'No'}")
     print(f"✅ Archivos creados: {'Sí' if archivos_ok else 'No'}")
 
     if datos_ok and dependencias_ok and archivos_ok:
-        print(f"\n🎉 **PASO 4 COMPLETADO EXITOSAMENTE**")
-        print(f"🔄 Sistema listo para formularios jerárquicos")
-        print(f"\n📋 **SIGUIENTE PASO:**")
-        print(f"1. Incluir el JavaScript en tu template de vehículos")
+        print("\n🎉 **PASO 4 COMPLETADO EXITOSAMENTE**")
+        print("🔄 Sistema listo para formularios jerárquicos")
+        print("\n📋 **SIGUIENTE PASO:**")
+        print("1. Incluir el JavaScript en tu template de vehículos")
         print(
-            f"2. Asegurar que los IDs de campos sean: id_marca, id_modelo, id_motor, id_caja"
+            "2. Asegurar que los IDs de campos sean: id_marca, id_modelo, id_motor, id_caja"
         )
-        print(f"3. Probar la funcionalidad en el navegador")
+        print("3. Probar la funcionalidad en el navegador")
     else:
-        print(f"\n⚠️  **HAY PROBLEMAS QUE REVISAR**")
-        print(f"Verificar los elementos marcados con ❌")
+        print("\n⚠️  **HAY PROBLEMAS QUE REVISAR**")
+        print("Verificar los elementos marcados con ❌")
 
 
 if __name__ == "__main__":

@@ -89,7 +89,6 @@ def verificar_completamente():
             print(f"   ❌ Error vehículos: {response_vehiculos.status_code}")
 
     print("\n=== RESUMEN DE TEMPLATES ACTUALIZADOS ===")
-    import glob
 
     templates_actualizados = [
         "templates/documentos/crear_documento_moderno.html",
@@ -99,7 +98,7 @@ def verificar_completamente():
 
     for template in templates_actualizados:
         try:
-            with open(template, "r", encoding="utf-8") as f:
+            with open(template, encoding="utf-8") as f:
                 content = f.read()
                 if 'id="id_cliente"' in content and "select2" in content:
                     print(f"   ✅ {template}")

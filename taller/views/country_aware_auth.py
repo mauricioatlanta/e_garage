@@ -1,11 +1,4 @@
-import re
-
-from allauth.account import app_settings
 from allauth.account.views import LoginView
-from django.contrib.auth import login
-from django.http import HttpResponseRedirect
-from django.shortcuts import redirect, render
-from django.urls import reverse
 
 
 class CountryAwareLoginView(LoginView):

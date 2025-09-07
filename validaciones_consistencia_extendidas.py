@@ -4,7 +4,6 @@
 Implementación completa de reglas de negocio country & tipo
 """
 import os
-import sys
 
 import django
 
@@ -13,8 +12,6 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings")
 django.setup()
 
 from django.core.exceptions import ValidationError
-from django.core.management.color import no_style
-from django.db import connection, models
 
 from taller.models import *
 from taller.servicios.models import *
@@ -52,7 +49,7 @@ def implementar_validaciones_documento():
     print("🔧 IMPLEMENTANDO VALIDACIONES EN DOCUMENTO")
 
     # Leer el archivo actual
-    with open("taller/models/documento.py", "r", encoding="utf-8") as f:
+    with open("taller/models/documento.py", encoding="utf-8") as f:
         contenido = f.read()
 
     # Buscar si ya existe el método clean

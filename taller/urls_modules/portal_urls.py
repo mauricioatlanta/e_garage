@@ -7,12 +7,16 @@ URLs para el portal web de clientes
 
 from django.urls import path
 
-from taller.views.portal_views import (ajax_detalle_documento,
-                                       portal_dashboard, portal_documentos,
-                                       portal_login, portal_logout,
-                                       portal_mis_solicitudes,
-                                       portal_solicitar_presupuesto,
-                                       portal_vehiculos)
+from taller.views.portal_views import (
+    ajax_detalle_documento,
+    portal_dashboard,
+    portal_documentos,
+    portal_login,
+    portal_logout,
+    portal_mis_solicitudes,
+    portal_solicitar_presupuesto,
+    portal_vehiculos,
+)
 
 urlpatterns = [
     # Login/Logout

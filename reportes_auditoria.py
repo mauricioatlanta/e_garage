@@ -37,7 +37,7 @@ class ReporteAuditoria:
             usuario=usuario, fecha_hora__gte=fecha_desde
         ).order_by("-fecha_hora")
 
-        print(f"📊 === REPORTE ACTIVIDAD USUARIO ===")
+        print("📊 === REPORTE ACTIVIDAD USUARIO ===")
         print(f"👤 Usuario: {usuario.username}")
         print(f"🏢 Empresa: {perfil.empresa.nombre_taller}")
         print(f"📅 Período: Últimos {dias} días")
@@ -75,7 +75,7 @@ class ReporteAuditoria:
             empresa=empresa, modelo="DOCUMENTO", fecha_hora__gte=fecha_desde
         ).order_by("-fecha_hora")
 
-        print(f"📋 === REPORTE DOCUMENTOS EMPRESA ===")
+        print("📋 === REPORTE DOCUMENTOS EMPRESA ===")
         print(f"🏢 Empresa: {empresa.nombre_taller}")
         print(f"📅 Período: Últimos {dias} días")
         print(f"📄 Total actividades documentos: {logs.count()}")
@@ -138,7 +138,7 @@ class ReporteAuditoria:
             accion="LOGIN", fecha_hora__gte=fecha_desde
         ).order_by("-fecha_hora")
 
-        print(f"🔒 === REPORTE SEGURIDAD ===")
+        print("🔒 === REPORTE SEGURIDAD ===")
         print(f"📅 Período: Últimos {dias} días")
         print(f"❌ Accesos denegados: {accesos_denegados.count()}")
         print(f"🔑 Logins: {logins.count()}")
@@ -180,7 +180,7 @@ class ReporteAuditoria:
 
         total_logs = LogAuditoria.objects.filter(fecha_hora__gte=fecha_desde)
 
-        print(f"📈 === REPORTE USO SISTEMA ===")
+        print("📈 === REPORTE USO SISTEMA ===")
         print(f"📅 Período: Últimos {dias} días")
         print(f"📊 Total actividades: {total_logs.count()}")
         print()

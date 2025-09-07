@@ -1,9 +1,7 @@
 from django import forms
-from django.utils.translation import gettext_lazy as _
 
 from taller.models.repuesto import CategoriaRepuesto, Repuesto
-from taller.models.tienda import Tienda
-from utils.pais import formatear_precio, get_configuracion_pais
+from utils.pais import get_configuracion_pais
 
 
 class RepuestoForm(forms.ModelForm):

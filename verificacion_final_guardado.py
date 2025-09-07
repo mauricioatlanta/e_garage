@@ -37,24 +37,24 @@ def main():
     marcas_chile = Marca.objects.filter(country="CL")
     modelos_chile = Modelo.objects.filter(marca__country="CL")
 
-    print(f"\n📊 Datos disponibles para formulario:")
+    print("\n📊 Datos disponibles para formulario:")
     print(f"   ✅ Marcas Chile: {marcas_chile.count()}")
     print(f"   ✅ Modelos Chile: {modelos_chile.count()}")
 
     # 4. Verificar marcas principales con modelos
     marcas_principales = ["Toyota", "Chevrolet", "Ford"]
-    print(f"\n🚗 Marcas principales con modelos:")
+    print("\n🚗 Marcas principales con modelos:")
     for marca_nombre in marcas_principales:
         marca = marcas_chile.filter(nombre=marca_nombre).first()
         if marca:
             modelos = Modelo.objects.filter(marca=marca)
             print(f"   {marca_nombre}: {modelos.count()} modelos")
 
-    print(f"\n🎉 ESTADO FINAL:")
-    print(f"   ✅ Problema de guardado: RESUELTO")
-    print(f"   ✅ Vehículos muestran nombres correctos")
-    print(f"   ✅ Formulario guarda IDs pero muestra nombres")
-    print(f"   ✅ Datos limpios sin marcas/modelos numéricos")
+    print("\n🎉 ESTADO FINAL:")
+    print("   ✅ Problema de guardado: RESUELTO")
+    print("   ✅ Vehículos muestran nombres correctos")
+    print("   ✅ Formulario guarda IDs pero muestra nombres")
+    print("   ✅ Datos limpios sin marcas/modelos numéricos")
 
 
 if __name__ == "__main__":

@@ -10,7 +10,7 @@ import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings")
 django.setup()
 
-from taller.models import MarcaVehiculo, ModeloVehiculo
+from taller.models import MarcaVehiculo
 
 print("=== SCRIPT DE DEBUG PARA FORMULARIO ===")
 print("Copiar y pegar esto en la consola del navegador:\n")

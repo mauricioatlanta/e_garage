@@ -1,10 +1,10 @@
 from allauth.account.models import EmailAddress
 from allauth.account.utils import send_email_confirmation
+
 from django import forms
 from django.contrib import messages
 from django.contrib.auth import get_user_model
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect, render
+from django.shortcuts import render
 
 
 class ResendEmailForm(forms.Form):

@@ -11,8 +11,7 @@ Fecha: 2025-01-23
 """
 
 import os
-import sys
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 import django
 from django.utils import timezone
@@ -143,7 +142,7 @@ def verificar_comprobantes():
             metodo_pago="transferencia",
         )
 
-        print(f"✅ Comprobante creado exitosamente")
+        print("✅ Comprobante creado exitosamente")
         print(f"   - Empresa: {comprobante.empresa.nombre_taller}")
         print(f"   - Monto: ${comprobante.monto:,.0f}")
         print(f"   - Estado: {comprobante.estado}")

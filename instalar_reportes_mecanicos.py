@@ -4,7 +4,6 @@ Script de instalación de dependencias opcionales para
 el módulo avanzado de Reportes por Mecánico
 """
 
-import os
 import subprocess
 import sys
 
@@ -46,7 +45,7 @@ def main():
         if install_package(pkg):
             instalados += 1
 
-    print(f"\n🎉 RESUMEN:")
+    print("\n🎉 RESUMEN:")
     print(f"   • Instalados: {instalados}/{len(dependencias)}")
 
     if instalados == len(dependencias):

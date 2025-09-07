@@ -3,8 +3,7 @@ from django.db import models
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from core.views import TenantViewMixin
-from taller.servicios.models import (CategoriaServicio, Servicio,
-                                     SubcategoriaServicio)
+from taller.servicios.models import CategoriaServicio, Servicio, SubcategoriaServicio
 
 
 class ServicioListView(LoginRequiredMixin, TenantViewMixin, ListView):

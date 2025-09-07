@@ -1,9 +1,14 @@
-from django.urls import path
 from rest_framework.routers import DefaultRouter
 
-from taller.servicios.servicios import (crear_servicio, editar_servicio,
-                                        eliminar_servicio,
-                                        explorador_servicios, lista_servicios)
+from django.urls import path
+
+from taller.servicios.servicios import (
+    crear_servicio,
+    editar_servicio,
+    eliminar_servicio,
+    explorador_servicios,
+    lista_servicios,
+)
 
 from .views import CategoriaServicioViewSet, ServicioViewSet
 

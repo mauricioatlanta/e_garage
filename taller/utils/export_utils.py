@@ -3,21 +3,16 @@ Utilidades para exportación de documentos a PDF, Excel y otros formatos
 """
 
 import io
-import os
 from datetime import datetime
 from decimal import Decimal
 
-import openpyxl
 import pandas as pd
-from django.conf import settings
-from django.http import FileResponse, HttpResponse
-from django.template.loader import get_template
 from openpyxl.styles import Alignment, Font, PatternFill
-from reportlab.lib.pagesizes import A4, letter
-from reportlab.lib.units import cm
-from reportlab.lib.utils import ImageReader
-from reportlab.pdfgen import canvas
 from weasyprint import CSS, HTML
+
+from django.conf import settings
+from django.http import HttpResponse
+from django.template.loader import get_template
 
 
 class DocumentoPDFExporter:

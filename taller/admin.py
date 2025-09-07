@@ -1,7 +1,6 @@
-from django.contrib import admin, messages
+from django.contrib import admin
 from django.contrib.admin import AdminSite
 from django.db import models
-from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
 
@@ -14,10 +13,14 @@ from taller.models.empresa import Empresa
 from taller.models.perfil_usuario import PerfilUsuario
 from taller.models.precio_suscripcion import PrecioSuscripcion
 from taller.models.tecnico import Tecnico
-from taller.servicios.models import (CategoriaServicio, CategoriaServicioName,
-                                     Servicio, ServicioName,
-                                     SubcategoriaServicio,
-                                     SubcategoriaServicioName)
+from taller.servicios.models import (
+    CategoriaServicio,
+    CategoriaServicioName,
+    Servicio,
+    ServicioName,
+    SubcategoriaServicio,
+    SubcategoriaServicioName,
+)
 
 from .models import ConfiguracionEmpresa
 

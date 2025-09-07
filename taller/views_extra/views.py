@@ -36,16 +36,8 @@ def enviar_email_reset_manual(request):
     return HttpResponse("Correo enviado manualmente (HTML)")
 
 
-from datetime import timedelta
-
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count, Sum
 from django.shortcuts import render
-from django.utils import timezone
-
-from taller.models.documento import Documento
-from taller.models.repuesto import Repuesto
-from taller.models.venta import Venta
 
 
 @login_required
@@ -61,7 +53,7 @@ def dashboard(request):
 
 
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect
 
 from taller.empresa_forms import EmpresaForm
 from taller.models.empresa import Empresa
@@ -80,11 +72,8 @@ def editar_empresa(request):
     return render(request, "empresa_form.html", {"form": form})
 
 
-import re
-
 from django.conf import settings
 from django.core.mail import send_mail
-from django.shortcuts import render
 from django.utils.crypto import get_random_string
 
 from taller.forms_subscription import PlanPagoForm
@@ -157,16 +146,12 @@ def registro_unificado(request):
 
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect, render
 
 
 @login_required
 def suscripcion_bloqueada(request):
     logout(request)
     return render(request, "bloqueada.html")
-
-
-from django.shortcuts import render
 
 
 def debug_cliente_autocomplete(request):
@@ -176,10 +161,9 @@ def debug_cliente_autocomplete(request):
 # --- Vistas de administración de suscripciones ---
 
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
 
-from taller.models.empresa import Empresa
 from taller.models.suscripcion import Suscripcion
 
 

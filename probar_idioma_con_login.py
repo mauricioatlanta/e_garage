@@ -36,7 +36,7 @@ def probar_idioma_con_login():
             return
 
         csrf_token = csrf_match.group(1)
-        print(f"✅ CSRF token obtenido")
+        print("✅ CSRF token obtenido")
 
         # 2. Hacer login como usuario USA
         print("2️⃣ Haciendo login como testuser_usa...")
@@ -72,7 +72,7 @@ def probar_idioma_con_login():
         # 4. Analizar el contenido
         content = clientes_response.text
 
-        print(f"\n🔍 ANÁLISIS DE CONTENIDO:")
+        print("\n🔍 ANÁLISIS DE CONTENIDO:")
 
         # Buscar textos específicos
         textos_espanol = [
@@ -107,9 +107,9 @@ def probar_idioma_con_login():
 
         # Buscar información del país
         if "🇺🇸" in content:
-            print(f"   🌍 País: 🇺🇸 USA")
+            print("   🌍 País: 🇺🇸 USA")
         elif "🇨🇱" in content:
-            print(f"   🌍 País: 🇨🇱 Chile")
+            print("   🌍 País: 🇨🇱 Chile")
 
         # Verificar headers
         content_language = clientes_response.headers.get(
@@ -125,21 +125,21 @@ def probar_idioma_con_login():
         else:
             idioma_detectado = "❓ INDETERMINADO"
 
-        print(f"\n📊 RESULTADO:")
+        print("\n📊 RESULTADO:")
         print(f"   • Textos en español: {len(espanol_encontrado)}")
         print(f"   • Textos en inglés: {len(ingles_encontrado)}")
         print(f"   • Idioma detectado: {idioma_detectado}")
 
-        print(f"\n🎯 CONCLUSIÓN:")
+        print("\n🎯 CONCLUSIÓN:")
         if idioma_detectado == "🇺🇸 INGLÉS":
-            print(f"   ✅ CORRECTO: USA muestra inglés")
+            print("   ✅ CORRECTO: USA muestra inglés")
         elif idioma_detectado == "🇪🇸 ESPAÑOL":
-            print(f"   ❌ INCORRECTO: USA muestra español (debería ser inglés)")
+            print("   ❌ INCORRECTO: USA muestra español (debería ser inglés)")
         else:
-            print(f"   ⚠️ INDETERMINADO: No se puede determinar el idioma")
+            print("   ⚠️ INDETERMINADO: No se puede determinar el idioma")
 
         # Mostrar fragmento del contenido para debug
-        print(f"\n🔍 FRAGMENTO DEL CONTENIDO:")
+        print("\n🔍 FRAGMENTO DEL CONTENIDO:")
         soup = BeautifulSoup(content, "html.parser")
         title = soup.find("title")
         if title:
@@ -160,7 +160,7 @@ def probar_idioma_con_login():
 
         traceback.print_exc()
 
-    print(f"\n✅ PRUEBA COMPLETADA!")
+    print("\n✅ PRUEBA COMPLETADA!")
 
 
 if __name__ == "__main__":

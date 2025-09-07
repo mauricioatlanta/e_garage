@@ -5,7 +5,6 @@ Paso 6B: Extensión de la migración a todas las vistas del sistema.
 """
 
 import glob
-import os
 import re
 from pathlib import Path
 
@@ -32,7 +31,7 @@ class GlobalTemplateMigrator:
                 continue
 
             try:
-                with open(py_file, "r", encoding="utf-8") as f:
+                with open(py_file, encoding="utf-8") as f:
                     content = f.read()
 
                     # Buscar patrones de render con templates hardcodeados
@@ -228,7 +227,7 @@ return TemplateResponse(request, template_name, context)
         for file_path in critical_files:
             full_path = self.base_path / file_path
             if full_path.exists():
-                with open(full_path, "r", encoding="utf-8") as f:
+                with open(full_path, encoding="utf-8") as f:
                     content = f.read()
 
                 original_content = content

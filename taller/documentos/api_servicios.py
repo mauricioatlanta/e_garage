@@ -2,8 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
 
-from taller.servicios.models import (CategoriaServicio, Servicio,
-                                     SubcategoriaServicio)
+from taller.servicios.models import CategoriaServicio, Servicio, SubcategoriaServicio
 
 
 @login_required
@@ -22,13 +21,13 @@ def api_servicios_por_categoria(request):
             "nombre": categoria.get_label("es"),
             "subcategorias": [],
         }
-        for subcategoria in getattr(categoria, "subcategorias").all():
+        for subcategoria in categoria.subcategorias.all():
             subcategoria_data = {
                 "id": subcategoria.pk,
                 "nombre": subcategoria.get_label("es"),
                 "servicios": [],
             }
-            for servicio in getattr(subcategoria, "servicios").all():
+            for servicio in subcategoria.servicios.all():
                 subcategoria_data["servicios"].append(
                     {"id": servicio.pk, "nombre": servicio.get_label("es")}
                 )

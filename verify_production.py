@@ -8,7 +8,6 @@ import sys
 
 import django
 from django.conf import settings
-from django.core.management import call_command
 
 
 def setup_django():
@@ -141,7 +140,7 @@ def main():
         if not static_ok:
             print("   - Problemas con archivos estáticos")
 
-        print(f"\n❌ Deployment NO recomendado en este momento")
+        print("\n❌ Deployment NO recomendado en este momento")
         sys.exit(1)
 
 

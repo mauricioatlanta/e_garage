@@ -43,7 +43,7 @@ class Command(BaseCommand):
 
             # Verificar resultado
             empresa.refresh_from_db()
-            self.stdout.write(f"\n📋 Estado final:")
+            self.stdout.write("\n📋 Estado final:")
             self.stdout.write(f"  - Usuario: {user.username}")
             self.stdout.write(f"  - Empresa: {empresa.nombre_taller}")
             self.stdout.write(f"  - País: {empresa.pais}")

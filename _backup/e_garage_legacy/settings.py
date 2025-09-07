@@ -95,7 +95,6 @@ TEMPLATES = [
 
 # ============================================================
 # Reexporta la versión para acceso en settings.APP_VERSION
-from egarage.version import APP_VERSION
 
 # 🚀 WSGI
 # ============================================================

@@ -24,10 +24,12 @@ from django.utils import timezone
 from taller.models.clientes import Cliente
 from taller.models.documento import Documento
 from taller.models.empresa import Empresa
-from taller.models.notificacion import (ConfiguracionNotificacion,
-                                        NotificacionEnviada,
-                                        RecordatorioMantenimiento,
-                                        TipoNotificacion)
+from taller.models.notificacion import (
+    ConfiguracionNotificacion,
+    NotificacionEnviada,
+    RecordatorioMantenimiento,
+    TipoNotificacion,
+)
 from taller.models.vehiculos import Vehiculo
 from taller.utils.notificaciones import NotificacionManager
 
@@ -272,11 +274,11 @@ try:
         dias_recordatorio=7,
     )
 
-    print(f"🔧 Recordatorio creado:")
-    print(f"   Tipo: Revisión General")
+    print("🔧 Recordatorio creado:")
+    print("   Tipo: Revisión General")
     print(f"   Fecha programada: {recordatorio.fecha_programada}")
     print(f"   Cliente: {mauricio.nombre}")
-    print(f"   Recordar en: 7 días antes")
+    print("   Recordar en: 7 días antes")
 
 except Exception as e:
     print(f"❌ Error creando recordatorio: {e}")
@@ -294,17 +296,17 @@ pendientes = NotificacionEnviada.objects.filter(
     destinatario_email="mauricioatlanta@gmail.com", estado="PENDIENTE"
 ).count()
 
-print(f"📊 ESTADÍSTICAS PARA MAURICIO:")
+print("📊 ESTADÍSTICAS PARA MAURICIO:")
 print(f"   📧 Total notificaciones: {total_notif}")
 print(f"   ✅ Enviadas: {enviadas}")
 print(f"   📮 Pendientes: {pendientes}")
 
-print(f"\n📱 DATOS CONFIGURADOS:")
-print(f"   📧 Email: mauricioatlanta@gmail.com")
-print(f"   📱 WhatsApp: +56963607348")
+print("\n📱 DATOS CONFIGURADOS:")
+print("   📧 Email: mauricioatlanta@gmail.com")
+print("   📱 WhatsApp: +56963607348")
 print(f"   🏢 Empresa: {empresa.nombre_taller}")
 
-print(f"\n🎯 PRÓXIMOS PASOS:")
+print("\n🎯 PRÓXIMOS PASOS:")
 print("1. Configurar contraseña de aplicación de Gmail")
 print("2. Ejecutar procesador_notificaciones.py para envío automático")
 print("3. El sistema creará notificaciones automáticamente al crear documentos")

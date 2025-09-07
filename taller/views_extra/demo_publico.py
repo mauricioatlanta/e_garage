@@ -1,6 +1,4 @@
 import json
-from datetime import datetime, timedelta
-from decimal import Decimal
 
 from django.http import JsonResponse
 from django.shortcuts import render

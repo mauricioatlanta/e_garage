@@ -1,4 +1,5 @@
 from allauth.account.views import ConfirmEmailView
+
 from django.shortcuts import redirect
 
 

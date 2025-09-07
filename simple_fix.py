@@ -4,7 +4,6 @@ Script simple para arreglar el documento 44 con datos válidos
 """
 
 import os
-import sys
 
 import django
 
@@ -89,7 +88,7 @@ def fix_it():
     servicios_final = LineaServicio.objects.filter(documento=documento).count()
     repuestos_final = LineaRepuesto.objects.filter(documento=documento).count()
 
-    print(f"\n🎯 RESULTADO:")
+    print("\n🎯 RESULTADO:")
     print(f"📋 Servicios: {servicios_final}")
     print(f"🔧 Repuestos: {repuestos_final}")
     print("✅ Documento 44 listo para edición!")

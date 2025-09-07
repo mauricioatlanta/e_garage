@@ -19,7 +19,7 @@ print("=" * 50)
 
 try:
     user = User.objects.get(username="taller2")
-    print(f"✅ Usuario taller2 encontrado:")
+    print("✅ Usuario taller2 encontrado:")
     print(f"   Email: {user.email}")
     print(f"   Activo: {user.is_active}")
     print(f"   Staff: {user.is_staff}")
@@ -40,7 +40,7 @@ try:
         empresa = Empresa.objects.get(usuario=user)
         print(f"   Empresa asociada: {empresa.nombre_taller}")
     except Empresa.DoesNotExist:
-        print(f"   ❌ Sin empresa asociada")
+        print("   ❌ Sin empresa asociada")
 
     # Si el password está mal, lo arreglamos
     if not is_correct:

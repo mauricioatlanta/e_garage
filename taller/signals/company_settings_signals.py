@@ -3,7 +3,6 @@ Signals para tracking de cambios en CompanySettings
 """
 
 # from taller.context_processors import invalidate_company_cache
-import json
 
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save, pre_save

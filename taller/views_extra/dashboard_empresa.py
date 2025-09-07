@@ -1,10 +1,10 @@
-from datetime import date, timedelta
+from datetime import timedelta
 from decimal import Decimal
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db.models import Avg, Count, F, Q, Sum
-from django.shortcuts import redirect, render
+from django.db.models import Count, F, Q, Sum
+from django.shortcuts import redirect
 from django.utils import timezone
 
 from taller.auth.decorators import login_required_default
@@ -12,7 +12,6 @@ from taller.models.clientes import Cliente
 from taller.models.documento import Documento
 from taller.models.empresa import Empresa
 from taller.models.lineas_documento import LineaServicio
-from taller.models.repuesto import Repuesto
 from taller.models.tecnico import Tecnico
 from taller.models.vehiculos import Vehiculo
 

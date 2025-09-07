@@ -16,8 +16,7 @@ django.setup()
 from django.utils import timezone
 
 from taller.models.empresa import Empresa
-from taller.models.notificacion import (ConfiguracionNotificacion,
-                                        NotificacionEnviada)
+from taller.models.notificacion import ConfiguracionNotificacion, NotificacionEnviada
 from taller.utils.notificaciones import NotificacionManager
 
 print("🚀 ENVÍO REAL DE NOTIFICACIONES PARA MAURICIO")
@@ -98,7 +97,7 @@ print(f"✅ Enviadas exitosamente: {enviadas}")
 print(f"📮 Pendientes: {pendientes}")
 print(f"❌ Con errores: {errores}")
 
-print(f"\n🎯 ¡Revisa tu email mauricioatlanta@gmail.com!")
+print("\n🎯 ¡Revisa tu email mauricioatlanta@gmail.com!")
 print("📱 También se pueden enviar por WhatsApp cuando tengas API configurada")
 
 print("\n🚀 SISTEMA DE NOTIFICACIONES FUNCIONANDO AL 100%")

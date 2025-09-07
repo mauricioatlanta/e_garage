@@ -4,7 +4,6 @@
 Crear motores y cajas para los modelos de vehículos existentes
 """
 import os
-import sys
 
 import django
 
@@ -13,7 +12,6 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings")
 django.setup()
 
 from taller.models.extras_vehiculo import CajaVehiculo, MotorVehiculo
-from taller.models.marca import Marca
 from taller.models.modelo import Modelo
 
 
@@ -119,7 +117,7 @@ def crear_motores_cajas_demo():
                     cajas_creadas += 1
                     print(f"   🔧 Caja: {caja_nombre}")
 
-    print(f"\n📊 RESUMEN:")
+    print("\n📊 RESUMEN:")
     print(f"   ⚙️ Motores creados: {motores_creados}")
     print(f"   🔧 Cajas creadas: {cajas_creadas}")
     print(f"   🚗 Modelos procesados: {modelos.count()}")
@@ -130,11 +128,11 @@ def crear_motores_cajas_demo():
     cajas_cl = CajaVehiculo.objects.filter(country="CL").count()
     cajas_us = CajaVehiculo.objects.filter(country="US").count()
 
-    print(f"\n🌍 POR PAÍS:")
+    print("\n🌍 POR PAÍS:")
     print(f"   🇨🇱 Chile: {motores_cl} motores, {cajas_cl} cajas")
     print(f"   🇺🇸 USA: {motores_us} motores, {cajas_us} cajas")
 
-    print(f"\n✅ DATOS DEMO CREADOS EXITOSAMENTE")
+    print("\n✅ DATOS DEMO CREADOS EXITOSAMENTE")
     print("🎯 Sistema listo para dependencia jerárquica")
 
 

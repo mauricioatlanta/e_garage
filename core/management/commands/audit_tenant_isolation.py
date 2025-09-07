@@ -11,7 +11,6 @@ import logging
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.db.models import F, Q
-from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 
@@ -298,8 +297,11 @@ class Command(BaseCommand):
         self.stdout.write("\n--- AUDITANDO LÍNEAS DE DOCUMENTO ---")
 
         try:
-            from taller.documentos.models import (LineaOtroServicio,
-                                                  LineaRepuesto, LineaServicio)
+            from taller.documentos.models import (
+                LineaOtroServicio,
+                LineaRepuesto,
+                LineaServicio,
+            )
 
             # Auditar LineaRepuesto
             if hasattr(LineaRepuesto, "empresa"):

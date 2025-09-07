@@ -17,7 +17,7 @@ def agregar_required_campos():
         return False
 
     # Leer contenido
-    with open(template_path, "r", encoding="utf-8") as f:
+    with open(template_path, encoding="utf-8") as f:
         content = f.read()
 
     print("🔧 Agregando atributos required a campos obligatorios...")
@@ -86,7 +86,7 @@ def verificar_formulario():
 
     template_path = Path("templates_canonical/taller/vehiculos/crear_vehiculo.html")
 
-    with open(template_path, "r", encoding="utf-8") as f:
+    with open(template_path, encoding="utf-8") as f:
         content = f.read()
 
     print("\n🔍 Verificando configuración del formulario...")

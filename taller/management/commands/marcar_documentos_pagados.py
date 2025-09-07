@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Comando para marcar todos los documentos como pagados
 Uso: python manage.py marcar_documentos_pagados --company "NOMBRE_EMPRESA"
@@ -6,7 +5,6 @@ Uso: python manage.py marcar_documentos_pagados --company "NOMBRE_EMPRESA"
 
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
-from django.utils import timezone
 
 from taller.models import Documento, Empresa
 

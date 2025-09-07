@@ -32,15 +32,15 @@ def main():
     print(f"🇺🇸 USA - Modelos: {modelos_usa}")
 
     # Mostrar algunas marcas y modelos de Chile
-    print(f"\n📋 Marcas principales Chile:")
+    print("\n📋 Marcas principales Chile:")
     for marca in Marca.objects.filter(country="CL").order_by("nombre")[:5]:
         modelos_count = Modelo.objects.filter(marca=marca).count()
         print(f"  • {marca.nombre} ({modelos_count} modelos)")
 
-    print(f"\n🎉 SISTEMA CONFIGURADO CORRECTAMENTE")
-    print(f"✅ Formulario de crear vehículo ahora debe mostrar:")
+    print("\n🎉 SISTEMA CONFIGURADO CORRECTAMENTE")
+    print("✅ Formulario de crear vehículo ahora debe mostrar:")
     print(f"   - Lista de marcas para Chile ({marcas_chile} opciones)")
-    print(f"   - Carga dinámica de modelos vía AJAX")
+    print("   - Carga dinámica de modelos vía AJAX")
     print(f"   - {modelos_chile} modelos totales disponibles")
 
 

@@ -1,6 +1,3 @@
-from django.urls import resolve
-
-
 def ui_namespaces(request):
     path = request.path_info.lstrip("/")
     first = path.split("/", 1)[0].lower()

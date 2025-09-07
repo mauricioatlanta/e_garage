@@ -28,8 +28,6 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.urls import NoReverseMatch, reverse
 
-from taller.models.empresa import Empresa
-
 from .forms.empresa import DatosPersonalesForm, EmpresaForm
 
 try:

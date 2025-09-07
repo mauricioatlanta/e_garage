@@ -1,7 +1,6 @@
 from django.urls import path
 
-from taller.autocomplete.views_autocomplete import (MarcaAutocomplete,
-                                                    ModeloAutocomplete)
+from taller.autocomplete.views_autocomplete import MarcaAutocomplete, ModeloAutocomplete
 from taller.vehiculos import views_chile
 
 app_name = "vehiculos_chile"

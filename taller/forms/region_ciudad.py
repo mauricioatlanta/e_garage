@@ -1,4 +1,5 @@
 from dal import autocomplete
+
 from django import forms
 
 from taller.models.region_ciudad import TallerCiudad, TallerRegion

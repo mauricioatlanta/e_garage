@@ -4,18 +4,20 @@ import logging
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import models
-from django.http import HttpResponse, JsonResponse
-from django.shortcuts import get_object_or_404, redirect
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_GET
 
 from taller.models.empresa import Empresa
 from taller.models.repuesto import Repuesto
-from taller.models.tienda import Tienda
 
-from .views_cbv import (RepuestoCreateView, RepuestoDetailView,
-                        RepuestoListView, RepuestoUpdateView)
+from .views_cbv import (
+    RepuestoCreateView,
+    RepuestoDetailView,
+    RepuestoListView,
+    RepuestoUpdateView,
+)
 
 log = logging.getLogger(__name__)
 
@@ -55,9 +57,6 @@ def eliminar_repuesto(request, pk):
         return JsonResponse(
             {"success": False, "error": "Método no permitido"}, status=405
         )
-
-
-from django.contrib.auth.decorators import login_required
 
 
 @login_required

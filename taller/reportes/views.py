@@ -3,12 +3,11 @@
 from datetime import date, timedelta
 
 import openpyxl
-from django.contrib.auth.decorators import login_required
-from django.db.models import (Case, Count, DecimalField, ExpressionWrapper, F,
-                              Sum, Value, When)
+from openpyxl.utils import get_column_letter
+
+from django.db.models import Count, DecimalField, ExpressionWrapper, F, Sum
 from django.db.models.functions import Coalesce
 from django.http import HttpResponse
-from openpyxl.utils import get_column_letter
 
 from taller.auth.decorators import login_required_default
 from taller.models import Documento
@@ -75,26 +74,22 @@ def exportar_mecanicos_excel(request):
     return response
 
 
-import calendar
-import json
 from collections import defaultdict
-from datetime import date, datetime, timedelta
+from datetime import datetime
 from decimal import Decimal
 
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.db.models import (Avg, Count, ExpressionWrapper, F, FloatField, Q,
-                              Sum)
-from django.http import HttpResponse, JsonResponse
-from django.shortcuts import redirect, render
+from django.db.models import FloatField
+from django.http import JsonResponse
+from django.shortcuts import render
 from django.utils import timezone
 
 from taller.models.clientes import Cliente
 from taller.models.documento import Documento
-from taller.models.lineas_documento import (LineaOtroServicio, LineaRepuesto,
-                                            LineaServicio)
-from taller.models.marca import Marca
-from taller.models.modelo import Modelo
+from taller.models.lineas_documento import (
+    LineaOtroServicio,
+    LineaRepuesto,
+    LineaServicio,
+)
 from taller.models.tecnico import Tecnico
 from taller.models.vehiculos import Vehiculo
 from taller.utils.empresa import get_or_create_empresa
@@ -110,7 +105,7 @@ def reportes_dashboard(request):
 def reporte_repuestos(request):
     from collections import defaultdict
 
-    from django.db.models import ExpressionWrapper, F, FloatField, Sum
+    from django.db.models import ExpressionWrapper, F, Sum
 
     from taller.models.lineas_documento import LineaRepuesto
     from taller.models.repuesto import Repuesto
@@ -138,9 +133,6 @@ def reporte_repuestos(request):
 
     # Repuestos con mayor margen de ganancia - FILTRADO POR EMPRESA
     # Márgenes solo si existen los campos en el modelo Repuesto
-    from decimal import Decimal
-
-    from django.db.models.functions import Coalesce
 
     repuestos_qs = Repuesto.objects.filter(empresa=empresa)
     if hasattr(Repuesto, "precio_compra") and hasattr(Repuesto, "precio_venta"):
@@ -365,8 +357,6 @@ def reporte_servicios(request):
     # Rankings de vehículos atendidos
     from taller.models.clientes import Cliente
     from taller.models.documento import Documento
-    from taller.models.marca import Marca
-    from taller.models.modelo import Modelo
     from taller.models.vehiculos import Vehiculo
 
     # Solo documentos con servicios realizados
@@ -523,11 +513,10 @@ def dashboard_inteligencia_operativa(request):
     🚀 Centro de Inteligencia Operativa - Dashboard Futurista 360°
     Análisis predictivo y KPIs avanzados para talleres automotrices
     """
-    from datetime import datetime, timedelta
+    from datetime import timedelta
     from decimal import Decimal, InvalidOperation
 
-    from django.db.models import Avg, Count, F, Q, Sum
-    from django.utils import timezone
+    from django.db.models import Count, F, Sum
 
     # 🔒 FILTRO CRÍTICO POR EMPRESA - Usuario autenticado garantizado
     empresa = get_or_create_empresa(request)
@@ -844,9 +833,7 @@ def reportes_mecanicos(request):
     total_documentos = documentos_qs.count()
 
     # Calcular total generado correctamente (incluyendo cantidad y descuentos)
-    from django.db.models import (Count, DecimalField, ExpressionWrapper, F,
-                                  Sum, Value)
-    from django.db.models.functions import Coalesce
+    from django.db.models import Count, DecimalField, ExpressionWrapper, F, Sum
 
     # Total de servicios
     total_servicios = (
@@ -1079,7 +1066,6 @@ def generar_pdf_mecanico(request, mecanico_id):
 @login_required_default
 def generar_resumen_whatsapp_mecanico(request, mecanico_id):
     """Genera un resumen para WhatsApp del mecánico específico"""
-    from django.http import JsonResponse
 
     return JsonResponse({"mensaje": "Función en desarrollo"})
 
@@ -1087,7 +1073,6 @@ def generar_resumen_whatsapp_mecanico(request, mecanico_id):
 @login_required_default
 def api_mecanicos_chart_data(request):
     """API para datos de gráficos de mecánicos"""
-    from django.http import JsonResponse
 
     return JsonResponse({"data": [], "labels": []})
 
@@ -1095,7 +1080,6 @@ def api_mecanicos_chart_data(request):
 @login_required_default
 def api_repuestos_chart_data(request):
     """API para datos de gráficos de repuestos"""
-    from django.http import JsonResponse
 
     return JsonResponse({"data": [], "labels": []})
 
@@ -1109,7 +1093,6 @@ def reportes_por_fecha(request):
 @login_required_default
 def reportes_repuestos_fecha(request, desde, hasta):
     """Reportes de repuestos en un rango de fechas"""
-    from django.http import JsonResponse
 
     return JsonResponse({"desde": desde, "hasta": hasta, "data": []})
 
@@ -1117,7 +1100,6 @@ def reportes_repuestos_fecha(request, desde, hasta):
 @login_required_default
 def reportes_servicios_fecha(request, desde, hasta):
     """Reportes de servicios en un rango de fechas"""
-    from django.http import JsonResponse
 
     return JsonResponse({"desde": desde, "hasta": hasta, "data": []})
 
@@ -1125,6 +1107,5 @@ def reportes_servicios_fecha(request, desde, hasta):
 @login_required_default
 def reportes_otros_servicios_fecha(request, desde, hasta):
     """Reportes de otros servicios en un rango de fechas"""
-    from django.http import JsonResponse
 
     return JsonResponse({"desde": desde, "hasta": hasta, "data": []})

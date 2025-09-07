@@ -4,7 +4,6 @@ Validaciones avanzadas adicionales - Paso 2 extendido
 Validaciones profundas de lógica de negocio y performance
 """
 import os
-import sys
 
 import django
 
@@ -15,8 +14,7 @@ django.setup()
 import traceback
 from decimal import Decimal
 
-from django.core.exceptions import ValidationError
-from django.db.models import Avg, Count, F, Q, Sum
+from django.db.models import Count, F
 
 from taller.models import *
 from taller.servicios.models import *
@@ -307,17 +305,17 @@ class ValidadorAvanzado:
             print(f"🎯 Porcentaje de éxito: {porcentaje_exito:.1f}%")
 
             if porcentaje_exito >= 90:
-                print(f"\n🎉 SISTEMA AVANZADO: Validaciones satisfactorias")
-                print(f"✅ Listo para entorno de producción")
+                print("\n🎉 SISTEMA AVANZADO: Validaciones satisfactorias")
+                print("✅ Listo para entorno de producción")
             elif porcentaje_exito >= 75:
-                print(f"\n⚠️ SISTEMA FUNCIONAL: Algunas mejoras recomendadas")
+                print("\n⚠️ SISTEMA FUNCIONAL: Algunas mejoras recomendadas")
             else:
-                print(f"\n❌ ACCIÓN REQUERIDA: Resolver problemas críticos")
+                print("\n❌ ACCIÓN REQUERIDA: Resolver problemas críticos")
 
         # Mostrar fallos si los hay
         fallos = [r for r in self.resultados if r["estado"] == "FAIL"]
         if fallos:
-            print(f"\n❌ PROBLEMAS A RESOLVER:")
+            print("\n❌ PROBLEMAS A RESOLVER:")
             for fallo in fallos:
                 print(f"   - {fallo['test']}: {fallo['detalles']}")
 

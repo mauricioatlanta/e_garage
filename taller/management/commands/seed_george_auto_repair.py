@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Seed para la empresa GEORGE AUTO REPAIR:
 - 10 clientes (3 con más de un vehículo)
@@ -20,15 +19,21 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils import timezone
 
-from taller.models import (ConfiguracionEmpresa, Documento, Empresa,
-                           LineaOtroServicio, LineaRepuesto, LineaServicio,
-                           Repuesto, Tecnico)
+from taller.models import (
+    ConfiguracionEmpresa,
+    Documento,
+    Empresa,
+    LineaOtroServicio,
+    LineaRepuesto,
+    LineaServicio,
+    Repuesto,
+    Tecnico,
+)
 from taller.models.clientes import Cliente
 from taller.models.marca import Marca
 from taller.models.modelo import Modelo
 from taller.models.vehiculos import Vehiculo
-from taller.servicios.models import (CategoriaServicio, Servicio,
-                                     SubcategoriaServicio)
+from taller.servicios.models import CategoriaServicio, Servicio, SubcategoriaServicio
 
 RND = random.Random(42)
 

@@ -1,5 +1,5 @@
-from django.db.models import Count, Q
-from django.http import HttpResponse, JsonResponse
+from django.db.models import Q
+from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.utils.translation import get_language
 
@@ -200,8 +200,12 @@ def crear_otro_servicio(request):
 import logging
 
 log = logging.getLogger(__name__)
-from .views_cbv import (ServicioCreateView, ServicioDetailView,
-                        ServicioListView, ServicioUpdateView)
+from .views_cbv import (
+    ServicioCreateView,
+    ServicioDetailView,
+    ServicioListView,
+    ServicioUpdateView,
+)
 
 
 def lista_servicios(request, *args, **kwargs):

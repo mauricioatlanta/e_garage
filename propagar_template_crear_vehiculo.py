@@ -4,7 +4,6 @@ Script para propagar templates desde la carpeta canonical a todas las variantes
 de país e idioma.
 """
 
-import os
 import shutil
 from pathlib import Path
 

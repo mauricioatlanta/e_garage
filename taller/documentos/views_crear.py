@@ -15,7 +15,6 @@ from taller.servicios.models import Servicio
 
 from .forms import DocumentoForm
 from .formsets import OtroServicioFormSet, RepuestoFormSet, ServicioFormSet
-from .models import Documento
 
 
 def _prefix(tipo):
@@ -70,7 +69,7 @@ def build_context(request, form=None, rep_fs=None, serv_fs=None, otro_fs=None):
 def crear_documento(request):
     """Vista robusta para crear documentos con formsets - NUNCA deja pantalla en blanco"""
 
-    print(f"[DOC][DEBUG] ========== INICIO CREAR DOCUMENTO ==========")
+    print("[DOC][DEBUG] ========== INICIO CREAR DOCUMENTO ==========")
     print(f"[DOC][DEBUG] Usuario: {request.user.username}")
     print(f"[DOC][DEBUG] Método: {request.method}")
 
@@ -83,10 +82,10 @@ def crear_documento(request):
             )
         except AttributeError:
             empresa = None
-            print(f"[DOC][DEBUG] Usuario sin empresa")
+            print("[DOC][DEBUG] Usuario sin empresa")
 
         if request.method == "POST":
-            print(f"[DOC][DEBUG] Procesando POST...")
+            print("[DOC][DEBUG] Procesando POST...")
             print(f"[DOC][POST] Datos recibidos: {dict(request.POST)}")
 
             # Crear formularios con datos POST
@@ -116,7 +115,7 @@ def crear_documento(request):
             print(f"[DOC][DEBUG] Formularios válidos: {forms_valid}")
 
             if forms_valid:
-                print(f"[DOC][DEBUG] Todos los formularios son válidos, guardando...")
+                print("[DOC][DEBUG] Todos los formularios son válidos, guardando...")
 
                 try:
                     # Crear documento
@@ -174,15 +173,15 @@ def crear_documento(request):
                     # Guardar líneas
                     rep_fs.instance = doc
                     rep_fs.save()
-                    print(f"[DOC][DEBUG] Líneas de repuestos guardadas")
+                    print("[DOC][DEBUG] Líneas de repuestos guardadas")
 
                     serv_fs.instance = doc
                     serv_fs.save()
-                    print(f"[DOC][DEBUG] Líneas de servicios guardadas")
+                    print("[DOC][DEBUG] Líneas de servicios guardadas")
 
                     otro_fs.instance = doc
                     otro_fs.save()
-                    print(f"[DOC][DEBUG] Líneas de otros servicios guardadas")
+                    print("[DOC][DEBUG] Líneas de otros servicios guardadas")
 
                     # Recalcular totales en servidor (autoridad)
                     try:
@@ -219,7 +218,7 @@ def crear_documento(request):
                     )
 
             # Si hay errores, re-render con errores visibles (nunca en blanco)
-            print(f"[DOC][DEBUG] Formularios inválidos, mostrando errores...")
+            print("[DOC][DEBUG] Formularios inválidos, mostrando errores...")
             print(
                 f"[DOC][ERROR] DOC ERR: {doc_form.errors.as_json() if doc_form.errors else 'N/A'}"
             )
@@ -237,7 +236,7 @@ def crear_documento(request):
             )
 
         # GET - Mostrar formularios vacíos
-        print(f"[DOC][DEBUG] Procesando GET...")
+        print("[DOC][DEBUG] Procesando GET...")
         ctx = build_context(request)
         return render(request, "taller/cl/es/documentos/crear_documento.html", ctx)
 

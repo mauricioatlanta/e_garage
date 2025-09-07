@@ -1,6 +1,7 @@
+from PIL import Image
+
 from django import forms
 from django.core.validators import RegexValidator
-from PIL import Image
 
 from taller.models import CompanySettings
 

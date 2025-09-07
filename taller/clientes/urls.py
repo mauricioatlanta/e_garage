@@ -1,9 +1,17 @@
 from django.urls import path
 
-from .views import (agregar_ciudad, ajax_buscar_clientes, cliente_delete,
-                    clientes_stats, crear_cliente, editar_cliente,
-                    lista_clientes, obtener_ciudades, obtener_ciudades_usa,
-                    ver_cliente)
+from .views import (
+    agregar_ciudad,
+    ajax_buscar_clientes,
+    cliente_delete,
+    clientes_stats,
+    crear_cliente,
+    editar_cliente,
+    lista_clientes,
+    obtener_ciudades,
+    obtener_ciudades_usa,
+    ver_cliente,
+)
 
 app_name = "clientes"
 

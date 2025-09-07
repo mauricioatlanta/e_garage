@@ -12,7 +12,6 @@ django.setup()
 from django.contrib.auth.models import User
 
 from taller.models.clientes import Cliente
-from taller.models.empresa import Empresa
 
 # Verificar la relación usuario-empresa-cliente
 print("=== VERIFICACIÓN DE RELACIONES ===")
@@ -32,7 +31,7 @@ print(f"Empresa del cliente: {cliente.empresa}")
 print(f"País de la empresa del cliente: {cliente.empresa.pais}")
 
 # Verificar si el TenantViewMixin permitiría al usuario ver este cliente
-print(f"\n=== FILTRADO TENANT ===")
+print("\n=== FILTRADO TENANT ===")
 print(f"¿Usuario empresa == Cliente empresa? {user.empresa == cliente.empresa}")
 
 # Filtrar clientes como lo haría TenantViewMixin

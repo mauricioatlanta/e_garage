@@ -3,19 +3,23 @@ URLs para el sistema de Analytics AI
 Dashboard futurista con diferenciación por país
 """
 
-from django.shortcuts import render
 from django.urls import path
 
 from . import admin_views, apis_avanzadas, views
-from .admin_views import (api_admin_charts, dashboard_admin,
-                          detalle_suscriptor, exportar_suscriptores_csv,
-                          test_info_view)
-from .funcionalidades_adicionales import (alertas_expiracion_api,
-                                          enviar_recordatorio_expiracion,
-                                          geographic_map_api,
-                                          predictive_indicators_api,
-                                          real_time_metrics_api,
-                                          user_behavior_api)
+from .admin_views import (
+    api_admin_charts,
+    dashboard_admin,
+    detalle_suscriptor,
+    exportar_suscriptores_csv,
+)
+from .funcionalidades_adicionales import (
+    alertas_expiracion_api,
+    enviar_recordatorio_expiracion,
+    geographic_map_api,
+    predictive_indicators_api,
+    real_time_metrics_api,
+    user_behavior_api,
+)
 
 app_name = "analytics"
 

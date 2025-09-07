@@ -70,8 +70,8 @@ try:
 
     print("✅ WSGI configurado exitosamente para PythonAnywhere")
     print(f"📁 Proyecto: {PROJECT_PATH}")
-    print(f"🗄️ Base de datos: MySQL en PythonAnywhere")
-    print(f"🌐 Configuración: e_garage.settings_production")
+    print("🗄️ Base de datos: MySQL en PythonAnywhere")
+    print("🌐 Configuración: e_garage.settings_production")
 
 except Exception as e:
     print(f"❌ Error al configurar WSGI: {e}")
@@ -99,7 +99,7 @@ def application_with_logging(environ, start_response):
         start_response(status, headers)
 
         return [
-            """
+            b"""
         <!DOCTYPE html>
         <html>
         <head>
@@ -117,9 +117,7 @@ def application_with_logging(environ, start_response):
             </div>
         </body>
         </html>
-        """.encode(
-                "utf-8"
-            )
+        """
         ]
 
 

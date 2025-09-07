@@ -18,12 +18,6 @@ resumen para mece1nicos. Las consultas usan los modelos canf3nicos y el
 campo `precio_unitario`.
 """
 
-import csv
-from datetime import date, timedelta
-from io import StringIO
-
-from django.db.models import Count, F, Sum
-from django.template.loader import render_to_string
 
 from taller.models.documento import Documento
 from taller.models.lineas_documento import LineaServicio
@@ -41,17 +35,6 @@ Las consultas usan los modelos canónicos (LineaServicio) y el campo
 normalizado `precio_unitario`. Las funciones usan accesos defensivos para
 compatibilidad con código legacy.
 """
-
-import csv
-from datetime import date, timedelta
-from io import StringIO
-
-from django.db.models import Count, F, Sum
-from django.template.loader import render_to_string
-
-from taller.models.documento import Documento
-from taller.models.lineas_documento import LineaServicio
-from taller.models.tecnico import Tecnico
 
 
 def _default_date_range(fecha_desde, fecha_hasta, dias=30):
@@ -363,7 +346,7 @@ class ReporteMecanicoWhatsApp:
             f"• Mes anterior: ${total_anterior:,.0f}",
             f"• Crecimiento: {crecimiento:+.1f}%",
             "",
-            f"🏆 ¡Excelente trabajo!",
+            "🏆 ¡Excelente trabajo!",
             "_Reporte eGarage Pro_",
         ]
 

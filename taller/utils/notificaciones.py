@@ -4,20 +4,23 @@ Utilidades para envío de notificaciones automáticas
 """
 import logging
 import smtplib
-from datetime import datetime, timedelta
+from datetime import timedelta
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 import requests
+
 from django.conf import settings
 from django.template import Context, Template
 from django.utils import timezone
 
 from taller.models.auditoria import LogAuditoria
-from taller.models.notificacion import (ConfiguracionNotificacion,
-                                        NotificacionEnviada,
-                                        RecordatorioMantenimiento,
-                                        TipoNotificacion)
+from taller.models.notificacion import (
+    ConfiguracionNotificacion,
+    NotificacionEnviada,
+    RecordatorioMantenimiento,
+    TipoNotificacion,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -283,9 +286,7 @@ class NotificacionManager:
                 return False
 
             # URL de API de WhatsApp Business (ejemplo)
-            url = "https://graph.facebook.com/v17.0/{}/messages".format(
-                self.config.whatsapp_numero_business
-            )
+            url = f"https://graph.facebook.com/v17.0/{self.config.whatsapp_numero_business}/messages"
 
             headers = {
                 "Authorization": f"Bearer {self.config.whatsapp_api_token}",

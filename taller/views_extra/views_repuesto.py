@@ -2,7 +2,6 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
 from taller.forms.repuesto import RepuestoForm
-from taller.models.perfil_usuario import PerfilUsuario
 from taller.models.repuesto import Repuesto
 
 

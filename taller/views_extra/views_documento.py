@@ -4,12 +4,9 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
 from taller.forms import DocumentoForm
-from taller.models.clientes import Cliente
 from taller.models.documento import Documento
 from taller.models.lineas_documento import LineaRepuesto, LineaServicio
-from taller.models.perfil_usuario import PerfilUsuario
 from taller.models.tecnico import Tecnico
-from taller.models.vehiculos import Vehiculo
 
 
 @login_required

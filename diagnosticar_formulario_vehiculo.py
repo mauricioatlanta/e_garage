@@ -4,7 +4,6 @@ Script para diagnosticar y corregir el problema de guardado del formulario de ve
 """
 
 import os
-import sys
 
 import django
 
@@ -120,7 +119,6 @@ def verificar_vista():
     print("\n🔍 Verificando vista crear_vehiculo...")
 
     try:
-        from taller.vehiculos.views import crear_vehiculo
 
         print("✅ Vista crear_vehiculo importada correctamente")
 

@@ -44,8 +44,6 @@ def ajax_buscar_clientes(request):
 
 import logging
 
-from django.http import JsonResponse
-
 from taller.models.region_ciudad import TallerCiudad
 from taller.models.ubicacion import Ciudad
 
@@ -93,10 +91,12 @@ def obtener_ciudades_usa(request):
     return JsonResponse(list(ciudades), safe=False)
 
 
-import logging
-
-from .views_cbv import (ClienteCreateView, ClienteDetailView, ClienteListView,
-                        ClienteUpdateView)
+from .views_cbv import (
+    ClienteCreateView,
+    ClienteDetailView,
+    ClienteListView,
+    ClienteUpdateView,
+)
 
 log = logging.getLogger(__name__)
 
@@ -129,8 +129,6 @@ def editar_cliente(request, *args, **kwargs):
 
 
 from django.db.models import Count
-from django.http import (HttpResponse, HttpResponseBadRequest,
-                         HttpResponseNotAllowed)
 from django.views.decorators.http import require_http_methods
 
 
@@ -240,7 +238,6 @@ def clientes_stats(request):
 
 import json
 
-from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
 

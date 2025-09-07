@@ -4,7 +4,6 @@ Script de validaciones de consistencia de datos entre países
 Paso 2 del plan de completitud al 100%
 """
 import os
-import sys
 
 import django
 
@@ -14,8 +13,7 @@ django.setup()
 
 import traceback
 
-from django.core.exceptions import ValidationError
-from django.db.models import Count, F, Q
+from django.db.models import Count, F
 
 from taller.models import *
 from taller.servicios.models import *
@@ -88,7 +86,7 @@ class ValidadorConsistencia:
                     vehiculo.pk,
                 )
 
-        print(f"✅ Validación FK Vehículos-Clientes completada")
+        print("✅ Validación FK Vehículos-Clientes completada")
 
     def validar_2_fk_documentos_multiempresa(self):
         """Validar que documentos referencien objetos de la misma empresa"""
@@ -145,7 +143,7 @@ class ValidadorConsistencia:
 
                 self.log_correccion(
                     f"Servicio {servicio.code}: {country_anterior} → {country_correcto}",
-                    f"Auto-sincronización de country",
+                    "Auto-sincronización de country",
                 )
         else:
             print("✅ Todos los servicios tienen country consistente")
@@ -328,26 +326,26 @@ class ValidadorConsistencia:
 
         # Mostrar errores críticos
         if total_errores > 0:
-            print(f"\n❌ ERRORES CRÍTICOS:")
+            print("\n❌ ERRORES CRÍTICOS:")
             for error in self.errores[:10]:  # Solo primeros 10
                 print(f"   - {error['tipo']}: {error['mensaje']}")
 
         # Mostrar advertencias importantes
         if total_advertencias > 0:
-            print(f"\n⚠️ ADVERTENCIAS:")
+            print("\n⚠️ ADVERTENCIAS:")
             for adv in self.advertencias[:5]:  # Solo primeras 5
                 print(f"   - {adv['tipo']}: {adv['mensaje']}")
 
         # Mostrar correcciones aplicadas
         if total_correcciones > 0:
-            print(f"\n🔧 CORRECCIONES APLICADAS:")
+            print("\n🔧 CORRECCIONES APLICADAS:")
             for corr in self.correciones_aplicadas:
                 print(f"   - {corr['mensaje']}")
 
         # Estado final
         if total_errores == 0:
-            print(f"\n✅ CONSISTENCIA VALIDADA: Base de datos íntegra")
-            print(f"🎯 Sistema listo para producción multicountry")
+            print("\n✅ CONSISTENCIA VALIDADA: Base de datos íntegra")
+            print("🎯 Sistema listo para producción multicountry")
         else:
             print(f"\n⚠️ ACCIÓN REQUERIDA: {total_errores} errores necesitan corrección")
 

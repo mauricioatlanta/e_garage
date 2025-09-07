@@ -12,7 +12,6 @@
 5. Relaciones jerárquicas funcionando
 """
 
-import json
 import os
 import sys
 
@@ -116,7 +115,7 @@ if __name__ == "__main__":
     print("\n📝 4. INTEGRACIÓN JAVASCRIPT:")
     try:
         with open(
-            "templates/taller/vehiculos/crear_vehiculo.html", "r", encoding="utf-8"
+            "templates/taller/vehiculos/crear_vehiculo.html", encoding="utf-8"
         ) as f:
             template_content = f.read()
 

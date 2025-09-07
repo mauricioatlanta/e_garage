@@ -1,7 +1,10 @@
 from django.contrib import admin
 
-from taller.models.lineas_documento import (LineaOtroServicio, LineaRepuesto,
-                                            LineaServicio)
+from taller.models.lineas_documento import (
+    LineaOtroServicio,
+    LineaRepuesto,
+    LineaServicio,
+)
 
 from .forms import DocumentoForm
 from .models import Documento

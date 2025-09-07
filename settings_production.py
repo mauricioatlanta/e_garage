@@ -4,7 +4,6 @@
 # Archivo: settings_production.py
 # URL de producción: https://e-garage-atlantareciclajes.pythonanywhere.com
 
-import logging
 import os
 from pathlib import Path
 

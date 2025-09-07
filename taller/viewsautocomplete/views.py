@@ -1,4 +1,5 @@
 from dal import autocomplete
+
 from django.utils.functional import cached_property
 
 from taller.models.marca import Marca

@@ -12,7 +12,6 @@ django.setup()
 from django.contrib.auth.models import User
 
 from taller.models.documento import Documento
-from taller.models.empresa import Empresa
 from taller.models.lineas_documento import LineaRepuesto as RepuestoDocumento
 from taller.models.lineas_documento import LineaServicio
 from taller.models.perfil_usuario import PerfilUsuario
@@ -48,7 +47,7 @@ try:
     print(f"   ✅ Usuario: {taller2.username}")
     print(f"   ✅ Empresa: {perfil_taller2.empresa.nombre_taller}")
     print(f"   ✅ Rol: {perfil_taller2.rol}")
-    print(f"   ✅ Contraseña: Verificada")
+    print("   ✅ Contraseña: Verificada")
 except Exception as e:
     print(f"   ❌ Error con taller2: {e}")
 

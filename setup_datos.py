@@ -12,9 +12,9 @@ user, created = User.objects.get_or_create(
 if created:
     user.set_password("admin123")
     user.save()
-    print(f"✅ Superusuario creado: admin / admin123")
+    print("✅ Superusuario creado: admin / admin123")
 else:
-    print(f"ℹ️ Superusuario ya existe: admin")
+    print("ℹ️ Superusuario ya existe: admin")
 
 # Crear empresa
 from taller.models.empresa import Empresa
@@ -39,9 +39,9 @@ perfil, created = PerfilUsuario.objects.get_or_create(
     user=user, defaults={"empresa": empresa, "es_superadmin": False}
 )
 if created:
-    print(f"✅ Perfil creado")
+    print("✅ Perfil creado")
 else:
-    print(f"ℹ️ Perfil ya existe")
+    print("ℹ️ Perfil ya existe")
 
 # Crear técnicos
 from taller.models.tecnico import Tecnico

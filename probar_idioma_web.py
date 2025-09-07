@@ -3,7 +3,6 @@
 Script para probar el idioma que se muestra en la web
 """
 
-import re
 
 import requests
 
@@ -37,7 +36,7 @@ def probar_idioma_web():
                 "Actions",
             ]
 
-            print(f"\n🔍 ANÁLISIS DE CONTENIDO:")
+            print("\n🔍 ANÁLISIS DE CONTENIDO:")
 
             # Verificar textos en español
             espanol_encontrado = []
@@ -61,7 +60,7 @@ def probar_idioma_web():
             else:
                 idioma_detectado = "❓ INDETERMINADO"
 
-            print(f"\n📊 RESULTADO:")
+            print("\n📊 RESULTADO:")
             print(f"   • Textos en español: {len(espanol_encontrado)}")
             print(f"   • Textos en inglés: {len(ingles_encontrado)}")
             print(f"   • Idioma detectado: {idioma_detectado}")
@@ -74,17 +73,17 @@ def probar_idioma_web():
 
             # Buscar información del país
             if "🇺🇸" in content:
-                print(f"   • País detectado: 🇺🇸 USA")
+                print("   • País detectado: 🇺🇸 USA")
             elif "🇨🇱" in content:
-                print(f"   • País detectado: 🇨🇱 Chile")
+                print("   • País detectado: 🇨🇱 Chile")
 
-            print(f"\n🎯 CONCLUSIÓN:")
+            print("\n🎯 CONCLUSIÓN:")
             if idioma_detectado == "🇺🇸 INGLÉS":
-                print(f"   ✅ CORRECTO: USA muestra inglés")
+                print("   ✅ CORRECTO: USA muestra inglés")
             elif idioma_detectado == "🇪🇸 ESPAÑOL":
-                print(f"   ❌ INCORRECTO: USA muestra español (debería ser inglés)")
+                print("   ❌ INCORRECTO: USA muestra español (debería ser inglés)")
             else:
-                print(f"   ⚠️ INDETERMINADO: No se puede determinar el idioma")
+                print("   ⚠️ INDETERMINADO: No se puede determinar el idioma")
 
         else:
             print(f"❌ Error al cargar la página (Status: {response.status_code})")
@@ -96,7 +95,7 @@ def probar_idioma_web():
     except Exception as e:
         print(f"❌ Error: {e}")
 
-    print(f"\n✅ PRUEBA COMPLETADA!")
+    print("\n✅ PRUEBA COMPLETADA!")
 
 
 if __name__ == "__main__":

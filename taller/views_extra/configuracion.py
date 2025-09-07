@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect
 
 from taller.forms.empresa import DatosPersonalesForm, EmpresaForm
 from taller.models.empresa import Empresa
@@ -29,7 +29,7 @@ def configuracion(request):
 
             if "logo" in request.FILES:
                 logo_file = request.FILES["logo"]
-                print(f"  📁 Archivo logo encontrado:")
+                print("  📁 Archivo logo encontrado:")
                 print(f"    - Nombre: {logo_file.name}")
                 print(f"    - Tamaño: {logo_file.size} bytes")
                 print(f"    - Tipo MIME: {logo_file.content_type}")

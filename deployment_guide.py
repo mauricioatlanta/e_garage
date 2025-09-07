@@ -2,10 +2,7 @@
 """
 Script para facilitar el despliegue en producción
 """
-import os
-import subprocess
 import sys
-from pathlib import Path
 
 
 def print_banner():

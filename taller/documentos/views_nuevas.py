@@ -4,8 +4,6 @@ from decimal import Decimal
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
 
 from taller.documentos.forms import DocumentoForm
 from taller.models.documento import Documento
@@ -17,7 +15,7 @@ from taller.models.lineas_documento import LineaRepuesto, LineaServicio
 @login_required
 def ver_documento_nuevo(request, documento_id):
     """Vista nueva y mejorada para ver documentos con repuestos y servicios"""
-    print(f"[VER_NUEVO] ===== INICIANDO VER DOCUMENTO NUEVO =====")
+    print("[VER_NUEVO] ===== INICIANDO VER DOCUMENTO NUEVO =====")
     print(f"[VER_NUEVO] Usuario: {request.user.username}")
     print(f"[VER_NUEVO] Documento ID: {documento_id}")
 
@@ -63,7 +61,7 @@ def ver_documento_nuevo(request, documento_id):
     iva = int(subtotal * Decimal("0.19"))
     total = subtotal + iva
 
-    print(f"[VER_NUEVO] CÁLCULOS:")
+    print("[VER_NUEVO] CÁLCULOS:")
     print(f"[VER_NUEVO]   Subtotal repuestos: ${subtotal_repuestos}")
     print(f"[VER_NUEVO]   Subtotal servicios: ${subtotal_servicios}")
     print(f"[VER_NUEVO]   Subtotal: ${subtotal}")
@@ -81,7 +79,7 @@ def ver_documento_nuevo(request, documento_id):
         "total": total,
     }
 
-    print(f"[VER_NUEVO] ===== RENDERIZANDO TEMPLATE NUEVO =====")
+    print("[VER_NUEVO] ===== RENDERIZANDO TEMPLATE NUEVO =====")
     return render(request, "taller/documentos/ver_documento_nuevo.html", context)
 
 
@@ -90,7 +88,7 @@ def ver_documento_nuevo(request, documento_id):
 def editar_documento_nuevo(request, documento_id):
     """Vista nueva y mejorada para editar documentos con repuestos y servicios"""
     print("🔥 VISTA EDITAR_DOCUMENTO_NUEVO EJECUTÁNDOSE 🔥")
-    print(f"[EDITAR_NUEVO] ===== INICIANDO EDITAR DOCUMENTO NUEVO =====")
+    print("[EDITAR_NUEVO] ===== INICIANDO EDITAR DOCUMENTO NUEVO =====")
     print(f"[EDITAR_NUEVO] Usuario: {request.user.username}")
     print(f"[EDITAR_NUEVO] Documento ID: {documento_id}")
     print(f"[EDITAR_NUEVO] Método: {request.method}")
@@ -121,13 +119,13 @@ def editar_documento_nuevo(request, documento_id):
         raise
 
     if request.method == "POST":
-        print(f"[EDITAR_NUEVO] ===== PROCESANDO POST =====")
+        print("[EDITAR_NUEVO] ===== PROCESANDO POST =====")
 
         # Obtener datos del formulario
         form = DocumentoForm(request.POST, instance=documento, empresa=empresa)
 
         if form.is_valid():
-            print(f"[EDITAR_NUEVO] Formulario válido")
+            print("[EDITAR_NUEVO] Formulario válido")
 
             # Procesar items JSON con transacción atómica
             json_items = request.POST.get("json_items", "[]")
@@ -249,7 +247,7 @@ def editar_documento_nuevo(request, documento_id):
                 request,
                 f"Documento {documento.numero_documento} guardado exitosamente.",
             )
-            print(f"[EDITAR_NUEVO] ===== REDIRIGIENDO AL LISTADO DE DOCUMENTOS =====")
+            print("[EDITAR_NUEVO] ===== REDIRIGIENDO AL LISTADO DE DOCUMENTOS =====")
             return redirect("documentos:lista_documentos")
         else:
             print(f"[EDITAR_NUEVO] ❌ Formulario inválido: {form.errors}")
@@ -269,7 +267,7 @@ def editar_documento_nuevo(request, documento_id):
         documento=documento
     ).order_by("id")
 
-    print(f"[EDITAR_NUEVO] ===== DEBUG DATOS =====")
+    print("[EDITAR_NUEVO] ===== DEBUG DATOS =====")
     print(f"[EDITAR_NUEVO] Documento ID: {documento.id}")
     print(f"[EDITAR_NUEVO] Repuestos actuales: {repuestos_query.count()}")
     print(f"[EDITAR_NUEVO] Servicios actuales: {servicios_query.count()}")
@@ -337,16 +335,14 @@ def editar_documento_nuevo(request, documento_id):
         "editando": True,
     }
 
-    print(
-        f"[EDITAR_NUEVO] ===== RENDERIZANDO TEMPLATE DE CREACIÓN (MODO EDICIÓN) ====="
-    )
+    print("[EDITAR_NUEVO] ===== RENDERIZANDO TEMPLATE DE CREACIÓN (MODO EDICIÓN) =====")
     return render(request, "taller/documentos/crear_documento.html", context)
 
 
 @login_required
 def test_documento_datos(request, documento_id):
     """Vista de test para verificar que los datos están en la base de datos"""
-    print(f"[TEST] ===== TEST DE DATOS DEL DOCUMENTO =====")
+    print("[TEST] ===== TEST DE DATOS DEL DOCUMENTO =====")
 
     # Obtener empresa del usuario
     try:
@@ -363,8 +359,7 @@ def test_documento_datos(request, documento_id):
     documento = get_object_or_404(Documento, id=documento_id, empresa=empresa)
 
     # Test directo en base de datos
-    from taller.models.lineas_documento import \
-        LineaRepuesto as RepuestoDocumento
+    from taller.models.lineas_documento import LineaRepuesto as RepuestoDocumento
     from taller.models.lineas_documento import LineaServicio as ServicioLinea
 
     repuestos_count = RepuestoDocumento.objects.filter(documento=documento).count()

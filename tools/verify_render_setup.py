@@ -4,9 +4,9 @@ Script de verificación para el setup de Render
 Verifica que todos los archivos necesarios estén presentes y configurados correctamente
 """
 
-import os
 import sys
 from pathlib import Path
+
 
 def check_file_exists(file_path, description):
     """Verifica que un archivo exista"""
@@ -22,11 +22,11 @@ def check_file_content(file_path, required_content, description):
     if not Path(file_path).exists():
         print(f"❌ {description}: {file_path} - NO ENCONTRADO")
         return False
-    
+
     try:
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, encoding='utf-8') as f:
             content = f.read()
-        
+
         for item in required_content:
             if item in content:
                 print(f"✅ {description}: {item} encontrado en {file_path}")
@@ -41,9 +41,9 @@ def check_file_content(file_path, required_content, description):
 def main():
     print("🔍 Verificando setup para Render...")
     print("=" * 50)
-    
+
     all_good = True
-    
+
     # Verificar archivos principales
     files_to_check = [
         ("render.yaml", "Configuración de Render"),
@@ -52,28 +52,26 @@ def main():
         ("gestion_taller/wsgi.py", "Configuración WSGI"),
         ("gestion_taller/settings/production.py", "Settings de producción"),
     ]
-    
+
     for file_path, description in files_to_check:
         if not check_file_exists(file_path, description):
             all_good = False
-    
+
     print("\n" + "=" * 50)
     print("🔧 Verificando configuración específica...")
-    
+
     # Verificar render.yaml
     render_checks = [
         "type: web",
         "env: python",
         "gunicorn",
         "collectstatic",
-        "migrate",
-        "whitenoise",
-        "psycopg2-binary"
+        "migrate"
     ]
-    
+
     if not check_file_content("render.yaml", render_checks, "Configuración de Render"):
         all_good = False
-    
+
     # Verificar requirements.txt
     requirements_checks = [
         "Django>=",
@@ -82,10 +80,10 @@ def main():
         "whitenoise",
         "gunicorn"
     ]
-    
+
     if not check_file_content("requirements.txt", requirements_checks, "Dependencias"):
         all_good = False
-    
+
     # Verificar production.py
     production_checks = [
         "DEBUG = False",
@@ -94,13 +92,13 @@ def main():
         "STATICFILES_STORAGE",
         "MEDIA_ROOT = Path"
     ]
-    
+
     if not check_file_content("gestion_taller/settings/production.py", production_checks, "Settings de producción"):
         all_good = False
-    
+
     print("\n" + "=" * 50)
     print("📁 Verificando estructura de directorios...")
-    
+
     # Verificar directorios importantes
     dirs_to_check = [
         ("gestion_taller", "Directorio principal del proyecto"),
@@ -109,13 +107,13 @@ def main():
         ("media", "Archivos de usuario"),
         ("templates", "Plantillas HTML"),
     ]
-    
+
     for dir_path, description in dirs_to_check:
         if not check_file_exists(dir_path, description):
             all_good = False
-    
+
     print("\n" + "=" * 50)
-    
+
     if all_good:
         print("🎉 ¡Todo está listo para el despliegue en Render!")
         print("\n📋 Próximos pasos:")

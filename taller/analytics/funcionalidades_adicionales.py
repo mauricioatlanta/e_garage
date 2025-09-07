@@ -3,14 +3,12 @@
 Implementaciones avanzadas sugeridas por el usuario
 """
 
-import json
 from collections import defaultdict
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.db.models import Avg, Count, Q, Sum
+from django.db.models import Count, Q
 from django.http import JsonResponse
-from django.shortcuts import render
 from django.utils import timezone
 
 from taller.analytics.admin_views import es_staff_o_admin

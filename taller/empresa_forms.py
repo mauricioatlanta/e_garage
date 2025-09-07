@@ -9,13 +9,9 @@ class EmpresaForm(forms.ModelForm):
         fields = ["nombre_taller", "logo", "direccion", "telefono"]
 
 
-from dal import autocomplete
 from django.shortcuts import render
 
-from taller.models.clientes import Cliente
 from taller.models.documento import Documento
-from taller.models.tecnico import Tecnico
-from taller.models.vehiculos import Vehiculo
 
 
 class DocumentoForm(forms.ModelForm):

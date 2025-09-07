@@ -1,8 +1,13 @@
 from django.urls import path
 
-from taller.repuestos.views import (buscar_repuestos_ajax, crear_repuesto,
-                                    editar_repuesto, eliminar_repuesto,
-                                    lista_repuestos, ver_repuesto)
+from taller.repuestos.views import (
+    buscar_repuestos_ajax,
+    crear_repuesto,
+    editar_repuesto,
+    eliminar_repuesto,
+    lista_repuestos,
+    ver_repuesto,
+)
 
 from .api import api_repuesto_por_codigo
 

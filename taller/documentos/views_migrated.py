@@ -5,16 +5,17 @@ Esto reemplaza las vistas FBV que están en views.py con plantillas hardcodeadas
 
 from decimal import Decimal
 
-from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import DecimalField, ExpressionWrapper, F, Sum
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, redirect
 from django.utils import timezone
 from django.utils.decorators import method_decorator
-from django.utils.translation import get_language
-from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
-                                  UpdateView)
+from django.views.generic import (
+    CreateView,
+    DeleteView,
+    DetailView,
+    ListView,
+    UpdateView,
+)
 
 from taller.forms.documento import DocumentoForm
 from taller.mixins import CountryLangTemplateMixin

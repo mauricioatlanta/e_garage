@@ -13,8 +13,6 @@ django.setup()
 from django.contrib.auth.models import User
 
 from taller.documentos.forms import DocumentoForm
-from taller.models.clientes import Cliente
-from taller.models.vehiculos import Vehiculo
 
 
 def main():

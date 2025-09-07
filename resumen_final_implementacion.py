@@ -4,7 +4,6 @@
 Documentación final de validaciones consistencia + fixtures reales
 """
 import os
-import sys
 
 import django
 

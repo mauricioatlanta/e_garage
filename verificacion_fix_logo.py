@@ -65,7 +65,7 @@ print("3️⃣ Verificando ConfiguracionEmpresa...")
 try:
     if user and hasattr(user, "empresa"):
         config = ConfiguracionEmpresa.objects.get(empresa=user.empresa)
-        print(f"✅ ConfiguracionEmpresa encontrada")
+        print("✅ ConfiguracionEmpresa encontrada")
         print(f"   Nombre público: {config.nombre_publico}")
         print(f"   Logo actual: {config.logo}")
         print(f"   Logo URL: {config.logo.url if config.logo else 'Sin logo'}")
@@ -110,7 +110,7 @@ try:
         if form.is_valid():
             print("✅ Formulario válido")
             obj = form.save()
-            print(f"✅ Guardado exitoso")
+            print("✅ Guardado exitoso")
             print(f"   Logo antes: {logo_antes}")
             print(f"   Logo después: {obj.logo}")
             print(f"   URL después: {obj.logo.url if obj.logo else 'Sin URL'}")

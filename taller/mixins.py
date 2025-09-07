@@ -45,7 +45,7 @@ class CountryLangTemplateMixin:
         try:
             template_name = select_country_lang_template(base_template, country, lang)
             return [template_name]
-        except Exception as e:
+        except Exception:
             # Fallback a template base si hay problemas
             return [f"taller/common/{base_template}", f"taller/{base_template}"]
 
@@ -76,7 +76,7 @@ class CountryLangTemplateMixin:
             template_name = select_country_lang_template(
                 self.base_template_name, country, lang
             )
-        except Exception as e:
+        except Exception:
             # Fallback a template base si hay problemas
             template_name = f"taller/common/{self.base_template_name}"
 

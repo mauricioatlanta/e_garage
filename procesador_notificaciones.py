@@ -13,13 +13,13 @@ import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings_sqlite")
 django.setup()
 
-from taller.models.auditoria import LogAuditoria
 from taller.models.empresa import Empresa
 from taller.models.notificacion import NotificacionEnviada
-from taller.utils.notificaciones import (notificar_documento_creado,
-                                         procesar_cola_notificaciones,
-                                         verificar_recordatorios_mantenimiento,
-                                         verificar_suscripciones_vencimiento)
+from taller.utils.notificaciones import (
+    procesar_cola_notificaciones,
+    verificar_recordatorios_mantenimiento,
+    verificar_suscripciones_vencimiento,
+)
 
 # Configurar logging
 logging.basicConfig(

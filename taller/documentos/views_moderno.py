@@ -9,7 +9,6 @@ from django.db import transaction
 from django.db.models import DecimalField, ExpressionWrapper, F, Q
 from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse
 from django.utils.timezone import now
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET
@@ -78,8 +77,11 @@ def api_buscar_repuestos(request):
 from taller.models.clientes import Cliente
 from taller.models.documento import Documento
 from taller.models.empresa import Empresa
-from taller.models.lineas_documento import (LineaOtroServicio, LineaRepuesto,
-                                            LineaServicio)
+from taller.models.lineas_documento import (
+    LineaOtroServicio,
+    LineaRepuesto,
+    LineaServicio,
+)
 from taller.models.repuesto import Repuesto
 from taller.models.tecnico import Tecnico
 from taller.models.vehiculos import Vehiculo
@@ -874,9 +876,8 @@ def _to_decimal_pct(txt: str) -> Decimal | None:
 @transaction.atomic
 def documento_form(request, pk=None):
     """Vista unificada para crear y editar documentos"""
-    from decimal import InvalidOperation
 
-    from django.db.models import DecimalField, ExpressionWrapper, Sum
+    from django.db.models import Sum
 
     from taller.documentos.forms import DocumentoForm
 

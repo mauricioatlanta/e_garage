@@ -6,23 +6,21 @@
 # Autor: Sistema de Analytics Avanzado
 # Fecha: 2024
 
-import json
 import logging
 import random
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from django.contrib.auth.decorators import login_required
+
 # Django imports
-from django.contrib.auth.models import User
-from django.db.models import Count, F, Q, Sum
+from django.db.models import Count, Q, Sum
 from django.http import JsonResponse
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
 # Modelos necesarios
-from taller.models import (ComprobantePago, Empresa, PerfilUsuario,
-                           TrialRegistro)
+from taller.models import ComprobantePago, Empresa, TrialRegistro
 
 logger = logging.getLogger(__name__)
 
@@ -480,7 +478,7 @@ def dashboard_user_behavior(request):
             },
             "insights": [
                 f"El {tasa_actividad}% de los usuarios están activos",
-                f"Hora pico de actividad: 10:00-11:00 AM",
+                "Hora pico de actividad: 10:00-11:00 AM",
                 (
                     f"Usuario más activo: {top_usuarios_data[0]['usuario']}"
                     if top_usuarios_data

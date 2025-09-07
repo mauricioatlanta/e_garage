@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Comando para ajustar precios de repuestos con decimales realistas en USD.
 Convierte precios enteros a decimales apropiados para un taller automotriz.
@@ -13,8 +12,13 @@ from decimal import Decimal
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
-from taller.models import (Empresa, LineaOtroServicio, LineaRepuesto,
-                           LineaServicio, Repuesto)
+from taller.models import (
+    Empresa,
+    LineaOtroServicio,
+    LineaRepuesto,
+    LineaServicio,
+    Repuesto,
+)
 from taller.servicios.models import Servicio
 
 RND = random.Random(42)

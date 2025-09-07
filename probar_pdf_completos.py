@@ -69,12 +69,12 @@ def probar_pdf_cuentas_test():
                             f"      ✅ PDF generado: {filename} ({len(pdf_content):,} bytes)"
                         )
                     else:
-                        print(f"      ❌ PDF vacío")
+                        print("      ❌ PDF vacío")
 
                 except Exception as e:
                     print(f"      ❌ Error: {str(e)}")
             else:
-                print(f"      ⚠️ Documento sin items - omitiendo PDF")
+                print("      ⚠️ Documento sin items - omitiendo PDF")
 
     print("\n=== PRUEBA COMPLETADA ===")
 

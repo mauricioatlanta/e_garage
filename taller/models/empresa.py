@@ -2,6 +2,7 @@ from datetime import timedelta
 from decimal import Decimal
 
 import pytz
+
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
@@ -282,7 +283,7 @@ class Empresa(models.Model):
                 "Tu suscripción ha vencido. Renueva para continuar usando el sistema."
             )
         elif dias == 1:
-            return f"⚠️ Tu suscripción vence mañana. ¡Renueva ahora!"
+            return "⚠️ Tu suscripción vence mañana. ¡Renueva ahora!"
         elif dias <= 5:
             return f"⚠️ Tu suscripción vence en {dias} días. Considera renovar pronto."
         return ""

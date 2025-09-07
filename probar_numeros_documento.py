@@ -4,10 +4,8 @@ Script para probar la API de generación de números de documento
 """
 
 import os
-import sys
 
 import django
-from django.conf import settings
 
 # Configurar Django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings")

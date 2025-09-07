@@ -2,25 +2,28 @@ import datetime
 import random
 from decimal import Decimal
 
+from faker import Faker
+
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 from django.db import connection, transaction
-from django.utils import timezone
-from faker import Faker
 
 from taller.models.clientes import Cliente
 from taller.models.documento import Documento
+
 # Importar modelos
 from taller.models.empresa import Empresa
-from taller.models.lineas_documento import (LineaOtroServicio, LineaRepuesto,
-                                            LineaServicio)
+from taller.models.lineas_documento import (
+    LineaOtroServicio,
+    LineaRepuesto,
+    LineaServicio,
+)
 from taller.models.marca import Marca
 from taller.models.modelo import Modelo
 from taller.models.repuesto import CategoriaRepuesto, Repuesto
 from taller.models.tecnico import Tecnico
 from taller.models.vehiculos import Vehiculo
-from taller.servicios.models import (CategoriaServicio, Servicio,
-                                     ServicioExterno)
+from taller.servicios.models import CategoriaServicio, ServicioExterno
 
 
 class Command(BaseCommand):

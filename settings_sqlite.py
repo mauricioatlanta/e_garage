@@ -1,6 +1,4 @@
 # Configuración temporal para usar SQLite
-import os
-from pathlib import Path
 
 # Importar la configuración base
 from e_garage.settings import *

@@ -29,16 +29,27 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "e_garage.settings")
 django.setup()
 
 from allauth.account.models import EmailAddress
+
 # Imports después de configurar Django
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.utils import timezone
 
 # Modelos del sistema
-from taller.models import (CategoriaServicio, Cliente, ComprobantePago,
-                           Documento, DocumentoItem, Empresa, MarcaVehiculo,
-                           ModeloVehiculo, Repuesto, Servicio, TrialRegistro,
-                           Vehiculo)
+from taller.models import (
+    CategoriaServicio,
+    Cliente,
+    ComprobantePago,
+    Documento,
+    DocumentoItem,
+    Empresa,
+    MarcaVehiculo,
+    ModeloVehiculo,
+    Repuesto,
+    Servicio,
+    TrialRegistro,
+    Vehiculo,
+)
 
 
 def print_step(step, description):
@@ -674,7 +685,7 @@ def generar_archivo_informe(usuarios_creados, datos_creados):
         if tipo in datos_creados:
             datos = datos_creados[tipo]
 
-            contenido += f"""
+            contenido += """
 #### 📊 Datos de Prueba Incluidos:
 
 **👥 Clientes:**
@@ -684,13 +695,13 @@ def generar_archivo_informe(usuarios_creados, datos_creados):
                     f"- {cliente.nombre} ({cliente.rut}) - {cliente.telefono}\n"
                 )
 
-            contenido += f"""
+            contenido += """
 **🚗 Vehículos:**
 """
             for vehiculo in datos["vehiculos"]:
                 contenido += f"- {vehiculo.marca.nombre} {vehiculo.modelo.nombre} {vehiculo.anio} - Patente: {vehiculo.patente}\n"
 
-            contenido += f"""
+            contenido += """
 **📄 Documentos:**
 """
             for documento in datos["documentos"]:

@@ -2,17 +2,14 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail
 from django.shortcuts import redirect, render
-from django.utils.crypto import get_random_string
 
 from taller.models.taller_info import TallerInfo
 from taller.views_extra.registro_utils import validar_prueba
 
 from ..forms.suscripcion import FormularioRegistro
 from ..models.empresa import Empresa
-from ..models.suscripcion import Suscripcion
 
 
 # Vista original

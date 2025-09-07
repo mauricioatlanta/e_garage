@@ -54,7 +54,7 @@ def main():
                 [user.id, user.id],
             )
             rows = cursor.fetchall()
-            print(f"\n✓ Verificación SQL directa:")
+            print("\n✓ Verificación SQL directa:")
             for row in rows:
                 print(
                     f"  - ID: {row[0]}, Nombre: {row[1]}, País: {row[2]}, user_id: {row[3]}, usuario_id: {row[4]}"
@@ -64,7 +64,7 @@ def main():
                 cursor.execute(
                     "UPDATE taller_empresa SET pais = 'US' WHERE id = %s", [row[0]]
                 )
-                print(f"    → SQL UPDATE aplicado")
+                print("    → SQL UPDATE aplicado")
 
         print("\n✅ Cambios aplicados con SQL directo")
 

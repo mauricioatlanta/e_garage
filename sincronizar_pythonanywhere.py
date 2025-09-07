@@ -215,7 +215,7 @@ def main():
         mostrar_instrucciones_finales(zip_name)
 
         print("\n✅ PAQUETE DE DEPLOY LISTO")
-        print(f"📁 Directorio: deploy_pythonanywhere/")
+        print("📁 Directorio: deploy_pythonanywhere/")
         print(f"📦 ZIP: {zip_name}")
 
     except Exception as e:

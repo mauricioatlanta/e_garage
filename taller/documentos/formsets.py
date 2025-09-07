@@ -1,8 +1,11 @@
 from django import forms
 from django.forms import BaseFormSet, formset_factory
 
-from taller.models.lineas_documento import (LineaOtroServicio, LineaRepuesto,
-                                            LineaServicio)
+from taller.models.lineas_documento import (
+    LineaOtroServicio,
+    LineaRepuesto,
+    LineaServicio,
+)
 from taller.models.repuesto import Repuesto
 from taller.servicios.models import Servicio
 

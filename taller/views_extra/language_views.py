@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.utils import translation
-from django.utils.translation import gettext as _
 
 
 def set_language_from_url(request):

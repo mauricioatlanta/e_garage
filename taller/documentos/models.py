@@ -2,11 +2,7 @@ from decimal import Decimal
 
 from django.db import models
 
-from taller.models.clientes import Cliente
 from taller.models.documento import Documento
-from taller.models.lineas_documento import (LineaOtroServicio, LineaRepuesto,
-                                            LineaServicio)
-from taller.models.vehiculos import Vehiculo
 
 Documento = Documento
 

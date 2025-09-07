@@ -2,11 +2,10 @@ from decimal import Decimal
 
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import DecimalField, ExpressionWrapper, F, Index, Sum
+from django.db.models import DecimalField, ExpressionWrapper, F, Sum
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _  # 👈 Para traducciones
 
-from core.models import TenantScoped
 from taller.models.clientes import Cliente
 from taller.models.mixins import AuditMixin
 from taller.models.vehiculos import Vehiculo
@@ -282,7 +281,6 @@ class Documento(AuditMixin, models.Model):
 
     def recalcular_totales(self):
         """Recalcula y actualiza los totales del documento aplicando IVA solo a repuestos"""
-        from decimal import Decimal
 
         # Subtotales "autoridad" en servidor
         rep_sub = (

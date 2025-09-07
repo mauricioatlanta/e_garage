@@ -3,14 +3,12 @@ Sistema de Reportes Inteligentes con AI Analytics
 Diferenciación por país con visualizaciones futuristas
 """
 
-import json
-from datetime import datetime, timedelta
-from decimal import Decimal
+from datetime import timedelta
 
-from django.db.models import Avg, Count, Q, Sum
+from django.db.models import Avg, Count, Sum
 from django.utils import timezone
 
-from taller.utils.pais_utils import formatear_precio, get_configuracion_pais
+from taller.utils.pais_utils import get_configuracion_pais
 
 
 class AIReportEngine:

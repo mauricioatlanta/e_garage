@@ -16,13 +16,7 @@ class Command(BaseCommand):
         self.stdout.write("-" * 80)
         for user in User.objects.all():
             self.stdout.write(
-                "{:<15} {:<30} {:<10} {:<10} {:<10}".format(
-                    user.username,
-                    user.email,
-                    str(user.is_active),
-                    str(user.is_staff),
-                    str(user.is_superuser),
-                )
+                f"{user.username:<15} {user.email:<30} {str(user.is_active):<10} {str(user.is_staff):<10} {str(user.is_superuser):<10}"
             )
         self.stdout.write(
             "\nPuedes resetear contraseñas con: python manage.py changepassword <username>\n"

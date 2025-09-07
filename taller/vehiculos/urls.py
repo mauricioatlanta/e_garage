@@ -1,19 +1,25 @@
 from django.urls import path
 
-from taller.autocomplete.views_autocomplete import (ClienteAutocomplete,
-                                                    MarcaAutocomplete,
-                                                    ModeloAutocomplete)
+from taller.autocomplete.views_autocomplete import (
+    ClienteAutocomplete,
+    MarcaAutocomplete,
+    ModeloAutocomplete,
+)
 from taller.vehiculos import views
-from taller.vehiculos.api import (api_cajas_por_modelo, api_modelos_usa,
-                                  api_motores_por_modelo, crear_modelo,
-                                  obtener_modelos)
+from taller.vehiculos.api import (
+    api_cajas_por_modelo,
+    api_modelos_usa,
+    api_motores_por_modelo,
+    crear_modelo,
+    obtener_modelos,
+)
 from taller.vehiculos.views_autocomplete import VehiculoAutocomplete
 from taller.vehiculos.views_autocomplete_caja import CajaVehiculoAutocomplete
 from taller.vehiculos.views_autocomplete_color import ColorVehiculoAutocomplete
-from taller.vehiculos.views_autocomplete_marca_usa import \
-    MarcaVehiculoUSA_Autocomplete
-from taller.vehiculos.views_autocomplete_modelo_usa import \
-    ModeloVehiculoUSA_Autocomplete
+from taller.vehiculos.views_autocomplete_marca_usa import MarcaVehiculoUSA_Autocomplete
+from taller.vehiculos.views_autocomplete_modelo_usa import (
+    ModeloVehiculoUSA_Autocomplete,
+)
 from taller.vehiculos.views_autocomplete_motor import MotorVehiculoAutocomplete
 
 app_name = "vehiculos"

@@ -1,10 +1,9 @@
-import os
+from PIL import Image
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
 from django.db import models
-from PIL import Image
 
 
 def validate_logo_size(image):

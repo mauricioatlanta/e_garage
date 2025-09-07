@@ -5,7 +5,6 @@ USA: selector ES/EN (guarda en cookie/sesión)
 """
 
 from django.conf import settings
-from django.shortcuts import redirect
 from django.utils import translation
 from django.utils.deprecation import MiddlewareMixin
 

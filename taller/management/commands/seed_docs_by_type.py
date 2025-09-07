@@ -7,8 +7,11 @@ from django.utils.timezone import now
 
 from taller.models import Documento, Empresa, Repuesto, Tecnico
 from taller.models.clientes import Cliente
-from taller.models.lineas_documento import (LineaOtroServicio, LineaRepuesto,
-                                            LineaServicio)
+from taller.models.lineas_documento import (
+    LineaOtroServicio,
+    LineaRepuesto,
+    LineaServicio,
+)
 from taller.models.marca import Marca
 from taller.models.modelo import Modelo
 from taller.models.vehiculos import Vehiculo

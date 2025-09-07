@@ -13,10 +13,8 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "garage_project.settings")
 sys.path.append("e:\\projecto\\e_garage")
 django.setup()
 
-from django.contrib.auth import get_user_model
 
-from taller.models import (Cliente, Documento, Empresa, LineaRepuesto,
-                           Repuesto, Tecnico, Vehiculo)
+from taller.models import Documento, Repuesto
 
 
 def verificacion_final():
@@ -39,7 +37,7 @@ def verificacion_final():
         return False
 
     ultimo_doc = Documento.objects.latest("id")
-    print(f"\n📄 ÚLTIMO DOCUMENTO:")
+    print("\n📄 ÚLTIMO DOCUMENTO:")
     print(
         f"DOC: {ultimo_doc.id} {ultimo_doc.empresa_id} {ultimo_doc.cliente_id} {ultimo_doc.vehiculo_id} {getattr(ultimo_doc, 'millas', None)}"
     )
@@ -73,7 +71,7 @@ def verificacion_final():
         print("❌ REPUESTO OF NO ESTÁ EN EL DOCUMENTO")
 
     # 6. Estado del problema
-    print(f"\n🔍 DIAGNÓSTICO:")
+    print("\n🔍 DIAGNÓSTICO:")
     if cnt_rep == 0:
         print("❌ PROBLEMA PERSISTE: No se guardan líneas de repuestos")
         print("   Causa: Vista no procesa los datos POST correctamente")
@@ -87,7 +85,7 @@ def verificacion_final():
 
 
 def comandos_shell_manuales():
-    print(f"\n📋 COMANDOS SHELL MANUALES:")
+    print("\n📋 COMANDOS SHELL MANUALES:")
     print("# Ejecutar en Django shell:")
     print("python manage.py shell")
     print("")

@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 import getpass
-import re
 import smtplib
-import socket
 import ssl
-import sys
 from email.message import EmailMessage
 
 import dns.resolver
@@ -72,7 +69,7 @@ for port in PORTS:
                             import base64
 
                             authz = user
-                            auth = f"\0{user}\0{password}".encode("utf-8")
+                            auth = f"\0{user}\0{password}".encode()
                             b64_auth = base64.b64encode(auth).decode("ascii")
                             code, resp = server.docmd("AUTH", "PLAIN " + b64_auth)
                             if code != 235:
@@ -103,7 +100,7 @@ for port in PORTS:
                             import base64
 
                             authz = user
-                            auth = f"\0{user}\0{password}".encode("utf-8")
+                            auth = f"\0{user}\0{password}".encode()
                             b64_auth = base64.b64encode(auth).decode("ascii")
                             code, resp = server.docmd("AUTH", "PLAIN " + b64_auth)
                             if code != 235:

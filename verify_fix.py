@@ -14,7 +14,7 @@ from taller.models.perfil_usuario import PerfilUsuario
 try:
     # Intentar hacer una consulta simple al modelo PerfilUsuario
     count = PerfilUsuario.objects.count()
-    print(f"✅ Modelo PerfilUsuario funciona correctamente")
+    print("✅ Modelo PerfilUsuario funciona correctamente")
     print(f"   Total de perfiles: {count}")
 
     # Listar algunos usuarios sin perfil

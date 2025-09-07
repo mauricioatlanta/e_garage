@@ -3,17 +3,10 @@ Utilidades para búsqueda y manejo de servicios multilenguaje
 Incluye normalización, búsqueda por aliases y fuzzy matching
 """
 
-import json
 import re
 from difflib import SequenceMatcher
 
-from django.db.models import Q
-from django.utils.text import slugify
-
-from taller.servicios.models import (CategoriaServicio, CategoriaServicioName,
-                                     Servicio, ServicioName,
-                                     SubcategoriaServicio,
-                                     SubcategoriaServicioName)
+from taller.servicios.models import CategoriaServicio, Servicio, ServicioName
 
 
 def normalize_search_term(term):

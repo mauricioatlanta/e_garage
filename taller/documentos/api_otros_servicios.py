@@ -41,8 +41,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 
-from taller.servicios.models import (CategoriaServicio, Servicio, ServicioName,
-                                     SubcategoriaServicio)
+from taller.servicios.models import Servicio, ServicioName, SubcategoriaServicio
 
 
 @login_required

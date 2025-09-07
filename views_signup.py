@@ -1,5 +1,4 @@
-from django.shortcuts import redirect, render
-from django.urls import reverse
+from django.shortcuts import render
 
 
 def signup_country_select(request):
@@ -7,7 +6,6 @@ def signup_country_select(request):
 
 
 def signup_chile(request):
-    from django.contrib import messages
     from django.contrib.auth.models import User
 
     from taller.forms_signup import SignupChileForm
@@ -43,7 +41,6 @@ def signup_chile(request):
 
 
 def signup_usa(request):
-    from django.contrib import messages
     from django.contrib.auth.models import User
 
     from taller.forms_signup import SignupUSAForm

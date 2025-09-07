@@ -21,7 +21,7 @@ def sin_pais(value):
 def formatear_pesos(valor):
     try:
         valor = int(valor)
-        return "${:,.0f}".format(valor).replace(",", ".")
+        return f"${valor:,.0f}".replace(",", ".")
     except (ValueError, TypeError):
         return valor
 
@@ -76,7 +76,7 @@ def add_thousands_separator(value):
             num = int(float(str(value)))
 
         # Formatear con separadores de miles usando punto
-        return "{:,}".format(num).replace(",", ".")
+        return f"{num:,}".replace(",", ".")
     except (ValueError, TypeError):
         return value
 

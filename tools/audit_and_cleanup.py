@@ -15,9 +15,13 @@ Uso:
   python tools/audit_and_cleanup.py --root E:/projecto/e_garage
 """
 from __future__ import annotations
-import argparse, re, shutil, sys
-from pathlib import Path
+
+import argparse
+import re
+import shutil
+import sys
 from datetime import datetime
+from pathlib import Path
 
 SUSPECT_PATTERNS = [
     r"backup.*\.py$", r".*final.*working.*\.py$", r"check_.*\.py$",
@@ -48,8 +52,8 @@ NOTES_MD     = [r".*\.md$"]
 
 MOVE_MAP = {
     "scripts": [
-        r"cargar_.*\.py$", r"agregar_.*\.py$", r"check_.*\.py$", 
-        r"acceso_.*\.py$", r"comando_.*\.py$", r"clear_.*\.py$", 
+        r"cargar_.*\.py$", r"agregar_.*\.py$", r"check_.*\.py$",
+        r"acceso_.*\.py$", r"comando_.*\.py$", r"clear_.*\.py$",
         r"configurar_.*\.py$", r"debug_.*\.py$", r"diagnostico_.*\.py$",
         r"fix_.*\.py$", r"crear_.*\.py$", r"demo_.*\.py$", r"generar_.*\.py$",
         r"limpiar_.*\.py$", r"migrar_.*\.py$", r"actualizar_.*\.py$",
@@ -168,7 +172,7 @@ def main():
     move_if_needed(root, MOVE_MAP, suspects+loaders+notes, args.apply, decisions)
 
     with report.open("w", encoding="utf-8") as fh:
-        fh.write(f"# eGarage – Auditoría de raíz\n\n")
+        fh.write("# eGarage – Auditoría de raíz\n\n")
         fh.write(f"- Fecha: {timestamp}\n")
         fh.write(f"- Root: `{root}`\n")
         fh.write(f"- manage.py: {manage if manage else 'NO ENCONTRADO'}\n")

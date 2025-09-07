@@ -1,5 +1,3 @@
-from .models.taller_info import TallerInfo
-
 # ...resto de imports...
 
 

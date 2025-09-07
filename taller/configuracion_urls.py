@@ -1,7 +1,9 @@
 from django.urls import path
 
-from .views_extra.views_configuracion import (configuracion_empresa,
-                                              configuracion_tecnicos)
+from .views_extra.views_configuracion import (
+    configuracion_empresa,
+    configuracion_tecnicos,
+)
 
 # URLconf para configuración
 urlpatterns = [

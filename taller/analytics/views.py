@@ -7,7 +7,7 @@ import json
 
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
@@ -325,7 +325,6 @@ def real_time_metrics_api(request):
     engine = AIReportEngine(request.user.empresa)
 
     # Métricas en tiempo real
-    from datetime import timedelta
 
     from django.utils import timezone
 

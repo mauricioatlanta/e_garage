@@ -2,7 +2,6 @@
 """
 Modelo para gestionar notificaciones automáticas del sistema
 """
-from datetime import timedelta
 
 from django.contrib.auth.models import User
 from django.db import models
@@ -11,7 +10,6 @@ from django.utils import timezone
 from .clientes import Cliente
 from .documento import Documento
 from .empresa import Empresa
-from .vehiculos import Vehiculo
 
 
 class TipoNotificacion(models.Model):

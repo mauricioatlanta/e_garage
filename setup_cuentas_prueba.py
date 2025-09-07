@@ -77,10 +77,10 @@ def crear_cuentas_prueba():
             empresa="E-Garage Admin",
         )
 
-        print(f"✅ Administrador creado:")
-        print(f"   Usuario: admin")
-        print(f"   Email: admin@egarage.com")
-        print(f"   Password: admin123")
+        print("✅ Administrador creado:")
+        print("   Usuario: admin")
+        print("   Email: admin@egarage.com")
+        print("   Password: admin123")
         print(f"   Empresa: {admin_empresa.nombre_taller}")
 
         # 2. Taller de prueba 1
@@ -100,10 +100,10 @@ def crear_cuentas_prueba():
             telefono="+56912345678",
         )
 
-        print(f"\n✅ Taller 1 creado:")
-        print(f"   Usuario: taller1")
-        print(f"   Email: taller1@test.com")
-        print(f"   Password: taller123")
+        print("\n✅ Taller 1 creado:")
+        print("   Usuario: taller1")
+        print("   Email: taller1@test.com")
+        print("   Password: taller123")
         print(f"   Empresa: {taller1_empresa.nombre_taller}")
 
         # 3. Taller de prueba 2
@@ -123,14 +123,14 @@ def crear_cuentas_prueba():
             telefono="+56987654321",
         )
 
-        print(f"\n✅ Taller 2 creado:")
-        print(f"   Usuario: taller2")
-        print(f"   Email: taller2@test.com")
-        print(f"   Password: taller123")
+        print("\n✅ Taller 2 creado:")
+        print("   Usuario: taller2")
+        print("   Email: taller2@test.com")
+        print("   Password: taller123")
         print(f"   Empresa: {taller2_empresa.nombre_taller}")
 
         # Crear algunas tiendas de ejemplo para cada taller
-        print(f"\n🏪 Creando tiendas de ejemplo...")
+        print("\n🏪 Creando tiendas de ejemplo...")
 
         # Tiendas para taller 1
         tienda1_1 = Tienda.objects.create(
@@ -165,21 +165,21 @@ def crear_cuentas_prueba():
 
 
 def mostrar_resumen():
-    print(f"\n📊 Resumen final:")
+    print("\n📊 Resumen final:")
     print(f"   Total usuarios: {User.objects.count()}")
     print(f"   Total empresas: {Empresa.objects.count()}")
     print(f"   Total tiendas: {Tienda.objects.count()}")
 
-    print(f"\n🔐 Credenciales de acceso:")
-    print(f"   Admin:   usuario='admin'   password='admin123'")
-    print(f"   Taller1: usuario='taller1' password='taller123'")
-    print(f"   Taller2: usuario='taller2' password='taller123'")
+    print("\n🔐 Credenciales de acceso:")
+    print("   Admin:   usuario='admin'   password='admin123'")
+    print("   Taller1: usuario='taller1' password='taller123'")
+    print("   Taller2: usuario='taller2' password='taller123'")
 
-    print(f"\n🌐 Puedes acceder en: http://127.0.0.1:8000/")
+    print("\n🌐 Puedes acceder en: http://127.0.0.1:8000/")
 
 
 if __name__ == "__main__":
     limpiar_datos()
     crear_cuentas_prueba()
     mostrar_resumen()
-    print(f"\n🎉 Base de datos preparada para pruebas!")
+    print("\n🎉 Base de datos preparada para pruebas!")

@@ -4,7 +4,6 @@
 Resumen ejecutivo de todas las validaciones de consistencia
 """
 import os
-import sys
 
 import django
 

@@ -66,10 +66,12 @@ urlpatterns = [
 
 # Agregar rutas de rentabilidad dinámicamente para evitar imports circulares
 try:
-    from .reportes_avanzados import (dashboard_rentabilidad,
-                                     reporte_comparativo_precios,
-                                     reporte_servicios_subcontratados,
-                                     reportes_rentabilidad)
+    from .reportes_avanzados import (
+        dashboard_rentabilidad,
+        reporte_comparativo_precios,
+        reporte_servicios_subcontratados,
+        reportes_rentabilidad,
+    )
 
     urlpatterns += [
         path(

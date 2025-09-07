@@ -2,12 +2,9 @@
 Vistas para exportación de documentos y reportes
 """
 
-import json
 from datetime import datetime, timedelta
 
-from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -17,8 +14,12 @@ from django.views.decorators.http import require_http_methods
 from taller.auth.decorators import login_required_default
 from taller.middleware.trial_middleware import empresa_actual
 from taller.models.documento import Documento
-from taller.utils.export_utils import (DocumentoPDFExporter, EmailSender,
-                                       ReportesExcelExporter, WhatsAppSender)
+from taller.utils.export_utils import (
+    DocumentoPDFExporter,
+    EmailSender,
+    ReportesExcelExporter,
+    WhatsAppSender,
+)
 
 
 @login_required_default

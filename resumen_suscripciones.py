@@ -14,7 +14,6 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 
 from taller.models.empresa import Empresa
-from taller.models.suscripcion import Suscripcion
 
 print("🎯" + "=" * 80)
 print("📋 RESUMEN COMPLETO DE SUSCRIPCIONES Y CREDENCIALES DE PRUEBA")
@@ -62,7 +61,7 @@ for i, taller in enumerate(usuarios_taller, 1):
     status = "✅" if taller["auth_ok"] else "❌"
     print(f'{i}. 🏢 {taller["empresa"]}')
     print(f'   👤 Usuario: {taller["username"]}')
-    print(f"   🔑 Password: taller123")
+    print("   🔑 Password: taller123")
     print(f'   📧 Email: {taller["email"]}')
     print(f'   📱 Teléfono: {taller["telefono"]}')
     print(f'   📍 Dirección: {taller["direccion"]}')

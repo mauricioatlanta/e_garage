@@ -1,6 +1,5 @@
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.utils import timezone
 
 from taller.models.trial import TrialRegistro
 

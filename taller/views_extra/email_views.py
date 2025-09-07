@@ -2,17 +2,17 @@
 Views para testing del sistema de emails
 """
 
-import json
-
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 
-from taller.utils.email_utils import (enviar_correo_bienvenida,
-                                      enviar_correo_prueba,
-                                      verificar_conexion_smtp)
+from taller.utils.email_utils import (
+    enviar_correo_bienvenida,
+    enviar_correo_prueba,
+    verificar_conexion_smtp,
+)
 
 
 @login_required

@@ -2,7 +2,6 @@ from django.test import TestCase
 
 from taller.forms.repuesto import RepuestoForm
 from taller.models.empresa import Empresa
-from taller.models.repuesto import Repuesto
 
 
 class RepuestoFormTest(TestCase):

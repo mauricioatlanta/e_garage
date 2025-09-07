@@ -5,7 +5,6 @@ from pathlib import Path
 
 from decouple import config
 from django.core.management.utils import get_random_secret_key
-from django.utils.translation import gettext_lazy as _
 
 # BASE DIR
 BASE_DIR = Path(__file__).resolve().parent.parent

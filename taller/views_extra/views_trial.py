@@ -2,7 +2,7 @@ import re
 
 from django.conf import settings
 from django.core.mail import send_mail
-from django.shortcuts import redirect, render
+from django.shortcuts import render
 from django.utils.crypto import get_random_string
 from django.views.decorators.csrf import csrf_protect
 
@@ -50,6 +50,6 @@ def registro_trial(request):
                     fail_silently=False,
                 )
                 mensaje = "¡Código enviado! Revisa tu correo electrónico."
-            except Exception as e:
+            except Exception:
                 error = "No se pudo enviar el correo. Intenta nuevamente."
     return render(request, "registro_trial.html", {"mensaje": mensaje, "error": error})

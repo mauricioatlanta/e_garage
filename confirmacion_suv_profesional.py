@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Confirmación Final: SUV Futurista Profesional del Año 2200
 """

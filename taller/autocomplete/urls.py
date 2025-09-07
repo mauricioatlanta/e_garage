@@ -1,12 +1,15 @@
 from django.urls import path
 
-from taller.autocomplete.views_autocomplete import (ClienteAutocomplete,
-                                                    MarcaAutocomplete,
-                                                    ModeloAutocomplete,
-                                                    TecnicoAutocomplete,
-                                                    VehiculoAutocomplete)
-from taller.autocomplete.views_autocomplete_color_cliente import \
-    ColorClienteAutocomplete
+from taller.autocomplete.views_autocomplete import (
+    ClienteAutocomplete,
+    MarcaAutocomplete,
+    ModeloAutocomplete,
+    TecnicoAutocomplete,
+    VehiculoAutocomplete,
+)
+from taller.autocomplete.views_autocomplete_color_cliente import (
+    ColorClienteAutocomplete,
+)
 from taller.views_extra.views_autocomplete import ServicioAutocomplete
 
 app_name = "autocomplete"

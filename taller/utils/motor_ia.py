@@ -3,15 +3,11 @@ Motor de Inteligencia Artificial para Diagnóstico Predictivo
 Sistema avanzado de análisis y recomendaciones automáticas
 """
 
-import json
-import math
 import random
-from collections import defaultdict
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 import pandas as pd
-from django.db.models import Avg, Count, Q, Sum
-from django.db.models.functions import TruncDate, TruncMonth
+
 from django.utils import timezone
 
 
@@ -245,10 +241,10 @@ class MotorDiagnosticoIA:
                 )
                 servicio["tipo"] = "subir"
             elif servicio["diferencia"] > 5:
-                servicio["recomendacion"] = f"🏆 Precio competitivo, mantener ventaja"
+                servicio["recomendacion"] = "🏆 Precio competitivo, mantener ventaja"
                 servicio["tipo"] = "mantener"
             else:
-                servicio["recomendacion"] = f"✅ Precio equilibrado"
+                servicio["recomendacion"] = "✅ Precio equilibrado"
                 servicio["tipo"] = "equilibrado"
 
         return servicios_mercado

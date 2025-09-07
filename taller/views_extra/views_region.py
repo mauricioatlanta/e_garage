@@ -3,8 +3,6 @@ import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from taller.models import TallerRegion
-
 
 @csrf_exempt
 def agregar_region(request):

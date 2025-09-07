@@ -1,7 +1,11 @@
 from django.urls import path
 
-from .views_autocomplete import (ClienteAutocomplete, RepuestoAutocomplete,
-                                 ServicioAutocomplete, VehiculoAutocomplete)
+from .views_autocomplete import (
+    ClienteAutocomplete,
+    RepuestoAutocomplete,
+    ServicioAutocomplete,
+    VehiculoAutocomplete,
+)
 
 urlpatterns = [
     path("cliente/", ClienteAutocomplete.as_view(), name="autocomplete-cliente"),

@@ -4,14 +4,11 @@ Vista administrativa para gestión y análisis de suscripciones
 """
 
 import csv
-import json
 from datetime import datetime, timedelta
 
 from django.contrib.admin.views.decorators import staff_member_required
-from django.contrib.auth.models import User
 from django.core.paginator import Paginator
-from django.db.models import Avg, Count, Q, Sum
-from django.db.models.functions import TruncDay, TruncMonth
+from django.db.models import Count, Q, Sum
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone

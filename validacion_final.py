@@ -11,8 +11,10 @@ from django.contrib.auth.models import User
 
 from taller.models.documento import Documento
 from taller.models.empresa import Empresa
-from taller.models.lineas_documento import (LineaOtroServicio, LineaRepuesto,
-                                            LineaServicio)
+from taller.models.lineas_documento import (
+    LineaRepuesto,
+    LineaServicio,
+)
 from taller.models.tecnico import Tecnico
 
 
@@ -50,7 +52,7 @@ def validacion_final_sistema():
         print(f"   - {tipo}: {cantidad}")
 
     # 4. Verificar integridad de datos en documentos recientes
-    print(f"\n🔍 VERIFICANDO INTEGRIDAD DE DOCUMENTOS RECIENTES:")
+    print("\n🔍 VERIFICANDO INTEGRIDAD DE DOCUMENTOS RECIENTES:")
     documentos_recientes = documentos.order_by("-id")[
         :3
     ]  # Usar id en lugar de fecha_creacion
@@ -101,7 +103,7 @@ def validacion_final_sistema():
         print(f"   ✅ Documento completo: {'Sí' if tiene_datos else 'No'}")
 
     # 5. Verificar URLs críticas
-    print(f"\n🌐 URLS DEL SISTEMA:")
+    print("\n🌐 URLS DEL SISTEMA:")
     if documentos.exists():
         doc_ejemplo = documentos.first()
         print(
@@ -111,14 +113,14 @@ def validacion_final_sistema():
             f"   ✏️ Editar documento: http://127.0.0.1:8000/documentos/editar/{doc_ejemplo.id}/"
         )
 
-    print(f"   ➕ Crear documento: http://127.0.0.1:8000/documentos/nuevo/")
-    print(f"   📋 Lista documentos: http://127.0.0.1:8000/documentos/")
+    print("   ➕ Crear documento: http://127.0.0.1:8000/documentos/nuevo/")
+    print("   📋 Lista documentos: http://127.0.0.1:8000/documentos/")
     print(
-        f"   🔧 API crear mecánico: http://127.0.0.1:8000/documentos/api/crear_mecanico/"
+        "   🔧 API crear mecánico: http://127.0.0.1:8000/documentos/api/crear_mecanico/"
     )
 
     # 6. Verificar archivos críticos
-    print(f"\n📁 ARCHIVOS CRÍTICOS:")
+    print("\n📁 ARCHIVOS CRÍTICOS:")
     archivos_criticos = [
         "taller/documentos/views.py",
         "templates/taller/documentos/crear_documento.html",
@@ -133,13 +135,13 @@ def validacion_final_sistema():
         print(f"   {'✅' if existe else '❌'} {archivo}")
 
     # 7. Resumen final
-    print(f"\n🏁 RESUMEN FINAL:")
-    print(f"   • Sistema operativo: ✅")
+    print("\n🏁 RESUMEN FINAL:")
+    print("   • Sistema operativo: ✅")
     print(f"   • Base de datos: ✅ ({documentos.count()} documentos)")
     print(f"   • Mecánicos: ✅ ({mecanicos.count()} registrados)")
-    print(f"   • Funcionalidad completa: ✅")
+    print("   • Funcionalidad completa: ✅")
 
-    print(f"\n🎉 SISTEMA E-GARAGE FUNCIONANDO CORRECTAMENTE")
+    print("\n🎉 SISTEMA E-GARAGE FUNCIONANDO CORRECTAMENTE")
     print("=" * 60)
 
 

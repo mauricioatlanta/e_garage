@@ -46,17 +46,17 @@ def buscar_clientes(request):
         # 🚀 BISTURÍ: Construir texto con nombre+apellido
         nombre_parts = [c.nombre]
         if "apellido" in fields and getattr(c, "apellido", None):
-            nombre_parts.append(getattr(c, "apellido"))
+            nombre_parts.append(c.apellido)
         text = " ".join(filter(None, nombre_parts))
 
         # Construir subtitle con info adicional
         extra = []
         if "tax_id" in fields and getattr(c, "tax_id", None):
-            extra.append(getattr(c, "tax_id"))
+            extra.append(c.tax_id)
         if "telefono" in fields and getattr(c, "telefono", None):
-            extra.append(getattr(c, "telefono"))
+            extra.append(c.telefono)
         if "email" in fields and getattr(c, "email", None):
-            extra.append(getattr(c, "email"))
+            extra.append(c.email)
         subtitle = " · ".join(extra) if extra else ""
 
         results.append(

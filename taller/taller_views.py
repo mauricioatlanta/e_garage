@@ -26,7 +26,6 @@ from django.shortcuts import get_object_or_404, redirect
 from django.utils.timezone import now
 
 from .models.empresa import Empresa
-from .models.taller_info import TallerInfo
 
 # Solo usuarios staff pueden acceder
 

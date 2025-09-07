@@ -6,4 +6,4 @@ class TallerConfig(AppConfig):
     name = "taller"
 
     def ready(self):
-        import taller.signals
+        pass

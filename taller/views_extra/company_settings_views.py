@@ -1,7 +1,6 @@
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import redirect, render
 
 from taller.forms.configuracion_empresa import ConfiguracionEmpresaForm
 from taller.utils.empresa import get_or_create_empresa  # tu helper

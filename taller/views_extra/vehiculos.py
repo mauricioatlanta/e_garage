@@ -1,6 +1,5 @@
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import redirect, render
 
-from taller.models.vehiculos import Vehiculo
 from taller.vehiculos.forms import VehiculoForm
 
 

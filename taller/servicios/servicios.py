@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, redirect, render
 
 from taller.forms.servicios import ServicioForm
-from taller.servicios.models import CategoriaServicio, SubcategoriaServicio
+from taller.servicios.models import CategoriaServicio
 
 
 def crear_servicio(request):

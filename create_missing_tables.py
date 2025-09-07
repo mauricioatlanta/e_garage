@@ -12,8 +12,7 @@ sys.path.append(os.path.dirname(__file__))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings")
 django.setup()
 
-from django.core.management.color import no_style
-from django.db import connection, models
+from django.db import connection
 
 
 def create_missing_tables():

@@ -5,7 +5,6 @@ Modelos de líneas de documento con validaciones de consistencia robustas
 from django.core.exceptions import ValidationError
 from django.db import models
 
-from taller.models.documento import Documento
 from taller.servicios.models import Servicio
 
 

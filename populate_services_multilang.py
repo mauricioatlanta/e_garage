@@ -14,10 +14,14 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "e_garage.settings")
 django.setup()
 
-from taller.servicios.models import (CategoriaServicio, CategoriaServicioName,
-                                     Servicio, ServicioName,
-                                     SubcategoriaServicio,
-                                     SubcategoriaServicioName)
+from taller.servicios.models import (
+    CategoriaServicio,
+    CategoriaServicioName,
+    Servicio,
+    ServicioName,
+    SubcategoriaServicio,
+    SubcategoriaServicioName,
+)
 
 
 def create_categories_and_services():

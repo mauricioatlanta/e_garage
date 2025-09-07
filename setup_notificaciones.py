@@ -12,8 +12,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings_sqlite")
 django.setup()
 
 from taller.models.empresa import Empresa
-from taller.models.notificacion import (ConfiguracionNotificacion,
-                                        TipoNotificacion)
+from taller.models.notificacion import ConfiguracionNotificacion, TipoNotificacion
 
 
 def crear_tipos_notificacion():
@@ -261,7 +260,6 @@ def crear_recordatorios_ejemplo():
     """Crear algunos recordatorios de mantenimiento de ejemplo"""
     from datetime import date, timedelta
 
-    from taller.models.clientes import Cliente
     from taller.models.notificacion import RecordatorioMantenimiento
     from taller.models.vehiculos import Vehiculo
 
@@ -311,7 +309,7 @@ def test_notificacion():
             print("❌ No hay datos suficientes para probar")
             return False
 
-        print(f"\n🧪 PROBANDO NOTIFICACIONES...")
+        print("\n🧪 PROBANDO NOTIFICACIONES...")
         print(f"   Empresa: {empresa.nombre_taller}")
         print(f"   Documento: #{documento.id}")
 
@@ -372,14 +370,14 @@ def main():
     print(f"✅ Prueba del sistema: {'EXITOSA' if test_ok else 'FALLÓ'}")
 
     if test_ok:
-        print(f"\n🎉 ¡SISTEMA DE NOTIFICACIONES CONFIGURADO EXITOSAMENTE!")
-        print(f"\n📋 PRÓXIMOS PASOS:")
-        print(f"   1. Configurar credenciales de email en cada empresa")
-        print(f"   2. Configurar APIs de WhatsApp/SMS si se requieren")
-        print(f"   3. Programar ejecución periódica del procesador")
-        print(f"   4. Probar envío real de notificaciones")
+        print("\n🎉 ¡SISTEMA DE NOTIFICACIONES CONFIGURADO EXITOSAMENTE!")
+        print("\n📋 PRÓXIMOS PASOS:")
+        print("   1. Configurar credenciales de email en cada empresa")
+        print("   2. Configurar APIs de WhatsApp/SMS si se requieren")
+        print("   3. Programar ejecución periódica del procesador")
+        print("   4. Probar envío real de notificaciones")
     else:
-        print(f"\n⚠️  Configuración completada con advertencias")
+        print("\n⚠️  Configuración completada con advertencias")
 
 
 if __name__ == "__main__":

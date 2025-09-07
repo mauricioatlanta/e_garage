@@ -3,7 +3,6 @@
 Script rápido para crear datos de prueba y ejecutar diagnóstico
 """
 import os
-import sys
 
 import django
 
@@ -63,11 +62,11 @@ if __name__ == "__main__":
     print("=== Creando datos de prueba ===")
     user, empresa, cliente, doc = crear_datos_prueba()
 
-    print(f"\n=== Resumen ===")
+    print("\n=== Resumen ===")
     print(f"Usuario: {user.username}")
     print(f"Empresa: {empresa.nombre_taller} ({empresa.pais})")
     print(f"Documentos en empresa: {Documento.objects.filter(empresa=empresa).count()}")
     print(f"Clientes en empresa: {Cliente.objects.filter(empresa=empresa).count()}")
 
-    print(f"\n=== Ejecutar comando probe ===")
+    print("\n=== Ejecutar comando probe ===")
     print(f"python manage.py probe_edit_document --user={user.username} --limit=1")

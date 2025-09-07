@@ -4,17 +4,13 @@ Previene ataques de fuerza bruta y protege contra spam
 """
 
 import time
-from datetime import datetime, timedelta
+from datetime import datetime
 from functools import wraps
 
 from django.core.cache import cache
-from django.http import HttpResponse
 from django.shortcuts import render
-from django.utils.decorators import method_decorator
-from django.views.decorators.cache import never_cache
 
-from taller.utils.smart_logging import (get_client_ip, get_user_agent,
-                                        smart_logger)
+from taller.utils.smart_logging import get_client_ip, get_user_agent, smart_logger
 
 
 class RateLimiter:

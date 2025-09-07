@@ -1,10 +1,7 @@
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.mail import send_mail
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, redirect, render
-from django.utils import timezone
+from django.shortcuts import redirect, render
 
 from taller.forms.comprobante_form import ComprobantePagoForm
 from taller.models.comprobante_pago import ComprobantePago

@@ -45,7 +45,7 @@ def main():
     lineas_repuesto_count = documento.lineas_repuesto.count()
     lineas_servicio_count = documento.lineas_servicio.count()
 
-    print(f"📊 Estado actual:")
+    print("📊 Estado actual:")
     print(f"   - Líneas repuesto: {lineas_repuesto_count}")
     print(f"   - Líneas servicio: {lineas_servicio_count}")
     print(f"   - Total repuestos: ${documento.total_repuestos()}")
@@ -100,7 +100,7 @@ def main():
         print("✅ Líneas de servicio agregadas")
 
     # 5. Verificar totales finales
-    print(f"\n📊 ESTADO FINAL:")
+    print("\n📊 ESTADO FINAL:")
     print(f"   - Líneas repuesto: {documento.lineas_repuesto.count()}")
     print(f"   - Líneas servicio: {documento.lineas_servicio.count()}")
     print(f"   - Total repuestos: ${documento.total_repuestos()}")
@@ -108,7 +108,7 @@ def main():
     print(f"   - Total general: ${documento.total_general()}")
 
     print(
-        f"\n🎉 ¡Problema solucionado! Los totales ahora deberían aparecer en la vista de lista."
+        "\n🎉 ¡Problema solucionado! Los totales ahora deberían aparecer en la vista de lista."
     )
 
 

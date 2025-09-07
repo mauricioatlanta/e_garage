@@ -1,7 +1,6 @@
 from django import forms
 
-from taller.models.servicios import (CategoriaServicio, Servicio,
-                                     SubcategoriaServicio)
+from taller.models.servicios import CategoriaServicio, Servicio
 
 
 class ServicioForm(forms.ModelForm):

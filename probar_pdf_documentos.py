@@ -76,7 +76,7 @@ def probar_pdf_documento():
                     f.write(pdf_content)
                 print(f"   💾 PDF guardado como: {filename}")
             else:
-                print(f"   ❌ Error: PDF vacío")
+                print("   ❌ Error: PDF vacío")
 
         except Exception as e:
             print(f"   ❌ Error al generar PDF: {str(e)}")

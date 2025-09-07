@@ -14,13 +14,8 @@ sys.path.append(".")
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
 django.setup()
 
-from django.contrib.auth.models import User
-from django.test import Client, RequestFactory
 
 from taller.models.documento import Documento
-from taller.models.empresa import Empresa
-from taller.models.lineas_documento import (LineaOtroServicio, LineaRepuesto,
-                                            LineaServicio)
 
 
 def probar_vistas_documento():
@@ -50,7 +45,7 @@ def probar_vistas_documento():
     print(f"   - Empresa: {documento_con_lineas.empresa.nombre_taller}")
 
     # Simular vista ver_documento
-    print(f"\n1. Simulando vista ver_documento:")
+    print("\n1. Simulando vista ver_documento:")
 
     # Consulta como en la vista actualizada
     documento_optimizado = (
@@ -96,7 +91,7 @@ def probar_vistas_documento():
     iva = subtotal * 0.19
     total = subtotal + iva
 
-    print(f"\n2. Cálculos de totales:")
+    print("\n2. Cálculos de totales:")
     print(f"   💰 Subtotal repuestos: ${subtotal_repuestos}")
     print(f"   💰 Subtotal servicios: ${subtotal_servicios}")
     print(f"   💰 Subtotal otros servicios: ${subtotal_otros_servicios}")
@@ -105,7 +100,7 @@ def probar_vistas_documento():
     print(f"   💰 TOTAL: ${total}")
 
     # Comparar con los métodos del modelo
-    print(f"\n3. Comparación con métodos del modelo:")
+    print("\n3. Comparación con métodos del modelo:")
     total_modelo = documento_optimizado.total_general()
     print(f"   📊 Total del modelo: ${total_modelo}")
     print(f"   ✅ Totales coinciden: {abs(float(total) - float(total_modelo)) < 0.01}")
@@ -117,9 +112,9 @@ if __name__ == "__main__":
     try:
         resultado = probar_vistas_documento()
         if resultado:
-            print(f"\n🎉 PRUEBA DE VISTAS COMPLETADA EXITOSAMENTE")
+            print("\n🎉 PRUEBA DE VISTAS COMPLETADA EXITOSAMENTE")
         else:
-            print(f"\n⚠️  PRUEBA DE VISTAS FALLÓ")
+            print("\n⚠️  PRUEBA DE VISTAS FALLÓ")
     except Exception as e:
         print(f"\n❌ ERROR EN PRUEBA: {e}")
         import traceback

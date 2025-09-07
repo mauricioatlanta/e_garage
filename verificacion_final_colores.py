@@ -4,7 +4,6 @@ Verificación final del sistema de colores
 """
 
 import os
-import sys
 
 import django
 

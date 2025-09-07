@@ -16,7 +16,6 @@ print("🔍 PRUEBA DE HUMO - DOCUMENTOS")
 print("=" * 40)
 
 try:
-    from django.db.models import Count
 
     from taller.models import Documento
 

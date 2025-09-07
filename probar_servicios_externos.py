@@ -12,11 +12,9 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings")
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 django.setup()
 
-from decimal import Decimal
 
-from taller.models import Documento, Empresa
+from taller.models import Empresa
 from taller.models.clientes import Cliente
-from taller.models.lineas_documento import LineaOtroServicio
 from taller.servicios.models import ServicioExterno
 
 
@@ -56,15 +54,15 @@ def probar_servicios_externos():
             f"      💰 Costo: ${servicio.costo_taller} | Cliente: ${servicio.precio_cliente} | Ganancia: ${servicio.ganancia}"
         )
 
-    print(f"\n✅ VERIFICACIÓN EXITOSA!")
-    print(f"📊 Servicios externos configurados y listos para usar en documentos")
-    print(f"🔧 Modelo LineaOtroServicio actualizado con soporte para ServicioExterno")
+    print("\n✅ VERIFICACIÓN EXITOSA!")
+    print("📊 Servicios externos configurados y listos para usar en documentos")
+    print("🔧 Modelo LineaOtroServicio actualizado con soporte para ServicioExterno")
     print(
-        f"💰 Los servicios externos pueden ser agregados a documentos con precios configurados"
+        "💰 Los servicios externos pueden ser agregados a documentos con precios configurados"
     )
 
     # Lista de servicios disponibles
-    print(f"\n🏢 SERVICIOS EXTERNOS DISPONIBLES:")
+    print("\n🏢 SERVICIOS EXTERNOS DISPONIBLES:")
     for i, servicio in enumerate(servicios_externos, 1):
         ganancia_pct = (
             (
@@ -83,7 +81,7 @@ def probar_servicios_externos():
         print(f"      � Ganancia: ${servicio.ganancia:,.0f} ({ganancia_pct:.1f}%)")
         print()
 
-    print(f"\n🎉 Prueba completada!")
+    print("\n🎉 Prueba completada!")
 
 
 if __name__ == "__main__":

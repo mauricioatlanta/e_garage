@@ -5,10 +5,10 @@ Configuración de desarrollo para eGarage
 from .base import *
 
 # Debug habilitado para desarrollo
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "True").lower() == "true"
 
 # Hosts permitidos para desarrollo
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "*").split(",")
 
 # Base de datos SQLite para desarrollo
 DATABASES = {
@@ -29,6 +29,7 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 # Mimetypes útiles en desarrollo
 import mimetypes
+
 mimetypes.add_type("text/css", ".css", True)
 mimetypes.add_type("application/javascript", ".js", True)
 

@@ -10,7 +10,6 @@ import os
 import sys
 
 import django
-from django.conf import settings
 
 # Configurar Django
 sys.path.append("c:/projecto/projecto_1/e_garage")
@@ -22,13 +21,8 @@ except Exception as e:
     print(f"Error configurando Django: {e}")
     sys.exit(1)
 
-import json
 
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
-from django.views.decorators.http import require_GET
 
-from taller.models import CajaVehiculo, Marca, Modelo, MotorVehiculo
 
 
 def crear_vista_ajax_modelos():

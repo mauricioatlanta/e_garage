@@ -55,9 +55,6 @@ def api_modelos_usa(request):
         return JsonResponse([], safe=False)
 
 
-from taller.models.modelo import Modelo
-
-
 def obtener_modelos(request):
     marca_id = request.GET.get("marca_id")
     q = request.GET.get("q", "").strip()

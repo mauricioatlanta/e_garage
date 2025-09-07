@@ -3,11 +3,7 @@ URLs específicas para USA (inglés)
 Prefijo: /us/
 """
 
-from django.http import HttpResponseRedirect
-from django.shortcuts import redirect
-from django.urls import include, path, reverse
-from django.utils.deprecation import MiddlewareMixin
-from django.views.generic import TemplateView
+from django.urls import include, path
 
 from taller import ajax_views
 from taller.views_extra.ajax import buscar_clientes, vehiculos_por_cliente

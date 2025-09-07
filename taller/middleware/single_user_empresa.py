@@ -4,8 +4,7 @@ Asegura que solo el usuario principal de cada empresa pueda acceder al sistema
 """
 
 from django.contrib.auth import logout
-from django.shortcuts import redirect, render
-from django.urls import reverse
+from django.shortcuts import render
 
 from taller.models.empresa import Empresa
 

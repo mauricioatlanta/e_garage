@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import redirect, render
 
 from ..forms.settings import ConfigEmpresaForm
 from ..models import ConfiguracionEmpresa, Tecnico

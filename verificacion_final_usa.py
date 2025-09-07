@@ -15,10 +15,8 @@ django.setup()
 
 from django.contrib.auth import get_user_model
 from django.test import Client
-from django.urls import reverse
 
 from taller.models.documento import Documento
-from taller.models.empresa import Empresa
 from taller.models.tecnico import Tecnico
 
 

@@ -8,15 +8,10 @@ Reportes visuales para análisis de rentabilidad y servicios externos
 from collections import defaultdict
 from datetime import date, timedelta
 
-from django.db import models
-from django.db.models import (Avg, Count, ExpressionWrapper, F, FloatField,
-                              Max, Min, Q, Sum)
+from django.db.models import Avg, Count, ExpressionWrapper, F, FloatField, Max, Min, Sum
 from django.shortcuts import render
 
-from taller.models.clientes import Cliente
-from taller.models.lineas_documento import (LineaOtroServicio, LineaRepuesto,
-                                            LineaServicio)
-from taller.models.vehiculos import Vehiculo
+from taller.models.lineas_documento import LineaOtroServicio, LineaServicio
 
 
 def reportes_rentabilidad(request):

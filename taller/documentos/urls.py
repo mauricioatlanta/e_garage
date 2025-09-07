@@ -2,17 +2,12 @@ import os
 import sys
 
 from django.urls import path
-from django.views.generic import RedirectView
 
 # from .api import lista_debug  # Función no existe
 from . import api_servicios, views
 from . import views_moderno as views_moderno
-from . import views_nuevas
 from .redirect_views import redirect_documento_crear, redirect_documento_editar
-from .views_cbv import DocumentoDetailView, DocumentoUpdateView
-from .views_class_based import DocumentoFormView
-from .views_class_based import DocumentoUpdateView as NewDocumentoUpdateView
-from .views_listado import DocumentoListViewBase
+from .views_cbv import DocumentoDetailView
 from .views_migrated import DocumentoCreateView, DocumentoDeleteView
 from .views_migrated import DocumentoDetailView as MigratedDetailView
 from .views_migrated import DocumentoListView

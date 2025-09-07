@@ -1,6 +1,5 @@
 # Middleware que añade la empresa al request según el usuario logueado
 from django.shortcuts import redirect
-from django.urls import reverse
 
 from taller.models.empresa import Empresa
 

@@ -4,7 +4,6 @@
 Sistema robusto de validaciones de consistencia implementado
 """
 import os
-import sys
 
 import django
 
@@ -86,7 +85,6 @@ def generar_reporte_final_paso2_extendido():
     print("-" * 50)
 
     # Verificar que las migraciones se aplicaron
-    from django.core.management import execute_from_command_line
     from django.db import connection
 
     # Verificar constraints

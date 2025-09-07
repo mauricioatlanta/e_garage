@@ -10,8 +10,10 @@ from django.views.i18n import JavaScriptCatalog  # 👈 Para catálogo JS
 
 from taller.views.country_aware_auth import country_aware_login
 from taller.views_extra.login_redirector import login_redirector
+
 # Importar vista de suscripción bloqueada
 from taller.views_extra.suscripcion import suscripcion_bloqueada
+
 # Importar vistas de trial
 from taller.views_extra.views_trial import registro_trial
 from taller.views_extra.views_trial_activate import activar_trial

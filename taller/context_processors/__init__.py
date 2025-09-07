@@ -10,6 +10,7 @@ Django obtenga el callable correcto.
 from django.core.cache import cache
 
 from .company_header import company_header  # ✅ NUEVO - Información de contacto
+
 # Traer la función existente definida en submódulo independiente
 from .empresa_contexto import empresa_contexto as _empresa_contexto_impl
 from .namespaces import ui_namespaces  # útil para otros settings

@@ -8,8 +8,11 @@ from django.views.generic import TemplateView
 
 from taller.models.marcas_usa import MarcaVehiculo, ModeloVehiculo
 from taller.models.ubicacion import Ciudad, Estado
-from taller.utils.us_localization import (USDCurrencyMixin,
-                                          USServiceTranslator, USTaxCalculator)
+from taller.utils.us_localization import (
+    USDCurrencyMixin,
+    USServiceTranslator,
+    USTaxCalculator,
+)
 
 
 class USLocalizationView(TemplateView):

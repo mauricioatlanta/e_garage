@@ -4,7 +4,7 @@ import json
 json_path = "modelos.json"
 
 try:
-    with open(json_path, "r", encoding="utf-8") as file:
+    with open(json_path, encoding="utf-8") as file:
         data = json.load(file)  # Intenta cargar el JSON
 
     # Verifica si los datos están en lista y no tienen IDs duplicados

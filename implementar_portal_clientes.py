@@ -17,11 +17,9 @@ import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings_sqlite")
 django.setup()
 
-from django.contrib.auth.models import User
 
 from taller.models.clientes import Cliente
 from taller.models.documento import Documento
-from taller.models.empresa import Empresa
 from taller.models.vehiculos import Vehiculo
 
 

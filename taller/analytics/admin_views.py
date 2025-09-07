@@ -10,14 +10,12 @@ Funcionalidades:
 """
 
 import csv
-import json
-from collections import defaultdict
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import User
-from django.db.models import Avg, Count, Q
+from django.db.models import Count, Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.utils import timezone

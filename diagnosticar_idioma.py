@@ -4,7 +4,6 @@ Script para diagnosticar el problema de idiomas
 """
 
 import os
-import sys
 
 import django
 
@@ -14,8 +13,6 @@ django.setup()
 
 from django.contrib.auth.models import User
 from django.test import RequestFactory
-
-from taller.models.empresa import Empresa
 
 
 def diagnosticar_idioma():
@@ -63,18 +60,18 @@ def diagnosticar_idioma():
     except User.DoesNotExist:
         print("❌ Usuario testuser_usa no encontrado")
 
-    print(f"\n📋 CONFIGURACIÓN ACTUAL:")
+    print("\n📋 CONFIGURACIÓN ACTUAL:")
     print(f"   • LANGUAGES: {django.conf.settings.LANGUAGES}")
     print(f"   • LANGUAGE_CODE: {django.conf.settings.LANGUAGE_CODE}")
     print(f"   • LANGUAGE_COOKIE_NAME: {django.conf.settings.LANGUAGE_COOKIE_NAME}")
 
-    print(f"\n🔧 MIDDLEWARES ACTIVOS:")
+    print("\n🔧 MIDDLEWARES ACTIVOS:")
     middlewares = django.conf.settings.MIDDLEWARE
     for i, middleware in enumerate(middlewares):
         if "language" in middleware.lower() or "i18n" in middleware.lower():
             print(f"   {i+1}. {middleware}")
 
-    print(f"\n✅ DIAGNÓSTICO COMPLETADO!")
+    print("\n✅ DIAGNÓSTICO COMPLETADO!")
 
 
 if __name__ == "__main__":

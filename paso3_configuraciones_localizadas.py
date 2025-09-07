@@ -4,7 +4,6 @@
 Configurar ajustes específicos por país para empresas demo
 """
 import os
-import sys
 
 import django
 
@@ -13,7 +12,6 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings")
 django.setup()
 
 from django.contrib.auth.models import User
-from django.utils import timezone
 
 from taller.models import CompanySettings, Empresa
 
@@ -72,7 +70,7 @@ class ConfiguracionesLocalizadas:
                     f"      Colores: {settings.primary_color} / {settings.secondary_color}"
                 )
 
-            except Exception as e:
+            except Exception:
                 print(f"      ⚠️ Sin CompanySettings: {empresa.nombre_taller}")
 
         print(f"   📊 Total empresas CL configuradas: {empresas_cl.count()}\n")
@@ -128,7 +126,7 @@ class ConfiguracionesLocalizadas:
                     f"      Colors: {settings.primary_color} / {settings.secondary_color}"
                 )
 
-            except Exception as e:
+            except Exception:
                 print(f"      ⚠️ No CompanySettings: {empresa.nombre_taller}")
 
         print(f"   📊 Total empresas US configuradas: {empresas_us.count()}\n")
@@ -182,7 +180,7 @@ class ConfiguracionesLocalizadas:
         print(f"🔧 Servicios demo US: {servicios_us.count()}")
         print(f"🔧 Total servicios demo: {servicios_demo.count()}")
 
-        print(f"\n✅ VALIDACIÓN COMPLETADA")
+        print("\n✅ VALIDACIÓN COMPLETADA")
 
     def generar_configuraciones_completas(self):
         """Generar todas las configuraciones localizadas"""
@@ -216,35 +214,35 @@ class ConfiguracionesLocalizadas:
         print("📊 REPORTE FINAL DE CONFIGURACIONES")
         print("=" * 80)
 
-        print(f"\n🇨🇱 CONFIGURACIONES CHILE:")
+        print("\n🇨🇱 CONFIGURACIONES CHILE:")
         print("   ⏰ Zona horaria: America/Santiago")
         print("   💰 Moneda: CLP ($)")
         print("   📅 Formato fecha: DD/MM/YYYY")
         print("   🌍 Idioma: Español (es)")
         print("   🎨 Colores: Rojo chileno (#d32f2f)")
 
-        print(f"\n🇺🇸 CONFIGURACIONES USA:")
+        print("\n🇺🇸 CONFIGURACIONES USA:")
         print("   ⏰ Time zone: America/New_York")
         print("   💰 Currency: USD ($)")
         print("   📅 Date format: MM/DD/YYYY")
         print("   🌍 Language: English (en)")
         print("   🎨 Colors: American blue (#1565c0)")
 
-        print(f"\n🎯 CARACTERÍSTICAS LOCALIZADAS:")
+        print("\n🎯 CARACTERÍSTICAS LOCALIZADAS:")
         print("   ⚙️ Zonas horarias específicas")
         print("   🎨 Paletas de colores por país")
         print("   📱 Formatos de teléfono locales")
         print("   💰 Monedas y separadores locales")
         print("   🌍 Idiomas principales configurados")
 
-        print(f"\n🔐 ACCESO A EMPRESAS DEMO:")
+        print("\n🔐 ACCESO A EMPRESAS DEMO:")
         empresas_demo = Empresa.objects.filter(user__username__startswith="demo_")
         for empresa in empresas_demo:
             print(
                 f"   {empresa.user.username} → {empresa.nombre_taller} ({empresa.pais})"
             )
 
-        print(f"\n🎉 CONFIGURACIONES COMPLETADAS")
+        print("\n🎉 CONFIGURACIONES COMPLETADAS")
         print("✅ Sistema listo con localizaciones específicas")
 
 

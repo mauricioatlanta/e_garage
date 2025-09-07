@@ -2,7 +2,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 
 from .forms import UbicacionForm
-from .models import Ciudad, Estado
+from .models import Ciudad
 
 
 def registro_ubicacion(request):

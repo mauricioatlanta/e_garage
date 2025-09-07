@@ -2,8 +2,7 @@ from django import forms
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 
-from .models import (CategoriaServicio, Servicio, ServicioName,
-                     SubcategoriaServicio)
+from .models import CategoriaServicio, Servicio, ServicioName, SubcategoriaServicio
 
 
 class OtroServicioForm(forms.ModelForm):

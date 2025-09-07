@@ -5,7 +5,6 @@ Configurado para ejecutarse como cronjob
 
 import os
 import sys
-from datetime import datetime, timedelta
 
 import django
 from django.conf import settings
@@ -279,7 +278,7 @@ Equipo eGarage
             self.process_subscription_notifications()
 
             # Resumen final
-            print(f"\n✅ Agente completado:")
+            print("\n✅ Agente completado:")
             print(f"   📧 Notificaciones enviadas: {self.notifications_sent}")
             print(f"   ❌ Errores: {len(self.errors)}")
 

@@ -47,4 +47,3 @@ class Modelo(models.Model):
 
 
 # Importar Cliente para que Django lo registre
-from .models.clientes import Cliente

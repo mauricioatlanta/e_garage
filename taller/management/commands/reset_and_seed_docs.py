@@ -5,9 +5,17 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils.timezone import now
 
-from taller.models import (Cliente, Documento, Empresa, LineaOtroServicio,
-                           LineaRepuesto, LineaServicio, Repuesto, Tecnico,
-                           Vehiculo)
+from taller.models import (
+    Cliente,
+    Documento,
+    Empresa,
+    LineaOtroServicio,
+    LineaRepuesto,
+    LineaServicio,
+    Repuesto,
+    Tecnico,
+    Vehiculo,
+)
 
 R_PARTS = [
     # part_number, nombre, precio_venta

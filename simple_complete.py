@@ -78,7 +78,7 @@ for i, doc in enumerate(docs[2:], 2):  # Últimos 2 docs
         except Exception as e:
             print(f"  ❌ Error otro servicio: {e}")
 
-print(f"\n🎯 Resumen final:")
+print("\n🎯 Resumen final:")
 for doc in docs:
     rep_count = doc.lineas_repuesto.count() if hasattr(doc, "lineas_repuesto") else 0
     serv_count = doc.lineas_servicio.count() if hasattr(doc, "lineas_servicio") else 0

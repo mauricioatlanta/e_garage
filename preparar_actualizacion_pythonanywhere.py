@@ -6,7 +6,6 @@
 
 import os
 import shutil
-from datetime import datetime
 
 
 def crear_paquete_actualizacion():

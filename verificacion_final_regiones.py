@@ -61,7 +61,7 @@ def main():
                         opciones = field.queryset.count()
                         print(f"    → {opciones} regiones disponibles")
                     except:
-                        print(f"    → Error verificando opciones")
+                        print("    → Error verificando opciones")
 
     except Exception as e:
         print(f"❌ Error: {e}")

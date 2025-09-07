@@ -3,7 +3,6 @@
 Script para sembrar documentos de prueba
 """
 import os
-import sys
 
 import django
 
@@ -17,9 +16,9 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 
 from taller.models.clientes import Cliente
+
 # Imports de modelos
 from taller.models.documento import Documento
-from taller.models.empresa import Empresa
 from taller.models.lineas_documento import LineaRepuesto, LineaServicio
 from taller.models.repuesto import Repuesto
 from taller.models.sequence import DocumentSequence

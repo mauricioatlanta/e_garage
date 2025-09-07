@@ -5,10 +5,8 @@
 # ===============================================================
 
 import os
-import sys
 
 import django
-from django.core.management import execute_from_command_line
 
 
 def verificar_archivos_produccion():
@@ -73,7 +71,7 @@ def verificar_dependencias():
     ]
 
     try:
-        with open("requirements.txt", "r") as f:
+        with open("requirements.txt") as f:
             contenido = f.read()
 
         for dep in dependencias_criticas:

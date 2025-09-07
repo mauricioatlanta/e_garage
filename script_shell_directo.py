@@ -67,7 +67,7 @@ if docs.exists():
         print("✅ Líneas de servicio creadas")
 
     # Verificar totales
-    print(f"\n📊 TOTALES CALCULADOS:")
+    print("\n📊 TOTALES CALCULADOS:")
     try:
         total_rep = doc.total_repuestos()
         total_serv = doc.total_servicios()
@@ -78,9 +78,9 @@ if docs.exists():
         print(f"   Total: ${total_gen}")
 
         if total_rep > 0 or total_serv > 0:
-            print(f"\n🎉 ¡ÉXITO! Los totales ahora aparecerán en la vista de lista")
+            print("\n🎉 ¡ÉXITO! Los totales ahora aparecerán en la vista de lista")
         else:
-            print(f"\n⚠️  Los totales siguen en 0 - revisar cálculos")
+            print("\n⚠️  Los totales siguen en 0 - revisar cálculos")
 
     except Exception as e:
         print(f"❌ Error calculando totales: {e}")

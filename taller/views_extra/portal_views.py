@@ -8,24 +8,22 @@ Views para el portal web donde los clientes pueden:
 - Revisar historial de servicios
 """
 
-import json
-
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 from django.core.paginator import Paginator
-from django.db.models import Q
-from django.http import Http404, JsonResponse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
-from django.views.decorators.csrf import csrf_exempt
 
 from taller.models.cliente import Cliente
 from taller.models.documento import Documento
-from taller.models.portal_cliente import (AccesoPortal, ClienteUsuario,
-                                          PortalConfiguracion,
-                                          SolicitudPresupuesto)
+from taller.models.portal_cliente import (
+    AccesoPortal,
+    ClienteUsuario,
+    PortalConfiguracion,
+    SolicitudPresupuesto,
+)
 from taller.models.vehiculos import Vehiculo
 
 

@@ -2,11 +2,10 @@
 Vistas para el módulo de inteligencia de negocio
 """
 
-import json
 from datetime import datetime, timedelta
 
 from django.contrib.auth.decorators import login_required
-from django.db.models import Avg, Count, F, Q, Sum
+from django.db.models import Avg, Count, F, Sum
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils import timezone
@@ -15,7 +14,6 @@ from taller.auth.decorators import login_required_default
 from taller.models.documento import Documento
 from taller.models.lineas_documento import LineaRepuesto as RepuestoDocumento
 from taller.models.lineas_documento import LineaServicio as LineaServicio
-from taller.models.repuesto import Repuesto
 from taller.models.tecnico import Tecnico
 
 

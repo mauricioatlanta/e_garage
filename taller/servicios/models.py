@@ -1,8 +1,4 @@
-import json
-
 from django.db import models
-
-from taller.models.documento import Documento
 
 
 class CategoriaServicio(models.Model):

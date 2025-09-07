@@ -3,7 +3,6 @@ Vista personalizada para redirecciones que preservan el contexto de país
 """
 
 from django.http import HttpResponseRedirect
-from django.shortcuts import redirect
 
 
 def redirect_documento_crear(request):

@@ -11,8 +11,6 @@ def lista_documentos_cl(request):
     return redirect("documentos:lista_documentos", country="cl")
 
 
-import json
-
 from django.views.decorators.csrf import csrf_exempt
 
 from taller.models.tecnico import Tecnico
@@ -194,8 +192,6 @@ def api_crear_servicio(request):
 
 # Alias para autocompletar servicios por nombre
 autocomplete_servicio_nombre = autocomplete_servicio
-from django.db import models
-from django.http import JsonResponse
 
 from taller.models.clientes import Cliente
 
@@ -224,8 +220,6 @@ def autocomplete_cliente(request):
     return JsonResponse(data, safe=False)
 
 
-from django.http import JsonResponse
-
 from taller.models.vehiculos import Vehiculo
 
 
@@ -252,8 +246,12 @@ def obtener_vehiculos_por_cliente(request):
 import logging
 
 log = logging.getLogger(__name__)
-from .views_cbv import (DocumentoCreateView, DocumentoDetailView,
-                        DocumentoListView, DocumentoUpdateView)
+from .views_cbv import (
+    DocumentoCreateView,
+    DocumentoDetailView,
+    DocumentoListView,
+    DocumentoUpdateView,
+)
 
 
 def lista_documentos(request, *args, **kwargs):
@@ -288,29 +286,28 @@ def editar_documento(request, *args, **kwargs):
     return JsonResponse({"results": results})
 
 
-import json
 import os
 
-from django.conf import settings
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, JsonResponse
-from django.shortcuts import get_object_or_404, redirect, render
-from django.template.loader import get_template
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_GET
 from weasyprint import HTML
 from xhtml2pdf import pisa
 
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+from django.template.loader import get_template
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_GET
+
 from taller.documentos.forms import DocumentoForm
 from taller.documentos.models import DetalleDocumento
-from taller.forms.formsets import DetalleDocumentoFormSet
 from taller.models.documento import Documento
 
 
 @login_required
 def crear_documento(request):
     print(
-        f"[DEBUG CREAR] ========== VERSIÓN CORREGIDA - INICIO CREAR DOCUMENTO =========="
+        "[DEBUG CREAR] ========== VERSIÓN CORREGIDA - INICIO CREAR DOCUMENTO =========="
     )
     print(f"[DEBUG CREAR] Usuario: {request.user.username}")
     print(f"[DEBUG CREAR] Método: {request.method}")
@@ -332,7 +329,7 @@ def crear_documento(request):
         )
 
     if request.method == "POST":
-        print(f"[DEBUG CREAR] ===== PROCESANDO POST =====")
+        print("[DEBUG CREAR] ===== PROCESANDO POST =====")
         post_data = request.POST.copy()
         print(f"[DEBUG CREAR] Datos POST recibidos: {list(post_data.keys())}")
         print(f"[DEBUG CREAR] json_items: {post_data.get('json_items')}")
@@ -352,7 +349,7 @@ def crear_documento(request):
 
         form = DocumentoForm(post_data, empresa=empresa, user=request.user)
         if form.is_valid():
-            print(f"[DEBUG CREAR] Formulario válido")
+            print("[DEBUG CREAR] Formulario válido")
             documento = form.save(commit=False)
             documento.empresa = empresa
 
@@ -379,7 +376,10 @@ def crear_documento(request):
                     items = json.loads(json_items)
                     print(f"[DEBUG CREAR] Items parseados: {len(items)} items")
                     from taller.models.lineas_documento import (
-                        LineaOtroServicio, LineaRepuesto, LineaServicio)
+                        LineaOtroServicio,
+                        LineaRepuesto,
+                        LineaServicio,
+                    )
 
                     for item in items:
                         print(f"[DEBUG CREAR] Procesando item: {item}")
@@ -412,16 +412,14 @@ def crear_documento(request):
 
                         elif tipo == "otro_servicio" and nombre and precio > 0:
                             # Buscar o crear el servicio en el catálogo por nombre localizado
-                            from taller.servicios.models import (Servicio,
-                                                                 ServicioName)
+                            from taller.servicios.models import Servicio, ServicioName
 
                             servicio_obj = Servicio.objects.filter(
                                 names__label__iexact=nombre, names__language="es"
                             ).first()
                             if not servicio_obj:
                                 # Crear servicio y nombre localizado
-                                from taller.servicios.models import \
-                                    SubcategoriaServicio
+                                from taller.servicios.models import SubcategoriaServicio
 
                                 subcat = SubcategoriaServicio.objects.filter(
                                     code="especiales", country="CL"
@@ -464,17 +462,17 @@ def crear_documento(request):
                     traceback.print_exc()
             else:
                 print(
-                    f"[DEBUG CREAR] json_items es None o vacío - no se recibieron items"
+                    "[DEBUG CREAR] json_items es None o vacío - no se recibieron items"
                 )
 
             # Redirigir al listado de documentos después de crear exitosamente
             print(
-                f"[DEBUG CREAR] ✅ DOCUMENTO CREADO EXITOSAMENTE - REDIRIGIENDO AL LISTADO"
+                "[DEBUG CREAR] ✅ DOCUMENTO CREADO EXITOSAMENTE - REDIRIGIENDO AL LISTADO"
             )
             return redirect("documentos:lista_documentos")
         else:
             print(f"[DEBUG CREAR] Formulario inválido: {form.errors}")
-            print(f"[DEBUG CREAR] ❌ DOCUMENTO NO CREADO - ERRORES EN FORMULARIO")
+            print("[DEBUG CREAR] ❌ DOCUMENTO NO CREADO - ERRORES EN FORMULARIO")
 
             # Agregar mensajes de error para mostrar al usuario
             from django.contrib import messages
@@ -587,7 +585,7 @@ def ver_documento(request, documento_id):
         )
         print(f"[DEBUG VER] Documento encontrado: {documento.numero_documento}")
     except AttributeError:
-        print(f"[DEBUG VER] Usuario sin empresa asociada")
+        print("[DEBUG VER] Usuario sin empresa asociada")
         # Si no tiene empresa asociada, no puede ver ningún documento
         from django.http import Http404
 
@@ -688,8 +686,7 @@ def lista_documentos(request):
     # Filtrar documentos por empresa del usuario
     try:
         empresa = request.user.empresa
-        from django.db.models import (Count, DecimalField, F, IntegerField,
-                                      Sum, Value)
+        from django.db.models import Count, DecimalField, F, IntegerField, Sum, Value
         from django.db.models.functions import Coalesce
 
         documentos = (
@@ -827,7 +824,7 @@ def editar_documento(request, documento_id):
 
         form = DocumentoForm(post_data, instance=documento)
         if form.is_valid():
-            print(f"[DEBUG EDICIÓN] Formulario válido")
+            print("[DEBUG EDICIÓN] Formulario válido")
             documento = form.save()
             json_items = request.POST.get("json_items")
             print(f"[DEBUG EDICIÓN] json_items recibido: {json_items}")
@@ -836,7 +833,10 @@ def editar_documento(request, documento_id):
                     items = json.loads(json_items)
                     print(f"[DEBUG EDICIÓN] Items parseados: {len(items)} items")
                     from taller.models.lineas_documento import (
-                        LineaOtroServicio, LineaRepuesto, LineaServicio)
+                        LineaOtroServicio,
+                        LineaRepuesto,
+                        LineaServicio,
+                    )
 
                     repuestos_anteriores = documento.lineas_repuesto.count()
                     servicios_anteriores = documento.lineas_servicio.count()
@@ -878,15 +878,13 @@ def editar_documento(request, documento_id):
                             )
                         elif tipo == "otro_servicio" and nombre and precio > 0:
                             # Buscar o crear el servicio en el catálogo por nombre localizado
-                            from taller.servicios.models import (Servicio,
-                                                                 ServicioName)
+                            from taller.servicios.models import Servicio, ServicioName
 
                             servicio_obj = Servicio.objects.filter(
                                 names__label__iexact=nombre, names__language="es"
                             ).first()
                             if not servicio_obj:
-                                from taller.servicios.models import \
-                                    SubcategoriaServicio
+                                from taller.servicios.models import SubcategoriaServicio
 
                                 subcat = SubcategoriaServicio.objects.filter(
                                     code="especiales", country="CL"
@@ -926,7 +924,7 @@ def editar_documento(request, documento_id):
                     traceback.print_exc()
             else:
                 print(
-                    f"[DEBUG EDICIÓN] json_items es None o vacío - no se recibieron items"
+                    "[DEBUG EDICIÓN] json_items es None o vacío - no se recibieron items"
                 )
             return redirect("documentos:editar_documento", documento_id=documento.id)
         else:

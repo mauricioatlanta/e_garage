@@ -29,17 +29,13 @@ def api_marcas(request):
 
 import logging
 
-from django.views.generic import DeleteView
-
 from taller.models.clientes import Cliente
 from taller.models.extras_vehiculo import ColorVehiculo
-from taller.models.marca import Marca
 from taller.models.modelo import Modelo
 from taller.models.vehiculos import ColorVehiculo, Vehiculo
 
 from .forms import VehiculoForm
-from .views_cbv import (VehiculoCreateView, VehiculoDetailView,
-                        VehiculoListView, VehiculoUpdateView)
+from .views_cbv import VehiculoDetailView, VehiculoListView, VehiculoUpdateView
 
 # Importar modelos del catálogo
 try:
@@ -304,10 +300,8 @@ def eliminar_vehiculo(request, vehiculo_id, *args, **kwargs):
 
 
 from django.db import models
-# --- API para búsqueda de clientes ---
-from django.http import JsonResponse
 
-from taller.models.clientes import Cliente
+# --- API para búsqueda de clientes ---
 
 
 def api_busqueda_clientes(request):

@@ -15,7 +15,6 @@ django.setup()
 
 from django.contrib.auth.models import User
 from django.test import Client
-from django.urls import resolve, reverse
 
 
 def test_url_redirects():
@@ -147,7 +146,7 @@ def test_authenticated_routes():
         # Probar dashboard espacial directo
         response = client.get("/taller/centro-operaciones-espacial/")
         if response.status_code == 200:
-            print(f"✅ /taller/centro-operaciones-espacial/ → 200 (dashboard cargado)")
+            print("✅ /taller/centro-operaciones-espacial/ → 200 (dashboard cargado)")
         else:
             print(f"⚠️  /taller/centro-operaciones-espacial/ → {response.status_code}")
 

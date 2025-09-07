@@ -17,8 +17,13 @@ django.setup()
 
 from django.contrib.auth import get_user_model
 
-from taller.models import (Cliente, Documento, Empresa, LineaRepuesto,
-                           Repuesto, Tecnico, Vehiculo)
+from taller.models import (
+    Cliente,
+    Documento,
+    Repuesto,
+    Tecnico,
+    Vehiculo,
+)
 
 
 def crear_documento_con_repuesto_OF():
@@ -57,7 +62,7 @@ def crear_documento_con_repuesto_OF():
     print(f"Status: {response.status_code}")
 
     if response.status_code != 200:
-        print(f"❌ ERROR: No se pudo cargar página de login")
+        print("❌ ERROR: No se pudo cargar página de login")
         return False
 
     # Extraer CSRF token
@@ -71,7 +76,7 @@ def crear_documento_con_repuesto_OF():
         print("❌ ERROR: No se encontró CSRF token")
         return False
 
-    print(f"✅ CSRF token obtenido")
+    print("✅ CSRF token obtenido")
 
     # POST login
     login_data = {
@@ -80,7 +85,7 @@ def crear_documento_con_repuesto_OF():
         "csrfmiddlewaretoken": csrf_token,
     }
 
-    print(f"\n🔐 POST Login...")
+    print("\n🔐 POST Login...")
     response = session.post(login_url, data=login_data)
     print(f"Status: {response.status_code}")
     print(f"Final URL: {response.url}")
@@ -116,7 +121,7 @@ def crear_documento_con_repuesto_OF():
     print(f"Status: {response.status_code}")
 
     if response.status_code != 200:
-        print(f"❌ ERROR: No se pudo cargar página de crear documento")
+        print("❌ ERROR: No se pudo cargar página de crear documento")
         return False
 
     # Extraer CSRF del formulario
@@ -130,7 +135,7 @@ def crear_documento_con_repuesto_OF():
         print("❌ ERROR: No se pudo obtener CSRF del formulario")
         return False
 
-    print(f"✅ CSRF formulario obtenido")
+    print("✅ CSRF formulario obtenido")
 
     # Preparar datos del documento con repuesto "OF"
     procesar_url = "http://127.0.0.1:8000/cl/documentos/procesar/"
@@ -167,7 +172,7 @@ def crear_documento_con_repuesto_OF():
         "otros_servicios_data": "[]",
     }
 
-    print(f"\n📝 DATOS POST:")
+    print("\n📝 DATOS POST:")
     print(f"  URL: {procesar_url}")
     print(f"  Cliente ID: {documento_data['cliente']}")
     print(f"  Vehículo ID: {documento_data['vehiculo']}")
@@ -186,7 +191,7 @@ def crear_documento_con_repuesto_OF():
     response = session.post(procesar_url, data=documento_data, allow_redirects=False)
 
     # EVIDENCIA 1: Status code y Location
-    print(f"\n📋 EVIDENCIA 1 - STATUS CODE:")
+    print("\n📋 EVIDENCIA 1 - STATUS CODE:")
     print(f"Status: {response.status_code}")
     print(f"Location: {response.headers.get('Location', 'N/A')}")
 
@@ -205,17 +210,17 @@ def crear_documento_con_repuesto_OF():
     print(f"✅ Documento creado: ID={doc_id}")
 
     # EVIDENCIA 2: Django shell output (exacta como solicita)
-    print(f"\n📋 EVIDENCIA 2 - DJANGO SHELL OUTPUT:")
-    print(f"from taller.models import Documento, LineaRepuesto")
-    print(f"doc = Documento.objects.latest('id')")
+    print("\n📋 EVIDENCIA 2 - DJANGO SHELL OUTPUT:")
+    print("from taller.models import Documento, LineaRepuesto")
+    print("doc = Documento.objects.latest('id')")
     print(
-        f"print('DOC:', doc.id, doc.empresa_id, doc.cliente_id, doc.vehiculo_id, getattr(doc, 'millas', None))"
+        "print('DOC:', doc.id, doc.empresa_id, doc.cliente_id, doc.vehiculo_id, getattr(doc, 'millas', None))"
     )
-    print(f"print('CNT rep:', doc.lineas_repuesto.count())")
-    print(f"print('CNT serv:', doc.lineas_servicio.count())")
-    print(f"print('CNT otros:', doc.lineas_otro_servicio.count())")
+    print("print('CNT rep:', doc.lineas_repuesto.count())")
+    print("print('CNT serv:', doc.lineas_servicio.count())")
+    print("print('CNT otros:', doc.lineas_otro_servicio.count())")
     print(
-        f"print('LIST rep ids:', list(doc.lineas_repuesto.values_list('id','repuesto_id','nombre','cantidad','precio_unitario','descuento')))"
+        "print('LIST rep ids:', list(doc.lineas_repuesto.values_list('id','repuesto_id','nombre','cantidad','precio_unitario','descuento')))"
     )
 
     # Ejecutar comandos Django shell
@@ -230,7 +235,7 @@ def crear_documento_con_repuesto_OF():
         )
     )
 
-    print(f"\n🔍 RESULTADO DJANGO SHELL:")
+    print("\n🔍 RESULTADO DJANGO SHELL:")
     print(f"DOC: {doc.id} {doc.empresa_id} {doc.cliente_id} {doc.vehiculo_id} {millas}")
     print(f"CNT rep: {cnt_rep}")
     print(f"CNT serv: {cnt_serv}")
@@ -239,7 +244,7 @@ def crear_documento_con_repuesto_OF():
 
     # EVIDENCIA 3: HTML del detalle donde NO aparece la línea
     detalle_url = f"http://127.0.0.1:8000/cl/documentos/{doc_id}/"
-    print(f"\n📋 EVIDENCIA 3 - HTML DETALLE:")
+    print("\n📋 EVIDENCIA 3 - HTML DETALLE:")
     print(f"URL: {detalle_url}")
 
     response = session.get(detalle_url)
@@ -277,7 +282,7 @@ def crear_documento_con_repuesto_OF():
                 print(f"  {i+1:2d}: {line.strip()}")
 
     # Análisis del problema
-    print(f"\n🔍 ANÁLISIS DEL PROBLEMA:")
+    print("\n🔍 ANÁLISIS DEL PROBLEMA:")
     if cnt_rep == 0:
         print("❌ PROBLEMA: CNT rep = 0 → La línea NO se guardó en la base de datos")
         print(

@@ -4,9 +4,7 @@ Script para actualizar el template crear_vehiculo.html con funcionalidades diná
 Propaga los cambios desde templates_canonical a todas las variantes de idiomas
 """
 
-import os
 import shutil
-import sys
 from pathlib import Path
 
 # Configuración para ambiente local
@@ -55,7 +53,7 @@ def verify_source_template():
             missing_features.append(feature)
 
     if missing_features:
-        print(f"❌ Template fuente incompleto. Faltan características:")
+        print("❌ Template fuente incompleto. Faltan características:")
         for feature in missing_features:
             print(f"   - {feature}")
         return False

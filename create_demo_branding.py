@@ -47,7 +47,7 @@ else:
     print(f"ℹ️ Configuración para {settings.company_name} ya existía")
 
 # Mostrar información
-print(f"\n📋 Configuración de empresa:")
+print("\n📋 Configuración de empresa:")
 print(f"   • Nombre: {settings.company_name}")
 print(f"   • Eslogan: {settings.tagline}")
 print(f"   • Color primario: {settings.primary_color}")
@@ -55,11 +55,11 @@ print(f"   • Email: {settings.email}")
 print(f"   • Teléfono: {settings.phone}")
 
 # Probar métodos del modelo
-print(f"\n🧪 Pruebas de métodos:")
+print("\n🧪 Pruebas de métodos:")
 print(f"   • get_company_name(): {settings.get_company_name()}")
 print(f"   • get_logo_url(): {settings.get_logo_url()}")
 print(f"   • get_primary_color(): {settings.get_primary_color()}")
 print(f"   • get_secondary_color(): {settings.get_secondary_color()}")
 
-print(f"\n✅ Sistema de branding configurado correctamente!")
-print(f"🔗 Puedes acceder a la configuración en: /settings/")
+print("\n✅ Sistema de branding configurado correctamente!")
+print("🔗 Puedes acceder a la configuración en: /settings/")

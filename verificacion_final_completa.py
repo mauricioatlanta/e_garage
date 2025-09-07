@@ -41,7 +41,7 @@ def verificacion_final_completa():
             print(f"   {status} {url} → {response.status_code}")
 
     # Test 2: URLs que deben dar 404 (ya no existen)
-    print(f"\n2. ❌ URLs que DEBEN DAR 404 (ya no existen):")
+    print("\n2. ❌ URLs que DEBEN DAR 404 (ya no existen):")
     urls_404 = [
         "/cl/accounts/login/",
         "/cl/accounts/signup/",
@@ -57,7 +57,7 @@ def verificacion_final_completa():
         print(f"   {status} {url} → {response.status_code} (debe ser 404)")
 
     # Test 3: Redirecciones automáticas
-    print(f"\n3. 🔄 REDIRECCIONES AUTOMÁTICAS:")
+    print("\n3. 🔄 REDIRECCIONES AUTOMÁTICAS:")
     redirecciones = [
         ("/signup/", "/accounts/signup/"),
         ("/login/", "/accounts/login/"),

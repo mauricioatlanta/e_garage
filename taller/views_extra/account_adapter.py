@@ -1,6 +1,4 @@
 from allauth.account.adapter import DefaultAccountAdapter
-from django.shortcuts import redirect
-from django.urls import reverse
 
 
 class CountryAwareAccountAdapter(DefaultAccountAdapter):

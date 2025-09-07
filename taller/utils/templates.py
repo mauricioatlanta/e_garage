@@ -1,5 +1,5 @@
 from django.template import TemplateDoesNotExist
-from django.template.loader import get_template, select_template
+from django.template.loader import get_template
 
 
 def select_country_lang_template(

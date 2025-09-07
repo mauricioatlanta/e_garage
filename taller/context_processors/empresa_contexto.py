@@ -1,6 +1,3 @@
-from django.conf import settings
-from django.core.cache import cache
-
 from taller.models import ConfiguracionEmpresa
 from taller.models.empresa import Empresa
 

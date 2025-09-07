@@ -1,13 +1,12 @@
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, redirect
 
 from taller.forms.clientes import ClienteForm
 from taller.models.clientes import Cliente
 from taller.models.modelo import Modelo  # Modelo estándar de vehículos
-from taller.models.region_ciudad import (TallerCiudad,  # noqa: F401
-                                         TallerRegion)
+from taller.models.region_ciudad import TallerCiudad, TallerRegion  # noqa: F401
 from taller.vehiculos.forms import VehiculoForm
 
 
@@ -63,9 +62,6 @@ def crear_cliente(request):
 
     # Usar template resolution en lugar de template hardcodeado
     from django.template.response import TemplateResponse
-    from django.utils.translation import get_language
-
-    from taller.utils.templates import select_country_lang_template
 
     # TEMPORAL: Usar template simple para testing mientras arreglamos la estructura
     template_name = "taller/clientes/crear_cliente_simple.html"

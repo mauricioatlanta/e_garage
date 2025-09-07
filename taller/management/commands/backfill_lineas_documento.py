@@ -4,8 +4,13 @@ from decimal import Decimal
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
-from taller.models import (Documento, LineaOtroServicio, LineaRepuesto,
-                           LineaServicio, Repuesto)
+from taller.models import (
+    Documento,
+    LineaOtroServicio,
+    LineaRepuesto,
+    LineaServicio,
+    Repuesto,
+)
 
 
 class Command(BaseCommand):
@@ -44,7 +49,6 @@ class Command(BaseCommand):
             if not detalles_raw:
                 # También buscar en DetalleDocumento si existe
                 try:
-                    from taller.documentos.models import DetalleDocumento
 
                     detalles_count = doc.detalles.count()
                     if detalles_count > 0:

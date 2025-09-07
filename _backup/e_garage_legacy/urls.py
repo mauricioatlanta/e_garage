@@ -105,7 +105,7 @@ if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-    print(f"🔧 DEBUG Media Config:")
+    print("🔧 DEBUG Media Config:")
     print(f"   MEDIA_URL: {settings.MEDIA_URL}")
     print(f"   MEDIA_ROOT: {settings.MEDIA_ROOT}")
-    print(f"   Static config added for media files")
+    print("   Static config added for media files")

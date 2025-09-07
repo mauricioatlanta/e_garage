@@ -1,5 +1,4 @@
 from django.core.exceptions import PermissionDenied
-from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 
 class TenantViewMixin:

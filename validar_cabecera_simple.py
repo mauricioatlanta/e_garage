@@ -105,7 +105,7 @@ def test_template_content():
     template_path = "templates/onboarding/bienvenida_chile.html"
 
     try:
-        with open(template_path, "r", encoding="utf-8") as f:
+        with open(template_path, encoding="utf-8") as f:
             content = f.read()
 
         template_checks = [
@@ -128,7 +128,7 @@ def test_template_content():
         login_count = content.count('href="/login/"')
         registro_count = content.count('href="/registro/"')
 
-        print(f"\n📊 ESTADÍSTICAS DEL TEMPLATE:")
+        print("\n📊 ESTADÍSTICAS DEL TEMPLATE:")
         print(f"   • Enlaces a /login/: {login_count}")
         print(f"   • Enlaces a /registro/: {registro_count}")
         print(f"   • Tamaño del archivo: {len(content)} caracteres")

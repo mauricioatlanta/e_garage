@@ -3,26 +3,19 @@ Generador de informes ejecutivos en PDF para eGarage
 Sistema de reportes avanzados con gráficos integrados
 """
 
-import os
-import tempfile
-from datetime import date, datetime
+from datetime import datetime
 from io import BytesIO
 
-from django.conf import settings
-from django.http import HttpResponse
-from reportlab.graphics.charts.barcharts import VerticalBarChart
-from reportlab.graphics.charts.legends import Legend
 from reportlab.graphics.charts.lineplots import LinePlot
-from reportlab.graphics.charts.piecharts import Pie
 from reportlab.graphics.shapes import Drawing
-from reportlab.graphics.widgets.markers import makeMarker
 from reportlab.lib import colors
-from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT, TA_RIGHT
-from reportlab.lib.pagesizes import A4, letter
+from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY
+from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
-from reportlab.lib.units import cm, inch
-from reportlab.platypus import (Image, PageBreak, Paragraph, SimpleDocTemplate,
-                                Spacer, Table, TableStyle)
+from reportlab.lib.units import inch
+from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+
+from django.http import HttpResponse
 
 
 class InformeEjecutivoPDF:
@@ -415,14 +408,10 @@ class InformeEjecutivoPDF:
 def generar_informe_ejecutivo_view(request):
     """Vista para generar y descargar el informe ejecutivo"""
     from django.db.models import F, Sum
-    from django.shortcuts import render
 
-    from taller.models.clientes import Cliente
-    from taller.models.documento import Documento
     # Obtener datos del contexto
     # Simulamos llamar a la vista pero solo necesitamos el contexto
     from taller.models.lineas_documento import LineaServicio
-    from taller.reportes.views import dashboard_inteligencia_operativa
 
     # Datos básicos para el informe
     contexto = {

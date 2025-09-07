@@ -2,21 +2,22 @@ import random
 from datetime import date
 from decimal import Decimal
 
-from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 
 from taller.models.clientes import Cliente
 from taller.models.documento import Documento
 from taller.models.empresa import Empresa
-from taller.models.lineas_documento import (LineaOtroServicio, LineaRepuesto,
-                                            LineaServicio)
+from taller.models.lineas_documento import (
+    LineaOtroServicio,
+    LineaRepuesto,
+    LineaServicio,
+)
 from taller.models.region_ciudad import TallerCiudad, TallerRegion
 from taller.models.repuesto import Repuesto
 from taller.models.tecnico import Tecnico
 from taller.models.tienda import Tienda
 from taller.models.vehiculos import Vehiculo
-from taller.servicios.models import (CategoriaServicio, Servicio,
-                                     SubcategoriaServicio)
+from taller.servicios.models import CategoriaServicio, Servicio, SubcategoriaServicio
 
 
 class Command(BaseCommand):

@@ -1,12 +1,9 @@
-import os
 import re
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import ValidationError
-from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
-from django.shortcuts import redirect, render
+from django.shortcuts import render
 
 from taller.models.empresa import Empresa
 from taller.models.perfil_usuario import PerfilUsuario

@@ -14,8 +14,7 @@ from taller.models.vehiculos import Vehiculo
 from .forms import VehiculoForm
 
 try:
-    from taller.models.catalogo import \
-        CatalogoModeloAuto  # Nuestro nuevo catálogo
+    from taller.models.catalogo import CatalogoModeloAuto  # Nuestro nuevo catálogo
     from taller.models.marcas_usa import MarcaVehiculo as MarcaVehiculoUSA
     from taller.models.marcas_usa import ModeloVehiculo as ModeloVehiculoUSA
 except Exception:  # pragma: no cover - si no existen modelos USA

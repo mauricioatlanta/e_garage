@@ -1,13 +1,10 @@
 from dal import autocomplete
 from dal_select2.widgets import ModelSelect2
+
 from django import forms
 from django.urls import reverse_lazy
 
 from taller.models.clientes import Cliente
-from taller.models.extras_vehiculo import (CajaVehiculo, ColorVehiculo,
-                                           MotorVehiculo)
-from taller.models.marca import Marca
-from taller.models.modelo import Modelo
 from taller.models.vehiculos import Vehiculo
 
 

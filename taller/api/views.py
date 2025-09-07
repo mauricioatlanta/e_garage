@@ -1,8 +1,7 @@
-from datetime import date, timedelta
+from datetime import timedelta
 
 from django.contrib.auth.decorators import login_required
 from django.db import models
-from django.db.models import Count, Q
 from django.http import JsonResponse
 from django.utils import timezone
 
@@ -50,12 +49,8 @@ def buscar_modelos_api(request):
 
 import json
 
-from django.db import models
-from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
 
-from taller.models.clientes import Cliente
 from taller.models.tienda import Tienda
 
 

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 🎉 REPORTE FINAL - SEGURIDAD 100% LOGRADA

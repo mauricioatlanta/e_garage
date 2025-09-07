@@ -4,7 +4,6 @@
 Crear documentos de ejemplo con servicios característicos por país
 """
 import os
-import sys
 
 import django
 
@@ -69,8 +68,7 @@ class DocumentosDemo:
 
                     for servicio in servicios_seleccionados:
                         # Crear línea de servicio (subtotal es calculado automáticamente)
-                        from taller.models.lineas_documento import \
-                            LineaServicio
+                        from taller.models.lineas_documento import LineaServicio
 
                         precio = servicio.precio_base or Decimal(
                             "10000"
@@ -135,8 +133,7 @@ class DocumentosDemo:
 
                     for servicio in servicios_seleccionados:
                         # Crear línea de servicio (subtotal es calculado automáticamente)
-                        from taller.models.lineas_documento import \
-                            LineaServicio
+                        from taller.models.lineas_documento import LineaServicio
 
                         precio = servicio.precio_base or Decimal(
                             "50"
@@ -196,7 +193,7 @@ class DocumentosDemo:
         print(f"   🇨🇱 Chile: {documentos_cl.count()}")
         print(f"   🇺🇸 USA: {documentos_us.count()}")
 
-        print(f"\n🌟 DATOS POR EMPRESA:")
+        print("\n🌟 DATOS POR EMPRESA:")
         for empresa in empresas_demo:
             clientes_emp = Cliente.objects.filter(empresa=empresa).count()
             vehiculos_emp = Vehiculo.objects.filter(empresa=empresa).count()
@@ -207,13 +204,13 @@ class DocumentosDemo:
                 f"      👥 {clientes_emp} clientes | 🚗 {vehiculos_emp} vehículos | 📄 {documentos_emp} documentos"
             )
 
-        print(f"\n🔐 CREDENCIALES DE ACCESO:")
+        print("\n🔐 CREDENCIALES DE ACCESO:")
         print("   Password para todos: demo2025")
         print("   Ejemplos de login:")
         for empresa in empresas_demo[:6]:  # Mostrar solo 6 ejemplos
             print(f"   - {empresa.user.username} → {empresa.nombre_taller}")
 
-        print(f"\n✨ CARACTERÍSTICAS COMPLETADAS:")
+        print("\n✨ CARACTERÍSTICAS COMPLETADAS:")
         print("   🎯 Datos realistas y coherentes por mercado")
         print("   🌍 Localización completa ES/EN")
         print("   🔧 Servicios característicos por país")
@@ -223,7 +220,7 @@ class DocumentosDemo:
         print("   ⚙️ Configuraciones localizadas")
         print("   🎨 Paletas de colores por país")
 
-        print(f"\n🎉 PASO 3 COMPLETADO AL 100%")
+        print("\n🎉 PASO 3 COMPLETADO AL 100%")
         print("✅ Sistema listo para pruebas funcionales completas")
         print("✅ Fixtures realistas CL/US implementadas")
         print("✅ Configuraciones por mercado aplicadas")

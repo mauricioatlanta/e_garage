@@ -1,9 +1,13 @@
 from django.core.management.base import BaseCommand
 
-from taller.servicios.models import (CategoriaServicio, CategoriaServicioName,
-                                     Servicio, ServicioName,
-                                     SubcategoriaServicio,
-                                     SubcategoriaServicioName)
+from taller.servicios.models import (
+    CategoriaServicio,
+    CategoriaServicioName,
+    Servicio,
+    ServicioName,
+    SubcategoriaServicio,
+    SubcategoriaServicioName,
+)
 
 
 class Command(BaseCommand):

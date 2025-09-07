@@ -9,7 +9,6 @@ import unittest
 import django
 from django.contrib.auth.models import User
 from django.test import Client, TestCase
-from django.urls import reverse
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings_sqlite")
 django.setup()

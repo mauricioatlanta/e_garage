@@ -58,7 +58,7 @@ def check_base_html_fixes():
     print("\n🔍 Verificando correcciones en base.html...")
 
     try:
-        with open("templates/base.html", "r", encoding="utf-8") as f:
+        with open("templates/base.html", encoding="utf-8") as f:
             content = f.read()
 
         checks = [
@@ -97,7 +97,7 @@ def check_template_updates():
     all_good = True
     for template in templates_to_check:
         try:
-            with open(template, "r", encoding="utf-8") as f:
+            with open(template, encoding="utf-8") as f:
                 content = f.read()
 
             if "/ajax/clientes/buscar/" in content:

@@ -6,7 +6,6 @@ Script para probar el idioma con usuario de Chile
 import re
 
 import requests
-from bs4 import BeautifulSoup
 
 
 def probar_chile_idioma():
@@ -40,7 +39,7 @@ def probar_chile_idioma():
             return
 
         csrf_token = csrf_match.group(1)
-        print(f"✅ CSRF token obtenido")
+        print("✅ CSRF token obtenido")
 
         # 3. Hacer login como usuario de Chile (asumiendo que existe)
         print("3️⃣ Haciendo login como usuario de Chile...")
@@ -101,7 +100,7 @@ def probar_chile_idioma():
         # 5. Analizar el contenido
         content = clientes_response.text
 
-        print(f"\n🔍 ANÁLISIS DE BOTONES DE NAVEGACIÓN:")
+        print("\n🔍 ANÁLISIS DE BOTONES DE NAVEGACIÓN:")
 
         # Buscar botones de navegación específicos
         botones_espanol = [
@@ -136,9 +135,9 @@ def probar_chile_idioma():
 
         # Buscar información del país
         if "🇺🇸" in content:
-            print(f"   🌍 País detectado: 🇺🇸 USA")
+            print("   🌍 País detectado: 🇺🇸 USA")
         elif "🇨🇱" in content:
-            print(f"   🌍 País detectado: 🇨🇱 Chile")
+            print("   🌍 País detectado: 🇨🇱 Chile")
 
         # Determinar idioma predominante
         if len(espanol_encontrado) > len(ingles_encontrado):
@@ -148,19 +147,19 @@ def probar_chile_idioma():
         else:
             idioma_detectado = "❓ INDETERMINADO"
 
-        print(f"\n📊 RESULTADO:")
+        print("\n📊 RESULTADO:")
         print(f"   • Botones en español: {len(espanol_encontrado)}")
         print(f"   • Botones en inglés: {len(ingles_encontrado)}")
         print(f"   • Idioma detectado: {idioma_detectado}")
         print(f"   • Content-Language: {content_language}")
 
-        print(f"\n🎯 CONCLUSIÓN:")
+        print("\n🎯 CONCLUSIÓN:")
         if idioma_detectado == "🇪🇸 ESPAÑOL":
-            print(f"   ✅ CORRECTO: Chile muestra español")
+            print("   ✅ CORRECTO: Chile muestra español")
         elif idioma_detectado == "🇺🇸 INGLÉS":
-            print(f"   ❌ INCORRECTO: Chile muestra inglés (debería ser español)")
+            print("   ❌ INCORRECTO: Chile muestra inglés (debería ser español)")
         else:
-            print(f"   ⚠️ INDETERMINADO: No se puede determinar el idioma")
+            print("   ⚠️ INDETERMINADO: No se puede determinar el idioma")
 
     except requests.exceptions.ConnectionError:
         print(
@@ -172,7 +171,7 @@ def probar_chile_idioma():
 
         traceback.print_exc()
 
-    print(f"\n✅ PRUEBA COMPLETADA!")
+    print("\n✅ PRUEBA COMPLETADA!")
 
 
 if __name__ == "__main__":

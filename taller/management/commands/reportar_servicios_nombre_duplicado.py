@@ -2,7 +2,7 @@ from collections import defaultdict
 
 from django.core.management.base import BaseCommand
 
-from taller.servicios.models import Servicio, ServicioName
+from taller.servicios.models import ServicioName
 
 
 class Command(BaseCommand):

@@ -9,7 +9,6 @@ django.setup()
 from django.contrib.auth.models import User
 
 from taller.models.clientes import Cliente
-from taller.models.empresa import Empresa
 from taller.models.vehiculos import Vehiculo
 
 print("=== RESUMEN DE DATOS ===")

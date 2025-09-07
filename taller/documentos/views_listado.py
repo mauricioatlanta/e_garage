@@ -1,11 +1,17 @@
-from django.db.models import (Count, DecimalField, IntegerField, OuterRef,
-                              Subquery, Sum, Value)
+from django.db.models import (
+    Count,
+    DecimalField,
+    IntegerField,
+    OuterRef,
+    Subquery,
+    Sum,
+    Value,
+)
 from django.db.models.functions import Coalesce
 from django.views.generic import ListView
 
 from taller.mixins import CountryLangTemplateMixin  # Agregar import del mixin
-from taller.models import (Documento, LineaOtroServicio, LineaRepuesto,
-                           LineaServicio)
+from taller.models import Documento, LineaOtroServicio, LineaRepuesto, LineaServicio
 
 
 class DocumentoListViewBase(CountryLangTemplateMixin, ListView):

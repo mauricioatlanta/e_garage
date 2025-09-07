@@ -4,7 +4,6 @@
 Creación de datos realistas, coherentes y variados para pruebas funcionales
 """
 import os
-import sys
 
 import django
 
@@ -19,8 +18,7 @@ from decimal import Decimal
 from django.contrib.auth.models import User
 
 from taller.models import *
-from taller.models.extras_vehiculo import (CajaVehiculo, ColorVehiculo,
-                                           MotorVehiculo)
+from taller.models.extras_vehiculo import ColorVehiculo
 from taller.models.marca import Marca
 from taller.models.modelo import Modelo
 from taller.models.region_ciudad import TallerCiudad, TallerRegion
@@ -1032,15 +1030,15 @@ class FixturesRealesGenerator:
             country="US", code__contains="demo_"
         ).count()
 
-        print(f"\n🇨🇱 CHILE:")
+        print("\n🇨🇱 CHILE:")
         print(f"   Empresas: {empresas_cl}")
         print(f"   Servicios: {servicios_cl}")
 
-        print(f"\n🇺🇸 USA:")
+        print("\n🇺🇸 USA:")
         print(f"   Empresas: {empresas_us}")
         print(f"   Servicios: {servicios_us}")
 
-        print(f"\n✨ CARACTERÍSTICAS DESTACADAS:")
+        print("\n✨ CARACTERÍSTICAS DESTACADAS:")
         print("   🎯 Datos realistas por mercado")
         print("   🌍 Localización completa ES/EN")
         print("   🔧 Servicios característicos por país")
@@ -1048,14 +1046,14 @@ class FixturesRealesGenerator:
         print("   💰 Precios en moneda local")
         print("   📱 Contactos y direcciones reales")
 
-        print(f"\n🔐 CREDENCIALES DE ACCESO:")
+        print("\n🔐 CREDENCIALES DE ACCESO:")
         print("   Username pattern: demo_[nombre]_[ciudad]")
         print("   Password para todos: demo2025")
         print("   Ejemplos:")
         print("   - demo_taller_santiago / demo2025")
         print("   - demo_mikes_auto_miami / demo2025")
 
-        print(f"\n🎉 FIXTURES COMPLETADAS EXITOSAMENTE")
+        print("\n🎉 FIXTURES COMPLETADAS EXITOSAMENTE")
         print("✅ Sistema listo para pruebas funcionales completas")
 
 
