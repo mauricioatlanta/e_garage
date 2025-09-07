@@ -1,6 +1,9 @@
 import json
+
 from django.core.management.base import BaseCommand
-from taller.models.region_ciudad import TallerRegion, TallerCiudad
+
+from taller.models.region_ciudad import TallerCiudad, TallerRegion
+
 
 class Command(BaseCommand):
     help = "Carga regiones y ciudades desde el archivo regiones_ciudades.json"
@@ -11,10 +14,12 @@ class Command(BaseCommand):
         TallerRegion.objects.all().delete()
 
         try:
-            with open('regiones_ciudades.json', encoding='utf-8') as f:
+            with open("regiones_ciudades.json", encoding="utf-8") as f:
                 data = json.load(f)
         except FileNotFoundError:
-            self.stdout.write(self.style.ERROR("❌ Archivo regiones_ciudades.json no encontrado."))
+            self.stdout.write(
+                self.style.ERROR("❌ Archivo regiones_ciudades.json no encontrado.")
+            )
             return
 
         self.stdout.write("📥 Cargando regiones y ciudades desde archivo...")
@@ -24,4 +29,6 @@ class Command(BaseCommand):
             for ciudad_name in item["ciudades"]:
                 TallerCiudad.objects.create(nombre=ciudad_name, region=region)
 
-        self.stdout.write(self.style.SUCCESS("✅ Regiones y ciudades cargadas correctamente."))
+        self.stdout.write(
+            self.style.SUCCESS("✅ Regiones y ciudades cargadas correctamente.")
+        )

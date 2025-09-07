@@ -4,11 +4,16 @@ from django.utils import timezone
 
 from taller.models import Documento
 
+
 class Command(BaseCommand):
     help = "Completa Documento.tecnico_responsable y hereda a líneas sin mecanico (repuesto/servicio/otros)."
 
     def add_arguments(self, parser):
-        parser.add_argument("--dry-run", action="store_true", help="Muestra lo que haría sin escribir cambios.")
+        parser.add_argument(
+            "--dry-run",
+            action="store_true",
+            help="Muestra lo que haría sin escribir cambios.",
+        )
 
     @transaction.atomic
     def handle(self, *args, **opts):
@@ -24,7 +29,9 @@ class Command(BaseCommand):
             if d.tecnico_responsable_id is None:
                 cand = getattr(getattr(d, "created_by", None), "tecnico", None)
                 cfg = getattr(getattr(d, "empresa", None), "config", None)
-                if cand and getattr(cand, "empresa_id", None) == getattr(d, "empresa_id", None):
+                if cand and getattr(cand, "empresa_id", None) == getattr(
+                    d, "empresa_id", None
+                ):
                     if not dry:
                         d.tecnico_responsable = cand
                         d.save(update_fields=["tecnico_responsable"])
@@ -41,7 +48,9 @@ class Command(BaseCommand):
                 if hasattr(d, "lineas_repuesto"):
                     qs = d.lineas_repuesto.filter(mecanico__isnull=True)
                     if not dry:
-                        set_lineas_rep += qs.update(mecanico_id=d.tecnico_responsable_id)
+                        set_lineas_rep += qs.update(
+                            mecanico_id=d.tecnico_responsable_id
+                        )
                     else:
                         set_lineas_rep += qs.count()
 
@@ -49,7 +58,9 @@ class Command(BaseCommand):
                 if hasattr(d, "lineas_servicio"):
                     qs = d.lineas_servicio.filter(mecanico__isnull=True)
                     if not dry:
-                        set_lineas_srv += qs.update(mecanico_id=d.tecnico_responsable_id)
+                        set_lineas_srv += qs.update(
+                            mecanico_id=d.tecnico_responsable_id
+                        )
                     else:
                         set_lineas_srv += qs.count()
 
@@ -57,12 +68,16 @@ class Command(BaseCommand):
                 if hasattr(d, "lineas_otro_servicio"):
                     qs = d.lineas_otro_servicio.filter(mecanico__isnull=True)
                     if not dry:
-                        set_lineas_otros += qs.update(mecanico_id=d.tecnico_responsable_id)
+                        set_lineas_otros += qs.update(
+                            mecanico_id=d.tecnico_responsable_id
+                        )
                     else:
                         set_lineas_otros += qs.count()
 
-        self.stdout.write(self.style.SUCCESS(
-            f"Backfill OK. tecnico_responsable seteado en {set_responsable} documentos; "
-            f"líneas actualizadas: rep={set_lineas_rep}, srv={set_lineas_srv}, otros={set_lineas_otros} "
-            f"{'(dry-run)' if dry else ''}"
-        ))
+        self.stdout.write(
+            self.style.SUCCESS(
+                f"Backfill OK. tecnico_responsable seteado en {set_responsable} documentos; "
+                f"líneas actualizadas: rep={set_lineas_rep}, srv={set_lineas_srv}, otros={set_lineas_otros} "
+                f"{'(dry-run)' if dry else ''}"
+            )
+        )

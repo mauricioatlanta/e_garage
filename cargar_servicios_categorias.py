@@ -4,14 +4,16 @@ Script para cargar servicios por categorías
 """
 import os
 import sys
+
 import django
 
 # Configurar Django
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings")
 django.setup()
 
-from taller.servicios.models import CategoriaServicio, SubcategoriaServicio, Servicio
+from taller.servicios.models import (CategoriaServicio, Servicio,
+                                     SubcategoriaServicio)
 
 # Datos de servicios organizados por categorías
 servicios_por_categoria = {
@@ -31,7 +33,7 @@ servicios_por_categoria = {
         "Revisión de presión y estado de neumáticos",
         "Revisión del sistema de escape y catalizador",
         "Rotación cruzada de neumáticos",
-        "Test de batería y sistema de carga eléctrica"
+        "Test de batería y sistema de carga eléctrica",
     ],
     "2. Reparaciones Mecánicas Generales": [
         "Ajuste y sincronización electrónica del motor",
@@ -50,7 +52,7 @@ servicios_por_categoria = {
         "Rectificación de culata y prueba hidráulica",
         "Reparación de fugas de aceite y refrigerante",
         "Reparación de sistema de inyección (common rail, TBI)",
-        "Revisión y reparación de sistema de escape (flexibles, catalizador)"
+        "Revisión y reparación de sistema de escape (flexibles, catalizador)",
     ],
     "3. Sistema de Frenos": [
         "Cambio de cilindro maestro de frenos",
@@ -61,7 +63,7 @@ servicios_por_categoria = {
         "Cambio de tambores y zapatas",
         "Purgado y sangrado del sistema de frenos",
         "Diagnóstico y reparación de ABS",
-        "Revisión y ajuste del freno de mano"
+        "Revisión y ajuste del freno de mano",
     ],
     "4. Sistema de Transmisión y Embrague": [
         "Cambio de aceite de transmisión automática (ATF)",
@@ -72,7 +74,7 @@ servicios_por_categoria = {
         "Cambio de homocinéticas internas y externas",
         "Cambio de retenes de transmisión",
         "Cambio de volante de inercia (bimasa o sólido)",
-        "Reparación o reemplazo de caja de cambios"
+        "Reparación o reemplazo de caja de cambios",
     ],
     "5. Sistema de Suspensión y Dirección": [
         "Ajuste y calibración de dirección hidráulica o EPS",
@@ -84,7 +86,7 @@ servicios_por_categoria = {
         "Cambio de cremallera o caja de dirección",
         "Cambio de espirales o resortes",
         "Reparación de sistema de dirección asistida",
-        "Revisión general de alineación y geometría"
+        "Revisión general de alineación y geometría",
     ],
     "6. Sistema Eléctrico y Electrónico": [
         "Cambio de focos, ampolletas halógenas y LED",
@@ -100,7 +102,7 @@ servicios_por_categoria = {
         "Instalación de luces LED o xenón",
         "Instalación de pantallas, radios y multimedia",
         "Reparación de alzavidrios eléctricos",
-        "Detección y solución de cortocircuitos"
+        "Detección y solución de cortocircuitos",
     ],
     "7. Aire Acondicionado y Climatización": [
         "Cambio de compresor de aire acondicionado",
@@ -122,7 +124,7 @@ servicios_por_categoria = {
         "Pulido, abrillantado y encerado profesional",
         "Reparación de golpes leves y abolladuras",
         "Reparación y pintura de parachoques plásticos",
-        "Cambio o reparación de molduras externas"
+        "Cambio o reparación de molduras externas",
     ],
     "9. Vidrios y Accesorios": [
         "Cambio de luneta trasera con desempañador",
@@ -133,7 +135,7 @@ servicios_por_categoria = {
         "Cambio de plumillas y sistema de limpiaparabrisas",
         "Polarizado de vidrios con lámina certificada",
         "Reparación y mantenimiento de sunroof",
-        "Reparación de trizaduras con resina"
+        "Reparación de trizaduras con resina",
     ],
     "10. Inspecciones y Certificaciones": [
         "Certificación de conversión a gas vehicular (GLP/GNC)",
@@ -144,24 +146,25 @@ servicios_por_categoria = {
         "Inspección de sistema eléctrico y luces",
         "Inspección pre-compra para autos usados",
         "Pre-chequeo técnico para Revisión Técnica",
-        "Revisión de sistema de emisiones y catalizador"
-    ]
+        "Revisión de sistema de emisiones y catalizador",
+    ],
 }
+
 
 def cargar_servicios():
     print("🚀 Iniciando carga de servicios por categorías...")
-    
+
     # Contadores
     categorias_creadas = 0
     subcategorias_creadas = 0
     servicios_creados = 0
-    
+
     # Limpiar datos existentes
     print("🧹 Limpiando servicios existentes...")
     Servicio.objects.all().delete()
     SubcategoriaServicio.objects.all().delete()
     CategoriaServicio.objects.all().delete()
-    
+
     # Crear categoría principal
     categoria_principal, created = CategoriaServicio.objects.get_or_create(
         nombre="Servicios de Taller Mecánico"
@@ -169,44 +172,42 @@ def cargar_servicios():
     if created:
         categorias_creadas += 1
         print(f"✅ Categoría principal creada: {categoria_principal.nombre}")
-    
+
     # Procesar cada subcategoría y sus servicios
     for subcategoria_nombre, servicios_lista in servicios_por_categoria.items():
         # Crear subcategoría
         subcategoria, created = SubcategoriaServicio.objects.get_or_create(
-            categoria=categoria_principal,
-            nombre=subcategoria_nombre
+            categoria=categoria_principal, nombre=subcategoria_nombre
         )
         if created:
             subcategorias_creadas += 1
             print(f"✅ Subcategoría creada: {subcategoria_nombre}")
-        
+
         # Crear servicios de esta subcategoría
         for servicio_nombre in servicios_lista:
             servicio, created = Servicio.objects.get_or_create(
-                subcategoria=subcategoria,
-                nombre=servicio_nombre
+                subcategoria=subcategoria, nombre=servicio_nombre
             )
             if created:
                 servicios_creados += 1
                 print(f"   🔧 Servicio creado: {servicio_nombre}")
-    
+
     print(f"\n🎉 ¡Proceso completado!")
     print(f"📊 Resumen de carga:")
     print(f"   Categorías creadas: {categorias_creadas}")
     print(f"   Subcategorías creadas: {subcategorias_creadas}")
     print(f"   Servicios creados: {servicios_creados}")
-    
+
     # Verificar totales en base de datos
     total_categorias = CategoriaServicio.objects.count()
     total_subcategorias = SubcategoriaServicio.objects.count()
     total_servicios = Servicio.objects.count()
-    
+
     print(f"\n📈 Total en base de datos:")
     print(f"   Categorías: {total_categorias}")
     print(f"   Subcategorías: {total_subcategorias}")
     print(f"   Servicios: {total_servicios}")
-    
+
     # Mostrar algunos ejemplos
     print(f"\n🔍 Ejemplos de servicios cargados:")
     for subcategoria in SubcategoriaServicio.objects.all()[:3]:
@@ -214,6 +215,7 @@ def cargar_servicios():
         print(f"   {subcategoria.nombre}:")
         for servicio in servicios_ejemplo:
             print(f"     - {servicio.nombre}")
+
 
 if __name__ == "__main__":
     cargar_servicios()

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>eGarage USA - Boost Your Automotive Business</title>
+    <title>🇺🇸 eGarage United States - Professional Automotive Management System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,658 +11,582 @@
     <style>
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            overflow-x: hidden;
         }
+        
+        /* Futuristic gradient backgrounds */
         .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 35%, #334155 65%, #0a0f1c 100%);
+            position: relative;
         }
-        .gradient-text {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .gradient-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(ellipse at center top, rgba(59, 130, 246, 0.15) 0%, rgba(99, 102, 241, 0.08) 35%, transparent 70%);
+        }
+        
+        /* Advanced animations */
+        .floating-animation {
+            animation: advancedFloat 8s ease-in-out infinite;
+        }
+        @keyframes advancedFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
+            25% { transform: translateY(-15px) rotate(1deg) scale(1.02); }
+            50% { transform: translateY(-8px) rotate(0deg) scale(1.03); }
+            75% { transform: translateY(-12px) rotate(-1deg) scale(1.01); }
+        }
+        
+        /* Holographic effects */
+        .holographic {
+            background: linear-gradient(145deg, rgba(59, 130, 246, 0.1), rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.1));
+            backdrop-filter: blur(20px) saturate(1.5);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Advanced pulse effect */
+        .pulse-glow {
+            animation: advancedPulse 3s ease-in-out infinite;
+            position: relative;
+        }
+        @keyframes advancedPulse {
+            0%, 100% { 
+                box-shadow: 0 0 20px rgba(99, 102, 241, 0.6), 0 0 40px rgba(59, 130, 246, 0.4); 
+                transform: scale(1);
+            }
+            50% { 
+                box-shadow: 0 0 30px rgba(99, 102, 241, 0.8), 0 0 60px rgba(59, 130, 246, 0.6); 
+                transform: scale(1.05);
+            }
+        }
+        
+        /* Neon text with multiple colors */
+        .neon-text {
+            background: linear-gradient(45deg, #3b82f6, #6366f1, #8b5cf6, #3b82f6);
+            background-size: 400% 400%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            animation: gradientShift 4s ease-in-out infinite;
+            text-shadow: 0 0 30px rgba(99, 102, 241, 0.5);
         }
-        .floating-animation {
-            animation: floating 6s ease-in-out infinite;
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
         }
-        @keyframes floating {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
+        
+        /* Particle system */
+        .particle {
+            position: absolute;
+            background: rgba(99, 102, 241, 0.8);
+            border-radius: 50%;
+            pointer-events: none;
         }
-        .pulse-glow {
-            animation: pulse-glow 2s infinite;
+        
+        /* Glitch effect */
+        .glitch {
+            position: relative;
         }
-        @keyframes pulse-glow {
-            0% { box-shadow: 0 0 20px rgba(102, 126, 234, 0.5); }
-            50% { box-shadow: 0 0 40px rgba(102, 126, 234, 0.8); }
-            100% { box-shadow: 0 0 20px rgba(102, 126, 234, 0.5); }
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
         }
-        .neon-text {
-            text-shadow: 0 0 10px rgba(102, 126, 234, 0.8);
+        .glitch::before {
+            animation: glitch-1 0.5s infinite linear alternate-reverse;
+            color: #ff0080;
+            z-index: -1;
+        }
+        .glitch::after {
+            animation: glitch-2 0.5s infinite linear alternate-reverse;
+            color: #00ff80;
+            z-index: -1;
+        }
+        @keyframes glitch-1 {
+            0% { transform: translateX(-2px) skew(-5deg); }
+            100% { transform: translateX(2px) skew(5deg); }
+        }
+        @keyframes glitch-2 {
+            0% { transform: translateX(2px) skew(-5deg); }
+            100% { transform: translateX(-2px) skew(5deg); }
+        }
+        
+        /* Tech grid */
+        .tech-grid {
+            background-image: 
+                linear-gradient(rgba(99, 102, 241, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 102, 241, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+        
+        /* Glass morphism card */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(99, 102, 241, 0.4);
+            box-shadow: 0 20px 60px rgba(99, 102, 241, 0.2);
+            transform: translateY(-5px);
         }
     </style>
 </head>
-<body class="bg-gray-900 text-white overflow-x-hidden">
-    <!-- Navigation -->
-    <nav class="fixed top-0 w-full z-50 bg-gray-900/95 backdrop-blur-sm border-b border-gray-800">
-        <div class="container mx-auto px-4 py-4">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                        <span class="text-white font-bold text-xl">eG</span>
-                    </div>
-                    <div>
-                        <h1 class="text-xl font-bold text-white">eGarage USA</h1>
-                        <p class="text-xs text-gray-400">Automotive Business Platform</p>
+<body class="gradient-bg text-white tech-grid">
+
+    <!-- Futuristic Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 holographic border-b border-indigo-500/30 py-4 px-6">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <!-- Logo Section -->
+            <div class="flex items-center gap-4">
+                <div class="relative">
+                    <img src="/static/img/logo.png" alt="eGarage Logo" class="h-12 w-auto floating-animation">
+                    <div class="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full blur-xl scale-110"></div>
+                </div>
+                <div>
+                    <span class="text-2xl font-bold neon-text">
+                        eGarage
+                    </span>
+                    <div class="text-xs text-indigo-300/80 font-medium">
+                        🇺🇸 United States
                     </div>
                 </div>
-                <div class="flex items-center space-x-4">
-                    <div class="flex items-center space-x-2">
-                        <span class="text-sm text-gray-400">🇺🇸 Country: <strong class="text-white">US</strong></span>
-                        <span class="text-gray-500">|</span>
-                        <div class="flex items-center space-x-2">
-                            <span class="text-sm text-gray-400">Language:</span>
-                            <select id="languageSelector" class="bg-gray-800 text-white text-sm rounded px-2 py-1 border border-gray-600 hover:border-gray-500 transition-colors">
-                                <option value="en" selected>🇺🇸 English</option>
-                                <option value="es">🇪🇸 Español</option>
-                            </select>
-                        </div>
-                    </div>
-                                        {% load country_url %}
-                                        <a href="{% country_url 'account_login' %}" class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-2 rounded-lg font-medium transition-all duration-300 hover:scale-105" data-translate="signIn">Sign In</a>
-                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="flex items-center gap-4">
+                <a href="#trial" 
+                   class="holographic hover:bg-indigo-500/20 text-indigo-200 hover:text-white px-6 py-2 rounded-xl font-bold text-sm transition-all duration-300">
+                    <span>🚀</span> Start Free Trial
+                </a>
+                <a href="/accounts/login/" 
+                   class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white px-6 py-2 rounded-xl font-bold text-sm transition-all duration-300 pulse-glow">
+                    <span>⚡</span> Sign In
+                </a>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
-        <!-- Animated Background -->
-        <div class="absolute inset-0 gradient-bg opacity-90"></div>
-        <div class="absolute inset-0">
-            <div class="floating-animation absolute top-20 left-10 w-20 h-20 bg-blue-500/20 rounded-full blur-xl"></div>
-            <div class="floating-animation absolute top-40 right-20 w-32 h-32 bg-purple-500/20 rounded-full blur-xl" style="animation-delay: -2s;"></div>
-            <div class="floating-animation absolute bottom-20 left-1/4 w-24 h-24 bg-indigo-500/20 rounded-full blur-xl" style="animation-delay: -4s;"></div>
+    <!-- Hero Section Futurista -->
+    <section class="min-h-screen flex flex-col justify-center items-center text-center px-6 lg:px-20 pt-20 relative overflow-hidden">
+        <!-- Partículas animadas de fondo -->
+        <div class="absolute inset-0 z-0">
+            <div class="particle" style="width: 4px; height: 4px; top: 20%; left: 10%; animation: particleFloat 8s linear infinite;"></div>
+            <div class="particle" style="width: 6px; height: 6px; top: 40%; left: 80%; animation: particleFloat 12s linear infinite 2s;"></div>
+            <div class="particle" style="width: 3px; height: 3px; top: 60%; left: 20%; animation: particleFloat 10s linear infinite 4s;"></div>
+            <div class="particle" style="width: 5px; height: 5px; top: 30%; left: 70%; animation: particleFloat 9s linear infinite 1s;"></div>
+            <div class="particle" style="width: 4px; height: 4px; top: 80%; left: 60%; animation: particleFloat 11s linear infinite 3s;"></div>
         </div>
         
-        <div class="relative z-10 text-center px-4 max-w-6xl mx-auto">
-            <h1 class="text-5xl md:text-7xl font-black mb-6 neon-text" data-translate="heroTitle">
-                Boost Your <span class="gradient-text">Automotive Business</span><br>
-                with eGarage USA
+        <!-- Elementos geométricos de fondo -->
+        <div class="absolute inset-0 z-0 opacity-10">
+            <svg width="100%" height="100%" class="w-full h-full">
+                <defs>
+                    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:0.3" />
+                        <stop offset="100%" style="stop-color:#6366f1;stop-opacity:0.3" />
+                    </linearGradient>
+                </defs>
+                <polygon points="0,0 400,200 0,400" fill="url(#grad1)" opacity="0.1"/>
+                <polygon points="1200,100 1400,0 1400,300" fill="url(#grad1)" opacity="0.08"/>
+                <circle cx="300" cy="300" r="120" fill="#3b82f6" opacity="0.05"/>
+                <circle cx="1100" cy="500" r="180" fill="#6366f1" opacity="0.05"/>
+            </svg>
+        </div>
+
+        <div class="relative z-10 max-w-6xl mx-auto">
+            <!-- Logo principal -->
+            <div class="mb-10 flex justify-center">
+                <div class="relative">
+                    <img src="/static/img/logo.png" alt="eGarage Logo" class="h-40 w-auto floating-animation drop-shadow-2xl">
+                    <div class="absolute inset-0 bg-gradient-to-r from-indigo-400/30 to-purple-400/30 rounded-full blur-2xl scale-125"></div>
+                </div>
+            </div>
+
+            <!-- Título principal con efecto glitch -->
+            <h1 class="text-5xl lg:text-8xl font-black mb-8 leading-tight">
+                <span class="block glitch neon-text" data-text="eGarage">eGarage</span>
+                <span class="block text-2xl lg:text-3xl text-indigo-300/90 font-normal mt-4">
+                    🇺🇸 Professional Automotive Management
+                </span>
             </h1>
-            <p class="text-xl md:text-2xl text-gray-200 mb-8 max-w-3xl mx-auto" data-translate="heroSubtitle">
-                From workshops to car wash — <strong>Manage everything, everywhere.</strong><br>
-                <em>Your workshop, your rules, our technology.</em>
+
+            <!-- Subtítulo -->
+            <p class="text-lg lg:text-2xl text-indigo-200/90 mb-12 max-w-4xl mx-auto leading-relaxed">
+                The most advanced platform for automotive businesses in the United States.
+                <span class="block mt-4 text-xl lg:text-2xl font-semibold text-white">
+                    🚀 AI-Powered Management • Real-Time Analytics • Future-Ready Technology
+                </span>
             </p>
-            
-            <!-- Quick Stats -->
-            <div class="flex flex-wrap justify-center gap-6 mb-12">
-                <div class="bg-white/10 backdrop-blur-sm rounded-lg px-6 py-3">
-                    <div class="text-2xl font-bold text-green-400">2,500+</div>
-                    <div class="text-sm text-gray-300" data-translate="activeSubscribers">Active Subscribers</div>
-                </div>
-                <div class="bg-white/10 backdrop-blur-sm rounded-lg px-6 py-3">
-                    <div class="text-2xl font-bold text-blue-400">45</div>
-                    <div class="text-sm text-gray-300" data-translate="statesCoverage">US States Coverage</div>
-                </div>
-                <div class="bg-white/10 backdrop-blur-sm rounded-lg px-6 py-3">
-                    <div class="text-2xl font-bold text-purple-400">99.9%</div>
-                    <div class="text-sm text-gray-300" data-translate="uptime">Uptime</div>
-                </div>
-            </div>
 
-            <!-- CTA Buttons -->
-            <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="/accounts/signup/" class="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-xl font-bold rounded-xl shadow-lg hover:scale-105 transition-transform pulse-glow" data-translate="startFreeTrial">
-                    Start Free Trial - 30 Days
+            <!-- Botones de acción futuristas -->
+            <div class="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
+                <a href="#trial" class="group relative overflow-hidden bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 px-12 py-5 rounded-2xl text-white font-bold text-xl shadow-2xl pulse-glow transition-all duration-300">
+                    <span class="relative z-10 flex items-center gap-3">
+                        <span>🚀</span>
+                        Start Free Trial
+                    </span>
+                    <div class="absolute inset-0 bg-gradient-to-r from-purple-600 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </a>
-                <a href="#demo" class="px-8 py-4 bg-white/10 backdrop-blur-sm text-white text-xl font-semibold rounded-xl border border-white/30 hover:bg-white/20 transition-colors" data-translate="requestDemo">
-                    Request a Demo
+                
+                <a href="#demo" class="glass-card px-12 py-5 rounded-2xl text-indigo-200 hover:text-white font-bold text-xl transition-all duration-300">
+                    <span class="flex items-center gap-3">
+                        <span>🎬</span>
+                        Watch Demo
+                    </span>
+                </a>
+                
+                <a href="/accounts/login/" class="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 px-12 py-5 rounded-2xl text-white font-bold text-xl shadow-2xl transition-all duration-300">
+                    <span class="flex items-center gap-3">
+                        <span>⚡</span>
+                        Sign In
+                    </span>
                 </a>
             </div>
-        </div>
-    </section>
 
-    <!-- Key Benefits Section -->
-    <section class="py-20 bg-gray-800">
-        <div class="container mx-auto px-4">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl font-bold mb-4" data-translate="benefitsTitle">Data-driven Success for the Automotive World</h2>
-                <p class="text-xl text-gray-400" data-translate="benefitsSubtitle">From bolts to big deals — Manage it all with precision</p>
-            </div>
-
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Performance Reports -->
-                <div class="bg-gray-900 rounded-xl p-8 hover:bg-gray-800 transition-colors">
-                    <div class="text-4xl mb-4">📊</div>
-                    <h3 class="text-xl font-bold mb-4" data-translate="performanceReports">Performance Reports</h3>
-                    <ul class="text-gray-400 space-y-2" data-translate-list="performanceList">
-                        <li>• Technician productivity tracking</li>
-                        <li>• Revenue by service type</li>
-                        <li>• Effectiveness metrics</li>
-                        <li>• Profit analysis by parts & services</li>
-                    </ul>
+            <!-- Características destacadas -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 text-base text-indigo-200/80 max-w-4xl mx-auto">
+                <div class="flex items-center justify-center gap-2 glass-card px-4 py-3 rounded-xl">
+                    <span class="text-green-400">✓</span>
+                    No Credit Card Required
                 </div>
-
-                <!-- Real-time Inventory -->
-                <div class="bg-gray-900 rounded-xl p-8 hover:bg-gray-800 transition-colors">
-                    <div class="text-4xl mb-4">📦</div>
-                    <h3 class="text-xl font-bold mb-4" data-translate="realTimeInventory">Real-time Inventory</h3>
-                    <ul class="text-gray-400 space-y-2" data-translate-list="inventoryList">
-                        <li>• Live stock control</li>
-                        <li>• Automatic reorder alerts</li>
-                        <li>• Parts profitability tracking</li>
-                        <li>• Supplier management</li>
-                    </ul>
+                <div class="flex items-center justify-center gap-2 glass-card px-4 py-3 rounded-xl">
+                    <span class="text-green-400">✓</span>
+                    24/7 Premium Support
                 </div>
-
-                <!-- Multi-Business Support -->
-                <div class="bg-gray-900 rounded-xl p-8 hover:bg-gray-800 transition-colors">
-                    <div class="text-4xl mb-4">🏢</div>
-                    <h3 class="text-xl font-bold mb-4" data-translate="multiBusinessSupport">Multi-Business Support</h3>
-                    <ul class="text-gray-400 space-y-2" data-translate-list="businessList">
-                        <li>• Mechanical Workshops</li>
-                        <li>• Spare Parts Stores</li>
-                        <li>• Tire Services</li>
-                        <li>• Car Wash Centers</li>
-                    </ul>
-                </div>
-
-                <!-- Mobile Access -->
-                <div class="bg-gray-900 rounded-xl p-8 hover:bg-gray-800 transition-colors">
-                    <div class="text-4xl mb-4">📱</div>
-                    <h3 class="text-xl font-bold mb-4" data-translate="anyDeviceAccess">Any Device Access</h3>
-                    <ul class="text-gray-400 space-y-2" data-translate-list="deviceList">
-                        <li>• Mobile responsive design</li>
-                        <li>• Tablet optimized</li>
-                        <li>• Desktop powerful</li>
-                        <li>• Cloud synchronized</li>
-                    </ul>
-                </div>
-
-                <!-- Client Management -->
-                <div class="bg-gray-900 rounded-xl p-8 hover:bg-gray-800 transition-colors">
-                    <div class="text-4xl mb-4">👥</div>
-                    <h3 class="text-xl font-bold mb-4" data-translate="smartClientManagement">Smart Client Management</h3>
-                    <ul class="text-gray-400 space-y-2" data-translate-list="clientList">
-                        <li>• Complete service history</li>
-                        <li>• Automated scheduling</li>
-                        <li>• Payment tracking</li>
-                        <li>• Customer communication</li>
-                    </ul>
-                </div>
-
-                <!-- Multi-location -->
-                <div class="bg-gray-900 rounded-xl p-8 hover:bg-gray-800 transition-colors">
-                    <div class="text-4xl mb-4">🌎</div>
-                    <h3 class="text-xl font-bold mb-4" data-translate="multiLocationReady">Multi-location Ready</h3>
-                    <ul class="text-gray-400 space-y-2" data-translate-list="locationList">
-                        <li>• Multiple branch management</li>
-                        <li>• Centralized reporting</li>
-                        <li>• Transfer tracking</li>
-                        <li>• Unified dashboard</li>
-                    </ul>
+                <div class="flex items-center justify-center gap-2 glass-card px-4 py-3 rounded-xl">
+                    <span class="text-green-400">✓</span>
+                    Setup in 24 Hours
                 </div>
             </div>
-        </div>
-    </section>
-
-    <!-- Pricing Section -->
-    <section class="py-20 bg-gray-900">
-        <div class="container mx-auto px-4">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl font-bold mb-4" data-translate="pricingTitle">Choose Your Success Plan</h2>
-                <p class="text-xl text-gray-400" data-translate="pricingSubtitle">All plans include 24/7 support and free updates</p>
-            </div>
-
-            <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-                <!-- Monthly Plan -->
-                <div class="bg-gray-800 rounded-xl p-8 hover:scale-105 transition-transform">
-                    <h3 class="text-2xl font-bold mb-2" data-translate="monthly">Monthly</h3>
-                    <div class="text-4xl font-black mb-4">$20 <span class="text-lg font-normal text-gray-400">USD/month</span></div>
-                    <ul class="text-gray-300 space-y-3 mb-8">
-                        <li>✅ Complete access to all features</li>
-                        <li>✅ 24/7 priority support</li>
-                        <li>✅ Real-time reporting</li>
-                        <li>✅ Mobile & desktop apps</li>
-                        <li>✅ Unlimited users</li>
-                    </ul>
-                    <a href="/accounts/signup/" class="block w-full px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors text-center" data-translate="startNow">
-                        Start Now
-                    </a>
-                </div>
-
-                <!-- Semester Plan (Most Popular) -->
-                <div class="bg-gradient-to-b from-blue-600 to-purple-600 rounded-xl p-8 hover:scale-105 transition-transform relative">
-                    <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-yellow-500 text-black px-4 py-1 rounded-full text-sm font-bold" data-translate="mostPopular">
-                        MOST POPULAR
-                    </div>
-                    <h3 class="text-2xl font-bold mb-2" data-translate="semester">Semester</h3>
-                    <div class="text-4xl font-black mb-2">$110 <span class="text-lg font-normal">USD/6 months</span></div>
-                    <div class="text-green-300 font-semibold mb-4" data-translate="savePercent8">Save 8% + Premium Features</div>
-                    <ul class="text-white space-y-3 mb-8">
-                        <li>✅ Everything in Monthly</li>
-                        <li>✅ Premium analytics dashboard</li>
-                        <li>✅ Advanced reporting tools</li>
-                        <li>✅ Priority feature requests</li>
-                        <li>✅ Free business consultation</li>
-                    </ul>
-                    <a href="/accounts/signup/" class="block w-full px-6 py-3 bg-white text-blue-600 font-bold rounded-lg hover:bg-gray-100 transition-colors text-center" data-translate="subscribeNow">
-                        Subscribe Now
-                    </a>
-                </div>
-
-                <!-- Annual Plan -->
-                <div class="bg-gray-800 rounded-xl p-8 hover:scale-105 transition-transform">
-                    <h3 class="text-2xl font-bold mb-2" data-translate="annual">Annual</h3>
-                    <div class="text-4xl font-black mb-2">$200 <span class="text-lg font-normal text-gray-400">USD/year</span></div>
-                    <div class="text-green-400 font-semibold mb-4" data-translate="savePercent16">Save 16% + Business Boost</div>
-                    <ul class="text-gray-300 space-y-3 mb-8">
-                        <li>✅ Everything in Semester</li>
-                        <li>✅ FREE initial consultation</li>
-                        <li>✅ Custom feature development</li>
-                        <li>✅ Dedicated account manager</li>
-                        <li>✅ White-label options</li>
-                    </ul>
-                    <a href="/accounts/signup/" class="block w-full px-6 py-3 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700 transition-colors text-center" data-translate="getBestValue">
-                        Get Best Value
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Testimonials Section -->
-    <section class="py-20 bg-gray-800">
-        <div class="container mx-auto px-4">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl font-bold mb-4" data-translate="testimonialsTitle">Success Stories from Real Customers</h2>
-                <p class="text-xl text-gray-400" data-translate="testimonialsSubtitle">See how eGarage transformed these businesses</p>
-            </div>
-
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Testimonial 1 -->
-                <div class="bg-gray-900 rounded-xl p-8">
-                    <div class="flex items-center mb-4">
-                        <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">J</div>
-                        <div class="ml-4">
-                            <h4 class="font-bold">John Martinez</h4>
-                            <p class="text-gray-400 text-sm">Workshop Owner - Atlanta, GA</p>
-                        </div>
-                    </div>
-                    <p class="text-gray-300 italic mb-4">
-                        "Since switching to eGarage, my sales tracking improved 200% and I reduced costs by 15%. The technician performance reports help me optimize my team."
-                    </p>
-                    <div class="text-yellow-400">⭐⭐⭐⭐⭐</div>
-                </div>
-
-                <!-- Testimonial 2 -->
-                <div class="bg-gray-900 rounded-xl p-8">
-                    <div class="flex items-center mb-4">
-                        <div class="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold">M</div>
-                        <div class="ml-4">
-                            <h4 class="font-bold">Maria Rodriguez</h4>
-                            <p class="text-gray-400 text-sm">Spare Parts Store - Miami, FL</p>
-                        </div>
-                    </div>
-                    <p class="text-gray-300 italic mb-4">
-                        "Inventory and sales are now in perfect sync — no more lost revenue. The real-time stock alerts save me thousands every month."
-                    </p>
-                    <div class="text-yellow-400">⭐⭐⭐⭐⭐</div>
-                </div>
-
-                <!-- Testimonial 3 -->
-                <div class="bg-gray-900 rounded-xl p-8">
-                    <div class="flex items-center mb-4">
-                        <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white font-bold">D</div>
-                        <div class="ml-4">
-                            <h4 class="font-bold">David Thompson</h4>
-                            <p class="text-gray-400 text-sm">Car Wash Chain - Phoenix, AZ</p>
-                        </div>
-                    </div>
-                    <p class="text-gray-300 italic mb-4">
-                        "Managing 3 locations was chaos before eGarage. Now I have unified reporting and can track everything from anywhere."
-                    </p>
-                    <div class="text-yellow-400">⭐⭐⭐⭐⭐</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Features Preview -->
-    <section id="demo" class="py-20 bg-gray-900">
-        <div class="container mx-auto px-4">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl font-bold mb-4" data-translate="featuresTitle">See eGarage in Action</h2>
-                <p class="text-xl text-gray-400" data-translate="featuresSubtitle">Powerful features designed for automotive businesses</p>
-            </div>
-
-            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="bg-gray-800 rounded-xl p-6 text-center hover:bg-gray-700 transition-colors">
-                    <div class="text-4xl mb-4">📊</div>
-                    <h3 class="font-bold mb-2" data-translate="dashboard">Dashboard</h3>
-                    <p class="text-gray-400 text-sm">Real-time business insights</p>
-                    <a href="/us/dashboard/" class="text-blue-400 hover:text-blue-300 text-sm" data-translate="viewDemo">View Demo →</a>
-                </div>
-
-                <div class="bg-gray-800 rounded-xl p-6 text-center hover:bg-gray-700 transition-colors">
-                    <div class="text-4xl mb-4">📦</div>
-                    <h3 class="font-bold mb-2" data-translate="inventory">Inventory</h3>
-                    <p class="text-gray-400 text-sm">Smart stock management</p>
-                    <a href="/us/repuestos/" class="text-blue-400 hover:text-blue-300 text-sm" data-translate="viewDemo">View Demo →</a>
-                </div>
-
-                <div class="bg-gray-800 rounded-xl p-6 text-center hover:bg-gray-700 transition-colors">
-                    <div class="text-4xl mb-4">👥</div>
-                    <h3 class="font-bold mb-2" data-translate="clients">Clients</h3>
-                    <p class="text-gray-400 text-sm">Customer relationship management</p>
-                    <a href="/us/clientes/" class="text-blue-400 hover:text-blue-300 text-sm" data-translate="viewDemo">View Demo →</a>
-                </div>
-
-                <div class="bg-gray-800 rounded-xl p-6 text-center hover:bg-gray-700 transition-colors">
-                    <div class="text-4xl mb-4">🚗</div>
-                    <h3 class="font-bold mb-2" data-translate="vehicles">Vehicles</h3>
-                    <p class="text-gray-400 text-sm">Complete vehicle database</p>
-                    <a href="/us/vehiculos/" class="text-blue-400 hover:text-blue-300 text-sm" data-translate="viewDemo">View Demo →</a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Final CTA Section -->
-    <section class="py-20 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 relative overflow-hidden">
-        <!-- Animated Background Effects -->
-        <div class="absolute inset-0">
-            <div class="floating-animation absolute top-10 left-10 w-20 h-20 bg-white/10 rounded-full blur-xl"></div>
-            <div class="floating-animation absolute bottom-10 right-10 w-32 h-32 bg-white/10 rounded-full blur-xl" style="animation-delay: -3s;"></div>
         </div>
         
-        <div class="container mx-auto px-4 text-center relative z-10">
-            <h2 class="text-5xl font-black mb-6 neon-text" data-translate="finalCtaTitle">
-                Ready to Take Your Workshop<br>
-                to the Next Level?
-            </h2>
-            <p class="text-xl mb-8 max-w-2xl mx-auto" data-translate="finalCtaSubtitle">
-                Join thousands of successful automotive businesses across the USA.<br>
-                <strong>Start your transformation today.</strong>
-            </p>
-            
-            <div class="flex flex-col sm:flex-row gap-6 justify-center">
-                <a href="/accounts/signup/" class="px-10 py-4 bg-white text-blue-600 text-xl font-bold rounded-xl shadow-lg hover:scale-105 transition-transform" data-translate="startNowFree">
-                    Start Now - Free Trial
-                </a>
-                <a href="mailto:sales@egarage.com" class="px-10 py-4 bg-white/20 backdrop-blur-sm text-white text-xl font-semibold rounded-xl border border-white/30 hover:bg-white/30 transition-colors" data-translate="requestDemoFinal">
-                    Request a Demo
-                </a>
+        <!-- Indicador de scroll mejorado -->
+        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20">
+            <div class="flex flex-col items-center gap-2 animate-bounce">
+                <span class="text-indigo-300/60 text-sm font-medium">Discover More</span>
+                <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                </svg>
             </div>
-            
-            <div class="mt-8 text-white/80">
-                <p data-translate="noCreditCard">✅ No credit card required • ✅ 30-day free trial • ✅ Cancel anytime</p>
+        </div>
+        
+        <style>
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(100vh) translateX(-50px);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) translateX(50px);
+                opacity: 0;
+            }
+        }
+        </style>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-20 px-6">
+        <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div class="space-y-8">
+                <div>
+                    <h2 class="text-4xl lg:text-5xl font-bold mb-6 neon-text">The Most Complete Platform</h2>
+                    <p class="text-xl text-indigo-200/90 mb-8 leading-relaxed">
+                        Whether you run a <strong class="text-white">repair shop</strong>, a <strong class="text-white">collision center</strong>, a <strong class="text-white">parts store</strong>, or a <strong class="text-white">multi-service automotive business</strong>, eGarage adapts perfectly to your needs.
+                    </p>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="glass-card p-6 rounded-2xl">
+                        <div class="flex items-center gap-4 mb-3">
+                            <span class="text-3xl">🚗</span>
+                            <h3 class="text-xl font-bold text-white">Vehicle Management</h3>
+                        </div>
+                        <p class="text-indigo-200/80">Complete history, maintenance records, and intelligent service scheduling with AI recommendations.</p>
+                    </div>
+
+                    <div class="glass-card p-6 rounded-2xl">
+                        <div class="flex items-center gap-4 mb-3">
+                            <span class="text-3xl">👥</span>
+                            <h3 class="text-xl font-bold text-white">Customer CRM</h3>
+                        </div>
+                        <p class="text-indigo-200/80">Advanced relationship management, loyalty programs, and automated communication systems.</p>
+                    </div>
+
+                    <div class="glass-card p-6 rounded-2xl">
+                        <div class="flex items-center gap-4 mb-3">
+                            <span class="text-3xl">📦</span>
+                            <h3 class="text-xl font-bold text-white">Smart Inventory</h3>
+                        </div>
+                        <p class="text-indigo-200/80">Real-time control, predictive reorder points, and intelligent supplier management.</p>
+                    </div>
+
+                    <div class="glass-card p-6 rounded-2xl">
+                        <div class="flex items-center gap-4 mb-3">
+                            <span class="text-3xl">📊</span>
+                            <h3 class="text-xl font-bold text-white">AI Analytics</h3>
+                        </div>
+                        <p class="text-indigo-200/80">Advanced KPIs, performance dashboards, and predictive business insights powered by AI.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="relative">
+                <div class="glass-card p-8 rounded-3xl floating-animation">
+                    <img src="/static/img/usa_dashboard_mockup.png" alt="eGarage USA Dashboard" class="rounded-2xl w-full shadow-2xl">
+                    <div class="absolute top-4 right-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-bold py-2 px-4 rounded-full shadow-lg pulse-glow">
+                        <span>🔴</span> Live Demo
+                    </div>
+                </div>
+                
+                <!-- Elementos decorativos -->
+                <div class="absolute -z-10 top-10 left-10 w-20 h-20 bg-indigo-500/20 rounded-full blur-xl"></div>
+                <div class="absolute -z-10 bottom-10 right-10 w-32 h-32 bg-purple-500/20 rounded-full blur-2xl"></div>
             </div>
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="bg-gray-900 py-12 border-t border-gray-800">
-        <div class="container mx-auto px-4">
-            <div class="text-center">
-                <div class="flex items-center justify-center space-x-3 mb-4">
-                    <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                        <span class="text-white font-bold">eG</span>
+    <!-- Business Types Section -->
+    <section class="py-20 px-6 relative overflow-hidden">
+        <!-- Fondo con gradiente y efectos -->
+        <div class="absolute inset-0 bg-gradient-to-br from-indigo-900/50 to-purple-900/50 backdrop-blur-sm"></div>
+        
+        <div class="max-w-6xl mx-auto text-center relative z-10">
+            <h2 class="text-4xl lg:text-5xl font-bold mb-8 neon-text">Why Choose eGarage USA?</h2>
+            <p class="text-xl text-indigo-200/90 mb-12 max-w-4xl mx-auto leading-relaxed">
+                Trusted by automotive professionals across multiple countries. 
+                Designed to <strong class="text-white">simplify operations</strong>, <strong class="text-white">boost sales</strong>, and <strong class="text-white">keep customers coming back</strong>.
+            </p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="glass-card p-8 rounded-2xl hover:scale-105 transition-all duration-300 group">
+                    <div class="text-5xl mb-6 group-hover:scale-110 transition-transform duration-300">🔧</div>
+                    <h3 class="font-bold text-2xl mb-4 text-white">Specialized Shops</h3>
+                    <p class="text-indigo-200/80 leading-relaxed">Perfect for auto repair shops, tire stores, or paint & body businesses that need smart, powerful, and intuitive tools.</p>
+                    <div class="mt-6 flex justify-center">
+                        <div class="w-16 h-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full"></div>
                     </div>
-                    <span class="text-xl font-bold">eGarage USA</span>
                 </div>
-                <p class="text-gray-400 mb-4" data-translate="footerText">
-                    © 2025 eGarage USA - Professional Automotive Business Platform<br>
-                    Designed for the US automotive service industry
+                
+                <div class="glass-card p-8 rounded-2xl hover:scale-105 transition-all duration-300 group">
+                    <div class="text-5xl mb-6 group-hover:scale-110 transition-transform duration-300">🏭</div>
+                    <h3 class="font-bold text-2xl mb-4 text-white">Multi-Service Centers</h3>
+                    <p class="text-indigo-200/80 leading-relaxed">Manage repairs, parts sales, tire services, and more — all in one integrated, AI-powered platform.</p>
+                    <div class="mt-6 flex justify-center">
+                        <div class="w-16 h-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"></div>
+                    </div>
+                </div>
+                
+                <div class="glass-card p-8 rounded-2xl hover:scale-105 transition-all duration-300 group">
+                    <div class="text-5xl mb-6 group-hover:scale-110 transition-transform duration-300">📈</div>
+                    <h3 class="font-bold text-2xl mb-4 text-white">Growth-Oriented Owners</h3>
+                    <p class="text-indigo-200/80 leading-relaxed">Track advanced KPIs, increase efficiency, and gain real-time insights into profitability with predictive analytics.</p>
+                    <div class="mt-6 flex justify-center">
+                        <div class="w-16 h-1 bg-gradient-to-r from-pink-500 to-red-500 rounded-full"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional features grid -->
+            <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                <div class="space-y-2">
+                    <div class="text-2xl">📱</div>
+                    <span class="text-sm text-indigo-200/80">Mobile Ready</span>
+                </div>
+                <div class="space-y-2">
+                    <div class="text-2xl">🧠</div>
+                    <span class="text-sm text-indigo-200/80">AI-Powered</span>
+                </div>
+                <div class="space-y-2">
+                    <div class="text-2xl">🔒</div>
+                    <span class="text-sm text-indigo-200/80">Bank-Level Security</span>
+                </div>
+                <div class="space-y-2">
+                    <div class="text-2xl">⚡</div>
+                    <span class="text-sm text-indigo-200/80">Lightning Fast</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action Section -->
+    <section id="trial" class="py-20 px-6 relative overflow-hidden">
+        <!-- Fondo futurista -->
+        <div class="absolute inset-0 bg-gradient-to-r from-indigo-600/80 via-purple-600/80 to-pink-600/80"></div>
+        <div class="absolute inset-0 tech-grid opacity-20"></div>
+        
+        <div class="max-w-4xl mx-auto text-center relative z-10">
+            <div class="mb-8">
+                <span class="text-6xl floating-animation inline-block">🚀</span>
+            </div>
+            
+            <h2 class="text-4xl lg:text-6xl font-bold mb-8 neon-text">Ready to Transform Your Business?</h2>
+            <p class="text-xl lg:text-2xl mb-12 text-indigo-100 leading-relaxed max-w-3xl mx-auto">
+                Join thousands of automotive professionals who trust eGarage to manage their operations with 
+                <strong class="text-white">cutting-edge technology</strong> and <strong class="text-white">intelligent automation</strong>.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row gap-6 justify-center items-center">
+                <a href="/accounts/login/" 
+                   class="group relative overflow-hidden bg-white text-indigo-600 font-bold px-12 py-5 rounded-2xl text-xl shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105">
+                    <span class="relative z-10 flex items-center gap-3">
+                        <span>⚡</span>
+                        Get Started Now
+                    </span>
+                    <div class="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <span class="absolute inset-0 group-hover:text-white transition-colors duration-300 flex items-center justify-center gap-3 font-bold text-xl">
+                        <span>⚡</span>
+                        Get Started Now
+                    </span>
+                </a>
+                
+                <a href="#demo" 
+                   class="glass-card border-2 border-white/30 hover:border-white/60 text-white font-bold px-12 py-5 rounded-2xl text-xl hover:bg-white/10 transition-all duration-300">
+                    <span class="flex items-center gap-3">
+                        <span>🎬</span>
+                        Schedule Demo
+                    </span>
+                </a>
+            </div>
+
+            <!-- Trust indicators -->
+            <div class="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
+                <div class="glass-card px-6 py-4 rounded-xl">
+                    <div class="text-2xl mb-2">⚡</div>
+                    <div class="text-white font-semibold">Setup in 24h</div>
+                    <div class="text-indigo-200/80 text-sm">Quick onboarding</div>
+                </div>
+                <div class="glass-card px-6 py-4 rounded-xl">
+                    <div class="text-2xl mb-2">🛡️</div>
+                    <div class="text-white font-semibold">100% Secure</div>
+                    <div class="text-indigo-200/80 text-sm">Bank-level encryption</div>
+                </div>
+                <div class="glass-card px-6 py-4 rounded-xl">
+                    <div class="text-2xl mb-2">📞</div>
+                    <div class="text-white font-semibold">24/7 Support</div>
+                    <div class="text-indigo-200/80 text-sm">Always here to help</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Futurista -->
+    <footer class="py-16 px-6 relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-t from-black to-gray-900/90"></div>
+        
+        <div class="max-w-6xl mx-auto relative z-10">
+            <!-- Logo y descripción principal -->
+            <div class="text-center mb-12">
+                <div class="flex justify-center items-center gap-4 mb-6">
+                    <img src="/static/img/logo.png" alt="eGarage Logo" class="h-12 w-auto floating-animation">
+                    <span class="text-3xl font-bold neon-text">eGarage</span>
+                </div>
+                <p class="text-lg text-indigo-200/80 max-w-2xl mx-auto leading-relaxed">
+                    The future of automotive business management. Powered by AI, designed for professionals.
                 </p>
-                <div class="text-sm text-gray-500">
-                    <span data-translate="systemStatus">System Status: </span>
-                    <span class="text-green-400" data-translate="allSystemsOperational">✅ All systems operational</span> •
-                    <span>Language: en-US</span> •
-                    <span>Country: {{ current_country|default:"US" }}</span>
+            </div>
+
+            <!-- Enlaces de navegación -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+                <div class="space-y-4">
+                    <h3 class="text-white font-bold text-lg">Platform</h3>
+                    <ul class="space-y-2 text-indigo-200/80">
+                        <li><a href="#trial" class="hover:text-white transition-colors">Free Trial</a></li>
+                        <li><a href="#demo" class="hover:text-white transition-colors">Live Demo</a></li>
+                        <li><a href="/pricing" class="hover:text-white transition-colors">Pricing</a></li>
+                        <li><a href="/features" class="hover:text-white transition-colors">Features</a></li>
+                    </ul>
+                </div>
+                
+                <div class="space-y-4">
+                    <h3 class="text-white font-bold text-lg">Support</h3>
+                    <ul class="space-y-2 text-indigo-200/80">
+                        <li><a href="/support" class="hover:text-white transition-colors">Help Center</a></li>
+                        <li><a href="/contact" class="hover:text-white transition-colors">Contact</a></li>
+                        <li><a href="/training" class="hover:text-white transition-colors">Training</a></li>
+                        <li><a href="/status" class="hover:text-white transition-colors">System Status</a></li>
+                    </ul>
+                </div>
+                
+                <div class="space-y-4">
+                    <h3 class="text-white font-bold text-lg">Company</h3>
+                    <ul class="space-y-2 text-indigo-200/80">
+                        <li><a href="/about" class="hover:text-white transition-colors">About</a></li>
+                        <li><a href="/careers" class="hover:text-white transition-colors">Careers</a></li>
+                        <li><a href="/blog" class="hover:text-white transition-colors">Blog</a></li>
+                        <li><a href="/news" class="hover:text-white transition-colors">News</a></li>
+                    </ul>
+                </div>
+                
+                <div class="space-y-4">
+                    <h3 class="text-white font-bold text-lg">Legal</h3>
+                    <ul class="space-y-2 text-indigo-200/80">
+                        <li><a href="/privacy" class="hover:text-white transition-colors">Privacy</a></li>
+                        <li><a href="/terms" class="hover:text-white transition-colors">Terms</a></li>
+                        <li><a href="/security" class="hover:text-white transition-colors">Security</a></li>
+                        <li><a href="/compliance" class="hover:text-white transition-colors">Compliance</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Copyright y badges -->
+            <div class="border-t border-indigo-800/30 pt-8">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div class="text-center md:text-left">
+                        <p class="text-indigo-200/70 mb-2">© 2025 eGarage United States. All rights reserved.</p>
+                        <p class="text-sm text-indigo-300/60 flex items-center justify-center md:justify-start gap-2">
+                            <span>🇺🇸</span> 
+                            Proudly serving automotive businesses across the United States
+                        </p>
+                    </div>
+                    
+                    <!-- Trust badges -->
+                    <div class="flex items-center gap-4">
+                        <div class="glass-card px-4 py-2 rounded-lg">
+                            <span class="text-green-400 text-sm font-semibold">🔒 SSL Secured</span>
+                        </div>
+                        <div class="glass-card px-4 py-2 rounded-lg">
+                            <span class="text-blue-400 text-sm font-semibold">☁️ Cloud-Native</span>
+                        </div>
+                        <div class="glass-card px-4 py-2 rounded-lg">
+                            <span class="text-purple-400 text-sm font-semibold">🤖 AI-Powered</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </footer>
 
-    <!-- Floating Action Button -->
-    <div class="fixed bottom-6 right-6 z-50">
-        <a href="/accounts/signup/" class="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center text-white shadow-lg hover:scale-110 transition-transform pulse-glow">
-            <span class="text-2xl">🚀</span>
-        </a>
-    </div>
-
-    <!-- Language Toggle Script -->
+    <!-- JavaScript for smooth scrolling -->
     <script>
-        // Traducciones
-        const translations = {
-            en: {
-                // Navigation
-                signIn: "Sign In",
-                
-                // Hero Section
-                heroTitle: "Boost Your <span class=\"gradient-text\">Automotive Business</span><br>with eGarage USA",
-                heroSubtitle: "From workshops to car wash — <strong>Manage everything, everywhere.</strong><br><em>Your workshop, your rules, our technology.</em>",
-                activeSubscribers: "Active Subscribers",
-                statesCoverage: "US States Coverage",
-                uptime: "Uptime",
-                startFreeTrial: "Start Free Trial - 30 Days",
-                requestDemo: "Request a Demo",
-                
-                // Benefits Section
-                benefitsTitle: "Data-driven Success for the Automotive World",
-                benefitsSubtitle: "From bolts to big deals — Manage it all with precision",
-                
-                performanceReports: "Performance Reports",
-                performanceList: ["• Technician productivity tracking", "• Revenue by service type", "• Effectiveness metrics", "• Profit analysis by parts & services"],
-                
-                realTimeInventory: "Real-time Inventory", 
-                inventoryList: ["• Live stock control", "• Automatic reorder alerts", "• Parts profitability tracking", "• Supplier management"],
-                
-                multiBusinessSupport: "Multi-Business Support",
-                businessList: ["• Mechanical Workshops", "• Spare Parts Stores", "• Tire Services", "• Car Wash Centers"],
-                
-                anyDeviceAccess: "Any Device Access",
-                deviceList: ["• Mobile responsive design", "• Tablet optimized", "• Desktop powerful", "• Cloud synchronized"],
-                
-                smartClientManagement: "Smart Client Management",
-                clientList: ["• Complete service history", "• Automated scheduling", "• Payment tracking", "• Customer communication"],
-                
-                multiLocationReady: "Multi-location Ready",
-                locationList: ["• Multiple branch management", "• Centralized reporting", "• Transfer tracking", "• Unified dashboard"],
-                
-                // Pricing Section
-                pricingTitle: "Choose Your Success Plan",
-                pricingSubtitle: "All plans include 24/7 support and free updates",
-                
-                monthly: "Monthly",
-                semester: "Semester", 
-                annual: "Annual",
-                mostPopular: "MOST POPULAR",
-                savePercent8: "Save 8% + Premium Features",
-                savePercent16: "Save 16% + Business Boost",
-                startNow: "Start Now",
-                subscribeNow: "Subscribe Now", 
-                getBestValue: "Get Best Value",
-                
-                // Testimonials
-                testimonialsTitle: "Success Stories from Real Customers",
-                testimonialsSubtitle: "See how eGarage transformed these businesses",
-                
-                // Features Preview
-                featuresTitle: "See eGarage in Action",
-                featuresSubtitle: "Powerful features designed for automotive businesses",
-                dashboard: "Dashboard",
-                inventory: "Inventory",
-                clients: "Clients",
-                vehicles: "Vehicles",
-                viewDemo: "View Demo →",
-                
-                // Final CTA
-                finalCtaTitle: "Ready to Take Your Workshop<br>to the Next Level?",
-                finalCtaSubtitle: "Join thousands of successful automotive businesses across the USA.<br><strong>Start your transformation today.</strong>",
-                startNowFree: "Start Now - Free Trial",
-                requestDemoFinal: "Request a Demo",
-                noCreditCard: "✅ No credit card required • ✅ 30-day free trial • ✅ Cancel anytime",
-                
-                // Footer
-                footerText: "© 2025 eGarage USA - Professional Automotive Business Platform<br>Designed for the US automotive service industry",
-                systemStatus: "System Status:",
-                allSystemsOperational: "✅ All systems operational"
-            },
-            es: {
-                // Navigation
-                signIn: "Iniciar Sesión",
-                
-                // Hero Section
-                heroTitle: "Impulsa Tu <span class=\"gradient-text\">Negocio Automotriz</span><br>con eGarage USA",
-                heroSubtitle: "Desde talleres hasta lavado de autos — <strong>Gestiona todo, en todas partes.</strong><br><em>Tu taller, tus reglas, nuestra tecnología.</em>",
-                activeSubscribers: "Suscriptores Activos",
-                statesCoverage: "Estados de EE.UU. Cubiertos",
-                uptime: "Tiempo Activo",
-                startFreeTrial: "Prueba Gratis - 30 Días",
-                requestDemo: "Solicitar Demo",
-                
-                // Benefits Section
-                benefitsTitle: "Éxito Basado en Datos para el Mundo Automotriz",
-                benefitsSubtitle: "Desde tornillos hasta grandes negocios — Gestiona todo con precisión",
-                
-                performanceReports: "Reportes de Rendimiento",
-                performanceList: ["• Seguimiento de productividad por técnico", "• Ingresos por tipo de servicio", "• Métricas de efectividad", "• Análisis de ganancias por repuestos y servicios"],
-                
-                realTimeInventory: "Inventario en Tiempo Real",
-                inventoryList: ["• Control de stock en vivo", "• Alertas automáticas de reorden", "• Seguimiento de rentabilidad de repuestos", "• Gestión de proveedores"],
-                
-                multiBusinessSupport: "Soporte Multi-Negocio", 
-                businessList: ["• Talleres Mecánicos", "• Casas de Repuestos", "• Servicios de Neumáticos", "• Centros de Lavado"],
-                
-                anyDeviceAccess: "Acceso desde Cualquier Dispositivo",
-                deviceList: ["• Diseño responsivo móvil", "• Optimizado para tablet", "• Potente en escritorio", "• Sincronización en la nube"],
-                
-                smartClientManagement: "Gestión Inteligente de Clientes",
-                clientList: ["• Historial completo de servicios", "• Programación automatizada", "• Seguimiento de pagos", "• Comunicación con clientes"],
-                
-                multiLocationReady: "Listo para Múltiples Ubicaciones",
-                locationList: ["• Gestión de múltiples sucursales", "• Reportes centralizados", "• Seguimiento de transferencias", "• Dashboard unificado"],
-                
-                // Pricing Section
-                pricingTitle: "Elige Tu Plan de Éxito",
-                pricingSubtitle: "Todos los planes incluyen soporte 24/7 y actualizaciones gratuitas",
-                
-                monthly: "Mensual",
-                semester: "Semestral",
-                annual: "Anual", 
-                mostPopular: "MÁS POPULAR",
-                savePercent8: "Ahorra 8% + Características Premium",
-                savePercent16: "Ahorra 16% + Impulso de Negocio",
-                startNow: "Comenzar Ahora",
-                subscribeNow: "Suscribirse Ahora",
-                getBestValue: "Obtener Mejor Valor",
-                
-                // Testimonials
-                testimonialsTitle: "Historias de Éxito de Clientes Reales",
-                testimonialsSubtitle: "Ve cómo eGarage transformó estos negocios",
-                
-                // Features Preview  
-                featuresTitle: "Ve eGarage en Acción",
-                featuresSubtitle: "Características poderosas diseñadas para negocios automotrices",
-                dashboard: "Panel de Control",
-                inventory: "Inventario", 
-                clients: "Clientes",
-                vehicles: "Vehículos",
-                viewDemo: "Ver Demo →",
-                
-                // Final CTA
-                finalCtaTitle: "¿Listo para Llevar Tu Taller<br>al Siguiente Nivel?",
-                finalCtaSubtitle: "Únete a miles de negocios automotrices exitosos en EE.UU.<br><strong>Comienza tu transformación hoy.</strong>",
-                startNowFree: "Comenzar Ahora - Prueba Gratis",
-                requestDemoFinal: "Solicitar Demo",
-                noCreditCard: "✅ No se requiere tarjeta de crédito • ✅ Prueba gratis de 30 días • ✅ Cancela en cualquier momento",
-                
-                // Footer
-                footerText: "© 2025 eGarage USA - Plataforma Profesional de Negocios Automotrices<br>Diseñado para la industria de servicios automotrices de EE.UU.",
-                systemStatus: "Estado del Sistema:",
-                allSystemsOperational: "✅ Todos los sistemas operativos"
-            }
-        };
-
-        // Función para cambiar idioma
-        function changeLanguage(lang) {
-            const t = translations[lang];
-            
-            // Actualizar elementos por ID
-            document.querySelector('[data-translate="signIn"]').textContent = t.signIn;
-            document.querySelector('[data-translate="heroTitle"]').innerHTML = t.heroTitle;
-            document.querySelector('[data-translate="heroSubtitle"]').innerHTML = t.heroSubtitle;
-            document.querySelector('[data-translate="activeSubscribers"]').textContent = t.activeSubscribers;
-            document.querySelector('[data-translate="statesCoverage"]').textContent = t.statesCoverage;
-            document.querySelector('[data-translate="uptime"]').textContent = t.uptime;
-            document.querySelector('[data-translate="startFreeTrial"]').textContent = t.startFreeTrial;
-            document.querySelector('[data-translate="requestDemo"]').textContent = t.requestDemo;
-            
-            document.querySelector('[data-translate="benefitsTitle"]').textContent = t.benefitsTitle;
-            document.querySelector('[data-translate="benefitsSubtitle"]').textContent = t.benefitsSubtitle;
-            
-            document.querySelector('[data-translate="performanceReports"]').textContent = t.performanceReports;
-            document.querySelector('[data-translate="realTimeInventory"]').textContent = t.realTimeInventory;
-            document.querySelector('[data-translate="multiBusinessSupport"]').textContent = t.multiBusinessSupport;
-            document.querySelector('[data-translate="anyDeviceAccess"]').textContent = t.anyDeviceAccess;
-            document.querySelector('[data-translate="smartClientManagement"]').textContent = t.smartClientManagement;
-            document.querySelector('[data-translate="multiLocationReady"]').textContent = t.multiLocationReady;
-            
-            document.querySelector('[data-translate="pricingTitle"]').textContent = t.pricingTitle;
-            document.querySelector('[data-translate="pricingSubtitle"]').textContent = t.pricingSubtitle;
-            document.querySelector('[data-translate="monthly"]').textContent = t.monthly;
-            document.querySelector('[data-translate="semester"]').textContent = t.semester;
-            document.querySelector('[data-translate="annual"]').textContent = t.annual;
-            document.querySelector('[data-translate="mostPopular"]').textContent = t.mostPopular;
-            
-            document.querySelector('[data-translate="testimonialsTitle"]').textContent = t.testimonialsTitle;
-            document.querySelector('[data-translate="testimonialsSubtitle"]').textContent = t.testimonialsSubtitle;
-            
-            document.querySelector('[data-translate="featuresTitle"]').textContent = t.featuresTitle;
-            document.querySelector('[data-translate="featuresSubtitle"]').textContent = t.featuresSubtitle;
-            document.querySelector('[data-translate="dashboard"]').textContent = t.dashboard;
-            document.querySelector('[data-translate="inventory"]').textContent = t.inventory;
-            document.querySelector('[data-translate="clients"]').textContent = t.clients;
-            document.querySelector('[data-translate="vehicles"]').textContent = t.vehicles;
-            
-            document.querySelector('[data-translate="finalCtaTitle"]').innerHTML = t.finalCtaTitle;
-            document.querySelector('[data-translate="finalCtaSubtitle"]').innerHTML = t.finalCtaSubtitle;
-            document.querySelector('[data-translate="startNowFree"]').textContent = t.startNowFree;
-            document.querySelector('[data-translate="requestDemoFinal"]').textContent = t.requestDemoFinal;
-            document.querySelector('[data-translate="noCreditCard"]').innerHTML = t.noCreditCard;
-            
-            document.querySelector('[data-translate="footerText"]').innerHTML = t.footerText;
-            document.querySelector('[data-translate="systemStatus"]').textContent = t.systemStatus;
-            document.querySelector('[data-translate="allSystemsOperational"]').textContent = t.allSystemsOperational;
-            
-            // Actualizar listas
-            const performanceList = document.querySelector('[data-translate-list="performanceList"]');
-            performanceList.innerHTML = t.performanceList.map(item => `<li>${item}</li>`).join('');
-            
-            const inventoryList = document.querySelector('[data-translate-list="inventoryList"]');
-            inventoryList.innerHTML = t.inventoryList.map(item => `<li>${item}</li>`).join('');
-            
-            const businessList = document.querySelector('[data-translate-list="businessList"]');
-            businessList.innerHTML = t.businessList.map(item => `<li>${item}</li>`).join('');
-            
-            const deviceList = document.querySelector('[data-translate-list="deviceList"]');
-            deviceList.innerHTML = t.deviceList.map(item => `<li>${item}</li>`).join('');
-            
-            const clientList = document.querySelector('[data-translate-list="clientList"]');
-            clientList.innerHTML = t.clientList.map(item => `<li>${item}</li>`).join('');
-            
-            const locationList = document.querySelector('[data-translate-list="locationList"]');
-            locationList.innerHTML = t.locationList.map(item => `<li>${item}</li>`).join('');
-        }
-
-        // Event listener para el selector de idioma
-        document.addEventListener('DOMContentLoaded', function() {
-            const languageSelector = document.getElementById('languageSelector');
-            languageSelector.addEventListener('change', function() {
-                changeLanguage(this.value);
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
             });
         });
     </script>

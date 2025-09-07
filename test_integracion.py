@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 import os
 import sys
+
 import django
 
 # Configurar Django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings_sqlite')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings_sqlite")
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 print("🔗 Iniciando prueba de integración...")
@@ -17,7 +18,7 @@ except Exception as e:
     sys.exit(1)
 
 # Imports después de setup
-from taller.models.notificacion import TipoNotificacion, NotificacionEnviada
+from taller.models.notificacion import NotificacionEnviada, TipoNotificacion
 
 print("✅ Imports exitosos")
 

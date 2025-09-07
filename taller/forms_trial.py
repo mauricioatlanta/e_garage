@@ -1,11 +1,13 @@
 from django import forms
 from django.core.exceptions import ValidationError
+
 from taller.models.trial import TrialRegistro
+
 
 class TrialForm(forms.ModelForm):
     class Meta:
         model = TrialRegistro
-        fields = ['nombre', 'email', 'telefono']
+        fields = ["nombre", "email", "telefono"]
 
     def clean_email(self):
         email = self.cleaned_data.get("email")

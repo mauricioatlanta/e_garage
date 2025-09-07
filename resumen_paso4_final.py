@@ -39,7 +39,7 @@ print("\n🎯 **FLUJO JERÁRQUICO:**")
 print("-" * 25)
 print("1️⃣ Usuario selecciona MARCA")
 print("2️⃣ Se cargan MODELOS via AJAX")
-print("3️⃣ Usuario selecciona MODELO") 
+print("3️⃣ Usuario selecciona MODELO")
 print("4️⃣ Se cargan MOTORES y CAJAS via AJAX")
 print("5️⃣ Usuario completa selección")
 
@@ -63,7 +63,8 @@ print("5. Verificar que se cargan motores y cajas")
 
 print("\n🎉 **EJEMPLO DE USO EN TEMPLATE:**")
 print("-" * 40)
-print("""
+print(
+    """
 <!-- En tu template HTML -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="{% static 'js/formulario_jerarquico.js' %}"></script>
@@ -88,7 +89,8 @@ print("""
         <option value="">Seleccione modelo primero</option>
     </select>
 </form>
-""")
+"""
+)
 
 print("\n🔧 **NEXT STEPS - PRÓXIMOS PASOS:**")
 print("-" * 40)
@@ -102,6 +104,6 @@ print("\n✅ **SISTEMA JERÁRQUICO LISTO PARA USAR**")
 print("🎯 Marca → Modelo → Motor/Caja funcionando al 100%")
 print("🔄 Base sólida para mejorar UX de formularios")
 
-print("\n" + "="*60)
+print("\n" + "=" * 60)
 print("🎉 **PASO 4 COMPLETADO EXITOSAMENTE** 🎉")
-print("="*60)
+print("=" * 60)

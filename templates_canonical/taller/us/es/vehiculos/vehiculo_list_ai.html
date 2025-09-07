@@ -1,0 +1,692 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block content %}
+<style>
+/* Futuristic AI-generated background */
+@keyframes matrix-rain {
+  0% { transform: translateY(-100vh); opacity: 1; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { 
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3), 
+                0 0 40px rgba(255, 0, 255, 0.2),
+                0 0 60px rgba(0, 255, 255, 0.1);
+  }
+  50% { 
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.6), 
+                0 0 60px rgba(255, 0, 255, 0.4),
+                0 0 90px rgba(0, 255, 255, 0.3);
+  }
+}
+
+@keyframes neural-network {
+  0% { transform: rotate(0deg) scale(1); opacity: 0.3; }
+  50% { transform: rotate(180deg) scale(1.1); opacity: 0.7; }
+  100% { transform: rotate(360deg) scale(1); opacity: 0.3; }
+}
+
+@keyframes hex-float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  25% { transform: translateY(-10px) rotate(90deg); }
+  50% { transform: translateY(0px) rotate(180deg); }
+  75% { transform: translateY(-5px) rotate(270deg); }
+}
+
+@keyframes data-stream {
+  0% { transform: translateX(-100%) skewX(-15deg); }
+  100% { transform: translateX(100vw) skewX(-15deg); }
+}
+
+@keyframes hologram-flicker {
+  0%, 98% { opacity: 1; }
+  99% { opacity: 0.8; }
+  100% { opacity: 1; }
+}
+
+/* Background Matrix Effect */
+.ai-matrix-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -10;
+  background: 
+    radial-gradient(circle at 25% 25%, #0a0a0a 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, #001122 0%, transparent 50%),
+    linear-gradient(135deg, #000511 0%, #001122 25%, #000a0a 50%, #001133 75%, #000511 100%);
+  overflow: hidden;
+}
+
+.matrix-code {
+  position: absolute;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: #00ff88;
+  white-space: nowrap;
+  animation: matrix-rain 8s linear infinite;
+  text-shadow: 0 0 10px #00ff88;
+}
+
+.neural-grid {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 50px 50px;
+  animation: neural-network 20s ease-in-out infinite;
+}
+
+.data-stream {
+  position: absolute;
+  width: 200px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #00ffff, transparent);
+  animation: data-stream 3s ease-in-out infinite;
+}
+
+/* AI Vehicle Mosaic Cards */
+.ai-vehicle-mosaic {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.vehicle-hex-card {
+  position: relative;
+  background: linear-gradient(135deg, 
+              rgba(10, 25, 47, 0.9) 0%, 
+              rgba(15, 30, 60, 0.9) 50%, 
+              rgba(10, 25, 47, 0.9) 100%);
+  border: 2px solid transparent;
+  border-radius: 20px;
+  padding: 25px;
+  backdrop-filter: blur(10px);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  overflow: hidden;
+  animation: hologram-flicker 3s ease-in-out infinite;
+}
+
+.vehicle-hex-card::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, 
+              #00ffff 0%, 
+              #ff00ff 25%, 
+              #ffff00 50%, 
+              #00ff00 75%, 
+              #00ffff 100%);
+  border-radius: 20px;
+  z-index: -1;
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.vehicle-hex-card:hover {
+  transform: translateY(-10px) scale(1.02);
+  animation: pulse-glow 1s ease-in-out infinite;
+}
+
+.vehicle-hex-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+              transparent, 
+              rgba(255, 255, 255, 0.2), 
+              transparent);
+  transition: left 0.5s;
+}
+
+.vehicle-hex-card:hover::after {
+  left: 100%;
+}
+
+.vehicle-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #00ffff, #ff00ff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  margin-bottom: 15px;
+  animation: hex-float 4s ease-in-out infinite;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+}
+
+.ai-hexagon {
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  clip-path: polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%);
+  background: linear-gradient(45deg, #00ffff, #ff00ff);
+  animation: hex-float 3s ease-in-out infinite;
+}
+
+.status-indicator {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  animation: pulse-glow 1.5s ease-in-out infinite;
+}
+
+.status-active {
+  background: #00ff00;
+  box-shadow: 0 0 15px #00ff00;
+}
+
+.status-maintenance {
+  background: #ffaa00;
+  box-shadow: 0 0 15px #ffaa00;
+}
+
+.status-inactive {
+  background: #ff0000;
+  box-shadow: 0 0 15px #ff0000;
+}
+
+/* AI Header */
+.ai-header {
+  position: relative;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, 
+              rgba(0, 20, 40, 0.8) 0%, 
+              rgba(10, 30, 60, 0.8) 50%, 
+              rgba(0, 20, 40, 0.8) 100%);
+  border-radius: 25px;
+  margin: 20px;
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  overflow: hidden;
+}
+
+.ai-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="circuit" patternUnits="userSpaceOnUse" width="100" height="100"><path d="M0 50h25v-25h50v50h-50v-25h25" stroke="%2300ffff" stroke-width="0.5" fill="none" opacity="0.3"/></pattern></defs><rect width="100" height="100" fill="url(%23circuit)"/></svg>') center/100px;
+  opacity: 0.2;
+}
+
+.ai-title {
+  font-size: 3.5rem;
+  font-weight: 900;
+  background: linear-gradient(45deg, #00ffff, #ff00ff, #ffff00, #00ff00);
+  background-size: 400% 400%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: neural-network 3s ease-in-out infinite;
+  text-align: center;
+  letter-spacing: 3px;
+  text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+}
+
+.ai-subtitle {
+  text-align: center;
+  color: #00ffff;
+  font-size: 1.2rem;
+  margin-top: 10px;
+  opacity: 0.8;
+  letter-spacing: 1px;
+}
+
+/* Search Interface */
+.ai-search-container {
+  position: relative;
+  margin: 30px 20px;
+  perspective: 1000px;
+}
+
+.ai-search-box {
+  position: relative;
+  background: linear-gradient(135deg, 
+              rgba(0, 30, 60, 0.9) 0%, 
+              rgba(10, 40, 80, 0.9) 100%);
+  border-radius: 20px;
+  padding: 20px;
+  border: 2px solid rgba(0, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+}
+
+.ai-search-input {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  border: 2px solid rgba(0, 255, 255, 0.5);
+  border-radius: 15px;
+  padding: 15px 20px;
+  color: #00ffff;
+  font-size: 1.1rem;
+  font-family: 'Orbitron', monospace;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.ai-search-input:focus {
+  border-color: #00ffff;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.ai-search-input::placeholder {
+  color: rgba(0, 255, 255, 0.5);
+}
+
+/* Floating Elements */
+.floating-elements {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -5;
+}
+
+.floating-hex {
+  position: absolute;
+  animation: hex-float 6s ease-in-out infinite;
+}
+
+/* Stats Panel */
+.ai-stats-panel {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: rgba(0, 20, 40, 0.9);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  border-radius: 15px;
+  padding: 15px;
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  color: #00ffff;
+  font-size: 0.9rem;
+}
+
+.stat-icon {
+  margin-right: 8px;
+  opacity: 0.7;
+}
+
+/* Action Buttons */
+.ai-action-btn {
+  background: linear-gradient(135deg, #00ffff, #0080ff);
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  color: #000;
+  font-weight: bold;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 15px rgba(0, 255, 255, 0.3);
+}
+
+.ai-action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 255, 255, 0.5);
+  background: linear-gradient(135deg, #00ffff, #00ccff);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .ai-vehicle-mosaic {
+    grid-template-columns: 1fr;
+    padding: 10px;
+  }
+  
+  .ai-title {
+    font-size: 2.5rem;
+  }
+  
+  .ai-stats-panel {
+    position: relative;
+    top: auto;
+    right: auto;
+    margin: 20px;
+  }
+}
+</style>
+
+<!-- AI Matrix Background -->
+<div class="ai-matrix-bg">
+  <div class="neural-grid"></div>
+  <!-- Matrix Rain Effect -->
+  <div class="matrix-code" style="left: 10%; animation-delay: 0s;">01001001 01000001</div>
+  <div class="matrix-code" style="left: 25%; animation-delay: 1s;">11010010 10110101</div>
+  <div class="matrix-code" style="left: 40%; animation-delay: 2s;">AI VEHICULAR SYS</div>
+  <div class="matrix-code" style="left: 55%; animation-delay: 3s;">10101010 11111111</div>
+  <div class="matrix-code" style="left: 70%; animation-delay: 4s;">NEURAL NETWORK</div>
+  <div class="matrix-code" style="left: 85%; animation-delay: 5s;">00110011 10011001</div>
+  
+  <!-- Data Streams -->
+  <div class="data-stream" style="top: 20%; animation-delay: 0s;"></div>
+  <div class="data-stream" style="top: 40%; animation-delay: 1.5s;"></div>
+  <div class="data-stream" style="top: 60%; animation-delay: 3s;"></div>
+  <div class="data-stream" style="top: 80%; animation-delay: 4.5s;"></div>
+</div>
+
+<!-- Floating Hexagons -->
+<div class="floating-elements">
+  <div class="ai-hexagon floating-hex" style="top: 10%; left: 5%; animation-delay: 0s;"></div>
+  <div class="ai-hexagon floating-hex" style="top: 30%; left: 90%; animation-delay: 1s;"></div>
+  <div class="ai-hexagon floating-hex" style="top: 70%; left: 10%; animation-delay: 2s;"></div>
+  <div class="ai-hexagon floating-hex" style="top: 50%; left: 85%; animation-delay: 3s;"></div>
+  <div class="ai-hexagon floating-hex" style="top: 80%; left: 50%; animation-delay: 4s;"></div>
+</div>
+
+<!-- AI Stats Panel -->
+<div class="ai-stats-panel">
+  <div class="stat-item">
+    <span class="stat-icon">🚗</span>
+    <span>{{ vehiculos|length }} Vehículos</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-icon">⚡</span>
+    <span>Sistema Activo</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-icon">🔄</span>
+    <span>Auto-Sync ON</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-icon">🛡️</span>
+    <span>Seguro</span>
+  </div>
+</div>
+
+<!-- AI Header -->
+<div class="ai-header">
+  <h1 class="ai-title">🚗 VEHICULAR MATRIX</h1>
+  <p class="ai-subtitle">Sistema de Gestión Vehicular Potenciado por IA</p>
+</div>
+
+<!-- AI Search Interface -->
+<div class="ai-search-container">
+  <div class="ai-search-box">
+    <form method="get" class="flex gap-4">
+      <input type="search" 
+             name="q" 
+             value="{{ request.GET.q }}" 
+             placeholder="🔍 Buscar por patente, cliente, marca, modelo... [IA ACTIVADA]" 
+             class="ai-search-input flex-1">
+      <button type="submit" class="ai-action-btn">
+        🔍 ESCANEAR
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- Action Bar -->
+<div style="text-align: center; margin: 20px;">
+  <a href="{% url 'taller:vehiculos:crear_vehiculo' %}" class="ai-action-btn">
+    ➕ NUEVO VEHÍCULO
+  </a>
+  <button class="ai-action-btn" style="margin-left: 10px;" onclick="toggleViewMode()">
+    🔄 CAMBIAR VISTA
+  </button>
+  <button class="ai-action-btn" style="margin-left: 10px;" onclick="activateAI()">
+    🤖 ACTIVAR IA
+  </button>
+</div>
+
+<!-- AI Vehicle Mosaic -->
+<div class="ai-vehicle-mosaic" id="vehicleMosaic">
+  {% for vehiculo in vehiculos %}
+  <div class="vehicle-hex-card" data-vehicle-id="{{ vehiculo.id }}">
+    <!-- Status Indicator -->
+    <div class="status-indicator {% if vehiculo.activo %}status-active{% else %}status-inactive{% endif %}"></div>
+    
+    <!-- Vehicle Avatar -->
+    <div class="vehicle-avatar">
+      {% if vehiculo.marca %}
+        {{ vehiculo.marca.nombre|first|upper }}
+      {% else %}
+        🚗
+      {% endif %}
+    </div>
+    
+    <!-- Vehicle Info -->
+    <div style="position: relative; z-index: 10;">
+      <h3 style="color: #00ffff; font-size: 1.3rem; font-weight: bold; margin-bottom: 8px; letter-spacing: 1px;">
+        {{ vehiculo.patente|upper }}
+      </h3>
+      
+      <div style="color: #ffffff; margin-bottom: 12px;">
+        <div style="margin-bottom: 6px;">
+          <span style="color: #ff00ff;">🏢</span>
+          {% if vehiculo.cliente.nombre or vehiculo.cliente.apellido %}
+            {{ vehiculo.cliente.nombre|default:"" }} {{ vehiculo.cliente.apellido|default:"" }}
+          {% else %}
+            Cliente N/A
+          {% endif %}
+        </div>
+        
+        <div style="margin-bottom: 6px;">
+          <span style="color: #ffff00;">🚙</span>
+          {{ vehiculo.marca.nombre|default:"N/A" }} {{ vehiculo.modelo.nombre|default:"N/A" }}
+        </div>
+        
+        <div style="margin-bottom: 6px;">
+          <span style="color: #00ff00;">📅</span>
+          {{ vehiculo.ano|default:"N/A" }}
+        </div>
+        
+        {% if vehiculo.color %}
+        <div style="margin-bottom: 6px;">
+          <span style="color: #ff8800;">🎨</span>
+          {{ vehiculo.color.nombre }}
+        </div>
+        {% endif %}
+      </div>
+      
+      <!-- Action Buttons -->
+      <div style="display: flex; gap: 8px; margin-top: 15px;">
+        <a href="{% url 'taller:vehiculos:ver_vehiculo' vehiculo.pk %}" 
+           class="ai-action-btn" 
+           style="flex: 1; text-align: center; text-decoration: none; font-size: 0.8rem; padding: 8px 12px;">
+          👁️ VER
+        </a>
+        <a href="{% url 'taller:vehiculos:editar_vehiculo' vehiculo_id=vehiculo.pk %}" 
+           class="ai-action-btn" 
+           style="flex: 1; text-align: center; text-decoration: none; font-size: 0.8rem; padding: 8px 12px;">
+          ✏️ EDITAR
+        </a>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <div class="vehicle-hex-card" style="grid-column: 1 / -1; text-align: center; padding: 60px;">
+    <div class="vehicle-avatar" style="margin: 0 auto 20px;">🤖</div>
+    <h3 style="color: #00ffff; font-size: 1.5rem; margin-bottom: 10px;">
+      No se encontraron vehículos
+    </h3>
+    <p style="color: rgba(255, 255, 255, 0.7);">
+      El sistema AI no detectó vehículos que coincidan con tu búsqueda
+    </p>
+    <a href="{% url 'taller:vehiculos:crear_vehiculo' %}" class="ai-action-btn" style="margin-top: 20px; display: inline-block;">
+      🚗 REGISTRAR PRIMER VEHÍCULO
+    </a>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Pagination (if needed) -->
+{% if is_paginated %}
+<div style="text-align: center; margin: 40px 20px;">
+  <div style="display: inline-flex; gap: 10px; background: rgba(0, 20, 40, 0.9); padding: 15px; border-radius: 15px; border: 1px solid rgba(0, 255, 255, 0.3);">
+    {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" 
+       class="ai-action-btn">
+      ← ANTERIOR
+    </a>
+    {% endif %}
+    
+    <span style="color: #00ffff; padding: 12px 20px; font-weight: bold;">
+      Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+    </span>
+    
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" 
+       class="ai-action-btn">
+      SIGUIENTE →
+    </a>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+
+<script>
+// AI Interactive Features
+document.addEventListener('DOMContentLoaded', function() {
+  // Add hover effects to vehicle cards
+  const cards = document.querySelectorAll('.vehicle-hex-card');
+  cards.forEach(card => {
+    card.addEventListener('mouseenter', function() {
+      this.style.transform = 'translateY(-15px) scale(1.05) rotateX(5deg)';
+      this.style.filter = 'brightness(1.2)';
+    });
+    
+    card.addEventListener('mouseleave', function() {
+      this.style.transform = 'translateY(0) scale(1) rotateX(0deg)';
+      this.style.filter = 'brightness(1)';
+    });
+  });
+  
+  // Create dynamic matrix code
+  function createMatrixRain() {
+    const characters = '01ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩαβγδεζηθικλμνξοπρστυφχψω';
+    const matrixBg = document.querySelector('.ai-matrix-bg');
+    
+    for (let i = 0; i < 20; i++) {
+      const code = document.createElement('div');
+      code.className = 'matrix-code';
+      code.style.left = Math.random() * 100 + '%';
+      code.style.animationDelay = Math.random() * 8 + 's';
+      code.style.animationDuration = (Math.random() * 3 + 5) + 's';
+      
+      let text = '';
+      for (let j = 0; j < 15; j++) {
+        text += characters[Math.floor(Math.random() * characters.length)];
+      }
+      code.textContent = text;
+      
+      matrixBg.appendChild(code);
+      
+      // Remove after animation
+      setTimeout(() => {
+        if (code.parentNode) {
+          code.parentNode.removeChild(code);
+        }
+      }, 8000);
+    }
+  }
+  
+  // Start matrix rain
+  createMatrixRain();
+  setInterval(createMatrixRain, 2000);
+  
+  // Add glitch effect randomly
+  function addGlitchEffect() {
+    const title = document.querySelector('.ai-title');
+    title.style.textShadow = '2px 0 #ff00ff, -2px 0 #00ffff, 0 0 30px #ffffff';
+    setTimeout(() => {
+      title.style.textShadow = '0 0 30px rgba(0, 255, 255, 0.5)';
+    }, 100);
+  }
+  
+  setInterval(addGlitchEffect, 5000);
+});
+
+// Toggle view mode
+function toggleViewMode() {
+  const mosaic = document.getElementById('vehicleMosaic');
+  if (mosaic.style.gridTemplateColumns === '1fr') {
+    mosaic.style.gridTemplateColumns = 'repeat(auto-fill, minmax(320px, 1fr))';
+  } else {
+    mosaic.style.gridTemplateColumns = '1fr';
+  }
+}
+
+// Activate AI (visual effect)
+function activateAI() {
+  const cards = document.querySelectorAll('.vehicle-hex-card');
+  cards.forEach((card, index) => {
+    setTimeout(() => {
+      card.style.animation = 'pulse-glow 0.5s ease-in-out';
+      card.style.transform = 'scale(1.1)';
+      setTimeout(() => {
+        card.style.transform = 'scale(1)';
+        card.style.animation = 'hologram-flicker 3s ease-in-out infinite';
+      }, 500);
+    }, index * 100);
+  });
+  
+  // Show AI activation message
+  const message = document.createElement('div');
+  message.innerHTML = '🤖 IA ACTIVADA - ANÁLISIS VEHICULAR EN PROGRESO...';
+  message.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #00ffff, #ff00ff);
+    color: #000;
+    padding: 20px 40px;
+    border-radius: 15px;
+    font-weight: bold;
+    font-size: 1.2rem;
+    z-index: 10000;
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+    animation: pulse-glow 1s ease-in-out infinite;
+  `;
+  
+  document.body.appendChild(message);
+  
+  setTimeout(() => {
+    document.body.removeChild(message);
+  }, 3000);
+}
+
+// Auto-refresh effect (visual only)
+setInterval(() => {
+  const indicators = document.querySelectorAll('.status-indicator');
+  indicators.forEach(indicator => {
+    indicator.style.transform = 'scale(1.3)';
+    setTimeout(() => {
+      indicator.style.transform = 'scale(1)';
+    }, 200);
+  });
+}, 10000);
+</script>
+
+{% endblock %}

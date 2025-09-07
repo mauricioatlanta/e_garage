@@ -1,26 +1,31 @@
 #!/usr/bin/env python
 import os
 import sys
+
 import django
 
 # Configurar Django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings_sqlite')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings_sqlite")
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 django.setup()
 
-from taller.models.documento import Documento, RepuestoDocumento, ServicioDocumento
-from taller.models.empresa import Empresa
 from django.contrib.auth.models import User
+
+from taller.models.documento import (Documento, RepuestoDocumento,
+                                     ServicioDocumento)
+from taller.models.empresa import Empresa
 
 print("=== DEBUG DOCUMENTO VACÍO ===")
 
 # Obtener último documento creado
-ultimo_doc = Documento.objects.order_by('-id').first()
+ultimo_doc = Documento.objects.order_by("-id").first()
 if not ultimo_doc:
     print("❌ No hay documentos en la base de datos")
     sys.exit(1)
 
-print(f"📄 Último documento: {ultimo_doc.numero_documento} ({ultimo_doc.tipo_documento})")
+print(
+    f"📄 Último documento: {ultimo_doc.numero_documento} ({ultimo_doc.tipo_documento})"
+)
 print(f"   Cliente: {ultimo_doc.cliente}")
 print(f"   Empresa: {ultimo_doc.empresa}")
 print(f"   Fecha: {ultimo_doc.fecha}")
@@ -45,7 +50,7 @@ print(f"   Total servicios en documentos: {ServicioDocumento.objects.count()}")
 
 # Verificar últimos 5 documentos
 print(f"\n📋 ÚLTIMOS 5 DOCUMENTOS:")
-ultimos = Documento.objects.order_by('-id')[:5]
+ultimos = Documento.objects.order_by("-id")[:5]
 for doc in ultimos:
     rep_count = RepuestoDocumento.objects.filter(documento=doc).count()
     serv_count = ServicioDocumento.objects.filter(documento=doc).count()

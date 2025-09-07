@@ -1,9 +1,11 @@
+from datetime import timedelta
+
+from django.conf import settings
+from django.core.mail import send_mail
 from django.core.management.base import BaseCommand
 from django.utils import timezone
-from django.core.mail import send_mail
-from django.conf import settings
+
 from taller.models.empresa import Empresa
-from datetime import timedelta
 
 
 class Command(BaseCommand):
@@ -11,45 +13,46 @@ class Command(BaseCommand):
     Comando para enviar notificaciones de vencimiento de suscripción
     Ejecutar diariamente con cron: python manage.py notificar_vencimientos
     """
-    help = 'Envía notificaciones de vencimiento de suscripción'
-    
+
+    help = "Envía notificaciones de vencimiento de suscripción"
+
     def handle(self, *args, **options):
         self.stdout.write("🔔 Iniciando verificación de suscripciones...")
-        
+
         hoy = timezone.now()
-        
+
         # Empresas que vencen en 5 días
         empresas_5_dias = Empresa.objects.filter(
             fecha_fin__date=hoy.date() + timedelta(days=5),
             notificacion_5_dias=False,
-            suscripcion_activa=True
+            suscripcion_activa=True,
         )
-        
+
         # Empresas que vencen mañana
         empresas_1_dia = Empresa.objects.filter(
             fecha_fin__date=hoy.date() + timedelta(days=1),
             notificacion_1_dia=False,
-            suscripcion_activa=True
+            suscripcion_activa=True,
         )
-        
+
         # Empresas que vencieron hoy
         empresas_vencidas = Empresa.objects.filter(
             fecha_fin__date=hoy.date(),
             notificacion_vencido=False,
-            suscripcion_activa=True
+            suscripcion_activa=True,
         )
-        
+
         # Enviar notificaciones
         count_5_dias = self.enviar_notificacion_5_dias(empresas_5_dias)
         count_1_dia = self.enviar_notificacion_1_dia(empresas_1_dia)
         count_vencidas = self.enviar_notificacion_vencido(empresas_vencidas)
-        
+
         self.stdout.write(
             self.style.SUCCESS(
                 f"✅ Notificaciones enviadas: {count_5_dias} (5 días), {count_1_dia} (1 día), {count_vencidas} (vencidas)"
             )
         )
-    
+
     def enviar_notificacion_5_dias(self, empresas):
         count = 0
         for empresa in empresas:
@@ -73,7 +76,7 @@ https://wa.me/56912345678
 
 Equipo eGarage
                 """
-                
+
                 send_mail(
                     subject,
                     message,
@@ -81,18 +84,20 @@ Equipo eGarage
                     [empresa.user.email],
                     fail_silently=False,
                 )
-                
+
                 empresa.notificacion_5_dias = True
                 empresa.save()
                 count += 1
-                
+
             except Exception as e:
                 self.stdout.write(
-                    self.style.ERROR(f"Error enviando email a {empresa.nombre_taller}: {e}")
+                    self.style.ERROR(
+                        f"Error enviando email a {empresa.nombre_taller}: {e}"
+                    )
                 )
-        
+
         return count
-    
+
     def enviar_notificacion_1_dia(self, empresas):
         count = 0
         for empresa in empresas:
@@ -124,7 +129,7 @@ https://wa.me/56912345678
 
 Equipo eGarage
                 """
-                
+
                 send_mail(
                     subject,
                     message,
@@ -132,18 +137,20 @@ Equipo eGarage
                     [empresa.user.email],
                     fail_silently=False,
                 )
-                
+
                 empresa.notificacion_1_dia = True
                 empresa.save()
                 count += 1
-                
+
             except Exception as e:
                 self.stdout.write(
-                    self.style.ERROR(f"Error enviando email a {empresa.nombre_taller}: {e}")
+                    self.style.ERROR(
+                        f"Error enviando email a {empresa.nombre_taller}: {e}"
+                    )
                 )
-        
+
         return count
-    
+
     def enviar_notificacion_vencido(self, empresas):
         count = 0
         for empresa in empresas:
@@ -175,7 +182,7 @@ Datos bancarios:
 
 Equipo eGarage
                 """
-                
+
                 send_mail(
                     subject,
                     message,
@@ -183,14 +190,16 @@ Equipo eGarage
                     [empresa.user.email],
                     fail_silently=False,
                 )
-                
+
                 empresa.notificacion_vencido = True
                 empresa.save()
                 count += 1
-                
+
             except Exception as e:
                 self.stdout.write(
-                    self.style.ERROR(f"Error enviando email a {empresa.nombre_taller}: {e}")
+                    self.style.ERROR(
+                        f"Error enviando email a {empresa.nombre_taller}: {e}"
+                    )
                 )
-        
+
         return count

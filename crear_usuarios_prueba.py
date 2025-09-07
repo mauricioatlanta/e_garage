@@ -9,23 +9,28 @@ import subprocess
 import sys
 from datetime import datetime
 
+
 def ejecutar_comando_django(comando, descripcion):
     """Ejecutar comando individual de Django"""
     print(f"\n🔧 {descripcion}")
     try:
         # Escribir comando a archivo temporal
-        with open('temp_django_cmd.py', 'w', encoding='utf-8') as f:
+        with open("temp_django_cmd.py", "w", encoding="utf-8") as f:
             f.write(comando)
-        
+
         # Ejecutar comando
-        result = subprocess.run([
-            sys.executable, 'manage.py', 'shell', '<', 'temp_django_cmd.py'
-        ], shell=True, capture_output=True, text=True, encoding='utf-8')
-        
+        result = subprocess.run(
+            [sys.executable, "manage.py", "shell", "<", "temp_django_cmd.py"],
+            shell=True,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+        )
+
         # Limpiar archivo temporal
-        if os.path.exists('temp_django_cmd.py'):
-            os.remove('temp_django_cmd.py')
-        
+        if os.path.exists("temp_django_cmd.py"):
+            os.remove("temp_django_cmd.py")
+
         if result.returncode == 0:
             print(f"✅ {descripcion} - Completado")
             return True
@@ -33,47 +38,55 @@ def ejecutar_comando_django(comando, descripcion):
             print(f"❌ Error en {descripcion}")
             print(f"Error: {result.stderr}")
             return False
-            
+
     except Exception as e:
         print(f"❌ Excepción en {descripcion}: {e}")
         return False
 
+
 def main():
     print("🚀 LIMPIEZA Y REGENERACIÓN DIRECTA")
-    print("="*50)
-    
+    print("=" * 50)
+
     # Lista de comandos a ejecutar
     comandos = [
         # 1. Limpiar emails de allauth
-        ("""
+        (
+            """
 from allauth.account.models import EmailAddress
 count = EmailAddress.objects.count()
 EmailAddress.objects.all().delete()
 print(f"Eliminados {count} emails de allauth")
-""", "Eliminar emails de allauth"),
-        
+""",
+            "Eliminar emails de allauth",
+        ),
         # 2. Limpiar documentos
-        ("""
+        (
+            """
 from taller.models import DocumentoItem, Documento
 items = DocumentoItem.objects.count()
 docs = Documento.objects.count()
 DocumentoItem.objects.all().delete()
 Documento.objects.all().delete()
 print(f"Eliminados {items} items y {docs} documentos")
-""", "Eliminar documentos"),
-        
+""",
+            "Eliminar documentos",
+        ),
         # 3. Limpiar vehículos y clientes
-        ("""
+        (
+            """
 from taller.models import Vehiculo, Cliente
 vehiculos = Vehiculo.objects.count()
 clientes = Cliente.objects.count()
 Vehiculo.objects.all().delete()
 Cliente.objects.all().delete()
 print(f"Eliminados {vehiculos} vehículos y {clientes} clientes")
-""", "Eliminar vehículos y clientes"),
-        
+""",
+            "Eliminar vehículos y clientes",
+        ),
         # 4. Limpiar empresas y usuarios (excepto superusuarios)
-        ("""
+        (
+            """
 from taller.models import Empresa, TrialRegistro, ComprobantePago
 from django.contrib.auth.models import User
 trials = TrialRegistro.objects.count()
@@ -87,10 +100,12 @@ Empresa.objects.exclude(usuario__is_superuser=True).delete()
 User.objects.exclude(is_superuser=True).delete()
 
 print(f"Eliminados: {trials} trials, {comps} comprobantes, {empresas} empresas, {usuarios} usuarios")
-""", "Limpiar empresas y usuarios"),
-        
+""",
+            "Limpiar empresas y usuarios",
+        ),
         # 5. Crear usuario Chile gratuito
-        ("""
+        (
+            """
 from django.contrib.auth.models import User
 from taller.models import Empresa, TrialRegistro
 from django.utils import timezone
@@ -132,10 +147,12 @@ TrialRegistro.objects.create(
 )
 
 print("✅ Usuario Chile gratuito creado: test_chile@egarage.cl")
-""", "Crear usuario Chile gratuito"),
-        
+""",
+            "Crear usuario Chile gratuito",
+        ),
         # 6. Crear usuario Chile pagado
-        ("""
+        (
+            """
 from django.contrib.auth.models import User
 from taller.models import Empresa, ComprobantePago
 from django.utils import timezone
@@ -177,10 +194,12 @@ ComprobantePago.objects.create(
 )
 
 print("✅ Usuario Chile pagado creado: test_chile_pago@egarage.cl")
-""", "Crear usuario Chile pagado"),
-        
+""",
+            "Crear usuario Chile pagado",
+        ),
         # 7. Crear usuario USA gratuito
-        ("""
+        (
+            """
 from django.contrib.auth.models import User
 from taller.models import Empresa, TrialRegistro
 from django.utils import timezone
@@ -222,10 +241,12 @@ TrialRegistro.objects.create(
 )
 
 print("✅ Usuario USA gratuito creado: test_usa@egarage.com")
-""", "Crear usuario USA gratuito"),
-        
+""",
+            "Crear usuario USA gratuito",
+        ),
         # 8. Crear usuario USA pagado
-        ("""
+        (
+            """
 from django.contrib.auth.models import User
 from taller.models import Empresa, ComprobantePago
 from django.utils import timezone
@@ -267,17 +288,19 @@ ComprobantePago.objects.create(
 )
 
 print("✅ Usuario USA pagado creado: test_usa_pago@egarage.com")
-""", "Crear usuario USA pagado"),
+""",
+            "Crear usuario USA pagado",
+        ),
     ]
-    
+
     # Ejecutar todos los comandos
     exitos = 0
     for comando, descripcion in comandos:
         if ejecutar_comando_django(comando, descripcion):
             exitos += 1
-    
+
     print(f"\n🎯 RESULTADO: {exitos}/{len(comandos)} comandos ejecutados exitosamente")
-    
+
     if exitos == len(comandos):
         print("\n🎉 ¡PROCESO COMPLETADO!")
         print("✅ 4 usuarios de prueba creados")
@@ -292,6 +315,7 @@ print("✅ Usuario USA pagado creado: test_usa_pago@egarage.com")
     else:
         print("\n❌ El proceso no se completó correctamente")
         return False
+
 
 if __name__ == "__main__":
     success = main()

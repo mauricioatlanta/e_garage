@@ -1,1 +1,0 @@
-// chain.js – gestiona encadenamiento de selects

@@ -6,10 +6,11 @@ Este script prueba el sistema de emails usando Django
 
 import os
 import sys
+
 import django
 
 # Configurar Django ANTES de importar settings
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'e_garage.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "e_garage.settings")
 django.setup()
 
 from django.conf import settings
@@ -28,22 +29,22 @@ print("\n🚀 Enviando email de prueba...")
 
 try:
     resultado = send_mail(
-        subject='Test de conexión SMTP - eGarage Django',
-        message='Este es un correo de prueba enviado desde Django. El sistema de emails está funcionando correctamente.',
-        from_email='eGarage <contacto@atlantareciclajes.cl>',
-        recipient_list=['mauricio@atlantareciclajes.cl'],
+        subject="Test de conexión SMTP - eGarage Django",
+        message="Este es un correo de prueba enviado desde Django. El sistema de emails está funcionando correctamente.",
+        from_email="eGarage <contacto@atlantareciclajes.cl>",
+        recipient_list=["mauricio@atlantareciclajes.cl"],
         fail_silently=False,
     )
-    
+
     if resultado:
-        print('✅ ¡Correo enviado exitosamente desde Django!')
-        print('📱 Revisa tu bandeja de entrada (y spam)')
+        print("✅ ¡Correo enviado exitosamente desde Django!")
+        print("📱 Revisa tu bandeja de entrada (y spam)")
         print(f"📊 Número de emails enviados: {resultado}")
     else:
-        print('❌ No se pudo enviar el correo')
-        
+        print("❌ No se pudo enviar el correo")
+
 except Exception as e:
-    print(f'❌ Error al enviar correo: {e}')
+    print(f"❌ Error al enviar correo: {e}")
     print(f"❌ Tipo de error: {type(e).__name__}")
 
 print("\n🎉 Prueba de Django completada!")

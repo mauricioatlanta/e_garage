@@ -72,15 +72,17 @@ El sistema está listo para producción y demostración.
 """
 
 import os
+
 import django
 
 # Configurar Django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'e_garage.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "e_garage.settings")
 django.setup()
 
+from taller.models.documento import Documento
 # Ahora podemos importar los modelos Django
 from taller.utils.motor_ia import MotorDiagnosticoIA
-from taller.models.documento import Documento
+
 
 def demo_motor_ia():
     """
@@ -89,46 +91,47 @@ def demo_motor_ia():
     """
     print("🧠 MOTOR DE IA PARA TALLERPRO")
     print("=" * 50)
-    
+
     # Obtener documentos
     documentos = Documento.objects.all()
     print(f"📊 Analizando {documentos.count()} documentos...")
-    
+
     # Inicializar motor
     motor_ia = MotorDiagnosticoIA()
-    
+
     # Ejecutar análisis completo
     print("\n🔄 Ejecutando análisis completo...")
     resultados = motor_ia.analizar_servicios_completo(documentos)
-    
+
     # Mostrar resultados
     print("\n📈 SERVICIOS EN CRECIMIENTO:")
-    for servicio in resultados['servicios_crecimiento'][:3]:
+    for servicio in resultados["servicios_crecimiento"][:3]:
         print(f"  • {servicio['nombre']}: +{servicio['tasa_crecimiento']:.1f}%")
-    
+
     print("\n📉 SERVICIOS EN DECLIVE:")
-    for servicio in resultados['servicios_declive'][:3]:
+    for servicio in resultados["servicios_declive"][:3]:
         print(f"  • {servicio['nombre']}: {servicio['tasa_declive']:.1f}%")
-    
+
     print("\n🗓️ ANÁLISIS ESTACIONAL:")
-    for estacion in resultados['estacionalidad'][:2]:
+    for estacion in resultados["estacionalidad"][:2]:
         print(f"  • {estacion['temporada']}: {estacion['tendencia']}")
-    
+
     print("\n💡 RECOMENDACIONES IA:")
-    for rec in resultados['recomendaciones_ia'][:3]:
+    for rec in resultados["recomendaciones_ia"][:3]:
         print(f"  • {rec['accion']}")
         print(f"    Impacto: +${rec['impacto_estimado']:,.0f}")
-    
+
     print("\n🔮 PREDICCIONES:")
-    for pred in resultados['predicciones_ingresos']:
+    for pred in resultados["predicciones_ingresos"]:
         print(f"  • {pred['periodo']}: ${pred['ingresos_proyectados']:,.0f}")
-    
+
     print("\n⚠️ ALERTAS CRÍTICAS:")
-    for alerta in resultados['alertas_criticas'][:2]:
+    for alerta in resultados["alertas_criticas"][:2]:
         print(f"  • {alerta['tipo']}: {alerta['descripcion']}")
-    
+
     print("\n✅ MOTOR DE IA FUNCIONANDO CORRECTAMENTE")
     print("🎯 Sistema listo para demostración a inversionistas")
+
 
 if __name__ == "__main__":
     demo_motor_ia()

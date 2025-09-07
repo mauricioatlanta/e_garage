@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 import os
-import django
 import sys
+
+import django
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings")
 django.setup()
 
-from taller.models.region_ciudad import TallerRegion, TallerCiudad
+from taller.models.region_ciudad import TallerCiudad, TallerRegion
 
 # Elimina todas las ciudades primero (por FK)
 TallerCiudad.objects.all().delete()
@@ -29,7 +31,7 @@ regiones = [
     "Los Rios",
     "Los Lagos",
     "Aysen del General Carlos Ibanez del Campo",
-    "Magallanes y de la Antartica Chilena"
+    "Magallanes y de la Antartica Chilena",
 ]
 
 for nombre in regiones:

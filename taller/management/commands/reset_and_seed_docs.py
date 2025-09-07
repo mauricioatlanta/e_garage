@@ -1,13 +1,13 @@
+import random
+from decimal import Decimal
+
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils.timezone import now
-from decimal import Decimal
-import random
 
-from taller.models import (
-    Empresa, Cliente, Vehiculo, Tecnico, Repuesto,
-    Documento, LineaRepuesto, LineaServicio, LineaOtroServicio
-)
+from taller.models import (Cliente, Documento, Empresa, LineaOtroServicio,
+                           LineaRepuesto, LineaServicio, Repuesto, Tecnico,
+                           Vehiculo)
 
 R_PARTS = [
     # part_number, nombre, precio_venta
@@ -34,61 +34,75 @@ R_OTROS = [
     ("A/C carga gas", "FrioCar Ltda", 18000, 28000),
 ]
 
+
 def get_or_create_us_company():
     emp = Empresa.objects.filter(country="US").order_by("id").first()
     if not emp:
-        emp = Empresa.objects.create(nombre="USA Test Garage", country="US", moneda="USD")
+        emp = Empresa.objects.create(
+            nombre="USA Test Garage", country="US", moneda="USD"
+        )
     return emp
+
 
 def seed_parts(emp):
     # Crea repuestos base si no existen
     for pn, nombre, price in R_PARTS:
         Repuesto.objects.get_or_create(
-            empresa=emp, part_number=pn,
-            defaults={"nombre": nombre, "precio_venta": Decimal(price)}
+            empresa=emp,
+            part_number=pn,
+            defaults={"nombre": nombre, "precio_venta": Decimal(price)},
         )
+
 
 def get_or_create_basics(emp):
     cli, _ = Cliente.objects.get_or_create(
-        empresa=emp, nombre="Cliente Demo",
-        defaults={"apellido": "Test", "email": "demo@test.com"}
+        empresa=emp,
+        nombre="Cliente Demo",
+        defaults={"apellido": "Test", "email": "demo@test.com"},
     )
-    
+
     # Necesitamos obtener marca y modelo existentes o crear básicos
     from taller.models import Marca, Modelo
+
     marca, _ = Marca.objects.get_or_create(
-        empresa=emp, nombre="Toyota",
-        defaults={"activo": True}
+        empresa=emp, nombre="Toyota", defaults={"activo": True}
     )
     modelo, _ = Modelo.objects.get_or_create(
-        marca=marca, nombre="Corolla",
-        defaults={"activo": True}
+        marca=marca, nombre="Corolla", defaults={"activo": True}
     )
-    
+
     veh, _ = Vehiculo.objects.get_or_create(
-        empresa=emp, cliente=cli, vin="1FAFP404XWF123456",
-        defaults={
-            "marca": marca, 
-            "modelo": modelo,
-            "patente": "DEMO123",
-            "anio": 2020
-        }
+        empresa=emp,
+        cliente=cli,
+        vin="1FAFP404XWF123456",
+        defaults={"marca": marca, "modelo": modelo, "patente": "DEMO123", "anio": 2020},
     )
     tec, _ = Tecnico.objects.get_or_create(
-        empresa=emp, nombre="Tech Demo", 
-        defaults={"activo": True}
+        empresa=emp, nombre="Tech Demo", defaults={"activo": True}
     )
     return cli, veh, tec
 
+
 def recalc_totals(doc):
     from decimal import Decimal
+
     rep_sub = Decimal("0")
     for lr in doc.lineas_repuesto.all():
         d = (lr.descuento or 0) / Decimal("100")
-        rep_sub += (lr.cantidad * lr.precio_unitario * (Decimal("1") - d))
-    serv_sub = sum([ls.cantidad * ls.precio_unitario * (Decimal("1") - (ls.descuento or 0)/Decimal("100"))
-                   for ls in doc.lineas_servicio.all()], Decimal("0"))
-    otros_sub = sum([lo.precio_cliente * lo.cantidad for lo in doc.lineas_otro_servicio.all()], Decimal("0"))
+        rep_sub += lr.cantidad * lr.precio_unitario * (Decimal("1") - d)
+    serv_sub = sum(
+        [
+            ls.cantidad
+            * ls.precio_unitario
+            * (Decimal("1") - (ls.descuento or 0) / Decimal("100"))
+            for ls in doc.lineas_servicio.all()
+        ],
+        Decimal("0"),
+    )
+    otros_sub = sum(
+        [lo.precio_cliente * lo.cantidad for lo in doc.lineas_otro_servicio.all()],
+        Decimal("0"),
+    )
     # En USA, no aplicamos IVA (sales tax configuraciones aparte). Para Chile usar 19% sobre repuestos.
     iva_rate = Decimal("0.00") if doc.empresa.country == "US" else Decimal("0.19")
     tax_amount = (rep_sub * iva_rate).quantize(Decimal("0.01"))
@@ -97,26 +111,63 @@ def recalc_totals(doc):
     # Persistir (ajusta nombres si tu modelo difiere)
     doc.neto_repuestos = rep_sub
     doc.neto_servicios = serv_sub + otros_sub
-    doc.tax_rate_applied = (iva_rate * 100)
+    doc.tax_rate_applied = iva_rate * 100
     doc.tax_amount = tax_amount
     doc.total = total
-    doc.save(update_fields=["neto_repuestos","neto_servicios","tax_rate_applied","tax_amount","total"])
+    doc.save(
+        update_fields=[
+            "neto_repuestos",
+            "neto_servicios",
+            "tax_rate_applied",
+            "tax_amount",
+            "total",
+        ]
+    )
+
 
 class Command(BaseCommand):
     help = "Borra TODOS los documentos (por empresa) y crea N documentos completos con millas, repuestos, servicios y otros."
 
     def add_arguments(self, parser):
-        parser.add_argument("--empresa", type=str, default="", help="Nombre de empresa. Si no se pasa, toma la primera US.")
-        parser.add_argument("--count", type=int, default=10, help="Cantidad de documentos nuevos a crear")
-        parser.add_argument("--hard", action="store_true", help="Borrar TODO para esa empresa")
-        parser.add_argument("--country", type=str, default="US", help="US o CL (afecta impuestos/millas)")
+        parser.add_argument(
+            "--empresa",
+            type=str,
+            default="",
+            help="Nombre de empresa. Si no se pasa, toma la primera US.",
+        )
+        parser.add_argument(
+            "--count",
+            type=int,
+            default=10,
+            help="Cantidad de documentos nuevos a crear",
+        )
+        parser.add_argument(
+            "--hard", action="store_true", help="Borrar TODO para esa empresa"
+        )
+        parser.add_argument(
+            "--country",
+            type=str,
+            default="US",
+            help="US o CL (afecta impuestos/millas)",
+        )
 
     @transaction.atomic
     def handle(self, *args, **opts):
         country = opts["country"].upper()
-        emp = Empresa.objects.filter(nombre=opts["empresa"]).first() if opts["empresa"] else None
+        emp = (
+            Empresa.objects.filter(nombre=opts["empresa"]).first()
+            if opts["empresa"]
+            else None
+        )
         if not emp:
-            emp = get_or_create_us_company() if country == "US" else Empresa.objects.filter(country="CL").first() or Empresa.objects.create(nombre="Chile Demo", country="CL", moneda="CLP")
+            emp = (
+                get_or_create_us_company()
+                if country == "US"
+                else Empresa.objects.filter(country="CL").first()
+                or Empresa.objects.create(
+                    nombre="Chile Demo", country="CL", moneda="CLP"
+                )
+            )
 
         seed_parts(emp)
         cli, veh, tec = get_or_create_basics(emp)
@@ -138,7 +189,7 @@ class Command(BaseCommand):
                 tipo="PRES" if i % 2 == 0 else "OT",  # PRES o OT según el modelo
                 country=country,
                 moneda="USD" if country == "US" else "CLP",
-                **({"millas": 65000 + i*500} if hasattr(Documento, "millas") else {})
+                **({"millas": 65000 + i * 500} if hasattr(Documento, "millas") else {}),
             )
 
             # >=3 repuestos
@@ -151,7 +202,7 @@ class Command(BaseCommand):
                     nombre=nombre,
                     cantidad=Decimal("1"),
                     precio_unitario=Decimal(price),
-                    descuento=Decimal("0")
+                    descuento=Decimal("0"),
                 )
 
             # >=1 servicio
@@ -162,7 +213,7 @@ class Command(BaseCommand):
                 nombre=s_name,
                 cantidad=Decimal("1"),
                 precio_unitario=Decimal(s_price),
-                descuento=Decimal("0")
+                descuento=Decimal("0"),
             )
 
             # >=1 otro servicio
@@ -174,7 +225,7 @@ class Command(BaseCommand):
                 cantidad=Decimal("1"),
                 costo_interno=Decimal(o_cost),
                 precio_cliente=Decimal(o_price),
-                ganancia=Decimal(o_price) - Decimal(o_cost)
+                ganancia=Decimal(o_price) - Decimal(o_cost),
             )
 
             recalc_totals(doc)

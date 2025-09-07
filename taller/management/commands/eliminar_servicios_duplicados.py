@@ -1,9 +1,12 @@
-from django.core.management.base import BaseCommand
-from taller.servicios.models import Servicio, ServicioName
 from collections import defaultdict
 
+from django.core.management.base import BaseCommand
+
+from taller.servicios.models import Servicio, ServicioName
+
+
 class Command(BaseCommand):
-    help = 'Elimina servicios y otros servicios repetidos por país (Chile y USA) manteniendo solo uno de cada grupo.'
+    help = "Elimina servicios y otros servicios repetidos por país (Chile y USA) manteniendo solo uno de cada grupo."
 
     def handle(self, *args, **options):
         total_duplicados = 0
@@ -21,9 +24,13 @@ class Command(BaseCommand):
                 a_eliminar = lista[1:]
                 for s in a_eliminar:
                     ServicioName.objects.filter(servicio=s).delete()
-                    detalles.append(f"Eliminado: id={s.id}, code={s.code}, country={s.country}, tipo={s.tipo}")
+                    detalles.append(
+                        f"Eliminado: id={s.id}, code={s.code}, country={s.country}, tipo={s.tipo}"
+                    )
                     s.delete()
                 total_duplicados += len(a_eliminar)
-        self.stdout.write(self.style.SUCCESS(f"Eliminados {total_duplicados} servicios repetidos."))
+        self.stdout.write(
+            self.style.SUCCESS(f"Eliminados {total_duplicados} servicios repetidos.")
+        )
         for d in detalles:
             self.stdout.write(self.style.NOTICE(d))

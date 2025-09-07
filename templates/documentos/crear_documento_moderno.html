@@ -6,63 +6,61 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/documento_moderno.css' %}">
 <style>
-    .container-fluid {
-        max-width: 1400px;
-    }
-    
-    .form-section {
-        background: white;
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        border: 1px solid #e3e6f0;
-    }
-    
-    .form-section h3 {
-        color: #5a5c69;
-        margin-bottom: 1rem;
-        font-size: 1.1rem;
-        font-weight: 600;
-        border-bottom: 2px solid #4e73df;
-        padding-bottom: 0.5rem;
-    }
-    
-    .form-group {
-        margin-bottom: 1rem;
-    }
-    
-    .form-label {
-        color: #5a5c69;
-        font-weight: 500;
-        margin-bottom: 0.5rem;
-    }
-    
-    .form-control {
-        border-radius: 8px;
-        border: 1px solid #d1d3e2;
-        padding: 0.75rem;
-        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-    }
-    
-    .form-control:focus {
-        border-color: #4e73df;
-        box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
-    }
-    
-    .btn-primary {
-        background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
-        border: none;
-        border-radius: 8px;
-        padding: 0.75rem 2rem;
-        font-weight: 500;
-        transition: all 0.3s ease;
-    }
-    
-    .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(78, 115, 223, 0.4);
-    }
+  .container-fluid { max-width: 1400px; }
+
+  .form-section {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border: 1px solid #e3e6f0;
+  }
+
+  .form-section h3 {
+    color: #5a5c69;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-bottom: 2px solid #4e73df;
+    padding-bottom: 0.5rem;
+  }
+
+  .form-group { margin-bottom: 1rem; }
+
+  .form-label {
+    color: #5a5c69;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-control {
+    border-radius: 8px;
+    border: 1px solid #d1d3e2;
+    padding: 0.75rem;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+  }
+  .form-control:focus {
+    border-color: #4e73df;
+    box-shadow: 0 0 0 .2rem rgba(78,115,223,.25);
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+    border: none; border-radius: 8px; padding: .75rem 2rem; font-weight: 500;
+    transition: all .3s ease;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(78,115,223,.4); }
+
+  .btn-secondary {
+    background: #6c757d; border: none; border-radius: 8px; padding: .75rem 2rem; font-weight: 500;
+    color: white; text-decoration: none; display: inline-block; transition: all .3s ease;
+  }
+  .btn-secondary:hover { background: #5a6268; color: white; text-decoration: none; transform: translateY(-1px); }
+
+  .alert { border-radius: 8px; border: none; margin-bottom: 1.5rem; }
+</style>
+{% endblock %}
     
     .btn-secondary {
         background: #6c757d;
@@ -103,9 +101,16 @@
             <p class="text-muted">Complete la información del documento</p>
         </div>
         <div>
-            <a href="{% url 'documentos_cl:lista_documentos' %}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Volver a Lista
-            </a>
+            {% comment %}🚀 BISTURÍ: URLs dinámicas por país{% endcomment %}
+            {% if country == 'us' %}
+                <a href="{% url 'documentos_us:lista_documentos' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to List
+                </a>
+            {% else %}
+                <a href="{% url 'documentos_cl:lista_documentos' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver a Lista
+                </a>
+            {% endif %}
         </div>
     </div>
 
@@ -165,12 +170,7 @@
                     
                     <div class="form-group">
                         <label class="form-label">Cliente</label>
-                        <select name="cliente" class="form-control" required>
-                            <option value="">-- Seleccionar Cliente --</option>
-                            {% for cliente in clientes %}
-                                <option value="{{ cliente.id }}">{{ cliente.nombre }}</option>
-                            {% endfor %}
-                        </select>
+                        <select name="cliente" class="form-control" id="id_cliente" required></select>
                     </div>
                     
                     <div class="form-group">
@@ -253,19 +253,123 @@
 </div>
 
 <script>
-// Script para cargar vehículos cuando se selecciona un cliente
-document.querySelector('select[name="cliente"]').addEventListener('change', function() {
-    const clienteId = this.value;
-    const vehiculoSelect = document.querySelector('select[name="vehiculo"]');
-    
+(function() {
+  // Prefijo por país (ya corregiste /cl vs /us)
+  const base = window.location.pathname.startsWith('/us/') ? '/us' : '/cl';
+
+  // Verifica jQuery + Select2
+  const $ = window.jQuery;
+  if (!$ || !$.fn || !$.fn.select2) {
+    console.warn("Select2/jQuery no están cargados. Asegúrate de incluirlos en base.html.");
+    return;
+  }
+
+  const dropdownParent = document.getElementById('eg-portal') || document.body;
+  const $cliente = $('#id_cliente');
+
+  // Helper: normaliza distintas formas de respuesta del backend
+  function normalizeClientResults(data) {
+    // Puede venir: {results:[...]} o lista [...]
+    const raw = Array.isArray(data) ? data : (data.results || data.items || []);
+    return raw.map(it => {
+      // Soportar varias llaves: text | nombre+apellido | name | email | telefono
+      const text =
+        it.text ??
+        [it.nombre, it.apellido].filter(Boolean).join(' ') ||
+        it.nombre ||
+        it.name ||
+        it.email ||
+        it.telefono ||
+        String(it.id);
+      const subtitle = it.subtitle || it.email || it.telefono || '';
+      return { id: it.id, text, subtitle };
+    });
+  }
+
+  $cliente.select2({
+    theme: 'bootstrap-5',
+    placeholder: 'Buscar cliente…',
+    allowClear: true,
+    minimumInputLength: 1,
+    width: '100%',
+    dropdownParent: $(dropdownParent),
+    ajax: {
+      url: base + "/ajax/clientes/buscar/",
+      dataType: 'json',
+      delay: 250,
+      cache: true,
+      data: function(params) {
+        return { q: params.term || '', page: params.page || 1 };
+      },
+      processResults: function(data, params) {
+        params.page = params.page || 1;
+        const results = normalizeClientResults(data);
+        return { results, pagination: { more: !!(data && data.more) } };
+      },
+      transport: function (params, success, failure) {
+        // Log para debug en Network/Console
+        const req = $.ajax(params);
+        req.then(function(resp){ success(resp); }).fail(function(xhr){ 
+          console.error("❌ AJAX clientes:", xhr.status, xhr.responseText);
+          failure(xhr);
+        });
+        return req;
+      }
+    },
+    templateResult: function(item) {
+      if (!item.id) return item.text;
+      const sub = item.subtitle ? `<div class="text-muted small">${item.subtitle}</div>` : '';
+      return $(`<div><div><strong>${item.text}</strong></div>${sub}</div>`);
+    },
+    templateSelection: function(item) { return item.text || item.id; }
+  });
+
+  // Vehículos por cliente (acepta ?cliente= o ?cliente_id=)
+  const vehiculoSelect = document.querySelector('select[name="vehiculo"]');
+
+  function cargarVehiculos(clienteId) {
+    if (!vehiculoSelect) return;
     if (!clienteId) {
-        vehiculoSelect.innerHTML = '<option value="">-- Seleccionar Vehículo --</option>';
-        return;
+      vehiculoSelect.innerHTML = '<option value="">-- Seleccionar Vehículo --</option>';
+      return;
     }
-    
-    // Aquí puedes agregar una llamada AJAX para cargar los vehículos del cliente
-    // Por ahora solo limpiamos la selección
     vehiculoSelect.innerHTML = '<option value="">-- Cargando vehículos... --</option>';
-});
+
+    // Probamos primero con ?cliente= (ruta clásica), si falla probamos ?cliente_id=
+    const urlA = `${base}/ajax/vehiculos-por-cliente/?cliente=${encodeURIComponent(clienteId)}`;
+    const urlB = `${base}/ajax/vehiculos-por-cliente/?cliente_id=${encodeURIComponent(clienteId)}`;
+
+    fetch(urlA, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+      .then(r => r.ok ? r.json() : Promise.reject({ step:'A', r }))
+      .then(data => renderVehiculos(data))
+      .catch(() => {
+        return fetch(urlB, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+          .then(r => r.json())
+          .then(data => renderVehiculos(data))
+          .catch(err => {
+            console.error("❌ AJAX vehículos:", err);
+            vehiculoSelect.innerHTML = '<option value="">-- Error al cargar vehículos --</option>';
+          });
+      });
+  }
+
+  function renderVehiculos(data) {
+    const raw = Array.isArray(data) ? data : (data.results || []);
+    const opts = ['<option value="">-- Seleccionar Vehículo --</option>']
+      .concat(raw.map(v => {
+        const label = v.text || [v.patente, v.marca, v.modelo].filter(Boolean).join(' ') || `Vehículo #${v.id}`;
+        return `<option value="${v.id}">${label}</option>`;
+      }));
+    vehiculoSelect.innerHTML = opts.join('');
+  }
+
+  $cliente.on('select2:select', function(e) {
+    const id = e.params.data.id;
+    cargarVehiculos(id);
+  }).on('select2:clear', function() {
+    cargarVehiculos('');
+  });
+
+})();
 </script>
 {% endblock %}

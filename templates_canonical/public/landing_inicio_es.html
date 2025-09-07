@@ -1,0 +1,232 @@
+{% extends "common/base.html" %}
+{% load country_url %}
+
+{% block title %}eGarage Pro - Centro de Operaciones{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-xl-10">
+            
+            <!-- Header Section -->
+            <div class="glass-card p-5 mb-5 text-center">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="display-4 mb-4">
+                            <i class="fas fa-cogs me-3 text-primary"></i>
+                            Centro de Operaciones
+                        </h1>
+                        <p class="lead text-secondary mb-4">
+                            Bienvenido al sistema de gestión integral para talleres automotrices
+                        </p>
+                        <div class="d-flex justify-content-center gap-3 flex-wrap">
+                            <span class="badge bg-success fs-6 px-3 py-2">
+                                <i class="fas fa-check-circle me-2"></i>Sistema Activo
+                            </span>
+                            <span class="badge bg-info fs-6 px-3 py-2">
+                                <i class="fas fa-globe me-2"></i>Chile
+                            </span>
+                            <span class="badge bg-warning fs-6 px-3 py-2">
+                                <i class="fas fa-language me-2"></i>Español
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-md-end">
+                        <div class="glass-card p-4 text-center">
+                            <i class="fas fa-chart-line fa-3x text-success mb-3"></i>
+                            <div class="h5 text-success mb-2">Estado del Sistema</div>
+                            <div class="small text-secondary">Operativo</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions Grid -->
+            <div class="row g-4 mb-5">
+                <div class="col-md-6 col-lg-3">
+                    <div class="glass-card p-4 text-center h-100">
+                        <div class="glass-card p-3 mb-3 mx-auto" style="width: 80px; height: 80px;">
+                            <i class="fas fa-users fa-2x text-primary"></i>
+                        </div>
+                        <h5 class="mb-3">Gestión de Clientes</h5>
+                        <p class="text-secondary mb-3">Administra tu base de clientes y vehículos</p>
+                        <a href="{% url 'taller:clientes:lista_clientes' %}" class="btn btn-futuristic btn-sm w-100">
+                            <i class="fas fa-arrow-right me-2"></i>Gestionar Clientes
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-3">
+                    <div class="glass-card p-4 text-center h-100">
+                        <div class="glass-card p-3 mb-3 mx-auto" style="width: 80px; height: 80px;">
+                            <i class="fas fa-car fa-2x text-success"></i>
+                        </div>
+                        <h5 class="mb-3">Vehículos</h5>
+                        <p class="text-secondary mb-3">Registra y gestiona vehículos de clientes</p>
+                        <a href="{% url 'taller:vehiculos:lista_vehiculos' %}" class="btn btn-futuristic btn-sm w-100">
+                            <i class="fas fa-arrow-right me-2"></i>Gestionar Vehículos
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-3">
+                    <div class="glass-card p-4 text-center h-100">
+                        <div class="glass-card p-3 mb-3 mx-auto" style="width: 80px; height: 80px;">
+                            <i class="fas fa-tools fa-2x text-warning"></i>
+                        </div>
+                        <h5 class="mb-3">Servicios</h5>
+                        <p class="text-secondary mb-3">Catálogo de servicios y repuestos</p>
+                        <a href="{% url 'taller:servicios:servicios_menu' %}" class="btn btn-futuristic btn-sm w-100">
+                            <i class="fas fa-arrow-right me-2"></i>Gestionar Servicios
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-3">
+                    <div class="glass-card p-4 text-center h-100">
+                        <div class="glass-card p-3 mb-3 mx-auto" style="width: 80px; height: 80px;">
+                            <i class="fas fa-file-invoice fa-2x text-info"></i>
+                        </div>
+                        <h5 class="mb-3">Documentos</h5>
+                        <p class="text-secondary mb-3">Facturas, boletas y presupuestos</p>
+                        <a href="{% url 'taller:documentos:lista_documentos' %}" class="btn btn-futuristic btn-sm w-100">
+                            <i class="fas fa-arrow-right me-2"></i>Gestionar Documentos
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configuration Section -->
+            <div class="row g-4 mb-5">
+                <div class="col-md-6">
+                    <div class="glass-card p-4 h-100">
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="glass-card p-3 me-3">
+                                <i class="fas fa-cogs fa-2x text-primary"></i>
+                            </div>
+                            <div>
+                                <h4 class="mb-1">Configuración de Empresa</h4>
+                                <p class="text-secondary mb-0">Personaliza tu taller</p>
+                            </div>
+                        </div>
+                        <p class="text-secondary mb-4">
+                            Configura el perfil de tu empresa, branding, técnicos y configuraciones financieras.
+                        </p>
+                        {% load country_url %}
+                        <a href="{% country_url 'company_settings' app_namespace='taller' %}" class="btn btn-futuristic">
+                            <i class="fas fa-cogs me-2"></i>Configurar Empresa
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="glass-card p-4 h-100">
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="glass-card p-3 me-3">
+                                <i class="fas fa-chart-bar fa-2x text-success"></i>
+                            </div>
+                            <div>
+                                <h4 class="mb-1">Reportes y Analytics</h4>
+                                <p class="text-secondary mb-0">Análisis de rendimiento</p>
+                            </div>
+                        </div>
+                        <p class="text-secondary mb-4">
+                            Visualiza estadísticas, reportes de ventas y métricas de tu taller.
+                        </p>
+                        <a href="{% country_url 'reportes_dashboard' app_namespace='reportes' %}" class="btn btn-futuristic">
+                            <i class="fas fa-chart-bar me-2"></i>Ver Reportes
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Status -->
+            <div class="glass-card p-4 text-center">
+                <h4 class="mb-4">
+                    <i class="fas fa-server me-2 text-info"></i>
+                    Estado del Sistema
+                </h4>
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <div class="glass-card p-3">
+                            <i class="fas fa-database fa-2x text-success mb-2"></i>
+                            <div class="small text-secondary">Base de Datos</div>
+                            <div class="fw-bold text-success">Operativa</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="glass-card p-3">
+                            <i class="fas fa-cloud fa-2x text-info mb-2"></i>
+                            <div class="small text-secondary">Servicios</div>
+                            <div class="fw-bold text-info">Activos</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="glass-card p-3">
+                            <i class="fas fa-shield-alt fa-2x text-warning mb-2"></i>
+                            <div class="small text-secondary">Seguridad</div>
+                            <div class="fw-bold text-warning">Protegido</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="glass-card p-3">
+                            <i class="fas fa-sync fa-2x text-primary mb-2"></i>
+                            <div class="small text-secondary">Sincronización</div>
+                            <div class="fw-bold text-primary">En Tiempo Real</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .glass-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 15px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+    
+    .glass-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    }
+    
+    .btn-futuristic {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        border: none;
+        border-radius: 10px;
+        color: white;
+        font-weight: 600;
+        padding: 12px 24px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-futuristic:hover {
+        background: linear-gradient(135deg, #0056b3, #004085);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 123, 255, 0.3);
+        color: white;
+    }
+    
+    .badge {
+        border-radius: 20px;
+        font-weight: 500;
+    }
+    
+    .display-4 {
+        font-weight: 700;
+        background: linear-gradient(135deg, #007bff, #00d4ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+</style>
+{% endblock %}

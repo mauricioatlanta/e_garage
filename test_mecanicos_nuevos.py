@@ -5,14 +5,16 @@ Script para probar que se puede agregar un mecánico nuevo al crear un documento
 
 import os
 import sys
+
 import django
 
 # Configurar el entorno de Django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings_sqlite')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings_sqlite")
 django.setup()
 
-from django.test import Client
 from django.contrib.auth.models import User
+from django.test import Client
+
 from taller.models.empresa import Empresa
 from taller.models.tecnico import Mecanico
 
@@ -24,16 +26,16 @@ try:
 
     # Crear o obtener usuario de prueba
     user, created = User.objects.get_or_create(
-        username='test_mecanicos',
+        username="test_mecanicos",
         defaults={
-            'email': 'test_mecanicos@example.com',
-            'first_name': 'Test',
-            'last_name': 'Mecanicos'
-        }
+            "email": "test_mecanicos@example.com",
+            "first_name": "Test",
+            "last_name": "Mecanicos",
+        },
     )
 
     if created:
-        user.set_password('password123')
+        user.set_password("password123")
         user.save()
         print(f"✅ Usuario creado: {user.username}")
     else:
@@ -43,11 +45,11 @@ try:
     empresa, created = Empresa.objects.get_or_create(
         usuario=user,
         defaults={
-            'nombre_taller': 'Taller de Prueba Mecánicos',
-            'direccion': 'Dirección de prueba',
-            'telefono': '123456789',
-            'rut': '12345678-9'
-        }
+            "nombre_taller": "Taller de Prueba Mecánicos",
+            "direccion": "Dirección de prueba",
+            "telefono": "123456789",
+            "rut": "12345678-9",
+        },
     )
 
     # Hacer login
@@ -60,30 +62,30 @@ try:
 
     # Probar autocompletado de mecánicos
     print("\n=== PRUEBA DE AUTOCOMPLETADO ===")
-    response = client.get('/autocomplete/mecanico/')
+    response = client.get("/autocomplete/mecanico/")
     print(f"✅ Respuesta GET /autocomplete/mecanico/: {response.status_code}")
-    
+
     if response.status_code == 200:
         print("✅ La vista de autocompletado funciona")
-        
+
         # Probar búsqueda con query
-        response = client.get('/autocomplete/mecanico/?q=Juan')
+        response = client.get("/autocomplete/mecanico/?q=Juan")
         print(f"✅ Búsqueda con query 'Juan': {response.status_code}")
-    
+
     # Probar la página de crear documento
-    response = client.get('/documentos/nuevo/')
+    response = client.get("/documentos/nuevo/")
     print(f"✅ Respuesta GET /documentos/nuevo/: {response.status_code}")
-    
+
     if response.status_code == 200:
-        content = response.content.decode('utf-8')
-        
+        content = response.content.decode("utf-8")
+
         # Verificar que el campo mecánico está presente y configurado correctamente
-        if 'autocomplete_mecanico' in content:
+        if "autocomplete_mecanico" in content:
             print("✅ Campo de mecánico con autocompletado encontrado")
         else:
             print("❌ Campo de mecánico con autocompletado NO encontrado")
-            
-        if 'data-tags' in content and 'true' in content:
+
+        if "data-tags" in content and "true" in content:
             print("✅ Configuración data-tags=true encontrada")
         else:
             print("⚠️  Configuración data-tags puede estar ausente")
@@ -105,7 +107,7 @@ try:
     print("3. Completa los demás campos obligatorios")
     print("4. Guarda el documento")
     print("5. El mecánico nuevo debería crearse automáticamente")
-    
+
     print(f"\n=== VERIFICACIÓN ADICIONAL ===")
     print("Si tienes problemas:")
     print("- Verifica que el JavaScript Select2 esté cargando correctamente")
@@ -115,6 +117,7 @@ try:
 except Exception as e:
     print(f"❌ Error durante la prueba: {e}")
     import traceback
+
     traceback.print_exc()
 
 print("\n=== PRUEBA COMPLETADA ===")

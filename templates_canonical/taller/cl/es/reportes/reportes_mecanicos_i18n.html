@@ -2,6 +2,7 @@
 {% load humanize %}
 {% load custom_filters %}
 {% load i18n %}  {# 👈 Cargar i18n #}
+{% load country_url %}
 
 {% block title %}{% trans "Reportes de Mecánicos" %} - {{ block.super }}{% endblock %}
 
@@ -214,7 +215,7 @@
     <!-- Botón de exportar Excel -->
     {% if reportes_data %}
     <div class="text-center mb-6">
-        <a href="{% url 'taller:reportes:exportar_mecanicos_excel' %}?{{ request.GET.urlencode }}" 
+        <a href="{% country_url 'exportar_mecanicos_excel' app_namespace='reportes' %}?{{ request.GET.urlencode }}" 
            class="ai-button">
             📊 {% trans "Exportar a Excel" %}
         </a>
@@ -250,32 +251,16 @@
                         <td class="font-bold">🔧 {{ reporte.tecnico__nombre }}</td>
                         <td class="text-center">{{ reporte.total_documentos }}</td>
                         <td class="text-right">
-                            {% if empresa.es_usa %}
-                                ${{ reporte.total_servicios|floatformat:2 }}
-                            {% else %}
-                                ${{ reporte.total_servicios|floatformat:0 }}
-                            {% endif %}
+                            {{ reporte.total_servicios|currency_format:request.user.empresa.pais|default:'CL' }}
                         </td>
                         <td class="text-right">
-                            {% if empresa.es_usa %}
-                                ${{ reporte.total_repuestos|floatformat:2 }}
-                            {% else %}
-                                ${{ reporte.total_repuestos|floatformat:0 }}
-                            {% endif %}
+                            {{ reporte.total_repuestos|currency_format:request.user.empresa.pais|default:'CL' }}
                         </td>
                         <td class="text-right font-bold">
-                            {% if empresa.es_usa %}
-                                ${{ reporte.total_general|floatformat:2 }}
-                            {% else %}
-                                ${{ reporte.total_general|floatformat:0 }}
-                            {% endif %}
+                            {{ reporte.total_general|currency_format:request.user.empresa.pais|default:'CL' }}
                         </td>
                         <td class="text-right">
-                            {% if empresa.es_usa %}
-                                ${{ reporte.promedio_por_documento|floatformat:2 }}
-                            {% else %}
-                                ${{ reporte.promedio_por_documento|floatformat:0 }}
-                            {% endif %}
+                            {{ reporte.promedio_por_documento|currency_format:request.user.empresa.pais|default:'CL' }}
                         </td>
                     </tr>
                     {% endfor %}

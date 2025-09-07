@@ -1,6 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 
+
 class PlanPagoForm(forms.Form):
     nombre = forms.CharField(max_length=100, label="Nombre")
     email = forms.EmailField(label="Correo electrónico")

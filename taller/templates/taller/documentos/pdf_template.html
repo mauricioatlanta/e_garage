@@ -7,56 +7,54 @@
     <style>
         @page {
             size: A4;
-            <style>
-                @page {
-                    size: A4;
-                    margin: 1.5cm;
-                    @bottom-center {
-                        content: "Página " counter(page) " de " counter(pages) " | Generado el {{ fecha_generacion|date:'d/m/Y H:i' }}";
-                        font-size: 9pt;
-                        color: #666;
-                    }
-                }
-                body {
-                    font-family: 'Arial', sans-serif;
-                    font-size: 11pt;
-                    line-height: 1.4;
-                    color: #333;
-                    margin: 0;
-                    padding: 0;
-                }
-                .header {
-                    display: flex;
-                    align-items: center;
-                    justify-content: flex-start;
-                    border-bottom: 3px solid #007bff;
-                    padding-bottom: 15px;
-                    margin-bottom: 25px;
-                }
-                .header-logo {
-                    flex: 0 0 auto;
-                    margin-right: 24px;
-                }
-                .logo {
-                    max-height: 80px;
-                    max-width: 180px;
-                    margin-bottom: 0;
-                }
-                .header-info {
-                    flex: 1 1 0%;
-                    text-align: center;
-                }
-                .empresa-nombre {
-                    font-size: 1.7em;
-                    font-weight: bold;
-                    color: #007bff;
-                    margin-bottom: 2px;
-                }
-                .empresa-datos {
-                    font-size: 1em;
-                    color: #444;
-                    margin-bottom: 2px;
-                }
+            margin: 1.5cm;
+            @bottom-center {
+                content: "Página " counter(page) " de " counter(pages) " | Generado el {{ fecha_generacion|date:'d/m/Y H:i' }}";
+                font-size: 9pt;
+                color: #666;
+            }
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            font-size: 11pt;
+            line-height: 1.4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+        .header-logo {
+            flex: 0 0 auto;
+            margin-right: 24px;
+        }
+        .logo {
+            max-height: 80px;
+            max-width: 180px;
+            margin-bottom: 0;
+        }
+        .header-info {
+            flex: 1 1 0%;
+            text-align: center;
+        }
+        .empresa-nombre {
+            font-size: 1.7em;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 2px;
+        }
+        .empresa-datos {
+            font-size: 1em;
+            color: #444;
+            margin-bottom: 2px;
+        }
+        .documento-header {
             background: linear-gradient(135deg, #007bff, #0056b3);
             color: white;
             padding: 20px;
@@ -259,6 +257,15 @@
         .servicio-externo {
             background-color: #fff3cd !important;
         }
+        
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+            font-size: 10px;
+            color: #666;
+        }
     </style>
 </head>
 <body>
@@ -272,9 +279,9 @@
         <div class="header-info">
             <div class="empresa-nombre">{{ empresa.nombre }}</div>
             <div class="empresa-datos">
-                {% if empresa.direccion %}{{ empresa.direccion }}<br>{% endif %}
-                {% if empresa.telefono %}Tel: {{ empresa.telefono }}{% endif %}
-                {% if empresa.email %} | Email: {{ empresa.email }}{% endif %}
+                {% if config_empresa.direccion %}{{ config_empresa.direccion }}<br>{% elif empresa.direccion %}{{ empresa.direccion }}<br>{% endif %}
+                {% if config_empresa.telefono %}Tel: {{ config_empresa.telefono }}{% elif empresa.telefono %}Tel: {{ empresa.telefono }}{% endif %}
+                {% if config_empresa.email_contacto %} | Email: {{ config_empresa.email_contacto }}{% elif empresa.email %} | Email: {{ empresa.email }}{% endif %}
                 {% if empresa.rut %}<br>RUT: {{ empresa.rut }}{% endif %}
             </div>
         </div>
@@ -440,7 +447,8 @@
     </div>
     {% endif %}
 
-    <!-- Totales -->
+    <!-- Totales - Solo para Facturas -->
+    {% if documento.tipo == 'FAC' %}
     <div class="totales">
         <div class="total-fila">
             <div class="total-label">Subtotal Repuestos:</div>
@@ -473,6 +481,7 @@
     </div>
 
     <div style="clear: both;"></div>
+    {% endif %}
 
     <!-- Firmas -->
     <div class="firma-seccion">
@@ -497,7 +506,28 @@
     <!-- Footer -->
     <div class="footer">
         <p>Documento generado el {{ fecha_generacion|date:"d/m/Y H:i" }} por {{ empresa.nombre }}</p>
-        <p>{{ empresa.direccion }} | Tel: {{ empresa.telefono }} | {{ empresa.email }}</p>
+                    <p>
+                {% if config_empresa.direccion %}{{ config_empresa.direccion }}{% elif empresa.direccion %}{{ empresa.direccion }}{% endif %}
+                {% if config_empresa.telefono %} | Tel: {{ config_empresa.telefono }}{% elif empresa.telefono %} | Tel: {{ empresa.telefono }}{% endif %}
+                {% if config_empresa.email_contacto %} | {{ config_empresa.email_contacto }}{% elif empresa.email %} | {{ empresa.email }}{% endif %}
+            </p>
+        
+        <!-- Total para Facturas en el Footer -->
+        {% if documento.tipo == 'FAC' %}
+        <div style="margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 8px; border: 1px solid #dee2e6;">
+            <div style="text-align: center; font-weight: bold; color: #007bff; font-size: 12pt; margin-bottom: 10px;">
+                TOTAL A PAGAR
+            </div>
+            <div style="text-align: center; font-size: 16pt; font-weight: bold; color: #007bff;">
+                ${{ total|floatformat:0 }}
+            </div>
+            {% if documento.incluir_iva %}
+            <div style="text-align: center; font-size: 10pt; color: #666; margin-top: 5px;">
+                IVA incluido
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
         
         <!-- Créditos de Atlanta Reciclajes -->
         <div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #ddd; text-align: center;">

@@ -1,20 +1,22 @@
-
 from django.db import models
-
 
 
 class AccountEmailaddress(models.Model):
     verified = models.BooleanField()
     primary = models.BooleanField()
-    user = models.ForeignKey('AuthUser', models.DO_NOTHING)
+    user = models.ForeignKey("AuthUser", models.DO_NOTHING)
     email = models.CharField(unique=True, max_length=254)
 
-    cliente = models.ForeignKey('TallerCliente', models.DO_NOTHING)
+    cliente = models.ForeignKey("TallerCliente", models.DO_NOTHING)
+
 
 class Meta:
     managed = False
-    db_table = 'account_emailaddress'
-    unique_together = (('user', 'primary'), ('user', 'email'),)
+    db_table = "account_emailaddress"
+    unique_together = (
+        ("user", "primary"),
+        ("user", "email"),
+    )
 
 
 class AccountEmailconfirmation(models.Model):
@@ -25,7 +27,7 @@ class AccountEmailconfirmation(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'account_emailconfirmation'
+        db_table = "account_emailconfirmation"
 
 
 class AuthGroup(models.Model):
@@ -33,28 +35,28 @@ class AuthGroup(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'auth_group'
+        db_table = "auth_group"
 
 
 class AuthGroupPermissions(models.Model):
     group = models.ForeignKey(AuthGroup, models.DO_NOTHING)
-    permission = models.ForeignKey('AuthPermission', models.DO_NOTHING)
+    permission = models.ForeignKey("AuthPermission", models.DO_NOTHING)
 
     class Meta:
         managed = False
-        db_table = 'auth_group_permissions'
-        unique_together = (('group', 'permission'),)
+        db_table = "auth_group_permissions"
+        unique_together = (("group", "permission"),)
 
 
 class AuthPermission(models.Model):
-    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING)
+    content_type = models.ForeignKey("DjangoContentType", models.DO_NOTHING)
     codename = models.CharField(max_length=100)
     name = models.CharField(max_length=255)
 
     class Meta:
         managed = False
-        db_table = 'auth_permission'
-        unique_together = (('content_type', 'codename'),)
+        db_table = "auth_permission"
+        unique_together = (("content_type", "codename"),)
 
 
 class AuthUser(models.Model):
@@ -71,7 +73,7 @@ class AuthUser(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'auth_user'
+        db_table = "auth_user"
 
 
 class AuthUserGroups(models.Model):
@@ -80,8 +82,8 @@ class AuthUserGroups(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'auth_user_groups'
-        unique_together = (('user', 'group'),)
+        db_table = "auth_user_groups"
+        unique_together = (("user", "group"),)
 
 
 class AuthUserUserPermissions(models.Model):
@@ -90,8 +92,8 @@ class AuthUserUserPermissions(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'auth_user_user_permissions'
-        unique_together = (('user', 'permission'),)
+        db_table = "auth_user_user_permissions"
+        unique_together = (("user", "permission"),)
 
 
 class DjangoAdminLog(models.Model):
@@ -99,13 +101,15 @@ class DjangoAdminLog(models.Model):
     object_repr = models.CharField(max_length=200)
     action_flag = models.PositiveSmallIntegerField()
     change_message = models.TextField()
-    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, blank=True, null=True)
+    content_type = models.ForeignKey(
+        "DjangoContentType", models.DO_NOTHING, blank=True, null=True
+    )
     user = models.ForeignKey(AuthUser, models.DO_NOTHING)
     action_time = models.DateTimeField()
 
     class Meta:
         managed = False
-        db_table = 'django_admin_log'
+        db_table = "django_admin_log"
 
 
 class DjangoContentType(models.Model):
@@ -114,8 +118,8 @@ class DjangoContentType(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'django_content_type'
-        unique_together = (('app_label', 'model'),)
+        db_table = "django_content_type"
+        unique_together = (("app_label", "model"),)
 
 
 class DjangoMigrations(models.Model):
@@ -125,7 +129,7 @@ class DjangoMigrations(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'django_migrations'
+        db_table = "django_migrations"
 
 
 class DjangoSession(models.Model):
@@ -135,7 +139,7 @@ class DjangoSession(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'django_session'
+        db_table = "django_session"
 
 
 class DjangoSite(models.Model):
@@ -144,7 +148,7 @@ class DjangoSite(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'django_site'
+        db_table = "django_site"
 
 
 class SocialaccountSocialaccount(models.Model):
@@ -157,8 +161,8 @@ class SocialaccountSocialaccount(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'socialaccount_socialaccount'
-        unique_together = (('provider', 'uid'),)
+        db_table = "socialaccount_socialaccount"
+        unique_together = (("provider", "uid"),)
 
 
 class SocialaccountSocialapp(models.Model):
@@ -172,7 +176,7 @@ class SocialaccountSocialapp(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'socialaccount_socialapp'
+        db_table = "socialaccount_socialapp"
 
 
 class SocialaccountSocialappSites(models.Model):
@@ -181,8 +185,8 @@ class SocialaccountSocialappSites(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'socialaccount_socialapp_sites'
-        unique_together = (('socialapp', 'site'),)
+        db_table = "socialaccount_socialapp_sites"
+        unique_together = (("socialapp", "site"),)
 
 
 class SocialaccountSocialtoken(models.Model):
@@ -190,12 +194,14 @@ class SocialaccountSocialtoken(models.Model):
     token_secret = models.TextField()
     expires_at = models.DateTimeField(blank=True, null=True)
     account = models.ForeignKey(SocialaccountSocialaccount, models.DO_NOTHING)
-    app = models.ForeignKey(SocialaccountSocialapp, models.DO_NOTHING, blank=True, null=True)
+    app = models.ForeignKey(
+        SocialaccountSocialapp, models.DO_NOTHING, blank=True, null=True
+    )
 
     class Meta:
         managed = False
-        db_table = 'socialaccount_socialtoken'
-        unique_together = (('app', 'account'),)
+        db_table = "socialaccount_socialtoken"
+        unique_together = (("app", "account"),)
 
 
 class TallerCategoriaservicio(models.Model):
@@ -204,17 +210,17 @@ class TallerCategoriaservicio(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'taller_categoriaservicio'
+        db_table = "taller_categoriaservicio"
 
 
 class TallerCita(models.Model):
     fecha = models.DateTimeField()
     motivo = models.TextField()
-    cliente = models.ForeignKey('TallerCliente', models.DO_NOTHING)
+    cliente = models.ForeignKey("TallerCliente", models.DO_NOTHING)
 
     class Meta:
         managed = False
-        db_table = 'taller_cita'
+        db_table = "taller_cita"
 
 
 class TallerCitataller(models.Model):
@@ -222,38 +228,44 @@ class TallerCitataller(models.Model):
     hora = models.TimeField()
     tipo = models.CharField(max_length=20)
     estado = models.CharField(max_length=20)
-    cliente = models.ForeignKey('TallerCliente', models.DO_NOTHING)
-    vehiculo = models.ForeignKey('Vehiculo', models.DO_NOTHING)
+    cliente = models.ForeignKey("TallerCliente", models.DO_NOTHING)
+    vehiculo = models.ForeignKey("Vehiculo", models.DO_NOTHING)
 
     class Meta:
         managed = False
-        db_table = 'taller_citataller'
-
-
-
-
+        db_table = "taller_citataller"
 
 
 class TallerDetalledocumento(models.Model):
     tipo_item = models.CharField(max_length=20)
     nombre_repuesto = models.CharField(max_length=100)
     part_number = models.CharField(max_length=100)
-    precio_unitario = models.DecimalField(max_digits=10, decimal_places=5)  # max_digits and decimal_places have been guessed, as this database handles decimal fields as float
-    precio_compra = models.DecimalField(max_digits=10, decimal_places=5)  # max_digits and decimal_places have been guessed, as this database handles decimal fields as float
-    precio_venta = models.DecimalField(max_digits=10, decimal_places=5)  # max_digits and decimal_places have been guessed, as this database handles decimal fields as float
+    precio_unitario = models.DecimalField(
+        max_digits=10, decimal_places=5
+    )  # max_digits and decimal_places have been guessed, as this database handles decimal fields as float
+    precio_compra = models.DecimalField(
+        max_digits=10, decimal_places=5
+    )  # max_digits and decimal_places have been guessed, as this database handles decimal fields as float
+    precio_venta = models.DecimalField(
+        max_digits=10, decimal_places=5
+    )  # max_digits and decimal_places have been guessed, as this database handles decimal fields as float
     cantidad = models.PositiveIntegerField()
-    subtotal = models.DecimalField(max_digits=10, decimal_places=5)  # max_digits and decimal_places have been guessed, as this database handles decimal fields as float
+    subtotal = models.DecimalField(
+        max_digits=10, decimal_places=5
+    )  # max_digits and decimal_places have been guessed, as this database handles decimal fields as float
     comentario_mecanico = models.TextField(blank=True, null=True)
     imagen_evidencia = models.CharField(max_length=100, blank=True, null=True)
-    documento = models.ForeignKey('Documento', models.DO_NOTHING)
-    repuesto = models.ForeignKey('TallerRepuesto', models.DO_NOTHING, blank=True, null=True)
-    servicio = models.ForeignKey('TallerServicio', models.DO_NOTHING, blank=True, null=True)
+    documento = models.ForeignKey("Documento", models.DO_NOTHING)
+    repuesto = models.ForeignKey(
+        "TallerRepuesto", models.DO_NOTHING, blank=True, null=True
+    )
+    servicio = models.ForeignKey(
+        "TallerServicio", models.DO_NOTHING, blank=True, null=True
+    )
 
     class Meta:
         managed = False
-        db_table = 'taller_detalledocumento'
-
-
+        db_table = "taller_detalledocumento"
 
 
 class TallerMarca(models.Model):
@@ -261,7 +273,7 @@ class TallerMarca(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'taller_marca'
+        db_table = "taller_marca"
 
 
 class TallerModelo(models.Model):
@@ -270,12 +282,8 @@ class TallerModelo(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'taller_modelo'
-
+        db_table = "taller_modelo"
 
     class Meta:
         managed = False
-        db_table = 'taller_suscripcion'
-
-
-
+        db_table = "taller_suscripcion"

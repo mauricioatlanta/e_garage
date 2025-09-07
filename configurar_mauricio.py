@@ -8,17 +8,18 @@ Configurar el sistema con credenciales reales para pruebas:
 - WhatsApp: +56963607348
 """
 import os
+
 import django
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings_sqlite')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings_sqlite")
 django.setup()
 
-from taller.models.notificacion import ConfiguracionNotificacion
-from taller.models.empresa import Empresa
 from taller.models.clientes import Cliente
+from taller.models.empresa import Empresa
+from taller.models.notificacion import ConfiguracionNotificacion
 
 print("🔧 CONFIGURANDO NOTIFICACIONES REALES PARA MAURICIO")
-print("="*60)
+print("=" * 60)
 
 # Seleccionar empresa para configurar (usaremos la primera disponible)
 empresa = Empresa.objects.first()
@@ -32,18 +33,18 @@ print(f"🏢 Configurando empresa: {empresa.nombre_taller}")
 config, created = ConfiguracionNotificacion.objects.get_or_create(
     empresa=empresa,
     defaults={
-        'email_activo': True,
-        'email_smtp_host': 'smtp.gmail.com',
-        'email_smtp_port': 587,
-        'email_use_tls': True,
-        'email_usuario': 'mauricioatlanta@gmail.com',
-        'email_remitente': 'mauricioatlanta@gmail.com',
-        'whatsapp_activo': True,
-        'whatsapp_numero_business': '+56963607348',
-        'notificar_documentos': True,
-        'notificar_suscripcion': True,
-        'notificar_mantenimiento': True
-    }
+        "email_activo": True,
+        "email_smtp_host": "smtp.gmail.com",
+        "email_smtp_port": 587,
+        "email_use_tls": True,
+        "email_usuario": "mauricioatlanta@gmail.com",
+        "email_remitente": "mauricioatlanta@gmail.com",
+        "whatsapp_activo": True,
+        "whatsapp_numero_business": "+56963607348",
+        "notificar_documentos": True,
+        "notificar_suscripcion": True,
+        "notificar_mantenimiento": True,
+    },
 )
 
 if created:
@@ -52,13 +53,13 @@ else:
     print("🔄 Actualizando configuración existente")
     # Actualizar con los nuevos datos
     config.email_activo = True
-    config.email_smtp_host = 'smtp.gmail.com'
+    config.email_smtp_host = "smtp.gmail.com"
     config.email_smtp_port = 587
     config.email_use_tls = True
-    config.email_usuario = 'mauricioatlanta@gmail.com'
-    config.email_remitente = 'mauricioatlanta@gmail.com'
+    config.email_usuario = "mauricioatlanta@gmail.com"
+    config.email_remitente = "mauricioatlanta@gmail.com"
     config.whatsapp_activo = True
-    config.whatsapp_numero_business = '+56963607348'
+    config.whatsapp_numero_business = "+56963607348"
     config.notificar_documentos = True
     config.notificar_suscripcion = True
     config.notificar_mantenimiento = True
@@ -86,15 +87,15 @@ from taller.models.region_ciudad import TallerCiudad
 ciudad = TallerCiudad.objects.first()
 
 cliente, created = Cliente.objects.get_or_create(
-    email='mauricioatlanta@gmail.com',
+    email="mauricioatlanta@gmail.com",
     empresa=empresa,
     defaults={
-        'nombre': 'Mauricio',
-        'apellido': 'Atlanta', 
-        'telefono': '+56963607348',
-        'direccion': 'Dirección de prueba',
-        'ciudad': ciudad
-    }
+        "nombre": "Mauricio",
+        "apellido": "Atlanta",
+        "telefono": "+56963607348",
+        "direccion": "Dirección de prueba",
+        "ciudad": ciudad,
+    },
 )
 
 if created:
@@ -102,7 +103,7 @@ if created:
 else:
     print(f"\n👤 Cliente existente encontrado: {cliente.nombre} {cliente.apellido}")
     # Actualizar datos
-    cliente.telefono = '+56963607348'
+    cliente.telefono = "+56963607348"
     cliente.save()
 
 print(f"   Email: {cliente.email}")

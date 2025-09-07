@@ -16,10 +16,11 @@
       <p class="mt-2 text-gray-400 max-w-2xl text-sm md:text-base">Listado inteligente con búsqueda dinámica, paginación y acciones rápidas.</p>
     </div>
     <div class="md:ml-auto flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-      <form method="get" class="flex-1 relative group">
-        <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Buscar por nombre o apellido..." class="w-full bg-[#0f172a] border border-cyan-500/40 focus:border-cyan-400/70 rounded-xl px-5 py-3 text-cyan-100 placeholder-gray-500 shadow-lg focus:ring-2 focus:ring-cyan-400/40 transition outline-none font-mono" />
-        <button type="submit" class="absolute top-1/2 -translate-y-1/2 right-3 text-cyan-300 hover:text-lime-300 transition"><i class="fas fa-search"></i></button>
-      </form>
+      <div class="flex-1 relative group">
+        <input type="text" id="search-input" name="q" value="{{ request.GET.q }}" placeholder="Buscar por nombre o apellido..." class="w-full bg-[#0f172a] border border-cyan-500/40 focus:border-cyan-400/70 rounded-xl px-5 py-3 text-white placeholder-gray-400 shadow-lg focus:ring-2 focus:ring-cyan-400/40 transition outline-none" style="color: white !important; background-color: #0f172a !important;" />
+        <button type="button" id="search-btn" class="absolute top-1/2 -translate-y-1/2 right-3 text-cyan-300 hover:text-lime-300 transition"><i class="fas fa-search"></i></button>
+        <div id="search-results" class="absolute top-full left-0 right-0 mt-1 bg-[#0f172a] border border-cyan-500/40 rounded-xl shadow-lg z-50 hidden max-h-60 overflow-y-auto"></div>
+      </div>
       <a href="{% url 'taller:clientes:crear_cliente' %}" class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 via-lime-500 to-fuchsia-500 text-[#0d1117] font-bold shadow-lg hover:shadow-cyan-500/40 text-sm md:text-base tracking-wide hover:scale-[1.03] transition active:scale-95"><span>➕</span><span>Nuevo Cliente</span></a>
     </div>
   </div>
@@ -57,7 +58,7 @@
                   <a href="{% url 'taller:clientes:editar_cliente' cliente.pk %}" class="text-cyan-300 hover:text-lime-300 transition" title="Editar">
                     <i class="fas fa-edit"></i>
                   </a>
-                  <a href="{% url 'taller:clientes:eliminar_cliente' cliente.pk %}" class="text-red-400 hover:text-red-300 transition" title="Eliminar" onclick="return confirmarEliminacion('{{ cliente.nombre }} {{ cliente.apellido }}');">
+                  <a href="{% url 'taller:clientes:eliminar_cliente' cliente_id=cliente.pk %}" class="text-red-400 hover:text-red-300 transition" title="Eliminar" >
                     <i class="fas fa-trash"></i>
                   </a>
                 </div>
@@ -133,5 +134,90 @@
 function confirmarEliminacion(nombre) {
   return confirm('¿Estás seguro de que deseas eliminar al cliente "' + nombre + '"? Esta acción no se puede deshacer.');
 }
+
+// Real-time search functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const searchInput = document.getElementById('search-input');
+  const searchResults = document.getElementById('search-results');
+  const searchBtn = document.getElementById('search-btn');
+  let searchTimeout;
+
+  // Real-time search as user types
+  searchInput.addEventListener('input', function() {
+    const query = this.value.trim();
+    
+    // Clear previous timeout
+    clearTimeout(searchTimeout);
+    
+    if (query.length < 2) {
+      searchResults.classList.add('hidden');
+      return;
+    }
+
+    // Debounce search requests
+    searchTimeout = setTimeout(() => {
+      performSearch(query);
+    }, 300);
+  });
+
+  // Search button click
+  searchBtn.addEventListener('click', function() {
+    const query = searchInput.value.trim();
+    if (query) {
+      // Redirect to filtered results
+      window.location.href = '?q=' + encodeURIComponent(query);
+    }
+  });
+
+  // Enter key in search input
+  searchInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const query = this.value.trim();
+      if (query) {
+        window.location.href = '?q=' + encodeURIComponent(query);
+      }
+    }
+  });
+
+  // Hide results when clicking outside
+  document.addEventListener('click', function(e) {
+    if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+      searchResults.classList.add('hidden');
+    }
+  });
+
+  function performSearch(query) {
+    fetch(`{% url 'taller:clientes:ajax_buscar_clientes' %}?q=${encodeURIComponent(query)}`)
+      .then(response => response.json())
+      .then(data => {
+        displaySearchResults(data);
+      })
+      .catch(error => {
+        console.error('Error en búsqueda:', error);
+        searchResults.classList.add('hidden');
+      });
+  }
+
+  function displaySearchResults(clientes) {
+    if (clientes.length === 0) {
+      searchResults.innerHTML = '<div class="p-3 text-gray-400 text-center">No se encontraron clientes</div>';
+    } else {
+      searchResults.innerHTML = clientes.map(cliente => `
+        <div class="p-3 hover:bg-cyan-500/10 cursor-pointer border-b border-cyan-900/20 last:border-b-0" onclick="selectCliente(${cliente.id})">
+          <div class="font-semibold text-cyan-100">${cliente.nombre} ${cliente.apellido}</div>
+          <div class="text-sm text-gray-400">${cliente.email || 'Sin email'}</div>
+          <div class="text-xs text-gray-500">${cliente.telefono || 'Sin teléfono'}</div>
+        </div>
+      `).join('');
+    }
+    searchResults.classList.remove('hidden');
+  }
+
+  function selectCliente(clienteId) {
+    // Redirect to client detail page
+    window.location.href = `{% url 'taller:clientes:ver_cliente' 0 %}`.replace('0', clienteId);
+  }
+});
 </script>
 {% endblock %}

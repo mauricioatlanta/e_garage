@@ -1349,12 +1349,12 @@
         </div>
         <div class="metric-card floating" style="animation-delay: 0.5s;">
             <div class="metric-icon">💰</div>
-            <div class="metric-value">{{ total_generado|formatear_pesos }}</div>
+            <div class="metric-value">{{ total_generado|currency_format:request.user.empresa.pais|default:'CL' }}</div>
             <div class="metric-label">Total Generado</div>
         </div>
         <div class="metric-card floating" style="animation-delay: 1s;">
             <div class="metric-icon">📊</div>
-            <div class="metric-value">{{ promedio_por_documento|formatear_pesos }}</div>
+            <div class="metric-value">{{ promedio_por_documento|currency_format:request.user.empresa.pais|default:'CL' }}</div>
             <div class="metric-label">Promedio por Documento</div>
         </div>
         <div class="metric-card floating" style="animation-delay: 1.5s;">
@@ -1374,7 +1374,7 @@
             <h4>🔮 Predicciones</h4>
             {% for prediccion in ia_insights.predicciones %}
             <div class="insight-item">
-                📈 <strong>{{ prediccion.mecanico }}</strong>: Proyección mensual de <strong>{{ prediccion.proyeccion_mensual|formatear_pesos }}</strong> 
+                📈 <strong>{{ prediccion.mecanico }}</strong>: Proyección mensual de <strong>{{ prediccion.proyeccion_mensual|currency_format:request.user.empresa.pais|default:'CL' }}</strong> 
                 ({{ prediccion.docs_proyectados }} documentos)
             </div>
             {% endfor %}
@@ -1466,8 +1466,8 @@
                         <td><strong>{{ data.mecanico.nombre }}</strong></td>
                         <td>{{ data.total_documentos }}</td>
                         <td>{{ data.total_servicios }}</td>
-                        <td><strong>{{ data.total_generado|formatear_pesos }}</strong></td>
-                        <td>{{ data.promedio_por_documento|formatear_pesos }}</td>
+                        <td><strong>{{ data.total_generado|currency_format:request.user.empresa.pais|default:'CL' }}</strong></td>
+                        <td>{{ data.promedio_por_documento|currency_format:request.user.empresa.pais|default:'CL' }}</td>
                         <td>
                             {% for servicio in data.servicios_top %}
                                 <span class="inline-block bg-blue-900 text-blue-300 px-2 py-1 rounded text-xs mr-1 mb-1">
@@ -1522,7 +1522,7 @@
                 </div>
                 <div class="metric-capsule glow">
                     <span class="metric-icon">💎</span>
-                    <span class="metric-value">{{ total_servicios_tecnico|formatear_pesos }} GENERADOS</span>
+                    <span class="metric-value">{{ total_servicios_tecnico|currency_format:request.user.empresa.pais|default:'CL' }} GENERADOS</span>
                 </div>
             </div>
         </div>
@@ -1585,7 +1585,7 @@
                             <div class="servicio-name">{{ servicio.nombre|truncatechars:30 }}</div>
                         </div>
                         <div class="data-cell valor-info">
-                            <div class="valor-amount">{{ servicio.precio_total|formatear_pesos }}</div>
+                            <div class="valor-amount">{{ servicio.precio_total|currency_format:request.user.empresa.pais|default:'CL' }}</div>
                         </div>
                         <div class="data-cell access-controls">
                             <a href="{% url 'documentos:ver_documento' servicio.documento.id %}" class="access-btn" target="_blank">
@@ -1611,11 +1611,11 @@
                         </div>
                         <div class="calc-section">
                             <div class="calc-label">💰 TOTAL BRUTO</div>
-                            <div class="calc-value mega">{{ total_servicios_tecnico|formatear_pesos }}</div>
+                            <div class="calc-value mega">{{ total_servicios_tecnico|currency_format:request.user.empresa.pais|default:'CL' }}</div>
                         </div>
                         <div class="calc-section">
                             <div class="calc-label">📈 PROMEDIO/DÍA</div>
-                            <div class="calc-value">{{ promedio_diario_tecnico|floatformat:0|add:"0"|formatear_pesos }}</div>
+                            <div class="calc-value">{{ promedio_diario_tecnico|floatformat:0|add:"0"|currency_format:request.user.empresa.pais|default:'CL' }}</div>
                         </div>
                         <div class="calc-section">
                             <div class="calc-label">⚡ EFICIENCIA</div>
@@ -1653,7 +1653,7 @@
                         <div class="analytics-card">
                             <div class="card-icon">💎</div>
                             <div class="card-label">MAYOR VALOR</div>
-                            <div class="card-value">{{ servicio_mas_valioso.total|formatear_pesos }}</div>
+                            <div class="card-value">{{ servicio_mas_valioso.total|currency_format:request.user.empresa.pais|default:'CL' }}</div>
                             <div class="card-sub">Rentabilidad máxima</div>
                         </div>
                         {% endif %}
@@ -1698,7 +1698,7 @@
                         <td><strong>#{{ forloop.counter }}</strong></td>
                         <td>{{ servicio.nombre }}</td>
                         <td>{{ servicio.cantidad }}</td>
-                        <td><strong>{{ servicio.total_ingresos|formatear_pesos }}</strong></td>
+                        <td><strong>{{ servicio.total_ingresos|currency_format:request.user.empresa.pais|default:'CL' }}</strong></td>
                     </tr>
                     {% endfor %}
                 </tbody>

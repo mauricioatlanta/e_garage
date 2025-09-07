@@ -1,0 +1,373 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+<style>
+/* Estilos básicos para el formulario */
+.form-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #1a1a2e;
+  border-radius: 10px;
+  color: white;
+}
+
+.form-field {
+  margin-bottom: 1rem;
+}
+
+.form-field label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #00ffe7;
+  font-weight: bold;
+}
+
+.form-field input, .form-field select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #00ffe7;
+  border-radius: 5px;
+  background: #0a0a0a;
+  color: white;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #00ffe7 0%, #1e90ff 100%);
+  color: #0a0a0a;
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-secondary {
+  background: #666;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.flex-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* Modal styles */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal.show {
+  display: flex;
+}
+
+.modal-content {
+  background: #1a1a2e;
+  padding: 2rem;
+  border-radius: 10px;
+  border: 2px solid #00ffe7;
+  max-width: 400px;
+  width: 90%;
+}
+
+.error {
+  color: #ff4444;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+</style>
+
+<div class="form-container">
+  <h1 style="color: #00ffe7; text-align: center; margin-bottom: 2rem;">
+    🚀 CREAR CLIENTE - PAÍS: {{ pais_usuario|default:"N/A" }}
+  </h1>
+  
+  <form method="post">
+    {% csrf_token %}
+    
+    {% if form.errors %}
+      <div style="background: #442222; padding: 1rem; border-radius: 5px; margin-bottom: 2rem;">
+        <h3 style="color: #ff4444;">Errores en el formulario:</h3>
+        {% for field, errors in form.errors.items %}
+          <div>
+            <strong>{{ field }}:</strong>
+            {% for error in errors %}
+              <div style="color: #ff6666;">• {{ error }}</div>
+            {% endfor %}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+      <!-- Nombre -->
+      <div class="form-field">
+        <label for="id_nombre">👤 Nombre:</label>
+        {{ form.nombre|add_class:'form-control' }}
+      </div>
+      
+      <!-- Apellido -->
+      <div class="form-field">
+        <label for="id_apellido">👥 Apellido:</label>
+        {{ form.apellido|add_class:'form-control' }}
+      </div>
+      
+      <!-- Email -->
+      <div class="form-field">
+        <label for="id_email">📧 Correo electrónico:</label>
+        {{ form.email|add_class:'form-control' }}
+      </div>
+      
+      <!-- Teléfono -->
+      <div class="form-field">
+        <label for="id_telefono">📱 Teléfono:</label>
+        {{ form.telefono|add_class:'form-control' }}
+      </div>
+    </div>
+    
+    <!-- Dirección -->
+    <div class="form-field">
+      <label for="id_direccion">🏠 Dirección:</label>
+      {{ form.direccion|add_class:'form-control' }}
+    </div>
+    
+    {% if pais_usuario == 'US' %}
+      <!-- Estados Unidos -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+        <div class="form-field">
+          <label for="id_estado_usa">🗺️ State:</label>
+          {{ form.estado_usa|add_class:'form-control' }}
+        </div>
+        <div class="form-field">
+          <label for="id_ciudad_usa">🏙️ City:</label>
+          {{ form.ciudad_usa|add_class:'form-control' }}
+        </div>
+        <div class="form-field">
+          <label for="id_zipcode">📮 Zip Code:</label>
+          {{ form.zipcode|add_class:'form-control' }}
+        </div>
+      </div>
+    {% else %}
+      <!-- Chile -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="form-field">
+          <label for="id_region">🗺️ Región:</label>
+          {{ form.region|add_class:'form-control' }}
+        </div>
+        <div class="form-field">
+          <label for="id_ciudad">🏙️ Ciudad:</label>
+          <div class="flex-row">
+            {{ form.ciudad|add_class:'form-control' }}
+            <button type="button" id="btn-agregar-ciudad" class="btn-secondary">
+              ➕ Nueva
+            </button>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+    
+    <div style="text-align: center; margin-top: 2rem;">
+      <button type="submit" class="btn-primary">
+        🚀 GUARDAR CLIENTE
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- Modal para agregar ciudad -->
+<div id="modal-agregar-ciudad" class="modal">
+  <div class="modal-content">
+    <h2 style="color: #00ffe7; margin-bottom: 1rem;">Agregar Nueva Ciudad</h2>
+    <form id="form-nueva-ciudad">
+      <div class="form-field">
+        <label for="input-nombre-ciudad">Nombre de la ciudad:</label>
+        <input type="text" id="input-nombre-ciudad" maxlength="100" required>
+      </div>
+      <div id="error-ciudad" class="error"></div>
+      <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem;">
+        <button type="button" id="cancelar-ciudad" class="btn-secondary">Cancelar</button>
+        <button type="submit" class="btn-primary">Agregar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Elementos
+  const regionSelect = document.getElementById('id_region');
+  const ciudadSelect = document.getElementById('id_ciudad');
+  const btnAgregarCiudad = document.getElementById('btn-agregar-ciudad');
+  const modal = document.getElementById('modal-agregar-ciudad');
+  const formNuevaCiudad = document.getElementById('form-nueva-ciudad');
+  const inputNombreCiudad = document.getElementById('input-nombre-ciudad');
+  const errorCiudad = document.getElementById('error-ciudad');
+  const cancelarCiudad = document.getElementById('cancelar-ciudad');
+
+  // Solo para Chile
+  if (regionSelect && ciudadSelect) {
+    
+    // Función para cargar ciudades
+    function cargarCiudades(regionId, selectedCiudadId = null) {
+      console.log('🌍 Cargando ciudades para región:', regionId);
+      
+      ciudadSelect.innerHTML = '<option value="">⏳ Cargando ciudades...</option>';
+      ciudadSelect.disabled = true;
+      
+      if (regionId) {
+        fetch(`{% url 'taller:clientes:obtener_ciudades' %}?region_id=${regionId}`)
+          .then(response => response.json())
+          .then(data => {
+            console.log('🏙️ Ciudades recibidas:', data);
+            ciudadSelect.innerHTML = '<option value="">--- Seleccionar Ciudad ---</option>';
+            
+            if (data.length === 0) {
+              ciudadSelect.innerHTML = '<option value="">❌ No hay ciudades disponibles</option>';
+            } else {
+              data.forEach(function(ciudad) {
+                const option = document.createElement('option');
+                option.value = ciudad.id;
+                option.textContent = ciudad.nombre;
+                if (selectedCiudadId && ciudad.id == selectedCiudadId) {
+                  option.selected = true;
+                }
+                ciudadSelect.appendChild(option);
+              });
+            }
+            ciudadSelect.disabled = false;
+          })
+          .catch(error => {
+            console.error('❌ Error al cargar ciudades:', error);
+            ciudadSelect.innerHTML = '<option value="">❌ Error al cargar ciudades</option>';
+            ciudadSelect.disabled = false;
+          });
+      } else {
+        ciudadSelect.innerHTML = '<option value="">--- Primero selecciona una región ---</option>';
+        ciudadSelect.disabled = false;
+      }
+    }
+
+    // Cargar ciudades cuando cambie la región
+    regionSelect.addEventListener('change', function() {
+      cargarCiudades(this.value);
+      // Habilitar/deshabilitar botón de agregar ciudad
+      if (btnAgregarCiudad) {
+        btnAgregarCiudad.disabled = !this.value;
+      }
+    });
+
+    // Cargar ciudades si ya hay una región seleccionada
+    if (regionSelect.value) {
+      cargarCiudades(regionSelect.value, ciudadSelect.getAttribute('data-selected'));
+    }
+
+    // Habilitar/deshabilitar botón según región
+    if (btnAgregarCiudad) {
+      btnAgregarCiudad.disabled = !regionSelect.value;
+    }
+  }
+
+  // Lógica del modal
+  if (btnAgregarCiudad) {
+    btnAgregarCiudad.addEventListener('click', function() {
+      if (!regionSelect.value) {
+        alert('Primero selecciona una región.');
+        return;
+      }
+      inputNombreCiudad.value = '';
+      errorCiudad.textContent = '';
+      modal.classList.add('show');
+      inputNombreCiudad.focus();
+    });
+  }
+
+  if (cancelarCiudad) {
+    cancelarCiudad.addEventListener('click', function() {
+      modal.classList.remove('show');
+    });
+  }
+
+  // Cerrar modal al hacer clic fuera
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) {
+      modal.classList.remove('show');
+    }
+  });
+
+  // Enviar formulario de nueva ciudad
+  if (formNuevaCiudad) {
+    formNuevaCiudad.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      errorCiudad.textContent = '';
+      const nombre = inputNombreCiudad.value.trim();
+      const regionId = regionSelect.value;
+      
+      if (!nombre) {
+        errorCiudad.textContent = 'El nombre de la ciudad es requerido.';
+        return;
+      }
+      
+      if (!regionId) {
+        errorCiudad.textContent = 'Primero selecciona una región.';
+        return;
+      }
+
+      // Enviar petición AJAX
+      fetch("{% url 'taller:clientes:agregar_ciudad' %}", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({
+          nombre: nombre,
+          region_id: regionId
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('📝 Respuesta del servidor:', data);
+        
+        if (data.success) {
+          // Agregar nueva ciudad al select
+          const option = document.createElement('option');
+          option.value = data.ciudad.id;
+          option.textContent = data.ciudad.nombre;
+          option.selected = true;
+          ciudadSelect.appendChild(option);
+          ciudadSelect.value = data.ciudad.id;
+          
+          // Cerrar modal
+          modal.classList.remove('show');
+          
+          console.log('✅ Ciudad agregada exitosamente');
+        } else {
+          errorCiudad.textContent = data.error || 'Error al agregar ciudad.';
+        }
+      })
+      .catch(error => {
+        console.error('❌ Error de red:', error);
+        errorCiudad.textContent = 'Error de red o del servidor.';
+      });
+    });
+  }
+});
+</script>
+
+{% endblock %}

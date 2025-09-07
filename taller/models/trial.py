@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 
+
 class TrialRegistro(models.Model):
     nombre = models.CharField(max_length=100)
     email = models.EmailField(unique=True)

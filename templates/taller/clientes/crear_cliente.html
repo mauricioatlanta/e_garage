@@ -154,6 +154,49 @@ textarea.cyber-input::placeholder {
   font-style: italic;
 }
 
+/* Estilos específicos para el selector de colores */
+#id_color {
+  background: linear-gradient(135deg, rgba(26, 35, 53, 0.9) 0%, rgba(15, 20, 35, 0.9) 100%) !important;
+  color: #e0f2f1 !important;
+  border: 2px solid rgba(0, 255, 231, 0.6) !important;
+  border-radius: 0.8rem !important;
+  font-family: 'Share Tech Mono', 'Orbitron', monospace !important;
+  font-size: 1.1rem !important;
+  padding: 0.8rem 1rem !important;
+  box-shadow: 
+    0 0 15px rgba(0, 255, 231, 0.3),
+    inset 0 0 10px rgba(0, 255, 231, 0.1) !important;
+  transition: all 0.3s ease !important;
+  width: 100% !important;
+}
+
+#id_color:focus {
+  outline: none !important;
+  border-color: #00ffe7 !important;
+  box-shadow: 
+    0 0 25px rgba(0, 255, 231, 0.5),
+    inset 0 0 15px rgba(0, 255, 231, 0.2) !important;
+  transform: scale(1.02);
+}
+
+#id_color option {
+  background: #1a2332 !important;
+  color: #e0f2f1 !important;
+  padding: 0.5rem !important;
+  border: none !important;
+}
+
+/* Preview de colores en el selector */
+.color-preview {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin-right: 8px;
+  border: 2px solid rgba(0, 255, 231, 0.6);
+  vertical-align: middle;
+}
+
 /* Enhanced buttons */
 .cyber-btn {
   background: linear-gradient(135deg, #00ffe7 0%, #1e90ff 50%, #8a2be2 100%);
@@ -363,6 +406,19 @@ textarea.cyber-input::placeholder {
           {{ form.ciudad|add_class:'cyber-input' }}
         </div>
       {% endif %}
+      
+      <!-- Color de identificación -->
+      <div class="field-container">
+        <label class="cyber-label" for="id_color">🎨 Color de identificación:</label>
+        {{ form.color|add_class:'cyber-input' }}
+        <small class="text-cyan-300 text-sm mt-1">
+          {% if form.pais == 'US' %}
+            Select a color to identify this client/subscriber
+          {% else %}
+            Selecciona un color para identificar a este cliente/subscriptor
+          {% endif %}
+        </small>
+      </div>
     </div>
     
     <div class="text-center pt-8">
@@ -494,6 +550,46 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   {% endif %}
+  
+  // Handle color preview
+  const colorSelect = document.getElementById('id_color');
+  if(colorSelect) {
+    // Crear preview del color seleccionado
+    const colorPreview = document.createElement('div');
+    colorPreview.id = 'color-preview';
+    colorPreview.style.cssText = `
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      margin-left: 10px;
+      border: 2px solid rgba(0, 255, 231, 0.6);
+      vertical-align: middle;
+      background: #333;
+    `;
+    
+    // Insertar preview después del selector
+    colorSelect.parentNode.insertBefore(colorPreview, colorSelect.nextSibling);
+    
+    // Función para actualizar preview
+    function updateColorPreview() {
+      const selectedOption = colorSelect.options[colorSelect.selectedIndex];
+      if(selectedOption && selectedOption.value) {
+        // Obtener el código de color del texto de la opción o de un atributo data
+        const colorCode = selectedOption.getAttribute('data-color') || '#333';
+        colorPreview.style.background = colorCode;
+        colorPreview.style.display = 'inline-block';
+      } else {
+        colorPreview.style.display = 'none';
+      }
+    }
+    
+    // Actualizar preview al cambiar selección
+    colorSelect.addEventListener('change', updateColorPreview);
+    
+    // Actualizar preview inicial
+    updateColorPreview();
+  }
 });
 
 function createParticles() {

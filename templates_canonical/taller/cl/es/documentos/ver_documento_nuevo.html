@@ -306,8 +306,8 @@
           <td><strong>{{ repuesto.codigo }}</strong></td>
           <td>{{ repuesto.nombre }}</td>
           <td class="cantidad">{{ repuesto.cantidad }}</td>
-          <td class="precio">${{ repuesto.precio|floatformat:0 }}</td>
-          <td class="precio">${{ repuesto.total|floatformat:0 }}</td>
+          <td class="precio" data-valor="{{ repuesto.precio }}">${{ repuesto.precio|floatformat:0 }}</td>
+          <td class="precio" data-valor="{{ repuesto.total }}">${{ repuesto.total|floatformat:0 }}</td>
         </tr>
         {% endfor %}
       </tbody>
@@ -402,6 +402,15 @@
       <span id="display-subtotal" class="precio" data-money="{{ subtotal }}"></span>
     </div>
     <div class="total-row">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+          <input type="checkbox" id="toggle-iva" {% if documento.incluir_iva %}checked{% endif %} 
+                 style="accent-color: #00f2fe;" onchange="actualizarTotales()">
+          <span>{% if company_country == 'US' %}🇺🇸 Aplicar Sales Tax{% else %}📋 Aplicar IVA (19%){% endif %}</span>
+        </label>
+      </div>
+    </div>
+    <div class="total-row">
       <span>{% if company_country == 'US' %}🇺🇸 Sales Tax:{% else %}📋 IVA (19%):{% endif %}</span>
       <span id="display-tax" class="precio" data-money="{{ iva }}"></span>
     </div>
@@ -452,7 +461,9 @@ console.log('ID:', {{ documento.id }});
 console.log('Número:', '{{ documento.numero_documento }}');
 console.log('Repuestos encontrados:', {{ repuestos|length }});
 console.log('Servicios encontrados:', {{ servicios|length }});
-console.log('Total general:', {{ total|floatformat:0 }});
+console.log('Subtotal repuestos:', '{{ subtotal_repuestos|default:0 }}');
+console.log('IVA:', '{{ iva|default:0 }}');
+console.log('Total general:', '{{ total|default:0 }}');
 
 {% if repuestos %}
 console.log('=== REPUESTOS ===');
@@ -468,17 +479,70 @@ console.log('- {{ servicio.nombre }}: ${{ servicio.precio }}');
 {% endfor %}
 {% endif %}
 
+// Función para formatear moneda chilena (sin decimales, con punto separador)
+function formatearPesosChilenos(valor) {
+  if (!valor || isNaN(valor)) return '$0';
+  const numero = Math.round(parseFloat(valor));
+  return '$' + numero.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
 // Formateo de monedas según país
 document.addEventListener('DOMContentLoaded', function () {
-  const root = document.getElementById('doc-root');
-  const locale = root?.dataset.locale || 'es-CL';
-  const currency = root?.dataset.currency || 'CLP';
-  const fmt = new Intl.NumberFormat(locale, { style: 'currency', currency });
-
-  document.querySelectorAll('[data-money]').forEach(el => {
+  console.log('=== INICIANDO FORMATEO ===');
+  
+  // Formatear todos los elementos con data-money (totales)
+  const elementsDataMoney = document.querySelectorAll('[data-money]');
+  console.log('Elementos con data-money encontrados:', elementsDataMoney.length);
+  
+  elementsDataMoney.forEach(el => {
     const raw = Number(el.getAttribute('data-money') || 0);
-    el.textContent = fmt.format(isNaN(raw) ? 0 : raw);
+    console.log('Elemento data-money:', el.id, 'Valor:', raw);
+    el.textContent = formatearPesosChilenos(raw);
   });
+
+  // Formatear todos los elementos con data-valor (precios individuales)
+  const elementsDataValor = document.querySelectorAll('[data-valor]');
+  console.log('Elementos con data-valor encontrados:', elementsDataValor.length);
+  
+  elementsDataValor.forEach(el => {
+    const valor = el.getAttribute('data-valor');
+    console.log('Elemento data-valor:', valor, 'Formateado:', formatearPesosChilenos(valor));
+    if (valor && !isNaN(valor)) {
+      el.textContent = formatearPesosChilenos(valor);
+    }
+  });
+  
+  console.log('=== FORMATEO COMPLETADO ===');
 });
+
+// Función para actualizar totales cuando se cambia el IVA
+function actualizarTotales() {
+  const subtotalElement = document.getElementById('display-subtotal');
+  const ivaElement = document.getElementById('display-tax');
+  const totalElement = document.getElementById('display-total');
+  const toggleIva = document.getElementById('toggle-iva');
+  
+  if (!subtotalElement || !ivaElement || !totalElement) return;
+  
+  // Obtener subtotal desde el atributo data-money
+  const subtotal = Number(subtotalElement.getAttribute('data-money') || 0);
+  
+  // Calcular IVA (19% para Chile)
+  let iva = 0;
+  if (toggleIva.checked) {
+    iva = Math.round(subtotal * 0.19);
+  }
+  
+  // Calcular total
+  const total = subtotal + iva;
+  
+  // Actualizar elementos
+  ivaElement.textContent = formatearPesosChilenos(iva);
+  totalElement.textContent = formatearPesosChilenos(total);
+  
+  // Actualizar atributos data-money para mantener consistencia
+  ivaElement.setAttribute('data-money', iva);
+  totalElement.setAttribute('data-money', total);
+}
 </script>
 {% endblock %}

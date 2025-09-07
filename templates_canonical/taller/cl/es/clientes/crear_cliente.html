@@ -174,6 +174,38 @@ textarea.cyber-input::placeholder {
   overflow: hidden;
 }
 
+/* Botón pequeño para agregar ciudad */
+.cyber-btn-small {
+  background: linear-gradient(135deg, #00ffe7 0%, #1e90ff 100%);
+  color: #0a0a0a;
+  font-family: 'Orbitron', 'Share Tech Mono', Arial, sans-serif;
+  font-size: 0.9rem;
+  font-weight: bold;
+  border-radius: 0.6rem;
+  box-shadow: 0 0 15px rgba(0, 255, 231, 0.4);
+  padding: 0.5rem 1rem;
+  transition: all 0.3s ease;
+  border: none;
+  min-width: auto;
+}
+
+.cyber-btn-small:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(0, 255, 231, 0.6);
+}
+
+.cyber-btn-small:disabled {
+  background: #666;
+  color: #999;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.cyber-btn-small:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
 .cyber-btn::before {
   content: '';
   position: absolute;
@@ -277,10 +309,10 @@ textarea.cyber-input::placeholder {
 <div class="max-w-5xl mx-auto cyber-form">
   <!-- Country Info -->
   <div class="debug-info">
-    <span style="color: rgba(255, 255, 255, 0.5);">[DEBUG pais: {{ form.pais }}]</span>
-    {% if form.pais == 'US' %}
+    <span style="color: rgba(255, 255, 255, 0.5);">[DEBUG pais: {{ pais_usuario|default:"N/A" }}]</span>
+    {% if pais_usuario == 'US' %}
       <img src="https://flagcdn.com/us.svg" alt="USA" class="country-flag inline ml-2">
-    {% elif form.pais == 'CL' %}
+    {% elif pais_usuario == 'CL' %}
       <img src="https://flagcdn.com/cl.svg" alt="Chile" class="country-flag inline ml-2">
     {% endif %}
   </div>
@@ -357,7 +389,33 @@ textarea.cyber-input::placeholder {
         </div>
         <div class="field-container">
           <label class="cyber-label" for="id_ciudad">🏙️ Ciudad:</label>
-          {{ form.ciudad|add_class:'cyber-input' }}
+          <div class="flex items-center gap-2">
+            {{ form.ciudad|add_class:'cyber-input flex-grow' }}
+            <button type="button" id="btn-agregar-ciudad" class="cyber-btn-small">
+              ➕ Nueva
+            </button>
+          </div>
+        </div>
+
+        <!-- Modal para agregar ciudad -->
+        <div id="modal-agregar-ciudad" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 hidden">
+          <div class="cyber-form w-full max-w-md relative border-2 border-cyan-400">
+            <button type="button" id="cerrar-modal-ciudad" class="absolute top-2 right-3 text-cyan-300 text-2xl font-bold hover:text-cyan-100">&times;</button>
+            <h2 class="cyber-title text-2xl mb-4">Agregar Nueva Ciudad</h2>
+            <form id="form-nueva-ciudad" class="space-y-4">
+              <div>
+                <label class="cyber-label" for="input-nombre-ciudad">Nombre de la ciudad:</label>
+                <input type="text" id="input-nombre-ciudad" class="cyber-input w-full" maxlength="100" required autocomplete="off">
+              </div>
+              <div id="error-ciudad" class="text-red-400 text-sm font-bold"></div>
+              <div class="flex justify-end gap-2 pt-2">
+                <button type="button" id="cancelar-ciudad" class="cyber-btn" style="background: #666; color: #ccc;">Cancelar</button>
+                <button type="submit" class="cyber-btn">Agregar</button>
+              </div>
+            </form>
+          </div>
+        </div>
+          </div>
         </div>
       {% endif %}
     </div>
@@ -379,6 +437,13 @@ document.addEventListener('DOMContentLoaded', function() {
   // Handle Chile regions/cities
   const regionSelect = document.getElementById('id_region');
   const ciudadSelect = document.getElementById('id_ciudad');
+  const btnAgregarCiudad = document.getElementById('btn-agregar-ciudad');
+  const modalCiudad = document.getElementById('modal-agregar-ciudad');
+  const cerrarModalCiudad = document.getElementById('cerrar-modal-ciudad');
+  const cancelarCiudad = document.getElementById('cancelar-ciudad');
+  const formNuevaCiudad = document.getElementById('form-nueva-ciudad');
+  const inputNombreCiudad = document.getElementById('input-nombre-ciudad');
+  const errorCiudad = document.getElementById('error-ciudad');
   
   if(regionSelect && ciudadSelect) {
     function cargarCiudades(regionId, selectedCiudadId = null) {
@@ -389,7 +454,7 @@ document.addEventListener('DOMContentLoaded', function() {
       ciudadSelect.disabled = true;
       
       if(regionId) {
-        fetch(`{% url 'clientes:obtener_ciudades' %}?region_id=${regionId}`)
+        fetch(`{% url 'taller:clientes:obtener_ciudades' %}?region_id=${regionId}`)
           .then(response => {
             if (!response.ok) {
               throw new Error('Network response was not ok');
@@ -435,10 +500,88 @@ document.addEventListener('DOMContentLoaded', function() {
     regionSelect.addEventListener('change', function() {
       cargarCiudades(this.value);
     });
+    // Al cambiar región, deshabilitar botón de agregar ciudad si no hay región
+    regionSelect.addEventListener('change', function() {
+      if (btnAgregarCiudad) {
+        btnAgregarCiudad.disabled = !this.value;
+      }
+    });
+    if (btnAgregarCiudad) {
+      btnAgregarCiudad.disabled = !regionSelect.value;
+    }
+  }
+
+  // Lógica para mostrar/ocultar modal de ciudad
+  if (btnAgregarCiudad && modalCiudad) {
+    btnAgregarCiudad.addEventListener('click', function() {
+      if (!regionSelect.value) {
+        alert('Primero selecciona una región.');
+        return;
+      }
+      inputNombreCiudad.value = '';
+      errorCiudad.textContent = '';
+      modalCiudad.classList.remove('hidden');
+      inputNombreCiudad.focus();
+    });
+  }
+  if (cerrarModalCiudad) {
+    cerrarModalCiudad.addEventListener('click', function() {
+      modalCiudad.classList.add('hidden');
+    });
+  }
+  if (cancelarCiudad) {
+    cancelarCiudad.addEventListener('click', function(e) {
+      e.preventDefault();
+      modalCiudad.classList.add('hidden');
+    });
+  }
+
+  // Enviar AJAX para agregar ciudad
+  if (formNuevaCiudad) {
+    formNuevaCiudad.addEventListener('submit', function(e) {
+      e.preventDefault();
+      errorCiudad.textContent = '';
+      const nombre = inputNombreCiudad.value.trim();
+      const regionId = regionSelect.value;
+      if (!nombre) {
+        errorCiudad.textContent = 'El nombre de la ciudad es requerido.';
+        return;
+      }
+      if (!regionId) {
+        errorCiudad.textContent = 'Primero selecciona una región.';
+        return;
+      }
+      fetch("{% url 'taller:clientes:agregar_ciudad' %}", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({ nombre: nombre, region_id: regionId })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Agregar la nueva ciudad al select y seleccionarla
+          const option = document.createElement('option');
+          option.value = data.ciudad.id;
+          option.textContent = data.ciudad.nombre;
+          option.selected = true;
+          ciudadSelect.appendChild(option);
+          ciudadSelect.value = data.ciudad.id;
+          modalCiudad.classList.add('hidden');
+        } else {
+          errorCiudad.textContent = data.error || 'Error al agregar ciudad.';
+        }
+      })
+      .catch(() => {
+        errorCiudad.textContent = 'Error de red o del servidor.';
+      });
+    });
   }
   
   // Handle USA states/cities
-  {% if form.pais == 'US' %}
+  {% if pais_usuario == 'US' %}
   const estadoSelect = document.getElementById('id_estado_usa');
   const ciudadUsaSelect = document.getElementById('id_ciudad_usa');
   
@@ -693,5 +836,121 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
+
+// Modal para agregar nueva ciudad
+document.addEventListener('DOMContentLoaded', function() {
+  const btnAgregarCiudad = document.getElementById('btn-agregar-ciudad');
+  const modal = document.getElementById('modal-nueva-ciudad');
+  const btnCerrarModal = document.getElementById('btn-cerrar-modal');
+  const btnCancelarModal = document.getElementById('btn-cancelar-modal');
+  const formNuevaCiudad = document.getElementById('form-nueva-ciudad');
+  const inputNombreCiudad = document.getElementById('input-nombre-ciudad');
+
+  if (btnAgregarCiudad) {
+    btnAgregarCiudad.addEventListener('click', function() {
+      const regionSelect = document.querySelector('select[name="region"]');
+      if (!regionSelect.value) {
+        alert('Primero debes seleccionar una región');
+        return;
+      }
+      modal.classList.remove('hidden');
+      inputNombreCiudad.focus();
+    });
+  }
+
+  if (btnCerrarModal) {
+    btnCerrarModal.addEventListener('click', function() {
+      modal.classList.add('hidden');
+      inputNombreCiudad.value = '';
+    });
+  }
+
+  if (btnCancelarModal) {
+    btnCancelarModal.addEventListener('click', function() {
+      modal.classList.add('hidden');
+      inputNombreCiudad.value = '';
+    });
+  }
+
+  if (formNuevaCiudad) {
+    formNuevaCiudad.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const nombreCiudad = inputNombreCiudad.value.trim();
+      const regionSelect = document.querySelector('select[name="region"]');
+      const regionId = regionSelect.value;
+      
+      if (!nombreCiudad) {
+        alert('Por favor ingresa el nombre de la ciudad');
+        return;
+      }
+      
+      // Enviar solicitud AJAX para crear nueva ciudad
+      fetch('{% url "agregar_ciudad" %}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({
+          nombre: nombreCiudad,
+          region_id: regionId
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Agregar la nueva ciudad al select
+          const ciudadSelect = document.querySelector('select[name="ciudad"]');
+          const option = document.createElement('option');
+          option.value = data.ciudad.id;
+          option.textContent = data.ciudad.nombre;
+          option.selected = true;
+          ciudadSelect.appendChild(option);
+          
+          // Cerrar modal
+          modal.classList.add('hidden');
+          inputNombreCiudad.value = '';
+          
+          // Mostrar mensaje de éxito
+          alert('Ciudad agregada exitosamente');
+        } else {
+          alert('Error: ' + data.error);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Error al agregar la ciudad');
+      });
+    });
+  }
+});
 </script>
+
+<!-- Modal para agregar nueva ciudad -->
+<div id="modal-nueva-ciudad" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="cyber-card max-w-md w-full mx-4">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-bold text-cyan-400">➕ Agregar Nueva Ciudad</h3>
+      <button id="btn-cerrar-modal" class="text-gray-400 hover:text-white">✕</button>
+    </div>
+    
+    <form id="form-nueva-ciudad">
+      <div class="mb-4">
+        <label for="input-nombre-ciudad" class="cyber-label">🏙️ Nombre de la Ciudad:</label>
+        <input type="text" id="input-nombre-ciudad" class="cyber-input w-full" placeholder="Ingresa el nombre de la ciudad" required>
+      </div>
+      
+      <div class="flex gap-2 justify-end">
+        <button type="button" id="btn-cancelar-modal" class="cyber-button-secondary px-4 py-2">
+          Cancelar
+        </button>
+        <button type="submit" class="cyber-button px-4 py-2">
+          ➕ Agregar Ciudad
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
 {% endblock %}

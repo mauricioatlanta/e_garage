@@ -106,39 +106,169 @@
     </script>
     
     <style>
+        /* Futuristic background gradients */
         .gradient-bg {
-            background: linear-gradient(135deg, #1f2937 0%, #111827 50%, #374151 100%);
+            background: linear-gradient(135deg, #0a0f1c 0%, #1a1b2e 35%, #16213e 65%, #0f1419 100%);
+            position: relative;
+            overflow: hidden;
         }
+        .gradient-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(ellipse at center top, rgba(0, 255, 159, 0.12) 0%, rgba(0, 230, 255, 0.08) 35%, transparent 70%);
+        }
+
+        /* Hero animations with floating effect */
         .hero-animation {
-            animation: fadeInUp 1s ease-out;
+            animation: heroFloat 6s ease-in-out infinite;
         }
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        @keyframes heroFloat {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-10px) scale(1.02); }
         }
+
+        /* Futuristic card styling */
         .card-hover {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: linear-gradient(145deg, rgba(15, 25, 40, 0.7) 0%, rgba(20, 30, 50, 0.8) 100%);
+            backdrop-filter: blur(20px) saturate(1.3);
+            border: 1px solid rgba(0, 255, 159, 0.3);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 255, 159, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .card-hover::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 159, 0.1), transparent);
+            transition: left 0.6s;
+        }
+        .card-hover:hover::before {
+            left: 100%;
         }
         .card-hover:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            transform: translateY(-8px) scale(1.02);
+            border-color: rgba(0, 255, 159, 0.6);
+            box-shadow: 0 20px 50px rgba(0, 255, 159, 0.25), 0 0 0 1px rgba(0, 255, 159, 0.3);
         }
+
+        /* Advanced pulse effect */
         .pulse-green {
-            animation: pulse-green 2s infinite;
+            animation: pulseAdvanced 3s ease-in-out infinite;
+            position: relative;
         }
-        @keyframes pulse-green {
-            0%, 100% {
-                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+        @keyframes pulseAdvanced {
+            0%, 100% { 
+                box-shadow: 0 0 0 0 rgba(0, 255, 159, 0.7), 0 0 20px rgba(0, 230, 255, 0.3);
+                transform: scale(1);
             }
-            70% {
-                box-shadow: 0 0 0 10px rgba(34, 197, 94, 0);
+            50% { 
+                box-shadow: 0 0 0 15px rgba(0, 255, 159, 0), 0 0 30px rgba(0, 230, 255, 0.5);
+                transform: scale(1.05);
             }
+        }
+
+        /* Floating animation for elements */
+        .float {
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* Glowing text effects */
+        .glow-text {
+            text-shadow: 0 0 10px rgba(0, 255, 159, 0.5), 0 0 20px rgba(0, 255, 159, 0.3), 0 0 30px rgba(0, 255, 159, 0.2);
+        }
+
+        /* Futuristic buttons */
+        .btn-futuristic {
+            background: linear-gradient(45deg, #00ff9f, #00e6ff);
+            border: none;
+            border-radius: 12px;
+            padding: 12px 24px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .btn-futuristic::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        .btn-futuristic:hover::before {
+            left: 100%;
+        }
+        .btn-futuristic:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 255, 159, 0.3);
+        }
+
+        /* Animated background particles */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+        .particle {
+            position: absolute;
+            background: rgba(0, 255, 159, 0.8);
+            border-radius: 50%;
+            animation: particleFloat 10s linear infinite;
+        }
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(100vh) translateX(0px);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.8;
+            }
+            90% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-100px) translateX(100px);
+                opacity: 0;
+            }
+        }
+
+        /* Glass morphism effects */
+        .glass-morphism {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+        }
+
+        /* Tech grid background */
+        .tech-grid {
+            background-image: 
+                linear-gradient(rgba(0, 255, 159, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 159, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
         }
     </style>
 </head>
@@ -147,72 +277,153 @@
     <!-- Fondo animado ecológico con partículas -->
     <canvas id="eco-bg" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:0;pointer-events:none;"></canvas>
 
-    <!-- Header superior con fondo glass y logo -->
-    <nav class="backdrop-blur bg-cyan-400/30 shadow-lg border-b border-cyan-300 py-3 px-4">
+    <!-- Navegación futurista con efecto glass -->
+    <nav class="fixed top-0 left-0 right-0 z-50 glass-morphism border-b border-cyan-300/20 py-4 px-6">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18" fill="#00e6ff" opacity="0.2"/><path d="M12 28L28 12M12 12l16 16" stroke="#00e6ff" stroke-width="3" stroke-linecap="round"/></svg>
-                <span class="text-2xl font-extrabold text-cyan-400 drop-shadow">eGarage</span>
-                <span class="ml-2 text-sm text-cyan-900/80 font-semibold">Gestión de Talleres</span>
+            <div class="flex items-center gap-4">
+                <div class="relative">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-400 to-cyan-600 flex items-center justify-center shadow-lg">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="text-white">
+                            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                            <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                            <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full animate-pulse"></div>
+                </div>
+                <div>
+                    <span class="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-green-400 bg-clip-text text-transparent">
+                        eGarage
+                    </span>
+                    <div class="text-xs text-cyan-300/80 font-medium">
+                        Gestión Inteligente
+                    </div>
+                </div>
             </div>
             <div class="flex items-center gap-4">
-<a href="{% if debug %}http://127.0.0.1:8080/selector-pais-egarage/{% else %}https://www.egarage.cl/selector-pais-egarage/{% endif %}" class="bg-gradient-to-r from-blue-700 via-white to-red-600 px-6 py-2 rounded-xl text-blue-900 font-extrabold text-sm transition-all duration-300 shadow-xl border-2 border-blue-700 flex items-center gap-2">
+                <a href="{% if debug %}http://127.0.0.1:8080/selector-pais-egarage/{% else %}https://www.egarage.cl/selector-pais-egarage/{% endif %}" 
+                   class="btn-futuristic bg-gradient-to-r from-blue-600 via-blue-500 to-red-500 text-white px-6 py-2 rounded-xl font-bold text-sm transition-all duration-300 flex items-center gap-2 shadow-xl">
                     <span>🌎</span> Entrar
                 </a>
-                <a href="#suscripcion" class="hidden md:inline-block border-2 border-cyan-400 text-cyan-700 hover:bg-cyan-400 hover:text-white px-4 py-2 rounded-xl text-sm font-bold transition shadow">🚀 Prueba Gratis</a>
+                <a href="#suscripcion" 
+                   class="hidden md:flex items-center gap-2 border border-cyan-400/50 hover:border-cyan-400 bg-cyan-400/10 hover:bg-cyan-400/20 text-cyan-300 hover:text-white px-4 py-2 rounded-xl text-sm font-bold transition-all duration-300">
+                    <span>🚀</span> Prueba Gratis
+                </a>
             </div>
         </div>
     </nav>
 
-    <!-- Encabezado (Hero Section) -->
-    <header class="min-h-screen gradient-bg text-white flex flex-col justify-center items-center text-center px-4 relative overflow-hidden">
-        <!-- Fondo animado celeste con partículas SVG -->
+    <!-- Hero Section Futurista -->
+    <header class="min-h-screen gradient-bg flex flex-col justify-center items-center text-center px-4 relative overflow-hidden pt-20 tech-grid">
+        <!-- Partículas animadas -->
+        <div class="particles">
+            <div class="particle" style="width: 4px; height: 4px; left: 10%; animation-delay: 0s;"></div>
+            <div class="particle" style="width: 6px; height: 6px; left: 20%; animation-delay: 2s;"></div>
+            <div class="particle" style="width: 3px; height: 3px; left: 30%; animation-delay: 4s;"></div>
+            <div class="particle" style="width: 5px; height: 5px; left: 40%; animation-delay: 1s;"></div>
+            <div class="particle" style="width: 4px; height: 4px; left: 60%; animation-delay: 3s;"></div>
+            <div class="particle" style="width: 7px; height: 7px; left: 70%; animation-delay: 5s;"></div>
+            <div class="particle" style="width: 3px; height: 3px; left: 80%; animation-delay: 1.5s;"></div>
+            <div class="particle" style="width: 5px; height: 5px; left: 90%; animation-delay: 2.5s;"></div>
+        </div>
+
+        <!-- Elementos de fondo geométricos -->
         <div class="absolute inset-0 z-0">
-            <svg width="100%" height="100%" class="w-full h-full" style="position:absolute;top:0;left:0;z-index:0;" viewBox="0 0 1440 900" fill="none">
-                <circle cx="200" cy="200" r="120" fill="#00e6ff" fill-opacity="0.13"/>
-                <circle cx="1200" cy="700" r="180" fill="#00e6ff" fill-opacity="0.09"/>
-                <circle cx="900" cy="300" r="90" fill="#00e6ff" fill-opacity="0.11"/>
-                <circle cx="700" cy="600" r="60" fill="#00e6ff" fill-opacity="0.08"/>
-                <circle cx="400" cy="700" r="100" fill="#00e6ff" fill-opacity="0.10"/>
+            <svg width="100%" height="100%" class="w-full h-full opacity-10">
+                <defs>
+                    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:#00ff9f;stop-opacity:0.3" />
+                        <stop offset="100%" style="stop-color:#00e6ff;stop-opacity:0.3" />
+                    </linearGradient>
+                </defs>
+                <polygon points="0,0 300,150 0,300" fill="url(#grad1)" opacity="0.1"/>
+                <polygon points="1200,200 1400,0 1400,400" fill="url(#grad1)" opacity="0.08"/>
+                <circle cx="200" cy="200" r="100" fill="#00ff9f" opacity="0.05"/>
+                <circle cx="1200" cy="600" r="150" fill="#00e6ff" opacity="0.05"/>
+                <circle cx="700" cy="400" r="80" fill="#00ff9f" opacity="0.06"/>
             </svg>
         </div>
         
-        <div class="hero-animation relative z-10 max-w-4xl mx-auto">
-            <div class="mb-6 flex flex-col items-center">
-                <img src="/static/img/logo.png" alt="eGarage Logo" class="h-64 w-auto mb-8 drop-shadow-2xl animate-pulse" style="background:rgba(0,230,255,0.13);border-radius:3rem;box-shadow:0 0 120px #00e6ffcc,0 0 0 24px #00e6ff22;max-width:600px;">
+        <div class="hero-animation relative z-10 max-w-5xl mx-auto">
+            <!-- Logo con efecto holográfico -->
+            <div class="mb-8 flex justify-center">
+                <div class="relative">
+                    <img src="/static/img/logo.png" alt="eGarage Logo" class="h-48 w-auto drop-shadow-2xl float">
+                    <div class="absolute inset-0 bg-gradient-to-r from-cyan-400/20 to-green-400/20 rounded-full blur-xl scale-110"></div>
+                </div>
             </div>
-            <h1 class="text-4xl md:text-6xl font-extrabold mb-6 leading-tight drop-shadow-lg">
-                El software <span class="text-cyan-300">N°1</span> para talleres técnicos profesionales
+
+            <!-- Título principal con efectos -->
+            <h1 class="text-4xl md:text-7xl font-black mb-8 leading-tight">
+                <span class="block text-white glow-text">El Software</span>
+                <span class="block bg-gradient-to-r from-cyan-400 via-green-400 to-cyan-300 bg-clip-text text-transparent animate-pulse">
+                    N°1 para Talleres
+                </span>
+                <span class="block text-xl md:text-2xl text-cyan-300/90 font-normal mt-4">
+                    Tecnológicos y Profesionales
+                </span>
             </h1>
-            <p class="text-lg md:text-xl text-cyan-100 mb-8 max-w-2xl mx-auto leading-relaxed">
-                Presupuestos, órdenes de trabajo, control de repuestos y más. Todo desde un solo lugar.<br>
-                <span class="block mt-2 text-cyan-200 font-semibold">¡Digitaliza tu taller hoy mismo!</span>
+
+            <!-- Subtítulo -->
+            <p class="text-lg md:text-xl text-cyan-100/90 mb-10 max-w-3xl mx-auto leading-relaxed">
+                Presupuestos inteligentes, órdenes de trabajo automatizadas, control de inventario en tiempo real.
+                <span class="block mt-3 text-cyan-300 font-semibold text-xl">
+                    🚀 Digitaliza tu taller con IA y automatización
+                </span>
             </p>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+
+            <!-- Botones de acción -->
+            <div class="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12">
                 <a href="#suscripcion" 
-                   class="bg-cyan-500 hover:bg-cyan-600 px-8 py-4 rounded-lg text-white font-bold text-lg transition-all duration-300 pulse-green shadow-xl"
+                   class="btn-futuristic bg-gradient-to-r from-green-500 to-cyan-500 hover:from-green-400 hover:to-cyan-400 px-10 py-4 rounded-2xl text-white font-bold text-lg shadow-2xl pulse-green"
                    onclick="trackEvent('click', 'hero', 'cta_demo_gratis', 1); scrollToSection('suscripcion');">
-                    🚀 Prueba Gratis 30 Días
+                    <span class="flex items-center gap-3">
+                        <span>🚀</span>
+                        Prueba Gratis 30 Días
+                    </span>
                 </a>
                 <a href="#beneficios" 
-                   class="border-2 border-cyan-300 hover:bg-cyan-300 hover:text-cyan-900 px-8 py-4 rounded-lg text-cyan-100 font-bold text-lg transition-all duration-300 shadow"
+                   class="glass-morphism border-cyan-400/50 hover:border-cyan-400 hover:bg-cyan-400/10 px-10 py-4 rounded-2xl text-cyan-200 hover:text-white font-bold text-lg transition-all duration-300"
                    onclick="trackEvent('click', 'hero', 'ver_caracteristicas', 1);">
-                    Ver Características
+                    <span class="flex items-center gap-3">
+                        <span>⚡</span>
+                        Ver Características
+                    </span>
                 </a>
-<a href="{% if debug %}http://127.0.0.1:8080/selector-pais-egarage/{% else %}https://www.egarage.cl/selector-pais-egarage/{% endif %}" class="bg-gradient-to-r from-blue-700 via-white to-red-600 px-8 py-4 rounded-lg text-blue-900 font-extrabold text-lg transition-all duration-300 shadow-xl border-2 border-blue-700 flex items-center gap-2" style="margin-top:8px;">
-                    <span>🌎</span> Entrar
+                <a href="{% if debug %}http://127.0.0.1:8080/selector-pais-egarage/{% else %}https://www.egarage.cl/selector-pais-egarage/{% endif %}" 
+                   class="btn-futuristic bg-gradient-to-r from-blue-600 via-blue-500 to-red-500 px-10 py-4 rounded-2xl text-white font-bold text-lg shadow-2xl">
+                    <span class="flex items-center gap-3">
+                        <span>🌎</span>
+                        Entrar Ahora
+                    </span>
                 </a>
             </div>
-            <div class="mt-8 text-sm text-cyan-200">
-                ✅ Sin tarjeta de crédito &nbsp;&nbsp; ✅ Soporte incluido &nbsp;&nbsp; ✅ Fácil de usar
+
+            <!-- Características destacadas -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-cyan-200/80">
+                <div class="flex items-center justify-center gap-2">
+                    <span class="text-green-400">✓</span>
+                    Sin tarjeta de crédito
+                </div>
+                <div class="flex items-center justify-center gap-2">
+                    <span class="text-green-400">✓</span>
+                    Soporte técnico incluido
+                </div>
+                <div class="flex items-center justify-center gap-2">
+                    <span class="text-green-400">✓</span>
+                    Configuración en 24h
+                </div>
             </div>
         </div>
         
-        <!-- Indicador de scroll -->
-        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-            <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-            </svg>
+        <!-- Indicador de scroll mejorado -->
+        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20">
+            <div class="flex flex-col items-center gap-2 animate-bounce">
+                <span class="text-cyan-300/60 text-xs font-medium">Descubre más</span>
+                <svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                </svg>
+            </div>
         </div>
     </header>
 

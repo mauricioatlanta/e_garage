@@ -1,15 +1,17 @@
+from django.conf import settings
 from django.core.mail import send_mail
 from django.shortcuts import render
-from django.conf import settings
+
 from .forms_subscription import PlanPagoForm
 
+
 def registro_plan_pago(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         form = PlanPagoForm(request.POST)
         if form.is_valid():
-            email = form.cleaned_data['email']
+            email = form.cleaned_data["email"]
             send_mail(
-                subject='Gracias por suscribirte a eGarage',
+                subject="Gracias por suscribirte a eGarage",
                 message=(
                     "Bienvenido a eGarage. Para activar tu plan, realiza la transferencia a:\n\n"
                     "Banco: Banco Ejemplo\n"

@@ -2,11 +2,15 @@
 """
 Script para cargar servicios completos por categorías
 """
-import django, os
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings')
+import os
+
+import django
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings")
 django.setup()
 
-from taller.servicios.models import CategoriaServicio, SubcategoriaServicio, Servicio
+from taller.servicios.models import (CategoriaServicio, Servicio,
+                                     SubcategoriaServicio)
 
 # Datos de servicios organizados por categorías
 servicios_data = {
@@ -26,7 +30,7 @@ servicios_data = {
         "Revisión de presión y estado de neumáticos",
         "Revisión del sistema de escape y catalizador",
         "Rotación cruzada de neumáticos",
-        "Test de batería y sistema de carga eléctrica"
+        "Test de batería y sistema de carga eléctrica",
     ],
     "2. Reparaciones Mecánicas Generales": [
         "Ajuste y sincronización electrónica del motor",
@@ -45,7 +49,7 @@ servicios_data = {
         "Rectificación de culata y prueba hidráulica",
         "Reparación de fugas de aceite y refrigerante",
         "Reparación de sistema de inyección (common rail, TBI)",
-        "Revisión y reparación de sistema de escape (flexibles, catalizador)"
+        "Revisión y reparación de sistema de escape (flexibles, catalizador)",
     ],
     "3. Sistema de Frenos": [
         "Cambio de cilindro maestro de frenos",
@@ -56,7 +60,7 @@ servicios_data = {
         "Cambio de tambores y zapatas",
         "Purgado y sangrado del sistema de frenos",
         "Diagnóstico y reparación de ABS",
-        "Revisión y ajuste del freno de mano"
+        "Revisión y ajuste del freno de mano",
     ],
     "4. Sistema de Transmisión y Embrague": [
         "Cambio de aceite de transmisión automática (ATF)",
@@ -67,7 +71,7 @@ servicios_data = {
         "Cambio de homocinéticas internas y externas",
         "Cambio de retenes de transmisión",
         "Cambio de volante de inercia (bimasa o sólido)",
-        "Reparación o reemplazo de caja de cambios"
+        "Reparación o reemplazo de caja de cambios",
     ],
     "5. Sistema de Suspensión y Dirección": [
         "Ajuste y calibración de dirección hidráulica o EPS",
@@ -79,7 +83,7 @@ servicios_data = {
         "Cambio de cremallera o caja de dirección",
         "Cambio de espirales o resortes",
         "Reparación de sistema de dirección asistida",
-        "Revisión general de alineación y geometría"
+        "Revisión general de alineación y geometría",
     ],
     "6. Sistema Eléctrico y Electrónico": [
         "Cambio de focos, ampolletas halógenas y LED",
@@ -95,7 +99,7 @@ servicios_data = {
         "Instalación de luces LED o xenón",
         "Instalación de pantallas, radios y multimedia",
         "Reparación de alzavidrios eléctricos",
-        "Detección y solución de cortocircuitos"
+        "Detección y solución de cortocircuitos",
     ],
     "7. Aire Acondicionado y Climatización": [
         "Cambio de compresor de aire acondicionado",
@@ -105,7 +109,7 @@ servicios_data = {
         "Carga y reciclado de gas refrigerante R134a o R1234yf",
         "Detección de fugas con nitrógeno o UV",
         "Limpieza interna del sistema de climatización",
-        "Revisión y cambio de ventiladores interiores o radiador"
+        "Revisión y cambio de ventiladores interiores o radiador",
     ],
     "8. Desabolladura y Pintura": [
         "Eliminación de rayones y microarañazos",
@@ -117,7 +121,7 @@ servicios_data = {
         "Pulido, abrillantado y encerado profesional",
         "Reparación de golpes leves y abolladuras",
         "Reparación y pintura de parachoques plásticos",
-        "Cambio o reparación de molduras externas"
+        "Cambio o reparación de molduras externas",
     ],
     "9. Vidrios y Accesorios": [
         "Cambio de luneta trasera con desempañador",
@@ -128,7 +132,7 @@ servicios_data = {
         "Cambio de plumillas y sistema de limpiaparabrisas",
         "Polarizado de vidrios con lámina certificada",
         "Reparación y mantenimiento de sunroof",
-        "Reparación de trizaduras con resina"
+        "Reparación de trizaduras con resina",
     ],
     "10. Inspecciones y Certificaciones": [
         "Certificación de conversión a gas vehicular (GLP/GNC)",
@@ -139,8 +143,8 @@ servicios_data = {
         "Inspección de sistema eléctrico y luces",
         "Inspección pre-compra para autos usados",
         "Pre-chequeo técnico para Revisión Técnica",
-        "Revisión de sistema de emisiones y catalizador"
-    ]
+        "Revisión de sistema de emisiones y catalizador",
+    ],
 }
 
 print("🚀 Iniciando carga completa de servicios...")
@@ -165,18 +169,16 @@ subcategorias_creadas = 0
 for sub_nombre, servicios_lista in servicios_data.items():
     # Crear subcategoría
     subcategoria, created = SubcategoriaServicio.objects.get_or_create(
-        categoria=categoria_principal,
-        nombre=sub_nombre
+        categoria=categoria_principal, nombre=sub_nombre
     )
     if created:
         subcategorias_creadas += 1
     print(f"✅ Subcategoría: {sub_nombre}")
-    
+
     # Crear servicios de esta subcategoría
     for servicio_nombre in servicios_lista:
         servicio, created = Servicio.objects.get_or_create(
-            subcategoria=subcategoria,
-            nombre=servicio_nombre
+            subcategoria=subcategoria, nombre=servicio_nombre
         )
         if created:
             servicios_creados += 1
@@ -197,4 +199,6 @@ print(f"   Categorías: {total_categorias}")
 print(f"   Subcategorías: {total_subcategorias}")
 print(f"   Servicios: {total_servicios}")
 
-print(f"\n✅ ¡{total_servicios} servicios organizados en {total_subcategorias} categorías!")
+print(
+    f"\n✅ ¡{total_servicios} servicios organizados en {total_subcategorias} categorías!"
+)

@@ -47,6 +47,34 @@ input[type="text"] {
 input[type="text"]::placeholder {
   color: #b2f5ea !important;
 }
+
+/* Estilos para el campo de búsqueda mejorado */
+#busqueda-vehiculo {
+  background: linear-gradient(135deg, #1a1a2e, #16213e) !important;
+  color: #fff !important;
+  border: 2px solid #4fd1c5 !important;
+  box-shadow: 0 4px 15px rgba(79, 209, 197, 0.2) !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
+}
+
+#busqueda-vehiculo:focus {
+  border-color: #00d4ff !important;
+  box-shadow: 0 0 25px rgba(0, 212, 255, 0.4) !important;
+  background: linear-gradient(135deg, #1a1a2e, #0f3460) !important;
+}
+
+#busqueda-vehiculo::placeholder {
+  color: #64b5f6 !important;
+  font-weight: 400 !important;
+}
+
+/* Contador de resultados */
+#contador-resultados {
+  background: rgba(30, 58, 138, 0.8) !important;
+  border: 1px solid rgba(59, 130, 246, 0.3) !important;
+  backdrop-filter: blur(10px) !important;
+}
 .translucent-card {
   background: rgba(0,0,0,0.6) !important;
   color: #fff !important;
@@ -78,7 +106,24 @@ input[type="text"]::placeholder {
   </div>
   
   <div class="mb-4">
-    <input class="w-full rounded px-4 py-2 text-black" id="busqueda-vehiculo" placeholder="Buscar vehículo por patente, modelo, VIN o marca..." type="text"/>
+    <div class="relative">
+      <input class="w-full rounded-lg px-6 py-4 text-black text-lg border-2 border-blue-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-200 transition-all duration-300" 
+             id="busqueda-vehiculo" 
+             placeholder="🔍 Buscar vehículo por patente, marca, modelo, año, cliente..." 
+             type="text"/>
+      <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+        <button type="button" id="limpiar-busqueda" class="text-gray-400 hover:text-red-400 transition-colors duration-200 mr-2" title="Limpiar búsqueda (ESC)">
+          <i class="fas fa-times-circle text-xl"></i>
+        </button>
+        <div class="text-gray-400 text-xl pointer-events-none">
+          <i class="fas fa-search"></i>
+        </div>
+      </div>
+    </div>
+    <div class="mt-2 text-sm text-gray-300">
+      <i class="fas fa-info-circle me-1"></i>
+      Búsqueda inteligente: patente, marca, modelo, año, nombre del cliente
+    </div>
   </div>
   
   <div class="overflow-x-auto">
@@ -120,13 +165,124 @@ input[type="text"]::placeholder {
     const input = document.getElementById('busqueda-vehiculo');
     const filas = document.querySelectorAll('#tabla-vehiculos tr');
     
-    input.addEventListener('input', function() {
-      const filtro = this.value.toLowerCase();
+    // Función de búsqueda mejorada
+    function buscarVehiculos(filtro) {
+      const filtroLower = filtro.toLowerCase();
+      let encontrados = 0;
+      
       filas.forEach(fila => {
-        const texto = fila.textContent.toLowerCase();
-        fila.style.display = texto.includes(filtro) ? '' : 'none';
+        // Obtener todas las celdas de la fila
+        const celdas = fila.querySelectorAll('td');
+        if (celdas.length === 0) return; // Saltar filas vacías
+        
+        // Buscar en cada celda específicamente
+        let coincide = false;
+        
+        celdas.forEach((celda, index) => {
+          const texto = celda.textContent.toLowerCase();
+          
+          // Búsqueda específica por tipo de campo
+          switch(index) {
+            case 0: // Patente
+              if (texto.includes(filtroLower)) coincide = true;
+              break;
+            case 1: // Marca
+              if (texto.includes(filtroLower)) coincide = true;
+              break;
+            case 2: // Modelo
+              if (texto.includes(filtroLower)) coincide = true;
+              break;
+            case 3: // Año
+              if (texto.includes(filtroLower)) coincide = true;
+              break;
+            case 4: // Cliente (nombre + apellido)
+              if (texto.includes(filtroLower)) coincide = true;
+              break;
+          }
+        });
+        
+        // Mostrar/ocultar fila
+        if (coincide) {
+          fila.style.display = '';
+          encontrados++;
+        } else {
+          fila.style.display = 'none';
+        }
       });
+      
+      // Mostrar contador de resultados
+      mostrarContadorResultados(encontrados, filtro);
+    }
+    
+    // Función para mostrar contador de resultados
+    function mostrarContadorResultados(encontrados, filtro) {
+      let contador = document.getElementById('contador-resultados');
+      if (!contador) {
+        contador = document.createElement('div');
+        contador.id = 'contador-resultados';
+        contador.className = 'mt-3 p-3 bg-blue-900 bg-opacity-50 rounded-lg text-center';
+        input.parentNode.parentNode.appendChild(contador);
+      }
+      
+      if (filtro.length > 0) {
+        contador.innerHTML = `
+          <i class="fas fa-search me-2"></i>
+          <span class="font-semibold">${encontrados}</span> vehículo${encontrados !== 1 ? 's' : ''} encontrado${encontrados !== 1 ? 's' : ''} para "<strong>${filtro}</strong>"
+        `;
+        contador.style.display = 'block';
+      } else {
+        contador.style.display = 'none';
+      }
+    }
+    
+    // Evento de búsqueda
+    input.addEventListener('input', function() {
+      const filtro = this.value.trim();
+      if (filtro.length === 0) {
+        // Mostrar todos si no hay filtro
+        filas.forEach(fila => fila.style.display = '');
+        const contador = document.getElementById('contador-resultados');
+        if (contador) contador.style.display = 'none';
+      } else {
+        buscarVehiculos(filtro);
+      }
     });
+    
+    // Búsqueda al presionar Enter
+    input.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        this.blur(); // Quitar foco
+      }
+    });
+    
+    // Limpiar búsqueda con Escape
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        this.value = '';
+        this.dispatchEvent(new Event('input'));
+        this.focus();
+      }
+    });
+    
+    // Botón de limpiar búsqueda
+    const btnLimpiar = document.getElementById('limpiar-busqueda');
+    btnLimpiar.addEventListener('click', function() {
+      input.value = '';
+      input.dispatchEvent(new Event('input'));
+      input.focus();
+    });
+    
+    // Mostrar/ocultar botón de limpiar según contenido
+    input.addEventListener('input', function() {
+      if (this.value.length > 0) {
+        btnLimpiar.style.display = 'block';
+      } else {
+        btnLimpiar.style.display = 'none';
+      }
+    });
+    
+    // Ocultar botón inicialmente
+    btnLimpiar.style.display = 'none';
   });
 </script>
 {% endblock %}

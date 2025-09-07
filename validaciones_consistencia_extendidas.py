@@ -5,50 +5,61 @@ Implementación completa de reglas de negocio country & tipo
 """
 import os
 import sys
+
 import django
 
 # Configurar Django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings")
 django.setup()
 
 from django.core.exceptions import ValidationError
-from django.db import models
 from django.core.management.color import no_style
-from django.db import connection
+from django.db import connection, models
+
 from taller.models import *
 from taller.servicios.models import *
 
+
 class ValidacionConsistencia:
     """Clase helper para validaciones de consistencia cross-country"""
-    
+
     @staticmethod
     def assert_same_country(a, b, mensaje="Objetos pertenecen a países diferentes"):
         """Validar que dos objetos tengan el mismo country"""
-        country_a = getattr(a, 'country', getattr(getattr(a, 'empresa', None), 'pais', None))
-        country_b = getattr(b, 'country', getattr(getattr(b, 'empresa', None), 'pais', None))
-        
+        country_a = getattr(
+            a, "country", getattr(getattr(a, "empresa", None), "pais", None)
+        )
+        country_b = getattr(
+            b, "country", getattr(getattr(b, "empresa", None), "pais", None)
+        )
+
         if country_a != country_b:
             raise ValidationError(f"{mensaje} ({country_a} != {country_b})")
-    
+
     @staticmethod
-    def assert_correct_tipo(servicio, tipo_esperado, mensaje="Tipo de servicio incorrecto"):
+    def assert_correct_tipo(
+        servicio, tipo_esperado, mensaje="Tipo de servicio incorrecto"
+    ):
         """Validar que un servicio tenga el tipo correcto"""
         if servicio.tipo != tipo_esperado:
-            raise ValidationError(f"{mensaje}. Esperado: {tipo_esperado}, Actual: {servicio.tipo}")
+            raise ValidationError(
+                f"{mensaje}. Esperado: {tipo_esperado}, Actual: {servicio.tipo}"
+            )
+
 
 def implementar_validaciones_documento():
     """Implementar validaciones en el modelo Documento"""
     print("🔧 IMPLEMENTANDO VALIDACIONES EN DOCUMENTO")
-    
+
     # Leer el archivo actual
-    with open('taller/models/documento.py', 'r', encoding='utf-8') as f:
+    with open("taller/models/documento.py", "r", encoding="utf-8") as f:
         contenido = f.read()
-    
+
     # Buscar si ya existe el método clean
-    if 'def clean(self):' in contenido:
+    if "def clean(self):" in contenido:
         print("   ✅ Validaciones ya existen en Documento")
         return
-    
+
     # Preparar validaciones para Documento
     validaciones_documento = '''
     def clean(self):
@@ -79,29 +90,31 @@ def implementar_validaciones_documento():
         """Llamar validaciones antes de guardar"""
         self.full_clean()
         return super().save(*args, **kwargs)'''
-    
+
     # Buscar dónde insertar (antes del final de la clase)
-    if 'class RepuestoDocumento' in contenido:
-        punto_insercion = contenido.find('class RepuestoDocumento')
+    if "class RepuestoDocumento" in contenido:
+        punto_insercion = contenido.find("class RepuestoDocumento")
         nuevo_contenido = (
-            contenido[:punto_insercion-1] + 
-            validaciones_documento + '\n\n' +
-            contenido[punto_insercion:]
+            contenido[: punto_insercion - 1]
+            + validaciones_documento
+            + "\n\n"
+            + contenido[punto_insercion:]
         )
     else:
         # Si no encontramos RepuestoDocumento, insertar antes del final del archivo
-        nuevo_contenido = contenido.rstrip() + validaciones_documento + '\n'
-    
+        nuevo_contenido = contenido.rstrip() + validaciones_documento + "\n"
+
     # Escribir el archivo actualizado
-    with open('taller/models/documento.py', 'w', encoding='utf-8') as f:
+    with open("taller/models/documento.py", "w", encoding="utf-8") as f:
         f.write(nuevo_contenido)
-    
+
     print("   ✅ Validaciones agregadas a Documento")
+
 
 def crear_modelos_linea_validados():
     """Crear modelos LineaServicio y LineaOtroServicio con validaciones"""
     print("🔧 CREANDO MODELOS DE LÍNEAS CON VALIDACIONES")
-    
+
     contenido_lineas = '''#!/usr/bin/env python
 """
 Modelos de líneas de documento con validaciones de consistencia robustas
@@ -327,18 +340,19 @@ class LineaRepuesto(models.Model):
     def __str__(self):
         return f"{self.nombre} ({self.codigo}) x{self.cantidad}"
 '''
-    
+
     # Escribir el archivo de modelos de líneas
-    with open('taller/models/lineas_documento.py', 'w', encoding='utf-8') as f:
+    with open("taller/models/lineas_documento.py", "w", encoding="utf-8") as f:
         f.write(contenido_lineas)
-    
+
     print("   ✅ Modelos LineaServicio, LineaOtroServicio y LineaRepuesto creados")
+
 
 def crear_constrains_base_datos():
     """Crear constraints a nivel de base de datos"""
     print("🔧 IMPLEMENTANDO CONSTRAINTS DE BASE DE DATOS")
-    
-    migration_content = '''# Generated by validaciones_consistencia_extendidas.py
+
+    migration_content = """# Generated by validaciones_consistencia_extendidas.py
 from django.db import migrations, models
 from django.db.models import CheckConstraint, Q, Index
 
@@ -375,18 +389,21 @@ class Migration(migrations.Migration):
             ),
         ),
     ]
-'''
-    
+"""
+
     # Escribir la migración
-    with open('taller/migrations/0008_validaciones_constraints.py', 'w', encoding='utf-8') as f:
+    with open(
+        "taller/migrations/0008_validaciones_constraints.py", "w", encoding="utf-8"
+    ) as f:
         f.write(migration_content)
-    
+
     print("   ✅ Migración de constraints creada: 0008_validaciones_constraints.py")
+
 
 def crear_tests_validaciones():
     """Crear tests completos para validaciones"""
     print("🔧 CREANDO TESTS DE VALIDACIONES")
-    
+
     test_content = '''#!/usr/bin/env python
 """
 Tests completos para validaciones de consistencia country & tipo
@@ -654,18 +671,19 @@ if __name__ == "__main__":
     tester = TestValidacionesConsistencia()
     tester.ejecutar_todos_los_tests()
 '''
-    
+
     # Escribir tests
-    with open('test_validaciones_consistencia.py', 'w', encoding='utf-8') as f:
+    with open("test_validaciones_consistencia.py", "w", encoding="utf-8") as f:
         f.write(test_content)
-    
+
     print("   ✅ Tests de validaciones creados: test_validaciones_consistencia.py")
+
 
 def crear_documentacion_validaciones():
     """Crear documentación completa del sistema de validaciones"""
     print("🔧 CREANDO DOCUMENTACIÓN DE VALIDACIONES")
-    
-    doc_content = '''# 🔒 SISTEMA DE VALIDACIONES DE CONSISTENCIA
+
+    doc_content = """# 🔒 SISTEMA DE VALIDACIONES DE CONSISTENCIA
 
 ## 📋 RESUMEN EJECUTIVO
 
@@ -807,36 +825,37 @@ python test_validaciones_consistencia.py
 
 ---
 *Documentación generada automáticamente por validaciones_consistencia_extendidas.py*
-'''
-    
+"""
+
     # Escribir documentación
-    with open('VALIDACIONES_CONSISTENCIA_DOCUMENTACION.md', 'w', encoding='utf-8') as f:
+    with open("VALIDACIONES_CONSISTENCIA_DOCUMENTACION.md", "w", encoding="utf-8") as f:
         f.write(doc_content)
-    
+
     print("   ✅ Documentación creada: VALIDACIONES_CONSISTENCIA_DOCUMENTACION.md")
+
 
 def ejecutar_implementacion_completa():
     """Ejecutar implementación completa del sistema de validaciones"""
     print("🚀 IMPLEMENTANDO SISTEMA COMPLETO DE VALIDACIONES")
     print("🎯 Paso 2 Extendido: Validaciones robustas country & tipo")
     print("=" * 70)
-    
+
     try:
         # 1. Implementar validaciones en modelos existentes
         implementar_validaciones_documento()
-        
+
         # 2. Crear nuevos modelos con validaciones
         crear_modelos_linea_validados()
-        
+
         # 3. Crear constraints de base de datos
         crear_constrains_base_datos()
-        
+
         # 4. Crear tests completos
         crear_tests_validaciones()
-        
+
         # 5. Crear documentación
         crear_documentacion_validaciones()
-        
+
         print("\n" + "=" * 70)
         print("🎉 IMPLEMENTACIÓN COMPLETA EXITOSA")
         print("=" * 70)
@@ -845,27 +864,29 @@ def ejecutar_implementacion_completa():
         print("✅ Constraints de BD preparados")
         print("✅ Suite de tests completa creada")
         print("✅ Documentación técnica generada")
-        
+
         print("\n🔧 ARCHIVOS CREADOS/MODIFICADOS:")
         print("   📝 taller/models/documento.py (modificado)")
         print("   📝 taller/models/lineas_documento.py (nuevo)")
         print("   📝 taller/migrations/0008_validaciones_constraints.py (nuevo)")
         print("   📝 test_validaciones_consistencia.py (nuevo)")
         print("   📝 VALIDACIONES_CONSISTENCIA_DOCUMENTACION.md (nuevo)")
-        
+
         print("\n🚀 PRÓXIMOS PASOS:")
         print("   1. Ejecutar migración: python manage.py migrate")
         print("   2. Ejecutar tests: python test_validaciones_consistencia.py")
         print("   3. Revisar documentación técnica")
         print("   4. Implementar validaciones en vistas existentes")
-        
+
         return True
-        
+
     except Exception as e:
         print(f"\n❌ ERROR EN IMPLEMENTACIÓN: {e}")
         import traceback
+
         traceback.print_exc()
         return False
+
 
 if __name__ == "__main__":
     ejecutar_implementacion_completa()

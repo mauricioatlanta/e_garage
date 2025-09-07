@@ -22,8 +22,8 @@ from pathlib import Path
 # 📁 CONFIGURACIÓN DE RUTAS
 # ============================================================
 # Ruta del proyecto en PythonAnywhere
-PROJECT_PATH = '/home/atlantareciclajes/e_garage'
-VENV_PATH = '/home/atlantareciclajes/.virtualenvs/e_garage_env'
+PROJECT_PATH = "/home/atlantareciclajes/e_garage"
+VENV_PATH = "/home/atlantareciclajes/.virtualenvs/e_garage_env"
 
 # Agregar el directorio del proyecto al path de Python
 if PROJECT_PATH not in sys.path:
@@ -41,17 +41,19 @@ if parent_path not in sys.path:
 # ===============================================================
 # 🔧 CONFIGURACIÓN DE ENTORNO
 # ===============================================================
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'e_garage.settings_production')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "e_garage.settings_production")
 
 # Variables de entorno para producción
-os.environ.setdefault('DB_NAME', 'atlantareciclajes$egarage')
-os.environ.setdefault('DB_USER', 'atlantareciclajes')
-os.environ.setdefault('DB_PASSWORD', 'laila2013@')
-os.environ.setdefault('DB_HOST', 'atlantareciclajes.mysql.pythonanywhere-services.com')
-os.environ.setdefault('DB_PORT', '3306')
+os.environ.setdefault("DB_NAME", "atlantareciclajes$egarage")
+os.environ.setdefault("DB_USER", "atlantareciclajes")
+os.environ.setdefault("DB_PASSWORD", "laila2013@")
+os.environ.setdefault("DB_HOST", "atlantareciclajes.mysql.pythonanywhere-services.com")
+os.environ.setdefault("DB_PORT", "3306")
 
 # Clave secreta (en producción debería estar en variables de entorno)
-os.environ.setdefault('DJANGO_SECRET_KEY', 'ej+v^g#=l@x+$#$n&8k3w#!zf_9z8j@4m5n6p7q8r9s0t1u2v3w4x5y6z')
+os.environ.setdefault(
+    "DJANGO_SECRET_KEY", "ej+v^g#=l@x+$#$n&8k3w#!zf_9z8j@4m5n6p7q8r9s0t1u2v3w4x5y6z"
+)
 
 # ============================================================
 # 🚀 INICIALIZACIÓN DE DJANGO
@@ -59,21 +61,22 @@ os.environ.setdefault('DJANGO_SECRET_KEY', 'ej+v^g#=l@x+$#$n&8k3w#!zf_9z8j@4m5n6
 try:
     import django
     from django.core.wsgi import get_wsgi_application
-    
+
     # Configurar Django
     django.setup()
-    
+
     # Obtener la aplicación WSGI
     application = get_wsgi_application()
-    
+
     print("✅ WSGI configurado exitosamente para PythonAnywhere")
     print(f"📁 Proyecto: {PROJECT_PATH}")
     print(f"🗄️ Base de datos: MySQL en PythonAnywhere")
     print(f"🌐 Configuración: e_garage.settings_production")
-    
+
 except Exception as e:
     print(f"❌ Error al configurar WSGI: {e}")
     raise
+
 
 # ============================================================
 # 🔧 CONFIGURACIÓN ADICIONAL PARA PYTHONANYWHERE
@@ -86,15 +89,17 @@ def application_with_logging(environ, start_response):
         return application(environ, start_response)
     except Exception as e:
         import traceback
+
         error_msg = f"Error en aplicación WSGI: {e}\n{traceback.format_exc()}"
         print(error_msg)
-        
+
         # Respuesta de error básica
-        status = '500 Internal Server Error'
-        headers = [('Content-Type', 'text/html')]
+        status = "500 Internal Server Error"
+        headers = [("Content-Type", "text/html")]
         start_response(status, headers)
-        
-        return ["""
+
+        return [
+            """
         <!DOCTYPE html>
         <html>
         <head>
@@ -112,7 +117,11 @@ def application_with_logging(environ, start_response):
             </div>
         </body>
         </html>
-        """.encode('utf-8')]
+        """.encode(
+                "utf-8"
+            )
+        ]
+
 
 # Usar el wrapper con logging en lugar de la aplicación directa
 # application = application_with_logging  # Descomenta si quieres logging adicional

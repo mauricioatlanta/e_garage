@@ -343,7 +343,12 @@ textarea.cyber-input::placeholder {
         </div>
         <div class="field-container">
           <label class="cyber-label" for="id_ciudad_usa">🏙️ City:</label>
-          {{ form.ciudad_usa|add_class:'cyber-input' }}
+          <div class="flex items-center gap-2">
+            {{ form.ciudad_usa|add_class:'cyber-input flex-grow' }}
+            <button type="button" id="btn-agregar-ciudad" class="cyber-button cyber-button-secondary text-sm px-3 py-2">
+              ➕ Nueva
+            </button>
+          </div>
         </div>
         <div class="field-container">
           <label class="cyber-label" for="id_zipcode">📮 Zip Code:</label>
@@ -693,5 +698,121 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
+
+// Modal para agregar nueva ciudad
+document.addEventListener('DOMContentLoaded', function() {
+  const btnAgregarCiudad = document.getElementById('btn-agregar-ciudad');
+  const modal = document.getElementById('modal-nueva-ciudad');
+  const btnCerrarModal = document.getElementById('btn-cerrar-modal');
+  const btnCancelarModal = document.getElementById('btn-cancelar-modal');
+  const formNuevaCiudad = document.getElementById('form-nueva-ciudad');
+  const inputNombreCiudad = document.getElementById('input-nombre-ciudad');
+
+  if (btnAgregarCiudad) {
+    btnAgregarCiudad.addEventListener('click', function() {
+      const estadoSelect = document.querySelector('select[name="estado_usa"]');
+      if (!estadoSelect.value) {
+        alert('Primero debes seleccionar un estado');
+        return;
+      }
+      modal.classList.remove('hidden');
+      inputNombreCiudad.focus();
+    });
+  }
+
+  if (btnCerrarModal) {
+    btnCerrarModal.addEventListener('click', function() {
+      modal.classList.add('hidden');
+      inputNombreCiudad.value = '';
+    });
+  }
+
+  if (btnCancelarModal) {
+    btnCancelarModal.addEventListener('click', function() {
+      modal.classList.add('hidden');
+      inputNombreCiudad.value = '';
+    });
+  }
+
+  if (formNuevaCiudad) {
+    formNuevaCiudad.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const nombreCiudad = inputNombreCiudad.value.trim();
+      const estadoSelect = document.querySelector('select[name="estado_usa"]');
+      const estadoId = estadoSelect.value;
+      
+      if (!nombreCiudad) {
+        alert('Por favor ingresa el nombre de la ciudad');
+        return;
+      }
+      
+      // Enviar solicitud AJAX para crear nueva ciudad
+      fetch('{% url "clientes:agregar_ciudad" %}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({
+          nombre: nombreCiudad,
+          region_id: estadoId  // Usamos region_id para compatibilidad con la vista
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Agregar la nueva ciudad al select
+          const ciudadSelect = document.querySelector('select[name="ciudad_usa"]');
+          const option = document.createElement('option');
+          option.value = data.ciudad.id;
+          option.textContent = data.ciudad.nombre;
+          option.selected = true;
+          ciudadSelect.appendChild(option);
+          
+          // Cerrar modal
+          modal.classList.add('hidden');
+          inputNombreCiudad.value = '';
+          
+          // Mostrar mensaje de éxito
+          alert('Ciudad agregada exitosamente');
+        } else {
+          alert('Error: ' + data.error);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Error al agregar la ciudad');
+      });
+    });
+  }
+});
 </script>
+
+<!-- Modal para agregar nueva ciudad -->
+<div id="modal-nueva-ciudad" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="cyber-card max-w-md w-full mx-4">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-bold text-cyan-400">➕ Add New City</h3>
+      <button id="btn-cerrar-modal" class="text-gray-400 hover:text-white">✕</button>
+    </div>
+    
+    <form id="form-nueva-ciudad">
+      <div class="mb-4">
+        <label for="input-nombre-ciudad" class="cyber-label">🏙️ City Name:</label>
+        <input type="text" id="input-nombre-ciudad" class="cyber-input w-full" placeholder="Enter the city name" required>
+      </div>
+      
+      <div class="flex gap-2 justify-end">
+        <button type="button" id="btn-cancelar-modal" class="cyber-button-secondary px-4 py-2">
+          Cancel
+        </button>
+        <button type="submit" class="cyber-button px-4 py-2">
+          ➕ Add City
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
 {% endblock %}

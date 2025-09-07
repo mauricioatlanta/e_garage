@@ -1,7 +1,9 @@
 from dal import autocomplete
 from django.utils.functional import cached_property
+
 from taller.models.marca import Marca
 from taller.models.modelo import Modelo
+
 
 def _resolve_country_from_request(request):
     # 1) middleware: request.empresa.pais
@@ -22,6 +24,7 @@ def _resolve_country_from_request(request):
         return "CL"
     return None
 
+
 class MarcaAutocomplete(autocomplete.Select2QuerySetView):
     @cached_property
     def country(self):
@@ -36,6 +39,7 @@ class MarcaAutocomplete(autocomplete.Select2QuerySetView):
         if self.q:
             qs = qs.filter(nombre__icontains=self.q)
         return qs.order_by("nombre")
+
 
 class ModeloAutocomplete(autocomplete.Select2QuerySetView):
     @cached_property

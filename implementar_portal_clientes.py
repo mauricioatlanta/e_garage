@@ -11,26 +11,32 @@ Portal web donde los clientes pueden:
 5. Ver recordatorios de mantenimiento
 """
 import os
+
 import django
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings_sqlite')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings_sqlite")
 django.setup()
 
 from django.contrib.auth.models import User
+
 from taller.models.clientes import Cliente
-from taller.models.empresa import Empresa
 from taller.models.documento import Documento
+from taller.models.empresa import Empresa
 from taller.models.vehiculos import Vehiculo
+
 
 def mostrar_seccion(titulo):
     print("\n" + "🎯 " + titulo)
-    print("="*60)
+    print("=" * 60)
+
 
 mostrar_seccion("ANÁLISIS PARA PORTAL DE CLIENTES")
 
 # Analizar estructura actual
 total_clientes = Cliente.objects.count()
-clientes_con_email = Cliente.objects.exclude(email__isnull=True).exclude(email__exact='').count()
+clientes_con_email = (
+    Cliente.objects.exclude(email__isnull=True).exclude(email__exact="").count()
+)
 total_documentos = Documento.objects.count()
 total_vehiculos = Vehiculo.objects.count()
 
@@ -42,7 +48,9 @@ print(f"   🚗 Total vehículos: {total_vehiculos}")
 
 # Mostrar algunos clientes de ejemplo
 print("\n👥 CLIENTES CON EMAIL (Candidatos para portal):")
-clientes_portal = Cliente.objects.exclude(email__isnull=True).exclude(email__exact='')[:5]
+clientes_portal = Cliente.objects.exclude(email__isnull=True).exclude(email__exact="")[
+    :5
+]
 for cliente in clientes_portal:
     docs_count = Documento.objects.filter(cliente=cliente).count()
     vehiculos_count = Vehiculo.objects.filter(cliente=cliente).count()
@@ -217,7 +225,7 @@ class AccesoPortal(models.Model):
 '''
 
 # Guardar el archivo
-with open('taller/models/portal_cliente.py', 'w', encoding='utf-8') as f:
+with open("taller/models/portal_cliente.py", "w", encoding="utf-8") as f:
     f.write(modelos_portal)
 
 print("✅ Archivo 'portal_cliente.py' creado")

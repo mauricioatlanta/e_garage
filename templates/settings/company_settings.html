@@ -1,268 +1,382 @@
-{% extends 'base.html' %}
+{% extends "common/base.html" %}
 {% load static %}
+<!-- 🔵 TEMPLATE ALTERNATIVA - SETTINGS -->
+<style>
+body { background: linear-gradient(45deg, #0000ff, #0000cc) !important; }
+body::before { content: "🔵 TEMPLATE ALTERNATIVA - SETTINGS"; position: fixed; top: 0; left: 0; background: #0000ff; color: #fff; padding: 10px; z-index: 9999; font-weight: bold; }
+</style>
 
-{% block title %}{{ page_title }} - {{ company_name }}{% endblock %}
+{% block title %}Configuración de Empresa{% endblock %}
 
-{% block nav_brand %}
-  {# Bloque vacío para eliminar el nombre amarillo en la página de configuración #}
-{% endblock %}
+{% if debug_payload %}
+<!-- DEBUG VISUAL: VER LO QUE ESTÁ GUARDADO EN BD -->
+<div style="background:#0b1220;border:1px solid #1f2a44;color:#9fdcff;padding:8px;border-radius:8px;margin-bottom:12px;font-size:12px">
+  <b>DEBUG:</b> empresa={{ debug_payload.empresa_id }} |
+  addr={{ debug_payload.address|default:"" }} |
+  phone={{ debug_payload.phone|default:"" }} |
+  email={{ debug_payload.email|default:"" }} |
+  web={{ debug_payload.website|default:"" }} |
+  currency={{ debug_payload.currency }} |
+  tax={{ debug_payload.tax }} |
+  tax_default={{ debug_payload.tax_default }}
+</div>
+{% endif %}
 
 {% block extra_css %}
 <style>
-    .settings-container {
-        max-width: 800px;
-        margin: 0 auto;
-    }
-    
     .form-section {
         background: white;
-        border-radius: 15px;
-        padding: 30px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        margin-bottom: 30px;
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 24px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        border: 1px solid #e5e7eb;
     }
     
     .form-section h4 {
-        color: var(--company-primary, #0d6efd);
+        color: #1f2937;
         margin-bottom: 20px;
+        font-size: 1.25rem;
+        font-weight: 600;
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 12px;
     }
     
-    .logo-preview {
-        max-width: 200px;
-        max-height: 100px;
-        border: 2px dashed #dee2e6;
-        border-radius: 10px;
-        padding: 20px;
-        text-align: center;
-        transition: all 0.3s ease;
+    .form-section h4 i {
+        color: #3b82f6;
+        font-size: 1.1em;
+    }
+    
+    .form-label {
+        font-weight: 500;
+        color: #374151;
+        margin-bottom: 8px;
+        display: block;
+    }
+    
+    .form-control, .form-select {
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        padding: 10px 12px;
+        font-size: 14px;
+        transition: border-color 0.2s;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .form-check-input {
+        width: 18px;
+        height: 18px;
+        margin-right: 8px;
+    }
+    
+    .btn-update {
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .btn-update:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+    
+    .btn-update:active {
+        transform: translateY(0);
+    }
+    
+    .current-logo {
+        max-width: 120px;
+        max-height: 120px;
+        border-radius: 8px;
+        border: 2px solid #e5e7eb;
+    }
+    
+    .logo-section {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+    
+    .logo-info {
+        flex: 1;
+    }
+    
+    .logo-actions {
+        display: flex;
+        gap: 8px;
+    }
+    
+    .btn-clear {
+        background: #ef4444;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 12px;
         cursor: pointer;
     }
     
-    .logo-preview:hover {
-        border-color: var(--company-primary, #0d6efd);
-        background: rgba(13, 110, 253, 0.05);
+    .btn-clear:hover {
+        background: #dc2626;
     }
     
-    .logo-preview img {
-        max-width: 100%;
-        max-height: 60px;
-        object-fit: contain;
+    .help-text {
+        font-size: 12px;
+        color: #6b7280;
+        margin-top: 4px;
     }
     
-    .alert-settings {
-        border-radius: 10px;
-        border: none;
-        padding: 20px;
+    .error-message {
+        color: #dc2626;
+        font-size: 14px;
+        margin-top: 8px;
+    }
+    
+    .space-y-8 {
+        margin-bottom: 32px;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="settings-container">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="h3 mb-0">
-                <i class="fas fa-cog text-primary me-2"></i>
-                Configuración de Empresa
-            </h1>
-            <p class="text-muted mb-0">Personaliza el branding de tu taller</p>
-        </div>
-    </div>
+<div class="container-fluid">
 
-    <!-- Alert Messages -->
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-settings alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                <i class="fas fa-{{ message.tags == 'success' and 'check-circle' or 'exclamation-triangle' }} me-2"></i>
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
+  {% include "common/_tpl_marker.html" with marker_from="settings/company_settings.html" %}
+
+  <!-- 🚨 CRUZ ROJA DE CONFIRMACIÓN - TEMPLATE CORRECTA -->
+  <div style="background:#dc2626;color:white;padding:12px;border-radius:8px;margin-bottom:16px;text-align:center;font-weight:bold;font-size:18px;border:3px solid #991b1b;box-shadow:0 4px 12px rgba(220,38,38,0.3)">
+    🚨 CRUZ ROJA DE CONFIRMACIÓN 🚨<br>
+    <small style="font-size:14px;opacity:0.9;">✅ TEMPLATE CORRECTA - PARCHES APLICADOS</small>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">
+          <i class="fas fa-cog text-primary"></i>
+          ⚙️ SYSTEM CONFIGURATION
+        </h1>
+        <div class="text-muted">
+          <small>Advanced Company Settings & Control Panel</small>
+        </div>
+      </div>
+
+      <div class="alert alert-info">
+        <strong>SYSTEM ONLINE</strong><br>
+        Company ID: {{ empresa.id }}
+      </div>
+
+      <!-- CONFIG SNAPSHOT (desde la vista/BD) -->
+      <div style="margin:8px 0; padding:8px; background:#111827; color:#93c5fd; border-radius:8px; font-size:12px">
+        <b>CONFIG SNAPSHOT (desde la vista/BD):</b>
+        ID={{ empresa.id }} |
+        addr={{ config.direccion|default:"-" }} |
+        phone={{ config.telefono|default:"-" }} |
+        email={{ config.email_contacto|default:"-" }} |
+        web={{ config.sitio_web|default:"-" }} |
+        currency={{ config.moneda|default:"-" }} |
+        tax={{ config.tasa_impuesto|default:"-" }}
+      </div>
+
+      {% if messages %}
+        {% for m in messages %}
+          <div class="alert alert-{{ m.tags|default:'info' }} mb-2">{{ m }}</div>
         {% endfor %}
-    {% endif %}
+      {% endif %}
+    </div>
+  </div>
 
-    <!-- Main Form -->
-    <form method="post" enctype="multipart/form-data" id="settingsForm">
-        {% csrf_token %}
-        
-        <!-- Logo Section -->
-        <div class="form-section">
-            <h4>
-                <i class="fas fa-image"></i>
-                Logo de la Empresa
-            </h4>
-            
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="logo-preview" onclick="document.getElementById('{{ form.logo.id_for_label }}').click()">
-                        {% if company_settings.logo %}
-                            <img src="{{ company_settings.logo.url }}" alt="Logo actual" id="logoPreview">
-                        {% else %}
-                            <div id="logoPreview">
-                                <i class="fas fa-upload fa-2x text-muted mb-2"></i>
-                                <p class="text-muted mb-0">Clic para subir logo</p>
-                            </div>
-                        {% endif %}
-                    </div>
-                    {{ form.logo }}
-                    {% if form.logo.help_text %}
-                        <small class="form-text text-muted">{{ form.logo.help_text }}</small>
-                    {% endif %}
-                </div>
-            </div>
+  <!-- ========== FORM 1: PROFILE ========== -->
+  <form method="post" enctype="multipart/form-data" class="space-y-8">
+    {% csrf_token %}
+    <input type="hidden" name="section" value="profile">
+    <div class="form-section">
+      <h4><i class="fas fa-building"></i> 🏢 COMPANY PROFILE</h4>
+
+      <div class="row">
+        <div class="col-md-6">
+          <label class="form-label">{{ form.nombre_publico.label }}</label>
+          {{ form.nombre_publico }}
+          {% if form.nombre_publico.errors %}<div class="error-message">{{ form.nombre_publico.errors.0 }}</div>{% endif %}
         </div>
-        
-        <!-- Company Name Section -->
-        <div class="form-section">
-            <h4>
-                <i class="fas fa-tag"></i>
-                Nombre de la Empresa
-            </h4>
-            
-            <div class="row">
-                <div class="col-md-12">
-                    <label class="form-label">{{ form.nombre_publico.label }}</label>
-                    {{ form.nombre_publico }}
-                    {% if form.nombre_publico.help_text %}
-                        <small class="form-text text-muted">{{ form.nombre_publico.help_text }}</small>
-                    {% endif %}
-                </div>
-            </div>
+        <div class="col-md-6">
+          <label class="form-label">{{ form.tagline.label }}</label>
+          {{ form.tagline }}
+          {% if form.tagline.errors %}<div class="error-message">{{ form.tagline.errors.0 }}</div>{% endif %}
         </div>
+      </div>
 
-        <!-- Tagline / Slogan Section -->
-        <div class="form-section">
-            <h4>
-                <i class="fas fa-quote-left"></i>
-                Tagline / Slogan
-            </h4>
-
-            <div class="row">
-                <div class="col-md-12">
-                    <label class="form-label">{{ form.tagline.label }}</label>
-                    {{ form.tagline }}
-                    {% if form.tagline.help_text %}
-                        <small class="form-text text-muted">{{ form.tagline.help_text }}</small>
-                    {% endif %}
-                </div>
-            </div>
+      <div class="row mt-3">
+        <div class="col-md-12">
+          <label class="form-label">{{ form.logo.label }}</label>
+          <div class="logo-section">
+            {% if config.logo %}
+              <img src="{{ config.logo.url }}" alt="Logo actual" class="current-logo">
+              <div class="logo-info"><strong>Actualmente:</strong> {{ config.logo.name }}</div>
+            {% else %}
+              <div class="logo-info"><small class="text-muted">No hay logo actual</small></div>
+            {% endif %}
+          </div>
+          {{ form.logo }}
+          {% if form.logo.errors %}<div class="error-message">{{ form.logo.errors.0 }}</div>{% endif %}
         </div>
+      </div>
 
-        <!-- Tax Configuration Section -->
-        <div class="form-section">
-            <h4>
-                <i class="fas fa-percentage"></i>
-                {% if user.empresa.pais == 'US' %}Tax Configuration{% else %}Configuración Fiscal{% endif %}
-            </h4>
-
-            <div class="row">
-                <div class="col-md-6">
-                    <label class="form-label">{{ form.iva_porcentaje.label }}</label>
-                    {{ form.iva_porcentaje }}
-                    <small class="form-text text-muted">
-                        {% if user.empresa.pais == 'US' %}
-                            Tax rate applied to documents
-                        {% else %}
-                            Porcentaje de IVA aplicado a los documentos
-                        {% endif %}
-                    </small>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-check mt-4">
-                        {{ form.aplicar_iva_por_defecto }}
-                        <label class="form-check-label" for="{{ form.aplicar_iva_por_defecto.id_for_label }}">
-                            {{ form.aplicar_iva_por_defecto.label }}
-                        </label>
-                        <small class="form-text text-muted d-block">
-                            {% if user.empresa.pais == 'US' %}
-                                Documents will include tax automatically
-                            {% else %}
-                                Los documentos incluirán IVA automáticamente
-                            {% endif %}
-                        </small>
-                    </div>
-                </div>
-            </div>
+      <div class="row mt-3">
+        <div class="col-md-12">
+          <label class="form-label">{{ form.direccion.label }}</label>
+          {{ form.direccion }}
+          {% if form.direccion.errors %}<div class="error-message">{{ form.direccion.errors.0 }}</div>{% endif %}
         </div>
+      </div>
 
-        <!-- Submit Button -->
-        <div class="form-section">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <button type="submit" class="btn btn-primary btn-lg">
-                        <i class="fas fa-save me-2"></i>
-                        💾 UPDATE PROFILE
-                    </button>
-                    <button type="button" class="btn btn-outline-secondary btn-lg ms-2" onclick="resetForm()">
-                        <i class="fas fa-undo me-2"></i>
-                        Descartar Cambios
-                    </button>
-                </div>
-                
-                <div class="text-muted">
-                    <small>
-                        <i class="fas fa-clock me-1"></i>
-                        Última actualización: {{ company_settings.updated_at|date:"d/m/Y H:i" }}
-                    </small>
-                </div>
-            </div>
+      <div class="row mt-3">
+        <div class="col-md-6">
+          <label class="form-label">{{ form.telefono.label }}</label>
+          {{ form.telefono }}
+          {% if form.telefono.errors %}<div class="error-message">{{ form.telefono.errors.0 }}</div>{% endif %}
         </div>
-    </form>
+        <div class="col-md-6">
+          <label class="form-label">{{ form.email_contacto.label }}</label>
+          {{ form.email_contacto }}
+          {% if form.email_contacto.errors %}<div class="error-message">{{ form.email_contacto.errors.0 }}</div>{% endif %}
+        </div>
+      </div>
+
+      <div class="row mt-3">
+        <div class="col-md-12">
+          <label class="form-label">{{ form.sitio_web.label }}</label>
+          {{ form.sitio_web }}
+          {% if form.sitio_web.errors %}<div class="error-message">{{ form.sitio_web.errors.0 }}</div>{% endif %}
+        </div>
+      </div>
+
+      <button type="submit" class="btn-update mt-4">
+        <i class="fas fa-save"></i> 💾 UPDATE PROFILE
+      </button>
+    </div>
+  </form>
+
+  <!-- ========== FORM 2: FINANCIAL ========== -->
+  <form method="post" class="space-y-8">
+    {% csrf_token %}
+    <input type="hidden" name="section" value="financial">
+    <div class="form-section">
+      <h4><i class="fas fa-coins"></i> 💰 FINANCIAL CONFIG</h4>
+
+      <div class="row">
+        <div class="col-md-4">
+          <label class="form-label">{{ form.moneda.label }}</label>
+          {{ form.moneda }}
+          {% if form.moneda.errors %}<div class="error-message">{{ form.moneda.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">{{ form.tasa_impuesto.label }}</label>
+          {{ form.tasa_impuesto }}
+          {% if form.tasa_impuesto.errors %}<div class="error-message">{{ form.tasa_impuesto.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-4">
+          <div class="mt-4">
+            <label class="form-label d-flex align-items-center">
+              {{ form.aplicar_impuesto_por_defecto }}
+              <span class="ms-2">Apply Tax by Default</span>
+            </label>
+            {% if form.aplicar_impuesto_por_defecto.errors %}<div class="error-message">{{ form.aplicar_impuesto_por_defecto.errors.0 }}</div>{% endif %}
+          </div>
+        </div>
+      </div>
+
+      <p class="text-xs opacity-70 mt-2"><strong>Nota:</strong> En Chile usa 19.00; en USA usa 0.00 o el sales tax local.</p>
+
+      <button type="submit" class="btn-update mt-4">
+        <i class="fas fa-save"></i> 💱 UPDATE FINANCIAL
+      </button>
+    </div>
+  </form>
+
+  <!-- ========== FORM 3: THEME ========== -->
+  <form method="post" class="space-y-8">
+    {% csrf_token %}
+    <input type="hidden" name="section" value="theme">
+    <div class="form-section">
+      <h4><i class="fas fa-palette"></i> 🎨 VISUAL THEME</h4>
+
+      <div class="row">
+        <div class="col-md-6">
+          <label class="form-label">{{ form.brand_color.label }}</label>
+          {{ form.brand_color }}
+          {% if form.brand_color.errors %}<div class="error-message">{{ form.brand_color.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-md-6">
+          <div class="mt-4">
+            <label class="form-label d-flex align-items-center">
+              {{ form.dividir_por_tecnico }}
+              <span class="ms-2">Separate by Technician</span>
+            </label>
+            {% if form.dividir_por_tecnico.errors %}<div class="error-message">{{ form.dividir_por_tecnico.errors.0 }}</div>{% endif %}
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-update mt-4">
+        <i class="fas fa-save"></i> 🎨 UPDATE THEME
+      </button>
+    </div>
+  </form>
+
+  <!-- QUICK ACTIONS (igual que antes) -->
+  <div class="form-section">
+    <h4><i class="fas fa-bolt"></i> ⚡ QUICK ACTIONS</h4>
+    <div class="row">
+      <div class="col-md-3">
+        <a href="{% url 'taller:tecnicos:lista' %}" class="btn btn-outline-primary w-100">
+          <i class="fas fa-tools"></i> 👨‍🔧 MANAGE TECHNICIANS
+        </a>
+      </div>
+      <div class="col-md-3">
+        <a href="{% url 'taller:centro_operaciones' %}" class="btn btn-outline-info w-100">
+          <i class="fas fa-satellite"></i> 🛰️ SPACE CENTER
+        </a>
+      </div>
+      <div class="col-md-3">
+        <a href="{% url 'taller:documentos:lista' %}" class="btn btn-outline-success w-100">
+          <i class="fas fa-file-alt"></i> 📄 DOCUMENTS
+        </a>
+      </div>
+      <div class="col-md-3">
+        <button type="button" onclick="location.reload()" class="btn btn-outline-secondary w-100">
+          <i class="fas fa-sync-alt"></i> 🔄 REFRESH SYSTEM
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CP Snapshot (esta vista) -->
+  <div style="margin-top:14px;padding:8px;border:2px solid #dc2626;border-radius:8px;font-size:12px;color:#333;background:#fef2f2;position:relative;">
+    <div style="position:absolute;top:-8px;left:16px;background:#dc2626;color:white;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:bold;">🚨 DIAGNÓSTICO ACTIVO</div>
+    <b>CP Snapshot (esta vista):</b><br>
+    ID={{ COMPANY_ID|default:"-" }}
+    | ADDRESS={{ COMPANY_ADDRESS|default:"-" }}
+    | PHONE={{ COMPANY_PHONE|default:"-" }}
+    | EMAIL={{ COMPANY_EMAIL|default:"-" }}
+    | WEB={{ COMPANY_WEBSITE|default:"-" }}
+    | TAX={{ COMPANY_TAX_RATE|default:"-" }}
+  </div>
+
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Setup logo preview
-    setupLogoPreview();
-    
-    // Setup form listeners
-    setupFormListeners();
-});
-
-function setupLogoPreview() {
-    const logoInput = document.getElementById('{{ form.logo.id_for_label }}');
-    if (logoInput) {
-        logoInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const preview = document.getElementById('logoPreview');
-                    preview.innerHTML = '<img src="' + e.target.result + '" alt="Logo preview">';
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-    }
-}
-
-function setupFormListeners() {
-    const nombrePublicoInput = document.getElementById('{{ form.nombre_publico.id_for_label }}');
-    const taglineInput = document.getElementById('{{ form.tagline.id_for_label }}');
-    
-    if (nombrePublicoInput) {
-        nombrePublicoInput.addEventListener('input', function() {
-            console.log('Nombre público cambiado:', this.value);
-        });
-    }
-    
-    if (taglineInput) {
-        taglineInput.addEventListener('input', function() {
-            console.log('Tagline cambiado:', this.value);
-        });
-    }
-}
-
-function resetForm() {
-    if (confirm('¿Descartar todos los cambios realizados?')) {
-        document.getElementById('settingsForm').reset();
-        location.reload();
-    }
-}
-</script>
 {% endblock %}

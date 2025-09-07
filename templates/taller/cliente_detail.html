@@ -83,7 +83,7 @@
            class="inline-flex items-center px-4 py-2 rounded-lg shadow bg-gradient-to-r from-cyan-500 to-fuchsia-500 text-white font-semibold hover:from-fuchsia-500 hover:to-cyan-500 transition-all duration-200 border border-cyan-400/60">
           ✏️ Editar
         </a>
-        <a href="{% url 'taller:clientes:eliminar_cliente' object.pk %}" 
+        <a href="{% url 'taller:clientes:delete' pk=object.pk %}" 
            class="inline-flex items-center px-4 py-2 rounded-lg shadow bg-red-600 text-white font-semibold hover:bg-red-700 transition-all duration-200 border border-red-500/60">
           🗑️ Eliminar
         </a>

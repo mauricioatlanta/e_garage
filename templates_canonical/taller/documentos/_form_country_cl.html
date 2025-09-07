@@ -1,0 +1,37 @@
+{% load i18n widget_tweaks %}
+
+{# ===== Chile: opciones y campos específicos ===== #}
+<div class="seccion-card">
+  <h3 class="seccion-title">🇨🇱 Opciones Chile</h3>
+
+  {# Kilometraje: usa el mismo campo extra del form (kilometraje) que persiste en vehiculo.millas #}
+  <div class="form-grid">
+    <div class="form-group">
+      <label class="form-label" for="{{ form.kilometraje.id_for_label }}">
+        {% trans "Kilometraje (km)" %}
+      </label>
+      {% if form.kilometraje %}
+        {{ form.kilometraje|add_class:"form-input" }}
+        {% if form.kilometraje.errors %}
+          <div class="error-message">{{ form.kilometraje.errors|join:", " }}</div>
+        {% endif %}
+        {% if form.kilometraje.help_text %}
+          <small class="text-cyan-300">{{ form.kilometraje.help_text }}</small>
+        {% endif %}
+      {% else %}
+        <p class="error-message">
+          {% trans "El formulario no expone el campo 'kilometraje'. Verifica DocumentoForm.__init__." %}
+        </p>
+      {% endif %}
+    </div>
+  </div>
+
+  {# Nota de impuestos (solo presentación; el cálculo real es del backend) #}
+  <div style="margin-top: 1rem;">
+    <div style="background: rgba(0, 242, 254, 0.1); border: 1px solid rgba(0, 242, 254, 0.3); border-radius: 0.5rem; padding: 0.75rem;">
+      <span style="color: #00f2fe; font-size: 0.9rem;">
+        ℹ️ {% trans "IVA 19% aplicado solo a Repuestos" %}
+      </span>
+    </div>
+  </div>
+</div>

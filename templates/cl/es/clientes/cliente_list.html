@@ -57,7 +57,7 @@
                   <a href="{% url 'taller:clientes:editar_cliente' cliente.pk %}" class="text-cyan-300 hover:text-lime-300 transition" title="Editar">
                     <i class="fas fa-edit"></i>
                   </a>
-                  <a href="{% url 'taller:clientes:eliminar_cliente' cliente.pk %}" class="text-red-400 hover:text-red-300 transition" title="Eliminar" onclick="return confirmarEliminacion('{{ cliente.nombre }} {{ cliente.apellido }}');">
+                  <a href="{% url 'taller:clientes:eliminar_cliente' cliente_id=cliente.pk %}" class="text-red-400 hover:text-red-300 transition" title="Eliminar" >
                     <i class="fas fa-trash"></i>
                   </a>
                 </div>

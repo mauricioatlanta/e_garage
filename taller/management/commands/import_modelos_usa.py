@@ -5,14 +5,18 @@ desde el CSV generado por el scraper de VehiclesAPI (USA 1970-presente)
 
 import csv
 import pathlib
+
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from django.utils import timezone
+
 from taller.models.catalogo import CatalogoModeloAuto
 
 
 class Command(BaseCommand):
-    help = "Importa Marca,Modelo desde el CSV generado por el scraper (USA 1970–presente)"
+    help = (
+        "Importa Marca,Modelo desde el CSV generado por el scraper (USA 1970–presente)"
+    )
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -54,12 +58,16 @@ class Command(BaseCommand):
         if clear_first:
             if is_dry_run:
                 current_count = CatalogoModeloAuto.objects.count()
-                self.stdout.write(f"🗑️  DRY-RUN: Se eliminarían {current_count} registros")
+                self.stdout.write(
+                    f"🗑️  DRY-RUN: Se eliminarían {current_count} registros"
+                )
             else:
                 deleted_count = CatalogoModeloAuto.objects.count()
                 CatalogoModeloAuto.objects.all().delete()
                 self.stdout.write(
-                    self.style.WARNING(f"🗑️  Eliminados {deleted_count} registros existentes")
+                    self.style.WARNING(
+                        f"🗑️  Eliminados {deleted_count} registros existentes"
+                    )
                 )
 
         # Leer y procesar CSV
@@ -67,22 +75,24 @@ class Command(BaseCommand):
             rows = []
             duplicados = 0
             lineas_vacias = 0
-            
+
             with csv_path.open("r", encoding="utf-8", newline="") as f:
                 reader = csv.DictReader(f)
-                
-                for line_num, record in enumerate(reader, start=2):  # +2 porque line 1 es header
+
+                for line_num, record in enumerate(
+                    reader, start=2
+                ):  # +2 porque line 1 es header
                     marca = (record.get("Marca") or "").strip()
                     modelo = (record.get("Modelo") or "").strip()
-                    
+
                     if not marca or not modelo:
                         lineas_vacias += 1
                         continue
-                    
+
                     # Normalización básica
                     marca = marca.title()
                     modelo = modelo.strip()
-                    
+
                     rows.append(CatalogoModeloAuto(marca=marca, modelo=modelo))
 
             total_filas = len(rows)
@@ -105,15 +115,14 @@ class Command(BaseCommand):
 
             with transaction.atomic():
                 for i in range(0, len(rows), chunk_size):
-                    chunk = rows[i:i + chunk_size]
-                    
+                    chunk = rows[i : i + chunk_size]
+
                     # bulk_create con ignore_conflicts evita errores por duplicados
                     created = CatalogoModeloAuto.objects.bulk_create(
-                        chunk, 
-                        ignore_conflicts=True
+                        chunk, ignore_conflicts=True
                     )
                     created_count += len(created)
-                    
+
                     # Progreso cada chunk
                     progress = ((i + len(chunk)) / len(rows)) * 100
                     self.stdout.write(f"⏳ Progreso: {progress:.1f}%")
@@ -122,7 +131,7 @@ class Command(BaseCommand):
             end_time = timezone.now()
             duration = (end_time - start_time).total_seconds()
             total_db = CatalogoModeloAuto.objects.count()
-            marcas_db = CatalogoModeloAuto.objects.values('marca').distinct().count()
+            marcas_db = CatalogoModeloAuto.objects.values("marca").distinct().count()
 
             self.stdout.write(self.style.SUCCESS("✅ Importación completada"))
             self.stdout.write(f"📈 Registros en DB: {total_db}")
@@ -136,12 +145,13 @@ class Command(BaseCommand):
     def _get_top_marcas_preview(self, limit=10):
         """Muestra las marcas más populares para verificación"""
         from django.db.models import Count
-        
-        top_marcas = (CatalogoModeloAuto.objects
-                     .values('marca')
-                     .annotate(count=Count('modelo'))
-                     .order_by('-count')[:limit])
-        
+
+        top_marcas = (
+            CatalogoModeloAuto.objects.values("marca")
+            .annotate(count=Count("modelo"))
+            .order_by("-count")[:limit]
+        )
+
         self.stdout.write("🔝 Top marcas:")
         for marca in top_marcas:
             self.stdout.write(f"   • {marca['marca']}: {marca['count']} modelos")

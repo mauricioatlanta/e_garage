@@ -1,27 +1,31 @@
 # views_documento_mejorado.py - Con auditoría y control de permisos
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
-from django.contrib import messages
-from taller.models.documento import Documento
-from taller.models.lineas_documento import LineaRepuesto, LineaServicio
-from taller.models.tecnico import Tecnico
-from taller.models.perfil_usuario import PerfilUsuario
-from taller.models.auditoria import LogAuditoria
-from taller.forms import DocumentoForm
 import json
 
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
+from django.shortcuts import get_object_or_404, redirect, render
 
-def log_auditoria_documento(usuario, empresa, accion, documento=None, descripcion="", request=None):
+from taller.forms import DocumentoForm
+from taller.models.auditoria import LogAuditoria
+from taller.models.documento import Documento
+from taller.models.lineas_documento import LineaRepuesto, LineaServicio
+from taller.models.perfil_usuario import PerfilUsuario
+from taller.models.tecnico import Tecnico
+
+
+def log_auditoria_documento(
+    usuario, empresa, accion, documento=None, descripcion="", request=None
+):
     """Helper para crear logs de auditoría específicos de documentos"""
     LogAuditoria.log_accion(
         usuario=usuario,
         empresa=empresa,
         accion=accion,
-        modelo='DOCUMENTO',
+        modelo="DOCUMENTO",
         objeto_id=documento.pk if documento else None,
         descripcion=descripcion,
-        request=request
+        request=request,
     )
 
 
@@ -31,29 +35,30 @@ def lista_documentos(request):
     # BLINDAJE MULTI-TENANT: Verificar autenticación y empresa
     if not request.user.is_authenticated:
         messages.error(request, "Usuario no autenticado")
-        return redirect('dashboard')
-    
-    empresa = getattr(request.user, 'empresa', None)
+        return redirect("dashboard")
+
+    empresa = getattr(request.user, "empresa", None)
     if not empresa:
         messages.error(request, "Usuario sin empresa asignada")
-        return redirect('dashboard')
-    
+        return redirect("dashboard")
+
     # BLINDAJE: Mostrar solo documentos de la empresa del usuario
     documentos = Documento.objects.filter(empresa=empresa)
     descripcion = f"Acceso a lista de documentos de empresa {empresa.nombre}"
-    
+
     # Log de auditoría
     log_auditoria_documento(
         usuario=request.user,
         empresa=empresa,
-        accion='VIEW',
+        accion="VIEW",
         descripcion=descripcion,
-        request=request
+        request=request,
     )
-    return render(request, 'taller/documentos/lista_documentos.html', {
-        'documentos': documentos,
-        'total_documentos': documentos.count()
-    })
+    return render(
+        request,
+        "taller/documentos/lista_documentos.html",
+        {"documentos": documentos, "total_documentos": documentos.count()},
+    )
 
 
 @login_required
@@ -63,135 +68,149 @@ def crear_documento(request):
         perfil = PerfilUsuario.objects.get(user=request.user)
     except PerfilUsuario.DoesNotExist:
         messages.error(request, "Usuario sin perfil de empresa configurado")
-        return redirect('dashboard')
-    
+        return redirect("dashboard")
+
     # Lógica moderna: cualquier usuario autenticado puede crear documento
 
-    if request.method == 'POST':
+    if request.method == "POST":
         form = DocumentoForm(request.POST)
         if form.is_valid():
             # Datos antes de crear
             datos_antes = None
-            
+
             # Crear documento
             documento = form.save(commit=False)
             documento.user = request.user
             documento.save()
-            
+
             # Datos después de crear
             datos_despues = {
-                'id': documento.pk,
-                'numero_documento': documento.numero_documento,
-                'tipo_documento': documento.tipo,
-                'fecha': str(documento.fecha_emision),
-                'cliente_id': documento.cliente.pk if documento.cliente else None,
-                'vehiculo_id': documento.vehiculo.pk if documento.vehiculo else None,
+                "id": documento.pk,
+                "numero_documento": documento.numero_documento,
+                "tipo_documento": documento.tipo,
+                "fecha": str(documento.fecha_emision),
+                "cliente_id": documento.cliente.pk if documento.cliente else None,
+                "vehiculo_id": documento.vehiculo.pk if documento.vehiculo else None,
             }
-            
+
             # Procesar repuestos y servicios
             repuestos_creados = []
             servicios_creados = []
-            
-            json_items = request.POST.get('json_items')
+
+            json_items = request.POST.get("json_items")
             if json_items:
                 try:
                     data = json.loads(json_items)
                     for item in data:
-                        if item['tipo'] == 'repuesto':
+                        if item["tipo"] == "repuesto":
                             repuesto = LineaRepuesto.objects.create(
                                 documento=documento,
-                                codigo=item['partnumber'],
-                                nombre=item['nombre'],
-                                cantidad=item.get('cantidad', 1),
-                                precio_unitario=item['precio'],
+                                codigo=item["partnumber"],
+                                nombre=item["nombre"],
+                                cantidad=item.get("cantidad", 1),
+                                precio_unitario=item["precio"],
                             )
-                            repuestos_creados.append({
-                                'codigo': repuesto.codigo,
-                                'nombre': repuesto.nombre,
-                                'cantidad': repuesto.cantidad,
-                                'precio': repuesto.precio_unitario
-                            })
-                            
-                        elif item['tipo'] == 'servicio':
+                            repuestos_creados.append(
+                                {
+                                    "codigo": repuesto.codigo,
+                                    "nombre": repuesto.nombre,
+                                    "cantidad": repuesto.cantidad,
+                                    "precio": repuesto.precio_unitario,
+                                }
+                            )
+
+                        elif item["tipo"] == "servicio":
                             servicio = LineaServicio.objects.create(
                                 documento=documento,
-                                nombre=item['nombre'],
-                                precio_unitario=item['precio'],
-                                cantidad=item.get('cantidad', 1)
+                                nombre=item["nombre"],
+                                precio_unitario=item["precio"],
+                                cantidad=item.get("cantidad", 1),
                             )
-                            servicios_creados.append({
-                                'nombre': servicio.nombre,
-                                'precio': servicio.precio_unitario
-                            })
-                    
+                            servicios_creados.append(
+                                {
+                                    "nombre": servicio.nombre,
+                                    "precio": servicio.precio_unitario,
+                                }
+                            )
+
                     # Agregar items a datos después
-                    datos_despues['repuestos'] = repuestos_creados
-                    datos_despues['servicios'] = servicios_creados
-                    
+                    datos_despues["repuestos"] = repuestos_creados
+                    datos_despues["servicios"] = servicios_creados
+
                 except json.JSONDecodeError as e:
-                    messages.error(request, f"Error procesando items del documento: {e}")
-                    
+                    messages.error(
+                        request, f"Error procesando items del documento: {e}"
+                    )
+
                     # Log del error
                     log_auditoria_documento(
                         usuario=request.user,
                         empresa=None,
-                        accion='CREATE',
+                        accion="CREATE",
                         documento=documento,
                         descripcion=f"Error al procesar items JSON: {e}",
-                        request=request
+                        request=request,
                     )
-            
+
             # Log de auditoría exitoso
             total_repuestos = len(repuestos_creados)
             total_servicios = len(servicios_creados)
             descripcion = f"Documento creado: {documento.numero_documento} con {total_repuestos} repuestos y {total_servicios} servicios"
-            
+
             log_auditoria_documento(
                 usuario=request.user,
                 empresa=None,
-                accion='CREATE',
+                accion="CREATE",
                 documento=documento,
                 descripcion=descripcion,
-                request=request
+                request=request,
             )
-            
-            messages.success(request, f"Documento {documento.numero_documento} creado exitosamente")
-            return redirect('documentos:lista_documentos')
+
+            messages.success(
+                request, f"Documento {documento.numero_documento} creado exitosamente"
+            )
+            return redirect("documentos:lista_documentos")
         else:
             # Log de errores de validación
-            errores = "; ".join([f"{campo}: {error}" for campo, error in form.errors.items()])
+            errores = "; ".join(
+                [f"{campo}: {error}" for campo, error in form.errors.items()]
+            )
             log_auditoria_documento(
                 usuario=request.user,
                 empresa=None,
-                accion='CREATE',
+                accion="CREATE",
                 descripcion=f"Intento fallido de crear documento. Errores: {errores}",
-                request=request
+                request=request,
             )
             messages.error(request, "Error en los datos del formulario")
     else:
         form = DocumentoForm()
-        
+
         # Log de acceso a formulario
         log_auditoria_documento(
             usuario=request.user,
             empresa=None,
-            accion='VIEW',
+            accion="VIEW",
             descripcion="Acceso a formulario de crear documento",
-            request=request
+            request=request,
         )
 
     # BLINDAJE MULTI-TENANT: Cargar técnicos solo de la empresa del usuario
-    empresa = getattr(request.user, 'empresa', None)
-    if empresa and hasattr(Tecnico, 'empresa'):
+    empresa = getattr(request.user, "empresa", None)
+    if empresa and hasattr(Tecnico, "empresa"):
         tecnicos = Tecnico.objects.filter(activo=True, empresa=empresa)
     else:
         # Fallback si Tecnico no es multi-tenant
         tecnicos = Tecnico.objects.filter(activo=True)
 
-    return render(request, 'taller/documentos/crear_documento.html', {
-        'form': form,
-        'tecnicos': tecnicos,
-    })
+    return render(
+        request,
+        "taller/documentos/crear_documento.html",
+        {
+            "form": form,
+            "tecnicos": tecnicos,
+        },
+    )
 
 
 @login_required
@@ -201,31 +220,31 @@ def editar_documento(request, documento_id):
         perfil = PerfilUsuario.objects.get(user=request.user)
     except PerfilUsuario.DoesNotExist:
         messages.error(request, "Usuario sin perfil de empresa configurado")
-        return redirect('dashboard')
+        return redirect("dashboard")
 
     # Obtener documento solo si pertenece al usuario
     documento = get_object_or_404(Documento, id=documento_id, user=request.user)
 
     # Datos antes de editar
     datos_antes = {
-        'numero_documento': documento.numero_documento,
-        'tipo_documento': documento.tipo_documento,
-        'fecha': str(documento.fecha),
-        'observaciones': documento.observaciones,
-        'repuestos': list(LineaRepuesto.objects.filter(documento=documento).values()),
-    'servicios': list(LineaServicio.objects.filter(documento=documento).values())
+        "numero_documento": documento.numero_documento,
+        "tipo_documento": documento.tipo_documento,
+        "fecha": str(documento.fecha),
+        "observaciones": documento.observaciones,
+        "repuestos": list(LineaRepuesto.objects.filter(documento=documento).values()),
+        "servicios": list(LineaServicio.objects.filter(documento=documento).values()),
     }
 
     repuestos = LineaRepuesto.objects.filter(documento=documento)
     servicios = LineaServicio.objects.filter(documento=documento)
-    
-    if request.method == 'POST':
+
+    if request.method == "POST":
         form = DocumentoForm(request.POST, instance=documento)
         if form.is_valid():
             documento_actualizado = form.save()
 
             # Procesar repuestos y servicios actualizados
-            json_items = request.POST.get('json_items')
+            json_items = request.POST.get("json_items")
             if json_items:
                 try:
                     data = json.loads(json_items)
@@ -236,36 +255,40 @@ def editar_documento(request, documento_id):
 
                     # Crear nuevos ítems
                     for item in data:
-                        if item['tipo'] == 'repuesto':
+                        if item["tipo"] == "repuesto":
                             LineaRepuesto.objects.create(
                                 documento=documento,
-                                codigo=item['partnumber'],
-                                nombre=item['nombre'],
-                                cantidad=item['cantidad'],
-                                precio_unitario=item['precio'],
+                                codigo=item["partnumber"],
+                                nombre=item["nombre"],
+                                cantidad=item["cantidad"],
+                                precio_unitario=item["precio"],
                             )
-                        elif item['tipo'] == 'servicio':
+                        elif item["tipo"] == "servicio":
                             LineaServicio.objects.create(
                                 documento=documento,
-                                nombre=item['nombre'],
-                                precio=item['precio'],
+                                nombre=item["nombre"],
+                                precio=item["precio"],
                             )
-                            
+
                     # Recargar repuestos y servicios después de guardar
                     repuestos = LineaRepuesto.objects.filter(documento=documento)
                     servicios = LineaServicio.objects.filter(documento=documento)
-                    
+
                 except json.JSONDecodeError as e:
                     messages.error(request, f"Error procesando items: {e}")
 
             # Datos después de editar
             datos_despues = {
-                'numero_documento': documento.numero_documento,
-                'tipo_documento': documento.tipo_documento,
-                'fecha': str(documento.fecha),
-                'observaciones': documento.observaciones,
-                'repuestos': list(LineaRepuesto.objects.filter(documento=documento).values()),
-                'servicios': list(LineaServicio.objects.filter(documento=documento).values())
+                "numero_documento": documento.numero_documento,
+                "tipo_documento": documento.tipo_documento,
+                "fecha": str(documento.fecha),
+                "observaciones": documento.observaciones,
+                "repuestos": list(
+                    LineaRepuesto.objects.filter(documento=documento).values()
+                ),
+                "servicios": list(
+                    LineaServicio.objects.filter(documento=documento).values()
+                ),
             }
 
             # Log de auditoría con cambios
@@ -273,43 +296,50 @@ def editar_documento(request, documento_id):
             log_auditoria_documento(
                 usuario=request.user,
                 empresa=None,
-                accion='UPDATE',
+                accion="UPDATE",
                 documento=documento,
                 descripcion=descripcion,
-                request=request
+                request=request,
             )
 
-            messages.success(request, f"Documento {documento.numero_documento} actualizado exitosamente")
-            return redirect('documentos:detalle_documento', documento_id=documento.pk)
+            messages.success(
+                request,
+                f"Documento {documento.numero_documento} actualizado exitosamente",
+            )
+            return redirect("documentos:detalle_documento", documento_id=documento.pk)
     else:
         form = DocumentoForm(instance=documento)
-        
+
         # Log de acceso a edición
         log_auditoria_documento(
             usuario=request.user,
             empresa=None,
-            accion='VIEW',
+            accion="VIEW",
             documento=documento,
             descripcion=f"Acceso a editar documento: {documento.numero_documento}",
-            request=request
+            request=request,
         )
 
     # BLINDAJE MULTI-TENANT: Cargar técnicos solo de la empresa del usuario
-    empresa = getattr(request.user, 'empresa', None)
-    if empresa and hasattr(Tecnico, 'empresa'):
+    empresa = getattr(request.user, "empresa", None)
+    if empresa and hasattr(Tecnico, "empresa"):
         tecnicos = Tecnico.objects.filter(activo=True, empresa=empresa)
     else:
         # Fallback si Tecnico no es multi-tenant
         tecnicos = Tecnico.objects.filter(activo=True)
 
-    return render(request, 'taller/documentos/crear_documento.html', {
-        'form': form,
-        'editando': True,
-        'documento': documento,
-        'repuestos': repuestos,
-        'servicios': servicios,
-        'tecnicos': tecnicos,
-    })
+    return render(
+        request,
+        "taller/documentos/crear_documento.html",
+        {
+            "form": form,
+            "editando": True,
+            "documento": documento,
+            "repuestos": repuestos,
+            "servicios": servicios,
+            "tecnicos": tecnicos,
+        },
+    )
 
 
 @login_required
@@ -319,49 +349,53 @@ def detalle_documento(request, documento_id):
         perfil = PerfilUsuario.objects.get(user=request.user)
     except PerfilUsuario.DoesNotExist:
         messages.error(request, "Usuario sin perfil de empresa configurado")
-        return redirect('dashboard')
+        return redirect("dashboard")
 
     # Obtener documento solo si pertenece al usuario
     documento = get_object_or_404(Documento, id=documento_id, user=request.user)
-    
+
     # Log de auditoría
     log_auditoria_documento(
         usuario=request.user,
         empresa=None,
-        accion='VIEW',
+        accion="VIEW",
         documento=documento,
         descripcion=f"Visualización de documento: {documento.numero_documento}",
-        request=request
+        request=request,
     )
-    
-    return render(request, 'taller/documentos/detalle_documento.html', {
-        'documento': documento
-    })
+
+    return render(
+        request, "taller/documentos/detalle_documento.html", {"documento": documento}
+    )
 
 
-@login_required 
+@login_required
 def eliminar_documento(request, documento_id):
     """Eliminar documento con auditoría"""
     try:
         perfil = PerfilUsuario.objects.get(user=request.user)
     except PerfilUsuario.DoesNotExist:
         messages.error(request, "Usuario sin perfil de empresa configurado")
-        return redirect('dashboard')
+        return redirect("dashboard")
 
     # Lógica moderna: cualquier usuario autenticado puede eliminar su propio documento
 
     # Obtener documento solo si pertenece al usuario
     documento = get_object_or_404(Documento, id=documento_id, user=request.user)
 
-    if request.method == 'POST':
+    if request.method == "POST":
         # Datos antes de eliminar
         datos_antes = {
-            'numero_documento': documento.numero_documento,
-            'tipo_documento': documento.tipo_documento,
-            'fecha': str(documento.fecha),
-            'cliente': str(documento.cliente) if documento.cliente else None,
-            'repuestos_count': LineaRepuesto.objects.filter(documento=documento).count(),
-            'servicios_count': LineaServicio.objects.filter(documento=documento).count()
+            "numero_documento": documento.numero_documento,
+            "tipo_documento": documento.tipo_documento,
+            "fecha": str(documento.fecha),
+            "cliente": str(documento.cliente) if documento.cliente else None,
+            "repuestos_count": LineaRepuesto.objects.filter(
+                documento=documento
+            ).count(),
+            "servicios_count": LineaServicio.objects.filter(
+                documento=documento
+            ).count(),
         }
 
         numero_doc = documento.numero_documento
@@ -371,14 +405,14 @@ def eliminar_documento(request, documento_id):
         log_auditoria_documento(
             usuario=request.user,
             empresa=None,
-            accion='DELETE',
+            accion="DELETE",
             descripcion=f"Documento eliminado: {numero_doc}",
-            request=request
+            request=request,
         )
 
         messages.success(request, f"Documento {numero_doc} eliminado exitosamente")
-        return redirect('documentos:lista_documentos')
+        return redirect("documentos:lista_documentos")
 
-    return render(request, 'taller/documentos/confirmar_eliminar.html', {
-        'documento': documento
-    })
+    return render(
+        request, "taller/documentos/confirmar_eliminar.html", {"documento": documento}
+    )

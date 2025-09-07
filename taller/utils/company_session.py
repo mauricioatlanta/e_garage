@@ -1,6 +1,7 @@
 """
 Utilidades para manejo de empresa activa en sesión.
 """
+
 from taller.models import Empresa
 
 
@@ -14,10 +15,12 @@ def set_active_company(request, empresa=None):
             empresa = Empresa.objects.get(user=request.user)
         except Empresa.DoesNotExist:
             empresa = None
-    
+
     if empresa:
         request.session["empresa_id"] = empresa.id
-        print(f"✅ Empresa activa establecida: {empresa.nombre_taller} (ID: {empresa.id})")
+        print(
+            f"✅ Empresa activa establecida: {empresa.nombre_taller} (ID: {empresa.id})"
+        )
     else:
         request.session.pop("empresa_id", None)
         print("⚠️  No se pudo establecer empresa activa")

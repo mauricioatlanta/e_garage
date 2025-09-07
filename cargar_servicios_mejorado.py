@@ -1,4 +1,4 @@
-from taller.models import CategoriaServicio, SubcategoriaServicio, Servicio
+from taller.models import CategoriaServicio, Servicio, SubcategoriaServicio
 
 servicios_por_categoria = {
     "1. Mantenimiento Preventivo y Servicios Periódicos": [
@@ -17,7 +17,7 @@ servicios_por_categoria = {
         "Revisión de presión y estado de neumáticos",
         "Revisión del sistema de escape y catalizador",
         "Rotación cruzada de neumáticos",
-        "Test de batería y sistema de carga eléctrica"
+        "Test de batería y sistema de carga eléctrica",
     ],
     "2. Reparaciones Mecánicas Generales": [
         "Ajuste y sincronización electrónica del motor",
@@ -36,7 +36,7 @@ servicios_por_categoria = {
         "Rectificación de culata y prueba hidráulica",
         "Reparación de fugas de aceite y refrigerante",
         "Reparación de sistema de inyección (common rail, TBI)",
-        "Revisión y reparación de sistema de escape (flexibles, catalizador)"
+        "Revisión y reparación de sistema de escape (flexibles, catalizador)",
     ],
     "3. Sistema de Frenos": [
         "Cambio de cilindro maestro de frenos",
@@ -47,7 +47,7 @@ servicios_por_categoria = {
         "Cambio de tambores y zapatas",
         "Purgado y sangrado del sistema de frenos",
         "Diagnóstico y reparación de ABS",
-        "Revisión y ajuste del freno de mano"
+        "Revisión y ajuste del freno de mano",
     ],
     "4. Sistema de Transmisión y Embrague": [
         "Cambio de aceite de transmisión automática (ATF)",
@@ -58,7 +58,7 @@ servicios_por_categoria = {
         "Cambio de homocinéticas internas y externas",
         "Cambio de retenes de transmisión",
         "Cambio de volante de inercia (bimasa o sólido)",
-        "Reparación o reemplazo de caja de cambios"
+        "Reparación o reemplazo de caja de cambios",
     ],
     "5. Sistema de Suspensión y Dirección": [
         "Ajuste y calibración de dirección hidráulica o EPS",
@@ -70,7 +70,7 @@ servicios_por_categoria = {
         "Cambio de cremallera o caja de dirección",
         "Cambio de espirales o resortes",
         "Reparación de sistema de dirección asistida",
-        "Revisión general de alineación y geometría"
+        "Revisión general de alineación y geometría",
     ],
     "6. Sistema Eléctrico y Electrónico": [
         "Cambio de focos, ampolletas halógenas y LED",
@@ -86,7 +86,7 @@ servicios_por_categoria = {
         "Instalación de luces LED o xenón",
         "Instalación de pantallas, radios y multimedia",
         "Reparación de alzavidrios eléctricos",
-        "Detección y solución de cortocircuitos"
+        "Detección y solución de cortocircuitos",
     ],
     "7. Aire Acondicionado y Climatización": [
         "Cambio de compresor de aire acondicionado",
@@ -96,7 +96,7 @@ servicios_por_categoria = {
         "Carga y reciclado de gas refrigerante R134a o R1234yf",
         "Detección de fugas con nitrógeno o UV",
         "Limpieza interna del sistema de climatización",
-        "Revisión y cambio de ventiladores interiores o radiador"
+        "Revisión y cambio de ventiladores interiores o radiador",
     ],
     "8. Desabolladura y Pintura": [
         "Eliminación de rayones y microarañazos",
@@ -108,7 +108,7 @@ servicios_por_categoria = {
         "Pulido, abrillantado y encerado profesional",
         "Reparación de golpes leves y abolladuras",
         "Reparación y pintura de parachoques plásticos",
-        "Cambio o reparación de molduras externas"
+        "Cambio o reparación de molduras externas",
     ],
     "9. Vidrios y Accesorios": [
         "Cambio de luneta trasera con desempañador",
@@ -119,7 +119,7 @@ servicios_por_categoria = {
         "Cambio de plumillas y sistema de limpiaparabrisas",
         "Polarizado de vidrios con lámina certificada",
         "Reparación y mantenimiento de sunroof",
-        "Reparación de trizaduras con resina"
+        "Reparación de trizaduras con resina",
     ],
     "10. Inspecciones y Certificaciones": [
         "Certificación de conversión a gas vehicular (GLP/GNC)",
@@ -130,11 +130,13 @@ servicios_por_categoria = {
         "Inspección de sistema eléctrico y luces",
         "Inspección pre-compra para autos usados",
         "Pre-chequeo técnico para Revisión Técnica",
-        "Revisión de sistema de emisiones y catalizador"
-    ]
+        "Revisión de sistema de emisiones y catalizador",
+    ],
 }
 
-categoria_padre, _ = CategoriaServicio.objects.get_or_create(nombre="Servicios Automotrices")
+categoria_padre, _ = CategoriaServicio.objects.get_or_create(
+    nombre="Servicios Automotrices"
+)
 
 contador_categorias = 1
 contador_subcategorias = 0
@@ -142,14 +144,17 @@ contador_servicios = 0
 
 for nombre_subcat, lista_servicios in servicios_por_categoria.items():
     subcategoria, creada = SubcategoriaServicio.objects.get_or_create(
-        nombre=nombre_subcat,
-        categoria=categoria_padre
+        nombre=nombre_subcat, categoria=categoria_padre
     )
     if creada:
         contador_subcategorias += 1
     for servicio in lista_servicios:
-        _, creado = Servicio.objects.get_or_create(nombre=servicio, subcategoria=subcategoria)
+        _, creado = Servicio.objects.get_or_create(
+            nombre=servicio, subcategoria=subcategoria
+        )
         if creado:
             contador_servicios += 1
 
-print(f"✅ Se cargaron {contador_categorias} categoría general, {contador_subcategorias} subcategorías y {contador_servicios} servicios.")
+print(
+    f"✅ Se cargaron {contador_categorias} categoría general, {contador_subcategorias} subcategorías y {contador_servicios} servicios."
+)

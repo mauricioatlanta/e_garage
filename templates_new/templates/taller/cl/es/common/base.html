@@ -4,17 +4,26 @@
 <html lang="{{ LANGUAGE_CODE }}">  {# 👈 Idioma dinámico #}
 <head>
   <meta charset="UTF-8">
-  <title>{% block title %}{{ company_name|defaul      <!-- 🌐 Selector de idioma con bandera dinámica -->
-      {% include "components/country_badge.html" %}
-      <form action="{% url 'set_language' %}" method="post" class="inline-block mx-2">
-        {% csrf_token %}
-        <input name="next" type="hidden" value="{{ request.get_full_path }}">
-        <select name="language" onchange="this.form.submit()" class="bg-black/60 text-cyan-300 border border-cyan-700 rounded px-2 py-1 text-sm">
-          <option value="es" {% if LANGUAGE_CODE == 'es' %}selected{% endif %}>ES</option>
-          <option value="en" {% if LANGUAGE_CODE == 'en' %}selected{% endif %}>EN</option>
-        </select>
-      </form>{% endblock %}</title>
+  <title>{% block title %}{{ company_name|default:"eGarage" }}{% endblock %}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- 🟢 MARCADOR TEMPORAL: TEMPLATES_NEW CL/ES BASE.HTML ACTIVO -->
+  <style>
+    .template-marker-green {
+      position: fixed !important;
+      top: 10px !important;
+      right: 50% !important;
+      transform: translateX(50%) !important;
+      z-index: 99999 !important;
+      background: green !important;
+      color: white !important;
+      padding: 10px !important;
+      border-radius: 5px !important;
+      font-size: 12px !important;
+      font-weight: bold !important;
+      box-shadow: 0 0 10px rgba(0,255,0,0.8) !important;
+    }
+  </style>
 
   <!-- 🌐 Catálogo JavaScript para gettext -->
   <script src="{% url 'javascript-catalog' %}"></script>
@@ -60,13 +69,19 @@
   <!-- jQuery -->
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
+  <!-- Select2 CSS y JS -->
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
   <!-- TailwindCSS -->
 
-  <!-- Autocomplete Light (DAL) -->
+  <!-- Autocomplete Light (DAL) - Comentado para evitar conflicto con Select2 manual -->
+  <!-- 
   <script src="{% static 'autocomplete_light/jquery.init.js' %}"></script>
   <script src="{% static 'autocomplete_light/select2.js' %}"></script>
   <script src="{% static 'autocomplete_light/autocomplete_light.js' %}"></script>
   <script src="{% static 'autocomplete_light/autocomplete.init.js' %}"></script>
+  -->
 
   {% block extra_head %}{% endblock %}
   {% block extra_css %}{% endblock %}
@@ -74,6 +89,9 @@
 
 <body class="bg-[#05070c] text-white font-sans min-h-screen flex flex-col relative dark-mode {% if enable_space_bg == 2 %}starfield-lite{% endif %}">
 {# Para desactivar en una página específica: crea un template alterno sin el starfield o pasa enable_space_bg=0 desde la vista. #}
+
+<!-- 🟢 MARCADOR VISUAL: TEMPLATES_NEW CL/ES -->
+<div class="template-marker-green">🟢 NEW CL/ES BASE.HTML</div>
 
 {% if enable_space_bg|default:1 %}
   <!-- Fondo animado de estrellas (modo completo o ligero) -->
@@ -103,7 +121,8 @@
   <div class="ml-auto flex items-center gap-4">
     <!-- Botón Settings -->
     {% if request.user.is_authenticated %}
-      {% url 'taller:company_settings' as settings_url %}
+      {% load country_url %}
+      {% country_url 'company_settings' app_namespace='taller' as settings_url %}
       {% if settings_url %}
         <a href="{{ settings_url }}"
            class="flex items-center gap-2 px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition"
@@ -137,8 +156,8 @@
       {% endif %}
       {% if empresa_usuario %}
         <span class="ml-4 text-lg font-semibold text-lime-300">{{ empresa_usuario.nombre_taller }}</span>
-      {% elif company_settings.tagline %}
-        <span class="ml-4 text-lg font-semibold text-lime-300">{{ company_settings.tagline }}</span>
+      {% elif company_tagline %}
+        <span class="ml-4 text-lg font-semibold text-lime-300">{{ company_tagline }}</span>
       {% endif %}
     {% else %}
       <a href="/" class="text-2xl font-extrabold text-cyan-300 tracking-widest hover:text-lime-300 transition">{{ company_name|default:"eGarage" }}</a>
@@ -188,7 +207,8 @@
       {% endif %}
       
       <!-- Settings -->
-      {% url 'taller:company_settings' as url_settings %}
+      {% load country_url %}
+      {% country_url 'company_settings' app_namespace='taller' as url_settings %}
       {% if url_settings %}
         <a href="{{ url_settings }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
           <span>⚙️</span>

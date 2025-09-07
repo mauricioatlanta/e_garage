@@ -22,7 +22,7 @@
       <td class="py-3 px-4 text-center">
   {% url 'taller:clientes:ver_cliente' cliente.id as url_ver_cliente %}
   {% url 'taller:clientes:editar_cliente' cliente.id as url_editar_cliente %}
-  {% url 'taller:clientes:eliminar_cliente' cliente.id as url_eliminar_cliente %}
+  {% url 'taller:clientes:delete' pk=cliente.id as url_eliminar_cliente %}
   <div class="inline-flex items-center gap-2 justify-center">
     <a href="{{ url_ver_cliente|default:'#' }}" class="btn-small view-btn" title="Ver cliente">👁️ Ver</a>
     <a href="{{ url_editar_cliente|default:'#' }}" class="btn-small edit-btn" title="Editar cliente">✏️ Editar</a>

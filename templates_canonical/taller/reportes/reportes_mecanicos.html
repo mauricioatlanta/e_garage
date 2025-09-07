@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load i18n static %}
+{% load i18n static custom_filters %}
 
 {% block content %}
 {% csrf_token %}
@@ -132,7 +132,7 @@
           <div class="flex items-center justify-between">
             <div>
               <p class="text-gray-400 text-sm">{% trans "Total Generado" %}</p>
-              <p class="text-3xl font-bold text-green-300">${{ total_generado|floatformat:0 }}</p>
+              <p class="text-3xl font-bold text-green-300">{{ total_generado|currency_format:request.user.empresa.pais|default:'CL' }}</p>
             </div>
             <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-green-500/30 to-emerald-500/30 border border-green-400/40 flex items-center justify-center">
               <span class="text-green-300 text-xl">💰</span>
@@ -148,7 +148,7 @@
           <div class="flex items-center justify-between">
             <div>
               <p class="text-gray-400 text-sm">{% trans "Promedio/Doc" %}</p>
-              <p class="text-3xl font-bold text-purple-300">${{ promedio_por_documento|floatformat:0 }}</p>
+              <p class="text-3xl font-bold text-purple-300">{{ promedio_por_documento|currency_format:request.user.empresa.pais|default:'CL' }}</p>
             </div>
             <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-purple-500/30 to-pink-500/30 border border-purple-400/40 flex items-center justify-center">
               <span class="text-purple-300 text-xl">📈</span>
@@ -216,7 +216,7 @@
                       <span class="text-gray-200">{{ documento.fecha_emision|date:"d/m/Y" }}</span>
                     </td>
                     <td class="py-3 px-4">
-                      <span class="text-green-300 font-bold">${{ documento.total|floatformat:0 }}</span>
+                      <span class="text-green-300 font-bold">{{ documento.total|currency_format:request.user.empresa.pais|default:'CL' }}</span>
                     </td>
                     <td class="py-3 px-4">
                       <div class="flex items-center space-x-2">

@@ -4,16 +4,13 @@ Ejecuta esto para crear un usuario admin y datos de prueba
 
 # Crear superusuario
 from django.contrib.auth.models import User
+
 user, created = User.objects.get_or_create(
-    username='admin',
-    defaults={
-        'email': 'admin@test.com', 
-        'is_staff': True,
-        'is_superuser': True
-    }
+    username="admin",
+    defaults={"email": "admin@test.com", "is_staff": True, "is_superuser": True},
 )
 if created:
-    user.set_password('admin123')
+    user.set_password("admin123")
     user.save()
     print(f"✅ Superusuario creado: admin / admin123")
 else:
@@ -21,13 +18,14 @@ else:
 
 # Crear empresa
 from taller.models.empresa import Empresa
+
 empresa, created = Empresa.objects.get_or_create(
     usuario=user,
     defaults={
-        'nombre_taller': 'Mi Taller de Prueba',
-        'telefono': '555-1234',
-        'email': 'taller@test.com'
-    }
+        "nombre_taller": "Mi Taller de Prueba",
+        "telefono": "555-1234",
+        "email": "taller@test.com",
+    },
 )
 if created:
     print(f"✅ Empresa creada: {empresa.nombre_taller}")
@@ -36,12 +34,9 @@ else:
 
 # Crear perfil
 from taller.models.perfil_usuario import PerfilUsuario
+
 perfil, created = PerfilUsuario.objects.get_or_create(
-    user=user,
-    defaults={
-        'empresa': empresa,
-        'es_superadmin': False
-    }
+    user=user, defaults={"empresa": empresa, "es_superadmin": False}
 )
 if created:
     print(f"✅ Perfil creado")
@@ -50,23 +45,22 @@ else:
 
 # Crear técnicos
 from taller.models.tecnico import Tecnico
+
 tecnicos_datos = [
-    'Juan Pérez - Técnico Jefe',
-    'María González - Especialista en Frenos', 
-    'Carlos López - Electricista',
-    'Ana Martínez - Diagnóstico',
-    'Luis Rodríguez - Suspensión'
+    "Juan Pérez - Técnico Jefe",
+    "María González - Especialista en Frenos",
+    "Carlos López - Electricista",
+    "Ana Martínez - Diagnóstico",
+    "Luis Rodríguez - Suspensión",
 ]
 
 for i, nombre in enumerate(tecnicos_datos):
     activo = i < 4  # Los primeros 4 activos, el último inactivo
     tecnico, created = Tecnico.objects.get_or_create(
-        empresa=empresa,
-        nombre=nombre,
-        defaults={'activo': activo}
+        empresa=empresa, nombre=nombre, defaults={"activo": activo}
     )
     if created:
-        status = "✅ ACTIVO" if tecnico.activo else "❌ INACTIVO" 
+        status = "✅ ACTIVO" if tecnico.activo else "❌ INACTIVO"
         print(f"{status} Técnico: {tecnico.nombre}")
 
 print("\n🎉 ¡Datos creados! Ahora puedes:")

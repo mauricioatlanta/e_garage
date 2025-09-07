@@ -2,12 +2,12 @@
 Script para simplificar el dashboard espacial y eliminar campos problemáticos
 """
 
+from datetime import timedelta
+from decimal import Decimal
 
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.utils import timezone
-from datetime import timedelta
-from decimal import Decimal
 
 # Reemplazar la función completa con una versión simplificada
 codigo_simplificado = '''@login_required

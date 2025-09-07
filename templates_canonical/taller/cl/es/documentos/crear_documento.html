@@ -460,19 +460,15 @@ input[type="checkbox"] {
 
 <!-- JavaScript para funcionalidad interactiva -->
 <script>
-// URLs para APIs
-{% url 'taller:documentos:api_vehiculos_por_cliente' as url_vxcli %}
-{% url 'taller:repuestos:api_repuesto_por_codigo' as url_rep_code %}
-{% url 'taller:documentos:buscar_clientes_ajax' as url_buscar_clientes %}
+/* URLs resueltas por Django (respetan /cl o /us, namespaces, etc.) */
+const urlVeh            = "/cl/ajax/vehiculos-por-cliente/";
+const urlRep            = "/cl/repuestos/api/repuesto-por-codigo/";
+const urlBuscarClientes = "/cl/ajax/clientes/buscar/";
 
-const urlVeh = "{{ url_vxcli }}";
-const urlRep = "{{ url_rep_code }}";
-const urlBuscarClientes = "{{ url_buscar_clientes }}";
-
-console.log('URLs configuradas:', { urlVeh, urlRep, urlBuscarClientes });
-
-// Espera que el template reciba {{ country }}
+/* País para formato de moneda (si ya lo pasas al contexto, úsalo; si no, CL por defecto) */
 const COUNTRY = "{{ country|default:'CL' }}";
+
+console.log('URLs canónicas configuradas:', { urlVeh, urlRep, urlBuscarClientes });
 
 // 1) Saneador robusto: "$15.000", "15,000.50", "  15000  " -> número
 function numRaw(v) {
@@ -572,22 +568,79 @@ function applyTheme(tipo) {
    
    if (tipo) {
      try {
+       // Usar URL canónica si está disponible, fallback a construida
+       const urlNextNumber = "/cl/documentos/api/obtener-numero-documento/";
+       console.log('🔢 Obteniendo próximo número:', { tipo, url: urlNextNumber });
+       
        // Hacer llamada AJAX para obtener el siguiente número
-       const response = await fetch(`/taller/documentos/api/next-number/?tipo=${encodeURIComponent(tipo)}`);
+       const response = await fetch(`${urlNextNumber}?tipo=${encodeURIComponent(tipo)}`, {
+         headers: {
+           'X-Requested-With': 'XMLHttpRequest'
+         }
+       });
+       
        if (response.ok) {
          const data = await response.json();
-         numeroField.textContent = data.numero;
+         numeroField.textContent = data.numero || `Número ${tipo}`;
+         console.log('✅ Número obtenido:', data.numero);
        } else {
+         console.warn('⚠️ No se pudo obtener número automático');
          numeroField.textContent = `Se generará automáticamente (${tipo})`;
        }
      } catch (error) {
-       console.error('Error obteniendo número:', error);
+       console.error('❌ Error obteniendo número:', error);
        numeroField.textContent = `Se generará automáticamente (${tipo})`;
      }
    } else {
      numeroField.textContent = 'Se generará automáticamente';
    }
  }
+
+// Función simplificada y robusta para cargar vehículos por cliente
+async function cargarVehiculosPorCliente(clienteId) {
+  const selVeh = document.getElementById('id_vehiculo');
+  if (!selVeh || !clienteId) {
+    if (selVeh) selVeh.innerHTML = '<option value="">Seleccione cliente primero...</option>';
+    console.log('❌ No se puede cargar vehículos:', { selVeh: !!selVeh, clienteId });
+    return;
+  }
+
+  console.log('🔄 Cargando vehículos para cliente:', clienteId, 'URL:', urlVeh);
+  selVeh.innerHTML = '<option value="">-- Cargando vehículos... --</option>';
+  
+  try {
+    const r = await fetch(`${urlVeh}?cliente=${encodeURIComponent(clienteId)}`, {
+      headers: { 'X-Requested-With': 'XMLHttpRequest' },
+      credentials: 'same-origin'
+    });
+
+    console.log('📡 Respuesta vehículos:', { status: r.status, ok: r.ok });
+
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const data = await r.json();
+    
+    console.log('✅ Datos vehículos recibidos:', data);
+
+    const items = Array.isArray(data) ? data : (data.results || []);
+    if (!items.length) {
+      selVeh.innerHTML = '<option value="">-- No hay vehículos registrados --</option>';
+      console.log('⚠️ Cliente sin vehículos registrados');
+      return;
+    }
+
+    selVeh.innerHTML = '<option value="">Seleccione vehículo...</option>' +
+      items.map(v => {
+        const label = v.text || [v.patente, v.marca, v.modelo].filter(Boolean).join(' ') || `Vehículo #${v.id}`;
+        return `<option value="${v.id}">${label}</option>`;
+      }).join('');
+
+    console.log(`✅ ${items.length} vehículos cargados correctamente`);
+
+  } catch (err) {
+    console.error('❌ Error cargando vehículos:', err);
+    selVeh.innerHTML = '<option value="">-- Error al cargar vehículos --</option>';
+  }
+}
 
 // Búsqueda AJAX de clientes
 let searchTimeout;
@@ -602,14 +655,67 @@ async function buscarClientes(query) {
     return;
   }
 
+  console.log('🔍 Buscando clientes con:', query, 'URL:', urlBuscarClientes);
+
   try {
-    const response = await fetch(`${urlBuscarClientes}?q=${encodeURIComponent(query)}`);
+    const response = await fetch(`${urlBuscarClientes}?q=${encodeURIComponent(query)}`, {
+      method: 'GET',
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'Content-Type': 'application/json',
+      },
+      credentials: 'same-origin'
+    });
+    
+    console.log('📡 Respuesta:', { 
+      status: response.status, 
+      ok: response.ok, 
+      contentType: response.headers.get('content-type') 
+    });
+    
+    // Verificar si es un redirect de login
+    if (response.status === 302 || response.status === 401) {
+      console.error('❌ Usuario no autenticado - redirigiendo a login');
+      clienteResultados.innerHTML = '<div class="p-3 text-red-400">⚠️ Sesión expirada. <a href="/accounts/login/" class="underline text-cyan-200">Inicia sesión</a></div>';
+      clienteResultados.classList.remove('hidden');
+      return;
+    }
+    
     if (response.ok) {
-      const clientes = await response.json();
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        console.error('❌ Respuesta no es JSON:', contentType);
+        clienteResultados.innerHTML = '<div class="p-3 text-red-400">❌ Error: respuesta no válida del servidor</div>';
+        clienteResultados.classList.remove('hidden');
+        return;
+      }
+      
+      const data = await response.json();
+      console.log('✅ Datos recibidos:', data);
+      
+      // Normalizar datos - manejar diferentes formatos
+      let clientes = [];
+      if (Array.isArray(data)) {
+        clientes = data;
+      } else if (data && Array.isArray(data.results)) {
+        clientes = data.results;
+      } else if (data && Array.isArray(data.items)) {
+        clientes = data.items;
+      } else {
+        console.warn('⚠️ Formato inesperado:', data);
+        clientes = [];
+      }
+      
       mostrarResultadosClientes(clientes);
+    } else {
+      console.error('❌ Error HTTP:', response.status, response.statusText);
+      clienteResultados.innerHTML = '<div class="p-3 text-red-400">❌ Error del servidor</div>';
+      clienteResultados.classList.remove('hidden');
     }
   } catch (error) {
-    console.error('Error buscando clientes:', error);
+    console.error('❌ Error completo:', error);
+    clienteResultados.innerHTML = '<div class="p-3 text-red-400">❌ Error de conexión</div>';
+    clienteResultados.classList.remove('hidden');
   }
 }
 
@@ -620,23 +726,42 @@ function mostrarResultadosClientes(clientes) {
     return;
   }
 
-  clienteResultados.innerHTML = clientes.map(cliente => `
-    <div class="cliente-item p-3 hover:bg-cyan-700 cursor-pointer border-b border-cyan-600 last:border-b-0" 
-         data-id="${cliente.id}" 
-         data-nombre="${cliente.nombre_completo || cliente.nombre}"
-         data-email="${cliente.email}"
-         data-telefono="${cliente.telefono}">
-      <div class="font-semibold text-cyan-200">${cliente.nombre_completo || cliente.nombre}</div>
-      <div class="text-sm text-gray-300">
-        ${cliente.telefono ? `📞 ${cliente.telefono}` : ''}
-        ${cliente.telefono && cliente.email ? ' | ' : ''}
-        ${cliente.email ? `📧 ${cliente.email}` : ''}
-        ${!cliente.telefono && !cliente.email ? 'Sin información adicional' : ''}
+  clienteResultados.innerHTML = clientes.map(cliente => {
+    // Manejar diferentes formatos de datos de cliente
+    const nombre = cliente.text || 
+                   cliente.nombre_completo || 
+                   cliente.nombre || 
+                   cliente.razon_social || 
+                   `Cliente #${cliente.id}` || 
+                   'Cliente sin nombre';
+    
+    const email = cliente.email || '';
+    const telefono = cliente.telefono || '';
+    const rut = cliente.rut || '';
+    
+    console.log('📋 Procesando cliente:', { id: cliente.id, nombre, email, telefono, rut });
+    
+    return `
+      <div class="cliente-item p-3 hover:bg-cyan-700 cursor-pointer border-b border-cyan-600 last:border-b-0" 
+           data-id="${cliente.id || ''}" 
+           data-nombre="${nombre}"
+           data-email="${email}"
+           data-telefono="${telefono}">
+        <div class="font-semibold text-cyan-200">${nombre}</div>
+        <div class="text-sm text-gray-300">
+          ${rut ? `RUT: ${rut}` : ''}
+          ${rut && (telefono || email) ? ' | ' : ''}
+          ${telefono ? `📞 ${telefono}` : ''}
+          ${telefono && email ? ' | ' : ''}
+          ${email ? `📧 ${email}` : ''}
+          ${!rut && !telefono && !email ? 'Sin información adicional' : ''}
+        </div>
       </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 
   clienteResultados.classList.remove('hidden');
+  console.log('✅ Resultados de clientes mostrados:', clientes.length);
 }
 
 async function seleccionarCliente(clienteId, nombre, email, telefono) {
@@ -697,37 +822,76 @@ clienteResultados?.addEventListener('click', (e) => {
 document.addEventListener('DOMContentLoaded', () => {
   applyTheme(selTipo?.value);
   updateDocumentNumber();
-});
-
-// Función para cargar vehículos por cliente
-async function cargarVehiculosPorCliente(clienteId) {
-  const selVeh = document.getElementById('id_vehiculo');
-  if (!selVeh || !clienteId || urlVeh === '#') {
-    console.log('No se puede cargar vehículos:', { selVeh: !!selVeh, clienteId, urlVeh });
-    return;
-  }
   
-  console.log('Cargando vehículos para cliente:', clienteId, 'URL:', urlVeh);
+  // 🚀 Inicializar búsqueda de clientes con Select2
+  console.log('🔧 Configurando búsqueda de clientes...');
   
   try {
-    const r = await fetch(`${urlVeh}?cliente_id=${encodeURIComponent(clienteId)}`);
-    console.log('Respuesta de vehículos:', r.status, r.ok);
+    const clienteSelect = $('#id_cliente');
+    if (clienteSelect.length && typeof $.fn.select2 === 'function') {
+      clienteSelect.select2({
+        ajax: {
+          url: urlBuscarClientes,
+          dataType: 'json',
+          delay: 300,
+          data: function (params) {
+            return {
+              q: params.term,
+              page: params.page || 1
+            };
+          },
+          processResults: function (data) {
+            console.log('📊 Resultados de búsqueda:', data);
+            const results = Array.isArray(data) ? data : (data.results || []);
+            return {
+              results: results.map(item => ({
+                id: item.id,
+                text: item.text || `${item.nombre || item.razon_social || 'Cliente'} (RUT: ${item.rut || 'N/A'})`
+              }))
+            };
+          },
+          transport: function (params, success, failure) {
+            const request = $.ajax({
+              url: params.url,
+              data: params.data,
+              headers: { 
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+              }
+            });
+            request.then(success).catch(failure);
+            return request;
+          }
+        },
+        placeholder: 'Buscar cliente...',
+        minimumInputLength: 2,
+        language: 'es',
+        allowClear: true
+      });
+      
+      console.log('✅ Select2 configurado correctamente');
+    } else {
+      console.log('⚠️ Select2 no disponible, usando búsqueda básica');
+    }
     
-    if (!r.ok) return;
-    const data = await r.json();
-    console.log('Datos de vehículos recibidos:', data);
-    
-    let html = '<option value="">Seleccione vehículo...</option>';
-    data.forEach(v => {
-      const label = `${v.patente || v.vin || ''} ${v.marca__nombre || ''} ${v.modelo__nombre || ''}`.trim();
-      html += `<option value="${v.id}">${label}</option>`;
+    // Configurar evento de cambio de cliente
+    $('#id_cliente').on('change', function() {
+      const clienteId = $(this).val();
+      console.log('🔄 Cliente seleccionado:', clienteId);
+      if (clienteId) {
+        cargarVehiculosPorCliente(clienteId);
+      } else {
+        const selVeh = document.getElementById('id_vehiculo');
+        if (selVeh) {
+          selVeh.innerHTML = '<option value="">Seleccione cliente primero...</option>';
+        }
+      }
     });
-    selVeh.innerHTML = html;
-    console.log('Vehículos cargados en select:', selVeh.innerHTML);
+    
   } catch (error) {
-    console.error('Error cargando vehículos:', error);
+    console.error('❌ Error configurando búsqueda de clientes:', error);
   }
-}
+});
 
 // Cargar vehículos por cliente (event listener para el select oculto)
 const selCliente = document.getElementById('id_cliente');

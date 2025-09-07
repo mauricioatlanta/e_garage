@@ -1,9 +1,11 @@
 from django.core.management.base import BaseCommand
+
 from taller.models.perfil_usuario import PerfilUsuario
 from taller.models.ubicacion import Ciudad
 
+
 class Command(BaseCommand):
-    help = 'Limpia el campo ciudad en PerfilUsuario para migración a ForeignKey.'
+    help = "Limpia el campo ciudad en PerfilUsuario para migración a ForeignKey."
 
     def handle(self, *args, **options):
         count = 0
@@ -21,4 +23,4 @@ class Command(BaseCommand):
                 perfil.ciudad = None
                 perfil.save()
                 count += 1
-        self.stdout.write(self.style.SUCCESS(f'Perfiles actualizados: {count}'))
+        self.stdout.write(self.style.SUCCESS(f"Perfiles actualizados: {count}"))

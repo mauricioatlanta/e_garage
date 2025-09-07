@@ -38,7 +38,7 @@
           </div>
           {% endif %}
         </div>
-        <form method="post" class="mt-10" onsubmit="return window.confirm('{% if LANGUAGE_CODE == 'es' %}¿Confirmas la eliminación permanente?{% else %}Confirm permanent deletion?{% endif %}');">
+        <form method="post" action="{% url 'taller:clientes:eliminar_cliente' cliente_id=cliente.pk %}" class="mt-10" id="delete-form">
           {% csrf_token %}
           <div class="flex flex-col sm:flex-row gap-4">
             {% url 'taller:clientes:lista_clientes' as url_lista %}
@@ -47,13 +47,30 @@
               <span class="text-lg">⟲</span>
               <span>{% if LANGUAGE_CODE == 'es' %}Cancelar{% else %}Cancel{% endif %}</span>
             </a>
-            <button type="submit" class="flex-1 relative inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-red-600 via-fuchsia-600 to-rose-600 hover:from-red-500 hover:via-fuchsia-500 hover:to-rose-500 text-white font-bold px-6 py-4 shadow-lg shadow-red-800/40 transition-all border border-red-400/40">
+            <button type="submit" id="delete-button" class="flex-1 relative inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-red-600 via-fuchsia-600 to-rose-600 hover:from-red-500 hover:via-fuchsia-500 hover:to-rose-500 text-white font-bold px-6 py-4 shadow-lg shadow-red-800/40 transition-all border border-red-400/40">
               <span class="text-lg">🗑️</span>
-              <span>{% if LANGUAGE_CODE == 'es' %}Eliminar Definitivamente{% else %}Delete Permanently{% endif %}</span>
+              <span id="button-text">{% if LANGUAGE_CODE == 'es' %}Eliminar Definitivamente{% else %}Delete Permanently{% endif %}</span>
               <span class="absolute -inset-px rounded-xl ring-2 ring-red-400/40 animate-pulse"></span>
             </button>
           </div>
         </form>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('delete-form');
+    const button = document.getElementById('delete-button');
+    const buttonText = document.getElementById('button-text');
+
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        
+        if (confirm('{% if LANGUAGE_CODE == 'es' %}¿Confirmas la eliminación permanente?{% else %}Confirm permanent deletion?{% endif %}')) {
+            button.disabled = true;
+            buttonText.textContent = '{% if LANGUAGE_CODE == 'es' %}Eliminando...{% else %}Deleting...{% endif %}';
+            form.submit();
+        }
+    }, { once: true });
+});
+</script>
         <div class="mt-10 text-xs text-gray-500 space-y-1">
           <p>⚡ {% if LANGUAGE_CODE == 'es' %}Acción irreversible. Exporta datos si es necesario.{% else %}Irreversible action. Export data if needed.{% endif %}</p>
           <p>🛡️ {% if LANGUAGE_CODE == 'es' %}Considera soft-delete si requiere auditoría futura.{% else %}Consider soft-delete if future auditing is required.{% endif %}</p>

@@ -1,7 +1,7 @@
 # taller/views_autocomplete.py
 from dal import autocomplete
-from taller.models.vehiculos import Vehiculo
 
+from taller.models.vehiculos import Vehiculo
 
 
 class AutocompleteVehiculo(autocomplete.Select2QuerySetView):
@@ -10,4 +10,3 @@ class AutocompleteVehiculo(autocomplete.Select2QuerySetView):
         if self.q:
             qs = qs.filter(patente__icontains=self.q)
         return qs
-

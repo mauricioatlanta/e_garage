@@ -1,5 +1,7 @@
 from django.db import models
+
 from taller.models.empresa import Empresa
+
 
 class Cliente(models.Model):
     nombre = models.CharField(max_length=100)

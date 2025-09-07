@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}eGarage Pro{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts - Futuristic -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom Futuristic CSS -->
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --cyber-gradient: linear-gradient(135deg, #00d4ff 0%, #090979 100%);
+            --dark-bg: #0a0a0f;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --border-glow: rgba(0, 212, 255, 0.3);
+            --text-primary: #ffffff;
+            --text-secondary: #b8c5d6;
+            --accent-blue: #00d4ff;
+            --accent-purple: #8b5cf6;
+            --accent-pink: #ec4899;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
+            z-index: -1;
+        }
+
+        /* Futuristic Navbar */
+        .navbar-futuristic {
+            background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-glow);
+            box-shadow: 0 8px 32px rgba(0, 212, 255, 0.1);
+        }
+
+        .navbar-brand-futuristic {
+            font-family: 'Orbitron', monospace;
+            font-weight: 900;
+            font-size: 1.8rem;
+            background: var(--cyber-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+        }
+
+        .nav-link-futuristic {
+            color: var(--text-secondary) !important;
+            font-weight: 500;
+            font-size: 1.1rem;
+            padding: 0.75rem 1.5rem !important;
+            margin: 0 0.25rem;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link-futuristic::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--cyber-gradient);
+            transition: left 0.3s ease;
+            z-index: -1;
+        }
+
+        .nav-link-futuristic:hover::before {
+            left: 0;
+        }
+
+        .nav-link-futuristic:hover {
+            color: var(--text-primary) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 212, 255, 0.3);
+        }
+
+        /* Glassmorphism Cards */
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glow);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 212, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.2);
+            border-color: var(--accent-blue);
+        }
+
+        /* Futuristic Buttons */
+        .btn-futuristic {
+            background: var(--cyber-gradient);
+            border: none;
+            border-radius: 12px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-futuristic::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-futuristic:hover::before {
+            left: 100%;
+        }
+
+        .btn-futuristic:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 212, 255, 0.5);
+        }
+
+        .btn-futuristic-secondary {
+            background: transparent;
+            border: 2px solid var(--accent-blue);
+            color: var(--accent-blue);
+        }
+
+        .btn-futuristic-secondary:hover {
+            background: var(--accent-blue);
+            color: var(--dark-bg);
+        }
+
+        /* Futuristic Footer */
+        .footer-futuristic {
+            background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border-glow);
+            margin-top: 5rem;
+        }
+
+        .footer-content {
+            padding: 2rem 0;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .footer-glow {
+            text-shadow: 0 0 10px var(--accent-blue);
+        }
+
+        /* Animations - DISABLED to prevent motion sickness */
+        /*
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 212, 255, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(0, 212, 255, 0.6); }
+        }
+
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .glow-animation {
+            animation: glow 2s ease-in-out infinite;
+        }
+        */
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navbar-brand-futuristic {
+                font-size: 1.4rem;
+            }
+            
+            .nav-link-futuristic {
+                padding: 0.5rem 1rem !important;
+                margin: 0.25rem 0;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--dark-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--cyber-gradient);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-blue);
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- TPL MARKER para debug -->
+    {% if debug %}
+      {% include "common/_tpl_marker.html" with marker_from="templates_canonical/common/base.html" %}
+    {% endif %}
+    
+    <!-- Futuristic Header -->
+    <nav class="navbar navbar-expand-lg navbar-futuristic">
+        <div class="container-fluid">
+            <a class="navbar-brand navbar-brand-futuristic" href="/">
+                <i class="fas fa-cog me-2"></i>eGarage Pro
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon text-light"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="navbar-nav ms-auto">
+                    {% load country_url %}
+                    <a class="nav-link nav-link-futuristic" href="{% country_url 'company_settings' app_namespace='taller' %}">
+                        <i class="fas fa-sliders-h me-2"></i>Settings
+                    </a>
+                    <a class="nav-link nav-link-futuristic" href="{% url 'taller:tecnicos_lista' %}">
+                        <i class="fas fa-users-cog me-2"></i>Técnicos
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content with Futuristic Container -->
+    <main class="container-fluid py-5">
+        <div class="row justify-content-center">
+            <div class="col-12 col-xl-10">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </main>
+
+    <!-- Futuristic Footer con información de empresa -->
+    <footer class="footer-futuristic">
+        <div class="container">
+            <div class="footer-content">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-building me-2 footer-glow"></i>
+                            <span>
+                                {% if COMPANY_NAME %}{{ COMPANY_NAME }}{% else %}eGarage Pro{% endif %}
+                                {% if COMPANY_ADDRESS %} | {{ COMPANY_ADDRESS }}{% endif %}
+                                {% if COMPANY_PHONE %} | {{ COMPANY_PHONE }}{% endif %}
+                                {% if COMPANY_EMAIL %} | {{ COMPANY_EMAIL }}{% endif %}
+                                {% if COMPANY_WEBSITE %} | {{ COMPANY_WEBSITE }}{% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <div class="d-flex align-items-center justify-content-md-end">
+                            <i class="fas fa-percentage me-2 footer-glow"></i>
+                            <span>
+                                {% if COMPANY_TAX_RATE and COMPANY_TAX_RATE > 0 %}
+                                    IVA: {{ COMPANY_TAX_RATE }}%
+                                {% else %}
+                                    Sin IVA
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Futuristic JavaScript Effects - DISABLED to prevent motion sickness -->
+    <script>
+        // Animations disabled to prevent motion sickness
+        /*
+        // Add floating animation to cards
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.glass-card');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+                card.classList.add('float-animation');
+            });
+
+            // Add glow effect to interactive elements
+            const interactiveElements = document.querySelectorAll('.btn-futuristic, .nav-link-futuristic');
+            interactiveElements.forEach(element => {
+                element.addEventListener('mouseenter', function() {
+                    this.classList.add('glow-animation');
+                });
+                
+                element.addEventListener('mouseleave', function() {
+                    this.classList.remove('glow-animation');
+                });
+            });
+        });
+        */
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

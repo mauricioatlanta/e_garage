@@ -12,36 +12,45 @@ import subprocess
 import sys
 from datetime import datetime
 
+
 def print_step(step, description):
     """Imprimir paso con formato colorido"""
     print(f"\n{'='*60}")
     print(f"🎯 PASO {step}: {description}")
     print(f"{'='*60}")
 
+
 def print_success(message):
     """Imprimir mensaje de éxito"""
     print(f"✅ {message}")
+
 
 def print_info(message):
     """Imprimir mensaje informativo"""
     print(f"📋 {message}")
 
+
 def print_error(message):
     """Imprimir mensaje de error"""
     print(f"❌ {message}")
+
 
 def ejecutar_django_command(comando_python):
     """Ejecutar comando de Django usando manage.py shell"""
     try:
         # Crear archivo temporal con el comando
-        with open('temp_command.py', 'w', encoding='utf-8') as f:
+        with open("temp_command.py", "w", encoding="utf-8") as f:
             f.write(comando_python)
-        
+
         # Ejecutar usando manage.py shell
-        result = subprocess.run([
-            sys.executable, 'manage.py', 'shell'
-        ], input=comando_python, text=True, capture_output=True, encoding='utf-8')
-        
+        result = subprocess.run(
+            [sys.executable, "manage.py", "shell"],
+            input=comando_python,
+            text=True,
+            capture_output=True,
+            encoding="utf-8",
+        )
+
         if result.returncode == 0:
             print_success("Comando ejecutado exitosamente")
             if result.stdout.strip():
@@ -49,30 +58,31 @@ def ejecutar_django_command(comando_python):
         else:
             print_error(f"Error en comando: {result.stderr}")
             return False
-        
+
         # Limpiar archivo temporal
-        if os.path.exists('temp_command.py'):
-            os.remove('temp_command.py')
-        
+        if os.path.exists("temp_command.py"):
+            os.remove("temp_command.py")
+
         return True
-        
+
     except Exception as e:
         print_error(f"Error ejecutando comando: {e}")
         return False
 
+
 def main():
     """Función principal"""
-    print("🚀" + "="*80)
+    print("🚀" + "=" * 80)
     print("🚀 LIMPIEZA + REGENERACIÓN SIMPLIFICADA DE DATOS DE PRUEBA")
-    print("🚀" + "="*80)
+    print("🚀" + "=" * 80)
     print(f"⏰ Iniciado: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}")
-    
+
     # ==========================================
     # PASO 1: LIMPIEZA COMPLETA
     # ==========================================
     print_step(1, "LIMPIEZA COMPLETA DE DATOS")
-    
-    comando_limpieza = '''
+
+    comando_limpieza = """
 import os
 import django
 from django.contrib.auth.models import User
@@ -137,18 +147,18 @@ except Exception as e:
     print(f"❌ Error en limpieza: {e}")
     import traceback
     traceback.print_exc()
-'''
-    
+"""
+
     if not ejecutar_django_command(comando_limpieza):
         print_error("Failed en limpieza")
         return False
-    
+
     # ==========================================
     # PASO 2: CREAR USUARIOS Y EMPRESAS
     # ==========================================
     print_step(2, "CREACIÓN DE USUARIOS Y EMPRESAS")
-    
-    comando_usuarios = '''
+
+    comando_usuarios = """
 from django.contrib.auth.models import User
 from django.utils import timezone
 from datetime import timedelta
@@ -318,18 +328,18 @@ except Exception as e:
     print(f"❌ Error creando usuarios: {e}")
     import traceback
     traceback.print_exc()
-'''
-    
+"""
+
     if not ejecutar_django_command(comando_usuarios):
         print_error("Failed en creación de usuarios")
         return False
-    
+
     # ==========================================
     # PASO 3: CREAR DATOS DE PRUEBA
     # ==========================================
     print_step(3, "CREACIÓN DE DATOS DE PRUEBA")
-    
-    comando_datos = '''
+
+    comando_datos = """
 from django.contrib.auth.models import User
 from decimal import Decimal
 from django.utils import timezone
@@ -529,17 +539,17 @@ except Exception as e:
     print(f"❌ Error creando datos: {e}")
     import traceback
     traceback.print_exc()
-'''
-    
+"""
+
     if not ejecutar_django_command(comando_datos):
         print_error("Failed en creación de datos")
         return False
-    
+
     # ==========================================
     # PASO 4: GENERAR ARCHIVO DE INFORME
     # ==========================================
     print_step(4, "GENERACIÓN DE ARCHIVO DE INFORME")
-    
+
     informe_contenido = f"""# 📋 INFORME DE DATOS DE PRUEBA - eGarage
 
 **🗓️ Generado:** {datetime.now().strftime('%d de %B de %Y - %H:%M:%S')}  
@@ -662,42 +672,46 @@ except Exception as e:
 *📅 Archivo generado automáticamente el {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}*  
 *🤖 Sistema: eGarage Test Data Generator v2.0*
 """
-    
+
     try:
-        with open('pruebas_suscripciones_creadas.md', 'w', encoding='utf-8') as f:
+        with open("pruebas_suscripciones_creadas.md", "w", encoding="utf-8") as f:
             f.write(informe_contenido)
         print_success("📄 Archivo creado: pruebas_suscripciones_creadas.md")
     except Exception as e:
         print_error(f"Error creando archivo: {e}")
-    
+
     # ==========================================
     # RESULTADO FINAL
     # ==========================================
-    print("\n" + "🎉" + "="*80)
+    print("\n" + "🎉" + "=" * 80)
     print("🎉 PROCESO COMPLETADO EXITOSAMENTE")
-    print("🎉" + "="*80)
-    
+    print("🎉" + "=" * 80)
+
     print_success("✅ Base de datos limpia y regenerada")
     print_success("✅ 4 usuarios de prueba creados (2 por país)")
     print_success("✅ Datos completos: clientes, vehículos, documentos")
     print_success("✅ Archivo de informe generado")
     print_success("✅ Vista web de verificación disponible")
-    
+
     print("\n📋 PRÓXIMOS PASOS:")
     print("1. 📄 Revisar archivo: pruebas_suscripciones_creadas.md")
-    print("2. 🌐 Probar login: https://atlantareciclajes.pythonanywhere.com/accounts/login/")
+    print(
+        "2. 🌐 Probar login: https://atlantareciclajes.pythonanywhere.com/accounts/login/"
+    )
     print("3. 🔍 Verificar datos: /analytics/admin/test/info/ (como admin)")
     print("4. 📊 Probar dashboards:")
     print("   - Principal: /analytics/dashboard/")
-    print("   - Admin: /analytics/admin/dashboard/") 
+    print("   - Admin: /analytics/admin/dashboard/")
     print("   - Avanzado: /analytics/admin/dashboard/avanzado/")
-    
+
     print(f"\n⏰ Finalizado: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}")
-    
+
     return True
+
 
 if __name__ == "__main__":
     from datetime import timedelta
+
     success = main()
     if success:
         print("\n🚀 ¡LISTO PARA PRUEBAS!")

@@ -334,69 +334,94 @@
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
-$(document).ready(function () {
+<script>
+(function() {
+  const base = window.location.pathname.startsWith('/us/') ? '/us' : '/cl';
+  const origin = window.location.origin;
+
+  const $ = window.jQuery;
+  if (!$ || !$.fn || !$.fn.select2) {
+    console.warn("Select2/jQuery no están cargados.");
+    return;
+  }
+
+  const dropdownParent = document.getElementById('eg-portal') || document.body;
   const $cliente = $('#id_cliente');
   const $vehiculo = $('#id_vehiculo');
   const $vehiculoWrapper = $('#vehiculo-wrapper');
   const $vehiculoAlerta = $('#vehiculo-alerta');
 
-  // Inicializar select2 en cliente SOLO UNA VEZ
-  $cliente.select2({
-    ajax: {
-      url: '/documentos/autocomplete/cliente/',
-      dataType: 'json',
-      delay: 250,
-      data: function(params) {
-        return { q: params.term };
-      },
-      processResults: function(data) {
-        return { results: data.results };
-      },
-      cache: true
-    },
-    placeholder: 'Buscar cliente...',
-    allowClear: true,
-    minimumInputLength: 0,
-    width: '100%'
-  });
-
-  // Si hay valor inicial, forzar mostrarlo en select2
-  var clienteId = $cliente.val();
-  if (clienteId) {
-    $.ajax({
-      type: 'GET',
-      url: '/documentos/autocomplete/cliente/',
-      data: {q: ''},
-      dataType: 'json'
-    }).then(function (data) {
-      var option = null;
-      for (var i = 0; i < data.results.length; i++) {
-        if (data.results[i].id == clienteId) {
-          option = new Option(data.results[i].text, data.results[i].id, true, true);
-          break;
-        }
-      }
-      if (option) {
-        $cliente.append(option).trigger('change');
-      }
+  function normalizeClientResults(data) {
+    const raw = Array.isArray(data) ? data : (data.results || data.items || []);
+    return raw.map(it => {
+      const text = it.text ??
+                   [it.nombre, it.apellido].filter(Boolean).join(' ') ||
+                   it.nombre || it.name || it.email || it.telefono || String(it.id);
+      const subtitle = it.subtitle || it.email || it.telefono || '';
+      return { id: it.id, text, subtitle };
     });
   }
+
+  $cliente.select2({
+    theme: 'bootstrap-5',
+    placeholder: 'Buscar cliente…',
+    allowClear: true,
+    minimumInputLength: 1,
+    width: '100%',
+    dropdownParent: $(dropdownParent),
+    ajax: {
+      url: origin + base + "/ajax/clientes/buscar/",
+      dataType: 'json',
+      delay: 250,
+      cache: true,
+      data: function(params) {
+        return { q: params.term || '', page: params.page || 1 };
+      },
+      beforeSend: function(xhr) {
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+      },
+      processResults: function(data, params) {
+        params.page = params.page || 1;
+        const results = normalizeClientResults(data);
+        return { results, pagination: { more: !!(data && data.more) } };
+      },
+      transport: function (params, success, failure) {
+        const req = $.ajax(params);
+        req.then(success).fail(function(xhr){
+          console.error("❌ AJAX clientes:", xhr.status, xhr.responseText);
+          failure(xhr);
+        });
+        return req;
+      }
+    },
+    templateResult: function(item) {
+      if (!item.id) return item.text;
+      const sub = item.subtitle ? `<div class="text-muted small">${item.subtitle}</div>` : '';
+      return $(`<div><div><strong>${item.text}</strong></div>${sub}</div>`);
+    },
+    templateSelection: function(item) { return item.text || item.id; }
+  });
 
   // Función para inicializar select2 en vehículo según cliente
   function initVehiculoSelect2(clienteId) {
     $vehiculo.select2({
       ajax: {
-        url: '/autocomplete/vehiculo/',
+        url: origin + base + '/ajax/vehiculos-por-cliente/',
         dataType: 'json',
         delay: 250,
         data: function(params) {
           return {
             q: params.term,
-            cliente: clienteId
+            cliente_id: clienteId
           };
         },
         processResults: function(data) {
-          return { results: data.results };
+          const raw = Array.isArray(data) ? data : (data.results || []);
+          const results = raw.map(v => {
+            const label = v.text || [v.patente, v.marca, v.modelo].filter(Boolean).join(' ') || `Vehículo #${v.id}`;
+            return { id: v.id, text: label };
+          });
+          return { results };
         },
         cache: true
       },
@@ -408,15 +433,18 @@ $(document).ready(function () {
   }
 
   // Inicializar vehículo con el cliente actual
-  initVehiculoSelect2($cliente.val());
+  if ($cliente.val()) {
+    initVehiculoSelect2($cliente.val());
+  }
 
   // Al cambiar cliente, resetear y recargar vehículo
   $cliente.on('change', function () {
     var clienteId = $(this).val();
     $vehiculo.val(null).trigger('change');
     $vehiculo.select2('destroy');
-    initVehiculoSelect2(clienteId);
+    
     if (clienteId) {
+      initVehiculoSelect2(clienteId);
       $vehiculoWrapper.removeClass('hidden');
     } else {
       $vehiculoWrapper.addClass('hidden');
@@ -433,7 +461,7 @@ $(document).ready(function () {
       }, 3000);
     }
   });
-});
+})();
 </script>
 <script>
 // Inicializar eventos para los cálculos de totales

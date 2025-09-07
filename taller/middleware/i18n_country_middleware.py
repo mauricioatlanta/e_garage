@@ -8,13 +8,20 @@ from django.conf import settings
 from django.shortcuts import redirect
 from django.utils import translation
 from django.utils.deprecation import MiddlewareMixin
+
 # LANGUAGE_SESSION_KEY no está disponible en todas las versiones de Django
-LANGUAGE_SESSION_KEY = 'django_language'
+LANGUAGE_SESSION_KEY = "django_language"
 import logging
 
 logger = logging.getLogger(__name__)
 
-ALLOWED_LANGS = {code for code, _ in getattr(settings, "LANGUAGES", (("es", "Español"), ("en", "English")))}
+ALLOWED_LANGS = {
+    code
+    for code, _ in getattr(
+        settings, "LANGUAGES", (("es", "Español"), ("en", "English"))
+    )
+}
+
 
 class CountryLanguageMiddleware(MiddlewareMixin):
     """
@@ -23,36 +30,44 @@ class CountryLanguageMiddleware(MiddlewareMixin):
     - Expone request.country y request.LANGUAGE_CODE
     - Asegura Content-Language y cookie django_language coherentes
     """
+
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
         path = request.path or ""
-        
+
         # Determinar país basado en URL y usuario logueado
-        url_country = "CL" if path.startswith("/cl/") else ("US" if path.startswith("/us/") else None)
-        
+        url_country = (
+            "CL"
+            if path.startswith("/cl/")
+            else ("US" if path.startswith("/us/") else None)
+        )
+
         # Si el usuario está logueado, usar su país de empresa
         user_country = None
-        if hasattr(request, 'user') and request.user.is_authenticated:
+        if hasattr(request, "user") and request.user.is_authenticated:
             try:
-                if hasattr(request.user, 'empresa') and request.user.empresa:
+                if hasattr(request.user, "empresa") and request.user.empresa:
                     user_country = request.user.empresa.pais
-                elif hasattr(request.user, 'perfilusuario') and request.user.perfilusuario:
+                elif (
+                    hasattr(request.user, "perfilusuario")
+                    and request.user.perfilusuario
+                ):
                     user_country = request.user.perfilusuario.pais
             except:
                 pass
-        
+
         # Priorizar el país del usuario sobre la URL
         # Si no hay usuario logueado, usar el país de la URL como fallback
         country = user_country if user_country else url_country
-        
-        # Debug logging
-        if getattr(settings, 'DEBUG', False):
-            logger.info(f"🌍 CountryLanguageMiddleware: URL={path}, user_country={user_country}, url_country={url_country}, final_country={country}")
-        request.country = country
-        
 
+        # Debug logging
+        if getattr(settings, "DEBUG", False):
+            logger.info(
+                f"🌍 CountryLanguageMiddleware: URL={path}, user_country={user_country}, url_country={url_country}, final_country={country}"
+            )
+        request.country = country
 
         # Lo que haya decidido LocaleMiddleware (cookie/sesión) antes de nosotros
         lang = getattr(request, "LANGUAGE_CODE", None)
@@ -68,17 +83,16 @@ class CountryLanguageMiddleware(MiddlewareMixin):
             if hasattr(request, "session"):
                 request.session[LANGUAGE_SESSION_KEY] = lang
         else:
-            # Verificar si hay una cookie establecida por el usuario
-            user_cookie = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME)
-            if user_cookie and user_cookie in ALLOWED_LANGS:
-                # Respetar la preferencia del usuario
-                lang = user_cookie
+            # FORZAR idioma según el país del usuario (ignorar cookies incorrectas)
+            if country == "US":
+                lang = "en"  # Inglés para usuarios de USA
+            elif country == "CL":
+                lang = "es"  # Español para usuarios de Chile
             else:
-                # Por defecto según el país del usuario
-                if country == "US":
-                    lang = "en"  # Inglés para usuarios de USA
-                elif country == "CL":
-                    lang = "es"  # Español para usuarios de Chile
+                # Solo usar cookie si no hay país definido
+                user_cookie = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME)
+                if user_cookie and user_cookie in ALLOWED_LANGS:
+                    lang = user_cookie
                 else:
                     lang = getattr(settings, "LANGUAGE_CODE", "es")  # Fallback
 
@@ -86,17 +100,25 @@ class CountryLanguageMiddleware(MiddlewareMixin):
         lang = lang or "es"  # Fallback final
         translation.activate(lang)
         request.LANGUAGE_CODE = lang
-        
+
         # Debug logging
-        if getattr(settings, 'DEBUG', False):
-            username = getattr(request.user, 'username', 'anonymous') if hasattr(request, 'user') else 'no_user_yet'
-            logger.info(f"🗣️ CountryLanguageMiddleware: Final language={lang}, country={country}, user={username}")
+        if getattr(settings, "DEBUG", False):
+            username = (
+                getattr(request.user, "username", "anonymous")
+                if hasattr(request, "user")
+                else "no_user_yet"
+            )
+            logger.info(
+                f"🗣️ CountryLanguageMiddleware: Final language={lang}, country={country}, user={username}"
+            )
 
         response = self.get_response(request)
         response.headers["Content-Language"] = lang
-        
+
         # No overwrites: sólo refuerza si no hay cookie
-        if not request.COOKIES.get(getattr(settings, "LANGUAGE_COOKIE_NAME", "django_language")):
+        if not request.COOKIES.get(
+            getattr(settings, "LANGUAGE_COOKIE_NAME", "django_language")
+        ):
             response.set_cookie(
                 settings.LANGUAGE_COOKIE_NAME,
                 lang,

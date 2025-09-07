@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load custom_filters %}
 
 {% block title %}Otros Servicios{% endblock %}
 
@@ -526,15 +527,15 @@
         <div class="service-pricing">
           <div class="price-row">
             <span class="price-label">Costo Taller:</span>
-            <span class="price-value price-cost">${{ servicio.costo_taller|floatformat:0 }}</span>
+            <span class="price-value price-cost">{{ servicio.costo_taller|currency_format:country }}</span>
           </div>
           <div class="price-row">
             <span class="price-label">Precio Cliente:</span>
-            <span class="price-value price-client">${{ servicio.precio_cliente|floatformat:0 }}</span>
+            <span class="price-value price-client">{{ servicio.precio_cliente|currency_format:country }}</span>
           </div>
           <div class="price-row">
             <span class="price-label">Ganancia:</span>
-            <span class="price-value price-profit">${{ servicio.ganancia|floatformat:0 }}</span>
+            <span class="price-value price-profit">{{ servicio.ganancia|currency_format:country }}</span>
           </div>
         </div>
         

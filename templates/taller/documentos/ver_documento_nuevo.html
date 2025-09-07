@@ -381,34 +381,11 @@
     </div>
   {% endif %}
 
-  <!-- TOTALES -->
-  <div class="total-section">
-    <div class="total-row">
-      <span>💰 Subtotal Repuestos:</span>
-      <span id="subtotal-repuestos" class="precio" data-money="{{ subtotal_repuestos }}"></span>
-    </div>
-    <div class="total-row">
-      <span>🔧 Subtotal Servicios:</span>
-      <span id="subtotal-servicios" class="precio" data-money="{{ subtotal_servicios }}"></span>
-    </div>
-    {% if subtotal_otros > 0 %}
-    <div class="total-row">
-      <span>⚡ Subtotal Otros:</span>
-      <span id="subtotal-otros" class="precio" data-money="{{ subtotal_otros }}"></span>
-    </div>
-    {% endif %}
-    <div class="total-row">
-      <span>📊 Subtotal:</span>
-      <span id="display-subtotal" class="precio" data-money="{{ subtotal }}"></span>
-    </div>
-    <div class="total-row">
-      <span>{% if company_country == 'US' %}🇺🇸 Sales Tax:{% else %}📋 IVA (19%):{% endif %}</span>
-      <span id="display-tax" class="precio" data-money="{{ iva }}"></span>
-    </div>
-    <div class="total-row total-final">
-      <span>🏆 TOTAL GENERAL:</span>
-      <strong id="display-total" data-money="{{ total }}"></strong>
-    </div>
+  <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+    <div>Repuestos: <strong>{{ subtotal_repuestos|clp }}</strong></div>
+    <div>Servicios: <strong>{{ subtotal_servicios|clp }}</strong></div>
+    <div>IVA (19% sobre repuestos): <strong>{{ iva|clp }}</strong></div>
+    <div class="text-lg">TOTAL: <strong>{{ total|clp }}</strong></div>
   </div>
 
   <!-- Observaciones -->

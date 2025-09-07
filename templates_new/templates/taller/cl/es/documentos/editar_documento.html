@@ -658,191 +658,175 @@ $(document).ready(function() {
     'line-height': '3rem'
   });
   
-  // Configuración especial para el cliente con información detallada
-  $('#id_cliente').select2({
-    placeholder: '🔍 Buscar cliente por nombre o teléfono...',
-    allowClear: true,
-    width: '100%',
-    minimumInputLength: 2,
-    ajax: {
-      url: '/documentos/autocomplete/cliente/',
-      dataType: 'json',
-      delay: 250,
-      data: function (params) {
-        return {
-          q: params.term,
-          page: params.page
-        };
-      },
-      processResults: function (data, params) {
-        console.log('Clientes recibidos:', data);
-        return {
-          results: data.results.map(cliente => ({
-            id: cliente.id,
-            text: `${cliente.nombre} ${cliente.apellido || ''} - ${cliente.telefono || 'Sin teléfono'}`,
-            nombre: cliente.nombre,
-            apellido: cliente.apellido,
-            telefono: cliente.telefono,
-            email: cliente.email
-          }))
-        };
-      },
-      cache: true
+  // Configuración robusta para el cliente con Select2
+  (function() {
+    const base = window.location.pathname.startsWith('/us/') ? '/us' : '/cl';
+    const origin = window.location.origin;
+
+    const $ = window.jQuery;
+    if (!$ || !$.fn || !$.fn.select2) {
+      console.warn("Select2/jQuery no están cargados.");
+      return;
     }
-  });
-  
-  // Configuración especial para el vehículo que depende del cliente
-  $('#id_vehiculo').select2({
-    placeholder: '🚗 Selecciona un cliente primero...',
-    allowClear: true,
-    width: '100%',
-    disabled: true,
-    ajax: {
-      url: '/documentos/autocomplete/vehiculo/',
-      dataType: 'json',
-      delay: 250,
-      data: function (params) {
-        const clienteId = $('#id_cliente').val();
-        if (!clienteId) {
-          return null; // No hacer llamada si no hay cliente seleccionado
+
+    const dropdownParent = document.getElementById('eg-portal') || document.body;
+    const $cliente = $('#id_cliente');
+
+    function normalizeClientResults(data) {
+      const raw = Array.isArray(data) ? data : (data.results || data.items || []);
+      return raw.map(it => {
+        const text = it.text ??
+                     [it.nombre, it.apellido].filter(Boolean).join(' ') ||
+                     it.nombre || it.name || it.email || it.telefono || String(it.id);
+        const subtitle = it.subtitle || it.email || it.telefono || '';
+        return { 
+          id: it.id, 
+          text: text + (it.telefono ? ` - ${it.telefono}` : ''), 
+          subtitle,
+          nombre: it.nombre,
+          apellido: it.apellido,
+          telefono: it.telefono,
+          email: it.email
+        };
+      });
+    }
+
+    $cliente.select2({
+      theme: 'bootstrap-5',
+      placeholder: '🔍 Buscar cliente por nombre o teléfono...',
+      allowClear: true,
+      minimumInputLength: 1,
+      width: '100%',
+      dropdownParent: $(dropdownParent),
+      ajax: {
+        url: origin + base + "/ajax/clientes/buscar/",
+        dataType: 'json',
+        delay: 250,
+        cache: true,
+        data: function(params) {
+          return { q: params.term || '', page: params.page || 1 };
+        },
+        beforeSend: function(xhr) {
+          xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        },
+        processResults: function(data, params) {
+          params.page = params.page || 1;
+          const results = normalizeClientResults(data);
+          return { results, pagination: { more: !!(data && data.more) } };
+        },
+        transport: function (params, success, failure) {
+          const req = $.ajax(params);
+          req.then(success).fail(function(xhr){
+            console.error("❌ AJAX clientes:", xhr.status, xhr.responseText);
+            failure(xhr);
+          });
+          return req;
         }
-        return {
-          q: params.term,
-          cliente: clienteId,
-          page: params.page
-        };
       },
-      processResults: function (data, params) {
-        return {
-          results: data.results.map(vehiculo => ({
-            id: vehiculo.id,
-            text: `${vehiculo.patente} - ${vehiculo.marca} ${vehiculo.modelo}`,
-            patente: vehiculo.patente,
-            marca: vehiculo.marca,
-            modelo: vehiculo.modelo
-          }))
-        };
+      templateResult: function(item) {
+        if (!item.id) return item.text;
+        const sub = item.subtitle ? `<div class="text-muted small">${item.subtitle}</div>` : '';
+        return $(`<div><div><strong>${item.text}</strong></div>${sub}</div>`);
       },
-      cache: true
+      templateSelection: function(item) { return item.text || item.id; }
+    });
+
+    // Configuración para vehículo con URLs robustas  
+    function initVehiculoSelect2(clienteId) {
+      $('#id_vehiculo').select2({
+        placeholder: '🚗 Buscar vehículo por patente...',
+        allowClear: true,
+        width: '100%',
+        ajax: {
+          url: origin + base + '/ajax/vehiculos-por-cliente/',
+          dataType: 'json',
+          delay: 250,
+          data: function(params) {
+            return {
+              q: params.term || '',
+              cliente_id: clienteId
+            };
+          },
+          processResults: function(data) {
+            const raw = Array.isArray(data) ? data : (data.results || []);
+            const results = raw.map(v => {
+              const label = v.text || [v.patente, v.marca, v.modelo].filter(Boolean).join(' ') || `Vehículo #${v.id}`;
+              return { 
+                id: v.id, 
+                text: label,
+                patente: v.patente,
+                marca: v.marca,
+                modelo: v.modelo
+              };
+            });
+            return { results };
+          },
+          cache: true
+        }
+      });
     }
-  });
-  
-  // Mostrar información del cliente cuando se selecciona Y actualizar vehículos
-  $('#id_cliente').on('select2:select', function (e) {
-    const cliente = e.params.data;
-    console.log('Cliente seleccionado:', cliente);
-    
-    // Mostrar información del cliente
-    if (cliente.nombre) {
-      const panel = document.getElementById('cliente-info-panel');
-      const nombreEl = document.getElementById('cliente-nombre');
-      const contactoEl = document.getElementById('cliente-contacto');
+
+    // Mostrar información del cliente cuando se selecciona Y actualizar vehículos
+    $cliente.on('select2:select', function (e) {
+      const cliente = e.params.data;
+      console.log('Cliente seleccionado:', cliente);
       
-      nombreEl.textContent = `${cliente.nombre} ${cliente.apellido || ''}`;
-      contactoEl.innerHTML = `
-        📞 ${cliente.telefono || 'No disponible'} | 
-        📧 ${cliente.email || 'No disponible'}
-      `;
-      
-      panel.style.display = 'block';
-    }
-    
-    // Habilitar y actualizar vehículos
-    $('#id_vehiculo').prop('disabled', false);
-    $('#id_vehiculo').val(null).trigger('change');
-    $('#id_vehiculo').select2('destroy').select2({
-      placeholder: '🚗 Buscar vehículo por patente...',
-      allowClear: true,
-      width: '100%',
-      ajax: {
-        url: '/documentos/autocomplete/vehiculo/',
-        dataType: 'json',
-        delay: 250,
-        data: function (params) {
-          return {
-            q: params.term,
-            cliente: cliente.id,
-            page: params.page
-          };
-        },
-        processResults: function (data, params) {
-          console.log('Vehículos recibidos para cliente', cliente.id, ':', data);
-          return {
-            results: data.results.map(vehiculo => ({
-              id: vehiculo.id,
-              text: `${vehiculo.patente} - ${vehiculo.marca} ${vehiculo.modelo}`,
-              patente: vehiculo.patente,
-              marca: vehiculo.marca,
-              modelo: vehiculo.modelo
-            }))
-          };
-        },
-        cache: true
+      // Mostrar información del cliente
+      if (cliente.nombre) {
+        const panel = document.getElementById('cliente-info-panel');
+        const nombreEl = document.getElementById('cliente-nombre');
+        const contactoEl = document.getElementById('cliente-contacto');
+        
+        nombreEl.textContent = `${cliente.nombre} ${cliente.apellido || ''}`;
+        contactoEl.innerHTML = `
+          📞 ${cliente.telefono || 'No disponible'} | 
+          📧 ${cliente.email || 'No disponible'}
+        `;
+        
+        panel.style.display = 'block';
       }
-    });
-  });
-  
-  // Ocultar información cuando se limpia la selección Y deshabilitar vehículo
-  $('#id_cliente').on('select2:clear', function (e) {
-    document.getElementById('cliente-info-panel').style.display = 'none';
-    // Limpiar y deshabilitar el campo de vehículo
-    $('#id_vehiculo').val(null).trigger('change');
-    $('#id_vehiculo').prop('disabled', true).select2({
-      placeholder: '🚗 Selecciona un cliente primero...',
-      allowClear: true,
-      width: '100%',
-      disabled: true
-    });
-  });
-  
-  // Si ya hay un cliente seleccionado, mostrar su información y habilitar vehículos
-  const clienteActual = $('#id_cliente').val();
-  if (clienteActual) {
-    console.log('Cliente ya seleccionado:', clienteActual);
-    const clienteTexto = $('#id_cliente option:selected').text();
-    if (clienteTexto && clienteTexto !== '') {
-      const panel = document.getElementById('cliente-info-panel');
-      const nombreEl = document.getElementById('cliente-nombre');
-      const contactoEl = document.getElementById('cliente-contacto');
       
-      nombreEl.textContent = clienteTexto.split(' - ')[0] || 'Cliente seleccionado';
-      contactoEl.textContent = '✅ Cliente asignado al documento';
-      panel.style.display = 'block';
-    }
-    
-    // Habilitar y configurar vehículos para el cliente actual
-    $('#id_vehiculo').prop('disabled', false);
-    $('#id_vehiculo').select2('destroy').select2({
-      placeholder: '🚗 Buscar vehículo por patente...',
-      allowClear: true,
-      width: '100%',
-      ajax: {
-        url: '/documentos/autocomplete/vehiculo/',
-        dataType: 'json',
-        delay: 250,
-        data: function (params) {
-          return {
-            q: params.term,
-            cliente: clienteActual,
-            page: params.page
-          };
-        },
-        processResults: function (data, params) {
-          console.log('Vehículos para cliente actual:', data);
-          return {
-            results: data.results.map(vehiculo => ({
-              id: vehiculo.id,
-              text: `${vehiculo.patente} - ${vehiculo.marca} ${vehiculo.modelo}`,
-              patente: vehiculo.patente,
-              marca: vehiculo.marca,
-              modelo: vehiculo.modelo
-            }))
-          };
-        },
-        cache: true
-      }
+      // Habilitar y actualizar vehículos
+      $('#id_vehiculo').prop('disabled', false);
+      $('#id_vehiculo').val(null).trigger('change');
+      $('#id_vehiculo').select2('destroy');
+      initVehiculoSelect2(cliente.id);
     });
-  }
+
+    // Ocultar información cuando se limpia la selección Y deshabilitar vehículo
+    $cliente.on('select2:clear', function (e) {
+      document.getElementById('cliente-info-panel').style.display = 'none';
+      // Limpiar y deshabilitar el campo de vehículo
+      $('#id_vehiculo').val(null).trigger('change');
+      $('#id_vehiculo').prop('disabled', true).select2({
+        placeholder: '🚗 Selecciona un cliente primero...',
+        allowClear: true,
+        width: '100%',
+        disabled: true
+      });
+    });
+
+    // Si ya hay un cliente seleccionado, mostrar su información y habilitar vehículos
+    const clienteActual = $cliente.val();
+    if (clienteActual) {
+      console.log('Cliente ya seleccionado:', clienteActual);
+      const clienteTexto = $cliente.find('option:selected').text();
+      if (clienteTexto && clienteTexto !== '') {
+        const panel = document.getElementById('cliente-info-panel');
+        const nombreEl = document.getElementById('cliente-nombre');
+        const contactoEl = document.getElementById('cliente-contacto');
+        
+        nombreEl.textContent = clienteTexto.split(' - ')[0] || 'Cliente seleccionado';
+        contactoEl.textContent = '✅ Cliente asignado al documento';
+        panel.style.display = 'block';
+      }
+      
+      // Habilitar y configurar vehículos para el cliente actual
+      $('#id_vehiculo').prop('disabled', false);
+      $('#id_vehiculo').select2('destroy');
+      initVehiculoSelect2(clienteActual);
+    }
+  })();
   
   // Activar autocompletar para filas existentes
   $('#tabla-repuestos tbody tr').each(function() {

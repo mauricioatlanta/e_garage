@@ -165,12 +165,7 @@
                     
                     <div class="form-group">
                         <label class="form-label">Cliente</label>
-                        <select name="cliente" class="form-control" required>
-                            <option value="">-- Seleccionar Cliente --</option>
-                            {% for cliente in clientes %}
-                                <option value="{{ cliente.id }}">{{ cliente.nombre }}</option>
-                            {% endfor %}
-                        </select>
+                        <select name="cliente" class="form-control" id="id_cliente" required></select>
                     </div>
                     
                     <div class="form-group">
@@ -253,19 +248,82 @@
 </div>
 
 <script>
-// Script para cargar vehículos cuando se selecciona un cliente
-document.querySelector('select[name="cliente"]').addEventListener('change', function() {
-    const clienteId = this.value;
-    const vehiculoSelect = document.querySelector('select[name="vehiculo"]');
-    
-    if (!clienteId) {
-        vehiculoSelect.innerHTML = '<option value="">-- Seleccionar Vehículo --</option>';
-        return;
+(function() {
+  // Asegura que exista el portal global (tú ya lo tienes: <div id="eg-portal" ...>)
+  const dropdownParent = document.getElementById('eg-portal') || document.body;
+
+  // --- CLIENTE: Select2 remoto ---
+  const $cliente = window.jQuery && window.jQuery('#id_cliente');
+  if (!$cliente || !$cliente.select2) {
+    console.warn("Select2/jQuery no están cargados. Verifica assets.");
+    return;
+  }
+
+  $cliente.select2({
+    theme: 'bootstrap-5',             // opcional, si usas Bootstrap 5
+    placeholder: 'Buscar cliente…',
+    allowClear: true,
+    minimumInputLength: 1,
+    width: '100%',
+    dropdownParent: window.jQuery(dropdownParent),
+    ajax: {
+      url: "{% url 'taller:ajax-buscar-clientes' %}",
+      dataType: 'json',
+      delay: 250,
+      cache: true,
+      data: function(params) {
+        return { q: params.term || '', page: params.page || 1 };
+      },
+      processResults: function(data, params) {
+        params.page = params.page || 1;
+        return {
+          results: data.results.map(function(it) {
+            // guardamos subtitle en 'it.subtitle' para templateResult
+            return { id: it.id, text: it.text, subtitle: it.subtitle || '' };
+          }),
+          pagination: { more: !!data.more }
+        };
+      }
+    },
+    templateResult: function(item) {
+      if (!item.id) return item.text;
+      const sub = item.subtitle ? `<div class="text-muted small">${item.subtitle}</div>` : '';
+      return window.jQuery(`<div><div><strong>${item.text}</strong></div>${sub}</div>`);
+    },
+    templateSelection: function(item) {
+      return item.text || item.id;
     }
-    
-    // Aquí puedes agregar una llamada AJAX para cargar los vehículos del cliente
-    // Por ahora solo limpiamos la selección
+  });
+
+  // --- VEHÍCULO: se rellena cuando cambia el cliente ---
+  const vehiculoSelect = document.querySelector('select[name="vehiculo"]');
+  function cargarVehiculos(clienteId) {
+    if (!vehiculoSelect) return;
+    if (!clienteId) {
+      vehiculoSelect.innerHTML = '<option value="">-- Seleccionar Vehículo --</option>';
+      return;
+    }
     vehiculoSelect.innerHTML = '<option value="">-- Cargando vehículos... --</option>';
-});
+    fetch(`{% url 'taller:ajax-vehiculos-por-cliente' %}?cliente=${encodeURIComponent(clienteId)}`, {
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(r => r.json())
+    .then(data => {
+      const opts = ['<option value="">-- Seleccionar Vehículo --</option>']
+        .concat((data.results || []).map(v => `<option value="${v.id}">${v.text}</option>`));
+      vehiculoSelect.innerHTML = opts.join('');
+    })
+    .catch(() => {
+      vehiculoSelect.innerHTML = '<option value="">-- Error al cargar vehículos --</option>';
+    });
+  }
+
+  $cliente.on('select2:select', function(e) {
+    const id = e.params.data.id;
+    cargarVehiculos(id);
+  }).on('select2:clear', function() {
+    cargarVehiculos('');
+  });
+})();
 </script>
 {% endblock %}

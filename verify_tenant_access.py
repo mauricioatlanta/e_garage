@@ -1,14 +1,16 @@
 #!/usr/bin/env python
 import os
 import sys
+
 import django
 
 # Configurar Django
-sys.path.append('.')
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings')
+sys.path.append(".")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings")
 django.setup()
 
 from django.contrib.auth.models import User
+
 from taller.models.clientes import Cliente
 from taller.models.empresa import Empresa
 
@@ -16,10 +18,12 @@ from taller.models.empresa import Empresa
 print("=== VERIFICACIÓN DE RELACIONES ===")
 
 # Usuario admin
-user = User.objects.get(username='admin')
+user = User.objects.get(username="admin")
 print(f"Usuario: {user.username}")
 print(f"Empresa del usuario: {user.empresa}")
-print(f"País de la empresa del usuario: {user.empresa.pais if user.empresa else 'None'}")
+print(
+    f"País de la empresa del usuario: {user.empresa.pais if user.empresa else 'None'}"
+)
 
 # Cliente 1
 cliente = Cliente.objects.get(id=1)
@@ -37,7 +41,7 @@ if user.empresa:
     print(f"Clientes accesibles para el usuario: {clientes_accesibles.count()}")
     for c in clientes_accesibles:
         print(f"  - Cliente {c.id}: {c.nombre} {c.apellido}")
-        
+
     if cliente in clientes_accesibles:
         print("✅ El cliente 1 ES accesible para el usuario admin")
     else:

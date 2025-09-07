@@ -133,11 +133,8 @@
 
   {% include "taller/documentos/_form_common.html" %}
   
-  {% if company_country == "CL" %}
-    {% include "taller/documentos/_form_country_cl.html" %}
-  {% else %}
-    {% include "taller/documentos/_form_country_us.html" %}
-  {% endif %}
+  {# Siempre usar las opciones de Chile en la versión /cl/ #}
+  {% include "taller/documentos/_form_country_cl.html" %}
 
   {% include "taller/documentos/_tables_items.html" %}
 
@@ -648,7 +645,7 @@ function calcularTotalFila(input) {
   
   const spanTotal = fila.querySelector('.total-fila');
   if (spanTotal) {
-    spanTotal.textContent = '{% if company_country == "US" %}${% else %}${% endif %}' + total.toFixed(2);
+    spanTotal.textContent = '$' + Math.round(total).toLocaleString('es-CL');
   }
   
   // Recalcular totales del documento
@@ -666,7 +663,7 @@ function calcularGananciaOtro(input) {
   
   const spanGanancia = fila.querySelector('.ganancia-fila');
   if (spanGanancia) {
-    spanGanancia.textContent = '{% if company_country == "US" %}${% else %}${% endif %}' + ganancia.toFixed(2);
+    spanGanancia.textContent = '$' + Math.round(ganancia).toLocaleString('es-CL');
     spanGanancia.style.color = ganancia >= 0 ? '#00f2fe' : '#ff4444';
   }
   
@@ -895,7 +892,7 @@ function mostrarResultadosServicios(servicios, contenedor, query) {
         <div class="autocomplete-item-name">${servicio.nombre}</div>
         <div class="autocomplete-item-details">
           ${servicio.descripcion || 'Sin descripción'}
-          <span class="autocomplete-item-precio">{% if company_country == "US" %}${% else %}${% endif %}${servicio.precio.toFixed(2)}</span>
+          <span class="autocomplete-item-precio">$${Math.round(servicio.precio).toLocaleString('es-CL')}</span>
         </div>
       `;
       item.onclick = () => agregarServicioSeleccionado(servicio);
@@ -940,7 +937,7 @@ function mostrarResultadosOtrosServicios(servicios, contenedor, query) {
         <div class="autocomplete-item-name">${servicio.nombre}</div>
         <div class="autocomplete-item-details">
           ${servicio.empresa_externa || 'Sin empresa'}
-          <span class="autocomplete-item-precio">{% if company_country == "US" %}${% else %}${% endif %}${servicio.precio_cliente.toFixed(2)}</span>
+          <span class="autocomplete-item-precio">$${Math.round(servicio.precio_cliente).toLocaleString('es-CL')}</span>
         </div>
       `;
       item.onclick = () => agregarOtroServicioSeleccionado(servicio);
@@ -992,7 +989,7 @@ function agregarOtroServicioSeleccionado(servicio) {
     <td><input type="text" class="form-input" value="${servicio.empresa_externa}" name="otro_empresa[]"></td>
     <td><input type="number" class="form-input input-number" value="${servicio.costo_interno}" step="0.01" name="otro_costo[]" onchange="calcularGananciaOtro(this)"></td>
     <td><input type="number" class="form-input input-number" value="${servicio.precio_cliente}" step="0.01" name="otro_precio[]" onchange="calcularGananciaOtro(this)"></td>
-    <td><span class="ganancia-fila">{% if company_country == "US" %}${% else %}${% endif %}${(servicio.precio_cliente - servicio.costo_interno).toFixed(2)}</span></td>
+    <td><span class="ganancia-fila">$${Math.round(servicio.precio_cliente - servicio.costo_interno).toLocaleString('es-CL')}</span></td>
     <td><button type="button" class="btn-secondary btn-eliminar" onclick="eliminarFila(this)">🗑️</button></td>
   `;
   
@@ -1046,5 +1043,46 @@ function crearNuevoServicio(nombre) {
   // Ocultar resultados
   document.getElementById('resultados-servicio').style.display = 'none';
 }
+
+// Función para formatear moneda chilena (sin decimales)
+function formatearPesosChilenos(valor) {
+  if (!valor || isNaN(valor)) return '$0';
+  const numero = Math.round(parseFloat(valor));
+  // Formatear con punto como separador de miles (formato chileno)
+  return '$' + numero.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
+// Función para formatear todos los precios en la página
+function formatearTodosLosPrecios() {
+  // Formatear precios en tablas
+  document.querySelectorAll('[data-precio]').forEach(elemento => {
+    const precio = elemento.getAttribute('data-precio');
+    elemento.textContent = formatearPesosChilenos(precio);
+  });
+
+  // Formatear todos los elementos con data-valor
+  document.querySelectorAll('[data-valor]').forEach(elemento => {
+    const valor = elemento.getAttribute('data-valor');
+    if (valor && !isNaN(valor)) {
+      elemento.textContent = formatearPesosChilenos(valor);
+    }
+  });
+  
+  // Formatear subtotales
+  document.querySelectorAll('#total-repuestos, #total-servicios, #total-otros-servicios').forEach(elemento => {
+    const valor = elemento.textContent.replace(/[^\d]/g, '');
+    if (valor) {
+      elemento.textContent = formatearPesosChilenos(valor);
+    }
+  });
+}
+
+// Ejecutar formateo cuando la página carga
+document.addEventListener('DOMContentLoaded', function() {
+  // Solo formatear si estamos en Chile
+  if (document.querySelector('[data-country="CL"]')) {
+    formatearTodosLosPrecios();
+  }
+});
 </script>
 {% endblock %}

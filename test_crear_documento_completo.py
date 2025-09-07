@@ -1,20 +1,24 @@
 #!/usr/bin/env python
 import os
 import sys
+
 import django
 
 # Configurar Django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings_sqlite')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings_sqlite")
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 django.setup()
 
-from taller.models.documento import Documento, RepuestoDocumento, ServicioDocumento
-from taller.models.empresa import Empresa
-from taller.models.clientes import Cliente
-from taller.models.vehiculos import Vehiculo
-from taller.models.tecnico import Mecanico
-from django.contrib.auth.models import User
 import json
+
+from django.contrib.auth.models import User
+
+from taller.models.clientes import Cliente
+from taller.models.documento import (Documento, RepuestoDocumento,
+                                     ServicioDocumento)
+from taller.models.empresa import Empresa
+from taller.models.tecnico import Mecanico
+from taller.models.vehiculos import Vehiculo
 
 print("=== TEST CREAR DOCUMENTO CON REPUESTOS/SERVICIOS ===")
 
@@ -25,8 +29,7 @@ if not user:
     sys.exit(1)
 
 empresa, created = Empresa.objects.get_or_create(
-    usuario=user,
-    defaults={'nombre_taller': f'Taller de {user.username}'}
+    usuario=user, defaults={"nombre_taller": f"Taller de {user.username}"}
 )
 print(f"🏢 Empresa: {empresa.nombre_taller} ({'creada' if created else 'existente'})")
 
@@ -37,7 +40,7 @@ if not cliente:
         empresa=empresa,
         nombre="Cliente Prueba",
         email="test@test.com",
-        telefono="123456789"
+        telefono="123456789",
     )
 print(f"👤 Cliente: {cliente.nombre}")
 
@@ -46,17 +49,17 @@ vehiculo = Vehiculo.objects.filter(empresa=empresa).first()
 if not vehiculo:
     from taller.models.marca import Marca
     from taller.models.modelo import Modelo
-    
+
     marca, _ = Marca.objects.get_or_create(nombre="Toyota")
     modelo, _ = Modelo.objects.get_or_create(marca=marca, nombre="Corolla")
-    
+
     vehiculo = Vehiculo.objects.create(
         empresa=empresa,
         cliente=cliente,
         marca=marca,
         modelo=modelo,
         patente="ABC123",
-        anio=2020
+        anio=2020,
     )
 print(f"🚗 Vehículo: {vehiculo.patente}")
 
@@ -73,7 +76,7 @@ documento = Documento.objects.create(
     vehiculo=vehiculo,
     mecanico=mecanico,
     kilometraje=50000,
-    observaciones="Documento de prueba"
+    observaciones="Documento de prueba",
 )
 print(f"📄 Documento creado: {documento.numero_documento}")
 
@@ -84,15 +87,15 @@ repuesto1 = RepuestoDocumento.objects.create(
     codigo="REP001",
     nombre="Filtro de aceite",
     cantidad=1,
-    precio=15000
+    precio=15000,
 )
 
 repuesto2 = RepuestoDocumento.objects.create(
     documento=documento,
-    codigo="REP002", 
+    codigo="REP002",
     nombre="Pastillas de freno",
     cantidad=2,
-    precio=45000
+    precio=45000,
 )
 
 print(f"   ✅ {repuesto1.nombre}: ${repuesto1.precio} x {repuesto1.cantidad}")
@@ -101,17 +104,11 @@ print(f"   ✅ {repuesto2.nombre}: ${repuesto2.precio} x {repuesto2.cantidad}")
 # 7. Agregar servicios
 print("\n⚙️ Creando servicios...")
 servicio1 = ServicioDocumento.objects.create(
-    empresa=empresa,
-    documento=documento,
-    nombre="Cambio de aceite",
-    precio=25000
+    empresa=empresa, documento=documento, nombre="Cambio de aceite", precio=25000
 )
 
 servicio2 = ServicioDocumento.objects.create(
-    empresa=empresa,
-    documento=documento,
-    nombre="Alineación",
-    precio=35000
+    empresa=empresa, documento=documento, nombre="Alineación", precio=35000
 )
 
 print(f"   ✅ {servicio1.nombre}: ${servicio1.precio}")

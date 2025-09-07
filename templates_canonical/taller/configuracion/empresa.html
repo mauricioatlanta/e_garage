@@ -1,0 +1,511 @@
+{% extends 'base.html' %}
+{% load static %}
+<!-- 🔴 TEMPLATE OBSOLETA - CONFIGURACION EMPRESA -->
+<style>
+body { background: linear-gradient(45deg, #ff0000, #cc0000) !important; }
+body::before { content: "🔴 TEMPLATE OBSOLETA - CONFIGURACION EMPRESA"; position: fixed; top: 0; left: 0; background: #ff0000; color: #fff; padding: 10px; z-index: 9999; font-weight: bold; }
+</style>
+
+{% block title %}🚀 Configuración del Taller - E-Garage{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Estilos futuristas y tecnológicos para la configuración */
+:root {
+    --neon-blue: #00f5ff;
+    --neon-purple: #bf00ff;
+    --neon-green: #39ff14;
+    --dark-bg: #0a0a0f;
+    --darker-bg: #050508;
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --border-glow: rgba(0, 245, 255, 0.3);
+}
+
+body {
+    background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+    color: #ffffff;
+    font-family: 'Orbitron', 'Segoe UI', monospace;
+    min-height: 100vh;
+}
+
+.config-container {
+    backdrop-filter: blur(20px);
+    background: linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+    border-radius: 20px;
+    border: 1px solid var(--border-glow);
+    box-shadow: 
+        0 8px 32px rgba(0, 245, 255, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    padding: 2rem;
+    margin: 2rem auto;
+    max-width: 1200px;
+    position: relative;
+    overflow: hidden;
+}
+
+.config-container::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(0, 245, 255, 0.05) 0%, transparent 70%);
+    animation: rotate 20s linear infinite;
+    z-index: -1;
+}
+
+@keyframes rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.config-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    position: relative;
+}
+
+.config-title {
+    font-size: 3rem;
+    font-weight: 900;
+    background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple), var(--neon-green));
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradient-shift 3s ease-in-out infinite;
+    text-shadow: 0 0 30px rgba(0, 245, 255, 0.5);
+    margin-bottom: 1rem;
+}
+
+@keyframes gradient-shift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+.config-subtitle {
+    color: #8a8a8a;
+    font-size: 1.2rem;
+    font-weight: 300;
+    letter-spacing: 2px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.stat-card {
+    background: linear-gradient(145deg, rgba(0, 245, 255, 0.1) 0%, rgba(191, 0, 255, 0.1) 100%);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.5s;
+}
+
+.stat-card:hover::before {
+    left: 100%;
+}
+
+.stat-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0, 245, 255, 0.2);
+    border-color: var(--neon-blue);
+}
+
+.stat-number {
+    font-size: 3rem;
+    font-weight: 900;
+    color: var(--neon-blue);
+    text-shadow: 0 0 20px currentColor;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: #cccccc;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.config-sections {
+    display: grid;
+    gap: 2rem;
+}
+
+.section-card {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 2rem;
+    transition: all 0.3s ease;
+}
+
+.section-card:hover {
+    border-color: var(--neon-purple);
+    box-shadow: 0 10px 30px rgba(191, 0, 255, 0.1);
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--neon-green);
+    margin-bottom: 1.5rem;
+}
+
+.section-icon {
+    font-size: 2rem;
+    filter: drop-shadow(0 0 10px currentColor);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    color: #cccccc;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.form-input {
+    width: 100%;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.file-input-wrapper {
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+    width: 100%;
+}
+
+.file-input {
+    position: absolute;
+    left: -9999px;
+    opacity: 0;
+}
+
+.file-input-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: linear-gradient(45deg, var(--neon-purple), var(--neon-blue));
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.file-input-label:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(191, 0, 255, 0.4);
+}
+
+.btn-futuristic {
+    background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-weight: 700;
+    padding: 1rem 2rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    position: relative;
+    overflow: hidden;
+    font-family: inherit;
+}
+
+.btn-futuristic::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.btn-futuristic:hover::before {
+    left: 100%;
+}
+
+.btn-futuristic:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px rgba(0, 245, 255, 0.4);
+}
+
+.btn-secondary {
+    background: linear-gradient(45deg, #666, #999);
+}
+
+.btn-secondary:hover {
+    box-shadow: 0 15px 35px rgba(153, 153, 153, 0.3);
+}
+
+.current-logo {
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: 15px;
+    border: 2px solid var(--neon-blue);
+    box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
+    margin-bottom: 1rem;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+}
+
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.action-card {
+    background: linear-gradient(145deg, rgba(57, 255, 20, 0.1) 0%, rgba(0, 245, 255, 0.1) 100%);
+    border-radius: 15px;
+    border: 1px solid rgba(57, 255, 20, 0.3);
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+}
+
+.action-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--neon-green);
+    box-shadow: 0 15px 30px rgba(57, 255, 20, 0.2);
+    text-decoration: none;
+    color: inherit;
+}
+
+.action-icon {
+    font-size: 3rem;
+    color: var(--neon-green);
+    margin-bottom: 1rem;
+    filter: drop-shadow(0 0 15px currentColor);
+}
+
+.action-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.action-description {
+    color: #aaaaaa;
+    font-size: 0.9rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .config-title {
+        font-size: 2rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+    
+    .quick-actions {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="config-container">
+    <div class="config-header">
+        <h1 class="config-title">⚙️ CONFIGURACIÓN AVANZADA</h1>
+        <p class="config-subtitle">Sistema de Gestión Tecnológica E-Garage</p>
+    </div>
+
+    <!-- Estadísticas en tiempo real -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.tecnicos_total }}</div>
+            <div class="stat-label">Técnicos Totales</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.tecnicos_activos }}</div>
+            <div class="stat-label">Técnicos Activos</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.documentos_total }}</div>
+            <div class="stat-label">Documentos Procesados</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ empresa.dias_restantes|default:"∞" }}</div>
+            <div class="stat-label">Días de Prueba</div>
+        </div>
+    </div>
+
+    <!-- Configuración de Empresa -->
+    <div class="config-sections">
+        <div class="section-card">
+            <h2 class="section-title">
+                <span class="section-icon">🏢</span>
+                Información de la Empresa
+            </h2>
+            
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                    <div>
+                        <div class="form-group">
+                            <label class="form-label" for="nombre_taller">🏷️ Nombre del Taller</label>
+                            <input type="text" id="nombre_taller" name="nombre_taller" class="form-input" 
+                                   value="{{ empresa.nombre_taller }}" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="empresa_nombre">🏢 Nombre de la Empresa</label>
+                            <input type="text" id="empresa_nombre" name="empresa_nombre" class="form-input" 
+                                   value="{{ empresa.empresa }}">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="telefono">📞 Teléfono</label>
+                            <input type="tel" id="telefono" name="telefono" class="form-input" 
+                                   value="{{ empresa.telefono }}">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="email">📧 Email</label>
+                            <input type="email" id="email" name="email" class="form-input" 
+                                   value="{{ empresa.email }}" placeholder="contacto@empresa.com">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="direccion">📍 Dirección</label>
+                            <textarea id="direccion" name="direccion" class="form-input" rows="3">{{ empresa.direccion }}</textarea>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="form-group">
+                            <label class="form-label">📷 Logo Actual</label>
+                            {% if empresa.logo %}
+                                <div style="text-align: center;">
+                                    <img src="{{ empresa.logo.url }}" alt="Logo" class="current-logo">
+                                </div>
+                            {% else %}
+                                <div style="text-align: center; padding: 2rem; border: 2px dashed #666; border-radius: 15px; color: #666;">
+                                    <div style="font-size: 3rem; margin-bottom: 1rem;">📷</div>
+                                    <div>Sin logo configurado</div>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="logo">🎨 Cambiar Logo</label>
+                            <div class="file-input-wrapper">
+                                <input type="file" id="logo" name="logo" accept="image/*" class="file-input">
+                                <label for="logo" class="file-input-label">
+                                    <span>📤</span>
+                                    Seleccionar Nueva Imagen
+                                </label>
+                            </div>
+                            <small style="color: #aaa; display: block; margin-top: 0.5rem;">
+                                Formatos: JPG, PNG, GIF. Máximo 5MB.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button type="submit" name="actualizar_empresa" class="btn-futuristic">
+                        💾 Actualizar Información
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Acciones Rápidas -->
+    <div class="quick-actions">
+        {% load country_url %}
+        {% country_url 'configuracion_tecnicos' app_namespace='taller' as url_config_tecnicos %}
+        <a href="{{ url_config_tecnicos|default:'/taller/configuracion/tecnicos/' }}" class="action-card">
+            <div class="action-icon">👨‍🔧</div>
+            <div class="action-title">Gestión de Técnicos</div>
+            <div class="action-description">Agregar, editar y gestionar técnicos del taller</div>
+        </a>
+        
+        {% country_url 'lista_documentos' app_namespace='documentos' as url_documentos %}
+        <a href="{{ url_documentos|default:'/taller/documentos/' }}" class="action-card">
+            <div class="action-icon">📋</div>
+            <div class="action-title">Documentos</div>
+            <div class="action-description">Ver y gestionar todos los documentos</div>
+        </a>
+        
+        <div class="action-card" onclick="location.reload()">
+            <div class="action-icon">🔄</div>
+            <div class="action-title">Actualizar Sistema</div>
+            <div class="action-description">Refrescar datos y estadísticas</div>
+        </div>
+    </div>
+</div>
+{% endblock %}

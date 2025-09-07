@@ -1,24 +1,25 @@
 from django.db import models
 
+
 class Modelo(models.Model):
     nombre = models.CharField(max_length=50)
-    marca = models.ForeignKey('taller.Marca', on_delete=models.CASCADE)
+    marca = models.ForeignKey("taller.Marca", on_delete=models.CASCADE)
     country = models.CharField(
-        max_length=2, 
-        default='CL',
+        max_length=2,
+        default="CL",
         choices=[
-            ('CL', 'Chile'),
-            ('US', 'Estados Unidos'),
+            ("CL", "Chile"),
+            ("US", "Estados Unidos"),
         ],
-        verbose_name="País"
+        verbose_name="País",
     )
 
     class Meta:
         verbose_name = "Modelo"
         verbose_name_plural = "Modelos"
-        unique_together = [('country', 'marca', 'nombre')]
+        unique_together = [("country", "marca", "nombre")]
         indexes = [
-            models.Index(fields=['country', 'marca', 'nombre']),
+            models.Index(fields=["country", "marca", "nombre"]),
         ]
 
     def __str__(self):
@@ -26,6 +27,6 @@ class Modelo(models.Model):
 
     def save(self, *args, **kwargs):
         # Asegurar que el country coincida con el de la marca
-        if hasattr(self, 'marca') and self.marca:
+        if hasattr(self, "marca") and self.marca:
             self.country = self.marca.country
         super().save(*args, **kwargs)

@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class RepuestoDocumento(models.Model):
     # ... tus campos ...
     class Meta:

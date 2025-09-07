@@ -66,6 +66,7 @@
       backdrop-filter: blur(8px);
       padding: 2em 1.5em;
       margin-bottom: 1.5em;
+      overflow: visible !important;
     }
     .btn-cine-future {
       background: linear-gradient(90deg, #00ffe7 0%, #1a2980 100%);
@@ -147,6 +148,202 @@
       0% { background-position: 0% 50%; }
       100% { background-position: 100% 50%; }
     }
+    
+    /* Diseño Cyber Futurista Moderno */
+    .cyber-section {
+      margin-bottom: 2rem;
+    }
+    
+    .cyber-header {
+      border-left: 4px solid #00ffe7;
+      padding-left: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .cyber-card {
+      background: linear-gradient(135deg, rgba(15, 32, 39, 0.9) 0%, rgba(26, 41, 128, 0.8) 100%);
+      border: 1px solid rgba(0, 255, 231, 0.3);
+      border-radius: 1rem;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: visible;
+    }
+    
+    .cyber-card::before {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: -1px;
+      right: -1px;
+      bottom: -1px;
+      background: linear-gradient(45deg, transparent, rgba(0, 255, 231, 0.1), transparent);
+      border-radius: 1rem;
+      z-index: -1;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .cyber-card:hover::before {
+      opacity: 1;
+    }
+    
+    .cyber-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0, 255, 231, 0.2);
+      border-color: rgba(0, 255, 231, 0.5);
+    }
+    
+    .cyber-label {
+      display: block;
+      font-weight: 600;
+      color: #00ffe7;
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.5rem;
+    }
+    
+    .cyber-input {
+      background: rgba(0, 0, 0, 0.6);
+      border: 2px solid rgba(0, 255, 231, 0.3);
+      border-radius: 0.75rem;
+      color: #ffffff;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      padding: 0.75rem 1rem;
+    }
+    
+    .cyber-input:focus {
+      outline: none;
+      border-color: #00ffe7;
+      box-shadow: 0 0 20px rgba(0, 255, 231, 0.3);
+      background: rgba(0, 0, 0, 0.8);
+    }
+    
+    .cyber-input::placeholder {
+      color: rgba(0, 255, 231, 0.6);
+    }
+    
+    .cyber-select {
+      background: rgba(0, 0, 0, 0.6);
+      border: 2px solid rgba(0, 255, 231, 0.3);
+      border-radius: 0.75rem;
+      color: #00ffe7;
+      font-weight: 500;
+      padding: 0.75rem 1rem;
+      transition: all 0.3s ease;
+    }
+    
+    .cyber-select:focus {
+      outline: none;
+      border-color: #00ffe7;
+      box-shadow: 0 0 20px rgba(0, 255, 231, 0.3);
+      background: rgba(0, 0, 0, 0.8);
+    }
+    
+    .cyber-details {
+      background: rgba(0, 255, 231, 0.1);
+      border: 1px solid rgba(0, 255, 231, 0.3);
+      border-radius: 0.5rem;
+      padding: 0.75rem;
+      color: #00ffe7;
+      font-size: 0.875rem;
+      line-height: 1.4;
+    }
+    
+    /* Mejorar las sugerencias con el tema cyber */
+    #sugerencias-clientes {
+      background: rgba(15, 32, 39, 0.95) !important;
+      border: 2px solid rgba(0, 255, 231, 0.4) !important;
+      backdrop-filter: blur(15px) !important;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 255, 231, 0.2) !important;
+    }
+    
+    #sugerencias-clientes li {
+      color: #ffffff;
+      border-bottom: 1px solid rgba(0, 255, 231, 0.2);
+      transition: all 0.3s ease;
+    }
+    
+    #sugerencias-clientes li:hover {
+      background: rgba(0, 255, 231, 0.2) !important;
+      color: #ffffff !important;
+      transform: translateX(4px);
+    }
+    
+    /* Botones Cyber */
+    .cyber-btn-primary {
+      background: linear-gradient(135deg, #00ffe7 0%, #1a2980 100%);
+      border: 2px solid #00ffe7;
+      color: #0f2027;
+      font-weight: 700;
+      padding: 1rem 2rem;
+      border-radius: 0.75rem;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .cyber-btn-primary::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s ease;
+    }
+    
+    .cyber-btn-primary:hover::before {
+      left: 100%;
+    }
+    
+    .cyber-btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 255, 231, 0.4);
+      border-color: #ffffff;
+    }
+    
+    .cyber-btn-secondary {
+      background: rgba(0, 0, 0, 0.6);
+      border: 2px solid rgba(0, 255, 231, 0.4);
+      color: #00ffe7;
+      font-weight: 600;
+      padding: 1rem 2rem;
+      border-radius: 0.75rem;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+    }
+    
+    .cyber-btn-secondary:hover {
+      background: rgba(0, 255, 231, 0.1);
+      border-color: #00ffe7;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(0, 255, 231, 0.2);
+      color: #ffffff;
+      text-decoration: none;
+    }
+    
+    /* CSS para depurar overlays agresivos */
+    .glassmorphism-box::before,
+    .glassmorphism-box::after {
+      pointer-events: none !important;
+    }
+    
+    /* Asegurar que el grid no limite el contenido */
+    .grid {
+      overflow: visible !important;
+    }
+    
+    /* Evitar que cualquier contenedor limite las sugerencias */
+    .glassmorphism-box,
+    .relative {
+      overflow: visible !important;
+    }
   </style>
 
   <div class="flex justify-between items-center mb-4">
@@ -170,13 +367,29 @@
       </div>
     {% endif %}
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-      <div class="glassmorphism-box p-6 rounded-2xl shadow-xl border border-cyan-300">
-        <label class="block font-semibold mb-1" for="id_cliente">Cliente</label>
-        <div class="relative">
-          <input type="text" id="busqueda-cliente-ajax" class="w-full px-4 py-2 rounded-xl bg-black/70 text-white font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400" style="color:#fff !important;" placeholder="Buscar cliente por nombre, apellido, email..." autocomplete="off">
-          <ul id="sugerencias-clientes" class="absolute left-0 right-0 bg-[#1a202c] rounded-xl shadow-lg mt-2 z-50 hidden max-h-60 overflow-y-auto"></ul>
-          <select id="id_cliente" name="cliente">
+    <!-- Sección Cliente - Área dedicada con espacio amplio -->
+    <div class="cyber-section mb-8">
+      <div class="cyber-header mb-4">
+        <h2 class="text-xl font-bold text-cyan-300 flex items-center gap-3">
+          <span class="w-8 h-8 bg-cyan-400/20 rounded-lg flex items-center justify-center">
+            <svg class="w-5 h-5 text-cyan-300" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"/>
+            </svg>
+          </span>
+          Información del Cliente
+        </h2>
+      </div>
+      <div class="cyber-card p-6">
+        <label class="cyber-label mb-3" for="id_cliente">Buscar Cliente</label>
+        <div class="relative mb-6">
+          <input type="text" id="busqueda-cliente-ajax" 
+                 class="cyber-input w-full px-6 py-4 text-lg" 
+                 placeholder="Escriba nombre, apellido o email del cliente..." 
+                 autocomplete="off">
+          <ul id="sugerencias-clientes" 
+              class="hidden bg-slate-800/95 backdrop-blur-sm rounded-xl shadow-2xl mt-2 max-h-60 overflow-y-auto border border-cyan-500/30"
+              style="position: fixed; pointer-events:auto;"></ul>
+          <select id="id_cliente" name="cliente" class="cyber-select mt-4">
             <option value="">---------</option>
             {% for cliente in clientes %}
               <option value="{{ cliente.id }}"
@@ -187,27 +400,44 @@
               </option>
             {% endfor %}
           </select>
-          <div id="cliente-detalles" class="mt-2 text-sm text-cyan-200" aria-live="polite"></div>
+          <div id="cliente-detalles" class="cyber-details mt-4" aria-live="polite"></div>
         </div>
         <div id="error-cliente" class="text-red-400 font-bold mt-2"></div>
       </div>
-      <div class="glassmorphism-box p-6 rounded-2xl shadow-xl border border-cyan-300">
-  <label class="block font-semibold mb-1" for="id_patente">Patente</label>
-  <div class="relative">
-          {% render_field form.patente class="w-full px-4 py-2 rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400" placeholder="Patente..." style="background:#111 !important;color:#00ffe7 !important;" %}
-        </div>
-        {{ form.patente.errors }}
+    </div>
+
+    <!-- Sección Datos del Vehículo - Grid moderno con separación -->
+    <div class="cyber-section mb-8">
+      <div class="cyber-header mb-4">
+        <h2 class="text-xl font-bold text-cyan-300 flex items-center gap-3">
+          <span class="w-8 h-8 bg-cyan-400/20 rounded-lg flex items-center justify-center">
+            <svg class="w-5 h-5 text-cyan-300" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
+            </svg>
+          </span>
+          Datos del Vehículo
+        </h2>
       </div>
-      <div class="glassmorphism-box p-6 rounded-2xl shadow-xl border border-cyan-300">
-        <label class="block font-semibold mb-1" for="busqueda-marca-ajax">Marca</label>
-        <div class="relative">
+      <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+        <!-- Patente -->
+        <div class="cyber-card p-6">
+          <label class="cyber-label mb-3" for="id_patente">Patente</label>
+          <div class="relative">
+            {% render_field form.patente class="cyber-input w-full px-4 py-3" placeholder="Patente del vehículo..." %}
+          </div>
+          {{ form.patente.errors }}
+        </div>
+
+        <!-- Marca -->
+        <div class="cyber-card p-6">
+          <label class="cyber-label mb-3" for="busqueda-marca-ajax">Marca</label>
+          <div class="relative">
             {% if country == 'US' %}
               {% if form.marca_usa %}
-                {# Mostrar etiqueta explícita para asegurar accesibilidad y permitir test que busca el texto #}
-                <label for="{{ form.marca_usa.id_for_label }}">{{ form.marca_usa.label }}</label>
+                <label for="{{ form.marca_usa.id_for_label }}" class="cyber-label">{{ form.marca_usa.label }}</label>
                 {{ form.marca_usa }}
               {% else %}
-                <select id="id_marca_usa" name="marca_usa" class="w-full px-4 py-2 rounded-xl bg-black/70 text-cyan-200 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400">
+                <select id="id_marca_usa" name="marca_usa" class="cyber-select w-full">
                   <option value="">---------</option>
                   {% for mu in marcas_usa %}
                     <option value="{{ mu.id }}">{{ mu.nombre }}</option>
@@ -216,7 +446,7 @@
               {% endif %}
               <input type="hidden" name="marca_hidden" value="{{ form.data.marca|default:'' }}">
             {% else %}
-              <select id="id_marca" name="marca" class="w-full px-4 py-2 rounded-xl bg-black/70 text-cyan-200 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400">
+              <select id="id_marca" name="marca" class="cyber-select w-full">
                 <option value="">---------</option>
                 {% for marca in marcas %}
                   <option value="{{ marca.id }}"
@@ -227,114 +457,142 @@
                 <option value="__nueva__" {% if form.data.marca == "__nueva__" %}selected{% endif %}>Agregar nueva marca...</option>
               </select>
               <input type="text" name="marca_nueva" id="input_marca_nueva" value="{{ form.data.marca_nueva|default:'' }}"
-                class="w-full px-4 py-2 rounded-xl bg-black/70 text-cyan-200 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400 mt-2 {% if form.data.marca != '__nueva__' %}hidden{% endif %}"
+                class="cyber-input w-full mt-3 {% if form.data.marca != '__nueva__' %}hidden{% endif %}"
                 placeholder="Escribe la nueva marca...">
             {% endif %}
+          </div>
+          <div id="error-marca" class="text-red-400 font-bold mt-2"></div>
         </div>
-        <div id="error-marca" class="text-red-400 font-bold mt-2"></div>
-      </div>
-      <div class="glassmorphism-box p-6 rounded-2xl shadow-xl border border-cyan-300">
-        <label class="block font-semibold mb-1" for="id_modelo">Modelo</label>
-        <div class="relative">
-          {% if country == 'US' %}
-            {% if form.modelo_usa %}
-              <label for="{{ form.modelo_usa.id_for_label }}">{{ form.modelo_usa.label }}</label>
-              {{ form.modelo_usa }}
-              {{ form.modelo_usa.errors }}
+
+        <!-- Modelo -->
+        <div class="cyber-card p-6">
+          <label class="cyber-label mb-3" for="id_modelo">Modelo</label>
+          <div class="relative">
+            {% if country == 'US' %}
+              {% if form.modelo_usa %}
+                <label for="{{ form.modelo_usa.id_for_label }}" class="cyber-label">{{ form.modelo_usa.label }}</label>
+                {{ form.modelo_usa }}
+                {{ form.modelo_usa.errors }}
+              {% else %}
+                <select id="id_modelo_usa" name="modelo_usa" class="cyber-select w-full">
+                  <option value="">---------</option>
+                </select>
+              {% endif %}
             {% else %}
-              <select id="id_modelo_usa" name="modelo_usa" class="w-full px-4 py-2 rounded-xl bg-black/70 text-cyan-200 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400">
-                <option value="">---------</option>
+              <select id="id_modelo" name="modelo" class="cyber-select w-full">
+                <option value="">Selecciona primero una marca...</option>
               </select>
+              {% if form.modelo.errors %}
+                <div class="text-red-400 text-sm mt-1">{{ form.modelo.errors.0 }}</div>
+              {% endif %}
             {% endif %}
-          {% else %}
-            <select id="id_modelo" name="modelo" class="w-full px-4 py-2 rounded-xl bg-black/70 text-cyan-200 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400">
-              <option value="">Selecciona primero una marca...</option>
-            </select>
-            {% if form.modelo.errors %}
-              <div class="text-red-400 text-sm mt-1">{{ form.modelo.errors.0 }}</div>
-            {% endif %}
-          {% endif %}
+          </div>
         </div>
-      </div>
-      <div class="glassmorphism-box p-6 rounded-2xl shadow-xl border border-cyan-300">
-        <label class="block font-semibold mb-1" for="id_anio">Año</label>
-        <div class="relative">
-          {% render_field form.anio class="w-full px-4 py-2 rounded-xl bg-black/70 text-cyan-200 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400" placeholder="Año..." %}
+
+        <!-- Año -->
+        <div class="cyber-card p-6">
+          <label class="cyber-label mb-3" for="id_anio">Año</label>
+          <div class="relative">
+            {% render_field form.anio class="cyber-input w-full" placeholder="Año del vehículo..." %}
+          </div>
+          {{ form.anio.errors }}
         </div>
-        {{ form.anio.errors }}
-      </div>
-      <div class="glassmorphism-box p-6 rounded-2xl shadow-xl border border-cyan-300">
-        <label class="block font-semibold mb-1" for="id_color">Color</label>
-        <div class="relative">
-          <select id="id_color" name="color" class="w-full px-4 py-2 rounded-xl bg-black/70 text-cyan-200 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400">
-            <option value="">---------</option>
-            {% for color in colores %}
-              <option value="{{ color.id }}"
-                {% if form.color.value == color.id or form.data.color == color.id|stringformat:"s" %}selected{% endif %}>
-                {{ color.nombre }}
+
+        <!-- Color -->
+        <div class="cyber-card p-6">
+          <label class="cyber-label mb-3" for="id_color">Color</label>
+          <div class="relative">
+            <select id="id_color" name="color" class="cyber-select w-full">
+              <option value="">---------</option>
+              {% for color in colores %}
+                <option value="{{ color.id }}"
+                  {% if form.color.value == color.id or form.data.color == color.id|stringformat:"s" %}selected{% endif %}>
+                  {{ color.nombre }}
+                </option>
+              {% endfor %}
+              <option value="__nuevo__"
+                {% if form.data.color == "__nuevo__" %}selected{% endif %}>
+                Agregar nuevo color...
               </option>
-            {% endfor %}
-            <option value="__nuevo__"
-              {% if form.data.color == "__nuevo__" %}selected{% endif %}>
-              Agregar nuevo color...
-            </option>
-          </select>
-          <input type="text" name="color_nuevo" id="input_color_nuevo" 
-                 value="{{ form.data.color_nuevo|default:'' }}"
-                 class="w-full px-4 py-2 rounded-xl bg-black/70 text-cyan-200 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400 mt-2 {% if form.data.color != '__nuevo__' %}hidden{% endif %}" 
-                 placeholder="Escribe el nuevo color...">
+            </select>
+            <input type="text" name="color_nuevo" id="input_color_nuevo" 
+                   value="{{ form.data.color_nuevo|default:'' }}"
+                   class="cyber-input w-full mt-3 {% if form.data.color != '__nuevo__' %}hidden{% endif %}" 
+                   placeholder="Escribe el nuevo color...">
+          </div>
+          {{ form.color.errors }}
         </div>
-        {{ form.color.errors }}
-      </div>
-      <div class="glassmorphism-box p-6 rounded-2xl shadow-xl border border-cyan-300">
-        <label class="block font-semibold mb-1" for="id_vin">VIN</label>
-        <div class="relative">
-          {% render_field form.vin class="w-full px-4 py-2 rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400" placeholder="VIN..." style="background:#111 !important;color:#00ffe7 !important;" %}
+
+        <!-- VIN -->
+        <div class="cyber-card p-6">
+          <label class="cyber-label mb-3" for="id_vin">VIN</label>
+          <div class="relative">
+            {% render_field form.vin class="cyber-input w-full" placeholder="Número VIN del vehículo..." %}
+          </div>
+          {{ form.vin.errors }}
         </div>
-        {{ form.vin.errors }}
-      </div>
-      <div class="glassmorphism-box p-6 rounded-2xl shadow-xl border border-cyan-300">
-        <label class="block font-semibold mb-1" for="id_motor">Motor</label>
-        <div class="relative">
-          <select id="id_motor" name="motor" class="w-full px-4 py-2 rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400">
-            <option value="">---------</option>
-            <option value="__nuevo__"
-              {% if form.data.motor == "__nuevo__" %}selected{% endif %}>
-              Agregar nuevo motor...
-            </option>
-          </select>
-          <input type="text" name="motor_nuevo" id="input_motor_nuevo" 
-                 value="{{ form.data.motor_nuevo|default:'' }}"
-                 class="w-full px-4 py-2 rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400 mt-2 {% if form.data.motor != '__nuevo__' %}hidden{% endif %}" 
-                 placeholder="Escribe el nuevo motor...">
+
+        <!-- Motor -->
+        <div class="cyber-card p-6">
+          <label class="cyber-label mb-3" for="id_motor">Motor</label>
+          <div class="relative">
+            <select id="id_motor" name="motor" class="cyber-select w-full">
+              <option value="">---------</option>
+              <option value="__nuevo__"
+                {% if form.data.motor == "__nuevo__" %}selected{% endif %}>
+                Agregar nuevo motor...
+              </option>
+            </select>
+            <input type="text" name="motor_nuevo" id="input_motor_nuevo" 
+                   value="{{ form.data.motor_nuevo|default:'' }}"
+                   class="cyber-input w-full mt-3 {% if form.data.motor != '__nuevo__' %}hidden{% endif %}" 
+                   placeholder="Escribe el nuevo motor...">
+          </div>
+          {{ form.motor.errors }}
         </div>
-        {{ form.motor.errors }}
-      </div>
-      <div class="glassmorphism-box p-6 rounded-2xl shadow-xl border border-cyan-300">
-        <label class="block font-semibold mb-1" for="id_caja">Caja</label>
-        <div class="relative">
-          <select id="id_caja" name="caja" class="w-full px-4 py-2 rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400">
-            <option value="">---------</option>
-            <option value="__nuevo__"
-              {% if form.data.caja == "__nuevo__" %}selected{% endif %}>
-              Agregar nueva caja...
-            </option>
-          </select>
-          <input type="text" name="caja_nueva" id="input_caja_nueva" 
-                 value="{{ form.data.caja_nueva|default:'' }}"
-                 class="w-full px-4 py-2 rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400 mt-2 {% if form.data.caja != '__nuevo__' %}hidden{% endif %}" 
-                 placeholder="Escribe la nueva caja...">
+
+        <!-- Caja -->
+        <div class="cyber-card p-6">
+          <label class="cyber-label mb-3" for="id_caja">Caja</label>
+          <div class="relative">
+            <select id="id_caja" name="caja" class="cyber-select w-full">
+              <option value="">---------</option>
+              <option value="__nuevo__"
+                {% if form.data.caja == "__nuevo__" %}selected{% endif %}>
+                Agregar nueva caja...
+              </option>
+            </select>
+            <input type="text" name="caja_nueva" id="input_caja_nueva" 
+                   value="{{ form.data.caja_nueva|default:'' }}"
+                   class="cyber-input w-full mt-3 {% if form.data.caja != '__nuevo__' %}hidden{% endif %}" 
+                   placeholder="Escribe la nueva caja...">
+          </div>
+          {{ form.caja.errors }}
         </div>
-        {{ form.caja.errors }}
       </div>
     </div>
 
-    <div class="flex justify-end gap-4 pt-6">
-  {% url 'taller:vehiculos:lista_vehiculos' as url_lista_vehiculos %}
-  <a href="{{ url_lista_vehiculos|default:'#' }}" class="btn-cine-future">Cancelar</a>
-      <button class="btn-cine-future" type="submit">
-        <span class="glow-text-future">Guardar Vehículo</span>
-      </button>
+    <!-- Botones de acción con estilo cyber -->
+    <div class="cyber-section">
+      <div class="flex justify-end gap-6 pt-8">
+        {% url 'taller:vehiculos:lista_vehiculos' as url_lista_vehiculos %}
+        <a href="{{ url_lista_vehiculos|default:'#' }}" class="cyber-btn-secondary">
+          <span class="flex items-center gap-2">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/>
+            </svg>
+            Cancelar
+          </span>
+        </a>
+        <button type="submit" class="cyber-btn-primary">
+          <span class="flex items-center gap-2">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+            </svg>
+            Guardar Vehículo
+          </span>
+        </button>
+      </div>
     </div>
   </form>
   <!-- AJAX búsqueda de clientes -->
@@ -448,6 +706,44 @@ function limpiarSug() {
 function setErrorCliente(msg) {
   if (errorCliente) errorCliente.textContent = msg || '';
 }
+
+// Portal functions
+const portal = document.getElementById('eg-portal');
+
+function attachToPortal() {
+  if (sugerenciasCliente && portal && sugerenciasCliente.parentElement !== portal) {
+    portal.appendChild(sugerenciasCliente);
+  }
+  // Configurar para position: fixed
+  if (sugerenciasCliente) {
+    sugerenciasCliente.style.position = 'fixed';
+    sugerenciasCliente.style.pointerEvents = 'auto';
+  }
+}
+
+function repositionSuggestions() {
+  if (!inputCliente || !sugerenciasCliente) return;
+  const r = inputCliente.getBoundingClientRect();
+  // PARA position: fixed usamos coords del viewport (no sumes scroll):
+  sugerenciasCliente.style.left  = `${r.left}px`;
+  sugerenciasCliente.style.top   = `${r.bottom + 6}px`;
+  sugerenciasCliente.style.width = `${r.width}px`;
+}
+
+function showSuggestions() {
+  attachToPortal();
+  repositionSuggestions();
+  if (sugerenciasCliente) {
+    sugerenciasCliente.classList.remove('hidden');
+  }
+}
+
+function hideSuggestions() {
+  if (sugerenciasCliente) {
+    sugerenciasCliente.classList.add('hidden');
+  }
+}
+
 function renderClientes(list) {
   limpiarSug();
   if (!Array.isArray(list) || list.length === 0) {
@@ -455,7 +751,9 @@ function renderClientes(list) {
     return;
   }
   setErrorCliente('');
-  sugerenciasCliente.classList.remove('hidden');
+  
+  showSuggestions();
+  
   list.forEach(c => {
     const li = document.createElement('li');
     li.innerHTML = `<div class="font-bold">${c.nombre} ${c.apellido}</div><div class="text-xs text-cyan-200">${c.email || ''} • ${c.telefono || ''}</div>`;
@@ -466,7 +764,7 @@ function renderClientes(list) {
       inputCliente.value  = `${c.nombre} ${c.apellido}`;
       const detalles = document.getElementById('cliente-detalles');
       if(detalles) detalles.innerHTML = `<strong>${c.nombre} ${c.apellido}</strong><br>${c.email||''} • ${c.telefono||''}`;
-      limpiarSug();
+      hideSuggestions();
     };
     sugerenciasCliente.appendChild(li);
   });
@@ -488,11 +786,14 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 if (inputCliente && sugerenciasCliente && selectCliente && errorCliente) {
   document.addEventListener('click', (e) => {
-    if (!sugerenciasCliente.contains(e.target) && e.target !== inputCliente) limpiarSug();
+    if (!sugerenciasCliente.contains(e.target) && e.target !== inputCliente) {
+      hideSuggestions();
+    }
   });
+  
   inputCliente.addEventListener('input', () => {
     const q = inputCliente.value.trim();
-    if (q.length < 2) { limpiarSug(); setErrorCliente(''); return; }
+    if (q.length < 2) { hideSuggestions(); setErrorCliente(''); return; }
     if (timer) clearTimeout(timer);
     timer = setTimeout(async () => {
       try {
@@ -504,9 +805,19 @@ if (inputCliente && sugerenciasCliente && selectCliente && errorCliente) {
       } catch (err) {
         if (err.name === 'AbortError') return;
         setErrorCliente('Error al buscar clientes.');
-        limpiarSug();
+        hideSuggestions();
       }
     }, 220);
+  });
+  
+  // Event listeners para reposicionamiento dinámico
+  window.addEventListener('scroll', repositionSuggestions, true);
+  window.addEventListener('resize', repositionSuggestions);
+  inputCliente.addEventListener('input', repositionSuggestions);
+  inputCliente.addEventListener('focus', () => {
+    if (!sugerenciasCliente.classList.contains('hidden')) {
+      showSuggestions();
+    }
   });
 }
 

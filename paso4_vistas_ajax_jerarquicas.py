@@ -8,12 +8,13 @@ Este script crea las vistas AJAX necesarias para el formulario jerárquico de ve
 
 import os
 import sys
+
 import django
 from django.conf import settings
 
 # Configurar Django
-sys.path.append('c:/projecto/projecto_1/e_garage')
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'taller.settings')
+sys.path.append("c:/projecto/projecto_1/e_garage")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "taller.settings")
 
 try:
     django.setup()
@@ -21,11 +22,14 @@ except Exception as e:
     print(f"Error configurando Django: {e}")
     sys.exit(1)
 
-from django.http import JsonResponse
-from django.views.decorators.http import require_GET
-from django.shortcuts import get_object_or_404
-from taller.models import Marca, Modelo, MotorVehiculo, CajaVehiculo
 import json
+
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from django.views.decorators.http import require_GET
+
+from taller.models import CajaVehiculo, Marca, Modelo, MotorVehiculo
+
 
 def crear_vista_ajax_modelos():
     """Crear vista AJAX para cargar modelos por marca"""
@@ -65,6 +69,7 @@ def load_modelos(request):
         }, status=400)
 '''
     return vista_content
+
 
 def crear_vista_ajax_motores():
     """Crear vista AJAX para cargar motores por modelo"""
@@ -108,6 +113,7 @@ def load_motores(request):
 '''
     return vista_content
 
+
 def crear_vista_ajax_cajas():
     """Crear vista AJAX para cargar cajas por modelo"""
     vista_content = '''
@@ -149,6 +155,7 @@ def load_cajas(request):
         }, status=400)
 '''
     return vista_content
+
 
 def crear_vista_ajax_combinado():
     """Crear vista AJAX combinada para motores y cajas"""
@@ -212,13 +219,14 @@ def load_motores_cajas(request):
 '''
     return vista_content
 
+
 def main():
     print("🎯 PASO 4B: Creando vistas AJAX para dependencia jerárquica")
     print("=" * 60)
-    
+
     # Crear archivo de vistas AJAX
     vistas_file = "taller/ajax_views.py"
-    
+
     # Importaciones y decoradores
     content = '''from django.http import JsonResponse
 from django.views.decorators.http import require_GET
@@ -231,7 +239,7 @@ Marca → Modelo → Motor/Caja
 """
 
 '''
-    
+
     # Agregar las vistas
     content += crear_vista_ajax_modelos()
     content += "\n\n"
@@ -240,15 +248,15 @@ Marca → Modelo → Motor/Caja
     content += crear_vista_ajax_cajas()
     content += "\n\n"
     content += crear_vista_ajax_combinado()
-    
+
     # Escribir archivo
-    with open(vistas_file, 'w', encoding='utf-8') as f:
+    with open(vistas_file, "w", encoding="utf-8") as f:
         f.write(content)
-    
+
     print(f"✅ Archivo creado: {vistas_file}")
-    
+
     # URLs para las vistas AJAX
-    urls_content = '''
+    urls_content = """
 # URLs para vistas AJAX jerárquicas
 from django.urls import path
 from taller import ajax_views
@@ -262,16 +270,16 @@ ajax_urlpatterns = [
 
 # Agregar estas URLs a tu urlpatterns principal:
 # urlpatterns += ajax_urlpatterns
-'''
-    
+"""
+
     urls_file = "paso4_urls_ajax.py"
-    with open(urls_file, 'w', encoding='utf-8') as f:
+    with open(urls_file, "w", encoding="utf-8") as f:
         f.write(urls_content)
-    
+
     print(f"✅ Archivo creado: {urls_file}")
-    
+
     # JavaScript para el frontend
-    js_content = '''
+    js_content = """
 /**
  * 🎯 JavaScript para formularios jerárquicos
  * Marca → Modelo → Motor/Caja
@@ -403,14 +411,14 @@ function debugFormularioJerarquico() {
     console.log('Motor:', $('#id_motor').val());
     console.log('Caja:', $('#id_caja').val());
 }
-'''
-    
+"""
+
     js_file = "paso4_formulario_jerarquico.js"
-    with open(js_file, 'w', encoding='utf-8') as f:
+    with open(js_file, "w", encoding="utf-8") as f:
         f.write(js_content)
-    
+
     print(f"✅ Archivo creado: {js_file}")
-    
+
     print("\n🎯 **PRÓXIMOS PASOS:**")
     print("1. Agregar las URLs AJAX a tu urls.py:")
     print("   from taller.ajax_views import ajax_urlpatterns")
@@ -420,9 +428,10 @@ function debugFormularioJerarquico() {
     print("\n3. Asegurar que jQuery esté cargado antes del script")
     print("\n4. Verificar que los nombres de campos coincidan:")
     print("   - id_marca, id_modelo, id_motor, id_caja")
-    
+
     print("\n✅ **VISTAS AJAX CREADAS EXITOSAMENTE**")
     print("🔄 Sistema listo para dependencia jerárquica Marca → Modelo → Motor/Caja")
+
 
 if __name__ == "__main__":
     main()

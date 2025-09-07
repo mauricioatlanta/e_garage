@@ -1,0 +1,240 @@
+{% extends "base.html" %}
+
+{% block title %}Gestión de Técnicos - eGarage Pro{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- Header Section -->
+        <div class="glass-card p-4 mb-4 text-center">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="h2 mb-3">
+                        <i class="fas fa-users-cog me-3 text-primary"></i>
+                        Gestión de Técnicos
+                    </h1>
+                    <p class="lead text-secondary mb-0">
+                        Administra tu equipo de técnicos y vendedores de manera eficiente
+                    </p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <div class="d-flex justify-content-md-end">
+                        <div class="glass-card p-3 text-center" style="min-width: 120px;">
+                            <i class="fas fa-user-check fa-2x text-success mb-2"></i>
+                            <div class="small text-secondary">Total</div>
+                            <div class="fw-bold text-success">{{ tecnicos.count }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        {% if messages %}
+            <div class="mb-4">
+                {% for message in messages %}
+                    <div class="glass-card p-3 mb-2 border-start border-4 
+                                {% if message.tags == 'success' %}border-success{% elif message.tags == 'error' %}border-danger{% else %}border-info{% endif %}">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-{% if message.tags == 'success' %}check-circle text-success{% elif message.tags == 'error' %}exclamation-triangle text-danger{% else %}info-circle text-info{% endif %} me-3"></i>
+                            <span>{{ message }}</span>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Action Bar -->
+        <div class="glass-card p-4 mb-4">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h4 class="mb-0">
+                        <i class="fas fa-list me-2 text-primary"></i>
+                        Lista de Técnicos
+                    </h4>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="{% url 'taller:tecnicos_nuevo' %}" class="btn btn-futuristic">
+                        <i class="fas fa-plus me-2"></i>Nuevo Técnico
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Technicians Table -->
+        <div class="glass-card p-4">
+            {% if tecnicos %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr class="text-secondary border-bottom border-secondary">
+                                <th class="border-0">
+                                    <i class="fas fa-user me-2"></i>Nombre
+                                </th>
+                                <th class="border-0 text-center">
+                                    <i class="fas fa-toggle-on me-2"></i>Estado
+                                </th>
+                                <th class="border-0 text-center">
+                                    <i class="fas fa-cogs me-2"></i>Acciones
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for tecnico in tecnicos %}
+                                <tr class="align-middle">
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="glass-card p-2 me-3" style="width: 40px; height: 40px;">
+                                                <i class="fas fa-user-tie text-primary"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold">{{ tecnico.nombre }}</div>
+                                                <small class="text-secondary">ID: {{ tecnico.id }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <form method="post" action="{% url 'taller:tecnicos_toggle' tecnico.id %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm {% if tecnico.activo %}btn-success{% else %}btn-outline-secondary{% endif %} btn-futuristic">
+                                                <i class="fas fa-{% if tecnico.activo %}check-circle{% else %}times-circle{% endif %} me-1"></i>
+                                                {{ tecnico.activo|yesno:"Activo,Inactivo" }}
+                                            </button>
+                                        </form>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group">
+                                            <a href="{% url 'taller:tecnicos_editar' tecnico.id %}" class="btn btn-sm btn-futuristic-secondary">
+                                                <i class="fas fa-edit me-1"></i>Editar
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <!-- Empty State -->
+                <div class="text-center py-5">
+                    <div class="glass-card p-5 d-inline-block">
+                        <i class="fas fa-users fa-4x text-secondary mb-4"></i>
+                        <h4 class="text-secondary mb-3">No hay técnicos registrados</h4>
+                        <p class="text-secondary mb-4">Comienza agregando tu primer técnico al sistema</p>
+                        <a href="{% url 'taller:tecnicos_nuevo' %}" class="btn btn-futuristic btn-lg">
+                            <i class="fas fa-plus me-2"></i>Agregar Primer Técnico
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Quick Stats -->
+        {% if tecnicos %}
+            <div class="row mt-4">
+                <div class="col-md-4">
+                    <div class="glass-card p-3 text-center">
+                        <i class="fas fa-user-check fa-2x text-success mb-2"></i>
+                        <div class="h4 text-success mb-1">{{ tecnicos|length }}</div>
+                        <div class="text-secondary">Total Técnicos</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="glass-card p-3 text-center">
+                        <i class="fas fa-toggle-on fa-2x text-primary mb-2"></i>
+                        <div class="h4 text-primary mb-1">{{ tecnicos|length }}</div>
+                        <div class="text-secondary">Activos</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="glass-card p-3 text-center">
+                        <i class="fas fa-toggle-off fa-2x text-secondary mb-2"></i>
+                        <div class="h4 text-secondary mb-1">0</div>
+                        <div class="text-secondary">Inactivos</div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Custom table styling */
+    .table {
+        color: var(--text-primary);
+        margin-bottom: 0;
+    }
+
+    .table th {
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 0.875rem;
+        border: none;
+        padding: 1rem 0.75rem;
+    }
+
+    .table td {
+        border: none;
+        padding: 1rem 0.75rem;
+        vertical-align: middle;
+    }
+
+    .table tbody tr {
+        transition: all 0.3s ease;
+        border-radius: 12px;
+    }
+
+    .table tbody tr:hover {
+        background: rgba(0, 212, 255, 0.05);
+        transform: translateX(5px);
+    }
+
+    /* Button group styling */
+    .btn-group .btn {
+        border-radius: 8px;
+        margin: 0 2px;
+    }
+
+    .btn-group .btn:first-child {
+        border-top-left-radius: 8px;
+        border-bottom-left-radius: 8px;
+    }
+
+    .btn-group .btn:last-child {
+        border-top-right-radius: 8px;
+        border-bottom-right-radius: 8px;
+    }
+
+    /* Stats cards */
+    .glass-card .h4 {
+        font-family: 'Orbitron', monospace;
+        font-weight: 700;
+    }
+
+    /* Empty state styling */
+    .glass-card .fa-4x {
+        opacity: 0.7;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .table-responsive {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .btn-group .btn {
+            margin: 2px 0;
+            border-radius: 8px !important;
+        }
+    }
+</style>
+{% endblock %}

@@ -1,9 +1,10 @@
 from django.urls import path
-from ..views import settings as v
 
-app_name = 'settings'
+from ..views_extra.company_settings_views import company_settings_view
+
+app_name = "settings"
 
 urlpatterns = [
-    path('', v.ver_configuracion, name='ver_configuracion'),
-    path('editar/', v.ajustar_configuracion, name='ajustar_configuracion'),
+    path("", company_settings_view, name="ver_configuracion"),
+    path("editar/", company_settings_view, name="ajustar_configuracion"),
 ]

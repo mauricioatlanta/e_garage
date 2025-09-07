@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 import os
+
 import django
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings")
 django.setup()
 
 from taller.models import Documento
@@ -12,9 +13,11 @@ docs = Documento.objects.all()
 print(f"Total: {docs.count()} documentos")
 
 for d in docs:
-    empresa_nombre = d.empresa.nombre_taller if d.empresa else 'N/A'
-    empresa_pais = d.empresa.pais if d.empresa else 'N/A'
-    print(f"  {d.pk:2d} - {d.tipo}-{d.numero:3d} | Empresa: {empresa_nombre} ({empresa_pais})")
+    empresa_nombre = d.empresa.nombre_taller if d.empresa else "N/A"
+    empresa_pais = d.empresa.pais if d.empresa else "N/A"
+    print(
+        f"  {d.pk:2d} - {d.tipo}-{d.numero:3d} | Empresa: {empresa_nombre} ({empresa_pais})"
+    )
 
 print("\n=== ANÁLISIS ===")
 print(f"IDs existentes: {list(docs.values_list('pk', flat=True))}")

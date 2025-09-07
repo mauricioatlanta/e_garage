@@ -1,23 +1,37 @@
 import os
-import django
 import sys
+
+import django
 
 # Configura el entorno Django
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings")
 django.setup()
 
 from taller.models.region_ciudad import TallerRegion
 
+
 def quitar_acentos(texto):
     reemplazos = (
-        ('á', 'a'), ('é', 'e'), ('í', 'i'), ('ó', 'o'), ('ú', 'u'),
-        ('Á', 'A'), ('É', 'E'), ('Í', 'I'), ('Ó', 'O'), ('Ú', 'U'),
-        ('ñ', 'n'), ('Ñ', 'N'), ('ü', 'u'), ('Ü', 'U')
+        ("á", "a"),
+        ("é", "e"),
+        ("í", "i"),
+        ("ó", "o"),
+        ("ú", "u"),
+        ("Á", "A"),
+        ("É", "E"),
+        ("Í", "I"),
+        ("Ó", "O"),
+        ("Ú", "U"),
+        ("ñ", "n"),
+        ("Ñ", "N"),
+        ("ü", "u"),
+        ("Ü", "U"),
     )
     for a, b in reemplazos:
         texto = texto.replace(a, b)
     return texto
+
 
 for region in TallerRegion.objects.all():
     nombre_original = region.nombre

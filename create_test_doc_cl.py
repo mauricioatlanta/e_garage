@@ -1,15 +1,17 @@
 #!/usr/bin/env python
 import os
+
 import django
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings")
 django.setup()
 
-from taller.models import Documento, Empresa, Cliente, Vehiculo
 from django.contrib.auth.models import User
 
+from taller.models import Cliente, Documento, Empresa, Vehiculo
+
 # Buscar empresa chilena
-empresa = Empresa.objects.filter(pais='CL').first()
+empresa = Empresa.objects.filter(pais="CL").first()
 if not empresa:
     print("❌ No hay empresa chilena")
     exit(1)
@@ -26,12 +28,14 @@ print(f"Vehículo: {vehiculo.marca}-{vehiculo.modelo}" if vehiculo else "Vehícu
 
 # Crear documento
 doc = Documento.objects.create(
-    tipo='PRES',
+    tipo="PRES",
     numero=99,
     empresa=empresa,
     cliente=cliente,
     vehiculo=vehiculo,
-    usuario_creacion=user
+    usuario_creacion=user,
 )
 
-print(f"✅ Documento creado: {doc.pk} - {doc.tipo}-{doc.numero} (Empresa: {doc.empresa.pais})")
+print(
+    f"✅ Documento creado: {doc.pk} - {doc.tipo}-{doc.numero} (Empresa: {doc.empresa.pais})"
+)

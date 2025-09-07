@@ -319,6 +319,188 @@
       box-shadow: 0 0 15px #00ff88;
     }
 
+    .action-link.whatsapp {
+      border-color: #25d366;
+      color: #25d366;
+    }
+
+    .action-link.whatsapp:hover {
+      background: #25d366;
+      color: #fff;
+      box-shadow: 0 0 15px #25d366;
+    }
+
+    /* Estilos para modal de WhatsApp */
+    .whatsapp-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .whatsapp-modal-content {
+      background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+      border: 2px solid #25d366;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 0 30px rgba(37, 211, 102, 0.3);
+    }
+
+    .whatsapp-header {
+      padding: 20px;
+      border-bottom: 1px solid rgba(37, 211, 102, 0.3);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .whatsapp-header h3 {
+      color: #25d366;
+      margin: 0;
+      font-family: 'Orbitron', monospace;
+      font-size: 1.2rem;
+    }
+
+    .whatsapp-close {
+      color: #ff6b6b;
+      font-size: 24px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: color 0.3s ease;
+    }
+
+    .whatsapp-close:hover {
+      color: #ff4757;
+    }
+
+    .whatsapp-body {
+      padding: 20px;
+    }
+
+    .whatsapp-field {
+      margin-bottom: 20px;
+    }
+
+    .whatsapp-field label {
+      display: block;
+      color: #00ffff;
+      font-weight: bold;
+      margin-bottom: 8px;
+      font-family: 'Orbitron', monospace;
+      font-size: 0.9rem;
+    }
+
+    .whatsapp-field small {
+      display: block;
+      color: #888;
+      font-size: 0.8rem;
+      margin-top: 5px;
+    }
+
+    .whatsapp-input,
+    .whatsapp-textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid rgba(37, 211, 102, 0.5);
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.7);
+      color: #fff;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      transition: border-color 0.3s ease;
+      box-sizing: border-box;
+    }
+
+    .whatsapp-input:focus,
+    .whatsapp-textarea:focus {
+      outline: none;
+      border-color: #25d366;
+      box-shadow: 0 0 10px rgba(37, 211, 102, 0.3);
+    }
+
+    .whatsapp-textarea {
+      resize: vertical;
+      min-height: 150px;
+    }
+
+    .whatsapp-footer {
+      padding: 20px;
+      border-top: 1px solid rgba(37, 211, 102, 0.3);
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .whatsapp-btn-cancel,
+    .whatsapp-btn-send {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'Orbitron', monospace;
+      font-weight: bold;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+    }
+
+    .whatsapp-btn-cancel {
+      background: rgba(255, 107, 107, 0.2);
+      color: #ff6b6b;
+      border: 1px solid #ff6b6b;
+    }
+
+    .whatsapp-btn-cancel:hover {
+      background: #ff6b6b;
+      color: #fff;
+    }
+
+    .whatsapp-btn-send {
+      background: rgba(37, 211, 102, 0.2);
+      color: #25d366;
+      border: 1px solid #25d366;
+    }
+
+    .whatsapp-btn-send:hover {
+      background: #25d366;
+      color: #fff;
+    }
+
+    .whatsapp-confirmacion {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: linear-gradient(45deg, #10b981, #059669);
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      font-family: 'Orbitron', monospace;
+      font-weight: bold;
+      z-index: 10001;
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
     .empty-state {
       text-align: center;
       padding: 60px 20px;
@@ -543,7 +725,7 @@
             <div class="action-links">
               {% comment %}Indicador de documentos sin itemización{% endcomment %}
               {% if doc.rep_count|default:0 == 0 and doc.serv_count|default:0 == 0 and doc.otros_count|default:0 == 0 %}
-                {% with total_monetario=doc.sum_rep|default:0|add:doc.sum_serv|default:0|add:doc.sum_out|default:0 %}
+                {% with total_monetario=doc.total_repuestos|default:0|add:doc.total_servicios|default:0|add:doc.total_otros|default:0 %}
                   {% if total_monetario > 0 %}
                     <span class="badge badge-warning" style="background: #f59e0b; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-right: 4px;">
                       ⚠️ SIN ITEMIZACIÓN
@@ -555,6 +737,7 @@
               <a href="{% if country == 'cl' %}{% url 'documentos_cl:ver_documento' documento_id=doc.id %}{% else %}{% url 'documentos_us:ver_documento' documento_id=doc.id %}{% endif %}" class="action-link view">VER</a>
               <a href="{% if country == 'cl' %}{% url 'documentos_cl:editar_documento' pk=doc.id %}{% else %}{% url 'documentos_us:editar_documento' pk=doc.id %}{% endif %}" class="action-link edit">EDIT</a>
               <a href="{% if country == 'cl' %}{% url 'documentos_cl:exportar_documento_pdf' documento_id=doc.id %}{% else %}{% url 'documentos_us:exportar_documento_pdf' documento_id=doc.id %}{% endif %}" class="action-link print" target="_blank">PDF</a>
+              <button onclick="enviarWhatsApp({{ doc.id }})" class="action-link whatsapp">WA</button>
               <a href="/{{ country }}/documentos/eliminar/{{ doc.id }}/" class="action-link delete" 
                  onclick="return confirm('⚠️ ELIMINAR DOCUMENTO? ESTA ACCIÓN NO SE PUEDE DESHACER')">DEL</a>
             </div>
@@ -823,5 +1006,124 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(() => tooltip.remove(), 300);
   }, 8000);
 });
+
+// 📱 Función para enviar documento por WhatsApp
+function enviarWhatsApp(documentoId) {
+  // Obtener datos del documento desde el DOM
+  const documentoRow = document.querySelector(`button[onclick*="${documentoId}"]`).closest('tr');
+  if (!documentoRow) {
+    alert('❌ Error: No se pudo encontrar la información del documento');
+    return;
+  }
+  
+  // Extraer información de la fila de la tabla
+  const cells = documentoRow.querySelectorAll('.table-cell');
+  const tipo = cells[0]?.textContent?.trim() || '';
+  const numero = cells[1]?.textContent?.trim() || '';
+  const fecha = cells[2]?.textContent?.trim() || '';
+  const cliente = cells[3]?.textContent?.trim() || '';
+  const vehiculo = cells[4]?.textContent?.trim() || '';
+  const total = cells[6]?.textContent?.trim() || '';
+  
+  // Crear mensaje personalizado
+  const mensaje = `🚗 *SHOP DOCUMENT* 🚗
+
+📋 *${tipo} #${numero}*
+📅 *Date:* ${fecha}
+👤 *Customer:* ${cliente}
+🚙 *Vehicle:* ${vehiculo}
+💰 *Total:* ${total}
+
+Hello! I'm sending you your vehicle document.
+
+Do you need any clarification about the work performed?
+
+_Message sent from eGarage - Auto Shop Management System_ 🔧`;
+  
+  // Mostrar modal para confirmar/editar mensaje y teléfono
+  mostrarModalWhatsApp(mensaje, documentoId);
+}
+
+function mostrarModalWhatsApp(mensaje, documentoId) {
+  // Crear modal dinámico
+  const modal = document.createElement('div');
+  modal.className = 'whatsapp-modal';
+  modal.innerHTML = `
+    <div class="whatsapp-modal-content">
+      <div class="whatsapp-header">
+        <h3>📲 Send via WhatsApp</h3>
+        <span class="whatsapp-close" onclick="cerrarModalWhatsApp()">&times;</span>
+      </div>
+      
+      <div class="whatsapp-body">
+        <div class="whatsapp-field">
+          <label>📞 Phone number (with country code):</label>
+          <input type="text" id="whatsapp-telefono" placeholder="+1234567890" class="whatsapp-input">
+          <small>Format: +1234567890 (USA) or +56912345678 (Chile)</small>
+        </div>
+        
+        <div class="whatsapp-field">
+          <label>💬 Message:</label>
+          <textarea id="whatsapp-mensaje" class="whatsapp-textarea" rows="12">${mensaje}</textarea>
+        </div>
+      </div>
+      
+      <div class="whatsapp-footer">
+        <button onclick="cerrarModalWhatsApp()" class="whatsapp-btn-cancel">Cancel</button>
+        <button onclick="enviarMensajeWhatsApp()" class="whatsapp-btn-send">📲 Send WhatsApp</button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  document.getElementById('whatsapp-telefono').focus();
+}
+
+function enviarMensajeWhatsApp() {
+  const telefono = document.getElementById('whatsapp-telefono').value.trim();
+  const mensaje = document.getElementById('whatsapp-mensaje').value.trim();
+  
+  if (!telefono) {
+    alert('❌ Please enter a phone number');
+    document.getElementById('whatsapp-telefono').focus();
+    return;
+  }
+  
+  if (!mensaje) {
+    alert('❌ Please enter a message');
+    document.getElementById('whatsapp-mensaje').focus();
+    return;
+  }
+  
+  // Limpiar número de teléfono (solo números y +)
+  const telefonoLimpio = telefono.replace(/[^\d+]/g, '');
+  
+  // Crear URL de WhatsApp
+  const mensajeCodificado = encodeURIComponent(mensaje);
+  const urlWhatsApp = `https://wa.me/${telefonoLimpio}?text=${mensajeCodificado}`;
+  
+  // Abrir WhatsApp
+  window.open(urlWhatsApp, '_blank');
+  
+  // Cerrar modal
+  cerrarModalWhatsApp();
+  
+  // Mostrar mensaje de confirmación
+  const confirmacion = document.createElement('div');
+  confirmacion.className = 'whatsapp-confirmacion';
+  confirmacion.innerHTML = '✅ WhatsApp opened. The message is ready to send.';
+  document.body.appendChild(confirmacion);
+  
+  setTimeout(() => {
+    confirmacion.remove();
+  }, 3000);
+}
+
+function cerrarModalWhatsApp() {
+  const modal = document.querySelector('.whatsapp-modal');
+  if (modal) {
+    modal.remove();
+  }
+}
 </script>
 {% endblock %}

@@ -1,131 +1,225 @@
+import dal.forms
 from django import forms
-from taller.models.clientes import Cliente
+from django.forms.widgets import Select
 
-from taller.models.region_ciudad import TallerRegion, TallerCiudad
-from taller.models.ubicacion import Estado as EstadoUSA, Ciudad as CiudadUSA
+from taller.models.clientes import Cliente
+from taller.models.color_cliente import ColorCliente
+from taller.models.region_ciudad import TallerCiudad, TallerRegion
+from taller.models.ubicacion import Ciudad as CiudadUSA
+from taller.models.ubicacion import Estado as EstadoUSA
+
+
+class ColorSelectWidget(Select):
+    """Widget personalizado para mostrar colores con preview"""
+
+    def create_option(
+        self, name, value, label, selected, index, subindex=None, attrs=None
+    ):
+        option = super().create_option(
+            name, value, label, selected, index, subindex, attrs
+        )
+
+        # Agregar atributo data-color si es un objeto ColorCliente
+        if value and hasattr(self.choices.queryset.model, "codigo_color"):
+            try:
+                color_obj = self.choices.queryset.get(pk=value)
+                option["attrs"]["data-color"] = color_obj.codigo_color
+            except:
+                pass
+
+        return option
 
 
 class ClienteForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
-        email = cleaned_data.get('email')
-        empresa = self.initial.get('empresa') or self.instance.empresa if hasattr(self.instance, 'empresa') else None
+        email = cleaned_data.get("email")
+        empresa = (
+            self.initial.get("empresa") or self.instance.empresa
+            if hasattr(self.instance, "empresa")
+            else None
+        )
         if email and empresa:
             qs = Cliente.objects.filter(empresa=empresa, email=email)
             if self.instance.pk:
                 qs = qs.exclude(pk=self.instance.pk)
             if qs.exists():
-                self.add_error('email', 'Ya existe un cliente con este email para esta empresa.')
+                self.add_error(
+                    "email", "Ya existe un cliente con este email para esta empresa."
+                )
         return cleaned_data
-    
+
     # Campos para Chile
     region = forms.ModelChoiceField(
         queryset=TallerRegion.objects.all(),
         required=False,
-        widget=forms.Select(attrs={'id': 'id_region', 'class': 'form-control'}),
-        empty_label="Seleccione Región"
+        widget=forms.Select(attrs={"id": "id_region", "class": "form-control"}),
+        empty_label="Seleccione Región",
     )
     ciudad = forms.ModelChoiceField(
         queryset=TallerCiudad.objects.none(),
         required=False,
-        widget=forms.Select(attrs={'id': 'id_ciudad', 'class': 'form-control'}),
-        empty_label="Seleccione Ciudad"
+        widget=forms.Select(attrs={"id": "id_ciudad", "class": "form-control"}),
+        empty_label="Seleccione Ciudad",
     )
 
     # Campos para USA
     estado_usa = forms.ModelChoiceField(
         queryset=EstadoUSA.objects.all(),
         required=False,
-        widget=forms.Select(attrs={'id': 'id_estado_usa', 'class': 'form-control'}),
-        empty_label="Select State"
+        widget=forms.Select(attrs={"id": "id_estado_usa", "class": "form-control"}),
+        empty_label="Select State",
     )
     ciudad_usa = forms.ModelChoiceField(
         queryset=CiudadUSA.objects.none(),
         required=False,
-        widget=forms.Select(attrs={'id': 'id_ciudad_usa', 'class': 'form-control'}),
-        empty_label="Select City"
+        widget=forms.Select(attrs={"id": "id_ciudad_usa", "class": "form-control"}),
+        empty_label="Select City",
     )
     zipcode = forms.CharField(
         required=False,
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Zipcode'})
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": "Zipcode"}
+        ),
+    )
+
+    # Campo para color de identificación con autocomplete
+    color = dal.forms.ModelSelect2(
+        queryset=ColorCliente.objects.none(),
+        required=False,
+        url="taller:autocomplete:autocomplete_color_cliente",
+        attrs={
+            "id": "id_color",
+            "class": "form-control",
+            "data-placeholder": "Seleccione Color",
+            "data-allow-clear": "true",
+            "data-minimum-input-length": 0,
+        },
+        help_text="Color para identificar al cliente/subscriptor",
     )
 
     class Meta:
         model = Cliente
-        fields = ['nombre', 'apellido', 'telefono', 'direccion', 'region', 'ciudad', 'estado_usa', 'ciudad_usa', 'zipcode', 'email']
+        fields = [
+            "nombre",
+            "apellido",
+            "telefono",
+            "direccion",
+            "region",
+            "ciudad",
+            "estado_usa",
+            "ciudad_usa",
+            "zipcode",
+            "email",
+            "color",
+        ]
         widgets = {
-            'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre'}),
-            'apellido': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Apellido'}),
-            'telefono': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '+56912345678'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'correo@ejemplo.com'}),
-            'direccion': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Dirección'}),
+            "nombre": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "Nombre"}
+            ),
+            "apellido": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "Apellido"}
+            ),
+            "telefono": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "+56912345678"}
+            ),
+            "email": forms.EmailInput(
+                attrs={"class": "form-control", "placeholder": "correo@ejemplo.com"}
+            ),
+            "direccion": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "Dirección"}
+            ),
         }
 
     def __init__(self, *args, **kwargs):
-        self.empresa = kwargs.pop('empresa', None)  # Almacenar empresa
+        self.empresa = kwargs.pop("empresa", None)  # Almacenar empresa
         super().__init__(*args, **kwargs)
 
         # Debug logging
         print(f"🔍 [ClienteForm] empresa: {self.empresa}")
         if self.empresa:
-            print(f"🔍 [ClienteForm] empresa.pais: {getattr(self.empresa, 'pais', 'NO_HAY_PAIS')}")
+            print(
+                f"🔍 [ClienteForm] empresa.pais: {getattr(self.empresa, 'pais', 'NO_HAY_PAIS')}"
+            )
         else:
             print(f"🔍 [ClienteForm] NO HAY EMPRESA")
 
         # Chile: región/ciudad
-        if 'region' in self.data and self.data.get('region') not in [None, '']:
+        if "region" in self.data and self.data.get("region") not in [None, ""]:
             try:
-                region_id = int(self.data.get('region'))
-                self.fields['ciudad'].queryset = TallerCiudad.objects.filter(region_id=region_id)
+                region_id = int(self.data.get("region"))
+                self.fields["ciudad"].queryset = TallerCiudad.objects.filter(
+                    region_id=region_id
+                )
             except (ValueError, TypeError):
-                self.fields['ciudad'].queryset = TallerCiudad.objects.none()
-        elif self.instance.pk and getattr(self.instance, 'region', None):
-            self.fields['ciudad'].queryset = TallerCiudad.objects.filter(region=self.instance.region)
+                self.fields["ciudad"].queryset = TallerCiudad.objects.none()
+        elif self.instance.pk and getattr(self.instance, "region", None):
+            self.fields["ciudad"].queryset = TallerCiudad.objects.filter(
+                region=self.instance.region
+            )
         else:
-            self.fields['ciudad'].queryset = TallerCiudad.objects.none()
+            self.fields["ciudad"].queryset = TallerCiudad.objects.none()
 
         # USA: estado/ciudad/zipcode
-        if 'estado_usa' in self.data and self.data.get('estado_usa') not in [None, '']:
+        if "estado_usa" in self.data and self.data.get("estado_usa") not in [None, ""]:
             try:
-                estado_id = int(self.data.get('estado_usa'))
-                self.fields['ciudad_usa'].queryset = CiudadUSA.objects.filter(estado_id=estado_id)
+                estado_id = int(self.data.get("estado_usa"))
+                self.fields["ciudad_usa"].queryset = CiudadUSA.objects.filter(
+                    estado_id=estado_id
+                )
             except (ValueError, TypeError):
-                self.fields['ciudad_usa'].queryset = CiudadUSA.objects.none()
-        elif self.instance.pk and getattr(self.instance, 'estado_usa', None):
-            self.fields['ciudad_usa'].queryset = CiudadUSA.objects.filter(estado=self.instance.estado_usa)
+                self.fields["ciudad_usa"].queryset = CiudadUSA.objects.none()
+        elif self.instance.pk and getattr(self.instance, "estado_usa", None):
+            self.fields["ciudad_usa"].queryset = CiudadUSA.objects.filter(
+                estado=self.instance.estado_usa
+            )
         else:
-            self.fields['ciudad_usa'].queryset = CiudadUSA.objects.none()
+            self.fields["ciudad_usa"].queryset = CiudadUSA.objects.none()
 
         # Exponer el país como atributo público para el template
         pais = None
         if self.empresa:
             pais = self.empresa.pais
-        elif self.instance.pk and hasattr(self.instance, 'empresa') and self.instance.empresa:
+        elif (
+            self.instance.pk
+            and hasattr(self.instance, "empresa")
+            and self.instance.empresa
+        ):
             pais = self.instance.empresa.pais
         self.pais = pais
 
         print(f"🔍 [ClienteForm] pais detectado: {self.pais}")
 
+        # Configurar colores según el país
+        if self.pais:
+            colores_disponibles = ColorCliente.get_colores_para_pais(self.pais)
+            self.fields["color"].queryset = colores_disponibles
+            print(
+                f"🔍 [ClienteForm] Colores disponibles para {self.pais}: {colores_disponibles.count()}"
+            )
+        else:
+            # Fallback: mostrar todos los colores activos
+            self.fields["color"].queryset = ColorCliente.objects.filter(activo=True)
+
         # Ocultar campos según el país
-        if self.pais == 'US':
+        if self.pais == "US":
             print(f"🔍 [ClienteForm] Ocultando campos de Chile para USA")
-            self.fields['region'].widget = forms.HiddenInput()
-            self.fields['ciudad'].widget = forms.HiddenInput()
+            self.fields["region"].widget = forms.HiddenInput()
+            self.fields["ciudad"].widget = forms.HiddenInput()
         else:
             print(f"🔍 [ClienteForm] Ocultando campos de USA para Chile")
-            self.fields['estado_usa'].widget = forms.HiddenInput()
-            self.fields['ciudad_usa'].widget = forms.HiddenInput()
-            self.fields['zipcode'].widget = forms.HiddenInput()
+            self.fields["estado_usa"].widget = forms.HiddenInput()
+            self.fields["ciudad_usa"].widget = forms.HiddenInput()
+            self.fields["zipcode"].widget = forms.HiddenInput()
 
     def save(self, commit=True):
         obj = super().save(commit=False)
-        
+
         # BLINDAJE MULTI-TENANT: SIEMPRE asignar empresa
         if self.empresa and not obj.empresa_id:
             obj.empresa = self.empresa
-        
+
         if commit:
             obj.save()
             self.save_m2m()
         return obj
-

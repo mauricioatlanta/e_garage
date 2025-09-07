@@ -1,19 +1,23 @@
 from django import forms
-from taller.models.servicios import SubcategoriaServicio, CategoriaServicio, Servicio 
+
+from taller.models.servicios import (CategoriaServicio, Servicio,
+                                     SubcategoriaServicio)
+
 
 class ServicioForm(forms.ModelForm):
     class Meta:
         model = Servicio
-        fields = ['nombre', 'subcategoria']
+        fields = ["nombre", "subcategoria"]
         widgets = {
-            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
-            'subcategoria': forms.Select(attrs={'class': 'form-control'}),
+            "nombre": forms.TextInput(attrs={"class": "form-control"}),
+            "subcategoria": forms.Select(attrs={"class": "form-control"}),
         }
+
 
 class CategoriaServicioForm(forms.ModelForm):
     class Meta:
         model = CategoriaServicio
-        fields = ['nombre']
+        fields = ["nombre"]
         widgets = {
-            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            "nombre": forms.TextInput(attrs={"class": "form-control"}),
         }

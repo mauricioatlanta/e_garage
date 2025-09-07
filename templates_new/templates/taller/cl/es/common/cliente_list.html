@@ -127,7 +127,7 @@
           </a>
 
           <!-- Eliminar -->
-          <a href="{% url 'taller:clientes:eliminar_cliente' cliente.pk %}" 
+          <a href="{% url 'taller:clientes:eliminar_cliente' cliente_id=cliente.pk %}" 
              class="flex-1 group/btn relative overflow-hidden rounded-xl bg-gradient-to-r from-red-500/20 to-pink-500/20 border border-red-400/30 px-3 py-2 text-center text-sm font-medium text-red-300 transition-all duration-300 hover:border-red-400/60 hover:shadow-lg hover:shadow-red-400/20"
              onclick="return confirm('¿Estás seguro de que quieres eliminar este cliente?')">
             <div class="absolute inset-0 bg-gradient-to-r from-red-500/30 to-pink-500/30 opacity-0 transition-opacity duration-300 group-hover/btn:opacity-100"></div>

@@ -1,0 +1,73 @@
+﻿$ErrorActionPreference = "Stop"
+# ==== preparar carpeta de backup ====
+$DATE    = Get-Date -Format "yyyyMMdd_HHmm"
+$BACK    = Join-Path "backups" $DATE
+New-Item -ItemType Directory -Force -Path $BACK | Out-Null
+# ==== huella del entorno ====
+git rev-parse HEAD              >  (Join-Path $BACK "git_head.txt")
+git branch --show-current       >  (Join-Path $BACK "git_branch.txt")
+git status                      >  (Join-Path $BACK "git_status.txt")
+python --version                *> (Join-Path $BACK "python_version.txt")
+pip --version                   *> (Join-Path $BACK "pip_version.txt")
+pip freeze                      *> (Join-Path $BACK "requirements_$DATE.txt")
+python manage.py --version      *> (Join-Path $BACK "django_version.txt")
+python manage.py showmigrations *> (Join-Path $BACK "migrations_$DATE.txt")
+python manage.py check --deploy *> (Join-Path $BACK "django_check_deploy_$DATE.txt")
+# ==== detectar DB desde settings ====
+$pyDetect = @"
+import os
+os.environ.setdefault('DJANGO_SETTINGS_MODULE','gestion_taller.settings')
+import django; django.setup()
+from django.conf import settings
+db = settings.DATABASES.get('default', {})
+print(db.get('ENGINE',''))
+print(db.get('NAME',''))
+"@
+$detectOut = python -c $pyDetect
+if ($LASTEXITCODE -ne 0) { throw "No se pudo detectar la DB desde Django settings." }
+$lines  = $detectOut -split "`r?`n"
+$ENGINE = $lines[0].Trim()
+$DBNAME = $lines[1].Trim()
+Write-Host "ENGINE: $ENGINE"
+Write-Host "NAME:   $DBNAME"
+# ==== backup DB ====
+if ($ENGINE -like "*sqlite*") {
+  if (-not (Test-Path -LiteralPath $DBNAME)) { throw "No se encontró SQLite: $DBNAME" }
+  $sqliteDest = Join-Path $BACK ("db_$DATE.sqlite3")
+  Copy-Item -LiteralPath $DBNAME -Destination $sqliteDest -Force
+  Get-FileHash $sqliteDest -Algorithm SHA256 | Out-File (Join-Path $BACK ("db_$DATE.sqlite3.sha256.txt"))
+  Write-Host "SQLite -> $sqliteDest"
+}
+elseif ($ENGINE -like "*postgresql*") {
+  $PGHOST=$env:PGHOST; if(-not $PGHOST){$PGHOST="localhost"}
+  $PGPORT=$env:PGPORT; if(-not $PGPORT){$PGPORT="5432"}
+  $PGUSER=$env:PGUSER; if(-not $PGUSER){$PGUSER="postgres"}
+  $PGDATABASE=$env:PGDATABASE; if(-not $PGDATABASE){ try{$PGDATABASE=[IO.Path]::GetFileName($DBNAME)}catch{$PGDATABASE=$DBNAME} }
+  if (-not $env:PGPASSWORD) { Write-Warning "Define `$env:PGPASSWORD para evitar prompt." }
+  $dumpPath = Join-Path $BACK ("egarage_$DATE.dump")
+  & pg_dump -h $PGHOST -p $PGPORT -U $PGUSER -d $PGDATABASE -F c -b -v -f $dumpPath
+  if ($LASTEXITCODE -ne 0) { throw "pg_dump falló" }
+  Write-Host "Postgres -> $dumpPath"
+}
+else {
+  Write-Warning "ENGINE no reconocido ($ENGINE). Salto backup DB."
+}
+# ==== backup media ====
+$mediaPath = "media"
+if (Test-Path $mediaPath) {
+  $mediaZip = Join-Path $BACK ("media_$DATE.zip")
+  Compress-Archive -Path "$mediaPath\*" -DestinationPath $mediaZip -Force
+  Write-Host "Media  -> $mediaZip"
+} else {
+  Write-Warning "No existe carpeta 'media/'."
+}
+# ==== backup .env (si existe) ====
+if (Test-Path ".env") {
+  Copy-Item ".env" (Join-Path $BACK (".env_$DATE")) -Force
+  Write-Host ".env   -> $(Join-Path $BACK (".env_$DATE"))"
+} else {
+  Write-Warning "No existe .env en la raíz."
+}
+# ==== resumen ====
+Write-Host "Backup OK => $BACK"
+Get-ChildItem $BACK | Select Name,Length | Format-Table

@@ -5,14 +5,14 @@ Este script prueba solo la funcionalidad de emails sin Django completo
 """
 
 import smtplib
-from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 # Configuración SMTP (copiada de settings.py)
-EMAIL_HOST = 'mail.atlantareciclajes.cl'
+EMAIL_HOST = "mail.atlantareciclajes.cl"
 EMAIL_PORT = 465
-EMAIL_HOST_USER = 'contacto@atlantareciclajes.cl'
-EMAIL_HOST_PASSWORD = ''  # Pega aquí la contraseña correcta del correo
+EMAIL_HOST_USER = "contacto@atlantareciclajes.cl"
+EMAIL_HOST_PASSWORD = ""  # Pega aquí la contraseña correcta del correo
 EMAIL_USE_SSL = True
 
 print("=" * 60)
@@ -34,17 +34,17 @@ try:
     else:
         server = smtplib.SMTP(EMAIL_HOST, EMAIL_PORT)
         server.starttls()
-    
+
     # Autenticar
     server.login(EMAIL_HOST_USER, EMAIL_HOST_PASSWORD)
     print("✅ ¡Conexión y autenticación exitosa!")
-    
+
     # Crear mensaje de prueba
-    msg = MIMEMultipart('alternative')
-    msg['Subject'] = 'Prueba Final SMTP - eGarage Sistema'
-    msg['From'] = f'eGarage Sistema <{EMAIL_HOST_USER}>'
-    msg['To'] = 'mauricio@atlantareciclajes.cl'
-    
+    msg = MIMEMultipart("alternative")
+    msg["Subject"] = "Prueba Final SMTP - eGarage Sistema"
+    msg["From"] = f"eGarage Sistema <{EMAIL_HOST_USER}>"
+    msg["To"] = "mauricio@atlantareciclajes.cl"
+
     # Texto plano
     texto_plano = """
 ¡Hola Mauricio!
@@ -60,7 +60,7 @@ Este es un correo de prueba del sistema eGarage.
 Saludos,
 eGarage - Sistema de Gestión de Talleres
     """
-    
+
     # HTML
     html = """
     <html>
@@ -92,29 +92,29 @@ eGarage - Sistema de Gestión de Talleres
     </body>
     </html>
     """
-    
+
     # Adjuntar partes
-    part1 = MIMEText(texto_plano, 'plain', 'utf-8')
-    part2 = MIMEText(html, 'html', 'utf-8')
-    
+    part1 = MIMEText(texto_plano, "plain", "utf-8")
+    part2 = MIMEText(html, "html", "utf-8")
+
     msg.attach(part1)
     msg.attach(part2)
-    
+
     # Enviar email
     print("📤 Enviando email de prueba final...")
     server.send_message(msg)
     print("✅ ¡Email enviado exitosamente!")
-    
+
     # Cerrar conexión
     server.quit()
     print("🔐 Conexión cerrada correctamente")
-    
+
     print("\n" + "=" * 60)
     print("🎉 ¡PRUEBA COMPLETADA CON ÉXITO!")
     print("📱 Revisa tu bandeja de entrada en mauricio@atlantareciclajes.cl")
     print("📧 El sistema de emails de eGarage está listo para usar")
     print("=" * 60)
-    
+
 except Exception as e:
     print(f"❌ Error: {e}")
     print(f"❌ Tipo de error: {type(e).__name__}")

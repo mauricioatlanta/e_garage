@@ -13,7 +13,7 @@
 
 {% block content %}
 <div class="container mx-auto px-4 py-6">
-  <div class="bg-slate-900/70 rounded-2xl p-6 shadow-xl border border-cyan-500/20">
+  <div class="bg-slate-900/70 rounded-2xl p-6 shadow-xl border border-cyan-500/20" data-country="{{ request.user.empresa.pais|default:'CL' }}">
     <div class="flex items-center gap-3 mb-4">
       <h1 class="text-xl font-bold text-cyan-200">
         {% if form.instance.pk %}
@@ -42,6 +42,20 @@
       </div>
 
       <div class="mt-6 flex items-center gap-2">
+        {% if request.user.empresa.pais == 'CL' %}
+        <!-- Mensaje específico para Chile -->
+        <div class="w-full bg-blue-900/30 border border-blue-400/30 rounded-lg p-4 mb-4">
+          <div class="flex items-center gap-2 text-blue-300">
+            <i class="fas fa-info-circle"></i>
+            <span class="font-semibold">Formato de Precios para Chile</span>
+          </div>
+          <p class="text-blue-200/80 text-sm mt-2">
+            Los precios se muestran en pesos chilenos sin decimales. Ejemplo: <code class="bg-black/40 px-1 rounded">$2.500</code> (dos mil quinientos pesos).
+            Los puntos se usan como separadores de miles, no como decimales.
+          </p>
+        </div>
+        {% endif %}
+        
         <button type="submit" class="px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-700 text-white shadow">
           {% if form.instance.pk %}
             {% if LANGUAGE_CODE == 'es' %}Guardar cambios{% else %}Save changes{% endif %}
@@ -62,6 +76,12 @@
 {% block extra_js %}
 <script src="{% static 'taller/js/repuestos_form.js' %}"></script>
 {% endblock extra_js %}
+
+
+
+
+
+
 
 
 

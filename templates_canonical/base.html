@@ -1,167 +1,113 @@
 {% load static %}
-{% load i18n %}  {# � Cargar i18n al principio #}
+{% load i18n %}
+{% load country_url %}
 <!DOCTYPE html>
-<html lang="{{ LANGUAGE_CODE }}">  {# 👈 Idioma dinámico #}
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
   <meta charset="UTF-8">
   <title>{% block title %}{{ company_name|default:"eGarage" }}{% endblock %}</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- 🌐 Catálogo JavaScript para gettext -->
+
+  {# --- Catálogo i18n --- #}
   <script src="{% url 'javascript-catalog' %}"></script>
 
-  <!-- Estilos principales -->
+  {# --- CSS principales SIEMPRE cargan --- #}
   <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
   <link rel="stylesheet" href="{% static 'css/output.css' %}">
-  {# Fondo espacial opcional #}
+
+  {# --- Starfield SOLO controla su CSS --- #}
   {% if enable_space_bg|default:1 %}
     <link rel="stylesheet" href="{% static 'css/starfield.css' %}">
   {% endif %}
 
-  <!-- Variables CSS dinámicas para branding -->
+  {# --- Branding variables --- #}
   <style>
-    :root {
+    :root{
       --company-primary: {{ company_color|default:"#0d6efd" }};
       --company-secondary: {{ secondary_color|default:"#6c757d" }};
       --bs-primary: {{ company_color|default:"#0d6efd" }};
       --bs-secondary: {{ secondary_color|default:"#6c757d" }};
     }
-    
-    /* Aplicar colores de empresa */
-    .text-primary, .navbar-brand { color: var(--company-primary) !important; }
-    .bg-primary { background-color: var(--company-primary) !important; }
-    .btn-primary { 
-      background-color: var(--company-primary) !important; 
-      border-color: var(--company-primary) !important; 
+    .text-primary,.navbar-brand{color:var(--company-primary)!important}
+    .bg-primary{background-color:var(--company-primary)!important}
+    .btn-primary{background-color:var(--company-primary)!important;border-color:var(--company-primary)!important}
+    .btn-primary:hover{
+      background-color: color-mix(in srgb, var(--company-primary) 85%, black)!important;
+      border-color: color-mix(in srgb, var(--company-primary) 85%, black)!important;
     }
-    .btn-primary:hover { 
-      background-color: color-mix(in srgb, var(--company-primary) 85%, black) !important; 
-      border-color: color-mix(in srgb, var(--company-primary) 85%, black) !important; 
-    }
-    .border-primary { border-color: var(--company-primary) !important; }
-    
-    /* Logo personalizado en header */
-    .company-logo {
-      max-height: 80px;
-      max-width: 200px;
-      object-fit: contain;
-    }
-    
-    /* Efectos de branding dinámico */
-    .company-header {
-      background: linear-gradient(135deg, #1f2937 0%, #374151 50%, #1f2937 100%);
-      border-bottom: 4px solid var(--company-primary);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    }
-    
-    .company-title {
-      color: var(--company-primary);
-      text-shadow: 0 0 20px var(--company-primary), 0 0 40px var(--company-primary);
-      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
-    }
+    .border-primary{border-color:var(--company-primary)!important}
+    .company-logo{max-height:80px;max-width:200px;object-fit:contain}
+    .company-header{background:linear-gradient(135deg,#1f2937 0%,#374151 50%,#1f2937 100%);border-bottom:4px solid var(--company-primary);box-shadow:0 10px 30px rgba(0,0,0,.3)}
+    .company-title{color:var(--company-primary);text-shadow:0 0 20px var(--company-primary),0 0 40px var(--company-primary);filter:drop-shadow(0 4px 8px rgba(0,0,0,.3))}
   </style>
 
-  <!-- jQuery -->
+  {# --- Font Awesome --- #}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" referrerpolicy="no-referrer" />
+
+  {# --- jQuery / DAL --- #}
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-
-  <!-- TailwindCSS -->
-
-  <!-- Autocomplete Light (DAL) -->
-  <script src="{% static 'autocomplete_light/jquery.init.js' %}"></script>
-  <script src="{% static 'autocomplete_light/select2.js' %}"></script>
-  <script src="{% static 'autocomplete_light/autocomplete_light.js' %}"></script>
-  <script src="{% static 'autocomplete_light/autocomplete.init.js' %}"></script>
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+  <script src="{% static 'autocomplete_light_custom/jquery.init.js' %}"></script>
+  <script src="{% static 'autocomplete_light_custom/select2.js' %}"></script>
+  <script src="{% static 'autocomplete_light_custom/autocomplete_light.js' %}"></script>
+  <script src="{% static 'autocomplete_light_custom/autocomplete.init.js' %}"></script>
 
   {% block extra_head %}{% endblock %}
   {% block extra_css %}{% endblock %}
 </head>
 
-<body class="bg-[#05070c] text-white font-sans min-h-screen flex flex-col relative dark-mode {% if enable_space_bg == 2 %}starfield-lite{% endif %}">
-{# Para desactivar en una página específica: crea un template alterno sin el starfield o pasa enable_space_bg=0 desde la vista. #}
+<body class="min-h-screen flex flex-col">
 
-{% if enable_space_bg|default:1 %}
-  <!-- Fondo animado de estrellas (modo completo o ligero) -->
-  <div id="bg-starfield" aria-hidden="true">
-    <div class="stars layer1"></div>
-    {% if enable_space_bg != 2 %}
-      <div class="stars layer2"></div>
-      <div class="stars layer3"></div>
-    {% endif %}
-  </div>
-{% endif %}
 
-<!-- Header y navegación unificados (ahora con branding dinámico) -->
-<header class="company-header flex items-center gap-6 p-6">
-  {% if company_logo_url %}
-    <img src="{{ company_logo_url }}" 
-         alt="{{ company_name }} Logo" 
-         class="company-logo h-20 w-auto rounded-lg shadow-lg border-2 border-opacity-30" 
-         style="border-color: {{ company_color|default:'#00ffff' }};">
-  {% else %}
-    <div class="company-logo h-20 w-20 bg-gradient-to-br rounded-lg flex items-center justify-center shadow-lg border-2 border-opacity-30" 
-         style="background: linear-gradient(135deg, {{ company_color|default:'#00ffff' }}80, {{ company_color|default:'#00ffff' }}40); border-color: {{ company_color|default:'#00ffff' }};">
-      <span class="text-3xl font-bold text-white">🏢</span>
+  {# --- Fondo estelar SOLO su HTML cuando flag activo --- #}
+  {% if enable_space_bg|default:1 %}
+    <div id="bg-starfield" aria-hidden="true">
+      <div class="stars layer1"></div>
+      {% if enable_space_bg != 2 %}
+        <div class="stars layer2"></div>
+        <div class="stars layer3"></div>
+      {% endif %}
     </div>
   {% endif %}
-  
-  <div class="flex flex-col">
-    <h1 class="company-title text-4xl font-bold drop-shadow-lg">
-      {{ company_name }}
-    </h1>
-    {% if company_tagline %}
-      <span class="text-xl text-gray-300 font-medium mt-1">{{ company_tagline }}</span>
-    {% elif request.user.is_authenticated %}
-      <span class="text-xl text-gray-300 font-medium mt-1">
-        {% if LANGUAGE_CODE == 'es' %}Sistema de Gestión de Talleres{% else %}Workshop Management System{% endif %}
-      </span>
-    {% endif %}
-  </div>
-  
-  <div class="ml-auto flex items-center gap-4">
-    <!-- Botón Settings -->
-    {% if request.user.is_authenticated and request.user.is_staff %}
-      {% url 'taller:settings:ver_configuracion' as settings_url %}
-      {% if settings_url %}
-        <a href="{{ settings_url }}"
-           class="flex items-center gap-2 px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition"
-           title="Configuración de Empresa">
-          <i class="fas fa-cog"></i>
-          <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Configuración{% else %}Settings{% endif %}</span>
-        </a>
-      {% endif %}
-    {% endif %}
-    
-    <!-- Selector de idioma - solo para US -->
-    {% if request.country == "US" %}
-    <form action="{% url 'set_language' %}" method="post" class="flex items-center">
-      {% csrf_token %}
-      <input type="hidden" name="next" value="{{ request.get_full_path }}">
-      <select name="language" onchange="this.form.submit()" class="border border-cyan-400 rounded px-2 py-1 text-gray-800 bg-white">
-        <option value="en" {% if request.LANGUAGE_CODE == 'en' %}selected{% endif %}>English</option>
-        <option value="es" {% if request.LANGUAGE_CODE == 'es' %}selected{% endif %}>Español</option>
-      </select>
-    </form>
-    {% endif %}
-  </div>
-</header>
 
-<nav class="w-full bg-black/60 backdrop-blur border-b border-cyan-700/40 shadow-lg py-3 px-6 flex items-center justify-between z-50 relative">
-  <div class="flex items-center gap-8">
-    {% if request.user.is_authenticated %}
-      {% url 'taller:dashboard_suscripciones' as dashboard_url %}
-      {% if dashboard_url %}
-        <a href="{{ dashboard_url }}" class="text-2xl font-extrabold text-cyan-300 tracking-widest hover:text-lime-300 transition">{{ company_name|default:"eGarage" }}</a>
-      {% endif %}
-      {% if company_name %}
-        <span class="ml-4 text-lg font-semibold text-lime-300">{{ company_name }}</span>
-      {% elif company_settings.tagline %}
-        <span class="ml-4 text-lg font-semibold text-lime-300">{{ company_settings.tagline }}</span>
-      {% endif %}
+  {# --- Header --- #}
+  <header class="company-header flex items-center gap-6 p-6">
+    {% if company_logo_url %}
+      <img src="{{ company_logo_url }}" alt="{{ company_name }} Logo"
+           class="company-logo h-20 w-auto rounded-lg shadow-lg border-2 border-opacity-30"
+           style="border-color: {{ company_color|default:'#00ffff' }};">
     {% else %}
-      <a href="/" class="text-2xl font-extrabold text-cyan-300 tracking-widest hover:text-lime-300 transition">{{ company_name|default:"eGarage" }}</a>
+      <div class="company-logo h-20 w-20 rounded-lg flex items-center justify-center shadow-lg border-2 border-opacity-30"
+           style="background: linear-gradient(135deg, {{ company_color|default:'#00ffff' }}80, {{ company_color|default:'#00ffff' }}40); border-color: {{ company_color|default:'#00ffff' }};">
+        <span class="text-3xl font-bold text-white">🏢</span>
+      </div>
     {% endif %}
-  </div>
-  <div class="flex items-center gap-4">
+
+    <div class="flex flex-col">
+      <h1 class="company-title text-4xl font-bold drop-shadow-lg">{{ company_name|default:"eGarage" }}</h1>
+      {% if company_tagline %}
+        <span class="text-xl text-gray-300 font-medium mt-1">{{ company_tagline }}</span>
+      {% elif request.user.is_authenticated %}
+        <span class="text-xl text-gray-300 font-medium mt-1">{% trans "Bienvenido" %}</span>
+      {% endif %}
+    </div>
+
+    <div class="ml-auto flex items-center gap-4">
+      {% if request.user.is_authenticated and request.user.is_staff %}
+        {% url 'taller:settings:ver_configuracion' as settings_url %}
+        {% if settings_url %}
+          <a href="{{ settings_url }}" class="flex items-center gap-2 px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition" title="Configuración de Empresa">
+            <i class="fas fa-cog"></i>
+          </a>
+        {% endif %}
+      {% endif %}
+    </div>
+  </header>
+
+  {# --- Navegación principal --- #}
+  <div id="main-navigation" class="flex items-center justify-center mt-4">
+    <div class="flex flex-wrap items-center justify-center gap-3 max-w-7xl w-full px-4">
     {% if request.user.is_authenticated %}
       <!-- Botones de navegación principal -->
       {% url 'taller:clientes:lista_clientes' as url_clientes %}
@@ -169,188 +115,246 @@
       {% if not url_vehiculos %}
         {% url 'vehiculos:lista_vehiculos' as url_vehiculos %}
       {% endif %}
+      
       {% if not url_vehiculos %}
         {% url 'chile:vehiculos:lista_vehiculos' as url_vehiculos %}
       {% endif %}
+      
       {% if not url_vehiculos %}
         {% url 'chile:taller:vehiculos:lista_vehiculos' as url_vehiculos %}
       {% endif %}
+      
       {% url 'taller:repuestos:lista_repuestos' as url_repuestos %}
+      {% url 'servicios:servicios_menu' as url_servicios %}
+      {% if not url_servicios %}
+        {% url 'taller:servicios:servicios_menu' as url_servicios %}
+      {% endif %}
+      
       {% if url_clientes %}
-        <a href="{{ url_clientes }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
-          <span>👥</span>
-          <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Clientes{% else %}Clients{% endif %}</span>
-        </a>
-      {% endif %}
-      {% if url_vehiculos %}
-        <a href="{{ url_vehiculos }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
-          <span>🚗</span>
-          <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Vehículos{% else %}Vehicles{% endif %}</span>
-        </a>
-      {% endif %}
-      {% if url_repuestos %}
-        <a href="{{ url_repuestos }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
-          <span>🔧</span>
-          <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Repuestos{% else %}Parts{% endif %}</span>
+        <a href="{{ url_clientes }}" class="group relative nav-button-power">
+          <div class="relative overflow-hidden">
+            <!-- Borde animado -->
+            <div class="absolute inset-0 bg-gradient-to-r from-cyan-400 via-cyan-300 to-cyan-400 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse"></div>
+            <div class="absolute inset-[1px] bg-gradient-to-r from-gray-900 to-gray-800 rounded-lg"></div>
+            <!-- Contenido -->
+            <div class="relative flex items-center gap-3 px-5 py-3 rounded-lg">
+              <div class="w-5 h-5 bg-gradient-to-br from-cyan-400 to-cyan-600 rounded-md flex items-center justify-center shadow-lg">
+                <div class="w-2 h-2 bg-white rounded-full animate-ping"></div>
+              </div>
+              <span class="font-bold text-sm text-cyan-300 group-hover:text-white transition-colors duration-300 tracking-wider">{% trans "CLIENTES" %}</span>
+            </div>
+            <!-- Efecto de brillo -->
+            <div class="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          </div>
         </a>
       {% endif %}
       
-      <!-- Centro Espacial -->
-      <a href="/cl/taller/centro-operaciones-espacial/" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
-        <span>🛰️</span>
-        <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Centro Espacial{% else %}Space Center{% endif %}</span>
+      {% if url_vehiculos %}
+        <a href="{{ url_vehiculos }}" class="group relative nav-button-power">
+          <div class="relative overflow-hidden">
+            <!-- Borde animado -->
+            <div class="absolute inset-0 bg-gradient-to-r from-lime-400 via-lime-300 to-lime-400 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse"></div>
+            <div class="absolute inset-[1px] bg-gradient-to-r from-gray-900 to-gray-800 rounded-lg"></div>
+            <!-- Contenido -->
+            <div class="relative flex items-center gap-3 px-5 py-3 rounded-lg">
+              <div class="w-5 h-5 bg-gradient-to-br from-lime-400 to-lime-600 rounded-md flex items-center justify-center shadow-lg">
+                <div class="w-2 h-2 bg-white rounded-full animate-ping"></div>
+              </div>
+              <span class="font-bold text-sm text-lime-300 group-hover:text-white transition-colors duration-300 tracking-wider">{% trans "VEHÍCULOS" %}</span>
+            </div>
+            <!-- Efecto de brillo -->
+            <div class="absolute inset-0 bg-gradient-to-r from-lime-500/20 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          </div>
+        </a>
+      {% endif %}
+      
+      {% if url_servicios %}
+        <a href="{{ url_servicios }}" class="group relative nav-button-power">
+          <div class="relative overflow-hidden">
+            <!-- Borde animado -->
+            <div class="absolute inset-0 bg-gradient-to-r from-purple-400 via-purple-300 to-purple-400 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse"></div>
+            <div class="absolute inset-[1px] bg-gradient-to-r from-gray-900 to-gray-800 rounded-lg"></div>
+            <!-- Contenido -->
+            <div class="relative flex items-center gap-3 px-5 py-3 rounded-lg">
+              <div class="w-5 h-5 bg-gradient-to-br from-purple-400 to-purple-600 rounded-md flex items-center justify-center shadow-lg">
+                <div class="w-2 h-2 bg-white rounded-full animate-ping"></div>
+              </div>
+              <span class="font-bold text-sm text-purple-300 group-hover:text-white transition-colors duration-300 tracking-wider">{% trans "SERVICIOS" %}</span>
+            </div>
+            <!-- Efecto de brillo -->
+            <div class="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          </div>
+        </a>
+      {% endif %}
+      
+      {% if url_repuestos %}
+        <a href="{{ url_repuestos }}" class="group relative nav-button-power">
+          <div class="relative overflow-hidden">
+            <!-- Borde animado -->
+            <div class="absolute inset-0 bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-400 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse"></div>
+            <div class="absolute inset-[1px] bg-gradient-to-r from-gray-900 to-gray-800 rounded-lg"></div>
+            <!-- Contenido -->
+            <div class="relative flex items-center gap-3 px-5 py-3 rounded-lg">
+              <div class="w-5 h-5 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-md flex items-center justify-center shadow-lg">
+                <div class="w-2 h-2 bg-white rounded-full animate-ping"></div>
+              </div>
+              <span class="font-bold text-sm text-yellow-300 group-hover:text-white transition-colors duration-300 tracking-wider">{% trans "REPUESTOS" %}</span>
+            </div>
+            <!-- Efecto de brillo -->
+            <div class="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          </div>
+        </a>
+      {% endif %}
+      
+      <!-- Centro de Investigación -->
+      <a href="{% if request.path|slice:':3' == '/cl' %}/cl/taller/centro-operaciones-espacial/{% else %}/us/centro-operaciones-espacial/{% endif %}" class="group relative nav-button-power">
+        <div class="relative overflow-hidden">
+          <!-- Borde animado -->
+          <div class="absolute inset-0 bg-gradient-to-r from-orange-400 via-orange-300 to-orange-400 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse"></div>
+          <div class="absolute inset-[1px] bg-gradient-to-r from-gray-900 to-gray-800 rounded-lg"></div>
+          <!-- Contenido -->
+          <div class="relative flex items-center gap-3 px-5 py-3 rounded-lg">
+            <div class="w-5 h-5 bg-gradient-to-br from-orange-400 to-orange-600 rounded-md flex items-center justify-center shadow-lg">
+              <div class="w-2 h-2 bg-white rounded-full animate-ping"></div>
+            </div>
+            <span class="font-bold text-sm text-orange-300 group-hover:text-white transition-colors duration-300 tracking-wider">{% trans "CENTRO" %}</span>
+          </div>
+          <!-- Efecto de brillo -->
+          <div class="absolute inset-0 bg-gradient-to-r from-orange-500/20 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        </div>
+      </a>
+      
+      <!-- Reportes -->
+      <a href="{% country_url 'reportes_dashboard' app_namespace='reportes' %}" class="group relative nav-button-power">
+        <div class="relative overflow-hidden">
+          <!-- Borde animado -->
+          <div class="absolute inset-0 bg-gradient-to-r from-emerald-400 via-emerald-300 to-emerald-400 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse"></div>
+          <div class="absolute inset-[1px] bg-gradient-to-r from-gray-900 to-gray-800 rounded-lg"></div>
+          <!-- Contenido -->
+          <div class="relative flex items-center gap-3 px-5 py-3 rounded-lg">
+            <div class="w-5 h-5 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-md flex items-center justify-center shadow-lg">
+              <div class="w-2 h-2 bg-white rounded-full animate-ping"></div>
+            </div>
+            <span class="font-bold text-sm text-emerald-300 group-hover:text-white transition-colors duration-300 tracking-wider">{% trans "REPORTES" %}</span>
+          </div>
+          <!-- Efecto de brillo -->
+          <div class="absolute inset-0 bg-gradient-to-r from-emerald-500/20 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        </div>
       </a>
       
       <!-- Settings -->
-      <a href="/cl/taller/settings/" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
-        <span>⚙️</span>
-        <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Settings{% else %}Settings{% endif %}</span>
+      <a href="{% if request.path|slice:':3' == '/cl' %}/cl/taller/settings/{% else %}/us/taller/settings/{% endif %}" class="group relative nav-button-power">
+        <div class="relative overflow-hidden">
+          <!-- Borde animado -->
+          <div class="absolute inset-0 bg-gradient-to-r from-indigo-400 via-indigo-300 to-indigo-400 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse"></div>
+          <div class="absolute inset-[1px] bg-gradient-to-r from-gray-900 to-gray-800 rounded-lg"></div>
+          <!-- Contenido -->
+          <div class="relative flex items-center gap-3 px-5 py-3 rounded-lg">
+            <div class="w-5 h-5 bg-gradient-to-br from-indigo-400 to-indigo-600 rounded-md flex items-center justify-center shadow-lg">
+              <div class="w-2 h-2 bg-white rounded-full animate-ping"></div>
+            </div>
+            <span class="font-bold text-sm text-indigo-300 group-hover:text-white transition-colors duration-300 tracking-wider">{% trans "CONFIG" %}</span>
+          </div>
+          <!-- Efecto de brillo -->
+          <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/20 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        </div>
       </a>
-  {% url 'servicios:servicios_menu' as url_servicios %}
-  {% if not url_servicios %}
-    {% url 'taller:servicios:servicios_menu' as url_servicios %}
-  {% endif %}
-  {% if url_servicios %}
-    <a href="{{ url_servicios }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
-      <span>🧰</span>
-      <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Servicios{% else %}Services{% endif %}</span>
-    </a>
-  {% endif %}
-  {% url 'servicios:otros_servicios_menu' as url_otros %}
-  {% if not url_otros %}
-    {% url 'taller:servicios:otros_servicios_menu' as url_otros %}
-  {% endif %}
-  {% if url_otros %}
-    <a href="{{ url_otros }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
-      <span>🛠️</span>
-      <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Otros Servicios{% else %}Other Services{% endif %}</span>
-    </a>
-  {% endif %}
-      {% comment %} Documentos con namespaces actualizados {% endcomment %}
-      {% if request.path|slice:":3" == "/cl" %}
-        {% url 'documentos_cl:lista_documentos' as url_documentos %}
-      {% elif request.path|slice:":3" == "/us" %}
-        {% url 'documentos_us:lista_documentos' as url_documentos %}
-      {% else %}
-        {% url 'documentos_cl:lista_documentos' as url_documentos %}
-      {% endif %}
-      {% if url_documentos %}
-        <a href="{{ url_documentos }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
-          <span>📄</span>
-          <span class="hidden md:inline">{% trans "Documentos" %}</span>
-        </a>
-      {% endif %}
       
       <!-- Separador visual -->
-      <div class="h-6 w-px bg-cyan-700"></div>
+      <div class="h-6 w-px bg-cyan-400/50"></div>
       
-      <!-- Configuración -->
-      {% url 'taller:configuracion' as url_config %}
-      {% if url_config %}
-        <a href="{{ url_config }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
-          <span>⚙️</span>
-          <span class="hidden md:inline">{% trans "Configuración" %}</span>
-        </a>
-      {% endif %}
+      <!-- Usuario info -->
+      <div class="nav-button flex items-center gap-2 px-4 py-2 bg-[#0a0f1a] border border-cyan-400 rounded-lg">
+        <div class="w-4 h-4 bg-cyan-400 rounded-sm flex items-center justify-center">
+          <div class="w-2 h-2 bg-white rounded-full"></div>
+        </div>
+        <span class="text-cyan-300 font-semibold text-sm">{{ request.user.username }}</span>
+      </div>
       
-      <!-- 🌐 Selector de idioma -->
-      <form action="{% url 'set_language' %}" method="post" class="inline-block mx-2">
+      <!-- Logout button -->
+      <form action="{% url 'account_logout' %}" method="post" class="inline-block">
         {% csrf_token %}
-        <input name="next" type="hidden" value="{{ request.get_full_path }}">
-        <select name="language" onchange="this.form.submit()" class="bg-black/60 text-cyan-300 border border-cyan-700 rounded px-2 py-1 text-sm">
-          {% if company_country == 'US' %}
-            <option value="es" {% if LANGUAGE_CODE == 'es' %}selected{% endif %}>🇺🇸 ES</option>
-            <option value="en" {% if LANGUAGE_CODE == 'en' %}selected{% endif %}>🇺🇸 EN</option>
-          {% else %}
-            <option value="es" {% if LANGUAGE_CODE == 'es' %}selected{% endif %}>🇨🇱 ES</option>
-            <option value="en" {% if LANGUAGE_CODE == 'en' %}selected{% endif %}>�� EN</option>
-          {% endif %}
-        </select>
-      </form>
-      
-      <span class="text-cyan-200 font-semibold">{{ request.user.username }}</span>
-      <form action="{% url 'account_logout' %}" method="post" style="display:inline;">
-        {% csrf_token %}
-        <button type="submit" class="bg-red-500 hover:bg-red-400 text-white font-bold px-4 py-2 rounded-xl transition shadow">
-          {% trans "Cerrar sesión" %}
+        <button type="submit" class="group relative nav-button-power">
+          <div class="relative overflow-hidden">
+            <!-- Borde animado -->
+            <div class="absolute inset-0 bg-gradient-to-r from-red-400 via-red-300 to-red-400 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse"></div>
+            <div class="absolute inset-[1px] bg-gradient-to-r from-gray-900 to-gray-800 rounded-lg"></div>
+            <!-- Contenido -->
+            <div class="relative flex items-center gap-3 px-5 py-3 rounded-lg">
+              <div class="w-5 h-5 bg-gradient-to-br from-red-400 to-red-600 rounded-md flex items-center justify-center shadow-lg">
+                <div class="w-2 h-2 bg-white rounded-full animate-ping"></div>
+              </div>
+              <span class="font-bold text-sm text-red-300 group-hover:text-white transition-colors duration-300 tracking-wider">{% trans "LOGOUT" %}</span>
+            </div>
+            <!-- Efecto de brillo -->
+            <div class="absolute inset-0 bg-gradient-to-r from-red-500/20 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          </div>
         </button>
       </form>
     {% else %}
-      <a href="{% url 'account_login' %}" class="bg-cyan-500 hover:bg-cyan-400 text-white font-bold px-4 py-2 rounded-xl transition shadow">
-        {% trans "Iniciar sesión o registrarse" %}
+      <!-- Login button for non-authenticated users -->
+      <a href="{% url 'account_login' %}" class="nav-button flex items-center gap-2 px-4 py-2 bg-[#0a0f1a] border border-cyan-400 rounded-lg hover:bg-[#0f172a] transition-all duration-300 text-cyan-300 hover:text-white">
+        <div class="w-4 h-4 bg-cyan-400 rounded-sm flex items-center justify-center">
+          <div class="w-2 h-2 bg-white rounded-full"></div>
+        </div>
+        <span class="font-medium text-sm">{% trans "LOGIN" %}</span>
       </a>
     {% endif %}
-  </div>
-</nav>
-
-{% block fondo_extra %}{% endblock %}
-
-{% block content %}{% endblock %}
-
-<!-- Footer unificado -->
-<footer class="bg-black/80 border-t border-cyan-700/40 py-4 mt-auto">
-  <div class="container mx-auto px-4 text-center">
-    <span class="text-xs text-gray-400 block">© 2025 <strong class="text-cyan-300">{{ company_name|default:"Atlanta Reciclajes" }}</strong> — {% if LANGUAGE_CODE == 'es' %}Todos los derechos reservados{% else %}All rights reserved{% endif %}.</span>
-    {% if company_settings.address or company_settings.phone or company_settings.email %}
-      <span class="text-xs text-gray-400 block">
-        {% if company_settings.address %}{{ company_settings.address }}{% endif %}
-        {% if company_settings.phone %} • Tel: {{ company_settings.phone }}{% endif %}
-        {% if company_settings.email %} • Email: <a href="mailto:{{ company_settings.email }}" class="text-cyan-400 hover:text-cyan-300">{{ company_settings.email }}</a>{% endif %}
-      </span>
-    {% else %}
-  <span class="text-xs text-gray-400 block">{{ company_name|default:"eGarage" }} AI™ {% if LANGUAGE_CODE == 'es' %}desarrollado por{% else %}system developed by{% endif %} Atlanta Reciclajes</span>
-    {% endif %}
-    <span class="text-xs text-gray-500 block">{% if LANGUAGE_CODE == 'es' %}Contacto{% else %}Contact{% endif %}: <a href="mailto:{{ company_settings.email|default:'suscripcion@atlantareciclajes.cl' }}" class="text-cyan-400 hover:text-cyan-300">{{ company_settings.email|default:"suscripcion@atlantareciclajes.cl" }}</a></span>
-  </div>
-</footer>
-
-{% block extra_js %}{% endblock %}
-
-{% if enable_space_bg|default:1 and enable_space_bg != 2 %}
-  <script src="{% static 'js/starfield.js' %}"></script>
-{% endif %}
-
-<script>
-    // CSRF helper
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-    const csrftoken = getCookie('csrftoken');
-
-    // Función global para confirmar eliminación
-    function confirmarEliminacion(nombreCliente) {
-        const isSpanish = document.documentElement.lang === 'es';
-        const message = isSpanish 
-            ? `⚠️ ¿Está seguro de que desea eliminar al cliente "${nombreCliente}"?\n\nEsta acción NO se puede deshacer.\n\nHaga clic en "Aceptar" para eliminar o "Cancelar" para mantener el cliente.`
-            : `⚠️ Are you sure you want to delete the client "${nombreCliente}"?\n\nThis action CANNOT be undone.\n\nClick "OK" to delete or "Cancel" to keep the client.`;
-        return confirm(message);
-    }
-</script>
-
-</body>
-
-<footer class="mt-16 border-t border-gray-700/30">
-  <div class="max-w-7xl mx-auto px-4 py-6 text-center text-gray-400 text-sm">
-    <div class="flex items-center justify-center gap-3">
-      <span class="font-medium">eGarage {{ APP_VERSION }}</span>
-      <span aria-hidden="true">•</span>
-      <span>{{ COPYRIGHT_TEXT }}</span>
-      <span aria-hidden="true">•</span>
-  <a href="{% url 'changelog' %}" class="text-cyan-400 hover:underline">{% if LANGUAGE_CODE == 'es' %}Ver historial de cambios{% else %}View changelog{% endif %}</a>
-  <span aria-hidden="true">•</span>
-  <a href="/legal/" class="text-cyan-400 hover:underline">Legal</a>
     </div>
   </div>
-</footer>
+
+  {# --- CONTENIDO --- #}
+  {% block fondo_extra %}{% endblock %}
+  <main class="flex-1">
+    {% block content %}{% endblock %}
+  </main>
+
+  {# --- FOOTER ÚNICO --- #}
+  <footer class="bg-black/80 border-t border-cyan-700/40 py-4 mt-auto">
+    <div class="container mx-auto px-4 text-center">
+      {% if company_settings.address or company_settings.phone or company_settings.email %}
+        <span class="text-xs text-gray-400 block">
+          {% if company_settings.address %}{{ company_settings.address }} {% endif %}
+          {% if company_settings.phone %}• {{ company_settings.phone }} {% endif %}
+          {% if company_settings.email %}• {{ company_settings.email }}{% endif %}
+        </span>
+      {% endif %}
+      <div class="mt-3 flex items-center justify-center gap-3 text-gray-400 text-sm">
+        <span class="font-medium">eGarage</span>
+        <span aria-hidden="true">•</span>
+        <span>© 2024</span>
+        <span aria-hidden="true">•</span>
+        <a href="/legal/" class="text-cyan-400 hover:underline">Legal</a>
+      </div>
+    </div>
+  </footer>
+
+  {# --- JS extra + Starfield JS si aplica --- #}
+  {% block extra_js %}{% endblock %}
+  {% if enable_space_bg|default:1 and enable_space_bg != 2 %}
+    <script src="{% static 'js/starfield.js' %}"></script>
+  {% endif %}
+
+  <script>
+    // CSRF helper
+    function getCookie(name){
+      let v=null; if(document.cookie && document.cookie!==''){
+        const cs=document.cookie.split(';');
+        for(let i=0;i<cs.length;i++){
+          const c=cs[i].trim(); if(c.substring(0,name.length+1)===(name+'=')){ v=decodeURIComponent(c.substring(name.length+1)); break; }
+        }
+      } return v;
+    }
+    const csrftoken=getCookie('csrftoken');
+
+    // Confirmación eliminar
+    function confirmarEliminacion(nombreCliente){
+      const isSpanish=document.documentElement.lang==='es';
+      const message=isSpanish
+        ? `⚠️ ¿Está seguro de eliminar a "${nombreCliente}"?\n\nEsta acción NO se puede deshacer.`
+        : `⚠️ Are you sure you want to delete "${nombreCliente}"?\n\nThis action CANNOT be undone.`;
+      return confirm(message);
+    }
+  </script>
+</body>
 </html>

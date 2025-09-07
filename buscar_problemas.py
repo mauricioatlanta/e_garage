@@ -1,15 +1,17 @@
 #!/usr/bin/env python
 import os
+
 import django
 
 # Configurar Django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings")
 django.setup()
 
-from taller.models import MarcaVehiculo, ModeloVehiculo
 from collections import defaultdict
 
-print('=== BÚSQUEDA DE PROBLEMAS EN MODELOS ===\n')
+from taller.models import MarcaVehiculo, ModeloVehiculo
+
+print("=== BÚSQUEDA DE PROBLEMAS EN MODELOS ===\n")
 
 # 1. Buscar modelos duplicados
 print("🔍 1. VERIFICANDO MODELOS DUPLICADOS:")
@@ -35,39 +37,36 @@ print(f"\n🔍 2. VERIFICANDO POSIBLES ASIGNACIONES INCORRECTAS:")
 
 # Modelos que deberían estar en marcas específicas
 asignaciones_correctas = {
-    'Camry': 'Toyota',
-    'Corolla': 'Toyota', 
-    'Prius': 'Toyota',
-    'RAV4': 'Toyota',
-    'Highlander': 'Toyota',
-    'Tacoma': 'Toyota',
-    'Tundra': 'Toyota',
-    'Sienna': 'Toyota',
-    
-    'Civic': 'Honda',
-    'Accord': 'Honda',
-    'CR-V': 'Honda',
-    'Pilot': 'Honda',
-    'Odyssey': 'Honda',
-    'Ridgeline': 'Honda',
-    'Fit': 'Honda',
-    
-    'Altima': 'Nissan',
-    'Sentra': 'Nissan',
-    'Rogue': 'Nissan',
-    'Pathfinder': 'Nissan',
-    'Maxima': 'Nissan',
-    'Armada': 'Nissan',
-    'Titan': 'Nissan',
-    
-    'Mustang': 'Ford',
-    'F-150': 'Ford',
-    'Explorer': 'Ford',
-    'Focus': 'Ford',
-    'Escape': 'Ford',
-    'Fusion': 'Ford',
-    'Edge': 'Ford',
-    'Expedition': 'Ford',
+    "Camry": "Toyota",
+    "Corolla": "Toyota",
+    "Prius": "Toyota",
+    "RAV4": "Toyota",
+    "Highlander": "Toyota",
+    "Tacoma": "Toyota",
+    "Tundra": "Toyota",
+    "Sienna": "Toyota",
+    "Civic": "Honda",
+    "Accord": "Honda",
+    "CR-V": "Honda",
+    "Pilot": "Honda",
+    "Odyssey": "Honda",
+    "Ridgeline": "Honda",
+    "Fit": "Honda",
+    "Altima": "Nissan",
+    "Sentra": "Nissan",
+    "Rogue": "Nissan",
+    "Pathfinder": "Nissan",
+    "Maxima": "Nissan",
+    "Armada": "Nissan",
+    "Titan": "Nissan",
+    "Mustang": "Ford",
+    "F-150": "Ford",
+    "Explorer": "Ford",
+    "Focus": "Ford",
+    "Escape": "Ford",
+    "Fusion": "Ford",
+    "Edge": "Ford",
+    "Expedition": "Ford",
 }
 
 problemas_encontrados = False
@@ -76,7 +75,9 @@ for nombre_modelo, marca_correcta in asignaciones_correctas.items():
         modelo = ModeloVehiculo.objects.get(nombre=nombre_modelo, activo=True)
         if modelo.marca.nombre != marca_correcta:
             problemas_encontrados = True
-            print(f"❌ INCORRECTO: {nombre_modelo} está en {modelo.marca.nombre}, debería estar en {marca_correcta}")
+            print(
+                f"❌ INCORRECTO: {nombre_modelo} está en {modelo.marca.nombre}, debería estar en {marca_correcta}"
+            )
         else:
             print(f"✅ CORRECTO: {nombre_modelo} está en {modelo.marca.nombre}")
     except ModeloVehiculo.DoesNotExist:

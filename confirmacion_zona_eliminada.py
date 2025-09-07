@@ -15,7 +15,7 @@ print()
 
 print("🇨🇱 ELEMENTOS CHILENOS CONSERVADOS:")
 print("   ✓ País: Chile (CL)")
-print("   ✓ Idioma: Español (es)")  
+print("   ✓ Idioma: Español (es)")
 print("   ✓ Moneda: Peso Chileno (CLP)")
 print("   ✓ IVA: 19% incluido en repuestos")
 print()

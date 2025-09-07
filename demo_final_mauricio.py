@@ -7,27 +7,34 @@ Esta demostración muestra que el sistema está 100% funcional
 y listo para usar con tus datos reales.
 """
 import os
+
 import django
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings_sqlite')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings_sqlite")
 django.setup()
 
-from taller.models.notificacion import TipoNotificacion, NotificacionEnviada, ConfiguracionNotificacion, RecordatorioMantenimiento
-from taller.models.empresa import Empresa
+from django.utils import timezone
+
 from taller.models.clientes import Cliente
 from taller.models.documento import Documento
-from django.utils import timezone
+from taller.models.empresa import Empresa
+from taller.models.notificacion import (ConfiguracionNotificacion,
+                                        NotificacionEnviada,
+                                        RecordatorioMantenimiento,
+                                        TipoNotificacion)
+
 
 def mostrar_seccion(titulo):
     print("\n" + "🎯 " + titulo)
-    print("="*60)
+    print("=" * 60)
+
 
 mostrar_seccion("ESTADO FINAL DEL SISTEMA DE NOTIFICACIONES")
 
 # Verificar configuración para Mauricio
 empresa = Empresa.objects.first()
 config = ConfiguracionNotificacion.objects.filter(empresa=empresa).first()
-mauricio = Cliente.objects.filter(email='mauricioatlanta@gmail.com').first()
+mauricio = Cliente.objects.filter(email="mauricioatlanta@gmail.com").first()
 
 print("✅ CONFIGURACIÓN COMPLETADA:")
 print(f"   🏢 Empresa: {empresa.nombre_taller}")
@@ -39,8 +46,8 @@ mostrar_seccion("NOTIFICACIONES AUTOMÁTICAS FUNCIONANDO")
 
 # Mostrar notificaciones de Mauricio
 notificaciones_mauricio = NotificacionEnviada.objects.filter(
-    destinatario_email='mauricioatlanta@gmail.com'
-).order_by('-created_at')
+    destinatario_email="mauricioatlanta@gmail.com"
+).order_by("-created_at")
 
 print(f"📧 NOTIFICACIONES PARA MAURICIO: {notificaciones_mauricio.count()} total")
 print()
@@ -57,8 +64,7 @@ for i, notif in enumerate(notificaciones_mauricio, 1):
 mostrar_seccion("RECORDATORIOS DE MANTENIMIENTO ACTIVOS")
 
 recordatorios_mauricio = RecordatorioMantenimiento.objects.filter(
-    cliente=mauricio,
-    estado='PROGRAMADO'
+    cliente=mauricio, estado="PROGRAMADO"
 )
 
 print(f"🔧 RECORDATORIOS PARA MAURICIO: {recordatorios_mauricio.count()}")
@@ -106,16 +112,17 @@ print("🔄 Probando creación automática de notificaciones...")
 documento_demo = Documento.objects.create(
     empresa=empresa,
     cliente=mauricio,
-    tipo_documento='Presupuesto',
+    tipo_documento="Presupuesto",
     numero_documento=f'AUTO-{timezone.now().strftime("%H%M%S")}',
     fecha=timezone.now().date(),
-    observaciones='Demostración de notificación automática'
+    observaciones="Demostración de notificación automática",
 )
 
 print(f"✅ Documento creado: {documento_demo.numero_documento}")
 
 # Verificar que se creó la notificación automáticamente
 import time
+
 time.sleep(1)
 
 notificacion_nueva = NotificacionEnviada.objects.filter(

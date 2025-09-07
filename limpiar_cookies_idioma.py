@@ -1,0 +1,163 @@
+#!/usr/bin/env python
+"""
+Script para limpiar cookies de idioma y probar el sistema
+"""
+
+import re
+
+import requests
+from bs4 import BeautifulSoup
+
+
+def limpiar_cookies_y_probar():
+    """Limpia cookies de idioma y prueba el sistema"""
+    print("🍪 LIMPIANDO COOKIES DE IDIOMA Y PROBANDO")
+    print("=" * 60)
+
+    session = requests.Session()
+
+    try:
+        # 1. Limpiar cookies existentes
+        print("1️⃣ Limpiando cookies existentes...")
+        session.cookies.clear()
+        print("✅ Cookies limpiadas")
+
+        # 2. Obtener página de login
+        print("2️⃣ Obteniendo página de login...")
+        login_page = session.get("http://127.0.0.1:8000/accounts/login/")
+
+        if login_page.status_code != 200:
+            print(
+                f"❌ Error al obtener página de login (Status: {login_page.status_code})"
+            )
+            return
+
+        # Extraer CSRF token
+        csrf_match = re.search(
+            r'name="csrfmiddlewaretoken" value="([^"]+)"', login_page.text
+        )
+        if not csrf_match:
+            print("❌ No se encontró CSRF token")
+            return
+
+        csrf_token = csrf_match.group(1)
+        print(f"✅ CSRF token obtenido")
+
+        # 3. Hacer login como usuario USA
+        print("3️⃣ Haciendo login como testuser_usa...")
+        login_data = {
+            "csrfmiddlewaretoken": csrf_token,
+            "login": "testuser_usa",
+            "password": "testpass123",
+        }
+
+        login_response = session.post(
+            "http://127.0.0.1:8000/accounts/login/", data=login_data
+        )
+
+        if login_response.status_code == 200 and "login" not in login_response.url:
+            print("✅ Login exitoso")
+        else:
+            print(f"❌ Error en login (Status: {login_response.status_code})")
+            return
+
+        # 4. Verificar cookies después del login
+        print("4️⃣ Verificando cookies después del login...")
+        cookies = session.cookies.get_dict()
+        print(f"   Cookies: {cookies}")
+
+        # 5. Acceder a la página de clientes
+        print("5️⃣ Accediendo a página de clientes...")
+        clientes_response = session.get("http://127.0.0.1:8000/taller/clientes/")
+
+        if clientes_response.status_code != 200:
+            print(
+                f"❌ Error al acceder a clientes (Status: {clientes_response.status_code})"
+            )
+            return
+
+        print("✅ Página de clientes cargada")
+
+        # 6. Verificar cookies después de acceder a clientes
+        print("6️⃣ Verificando cookies después de acceder a clientes...")
+        cookies_finales = session.cookies.get_dict()
+        print(f"   Cookies finales: {cookies_finales}")
+
+        # 7. Analizar el contenido
+        content = clientes_response.text
+
+        print(f"\n🔍 ANÁLISIS DE CONTENIDO:")
+
+        # Buscar textos específicos
+        textos_espanol = [
+            "Gestión de Clientes",
+            "Nuevo Cliente",
+            "Buscar por nombre o apellido",
+            "Acciones",
+        ]
+
+        textos_ingles = [
+            "Client Management",
+            "New Client",
+            "Search by name or last name",
+            "Actions",
+        ]
+
+        # Verificar textos en español
+        espanol_encontrado = []
+        for texto in textos_espanol:
+            if texto in content:
+                espanol_encontrado.append(texto)
+                print(f"   ✅ Español: '{texto}'")
+
+        # Verificar textos en inglés
+        ingles_encontrado = []
+        for texto in textos_ingles:
+            if texto in content:
+                ingles_encontrado.append(texto)
+                print(f"   ✅ Inglés: '{texto}'")
+
+        # Verificar headers
+        content_language = clientes_response.headers.get(
+            "Content-Language", "No especificado"
+        )
+        print(f"   📋 Content-Language: {content_language}")
+
+        # Determinar idioma predominante
+        if len(espanol_encontrado) > len(ingles_encontrado):
+            idioma_detectado = "🇪🇸 ESPAÑOL"
+        elif len(ingles_encontrado) > len(espanol_encontrado):
+            idioma_detectado = "🇺🇸 INGLÉS"
+        else:
+            idioma_detectado = "❓ INDETERMINADO"
+
+        print(f"\n📊 RESULTADO:")
+        print(f"   • Textos en español: {len(espanol_encontrado)}")
+        print(f"   • Textos en inglés: {len(ingles_encontrado)}")
+        print(f"   • Idioma detectado: {idioma_detectado}")
+        print(f"   • Content-Language: {content_language}")
+
+        print(f"\n🎯 CONCLUSIÓN:")
+        if idioma_detectado == "🇺🇸 INGLÉS":
+            print(f"   ✅ CORRECTO: USA muestra inglés")
+        elif idioma_detectado == "🇪🇸 ESPAÑOL":
+            print(f"   ❌ INCORRECTO: USA muestra español (debería ser inglés)")
+            print(f"   🔧 El middleware no está funcionando correctamente")
+        else:
+            print(f"   ⚠️ INDETERMINADO: No se puede determinar el idioma")
+
+    except requests.exceptions.ConnectionError:
+        print(
+            "❌ No se puede conectar al servidor. ¿Está corriendo en http://127.0.0.1:8000?"
+        )
+    except Exception as e:
+        print(f"❌ Error: {e}")
+        import traceback
+
+        traceback.print_exc()
+
+    print(f"\n✅ PRUEBA COMPLETADA!")
+
+
+if __name__ == "__main__":
+    limpiar_cookies_y_probar()

@@ -90,7 +90,8 @@
   <div class="ml-auto flex items-center gap-4">
     <!-- Settings Button -->
     {% if request.user.is_authenticated %}
-      {% url 'taller:company_settings' as settings_url %}
+      {% load country_url %}
+      {% country_url 'company_settings' app_namespace='taller' as settings_url %}
       {% if settings_url %}
         <a href="{{ settings_url }}"
            class="flex items-center gap-2 px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition"
@@ -127,8 +128,8 @@
       {% endif %}
       {% if empresa_usuario %}
         <span class="ml-4 text-lg font-semibold text-lime-300">{{ empresa_usuario.nombre_taller }}</span>
-      {% elif company_settings.tagline %}
-        <span class="ml-4 text-lg font-semibold text-lime-300">{{ company_settings.tagline }}</span>
+      {% elif company_tagline %}
+        <span class="ml-4 text-lg font-semibold text-lime-300">{{ company_tagline }}</span>
       {% endif %}
     {% else %}
       <a href="/" class="text-2xl font-extrabold text-cyan-300 tracking-widest hover:text-lime-300 transition">{{ company_name|default:"eGarage" }}</a>
@@ -137,18 +138,9 @@
   <div class="flex items-center gap-4">
     {% if request.user.is_authenticated %}
       <!-- Main navigation buttons -->
-      {% url 'taller:clientes:lista_clientes' as url_clientes %}
-      {% url 'taller:vehiculos:lista_vehiculos' as url_vehiculos %}
-      {% if not url_vehiculos %}
-        {% url 'vehiculos:lista_vehiculos' as url_vehiculos %}
-      {% endif %}
-      {% if not url_vehiculos %}
-        {% url 'chile:vehiculos:lista_vehiculos' as url_vehiculos %}
-      {% endif %}
-      {% if not url_vehiculos %}
-        {% url 'chile:taller:vehiculos:lista_vehiculos' as url_vehiculos %}
-      {% endif %}
-      {% url 'taller:repuestos:lista_repuestos' as url_repuestos %}
+      {% url 'usa:clientes:lista_clientes' as url_clientes %}
+      {% url 'vehiculos:lista_vehiculos' as url_vehiculos %}
+      {% url 'usa:repuestos:lista_repuestos' as url_repuestos %}
       {% if url_clientes %}
         <a href="{{ url_clientes }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
           <span>👥</span>
@@ -169,36 +161,36 @@
       {% endif %}
       
       <!-- Space Center -->
-      {% url 'centro_operaciones_espacial' as url_centro_espacial %}
-      {% if url_centro_espacial %}
-        <a href="{{ url_centro_espacial }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
-          <span>🛰️</span>
-          <span class="hidden md:inline">Space Center</span>
-        </a>
-      {% endif %}
+      <a href="{% url 'usa:centro_operaciones_espacial' %}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
+        <span>🛰️</span>
+        <span class="hidden md:inline">Space Center</span>
+      </a>
+      
+      <!-- Reports -->
+      <a href="{% url 'usa:reportes:dashboard' %}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
+        <span>📊</span>
+        <span class="hidden md:inline">Reports</span>
+      </a>
       
       <!-- Settings -->
-      {% url 'taller:company_settings' as url_settings %}
+      {% load country_url %}
+      {% country_url 'company_settings' app_namespace='taller' as url_settings %}
       {% if url_settings %}
         <a href="{{ url_settings }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
           <span>⚙️</span>
           <span class="hidden md:inline">Settings</span>
         </a>
       {% endif %}
-      {% url 'servicios:servicios_menu' as url_servicios %}
-      {% if not url_servicios %}
-        {% url 'taller:servicios:servicios_menu' as url_servicios %}
-      {% endif %}
+      {% url 'usa:servicios:servicios_menu' as url_servicios %}
       {% if url_servicios %}
         <a href="{{ url_servicios }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
           <span>🧰</span>
           <span class="hidden md:inline">Services</span>
         </a>
       {% endif %}
-      {% url 'servicios:otros_servicios_menu' as url_otros %}
-      {% if not url_otros %}
-        {% url 'taller:servicios:otros_servicios_menu' as url_otros %}
-      {% endif %}
+      
+      <!-- Other Services -->
+      {% url 'usa:servicios:otros_servicios_menu' as url_otros %}
       {% if url_otros %}
         <a href="{{ url_otros }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
           <span>🛠️</span>

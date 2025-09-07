@@ -1,12 +1,14 @@
 #!/usr/bin/env python
 import os
+
 import django
 
 # Configurar Django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings")
 django.setup()
 
 from django.contrib.auth.models import User
+
 from taller.models.empresa import Empresa
 
 print("🔍 USUARIOS EXISTENTES EN EL SISTEMA:")

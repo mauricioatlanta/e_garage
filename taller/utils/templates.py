@@ -1,16 +1,19 @@
-from django.template.loader import select_template, get_template
 from django.template import TemplateDoesNotExist
+from django.template.loader import get_template, select_template
 
-def select_country_lang_template(base_path: str, country: str, lang: str, fallback_lang="es"):
+
+def select_country_lang_template(
+    base_path: str, country: str, lang: str, fallback_lang="es"
+):
     """
     Selecciona template basado en país e idioma con fallbacks.
-    
+
     Args:
         base_path: Ruta base del template (ej: "documentos/crear_documento.html")
         country: Código de país (CL/US)
         lang: Código de idioma (es/en)
         fallback_lang: Idioma de fallback por defecto
-    
+
     Returns:
         Nombre del template seleccionado usando la jerarquía:
         1. taller/{country}/{lang}/{base_path}
@@ -23,7 +26,7 @@ def select_country_lang_template(base_path: str, country: str, lang: str, fallba
     """
     country = (country or "CL").lower()
     lang = (lang or fallback_lang).lower()
-    
+
     candidates = [
         f"taller/{country}/{lang}/{base_path}",
         f"taller/{country}/{lang}/common/{base_path}",
@@ -33,7 +36,7 @@ def select_country_lang_template(base_path: str, country: str, lang: str, fallba
         f"taller/cl/{lang}/common/{base_path}",
         f"taller/common/{base_path}",
     ]
-    
+
     # Intentar encontrar el primer template que existe
     for candidate in candidates:
         try:
@@ -41,6 +44,6 @@ def select_country_lang_template(base_path: str, country: str, lang: str, fallba
             return candidate
         except TemplateDoesNotExist:
             continue
-    
+
     # Si ninguno existe, retornar el último candidato como fallback
     return candidates[-1]

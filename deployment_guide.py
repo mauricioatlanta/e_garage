@@ -7,39 +7,44 @@ import subprocess
 import sys
 from pathlib import Path
 
+
 def print_banner():
-    print("""
+    print(
+        """
 ╔══════════════════════════════════════════════════════════════╗
 ║                    E-GARAGE DEPLOYMENT GUIDE                ║
 ║                      Versión Producción                     ║
 ╚══════════════════════════════════════════════════════════════╝
-""")
+"""
+    )
+
 
 def check_requirements():
     """Verificar requisitos del sistema"""
     print("\n🔍 VERIFICANDO REQUISITOS DEL SISTEMA...")
-    
+
     requirements = {
-        'Python': '3.8+',
-        'Django': '5.1.6',
-        'PostgreSQL': '12+',
-        'Redis': '6+',
-        'Git': 'Cualquier versión'
+        "Python": "3.8+",
+        "Django": "5.1.6",
+        "PostgreSQL": "12+",
+        "Redis": "6+",
+        "Git": "Cualquier versión",
     }
-    
+
     for req, version in requirements.items():
         print(f"✓ {req}: {version}")
-    
+
     print("\n📋 REQUISITOS DE SISTEMA OPERATIVO:")
     print("• Ubuntu 20.04+ / CentOS 8+ / RHEL 8+")
     print("• 2GB RAM mínimo (4GB recomendado)")
     print("• 20GB espacio en disco")
     print("• Conexión a internet")
 
+
 def setup_environment():
     """Configurar entorno de producción"""
     print("\n🛠️  CONFIGURACIÓN DEL ENTORNO...")
-    
+
     commands = [
         "# 1. Actualizar sistema",
         "sudo apt update && sudo apt upgrade -y",
@@ -68,14 +73,15 @@ def setup_environment():
         "sudo systemctl enable redis-server",
         "sudo systemctl start redis-server",
     ]
-    
+
     for cmd in commands:
         print(cmd)
+
 
 def deploy_application():
     """Pasos para desplegar la aplicación"""
     print("\n🚀 DESPLIEGUE DE LA APLICACIÓN...")
-    
+
     steps = [
         "# 1. Cambiar al usuario egarage",
         "sudo su - egarage",
@@ -107,14 +113,15 @@ def deploy_application():
         "# 8. Crear superusuario",
         "python manage.py createsuperuser --settings=settings_production",
     ]
-    
+
     for step in steps:
         print(step)
+
 
 def configure_services():
     """Configurar servicios del sistema"""
     print("\n⚙️  CONFIGURACIÓN DE SERVICIOS...")
-    
+
     # Servicio Gunicorn
     gunicorn_service = """
 [Unit]
@@ -142,10 +149,10 @@ RestartSec=5
 [Install]
 WantedBy=multi-user.target
 """
-    
+
     print("📝 ARCHIVO: /etc/systemd/system/egarage.service")
     print(gunicorn_service)
-    
+
     # Configuración Nginx
     nginx_config = """
 server {
@@ -177,10 +184,10 @@ server {
     }
 }
 """
-    
+
     print("\n📝 ARCHIVO: /etc/nginx/sites-available/egarage")
     print(nginx_config)
-    
+
     print("\n🔧 COMANDOS PARA ACTIVAR SERVICIOS:")
     activation_commands = [
         "# Habilitar y iniciar E-Garage",
@@ -197,14 +204,15 @@ server {
         "sudo systemctl status egarage",
         "sudo systemctl status nginx",
     ]
-    
+
     for cmd in activation_commands:
         print(cmd)
+
 
 def setup_automation():
     """Configurar automatización (cron, monitoreo)"""
     print("\n🤖 CONFIGURACIÓN DE AUTOMATIZACIÓN...")
-    
+
     crontab = """
 # E-Garage Automation Jobs
 # Backup diario a las 2:00 AM
@@ -219,10 +227,10 @@ def setup_automation():
 # Reinicio semanal del servicio (opcional, domingos a las 4:00 AM)
 0 4 * * 0 sudo systemctl restart egarage
 """
-    
+
     print("📝 CRONTAB PARA USUARIO egarage:")
     print(crontab)
-    
+
     print("\n🔧 COMANDOS PARA CONFIGURAR CRON:")
     cron_commands = [
         "# Crear directorio de logs",
@@ -233,14 +241,15 @@ def setup_automation():
         "sudo -u egarage crontab -e",
         "# Pegar el contenido del crontab anterior",
     ]
-    
+
     for cmd in cron_commands:
         print(cmd)
+
 
 def security_hardening():
     """Configuración de seguridad"""
     print("\n🔒 CONFIGURACIÓN DE SEGURIDAD...")
-    
+
     security_steps = [
         "# 1. Configurar firewall",
         "sudo ufw enable",
@@ -263,10 +272,10 @@ def security_hardening():
         "# 5. Configurar logrotate",
         "sudo nano /etc/logrotate.d/egarage",
     ]
-    
+
     for step in security_steps:
         print(step)
-    
+
     logrotate_config = """
 /var/log/egarage/*.log {
     daily
@@ -278,47 +287,49 @@ def security_hardening():
     copytruncate
 }
 """
-    
+
     print("\n📝 ARCHIVO: /etc/logrotate.d/egarage")
     print(logrotate_config)
+
 
 def monitoring_services():
     """Configurar servicios de monitoreo"""
     print("\n📊 SERVICIOS DE MONITOREO RECOMENDADOS...")
-    
+
     services = {
         "Sentry": {
             "descripción": "Monitoreo de errores en tiempo real",
             "url": "https://sentry.io",
-            "configuración": "Agregar SENTRY_DSN a variables de entorno"
+            "configuración": "Agregar SENTRY_DSN a variables de entorno",
         },
         "UptimeRobot": {
             "descripción": "Monitoreo de disponibilidad",
             "url": "https://uptimerobot.com",
-            "configuración": "Monitor HTTP cada 5 minutos"
+            "configuración": "Monitor HTTP cada 5 minutos",
         },
         "Google Analytics": {
             "descripción": "Análisis de uso",
             "url": "https://analytics.google.com",
-            "configuración": "Agregar código de seguimiento"
+            "configuración": "Agregar código de seguimiento",
         },
         "Slack/Discord": {
             "descripción": "Notificaciones de alertas",
             "url": "Webhook URL",
-            "configuración": "Configurar SLACK_WEBHOOK_URL"
-        }
+            "configuración": "Configurar SLACK_WEBHOOK_URL",
+        },
     }
-    
+
     for service, info in services.items():
         print(f"\n🔧 {service}:")
         print(f"   Descripción: {info['descripción']}")
         print(f"   URL: {info['url']}")
         print(f"   Configuración: {info['configuración']}")
 
+
 def create_env_template():
     """Crear template de variables de entorno"""
     print("\n📄 TEMPLATE .env PARA PRODUCCIÓN...")
-    
+
     env_template = """
 # Django Settings
 DJANGO_SECRET_KEY=tu-clave-super-secreta-de-produccion-de-50-caracteres
@@ -349,36 +360,40 @@ EMAIL_ALERTS=admin@tu-dominio.com,tech@tu-dominio.com
 # Backup
 BACKUP_RETENTION_DAYS=30
 """
-    
+
     print(env_template)
+
 
 def main():
     """Función principal"""
     print_banner()
-    
+
     options = {
-        '1': ('Verificar Requisitos', check_requirements),
-        '2': ('Configurar Entorno', setup_environment),
-        '3': ('Desplegar Aplicación', deploy_application),
-        '4': ('Configurar Servicios', configure_services),
-        '5': ('Configurar Automatización', setup_automation),
-        '6': ('Seguridad y Hardening', security_hardening),
-        '7': ('Servicios de Monitoreo', monitoring_services),
-        '8': ('Template Variables .env', create_env_template),
-        '9': ('Guía Completa', lambda: [func() for _, func in options.values() if func != options['9'][1]]),
-        '0': ('Salir', lambda: sys.exit(0))
+        "1": ("Verificar Requisitos", check_requirements),
+        "2": ("Configurar Entorno", setup_environment),
+        "3": ("Desplegar Aplicación", deploy_application),
+        "4": ("Configurar Servicios", configure_services),
+        "5": ("Configurar Automatización", setup_automation),
+        "6": ("Seguridad y Hardening", security_hardening),
+        "7": ("Servicios de Monitoreo", monitoring_services),
+        "8": ("Template Variables .env", create_env_template),
+        "9": (
+            "Guía Completa",
+            lambda: [func() for _, func in options.values() if func != options["9"][1]],
+        ),
+        "0": ("Salir", lambda: sys.exit(0)),
     }
-    
+
     while True:
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("SELECCIONA UNA OPCIÓN:")
-        print("="*60)
-        
+        print("=" * 60)
+
         for key, (description, _) in options.items():
             print(f"{key}. {description}")
-        
+
         choice = input("\nIngresa tu opción (0-9): ").strip()
-        
+
         if choice in options:
             _, func = options[choice]
             try:
@@ -389,6 +404,7 @@ def main():
                 print(f"\nError: {e}")
         else:
             print("Opción inválida. Intenta de nuevo.")
+
 
 if __name__ == "__main__":
     main()

@@ -1,7 +1,8 @@
+from django.core.cache import cache
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.core.cache import cache
-from .models import Empresa, ConfiguracionEmpresa, CompanySettings
+
+from .models import CompanySettings, ConfiguracionEmpresa, Empresa
 
 
 def _invalidate_cache_keys_for_empresa(empresa_id):
@@ -21,12 +22,16 @@ def empresa_saved(sender, instance, **kwargs):
 @receiver(post_save, sender=ConfiguracionEmpresa)
 def configuracion_empresa_saved(sender, instance, **kwargs):
     """Invalidar cache cuando se actualiza ConfiguracionEmpresa"""
-    if hasattr(instance, 'empresa') and instance.empresa:
+    if hasattr(instance, "empresa") and instance.empresa:
         _invalidate_cache_keys_for_empresa(instance.empresa.id)
 
 
 @receiver(post_save, sender=CompanySettings)
 def company_settings_saved(sender, instance, **kwargs):
     """Invalidar cache cuando se actualiza CompanySettings"""
-    if hasattr(instance, 'user') and instance.user and hasattr(instance.user, 'empresa'):
+    if (
+        hasattr(instance, "user")
+        and instance.user
+        and hasattr(instance.user, "empresa")
+    ):
         _invalidate_cache_keys_for_empresa(instance.user.empresa.id)

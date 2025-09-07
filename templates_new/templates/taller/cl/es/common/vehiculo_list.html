@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
+<!-- 🟡 MARCADOR AMARILLO OSCURO: TEMPLATE NEW CL ES COMMON VEHICULO_LIST.HTML -->
+<div style="position: fixed; top: 10px; right: 10px; z-index: 99999; background: darkgoldenrod; color: white; padding: 10px; border-radius: 5px; font-weight: bold;">🟡 NEW CL ES</div>
 <div class="container mx-auto px-4 py-8">
   <h1 class="text-2xl font-bold mb-4 text-white">Lista de Vehículos</h1>
   <a href="{% url 'taller:vehiculos:crear_vehiculo' %}" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg shadow bg-gradient-to-r from-cyan-500 to-fuchsia-500 text-white font-semibold hover:from-fuchsia-500 hover:to-cyan-500 transition-all duration-200 border border-cyan-400/60 mb-4">🚗 Agregar Vehículo</a>

@@ -4,7 +4,45 @@
 {% block content %}
 <!-- Fondo animado -->
 <div class="fixed inset-0 overflow-hidden pointer-events-none">
-  <div class="absolute inset-0 bg-gradient-to-br from-[#0a0a0a] via-[#0d1117] to-[#0f172a]"></div>
+  <div class="absolute i            <!-- Color -->
+            <div>
+              <label for="color" class="block text-sm font-medium text-gray-300 mb-2">
+                {% trans "Color" %}
+              </label>
+              <div class="flex items-center space-x-2">
+                <div class="relative flex-1">
+                  <select id="id_color" name="color" title="{% trans 'Seleccionar color del vehículo' %}"
+                          class="w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400">
+                    <option value="">{% trans "Seleccionar color..." %}</option>
+                    <option value="Blanco" {% if form.color.value == "Blanco" %}selected{% endif %}>🤍 {% trans "Blanco" %}</option>
+                    <option value="Negro" {% if form.color.value == "Negro" %}selected{% endif %}>🖤 {% trans "Negro" %}</option>
+                    <option value="Gris" {% if form.color.value == "Gris" %}selected{% endif %}>🩶 {% trans "Gris" %}</option>
+                    <option value="Plata" {% if form.color.value == "Plata" %}selected{% endif %}>🩶 {% trans "Plata" %}</option>
+                    <option value="Rojo" {% if form.color.value == "Rojo" %}selected{% endif %}>❤️ {% trans "Rojo" %}</option>
+                    <option value="Azul" {% if form.color.value == "Azul" %}selected{% endif %}>💙 {% trans "Azul" %}</option>
+                    <option value="Verde" {% if form.color.value == "Verde" %}selected{% endif %}>💚 {% trans "Verde" %}</option>
+                    <option value="Amarillo" {% if form.color.value == "Amarillo" %}selected{% endif %}>💛 {% trans "Amarillo" %}</option>
+                    <option value="Naranja" {% if form.color.value == "Naranja" %}selected{% endif %}>🧡 {% trans "Naranja" %}</option>
+                    <option value="Morado" {% if form.color.value == "Morado" %}selected{% endif %}>💜 {% trans "Morado" %}</option>
+                    <option value="Café" {% if form.color.value == "Café" %}selected{% endif %}>🤎 {% trans "Café" %}</option>
+                    <option value="Dorado" {% if form.color.value == "Dorado" %}selected{% endif %}>💛 {% trans "Dorado" %}</option>
+                    <option value="Otro" {% if form.color.value == "Otro" %}selected{% endif %}>🎨 {% trans "Otro" %}</option>
+                  </select>
+                  <div id="loading-color" class="hidden absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <div class="w-4 h-4 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin"></div>
+                  </div>
+                </div>
+                <button type="button" id="agregar-color" 
+                        class="px-3 py-3 bg-gradient-to-r from-lime-600 to-green-600 text-white rounded-lg font-semibold hover:from-lime-500 hover:to-green-500 transform transition-all duration-200 hover:scale-105 shadow-lg border border-lime-400/30">
+                  +
+                </button>
+              </div>
+              {% if form.color.errors %}
+                <div class="mt-1 text-xs text-red-400">
+                  {{ form.color.errors.0 }}
+                </div>
+              {% endif %}
+            </div>adient-to-br from-[#0a0a0a] via-[#0d1117] to-[#0f172a]"></div>
   <!-- Partículas animadas -->
   <div class="absolute top-16 left-12 w-2 h-2 bg-cyan-400 rounded-full animate-ping opacity-20"></div>
   <div class="absolute top-1/3 right-20 w-1 h-1 bg-fuchsia-400 rounded-full animate-pulse opacity-30"></div>
@@ -344,6 +382,34 @@
   </div>
 </div>
 
+<!-- Modal para agregar nuevo color -->
+<div id="modal-color" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50">
+  <div class="flex items-center justify-center min-h-screen p-4">
+    <div class="relative">
+      <div class="absolute -inset-1 rounded-xl bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 opacity-30 blur-xl"></div>
+      <div class="relative rounded-xl border border-pink-400/30 bg-black/90 backdrop-blur-sm p-6 max-w-md w-full">
+        <div class="text-center">
+          <h3 class="text-xl font-bold text-gray-200 mb-4">🎨 {% trans "Agregar Nuevo Color" %}</h3>
+          <input type="text" 
+                 id="nuevo-color" 
+                 placeholder="{% trans 'Nombre del color...' %}"
+                 class="w-full px-4 py-3 rounded-lg bg-black border border-pink-500/30 text-pink-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-400/50 focus:border-pink-400 mb-4">
+          <div class="flex space-x-3">
+            <button onclick="cerrarModal(this)" 
+                    class="flex-1 px-4 py-2 rounded-lg bg-gradient-to-r from-gray-600/20 to-gray-700/20 border border-gray-500/40 text-gray-300 hover:from-gray-500/30 hover:to-gray-600/30 transition-all duration-200 text-sm font-medium">
+              {% trans "Cancelar" %}
+            </button>
+            <button onclick="guardarNuevo('color', this)" 
+                    class="flex-1 px-4 py-2 rounded-lg bg-gradient-to-r from-pink-600/20 to-purple-600/20 border border-pink-400/40 text-pink-300 hover:from-pink-500/30 hover:to-purple-500/30 transition-all duration-200 text-sm font-medium">
+              {% trans "Guardar" %}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Estilos adicionales -->
 <style>
 @keyframes float {
@@ -428,7 +494,8 @@ document.addEventListener('DOMContentLoaded', function() {
     marcas: '/taller/vehiculos/api/marcas/',
     modelos: '/taller/vehiculos/api/modelos/',
     motores: '/taller/vehiculos/api/motores/',
-    cajas: '/taller/vehiculos/api/cajas/'
+    cajas: '/taller/vehiculos/api/cajas/',
+    colores: '/taller/vehiculos/api/colores/'
   };
 
   // =================== FUNCIONES PARA VEHÍCULOS ===================
@@ -440,6 +507,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const modeloSelect = document.getElementById('id_modelo');
   const motorSelect = document.getElementById('id_motor');
   const cajaSelect = document.getElementById('id_caja');
+  const colorSelect = document.getElementById('id_color');
   
   // Cargar datos iniciales
   cargarMarcas();
@@ -623,18 +691,37 @@ document.addEventListener('DOMContentLoaded', function() {
     
     showLoading(cajaSelect, 'loading-caja');
     
-    fetch(API_ENDPOINTS.cajas)
+    // Obtener modelo_id del select de modelo
+    const modeloId = modeloSelect ? modeloSelect.value : '';
+    const url = modeloId ? `${API_ENDPOINTS.cajas}?modelo_id=${modeloId}` : API_ENDPOINTS.cajas;
+    
+    // Cajas predefinidas como fallback
+    const cajasPredefinidas = [
+      {id: 'Manual 5 velocidades', nombre: 'Manual 5 velocidades'},
+      {id: 'Manual 6 velocidades', nombre: 'Manual 6 velocidades'},
+      {id: 'Automática 4 velocidades', nombre: 'Automática 4 velocidades'},
+      {id: 'Automática 6 velocidades', nombre: 'Automática 6 velocidades'},
+      {id: 'Automática CVT', nombre: 'Automática CVT'},
+      {id: 'Automática 8 velocidades', nombre: 'Automática 8 velocidades'},
+      {id: 'Secuencial', nombre: 'Secuencial'},
+      {id: 'Tiptronic', nombre: 'Tiptronic'}
+    ];
+    
+    fetch(url)
       .then(response => response.json())
       .then(data => {
         hideLoading('loading-caja');
-        poblarSelect(cajaSelect, data.cajas || [], 'Seleccionar caja...');
+        // Si no hay datos de la API, usar predefinidas
+        const cajas = Array.isArray(data) && data.length > 0 ? data : cajasPredefinidas;
+        poblarSelect(cajaSelect, cajas, 'Seleccionar caja...');
         cajaSelect.disabled = false;
       })
       .catch(error => {
         console.error('Error al cargar cajas:', error);
         hideLoading('loading-caja');
-        poblarSelect(cajaSelect, [], 'Error al cargar cajas');
-        cajaSelect.disabled = true;
+        // En caso de error, usar cajas predefinidas
+        poblarSelect(cajaSelect, cajasPredefinidas, 'Seleccionar caja...');
+        cajaSelect.disabled = false;
       });
   }
 
@@ -767,8 +854,10 @@ document.addEventListener('DOMContentLoaded', function() {
   // =================== MODALES ===================
   const agregarMotor = document.getElementById('agregar-motor');
   const agregarCaja = document.getElementById('agregar-caja');
+  const agregarColor = document.getElementById('agregar-color');
   const modalMotor = document.getElementById('modal-motor');
   const modalCaja = document.getElementById('modal-caja');
+  const modalColor = document.getElementById('modal-color');
 
   if (agregarMotor) {
     agregarMotor.addEventListener('click', function() {
@@ -781,6 +870,13 @@ document.addEventListener('DOMContentLoaded', function() {
     agregarCaja.addEventListener('click', function() {
       modalCaja.classList.remove('hidden');
       document.getElementById('nuevo-caja').focus();
+    });
+  }
+
+  if (agregarColor) {
+    agregarColor.addEventListener('click', function() {
+      modalColor.classList.remove('hidden');
+      document.getElementById('nuevo-color').focus();
     });
   }
 
@@ -806,15 +902,40 @@ document.addEventListener('DOMContentLoaded', function() {
       return;
     }
     
-    const select = tipo === 'motor' ? motorSelect : cajaSelect;
+    let select;
+    if (tipo === 'motor') {
+      select = motorSelect;
+    } else if (tipo === 'caja') {
+      select = cajaSelect;
+    } else if (tipo === 'color') {
+      select = colorSelect;
+    }
+    
+    if (!select) return;
+    
+    // Crear opción especial que indica que es nueva
     const option = document.createElement('option');
-    option.value = valor;
+    option.value = '__nuevo__';
     option.textContent = valor;
     option.selected = true;
+    option.setAttribute('data-nuevo', valor);
     select.appendChild(option);
     
-    window.cerrarModal(button);
-    mostrarNotificacion(`${tipo === 'motor' ? 'Motor' : 'Caja'} agregado exitosamente`, 'success');
+    // Crear campo hidden para enviar el nuevo valor
+    const hiddenField = document.createElement('input');
+    hiddenField.type = 'hidden';
+    hiddenField.name = `${tipo}_nuevo`;
+    hiddenField.value = valor;
+    select.parentNode.appendChild(hiddenField);
+    
+    // Cerrar modal
+    const modal = button.closest('.fixed');
+    modal.classList.add('hidden');
+    
+    const nombreTipo = tipo === 'motor' ? 'Motor' : 
+                      tipo === 'caja' ? 'Caja' : 
+                      'Color';
+    mostrarNotificacion(`${nombreTipo} agregado exitosamente`, 'success');
   };
   
   function mostrarNotificacion(mensaje, tipo) {

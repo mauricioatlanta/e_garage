@@ -1,10 +1,12 @@
 # --- API para marcas ---
-from taller.models.marca import Marca
-from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect, get_object_or_404
-from django.db import transaction
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.db import transaction
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+
+from taller.models.marca import Marca
+
 
 def api_marcas(request):
     """
@@ -14,23 +16,30 @@ def api_marcas(request):
     # BLINDAJE: Verificar autenticación del usuario
     if not request.user.is_authenticated:
         return JsonResponse([], safe=False)
-    
-    # Las marcas pueden ser globales, pero verificamos autenticación
-    marcas = list(Marca.objects.values('id', 'nombre'))
+
+    # Obtener país del usuario desde el middleware
+    country = getattr(request, "country", "CL")
+
+    # Filtrar marcas por país y ordenar alfabéticamente
+    marcas = list(
+        Marca.objects.filter(country=country).order_by("nombre").values("id", "nombre")
+    )
     return JsonResponse(marcas, safe=False)
 
+
 import logging
-from .views_cbv import (
-    VehiculoListView, VehiculoDetailView, VehiculoCreateView, VehiculoUpdateView
-)
+
 from django.views.generic import DeleteView
-from taller.models.vehiculos import Vehiculo
+
+from taller.models.clientes import Cliente
+from taller.models.extras_vehiculo import ColorVehiculo
 from taller.models.marca import Marca
 from taller.models.modelo import Modelo
-from taller.models.extras_vehiculo import ColorVehiculo
+from taller.models.vehiculos import ColorVehiculo, Vehiculo
+
 from .forms import VehiculoForm
-from taller.models.clientes import Cliente
-from taller.models.vehiculos import ColorVehiculo
+from .views_cbv import (VehiculoCreateView, VehiculoDetailView,
+                        VehiculoListView, VehiculoUpdateView)
 
 # Importar modelos del catálogo
 try:
@@ -45,102 +54,113 @@ except ImportError:
 
 log = logging.getLogger(__name__)
 
+
 def lista_vehiculos(request, *args, **kwargs):
     log.info("FBV shim: lista_vehiculos")
     return VehiculoListView.as_view()(request, *args, **kwargs)
 
+
 def ver_vehiculo(request, *args, **kwargs):
     log.info("FBV shim: ver_vehiculo")
     return VehiculoDetailView.as_view()(request, *args, **kwargs)
+
 
 @login_required
 @transaction.atomic
 def crear_vehiculo(request):
     """Vista simplificada para creación de vehículos"""
     from taller.models.vehiculos import Vehiculo
-    
+
     # Detectar país del usuario
-    empresa = getattr(request.user, 'empresa', None)
-    raw_country = getattr(empresa, 'pais', None) or 'CL'
+    empresa = getattr(request.user, "empresa", None)
+    raw_country = getattr(empresa, "pais", None) or "CL"
     country = str(raw_country).strip().upper()
-    
-    if country not in ('CL', 'US'):
-        log.warning("[crear_vehiculo] country desconocido '%s' normalizado a 'CL'", country)
-        country = 'CL'
-    
-    print('[DEBUG crear_vehiculo] user=', request.user.username, 
-          'empresa_pais=', getattr(request.user.empresa, 'pais', None),
-          'country_ctx=', country)
-    
-    if request.method == 'POST':
-        print('[DEBUG POST] Datos recibidos:')
+
+    if country not in ("CL", "US"):
+        log.warning(
+            "[crear_vehiculo] country desconocido '%s' normalizado a 'CL'", country
+        )
+        country = "CL"
+
+    print(
+        "[DEBUG crear_vehiculo] user=",
+        request.user.username,
+        "empresa_pais=",
+        getattr(request.user.empresa, "pais", None),
+        "country_ctx=",
+        country,
+    )
+
+    if request.method == "POST":
+        print("[DEBUG POST] Datos recibidos:")
         for key, value in request.POST.items():
-            print(f'  {key}: {value}')
-        
+            print(f"  {key}: {value}")
+
         try:
             # Crear vehículo directamente con los datos del POST
             vehiculo = Vehiculo()
-            
+
             # Cliente (requerido)
-            cliente_id = request.POST.get('cliente')
+            cliente_id = request.POST.get("cliente")
             if not cliente_id:
-                messages.error(request, 'Debe seleccionar un cliente')
+                messages.error(request, "Debe seleccionar un cliente")
                 form = VehiculoForm(user=request.user)
                 return _render_form_with_context(request, form, country, empresa)
-            
+
             try:
                 vehiculo.cliente = Cliente.objects.get(id=cliente_id, empresa=empresa)
             except Cliente.DoesNotExist:
-                messages.error(request, 'Cliente no válido')
+                messages.error(request, "Cliente no válido")
                 form = VehiculoForm(user=request.user)
                 return _render_form_with_context(request, form, country, empresa)
-            
+
             # Marca (requerida)
-            marca_id = request.POST.get('marca')
+            marca_id = request.POST.get("marca")
             if not marca_id:
-                messages.error(request, 'Debe seleccionar una marca')
+                messages.error(request, "Debe seleccionar una marca")
                 form = VehiculoForm(user=request.user)
                 return _render_form_with_context(request, form, country, empresa)
-            
+
             try:
                 vehiculo.marca = Marca.objects.get(id=marca_id)
             except Marca.DoesNotExist:
-                messages.error(request, 'Marca no válida')
+                messages.error(request, "Marca no válida")
                 form = VehiculoForm(user=request.user)
                 return _render_form_with_context(request, form, country, empresa)
-            
+
             # Modelo (requerido)
-            modelo_id = request.POST.get('modelo')
+            modelo_id = request.POST.get("modelo")
             if not modelo_id:
-                messages.error(request, 'Debe seleccionar un modelo')
+                messages.error(request, "Debe seleccionar un modelo")
                 form = VehiculoForm(user=request.user)
                 return _render_form_with_context(request, form, country, empresa)
-            
+
             try:
                 vehiculo.modelo = Modelo.objects.get(id=modelo_id, marca=vehiculo.marca)
             except Modelo.DoesNotExist:
-                messages.error(request, 'Modelo no válido')
+                messages.error(request, "Modelo no válido")
                 form = VehiculoForm(user=request.user)
                 return _render_form_with_context(request, form, country, empresa)
-            
+
             # Color (requerido)
-            color_id = request.POST.get('color')
+            color_id = request.POST.get("color")
             if not color_id:
-                messages.error(request, 'Debe seleccionar un color')
+                messages.error(request, "Debe seleccionar un color")
                 form = VehiculoForm(user=request.user)
                 return _render_form_with_context(request, form, country, empresa)
-            
-            if color_id == '__nuevo__':
+
+            if color_id == "__nuevo__":
                 # Crear nuevo color
-                color_nuevo = request.POST.get('color_nuevo', '').strip()
+                color_nuevo = request.POST.get("color_nuevo", "").strip()
                 if not color_nuevo:
-                    messages.error(request, 'Debe especificar el nombre del nuevo color')
+                    messages.error(
+                        request, "Debe especificar el nombre del nuevo color"
+                    )
                     form = VehiculoForm(user=request.user)
                     return _render_form_with_context(request, form, country, empresa)
-                
+
                 color_obj, created = ColorVehiculo.objects.get_or_create(
-                    nombre=color_nuevo,
-                    defaults={'nombre': color_nuevo}
+                    nombre=color_nuevo, defaults={"nombre": color_nuevo}
                 )
                 vehiculo.color = color_obj
                 if created:
@@ -149,70 +169,74 @@ def crear_vehiculo(request):
                 try:
                     vehiculo.color = ColorVehiculo.objects.get(id=color_id)
                 except ColorVehiculo.DoesNotExist:
-                    messages.error(request, 'Color no válido')
+                    messages.error(request, "Color no válido")
                     form = VehiculoForm(user=request.user)
                     return _render_form_with_context(request, form, country, empresa)
-            
+
             # Patente (requerida)
-            patente = request.POST.get('patente', '').strip()
+            patente = request.POST.get("patente", "").strip()
             if not patente:
-                messages.error(request, 'Debe especificar la patente')
+                messages.error(request, "Debe especificar la patente")
                 form = VehiculoForm(user=request.user)
                 return _render_form_with_context(request, form, country, empresa)
             vehiculo.patente = patente
-            
+
             # Año (requerido)
-            anio = request.POST.get('anio')  # Corregido: 'anio' en lugar de 'ano'
+            anio = request.POST.get("anio")  # Corregido: 'anio' en lugar de 'ano'
             if not anio:
-                messages.error(request, 'Debe seleccionar el año')
+                messages.error(request, "Debe seleccionar el año")
                 form = VehiculoForm(user=request.user)
                 return _render_form_with_context(request, form, country, empresa)
             try:
                 vehiculo.anio = int(anio)  # Corregido: 'anio' en lugar de 'ano'
             except ValueError:
-                messages.error(request, 'Año no válido')
+                messages.error(request, "Año no válido")
                 form = VehiculoForm(user=request.user)
                 return _render_form_with_context(request, form, country, empresa)
-            
+
             # Campos opcionales
-            vehiculo.vin = request.POST.get('vin', '').strip()
+            vehiculo.vin = request.POST.get("vin", "").strip()
             # Eliminado 'observaciones' - no existe en el modelo Vehiculo
-            
+
             # Motor (opcional)
-            motor_id = request.POST.get('motor')
-            if motor_id and motor_id != '':
+            motor_id = request.POST.get("motor")
+            if motor_id and motor_id != "":
                 try:
                     from taller.models.extras_vehiculo import MotorVehiculo
+
                     vehiculo.motor = MotorVehiculo.objects.get(id=motor_id)
                 except:
                     pass  # Motor es opcional
-            
+
             # Caja (opcional)
-            caja_id = request.POST.get('caja')
-            if caja_id and caja_id != '':
+            caja_id = request.POST.get("caja")
+            if caja_id and caja_id != "":
                 try:
                     from taller.models.extras_vehiculo import CajaVehiculo
+
                     vehiculo.caja = CajaVehiculo.objects.get(id=caja_id)
                 except:
                     pass  # Caja es opcional
-            
+
             # Asignar empresa
             vehiculo.empresa = empresa
-            
+
             # Guardar vehículo
             vehiculo.save()
-            
-            messages.success(request, f'Vehículo {vehiculo.patente} creado exitosamente')
+
+            messages.success(
+                request, f"Vehículo {vehiculo.patente} creado exitosamente"
+            )
             log.info(f"Vehículo creado: {vehiculo}")
-            
-            return redirect('taller:vehiculos:lista_vehiculos')
-            
+
+            return redirect("taller:vehiculos:lista_vehiculos")
+
         except Exception as e:
             log.error(f"Error creando vehículo: {e}")
-            messages.error(request, f'Error al crear el vehículo: {str(e)}')
+            messages.error(request, f"Error al crear el vehículo: {str(e)}")
             form = VehiculoForm(user=request.user)
             return _render_form_with_context(request, form, country, empresa)
-    
+
     else:
         # GET request - mostrar formulario
         form = VehiculoForm(user=request.user)
@@ -222,37 +246,44 @@ def crear_vehiculo(request):
 def _render_form_with_context(request, form, country, empresa):
     """Helper para renderizar el formulario con el contexto adecuado"""
     SHOW_DEBUG = True
-    
+
     # Contexto base
     ctx = {
-        'country': country,
-        'SHOW_DEBUG': SHOW_DEBUG,
-        'debug_empresa_pais': f"empresa={getattr(empresa,'id',None)} pais={country} usuario={request.user.username}",
-        'clientes': Cliente.objects.filter(empresa=empresa)[:500],  # BLINDAJE: Filtrado por empresa
-        'colores': ColorVehiculo.get_colores_para_pais(country),  # CORREGIDO: Colores por país
-        'form': form,
+        "country": country,
+        "SHOW_DEBUG": SHOW_DEBUG,
+        "debug_empresa_pais": f"empresa={getattr(empresa,'id',None)} pais={country} usuario={request.user.username}",
+        "clientes": Cliente.objects.filter(empresa=empresa)[
+            :500
+        ],  # BLINDAJE: Filtrado por empresa
+        "colores": ColorVehiculo.get_colores_para_pais(
+            country
+        ),  # CORREGIDO: Colores por país
+        "form": form,
     }
-    
+
     # Contexto específico por país
-    if country == 'US':
+    if country == "US":
         # Usar nuestro catálogo importado para USA
         if CatalogoModeloAuto:
-            ctx['marcas_usa'] = CatalogoModeloAuto.get_marcas_activas()[:500]
-            ctx['usa_catalogo_disponible'] = True
+            ctx["marcas_usa"] = CatalogoModeloAuto.get_marcas_activas()[:500]
+            ctx["usa_catalogo_disponible"] = True
         elif MarcaUSA:
-            ctx['marcas_usa'] = MarcaUSA.objects.filter(activa=True).order_by('nombre')[:500]
+            ctx["marcas_usa"] = MarcaUSA.objects.filter(activa=True).order_by("nombre")[
+                :500
+            ]
     else:
-        # Chile - usar modelos tradicionales  
-        ctx['marcas'] = Marca.objects.filter(country='CL').order_by('nombre')
+        # Chile - usar modelos tradicionales
+        ctx["marcas"] = Marca.objects.filter(country="CL").order_by("nombre")
 
-    return render(request, 'taller/vehiculos/crear_vehiculo.html', ctx)
+    return render(request, "taller/vehiculos/crear_vehiculo.html", ctx)
+
 
 def editar_vehiculo(request, *args, **kwargs):
     log.info("FBV shim: editar_vehiculo")
     # Normalizar nombre de argumento a 'pk' para compatibilidad con UpdateView
-    vehiculo_id = kwargs.pop('vehiculo_id', None)
+    vehiculo_id = kwargs.pop("vehiculo_id", None)
     if vehiculo_id is not None:
-        kwargs['pk'] = vehiculo_id
+        kwargs["pk"] = vehiculo_id
     return VehiculoUpdateView.as_view()(request, *args, **kwargs)
 
 
@@ -261,17 +292,23 @@ def eliminar_vehiculo(request, vehiculo_id, *args, **kwargs):
     vehiculo = get_object_or_404(Vehiculo, pk=vehiculo_id)
     if request.method == "POST":
         vehiculo.delete()
-        messages.success(request, f"Vehículo {vehiculo.patente} eliminado correctamente.")
+        messages.success(
+            request, f"Vehículo {vehiculo.patente} eliminado correctamente."
+        )
         # Redirigir a la lista de vehículos después de eliminar
         return redirect("vehiculos:lista_vehiculos")
     # Si no es POST, mostrar template de confirmación
-    return render(request, 'taller/vehiculos/eliminar_confirmar.html', {'object': vehiculo})
+    return render(
+        request, "taller/vehiculos/eliminar_confirmar.html", {"object": vehiculo}
+    )
 
 
+from django.db import models
 # --- API para búsqueda de clientes ---
 from django.http import JsonResponse
+
 from taller.models.clientes import Cliente
-from django.db import models
+
 
 def api_busqueda_clientes(request):
     """
@@ -282,25 +319,23 @@ def api_busqueda_clientes(request):
     # BLINDAJE MULTI-TENANT: Verificar autenticación y empresa
     if not request.user.is_authenticated:
         return JsonResponse([], safe=False)
-    
-    empresa = getattr(request.user, 'empresa', None)
+
+    empresa = getattr(request.user, "empresa", None)
     if not empresa:
         return JsonResponse([], safe=False)
-    
+
     q = request.GET.get("q", "").strip()
     if not q:
         return JsonResponse([], safe=False)
-        
+
     # BLINDAJE: Filtrar SOLO por empresa del usuario
-    clientes = Cliente.objects.filter(
-        empresa=empresa
-    ).filter(
-        models.Q(nombre__icontains=q) |
-        models.Q(apellido__icontains=q) |
-        models.Q(email__icontains=q) |
-        models.Q(telefono__icontains=q)
+    clientes = Cliente.objects.filter(empresa=empresa).filter(
+        models.Q(nombre__icontains=q)
+        | models.Q(apellido__icontains=q)
+        | models.Q(email__icontains=q)
+        | models.Q(telefono__icontains=q)
     )[:20]
-    
+
     data = [
         {
             "id": c.pk,
@@ -316,21 +351,50 @@ def api_busqueda_clientes(request):
 
 def api_modelos_usa(request):
     """API para cargar modelos USA basados en marca seleccionada"""
-    marca = request.GET.get('marca', '').strip()
+    marca = request.GET.get("marca", "").strip()
     if not marca:
-        return JsonResponse({'results': []})
-    
+        return JsonResponse({"results": []})
+
     try:
         if CatalogoModeloAuto:
             # Usar catálogo importado
             modelos = CatalogoModeloAuto.get_modelos_por_marca(marca)
-            results = [{'id': modelo, 'text': modelo} for modelo in modelos]
+            results = [{"id": modelo, "text": modelo} for modelo in modelos]
         else:
             # Fallback sin catálogo
             results = []
-        
-        return JsonResponse({'results': results})
+
+        return JsonResponse({"results": results})
     except Exception as e:
         log.error(f"Error en api_modelos_usa: {e}")
-        return JsonResponse({'results': [], 'error': str(e)})
+        return JsonResponse({"results": [], "error": str(e)})
 
+
+@login_required
+def api_colores(request):
+    """API para obtener colores disponibles"""
+    try:
+        # Obtener país del usuario
+        country = getattr(request, "country", "CL")
+
+        # Colores predefinidos con emojis
+        colores_predefinidos = [
+            {"id": "Blanco", "nombre": "🤍 Blanco"},
+            {"id": "Negro", "nombre": "🖤 Negro"},
+            {"id": "Gris", "nombre": "🩶 Gris"},
+            {"id": "Plata", "nombre": "🩶 Plata"},
+            {"id": "Rojo", "nombre": "❤️ Rojo"},
+            {"id": "Azul", "nombre": "💙 Azul"},
+            {"id": "Verde", "nombre": "💚 Verde"},
+            {"id": "Amarillo", "nombre": "💛 Amarillo"},
+            {"id": "Naranja", "nombre": "🧡 Naranja"},
+            {"id": "Morado", "nombre": "💜 Morado"},
+            {"id": "Café", "nombre": "🤎 Café"},
+            {"id": "Dorado", "nombre": "💛 Dorado"},
+            {"id": "Otro", "nombre": "🎨 Otro"},
+        ]
+
+        return JsonResponse({"colores": colores_predefinidos})
+    except Exception as e:
+        log.error(f"Error en api_colores: {e}")
+        return JsonResponse({"colores": [], "error": str(e)})

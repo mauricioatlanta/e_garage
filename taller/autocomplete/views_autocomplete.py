@@ -1,11 +1,12 @@
-
 from dal import autocomplete
 from django.db.models import Q
+
 from taller.models.clientes import Cliente
-from taller.models.vehiculos import Vehiculo
 from taller.models.marca import Marca
 from taller.models.modelo import Modelo
 from taller.models.tecnico import Tecnico
+from taller.models.vehiculos import Vehiculo
+
 
 class TecnicoAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
@@ -18,11 +19,11 @@ class TecnicoAutocomplete(autocomplete.Select2QuerySetView):
     def create(self, text):
         # Permitir crear un nuevo técnico desde el widget select2 (soporte oficial DAL)
         return self.get_queryset().model.objects.create(nombre=text)
-    
+
     def get_result_label(self, result):
         # Para CharField, devolver el nombre en lugar del ID
         return result.nombre
-    
+
     def get_result_value(self, result):
         # Para CharField, devolver el nombre en lugar del ID
         return result.nombre
@@ -33,29 +34,27 @@ class ClienteAutocomplete(autocomplete.Select2QuerySetView):
         # Filtrar por empresa del usuario autenticado
         if not self.request.user.is_authenticated:
             return Cliente.objects.none()
-            
-        try:
-            empresa = self.request.user.empresa
-        except AttributeError:
-            # Si no tiene empresa asociada, buscar o crear una
-            from taller.models.empresa import Empresa
-            empresa, created = Empresa.objects.get_or_create(
-                user=self.request.user,
-                defaults={'nombre_taller': f'Taller de {self.request.user.username}'}
-            )
-        
+
+        # Usar el helper para obtener o crear la empresa
+        from taller.utils.empresa import get_or_create_empresa
+
+        empresa = get_or_create_empresa(self.request)
+
+        if not empresa:
+            return Cliente.objects.none()
+
         qs = Cliente.objects.filter(empresa=empresa)
         if self.q:
             qs = qs.filter(
-                Q(nombre__icontains=self.q) |
-                Q(apellido__icontains=self.q) |
-                Q(email__icontains=self.q) |
-                Q(telefono__icontains=self.q)
+                Q(nombre__icontains=self.q)
+                | Q(apellido__icontains=self.q)
+                | Q(email__icontains=self.q)
+                | Q(telefono__icontains=self.q)
             )
         return qs
 
     def get_result_label(self, result):
-        telefono = result.telefono or 'Sin teléfono'
+        telefono = result.telefono or "Sin teléfono"
         return f"{result.nombre} {result.apellido} - {telefono}"
 
 
@@ -64,22 +63,19 @@ class VehiculoAutocomplete(autocomplete.Select2QuerySetView):
         if not self.request.user.is_authenticated:
             return Vehiculo.objects.none()
 
-        # Obtener empresa del usuario
-        try:
-            empresa = self.request.user.empresa
-        except AttributeError:
-            # Si no tiene empresa asociada, buscar o crear una
-            from taller.models.empresa import Empresa
-            empresa, created = Empresa.objects.get_or_create(
-                user=self.request.user,
-                defaults={'nombre_taller': f'Taller de {self.request.user.username}'}
-            )
+        # Usar el helper para obtener o crear la empresa
+        from taller.utils.empresa import get_or_create_empresa
+
+        empresa = get_or_create_empresa(self.request)
+
+        if not empresa:
+            return Vehiculo.objects.none()
 
         # Filtrar vehículos por empresa (a través del cliente)
-        qs = Vehiculo.objects.select_related('cliente').filter(empresa=empresa)
+        qs = Vehiculo.objects.select_related("cliente").filter(empresa=empresa)
 
         # Filtrar por cliente específico si se proporciona
-        cliente_id = self.request.GET.get('cliente')
+        cliente_id = self.request.GET.get("cliente")
         if cliente_id:
             # Verificar que el cliente pertenece a la empresa del usuario
             try:
@@ -91,11 +87,10 @@ class VehiculoAutocomplete(autocomplete.Select2QuerySetView):
 
         if self.q:
             qs = qs.filter(
-                Q(patente__icontains=self.q) |
-                Q(modelo__nombre__icontains=self.q)
+                Q(patente__icontains=self.q) | Q(modelo__nombre__icontains=self.q)
             )
 
-        return qs.order_by('patente')
+        return qs.order_by("patente")
 
 
 def _resolve_country_from_request(request):
@@ -122,6 +117,7 @@ def _resolve_country_from_request(request):
     empresa_id = request.session.get("empresa_actual_id")
     if empresa_id:
         from taller.models.empresa import Empresa
+
         try:
             e = Empresa.objects.only("pais").get(id=empresa_id)
             if e.pais in ("CL", "US"):
@@ -167,7 +163,7 @@ class ModeloAutocomplete(autocomplete.Select2QuerySetView):
         if country not in ("CL", "US"):
             return Modelo.objects.none()
 
-        qs = Modelo.objects.select_related('marca').filter(country=country)
+        qs = Modelo.objects.select_related("marca").filter(country=country)
 
         # Si llega marca desde forward de Select2, respétala
         marca_id = self.forwarded.get("marca")

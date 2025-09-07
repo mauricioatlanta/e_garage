@@ -1,1 +1,0 @@
-// Archivo preparado para animaciones JS personalizadas.

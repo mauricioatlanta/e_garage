@@ -79,6 +79,8 @@
 <body class="bg-[#05070c] text-white font-sans min-h-screen flex flex-col relative dark-mode {% if enable_space_bg == 2 %}starfield-lite{% endif %}">
 {# Para desactivar en una página específica: crea un template alterno sin el starfield o pasa enable_space_bg=0 desde la vista. #}
 
+{% include "common/_tpl_marker.html" with marker_from="common/base.html" %}
+
 {% if enable_space_bg|default:1 %}
   <!-- Fondo animado de estrellas (modo completo o ligero) -->
   <div id="bg-starfield" aria-hidden="true">
@@ -154,8 +156,8 @@
       {% endif %}
       {% if company_name %}
         <span class="ml-4 text-lg font-semibold text-lime-300">{{ company_name }}</span>
-      {% elif company_settings.tagline %}
-        <span class="ml-4 text-lg font-semibold text-lime-300">{{ company_settings.tagline }}</span>
+      {% elif company_tagline %}
+        <span class="ml-4 text-lg font-semibold text-lime-300">{{ company_tagline }}</span>
       {% endif %}
     {% else %}
       <a href="/" class="text-2xl font-extrabold text-cyan-300 tracking-widest hover:text-lime-300 transition">{{ company_name|default:"eGarage" }}</a>
@@ -284,6 +286,22 @@
 </nav>
 
 {% block fondo_extra %}{% endblock %}
+
+<header class="w-full bg-gray-900 text-white">
+  <div class="max-w-6xl mx-auto flex items-center gap-3 p-3">
+    {% if empresa_cfg and empresa_cfg.logo %}
+      <img src="{{ empresa_cfg.logo.url }}" alt="logo" class="h-10 w-10 rounded-lg object-cover">
+    {% endif %}
+    <div class="leading-tight">
+      <div class="font-semibold text-lg">
+        {{ empresa_cfg.nombre_publico|default:"Mi Empresa" }}
+      </div>
+      {% if empresa_cfg.tagline %}
+        <div class="text-sm text-gray-300">{{ empresa_cfg.tagline }}</div>
+      {% endif %}
+    </div>
+  </div>
+</header>
 
 {% block content %}{% endblock %}
 

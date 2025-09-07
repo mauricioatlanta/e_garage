@@ -50,7 +50,7 @@
       {% csrf_token %}
       
       <!-- Información del Cliente -->
-      <div class="relative">
+      <div class="relative z-50">
         <div class="absolute -inset-1 rounded-xl bg-gradient-to-r from-cyan-500/20 via-blue-500/20 to-purple-500/20 blur-xl"></div>
         <div class="relative rounded-xl border border-cyan-400/30 bg-gradient-to-r from-[#0d1117]/90 to-[#111827]/90 backdrop-blur-sm p-6">
           <div class="flex items-center space-x-3 mb-4">
@@ -87,7 +87,7 @@
                 {{ form.cliente|add_class:"hidden" }}
                 
                 <!-- Lista de sugerencias -->
-                <div id="sugerencias-clientes" class="absolute top-full left-0 right-0 z-50 mt-1 hidden">
+                <div id="sugerencias-clientes" class="absolute top-full left-0 right-0 mt-1 hidden" style="z-index: 9999;">
                   <div class="bg-gradient-to-r from-[#0d1117] to-[#111827] border border-cyan-400/40 rounded-lg shadow-2xl shadow-cyan-500/20 max-h-60 overflow-y-auto">
                     <!-- Las sugerencias se cargarán aquí -->
                   </div>
