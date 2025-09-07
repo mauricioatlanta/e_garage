@@ -27,18 +27,11 @@ else:
         }
     }
 
-# WhiteNoise para archivos estáticos
-MIDDLEWARE = [
-    "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",
-    "django.contrib.sessions.middleware.SessionMiddleware",
-    "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
-    "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "gestion_taller.middleware.country_prefix.CountryPrefixMiddleware",
-]
+# WhiteNoise para archivos estáticos - insertar después de SecurityMiddleware
+MIDDLEWARE = MIDDLEWARE.copy()
+# Insertar WhiteNoise después de SecurityMiddleware
+security_index = MIDDLEWARE.index("django.middleware.security.SecurityMiddleware")
+MIDDLEWARE.insert(security_index + 1, "whitenoise.middleware.WhiteNoiseMiddleware")
 
 # Archivos estáticos con WhiteNoise
 STATIC_URL = "/static/"
@@ -68,6 +61,13 @@ CACHES = {
 }
 
 # Logging para producción
+import os
+from pathlib import Path
+
+# Crear directorio de logs si no existe
+logs_dir = Path("/opt/render/project/src/logs") if os.path.exists("/opt/render") else BASE_DIR / "logs"
+logs_dir.mkdir(exist_ok=True)
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -85,7 +85,7 @@ LOGGING = {
         "console": {"class": "logging.StreamHandler", "formatter": "simple"},
         "file": {
             "class": "logging.FileHandler",
-            "filename": "/opt/render/project/src/logs/django_prod.log",
+            "filename": str(logs_dir / "django_prod.log"),
             "formatter": "verbose",
         },
     },

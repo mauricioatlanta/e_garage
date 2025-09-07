@@ -1,6 +1,6 @@
 from django.urls import include, path
 
-import onboarding_views
+from scripts import onboarding_views
 
 app_name = "onboarding"
 
