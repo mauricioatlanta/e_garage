@@ -1,37 +1,64 @@
-﻿repos:
+﻿# Pre-commit hooks para eGarage
+# Instalar con: pip install pre-commit && pre-commit install
+
+repos:
+  # Formateo de código
+  - repo: https://github.com/psf/black
+    rev: 24.8.0
+    hooks:
+      - id: black
+        language_version: python3
+        args: [--line-length=88, --target-version=py311]
+
+  # Linting con ruff (más rápido que flake8)
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: v0.6.9
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+
+  # Ordenamiento de imports
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        args: [--profile=black, --line-length=88]
+
+  # Verificación de archivos
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v4.5.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-yaml
       - id: check-added-large-files
+        args: [--maxkb=1000]
       - id: check-merge-conflict
       - id: debug-statements
 
-  - repo: https://github.com/psf/black
-    rev: 24.10.0
+  # Django específico
+  - repo: https://github.com/adamchainz/django-upgrade
+    rev: 1.15.0
     hooks:
-      - id: black
-        language_version: python3
+      - id: django-upgrade
+        args: [--target-version=4.2]
 
-  - repo: https://github.com/pycqa/isort
-    rev: 5.13.2
+  # Verificación de seguridad
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.5
     hooks:
-      - id: isort
-        args: ["--profile", "black"]
+      - id: bandit
+        args: [-r, ., -f, json, -o, bandit-report.json]
+        exclude: ^(tests/|migrations/|venv/|env/)
 
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.8.4
+  # Verificación de dependencias
+  - repo: https://github.com/jazzband/pip-tools
+    rev: 7.3.0
     hooks:
-      - id: ruff
-        args: [--fix, --exit-non-zero-on-fix]
+      - id: pip-compile
+        files: ^requirements.*\.txt$
+        args: [--upgrade, --generate-hashes]
 
-  - repo: local
-    hooks:
-      - id: django-check
-        name: Django Check
-        entry: python manage.py check
-        language: system
-        pass_filenames: false
-        always_run: true
+# Configuración global
+default_stages: [commit, push]
+fail_fast: false
