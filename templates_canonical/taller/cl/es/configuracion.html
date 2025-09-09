@@ -2,151 +2,567 @@
 {% load static widget_tweaks %}
 
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/configuracion_futurista.css' %}">
+<!-- 🚀 SUPER TECNOLÓGICO - CONFIGURACIÓN FUTURISTA -->
+<style>
+/* 🌌 VARIABLES DE COLORES FUTURISTAS */
+:root {
+    --neon-cyan: #00ffff;
+    --neon-purple: #8a2be2;
+    --neon-green: #00ff88;
+    --neon-gold: #ffd700;
+    --neon-pink: #ff1493;
+    --neon-blue: #0080ff;
+    --dark-space: #0a0a0f;
+    --panel-bg: rgba(5, 15, 25, 0.95);
+    --glass-bg: rgba(255, 255, 255, 0.06);
+    --holo-glow: 0 0 20px;
+    --matrix-green: #00ff41;
+    --cyber-blue: #00d4ff;
+}
 
-        <div class="futuristic-bg"></div>
-        <div class="max-w-6xl mx-auto futuristic-form">
-          <h1 class="futuristic-title">Configuración del Taller</h1>
+/* 🌌 FONDO ESPACIAL AVANZADO */
+body {
+    background: 
+        radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(120, 200, 255, 0.2) 0%, transparent 50%),
+        linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+    color: #ffffff;
+    font-family: 'Orbitron', 'Segoe UI', monospace;
+    overflow-x: hidden;
+    min-height: 100vh;
+}
 
-          {% if created %}
-            <div class="info-box">
-              <h3 style="color:#c0c0c0;">✓ Bienvenido a TallerPro</h3>
-              <p style="color:#a0a0a0;">Esta es tu primera vez configurando el taller. Completa los datos para personalizar tu experiencia.</p>
-            </div>
-          {% endif %}
+/* 🚀 CONTAINER PRINCIPAL */
+.config-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+    position: relative;
+    z-index: 1;
+}
 
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-6">
-            <div class="personal-section">
-              <h3 class="futuristic-label">Datos Personales</h3>
-              <form method="post" class="space-y-4">
+/* 🌟 HEADER TECNOLÓGICO */
+.config-header {
+    background: var(--panel-bg);
+    border: 2px solid var(--neon-cyan);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    backdrop-filter: blur(15px);
+    box-shadow: var(--holo-glow) var(--neon-cyan);
+    position: relative;
+    overflow: hidden;
+}
+
+.config-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple), var(--neon-gold), var(--neon-green));
+    animation: scan-line 3s infinite;
+}
+
+.config-title {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: var(--neon-cyan);
+    text-align: center;
+    text-shadow: 0 0 20px var(--neon-cyan);
+    font-family: 'Orbitron', monospace;
+    letter-spacing: 3px;
+    margin-bottom: 1rem;
+}
+
+.config-subtitle {
+    font-size: 1.1rem;
+    color: var(--neon-purple);
+    text-align: center;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 2px;
+    opacity: 0.9;
+}
+
+/* 🎯 PANELES DE CONFIGURACIÓN */
+.config-panel {
+    background: var(--panel-bg);
+    border: 1px solid var(--neon-purple);
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    backdrop-filter: blur(15px);
+    box-shadow: var(--holo-glow) var(--neon-purple);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s ease;
+}
+
+.config-panel:hover {
+    border-color: var(--neon-gold);
+    box-shadow: var(--holo-glow) var(--neon-gold);
+    transform: translateY(-5px);
+}
+
+.config-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--neon-purple), var(--neon-gold), transparent);
+    animation: panel-scan 4s infinite;
+}
+
+.panel-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--neon-gold);
+    margin-bottom: 1.5rem;
+    text-shadow: 0 0 10px var(--neon-gold);
+    font-family: 'Orbitron', monospace;
+    letter-spacing: 2px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.panel-title::before {
+    content: '⚡';
+    font-size: 1.2rem;
+    animation: icon-pulse 2s infinite;
+}
+
+/* 🎨 FORMULARIOS FUTURISTAS */
+.futuristic-form {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.form-group {
+    position: relative;
+}
+
+.form-label {
+    display: block;
+    color: var(--neon-cyan);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 1px;
+    font-size: 0.9rem;
+}
+
+.form-input {
+    width: 100%;
+    background: var(--glass-bg);
+    border: 1px solid var(--neon-purple);
+    border-radius: 8px;
+    padding: 1rem;
+    color: #ffffff;
+    font-family: 'Courier New', monospace;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+    background: rgba(0, 255, 255, 0.05);
+}
+
+.form-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* 🚀 BOTONES TECNOLÓGICOS */
+.cyber-btn {
+    background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+    border: none;
+    border-radius: 10px;
+    padding: 1rem 2rem;
+    color: #ffffff;
+    font-weight: 700;
+    font-family: 'Orbitron', monospace;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    text-transform: uppercase;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+.cyber-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.6);
+    background: linear-gradient(135deg, var(--neon-purple), var(--neon-gold));
+}
+
+.cyber-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.6s;
+}
+
+.cyber-btn:hover::before {
+    left: 100%;
+}
+
+/* 📊 ESTADO DE CUENTA TECNOLÓGICO */
+.status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.status-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--neon-green);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.status-card:hover {
+    transform: scale(1.05);
+    box-shadow: var(--holo-glow) var(--neon-green);
+}
+
+.status-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--neon-green);
+    animation: status-pulse 2s infinite;
+}
+
+.status-value {
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--neon-green);
+    text-shadow: 0 0 15px var(--neon-green);
+    font-family: 'Orbitron', monospace;
+    margin-bottom: 0.5rem;
+}
+
+.status-label {
+    font-size: 0.9rem;
+    color: var(--neon-cyan);
+    font-family: 'Courier New', monospace;
+    letter-spacing: 1px;
+}
+
+/* 👥 TÉCNICOS AVANZADOS */
+.tech-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.tech-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--neon-pink);
+    border-radius: 10px;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.3s ease;
+}
+
+.tech-card:hover {
+    border-color: var(--neon-gold);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+}
+
+.tech-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.tech-name {
+    color: var(--neon-cyan);
+    font-weight: 600;
+    font-family: 'Courier New', monospace;
+}
+
+.tech-status {
+    font-size: 0.8rem;
+    font-family: 'Orbitron', monospace;
+    letter-spacing: 1px;
+}
+
+.tech-status.active {
+    color: var(--neon-green);
+}
+
+.tech-status.inactive {
+    color: #ff6b6b;
+}
+
+/* 🎭 ANIMACIONES */
+@keyframes scan-line {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+@keyframes panel-scan {
+    0% { transform: translateX(-100%); opacity: 0; }
+    50% { opacity: 1; }
+    100% { transform: translateX(100%); opacity: 0; }
+}
+
+@keyframes icon-pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.7; }
+}
+
+@keyframes status-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* 📱 RESPONSIVE */
+@media (max-width: 768px) {
+    .config-container {
+        padding: 1rem;
+    }
+    
+    .config-title {
+        font-size: 2rem;
+    }
+    
+    .status-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .tech-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* 🌟 EFECTOS ESPECIALES */
+.matrix-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    opacity: 0.1;
+    background: 
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            var(--matrix-green) 2px,
+            var(--matrix-green) 4px
+        );
+    animation: matrix-fall 20s linear infinite;
+}
+
+@keyframes matrix-fall {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100vh); }
+}
+</style>
+
+<!-- 🌌 FONDO MATRIX -->
+<div class="matrix-bg"></div>
+
+<div class="config-container">
+    <!-- 🚀 HEADER TECNOLÓGICO -->
+    <div class="config-header">
+        <h1 class="config-title">⚙️ CONFIGURACIÓN AVANZADA</h1>
+        <p class="config-subtitle">Sistema de Control Central - Taller Inteligente</p>
+    </div>
+
+    {% if created %}
+    <div class="config-panel" style="border-color: var(--neon-green);">
+        <div class="panel-title" style="color: var(--neon-green);">
+            🎉 ¡Bienvenido al Sistema!
+        </div>
+        <p style="color: var(--neon-cyan); font-family: 'Courier New', monospace; line-height: 1.6;">
+            Esta es tu primera configuración del taller. Completa los datos para activar todas las funcionalidades del sistema.
+        </p>
+    </div>
+    {% endif %}
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+        <!-- 👤 DATOS PERSONALES -->
+        <div class="config-panel">
+            <div class="panel-title">👤 Datos Personales</div>
+            <form method="post" class="futuristic-form">
                 {% csrf_token %}
                 <input type="hidden" name="datos_form" value="1">
-                <div>
-                  <label class="futuristic-label" for="id_first_name">{{ datos_form.first_name.label }}</label>
-                  {{ datos_form.first_name|add_class:'futuristic-input' }}
+                
+                <div class="form-group">
+                    <label class="form-label" for="id_first_name">{{ datos_form.first_name.label }}</label>
+                    {{ datos_form.first_name|add_class:'form-input' }}
                 </div>
-                <div>
-                  <label class="futuristic-label" for="id_last_name">{{ datos_form.last_name.label }}</label>
-                  {{ datos_form.last_name|add_class:'futuristic-input' }}
+                
+                <div class="form-group">
+                    <label class="form-label" for="id_last_name">{{ datos_form.last_name.label }}</label>
+                    {{ datos_form.last_name|add_class:'form-input' }}
                 </div>
-                <div>
-                  <label class="futuristic-label" for="id_email">{{ datos_form.email.label }}</label>
-                  {{ datos_form.email|add_class:'futuristic-input' }}
+                
+                <div class="form-group">
+                    <label class="form-label" for="id_email">{{ datos_form.email.label }}</label>
+                    {{ datos_form.email|add_class:'form-input' }}
                 </div>
-                <div class="text-center pt-4">
-                  <button class="futuristic-btn" type="submit">Guardar Datos Personales</button>
-                </div>
-              </form>
-            </div>
-
-            <div class="config-section">
-              <h3 class="futuristic-label">Datos de la Empresa</h3>
-              <form method="post" enctype="multipart/form-data" class="space-y-4">
-                {% csrf_token %}
-                <input type="hidden" name="empresa_form" value="1">
-                <div>
-                  <label class="futuristic-label" for="id_nombre_taller">{{ empresa_form.nombre_taller.label }}</label>
-                  {{ empresa_form.nombre_taller|add_class:'futuristic-input' }}
-                </div>
-                <div>
-                  <label class="futuristic-label" for="id_empresa">{{ empresa_form.empresa.label }}</label>
-                  {{ empresa_form.empresa|add_class:'futuristic-input' }}
-                </div>
-                <div>
-                  <label class="futuristic-label" for="id_direccion">{{ empresa_form.direccion.label }}</label>
-                  {{ empresa_form.direccion|add_class:'futuristic-input' }}
-                </div>
-                <div>
-                  <label class="futuristic-label" for="id_telefono">{{ empresa_form.telefono.label }}</label>
-                  {{ empresa_form.telefono|add_class:'futuristic-input' }}
-                </div>
-                <div>
-                  <label class="futuristic-label" for="id_logo">{{ empresa_form.logo.label }}</label>
-                  {{ empresa_form.logo|add_class:'futuristic-input' }}
-                  {% if empresa.logo %}
-                    <div class="mt-4">
-                      <p class="text-cyan-300 mb-2">Logo actual:</p>
-                      <img src="{{ empresa.logo.url }}" alt="Logo actual" class="max-w-xs h-auto border-2 border-cyan-400 rounded-lg">
-                    </div>
-                  {% endif %}
-                </div>
-                <div class="text-center pt-4">
-                  <button class="futuristic-btn" type="submit">Guardar Datos de la Empresa</button>
-                </div>
-              </form>
-            </div>
-          </div>
-
-          <div class="config-section mt-8">
-            <h3 class="futuristic-label">Estado de la Cuenta</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-              <div class="bg-gradient-to-r from-green-500 to-green-600 p-4 rounded-lg">
-                <div class="text-2xl font-bold">{{ empresa.dias_restantes }}</div>
-                <div class="text-sm">Días restantes</div>
-              </div>
-              <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-4 rounded-lg">
-                <div class="text-2xl font-bold">{{ empresa.suscripcion_activa|yesno:"Si,No" }}</div>
-                <div class="text-sm">Suscripción</div>
-              </div>
-              <div class="bg-gradient-to-r from-purple-500 to-purple-600 p-4 rounded-lg">
-                <div class="text-2xl font-bold">{{ empresa.fecha_inicio|date:"d/m/Y" }}</div>
-                <div class="text-sm">Fecha de inicio</div>
-              </div>
-            </div>
-          </div>
-
-          {% if tecnicos is not None %}
-          <div class="config-section mt-10">
-            <h3 class="futuristic-label flex items-center justify-between">Técnicos
-              {% if crear_tecnico_url %}
-                <a href="{{ crear_tecnico_url }}" class="ml-4 futuristic-btn py-1 px-3 text-sm">Agregar Técnico</a>
-              {% endif %}
-            </h3>
-            <form method="post" class="mt-4 grid grid-cols-1 md:grid-cols-5 gap-3 items-end bg-black/30 p-4 rounded-lg border border-cyan-800/40">
-              {% csrf_token %}
-              <input type="hidden" name="crear_tecnico_rapido" value="1">
-              <div class="md:col-span-2">
-                <label class="futuristic-label text-xs" for="tec_nombre">Nombre</label>
-                <input id="tec_nombre" name="nombre" required minlength="2" placeholder="Nombre" class="futuristic-input w-full" />
-              </div>
-              <div>
-                <label class="futuristic-label text-xs" for="tec_tel">Teléfono</label>
-                <input id="tec_tel" name="telefono" placeholder="+56..." class="futuristic-input w-full" />
-              </div>
-              <div class="md:col-span-1">
-                <label class="futuristic-label text-xs" for="tec_dir">Dirección</label>
-                <input id="tec_dir" name="direccion" placeholder="Opcional" class="futuristic-input w-full" />
-              </div>
-              <div>
-                <button type="submit" class="futuristic-btn w-full py-2">Crear</button>
-              </div>
+                
+                <button class="cyber-btn" type="submit">💾 Guardar Datos</button>
             </form>
-            {% if tecnicos %}
-              <ul class="mt-4 divide-y divide-cyan-800/40 bg-black/30 rounded-xl border border-cyan-700/30">
-                {% for t in tecnicos %}
-                  <li class="p-3 flex items-center gap-4">
-                    <span class="text-cyan-200 text-sm flex-1">{{ t.nombre }}</span>
-                    <span class="text-xs {{ t.activo|yesno:'text-green-400,text-gray-500' }} font-mono">{{ t.activo|yesno:'ACTIVO,INACTIVO' }}</span>
-                    <form method="post" class="ml-2">
-                      {% csrf_token %}
-                      <button name="toggle_tecnico" value="{{ t.id }}" class="text-xs px-3 py-1 rounded {{ t.activo|yesno:'bg-red-600 hover:bg-red-500,bg-green-600 hover:bg-green-500' }} transition">
-                        {{ t.activo|yesno:'Desactivar,Activar' }}
-                      </button>
-                    </form>
-                  </li>
-                {% endfor %}
-              </ul>
-            {% else %}
-              <p class="text-gray-400 text-sm mt-2">No hay técnicos aún.</p>
-            {% endif %}
-          </div>
-          {% endif %}
-
-          <div class="text-center pt-6">
-            <a href="/" class="futuristic-btn">Volver al Dashboard</a>
-          </div>
         </div>
 
-        <script src="{% static 'js/image_preview_simple.js' %}"></script>
+        <!-- 🏢 DATOS DE LA EMPRESA -->
+        <div class="config-panel">
+            <div class="panel-title">🏢 Datos de la Empresa</div>
+            <form method="post" enctype="multipart/form-data" class="futuristic-form">
+                {% csrf_token %}
+                <input type="hidden" name="empresa_form" value="1">
+                
+                <div class="form-group">
+                    <label class="form-label" for="id_nombre_taller">{{ empresa_form.nombre_taller.label }}</label>
+                    {{ empresa_form.nombre_taller|add_class:'form-input' }}
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="id_empresa">{{ empresa_form.empresa.label }}</label>
+                    {{ empresa_form.empresa|add_class:'form-input' }}
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="id_direccion">{{ empresa_form.direccion.label }}</label>
+                    {{ empresa_form.direccion|add_class:'form-input' }}
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="id_telefono">{{ empresa_form.telefono.label }}</label>
+                    {{ empresa_form.telefono|add_class:'form-input' }}
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="id_logo">{{ empresa_form.logo.label }}</label>
+                    {{ empresa_form.logo|add_class:'form-input' }}
+                    {% if empresa.logo %}
+                    <div style="margin-top: 1rem; text-align: center;">
+                        <p style="color: var(--neon-cyan); margin-bottom: 0.5rem; font-family: 'Courier New', monospace;">Logo actual:</p>
+                        <img src="{{ empresa.logo.url }}" alt="Logo actual" style="max-width: 150px; height: auto; border: 2px solid var(--neon-cyan); border-radius: 10px; box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);">
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <button class="cyber-btn" type="submit">💾 Guardar Empresa</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 📊 ESTADO DE LA CUENTA -->
+    <div class="config-panel">
+        <div class="panel-title">📊 Estado del Sistema</div>
+        <div class="status-grid">
+            <div class="status-card">
+                <div class="status-value">{{ empresa.dias_restantes }}</div>
+                <div class="status-label">Días Restantes</div>
+            </div>
+            <div class="status-card">
+                <div class="status-value">{{ empresa.suscripcion_activa|yesno:"✅,❌" }}</div>
+                <div class="status-label">Suscripción</div>
+            </div>
+            <div class="status-card">
+                <div class="status-value">{{ empresa.fecha_inicio|date:"d/m/Y" }}</div>
+                <div class="status-label">Fecha de Inicio</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 👥 GESTIÓN DE TÉCNICOS -->
+    {% if tecnicos is not None %}
+    <div class="config-panel">
+        <div class="panel-title">👥 Gestión de Técnicos</div>
+        
+        <!-- Formulario rápido -->
+        <form method="post" style="display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 1rem; align-items: end; background: var(--glass-bg); padding: 1.5rem; border-radius: 10px; border: 1px solid var(--neon-purple); margin-bottom: 1.5rem;">
+            {% csrf_token %}
+            <input type="hidden" name="crear_tecnico_rapido" value="1">
+            
+            <div class="form-group">
+                <label class="form-label" for="tec_nombre">Nombre del Técnico</label>
+                <input id="tec_nombre" name="nombre" required minlength="2" placeholder="Nombre completo" class="form-input" />
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="tec_tel">Teléfono</label>
+                <input id="tec_tel" name="telefono" placeholder="+56..." class="form-input" />
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="tec_dir">Dirección</label>
+                <input id="tec_dir" name="direccion" placeholder="Opcional" class="form-input" />
+            </div>
+            
+            <button type="submit" class="cyber-btn" style="padding: 1rem;">➕ Crear</button>
+        </form>
+
+        <!-- Lista de técnicos -->
+        {% if tecnicos %}
+        <div class="tech-grid">
+            {% for t in tecnicos %}
+            <div class="tech-card">
+                <div class="tech-info">
+                    <div class="tech-name">{{ t.nombre }}</div>
+                    <div class="tech-status {{ t.activo|yesno:'active,inactive' }}">
+                        {{ t.activo|yesno:'🟢 ACTIVO','🔴 INACTIVO' }}
+                    </div>
+                </div>
+                <form method="post" style="margin: 0;">
+                    {% csrf_token %}
+                    <button name="toggle_tecnico" value="{{ t.id }}" 
+                            class="cyber-btn" 
+                            style="padding: 0.5rem 1rem; font-size: 0.8rem; background: {{ t.activo|yesno:'linear-gradient(135deg, #ff6b6b, #ff8e8e)','linear-gradient(135deg, #00ff88, #00ffaa)' }};">
+                        {{ t.activo|yesno:'Desactivar','Activar' }}
+                    </button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p style="color: var(--neon-cyan); text-align: center; font-family: 'Courier New', monospace; padding: 2rem;">
+            No hay técnicos registrados en el sistema.
+        </p>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- 🚀 NAVEGACIÓN -->
+    <div style="text-align: center; margin-top: 2rem;">
+        <a href="/" class="cyber-btn" style="background: linear-gradient(135deg, var(--neon-gold), var(--neon-pink));">
+            🏠 Volver al Dashboard
+        </a>
+    </div>
+</div>
+
+<script src="{% static 'js/image_preview_simple.js' %}"></script>
 
 {% endblock content %}
