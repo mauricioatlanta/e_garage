@@ -317,7 +317,7 @@ body {
         <div class="nav-grid">
 
             <!-- SUPER FICHA UNIFICADA - INTELIGENCIA TÁCTICA TOTAL -->
-            <a href="/cl/business-intelligence/dashboard/" class="command-panel super-unified-panel">
+            <a href="{% url 'chile:business_intelligence:dashboard' %}" class="command-panel super-unified-panel">
                 <div class="unified-header">
                     <div class="unified-icons">
                         <span class="icon-trio">🧠</span>
@@ -342,13 +342,13 @@ body {
                 </div>
             </a>
 
-            <a href="/cl/taller/reportes/mecanicos/" class="command-panel">
+            <a href="{% url 'chile:reportes_cl:mecanicos' %}" class="command-panel">
                 <div class="text-3xl mb-2">👨‍🔧</div>
                 <div class="font-semibold console-text">PERSONAL TÉCNICO</div>
                 <div class="text-sm text-gray-400 console-text">Análisis individual</div>
             </a>
 
-            <a href="/documentos/" class="command-panel modern-panel">
+            <a href="{% url 'documentos:listado' %}" class="command-panel modern-panel">
                 <div class="modern-icon-container">
                     <div class="main-icon">📄</div>
                     <div class="secondary-icon">🚀</div>
@@ -358,7 +358,7 @@ body {
                 <div class="modern-description">Gestión documental AI</div>
             </a>
 
-            <a href="/cl/clientes/" class="command-panel modern-panel">
+            <a href="{% url 'chile:servicios:clientes' %}" class="command-panel modern-panel">
                 <div class="modern-icon-container">
                     <div class="main-icon">🌐</div>
                     <div class="secondary-icon">💫</div>
@@ -368,7 +368,7 @@ body {
                 <div class="modern-description">Ecosystem relacional</div>
             </a>
 
-            <a href="/cl/vehiculos/" class="command-panel modern-panel">
+            <a href="{% url 'chile:servicios:vehiculos' %}" class="command-panel modern-panel">
                 <div class="modern-icon-container">
                     <div class="main-icon">🚗</div>
                     <div class="secondary-icon">⚡</div>
