@@ -1,43 +1,470 @@
 {% extends "base.html" %}
 {% load i18n static %}
+{% load form_filters %}
 
 {% block title %}eGarage — {% trans "Iniciar sesión" %}{% endblock %}
 
 {% block content %}
-<section class="eg-card eg-glow">
-  <header class="eg-card-head">
-    <div class="eg-logo">eGarage</div>
-    <h1 class="eg-h1">{% trans "Iniciar sesión" %}</h1>
-    <p class="eg-sub">{% trans "Bienvenido de nuevo. Ingresa tus credenciales." %}</p>
-  </header>
+<style>
+  /* 🚀 Diseño Futurista Avanzado - Inteligencia Superior */
+  .futuristic-login {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+    overflow: hidden;
+  }
 
-  <form method="post" class="eg-form" novalidate>
-    {% csrf_token %}
-    {{ form.non_field_errors }}
+  .futuristic-login::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      radial-gradient(circle at 20% 80%, rgba(0, 255, 255, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(0, 255, 127, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, rgba(255, 0, 255, 0.05) 0%, transparent 50%);
+    animation: cosmicFlow 20s ease-in-out infinite;
+  }
 
-    {# Render genérico de campos para que funcione con tu CustomLoginForm #}
-    {% for field in form %}
-      <label class="eg-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-      <div class="eg-input-wrap {% if field.errors %}eg-has-error{% endif %}">
-        {{ field }}
-      </div>
-      {% for err in field.errors %}
-        <div class="eg-error">{{ err }}</div>
-      {% endfor %}
-    {% endfor %}
+  @keyframes cosmicFlow {
+    0%, 100% { transform: translateX(0) translateY(0) rotate(0deg); }
+    33% { transform: translateX(30px) translateY(-30px) rotate(1deg); }
+    66% { transform: translateX(-20px) translateY(20px) rotate(-1deg); }
+  }
 
-    <div class="eg-row">
-      <a class="eg-link" href="{% url 'account_reset_password' %}">{% trans "¿Has olvidado tu contraseña?" %}</a>
+  .quantum-particles {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .particle {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: #00ffff;
+    border-radius: 50%;
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .particle:nth-child(2n) {
+    background: #00ff7f;
+    animation-delay: -2s;
+  }
+
+  .particle:nth-child(3n) {
+    background: #ff00ff;
+    animation-delay: -4s;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px) translateX(0px); opacity: 0; }
+    50% { transform: translateY(-100px) translateX(50px); opacity: 1; }
+  }
+
+  .neural-container {
+    position: relative;
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    border-radius: 20px;
+    padding: 3rem;
+    width: 100%;
+    max-width: 450px;
+    box-shadow: 
+      0 0 50px rgba(0, 255, 255, 0.2),
+      inset 0 0 50px rgba(0, 255, 255, 0.1);
+    animation: neuralPulse 4s ease-in-out infinite;
+  }
+
+  @keyframes neuralPulse {
+    0%, 100% { 
+      box-shadow: 
+        0 0 50px rgba(0, 255, 255, 0.2),
+        inset 0 0 50px rgba(0, 255, 255, 0.1);
+    }
+    50% { 
+      box-shadow: 
+        0 0 80px rgba(0, 255, 255, 0.4),
+        inset 0 0 80px rgba(0, 255, 255, 0.2);
+    }
+  }
+
+  .ai-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .quantum-logo {
+    font-size: 3rem;
+    font-weight: 900;
+    background: linear-gradient(45deg, #00ffff, #00ff7f, #ff00ff);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: quantumShift 3s ease-in-out infinite;
+    text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+  }
+
+  @keyframes quantumShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  .ai-title {
+    font-size: 1.8rem;
+    color: #ffffff;
+    margin: 1rem 0 0.5rem 0;
+    font-weight: 300;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .ai-subtitle {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+    margin-bottom: 0;
+    font-weight: 300;
+  }
+
+  .neural-form {
+    position: relative;
+  }
+
+  .input-group {
+    position: relative;
+    margin-bottom: 2rem;
+  }
+
+  .neural-label {
+    display: block;
+    color: #00ffff;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .neural-input {
+    width: 100%;
+    padding: 1rem 1.5rem;
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid rgba(0, 255, 255, 0.3);
+    border-radius: 10px;
+    color: #ffffff;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+  }
+
+  .neural-input:focus {
+    outline: none;
+    border-color: #00ffff;
+    box-shadow: 
+      0 0 20px rgba(0, 255, 255, 0.3),
+      inset 0 0 20px rgba(0, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.8);
+  }
+
+  .neural-input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .quantum-button {
+    width: 100%;
+    padding: 1.2rem 2rem;
+    background: linear-gradient(45deg, #00ffff, #00ff7f);
+    border: none;
+    border-radius: 10px;
+    color: #000000;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+
+  .quantum-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .quantum-button:hover::before {
+    left: 100%;
+  }
+
+  .quantum-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0, 255, 255, 0.4);
+  }
+
+  .quantum-button:active {
+    transform: translateY(0);
+  }
+
+  .neural-links {
+    text-align: center;
+    margin: 1.5rem 0;
+  }
+
+  .neural-link {
+    color: #00ffff;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .neural-link::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: #00ffff;
+    transition: width 0.3s ease;
+  }
+
+  .neural-link:hover::after {
+    width: 100%;
+  }
+
+  .neural-link:hover {
+    color: #00ff7f;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+  }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    margin: 2rem 0;
+  }
+
+  .divider::before,
+  .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.5), transparent);
+  }
+
+  .divider span {
+    color: rgba(255, 255, 255, 0.6);
+    padding: 0 1rem;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  .signup-section {
+    text-align: center;
+  }
+
+  .signup-text {
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+  }
+
+  .ghost-button {
+    display: inline-block;
+    padding: 0.8rem 2rem;
+    background: transparent;
+    border: 2px solid rgba(0, 255, 255, 0.5);
+    border-radius: 10px;
+    color: #00ffff;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+  }
+
+  .ghost-button:hover {
+    background: rgba(0, 255, 255, 0.1);
+    border-color: #00ffff;
+    color: #ffffff;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+  }
+
+  .error-message {
+    color: #ff4444;
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(255, 68, 68, 0.1);
+    border: 1px solid rgba(255, 68, 68, 0.3);
+    border-radius: 5px;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .neural-container {
+      margin: 1rem;
+      padding: 2rem;
+    }
+    
+    .quantum-logo {
+      font-size: 2.5rem;
+    }
+    
+    .ai-title {
+      font-size: 1.5rem;
+    }
+  }
+</style>
+
+<div class="futuristic-login">
+  <!-- Partículas Cuánticas -->
+  <div class="quantum-particles">
+    <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
+    <div class="particle" style="left: 20%; animation-delay: 1s;"></div>
+    <div class="particle" style="left: 30%; animation-delay: 2s;"></div>
+    <div class="particle" style="left: 40%; animation-delay: 3s;"></div>
+    <div class="particle" style="left: 50%; animation-delay: 4s;"></div>
+    <div class="particle" style="left: 60%; animation-delay: 5s;"></div>
+    <div class="particle" style="left: 70%; animation-delay: 0.5s;"></div>
+    <div class="particle" style="left: 80%; animation-delay: 1.5s;"></div>
+    <div class="particle" style="left: 90%; animation-delay: 2.5s;"></div>
+  </div>
+
+  <div class="neural-container">
+    <div class="ai-header">
+      <div class="quantum-logo">eGarage</div>
+      <h1 class="ai-title">{% trans "Acceso Neural" %}</h1>
+      <p class="ai-subtitle">{% trans "Autenticación cuántica iniciada" %}</p>
     </div>
 
-    <button class="eg-btn eg-btn-primary" type="submit">{% trans "Iniciar sesión" %}</button>
-  </form>
+    <form method="post" class="neural-form" novalidate>
+    {% csrf_token %}
+      
+      {% if form.non_field_errors %}
+        <div class="error-message">
+          {% for error in form.non_field_errors %}
+            {{ error }}
+          {% endfor %}
+        </div>
+      {% endif %}
 
-  <div class="eg-divider"><span>{% trans "o" %}</span></div>
+    {% for field in form %}
+        <div class="input-group">
+          <label class="neural-label" for="{{ field.id_for_label }}">
+            {{ field.label }}
+          </label>
+          {{ field|add_class:"neural-input" }}
+          {% for err in field.errors %}
+            <div class="error-message">{{ err }}</div>
+          {% endfor %}
+      </div>
+      {% endfor %}
 
-  <div class="eg-row eg-between">
-    <span class="eg-muted">{% trans "¿No tienes cuenta?" %}</span>
-    <a class="eg-btn eg-btn-ghost" href="{% url 'account_signup' %}">{% trans "Registrarse" %}</a>
+      <button class="quantum-button" type="submit">
+        {% trans "Iniciar Sesión Cuántica" %}
+      </button>
+    </form>
+
+    <div class="neural-links">
+      <a class="neural-link" href="{% url 'account_reset_password' %}">
+        {% trans "Recuperar Acceso Neural" %}
+      </a>
+    </div>
+
+    <div class="divider">
+      <span>{% trans "o" %}</span>
+    </div>
+
+    <div class="signup-section">
+      <p class="signup-text">{% trans "¿Primera vez en el sistema?" %}</p>
+      <a class="ghost-button" href="{% url 'account_signup' %}">
+        {% trans "Registro Neural" %}
+      </a>
+    </div>
   </div>
-</section>
+</div>
+
+<script>
+  // Efectos de partículas dinámicas
+  document.addEventListener('DOMContentLoaded', function() {
+    const particlesContainer = document.querySelector('.quantum-particles');
+    
+    // Crear partículas adicionales
+    for (let i = 0; i < 15; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'particle';
+      particle.style.left = Math.random() * 100 + '%';
+      particle.style.animationDelay = Math.random() * 6 + 's';
+      particle.style.animationDuration = (Math.random() * 4 + 4) + 's';
+      particlesContainer.appendChild(particle);
+    }
+
+    // Efecto de hover en inputs
+    const inputs = document.querySelectorAll('.neural-input');
+    inputs.forEach(input => {
+      input.addEventListener('focus', function() {
+        this.parentElement.style.transform = 'scale(1.02)';
+      });
+      
+      input.addEventListener('blur', function() {
+        this.parentElement.style.transform = 'scale(1)';
+      });
+    });
+
+    // Efecto de click en botón
+    const button = document.querySelector('.quantum-button');
+    button.addEventListener('click', function(e) {
+      // Crear efecto de ondas
+      const ripple = document.createElement('div');
+      ripple.style.position = 'absolute';
+      ripple.style.borderRadius = '50%';
+      ripple.style.background = 'rgba(255, 255, 255, 0.3)';
+      ripple.style.transform = 'scale(0)';
+      ripple.style.animation = 'ripple 0.6s linear';
+      ripple.style.left = '50%';
+      ripple.style.top = '50%';
+      ripple.style.width = '20px';
+      ripple.style.height = '20px';
+      ripple.style.marginLeft = '-10px';
+      ripple.style.marginTop = '-10px';
+      
+      this.appendChild(ripple);
+      
+      setTimeout(() => {
+        ripple.remove();
+      }, 600);
+    });
+  });
+
+  // CSS para efecto ripple
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes ripple {
+      to {
+        transform: scale(4);
+        opacity: 0;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+</script>
 {% endblock %}
