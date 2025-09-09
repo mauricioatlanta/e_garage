@@ -83,7 +83,7 @@ def dashboard_centro_operaciones(request):
     )
 
     # Clientes
-    clientes_activos = Cliente.objects.filter(empresa=empresa, activo=True).count()
+    clientes_activos = Cliente.objects.filter(empresa=empresa).count()
     clientes_nuevos_mes = Cliente.objects.filter(
         empresa=empresa, fecha_creacion__gte=inicio_mes
     ).count()
