@@ -13,7 +13,7 @@ class CountryAwareAccountAdapter(DefaultAccountAdapter):
                     if request.user.empresa.pais == "US":
                         return "/us/en/dashboard/"  # Ambiente de trabajo del usuario
                     elif request.user.empresa.pais == "CL":
-                        return "/cl/dashboard/"  # Ambiente de trabajo del usuario
+                        return "/cl/es/dashboard/"  # Ambiente de trabajo del usuario
                 # Buscar en perfil
                 elif hasattr(request.user, "perfil") and hasattr(
                     request.user.perfil, "pais"
@@ -21,7 +21,7 @@ class CountryAwareAccountAdapter(DefaultAccountAdapter):
                     if request.user.perfil.pais == "US":
                         return "/us/en/dashboard/"  # Ambiente de trabajo del usuario
                     elif request.user.perfil.pais == "CL":
-                        return "/cl/dashboard/"  # Ambiente de trabajo del usuario
+                        return "/cl/es/dashboard/"  # Ambiente de trabajo del usuario
             except:
                 pass
 
@@ -30,12 +30,12 @@ class CountryAwareAccountAdapter(DefaultAccountAdapter):
             if request.country == "US":
                 return "/us/en/dashboard/"  # Ambiente de trabajo del usuario
             elif request.country == "CL":
-                return "/cl/dashboard/"  # Ambiente de trabajo del usuario
+                return "/cl/es/dashboard/"  # Ambiente de trabajo del usuario
 
         # PRIORIDAD 3: Detectar país por path o parámetros
         path = request.path
         if path.startswith("/cl/") or "cl" in request.GET.get("country", ""):
-            return "/cl/dashboard/"  # Ambiente de trabajo del usuario
+            return "/cl/es/dashboard/"  # Ambiente de trabajo del usuario
         if (
             path.startswith("/us")
             or path.startswith("/usa")
@@ -46,4 +46,4 @@ class CountryAwareAccountAdapter(DefaultAccountAdapter):
         country = request.session.get("country")
         if country == "usa":
             return "/us/en/dashboard/"  # Ambiente de trabajo del usuario
-        return "/cl/dashboard/"  # Ambiente de trabajo del usuario
+        return "/cl/es/dashboard/"  # Ambiente de trabajo del usuario
