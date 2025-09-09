@@ -262,7 +262,7 @@
         </a>
 
       <!-- Centro de Investigación -->
-      <a href="{% if request.path|slice:':3' == '/cl' %}/cl/taller/centro-operaciones-espacial/{% else %}/us/centro-operaciones-espacial/{% endif %}" class="group relative nav-button-power">
+      <a href="{% if request.path|slice:':3' == '/cl' %}/cl/centro-operaciones-espacial/{% else %}/us/centro-operaciones-espacial/{% endif %}" class="group relative nav-button-power">
         <div class="relative overflow-hidden">
           <!-- Borde animado -->
           <div class="absolute inset-0 bg-gradient-to-r from-orange-400 via-orange-300 to-orange-400 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse"></div>
@@ -280,7 +280,7 @@
       </a>
 
       <!-- Reportes -->
-      <a href="{% country_url 'reportes_dashboard' app_namespace='reportes' %}" class="group relative nav-button-power">
+      <a href="{% if request.path|slice:':3' == '/cl' %}/cl/reportes/{% else %}/us/reportes/{% endif %}" class="group relative nav-button-power">
         <div class="relative overflow-hidden">
           <!-- Borde animado -->
           <div class="absolute inset-0 bg-gradient-to-r from-emerald-400 via-emerald-300 to-emerald-400 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse"></div>
