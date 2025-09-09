@@ -258,7 +258,7 @@ urlpatterns = [
     # Redirect para URLs antiguas de taller/settings
     path(
         "taller/settings/",
-        RedirectView.as_view(url="/cl/settings/", permanent=False),
+        RedirectView.as_view(url="/cl/configuracion/", permanent=False),
         name="taller_settings_redirect_legacy",
     ),
     # Redirect para URLs antiguas de taller/centro-operaciones-espacial
@@ -276,7 +276,7 @@ urlpatterns = [
     # Redirect específico para USA
     path(
         "us/taller/settings/",
-        RedirectView.as_view(url="/us/settings/", permanent=False),
+        RedirectView.as_view(url="/us/configuracion/", permanent=False),
         name="usa_taller_settings_redirect",
     ),
     # Diagnóstico temporal (REMOVER EN PRODUCCIÓN)

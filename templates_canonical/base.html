@@ -250,7 +250,7 @@
       </a>
 
       <!-- Settings -->
-      <a href="{% if request.path|slice:':3' == '/cl' %}/cl/taller/settings/{% else %}/us/taller/settings/{% endif %}" class="group relative nav-button-power">
+      <a href="{% url 'chile:company_settings' %}" class="group relative nav-button-power">
         <div class="relative overflow-hidden">
           <!-- Borde animado -->
           <div class="absolute inset-0 bg-gradient-to-r from-indigo-400 via-indigo-300 to-indigo-400 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse"></div>
