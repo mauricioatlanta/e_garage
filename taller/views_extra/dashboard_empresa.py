@@ -1,9 +1,10 @@
-from datetime import timedelta
+from datetime import date, timedelta
 from decimal import Decimal
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count, F, Q, Sum
+from django.db.models import Count, F, Q, Sum, DecimalField, ExpressionWrapper
+from django.db.models.functions import Coalesce
 from django.shortcuts import redirect
 from django.utils import timezone
 
@@ -11,7 +12,7 @@ from taller.auth.decorators import login_required_default
 from taller.models.clientes import Cliente
 from taller.models.documento import Documento
 from taller.models.empresa import Empresa
-from taller.models.lineas_documento import LineaServicio
+from taller.models.lineas_documento import LineaServicio, LineaRepuesto
 from taller.models.tecnico import Tecnico
 from taller.models.vehiculos import Vehiculo
 
@@ -35,10 +36,16 @@ def dashboard_centro_operaciones(request):
         )
 
     # 📅 Fechas de referencia
-    hoy = timezone.now().date()
+    hoy = timezone.localdate()
     hace_7_dias = hoy - timedelta(days=7)
     hace_30_dias = hoy - timedelta(days=30)
-    inicio_mes = hoy.replace(day=1)
+    inicio_mes = date(hoy.year, hoy.month, 1)
+
+    # --- EXPRESIÓN DE SUBTOTAL POR LÍNEA ---
+    line_subtotal = ExpressionWrapper(
+        F("precio_unitario") * F("cantidad"),
+        output_field=DecimalField(max_digits=14, decimal_places=2),
+    )
 
     # 📊 KPIs PRINCIPALES (filtrados por empresa)
 
@@ -60,8 +67,7 @@ def dashboard_centro_operaciones(request):
             documento__empresa=empresa,
             documento__fecha_emision=hoy,
             documento__tipo="FAC",
-        ).aggregate(total=Sum(F("precio_unitario") * F("cantidad")))["total"]
-        or 0
+        ).aggregate(total=Coalesce(Sum(line_subtotal), 0))["total"]
     )
 
     facturacion_semana = (
@@ -69,8 +75,7 @@ def dashboard_centro_operaciones(request):
             documento__empresa=empresa,
             documento__fecha_emision__gte=hace_7_dias,
             documento__tipo="FAC",
-        ).aggregate(total=Sum(F("precio_unitario") * F("cantidad")))["total"]
-        or 0
+        ).aggregate(total=Coalesce(Sum(line_subtotal), 0))["total"]
     )
 
     facturacion_mes = (
@@ -78,9 +83,22 @@ def dashboard_centro_operaciones(request):
             documento__empresa=empresa,
             documento__fecha_emision__gte=inicio_mes,
             documento__tipo="FAC",
-        ).aggregate(total=Sum(F("precio_unitario") * F("cantidad")))["total"]
-        or 0
+        ).aggregate(total=Coalesce(Sum(line_subtotal), 0))["total"]
     )
+
+    # --- REPUESTOS DEL MES (KPIs) ---
+    repuestos_qs = LineaRepuesto.objects.filter(
+        documento__empresa=empresa,
+        documento__fecha_emision__date__gte=inicio_mes,
+        documento__fecha_emision__date__lte=hoy,
+    )
+
+    total_repuestos_mes = repuestos_qs.aggregate(
+        total=Coalesce(Sum(line_subtotal), 0)
+    )["total"]
+
+    # --- IVA: según regla, SOLO sobre repuestos (19% CL) ---
+    iva_repuestos = (total_repuestos_mes or 0) * Decimal("0.19")
 
     # Clientes
     clientes_activos = Cliente.objects.filter(empresa=empresa).count()
@@ -149,7 +167,7 @@ def dashboard_centro_operaciones(request):
 
     # Clientes inactivos (sin documentos en 60 días)
     clientes_inactivos = (
-        Cliente.objects.filter(empresa=empresa, activo=True)
+        Cliente.objects.filter(empresa=empresa)
         .exclude(documentos__fecha_emision__gte=hoy - timedelta(days=60))
         .count()
     )
@@ -211,6 +229,8 @@ def dashboard_centro_operaciones(request):
         "facturacion_hoy": facturacion_hoy,
         "facturacion_semana": facturacion_semana,
         "facturacion_mes": facturacion_mes,
+        "total_repuestos_mes": total_repuestos_mes,
+        "iva_repuestos": iva_repuestos,
         "clientes_activos": clientes_activos,
         "clientes_nuevos_mes": clientes_nuevos_mes,
         "clientes_atendidos_semana": clientes_atendidos_semana,
