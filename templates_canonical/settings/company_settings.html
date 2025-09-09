@@ -1,37 +1,199 @@
 {% extends "common/base.html" %}
 {% load static %}
-<!-- 🟢 TEMPLATE MODERNA - SETTINGS UNIFICADA -->
-<style>
-body { background: linear-gradient(45deg, #00ff00, #00cc00) !important; }
-body::before { content: "🟢 TEMPLATE MODERNA - SETTINGS UNIFICADA"; position: fixed; top: 0; left: 0; background: #00ff00; color: #000; padding: 10px; z-index: 9999; font-weight: bold; }
-</style>
-{% block content %}
-<div class="max-w-3xl mx-auto bg-white rounded-xl shadow p-6">
-  <h1 class="text-2xl font-semibold mb-4">Configuración de la empresa</h1>
 
-  <form method="post" enctype="multipart/form-data" class="space-y-4">
-    {% csrf_token %}
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {{ form.nombre_publico.label_tag }} {{ form.nombre_publico }}
-      {{ form.tagline.label_tag }} {{ form.tagline }}
-      {{ form.direccion.label_tag }} {{ form.direccion }}
-      {{ form.telefono.label_tag }} {{ form.telefono }}
-      {{ form.email_contacto.label_tag }} {{ form.email_contacto }}
-      {{ form.sitio_web.label_tag }} {{ form.sitio_web }}
-      {{ form.moneda.label_tag }} {{ form.moneda }}
-      {{ form.tasa_impuesto.label_tag }} {{ form.tasa_impuesto }}
-      {{ form.aplicar_impuesto_por_defecto.label_tag }} {{ form.aplicar_impuesto_por_defecto }}
-      {{ form.dividir_por_tecnico.label_tag }} {{ form.dividir_por_tecnico }}
-      <div class="md:col-span-2">
-        {{ form.logo.label_tag }} {{ form.logo }}
-      </div>
+<!-- 🚀 SUPER TECNOLÓGICO - CONFIGURACIÓN EMPRESA FUTURISTA -->
+<link rel="stylesheet" href="{% static 'css/configuracion_futurista.css' %}">
+
+{% block content %}
+<!-- 🌌 FONDO MATRIX -->
+<div class="matrix-bg"></div>
+
+<div class="config-container">
+    <!-- 🚀 HEADER TECNOLÓGICO -->
+    <div class="config-header">
+        <h1 class="config-title">⚙️ CONFIGURACIÓN EMPRESARIAL</h1>
+        <p class="config-subtitle">Sistema de Control Central - Configuración Avanzada</p>
     </div>
 
-    {% if form.errors %}
-      <div class="bg-red-50 text-red-700 p-3 rounded">{{ form.errors }}</div>
-    {% endif %}
+    <!-- 🏢 PANEL DE CONFIGURACIÓN EMPRESARIAL -->
+    <div class="config-panel">
+        <div class="panel-title">🏢 Datos de la Empresa</div>
+        
+        <form method="post" enctype="multipart/form-data" class="futuristic-form">
+            {% csrf_token %}
+            
+            <!-- Primera fila -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.nombre_publico.id_for_label }}">{{ form.nombre_publico.label }}</label>
+                    {{ form.nombre_publico|add_class:'form-input' }}
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.tagline.id_for_label }}">{{ form.tagline.label }}</label>
+                    {{ form.tagline|add_class:'form-input' }}
+                </div>
+            </div>
 
-    <button class="px-4 py-2 bg-blue-600 text-white rounded-lg">Guardar</button>
-  </form>
+            <!-- Segunda fila -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.direccion.id_for_label }}">{{ form.direccion.label }}</label>
+                    {{ form.direccion|add_class:'form-input' }}
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.telefono.id_for_label }}">{{ form.telefono.label }}</label>
+                    {{ form.telefono|add_class:'form-input' }}
+                </div>
+            </div>
+
+            <!-- Tercera fila -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.email_contacto.id_for_label }}">{{ form.email_contacto.label }}</label>
+                    {{ form.email_contacto|add_class:'form-input' }}
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.sitio_web.id_for_label }}">{{ form.sitio_web.label }}</label>
+                    {{ form.sitio_web|add_class:'form-input' }}
+                </div>
+            </div>
+
+            <!-- Cuarta fila - Configuración financiera -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.moneda.id_for_label }}">{{ form.moneda.label }}</label>
+                    {{ form.moneda|add_class:'form-input' }}
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.tasa_impuesto.id_for_label }}">{{ form.tasa_impuesto.label }}</label>
+                    {{ form.tasa_impuesto|add_class:'form-input' }}
+                </div>
+            </div>
+
+            <!-- Quinta fila - Configuraciones avanzadas -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.aplicar_impuesto_por_defecto.id_for_label }}" style="display: flex; align-items: center; gap: 10px;">
+                        {{ form.aplicar_impuesto_por_defecto }}
+                        <span>{{ form.aplicar_impuesto_por_defecto.label }}</span>
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.dividir_por_tecnico.id_for_label }}" style="display: flex; align-items: center; gap: 10px;">
+                        {{ form.dividir_por_tecnico }}
+                        <span>{{ form.dividir_por_tecnico.label }}</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Logo -->
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+                <label class="form-label" for="{{ form.logo.id_for_label }}">{{ form.logo.label }}</label>
+                {{ form.logo|add_class:'form-input' }}
+                <div style="margin-top: 0.5rem; color: var(--neon-cyan); font-size: 0.9rem; font-family: 'Courier New', monospace;">
+                    📁 Selecciona un archivo de imagen para el logo de tu empresa
+                </div>
+            </div>
+
+            <!-- Errores -->
+            {% if form.errors %}
+            <div style="background: rgba(255, 0, 0, 0.1); border: 1px solid #ff6b6b; border-radius: 10px; padding: 1rem; margin-bottom: 1.5rem;">
+                <h3 style="color: #ff6b6b; font-family: 'Orbitron', monospace; margin-bottom: 0.5rem;">⚠️ Errores en el formulario:</h3>
+                <div style="color: #ff8e8e; font-family: 'Courier New', monospace;">
+                    {{ form.errors }}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Botón de guardar -->
+            <div style="text-align: center; margin-top: 2rem;">
+                <button class="cyber-btn" type="submit" style="background: linear-gradient(135deg, var(--neon-green), var(--neon-cyan));">
+                    💾 GUARDAR CONFIGURACIÓN
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- 🚀 NAVEGACIÓN -->
+    <div style="text-align: center; margin-top: 2rem;">
+        <a href="/" class="cyber-btn" style="background: linear-gradient(135deg, var(--neon-gold), var(--neon-pink));">
+            🏠 Volver al Dashboard
+        </a>
+    </div>
 </div>
+
+<!-- 🎨 ESTILOS ADICIONALES PARA CHECKBOXES -->
+<style>
+/* Estilos para checkboxes futuristas */
+input[type="checkbox"] {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--neon-cyan);
+    border-radius: 4px;
+    background: var(--glass-bg);
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+input[type="checkbox"]:checked {
+    background: var(--neon-cyan);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+}
+
+input[type="checkbox"]:checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #000;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+input[type="checkbox"]:hover {
+    border-color: var(--neon-gold);
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+/* Estilos para selects */
+select.form-input {
+    background: var(--glass-bg);
+    border: 1px solid var(--neon-purple);
+    border-radius: 8px;
+    padding: 1rem;
+    color: #ffffff;
+    font-family: 'Courier New', monospace;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+select.form-input:focus {
+    outline: none;
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+    background: rgba(0, 255, 255, 0.05);
+}
+
+select.form-input option {
+    background: var(--dark-space);
+    color: #ffffff;
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+    .config-container > div[style*="grid-template-columns"] {
+        grid-template-columns: 1fr !important;
+    }
+}
+</style>
+
 {% endblock %}
