@@ -71,7 +71,7 @@ MIDDLEWARE = [
     "taller.middleware.empresa_middleware.EmpresaMiddleware",
     "gestion_taller.middleware.country_prefix.EnforceCountryPrefixMiddleware",
     "taller.middleware.country_context.CountryContextMiddleware",
-    "taller.middleware.fix_language_middleware.FixLanguageMiddleware",
+    # "taller.middleware.fix_language_middleware.FixLanguageMiddleware",  # DESHABILITADO - Causa bucles infinitos
     "taller.middleware.verificar_suscripcion.VerificarSuscripcionMiddleware",
 ]
 
