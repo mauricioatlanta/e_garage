@@ -3,7 +3,7 @@ from decimal import Decimal
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count, F, Q, Sum, DecimalField, ExpressionWrapper, Value
+from django.db.models import Count, F, Q, Sum, DecimalField, Value
 from django.db.models.functions import Coalesce
 from django.shortcuts import redirect
 from django.utils import timezone
@@ -41,12 +41,6 @@ def dashboard_centro_operaciones(request):
     hace_30_dias = hoy - timedelta(days=30)
     inicio_mes = date(hoy.year, hoy.month, 1)
 
-    # --- EXPRESIÓN DE SUBTOTAL POR LÍNEA ---
-    line_subtotal = ExpressionWrapper(
-        F("precio_unitario") * F("cantidad"),
-        output_field=DecimalField(max_digits=14, decimal_places=2),
-    )
-
     # --- FALLBACK DECIMAL PARA COALESCE ---
     ZERO_DEC = Value(Decimal("0.00"), output_field=DecimalField(max_digits=14, decimal_places=2))
 
@@ -70,7 +64,7 @@ def dashboard_centro_operaciones(request):
             documento__empresa=empresa,
             documento__fecha_emision=hoy,
             documento__tipo="FAC",
-        ).aggregate(total=Coalesce(Sum(line_subtotal), ZERO_DEC))["total"]
+        ).aggregate(total=Coalesce(Sum("subtotal"), ZERO_DEC))["total"]
     )
 
     facturacion_semana = (
@@ -78,7 +72,7 @@ def dashboard_centro_operaciones(request):
             documento__empresa=empresa,
             documento__fecha_emision__gte=hace_7_dias,
             documento__tipo="FAC",
-        ).aggregate(total=Coalesce(Sum(line_subtotal), ZERO_DEC))["total"]
+        ).aggregate(total=Coalesce(Sum("subtotal"), ZERO_DEC))["total"]
     )
 
     facturacion_mes = (
@@ -86,7 +80,7 @@ def dashboard_centro_operaciones(request):
             documento__empresa=empresa,
             documento__fecha_emision__gte=inicio_mes,
             documento__tipo="FAC",
-        ).aggregate(total=Coalesce(Sum(line_subtotal), ZERO_DEC))["total"]
+        ).aggregate(total=Coalesce(Sum("subtotal"), ZERO_DEC))["total"]
     )
 
     # --- REPUESTOS DEL MES (KPIs) ---
@@ -97,7 +91,7 @@ def dashboard_centro_operaciones(request):
     )
 
     total_repuestos_mes = repuestos_qs.aggregate(
-        total=Coalesce(Sum(line_subtotal), ZERO_DEC)
+        total=Coalesce(Sum("subtotal"), ZERO_DEC)
     )["total"]
 
     # --- IVA: según regla, SOLO sobre repuestos (19% CL) ---
@@ -132,7 +126,7 @@ def dashboard_centro_operaciones(request):
         .values("nombre")
         .annotate(
             cantidad=Count("id"), 
-            ingresos=Coalesce(Sum(line_subtotal), ZERO_DEC)
+            ingresos=Coalesce(Sum("subtotal"), ZERO_DEC)
         )
         .order_by("-cantidad")[:5]
     )
@@ -315,7 +309,7 @@ def dashboard_centro_operaciones_espacial(request):
         documento__empresa=empresa,
         documento__fecha_emision__gte=hace_30_dias,
         documento__tipo="FAC",
-    ).aggregate(total=Coalesce(Sum(line_subtotal), ZERO_DEC))["total"]
+    ).aggregate(total=Coalesce(Sum("subtotal"), ZERO_DEC))["total"]
 
     # Ticket promedio
     ticket_promedio = (
