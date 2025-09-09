@@ -60,7 +60,7 @@ MIDDLEWARE = [
     "gestion_taller.middleware.country_prefix.EnforceCountryPrefixMiddleware",
     "taller.middleware.country_context.CountryContextMiddleware",
     # Idioma (elige SOLO una)
-    "taller.middleware.fix_language_middleware.FixLanguageMiddleware",
+    # "taller.middleware.fix_language_middleware.FixLanguageMiddleware",  # DESHABILITADO - Causa bucles infinitos
     # "taller.middleware.i18n_country_middleware.I18nCountryMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
