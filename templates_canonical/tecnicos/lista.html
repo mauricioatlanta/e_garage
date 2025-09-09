@@ -34,7 +34,7 @@
         {% if messages %}
             <div class="mb-4">
                 {% for message in messages %}
-                    <div class="glass-card p-3 mb-2 border-start border-4 
+                    <div class="glass-card p-3 mb-2 border-start border-4
                                 {% if message.tags == 'success' %}border-success{% elif message.tags == 'error' %}border-danger{% else %}border-info{% endif %}">
                         <div class="d-flex align-items-center">
                             <i class="fas fa-{% if message.tags == 'success' %}check-circle text-success{% elif message.tags == 'error' %}exclamation-triangle text-danger{% else %}info-circle text-info{% endif %} me-3"></i>
@@ -226,12 +226,12 @@
             border-radius: 12px;
             overflow: hidden;
         }
-        
+
         .btn-group {
             display: flex;
             flex-direction: column;
         }
-        
+
         .btn-group .btn {
             margin: 2px 0;
             border-radius: 8px !important;

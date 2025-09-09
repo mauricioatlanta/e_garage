@@ -92,57 +92,57 @@ try:
     # Intentar importar modelos
     from taller.models import Empresa, Cliente, Vehiculo, Documento, DocumentoItem, TrialRegistro, ComprobantePago
     from allauth.account.models import EmailAddress
-    
+
     print("🧹 Iniciando limpieza...")
-    
+
     with transaction.atomic():
         # Eliminar emails de allauth
         email_count = EmailAddress.objects.count()
         EmailAddress.objects.all().delete()
         print(f"✅ Eliminados {email_count} emails de allauth")
-        
+
         # Eliminar items de documentos
         items_count = DocumentoItem.objects.count()
         DocumentoItem.objects.all().delete()
         print(f"✅ Eliminados {items_count} items de documentos")
-        
+
         # Eliminar documentos
         docs_count = Documento.objects.count()
         Documento.objects.all().delete()
         print(f"✅ Eliminados {docs_count} documentos")
-        
+
         # Eliminar vehículos
         vehiculos_count = Vehiculo.objects.count()
         Vehiculo.objects.all().delete()
         print(f"✅ Eliminados {vehiculos_count} vehículos")
-        
+
         # Eliminar clientes
         clientes_count = Cliente.objects.count()
         Cliente.objects.all().delete()
         print(f"✅ Eliminados {clientes_count} clientes")
-        
+
         # Eliminar trials
         trials_count = TrialRegistro.objects.count()
         TrialRegistro.objects.all().delete()
         print(f"✅ Eliminados {trials_count} trials")
-        
+
         # Eliminar comprobantes
         comp_count = ComprobantePago.objects.count()
         ComprobantePago.objects.all().delete()
         print(f"✅ Eliminados {comp_count} comprobantes")
-        
+
         # Eliminar empresas (excepto superusuarios)
         empresas_count = Empresa.objects.exclude(usuario__is_superuser=True).count()
         Empresa.objects.exclude(usuario__is_superuser=True).delete()
         print(f"✅ Eliminadas {empresas_count} empresas")
-        
+
         # Eliminar usuarios (excepto superusuarios)
         usuarios_count = User.objects.exclude(is_superuser=True).count()
         User.objects.exclude(is_superuser=True).delete()
         print(f"✅ Eliminados {usuarios_count} usuarios")
-        
+
         print("🧹 LIMPIEZA COMPLETADA")
-    
+
 except Exception as e:
     print(f"❌ Error en limpieza: {e}")
     import traceback
@@ -167,11 +167,11 @@ from django.db import transaction
 
 try:
     from taller.models import Empresa, TrialRegistro, ComprobantePago
-    
+
     print("👤 Creando usuarios de prueba...")
-    
+
     with transaction.atomic():
-        
+
         # ===== CHILE GRATUITO =====
         user_chile_free = User.objects.create_user(
             username='test_chile',
@@ -181,7 +181,7 @@ try:
             last_name='Chile Gratuito',
             is_active=True
         )
-        
+
         empresa_chile_free = Empresa.objects.create(
             usuario=user_chile_free,
             nombre='eGarage Chile',
@@ -197,7 +197,7 @@ try:
             suscripcion_activa=True,
             estado='trial'
         )
-        
+
         TrialRegistro.objects.create(
             nombre='Test Chile Gratuito',
             email='test_chile@egarage.cl',
@@ -207,9 +207,9 @@ try:
             fecha_fin=timezone.now().date() + timedelta(days=30),
             activo=True
         )
-        
+
         print("✅ Usuario Chile gratuito creado: test_chile@egarage.cl")
-        
+
         # ===== CHILE PAGADO =====
         user_chile_paid = User.objects.create_user(
             username='test_chile_pago',
@@ -219,7 +219,7 @@ try:
             last_name='Chile Pagado',
             is_active=True
         )
-        
+
         empresa_chile_paid = Empresa.objects.create(
             usuario=user_chile_paid,
             nombre='eGarage Chile Premium',
@@ -235,7 +235,7 @@ try:
             suscripcion_activa=True,
             estado='activa'
         )
-        
+
         ComprobantePago.objects.create(
             empresa=empresa_chile_paid,
             monto=Decimal('29990'),
@@ -244,9 +244,9 @@ try:
             metodo_pago='transferencia',
             referencia_pago='TEST-CL-001'
         )
-        
+
         print("✅ Usuario Chile pagado creado: test_chile_pago@egarage.cl")
-        
+
         # ===== USA GRATUITO =====
         user_usa_free = User.objects.create_user(
             username='test_usa',
@@ -256,7 +256,7 @@ try:
             last_name='USA Free',
             is_active=True
         )
-        
+
         empresa_usa_free = Empresa.objects.create(
             usuario=user_usa_free,
             nombre='eGarage USA',
@@ -272,7 +272,7 @@ try:
             suscripcion_activa=True,
             estado='trial'
         )
-        
+
         TrialRegistro.objects.create(
             nombre='Test USA Free',
             email='test_usa@egarage.com',
@@ -282,9 +282,9 @@ try:
             fecha_fin=timezone.now().date() + timedelta(days=30),
             activo=True
         )
-        
+
         print("✅ Usuario USA gratuito creado: test_usa@egarage.com")
-        
+
         # ===== USA PAGADO =====
         user_usa_paid = User.objects.create_user(
             username='test_usa_pago',
@@ -294,7 +294,7 @@ try:
             last_name='USA Paid',
             is_active=True
         )
-        
+
         empresa_usa_paid = Empresa.objects.create(
             usuario=user_usa_paid,
             nombre='eGarage USA Premium',
@@ -310,7 +310,7 @@ try:
             suscripcion_activa=True,
             estado='activa'
         )
-        
+
         ComprobantePago.objects.create(
             empresa=empresa_usa_paid,
             monto=Decimal('39.99'),
@@ -319,11 +319,11 @@ try:
             metodo_pago='credit_card',
             referencia_pago='TEST-US-001'
         )
-        
+
         print("✅ Usuario USA pagado creado: test_usa_pago@egarage.com")
-        
+
         print("🎉 TODOS LOS USUARIOS CREADOS EXITOSAMENTE")
-    
+
 except Exception as e:
     print(f"❌ Error creando usuarios: {e}")
     import traceback
@@ -350,11 +350,11 @@ try:
         Empresa, Cliente, Vehiculo, MarcaVehiculo, ModeloVehiculo,
         Documento, DocumentoItem, Repuesto, CategoriaServicio, Servicio
     )
-    
+
     print("📊 Creando datos de prueba...")
-    
+
     with transaction.atomic():
-        
+
         # Crear marcas y modelos
         marca_chile, created = MarcaVehiculo.objects.get_or_create(
             nombre="Chevrolet",
@@ -365,7 +365,7 @@ try:
             nombre="Sail",
             defaults={'anio_inicio': 2015, 'anio_fin': 2024, 'activo': True}
         )
-        
+
         marca_usa, created = MarcaVehiculo.objects.get_or_create(
             nombre="Ford",
             defaults={'pais': 'US', 'activo': True}
@@ -375,13 +375,13 @@ try:
             nombre="F-150",
             defaults={'anio_inicio': 2018, 'anio_fin': 2024, 'activo': True}
         )
-        
+
         # Crear categoría y servicios
         categoria, created = CategoriaServicio.objects.get_or_create(
             nombre="Mantenimiento General",
             defaults={'descripcion': 'Servicios básicos', 'activo': True}
         )
-        
+
         servicio1, created = Servicio.objects.get_or_create(
             nombre="Cambio de Aceite",
             defaults={
@@ -391,7 +391,7 @@ try:
                 'activo': True
             }
         )
-        
+
         servicio2, created = Servicio.objects.get_or_create(
             nombre="Revisión de Frenos",
             defaults={
@@ -401,7 +401,7 @@ try:
                 'activo': True
             }
         )
-        
+
         # Crear repuestos
         repuesto1, created = Repuesto.objects.get_or_create(
             nombre="Aceite Motor 15W40",
@@ -412,7 +412,7 @@ try:
                 'activo': True
             }
         )
-        
+
         repuesto2, created = Repuesto.objects.get_or_create(
             nombre="Filtro de Aceite",
             defaults={
@@ -422,9 +422,9 @@ try:
                 'activo': True
             }
         )
-        
+
         print("✅ Marcas, servicios y repuestos creados")
-        
+
         # Obtener empresas creadas
         empresas = Empresa.objects.filter(
             usuario__email__in=[
@@ -434,10 +434,10 @@ try:
                 'test_usa_pago@egarage.com'
             ]
         )
-        
+
         for empresa in empresas:
             print(f"📋 Creando datos para: {empresa.nombre}")
-            
+
             # Determinar configuración por país
             if empresa.pais == 'CL':
                 marca, modelo = marca_chile, modelo_chile
@@ -451,7 +451,7 @@ try:
                     {"nombre": "John Smith", "rut": "SSN123456789", "telefono": "+15551111111"},
                     {"nombre": "Jane Doe", "rut": "SSN987654321", "telefono": "+15552222222"}
                 ]
-            
+
             # Crear clientes
             for cliente_data in clientes_data:
                 cliente = Cliente.objects.create(
@@ -464,7 +464,7 @@ try:
                     activo=True
                 )
                 print(f"  ✅ Cliente: {cliente.nombre}")
-                
+
                 # Crear vehículo para cada cliente
                 vehiculo = Vehiculo.objects.create(
                     empresa=empresa,
@@ -479,7 +479,7 @@ try:
                     activo=True
                 )
                 print(f"  ✅ Vehículo: {vehiculo.marca.nombre} {vehiculo.modelo.nombre}")
-                
+
                 # Crear documento
                 documento = Documento.objects.create(
                     empresa=empresa,
@@ -495,10 +495,10 @@ try:
                     estado='borrador',
                     observaciones='Documento de prueba'
                 )
-                
+
                 # Agregar items
                 subtotal = Decimal('0')
-                
+
                 item1 = DocumentoItem.objects.create(
                     documento=documento,
                     tipo_item='repuesto',
@@ -509,7 +509,7 @@ try:
                     descripcion=f'Repuesto: {repuesto1.nombre}'
                 )
                 subtotal += item1.subtotal
-                
+
                 item2 = DocumentoItem.objects.create(
                     documento=documento,
                     tipo_item='servicio',
@@ -520,21 +520,21 @@ try:
                     descripcion=f'Servicio: {servicio1.nombre}'
                 )
                 subtotal += item2.subtotal
-                
+
                 # Calcular totales
                 impuestos = subtotal * Decimal('0.19')
                 total = subtotal + impuestos
-                
+
                 documento.subtotal = subtotal
                 documento.impuestos = impuestos
                 documento.total = total
                 documento.estado = 'finalizado'
                 documento.save()
-                
+
                 print(f"  ✅ Documento: {documento.numero_documento} - ${total:,.0f}")
-        
+
         print("🎉 TODOS LOS DATOS DE PRUEBA CREADOS")
-    
+
 except Exception as e:
     print(f"❌ Error creando datos: {e}")
     import traceback
@@ -552,9 +552,9 @@ except Exception as e:
 
     informe_contenido = f"""# 📋 INFORME DE DATOS DE PRUEBA - eGarage
 
-**🗓️ Generado:** {datetime.now().strftime('%d de %B de %Y - %H:%M:%S')}  
-**🎯 Propósito:** Pruebas de suscripciones por país  
-**🌎 Países:** Chile 🇨🇱 y USA 🇺🇸  
+**🗓️ Generado:** {datetime.now().strftime('%d de %B de %Y - %H:%M:%S')}
+**🎯 Propósito:** Pruebas de suscripciones por país
+**🌎 Países:** Chile 🇨🇱 y USA 🇺🇸
 
 ---
 
@@ -669,7 +669,7 @@ except Exception as e:
 
 ---
 
-*📅 Archivo generado automáticamente el {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}*  
+*📅 Archivo generado automáticamente el {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}*
 *🤖 Sistema: eGarage Test Data Generator v2.0*
 """
 

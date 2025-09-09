@@ -2,6 +2,7 @@
 """
 Verificar clientes y vehículos disponibles para taller2
 """
+
 import os
 from pathlib import Path
 
@@ -64,17 +65,17 @@ def verificar_datos_taller2():
         cliente_valido = clientes.first()
         vehiculo_valido = vehiculos.filter(cliente=cliente_valido).first()
 
-        print(f"\n✅ DATOS VÁLIDOS PARA TEST:")
+        print("\n✅ DATOS VÁLIDOS PARA TEST:")
         print(
             f"   Cliente ID: {cliente_valido.pk} ({cliente_valido.nombre} {cliente_valido.apellido})"
         )
         if vehiculo_valido:
             print(f"   Vehículo ID: {vehiculo_valido.pk} ({vehiculo_valido.patente})")
         else:
-            print(f"   ⚠️ No hay vehículos para este cliente")
+            print("   ⚠️ No hay vehículos para este cliente")
         print(f"   Número documento sugerido: TALLER2-TEST-{docs.count() + 1}")
     else:
-        print(f"\n❌ PROBLEMA: No hay clientes o vehículos disponibles para taller2")
+        print("\n❌ PROBLEMA: No hay clientes o vehículos disponibles para taller2")
 
 
 if __name__ == "__main__":

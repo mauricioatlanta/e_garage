@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
     <form class="space-y-5" method="POST">
       {% csrf_token %}
       {{ form.non_field_errors }}
-      
+
       <!-- Campo de Usuario/Email -->
       <div>
         <label class="block text-sm font-semibold text-cyan-300" for="id_login">{% trans "Email" %}</label>
@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <p class="text-sm text-cyan-300 mt-1">{% for error in form.login.errors %}{{ error }}<br>{% endfor %}</p>
         {% endif %}
       </div>
-      
+
       <!-- Campo de Contraseña -->
       <div>
         <label class="block text-sm font-semibold text-cyan-300" for="id_password">{% trans "Password" %}</label>
@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <p class="text-sm text-cyan-300 mt-1">{% for error in form.password.errors %}{{ error }}<br>{% endfor %}</p>
         {% endif %}
       </div>
-      
+
       <!-- Campo Remember Me (si existe) -->
       {% if form.remember %}
       <div class="flex items-center space-x-2">
@@ -87,7 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
       {% trans "Don't have an account?" %}
       <a class="text-cyan-300 hover:underline" href="/signup/">{% trans "Register here" %}</a>
     </p>
-    
+
     <!-- Botones de idioma para USA -->
     {% if '/us/' in request.path %}
     <div class="flex justify-center gap-4 mt-4">
@@ -95,7 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <a href="?lang=en" class="text-xs px-3 py-1 rounded-full border border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black transition">🇺🇸 ENG</a>
     </div>
     {% endif %}
-    
+
     <!-- Créditos de Atlanta Reciclajes -->
     <div class="mt-8 pt-4 border-t border-cyan-700/30">
       <p class="text-center text-gray-500 text-xs">
@@ -175,12 +175,12 @@ body {
     animation: textGlow 3s ease-in-out infinite alternate;
 }
 @keyframes textGlow {
-    0% { 
-        background-position: 0% 50%; 
+    0% {
+        background-position: 0% 50%;
         text-shadow: 0 0 20px #00e6ffaa, 0 0 40px #00e6ff44;
     }
-    100% { 
-        background-position: 100% 50%; 
+    100% {
+        background-position: 100% 50%;
         text-shadow: 0 0 30px #00e6ffcc, 0 0 60px #00e6ff66;
     }
 }

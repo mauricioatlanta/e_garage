@@ -2,6 +2,7 @@
 """
 Script de verificación final - Comprobar que el dropdown de vehículos funciona
 """
+
 import os
 
 import django

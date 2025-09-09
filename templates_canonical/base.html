@@ -79,7 +79,7 @@
       <span>❌</span>
       <span>❌</span>
     </div>
-    
+
     {% if company_logo_url %}
       <img src="{{ company_logo_url }}" alt="{{ company_name }} Logo"
            class="company-logo h-20 w-auto rounded-lg shadow-lg border-2 border-opacity-30"
@@ -122,21 +122,21 @@
       {% if not url_vehiculos %}
         {% url 'vehiculos:lista_vehiculos' as url_vehiculos %}
       {% endif %}
-      
+
       {% if not url_vehiculos %}
         {% url 'chile:vehiculos:lista_vehiculos' as url_vehiculos %}
       {% endif %}
-      
+
       {% if not url_vehiculos %}
         {% url 'chile:taller:vehiculos:lista_vehiculos' as url_vehiculos %}
       {% endif %}
-      
+
       {% url 'taller:repuestos:lista_repuestos' as url_repuestos %}
       {% url 'servicios:servicios_menu' as url_servicios %}
       {% if not url_servicios %}
         {% url 'taller:servicios:servicios_menu' as url_servicios %}
       {% endif %}
-      
+
       {% if url_clientes %}
         <a href="{{ url_clientes }}" class="group relative nav-button-power">
           <div class="relative overflow-hidden">
@@ -155,7 +155,7 @@
           </div>
         </a>
       {% endif %}
-      
+
       {% if url_vehiculos %}
         <a href="{{ url_vehiculos }}" class="group relative nav-button-power">
           <div class="relative overflow-hidden">
@@ -174,7 +174,7 @@
           </div>
         </a>
       {% endif %}
-      
+
       {% if url_servicios %}
         <a href="{{ url_servicios }}" class="group relative nav-button-power">
           <div class="relative overflow-hidden">
@@ -193,7 +193,7 @@
           </div>
         </a>
       {% endif %}
-      
+
       {% if url_repuestos %}
         <a href="{{ url_repuestos }}" class="group relative nav-button-power">
           <div class="relative overflow-hidden">
@@ -212,7 +212,7 @@
           </div>
         </a>
       {% endif %}
-      
+
       <!-- Centro de Investigación -->
       <a href="{% if request.path|slice:':3' == '/cl' %}/cl/taller/centro-operaciones-espacial/{% else %}/us/centro-operaciones-espacial/{% endif %}" class="group relative nav-button-power">
         <div class="relative overflow-hidden">
@@ -230,7 +230,7 @@
           <div class="absolute inset-0 bg-gradient-to-r from-orange-500/20 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
         </div>
       </a>
-      
+
       <!-- Reportes -->
       <a href="{% country_url 'reportes_dashboard' app_namespace='reportes' %}" class="group relative nav-button-power">
         <div class="relative overflow-hidden">
@@ -248,7 +248,7 @@
           <div class="absolute inset-0 bg-gradient-to-r from-emerald-500/20 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
         </div>
       </a>
-      
+
       <!-- Settings -->
       <a href="{% if request.path|slice:':3' == '/cl' %}/cl/taller/settings/{% else %}/us/taller/settings/{% endif %}" class="group relative nav-button-power">
         <div class="relative overflow-hidden">
@@ -266,10 +266,10 @@
           <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/20 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
         </div>
       </a>
-      
+
       <!-- Separador visual -->
       <div class="h-6 w-px bg-cyan-400/50"></div>
-      
+
       <!-- Usuario info -->
       <div class="nav-button flex items-center gap-2 px-4 py-2 bg-[#0a0f1a] border border-cyan-400 rounded-lg">
         <div class="w-4 h-4 bg-cyan-400 rounded-sm flex items-center justify-center">
@@ -277,7 +277,7 @@
         </div>
         <span class="text-cyan-300 font-semibold text-sm">{{ request.user.username }}</span>
       </div>
-      
+
       <!-- Logout button -->
       <form action="{% url 'account_logout' %}" method="post" class="inline-block">
         {% csrf_token %}

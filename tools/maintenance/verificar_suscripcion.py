@@ -1,4 +1,3 @@
-from django.core.exceptions import ImproperlyConfigured
 from django.shortcuts import redirect
 from django.urls import reverse
 

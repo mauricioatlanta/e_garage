@@ -9,9 +9,6 @@ class VerificarSuscripcionMiddleware:
     def __call__(self, request):
         if request.user.is_authenticated:
             empresa = getattr(request, "empresa", None)
-            if empresa and hasattr(empresa, 'debe_bloquear') and empresa.debe_bloquear:
+            if empresa and hasattr(empresa, "debe_bloquear") and empresa.debe_bloquear:
                 return redirect(reverse("suscripcion_bloqueada"))
         return self.get_response(request)
-
-
-

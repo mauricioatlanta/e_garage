@@ -2,6 +2,7 @@
 """
 Script de verificación final - todas las URLs corregidas
 """
+
 import os
 
 import django

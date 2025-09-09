@@ -2,6 +2,7 @@
 """
 Script para cargar regiones y ciudades desde regiones_ciudades.json
 """
+
 import json
 import os
 import sys
@@ -20,7 +21,7 @@ def cargar_regiones_ciudades():
     """Carga regiones y ciudades desde el archivo JSON"""
 
     # Leer el archivo JSON
-    with open("regiones_ciudades.json", "r", encoding="utf-8") as f:
+    with open("regiones_ciudades.json", encoding="utf-8") as f:
         data = json.load(f)
 
     print("🚀 Iniciando carga de regiones y ciudades...")
@@ -51,14 +52,14 @@ def cargar_regiones_ciudades():
                 ciudades_creadas += 1
                 print(f"   🏙️ Ciudad creada: {ciudad.nombre}")
 
-    print(f"\n🎉 ¡Proceso completado!")
+    print("\n🎉 ¡Proceso completado!")
     print(f"📊 Regiones creadas: {regiones_creadas}")
     print(f"🏙️ Ciudades creadas: {ciudades_creadas}")
 
     # Verificar datos
     total_regiones = TallerRegion.objects.count()
     total_ciudades = TallerCiudad.objects.count()
-    print(f"\n📈 Total en base de datos:")
+    print("\n📈 Total en base de datos:")
     print(f"   Regiones: {total_regiones}")
     print(f"   Ciudades: {total_ciudades}")
 

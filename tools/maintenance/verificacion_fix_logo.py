@@ -8,8 +8,9 @@ import os
 import sys
 from io import BytesIO
 
-import django
 from PIL import Image
+
+import django
 
 # Configurar Django
 project_root = "e:/projecto/e_garage"

@@ -25,7 +25,7 @@ for nombre, apellido in nombres:
         direccion=f"Calle {apellido} 123",
         ciudad=ciudad,
         region=region,
-        email=f"{nombre.lower()}@tallerpro.cl"
+        email=f"{nombre.lower()}@tallerpro.cl",
     )
 
 print("✅ 10 clientes creados correctamente.")

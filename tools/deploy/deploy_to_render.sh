@@ -36,7 +36,7 @@ if [ -z "$(git status --porcelain)" ]; then
 else
     echo "📋 Cambios detectados:"
     git status --short
-    
+
     read -p "¿Deseas hacer commit de estos cambios? (y/n): " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then

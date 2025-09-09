@@ -194,7 +194,11 @@ if SAFE_MODE:
         "loggers": {
             "django": {"handlers": ["null"], "level": "WARNING", "propagate": False},
             "taller": {"handlers": ["null"], "level": "WARNING", "propagate": False},
-            "django.request": {"handlers": ["console"], "level": "ERROR", "propagate": False},
+            "django.request": {
+                "handlers": ["console"],
+                "level": "ERROR",
+                "propagate": False,
+            },
         },
     }
 else:
@@ -204,9 +208,21 @@ else:
         "handlers": {"console": {"class": "logging.StreamHandler"}},
         "root": {"handlers": ["console"], "level": "INFO"},
         "loggers": {
-            "django.utils.autoreload": {"handlers": ["console"], "level": "WARNING", "propagate": False},
-            "watchdog.observers":     {"handlers": ["console"], "level": "WARNING", "propagate": False},
-            "django.db.backends":     {"handlers": ["console"], "level": "WARNING", "propagate": False},
-            "taller":                 {"handlers": ["console"], "level": "INFO"},
+            "django.utils.autoreload": {
+                "handlers": ["console"],
+                "level": "WARNING",
+                "propagate": False,
+            },
+            "watchdog.observers": {
+                "handlers": ["console"],
+                "level": "WARNING",
+                "propagate": False,
+            },
+            "django.db.backends": {
+                "handlers": ["console"],
+                "level": "WARNING",
+                "propagate": False,
+            },
+            "taller": {"handlers": ["console"], "level": "INFO"},
         },
     }

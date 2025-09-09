@@ -109,7 +109,7 @@ def registro_unificado(request):
                     telefono=telefono,
                     codigo=codigo,
                     ip=request.META.get("REMOTE_ADDR"),
-                    user_agent=request.META.get("HTTP_USER_AGENT", ""),
+                    user_agent=request.headers.get("user-agent", ""),
                 )
                 destinatarios = [email, "suscripcion@atlantareciclajes.cl"]
                 send_mail(

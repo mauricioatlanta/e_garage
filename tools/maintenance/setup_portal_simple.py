@@ -9,10 +9,7 @@ from django.contrib.auth.models import User
 
 from taller.models.cliente import Cliente
 from taller.models.empresa import Empresa
-from taller.models.portal_cliente import (
-    ClienteUsuario,
-    PortalConfiguracion,
-)
+from taller.models.portal_cliente import ClienteUsuario, PortalConfiguracion
 
 
 def configurar_portal():

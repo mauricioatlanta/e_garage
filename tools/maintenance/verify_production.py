@@ -3,6 +3,7 @@
 Script de verificación post-deployment para eGarage
 Verifica que todas las configuraciones de seguridad estén funcionando
 """
+
 import os
 import sys
 

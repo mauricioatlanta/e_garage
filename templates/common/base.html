@@ -26,34 +26,34 @@
       --bs-primary: {{ company_color|default:"#0d6efd" }};
       --bs-secondary: {{ secondary_color|default:"#6c757d" }};
     }
-    
+
     /* Aplicar colores de empresa */
     .text-primary, .navbar-brand { color: var(--company-primary) !important; }
     .bg-primary { background-color: var(--company-primary) !important; }
-    .btn-primary { 
-      background-color: var(--company-primary) !important; 
-      border-color: var(--company-primary) !important; 
+    .btn-primary {
+      background-color: var(--company-primary) !important;
+      border-color: var(--company-primary) !important;
     }
-    .btn-primary:hover { 
-      background-color: color-mix(in srgb, var(--company-primary) 85%, black) !important; 
-      border-color: color-mix(in srgb, var(--company-primary) 85%, black) !important; 
+    .btn-primary:hover {
+      background-color: color-mix(in srgb, var(--company-primary) 85%, black) !important;
+      border-color: color-mix(in srgb, var(--company-primary) 85%, black) !important;
     }
     .border-primary { border-color: var(--company-primary) !important; }
-    
+
     /* Logo personalizado en header */
     .company-logo {
       max-height: 80px;
       max-width: 200px;
       object-fit: contain;
     }
-    
+
     /* Efectos de branding dinámico */
     .company-header {
       background: linear-gradient(135deg, #1f2937 0%, #374151 50%, #1f2937 100%);
       border-bottom: 4px solid var(--company-primary);
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     }
-    
+
     .company-title {
       color: var(--company-primary);
       text-shadow: 0 0 20px var(--company-primary), 0 0 40px var(--company-primary);
@@ -100,19 +100,19 @@
     <span>❌</span>
     <span>❌</span>
   </div>
-  
+
   {% if company_logo_url %}
-    <img src="{{ company_logo_url }}" 
-         alt="{{ company_name }} Logo" 
-         class="company-logo h-20 w-auto rounded-lg shadow-lg border-2 border-opacity-30" 
+    <img src="{{ company_logo_url }}"
+         alt="{{ company_name }} Logo"
+         class="company-logo h-20 w-auto rounded-lg shadow-lg border-2 border-opacity-30"
          style="border-color: {{ company_color|default:'#00ffff' }};">
   {% else %}
-    <div class="company-logo h-20 w-20 bg-gradient-to-br rounded-lg flex items-center justify-center shadow-lg border-2 border-opacity-30" 
+    <div class="company-logo h-20 w-20 bg-gradient-to-br rounded-lg flex items-center justify-center shadow-lg border-2 border-opacity-30"
          style="background: linear-gradient(135deg, {{ company_color|default:'#00ffff' }}80, {{ company_color|default:'#00ffff' }}40); border-color: {{ company_color|default:'#00ffff' }};">
       <span class="text-3xl font-bold text-white">🏢</span>
     </div>
   {% endif %}
-  
+
   <div class="flex flex-col">
     <h1 class="company-title text-4xl font-bold drop-shadow-lg">
       {{ company_name }}
@@ -125,7 +125,7 @@
       </span>
     {% endif %}
   </div>
-  
+
   <div class="ml-auto flex items-center gap-4">
     <!-- Botón Settings -->
     {% if request.user.is_authenticated and request.user.is_staff %}
@@ -139,7 +139,7 @@
         </a>
       {% endif %}
     {% endif %}
-    
+
     <!-- Selector de idioma - solo para US -->
     {% if request.country == "US" %}
     <form action="{% url 'set_language' %}" method="post" class="flex items-center">
@@ -203,13 +203,13 @@
           <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Repuestos{% else %}Parts{% endif %}</span>
         </a>
       {% endif %}
-      
+
       <!-- Centro Espacial -->
       <a href="/cl/taller/centro-operaciones-espacial/" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
         <span>🛰️</span>
         <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Centro Espacial{% else %}Space Center{% endif %}</span>
       </a>
-      
+
       <!-- Settings -->
       <a href="/cl/taller/settings/" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
         <span>⚙️</span>
@@ -249,10 +249,10 @@
           <span class="hidden md:inline">{% trans "Documentos" %}</span>
         </a>
       {% endif %}
-      
+
       <!-- Separador visual -->
       <div class="h-6 w-px bg-cyan-700"></div>
-      
+
       <!-- Configuración -->
       {% url 'taller:configuracion' as url_config %}
       {% if url_config %}
@@ -261,7 +261,7 @@
           <span class="hidden md:inline">{% trans "Configuración" %}</span>
         </a>
       {% endif %}
-      
+
       <!-- 🌐 Selector de idioma -->
       <form action="{% url 'set_language' %}" method="post" class="inline-block mx-2">
         {% csrf_token %}
@@ -276,7 +276,7 @@
           {% endif %}
         </select>
       </form>
-      
+
       <span class="text-cyan-200 font-semibold">{{ request.user.username }}</span>
       <form action="{% url 'account_logout' %}" method="post" style="display:inline;">
         {% csrf_token %}
@@ -356,7 +356,7 @@
     // Función global para confirmar eliminación
     function confirmarEliminacion(nombreCliente) {
         const isSpanish = document.documentElement.lang === 'es';
-        const message = isSpanish 
+        const message = isSpanish
             ? `⚠️ ¿Está seguro de que desea eliminar al cliente "${nombreCliente}"?\n\nEsta acción NO se puede deshacer.\n\nHaga clic en "Aceptar" para eliminar o "Cancelar" para mantener el cliente.`
             : `⚠️ Are you sure you want to delete the client "${nombreCliente}"?\n\nThis action CANNOT be undone.\n\nClick "OK" to delete or "Cancel" to keep the client.`;
         return confirm(message);

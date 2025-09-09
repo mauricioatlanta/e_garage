@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import os
-import sys
 
 import django
 
@@ -9,7 +8,6 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings")
 django.setup()
 
 from taller.models.documento import Documento
-from taller.models.tecnico import Mecanico
 
 try:
     doc = Documento.objects.get(id=41)

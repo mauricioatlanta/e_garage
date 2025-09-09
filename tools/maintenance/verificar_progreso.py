@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import os
 import re
@@ -23,7 +22,7 @@ def verificar_progreso():
     for archivo in archivos:
         if os.path.exists(archivo):
             try:
-                with open(archivo, "r", encoding="utf-8") as f:
+                with open(archivo, encoding="utf-8") as f:
                     contenido = f.read()
 
                 # Buscar .objects.all()
@@ -48,7 +47,7 @@ def verificar_progreso():
         else:
             print(f"Archivo no encontrado: {archivo}")
 
-    print(f"\n=== RESUMEN ===")
+    print("\n=== RESUMEN ===")
     print(f"Total .objects.all() sin filtros: {total_objects_all}")
     print(f"Total .objects.get() sin empresa: {total_get_sin_empresa}")
     print(

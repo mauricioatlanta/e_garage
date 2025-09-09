@@ -2,6 +2,7 @@
 """
 Script de verificación final - Campos de región en formulario de clientes
 """
+
 import os
 
 import django

@@ -7,7 +7,6 @@ Usa comandos individuales de Django para mayor control
 import os
 import subprocess
 import sys
-from datetime import datetime
 
 
 def ejecutar_comando_django(comando, descripcion):

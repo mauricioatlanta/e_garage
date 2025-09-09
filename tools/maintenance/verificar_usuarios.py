@@ -4,7 +4,6 @@ Script para verificar usuarios existentes
 """
 
 import os
-import sys
 
 import django
 
@@ -35,7 +34,7 @@ def verificar_usuarios():
             print(f"      • Empresa: {usuario.empresa.nombre_taller}")
             print(f"      • País: {usuario.empresa.pais}")
         else:
-            print(f"      • Empresa: Sin empresa")
+            print("      • Empresa: Sin empresa")
         print()
 
     print("✅ VERIFICACIÓN COMPLETADA!")

@@ -2,6 +2,7 @@
 """
 Verificar el documento ID 41 y sus datos relacionados
 """
+
 import os
 from pathlib import Path
 
@@ -20,7 +21,6 @@ settings.DATABASES = {
 
 django.setup()
 
-from taller.models.clientes import Cliente
 from taller.models.documento import Documento
 from taller.models.vehiculos import Vehiculo
 
@@ -31,7 +31,7 @@ def verificar_documento_41():
     try:
         # Obtener el documento
         doc = Documento.objects.get(id=41)
-        print(f"📄 Documento encontrado:")
+        print("📄 Documento encontrado:")
         print(f"   ID: {doc.id}")
         print(f"   Número: {doc.numero_documento}")
         print(f"   Tipo: {doc.tipo_documento}")
@@ -41,7 +41,7 @@ def verificar_documento_41():
 
         # Verificar cliente
         cliente = doc.cliente
-        print(f"\n👤 Cliente asociado:")
+        print("\n👤 Cliente asociado:")
         print(f"   ID: {cliente.id}")
         print(f"   Nombre: {cliente.nombre} {cliente.apellido}")
         print(f"   Empresa: {cliente.empresa.nombre_taller}")
@@ -65,15 +65,15 @@ def verificar_documento_41():
         # Verificar si el vehículo del documento pertenece al cliente
         if doc.vehiculo:
             if doc.vehiculo.cliente == doc.cliente:
-                print(f"\n✅ El vehículo del documento pertenece al cliente correcto")
+                print("\n✅ El vehículo del documento pertenece al cliente correcto")
             else:
                 print(
-                    f"\n❌ PROBLEMA: El vehículo del documento NO pertenece al cliente"
+                    "\n❌ PROBLEMA: El vehículo del documento NO pertenece al cliente"
                 )
                 print(f"   Vehículo cliente: {doc.vehiculo.cliente}")
                 print(f"   Documento cliente: {doc.cliente}")
         else:
-            print(f"\n⚠️ El documento no tiene vehículo asignado")
+            print("\n⚠️ El documento no tiene vehículo asignado")
 
     except Documento.DoesNotExist:
         print("❌ Documento ID 41 no encontrado")

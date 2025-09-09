@@ -5,12 +5,10 @@
 # ===============================================================
 
 import os
-import sys
 
 import django
-from django.core.management import execute_from_command_line
 from django.test import Client
-from django.urls import resolve, reverse
+from django.urls import resolve
 
 
 def configurar_django():
@@ -41,7 +39,7 @@ def probar_urls_bienvenida():
             # Probar resolución de URL
             try:
                 resolver_match = resolve(path)
-                print(f"   ✅ URL resuelve correctamente")
+                print("   ✅ URL resuelve correctamente")
                 print(f"   📝 Vista: {resolver_match.func}")
             except Exception as e:
                 print(f"   ❌ Error resolviendo URL: {e}")
@@ -52,16 +50,16 @@ def probar_urls_bienvenida():
             print(f"   📊 Status Code: {response.status_code}")
 
             if response.status_code == 200:
-                print(f"   ✅ Respuesta exitosa")
+                print("   ✅ Respuesta exitosa")
                 # Verificar contenido básico
                 if hasattr(response, "content"):
                     content = response.content.decode("utf-8")
                     if "eGarage" in content:
-                        print(f"   ✅ Contenido correcto encontrado")
+                        print("   ✅ Contenido correcto encontrado")
                     else:
-                        print(f"   ⚠️  Contenido básico presente")
+                        print("   ⚠️  Contenido básico presente")
             elif response.status_code == 404:
-                print(f"   ❌ URL no encontrada (404)")
+                print("   ❌ URL no encontrada (404)")
             else:
                 print(f"   ⚠️  Código inesperado: {response.status_code}")
 

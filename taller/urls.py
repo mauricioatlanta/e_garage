@@ -1,6 +1,5 @@
 from django.urls import include, path
 
-from taller.views_extra import tecnicos_views as tv
 from taller.views_extra.company_settings_views import company_settings_view
 from taller.views_extra.views import dashboard
 from taller.views_extra.views_configuracion import configuracion_empresa

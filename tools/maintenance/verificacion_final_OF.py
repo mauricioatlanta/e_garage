@@ -3,6 +3,7 @@
 Script final de verificación manual
 Ejecutar después de los fixes para demostrar que funciona
 """
+
 import os
 import sys
 

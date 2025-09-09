@@ -2,6 +2,7 @@
 """
 Verificación simple del sistema
 """
+
 import os
 from datetime import datetime
 

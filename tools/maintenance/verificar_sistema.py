@@ -2,6 +2,7 @@
 """
 Script para verificar que todo el sistema está funcionando correctamente
 """
+
 import os
 
 import django
@@ -10,7 +11,6 @@ import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings")
 django.setup()
 
-from django.contrib.auth.models import User
 from django.db import connection
 
 from taller.models import Documento, Empresa, LogAuditoria, PerfilUsuario
@@ -194,7 +194,6 @@ def verificar_sistema_backup():
     print("\n🔍 VERIFICANDO SISTEMA DE BACKUP...")
 
     try:
-        import datetime
         from pathlib import Path
 
         backup_dir = Path(__file__).parent / "backups"

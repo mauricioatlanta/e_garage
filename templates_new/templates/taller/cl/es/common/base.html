@@ -44,20 +44,20 @@
       --bs-primary: {{ primary_color|default:"#0d6efd" }};
       --bs-secondary: {{ secondary_color|default:"#6c757d" }};
     }
-    
+
     /* Aplicar colores de empresa */
     .text-primary, .navbar-brand { color: var(--company-primary) !important; }
     .bg-primary { background-color: var(--company-primary) !important; }
-    .btn-primary { 
-      background-color: var(--company-primary) !important; 
-      border-color: var(--company-primary) !important; 
+    .btn-primary {
+      background-color: var(--company-primary) !important;
+      border-color: var(--company-primary) !important;
     }
-    .btn-primary:hover { 
-      background-color: color-mix(in srgb, var(--company-primary) 85%, black) !important; 
-      border-color: color-mix(in srgb, var(--company-primary) 85%, black) !important; 
+    .btn-primary:hover {
+      background-color: color-mix(in srgb, var(--company-primary) 85%, black) !important;
+      border-color: color-mix(in srgb, var(--company-primary) 85%, black) !important;
     }
     .border-primary { border-color: var(--company-primary) !important; }
-    
+
     /* Logo personalizado en header */
     .company-logo {
       max-height: 60px;
@@ -76,7 +76,7 @@
   <!-- TailwindCSS -->
 
   <!-- Autocomplete Light (DAL) - Comentado para evitar conflicto con Select2 manual -->
-  <!-- 
+  <!--
   <script src="{% static 'autocomplete_light/jquery.init.js' %}"></script>
   <script src="{% static 'autocomplete_light/select2.js' %}"></script>
   <script src="{% static 'autocomplete_light/autocomplete_light.js' %}"></script>
@@ -112,9 +112,9 @@
     <span>❌</span>
     <span>❌</span>
   </div>
-  
-  <img src="{{ company_logo|default:'/static/img/TallerPro_logo.png' }}" 
-       alt="{{ company_name|default:'eGarage' }} Logo" 
+
+  <img src="{{ company_logo|default:'/static/img/TallerPro_logo.png' }}"
+       alt="{{ company_name|default:'eGarage' }} Logo"
        class="company-logo mx-auto">
   <div class="flex flex-col">
     <h1 class="text-xl font-bold text-gray-800">{{ company_name|default:"eGarage" }}</h1>
@@ -124,7 +124,7 @@
       <span class="text-sm text-gray-600">{% if LANGUAGE_CODE == 'es' %}Sistema de Gestión de Talleres{% else %}Workshop Management System{% endif %}</span>
     {% endif %}
   </div>
-  
+
   <div class="ml-auto flex items-center gap-4">
     <!-- Botón Settings -->
     {% if request.user.is_authenticated %}
@@ -139,7 +139,7 @@
         </a>
       {% endif %}
     {% endif %}
-    
+
     <!-- Selector de idioma -->
     <form action="{% url 'set_language' %}" method="post" class="flex items-center">
       {% csrf_token %}
@@ -203,7 +203,7 @@
           <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Repuestos{% else %}Parts{% endif %}</span>
         </a>
       {% endif %}
-      
+
       <!-- Centro Espacial -->
       {% url 'centro_operaciones_espacial' as url_centro_espacial %}
       {% if url_centro_espacial %}
@@ -212,7 +212,7 @@
           <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Centro Espacial{% else %}Space Center{% endif %}</span>
         </a>
       {% endif %}
-      
+
       <!-- Settings -->
       {% load country_url %}
       {% country_url 'company_settings' app_namespace='taller' as url_settings %}
@@ -256,10 +256,10 @@
           <span class="hidden md:inline">{% trans "Documentos" %}</span>
         </a>
       {% endif %}
-      
+
       <!-- Separador visual -->
       <div class="h-6 w-px bg-cyan-700"></div>
-      
+
       <!-- Configuración -->
       {% url 'taller:configuracion' as url_config %}
       {% if url_config %}
@@ -268,7 +268,7 @@
           <span class="hidden md:inline">{% trans "Configuración" %}</span>
         </a>
       {% endif %}
-      
+
       <!-- 🌐 Selector de idioma -->
       <form action="{% url 'set_language' %}" method="post" class="inline-block mx-2">
         {% csrf_token %}
@@ -283,9 +283,9 @@
           {% endif %}
         </select>
       </form>
-      
+
       <!-- Chile siempre en español - sin selector de idioma -->
-      
+
       <span class="text-cyan-200 font-semibold">{{ request.user.username }}</span>
       <form action="{% url 'account_logout' %}" method="post" style="display:inline;">
         {% csrf_token %}

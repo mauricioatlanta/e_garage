@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """Script para verificar datos de mecánicos y documentos"""
+
 import os
 
 import django
@@ -10,7 +11,6 @@ django.setup()
 
 from taller.models.documento import Documento
 from taller.models.empresa import Empresa
-from taller.models.tecnico import Mecanico
 
 print("🔍 VERIFICANDO DATOS DEL SISTEMA...")
 print(f"📊 Empresas: {Empresa.objects.count()}")

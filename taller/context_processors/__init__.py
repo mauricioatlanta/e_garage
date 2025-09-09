@@ -60,8 +60,8 @@ def company_branding(request):
         }
 
     from taller.models import ConfiguracionEmpresa
-    from taller.models.empresa import Empresa
     from taller.models.company_settings import CompanySettings
+    from taller.models.empresa import Empresa
 
     cache_key = f"company_branding_{user.id}"
     cached_data = cache.get(cache_key)
@@ -92,15 +92,25 @@ def company_branding(request):
 
             # Determinar logo URL
             logo_url = "/static/images/egarage_default_logo.png"
-            if company_settings and hasattr(company_settings, 'logo') and company_settings.logo:
+            if (
+                company_settings
+                and hasattr(company_settings, "logo")
+                and company_settings.logo
+            ):
                 logo_url = company_settings.logo.url
 
             # Determinar nombre de empresa
             company_name = "eGarage"
             if company_settings:
-                if hasattr(company_settings, 'company_name') and company_settings.company_name:
+                if (
+                    hasattr(company_settings, "company_name")
+                    and company_settings.company_name
+                ):
                     company_name = company_settings.company_name
-                elif hasattr(company_settings, 'nombre_publico') and company_settings.nombre_publico:
+                elif (
+                    hasattr(company_settings, "nombre_publico")
+                    and company_settings.nombre_publico
+                ):
                     company_name = company_settings.nombre_publico
             elif empresa:
                 company_name = empresa.nombre_taller
@@ -108,9 +118,15 @@ def company_branding(request):
             # Determinar colores
             primary_color = "#0d6efd"
             if company_settings:
-                if hasattr(company_settings, 'primary_color') and company_settings.primary_color:
+                if (
+                    hasattr(company_settings, "primary_color")
+                    and company_settings.primary_color
+                ):
                     primary_color = company_settings.primary_color
-                elif hasattr(company_settings, 'brand_color') and company_settings.brand_color:
+                elif (
+                    hasattr(company_settings, "brand_color")
+                    and company_settings.brand_color
+                ):
                     primary_color = company_settings.brand_color
 
             cached_data = {
@@ -124,11 +140,11 @@ def company_branding(request):
 
             if company_settings:
                 # Agregar campos adicionales según el tipo de configuración
-                if hasattr(company_settings, 'tagline') and company_settings.tagline:
+                if hasattr(company_settings, "tagline") and company_settings.tagline:
                     cached_data["company_tagline"] = company_settings.tagline
-                if hasattr(company_settings, 'currency') and company_settings.currency:
+                if hasattr(company_settings, "currency") and company_settings.currency:
                     cached_data["company_currency"] = company_settings.currency
-                elif hasattr(company_settings, 'moneda') and company_settings.moneda:
+                elif hasattr(company_settings, "moneda") and company_settings.moneda:
                     cached_data["company_currency"] = company_settings.moneda
 
             cache.set(cache_key, cached_data, 3600)

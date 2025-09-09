@@ -2,6 +2,7 @@
 """
 Verificar si el documento 41 se creó correctamente
 """
+
 import os
 
 import django
@@ -49,7 +50,7 @@ try:
     )
     total_documento = total_repuestos + total_servicios
 
-    print(f"\n💰 Totales:")
+    print("\n💰 Totales:")
     print(f"   - Repuestos: ${total_repuestos:,}")
     print(f"   - Servicios: ${total_servicios:,}")
     print(f"   - TOTAL: ${total_documento:,}")

@@ -33,7 +33,7 @@ CSRF_TRUSTED_ORIGINS = [
 
 # SSL/HTTPS (activar si usas HTTPS)
 SECURE_SSL_REDIRECT = True
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 # Cookies seguras
 SESSION_COOKIE_SECURE = True
@@ -44,7 +44,7 @@ CSRF_COOKIE_HTTPONLY = True
 # Headers de seguridad
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
-X_FRAME_OPTIONS = 'DENY'
+X_FRAME_OPTIONS = "DENY"
 
 # HSTS (HTTP Strict Transport Security)
 SECURE_HSTS_SECONDS = 31536000  # 1 año
@@ -58,15 +58,15 @@ SECURE_HSTS_PRELOAD = True
 # Configuración de base de datos para producción
 # Usar variables de entorno para credenciales
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME', 'egarage_prod'),
-        'USER': os.getenv('DB_USER', 'egarage_user'),
-        'PASSWORD': os.getenv('DB_PASSWORD', ''),
-        'HOST': os.getenv('DB_HOST', 'localhost'),
-        'PORT': os.getenv('DB_PORT', '5432'),
-        'OPTIONS': {
-            'sslmode': 'require',
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.getenv("DB_NAME", "egarage_prod"),
+        "USER": os.getenv("DB_USER", "egarage_user"),
+        "PASSWORD": os.getenv("DB_PASSWORD", ""),
+        "HOST": os.getenv("DB_HOST", "localhost"),
+        "PORT": os.getenv("DB_PORT", "5432"),
+        "OPTIONS": {
+            "sslmode": "require",
         },
     }
 }
@@ -77,14 +77,14 @@ DATABASES = {
 
 # Configuración de caché para producción
 CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': os.getenv('REDIS_URL', 'redis://localhost:6379/1'),
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": os.getenv("REDIS_URL", "redis://localhost:6379/1"),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
         },
-        'KEY_PREFIX': 'egarage_prod',
-        'TIMEOUT': 300,  # 5 minutos
+        "KEY_PREFIX": "egarage_prod",
+        "TIMEOUT": 300,  # 5 minutos
     }
 }
 
@@ -93,65 +93,65 @@ CACHES = {
 # =============================================================================
 
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
-            'style': '{',
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
+            "style": "{",
         },
-        'simple': {
-            'format': '{levelname} {message}',
-            'style': '{',
-        },
-    },
-    'handlers': {
-        'file': {
-            'level': 'INFO',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs', 'egarage_prod.log'),
-            'maxBytes': 1024*1024*15,  # 15MB
-            'backupCount': 10,
-            'formatter': 'verbose',
-        },
-        'error_file': {
-            'level': 'ERROR',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs', 'egarage_errors.log'),
-            'maxBytes': 1024*1024*15,  # 15MB
-            'backupCount': 10,
-            'formatter': 'verbose',
-        },
-        'console': {
-            'level': 'WARNING',
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple',
+        "simple": {
+            "format": "{levelname} {message}",
+            "style": "{",
         },
     },
-    'root': {
-        'handlers': ['console', 'file'],
-        'level': 'INFO',
+    "handlers": {
+        "file": {
+            "level": "INFO",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": os.path.join(BASE_DIR, "logs", "egarage_prod.log"),
+            "maxBytes": 1024 * 1024 * 15,  # 15MB
+            "backupCount": 10,
+            "formatter": "verbose",
+        },
+        "error_file": {
+            "level": "ERROR",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": os.path.join(BASE_DIR, "logs", "egarage_errors.log"),
+            "maxBytes": 1024 * 1024 * 15,  # 15MB
+            "backupCount": 10,
+            "formatter": "verbose",
+        },
+        "console": {
+            "level": "WARNING",
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
+        },
     },
-    'loggers': {
-        'django': {
-            'handlers': ['file', 'error_file'],
-            'level': 'INFO',
-            'propagate': False,
+    "root": {
+        "handlers": ["console", "file"],
+        "level": "INFO",
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["file", "error_file"],
+            "level": "INFO",
+            "propagate": False,
         },
-        'taller': {
-            'handlers': ['file', 'error_file'],
-            'level': 'INFO',
-            'propagate': False,
+        "taller": {
+            "handlers": ["file", "error_file"],
+            "level": "INFO",
+            "propagate": False,
         },
-        'django.request': {
-            'handlers': ['error_file'],
-            'level': 'ERROR',
-            'propagate': False,
+        "django.request": {
+            "handlers": ["error_file"],
+            "level": "ERROR",
+            "propagate": False,
         },
-        'django.security': {
-            'handlers': ['error_file'],
-            'level': 'WARNING',
-            'propagate': False,
+        "django.security": {
+            "handlers": ["error_file"],
+            "level": "WARNING",
+            "propagate": False,
         },
     },
 }
@@ -161,25 +161,32 @@ LOGGING = {
 # =============================================================================
 
 # Configuración de email para producción
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
-EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.gmail.com")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
-DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'noreply@tu-dominio.com')
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "noreply@tu-dominio.com")
 
 # =============================================================================
 # ARCHIVOS ESTÁTICOS
 # =============================================================================
 
 # Configuración de archivos estáticos para producción
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
 
 # Configuración de archivos media para producción
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_URL = "/media/"
 
 # =============================================================================
 # OPTIMIZACIONES
@@ -189,8 +196,8 @@ MEDIA_URL = '/media/'
 DEBUG_TOOLBAR = False
 
 # Configuración de sesiones
-SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
-SESSION_CACHE_ALIAS = 'default'
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "default"
 
 # Configuración de archivos
 FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
@@ -204,7 +211,7 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
 # Sentry para tracking de errores
 # import sentry_sdk
 # from sentry_sdk.integrations.django import DjangoIntegration
-# 
+#
 # sentry_sdk.init(
 #     dsn=os.getenv('SENTRY_DSN'),
 #     integrations=[DjangoIntegration()],
@@ -217,7 +224,7 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
 # =============================================================================
 
 # SECRET_KEY debe estar en variables de entorno
-SECRET_KEY = os.getenv('SECRET_KEY', 'your-secret-key-here')
+SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-here")
 
 # Configuración de CORS (si usas API)
 CORS_ALLOWED_ORIGINS = [
@@ -234,7 +241,7 @@ EGARAGE_PROD = True
 
 # Configuración de backup automático
 BACKUP_ENABLED = True
-BACKUP_SCHEDULE = '0 2 * * *'  # Diario a las 2 AM
+BACKUP_SCHEDULE = "0 2 * * *"  # Diario a las 2 AM
 
 # Configuración de notificaciones
 NOTIFICATIONS_ENABLED = True
@@ -243,11 +250,11 @@ NOTIFICATIONS_SMS = False  # Configurar según necesidad
 
 # Configuración de reportes
 REPORTS_ENABLED = True
-REPORTS_SCHEDULE = '0 6 * * 1'  # Lunes a las 6 AM
+REPORTS_SCHEDULE = "0 6 * * 1"  # Lunes a las 6 AM
 
 # Configuración de limpieza de datos
 DATA_CLEANUP_ENABLED = True
-DATA_CLEANUP_SCHEDULE = '0 3 * * 0'  # Domingo a las 3 AM
+DATA_CLEANUP_SCHEDULE = "0 3 * * 0"  # Domingo a las 3 AM
 
 # =============================================================================
 # CHECKLIST DE SEGURIDAD

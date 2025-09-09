@@ -2,6 +2,7 @@
 """
 Script para verificar la integración entre taller2 y la creación de documentos
 """
+
 import os
 from pathlib import Path
 
@@ -61,7 +62,7 @@ def verificar_empresa_taller2():
             print(f"\n📋 Empresas sin usuario: {empresas_sin_usuario.count()}")
 
         # Verificar que la empresa esté bien asociada al usuario taller2
-        print(f"\n🔍 Verificando empresa específica de taller2:")
+        print("\n🔍 Verificando empresa específica de taller2:")
         print(f"   PerfilUsuario.empresa: {perfil.empresa}")
         print(f"   PerfilUsuario.empresa.usuario: {perfil.empresa.usuario}")
 

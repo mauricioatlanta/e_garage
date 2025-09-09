@@ -19,7 +19,7 @@
 <a href="{% url 'taller:vehiculos:crear_vehiculo' %}">➕ Agregar Vehículo</a>
 ```
 
-# RESULTADO: 
+# RESULTADO:
 # VIEW: taller.vehiculos.views crear_vehiculo
 ```
 
@@ -32,7 +32,7 @@
 # ANTES (problemático):
 path('vehiculos/', include(('taller.vehiculos.urls_chile', 'vehiculos_chile'), namespace='vehiculos_chile')),
 
-# DESPUÉS (corregido):  
+# DESPUÉS (corregido):
 path('vehiculos/', include(('taller.vehiculos.urls', 'vehiculos'), namespace='vehiculos')),
 ```
 
@@ -45,9 +45,9 @@ path('vehiculos/', include(('taller.vehiculos.urls', 'vehiculos'), namespace='ve
 **Características Implementadas**:
 - 🌍 **Detección automática de país**: `country = getattr(empresa, 'pais', 'CL').strip().upper()`
 - 🔧 **Flag de debug para testing**: `force_us=1` para usuarios staff
-- 📊 **Log de confirmación**: 
+- 📊 **Log de confirmación**:
   ```python
-  print('[DEBUG crear_vehiculo] user=', request.user.username, 
+  print('[DEBUG crear_vehiculo] user=', request.user.username,
         'empresa_pais=', getattr(request.user.empresa, 'pais', None),
         'country_ctx=', country)
   ```
@@ -130,12 +130,12 @@ resolve('/taller/vehiculos/crear/').func.__module__ == 'taller.vehiculos.views'
 
 ## 🚀 SIGUIENTE PASO
 
-**Acceder a**: `http://127.0.0.1:8000/taller/vehiculos/crear/` 
+**Acceder a**: `http://127.0.0.1:8000/taller/vehiculos/crear/`
 
 **Con usuario**: `testuser_usa` (empresa.pais='US')
 
 **Verificar que aparezca**:
-- ✅ `[DEBUG country: US]` 
+- ✅ `[DEBUG country: US]`
 - ✅ Bandera USA 🇺🇸
 - ✅ Campos "Brand (USA)" y "Model (USA)"
 - ✅ Log en consola: `[DEBUG crear_vehiculo] ... country_ctx= US`

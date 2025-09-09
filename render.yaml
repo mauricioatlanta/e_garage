@@ -9,7 +9,7 @@ services:
     buildCommand: |
       # Instalar dependencias
       pip install -r requirements.txt
-      
+
       # Pre-checks livianos (no deben fallar el build)
       echo "🔍 Verificando configuración mínima..."
       python - <<'PY'
@@ -23,27 +23,27 @@ services:
           print(f"⚠️  Django minimal warning: {e}")
           # No fallar el build por esto
       PY
-      
+
       # Verificar estructura básica
       echo "🔍 Verificando estructura de directorios..."
       mkdir -p staticfiles media logs
-      
+
       # Compilar archivos estáticos
       echo "📦 Compilando archivos estáticos..."
       DJANGO_SETTINGS_MODULE=gestion_taller.settings.prod python manage.py collectstatic --noinput
-      
+
       # Compilar mensajes i18n
       echo "🌍 Compilando mensajes i18n..."
       DJANGO_SETTINGS_MODULE=gestion_taller.settings.prod python manage.py compilemessages
-      
+
       echo "✅ Build completado exitosamente"
-    
+
     startCommand: |
       # Migraciones y arranque
       echo "🚀 Iniciando eGarage..."
       DJANGO_SETTINGS_MODULE=gestion_taller.settings.prod python manage.py migrate --noinput
       gunicorn gestion_taller.wsgi:application --workers 3 --timeout 90 --bind 0.0.0.0:$PORT
-    
+
     envVars:
       - key: DJANGO_SETTINGS_MODULE
         value: gestion_taller.settings.prod
@@ -66,13 +66,13 @@ services:
       # Modo seguro como fallback
       - key: EGARAGE_SAFE_MODE
         value: "0"
-    
+
     healthCheckPath: /ping/
-    
+
     # Configuración de auto-deploy
     autoDeploy: true
     branch: main
-    
+
     # Configuración de logs
     logRetentionPolicy:
       type: limited

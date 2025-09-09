@@ -25,20 +25,20 @@
       --bs-primary: {{ primary_color|default:"#0d6efd" }};
       --bs-secondary: {{ secondary_color|default:"#6c757d" }};
     }
-    
+
     /* Apply company colors */
     .text-primary, .navbar-brand { color: var(--company-primary) !important; }
     .bg-primary { background-color: var(--company-primary) !important; }
-    .btn-primary { 
-      background-color: var(--company-primary) !important; 
-      border-color: var(--company-primary) !important; 
+    .btn-primary {
+      background-color: var(--company-primary) !important;
+      border-color: var(--company-primary) !important;
     }
-    .btn-primary:hover { 
-      background-color: color-mix(in srgb, var(--company-primary) 85%, black) !important; 
-      border-color: color-mix(in srgb, var(--company-primary) 85%, black) !important; 
+    .btn-primary:hover {
+      background-color: color-mix(in srgb, var(--company-primary) 85%, black) !important;
+      border-color: color-mix(in srgb, var(--company-primary) 85%, black) !important;
     }
     .border-primary { border-color: var(--company-primary) !important; }
-    
+
     /* Custom logo in header */
     .company-logo {
       max-height: 60px;
@@ -75,8 +75,8 @@
 
 <!-- Unified header and navigation (now with dynamic branding) -->
 <header class="flex items-center gap-4 p-4 bg-white shadow-md">
-  <img src="{{ company_logo|default:'/static/img/TallerPro_logo.png' }}" 
-       alt="{{ company_name|default:'eGarage' }} Logo" 
+  <img src="{{ company_logo|default:'/static/img/TallerPro_logo.png' }}"
+       alt="{{ company_name|default:'eGarage' }} Logo"
        class="company-logo mx-auto">
   <div class="flex flex-col">
     <h1 class="text-xl font-bold text-gray-800">{{ company_name|default:"eGarage" }}</h1>
@@ -86,7 +86,7 @@
       <span class="text-sm text-gray-600">Workshop Management System</span>
     {% endif %}
   </div>
-  
+
   <div class="ml-auto flex items-center gap-4">
     <!-- Settings Button -->
     {% if request.user.is_authenticated %}
@@ -101,7 +101,7 @@
         </a>
       {% endif %}
     {% endif %}
-    
+
     <!-- Language selector - Solo para USA -->
     {% if request.country == "US" %}
     <form action="{% url 'set_language' %}" method="post" class="flex items-center">
@@ -159,19 +159,19 @@
           <span class="hidden md:inline">Parts</span>
         </a>
       {% endif %}
-      
+
       <!-- Space Center -->
       <a href="{% url 'usa:centro_operaciones_espacial' %}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
         <span>🛰️</span>
         <span class="hidden md:inline">Space Center</span>
       </a>
-      
+
       <!-- Reports -->
       <a href="{% url 'reportes_us_en:dashboard' %}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
         <span>📊</span>
         <span class="hidden md:inline">Reports</span>
       </a>
-      
+
       <!-- Settings -->
       {% load country_url %}
       {% country_url 'company_settings' app_namespace='taller' as url_settings %}
@@ -188,7 +188,7 @@
           <span class="hidden md:inline">Services</span>
         </a>
       {% endif %}
-      
+
       <!-- Other Services -->
       {% url 'usa:servicios:otros_servicios_menu' as url_otros %}
       {% if url_otros %}
@@ -211,10 +211,10 @@
           <span class="hidden md:inline">Documents</span>
         </a>
       {% endif %}
-      
+
       <!-- Visual separator -->
       <div class="h-6 w-px bg-cyan-700"></div>
-      
+
       <!-- Configuration -->
       {% url 'taller:configuracion' as url_config %}
       {% if url_config %}
@@ -223,7 +223,7 @@
           <span class="hidden md:inline">Configuration</span>
         </a>
       {% endif %}
-      
+
       <!-- Language selector - Solo para USA -->
       {% if request.country == "US" %}
       <form action="{% url 'set_language' %}" method="post" class="inline-block mx-2">
@@ -235,7 +235,7 @@
         </select>
       </form>
       {% endif %}
-      
+
       <span class="text-cyan-200 font-semibold">{{ request.user.username }}</span>
       <form action="{% url 'account_logout' %}" method="post" style="display:inline;">
         {% csrf_token %}
@@ -310,4 +310,3 @@
 </script>
 </body>
 </html>
-

@@ -6,19 +6,19 @@
 {{ block.super }}
 <style>
 /* Temas dinámicos para tipos de documento - MEJORADOS */
-.theme-ot   { 
-  background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%); 
-  border: 3px solid #22d3ee; 
+.theme-ot   {
+  background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+  border: 3px solid #22d3ee;
   box-shadow: 0 0 20px rgba(34, 211, 238, 0.3);
 }
-.theme-fac  { 
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); 
-  border: 3px solid #a78bfa; 
+.theme-fac  {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  border: 3px solid #a78bfa;
   box-shadow: 0 0 20px rgba(167, 139, 250, 0.3);
 }
-.theme-pres { 
-  background: linear-gradient(135deg, #102a43 0%, #243b53 50%, #1e3a8a 100%); 
-  border: 3px solid #34d399; 
+.theme-pres {
+  background: linear-gradient(135deg, #102a43 0%, #243b53 50%, #1e3a8a 100%);
+  border: 3px solid #34d399;
   box-shadow: 0 0 20px rgba(52, 211, 153, 0.3);
 }
 
@@ -159,7 +159,7 @@ input[type="checkbox"] {
 {% block documento_content %}
 <form method="post" id="document-form" class="max-w-7xl mx-auto">
   {% csrf_token %}
-  
+
   <!-- Mensajes del sistema -->
   {% if messages %}
     {% for message in messages %}
@@ -204,10 +204,10 @@ input[type="checkbox"] {
 
   <!-- Shell del documento con tema dinámico -->
   <div id="doc-shell" class="rounded-3xl p-6 theme-ot border-2">
-    
+
     <!-- Cabecera del documento -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-      
+
       <!-- Tipo de documento -->
       <div class="space-y-4">
         <label class="block text-cyan-200 font-semibold">Tipo de Documento</label>
@@ -216,7 +216,7 @@ input[type="checkbox"] {
           <option value="FAC">Factura</option>
           <option value="PRES">Presupuesto</option>
         </select>
-        
+
                  <!-- Número (readonly) -->
          <label class="block text-cyan-200 font-semibold">Número</label>
          <div class="form-control w-full bg-gray-800 text-cyan-300 font-mono text-center py-3" id="id_numero">
@@ -227,13 +227,13 @@ input[type="checkbox"] {
       <!-- Cliente y Vehículo -->
       <div class="space-y-4">
         <label class="block text-cyan-200 font-semibold">Cliente</label>
-        
+
         <!-- Campo de búsqueda AJAX -->
         <div class="relative">
           <input type="text" id="cliente-busqueda" class="form-control w-full" placeholder="Escribe para buscar clientes..." autocomplete="off">
           <div id="cliente-resultados" class="absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
         </div>
-        
+
         <!-- Campo de selección oculto -->
         <select id="id_cliente" name="cliente" class="form-select w-full hidden">
           <option value="">Seleccione cliente...</option>
@@ -241,7 +241,7 @@ input[type="checkbox"] {
             <option value="{{ cliente.id }}">{{ cliente.nombre }} {{ cliente.apellido }}</option>
           {% endfor %}
         </select>
-        
+
         <!-- Información del cliente seleccionado -->
         <div id="cliente-info" class="hidden p-3 bg-cyan-900/20 border border-cyan-400 rounded-lg">
           <div class="text-cyan-200 text-sm">
@@ -403,9 +403,9 @@ input[type="checkbox"] {
       <h3 class="text-2xl font-bold text-cyan-300 mb-4">📝 Observaciones</h3>
       <div class="space-y-4">
         <label class="block text-cyan-200 font-semibold">Notas adicionales</label>
-        <textarea 
-          name="observaciones" 
-          class="form-control w-full h-32 resize-y" 
+        <textarea
+          name="observaciones"
+          class="form-control w-full h-32 resize-y"
           placeholder="Observaciones opcionales - Puede dejarse vacío si no hay información adicional..."
         >{{ form.observaciones.value|default:'' }}</textarea>
         {% if form.observaciones.errors %}
@@ -417,7 +417,7 @@ input[type="checkbox"] {
     <!-- Totales -->
     <div class="totales-section">
       <h3 class="text-2xl font-bold text-cyan-300 mb-4">💰 Totales</h3>
-      
+
       <!-- Checkbox IVA junto a totales -->
       <div class="mb-4">
         <label class="flex items-center text-cyan-200">
@@ -425,7 +425,7 @@ input[type="checkbox"] {
           Aplicar IVA (19%)
         </label>
       </div>
-      
+
              <div class="space-y-2">
                   <div class="totales-row">
             <span class="text-cyan-200">Neto Repuestos:</span>
@@ -494,25 +494,25 @@ function formatCLP(n) {
   return new Intl.NumberFormat('es-CL', { style:'currency', currency:'CLP', maximumFractionDigits:0 }).format(Number(n)||0);
 }
 
-function money(n){ 
-  return COUNTRY==='CL' ? formatCLP(n) : new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(Number(n)||0); 
+function money(n){
+  return COUNTRY==='CL' ? formatCLP(n) : new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(Number(n)||0);
 }
 
 // Funciones para manejo de precios
 function formatPriceInput(input) {
   let value = input.value.replace(/[^\d.-]/g, '');
-  
+
   if (value === '' || value === '-') {
     input.value = '';
     return;
   }
-  
+
   let numValue = parseFloat(value);
   if (isNaN(numValue)) {
     input.value = '';
     return;
   }
-  
+
   // Formatear según el país
   if (COUNTRY === 'US') {
     input.value = numValue.toFixed(2);
@@ -526,7 +526,7 @@ function handlePriceInput(input) {
   input.addEventListener('blur', () => {
     formatPriceInput(input);
   });
-  
+
   // Permitir solo números, punto decimal y guión
   input.addEventListener('input', (e) => {
     const value = e.target.value;
@@ -534,7 +534,7 @@ function handlePriceInput(input) {
       e.target.value = value.replace(/[^\d.-]/g, '');
     }
   });
-  
+
   // Prevenir múltiples puntos decimales
   input.addEventListener('keydown', (e) => {
     if (e.key === '.' && e.target.value.includes('.')) {
@@ -558,7 +558,7 @@ function applyTheme(tipo) {
   if (tipo === 'FAC') shell.classList.add('theme-fac');
   else if (tipo === 'PRES') shell.classList.add('theme-pres');
   else shell.classList.add('theme-ot'); // OT por defecto
-  
+
   // Actualizar número automáticamente
   updateDocumentNumber();
 }
@@ -566,20 +566,20 @@ function applyTheme(tipo) {
  async function updateDocumentNumber() {
    const tipo = selTipo.value;
    const numeroField = document.getElementById('id_numero');
-   
+
    if (tipo) {
      try {
        // Usar URL canónica si está disponible, fallback a construida
        const urlNextNumber = "/cl/documentos/api/obtener-numero-documento/";
        console.log('🔢 Obteniendo próximo número:', { tipo, url: urlNextNumber });
-       
+
        // Hacer llamada AJAX para obtener el siguiente número
        const response = await fetch(`${urlNextNumber}?tipo=${encodeURIComponent(tipo)}`, {
          headers: {
            'X-Requested-With': 'XMLHttpRequest'
          }
        });
-       
+
        if (response.ok) {
          const data = await response.json();
          numeroField.textContent = data.numero || `Número ${tipo}`;
@@ -608,7 +608,7 @@ async function cargarVehiculosPorCliente(clienteId) {
 
   console.log('🔄 Cargando vehículos para cliente:', clienteId, 'URL:', urlVeh);
   selVeh.innerHTML = '<option value="">-- Cargando vehículos... --</option>';
-  
+
   try {
     const r = await fetch(`${urlVeh}?cliente=${encodeURIComponent(clienteId)}`, {
       headers: { 'X-Requested-With': 'XMLHttpRequest' },
@@ -619,7 +619,7 @@ async function cargarVehiculosPorCliente(clienteId) {
 
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
     const data = await r.json();
-    
+
     console.log('✅ Datos vehículos recibidos:', data);
 
     const items = Array.isArray(data) ? data : (data.results || []);
@@ -667,13 +667,13 @@ async function buscarClientes(query) {
       },
       credentials: 'same-origin'
     });
-    
-    console.log('📡 Respuesta:', { 
-      status: response.status, 
-      ok: response.ok, 
-      contentType: response.headers.get('content-type') 
+
+    console.log('📡 Respuesta:', {
+      status: response.status,
+      ok: response.ok,
+      contentType: response.headers.get('content-type')
     });
-    
+
     // Verificar si es un redirect de login
     if (response.status === 302 || response.status === 401) {
       console.error('❌ Usuario no autenticado - redirigiendo a login');
@@ -681,7 +681,7 @@ async function buscarClientes(query) {
       clienteResultados.classList.remove('hidden');
       return;
     }
-    
+
     if (response.ok) {
       const contentType = response.headers.get('content-type');
       if (!contentType || !contentType.includes('application/json')) {
@@ -690,10 +690,10 @@ async function buscarClientes(query) {
         clienteResultados.classList.remove('hidden');
         return;
       }
-      
+
       const data = await response.json();
       console.log('✅ Datos recibidos:', data);
-      
+
       // Normalizar datos - manejar diferentes formatos
       let clientes = [];
       if (Array.isArray(data)) {
@@ -706,7 +706,7 @@ async function buscarClientes(query) {
         console.warn('⚠️ Formato inesperado:', data);
         clientes = [];
       }
-      
+
       mostrarResultadosClientes(clientes);
     } else {
       console.error('❌ Error HTTP:', response.status, response.statusText);
@@ -729,22 +729,22 @@ function mostrarResultadosClientes(clientes) {
 
   clienteResultados.innerHTML = clientes.map(cliente => {
     // Manejar diferentes formatos de datos de cliente
-    const nombre = cliente.text || 
-                   cliente.nombre_completo || 
-                   cliente.nombre || 
-                   cliente.razon_social || 
-                   `Cliente #${cliente.id}` || 
+    const nombre = cliente.text ||
+                   cliente.nombre_completo ||
+                   cliente.nombre ||
+                   cliente.razon_social ||
+                   `Cliente #${cliente.id}` ||
                    'Cliente sin nombre';
-    
+
     const email = cliente.email || '';
     const telefono = cliente.telefono || '';
     const rut = cliente.rut || '';
-    
+
     console.log('📋 Procesando cliente:', { id: cliente.id, nombre, email, telefono, rut });
-    
+
     return `
-      <div class="cliente-item p-3 hover:bg-cyan-700 cursor-pointer border-b border-cyan-600 last:border-b-0" 
-           data-id="${cliente.id || ''}" 
+      <div class="cliente-item p-3 hover:bg-cyan-700 cursor-pointer border-b border-cyan-600 last:border-b-0"
+           data-id="${cliente.id || ''}"
            data-nombre="${nombre}"
            data-email="${email}"
            data-telefono="${telefono}">
@@ -768,19 +768,19 @@ function mostrarResultadosClientes(clientes) {
 async function seleccionarCliente(clienteId, nombre, email, telefono) {
   // Ocultar resultados
   clienteResultados.classList.add('hidden');
-  
+
   // Limpiar campo de búsqueda
   clienteBusqueda.value = nombre;
-  
+
   // Seleccionar en el select oculto
   clienteSelect.value = clienteId;
-  
+
   // Mostrar información del cliente
   document.getElementById('cliente-nombre').textContent = nombre;
   document.getElementById('cliente-email').textContent = email || 'Sin email';
   document.getElementById('cliente-telefono').textContent = telefono || 'Sin teléfono';
   clienteInfo.classList.remove('hidden');
-  
+
   // Cargar vehículos directamente
   await cargarVehiculosPorCliente(clienteId);
 }
@@ -823,10 +823,10 @@ clienteResultados?.addEventListener('click', (e) => {
 document.addEventListener('DOMContentLoaded', () => {
   applyTheme(selTipo?.value);
   updateDocumentNumber();
-  
+
   // 🚀 Inicializar búsqueda de clientes con Select2
   console.log('🔧 Configurando búsqueda de clientes...');
-  
+
   try {
     const clienteSelect = $('#id_cliente');
     if (clienteSelect.length && typeof $.fn.select2 === 'function') {
@@ -855,7 +855,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const request = $.ajax({
               url: params.url,
               data: params.data,
-              headers: { 
+              headers: {
                 'X-Requested-With': 'XMLHttpRequest',
                 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
               }
@@ -869,12 +869,12 @@ document.addEventListener('DOMContentLoaded', () => {
         language: 'es',
         allowClear: true
       });
-      
+
       console.log('✅ Select2 configurado correctamente');
     } else {
       console.log('⚠️ Select2 no disponible, usando búsqueda básica');
     }
-    
+
     // Configurar evento de cambio de cliente
     $('#id_cliente').on('change', function() {
       const clienteId = $(this).val();
@@ -888,7 +888,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     });
-    
+
   } catch (error) {
     console.error('❌ Error configurando búsqueda de clientes:', error);
   }
@@ -939,12 +939,12 @@ function wireRepRow(row) {
   inpCode?.addEventListener('change', () => fetchByCode(inpCode.value.trim()));
   qEl?.addEventListener('input', recalc);
   inpPV?.addEventListener('input', recalc);
-  
+
   // Aplicar manejo de precios al campo de precio de venta
   if (inpPV) {
     handlePriceInput(inpPV);
   }
-  
+
   recalc(); // Inicializar
 }
 
@@ -966,12 +966,12 @@ function wireServRow(row) {
 
   qEl?.addEventListener('input', recalc);
   pEl?.addEventListener('input', recalc);
-  
+
   // Aplicar manejo de precios al campo de precio
   if (pEl) {
     handlePriceInput(pEl);
   }
-  
+
   recalc(); // Inicializar
 }
 
@@ -993,18 +993,18 @@ function wireOtroRow(row) {
 
   qEl?.addEventListener('input', recalc);
   pEl?.addEventListener('input', recalc);
-  
+
   // Aplicar manejo de precios al campo de precio
   if (pEl) {
     handlePriceInput(pEl);
   }
-  
+
   // Aplicar manejo de precios al campo de precio de taller
   const inpPrecioTaller = row.querySelector('.otr-precio-taller');
   if (inpPrecioTaller) {
     handlePriceInput(inpPrecioTaller);
   }
-  
+
   recalc(); // Inicializar
 }
 
@@ -1044,7 +1044,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.rep-row').forEach(wireRepRow);
   document.querySelectorAll('.serv-row').forEach(wireServRow);
   document.querySelectorAll('.otr-row').forEach(wireOtroRow);
-  
+
   // Inicializar totales con formato chileno
   setTimeout(() => {
     window.recalcTotales();
@@ -1056,7 +1056,7 @@ document.getElementById('add-repuesto')?.addEventListener('click', () => {
   const container = document.getElementById('repuestos-container');
   const formCount = document.getElementById('id_rep-TOTAL_FORMS');
   const currentCount = parseInt(formCount.value);
-  
+
      // Crear nueva fila de repuesto
    const newRow = document.createElement('div');
    newRow.className = 'rep-row linea-row';
@@ -1093,13 +1093,13 @@ document.getElementById('add-repuesto')?.addEventListener('click', () => {
          </div>
       </div>
    `;
-  
+
   container.appendChild(newRow);
   formCount.value = currentCount + 1;
-  
+
      // Wire la nueva fila
    wireRepRow(newRow);
-   
+
    // Posicionar cursor en el campo código de la nueva fila
    const newCodeField = newRow.querySelector('.rep-codigo');
    if (newCodeField) {
@@ -1111,7 +1111,7 @@ document.getElementById('add-servicio')?.addEventListener('click', () => {
   const container = document.getElementById('servicios-container');
   const formCount = document.getElementById('id_serv-TOTAL_FORMS');
   const currentCount = parseInt(formCount.value);
-  
+
      // Crear nueva fila de servicio
    const newRow = document.createElement('div');
    newRow.className = 'serv-row linea-row';
@@ -1137,10 +1137,10 @@ document.getElementById('add-servicio')?.addEventListener('click', () => {
          </div>
       </div>
    `;
-  
+
   container.appendChild(newRow);
   formCount.value = currentCount + 1;
-  
+
   // Wire la nueva fila
   wireServRow(newRow);
 });
@@ -1149,7 +1149,7 @@ document.getElementById('add-otro')?.addEventListener('click', () => {
   const container = document.getElementById('otros-container');
   const formCount = document.getElementById('id_otr-TOTAL_FORMS');
   const currentCount = parseInt(formCount.value);
-  
+
      // Crear nueva fila de otro servicio
    const newRow = document.createElement('div');
    newRow.className = 'otr-row linea-row';
@@ -1183,10 +1183,10 @@ document.getElementById('add-otro')?.addEventListener('click', () => {
          </div>
       </div>
    `;
-  
+
   container.appendChild(newRow);
   formCount.value = currentCount + 1;
-  
+
   // Wire la nueva fila
   wireOtroRow(newRow);
 });

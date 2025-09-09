@@ -2,6 +2,7 @@
 """
 Script simple para crear usuarios de prueba
 """
+
 import os
 import sys
 
@@ -106,7 +107,7 @@ def crear_usuarios_prueba():
         print("ℹ️ Empresa Taller Premium ya existe")
 
     print("\n📊 Resumen de cuentas:")
-    print(f"   Admin: admin / admin123")
+    print("   Admin: admin / admin123")
     print(f"   Taller1: taller1 / taller123 ({empresa1.nombre_taller})")
     print(f"   Taller2: taller2 / taller123 ({empresa2.nombre_taller})")
 

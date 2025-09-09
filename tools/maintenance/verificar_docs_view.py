@@ -1,7 +1,6 @@
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Count
 from django.http import HttpResponse
-from django.shortcuts import render
 
 from taller.models import Documento, Empresa
 
@@ -9,44 +8,48 @@ from taller.models import Documento, Empresa
 @staff_member_required
 def verificar_documentos(request):
     """Vista para verificar el estado de los documentos"""
-    
+
     context = {
-        'total_documentos': 0,
-        'total_empresas': 0,
-        'documentos_recientes': [],
-        'error': None
+        "total_documentos": 0,
+        "total_empresas": 0,
+        "documentos_recientes": [],
+        "error": None,
     }
-    
+
     try:
         # Conteos básicos
-        context['total_documentos'] = Documento.objects.count()
-        context['total_empresas'] = Empresa.objects.count()
-        
+        context["total_documentos"] = Documento.objects.count()
+        context["total_empresas"] = Empresa.objects.count()
+
         # Documentos recientes con anotaciones
-        documentos = Documento.objects.annotate(
-            rep_count=Count("lineas_repuesto", distinct=True),
-            serv_count=Count("lineas_servicio", distinct=True), 
-            otros_count=Count("lineas_otro_servicio", distinct=True)
-        ).select_related('empresa', 'cliente').order_by('-id')[:10]
-        
-        context['documentos_recientes'] = [
+        documentos = (
+            Documento.objects.annotate(
+                rep_count=Count("lineas_repuesto", distinct=True),
+                serv_count=Count("lineas_servicio", distinct=True),
+                otros_count=Count("lineas_otro_servicio", distinct=True),
+            )
+            .select_related("empresa", "cliente")
+            .order_by("-id")[:10]
+        )
+
+        context["documentos_recientes"] = [
             {
-                'id': doc.id,
-                'numero': getattr(doc, 'numero_documento', 'N/A'),
-                'empresa': doc.empresa.nombre if doc.empresa else 'N/A',
-                'country': getattr(doc.empresa, 'country', 'N/A'),
-                'cliente': str(doc.cliente) if doc.cliente else 'N/A',
-                'rep_count': getattr(doc, 'rep_count', 0),
-                'serv_count': getattr(doc, 'serv_count', 0),
-                'otros_count': getattr(doc, 'otros_count', 0),
-                'total': getattr(doc, 'total', 0),
+                "id": doc.id,
+                "numero": getattr(doc, "numero_documento", "N/A"),
+                "empresa": doc.empresa.nombre if doc.empresa else "N/A",
+                "country": getattr(doc.empresa, "country", "N/A"),
+                "cliente": str(doc.cliente) if doc.cliente else "N/A",
+                "rep_count": getattr(doc, "rep_count", 0),
+                "serv_count": getattr(doc, "serv_count", 0),
+                "otros_count": getattr(doc, "otros_count", 0),
+                "total": getattr(doc, "total", 0),
             }
             for doc in documentos
         ]
-        
+
     except Exception as e:
-        context['error'] = str(e)
-    
+        context["error"] = str(e)
+
     html = f"""
     <!DOCTYPE html>
     <html>
@@ -63,15 +66,15 @@ def verificar_documentos(request):
     </head>
     <body>
         <h1>🔍 Verificación de Documentos</h1>
-        
+
         {'<div class="error">Error: ' + context["error"] + '</div>' if context["error"] else ''}
-        
+
         <div class="success">
             <h2>📊 Resumen</h2>
             <p><strong>Total Empresas:</strong> {context["total_empresas"]}</p>
             <p><strong>Total Documentos:</strong> {context["total_documentos"]}</p>
         </div>
-        
+
         <h2>📄 Últimos 10 Documentos</h2>
         <table>
             <thead>
@@ -94,12 +97,12 @@ def verificar_documentos(request):
                 ])}
             </tbody>
         </table>
-        
+
         <h2>🔧 Acciones</h2>
         <p><a href="/chile/documentos/lista/">Ver Lista Chile</a></p>
         <p><a href="/us/documentos/lista/">Ver Lista USA</a></p>
         <p><a href="/admin/">Admin Django</a></p>
-        
+
         <h2>🔄 Comandos para ejecutar en terminal</h2>
         <pre>
 # Limpiar y crear documentos USA
@@ -113,5 +116,5 @@ print("Docs:", Documento.objects.count())
     </body>
     </html>
     """
-    
+
     return HttpResponse(html)

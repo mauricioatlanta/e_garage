@@ -2,6 +2,7 @@
 """
 Script de debug para verificar el problema de modelos en el formulario
 """
+
 import os
 
 import django
@@ -36,10 +37,10 @@ Array.from(selectMarca.options).forEach((option, index) => {
 // 3. Función para probar manualmente una marca específica
 function probarMarca(marcaId) {
     console.log(`🧪 PROBANDO MARCA ID: ${marcaId}`);
-    
+
     const apiUrl = `/api/modelos/${marcaId}/`;
     console.log(`📡 URL: ${apiUrl}`);
-    
+
     fetch(apiUrl)
         .then(res => {
             console.log(`📊 Status: ${res.status}`);

@@ -2,6 +2,7 @@
 """
 Script de verificación final del sistema de login corregido
 """
+
 import os
 
 import django

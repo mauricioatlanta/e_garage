@@ -9,7 +9,6 @@ Script para crear servicios subcontratados de ejemplo y probar los nuevos report
 import os
 
 import django
-from django.conf import settings
 
 # Configurar Django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings")
@@ -164,7 +163,7 @@ def crear_datos_prueba():
             print(f"❌ Error creando documento {i}: {e}")
             continue
 
-    print(f"✅ Datos de prueba creados:")
+    print("✅ Datos de prueba creados:")
     print(f"   📄 Documentos: {documentos_creados}")
     print(f"   🔧 Servicios externos: {servicios_creados}")
     print(f"   🏢 Proveedores únicos: {len(servicios_externos)}")
@@ -177,15 +176,15 @@ def crear_datos_prueba():
     total_costos = sum([s.costo_interno for s in OtroServicioDocumento.objects.all()])
     ganancia_total = total_ingresos - total_costos
 
-    print(f"\n📊 Estadísticas generales:")
+    print("\n📊 Estadísticas generales:")
     print(f"   💰 Total ingresos: ${total_ingresos:,}")
     print(f"   💸 Total costos: ${total_costos:,}")
     print(f"   📈 Ganancia total: ${ganancia_total:,}")
     print(f"   📊 Margen promedio: {(ganancia_total/total_ingresos*100):.1f}%")
 
-    print(f"\n🎯 Reportes disponibles en:")
-    print(f"   🌐 http://127.0.0.1:8001/reportes/")
-    print(f"   📈 http://127.0.0.1:8001/reportes/dashboard-rentabilidad/")
+    print("\n🎯 Reportes disponibles en:")
+    print("   🌐 http://127.0.0.1:8001/reportes/")
+    print("   📈 http://127.0.0.1:8001/reportes/dashboard-rentabilidad/")
 
 
 if __name__ == "__main__":

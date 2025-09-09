@@ -3,6 +3,7 @@
 Script de verificación final para la configuración USA
 Verifica que todo esté funcionando correctamente
 """
+
 import os
 import sys
 from decimal import Decimal

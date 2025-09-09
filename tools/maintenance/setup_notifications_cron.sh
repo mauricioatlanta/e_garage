@@ -29,7 +29,7 @@ if crontab -l 2>/dev/null | grep -q "notification_agent.py"; then
     echo "⚠️  Ya existe una entrada de cronjob para notification_agent.py"
     echo "📋 Entradas actuales:"
     crontab -l | grep notification_agent.py
-    
+
     read -p "¿Deseas reemplazarla? (y/n): " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then

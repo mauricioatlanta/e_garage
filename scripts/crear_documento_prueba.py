@@ -7,12 +7,10 @@ sys.path.append(".")
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings_sqlite")
 django.setup()
 
-import json
 
 from django.contrib.auth.models import User
 
-from taller.models import (Cliente, Documento, RepuestoDocumento,
-                           ServicioDocumento)
+from taller.models import Cliente, Documento, RepuestoDocumento, ServicioDocumento
 from taller.models.empresa import Empresa
 
 # Buscar usuario y empresa
@@ -52,7 +50,7 @@ try:
     print(f"Servicio creado: {servicio.id}")
 
     # Verificar las relaciones
-    print(f"\n=== VERIFICACIÓN ===")
+    print("\n=== VERIFICACIÓN ===")
     print(f"Documento {documento.id}:")
     print(f"  Repuestos: {documento.repuestos.count()}")
     print(f"  Servicios: {documento.servicios.count()}")

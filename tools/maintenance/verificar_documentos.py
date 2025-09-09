@@ -2,6 +2,7 @@
 """
 Script simple para verificar documentos existentes y su estado
 """
+
 import os
 import sys
 
@@ -22,7 +23,7 @@ def verificar_documentos():
 
     documentos = Documento.objects.all().order_by("-id")[:10]
     print(f"Total documentos en BD: {Documento.objects.count()}")
-    print(f"Mostrando últimos 10 documentos:")
+    print("Mostrando últimos 10 documentos:")
     print("-" * 80)
 
     for doc in documentos:
@@ -45,9 +46,9 @@ def verificar_documentos():
             print(f"     - {s.nombre} | ${precio_s}")
 
         if repuestos.count() == 0 and servicios.count() == 0:
-            print(f"   ❌ DOCUMENTO VACÍO")
+            print("   ❌ DOCUMENTO VACÍO")
         else:
-            print(f"   ✅ DOCUMENTO CON ITEMS")
+            print("   ✅ DOCUMENTO CON ITEMS")
         print("-" * 40)
 
 

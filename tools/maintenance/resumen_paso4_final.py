@@ -76,15 +76,15 @@ print(
         <option value="{{ marca.id }}">{{ marca.nombre }}</option>
         {% endfor %}
     </select>
-    
+
     <select id="id_modelo" name="modelo" disabled>
         <option value="">Seleccione marca primero</option>
     </select>
-    
+
     <select id="id_motor" name="motor" disabled>
         <option value="">Seleccione modelo primero</option>
     </select>
-    
+
     <select id="id_caja" name="caja" disabled>
         <option value="">Seleccione modelo primero</option>
     </select>

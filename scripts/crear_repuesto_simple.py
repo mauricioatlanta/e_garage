@@ -2,8 +2,8 @@
 """
 Script simple para crear un repuesto ficticio usando SQLite
 """
+
 import os
-import sys
 
 import django
 
@@ -54,7 +54,7 @@ def main():
         "stock": 8,
     }
 
-    print(f"\n📝 Creando repuesto con datos:")
+    print("\n📝 Creando repuesto con datos:")
     for key, value in datos.items():
         print(f"   {key}: {value}")
 
@@ -69,7 +69,7 @@ def main():
         repuesto.empresa = empresa
         repuesto.save()
 
-        print(f"\n🎉 ¡REPUESTO FICTICIO CREADO!")
+        print("\n🎉 ¡REPUESTO FICTICIO CREADO!")
         print(f"   🆔 ID: {repuesto.id}")
         print(f"   📦 Nombre: {repuesto.nombre_repuesto}")
         print(f"   🔢 Part Number: {repuesto.part_number}")

@@ -61,7 +61,7 @@
 
     /* ===== NEON GLOW EFFECTS ===== */
     .neon-glow {
-        box-shadow: 
+        box-shadow:
             0 0 5px #00ffff,
             0 0 10px #00ffff,
             0 0 15px #00ffff,
@@ -71,14 +71,14 @@
 
     @keyframes neonPulse {
         from {
-            box-shadow: 
+            box-shadow:
                 0 0 5px #00ffff,
                 0 0 10px #00ffff,
                 0 0 15px #00ffff,
                 0 0 20px #00ffff;
         }
         to {
-            box-shadow: 
+            box-shadow:
                 0 0 10px #00ffff,
                 0 0 20px #00ffff,
                 0 0 30px #00ffff,
@@ -165,7 +165,7 @@
 
     .control-panel:hover {
         transform: translateY(-5px);
-        box-shadow: 
+        box-shadow:
             0 10px 30px rgba(0, 255, 255, 0.3),
             0 0 20px rgba(0, 255, 255, 0.2);
     }
@@ -214,7 +214,7 @@
     .futuristic-input:focus {
         outline: none;
         border-color: #00ffff;
-        box-shadow: 
+        box-shadow:
             0 0 10px rgba(0, 255, 255, 0.5),
             inset 0 0 10px rgba(0, 255, 255, 0.1);
         background: rgba(0, 0, 0, 0.9);
@@ -397,15 +397,15 @@
         .control-title {
             font-size: 2rem;
         }
-        
+
         .futuristic-container {
             padding: 1rem;
         }
-        
+
         .control-panel {
             padding: 1.5rem;
         }
-        
+
         .technician-grid {
             grid-template-columns: 1fr;
         }
@@ -491,18 +491,18 @@
         <form method="post" enctype="multipart/form-data" id="companyForm">
             {% csrf_token %}
             <input type="hidden" name="section" value="company">
-            
+
             <div class="row">
                 <div class="col-md-6">
                     <label class="futuristic-label">Company Name</label>
-                    <input type="text" name="company_name" class="futuristic-input" 
-                           value="{{ company_settings.company_name|default:'' }}" 
+                    <input type="text" name="company_name" class="futuristic-input"
+                           value="{{ company_settings.company_name|default:'' }}"
                            placeholder="Enter your company name">
                 </div>
                 <div class="col-md-6">
                     <label class="futuristic-label">Tagline / Motto</label>
-                    <input type="text" name="tagline" class="futuristic-input" 
-                           value="{{ company_settings.tagline|default:'' }}" 
+                    <input type="text" name="tagline" class="futuristic-input"
+                           value="{{ company_settings.tagline|default:'' }}"
                            placeholder="Your company motto">
                 </div>
             </div>
@@ -510,19 +510,19 @@
             <div class="row mt-3">
                 <div class="col-md-6">
                     <label class="futuristic-label">Address</label>
-                    <textarea name="address" class="futuristic-input" rows="3" 
+                    <textarea name="address" class="futuristic-input" rows="3"
                               placeholder="Company address">{{ company_settings.address|default:'' }}</textarea>
                 </div>
                 <div class="col-md-6">
                     <label class="futuristic-label">Contact Information</label>
-                    <input type="text" name="phone" class="futuristic-input mb-2" 
-                           value="{{ company_settings.phone|default:'' }}" 
+                    <input type="text" name="phone" class="futuristic-input mb-2"
+                           value="{{ company_settings.phone|default:'' }}"
                            placeholder="Phone number">
-                    <input type="email" name="email" class="futuristic-input mb-2" 
-                           value="{{ company_settings.email|default:'' }}" 
+                    <input type="email" name="email" class="futuristic-input mb-2"
+                           value="{{ company_settings.email|default:'' }}"
                            placeholder="Email address">
-                    <input type="url" name="website" class="futuristic-input" 
-                           value="{{ company_settings.website|default:'' }}" 
+                    <input type="url" name="website" class="futuristic-input"
+                           value="{{ company_settings.website|default:'' }}"
                            placeholder="Website URL">
                 </div>
             </div>
@@ -537,7 +537,7 @@
                             <div style="color: #666; font-style: italic;">No logo uploaded</div>
                         {% endif %}
                     </div>
-                    <input type="file" name="logo" class="futuristic-input" accept="image/*" 
+                    <input type="file" name="logo" class="futuristic-input" accept="image/*"
                            onchange="previewLogo(this)">
                 </div>
             </div>
@@ -545,7 +545,7 @@
             <div class="row mt-3">
                 <div class="col-md-6">
                     <label class="futuristic-label">Primary Color</label>
-                    <input type="color" name="primary_color" class="futuristic-input" 
+                    <input type="color" name="primary_color" class="futuristic-input"
                            value="{{ company_settings.primary_color|default:'#00ffff' }}">
                 </div>
                 <div class="col-md-6">
@@ -580,21 +580,21 @@
             {% csrf_token %}
             <input type="hidden" name="section" value="technician">
             <input type="hidden" name="action" value="add">
-            
+
             <div class="row">
                 <div class="col-md-4">
                     <label class="futuristic-label">Full Name</label>
-                    <input type="text" name="nombre" class="futuristic-input" 
+                    <input type="text" name="nombre" class="futuristic-input"
                            placeholder="Technician name" required>
                 </div>
                 <div class="col-md-4">
                     <label class="futuristic-label">Phone</label>
-                    <input type="tel" name="telefono" class="futuristic-input" 
+                    <input type="tel" name="telefono" class="futuristic-input"
                            placeholder="Phone number">
                 </div>
                 <div class="col-md-4">
                     <label class="futuristic-label">Address</label>
-                    <input type="text" name="direccion" class="futuristic-input" 
+                    <input type="text" name="direccion" class="futuristic-input"
                            placeholder="Address">
                 </div>
             </div>
@@ -677,7 +677,7 @@
 function createParticles() {
     const particlesContainer = document.getElementById('particles');
     const particleCount = 50;
-    
+
     for (let i = 0; i < particleCount; i++) {
         const particle = document.createElement('div');
         particle.className = 'particle';
@@ -713,7 +713,7 @@ function toggleTechnician(technicianId, activate) {
     formData.append('action', 'toggle');
     formData.append('technician_id', technicianId);
     formData.append('activate', activate);
-    
+
     fetch(window.location.href, {
         method: 'POST',
         body: formData
@@ -735,7 +735,7 @@ function deleteTechnician(technicianId) {
         formData.append('section', 'technician');
         formData.append('action', 'delete');
         formData.append('technician_id', technicianId);
-        
+
         fetch(window.location.href, {
             method: 'POST',
             body: formData
@@ -769,14 +769,14 @@ document.getElementById('technicianForm').addEventListener('submit', function(e)
 // ===== INITIALIZE =====
 document.addEventListener('DOMContentLoaded', function() {
     createParticles();
-    
+
     // Add some interactive effects
     const panels = document.querySelectorAll('.control-panel');
     panels.forEach(panel => {
         panel.addEventListener('mouseenter', function() {
             this.style.transform = 'translateY(-5px) scale(1.02)';
         });
-        
+
         panel.addEventListener('mouseleave', function() {
             this.style.transform = 'translateY(0) scale(1)';
         });

@@ -4,7 +4,6 @@ Script de verificación para la restricción de usuario único por empresa
 """
 
 import os
-import sys
 
 import django
 

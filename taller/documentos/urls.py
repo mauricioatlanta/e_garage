@@ -1,6 +1,3 @@
-import os
-import sys
-
 from django.urls import path
 
 # from .api import lista_debug  # Función no existe

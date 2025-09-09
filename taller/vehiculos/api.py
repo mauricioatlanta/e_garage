@@ -219,11 +219,10 @@ def api_cajas_por_modelo(request):
     return JsonResponse(data, safe=False)
 
 
-from django.http import JsonResponse, HttpResponseNotAllowed
+from django.db import transaction
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-from django.db import transaction
-import json
+
 
 @csrf_exempt
 @require_http_methods(["POST"])
@@ -242,8 +241,8 @@ def api_create(request):
     if missing:
         return JsonResponse({"error": "missing_fields", "fields": missing}, status=400)
 
-    from taller.models.empresa import Empresa
     from taller.models.clientes import Cliente
+    from taller.models.empresa import Empresa
     from taller.models.vehiculos import Vehiculo
 
     # Fetch FKs

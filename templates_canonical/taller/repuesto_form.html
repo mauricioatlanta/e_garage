@@ -55,7 +55,7 @@
           </p>
         </div>
         {% endif %}
-        
+
         <button type="submit" class="px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-700 text-white shadow">
           {% if form.instance.pk %}
             {% if LANGUAGE_CODE == 'es' %}Guardar cambios{% else %}Save changes{% endif %}
@@ -76,21 +76,3 @@
 {% block extra_js %}
 <script src="{% static 'taller/js/repuestos_form.js' %}"></script>
 {% endblock extra_js %}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

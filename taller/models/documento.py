@@ -350,9 +350,13 @@ class Documento(AuditMixin, models.Model):
         verbose_name_plural = _("Documentos")
         indexes = [
             # Índices optimizados para KPIs
-            models.Index(fields=["empresa", "fecha_emision"]),  # KPI por empresa y fecha
+            models.Index(
+                fields=["empresa", "fecha_emision"]
+            ),  # KPI por empresa y fecha
             models.Index(fields=["fecha_emision"]),  # KPI global por fecha
-            models.Index(fields=["tecnico_responsable", "fecha_emision"]),  # KPI por técnico y fecha
+            models.Index(
+                fields=["tecnico_responsable", "fecha_emision"]
+            ),  # KPI por técnico y fecha
             models.Index(fields=["estado", "fecha_emision"]),  # KPI por estado y fecha
             models.Index(fields=["tipo", "fecha_emision"]),  # KPI por tipo y fecha
             # Índices de rendimiento general

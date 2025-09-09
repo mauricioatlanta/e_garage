@@ -28,20 +28,20 @@
       --bs-primary: {{ primary_color|default:"#0d6efd" }};
       --bs-secondary: {{ secondary_color|default:"#6c757d" }};
     }
-    
+
     /* Aplicar colores de empresa */
     .text-primary, .navbar-brand { color: var(--company-primary) !important; }
     .bg-primary { background-color: var(--company-primary) !important; }
-    .btn-primary { 
-      background-color: var(--company-primary) !important; 
-      border-color: var(--company-primary) !important; 
+    .btn-primary {
+      background-color: var(--company-primary) !important;
+      border-color: var(--company-primary) !important;
     }
-    .btn-primary:hover { 
-      background-color: color-mix(in srgb, var(--company-primary) 85%, black) !important; 
-      border-color: color-mix(in srgb, var(--company-primary) 85%, black) !important; 
+    .btn-primary:hover {
+      background-color: color-mix(in srgb, var(--company-primary) 85%, black) !important;
+      border-color: color-mix(in srgb, var(--company-primary) 85%, black) !important;
     }
     .border-primary { border-color: var(--company-primary) !important; }
-    
+
     /* Logo personalizado en header */
     .company-logo {
       max-height: 60px;
@@ -96,21 +96,21 @@
 
 <!-- Header y navegación unificados (ahora con branding dinámico) -->
 <header class="flex items-center gap-4 p-4 bg-white shadow-md">
-  
+
   <!-- Red crosses in header -->
   <div class="flex items-center gap-2 text-red-500 text-2xl">
     <span>❌</span>
     <span>❌</span>
     <span>❌</span>
   </div>
-  
+
   {% if company_logo_url %}
-    <img src="{{ company_logo_url }}" 
-         alt="{{ company_name|default:'eGarage' }} Logo" 
+    <img src="{{ company_logo_url }}"
+         alt="{{ company_name|default:'eGarage' }} Logo"
          class="company-logo mx-auto h-8 w-auto">
   {% else %}
-    <img src="{% static 'img/TallerPro_logo.png' %}" 
-         alt="{{ company_name|default:'eGarage' }} Logo" 
+    <img src="{% static 'img/TallerPro_logo.png' %}"
+         alt="{{ company_name|default:'eGarage' }} Logo"
          class="company-logo mx-auto h-8 w-auto">
   {% endif %}
   <div class="flex flex-col">
@@ -123,7 +123,7 @@
       {% endif %}
     {% endblock %}
   </div>
-  
+
   <div class="ml-auto flex items-center gap-4">
     <!-- Botón Settings -->
     {% if request.user.is_authenticated %}
@@ -138,7 +138,7 @@
         </a>
       {% endif %}
     {% endif %}
-    
+
     <!-- Selector de idioma -->
     <form action="{% url 'set_language' %}" method="post" class="flex items-center">
       {% csrf_token %}
@@ -207,7 +207,7 @@
           <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Repuestos{% else %}Parts{% endif %}</span>
         </a>
       {% endif %}
-      
+
       {% if request.path|slice:':3' == '/us' %}
         {% url 'usa:servicios:servicios_menu' as url_servicios %}
       {% else %}
@@ -225,7 +225,7 @@
           <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Servicios{% else %}Services{% endif %}</span>
         </a>
       {% endif %}
-      
+
       <!-- Otros Servicios -->
       {% if request.path|slice:':3' == '/us' %}
         {% url 'usa:servicios:otros_servicios_menu' as url_otros %}
@@ -244,13 +244,13 @@
           <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Otros Servicios{% else %}Other Services{% endif %}</span>
         </a>
       {% endif %}
-      
+
       <!-- Centro Espacial -->
       <a href="{% if request.path|slice:':3' == '/cl' %}/cl/taller/centro-operaciones-espacial/{% else %}/us/centro-operaciones-espacial/{% endif %}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
         <span>🛰️</span>
         <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Centro Espacial{% else %}Space Center{% endif %}</span>
       </a>
-      
+
       <!-- Settings -->
       <a href="{% if request.path|slice:':3' == '/cl' %}/cl/taller/settings/{% else %}/us/taller/settings/{% endif %}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
         <span>⚙️</span>
@@ -270,34 +270,34 @@
           <span class="hidden md:inline">{% trans "Documentos" %}</span>
         </a>
       {% endif %}
-      
+
       <!-- Reportes -->
       <a href="{% if request.path|slice:':3' == '/cl' %}/cl/taller/reportes/{% else %}/us/taller/reportes/{% endif %}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
         <span>📊</span>
         <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Reportes{% else %}Reports{% endif %}</span>
       </a>
-      
+
       <!-- Dashboard -->
       <a href="/dashboard/" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
         <span>🏠</span>
         <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Dashboard{% else %}Dashboard{% endif %}</span>
       </a>
-      
+
       <!-- Mis vehículos -->
       <a href="/vehiculos/" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
         <span>🚗</span>
         <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Mis vehículos{% else %}My Vehicles{% endif %}</span>
       </a>
-      
+
       <!-- Correos -->
       <a href="/account/email/" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
         <span>📧</span>
         <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Correos{% else %}Emails{% endif %}</span>
       </a>
-      
+
       <!-- Separador visual -->
       <div class="h-6 w-px bg-cyan-700"></div>
-      
+
       <!-- Configuración -->
       {% url 'taller:configuracion' as url_config %}
       {% if url_config %}
@@ -306,7 +306,7 @@
           <span class="hidden md:inline">{% trans "Configuración" %}</span>
         </a>
       {% endif %}
-      
+
       <!-- 🌐 Selector de idioma -->
       <form action="{% url 'set_language' %}" method="post" class="inline-block mx-2">
         {% csrf_token %}
@@ -321,7 +321,7 @@
           {% endif %}
         </select>
       </form>
-      
+
       <span class="text-cyan-200 font-semibold">{{ request.user.username }}</span>
       <form action="{% url 'account_logout' %}" method="post" style="display:inline;">
         {% csrf_token %}
@@ -345,10 +345,10 @@
 <footer class="bg-black/80 border-t border-cyan-700/40 py-4 mt-auto">
   <div class="container mx-auto px-4 text-center">
     <span class="text-xs text-gray-400 block">© {% now "Y" %} <strong class="text-cyan-300">{{ company_name|default:"Atlanta Reciclajes" }}</strong> — {% if LANGUAGE_CODE == 'es' %}Todos los derechos reservados{% else %}All rights reserved{% endif %}.</span>
-    
+
     <!-- Información de contacto de la empresa -->
     {% include "common/_footer_company.html" %}
-    
+
     {% if company_settings.address or company_settings.phone or company_settings.email %}
       <span class="text-xs text-gray-400 block">
         {% if company_settings.address %}{{ company_settings.address }}{% endif %}
@@ -397,7 +397,7 @@
 </script>
 
 <!-- Portal nuclear para elementos que deben aparecer por encima de TODO -->
-<div id="eg-portal" 
+<div id="eg-portal"
      class="fixed inset-0 pointer-events-none"
      style="z-index:2147483647 !important;"></div>
 

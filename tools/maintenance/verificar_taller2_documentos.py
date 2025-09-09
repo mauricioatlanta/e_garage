@@ -2,6 +2,7 @@
 """
 Script para verificar el problema de taller2 con documentos
 """
+
 # Configurar Django
 import os
 from pathlib import Path
@@ -12,7 +13,6 @@ BASE_DIR = Path(__file__).resolve().parent
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "e_garage.settings")
 
 # Configurar temporalmente SQLite
-import django
 from django.conf import settings
 
 # Sobrescribir configuración de base de datos
@@ -27,9 +27,7 @@ django.setup()
 
 from django.contrib.auth.models import User
 
-from taller.models.documento import (Documento, RepuestoDocumento,
-                                     ServicioDocumento)
-from taller.models.empresa import Empresa
+from taller.models.documento import Documento, RepuestoDocumento, ServicioDocumento
 from taller.models.perfilusuario import PerfilUsuario
 
 
@@ -48,14 +46,14 @@ def verificar_taller2():
         # 2. Verificar PerfilUsuario
         try:
             perfil = PerfilUsuario.objects.get(user=user)
-            print(f"\n✅ PerfilUsuario encontrado:")
+            print("\n✅ PerfilUsuario encontrado:")
             print(f"   ID: {perfil.pk}")
             print(f"   Empresa: {perfil.empresa}")
             print(f"   Empresa ID: {perfil.empresa.pk if perfil.empresa else 'NULL'}")
             print(f"   Rol: {perfil.rol}")
 
             if perfil.empresa:
-                print(f"\n📋 Información de la Empresa:")
+                print("\n📋 Información de la Empresa:")
                 print(f"   Nombre: {perfil.empresa.nombre_taller}")
                 print(f"   Suscripción activa: {perfil.empresa.suscripcion_activa}")
                 print(f"   Fecha inicio: {perfil.empresa.fecha_inicio}")
@@ -96,7 +94,7 @@ def verificar_taller2():
         # 4. Verificar último documento con problemas
         ultimo_doc = docs.first()
         if ultimo_doc:
-            print(f"\n🔎 ANÁLISIS DETALLADO DEL ÚLTIMO DOCUMENTO:")
+            print("\n🔎 ANÁLISIS DETALLADO DEL ÚLTIMO DOCUMENTO:")
             print(f"   Documento #{ultimo_doc.numero_documento}")
             print(f"   Tipo: {ultimo_doc.tipo_documento}")
             print(f"   Cliente: {ultimo_doc.cliente}")
@@ -104,7 +102,7 @@ def verificar_taller2():
 
             repuestos_bd = RepuestoDocumento.objects.filter(documento=ultimo_doc)
             servicios_bd = ServicioDocumento.objects.filter(documento=ultimo_doc)
-            print(f"\n   Items en base de datos:")
+            print("\n   Items en base de datos:")
             print(f"     Repuestos: {repuestos_bd.count()}")
             print(f"     Servicios: {servicios_bd.count()}")
 

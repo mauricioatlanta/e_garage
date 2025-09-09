@@ -6,17 +6,23 @@ Prefijo: /us/
 from django.urls import include, path
 
 from taller import ajax_views
-from taller.views_extra.ajax import buscar_clientes, vehiculos_por_cliente
-from taller.views_extra.country_views import dashboard_usa_view, test_usa_view
-from taller.views_extra.views import dashboard
-from taller.views_extra.dashboard_empresa import dashboard_centro_operaciones, dashboard_centro_operaciones_espacial
 from taller.taller_views import dashboard_suscripciones
-from taller.views_extra.views_configuracion import configuracion_empresa, configuracion_tecnicos
+from taller.views_extra.ajax import buscar_clientes, vehiculos_por_cliente
 from taller.views_extra.company_settings_views import company_settings_view
+from taller.views_extra.country_views import test_usa_view
+from taller.views_extra.dashboard_empresa import (
+    dashboard_centro_operaciones,
+    dashboard_centro_operaciones_espacial,
+)
 from taller.views_extra.futuristic_company_settings_views import (
-    futuristic_company_settings_view,
+    api_technician_delete,
     api_technician_toggle,
-    api_technician_delete
+    futuristic_company_settings_view,
+)
+from taller.views_extra.views import dashboard
+from taller.views_extra.views_configuracion import (
+    configuracion_empresa,
+    configuracion_tecnicos,
 )
 
 
@@ -54,20 +60,32 @@ urlpatterns = [
     path("", dashboard, name="home"),
     # Incluir las rutas específicas que necesitamos
     path("dashboard/", dashboard, name="dashboard"),
-    path("centro-operaciones/", dashboard_centro_operaciones, name="centro_operaciones"),
-    path("centro-operaciones-espacial/", dashboard_centro_operaciones_espacial, name="centro_operaciones_espacial"),
+    path(
+        "centro-operaciones/", dashboard_centro_operaciones, name="centro_operaciones"
+    ),
+    path(
+        "centro-operaciones-espacial/",
+        dashboard_centro_operaciones_espacial,
+        name="centro_operaciones_espacial",
+    ),
     path("admin/dashboard/", dashboard_suscripciones, name="dashboard_suscripciones"),
     path("configuracion/", configuracion_empresa, name="configuracion"),
-    path("configuracion/tecnicos/", configuracion_tecnicos, name="configuracion_tecnicos"),
+    path(
+        "configuracion/tecnicos/", configuracion_tecnicos, name="configuracion_tecnicos"
+    ),
     path("settings/", company_settings_view, name="company_settings"),
-    path("en/settings/", futuristic_company_settings_view, name="futuristic_company_settings"),
+    path(
+        "en/settings/",
+        futuristic_company_settings_view,
+        name="futuristic_company_settings",
+    ),
     # API endpoints for technician management
     path("api/technician/toggle/", api_technician_toggle, name="api_technician_toggle"),
     path("api/technician/delete/", api_technician_delete, name="api_technician_delete"),
     # Test endpoint USA
     path("test/", test_usa_view, name="test"),
     # === MÓDULOS PRINCIPALES ===
-    # NOTA: Los submódulos principales (clientes, vehiculos, repuestos, servicios, 
+    # NOTA: Los submódulos principales (clientes, vehiculos, repuestos, servicios,
     # documentos, reportes) están incluidos en taller_main_urls.py para evitar duplicación
     # Solo incluimos aquí rutas específicas de USA que no están en el core
     # === AJAX ENDPOINTS ===

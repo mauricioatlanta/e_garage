@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container mx-auto p-8">
     <h1 class="text-3xl font-bold mb-6">🔍 DEBUG FORMULARIO VEHÍCULOS</h1>
-    
+
     <div class="bg-gray-100 p-6 rounded-lg mb-6">
         <h2 class="text-xl font-semibold mb-4">📊 INFORMACIÓN DEL USUARIO</h2>
         <p><strong>Usuario:</strong> {{ user.username }}</p>
@@ -15,7 +15,7 @@
     <div class="bg-blue-100 p-6 rounded-lg mb-6">
         <h2 class="text-xl font-semibold mb-4">📋 CAMPOS DEL FORMULARIO</h2>
         <p><strong>Total campos:</strong> {{ form.fields|length }}</p>
-        
+
         <div class="grid grid-cols-2 gap-4">
             {% for field_name, field in form.fields.items %}
             <div class="bg-white p-4 rounded border">
@@ -44,14 +44,14 @@
 
     <div class="bg-green-100 p-6 rounded-lg mb-6">
         <h2 class="text-xl font-semibold mb-4">🎯 VERIFICACIÓN ESPECÍFICA</h2>
-        
+
         <div class="space-y-4">
             <div>
                 <h3 class="font-semibold">Campos USA:</h3>
                 <p>marca_texto: {% if 'marca_texto' in form.fields %}✅ PRESENTE{% else %}❌ AUSENTE{% endif %}</p>
                 <p>modelo_texto: {% if 'modelo_texto' in form.fields %}✅ PRESENTE{% else %}❌ AUSENTE{% endif %}</p>
             </div>
-            
+
             <div>
                 <h3 class="font-semibold">Campos Chile:</h3>
                 <p>marca: {% if 'marca' in form.fields %}✅ PRESENTE{% else %}❌ AUSENTE{% endif %}</p>
@@ -62,7 +62,7 @@
 
     <div class="bg-yellow-100 p-6 rounded-lg">
         <h2 class="text-xl font-semibold mb-4">🧪 RENDERIZADO DE CAMPOS</h2>
-        
+
         <div class="space-y-4">
             <div>
                 <h3 class="font-semibold">Campo marca_texto (USA):</h3>
@@ -72,7 +72,7 @@
                     <p class="text-red-600">❌ Campo marca_texto no encontrado</p>
                 {% endif %}
             </div>
-            
+
             <div>
                 <h3 class="font-semibold">Campo marca (Chile):</h3>
                 {% if 'marca' in form.fields %}
@@ -85,12 +85,3 @@
     </div>
 </div>
 {% endblock %}
-
-
-
-
-
-
-
-
-

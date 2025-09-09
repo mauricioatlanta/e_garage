@@ -93,14 +93,14 @@ try:
     iva = subtotal * 0.19
     total = subtotal + iva
 
-    print(f"\n💰 RESUMEN:")
+    print("\n💰 RESUMEN:")
     print(f"   Repuestos: ${total_repuestos:,}")
     print(f"   Servicios: ${total_servicios:,}")
     print(f"   Subtotal: ${subtotal:,}")
     print(f"   IVA (19%): ${iva:,.0f}")
     print(f"   TOTAL: ${total:,.0f}")
 
-    print(f"\n🔗 URLs para probar:")
+    print("\n🔗 URLs para probar:")
     print(f"   Ver: http://127.0.0.1:8000/documentos/{documento.id}/")
     print(f"   Editar: http://127.0.0.1:8000/documentos/editar/{documento.id}/")
 

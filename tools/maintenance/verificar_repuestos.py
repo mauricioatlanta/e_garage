@@ -4,7 +4,7 @@ import os
 import django
 
 # Configurar Django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings")
 django.setup()
 
 from django.db import models
@@ -27,7 +27,7 @@ for r in Repuesto.objects.all()[:5]:
 # Buscar repuestos que contengan "of"
 print("\nRepuestos que contienen 'of':")
 repuestos_of = Repuesto.objects.filter(
-    models.Q(nombre__icontains='of') | models.Q(part_number__icontains='of')
+    models.Q(nombre__icontains="of") | models.Q(part_number__icontains="of")
 )
 for r in repuestos_of:
     print(f"- {r.part_number} | {r.nombre} | ${r.precio_venta}")

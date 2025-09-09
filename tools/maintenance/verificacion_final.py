@@ -2,6 +2,7 @@
 """
 Verificación completa de la búsqueda de clientes en documentos para Chile y USA
 """
+
 import os
 
 import django

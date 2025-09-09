@@ -214,7 +214,7 @@ def test_herencia_responsable_con_company_settings():
     assert (
         l_on.documento == doc_on
     ), "Línea ON debe estar asociada al documento correcto"
-    
+
     # Con flag ON, la línea no debe heredar automáticamente el responsable del documento
     # (esto verifica que el flag dividir_por_tecnico funciona correctamente)
     # Si la línea tuviera un campo de responsable, debería permanecer None o su valor original

@@ -2,6 +2,7 @@
 """
 Resumen final - Verificar que todo está funcionando correctamente
 """
+
 import os
 
 import django

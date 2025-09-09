@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 
 from decouple import config
+
 from django.core.management.utils import get_random_secret_key
 
 # BASE DIR
@@ -113,7 +114,6 @@ LOCALE_PATHS = [
 ]
 TIME_ZONE = "America/Santiago"
 USE_I18N = True
-USE_L10N = True
 USE_TZ = True
 THOUSAND_SEPARATOR = "."
 USE_THOUSAND_SEPARATOR = True

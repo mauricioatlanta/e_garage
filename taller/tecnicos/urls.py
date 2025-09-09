@@ -1,5 +1,6 @@
 # taller/tecnicos/urls.py
 from django.urls import path
+
 from ..views_extra.tecnicos_views import (
     tecnicos_crear,
     tecnicos_editar,

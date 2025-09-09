@@ -68,12 +68,12 @@ def redirect_cl_to_es(request, path=None):
         # Get the path after /cl/
         path_after_cl = request.path[3:]  # Remove '/cl' from the beginning
         new_path = f"/cl/es{path_after_cl}"
-    
+
     # Preserve query parameters
     if request.GET:
         query_string = request.GET.urlencode()
         new_path = f"{new_path}?{query_string}"
-    
+
     return redirect(new_path)
 
 
@@ -92,9 +92,19 @@ urlpatterns = [
     path("activar-trial/", activar_trial, name="activar_trial"),
     path("activar/", activar_trial, name="activar_trial_short"),
     # Contacto de ventas
-    path("contacto-ventas/", lambda request: redirect("https://wa.me/56912345678?text=Hola%20quiero%20información%20sobre%20el%20plan%20empresarial%20de%20eGarage"), name="contacto_ventas"),
+    path(
+        "contacto-ventas/",
+        lambda request: redirect(
+            "https://wa.me/56912345678?text=Hola%20quiero%20información%20sobre%20el%20plan%20empresarial%20de%20eGarage"
+        ),
+        name="contacto_ventas",
+    ),
     # Páginas de bienvenida por país
-    path("bienvenida/cl/", TemplateView.as_view(template_name="taller/bienvenida_chile.html"), name="bienvenida_chile"),
+    path(
+        "bienvenida/cl/",
+        TemplateView.as_view(template_name="taller/bienvenida_chile.html"),
+        name="bienvenida_chile",
+    ),
     # Login personalizado con contexto de país
     path("accounts/login/", country_aware_login, name="account_login"),
     # Allauth para el resto de funcionalidades
@@ -173,7 +183,6 @@ urlpatterns = [
         RedirectView.as_view(url="/us/en/", permanent=False),
         name="us_redirect",
     ),
-
     # 🇨🇱 Chile - Español
     path(
         "cl/es/",
@@ -197,7 +206,6 @@ urlpatterns = [
         redirect_cl_to_es,
         name="cl_redirect_with_path",
     ),
-
     # Si agregas más combinaciones, repite este patrón: un solo include por prefijo.
     # path("taller/", include(("taller.urls", "taller"), namespace="taller")),  # ELIMINADO: URLs sin prefijo de país
     # APIs globales (sin prefijo de país)
@@ -218,11 +226,15 @@ urlpatterns = [
     # URLs con prefijo de país específico - NAMESPACES ÚNICOS
     path(
         "cl/documentos/",
-        include(("taller.documentos.urls", "documentos_cl_es"), namespace="documentos_cl_es"),
+        include(
+            ("taller.documentos.urls", "documentos_cl_es"), namespace="documentos_cl_es"
+        ),
     ),
     path(
         "us/documentos/",
-        include(("taller.documentos.urls", "documentos_us_en"), namespace="documentos_us_en"),
+        include(
+            ("taller.documentos.urls", "documentos_us_en"), namespace="documentos_us_en"
+        ),
     ),
     path(
         "cl/reportes/",

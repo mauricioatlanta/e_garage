@@ -396,7 +396,7 @@ class Command(BaseCommand):
                 with connection.cursor() as cursor:
                     cursor.execute(
                         """
-                        INSERT INTO taller_documento 
+                        INSERT INTO taller_documento
                         (created_at, updated_at, tipo, numero, estado, fecha_emision, moneda, country,
                          neto_repuestos, neto_servicios, descuento, tax_rate_applied, tax_amount, total,
                          cliente_id, empresa_id, vehiculo_id)

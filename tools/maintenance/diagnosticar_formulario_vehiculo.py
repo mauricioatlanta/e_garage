@@ -119,7 +119,6 @@ def verificar_vista():
     print("\n🔍 Verificando vista crear_vehiculo...")
 
     try:
-
         print("✅ Vista crear_vehiculo importada correctamente")
 
         # Verificar URL

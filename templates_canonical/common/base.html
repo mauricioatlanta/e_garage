@@ -4,16 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}eGarage Pro{% endblock %}</title>
-    
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <!-- Google Fonts - Futuristic -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+
     <!-- Custom Futuristic CSS -->
     <style>
         :root {
@@ -51,7 +51,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: 
+            background:
                 radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
                 radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
                 radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
@@ -217,7 +217,7 @@
             .navbar-brand-futuristic {
                 font-size: 1.4rem;
             }
-            
+
             .nav-link-futuristic {
                 padding: 0.5rem 1rem !important;
                 margin: 0.25rem 0;
@@ -242,7 +242,7 @@
             background: var(--accent-blue);
         }
     </style>
-    
+
     {% block extra_css %}{% endblock %}
 </head>
 <body>
@@ -250,7 +250,7 @@
     {% if debug %}
       {% include "common/_tpl_marker.html" with marker_from="templates_canonical/common/base.html" %}
     {% endif %}
-    
+
     <!-- Futuristic Header -->
     <nav class="navbar navbar-expand-lg navbar-futuristic">
         <div class="container-fluid">
@@ -260,15 +260,15 @@
                 <span>❌</span>
                 <span>❌</span>
             </div>
-            
+
             <a class="navbar-brand navbar-brand-futuristic" href="/">
                 <i class="fas fa-cog me-2"></i>eGarage Pro
             </a>
-            
+
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon text-light"></span>
             </button>
-            
+
             <div class="collapse navbar-collapse" id="navbarNav">
                 <div class="navbar-nav ms-auto">
                     {% load country_url %}
@@ -328,7 +328,7 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     <!-- Futuristic JavaScript Effects - DISABLED to prevent motion sickness -->
     <script>
         // Animations disabled to prevent motion sickness
@@ -347,7 +347,7 @@
                 element.addEventListener('mouseenter', function() {
                     this.classList.add('glow-animation');
                 });
-                
+
                 element.addEventListener('mouseleave', function() {
                     this.classList.remove('glow-animation');
                 });
@@ -355,7 +355,7 @@
         });
         */
     </script>
-    
+
     {% block extra_js %}{% endblock %}
 </body>
 </html>

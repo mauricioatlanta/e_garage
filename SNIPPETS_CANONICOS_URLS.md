@@ -10,17 +10,17 @@ from django.urls import include, path
 urlpatterns = [
     # === AUTHENTICATION GLOBAL ===
     path("accounts/", include("allauth.urls")),
-    
+
     # === PAÍSES E IDIOMAS ===
     # Chile - Español
     path("cl/", include(("taller.urls_extra.chile", "taller_cl_es"), namespace="taller_cl_es")),
-    
+
     # USA - Inglés
     path("us/", include(("taller.urls_extra.usa", "taller_us_en"), namespace="taller_us_en")),
-    
+
     # === ADMIN ===
     path("admin/", admin.site.urls),
-    
+
     # === STATIC FILES (desarrollo) ===
     if settings.DEBUG:
         from django.conf.urls.static import static
@@ -56,56 +56,56 @@ urlpatterns = [
     path("", TemplateView.as_view(template_name="taller/landing/inicio.html"), name="landing_inicio"),
     path("chile/", TemplateView.as_view(template_name="taller/landing/chile.html"), name="landing_chile"),
     path("usa/", bienvenida_usa, name="landing_usa"),
-    
+
     # === MÓDULOS PRINCIPALES ===
     # Clientes
     path("clientes/", include("taller.clientes.urls")),
-    
+
     # Vehículos
     path("vehiculos/", include("taller.vehiculos.urls")),
-    
+
     # Repuestos
     path("repuestos/", include("taller.repuestos.urls")),
-    
+
     # Servicios
     path("servicios/", include(("taller.servicios.urls", "servicios"), namespace="servicios")),
-    
+
     # Documentos
     path("documentos/", include(("taller.documentos.urls", "documentos"), namespace="documentos")),
-    
+
     # Reportes
     path("reportes/", include("taller.reportes.urls")),
-    
+
     # === MÓDULOS AVANZADOS ===
     # Business Intelligence
     path("business-intelligence/", include("taller.business_intelligence_urls", namespace="business_intelligence")),
-    
+
     # API
     path("api/", include("taller.api.urls", namespace="api")),
-    
+
     # Admin Monitoring
     path("admin/monitoring/", include("taller.urls_modules.admin_monitoring")),
-    
+
     # Emails
     path("emails/", include("taller.emails.urls")),
-    
+
     # === VISTAS ESPECÍFICAS ===
     # Dashboard de suscripciones
     path("admin/dashboard/", dashboard_suscripciones, name="dashboard_suscripciones"),
-    
+
     # Debug
     path("debug-autocomplete/", debug_cliente_autocomplete, name="debug_autocomplete"),
-    
+
     # Renovar empresa
     path("renovar-empresa/<int:empresa_id>/", renovar_empresa, name="renovar_empresa"),
-    
+
     # === CONFIGURACIÓN ===
     path("configuracion/", include("taller.views_extra.views_configuracion"), name="configuracion"),
     path("configuracion/tecnicos/", include("taller.views_extra.views_configuracion"), name="configuracion_tecnicos"),
-    
+
     # === AUTOLOAD ===
     path("autocomplete/", include("taller.autocomplete.urls")),
-    
+
     # === AJAX ENDPOINTS ===
     path("ajax/", include("taller.views_extra.ajax")),
 ]
@@ -160,34 +160,34 @@ urlpatterns = [
     # Landing page profesional para USA
     path("", landing_usa, name="home"),
     path("dashboard/", dashboard_usa_view, name="dashboard"),
-    
+
     # Centro de Operaciones Espacial para USA
     path("centro-operaciones-espacial/", dashboard_usa_view, name="centro_operaciones_espacial"),
-    
+
     # Test endpoint USA
     path("test/", test_usa_view, name="test"),
-    
+
     # === MÓDULOS PRINCIPALES ===
-    # NOTA: Los submódulos principales (clientes, vehiculos, repuestos, servicios, 
+    # NOTA: Los submódulos principales (clientes, vehiculos, repuestos, servicios,
     # documentos, reportes) están incluidos en taller_main_urls.py para evitar duplicación
     # Solo incluimos aquí rutas específicas de USA que no están en el core
-    
+
     # === CONFIGURACIÓN Y SETTINGS ===
     # Incluir URLs principales de taller (configuración, settings, etc.)
     # Este archivo incluye todos los submódulos principales con namespaces correctos
     path("", include("taller.taller_main_urls")),
-    
+
     # === AJAX ENDPOINTS ESPECÍFICOS DE USA ===
     # AJAX jerárquico para vehículos
     path("ajax/load-modelos/", ajax_views.load_modelos, name="ajax_load_modelos"),
     path("ajax/load-motores/", ajax_views.load_motores, name="ajax_load_motores"),
     path("ajax/load-cajas/", ajax_views.load_cajas, name="ajax_load_cajas"),
     path("ajax/load-motores-cajas/", ajax_views.load_motores_cajas, name="ajax_load_motores_cajas"),
-    
+
     # AJAX específicos para USA
     path("ajax/clientes/buscar/", buscar_clientes, name="us_ajax_buscar_clientes"),
     path("ajax/vehiculos-por-cliente/", vehiculos_por_cliente, name="us_ajax_vehiculos_por_cliente"),
-    
+
     # === AUTHENTICATION ===
     # Login para USA
     path("login/", usa_login_view, name="account_login"),
@@ -195,7 +195,7 @@ urlpatterns = [
     path("signup/", usa_signup_view, name="account_signup"),
     # Registro para USA
     path("registro/", include("scripts.onboarding_urls")),
-    
+
     # === DASHBOARD DE SUSCRIPTOR ===
     path("", include("taller.analytics.urls_suscriptor")),
 ]
@@ -250,30 +250,30 @@ urlpatterns = [
     # Landing page para Chile
     path("", landing_chile, name="home"),
     path("dashboard/", dashboard_chile_view, name="dashboard"),
-    
+
     # Test endpoint Chile
     path("test/", test_chile_view, name="test"),
-    
+
     # === MÓDULOS PRINCIPALES ===
-    # NOTA: Los submódulos principales (clientes, vehiculos, repuestos, servicios, 
+    # NOTA: Los submódulos principales (clientes, vehiculos, repuestos, servicios,
     # documentos, reportes) están incluidos en taller_main_urls.py para evitar duplicación
     # Solo incluimos aquí rutas específicas de Chile que no están en el core
-    
+
     # URLs principales de taller (configuración, settings, etc.)
     # Este archivo incluye todos los submódulos principales con namespaces correctos
     path("", include("taller.taller_main_urls")),
-    
+
     # === AJAX ENDPOINTS ESPECÍFICOS DE CHILE ===
     # AJAX jerárquico para vehículos
     path("ajax/load-modelos/", ajax_views.load_modelos, name="ajax_load_modelos"),
     path("ajax/load-motores/", ajax_views.load_motores, name="ajax_load_motores"),
     path("ajax/load-cajas/", ajax_views.load_cajas, name="ajax_load_cajas"),
     path("ajax/load-motores-cajas/", ajax_views.load_motores_cajas, name="ajax_load_motores_cajas"),
-    
+
     # AJAX específicos para Chile
     path("ajax/clientes/buscar/", buscar_clientes, name="cl_ajax_buscar_clientes"),
     path("ajax/vehiculos-por-cliente/", vehiculos_por_cliente, name="cl_ajax_vehiculos_por_cliente"),
-    
+
     # === AUTHENTICATION ===
     # Login para Chile
     path("login/", chile_login_view, name="account_login"),
@@ -281,7 +281,7 @@ urlpatterns = [
     path("signup/", chile_signup_view, name="account_signup"),
     # Registro para Chile
     path("registro/", include("scripts.onboarding_urls")),
-    
+
     # === DASHBOARD DE SUSCRIPTOR ===
     path("", include("taller.analytics.urls_suscriptor")),
 ]

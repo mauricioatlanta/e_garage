@@ -151,19 +151,19 @@
   </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-[#0d0d0d]">
-  
+
   <!-- 🌟 Cabecera de Navegación con Login/Registro -->
   <header class="relative z-50 bg-gradient-to-r from-black/80 via-gray-900/80 to-black/80 backdrop-blur-md border-b border-cyan-400/30">
     <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center py-4">
-        
+
         <!-- RED CROSSES - BIENVENIDA CHILE -->
         <div class="flex items-center gap-2 text-red-500 text-2xl mr-4">
           <span>❌</span>
           <span>❌</span>
           <span>❌</span>
         </div>
-        
+
         <!-- Logo -->
         <div class="flex items-center space-x-3">
           <img src="{% static 'img/logo.png' %}" alt="eGarage" class="w-8 h-8 animate-pulse" style="filter: drop-shadow(0 0 8px #00ffff88);">
@@ -172,39 +172,39 @@
           <span class="text-xl font-bold text-cyan-400 font-mono">eGarage</span>
           <span class="px-2 py-1 text-xs bg-cyan-400/20 text-cyan-300 rounded-full border border-cyan-400/30">🇨🇱 Chile</span>
         </div>
-        
+
         <!-- Menú de Navegación -->
         <div class="hidden md:flex items-center space-x-8">
           <!-- Navigation items removed as requested -->
         </div>
-        
+
         <!-- Botones de Autenticación -->
         <div class="flex items-center space-x-4">
-          
+
           <!-- Botón de Login -->
           {% load country_url %}
           <a href="{% country_url 'account_login' %}" class="inline-flex items-center px-4 py-2 text-sm font-medium text-cyan-400 bg-transparent border border-cyan-400/50 rounded-lg hover:bg-cyan-400/10 hover:border-cyan-400 transition-all duration-300 group">
             <i class="fas fa-sign-in-alt mr-2 group-hover:scale-110 transition-transform"></i>
             Ingresar
           </a>
-          
+
           <!-- Botón de Registro -->
           <a href="/registro/" class="inline-flex items-center px-4 py-2 text-sm font-medium text-black bg-gradient-to-r from-cyan-400 to-blue-500 rounded-lg hover:from-cyan-300 hover:to-blue-400 hover:scale-105 transition-all duration-300 shadow-lg group">
             <i class="fas fa-user-plus mr-2 group-hover:scale-110 transition-transform"></i>
             Registrarse
           </a>
-          
+
         </div>
-        
+
         <!-- Menú Móvil Toggle -->
         <div class="md:hidden">
           <button id="mobile-menu-toggle" class="text-gray-300 hover:text-cyan-400 focus:outline-none">
             <i class="fas fa-bars text-xl"></i>
           </button>
         </div>
-        
+
       </div>
-      
+
       <!-- Menú Móvil Desplegable -->
       <div id="mobile-menu" class="md:hidden hidden border-t border-cyan-400/30 py-4">
         <div class="flex flex-col space-y-4">
@@ -219,7 +219,7 @@
           </div>
         </div>
       </div>
-      
+
     </nav>
   </header>
 
@@ -356,7 +356,7 @@
             <div class="bg-gradient-to-r from-cyan-400 to-blue-500 h-2 rounded-full" style="width: 98%"></div>
           </div>
         </div>
-        
+
         <div class="glass-card p-6 text-center" data-aos="fade-up" data-aos-delay="100">
           <div class="text-4xl font-bold text-lime-400 mb-2">+45%</div>
           <div class="text-gray-300">Aumento en Productividad</div>
@@ -364,7 +364,7 @@
             <div class="bg-gradient-to-r from-lime-400 to-cyan-400 h-2 rounded-full" style="width: 45%"></div>
           </div>
         </div>
-        
+
         <div class="glass-card p-6 text-center" data-aos="fade-up" data-aos-delay="200">
           <div class="text-4xl font-bold text-purple-400 mb-2">-60%</div>
           <div class="text-gray-300">Reducción en Tiempo Administrativo</div>
@@ -372,7 +372,7 @@
             <div class="bg-gradient-to-r from-purple-400 to-pink-500 h-2 rounded-full" style="width: 60%"></div>
           </div>
         </div>
-        
+
         <div class="glass-card p-6 text-center" data-aos="fade-up" data-aos-delay="300">
           <div class="text-4xl font-bold text-orange-400 mb-2">+30%</div>
           <div class="text-gray-300">Incremento en Ventas</div>
@@ -395,7 +395,7 @@
               <div class="w-full bg-gray-700 rounded-full h-3">
                 <div class="bg-gradient-to-r from-cyan-400 to-blue-500 h-3 rounded-full" style="width: 78%"></div>
               </div>
-              
+
               <div class="flex items-center justify-between">
                 <span class="text-gray-300">⭐⭐⭐⭐ Muy Bueno</span>
                 <span class="text-lime-400 font-bold">18%</span>
@@ -403,7 +403,7 @@
               <div class="w-full bg-gray-700 rounded-full h-3">
                 <div class="bg-gradient-to-r from-lime-400 to-cyan-400 h-3 rounded-full" style="width: 18%"></div>
               </div>
-              
+
               <div class="flex items-center justify-between">
                 <span class="text-gray-300">⭐⭐⭐ Bueno</span>
                 <span class="text-purple-400 font-bold">3%</span>
@@ -411,7 +411,7 @@
               <div class="w-full bg-gray-700 rounded-full h-3">
                 <div class="bg-gradient-to-r from-purple-400 to-pink-500 h-3 rounded-full" style="width: 3%"></div>
               </div>
-              
+
               <div class="flex items-center justify-between">
                 <span class="text-gray-300">⭐⭐ Regular</span>
                 <span class="text-orange-400 font-bold">1%</span>
@@ -421,12 +421,12 @@
               </div>
             </div>
           </div>
-          
+
           <div class="text-center">
             <div class="relative w-48 h-48 mx-auto">
               <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                 <circle cx="50" cy="50" r="40" fill="none" stroke="#374151" stroke-width="8"/>
-                <circle cx="50" cy="50" r="40" fill="none" stroke="url(#gradient)" stroke-width="8" 
+                <circle cx="50" cy="50" r="40" fill="none" stroke="url(#gradient)" stroke-width="8"
                         stroke-dasharray="251.2" stroke-dashoffset="55.2" stroke-linecap="round"/>
                 <defs>
                   <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -465,7 +465,7 @@
             <strong>Resultado:</strong> +40% eficiencia operativa
           </div>
         </div>
-        
+
         <div class="glass-card p-6" data-aos="fade-up" data-aos-delay="100">
           <div class="flex items-center mb-4">
             <div class="w-12 h-12 bg-gradient-to-r from-lime-400 to-cyan-400 rounded-full flex items-center justify-center mr-3">
@@ -482,7 +482,7 @@
             <strong>Resultado:</strong> +65% satisfacción del cliente
           </div>
         </div>
-        
+
         <div class="glass-card p-6" data-aos="fade-up" data-aos-delay="200">
           <div class="flex items-center mb-4">
             <div class="w-12 h-12 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full flex items-center justify-center mr-3">
@@ -515,7 +515,7 @@
       </div>
 
       <div class="grid lg:grid-cols-2 gap-12 mb-16">
-        
+
         <!-- Gestión Inteligente -->
         <div class="glass-card p-8" data-aos="fade-right">
           <div class="flex items-center mb-6">
@@ -635,7 +635,7 @@
           <h3 class="text-3xl font-bold text-cyan-300 mb-4">🇨🇱 Específicamente Diseñado para Chile</h3>
           <p class="text-gray-400">Funcionalidades adaptadas a la realidad del mercado automotriz chileno</p>
         </div>
-        
+
         <div class="grid md:grid-cols-3 gap-8">
           <div class="text-center">
             <div class="w-16 h-16 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -644,7 +644,7 @@
             <h4 class="text-xl font-bold text-cyan-300 mb-2">Documentación Legal</h4>
             <p class="text-gray-400">Boletas, facturas y documentos según normativa SII</p>
           </div>
-          
+
           <div class="text-center">
             <div class="w-16 h-16 bg-gradient-to-r from-lime-400 to-cyan-400 rounded-full flex items-center justify-center mx-auto mb-4">
               <i class="fas fa-map-marker-alt text-2xl text-black"></i>
@@ -652,7 +652,7 @@
             <h4 class="text-xl font-bold text-lime-300 mb-2">Base de Datos Chilena</h4>
             <p class="text-gray-400">Todas las regiones, comunas y códigos postales</p>
           </div>
-          
+
           <div class="text-center">
             <div class="w-16 h-16 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
               <i class="fas fa-calculator text-2xl text-black"></i>
@@ -681,7 +681,7 @@
       </div>
 
       <div class="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-        
+
         <!-- Plan Básico -->
         <div class="glass-card p-8 relative border-2 border-cyan-400/40 hover:border-cyan-400/80 transition-all duration-300" data-aos="fade-up">
           <div class="text-center mb-8">
@@ -693,7 +693,7 @@
             <div class="text-4xl font-bold text-white mb-2">$15 <span class="text-lg text-gray-300">USD/mes</span></div>
             <div class="text-sm text-cyan-400 font-semibold">≈ $15,000 CLP/mes</div>
           </div>
-          
+
           <ul class="space-y-4 mb-8">
             <li class="flex items-center text-gray-300">
               <i class="fas fa-check text-cyan-400 mr-3"></i>
@@ -720,7 +720,7 @@
               <span>Backup automático</span>
             </li>
           </ul>
-          
+
           <a href="/registro/?plan=basico" class="block w-full text-center px-6 py-3 bg-gradient-to-r from-cyan-400 to-blue-500 text-black font-bold rounded-lg hover:scale-105 transition-all duration-300">
             Comenzar Prueba Gratis
           </a>
@@ -733,7 +733,7 @@
               ⭐ MÁS POPULAR
             </span>
           </div>
-          
+
           <div class="text-center mb-8">
             <div class="w-16 h-16 bg-gradient-to-r from-lime-400 to-cyan-400 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
               <i class="fas fa-crown text-2xl text-black"></i>
@@ -743,7 +743,7 @@
             <div class="text-4xl font-bold text-white mb-2">$35 <span class="text-lg text-gray-300">USD/mes</span></div>
             <div class="text-sm text-lime-400 font-semibold">≈ $35,000 CLP/mes</div>
           </div>
-          
+
           <ul class="space-y-4 mb-8">
             <li class="flex items-center text-gray-300">
               <i class="fas fa-check text-lime-400 mr-3"></i>
@@ -778,7 +778,7 @@
               <span>Capacitación incluida</span>
             </li>
           </ul>
-          
+
           <a href="/registro/?plan=profesional" class="block w-full text-center px-6 py-3 bg-gradient-to-r from-lime-400 to-cyan-400 text-black font-bold rounded-lg hover:scale-105 transition-all duration-300">
             Comenzar Prueba Gratis
           </a>
@@ -795,7 +795,7 @@
             <div class="text-4xl font-bold text-white mb-2">$75 <span class="text-lg text-gray-300">USD/mes</span></div>
             <div class="text-sm text-purple-400 font-semibold">≈ $75,000 CLP/mes</div>
           </div>
-          
+
           <ul class="space-y-4 mb-8">
             <li class="flex items-center text-gray-300">
               <i class="fas fa-check text-purple-400 mr-3"></i>
@@ -830,7 +830,7 @@
               <span>SLA garantizado 99.9%</span>
             </li>
           </ul>
-          
+
           <a href="/registro/?plan=empresarial" class="block w-full text-center px-6 py-3 bg-gradient-to-r from-purple-400 to-pink-500 text-black font-bold rounded-lg hover:scale-105 transition-all duration-300">
             Comenzar Prueba Gratis
           </a>
@@ -842,7 +842,7 @@
         <div class="glass-card p-8 max-w-4xl mx-auto border-2 border-cyan-400/30">
           <h3 class="text-2xl font-bold text-cyan-300 mb-6">¿Necesitas algo personalizado?</h3>
           <p class="text-gray-300 mb-6">
-            Todos los planes incluyen 30 días de prueba gratuita, sin compromiso. 
+            Todos los planes incluyen 30 días de prueba gratuita, sin compromiso.
             Si necesitas funcionalidades específicas para tu taller, contáctanos para un plan personalizado.
           </p>
           <div class="flex flex-col sm:flex-row gap-4 justify-center">
@@ -1024,11 +1024,11 @@
         document.addEventListener('DOMContentLoaded', function() {
             const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
             const mobileMenu = document.getElementById('mobile-menu');
-            
+
             if (mobileMenuToggle && mobileMenu) {
                 mobileMenuToggle.addEventListener('click', function() {
                     mobileMenu.classList.toggle('hidden');
-                    
+
                     // Cambiar icono del botón
                     const icon = mobileMenuToggle.querySelector('i');
                     if (mobileMenu.classList.contains('hidden')) {
@@ -1038,7 +1038,7 @@
                     }
                 });
             }
-            
+
             // Cerrar menú al hacer clic en enlaces
             const mobileMenuLinks = mobileMenu.querySelectorAll('a');
             mobileMenuLinks.forEach(link => {

@@ -17,6 +17,7 @@ def check_file_exists(file_path, description):
         print(f"❌ {description}: {file_path} - NO ENCONTRADO")
         return False
 
+
 def check_file_content(file_path, required_content, description):
     """Verifica que un archivo contenga contenido específico"""
     if not Path(file_path).exists():
@@ -24,7 +25,7 @@ def check_file_content(file_path, required_content, description):
         return False
 
     try:
-        with open(file_path, encoding='utf-8') as f:
+        with open(file_path, encoding="utf-8") as f:
             content = f.read()
 
         for item in required_content:
@@ -37,6 +38,7 @@ def check_file_content(file_path, required_content, description):
     except Exception as e:
         print(f"❌ {description}: Error leyendo {file_path} - {e}")
         return False
+
 
 def main():
     print("🔍 Verificando setup para Render...")
@@ -61,13 +63,7 @@ def main():
     print("🔧 Verificando configuración específica...")
 
     # Verificar render.yaml
-    render_checks = [
-        "type: web",
-        "env: python",
-        "gunicorn",
-        "collectstatic",
-        "migrate"
-    ]
+    render_checks = ["type: web", "env: python", "gunicorn", "collectstatic", "migrate"]
 
     if not check_file_content("render.yaml", render_checks, "Configuración de Render"):
         all_good = False
@@ -78,7 +74,7 @@ def main():
         "psycopg2-binary",
         "dj-database-url",
         "whitenoise",
-        "gunicorn"
+        "gunicorn",
     ]
 
     if not check_file_content("requirements.txt", requirements_checks, "Dependencias"):
@@ -90,10 +86,14 @@ def main():
         "whitenoise.middleware.WhiteNoiseMiddleware",
         "dj_database_url.config",
         "STATICFILES_STORAGE",
-        "MEDIA_ROOT = Path"
+        "MEDIA_ROOT = Path",
     ]
 
-    if not check_file_content("gestion_taller/settings/production.py", production_checks, "Settings de producción"):
+    if not check_file_content(
+        "gestion_taller/settings/production.py",
+        production_checks,
+        "Settings de producción",
+    ):
         all_good = False
 
     print("\n" + "=" * 50)
@@ -123,8 +123,11 @@ def main():
         return 0
     else:
         print("❌ Hay problemas que deben resolverse antes del despliegue")
-        print("\n🔧 Revisa los errores arriba y corrige los archivos faltantes o mal configurados")
+        print(
+            "\n🔧 Revisa los errores arriba y corrige los archivos faltantes o mal configurados"
+        )
         return 1
+
 
 if __name__ == "__main__":
     sys.exit(main())

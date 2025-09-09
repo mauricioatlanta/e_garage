@@ -2,6 +2,7 @@
 """
 Verificación final: Formulario de vehículos funciona correctamente
 """
+
 import os
 
 import django

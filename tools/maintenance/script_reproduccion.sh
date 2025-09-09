@@ -11,8 +11,8 @@ from taller.models.empresa import Empresa
 empresa = Empresa.objects.get(nombre_taller='CL SA')
 cliente = Cliente.objects.get(empresa=empresa, nombre='Juan Pérez')
 vehiculo, created = Vehiculo.objects.get_or_create(
-    empresa=empresa, 
-    cliente=cliente, 
+    empresa=empresa,
+    cliente=cliente,
     patente='ABC123',
     defaults={'anio': 2020}
 )
@@ -21,7 +21,7 @@ print(f'Vehículo creado: {vehiculo} (ID: {vehiculo.id})')
 
 ## 2) PROBAR CREAR DOCUMENTO VÍA POST (debe fallar en redirección y totales)
 
-# Login primero 
+# Login primero
 http --session=test POST http://127.0.0.1:8000/accounts/login/ \
   username=testuser_cl password=test123 \
   --follow --print=HhBb

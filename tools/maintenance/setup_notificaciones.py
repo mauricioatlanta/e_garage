@@ -2,6 +2,7 @@
 """
 Script para configurar el sistema de notificaciones con templates predeterminados
 """
+
 import os
 
 import django
@@ -192,7 +193,7 @@ Hemos notado que no nos has visitado en un tiempo y queremos saber de ti.
 
 En {{empresa.nombre_taller}} siempre estamos aquí para cuidar tu vehículo con:
 ✅ Mantenimiento preventivo
-✅ Reparaciones especializadas  
+✅ Reparaciones especializadas
 ✅ Repuestos originales
 ✅ Garantía en todos nuestros trabajos
 

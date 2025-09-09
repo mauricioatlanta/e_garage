@@ -2,6 +2,7 @@
 """
 Script para crear un cliente ficticio para el taller1
 """
+
 import os
 import sys
 
@@ -67,7 +68,7 @@ def crear_cliente_ficticio():
 
         # Crear nuevo cliente
         cliente = Cliente.objects.create(**cliente_data)
-        print(f"🎉 Cliente creado exitosamente:")
+        print("🎉 Cliente creado exitosamente:")
         print(f"   ID: {cliente.pk}")
         print(f"   Nombre: {cliente.nombre} {cliente.apellido}")
         print(f"   Teléfono: {cliente.telefono}")
@@ -101,7 +102,7 @@ if __name__ == "__main__":
         print(f"\n✅ Cliente creado con ID: {cliente.pk}")
 
         # Verificar que el cliente pertenece a la empresa correcta
-        print(f"\n🔍 Verificación de aislamiento:")
+        print("\n🔍 Verificación de aislamiento:")
         clientes_taller1 = Cliente.objects.filter(empresa=cliente.empresa)
         print(f"   Clientes del Taller 1: {clientes_taller1.count()}")
 

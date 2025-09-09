@@ -246,7 +246,6 @@ def crear_usuarios_empresas():
 
     try:
         with transaction.atomic():
-
             # =================================
             # CHILE - PLAN GRATUITO
             # =================================
@@ -472,7 +471,6 @@ def crear_datos_prueba(
 
     try:
         with transaction.atomic():
-
             for usuario_data in usuarios_creados:
                 empresa = usuario_data["empresa"]
                 tipo = usuario_data["tipo"]
@@ -643,9 +641,9 @@ def generar_archivo_informe(usuarios_creados, datos_creados):
 
     contenido = f"""# 📋 INFORME DE DATOS DE PRUEBA - eGarage
 
-**🗓️ Generado:** {datetime.now().strftime('%d de %B de %Y - %H:%M:%S')}  
-**🎯 Propósito:** Pruebas de suscripciones por país  
-**🌎 Países:** Chile 🇨🇱 y USA 🇺🇸  
+**🗓️ Generado:** {datetime.now().strftime('%d de %B de %Y - %H:%M:%S')}
+**🎯 Propósito:** Pruebas de suscripciones por país
+**🌎 Países:** Chile 🇨🇱 y USA 🇺🇸
 
 ---
 
@@ -763,7 +761,7 @@ def generar_archivo_informe(usuarios_creados, datos_creados):
 
 ---
 
-*📅 Archivo generado automáticamente el {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}*  
+*📅 Archivo generado automáticamente el {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}*
 *🤖 Sistema: eGarage Test Data Generator*
 """
 
@@ -798,22 +796,22 @@ def test_info_view(request):
     """
     if not (request.user.is_staff or request.user.is_superuser):
         return redirect('/')
-    
+
     # Obtener usuarios de prueba
     usuarios_prueba = User.objects.filter(
         email__in=[
             'test_chile@egarage.cl',
-            'test_chile_pago@egarage.cl', 
+            'test_chile_pago@egarage.cl',
             'test_usa@egarage.com',
             'test_usa_pago@egarage.com'
         ]
     ).select_related('empresa')
-    
+
     context = {
         'usuarios_prueba': usuarios_prueba,
         'timestamp': timezone.now()
     }
-    
+
     return render(request, 'admin/test_info.html', context)
 '''
 
@@ -840,7 +838,7 @@ def test_info_view(request):
     <div class="container">
         <h1>🧪 Usuarios de Prueba - eGarage</h1>
         <p><strong>Generado:</strong> {{ timestamp|date:"d/m/Y H:i:s" }}</p>
-        
+
         <div style="background: #e8f4f8; padding: 20px; border-radius: 8px; margin: 20px 0;">
             <h3>🔐 URL de Login</h3>
             <div class="credential">
@@ -849,7 +847,7 @@ def test_info_view(request):
                 </a>
             </div>
         </div>
-        
+
         {% for usuario in usuarios_prueba %}
             <div class="usuario-card {% if usuario.empresa.pais == 'CL' %}chile{% else %}usa{% endif %} {% if usuario.empresa.plan_suscripcion == 'gratuito' %}gratuito{% else %}pagado{% endif %}">
                 <h2>
@@ -859,19 +857,19 @@ def test_info_view(request):
                         ({{ usuario.empresa.plan_suscripcion|title }})
                     </span>
                 </h2>
-                
+
                 <div class="credential">
                     <strong>📧 Email:</strong> {{ usuario.email }}<br>
                     <strong>🔑 Contraseña:</strong> test1234
                 </div>
-                
+
                 <p><strong>📍 Ciudad:</strong> {{ usuario.empresa.ciudad }}</p>
                 <p><strong>📞 Teléfono:</strong> {{ usuario.empresa.telefono }}</p>
                 <p><strong>🆔 Estado:</strong> {{ usuario.empresa.estado|title }}</p>
                 <p><strong>📅 Expira:</strong> {{ usuario.empresa.fecha_expiracion|date:"d/m/Y" }}</p>
             </div>
         {% endfor %}
-        
+
         <div style="background: #fff3cd; padding: 20px; border-radius: 8px; margin: 20px 0;">
             <h3>🎯 Pruebas Sugeridas</h3>
             <ul>

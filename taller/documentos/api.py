@@ -65,11 +65,12 @@ def api_next_number(request):
     return JsonResponse(data)
 
 
-from django.http import JsonResponse
+import json
+
+from django.db import transaction
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-from django.db import transaction
-import json
+
 
 def _get_company_settings(emp):
     try:
@@ -85,6 +86,7 @@ def _get_company_settings(emp):
     if "user" in fields and hasattr(emp, "user_id"):
         return qs.filter(user=emp.user).first()
     return None
+
 
 def _tax_rate_for_empresa(emp):
     """
@@ -103,7 +105,7 @@ def _tax_rate_for_empresa(emp):
                     continue
                 if val < 0:
                     continue
-                return val/100.0 if val > 1 else val
+                return val / 100.0 if val > 1 else val
     return 0.19 if (getattr(emp, "pais", "") or "").upper() == "CL" else 0.0
 
 
@@ -121,11 +123,11 @@ def api_create(request):
     if missing:
         return JsonResponse({"error": "missing_fields", "fields": missing}, status=400)
 
-    from taller.models.empresa import Empresa
     from taller.models.clientes import Cliente
-    from taller.models.vehiculos import Vehiculo
     from taller.models.documento import Documento
-    from taller.models.lineas_documento import LineaServicio, LineaRepuesto
+    from taller.models.empresa import Empresa
+    from taller.models.lineas_documento import LineaRepuesto, LineaServicio
+    from taller.models.vehiculos import Vehiculo
 
     # FKs
     try:
@@ -164,6 +166,7 @@ def api_create(request):
     if tecnico_id and "tecnico_responsable" in [f.name for f in Documento._meta.fields]:
         try:
             from taller.models.tecnico import Tecnico
+
             tecnico_obj = Tecnico.objects.get(id=tecnico_id)
             doc.tecnico_responsable = tecnico_obj
             doc.save(update_fields=["tecnico_responsable"])
@@ -195,7 +198,7 @@ def api_create(request):
     subtotal = 0.0
 
     # Crear líneas de servicio
-    for d in (payload.get("lineas_servicio") or []):
+    for d in payload.get("lineas_servicio") or []:
         if not _valid_line(d):
             return JsonResponse({"error": "invalid_line_servicio"}, status=400)
         ls_kwargs = dict(
@@ -207,10 +210,12 @@ def api_create(request):
         )
         ls_kwargs.update(_responsable_kwargs(LineaServicio, tecnico_obj))
         LineaServicio.objects.create(**ls_kwargs)
-        subtotal += (ls_kwargs["cantidad"] * ls_kwargs["precio_unitario"]) - ls_kwargs["descuento"]
+        subtotal += (ls_kwargs["cantidad"] * ls_kwargs["precio_unitario"]) - ls_kwargs[
+            "descuento"
+        ]
 
     # Crear líneas de repuesto
-    for d in (payload.get("lineas_repuesto") or []):
+    for d in payload.get("lineas_repuesto") or []:
         if not _valid_line(d):
             return JsonResponse({"error": "invalid_line_repuesto"}, status=400)
         lr_kwargs = dict(
@@ -228,7 +233,9 @@ def api_create(request):
                 lr_kwargs["codigo"] = f"REP-{doc.id}-{d['nombre'][:8]}".upper()
         lr_kwargs.update(_responsable_kwargs(LineaRepuesto, tecnico_obj))
         LineaRepuesto.objects.create(**lr_kwargs)
-        subtotal += (lr_kwargs["cantidad"] * lr_kwargs["precio_unitario"]) - lr_kwargs["descuento"]
+        subtotal += (lr_kwargs["cantidad"] * lr_kwargs["precio_unitario"]) - lr_kwargs[
+            "descuento"
+        ]
 
     # Cálculo de impuesto usando CompanySettings con fallback
     tasa = _tax_rate_for_empresa(emp)

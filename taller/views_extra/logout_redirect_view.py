@@ -1,7 +1,6 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.contrib.auth import logout
-from django.contrib.auth.decorators import login_required
 
 
 @login_required
@@ -12,19 +11,23 @@ def logout_redirect_view(request):
     """
     # Obtener información del país antes del logout
     country = None
-    
+
     # PRIORIDAD 1: Detectar país desde usuario autenticado (empresa)
     if request.user.is_authenticated:
         try:
             # Buscar en empresa (prioridad más alta)
-            if hasattr(request.user, "empresa") and hasattr(request.user.empresa, "pais"):
+            if hasattr(request.user, "empresa") and hasattr(
+                request.user.empresa, "pais"
+            ):
                 country = request.user.empresa.pais
             # Buscar en perfil
-            elif hasattr(request.user, "perfil") and hasattr(request.user.perfil, "pais"):
+            elif hasattr(request.user, "perfil") and hasattr(
+                request.user.perfil, "pais"
+            ):
                 country = request.user.perfil.pais
         except Exception:
             pass
-    
+
     # PRIORIDAD 2: Detectar país por path actual
     if not country:
         path = request.path
@@ -37,7 +40,7 @@ def logout_redirect_view(request):
             or "usa" in request.GET.get("country", "")
         ):
             country = "US"
-    
+
     # PRIORIDAD 3: Detectar país por sesión
     if not country:
         session_country = request.session.get("country")
@@ -45,7 +48,7 @@ def logout_redirect_view(request):
             country = "US"
         elif session_country == "cl" or session_country == "chile":
             country = "CL"
-    
+
     # Redirigir según el país detectado
     if country == "US":
         return redirect(reverse("usa:account_login"))
@@ -54,4 +57,3 @@ def logout_redirect_view(request):
     else:
         # FALLBACK: Redirigir a Chile por defecto
         return redirect(reverse("chile:account_login"))
-

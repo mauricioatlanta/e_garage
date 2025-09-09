@@ -2,6 +2,7 @@
 """
 Script final de verificación para el problema de la bandera
 """
+
 import os
 
 import django

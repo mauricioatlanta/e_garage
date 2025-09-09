@@ -2,6 +2,7 @@
 """
 Script para cargar servicios por categorías
 """
+
 import os
 import sys
 
@@ -12,8 +13,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings")
 django.setup()
 
-from taller.servicios.models import (CategoriaServicio, Servicio,
-                                     SubcategoriaServicio)
+from taller.servicios.models import CategoriaServicio, Servicio, SubcategoriaServicio
 
 # Datos de servicios organizados por categorías
 servicios_por_categoria = {
@@ -192,8 +192,8 @@ def cargar_servicios():
                 servicios_creados += 1
                 print(f"   🔧 Servicio creado: {servicio_nombre}")
 
-    print(f"\n🎉 ¡Proceso completado!")
-    print(f"📊 Resumen de carga:")
+    print("\n🎉 ¡Proceso completado!")
+    print("📊 Resumen de carga:")
     print(f"   Categorías creadas: {categorias_creadas}")
     print(f"   Subcategorías creadas: {subcategorias_creadas}")
     print(f"   Servicios creados: {servicios_creados}")
@@ -203,13 +203,13 @@ def cargar_servicios():
     total_subcategorias = SubcategoriaServicio.objects.count()
     total_servicios = Servicio.objects.count()
 
-    print(f"\n📈 Total en base de datos:")
+    print("\n📈 Total en base de datos:")
     print(f"   Categorías: {total_categorias}")
     print(f"   Subcategorías: {total_subcategorias}")
     print(f"   Servicios: {total_servicios}")
 
     # Mostrar algunos ejemplos
-    print(f"\n🔍 Ejemplos de servicios cargados:")
+    print("\n🔍 Ejemplos de servicios cargados:")
     for subcategoria in SubcategoriaServicio.objects.all()[:3]:
         servicios_ejemplo = subcategoria.servicios.all()[:2]
         print(f"   {subcategoria.nombre}:")

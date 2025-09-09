@@ -3,6 +3,7 @@
 🎯 RESUMEN COMPLETO: PASOS 2 Y 3 IMPLEMENTADOS
 Documentación final de validaciones consistencia + fixtures reales
 """
+
 import os
 
 import django

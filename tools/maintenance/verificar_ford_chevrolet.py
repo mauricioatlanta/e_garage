@@ -4,16 +4,16 @@ import os
 import django
 
 # Configurar Django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings")
 django.setup()
 
 from taller.models import MarcaVehiculo, ModeloVehiculo
 
-print('=== VERIFICACIÓN ESPECÍFICA: FORD Y CHEVROLET ===\n')
+print("=== VERIFICACIÓN ESPECÍFICA: FORD Y CHEVROLET ===\n")
 
 # Verificar Ford
 try:
-    ford = MarcaVehiculo.objects.get(nombre='Ford', activa=True)
+    ford = MarcaVehiculo.objects.get(nombre="Ford", activa=True)
     print(f"✅ Ford encontrada - ID: {ford.pk}")
     modelos_ford = ModeloVehiculo.objects.filter(marca=ford, activo=True)
     print(f"Modelos Ford en BD: {modelos_ford.count()}")
@@ -24,9 +24,9 @@ except MarcaVehiculo.DoesNotExist:
 
 print()
 
-# Verificar Chevrolet  
+# Verificar Chevrolet
 try:
-    chevrolet = MarcaVehiculo.objects.get(nombre='Chevrolet', activa=True)
+    chevrolet = MarcaVehiculo.objects.get(nombre="Chevrolet", activa=True)
     print(f"✅ Chevrolet encontrada - ID: {chevrolet.pk}")
     modelos_chevrolet = ModeloVehiculo.objects.filter(marca=chevrolet, activo=True)
     print(f"Modelos Chevrolet en BD: {modelos_chevrolet.count()}")
@@ -35,12 +35,12 @@ try:
 except MarcaVehiculo.DoesNotExist:
     print("❌ Chevrolet no encontrada")
 
-print(f"\n=== IDs DE TODAS LAS MARCAS ===")
-marcas = MarcaVehiculo.objects.filter(activa=True).order_by('nombre')
+print("\n=== IDs DE TODAS LAS MARCAS ===")
+marcas = MarcaVehiculo.objects.filter(activa=True).order_by("nombre")
 for marca in marcas[:10]:  # Solo primeras 10 para no saturar
     print(f"ID {marca.pk}: {marca.nombre}")
 
-print(f"\n=== VERIFICAR CAMPO ACTIVO EN MODELOS ===")
+print("\n=== VERIFICAR CAMPO ACTIVO EN MODELOS ===")
 # Verificar si hay modelos inactivos
 total_modelos = ModeloVehiculo.objects.count()
 modelos_activos = ModeloVehiculo.objects.filter(activo=True).count()

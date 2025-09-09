@@ -3,6 +3,7 @@
 RESUMEN COMPLETO DE SUSCRIPCIONES Y CREDENCIALES DE PRUEBA
 E-GARAGE SYSTEM - Listo para demostración
 """
+
 import os
 
 import django

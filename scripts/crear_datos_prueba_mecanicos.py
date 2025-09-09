@@ -2,6 +2,7 @@
 """
 Script para crear datos de prueba para el sistema de mecánicos
 """
+
 import os
 import sys
 
@@ -16,7 +17,6 @@ from django.contrib.auth.models import User
 
 from taller.models.empresa import Empresa
 from taller.models.perfilusuario import PerfilUsuario
-from taller.models.tecnico import Mecanico
 
 
 def crear_datos_prueba():

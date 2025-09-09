@@ -2,8 +2,8 @@
 """
 Script para crear un repuesto ficticio usando SQLite directamente
 """
+
 import os
-import sys
 
 import django
 
@@ -60,12 +60,12 @@ def crear_repuesto_ficticio():
             "stock": 15,
         }
 
-        print(f"\n📝 Datos del repuesto a crear:")
+        print("\n📝 Datos del repuesto a crear:")
         for key, value in datos_repuesto.items():
             print(f"   {key}: {value}")
 
         # Crear formulario
-        print(f"\n🔄 Validando formulario...")
+        print("\n🔄 Validando formulario...")
         form = RepuestoForm(datos_repuesto)
 
         if form.is_valid():
@@ -73,12 +73,12 @@ def crear_repuesto_ficticio():
             print(f"📊 Datos limpios: {form.cleaned_data}")
 
             # Guardar repuesto
-            print(f"\n💾 Guardando repuesto...")
+            print("\n💾 Guardando repuesto...")
             repuesto = form.save(commit=False)
             repuesto.empresa = empresa
             repuesto.save()
 
-            print(f"\n🎉 ¡REPUESTO CREADO EXITOSAMENTE!")
+            print("\n🎉 ¡REPUESTO CREADO EXITOSAMENTE!")
             print(f"   ID: {repuesto.id}")
             print(f"   Nombre: {repuesto.nombre_repuesto}")
             print(f"   Part Number: {repuesto.part_number}")

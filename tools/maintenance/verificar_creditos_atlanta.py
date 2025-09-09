@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
-Test para verificar que los créditos de Atlanta Reciclajes 
+Test para verificar que los créditos de Atlanta Reciclajes
 están correctamente integrados en todo el sistema eGarage
 """
 
@@ -57,7 +56,7 @@ def verificar_templates():
             continue
 
         try:
-            with open(full_path, "r", encoding="utf-8") as f:
+            with open(full_path, encoding="utf-8") as f:
                 contenido = f.read()
 
             creditos_encontrados = []
@@ -174,9 +173,9 @@ if __name__ == "__main__":
     print("   3. Generar un PDF de prueba para verificar créditos")
     print("   4. Confirmar que el logo se muestra correctamente")
 
-    print(f"\n💼 CRÉDITOS IMPLEMENTADOS:")
-    print(f"   • Empresa: Atlanta Reciclajes")
-    print(f"   • RUT: 77.350.892-5")
-    print(f"   • Email: suscripcion@atlantareciclajes.cl")
-    print(f"   • Producto: eGarage AI™")
-    print(f"   • Logo: /static/img/logo.png")
+    print("\n💼 CRÉDITOS IMPLEMENTADOS:")
+    print("   • Empresa: Atlanta Reciclajes")
+    print("   • RUT: 77.350.892-5")
+    print("   • Email: suscripcion@atlantareciclajes.cl")
+    print("   • Producto: eGarage AI™")
+    print("   • Logo: /static/img/logo.png")

@@ -2,6 +2,7 @@
 """
 Script para cargar servicios completos por categorías
 """
+
 import os
 
 import django
@@ -9,8 +10,7 @@ import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings")
 django.setup()
 
-from taller.servicios.models import (CategoriaServicio, Servicio,
-                                     SubcategoriaServicio)
+from taller.servicios.models import CategoriaServicio, Servicio, SubcategoriaServicio
 
 # Datos de servicios organizados por categorías
 servicios_data = {
@@ -184,8 +184,8 @@ for sub_nombre, servicios_lista in servicios_data.items():
             servicios_creados += 1
         print(f"   🔧 {servicio_nombre}")
 
-print(f"\n🎉 ¡Carga completada!")
-print(f"📊 Resumen:")
+print("\n🎉 ¡Carga completada!")
+print("📊 Resumen:")
 print(f"   Subcategorías creadas: {subcategorias_creadas}")
 print(f"   Servicios creados: {servicios_creados}")
 
@@ -194,7 +194,7 @@ total_categorias = CategoriaServicio.objects.count()
 total_subcategorias = SubcategoriaServicio.objects.count()
 total_servicios = Servicio.objects.count()
 
-print(f"\n📈 Total en base de datos:")
+print("\n📈 Total en base de datos:")
 print(f"   Categorías: {total_categorias}")
 print(f"   Subcategorías: {total_subcategorias}")
 print(f"   Servicios: {total_servicios}")

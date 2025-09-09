@@ -12,12 +12,8 @@ django.setup()
 from django.contrib.auth.models import User
 
 from taller.models.clientes import Cliente
-from taller.models.documento import (Documento, RepuestoDocumento,
-                                     ServicioDocumento)
+from taller.models.documento import Documento, RepuestoDocumento, ServicioDocumento
 from taller.models.empresa import Empresa
-from taller.models.marca import Marca
-from taller.models.modelo import Modelo
-from taller.models.tecnico import Mecanico
 from taller.models.vehiculos import Vehiculo
 
 print("=== CREAR DOCUMENTO DE PRUEBA COMPLETO ===")
@@ -85,7 +81,7 @@ repuestos_data = [
     },
 ]
 
-print(f"\n🔧 Creando repuestos:")
+print("\n🔧 Creando repuestos:")
 for i, rep_data in enumerate(repuestos_data, 1):
     repuesto = RepuestoDocumento.objects.create(
         documento=documento,
@@ -107,7 +103,7 @@ servicios_data = [
     {"nombre": "Alineación y balanceo", "precio": 30000},
 ]
 
-print(f"\n⚙️ Creando servicios:")
+print("\n⚙️ Creando servicios:")
 for i, serv_data in enumerate(servicios_data, 1):
     servicio = ServicioDocumento.objects.create(
         empresa=empresa,
@@ -127,14 +123,14 @@ subtotal = subtotal_repuestos + subtotal_servicios
 iva = int(subtotal * 0.19)
 total = subtotal + iva
 
-print(f"\n💰 RESUMEN FINANCIERO:")
+print("\n💰 RESUMEN FINANCIERO:")
 print(f"   Subtotal repuestos: ${subtotal_repuestos:,}")
 print(f"   Subtotal servicios: ${subtotal_servicios:,}")
 print(f"   Subtotal: ${subtotal:,}")
 print(f"   IVA (19%): ${iva:,}")
 print(f"   TOTAL: ${total:,}")
 
-print(f"\n🎯 URLS PARA PROBAR:")
+print("\n🎯 URLS PARA PROBAR:")
 print(
     f"   Ver documento nuevo: http://127.0.0.1:8000/documentos/nuevo-ver/{documento.id}/"
 )
@@ -143,6 +139,6 @@ print(
 )
 print(f"   Test de datos: http://127.0.0.1:8000/documentos/test-datos/{documento.id}/")
 
-print(f"\n✅ Documento de prueba completo creado exitosamente")
+print("\n✅ Documento de prueba completo creado exitosamente")
 print(f"📋 Contiene {repuestos.count()} repuestos y {servicios.count()} servicios")
 print(f"🆔 ID del documento: {documento.id}")

@@ -2,6 +2,7 @@
 """
 Script para verificar usuarios y credenciales de prueba
 """
+
 import os
 
 import django
@@ -13,7 +14,6 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 
 from taller.models.empresa import Empresa
-from taller.models.suscripcion import Suscripcion
 
 print("=" * 80)
 print("🔐 USUARIOS Y CREDENCIALES DE PRUEBA - E-GARAGE")

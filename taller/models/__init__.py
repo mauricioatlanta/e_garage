@@ -1,14 +1,13 @@
 # Branding y configuración avanzada
 # Catálogo global
 from .catalogo import CatalogoModeloAuto
+from .clientes import Cliente
 from .company_settings import CompanySettings, CompanySettingsHistory
 from .configuracion import ConfiguracionEmpresa
 
 # Modelos principales
 from .documento import Documento
 from .empresa import Empresa  # re-export para importaciones simples en tests
-from .clientes import Cliente
-from .vehiculos import Vehiculo
 
 # Líneas de documento
 from .lineas_documento import LineaOtroServicio, LineaRepuesto, LineaServicio
@@ -19,5 +18,6 @@ from .mixins import AuditMixin
 # Repuestos
 from .repuesto import CategoriaRepuesto, Repuesto
 from .tecnico import Tecnico
+from .vehiculos import Vehiculo
 
 # from .tecnico import Tecnico as Mecanico  # alias legacy si es necesario

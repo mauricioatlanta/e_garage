@@ -6,7 +6,6 @@ from django.urls import include, path
 logger = logging.getLogger(__name__)
 logger.debug("CARGANDO taller/taller_main_urls.py")
 from django.views.generic import TemplateView
-from django.shortcuts import render
 
 from taller.views_extra.bienvenida_usa import bienvenida_usa
 from taller.views_extra.landing_chile import landing_chile
@@ -148,12 +147,27 @@ urlpatterns = [
     #     name="test_service_search",
     # ),
     # Módulos del sistema
-    path("clientes/",  include(("taller.clientes.urls",   "clientes"),   namespace="clientes")),
-    path("vehiculos/", include(("taller.vehiculos.urls",  "vehiculos"),  namespace="vehiculos")),
-    path("servicios/", include(("taller.servicios.urls",  "servicios"),  namespace="servicios")),
-    path("repuestos/", include(("taller.repuestos.urls",  "repuestos"),  namespace="repuestos")),
-    path("reportes/",  include(("taller.reportes.urls",   "reportes"),   namespace="reportes")),
-    path("tecnicos/",  include(("taller.tecnicos.urls",   "tecnicos"),   namespace="tecnicos")),
+    path(
+        "clientes/", include(("taller.clientes.urls", "clientes"), namespace="clientes")
+    ),
+    path(
+        "vehiculos/",
+        include(("taller.vehiculos.urls", "vehiculos"), namespace="vehiculos"),
+    ),
+    path(
+        "servicios/",
+        include(("taller.servicios.urls", "servicios"), namespace="servicios"),
+    ),
+    path(
+        "repuestos/",
+        include(("taller.repuestos.urls", "repuestos"), namespace="repuestos"),
+    ),
+    path(
+        "reportes/", include(("taller.reportes.urls", "reportes"), namespace="reportes")
+    ),
+    path(
+        "tecnicos/", include(("taller.tecnicos.urls", "tecnicos"), namespace="tecnicos")
+    ),
     path(
         "business-intelligence/",
         include("taller.business_intelligence_urls", namespace="business_intelligence"),
@@ -227,9 +241,14 @@ us_patterns = [
     path("api/catalogo/modelos/", api_modelos, name="api_catalogo_modelos"),
     path("api/catalogo/stats/", api_estadisticas_catalogo, name="api_catalogo_stats"),
     # APIs adicionales
-    path("api/",       include(("taller.api.urls",        "api"),        namespace="api")),
-    path("admin-monitoring/",
-         include(("taller.urls_modules.admin_monitoring", "admin_monitoring"),   namespace="admin_monitoring")),
+    path("api/", include(("taller.api.urls", "api"), namespace="api")),
+    path(
+        "admin-monitoring/",
+        include(
+            ("taller.urls_modules.admin_monitoring", "admin_monitoring"),
+            namespace="admin_monitoring",
+        ),
+    ),
     path("emails/", include("taller.emails.urls")),
     path("cambiar-idioma/", cambiar_idioma, name="cambiar_idioma"),
     # AJAX Jerárquico - Vehículos
