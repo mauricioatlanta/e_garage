@@ -11,8 +11,31 @@
 <div class="config-container">
     <!-- 🚀 HEADER TECNOLÓGICO -->
     <div class="config-header">
-        <h1 class="config-title">⚙️ CONFIGURACIÓN EMPRESARIAL</h1>
-        <p class="config-subtitle">Sistema de Control Central - Configuración Avanzada</p>
+        <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 1rem;">
+            <div style="width: 60px; height: 60px; background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple)); border-radius: 50%; display: flex; align-items: center; justify-content: center; animation: icon-pulse 2s infinite;">
+                <span style="font-size: 2rem;">⚙️</span>
+            </div>
+            <div>
+                <h1 class="config-title">CONFIGURACIÓN EMPRESARIAL</h1>
+                <p class="config-subtitle">Sistema de Control Central - Configuración Avanzada</p>
+            </div>
+        </div>
+        
+        <!-- Estadísticas rápidas -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-top: 1.5rem;">
+            <div style="background: rgba(0, 255, 255, 0.1); border: 1px solid var(--neon-cyan); border-radius: 10px; padding: 1rem; text-align: center;">
+                <div style="color: var(--neon-cyan); font-size: 1.5rem; font-weight: bold; font-family: 'Orbitron', monospace;">🏢</div>
+                <div style="color: var(--neon-cyan); font-size: 0.9rem; font-family: 'Courier New', monospace;">Empresa</div>
+            </div>
+            <div style="background: rgba(255, 215, 0, 0.1); border: 1px solid var(--neon-gold); border-radius: 10px; padding: 1rem; text-align: center;">
+                <div style="color: var(--neon-gold); font-size: 1.5rem; font-weight: bold; font-family: 'Orbitron', monospace;">👥</div>
+                <div style="color: var(--neon-gold); font-size: 0.9rem; font-family: 'Courier New', monospace;">Técnicos</div>
+            </div>
+            <div style="background: rgba(0, 255, 136, 0.1); border: 1px solid var(--neon-green); border-radius: 10px; padding: 1rem; text-align: center;">
+                <div style="color: var(--neon-green); font-size: 1.5rem; font-weight: bold; font-family: 'Orbitron', monospace;">⚡</div>
+                <div style="color: var(--neon-green); font-size: 0.9rem; font-family: 'Courier New', monospace;">Sistema</div>
+            </div>
+        </div>
     </div>
 
     <!-- 🏢 PANEL DE CONFIGURACIÓN EMPRESARIAL -->
@@ -119,6 +142,58 @@
         </form>
     </div>
 
+    <!-- 👥 GESTIÓN DE TÉCNICOS -->
+    <div class="config-panel">
+        <div class="panel-title">👥 Gestión de Técnicos</div>
+        
+        <!-- Formulario para agregar técnico -->
+        <div style="background: var(--glass-bg); border: 1px solid var(--neon-cyan); border-radius: 15px; padding: 2rem; margin-bottom: 2rem;">
+            <h3 style="color: var(--neon-cyan); font-family: 'Orbitron', monospace; margin-bottom: 1.5rem; text-align: center;">
+                ➕ Agregar Nuevo Técnico
+            </h3>
+            
+            <form method="post" style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 1.5rem; align-items: end;">
+                {% csrf_token %}
+                <input type="hidden" name="crear_tecnico" value="1">
+                
+                <div class="form-group">
+                    <label class="form-label" for="tecnico_nombre">Nombre Completo</label>
+                    <input id="tecnico_nombre" name="nombre" required minlength="2" 
+                           placeholder="Ej: Juan Pérez" class="form-input" />
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="tecnico_telefono">Teléfono</label>
+                    <input id="tecnico_telefono" name="telefono" type="tel" 
+                           placeholder="+56 9 1234 5678" class="form-input" />
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="tecnico_direccion">Dirección</label>
+                    <input id="tecnico_direccion" name="direccion" 
+                           placeholder="Dirección del técnico" class="form-input" />
+                </div>
+                
+                <button type="submit" class="cyber-btn" style="background: linear-gradient(135deg, var(--neon-green), var(--neon-cyan)); padding: 1rem 1.5rem;">
+                    ➕ Crear
+                </button>
+            </form>
+        </div>
+
+        <!-- Lista de técnicos existentes -->
+        <div style="background: var(--glass-bg); border: 1px solid var(--neon-purple); border-radius: 15px; padding: 2rem;">
+            <h3 style="color: var(--neon-purple); font-family: 'Orbitron', monospace; margin-bottom: 1.5rem; text-align: center;">
+                📋 Técnicos Registrados
+            </h3>
+            
+            <!-- Aquí se mostrarían los técnicos existentes -->
+            <div style="text-align: center; padding: 2rem; color: var(--neon-cyan); font-family: 'Courier New', monospace;">
+                <p>🔧 Sistema de gestión de técnicos listo para implementar</p>
+                <p style="font-size: 0.9rem; opacity: 0.8;">Los técnicos agregados aparecerán aquí con opciones de editar y activar/desactivar</p>
+            </div>
+        </div>
+    </div>
+
     <!-- 🚀 NAVEGACIÓN -->
     <div style="text-align: center; margin-top: 2rem;">
         <a href="/" class="cyber-btn" style="background: linear-gradient(135deg, var(--neon-gold), var(--neon-pink));">
@@ -188,11 +263,168 @@ select.form-input option {
     color: #ffffff;
 }
 
-/* Responsive para móviles */
+/* 👥 ESTILOS PARA GESTIÓN DE TÉCNICOS */
+.tech-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--neon-pink);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.tech-card:hover {
+    border-color: var(--neon-gold);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+    transform: translateY(-2px);
+}
+
+.tech-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple), var(--neon-gold));
+    animation: tech-scan 3s infinite;
+}
+
+.tech-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+}
+
+.tech-name {
+    color: var(--neon-cyan);
+    font-weight: 600;
+    font-family: 'Orbitron', monospace;
+    font-size: 1.1rem;
+}
+
+.tech-details {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.9rem;
+    color: var(--neon-purple);
+    font-family: 'Courier New', monospace;
+}
+
+.tech-status {
+    font-size: 0.8rem;
+    font-family: 'Orbitron', monospace;
+    letter-spacing: 1px;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-weight: bold;
+}
+
+.tech-status.active {
+    background: rgba(0, 255, 136, 0.2);
+    color: var(--neon-green);
+    border: 1px solid var(--neon-green);
+}
+
+.tech-status.inactive {
+    background: rgba(255, 107, 107, 0.2);
+    color: #ff6b6b;
+    border: 1px solid #ff6b6b;
+}
+
+.tech-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.tech-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.tech-btn.edit {
+    background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
+    color: #000;
+}
+
+.tech-btn.toggle {
+    background: linear-gradient(135deg, var(--neon-gold), var(--neon-pink));
+    color: #000;
+}
+
+.tech-btn.delete {
+    background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+    color: #fff;
+}
+
+.tech-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+}
+
+/* 🎭 ANIMACIONES ADICIONALES */
+@keyframes tech-scan {
+    0% { transform: translateX(-100%); opacity: 0; }
+    50% { opacity: 1; }
+    100% { transform: translateX(100%); opacity: 0; }
+}
+
+/* 📱 RESPONSIVE MEJORADO */
 @media (max-width: 768px) {
     .config-container > div[style*="grid-template-columns"] {
         grid-template-columns: 1fr !important;
     }
+    
+    .tech-card {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+    }
+    
+    .tech-actions {
+        justify-content: center;
+    }
+    
+    .tech-details {
+        flex-direction: column;
+        gap: 0.3rem;
+    }
+}
+
+/* 🌟 EFECTOS ESPECIALES MEJORADOS */
+.config-panel {
+    position: relative;
+}
+
+.config-panel::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent 30%, rgba(0, 255, 255, 0.03) 50%, transparent 70%);
+    pointer-events: none;
+    animation: panel-shimmer 4s infinite;
+}
+
+@keyframes panel-shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
 }
 </style>
 
