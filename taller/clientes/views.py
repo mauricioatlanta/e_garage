@@ -226,9 +226,9 @@ def clientes_stats(request):
     if country:
         qs = qs.filter(empresa__pais__iexact=country)
     if start:
-        qs = qs.filter(fecha_creacion__gte=start)
+        qs = qs.filter(created_at__gte=start)
     if end:
-        qs = qs.filter(fecha_creacion__lte=end)
+        qs = qs.filter(created_at__lte=end)
 
     agg = qs.values("region__nombre").annotate(count=Count("id")).order_by("-count")
     labels = [row.get("region__nombre") or "Sin región" for row in agg]

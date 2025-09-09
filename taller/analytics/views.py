@@ -158,7 +158,7 @@ class AIInsightView(View):
 
         fecha_inicio = timezone.now() - timedelta(days=timeframe)
         documentos = engine.empresa.documento_set.filter(
-            fecha_creacion__gte=fecha_inicio
+            created_at__gte=fecha_inicio
         )
 
         insights = []
@@ -331,7 +331,7 @@ def real_time_metrics_api(request):
     today = timezone.now().date()
 
     # Documentos de hoy
-    docs_today = engine.empresa.documento_set.filter(fecha_creacion__date=today)
+    docs_today = engine.empresa.documento_set.filter(created_at__date=today)
 
     # Métricas de rendimiento
     metrics = {
