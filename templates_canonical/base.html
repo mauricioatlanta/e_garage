@@ -117,13 +117,9 @@
     <div class="flex flex-wrap items-center justify-center gap-3 max-w-7xl w-full px-4">
     {% if request.user.is_authenticated %}
       <!-- Botones de navegación principal -->
-      {% url 'clientes:lista_clientes' as url_clientes %}
-      {% url 'vehiculos:lista_vehiculos' as url_vehiculos %}
-      {% url 'repuestos:lista_repuestos' as url_repuestos %}
-      {% url 'servicios:servicios_menu' as url_servicios %}
-
-      {% if url_clientes %}
-        <a href="{{ url_clientes }}" class="group relative nav-button-power">
+      
+      <!-- Clientes -->
+      <a href="{% if request.path|slice:':3' == '/cl' %}/cl/clientes/{% else %}/us/clientes/{% endif %}" class="group relative nav-button-power">
           <div class="relative overflow-hidden">
             <!-- Borde animado -->
             <div class="absolute inset-0 bg-gradient-to-r from-cyan-400 via-cyan-300 to-cyan-400 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse"></div>
@@ -139,10 +135,9 @@
             <div class="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
           </div>
         </a>
-      {% endif %}
 
-      {% if url_vehiculos %}
-        <a href="{{ url_vehiculos }}" class="group relative nav-button-power">
+      <!-- Vehículos -->
+      <a href="{% if request.path|slice:':3' == '/cl' %}/cl/vehiculos/{% else %}/us/vehiculos/{% endif %}" class="group relative nav-button-power">
           <div class="relative overflow-hidden">
             <!-- Borde animado -->
             <div class="absolute inset-0 bg-gradient-to-r from-lime-400 via-lime-300 to-lime-400 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse"></div>
@@ -158,10 +153,9 @@
             <div class="absolute inset-0 bg-gradient-to-r from-lime-500/20 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
           </div>
         </a>
-      {% endif %}
 
-      {% if url_servicios %}
-        <a href="{{ url_servicios }}" class="group relative nav-button-power">
+      <!-- Servicios -->
+      <a href="{% if request.path|slice:':3' == '/cl' %}/cl/servicios/{% else %}/us/servicios/{% endif %}" class="group relative nav-button-power">
           <div class="relative overflow-hidden">
             <!-- Borde animado -->
             <div class="absolute inset-0 bg-gradient-to-r from-purple-400 via-purple-300 to-purple-400 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse"></div>
@@ -177,10 +171,9 @@
             <div class="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
           </div>
         </a>
-      {% endif %}
 
-      {% if url_repuestos %}
-        <a href="{{ url_repuestos }}" class="group relative nav-button-power">
+      <!-- Repuestos -->
+      <a href="{% if request.path|slice:':3' == '/cl' %}/cl/repuestos/{% else %}/us/repuestos/{% endif %}" class="group relative nav-button-power">
           <div class="relative overflow-hidden">
             <!-- Borde animado -->
             <div class="absolute inset-0 bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-400 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse"></div>
@@ -196,12 +189,9 @@
             <div class="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
           </div>
         </a>
-      {% endif %}
 
       <!-- Documentos -->
-      {% url 'documentos:lista_documentos' as url_documentos %}
-      {% if url_documentos %}
-        <a href="{{ url_documentos }}" class="group relative nav-button-power">
+      <a href="{% if request.path|slice:':3' == '/cl' %}/cl/documentos/{% else %}/us/documentos/{% endif %}" class="group relative nav-button-power">
           <div class="relative overflow-hidden">
             <!-- Borde animado -->
             <div class="absolute inset-0 bg-gradient-to-r from-teal-400 via-teal-300 to-teal-400 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse"></div>
@@ -217,12 +207,9 @@
             <div class="absolute inset-0 bg-gradient-to-r from-teal-500/20 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
           </div>
         </a>
-      {% endif %}
 
       <!-- Otros Servicios -->
-      {% url 'servicios:otros_servicios_menu' as url_otros_servicios %}
-      {% if url_otros_servicios %}
-        <a href="{{ url_otros_servicios }}" class="group relative nav-button-power">
+      <a href="{% if request.path|slice:':3' == '/cl' %}/cl/servicios/otros-servicios/{% else %}/us/servicios/otros-servicios/{% endif %}" class="group relative nav-button-power">
           <div class="relative overflow-hidden">
             <!-- Borde animado -->
             <div class="absolute inset-0 bg-gradient-to-r from-pink-400 via-pink-300 to-pink-400 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse"></div>
@@ -238,7 +225,6 @@
             <div class="absolute inset-0 bg-gradient-to-r from-pink-500/20 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
           </div>
         </a>
-      {% endif %}
 
       <!-- Centro de Investigación -->
       <a href="{% if request.path|slice:':3' == '/cl' %}/cl/taller/centro-operaciones-espacial/{% else %}/us/centro-operaciones-espacial/{% endif %}" class="group relative nav-button-power">
