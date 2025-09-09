@@ -378,6 +378,36 @@ body {
                 <div class="modern-description">Sistema vehicular smart</div>
             </a>
 
+            <a href="{% url 'repuestos:lista_repuestos' %}" class="command-panel modern-panel">
+                <div class="modern-icon-container">
+                    <div class="main-icon">🔧</div>
+                    <div class="secondary-icon">⚡</div>
+                </div>
+                <div class="modern-title">PARTS HUB</div>
+                <div class="modern-subtitle">Parts Management</div>
+                <div class="modern-description">Gestión de repuestos</div>
+            </a>
+
+            <a href="{% url 'servicios:servicios_menu' %}" class="command-panel modern-panel">
+                <div class="modern-icon-container">
+                    <div class="main-icon">🛠️</div>
+                    <div class="secondary-icon">💫</div>
+                </div>
+                <div class="modern-title">SERVICE CORE</div>
+                <div class="modern-subtitle">Service Center</div>
+                <div class="modern-description">Gestión de servicios</div>
+            </a>
+
+            <a href="{% url 'servicios:otros_servicios_menu' %}" class="command-panel modern-panel">
+                <div class="modern-icon-container">
+                    <div class="main-icon">🌟</div>
+                    <div class="secondary-icon">🚀</div>
+                </div>
+                <div class="modern-title">EXTRA SERVICES</div>
+                <div class="modern-subtitle">Additional Services</div>
+                <div class="modern-description">Otros servicios</div>
+            </a>
+
             {% url 'chile:configuracion' as url_configuracion %}
             <a href="{{ url_configuracion|default:'#' }}" class="command-panel modern-panel">
                 <div class="modern-icon-container">
