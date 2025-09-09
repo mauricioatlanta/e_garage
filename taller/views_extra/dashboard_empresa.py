@@ -124,16 +124,13 @@ def dashboard_centro_operaciones(request):
     # Técnicos y productividad
     tecnicos_activos = Tecnico.objects.filter(empresa=empresa, activo=True).count()
 
-    # 📈 SERVICIOS MÁS DEMANDADOS (Top 5)
+    # 📈 SERVICIOS MÁS DEMANDADOS (Top 5) - Usar solo cantidad por ahora
     servicios_top = (
         LineaServicio.objects.filter(
             documento__empresa=empresa, documento__fecha_emision__gte=hace_30_dias
         )
         .values("nombre")
-        .annotate(
-            cantidad=Count("id"), 
-            ingresos=Coalesce(Sum(line_subtotal), ZERO_DEC)
-        )
+        .annotate(cantidad=Count("id"))
         .order_by("-cantidad")[:5]
     )
 
