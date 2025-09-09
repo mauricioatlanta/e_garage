@@ -7,21 +7,21 @@
   <title>{% trans "eGarage Chile - Software N°1 para Talleres Mecánicos" %}</title>
   <meta name="description" content="La plataforma más avanzada para gestión de talleres mecánicos en Chile. Presupuestos digitales, control de inventario, órdenes de trabajo y más. Prueba gratis 30 días.">
   <meta name="keywords" content="software taller mecánico, gestión taller automotriz, presupuestos digitales, control repuestos, órdenes trabajo, facturación taller Chile">
-  
+
   <!-- Open Graph Meta Tags -->
   <meta property="og:title" content="eGarage Chile - Software N°1 para Talleres Mecánicos">
   <meta property="og:description" content="Digitaliza tu taller con eGarage. Presupuestos, inventario, facturación y más. Prueba gratis 30 días.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://egarage.cl">
-  
+
   <!-- Favicon -->
   <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>">
-  
+
   <!-- External Libraries -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  
+
   <style>
     /* === FUENTES FUTURISTAS === */
     body {
@@ -30,11 +30,11 @@
       font-family: 'Inter', sans-serif;
       overflow-x: hidden;
     }
-    
+
     .font-orbitron {
       font-family: 'Orbitron', monospace;
     }
-    
+
     /* === FONDO DINÁMICO FUTURISTA === */
     .futuristic-bg {
       position: fixed;
@@ -43,13 +43,13 @@
       width: 100%;
       height: 100%;
       z-index: -1;
-      background: 
+      background:
         radial-gradient(circle at 20% 80%, rgba(0, 255, 255, 0.1) 0%, transparent 50%),
         radial-gradient(circle at 80% 20%, rgba(0, 255, 0, 0.1) 0%, transparent 50%),
         radial-gradient(circle at 40% 40%, rgba(255, 0, 255, 0.1) 0%, transparent 50%),
         linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
     }
-    
+
     .futuristic-bg::before {
       content: '';
       position: absolute;
@@ -57,18 +57,18 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background-image: 
+      background-image:
         linear-gradient(90deg, transparent 98%, rgba(0, 255, 255, 0.03) 100%),
         linear-gradient(0deg, transparent 98%, rgba(0, 255, 255, 0.03) 100%);
       background-size: 50px 50px;
       animation: grid-move 20s linear infinite;
     }
-    
+
     @keyframes grid-move {
       0% { transform: translate(0, 0); }
       100% { transform: translate(50px, 50px); }
     }
-    
+
     /* === PARTÍCULAS FLOTANTES === */
     .floating-particles {
       position: fixed;
@@ -79,7 +79,7 @@
       z-index: -1;
       pointer-events: none;
     }
-    
+
     .particle {
       position: absolute;
       width: 2px;
@@ -88,17 +88,17 @@
       border-radius: 50%;
       animation: float 15s infinite linear;
     }
-    
+
     .particle:nth-child(2n) {
       background: rgba(0, 255, 0, 0.6);
       animation-duration: 20s;
     }
-    
+
     .particle:nth-child(3n) {
       background: rgba(255, 0, 255, 0.6);
       animation-duration: 25s;
     }
-    
+
     @keyframes float {
       0% {
         transform: translateY(100vh) translateX(0);
@@ -115,7 +115,7 @@
         opacity: 0;
       }
     }
-    
+
     /* === TARJETAS DE CRISTAL MEJORADAS === */
     .glass-card {
       background: rgba(255,255,255,0.08);
@@ -128,7 +128,7 @@
       overflow: hidden;
       transition: all 0.3s ease;
     }
-    
+
     .glass-card::before {
       content: '';
       position: absolute;
@@ -139,32 +139,32 @@
       background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
       transition: left 0.5s;
     }
-    
+
     .glass-card:hover::before {
       left: 100%;
     }
-    
+
     .glass-card:hover {
       transform: translateY(-5px);
       border-color: rgba(0,255,255,0.6);
       box-shadow: 0 20px 40px rgba(0,255,255,0.2);
     }
-    
+
     /* === EFECTOS DE TEXTO FUTURISTAS === */
     .futuristic-glow {
-      text-shadow: 
+      text-shadow:
         0 0 10px #00ffff,
         0 0 20px #00ffff,
         0 0 30px #00ffff,
         0 0 40px #00ffff;
       animation: glow-pulse 2s ease-in-out infinite alternate;
     }
-    
+
     @keyframes glow-pulse {
       from { text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 30px #00ffff; }
       to { text-shadow: 0 0 20px #00ffff, 0 0 30px #00ffff, 0 0 40px #00ffff; }
     }
-    
+
     .cyber-text {
       background: linear-gradient(45deg, #00ffff, #00ff00, #ff00ff, #ffff00);
       background-size: 400% 400%;
@@ -173,13 +173,13 @@
       background-clip: text;
       animation: cyber-gradient 3s ease infinite;
     }
-    
+
     @keyframes cyber-gradient {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
-    
+
     /* === BOTONES FUTURISTAS === */
     .cyber-button {
       background: linear-gradient(45deg, #00ffff, #0080ff);
@@ -192,7 +192,7 @@
       overflow: hidden;
       transition: all 0.3s ease;
     }
-    
+
     .cyber-button::before {
       content: '';
       position: absolute;
@@ -203,75 +203,75 @@
       background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
       transition: left 0.5s;
     }
-    
+
     .cyber-button:hover::before {
       left: 100%;
     }
-    
+
     .cyber-button:hover {
       transform: translateY(-2px);
       box-shadow: 0 10px 20px rgba(0,255,255,0.4);
     }
-    
+
     /* === ANIMACIONES DE ENTRADA === */
     .fade-in-up {
       opacity: 0;
       transform: translateY(30px);
       animation: fadeInUp 0.8s ease forwards;
     }
-    
+
     @keyframes fadeInUp {
       to {
         opacity: 1;
         transform: translateY(0);
       }
     }
-    
+
     .fade-in-left {
       opacity: 0;
       transform: translateX(-30px);
       animation: fadeInLeft 0.8s ease forwards;
     }
-    
+
     @keyframes fadeInLeft {
       to {
         opacity: 1;
         transform: translateX(0);
       }
     }
-    
+
     .fade-in-right {
       opacity: 0;
       transform: translateX(30px);
       animation: fadeInRight 0.8s ease forwards;
     }
-    
+
     @keyframes fadeInRight {
       to {
         opacity: 1;
         transform: translateX(0);
       }
     }
-    
+
     /* === DELAYS DE ANIMACIÓN === */
     .delay-100 { animation-delay: 0.1s; }
     .delay-200 { animation-delay: 0.2s; }
     .delay-300 { animation-delay: 0.3s; }
     .delay-400 { animation-delay: 0.4s; }
     .delay-500 { animation-delay: 0.5s; }
-    
+
     /* === SCROLL SUAVE === */
     html {
       scroll-behavior: smooth;
     }
-    
+
     /* === RESPONSIVE === */
     @media (max-width: 768px) {
       .glass-card {
         padding: 1.5rem;
         margin: 1rem 0;
       }
-      
+
       .futuristic-glow {
         text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
       }
@@ -279,32 +279,26 @@
   </style>
 </head>
 <body class="min-h-screen">
-  
+
   <!-- === FONDO DINÁMICO FUTURISTA === -->
   <div class="futuristic-bg"></div>
-  
+
   <!-- === PARTÍCULAS FLOTANTES === -->
   <div class="floating-particles" id="particles"></div>
-  
+
   <!-- === NAVEGACIÓN FUTURISTA === -->
-  <nav class="fixed top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-md border-b border-cyan-400/30">
+  <nav class="relative bg-black/20 backdrop-blur-md border-b border-cyan-400/30">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center py-4">
-        
-        <!-- 🔴 CRUCES ROJAS DE IDENTIFICACIÓN -->
-        <div class="flex items-center gap-4">
-          <div class="flex items-center gap-2 text-red-500 text-2xl">
-            <span>❌</span>
-            <span>❌</span>
-            <span>❌</span>
-          </div>
-          <div class="flex items-center space-x-3">
+
+        <!-- Logo eGarage -->
+        <div class="flex items-center space-x-3">
             <i class="fas fa-cog text-cyan-400 text-2xl animate-spin"></i>
             <h1 class="text-2xl font-bold text-cyan-400 font-orbitron">eGarage</h1>
             <span class="text-lime-400 font-bold">CHILE</span>
           </div>
         </div>
-        
+
         <!-- Menú de navegación -->
         <div class="hidden md:flex items-center space-x-8">
           <a href="#features" class="text-gray-300 hover:text-cyan-400 transition-colors">Características</a>
@@ -312,7 +306,7 @@
           <a href="#testimonials" class="text-gray-300 hover:text-cyan-400 transition-colors">Testimonios</a>
           <a href="#contact" class="text-gray-300 hover:text-cyan-400 transition-colors">Contacto</a>
         </div>
-        
+
         <!-- Botones de acción -->
         <div class="flex items-center space-x-4">
           <a href="/accounts/login/" class="text-gray-300 hover:text-cyan-400 transition-colors">
@@ -327,10 +321,10 @@
   </nav>
 
   <!-- === HERO SECTION FUTURISTA === -->
-  <main class="pt-20">
+  <main>
     <section class="min-h-screen flex items-center justify-center relative overflow-hidden">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        
+
         <!-- Título principal con efectos futuristas -->
         <div class="fade-in-up">
           <h1 class="text-6xl md:text-8xl font-bold mb-8 font-orbitron">
@@ -341,18 +335,18 @@
             La Plataforma N°1 para Talleres Mecánicos
           </div>
         </div>
-        
+
         <!-- Subtítulo con animación -->
         <div class="fade-in-up delay-200">
           <p class="text-xl md:text-2xl text-gray-300 mb-4 max-w-4xl mx-auto">
             🚀 <strong class="text-cyan-400">Digitaliza tu taller</strong> con la tecnología más avanzada
           </p>
           <p class="text-lg md:text-xl text-gray-400 mb-12 max-w-3xl mx-auto">
-            Confiado por <span class="text-lime-400 font-bold">500+ talleres</span> en Chile. 
+            Confiado por <span class="text-lime-400 font-bold">500+ talleres</span> en Chile.
             Funcionalidades reales. Soporte bilingüe. Sin riesgos.
           </p>
         </div>
-        
+
         <!-- Botones de acción futuristas -->
         <div class="fade-in-up delay-300 flex flex-col md:flex-row gap-6 justify-center items-center">
           <a href="/registro/" class="cyber-button px-12 py-4 rounded-full text-xl font-bold">
@@ -364,7 +358,7 @@
             💰 Ver Precios
           </a>
         </div>
-        
+
         <!-- Estadísticas impresionantes -->
         <div class="fade-in-up delay-400 mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
           <div class="glass-card text-center">
@@ -380,7 +374,7 @@
             <div class="text-gray-300">Tiempo de Actividad</div>
           </div>
         </div>
-        
+
       </div>
     </section>
 
@@ -397,14 +391,14 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          
+
           <!-- Característica 1 -->
           <div class="glass-card fade-in-up">
             <div class="text-center">
               <div class="text-6xl mb-4">📱</div>
               <h3 class="text-2xl font-bold text-cyan-400 mb-4">Presupuestos Digitales</h3>
               <p class="text-gray-300 mb-6">
-                Crea presupuestos profesionales en segundos con nuestra IA avanzada. 
+                Crea presupuestos profesionales en segundos con nuestra IA avanzada.
                 Incluye fotos, descripciones detalladas y precios automáticos.
               </p>
               <ul class="text-left text-gray-400 space-y-2">
@@ -421,7 +415,7 @@
               <div class="text-6xl mb-4">📦</div>
               <h3 class="text-2xl font-bold text-lime-400 mb-4">Control de Inventario</h3>
               <p class="text-gray-300 mb-6">
-                Gestiona tu stock con alertas inteligentes. Nunca más te quedes sin repuestos 
+                Gestiona tu stock con alertas inteligentes. Nunca más te quedes sin repuestos
                 cuando más los necesitas.
               </p>
               <ul class="text-left text-gray-400 space-y-2">
@@ -438,7 +432,7 @@
               <div class="text-6xl mb-4">🔧</div>
               <h3 class="text-2xl font-bold text-purple-400 mb-4">Órdenes de Trabajo</h3>
               <p class="text-gray-300 mb-6">
-                Digitaliza completamente el flujo de trabajo. Desde la recepción hasta 
+                Digitaliza completamente el flujo de trabajo. Desde la recepción hasta
                 la entrega del vehículo.
               </p>
               <ul class="text-left text-gray-400 space-y-2">
@@ -455,7 +449,7 @@
               <div class="text-6xl mb-4">📊</div>
               <h3 class="text-2xl font-bold text-yellow-400 mb-4">Reportes con IA</h3>
               <p class="text-gray-300 mb-6">
-                Analiza el rendimiento de tu taller con reportes inteligentes que 
+                Analiza el rendimiento de tu taller con reportes inteligentes que
                 te ayudan a tomar mejores decisiones.
               </p>
               <ul class="text-left text-gray-400 space-y-2">
@@ -472,7 +466,7 @@
               <div class="text-6xl mb-4">💬</div>
               <h3 class="text-2xl font-bold text-pink-400 mb-4">WhatsApp Business</h3>
               <p class="text-gray-300 mb-6">
-                Integración completa con WhatsApp Business para comunicación 
+                Integración completa con WhatsApp Business para comunicación
                 directa con tus clientes.
               </p>
               <ul class="text-left text-gray-400 space-y-2">
@@ -489,7 +483,7 @@
               <div class="text-6xl mb-4">🌐</div>
               <h3 class="text-2xl font-bold text-orange-400 mb-4">Portal del Cliente</h3>
               <p class="text-gray-300 mb-6">
-                Tus clientes pueden ver el estado de su vehículo en tiempo real 
+                Tus clientes pueden ver el estado de su vehículo en tiempo real
                 desde cualquier dispositivo.
               </p>
               <ul class="text-left text-gray-400 space-y-2">
@@ -512,7 +506,7 @@
             💰 Planes que se Adaptan a tu Taller
           </h2>
           <p class="text-xl text-gray-300 max-w-3xl mx-auto mb-6">
-            Desde talleres pequeños hasta grandes operaciones. Precios en USD para estabilidad, pago en CLP al tipo de cambio del día.
+            Desde talleres pequeños hasta grandes operaciones. Precios en pesos chilenos para mayor claridad y transparencia.
           </p>
           <div class="glass-card max-w-2xl mx-auto">
             <div class="flex items-center justify-center space-x-4">
@@ -526,18 +520,18 @@
         </div>
 
         <div class="grid lg:grid-cols-3 gap-8">
-          
+
           <!-- Plan Básico -->
           <div class="glass-card border-2 border-cyan-400/40 fade-in-up">
             <div class="text-center mb-8">
               <div class="text-4xl mb-4">🚀</div>
               <h3 class="text-3xl font-bold text-cyan-300 mb-2 font-orbitron">BÁSICO</h3>
               <p class="text-gray-300 mb-4">Perfecto para talleres pequeños</p>
-              <div class="text-5xl font-bold text-white mb-2">$15 <span class="text-lg text-gray-300">USD/mes</span></div>
-              <div class="text-sm text-cyan-400 font-semibold">≈ $15,000 CLP/mes</div>
+              <div class="text-5xl font-bold text-white mb-2">$20.000 <span class="text-lg text-gray-300">CLP/mes</span></div>
+              <div class="text-sm text-cyan-400 font-semibold">≈ $20 USD/mes</div>
               <div class="text-xs text-gray-500 mt-2">Facturación mensual</div>
             </div>
-            
+
             <ul class="space-y-3 mb-8 text-left">
               <li class="flex items-center text-gray-300">
                 <i class="fas fa-check text-cyan-400 mr-3"></i>
@@ -568,7 +562,7 @@
                 <span>Hasta 2 usuarios</span>
               </li>
             </ul>
-            
+
             <a href="/registro/?plan=basico" class="block w-full text-center px-6 py-4 bg-gradient-to-r from-cyan-400 to-blue-500 text-black font-bold rounded-lg hover:from-cyan-300 hover:to-blue-400 transition-all">
               <i class="fas fa-rocket mr-2"></i>
               Comenzar Prueba Gratis
@@ -586,11 +580,11 @@
               <div class="text-4xl mb-4">💎</div>
               <h3 class="text-3xl font-bold text-lime-300 mb-2 font-orbitron">PROFESIONAL</h3>
               <p class="text-gray-300 mb-4">Para talleres en crecimiento</p>
-              <div class="text-5xl font-bold text-white mb-2">$35 <span class="text-lg text-gray-300">USD/mes</span></div>
-              <div class="text-sm text-lime-400 font-semibold">≈ $35,000 CLP/mes</div>
-              <div class="text-xs text-gray-500 mt-2">Facturación mensual</div>
+              <div class="text-5xl font-bold text-white mb-2">$100.000 <span class="text-lg text-gray-300">CLP/semestre</span></div>
+              <div class="text-sm text-lime-400 font-semibold">≈ $100 USD/semestre</div>
+              <div class="text-xs text-gray-500 mt-2">Facturación semestral</div>
             </div>
-            
+
             <ul class="space-y-3 mb-8 text-left">
               <li class="flex items-center text-gray-300">
                 <i class="fas fa-check text-lime-400 mr-3"></i>
@@ -625,7 +619,7 @@
                 <span>Soporte prioritario 24/7</span>
               </li>
             </ul>
-            
+
             <a href="/registro/?plan=profesional" class="block w-full text-center px-6 py-4 bg-gradient-to-r from-lime-400 to-cyan-400 text-black font-bold rounded-lg hover:from-lime-300 hover:to-cyan-300 transition-all">
               <i class="fas fa-crown mr-2"></i>
               Comenzar Prueba Gratis
@@ -638,11 +632,11 @@
               <div class="text-4xl mb-4">🏢</div>
               <h3 class="text-3xl font-bold text-purple-300 mb-2 font-orbitron">EMPRESARIAL</h3>
               <p class="text-gray-300 mb-4">Para grandes operaciones</p>
-              <div class="text-5xl font-bold text-white mb-2">$75 <span class="text-lg text-gray-300">USD/mes</span></div>
-              <div class="text-sm text-purple-400 font-semibold">≈ $75,000 CLP/mes</div>
-              <div class="text-xs text-gray-500 mt-2">Facturación mensual</div>
+              <div class="text-5xl font-bold text-white mb-2">$200.000 <span class="text-lg text-gray-300">CLP/semestre</span></div>
+              <div class="text-sm text-purple-400 font-semibold">≈ $200 USD/semestre</div>
+              <div class="text-xs text-gray-500 mt-2">Facturación semestral</div>
             </div>
-            
+
             <ul class="space-y-3 mb-8 text-left">
               <li class="flex items-center text-gray-300">
                 <i class="fas fa-check text-purple-400 mr-3"></i>
@@ -677,7 +671,7 @@
                 <span>Soporte telefónico prioritario</span>
               </li>
             </ul>
-            
+
             <a href="/registro/?plan=empresarial" class="block w-full text-center px-6 py-4 bg-gradient-to-r from-purple-400 to-pink-500 text-black font-bold rounded-lg hover:from-purple-300 hover:to-pink-400 transition-all">
               <i class="fas fa-building mr-2"></i>
               Comenzar Prueba Gratis
@@ -700,7 +694,7 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          
+
           <!-- Testimonio 1 -->
           <div class="glass-card fade-in-up">
             <div class="text-center">
@@ -802,7 +796,7 @@
   <footer class="bg-black/40 border-t border-cyan-400/30 py-12">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-        
+
         <!-- Logo y descripción -->
         <div class="col-span-1 md:col-span-2">
           <div class="flex items-center space-x-3 mb-4">
@@ -810,7 +804,7 @@
             <h3 class="text-2xl font-bold text-cyan-400 font-orbitron">eGarage Chile</h3>
           </div>
           <p class="text-gray-300 mb-4">
-            La plataforma más avanzada para gestión de talleres mecánicos en Chile. 
+            La plataforma más avanzada para gestión de talleres mecánicos en Chile.
             Digitaliza tu taller con tecnología de vanguardia.
           </p>
           <div class="flex space-x-4">
@@ -851,7 +845,7 @@
         </div>
 
       </div>
-      
+
       <div class="border-t border-cyan-400/30 mt-8 pt-8 text-center">
         <p class="text-gray-400">
           &copy; 2025 eGarage Chile. Desarrollado con IA para técnicos. Todos los derechos reservados.
@@ -866,7 +860,7 @@
     function createParticles() {
       const particlesContainer = document.getElementById('particles');
       const particleCount = 50;
-      
+
       for (let i = 0; i < particleCount; i++) {
         const particle = document.createElement('div');
         particle.className = 'particle';
@@ -880,11 +874,11 @@
     // Animaciones de scroll
     function animateOnScroll() {
       const elements = document.querySelectorAll('.fade-in-up, .fade-in-left, .fade-in-right');
-      
+
       elements.forEach(element => {
         const elementTop = element.getBoundingClientRect().top;
         const elementVisible = 150;
-        
+
         if (elementTop < window.innerHeight - elementVisible) {
           element.style.opacity = '1';
           element.style.transform = 'translateY(0) translateX(0)';
@@ -897,7 +891,7 @@
       const scrolled = window.pageYOffset;
       const parallax = document.querySelector('.futuristic-bg');
       const speed = scrolled * 0.5;
-      
+
       if (parallax) {
         parallax.style.transform = `translateY(${speed}px)`;
       }
@@ -907,7 +901,7 @@
     document.addEventListener('DOMContentLoaded', function() {
       createParticles();
       animateOnScroll();
-      
+
       // Animar elementos al cargar
       setTimeout(() => {
         const elements = document.querySelectorAll('.fade-in-up, .fade-in-left, .fade-in-right');
@@ -931,7 +925,7 @@
       button.addEventListener('mouseenter', function() {
         this.style.transform = 'translateY(-2px) scale(1.05)';
       });
-      
+
       button.addEventListener('mouseleave', function() {
         this.style.transform = 'translateY(0) scale(1)';
       });
