@@ -131,7 +131,7 @@ urlpatterns = [
     ),
     # === MÓDULOS PRINCIPALES ===
     # Incluir URLs principales de taller (clientes, vehiculos, repuestos, etc.)
-    path("", include("taller.taller_main_urls")),
+    path("", include(("taller.taller_main_urls", "taller"), namespace="taller")),
     # path('api/', include('taller.api.urls')),
     # path('autocomplete/', include('taller.autocomplete.urls')),
     # path('analytics/', include('taller.analytics.urls')),
