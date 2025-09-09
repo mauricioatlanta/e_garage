@@ -116,6 +116,7 @@ urlpatterns = [
     path("us/accounts/signup/", redirect_qs("/accounts/signup/")),
     # Redirects amigables para login
     path("cl/login/", redirect_qs("/cl/accounts/login/")),
+    path("cl/es/login/", redirect_qs("/cl/accounts/login/")),
     path("us/login/", redirect_qs("/us/accounts/login/")),
     # Logout
     path("cl/accounts/logout/", redirect_qs("/accounts/logout/")),
