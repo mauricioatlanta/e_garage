@@ -139,12 +139,12 @@ def dashboard_centro_operaciones(request):
         Tecnico.objects.filter(empresa=empresa, activo=True)
         .annotate(
             docs_realizados=Count(
-                "documentos", filter=Q(documentos__fecha_emision__gte=hace_30_dias)
+                "documentos_responsables", filter=Q(documentos_responsables__fecha_emision__gte=hace_30_dias)
             ),
             ingresos_generados=Coalesce(
                 Sum(
-                    "documentos__lineas_servicio__precio_unitario",
-                    filter=Q(documentos__fecha_emision__gte=hace_30_dias),
+                    "documentos_responsables__lineas_servicio__precio_unitario",
+                    filter=Q(documentos_responsables__fecha_emision__gte=hace_30_dias),
                 ),
                 ZERO_DEC
             ),
