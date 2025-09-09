@@ -58,7 +58,7 @@ MIDDLEWARE = [
     # Empresa + País
     "taller.middleware.empresa_middleware.EmpresaMiddleware",
     "gestion_taller.middleware.country_prefix.EnforceCountryPrefixMiddleware",
-    "taller.middleware.country_context.CountryContextMiddleware",
+    # "taller.middleware.country_context.CountryContextMiddleware",  # DESHABILITADO - Causa bucles infinitos con /es/
     # Idioma (elige SOLO una)
     # "taller.middleware.fix_language_middleware.FixLanguageMiddleware",  # DESHABILITADO - Causa bucles infinitos
     # "taller.middleware.i18n_country_middleware.I18nCountryMiddleware",
