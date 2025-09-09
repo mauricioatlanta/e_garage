@@ -67,10 +67,10 @@ MIDDLEWARE = [
     # 9. Allauth (después de autenticación)
     "allauth.account.middleware.AccountMiddleware",
     # 10. Middlewares personalizados (orden específico)
-    "taller.middleware.country_url_migration.CountryURLRedirectMiddleware",
+    # "taller.middleware.country_url_migration.CountryURLRedirectMiddleware",  # DESHABILITADO - Causa bucles infinitos
     "taller.middleware.empresa_middleware.EmpresaMiddleware",
     "gestion_taller.middleware.country_prefix.EnforceCountryPrefixMiddleware",
-    "taller.middleware.country_context.CountryContextMiddleware",
+    # "taller.middleware.country_context.CountryContextMiddleware",  # DESHABILITADO - Causa bucles infinitos con /es/
     # "taller.middleware.fix_language_middleware.FixLanguageMiddleware",  # DESHABILITADO - Causa bucles infinitos
     "taller.middleware.verificar_suscripcion.VerificarSuscripcionMiddleware",
 ]
