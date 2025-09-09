@@ -352,8 +352,8 @@
   <div class="neural-container">
     <div class="ai-header">
       <div class="quantum-logo">eGarage</div>
-      <h1 class="ai-title">{% trans "Acceso Neural" %}</h1>
-      <p class="ai-subtitle">{% trans "Autenticación cuántica iniciada" %}</p>
+      <h1 class="ai-title">{% trans "Iniciar Sesión" %}</h1>
+      <p class="ai-subtitle">{% trans "Acceso al sistema de gestión" %}</p>
     </div>
 
     <form method="post" class="neural-form" novalidate>
@@ -380,13 +380,13 @@
       {% endfor %}
 
       <button class="quantum-button" type="submit">
-        {% trans "Iniciar Sesión Cuántica" %}
+        {% trans "Iniciar Sesión" %}
       </button>
     </form>
 
     <div class="neural-links">
       <a class="neural-link" href="{% url 'account_reset_password' %}">
-        {% trans "Recuperar Acceso Neural" %}
+        {% trans "¿Olvidaste tu contraseña?" %}
       </a>
     </div>
 
@@ -395,9 +395,9 @@
     </div>
 
     <div class="signup-section">
-      <p class="signup-text">{% trans "¿Primera vez en el sistema?" %}</p>
+      <p class="signup-text">{% trans "¿No tienes una cuenta?" %}</p>
       <a class="ghost-button" href="{% url 'account_signup' %}">
-        {% trans "Registro Neural" %}
+        {% trans "Registrarse" %}
       </a>
     </div>
   </div>
