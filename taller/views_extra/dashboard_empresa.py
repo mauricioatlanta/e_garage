@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from decimal import Decimal
 
 from django.contrib import messages
@@ -92,8 +92,8 @@ def dashboard_centro_operaciones(request):
     # --- REPUESTOS DEL MES (KPIs) ---
     repuestos_qs = LineaRepuesto.objects.filter(
         documento__empresa=empresa,
-        documento__fecha_emision__date__gte=inicio_mes,
-        documento__fecha_emision__date__lte=hoy,
+        documento__fecha_emision__gte=inicio_mes,
+        documento__fecha_emision__lte=hoy,
     )
 
     total_repuestos_mes = repuestos_qs.aggregate(
@@ -105,8 +105,14 @@ def dashboard_centro_operaciones(request):
 
     # Clientes
     clientes_activos = Cliente.objects.filter(empresa=empresa).count()
+    # Clientes nuevos del mes (created_at es DateTimeField, pero usamos datetime para consistencia)
+    now = timezone.now()
+    inicio_mes_dt = timezone.make_aware(datetime(now.year, now.month, 1))
+    
     clientes_nuevos_mes = Cliente.objects.filter(
-        empresa=empresa, created_at__date__gte=inicio_mes
+        empresa=empresa,
+        created_at__gte=inicio_mes_dt,
+        created_at__lte=now,
     ).count()
     clientes_atendidos_semana = (
         Documento.objects.filter(empresa=empresa, fecha_emision__gte=hace_7_dias)
