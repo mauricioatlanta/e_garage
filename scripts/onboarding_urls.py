@@ -11,5 +11,5 @@ urlpatterns = [
     path("bienvenida/", onboarding_views.bienvenida_onboarding, name="bienvenida"),
     path("paso/", onboarding_views.onboarding_paso, name="onboarding_paso"),
     # Incluir rutas de IA como parte del onboarding
-    path("ia/", include("taller.ia_urls", namespace="ia_onboarding")),
+    path("ia/", include(("taller.ia_urls", "ia"), namespace="ia_onboarding")),
 ]

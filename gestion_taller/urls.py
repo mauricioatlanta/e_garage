@@ -168,21 +168,10 @@ urlpatterns = [
         TemplateView.as_view(template_name="changelog.html"),
         name="changelog",
     ),
-    # 🇺🇸 USA - Inglés
-    path(
-        "us/en/",
-        include(("taller.urls_extra.usa", "usa"), namespace="usa"),
-    ),
-    # 🇺🇸 USA - Español
-    path(
-        "us/es/",
-        include(("taller.urls_extra.usa", "usa"), namespace="usa"),
-    ),
-    # Redirect us/ to us/en/
+    # 🇺🇸 USA - Unificado (inglés y español)
     path(
         "us/",
-        RedirectView.as_view(url="/us/en/", permanent=False),
-        name="us_redirect",
+        include(("taller.urls_extra.usa", "usa"), namespace="usa"),
     ),
     # 🇨🇱 Chile - Español
     path(

@@ -111,7 +111,7 @@ urlpatterns = [
     # Signup para USA
     path("signup/", usa_signup_view, name="account_signup"),
     # Registro para USA
-    path("registro/", include("scripts.onboarding_urls")),
+    path("registro/", include(("scripts.onboarding_urls", "onboarding"), namespace="usa_onboarding")),
     # === DASHBOARD DE SUSCRIPTOR ===
     path("", include("taller.analytics.urls_suscriptor")),
 ]

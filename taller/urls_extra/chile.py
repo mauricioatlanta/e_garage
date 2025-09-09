@@ -75,7 +75,7 @@ urlpatterns = [
         name="account_login",
     ),
     # Registro para Chile (español por defecto)
-    path("registro/", include("scripts.onboarding_urls")),
+    path("registro/", include(("scripts.onboarding_urls", "onboarding"), namespace="chile_onboarding")),
     # === AJAX JERÁRQUICO - VEHÍCULOS ===
     path(
         "taller/ajax/load-modelos/", ajax_views.load_modelos, name="ajax_load_modelos"
