@@ -213,6 +213,48 @@
         </a>
       {% endif %}
 
+      <!-- Documentos -->
+      {% url 'documentos:lista_documentos' as url_documentos %}
+      {% if url_documentos %}
+        <a href="{{ url_documentos }}" class="group relative nav-button-power">
+          <div class="relative overflow-hidden">
+            <!-- Borde animado -->
+            <div class="absolute inset-0 bg-gradient-to-r from-teal-400 via-teal-300 to-teal-400 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse"></div>
+            <div class="absolute inset-[1px] bg-gradient-to-r from-gray-900 to-gray-800 rounded-lg"></div>
+            <!-- Contenido -->
+            <div class="relative flex items-center gap-3 px-5 py-3 rounded-lg">
+              <div class="w-5 h-5 bg-gradient-to-br from-teal-400 to-teal-600 rounded-md flex items-center justify-center shadow-lg">
+                <div class="w-2 h-2 bg-white rounded-full animate-ping"></div>
+              </div>
+              <span class="font-bold text-sm text-teal-300 group-hover:text-white transition-colors duration-300 tracking-wider">{% trans "DOCUMENTOS" %}</span>
+            </div>
+            <!-- Efecto de brillo -->
+            <div class="absolute inset-0 bg-gradient-to-r from-teal-500/20 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          </div>
+        </a>
+      {% endif %}
+
+      <!-- Otros Servicios -->
+      {% url 'servicios:otros_servicios_menu' as url_otros_servicios %}
+      {% if url_otros_servicios %}
+        <a href="{{ url_otros_servicios }}" class="group relative nav-button-power">
+          <div class="relative overflow-hidden">
+            <!-- Borde animado -->
+            <div class="absolute inset-0 bg-gradient-to-r from-pink-400 via-pink-300 to-pink-400 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse"></div>
+            <div class="absolute inset-[1px] bg-gradient-to-r from-gray-900 to-gray-800 rounded-lg"></div>
+            <!-- Contenido -->
+            <div class="relative flex items-center gap-3 px-5 py-3 rounded-lg">
+              <div class="w-5 h-5 bg-gradient-to-br from-pink-400 to-pink-600 rounded-md flex items-center justify-center shadow-lg">
+                <div class="w-2 h-2 bg-white rounded-full animate-ping"></div>
+              </div>
+              <span class="font-bold text-sm text-pink-300 group-hover:text-white transition-colors duration-300 tracking-wider">{% trans "EXTRA" %}</span>
+            </div>
+            <!-- Efecto de brillo -->
+            <div class="absolute inset-0 bg-gradient-to-r from-pink-500/20 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          </div>
+        </a>
+      {% endif %}
+
       <!-- Centro de Investigación -->
       <a href="{% if request.path|slice:':3' == '/cl' %}/cl/taller/centro-operaciones-espacial/{% else %}/us/centro-operaciones-espacial/{% endif %}" class="group relative nav-button-power">
         <div class="relative overflow-hidden">
