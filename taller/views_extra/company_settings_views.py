@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
+from django.core.cache import cache
 
 from taller.forms.configuracion_empresa import ConfiguracionEmpresaForm
 from taller.utils.empresa import get_or_create_empresa  # tu helper
@@ -20,10 +21,15 @@ def company_settings_view(request):
         form = ConfiguracionEmpresaForm(request.POST, request.FILES, instance=config)
         if form.is_valid():
             cfg = form.save()
-            messages.success(request, "Configuración actualizada.")
+            
+            # Invalidar caché de branding para que se actualice en todas las páginas
+            cache_key = f"company_branding_{request.user.id}"
+            cache.delete(cache_key)
+            
+            messages.success(request, "✅ Configuración actualizada correctamente. Los cambios se reflejarán en todas las páginas.")
             return redirect(request.path)
         else:
-            messages.error(request, "Revisa los campos, hay errores en el formulario.")
+            messages.error(request, "❌ Revisa los campos, hay errores en el formulario.")
     else:
         form = ConfiguracionEmpresaForm(instance=config)
 
