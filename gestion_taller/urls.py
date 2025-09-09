@@ -184,18 +184,18 @@ urlpatterns = [
         TemplateView.as_view(template_name="onboarding/bienvenida_chile_simple.html"),
         name="cl_egarage_bienvenida",
     ),
-    # Redirect cl/ to cl/es/ preserving the rest of the path
-    path(
-        "cl/",
-        redirect_cl_to_es,
-        name="cl_redirect",
-    ),
-    # Redirect cl/anything to cl/es/anything preserving the rest of the path
-    path(
-        "cl/<path:path>",
-        redirect_cl_to_es,
-        name="cl_redirect_with_path",
-    ),
+    # Redirect cl/ to cl/es/ preserving the rest of the path - DESHABILITADO - Causa bucles infinitos
+    # path(
+    #     "cl/",
+    #     redirect_cl_to_es,
+    #     name="cl_redirect",
+    # ),
+    # Redirect cl/anything to cl/es/anything preserving the rest of the path - DESHABILITADO - Causa bucles infinitos
+    # path(
+    #     "cl/<path:path>",
+    #     redirect_cl_to_es,
+    #     name="cl_redirect_with_path",
+    # ),
     # Si agregas más combinaciones, repite este patrón: un solo include por prefijo.
     # path("taller/", include(("taller.urls", "taller"), namespace="taller")),  # ELIMINADO: URLs sin prefijo de país
     # APIs globales (sin prefijo de país)
