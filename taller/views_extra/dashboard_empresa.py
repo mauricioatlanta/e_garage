@@ -131,7 +131,8 @@ def dashboard_centro_operaciones(request):
         )
         .values("nombre")
         .annotate(
-            cantidad=Count("id"), ingresos=Sum(F("precio_unitario") * F("cantidad"))
+            cantidad=Count("id"), 
+            ingresos=Coalesce(Sum(line_subtotal), ZERO_DEC)
         )
         .order_by("-cantidad")[:5]
     )
@@ -143,9 +144,12 @@ def dashboard_centro_operaciones(request):
             docs_realizados=Count(
                 "documentos", filter=Q(documentos__fecha_emision__gte=hace_30_dias)
             ),
-            ingresos_generados=Sum(
-                "documentos__lineas_servicio__precio_unitario",
-                filter=Q(documentos__fecha_emision__gte=hace_30_dias),
+            ingresos_generados=Coalesce(
+                Sum(
+                    "documentos__lineas_servicio__precio_unitario",
+                    filter=Q(documentos__fecha_emision__gte=hace_30_dias),
+                ),
+                ZERO_DEC
             ),
         )
         .order_by("-docs_realizados")[:5]
@@ -311,9 +315,7 @@ def dashboard_centro_operaciones_espacial(request):
         documento__empresa=empresa,
         documento__fecha_emision__gte=hace_30_dias,
         documento__tipo="FAC",
-    ).aggregate(total=Sum(F("precio_unitario") * F("cantidad")))["total"] or Decimal(
-        "0"
-    )
+    ).aggregate(total=Coalesce(Sum(line_subtotal), ZERO_DEC))["total"]
 
     # Ticket promedio
     ticket_promedio = (
