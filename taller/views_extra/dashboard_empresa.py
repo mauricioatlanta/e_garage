@@ -338,16 +338,9 @@ def dashboard_centro_operaciones_espacial(request):
         "es_dashboard_espacial": True,
     }
 
-    # Usar template resolution en lugar de template hardcodeado
+    # Usar template directo para evitar problemas de resolución
     from django.template.response import TemplateResponse
-    from django.utils.translation import get_language
 
-    from taller.utils.templates import select_country_lang_template
-
-    template_name = select_country_lang_template(
-        "dashboard/centro_operaciones_espacial.html",
-        getattr(request.user.empresa, "pais", "cl").lower(),
-        get_language(),
-    )
+    template_name = "taller/cl/es/dashboard/centro_operaciones_espacial.html"
 
     return TemplateResponse(request, template_name, contexto)
