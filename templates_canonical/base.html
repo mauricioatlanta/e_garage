@@ -73,11 +73,46 @@
 
   {# --- Header --- #}
   <header class="company-header flex items-center gap-6 p-6">
-    <!-- BLUE CROSSES - CANONICAL BASE -->
-    <div class="flex items-center gap-2 text-blue-500 text-3xl">
-      <span>❌</span>
-      <span>❌</span>
-      <span>❌</span>
+    <!-- CONFIG Y LOGOUT BUTTONS -->
+    <div class="flex items-center gap-3">
+      <!-- Config Button -->
+      <a href="{% url 'chile:company_settings' %}" class="group relative">
+        <div class="relative overflow-hidden">
+          <!-- Borde animado -->
+          <div class="absolute inset-0 bg-gradient-to-r from-indigo-400 via-indigo-300 to-indigo-400 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse"></div>
+          <div class="absolute inset-[1px] bg-gradient-to-r from-gray-900 to-gray-800 rounded-lg"></div>
+          <!-- Contenido -->
+          <div class="relative flex items-center gap-2 px-4 py-2 rounded-lg">
+            <div class="w-4 h-4 bg-gradient-to-br from-indigo-400 to-indigo-600 rounded-md flex items-center justify-center shadow-lg">
+              <div class="w-1.5 h-1.5 bg-white rounded-full animate-ping"></div>
+            </div>
+            <span class="font-bold text-xs text-indigo-300 group-hover:text-white transition-colors duration-300 tracking-wider">CONFIG</span>
+          </div>
+          <!-- Efecto de brillo -->
+          <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/20 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        </div>
+      </a>
+
+      <!-- Logout Button -->
+      <form action="{% url 'account_logout' %}" method="post" class="inline-block">
+        {% csrf_token %}
+        <button type="submit" class="group relative">
+          <div class="relative overflow-hidden">
+            <!-- Borde animado -->
+            <div class="absolute inset-0 bg-gradient-to-r from-red-400 via-red-300 to-red-400 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse"></div>
+            <div class="absolute inset-[1px] bg-gradient-to-r from-gray-900 to-gray-800 rounded-lg"></div>
+            <!-- Contenido -->
+            <div class="relative flex items-center gap-2 px-4 py-2 rounded-lg">
+              <div class="w-4 h-4 bg-gradient-to-br from-red-400 to-red-600 rounded-md flex items-center justify-center shadow-lg">
+                <div class="w-1.5 h-1.5 bg-white rounded-full animate-ping"></div>
+              </div>
+              <span class="font-bold text-xs text-red-300 group-hover:text-white transition-colors duration-300 tracking-wider">LOGOUT</span>
+            </div>
+            <!-- Efecto de brillo -->
+            <div class="absolute inset-0 bg-gradient-to-r from-red-500/20 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          </div>
+        </button>
+      </form>
     </div>
 
     {% if company_logo_url %}
@@ -262,47 +297,6 @@
         </div>
       </a>
 
-      <!-- Settings -->
-      <a href="{% url 'chile:company_settings' %}" class="group relative nav-button-power">
-        <div class="relative overflow-hidden">
-          <!-- Borde animado -->
-          <div class="absolute inset-0 bg-gradient-to-r from-indigo-400 via-indigo-300 to-indigo-400 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse"></div>
-          <div class="absolute inset-[1px] bg-gradient-to-r from-gray-900 to-gray-800 rounded-lg"></div>
-          <!-- Contenido -->
-          <div class="relative flex items-center gap-3 px-5 py-3 rounded-lg">
-            <div class="w-5 h-5 bg-gradient-to-br from-indigo-400 to-indigo-600 rounded-md flex items-center justify-center shadow-lg">
-              <div class="w-2 h-2 bg-white rounded-full animate-ping"></div>
-            </div>
-            <span class="font-bold text-sm text-indigo-300 group-hover:text-white transition-colors duration-300 tracking-wider">{% trans "CONFIG" %}</span>
-          </div>
-          <!-- Efecto de brillo -->
-          <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/20 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-        </div>
-      </a>
-
-      <!-- Separador visual -->
-      <div class="h-6 w-px bg-cyan-400/50"></div>
-
-      <!-- Logout button -->
-      <form action="{% url 'account_logout' %}" method="post" class="inline-block">
-        {% csrf_token %}
-        <button type="submit" class="group relative nav-button-power">
-          <div class="relative overflow-hidden">
-            <!-- Borde animado -->
-            <div class="absolute inset-0 bg-gradient-to-r from-red-400 via-red-300 to-red-400 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse"></div>
-            <div class="absolute inset-[1px] bg-gradient-to-r from-gray-900 to-gray-800 rounded-lg"></div>
-            <!-- Contenido -->
-            <div class="relative flex items-center gap-3 px-5 py-3 rounded-lg">
-              <div class="w-5 h-5 bg-gradient-to-br from-red-400 to-red-600 rounded-md flex items-center justify-center shadow-lg">
-                <div class="w-2 h-2 bg-white rounded-full animate-ping"></div>
-              </div>
-              <span class="font-bold text-sm text-red-300 group-hover:text-white transition-colors duration-300 tracking-wider">{% trans "LOGOUT" %}</span>
-            </div>
-            <!-- Efecto de brillo -->
-            <div class="absolute inset-0 bg-gradient-to-r from-red-500/20 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          </div>
-        </button>
-      </form>
     {% else %}
       <!-- Login button for non-authenticated users -->
       <a href="{% url 'account_login' %}" class="nav-button flex items-center gap-2 px-4 py-2 bg-[#0a0f1a] border border-cyan-400 rounded-lg hover:bg-[#0f172a] transition-all duration-300 text-cyan-300 hover:text-white">
