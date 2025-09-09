@@ -57,7 +57,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     # Empresa + País
     "taller.middleware.empresa_middleware.EmpresaMiddleware",
-    "gestion_taller.middleware.country_prefix.EnforceCountryPrefixMiddleware",
+    # "gestion_taller.middleware.country_prefix.EnforceCountryPrefixMiddleware",  # DESHABILITADO - Causa bucles infinitos
     # "taller.middleware.country_context.CountryContextMiddleware",  # DESHABILITADO - Causa bucles infinitos con /es/
     # Idioma (elige SOLO una)
     # "taller.middleware.fix_language_middleware.FixLanguageMiddleware",  # DESHABILITADO - Causa bucles infinitos
