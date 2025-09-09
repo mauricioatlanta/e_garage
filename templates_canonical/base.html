@@ -117,25 +117,10 @@
     <div class="flex flex-wrap items-center justify-center gap-3 max-w-7xl w-full px-4">
     {% if request.user.is_authenticated %}
       <!-- Botones de navegación principal -->
-      {% url 'taller:clientes:lista_clientes' as url_clientes %}
-      {% url 'taller:vehiculos:lista_vehiculos' as url_vehiculos %}
-      {% if not url_vehiculos %}
-        {% url 'vehiculos:lista_vehiculos' as url_vehiculos %}
-      {% endif %}
-
-      {% if not url_vehiculos %}
-        {% url 'chile:vehiculos:lista_vehiculos' as url_vehiculos %}
-      {% endif %}
-
-      {% if not url_vehiculos %}
-        {% url 'chile:taller:vehiculos:lista_vehiculos' as url_vehiculos %}
-      {% endif %}
-
-      {% url 'taller:repuestos:lista_repuestos' as url_repuestos %}
+      {% url 'clientes:lista_clientes' as url_clientes %}
+      {% url 'vehiculos:lista_vehiculos' as url_vehiculos %}
+      {% url 'repuestos:lista_repuestos' as url_repuestos %}
       {% url 'servicios:servicios_menu' as url_servicios %}
-      {% if not url_servicios %}
-        {% url 'taller:servicios:servicios_menu' as url_servicios %}
-      {% endif %}
 
       {% if url_clientes %}
         <a href="{{ url_clientes }}" class="group relative nav-button-power">
@@ -311,14 +296,6 @@
 
       <!-- Separador visual -->
       <div class="h-6 w-px bg-cyan-400/50"></div>
-
-      <!-- Usuario info -->
-      <div class="nav-button flex items-center gap-2 px-4 py-2 bg-[#0a0f1a] border border-cyan-400 rounded-lg">
-        <div class="w-4 h-4 bg-cyan-400 rounded-sm flex items-center justify-center">
-          <div class="w-2 h-2 bg-white rounded-full"></div>
-        </div>
-        <span class="text-cyan-300 font-semibold text-sm">{{ request.user.username }}</span>
-      </div>
 
       <!-- Logout button -->
       <form action="{% url 'account_logout' %}" method="post" class="inline-block">
