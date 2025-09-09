@@ -35,7 +35,7 @@ def tecnicos_crear(request):
             t.empresa = empresa
             t.save()
             messages.success(request, "Técnico creado.")
-            return redirect("taller:tecnicos_lista")
+            return redirect("taller:tecnicos:lista")
     else:
         form = TecnicoForm()
     return render(
@@ -55,7 +55,7 @@ def tecnicos_editar(request, tecnico_id):
         if form.is_valid():
             form.save()
             messages.success(request, "Técnico actualizado.")
-            return redirect("taller:tecnicos_lista")
+            return redirect("taller:tecnicos:lista")
     else:
         form = TecnicoForm(instance=t)
     return render(
@@ -73,4 +73,4 @@ def tecnicos_toggle_activo(request, tecnico_id):
     t.activo = not t.activo
     t.save(update_fields=["activo"])
     messages.success(request, f"Técnico {'activado' if t.activo else 'desactivado'}.")
-    return redirect("taller:tecnicos_lista")
+    return redirect("taller:tecnicos:lista")

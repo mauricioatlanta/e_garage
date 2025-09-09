@@ -59,18 +59,8 @@ urlpatterns = [
     # path('', include('taller.taller_main_urls')),  # Eliminado para evitar conflicto de namespace
     # Puedes agregar aquí otras rutas globales si es necesario
     path("vehiculos/ajax/", include("taller.ajax_urls")),
-    # Company settings y técnicos
+    # Company settings
     path("settings/", company_settings_view, name="company_settings"),
-    path("tecnicos/", tv.tecnicos_lista, name="tecnicos_lista"),
-    path("tecnicos/nuevo/", tv.tecnicos_crear, name="tecnicos_nuevo"),
-    path(
-        "tecnicos/<int:tecnico_id>/editar/", tv.tecnicos_editar, name="tecnicos_editar"
-    ),
-    path(
-        "tecnicos/<int:tecnico_id>/toggle/",
-        tv.tecnicos_toggle_activo,
-        name="tecnicos_toggle",
-    ),
     # URLs de autocomplete para los formularios
     path(
         "autocomplete/",

@@ -49,7 +49,17 @@ def dashboard(request):
     # Redirigir automáticamente al nuevo dashboard empresarial
     from django.shortcuts import redirect
 
-    return redirect("taller:centro_operaciones")
+    # Detectar país desde la URL para usar el namespace correcto
+    path = request.path
+    if path.startswith("/cl/"):
+        # Chile - usar namespace chile
+        return redirect("chile:centro_operaciones")
+    elif path.startswith("/us/"):
+        # USA - usar namespace usa
+        return redirect("usa:centro_operaciones_espacial")
+    else:
+        # Fallback - usar namespace taller
+        return redirect("taller:centro_operaciones")
 
 
 from django.contrib.auth.decorators import login_required

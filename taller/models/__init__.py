@@ -7,6 +7,8 @@ from .configuracion import ConfiguracionEmpresa
 # Modelos principales
 from .documento import Documento
 from .empresa import Empresa  # re-export para importaciones simples en tests
+from .clientes import Cliente
+from .vehiculos import Vehiculo
 
 # Líneas de documento
 from .lineas_documento import LineaOtroServicio, LineaRepuesto, LineaServicio

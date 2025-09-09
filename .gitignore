@@ -1,41 +1,152 @@
-# Archivos de entorno
-.env
-*.sqlite3
+# eGarage - .gitignore final
 
-# Archivos de compilación Python
-*.pyc
+# Python
 __pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
 
-# Archivos estáticos y media
-/staticfiles/
-/media/
-/logs/
-
-# Archivos de VSCode y sistema
-.vscode/
-.DS_Store
-*.zip
-
-# Archivos temporales
+# Django
 *.log
-*.bak
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+static/
+
+# Entornos virtuales
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.conda/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Sistema operativo
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs y archivos temporales
+logs/
+*.log
 *.tmp
-
-# Archivos específicos del proyecto
-egarage_update_*.zip
-backup_*.log
-*_working.log
-
-# Directorios de despliegue
-deploy_pythonanywhere/
-
-# Archivos de desarrollo
-debug_*.py
-test_*.py
-crear_*.py
-cargar_*.py
-verificar_*.py
-.aider*
+*.temp
+.cache/
+.pytest_cache/
 
 # Archivos de configuración local
-gestion_taller/settings/local.py
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Archivos de backup
+*.backup
+*.bak
+*_backup/
+backup/
+
+# Archivos de test
+.coverage
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# poetry
+poetry.lock
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+# Archivos específicos de eGarage
+bandit-report.json
+*.sqlite3
+*.db
+
+# Archivos de desarrollo
+test_*.py
+debug_*.py
+*_test.py
+*_debug.py
+
+# Archivos de migración temporal
+*/migrations/00*.py
+!*/migrations/__init__.py
+
+# Archivos de configuración de producción
+settings_production.py
+settings_prod.py

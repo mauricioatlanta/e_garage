@@ -1,15 +1,8 @@
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.shortcuts import redirect, render
-
-from taller.models.taller_info import TallerInfo
-from taller.views_extra.registro_utils import validar_prueba
-
-from ..forms.suscripcion import FormularioRegistro
-from ..models.empresa import Empresa
 
 
 # Vista original
@@ -32,6 +25,15 @@ codigos_activacion = {}
 
 
 def registro(request):
+    # SAFE IMPORT: Imports movidos aquí para evitar AppRegistryNotReady
+    from django.contrib.auth.models import User
+
+    from taller.models.taller_info import TallerInfo
+    from taller.views_extra.registro_utils import validar_prueba
+
+    from ..forms.suscripcion import FormularioRegistro
+    from ..models.empresa import Empresa
+
     if request.method == "POST":
         form = FormularioRegistro(request.POST)
         tipo_registro = request.POST.get("tipo_registro")
@@ -101,6 +103,9 @@ def registro(request):
 
 
 def activar(request):
+    # Import movido aquí para evitar AppRegistryNotReady
+    from django.contrib.auth.models import User
+
     username = request.session.get("usuario_activacion")
     if not username:
         return render(request, "error_activacion.html")

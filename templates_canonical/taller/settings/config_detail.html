@@ -1,5 +1,6 @@
 {% extends "taller/cl/es/base.html" %}
 {% load static %}
+{% load country_url %}
 
 {% block title %}Configuración de Empresa{% endblock %}
 
@@ -18,7 +19,7 @@
                        class="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
                         ✏️ Editar Configuración
                     </a>
-                    <a href="{% url 'taller:tecnicos:lista_tecnicos' %}" 
+                    <a href="{% country_url 'tecnicos:lista' app_namespace='taller' %}" 
                        class="bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600 transition-colors">
                         👥 Gestionar Técnicos
                     </a>
@@ -109,7 +110,7 @@
         <div class="bg-white rounded-lg shadow-lg p-6 mt-8">
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-2xl font-bold text-gray-800">👥 Técnicos de la Empresa</h2>
-                <a href="{% url 'taller:tecnicos:crear_tecnico' %}" 
+                <a href="{% country_url 'tecnicos:nuevo' app_namespace='taller' %}" 
                    class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
                     ➕ Agregar Técnico
                 </a>
@@ -129,9 +130,9 @@
                             </div>
                         </div>
                         <div class="mt-3 flex space-x-2">
-                            <a href="{% url 'taller:tecnicos:editar_tecnico' tecnico.id %}" 
+                            <a href="{% country_url 'tecnicos:editar' tecnico.id app_namespace='taller' %}" 
                                class="text-blue-600 hover:text-blue-800 text-sm">✏️ Editar</a>
-                            <a href="{% url 'taller:tecnicos:detalle_tecnico' tecnico.id %}" 
+                            <a href="{% country_url 'tecnicos:lista' app_namespace='taller' %}" 
                                class="text-gray-600 hover:text-gray-800 text-sm">👁️ Ver</a>
                         </div>
                     </div>
@@ -142,7 +143,7 @@
                     <div class="text-6xl mb-4">👥</div>
                     <h3 class="text-xl font-semibold text-gray-600 mb-2">No hay técnicos registrados</h3>
                     <p class="text-gray-500 mb-4">Agrega técnicos para poder asignarlos a los documentos</p>
-                    <a href="{% url 'taller:tecnicos:crear_tecnico' %}" 
+                    <a href="{% country_url 'tecnicos:nuevo' app_namespace='taller' %}" 
                        class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
                         ➕ Agregar Primer Técnico
                     </a>

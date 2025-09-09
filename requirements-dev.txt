@@ -1,9 +1,197 @@
--r requirements.txt
-pytest==8.3.4
-pytest-django==4.9.0
-pytest-cov==6.0.0
-ruff==0.6.5
-black==24.10.0
-isort==5.13.2
-pre-commit==4.0.1
-bandit==1.7.9
+# Dependencias de desarrollo para eGarage
+# Instalar con: pip install -r requirements-dev.txt
+
+# Testing
+pytest>=7.4.0
+pytest-django>=4.5.0
+pytest-cov>=4.1.0
+pytest-xdist>=3.3.0  # Para tests paralelos
+pytest-mock>=3.11.0
+
+# Linting y formateo
+ruff>=0.6.9
+black>=24.8.0
+isort>=5.13.2
+flake8>=6.0.0
+mypy>=1.5.0
+
+# Seguridad
+safety>=2.3.0
+bandit>=1.7.5
+
+# Pre-commit
+pre-commit>=3.4.0
+
+# Django específico
+django-debug-toolbar>=4.2.0
+django-extensions>=3.2.0
+django-upgrade>=1.15.0
+
+# Herramientas de desarrollo
+ipython>=8.15.0
+jupyter>=1.0.0
+notebook>=7.0.0
+
+# Documentación
+sphinx>=7.1.0
+sphinx-rtd-theme>=1.3.0
+
+# Monitoreo y profiling
+django-silk>=5.0.0
+memory-profiler>=0.61.0
+line-profiler>=4.1.0
+
+# Herramientas de base de datos
+django-extensions>=3.2.0  # Para shell_plus, etc.
+
+# Herramientas de deployment
+gunicorn>=21.2.0
+whitenoise>=6.5.0
+
+# Herramientas de backup
+django-dbbackup>=3.3.0
+
+# Herramientas de cache
+django-redis>=5.4.0
+
+# Herramientas de email
+django-anymail>=10.1.0
+
+# Herramientas de logging
+structlog>=23.1.0
+
+# Herramientas de validación
+django-crispy-forms>=2.0.0
+crispy-bootstrap5>=0.7.0
+
+# Herramientas de API
+djangorestframework>=3.14.0
+django-cors-headers>=4.3.0
+
+# Herramientas de internacionalización
+django-modeltranslation>=0.18.0
+
+# Herramientas de paginación
+django-pagination>=2.0.0
+
+# Herramientas de filtros
+django-filter>=23.3.0
+
+# Herramientas de búsqueda
+django-haystack>=3.2.0
+
+# Herramientas de archivos
+Pillow>=10.0.0
+python-magic>=0.4.27
+
+# Herramientas de fecha/hora
+python-dateutil>=2.8.2
+pytz>=2023.3
+
+# Herramientas de validación de datos
+cerberus>=1.3.4
+marshmallow>=3.20.0
+
+# Herramientas de testing avanzado
+factory-boy>=3.3.0
+faker>=19.6.0
+freezegun>=1.2.0
+
+# Herramientas de performance
+django-silk>=5.0.0
+django-debug-toolbar>=4.2.0
+
+# Herramientas de seguridad
+django-security>=0.20.0
+django-csp>=3.7.0
+
+# Herramientas de monitoreo
+sentry-sdk>=1.32.0
+
+# Herramientas de deployment
+docker>=6.1.0
+docker-compose>=1.29.0
+
+# Herramientas de CI/CD
+tox>=4.6.0
+coverage>=7.3.0
+
+# Herramientas de documentación
+mkdocs>=1.5.0
+mkdocs-material>=9.2.0
+
+# Herramientas de análisis de código
+radon>=6.0.0
+xenon>=0.9.0
+
+# Herramientas de testing de carga
+locust>=2.17.0
+
+# Herramientas de testing de API
+requests>=2.31.0
+httpx>=0.24.0
+
+# Herramientas de testing de base de datos
+django-test-plus>=2.4.0
+
+# Herramientas de testing de frontend
+selenium>=4.15.0
+beautifulsoup4>=4.12.0
+
+# Herramientas de testing de performance
+django-silk>=5.0.0
+django-debug-toolbar>=4.2.0
+
+# Herramientas de testing de seguridad
+django-security>=0.20.0
+django-csp>=3.7.0
+
+# Herramientas de testing de integración
+django-test-plus>=2.4.0
+
+# Herramientas de testing de regresión
+django-test-plus>=2.4.0
+
+# Herramientas de testing de smoke
+django-test-plus>=2.4.0
+
+# Herramientas de testing de end-to-end
+django-test-plus>=2.4.0
+
+# Herramientas de testing de performance
+django-silk>=5.0.0
+django-debug-toolbar>=4.2.0
+
+# Herramientas de testing de carga
+locust>=2.17.0
+
+# Herramientas de testing de API
+requests>=2.31.0
+httpx>=0.24.0
+
+# Herramientas de testing de base de datos
+django-test-plus>=2.4.0
+
+# Herramientas de testing de frontend
+selenium>=4.15.0
+beautifulsoup4>=4.12.0
+
+# Herramientas de testing de performance
+django-silk>=5.0.0
+django-debug-toolbar>=4.2.0
+
+# Herramientas de testing de seguridad
+django-security>=0.20.0
+django-csp>=3.7.0
+
+# Herramientas de testing de integración
+django-test-plus>=2.4.0
+
+# Herramientas de testing de regresión
+django-test-plus>=2.4.0
+
+# Herramientas de testing de smoke
+django-test-plus>=2.4.0
+
+# Herramientas de testing de end-to-end
+django-test-plus>=2.4.0

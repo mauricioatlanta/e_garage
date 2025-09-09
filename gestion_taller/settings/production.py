@@ -36,7 +36,14 @@ MIDDLEWARE.insert(security_index + 1, "whitenoise.middleware.WhiteNoiseMiddlewar
 # Archivos estáticos con WhiteNoise
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 # Archivos subidos por el usuario (en disco persistente de Render)
 MEDIA_URL = "/media/"
@@ -65,7 +72,11 @@ import os
 from pathlib import Path
 
 # Crear directorio de logs si no existe
-logs_dir = Path("/opt/render/project/src/logs") if os.path.exists("/opt/render") else BASE_DIR / "logs"
+logs_dir = (
+    Path("/opt/render/project/src/logs")
+    if os.path.exists("/opt/render")
+    else BASE_DIR / "logs"
+)
 logs_dir.mkdir(exist_ok=True)
 
 LOGGING = {

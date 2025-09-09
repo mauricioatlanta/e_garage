@@ -99,7 +99,7 @@ def configuracion(request):
     # Resolver URL crear técnico de forma segura (evita NoReverseMatch en template)
     crear_tecnico_url = None
     for name in [
-        "taller:tecnicos:crear_tecnico",
+        "taller:tecnicos:nuevo",
         "tecnicos:crear_tecnico",
         "taller:crear_tecnico",
         "crear_tecnico",

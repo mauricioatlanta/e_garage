@@ -92,6 +92,9 @@ class Vehiculo(TenantScoped):
     class Meta(TenantScoped.Meta):
         ordering = ["marca", "modelo", "patente"]
         verbose_name = "Vehículo"
+        constraints = [
+            models.UniqueConstraint(fields=["empresa", "patente"], name="uq_empresa_patente")
+        ]
         indexes = [
             models.Index(fields=["empresa"]),
             models.Index(fields=["empresa", "patente"]),

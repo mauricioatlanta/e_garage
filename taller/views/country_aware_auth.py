@@ -1,10 +1,9 @@
-from allauth.account.views import LoginView
-
-
-class CountryAwareLoginView(LoginView):
+class CountryAwareLoginView:
     """
     Vista de login que detecta el país desde el parámetro 'next'
     para asegurar el contexto correcto de país
+    
+    # SAFE IMPORT: No importa modelos a nivel de módulo para evitar AppRegistryNotReady
     """
 
     def dispatch(self, request, *args, **kwargs):
@@ -97,5 +96,20 @@ def country_aware_login(request):
 
     # Usar la vista original de allauth con contexto corregido
     from allauth.account.views import login as allauth_login
+    from taller.forms.custom_login import CustomLoginForm
 
-    return allauth_login(request)
+    # Asegurar que el formulario se pase correctamente
+    if request.method == 'GET':
+        form = CustomLoginForm()
+    else:
+        form = CustomLoginForm(request.POST)
+    
+    # Llamar a la vista de allauth
+    response = allauth_login(request)
+    
+    # Si es una respuesta de template, asegurar que el formulario esté en el contexto
+    if hasattr(response, 'context_data'):
+        response.context_data['form'] = form
+        response.context_data['debug'] = True  # Para debugging
+    
+    return response

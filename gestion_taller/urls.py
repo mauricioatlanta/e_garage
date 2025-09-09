@@ -10,6 +10,7 @@ from django.views.i18n import JavaScriptCatalog  # 👈 Para catálogo JS
 
 from taller.views.country_aware_auth import country_aware_login
 from taller.views_extra.login_redirector import login_redirector
+from taller.views_extra.logout_redirect_view import logout_redirect_view
 
 # Importar vista de suscripción bloqueada
 from taller.views_extra.suscripcion import suscripcion_bloqueada
@@ -58,6 +59,24 @@ def redirect_qs(to):
     return view
 
 
+def redirect_cl_to_es(request, path=None):
+    """Redirect /cl/... to /cl/es/... preserving the rest of the path"""
+    if path:
+        # If path is provided as parameter, use it
+        new_path = f"/cl/es/{path}"
+    else:
+        # Get the path after /cl/
+        path_after_cl = request.path[3:]  # Remove '/cl' from the beginning
+        new_path = f"/cl/es{path_after_cl}"
+    
+    # Preserve query parameters
+    if request.GET:
+        query_string = request.GET.urlencode()
+        new_path = f"{new_path}?{query_string}"
+    
+    return redirect(new_path)
+
+
 urlpatterns = [
     # Página de inicio - redirige según el usuario
     path("", redirect_to_home, name="home"),
@@ -72,6 +91,10 @@ urlpatterns = [
     path("registro-trial/", registro_trial, name="registro_trial"),
     path("activar-trial/", activar_trial, name="activar_trial"),
     path("activar/", activar_trial, name="activar_trial_short"),
+    # Contacto de ventas
+    path("contacto-ventas/", lambda request: redirect("https://wa.me/56912345678?text=Hola%20quiero%20información%20sobre%20el%20plan%20empresarial%20de%20eGarage"), name="contacto_ventas"),
+    # Páginas de bienvenida por país
+    path("bienvenida/cl/", TemplateView.as_view(template_name="taller/bienvenida_chile.html"), name="bienvenida_chile"),
     # Login personalizado con contexto de país
     path("accounts/login/", country_aware_login, name="account_login"),
     # Allauth para el resto de funcionalidades
@@ -134,15 +157,48 @@ urlpatterns = [
         TemplateView.as_view(template_name="changelog.html"),
         name="changelog",
     ),
-    path("cl/", include("taller.urls_extra.chile")),
-    path("us/", include("taller.urls_extra.usa")),
-    # USA Vehicle routes with namespace
+    # 🇺🇸 USA - Inglés
     path(
-        "us/vehiculos/",
-        include(
-            ("taller.vehiculos.urls_usa", "vehiculos_usa"), namespace="vehiculos_usa"
-        ),
+        "us/en/",
+        include(("taller.urls_extra.usa", "usa"), namespace="usa"),
     ),
+    # 🇺🇸 USA - Español
+    path(
+        "us/es/",
+        include(("taller.urls_extra.usa", "usa"), namespace="usa"),
+    ),
+    # Redirect us/ to us/en/
+    path(
+        "us/",
+        RedirectView.as_view(url="/us/en/", permanent=False),
+        name="us_redirect",
+    ),
+
+    # 🇨🇱 Chile - Español
+    path(
+        "cl/es/",
+        include(("taller.urls_extra.chile", "chile"), namespace="chile"),
+    ),
+    # Página de bienvenida específica para /cl/egarage/
+    path(
+        "cl/egarage/",
+        TemplateView.as_view(template_name="onboarding/bienvenida_chile_simple.html"),
+        name="cl_egarage_bienvenida",
+    ),
+    # Redirect cl/ to cl/es/ preserving the rest of the path
+    path(
+        "cl/",
+        redirect_cl_to_es,
+        name="cl_redirect",
+    ),
+    # Redirect cl/anything to cl/es/anything preserving the rest of the path
+    path(
+        "cl/<path:path>",
+        redirect_cl_to_es,
+        name="cl_redirect_with_path",
+    ),
+
+    # Si agregas más combinaciones, repite este patrón: un solo include por prefijo.
     # path("taller/", include(("taller.urls", "taller"), namespace="taller")),  # ELIMINADO: URLs sin prefijo de país
     # APIs globales (sin prefijo de país)
     path("api/v1/", include("taller.api.urls")),
@@ -159,25 +215,27 @@ urlpatterns = [
     path(
         "us/documentos/us/", RedirectView.as_view(url="/us/documentos/", permanent=True)
     ),
-    # URLs con prefijo de país específico - EVITAR GRUPOS REGEX DUPLICADOS
+    # URLs con prefijo de país específico - NAMESPACES ÚNICOS
     path(
         "cl/documentos/",
-        include(("taller.documentos.urls", "documentos"), namespace="documentos_cl"),
+        include(("taller.documentos.urls", "documentos_cl_es"), namespace="documentos_cl_es"),
     ),
     path(
         "us/documentos/",
-        include(("taller.documentos.urls", "documentos"), namespace="documentos_us"),
+        include(("taller.documentos.urls", "documentos_us_en"), namespace="documentos_us_en"),
     ),
     path(
         "cl/reportes/",
-        include(("taller.reportes.urls", "reportes"), namespace="reportes_cl"),
+        include(("taller.reportes.urls", "reportes_cl_es"), namespace="reportes_cl_es"),
     ),
     path(
         "us/reportes/",
-        include(("taller.reportes.urls", "reportes"), namespace="reportes_us"),
+        include(("taller.reportes.urls", "reportes_us_en"), namespace="reportes_us_en"),
     ),
     # Ruta de seguridad para /login/ global
     path("login/", login_redirector, name="login_redirector"),
+    # Vista personalizada de logout redirect
+    path("logout-redirect/", logout_redirect_view, name="logout_redirect"),
     # Redirect para compatibilidad con URLs antiguas de vehiculos
     path(
         "taller/vehiculos/",
@@ -189,6 +247,18 @@ urlpatterns = [
         "taller/settings/",
         RedirectView.as_view(url="/cl/settings/", permanent=False),
         name="taller_settings_redirect_legacy",
+    ),
+    # Redirect para URLs antiguas de taller/centro-operaciones-espacial
+    path(
+        "taller/centro-operaciones-espacial/",
+        RedirectView.as_view(url="/cl/centro-operaciones-espacial/", permanent=False),
+        name="centro_operaciones_espacial_redirect_legacy",
+    ),
+    # Redirect para URLs antiguas de common/centro-operaciones-espacial
+    path(
+        "common/centro-operaciones-espacial/",
+        RedirectView.as_view(url="/cl/centro-operaciones-espacial/", permanent=False),
+        name="common_centro_operaciones_espacial_redirect_legacy",
     ),
     # Redirect específico para USA
     path(

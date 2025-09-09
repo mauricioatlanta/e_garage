@@ -52,9 +52,10 @@ def test_fix_language_middleware_smoke():
         from taller.middleware.fix_language_middleware import FixLanguageMiddleware
     except ImportError:
         pytest.skip("fix_language_middleware not available")
-    
+
     rf = RequestFactory()
-    middleware = FixLanguageMiddleware(lambda r: None)
+    from django.http import HttpResponse
+    middleware = FixLanguageMiddleware(lambda r: HttpResponse())
     
     # Test with various language scenarios
     test_cases = [

@@ -1,0 +1,552 @@
+{% load i18n static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% trans "eGarage Chile - La Plataforma N°1 para Digitalizar tu Taller" %}</title>
+  <meta name="description" content="Digitaliza tu taller mecánico en Chile. Aumenta ventas, controla costos y atiende mejor a tus clientes. Prueba gratis 15 días.">
+  <meta name="keywords" content="software taller mecánico Chile, gestión taller automotriz, presupuestos digitales, control repuestos, órdenes trabajo">
+  
+  <!-- Open Graph Meta Tags -->
+  <meta property="og:title" content="eGarage Chile - La Plataforma N°1 para Digitalizar tu Taller">
+  <meta property="og:description" content="Digitaliza tu taller mecánico en Chile. Aumenta ventas, controla costos y atiende mejor a tus clientes.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://egarage.cl/bienvenida/cl/">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>">
+  
+  <!-- External Libraries -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0a0a0a;
+      color: #fff;
+      overflow-x: hidden;
+    }
+    
+    /* Fondo animado futurista */
+    .futuristic-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      background: 
+        radial-gradient(circle at 20% 80%, rgba(0, 255, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(0, 255, 0, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(255, 0, 255, 0.1) 0%, transparent 50%),
+        linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+    }
+    
+    .futuristic-bg::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(90deg, transparent 98%, rgba(0, 255, 255, 0.03) 100%),
+        linear-gradient(0deg, transparent 98%, rgba(0, 255, 255, 0.03) 100%);
+      background-size: 50px 50px;
+      animation: grid-move 20s linear infinite;
+    }
+    
+    @keyframes grid-move {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(50px, 50px); }
+    }
+    
+    /* Partículas flotantes */
+    .floating-particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      pointer-events: none;
+    }
+    
+    .particle {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: rgba(0, 255, 255, 0.6);
+      border-radius: 50%;
+      animation: float 15s infinite linear;
+    }
+    
+    .particle:nth-child(2n) {
+      background: rgba(0, 255, 0, 0.6);
+      animation-duration: 20s;
+    }
+    
+    .particle:nth-child(3n) {
+      background: rgba(255, 0, 255, 0.6);
+      animation-duration: 25s;
+    }
+    
+    @keyframes float {
+      0% {
+        transform: translateY(100vh) translateX(0);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100px) translateX(100px);
+        opacity: 0;
+      }
+    }
+    
+    /* Animaciones de entrada */
+    .fade-in-up {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.7s ease;
+    }
+    
+    .fade-in-up.animate {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .fade-in-left {
+      opacity: 0;
+      transform: translateX(-30px);
+      transition: all 0.7s ease;
+    }
+    
+    .fade-in-left.animate {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    
+    .fade-in-right {
+      opacity: 0;
+      transform: translateX(30px);
+      transition: all 0.7s ease;
+    }
+    
+    .fade-in-right.animate {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    
+    /* Delays de animación */
+    .delay-100 { transition-delay: 0.1s; }
+    .delay-200 { transition-delay: 0.2s; }
+    .delay-300 { transition-delay: 0.3s; }
+    .delay-400 { transition-delay: 0.4s; }
+    .delay-500 { transition-delay: 0.5s; }
+    
+    /* Efectos hover mejorados */
+    .hover-lift {
+      transition: all 0.3s ease;
+    }
+    
+    .hover-lift:hover {
+      transform: translateY(-5px);
+    }
+    
+    /* Scroll suave */
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
+</head>
+<body class="min-h-screen">
+  
+  <!-- === FONDO DINÁMICO FUTURISTA === -->
+  <div class="futuristic-bg"></div>
+  
+  <!-- === PARTÍCULAS FLOTANTES === -->
+  <div class="floating-particles" id="particles"></div>
+  
+  <!-- === NAVEGACIÓN FIJA EXISTENTE === -->
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-md border-b border-cyan-400/30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center py-4">
+        
+        <!-- Logo -->
+        <div class="flex items-center space-x-3">
+          <i class="fas fa-cog text-cyan-400 text-2xl animate-spin"></i>
+          <h1 class="text-2xl font-bold text-cyan-400">eGarage</h1>
+          <span class="text-emerald-400 font-bold">CHILE</span>
+        </div>
+        
+        <!-- Menú de navegación -->
+        <div class="hidden md:flex items-center space-x-8">
+          <a href="#beneficios" class="text-gray-300 hover:text-cyan-400 transition-colors">Beneficios</a>
+          <a href="#caracteristicas" class="text-gray-300 hover:text-cyan-400 transition-colors">Características</a>
+          <a href="#planes" class="text-gray-300 hover:text-cyan-400 transition-colors">Planes</a>
+          <a href="#testimonios" class="text-gray-300 hover:text-cyan-400 transition-colors">Testimonios</a>
+        </div>
+        
+        <!-- Botones de acción -->
+        <div class="flex items-center space-x-4">
+          <a href="/accounts/login/" class="text-gray-300 hover:text-cyan-400 transition-colors">
+            <i class="fas fa-sign-in-alt mr-2"></i>Iniciar Sesión
+          </a>
+          <a href="{% url 'taller:registro_trial' %}" class="px-6 py-2 rounded-full font-semibold bg-emerald-500 hover:bg-emerald-600 text-white transition-all" data-track="cta-nav-probar">
+            <i class="fas fa-rocket mr-2"></i>Probar Gratis
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- === HERO SECTION === -->
+  <section id="hero" class="relative pt-28 pb-16 md:pt-32 md:pb-20 overflow-hidden">
+    <div class="max-w-6xl mx-auto px-4 text-center">
+      <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight text-white drop-shadow fade-in-up" data-animate>
+        La Plataforma Nº1 para Digitalizar tu Taller en Chile
+      </h1>
+      <p class="mt-4 text-base md:text-lg text-gray-200/90 fade-in-up delay-100" data-animate>
+        Aumenta tus ventas, controla tus costos y atiende mejor a tus clientes desde un solo lugar.
+      </p>
+      <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center fade-in-up delay-200" data-animate>
+        <a href="{% url 'taller:registro_trial' %}" class="px-6 py-3 rounded-2xl font-semibold bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg transition-all" data-track="cta-hero-probar">
+          Probar Gratis 15 Días
+        </a>
+        <a href="#video-demo" class="px-6 py-3 rounded-2xl font-semibold bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-all" data-track="cta-hero-video">
+          Ver Video Demo
+        </a>
+      </div>
+      <div class="mt-6 text-xs text-gray-300/80 fade-in-up delay-300" data-animate>Sin tarjeta • Cancela cuando quieras</div>
+    </div>
+  </section>
+
+  <!-- === BENEFICIOS INMEDIATOS === -->
+  <section id="beneficios" class="py-12">
+    <div class="max-w-6xl mx-auto px-4 grid md:grid-cols-4 gap-4">
+      <div class="rounded-2xl bg-white/5 border border-white/10 p-5 backdrop-blur hover-lift fade-in-up" data-animate>
+        <div class="text-2xl">📈</div>
+        <h3 class="mt-2 font-bold text-white">Más Ganancias</h3>
+        <p class="text-sm text-gray-300 mt-1">Controla márgenes de repuestos y servicios en tiempo real.</p>
+      </div>
+      <div class="rounded-2xl bg-white/5 border border-white/10 p-5 backdrop-blur hover-lift fade-in-up delay-100" data-animate>
+        <div class="text-2xl">🕒</div>
+        <h3 class="mt-2 font-bold text-white">Ahorra Tiempo</h3>
+        <p class="text-sm text-gray-300 mt-1">Menos papeleo: documentos y flujo 100% digital.</p>
+      </div>
+      <div class="rounded-2xl bg-white/5 border border-white/10 p-5 backdrop-blur hover-lift fade-in-up delay-200" data-animate>
+        <div class="text-2xl">🤝</div>
+        <h3 class="mt-2 font-bold text-white">Más Clientes</h3>
+        <p class="text-sm text-gray-300 mt-1">Cotiza y envía recibos por WhatsApp en segundos.</p>
+      </div>
+      <div class="rounded-2xl bg-white/5 border border-white/10 p-5 backdrop-blur hover-lift fade-in-up delay-300" data-animate>
+        <div class="text-2xl">🔒</div>
+        <h3 class="mt-2 font-bold text-white">Seguro y en la Nube</h3>
+        <p class="text-sm text-gray-300 mt-1">Respaldo automático y disponibilidad 99,9%.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- === CASOS DE USO === -->
+  <section id="casos-uso" class="py-12">
+    <div class="max-w-6xl mx-auto px-4">
+      <h2 class="text-2xl md:text-3xl font-extrabold text-white fade-in-up" data-animate>Hecho para tu negocio</h2>
+      <div class="mt-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="rounded-2xl bg-white/5 border border-white/10 p-5 hover-lift fade-in-up delay-100" data-animate>
+          <h3 class="font-bold text-white">Talleres Mecánicos</h3>
+          <p class="text-sm text-gray-300 mt-1">Mano de obra + repuestos + órdenes de trabajo.</p>
+        </div>
+        <div class="rounded-2xl bg-white/5 border border-white/10 p-5 hover-lift fade-in-up delay-200" data-animate>
+          <h3 class="font-bold text-white">Casas de Repuestos</h3>
+          <p class="text-sm text-gray-300 mt-1">Stock, ventas y ganancias por ítem en tiempo real.</p>
+        </div>
+        <div class="rounded-2xl bg-white/5 border border-white/10 p-5 hover-lift fade-in-up delay-300" data-animate>
+          <h3 class="font-bold text-white">Vulcanizaciones</h3>
+          <p class="text-sm text-gray-300 mt-1">Tickets rápidos, turnos y servicios recurrentes.</p>
+        </div>
+        <div class="rounded-2xl bg-white/5 border border-white/10 p-5 hover-lift fade-in-up delay-400" data-animate>
+          <h3 class="font-bold text-white">Lavados de Autos</h3>
+          <p class="text-sm text-gray-300 mt-1">Planes de clientes frecuentes y cobros rápidos.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- === MÉTRICAS DIFERENCIALES === -->
+  <section id="metricas" class="py-12">
+    <div class="max-w-6xl mx-auto px-4 grid md:grid-cols-3 gap-4 text-center">
+      <div class="rounded-2xl bg-white/5 border border-white/10 p-6 hover-lift fade-in-up" data-animate>
+        <div class="text-4xl font-extrabold text-white">500+</div>
+        <div class="text-gray-300">talleres y negocios automotrices</div>
+      </div>
+      <div class="rounded-2xl bg-white/5 border border-white/10 p-6 hover-lift fade-in-up delay-100" data-animate>
+        <div class="text-4xl font-extrabold text-white">50K+</div>
+        <div class="text-gray-300">documentos procesados</div>
+      </div>
+      <div class="rounded-2xl bg-white/5 border border-white/10 p-6 hover-lift fade-in-up delay-200" data-animate>
+        <div class="text-4xl font-extrabold text-white">99,9%</div>
+        <div class="text-gray-300">disponibilidad</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- === CARACTERÍSTICAS CLAVE === -->
+  <section id="caracteristicas" class="py-12">
+    <div class="max-w-6xl mx-auto px-4">
+      <h2 class="text-2xl md:text-3xl font-extrabold text-white text-center mb-12 fade-in-up" data-animate>Características que marcan la diferencia</h2>
+      <div class="grid md:grid-cols-2 gap-8">
+        <div class="rounded-2xl bg-white/5 border border-white/10 p-6 hover-lift fade-in-left" data-animate>
+          <div class="flex items-start space-x-4">
+            <div class="text-3xl">📊</div>
+            <div>
+              <h3 class="font-bold text-white text-lg">Dashboard de Ganancias en Tiempo Real</h3>
+              <p class="text-gray-300 mt-2">Controla la rentabilidad por técnico, repuesto y servicio al instante.</p>
+            </div>
+          </div>
+        </div>
+        <div class="rounded-2xl bg-white/5 border border-white/10 p-6 hover-lift fade-in-right delay-100" data-animate>
+          <div class="flex items-start space-x-4">
+            <div class="text-3xl">📄</div>
+            <div>
+              <h3 class="font-bold text-white text-lg">Documentos Digitales</h3>
+              <p class="text-gray-300 mt-2">Presupuestos, órdenes de trabajo y recibos completamente digitales.</p>
+            </div>
+          </div>
+        </div>
+        <div class="rounded-2xl bg-white/5 border border-white/10 p-6 hover-lift fade-in-left delay-200" data-animate>
+          <div class="flex items-start space-x-4">
+            <div class="text-3xl">💬</div>
+            <div>
+              <h3 class="font-bold text-white text-lg">WhatsApp Integrado</h3>
+              <p class="text-gray-300 mt-2">Envía cotizaciones y confirma trabajos al instante por WhatsApp.</p>
+            </div>
+          </div>
+        </div>
+        <div class="rounded-2xl bg-white/5 border border-white/10 p-6 hover-lift fade-in-right delay-300" data-animate>
+          <div class="flex items-start space-x-4">
+            <div class="text-3xl">🌐</div>
+            <div>
+              <h3 class="font-bold text-white text-lg">Portal de Clientes</h3>
+              <p class="text-gray-300 mt-2">Historial de servicios, documentos y pagos accesibles 24/7.</p>
+            </div>
+          </div>
+        </div>
+        <div class="rounded-2xl bg-white/5 border border-white/10 p-6 hover-lift fade-in-left delay-400" data-animate>
+          <div class="flex items-start space-x-4">
+            <div class="text-3xl">👥</div>
+            <div>
+              <h3 class="font-bold text-white text-lg">Roles y Permisos</h3>
+              <p class="text-gray-300 mt-2">Dueños, técnicos y vendedores con acceso controlado según su rol.</p>
+            </div>
+          </div>
+        </div>
+        <div class="rounded-2xl bg-white/5 border border-white/10 p-6 hover-lift fade-in-right delay-500" data-animate>
+          <div class="flex items-start space-x-4">
+            <div class="text-3xl">📱</div>
+            <div>
+              <h3 class="font-bold text-white text-lg">App Móvil</h3>
+              <p class="text-gray-300 mt-2">Gestiona tu taller desde cualquier lugar con nuestra app móvil.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- === COMPARATIVA === -->
+  <section id="comparativa" class="py-12">
+    <div class="max-w-6xl mx-auto px-4">
+      <h2 class="text-2xl md:text-3xl font-extrabold text-white text-center mb-12 fade-in-up" data-animate>¿Por qué cambiar hoy?</h2>
+      <div class="mt-6 grid md:grid-cols-2 gap-6">
+        <div class="rounded-2xl p-5 bg-red-500/10 border border-red-300/20 hover-lift fade-in-left" data-animate>
+          <h3 class="font-bold text-red-200 text-lg">Sin eGarage</h3>
+          <ul class="mt-2 text-gray-300 list-disc list-inside text-sm space-y-1">
+            <li>Pérdida de margen por no controlar costos.</li>
+            <li>Horas al día en papeleo.</li>
+            <li>Clientes sin respuesta rápida.</li>
+            <li>Información dispersa en papeles.</li>
+          </ul>
+        </div>
+        <div class="rounded-2xl p-5 bg-emerald-500/10 border border-emerald-300/20 hover-lift fade-in-right delay-100" data-animate>
+          <h3 class="font-bold text-emerald-200 text-lg">Con eGarage</h3>
+          <ul class="mt-2 text-gray-300 list-disc list-inside text-sm space-y-1">
+            <li>+30% de rentabilidad promedio.</li>
+            <li>-70% de tiempo administrativo.</li>
+            <li>Cotizaciones y recibos por WhatsApp en segundos.</li>
+            <li>Todo centralizado y accesible desde cualquier lugar.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- === PLANES === -->
+  <section id="planes" class="py-12">
+    <div class="max-w-6xl mx-auto px-4 text-center">
+      <h2 class="text-2xl md:text-3xl font-extrabold text-white fade-in-up" data-animate>Planes que se adaptan a tu taller</h2>
+      <p class="text-gray-300 mt-2 fade-in-up delay-100" data-animate>Paga en CLP. Ahorra con el plan anual (2 meses gratis).</p>
+
+      <div class="mt-8 grid md:grid-cols-3 gap-4">
+        <!-- Básico -->
+        <div class="rounded-2xl bg-white/5 border border-white/10 p-6 hover-lift fade-in-up delay-200" data-animate>
+          <h3 class="font-bold text-white">Inicial</h3>
+          <div class="mt-2 text-3xl font-extrabold text-white">$15 USD <span class="text-sm text-gray-300">/mes</span></div>
+          <div class="text-sm text-gray-300 mt-1">≈ CLP $15.000</div>
+          <ul class="mt-4 text-left text-sm text-gray-300 space-y-1">
+            <li>Documentos digitales</li>
+            <li>Envíos por WhatsApp</li>
+            <li>1 usuario</li>
+            <li>Soporte por email</li>
+          </ul>
+          <a href="{% url 'taller:registro_trial' %}" class="mt-6 inline-block px-5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all" data-track="cta-plan-inicial">Comenzar</a>
+        </div>
+
+        <!-- Pro (recomendado) -->
+        <div class="rounded-2xl bg-gradient-to-b from-emerald-600/40 to-emerald-500/20 border border-emerald-300/30 p-6 ring-2 ring-emerald-400 hover-lift fade-in-up delay-300" data-animate>
+          <div class="text-xs inline-block px-2 py-1 rounded-full bg-emerald-500 text-white mb-2">Más Popular</div>
+          <h3 class="font-bold text-white">Profesional</h3>
+          <div class="mt-2 text-3xl font-extrabold text-white">$35 USD <span class="text-sm text-white/80">/mes</span></div>
+          <div class="text-sm text-white/80 mt-1">≈ CLP $35.000</div>
+          <ul class="mt-4 text-left text-sm text-white/90 space-y-1">
+            <li>Todo del plan Inicial</li>
+            <li>Dashboard de ganancias</li>
+            <li>Roles y permisos</li>
+            <li>3 usuarios</li>
+            <li>Soporte prioritario</li>
+          </ul>
+          <a href="{% url 'taller:registro_trial' %}" class="mt-6 inline-block px-5 py-2 rounded-xl bg-white text-emerald-700 font-semibold transition-all" data-track="cta-plan-profesional">Probar Gratis</a>
+        </div>
+
+        <!-- Empresarial -->
+        <div class="rounded-2xl bg-white/5 border border-white/10 p-6 hover-lift fade-in-up delay-400" data-animate>
+          <h3 class="font-bold text-white">Empresarial</h3>
+          <div class="mt-2 text-3xl font-extrabold text-white">$75 USD <span class="text-sm text-gray-300">/mes</span></div>
+          <div class="text-sm text-gray-300 mt-1">≈ CLP $75.000</div>
+          <ul class="mt-4 text-left text-sm text-gray-300 space-y-1">
+            <li>Todo del plan Profesional</li>
+            <li>Soporte prioritario</li>
+            <li>5+ usuarios</li>
+            <li>Integraciones avanzadas</li>
+            <li>Gerente de cuenta</li>
+          </ul>
+          <a href="{% url 'taller:contacto_ventas' %}" class="mt-6 inline-block px-5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all" data-track="cta-plan-empresarial">Hablar con Ventas</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- === TESTIMONIOS === -->
+  <section id="testimonios" class="py-12">
+    <div class="max-w-6xl mx-auto px-4">
+      <h2 class="text-2xl md:text-3xl font-extrabold text-white text-center mb-12 fade-in-up" data-animate>Lo que dicen nuestros clientes</h2>
+      <div class="mt-6 grid md:grid-cols-3 gap-4">
+        <div class="rounded-2xl bg-white/5 border border-white/10 p-5 hover-lift fade-in-up delay-100" data-animate>
+          <div class="text-yellow-300">★★★★★</div>
+          <p class="mt-2 text-gray-200 text-sm italic">"Antes tardábamos 2 horas al día en papeleo; ahora todo se resuelve en 10 minutos."</p>
+          <div class="mt-3 text-xs text-gray-400">Pedro Gómez · Taller Mecánico · Valparaíso</div>
+        </div>
+        <div class="rounded-2xl bg-white/5 border border-white/10 p-5 hover-lift fade-in-up delay-200" data-animate>
+          <div class="text-yellow-300">★★★★★</div>
+          <p class="mt-2 text-gray-200 text-sm italic">"Por fin controlo el margen de cada repuesto y servicio sin Excel."</p>
+          <div class="mt-3 text-xs text-gray-400">Marcela Rivas · Casa de Repuestos · Santiago</div>
+        </div>
+        <div class="rounded-2xl bg-white/5 border border-white/10 p-5 hover-lift fade-in-up delay-300" data-animate>
+          <div class="text-yellow-300">★★★★★</div>
+          <p class="mt-2 text-gray-200 text-sm italic">"Cotizaciones por WhatsApp y pago confirmado, todo más rápido."</p>
+          <div class="mt-3 text-xs text-gray-400">Juan Alarcón · Vulcanización · La Serena</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- === CTA FINAL === -->
+  <section id="cta-final" class="py-16">
+    <div class="max-w-4xl mx-auto px-4 text-center">
+      <h2 class="text-3xl md:text-4xl font-extrabold text-white fade-in-up" data-animate>Cada día sin eGarage es dinero que no ves.</h2>
+      <p class="mt-3 text-gray-200 fade-in-up delay-100" data-animate>Empieza hoy. Si no mejoras en 30 días, no pagas.</p>
+      <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center fade-in-up delay-200" data-animate>
+        <a href="{% url 'taller:registro_trial' %}" class="px-6 py-3 rounded-2xl font-semibold bg-emerald-500 hover:bg-emerald-600 text-white transition-all" data-track="cta-final-comenzar">
+          Comenzar Gratis
+        </a>
+        <a href="https://wa.me/56912345678?text=Hola%20quiero%20una%20demo%20de%20eGarage" class="px-6 py-3 rounded-2xl font-semibold bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-all" data-track="cta-final-whatsapp">
+          Agenda Demo por WhatsApp
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- === FOOTER === -->
+  <footer class="bg-black/40 border-t border-cyan-400/30 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        
+        <!-- Logo y descripción -->
+        <div class="col-span-1 md:col-span-2">
+          <div class="flex items-center space-x-3 mb-4">
+            <i class="fas fa-cog text-cyan-400 text-2xl animate-spin"></i>
+            <h3 class="text-2xl font-bold text-cyan-400">eGarage Chile</h3>
+          </div>
+          <p class="text-gray-300 mb-4">
+            La plataforma más avanzada para gestión de talleres mecánicos en Chile. 
+            Digitaliza tu taller con tecnología de vanguardia.
+          </p>
+          <div class="flex space-x-4">
+            <a href="#" class="text-gray-400 hover:text-cyan-400 transition-colors">
+              <i class="fab fa-facebook text-xl"></i>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-cyan-400 transition-colors">
+              <i class="fab fa-instagram text-xl"></i>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-cyan-400 transition-colors">
+              <i class="fab fa-linkedin text-xl"></i>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-cyan-400 transition-colors">
+              <i class="fab fa-youtube text-xl"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Enlaces rápidos -->
+        <div>
+          <h4 class="text-lg font-bold text-cyan-400 mb-4">Enlaces Rápidos</h4>
+          <ul class="space-y-2">
+            <li><a href="#beneficios" class="text-gray-300 hover:text-cyan-400 transition-colors">Beneficios</a></li>
+            <li><a href="#caracteristicas" class="text-gray-300 hover:text-cyan-400 transition-colors">Características</a></li>
+            <li><a href="#planes" class="text-gray-300 hover:text-cyan-400 transition-colors">Planes</a></li>
+            <li><a href="#testimonios" class="text-gray-300 hover:text-cyan-400 transition-colors">Testimonios</a></li>
+          </ul>
+        </div>
+
+        <!-- Contacto -->
+        <div>
+          <h4 class="text-lg font-bold text-cyan-400 mb-4">Contacto</h4>
+          <ul class="space-y-2 text-gray-300">
+            <li><i class="fas fa-phone text-cyan-400 mr-2"></i>+56 9 1234 5678</li>
+            <li><i class="fas fa-envelope text-cyan-400 mr-2"></i>soporte@egarage.cl</li>
+            <li><i class="fas fa-map-marker-alt text-cyan-400 mr-2"></i>Santiago, Chile</li>
+          </ul>
+        </div>
+
+      </div>
+      
+      <div class="border-t border-cyan-400/30 mt-8 pt-8 text-center">
+        <p class="text-gray-400">
+          &copy; 2025 eGarage Chile. Desarrollado con IA para técnicos. Todos los derechos reservados.
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- === JAVASCRIPT PARA EFECTOS === -->
+  <script src="{% static 'js/landing_cl.js' %}" defer></script>
+
+</body>
+</html>

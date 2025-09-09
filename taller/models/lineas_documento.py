@@ -96,7 +96,10 @@ class LineaServicio(models.Model):
         verbose_name = "Línea de Servicio"
         verbose_name_plural = "Líneas de Servicios"
         indexes = [
+            # Índices válidos (sin campo 'responsable' que no existe)
             models.Index(fields=["documento", "servicio"]),
+            # Los KPIs usarán documento__tecnico_responsable con Coalesce
+            # Los índices en Documento ya optimizan las consultas por fecha_emision
         ]
 
     def __str__(self):
@@ -185,8 +188,11 @@ class LineaOtroServicio(models.Model):
         verbose_name = "Línea de Otro Servicio"
         verbose_name_plural = "Líneas de Otros Servicios"
         indexes = [
+            # Índices válidos (sin campo 'responsable' que no existe)
             models.Index(fields=["documento", "servicio"]),
             models.Index(fields=["empresa_externa"]),
+            # Los KPIs usarán documento__tecnico_responsable con Coalesce
+            # Los índices en Documento ya optimizan las consultas por fecha_emision
         ]
 
     def __str__(self):
@@ -251,8 +257,11 @@ class LineaRepuesto(models.Model):
         verbose_name = "Línea de Repuesto"
         verbose_name_plural = "Líneas de Repuestos"
         indexes = [
+            # Índices válidos (sin campo 'responsable' que no existe)
             models.Index(fields=["documento", "repuesto"]),
             models.Index(fields=["codigo"]),
+            # Los KPIs usarán documento__tecnico_responsable con Coalesce
+            # Los índices en Documento ya optimizan las consultas por fecha_emision
         ]
 
     def __str__(self):

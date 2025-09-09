@@ -1,0 +1,156 @@
+[
+  {
+    "model": "taller.cliente",
+    "pk": 1,
+    "fields": {
+      "nombre": "Juan Pérez",
+      "apellido": "García",
+      "email": "juan.perez@example.com",
+      "telefono": "+56912345678",
+      "direccion": "Av. Principal 123, Santiago",
+      "fecha_registro": "2024-01-15T10:30:00Z",
+      "activo": true,
+      "empresa": 1
+    }
+  },
+  {
+    "model": "taller.cliente",
+    "pk": 2,
+    "fields": {
+      "nombre": "María",
+      "apellido": "Rodríguez",
+      "email": "maria.rodriguez@example.com",
+      "telefono": "+56987654321",
+      "direccion": "Calle Secundaria 456, Valparaíso",
+      "fecha_registro": "2024-01-20T14:15:00Z",
+      "activo": true,
+      "empresa": 1
+    }
+  },
+  {
+    "model": "taller.marca",
+    "pk": 1,
+    "fields": {
+      "nombre": "Toyota",
+      "pais_origen": "Japón",
+      "activa": true
+    }
+  },
+  {
+    "model": "taller.marca",
+    "pk": 2,
+    "fields": {
+      "nombre": "Ford",
+      "pais_origen": "Estados Unidos",
+      "activa": true
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 1,
+    "fields": {
+      "nombre": "Corolla",
+      "marca": 1,
+      "año_inicio": 2020,
+      "año_fin": null,
+      "activo": true
+    }
+  },
+  {
+    "model": "taller.modelo",
+    "pk": 2,
+    "fields": {
+      "nombre": "Focus",
+      "marca": 2,
+      "año_inicio": 2019,
+      "año_fin": null,
+      "activo": true
+    }
+  },
+  {
+    "model": "taller.vehiculo",
+    "pk": 1,
+    "fields": {
+      "cliente": 1,
+      "marca": 1,
+      "modelo": 1,
+      "año": 2021,
+      "patente": "ABC123",
+      "color": "Blanco",
+      "kilometraje": 15000,
+      "vin": "1HGBH41JXMN109186",
+      "fecha_registro": "2024-01-15T10:30:00Z",
+      "activo": true,
+      "empresa": 1
+    }
+  },
+  {
+    "model": "taller.vehiculo",
+    "pk": 2,
+    "fields": {
+      "cliente": 2,
+      "marca": 2,
+      "modelo": 2,
+      "año": 2020,
+      "patente": "XYZ789",
+      "color": "Azul",
+      "kilometraje": 25000,
+      "vin": "2HGBH41JXMN109187",
+      "fecha_registro": "2024-01-20T14:15:00Z",
+      "activo": true,
+      "empresa": 1
+    }
+  },
+  {
+    "model": "taller.servicio",
+    "pk": 1,
+    "fields": {
+      "nombre": "Cambio de aceite",
+      "descripcion": "Cambio de aceite del motor y filtro",
+      "precio": 25000,
+      "duracion_minutos": 30,
+      "activo": true,
+      "empresa": 1
+    }
+  },
+  {
+    "model": "taller.servicio",
+    "pk": 2,
+    "fields": {
+      "nombre": "Revisión técnica",
+      "descripcion": "Revisión completa del vehículo",
+      "precio": 45000,
+      "duracion_minutos": 60,
+      "activo": true,
+      "empresa": 1
+    }
+  },
+  {
+    "model": "taller.repuesto",
+    "pk": 1,
+    "fields": {
+      "nombre": "Filtro de aceite",
+      "codigo": "FIL001",
+      "descripcion": "Filtro de aceite para motor",
+      "precio": 8500,
+      "stock": 50,
+      "stock_minimo": 10,
+      "activo": true,
+      "empresa": 1
+    }
+  },
+  {
+    "model": "taller.repuesto",
+    "pk": 2,
+    "fields": {
+      "nombre": "Pastillas de freno",
+      "codigo": "PAST001",
+      "descripcion": "Pastillas de freno delanteras",
+      "precio": 35000,
+      "stock": 20,
+      "stock_minimo": 5,
+      "activo": true,
+      "empresa": 1
+    }
+  }
+]

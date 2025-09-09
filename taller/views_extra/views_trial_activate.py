@@ -2,11 +2,12 @@ from django.shortcuts import render
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_protect
 
-from taller.models.trial import TrialRegistro
-
 
 @csrf_protect
 def activar_trial(request):
+    # Import movido aquí para evitar AppRegistryNotReady
+    from taller.models.trial import TrialRegistro
+
     mensaje = error = None
     if request.method == "POST":
         email = request.POST.get("email", "").strip().lower()

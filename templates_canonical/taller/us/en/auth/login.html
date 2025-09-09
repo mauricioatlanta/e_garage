@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
       Debug: Country={{ country|default:'None' }}, Next={{ request.GET.next|default:'None' }}
     </div>
     {% endif %}
-    <form class="space-y-5" method="POST">>
+    <form class="space-y-5" method="POST">
       {% csrf_token %}
       {{ form.non_field_errors }}
       

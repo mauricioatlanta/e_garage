@@ -217,3 +217,79 @@ def api_cajas_por_modelo(request):
         data = list(qs)
 
     return JsonResponse(data, safe=False)
+
+
+from django.http import JsonResponse, HttpResponseNotAllowed
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
+from django.db import transaction
+import json
+
+@csrf_exempt
+@require_http_methods(["POST"])
+@transaction.atomic
+def api_create(request):
+    # Content-Type flexible: solo forzamos JSON si viene como application/json
+    raw = request.body or b""
+    try:
+        payload = json.loads(raw.decode("utf-8")) if raw else {}
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "malformed_json"}, status=400)
+
+    # Campos requeridos
+    required = ["empresa_id", "cliente_id", "patente", "marca", "modelo"]
+    missing = [k for k in required if k not in payload]
+    if missing:
+        return JsonResponse({"error": "missing_fields", "fields": missing}, status=400)
+
+    from taller.models.empresa import Empresa
+    from taller.models.clientes import Cliente
+    from taller.models.vehiculos import Vehiculo
+
+    # Fetch FKs
+    try:
+        emp = Empresa.objects.get(id=payload["empresa_id"])
+    except Empresa.DoesNotExist:
+        return JsonResponse({"error": "empresa_not_found"}, status=400)
+
+    try:
+        cli = Cliente.objects.get(id=payload["cliente_id"])
+    except Cliente.DoesNotExist:
+        return JsonResponse({"error": "cliente_not_found"}, status=400)
+
+    # Consistencia de empresa
+    if getattr(cli, "empresa_id", None) != emp.id:
+        return JsonResponse({"error": "empresa_mismatch_cliente"}, status=400)
+
+    patente = str(payload["patente"]).strip().upper()
+
+    # Unicidad por empresa
+    if Vehiculo.objects.filter(empresa=emp, patente=patente).exists():
+        return JsonResponse({"error": "patente_duplicada"}, status=409)
+
+    # Crear - usar campos de texto para compatibilidad con tests
+    attrs = dict(
+        empresa=emp,
+        cliente=cli,
+        patente=patente,
+        marca_texto=payload.get("marca"),
+        modelo_texto=payload.get("modelo"),
+    )
+    # Campo opcional 'anio'
+    if "anio" in [f.name for f in Vehiculo._meta.fields] and "anio" in payload:
+        attrs["anio"] = payload["anio"]
+
+    v = Vehiculo.objects.create(**attrs)
+
+    # Respuesta mínima compatible con tests estrictos
+    data = {
+        "id": v.id,
+        "empresa_id": emp.id,
+        "cliente_id": cli.id,
+        "patente": v.patente,
+        "marca": getattr(v, "marca_texto", None),
+        "modelo": getattr(v, "modelo_texto", None),
+    }
+    if hasattr(v, "anio"):
+        data["anio"] = v.anio
+    return JsonResponse({"vehiculo": data}, status=201)

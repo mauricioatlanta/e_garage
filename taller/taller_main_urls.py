@@ -6,8 +6,10 @@ from django.urls import include, path
 logger = logging.getLogger(__name__)
 logger.debug("CARGANDO taller/taller_main_urls.py")
 from django.views.generic import TemplateView
+from django.shortcuts import render
 
 from taller.views_extra.bienvenida_usa import bienvenida_usa
+from taller.views_extra.landing_chile import landing_chile
 
 from . import ajax_views  # Importar vistas AJAX para formularios jerárquicos
 from .taller_views import (
@@ -33,6 +35,23 @@ from .views_extra.views_configuracion import (
 )
 
 app_name = "taller"
+
+
+def landing_inicio_country_aware(request):
+    """
+    Vista que detecta el país y muestra la landing page apropiada
+    """
+    # Detectar país desde la URL
+    path = request.path
+    if path.startswith("/cl/"):
+        # Chile - mostrar landing page en español
+        return landing_chile(request)
+    elif path.startswith("/us/"):
+        # USA - mostrar landing page en inglés
+        return TemplateView.as_view(template_name="us/en/landing_usa.html")(request)
+    else:
+        # Fallback - mostrar USA por defecto
+        return TemplateView.as_view(template_name="us/en/landing_usa.html")(request)
 
 
 # Vista temporal del diagnóstico IA
@@ -69,7 +88,7 @@ def diagnostico_ia_temp(request):
 urlpatterns = [
     path(
         "",
-        TemplateView.as_view(template_name="public/landing_inicio_es.html"),
+        landing_inicio_country_aware,
         name="landing_inicio",
     ),
     path(
@@ -104,37 +123,37 @@ urlpatterns = [
     ),
     # === CONFIGURACIÓN DE EMPRESA Y BRANDING ===
     path("settings/", company_settings_view, name="company_settings"),
-    path(
-        "test-i18n/",
-        __import__(
-            "taller.views_extra.test_i18n_view", fromlist=["test_i18n_view"]
-        ).test_i18n_view,
-        name="test_i18n",
-    ),
+    # Comentado temporalmente - módulo no existe
+    # path(
+    #     "test-i18n/",
+    #     __import__(
+    #         "taller.views_extra.test_i18n_view", fromlist=["test_i18n_view"]
+    #     ).test_i18n_view,
+    #     name="test_i18n",
+    # ),
     # === VISTAS DE PRUEBA MULTILENGUAJE ===
-    path(
-        "test/country-detection/",
-        __import__(
-            "taller.views_extra.test_multilang", fromlist=["test_country_detection"]
-        ).test_country_detection,
-        name="test_country_detection",
-    ),
-    path(
-        "test/service-search/",
-        __import__(
-            "taller.views_extra.test_multilang", fromlist=["test_service_search_api"]
-        ).test_service_search_api,
-        name="test_service_search",
-    ),
+    # Comentado temporalmente - módulos no existen
+    # path(
+    #     "test/country-detection/",
+    #     __import__(
+    #         "taller.views_extra.test_multilang", fromlist=["test_country_detection"]
+    #     ).test_country_detection,
+    #     name="test_country_detection",
+    # ),
+    # path(
+    #     "test/service-search/",
+    #     __import__(
+    #         "taller.views_extra.test_multilang", fromlist=["test_service_search_api"]
+    #     ).test_service_search_api,
+    #     name="test_service_search",
+    # ),
     # Módulos del sistema
-    path("clientes/", include("taller.clientes.urls")),
-    path("vehiculos/", include("taller.vehiculos.urls")),
-    path("repuestos/", include("taller.repuestos.urls")),
-    path(
-        "servicios/",
-        include(("taller.servicios.urls", "servicios"), namespace="servicios"),
-    ),
-    path("reportes/", include("taller.reportes.urls")),
+    path("clientes/",  include(("taller.clientes.urls",   "clientes"),   namespace="clientes")),
+    path("vehiculos/", include(("taller.vehiculos.urls",  "vehiculos"),  namespace="vehiculos")),
+    path("servicios/", include(("taller.servicios.urls",  "servicios"),  namespace="servicios")),
+    path("repuestos/", include(("taller.repuestos.urls",  "repuestos"),  namespace="repuestos")),
+    path("reportes/",  include(("taller.reportes.urls",   "reportes"),   namespace="reportes")),
+    path("tecnicos/",  include(("taller.tecnicos.urls",   "tecnicos"),   namespace="tecnicos")),
     path(
         "business-intelligence/",
         include("taller.business_intelligence_urls", namespace="business_intelligence"),
@@ -208,8 +227,9 @@ us_patterns = [
     path("api/catalogo/modelos/", api_modelos, name="api_catalogo_modelos"),
     path("api/catalogo/stats/", api_estadisticas_catalogo, name="api_catalogo_stats"),
     # APIs adicionales
-    path("api/", include("taller.api.urls", namespace="api")),
-    path("admin/monitoring/", include("taller.urls_modules.admin_monitoring")),
+    path("api/",       include(("taller.api.urls",        "api"),        namespace="api")),
+    path("admin-monitoring/",
+         include(("taller.urls_modules.admin_monitoring", "admin_monitoring"),   namespace="admin_monitoring")),
     path("emails/", include("taller.emails.urls")),
     path("cambiar-idioma/", cambiar_idioma, name="cambiar_idioma"),
     # AJAX Jerárquico - Vehículos

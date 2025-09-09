@@ -51,7 +51,7 @@ class EnforceCountryPrefixMiddleware:
                         new_path += "?" + urlencode(request.GET, doseq=True)
 
                     logger.info(
-                        f"Redirigiendo usuario de {empresa.nombre} ({empresa.pais}) de {path} a {new_path}"
+                        f"Redirigiendo usuario de {getattr(empresa, 'nombre_taller', 'Unknown')} ({empresa.pais}) de {path} a {new_path}"
                     )
                     return redirect(new_path)
 

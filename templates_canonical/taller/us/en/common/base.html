@@ -91,13 +91,13 @@
     <!-- Settings Button -->
     {% if request.user.is_authenticated %}
       {% load country_url %}
-      {% country_url 'company_settings' app_namespace='taller' as settings_url %}
+      {% country_url 'futuristic_company_settings' app_namespace='taller' as settings_url %}
       {% if settings_url %}
         <a href="{{ settings_url }}"
            class="flex items-center gap-2 px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition"
-           title="Company Settings">
+           title="⚡ Futuristic Control Center">
           <i class="fas fa-cog"></i>
-          <span class="hidden md:inline">Settings</span>
+          <span class="hidden md:inline">⚡ Control Center</span>
         </a>
       {% endif %}
     {% endif %}
@@ -167,7 +167,7 @@
       </a>
       
       <!-- Reports -->
-      <a href="{% url 'usa:reportes:dashboard' %}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
+      <a href="{% url 'reportes_us_en:dashboard' %}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
         <span>📊</span>
         <span class="hidden md:inline">Reports</span>
       </a>

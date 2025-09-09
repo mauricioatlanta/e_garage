@@ -23,23 +23,34 @@ from django.http import HttpResponseRedirect
 
 from taller import ajax_views
 from taller.views_extra.ajax import buscar_clientes, vehiculos_por_cliente
-from taller.views_extra.country_views import dashboard_cl_view, test_chile_view
+from taller.views_extra.country_views import test_chile_view
 from taller.views_extra.landing_chile import landing_chile
+from taller.views_extra.dashboard_empresa import dashboard_centro_operaciones, dashboard_centro_operaciones_espacial
+from taller.views_extra.views import dashboard
+from taller.taller_views import dashboard_suscripciones
+from taller.views_extra.views_configuracion import configuracion_empresa, configuracion_tecnicos
+from taller.views_extra.company_settings_views import company_settings_view
 
 app_name = "chile"
 
 urlpatterns = [
-    # Landing page pública para Chile
-    path("", landing_chile, name="home"),
-    # Dashboard principal Chile (requiere autenticación)
-    path("dashboard/", dashboard_cl_view, name="dashboard"),
-    # Redirección para compatibilidad: /cl/centro-operaciones-espacial/ -> /cl/taller/centro-operaciones-espacial/
-    path(
-        "centro-operaciones-espacial/",
-        lambda request: HttpResponseRedirect("/cl/taller/centro-operaciones-espacial/"),
-    ),
+    # Vista de inicio para /cl/es/ - redirige a la página de bienvenida
+    path("", lambda request: HttpResponseRedirect("/cl/egarage/"), name="chile_home"),
+    # URLs principales de taller (configuración, settings, etc.)
+    # Incluir las rutas específicas que necesitamos
+    path("dashboard/", dashboard, name="dashboard"),
+    path("centro-operaciones/", dashboard_centro_operaciones, name="centro_operaciones"),
+    path("centro-operaciones-espacial/", dashboard_centro_operaciones_espacial, name="centro_operaciones_espacial"),
+    path("admin/dashboard/", dashboard_suscripciones, name="dashboard_suscripciones"),
+    path("configuracion/", configuracion_empresa, name="configuracion"),
+    path("configuracion/tecnicos/", configuracion_tecnicos, name="configuracion_tecnicos"),
+    path("settings/", company_settings_view, name="company_settings"),
+    # Dashboard principal Chile (requiere autenticación) - Usar el de taller_main_urls
+    # path("dashboard/", dashboard_cl_view, name="dashboard"),
     # Test endpoint Chile
     path("test/", test_chile_view, name="test"),
+    # Página de bienvenida para Chile
+    path("egarage/", TemplateView.as_view(template_name="onboarding/bienvenida_chile.html"), name="bienvenida_chile"),
     # Login para suscriptores de Chile (redirige al login global, pero aquí puedes poner una vista personalizada si lo deseas)
     path(
         "login/",
@@ -62,20 +73,10 @@ urlpatterns = [
         name="ajax_load_motores_cajas",
     ),
     # Módulos principales (incluir cuando estén funcionando)
-    path(
-        "vehiculos/",
-        include(("taller.vehiculos.urls", "vehiculos"), namespace="vehiculos"),
-    ),
-    path("clientes/", include("taller.clientes.urls")),
-    path("repuestos/", include("taller.repuestos.urls")),
-    # URLs principales de taller (configuración, settings, etc.) - sin prefijo para namespace global
-    path(
-        "", include("taller.taller_main_urls")
-    ),  # NUEVO: acceso directo a AJAX igual que USA
-    path(
-        "taller/",
-        include(("taller.taller_main_urls", "taller"), namespace="taller_main"),
-    ),  # NAMESPACE CAMBIADO para evitar duplicación con gestion_taller/urls.py
+    # === MÓDULOS PRINCIPALES ===
+    # NOTA: Los submódulos principales (clientes, vehiculos, repuestos, servicios, 
+    # documentos, reportes) están incluidos en taller_main_urls.py para evitar duplicación
+    # Solo incluimos aquí rutas específicas de Chile que no están en el core
     # Dashboard de suscriptor
     path("", include("taller.analytics.urls_suscriptor")),
     # Servicios y documentos con namespace bajo /cl/taller/

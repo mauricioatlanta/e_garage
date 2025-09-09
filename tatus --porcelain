@@ -1,0 +1,12 @@
+* [32mchore/coverage-bump-microtests[m
+  chore/middleware-saneamiento[m
+  chore/normalizar-paquete-django[m
+  chore/render-setup[m
+  chore/render-setup-clean[m
+  chore/templates-refactor-country-lang[m
+  cleanup/views-shims-only[m
+  feat/onboarding-email-discovery[m
+  hardening/tenant-fase1[m
+  hardening/tenant-i18n[m
+  main[m
+  release-hardening[m

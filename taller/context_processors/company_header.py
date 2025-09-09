@@ -17,7 +17,7 @@ def company_header(request):
             "COMPANY_ID": empresa.id,
             "COMPANY_NAME": cfg.nombre_publico or getattr(empresa, "nombre", "eGarage"),
             "COMPANY_TAGLINE": cfg.tagline or "",
-            "COMPANY_LOGO": getattr(cfg.logo, "url", ""),
+            "COMPANY_LOGO": getattr(cfg.logo, "url", "") if cfg.logo else "",
             "COMPANY_ADDRESS": cfg.direccion or "",
             "COMPANY_PHONE": cfg.telefono or "",
             "COMPANY_EMAIL": cfg.email_contacto or "",

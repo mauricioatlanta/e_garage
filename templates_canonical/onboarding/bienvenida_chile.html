@@ -1,726 +1,545 @@
-{% load humanize %}
+{% load i18n static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ page_title|default:"eGarage Chile - Gestión Automotriz del Futuro" }}</title>
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Futuristic styles -->
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background: 
-                radial-gradient(circle at 20% 80%, rgba(0, 255, 255, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 40% 40%, rgba(168, 85, 247, 0.05) 0%, transparent 50%),
-                linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
-            min-height: 100vh;
-            position: relative;
-            overflow-x: hidden;
-        }
-        
-        .orbitron {
-            font-family: 'Orbitron', monospace;
-        }
-        
-        .starfield {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1;
-        }
-        
-        .star {
-            position: absolute;
-            background: white;
-            border-radius: 50%;
-            animation: twinkle 3s infinite;
-        }
-        
-        .star.blue { background: #00ffff; }
-        .star.purple { background: #8b5cf6; }
-        .star.pink { background: #ec4899; }
-        
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.3; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.2); }
-        }
-        
-        .cyber-grid {
-            background-image: 
-                linear-gradient(rgba(0, 255, 255, 0.08) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 255, 255, 0.08) 1px, transparent 1px);
-            background-size: 40px 40px;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 2;
-            animation: gridMove 20s linear infinite;
-        }
-        
-        @keyframes gridMove {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(40px, 40px); }
-        }
-        
-        .glass-panel {
-            background: rgba(15, 23, 42, 0.85);
-            -webkit-backdrop-filter: blur(20px);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(0, 255, 255, 0.3);
-            border-radius: 20px;
-            box-shadow: 
-                0 8px 32px rgba(0, 0, 0, 0.4),
-                0 0 20px rgba(0, 255, 255, 0.15),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            position: relative;
-        }
-        
-        .glass-panel::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, 
-                rgba(0, 255, 255, 0.02) 0%,
-                transparent 50%,
-                rgba(168, 85, 247, 0.02) 100%);
-            border-radius: 20px;
-            pointer-events: none;
-        }
-        
-        .btn-cyber {
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            background: linear-gradient(45deg, 
-                rgba(0, 255, 255, 0.1) 0%,
-                rgba(99, 102, 241, 0.1) 50%,
-                rgba(168, 85, 247, 0.1) 100%);
-        }
-        
-        .btn-cyber::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, 
-                transparent, 
-                rgba(255, 255, 255, 0.2), 
-                transparent);
-            transition: left 0.5s ease;
-        }
-        
-        .btn-cyber:hover {
-            transform: translateY(-2px);
-            box-shadow: 
-                0 10px 30px rgba(0, 0, 0, 0.3),
-                0 0 20px rgba(0, 255, 255, 0.4);
-        }
-        
-        .btn-cyber:hover::before {
-            left: 100%;
-        }
-        
-        .card-float {
-            transform: translateY(0);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            position: relative;
-        }
-        
-        .card-float:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 
-                0 20px 40px rgba(0,0,0,0.3),
-                0 0 30px rgba(0, 255, 255, 0.2);
-        }
-        
-        .hero-gradient {
-            background: 
-                radial-gradient(circle at 50% 50%, rgba(0, 255, 255, 0.1) 0%, transparent 70%),
-                linear-gradient(135deg, 
-                    rgba(59, 130, 246, 0.1) 0%,
-                    rgba(99, 102, 241, 0.1) 25%,
-                    rgba(168, 85, 247, 0.1) 50%,
-                    rgba(236, 72, 153, 0.1) 75%,
-                    rgba(59, 130, 246, 0.1) 100%);
-            position: relative;
-        }
-        
-        .hero-gradient::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, 
-                transparent 30%, 
-                rgba(0, 255, 255, 0.03) 50%, 
-                transparent 70%);
-            border-radius: 24px;
-            animation: shimmer 3s ease-in-out infinite;
-        }
-        
-        @keyframes shimmer {
-            0%, 100% { opacity: 0; }
-            50% { opacity: 1; }
-        }
-        
-        .tech-icon {
-            background: linear-gradient(135deg, 
-                rgba(0, 255, 255, 0.2) 0%,
-                rgba(99, 102, 241, 0.2) 50%,
-                rgba(168, 85, 247, 0.2) 100%);
-            border: 1px solid rgba(0, 255, 255, 0.3);
-            box-shadow: 
-                0 0 20px rgba(0, 255, 255, 0.2),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
-        }
-        
-        .floating-element {
-            animation: float 6s ease-in-out infinite;
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
-        
-        .pulse-ring {
-            animation: pulseRing 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
-        }
-        
-        @keyframes pulseRing {
-            0% { transform: scale(0.8); opacity: 1; }
-            80%, 100% { transform: scale(1.2); opacity: 0; }
-        }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% trans "Bienvenido a eGarage Chile" %}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
+  <script src="https://cdn.lordicon.com/lordicon.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.waves.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.net.min.js"></script>
+  <style>
+    .glitch {
+      color: #0ff;
+      position: relative;
+      display: inline-block;
+    }
+    .glitch::after {
+      content: attr(data-text);
+      position: absolute;
+      left: 2px;
+      top: 0;
+      color: #f0f;
+      opacity: 0.7;
+      text-shadow: -1px 0 red;
+      animation: glitch 1s infinite linear alternate-reverse;
+    }
+    @keyframes glitch {
+      0% { left:2px; opacity:0.7; }
+      20% { left:-2px; opacity:0.5; }
+      40% { left:2px; opacity:0.8; }
+      60% { left:1px; opacity:0.6; }
+      80% { left:-1px; opacity:0.9; }
+      100% { left:2px; opacity:0.7; }
+    }
+    .toggle-switch {
+      position: fixed;
+      top: 1.5rem;
+      right: 1.5rem;
+      z-index: 50;
+      background: rgba(0,0,0,0.7);
+      border-radius: 9999px;
+      padding: 0.5rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      box-shadow: 0 2px 12px #00ffff44;
+      transition: background 0.3s;
+    }
+    .toggle-switch:hover {
+      background: rgba(255,255,255,0.1);
+    }
+    .light-mode {
+      background: #f7fafc !important;
+      color: #222 !important;
+    }
+    .light-mode .glass-card, .light-mode .glass {
+      background: rgba(0,0,0,0.08) !important;
+      color: #222 !important;
+    }
+    .light-mode .futuristic-glow {
+      text-shadow: 0 0 12px #00f0ff, 0 0 2px #fff;
+      color: #0d0d0d !important;
+    }
+    .light-mode .svg-blob path[fill] {
+      fill: #f7fafc !important;
+    }
+    .light-mode .svg-blob path[stroke] {
+      stroke: #00ffff !important;
+    }
+    .light-mode .icon-float {
+      color: #0d0d0d !important;
+    }
+    .sticky-cta {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    @media (max-width: 640px) {
+      .sticky-cta {
+        right: 0.5rem;
+        left: 0.5rem;
+        bottom: 0.5rem;
+        justify-content: center;
+      }
+    }
+    body {
+      background: #0d0d0d !important;
+      font-family: 'Share Tech Mono', 'Orbitron', monospace;
+      color: #fff;
+      min-height: 100vh;
+    }
+    h1, h2, h3, h4, .futuristic-glow {
+      font-family: 'Orbitron', 'Share Tech Mono', monospace !important;
+      letter-spacing: 1.5px;
+    }
+    .futuristic-glow {
+      text-shadow: 0 0 24px #00ffff, 0 0 12px #00f0ff, 0 0 4px #fff;
+    }
+    .glass-card, .glass {
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(12px);
+      border-radius: 1.5rem;
+      box-shadow: 0 8px 32px 0 rgba(0,255,255,0.10);
+      color: #fff;
+      transition: transform 0.2s, background 0.2s;
+    }
+    .glass-card:hover, .glass:hover {
+      transform: scale(1.04);
+      background: rgba(0,255,255,0.12);
+    }
+    .svg-blob {
+      width: 100vw;
+      height: 100px;
+      display: block;
+      margin: 0;
+      z-index: 2;
+    }
+    .icon-float {
+      transition: transform 0.3s, color 0.3s;
+      will-change: transform;
+    }
+    .icon-float:hover {
+      transform: scale(1.25) rotate(-8deg);
+      color: #f472b6;
+    }
+    .lordicon-cta {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 1.5rem auto;
+      display: block;
+    }
+    .aos-animate {
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  </style>
 </head>
-<body class="text-white min-h-screen">
-    
-    <!-- Starfield background -->
-    <div class="starfield" id="starfield"></div>
-    
-    <!-- Cyber grid -->
-    <div class="cyber-grid"></div>
-    
-    <!-- Main content -->
-    <div class="relative z-20">
+<body class="min-h-screen flex flex-col justify-between bg-[#0d0d0d]">
+  
+  <!-- 🌟 Cabecera de Navegación con Login/Registro -->
+  <header class="relative z-50 bg-gradient-to-r from-black/80 via-gray-900/80 to-black/80 backdrop-blur-md border-b border-cyan-400/30">
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center py-4">
         
-        <!-- Header Section -->
-        <section class="max-w-5xl mx-auto px-6 py-14">
-            <!-- Header + bandera -->
-            <div class="flex items-center justify-between mb-8">
-                <div class="flex items-center gap-4">
-                    <img src="/static/img/flags/cl.svg" alt="Chile" class="h-8 w-12 rounded-md ring-2 ring-cyan-400/50 shadow-lg" />
-                    <div class="text-sm opacity-70">Chile • Moneda: {{ moneda|default:"CLP" }} • Idioma: {{ idioma|default:"ES" }}</div>
-                </div>
-                <div class="floating-element">
-                    <img src="/static/img/logos/egarage-logo.svg" alt="eGarage" class="h-12 opacity-90 hover:opacity-100 transition-opacity" />
-                </div>
-            </div>
-
-            <!-- Hero -->
-            <div class="text-center hero-gradient rounded-3xl p-12 glass-panel relative overflow-hidden">
-                <!-- Elementos decorativos de fondo -->
-                <div class="absolute top-4 left-4 w-2 h-2 bg-cyan-400 rounded-full pulse-ring"></div>
-                <div class="absolute top-8 right-8 w-1 h-1 bg-purple-400 rounded-full pulse-ring" style="animation-delay: 1s;"></div>
-                <div class="absolute bottom-6 left-1/4 w-1.5 h-1.5 bg-pink-400 rounded-full pulse-ring" style="animation-delay: 2s;"></div>
-                
-                <!-- Logo central grande -->
-                <div class="mb-6 relative">
-                    <div class="inline-block">
-                        <div class="relative">
-                            <div class="absolute inset-0 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 rounded-2xl blur-xl opacity-30 animate-pulse"></div>
-                            <div class="relative bg-gradient-to-br from-gray-900/90 to-black/90 p-6 rounded-2xl border-2 border-cyan-400/60 tech-icon">
-                                <svg class="w-20 h-20 text-cyan-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
-                                </svg>
-                                <!-- Indicadores de estado -->
-                                <div class="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                                <div class="absolute -bottom-1 -left-1 w-2 h-2 bg-cyan-400 rounded-full animate-pulse" style="animation-delay: 0.5s;"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <h1 class="orbitron text-4xl md:text-6xl font-black mb-6 bg-gradient-to-r from-cyan-300 via-blue-300 to-purple-400 bg-clip-text text-transparent">
-                    {{ frases.headline|default:"eGarage Chile" }}
-                </h1>
-                <p class="text-lg md:text-xl opacity-80 max-w-3xl mx-auto mb-8 leading-relaxed">
-                    {{ frases.sub|default:"Plataforma de vanguardia para talleres automotrices modernos. Gestiona tu taller con tecnología avanzada, inteligencia artificial y herramientas de última generación diseñadas específicamente para el mercado chileno." }}
-                </p>
-
-                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <a href="/accounts/login/" class="btn-cyber px-8 py-4 rounded-xl ring-2 ring-cyan-400/40 hover:ring-cyan-400/80 transition text-lg font-semibold hover:text-cyan-300">
-                        🔐 Iniciar Sesión
-                    </a>
-                    <a href="/accounts/signup/" class="btn-cyber px-8 py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 transition shadow-lg shadow-indigo-500/20 text-lg font-semibold">
-                        🚀 Registrarse
-                    </a>
-                    <a href="/accounts/signup/?trial=1" class="btn-cyber px-8 py-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 transition shadow-lg shadow-emerald-500/20 text-lg font-semibold">
-                        ⚡ Prueba Gratis 30 días
-                    </a>
-                </div>
-            </div>
-        </section>
-
-        <!-- Diferenciales -->
-        <section class="max-w-6xl mx-auto px-6 py-12">
-            <h2 class="orbitron text-3xl font-bold mb-12 text-center bg-gradient-to-r from-cyan-300 to-purple-400 bg-clip-text text-transparent">
-                ¿Por qué eGarage Chile?
-            </h2>
-            <div class="grid md:grid-cols-3 gap-6">
-                {% if diferenciales %}
-                    {% for f in diferenciales %}
-                        <div class="glass-panel p-6 card-float">
-                            <div class="flex items-center gap-3 mb-4">
-                                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center">
-                                    {% if f.icon == 'chart-bar' %}
-                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
-                                        </svg>
-                                    {% elif f.icon == 'package' %}
-                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                        </svg>
-                                    {% elif f.icon == 'receipt' %}
-                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-                                        </svg>
-                                    {% elif f.icon == 'bot' %}
-                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-                                        </svg>
-                                    {% elif f.icon == 'users' %}
-                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-9 5 9M1 21l5-9 5 9M16 21l5-9 5 9M21 3L9 15l-6-6"></path>
-                                        </svg>
-                                    {% elif f.icon == 'store' %}
-                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                                        </svg>
-                                    {% else %}
-                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                                        </svg>
-                                    {% endif %}
-                                </div>
-                                <div class="text-lg font-semibold text-cyan-300">{{ f.titulo }}</div>
-                            </div>
-                            <div class="text-sm opacity-90 leading-relaxed">{{ f.desc }}</div>
-                        </div>
-                    {% endfor %}
-                {% else %}
-                    <!-- Default features if no data provided -->
-                    <div class="glass-panel p-6 card-float">
-                        <div class="flex items-center gap-3 mb-4">
-                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center">
-                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                                </svg>
-                            </div>
-                            <div class="text-lg font-semibold text-cyan-300">Reportes Avanzados</div>
-                        </div>
-                        <div class="text-sm opacity-90 leading-relaxed">Informes detallados para mecánicos con análisis profundo de servicios realizados.</div>
-                    </div>
-                    
-                    <div class="glass-panel p-6 card-float">
-                        <div class="flex items-center gap-3 mb-4">
-                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-400 to-pink-600 flex items-center justify-center">
-                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                                </svg>
-                            </div>
-                            <div class="text-lg font-semibold text-cyan-300">Gestión de Inventario</div>
-                        </div>
-                        <div class="text-sm opacity-90 leading-relaxed">Control completo de stock, repuestos y herramientas con alertas automáticas.</div>
-                    </div>
-                    
-                    <div class="glass-panel p-6 card-float">
-                        <div class="flex items-center gap-3 mb-4">
-                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center">
-                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
-                                </svg>
-                            </div>
-                            <div class="text-lg font-semibold text-cyan-300">Gestión de Clientes</div>
-                        </div>
-                        <div class="text-sm opacity-90 leading-relaxed">CRM integrado para seguimiento completo del historial automotriz de cada cliente.</div>
-                    </div>
-                {% endif %}
-            </div>
-        </section>
-
-        <!-- Bloque de WhatsApp destacado -->
-        <section class="max-w-6xl mx-auto px-6 py-12">
-            <div class="glass-panel p-8 card-float bg-gradient-to-r from-green-900/40 to-emerald-900/40 border-green-400/30">
-                <div class="flex items-center justify-center gap-6 mb-6">
-                    <div class="w-16 h-16 rounded-full bg-green-500 flex items-center justify-center">
-                        <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <h3 class="text-2xl font-bold text-green-300 mb-2">WhatsApp integrado</h3>
-                        <p class="text-lg opacity-90">Cotiza y envía documentos directo al WhatsApp de tus clientes.</p>
-                    </div>
-                </div>
-                <div class="text-center">
-                    <p class="text-xl font-semibold text-white mb-4">
-                        <strong class="text-green-300">Más rápido, más ventas.</strong>
-                    </p>
-                    <p class="opacity-80">Presupuestos, facturas, recordatorios y seguimiento automático.</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Comparativa visual -->
-        <section class="max-w-6xl mx-auto px-6 py-12">
-            <h2 class="text-3xl font-bold mb-8 text-center bg-gradient-to-r from-red-300 to-green-300 bg-clip-text text-transparent">
-                Antes vs Ahora
-            </h2>
-            <div class="grid md:grid-cols-2 gap-8">
-                <!-- Antes -->
-                <div class="glass-panel p-8 border-red-400/30 bg-gradient-to-br from-red-900/20 to-orange-900/20">
-                    <div class="text-center mb-6">
-                        <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-red-500/20 flex items-center justify-center">
-                            <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                        </div>
-                        <h3 class="text-xl font-bold text-red-300 mb-4">Con libreta y lápiz</h3>
-                    </div>
-                    <ul class="space-y-3 text-sm opacity-90">
-                        <li class="flex items-center gap-2">
-                            <span class="text-red-400">❌</span> Desorden y pérdidas de información
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="text-red-400">❌</span> Clientes confundidos y molestos
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="text-red-400">❌</span> Horas perdidas buscando datos
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="text-red-400">❌</span> Sin saber cuánto ganas realmente
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- Después -->
-                <div class="glass-panel p-8 border-green-400/30 bg-gradient-to-br from-green-900/20 to-emerald-900/20">
-                    <div class="text-center mb-6">
-                        <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-green-500/20 flex items-center justify-center">
-                            <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                            </svg>
-                        </div>
-                        <h3 class="text-xl font-bold text-green-300 mb-4">Con eGarage</h3>
-                    </div>
-                    <ul class="space-y-3 text-sm opacity-90">
-                        <li class="flex items-center gap-2">
-                            <span class="text-green-400">✅</span> Orden, claridad y profesionalismo
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="text-green-400">✅</span> Clientes satisfechos y fidelizados
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="text-green-400">✅</span> Todo en segundos, sin buscar papeles
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="text-green-400">✅</span> Reportes en tiempo real de ingresos
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </section>
-
-        <!-- Franja de confianza -->
-        <section class="max-w-6xl mx-auto px-6 py-12">
-            <div class="glass-panel p-8 bg-gradient-to-r from-blue-900/20 to-purple-900/20 border-blue-400/30">
-                <div class="grid md:grid-cols-3 gap-8 text-center">
-                    <div>
-                        <div class="text-3xl font-bold text-blue-300 mb-2">+99.9%</div>
-                        <div class="text-sm opacity-80">Uptime garantizado</div>
-                    </div>
-                    <div>
-                        <div class="text-3xl font-bold text-purple-300 mb-2">24/7 🇨🇱</div>
-                        <div class="text-sm opacity-80">Soporte en Chile</div>
-                    </div>
-                    <div>
-                        <div class="text-3xl font-bold text-green-300 mb-2">Sin letra chica</div>
-                        <div class="text-sm opacity-80">Planes transparentes</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Sección especial para Casas de Repuestos -->
-        <section class="max-w-6xl mx-auto px-6 py-12">
-            <div class="glass-panel p-8 bg-gradient-to-r from-orange-900/20 to-red-900/20 border-orange-400/30">
-                <div class="text-center mb-8">
-                    <h2 class="text-3xl font-bold mb-4 bg-gradient-to-r from-orange-300 to-red-300 bg-clip-text text-transparent">
-                        🔧 Especial para Casas de Repuestos
-                    </h2>
-                    <p class="text-xl opacity-90 mb-6">
-                        <strong class="text-orange-300">eGarage no es solo para talleres: es una super herramienta para casas de repuestos.</strong>
-                    </p>
-                </div>
-                
-                <div class="grid md:grid-cols-2 gap-8">
-                    <div>
-                        <h3 class="text-xl font-bold text-orange-300 mb-4">🚀 Digitaliza tu bodega sin gastar millones</h3>
-                        <ul class="space-y-3 text-sm opacity-90">
-                            <li class="flex items-center gap-2">
-                                <span class="text-orange-400">✅</span> Vende más con catálogos digitales y control de stock en tiempo real
-                            </li>
-                            <li class="flex items-center gap-2">
-                                <span class="text-orange-400">✅</span> Genera cotizaciones y envíalas directo a WhatsApp con un clic
-                            </li>
-                            <li class="flex items-center gap-2">
-                                <span class="text-orange-400">✅</span> Gestiona comisiones, precios y utilidades sin complicaciones
-                            </li>
-                            <li class="flex items-center gap-2">
-                                <span class="text-orange-400">✅</span> Administra repuestos, controla técnicos y haz seguimiento de clientes
-                            </li>
-                        </ul>
-                    </div>
-                    
-                    <div class="bg-gradient-to-br from-orange-800/30 to-red-800/30 border border-orange-400/40 rounded-2xl p-6">
-                        <h4 class="text-lg font-bold text-orange-200 mb-3">💡 El mismo precio, doble funcionalidad</h4>
-                        <p class="text-sm opacity-90 mb-4">
-                            Con eGarage puedes gestionar tanto tu taller como tu casa de repuestos desde una sola plataforma.
-                        </p>
-                        <div class="text-center">
-                            <div class="text-2xl font-bold text-white mb-2">$20.000/mes</div>
-                            <div class="text-xs opacity-70">Para taller + casa de repuestos</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Planes -->
-        {% if planes %}
-        <section class="max-w-6xl mx-auto px-6 py-12">
-            <h2 class="text-3xl font-bold mb-8 text-center bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">
-                Planes que caben en tu bolsillo
-            </h2>
-            <div class="text-center mb-8">
-                <p class="text-lg opacity-90 mb-2">
-                    <strong class="text-cyan-300">No somos un gasto, somos la inversión más barata que hará crecer tu taller.</strong>
-                </p>
-                <p class="text-sm opacity-70">Si tu taller cabe en una cuadra, eGarage cabe en tu bolsillo.</p>
-            </div>
-            <div class="grid md:grid-cols-3 gap-6">
-                {% for p in planes %}
-                    <div class="relative glass-panel p-8 card-float {% if p.badge %}ring-2 ring-emerald-400/50{% endif %}">
-                        {% if p.badge %}
-                            <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 text-xs px-3 py-1 rounded-full bg-emerald-600 font-semibold">
-                                {{ p.badge }}
-                            </div>
-                        {% endif %}
-                        <div class="text-center">
-                            <div class="text-xl font-bold mb-2 text-cyan-300">{{ p.nombre }}</div>
-                            <div class="text-4xl font-black mb-1 bg-gradient-to-r from-white to-cyan-200 bg-clip-text text-transparent">
-                                ${{ p.precio|intcomma }}
-                            </div>
-                            <div class="text-sm opacity-80 mb-6">{{ p.detalle }}</div>
-                            <a href="/accounts/signup/?plan={{ p.nombre|urlencode }}" class="inline-block w-full px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 transition font-semibold btn-cyber">
-                                Elegir plan
-                            </a>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-            <div class="text-center mt-8">
-                <p class="text-xs opacity-60 mb-4">Precios en CLP con IVA incluido, sin letra chica.</p>
-                <div class="glass-panel p-6 bg-gradient-to-r from-emerald-900/20 to-green-900/20 border-emerald-400/30 max-w-2xl mx-auto">
-                    <p class="text-lg font-semibold text-emerald-300 mb-2">
-                        🎯 "Cada día sin eGarage es dinero perdido"
-                    </p>
-                    <p class="text-sm opacity-90">
-                        Otros software = caros, complejos, para grandes cadenas.<br>
-                        <strong class="text-white">eGarage = simple, accesible y diseñado para el taller que quiere dar el salto sin arruinarse.</strong>
-                    </p>
-                </div>
-            </div>
-        </section>
-        {% endif %}
-
-        <!-- Testimonios -->
-        {% if testimonios %}
-        <section class="max-w-6xl mx-auto px-6 py-12">
-            <h2 class="text-3xl font-bold mb-8 text-center bg-gradient-to-r from-white to-green-200 bg-clip-text text-transparent">
-                Lo que dicen nuestros clientes
-            </h2>
-            <div class="grid md:grid-cols-3 gap-6">
-                {% for t in testimonios %}
-                    <div class="glass-panel p-6 card-float">
-                        <div class="flex items-center gap-3 mb-4">
-                            <img src="/static/{{ t.avatar }}" class="h-12 w-12 rounded-full ring-2 ring-cyan-400/50" alt="{{ t.nombre }}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2248%22 height=%2248%22 viewBox=%220 0 48 48%22%3E%3Ccircle cx=%2224%22 cy=%2224%22 r=%2224%22 fill=%22%23374151%22/%3E%3Ctext x=%2224%22 y=%2230%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22Arial%22 font-size=%2220%22%3E{{ t.nombre.0|upper }}%3C/text%3E%3C/svg%3E'">
-                            <div>
-                                <div class="text-sm font-semibold text-cyan-300">{{ t.nombre }}</div>
-                                <div class="text-xs opacity-70">{{ t.ciudad }}</div>
-                            </div>
-                        </div>
-                        <p class="text-sm opacity-90 leading-relaxed italic">"{{ t.texto }}"</p>
-                    </div>
-                {% endfor %}
-            </div>
-        </section>
-        {% endif %}
-
-        <!-- Cierre CTA -->
-        <section class="max-w-5xl mx-auto px-6 py-16">
-            <div class="glass-panel p-12 text-center hero-gradient">
-                <h3 class="text-3xl font-bold mb-4 bg-gradient-to-r from-cyan-300 to-purple-400 bg-clip-text text-transparent">
-                    Transforma tu taller en un negocio inteligente
-                </h3>
-                <p class="text-xl opacity-90 mb-4 leading-relaxed">
-                    <strong class="text-cyan-300">Lo que hoy haces en 3 horas, con eGarage lo haces en 10 minutos.</strong>
-                </p>
-                <p class="opacity-80 mb-8 text-lg leading-relaxed">
-                    Desde pequeños talleres familiares hasta grandes centros de servicio: <strong class="text-white">todos caben en eGarage</strong>.<br>
-                    La digitalización ya no es un lujo, <strong class="text-emerald-300">es tu nueva ventaja competitiva</strong>.
-                </p>
-                
-                <div class="bg-gradient-to-r from-red-900/20 to-orange-900/20 border border-orange-400/30 rounded-2xl p-6 mb-8">
-                    <p class="text-lg font-semibold text-orange-300 mb-2">
-                        🚨 Tu taller pequeño, con herramientas de gigante
-                    </p>
-                    <p class="text-sm opacity-90">
-                        Lo que otras apps venden caro para talleres grandes, nosotros lo hacemos simple y accesible para todos.
-                    </p>
-                </div>
-
-                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
-                    <a href="/accounts/signup/?trial=1" class="btn-cyber px-12 py-5 rounded-xl bg-emerald-600 hover:bg-emerald-500 transition text-xl font-bold shadow-lg shadow-emerald-500/30">
-                        🎯 Prueba Gratis 30 días – Sin tarjeta
-                    </a>
-                    <a href="/accounts/signup/" class="btn-cyber px-10 py-5 rounded-xl bg-indigo-600 hover:bg-indigo-500 transition text-lg font-semibold">
-                        Comenzar con $20.000/mes
-                    </a>
-                </div>
-                
-                <div class="text-center">
-                    <a href="/contacto/" class="btn-cyber px-8 py-3 rounded-xl ring-1 ring-white/20 hover:ring-cyan-400/60 transition text-base font-medium hover:text-cyan-300">
-                        📞 Solicitar Demo Personal
-                    </a>
-                </div>
-            </div>
-        </section>
+        <!-- Logo -->
+        <div class="flex items-center space-x-3">
+          <img src="{% static 'img/logo.png' %}" alt="eGarage" class="w-8 h-8 animate-pulse" style="filter: drop-shadow(0 0 8px #00ffff88);">
+          <!-- RED triangle indicator - templates_canonical/onboarding/ -->
+          <div class="w-0 h-0 border-l-[6px] border-r-[6px] border-b-[10px] border-l-transparent border-r-transparent border-b-red-500 animate-pulse"></div>
+          <span class="text-xl font-bold text-cyan-400 font-mono">eGarage</span>
+          <span class="px-2 py-1 text-xs bg-cyan-400/20 text-cyan-300 rounded-full border border-cyan-400/30">🇨🇱 Chile</span>
+        </div>
         
-        <!-- Footer -->
-        <footer class="max-w-6xl mx-auto px-6 py-12 border-t border-cyan-400/20 relative">
-            <!-- Elementos decorativos -->
-            <div class="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-0.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent"></div>
-            
-            <div class="grid md:grid-cols-3 gap-8 mb-8">
-                <!-- Logo y descripción -->
-                <div class="text-center md:text-left">
-                    <div class="mb-4">
-                        <img src="/static/img/logos/egarage-logo.svg" alt="eGarage" class="h-10 mx-auto md:mx-0 opacity-90" />
-                    </div>
-                    <p class="text-sm opacity-70 leading-relaxed">
-                        Plataforma digital de vanguardia para talleres automotrices modernos en Chile.
-                    </p>
-                </div>
-                
-                <!-- Enlaces rápidos -->
-                <div class="text-center">
-                    <h4 class="font-semibold text-cyan-300 mb-4">Enlaces Rápidos</h4>
-                    <div class="space-y-2 text-sm">
-                        <div><a href="/accounts/login/" class="opacity-70 hover:opacity-100 hover:text-cyan-300 transition">Iniciar Sesión</a></div>
-                        <div><a href="/accounts/signup/" class="opacity-70 hover:opacity-100 hover:text-cyan-300 transition">Registro</a></div>
-                        <div><a href="/contacto/" class="opacity-70 hover:opacity-100 hover:text-cyan-300 transition">Contacto</a></div>
-                        <div><a href="/demo/" class="opacity-70 hover:opacity-100 hover:text-cyan-300 transition">Demo</a></div>
-                    </div>
-                </div>
-                
-                <!-- Contacto Chile -->
-                <div class="text-center md:text-right">
-                    <h4 class="font-semibold text-cyan-300 mb-4">Contacto Chile</h4>
-                    <div class="space-y-2 text-sm opacity-70">
-                        <div class="flex items-center justify-center md:justify-end gap-2">
-                            <img src="/static/img/flags/cl.svg" alt="Chile" class="h-4 w-6 rounded-sm" />
-                            <span>Soporte Local</span>
-                        </div>
-                        <div>📧 chile@egarage.com</div>
-                        <div>💬 WhatsApp Business</div>
-                        <div>🕒 Lun-Vie 9:00-18:00 CLT</div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Línea divisoria con gradiente -->
-            <div class="w-full h-0.5 bg-gradient-to-r from-transparent via-cyan-400/30 to-transparent mb-6"></div>
-            
-            <!-- Copyright y badges -->
-            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-                <div class="text-sm opacity-60">
-                    <p>&copy; 2025 eGarage Chile. Gestión Automotriz del Futuro.</p>
-                </div>
-                
-                <!-- Tech badges -->
-                <div class="flex items-center gap-4">
-                    <div class="flex items-center gap-2 text-xs opacity-50">
-                        <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                        <span>Sistema Activo</span>
-                    </div>
-                    <div class="flex items-center gap-2 text-xs opacity-50">
-                        <div class="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
-                        <span>SSL Seguro</span>
-                    </div>
-                    <div class="flex items-center gap-2 text-xs opacity-50">
-                        <div class="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-                        <span>Datos Protegidos</span>
-                    </div>
-                </div>
-            </div>
-        </footer>
+        <!-- Menú de Navegación -->
+        <div class="hidden md:flex items-center space-x-8">
+          <a href="#features" class="text-gray-300 hover:text-cyan-400 transition-colors duration-300 font-medium">Funciones</a>
+          <a href="#plans" class="text-gray-300 hover:text-cyan-400 transition-colors duration-300 font-medium">Precios</a>
+          <a href="#about" class="text-gray-300 hover:text-cyan-400 transition-colors duration-300 font-medium">Acerca de</a>
+        </div>
+        
+        <!-- Botones de Autenticación -->
+        <div class="flex items-center space-x-4">
+          
+          <!-- Botón de Login -->
+          {% load country_url %}
+          <a href="{% country_url 'account_login' %}" class="inline-flex items-center px-4 py-2 text-sm font-medium text-cyan-400 bg-transparent border border-cyan-400/50 rounded-lg hover:bg-cyan-400/10 hover:border-cyan-400 transition-all duration-300 group">
+            <i class="fas fa-sign-in-alt mr-2 group-hover:scale-110 transition-transform"></i>
+            Ingresar
+          </a>
+          
+          <!-- Botón de Registro -->
+          <a href="/registro/" class="inline-flex items-center px-4 py-2 text-sm font-medium text-black bg-gradient-to-r from-cyan-400 to-blue-500 rounded-lg hover:from-cyan-300 hover:to-blue-400 hover:scale-105 transition-all duration-300 shadow-lg group">
+            <i class="fas fa-user-plus mr-2 group-hover:scale-110 transition-transform"></i>
+            Registrarse
+          </a>
+          
+        </div>
+        
+        <!-- Menú Móvil Toggle -->
+        <div class="md:hidden">
+          <button id="mobile-menu-toggle" class="text-gray-300 hover:text-cyan-400 focus:outline-none">
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+        </div>
+        
+      </div>
+      
+      <!-- Menú Móvil Desplegable -->
+      <div id="mobile-menu" class="md:hidden hidden border-t border-cyan-400/30 py-4">
+        <div class="flex flex-col space-y-4">
+          <a href="#features" class="text-gray-300 hover:text-cyan-400 transition-colors duration-300 px-4 py-2">Funciones</a>
+          <a href="#plans" class="text-gray-300 hover:text-cyan-400 transition-colors duration-300 px-4 py-2">Precios</a>
+          <a href="#about" class="text-gray-300 hover:text-cyan-400 transition-colors duration-300 px-4 py-2">Acerca de</a>
+          <div class="flex space-x-4 px-4 pt-4 border-t border-cyan-400/30">
+            <a href="{% country_url 'account_login' %}" class="flex-1 text-center px-4 py-2 text-cyan-400 border border-cyan-400/50 rounded-lg hover:bg-cyan-400/10 transition-all">
+              <i class="fas fa-sign-in-alt mr-2"></i>Ingresar
+            </a>
+            <a href="/registro/" class="flex-1 text-center px-4 py-2 text-black bg-gradient-to-r from-cyan-400 to-blue-500 rounded-lg hover:scale-105 transition-all">
+              <i class="fas fa-user-plus mr-2"></i>Registrarse
+            </a>
+          </div>
+        </div>
+      </div>
+      
+    </nav>
+  </header>
+
+  <div id="vanta-matrix" class="fixed top-0 left-0 w-full h-[420px] -z-10"></div>
+  <div id="vanta-bg" class="fixed inset-0 -z-20"></div>
+  <main class="relative z-10">
+    <!-- Hero Section -->
+    <section class="text-center py-24 px-6 relative" data-aos="fade-up">
+      <img src="{% static 'img/logo.png' %}" alt="eGarage Logo" class="mx-auto mb-8 w-32 md:w-40 animate-spin-slow" style="filter: drop-shadow(0 0 24px #00ffff88);">
+      <h1 class="text-5xl md:text-6xl font-extrabold futuristic-glow mb-6 bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-500 to-[#00fff7] drop-shadow-lg animate-pulse" style="letter-spacing:2px;">La plataforma N°1 para talleres en Chile</h1>
+      <div class="absolute left-1/2 -translate-x-1/2 top-8 md:top-10 z-10">
+        <lord-icon
+          src="https://cdn.lordicon.com/wxhtpnnk.json"
+          trigger="loop"
+          colors="primary:#00ffff,secondary:#00bfff"
+          style="width:64px;height:64px;filter:drop-shadow(0 0 16px #00ffffcc);"
+        ></lord-icon>
+      </div>
+      <p class="text-xl text-cyan-200 mb-8">Confiado por técnicos de todo Chile. Funcionalidades reales. Soporte bilingüe. Sin riesgos.</p>
+      <div class="mt-10 flex flex-col md:flex-row gap-4 justify-center">
+        <a href="/registro/" class="px-10 py-4 bg-gradient-to-r from-lime-400 to-cyan-400 text-black font-bold rounded-full shadow-lg hover:scale-105 transition-all card-glow text-xl">🚀 Comenzar prueba gratis</a>
+        <a href="#plans" class="px-10 py-4 bg-gradient-to-r from-cyan-400 to-blue-500 text-black font-bold rounded-full shadow-lg hover:scale-105 transition-all card-glow text-xl">💰 Ver precios</a>
+      </div>
+    </section>
+    <div class="sticky-cta">
+      <a href="#cta" class="bg-gradient-to-r from-cyan-400 to-blue-500 text-black px-6 py-3 rounded-full shadow-lg hover:scale-105 transition text-lg font-bold">🚀 ¡Empieza ahora!</a>
     </div>
-    
-    <!-- Scripts -->
+    <div class="svg-blob">
+      <svg viewBox="0 0 1440 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0,80 Q720,0 1440,80 L1440,100 L0,100 Z" fill="#0d0d0d"/><path d="M0,80 Q720,0 1440,80" stroke="#00eaff" stroke-width="4" fill="none"/></svg>
+    </div>
+    <section class="max-w-5xl mx-auto py-20 px-4 grid md:grid-cols-3 gap-12" id="virtues">
+      <div data-aos="fade-right">
+        <h2 class="text-4xl font-bold text-cyan-300 mb-6 futuristic-glow">Gestión</h2>
+        <div class="glass-card p-6 mb-6 flex flex-col items-center">
+          <i class="fas fa-shield-alt text-5xl mb-4 icon-float"></i>
+          <h3 class="text-2xl font-bold mb-2">Control de Garantías</h3>
+          <p class="text-lg text-gray-300">Lleva el control de garantías por tiempo o kilometraje con alertas y registros digitales.</p>
+        </div>
+        <div class="glass-card p-6 flex flex-col items-center">
+          <i class="fas fa-chart-line text-5xl mb-4 icon-float"></i>
+          <h3 class="text-2xl font-bold mb-2">Reportes de Rentabilidad</h3>
+          <p class="text-lg text-gray-300">Conoce tus ganancias por servicios, repuestos o ambos — en tiempo real.</p>
+        </div>
+      </div>
+      <div data-aos="fade-up">
+        <h2 class="text-4xl font-bold text-cyan-300 mb-6 futuristic-glow">Automatización</h2>
+        <div class="glass-card p-6 mb-6 flex flex-col items-center">
+          <i class="fas fa-user-cog text-5xl mb-4 icon-float"></i>
+          <h3 class="text-2xl font-bold mb-2">Rendimiento de Técnicos</h3>
+          <p class="text-lg text-gray-300">Mide desempeño, tiempos de trabajo y destaca a los mejores.</p>
+        </div>
+        <div class="glass-card p-6 flex flex-col items-center">
+          <i class="fas fa-boxes text-5xl mb-4 icon-float"></i>
+          <h3 class="text-2xl font-bold mb-2">Alertas de Inventario</h3>
+          <p class="text-lg text-gray-300">Recibe notificaciones cuando el stock esté bajo o inactivo.</p>
+        </div>
+      </div>
+      <div data-aos="fade-left">
+        <h2 class="text-4xl font-bold text-lime-300 mb-6 futuristic-glow">Cliente</h2>
+        <div class="glass-card p-6 mb-6 flex flex-col items-center">
+          <i class="fas fa-file-signature text-5xl mb-4 icon-float"></i>
+          <h3 class="text-2xl font-bold mb-2">Documentos Digitales</h3>
+          <p class="text-lg text-gray-300">Órdenes de trabajo, diagnósticos y recibos sin papel.</p>
+        </div>
+        <div class="glass-card p-6 flex flex-col items-center">
+          <i class="fas fa-users text-5xl mb-4 icon-float"></i>
+          <h3 class="text-2xl font-bold mb-2">Portal del Cliente</h3>
+          <p class="text-lg text-gray-300">Tus clientes pueden ver facturas, historial y actualizaciones online.</p>
+        </div>
+      </div>
+    </section>
+    <div class="svg-blob">
+      <svg viewBox="0 0 1440 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0,20 Q720,100 1440,20 L1440,100 L0,100 Z" fill="#0d0d0d"/><path d="M0,20 Q720,100 1440,20" stroke="#00bfff" stroke-width="4" fill="none"/></svg>
+    </div>
+    <section class="max-w-6xl mx-auto py-20 px-4 flex flex-col gap-24">
+      <div class="flex flex-col md:flex-row items-center gap-12" data-aos="fade-right">
+        <div class="flex-1">
+          <h2 class="text-4xl font-bold text-cyan-200 mb-4 futuristic-glow">Dashboard Todo-en-Uno</h2>
+          <p class="text-lg text-gray-400">Todo lo que necesitas en un solo lugar: trabajos, inventario, clientes y más.</p>
+        </div>
+        <div class="flex-1 flex justify-center">
+          <i class="fas fa-tachometer-alt text-7xl text-cyan-400 icon-float"></i>
+        </div>
+      </div>
+      <div class="flex flex-col items-center text-center" data-aos="fade-up">
+        <h2 class="text-4xl font-bold text-cyan-200 mb-4 futuristic-glow">Recordatorios Automáticos</h2>
+        <i class="fas fa-bell text-6xl text-cyan-400 mb-4 icon-float"></i>
+        <p class="text-lg text-gray-400 max-w-2xl">Nunca pierdas un servicio o seguimiento. Notificaciones automáticas para ti y tus clientes.</p>
+      </div>
+      <div class="relative" data-aos="fade-left">
+        <div class="absolute left-0 top-1/2 w-2 h-64 bg-gradient-to-b from-cyan-400 to-blue-500 rounded-full -translate-y-1/2"></div>
+        <div class="ml-12">
+          <h2 class="text-4xl font-bold text-lime-200 mb-4 futuristic-glow">Tu Ruta al Éxito</h2>
+          <ul class="space-y-6">
+            <li class="flex items-center gap-4">
+              <span class="w-8 h-8 rounded-full bg-cyan-400 flex items-center justify-center text-black font-bold">1</span>
+              <span class="text-lg text-gray-300">Registra tu taller en minutos</span>
+            </li>
+            <li class="flex items-center gap-4">
+              <span class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-black font-bold">2</span>
+              <span class="text-lg text-gray-300">Importa tus clientes e inventario</span>
+            </li>
+            <li class="flex items-center gap-4">
+              <span class="w-8 h-8 rounded-full bg-lime-400 flex items-center justify-center text-black font-bold">3</span>
+              <span class="text-lg text-gray-300">¡Comienza a trabajar de forma inteligente!</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="w-full py-16 flex flex-col items-center justify-center bg-gradient-to-r from-blue-900/30 via-cyan-900/30 to-black/80 rounded-3xl" data-aos="fade-up">
+        <h2 class="text-4xl font-bold text-cyan-300 mb-4 futuristic-glow">Analítica en Tiempo Real</h2>
+        <i class="fas fa-chart-pie text-6xl text-cyan-400 mb-4 icon-float"></i>
+        <p class="text-lg text-gray-400 max-w-2xl">Visualiza el crecimiento de tu negocio y toma decisiones basadas en datos al instante.</p>
+      </div>
+    </section>
+    <div class="svg-blob">
+      <svg viewBox="0 0 1440 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0,60 Q720,100 1440,60 L1440,100 L0,100 Z" fill="#0d0d0d"/><path d="M0,60 Q720,100 1440,60" stroke="#00eaff" stroke-width="4" fill="none"/></svg>
+    </div>
+    <section class="max-w-6xl mx-auto py-20 px-4" id="testimonials">
+      <h2 class="text-4xl font-bold text-center text-cyan-300 mb-12 futuristic-glow" data-aos="fade-up">Lo que dicen nuestros clientes</h2>
+      <div class="grid md:grid-cols-3 gap-10">
+        <div class="bg-white/5 rounded-3xl p-8 flex flex-col items-center" data-aos="fade-up">
+          <img src="/static/img/testimonio1.jpg" alt="Taller Don Luis" class="w-20 h-20 rounded-full mb-4 border-4 border-cyan-400 object-cover shadow-lg" />
+          <p class="text-3xl text-white leading-snug mb-4">“Antes de eGarage, usábamos Excel y papel... ahora todo es automático. ¡Un cambio total para nuestro taller!”</p>
+          <div class="mt-2 text-cyan-400 font-bold">Taller Don Luis — Santiago, CL</div>
+        </div>
+        <div class="bg-white/5 rounded-3xl p-8 flex flex-col items-center" data-aos="fade-up" data-aos-delay="150">
+          <img src="/static/img/testimonio2.jpg" alt="AutoPro Viña" class="w-20 h-20 rounded-full mb-4 border-4 border-blue-400 object-cover shadow-lg" />
+          <p class="text-3xl text-white leading-snug mb-4">“El soporte bilingüe nos ayudó a migrar rápido. Lo recomiendo para cualquier taller en Chile.”</p>
+          <div class="mt-2 text-blue-400 font-bold">AutoPro — Viña del Mar, CL</div>
+        </div>
+        <div class="bg-white/5 rounded-3xl p-8 flex flex-col items-center" data-aos="fade-up" data-aos-delay="300">
+          <img src="/static/img/testimonio3.jpg" alt="Speed Garage Concepción" class="w-20 h-20 rounded-full mb-4 border-4 border-lime-400 object-cover shadow-lg" />
+          <p class="text-3xl text-white leading-snug mb-4">“La prueba gratis nos convenció. Ahora todo es digital y nuestros clientes lo notan.”</p>
+          <div class="mt-2 text-lime-400 font-bold">Speed Garage — Concepción, CL</div>
+        </div>
+      </div>
+    </section>
+    <div class="svg-blob">
+      <svg viewBox="0 0 1440 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0,80 Q720,0 1440,80 L1440,100 L0,100 Z" fill="#0d0d0d"/><path d="M0,80 Q720,0 1440,80" stroke="#00eaff" stroke-width="4" fill="none"/></svg>
+    </div>
+    <section id="cta" class="w-full min-h-[60vh] flex flex-col items-center justify-center py-32 relative" style="background:#0d0d0d;" data-aos="zoom-in">
+      <div class="flex flex-col items-center justify-center mb-6">
+        <lord-icon
+          src="https://cdn.lordicon.com/wxhtpnnk.json"
+          trigger="loop"
+          colors="primary:#00ffff,secondary:#00bfff"
+          style="width:80px;height:80px;filter:drop-shadow(0 0 24px #00eaffcc);"
+        ></lord-icon>
+      </div>
+      <h2 class="text-5xl text-cyan-300 font-bold futuristic-glow text-center mb-8">
+        ¿Listo para llevar tu taller al siguiente nivel?
+      </h2>
+      <a href="/registro/" class="mt-8 px-10 py-4 bg-gradient-to-r from-cyan-400 to-blue-500 text-black text-xl font-bold rounded-2xl hover:scale-105 transition shadow-2xl">Comienza gratis hoy</a>
+    </section>
+    <footer class="mt-20 text-center text-gray-400 text-sm pb-10">
+      <p>&copy; 2025 eGarage Chile. Desarrollado con IA para técnicos</p>
+    </footer>
+  </main>
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script>
+    VANTA.NET({
+      el: "#vanta-matrix",
+      mouseControls: true,
+      touchControls: true,
+      minHeight: 420.00,
+      minWidth: 200.00,
+      scale: 1.0,
+      scaleMobile: 1.0,
+      color: 0x00ffff,
+      backgroundColor: 0x0d0d0d,
+      points: 12.0,
+      maxDistance: 22.0,
+      spacing: 18.0
+    });
+    VANTA.WAVES({
+      el: "#vanta-bg",
+      color: 0x00ffff,
+      shininess: 50,
+      waveHeight: 20,
+      waveSpeed: 0.7,
+      zoom: 0.85,
+      backgroundColor: 0x0d0d0d
+    });
+    AOS.init({
+      duration: 900,
+      once: true,
+      offset: 80,
+      delay: 100,
+      easing: 'ease-in-out-cubic'
+    });
+    document.addEventListener('DOMContentLoaded', function() {
+      const toggle = document.createElement('div');
+      toggle.className = 'toggle-switch';
+      toggle.innerHTML = '<span>🌙</span><span id="toggle-label">Oscuro</span>';
+      document.body.appendChild(toggle);
+      let isLight = false;
+      toggle.onclick = function() {
+        isLight = !isLight;
+        document.body.classList.toggle('light-mode', isLight);
+        document.getElementById('toggle-label').textContent = isLight ? 'Claro' : 'Oscuro';
+        toggle.firstChild.textContent = isLight ? '☀️' : '🌙';
+      };
+    });
+  </script>
+</body>
+</html>
+                    <div class="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-cyan-400/20 p-6 hover-lift cyber-border">
+                        <i class="fas fa-map-marker-alt feature-icon text-4xl mb-4 block text-center"></i>
+                        <h5 class="text-xl font-semibold text-center mb-3 text-cyan-300">{% trans "Regions of Chile" %}</h5>
+                        <p class="text-gray-400 text-center">{% trans "Complete database with all cities and communes" %}</p>
+                    </div>
+                    <div class="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-cyan-400/20 p-6 hover-lift cyber-border">
+                        <i class="fas fa-receipt feature-icon text-4xl mb-4 block text-center"></i>
+                        <h5 class="text-xl font-semibold text-center mb-3 text-cyan-300">{% trans "Legal Documents" %}</h5>
+                        <p class="text-gray-400 text-center">{% trans "Billing according to Chilean regulations" %}</p>
+                    </div>
+                </div>
+
+                <!-- Beneficios -->
+                <div class="mb-12">
+                    <h3 class="text-3xl font-bold text-center mb-8 text-transparent bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text">
+                        🚀 Lo que obtienes con eGarage Chile:
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-4">
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-check-circle check-icon text-xl"></i>
+                                <span class="text-gray-300">{% trans "Customer and vehicle management" %}</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-check-circle check-icon text-xl"></i>
+                                <span class="text-gray-300">{% trans "Automatic quotes in CLP" %}</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-check-circle check-icon text-xl"></i>
+                                <span class="text-gray-300">{% trans "Spare parts inventory control" %}</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-check-circle check-icon text-xl"></i>
+                                <span class="text-gray-300">{% trans "Appointments and services schedule" %}</span>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-check-circle check-icon text-xl"></i>
+                                <span class="text-gray-300">{% trans "Advanced reports with AI" %}</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-check-circle check-icon text-xl"></i>
+                                <span class="text-gray-300">{% trans "WhatsApp Business integration" %}</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-check-circle check-icon text-xl"></i>
+                                <span class="text-gray-300">{% trans "Automatic cloud backup" %}</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-check-circle check-icon text-xl"></i>
+                                <span class="text-gray-300">{% trans "Technical support in Spanish" %}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+                    <a href="/dashboard/" class="btn-chile text-white px-8 py-3 rounded-lg font-semibold text-lg hover:shadow-lg flex items-center space-x-2 min-w-[200px] justify-center">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>{% trans "Go to Dashboard" %}</span>
+                    </a>
+                    <a href="/registro/" class="border border-cyan-400 text-cyan-400 px-8 py-3 rounded-lg font-semibold text-lg hover:bg-cyan-400 hover:text-gray-900 transition-all duration-300 flex items-center space-x-2 min-w-[200px] justify-center">
+                        <i class="fas fa-user-plus"></i>
+                        <span>{% trans "Create Account" %}</span>
+                    </a>
+                </div>
+
+                <!-- Información adicional -->
+                <div class="text-center pt-8 border-t border-cyan-400/20">
+                    <div class="space-y-2 text-gray-400">
+                        <p class="flex items-center justify-center space-x-2">
+                            <i class="fas fa-phone text-cyan-400"></i>
+                            <span>{% trans "Support: +56 9 1234 5678" %}</span>
+                        </p>
+                        <p class="flex items-center justify-center space-x-2">
+                            <i class="fas fa-envelope text-cyan-400"></i>
+                            <span>{% trans "Email: soporte@egarage.cl" %}</span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Créditos -->
+                <div class="text-center mt-8 pt-6 border-t border-cyan-400/10">
+                    <p class="text-sm text-gray-500">
+                        {% trans "Developed with ❤️ by" %} <span class="text-cyan-400 font-semibold">Atlanta Reciclajes</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 📱 JavaScript para Menú Móvil -->
     <script>
-        // Create starfield
-        function createStarfield() {
-            const starfield = document.getElementById('starfield');
-            const numberOfStars = 100;
-            
-            for (let i = 0; i < numberOfStars; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                star.style.left = Math.random() * 100 + '%';
-                star.style.top = Math.random() * 100 + '%';
-                star.style.width = Math.random() * 2 + 1 + 'px';
-                star.style.height = star.style.width;
-                star.style.animationDelay = Math.random() * 3 + 's';
-                starfield.appendChild(star);
-            }
-        }
-        
-        // Initialize starfield
         document.addEventListener('DOMContentLoaded', function() {
-            createStarfield();
+            const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            if (mobileMenuToggle && mobileMenu) {
+                mobileMenuToggle.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('hidden');
+                    
+                    // Cambiar icono del botón
+                    const icon = mobileMenuToggle.querySelector('i');
+                    if (mobileMenu.classList.contains('hidden')) {
+                        icon.className = 'fas fa-bars text-xl';
+                    } else {
+                        icon.className = 'fas fa-times text-xl';
+                    }
+                });
+            }
+            
+            // Cerrar menú al hacer clic en enlaces
+            const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+            mobileMenuLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    mobileMenu.classList.add('hidden');
+                    const icon = mobileMenuToggle.querySelector('i');
+                    icon.className = 'fas fa-bars text-xl';
+                });
+            });
         });
     </script>
 </body>

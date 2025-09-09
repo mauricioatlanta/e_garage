@@ -33,6 +33,8 @@ import mimetypes
 mimetypes.add_type("text/css", ".css", True)
 mimetypes.add_type("application/javascript", ".js", True)
 
-# Logging más detallado para desarrollo
-LOGGING["loggers"]["django"]["level"] = "DEBUG"
-LOGGING["loggers"]["taller"]["level"] = "DEBUG"
+# Logging más detallado para desarrollo (solo si no está en modo seguro)
+if not SAFE_MODE:
+    # La configuración de logging ya está optimizada en base.py
+    # No necesitamos modificar nada aquí
+    pass

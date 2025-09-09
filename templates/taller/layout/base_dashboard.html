@@ -12,6 +12,13 @@
   {% block header %}
   <header class="bg-gray-900 shadow p-4 flex justify-between items-center">
     <div class="flex items-center gap-4">
+      <!-- GREEN CROSSES - TALLER DASHBOARD -->
+      <div class="flex items-center gap-2 text-green-500 text-2xl">
+        <span>❌</span>
+        <span>❌</span>
+        <span>❌</span>
+      </div>
+      
       {% if company_logo_url %}
         <img src="{{ company_logo_url }}" class="h-8 w-auto" alt="Logo {{ company_name }}">
       {% else %}

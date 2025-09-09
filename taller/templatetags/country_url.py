@@ -41,6 +41,13 @@ def country_url(context, url_name, *args, **kwargs):
             elif country_ns == "usa":
                 app_namespace = "reportes_us"
 
+        # Mapeo especial para documentos
+        if app_namespace == "documentos":
+            if country_ns == "chile":
+                app_namespace = "documentos_cl_es"
+            elif country_ns == "usa":
+                app_namespace = "documentos_us_en"
+
         # Mapeo especial para taller - en USA las URLs de taller están directamente bajo el namespace usa
         if app_namespace == "taller" and country_ns == "usa":
             full_url_name = f"{country_ns}:{url_name}"

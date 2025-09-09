@@ -16,6 +16,9 @@ load_dotenv()
 # Directorio base del proyecto
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
+# Modo seguro para diagnóstico
+SAFE_MODE = os.environ.get("EGARAGE_SAFE_MODE") == "1"
+
 # Seguridad básica
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", get_random_secret_key())
 
@@ -43,24 +46,32 @@ INSTALLED_APPS = [
     "ubicacion.apps.UbicacionConfig",
 ]
 
-# Middleware común
+# Middleware común - ORDEN RECOMENDADO POR DJANGO
 MIDDLEWARE = [
+    # 1. Seguridad (primero)
     "django.middleware.security.SecurityMiddleware",
+    # 2. Sesiones (antes de autenticación)
     "django.contrib.sessions.middleware.SessionMiddleware",
-    "taller.middleware.country_url_migration.CountryURLRedirectMiddleware",
+    # 3. Localización (antes de CommonMiddleware)
+    "django.middleware.locale.LocaleMiddleware",
+    # 4. Common (después de sesiones y locale)
     "django.middleware.common.CommonMiddleware",
+    # 5. CSRF (antes de autenticación)
     "django.middleware.csrf.CsrfViewMiddleware",
+    # 6. Autenticación
     "django.contrib.auth.middleware.AuthenticationMiddleware",
-    # Empresa + País
+    # 7. Mensajes (después de autenticación)
+    "django.contrib.messages.middleware.MessageMiddleware",
+    # 8. Clickjacking (después de mensajes)
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    # 9. Allauth (después de autenticación)
+    "allauth.account.middleware.AccountMiddleware",
+    # 10. Middlewares personalizados (orden específico)
+    "taller.middleware.country_url_migration.CountryURLRedirectMiddleware",
     "taller.middleware.empresa_middleware.EmpresaMiddleware",
     "gestion_taller.middleware.country_prefix.EnforceCountryPrefixMiddleware",
     "taller.middleware.country_context.CountryContextMiddleware",
-    # Idioma (elige SOLO una)
     "taller.middleware.fix_language_middleware.FixLanguageMiddleware",
-    "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "allauth.account.middleware.AccountMiddleware",
-    # Suscripción / trial
     "taller.middleware.verificar_suscripcion.VerificarSuscripcionMiddleware",
 ]
 
@@ -98,7 +109,6 @@ WSGI_APPLICATION = "gestion_taller.wsgi.application"
 LANGUAGE_CODE = os.getenv("LANGUAGE_CODE", "es")  # Español por defecto (Chile)
 TIME_ZONE = os.getenv("TIME_ZONE", "America/Santiago")
 USE_I18N = True
-USE_L10N = True
 USE_TZ = True
 
 # Idiomas soportados
@@ -172,55 +182,31 @@ EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_PASSWORD", ",*naHZ0xIFO")
 DEFAULT_FROM_EMAIL = "eGarage <suscripcion@atlantareciclajes.cl>"
 
 # Logging útil (errores reales)
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "verbose": {
-            "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
-            "style": "{",
+if SAFE_MODE:
+    LOGGING = {
+        "version": 1,
+        "disable_existing_loggers": True,
+        "handlers": {
+            "null": {"class": "logging.NullHandler"},
+            "console": {"class": "logging.StreamHandler", "level": "WARNING"},
         },
-        "simple": {
-            "format": "{levelname} {message}",
-            "style": "{",
+        "root": {"handlers": ["null"], "level": "WARNING"},
+        "loggers": {
+            "django": {"handlers": ["null"], "level": "WARNING", "propagate": False},
+            "taller": {"handlers": ["null"], "level": "WARNING", "propagate": False},
+            "django.request": {"handlers": ["console"], "level": "ERROR", "propagate": False},
         },
-    },
-    "handlers": {
-        "console": {
-            "class": "logging.StreamHandler",
-            "formatter": "simple",
+    }
+else:
+    LOGGING = {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "handlers": {"console": {"class": "logging.StreamHandler"}},
+        "root": {"handlers": ["console"], "level": "INFO"},
+        "loggers": {
+            "django.utils.autoreload": {"handlers": ["console"], "level": "WARNING", "propagate": False},
+            "watchdog.observers":     {"handlers": ["console"], "level": "WARNING", "propagate": False},
+            "django.db.backends":     {"handlers": ["console"], "level": "WARNING", "propagate": False},
+            "taller":                 {"handlers": ["console"], "level": "INFO"},
         },
-        "file": {
-            "class": "logging.FileHandler",
-            "filename": BASE_DIR / "logs" / "django.log",
-            "formatter": "verbose",
-        },
-    },
-    "root": {
-        "handlers": ["console"],
-        "level": "INFO",
-    },
-    "loggers": {
-        "django": {
-            "handlers": ["console", "file"],
-            "level": "INFO",
-            "propagate": False,
-        },
-        "taller": {
-            "handlers": ["console", "file"],
-            "level": "DEBUG",
-            "propagate": False,
-        },
-        # Logging específico para errores críticos
-        "django.request": {
-            "handlers": ["console", "file"],
-            "level": "ERROR",
-            "propagate": False,
-        },
-        "django.security": {
-            "handlers": ["console", "file"],
-            "level": "WARNING",
-            "propagate": False,
-        },
-    },
-}
+    }

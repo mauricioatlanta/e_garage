@@ -8,6 +8,7 @@ from taller.autocomplete.views_autocomplete import (
 from taller.vehiculos import views
 from taller.vehiculos.api import (
     api_cajas_por_modelo,
+    api_create,
     api_modelos_usa,
     api_motores_por_modelo,
     crear_modelo,
@@ -37,6 +38,7 @@ urlpatterns = [
     path("api/modelos-usa/", api_modelos_usa, name="api_modelos_usa"),
     path("api/motores/", api_motores_por_modelo, name="api_motores_por_modelo"),
     path("api/cajas/", api_cajas_por_modelo, name="api_cajas_por_modelo"),
+    path("api/create/", api_create, name="api_create"),
     path("api/colores/", views.api_colores, name="api_colores"),
     path("api/clientes/", views.api_busqueda_clientes, name="api_busqueda_clientes"),
     path("api/marcas/", views.api_marcas, name="api_marcas"),

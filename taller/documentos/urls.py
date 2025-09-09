@@ -4,7 +4,7 @@ import sys
 from django.urls import path
 
 # from .api import lista_debug  # Función no existe
-from . import api_servicios, views
+from . import api, api_servicios, views
 from . import views_moderno as views_moderno
 from .redirect_views import redirect_documento_crear, redirect_documento_editar
 from .views_cbv import DocumentoDetailView
@@ -13,10 +13,11 @@ from .views_migrated import DocumentoDetailView as MigratedDetailView
 from .views_migrated import DocumentoListView
 from .views_migrated import DocumentoUpdateView as MigratedUpdateView
 
-sys.path.append(
-    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-)
-from test_editar import fix_documento_data, test_editar_simple
+# Comentado temporalmente - módulo no existe
+# sys.path.append(
+#     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# )
+# from test_editar import fix_documento_data, test_editar_simple
 
 app_name = "documentos"
 
@@ -38,8 +39,9 @@ urlpatterns = [
     # Compatibilidad con rutas antiguas - CON PRESERVACIÓN DE PAÍS
     path("nuevo/", redirect_documento_crear, name="crear_documento"),
     path("nuevo-editar/<int:pk>/", redirect_documento_editar, name="editar_documento"),
-    path("test-editar/<int:documento_id>/", test_editar_simple, name="test_editar"),
-    path("fix-data/<int:documento_id>/", fix_documento_data, name="fix_data"),
+    # Comentado temporalmente - funciones no existen
+    # path("test-editar/<int:documento_id>/", test_editar_simple, name="test_editar"),
+    # path("fix-data/<int:documento_id>/", fix_documento_data, name="fix_data"),
     path(
         "procesar/",
         views_moderno.procesar_documento_moderno_wrapper,
@@ -96,6 +98,7 @@ urlpatterns = [
         name="autocomplete_repuesto",
     ),
     path("api/crear-servicio/", views.api_crear_servicio, name="api_crear_servicio"),
+    path("api/create/", api.api_create, name="api_create"),
     # Endpoint de diagnóstico
     # path("lista-debug/", lista_debug, name="lista_debug"),  # Función no existe
 ]

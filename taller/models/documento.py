@@ -179,9 +179,15 @@ class Documento(AuditMixin, models.Model):
         )
 
         if ultimo_doc and ultimo_doc.numero:
-            self.numero = ultimo_doc.numero + 1
+            # Convertir el número a entero, sumar 1, y volver a string
+            try:
+                numero_anterior = int(ultimo_doc.numero)
+                self.numero = str(numero_anterior + 1)
+            except (ValueError, TypeError):
+                # Si no se puede convertir a entero, empezar desde 1
+                self.numero = "1"
         else:
-            self.numero = 1
+            self.numero = "1"
 
         return self.numero
 
@@ -343,6 +349,13 @@ class Documento(AuditMixin, models.Model):
         verbose_name = _("Documento")
         verbose_name_plural = _("Documentos")
         indexes = [
-            models.Index(fields=["empresa", "fecha_emision"]),
+            # Índices optimizados para KPIs
+            models.Index(fields=["empresa", "fecha_emision"]),  # KPI por empresa y fecha
+            models.Index(fields=["fecha_emision"]),  # KPI global por fecha
+            models.Index(fields=["tecnico_responsable", "fecha_emision"]),  # KPI por técnico y fecha
+            models.Index(fields=["estado", "fecha_emision"]),  # KPI por estado y fecha
+            models.Index(fields=["tipo", "fecha_emision"]),  # KPI por tipo y fecha
+            # Índices de rendimiento general
             models.Index(fields=["tecnico_responsable"]),
+            models.Index(fields=["cliente", "fecha_emision"]),  # Búsquedas por cliente
         ]

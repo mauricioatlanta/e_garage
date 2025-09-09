@@ -80,6 +80,13 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: var(--primary-color);">
         <div class="container-fluid">
+            <!-- PINK CROSSES - PORTAL BASE -->
+            <div class="flex items-center gap-2 text-pink-500 text-2xl me-3">
+                <span>❌</span>
+                <span>❌</span>
+                <span>❌</span>
+            </div>
+            
             <a class="navbar-brand" href="{% url 'portal_dashboard' %}">
                 <i class="fas fa-car"></i>
                 {% if portal_config.titulo_portal %}

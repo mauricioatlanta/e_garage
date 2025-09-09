@@ -165,9 +165,8 @@ AUTHENTICATION_BACKENDS = (
     "allauth.account.auth_backends.AuthenticationBackend",
 )
 LOGIN_REDIRECT_URL = "/login/"  # Redirige a la vista country-aware después del login
-ACCOUNT_LOGOUT_REDIRECT_URL = (
-    "/login/"  # Redirige a la vista country-aware después del logout
-)
+# Usar vista personalizada de logout que detecta el país correcto
+ACCOUNT_LOGOUT_REDIRECT_URL = "/logout-redirect/"  # Redirigir a nuestra vista personalizada
 ACCOUNT_LOGIN_METHODS = {"username", "email"}
 ACCOUNT_EMAIL_VERIFICATION = "none"  # Sin verificación de email para desarrollo
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True

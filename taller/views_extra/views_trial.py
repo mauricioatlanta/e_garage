@@ -6,17 +6,18 @@ from django.shortcuts import render
 from django.utils.crypto import get_random_string
 from django.views.decorators.csrf import csrf_protect
 
-from taller.models.trial import TrialRegistro
-
 
 @csrf_protect
 def registro_trial(request):
+    # Import movido aquí para evitar AppRegistryNotReady
+    from taller.models.trial import TrialRegistro
+
     mensaje = error = None
     if request.method == "POST":
         nombre = request.POST.get("nombre", "").strip()
         email = request.POST.get("email", "").strip().lower()
         ip = request.META.get("REMOTE_ADDR")
-        user_agent = request.META.get("HTTP_USER_AGENT", "")
+        user_agent = request.headers.get("user-agent", "")
         # Validación básica
         if not nombre or not email:
             error = "Todos los campos son obligatorios."
