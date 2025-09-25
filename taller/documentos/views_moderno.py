@@ -770,7 +770,17 @@ def api_obtener_numero_documento(request):
     if request.method != "GET":
         return JsonResponse({"error": "Método no permitido"}, status=405)
 
-    tipo_documento = request.GET.get("tipo", "")
+    raw_tipo = (request.GET.get("tipo") or "").upper()
+
+    # Mapear tipos legacy y nuevos
+    tipo_map = {
+        "FAC": "REC",  # Factura → Recibo
+        "BOL": "REC",  # Boleta → Recibo
+        "REC": "REC",  # Recibo (nuevo)
+        "OT": "OT",  # Orden de Trabajo
+        "PRES": "PRES",  # Presupuesto
+    }
+    tipo_documento = tipo_map.get(raw_tipo, "OT")  # por defecto OT
 
     if not tipo_documento:
         return JsonResponse({"error": "Tipo de documento requerido"}, status=400)
@@ -790,15 +800,17 @@ def api_obtener_numero_documento(request):
                         {"error": "No hay empresa configurada"}, status=400
                     )
 
-        # Mapear códigos de tipo a nombres completos si es necesario
+        # Mapear códigos de tipo a nombres completos para prefijos
         tipo_mapping = {
             "FAC": "FACTURA",
             "PRES": "PRESUPUESTO",
             "OT": "ORDEN_TRABAJO",
+            "REC": "RECIBO",  # Nuevo tipo
             "BOL": "BOLETA",
             "FACTURA": "FACTURA",
             "PRESUPUESTO": "PRESUPUESTO",
             "ORDEN_TRABAJO": "ORDEN_TRABAJO",
+            "RECIBO": "RECIBO",
             "BOLETA": "BOLETA",
         }
 
@@ -826,15 +838,17 @@ def api_obtener_numero_documento(request):
             prefijos = {
                 "PRESUPUESTO": "E",  # Estimate
                 "ORDEN_TRABAJO": "WO",  # Work Order
-                "FACTURA": "I",  # Invoice
-                "BOLETA": "R",  # Receipt
+                "RECIBO": "R",  # Receipt
+                "FACTURA": "I",  # Invoice (legacy)
+                "BOLETA": "B",  # Boleta (legacy)
             }
         else:  # Chile
             prefijos = {
                 "PRESUPUESTO": "E",  # Estimado
                 "ORDEN_TRABAJO": "OT",  # Orden de Trabajo
-                "FACTURA": "F",  # Factura
-                "BOLETA": "B",  # Boleta
+                "RECIBO": "R",  # Recibo/Boleta
+                "FACTURA": "F",  # Factura (legacy)
+                "BOLETA": "B",  # Boleta (legacy)
             }
 
         prefijo = prefijos.get(tipo_documento_normalizado, "DOC")

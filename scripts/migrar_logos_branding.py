@@ -3,6 +3,7 @@
 Script para migrar logos de Empresa a ConfiguracionEmpresa
 y sincronizar los dos sistemas de branding
 """
+
 import os
 
 import django

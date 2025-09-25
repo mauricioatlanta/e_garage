@@ -1,16 +1,17 @@
 {% extends "base.html" %}
+{% load country_url %}
 {% load i18n static %}
 
 {% block extra_head %}
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-  
+
   body {
     font-family: 'Inter', sans-serif;
   }
-  
+
   .tech-grid {
-    background-image: 
+    background-image:
       linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
       linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px);
     background-size: 20px 20px;
@@ -22,37 +23,37 @@
     z-index: -1;
     opacity: 0.3;
   }
-  
+
   .glass-card {
     background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
   }
-  
+
   .tech-glow {
     box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
   }
-  
+
   .professional-gradient {
     background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%);
   }
-  
+
   .accent-blue {
     color: #3b82f6;
   }
-  
+
   .accent-blue-bg {
     background: linear-gradient(135deg, #3b82f6, #1d4ed8);
   }
-  
+
   .accent-slate {
     color: #64748b;
   }
-  
+
   .hover-lift {
     transition: all 0.3s ease;
   }
-  
+
   .hover-lift:hover {
     transform: translateY(-2px);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
@@ -98,8 +99,8 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
             </svg>
           </div>
-          <input type="search" name="q" value="{{ request.GET.q }}" 
-                 placeholder="{% trans 'Search by license plate, customer, brand or model...' %}" 
+          <input type="search" name="q" value="{{ request.GET.q }}"
+                 placeholder="{% trans 'Search by license plate, customer, brand or model...' %}"
                  class="w-full pl-12 pr-4 py-4 bg-slate-800/50 border border-slate-600/30 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/70 text-lg transition-all">
         </div>
         <button type="submit" class="px-8 py-4 accent-blue-bg text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-blue-500/25 transition-all flex items-center space-x-2">
@@ -131,7 +132,7 @@
             </div>
           </div>
         </div>
-        
+
         <!-- Customer -->
         <div class="lg:col-span-1">
           <div class="space-y-1">
@@ -140,7 +141,7 @@
             <p class="text-slate-400 text-sm">{{ vehiculo.cliente.apellido|default:"" }}</p>
           </div>
         </div>
-        
+
         <!-- Brand -->
         <div class="lg:col-span-1">
           <div class="space-y-1">
@@ -148,7 +149,7 @@
             <p class="text-white font-bold text-lg">{{ vehiculo.marca.nombre|default:"-" }}</p>
           </div>
         </div>
-        
+
         <!-- Model -->
         <div class="lg:col-span-1">
           <div class="space-y-1">
@@ -156,7 +157,7 @@
             <p class="text-white font-semibold">{{ vehiculo.modelo.nombre|default:"-" }}</p>
           </div>
         </div>
-        
+
         <!-- Year -->
         <div class="lg:col-span-1">
           <div class="flex items-center space-x-3">
@@ -171,10 +172,10 @@
             </div>
           </div>
         </div>
-        
+
         <!-- Actions -->
         <div class="lg:col-span-1 flex justify-end space-x-3">
-          <a href="{% url 'taller:vehiculos:ver_vehiculo' vehiculo.pk %}" 
+          <a href="{% url 'taller:vehiculos:ver_vehiculo' vehiculo.pk %}"
              class="px-4 py-2 rounded-lg bg-blue-600/20 border border-blue-500/30 text-blue-300 hover:bg-blue-500/30 hover:border-blue-400/50 hover:text-blue-200 transition-all duration-200 text-sm font-medium flex items-center space-x-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -182,7 +183,7 @@
             </svg>
             <span>{% trans "View" %}</span>
           </a>
-          <a href="{% url 'taller:vehiculos:editar_vehiculo' vehiculo.pk %}" 
+          <a href="{% url 'taller:vehiculos:editar_vehiculo' vehiculo.pk %}"
              class="px-4 py-2 rounded-lg bg-blue-600/20 border border-blue-500/30 text-blue-300 hover:bg-blue-500/30 hover:border-blue-400/50 hover:text-blue-200 transition-all duration-200 text-sm font-medium flex items-center space-x-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
@@ -191,7 +192,7 @@
           </a>
         </div>
       </div>
-      
+
       <!-- Professional Status Bar -->
       <div class="border-t border-slate-600/20 mt-4 pt-4">
         <div class="flex items-center justify-between text-sm">
@@ -233,17 +234,17 @@
           <span class="text-blue-500/50">•</span>
           <span>{{ paginator.count }} {% trans "records" %}</span>
         </div>
-        
+
         <nav class="flex items-center space-x-2">
           {% if page_obj.has_previous %}
-            <a href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" 
+            <a href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
                class="px-4 py-2 rounded-lg bg-blue-600/20 border border-blue-500/30 text-blue-300 hover:bg-blue-500/30 hover:border-blue-400/50 hover:text-blue-200 transition-all duration-200 text-sm font-medium flex items-center space-x-2">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>
               </svg>
               <span class="hidden sm:inline">{% trans "First" %}</span>
             </a>
-            <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" 
+            <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
                class="px-4 py-2 rounded-lg bg-blue-600/20 border border-blue-500/30 text-blue-300 hover:bg-blue-500/30 hover:border-blue-400/50 hover:text-blue-200 transition-all duration-200 text-sm font-medium flex items-center space-x-2">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
@@ -251,20 +252,20 @@
               <span class="hidden sm:inline">{% trans "Previous" %}</span>
             </a>
           {% endif %}
-          
+
           <div class="px-4 py-2 rounded-lg accent-blue-bg text-white font-bold text-sm">
             {{ page_obj.number }}
           </div>
-          
+
           {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" 
+            <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
                class="px-4 py-2 rounded-lg bg-blue-600/20 border border-blue-500/30 text-blue-300 hover:bg-blue-500/30 hover:border-blue-400/50 hover:text-blue-200 transition-all duration-200 text-sm font-medium flex items-center space-x-2">
               <span class="hidden sm:inline">{% trans "Next" %}</span>
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
               </svg>
             </a>
-            <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" 
+            <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
                class="px-4 py-2 rounded-lg bg-blue-600/20 border border-blue-500/30 text-blue-300 hover:bg-blue-500/30 hover:border-blue-400/50 hover:text-blue-200 transition-all duration-200 text-sm font-medium flex items-center space-x-2">
               <span class="hidden sm:inline">{% trans "Last" %}</span>
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -280,7 +281,7 @@
 
   <!-- Professional Add Vehicle Button -->
   <div class="mt-8 flex justify-center">
-    <a href="{% url 'taller:vehiculos:crear_vehiculo' %}" 
+    <a href="{% country_url 'vehiculos:crear_vehiculo' %}"
        class="inline-flex items-center space-x-3 px-8 py-4 rounded-2xl accent-blue-bg text-white font-semibold text-lg shadow-lg hover:shadow-blue-500/25 transition-all duration-300 hover-lift">
       <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

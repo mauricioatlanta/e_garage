@@ -3,6 +3,7 @@
 🔥 PASO 2 EXTENDIDO - VALIDACIONES DE CONSISTENCIA ROBUSTAS
 Implementación completa de reglas de negocio country & tipo
 """
+
 import os
 
 import django
@@ -62,27 +63,27 @@ def implementar_validaciones_documento():
     def clean(self):
         """Validaciones de consistencia para Documento"""
         from django.core.exceptions import ValidationError
-        
+
         # Validar que cliente pertenezca a la misma empresa
         if self.cliente and self.empresa:
             if self.cliente.empresa != self.empresa:
                 raise ValidationError("Cliente pertenece a una empresa diferente")
-        
+
         # Validar que vehículo pertenezca al cliente correcto
         if self.vehiculo and self.cliente:
             if self.vehiculo.cliente != self.cliente:
                 raise ValidationError("Vehículo no pertenece al cliente seleccionado")
-        
+
         # Validar consistencia de país
         if self.cliente and self.empresa:
             try:
                 ValidacionConsistencia.assert_same_country(
-                    self.cliente, self.empresa, 
+                    self.cliente, self.empresa,
                     "Cliente y empresa deben estar en el mismo país"
                 )
             except ValidationError as e:
                 raise ValidationError(str(e))
-    
+
     def save(self, *args, **kwargs):
         """Llamar validaciones antes de guardar"""
         self.full_clean()
@@ -123,16 +124,16 @@ from taller.servicios.models import Servicio
 
 class ValidacionConsistencia:
     """Clase helper para validaciones de consistencia cross-country"""
-    
+
     @staticmethod
     def assert_same_country(a, b, mensaje="Objetos pertenecen a países diferentes"):
         """Validar que dos objetos tengan el mismo country"""
         country_a = getattr(a, 'country', getattr(getattr(a, 'empresa', None), 'pais', None))
         country_b = getattr(b, 'country', getattr(getattr(b, 'empresa', None), 'pais', None))
-        
+
         if country_a != country_b:
             raise ValidationError(f"{mensaje} ({country_a} != {country_b})")
-    
+
     @staticmethod
     def assert_correct_tipo(servicio, tipo_esperado, mensaje="Tipo de servicio incorrecto"):
         """Validar que un servicio tenga el tipo correcto"""
@@ -143,12 +144,12 @@ class ValidacionConsistencia:
 class LineaServicio(models.Model):
     """Línea de servicio interno del taller"""
     documento = models.ForeignKey(
-        Documento, 
-        on_delete=models.CASCADE, 
+        Documento,
+        on_delete=models.CASCADE,
         related_name='lineas_servicio'
     )
     servicio = models.ForeignKey(
-        Servicio, 
+        Servicio,
         on_delete=models.PROTECT,
         help_text="Servicio interno del taller"
     )
@@ -156,12 +157,12 @@ class LineaServicio(models.Model):
     cantidad = models.PositiveIntegerField(default=1)
     precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
     descuento = models.DecimalField(
-        max_digits=5, decimal_places=2, 
-        default=0, 
+        max_digits=5, decimal_places=2,
+        default=0,
         help_text="Descuento en porcentaje"
     )
     observaciones = models.TextField(blank=True, null=True)
-    
+
     def clean(self):
         """Validaciones de consistencia para LineaServicio"""
         # Validar country consistency
@@ -170,33 +171,33 @@ class LineaServicio(models.Model):
                 self.documento, self.servicio,
                 "Servicio de otro país no puede usarse en este documento"
             )
-        
+
         # Validar que sea servicio interno
         if self.servicio:
             ValidacionConsistencia.assert_correct_tipo(
                 self.servicio, 'interno',
                 "Esta línea requiere un servicio de tipo 'interno' (del taller)"
             )
-    
+
     def save(self, *args, **kwargs):
         """Llamar validaciones antes de guardar"""
         self.full_clean()
         return super().save(*args, **kwargs)
-    
+
     @property
     def subtotal(self):
         """Calcular subtotal con descuento"""
         subtotal_bruto = self.cantidad * self.precio_unitario
         descuento_valor = subtotal_bruto * (self.descuento / 100)
         return subtotal_bruto - descuento_valor
-    
+
     class Meta:
         verbose_name = "Línea de Servicio"
         verbose_name_plural = "Líneas de Servicios"
         indexes = [
             models.Index(fields=['documento', 'servicio']),
         ]
-    
+
     def __str__(self):
         return f"{self.nombre} (x{self.cantidad})"
 
@@ -204,18 +205,18 @@ class LineaServicio(models.Model):
 class LineaOtroServicio(models.Model):
     """Línea de servicio externo subcontratado"""
     documento = models.ForeignKey(
-        Documento, 
-        on_delete=models.CASCADE, 
+        Documento,
+        on_delete=models.CASCADE,
         related_name='lineas_otro_servicio'
     )
     servicio = models.ForeignKey(
-        Servicio, 
+        Servicio,
         on_delete=models.PROTECT,
         help_text="Servicio externo subcontratado"
     )
     nombre = models.CharField(max_length=255, help_text="Nombre del servicio externo")
     empresa_externa = models.CharField(
-        max_length=255, 
+        max_length=255,
         help_text="Empresa que realiza el servicio"
     )
     cantidad = models.PositiveIntegerField(default=1)
@@ -228,7 +229,7 @@ class LineaOtroServicio(models.Model):
         help_text="Precio cobrado al cliente"
     )
     observaciones = models.TextField(blank=True, null=True)
-    
+
     def clean(self):
         """Validaciones de consistencia para LineaOtroServicio"""
         # Validar country consistency
@@ -237,38 +238,38 @@ class LineaOtroServicio(models.Model):
                 self.documento, self.servicio,
                 "Otro servicio de otro país no puede usarse en este documento"
             )
-        
+
         # Validar que sea servicio externo
         if self.servicio:
             ValidacionConsistencia.assert_correct_tipo(
                 self.servicio, 'externo',
                 "Esta línea requiere un servicio de tipo 'externo' (subcontratado)"
             )
-        
+
         # Validar precios lógicos
         if self.costo_interno and self.precio_cliente:
             if self.precio_cliente < self.costo_interno:
                 raise ValidationError(
                     "El precio al cliente no puede ser menor al costo interno"
                 )
-    
+
     def save(self, *args, **kwargs):
         """Llamar validaciones antes de guardar"""
         self.full_clean()
         return super().save(*args, **kwargs)
-    
+
     @property
     def ganancia(self):
         """Calcular ganancia por línea"""
         return (self.precio_cliente - self.costo_interno) * self.cantidad
-    
+
     @property
     def margen_porcentaje(self):
         """Calcular margen en porcentaje"""
         if self.precio_cliente > 0:
             return ((self.precio_cliente - self.costo_interno) / self.precio_cliente) * 100
         return 0
-    
+
     class Meta:
         verbose_name = "Línea de Otro Servicio"
         verbose_name_plural = "Líneas de Otros Servicios"
@@ -276,7 +277,7 @@ class LineaOtroServicio(models.Model):
             models.Index(fields=['documento', 'servicio']),
             models.Index(fields=['empresa_externa']),
         ]
-    
+
     def __str__(self):
         return f"{self.nombre} - {self.empresa_externa} (x{self.cantidad})"
 
@@ -284,12 +285,12 @@ class LineaOtroServicio(models.Model):
 class LineaRepuesto(models.Model):
     """Línea de repuesto con validaciones de país"""
     documento = models.ForeignKey(
-        Documento, 
-        on_delete=models.CASCADE, 
+        Documento,
+        on_delete=models.CASCADE,
         related_name='lineas_repuesto'
     )
     repuesto = models.ForeignKey(
-        'taller.Repuesto', 
+        'taller.Repuesto',
         on_delete=models.PROTECT,
         null=True, blank=True,
         help_text="Repuesto del catálogo"
@@ -299,12 +300,12 @@ class LineaRepuesto(models.Model):
     cantidad = models.PositiveIntegerField(default=1)
     precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
     descuento = models.DecimalField(
-        max_digits=5, decimal_places=2, 
-        default=0, 
+        max_digits=5, decimal_places=2,
+        default=0,
         help_text="Descuento en porcentaje"
     )
     observaciones = models.TextField(blank=True, null=True)
-    
+
     def clean(self):
         """Validaciones de consistencia para LineaRepuesto"""
         # Solo validar country si el repuesto tiene field country
@@ -313,19 +314,19 @@ class LineaRepuesto(models.Model):
                 self.documento, self.repuesto,
                 "Repuesto de otro país no puede usarse en este documento"
             )
-    
+
     def save(self, *args, **kwargs):
         """Llamar validaciones antes de guardar"""
         self.full_clean()
         return super().save(*args, **kwargs)
-    
+
     @property
     def subtotal(self):
         """Calcular subtotal con descuento"""
         subtotal_bruto = self.cantidad * self.precio_unitario
         descuento_valor = subtotal_bruto * (self.descuento / 100)
         return subtotal_bruto - descuento_valor
-    
+
     class Meta:
         verbose_name = "Línea de Repuesto"
         verbose_name_plural = "Líneas de Repuestos"
@@ -333,7 +334,7 @@ class LineaRepuesto(models.Model):
             models.Index(fields=['documento', 'repuesto']),
             models.Index(fields=['codigo']),
         ]
-    
+
     def __str__(self):
         return f"{self.nombre} ({self.codigo}) x{self.cantidad}"
 '''
@@ -368,7 +369,7 @@ class Migration(migrations.Migration):
                 name='servicio_tipo_valido'
             ),
         ),
-        
+
         # Índices compuestos para performance
         migrations.AddIndex(
             model_name='servicio',
@@ -377,7 +378,7 @@ class Migration(migrations.Migration):
                 name='servicio_country_tipo_code_idx'
             ),
         ),
-        
+
         migrations.AddIndex(
             model_name='servicioname',
             index=Index(
@@ -423,38 +424,38 @@ from decimal import Decimal
 
 class TestValidacionesConsistencia:
     """Tests de validaciones de consistencia"""
-    
+
     def setUp(self):
         """Configurar datos de prueba"""
         # Crear usuarios y empresas para CL y US
         self.user_cl = User.objects.create_user('test_cl', 'test@cl.com', 'pass123')
         self.user_us = User.objects.create_user('test_us', 'test@us.com', 'pass123')
-        
+
         self.empresa_cl = Empresa.objects.create(
             user=self.user_cl,
             nombre_taller='Taller Chile',
             pais='CL'
         )
-        
+
         self.empresa_us = Empresa.objects.create(
             user=self.user_us,
             nombre_taller='Auto Shop USA',
             pais='US'
         )
-        
+
         # Crear clientes
         self.cliente_cl = Cliente.objects.create(
             empresa=self.empresa_cl,
             nombre='Juan',
             apellido='Pérez'
         )
-        
+
         self.cliente_us = Cliente.objects.create(
             empresa=self.empresa_us,
             nombre='John',
             apellido='Smith'
         )
-        
+
         # Crear servicios CL
         cat_cl = CategoriaServicio.objects.create(country='CL', code='mantenimiento')
         subcat_cl = SubcategoriaServicio.objects.create(
@@ -462,21 +463,21 @@ class TestValidacionesConsistencia:
             country='CL',
             code='motor'
         )
-        
+
         self.servicio_interno_cl = Servicio.objects.create(
             subcategoria=subcat_cl,
             country='CL',
             tipo='interno',
             code='cambio_aceite_cl'
         )
-        
+
         self.servicio_externo_cl = Servicio.objects.create(
             subcategoria=subcat_cl,
             country='CL',
             tipo='externo',
             code='grua_cl'
         )
-        
+
         # Crear servicios US
         cat_us = CategoriaServicio.objects.create(country='US', code='maintenance')
         subcat_us = SubcategoriaServicio.objects.create(
@@ -484,21 +485,21 @@ class TestValidacionesConsistencia:
             country='US',
             code='engine'
         )
-        
+
         self.servicio_interno_us = Servicio.objects.create(
             subcategoria=subcat_us,
             country='US',
             tipo='interno',
             code='oil_change_us'
         )
-        
+
         self.servicio_externo_us = Servicio.objects.create(
             subcategoria=subcat_us,
             country='US',
             tipo='externo',
             code='towing_us'
         )
-        
+
         # Crear documentos
         self.doc_cl = Documento.objects.create(
             empresa=self.empresa_cl,
@@ -506,7 +507,7 @@ class TestValidacionesConsistencia:
             tipo_documento='Orden de trabajo',
             numero_documento='CL-001'
         )
-        
+
         self.doc_us = Documento.objects.create(
             empresa=self.empresa_us,
             cliente=self.cliente_us,
@@ -517,7 +518,7 @@ class TestValidacionesConsistencia:
     def test_1_linea_servicio_correcto_cl(self):
         """✅ Test: Línea servicio interno CL → documento CL"""
         print("\\n🧪 TEST 1: Línea servicio interno correcto (CL)")
-        
+
         try:
             linea = LineaServicio.objects.create(
                 documento=self.doc_cl,
@@ -534,7 +535,7 @@ class TestValidacionesConsistencia:
     def test_2_linea_otro_servicio_correcto_cl(self):
         """✅ Test: Línea otro servicio externo CL → documento CL"""
         print("\\n🧪 TEST 2: Línea otro servicio correcto (CL)")
-        
+
         try:
             linea = LineaOtroServicio.objects.create(
                 documento=self.doc_cl,
@@ -553,7 +554,7 @@ class TestValidacionesConsistencia:
     def test_3_error_servicio_cross_country(self):
         """❌ Test: Servicio US en documento CL debe fallar"""
         print("\\n🧪 TEST 3: Error cross-country (servicio US → doc CL)")
-        
+
         try:
             linea = LineaServicio.objects.create(
                 documento=self.doc_cl,
@@ -570,7 +571,7 @@ class TestValidacionesConsistencia:
     def test_4_error_tipo_incorrecto(self):
         """❌ Test: Servicio externo en LineaServicio debe fallar"""
         print("\\n🧪 TEST 4: Error tipo incorrecto (externo → LineaServicio)")
-        
+
         try:
             linea = LineaServicio.objects.create(
                 documento=self.doc_cl,
@@ -587,7 +588,7 @@ class TestValidacionesConsistencia:
     def test_5_error_tipo_incorrecto_otro_servicio(self):
         """❌ Test: Servicio interno en LineaOtroServicio debe fallar"""
         print("\\n🧪 TEST 5: Error tipo incorrecto (interno → LineaOtroServicio)")
-        
+
         try:
             linea = LineaOtroServicio.objects.create(
                 documento=self.doc_cl,
@@ -606,7 +607,7 @@ class TestValidacionesConsistencia:
     def test_6_documento_cross_empresa(self):
         """❌ Test: Cliente de empresa diferente debe fallar"""
         print("\\n🧪 TEST 6: Error cliente cross-empresa")
-        
+
         try:
             doc = Documento(
                 empresa=self.empresa_cl,
@@ -625,9 +626,9 @@ class TestValidacionesConsistencia:
         """Ejecutar suite completa de tests"""
         print("🚀 EJECUTANDO TESTS DE VALIDACIONES DE CONSISTENCIA")
         print("=" * 70)
-        
+
         self.setUp()
-        
+
         tests = [
             self.test_1_linea_servicio_correcto_cl,
             self.test_2_linea_otro_servicio_correcto_cl,
@@ -636,17 +637,17 @@ class TestValidacionesConsistencia:
             self.test_5_error_tipo_incorrecto_otro_servicio,
             self.test_6_documento_cross_empresa,
         ]
-        
+
         resultados = []
         for test in tests:
             resultado = test()
             resultados.append(resultado)
-        
+
         # Reporte final
         total = len(resultados)
         exitosos = sum(resultados)
         fallidos = total - exitosos
-        
+
         print("\\n" + "=" * 70)
         print("📊 REPORTE FINAL DE TESTS")
         print("=" * 70)
@@ -654,14 +655,14 @@ class TestValidacionesConsistencia:
         print(f"✅ Exitosos: {exitosos}")
         print(f"❌ Fallidos: {fallidos}")
         print(f"🎯 Porcentaje éxito: {(exitosos/total)*100:.1f}%")
-        
+
         if fallidos == 0:
             print("\\n🎉 TODOS LOS TESTS PASARON")
             print("✅ Sistema de validaciones funcionando correctamente")
         else:
             print("\\n⚠️ ALGUNOS TESTS FALLARON")
             print("❌ Revisar implementación de validaciones")
-        
+
         return fallidos == 0
 
 if __name__ == "__main__":
@@ -710,13 +711,13 @@ class LineaServicio(models.Model):
             self.documento, self.servicio,
             "Servicio de otro país no puede usarse en este documento"
         )
-        
+
         # Validar tipo interno
         ValidacionConsistencia.assert_correct_tipo(
             self.servicio, 'interno',
             "Esta línea requiere un servicio de tipo 'interno'"
         )
-    
+
     def save(self, *args, **kwargs):
         self.full_clean()  # Forzar validaciones
         return super().save(*args, **kwargs)
@@ -726,11 +727,11 @@ class LineaServicio(models.Model):
 
 ```sql
 -- Tipo válido en servicios
-ALTER TABLE taller_servicio ADD CONSTRAINT servicio_tipo_valido 
+ALTER TABLE taller_servicio ADD CONSTRAINT servicio_tipo_valido
 CHECK (tipo IN ('interno', 'externo'));
 
 -- Índices de performance
-CREATE INDEX servicio_country_tipo_code_idx 
+CREATE INDEX servicio_country_tipo_code_idx
 ON taller_servicio (country, tipo, code);
 ```
 

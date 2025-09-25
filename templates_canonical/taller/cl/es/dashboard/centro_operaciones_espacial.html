@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load country_url %}
 {% load static %}
 
 {% block title %}{{ empresa.nombre_taller }} - Centro de Comandos{% endblock %}
@@ -309,6 +310,18 @@ body {
 <!-- 🔵 IDENTIFICATION SQUARE - CHILE SPANISH TEMPLATE -->
 <div style="position: fixed; top: 10px; right: 10px; width: 50px; height: 50px; background-color: #0000ff; z-index: 9999; border: 3px solid #fff; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px;">CL-ES</div>
 
+<!-- 🌐 LANGUAGE SWITCHER -->
+<div style="position: fixed; top: 10px; left: 10px; z-index: 9999;">
+    <form action="{% url 'set_language' %}" method="post" style="display: inline-block;">
+        {% csrf_token %}
+        <input name="next" type="hidden" value="{{ request.get_full_path }}">
+        <select name="language" onchange="this.form.submit()" style="background: rgba(0, 0, 0, 0.8); color: #00ffff; border: 2px solid #00ffff; border-radius: 8px; padding: 8px 12px; font-family: 'Orbitron', monospace; font-size: 12px; font-weight: bold;">
+            <option value="es" {% if LANGUAGE_CODE == 'es' %}selected{% endif %}>🇨🇱 Español</option>
+            <option value="en" {% if LANGUAGE_CODE == 'en' %}selected{% endif %}>🇺🇸 English</option>
+        </select>
+    </form>
+</div>
+
 <div class="max-w-7xl mx-auto p-6">
 
     <!-- 🚀 Panel de Comandos -->
@@ -317,7 +330,7 @@ body {
         <div class="nav-grid">
 
             <!-- SUPER FICHA UNIFICADA - INTELIGENCIA TÁCTICA TOTAL -->
-            <a href="{% url 'business_intelligence:dashboard' %}" class="command-panel super-unified-panel">
+            <a href="#" class="command-panel super-unified-panel" onclick="alert('Módulo de Business Intelligence en desarrollo'); return false;">
                 <div class="unified-header">
                     <div class="unified-icons">
                         <span class="icon-trio">🧠</span>
@@ -342,13 +355,13 @@ body {
                 </div>
             </a>
 
-            <a href="{% url 'reportes:reportes_mecanicos' %}" class="command-panel">
+            <a href="{% url 'reportes_cl_es:reportes_mecanicos' %}" class="command-panel">
                 <div class="text-3xl mb-2">👨‍🔧</div>
                 <div class="font-semibold console-text">PERSONAL TÉCNICO</div>
                 <div class="text-sm text-gray-400 console-text">Análisis individual</div>
             </a>
 
-            <a href="{% url 'documentos:lista_documentos' %}" class="command-panel modern-panel">
+            <a href="{% url 'documentos_cl_es:lista_documentos' %}" class="command-panel modern-panel">
                 <div class="modern-icon-container">
                     <div class="main-icon">📄</div>
                     <div class="secondary-icon">🚀</div>
@@ -358,7 +371,7 @@ body {
                 <div class="modern-description">Gestión documental AI</div>
             </a>
 
-            <a href="{% url 'clientes:lista_clientes' %}" class="command-panel modern-panel">
+            <a href="{% country_url 'clientes:lista_clientes' %}" class="command-panel modern-panel">
                 <div class="modern-icon-container">
                     <div class="main-icon">🌐</div>
                     <div class="secondary-icon">💫</div>
@@ -368,7 +381,7 @@ body {
                 <div class="modern-description">Ecosystem relacional</div>
             </a>
 
-            <a href="{% url 'vehiculos:lista_vehiculos' %}" class="command-panel modern-panel">
+            <a href="{% country_url 'vehiculos:lista_vehiculos' %}" class="command-panel modern-panel">
                 <div class="modern-icon-container">
                     <div class="main-icon">🚗</div>
                     <div class="secondary-icon">⚡</div>
@@ -378,7 +391,7 @@ body {
                 <div class="modern-description">Sistema vehicular smart</div>
             </a>
 
-            <a href="{% url 'repuestos:lista_repuestos' %}" class="command-panel modern-panel">
+            <a href="{% country_url 'repuestos:lista_repuestos' %}" class="command-panel modern-panel">
                 <div class="modern-icon-container">
                     <div class="main-icon">🔧</div>
                     <div class="secondary-icon">⚡</div>
@@ -388,7 +401,7 @@ body {
                 <div class="modern-description">Gestión de repuestos</div>
             </a>
 
-            <a href="{% url 'servicios:servicios_menu' %}" class="command-panel modern-panel">
+            <a href="{% country_url 'servicios:servicios_menu' %}" class="command-panel modern-panel">
                 <div class="modern-icon-container">
                     <div class="main-icon">🛠️</div>
                     <div class="secondary-icon">💫</div>
@@ -398,7 +411,7 @@ body {
                 <div class="modern-description">Gestión de servicios</div>
             </a>
 
-            <a href="{% url 'servicios:otros_servicios_menu' %}" class="command-panel modern-panel">
+            <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="command-panel modern-panel">
                 <div class="modern-icon-container">
                     <div class="main-icon">🌟</div>
                     <div class="secondary-icon">🚀</div>

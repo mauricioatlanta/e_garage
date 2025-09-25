@@ -8,7 +8,7 @@ El módulo de inteligencia de negocio proporciona análisis profundos y visualiz
 
 ### 1. 📊 Ranking de Servicios Más Vendidos
 - **Objetivo**: Identificar qué servicios son más populares y rentables
-- **Métricas**: 
+- **Métricas**:
   - Cantidad vendida
   - Ingresos totales
   - Precio promedio
@@ -70,7 +70,7 @@ O acceder directamente a: `http://localhost:8000/taller/business-intelligence/da
 ### 📈 Métricas Principales
 - **Total de documentos** en el período
 - **Ingresos totales** generados
-- **Servicios realizados** 
+- **Servicios realizados**
 - **Promedio diario** de ingresos
 
 ### 🎨 Visualizaciones
@@ -83,7 +83,7 @@ O acceder directamente a: `http://localhost:8000/taller/business-intelligence/da
 El módulo incluye APIs para integración con otras herramientas:
 
 - `GET /taller/business-intelligence/api/servicios-ranking/`
-- `GET /taller/business-intelligence/api/repuestos-utilidad/`  
+- `GET /taller/business-intelligence/api/repuestos-utilidad/`
 - `GET /taller/business-intelligence/api/mecanicos-stats/`
 
 Todas las APIs soportan filtros por fecha:
@@ -167,11 +167,11 @@ Para problemas o sugerencias relacionadas con el módulo de inteligencia de nego
 
 ## 🏆 Beneficios Clave
 
-✅ **Decisiones basadas en datos** en lugar de intuición  
-✅ **Identificación de oportunidades** de crecimiento  
-✅ **Optimización de inventario** y recursos  
-✅ **Mejora del rendimiento** del personal  
-✅ **Incremento de rentabilidad** general del taller  
+✅ **Decisiones basadas en datos** en lugar de intuición
+✅ **Identificación de oportunidades** de crecimiento
+✅ **Optimización de inventario** y recursos
+✅ **Mejora del rendimiento** del personal
+✅ **Incremento de rentabilidad** general del taller
 
 ---
 

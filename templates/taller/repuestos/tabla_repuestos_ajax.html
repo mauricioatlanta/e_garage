@@ -1,3 +1,4 @@
+{% load country_url %}
 {% for repuesto in repuestos %}
 <tr class="hover:bg-cyan-900/20">
   <td class="px-6 py-4 whitespace-nowrap text-sm text-white">{{ repuesto.part_number|default:"-" }}</td>
@@ -8,8 +9,8 @@
   <td class="px-6 py-4 whitespace-nowrap text-sm text-white">{{ repuesto.cantidad_stock }}</td>
   <td class="px-6 py-4 whitespace-nowrap text-sm text-white">{{ repuesto.proveedor|default:"-" }}</td>
   <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-    <a href="{% url 'taller:repuestos:ver_repuesto' repuesto.pk %}" class="text-cyan-400 hover:text-cyan-300 mr-3">Ver</a>
-    <a href="{% url 'taller:repuestos:editar_repuesto' repuesto.pk %}" class="text-green-400 hover:text-green-300">Editar</a>
+    <a href="{% country_url 'repuestos:ver_repuesto' repuesto.pk  %}" class="text-cyan-400 hover:text-cyan-300 mr-3">Ver</a>
+    <a href="{% country_url 'repuestos:editar_repuesto' repuesto.pk  %}" class="text-green-400 hover:text-green-300">Editar</a>
   </td>
 </tr>
 {% empty %}

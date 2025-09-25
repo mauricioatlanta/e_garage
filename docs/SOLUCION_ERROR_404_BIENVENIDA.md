@@ -18,7 +18,7 @@ Request URL: https://e-garage-atlantareciclajes.pythonanywhere.com/bienvenida/us
 
 1. **Ir a PythonAnywhere → Files**
 2. **Navegar a:** `/home/atlantareciclajes/e-garage-atlantareciclajes/gestion_taller/`
-3. **Subir y reemplazar:** `urls.py` 
+3. **Subir y reemplazar:** `urls.py`
    - Usar el archivo: `actualizacion_pythonanywhere/gestion_taller_urls.py`
    - Renombrarlo a: `urls.py`
 
@@ -44,8 +44,8 @@ Request URL: https://e-garage-atlantareciclajes.pythonanywhere.com/bienvenida/us
 
 Probar estos enlaces después de recargar:
 
-✅ **Chile:** https://e-garage-atlantareciclajes.pythonanywhere.com/bienvenida/cl/  
-✅ **USA:** https://e-garage-atlantareciclajes.pythonanywhere.com/bienvenida/usa/  
+✅ **Chile:** https://e-garage-atlantareciclajes.pythonanywhere.com/bienvenida/cl/
+✅ **USA:** https://e-garage-atlantareciclajes.pythonanywhere.com/bienvenida/usa/
 ✅ **USA Alt:** https://e-garage-atlantareciclajes.pythonanywhere.com/welcome/us/
 
 ## 📋 **CONTENIDO DE LAS URLs AGREGADAS:**
@@ -64,7 +64,7 @@ path('welcome/us/', TemplateView.as_view(template_name='onboarding/bienvenida_us
 Después de estos pasos, las URLs mostrarán:
 
 - **🇨🇱 /bienvenida/cl/:** Página de bienvenida en español para Chile
-- **🇺🇸 /bienvenida/usa/:** Página de bienvenida en inglés para USA  
+- **🇺🇸 /bienvenida/usa/:** Página de bienvenida en inglés para USA
 - **🇺🇸 /welcome/us/:** URL alternativa para USA
 
 ## 🛠️ **SI HAY PROBLEMAS:**
@@ -103,6 +103,6 @@ Si después de seguir estos pasos aún hay problemas:
 Una vez completados estos pasos, las URLs de bienvenida funcionarán perfectamente y no habrá más errores 404.
 
 ---
-**📅 Fecha:** 24 de julio de 2025  
-**⏱️ Tiempo estimado:** 5-10 minutos  
+**📅 Fecha:** 24 de julio de 2025
+**⏱️ Tiempo estimado:** 5-10 minutos
 **🎯 Estado:** SOLUCIÓN LISTA ✅

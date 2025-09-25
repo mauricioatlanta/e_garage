@@ -1,9 +1,10 @@
+{% load country_url %}
 {% extends "base.html" %}
 {% block content %}
 <div class="container mx-auto px-4 py-8">
   <h1 class="text-2xl font-bold mb-4 text-white">Lista de Servicios</h1>
-  <a href="{% url 'taller:servicios:crear_servicio' %}" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg shadow bg-gradient-to-r from-cyan-500 to-fuchsia-500 text-white font-semibold hover:from-fuchsia-500 hover:to-cyan-500 transition-all duration-200 border border-cyan-400/60 mb-4">➕ Agregar Servicio</a>
-  
+  <a href="{% country_url 'servicios:crear_servicio' %}" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg shadow bg-gradient-to-r from-cyan-500 to-fuchsia-500 text-white font-semibold hover:from-fuchsia-500 hover:to-cyan-500 transition-all duration-200 border border-cyan-400/60 mb-4">➕ Agregar Servicio</a>
+
   <div class="bg-black/60 backdrop-blur border border-cyan-400/30 rounded-lg p-6">
     <div class="text-center text-cyan-300">
       <div class="mb-4">

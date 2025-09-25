@@ -45,7 +45,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background-image: 
+        background-image:
             linear-gradient(rgba(0, 255, 136, 0.1) 1px, transparent 1px),
             linear-gradient(90deg, rgba(0, 255, 136, 0.1) 1px, transparent 1px);
         background-size: 20px 20px;
@@ -61,9 +61,9 @@
 
     /* Contenedor principal con efecto holográfico */
     .ai-container {
-        background: linear-gradient(135deg, 
-            rgba(0, 255, 136, 0.05) 0%, 
-            rgba(0, 102, 255, 0.05) 50%, 
+        background: linear-gradient(135deg,
+            rgba(0, 255, 136, 0.05) 0%,
+            rgba(0, 102, 255, 0.05) 50%,
             rgba(255, 0, 128, 0.05) 100%);
         backdrop-filter: blur(20px);
         border: 1px solid rgba(0, 255, 136, 0.2);
@@ -73,7 +73,7 @@
         max-width: 1400px;
         position: relative;
         overflow: hidden;
-        box-shadow: 
+        box-shadow:
             0 0 50px rgba(0, 255, 136, 0.1),
             inset 0 0 50px rgba(0, 255, 136, 0.05);
     }
@@ -85,9 +85,9 @@
         left: -100%;
         width: 100%;
         height: 100%;
-        background: linear-gradient(90deg, 
-            transparent, 
-            rgba(0, 255, 136, 0.1), 
+        background: linear-gradient(90deg,
+            transparent,
+            rgba(0, 255, 136, 0.1),
             transparent);
         animation: ai-scan 3s infinite;
     }
@@ -103,10 +103,10 @@
         font-size: 3rem;
         font-weight: 900;
         text-align: center;
-        background: linear-gradient(45deg, 
-            var(--ai-primary), 
-            var(--ai-secondary), 
-            var(--ai-accent), 
+        background: linear-gradient(45deg,
+            var(--ai-primary),
+            var(--ai-secondary),
+            var(--ai-accent),
             var(--ai-glow));
         background-size: 400% 400%;
         -webkit-background-clip: text;
@@ -143,8 +143,8 @@
     }
 
     .enfoque-btn {
-        background: linear-gradient(135deg, 
-            rgba(0, 255, 136, 0.2) 0%, 
+        background: linear-gradient(135deg,
+            rgba(0, 255, 136, 0.2) 0%,
             rgba(0, 102, 255, 0.2) 100%);
         border: 1px solid rgba(0, 255, 136, 0.4);
         color: var(--ai-primary);
@@ -163,8 +163,8 @@
 
     .enfoque-btn:hover {
         transform: translateY(-3px);
-        background: linear-gradient(135deg, 
-            rgba(0, 255, 136, 0.4) 0%, 
+        background: linear-gradient(135deg,
+            rgba(0, 255, 136, 0.4) 0%,
             rgba(0, 102, 255, 0.4) 100%);
         box-shadow: 0 15px 30px rgba(0, 255, 136, 0.3);
         color: white;
@@ -178,8 +178,8 @@
 
     /* Paneles de contenido */
     .enfoque-panel {
-        background: linear-gradient(135deg, 
-            rgba(255, 255, 255, 0.08) 0%, 
+        background: linear-gradient(135deg,
+            rgba(255, 255, 255, 0.08) 0%,
             rgba(255, 255, 255, 0.04) 100%);
         backdrop-filter: blur(15px);
         border: 1px solid rgba(0, 255, 136, 0.3);
@@ -197,9 +197,9 @@
         left: 0;
         right: 0;
         height: 2px;
-        background: linear-gradient(90deg, 
-            var(--ai-primary), 
-            var(--ai-glow), 
+        background: linear-gradient(90deg,
+            var(--ai-primary),
+            var(--ai-glow),
             var(--ai-accent));
         animation: data-flow 2s ease infinite;
     }
@@ -220,8 +220,8 @@
     }
 
     .futuristic-table thead th {
-        background: linear-gradient(135deg, 
-            rgba(0, 255, 136, 0.3) 0%, 
+        background: linear-gradient(135deg,
+            rgba(0, 255, 136, 0.3) 0%,
             rgba(0, 102, 255, 0.3) 100%);
         color: var(--ai-primary);
         font-weight: 700;
@@ -270,8 +270,8 @@
     }
 
     .ai-card {
-        background: linear-gradient(135deg, 
-            rgba(0, 255, 136, 0.1) 0%, 
+        background: linear-gradient(135deg,
+            rgba(0, 255, 136, 0.1) 0%,
             rgba(0, 102, 255, 0.1) 100%);
         backdrop-filter: blur(15px);
         border: 1px solid rgba(0, 255, 136, 0.3);
@@ -487,7 +487,7 @@
     </div>
 
     <!-- Agregar más paneles según sea necesario -->
-    
+
 </div>
 
 <script>
@@ -531,31 +531,31 @@ particlesJS('particles-js', {
 document.addEventListener('DOMContentLoaded', function() {
     const buttons = document.querySelectorAll('.enfoque-btn');
     const panels = document.querySelectorAll('.enfoque-panel');
-    
+
     // Mostrar panel por defecto
     document.getElementById('panel-facturacion_total').style.display = 'block';
     document.querySelector('[data-enfoque="facturacion_total"]').classList.add('active');
-    
+
     buttons.forEach(button => {
         button.addEventListener('click', function() {
             const enfoque = this.getAttribute('data-enfoque');
-            
+
             // Ocultar todos los paneles
             panels.forEach(panel => {
                 panel.style.display = 'none';
             });
-            
+
             // Quitar clase active de todos los botones
             buttons.forEach(btn => {
                 btn.classList.remove('active');
             });
-            
+
             // Mostrar panel seleccionado
             const targetPanel = document.getElementById('panel-' + enfoque);
             if (targetPanel) {
                 targetPanel.style.display = 'block';
             }
-            
+
             // Agregar clase active al botón seleccionado
             this.classList.add('active');
         });

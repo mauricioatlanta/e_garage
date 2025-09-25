@@ -1,3 +1,4 @@
+{% load country_url %}
 {% extends 'base.html' %}
 
 {% block title %}🚗 Demo IA Vehicular{% endblock %}
@@ -299,11 +300,11 @@
         .servicios-grid {
             grid-template-columns: 1fr;
         }
-        
+
         .vehiculo-specs {
             grid-template-columns: 1fr 1fr;
         }
-        
+
         .action-buttons {
             flex-direction: column;
             align-items: center;
@@ -404,7 +405,7 @@
         <h3 style="color: var(--electric-yellow); font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem; text-align: center;">
             ⚡ Impacto de la IA en tu Taller
         </h3>
-        
+
         <div class="comparativa-item">
             <span>🕐 Tiempo de Análisis:</span>
             <div>
@@ -413,7 +414,7 @@
                 <span class="comparativa-con">{{ demo_data.comparativa_sin_ia.tiempo_analisis|slice:"16:" }}</span>
             </div>
         </div>
-        
+
         <div class="comparativa-item">
             <span>🎯 Precisión Recomendaciones:</span>
             <div>
@@ -422,7 +423,7 @@
                 <span class="comparativa-con">{{ demo_data.comparativa_sin_ia.precision_recomendaciones|slice:"17:" }}</span>
             </div>
         </div>
-        
+
         <div class="comparativa-item">
             <span>💸 Oportunidades Perdidas:</span>
             <div>
@@ -433,7 +434,7 @@
 
     <!-- Botones de Acción -->
     <div class="action-buttons">
-        <a href="{% url 'taller:ia:sugerencias_basicas' %}" class="btn-demo">
+        <a href="{% country_url 'ia:sugerencias_basicas' %}" class="btn-demo">
             🤖 Probar IA Completa
         </a>
         <a href="{% url 'onboarding:onboarding_paso' %}?paso=2" class="btn-demo btn-secondary">
@@ -469,17 +470,17 @@ window.addEventListener('load', function() {
     const confianzaEl = document.querySelector('.confianza-numero');
     const targetValue = {{ demo_data.analisis_ia.confianza }};
     let currentValue = 0;
-    
+
     const interval = setInterval(() => {
         currentValue += 2;
         confianzaEl.textContent = currentValue + '%';
-        
+
         if (currentValue >= targetValue) {
             confianzaEl.textContent = targetValue + '%';
             clearInterval(interval);
         }
     }, 50);
-    
+
     // Analytics
     gtag('event', 'demo_ia_vehicular_vista', {
         'event_category': 'onboarding_engagement',

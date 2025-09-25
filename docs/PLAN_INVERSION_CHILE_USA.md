@@ -252,7 +252,7 @@
 **eGarage tiene todos los elementos para una inversión exitosa:**
 
 ✅ **Mercado probado** - Talleres necesitan urgentemente digitalización
-✅ **Producto diferenciado** - IA + UX superior a competencia legacy  
+✅ **Producto diferenciado** - IA + UX superior a competencia legacy
 ✅ **Estrategia bicultural** - Ventaja única Chile + USA
 ✅ **Unit economics sólidos** - LTV/CAC >10x en ambos mercados
 ✅ **Team ejecutor** - Experiencia técnica y de mercado
@@ -261,7 +261,7 @@
 ### **🎖️ ROI Proyectado para Inversionistas:**
 - **Inversión:** $350K USD
 - **Valoración actual:** $1.5M USD (post-money)
-- **Valoración 18 meses:** $15-25M USD  
+- **Valoración 18 meses:** $15-25M USD
 - **ROI potencial:** **10-15x** en 18 meses
 
 **¿Listo para cambiar la industria automotriz con IA?** 🚀

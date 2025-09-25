@@ -18,13 +18,13 @@
         position: relative;
         overflow-x: hidden;
     }
-    
+
     @keyframes gradientShift {
         0% { background-position: 0% 50%; }
         50% { background-position: 100% 50%; }
         100% { background-position: 0% 50%; }
     }
-    
+
     /* Partículas flotantes */
     body::before {
         content: '';
@@ -33,7 +33,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background-image: 
+        background-image:
             radial-gradient(circle at 20% 80%, rgba(0, 255, 255, 0.1) 0%, transparent 50%),
             radial-gradient(circle at 80% 20%, rgba(255, 0, 255, 0.1) 0%, transparent 50%),
             radial-gradient(circle at 40% 40%, rgba(0, 255, 0, 0.1) 0%, transparent 50%);
@@ -41,13 +41,13 @@
         pointer-events: none;
         z-index: -1;
     }
-    
+
     @keyframes float {
         0%, 100% { transform: translateY(0px) rotate(0deg); }
         33% { transform: translateY(-20px) rotate(120deg); }
         66% { transform: translateY(10px) rotate(240deg); }
     }
-    
+
     .container-fluid {
         background: transparent !important;
         color: #ffffff !important;
@@ -57,17 +57,17 @@
 
     /* 🎯 HEADER QUANTUM MODERNIZADO */
     .dashboard-header {
-        background: linear-gradient(135deg, 
-            rgba(0, 255, 255, 0.1) 0%, 
-            rgba(0, 128, 255, 0.1) 30%, 
-            rgba(255, 0, 255, 0.1) 70%, 
+        background: linear-gradient(135deg,
+            rgba(0, 255, 255, 0.1) 0%,
+            rgba(0, 128, 255, 0.1) 30%,
+            rgba(255, 0, 255, 0.1) 70%,
             rgba(128, 0, 255, 0.1) 100%);
         border: 2px solid rgba(0, 255, 255, 0.3);
         border-radius: 20px;
         padding: 2rem;
         margin-bottom: 2rem;
         backdrop-filter: blur(20px);
-        box-shadow: 
+        box-shadow:
             0 0 30px rgba(0, 255, 255, 0.2),
             inset 0 0 20px rgba(255, 255, 255, 0.05);
         display: flex;
@@ -169,7 +169,7 @@
         font-weight: 700;
         font-family: 'Courier New', monospace;
     }
-    
+
     .stats-card {
         background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%);
         backdrop-filter: blur(10px);
@@ -188,7 +188,7 @@
         text-align: center;
         overflow: hidden;
     }
-    
+
     .chart-container {
         background: rgba(255, 255, 255, 0.1);
         backdrop-filter: blur(15px);
@@ -203,7 +203,7 @@
         color: #ffffff !important;
         position: relative;
     }
-    
+
     .chart-container::before {
         content: '';
         position: absolute;
@@ -215,7 +215,7 @@
         border-radius: 15px;
         pointer-events: none;
     }
-    
+
     .chart-container h5 {
         color: #00ffff !important;
         font-weight: 600;
@@ -224,7 +224,7 @@
         position: relative;
         z-index: 2;
     }
-    
+
     /* Forzar mini gráficos */
     .chart-container canvas {
         max-height: 60px !important;
@@ -232,7 +232,7 @@
         width: 100% !important;
         max-width: 100% !important;
     }
-    
+
     #serviciosChart,
     #utilidadChart {
         max-height: 60px !important;
@@ -240,7 +240,7 @@
         width: 100% !important;
         max-width: 100% !important;
     }
-    
+
     .metric-value {
         font-size: 1.2rem;
         font-weight: bold;
@@ -253,16 +253,16 @@
         -webkit-line-clamp: 1;
         -webkit-box-orient: vertical;
     }
-    
+
     .metric-value.compact {
         font-size: 1rem;
     }
-    
+
     .metric-value.large-number {
         font-size: 0.9rem;
         font-family: 'Courier New', monospace;
     }
-    
+
     .metric-label {
         font-size: 0.65rem;
         opacity: 0.9;
@@ -272,7 +272,7 @@
         max-height: 2.5rem;
         overflow: hidden;
     }
-    
+
     .metric-label small {
         font-size: 0.55rem;
         opacity: 0.7;
@@ -280,7 +280,7 @@
         margin-top: 0.1rem;
         color: #00ff88;
     }
-    
+
     .table-container {
         background: rgba(255, 255, 255, 0.1);
         backdrop-filter: blur(15px);
@@ -291,34 +291,34 @@
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         color: #ffffff !important;
     }
-    
+
     .table-container h5 {
         color: #00ffff !important;
         font-weight: 600;
         text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
     }
-    
+
     .table-container .table {
         color: #ffffff !important;
         background: transparent !important;
     }
-    
+
     .table-container .table th {
         color: #00ffff !important;
         background-color: rgba(0, 255, 255, 0.1) !important;
         border-color: rgba(255, 255, 255, 0.2) !important;
         text-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
     }
-    
+
     .table-container .table td {
         color: #ffffff !important;
         border-color: rgba(255, 255, 255, 0.1) !important;
     }
-    
+
     .table-hover tbody tr:hover {
         background-color: rgba(0, 255, 255, 0.1) !important;
     }
-    
+
     .filter-section {
         background: rgba(255, 255, 255, 0.1);
         backdrop-filter: blur(15px);
@@ -329,27 +329,27 @@
         color: #ffffff !important;
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
     }
-    
+
     .filter-section label {
         color: #00ffff !important;
         font-weight: 500;
         text-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
     }
-    
+
     .filter-section .form-control {
         background: rgba(0, 0, 0, 0.3) !important;
         border: 1px solid rgba(0, 255, 255, 0.5) !important;
         color: #ffffff !important;
         backdrop-filter: blur(5px);
     }
-    
+
     .filter-section .form-control:focus {
         background: rgba(0, 0, 0, 0.5) !important;
         border-color: #00ffff !important;
         box-shadow: 0 0 15px rgba(0, 255, 255, 0.3) !important;
         color: #ffffff !important;
     }
-    
+
     .btn-primary {
         background: linear-gradient(135deg, #00ffff, #0080ff) !important;
         border: none !important;
@@ -359,28 +359,28 @@
         box-shadow: 0 4px 15px rgba(0, 255, 255, 0.3);
         transition: all 0.3s ease;
     }
-    
+
     .btn-primary:hover {
         background: linear-gradient(135deg, #00cccc, #0066cc) !important;
         transform: translateY(-2px);
         box-shadow: 0 6px 20px rgba(0, 255, 255, 0.4);
     }
-    
+
     .profit-positive {
         color: #28a745;
         font-weight: bold;
     }
-    
+
     .profit-negative {
         color: #dc3545;
         font-weight: bold;
     }
-    
+
     .progress-bar-custom {
         height: 8px;
         border-radius: 4px;
     }
-    
+
     /* Estilos generales para tema oscuro futurista */
     .container-fluid h1,
     .container-fluid h2,
@@ -392,22 +392,22 @@
         text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
         font-weight: 600;
     }
-    
+
     .container-fluid p,
     .container-fluid span,
     .container-fluid div {
         color: #ffffff !important;
     }
-    
+
     .text-muted {
         color: #cccccc !important;
     }
-    
+
     .fw-bold {
         color: #ffffff !important;
         font-weight: 700;
     }
-    
+
     .badge {
         color: #000000 !important;
         background: linear-gradient(135deg, #00ffff, #ff00ff) !important;
@@ -415,26 +415,26 @@
         text-shadow: none;
         font-weight: bold;
     }
-    
+
     .text-success {
         color: #00ff88 !important;
         text-shadow: 0 0 5px rgba(0, 255, 136, 0.5);
     }
-    
+
     /* Efectos de resplandor para valores monetarios */
     .clp-value {
         color: #00ff88 !important;
         font-weight: bold;
         text-shadow: 0 0 8px rgba(0, 255, 136, 0.6);
     }
-    
+
     /* Animación sutil para elementos interactivos */
     .chart-container,
     .table-container,
     .stats-card {
         transition: all 0.3s ease;
     }
-    
+
     /* 🌌 MOSAICO INTELIGENTE QUANTUM BUSINESS - DISEÑO FUTURISTA */
     .quantum-intelligence-grid {
         display: grid;
@@ -448,16 +448,16 @@
     /* 💎 Panel Principal de Comando */
     .quantum-command-center {
         grid-column: 1 / -1;
-        background: linear-gradient(135deg, 
-            rgba(0, 255, 255, 0.1) 0%, 
-            rgba(0, 128, 255, 0.1) 30%, 
-            rgba(255, 0, 255, 0.1) 70%, 
+        background: linear-gradient(135deg,
+            rgba(0, 255, 255, 0.1) 0%,
+            rgba(0, 128, 255, 0.1) 30%,
+            rgba(255, 0, 255, 0.1) 70%,
             rgba(128, 0, 255, 0.1) 100%);
         border: 2px solid rgba(0, 255, 255, 0.3);
         border-radius: 20px;
         padding: 2rem;
         backdrop-filter: blur(20px);
-        box-shadow: 
+        box-shadow:
             0 0 30px rgba(0, 255, 255, 0.2),
             inset 0 0 20px rgba(255, 255, 255, 0.05);
         position: relative;
@@ -494,11 +494,11 @@
     }
 
     @keyframes hologramPulse {
-        0%, 100% { 
+        0%, 100% {
             text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 30px #00ffff;
             transform: scale(1);
         }
-        50% { 
+        50% {
             text-shadow: 0 0 15px #00ffff, 0 0 30px #00ffff, 0 0 45px #00ffff;
             transform: scale(1.05);
         }
@@ -820,11 +820,11 @@
     }
 
     @keyframes aiPulse {
-        0%, 100% { 
+        0%, 100% {
             transform: scale(1);
             filter: hue-rotate(0deg);
         }
-        50% { 
+        50% {
             transform: scale(1.1);
             filter: hue-rotate(120deg);
         }
@@ -1303,7 +1303,7 @@
 
     <!-- 🎯 MOSAICO INTELIGENTE BUSINESS INTELLIGENCE QUANTUM -->
     <div class="quantum-intelligence-grid">
-        
+
         <!-- 💎 Panel Principal de Comando -->
         <div class="quantum-command-center">
             <div class="command-header">
@@ -1311,7 +1311,7 @@
                 <h2 class="command-title">NEURAL BUSINESS CORE</h2>
                 <div class="quantum-status">● ONLINE</div>
             </div>
-            
+
             <!-- KPIs Holográficos -->
             <div class="holographic-kpis">
                 <div class="holo-metric primary-glow">
@@ -1322,7 +1322,7 @@
                         <div class="trend-indicator positive">+12.3%</div>
                     </div>
                 </div>
-                
+
                 <div class="holo-metric secondary-glow">
                     <div class="metric-icon">📊</div>
                     <div class="metric-data">
@@ -1331,7 +1331,7 @@
                         <div class="trend-indicator positive">+8.7%</div>
                     </div>
                 </div>
-                
+
                 <div class="holo-metric tertiary-glow">
                     <div class="metric-icon">�</div>
                     <div class="metric-data">
@@ -1340,7 +1340,7 @@
                         <div class="trend-indicator neutral">+2.1%</div>
                     </div>
                 </div>
-                
+
                 <div class="holo-metric quaternary-glow">
                     <div class="metric-icon">⚡</div>
                     <div class="metric-data">
@@ -1396,7 +1396,7 @@
                 <span class="matrix-title">MATRIZ DE PERFORMANCE</span>
                 <div class="matrix-status">SCANNING...</div>
             </div>
-            
+
             <div class="performance-metrics">
                 <div class="perf-metric excellence">
                     <div class="perf-icon">🎯</div>
@@ -1405,7 +1405,7 @@
                         <div class="perf-label">Eficiencia</div>
                     </div>
                 </div>
-                
+
                 <div class="perf-metric success">
                     <div class="perf-icon">🚀</div>
                     <div class="perf-data">
@@ -1413,7 +1413,7 @@
                         <div class="perf-label">Conversión</div>
                     </div>
                 </div>
-                
+
                 <div class="perf-metric warning">
                     <div class="perf-icon">⚙️</div>
                     <div class="perf-data">
@@ -1433,7 +1433,7 @@
                     <div class="ai-status">Analizando patrones...</div>
                 </div>
             </div>
-            
+
             <div class="ai-predictions">
                 <div class="prediction-item">
                     <div class="prediction-icon">📈</div>
@@ -1441,14 +1441,14 @@
                         <strong>Tendencia Positiva:</strong> Aumento del 15% en servicios este mes
                     </div>
                 </div>
-                
+
                 <div class="prediction-item">
                     <div class="prediction-icon">💡</div>
                     <div class="prediction-text">
                         <strong>Oportunidad:</strong> Repuestos premium generan 40% más margen
                     </div>
                 </div>
-                
+
                 <div class="prediction-item">
                     <div class="prediction-icon">⚡</div>
                     <div class="prediction-text">
@@ -1615,7 +1615,7 @@
                                     <div class="d-flex align-items-center">
                                         <span class="me-2">{{ repuesto.margen_utilidad }}%</span>
                                         <div class="progress flex-grow-1 progress-bar-custom">
-                                            <div class="progress-bar bg-success" 
+                                            <div class="progress-bar bg-success"
                                                  style="width: {{ repuesto.margen_utilidad|floatformat:0 }}%"></div>
                                         </div>
                                     </div>
@@ -1677,7 +1677,7 @@
                                 <td>
                                     {% if tecnico.ingresos_totales > 0 %}
                                         <div class="progress progress-bar-custom">
-                                            <div class="progress-bar bg-success" 
+                                            <div class="progress-bar bg-success"
                                                  style="width: {% widthratio tecnico.ingresos_totales tecnicos_stats.0.ingresos_totales 100 %}%"></div>
                                         </div>
                                     {% else %}
@@ -1746,7 +1746,7 @@ function iniciarEfectosQuantum() {
             this.style.boxShadow = '0 15px 40px rgba(0, 255, 255, 0.3)';
             this.style.transform = 'translateY(-5px) scale(1.02)';
         });
-        
+
         card.addEventListener('mouseleave', function() {
             this.style.boxShadow = '';
             this.style.transform = '';
@@ -1782,7 +1782,7 @@ function animarContadores() {
     contadores.forEach(contador => {
         const texto = contador.textContent;
         const numero = parseFloat(texto.replace(/[^0-9.-]/g, ''));
-        
+
         if (!isNaN(numero) && numero > 0) {
             let count = 0;
             const increment = numero / 50;
@@ -1792,7 +1792,7 @@ function animarContadores() {
                     count = numero;
                     clearInterval(timer);
                 }
-                
+
                 // Mantener formato original
                 if (texto.includes('$')) {
                     contador.textContent = '$' + Math.floor(count).toLocaleString();
@@ -1830,7 +1830,7 @@ function iniciarRelojSistema() {
             });
             clockElement.textContent = timeString;
         }
-        
+
         updateClock();
         setInterval(updateClock, 1000);
     }
@@ -1839,11 +1839,11 @@ function iniciarRelojSistema() {
 // Función de actualización automática (opcional)
 function actualizacionAutomatica() {
     console.log('🚀 Sistema Quantum Business Intelligence operativo');
-    
+
     // Agregar indicador de última actualización
     const now = new Date();
     const timeString = now.toLocaleTimeString('es-CL');
-    
+
     // Crear o actualizar indicador de tiempo
     let timeIndicator = document.getElementById('last-update');
     if (!timeIndicator) {
@@ -1865,7 +1865,7 @@ function actualizacionAutomatica() {
         `;
         document.body.appendChild(timeIndicator);
     }
-    
+
     timeIndicator.textContent = `⚡ Última actualización: ${timeString}`;
 }
 
@@ -1916,7 +1916,7 @@ Chart.defaults.backgroundColor = 'rgba(0, 255, 255, 0.1)';
 
 // Datos de servicios para el gráfico
 const serviciosData = {{ servicios_ranking|safe }};
-const serviciosLabels = serviciosData.map(item => item.nombre.length > 15 ? 
+const serviciosLabels = serviciosData.map(item => item.nombre.length > 15 ?
     item.nombre.substring(0, 15) + '...' : item.nombre);
 const serviciosValues = serviciosData.map(item => item.cantidad_vendida);
 
@@ -1971,11 +1971,11 @@ new Chart(serviciosCtx, {
             }
         },
         scales: {
-            y: { 
+            y: {
                 display: false,
                 grid: { color: 'rgba(0, 255, 255, 0.1)' }
             },
-            x: { 
+            x: {
                 display: false,
                 grid: { color: 'rgba(0, 255, 255, 0.1)' }
             }
@@ -1992,7 +1992,7 @@ new Chart(serviciosCtx, {
 
 // Datos de utilidad de repuestos con formato CLP
 const utilidadData = {{ repuestos_utilidad|safe }};
-const utilidadLabels = utilidadData.map(item => item.nombre.length > 12 ? 
+const utilidadLabels = utilidadData.map(item => item.nombre.length > 12 ?
     item.nombre.substring(0, 12) + '...' : item.nombre);
 const utilidadValues = utilidadData.map(item => item.utilidad_bruta);
 
@@ -2060,16 +2060,16 @@ new Chart(utilidadCtx, {
 document.getElementById('btn-actualizar').addEventListener('click', function() {
     const fechaInicio = document.getElementById('fecha_inicio').value;
     const fechaFin = document.getElementById('fecha_fin').value;
-    
+
     if (fechaInicio && fechaFin) {
         // Efecto de carga futurista
         this.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Actualizando...';
         this.disabled = true;
-        
+
         const url = new URL(window.location);
         url.searchParams.set('fecha_inicio', fechaInicio);
         url.searchParams.set('fecha_fin', fechaFin);
-        
+
         setTimeout(() => {
             window.location.href = url.toString();
         }, 500);
@@ -2084,10 +2084,10 @@ document.getElementById('btn-actualizar').addEventListener('click', function() {
             <strong>⚠️ Atención:</strong> Por favor selecciona ambas fechas para filtrar los datos.
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         `;
-        
+
         const container = document.querySelector('.container-fluid');
         container.insertBefore(alertDiv, container.firstChild);
-        
+
         setTimeout(() => {
             alertDiv.remove();
         }, 3000);
@@ -2098,11 +2098,11 @@ document.getElementById('btn-actualizar').addEventListener('click', function() {
 document.getElementById('btn-exportar').addEventListener('click', function() {
     this.innerHTML = '<i class="fas fa-download fa-spin"></i> Generando...';
     this.disabled = true;
-    
+
     setTimeout(() => {
         this.innerHTML = '<i class="fas fa-download"></i> Exportar Datos';
         this.disabled = false;
-        
+
         // Alerta de desarrollo
         const alertDiv = document.createElement('div');
         alertDiv.className = 'alert alert-info alert-dismissible fade show';
@@ -2113,10 +2113,10 @@ document.getElementById('btn-exportar').addEventListener('click', function() {
             <strong>🚀 Funcionalidad en desarrollo:</strong> La exportación estará disponible en la próxima actualización.
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         `;
-        
+
         const container = document.querySelector('.container-fluid');
         container.insertBefore(alertDiv, container.firstChild);
-        
+
         setTimeout(() => {
             alertDiv.remove();
         }, 4000);
@@ -2131,7 +2131,7 @@ document.addEventListener('DOMContentLoaded', function() {
         'metric-ticket': 91528,
         'metric-hora': 22500
     };
-    
+
     Object.keys(bigNumbers).forEach(id => {
         const element = document.getElementById(id);
         if (element) {
@@ -2139,7 +2139,7 @@ document.addEventListener('DOMContentLoaded', function() {
             element.classList.add('clp-value');
         }
     });
-    
+
     // Formatear valores en tablas
     const monetaryElements = document.querySelectorAll('[data-currency]');
     monetaryElements.forEach(element => {
@@ -2149,7 +2149,7 @@ document.addEventListener('DOMContentLoaded', function() {
             element.classList.add('clp-value');
         }
     });
-    
+
     // Agregar animación de conteo para números
     const metricElements = document.querySelectorAll('.metric-value');
     metricElements.forEach(element => {
@@ -2157,13 +2157,13 @@ document.addEventListener('DOMContentLoaded', function() {
             element.style.animation = 'pulse 2s infinite';
         }
     });
-    
+
     // Efecto de aparecer gradualmente
     const cards = document.querySelectorAll('.chart-container, .table-container, .stats-card');
     cards.forEach((card, index) => {
         card.style.opacity = '0';
         card.style.transform = 'translateY(20px)';
-        
+
         setTimeout(() => {
             card.style.transition = 'all 0.6s ease';
             card.style.opacity = '1';
@@ -2179,7 +2179,7 @@ style.textContent = `
         0%, 100% { opacity: 1; transform: scale(1); }
         50% { opacity: 0.8; transform: scale(1.05); }
     }
-    
+
     .stats-card:hover .metric-value {
         animation: pulse 1s infinite;
     }
@@ -2191,10 +2191,10 @@ let countdown = 300; // 5 minutos
 const updateCountdown = () => {
     const minutes = Math.floor(countdown / 60);
     const seconds = countdown % 60;
-    
+
     // Actualizar título de página
     document.title = `BI Dashboard (${minutes}:${seconds.toString().padStart(2, '0')}) - {{ empresa.nombre_taller|safe }}`;
-    
+
     countdown--;
     if (countdown < 0) {
         location.reload();

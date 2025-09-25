@@ -2,6 +2,7 @@
 """
 Diagnóstico completo del sistema de notificaciones
 """
+
 import os
 
 import django

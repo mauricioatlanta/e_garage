@@ -157,9 +157,7 @@ class AIInsightView(View):
         from django.utils import timezone
 
         fecha_inicio = timezone.now() - timedelta(days=timeframe)
-        documentos = engine.empresa.documento_set.filter(
-            created_at__gte=fecha_inicio
-        )
+        documentos = engine.empresa.documento_set.filter(created_at__gte=fecha_inicio)
 
         insights = []
 

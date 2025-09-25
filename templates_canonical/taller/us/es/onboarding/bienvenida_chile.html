@@ -145,53 +145,53 @@
   </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-[#0d0d0d]">
-  
+
   <!-- 🌟 Cabecera de Navegación con Login/Registro -->
   <header class="relative z-50 bg-gradient-to-r from-black/80 via-gray-900/80 to-black/80 backdrop-blur-md border-b border-cyan-400/30">
     <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center py-4">
-        
+
         <!-- Logo -->
         <div class="flex items-center space-x-3">
           <img src="{% static 'img/logo.png' %}" alt="eGarage" class="w-8 h-8 animate-pulse" style="filter: drop-shadow(0 0 8px #00ffff88);">
           <span class="text-xl font-bold text-cyan-400 font-mono">eGarage</span>
           <span class="px-2 py-1 text-xs bg-cyan-400/20 text-cyan-300 rounded-full border border-cyan-400/30">🇨🇱 Chile</span>
         </div>
-        
+
         <!-- Menú de Navegación -->
         <div class="hidden md:flex items-center space-x-8">
           <a href="#features" class="text-gray-300 hover:text-cyan-400 transition-colors duration-300 font-medium">Funciones</a>
           <a href="#plans" class="text-gray-300 hover:text-cyan-400 transition-colors duration-300 font-medium">Precios</a>
           <a href="#about" class="text-gray-300 hover:text-cyan-400 transition-colors duration-300 font-medium">Acerca de</a>
         </div>
-        
+
         <!-- Botones de Autenticación -->
         <div class="flex items-center space-x-4">
-          
+
           <!-- Botón de Login -->
           {% load country_url %}
           <a href="{% country_url 'account_login' %}" class="inline-flex items-center px-4 py-2 text-sm font-medium text-cyan-400 bg-transparent border border-cyan-400/50 rounded-lg hover:bg-cyan-400/10 hover:border-cyan-400 transition-all duration-300 group">
             <i class="fas fa-sign-in-alt mr-2 group-hover:scale-110 transition-transform"></i>
             Ingresar
           </a>
-          
+
           <!-- Botón de Registro -->
           <a href="/registro/" class="inline-flex items-center px-4 py-2 text-sm font-medium text-black bg-gradient-to-r from-cyan-400 to-blue-500 rounded-lg hover:from-cyan-300 hover:to-blue-400 hover:scale-105 transition-all duration-300 shadow-lg group">
             <i class="fas fa-user-plus mr-2 group-hover:scale-110 transition-transform"></i>
             Registrarse
           </a>
-          
+
         </div>
-        
+
         <!-- Menú Móvil Toggle -->
         <div class="md:hidden">
           <button id="mobile-menu-toggle" class="text-gray-300 hover:text-cyan-400 focus:outline-none">
             <i class="fas fa-bars text-xl"></i>
           </button>
         </div>
-        
+
       </div>
-      
+
       <!-- Menú Móvil Desplegable -->
       <div id="mobile-menu" class="md:hidden hidden border-t border-cyan-400/30 py-4">
         <div class="flex flex-col space-y-4">
@@ -208,7 +208,7 @@
           </div>
         </div>
       </div>
-      
+
     </nav>
   </header>
 
@@ -514,11 +514,11 @@
         document.addEventListener('DOMContentLoaded', function() {
             const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
             const mobileMenu = document.getElementById('mobile-menu');
-            
+
             if (mobileMenuToggle && mobileMenu) {
                 mobileMenuToggle.addEventListener('click', function() {
                     mobileMenu.classList.toggle('hidden');
-                    
+
                     // Cambiar icono del botón
                     const icon = mobileMenuToggle.querySelector('i');
                     if (mobileMenu.classList.contains('hidden')) {
@@ -528,7 +528,7 @@
                     }
                 });
             }
-            
+
             // Cerrar menú al hacer clic en enlaces
             const mobileMenuLinks = mobileMenu.querySelectorAll('a');
             mobileMenuLinks.forEach(link => {

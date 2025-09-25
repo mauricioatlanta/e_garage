@@ -3,6 +3,7 @@
 Script de validaciones de consistencia de datos entre países
 Paso 2 del plan de completitud al 100%
 """
+
 import os
 
 import django

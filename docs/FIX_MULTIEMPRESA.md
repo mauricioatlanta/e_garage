@@ -11,7 +11,7 @@ Los clientes y vehículos de diferentes talleres/empresas se estaban mezclando e
 - ❌ Violación de seguridad: Usuario de "Taller A" podía ver clientes de "Taller B"
 
 ### Estructura de Datos Verificada:
-- ✅ **3 empresas** en el sistema: "Administración E-Garage", "Taller AutoFix", "Mecánica Express"  
+- ✅ **3 empresas** en el sistema: "Administración E-Garage", "Taller AutoFix", "Mecánica Express"
 - ✅ **10 clientes** distribuidos: 2+5+3 por empresa
 - ✅ **7 vehículos** distribuidos: 0+4+3 por empresa
 - ✅ Todos los registros tienen empresa asignada
@@ -23,7 +23,7 @@ Los clientes y vehículos de diferentes talleres/empresas se estaban mezclando e
 def get_queryset(self):
     if not self.request.user.is_authenticated:
         return Cliente.objects.none()
-        
+
     try:
         empresa = self.request.user.empresa_usuario
     except AttributeError:
@@ -31,7 +31,7 @@ def get_queryset(self):
             usuario=self.request.user,
             defaults={'nombre_taller': f'Taller de {self.request.user.username}'}
         )
-    
+
     qs = Cliente.objects.filter(empresa=empresa)  # 🔒 FILTRO CLAVE
 ```
 
@@ -40,7 +40,7 @@ def get_queryset(self):
 def get_queryset(self):
     # Filtrar vehículos por empresa
     qs = Vehiculo.objects.filter(empresa=empresa)
-    
+
     # Verificar que el cliente pertenece a la empresa
     if cliente_id:
         try:
@@ -61,7 +61,7 @@ def get_queryset(self):
 ```
 📊 DISTRIBUCIÓN DE CLIENTES:
    🏢 Administración E-Garage: 2 clientes
-   🏢 Taller AutoFix: 5 clientes  
+   🏢 Taller AutoFix: 5 clientes
    🏢 Mecánica Express: 3 clientes
 
 🚗 DISTRIBUCIÓN DE VEHÍCULOS:

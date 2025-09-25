@@ -140,13 +140,13 @@
             <div class="stat-value">{{ repuestos.count }}</div>
             <div class="stat-label">Total Repuestos</div>
         </div>
-        
+
         <div class="stat-card">
             <div class="stat-icon">🔢</div>
             <div class="stat-value">{{ total_repuestos.cantidad_total|default:0 }}</div>
             <div class="stat-label">Cantidad Vendida</div>
         </div>
-        
+
         <div class="stat-card">
             <div class="stat-icon">💰</div>
             <div class="stat-value">${{ total_repuestos.valor_total|floatformat:0|default:0 }}</div>
@@ -176,7 +176,7 @@
     <!-- Tabla Detallada -->
     <div style="background: rgba(10, 10, 15, 0.9); border: 1px solid var(--cyber-blue); border-radius: 15px; padding: 2rem;">
         <h3 style="color: var(--cyber-blue); margin-bottom: 1.5rem;">📋 Detalle de Repuestos</h3>
-        
+
         {% if repuestos %}
         <table class="cyber-table">
             <thead>

@@ -1,3 +1,4 @@
+{% load country_url %}
 {% extends "base.html" %}
 {% load static i18n widget_tweaks %}
 
@@ -41,7 +42,7 @@
         <button type="submit" class="px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-700 text-white shadow">
           {% if form.instance.pk %}Guardar cambios{% else %}Crear repuesto{% endif %}
         </button>
-        <a href="{% url 'taller:repuestos:lista_repuestos' %}"
+        <a href="{% country_url 'repuestos:lista_repuestos' %}"
            class="inline-flex items-center px-4 py-2 border border-cyan-400/60 rounded-lg text-white bg-black/60 hover:bg-cyan-900/30">
           ← Volver a la lista
         </a>

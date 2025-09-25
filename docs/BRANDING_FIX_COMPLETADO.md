@@ -34,7 +34,7 @@ def company_context(request):
 ### ✅ Tarea 3 — Templates actualizados
 **Archivos modificados**:
 - `templates/base.html` ← Template principal
-- `templates_canonical/base.html` ← Template moderno  
+- `templates_canonical/base.html` ← Template moderno
 - `templates/taller/layout/base_dashboard.html` ← Dashboard
 
 **Cambios implementados**:
@@ -114,7 +114,7 @@ python manage.py runserver
 5. Navegar a dashboard, clientes, documentos
 6. **Verificar**: Header muestra nuevo nombre y logo ✅
 
-### 3. Probar en USA  
+### 3. Probar en USA
 1. Login con `testuser_us`
 2. Ir a `/us/taller/settings/`
 3. Cambiar **Company Name** y subir **Company Logo**
@@ -126,7 +126,7 @@ python manage.py runserver
 
 ## 🎯 RESULTADO ESPERADO
 
-**ANTES**: 
+**ANTES**:
 - Cambiar nombre/logo en Settings → No se reflejaba en otras páginas
 - Headers mostraban "eGarage" hardcodeado
 - Logos estáticos desde `/static/`
@@ -160,7 +160,7 @@ python manage.py runserver
 ## ✨ BENEFICIOS IMPLEMENTADOS
 
 1. **🔄 Actualización inmediata**: Cambios en Settings se reflejan al instante
-2. **🌍 Multi-país**: Funciona en Chile y USA sin duplicar código  
+2. **🌍 Multi-país**: Funciona en Chile y USA sin duplicar código
 3. **⚡ Performance**: Cache inteligente con invalidación automática
 4. **🎨 Branding dinámico**: Logo y nombre personalizables por empresa
 5. **🔧 Mantenible**: Código limpio, señales automáticas, origen de verdad único

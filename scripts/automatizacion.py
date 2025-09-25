@@ -2,12 +2,14 @@
 """
 Script de automatización para tareas de mantenimiento
 """
+
 import os
 import time
 from datetime import datetime
 
-import django
 import schedule
+
+import django
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings_sqlite")
 django.setup()

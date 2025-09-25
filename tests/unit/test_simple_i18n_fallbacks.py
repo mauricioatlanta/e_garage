@@ -1,5 +1,6 @@
 import pytest
-from django.template import Template, Context
+
+from django.template import Context, Template
 from django.test import RequestFactory
 
 
@@ -11,7 +12,7 @@ def test_simple_i18n_fallbacks_feos():
     Covers taller/templatetags/simple_i18n.py
     """
     rf = RequestFactory()
-    
+
     # Test with various "ugly" inputs
     test_cases = [
         # (input_value, expected_behavior)
@@ -22,7 +23,7 @@ def test_simple_i18n_fallbacks_feos():
         ("en-US", "should work normally"),
         ("es-CL", "should work normally"),
     ]
-    
+
     # Test context with various values
     ctx = {
         "val_none": None,
@@ -31,7 +32,7 @@ def test_simple_i18n_fallbacks_feos():
         "val_normal": "en-US",
         "val_spanish": "es-CL",
     }
-    
+
     # Try to load and use simple_i18n filters
     template_candidates = [
         # Common simple_i18n filter patterns
@@ -44,7 +45,7 @@ def test_simple_i18n_fallbacks_feos():
         "{% load simple_i18n %}{{ val_normal|i18n }}",
         "{% load simple_i18n %}{{ val_normal|localize }}",
     ]
-    
+
     rendered_ok = False
     for template_src in template_candidates:
         try:
@@ -58,7 +59,7 @@ def test_simple_i18n_fallbacks_feos():
                 continue
             # If it's a different error, that's ok too - we're testing robustness
             continue
-    
+
     if not rendered_ok:
         pytest.skip("simple_i18n filters not available or not working")
 
@@ -70,19 +71,19 @@ def test_simple_i18n_with_request_context():
     """
     rf = RequestFactory()
     request = rf.get("/?lang=es")
-    
+
     ctx = {
         "request": request,
         "text": "Hello World",
         "locale": "es-CL",
     }
-    
+
     template_candidates = [
         "{% load simple_i18n %}{{ text|translate }}",
         "{% load simple_i18n %}{{ locale|translate }}",
         "{% load simple_i18n %}{{ request|translate }}",
     ]
-    
+
     for template_src in template_candidates:
         try:
             result = Template(template_src).render(Context(ctx))

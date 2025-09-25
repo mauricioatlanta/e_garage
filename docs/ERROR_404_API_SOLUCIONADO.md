@@ -8,7 +8,7 @@ Se ha corregido el error 404 que ocurría al intentar cargar vehículos por clie
 
 **Error reportado:**
 ```
-:8000/us/documentos/us/api/vehiculos-cliente/?cliente_id=27:1 
+:8000/us/documentos/us/api/vehiculos-cliente/?cliente_id=27:1
 Failed to load resource: the server responded with a status of 404 (Not Found)
 ```
 

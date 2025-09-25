@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load country_url %}
 {% load i18n static %}
 
 {% block content %}
@@ -36,7 +37,7 @@
           </div>
           <div class="relative group">
             <div class="absolute -inset-1 rounded-lg bg-gradient-to-r from-emerald-500 via-lime-500 to-green-500 opacity-30 blur group-hover:opacity-50 transition-opacity"></div>
-            <a href="{% url 'taller:repuestos:crear_repuesto' %}"
+            <a href="{% country_url 'repuestos:crear_repuesto' %}"
                class="relative inline-flex items-center space-x-2 px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-600 via-lime-600 to-green-600 hover:from-emerald-500 hover:via-lime-500 hover:to-green-500 text-white font-bold text-sm shadow-lg shadow-emerald-800/40 transition-all duration-300 border border-emerald-400/40">
               <div class="w-4 h-4 rounded-md bg-white/20 flex items-center justify-center">
                 <span class="text-sm">➕</span>

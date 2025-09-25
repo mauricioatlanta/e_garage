@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """Script simple para cambiar contraseña"""
+
 import os
 import sys
 

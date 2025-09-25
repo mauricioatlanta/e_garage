@@ -1,0 +1,764 @@
+{% load i18n static %}
+{% load country_url %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% trans "Welcome to eGarage USA" %}</title>
+
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="{% trans 'Auto shop platform: work orders, inventory, client portal, analytics in the USA.' %}">
+  <link rel="canonical" href="{{ request.build_absolute_uri }}">
+
+  <!-- Open Graph Meta Tags -->
+  <meta property="og:title" content="{% trans 'eGarage USA — Auto Shop Platform' %}">
+  <meta property="og:description" content="{% trans 'Work smarter with digital documents, reminders and analytics.' %}">
+  <meta property="og:image" content="{% static 'img/og-us.png' %}">
+  <meta property="og:url" content="{{ request.build_absolute_uri }}">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="eGarage">
+
+  <!-- Twitter Card Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{% trans 'eGarage USA — Auto Shop Platform' %}">
+  <meta name="twitter:description" content="{% trans 'Work smarter with digital documents, reminders and analytics.' %}">
+  <meta name="twitter:image" content="{% static 'img/og-us.png' %}">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
+  <script src="https://cdn.lordicon.com/lordicon.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.net.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.globe.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.dots.min.js" defer></script>
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js" defer></script>
+  <style>
+    /* Definir animate-spin-slow para Tailwind CDN */
+    @keyframes spin {
+      to { transform: rotate(360deg) }
+    }
+    .animate-spin-slow {
+      animation: spin 6s linear infinite;
+    }
+
+    /* Respeta reduce-motion para accesibilidad */
+    @media (prefers-reduced-motion: reduce) {
+      .animate-spin-slow {
+        animation: none !important;
+      }
+    }
+
+    body {
+      background: #0a0a0a !important;
+      font-family: 'Exo 2', sans-serif;
+      color: #ffffff;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+     /* Tipografías especializadas */
+     .font-futuristic {
+       font-family: 'Orbitron', monospace;
+       letter-spacing: 0.05em;
+     }
+
+     .font-tech {
+       font-family: 'JetBrains Mono', monospace;
+       letter-spacing: 0.02em;
+     }
+
+     .font-display {
+       font-family: 'Exo 2', sans-serif;
+       font-weight: 300;
+       letter-spacing: 0.03em;
+     }
+
+     .font-bold-tech {
+       font-family: 'Exo 2', sans-serif;
+       font-weight: 700;
+       letter-spacing: 0.02em;
+     }
+
+    .futuristic-glow {
+      text-shadow: 0 0 30px rgba(34, 211, 238, 0.8);
+    }
+
+    .glass-card, .glass {
+      background: linear-gradient(135deg, rgba(34, 211, 238, 0.1) 0%, rgba(96, 165, 250, 0.05) 100%);
+      backdrop-filter: blur(25px);
+      border-radius: 1.5rem;
+      border: 1px solid rgba(34, 211, 238, 0.3);
+      transition: all 0.4s ease;
+      box-shadow:
+        0 8px 32px rgba(34, 211, 238, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .glass-card::before, .glass::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(34, 211, 238, 0.1), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .glass-card:hover::before, .glass:hover::before {
+      left: 100%;
+    }
+
+    .glass-card:hover, .glass:hover {
+      border-color: rgba(34, 211, 238, 0.8);
+      transform: translateY(-6px) scale(1.02);
+      box-shadow:
+        0 25px 50px rgba(34, 211, 238, 0.3),
+        0 0 0 1px rgba(34, 211, 238, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    /* Tarjetas especiales con efectos neón */
+    .neon-card {
+      background: linear-gradient(135deg, rgba(34, 211, 238, 0.15) 0%, rgba(96, 165, 250, 0.08) 50%, rgba(167, 139, 250, 0.05) 100%);
+      backdrop-filter: blur(30px);
+      border-radius: 1.5rem;
+      border: 2px solid rgba(34, 211, 238, 0.4);
+      transition: all 0.5s ease;
+      box-shadow:
+        0 10px 40px rgba(34, 211, 238, 0.2),
+        0 0 20px rgba(34, 211, 238, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .neon-card::after {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, #22d3ee, #60a5fa, #a78bfa, #22d3ee);
+      border-radius: 1.5rem;
+      z-index: -1;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .neon-card:hover::after {
+      opacity: 0.3;
+    }
+
+    .neon-card:hover {
+      border-color: rgba(34, 211, 238, 0.9);
+      transform: translateY(-8px) scale(1.03);
+      box-shadow:
+        0 30px 60px rgba(34, 211, 238, 0.4),
+        0 0 30px rgba(34, 211, 238, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+
+    /* Tarjetas de métricas con efecto de pulso */
+    .metric-card {
+      background: linear-gradient(135deg, rgba(34, 211, 238, 0.12) 0%, rgba(96, 165, 250, 0.06) 100%);
+      backdrop-filter: blur(25px);
+      border-radius: 1.5rem;
+      border: 1px solid rgba(34, 211, 238, 0.3);
+      transition: all 0.4s ease;
+      box-shadow:
+        0 8px 32px rgba(34, 211, 238, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .metric-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at 50% 50%, rgba(34, 211, 238, 0.1) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .metric-card:hover::before {
+      opacity: 1;
+    }
+
+    .metric-card:hover {
+      border-color: rgba(34, 211, 238, 0.7);
+      transform: translateY(-4px);
+      box-shadow:
+        0 20px 40px rgba(34, 211, 238, 0.25),
+        0 0 0 1px rgba(34, 211, 238, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    .sticky-cta {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    @media (max-width: 640px) {
+      .sticky-cta {
+        right: 0.5rem;
+        left: 0.5rem;
+        bottom: 0.5rem;
+        justify-content: center;
+      }
+    }
+
+    .icon-float {
+      transition: transform 0.3s ease;
+      color: #22d3ee;
+      filter: drop-shadow(0 0 10px rgba(34, 211, 238, 0.5));
+    }
+
+    .icon-float:hover {
+      transform: scale(1.2);
+      color: #60a5fa;
+      filter: drop-shadow(0 0 20px rgba(34, 211, 238, 0.8));
+    }
+
+    /* Grid animada de fondo más visible */
+    .grid-bg {
+      background-image:
+        linear-gradient(rgba(34, 211, 238, 0.15) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(34, 211, 238, 0.15) 1px, transparent 1px);
+      background-size: 40px 40px;
+      animation: grid-move 20s linear infinite;
+    }
+
+    @keyframes grid-move {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(40px, 40px); }
+    }
+
+    /* Líneas de energía */
+    .energy-lines {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: -1;
+    }
+
+    .energy-line {
+      position: absolute;
+      width: 2px;
+      height: 100px;
+      background: linear-gradient(to bottom, transparent, #22d3ee, transparent);
+      animation: energy-flow 3s linear infinite;
+    }
+
+    @keyframes energy-flow {
+      0% { transform: translateY(-100px); opacity: 0; }
+      50% { opacity: 1; }
+      100% { transform: translateY(100vh); opacity: 0; }
+    }
+
+    /* Partículas flotantes */
+    .particles {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: -1;
+    }
+
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: #22d3ee;
+      border-radius: 50%;
+      animation: particle-float 6s linear infinite;
+    }
+
+    @keyframes particle-float {
+      0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+    }
+
+    /* Efecto de escaneo */
+    .scan-line {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(to right, transparent, #22d3ee, transparent);
+      animation: scan 4s linear infinite;
+      z-index: 1;
+    }
+
+    @keyframes scan {
+      0% { transform: translateY(-100vh); }
+      100% { transform: translateY(100vh); }
+    }
+
+    /* Botones con efecto neón */
+    .neon-button {
+      background: linear-gradient(45deg, #22d3ee, #60a5fa);
+      border: 2px solid #22d3ee;
+      box-shadow: 0 0 20px rgba(34, 211, 238, 0.5);
+      transition: all 0.3s ease;
+    }
+
+    .neon-button:hover {
+      box-shadow: 0 0 30px rgba(34, 211, 238, 0.8);
+      transform: translateY(-2px);
+    }
+
+    /* Títulos con efecto holográfico */
+    .holographic-text {
+      background: linear-gradient(45deg, #22d3ee, #60a5fa, #a78bfa, #22d3ee);
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: holographic 3s ease-in-out infinite;
+    }
+
+    @keyframes holographic {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+  <!-- Header con Login/Registro -->
+  <header class="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-sm border-b border-cyan-400/30">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <!-- Logo -->
+      <div class="flex items-center gap-3">
+        <img src="{% static 'img/logo.png' %}" alt="eGarage" class="w-8 h-8" style="filter: drop-shadow(0 0 10px rgba(34, 211, 238, 0.8));">
+        <span class="text-cyan-400 font-futuristic font-bold text-lg">eGarage</span>
+      </div>
+
+      <!-- Navegación -->
+      <nav class="hidden md:flex items-center gap-6">
+        <a href="#pricing" class="text-cyan-300 hover:text-cyan-400 transition-colors font-tech" aria-label="{% trans 'View pricing plans' %}">{% trans "Pricing" %}</a>
+        <a href="#virtues" class="text-cyan-300 hover:text-cyan-400 transition-colors font-tech" aria-label="{% trans 'View features' %}">{% trans "Features" %}</a>
+      </nav>
+
+      <!-- Botones de Acción -->
+      <div class="flex items-center gap-3">
+        <a href="{% country_url 'account_login' %}" class="px-4 py-2 text-cyan-400 hover:text-cyan-300 transition-colors font-tech" aria-label="{% trans 'Login to your account' %}">{% trans "Login" %}</a>
+        <a href="{% country_url 'registro' %}" class="px-4 py-2 neon-button text-black font-futuristic font-bold rounded-full text-sm" aria-label="{% trans 'Start free trial' %}">🚀 {% trans "Start Free" %}</a>
+
+        <!-- Language Selector -->
+        <div class="ml-3">
+          <form action="{% url 'set_language' %}" method="post" class="inline">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <select name="language" onchange="this.form.submit()" class="bg-transparent text-cyan-400 text-sm font-medium border-none outline-none cursor-pointer">
+              <option value="en" {% if request.LANGUAGE_CODE == 'en' %}selected{% endif %}>🇺🇸</option>
+              <option value="es" {% if request.LANGUAGE_CODE == 'es' %}selected{% endif %}>🇪🇸</option>
+            </select>
+          </form>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Fondos animados múltiples -->
+  <div id="vanta-globe" class="fixed inset-0 -z-10"></div>
+  <div id="vanta-dots" class="fixed inset-0 -z-20"></div>
+  <div class="grid-bg fixed inset-0 -z-30"></div>
+
+  <!-- Líneas de energía -->
+  <div class="energy-lines">
+    <div class="energy-line" style="left: 10%; animation-delay: 0s;"></div>
+    <div class="energy-line" style="left: 30%; animation-delay: 1s;"></div>
+    <div class="energy-line" style="left: 50%; animation-delay: 2s;"></div>
+    <div class="energy-line" style="left: 70%; animation-delay: 0.5s;"></div>
+    <div class="energy-line" style="left: 90%; animation-delay: 1.5s;"></div>
+  </div>
+
+  <!-- Partículas flotantes -->
+  <div class="particles">
+    <div class="particle" style="left: 5%; animation-delay: 0s;"></div>
+    <div class="particle" style="left: 15%; animation-delay: 1s;"></div>
+    <div class="particle" style="left: 25%; animation-delay: 2s;"></div>
+    <div class="particle" style="left: 35%; animation-delay: 3s;"></div>
+    <div class="particle" style="left: 45%; animation-delay: 4s;"></div>
+    <div class="particle" style="left: 55%; animation-delay: 5s;"></div>
+    <div class="particle" style="left: 65%; animation-delay: 0.5s;"></div>
+    <div class="particle" style="left: 75%; animation-delay: 1.5s;"></div>
+    <div class="particle" style="left: 85%; animation-delay: 2.5s;"></div>
+    <div class="particle" style="left: 95%; animation-delay: 3.5s;"></div>
+  </div>
+
+  <!-- Línea de escaneo -->
+  <div class="scan-line"></div>
+
+  <main class="relative z-10">
+    <!-- Hero Section -->
+    <section class="text-center py-24 px-6 relative pt-32" data-aos="fade-up">
+      <img src="{% static 'img/logo.png' %}" alt="eGarage Logo" class="mx-auto mb-8 w-32 md:w-40 animate-spin-slow" style="filter: drop-shadow(0 0 30px rgba(34, 211, 238, 0.9));">
+
+             <h1 class="text-3xl md:text-6xl font-futuristic font-extrabold tracking-tight
+                  holographic-text mb-6">
+         {% trans "The #1 Auto Shop Platform in the USA" %}
+       </h1>
+
+             <p class="text-xl text-cyan-300 mb-8 font-tech font-medium">{% trans "Trusted by mechanics across America. Real features. Bilingual support. No risk." %}</p>
+
+             <div class="mt-10 flex flex-col md:flex-row gap-4 justify-center">
+         <a href="{% country_url 'registro' %}" class="px-10 py-4 neon-button text-black font-futuristic font-bold rounded-full text-xl" aria-label="{% trans 'Start your free trial' %}">🚀 {% trans "Start Free Trial" %}</a>
+         <a href="{% country_url 'account_login' %}" class="px-10 py-4 bg-black/60 backdrop-blur border border-cyan-400/50 text-cyan-400 font-futuristic font-bold rounded-full text-xl hover:bg-black/80 transition-all" aria-label="{% trans 'Login to your account' %}">🔑 {% trans "Login" %}</a>
+         <a href="#pricing" class="px-10 py-4 bg-black/60 backdrop-blur border border-cyan-400/50 text-cyan-400 font-futuristic font-bold rounded-full text-xl hover:bg-black/80 transition-all" aria-label="{% trans 'View pricing plans' %}">💰 {% trans "See Pricing" %}</a>
+       </div>
+    </section>
+
+         <!-- Botón sticky CTA flotante -->
+     <div class="sticky-cta">
+       <a href="#cta" class="neon-button text-black px-6 py-3 rounded-full text-lg font-futuristic font-bold" aria-label="{% trans 'Start your free trial now' %}">🚀 {% trans "Start Now" %}</a>
+     </div>
+
+    <!-- Sección de Rubros -->
+    <section class="mx-auto max-w-6xl px-4 py-16">
+             <h2 class="text-2xl md:text-4xl font-futuristic font-bold text-cyan-400 mb-8 text-center holographic-text">
+         Sectors We Empower
+       </h2>
+      <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+                 <!-- Taller Mecánico -->
+         <article class="neon-card p-6" data-aos="fade-up">
+           <div class="text-4xl mb-4">🔧</div>
+           <h3 class="text-lg font-bold-tech text-white mb-3">Auto Repair Shop</h3>
+           <p class="text-sm font-tech text-cyan-200">
+             Work orders, reception checklists, technician times and performance tracking.
+           </p>
+         </article>
+         <!-- Vulcanización / Neumáticos -->
+         <article class="neon-card p-6" data-aos="fade-up" data-aos-delay="100">
+           <div class="text-4xl mb-4">🛞</div>
+           <h3 class="text-lg font-bold-tech text-white mb-3">Tire & Vulcanization</h3>
+           <p class="text-sm font-tech text-cyan-200">
+             Rotation, balancing, tire set history, stock alerts and quick quotes.
+           </p>
+         </article>
+         <!-- Pintura y Hojalatería -->
+         <article class="neon-card p-6" data-aos="fade-up" data-aos-delay="200">
+           <div class="text-4xl mb-4">🎨</div>
+           <h3 class="text-lg font-bold-tech text-white mb-3">Paint & Body Shop</h3>
+           <p class="text-sm font-tech text-cyan-200">
+             Process stages, materials per job, before/after photos and estimates.
+           </p>
+         </article>
+         <!-- Casa de Repuestos -->
+         <article class="neon-card p-6" data-aos="fade-up" data-aos-delay="300">
+           <div class="text-4xl mb-4">🧩</div>
+           <h3 class="text-lg font-bold-tech text-white mb-3">Parts Store</h3>
+           <p class="text-sm font-tech text-cyan-200">
+             Catalog, part numbers, margins, sales and digital document integration.
+           </p>
+         </article>
+      </div>
+    </section>
+
+    <!-- Virtudes agrupadas -->
+    <section class="max-w-5xl mx-auto py-20 px-4 grid md:grid-cols-3 gap-12" id="virtues">
+             <!-- Gestión -->
+       <div data-aos="fade-right">
+         <h2 class="text-4xl font-futuristic font-bold text-cyan-400 mb-6 holographic-text">{% trans "Management" %}</h2>
+        <div class="glass-card p-6 mb-6 flex flex-col items-center">
+          <i class="fas fa-shield-alt text-5xl mb-4 icon-float"></i>
+                     <h3 class="text-2xl font-bold-tech mb-2 text-white">{% trans "Warranty Control" %}</h3>
+           <p class="text-lg font-tech text-cyan-200">{% trans "Track guarantees by time or mileage with alerts and digital records." %}</p>
+        </div>
+        <div class="glass-card p-6 flex flex-col items-center">
+          <i class="fas fa-chart-line text-5xl mb-4 icon-float"></i>
+                     <h3 class="text-2xl font-bold-tech mb-2 text-white">{% trans "Profit Reports" %}</h3>
+           <p class="text-lg font-tech text-cyan-200">{% trans "Know your earnings from services, parts, or both — in real time." %}</p>
+        </div>
+      </div>
+             <!-- Automatización -->
+       <div data-aos="fade-up">
+         <h2 class="text-4xl font-futuristic font-bold text-cyan-400 mb-6 holographic-text">{% trans "Automation" %}</h2>
+        <div class="glass-card p-6 mb-6 flex flex-col items-center">
+          <i class="fas fa-user-cog text-5xl mb-4 icon-float"></i>
+                     <h3 class="text-2xl font-bold-tech mb-2 text-white">{% trans "Mechanic Performance" %}</h3>
+           <p class="text-lg font-tech text-cyan-200">{% trans "Measure performance, job times and track top performers." %}</p>
+        </div>
+        <div class="glass-card p-6 flex flex-col items-center">
+          <i class="fas fa-boxes text-5xl mb-4 icon-float"></i>
+                     <h3 class="text-2xl font-bold-tech mb-2 text-white">{% trans "Inventory Alerts" %}</h3>
+           <p class="text-lg font-tech text-cyan-200">{% trans "Get notified when stock is low or inactive." %}</p>
+        </div>
+      </div>
+             <!-- Cliente -->
+       <div data-aos="fade-left">
+         <h2 class="text-4xl font-futuristic font-bold text-cyan-400 mb-6 holographic-text">{% trans "Client" %}</h2>
+        <div class="glass-card p-6 mb-6 flex flex-col items-center">
+          <i class="fas fa-file-signature text-5xl mb-4 icon-float"></i>
+                     <h3 class="text-2xl font-bold-tech mb-2 text-white">{% trans "Digital Documents" %}</h3>
+           <p class="text-lg font-tech text-cyan-200">{% trans "Paperless work orders, check-ins, diagnostics and receipts." %}</p>
+        </div>
+        <div class="glass-card p-6 flex flex-col items-center">
+          <i class="fas fa-users text-5xl mb-4 icon-float"></i>
+                     <h3 class="text-2xl font-bold-tech mb-2 text-white">{% trans "Customer Portal" %}</h3>
+           <p class="text-lg font-tech text-cyan-200">{% trans "Clients can view invoices, service history and updates online." %}</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Layout tipo revista scroll alterno -->
+    <section class="max-w-6xl mx-auto py-20 px-4 flex flex-col gap-24">
+      <div class="flex flex-col md:flex-row items-center gap-12" data-aos="fade-right">
+        <div class="flex-1">
+                     <h2 class="text-4xl font-futuristic font-bold text-cyan-400 mb-4 holographic-text">{% trans "All-in-one Dashboard" %}</h2>
+           <p class="text-lg font-tech text-cyan-200">{% trans "Everything you need in one place: jobs, inventory, clients, and more." %}</p>
+        </div>
+        <div class="flex-1 flex justify-center">
+          <i class="fas fa-tachometer-alt text-7xl text-cyan-400 icon-float"></i>
+        </div>
+      </div>
+      <div class="flex flex-col items-center text-center" data-aos="fade-up">
+                 <h2 class="text-4xl font-futuristic font-bold text-cyan-400 mb-4 holographic-text">{% trans "Automated Reminders" %}</h2>
+         <i class="fas fa-bell text-6xl text-cyan-400 mb-4 icon-float"></i>
+         <p class="text-lg font-tech text-cyan-200 max-w-2xl">{% trans "Never miss a service or follow-up. Automated notifications for you and your clients." %}</p>
+      </div>
+      <div class="relative" data-aos="fade-left">
+        <div class="absolute left-0 top-1/2 w-2 h-64 bg-gradient-to-b from-cyan-400 to-blue-500 rounded-full -translate-y-1/2"></div>
+        <div class="ml-12">
+                     <h2 class="text-4xl font-futuristic font-bold text-cyan-400 mb-4 holographic-text">{% trans "Timeline of Success" %}</h2>
+          <ul class="space-y-6">
+            <li class="flex items-center gap-4">
+              <span class="w-8 h-8 rounded-full bg-cyan-400 flex items-center justify-center text-black font-bold">1</span>
+              <span class="text-lg text-cyan-200">{% trans "Register your shop in minutes" %}</span>
+            </li>
+            <li class="flex items-center gap-4">
+              <span class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-black font-bold">2</span>
+              <span class="text-lg text-cyan-200">{% trans "Import your clients and inventory" %}</span>
+            </li>
+            <li class="flex items-center gap-4">
+              <span class="w-8 h-8 rounded-full bg-cyan-400 flex items-center justify-center text-black font-bold">3</span>
+              <span class="text-lg text-cyan-200">{% trans "Start working smarter, not harder!" %}</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="w-full py-16 flex flex-col items-center justify-center glass-card" data-aos="fade-up">
+                 <h2 class="text-4xl font-futuristic font-bold text-cyan-400 mb-4 holographic-text">{% trans "Real-time Analytics" %}</h2>
+         <i class="fas fa-chart-pie text-6xl text-cyan-400 mb-4 icon-float"></i>
+         <p class="text-lg font-tech text-cyan-200 max-w-2xl">{% trans "Visualize your business growth and make data-driven decisions instantly." %}</p>
+      </div>
+    </section>
+
+    <!-- Precios actualizados sin decimales -->
+    <section id="pricing" class="mx-auto max-w-6xl px-4 py-20">
+             <h2 class="text-2xl md:text-4xl font-futuristic font-bold text-cyan-400 text-center mb-10 holographic-text">
+         Simple Plans, No Fine Print
+       </h2>
+
+      <div class="grid gap-6 md:grid-cols-3">
+        <!-- Mensual -->
+        <div class="neon-card p-8" data-aos="fade-up">
+                     <h3 class="text-white text-xl font-bold-tech mb-4">Monthly</h3>
+           <p class="text-4xl font-futuristic font-extrabold text-white mb-2">$20</p>
+           <p class="text-cyan-300 mb-6 font-tech">per month</p>
+          <ul class="space-y-2 text-cyan-200 text-sm mb-8">
+            <li>✓ Unlimited users</li>
+            <li>✓ Digital documents</li>
+            <li>✓ Bilingual support</li>
+          </ul>
+          <a href="{% country_url 'registro' %}" class="inline-flex items-center justify-center w-full rounded-xl neon-button text-black font-semibold py-3" aria-label="{% trans 'Start monthly plan' %}">
+            {% trans "Start" %}
+          </a>
+        </div>
+
+        <!-- Semestral -->
+        <div class="neon-card p-8" data-aos="fade-up" data-aos-delay="100" style="border-color: rgba(34, 211, 238, 0.8); box-shadow: 0 0 40px rgba(34, 211, 238, 0.3);">
+          <div class="inline-block text-xs px-3 py-1 rounded-full bg-cyan-400/30 text-cyan-300 border border-cyan-300/50 mb-4">
+            ⭐ Recommended
+          </div>
+                     <h3 class="text-white text-xl font-bold-tech mb-4">Semi-Annual</h3>
+           <p class="text-4xl font-futuristic font-extrabold text-white mb-2">$110</p>
+           <p class="text-cyan-300 mb-6 font-tech">every 6 months</p>
+          <ul class="space-y-2 text-cyan-200 text-sm mb-8">
+            <li>✓ Everything from Monthly plan</li>
+            <li>✓ Automatic reminders</li>
+            <li>✓ Profit reports</li>
+          </ul>
+          <a href="{% country_url 'registro' %}" class="inline-flex items-center justify-center w-full rounded-xl neon-button text-black font-semibold py-3" aria-label="{% trans 'Choose semi-annual plan' %}">
+            {% trans "Choose Semi-Annual" %}
+          </a>
+        </div>
+
+        <!-- Anual -->
+        <div class="neon-card p-8" data-aos="fade-up" data-aos-delay="200">
+                     <h3 class="text-white text-xl font-bold-tech mb-4">Annual</h3>
+           <p class="text-4xl font-futuristic font-extrabold text-white mb-2">$200</p>
+           <p class="text-cyan-300 mb-6 font-tech">per year</p>
+          <ul class="space-y-2 text-cyan-200 text-sm mb-8">
+            <li>✓ Everything from Semi-Annual plan</li>
+            <li>✓ Volume discounts</li>
+            <li>✓ Priority support</li>
+          </ul>
+          <a href="{% country_url 'registro' %}" class="inline-flex items-center justify-center w-full rounded-xl neon-button text-black font-semibold py-3" aria-label="{% trans 'Choose annual plan' %}">
+            {% trans "Choose Annual" %}
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonios modernos -->
+    <section class="mx-auto max-w-6xl px-4 py-20">
+             <h2 class="text-2xl md:text-4xl font-futuristic font-bold text-cyan-400 text-center mb-10 holographic-text">
+         Real Stories from Real Shops
+       </h2>
+
+      <!-- Métricas arriba -->
+      <div class="grid gap-4 md:grid-cols-3 mb-10">
+        <div class="metric-card p-6 text-center" data-aos="fade-up">
+          <div class="text-3xl font-extrabold text-white mb-2">+38%</div>
+          <div class="text-cyan-200 text-sm">Higher average revenue</div>
+        </div>
+        <div class="metric-card p-6 text-center" data-aos="fade-up" data-aos-delay="100">
+          <div class="text-3xl font-extrabold text-white mb-2">-27%</div>
+          <div class="text-cyan-200 text-sm">Less time in reception</div>
+        </div>
+        <div class="metric-card p-6 text-center" data-aos="fade-up" data-aos-delay="200">
+          <div class="text-3xl font-extrabold text-white mb-2">4.9/5</div>
+          <div class="text-cyan-200 text-sm">Customer satisfaction</div>
+        </div>
+      </div>
+
+      <!-- Cards -->
+      <div class="grid gap-6 md:grid-cols-3">
+        <article class="neon-card p-6" data-aos="fade-up">
+          <div class="flex items-center gap-3 mb-4">
+            <img class="h-10 w-10 rounded-full" src="https://dummyimage.com/80x80/1e293b/ffffff&text=DL" alt="">
+                         <div>
+               <div class="text-white font-bold-tech">Don Luis Auto</div>
+               <div class="text-cyan-300 text-sm font-tech">Atlanta, GA</div>
+             </div>
+          </div>
+          <p class="text-cyan-200">
+            "This software changed how we work; now everything is tracked and we get paid faster."
+          </p>
+        </article>
+        <article class="neon-card p-6" data-aos="fade-up" data-aos-delay="100">
+          <div class="flex items-center gap-3 mb-4">
+            <img class="h-10 w-10 rounded-full" src="https://dummyimage.com/80x80/1e293b/ffffff&text=RP" alt="">
+                         <div>
+               <div class="text-white font-bold-tech">AutoPro</div>
+               <div class="text-cyan-300 text-sm font-tech">Miami, FL</div>
+             </div>
+          </div>
+          <p class="text-cyan-200">
+            "Bilingual support and quick migration. Perfect for growing shops."
+          </p>
+        </article>
+        <article class="neon-card p-6" data-aos="fade-up" data-aos-delay="200">
+          <div class="flex items-center gap-3 mb-4">
+            <img class="h-10 w-10 rounded-full" src="https://dummyimage.com/80x80/1e293b/ffffff&text=SG" alt="">
+                         <div>
+               <div class="text-white font-bold-tech">Speed Garage</div>
+               <div class="text-cyan-300 text-sm font-tech">Dallas, TX</div>
+             </div>
+          </div>
+          <p class="text-cyan-200">
+            "The free trial convinced us. Now everything is digital and customers notice."
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <!-- CTA Final Supernova -->
+    <section id="cta" class="w-full min-h-[60vh] flex flex-col items-center justify-center py-32 relative" data-aos="zoom-in">
+             <h2 class="text-5xl text-cyan-400 font-futuristic font-bold text-center mb-8 holographic-text">
+         {% trans "Ready to upgrade your workshop into a smart force?" %}
+       </h2>
+      <a href="{% country_url 'registro' %}" class="mt-8 px-10 py-4 neon-button text-black text-xl font-bold rounded-2xl" aria-label="{% trans 'Start your free trial today' %}">{% trans "Start Free Today" %}</a>
+    </section>
+
+    <footer class="mt-20 text-center text-cyan-300 text-sm pb-10">
+      <p>&copy; 2025 eGarage USA. {% trans "Built with AI for mechanics" %}</p>
+    </footer>
+  </main>
+
+  <!-- Scripts -->
+  <script defer>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Respeta reduce-motion para accesibilidad
+      const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (!reduce) {
+        // Vanta.js Globe
+        if (typeof VANTA !== 'undefined' && VANTA.GLOBE) {
+          VANTA.GLOBE({
+            el: "#vanta-globe",
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.00,
+            minWidth: 200.00,
+            scale: 1.00,
+            scaleMobile: 1.00,
+            color: 0x22d3ee,
+            color2: 0x60a5fa,
+            backgroundColor: 0x0a0a0a,
+            size: 1.00
+          });
+        }
+
+        // Vanta.js Dots
+        if (typeof VANTA !== 'undefined' && VANTA.DOTS) {
+          VANTA.DOTS({
+            el: "#vanta-dots",
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.00,
+            minWidth: 200.00,
+            scale: 1.00,
+            scaleMobile: 1.00,
+            color: 0x22d3ee,
+            color2: 0x60a5fa,
+            backgroundColor: 0x0a0a0a,
+            size: 3.00,
+            spacing: 35.00,
+            showLines: false
+          });
+        }
+
+        // AOS.js animaciones scroll
+        if (typeof AOS !== 'undefined') {
+          AOS.init({
+            duration: 900,
+            once: true,
+            offset: 80,
+            delay: 100,
+            easing: 'ease-in-out-cubic'
+          });
+        }
+      }
+
+      console.log('Página cargada completamente');
+    });
+  </script>
+</body>
+</html>

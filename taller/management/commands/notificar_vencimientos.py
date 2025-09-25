@@ -171,7 +171,7 @@ Para reactivar tu cuenta:
 No perderás tus datos - están seguros y se reactivarán cuando renueves.
 
 Datos bancarios:
-- Banco Estado  
+- Banco Estado
 - Cuenta: 123-456-789
 - RUT: 12.345.678-9
 - Titular: Atlanta Reciclajes SPA

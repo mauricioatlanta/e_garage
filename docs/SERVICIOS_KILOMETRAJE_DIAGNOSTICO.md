@@ -4,7 +4,7 @@
 
 El usuario reportó que al crear un documento, en la vista de detalle del documento no aparecen:
 - ✅ **Los servicios internos**
-- ✅ **Los otros servicios externos** 
+- ✅ **Los otros servicios externos**
 - ✅ **El kilometraje del vehículo**
 
 ### 📊 **Evidencia del problema:**
@@ -82,7 +82,7 @@ print(f"Kilometraje del vehículo: {getattr(doc.vehiculo, 'millas', 'No especifi
    - `otros_servicios_data` → JSON de servicios externos
 3. **Backend**: `procesar_documento_moderno_wrapper` recibe POST data
 4. **Backend**: Parsea JSON de servicios y otros servicios
-5. **Backend**: Crea `LineaServicio` y `LineaOtroServicio` 
+5. **Backend**: Crea `LineaServicio` y `LineaOtroServicio`
 6. **Backend**: Actualiza kilometraje del vehículo
 
 ### **Visualización de Documento:**
@@ -104,7 +104,7 @@ print(f"Kilometraje del vehículo: {getattr(doc.vehiculo, 'millas', 'No especifi
 ### **1. Logs en Consola del Servidor**
 Al crear documento, revisar logs de debug que muestran:
 - Cantidad de servicios recibidos
-- Servicios siendo procesados 
+- Servicios siendo procesados
 - IDs de líneas creadas
 
 ### **2. Script de Verificación**
@@ -161,7 +161,7 @@ Si el problema persiste, verificar:
 
 Después de estas correcciones:
 - ✅ **Kilometraje**: Se actualiza en el vehículo y aparece en detalle
-- ✅ **Servicios**: Se crean correctamente y aparecen en lista  
+- ✅ **Servicios**: Se crean correctamente y aparecen en lista
 - ✅ **Otros servicios**: Se crean correctamente y aparecen en lista
 - ✅ **Debug**: Logs permiten diagnosticar problemas futuros
 

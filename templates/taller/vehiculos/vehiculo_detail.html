@@ -1,3 +1,4 @@
+{% load country_url %}
 {% extends 'base.html' %}
 {% load static %}
 
@@ -44,25 +45,25 @@
             <h3 class="text-2xl font-bold text-cyan-300 border-b border-cyan-400/30 pb-2">
               Especificaciones Técnicas
             </h3>
-            
+
             <div class="grid grid-cols-2 gap-4">
               <div class="bg-black/30 rounded-xl p-4 border border-cyan-400/20">
                 <div class="text-cyan-400 text-sm font-semibold uppercase tracking-wider">VIN</div>
                 <div class="text-white font-mono text-lg">{{ object.vin|default:"No especificado" }}</div>
               </div>
-              
+
               <div class="bg-black/30 rounded-xl p-4 border border-cyan-400/20">
                 <div class="text-cyan-400 text-sm font-semibold uppercase tracking-wider">Color</div>
                 <div class="text-white text-lg">{{ object.color.nombre }}</div>
               </div>
-              
+
               {% if object.motor %}
               <div class="bg-black/30 rounded-xl p-4 border border-cyan-400/20">
                 <div class="text-cyan-400 text-sm font-semibold uppercase tracking-wider">Motor</div>
                 <div class="text-white text-lg">{{ object.motor.nombre }}</div>
               </div>
               {% endif %}
-              
+
               {% if object.caja %}
               <div class="bg-black/30 rounded-xl p-4 border border-cyan-400/20">
                 <div class="text-cyan-400 text-sm font-semibold uppercase tracking-wider">Caja</div>
@@ -78,7 +79,7 @@
           <h3 class="text-2xl font-bold text-cyan-300 border-b border-cyan-400/30 pb-2">
             Propietario
           </h3>
-          
+
           <div class="bg-gradient-to-br from-cyan-900/30 to-blue-900/30 rounded-2xl p-6 border border-cyan-400/30">
             <div class="flex items-center space-x-4 mb-4">
               <div class="w-12 h-12 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full flex items-center justify-center">
@@ -91,7 +92,7 @@
                 <p class="text-cyan-300">{{ object.cliente.email }}</p>
               </div>
             </div>
-            
+
             {% if object.cliente.telefono %}
             <div class="flex items-center space-x-2 text-gray-300">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -113,23 +114,23 @@
 
     <!-- Acciones -->
     <div class="flex flex-col sm:flex-row gap-4 justify-center">
-      <a href="{% url 'taller:vehiculos:lista_vehiculos' %}" 
+      <a href="{% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{% else %}/cl/vehiculos/{% endif %}"
          class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-500 hover:to-gray-600 text-white font-bold rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-lg">
         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
         </svg>
         Volver a la Lista
       </a>
-      
-      <a href="{% url 'taller:vehiculos:editar_vehiculo' object.id %}" 
+
+      <a href="{% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{{ object.id }}/editar/{% else %}/cl/vehiculos/{{ object.id }}/editar/{% endif %}"
          class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-lg">
         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
         </svg>
         Editar Vehículo
       </a>
-      
-      <button onclick="confirmarEliminacion()" 
+
+      <button onclick="confirmarEliminacion()"
               class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-bold rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-lg">
         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
@@ -152,15 +153,15 @@
         </div>
         <h3 class="text-2xl font-bold text-white mb-2">Confirmar Eliminación</h3>
         <p class="text-gray-300 mb-6">¿Estás seguro de que quieres eliminar el vehículo <strong>{{ object.patente }}</strong>? Esta acción no se puede deshacer.</p>
-        
-        <form method="post" action="{% url 'taller:vehiculos:eliminar_vehiculo' object.id %}">
+
+        <form method="post" action="{% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{{ object.id }}/eliminar/{% else %}/cl/vehiculos/{{ object.id }}/eliminar/{% endif %}">
           {% csrf_token %}
           <div class="flex space-x-4">
-            <button type="button" onclick="cerrarModal()" 
+            <button type="button" onclick="cerrarModal()"
                     class="flex-1 px-6 py-3 bg-gray-600 hover:bg-gray-500 text-white font-bold rounded-xl transition-colors">
               Cancelar
             </button>
-            <button type="submit" 
+            <button type="submit"
                     class="flex-1 px-6 py-3 bg-red-600 hover:bg-red-500 text-white font-bold rounded-xl transition-colors">
               Eliminar
             </button>

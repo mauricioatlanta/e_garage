@@ -18,7 +18,7 @@ Se ha implementado exitosamente la restricción para que cada taller (empresa o 
 
 ### 3. ✅ Admin Personalizado
 - **EmpresaAdmin**: Solo superusuarios pueden crear empresas
-- **PerfilUsuarioAdmin**: 
+- **PerfilUsuarioAdmin**:
   - `has_add_permission()` retorna `False` (bloquea creación)
   - Solo permite visualización de datos existentes
   - Solo superusuarios pueden eliminar perfiles
@@ -94,7 +94,7 @@ if User.objects.filter(email=email).exists():
 def has_add_permission(self, request):
     return request.user.is_superuser
 
-# PerfilUsuarioAdmin  
+# PerfilUsuarioAdmin
 def has_add_permission(self, request):
     return False  # BLOQUEAR creación
 ```

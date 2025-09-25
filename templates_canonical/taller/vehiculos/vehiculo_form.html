@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load country_url %}
 {% load i18n static widget_tweaks %}
 
 {% block content %}
@@ -32,7 +33,7 @@
                     <div class="w-4 h-4 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin"></div>
                   </div>
                 </div>
-                <button type="button" id="agregar-color" 
+                <button type="button" id="agregar-color"
                         class="px-3 py-3 bg-gradient-to-r from-lime-600 to-green-600 text-white rounded-lg font-semibold hover:from-lime-500 hover:to-green-500 transform transition-all duration-200 hover:scale-105 shadow-lg border border-lime-400/30">
                   +
                 </button>
@@ -72,8 +73,8 @@
             <p class="text-gray-400 text-xs mt-0.5">{% trans "Modificar registro vehicular" %}</p>
           </div>
         </div>
-        
-        <a href="{% url 'taller:vehiculos:lista_vehiculos' %}" 
+
+        <a href="{% if request.path|slice:':4' == '/us/' %}/us/vehiculos/{% else %}/cl/vehiculos/{% endif %}"
            class="inline-flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-gray-600/20 to-gray-500/20 border border-gray-400/40 text-gray-300 hover:from-gray-500/30 hover:to-gray-400/30 hover:text-gray-200 transition-all duration-300">
           <span>⟲</span>
           <span class="hidden sm:inline">{% trans "Volver" %}</span>
@@ -86,7 +87,7 @@
   <div class="max-w-4xl mx-auto">
     <form method="post" class="space-y-6">
       {% csrf_token %}
-      
+
       <!-- Información del Cliente -->
       <div class="relative">
         <div class="absolute -inset-1 rounded-xl bg-gradient-to-r from-cyan-500/20 via-blue-500/20 to-purple-500/20 blur-xl"></div>
@@ -97,16 +98,16 @@
             </div>
             <h2 class="text-lg font-bold text-cyan-300">{% trans "Información del Cliente" %}</h2>
           </div>
-          
+
           <!-- Cliente -->
           <div class="mb-6">
               <label for="{{ form.cliente.id_for_label }}" class="block text-cyan-300 text-sm font-bold mb-3">
                   Cliente *
               </label>
-              
+
               <!-- Campo oculto con el ID del cliente seleccionado -->
               {{ form.cliente|add_class:"hidden" }}
-              
+
               <!-- Campo visible del cliente (para mostrar el cliente actual si existe) -->
               {% if form.instance.cliente %}
               <div class="mt-2 p-3 rounded-lg bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border border-cyan-400/40">
@@ -127,7 +128,7 @@
                 <p class="text-red-300 text-sm">No hay cliente asignado a este vehículo</p>
               </div>
               {% endif %}
-              
+
               {% if form.cliente.errors %}
                   <div class="mt-2 text-red-400 text-sm">
                       {{ form.cliente.errors }}
@@ -147,7 +148,7 @@
             </div>
             <h2 class="text-lg font-bold text-emerald-300">{% trans "Datos del Vehículo" %}</h2>
           </div>
-          
+
           <!-- Primera fila: Año, Marca, Modelo -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             <!-- Año -->
@@ -162,7 +163,7 @@
                 </div>
               {% endif %}
             </div>
-            
+
             <!-- Marca -->
             <div>
               <label for="marca" class="block text-sm font-medium text-gray-300 mb-2">
@@ -180,7 +181,7 @@
                 </div>
               {% endif %}
             </div>
-            
+
             <!-- Modelo -->
             <div>
               <label for="modelo" class="block text-sm font-medium text-gray-300 mb-2">
@@ -199,7 +200,7 @@
               {% endif %}
             </div>
           </div>
-          
+
           <!-- Segunda fila: Patente, VIN -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <!-- Patente -->
@@ -214,7 +215,7 @@
                 </div>
               {% endif %}
             </div>
-            
+
             <!-- VIN -->
             <div>
               <label for="vin" class="block text-sm font-medium text-gray-300 mb-2">
@@ -228,7 +229,7 @@
               {% endif %}
             </div>
           </div>
-          
+
           <!-- Tercera fila: Color, Motor, Caja -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <!-- Color -->
@@ -243,7 +244,7 @@
                 </div>
               {% endif %}
             </div>
-            
+
             <!-- Motor -->
             <div>
               <label for="motor" class="block text-sm font-medium text-gray-300 mb-2">
@@ -256,7 +257,7 @@
                     <div class="w-4 h-4 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin"></div>
                   </div>
                 </div>
-                <button type="button" 
+                <button type="button"
                         id="agregar-motor"
                         class="px-4 py-3 rounded-lg bg-gradient-to-r from-lime-600/20 to-green-600/20 border border-lime-400/40 text-lime-300 hover:from-lime-500/30 hover:to-green-500/30 transition-all duration-200"
                         title="{% trans 'Agregar nuevo motor' %}">
@@ -269,7 +270,7 @@
                 </div>
               {% endif %}
             </div>
-            
+
             <!-- Caja -->
             <div>
               <label for="caja" class="block text-sm font-medium text-gray-300 mb-2">
@@ -282,7 +283,7 @@
                     <div class="w-4 h-4 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin"></div>
                   </div>
                 </div>
-                <button type="button" 
+                <button type="button"
                         id="agregar-caja"
                         class="px-4 py-3 rounded-lg bg-gradient-to-r from-lime-600/20 to-green-600/20 border border-lime-400/40 text-lime-300 hover:from-lime-500/30 hover:to-green-500/30 transition-all duration-200"
                         title="{% trans 'Agregar nueva caja' %}">
@@ -301,13 +302,13 @@
 
       <!-- Botones de acción -->
       <div class="flex flex-col sm:flex-row gap-4 justify-end">
-        <a href="{% url 'taller:vehiculos:lista_vehiculos' %}" 
+        <a href="{% if request.path|slice:':4' == '/us/' %}/us/vehiculos/{% else %}/cl/vehiculos/{% endif %}"
            class="inline-flex items-center justify-center space-x-2 px-6 py-3 rounded-xl bg-gradient-to-r from-gray-600/20 to-gray-500/20 border border-gray-400/40 text-gray-300 hover:from-gray-500/30 hover:to-gray-400/30 hover:text-gray-200 transition-all duration-300">
           <span class="text-lg">⟲</span>
           <span>{% trans "Cancelar" %}</span>
         </a>
-        
-        <button type="submit" 
+
+        <button type="submit"
                 class="group flex-1 relative inline-flex items-center justify-center space-x-2 px-8 py-4 rounded-xl bg-gradient-to-r from-emerald-600 via-lime-600 to-green-600 hover:from-emerald-500 hover:via-lime-500 hover:to-green-500 text-white font-bold shadow-lg shadow-emerald-800/40 transition-all duration-300 border border-emerald-400/40">
           <span class="text-lg">💾</span>
           <span>{% trans "Guardar Cambios" %}</span>
@@ -335,16 +336,16 @@
       <div class="relative rounded-xl border border-lime-400/30 bg-black/90 backdrop-blur-sm p-6 max-w-md w-full">
         <div class="text-center">
           <h3 class="text-xl font-bold text-gray-200 mb-4">{% trans "Agregar Nuevo Motor" %}</h3>
-          <input type="text" 
-                 id="nuevo-motor" 
+          <input type="text"
+                 id="nuevo-motor"
                  placeholder="{% trans 'Nombre del motor...' %}"
                  class="w-full px-4 py-3 rounded-lg bg-black border border-lime-500/30 text-lime-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-lime-400/50 focus:border-lime-400 mb-4">
           <div class="flex space-x-3">
-            <button onclick="cerrarModal(this)" 
+            <button onclick="cerrarModal(this)"
                     class="flex-1 px-4 py-2 rounded-lg bg-gradient-to-r from-gray-600/20 to-gray-700/20 border border-gray-500/40 text-gray-300 hover:from-gray-500/30 hover:to-gray-600/30 transition-all duration-200 text-sm font-medium">
               {% trans "Cancelar" %}
             </button>
-            <button onclick="guardarNuevo('motor', this)" 
+            <button onclick="guardarNuevo('motor', this)"
                     class="flex-1 px-4 py-2 rounded-lg bg-gradient-to-r from-lime-600/20 to-green-600/20 border border-lime-400/40 text-lime-300 hover:from-lime-500/30 hover:to-green-500/30 transition-all duration-200 text-sm font-medium">
               {% trans "Guardar" %}
             </button>
@@ -362,16 +363,16 @@
       <div class="relative rounded-xl border border-lime-400/30 bg-black/90 backdrop-blur-sm p-6 max-w-md w-full">
         <div class="text-center">
           <h3 class="text-xl font-bold text-gray-200 mb-4">{% trans "Agregar Nueva Caja" %}</h3>
-          <input type="text" 
-                 id="nuevo-caja" 
+          <input type="text"
+                 id="nuevo-caja"
                  placeholder="{% trans 'Nombre de la caja...' %}"
                  class="w-full px-4 py-3 rounded-lg bg-black border border-lime-500/30 text-lime-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-lime-400/50 focus:border-lime-400 mb-4">
           <div class="flex space-x-3">
-            <button onclick="cerrarModal(this)" 
+            <button onclick="cerrarModal(this)"
                     class="flex-1 px-4 py-2 rounded-lg bg-gradient-to-r from-gray-600/20 to-gray-700/20 border border-gray-500/40 text-gray-300 hover:from-gray-500/30 hover:to-gray-600/30 transition-all duration-200 text-sm font-medium">
               {% trans "Cancelar" %}
             </button>
-            <button onclick="guardarNuevo('caja', this)" 
+            <button onclick="guardarNuevo('caja', this)"
                     class="flex-1 px-4 py-2 rounded-lg bg-gradient-to-r from-lime-600/20 to-green-600/20 border border-lime-400/40 text-lime-300 hover:from-lime-500/30 hover:to-green-500/30 transition-all duration-200 text-sm font-medium">
               {% trans "Guardar" %}
             </button>
@@ -390,16 +391,16 @@
       <div class="relative rounded-xl border border-pink-400/30 bg-black/90 backdrop-blur-sm p-6 max-w-md w-full">
         <div class="text-center">
           <h3 class="text-xl font-bold text-gray-200 mb-4">🎨 {% trans "Agregar Nuevo Color" %}</h3>
-          <input type="text" 
-                 id="nuevo-color" 
+          <input type="text"
+                 id="nuevo-color"
                  placeholder="{% trans 'Nombre del color...' %}"
                  class="w-full px-4 py-3 rounded-lg bg-black border border-pink-500/30 text-pink-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-400/50 focus:border-pink-400 mb-4">
           <div class="flex space-x-3">
-            <button onclick="cerrarModal(this)" 
+            <button onclick="cerrarModal(this)"
                     class="flex-1 px-4 py-2 rounded-lg bg-gradient-to-r from-gray-600/20 to-gray-700/20 border border-gray-500/40 text-gray-300 hover:from-gray-500/30 hover:to-gray-600/30 transition-all duration-200 text-sm font-medium">
               {% trans "Cancelar" %}
             </button>
-            <button onclick="guardarNuevo('color', this)" 
+            <button onclick="guardarNuevo('color', this)"
                     class="flex-1 px-4 py-2 rounded-lg bg-gradient-to-r from-pink-600/20 to-purple-600/20 border border-pink-400/40 text-pink-300 hover:from-pink-500/30 hover:to-purple-500/30 transition-all duration-200 text-sm font-medium">
               {% trans "Guardar" %}
             </button>
@@ -488,7 +489,7 @@ select:not(:disabled):hover {
 document.addEventListener('DOMContentLoaded', function() {
   // =================== VARIABLES GLOBALES ===================
   // Variables para el formulario de vehículo
-  
+
   // =================== API ENDPOINTS ===================
   const API_ENDPOINTS = {
     marcas: '/taller/vehiculos/api/marcas/',
@@ -508,10 +509,10 @@ document.addEventListener('DOMContentLoaded', function() {
   const motorSelect = document.getElementById('id_motor');
   const cajaSelect = document.getElementById('id_caja');
   const colorSelect = document.getElementById('id_color');
-  
+
   // Cargar datos iniciales
   cargarMarcas();
-  
+
   // Solo cargar motores y cajas si son selects
   if (motorSelect && motorSelect.tagName === 'SELECT') {
     cargarMotores();
@@ -519,13 +520,13 @@ document.addEventListener('DOMContentLoaded', function() {
   if (cajaSelect && cajaSelect.tagName === 'SELECT') {
     cargarCajas();
   }
-  
+
   // Inicializar valores existentes para edición
   inicializarValoresExistentes();
-  
+
   // Preservar valores de campos de texto
   preservarValoresCamposTexto();
-  
+
   // DEBUG: Botón temporal para probar la funcionalidad
   const debugButton = document.createElement('button');
   debugButton.type = 'button';
@@ -536,7 +537,7 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('marcaSelect:', marcaSelect);
     console.log('modeloSelect:', modeloSelect);
     console.log('API_ENDPOINTS:', API_ENDPOINTS);
-    
+
     if (marcaSelect && marcaSelect.value) {
       console.log('Marca seleccionada:', marcaSelect.value);
       cargarModelos(marcaSelect.value);
@@ -545,13 +546,13 @@ document.addEventListener('DOMContentLoaded', function() {
       cargarModelos('1');
     }
   };
-  
+
   // Insertar botón de debug después del primer div del formulario
   const firstFormDiv = document.querySelector('form > div');
   if (firstFormDiv) {
     firstFormDiv.parentNode.insertBefore(debugButton, firstFormDiv);
   }
-  
+
   if (marcaSelect) {
     marcaSelect.addEventListener('change', function() {
       const marcaId = this.value;
@@ -566,12 +567,12 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
-  
+
   function cargarMarcas() {
     if (!marcaSelect) return;
-    
+
     showLoading(marcaSelect, 'loading-marca');
-    
+
     // Marcas predefinidas para fallback
     const marcasPredefinidas = [
       {id: 'Toyota', nombre: 'Toyota'},
@@ -590,7 +591,7 @@ document.addEventListener('DOMContentLoaded', function() {
       {id: 'Mercedes-Benz', nombre: 'Mercedes-Benz'},
       {id: 'Audi', nombre: 'Audi'}
     ];
-    
+
     fetch(API_ENDPOINTS.marcas)
       .then(response => response.json())
       .then(data => {
@@ -605,33 +606,33 @@ document.addEventListener('DOMContentLoaded', function() {
         marcaSelect.disabled = false;
       });
   }
-  
+
   function cargarModelos(marcaId) {
     console.log('=== INICIO cargarModelos ===');
     console.log('marcaId recibido:', marcaId);
     console.log('modeloSelect:', modeloSelect);
-    
+
     if (!modeloSelect) {
       console.error('modeloSelect no encontrado');
       return;
     }
-    
+
     // Si es un campo de texto (no select), no hacer nada
     if (modeloSelect.tagName !== 'SELECT') {
       console.log('modeloSelect no es un SELECT, es:', modeloSelect.tagName);
       return;
     }
-    
+
     console.log('Cargando modelos para marca ID:', marcaId);
     console.log('URL de la API:', `${API_ENDPOINTS.modelos}?marca_id=${marcaId}`);
-    
+
     showLoading(modeloSelect, 'loading-modelo');
     limpiarSelect(modeloSelect, 'Cargando modelos...');
     modeloSelect.disabled = true;
-    
+
     const url = `${API_ENDPOINTS.modelos}?marca_id=${marcaId}`;
     console.log('Fetching URL:', url);
-    
+
     fetch(url)
       .then(response => {
         console.log('Respuesta de la API:', response.status, response.ok);
@@ -645,7 +646,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Tipo de datos:', typeof data);
         console.log('Es array:', Array.isArray(data));
         console.log('Longitud:', data ? data.length : 'undefined');
-        
+
         hideLoading('loading-modelo');
         poblarSelect(modeloSelect, data || [], 'Seleccionar modelo...');
         modeloSelect.disabled = false;
@@ -659,15 +660,15 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('=== FIN cargarModelos (error) ===');
       });
   }
-  
+
   function cargarMotores() {
     if (!motorSelect) return;
-    
+
     // Si es un campo de texto (no select), no hacer nada
     if (motorSelect.tagName !== 'SELECT') return;
-    
+
     showLoading(motorSelect, 'loading-motor');
-    
+
     fetch(API_ENDPOINTS.motores)
       .then(response => response.json())
       .then(data => {
@@ -682,19 +683,19 @@ document.addEventListener('DOMContentLoaded', function() {
         motorSelect.disabled = true;
       });
   }
-  
+
   function cargarCajas() {
     if (!cajaSelect) return;
-    
+
     // Si es un campo de texto (no select), no hacer nada
     if (cajaSelect.tagName !== 'SELECT') return;
-    
+
     showLoading(cajaSelect, 'loading-caja');
-    
+
     // Obtener modelo_id del select de modelo
     const modeloId = modeloSelect ? modeloSelect.value : '';
     const url = modeloId ? `${API_ENDPOINTS.cajas}?modelo_id=${modeloId}` : API_ENDPOINTS.cajas;
-    
+
     // Cajas predefinidas como fallback
     const cajasPredefinidas = [
       {id: 'Manual 5 velocidades', nombre: 'Manual 5 velocidades'},
@@ -706,7 +707,7 @@ document.addEventListener('DOMContentLoaded', function() {
       {id: 'Secuencial', nombre: 'Secuencial'},
       {id: 'Tiptronic', nombre: 'Tiptronic'}
     ];
-    
+
     fetch(url)
       .then(response => response.json())
       .then(data => {
@@ -729,12 +730,12 @@ document.addEventListener('DOMContentLoaded', function() {
   function preservarValoresCamposTexto() {
     // Para campos de texto (modelo, motor, caja), asegurar que no se pierdan
     const camposTexto = ['modelo', 'motor', 'caja'];
-    
+
     camposTexto.forEach(campo => {
       const elemento = document.getElementById(campo);
       if (elemento && elemento.tagName === 'INPUT' && elemento.value) {
         const valorOriginal = elemento.value;
-        
+
         // Crear un observer para detectar cambios
         const observer = new MutationObserver(function(mutations) {
           mutations.forEach(function(mutation) {
@@ -745,12 +746,12 @@ document.addEventListener('DOMContentLoaded', function() {
             }
           });
         });
-        
+
         observer.observe(elemento, {
           attributes: true,
           attributeFilter: ['value']
         });
-        
+
         // También verificar periódicamente
         setInterval(() => {
           if (elemento.value !== valorOriginal) {
@@ -760,7 +761,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
-  
+
   // =================== FUNCIÓN PARA INICIALIZAR VALORES EXISTENTES ===================
   function inicializarValoresExistentes() {
     // Si estamos en modo edición, preservar los valores existentes
@@ -801,7 +802,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
   }
-  
+
   // =================== FUNCIONES AUXILIARES ===================
   function showLoading(element, loadingId) {
     const loading = document.getElementById(loadingId);
@@ -823,20 +824,20 @@ document.addEventListener('DOMContentLoaded', function() {
   function poblarSelect(select, items, placeholder) {
     // Guardar el valor actual antes de limpiar
     const valorActual = select.value;
-    
+
     select.innerHTML = '';
     const option = document.createElement('option');
     option.value = '';
     option.textContent = placeholder;
     select.appendChild(option);
-    
+
     items.forEach(item => {
       const option = document.createElement('option');
       option.value = item.id;
       option.textContent = item.nombre;
       select.appendChild(option);
     });
-    
+
     // Restaurar el valor si existía
     if (valorActual) {
       select.value = valorActual;
@@ -889,11 +890,11 @@ document.addEventListener('DOMContentLoaded', function() {
       modal.remove();
     }, 200);
   };
-  
+
   window.guardarNuevo = function(tipo, button) {
     const input = document.getElementById(`nuevo-${tipo}`);
     const valor = input.value.trim();
-    
+
     if (!valor) {
       input.style.borderColor = '#ef4444';
       setTimeout(() => {
@@ -901,7 +902,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }, 2000);
       return;
     }
-    
+
     let select;
     if (tipo === 'motor') {
       select = motorSelect;
@@ -910,9 +911,9 @@ document.addEventListener('DOMContentLoaded', function() {
     } else if (tipo === 'color') {
       select = colorSelect;
     }
-    
+
     if (!select) return;
-    
+
     // Crear opción especial que indica que es nueva
     const option = document.createElement('option');
     option.value = '__nuevo__';
@@ -920,65 +921,65 @@ document.addEventListener('DOMContentLoaded', function() {
     option.selected = true;
     option.setAttribute('data-nuevo', valor);
     select.appendChild(option);
-    
+
     // Crear campo hidden para enviar el nuevo valor
     const hiddenField = document.createElement('input');
     hiddenField.type = 'hidden';
     hiddenField.name = `${tipo}_nuevo`;
     hiddenField.value = valor;
     select.parentNode.appendChild(hiddenField);
-    
+
     // Cerrar modal
     const modal = button.closest('.fixed');
     modal.classList.add('hidden');
-    
-    const nombreTipo = tipo === 'motor' ? 'Motor' : 
-                      tipo === 'caja' ? 'Caja' : 
+
+    const nombreTipo = tipo === 'motor' ? 'Motor' :
+                      tipo === 'caja' ? 'Caja' :
                       'Color';
     mostrarNotificacion(`${nombreTipo} agregado exitosamente`, 'success');
   };
-  
+
   function mostrarNotificacion(mensaje, tipo) {
     const notif = document.createElement('div');
     notif.className = `fixed top-4 right-4 z-50 px-4 py-3 rounded-lg border ${
-      tipo === 'success' 
-        ? 'bg-emerald-900/80 border-emerald-400/40 text-emerald-200' 
+      tipo === 'success'
+        ? 'bg-emerald-900/80 border-emerald-400/40 text-emerald-200'
         : 'bg-red-900/80 border-red-400/40 text-red-200'
     } backdrop-blur-sm transform translate-x-full transition-all duration-300`;
     notif.textContent = mensaje;
-    
+
     document.body.appendChild(notif);
-    
+
     setTimeout(() => {
       notif.classList.remove('translate-x-full');
     }, 10);
-    
+
     setTimeout(() => {
       notif.classList.add('translate-x-full');
       setTimeout(() => notif.remove(), 300);
     }, 3000);
   }
-  
+
   // =================== EVENT LISTENERS ===================
-  
+
   // Debug del formulario
   const form = document.querySelector('form');
   if (form) {
     form.addEventListener('submit', function(e) {
       console.log('[DEBUG] Formulario enviándose...');
       console.log('[DEBUG] Datos del formulario:', new FormData(form));
-      
+
       // Verificar campos requeridos
       const cliente = document.querySelector('[name="cliente"]');
       const marca = document.querySelector('[name="marca"]');
       const patente = document.querySelector('[name="patente"]');
       const anio = document.querySelector('[name="anio"]');
-      
+
       console.log('[DEBUG] Cliente:', cliente ? cliente.value : 'NO ENCONTRADO');
       console.log('[DEBUG] Marca:', marca ? marca.value : 'NO ENCONTRADO');
       console.log('[DEBUG] Patente:', patente ? patente.value : 'NO ENCONTRADO');
       console.log('[DEBUG] Año:', anio ? anio.value : 'NO ENCONTRADO');
-      
+
       // Si algún campo requerido está vacío, prevenir envío
       if (!cliente || !cliente.value) {
         e.preventDefault();
@@ -1000,11 +1001,11 @@ document.addEventListener('DOMContentLoaded', function() {
         alert('Debe seleccionar un año');
         return false;
       }
-      
+
       console.log('[DEBUG] Formulario válido, enviando...');
     });
   }
-  
+
   // Event listeners simplificados para vehículo
 });
 </script>

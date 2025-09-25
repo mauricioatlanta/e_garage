@@ -14,7 +14,7 @@
 {% block documento_title %}
 <div class="documento-header-container">
   <h1 class="documento-title">✏️ Editando: {{ documento.tipo }} #{{ documento.numero }}</h1>
-  
+
   <!-- Indicador de Estado de Pago -->
   <div class="estado-pago-indicator">
     {% if documento.estado_pago == 'PAGADO' %}
@@ -107,11 +107,11 @@
     flex-direction: column;
     text-align: center;
   }
-  
+
   .documento-title {
     font-size: 1.8rem;
   }
-  
+
   .estado-badge {
     padding: 0.6rem 1.2rem;
     font-size: 0.8rem;
@@ -132,7 +132,7 @@
   <input type="hidden" id="id_incluir_iva" name="incluir_iva" value="{% if documento.incluir_iva %}on{% endif %}">
 
   {% include "taller/documentos/_form_common.html" %}
-  
+
   {% if company_country == "CL" %}
     {% include "taller/documentos/_form_country_cl.html" %}
   {% else %}
@@ -144,7 +144,7 @@
   <!-- Observaciones al final de la página -->
   <div class="seccion-card" style="margin-top: 2rem;">
     <h3 class="seccion-title">📝 Observaciones <span style="color: #999; font-size: 0.8rem; font-weight: normal;">(Opcional)</span></h3>
-    
+
     <div class="form-group full-width">
       <label class="form-label" for="{{ form.observaciones.id_for_label }}">
         Notas y comentarios adicionales
@@ -160,12 +160,12 @@
 </form>
 
 <!-- SECCIÓN DE FACTURACIÓN COMPLETA -->
-<div class="invoice-summary-section">  
+<div class="invoice-summary-section">
   <div class="invoice-card">
     <div class="invoice-header">
       <h3 class="invoice-title">📋 Resumen de Facturación</h3>
     </div>
-    
+
     <div class="invoice-content">
       <!-- Subtotales por categoría -->
       <div class="invoice-breakdown">
@@ -183,7 +183,7 @@
         </div>
         <div class="breakdown-divider"></div>
       </div>
-      
+
       <!-- Total Subtotal -->
       <div class="invoice-subtotal">
         <div class="subtotal-item">
@@ -191,13 +191,13 @@
           <span class="subtotal-value" id="subtotal-invoice">{% if company_country == 'US' %}${% else %}${% endif %}{{ subtotal|default:0|floatformat:0 }}</span>
         </div>
       </div>
-      
+
       <!-- Control de IVA -->
       <div class="invoice-tax-control">
         <div class="tax-checkbox-container">
           <label class="tax-checkbox-label">
-            <input type="checkbox" id="invoice-incluir-iva" 
-                   class="tax-checkbox" 
+            <input type="checkbox" id="invoice-incluir-iva"
+                   class="tax-checkbox"
                    {% if documento.incluir_iva %}checked{% endif %}
                    onchange="actualizarIvaFactura()">
             <span class="checkbox-custom"></span>
@@ -211,7 +211,7 @@
             {% endif %}
           </small>
         </div>
-        
+
         <div class="tax-amount-container">
           <div class="tax-item">
             <span class="tax-label">{{ doc_tax_label|default:"IVA" }}:</span>
@@ -219,7 +219,7 @@
           </div>
         </div>
       </div>
-      
+
       <!-- Total Final -->
       <div class="invoice-total">
         <div class="total-item">
@@ -448,28 +448,28 @@
   .invoice-card {
     margin: 0 1rem;
   }
-  
+
   .invoice-content {
     padding: 1.5rem;
   }
-  
+
   .invoice-tax-control {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .tax-amount-container {
     text-align: center;
   }
-  
+
   .breakdown-item {
     font-size: 0.9rem;
   }
-  
+
   .total-label {
     font-size: 1.2rem;
   }
-  
+
   .total-value {
     font-size: 1.6rem;
   }
@@ -480,12 +480,12 @@
 function actualizarIvaFactura() {
   const checkbox = document.getElementById('invoice-incluir-iva');
   const hiddenInput = document.getElementById('id_incluir_iva');
-  
+
   // Sincronizar con el input hidden del formulario
   if (hiddenInput) {
     hiddenInput.value = checkbox.checked ? 'on' : '';
   }
-  
+
   // Disparar actualización de totales
   if (typeof actualizarTotalesDocumento === 'function') {
     actualizarTotalesDocumento();
@@ -496,18 +496,18 @@ function actualizarIvaFactura() {
 document.addEventListener('DOMContentLoaded', function() {
   const checkbox = document.getElementById('invoice-incluir-iva');
   const hiddenInput = document.getElementById('id_incluir_iva');
-  
+
   // Sincronizar estado inicial
   if (checkbox && hiddenInput) {
     checkbox.checked = hiddenInput.value === 'on' || hiddenInput.value === 'true';
   }
-  
+
   // Configurar botones de agregar items
   configurarBotonesAgregar();
-  
+
   // Configurar autocompletado
   configurarAutocompletado();
-  
+
   // Ejecutar cálculo inicial de totales después de que todo esté cargado
   setTimeout(function() {
     if (typeof actualizarTotalesDocumento === 'function') {
@@ -526,7 +526,7 @@ function configurarBotonesAgregar() {
       agregarFilaRepuesto();
     });
   }
-  
+
   // Botón agregar servicio
   const btnServicio = document.getElementById('btn-agregar-servicio');
   if (btnServicio) {
@@ -534,7 +534,7 @@ function configurarBotonesAgregar() {
       agregarFilaServicio();
     });
   }
-  
+
   // Botón agregar otro servicio
   const btnOtro = document.getElementById('btn-agregar-otro');
   if (btnOtro) {
@@ -548,11 +548,11 @@ function configurarBotonesAgregar() {
 function agregarFilaRepuesto() {
   const tabla = document.getElementById('tabla-repuestos').getElementsByTagName('tbody')[0];
   const noRepuestos = document.getElementById('no-repuestos');
-  
+
   if (noRepuestos) {
     noRepuestos.remove();
   }
-  
+
   const fila = tabla.insertRow();
   fila.innerHTML = `
     <td><input type="text" class="form-input" placeholder="Código" name="repuesto_codigo[]"></td>
@@ -568,11 +568,11 @@ function agregarFilaRepuesto() {
 function agregarFilaServicio() {
   const tabla = document.getElementById('tabla-servicios').getElementsByTagName('tbody')[0];
   const noServicios = document.getElementById('no-servicios');
-  
+
   if (noServicios) {
     noServicios.remove();
   }
-  
+
   const fila = tabla.insertRow();
   fila.innerHTML = `
     <td><input type="text" class="form-input" placeholder="Nombre del servicio" name="servicio_nombre[]"></td>
@@ -585,11 +585,11 @@ function agregarFilaServicio() {
 function agregarFilaOtroServicio() {
   const tabla = document.getElementById('tabla-otros').getElementsByTagName('tbody')[0];
   const noOtros = document.getElementById('no-otros');
-  
+
   if (noOtros) {
     noOtros.remove();
   }
-  
+
   const fila = tabla.insertRow();
   fila.innerHTML = `
     <td><input type="text" class="form-input" placeholder="Nombre del servicio" name="otro_servicio[]"></td>
@@ -605,16 +605,16 @@ function agregarFilaOtroServicio() {
 function eliminarFila(boton) {
   const fila = boton.closest('tr');
   const tabla = fila.closest('table');
-  
+
   fila.remove();
-  
+
   // Verificar si la tabla está vacía y agregar mensaje
   const tbody = tabla.getElementsByTagName('tbody')[0];
   if (tbody.children.length === 0) {
     const tablaId = tabla.id;
     let mensaje = '';
     let id = '';
-    
+
     if (tablaId === 'tabla-repuestos') {
       mensaje = 'No hay repuestos agregados';
       id = 'no-repuestos';
@@ -625,14 +625,14 @@ function eliminarFila(boton) {
       mensaje = 'No hay otros servicios agregados';
       id = 'no-otros';
     }
-    
+
     if (mensaje) {
       const filaVacia = tbody.insertRow();
       filaVacia.id = id;
       filaVacia.innerHTML = `<td colspan="6" style="text-align: center; color: #6c757d;">${mensaje}</td>`;
     }
   }
-  
+
   // Recalcular totales
   if (typeof actualizarTotalesDocumento === 'function') {
     actualizarTotalesDocumento();
@@ -645,12 +645,12 @@ function calcularTotalFila(input) {
   const cantidad = parseFloat(fila.querySelector('[name*="cantidad"]').value) || 0;
   const precio = parseFloat(fila.querySelector('[name*="precio"]').value) || 0;
   const total = cantidad * precio;
-  
+
   const spanTotal = fila.querySelector('.total-fila');
   if (spanTotal) {
     spanTotal.textContent = '{% if company_country == "US" %}${% else %}${% endif %}' + total.toFixed(2);
   }
-  
+
   // Recalcular totales del documento
   if (typeof actualizarTotalesDocumento === 'function') {
     actualizarTotalesDocumento();
@@ -663,13 +663,13 @@ function calcularGananciaOtro(input) {
   const costo = parseFloat(fila.querySelector('[name*="costo"]').value) || 0;
   const precio = parseFloat(fila.querySelector('[name*="precio"]').value) || 0;
   const ganancia = precio - costo;
-  
+
   const spanGanancia = fila.querySelector('.ganancia-fila');
   if (spanGanancia) {
     spanGanancia.textContent = '{% if company_country == "US" %}${% else %}${% endif %}' + ganancia.toFixed(2);
     spanGanancia.style.color = ganancia >= 0 ? '#00f2fe' : '#ff4444';
   }
-  
+
   // Recalcular totales del documento
   if (typeof actualizarTotalesDocumento === 'function') {
     actualizarTotalesDocumento();
@@ -681,24 +681,24 @@ function configurarAutocompletado() {
   // Autocompletado para repuestos
   const inputRepuesto = document.getElementById('buscar-repuesto');
   const resultadosRepuesto = document.getElementById('resultados-repuesto');
-  
+
   if (inputRepuesto && resultadosRepuesto) {
     let timeoutRepuesto;
-    
+
     inputRepuesto.addEventListener('input', function() {
       clearTimeout(timeoutRepuesto);
       const query = this.value.trim();
-      
+
       if (query.length < 2) {
         resultadosRepuesto.style.display = 'none';
         return;
       }
-      
+
       timeoutRepuesto = setTimeout(() => {
         buscarRepuestos(query, resultadosRepuesto);
       }, 300);
     });
-    
+
     // Ocultar resultados al hacer clic fuera
     document.addEventListener('click', function(e) {
       if (!inputRepuesto.contains(e.target) && !resultadosRepuesto.contains(e.target)) {
@@ -706,28 +706,28 @@ function configurarAutocompletado() {
       }
     });
   }
-  
+
   // Autocompletado para servicios
   const inputServicio = document.getElementById('buscar-servicio');
   const resultadosServicio = document.getElementById('resultados-servicio');
-  
+
   if (inputServicio && resultadosServicio) {
     let timeoutServicio;
-    
+
     inputServicio.addEventListener('input', function() {
       clearTimeout(timeoutServicio);
       const query = this.value.trim();
-      
+
       if (query.length < 2) {
         resultadosServicio.style.display = 'none';
         return;
       }
-      
+
       timeoutServicio = setTimeout(() => {
         buscarServicios(query, resultadosServicio);
       }, 300);
     });
-    
+
     // Ocultar resultados al hacer clic fuera
     document.addEventListener('click', function(e) {
       if (!inputServicio.contains(e.target) && !resultadosServicio.contains(e.target)) {
@@ -735,28 +735,28 @@ function configurarAutocompletado() {
       }
     });
   }
-  
+
   // Autocompletado para otros servicios
   const inputOtroServicio = document.getElementById('buscar-otro-servicio');
   const resultadosOtroServicio = document.getElementById('resultados-otro-servicio');
-  
+
   if (inputOtroServicio && resultadosOtroServicio) {
     let timeoutOtroServicio;
-    
+
     inputOtroServicio.addEventListener('input', function() {
       clearTimeout(timeoutOtroServicio);
       const query = this.value.trim();
-      
+
       if (query.length < 2) {
         resultadosOtroServicio.style.display = 'none';
         return;
       }
-      
+
       timeoutOtroServicio = setTimeout(() => {
         buscarOtrosServicios(query, resultadosOtroServicio);
       }, 300);
     });
-    
+
     // Ocultar resultados al hacer clic fuera
     document.addEventListener('click', function(e) {
       if (!inputOtroServicio.contains(e.target) && !resultadosOtroServicio.contains(e.target)) {
@@ -782,7 +782,7 @@ function buscarRepuestos(query, contenedor) {
 // Mostrar resultados de repuestos
 function mostrarResultadosRepuestos(repuestos, contenedor, query) {
   contenedor.innerHTML = '';
-  
+
   if (repuestos.length === 0) {
     // Opción para crear nuevo repuesto
     const itemCrear = document.createElement('div');
@@ -804,7 +804,7 @@ function mostrarResultadosRepuestos(repuestos, contenedor, query) {
       item.onclick = () => agregarRepuestoSeleccionado(repuesto);
       contenedor.appendChild(item);
     });
-    
+
     // Opción para crear nuevo repuesto
     const itemCrear = document.createElement('div');
     itemCrear.className = 'autocomplete-item autocomplete-create';
@@ -812,7 +812,7 @@ function mostrarResultadosRepuestos(repuestos, contenedor, query) {
     itemCrear.onclick = () => crearNuevoRepuesto(query);
     contenedor.appendChild(itemCrear);
   }
-  
+
   contenedor.style.display = 'block';
 }
 
@@ -820,11 +820,11 @@ function mostrarResultadosRepuestos(repuestos, contenedor, query) {
 function agregarRepuestoSeleccionado(repuesto) {
   const tabla = document.getElementById('tabla-repuestos').getElementsByTagName('tbody')[0];
   const noRepuestos = document.getElementById('no-repuestos');
-  
+
   if (noRepuestos) {
     noRepuestos.remove();
   }
-  
+
   const fila = tabla.insertRow();
   fila.innerHTML = `
     <td><input type="text" class="form-input" value="${repuesto.part_number || ''}" placeholder="Código" name="repuesto_codigo[]"></td>
@@ -834,11 +834,11 @@ function agregarRepuestoSeleccionado(repuesto) {
     <td><span class="total-fila">$0.00</span></td>
     <td><button type="button" class="btn-secondary btn-eliminar" onclick="eliminarFila(this)">🗑️</button></td>
   `;
-  
+
   // Limpiar campo de búsqueda
   document.getElementById('buscar-repuesto').value = '';
   document.getElementById('resultados-repuesto').style.display = 'none';
-  
+
   // Recalcular totales
   if (typeof actualizarTotalesDocumento === 'function') {
     actualizarTotalesDocumento();
@@ -849,15 +849,15 @@ function agregarRepuestoSeleccionado(repuesto) {
 function crearNuevoRepuesto(nombre) {
   const codigo = prompt('Ingrese el código del repuesto (opcional):', '');
   if (codigo === null) return;
-  
+
   // Agregar directamente a la tabla (sin crear en base de datos)
   const repuesto = {
     nombre: nombre.trim(),
     part_number: codigo.trim()
   };
-  
+
   agregarRepuestoSeleccionado(repuesto);
-  
+
   // Ocultar resultados
   document.getElementById('resultados-repuesto').style.display = 'none';
 }
@@ -878,7 +878,7 @@ function buscarServicios(query, contenedor) {
 // Mostrar resultados de servicios
 function mostrarResultadosServicios(servicios, contenedor, query) {
   contenedor.innerHTML = '';
-  
+
   if (servicios.length === 0) {
     // Opción para crear nuevo servicio
     const itemCrear = document.createElement('div');
@@ -901,7 +901,7 @@ function mostrarResultadosServicios(servicios, contenedor, query) {
       item.onclick = () => agregarServicioSeleccionado(servicio);
       contenedor.appendChild(item);
     });
-    
+
     // Opción para crear nuevo servicio
     const itemCrear = document.createElement('div');
     itemCrear.className = 'autocomplete-item autocomplete-create';
@@ -909,7 +909,7 @@ function mostrarResultadosServicios(servicios, contenedor, query) {
     itemCrear.onclick = () => crearNuevoServicio(query);
     contenedor.appendChild(itemCrear);
   }
-  
+
   contenedor.style.display = 'block';
 }
 
@@ -929,7 +929,7 @@ function buscarOtrosServicios(query, contenedor) {
 // Mostrar resultados de otros servicios
 function mostrarResultadosOtrosServicios(servicios, contenedor, query) {
   contenedor.innerHTML = '';
-  
+
   if (servicios.length === 0) {
     contenedor.innerHTML = '<div class="autocomplete-item" style="text-align: center; color: #999;">No se encontraron servicios externos</div>';
   } else {
@@ -947,7 +947,7 @@ function mostrarResultadosOtrosServicios(servicios, contenedor, query) {
       contenedor.appendChild(item);
     });
   }
-  
+
   contenedor.style.display = 'block';
 }
 
@@ -955,22 +955,22 @@ function mostrarResultadosOtrosServicios(servicios, contenedor, query) {
 function agregarServicioSeleccionado(servicio) {
   const tabla = document.getElementById('tabla-servicios').getElementsByTagName('tbody')[0];
   const noServicios = document.getElementById('no-servicios');
-  
+
   if (noServicios) {
     noServicios.remove();
   }
-  
+
   const fila = tabla.insertRow();
   fila.innerHTML = `
     <td><input type="text" class="form-input" value="${servicio.nombre}" name="servicio_nombre[]"></td>
     <td><input type="number" class="form-input input-number" value="${servicio.precio}" step="0.01" name="servicio_precio[]" onchange="actualizarTotalesDocumento()"></td>
     <td><button type="button" class="btn-secondary btn-eliminar" onclick="eliminarFila(this)">🗑️</button></td>
   `;
-  
+
   // Limpiar campo de búsqueda
   document.getElementById('buscar-servicio').value = '';
   document.getElementById('resultados-servicio').style.display = 'none';
-  
+
   // Recalcular totales
   if (typeof actualizarTotalesDocumento === 'function') {
     actualizarTotalesDocumento();
@@ -981,11 +981,11 @@ function agregarServicioSeleccionado(servicio) {
 function agregarOtroServicioSeleccionado(servicio) {
   const tabla = document.getElementById('tabla-otros').getElementsByTagName('tbody')[0];
   const noOtros = document.getElementById('no-otros');
-  
+
   if (noOtros) {
     noOtros.remove();
   }
-  
+
   const fila = tabla.insertRow();
   fila.innerHTML = `
     <td><input type="text" class="form-input" value="${servicio.nombre}" name="otro_servicio[]"></td>
@@ -995,11 +995,11 @@ function agregarOtroServicioSeleccionado(servicio) {
     <td><span class="ganancia-fila">{% if company_country == "US" %}${% else %}${% endif %}${(servicio.precio_cliente - servicio.costo_interno).toFixed(2)}</span></td>
     <td><button type="button" class="btn-secondary btn-eliminar" onclick="eliminarFila(this)">🗑️</button></td>
   `;
-  
+
   // Limpiar campo de búsqueda
   document.getElementById('buscar-otro-servicio').value = '';
   document.getElementById('resultados-otro-servicio').style.display = 'none';
-  
+
   // Recalcular totales
   if (typeof actualizarTotalesDocumento === 'function') {
     actualizarTotalesDocumento();
@@ -1010,16 +1010,16 @@ function agregarOtroServicioSeleccionado(servicio) {
 function crearNuevoServicio(nombre) {
   const precio = prompt('Ingrese el precio del servicio:', '0.00');
   if (precio === null) return;
-  
+
   const descripcion = prompt('Ingrese una descripción (opcional):', '');
   if (descripcion === null) return;
-  
+
   const data = {
     nombre: nombre.trim(),
     precio: parseFloat(precio) || 0,
     descripcion: descripcion.trim()
   };
-  
+
   fetch('/taller/documentos/api/crear-servicio/', {
     method: 'POST',
     headers: {
@@ -1042,7 +1042,7 @@ function crearNuevoServicio(nombre) {
     console.error('Error:', error);
     alert('Error al crear el servicio');
   });
-  
+
   // Ocultar resultados
   document.getElementById('resultados-servicio').style.display = 'none';
 }

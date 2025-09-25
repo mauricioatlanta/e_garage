@@ -52,7 +52,7 @@
 
 ### ⚠️ Correcciones Parciales en Reportes:
 - ✅ `reporte_repuestos()` - Corregido
-- ✅ `reporte_servicios()` - Corregido  
+- ✅ `reporte_servicios()` - Corregido
 - ✅ `dashboard_inteligencia_operativa()` - Corregido
 - ✅ `diagnostico_ia()` - Corregido
 - ✅ `reportes_mecanicos()` - Corregido
@@ -174,7 +174,7 @@ class EmpresaMiddleware:
 
 ---
 
-**Estado**: 🚨 **VULNERABILIDAD CRÍTICA ACTIVA**  
-**Prioridad**: **MÁXIMA**  
-**Tiempo estimado de corrección**: **2-4 horas**  
+**Estado**: 🚨 **VULNERABILIDAD CRÍTICA ACTIVA**
+**Prioridad**: **MÁXIMA**
+**Tiempo estimado de corrección**: **2-4 horas**
 **Impacto en producción**: **ALTO RIESGO**

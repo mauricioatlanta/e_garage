@@ -50,7 +50,7 @@ class RepuestoForm(forms.ModelForm):
     repuesto = forms.ModelChoiceField(
         queryset=Repuesto.objects.none(),
         widget=autocomplete.ModelSelect2(
-            url="autocomplete-repuesto",
+            url="autocomplete:repuesto",
             attrs={
                 "data-placeholder": "🔍 Buscar repuesto por part number o nombre",
                 "data-minimum-input-length": 1,
@@ -72,7 +72,7 @@ class VehiculoForm(forms.ModelForm):
     cliente = forms.ModelChoiceField(
         queryset=Cliente.objects.none(),
         widget=autocomplete.ModelSelect2(
-            url="autocomplete-cliente",
+            url="autocomplete:cliente",
             attrs={
                 "data-placeholder": "🔍 Buscar cliente por nombre o RUT",
                 "data-minimum-input-length": 1,
@@ -123,7 +123,7 @@ class DocumentoFormOld(forms.ModelForm):
     cliente = forms.ModelChoiceField(
         queryset=Cliente.objects.none(),  # Se configura en __init__
         widget=autocomplete.ModelSelect2(
-            url="autocomplete-cliente",
+            url="autocomplete:cliente",
             attrs={
                 "data-placeholder": "🔍 Buscar cliente...",
                 "data-minimum-input-length": 1,
@@ -135,7 +135,7 @@ class DocumentoFormOld(forms.ModelForm):
     vehiculo = forms.ModelChoiceField(
         queryset=Vehiculo.objects.none(),  # Se configura en __init__
         widget=autocomplete.ModelSelect2(
-            url="autocomplete-vehiculo",
+            url="autocomplete:vehiculo",
             forward=["cliente"],
             attrs={
                 "data-placeholder": "🔍 Buscar por patente o VIN",
@@ -193,7 +193,7 @@ class DocumentoFormOld(forms.ModelForm):
         mecanico_nombre = self.cleaned_data.get("mecanico")
         if mecanico_nombre:
             mecanico_obj, _ = Tecnico.objects.get_or_create(nombre=mecanico_nombre)
-            instance.mecanico = mecanico_obj
+            instance.tecnico_responsable = mecanico_obj
         if commit:
             instance.save()
             self.save_m2m()

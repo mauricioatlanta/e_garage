@@ -63,7 +63,7 @@ class ClienteCreateView(
     def get_success_url(self):
         from django.urls import reverse
 
-        return reverse("taller:clientes:lista_clientes")
+        return reverse("chile:taller:clientes:lista_clientes")
 
     def form_valid(self, form):
         from django.db import IntegrityError
@@ -80,7 +80,7 @@ class ClienteCreateView(
 
     model = Cliente
     form_class = None  # Se setea en get_form_class
-    base_template_name = "clientes/crear_cliente_simple.html"  # Usar template simple
+    base_template_name = "clientes/crear_cliente.html"  # Usar template existente
 
     def get_form_class(self):
         from taller.clientes.forms import ClienteForm
@@ -171,4 +171,4 @@ class ClienteUpdateView(
     def get_success_url(self):
         from django.urls import reverse
 
-        return reverse("taller:clientes:lista_clientes")
+        return reverse("chile:taller:clientes:lista_clientes")

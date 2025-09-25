@@ -6,6 +6,7 @@
 Este script envía las notificaciones pendientes usando el procesador
 ya configurado con tu contraseña de Gmail.
 """
+
 import os
 
 import django

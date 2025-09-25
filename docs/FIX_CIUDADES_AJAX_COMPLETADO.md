@@ -15,7 +15,7 @@
 4. **Modelo Cliente**: Solo tiene campos: empresa, nombre, apellido, telefono, direccion, region, ciudad, email
 
 ## ✅ Solución Implementada
-**Archivos Corregidos**: 
+**Archivos Corregidos**:
 - ❌ **Eliminado**: `taller/forms/clientes.py` (formulario duplicado problemático)
 - ✅ **Mejorado**: `taller/clientes/forms.py` (formulario correcto)
 
@@ -23,16 +23,16 @@
 ```python
 class ClienteForm(forms.ModelForm):
     region = forms.ModelChoiceField(
-        queryset=TallerRegion.objects.all(), 
+        queryset=TallerRegion.objects.all(),
         widget=forms.Select(attrs={'id': 'id_region', 'class': 'form-control'}),
         empty_label="Seleccione Región"
     )
     ciudad = forms.ModelChoiceField(
-        queryset=TallerCiudad.objects.none(), 
+        queryset=TallerCiudad.objects.none(),
         widget=forms.Select(attrs={'id': 'id_ciudad', 'class': 'form-control'}),
         empty_label="Seleccione Ciudad"
     )
-    
+
     class Meta:
         model = Cliente  # ✅ Correcto (no TallerCliente)
         fields = ['nombre', 'apellido', 'telefono', 'direccion', 'region', 'ciudad', 'email']  # ✅ Sin 'rut'

@@ -116,16 +116,16 @@ body {
 <div class="max-w-4xl mx-auto cuadro">
   <div class="flex justify-between items-center mb-6">
     <h1 class="text-3xl font-bold font-orbitron">Editar Vehículo</h1>
-    <a href="{% country_url 'lista_vehiculos' app_namespace='vehiculos' %}" 
+    <a href="{% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{% else %}/cl/vehiculos/{% endif %}"
        class="btn-futuristic btn-secondary">← Volver a la lista</a>
   </div>
 
   <div class="form-card">
     <form method="post">
       {% csrf_token %}
-      
+
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        
+
         <div class="form-group">
           <label for="{{ form.patente.id_for_label }}">Patente</label>
           {{ form.patente }}
@@ -180,8 +180,9 @@ body {
         <button type="submit" class="btn-futuristic">
           💾 Guardar cambios
         </button>
-        
-        <a href="{% url 'vehiculos:ver_vehiculo' object.id %}" 
+
+        {% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{{ object.id }}/{% else %}/cl/vehiculos/{{ object.id }}/{% endif %} as url_ver_vehiculo
+        <a href="{{ url_ver_vehiculo|default:'#' }}"
            class="btn-futuristic btn-secondary">
           ❌ Cancelar
         </a>

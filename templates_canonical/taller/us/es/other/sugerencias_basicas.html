@@ -337,7 +337,7 @@
         .sugerencias-container {
             grid-template-columns: 1fr;
         }
-        
+
         .vehiculo-selector {
             grid-template-columns: 1fr;
         }
@@ -358,7 +358,7 @@
     <!-- Demo Interactivo -->
     <div class="demo-panel">
         <h2 class="demo-title">🎯 Prueba la IA con un vehículo</h2>
-        
+
         <div class="vehiculo-selector">
             <div class="form-group">
                 <label for="marca">🚗 Marca</label>
@@ -373,23 +373,23 @@
                     <option value="ford">Ford</option>
                 </select>
             </div>
-            
+
             <div class="form-group">
                 <label for="modelo">🏷️ Modelo</label>
                 <input type="text" id="modelo" class="form-control" placeholder="Ej: Corolla, Sentra">
             </div>
-            
+
             <div class="form-group">
                 <label for="anio">📅 Año</label>
                 <input type="number" id="anio" class="form-control" placeholder="2020" min="1990" max="2025">
             </div>
-            
+
             <div class="form-group">
                 <label for="kilometraje">📏 Kilometraje</label>
                 <input type="number" id="kilometraje" class="form-control" placeholder="50000" min="0">
             </div>
         </div>
-        
+
         <button onclick="generarSugerencias()" class="btn-ai">
             🤖 Generar Sugerencias con IA
         </button>
@@ -490,19 +490,19 @@ function generarSugerencias() {
     const modelo = document.getElementById('modelo').value;
     const anio = document.getElementById('anio').value;
     const kilometraje = document.getElementById('kilometraje').value;
-    
+
     if (!marca) {
         alert('Por favor selecciona al menos una marca');
         return;
     }
-    
+
     mostrarLoading();
-    
+
     // Simular procesamiento de IA
     setTimeout(() => {
         const sugerencias = obtenerSugerenciasPorMarca(marca);
         mostrarResultados(sugerencias, marca, kilometraje);
-        
+
         // Analytics
         gtag('event', 'ia_sugerencias_generadas', {
             'event_category': 'ia_engagement',
@@ -518,7 +518,7 @@ function generarSugerencias() {
 
 function demoMarca(marca) {
     document.getElementById('marca').value = marca;
-    
+
     if (marca === 'toyota') {
         document.getElementById('modelo').value = 'Corolla';
         document.getElementById('anio').value = '2020';
@@ -528,7 +528,7 @@ function demoMarca(marca) {
         document.getElementById('anio').value = '2019';
         document.getElementById('kilometraje').value = '60000';
     }
-    
+
     generarSugerencias();
 }
 
@@ -544,12 +544,12 @@ function obtenerSugerenciasPorMarca(marca) {
 function mostrarResultados(sugerencias, marca, kilometraje) {
     document.getElementById('loading-ia').style.display = 'none';
     document.getElementById('resultados-ia').style.display = 'block';
-    
+
     // Confianza
     const confianza = marca === 'toyota' || marca === 'nissan' ? 88 : 72;
     document.getElementById('confianza-texto').textContent = confianza;
     document.getElementById('confianza-fill').style.width = confianza + '%';
-    
+
     // Servicios
     const serviciosHtml = sugerencias.servicios_comunes.map(servicio => `
         <div class="sugerencia-item">
@@ -559,7 +559,7 @@ function mostrarResultados(sugerencias, marca, kilometraje) {
         </div>
     `).join('');
     document.getElementById('servicios-sugeridos').innerHTML = serviciosHtml;
-    
+
     // Repuestos
     if (sugerencias.repuestos_frecuentes) {
         const repuestosHtml = sugerencias.repuestos_frecuentes.map(repuesto => `
@@ -571,7 +571,7 @@ function mostrarResultados(sugerencias, marca, kilometraje) {
         `).join('');
         document.getElementById('repuestos-sugeridos').innerHTML = repuestosHtml;
     }
-    
+
     // Alertas
     if (sugerencias.alertas) {
         const alertasHtml = sugerencias.alertas.map(alerta => `
@@ -580,7 +580,7 @@ function mostrarResultados(sugerencias, marca, kilometraje) {
         document.getElementById('alertas-lista').innerHTML = alertasHtml;
         document.getElementById('alertas-panel').style.display = 'block';
     }
-    
+
     // Scroll a resultados
     document.getElementById('resultados-ia').scrollIntoView({ behavior: 'smooth' });
 }

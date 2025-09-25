@@ -1,3 +1,4 @@
+{% load country_url %}
 <!-- Panel de administración de suscripciones -->
 {% extends 'base.html' %}
 {% block content %}
@@ -107,7 +108,7 @@ body {
           {% endif %}
         </td>
         <td>
-          <form method="post" action="{% url 'taller:renovar_empresa' item.empresa.id %}">
+          <form method="post" action="{% country_url 'renovar_empresa' item.empresa.id  %}">
             {% csrf_token %}
             <button class="btn-renovar">Renovar</button>
           </form>

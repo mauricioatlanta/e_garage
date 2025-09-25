@@ -11,10 +11,7 @@ from django.contrib.auth.models import User
 
 from taller.models.documento import Documento
 from taller.models.empresa import Empresa
-from taller.models.lineas_documento import (
-    LineaRepuesto,
-    LineaServicio,
-)
+from taller.models.lineas_documento import LineaRepuesto, LineaServicio
 from taller.models.tecnico import Tecnico
 
 

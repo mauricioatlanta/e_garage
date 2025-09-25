@@ -3,7 +3,6 @@ from django.core.management.base import BaseCommand
 
 from taller.models.empresa import Empresa
 from taller.models.perfilusuario import PerfilUsuario
-from taller.models.tecnico import Mecanico
 
 
 class Command(BaseCommand):

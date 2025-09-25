@@ -299,7 +299,7 @@ input[type="text"]::placeholder {
     grid-template-columns: 1fr;
     gap: 15px;
   }
-  
+
   .cliente-card:nth-child(3n),
   .cliente-card:nth-child(5n),
   .cliente-card:nth-child(7n) {
@@ -327,10 +327,10 @@ input[type="text"]::placeholder {
     <div class="twinkling"></div>
     <div class="clouds"></div>
   </div>
-  
+
   <!-- Partículas flotantes -->
   <div id="particles" class="particles-container"></div>
-  
+
   <div class="content-container max-w-7xl mx-auto">
   <!-- Header Section with Glowing Effect -->
   <div class="futuristic-header">
@@ -353,7 +353,7 @@ input[type="text"]::placeholder {
           </div>
           <div class="relative group">
             <div class="absolute -inset-1 rounded-lg bg-gradient-to-r from-emerald-500 via-lime-500 to-green-500 opacity-30 blur group-hover:opacity-50 transition-opacity"></div>
-            <a href="{% country_url 'crear_cliente' app_namespace='clientes' %}" 
+            <a href="{% country_url 'crear_cliente' app_namespace='clientes' %}"
                class="relative inline-flex items-center space-x-2 px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-600 via-lime-600 to-green-600 hover:from-emerald-500 hover:via-lime-500 hover:to-green-500 text-white font-bold text-sm shadow-lg shadow-emerald-800/40 transition-all duration-300 border border-emerald-400/40">
               <div class="w-4 h-4 rounded-md bg-white/20 flex items-center justify-center">
                 <span class="text-sm">➕</span>
@@ -365,7 +365,7 @@ input[type="text"]::placeholder {
       </div>
     </div>
   </div>
-  
+
   <!-- Chart Section -->
   <div class="chart-section">
     <h3 class="text-xl font-bold mb-4 text-cyan-300 font-orbitron">📊 Distribución de Clientes por Región</h3>
@@ -380,32 +380,32 @@ input[type="text"]::placeholder {
       </div>
     </div>
   </div>
-  
+
   <!-- Search Section -->
   <div class="futuristic-search">
     <div class="glow-bg"></div>
     <div class="input-container">
       <div class="search-icon">🔍</div>
-      <input type="search" id="searchInput" name="q" 
-             placeholder="Buscar cliente por nombre, apellido, email o teléfono..." 
+      <input type="search" id="searchInput" name="q"
+             placeholder="Buscar cliente por nombre, apellido, email o teléfono..."
              class="w-full px-3 py-2 bg-transparent text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-400/50 text-sm">
       <button type="button" id="searchBtn" class="search-btn">
         ESCANEAR
       </button>
     </div>
   </div>
-  
+
   <!-- Clientes Grid - Futuristic Style -->
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3" id="clientesContainer">
     {% for cliente in clientes %}
-    <div class="group relative futuristic-card transform hover:scale-105 transition-all duration-300" 
-         data-name="{{ cliente.nombre|default:'' }} {{ cliente.apellido|default:'' }}" 
+    <div class="group relative futuristic-card transform hover:scale-105 transition-all duration-300"
+         data-name="{{ cliente.nombre|default:'' }} {{ cliente.apellido|default:'' }}"
          data-email="{{ cliente.email|default:'' }}"
          data-telefono="{{ cliente.telefono|default:'' }}"
          data-cliente-id="{{ cliente.pk }}">
       <!-- Glow effect -->
       <div class="glow-effect"></div>
-      
+
       <!-- Main card -->
       <div class="relative rounded-lg border border-gray-700/50 bg-black/40 backdrop-blur-sm hover:border-cyan-400/30 transition-all duration-300 h-48 flex flex-col">
         <!-- Header with ID -->
@@ -414,7 +414,7 @@ input[type="text"]::placeholder {
             <div class="flex items-center space-x-2">
               <div class="w-6 h-6 rounded-md border border-cyan-400/30 flex items-center justify-center"
                    {% if cliente.color %}style="background-color: {{ cliente.color.codigo_color }}20; border-color: {{ cliente.color.codigo_color }}50;"{% else %}style="background: linear-gradient(135deg, rgba(6, 182, 212, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);"{% endif %}>
-                <span class="font-mono text-xs" 
+                <span class="font-mono text-xs"
                       {% if cliente.color %}style="color: {{ cliente.color.codigo_color }};"{% else %}class="text-cyan-300"{% endif %}>
                   {{ cliente.nombre|first|upper }}{{ cliente.apellido|first|upper }}
                 </span>
@@ -427,7 +427,7 @@ input[type="text"]::placeholder {
             <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
           </div>
         </div>
-        
+
         <!-- Content -->
         <div class="p-3 space-y-2 flex-1">
           <!-- Nombre completo -->
@@ -435,7 +435,7 @@ input[type="text"]::placeholder {
             <p class="text-xs text-gray-500 uppercase tracking-wider">Cliente</p>
             <p class="text-gray-200 font-medium text-sm truncate">{{ cliente.nombre }} {{ cliente.apellido }}</p>
           </div>
-          
+
           <!-- Email y Teléfono -->
           <div class="grid grid-cols-1 gap-2">
             {% if cliente.email %}
@@ -451,7 +451,7 @@ input[type="text"]::placeholder {
             </div>
             {% endif %}
           </div>
-          
+
           <!-- Ciudad -->
           {% if cliente.ciudad %}
           <div class="flex items-center space-x-2">
@@ -464,11 +464,11 @@ input[type="text"]::placeholder {
             </div>
           </div>
           {% endif %}
-          
+
           <!-- Color de identificación -->
           {% if cliente.color %}
           <div class="flex items-center space-x-2">
-            <div class="w-5 h-5 rounded-full border-2 border-cyan-400/50" 
+            <div class="w-5 h-5 rounded-full border-2 border-cyan-400/50"
                  style="background-color: {{ cliente.color.codigo_color }};"></div>
             <div>
               <p class="text-xs text-gray-500 uppercase tracking-wider">Color</p>
@@ -477,11 +477,12 @@ input[type="text"]::placeholder {
           </div>
           {% endif %}
         </div>
-        
+
         <!-- Actions -->
         <div class="p-3 border-t border-gray-700/30 flex-shrink-0">
           <div class="flex justify-between space-x-1">
-            <a href="{% url 'clientes:ver_cliente' cliente.id %}" 
+            {% country_url 'clientes:ver_cliente' cliente.id as url_ver %}
+            <a href="{{ url_ver }}"
                class="flex-1 group/btn relative px-2 py-1.5 rounded-md bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border border-cyan-400/40 text-cyan-300 hover:from-cyan-500/30 hover:to-blue-500/30 hover:text-cyan-200 transition-all duration-200 text-xs font-medium text-center">
               <span class="relative z-10 flex items-center justify-center space-x-1">
                 <span>👁️</span>
@@ -489,7 +490,8 @@ input[type="text"]::placeholder {
               </span>
               <div class="absolute inset-0 rounded-md bg-gradient-to-r from-cyan-600 to-blue-600 opacity-0 group-hover/btn:opacity-20 transition-opacity"></div>
             </a>
-            <a href="{% url 'clientes:editar_cliente' cliente.id %}" 
+            {% country_url 'clientes:editar_cliente' cliente.id as url_editar %}
+            <a href="{{ url_editar }}"
                class="flex-1 group/btn relative px-2 py-1.5 rounded-md bg-gradient-to-r from-emerald-600/20 to-green-600/20 border border-emerald-400/40 text-emerald-300 hover:from-emerald-500/30 hover:to-green-500/30 hover:text-emerald-200 transition-all duration-200 text-xs font-medium text-center">
               <span class="relative z-10 flex items-center justify-center space-x-1">
                 <span>⚙️</span>
@@ -497,7 +499,8 @@ input[type="text"]::placeholder {
               </span>
               <div class="absolute inset-0 rounded-md bg-gradient-to-r from-emerald-600 to-green-600 opacity-0 group-hover/btn:opacity-20 transition-opacity"></div>
             </a>
-            <button onclick="confirmarEliminacion({{ cliente.pk }}, '{{ cliente.nombre|escapejs }} {{ cliente.apellido|escapejs }}', '{% url 'clientes:eliminar_cliente' cliente.id %}')" 
+            {% country_url 'clientes:eliminar_cliente' cliente.id as url_eliminar %}
+            <button onclick="confirmarEliminacion({{ cliente.pk }}, '{{ cliente.nombre|escapejs }} {{ cliente.apellido|escapejs }}', '{{ url_eliminar }}')"
                     class="flex-1 group/btn relative px-2 py-1.5 rounded-md bg-gradient-to-r from-red-600/20 to-pink-600/20 border border-red-400/40 text-red-300 hover:from-red-500/30 hover:to-pink-500/30 hover:text-red-200 transition-all duration-200 text-xs font-medium text-center">
               <span class="relative z-10 flex items-center justify-center space-x-1">
                 <span>🗑️</span>
@@ -539,7 +542,7 @@ input[type="text"]::placeholder {
         <h3 class="text-xl font-bold text-gray-200 mb-2 modal-title">Confirmar Eliminación</h3>
         <p class="text-gray-400 mb-6 modal-message">¿Está seguro de que desea eliminar <span class="item-name text-red-400 font-semibold"></span>?</p>
         <div class="flex space-x-3">
-          <button onclick="cerrarModal()" 
+          <button onclick="cerrarModal()"
                   class="flex-1 px-4 py-2 rounded-lg bg-gradient-to-r from-gray-600/20 to-gray-700/20 border border-gray-500/40 text-gray-300 hover:from-gray-500/30 hover:to-gray-600/30 transition-all duration-200 text-sm font-medium">
             Cancelar
           </button>
@@ -565,11 +568,11 @@ input[type="text"]::placeholder {
         items: '.futuristic-card'
       });
     }
-    
+
     // Chart functionality (mantener el código existente)
     const input = document.getElementById('searchInput');
     const cards = document.querySelectorAll('.futuristic-card');
-    
+
     input.addEventListener('input', function() {
       const filtro = this.value.toLowerCase();
       cards.forEach(card => {

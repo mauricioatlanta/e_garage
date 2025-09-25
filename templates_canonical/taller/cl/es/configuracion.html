@@ -33,22 +33,22 @@
             <form method="post" class="futuristic-form">
                 {% csrf_token %}
                 <input type="hidden" name="datos_form" value="1">
-                
+
                 <div class="form-group">
                     <label class="form-label" for="id_first_name">{{ datos_form.first_name.label }}</label>
                     {{ datos_form.first_name|add_class:'form-input' }}
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label" for="id_last_name">{{ datos_form.last_name.label }}</label>
                     {{ datos_form.last_name|add_class:'form-input' }}
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label" for="id_email">{{ datos_form.email.label }}</label>
                     {{ datos_form.email|add_class:'form-input' }}
                 </div>
-                
+
                 <button class="cyber-btn" type="submit">💾 Guardar Datos</button>
             </form>
         </div>
@@ -59,27 +59,27 @@
             <form method="post" enctype="multipart/form-data" class="futuristic-form">
                 {% csrf_token %}
                 <input type="hidden" name="empresa_form" value="1">
-                
+
                 <div class="form-group">
                     <label class="form-label" for="id_nombre_taller">{{ empresa_form.nombre_taller.label }}</label>
                     {{ empresa_form.nombre_taller|add_class:'form-input' }}
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label" for="id_empresa">{{ empresa_form.empresa.label }}</label>
                     {{ empresa_form.empresa|add_class:'form-input' }}
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label" for="id_direccion">{{ empresa_form.direccion.label }}</label>
                     {{ empresa_form.direccion|add_class:'form-input' }}
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label" for="id_telefono">{{ empresa_form.telefono.label }}</label>
                     {{ empresa_form.telefono|add_class:'form-input' }}
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label" for="id_logo">{{ empresa_form.logo.label }}</label>
                     {{ empresa_form.logo|add_class:'form-input' }}
@@ -90,7 +90,7 @@
                     </div>
                     {% endif %}
                 </div>
-                
+
                 <button class="cyber-btn" type="submit">💾 Guardar Empresa</button>
             </form>
         </div>
@@ -119,27 +119,27 @@
     {% if tecnicos is not None %}
     <div class="config-panel">
         <div class="panel-title">👥 Gestión de Técnicos</div>
-        
+
         <!-- Formulario rápido -->
         <form method="post" style="display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 1rem; align-items: end; background: var(--glass-bg); padding: 1.5rem; border-radius: 10px; border: 1px solid var(--neon-purple); margin-bottom: 1.5rem;">
             {% csrf_token %}
             <input type="hidden" name="crear_tecnico_rapido" value="1">
-            
+
             <div class="form-group">
                 <label class="form-label" for="tec_nombre">Nombre del Técnico</label>
                 <input id="tec_nombre" name="nombre" required minlength="2" placeholder="Nombre completo" class="form-input" />
             </div>
-            
+
             <div class="form-group">
                 <label class="form-label" for="tec_tel">Teléfono</label>
                 <input id="tec_tel" name="telefono" placeholder="+56..." class="form-input" />
             </div>
-            
+
             <div class="form-group">
                 <label class="form-label" for="tec_dir">Dirección</label>
                 <input id="tec_dir" name="direccion" placeholder="Opcional" class="form-input" />
             </div>
-            
+
             <button type="submit" class="cyber-btn" style="padding: 1rem;">➕ Crear</button>
         </form>
 
@@ -156,8 +156,8 @@
                 </div>
                 <form method="post" style="margin: 0;">
                     {% csrf_token %}
-                    <button name="toggle_tecnico" value="{{ t.id }}" 
-                            class="cyber-btn" 
+                    <button name="toggle_tecnico" value="{{ t.id }}"
+                            class="cyber-btn"
                             style="padding: 0.5rem 1rem; font-size: 0.8rem; background: {{ t.activo|yesno:'linear-gradient(135deg, #ff6b6b, #ff8e8e)','linear-gradient(135deg, #00ff88, #00ffaa)' }};">
                         {{ t.activo|yesno:'Desactivar','Activar' }}
                     </button>

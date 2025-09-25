@@ -45,21 +45,21 @@ urlpatterns = [
     # Landings internacionales
     path('chile/', TemplateView.as_view(template_name='public/landing_chile.html'), name='landing_chile'),
     path('landing-bilingue/', TemplateView.as_view(template_name='public/landing_inicio_en.html'), name='landing_bilingue'),
-    
+
     # URLs de bienvenida por país - NUEVAS URLS
     path('bienvenida/cl/', TemplateView.as_view(template_name='onboarding/bienvenida_chile.html'), name='bienvenida_chile'),
     path('bienvenida/usa/', TemplateView.as_view(template_name='onboarding/bienvenida_usa.html'), name='bienvenida_usa'),
     path('welcome/us/', TemplateView.as_view(template_name='onboarding/bienvenida_usa.html'), name='welcome_usa'),
-    
+
     path('registro/', registro, name='registro'),
     path('suscripcion-bloqueada/', suscripcion_bloqueada, name='suscripcion_bloqueada'),
-    
+
     # Sistema de suscripciones
     path('suspension/', suspension, name='suspension'),
     path('comprobante-pago/', subir_comprobante, name='subir_comprobante'),
     path('api/estado-suscripcion/', estado_suscripcion, name='estado_suscripcion'),
     path('precios/', precios, name='precios'),
-    
+
     path('', landing_inicio, name='inicio'),
     path('landing/', landing_premium, name='landing_premium'),
     path('egarage/', landing_egarage, name='landing_egarage'),
@@ -68,20 +68,20 @@ urlpatterns = [
     path('activar-trial/', activar_trial, name='activar_trial'),
     path('activar/', activar_trial),
     path('admin/', admin_site.urls),
-    
+
     # API principal de la app
     path('api/', include('taller.urls.api_urls')),
     path('api/', include('taller.urls.api_urls_usa')),
-    
+
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
-    
+
     # Django Allauth URLs
     path('accounts/', include('allauth.urls')),
 
     # Dashboard principal
     path('dashboard/', dashboard_view, name='dashboard'),
-    
+
     # Landings específicas para usuarios
     path('inicio-usuarios/', landing_inicio, name='inicio_usuarios'),
     path('mecanicos/', landing_mecanicos, name='landing_mecanicos'),
@@ -98,16 +98,16 @@ urlpatterns = [
     path('reportes/', include('taller.reportes.urls')),
     path('repuestos/', include('taller.repuestos.urls')),
     path('documentos/', include('taller.documentos.urls')),
-    
+
     # Autocomplete URLs
     path('autocomplete/', include('taller.urls.autocomplete_urls')),
-    
+
     # Servicios URLs
     path('servicios/', include('taller.urls.servicios_urls')),
-    
+
     # API para obtener ciudades por región
     path('api/ciudades/', obtener_ciudades, name='ciudades_por_region'),
-    
+
     # API adicionales
     path('api/', include('taller.urls.api_general')),
 ]
@@ -350,6 +350,6 @@ Después del reload, probar estas URLs en el navegador:
 - ✅ https://e-garage-atlantareciclajes.pythonanywhere.com/welcome/us/
 
 ---
-**⏱️ Tiempo total:** 2-3 minutos  
-**🎯 Dificultad:** Fácil (copiar y pegar)  
+**⏱️ Tiempo total:** 2-3 minutos
+**🎯 Dificultad:** Fácil (copiar y pegar)
 **✅ Garantía:** URLs funcionando al 100%

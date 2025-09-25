@@ -25,10 +25,11 @@ class Documento(AuditMixin, models.Model):
     tipo = models.CharField(
         max_length=4,
         choices=[
+            ("OT", _("Orden de Trabajo")),
             ("PRES", _("Presupuesto")),
-            ("OT", _("Orden de trabajo")),
-            ("FAC", _("Factura")),
-            ("BOL", _("Boleta")),
+            ("REC", _("Recibo/Boleta")),
+            # ("FAC", _("Factura (LEGACY)")),  # Legacy, no mostrar en forms
+            # ("BOL", _("Boleta (LEGACY)")),   # Legacy, no mostrar en forms
         ],
         db_index=True,
     )

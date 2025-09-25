@@ -2,10 +2,9 @@ from dal import autocomplete
 from dal_select2.widgets import ModelSelect2
 
 from django import forms
-from django.urls import reverse_lazy
 
 from taller.models.clientes import Cliente
-from taller.models.vehiculos import Vehiculo
+from taller.models.vehiculos import CajaVehiculo, Modelo, MotorVehiculo, Vehiculo
 
 
 class VehiculoForm(forms.ModelForm):
@@ -19,9 +18,18 @@ class VehiculoForm(forms.ModelForm):
             self.fields["cliente"].queryset = Cliente.objects.filter(
                 empresa=self.user.empresa
             )
+            # Filtrar modelos por país de la empresa
+            country = getattr(self.user.empresa, "pais", "CL")
+            self.fields["modelo"].queryset = Modelo.objects.filter(country=country)
+            # Motores y cajas se cargan vía AJAX, iniciar vacíos
+            self.fields["motor"].queryset = MotorVehiculo.objects.none()
+            self.fields["caja"].queryset = CajaVehiculo.objects.none()
         else:
-            # Si no hay user o empresa, no mostrar clientes
+            # Si no hay user o empresa, no mostrar opciones
             self.fields["cliente"].queryset = Cliente.objects.none()
+            self.fields["modelo"].queryset = Modelo.objects.none()
+            self.fields["motor"].queryset = MotorVehiculo.objects.none()
+            self.fields["caja"].queryset = CajaVehiculo.objects.none()
 
     class Meta:
         model = Vehiculo
@@ -37,51 +45,58 @@ class VehiculoForm(forms.ModelForm):
             "color",
         ]
         widgets = {
-            "cliente": ModelSelect2(
-                url=reverse_lazy("vehiculos:autocomplete_cliente"),
+            "cliente": autocomplete.ModelSelect2(
+                url="autocomplete:cliente",
                 attrs={
-                    "data-placeholder": "Buscar cliente...",
-                    "data-minimum-input-length": 0,
+                    "data-placeholder": "🔍 Escribe el nombre del cliente para buscar...",
+                    "data-minimum-input-length": 1,
+                    "data-allow-clear": "true",
+                    "style": "width:100%",
                 },
             ),
             "marca": ModelSelect2(
-                url=reverse_lazy("vehiculos:autocomplete_marca"),
+                url="autocomplete:marca",
                 attrs={
                     "data-placeholder": "Seleccionar marca...",
                     "data-minimum-input-length": 0,
+                    "style": "width:100%",
                 },
             ),
             "modelo": ModelSelect2(
-                url=reverse_lazy("vehiculos:autocomplete_modelo"),
+                url="autocomplete:modelo",
                 forward=["marca"],
                 attrs={
                     "data-placeholder": "Modelos según marca...",
                     "data-minimum-input-length": 0,
+                    "style": "width:100%",
                 },
             ),
             "motor": ModelSelect2(
-                url=reverse_lazy("vehiculos:autocomplete_motor"),
+                url="/cl/es/vehiculos/autocomplete/motor/",
                 forward=["modelo"],
                 attrs={
-                    "data-placeholder": "Filtrado por modelo...",
+                    "data-placeholder": "Motor filtrado por modelo...",
                     "data-minimum-input-length": 0,
+                    "style": "width:100%",
                 },
             ),
             "caja": ModelSelect2(
-                url=reverse_lazy("vehiculos:autocomplete_caja"),
+                url="/cl/es/vehiculos/autocomplete/caja/",
                 forward=["modelo"],
                 attrs={
-                    "data-placeholder": "Filtrado por modelo...",
+                    "data-placeholder": "Caja filtrada por modelo...",
                     "data-minimum-input-length": 0,
+                    "style": "width:100%",
                 },
             ),
             "color": autocomplete.ModelSelect2(
-                url=reverse_lazy("vehiculos:autocomplete_color"),
+                url="/cl/es/vehiculos/autocomplete/color/",
                 attrs={
                     "data-placeholder": "Selecciona o escribe un color...",
                     "data-tags": "true",  # Permite escribir uno nuevo
                     "data-allow-clear": "true",
                     "data-minimum-input-length": 0,
+                    "style": "width:100%",
                 },
             ),
         }

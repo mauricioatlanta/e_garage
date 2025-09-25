@@ -1,3 +1,4 @@
+{% load country_url %}
 {% extends 'base.html' %}
 {% load static %}
 
@@ -35,7 +36,7 @@
         <!-- Botón flotante -->
         {% url 'servicios:crear_otro_servicio' as url_crear_otro %}
         {% if not url_crear_otro %}
-            {% url 'taller:servicios:crear_otro_servicio' as url_crear_otro %}
+            {% country_url 'servicios:crear_otro_servicio' as url_crear_otro %}
         {% endif %}
         {% if not url_crear_otro %}
             {% url 'chile:servicios:crear_otro_servicio' as url_crear_otro %}

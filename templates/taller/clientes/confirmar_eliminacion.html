@@ -1,3 +1,4 @@
+{% load country_url %}
 {% extends 'base.html' %}
 {% load i18n %}
 {% block title %}{% if LANGUAGE_CODE == 'es' %}Confirmar Eliminación{% else %}Confirm Delete{% endif %} · {{ cliente }}{% endblock %}
@@ -38,11 +39,11 @@
           </div>
           {% endif %}
         </div>
-        <form method="post" action="{% url 'taller:clientes:eliminar_cliente' cliente_id=cliente.pk %}" class="mt-10" id="delete-form">
+        <form method="post" action="{% country_url 'clientes:eliminar_cliente' cliente_id=cliente.pk  %}" class="mt-10" id="delete-form">
           {% csrf_token %}
           <div class="flex flex-col sm:flex-row gap-4">
-            {% url 'taller:clientes:lista_clientes' as url_lista %}
-            {% if not url_lista %}{% url 'taller:clientes:lista_clientes' as url_lista %}{% endif %}
+            {% country_url 'clientes:lista_clientes' as url_lista %}
+            {% if not url_lista %}{% country_url 'clientes:lista_clientes' as url_lista %}{% endif %}
             <a href="{{ url_lista }}" class="group flex-1 inline-flex items-center justify-center gap-2 rounded-xl border border-cyan-500/40 bg-gradient-to-r from-cyan-600/20 to-cyan-400/10 hover:from-cyan-500/30 hover:to-cyan-300/20 text-cyan-200 font-semibold px-6 py-4 transition-all shadow hover:shadow-cyan-500/20">
               <span class="text-lg">⟲</span>
               <span>{% if LANGUAGE_CODE == 'es' %}Cancelar{% else %}Cancel{% endif %}</span>
@@ -62,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     form.addEventListener('submit', function(event) {
         event.preventDefault();
-        
+
         if (confirm('{% if LANGUAGE_CODE == 'es' %}¿Confirmas la eliminación permanente?{% else %}Confirm permanent deletion?{% endif %}')) {
             button.disabled = true;
             buttonText.textContent = '{% if LANGUAGE_CODE == 'es' %}Eliminando...{% else %}Deleting...{% endif %}';

@@ -89,18 +89,18 @@
             <h1>⚠️ eGarage</h1>
             <p>Tu trial está por vencer</p>
         </div>
-        
+
         <div class="content">
             <h2>Hola {{ user_name }},</h2>
-            
+
             <div class="warning-box">
                 <div class="warning-icon">⏰</div>
                 <h3>Tu trial expira en {{ days_remaining }} día{{ days_remaining|pluralize:",s" }}</h3>
                 <p><strong>{{ empresa_name }}</strong></p>
             </div>
-            
+
             <p>Tu período de prueba gratuito de eGarage está llegando a su fin. ¡No pierdas acceso a todas las funcionalidades que te ayudan a gestionar tu taller!</p>
-            
+
             <div class="benefits">
                 <h4>🚀 Lo que perderás si no activas tu suscripción:</h4>
                 <ul>
@@ -112,12 +112,12 @@
                     <li>☁️ Backup automático en la nube</li>
                 </ul>
             </div>
-            
+
             <div style="text-align: center; margin: 30px 0;">
                 <a href="{{ upgrade_url }}" class="cta-button">🚀 Activar Suscripción</a>
                 <a href="{{ login_url }}" class="cta-button" style="background: #28a745;">🔐 Ingresar a mi Cuenta</a>
             </div>
-            
+
             <p><strong>¿Por qué elegir eGarage?</strong></p>
             <p>Más de 10,000 talleres confían en nosotros para:</p>
             <ul>
@@ -125,10 +125,10 @@
                 <li>Reducir tiempo de gestión en 60%</li>
                 <li>Mejorar satisfacción del cliente</li>
             </ul>
-            
+
             <p>¿Tienes preguntas? Nuestro equipo está listo para ayudarte.</p>
         </div>
-        
+
         <div class="footer">
             <p>📧 <strong>¿Necesitas ayuda?</strong> Escríbenos a {{ support_email }}</p>
             <p>© {{ today.year }} eGarage - La plataforma #1 para talleres</p>

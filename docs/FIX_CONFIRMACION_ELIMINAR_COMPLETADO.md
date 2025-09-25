@@ -28,7 +28,7 @@ function confirmarEliminacion(nombreCliente) {
 ```
 
 ```html
-<a href="{% url 'taller:clientes:eliminar_cliente' cliente.id %}" 
+<a href="{% url 'taller:clientes:eliminar_cliente' cliente.id %}"
    class="text-red-400 hover:underline"
    onclick="return confirmarEliminacion('{{ cliente.nombre }}{% if cliente.apellido %} {{ cliente.apellido }}{% endif %}')">
    Eliminar

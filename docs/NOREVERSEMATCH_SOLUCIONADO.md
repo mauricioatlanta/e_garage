@@ -9,7 +9,7 @@ Se ha corregido el error `NoReverseMatch` que ocurría al procesar documentos, c
 **Error específico:**
 ```
 NoReverseMatch at /us/documentos/procesar/
-Reverse for 'crear_documento' with keyword arguments '{'country': 'US'}' not found. 
+Reverse for 'crear_documento' with keyword arguments '{'country': 'US'}' not found.
 1 pattern(s) tried: ['us/documentos/nuevo/\\Z']
 ```
 
@@ -90,7 +90,7 @@ urlpatterns = [
 #### **Resolución automática:**
 - Cuando estás en `/us/documentos/procesar/`, el namespace es `documentos_us`
 - `redirect('documentos:crear_documento')` se resuelve a `/us/documentos/nuevo/`
-- Cuando estás en `/cl/documentos/procesar/`, el namespace es `documentos_cl`  
+- Cuando estás en `/cl/documentos/procesar/`, el namespace es `documentos_cl`
 - `redirect('documentos:crear_documento')` se resuelve a `/cl/documentos/nuevo/`
 
 ### 🧪 **Funcionalidades Restauradas**
@@ -146,7 +146,7 @@ El sistema de procesamiento de documentos está completamente funcional:
 
 - ✅ **`taller/documentos/views_moderno.py`**
   - Línea 195: Redirect validación método
-  - Línea 211: Redirect validación campos  
+  - Línea 211: Redirect validación campos
   - Línea 456: Redirect éxito
   - Línea 460: Redirect manejo errores
 

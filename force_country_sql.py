@@ -2,6 +2,7 @@
 """
 Script para forzar el cambio de país directamente en SQL
 """
+
 import os
 import sys
 

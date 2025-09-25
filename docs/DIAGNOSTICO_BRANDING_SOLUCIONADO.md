@@ -46,13 +46,13 @@ if config and config.logo:
 def empresa_contexto(request):
     # ANTES: empresa.logo.url (❌ NO existe)
     # DESPUÉS: empresa.config.logo.url (✅ CORRECTO)
-    
+
     if empresa:
         config = getattr(empresa, 'config', None)
         logo_url = None
         if config and config.logo:
             logo_url = config.logo.url
-        
+
         return {
             'empresa': empresa,
             'nombre_taller': getattr(empresa, 'nombre_taller', 'eGarage'),
@@ -66,14 +66,14 @@ def empresa_contexto(request):
 def company_branding(request):
     # ANTES: Buscaba CompanySettings inexistente
     # DESPUÉS: Busca ConfiguracionEmpresa
-    
+
     empresa = Empresa.objects.get(user=request.user)
     company_settings = ConfiguracionEmpresa.objects.get(empresa=empresa)
-    
+
     logo_url = '/static/images/egarage_default_logo.png'
     if company_settings and company_settings.logo:
         logo_url = company_settings.logo.url
-    
+
     return {
         'company_logo': logo_url,
         'company_logo_url': logo_url,  # Alias para compatibilidad
@@ -88,7 +88,7 @@ def company_context(request):
     # Corregido para buscar empresa del usuario correctamente
     empresa = Empresa.objects.get(user=request.user)
     company_settings = ConfiguracionEmpresa.objects.get(empresa=empresa)
-    
+
     return {
         "country": empresa.pais,
         "company_settings": company_settings,
@@ -133,8 +133,8 @@ Después de las correcciones, los templates tienen acceso a:
 ### Template PDF (`base_document.html`):
 ```html
 {% if company_logo and company_logo != '/static/images/egarage_default_logo.png' %}
-    <img src="{{ request.build_absolute_uri:company_logo }}" 
-         alt="{{ company_name|default:'eGarage' }}" 
+    <img src="{{ request.build_absolute_uri:company_logo }}"
+         alt="{{ company_name|default:'eGarage' }}"
          class="company-logo">
 {% endif %}
 ```
@@ -142,7 +142,7 @@ Después de las correcciones, los templates tienen acceso a:
 ### Vista PDF (`taller/documentos/views.py`):
 ```python
 # El context processor automáticamente inyecta company_logo_url
-# build_absolute_uri convierte /media/logos/auto.png en 
+# build_absolute_uri convierte /media/logos/auto.png en
 # http://127.0.0.1:8000/media/logos/auto.png para WeasyPrint
 ```
 
@@ -158,7 +158,7 @@ TEMPLATES = [{
         'context_processors': [
             # ...
             'taller.context_processors.empresa_contexto',      # ✅ Activo
-            'taller.context_processors.company_context',       # ✅ Activo  
+            'taller.context_processors.company_context',       # ✅ Activo
             'taller.context_processors.company_branding',      # ✅ Debería estar activo
         ],
     },

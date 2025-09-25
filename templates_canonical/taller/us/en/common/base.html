@@ -91,7 +91,7 @@
     <!-- Settings Button -->
     {% if request.user.is_authenticated %}
       {% load country_url %}
-      {% country_url 'futuristic_company_settings' app_namespace='taller' as settings_url %}
+      {% country_url 'futuristic_company_settings' app_namespace='direct' as settings_url %}
       {% if settings_url %}
         <a href="{{ settings_url }}"
            class="flex items-center gap-2 px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition"
@@ -174,7 +174,7 @@
 
       <!-- Settings -->
       {% load country_url %}
-      {% country_url 'company_settings' app_namespace='taller' as url_settings %}
+      {% country_url 'company_settings' app_namespace='direct' as url_settings %}
       {% if url_settings %}
         <a href="{{ url_settings }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
           <span>⚙️</span>
@@ -199,11 +199,11 @@
       {% endif %}
       {% comment %} Documents with updated namespaces {% endcomment %}
       {% if request.path|slice:":3" == "/cl" %}
-        {% url 'documentos_cl:lista_documentos' as url_documentos %}
+        {% url 'documentos_cl_es:lista_documentos' as url_documentos %}
       {% elif request.path|slice:":3" == "/us" %}
-        {% url 'documentos_us:lista_documentos' as url_documentos %}
+        {% url 'documentos_us_en:lista_documentos' as url_documentos %}
       {% else %}
-        {% url 'documentos_cl:lista_documentos' as url_documentos %}
+        {% url 'documentos_cl_es:lista_documentos' as url_documentos %}
       {% endif %}
       {% if url_documentos %}
         <a href="{{ url_documentos }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">

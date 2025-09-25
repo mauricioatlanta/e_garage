@@ -225,7 +225,6 @@ def rate_limit(action="login", per_ip=True, per_user=False):
                 and response.status_code in [200, 302]
                 and request.method == "POST"
             ):
-
                 for identifier in identifiers:
                     rate_limiter.reset_attempts(action, identifier)
 

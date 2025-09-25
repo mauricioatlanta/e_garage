@@ -3,7 +3,7 @@
 ## 🔍 Elementos Eliminados
 En `/en/vehiculos/crear/` se eliminó la barra de navegación superior que contenía:
 - E-Garage (logo/texto)
-- Inicio  
+- Inicio
 - Vehículos
 - Documentos
 - Repuestos

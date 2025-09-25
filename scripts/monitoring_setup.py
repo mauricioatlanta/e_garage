@@ -2,14 +2,16 @@
 """
 Script para configurar monitoreo y alertas en producción
 """
+
 import json
 import logging
 import os
 from datetime import datetime
 from pathlib import Path
 
-import django
 import requests
+
+import django
 
 # Configurar Django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings")

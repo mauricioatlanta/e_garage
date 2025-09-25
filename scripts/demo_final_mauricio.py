@@ -6,6 +6,7 @@
 Esta demostración muestra que el sistema está 100% funcional
 y listo para usar con tus datos reales.
 """
+
 import os
 
 import django

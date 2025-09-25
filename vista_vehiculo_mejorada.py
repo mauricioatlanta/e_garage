@@ -21,14 +21,14 @@ log = logging.getLogger(__name__)
 def crear_vehiculo(request):
     """Vista para crear vehículos con FormVehiculo"""
     empresa = getattr(request.user, "empresa", None)
-    
+
     if not empresa:
         messages.error(request, "No tienes una empresa asignada")
         return redirect('taller:dashboard')
 
     if request.method == "POST":
         print('[DEBUG POST] Datos recibidos:', dict(request.POST))
-        
+
         form = VehiculoForm(request.POST, user=request.user)
         if form.is_valid():
             vehiculo = form.save(commit=False)
@@ -39,7 +39,7 @@ def crear_vehiculo(request):
             messages.success(request, "Vehículo creado correctamente.")
             log.info(f"Vehículo creado: {vehiculo}")
             # ✅ Redirigir a la lista
-            return redirect("taller:vehiculos:lista_vehiculos")
+            return redirect("chile:taller:vehiculos:lista_vehiculos")
         else:
             messages.error(request, "Revisa los errores del formulario.")
             print('[DEBUG] Errores del formulario:', form.errors)
@@ -48,13 +48,13 @@ def crear_vehiculo(request):
 
     # Detectar país para contexto
     country = getattr(empresa, 'pais', 'CL')
-    
+
     # Si usas el combo manual de clientes en el template:
     clientes = Cliente.objects.filter(empresa=empresa).order_by("nombre")
-    
+
     # Obtener marcas según país
     marcas = get_marcas_por_pais(country)
-    
+
     # Colores globales
     colores = ColorVehiculo.objects.all()
 

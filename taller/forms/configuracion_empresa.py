@@ -26,6 +26,33 @@ class ConfiguracionEmpresaForm(forms.ModelForm):
         ]
         widgets = {"logo": ClearableFileInput(attrs={"accept": "image/*"})}
 
+    def __init__(self, *args, **kwargs):
+        # Extraer request de kwargs antes de llamar a super()
+        request = kwargs.pop("request", None)
+        super().__init__(*args, **kwargs)
+
+        # Detectar el país basado en la URL o contexto
+        if request:
+            # Si la URL contiene /us/, es USA
+            if "/us/" in request.path:
+                # Para USA, solo mostrar USD
+                self.fields["moneda"].widget = forms.Select(
+                    choices=[("USD", "USD - Dólares Americanos")]
+                )
+                self.fields["moneda"].initial = "USD"
+                # Para USA, tasa de impuesto por defecto 0.00 (sin sales tax)
+                if not self.instance.pk:  # Solo si es nueva configuración
+                    self.fields["tasa_impuesto"].initial = 0.00
+            else:
+                # Para Chile, solo mostrar CLP
+                self.fields["moneda"].widget = forms.Select(
+                    choices=[("CLP", "CLP - Pesos Chilenos")]
+                )
+                self.fields["moneda"].initial = "CLP"
+                # Para Chile, tasa de impuesto por defecto 19.00 (IVA)
+                if not self.instance.pk:  # Solo si es nueva configuración
+                    self.fields["tasa_impuesto"].initial = 19.00
+
     def clean_logo(self):
         logo = self.cleaned_data.get("logo")
         if not logo:

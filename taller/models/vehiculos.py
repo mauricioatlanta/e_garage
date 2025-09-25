@@ -85,9 +85,11 @@ class Vehiculo(TenantScoped):
 
     def get_absolute_url(self):  # usado por CreateView en tests
         try:
-            return reverse("vehiculos:ver_vehiculo", args=[self.pk])
+            # Usar el namespace por defecto (chile) como fallback
+            # Las vistas deben usar country_url para generar URLs correctas
+            return reverse("chile:taller:vehiculos:ver_vehiculo", args=[self.pk])
         except Exception:
-            return "/vehiculos-core/"  # fallback seguro
+            return "/vehiculos/"  # fallback seguro
 
     class Meta(TenantScoped.Meta):
         ordering = ["marca", "modelo", "patente"]

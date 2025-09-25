@@ -20,7 +20,7 @@
     <div class="widgets-section mb-8">
       <h3 class="text-xl font-bold text-center mb-4 text-[#00e6d0]">📊 Resumen Ejecutivo</h3>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        
+
         <!-- Widget de Técnicos -->
         <div class="widget-card">
           <div class="widget-header">
@@ -81,7 +81,7 @@
 
       <!-- Grid de Categorías de Reportes -->
       <div class="reportes-grid">
-        
+
         <!-- 👥 CLIENTES -->
         <div class="categoria-card" data-categoria="clientes">
           <div class="categoria-header">
@@ -266,7 +266,7 @@
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      
+
       <!-- 🚀 NUEVO: Dashboard de Inteligencia Operativa -->
       <a href="inteligencia/" class="reporte-card nuevo-reporte pulse-glow" style="grid-column: span 2;">
         <div class="icon-report">🚀</div>
@@ -274,7 +274,7 @@
         <div class="reporte-desc">Dashboard Futurista 360° con IA predictiva, KPIs avanzados, gráficos interactivos y análisis en tiempo real</div>
         <span class="badge-nuevo">🚀 FUTURISTA</span>
       </a>
-      
+
       <!-- 🧠 SÚPER NUEVO: Reportes por Técnico con IA -->
       <a href="mecanicos/" class="reporte-card nuevo-reporte pulse-glow" style="grid-column: span 2;">
         <div class="icon-report">🧠</div>
@@ -290,14 +290,14 @@
         <div class="reporte-desc">Analytics completo de inventario: top ventas, márgenes, stock crítico, históricos y repuestos sin movimiento</div>
         <span class="badge-nuevo">📊 ANALYTICS</span>
       </a>
-      
+
       <!-- Reportes Básicos -->
       <a href="servicios/" class="reporte-card">
         <div class="icon-report">🛠️</div>
         <div class="reporte-title">Servicios realizados</div>
         <div class="reporte-desc">Estadísticas de servicios, ingresos, frecuencia y tipos más solicitados.</div>
       </a>
-      
+
       <!-- 🚀 NUEVOS REPORTES AVANZADOS -->
       <a href="dashboard-rentabilidad/" class="reporte-card nuevo-reporte">
         <div class="icon-report">📈</div>
@@ -323,7 +323,7 @@
         <div class="reporte-desc">Análisis de servicios externos más frecuentes y tendencias</div>
         <span class="badge-nuevo">NUEVO</span>
       </a>
-      
+
       <!-- Reportes Tradicionales -->
       <a href="servicios/?enfoque=vehiculos" class="reporte-card">
         <div class="icon-report">🚗</div>
@@ -424,11 +424,11 @@
 }
 
 @keyframes pulseGlow {
-  from { 
+  from {
     box-shadow: 0 0 20px #00fff7cc, 0 0 8px #00e6d0;
     border: 1.5px solid #00fff7;
   }
-  to { 
+  to {
     box-shadow: 0 0 40px #00fff7ff, 0 0 15px #00e6d0;
     border: 1.5px solid #00fff7;
   }
@@ -849,7 +849,7 @@ canvas {
 
 .btn-detalle:hover, .btn-exportar:hover {
   border-color: #00fff7;
-  box-shadow: 
+  box-shadow:
     0 0 20px rgba(0,230,208,0.4),
     inset 0 0 20px rgba(0,230,208,0.1);
   transform: translateY(-2px) scale(1.02);
@@ -859,7 +859,7 @@ canvas {
 
 .btn-detalle:active, .btn-exportar:active {
   transform: translateY(0) scale(0.98);
-  box-shadow: 
+  box-shadow:
     0 0 10px rgba(0,230,208,0.6),
     inset 0 0 10px rgba(0,230,208,0.2);
 }
@@ -883,7 +883,7 @@ canvas {
   background: linear-gradient(135deg, rgba(255,107,53,0.25), rgba(255,206,87,0.35));
   border-color: #feca57;
   color: #feca57;
-  box-shadow: 
+  box-shadow:
     0 0 20px rgba(255,107,53,0.4),
     inset 0 0 20px rgba(255,107,53,0.1);
 }
@@ -915,10 +915,10 @@ document.addEventListener('DOMContentLoaded', function() {
             padding: 2
         },
         plugins: {
-            legend: { 
-                display: false 
+            legend: {
+                display: false
             },
-            tooltip: { 
+            tooltip: {
                 enabled: true,
                 mode: 'index',
                 intersect: false,
@@ -931,7 +931,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         },
         scales: {
-            x: { 
+            x: {
                 display: true,
                 grid: { display: false },
                 ticks: {
@@ -948,9 +948,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
             },
-            y: { 
+            y: {
                 display: true,
-                grid: { 
+                grid: {
                     display: true,
                     color: 'rgba(0,230,208,0.1)'
                 },
@@ -962,7 +962,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         },
         elements: {
-            point: { 
+            point: {
                 radius: 1,
                 hoverRadius: 3,
                 backgroundColor: '#00fff7'
@@ -987,7 +987,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             document.getElementById('tecnicosTotal').textContent = data.mecanicos.length;
-            
+
             // Mini gráfico de evolución de técnicos
             const ctx1 = document.getElementById('miniChartTecnicos').getContext('2d');
             new Chart(ctx1, {
@@ -1015,7 +1015,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             document.getElementById('stockCritico').textContent = data.stock_critico;
-            
+
             // Mini gráfico de evolución de repuestos
             const ctx2 = document.getElementById('miniChartRepuestos').getContext('2d');
             new Chart(ctx2, {
@@ -1046,14 +1046,14 @@ function initReportesDinamicos() {
     // Variables globales para filtros
     let fechaDesde = document.getElementById('fechaDesde').value;
     let fechaHasta = document.getElementById('fechaHasta').value;
-    
+
     // Event listeners para filtros
     document.getElementById('aplicarFiltros').addEventListener('click', function() {
         fechaDesde = document.getElementById('fechaDesde').value;
         fechaHasta = document.getElementById('fechaHasta').value;
         cargarTodasLasCategorias();
     });
-    
+
     document.getElementById('resetFiltros').addEventListener('click', function() {
         const hoy = new Date().toISOString().split('T')[0];
         const haceUnMes = new Date(Date.now() - 30*24*60*60*1000).toISOString().split('T')[0];
@@ -1063,7 +1063,7 @@ function initReportesDinamicos() {
         fechaHasta = hoy;
         cargarTodasLasCategorias();
     });
-    
+
     // Event listeners para botones de detalles
     document.querySelectorAll('.btn-detalle').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -1071,7 +1071,7 @@ function initReportesDinamicos() {
             abrirDetalleCategoria(tipo);
         });
     });
-    
+
     // Event listeners para botones de exportar
     document.querySelectorAll('.btn-exportar').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -1079,7 +1079,7 @@ function initReportesDinamicos() {
             exportarCategoria(tipo);
         });
     });
-    
+
     // Cargar datos iniciales
     cargarTodasLasCategorias();
 }
@@ -1087,7 +1087,7 @@ function initReportesDinamicos() {
 function cargarTodasLasCategorias() {
     const fechaDesde = document.getElementById('fechaDesde').value;
     const fechaHasta = document.getElementById('fechaHasta').value;
-    
+
     // Cargar cada categoría
     cargarClientes(fechaDesde, fechaHasta);
     cargarVehiculos(fechaDesde, fechaHasta);
@@ -1106,10 +1106,10 @@ function cargarClientes(fechaDesde, fechaHasta) {
             document.getElementById('totalClientes').textContent = data.total || '15';
             document.getElementById('clientesNuevos').textContent = data.nuevos || '5';
             document.getElementById('clientesRecurrentes').textContent = data.recurrentes || '10';
-            
+
             // Mini gráfico de clientes
             crearMiniGrafico('chartClientes', data.evolucion || [
-                {fecha: '04/08', valor: 3}, {fecha: '05/08', valor: 5}, 
+                {fecha: '04/08', valor: 3}, {fecha: '05/08', valor: 5},
                 {fecha: '06/08', valor: 2}, {fecha: '07/08', valor: 4},
                 {fecha: '08/08', valor: 6}, {fecha: '09/08', valor: 3}, {fecha: '10/08', valor: 2}
             ], '#4ade80');
@@ -1121,7 +1121,7 @@ function cargarClientes(fechaDesde, fechaHasta) {
             document.getElementById('clientesNuevos').textContent = '5';
             document.getElementById('clientesRecurrentes').textContent = '10';
             crearMiniGrafico('chartClientes', [
-                {fecha: '04/08', valor: 3}, {fecha: '05/08', valor: 5}, 
+                {fecha: '04/08', valor: 3}, {fecha: '05/08', valor: 5},
                 {fecha: '06/08', valor: 2}, {fecha: '07/08', valor: 4},
                 {fecha: '08/08', valor: 6}, {fecha: '09/08', valor: 3}, {fecha: '10/08', valor: 2}
             ], '#4ade80');
@@ -1134,9 +1134,9 @@ function cargarVehiculos(fechaDesde, fechaHasta) {
     document.getElementById('totalVehiculos').textContent = '28';
     document.getElementById('marcaTop').textContent = 'Toyota';
     document.getElementById('modeloTop').textContent = 'Corolla';
-    
+
     crearMiniGrafico('chartVehiculos', [
-        {fecha: '04/08', valor: 4}, {fecha: '05/08', valor: 6}, 
+        {fecha: '04/08', valor: 4}, {fecha: '05/08', valor: 6},
         {fecha: '06/08', valor: 3}, {fecha: '07/08', valor: 5},
         {fecha: '08/08', valor: 8}, {fecha: '09/08', valor: 4}, {fecha: '10/08', valor: 3}
     ], '#06b6d4');
@@ -1151,7 +1151,7 @@ function cargarRepuestosDinamicos(fechaDesde, fechaHasta) {
             document.getElementById('repuestosVendidos').textContent = totalVendidos;
             document.getElementById('stockCriticoRep').textContent = data.stock_critico;
             document.getElementById('ingresoRepuestos').textContent = '$' + data.repuestos.reduce((sum, r) => sum + r.ingresos, 0).toLocaleString();
-            
+
             crearMiniGrafico('chartRepuestos', data.evolucion, '#f59e0b');
         })
         .catch(error => {
@@ -1160,7 +1160,7 @@ function cargarRepuestosDinamicos(fechaDesde, fechaHasta) {
             document.getElementById('stockCriticoRep').textContent = '1';
             document.getElementById('ingresoRepuestos').textContent = '$4.9M';
             crearMiniGrafico('chartRepuestos', [
-                {fecha: '04/08', total: 45000}, {fecha: '05/08', total: 52000}, 
+                {fecha: '04/08', total: 45000}, {fecha: '05/08', total: 52000},
                 {fecha: '06/08', total: 38000}, {fecha: '07/08', total: 41000},
                 {fecha: '08/08', total: 656926}, {fecha: '09/08', total: 35000}, {fecha: '10/08', total: 28000}
             ], '#f59e0b');
@@ -1173,9 +1173,9 @@ function cargarServicios(fechaDesde, fechaHasta) {
     document.getElementById('serviciosRealizados').textContent = '45';
     document.getElementById('servicioTop').textContent = 'Cambio Aceite';
     document.getElementById('ingresoServicios').textContent = '$2.3M';
-    
+
     crearMiniGrafico('chartServicios', [
-        {fecha: '04/08', valor: 6}, {fecha: '05/08', valor: 8}, 
+        {fecha: '04/08', valor: 6}, {fecha: '05/08', valor: 8},
         {fecha: '06/08', valor: 5}, {fecha: '07/08', valor: 7},
         {fecha: '08/08', valor: 12}, {fecha: '09/08', valor: 9}, {fecha: '10/08', valor: 6}
     ], '#8b5cf6');
@@ -1187,9 +1187,9 @@ function cargarOtrosServicios(fechaDesde, fechaHasta) {
     document.getElementById('otrosRealizados').textContent = '12';
     document.getElementById('proveedorTop').textContent = 'Taller Externo A';
     document.getElementById('costoOtros').textContent = '$850K';
-    
+
     crearMiniGrafico('chartOtros', [
-        {fecha: '04/08', valor: 2}, {fecha: '05/08', valor: 3}, 
+        {fecha: '04/08', valor: 2}, {fecha: '05/08', valor: 3},
         {fecha: '06/08', valor: 1}, {fecha: '07/08', valor: 2},
         {fecha: '08/08', valor: 4}, {fecha: '09/08', valor: 2}, {fecha: '10/08', valor: 1}
     ], '#ef4444');
@@ -1203,7 +1203,7 @@ function cargarTecnicosDinamicos(fechaDesde, fechaHasta) {
             document.getElementById('tecnicosActivos').textContent = data.mecanicos.length;
             document.getElementById('tecnicoTop').textContent = data.mecanicos[0]?.nombre || 'N/A';
             document.getElementById('ingresoTecnicos').textContent = '$' + data.mecanicos.reduce((sum, t) => sum + t.total, 0).toLocaleString();
-            
+
             crearMiniGrafico('chartTecnicos', data.evolucion, '#10b981');
         })
         .catch(error => {
@@ -1212,7 +1212,7 @@ function cargarTecnicosDinamicos(fechaDesde, fechaHasta) {
             document.getElementById('tecnicoTop').textContent = 'Ana Martínez';
             document.getElementById('ingresoTecnicos').textContent = '$3.9M';
             crearMiniGrafico('chartTecnicos', [
-                {fecha: '04/08', total: 307492}, {fecha: '05/08', total: 201620}, 
+                {fecha: '04/08', total: 307492}, {fecha: '05/08', total: 201620},
                 {fecha: '06/08', total: 0}, {fecha: '07/08', total: 0},
                 {fecha: '08/08', total: 266928}, {fecha: '09/08', total: 0}, {fecha: '10/08', total: 0}
             ], '#10b981');
@@ -1221,16 +1221,16 @@ function cargarTecnicosDinamicos(fechaDesde, fechaHasta) {
 
 function crearMiniGrafico(canvasId, datos, color) {
     const canvas = document.getElementById(canvasId);
-    
+
     // 🚀 FORZAR TAMAÑO MINI AGRESIVAMENTE
     canvas.style.height = '50px';
     canvas.style.maxHeight = '50px';
     canvas.style.width = '100%';
     canvas.height = 50;
     canvas.width = canvas.offsetWidth;
-    
+
     const ctx = canvas.getContext('2d');
-    
+
     new Chart(ctx, {
         type: 'line',
         data: {
@@ -1255,9 +1255,9 @@ function crearMiniGrafico(canvasId, datos, color) {
             layout: {
                 padding: 2
             },
-            plugins: { 
-                legend: { display: false }, 
-                tooltip: { 
+            plugins: {
+                legend: { display: false },
+                tooltip: {
                     enabled: true,
                     backgroundColor: 'rgba(0,0,0,0.8)',
                     titleColor: '#00e6d0',
@@ -1269,8 +1269,8 @@ function crearMiniGrafico(canvasId, datos, color) {
                     bodyFont: { size: 9 }
                 }
             },
-            scales: { 
-                x: { 
+            scales: {
+                x: {
                     display: true,
                     grid: { display: false },
                     ticks: {
@@ -1287,9 +1287,9 @@ function crearMiniGrafico(canvasId, datos, color) {
                         }
                     }
                 },
-                y: { 
+                y: {
                     display: true,
-                    grid: { 
+                    grid: {
                         display: true,
                         color: 'rgba(0,230,208,0.08)'
                     },
@@ -1300,11 +1300,11 @@ function crearMiniGrafico(canvasId, datos, color) {
                     }
                 }
             },
-            elements: { 
-                point: { 
+            elements: {
+                point: {
                     radius: 1,
                     hoverRadius: 2
-                } 
+                }
             },
             interaction: {
                 intersect: false,
@@ -1321,13 +1321,13 @@ function abrirDetalleCategoria(tipo) {
     // Redirigir a la página específica de cada categoría
     const rutas = {
         'clientes': 'servicios/?enfoque=clientes',
-        'vehiculos': 'servicios/?enfoque=vehiculos', 
+        'vehiculos': 'servicios/?enfoque=vehiculos',
         'repuestos': 'repuestos/',
         'servicios': 'servicios/',
         'otros': 'servicios-subcontratados/',
         'tecnicos': 'mecanicos/'
     };
-    
+
     if (rutas[tipo]) {
         window.location.href = rutas[tipo];
     }
@@ -1336,10 +1336,10 @@ function abrirDetalleCategoria(tipo) {
 function exportarCategoria(tipo) {
     const fechaDesde = document.getElementById('fechaDesde').value;
     const fechaHasta = document.getElementById('fechaHasta').value;
-    
+
     // Aquí podrías implementar la descarga de Excel/PDF
     alert(`Exportando datos de ${tipo} desde ${fechaDesde} hasta ${fechaHasta}...`);
-    
+
     // Ejemplo de URL de exportación
     const exportUrl = `${tipo}/export/?fecha_desde=${fechaDesde}&fecha_hasta=${fechaHasta}`;
     // window.open(exportUrl, '_blank');

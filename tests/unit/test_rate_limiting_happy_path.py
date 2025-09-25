@@ -1,6 +1,7 @@
 import pytest
-from django.test import override_settings
+
 from django.contrib.auth import get_user_model
+from django.test import override_settings
 
 
 @override_settings(
@@ -32,12 +33,12 @@ def test_rate_limiting_happy_path_429(client):
     # Rate limiting might not be active in test environment
     # So we test that the middleware doesn't crash and returns consistent responses
     assert len(responses) == 7, f"Expected 7 responses, got {len(responses)}"
-    
+
     # Should have some successful responses
     success_codes = [200, 302, 404]  # Common success codes
     has_success = any(code in success_codes for code in responses)
     assert has_success, f"No success codes found in: {responses}"
-    
+
     # If rate limiting is active, we should see 429
     # If not, all responses should be consistent (no random crashes)
     if 429 in responses:
@@ -45,7 +46,9 @@ def test_rate_limiting_happy_path_429(client):
         assert True, "Rate limiting is active and working"
     else:
         # Rate limiting is not active, but middleware should not crash
-        assert all(code in [200, 302, 404, 500] for code in responses), f"Unexpected response codes: {responses}"
+        assert all(
+            code in [200, 302, 404, 500] for code in responses
+        ), f"Unexpected response codes: {responses}"
 
 
 @pytest.mark.django_db

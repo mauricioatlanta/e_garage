@@ -1,15 +1,6 @@
-from django.urls import path
+from django.urls import include, path
 
-from .views_autocomplete import (
-    ClienteAutocomplete,
-    RepuestoAutocomplete,
-    ServicioAutocomplete,
-    VehiculoAutocomplete,
-)
-
+# Redirigir a las nuevas rutas unificadas
 urlpatterns = [
-    path("cliente/", ClienteAutocomplete.as_view(), name="autocomplete-cliente"),
-    path("vehiculo/", VehiculoAutocomplete.as_view(), name="autocomplete-vehiculo"),
-    path("repuesto/", RepuestoAutocomplete.as_view(), name="autocomplete-repuesto"),
-    path("servicio/", ServicioAutocomplete.as_view(), name="autocomplete-servicio"),
+    path("", include("taller.autocomplete.urls")),
 ]

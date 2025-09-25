@@ -1,0 +1,33 @@
+[tool.black]
+line-length = 100
+target-version = ["py311", "py312", "py313"]
+exclude = '''
+(
+    /(
+        \.git
+      | \.venv
+      | venv
+      | __pycache__
+      | node_modules
+      | _disabled_templates
+      | templates_final
+      | templates_new
+      | deploy_pythonanywhere
+      | actualizacion_pythonanywhere
+      | frontend/public
+      | reports
+    )/
+  | \. (html|htm|txt) \. py$
+)
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 100
+known_first_party = ["taller", "gestion_taller"]
+skip = [
+  ".git", ".venv", "venv", "__pycache__", "node_modules",
+  "_disabled_templates", "templates_final", "templates_new",
+  "deploy_pythonanywhere", "actualizacion_pythonanywhere",
+  "frontend/public", "reports"
+]

@@ -37,7 +37,7 @@ iva = int(subtotal * Decimal('0.19'))  # Funciona perfectamente
 ```
 
 #### 3. **Ubicaciones corregidas:**
-- ✅ **Línea 53**: Función `ver_documento_nuevo` 
+- ✅ **Línea 53**: Función `ver_documento_nuevo`
 - ✅ **Línea 205**: Función `editar_documento_nuevo`
 
 ### 🧪 **Verificación**

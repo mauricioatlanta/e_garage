@@ -72,7 +72,7 @@ path('egarage-pro/', landing_egarage, name='landing_egarage_pro'),
 
 #### 2. **Beneficios (6 características)**
 - 🧾 Crear Documentos
-- 📦 Control de Repuestos  
+- 📦 Control de Repuestos
 - 📊 Reportes y Análisis
 - 🚗 Gestión de Vehículos
 - 👥 Gestión de Clientes

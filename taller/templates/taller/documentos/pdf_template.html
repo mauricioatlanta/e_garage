@@ -62,35 +62,35 @@
             margin-bottom: 25px;
             text-align: center;
         }
-        
+
         .documento-titulo {
             font-size: 20pt;
             font-weight: bold;
             margin-bottom: 5px;
         }
-        
+
         .documento-numero {
             font-size: 16pt;
             margin-bottom: 10px;
         }
-        
+
         .info-grid {
             display: table;
             width: 100%;
             margin-bottom: 30px;
         }
-        
+
         .info-row {
             display: table-row;
         }
-        
+
         .info-cell {
             display: table-cell;
             width: 50%;
             vertical-align: top;
             padding: 0 10px;
         }
-        
+
         .info-box {
             border: 2px solid #e9ecef;
             padding: 15px;
@@ -98,7 +98,7 @@
             background: #f8f9fa;
             margin-bottom: 15px;
         }
-        
+
         .info-titulo {
             font-weight: bold;
             color: #007bff;
@@ -107,30 +107,30 @@
             border-bottom: 1px solid #dee2e6;
             padding-bottom: 5px;
         }
-        
+
         .info-campo {
             margin-bottom: 5px;
         }
-        
+
         .info-label {
             font-weight: bold;
             color: #495057;
             display: inline-block;
             width: 100px;
         }
-        
+
         .tabla-items {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 25px;
             border: 2px solid #007bff;
         }
-        
+
         .tabla-items thead {
             background: #007bff;
             color: white;
         }
-        
+
         .tabla-items th {
             padding: 12px 8px;
             text-align: left;
@@ -138,25 +138,25 @@
             border: 1px solid #0056b3;
             font-size: 10pt;
         }
-        
+
         .tabla-items td {
             padding: 10px 8px;
             border: 1px solid #dee2e6;
             font-size: 10pt;
         }
-        
+
         .tabla-items tbody tr:nth-child(even) {
             background: #f8f9fa;
         }
-        
+
         .texto-derecha {
             text-align: right;
         }
-        
+
         .texto-centro {
             text-align: center;
         }
-        
+
         .subtitulo {
             font-size: 14pt;
             font-weight: bold;
@@ -165,7 +165,7 @@
             border-bottom: 2px solid #007bff;
             padding-bottom: 5px;
         }
-        
+
         .totales {
             background: #e3f2fd;
             border: 2px solid #007bff;
@@ -175,47 +175,47 @@
             float: right;
             width: 350px;
         }
-        
+
         .total-fila {
             display: table;
             width: 100%;
             margin-bottom: 8px;
         }
-        
+
         .total-label {
             display: table-cell;
             font-weight: bold;
             color: #495057;
         }
-        
+
         .total-valor {
             display: table-cell;
             text-align: right;
             font-weight: bold;
             width: 120px;
         }
-        
+
         .total-final {
             border-top: 2px solid #007bff;
             padding-top: 10px;
             margin-top: 10px;
         }
-        
+
         .total-final .total-label {
             font-size: 14pt;
             color: #007bff;
         }
-        
+
         .total-final .total-valor {
             font-size: 16pt;
             color: #007bff;
         }
-        
+
         .observaciones {
             margin-top: 30px;
             clear: both;
         }
-        
+
         .observaciones-box {
             border: 1px solid #dee2e6;
             padding: 15px;
@@ -223,18 +223,18 @@
             background: #f8f9fa;
             min-height: 60px;
         }
-        
+
         .firma-seccion {
             margin-top: 50px;
             clear: both;
         }
-        
+
         .firma-grid {
             display: table;
             width: 100%;
             margin-top: 30px;
         }
-        
+
         .firma-cell {
             display: table-cell;
             width: 50%;
@@ -242,22 +242,22 @@
             vertical-align: bottom;
             padding: 20px;
         }
-        
+
         .firma-linea {
             border-top: 1px solid #333;
             margin-bottom: 5px;
             height: 40px;
         }
-        
+
         .firma-texto {
             font-size: 10pt;
             color: #666;
         }
-        
+
         .servicio-externo {
             background-color: #fff3cd !important;
         }
-        
+
         .footer {
             margin-top: 50px;
             text-align: center;
@@ -325,7 +325,7 @@
                     {% endif %}
                 </div>
             </div>
-            
+
             <div class="info-cell">
                 {% if documento.vehiculo %}
                 <div class="info-box">
@@ -353,12 +353,12 @@
                     {% endif %}
                 </div>
                 {% endif %}
-                
-                {% if documento.mecanico %}
+
+                {% if documento.tecnico_responsable %}
                 <div class="info-box" style="margin-top: 15px;">
                     <div class="info-titulo">🔧 Mecánico Asignado</div>
                     <div class="info-campo">
-                        <span class="info-label">Nombre:</span> {{ documento.mecanico.nombre }}
+                        <span class="info-label">Nombre:</span> {{ documento.tecnico_responsable.nombre }}
                     </div>
                 </div>
                 {% endif %}
@@ -511,7 +511,7 @@
                 {% if config_empresa.telefono %} | Tel: {{ config_empresa.telefono }}{% elif empresa.telefono %} | Tel: {{ empresa.telefono }}{% endif %}
                 {% if config_empresa.email_contacto %} | {{ config_empresa.email_contacto }}{% elif empresa.email %} | {{ empresa.email }}{% endif %}
             </p>
-        
+
         <!-- Total para Facturas en el Footer -->
         {% if documento.tipo == 'FAC' %}
         <div style="margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 8px; border: 1px solid #dee2e6;">
@@ -528,12 +528,12 @@
             {% endif %}
         </div>
         {% endif %}
-        
+
         <!-- Créditos de Atlanta Reciclajes -->
         <div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #ddd; text-align: center;">
             <p style="font-size: 9pt; color: #888; margin: 5px 0;">
-                <strong>eGarage AI™</strong> - Sistema desarrollado por 
-                <strong style="color: #007bff;">Atlanta Reciclajes</strong> | 
+                <strong>eGarage AI™</strong> - Sistema desarrollado por
+                <strong style="color: #007bff;">Atlanta Reciclajes</strong> |
 
                 <a href="mailto:suscripcion@atlantareciclajes.cl" style="color: #007bff;">suscripcion@atlantareciclajes.cl</a>
             </p>

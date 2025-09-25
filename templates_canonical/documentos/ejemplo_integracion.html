@@ -1,0 +1,142 @@
+{% load i18n static %}
+{% load country_url %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
+<head>
+    <meta charset="utf-8">
+    <title>{% trans "Documentos - eGarage" %}</title>
+    <script src="{% static 'documentos/documentos_form_final.js' %}" defer></script>
+    <script src="{% static 'documentos/documentos_form_numbers.js' %}" defer></script>
+    <script src="{% static 'documentos/documentos_form_patch.js' %}" defer></script>
+    <link rel="stylesheet" href="{% static 'documentos/documentos_form_patch.css' %}">
+    <link rel="stylesheet" href="{% static 'documentos/documentos_form_numbers.css' %}">
+</head>
+<body>
+    <!-- Configuración para el JavaScript -->
+    <div id="doc-data"
+         data-endpoint-clientes="{% country_url 'documentos:api_clientes' %}"
+         data-endpoint-vehiculos-cliente="{% country_url 'documentos:api_vehiculos_cliente' %}"
+         data-endpoint-repuestos="{% country_url 'documentos:api_repuestos' %}"
+         data-endpoint-servicios="{% country_url 'documentos:api_servicios' %}"
+         data-endpoint-otros="{% country_url 'documentos:api_otros' %}"
+         data-endpoint-next-number="{% country_url 'documentos:api_next_number' %}"
+         data-save-url="{% country_url 'documentos:api_save' %}"
+         data-country="{{ request.user.empresa.pais|default:'US' }}"
+         data-tax-rate="{{ request.user.empresa.sales_tax|default:0 }}">
+    </div>
+
+    <!-- Configuración de debug (solo en desarrollo) -->
+    <script>
+        window.__DOC_CFG__ = {
+            debugFetch: {{ DEBUG|yesno:"true,false" }}
+        };
+    </script>
+
+    <!-- Tu contenido del formulario aquí -->
+    <div id="documento-form">
+        <!-- Ejemplo de campo de tipo con preview de numeración -->
+        <div class="form-group">
+            <label for="id_tipo">{% trans "Tipo de documento" %}</label>
+            <select id="id_tipo" name="tipo" class="form-control">
+                <option value="">{% trans "Seleccionar tipo..." %}</option>
+                <option value="FAC">{% trans "Factura" %}</option>
+                <option value="PRES">{% trans "Presupuesto" %}</option>
+                <option value="OT">{% trans "Orden de Trabajo" %}</option>
+            </select>
+        </div>
+
+        <!-- Preview del número siguiente -->
+        <div class="form-group">
+            <label>{% trans "Número siguiente" %}</label>
+            <div id="numero_preview" class="form-control-plaintext" style="font-weight: bold; color: #007bff;">
+                —
+            </div>
+        </div>
+
+        <!-- Campos de búsqueda con autocompletado -->
+        <div class="form-group">
+            <label for="client-search">{% trans "Cliente" %}</label>
+            <input id="client-search" type="text" class="form-control" autocomplete="off" placeholder="{% trans 'Buscar cliente...' %}">
+            <div id="client-results" class="eg-dd-wrap"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="vehicle-search">{% trans "Vehículo" %}</label>
+            <input id="vehicle-search" type="text" class="form-control" autocomplete="off" placeholder="{% trans 'Buscar vehículo...' %}">
+            <div id="vehicle-results" class="eg-dd-wrap"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="quick-rep-search">{% trans "Repuestos" %}</label>
+            <input id="quick-rep-search" type="text" class="form-control" autocomplete="off" placeholder="{% trans 'Buscar repuestos...' %}">
+            <div id="quick-rep-results" class="eg-dd-wrap"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="quick-serv-search">{% trans "Servicios" %}</label>
+            <input id="quick-serv-search" type="text" class="form-control" autocomplete="off" placeholder="{% trans 'Buscar servicios...' %}">
+            <div id="quick-serv-results" class="eg-dd-wrap"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="quick-otros-search">{% trans "Otros Servicios" %}</label>
+            <input id="quick-otros-search" type="text" class="form-control" autocomplete="off" placeholder="{% trans 'Buscar otros servicios...' %}">
+            <div id="quick-otros-results" class="eg-dd-wrap"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="id_fecha_emision">{% trans "Fecha de Emisión" %}</label>
+            <input id="id_fecha_emision" type="date" class="form-control" name="fecha_emision">
+        </div>
+
+        <!-- Botón de guardar con hook de invalidación -->
+        <div class="form-group">
+            <button type="button" id="btn-guardar" class="btn btn-primary">
+                {% trans "Guardar Documento" %}
+            </button>
+        </div>
+
+        <!-- Otros campos del formulario -->
+    </div>
+
+    <!-- Botones de scroll (opcionales) -->
+    <button id="btn-scroll-top" style="display: none;">↑</button>
+    <button id="btn-scroll-bottom" style="display: none;">↓</button>
+
+    <!-- Ejemplo de uso del hook de invalidación -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const btnGuardar = document.getElementById('btn-guardar');
+            if (btnGuardar) {
+                btnGuardar.addEventListener('click', async function() {
+                    try {
+                        // Simular guardado de documento
+                        console.log('Guardando documento...');
+
+                        // Aquí iría tu lógica real de guardado
+                        // const response = await fetch('{% country_url "documentos:api_save" %}', {
+                        //     method: 'POST',
+                        //     headers: { 'Content-Type': 'application/json' },
+                        //     body: JSON.stringify(formData)
+                        // });
+
+                        // Simular éxito
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+
+                        // Invalidar cache para refrescar correlativo
+                        if (window.egNumero) {
+                            window.egNumero.invalidate();
+                            console.log('✅ Documento guardado y correlativo actualizado');
+                        }
+
+                        alert('Documento guardado exitosamente');
+                    } catch (error) {
+                        console.error('Error al guardar:', error);
+                        alert('Error al guardar documento');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

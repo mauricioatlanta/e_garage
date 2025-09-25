@@ -150,3 +150,6 @@ debug_*.py
 # Archivos de configuración de producción
 settings_production.py
 settings_prod.py
+templates_backup_*/
+_disabled_templates/
+templates/_quarantine/

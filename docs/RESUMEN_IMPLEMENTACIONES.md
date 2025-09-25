@@ -4,7 +4,7 @@
 📁 Archivo: `tests_regresion_documentos.py`
 🎯 Funcionalidad:
 - Tests unitarios para creación de documentos
-- Verificación de aislamiento entre empresas  
+- Verificación de aislamiento entre empresas
 - Tests de cálculos de totales
 - Validación de guardado de repuestos/servicios
 
@@ -14,7 +14,7 @@ python tests_regresion_documentos.py
 ```
 
 ## ✅ 2. SISTEMA DE AUDITORÍA COMPLETO
-📁 Archivos: 
+📁 Archivos:
 - `taller/models/auditoria.py` - Modelo de logs
 - `views_documento_mejorado.py` - Views con auditoría
 - `taller/utils/permisos.py` - Decoradores de seguridad
@@ -69,7 +69,7 @@ python automatizacion.py backup   # Backup automático
 
 📊 Backups creados:
 ✅ Administración E-Garage: 6 documentos
-✅ Taller AutoFix: 4 documentos  
+✅ Taller AutoFix: 4 documentos
 ✅ Mecánica Express: 2 documentos
 ✅ Talleres de prueba: 0 documentos
 

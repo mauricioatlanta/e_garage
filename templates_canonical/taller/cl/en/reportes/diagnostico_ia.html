@@ -5,7 +5,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Fira+Code:wght@300;400;600&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  
+
   body {
     background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 30%, #16213e  60%, #0f3460 100%);
     min-height: 100vh;
@@ -21,7 +21,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: 
+    background:
       radial-gradient(circle at 20% 50%, rgba(0, 255, 255, 0.1) 0%, transparent 50%),
       radial-gradient(circle at 80% 20%, rgba(255, 0, 255, 0.1) 0%, transparent 50%),
       radial-gradient(circle at 40% 80%, rgba(0, 255, 0, 0.1) 0%, transparent 50%);
@@ -52,7 +52,7 @@
     background: linear-gradient(135deg, rgba(0, 255, 255, 0.1) 0%, rgba(255, 0, 255, 0.1) 100%);
     border-radius: 2rem;
     border: 1px solid rgba(0, 255, 255, 0.3);
-    box-shadow: 
+    box-shadow:
       0 0 50px rgba(0, 255, 255, 0.2),
       inset 0 0 50px rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(10px);
@@ -89,7 +89,7 @@
     border-radius: 1.5rem;
     padding: 2rem;
     border: 1px solid rgba(0, 255, 255, 0.2);
-    box-shadow: 
+    box-shadow:
       0 10px 40px rgba(0, 0, 0, 0.5),
       0 0 20px rgba(0, 255, 255, 0.1),
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
@@ -101,7 +101,7 @@
 
   .ai-panel:hover {
     transform: translateY(-5px);
-    box-shadow: 
+    box-shadow:
       0 20px 60px rgba(0, 0, 0, 0.7),
       0 0 40px rgba(0, 255, 255, 0.3);
   }
@@ -413,15 +413,15 @@
       padding: 1rem;
       gap: 1rem;
     }
-    
+
     .ai-title {
       font-size: 2.5rem;
     }
-    
+
     .ai-header {
       padding: 2rem 1rem;
     }
-    
+
     .ai-panel {
       padding: 1.5rem;
     }
@@ -644,13 +644,13 @@
 // Efecto de typing para insights
 document.addEventListener('DOMContentLoaded', function() {
   const insights = document.querySelectorAll('.ai-insight');
-  
+
   insights.forEach((insight, index) => {
     setTimeout(() => {
       insight.style.animation = 'slideInUp 0.5s ease-out forwards';
     }, index * 500);
   });
-  
+
   // Actualización automática cada 30 segundos (simulada)
   setInterval(() => {
     const indicators = document.querySelectorAll('.ai-metric-value');
@@ -658,14 +658,14 @@ document.addEventListener('DOMContentLoaded', function() {
       indicator.style.animation = 'flash 0.5s ease-in-out';
     });
   }, 30000);
-  
+
   // Efecto de hover para paneles
   const panels = document.querySelectorAll('.ai-panel');
   panels.forEach(panel => {
     panel.addEventListener('mouseenter', function() {
       this.style.transform = 'translateY(-5px) scale(1.02)';
     });
-    
+
     panel.addEventListener('mouseleave', function() {
       this.style.transform = 'translateY(0) scale(1)';
     });

@@ -1,7 +1,6 @@
 from django import forms
 
 from taller.models.repuesto import CategoriaRepuesto, Repuesto
-from utils.pais import get_configuracion_pais
 
 
 class RepuestoForm(forms.ModelForm):
@@ -102,31 +101,9 @@ class RepuestoForm(forms.ModelForm):
                 empresa=self.user.empresa, nombre__in=spanish_categories
             )
 
-        # Configurar placeholders y formatos según el país
-        if self.user and hasattr(self.user, "empresa"):
-            config = get_configuracion_pais(self.user.empresa)
-            simbolo = config["simbolo_moneda"]
-            moneda = config["moneda"]
-
-            # Actualizar placeholders con la moneda correcta
-            self.fields["precio_compra"].widget.attrs.update(
-                {
-                    "placeholder": (
-                        f"{simbolo}0.00 {moneda}"
-                        if config["decimales"] > 0
-                        else f"{simbolo}0 {moneda}"
-                    )
-                }
-            )
-            self.fields["precio_venta"].widget.attrs.update(
-                {
-                    "placeholder": (
-                        f"{simbolo}0.00 {moneda}"
-                        if config["decimales"] > 0
-                        else f"{simbolo}0 {moneda}"
-                    )
-                }
-            )
+        # Configurar placeholders simples
+        self.fields["precio_compra"].widget.attrs.update({"placeholder": "0.00"})
+        self.fields["precio_venta"].widget.attrs.update({"placeholder": "0.00"})
 
     class Meta:
         model = Repuesto
@@ -158,15 +135,13 @@ class RepuestoForm(forms.ModelForm):
             "precio_compra": forms.TextInput(
                 attrs={
                     "class": "w-full bg-black/40 text-white border border-cyan-400/30 rounded-lg p-2",
-                    "inputmode": "decimal",
-                    "data-currency-field": "true",
+                    "placeholder": "0.00",
                 }
             ),
             "precio_venta": forms.TextInput(
                 attrs={
                     "class": "w-full bg-black/40 text-white border border-cyan-400/30 rounded-lg p-2",
-                    "inputmode": "decimal",
-                    "data-currency-field": "true",
+                    "placeholder": "0.00",
                 }
             ),
             "cantidad_stock": forms.NumberInput(
@@ -182,141 +157,46 @@ class RepuestoForm(forms.ModelForm):
         }
 
     def clean_precio_compra(self):
-        valor = self.cleaned_data["precio_compra"]
+        valor = self.cleaned_data.get("precio_compra")
+        if valor is None:
+            return valor
 
-        # Determinar formato según el país del usuario
-        if self.user and hasattr(self.user, "empresa"):
-            config = get_configuracion_pais(self.user.empresa)
-            separador_decimal = "." if config["decimales"] > 0 else ""
-        else:
-            separador_decimal = "."  # Default
-
-        # Limpiar el valor: eliminar símbolos de moneda y separadores
-        limpio = (
-            str(valor).replace("$", "").replace("USD", "").replace("CLP", "").strip()
-        )
-
-        if separador_decimal and "." in limpio:
-            # Para monedas con decimales (USD)
-            limpio = limpio.replace(",", "")  # Remover separadores de miles
-            try:
-                return float(limpio)
-            except ValueError:
-                is_english = (
-                    self.user
-                    and hasattr(self.user, "empresa")
-                    and self.user.empresa.pais == "US"
-                )
-                error_msg = (
-                    "Purchase price must be a valid number"
-                    if is_english
-                    else "El precio de compra debe ser un número válido"
-                )
-                raise forms.ValidationError(error_msg)
-        elif separador_decimal and "," in limpio and "." not in limpio:
-            # Para formato europeo (comas como separador decimal)
-            limpio = limpio.replace(",", ".")  # Convertir coma a punto
-            try:
-                return float(limpio)
-            except ValueError:
-                is_english = (
-                    self.user
-                    and hasattr(self.user, "empresa")
-                    and self.user.empresa.pais == "US"
-                )
-                error_msg = (
-                    "Purchase price must be a valid number"
-                    if is_english
-                    else "El precio de compra debe ser un número válido"
-                )
-                raise forms.ValidationError(error_msg)
-        else:
-            # Para monedas sin decimales (CLP)
-            limpio = limpio.replace(".", "").replace(
-                ",", ""
-            )  # Remover todos los separadores
-            try:
-                return int(limpio)
-            except ValueError:
-                is_english = (
-                    self.user
-                    and hasattr(self.user, "empresa")
-                    and self.user.empresa.pais == "US"
-                )
-                error_msg = (
-                    "Purchase price must be a valid number"
-                    if is_english
-                    else "El precio de compra debe ser un número válido"
-                )
-                raise forms.ValidationError(error_msg)
+        # Validación simple: si es un número, está bien
+        try:
+            return float(valor)
+        except (ValueError, TypeError):
+            is_english = (
+                self.user
+                and hasattr(self.user, "empresa")
+                and self.user.empresa.pais == "US"
+            )
+            error_msg = (
+                "Purchase price must be a valid number"
+                if is_english
+                else "El precio de compra debe ser un número válido"
+            )
+            raise forms.ValidationError(error_msg)
 
     def clean_precio_venta(self):
-        valor = self.cleaned_data["precio_venta"]
-        # Determinar formato según el país del usuario
-        if self.user and hasattr(self.user, "empresa"):
-            config = get_configuracion_pais(self.user.empresa)
-            separador_decimal = "." if config["decimales"] > 0 else ""
-        else:
-            separador_decimal = "."  # Default
+        valor = self.cleaned_data.get("precio_venta")
+        if valor is None:
+            return valor
 
-        # Limpiar el valor: eliminar símbolos de moneda y separadores
-        limpio = (
-            str(valor).replace("$", "").replace("USD", "").replace("CLP", "").strip()
-        )
-
-        if separador_decimal and "." in limpio:
-            # Para monedas con decimales (USD)
-            limpio = limpio.replace(",", "")  # Remover separadores de miles
-            try:
-                return float(limpio)
-            except ValueError:
-                is_english = (
-                    self.user
-                    and hasattr(self.user, "empresa")
-                    and self.user.empresa.pais == "US"
-                )
-                error_msg = (
-                    "Sale price must be a valid number"
-                    if is_english
-                    else "El precio de venta debe ser un número válido"
-                )
-                raise forms.ValidationError(error_msg)
-        elif separador_decimal and "," in limpio and "." not in limpio:
-            # Para formato europeo (comas como separador decimal)
-            limpio = limpio.replace(",", ".")  # Convertir coma a punto
-            try:
-                return float(limpio)
-            except ValueError:
-                is_english = (
-                    self.user
-                    and hasattr(self.user, "empresa")
-                    and self.user.empresa.pais == "US"
-                )
-                error_msg = (
-                    "Sale price must be a valid number"
-                    if is_english
-                    else "El precio de venta debe ser un número válido"
-                )
-                raise forms.ValidationError(error_msg)
-        else:
-            # Para monedas sin decimales (CLP)
-            limpio = limpio.replace(".", "").replace(
-                ",", ""
-            )  # Remover todos los separadores
-            try:
-                return int(limpio)
-            except ValueError:
-                is_english = (
-                    self.user
-                    and hasattr(self.user, "empresa")
-                    and self.user.empresa.pais == "US"
-                )
-                error_msg = (
-                    "Sale price must be a valid number"
-                    if is_english
-                    else "El precio de venta debe ser un número válido"
-                )
-                raise forms.ValidationError(error_msg)
+        # Validación simple: si es un número, está bien
+        try:
+            return float(valor)
+        except (ValueError, TypeError):
+            is_english = (
+                self.user
+                and hasattr(self.user, "empresa")
+                and self.user.empresa.pais == "US"
+            )
+            error_msg = (
+                "Sale price must be a valid number"
+                if is_english
+                else "El precio de venta debe ser un número válido"
+            )
+            raise forms.ValidationError(error_msg)
 
     def clean_part_number(self):
         """Validar que el part_number sea único para la empresa"""

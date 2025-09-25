@@ -1,3 +1,4 @@
+{% load country_url %}
 {% extends 'base.html' %}
 {% load static %}
 {% load i18n %}
@@ -19,28 +20,7 @@
     --space-purple: #8a2be2;
     --dark-space: #0a0a0f;
     --panel-bg: rgba(5, 15, 25, 0.95);
-    --glass-bg: rgba(255,                <div class="unified-title">
-                    <div class="main-title">NEURAL INTELLIGENCE</div>
-                    <div class="sub-title"            <a href="/cl/taller/reportes/mecanicos/" class="command-panel modern-panel">
-                <div class="modern-icon-container">
-                    <div class="main-icon">🔧</div>
-                    <div class="secondary-icon">⚡</div>
-                </div>
-                <div class="modern-title">HUMAN TECH</div>
-                <div class="modern-subtitle">Performance Matrix</div>
-                <div class="modern-description">Analytics personal avanzado</div>
-            </a>TUM CORE</div>
-                </div>
-                <div class="unified-features">
-                    <span class="feature-tag">🧠 ANALYTICS</span>
-                    <span class="feature-tag">⚡ AI ENGINE</span>
-                    <span class="feature-tag">💎 INSIGHTS</span>
-                </div>
-                <div class="unified-description">
-                    <div class="desc-line">• Análisis predictivo cuántico</div>
-                    <div class="desc-line">• Motor de IA autónomo</div>
-                    <div class="desc-line">• Intelligence omnichannel</div>
-                </div>3);
+    --glass-bg: rgba(255, 255, 255, 0.06);
     --holo-glow: 0 0 20px;
 }
 
@@ -637,7 +617,7 @@ body {
         <div class="nav-grid">
 
             <!-- SUPER FICHA UNIFICADA - INTELIGENCIA TÁCTICA TOTAL -->
-            <a href="/cl/business-intelligence/dashboard/" class="command-panel super-unified-panel">
+            <a href="{% country_url 'business_intelligence:dashboard' %}" class="command-panel super-unified-panel">
                 <div class="unified-header">
                     <div class="unified-icons">
                         <span class="icon-trio">🧠</span>
@@ -662,13 +642,13 @@ body {
                 </div>
             </a>
 
-            <a href="/cl/taller/reportes/mecanicos/" class="command-panel">
+            <a href="{% country_url 'reportes:reportes_mecanicos' %}" class="command-panel">
                 <div class="text-3xl mb-2">👨‍�</div>
                 <div class="font-semibold console-text">PERSONAL TÉCNICO</div>
                 <div class="text-sm text-gray-400 console-text">Análisis individual</div>
             </a>
 
-            <a href="/documentos/" class="command-panel modern-panel">
+            <a href="{% country_url 'documentos:lista_documentos' %}" class="command-panel modern-panel">
                 <div class="modern-icon-container">
                     <div class="main-icon">�</div>
                     <div class="secondary-icon">🚀</div>
@@ -678,7 +658,7 @@ body {
                 <div class="modern-description">Gestión documental AI</div>
             </a>
 
-            <a href="/cl/clientes/" class="command-panel modern-panel">
+            <a href="{% country_url 'clientes:lista_clientes' %}" class="command-panel modern-panel">
                 <div class="modern-icon-container">
                     <div class="main-icon">🌐</div>
                     <div class="secondary-icon">💫</div>
@@ -688,7 +668,7 @@ body {
                 <div class="modern-description">Ecosystem relacional</div>
             </a>
 
-            <a href="/cl/vehiculos/" class="command-panel modern-panel">
+            <a href="{% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{% else %}/cl/vehiculos/{% endif %}" class="command-panel modern-panel">
                 <div class="modern-icon-container">
                     <div class="main-icon">�</div>
                     <div class="secondary-icon">⚡</div>
@@ -698,7 +678,37 @@ body {
                 <div class="modern-description">Sistema vehicular smart</div>
             </a>
 
-                        {% url 'taller:configuracion' as url_configuracion %}
+            <a href="{% country_url 'repuestos:lista_repuestos' %}" class="command-panel modern-panel">
+                <div class="modern-icon-container">
+                    <div class="main-icon">🔧</div>
+                    <div class="secondary-icon">⚡</div>
+                </div>
+                <div class="modern-title">PARTS HUB</div>
+                <div class="modern-subtitle">Parts Management</div>
+                <div class="modern-description">Gestión de repuestos</div>
+            </a>
+
+            <a href="{% country_url 'servicios:lista_servicios' %}" class="command-panel modern-panel">
+                <div class="modern-icon-container">
+                    <div class="main-icon">🛠️</div>
+                    <div class="secondary-icon">💫</div>
+                </div>
+                <div class="modern-title">SERVICE CORE</div>
+                <div class="modern-subtitle">Service Center</div>
+                <div class="modern-description">Gestión de servicios</div>
+            </a>
+
+            <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="command-panel modern-panel">
+                <div class="modern-icon-container">
+                    <div class="main-icon">🌟</div>
+                    <div class="secondary-icon">🚀</div>
+                </div>
+                <div class="modern-title">EXTRA SERVICES</div>
+                <div class="modern-subtitle">Additional Services</div>
+                <div class="modern-description">Otros servicios</div>
+            </a>
+
+                        {% country_url 'configuracion' as url_configuracion %}
                         {% if url_configuracion %}
                             <a href="{{ url_configuracion }}" class="command-panel modern-panel">
                         {% else %}

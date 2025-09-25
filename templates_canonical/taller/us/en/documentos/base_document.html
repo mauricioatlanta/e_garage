@@ -15,7 +15,7 @@
                 color: {{ primary_color|default:"#0d6efd" }};
             }
         }
-        
+
         body {
             font-family: Arial, sans-serif;
             font-size: 12px;
@@ -24,7 +24,7 @@
             margin: 0;
             padding: 0;
         }
-        
+
         /* Header personalizado */
         .document-header {
             border-bottom: 3px solid {{ primary_color|default:"#0d6efd" }};
@@ -34,54 +34,54 @@
             align-items: center;
             justify-content: space-between;
         }
-        
+
         .company-info {
             flex: 1;
         }
-        
+
         .company-logo {
             max-height: 80px;
             max-width: 200px;
             object-fit: contain;
         }
-        
+
         .company-name {
             font-size: 24px;
             font-weight: bold;
             color: {{ primary_color|default:"#0d6efd" }};
             margin: 0;
         }
-        
+
         .company-tagline {
             font-size: 14px;
             color: {{ secondary_color|default:"#6c757d" }};
             margin: 5px 0;
         }
-        
+
         .company-contact {
             font-size: 11px;
             color: #666;
             margin-top: 10px;
         }
-        
+
         .document-info {
             text-align: right;
             border-left: 2px solid {{ primary_color|default:"#0d6efd" }};
             padding-left: 20px;
         }
-        
+
         .document-number {
             font-size: 18px;
             font-weight: bold;
             color: {{ primary_color|default:"#0d6efd" }};
         }
-        
+
         .document-date {
             font-size: 12px;
             color: #666;
             margin-top: 5px;
         }
-        
+
         /* Sección de cliente */
         .client-section {
             background: #f8f9fa;
@@ -90,21 +90,21 @@
             padding: 20px;
             margin: 20px 0;
         }
-        
+
         .client-section h3 {
             color: {{ primary_color|default:"#0d6efd" }};
             margin-top: 0;
             border-bottom: 1px solid {{ primary_color|default:"#0d6efd" }};
             padding-bottom: 8px;
         }
-        
+
         /* Tabla de contenido */
         .content-table {
             width: 100%;
             border-collapse: collapse;
             margin: 20px 0;
         }
-        
+
         .content-table th {
             background: {{ primary_color|default:"#0d6efd" }};
             color: white;
@@ -112,43 +112,43 @@
             text-align: left;
             font-weight: bold;
         }
-        
+
         .content-table td {
             padding: 10px 8px;
             border-bottom: 1px solid #dee2e6;
         }
-        
+
         .content-table tr:nth-child(even) {
             background: #f8f9fa;
         }
-        
+
         .content-table tr:hover {
             background: rgba(13, 110, 253, 0.1);
         }
-        
+
         /* Totales */
         .totals-section {
             margin-top: 30px;
             text-align: right;
         }
-        
+
         .totals-table {
             margin-left: auto;
             min-width: 300px;
         }
-        
+
         .totals-table td {
             padding: 8px 15px;
             border: none;
         }
-        
+
         .totals-table .total-row {
             background: {{ primary_color|default:"#0d6efd" }};
             color: white;
             font-weight: bold;
             font-size: 16px;
         }
-        
+
         /* Footer */
         .document-footer {
             margin-top: 50px;
@@ -157,27 +157,27 @@
             font-size: 11px;
             color: #666;
         }
-        
+
         .footer-columns {
             display: flex;
             justify-content: space-between;
         }
-        
+
         .footer-column {
             flex: 1;
             margin-right: 20px;
         }
-        
+
         .footer-column:last-child {
             margin-right: 0;
         }
-        
+
         .footer-column h4 {
             color: {{ primary_color|default:"#0d6efd" }};
             font-size: 12px;
             margin-bottom: 10px;
         }
-        
+
         /* Términos y condiciones */
         .terms-section {
             margin-top: 30px;
@@ -187,12 +187,12 @@
             font-size: 10px;
             color: #666;
         }
-        
+
         .terms-section h4 {
             color: {{ primary_color|default:"#0d6efd" }};
             margin-top: 0;
         }
-        
+
         /* Utilidades */
         .text-center { text-align: center; }
         .text-right { text-align: right; }
@@ -201,7 +201,7 @@
         .font-bold { font-weight: bold; }
         .mb-0 { margin-bottom: 0; }
         .mt-20 { margin-top: 20px; }
-        
+
         /* Responsive para impresión */
         @media print {
             .no-print { display: none; }
@@ -216,13 +216,13 @@
             {% if company_logo and company_logo != '/static/images/egarage_default_logo.png' %}
                 <img src="{{ request.build_absolute_uri:company_logo }}" alt="{{ company_name|default:'eGarage' }}" class="company-logo">
             {% endif %}
-            
+
             <h1 class="company-name">{{ company_name|default:"eGarage" }}</h1>
-            
+
             {% if company_tagline %}
                 <p class="company-tagline">{{ company_tagline }}</p>
             {% endif %}
-            
+
             <div class="company-contact">
                 {% if company_address %}
                     <div><strong>Dirección:</strong> {{ company_address }}</div>
@@ -238,7 +238,7 @@
                 {% endif %}
             </div>
         </div>
-        
+
         <div class="document-info">
             <div class="document-number">{{ document_type|upper }} {{ document_number }}</div>
             <div class="document-date">Fecha: {{ document_date|date:"d/m/Y" }}</div>
@@ -247,7 +247,7 @@
             {% endif %}
         </div>
     </div>
-    
+
     <!-- Información del cliente -->
     {% if client %}
     <div class="client-section">
@@ -271,14 +271,14 @@
         </div>
     </div>
     {% endif %}
-    
+
     <!-- Contenido principal del documento -->
     <div class="document-content">
         {% block document_content %}
         <!-- Este bloque será sobrescrito por los templates específicos -->
         {% endblock %}
     </div>
-    
+
     <!-- Totales -->
     {% if show_totals %}
     <div class="totals-section">
@@ -289,21 +289,21 @@
                 <td class="text-right">${{ subtotal|floatformat:0 }}</td>
             </tr>
             {% endif %}
-            
+
             {% if tax_amount %}
             <tr>
                 <td><strong>IVA ({{ tax_rate }}%):</strong></td>
                 <td class="text-right">${{ tax_amount|floatformat:0 }}</td>
             </tr>
             {% endif %}
-            
+
             {% if discount %}
             <tr>
                 <td><strong>Descuento:</strong></td>
                 <td class="text-right">-${{ discount|floatformat:0 }}</td>
             </tr>
             {% endif %}
-            
+
             <tr class="total-row">
                 <td><strong>TOTAL:</strong></td>
                 <td class="text-right"><strong>${{ total|floatformat:0 }}</strong></td>
@@ -311,7 +311,7 @@
         </table>
     </div>
     {% endif %}
-    
+
     <!-- Footer -->
     <div class="document-footer">
         <div class="footer-columns">
@@ -328,7 +328,7 @@
                     <p>{{ company_email }}</p>
                 {% endif %}
             </div>
-            
+
             <div class="footer-column">
                 <h4>Información Fiscal</h4>
                 {% if company_tax_id %}
@@ -338,7 +338,7 @@
                     <p>Licencia: {{ company_settings.business_license }}</p>
                 {% endif %}
             </div>
-            
+
             <div class="footer-column">
                 <h4>Documento</h4>
                 <p>{{ document_type|title }} N° {{ document_number }}</p>
@@ -346,7 +346,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Términos y condiciones -->
     {% if company_settings.terms_and_conditions %}
     <div class="terms-section">
@@ -354,7 +354,7 @@
         <p>{{ company_settings.terms_and_conditions|linebreaks }}</p>
     </div>
     {% endif %}
-    
+
     <!-- Powered by (solo si no hay branding personalizado completo) -->
     {% if not company_settings or company_name == 'eGarage' %}
     <div style="text-align: center; margin-top: 30px; font-size: 10px; color: #999;">

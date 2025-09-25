@@ -1,11 +1,12 @@
 # gestion_taller/urls.py o e_garage/urls.py
+from demo_reportes_views import demo_reportes_por_fecha
+
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 from django.urls import include, path
 from django.views.generic import TemplateView
 
-from demo_reportes_views import demo_reportes_por_fecha
 from taller.admin import admin_site
 from taller.clientes.views import obtener_ciudades
 from taller.dashboard_views import dashboard_view

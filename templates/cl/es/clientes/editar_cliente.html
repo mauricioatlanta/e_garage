@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% load widget_tweaks %}
+{% load country_url %}
 
 {% block title %}{% if LANGUAGE_CODE == 'es' %}Editar Cliente{% else %}Edit Client{% endif %}{% endblock %}
 
@@ -20,7 +21,7 @@
           {% if LANGUAGE_CODE == 'es' %}Actualiza la información y guarda los cambios. Los campos dinámicos de región/ciudad se cargan automáticamente.{% else %}Update client information and save changes. Region / city dynamic fields load automatically.{% endif %}
         </p>
       </div>
-      {% url 'taller:clientes:lista_clientes' as url_lista_clientes %}
+      {% country_url 'clientes:lista_clientes' as url_lista_clientes %}
       <a href="{{ url_lista_clientes|default:'#' }}" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#132034] hover:bg-[#173653] text-cyan-200 font-semibold shadow-lg shadow-cyan-900/40 transition hover:scale-105">
         <i class="fas fa-arrow-left"></i>
         <span>{% if LANGUAGE_CODE == 'es' %}Volver{% else %}Back{% endif %}</span>
@@ -61,7 +62,7 @@
           <label for="id_telefono" class="text-xs font-semibold uppercase tracking-wider text-cyan-300/90 group-hover:text-lime-300 transition">{% if LANGUAGE_CODE == 'es' %}Teléfono{% else %}Phone{% endif %}</label>
           {{ form.telefono|add_class:'w-full rounded-xl bg-white border border-cyan-600/40 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/40 px-4 py-3 text-gray-900 placeholder-gray-500 shadow-md outline-none transition font-medium' }}
         </div>
-        
+
         <!-- Campos Chile: región/ciudad -->
         {% if form.pais != 'US' %}
         <div class="flex flex-col gap-2 group">
@@ -120,12 +121,12 @@
     const regionSelect = document.getElementById('id_region');
     const ciudadSelect = document.getElementById('id_ciudad');
     const ciudadActual = '{{ form.ciudad.value|default_if_none:"" }}';
-    
+
     if(regionSelect && ciudadSelect){
       function cargarCiudades(regionId, pre){
         ciudadSelect.innerHTML = '<option value="">---------</option>';
         if(regionId){
-          fetch(`{% url 'taller:clientes:obtener_ciudades' %}?region_id=${regionId}`)
+          fetch(`{% country_url 'clientes:obtener_ciudades' %}?region_id=${regionId}`)
             .then(r=>r.json())
             .then(data=>{
               data.forEach(c=>{
@@ -143,12 +144,12 @@
     const estadoSelect = document.getElementById('id_estado_usa');
     const ciudadUsaSelect = document.getElementById('id_ciudad_usa');
     const ciudadUsaActual = '{{ form.ciudad_usa.value|default_if_none:"" }}';
-    
+
     if(estadoSelect && ciudadUsaSelect){
       function cargarCiudadesUsa(estadoId, pre){
         ciudadUsaSelect.innerHTML = '<option value="">Select City</option>';
         if(estadoId){
-          fetch(`{% url 'taller:clientes:obtener_ciudades_usa' %}?estado_id=${estadoId}`)
+          fetch(`{% country_url 'clientes:obtener_ciudades_usa' %}?estado_id=${estadoId}`)
             .then(r=>r.json())
             .then(data=>{
               data.forEach(c=>{

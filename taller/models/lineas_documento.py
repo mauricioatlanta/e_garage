@@ -61,6 +61,14 @@ class LineaServicio(models.Model):
         help_text="Descuento en porcentaje",
     )
     observaciones = models.TextField(blank=True, null=True)
+    tecnico_responsable = models.ForeignKey(
+        "taller.Tecnico",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="lineas_servicio",
+        help_text="Técnico responsable de esta línea (si no se especifica, hereda del documento)",
+    )
 
     def clean(self):
         """Validaciones de consistencia para LineaServicio"""
@@ -97,8 +105,8 @@ class LineaServicio(models.Model):
         verbose_name = "Línea de Servicio"
         verbose_name_plural = "Líneas de Servicios"
         indexes = [
-            # Índices válidos (sin campo 'responsable' que no existe)
             models.Index(fields=["documento", "servicio"]),
+            models.Index(fields=["tecnico_responsable"]),
             # Los KPIs usarán documento__tecnico_responsable con Coalesce
             # Los índices en Documento ya optimizan las consultas por fecha_emision
         ]
@@ -142,6 +150,14 @@ class LineaOtroServicio(models.Model):
         max_digits=10, decimal_places=2, help_text="Precio cobrado al cliente"
     )
     observaciones = models.TextField(blank=True, null=True)
+    tecnico_responsable = models.ForeignKey(
+        "taller.Tecnico",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="lineas_otro_servicio",
+        help_text="Técnico responsable de esta línea (si no se especifica, hereda del documento)",
+    )
 
     def clean(self):
         """Validaciones de consistencia para LineaOtroServicio"""
@@ -189,9 +205,9 @@ class LineaOtroServicio(models.Model):
         verbose_name = "Línea de Otro Servicio"
         verbose_name_plural = "Líneas de Otros Servicios"
         indexes = [
-            # Índices válidos (sin campo 'responsable' que no existe)
             models.Index(fields=["documento", "servicio"]),
             models.Index(fields=["empresa_externa"]),
+            models.Index(fields=["tecnico_responsable"]),
             # Los KPIs usarán documento__tecnico_responsable con Coalesce
             # Los índices en Documento ya optimizan las consultas por fecha_emision
         ]
@@ -226,6 +242,14 @@ class LineaRepuesto(models.Model):
         help_text="Descuento en porcentaje",
     )
     observaciones = models.TextField(blank=True, null=True)
+    tecnico_responsable = models.ForeignKey(
+        "taller.Tecnico",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="lineas_repuesto",
+        help_text="Técnico responsable de esta línea (si no se especifica, hereda del documento)",
+    )
 
     def clean(self):
         """Validaciones de consistencia para LineaRepuesto"""
@@ -258,9 +282,9 @@ class LineaRepuesto(models.Model):
         verbose_name = "Línea de Repuesto"
         verbose_name_plural = "Líneas de Repuestos"
         indexes = [
-            # Índices válidos (sin campo 'responsable' que no existe)
             models.Index(fields=["documento", "repuesto"]),
             models.Index(fields=["codigo"]),
+            models.Index(fields=["tecnico_responsable"]),
             # Los KPIs usarán documento__tecnico_responsable con Coalesce
             # Los índices en Documento ya optimizan las consultas por fecha_emision
         ]

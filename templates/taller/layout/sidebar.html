@@ -1,21 +1,22 @@
 
+{% load country_url %}
 <aside class="fixed top-0 left-0 h-full w-20 bg-gray-800 pt-20 flex flex-col items-center space-y-6 z-40">
-  <a href="/cl/clientes/" title="Clientes">
+  <a href="{% country_url 'clientes:lista_clientes' %}" title="Clientes">
     <i class="fas fa-users text-xl text-cyan-300 hover:text-white"></i>
   </a>
-  <a href="/cl/vehiculos/" title="Vehículos">
+  <a href="{% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{% else %}/cl/vehiculos/{% endif %}" title="Vehículos">
     <i class="fas fa-car text-xl text-cyan-300 hover:text-white"></i>
   </a>
-  <a href="/servicios/" title="Servicios">
+  <a href="{% country_url 'servicios:servicios_menu' %}" title="Servicios">
     <i class="fas fa-tools text-xl text-cyan-300 hover:text-white"></i>
   </a>
-  <a href="/repuestos/" title="Repuestos">
+  <a href="{% country_url 'repuestos:lista_repuestos' %}" title="Repuestos">
     <i class="fas fa-cogs text-xl text-cyan-300 hover:text-white"></i>
   </a>
-  <a href="/documentos/" title="Documentos">
+  <a href="{% country_url 'documentos:lista_documentos' %}" title="Documentos">
     <i class="fas fa-file-invoice text-xl text-cyan-300 hover:text-white"></i>
   </a>
-  <a href="/cl/reportes/" title="Reportes">
+  <a href="{% country_url 'reportes:reportes_dashboard' %}" title="Reportes">
     <i class="fas fa-chart-bar text-xl text-cyan-300 hover:text-white"></i>
   </a>
 </aside>

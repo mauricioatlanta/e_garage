@@ -1,22 +1,15 @@
-"""
-URLs específicas para USA (inglés)
-Prefijo: /us/
-"""
-
 from django.urls import include, path
 
 from taller import ajax_views
 from taller.taller_views import dashboard_suscripciones
 from taller.views_extra.ajax import buscar_clientes, vehiculos_por_cliente
+from taller.views_extra.bienvenida_usa import bienvenida_usa
 from taller.views_extra.company_settings_views import company_settings_view
-from taller.views_extra.country_views import test_usa_view
 from taller.views_extra.dashboard_empresa import (
     dashboard_centro_operaciones,
     dashboard_centro_operaciones_espacial,
 )
 from taller.views_extra.futuristic_company_settings_views import (
-    api_technician_delete,
-    api_technician_toggle,
     futuristic_company_settings_view,
 )
 from taller.views_extra.views import dashboard
@@ -24,42 +17,36 @@ from taller.views_extra.views_configuracion import (
     configuracion_empresa,
     configuracion_tecnicos,
 )
+from taller.views_extra.views_trial_activate import activar_trial
 
-
-def usa_login_view(request):
-    """Vista personalizada de login para USA que no redirige automáticamente"""
-    from allauth.account.views import LoginView
-
-    # Configurar el contexto de país para USA
-    request.country = "US"
-    request.country_code = "US"
-
-    # Usar la vista de allauth pero con template específico para USA
-    view = LoginView.as_view(template_name="taller/us/en/auth/login.html")
-    return view(request)
-
-
-def usa_signup_view(request):
-    """Vista personalizada de signup para USA"""
-    from allauth.account.views import SignupView
-
-    # Configurar el contexto de país para USA
-    request.country = "US"
-    request.country_code = "US"
-
-    # Usar la vista de allauth pero con template específico para USA
-    view = SignupView.as_view(template_name="taller/us/en/auth/signup.html")
-    return view(request)
-
+# from taller.views_extra.crear_motor_caja import crear_motor, crear_caja, crear_color  # ❌ Desactivado - usando views_create_parts
 
 app_name = "usa"
 
+
+def usa_login_view(request):
+    from allauth.account.views import LoginView
+
+    request.country = "US"
+    request.country_code = "US"
+    return LoginView.as_view(template_name="taller/us/en/auth/login.html")(request)
+
+
+def usa_signup_view(request):
+    from allauth.account.views import SignupView
+
+    request.country = "US"
+    request.country_code = "US"
+    return SignupView.as_view(template_name="taller/us/en/auth/signup.html")(request)
+
+
 urlpatterns = [
-    # === CONFIGURACIÓN Y SETTINGS ===
-    # URL raíz para USA - redirige al dashboard
-    path("", dashboard, name="home"),
-    # Incluir las rutas específicas que necesitamos
-    path("dashboard/", dashboard, name="dashboard"),
+    # 1) Home y páginas específicas USA
+    path("", bienvenida_usa, name="home"),
+    path(
+        "dashboard/", dashboard, name="dashboard"
+    ),  # si existe en taller, este gana por orden
+    path("en/dashboard/", dashboard, name="dashboard_en_redirect"),
     path(
         "centro-operaciones/", dashboard_centro_operaciones, name="centro_operaciones"
     ),
@@ -69,6 +56,7 @@ urlpatterns = [
         name="centro_operaciones_espacial",
     ),
     path("admin/dashboard/", dashboard_suscripciones, name="dashboard_suscripciones"),
+    # 2) Configuración
     path("configuracion/", configuracion_empresa, name="configuracion"),
     path(
         "configuracion/tecnicos/", configuracion_tecnicos, name="configuracion_tecnicos"
@@ -79,17 +67,16 @@ urlpatterns = [
         futuristic_company_settings_view,
         name="futuristic_company_settings",
     ),
-    # API endpoints for technician management
-    path("api/technician/toggle/", api_technician_toggle, name="api_technician_toggle"),
-    path("api/technician/delete/", api_technician_delete, name="api_technician_delete"),
-    # Test endpoint USA
-    path("test/", test_usa_view, name="test"),
-    # === MÓDULOS PRINCIPALES ===
-    # NOTA: Los submódulos principales (clientes, vehiculos, repuestos, servicios,
-    # documentos, reportes) están incluidos en taller_main_urls.py para evitar duplicación
-    # Solo incluimos aquí rutas específicas de USA que no están en el core
-    # === AJAX ENDPOINTS ===
-    # AJAX jerárquico para vehículos
+    # 3) Auth Allauth para USA (nombres globales a propósito)
+    path("login/", usa_login_view, name="account_login"),
+    path("signup/", usa_signup_view, name="account_signup"),
+    # 4) Trial y onboarding
+    path("activar-trial/", activar_trial, name="activar_trial"),
+    path(
+        "registro/",
+        include(("scripts.onboarding_urls", "onboarding"), namespace="usa_onboarding"),
+    ),
+    # 5) AJAX específicos USA
     path("ajax/load-modelos/", ajax_views.load_modelos, name="ajax_load_modelos"),
     path("ajax/load-motores/", ajax_views.load_motores, name="ajax_load_motores"),
     path("ajax/load-cajas/", ajax_views.load_cajas, name="ajax_load_cajas"),
@@ -98,20 +85,22 @@ urlpatterns = [
         ajax_views.load_motores_cajas,
         name="ajax_load_motores_cajas",
     ),
-    # AJAX específicos para USA
     path("ajax/clientes/buscar/", buscar_clientes, name="us_ajax_buscar_clientes"),
     path(
         "ajax/vehiculos-por-cliente/",
         vehiculos_por_cliente,
         name="us_ajax_vehiculos_por_cliente",
     ),
-    # === AUTHENTICATION ===
-    # Login para USA
-    path("login/", usa_login_view, name="account_login"),
-    # Signup para USA
-    path("signup/", usa_signup_view, name="account_signup"),
-    # Registro para USA
-    path("registro/", include(("scripts.onboarding_urls", "onboarding"), namespace="usa_onboarding")),
-    # === DASHBOARD DE SUSCRIPTOR ===
+    # 6) Autocomplete y creadores rápidos (verifica que no se dupliquen en taller.urls)
+    path(
+        "autocomplete/",
+        include(("taller.autocomplete.urls", "autocomplete"), namespace="autocomplete"),
+    ),
+    # path("vehiculos/crear-motor/", crear_motor, name="crear_motor"),  # ❌ Desactivado - usar vehiculos:crear_motor
+    # path("vehiculos/crear-caja/", crear_caja, name="crear_caja"),    # ❌ Desactivado - usar vehiculos:crear_caja
+    # path("vehiculos/crear-color/", crear_color, name="crear_color"), # ❌ Desactivado - usar vehiculos:crear_color
+    # 7) Analytics (antes de taller si sus rutas son más específicas)
     path("", include("taller.analytics.urls_suscriptor")),
+    # 8) Núcleo de taller (último para que no opaque lo anterior)
+    path("", include(("taller.urls", "taller"), namespace="taller")),
 ]

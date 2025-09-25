@@ -1,8 +1,8 @@
 # 📋 INFORME DE DATOS DE PRUEBA - eGarage
 
-**🗓️ Generado:** 24 de July de 2025 - 12:49:55  
-**🎯 Propósito:** Pruebas de suscripciones por país  
-**🌎 Países:** Chile 🇨🇱 y USA 🇺🇸  
+**🗓️ Generado:** 24 de July de 2025 - 12:49:55
+**🎯 Propósito:** Pruebas de suscripciones por país
+**🌎 Países:** Chile 🇨🇱 y USA 🇺🇸
 
 ---
 
@@ -117,5 +117,5 @@
 
 ---
 
-*📅 Archivo generado automáticamente el 24/07/2025 12:49:55*  
+*📅 Archivo generado automáticamente el 24/07/2025 12:49:55*
 *🤖 Sistema: eGarage Test Data Generator v2.0*

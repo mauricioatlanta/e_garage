@@ -2,6 +2,7 @@
 """
 Diagnóstico rápido de edición de documentos
 """
+
 import os
 
 import django

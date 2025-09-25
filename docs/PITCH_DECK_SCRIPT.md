@@ -16,7 +16,7 @@
 
 #### **Pain Points Identificados:**
 - ❌ **Gestión manual** de inventario = 15% pérdidas por desabastecimiento
-- ❌ **Presupuestos en papel** = 25% más tiempo por cotización  
+- ❌ **Presupuestos en papel** = 25% más tiempo por cotización
 - ❌ **Sin seguimiento** de rentabilidad = Decisiones a ciegas
 - ❌ **Comunicación ineficiente** = 30% de reclamos por falta de información
 - ❌ **Reportes inexistentes** = Imposible optimizar operaciones
@@ -122,7 +122,7 @@
 - **Freemium:** 30 días gratis, luego conversión 35%
 
 #### **📊 Unit Economics:**
-| Metric | Chile | USA | 
+| Metric | Chile | USA |
 |--------|-------|-----|
 | **ARPU** | $180/mes | $450/mes |
 | **CAC** | $400 | $1,500 |
@@ -225,7 +225,7 @@
 
 #### **🏆 Strategic Acquirers:**
 - **CDK Global** ($6.2B revenue) - Portfolio expansion
-- **Cox Automotive** ($20B revenue) - Vertical integration  
+- **Cox Automotive** ($20B revenue) - Vertical integration
 - **Solera Holdings** - Geographic expansion
 - **Private Equity** - Industry roll-up strategy
 

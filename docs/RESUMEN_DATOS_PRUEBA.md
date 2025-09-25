@@ -11,7 +11,7 @@ Se han generado **datos de prueba completos** para validar el sistema de documen
 
 ## 📋 Documentos por Tipo
 - **Presupuestos**: 30
-- **Órdenes de Trabajo**: 30  
+- **Órdenes de Trabajo**: 30
 - **Facturas**: 30
 
 ## 👥 Datos Maestros Creados

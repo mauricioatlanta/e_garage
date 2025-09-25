@@ -26,7 +26,7 @@ if (window.jQuery && jQuery.fn && jQuery.fn.select2) {
     });
     console.log('✅ Select2 inicializado para marca_usa');
   }
-  
+
   // Inicializar modelo_usa
   if ($mo && $mo.length && !$mo.data('select2')) {
     $mo.select2({
@@ -50,7 +50,7 @@ $m.on('select2:select', (e) => {
   if (marcaSeleccionada && selectModeloUsa) {
     console.log('🔄 Cargando modelos para marca:', marcaSeleccionada);
     cargarModelosUsa(marcaSeleccionada);
-    
+
     // Habilitar el campo de modelo
     if ($mo && $mo.length) {
       $mo.prop('disabled', false);

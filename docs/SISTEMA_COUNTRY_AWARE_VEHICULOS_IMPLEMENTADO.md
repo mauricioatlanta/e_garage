@@ -43,7 +43,7 @@ class CatalogoModeloAuto(models.Model):
     marca = models.CharField(max_length=100)
     modelo = models.CharField(max_length=200)
     activo = models.BooleanField(default=True)
-    
+
     @classmethod
     def get_marcas_activas(cls):
         return cls.objects.filter(activo=True).values_list('marca', flat=True).distinct().order_by('marca')
@@ -55,10 +55,10 @@ class VehiculoForm(forms.ModelForm):
     def add_usa_fields(self):
         """Agregar campos específicos para usuarios de USA"""
         from taller.models.catalogo import CatalogoModeloAuto
-        
+
         marcas_list = list(CatalogoModeloAuto.get_marcas_activas())
         marcas_choices = [(m, m) for m in marcas_list]
-        
+
         self.fields['marca_usa'] = forms.ChoiceField(
             choices=[('', 'Select Brand...')] + marcas_choices,
             label='Brand (USA)',
@@ -73,10 +73,10 @@ class VehiculoCreateView(LoginRequiredMixin, TenantViewMixin, CreateView):
         ctx = super().get_context_data(**kwargs)
         empresa = getattr(self.request.user, 'empresa', None)
         country = getattr(empresa, 'pais', 'CL').strip().upper()
-        
+
         ctx['country'] = country
         ctx['SHOW_DEBUG'] = True
-        
+
         if country == 'US':
             ctx['marcas_usa'] = CatalogoModeloAuto.get_marcas_activas()[:500]
 ```
@@ -106,7 +106,7 @@ def api_modelos_usa(request):
     marca = request.GET.get('marca', '').strip()
     if not marca:
         return JsonResponse({'results': []})
-    
+
     modelos = CatalogoModeloAuto.get_modelos_por_marca(marca)
     results = [{'id': modelo, 'text': modelo} for modelo in modelos]
     return JsonResponse({'results': results})
@@ -151,7 +151,7 @@ def api_modelos_usa(request):
 🟢 **SISTEMA COMPLETAMENTE FUNCIONAL**
 - ✅ Detección automática de país
 - ✅ Formularios country-aware
-- ✅ APIs especializadas  
+- ✅ APIs especializadas
 - ✅ Templates adaptativos
 - ✅ Base de datos poblada
 - ✅ Debugging habilitado

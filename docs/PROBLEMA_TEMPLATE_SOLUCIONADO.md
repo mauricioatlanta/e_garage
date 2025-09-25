@@ -21,7 +21,7 @@ Script `migrar_vistas_automatico.py` que:
 ### 3. **Archivos Migrados Automáticamente**
 ```
 ✅ taller/documentos/views_moderno.py (2 cambios)
-✅ taller/viewsautocomplete/views_main.py (5 cambios)  
+✅ taller/viewsautocomplete/views_main.py (5 cambios)
 ✅ taller/viewsautocomplete/views.py (3 cambios)
 ✅ taller/views_extra/configuracion.py (1 cambio)
 ✅ taller/taller_main_urls.py (1 cambio)
@@ -69,8 +69,8 @@ from django.utils.translation import get_language
 from django.template.response import TemplateResponse
 
 template_name = select_country_lang_template(
-    "template.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "template.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -87,7 +87,7 @@ return TemplateResponse(request, template_name, context)
 ## 🎯 **RESULTADO**
 
 **¡MIGRACIÓN COMPLETA!** El sistema ahora:
-1. **Detecta automáticamente** país del usuario (`user.empresa.pais`) 
+1. **Detecta automáticamente** país del usuario (`user.empresa.pais`)
 2. **Resuelve idioma** desde `get_language()`
 3. **Carga template correcto** usando jerarquía de fallbacks
 4. **Previene errores** `TemplateDoesNotExist`

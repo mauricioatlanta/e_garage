@@ -27,7 +27,7 @@
     "fields": {
       "empresa": 1,
       "nombre": "Alex Tech",
-      "especialidad": "Mecánica General",
+      "especialidad": "Mec\u00e1nica General",
       "activo": true,
       "fecha_registro": "2024-01-01T00:00:00Z"
     }
@@ -37,8 +37,8 @@
     "pk": 2,
     "fields": {
       "empresa": 2,
-      "nombre": "Carlos Mecánico",
-      "especialidad": "Mecánica General",
+      "nombre": "Carlos Mec\u00e1nico",
+      "especialidad": "Mec\u00e1nica General",
       "activo": true,
       "fecha_registro": "2024-01-01T00:00:00Z"
     }
@@ -63,8 +63,8 @@
     "pk": 2,
     "fields": {
       "empresa": 2,
-      "nombre": "María",
-      "apellido": "González",
+      "nombre": "Mar\u00eda",
+      "apellido": "Gonz\u00e1lez",
       "email": "maria.gonzalez@example.com",
       "telefono": "+56912345678",
       "direccion": "Av. Principal 123, Santiago",
@@ -78,7 +78,7 @@
     "pk": 1,
     "fields": {
       "nombre": "Toyota",
-      "pais_origen": "Japón",
+      "pais_origen": "Jap\u00f3n",
       "activa": true
     }
   },
@@ -97,8 +97,8 @@
     "fields": {
       "nombre": "Corolla",
       "marca": 1,
-      "año_inicio": 2020,
-      "año_fin": null,
+      "a\u00f1o_inicio": 2020,
+      "a\u00f1o_fin": null,
       "activo": true
     }
   },
@@ -108,8 +108,8 @@
     "fields": {
       "nombre": "F-150",
       "marca": 2,
-      "año_inicio": 2019,
-      "año_fin": null,
+      "a\u00f1o_inicio": 2019,
+      "a\u00f1o_fin": null,
       "activo": true
     }
   },
@@ -121,7 +121,7 @@
       "cliente": 1,
       "marca": 1,
       "modelo": 1,
-      "año": 2021,
+      "a\u00f1o": 2021,
       "patente": "ABC123",
       "color": "Blanco",
       "kilometraje": 15000,
@@ -138,7 +138,7 @@
       "cliente": 2,
       "marca": 2,
       "modelo": 2,
-      "año": 2020,
+      "a\u00f1o": 2020,
       "patente": "XYZ789",
       "color": "Azul",
       "kilometraje": 25000,
@@ -154,7 +154,7 @@
       "empresa": 1,
       "nombre": "Oil Change",
       "descripcion": "Engine oil change and filter replacement",
-      "precio": 50.00,
+      "precio": 50.0,
       "duracion_minutos": 30,
       "activo": true
     }
@@ -179,7 +179,7 @@
       "nombre": "Oil Filter",
       "codigo": "FIL001",
       "descripcion": "Engine oil filter",
-      "precio": 15.00,
+      "precio": 15.0,
       "stock": 50,
       "stock_minimo": 10,
       "activo": true
@@ -229,7 +229,7 @@
       "fecha_emision": "2024-01-20",
       "fecha_creacion": "2024-01-20T14:15:00Z",
       "numero_documento": "OT-002",
-      "observaciones": "Revisión técnica",
+      "observaciones": "Revisi\u00f3n t\u00e9cnica",
       "activo": true
     }
   },
@@ -241,8 +241,8 @@
       "servicio": 1,
       "responsable": 1,
       "cantidad": 1,
-      "precio_unitario": 50.00,
-      "descuento": 0.00,
+      "precio_unitario": 50.0,
+      "descuento": 0.0,
       "descripcion": "Oil change service",
       "activo": true
     }
@@ -256,7 +256,7 @@
       "responsable": 2,
       "cantidad": 1,
       "precio_unitario": 25000,
-      "descuento": 0.00,
+      "descuento": 0.0,
       "descripcion": "Cambio de aceite",
       "activo": true
     }
@@ -269,8 +269,8 @@
       "repuesto": 1,
       "responsable": 1,
       "cantidad": 1,
-      "precio_unitario": 15.00,
-      "descuento": 0.00,
+      "precio_unitario": 15.0,
+      "descuento": 0.0,
       "descripcion": "Oil filter replacement",
       "activo": true
     }
@@ -284,7 +284,7 @@
       "responsable": 2,
       "cantidad": 1,
       "precio_unitario": 8500,
-      "descuento": 0.00,
+      "descuento": 0.0,
       "descripcion": "Filtro de aceite",
       "activo": true
     }

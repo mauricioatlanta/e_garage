@@ -8,6 +8,7 @@ Esta demostración muestra el funcionamiento completo del sistema:
 2. Procesamiento de la cola de notificaciones
 3. Recordatorios de mantenimiento
 """
+
 import os
 from datetime import datetime, timedelta
 

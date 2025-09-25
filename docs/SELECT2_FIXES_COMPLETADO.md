@@ -26,7 +26,7 @@
 
 ```html
 <!-- DAL scripts comentados -->
-<!-- 
+<!--
 <script src="{% static 'autocomplete_light/select2.js' %}"></script>
 <script src="{% static 'autocomplete_light/autocomplete_light.js' %}"></script>
 -->
@@ -54,7 +54,7 @@
 (function() {
   const base = window.location.pathname.startsWith('/us/') ? '/us' : '/cl';
   const origin = window.location.origin;
-  
+
   const $ = window.jQuery;
   if (!$ || !$.fn || !$.fn.select2) {
     console.warn("Select2/jQuery no están cargados.");
@@ -137,7 +137,7 @@ verify_select2_fixes.py                                               [NUEVO]
 
 Los tres problemas identificados han sido solucionados:
 1. ✅ Título HTML válido
-2. ✅ Conflicto Select2 resuelto  
+2. ✅ Conflicto Select2 resuelto
 3. ✅ JavaScript robusto implementado
 
 El autocompletado de clientes debería funcionar correctamente ahora con URLs absolutas, manejo de errores robusto y sin conflictos de librerías.

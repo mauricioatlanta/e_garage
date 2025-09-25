@@ -1,33 +1,36 @@
 # gestion_taller/urls.py o e_garage/urls.py
+from demo_reportes_views import demo_reportes_por_fecha
+
 from django.conf import settings
-from django.conf.urls.i18n import i18n_patterns
 from django.conf.urls.static import static
-from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import include, path
 from django.views.generic import TemplateView
 
-from demo_reportes_views import demo_reportes_por_fecha
 from taller.admin import admin_site
 from taller.clientes.views import obtener_ciudades
 from taller.dashboard_views import dashboard_view
 from taller.main_views import (  # Corregido: importar desde main_views
-    landing_inicio, landing_premium)
-from taller.main_views_mkt import (landing_clientes, landing_ia,
-                                   landing_mecanicos, landing_reportes,
-                                   landing_repuestos, landing_servicios)
-from taller.reportes.reportes_avanzados import (  # Importar dashboard y reportes de rentabilidad
-    dashboard_rentabilidad, reporte_comparativo_precios,
-    reporte_servicios_subcontratados, reportes_rentabilidad)
-from taller.reportes.views import (  # Importar vistas de reportes directamente
-    dashboard_inteligencia_operativa, diagnostico_ia, reporte_repuestos,
-    reporte_servicios, reportes_dashboard)
+    landing_inicio,
+    landing_premium,
+)
+from taller.main_views_mkt import (
+    landing_clientes,
+    landing_ia,
+    landing_mecanicos,
+    landing_reportes,
+    landing_repuestos,
+    landing_servicios,
+)
 from taller.views.landing_usa import landing_usa
 from taller.views.suscripcion import registro, suscripcion_bloqueada
-from taller.views.views_suscripciones import (estado_suscripcion, precios,
-                                              subir_comprobante, suspension)
-from taller.views_landing import \
-    landing_egarage  # Importar la vista de la landing page
+from taller.views.views_suscripciones import (
+    estado_suscripcion,
+    precios,
+    subir_comprobante,
+    suspension,
+)
+from taller.views_landing import landing_egarage  # Importar la vista de la landing page
 from taller.views_trial import registro_trial
 from taller.views_trial_activate import activar_trial
 
@@ -152,17 +155,24 @@ urlpatterns = [
 ]
 
 # 🎯 DEMO PÚBLICO ATLANTA (para marketing)
-from taller.views.demo_publico import (demo_atlanta_publico,
-                                       demo_cotizacion_ajax,
-                                       verificar_codigo_atlanta)
+from taller.views.demo_publico import (
+    demo_atlanta_publico,
+    demo_cotizacion_ajax,
+    verificar_codigo_atlanta,
+)
+
 # 🇺🇸 URLs DIRECTAS PARA LOCALIZACIÓN USA (acceso fácil)
-from taller.views.us_views import (USLocalizationView,
-                                   api_calcular_impuestos_usa,
-                                   api_ciudades_por_estado, api_estados_usa,
-                                   api_marcas_vehiculos_usa,
-                                   api_modelos_por_marca,
-                                   api_traducir_servicios, cambiar_idioma,
-                                   demo_atlanta_personalization)
+from taller.views.us_views import (
+    USLocalizationView,
+    api_calcular_impuestos_usa,
+    api_ciudades_por_estado,
+    api_estados_usa,
+    api_marcas_vehiculos_usa,
+    api_modelos_por_marca,
+    api_traducir_servicios,
+    cambiar_idioma,
+    demo_atlanta_personalization,
+)
 
 usa_patterns = [
     # Demos principales con acceso directo

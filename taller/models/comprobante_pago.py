@@ -106,15 +106,15 @@ class ComprobantePago(models.Model):
 
         message = f"""
         ¡Excelente! Tu pago ha sido aprobado.
-        
+
         Detalles:
         - Empresa: {self.empresa.nombre_taller}
         - Monto: ${self.monto} {self.moneda}
         - Plan: {plan_display}
         - Nueva fecha de vencimiento: {fecha_vencimiento}
-        
+
         Ya puedes continuar usando eGarage sin restricciones.
-        
+
         ¡Gracias por confiar en nosotros!
         """
 
@@ -137,14 +137,14 @@ class ComprobantePago(models.Model):
         subject = f"❌ Pago Rechazado - {self.empresa.nombre_taller}"
         message = f"""
         Tu comprobante de pago ha sido rechazado.
-        
+
         Detalles:
         - Empresa: {self.empresa.nombre_taller}
         - Monto: ${self.monto} {self.moneda}
         - Motivo: {self.notas_admin}
-        
+
         Por favor, revisa el comprobante y vuelve a subirlo o contáctanos para más información.
-        
+
         WhatsApp: +56 9 XXXX XXXX
         Email: suscripcion@atlantareciclajes.cl
         """
@@ -175,7 +175,7 @@ class ComprobantePago(models.Model):
         subject = f"💰 Nuevo Comprobante de Pago - {self.empresa.nombre_taller}"
         message = f"""
         Se ha subido un nuevo comprobante de pago.
-        
+
         Detalles:
         - Empresa: {self.empresa.nombre_taller}
         - Usuario: {self.empresa.user.username} ({self.empresa.user.email})
@@ -183,7 +183,7 @@ class ComprobantePago(models.Model):
         - Plan solicitado: {plan_display}
         - Método de pago: {metodo_display}
         - Número transacción: {self.numero_transaccion}
-        
+
         Revisa el comprobante en el panel de administración.
         """
 

@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🎯 Dashboard Admin - eGarage Suscriptores</title>
-    
+
     <!-- Fuentes futuristas -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;800&display=swap" rel="stylesheet">
-    
+
     <!-- Chart.js para gráficos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+
     <!-- Tailwind CSS -->
-    
+
     <style>
         :root {
             --neon-cyan: #00f5ff;
@@ -24,7 +24,7 @@
             --glass-bg: rgba(255, 255, 255, 0.05);
             --glass-border: rgba(255, 255, 255, 0.1);
         }
-        
+
         body {
             font-family: 'Exo 2', sans-serif;
             background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
@@ -32,11 +32,11 @@
             min-height: 100vh;
             overflow-x: auto;
         }
-        
+
         .orbitron {
             font-family: 'Orbitron', monospace;
         }
-        
+
         /* Glassmorphism cards */
         .glass-card {
             background: var(--glass-bg);
@@ -46,13 +46,13 @@
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             transition: all 0.3s ease;
         }
-        
+
         .glass-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 15px 40px rgba(0, 245, 255, 0.2);
             border-color: var(--neon-cyan);
         }
-        
+
         /* KPI Cards futuristas */
         .kpi-card {
             background: linear-gradient(135deg, var(--glass-bg) 0%, rgba(0, 245, 255, 0.1) 100%);
@@ -65,7 +65,7 @@
             position: relative;
             overflow: hidden;
         }
-        
+
         .kpi-card::before {
             content: '';
             position: absolute;
@@ -76,17 +76,17 @@
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
             transition: left 0.5s;
         }
-        
+
         .kpi-card:hover::before {
             left: 100%;
         }
-        
+
         .kpi-card:hover {
             transform: scale(1.05);
             border-color: var(--neon-green);
             box-shadow: 0 10px 30px rgba(0, 255, 136, 0.3);
         }
-        
+
         .kpi-number {
             font-family: 'Orbitron', monospace;
             font-size: 2.5rem;
@@ -96,7 +96,7 @@
             -webkit-text-fill-color: transparent;
             text-shadow: 0 0 20px rgba(0, 245, 255, 0.5);
         }
-        
+
         .kpi-label {
             font-size: 0.9rem;
             color: #a0a0a0;
@@ -104,7 +104,7 @@
             letter-spacing: 1px;
             margin-top: 0.5rem;
         }
-        
+
         /* Botones futuristas */
         .futurista-btn {
             background: linear-gradient(45deg, var(--neon-cyan), var(--neon-blue));
@@ -119,13 +119,13 @@
             position: relative;
             overflow: hidden;
         }
-        
+
         .futurista-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(0, 245, 255, 0.4);
             background: linear-gradient(45deg, var(--neon-green), var(--neon-cyan));
         }
-        
+
         .futurista-btn::before {
             content: '';
             position: absolute;
@@ -136,11 +136,11 @@
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
             transition: left 0.3s;
         }
-        
+
         .futurista-btn:hover::before {
             left: 100%;
         }
-        
+
         /* Tabla futurista */
         .tabla-futurista {
             background: var(--glass-bg);
@@ -149,7 +149,7 @@
             overflow: hidden;
             border: 1px solid var(--glass-border);
         }
-        
+
         .tabla-futurista th {
             background: linear-gradient(45deg, rgba(0, 245, 255, 0.2), rgba(179, 71, 217, 0.2));
             color: var(--neon-cyan);
@@ -160,70 +160,70 @@
             padding: 1rem;
             border-bottom: 1px solid var(--neon-cyan);
         }
-        
+
         .tabla-futurista td {
             padding: 0.75rem 1rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             transition: all 0.3s ease;
         }
-        
+
         .tabla-futurista tr:hover td {
             background: rgba(0, 245, 255, 0.1);
             color: var(--neon-cyan);
         }
-        
+
         /* Alertas futuristas */
         .alerta-critica {
             background: linear-gradient(45deg, rgba(255, 68, 68, 0.2), rgba(255, 0, 255, 0.1));
             border: 1px solid #ff4444;
             color: #ff6666;
         }
-        
+
         .alerta-advertencia {
             background: linear-gradient(45deg, rgba(255, 170, 0, 0.2), rgba(255, 255, 0, 0.1));
             border: 1px solid #ffaa00;
             color: #ffcc44;
         }
-        
+
         .alerta-info {
             background: linear-gradient(45deg, rgba(0, 245, 255, 0.2), rgba(0, 102, 255, 0.1));
             border: 1px solid var(--neon-cyan);
             color: var(--neon-cyan);
         }
-        
+
         /* Animaciones de entrada */
         .fade-in {
             animation: fadeIn 0.6s ease-out;
         }
-        
+
         .slide-up {
             animation: slideUp 0.8s ease-out;
         }
-        
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        
+
         @keyframes slideUp {
             from { opacity: 0; transform: translateY(40px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        
+
         /* Efectos de glow */
         .glow-text {
             text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan), 0 0 30px var(--neon-cyan);
         }
-        
+
         .pulse-glow {
             animation: pulseGlow 2s infinite;
         }
-        
+
         @keyframes pulseGlow {
             0%, 100% { box-shadow: 0 0 10px rgba(0, 245, 255, 0.3); }
             50% { box-shadow: 0 0 20px rgba(0, 245, 255, 0.6), 0 0 30px rgba(0, 245, 255, 0.4); }
         }
-        
+
         /* Responsive improvements */
         @media (max-width: 768px) {
             .kpi-number { font-size: 2rem; }
@@ -255,7 +255,7 @@
     </header>
 
     <div class="container mx-auto px-4 py-6">
-        
+
         <!-- KPI Cards principales -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 slide-up">
             <div class="kpi-card">
@@ -278,7 +278,7 @@
 
         <!-- Distribución geográfica y alertas -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            
+
             <!-- Distribución por país -->
             <div class="glass-card p-6 fade-in">
                 <h3 class="orbitron text-xl font-bold mb-4 text-center glow-text">
@@ -344,7 +344,7 @@
 
         <!-- Gráficos principales -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            
+
             <!-- Distribución por planes -->
             <div class="glass-card p-6 slide-up">
                 <h3 class="orbitron text-xl font-bold mb-4 text-center glow-text">
@@ -425,7 +425,7 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs 
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs
                                     {% if empresa.plan == 'trial' %}bg-yellow-500/20 text-yellow-300
                                     {% elif empresa.plan == 'basic' %}bg-blue-500/20 text-blue-300
                                     {% elif empresa.plan == 'premium' %}bg-purple-500/20 text-purple-300
@@ -448,7 +448,7 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <button onclick="verDetalle({{ empresa.id }})" 
+                                <button onclick="verDetalle({{ empresa.id }})"
                                         class="text-cyan-400 hover:text-cyan-300 transition-colors">
                                     👁️ Ver
                                 </button>
@@ -468,7 +468,7 @@
 
         <!-- Información adicional -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            
+
             <!-- Ingresos estimados -->
             <div class="glass-card p-6 fade-in">
                 <h3 class="orbitron text-xl font-bold mb-4 text-center glow-text">

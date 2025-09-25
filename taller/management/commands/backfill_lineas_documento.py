@@ -49,7 +49,6 @@ class Command(BaseCommand):
             if not detalles_raw:
                 # También buscar en DetalleDocumento si existe
                 try:
-
                     detalles_count = doc.detalles.count()
                     if detalles_count > 0:
                         self.stdout.write(

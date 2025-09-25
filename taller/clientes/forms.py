@@ -1,4 +1,4 @@
-import dal.forms
+# from dal.widgets import ModelSelect2Widget  # Temporarily disabled
 
 from django import forms
 from django.forms.widgets import Select
@@ -85,17 +85,18 @@ class ClienteForm(forms.ModelForm):
     )
 
     # Campo para color de identificación con autocomplete
-    color = dal.forms.ModelSelect2(
-        queryset=ColorCliente.objects.none(),
+    color = forms.ModelChoiceField(
+        queryset=ColorCliente.objects.all(),
         required=False,
-        url="taller:autocomplete:autocomplete_color_cliente",
-        attrs={
-            "id": "id_color",
-            "class": "form-control",
-            "data-placeholder": "Seleccione Color",
-            "data-allow-clear": "true",
-            "data-minimum-input-length": 0,
-        },
+        widget=forms.Select(
+            attrs={
+                "id": "id_color",
+                "class": "form-control",
+                "data-placeholder": "Seleccione Color",
+                "data-allow-clear": "true",
+                "data-minimum-input-length": 0,
+            }
+        ),
         help_text="Color para identificar al cliente/subscriptor",
     )
 
@@ -135,6 +136,12 @@ class ClienteForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.empresa = kwargs.pop("empresa", None)  # Almacenar empresa
         super().__init__(*args, **kwargs)
+
+        # Agregar atributo pais para el template
+        if self.empresa and hasattr(self.empresa, "pais"):
+            self.pais = self.empresa.pais
+        else:
+            self.pais = "CL"  # Default a Chile
 
         # Debug logging
         print(f"🔍 [ClienteForm] empresa: {self.empresa}")

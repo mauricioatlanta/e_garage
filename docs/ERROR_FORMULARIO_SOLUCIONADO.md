@@ -27,7 +27,7 @@ class DocumentoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.empresa = kwargs.pop('empresa', None)
         super().__init__(*args, **kwargs)
-        
+
         if self.empresa:
             # Filtrar los queryset por empresa si está disponible
             from taller.models.clientes import Cliente

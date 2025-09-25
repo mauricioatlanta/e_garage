@@ -9,7 +9,7 @@
 - ✅ **views.py**: FBV principales convertidas a usar `select_country_lang_template`
 
 ### 2. **URLs Actualizadas**
-- ✅ **taller/documentos/urls.py**: 
+- ✅ **taller/documentos/urls.py**:
   - Importa vistas migradas
   - Rutas principales usan nuevas CBV con template resolution
   - Mantiene compatibilidad con redirects
@@ -76,10 +76,10 @@
 ```python
 class DocumentoListView(CountryLangTemplateMixin, ListView):
     base_template_name = "documentos/lista_documentos.html"
-    
+
 class DocumentoCreateView(CountryLangTemplateMixin, CreateView):
     base_template_name = "documentos/crear_documento.html"
-    
+
 class DocumentoDetailView(CountryLangTemplateMixin, DetailView):
     base_template_name = "documentos/ver_documento_nuevo.html"
 ```
@@ -87,8 +87,8 @@ class DocumentoDetailView(CountryLangTemplateMixin, DetailView):
 ### Function-Based Views Actualizadas
 ```python
 template_name = select_country_lang_template(
-    "documentos/crear_documento.html", 
-    getattr(empresa, 'pais', 'cl').lower(), 
+    "documentos/crear_documento.html",
+    getattr(empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)

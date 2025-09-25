@@ -15,8 +15,9 @@ def main():
 
     # 🔍 Verificar dependencias clave
     try:
-        import django
         import xhtml2pdf
+
+        import django
     except ImportError as exc:
         logging.error(
             "❌ Faltan dependencias clave. Asegúrate de instalar los paquetes requeridos."

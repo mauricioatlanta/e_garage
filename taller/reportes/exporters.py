@@ -164,8 +164,8 @@ def exportar_csv_personalizado(mecanico_id=None, fecha_desde=None, fecha_hasta=N
                     else ""
                 ),
                 (
-                    documento.mecanico.nombre
-                    if getattr(documento, "mecanico", None)
+                    documento.tecnico_responsable.nombre
+                    if getattr(documento, "tecnico_responsable", None)
                     else ""
                 ),
                 getattr(documento, "tipo_documento", ""),

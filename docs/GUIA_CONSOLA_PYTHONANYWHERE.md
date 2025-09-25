@@ -79,21 +79,21 @@ urlpatterns = [
     # Landings internacionales
     path('chile/', TemplateView.as_view(template_name='public/landing_chile.html'), name='landing_chile'),
     path('landing-bilingue/', TemplateView.as_view(template_name='public/landing_inicio_en.html'), name='landing_bilingue'),
-    
+
     # URLs de bienvenida por país
     path('bienvenida/cl/', TemplateView.as_view(template_name='onboarding/bienvenida_chile.html'), name='bienvenida_chile'),
     path('bienvenida/usa/', TemplateView.as_view(template_name='onboarding/bienvenida_usa.html'), name='bienvenida_usa'),
     path('welcome/us/', TemplateView.as_view(template_name='onboarding/bienvenida_usa.html'), name='welcome_usa'),
-    
+
     path('registro/', registro, name='registro'),
     path('suscripcion-bloqueada/', suscripcion_bloqueada, name='suscripcion_bloqueada'),
-    
+
     # Sistema de suscripciones
     path('suspension/', suspension, name='suspension'),
     path('comprobante-pago/', subir_comprobante, name='subir_comprobante'),
     path('api/estado-suscripcion/', estado_suscripcion, name='estado_suscripcion'),
     path('precios/', precios, name='precios'),
-    
+
     path('', landing_inicio, name='inicio'),
     path('landing/', landing_premium, name='landing_premium'),  # Nueva ruta para landing.html
     path('egarage/', landing_egarage, name='landing_egarage'),  # Landing page profesional de eGarage
@@ -102,20 +102,20 @@ urlpatterns = [
     path('activar-trial/', activar_trial, name='activar_trial'),
     path('activar/', activar_trial),
     path('admin/', admin_site.urls),
-    
+
     # API principal de la app (incluye tiendas/crear)
     path('api/', include('taller.urls.api_urls')),
     path('api/', include('taller.urls.api_urls_usa')),  # ✅ APIs USA
-    
+
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
-    
+
     # Django Allauth URLs
     path('accounts/', include('allauth.urls')),
 
     # Dashboard principal
     path('dashboard/', dashboard_view, name='dashboard'),
-    
+
     # Landings específicas para usuarios (marketing)
     path('inicio-usuarios/', landing_inicio, name='inicio_usuarios'),  # Landing general en /inicio-usuarios/
     path('mecanicos/', landing_mecanicos, name='landing_mecanicos'),
@@ -132,16 +132,16 @@ urlpatterns = [
     path('reportes/', include('taller.reportes.urls')),
     path('repuestos/', include('taller.repuestos.urls')),
     path('documentos/', include('taller.documentos.urls')),
-    
+
     # Autocomplete URLs
     path('autocomplete/', include('taller.urls.autocomplete_urls')),
-    
+
     # Servicios URLs
     path('servicios/', include('taller.urls.servicios_urls')),
-    
+
     # API para obtener ciudades por región
     path('api/ciudades/', obtener_ciudades, name='ciudades_por_region'),
-    
+
     # API adicionales
     path('api/', include('taller.urls.api_general')),
 ]
@@ -173,12 +173,12 @@ usa_patterns = [
     # Demos principales con acceso directo
     path('demo-usa/', USLocalizationView.as_view(), name='demo_usa_directo'),
     path('demo-atlanta/', demo_atlanta_personalization, name='demo_atlanta_directo'),
-    
+
     # 🎯 Demo público Atlanta (SIN LOGIN - para marketing)
     path('demo/atlanta/', demo_atlanta_publico, name='demo_atlanta_publico_directo'),
     path('demo/atlanta/quote/', demo_cotizacion_ajax, name='demo_atlanta_quote_directo'),
     path('demo/atlanta/verify-code/', verificar_codigo_atlanta, name='demo_atlanta_verify_directo'),
-    
+
     # APIs USA con acceso directo
     path('api-usa/estados/', api_estados_usa, name='api_estados_usa'),
     path('api-usa/ciudades/<int:estado_id>/', api_ciudades_por_estado, name='api_ciudades_usa'),
@@ -546,6 +546,6 @@ ls -la gestion_taller/urls.py* templates/onboarding/
 ```
 
 ---
-**⏱️ Tiempo:** 5-10 minutos  
-**🎯 Dificultad:** Intermedio  
+**⏱️ Tiempo:** 5-10 minutos
+**🎯 Dificultad:** Intermedio
 **✅ Resultado:** URLs funcionando ✅

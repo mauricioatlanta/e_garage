@@ -1,5 +1,5 @@
 {% extends "common/base.html" %}
-{% load static widget_tweaks %}
+{% load static widget_tweaks country_url %}
 
 {% block content %}
 <!-- 🚀 SUPER TECNOLÓGICO - CONFIGURACIÓN EMPRESA FUTURISTA -->
@@ -22,7 +22,7 @@
 
 /* 🌌 FONDO ESPACIAL AVANZADO */
 body {
-    background: 
+    background:
         radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
         radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
         radial-gradient(circle at 40% 40%, rgba(120, 200, 255, 0.2) 0%, transparent 50%),
@@ -105,7 +105,7 @@ body {
     height: 100%;
     z-index: -1;
     opacity: 0.1;
-    background: 
+    background:
         repeating-linear-gradient(
             0deg,
             transparent,
@@ -326,11 +326,11 @@ select.form-input option {
     .config-container {
         padding: 1rem;
     }
-    
+
     .config-title {
         font-size: 2rem;
     }
-    
+
     .futuristic-form > div[style*="grid-template-columns"] {
         grid-template-columns: 1fr !important;
     }
@@ -352,7 +352,7 @@ select.form-input option {
                 <p class="config-subtitle">Sistema de Control Central - Configuración Avanzada</p>
             </div>
         </div>
-        
+
         <!-- Estadísticas rápidas -->
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin-top: 2rem;">
             <div style="background: rgba(0, 255, 255, 0.1); border: 2px solid var(--neon-cyan); border-radius: 15px; padding: 1.5rem; text-align: center; transition: all 0.3s ease;">
@@ -373,17 +373,17 @@ select.form-input option {
     <!-- 🏢 PANEL DE CONFIGURACIÓN EMPRESARIAL -->
     <div class="config-panel">
         <div class="panel-title">🏢 Datos de la Empresa</div>
-        
+
         <form method="post" enctype="multipart/form-data" class="futuristic-form">
             {% csrf_token %}
-            
+
             <!-- Primera fila -->
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
                 <div class="form-group">
                     <label class="form-label" for="{{ form.nombre_publico.id_for_label }}">{{ form.nombre_publico.label }}</label>
                     {{ form.nombre_publico|add_class:'form-input' }}
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label" for="{{ form.tagline.id_for_label }}">{{ form.tagline.label }}</label>
                     {{ form.tagline|add_class:'form-input' }}
@@ -396,7 +396,7 @@ select.form-input option {
                     <label class="form-label" for="{{ form.direccion.id_for_label }}">{{ form.direccion.label }}</label>
                     {{ form.direccion|add_class:'form-input' }}
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label" for="{{ form.telefono.id_for_label }}">{{ form.telefono.label }}</label>
                     {{ form.telefono|add_class:'form-input' }}
@@ -409,7 +409,7 @@ select.form-input option {
                     <label class="form-label" for="{{ form.email_contacto.id_for_label }}">{{ form.email_contacto.label }}</label>
                     {{ form.email_contacto|add_class:'form-input' }}
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label" for="{{ form.sitio_web.id_for_label }}">{{ form.sitio_web.label }}</label>
                     {{ form.sitio_web|add_class:'form-input' }}
@@ -422,7 +422,7 @@ select.form-input option {
                     <label class="form-label" for="{{ form.moneda.id_for_label }}">{{ form.moneda.label }}</label>
                     {{ form.moneda|add_class:'form-input' }}
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label" for="{{ form.tasa_impuesto.id_for_label }}">{{ form.tasa_impuesto.label }}</label>
                     {{ form.tasa_impuesto|add_class:'form-input' }}
@@ -437,7 +437,7 @@ select.form-input option {
                         <span>{{ form.aplicar_impuesto_por_defecto.label }}</span>
                     </label>
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label" for="{{ form.dividir_por_tecnico.id_for_label }}" style="display: flex; align-items: center; gap: 15px;">
                         {{ form.dividir_por_tecnico }}
@@ -477,35 +477,35 @@ select.form-input option {
     <!-- 👥 GESTIÓN DE TÉCNICOS -->
     <div class="config-panel">
         <div class="panel-title">👥 Gestión de Técnicos</div>
-        
+
         <!-- Formulario para agregar técnico -->
         <div style="background: var(--glass-bg); border: 2px solid var(--neon-cyan); border-radius: 20px; padding: 2.5rem; margin-bottom: 2.5rem;">
             <h3 style="color: var(--neon-cyan); font-family: 'Orbitron', monospace; margin-bottom: 2rem; text-align: center; font-size: 1.5rem; letter-spacing: 2px;">
                 ➕ Agregar Nuevo Técnico
             </h3>
-            
+
             <form method="post" style="display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 2rem; align-items: end;">
                 {% csrf_token %}
                 <input type="hidden" name="crear_tecnico" value="1">
-                
+
                 <div class="form-group">
                     <label class="form-label" for="tecnico_nombre">Nombre Completo</label>
-                    <input id="tecnico_nombre" name="nombre" required minlength="2" 
+                    <input id="tecnico_nombre" name="nombre" required minlength="2"
                            placeholder="Ej: Juan Pérez" class="form-input" />
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label" for="tecnico_telefono">Teléfono</label>
-                    <input id="tecnico_telefono" name="telefono" type="tel" 
+                    <input id="tecnico_telefono" name="telefono" type="tel"
                            placeholder="+56 9 1234 5678" class="form-input" />
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label" for="tecnico_direccion">Dirección</label>
-                    <input id="tecnico_direccion" name="direccion" 
+                    <input id="tecnico_direccion" name="direccion"
                            placeholder="Dirección del técnico" class="form-input" />
                 </div>
-                
+
                 <button type="submit" class="cyber-btn" style="background: linear-gradient(135deg, var(--neon-green), var(--neon-cyan)); padding: 1.2rem 2rem;">
                     ➕ Crear
                 </button>
@@ -517,18 +517,65 @@ select.form-input option {
             <h3 style="color: var(--neon-purple); font-family: 'Orbitron', monospace; margin-bottom: 2rem; text-align: center; font-size: 1.5rem; letter-spacing: 2px;">
                 📋 Técnicos Registrados
             </h3>
-            
-            <!-- Aquí se mostrarían los técnicos existentes -->
-            <div style="text-align: center; padding: 3rem; color: var(--neon-cyan); font-family: 'Courier New', monospace;">
-                <p style="font-size: 1.2rem; margin-bottom: 1rem;">🔧 Sistema de gestión de técnicos listo para implementar</p>
-                <p style="font-size: 1rem; opacity: 0.8;">Los técnicos agregados aparecerán aquí con opciones de editar y activar/desactivar</p>
-            </div>
+
+            <!-- Lista de técnicos existentes -->
+            {% if tecnicos %}
+                <div style="display: grid; gap: 1.5rem;">
+                    {% for tecnico in tecnicos %}
+                    <div style="background: rgba(138, 43, 226, 0.1); border: 1px solid var(--neon-purple); border-radius: 15px; padding: 1.5rem; display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 1rem; align-items: center;">
+                        <div>
+                            <h4 style="color: var(--neon-purple); font-family: 'Orbitron', monospace; margin: 0 0 0.5rem 0; font-size: 1.1rem;">
+                                👤 {{ tecnico.nombre }}
+                            </h4>
+                            <p style="color: var(--neon-cyan); font-family: 'Courier New', monospace; margin: 0; font-size: 0.9rem; opacity: 0.8;">
+                                📞 {{ tecnico.telefono|default:"Sin teléfono" }}
+                            </p>
+                            {% if tecnico.direccion %}
+                            <p style="color: var(--neon-cyan); font-family: 'Courier New', monospace; margin: 0; font-size: 0.9rem; opacity: 0.8;">
+                                📍 {{ tecnico.direccion }}
+                            </p>
+                            {% endif %}
+                        </div>
+
+                        <div style="text-align: center;">
+                            <span style="color: {% if tecnico.activo %}var(--neon-green){% else %}var(--neon-red){% endif %}; font-family: 'Courier New', monospace; font-size: 0.9rem;">
+                                {% if tecnico.activo %}✅ Activo{% else %}❌ Inactivo{% endif %}
+                            </span>
+                        </div>
+
+                        <div style="text-align: center;">
+                            <span style="color: var(--neon-cyan); font-family: 'Courier New', monospace; font-size: 0.9rem;">
+                                🏢 {{ tecnico.empresa.nombre_taller }}
+                            </span>
+                        </div>
+
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button type="button" class="cyber-btn" style="background: linear-gradient(135deg, var(--neon-gold), var(--neon-orange)); padding: 0.5rem 1rem; font-size: 0.8rem;">
+                                ✏️ Editar
+                            </button>
+                            <form method="post" style="display: inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="toggle_tecnico" value="{{ tecnico.id }}">
+                                <button type="submit" class="cyber-btn" style="background: linear-gradient(135deg, {% if tecnico.activo %}var(--neon-red){% else %}var(--neon-green){% endif %}, {% if tecnico.activo %}var(--neon-orange){% else %}var(--neon-cyan){% endif %}); padding: 0.5rem 1rem; font-size: 0.8rem;">
+                                    {% if tecnico.activo %}⏸️ Desactivar{% else %}▶️ Activar{% endif %}
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div style="text-align: center; padding: 3rem; color: var(--neon-cyan); font-family: 'Courier New', monospace;">
+                    <p style="font-size: 1.2rem; margin-bottom: 1rem;">🔧 No hay técnicos registrados</p>
+                    <p style="font-size: 1rem; opacity: 0.8;">Usa el formulario de arriba para agregar tu primer técnico</p>
+                </div>
+            {% endif %}
         </div>
     </div>
 
     <!-- 🚀 NAVEGACIÓN -->
     <div style="text-align: center; margin-top: 3rem;">
-        <a href="/" class="cyber-btn" style="background: linear-gradient(135deg, var(--neon-gold), var(--neon-pink));">
+        <a href="{% country_url 'dashboard' app_namespace='direct' %}" class="cyber-btn" style="background: linear-gradient(135deg, var(--neon-gold), var(--neon-pink));">
             🏠 Volver al Dashboard
         </a>
     </div>
@@ -720,17 +767,17 @@ select.form-input option {
     .config-container > div[style*="grid-template-columns"] {
         grid-template-columns: 1fr !important;
     }
-    
+
     .tech-card {
         flex-direction: column;
         align-items: stretch;
         gap: 1rem;
     }
-    
+
     .tech-actions {
         justify-content: center;
     }
-    
+
     .tech-details {
         flex-direction: column;
         gap: 0.3rem;

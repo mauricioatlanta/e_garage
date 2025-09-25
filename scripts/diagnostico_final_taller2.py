@@ -2,6 +2,7 @@
 """
 Diagnóstico final del problema de documentos en taller2
 """
+
 import os
 from pathlib import Path
 

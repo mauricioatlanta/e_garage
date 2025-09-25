@@ -1,4 +1,5 @@
 {% extends "taller/cl/es/base.html" %}
+{% load country_url %}
 {% load static %}
 
 {% block title %}Editar Configuración de Empresa{% endblock %}
@@ -13,7 +14,7 @@
                     <h1 class="text-3xl font-bold text-white">✏️ Editar Configuración</h1>
                     <p class="text-blue-100 mt-2">Modifica la configuración de tu empresa</p>
                 </div>
-                <a href="{% url 'taller:settings:ver_configuracion' %}" 
+                <a href="{% country_url 'settings:ver_configuracion' %}"
                    class="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
                     ← Volver
                 </a>
@@ -24,7 +25,7 @@
         <div class="bg-white rounded-lg shadow-lg p-8">
             <form method="post" enctype="multipart/form-data" class="space-y-8">
                 {% csrf_token %}
-                
+
                 <!-- Mensajes de error -->
                 {% if form.errors %}
                     <div class="bg-red-50 border border-red-200 rounded-lg p-4">
@@ -42,7 +43,7 @@
                 <!-- Información General -->
                 <div class="border-b pb-6">
                     <h2 class="text-2xl font-bold text-gray-800 mb-6">📋 Información General</h2>
-                    
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label for="{{ form.nombre_publico.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
@@ -53,7 +54,7 @@
                                 <p class="text-sm text-gray-500 mt-1">{{ form.nombre_publico.help_text }}</p>
                             {% endif %}
                         </div>
-                        
+
                         <div>
                             <label for="{{ form.moneda.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
                                 Moneda
@@ -61,7 +62,7 @@
                             {{ form.moneda }}
                         </div>
                     </div>
-                    
+
                     <div class="mt-6">
                         <label for="{{ form.logo.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
                             Logo de la Empresa
@@ -83,7 +84,7 @@
                 <!-- Configuración Fiscal -->
                 <div class="border-b pb-6">
                     <h2 class="text-2xl font-bold text-gray-800 mb-6">💰 Configuración Fiscal</h2>
-                    
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label for="{{ form.iva_porcentaje.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
@@ -92,7 +93,7 @@
                             {{ form.iva_porcentaje }}
                             <p class="text-sm text-gray-500 mt-1">Porcentaje de IVA aplicado a los documentos</p>
                         </div>
-                        
+
                         <div class="flex items-center space-x-3">
                             {{ form.aplicar_iva_por_defecto }}
                             <div>
@@ -108,7 +109,7 @@
                 <!-- Configuración de Técnicos -->
                 <div class="border-b pb-6">
                     <h2 class="text-2xl font-bold text-gray-800 mb-6">👥 Configuración de Técnicos</h2>
-                    
+
                     <div class="space-y-6">
                         <div>
                             <label for="{{ form.tecnico_por_defecto.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
@@ -117,7 +118,7 @@
                             {{ form.tecnico_por_defecto }}
                             <p class="text-sm text-gray-500 mt-1">Técnico asignado por defecto a nuevos documentos</p>
                         </div>
-                        
+
                         <div class="flex items-center space-x-3">
                             {{ form.dividir_por_tecnico_por_defecto }}
                             <div>
@@ -133,7 +134,7 @@
                 <!-- Personalización -->
                 <div class="pb-6">
                     <h2 class="text-2xl font-bold text-gray-800 mb-6">🎨 Personalización</h2>
-                    
+
                     <div>
                         <label for="{{ form.brand_color.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
                             Color de Marca
@@ -145,11 +146,11 @@
 
                 <!-- Botones -->
                 <div class="flex justify-end space-x-4 pt-6 border-t">
-                    <a href="{% url 'taller:settings:ver_configuracion' %}" 
+                    <a href="{% country_url 'settings:ver_configuracion' %}"
                        class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-colors">
                         Cancelar
                     </a>
-                    <button type="submit" 
+                    <button type="submit"
                             class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold">
                         💾 Guardar Configuración
                     </button>

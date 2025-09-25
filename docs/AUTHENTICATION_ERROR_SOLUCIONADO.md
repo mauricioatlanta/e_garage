@@ -17,7 +17,7 @@ Field 'id' expected a number but got <SimpleLazyObject: <django.contrib.auth.mod
 # Línea 181: empresa = request.user.empresa
 # ❌ FALLA: user es AnonymousUser (usuario no autenticado)
 
-# Línea 183: empresa, created = Empresa.objects.get_or_create(user=request.user, ...)  
+# Línea 183: empresa, created = Empresa.objects.get_or_create(user=request.user, ...)
 # ❌ FALLA: Intenta usar AnonymousUser como ID en base de datos
 ```
 
@@ -125,7 +125,7 @@ LOGIN_REDIRECT_URL = '/login/'  # Después del login exitoso
 #### **Test 1: Usuario autenticado** ✅
 1. Login exitoso
 2. Acceso a formulario de documento
-3. Envío de formulario 
+3. Envío de formulario
 4. Procesamiento exitoso
 5. Redirect a lista
 

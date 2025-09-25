@@ -33,7 +33,7 @@ El usuario reportó que al seleccionar una imagen para el logo, "no la carga, si
 ```javascript
 logoInput.addEventListener('change', function(e) {
     const file = e.target.files[0];
-    
+
     if (file) {
         // Validaciones
         if (file.size > 5 * 1024 * 1024) { // 5MB
@@ -42,35 +42,35 @@ logoInput.addEventListener('change', function(e) {
             previewContainer.classList.add('hidden');
             return;
         }
-        
+
         if (!file.type.startsWith('image/')) {
             alert('❌ Solo se permiten archivos de imagen.');
             logoInput.value = '';
             previewContainer.classList.add('hidden');
             return;
         }
-        
+
         // Mostrar información del archivo
         fileName.textContent = file.name;
         fileSize.textContent = (file.size / 1024).toFixed(1) + ' KB';
-        
+
         // Crear vista previa usando FileReader
         const reader = new FileReader();
         reader.onload = function(e) {
             imagePreview.src = e.target.result;
             previewContainer.classList.remove('hidden');
-            
+
             // Animación suave de aparición
             previewContainer.style.opacity = '0';
             previewContainer.style.transform = 'translateY(20px)';
             previewContainer.style.transition = 'all 0.3s ease';
-            
+
             setTimeout(() => {
                 previewContainer.style.opacity = '1';
                 previewContainer.style.transform = 'translateY(0)';
             }, 50);
         };
-        
+
         reader.readAsDataURL(file);
     }
 });

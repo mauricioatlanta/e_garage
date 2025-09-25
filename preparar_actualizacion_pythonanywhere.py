@@ -60,7 +60,7 @@ def generar_instrucciones_deploy():
 # ===============================================================
 
 ## 🎯 PROBLEMA IDENTIFICADO:
-El error 404 en /bienvenida/usa/ se debe a que las URLs nuevas 
+El error 404 en /bienvenida/usa/ se debe a que las URLs nuevas
 no están en el servidor de producción.
 
 ## 📦 ARCHIVOS A SUBIR:

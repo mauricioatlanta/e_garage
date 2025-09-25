@@ -50,7 +50,7 @@
 **Prueba directa del formulario:**
 ```
 ✅ Formulario válido: True
-✅ Logo después: logos/test.png  
+✅ Logo después: logos/test.png
 ✅ URL: /media/logos/test.png
 ```
 
@@ -58,7 +58,7 @@
 
 ## 📍 **ESTADO ACTUAL:**
 
-- ✅ Template usa `{{ form.logo }}` 
+- ✅ Template usa `{{ form.logo }}`
 - ✅ Widget con clases CSS correctas
 - ✅ Parche bisturí activo para logs
 - ✅ Cache-busting implementado
@@ -68,7 +68,7 @@
 ## 🎯 **PRÓXIMA PRUEBA:**
 
 1. Ir a `/cl/taller/settings/`
-2. Subir imagen y presionar 💾 UPDATE PROFILE  
+2. Subir imagen y presionar 💾 UPDATE PROFILE
 3. Ver logs `🧪 DEBUG:` en console
 4. Confirmar que el logo aparece inmediatamente
 

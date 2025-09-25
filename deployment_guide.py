@@ -2,6 +2,7 @@
 """
 Script para facilitar el despliegue en producción
 """
+
 import sys
 
 
@@ -155,20 +156,20 @@ WantedBy=multi-user.target
 server {
     listen 80;
     server_name tu-dominio.com www.tu-dominio.com;
-    
+
     client_max_body_size 10M;
-    
+
     location /static/ {
         alias /opt/egarage/staticfiles/;
         expires 30d;
         add_header Cache-Control "public, immutable";
     }
-    
+
     location /media/ {
         alias /opt/egarage/media/;
         expires 7d;
     }
-    
+
     location / {
         proxy_pass http://unix:/opt/egarage/egarage.sock;
         proxy_set_header Host $host;

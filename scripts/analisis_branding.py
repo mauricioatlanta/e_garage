@@ -3,6 +3,7 @@
 Análisis completo del flujo de branding
 Detecta dónde se rompe la cadena: modelo → settings → media → context processor → template → PDF
 """
+
 import os
 
 import django

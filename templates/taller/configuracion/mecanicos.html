@@ -30,7 +30,7 @@ body {
     background: linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
     border-radius: 20px;
     border: 1px solid var(--border-glow);
-    box-shadow: 
+    box-shadow:
         0 8px 32px rgba(0, 245, 255, 0.1),
         inset 0 1px 0 rgba(255, 255, 255, 0.1);
     padding: 2rem;
@@ -222,7 +222,7 @@ body {
 .field-input:focus {
     outline: none;
     border-color: var(--neon-green);
-    box-shadow: 
+    box-shadow:
         0 0 25px rgba(57, 255, 20, 0.3),
         inset 0 1px 0 rgba(255, 255, 255, 0.1);
     transform: translateY(-3px);
@@ -494,21 +494,21 @@ body {
     .page-title {
         font-size: 2rem;
     }
-    
+
     .form-grid {
         grid-template-columns: 1fr;
         gap: 1rem;
     }
-    
+
     .mecanicos-grid {
         grid-template-columns: 1fr;
         gap: 1.5rem;
     }
-    
+
     .mecanico-actions {
         flex-direction: column;
     }
-    
+
     .btn-action {
         min-width: auto;
     }
@@ -636,39 +636,39 @@ body {
             <span class="section-icon">➕</span>
             Agregar Nuevo Técnico
         </h2>
-        
+
         <form method="post">
             {% csrf_token %}
             <div class="form-grid">
                 <div class="form-field">
                     <label class="field-label" for="nombre_nuevo_mecanico">👤 Nombre Completo</label>
-                    <input type="text" 
-                           id="nombre_nuevo_mecanico" 
-                           name="nombre_nuevo_mecanico" 
-                           class="field-input" 
+                    <input type="text"
+                           id="nombre_nuevo_mecanico"
+                           name="nombre_nuevo_mecanico"
+                           class="field-input"
                            placeholder="Ingresa el nombre del técnico"
                            required>
                 </div>
-                
+
                 <div class="form-field">
                     <label class="field-label" for="telefono_nuevo_mecanico">📞 Teléfono</label>
-                    <input type="tel" 
-                           id="telefono_nuevo_mecanico" 
-                           name="telefono_nuevo_mecanico" 
-                           class="field-input" 
+                    <input type="tel"
+                           id="telefono_nuevo_mecanico"
+                           name="telefono_nuevo_mecanico"
+                           class="field-input"
                            placeholder="+56 9 XXXX XXXX">
                 </div>
-                
+
                 <div class="form-field" style="grid-column: 1 / -1;">
                     <label class="field-label" for="direccion_nuevo_mecanico">📍 Dirección</label>
-                    <input type="text" 
-                           id="direccion_nuevo_mecanico" 
-                           name="direccion_nuevo_mecanico" 
-                           class="field-input" 
+                    <input type="text"
+                           id="direccion_nuevo_mecanico"
+                           name="direccion_nuevo_mecanico"
+                           class="field-input"
                            placeholder="Dirección del técnico (opcional)">
                 </div>
             </div>
-            
+
             <div style="text-align: center;">
                 <button type="submit" name="crear_tecnico" class="btn-add">
                     ➕ Agregar Técnico
@@ -691,7 +691,7 @@ body {
                     {% endif %}
                 </span>
             </div>
-            
+
             <div class="mecanico-info">
                 {% if mecanico.telefono %}
                 <div class="info-item">
@@ -699,30 +699,30 @@ body {
                     <span>{{ mecanico.telefono }}</span>
                 </div>
                 {% endif %}
-                
+
                 {% if mecanico.direccion %}
                 <div class="info-item">
                     <span class="info-icon">📍</span>
                     <span>{{ mecanico.direccion }}</span>
                 </div>
                 {% endif %}
-                
+
                 <div class="info-item">
                     <span class="info-icon">📅</span>
                     <span>ID: {{ mecanico.id }}</span>
                 </div>
             </div>
-            
+
             <div class="mecanico-actions">
                 <button class="btn-action btn-edit" onclick="editarMecanico({{ mecanico.id }}, '{{ mecanico.nombre }}', '{{ mecanico.telefono }}', '{{ mecanico.direccion }}')">
                     ✏️ Editar
                 </button>
-                
+
                 {% if mecanico.activo %}
                     <form method="post" style="flex: 1;">
                         {% csrf_token %}
                         <input type="hidden" name="tecnico_id" value="{{ mecanico.id }}">
-                        <button type="submit" name="desactivar_mecanico" class="btn-action btn-toggle" 
+                        <button type="submit" name="desactivar_mecanico" class="btn-action btn-toggle"
                                 onclick="return confirm('¿Desactivar a {{ mecanico.nombre }}? Ya no aparecerá en formularios nuevos.')">
                             ⏸️ Desactivar
                         </button>
@@ -736,11 +736,11 @@ body {
                         </button>
                     </form>
                 {% endif %}
-                
+
                 <form method="post" style="flex: 1;">
                     {% csrf_token %}
                     <input type="hidden" name="tecnico_id" value="{{ mecanico.id }}">
-                    <button type="submit" name="eliminar_mecanico" class="btn-action btn-delete" 
+                    <button type="submit" name="eliminar_mecanico" class="btn-action btn-delete"
                             onclick="return confirm('⚠️ ¿Eliminar permanentemente a {{ mecanico.nombre }}?\n\nEsta acción no se puede deshacer.')">
                         🗑️ Eliminar
                     </button>
@@ -765,38 +765,38 @@ body {
             <span class="section-icon">✏️</span>
             Editar Técnico
         </h2>
-        
+
         <form method="post" id="editForm">
             {% csrf_token %}
             <input type="hidden" name="tecnico_id" id="edit_tecnico_id">
-            
+
             <div class="form-grid">
                 <div class="form-field">
                     <label class="field-label" for="edit_nombre">👤 Nombre Completo</label>
-                    <input type="text" 
-                           id="edit_nombre" 
-                           name="nuevo_nombre" 
-                           class="field-input" 
+                    <input type="text"
+                           id="edit_nombre"
+                           name="nuevo_nombre"
+                           class="field-input"
                            required>
                 </div>
-                
+
                 <div class="form-field">
                     <label class="field-label" for="edit_telefono">📞 Teléfono</label>
-                    <input type="tel" 
-                           id="edit_telefono" 
-                           name="nuevo_telefono" 
+                    <input type="tel"
+                           id="edit_telefono"
+                           name="nuevo_telefono"
                            class="field-input">
                 </div>
-                
+
                 <div class="form-field" style="grid-column: 1 / -1;">
                     <label class="field-label" for="edit_direccion">📍 Dirección</label>
-                    <input type="text" 
-                           id="edit_direccion" 
-                           name="nueva_direccion" 
+                    <input type="text"
+                           id="edit_direccion"
+                           name="nueva_direccion"
                            class="field-input">
                 </div>
             </div>
-            
+
             <div style="text-align: center; margin-top: 2rem;">
                 <button type="submit" name="editar_mecanico" class="btn-add">
                     💾 Guardar Cambios
@@ -822,27 +822,27 @@ document.addEventListener('DOMContentLoaded', function() {
         particle.style.animationDuration = (Math.random() * 4 + 3) + 's';
         particle.style.animationDelay = Math.random() * 3 + 's';
         document.body.appendChild(particle);
-        
+
         setTimeout(() => {
             particle.remove();
         }, 7000);
     }
-    
+
     // Crear partículas periódicamente
     setInterval(createMechanicParticle, 3000);
-    
+
     // Efectos de hover mejorados
     const cards = document.querySelectorAll('.mecanico-card');
     cards.forEach(card => {
         card.addEventListener('mouseenter', function() {
             this.style.zIndex = '10';
         });
-        
+
         card.addEventListener('mouseleave', function() {
             this.style.zIndex = '1';
         });
     });
-    
+
     // Animaciones de entrada
     const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry, index) => {
@@ -854,14 +854,14 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-    
+
     document.querySelectorAll('.mecanico-card, .stat-badge').forEach(el => {
         el.style.opacity = '0';
         el.style.transform = 'translateY(30px)';
         el.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
         observer.observe(el);
     });
-    
+
     // Validación del formulario
     const addForm = document.querySelector('form');
     if (addForm) {
@@ -873,7 +873,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 nombreInput.focus();
                 return false;
             }
-            
+
             const submitBtn = this.querySelector('button[type="submit"]');
             if (submitBtn) {
                 submitBtn.innerHTML = '<span class="loading-spinner"></span> Agregando...';
@@ -920,18 +920,18 @@ document.addEventListener('keydown', function(e) {
       {% csrf_token %}
       <div class="flex-1">
         <label for="nombre_nuevo_mecanico" class="block text-sm font-medium text-gray-700 mb-1">Nombre completo</label>
-        <input 
-          type="text" 
-          name="nombre_nuevo_mecanico" 
+        <input
+          type="text"
+          name="nombre_nuevo_mecanico"
           id="nombre_nuevo_mecanico"
-          placeholder="Ej: Juan Carlos Pérez" 
+          placeholder="Ej: Juan Carlos Pérez"
           class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           required
         >
       </div>
-      <button 
-        type="submit" 
-        name="crear_tecnico" 
+      <button
+        type="submit"
+        name="crear_tecnico"
         class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
       >
         ➕ Agregar
@@ -947,7 +947,7 @@ document.addEventListener('keydown', function(e) {
         Gestiona los técnicos de tu taller. Solo los técnicos activos aparecerán en los formularios de documentos.
       </p>
     </div>
-    
+
     {% if mecanicos %}
       <div class="divide-y divide-gray-200">
         {% for mecanico in mecanicos %}
@@ -980,7 +980,7 @@ document.addEventListener('keydown', function(e) {
 
               <div class="flex items-center gap-2">
                 <!-- Botón para editar nombre -->
-                <button 
+                <button
                   onclick="editarMecanico({{ mecanico.id }}, '{{ mecanico.nombre|escapejs }}')"
                   class="text-blue-600 hover:text-blue-800 font-medium text-sm px-3 py-1 rounded border border-blue-200 hover:border-blue-300 transition-colors"
                 >
@@ -992,18 +992,18 @@ document.addEventListener('keydown', function(e) {
                   {% csrf_token %}
                   <input type="hidden" name="tecnico_id" value="{{ mecanico.id }}">
                   {% if mecanico.activo %}
-                    <button 
-                      type="submit" 
-                      name="desactivar_mecanico" 
+                    <button
+                      type="submit"
+                      name="desactivar_mecanico"
                       class="text-red-600 hover:text-red-800 font-medium text-sm px-3 py-1 rounded border border-red-200 hover:border-red-300 transition-colors"
                       onclick="return confirm('¿Está seguro de desactivar a {{ mecanico.nombre }}?')"
                     >
                       ❌ Desactivar
                     </button>
                   {% else %}
-                    <button 
-                      type="submit" 
-                      name="activar_mecanico" 
+                    <button
+                      type="submit"
+                      name="activar_mecanico"
                       class="text-green-600 hover:text-green-800 font-medium text-sm px-3 py-1 rounded border border-green-200 hover:border-green-300 transition-colors"
                     >
                       ✅ Activar
@@ -1054,14 +1054,14 @@ document.addEventListener('keydown', function(e) {
 
   <!-- Botones de navegación -->
   <div class="mt-8 flex justify-between">
-    <a 
-      href="{% url 'documentos:lista_documentos' %}" 
+    <a
+      href="{% url 'documentos:lista_documentos' %}"
       class="text-gray-600 hover:text-gray-800 font-medium"
     >
       ← Volver a Documentos
     </a>
-    <a 
-      href="/admin/" 
+    <a
+      href="/admin/"
       class="text-blue-600 hover:text-blue-800 font-medium"
       target="_blank"
     >
@@ -1079,25 +1079,25 @@ document.addEventListener('keydown', function(e) {
       <input type="hidden" id="edit_tecnico_id" name="tecnico_id" value="">
       <div class="mb-4">
         <label for="edit_nombre" class="block text-sm font-medium text-gray-700 mb-2">Nombre:</label>
-        <input 
-          type="text" 
-          id="edit_nombre" 
-          name="nuevo_nombre" 
-          class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+        <input
+          type="text"
+          id="edit_nombre"
+          name="nuevo_nombre"
+          class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           required
         >
       </div>
       <div class="flex justify-end gap-3">
-        <button 
-          type="button" 
-          onclick="cerrarModal()" 
+        <button
+          type="button"
+          onclick="cerrarModal()"
           class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors"
         >
           Cancelar
         </button>
-        <button 
-          type="submit" 
-          name="editar_mecanico" 
+        <button
+          type="submit"
+          name="editar_mecanico"
           class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
         >
           💾 Guardar

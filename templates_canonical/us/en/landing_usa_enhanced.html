@@ -6,10 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% if current_language == 'es' %}eGarage Estados Unidos - Sistema Profesional de Gestión Automotriz{% else %}eGarage United States - Professional Automotive Management System{% endif %}</title>
     <meta name="description" content="{% if current_language == 'es' %}Sistema profesional de gestión automotriz diseñado para el mercado estadounidense. Perfecto para talleres de reparación, tiendas de repuestos, vulcanizaciones y centros automotrices integrales.{% else %}Professional automotive management system built for the United States market. Perfect for repair shops, parts stores, tire services, and multi-service automotive centers.{% endif %}">
-    
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- Custom Styles -->
     <style>
         :root {
@@ -20,20 +20,20 @@
             --text-gray: #374151;
             --text-gray-light: #6b7280;
         }
-        
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             line-height: 1.6;
             overflow-x: hidden;
         }
-        
+
         .gradient-bg {
-            background: 
+            background:
                 linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #533483 100%);
             position: relative;
             overflow: hidden;
         }
-        
+
         .gradient-bg::before {
             content: '';
             position: absolute;
@@ -41,14 +41,14 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: 
+            background:
                 radial-gradient(circle at 20% 80%, rgba(138, 43, 226, 0.15) 0%, transparent 50%),
                 radial-gradient(circle at 80% 20%, rgba(79, 70, 229, 0.15) 0%, transparent 50%),
                 radial-gradient(circle at 40% 40%, rgba(6, 182, 212, 0.15) 0%, transparent 50%),
                 radial-gradient(circle at 60% 60%, rgba(255, 0, 255, 0.1) 0%, transparent 50%);
             animation: backgroundShift 20s ease-in-out infinite;
         }
-        
+
         .gradient-bg::after {
             content: '';
             position: absolute;
@@ -56,61 +56,61 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: 
+            background:
                 linear-gradient(45deg, transparent 30%, rgba(138, 43, 226, 0.03) 50%, transparent 70%),
                 linear-gradient(-45deg, transparent 30%, rgba(79, 70, 229, 0.03) 50%, transparent 70%);
             animation: matrixRain 30s linear infinite;
         }
-        
+
         @keyframes backgroundShift {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.8; }
         }
-        
+
         @keyframes matrixRain {
             0% { transform: translateY(-100%); }
             100% { transform: translateY(100%); }
         }
-        
+
         @keyframes neonPulse {
-            0%, 100% { 
-                text-shadow: 
+            0%, 100% {
+                text-shadow:
                     0 0 5px #8a2be2,
                     0 0 10px #8a2be2,
                     0 0 15px #8a2be2,
                     0 0 20px #8a2be2;
             }
-            50% { 
-                text-shadow: 
+            50% {
+                text-shadow:
                     0 0 2px #8a2be2,
                     0 0 5px #8a2be2,
                     0 0 8px #8a2be2,
                     0 0 12px #8a2be2;
             }
         }
-        
+
         @keyframes neonGlow {
-            0%, 100% { 
-                box-shadow: 
+            0%, 100% {
+                box-shadow:
                     0 0 5px #8a2be2,
                     0 0 10px #8a2be2,
                     0 0 15px #8a2be2,
                     inset 0 0 5px rgba(138, 43, 226, 0.1);
             }
-            50% { 
-                box-shadow: 
+            50% {
+                box-shadow:
                     0 0 10px #8a2be2,
                     0 0 20px #8a2be2,
                     0 0 30px #8a2be2,
                     inset 0 0 10px rgba(138, 43, 226, 0.2);
             }
         }
-        
+
         .gradient-indigo {
             background: linear-gradient(135deg, #312e81 0%, #3730a3 50%, #4f46e5 100%);
             position: relative;
         }
-        
+
         .gradient-indigo::before {
             content: '';
             position: absolute;
@@ -118,21 +118,21 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: 
+            background:
                 radial-gradient(circle at 30% 70%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
                 radial-gradient(circle at 70% 30%, rgba(79, 70, 229, 0.1) 0%, transparent 50%);
             animation: indigoGlow 15s ease-in-out infinite;
         }
-        
+
         @keyframes indigoGlow {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.7; }
         }
-        
+
         .btn-primary {
             background: linear-gradient(135deg, #8a2be2 0%, #4f46e5 50%, #06b6d4 100%);
             transition: all 0.3s ease;
-            box-shadow: 
+            box-shadow:
                 0 0 20px rgba(138, 43, 226, 0.5),
                 0 0 40px rgba(79, 70, 229, 0.3),
                 inset 0 0 20px rgba(255, 255, 255, 0.1);
@@ -141,7 +141,7 @@
             border: 2px solid #8a2be2;
             animation: neonGlow 3s ease-in-out infinite;
         }
-        
+
         .btn-primary::before {
             content: '';
             position: absolute;
@@ -152,23 +152,23 @@
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
             transition: left 0.5s;
         }
-        
+
         .btn-primary:hover::before {
             left: 100%;
         }
-        
+
         .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4);
         }
-        
+
         .btn-secondary {
             border: 2px solid #6366f1;
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
         }
-        
+
         .btn-secondary::before {
             content: '';
             position: absolute;
@@ -179,22 +179,22 @@
             background: rgba(99, 102, 241, 0.1);
             transition: width 0.3s ease;
         }
-        
+
         .btn-secondary:hover::before {
             width: 100%;
         }
-        
+
         .btn-secondary:hover {
             transform: translateY(-2px);
         }
-        
+
         .feature-card {
             transition: all 0.3s ease;
             border: 1px solid rgba(255, 255, 255, 0.1);
             position: relative;
             overflow: hidden;
         }
-        
+
         .feature-card::before {
             content: '';
             position: absolute;
@@ -206,47 +206,47 @@
             transform: translateX(-100%);
             transition: transform 0.6s ease;
         }
-        
+
         .feature-card:hover::before {
             transform: translateX(100%);
         }
-        
+
         .feature-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
         }
-        
+
         .glass-effect {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        
+
         .text-gradient {
             background: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-purple) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-        
+
         .floating-animation {
             animation: float 6s ease-in-out infinite;
         }
-        
+
         @keyframes float {
             0%, 100% { transform: translateY(0px); }
             50% { transform: translateY(-20px); }
         }
-        
+
         .pulse-glow {
             animation: pulse-glow 2s ease-in-out infinite alternate;
         }
-        
+
         @keyframes pulse-glow {
             from { box-shadow: 0 0 20px rgba(79, 70, 229, 0.3); }
             to { box-shadow: 0 0 40px rgba(79, 70, 229, 0.6); }
         }
-        
+
         /* Futuristic Background Elements */
         .tech-grid {
             position: absolute;
@@ -254,25 +254,25 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-image: 
+            background-image:
                 linear-gradient(rgba(79, 70, 229, 0.1) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(79, 70, 229, 0.1) 1px, transparent 1px);
             background-size: 50px 50px;
             animation: gridMove 20s linear infinite;
         }
-        
+
         @keyframes gridMove {
             0% { transform: translate(0, 0); }
             100% { transform: translate(50px, 50px); }
         }
-        
+
         .floating-particles {
             position: absolute;
             width: 100%;
             height: 100%;
             overflow: hidden;
         }
-        
+
         .particle {
             position: absolute;
             width: 2px;
@@ -281,7 +281,7 @@
             border-radius: 50%;
             animation: particleFloat 15s linear infinite;
         }
-        
+
         @keyframes particleFloat {
             0% {
                 transform: translateY(100vh) translateX(0);
@@ -298,25 +298,25 @@
                 opacity: 0;
             }
         }
-        
+
         .circuit-lines {
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: 
+            background:
                 linear-gradient(90deg, transparent 0%, rgba(79, 70, 229, 0.1) 50%, transparent 100%),
                 linear-gradient(0deg, transparent 0%, rgba(139, 92, 246, 0.1) 50%, transparent 100%);
             background-size: 200px 200px;
             animation: circuitPulse 10s ease-in-out infinite;
         }
-        
+
         @keyframes circuitPulse {
             0%, 100% { opacity: 0.3; }
             50% { opacity: 0.8; }
         }
-        
+
         .testimonial-card {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
@@ -325,7 +325,7 @@
             position: relative;
             overflow: hidden;
         }
-        
+
         .testimonial-card::before {
             content: '';
             position: absolute;
@@ -337,38 +337,38 @@
             opacity: 0;
             transition: opacity 0.3s ease;
         }
-        
+
         .testimonial-card:hover::before {
             opacity: 1;
         }
-        
+
         .testimonial-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
         }
-        
+
         .company-logo {
             filter: brightness(0) invert(1);
             opacity: 0.8;
             transition: all 0.3s ease;
         }
-        
+
         .testimonial-card:hover .company-logo {
             opacity: 1;
             transform: scale(1.1);
         }
-        
+
         .tech-icon {
             animation: techRotate 10s linear infinite;
         }
-        
+
         @keyframes techRotate {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        
+
         .glow-text {
-            text-shadow: 
+            text-shadow:
                 0 0 5px #8a2be2,
                 0 0 10px #8a2be2,
                 0 0 15px #8a2be2,
@@ -377,7 +377,7 @@
                 0 0 40px #8a2be2;
             animation: neonPulse 2s ease-in-out infinite;
         }
-        
+
         .neon-title {
             background: linear-gradient(45deg, #8a2be2, #4f46e5, #06b6d4, #ff00ff);
             background-size: 400% 400%;
@@ -386,23 +386,23 @@
             background-clip: text;
             animation: gradientShift 3s ease-in-out infinite;
         }
-        
+
         @keyframes gradientShift {
             0%, 100% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
         }
-        
+
         .holographic-effect {
-            background: linear-gradient(45deg, 
-                rgba(79, 70, 229, 0.1) 0%, 
-                rgba(139, 92, 246, 0.1) 25%, 
-                rgba(6, 182, 212, 0.1) 50%, 
-                rgba(99, 102, 241, 0.1) 75%, 
+            background: linear-gradient(45deg,
+                rgba(79, 70, 229, 0.1) 0%,
+                rgba(139, 92, 246, 0.1) 25%,
+                rgba(6, 182, 212, 0.1) 50%,
+                rgba(99, 102, 241, 0.1) 75%,
                 rgba(79, 70, 229, 0.1) 100%);
             background-size: 400% 400%;
             animation: holographicShift 8s ease-in-out infinite;
         }
-        
+
         @keyframes holographicShift {
             0%, 100% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
@@ -445,7 +445,7 @@
         <div class="tech-grid"></div>
         <div class="circuit-lines"></div>
         <div class="floating-particles" id="particles-container"></div>
-        
+
         <div class="max-w-6xl mx-auto text-center relative z-10">
             <div class="floating-animation mb-8">
                 <div class="inline-block p-6 rounded-full bg-gradient-to-r from-purple-500 via-indigo-500 to-cyan-500 relative">
@@ -471,7 +471,7 @@
                     <span class="relative z-10">{% if current_language == 'es' %}Ver Demo{% else %}Watch Demo{% endif %}</span>
                 </a>
             </div>
-            
+
             <!-- Tech Icons -->
             <div class="mt-12 flex justify-center space-x-8 opacity-60">
                 <div class="tech-icon text-2xl">🔧</div>
@@ -491,7 +491,7 @@
             <div class="absolute bottom-10 right-10 w-40 h-40 bg-indigo-500 rounded-full blur-3xl animate-pulse" style="animation-delay: 2s;"></div>
             <div class="absolute top-1/2 left-1/2 w-24 h-24 bg-cyan-500 rounded-full blur-2xl animate-pulse" style="animation-delay: 4s;"></div>
         </div>
-        
+
         <div class="max-w-7xl mx-auto px-6 relative z-10">
             <div class="text-center mb-16">
                 <div class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-100 to-indigo-100 rounded-full mb-6">
@@ -627,7 +627,7 @@
                                 {% if current_language == 'es' %}eGarage USA Dashboard{% else %}eGarage USA Dashboard{% endif %}
                             </span>
                         </div>
-                        
+
                         <div class="space-y-4">
                             <div class="h-4 bg-gradient-to-r from-purple-500 to-indigo-500 rounded w-3/4"></div>
                             <div class="h-3 bg-gray-600 rounded w-1/2"></div>
@@ -638,12 +638,12 @@
                                 <div class="h-20 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg"></div>
                             </div>
                         </div>
-                        
+
                         <div class="absolute -top-4 -right-4 bg-gradient-to-r from-purple-500 to-indigo-500 text-white text-xs font-bold py-2 px-4 rounded-full shadow-lg animate-pulse">
                             ✨ AI Powered
                         </div>
                     </div>
-                    
+
                     <!-- Floating Elements -->
                     <div class="absolute -bottom-6 -left-6 bg-white rounded-2xl p-4 shadow-xl border border-gray-200">
                         <div class="flex items-center space-x-3">
@@ -656,7 +656,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="absolute -top-6 -left-6 bg-white rounded-2xl p-4 shadow-xl border border-gray-200">
                         <div class="flex items-center space-x-3">
                             <div class="w-8 h-8 bg-gradient-to-r from-indigo-500 to-cyan-500 rounded-lg flex items-center justify-center">
@@ -705,10 +705,10 @@
                     </div>
                     <p class="text-gray-300 mb-4">
                         {% if current_language == 'es' %}
-                            "eGarage revolucionó nuestro taller. Ahora gestionamos 3x más vehículos con la misma eficiencia. 
+                            "eGarage revolucionó nuestro taller. Ahora gestionamos 3x más vehículos con la misma eficiencia.
                             La facturación automática nos ahorra 2 horas diarias."
                         {% else %}
-                            "eGarage revolutionized our shop. We now manage 3x more vehicles with the same efficiency. 
+                            "eGarage revolutionized our shop. We now manage 3x more vehicles with the same efficiency.
                             Automated billing saves us 2 hours daily."
                         {% endif %}
                     </p>
@@ -734,10 +734,10 @@
                     </div>
                     <p class="text-gray-300 mb-4">
                         {% if current_language == 'es' %}
-                            "El control de inventario es increíble. Nunca más nos quedamos sin neumáticos. 
+                            "El control de inventario es increíble. Nunca más nos quedamos sin neumáticos.
                             Los reportes nos ayudan a tomar mejores decisiones de compra."
                         {% else %}
-                            "Inventory control is incredible. We never run out of tires anymore. 
+                            "Inventory control is incredible. We never run out of tires anymore.
                             Reports help us make better purchasing decisions."
                         {% endif %}
                     </p>
@@ -763,10 +763,10 @@
                     </div>
                     <p class="text-gray-300 mb-4">
                         {% if current_language == 'es' %}
-                            "La gestión de clientes mejoró 100%. Ahora tenemos el historial completo de cada vehículo 
+                            "La gestión de clientes mejoró 100%. Ahora tenemos el historial completo de cada vehículo
                             y podemos ofrecer servicios personalizados."
                         {% else %}
-                            "Customer management improved 100%. We now have complete history of each vehicle 
+                            "Customer management improved 100%. We now have complete history of each vehicle
                             and can offer personalized services."
                         {% endif %}
                     </p>
@@ -792,10 +792,10 @@
                     </div>
                     <p class="text-gray-300 mb-4">
                         {% if current_language == 'es' %}
-                            "El sistema de inventario es perfecto. Controlamos stock en tiempo real y 
+                            "El sistema de inventario es perfecto. Controlamos stock en tiempo real y
                             las alertas automáticas nos mantienen siempre abastecidos."
                         {% else %}
-                            "Inventory system is perfect. We control stock in real-time and 
+                            "Inventory system is perfect. We control stock in real-time and
                             automatic alerts keep us always supplied."
                         {% endif %}
                     </p>
@@ -821,10 +821,10 @@
                     </div>
                     <p class="text-gray-300 mb-4">
                         {% if current_language == 'es' %}
-                            "eGarage nos permitió integrar todos nuestros servicios. Mecánica, repuestos, 
+                            "eGarage nos permitió integrar todos nuestros servicios. Mecánica, repuestos,
                             vulcanización y lavado, todo en una sola plataforma."
                         {% else %}
-                            "eGarage allowed us to integrate all our services. Repairs, parts, 
+                            "eGarage allowed us to integrate all our services. Repairs, parts,
                             tire service and car wash, all in one platform."
                         {% endif %}
                     </p>
@@ -850,10 +850,10 @@
                     </div>
                     <p class="text-gray-300 mb-4">
                         {% if current_language == 'es' %}
-                            "Los reportes y KPIs nos ayudaron a aumentar las ventas en 40%. 
+                            "Los reportes y KPIs nos ayudaron a aumentar las ventas en 40%.
                             Ahora sabemos exactamente qué servicios son más rentables."
                         {% else %}
-                            "Reports and KPIs helped us increase sales by 40%. 
+                            "Reports and KPIs helped us increase sales by 40%.
                             Now we know exactly which services are most profitable."
                         {% endif %}
                     </p>
@@ -874,10 +874,10 @@
             </h2>
             <p class="text-lg mb-10">
                 {% if current_language == 'es' %}
-                    Confiado por profesionales automotrices en todo Chile y ahora expandiéndose en Estados Unidos. 
+                    Confiado por profesionales automotrices en todo Chile y ahora expandiéndose en Estados Unidos.
                     Diseñado para simplificar operaciones, aumentar ventas y mantener a los clientes regresando.
                 {% else %}
-                    Trusted by automotive professionals across Chile and now expanding in the United States. 
+                    Trusted by automotive professionals across Chile and now expanding in the United States.
                     Designed to simplify operations, boost sales, and keep customers coming back.
                 {% endif %}
             </p>
@@ -1046,7 +1046,7 @@
     <footer class="bg-gray-900 text-gray-400 py-12 text-center">
         <div class="max-w-6xl mx-auto px-6">
             <p class="mb-4">
-                © 2025 {% if current_language == 'es' %}eGarage Estados Unidos{% else %}eGarage United States{% endif %}. 
+                © 2025 {% if current_language == 'es' %}eGarage Estados Unidos{% else %}eGarage United States{% endif %}.
                 {% if current_language == 'es' %}Todos los derechos reservados.{% else %}All rights reserved.{% endif %}
             </p>
             <div class="flex justify-center space-x-6">

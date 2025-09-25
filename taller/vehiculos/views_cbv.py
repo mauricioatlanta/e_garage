@@ -32,6 +32,12 @@ class VehiculoListView(
     # Nombre explícito para que la plantilla 'vehiculos.html' que itera sobre 'vehiculos' funcione
     context_object_name = "vehiculos"
 
+    def get_template_names(self):
+        """Override template selection for USA users to use simple template"""
+        if self.request.path.startswith("/us/"):
+            return ["taller/us/en/vehiculos/vehiculo_list_simple.html"]
+        return super().get_template_names()
+
     def get_queryset(self):
         # Fallback: en tests puede que middleware no inyecte request.empresa; usar empresa de user
         if not getattr(self.request, "empresa", None) and getattr(

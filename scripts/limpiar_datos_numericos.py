@@ -2,6 +2,7 @@
 """
 Script para limpiar marcas y modelos con nombres numéricos problemáticos
 """
+
 import os
 
 import django

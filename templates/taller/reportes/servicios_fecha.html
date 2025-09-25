@@ -150,13 +150,13 @@
             <div class="stat-value">{{ servicios.count }}</div>
             <div class="stat-label">Total Servicios</div>
         </div>
-        
+
         <div class="stat-card">
             <div class="stat-icon">⏱️</div>
             <div class="stat-value">{{ total_horas|floatformat:1|default:0 }}</div>
             <div class="stat-label">Horas Trabajadas</div>
         </div>
-        
+
         <div class="stat-card">
             <div class="stat-icon">💰</div>
             <div class="stat-value">${{ total_servicios.valor_total|floatformat:0|default:0 }}</div>
@@ -206,7 +206,7 @@
     <!-- Tabla Detallada -->
     <div style="background: rgba(10, 10, 15, 0.9); border: 1px solid var(--cyber-blue); border-radius: 15px; padding: 2rem;">
         <h3 style="color: var(--cyber-blue); margin-bottom: 1.5rem;">📋 Detalle de Servicios</h3>
-        
+
         {% if servicios %}
         <table class="cyber-table">
             <thead>

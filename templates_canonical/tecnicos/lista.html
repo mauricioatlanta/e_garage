@@ -55,7 +55,7 @@
                     </h4>
                 </div>
                 <div class="col-md-6 text-md-end">
-                    <a href="{% country_url 'tecnicos:nuevo' app_namespace='taller' %}" class="btn btn-futuristic">
+                    <a href="{% country_url 'configuracion_tecnicos' app_namespace='direct' %}" class="btn btn-futuristic">
                         <i class="fas fa-plus me-2"></i>Nuevo Técnico
                     </a>
                 </div>
@@ -95,7 +95,7 @@
                                         </div>
                                     </td>
                                     <td class="text-center">
-                                        <form method="post" action="{% country_url 'tecnicos:toggle' tecnico.id app_namespace='taller' %}" class="d-inline">
+                                        <form method="post" action="{% country_url 'configuracion_tecnicos' app_namespace='direct' %}" class="d-inline">
                                             {% csrf_token %}
                                             <button type="submit" class="btn btn-sm {% if tecnico.activo %}btn-success{% else %}btn-outline-secondary{% endif %} btn-futuristic">
                                                 <i class="fas fa-{% if tecnico.activo %}check-circle{% else %}times-circle{% endif %} me-1"></i>
@@ -105,7 +105,7 @@
                                     </td>
                                     <td class="text-center">
                                         <div class="btn-group" role="group">
-                                            <a href="{% country_url 'tecnicos:editar' tecnico.id app_namespace='taller' %}" class="btn btn-sm btn-futuristic-secondary">
+                                            <a href="{% country_url 'configuracion_tecnicos' app_namespace='direct' %}" class="btn btn-sm btn-futuristic-secondary">
                                                 <i class="fas fa-edit me-1"></i>Editar
                                             </a>
                                         </div>
@@ -122,7 +122,7 @@
                         <i class="fas fa-users fa-4x text-secondary mb-4"></i>
                         <h4 class="text-secondary mb-3">No hay técnicos registrados</h4>
                         <p class="text-secondary mb-4">Comienza agregando tu primer técnico al sistema</p>
-                        <a href="{% country_url 'tecnicos:nuevo' app_namespace='taller' %}" class="btn btn-futuristic btn-lg">
+                        <a href="{% country_url 'configuracion_tecnicos' app_namespace='direct' %}" class="btn btn-futuristic btn-lg">
                             <i class="fas fa-plus me-2"></i>Agregar Primer Técnico
                         </a>
                     </div>

@@ -21,7 +21,7 @@ window.country = "{{ user.empresa.pais|default:'CL' }}";
         {% if es_edicion %}✏️ Editando Documento #{{ documento.numero }}{% else %}🚀 Crear Documento{% endif %}
       </h1>
       {% include "components/country_badge.html" %}
-      
+
       <div id="doc-type-switch" class="flex gap-3 justify-center p-4 mt-4">
         <button type="button" data-tipo="FAC" class="btn-type">💸 Factura</button>
         <button type="button" data-tipo="COT" class="btn-type active">📋 Cotización</button>
@@ -47,9 +47,9 @@ window.country = "{{ user.empresa.pais|default:'CL' }}";
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <div class="neon-card p-4">
           <label class="block mb-2 font-semibold text-cyan-200">🔍 Buscar cliente</label>
-          <input id="cliente-search" class="futurista-input w-full" 
+          <input id="cliente-search" class="futurista-input w-full"
                  placeholder="Nombre, RUT/EIN, email...">
-          
+
           <label class="block mt-4 mb-2 font-semibold text-cyan-200">👤 Cliente</label>
           <select id="cliente" name="cliente" class="futurista-input w-full">
             <option value="">Seleccione un cliente...</option>
@@ -85,12 +85,12 @@ window.country = "{{ user.empresa.pais|default:'CL' }}";
           {% endif %}
 
           <label class="block mt-4 mb-2 font-semibold text-cyan-200">📅 Fecha</label>
-          <input type="date" name="fecha_emision" class="futurista-input w-full" 
+          <input type="date" name="fecha_emision" class="futurista-input w-full"
                  value="{{ form.fecha_emision.value|default:today|date:'Y-m-d' }}">
           {% if form.fecha_emision.errors %}
             <div class="text-red-400 text-sm mt-1">{{ form.fecha_emision.errors.0 }}</div>
           {% endif %}
-          
+
           <div class="flex items-center mt-4">
             <label for="{{ form.pagado.id_for_label }}" class="flex items-center text-cyan-200">
               {{ form.pagado|add_class:"mr-2 text-cyan-400" }}
@@ -136,7 +136,7 @@ window.country = "{{ user.empresa.pais|default:'CL' }}";
       <!-- OBSERVACIONES -->
       <div class="neon-card p-4 mb-6">
         <label class="block mb-2 font-semibold text-cyan-200">📝 Observaciones</label>
-        <textarea name="detalles" rows="4" class="futurista-input w-full" 
+        <textarea name="detalles" rows="4" class="futurista-input w-full"
                   placeholder="Notas para el cliente o internas…">{{ form.detalles.value|default:'' }}</textarea>
       </div>
 
@@ -150,7 +150,7 @@ window.country = "{{ user.empresa.pais|default:'CL' }}";
             </label>
             <div class="flex items-center gap-2">
               <label class="font-semibold text-cyan-200">Tasa (%):</label>
-              <input id="tax-rate" class="futurista-input w-24" 
+              <input id="tax-rate" class="futurista-input w-24"
                      value="19" type="number" step="0.01">
             </div>
           </div>
@@ -190,7 +190,7 @@ window.country = "{{ user.empresa.pais|default:'CL' }}";
           <button type="button" class="palette-tab" data-tab="servicios">🔧 Servicios</button>
           <button type="button" class="palette-tab" data-tab="otros">🏢 Otros</button>
         </div>
-        <input id="palette-search" class="futurista-input w-full mb-4" 
+        <input id="palette-search" class="futurista-input w-full mb-4"
                placeholder="Buscar...">
         <div id="palette-results" class="max-h-64 overflow-y-auto space-y-2">
           <!-- Resultados dinámicos -->
@@ -214,21 +214,21 @@ console.log('🔧 DOC-JS-ATTACHED (extra_js block)');
 // 🧪 DEBUG: Botón temporal para probar búsqueda de clientes
 function debugTestClientes() {
   console.log('🧪 TEST DEBUG: Verificando búsqueda de clientes...');
-  
+
   // Verificar elementos
   const clienteSearch = document.getElementById('cliente-search');
   const clienteSelect = document.getElementById('cliente');
-  
+
   console.log('🔍 Elementos:', {
     'cliente-search': !!clienteSearch,
     'cliente': !!clienteSelect
   });
-  
+
   if (!clienteSearch || !clienteSelect) {
     console.error('❌ Elementos no encontrados');
     return;
   }
-  
+
   // Test API
   fetch('/api/v1/clientes/?q=juan')
     .then(r => r.json())
@@ -236,16 +236,16 @@ function debugTestClientes() {
       console.log('✅ API respuesta:', data);
       if (data.results && data.results.length > 0) {
         console.log('🎉 Clientes encontrados:', data.results.length);
-        
+
         // Actualizar select manualmente
-        clienteSelect.innerHTML = '<option value="">Seleccione...</option>' + 
+        clienteSelect.innerHTML = '<option value="">Seleccione...</option>' +
           data.results.map(c => `<option value="${c.id}">${c.nombre} — ${c.identificador}</option>`).join('');
-        
+
         console.log('✅ Select actualizado manualmente');
       }
     })
     .catch(e => console.error('❌ Error API:', e));
-  
+
   // Test event listener
   setTimeout(() => {
     console.log('⌨️ Simulando input...');

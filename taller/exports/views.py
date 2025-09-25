@@ -108,7 +108,7 @@ def generar_link_whatsapp(request, documento_id):
         )
 
         # Mensaje personalizado
-        mensaje = f"""¡Hola {documento.cliente.nombre}! 
+        mensaje = f"""¡Hola {documento.cliente.nombre}!
 
 Adjunto encontrarás tu {documento.tipo_documento.lower()} #{documento.numero_documento} de {documento.empresa.nombre}.
 

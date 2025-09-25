@@ -1,3 +1,4 @@
+{% load country_url %}
 {% extends 'base.html' %}
 {% load widget_tweaks %}
 
@@ -43,7 +44,7 @@
       <textarea id="observaciones" name="observaciones" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring focus:ring-indigo-300 bg-white text-gray-900"></textarea>
     </div>
     <div class="col-span-2 flex justify-end gap-4">
-  {% url 'taller:repuestos:lista_repuestos' as url_lista_repuestos %}
+  {% country_url 'repuestos:lista_repuestos' as url_lista_repuestos %}
   <a class="bg-gray-300 text-gray-700 px-5 py-2 rounded hover:bg-gray-400 shadow" href="{{ url_lista_repuestos|default:'#' }}">Cancelar</a>
       <button class="bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700 shadow btn-futuristic" type="submit">Guardar</button>
     </div>

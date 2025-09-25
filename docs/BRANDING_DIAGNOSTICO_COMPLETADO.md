@@ -29,7 +29,7 @@ Usar la URL correcta: `/taller/settings/editar/` (no `/configuracion/`)
 Esta página edita `ConfiguracionEmpresa` que es el modelo correcto.
 
 ### 🎯 **Estado Final:**
-- ✅ Logos aparecen en todas las páginas 
+- ✅ Logos aparecen en todas las páginas
 - ✅ Logos aparecen en PDFs (WeasyPrint)
 - ✅ Sin funciones duplicadas
 - ✅ Cache funcionando (3600s)
@@ -37,7 +37,7 @@ Esta página edita `ConfiguracionEmpresa` que es el modelo correcto.
 
 ### 📁 **Archivos Modificados:**
 - `taller/context_processors/__init__.py` - Context processor principal
-- `taller/context_processors/empresa_contexto.py` - Corregido imports 
+- `taller/context_processors/empresa_contexto.py` - Corregido imports
 - `taller/context_processors.py` - Eliminada función duplicada
 - `migrar_logos_branding.py` - Script de migración ejecutado
 

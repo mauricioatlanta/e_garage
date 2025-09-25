@@ -103,23 +103,23 @@
 
     <div class="content">
         <p>Estimado/a <strong>{{ cliente.nombre }}</strong>,</p>
-        
+
         <p>Esperamos que se encuentre muy bien.</p>
-        
+
         <p>Le adjuntamos el {{ documento.tipo_documento|lower }} correspondiente a los servicios realizados en su vehículo.</p>
 
         <div class="info-box">
             <h3>Detalles del Servicio</h3>
             <p><strong>Vehículo:</strong> {{ documento.vehiculo.marca }} {{ documento.vehiculo.modelo }} ({{ documento.vehiculo.patente }})</p>
             <p><strong>Fecha:</strong> {{ documento.fecha|date:"d/m/Y" }}</p>
-            {% if documento.mecanico %}
-            <p><strong>Mecánico:</strong> {{ documento.mecanico.nombre }}</p>
+            {% if documento.tecnico_responsable %}
+            <p><strong>Mecánico:</strong> {{ documento.tecnico_responsable.nombre }}</p>
             {% endif %}
             <p><strong>Total:</strong> ${{ total|floatformat:0 }}</p>
         </div>
 
         <p>Si tiene alguna consulta sobre este documento, no dude en contactarnos.</p>
-        
+
         <p>¡Gracias por confiar en nosotros!</p>
     </div>
 

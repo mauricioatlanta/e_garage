@@ -3,7 +3,7 @@
 ## 🎯 Resumen de lo implementado
 
 ### 1. URLs Unificadas ✅
-- **Pantalla única**: `/cl/documentos/form/` y `/us/documentos/form/` 
+- **Pantalla única**: `/cl/documentos/form/` y `/us/documentos/form/`
 - **Edición**: `/cl/documentos/form/{pk}/` y `/us/documentos/form/{pk}/`
 - **Compatibilidad**: Redirects desde URLs legacy usando `RedirectView`
 

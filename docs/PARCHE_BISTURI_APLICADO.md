@@ -2,7 +2,7 @@
 
 ## ✅ **CAMBIOS IMPLEMENTADOS:**
 
-### 1️⃣ **DEBUG Fuerte en Vista** 
+### 1️⃣ **DEBUG Fuerte en Vista**
 ```python
 # En company_settings_view POST:
 print("🧪 DEBUG: request.FILES keys ->", list(request.FILES.keys()))
@@ -28,7 +28,7 @@ print("🧪 DEBUG: logo URL:", getattr(obj.logo, 'url', None) if obj.logo else N
 
 ### 4️⃣ **Cache-Busting en Template**
 ```html
-<img src="{{ company_settings.logo.url }}?v={{ company_settings.updated_at|date:'U' }}" 
+<img src="{{ company_settings.logo.url }}?v={{ company_settings.updated_at|date:'U' }}"
      alt="Current Logo" id="logoPreview">
 ```
 
@@ -40,7 +40,7 @@ print("🧪 DEBUG: logo URL:", getattr(obj.logo, 'url', None) if obj.logo else N
 
 ## 📊 **ESTADO VERIFICADO:**
 
-- ✅ **Usuario:** testuser_usa  
+- ✅ **Usuario:** testuser_usa
 - ✅ **Empresa:** GEORGE AUTO REPAIR
 - ✅ **Configuración:** Existe con logo actual: `logos/barco.png`
 - ✅ **Formulario:** CompanyInfoForm con campo logo (FileInput)
@@ -50,22 +50,22 @@ print("🧪 DEBUG: logo URL:", getattr(obj.logo, 'url', None) if obj.logo else N
 ## 🎯 **QUÉ REVELARÁ EL PARCHE:**
 
 ### **Si `request.FILES['logo']` aparece:**
-✅ **Archivo viaja correctamente** → Se guardará forzadamente  
+✅ **Archivo viaja correctamente** → Se guardará forzadamente
 📋 **Problema era:** ModelForm ignorando archivo o cache viejo
 
 ### **Si NO aparece:**
-❌ **Archivo no viaja** → Problema en cliente  
+❌ **Archivo no viaja** → Problema en cliente
 📋 **Revisar:** Input disabled, JS bloqueando, form corruption
 
 ### **Si se guarda pero no se ve:**
-📋 **Problema:** Media serving o cache del navegador  
+📋 **Problema:** Media serving o cache del navegador
 ✅ **Solucionado con:** Cache-busting querystring
 
 ## 🔍 **INSTRUCCIONES DE PRUEBA:**
 
 1. **Ir a:** `http://127.0.0.1:8000/cl/taller/settings/`
 2. **Abrir:** DevTools → Network tab
-3. **Subir:** Imagen PNG/JPG ≤ 2MB  
+3. **Subir:** Imagen PNG/JPG ≤ 2MB
 4. **Presionar:** 💾 UPDATE PROFILE
 5. **Verificar:**
    - Request debe ser `multipart/form-data`

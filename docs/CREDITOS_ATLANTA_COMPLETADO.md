@@ -50,7 +50,7 @@ Se ha integrado exitosamente el crédito y logo de **Atlanta Reciclajes** en tod
 
 ```
 ✅ templates/base.html                                    - Footer global
-✅ templates/registration/login.html                      - Login principal  
+✅ templates/registration/login.html                      - Login principal
 ✅ templates/account/login.html                          - Login allauth
 ✅ templates/suspension/suspension.html                   - Página suspensión
 ✅ templates/landing_egarage.html                        - Landing principal
@@ -145,6 +145,6 @@ Para cualquier modificación o ajuste de los créditos, contactar:
 
 ---
 
-**🎉 INTEGRACIÓN COMPLETADA EXITOSAMENTE** 
+**🎉 INTEGRACIÓN COMPLETADA EXITOSAMENTE**
 
 *Todos los créditos de Atlanta Reciclajes han sido implementados correctamente en el sistema eGarage AI™*

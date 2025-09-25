@@ -2,6 +2,7 @@
 """
 Procesador que se ejecuta periódicamente para enviar notificaciones automáticas
 """
+
 import logging
 import os
 from datetime import datetime, timedelta

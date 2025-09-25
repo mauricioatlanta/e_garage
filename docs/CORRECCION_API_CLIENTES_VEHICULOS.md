@@ -29,15 +29,15 @@ def api_busqueda_clientes(request):
     # BLINDAJE MULTI-TENANT: Verificar autenticación y empresa
     if not request.user.is_authenticated:
         return JsonResponse([], safe=False)
-    
+
     empresa = getattr(request.user, 'empresa', None)
     if not empresa:
         return JsonResponse([], safe=False)
-    
+
     q = request.GET.get("q", "").strip()
     if not q:
         return JsonResponse([], safe=False)
-        
+
     # BLINDAJE: Filtrar SOLO por empresa del usuario
     clientes = Cliente.objects.filter(
         empresa=empresa  # ✅ FILTRO OBLIGATORIO
@@ -57,7 +57,7 @@ def api_marcas(request):
     # BLINDAJE: Verificar autenticación del usuario
     if not request.user.is_authenticated:
         return JsonResponse([], safe=False)
-    
+
     marcas = list(Marca.objects.values('id', 'nombre'))
     return JsonResponse(marcas, safe=False)
 ```
@@ -73,11 +73,11 @@ class VehiculoAutocomplete(autocomplete.Select2QuerySetView):
         # BLINDAJE MULTI-TENANT: Verificar autenticación y empresa
         if not self.request.user.is_authenticated:
             return Vehiculo.objects.none()
-        
+
         empresa = getattr(self.request.user, 'empresa', None)
         if not empresa:
             return Vehiculo.objects.none()
-        
+
         # BLINDAJE: Filtrar SOLO por empresa del usuario
         qs = Vehiculo.objects.filter(empresa=empresa)
 ```
@@ -87,7 +87,7 @@ class VehiculoAutocomplete(autocomplete.Select2QuerySetView):
 ### Para testuser_cl:
 1. ✅ Login como `testuser_cl`
 2. ✅ Ir a: `http://127.0.0.1:8000/vehiculos-core/crear/`
-3. ✅ En el campo cliente, buscar "john" 
+3. ✅ En el campo cliente, buscar "john"
 4. ✅ **DEBE mostrar SOLO clientes CL** (no debe aparecer john wick ni john lennon)
 
 ### Para testuser_usa:

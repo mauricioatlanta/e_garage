@@ -20,7 +20,7 @@
 def __init__(self, *args, **kwargs):
     self.user = kwargs.pop('user', None)
     super().__init__(*args, **kwargs)
-    
+
     if self.user and hasattr(self.user, 'empresa') and self.user.empresa.pais == 'US':
         # Configuración para USA
         self.fields['marca'].queryset = get_marcas_por_pais('US')
@@ -58,11 +58,11 @@ def __init__(self, *args, **kwargs):
 def __init__(self, *args, **kwargs):
     self.user = kwargs.pop('user', None)
     super().__init__(*args, **kwargs)
-    
+
     pais = 'CL'
     if self.user and hasattr(self.user, 'empresa') and self.user.empresa.pais:
         pais = self.user.empresa.pais
-    
+
     if pais == 'US':
         self.fields['telefono'].widget.attrs.update({
             'placeholder': '(555) 123-4567',
@@ -90,12 +90,12 @@ def __init__(self, *args, **kwargs):
 def __init__(self, *args, **kwargs):
     self.user = kwargs.pop('user', None)
     super().__init__(*args, **kwargs)
-    
+
     if self.user and hasattr(self.user, 'empresa'):
         config = get_configuracion_pais(self.user.empresa)
         simbolo = config['simbolo_moneda']
         moneda = config['moneda']
-        
+
         placeholder = f'{simbolo}0.00 {moneda}' if config['decimales'] > 0 else f'{simbolo}0 {moneda}'
         self.fields['precio_compra'].widget.attrs.update({'placeholder': placeholder})
         self.fields['precio_venta'].widget.attrs.update({'placeholder': placeholder})
@@ -106,7 +106,7 @@ def __init__(self, *args, **kwargs):
 ### `taller/utils/pais_utils.py`
 **Funciones agregadas**:
 
-1. **`get_regiones_por_pais(pais)`**: 
+1. **`get_regiones_por_pais(pais)`**:
    - Chile: Regiones tradicionales desde BD
    - USA: 50 estados americanos
 
@@ -130,7 +130,7 @@ python test_forms_direct.py
 
 **Resultados de prueba**:
 - ✅ Patente chilena ABC123: Válida
-- ✅ Patente USA ABC123: Válida  
+- ✅ Patente USA ABC123: Válida
 - ✅ Teléfono chileno +56912345678: Válido
 - ✅ Teléfono USA (555) 123-4567: Válido
 - ✅ Configuración Chile - Moneda: CLP, Símbolo: $
@@ -146,7 +146,7 @@ python test_forms_direct.py
 
 ### Ejemplo 2: Usuario USA crea cliente
 - Ve lista de estados americanos
-- Placeholder teléfono: "(555) 123-4567"  
+- Placeholder teléfono: "(555) 123-4567"
 - Label: "State" en lugar de "Región"
 
 ### Ejemplo 3: Usuario USA crea repuesto

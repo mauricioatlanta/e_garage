@@ -2,6 +2,7 @@
 """
 Script para verificar qué tablas existen en la base de datos
 """
+
 import os
 import sqlite3
 import sys

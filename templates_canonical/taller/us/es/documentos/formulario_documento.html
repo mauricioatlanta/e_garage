@@ -304,7 +304,7 @@
       <div><span class="font-bold">Total servicios:</span> <span id="neto-servicios">$0</span></div>
       <div><span class="font-bold">Otros:</span> <span id="neto-otros">$0</span></div>
       <div><span class="font-bold">Subtotal:</span> <span id="subtotal-doc">$0</span></div>
-      
+
       <!-- Sección de impuestos específica por país -->
       {% if company_country == 'CL' %}
         <div class="flex items-center gap-2">
@@ -317,7 +317,7 @@
           <span id="tax-amount">$0</span>
         </div>
       {% endif %}
-      
+
       <div class="text-xl"><span class="font-bold">Gran Total:</span> <span id="total-doc">$0</span></div>
     </div>
 
@@ -444,21 +444,21 @@ $(document).ready(function() {
       window.actualizarTotalRepuestos();
     }
   });
-  
+
   // Agregar event listeners para cambios en servicios
   $(document).on('input', '.precio-servicio-input', function() {
     if (window.actualizarTotalServicios) {
       window.actualizarTotalServicios();
     }
   });
-  
+
   // Event listener para el checkbox de IVA
   $('#lleva_iva').on('change', function() {
     if (window.actualizarTotalesDocumento) {
       window.actualizarTotalesDocumento();
     }
   });
-  
+
   // Event listeners para eliminar repuestos
   $(document).on('click', '.remove-repuesto', function() {
     $(this).closest('tr').remove();
@@ -466,7 +466,7 @@ $(document).ready(function() {
       window.actualizarTotalRepuestos();
     }
   });
-  
+
   // Event listeners para eliminar servicios
   $(document).on('click', '.remove-servicio', function() {
     $(this).closest('tr').remove();
@@ -474,7 +474,7 @@ $(document).ready(function() {
       window.actualizarTotalServicios();
     }
   });
-  
+
 
   // Calcular totales iniciales cuando la página se carga
   setTimeout(function() {

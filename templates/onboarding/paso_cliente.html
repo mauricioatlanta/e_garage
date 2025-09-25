@@ -1,3 +1,4 @@
+{% load country_url %}
 {% extends 'base.html' %}
 
 {% block title %}Paso 1: Agregar tu primer cliente{% endblock %}
@@ -244,7 +245,7 @@
         .step-content {
             grid-template-columns: 1fr;
         }
-        
+
         .floating-tip {
             position: relative;
             bottom: auto;
@@ -277,9 +278,9 @@
         <!-- Panel Tutorial -->
         <div class="tutorial-panel">
             <h1 class="step-title">👥 {{ paso_info.titulo }}</h1>
-            
+
             <div class="step-description">
-                Los clientes son el corazón de tu taller. Aquí registrarás toda la información 
+                Los clientes son el corazón de tu taller. Aquí registrarás toda la información
                 importante: nombre, contacto, historial de servicios.
             </div>
 
@@ -318,9 +319,9 @@
                 <p style="color: var(--glow-cyan); margin-bottom: 1rem;">
                     Nuestro sistema de IA analiza cada cliente y sugiere servicios automáticamente.
                 </p>
-                <a href="{% url 'taller:ia:demo_vehiculo' %}" 
-                   style="background: linear-gradient(45deg, var(--ai-orange), var(--electric-yellow)); 
-                          color: #000; padding: 8px 16px; border-radius: 8px; text-decoration: none; 
+                <a href="{% country_url 'ia:demo_vehiculo' %}"
+                   style="background: linear-gradient(45deg, var(--ai-orange), var(--electric-yellow));
+                          color: #000; padding: 8px 16px; border-radius: 8px; text-decoration: none;
                           font-weight: bold; display: inline-block; transition: all 0.3s ease;"
                    onmouseover="this.style.transform='scale(1.05)'"
                    onmouseout="this.style.transform='scale(1)'">
@@ -338,32 +339,32 @@
             <form id="clienteForm">
                 <div class="form-group">
                     <label for="nombre">👤 Nombre completo</label>
-                    <input type="text" id="nombre" name="nombre" class="form-control" 
+                    <input type="text" id="nombre" name="nombre" class="form-control"
                            placeholder="Ej: Juan Pérez González" required>
                 </div>
 
                 <div class="form-group">
                     <label for="telefono">📱 Teléfono</label>
-                    <input type="tel" id="telefono" name="telefono" class="form-control" 
+                    <input type="tel" id="telefono" name="telefono" class="form-control"
                            placeholder="Ej: +56 9 1234 5678" required>
                 </div>
 
                 <div class="form-group">
                     <label for="email">📧 Email</label>
-                    <input type="email" id="email" name="email" class="form-control" 
+                    <input type="email" id="email" name="email" class="form-control"
                            placeholder="Ej: cliente@email.com">
                 </div>
 
                 <div class="form-group">
                     <label for="direccion">🏠 Dirección</label>
-                    <input type="text" id="direccion" name="direccion" class="form-control" 
+                    <input type="text" id="direccion" name="direccion" class="form-control"
                            placeholder="Ej: Las Condes 123, Santiago">
                 </div>
 
                 <button type="submit" class="btn-next">
                     ✅ Crear Cliente y Continuar
                 </button>
-                
+
                 <button type="button" class="btn-skip" onclick="saltarPaso()">
                     ⏭️ Saltar este paso
                 </button>
@@ -400,7 +401,7 @@ particlesJS("particles-js", {
 // Manejo del formulario
 document.getElementById('clienteForm').addEventListener('submit', function(e) {
     e.preventDefault();
-    
+
     const formData = new FormData(this);
     const data = {
         nombre: formData.get('nombre'),
@@ -408,25 +409,25 @@ document.getElementById('clienteForm').addEventListener('submit', function(e) {
         email: formData.get('email'),
         direccion: formData.get('direccion')
     };
-    
+
     // Validar datos mínimos
     if (!data.nombre || !data.telefono) {
         alert('Por favor completa al menos el nombre y teléfono');
         return;
     }
-    
+
     // Simular creación de cliente (en implementación real, enviar a backend)
     const btn = document.querySelector('.btn-next');
     btn.innerHTML = '⏳ Creando cliente...';
     btn.disabled = true;
-    
+
     setTimeout(() => {
         // Analytics
         gtag('event', 'onboarding_cliente_created', {
             'event_category': 'onboarding',
             'event_label': 'paso_1_completado'
         });
-        
+
         // Ir al siguiente paso
         window.location.href = '/onboarding/paso/2/';
     }, 1500);
@@ -438,7 +439,7 @@ function saltarPaso() {
             'event_category': 'onboarding',
             'event_label': 'paso_1_saltado'
         });
-        
+
         window.location.href = '/onboarding/paso/2/';
     }
 }

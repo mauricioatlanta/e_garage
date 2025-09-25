@@ -5,7 +5,7 @@
 {% block extra_head %}
   <style>
     body {
-      background: 
+      background:
         radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
         radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
         radial-gradient(circle at 40% 40%, rgba(120, 200, 255, 0.2) 0%, transparent 5          <th class="sortable-header" data-sort="vehiculo" onclick="sortTable('vehiculo')">
@@ -37,7 +37,7 @@
       border: 2px solid #00ffff;
       border-radius: 20px;
       backdrop-filter: blur(15px);
-      box-shadow: 
+      box-shadow:
         0 0 20px #00ffff,
         inset 0 1px 0 rgba(255, 255, 255, 0.1);
       position: relative;
@@ -592,7 +592,7 @@
 
 {% block content %}
 <div class="max-w-7xl mx-auto p-6">
-  
+
   <!-- Header con Logo Personalizado -->
   <div class="futuristic-container p-6 mb-6 hologram-effect">
     <div class="logo-header">
@@ -618,12 +618,12 @@
   <div class="futuristic-container p-6">
     <div class="command-panel-grid">
       <div class="search-control">
-        <input id="busqueda-documento" type="text" 
-               placeholder="🔍 BUSCAR DOCUMENTOS POR TIPO, CLIENTE, VEHÍCULO..." 
+        <input id="busqueda-documento" type="text"
+               placeholder="🔍 BUSCAR DOCUMENTOS POR TIPO, CLIENTE, VEHÍCULO..."
                class="search-input">
         <span class="search-icon">⚡</span>
       </div>
-      <a href="{% if country == 'cl' %}{% url 'documentos_cl:crear_documento' %}{% else %}{% url 'documentos_us:crear_documento' %}{% endif %}" class="action-button glitch-effect">
+      <a href="{% if country == 'cl' %}{% url 'documentos_cl_es:crear_documento' %}{% else %}{% url 'documentos_us_en:crear_documento' %}{% endif %}" class="action-button glitch-effect">
         ➕ CREAR DOCUMENTO
       </a>
     </div>
@@ -685,16 +685,16 @@
           </th>
         </tr>
       </thead>
-      
+
       <!-- DEBUG: ¿esta vista es la correcta? -->
       <div style="display:none" id="view-sentinel">LIST_VIEW=DocumentoListViewBase</div>
-      
+
       <tbody id="tabla-documentos">
         {% for doc in documentos %}
-        <tr class="table-row" data-tipo="{{ doc.tipo }}" 
-            data-numero="{{ doc.numero_documento }}" 
-            data-fecha="{{ doc.fecha_emision|date:'Y-m-d' }}" 
-            data-cliente="{{ doc.cliente }}" 
+        <tr class="table-row" data-tipo="{{ doc.tipo }}"
+            data-numero="{{ doc.numero_documento }}"
+            data-fecha="{{ doc.fecha_emision|date:'Y-m-d' }}"
+            data-cliente="{{ doc.cliente }}"
             data-vehiculo="{{ doc.vehiculo }}">
           <td class="table-cell">
             <span class="data-type">{{ doc.get_tipo_display }}</span>
@@ -733,12 +733,12 @@
                   {% endif %}
                 {% endwith %}
               {% endif %}
-              
-              <a href="{% if country == 'cl' %}{% url 'documentos_cl:ver_documento' documento_id=doc.id %}{% else %}{% url 'documentos_us:ver_documento' documento_id=doc.id %}{% endif %}" class="action-link view">VER</a>
-              <a href="{% if country == 'cl' %}{% url 'documentos_cl:editar_documento' pk=doc.id %}{% else %}{% url 'documentos_us:editar_documento' pk=doc.id %}{% endif %}" class="action-link edit">EDIT</a>
-              <a href="{% if country == 'cl' %}{% url 'documentos_cl:exportar_documento_pdf' documento_id=doc.id %}{% else %}{% url 'documentos_us:exportar_documento_pdf' documento_id=doc.id %}{% endif %}" class="action-link print" target="_blank">PDF</a>
+
+              <a href="{% if country == 'cl' %}{% url 'documentos_cl_es:ver_documento' documento_id=doc.id %}{% else %}{% url 'documentos_us_en:ver_documento' documento_id=doc.id %}{% endif %}" class="action-link view">VER</a>
+              <a href="{% if country == 'cl' %}{% url 'documentos_cl_es:editar_documento' pk=doc.id %}{% else %}{% url 'documentos_us_en:editar_documento' pk=doc.id %}{% endif %}" class="action-link edit">EDIT</a>
+              <a href="{% if country == 'cl' %}{% url 'documentos_cl_es:exportar_documento_pdf' documento_id=doc.id %}{% else %}{% url 'documentos_us_en:exportar_documento_pdf' documento_id=doc.id %}{% endif %}" class="action-link print" target="_blank">PDF</a>
               <button onclick="enviarWhatsApp({{ doc.id }})" class="action-link whatsapp">WA</button>
-              <a href="/{{ country }}/documentos/eliminar/{{ doc.id }}/" class="action-link delete" 
+              <a href="/{{ country }}/documentos/eliminar/{{ doc.id }}/" class="action-link delete"
                  onclick="return confirm('⚠️ ELIMINAR DOCUMENTO? ESTA ACCIÓN NO SE PUEDE DESHACER')">DEL</a>
             </div>
           </td>
@@ -753,7 +753,7 @@
         {% endfor %}
       </tbody>
     </table>
-    
+
     <!-- Total de Facturas -->
     <div class="futuristic-container p-4 mt-6" style="background: rgba(0, 255, 0, 0.1); border-color: #00ff00;">
       <div class="flex justify-between items-center">
@@ -777,22 +777,22 @@ document.addEventListener('DOMContentLoaded', function() {
   // Variables globales para ordenamiento
   let currentSort = { column: null, direction: 'asc' };
   let allRows = [];
-  
+
   // Capturar todas las filas al cargar
   const tableBody = document.getElementById('tabla-documentos');
   allRows = Array.from(tableBody.querySelectorAll('tr'));
-  
+
   // 🔍 Función de búsqueda avanzada
   const searchInput = document.getElementById('busqueda-documento');
   searchInput.addEventListener('input', function() {
     const filtro = this.value.toLowerCase().trim();
-    
+
     allRows.forEach(fila => {
       if (fila.cells.length > 1) { // Evitar fila de "vacío"
-        const textoCompleto = Array.from(fila.cells).slice(0, -1).map(cell => 
+        const textoCompleto = Array.from(fila.cells).slice(0, -1).map(cell =>
           cell.textContent.toLowerCase()
         ).join(' ');
-        
+
         if (textoCompleto.includes(filtro)) {
           fila.style.display = '';
           fila.style.animation = 'fadeIn 0.3s ease';
@@ -801,7 +801,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       }
     });
-    
+
     // Efecto de búsqueda activa
     if (filtro.length > 0) {
       searchInput.style.borderColor = '#ffd700';
@@ -815,7 +815,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // 📊 Función de ordenamiento inteligente
   window.sortTable = function(column) {
     console.log('Ordenando por:', column);
-    
+
     // Determinar dirección del ordenamiento
     if (currentSort.column === column) {
       currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
@@ -823,19 +823,19 @@ document.addEventListener('DOMContentLoaded', function() {
       currentSort.column = column;
       currentSort.direction = 'asc';
     }
-    
+
     // Actualizar indicadores visuales
     updateSortIndicators(column, currentSort.direction);
-    
+
     // Filtrar solo filas visibles con datos
-    const visibleRows = allRows.filter(row => 
+    const visibleRows = allRows.filter(row =>
       row.style.display !== 'none' && row.cells.length > 1
     );
-    
+
     // Ordenar según el tipo de datos
     visibleRows.sort((a, b) => {
       let valueA, valueB;
-      
+
       switch(column) {
         case 'tipo':
           valueA = a.dataset.tipo || '';
@@ -860,7 +860,7 @@ document.addEventListener('DOMContentLoaded', function() {
         default:
           return 0;
       }
-      
+
       // Comparación según tipo de dato
       if (typeof valueA === 'number' && typeof valueB === 'number') {
         return currentSort.direction === 'asc' ? valueA - valueB : valueB - valueA;
@@ -875,22 +875,22 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       }
     });
-    
+
     // Limpiar tabla y volver a insertar filas ordenadas
     tableBody.innerHTML = '';
-    
+
     // Agregar filas ordenadas
     visibleRows.forEach((row, index) => {
       row.style.animation = `slideIn 0.3s ease ${index * 0.05}s`;
       tableBody.appendChild(row);
     });
-    
+
     // Agregar filas ocultas al final
-    const hiddenRows = allRows.filter(row => 
+    const hiddenRows = allRows.filter(row =>
       row.style.display === 'none' || row.cells.length <= 1
     );
     hiddenRows.forEach(row => tableBody.appendChild(row));
-    
+
     // Efecto visual de ordenamiento completado
     const header = document.querySelector(`[data-sort="${column}"]`);
     if (header) {
@@ -900,7 +900,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }, 500);
     }
   };
-  
+
   // 🎯 Actualizar indicadores de ordenamiento
   function updateSortIndicators(activeColumn, direction) {
     // Limpiar todos los indicadores
@@ -908,7 +908,7 @@ document.addEventListener('DOMContentLoaded', function() {
       indicator.textContent = '⚡';
       indicator.style.opacity = '0.7';
     });
-    
+
     // Actualizar indicador activo
     const activeIndicator = document.getElementById(`sort-${activeColumn}`);
     if (activeIndicator) {
@@ -917,19 +917,19 @@ document.addEventListener('DOMContentLoaded', function() {
       activeIndicator.style.color = '#ffd700';
     }
   }
-  
+
   // ✨ Efectos visuales adicionales
   const actionLinks = document.querySelectorAll('.action-link');
   actionLinks.forEach(link => {
     link.addEventListener('mouseenter', function() {
       this.style.transform = 'scale(1.1) rotate(2deg)';
     });
-    
+
     link.addEventListener('mouseleave', function() {
       this.style.transform = 'scale(1) rotate(0deg)';
     });
   });
-  
+
   // 🎮 Atajos de teclado para ordenamiento
   document.addEventListener('keydown', function(e) {
     if (e.ctrlKey) {
@@ -957,7 +957,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
   });
-  
+
   // 🚀 Animaciones CSS dinámicas
   const style = document.createElement('style');
   style.textContent = `
@@ -965,24 +965,24 @@ document.addEventListener('DOMContentLoaded', function() {
       from { opacity: 0; transform: translateY(-10px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    
+
     @keyframes slideIn {
       from { opacity: 0; transform: translateX(-20px); }
       to { opacity: 1; transform: translateX(0); }
     }
-    
+
     .table-row {
       animation: fadeIn 0.3s ease;
     }
   `;
   document.head.appendChild(style);
-  
+
   // 💡 Tooltip informativo para atajos
   const tooltip = document.createElement('div');
   tooltip.innerHTML = `
-    <div style="position: fixed; bottom: 20px; right: 20px; 
-                background: rgba(0, 0, 0, 0.9); color: #00ffff; 
-                padding: 15px; border-radius: 10px; 
+    <div style="position: fixed; bottom: 20px; right: 20px;
+                background: rgba(0, 0, 0, 0.9); color: #00ffff;
+                padding: 15px; border-radius: 10px;
                 border: 1px solid #00ffff; font-family: 'Courier New', monospace;
                 font-size: 11px; z-index: 1000; max-width: 250px;">
       <strong>⚡ ATAJOS RÁPIDOS:</strong><br>
@@ -993,14 +993,14 @@ document.addEventListener('DOMContentLoaded', function() {
       Ctrl+5: Ordenar por Vehículo
     </div>
   `;
-  
+
   // Mostrar tooltip brevemente al cargar
   document.body.appendChild(tooltip);
   setTimeout(() => {
     tooltip.style.opacity = '0.7';
     tooltip.style.transition = 'opacity 0.3s ease';
   }, 2000);
-  
+
   setTimeout(() => {
     tooltip.style.opacity = '0';
     setTimeout(() => tooltip.remove(), 300);
@@ -1015,7 +1015,7 @@ function enviarWhatsApp(documentoId) {
     alert('❌ Error: No se pudo encontrar la información del documento');
     return;
   }
-  
+
   // Extraer información de la fila de la tabla
   const cells = documentoRow.querySelectorAll('.table-cell');
   const tipo = cells[0]?.textContent?.trim() || '';
@@ -1024,7 +1024,7 @@ function enviarWhatsApp(documentoId) {
   const cliente = cells[3]?.textContent?.trim() || '';
   const vehiculo = cells[4]?.textContent?.trim() || '';
   const total = cells[6]?.textContent?.trim() || '';
-  
+
   // Crear mensaje personalizado
   const mensaje = `🚗 *SHOP DOCUMENT* 🚗
 
@@ -1039,7 +1039,7 @@ Hello! I'm sending you your vehicle document.
 Do you need any clarification about the work performed?
 
 _Message sent from eGarage - Auto Shop Management System_ 🔧`;
-  
+
   // Mostrar modal para confirmar/editar mensaje y teléfono
   mostrarModalWhatsApp(mensaje, documentoId);
 }
@@ -1054,27 +1054,27 @@ function mostrarModalWhatsApp(mensaje, documentoId) {
         <h3>📲 Send via WhatsApp</h3>
         <span class="whatsapp-close" onclick="cerrarModalWhatsApp()">&times;</span>
       </div>
-      
+
       <div class="whatsapp-body">
         <div class="whatsapp-field">
           <label>📞 Phone number (with country code):</label>
           <input type="text" id="whatsapp-telefono" placeholder="+1234567890" class="whatsapp-input">
           <small>Format: +1234567890 (USA) or +56912345678 (Chile)</small>
         </div>
-        
+
         <div class="whatsapp-field">
           <label>💬 Message:</label>
           <textarea id="whatsapp-mensaje" class="whatsapp-textarea" rows="12">${mensaje}</textarea>
         </div>
       </div>
-      
+
       <div class="whatsapp-footer">
         <button onclick="cerrarModalWhatsApp()" class="whatsapp-btn-cancel">Cancel</button>
         <button onclick="enviarMensajeWhatsApp()" class="whatsapp-btn-send">📲 Send WhatsApp</button>
       </div>
     </div>
   `;
-  
+
   document.body.appendChild(modal);
   document.getElementById('whatsapp-telefono').focus();
 }
@@ -1082,38 +1082,38 @@ function mostrarModalWhatsApp(mensaje, documentoId) {
 function enviarMensajeWhatsApp() {
   const telefono = document.getElementById('whatsapp-telefono').value.trim();
   const mensaje = document.getElementById('whatsapp-mensaje').value.trim();
-  
+
   if (!telefono) {
     alert('❌ Please enter a phone number');
     document.getElementById('whatsapp-telefono').focus();
     return;
   }
-  
+
   if (!mensaje) {
     alert('❌ Please enter a message');
     document.getElementById('whatsapp-mensaje').focus();
     return;
   }
-  
+
   // Limpiar número de teléfono (solo números y +)
   const telefonoLimpio = telefono.replace(/[^\d+]/g, '');
-  
+
   // Crear URL de WhatsApp
   const mensajeCodificado = encodeURIComponent(mensaje);
   const urlWhatsApp = `https://wa.me/${telefonoLimpio}?text=${mensajeCodificado}`;
-  
+
   // Abrir WhatsApp
   window.open(urlWhatsApp, '_blank');
-  
+
   // Cerrar modal
   cerrarModalWhatsApp();
-  
+
   // Mostrar mensaje de confirmación
   const confirmacion = document.createElement('div');
   confirmacion.className = 'whatsapp-confirmacion';
   confirmacion.innerHTML = '✅ WhatsApp opened. The message is ready to send.';
   document.body.appendChild(confirmacion);
-  
+
   setTimeout(() => {
     confirmacion.remove();
   }, 3000);

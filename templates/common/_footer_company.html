@@ -10,7 +10,7 @@
       </div>
     </div>
     {% endif %}
-    
+
     {% if COMPANY_PHONE %}
     <div class="col-md-3 mb-2">
       <div class="d-flex align-items-center">
@@ -19,7 +19,7 @@
       </div>
     </div>
     {% endif %}
-    
+
     {% if COMPANY_EMAIL %}
     <div class="col-md-3 mb-2">
       <div class="d-flex align-items-center">
@@ -28,7 +28,7 @@
       </div>
     </div>
     {% endif %}
-    
+
     {% if COMPANY_WEBSITE %}
     <div class="col-md-3 mb-2">
       <div class="d-flex align-items-center">
@@ -38,7 +38,7 @@
     </div>
     {% endif %}
   </div>
-  
+
   <!-- DEBUG: Company ID y Tax Rate para verificar que estamos viendo la misma empresa -->
   <div class="text-xs opacity-70 mt-2 text-center">
     Company ID (CP): {{ COMPANY_ID|default:"NO ID" }} | TAX: {{ COMPANY_TAX_RATE|default:"NO TAX" }}

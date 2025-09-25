@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load country_url %}
 {% load static i18n widget_tweaks %}
 
 {% block title %}{% if LANGUAGE_CODE == 'es' %}Editar repuesto{% else %}Edit part{% endif %}{% endblock %}
@@ -42,19 +43,16 @@
       </div>
 
       <div class="mt-6 flex items-center gap-2">
-        {% if request.user.empresa.pais == 'CL' %}
-        <!-- Mensaje específico para Chile -->
+        <!-- Mensaje de ayuda para precios -->
         <div class="w-full bg-blue-900/30 border border-blue-400/30 rounded-lg p-4 mb-4">
           <div class="flex items-center gap-2 text-blue-300">
             <i class="fas fa-info-circle"></i>
-            <span class="font-semibold">Formato de Precios para Chile</span>
+            <span class="font-semibold">Formato de Precios</span>
           </div>
           <p class="text-blue-200/80 text-sm mt-2">
-            Los precios se muestran en pesos chilenos sin decimales. Ejemplo: <code class="bg-black/40 px-1 rounded">$2.500</code> (dos mil quinientos pesos).
-            Los puntos se usan como separadores de miles, no como decimales.
+            Ingresa los precios como números decimales. Ejemplo: <code class="bg-black/40 px-1 rounded">15000.50</code>
           </p>
         </div>
-        {% endif %}
 
         <button type="submit" class="px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-700 text-white shadow">
           {% if form.instance.pk %}
@@ -63,7 +61,7 @@
             {% if LANGUAGE_CODE == 'es' %}Crear repuesto{% else %}Create part{% endif %}
           {% endif %}
         </button>
-        <a href="{% url 'taller:repuestos:lista_repuestos' %}"
+        <a href="{% country_url 'repuestos:lista_repuestos' %}"
            class="inline-flex items-center px-4 py-2 border border-cyan-400/60 rounded-lg text-white bg-black/60 hover:bg-cyan-900/30">
           {% if LANGUAGE_CODE == 'es' %}← Volver a la lista{% else %}← Back to list{% endif %}
         </a>
@@ -74,5 +72,4 @@
 {% endblock content %}
 
 {% block extra_js %}
-<script src="{% static 'taller/js/repuestos_form.js' %}"></script>
 {% endblock extra_js %}

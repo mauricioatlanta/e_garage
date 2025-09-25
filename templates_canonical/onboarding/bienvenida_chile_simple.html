@@ -340,14 +340,36 @@
 
         <!-- Botones de acción futuristas -->
         <div class="fade-in-up delay-300 flex flex-col md:flex-row gap-6 justify-center items-center">
-          <a href="/registro/" class="cyber-button px-12 py-4 rounded-full text-xl font-bold">
-            <i class="fas fa-rocket mr-3"></i>
-            🚀 Comenzar Prueba Gratis
+          <a href="/registro/" class="cyber-button px-12 py-4 rounded-full text-xl font-bold transform hover:scale-105 transition-all duration-300 shadow-2xl">
+            <i class="fas fa-gift mr-3"></i>
+            🎉 Prueba Gratis 30 Días
           </a>
-          <a href="#plans" class="px-12 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold rounded-full text-xl border-2 border-purple-400 hover:border-pink-400 transition-all">
-            <i class="fas fa-dollar-sign mr-3"></i>
-            💰 Ver Precios
+          <a href="#plans" class="px-12 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold rounded-full text-xl border-2 border-purple-400 hover:border-pink-400 transition-all transform hover:scale-105 shadow-2xl">
+            <i class="fas fa-credit-card mr-3"></i>
+            💳 Suscribirse Ahora
           </a>
+        </div>
+
+        <!-- Información destacada -->
+        <div class="fade-in-up delay-400 mt-8">
+          <div class="glass-card max-w-4xl mx-auto text-center">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div class="flex items-center justify-center space-x-4">
+                <i class="fas fa-shield-alt text-4xl text-lime-400"></i>
+                <div class="text-left">
+                  <h3 class="text-xl font-bold text-cyan-300">Sin Compromiso</h3>
+                  <p class="text-gray-300">30 días gratis • Sin tarjeta de crédito • Cancela cuando quieras</p>
+                </div>
+              </div>
+              <div class="flex items-center justify-center space-x-4">
+                <i class="fas fa-rocket text-4xl text-purple-400"></i>
+                <div class="text-left">
+                  <h3 class="text-xl font-bold text-purple-300">Acceso Completo</h3>
+                  <p class="text-gray-300">Todas las funciones • Soporte 24/7 • Actualizaciones incluidas</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Estadísticas impresionantes -->
@@ -499,12 +521,20 @@
           <p class="text-xl text-gray-300 max-w-3xl mx-auto mb-6">
             Desde talleres pequeños hasta grandes operaciones. Precios en pesos chilenos para mayor claridad y transparencia.
           </p>
-          <div class="glass-card max-w-2xl mx-auto">
-            <div class="flex items-center justify-center space-x-4">
-              <i class="fas fa-gift text-4xl text-lime-400"></i>
-              <div>
-                <p class="text-2xl font-bold text-cyan-200">🎉 ¡30 días de prueba GRATIS!</p>
-                <p class="text-gray-300">Sin compromiso • Sin tarjeta de crédito • Acceso completo</p>
+          <div class="glass-card max-w-3xl mx-auto border-2 border-lime-400/50">
+            <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-8">
+              <i class="fas fa-gift text-6xl text-lime-400 animate-bounce"></i>
+              <div class="text-center md:text-left">
+                <p class="text-3xl font-bold text-cyan-200 mb-2">🎉 ¡30 días de prueba GRATIS!</p>
+                <p class="text-xl text-gray-300 mb-4">Sin compromiso • Sin tarjeta de crédito • Acceso completo</p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                  <a href="/registro/" class="px-6 py-3 bg-gradient-to-r from-lime-400 to-cyan-400 text-black font-bold rounded-lg hover:from-lime-300 hover:to-cyan-300 transition-all transform hover:scale-105">
+                    <i class="fas fa-rocket mr-2"></i>Iniciar Prueba Gratis
+                  </a>
+                  <a href="#plans" class="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold rounded-lg hover:from-purple-400 hover:to-pink-400 transition-all transform hover:scale-105">
+                    <i class="fas fa-credit-card mr-2"></i>Ver Planes de Pago
+                  </a>
+                </div>
               </div>
             </div>
           </div>

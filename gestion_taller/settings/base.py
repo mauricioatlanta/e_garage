@@ -171,15 +171,15 @@ LOGIN_URL = "/accounts/login/"
 # Adaptador personalizado para redirección según país
 ACCOUNT_ADAPTER = "taller.views_extra.account_adapter.CountryAwareAccountAdapter"
 
-# Email backend
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "mail.atlantareciclajes.cl"
+# Email backend - Usando backend personalizado para evitar errores SMTP
+EMAIL_BACKEND = "taller.backends.egarage_email.EgarageEmailBackend"
+EMAIL_HOST = "srv24.cpanelhost.cl"
 EMAIL_PORT = 465
 EMAIL_USE_SSL = True
 EMAIL_USE_TLS = False
-EMAIL_HOST_USER = "suscripcion@atlantareciclajes.cl"
-EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_PASSWORD", ",*naHZ0xIFO")
-DEFAULT_FROM_EMAIL = "eGarage <suscripcion@atlantareciclajes.cl>"
+EMAIL_HOST_USER = "subcription@egarage.cl"
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_PASSWORD", "tu_contraseña_aqui")
+DEFAULT_FROM_EMAIL = "eGarage <subcription@egarage.cl>"
 
 # Logging útil (errores reales)
 if SAFE_MODE:

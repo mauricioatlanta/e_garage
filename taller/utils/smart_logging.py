@@ -169,7 +169,7 @@ smart_logger = SmartLogger()
 # Función de utilidad para obtener IP del request
 def get_client_ip(request):
     """Obtiene la IP real del cliente"""
-    x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+    x_forwarded_for = request.headers.get("x-forwarded-for")
     if x_forwarded_for:
         ip = x_forwarded_for.split(",")[0]
     else:
@@ -180,7 +180,7 @@ def get_client_ip(request):
 # Función de utilidad para obtener User Agent
 def get_user_agent(request):
     """Obtiene el User Agent del request"""
-    return request.META.get("HTTP_USER_AGENT", "Unknown")
+    return request.headers.get("user-agent", "Unknown")
 
 
 # Decorador para logging automático de vistas

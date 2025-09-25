@@ -1,0 +1,46 @@
+repos:
+  - repo: https://github.com/psf/black
+    rev: 24.8.0
+    hooks:
+      - id: black
+        language_version: python3
+        exclude: |
+          (?x)
+          ^(_disabled_templates|templates_final|templates_new|deploy_pythonanywhere|actualizacion_pythonanywhere|frontend/public|reports)/
+          | \. (html|htm|txt) \. py$
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        exclude: |
+          (?x)
+          ^(_disabled_templates|templates_final|templates_new|deploy_pythonanywhere|actualizacion_pythonanywhere|frontend/public|reports)/
+          | \. (html|htm|txt) \. py$
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.9
+    hooks:
+      - id: ruff
+        args: [--fix]
+        exclude: |
+          (?x)
+          ^(_disabled_templates|templates_final|templates_new|deploy_pythonanywhere|actualizacion_pythonanywhere|frontend/public|reports)/
+          | \. (html|htm|txt) \. py$
+  - repo: https://github.com/Riverside-Healthcare/djLint
+    rev: v1.34.1
+    hooks:
+      - id: djlint-django
+        name: djLint (Django templates)
+        files: ^templates/|^taller/.*templates/|^templates_final/|^templates_new/
+        exclude: |
+          (?x)
+          ^(_disabled_templates|reports)/
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v4.0.0-alpha.8
+    hooks:
+      - id: prettier
+        files: \. (js|jsx|ts|tsx|css|scss|md|json|yml|yaml)$
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: end-of-file-fixer
+      - id: trailing-whitespace

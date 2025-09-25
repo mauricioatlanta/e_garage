@@ -7,6 +7,7 @@ Configurar el sistema con credenciales reales para pruebas:
 - Email: mauricioatlanta@gmail.com
 - WhatsApp: +56963607348
 """
+
 import os
 
 import django

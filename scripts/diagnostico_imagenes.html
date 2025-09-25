@@ -41,7 +41,7 @@
         <h1 class="text-3xl font-bold mb-8 text-center text-cyan-300">
             🔍 Diagnóstico Completo - Subida de Imágenes
         </h1>
-        
+
         <div class="max-w-4xl mx-auto">
             <!-- Problema Reportado -->
             <div class="bg-red-900 border border-red-600 p-4 rounded-lg mb-6">
@@ -51,25 +51,25 @@
                 </p>
                 <p class="text-red-200 mt-2">El logo no se carga y sigue mostrando el ícono de cámara.</p>
             </div>
-            
+
             <!-- Formulario de Prueba -->
             <div class="bg-gray-900 p-8 rounded-lg border border-gray-700 mb-6">
                 <h2 class="text-xl font-bold text-cyan-300 mb-4">🧪 Prueba de Subida</h2>
-                
+
                 <form id="test-form" enctype="multipart/form-data" class="space-y-6">
                     <div>
                         <label class="block text-cyan-300 mb-2 font-semibold" for="logo">
                             🖼️ Selecciona tu archivo problemático:
                         </label>
-                        <input 
-                            type="file" 
-                            id="logo" 
+                        <input
+                            type="file"
+                            id="logo"
                             name="logo"
                             accept="image/*"
                             class="futuristic-input w-full"
                         >
                     </div>
-                    
+
                     <!-- Vista previa -->
                     <div id="image-preview-container" class="hidden">
                         <h3 class="text-green-300 font-bold mb-2">✅ Vista Previa:</h3>
@@ -84,13 +84,13 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <button type="submit" class="bg-gradient-to-r from-cyan-500 to-blue-500 px-6 py-3 rounded-lg font-semibold hover:from-cyan-600 hover:to-blue-600 transition-all duration-300 w-full">
                         📤 Simular Envío del Formulario
                     </button>
                 </form>
             </div>
-            
+
             <!-- Log de Depuración -->
             <div class="bg-gray-800 rounded-lg border border-gray-600">
                 <h2 class="text-xl font-bold text-yellow-300 p-4 border-b border-gray-600">📝 Log de Depuración:</h2>
@@ -98,7 +98,7 @@
                     <p>⏳ Esperando selección de archivo...</p>
                 </div>
             </div>
-            
+
             <!-- Análisis de Problemas Comunes -->
             <div class="bg-gray-800 p-6 rounded-lg border border-gray-600 mt-6">
                 <h3 class="text-xl font-bold text-orange-300 mb-4">🔧 Análisis de Problemas Comunes:</h3>
@@ -128,7 +128,7 @@
 
     <script>
         let debugLog = document.getElementById('debug-log');
-        
+
         function log(message, type = 'info') {
             const colors = {
                 'info': 'text-green-300',
@@ -136,12 +136,12 @@
                 'error': 'text-red-300',
                 'success': 'text-blue-300'
             };
-            
+
             const timestamp = new Date().toLocaleTimeString();
             debugLog.innerHTML += `<p class="${colors[type]}">[${timestamp}] ${message}</p>`;
             debugLog.scrollTop = debugLog.scrollHeight;
         }
-        
+
         document.addEventListener('DOMContentLoaded', function() {
             const logoInput = document.getElementById('logo');
             const previewContainer = document.getElementById('image-preview-container');
@@ -151,34 +151,34 @@
             const fileType = document.getElementById('file-type');
             const fileDate = document.getElementById('file-date');
             const testForm = document.getElementById('test-form');
-            
+
             log('🚀 Sistema de diagnóstico iniciado');
-            
+
             logoInput.addEventListener('change', function(e) {
                 log('🔄 Evento change disparado', 'info');
-                
+
                 const file = e.target.files[0];
                 const inputValue = e.target.value;
-                
+
                 log(`📂 Files en input: ${e.target.files.length}`, 'info');
                 log(`📂 Valor del input: "${inputValue}"`, 'info');
-                
+
                 if (file) {
                     log('🖼️ ARCHIVO DETECTADO:', 'success');
                     log(`  📁 Nombre: "${file.name}"`, 'info');
                     log(`  📏 Tamaño: ${file.size} bytes (${(file.size/1024).toFixed(2)} KB)`, 'info');
                     log(`  🔍 Tipo MIME: "${file.type}"`, 'info');
                     log(`  📅 Última modificación: ${new Date(file.lastModified).toLocaleString()}`, 'info');
-                    
+
                     // Análisis del nombre del archivo
                     const hasSpaces = file.name.includes(' ');
                     const hasSpecialChars = /[^a-zA-Z0-9.-]/.test(file.name);
                     const hasExtension = file.name.includes('.');
-                    
+
                     if (hasSpaces) log('⚠️ PROBLEMA: El nombre contiene espacios', 'warn');
                     if (hasSpecialChars) log('⚠️ PROBLEMA: El nombre contiene caracteres especiales', 'warn');
                     if (!hasExtension) log('⚠️ PROBLEMA: El archivo no tiene extensión', 'warn');
-                    
+
                     // Validaciones
                     if (file.size === 0) {
                         log('❌ ERROR: El archivo está vacío', 'error');
@@ -186,27 +186,27 @@
                         previewContainer.classList.add('hidden');
                         return;
                     }
-                    
+
                     if (file.size > 5 * 1024 * 1024) {
                         log('❌ ERROR: Archivo muy grande (>5MB)', 'error');
                         logoInput.value = '';
                         previewContainer.classList.add('hidden');
                         return;
                     }
-                    
+
                     if (!file.type.startsWith('image/')) {
                         log('❌ ERROR: No es un archivo de imagen', 'error');
                         logoInput.value = '';
                         previewContainer.classList.add('hidden');
                         return;
                     }
-                    
+
                     // Mostrar información
                     fileName.textContent = file.name;
                     fileSize.textContent = (file.size / 1024).toFixed(1) + ' KB';
                     fileType.textContent = file.type;
                     fileDate.textContent = new Date(file.lastModified).toLocaleString();
-                    
+
                     // Crear vista previa
                     const reader = new FileReader();
                     reader.onload = function(e) {
@@ -214,26 +214,26 @@
                         previewContainer.classList.remove('hidden');
                         log('✅ Vista previa cargada correctamente', 'success');
                     };
-                    
+
                     reader.onerror = function() {
                         log('❌ ERROR: No se pudo leer el archivo', 'error');
                     };
-                    
+
                     reader.readAsDataURL(file);
                     log('📖 Leyendo archivo para vista previa...', 'info');
-                    
+
                 } else {
                     log('❌ No se seleccionó ningún archivo', 'warn');
                     previewContainer.classList.add('hidden');
                 }
             });
-            
+
             // Test de envío del formulario
             testForm.addEventListener('submit', function(e) {
                 e.preventDefault();
-                
+
                 log('📤 SIMULANDO ENVÍO DEL FORMULARIO:', 'success');
-                
+
                 const formData = new FormData(testForm);
                 for (let [key, value] of formData.entries()) {
                     if (value instanceof File) {
@@ -242,7 +242,7 @@
                         log(`  ${key}: ${value}`, 'info');
                     }
                 }
-                
+
                 const logoFile = formData.get('logo');
                 if (logoFile && logoFile.size > 0) {
                     log('✅ ÉXITO: El archivo se incluiría en el envío', 'success');

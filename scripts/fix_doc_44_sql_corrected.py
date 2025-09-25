@@ -38,7 +38,7 @@ def agregar_servicios_documento_44():
     for i, (servicio_id, nombre) in enumerate(servicios, 1):
         cursor.execute(
             """
-            INSERT INTO taller_lineaservicio 
+            INSERT INTO taller_lineaservicio
             (nombre, cantidad, precio_unitario, descuento, observaciones, documento_id, servicio_id)
             VALUES (?, ?, ?, ?, ?, ?, ?)
         """,
@@ -63,7 +63,7 @@ def agregar_servicios_documento_44():
     for nombre, cantidad, precio in otros_servicios:
         cursor.execute(
             """
-            INSERT INTO taller_lineaotroservicio 
+            INSERT INTO taller_lineaotroservicio
             (nombre, cantidad, precio_unitario, descuento, observaciones, documento_id)
             VALUES (?, ?, ?, ?, ?, ?)
         """,

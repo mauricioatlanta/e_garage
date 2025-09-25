@@ -5,6 +5,12 @@ from .modelo import Modelo
 
 class ColorVehiculo(models.Model):
     nombre = models.CharField(max_length=50, unique=True)
+    hex = models.CharField(
+        max_length=7,
+        blank=True,
+        null=True,
+        help_text="Código de color hexadecimal (#FF0000)",
+    )
     # TEMPORAL: Campo country comentado hasta aplicar migración
     # country = models.CharField(
     #     max_length=2,

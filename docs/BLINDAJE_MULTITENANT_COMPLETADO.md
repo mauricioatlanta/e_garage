@@ -14,7 +14,7 @@
 - ✅ Blindaje obligatorio en `form_valid()`: asigna empresa automáticamente
 - ✅ Verificación de autenticación y empresa obligatoria
 
-**Archivo**: `core/models.py` 
+**Archivo**: `core/models.py`
 - ✅ TenantQuerySet con método `for_company()`
 - ✅ TenantManager mejorado con `for_request()` y `for_tenant()`
 - ✅ Soporte para filtros por empresa desde el request
@@ -23,7 +23,7 @@
 
 **Archivo**: `taller/clientes/views.py`
 - ✅ `ajax_buscar_clientes()`: filtro obligatorio por empresa
-- ✅ `clientes_stats()`: filtro obligatorio por empresa  
+- ✅ `clientes_stats()`: filtro obligatorio por empresa
 - ✅ `eliminar_cliente()`: verificación de empresa del usuario
 
 **Archivo**: `taller/vehiculos/views.py` ⭐ **CRÍTICO CORREGIDO**
@@ -67,7 +67,7 @@
 
 **Archivo**: `tests/test_tenant_isolation.py`
 - ✅ Tests para aislamiento de clientes
-- ✅ Tests para aislamiento de vehículos  
+- ✅ Tests para aislamiento de vehículos
 - ✅ Tests para autocompletados
 - ✅ Tests para formularios que asignan empresa
 - ✅ Tests para acceso cross-tenant bloqueado
@@ -79,11 +79,11 @@
 def get_queryset(self):
     if not self.request.user.is_authenticated:
         return self.model.objects.none()
-    
+
     empresa = getattr(self.request.user, 'empresa', None)
     if not empresa:
         return self.model.objects.none()
-    
+
     return self.model.objects.filter(empresa=empresa)
 ```
 
@@ -96,7 +96,7 @@ def get_queryset(self):
     empresa = getattr(self.request.user, 'empresa', None)
     if not empresa:
         return Modelo.objects.none()
-        
+
     qs = Modelo.objects.filter(empresa=empresa)
     # filtros adicionales...
     return qs
@@ -106,10 +106,10 @@ def get_queryset(self):
 ```python
 def save(self, commit=True):
     obj = super().save(commit=False)
-    
+
     if self.empresa and not obj.empresa_id:
         obj.empresa = self.empresa
-    
+
     if commit:
         obj.save()
     return obj
@@ -120,11 +120,11 @@ def save(self, commit=True):
 def ajax_endpoint(request):
     if not request.user.is_authenticated:
         return JsonResponse([], safe=False)
-    
+
     empresa = getattr(request.user, 'empresa', None)
     if not empresa:
         return JsonResponse([], safe=False)
-    
+
     datos = Modelo.objects.filter(empresa=empresa)
     # procesar datos...
 ```
@@ -177,7 +177,7 @@ def ajax_endpoint(request):
 
 - **Cobertura de filtros**: 100% en vistas críticas
 - **Autocompletados seguros**: 100%
-- **Formularios seguros**: 100% 
+- **Formularios seguros**: 100%
 - **AJAX endpoints seguros**: 100%
 - **Tests de regresión**: Implementados
 
@@ -211,7 +211,7 @@ def ajax_endpoint(request):
 ## 🎯 ESTADO FINAL
 
 ✅ **BLINDAJE MULTI-TENANT**: COMPLETADO
-✅ **SEPARACIÓN CL/US**: OPERACIONAL  
+✅ **SEPARACIÓN CL/US**: OPERACIONAL
 ✅ **TESTS AUTOMÁTICOS**: IMPLEMENTADOS
 ✅ **AUDITORÍA**: DISPONIBLE
 ✅ **DOCUMENTACIÓN**: COMPLETA

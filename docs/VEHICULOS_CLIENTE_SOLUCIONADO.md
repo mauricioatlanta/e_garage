@@ -12,11 +12,11 @@ El JavaScript en el template `crear_documento.html` solo estaba mostrando/oculta
 ```javascript
 $cliente.on('change', function () {
     const clienteId = $(this).val();
-    
+
     // Solo limpiaba y mostraba/ocultaba el selector
     $vehiculo.val(null).trigger('change');
     $vehiculo.empty();
-    
+
     if (clienteId) {
         $vehiculoWrapper.removeClass('hidden');  // Solo mostraba
     } else {
@@ -41,27 +41,27 @@ La API `api_vehiculos_cliente` ya existía y funcionaba correctamente:
 $cliente.on('change', function () {
     const clienteId = $(this).val();
     console.log('Cliente cambiado a:', clienteId);
-    
+
     // Limpiar selección de vehículo
     $vehiculo.val(null).trigger('change');
     $vehiculo.empty();
-    
+
     if (clienteId) {
         $vehiculoWrapper.removeClass('hidden');
         console.log('Mostrando selector de vehículos y cargando lista...');
-        
+
         // ✅ NUEVA FUNCIONALIDAD: Cargar vehículos del cliente
         const countryPrefix = window.location.pathname.startsWith('/us/') ? 'us' : 'cl';
         const apiUrl = `/${countryPrefix}/documentos/api/vehiculos-cliente/?cliente_id=${clienteId}`;
-        
+
         $.get(apiUrl)
             .done(function(data) {
                 console.log('Vehículos recibidos:', data);
-                
+
                 // Poblar el selector con los vehículos
                 $vehiculo.empty();
                 $vehiculo.append('<option value="">Seleccione un vehículo</option>');
-                
+
                 if (data.vehiculos && data.vehiculos.length > 0) {
                     data.vehiculos.forEach(function(vehiculo) {
                         const texto = `${vehiculo.patente} - ${vehiculo.marca} ${vehiculo.modelo} (${vehiculo.anio})`;
@@ -109,7 +109,7 @@ La solución funciona para ambos países:
 
 1. **Usuario abre**: Página de crear documento
 2. **Usuario selecciona**: Cliente del dropdown
-3. **Sistema automáticamente**: 
+3. **Sistema automáticamente**:
    - Muestra el selector de vehículos
    - Carga vehículos del cliente via API
    - Poblá el dropdown con opciones

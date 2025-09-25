@@ -35,7 +35,7 @@ def main():
             # Agregar la columna manualmente con SQL
             cursor.execute(
                 """
-                ALTER TABLE taller_colorvehiculo 
+                ALTER TABLE taller_colorvehiculo
                 ADD COLUMN country VARCHAR(2) DEFAULT 'CL';
             """
             )
@@ -63,8 +63,8 @@ def main():
             for color in colores_español:
                 cursor.execute(
                     """
-                    UPDATE taller_colorvehiculo 
-                    SET country = 'CL' 
+                    UPDATE taller_colorvehiculo
+                    SET country = 'CL'
                     WHERE nombre = ?;
                 """,
                     [color],
@@ -86,8 +86,8 @@ def main():
             for color in colores_inglés:
                 cursor.execute(
                     """
-                    UPDATE taller_colorvehiculo 
-                    SET country = 'US' 
+                    UPDATE taller_colorvehiculo
+                    SET country = 'US'
                     WHERE nombre = ?;
                 """,
                     [color],

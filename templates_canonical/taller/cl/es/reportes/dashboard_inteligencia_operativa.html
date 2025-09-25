@@ -12,7 +12,7 @@
     font-family: 'Orbitron', sans-serif;
     overflow-x: hidden;
   }
-  
+
   /* 🚀 Contenedor principal futurista */
   .intelligence-hub {
     background: rgba(10, 10, 30, 0.85);
@@ -25,7 +25,7 @@
     position: relative;
     overflow: hidden;
   }
-  
+
   .intelligence-hub::before {
     content: '';
     position: absolute;
@@ -37,11 +37,11 @@
     animation: rotate 20s linear infinite;
     z-index: -1;
   }
-  
+
   @keyframes rotate {
     100% { transform: rotate(360deg); }
   }
-  
+
   /* 🧠 KPI Cards futuristas */
   .kpi-card {
     background: rgba(15, 15, 40, 0.9);
@@ -54,13 +54,13 @@
     transition: all 0.3s ease;
     cursor: pointer;
   }
-  
+
   .kpi-card:hover {
     transform: translateY(-8px) scale(1.02);
     box-shadow: 0 20px 40px rgba(0, 255, 255, 0.3);
     border-color: rgba(0, 255, 255, 0.8);
   }
-  
+
   .kpi-value {
     font-size: 2.5rem;
     font-weight: 800;
@@ -71,7 +71,7 @@
     font-family: 'Orbitron', sans-serif;
     text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
   }
-  
+
   .kpi-label {
     color: rgba(255, 255, 255, 0.8);
     font-size: 0.9rem;
@@ -79,7 +79,7 @@
     letter-spacing: 1px;
     margin-top: 0.5rem;
   }
-  
+
   .kpi-trend {
     display: flex;
     align-items: center;
@@ -87,11 +87,11 @@
     margin-top: 0.5rem;
     font-size: 0.8rem;
   }
-  
+
   .trend-up { color: #00ff88; }
   .trend-down { color: #ff4444; }
   .trend-neutral { color: #ffaa00; }
-  
+
   /* 📊 Gráficos modernos */
   .chart-container {
     background: rgba(10, 10, 30, 0.8);
@@ -100,7 +100,7 @@
     border: 1px solid rgba(0, 255, 255, 0.2);
     position: relative;
   }
-  
+
   .chart-title {
     color: #00ffff;
     font-size: 1.2rem;
@@ -109,7 +109,7 @@
     margin-bottom: 1rem;
     text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
   }
-  
+
   /* 🔔 Panel de alertas */
   .alerts-panel {
     background: rgba(20, 20, 50, 0.9);
@@ -118,7 +118,7 @@
     padding: 1.5rem;
     margin: 1rem 0;
   }
-  
+
   .alert-item {
     display: flex;
     align-items: center;
@@ -128,12 +128,12 @@
     border-radius: 8px;
     border-left: 3px solid #ff6b6b;
   }
-  
+
   .alert-icon {
     font-size: 1.5rem;
     margin-right: 1rem;
   }
-  
+
   /* 📥 Botones de acción futuristas */
   .action-btn {
     background: linear-gradient(45deg, #0080ff, #00ffff);
@@ -149,13 +149,13 @@
     letter-spacing: 1px;
     box-shadow: 0 4px 15px rgba(0, 128, 255, 0.3);
   }
-  
+
   .action-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(0, 255, 255, 0.4);
     background: linear-gradient(45deg, #00ffff, #0080ff);
   }
-  
+
   /* 🎖️ Medallas y gamificación */
   .achievement-badge {
     display: inline-flex;
@@ -169,7 +169,7 @@
     margin: 0.2rem;
     box-shadow: 0 2px 10px rgba(255, 215, 0, 0.3);
   }
-  
+
   /* 📈 Predicciones IA */
   .ai-prediction {
     background: linear-gradient(135deg, rgba(0, 255, 0, 0.1), rgba(0, 255, 255, 0.1));
@@ -179,7 +179,7 @@
     margin: 1rem 0;
     text-align: center;
   }
-  
+
   .ai-prediction-title {
     color: #00ff88;
     font-weight: 600;
@@ -188,13 +188,13 @@
     align-items: center;
     justify-content: center;
   }
-  
+
   .ai-prediction-value {
     font-size: 1.3rem;
     color: #00ffff;
     font-weight: 700;
   }
-  
+
   /* 🗓️ Mapa térmico */
   .heatmap-container {
     display: grid;
@@ -202,7 +202,7 @@
     gap: 2px;
     margin: 1rem 0;
   }
-  
+
   .heatmap-day {
     aspect-ratio: 1;
     border-radius: 4px;
@@ -214,58 +214,58 @@
     cursor: pointer;
     transition: all 0.2s ease;
   }
-  
+
   .heat-low { background: rgba(0, 255, 255, 0.1); }
   .heat-medium { background: rgba(0, 255, 255, 0.3); }
   .heat-high { background: rgba(0, 255, 255, 0.6); }
   .heat-very-high { background: rgba(0, 255, 255, 0.9); color: #000; }
-  
+
   .heatmap-day:hover {
     transform: scale(1.1);
     z-index: 10;
   }
-  
+
   /* ⚡ Animaciones */
   .pulse-glow {
     animation: pulseGlow 2s ease-in-out infinite alternate;
   }
-  
+
   @keyframes pulseGlow {
     from { box-shadow: 0 0 20px rgba(0, 255, 255, 0.3); }
     to { box-shadow: 0 0 30px rgba(0, 255, 255, 0.6); }
   }
-  
+
   /* 📱 Responsive */
   @media (max-width: 768px) {
-    .intelligence-hub { 
-      padding: 1rem; 
-      margin: 0.5rem; 
+    .intelligence-hub {
+      padding: 1rem;
+      margin: 0.5rem;
       border-radius: 16px;
     }
-    
-    .kpi-value { 
-      font-size: 1.8rem; 
+
+    .kpi-value {
+      font-size: 1.8rem;
     }
-    
+
     .kpi-label {
       font-size: 0.8rem;
     }
-    
+
     .chart-container {
       padding: 1rem;
     }
-    
+
     .chart-title {
       font-size: 1rem;
       margin-bottom: 0.5rem;
     }
-    
+
     .action-btn {
       padding: 0.6rem 1rem;
       font-size: 0.9rem;
       border-radius: 8px;
     }
-    
+
     h1.text-5xl {
       font-size: 2.5rem !important;
       line-height: 1.2;
@@ -282,7 +282,7 @@
       🚀 Centro de Inteligencia Operativa
     </h1>
     <p class="text-xl text-gray-300">Dashboard Futurista 360° - Análisis Predictivo en Tiempo Real</p>
-    
+
     <!-- 🎖️ Medallas de Achievement -->
     <div class="mt-4">
       <span class="achievement-badge">🔥 Taller en Crecimiento</span>
@@ -295,7 +295,7 @@
   <div class="intelligence-hub">
     <h2 class="chart-title mb-6">📊 Indicadores Clave de Rendimiento (KPIs)</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      
+
       <div class="kpi-card pulse-glow">
         <div class="kpi-value">${{ facturacion_total|floatformat:0|intcomma }}</div>
         <div class="kpi-label">Facturación Total</div>
@@ -303,7 +303,7 @@
           <span>📈 +12% vs mes anterior</span>
         </div>
       </div>
-      
+
       <div class="kpi-card">
         <div class="kpi-value">{{ clientes_activos_porcentaje }}%</div>
         <div class="kpi-label">Retorno de Clientes</div>
@@ -311,7 +311,7 @@
           <span>📈 +5% esta semana</span>
         </div>
       </div>
-      
+
       <div class="kpi-card">
         <div class="kpi-value">${{ ticket_promedio|floatformat:0|intcomma }}</div>
         <div class="kpi-label">Ticket Promedio</div>
@@ -319,7 +319,7 @@
           <span>➡️ Estable</span>
         </div>
       </div>
-      
+
       <div class="kpi-card">
         <div class="kpi-value">${{ ingresos_por_hora|floatformat:0|intcomma }}</div>
         <div class="kpi-label">Ingresos/Hora</div>
@@ -327,7 +327,7 @@
           <span>📈 +8% eficiencia</span>
         </div>
       </div>
-      
+
       <div class="kpi-card">
         <div class="kpi-value">{{ margen_promedio }}%</div>
         <div class="kpi-label">Margen Promedio</div>
@@ -335,7 +335,7 @@
           <span>📈 Excelente rentabilidad</span>
         </div>
       </div>
-      
+
       <div class="kpi-card">
         <div class="kpi-value">{{ vehiculos_por_semana }}</div>
         <div class="kpi-label">Vehículos/Semana</div>
@@ -343,7 +343,7 @@
           <span>📈 +15% capacidad</span>
         </div>
       </div>
-      
+
       <div class="kpi-card">
         <div class="kpi-value">{{ total_documentos }}</div>
         <div class="kpi-label">Total Documentos</div>
@@ -351,7 +351,7 @@
           <span>📄 Actividad alta</span>
         </div>
       </div>
-      
+
       <div class="kpi-card">
         <div class="kpi-value">{{ satisfaccion_cliente }}⭐</div>
         <div class="kpi-label">Satisfacción Cliente</div>
@@ -379,13 +379,13 @@
 
   <!-- 📊 Gráficos Interactivos -->
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-    
+
     <!-- Facturación Mensual -->
     <div class="chart-container">
       <div class="chart-title">📈 Facturación Mensual Comparativa</div>
       <canvas id="facturacionChart" width="400" height="250"></canvas>
     </div>
-    
+
     <!-- Top Servicios -->
     <div class="chart-container">
       <div class="chart-title">🔧 Top Servicios Más Demandados</div>
@@ -408,12 +408,12 @@
       <div class="text-center text-xs text-gray-400">V</div>
       <div class="text-center text-xs text-gray-400">S</div>
       <div class="text-center text-xs text-gray-400">D</div>
-      
+
       {% for semana in servicios_por_dia|slice:":28" %}
         {% if forloop.counter0|divisibleby:7 %}
           <!-- Nueva semana -->
         {% endif %}
-        <div class="heatmap-day heat-{% if semana.servicios <= 4 %}low{% elif semana.servicios <= 9 %}medium{% elif semana.servicios <= 14 %}high{% else %}very-high{% endif %}" 
+        <div class="heatmap-day heat-{% if semana.servicios <= 4 %}low{% elif semana.servicios <= 9 %}medium{% elif semana.servicios <= 14 %}high{% else %}very-high{% endif %}"
              title="{{ semana.fecha }}: {{ semana.servicios }} servicios">
           {{ semana.servicios }}
         </div>
@@ -430,7 +430,7 @@
   <!-- 🔔 Panel de Alertas y Oportunidades -->
   <div class="alerts-panel">
     <h3 class="text-xl font-bold text-red-400 mb-4">🔔 Alertas y Oportunidades</h3>
-    
+
     <div class="alert-item">
       <span class="alert-icon">⚠️</span>
       <div>
@@ -438,7 +438,7 @@
         <br><span class="text-sm text-gray-400">Considera enviar una promoción de mantenimiento</span>
       </div>
     </div>
-    
+
     <div class="alert-item">
       <span class="alert-icon">💡</span>
       <div>
@@ -446,7 +446,7 @@
         <br><span class="text-sm text-gray-400">Oportunidad: optimizar capacidad operativa</span>
       </div>
     </div>
-    
+
     <div class="alert-item">
       <span class="alert-icon">🎯</span>
       <div>
@@ -460,19 +460,19 @@
   <div class="intelligence-hub">
     <h3 class="chart-title mb-6">📥 Reportes Descargables Inteligentes</h3>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      
+
       <button class="action-btn" onclick="window.location.href='/reportes/diagnostico/'">
         🤖 Diagnóstico IA
       </button>
-      
+
       <button class="action-btn" onclick="exportarGrafico()">
         📊 Exportar Gráficos
       </button>
-      
+
       <button class="action-btn" onclick="generarInforme()">
         📄 Informe PDF
       </button>
-      
+
       <button class="action-btn" onclick="window.location.href='/reportes/'">
         📈 Dashboard Principal
       </button>
@@ -482,7 +482,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  
+
   // 📈 Gráfico de Facturación Mensual
   const facturacionCtx = document.getElementById('facturacionChart').getContext('2d');
   new Chart(facturacionCtx, {
@@ -516,8 +516,8 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         y: {
           grid: { color: 'rgba(0, 255, 255, 0.1)' },
-          ticks: { 
-            color: '#00ffff', 
+          ticks: {
+            color: '#00ffff',
             font: { family: 'Orbitron' },
             callback: function(value) {
               return '$' + (value / 1000000).toFixed(1) + 'M';
@@ -531,7 +531,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
   });
-  
+
   // 🔧 Gráfico de Servicios
   const serviciosCtx = document.getElementById('serviciosChart').getContext('2d');
   new Chart(serviciosCtx, {

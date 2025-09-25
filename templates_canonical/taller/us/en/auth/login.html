@@ -31,12 +31,12 @@ document.addEventListener("DOMContentLoaded", () => {
   <div class="premium-card w-full max-w-md p-8 mt-24">
     <div class="flex flex-col items-center justify-center mb-8">
       <div class="flex items-center justify-center gap-4 mb-4">
-        <img src="{% static 'img/TallerPro_logo.png' %}" alt="E-Garage Logo" class="w-40 h-40 shadow-2xl border-4 border-cyan-400 bg-[#181c1f]">
+        <img src="{% static 'img/TallerPro_logo.png' %}" alt="E-Garage Logo" class="w-14 h-14 shadow-lg border-2 border-cyan-400 bg-[#181c1f] rounded-lg" style="width: 56px !important; height: 56px !important;">
         <!-- Bandera según el país -->
         {% if request.current_country == 'chile' %}
-        <div class="text-6xl animate-bounce">🇨🇱</div>
+        <div class="text-4xl animate-bounce">🇨🇱</div>
         {% elif request.current_country == 'usa' %}
-        <div class="text-6xl animate-bounce">��</div>
+        <div class="text-4xl animate-bounce">��</div>
         {% endif %}
       </div>
       <span class="block text-4xl font-extrabold text-cyan-300 tracking-widest text-center">E-Garage</span>

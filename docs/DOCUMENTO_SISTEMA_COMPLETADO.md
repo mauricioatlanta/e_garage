@@ -49,7 +49,7 @@ Doc 43 (PRES): MILLAS=85000, #REP=1, #SERV=1, #OTROS=1, TOTAL=$58.50
 
 #### Etiquetas Dinámicas:
 - **US + Español**: "Millas"
-- **US + English**: "Miles"  
+- **US + English**: "Miles"
 - **CL + Ambos**: "Kilometraje"
 
 ### 🔧 ARCHIVOS MODIFICADOS
@@ -97,7 +97,7 @@ CL + en: Kilometraje ✅
 
 El sistema de documentos E-Garage está completamente funcional con:
 - ✅ Conteos exactos de items por documento
-- ✅ Formateo de moneda por país 
+- ✅ Formateo de moneda por país
 - ✅ Internacionalización completa
 - ✅ Base de datos actualizada
 - ✅ Templates optimizados

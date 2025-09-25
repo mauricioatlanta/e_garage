@@ -4,7 +4,7 @@
 
 ### 🔍 **Problemas Identificados:**
 
-1. **❌ Error en API (`api.py`)**: 
+1. **❌ Error en API (`api.py`)**:
    - **Línea 21**: `data = [{'id': m['modelo'], 'nombre': m['modelo']} for m in modelos]`
    - **Problema**: Trataba `m` como diccionario cuando `get_modelos_por_marca()` retorna strings
 
@@ -94,7 +94,7 @@ País empresa: US
 
 ### **🌟 Funcionalidad Esperada:**
 - 🇺🇸 Bandera USA visible
-- 📝 Campos "Brand (USA)" y "Model (USA)" 
+- 📝 Campos "Brand (USA)" y "Model (USA)"
 - 🔎 Select2 con 391 marcas disponibles
 - ⚡ Carga dinámica de modelos al seleccionar marca
 - 🎯 Debug info: `[DEBUG country: US]`

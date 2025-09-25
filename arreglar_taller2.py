@@ -2,6 +2,7 @@
 """
 Script para diagnosticar y arreglar el usuario taller2
 """
+
 import os
 
 import django

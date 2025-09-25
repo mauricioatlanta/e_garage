@@ -2,8 +2,7 @@ from datetime import date, datetime, timedelta
 from decimal import Decimal
 
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.db.models import Count, F, Q, Sum, DecimalField, Value, ExpressionWrapper
+from django.db.models import Count, DecimalField, ExpressionWrapper, F, Q, Sum, Value
 from django.db.models.functions import Coalesce
 from django.shortcuts import redirect
 from django.utils import timezone
@@ -11,10 +10,30 @@ from django.utils import timezone
 from taller.auth.decorators import login_required_default
 from taller.models.clientes import Cliente
 from taller.models.documento import Documento
-from taller.models.empresa import Empresa
-from taller.models.lineas_documento import LineaServicio, LineaRepuesto
+from taller.models.lineas_documento import LineaRepuesto, LineaServicio
 from taller.models.tecnico import Tecnico
 from taller.models.vehiculos import Vehiculo
+
+# --- CONSTANTS ---
+SUBTOTAL_EXPR = ExpressionWrapper(
+    F("precio_unitario") * F("cantidad"),
+    output_field=DecimalField(max_digits=14, decimal_places=2),
+)
+
+ZERO_DEC = Value(
+    Decimal("0.00"), output_field=DecimalField(max_digits=14, decimal_places=2)
+)
+
+
+# --- HELPER FUNCTIONS ---
+def total_servicios(qs_base):
+    """Calcula el total de servicios usando subtotal (precio * cantidad)"""
+    return qs_base.aggregate(total=Coalesce(Sum(SUBTOTAL_EXPR), ZERO_DEC))["total"]
+
+
+def total_repuestos(qs_base):
+    """Calcula el total de repuestos usando subtotal (precio * cantidad)"""
+    return qs_base.aggregate(total=Coalesce(Sum(SUBTOTAL_EXPR), ZERO_DEC))["total"]
 
 
 @login_required_default
@@ -25,15 +44,20 @@ def dashboard_centro_operaciones(request):
     Incluye KPIs, reportes rápidos y navegación a todas las funciones
     """
 
-    # 🔒 Obtener empresa del usuario logueado
+    # 🔒 Obtener empresa del usuario logueado - NO crear silenciosamente
     try:
         empresa = request.user.empresa
-    except:
-        # Si no tiene empresa, crear una básica o redirigir
-        empresa, created = Empresa.objects.get_or_create(
-            user=request.user,
-            defaults={"nombre_taller": f"Taller de {request.user.username}"},
-        )
+    except Exception:
+        messages.error(request, "Selecciona o crea tu empresa para continuar.")
+
+        # Detectar país y redirigir al namespace correcto
+        if "/us/" in request.path:
+            return redirect("usa:configuracion")
+        elif "/cl/" in request.path:
+            return redirect("chile:configuracion")
+        else:
+            # Fallback al namespace global
+            return redirect("configuracion")
 
     # 📅 Fechas de referencia
     hoy = timezone.localdate()
@@ -41,14 +65,19 @@ def dashboard_centro_operaciones(request):
     hace_30_dias = hoy - timedelta(days=30)
     inicio_mes = date(hoy.year, hoy.month, 1)
 
-    # --- EXPRESIÓN DE SUBTOTAL POR LÍNEA ---
-    line_subtotal = ExpressionWrapper(
-        F("precio_unitario") * F("cantidad"),
-        output_field=DecimalField(max_digits=14, decimal_places=2),
-    )
+    # Zona horaria para clientes nuevos del mes
+    tz = timezone.get_current_timezone()
+    # Corregir para zoneinfo (Python 3.9+) que no tiene localize()
+    if hasattr(tz, "localize"):
+        inicio_mes_dt = tz.localize(datetime(hoy.year, hoy.month, 1, 0, 0, 0))
+    else:
+        # Para zoneinfo, usar datetime con tzinfo directamente
+        inicio_mes_dt = datetime(hoy.year, hoy.month, 1, 0, 0, 0, tzinfo=tz)
 
     # --- FALLBACK DECIMAL PARA COALESCE ---
-    ZERO_DEC = Value(Decimal("0.00"), output_field=DecimalField(max_digits=14, decimal_places=2))
+    ZERO_DEC = Value(
+        Decimal("0.00"), output_field=DecimalField(max_digits=14, decimal_places=2)
+    )
 
     # 📊 KPIs PRINCIPALES (filtrados por empresa)
 
@@ -64,51 +93,49 @@ def dashboard_centro_operaciones(request):
     ).count()
     total_documentos = Documento.objects.filter(empresa=empresa).count()
 
-    # Facturación (basada en servicios)
-    facturacion_hoy = (
-        LineaServicio.objects.filter(
-            documento__empresa=empresa,
-            documento__fecha_emision=hoy,
-            documento__tipo="FAC",
-        ).aggregate(total=Coalesce(Sum(line_subtotal), ZERO_DEC))["total"]
+    # --- BASES DE AGREGACIÓN ---
+    base_hoy_fac = LineaServicio.objects.filter(
+        documento__empresa=empresa, documento__fecha_emision=hoy, documento__tipo="FAC"
     )
-
-    facturacion_semana = (
-        LineaServicio.objects.filter(
-            documento__empresa=empresa,
-            documento__fecha_emision__gte=hace_7_dias,
-            documento__tipo="FAC",
-        ).aggregate(total=Coalesce(Sum(line_subtotal), ZERO_DEC))["total"]
+    base_sem_fac = LineaServicio.objects.filter(
+        documento__empresa=empresa,
+        documento__fecha_emision__gte=hace_7_dias,
+        documento__tipo="FAC",
     )
-
-    facturacion_mes = (
-        LineaServicio.objects.filter(
-            documento__empresa=empresa,
-            documento__fecha_emision__gte=inicio_mes,
-            documento__tipo="FAC",
-        ).aggregate(total=Coalesce(Sum(line_subtotal), ZERO_DEC))["total"]
-    )
-
-    # --- REPUESTOS DEL MES (KPIs) ---
-    repuestos_qs = LineaRepuesto.objects.filter(
+    base_mes_fac_srv = LineaServicio.objects.filter(
         documento__empresa=empresa,
         documento__fecha_emision__gte=inicio_mes,
-        documento__fecha_emision__lte=hoy,
+        documento__tipo="FAC",
+    )
+    base_mes_fac_rep = LineaRepuesto.objects.filter(
+        documento__empresa=empresa,
+        documento__fecha_emision__gte=inicio_mes,
+        documento__tipo="FAC",
     )
 
-    total_repuestos_mes = repuestos_qs.aggregate(
-        total=Coalesce(Sum(line_subtotal), ZERO_DEC)
-    )["total"]
+    # --- FACTURACIÓN SEPARADA POR SERVICIOS Y REPUESTOS ---
+    facturacion_servicios_hoy = total_servicios(base_hoy_fac)
+    facturacion_servicios_semana = total_servicios(base_sem_fac)
+    facturacion_servicios_mes = total_servicios(base_mes_fac_srv)
 
     # --- IVA: según regla, SOLO sobre repuestos (19% CL) ---
-    iva_repuestos = (total_repuestos_mes or Decimal("0.00")) * Decimal("0.19")
+    total_repuestos_mes = total_repuestos(base_mes_fac_rep) or Decimal("0.00")
+    iva_repuestos = Decimal("0.00")
+    if empresa.pais == "CL":
+        iva_repuestos = (total_repuestos_mes * Decimal("0.19")).quantize(
+            Decimal("0.01")
+        )
+
+    # --- SUMA TOTAL DEL MES (sin IVA) ---
+    facturacion_mes_total = (facturacion_servicios_mes or Decimal("0")) + (
+        total_repuestos_mes or Decimal("0")
+    )
 
     # Clientes
     clientes_activos = Cliente.objects.filter(empresa=empresa).count()
-    # Clientes nuevos del mes (created_at es DateTimeField, pero usamos datetime para consistencia)
+
+    # Clientes nuevos del mes (usando timezone correcto)
     now = timezone.now()
-    inicio_mes_dt = timezone.make_aware(datetime(now.year, now.month, 1))
-    
     clientes_nuevos_mes = Cliente.objects.filter(
         empresa=empresa,
         created_at__gte=inicio_mes_dt,
@@ -134,23 +161,55 @@ def dashboard_centro_operaciones(request):
         .order_by("-cantidad")[:5]
     )
 
-    # 🔧 TÉCNICOS MÁS PRODUCTIVOS (Top 5)
-    tecnicos_productivos = (
-        Tecnico.objects.filter(empresa=empresa, activo=True)
-        .annotate(
-            docs_realizados=Count(
-                "documentos_responsables", filter=Q(documentos_responsables__fecha_emision__gte=hace_30_dias)
-            ),
-            ingresos_generados=Coalesce(
-                Sum(
-                    "documentos_responsables__lineas_servicio__precio_unitario",
-                    filter=Q(documentos_responsables__fecha_emision__gte=hace_30_dias),
-                ),
-                ZERO_DEC
-            ),
-        )
-        .order_by("-docs_realizados")[:5]
+    # 🔧 TÉCNICOS MÁS PRODUCTIVOS (Top 5) - KPI por técnico efectivo
+
+    # Técnico efectivo: Coalesce(linea.tecnico_responsable, documento__tecnico_responsable)
+    tecnico_efectivo = Coalesce(
+        F("tecnico_responsable"), F("documento__tecnico_responsable")
     )
+
+    # Líneas del período (últimos 30 días, facturas)
+    lineas_periodo = LineaServicio.objects.filter(
+        documento__empresa=empresa,
+        documento__fecha_emision__gte=hace_30_dias,
+        documento__tipo="FAC",
+    ).exclude(  # Excluir si ambos técnicos son nulos
+        Q(tecnico_responsable__isnull=True)
+        & Q(documento__tecnico_responsable__isnull=True)
+    )
+
+    # Agregación por técnico efectivo
+    tecnicos_productivos_raw = (
+        lineas_periodo.annotate(
+            tecnico_id=tecnico_efectivo,
+            ingresos_generados=Coalesce(Sum(SUBTOTAL_EXPR), ZERO_DEC),
+            docs_realizados=Count("documento", distinct=True),
+        )
+        .values(
+            "tecnico_id", "ingresos_generados", "docs_realizados"
+        )  # Incluir todos los campos anotados
+        .exclude(tecnico_id__isnull=True)
+        .order_by("-ingresos_generados")[:5]
+    )
+
+    # Enriquecer con datos del técnico
+    tecnicos_ids = [t["tecnico_id"] for t in tecnicos_productivos_raw]
+    tecnicos_map = {
+        t.id: t
+        for t in Tecnico.objects.filter(id__in=tecnicos_ids).only(
+            "id", "nombre", "activo"
+        )
+    }
+
+    # Transformar a lista rica para el template
+    tecnicos_productivos = [
+        {
+            "tecnico": tecnicos_map.get(row["tecnico_id"]),
+            "ingresos_generados": row["ingresos_generados"],
+            "docs_realizados": row["docs_realizados"],
+        }
+        for row in tecnicos_productivos_raw
+    ]
 
     # 📋 ESTADO DE DOCUMENTOS
     presupuestos_pendientes = Documento.objects.filter(
@@ -158,6 +217,11 @@ def dashboard_centro_operaciones(request):
     ).count()
 
     ordenes_en_proceso = Documento.objects.filter(empresa=empresa, tipo="OT").count()
+
+    # Presupuestos del MES (mismo rango temporal que facturas)
+    presupuestos_mes = Documento.objects.filter(
+        empresa=empresa, tipo="PRES", fecha_emision__gte=inicio_mes
+    ).count()
 
     facturas_mes = Documento.objects.filter(
         empresa=empresa, tipo="FAC", fecha_emision__gte=inicio_mes
@@ -175,10 +239,11 @@ def dashboard_centro_operaciones(request):
     # ⚠️ ALERTAS Y OPORTUNIDADES
     alertas = []
 
-    # Clientes inactivos (sin documentos en 60 días)
+    # Clientes inactivos (sin documentos en 60 días) - Solo clientes con documentos
     clientes_inactivos = (
-        Cliente.objects.filter(empresa=empresa)
+        Cliente.objects.filter(empresa=empresa, documentos__isnull=False)
         .exclude(documentos__fecha_emision__gte=hoy - timedelta(days=60))
+        .distinct()
         .count()
     )
 
@@ -212,18 +277,36 @@ def dashboard_centro_operaciones(request):
         dias_transcurridos = (hoy - inicio_mes).days + 1
         proyeccion_docs_mes = (documentos_mes / dias_transcurridos) * 30
         proyeccion_facturacion = (
-            (facturacion_mes / dias_transcurridos) * 30 if facturacion_mes > 0 else 0
+            (facturacion_mes_total / dias_transcurridos) * 30
+            if facturacion_mes_total > 0
+            else 0
         )
     else:
         proyeccion_docs_mes = 0
         proyeccion_facturacion = 0
 
-    # 💰 CÁLCULO TICKET PROMEDIO
-    ticket_promedio = facturacion_mes / max(facturas_mes, 1)
+    # 💰 CÁLCULO TICKET PROMEDIO - Coherente con el numerador
+    # Opción 1: ticket de facturas del mes, servicios + repuestos
+    lineas_fac_mes_srv = LineaServicio.objects.filter(
+        documento__empresa=empresa,
+        documento__tipo="FAC",
+        documento__fecha_emision__gte=inicio_mes,
+    )
+    lineas_fac_mes_rep = LineaRepuesto.objects.filter(
+        documento__empresa=empresa,
+        documento__tipo="FAC",
+        documento__fecha_emision__gte=inicio_mes,
+    )
+
+    monto_fac_mes = Coalesce(
+        lineas_fac_mes_srv.aggregate(t=Sum(SUBTOTAL_EXPR))["t"], Decimal("0")
+    ) + Coalesce(lineas_fac_mes_rep.aggregate(t=Sum(SUBTOTAL_EXPR))["t"], Decimal("0"))
+
+    ticket_promedio = (monto_fac_mes / facturas_mes) if facturas_mes else Decimal("0")
 
     # 🎯 MÉTRICAS DE EFICIENCIA
     eficiencia_conversion = (
-        facturas_mes / max(presupuestos_pendientes + facturas_mes, 1)
+        facturas_mes / max(presupuestos_mes + facturas_mes, 1)
     ) * 100
 
     context = {
@@ -236,9 +319,10 @@ def dashboard_centro_operaciones(request):
         "documentos_semana": documentos_semana,
         "documentos_mes": documentos_mes,
         "total_documentos": total_documentos,
-        "facturacion_hoy": facturacion_hoy,
-        "facturacion_semana": facturacion_semana,
-        "facturacion_mes": facturacion_mes,
+        "facturacion_servicios_hoy": facturacion_servicios_hoy,
+        "facturacion_servicios_semana": facturacion_servicios_semana,
+        "facturacion_servicios_mes": facturacion_servicios_mes,
+        "facturacion_mes_total": facturacion_mes_total,
         "total_repuestos_mes": total_repuestos_mes,
         "iva_repuestos": iva_repuestos,
         "clientes_activos": clientes_activos,
@@ -252,6 +336,7 @@ def dashboard_centro_operaciones(request):
         "tecnicos_productivos": tecnicos_productivos,
         # Estado operativo
         "presupuestos_pendientes": presupuestos_pendientes,
+        "presupuestos_mes": presupuestos_mes,
         "ordenes_en_proceso": ordenes_en_proceso,
         "facturas_mes": facturas_mes,
         # Alertas
@@ -282,18 +367,48 @@ def dashboard_centro_operaciones(request):
     return TemplateResponse(request, template_name, context)
 
 
-@login_required
 @login_required_default
 def dashboard_centro_operaciones_espacial(request):
     """
     Dashboard especializado con estética espacial futurista
     """
-    # Obtener empresa del usuario autenticado
+    # Inicializar contexto
+    contexto = {}
+
+    # Forzar idioma inglés para URLs de USA
+    if request.path.startswith("/us/"):
+        from django.utils import translation
+
+        translation.activate("en")
+        request.LANGUAGE_CODE = "en"
+        # Forzar contexto de idioma
+        contexto["LANGUAGE_CODE"] = "en"
+        contexto["LANGUAGE_NAME"] = "English"
+
+    # Obtener empresa del usuario autenticado - NO crear silenciosamente
     try:
-        empresa = Empresa.objects.get(user=request.user)
-    except Empresa.DoesNotExist:
-        messages.error(request, "No se encontró una empresa asociada a este usuario.")
-        return redirect("login")
+        empresa = request.user.empresa
+    except Exception:
+        messages.error(request, "Selecciona o crea tu empresa para continuar.")
+        # Detectar país y redirigir al namespace correcto
+        if "/us/" in request.path:
+            return redirect("usa:configuracion")
+        elif "/cl/" in request.path:
+            return redirect("chile:configuracion")
+        else:
+            # Fallback al namespace global
+            return redirect("configuracion")
+
+    # --- EXPRESIÓN DE SUBTOTAL POR LÍNEA ---
+    line_subtotal = ExpressionWrapper(
+        F("precio_unitario") * F("cantidad"),
+        output_field=DecimalField(max_digits=14, decimal_places=2),
+    )
+
+    # --- FALLBACK DECIMAL PARA COALESCE ---
+    ZERO_DEC = Value(
+        Decimal("0.00"), output_field=DecimalField(max_digits=14, decimal_places=2)
+    )
 
     # Datos básicos y seguros
     documentos_total = Documento.objects.filter(empresa=empresa).count()
@@ -324,23 +439,54 @@ def dashboard_centro_operaciones_espacial(request):
     facturas = Documento.objects.filter(empresa=empresa, tipo="FAC").count()
     ordenes = Documento.objects.filter(empresa=empresa, tipo="OT").count()
 
-    contexto = {
-        "empresa": empresa,
-        "documentos_total": documentos_total,
-        "documentos_mes": documentos_mes,
-        "clientes_total": clientes_total,
-        "tecnicos_total": tecnicos_total,
-        "facturacion_mes": facturacion_mes,
-        "ticket_promedio": ticket_promedio,
-        "presupuestos": presupuestos,
-        "facturas": facturas,
-        "ordenes": ordenes,
-        "es_dashboard_espacial": True,
-    }
+    # Actualizar contexto con datos del dashboard
+    contexto.update(
+        {
+            "empresa": empresa,
+            "documentos_total": documentos_total,
+            "documentos_mes": documentos_mes,
+            "clientes_total": clientes_total,
+            "tecnicos_total": tecnicos_total,
+            "facturacion_mes": facturacion_mes,
+            "ticket_promedio": ticket_promedio,
+            "presupuestos": presupuestos,
+            "facturas": facturas,
+            "ordenes": ordenes,
+            "es_dashboard_espacial": True,
+            # Variables para el template base
+            "company_name": empresa.nombre_taller,
+            "company_logo_url": empresa.logo.url if empresa.logo else None,
+            "company_color": (
+                empresa.color_primario
+                if hasattr(empresa, "color_primario")
+                else "#00ffff"
+            ),
+            "company_tagline": empresa.tagline if hasattr(empresa, "tagline") else None,
+        }
+    )
 
-    # Usar template directo para evitar problemas de resolución
+    # Usar template resolution unificado
     from django.template.response import TemplateResponse
+    from django.utils.translation import get_language
 
-    template_name = "taller/cl/es/dashboard/centro_operaciones_espacial.html"
+    from taller.utils.templates import select_country_lang_template
+
+    # Forzar template correcto basado en la URL y idioma
+    if request.path.startswith("/us/"):
+        # Para USA, usar template en inglés por defecto, pero permitir español
+        if get_language() == "es":
+            # Si se selecciona español, usar template de Chile
+            template_name = "taller/cl/es/dashboard/centro_operaciones_espacial.html"
+        else:
+            # Por defecto inglés para USA - usar template que extiende base en inglés
+            template_name = "taller/us/en/dashboard/centro_operaciones_espacial.html"
+            # Forzar que use el template base en inglés
+            contexto["use_usa_base"] = True
+    else:
+        template_name = select_country_lang_template(
+            "dashboard/centro_operaciones_espacial.html",
+            getattr(empresa, "pais", "cl").lower(),
+            get_language(),
+        )
 
     return TemplateResponse(request, template_name, contexto)

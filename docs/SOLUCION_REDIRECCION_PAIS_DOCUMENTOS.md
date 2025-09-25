@@ -6,7 +6,7 @@ Los usuarios chilenos al acceder a `/cl/documentos/nuevo/` eran incorrectamente 
 
 ### Síntomas
 - ❌ Usuario chileno (`testuser_cl`) accedía a `/cl/documentos/nuevo/`
-- ❌ Era redirigido a `/us/documentos/form/` (país incorrecto)  
+- ❌ Era redirigido a `/us/documentos/form/` (país incorrecto)
 - ❌ Perdía el contexto de país en la URL
 
 ## Diagnóstico
@@ -39,7 +39,7 @@ def redirect_documento_crear(request):
     """
     # Obtener país del contexto del request
     country = getattr(request, 'country', None)
-    
+
     if country == 'CL':
         return HttpResponseRedirect('/cl/documentos/form/')
     elif country == 'US':
@@ -63,7 +63,7 @@ En `taller/documentos/urls.py`:
 # ANTES (problemático)
 path("nuevo/", RedirectView.as_view(pattern_name="documentos:documento_crear", permanent=False), name="crear_documento")
 
-# DESPUÉS (corregido)  
+# DESPUÉS (corregido)
 path("nuevo/", redirect_documento_crear, name="crear_documento")
 ```
 
@@ -87,14 +87,14 @@ USA: GET /us/documentos/nuevo/
    Status Code: 200
    Redirecciones realizadas:
      → 302: /us/documentos/form/
-   URL final: /us/documentos/form/  
+   URL final: /us/documentos/form/
    ✅ CORRECTO: Redirigió a la URL de USA
 ```
 
 ## Beneficios
 
 1. ✅ **Preservación de Contexto**: El país se mantiene en toda la redirección
-2. ✅ **Multi-tenant**: Funciona para ambos países (Chile/USA)  
+2. ✅ **Multi-tenant**: Funciona para ambos países (Chile/USA)
 3. ✅ **Robustez**: Incluye múltiples mecanismos de detección de país
 4. ✅ **Compatibilidad**: Mantiene URLs existentes funcionando
 5. ✅ **UX Mejorada**: Los usuarios se mantienen en su contexto correcto

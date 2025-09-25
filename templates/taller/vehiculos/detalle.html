@@ -1,3 +1,4 @@
+{% load country_url %}
 {% extends "base.html" %}
 {% load static %}
 {% block title %}Detalle del Vehículo - TallerPro{% endblock %}
@@ -26,7 +27,7 @@
       <li><strong>VIN:</strong> {{ vehiculo.vin }}</li>
     </ul>
     <div class="mt-6 text-center">
-  {% url 'taller:vehiculos:lista_vehiculos' as url_lista_vehiculos %}
+  {% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{% else %}/cl/vehiculos/{% endif %} as url_lista_vehiculos
   <a href="{{ url_lista_vehiculos|default:'#' }}" class="bg-sky-600 text-white px-6 py-2 rounded hover:bg-sky-700">⬅️ Volver</a>
     </div>
   </div>

@@ -12,7 +12,7 @@
                     <h4><i class="fas fa-clock"></i> Configuración de Zona Horaria</h4>
                 </div>
                 <div class="card-body">
-                    
+
                     <!-- Timezone Actual -->
                     <div class="alert alert-info">
                         <h5><i class="fas fa-info-circle"></i> Zona Horaria Actual</h5>
@@ -31,7 +31,7 @@
                     <!-- Formulario de Cambio -->
                     <form method="post" id="timezoneForm">
                         {% csrf_token %}
-                        
+
                         <div class="form-group">
                             <label for="zona_horaria"><strong>Seleccionar Nueva Zona Horaria:</strong></label>
                             <select name="zona_horaria" id="zona_horaria" class="form-control" onchange="previewTimezone()">
@@ -106,16 +106,16 @@ async function previewTimezone() {
     const timezone = select.value;
     const previewDiv = document.getElementById('timezone-preview');
     const previewContent = document.getElementById('preview-content');
-    
+
     if (timezone === '{{ current_timezone }}') {
         previewDiv.style.display = 'none';
         return;
     }
-    
+
     try {
         const response = await fetch(`{% url 'preview_timezone' %}?timezone=${encodeURIComponent(timezone)}`);
         const data = await response.json();
-        
+
         if (data.success) {
             previewContent.innerHTML = `
                 <strong>${data.timezone_display}</strong><br>

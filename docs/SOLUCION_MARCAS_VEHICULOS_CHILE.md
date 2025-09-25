@@ -42,7 +42,7 @@ marcas = list(Marca.objects.filter(country=country)
 #### 4. **Ampliación del Catálogo de Marcas**
 Se agregaron las siguientes marcas para Chile:
 - ✅ **Acura** (ID: 44)
-- ✅ **Infiniti** (ID: 45) 
+- ✅ **Infiniti** (ID: 45)
 - ✅ **Lexus** (ID: 46)
 - ✅ **Mini** (ID: 47)
 - ✅ **Alfa Romeo** (ID: 48)
@@ -100,6 +100,6 @@ Se agregaron las siguientes marcas para Chile:
 5. **Escalabilidad**: Fácil agregar nuevas marcas
 
 ---
-**Estado**: ✅ **COMPLETADO**  
-**Fecha**: 3 de septiembre de 2025  
+**Estado**: ✅ **COMPLETADO**
+**Fecha**: 3 de septiembre de 2025
 **Tiempo de Resolución**: ~30 minutos

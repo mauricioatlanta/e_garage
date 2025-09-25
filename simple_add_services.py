@@ -28,7 +28,7 @@ def agregar_servicios():
     # Insertar servicios usando formato compatible
     for i, (servicio_id, nombre) in enumerate(servicios, 1):
         sql = """
-            INSERT INTO taller_lineaservicio 
+            INSERT INTO taller_lineaservicio
             (nombre, cantidad, precio_unitario, descuento, observaciones, documento_id, servicio_id)
             VALUES (%s, %s, %s, %s, %s, %s, %s)
         """
@@ -53,7 +53,7 @@ def agregar_servicios():
 
     for nombre, cantidad, precio in otros_servicios:
         sql = """
-            INSERT INTO taller_lineaotroservicio 
+            INSERT INTO taller_lineaotroservicio
             (nombre, cantidad, precio_unitario, descuento, observaciones, documento_id)
             VALUES (%s, %s, %s, %s, %s, %s)
         """

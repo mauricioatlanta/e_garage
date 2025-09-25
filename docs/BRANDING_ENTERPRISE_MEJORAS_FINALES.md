@@ -29,19 +29,19 @@ def unified_branding_context(request):
     Context processor que combina branding personalizado con multilenguaje
     Prioridad: Branding del usuario > Defaults por país > Defaults globales
     """
-    
+
     # Obtener contexto multilenguaje
     current_country = get_country_from_request(request)
     current_language = get_language_from_request(request)
-    
+
     # Cache key único por usuario/país/idioma
     user_id = request.user.id if request.user.is_authenticated else 'anonymous'
     cache_key = f'unified_context_{user_id}_{current_country}_{current_language}'
-    
+
     cached_context = cache.get(cache_key)
     if cached_context:
         return cached_context
-    
+
     context = {
         # Contexto multilenguaje base
         'current_country': current_country,
@@ -50,12 +50,12 @@ def unified_branding_context(request):
         'country_flag': get_country_flag(current_country),
         'language_name': get_language_display_name(current_language),
     }
-    
+
     # Agregar branding personalizado si usuario autenticado
     if request.user.is_authenticated:
         try:
             company_settings = CompanySettings.objects.get(user=request.user)
-            
+
             # Branding personalizado
             context.update({
                 'company_name': company_settings.get_company_name(),
@@ -70,23 +70,23 @@ def unified_branding_context(request):
                 'font_size_base': company_settings.font_size_base,
                 'border_radius': company_settings.border_radius,
                 'shadow_style': company_settings.shadow_style,
-                
+
                 # Datos de contacto localizados
                 'company_address': company_settings.get_localized_address(current_country),
                 'company_phone': company_settings.get_localized_phone(current_country),
                 'company_email': company_settings.email,
                 'company_website': company_settings.website,
-                
+
                 # Configuración regional
                 'currency_symbol': company_settings.get_currency_for_country(current_country),
                 'timezone': company_settings.get_timezone_for_country(current_country),
                 'date_format': company_settings.get_date_format_for_country(current_country),
-                
+
                 # Branding flags
                 'has_custom_branding': True,
                 'branding_tier': company_settings.get_branding_tier(),
             })
-            
+
         except CompanySettings.DoesNotExist:
             # Defaults globales por país
             context.update(get_default_branding_for_country(current_country))
@@ -95,7 +95,7 @@ def unified_branding_context(request):
         # Usuario no autenticado - branding por defecto del país
         context.update(get_default_branding_for_country(current_country))
         context['has_custom_branding'] = False
-    
+
     # Cache por 5 minutos
     cache.set(cache_key, context, 300)
     return context
@@ -113,14 +113,14 @@ def get_default_branding_for_country(country):
         },
         'US': {
             'company_name': 'eGarage USA',
-            'company_logo': '/static/img/egarage-us-logo.png', 
+            'company_logo': '/static/img/egarage-us-logo.png',
             'primary_color': '#1565c0',  # Azul americano
             'secondary_color': '#d32f2f',
             'currency_symbol': '$',
             'phone_format': '+1 (XXX) XXX-XXXX',
         }
     }
-    
+
     return defaults.get(country, defaults['US'])
 ```
 
@@ -130,27 +130,27 @@ def get_default_branding_for_country(country):
 # taller/models/company_settings.py - Campos adicionales
 class CompanySettings(models.Model):
     # ... campos existentes ...
-    
+
     # NUEVOS CAMPOS - Personalización Avanzada
     accent_color = models.CharField(
-        max_length=7, 
+        max_length=7,
         default='#ff9800',
         validators=[validate_hex_color],
         help_text="Color de acentos y highlights"
     )
     background_color = models.CharField(
         max_length=7,
-        default='#ffffff', 
+        default='#ffffff',
         validators=[validate_hex_color],
         help_text="Color de fondo principal"
     )
     text_color = models.CharField(
         max_length=7,
         default='#212121',
-        validators=[validate_hex_color], 
+        validators=[validate_hex_color],
         help_text="Color de texto principal"
     )
-    
+
     # Tipografía
     FONT_CHOICES = [
         ('system', 'Fuente del Sistema'),
@@ -172,7 +172,7 @@ class CompanySettings(models.Model):
         validators=[MinValueValidator(12), MaxValueValidator(18)],
         help_text="Tamaño base de fuente (12-18px)"
     )
-    
+
     # Estilo visual
     border_radius = models.IntegerField(
         default=4,
@@ -182,7 +182,7 @@ class CompanySettings(models.Model):
     SHADOW_CHOICES = [
         ('none', 'Sin sombras'),
         ('subtle', 'Sombras sutiles'),
-        ('medium', 'Sombras medianas'), 
+        ('medium', 'Sombras medianas'),
         ('strong', 'Sombras marcadas'),
     ]
     shadow_style = models.CharField(
@@ -191,13 +191,13 @@ class CompanySettings(models.Model):
         default='subtle',
         help_text="Estilo de sombras"
     )
-    
+
     # Localización multipaís
     address_cl = models.TextField(blank=True, help_text="Dirección en Chile")
-    address_us = models.TextField(blank=True, help_text="Dirección en USA") 
+    address_us = models.TextField(blank=True, help_text="Dirección en USA")
     phone_cl = models.CharField(max_length=20, blank=True, help_text="Teléfono Chile")
     phone_us = models.CharField(max_length=20, blank=True, help_text="Teléfono USA")
-    
+
     # Métodos para localización
     def get_localized_address(self, country):
         """Dirección localizada por país"""
@@ -206,15 +206,15 @@ class CompanySettings(models.Model):
         elif country == 'US' and self.address_us:
             return self.address_us
         return self.address  # Fallback a dirección principal
-    
+
     def get_localized_phone(self, country):
         """Teléfono localizado por país"""
         if country == 'CL' and self.phone_cl:
             return self.phone_cl
         elif country == 'US' and self.phone_us:
-            return self.phone_us  
+            return self.phone_us
         return self.phone  # Fallback
-    
+
     def get_currency_for_country(self, country):
         """Símbolo de moneda según país"""
         currencies = {
@@ -225,20 +225,20 @@ class CompanySettings(models.Model):
             'AR': '$',
         }
         return currencies.get(country, '$')
-    
+
     def get_font_family(self):
         """CSS para familia tipográfica"""
         fonts = {
             'system': '-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui',
             'roboto': '"Roboto", sans-serif',
-            'open-sans': '"Open Sans", sans-serif', 
+            'open-sans': '"Open Sans", sans-serif',
             'lato': '"Lato", sans-serif',
             'montserrat': '"Montserrat", sans-serif',
             'poppins': '"Poppins", sans-serif',
             'source-sans': '"Source Sans Pro", sans-serif',
         }
         return fonts.get(self.font_family, fonts['system'])
-    
+
     def get_css_variables(self):
         """Variables CSS para personalización avanzada"""
         return {
@@ -252,7 +252,7 @@ class CompanySettings(models.Model):
             '--border-radius': f'{self.border_radius}px',
             '--shadow-style': self.get_shadow_css(),
         }
-    
+
     def get_shadow_css(self):
         """CSS para sombras según estilo"""
         shadows = {
@@ -304,7 +304,7 @@ class CompanySettings(models.Model):
                         <span class="color-preview" data-color="text"></span>
                     </div>
                 </div>
-                
+
                 <!-- Paletas Predefinidas -->
                 <div class="preset-palettes">
                     <h6>Paletas Predefinidas</h6>
@@ -336,7 +336,7 @@ class CompanySettings(models.Model):
                     </div>
                 </div>
             </div>
-            
+
             <!-- Tipografía -->
             <div class="col-md-6">
                 <h5>🔤 Tipografía</h5>
@@ -355,7 +355,7 @@ class CompanySettings(models.Model):
                             <p class="preview-text">Su empresa automotriz de confianza</p>
                         </div>
                     </div>
-                    
+
                     <div class="form-group">
                         <label>Tamaño Base</label>
                         <div class="size-slider">
@@ -366,7 +366,7 @@ class CompanySettings(models.Model):
                 </div>
             </div>
         </div>
-        
+
         <!-- Estilo Visual -->
         <div class="row mt-4">
             <div class="col-md-6">
@@ -380,7 +380,7 @@ class CompanySettings(models.Model):
                             <div class="radius-preview"></div>
                         </div>
                     </div>
-                    
+
                     <div class="form-group">
                         <label>Estilo de Sombras</label>
                         <div class="shadow-options">
@@ -404,7 +404,7 @@ class CompanySettings(models.Model):
                     </div>
                 </div>
             </div>
-            
+
             <!-- Preview en Tiempo Real -->
             <div class="col-md-6">
                 <h5>👁️ Vista Previa</h5>
@@ -436,7 +436,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const sizeSlider = document.querySelector('input[name="font_size_base"]');
     const radiusSlider = document.querySelector('input[name="border_radius"]');
     const shadowOptions = document.querySelectorAll('input[name="shadow_style"]');
-    
+
     function updatePreview() {
         const preview = document.getElementById('advanced-preview');
         const styles = {
@@ -450,19 +450,19 @@ document.addEventListener('DOMContentLoaded', function() {
             '--border-radius': radiusSlider.value + 'px',
             '--shadow-style': getShadowStyle(),
         };
-        
+
         Object.entries(styles).forEach(([prop, value]) => {
             preview.style.setProperty(prop, value);
         });
     }
-    
+
     // Event listeners para actualización en tiempo real
     colorPickers.forEach(picker => picker.addEventListener('input', updatePreview));
     fontSelector.addEventListener('change', updatePreview);
     sizeSlider.addEventListener('input', updatePreview);
     radiusSlider.addEventListener('input', updatePreview);
     shadowOptions.forEach(option => option.addEventListener('change', updatePreview));
-    
+
     // Paletas predefinidas
     document.querySelectorAll('.palette-option').forEach(option => {
         option.addEventListener('click', function() {
@@ -492,10 +492,10 @@ from taller.utils.pdf_generator import DocumentoPDFGenerator
 
 class PDFCrossPlatformTest(TestCase):
     """Tests para verificar PDFs en diferentes navegadores y dispositivos"""
-    
+
     def setUp(self):
         self.user = User.objects.create_user(
-            username='test_pdf', 
+            username='test_pdf',
             password='test123'
         )
         self.company_settings = CompanySettings.objects.create(
@@ -504,51 +504,51 @@ class PDFCrossPlatformTest(TestCase):
             primary_color='#e74c3c',
             secondary_color='#3498db'
         )
-        
+
         # Logo de prueba (base64)
         self.test_logo = self._create_test_logo()
         self.company_settings.logo = self.test_logo
         self.company_settings.save()
-    
+
     def _create_test_logo(self):
         """Crea logo de prueba para testing"""
         # Crear imagen de prueba 200x100px
         img = Image.new('RGB', (200, 100), color='#e74c3c')
         # Agregar texto simulado
         # En producción usarías PIL.ImageDraw para agregar texto
-        
+
         buffer = BytesIO()
         img.save(buffer, format='PNG')
         return base64.b64encode(buffer.getvalue()).decode()
-    
+
     def test_pdf_logo_scaling(self):
         """Test que logos se escalen correctamente en PDF"""
         documento = self._create_test_document()
         generator = DocumentoPDFGenerator(documento)
-        
+
         # Generar PDF con diferentes tamaños de logo
         logo_sizes = [
             (50, 25),   # Pequeño
-            (100, 50),  # Mediano  
+            (100, 50),  # Mediano
             (200, 100), # Grande
             (400, 200), # Extra grande
         ]
-        
+
         for width, height in logo_sizes:
             with self.subTest(size=f"{width}x{height}"):
                 # Redimensionar logo
                 resized_logo = self._resize_logo(width, height)
                 self.company_settings.logo = resized_logo
                 self.company_settings.save()
-                
+
                 # Generar PDF
                 pdf_content = generator.generate()
                 self.assertIsNotNone(pdf_content)
                 self.assertGreater(len(pdf_content), 1000)  # PDF mínimo
-                
+
                 # Verificar que PDF sea válido
                 self.assertTrue(pdf_content.startswith(b'%PDF'))
-    
+
     def test_pdf_color_consistency(self):
         """Test que colores se reproduzcan correctamente"""
         test_colors = [
@@ -560,75 +560,75 @@ class PDFCrossPlatformTest(TestCase):
             '#cccccc',  # Gris claro
             '#333333',  # Gris oscuro
         ]
-        
+
         documento = self._create_test_document()
-        
+
         for color in test_colors:
             with self.subTest(color=color):
                 self.company_settings.primary_color = color
                 self.company_settings.save()
-                
+
                 generator = DocumentoPDFGenerator(documento)
                 pdf_content = generator.generate()
-                
+
                 # Verificar que PDF se genere sin errores
                 self.assertIsNotNone(pdf_content)
                 # En un test más avanzado, podrías analizar el contenido PDF
                 # para verificar que los colores estén presentes
-    
+
     def test_pdf_font_rendering(self):
         """Test renderizado de diferentes fuentes"""
         fonts = ['roboto', 'open-sans', 'lato', 'montserrat']
         documento = self._create_test_document()
-        
+
         for font in fonts:
             with self.subTest(font=font):
                 self.company_settings.font_family = font
                 self.company_settings.save()
-                
+
                 generator = DocumentoPDFGenerator(documento)
                 pdf_content = generator.generate()
-                
+
                 self.assertIsNotNone(pdf_content)
                 self.assertGreater(len(pdf_content), 1000)
-    
+
     def test_pdf_responsive_layout(self):
         """Test que layout se adapte a diferentes tamaños"""
         page_sizes = [
             ('letter', 'Carta US'),
-            ('a4', 'A4 Internacional'), 
+            ('a4', 'A4 Internacional'),
             ('legal', 'Legal US'),
         ]
-        
+
         documento = self._create_test_document()
-        
+
         for size_code, size_name in page_sizes:
             with self.subTest(size=size_name):
                 generator = DocumentoPDFGenerator(
-                    documento, 
+                    documento,
                     page_size=size_code
                 )
                 pdf_content = generator.generate()
-                
+
                 self.assertIsNotNone(pdf_content)
                 # Verificar que el tamaño afecte el contenido
                 self.assertGreater(len(pdf_content), 1000)
-    
+
     def _create_test_document(self):
         """Crea documento de prueba"""
         # Aquí crearías un documento con datos de prueba
         # Simulando la estructura de tus documentos reales
         pass
-    
+
     def _resize_logo(self, width, height):
         """Redimensiona logo para testing"""
         # Decodificar logo actual
         logo_data = base64.b64decode(self.company_settings.logo)
         img = Image.open(BytesIO(logo_data))
-        
+
         # Redimensionar
         img_resized = img.resize((width, height), Image.Resampling.LANCZOS)
-        
+
         # Convertir de vuelta a base64
         buffer = BytesIO()
         img_resized.save(buffer, format='PNG')
@@ -637,39 +637,39 @@ class PDFCrossPlatformTest(TestCase):
 
 class PDFBrowserCompatibilityTest(TestCase):
     """Tests para compatibilidad entre navegadores"""
-    
+
     def test_pdf_download_headers(self):
         """Test headers correctos para descarga en navegadores"""
         client = Client()
         user = User.objects.create_user('test', 'test@test.com', 'test123')
         client.force_login(user)
-        
+
         # Crear documento de prueba
         documento = self._create_test_document()
-        
+
         # Test descarga PDF
         response = client.get(f'/documentos/{documento.id}/pdf/')
-        
+
         # Verificar headers
         self.assertEqual(response['Content-Type'], 'application/pdf')
         self.assertIn('attachment', response['Content-Disposition'])
         self.assertIn('filename=', response['Content-Disposition'])
-        
+
         # Verificar contenido
         self.assertGreater(len(response.content), 1000)
         self.assertTrue(response.content.startswith(b'%PDF'))
-    
+
     def test_pdf_inline_display(self):
         """Test visualización inline en navegadores"""
         client = Client()
         user = User.objects.create_user('test2', 'test2@test.com', 'test123')
         client.force_login(user)
-        
+
         documento = self._create_test_document()
-        
+
         # Test visualización inline
         response = client.get(f'/documentos/{documento.id}/preview/')
-        
+
         # Headers para visualización
         self.assertEqual(response['Content-Type'], 'application/pdf')
         self.assertIn('inline', response['Content-Disposition'])
@@ -695,7 +695,7 @@ def export_branding_config(request):
     """Exporta configuración de branding del usuario"""
     try:
         settings = CompanySettings.objects.get(user=request.user)
-        
+
         # Preparar datos para exportación
         export_data = {
             'version': '1.0',
@@ -734,7 +734,7 @@ def export_branding_config(request):
                 'terms_conditions': settings.terms_conditions,
             }
         }
-        
+
         # Incluir logo si existe
         if settings.logo:
             # Convertir logo a base64 para portabilidad
@@ -742,7 +742,7 @@ def export_branding_config(request):
                 logo_data = base64.b64encode(logo_file.read()).decode()
                 export_data['logo_data'] = logo_data
                 export_data['logo_filename'] = settings.logo.name
-        
+
         # Generar respuesta JSON
         filename = f"egarage_branding_{request.user.username}_{timezone.now().strftime('%Y%m%d_%H%M%S')}.json"
         response = HttpResponse(
@@ -750,36 +750,36 @@ def export_branding_config(request):
             content_type='application/json'
         )
         response['Content-Disposition'] = f'attachment; filename="{filename}"'
-        
+
         return response
-        
+
     except CompanySettings.DoesNotExist:
         return JsonResponse({
             'error': 'No se encontró configuración de branding'
         }, status=404)
 
-@login_required 
+@login_required
 @csrf_exempt
 def import_branding_config(request):
     """Importa configuración de branding"""
     if request.method != 'POST':
         return JsonResponse({'error': 'Método no permitido'}, status=405)
-    
+
     try:
         # Verificar si se subió archivo
         if 'config_file' not in request.FILES:
             return JsonResponse({
                 'error': 'No se proporcionó archivo de configuración'
             }, status=400)
-        
+
         config_file = request.FILES['config_file']
-        
+
         # Verificar formato JSON
         if not config_file.name.endswith('.json'):
             return JsonResponse({
                 'error': 'El archivo debe ser formato JSON'
             }, status=400)
-        
+
         # Leer y parsear archivo
         try:
             config_data = json.loads(config_file.read().decode('utf-8'))
@@ -787,19 +787,19 @@ def import_branding_config(request):
             return JsonResponse({
                 'error': 'Archivo JSON inválido'
             }, status=400)
-        
+
         # Validar estructura
         required_sections = ['company_info', 'branding', 'localization', 'document_settings']
         if not all(section in config_data for section in required_sections):
             return JsonResponse({
                 'error': 'Estructura de configuración inválida'
             }, status=400)
-        
+
         # Obtener o crear configuración
         settings, created = CompanySettings.objects.get_or_create(
             user=request.user
         )
-        
+
         # Aplicar configuración de empresa
         company_info = config_data['company_info']
         settings.company_name = company_info.get('company_name', settings.company_name)
@@ -808,7 +808,7 @@ def import_branding_config(request):
         settings.phone = company_info.get('phone', settings.phone)
         settings.email = company_info.get('email', settings.email)
         settings.website = company_info.get('website', settings.website)
-        
+
         # Aplicar branding
         branding = config_data['branding']
         settings.primary_color = branding.get('primary_color', settings.primary_color)
@@ -820,7 +820,7 @@ def import_branding_config(request):
         settings.font_size_base = branding.get('font_size_base', settings.font_size_base)
         settings.border_radius = branding.get('border_radius', settings.border_radius)
         settings.shadow_style = branding.get('shadow_style', settings.shadow_style)
-        
+
         # Aplicar localización
         localization = config_data['localization']
         settings.address_cl = localization.get('address_cl', settings.address_cl)
@@ -829,20 +829,20 @@ def import_branding_config(request):
         settings.phone_us = localization.get('phone_us', settings.phone_us)
         settings.currency = localization.get('currency', settings.currency)
         settings.timezone = localization.get('timezone', settings.timezone)
-        
+
         # Aplicar configuración de documentos
         doc_settings = config_data['document_settings']
         settings.invoice_prefix = doc_settings.get('invoice_prefix', settings.invoice_prefix)
         settings.quote_prefix = doc_settings.get('quote_prefix', settings.quote_prefix)
         settings.work_order_prefix = doc_settings.get('work_order_prefix', settings.work_order_prefix)
         settings.terms_conditions = doc_settings.get('terms_conditions', settings.terms_conditions)
-        
+
         # Procesar logo si existe
         if 'logo_data' in config_data and config_data['logo_data']:
             try:
                 logo_data = base64.b64decode(config_data['logo_data'])
                 logo_filename = config_data.get('logo_filename', f'imported_logo_{uuid.uuid4().hex}.png')
-                
+
                 # Guardar logo
                 settings.logo.save(
                     logo_filename,
@@ -852,20 +852,20 @@ def import_branding_config(request):
             except Exception as e:
                 # Si falla el logo, continuar con el resto de la configuración
                 pass
-        
+
         # Guardar configuración
         settings.save()
-        
+
         # Limpiar cache
         cache_key_pattern = f'company_settings_{request.user.id}_*'
         cache.delete_pattern(cache_key_pattern)
-        
+
         return JsonResponse({
             'success': True,
             'message': 'Configuración importada exitosamente',
             'imported_sections': list(config_data.keys())
         })
-        
+
     except Exception as e:
         return JsonResponse({
             'error': f'Error al importar configuración: {str(e)}'
@@ -876,16 +876,16 @@ def validate_config_file(request):
     """Valida archivo de configuración antes de importar"""
     if request.method != 'POST':
         return JsonResponse({'error': 'Método no permitido'}, status=405)
-    
+
     try:
         if 'config_file' not in request.FILES:
             return JsonResponse({
                 'error': 'No se proporcionó archivo'
             }, status=400)
-        
+
         config_file = request.FILES['config_file']
         config_data = json.loads(config_file.read().decode('utf-8'))
-        
+
         # Validaciones
         validation_results = {
             'valid': True,
@@ -895,7 +895,7 @@ def validate_config_file(request):
             'warnings': [],
             'errors': []
         }
-        
+
         # Verificar secciones requeridas
         required_sections = ['company_info', 'branding', 'localization', 'document_settings']
         for section in required_sections:
@@ -904,7 +904,7 @@ def validate_config_file(request):
             else:
                 validation_results['errors'].append(f'Sección faltante: {section}')
                 validation_results['valid'] = False
-        
+
         # Verificar logo
         if 'logo_data' in config_data:
             try:
@@ -915,7 +915,7 @@ def validate_config_file(request):
                 validation_results['logo_status'] = 'Inválido'
         else:
             validation_results['logo_status'] = 'No incluido'
-        
+
         # Verificar colores
         branding = config_data.get('branding', {})
         color_fields = ['primary_color', 'secondary_color', 'accent_color']
@@ -923,9 +923,9 @@ def validate_config_file(request):
             color = branding.get(field)
             if color and not re.match(r'^#[0-9A-Fa-f]{6}$', color):
                 validation_results['warnings'].append(f'Color inválido en {field}: {color}')
-        
+
         return JsonResponse(validation_results)
-        
+
     except json.JSONDecodeError:
         return JsonResponse({
             'valid': False,
@@ -954,7 +954,7 @@ def validate_config_file(request):
                     <p class="text-muted">
                         Descarga tu configuración de branding completa para respaldo o transferencia.
                     </p>
-                    
+
                     <div class="export-options">
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="export_logo" checked>
@@ -975,14 +975,14 @@ def validate_config_file(request):
                             </label>
                         </div>
                     </div>
-                    
+
                     <button class="btn btn-primary mt-3" id="export_config_btn">
                         <i class="fas fa-download"></i> Exportar Configuración
                     </button>
                 </div>
             </div>
         </div>
-        
+
         <!-- Import -->
         <div class="col-md-6">
             <div class="card">
@@ -993,7 +993,7 @@ def validate_config_file(request):
                     <p class="text-muted">
                         Importa una configuración de branding desde un archivo exportado.
                     </p>
-                    
+
                     <div class="import-zone" id="import_dropzone">
                         <div class="dropzone-content">
                             <i class="fas fa-cloud-upload-alt fa-3x text-muted"></i>
@@ -1002,11 +1002,11 @@ def validate_config_file(request):
                         </div>
                         <input type="file" id="config_file_input" accept=".json" style="display: none;">
                     </div>
-                    
+
                     <div class="validation-results mt-3" id="validation_results" style="display: none;">
                         <!-- Resultados de validación aparecerán aquí -->
                     </div>
-                    
+
                     <div class="import-actions mt-3" style="display: none;" id="import_actions">
                         <button class="btn btn-success" id="confirm_import_btn">
                             <i class="fas fa-check"></i> Confirmar Importación
@@ -1031,52 +1031,52 @@ document.addEventListener('DOMContentLoaded', function() {
             include_colors: document.getElementById('export_colors').checked,
             include_typography: document.getElementById('export_typography').checked,
         };
-        
+
         // Crear URL con parámetros
         const params = new URLSearchParams(options);
         window.location.href = `/api/branding/export/?${params}`;
     });
-    
+
     // Import functionality
     const dropzone = document.getElementById('import_dropzone');
     const fileInput = document.getElementById('config_file_input');
-    
+
     dropzone.addEventListener('click', () => fileInput.click());
-    
+
     dropzone.addEventListener('dragover', function(e) {
         e.preventDefault();
         this.classList.add('dragover');
     });
-    
+
     dropzone.addEventListener('dragleave', function(e) {
         this.classList.remove('dragover');
     });
-    
+
     dropzone.addEventListener('drop', function(e) {
         e.preventDefault();
         this.classList.remove('dragover');
-        
+
         const files = e.dataTransfer.files;
         if (files.length > 0) {
             handleFileSelection(files[0]);
         }
     });
-    
+
     fileInput.addEventListener('change', function(e) {
         if (e.target.files.length > 0) {
             handleFileSelection(e.target.files[0]);
         }
     });
-    
+
     function handleFileSelection(file) {
         // Validar archivo
         validateConfigFile(file);
     }
-    
+
     function validateConfigFile(file) {
         const formData = new FormData();
         formData.append('config_file', file);
-        
+
         fetch('/api/branding/validate/', {
             method: 'POST',
             body: formData,
@@ -1096,12 +1096,12 @@ document.addEventListener('DOMContentLoaded', function() {
             showError('Error al validar archivo');
         });
     }
-    
+
     function displayValidationResults(results) {
         const container = document.getElementById('validation_results');
         container.innerHTML = '';
         container.style.display = 'block';
-        
+
         if (results.valid) {
             container.innerHTML = `
                 <div class="alert alert-success">
@@ -1114,7 +1114,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </ul>
                 </div>
             `;
-            
+
             if (results.warnings.length > 0) {
                 container.innerHTML += `
                     <div class="alert alert-warning">

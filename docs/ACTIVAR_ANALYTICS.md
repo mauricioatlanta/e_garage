@@ -19,7 +19,7 @@
 
 ### **4. Configurar flujo de datos**
 - **Plataforma**: Web
-- **URL del sitio web**: 
+- **URL del sitio web**:
   - Desarrollo: `http://127.0.0.1:8000`
   - Producción: `https://tudominio.com`
 - **Nombre del stream**: `eGarage Landing Page`

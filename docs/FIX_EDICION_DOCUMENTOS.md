@@ -39,7 +39,7 @@ console.log('[EDICIÓN] Servicio cargado:', nombre);
 
 ### Documento de Prueba #15
 - **Antes**: Sin mecánico, sin repuestos, sin servicios
-- **Después**: 
+- **Después**:
   - ✅ Mecánico: Juan Pérez
   - ✅ Repuestos: 2 items ($130,000)
   - ✅ Servicios: 2 items ($80,000)

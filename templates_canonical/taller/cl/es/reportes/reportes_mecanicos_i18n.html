@@ -37,7 +37,7 @@
         background: linear-gradient(135deg, rgba(0,255,136,0.1) 0%, rgba(0,102,255,0.1) 50%, rgba(255,0,128,0.1) 100%);
         border: 2px solid var(--ai-glow);
         border-radius: 20px;
-        box-shadow: 
+        box-shadow:
             0 0 50px rgba(0,255,255,0.3),
             inset 0 0 30px rgba(0,255,136,0.1);
         backdrop-filter: blur(10px);
@@ -190,7 +190,7 @@
                 <label class="block text-sm font-bold mb-2 text-cyan-300">
                     {% trans "Fecha inicio" %}
                 </label>
-                <input type="date" name="fecha_inicio" value="{{ fecha_inicio }}" 
+                <input type="date" name="fecha_inicio" value="{{ fecha_inicio }}"
                        class="filter-input w-full">
             </div>
 
@@ -199,7 +199,7 @@
                 <label class="block text-sm font-bold mb-2 text-cyan-300">
                     {% trans "Fecha fin" %}
                 </label>
-                <input type="date" name="fecha_fin" value="{{ fecha_fin }}" 
+                <input type="date" name="fecha_fin" value="{{ fecha_fin }}"
                        class="filter-input w-full">
             </div>
 
@@ -215,7 +215,7 @@
     <!-- Botón de exportar Excel -->
     {% if reportes_data %}
     <div class="text-center mb-6">
-        <a href="{% country_url 'exportar_mecanicos_excel' app_namespace='reportes' %}?{{ request.GET.urlencode }}" 
+        <a href="{% country_url 'exportar_mecanicos_excel' app_namespace='reportes' %}?{{ request.GET.urlencode }}"
            class="ai-button">
             📊 {% trans "Exportar a Excel" %}
         </a>
@@ -284,20 +284,20 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const ctx = document.getElementById('chartRendimiento').getContext('2d');
-    
+
     // Datos del gráfico
     const labels = [
         {% for reporte in reportes_data %}
             '{{ reporte.tecnico__nombre }}',
         {% endfor %}
     ];
-    
+
     const totalData = [
         {% for reporte in reportes_data %}
             {{ reporte.total_general|default:0 }},
         {% endfor %}
     ];
-    
+
     // Crear gráfico
     new Chart(ctx, {
         type: 'bar',

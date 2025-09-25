@@ -2,6 +2,7 @@
 """
 Sistema de backup simplificado que funciona con los modelos disponibles
 """
+
 import json
 import logging
 import os
@@ -69,7 +70,6 @@ class BackupSimplificado:
 
             # Recopilar datos de la empresa
             from django.core import serializers
-
 
             backup_data = {
                 "empresa": {

@@ -37,7 +37,7 @@
 
 **Base de Datos:**
 - 👤 3 usuarios registrados
-- 🏢 3 empresas configuradas  
+- 🏢 3 empresas configuradas
 - 🔧 15 mecánicos disponibles
 - 📄 5 documentos creados
 - 🔩 Repuestos y servicios integrados

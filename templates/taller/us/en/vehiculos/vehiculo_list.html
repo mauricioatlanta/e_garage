@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n static widget_tweaks %}
+{% load country_url %}
 
 {% block content %}
 <!-- Fondo animado -->
@@ -28,8 +29,8 @@
             <p class="text-gray-400 text-xs mt-0.5">{% trans "Manage your vehicle fleet" %}</p>
           </div>
         </div>
-        
-        <a href="{% url 'vehiculos_usa:crear_vehiculo' %}" 
+
+        <a href="/us/vehiculos/crear/"
            class="inline-flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600/20 to-green-600/20 border border-emerald-400/40 text-emerald-300 hover:from-emerald-500/30 hover:to-green-500/30 hover:text-emerald-200 transition-all duration-300">
           <span>➕</span>
           <span class="hidden sm:inline">{% trans "Add Vehicle" %}</span>
@@ -59,19 +60,19 @@
                   </div>
                 </div>
                 <div class="flex space-x-2">
-                  <a href="{% url 'vehiculos_usa:ver_vehiculo' vehiculo.pk %}" 
+                  <a href="/us/vehiculos/{{ vehiculo.pk }}/"
                      class="p-2 rounded-lg bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border border-cyan-400/40 text-cyan-300 hover:from-cyan-500/30 hover:to-blue-500/30 transition-all duration-200"
                      title="{% trans 'View Details' %}">
                     👁️
                   </a>
-                  <a href="{% url 'vehiculos_usa:editar_vehiculo' vehiculo.pk %}" 
+                  <a href="/us/vehiculos/{{ vehiculo.pk }}/editar/"
                      class="p-2 rounded-lg bg-gradient-to-r from-orange-600/20 to-yellow-600/20 border border-orange-400/40 text-orange-300 hover:from-orange-500/30 hover:to-yellow-500/30 transition-all duration-200"
                      title="{% trans 'Edit' %}">
                     ✏️
                   </a>
                 </div>
               </div>
-              
+
               <div class="space-y-2">
                 <div class="flex items-center space-x-2 text-sm">
                   <span class="text-gray-400">👤</span>
@@ -107,7 +108,7 @@
         </div>
         <h3 class="text-xl font-bold text-gray-300 mb-2">{% trans "No vehicles found" %}</h3>
         <p class="text-gray-400 mb-6">{% trans "Start by adding your first vehicle to the system" %}</p>
-        <a href="{% url 'vehiculos_usa:crear_vehiculo' %}" 
+        <a href="/us/vehiculos/crear/"
            class="inline-flex items-center space-x-2 px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-600/20 to-green-600/20 border border-emerald-400/40 text-emerald-300 hover:from-emerald-500/30 hover:to-green-500/30 hover:text-emerald-200 transition-all duration-300">
           <span>➕</span>
           <span>{% trans "Add First Vehicle" %}</span>

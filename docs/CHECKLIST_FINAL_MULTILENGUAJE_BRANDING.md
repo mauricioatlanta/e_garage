@@ -22,7 +22,7 @@
 ## 🔥 TAREAS FINALES PARA PRODUCCIÓN
 
 ### 1. 🌐 Migración URLs de Idioma a País
-**Prioridad**: Alta  
+**Prioridad**: Alta
 **Objetivo**: URLs más claras que reflejen mercado, no idioma
 
 ```python
@@ -44,7 +44,7 @@
 - Tests - Actualizar endpoints de prueba
 
 ### 2. 🎨 Integración Branding en Multilenguaje
-**Prioridad**: Alta  
+**Prioridad**: Alta
 **Objetivo**: Branding personalizado funcione con países/idiomas
 
 ```python
@@ -55,7 +55,7 @@ def unified_context(request):
         'company_name': settings.get_company_name(),
         'company_logo': settings.get_logo_url(),
         'primary_color': settings.get_primary_color(),
-        
+
         # Contexto multilenguaje
         'current_country': get_country_from_request(request),
         'current_language': get_language_from_request(request),
@@ -69,7 +69,7 @@ def unified_context(request):
 - `templates/base.html` - Selector país + branding
 
 ### 3. 📊 Fixtures Completas de Datos
-**Prioridad**: Media  
+**Prioridad**: Media
 **Objetivo**: Datos demo reales para CL y US
 
 ```json
@@ -95,11 +95,11 @@ def unified_context(request):
 
 // fixtures/usa_services.json
 {
-  "model": "taller.categoriaservicioname", 
+  "model": "taller.categoriaservicioname",
   "pk": 2,
   "fields": {
     "categoria": 1,
-    "language": "en", 
+    "language": "en",
     "name": "Maintenance",
     "aliases": ["service", "checkup", "tune-up"]
   }
@@ -122,16 +122,16 @@ fixtures/
 ```
 
 ### 4. 🧪 Tests Matrix Automáticos
-**Prioridad**: Alta  
+**Prioridad**: Alta
 **Objetivo**: Garantizar funcionalidad en todas las combinaciones
 
 ```python
 # tests/test_multilang_matrix.py
 class MultiLangMatrixTest(TestCase):
-    
+
     countries = ['CL', 'US']
     languages = ['es', 'en']
-    
+
     def test_country_language_matrix(self):
         """Test todas las combinaciones país×idioma"""
         for country in self.countries:
@@ -140,7 +140,7 @@ class MultiLangMatrixTest(TestCase):
                     self._test_crud_operations(country, language)
                     self._test_search_functionality(country, language)
                     self._test_branding_context(country, language)
-    
+
     def test_fuzzy_search_matrix(self):
         """Test búsqueda fuzzy en todos los idiomas"""
         test_cases = [
@@ -149,48 +149,48 @@ class MultiLangMatrixTest(TestCase):
             ('US', 'en', 'oil change', 'oil replacement'),
             ('US', 'en', 'brake', 'brake service'),
         ]
-        
+
         for country, lang, query, expected in test_cases:
             with self.subTest(country=country, lang=lang, query=query):
                 results = ServiceSearchEngine(country, lang).search(query)
                 self.assertIn(expected.lower(), [r.name.lower() for r in results])
-    
+
     def test_cross_country_isolation(self):
         """Verificar que datos de países no se mezclen"""
         # Crear servicio en CL
         cl_service = self._create_service('CL', 'Cambio de aceite')
-        
+
         # Buscar desde US no debe encontrarlo
         us_results = ServiceSearchEngine('US', 'en').search('oil change')
         self.assertNotIn(cl_service, us_results)
 ```
 
 ### 5. 🔒 Validación de Consistencia
-**Prioridad**: Alta  
+**Prioridad**: Alta
 **Objetivo**: Prevenir datos inconsistentes entre países
 
 ```python
 # validators/country_consistency.py
 class CountryConsistencyValidator:
     """Valida que todos los FKs tengan el mismo country"""
-    
+
     def validate_document_consistency(self, documento):
         """Valida que cliente, vehículo y servicios sean del mismo país"""
         base_country = documento.cliente.country
-        
+
         # Validar vehículo
         if documento.vehiculo and documento.vehiculo.country != base_country:
             raise ValidationError(
                 f"Vehículo debe ser del mismo país que cliente ({base_country})"
             )
-        
+
         # Validar servicios
         for servicio_doc in documento.servicios.all():
             if servicio_doc.servicio.country != base_country:
                 raise ValidationError(
                     f"Servicio {servicio_doc.servicio} debe ser del país {base_country}"
                 )
-    
+
     def validate_service_hierarchy(self, servicio):
         """Valida jerarquía categoría→subcategoría→servicio"""
         if servicio.subcategoria.categoria.country != servicio.country:
@@ -274,7 +274,7 @@ egarage_final/
 
 **OBJETIVO (100% producción)**:
 - ✅ Core multilenguaje sólido
-- ✅ Branding personalizado funcional  
+- ✅ Branding personalizado funcional
 - ✅ APIs y endpoints operativos
 - ✅ URLs usan países (`/cl/`, `/us/`)
 - ✅ Fixtures completas con datos reales

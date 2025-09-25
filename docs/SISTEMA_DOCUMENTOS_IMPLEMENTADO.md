@@ -245,6 +245,6 @@ El sistema de creación de documentos está listo para uso en producción con to
 
 ---
 
-**Desarrollado por:** Claude Sonnet 4  
-**Fecha:** 28 de Agosto, 2025  
+**Desarrollado por:** Claude Sonnet 4
+**Fecha:** 28 de Agosto, 2025
 **Versión:** 1.0.0

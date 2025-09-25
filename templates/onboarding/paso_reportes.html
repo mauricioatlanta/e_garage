@@ -1,3 +1,4 @@
+{% load country_url %}
 {% extends 'base.html' %}
 
 {% block title %}📊 Demo de Reportes Avanzados{% endblock %}
@@ -234,11 +235,11 @@
         .metrics-grid {
             grid-template-columns: 1fr 1fr;
         }
-        
+
         .charts-container {
             grid-template-columns: 1fr;
         }
-        
+
         .action-buttons {
             flex-direction: column;
             align-items: center;
@@ -315,19 +316,19 @@
         <h3 style="color: var(--ai-orange); font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem; text-align: center;">
             🧠 Insights Generados por IA
         </h3>
-        
+
         <div class="insight-item">
             Los martes son 34% más rentables - programa servicios premium ese día
         </div>
-        
+
         <div class="insight-item">
             Clientes con Toyota gastan 67% más en promedio - enfócate en esta marca
         </div>
-        
+
         <div class="insight-item">
             Servicios de frenos tienen mayor margen - promociona paquetes de seguridad
         </div>
-        
+
         <div class="insight-item">
             El 78% de clientes retorna si recibe WhatsApp de seguimiento
         </div>
@@ -335,7 +336,7 @@
 
     <!-- Botones de Acción -->
     <div class="action-buttons">
-        <a href="{% url 'taller:reportes_unificados' %}" class="btn-demo">
+        <a href="{% country_url 'reportes_unificados' %}" class="btn-demo">
             📊 Ver Reportes Completos
         </a>
         <a href="{% url 'onboarding:onboarding_paso' %}?paso=5" class="btn-demo btn-continue">
@@ -387,11 +388,11 @@ new Chart(ctxIngresos, {
             legend: { labels: { color: '#00ffff' } }
         },
         scales: {
-            y: { 
+            y: {
                 ticks: { color: '#00ffff' },
                 grid: { color: 'rgba(0, 212, 255, 0.2)' }
             },
-            x: { 
+            x: {
                 ticks: { color: '#00ffff' },
                 grid: { color: 'rgba(0, 212, 255, 0.2)' }
             }
@@ -428,12 +429,12 @@ function actualizarMetricas() {
         { id: 'clientes-nuevos', base: 28, variacion: 1 },
         { id: 'eficiencia', base: 94, variacion: 2, sufijo: '%' }
     ];
-    
+
     elementos.forEach(elem => {
         const elemento = document.getElementById(elem.id);
         const variacion = Math.floor(Math.random() * elem.variacion * 2) - elem.variacion;
         const nuevoValor = elem.base + variacion;
-        
+
         if (elem.sufijo) {
             elemento.textContent = nuevoValor + elem.sufijo;
         } else if (elem.id === 'ingresos-mes') {

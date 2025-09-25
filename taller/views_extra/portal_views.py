@@ -58,7 +58,7 @@ def portal_login(request):
                 AccesoPortal.objects.create(
                     cliente_usuario=cliente_usuario,
                     ip_address=request.META.get("REMOTE_ADDR"),
-                    user_agent=request.META.get("HTTP_USER_AGENT", ""),
+                    user_agent=request.headers.get("user-agent", ""),
                     pagina_visitada="login",
                     accion_realizada="login_exitoso",
                 )
@@ -112,7 +112,7 @@ def portal_dashboard(request):
         AccesoPortal.objects.create(
             cliente_usuario=cliente_usuario,
             ip_address=request.META.get("REMOTE_ADDR"),
-            user_agent=request.META.get("HTTP_USER_AGENT", ""),
+            user_agent=request.headers.get("user-agent", ""),
             pagina_visitada="dashboard",
             accion_realizada="vista_dashboard",
         )
@@ -183,7 +183,7 @@ def portal_documentos(request):
         AccesoPortal.objects.create(
             cliente_usuario=cliente_usuario,
             ip_address=request.META.get("REMOTE_ADDR"),
-            user_agent=request.META.get("HTTP_USER_AGENT", ""),
+            user_agent=request.headers.get("user-agent", ""),
             pagina_visitada="documentos",
             accion_realizada="vista_documentos",
         )
@@ -233,7 +233,7 @@ def portal_solicitar_presupuesto(request):
                 AccesoPortal.objects.create(
                     cliente_usuario=cliente_usuario,
                     ip_address=request.META.get("REMOTE_ADDR"),
-                    user_agent=request.META.get("HTTP_USER_AGENT", ""),
+                    user_agent=request.headers.get("user-agent", ""),
                     pagina_visitada="solicitar_presupuesto",
                     accion_realizada=f"crear_solicitud_{solicitud.numero_solicitud}",
                 )
@@ -287,7 +287,7 @@ def portal_mis_solicitudes(request):
         AccesoPortal.objects.create(
             cliente_usuario=cliente_usuario,
             ip_address=request.META.get("REMOTE_ADDR"),
-            user_agent=request.META.get("HTTP_USER_AGENT", ""),
+            user_agent=request.headers.get("user-agent", ""),
             pagina_visitada="mis_solicitudes",
             accion_realizada="vista_solicitudes",
         )
@@ -318,7 +318,7 @@ def portal_vehiculos(request):
         AccesoPortal.objects.create(
             cliente_usuario=cliente_usuario,
             ip_address=request.META.get("REMOTE_ADDR"),
-            user_agent=request.META.get("HTTP_USER_AGENT", ""),
+            user_agent=request.headers.get("user-agent", ""),
             pagina_visitada="vehiculos",
             accion_realizada="vista_vehiculos",
         )

@@ -28,13 +28,13 @@ class LineaServicio(models.Model):
             self.documento, self.servicio,
             "Servicio de otro país no puede usarse en este documento"
         )
-        
+
         # Validar tipo interno
         ValidacionConsistencia.assert_correct_tipo(
             self.servicio, 'interno',
             "Esta línea requiere un servicio de tipo 'interno'"
         )
-    
+
     def save(self, *args, **kwargs):
         self.full_clean()  # Forzar validaciones
         return super().save(*args, **kwargs)
@@ -44,11 +44,11 @@ class LineaServicio(models.Model):
 
 ```sql
 -- Tipo válido en servicios
-ALTER TABLE taller_servicio ADD CONSTRAINT servicio_tipo_valido 
+ALTER TABLE taller_servicio ADD CONSTRAINT servicio_tipo_valido
 CHECK (tipo IN ('interno', 'externo'));
 
 -- Índices de performance
-CREATE INDEX servicio_country_tipo_code_idx 
+CREATE INDEX servicio_country_tipo_code_idx
 ON taller_servicio (country, tipo, code);
 ```
 

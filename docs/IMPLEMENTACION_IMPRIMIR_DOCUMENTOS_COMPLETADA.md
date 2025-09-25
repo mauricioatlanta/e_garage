@@ -11,7 +11,7 @@
 
 2. **Template PDF Profesional Mejorado**
    - ✅ Header con logo y datos de la empresa
-   - ✅ Información completa del cliente y vehículo  
+   - ✅ Información completa del cliente y vehículo
    - ✅ Tablas organizadas por secciones:
      - 🔩 Repuestos (código, descripción, cantidad, precio, total)
      - ⚙️ Servicios (descripción, precio)
@@ -38,7 +38,7 @@
 ### **Archivos PDF Generados**
 ```
 invoice_CL_128.pdf   (26,086 bytes) - Presupuesto #PRE-56346
-invoice_CL_129.pdf   (23,664 bytes) - Presupuesto #PRE-99477  
+invoice_CL_129.pdf   (23,664 bytes) - Presupuesto #PRE-99477
 invoice_CL_130.pdf   (26,059 bytes) - Presupuesto #PRE-98030
 invoice_US_192.pdf   (27,913 bytes) - Presupuesto #US-PRE-33866
 invoice_US_193.pdf   (28,161 bytes) - Presupuesto #US-PRE-81632
@@ -96,7 +96,7 @@ invoice_US_194.pdf   (26,997 bytes) - Presupuesto #US-PRE-64741
 - 🇨🇱 Nombres y datos en español
 - 📞 Formato de teléfonos chilenos
 
-### **USA (testuser_usa)**  
+### **USA (testuser_usa)**
 - 💱 Precios en USD (dólares americanos)
 - 🇺🇸 Nombres y datos en inglés
 - 📞 Formato de teléfonos americanos (+1-555-xxx-xxxx)

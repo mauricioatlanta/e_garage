@@ -36,7 +36,9 @@ def registro_trial(request):
             try:
                 # Enviar al usuario y a subcripcion@atlantareciclajes.cl
                 destinatarios = [email, "subcripcion@atlantareciclajes.cl"]
-                link_activacion = f"https://egarage.cl/activar-trial/?email={email}"
+                link_activacion = (
+                    f"https://egarage.cl/cl/es/activar-trial/?email={email}"
+                )
                 mensaje = (
                     f"Hola {nombre},\n\n"
                     f"Tu código de instalación seguro es: {codigo}\n\n"

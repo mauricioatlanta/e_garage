@@ -153,5 +153,5 @@ print(f"DEBUG API - Documentos encontrados: {documentos_qs.count()}")
 Los gráficos "📊 Rendimiento por Técnico" y "📈 Evolución Semanal" ahora muestran información real y detallada cuando el usuario tiene datos asociados. La API funciona correctamente y devuelve datos estructurados para Chart.js.
 
 ---
-*Resolución implementada y verificada el 10 de agosto de 2025*  
+*Resolución implementada y verificada el 10 de agosto de 2025*
 *Los gráficos ahora contienen información completa y útil*

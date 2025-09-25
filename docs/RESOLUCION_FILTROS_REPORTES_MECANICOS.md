@@ -4,7 +4,7 @@
 
 El usuario reportó que los filtros de fecha y técnico en la página de reportes de mecánicos no funcionaban correctamente, mostrando los mismos resultados independientemente de los parámetros utilizados.
 
-**URL problemática reportada:** 
+**URL problemática reportada:**
 `http://127.0.0.1:8000/cl/reportes/mecanicos/?fecha_desde=2025-07-01&fecha_hasta=2025-08-11&tecnico_id=3`
 
 ## 🔍 Diagnóstico Realizado
@@ -78,11 +78,11 @@ print(f"DEBUG - Query SQL: {documentos_qs.query}")
 
 ### Query SQL Generada:
 ```sql
-SELECT * FROM "taller_documento" 
+SELECT * FROM "taller_documento"
 WHERE (
-    "taller_documento"."empresa_id" = 13 
-    AND "taller_documento"."fecha" BETWEEN 2025-07-01 AND 2025-08-11 
-    AND "taller_documento"."tecnico_id" IS NOT NULL 
+    "taller_documento"."empresa_id" = 13
+    AND "taller_documento"."fecha" BETWEEN 2025-07-01 AND 2025-08-11
+    AND "taller_documento"."tecnico_id" IS NOT NULL
     AND "taller_documento"."tecnico_id" = 8
 )
 ```

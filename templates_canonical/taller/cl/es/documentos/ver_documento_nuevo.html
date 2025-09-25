@@ -159,7 +159,7 @@
     border-radius: 0.5rem;
     margin: 1rem 0;
   }
-  
+
   /* Estilos para estados de pago */
   .estado-pago {
     padding: 6px 12px;
@@ -204,7 +204,7 @@
     gap: 0.5rem;
     min-width: 200px;
   }
-  
+
   .pricing-row {
     display: flex;
     justify-content: space-between;
@@ -212,7 +212,7 @@
     padding: 0.25rem 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
-  
+
   .pricing-row.ganancia {
     border-bottom: 2px solid #00f2fe;
     font-weight: bold;
@@ -226,11 +226,11 @@
      data-locale="{% if company_country == 'US' %}en-US{% else %}es-CL{% endif %}"
      data-currency="{% if company_country == 'US' %}USD{% else %}CLP{% endif %}">
   <div class="estado-documento">✅ Guardado</div>
-  
+
   <h1 class="documento-title">
     {{ documento.tipo_documento }} #{{ documento.numero_documento }}
   </h1>
-  
+
   <!-- Información del documento -->
   <div class="info-grid">
     <div class="info-item">
@@ -404,7 +404,7 @@
     <div class="total-row">
       <div style="display: flex; align-items: center; gap: 10px;">
         <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
-          <input type="checkbox" id="toggle-iva" {% if documento.incluir_iva %}checked{% endif %} 
+          <input type="checkbox" id="toggle-iva" {% if documento.incluir_iva %}checked{% endif %}
                  style="accent-color: #00f2fe;" onchange="actualizarTotales()">
           <span>{% if company_country == 'US' %}🇺🇸 Aplicar Sales Tax{% else %}📋 Aplicar IVA (19%){% endif %}</span>
         </label>
@@ -431,23 +431,23 @@
   <!-- Acciones -->
   <div class="acciones">
   {% if request.path|slice:":3" == "/cl" %}
-    <a href="{% url 'documentos_cl:lista_documentos' %}" class="btn-accion">
+    <a href="{% url 'documentos_cl_es:lista_documentos' %}" class="btn-accion">
         ← Volver al Listado
       </a>
-    <a href="{% url 'documentos_cl:editar_documento' pk=documento.id %}" class="btn-accion">
+    <a href="{% url 'documentos_cl_es:editar_documento' pk=documento.id %}" class="btn-accion">
         ✏️ Editar Documento
       </a>
-    <a href="{% url 'documentos_cl:exportar_documento_pdf' documento_id=documento.id %}" class="btn-accion" target="_blank">
+    <a href="{% url 'documentos_cl_es:exportar_documento_pdf' documento_id=documento.id %}" class="btn-accion" target="_blank">
         📄 Exportar PDF
       </a>
   {% else %}
-    <a href="{% url 'documentos_us:lista_documentos' %}" class="btn-accion">
+    <a href="{% url 'documentos_us_en:lista_documentos' %}" class="btn-accion">
         ← Volver al Listado
       </a>
-    <a href="{% url 'documentos_us:editar_documento' pk=documento.id %}" class="btn-accion">
+    <a href="{% url 'documentos_us_en:editar_documento' pk=documento.id %}" class="btn-accion">
         ✏️ Editar Documento
       </a>
-    <a href="{% url 'documentos_us:exportar_documento_pdf' documento_id=documento.id %}" class="btn-accion" target="_blank">
+    <a href="{% url 'documentos_us_en:exportar_documento_pdf' documento_id=documento.id %}" class="btn-accion" target="_blank">
         📄 Exportar PDF
       </a>
   {% endif %}
@@ -489,11 +489,11 @@ function formatearPesosChilenos(valor) {
 // Formateo de monedas según país
 document.addEventListener('DOMContentLoaded', function () {
   console.log('=== INICIANDO FORMATEO ===');
-  
+
   // Formatear todos los elementos con data-money (totales)
   const elementsDataMoney = document.querySelectorAll('[data-money]');
   console.log('Elementos con data-money encontrados:', elementsDataMoney.length);
-  
+
   elementsDataMoney.forEach(el => {
     const raw = Number(el.getAttribute('data-money') || 0);
     console.log('Elemento data-money:', el.id, 'Valor:', raw);
@@ -503,7 +503,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // Formatear todos los elementos con data-valor (precios individuales)
   const elementsDataValor = document.querySelectorAll('[data-valor]');
   console.log('Elementos con data-valor encontrados:', elementsDataValor.length);
-  
+
   elementsDataValor.forEach(el => {
     const valor = el.getAttribute('data-valor');
     console.log('Elemento data-valor:', valor, 'Formateado:', formatearPesosChilenos(valor));
@@ -511,7 +511,7 @@ document.addEventListener('DOMContentLoaded', function () {
       el.textContent = formatearPesosChilenos(valor);
     }
   });
-  
+
   console.log('=== FORMATEO COMPLETADO ===');
 });
 
@@ -521,25 +521,25 @@ function actualizarTotales() {
   const ivaElement = document.getElementById('display-tax');
   const totalElement = document.getElementById('display-total');
   const toggleIva = document.getElementById('toggle-iva');
-  
+
   if (!subtotalElement || !ivaElement || !totalElement) return;
-  
+
   // Obtener subtotal desde el atributo data-money
   const subtotal = Number(subtotalElement.getAttribute('data-money') || 0);
-  
+
   // Calcular IVA (19% para Chile)
   let iva = 0;
   if (toggleIva.checked) {
     iva = Math.round(subtotal * 0.19);
   }
-  
+
   // Calcular total
   const total = subtotal + iva;
-  
+
   // Actualizar elementos
   ivaElement.textContent = formatearPesosChilenos(iva);
   totalElement.textContent = formatearPesosChilenos(total);
-  
+
   // Actualizar atributos data-money para mantener consistencia
   ivaElement.setAttribute('data-money', iva);
   totalElement.setAttribute('data-money', total);

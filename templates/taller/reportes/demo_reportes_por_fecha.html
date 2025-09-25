@@ -311,12 +311,12 @@
                     <label for="desde">📅 Fecha Desde</label>
                     <input type="date" id="desde" name="desde" class="form-control" value="{{ desde }}">
                 </div>
-                
+
                 <div class="form-group">
                     <label for="hasta">📅 Fecha Hasta</label>
                     <input type="date" id="hasta" name="hasta" class="form-control" value="{{ hasta }}">
                 </div>
-                
+
                 <div class="form-group">
                     <label for="tipo">📈 Tipo de Reporte</label>
                     <select id="tipo" name="tipo" class="form-control">
@@ -326,7 +326,7 @@
                         <option value="detallado" {% if tipo_reporte == 'detallado' %}selected{% endif %}>Detallado</option>
                     </select>
                 </div>
-                
+
                 <div class="form-group">
                     <button type="submit" class="btn-cyber">
                         🔍 Generar Reporte
@@ -345,19 +345,19 @@
                 <div class="stat-value">{{ total_documentos }}</div>
                 <div class="stat-label">Total Documentos</div>
             </div>
-            
+
             <div class="stat-card">
                 <div class="stat-icon">🔧</div>
                 <div class="stat-value">{{ total_servicios.cantidad|default:0 }}</div>
                 <div class="stat-label">Total Servicios</div>
             </div>
-            
+
             <div class="stat-card">
                 <div class="stat-icon">⚙️</div>
                 <div class="stat-value">{{ total_repuestos.cantidad_total|default:0 }}</div>
                 <div class="stat-label">Repuestos Vendidos</div>
             </div>
-            
+
             <div class="stat-card">
                 <div class="stat-icon">💰</div>
                 <div class="stat-value">${{ total_servicios.valor_total|add:total_repuestos.valor_total|floatformat:0|default:0 }}</div>
@@ -495,10 +495,10 @@ particlesJS("particles-js", {
 // AJAX para formulario
 document.getElementById('reporteForm').addEventListener('submit', function(e) {
     e.preventDefault();
-    
+
     const formData = new FormData(this);
     const params = new URLSearchParams(formData);
-    
+
     // Mostrar loading
     document.getElementById('resultados').innerHTML = `
         <div class="loading">
@@ -506,7 +506,7 @@ document.getElementById('reporteForm').addEventListener('submit', function(e) {
             <p>Generando reporte...</p>
         </div>
     `;
-    
+
     // Simular carga y recargar página con parámetros
     setTimeout(() => {
         window.location.href = '?' + params.toString();
@@ -517,13 +517,13 @@ document.getElementById('reporteForm').addEventListener('submit', function(e) {
 window.addEventListener('load', function() {
     const desde = document.getElementById('desde');
     const hasta = document.getElementById('hasta');
-    
+
     if (!desde.value) {
         const fecha30DiasAtras = new Date();
         fecha30DiasAtras.setDate(fecha30DiasAtras.getDate() - 30);
         desde.value = fecha30DiasAtras.toISOString().split('T')[0];
     }
-    
+
     if (!hasta.value) {
         const hoy = new Date();
         hasta.value = hoy.toISOString().split('T')[0];

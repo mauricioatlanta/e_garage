@@ -2,6 +2,7 @@
 """
 Utilidades para envío de notificaciones automáticas
 """
+
 import logging
 import smtplib
 from datetime import timedelta

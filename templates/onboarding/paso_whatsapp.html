@@ -1,3 +1,4 @@
+{% load country_url %}
 {% extends 'base.html' %}
 
 {% block title %}💬 Contacto Directo - WhatsApp Integrado{% endblock %}
@@ -341,12 +342,12 @@
         .features-showcase {
             grid-template-columns: 1fr;
         }
-        
+
         .action-buttons {
             flex-direction: column;
             align-items: center;
         }
-        
+
         .final-title {
             font-size: 2rem;
         }
@@ -376,7 +377,7 @@
             ¡Felicitaciones! Tu taller está digitalizado
         </h2>
         <p style="color: var(--glow-cyan); font-size: 1.1rem;">
-            Has completado exitosamente todos los módulos del onboarding. 
+            Has completado exitosamente todos los módulos del onboarding.
             Tu sistema está listo para revolucionar tu taller.
         </p>
     </div>
@@ -408,7 +409,7 @@
         <h3 style="color: var(--whatsapp-green); font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem; text-align: center;">
             💬 WhatsApp Business Integrado
         </h3>
-        
+
         <div class="whatsapp-preview">
             <div class="whatsapp-header">
                 <div class="whatsapp-avatar">🔧</div>
@@ -417,20 +418,20 @@
                     <p>En línea</p>
                 </div>
             </div>
-            
+
             <div class="whatsapp-message">
-                ¡Hola! 👋 Gracias por contactarnos. 
+                ¡Hola! 👋 Gracias por contactarnos.
                 <br><br>
                 🔧 Servicios disponibles:
                 <br>• Diagnóstico computarizado
-                <br>• Mantenimiento preventivo  
+                <br>• Mantenimiento preventivo
                 <br>• Reparaciones especializadas
                 <br><br>
                 ¿En qué podemos ayudarte hoy?
                 <div class="whatsapp-time">12:34 ✓✓</div>
             </div>
         </div>
-        
+
         <p style="color: var(--glow-cyan); text-align: center; margin-top: 1rem;">
             Respuesta automática configurada para nuevos clientes
         </p>
@@ -442,7 +443,7 @@
             <div class="feature-icon">📱</div>
             <h3 class="feature-title">Comunicación Directa</h3>
             <p class="feature-description">
-                Conecta instantáneamente con clientes a través de WhatsApp Business. 
+                Conecta instantáneamente con clientes a través de WhatsApp Business.
                 Envía cotizaciones, recordatorios y actualizaciones en tiempo real.
             </p>
         </div>
@@ -471,7 +472,7 @@
         <h3 style="color: var(--neon-purple); font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem; text-align: center;">
             🚀 Próximos Pasos Recomendados
         </h3>
-        
+
         <div class="step-item">
             <div class="step-number">1</div>
             <div>
@@ -480,7 +481,7 @@
                 <span style="color: var(--glow-cyan);">Completa datos de contacto, logo y servicios principales</span>
             </div>
         </div>
-        
+
         <div class="step-item">
             <div class="step-number">2</div>
             <div>
@@ -489,7 +490,7 @@
                 <span style="color: var(--glow-cyan);">Migra información de clientes existentes al sistema</span>
             </div>
         </div>
-        
+
         <div class="step-item">
             <div class="step-number">3</div>
             <div>
@@ -498,7 +499,7 @@
                 <span style="color: var(--glow-cyan);">Vincula tu número comercial para comunicación directa</span>
             </div>
         </div>
-        
+
         <div class="step-item">
             <div class="step-number">4</div>
             <div>
@@ -511,17 +512,17 @@
 
     <!-- Botones de Acción Final -->
     <div class="action-buttons">
-        <a href="https://wa.me/56912345678?text=¡Hola!%20Completé%20el%20onboarding%20de%20e-Garage%20y%20necesito%20ayuda%20para%20conectar%20mi%20WhatsApp%20Business" 
+        <a href="https://wa.me/56912345678?text=¡Hola!%20Completé%20el%20onboarding%20de%20e-Garage%20y%20necesito%20ayuda%20para%20conectar%20mi%20WhatsApp%20Business"
            target="_blank" class="btn-whatsapp">
             💬 Conectar WhatsApp Business
         </a>
-        
-    {% url 'taller:dashboard_suscripciones' as url_dashboard_suscripciones %}
+
+    {% country_url 'dashboard_suscripciones' as url_dashboard_suscripciones %}
     <a href="{{ url_dashboard_suscripciones|default:'#' }}" class="btn-whatsapp btn-dashboard">
             🏠 Ir al Dashboard Principal
         </a>
-        
-    {% url 'taller:ia:sugerencias_basicas' as url_sugerencias_basicas %}
+
+    {% country_url 'ia:sugerencias_basicas' as url_sugerencias_basicas %}
     <a href="{{ url_sugerencias_basicas|default:'#' }}" class="btn-whatsapp" style="background: linear-gradient(45deg, var(--ai-orange), var(--electric-yellow));">
             🧠 Explorar IA Avanzada
         </a>
@@ -577,17 +578,17 @@ function playSuccessSound() {
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
-    
+
     oscillator.connect(gainNode);
     gainNode.connect(audioContext.destination);
-    
+
     oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
     oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1); // E5
     oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2); // G5
-    
+
     gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
     gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-    
+
     oscillator.start(audioContext.currentTime);
     oscillator.stop(audioContext.currentTime + 0.5);
 }
@@ -596,7 +597,7 @@ function playSuccessSound() {
 function animarProgreso() {
     const circle = document.querySelector('.completion-circle');
     let progress = 0;
-    
+
     const interval = setInterval(() => {
         progress += 2;
         if (progress <= 100) {
@@ -613,7 +614,7 @@ window.addEventListener('load', function() {
         playSuccessSound();
         animarProgreso();
     }, 1000);
-    
+
     // Analytics de finalización
     gtag('event', 'onboarding_completado', {
         'event_category': 'conversion',
@@ -626,7 +627,7 @@ window.addEventListener('load', function() {
             'empresa': '{{ request.user.empresa.nombre_taller }}'
         }
     });
-    
+
     // Evento especial de conversión
     gtag('event', 'purchase', {
         'transaction_id': 'onboarding_{{ request.user.id }}',
@@ -648,7 +649,7 @@ document.querySelectorAll('.feature-card').forEach(card => {
         this.style.transform = 'translateY(-5px) scale(1.02)';
         this.style.borderColor = 'var(--whatsapp-green)';
     });
-    
+
     card.addEventListener('mouseleave', function() {
         this.style.transform = 'translateY(0) scale(1)';
         this.style.borderColor = 'var(--cyber-blue)';

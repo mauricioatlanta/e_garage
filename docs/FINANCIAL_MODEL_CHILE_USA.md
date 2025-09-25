@@ -18,7 +18,7 @@ Payback Period: 2.2 meses
 
 ### **🇺🇸 USA - Métricas Premium**
 ```
-ARPU (Average Revenue Per User): $450 USD/mes  
+ARPU (Average Revenue Per User): $450 USD/mes
 CAC (Customer Acquisition Cost): $1,500 USD
 LTV (Customer Lifetime Value): $16,200 USD (36 meses)
 LTV/CAC Ratio: 10.8x

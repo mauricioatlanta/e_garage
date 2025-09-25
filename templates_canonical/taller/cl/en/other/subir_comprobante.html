@@ -27,10 +27,10 @@
                 </h2>
                 <p class="text-blue-100">Completa todos los campos para procesar tu pago más rápido</p>
             </div>
-            
+
             <form method="post" enctype="multipart/form-data" class="p-6">
                 {% csrf_token %}
-                
+
                 {% if messages %}
                     {% for message in messages %}
                         <div class="mb-4 p-4 rounded-lg {% if message.tags == 'success' %}bg-green-50 border border-green-200 text-green-700{% else %}bg-red-50 border border-red-200 text-red-700{% endif %}">
@@ -41,7 +41,7 @@
                         </div>
                     {% endfor %}
                 {% endif %}
-                
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Plan y Monto -->
                     <div>
@@ -53,7 +53,7 @@
                             <p class="mt-1 text-sm text-red-600">{{ form.plan_solicitado.errors.0 }}</p>
                         {% endif %}
                     </div>
-                    
+
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">
                             {{ form.monto.label }}
@@ -64,7 +64,7 @@
                         {% endif %}
                         <p class="mt-1 text-xs text-gray-500">{{ form.monto.help_text }}</p>
                     </div>
-                    
+
                     <!-- Método de Pago -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -75,7 +75,7 @@
                             <p class="mt-1 text-sm text-red-600">{{ form.metodo_pago.errors.0 }}</p>
                         {% endif %}
                     </div>
-                    
+
                     <!-- Número de Transacción -->
                     <div class="md:col-span-2">
                         <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -88,7 +88,7 @@
                         <p class="mt-1 text-xs text-gray-500">{{ form.numero_transaccion.help_text }}</p>
                     </div>
                 </div>
-                
+
                 <!-- Archivo de Comprobante -->
                 <div class="mt-6">
                     <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -105,7 +105,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Comentarios -->
                 <div class="mt-6">
                     <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -116,16 +116,16 @@
                         <p class="mt-1 text-sm text-red-600">{{ form.descripcion.errors.0 }}</p>
                     {% endif %}
                 </div>
-                
+
                 <!-- Botones -->
                 <div class="mt-8 flex space-x-4">
-                    <button type="submit" 
+                    <button type="submit"
                             class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors">
                         <i class="fas fa-upload mr-2"></i>
                         Subir Comprobante
                     </button>
-                    
-                    <a href="{% url 'suspension' %}" 
+
+                    <a href="{% url 'suspension' %}"
                        class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 font-bold py-3 px-4 rounded-lg transition-colors text-center">
                         <i class="fas fa-arrow-left mr-2"></i>
                         Volver
@@ -133,7 +133,7 @@
                 </div>
             </form>
         </div>
-        
+
         <!-- Información adicional -->
         <div class="max-w-2xl mx-auto mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
             <h3 class="font-semibold text-blue-800 mb-3">
@@ -148,7 +148,7 @@
             </ul>
         </div>
     </div>
-    
+
     <script>
         // Preview del archivo seleccionado
         document.querySelector('input[type="file"]').addEventListener('change', function(e) {
@@ -157,11 +157,11 @@
                 const fileInfo = document.createElement('p');
                 fileInfo.className = 'mt-2 text-sm text-green-600';
                 fileInfo.innerHTML = `<i class="fas fa-file mr-2"></i>Archivo seleccionado: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
-                
+
                 // Remover info previa si existe
                 const existingInfo = e.target.parentNode.querySelector('.file-info');
                 if (existingInfo) existingInfo.remove();
-                
+
                 fileInfo.classList.add('file-info');
                 e.target.parentNode.appendChild(fileInfo);
             }

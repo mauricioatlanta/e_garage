@@ -15,7 +15,7 @@
       <div class="flex items-center gap-3"><i class="fas fa-envelope text-cyan-300"></i> <span class="font-bold">Email:</span> {{ cliente.email }}</div>
       <div class="flex items-center gap-3"><i class="fas fa-phone text-lime-300"></i> <span class="font-bold">Teléfono:</span> {{ cliente.telefono }}</div>
       <div class="flex items-center gap-3"><i class="fas fa-map-marker-alt text-fuchsia-300"></i> <span class="font-bold">Dirección:</span> {{ cliente.direccion }}</div>
-      
+
       <!-- Campos específicos según país -->
       {% if cliente.empresa.pais == 'US' %}
         <!-- Campos USA -->

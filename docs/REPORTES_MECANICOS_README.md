@@ -198,7 +198,7 @@ def generar_insights_ia_mecanicos():
     # Ajustar umbrales de alertas
     UMBRAL_BAJO_RENDIMIENTO = 0.6  # 60% del promedio
     UMBRAL_DIFERENCIA_CRITICA = 50  # 50% de diferencia
-    
+
     # Personalizar tipos de sugerencias
     TIPOS_SUGERENCIAS = [
         'especialización',
@@ -302,7 +302,7 @@ if not Mecanico.objects.exists():
 
 ## 🎉 ¡Módulo Listo!
 
-El módulo **"📊 Reportes por Mecánico"** está completamente implementado y listo para usar. 
+El módulo **"📊 Reportes por Mecánico"** está completamente implementado y listo para usar.
 
 ### 🚀 Para empezar:
 1. Ejecuta `python instalar_reportes_mecanicos.py`

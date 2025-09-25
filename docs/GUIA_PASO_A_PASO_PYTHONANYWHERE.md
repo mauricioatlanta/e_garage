@@ -126,6 +126,6 @@ Si tienes problemas durante el proceso:
 3. **Support:** Contactar soporte de PythonAnywhere si es necesario
 
 ---
-**⏱️ Tiempo estimado:** 5-10 minutos  
-**🎯 Dificultad:** Fácil  
+**⏱️ Tiempo estimado:** 5-10 minutos
+**🎯 Dificultad:** Fácil
 **✅ Éxito garantizado:** Si sigues los pasos exactos

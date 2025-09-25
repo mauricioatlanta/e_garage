@@ -1,3 +1,4 @@
+{% load country_url %}
 {% extends 'base.html' %}
 {% load static %}
 
@@ -16,7 +17,7 @@
 
   <!-- Grid de configuraciones -->
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    
+
     <!-- Configuración de Técnicos -->
     <div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow">
       <div class="flex items-center gap-4 mb-4">
@@ -28,7 +29,7 @@
           <p class="text-sm text-gray-600">Gestionar personal del taller</p>
         </div>
       </div>
-      
+
       <div class="mb-4 space-y-1">
         <div class="flex justify-between text-sm">
           <span class="text-gray-600">Total:</span>
@@ -45,10 +46,10 @@
         </div>
         {% endif %}
       </div>
-      
-      <a 
-  {% url 'taller:configuracion_tecnicos' as url_config_tecnicos %}
-  href="{{ url_config_tecnicos|default:'#' }}" 
+
+      <a
+  {% country_url 'configuracion_tecnicos' as url_config_tecnicos %}
+  href="{{ url_config_tecnicos|default:'#' }}"
         class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg inline-block text-center transition-colors"
       >
         Gestionar Técnicos →
@@ -66,7 +67,7 @@
           <p class="text-sm text-gray-600">Información de la empresa</p>
         </div>
       </div>
-      
+
       <div class="mb-4 space-y-1">
         <div class="text-sm text-gray-600">
           <div>{{ empresa.nombre_taller }}</div>
@@ -78,8 +79,8 @@
           {% endif %}
         </div>
       </div>
-      
-      <button 
+
+      <button
         class="w-full bg-gray-400 text-white font-medium py-3 px-4 rounded-lg cursor-not-allowed"
         disabled
       >
@@ -98,12 +99,12 @@
           <p class="text-sm text-gray-600">Catálogo de servicios</p>
         </div>
       </div>
-      
+
       <div class="mb-4">
         <p class="text-sm text-gray-600">Configura los servicios que ofrece tu taller</p>
       </div>
-      
-      <button 
+
+      <button
         class="w-full bg-gray-400 text-white font-medium py-3 px-4 rounded-lg cursor-not-allowed"
         disabled
       >
@@ -122,12 +123,12 @@
           <p class="text-sm text-gray-600">Análisis y estadísticas</p>
         </div>
       </div>
-      
+
       <div class="mb-4">
         <p class="text-sm text-gray-600">Visualiza el rendimiento de tu taller</p>
       </div>
-      
-      <button 
+
+      <button
         class="w-full bg-gray-400 text-white font-medium py-3 px-4 rounded-lg cursor-not-allowed"
         disabled
       >
@@ -146,13 +147,13 @@
           <p class="text-sm text-gray-600">Panel de admin completo</p>
         </div>
       </div>
-      
+
       <div class="mb-4">
         <p class="text-sm text-gray-600">Acceso completo a configuraciones avanzadas</p>
       </div>
-      
-      <a 
-        href="/admin/" 
+
+      <a
+        href="/admin/"
         target="_blank"
         class="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-3 px-4 rounded-lg inline-block text-center transition-colors"
       >
@@ -171,13 +172,13 @@
           <p class="text-sm text-gray-600">Gestión de documentos</p>
         </div>
       </div>
-      
+
       <div class="mb-4">
         <p class="text-sm text-gray-600">Ver y gestionar todos los documentos</p>
       </div>
-      
-      <a 
-        href="{% url 'documentos:lista_documentos' %}" 
+
+      <a
+        href="{% url 'documentos:lista_documentos' %}"
         class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg inline-block text-center transition-colors"
       >
         Ver Documentos →
@@ -187,9 +188,9 @@
 
   <!-- Navegación -->
   <div class="mt-12 text-center">
-    <a 
-  {% url 'taller:dashboard_suscripciones' as url_dashboard_suscripciones %}
-  href="{{ url_dashboard_suscripciones|default:'#' }}" 
+    <a
+  {% country_url 'dashboard_suscripciones' as url_dashboard_suscripciones %}
+  href="{{ url_dashboard_suscripciones|default:'#' }}"
       class="text-gray-600 hover:text-gray-800 font-medium"
     >
       ← Volver al Dashboard

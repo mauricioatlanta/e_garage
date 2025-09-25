@@ -2,6 +2,7 @@
 """
 Diagnóstico de redirección de URLs por país para usuarios de Chile
 """
+
 import os
 
 import django

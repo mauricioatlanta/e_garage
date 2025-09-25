@@ -96,6 +96,10 @@ urlpatterns = [
     ),
     path("api/crear-servicio/", views.api_crear_servicio, name="api_crear_servicio"),
     path("api/create/", api.api_create, name="api_create"),
+    # Autocompletado de clientes
+    path(
+        "autocomplete/cliente/", views.autocomplete_cliente, name="autocomplete_cliente"
+    ),
     # Endpoint de diagnóstico
     # path("lista-debug/", lista_debug, name="lista_debug"),  # Función no existe
 ]

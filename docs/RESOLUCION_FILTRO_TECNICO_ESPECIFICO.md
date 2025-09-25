@@ -13,7 +13,7 @@ En la función `reportes_mecanicos()`, la lógica para procesar datos por técni
 **Código problemático:**
 ```python
 # ❌ PROBLEMÁTICO: Siempre procesaba TODOS los técnicos
-for mecanico in Tecnico.objects.filter(empresa=empresa):  
+for mecanico in Tecnico.objects.filter(empresa=empresa):
     # ... procesaba datos de todos los técnicos independientemente del filtro
 ```
 
@@ -42,7 +42,7 @@ for mecanico in tecnicos_a_procesar:
 
 ### Lógica de Filtrado
 1. **Técnico específico seleccionado**: Solo muestra datos de ese técnico
-2. **"Todos" o sin selección**: Muestra datos de todos los técnicos  
+2. **"Todos" o sin selección**: Muestra datos de todos los técnicos
 3. **Técnico inexistente**: Fallback a mostrar todos (con mensaje de debug)
 
 ## 🧪 Verificación de Funcionamiento
@@ -80,14 +80,14 @@ http://127.0.0.1:8000/cl/reportes/mecanicos/?fecha_desde=2025-07-01&fecha_hasta=
 ## 📊 Impacto de la Corrección
 
 ### Antes (❌ Problemático):
-- **Documentos filtrados**: ✅ Correcto (solo del técnico seleccionado)  
+- **Documentos filtrados**: ✅ Correcto (solo del técnico seleccionado)
 - **Métricas generales**: ✅ Correcto (calculadas solo del técnico)
 - **Lista de técnicos**: ❌ **Mostraba TODOS los técnicos**
 - **Análisis comparativo**: ❌ **Incluía datos de otros técnicos**
 
 ### Después (✅ Corregido):
 - **Documentos filtrados**: ✅ Correcto (solo del técnico seleccionado)
-- **Métricas generales**: ✅ Correcto (calculadas solo del técnico)  
+- **Métricas generales**: ✅ Correcto (calculadas solo del técnico)
 - **Lista de técnicos**: ✅ **Solo muestra el técnico seleccionado**
 - **Análisis comparativo**: ✅ **Solo datos del técnico específico**
 
@@ -110,5 +110,5 @@ http://127.0.0.1:8000/cl/reportes/mecanicos/?fecha_desde=2025-07-01&fecha_hasta=
 Los reportes por técnico ahora muestran **exclusivamente** la información del técnico seleccionado en el rango de fechas especificado, eliminando la información genérica de otros técnicos que confundía al usuario.
 
 ---
-*Resolución implementada y verificada el 10 de agosto de 2025*  
+*Resolución implementada y verificada el 10 de agosto de 2025*
 *El reporte por técnico ahora es específico y enfocado como se requería*

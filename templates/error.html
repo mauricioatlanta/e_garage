@@ -1,3 +1,4 @@
+{% load country_url %}
 {% extends 'base.html' %}
 {% load static %}
 
@@ -9,23 +10,23 @@
     <div class="text-center">
       <div class="text-6xl mb-4">❌</div>
       <h1 class="text-3xl font-bold text-red-400 mb-4">Error del Sistema</h1>
-      
+
       {% if error %}
         <div class="bg-red-500/20 border border-red-400 rounded-xl p-4 mb-6">
           <p class="text-red-300 text-lg">{{ error }}</p>
         </div>
       {% endif %}
-      
+
       <div class="text-gray-300 mb-6">
         <p>Se ha producido un error en el sistema. Por favor, contacta al administrador si el problema persiste.</p>
       </div>
-      
+
       <div class="flex flex-wrap gap-4 justify-center">
-  {% url 'taller:dashboard' as url_dashboard %}
+  {% country_url 'dashboard' as url_dashboard %}
   <a href="{{ url_dashboard|default:'#' }}" class="bg-cyan-500 hover:bg-cyan-400 text-white font-bold px-6 py-3 rounded-xl transition shadow">
           🏠 Volver al Dashboard
         </a>
-  {% url 'taller:configuracion' as url_configuracion %}
+  {% country_url 'configuracion' as url_configuracion %}
   <a href="{{ url_configuracion|default:'#' }}" class="bg-blue-500 hover:bg-blue-400 text-white font-bold px-6 py-3 rounded-xl transition shadow">
           ⚙️ Configuración
         </a>

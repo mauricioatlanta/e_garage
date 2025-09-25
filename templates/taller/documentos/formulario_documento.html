@@ -2,6 +2,7 @@
 {% load static %}
 
 {% block extra_head %}
+  {% include 'taller/includes/ajax_endpoints.html' %}
   {{ form.media }}
   <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
@@ -304,7 +305,7 @@
       <div><span class="font-bold">Total servicios:</span> <span id="neto-servicios">$0</span></div>
       <div><span class="font-bold">Otros:</span> <span id="neto-otros">$0</span></div>
       <div><span class="font-bold">Subtotal:</span> <span id="subtotal-doc">$0</span></div>
-      
+
       <!-- Sección de impuestos específica por país -->
       {% if company_country == 'CL' %}
         <div class="flex items-center gap-2">
@@ -317,7 +318,7 @@
           <span id="tax-amount">$0</span>
         </div>
       {% endif %}
-      
+
       <div class="text-xl"><span class="font-bold">Gran Total:</span> <span id="total-doc">$0</span></div>
     </div>
 
@@ -343,7 +344,7 @@ $(document).ready(function () {
   // Inicializar select2 en cliente SOLO UNA VEZ
   $cliente.select2({
     ajax: {
-      url: '/documentos/autocomplete/cliente/',
+      url: window.AJAX_ENDPOINTS.buscarClientes,
       dataType: 'json',
       delay: 250,
       data: function(params) {
@@ -365,7 +366,7 @@ $(document).ready(function () {
   if (clienteId) {
     $.ajax({
       type: 'GET',
-      url: '/documentos/autocomplete/cliente/',
+      url: window.AJAX_ENDPOINTS.buscarClientes,
       data: {q: ''},
       dataType: 'json'
     }).then(function (data) {
@@ -386,7 +387,7 @@ $(document).ready(function () {
   function initVehiculoSelect2(clienteId) {
     $vehiculo.select2({
       ajax: {
-        url: '/autocomplete/vehiculo/',
+        url: window.AJAX_ENDPOINTS.vehiculosPorCliente,
         dataType: 'json',
         delay: 250,
         data: function(params) {
@@ -444,21 +445,21 @@ $(document).ready(function() {
       window.actualizarTotalRepuestos();
     }
   });
-  
+
   // Agregar event listeners para cambios en servicios
   $(document).on('input', '.precio-servicio-input', function() {
     if (window.actualizarTotalServicios) {
       window.actualizarTotalServicios();
     }
   });
-  
+
   // Event listener para el checkbox de IVA
   $('#lleva_iva').on('change', function() {
     if (window.actualizarTotalesDocumento) {
       window.actualizarTotalesDocumento();
     }
   });
-  
+
   // Event listeners para eliminar repuestos
   $(document).on('click', '.remove-repuesto', function() {
     $(this).closest('tr').remove();
@@ -466,7 +467,7 @@ $(document).ready(function() {
       window.actualizarTotalRepuestos();
     }
   });
-  
+
   // Event listeners para eliminar servicios
   $(document).on('click', '.remove-servicio', function() {
     $(this).closest('tr').remove();
@@ -474,7 +475,7 @@ $(document).ready(function() {
       window.actualizarTotalServicios();
     }
   });
-  
+
 
   // Calcular totales iniciales cuando la página se carga
   setTimeout(function() {

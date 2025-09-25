@@ -12,7 +12,7 @@
     <div class="particle" style="top: 80%; left: 10%; animation-delay: 4s;"></div>
     <div class="particle" style="top: 30%; left: 90%; animation-delay: 5s;"></div>
   </div>
-  
+
   <h1 class="text-5xl font-extrabold text-center mb-8 ai-text" style="font-family: 'Orbitron', 'Share Tech Mono', Arial, sans-serif; letter-spacing: 4px; text-shadow: 0 0 30px #00ffff, 0 0 60px #ff00ff;">
     🤖 SISTEMA DE INTELIGENCIA ARTIFICIAL<br>
     <span style="font-size: 0.8em; margin-top: 10px; display: block;">ANÁLISIS PREDICTIVO DE REPUESTOS</span>
@@ -147,19 +147,19 @@
     border-top: 2px solid #ffd700;
   }
   .ai-highlight { color: #d90429; font-weight: bold; }
-  
+
   /* Efectos holográficos y de IA */
   .holographic-container {
     position: relative;
     background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #533483 100%);
     border: 2px solid #00ffff;
     border-radius: 20px;
-    box-shadow: 
+    box-shadow:
       0 0 30px rgba(0, 255, 255, 0.5),
       inset 0 0 30px rgba(0, 255, 255, 0.1);
     overflow: hidden;
   }
-  
+
   .holographic-container::before {
     content: '';
     position: absolute;
@@ -167,34 +167,34 @@
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, 
-      transparent, 
-      rgba(0, 255, 255, 0.2), 
+    background: linear-gradient(90deg,
+      transparent,
+      rgba(0, 255, 255, 0.2),
       transparent);
     animation: holographic-sweep 3s ease-in-out infinite;
   }
-  
+
   @keyframes holographic-sweep {
     0% { left: -100%; }
     50% { left: 100%; }
     100% { left: 100%; }
   }
-  
+
   /* Canvas con efectos de IA */
   #ventasMensualesChart {
     border: 3px solid #00ffff;
     border-radius: 15px;
-    background: linear-gradient(45deg, 
-      rgba(0, 0, 0, 0.8), 
-      rgba(0, 255, 255, 0.1), 
+    background: linear-gradient(45deg,
+      rgba(0, 0, 0, 0.8),
+      rgba(0, 255, 255, 0.1),
       rgba(0, 0, 0, 0.8));
-    box-shadow: 
+    box-shadow:
       0 0 40px rgba(0, 255, 255, 0.6),
       inset 0 0 40px rgba(0, 255, 255, 0.1);
     position: relative;
     z-index: 10;
   }
-  
+
   /* Efectos de partículas flotantes */
   .floating-particles {
     position: absolute;
@@ -205,7 +205,7 @@
     pointer-events: none;
     z-index: 1;
   }
-  
+
   .particle {
     position: absolute;
     width: 4px;
@@ -215,55 +215,55 @@
     animation: float-particle 6s ease-in-out infinite;
     box-shadow: 0 0 10px #00ffff;
   }
-  
+
   @keyframes float-particle {
-    0%, 100% { 
+    0%, 100% {
       transform: translateY(0px) scale(1);
       opacity: 0.3;
     }
-    50% { 
+    50% {
       transform: translateY(-20px) scale(1.5);
       opacity: 1;
     }
   }
-  
+
   /* Botones con efectos de IA */
   .enfoque-btn.active {
     background: linear-gradient(90deg, #00ffff 0%, #ff00ff 50%, #ffff00 100%);
     color: #000;
-    box-shadow: 
+    box-shadow:
       0 0 30px rgba(0, 255, 255, 0.8),
       0 0 60px rgba(255, 0, 255, 0.6),
       0 0 90px rgba(255, 255, 0, 0.4);
     transform: scale(1.05);
     animation: ai-pulse 2s ease-in-out infinite;
   }
-  
+
   @keyframes ai-pulse {
-    0%, 100% { 
-      box-shadow: 
+    0%, 100% {
+      box-shadow:
         0 0 30px rgba(0, 255, 255, 0.8),
         0 0 60px rgba(255, 0, 255, 0.6),
         0 0 90px rgba(255, 255, 0, 0.4);
     }
-    50% { 
-      box-shadow: 
+    50% {
+      box-shadow:
         0 0 40px rgba(0, 255, 255, 1),
         0 0 80px rgba(255, 0, 255, 0.8),
         0 0 120px rgba(255, 255, 0, 0.6);
     }
   }
-  
+
   /* Tabla con efectos holográficos */
   .futuristic-table {
     background: rgba(0, 0, 0, 0.7);
     border: 2px solid #00ffff;
     border-radius: 15px;
-    box-shadow: 
+    box-shadow:
       0 0 30px rgba(0, 255, 255, 0.3),
       inset 0 0 30px rgba(0, 255, 255, 0.1);
   }
-  
+
   .futuristic-table th {
     background: linear-gradient(90deg, #00ffff, #ff00ff);
     color: #000;
@@ -271,18 +271,18 @@
     text-shadow: none;
     border-bottom: 3px solid #00ffff;
   }
-  
+
   .futuristic-table td {
     border-bottom: 1px solid rgba(0, 255, 255, 0.3);
     transition: all 0.3s ease;
   }
-  
+
   .futuristic-table tr:hover td {
     background: rgba(0, 255, 255, 0.1);
     color: #00ffff;
     text-shadow: 0 0 10px #00ffff;
   }
-  
+
   /* Efectos de texto con IA */
   .ai-text {
     background: linear-gradient(45deg, #00ffff, #ff00ff, #ffff00, #00ff00);
@@ -292,7 +292,7 @@
     -webkit-text-fill-color: transparent;
     animation: ai-gradient 3s ease infinite;
   }
-  
+
   @keyframes ai-gradient {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
@@ -320,13 +320,13 @@
     const ventasMensuales = {{ ventas_mensuales|safe }};
     const ctx = document.getElementById('ventasMensualesChart').getContext('2d');
     if(window.ventasChart) window.ventasChart.destroy();
-    
+
     // Crear gradiente dinámico para el fondo
     const gradient = ctx.createLinearGradient(0, 0, 0, 400);
     gradient.addColorStop(0, 'rgba(0, 255, 255, 0.8)');
     gradient.addColorStop(0.5, 'rgba(138, 43, 226, 0.6)');
     gradient.addColorStop(1, 'rgba(255, 20, 147, 0.4)');
-    
+
     // Crear gradiente para la línea principal
     const lineGradient = ctx.createLinearGradient(0, 0, 400, 0);
     lineGradient.addColorStop(0, '#00ffff');
@@ -334,7 +334,7 @@
     lineGradient.addColorStop(0.5, '#ffff00');
     lineGradient.addColorStop(0.75, '#00ff00');
     lineGradient.addColorStop(1, '#ff0080');
-    
+
     window.ventasChart = new Chart(ctx, {
       type: 'line',
       data: {
@@ -370,12 +370,12 @@
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { 
+          legend: {
             display: true,
             labels: {
               color: '#00ffff',
-              font: { 
-                size: 16, 
+              font: {
+                size: 16,
                 family: 'Orbitron',
                 weight: 'bold'
               },
@@ -387,8 +387,8 @@
             display: true,
             text: '🤖 SISTEMA DE INTELIGENCIA ARTIFICIAL - ANÁLISIS PREDICTIVO',
             color: '#00ffff',
-            font: { 
-              size: 24, 
+            font: {
+              size: 24,
               family: 'Orbitron',
               weight: '900'
             },
@@ -414,16 +414,16 @@
         },
         scales: {
           x: {
-            grid: { 
+            grid: {
               color: 'rgba(0, 255, 255, 0.3)',
               lineWidth: 2,
               drawBorder: true,
               borderColor: '#00ffff'
             },
-            ticks: { 
-              color: '#00ffff', 
-              font: { 
-                family: 'Orbitron', 
+            ticks: {
+              color: '#00ffff',
+              font: {
+                family: 'Orbitron',
                 size: 14,
                 weight: 'bold'
               },
@@ -435,17 +435,17 @@
             }
           },
           y: {
-            grid: { 
+            grid: {
               color: 'rgba(0, 255, 255, 0.3)',
               lineWidth: 2,
               drawBorder: true,
               borderColor: '#00ffff'
             },
             beginAtZero: true,
-            ticks: { 
-              color: '#00ffff', 
-              font: { 
-                family: 'Orbitron', 
+            ticks: {
+              color: '#00ffff',
+              font: {
+                family: 'Orbitron',
                 size: 14,
                 weight: 'bold'
               },
@@ -497,19 +497,19 @@
         }
       }
     });
-    
+
       // Agregar efectos holográficos adicionales
   addHolographicEffects();
-  
+
   // Efectos de IA adicionales
   addAIEffects();
 }
-  
+
   // Función para crear partículas holográficas
   function createHolographicParticles() {
     const canvas = document.getElementById('ventasMensualesChart');
     const particles = [];
-    
+
     for (let i = 0; i < 20; i++) {
       const particle = {
         x: Math.random() * canvas.width,
@@ -521,17 +521,17 @@
       };
       particles.push(particle);
     }
-    
+
     // Animar partículas
     function animateParticles() {
       const ctx = canvas.getContext('2d');
       ctx.save();
-      
+
       particles.forEach((particle, index) => {
         particle.x += particle.vx;
         particle.y += particle.vy;
         particle.life -= particle.decay;
-        
+
         if (particle.life <= 0) {
           particles.splice(index, 1);
         } else {
@@ -544,22 +544,22 @@
           ctx.fill();
         }
       });
-      
+
       ctx.restore();
-      
+
       if (particles.length > 0) {
         requestAnimationFrame(animateParticles);
       }
     }
-    
+
     animateParticles();
   }
-  
+
   // Función para agregar efectos holográficos
   function addHolographicEffects() {
     const canvas = document.getElementById('ventasMensualesChart');
     const ctx = canvas.getContext('2d');
-    
+
     // Efecto de escaneo holográfico
     let scanLine = 0;
     function drawScanLine() {
@@ -569,34 +569,34 @@
       ctx.shadowColor = '#00ffff';
       ctx.shadowBlur = 20;
       ctx.setLineDash([10, 5]);
-      
+
       ctx.beginPath();
       ctx.moveTo(0, scanLine);
       ctx.lineTo(canvas.width, scanLine);
       ctx.stroke();
-      
+
       ctx.restore();
-      
+
       scanLine += 2;
       if (scanLine > canvas.height) {
         scanLine = 0;
       }
-      
+
       setTimeout(drawScanLine, 100);
     }
-    
+
     drawScanLine();
   }
-  
+
   // Función para agregar efectos de IA
   function addAIEffects() {
     const canvas = document.getElementById('ventasMensualesChart');
-    
+
     // Efecto de conexiones neuronales
     function drawNeuralConnections() {
       const ctx = canvas.getContext('2d');
       const points = [];
-      
+
       // Crear puntos de conexión
       for (let i = 0; i < 8; i++) {
         points.push({
@@ -605,7 +605,7 @@
           connections: []
         });
       }
-      
+
       // Conectar puntos
       points.forEach((point, i) => {
         const numConnections = Math.floor(Math.random() * 3) + 1;
@@ -614,7 +614,7 @@
           point.connections.push(targetIndex);
         }
       });
-      
+
       // Dibujar conexiones
       function animateConnections() {
         ctx.save();
@@ -623,7 +623,7 @@
         ctx.globalAlpha = 0.6;
         ctx.shadowColor = '#00ffff';
         ctx.shadowBlur = 5;
-        
+
         points.forEach((point, i) => {
           point.connections.forEach(targetIndex => {
             const target = points[targetIndex];
@@ -633,33 +633,33 @@
             ctx.stroke();
           });
         });
-        
+
         ctx.restore();
-        
+
         // Mover puntos ligeramente
         points.forEach(point => {
           point.x += (Math.random() - 0.5) * 2;
           point.y += (Math.random() - 0.5) * 2;
-          
+
           // Mantener dentro del canvas
           point.x = Math.max(0, Math.min(canvas.width, point.x));
           point.y = Math.max(0, Math.min(canvas.height, point.y));
         });
-        
+
         requestAnimationFrame(animateConnections);
       }
-      
+
       animateConnections();
     }
-    
+
     // Iniciar efectos de IA
     setTimeout(drawNeuralConnections, 1000);
-    
+
     // Efecto de datos fluyendo
     function drawDataFlow() {
       const ctx = canvas.getContext('2d');
       let flowY = 0;
-      
+
       function animateFlow() {
         ctx.save();
         ctx.strokeStyle = '#ff00ff';
@@ -668,34 +668,34 @@
         ctx.setLineDash([20, 10]);
         ctx.shadowColor = '#ff00ff';
         ctx.shadowBlur = 15;
-        
+
         ctx.beginPath();
         ctx.moveTo(0, flowY);
         ctx.lineTo(canvas.width, flowY);
         ctx.stroke();
-        
+
         ctx.restore();
-        
+
         flowY += 3;
         if (flowY > canvas.height) {
           flowY = 0;
         }
-        
+
         setTimeout(animateFlow, 200);
       }
-      
+
       animateFlow();
     }
-    
+
     setTimeout(drawDataFlow, 2000);
   }
-  
+
   // Inicialización del sistema de IA
   document.addEventListener('DOMContentLoaded', function() {
     console.log('🤖 SISTEMA DE IA INICIADO');
     console.log('🔮 MÓDULO DE ANÁLISIS PREDICTIVO ACTIVO');
     console.log('📊 GRÁFICAS HOLOGRÁFICAS 3D CARGADAS');
-    
+
     // Crear partículas adicionales dinámicamente
     setInterval(() => {
       const particle = document.createElement('div');
@@ -704,7 +704,7 @@
       particle.style.left = Math.random() * 100 + '%';
       particle.style.animationDelay = Math.random() * 6 + 's';
       document.querySelector('.floating-particles').appendChild(particle);
-      
+
       // Remover partícula después de la animación
       setTimeout(() => {
         if (particle.parentNode) {

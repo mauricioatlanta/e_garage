@@ -65,7 +65,7 @@
 
 El script `crear_datos_reportes_avanzados.py` generó:
 - **30 documentos** de factura
-- **53 servicios externos** 
+- **53 servicios externos**
 - **10 proveedores** únicos
 - **Margen promedio**: 27.6%
 - **Ganancia total**: $2,466,842

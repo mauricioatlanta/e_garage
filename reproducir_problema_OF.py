@@ -2,13 +2,15 @@
 """
 Script de reproducción: Crear documento con repuesto "OF" y demostrar el problema
 """
+
 import json
 import os
 import sys
 from datetime import datetime
 
-import django
 import requests
+
+import django
 
 # Setup Django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "garage_project.settings")
@@ -17,13 +19,7 @@ django.setup()
 
 from django.contrib.auth import get_user_model
 
-from taller.models import (
-    Cliente,
-    Documento,
-    Repuesto,
-    Tecnico,
-    Vehiculo,
-)
+from taller.models import Cliente, Documento, Repuesto, Tecnico, Vehiculo
 
 
 def crear_documento_con_repuesto_OF():

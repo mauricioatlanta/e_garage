@@ -27,14 +27,14 @@ path("ajax/vehiculos-por-cliente/", vehiculos_por_cliente, name="cl_ajax_vehicul
 ```
 
 **USA** (`taller/urls_extra/usa.py`):
-```python 
+```python
 from taller.views_extra.ajax import buscar_clientes, vehiculos_por_cliente
 
 path("ajax/clientes/buscar/", buscar_clientes, name="us_ajax_buscar_clientes"),
 path("ajax/vehiculos-por-cliente/", vehiculos_por_cliente, name="us_ajax_vehiculos_por_cliente"),
 ```
 
-**Resultado**: 
+**Resultado**:
 - ✅ `/cl/ajax/clientes/buscar/` → Status 200, 8 clientes encontrados
 - ✅ `/us/ajax/clientes/buscar/` → Status 200, 8 clientes encontrados
 
@@ -63,7 +63,7 @@ fetch(base + "/ajax/vehiculos-por-cliente/?cliente=" + encodeURIComponent(client
 
 ### ✅ Endpoints AJAX Funcionando
 - **Chile**: `/cl/ajax/clientes/buscar/?q=a` → 8 resultados (Alberto, Daniela, etc.)
-- **USA**: `/us/ajax/clientes/buscar/?q=a` → 8 resultados  
+- **USA**: `/us/ajax/clientes/buscar/?q=a` → 8 resultados
 - **Multi-tenant**: Respeta empresa del usuario (ALS AUTO REPAIR ID: 4)
 - **JSON**: Formato correcto `{results: [{id, text}], more: boolean}`
 
@@ -82,7 +82,7 @@ python manage.py check
 🎉 **BÚSQUEDA INTELIGENTE COMPLETAMENTE FUNCIONAL**
 
 - ✅ Select2 carga y funciona correctamente
-- ✅ Búsqueda en tiempo real con delay de 250ms  
+- ✅ Búsqueda en tiempo real con delay de 250ms
 - ✅ Paginación para muchos resultados
 - ✅ Multi-tenant: cada usuario ve solo sus clientes
 - ✅ Multi-país: URLs dinámicas /cl/ y /us/
@@ -92,7 +92,7 @@ python manage.py check
 ## Archivos Modificados
 
 - 🔧 `taller/urls_extra/chile.py` - Agregados endpoints AJAX
-- 🔧 `taller/urls_extra/usa.py` - Agregados endpoints AJAX  
+- 🔧 `taller/urls_extra/usa.py` - Agregados endpoints AJAX
 - 🔧 `templates/documentos/crear_documento_moderno.html` - JavaScript robusto
 - 📊 `test_endpoints_final.py` - Verificación automática
 

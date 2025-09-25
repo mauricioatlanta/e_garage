@@ -1,5 +1,6 @@
 {% load static %}
 {% load i18n %}  {# � Cargar i18n al principio #}
+{% load country_url %}
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE }}">  {# 👈 Idioma dinámico #}
 <head>
@@ -129,7 +130,7 @@
   <div class="ml-auto flex items-center gap-4">
     <!-- Botón Settings -->
     {% if request.user.is_authenticated and request.user.is_staff %}
-      {% url 'taller:settings:ver_configuracion' as settings_url %}
+      {% country_url 'settings:ver_configuracion' as settings_url %}
       {% if settings_url %}
         <a href="{{ settings_url }}"
            class="flex items-center gap-2 px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition"
@@ -157,7 +158,7 @@
 <nav class="w-full bg-black/60 backdrop-blur border-b border-cyan-700/40 shadow-lg py-3 px-6 flex items-center justify-between z-50 relative">
   <div class="flex items-center gap-8">
     {% if request.user.is_authenticated %}
-      {% url 'taller:dashboard_suscripciones' as dashboard_url %}
+      {% country_url 'dashboard_suscripciones' as dashboard_url %}
       {% if dashboard_url %}
         <a href="{{ dashboard_url }}" class="text-2xl font-extrabold text-cyan-300 tracking-widest hover:text-lime-300 transition">{{ company_name|default:"eGarage" }}</a>
       {% endif %}
@@ -173,33 +174,30 @@
   <div class="flex items-center gap-4">
     {% if request.user.is_authenticated %}
       <!-- Botones de navegación principal -->
-      {% url 'taller:clientes:lista_clientes' as url_clientes %}
-      {% url 'taller:vehiculos:lista_vehiculos' as url_vehiculos %}
-      {% if not url_vehiculos %}
-        {% url 'vehiculos:lista_vehiculos' as url_vehiculos %}
-      {% endif %}
-      {% if not url_vehiculos %}
-        {% url 'chile:vehiculos:lista_vehiculos' as url_vehiculos %}
-      {% endif %}
-      {% if not url_vehiculos %}
-        {% url 'chile:taller:vehiculos:lista_vehiculos' as url_vehiculos %}
-      {% endif %}
-      {% url 'taller:repuestos:lista_repuestos' as url_repuestos %}
-      {% if url_clientes %}
-        <a href="{{ url_clientes }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
+      {% if request.path|slice:":4" == "/us/" %}
+        <a href="/us/clientes/" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
           <span>👥</span>
           <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Clientes{% else %}Clients{% endif %}</span>
         </a>
-      {% endif %}
-      {% if url_vehiculos %}
-        <a href="{{ url_vehiculos }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
+        <a href="/us/vehiculos/" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
           <span>🚗</span>
           <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Vehículos{% else %}Vehicles{% endif %}</span>
         </a>
-      {% endif %}
-      {% if url_repuestos %}
-        <a href="{{ url_repuestos }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
-          <span>🔧</span>
+        <a href="/us/repuestos/" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
+          <span>🧩</span>
+          <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Repuestos{% else %}Parts{% endif %}</span>
+        </a>
+      {% else %}
+        <a href="/cl/clientes/" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
+          <span>👥</span>
+          <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Clientes{% else %}Clients{% endif %}</span>
+        </a>
+        <a href="/cl/vehiculos/" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
+          <span>🚗</span>
+          <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Vehículos{% else %}Vehicles{% endif %}</span>
+        </a>
+        <a href="/cl/repuestos/" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
+          <span>🧩</span>
           <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Repuestos{% else %}Parts{% endif %}</span>
         </a>
       {% endif %}
@@ -217,7 +215,7 @@
       </a>
   {% url 'servicios:servicios_menu' as url_servicios %}
   {% if not url_servicios %}
-    {% url 'taller:servicios:servicios_menu' as url_servicios %}
+    {% country_url 'servicios:servicios_menu' as url_servicios %}
   {% endif %}
   {% if url_servicios %}
     <a href="{{ url_servicios }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
@@ -227,7 +225,7 @@
   {% endif %}
   {% url 'servicios:otros_servicios_menu' as url_otros %}
   {% if not url_otros %}
-    {% url 'taller:servicios:otros_servicios_menu' as url_otros %}
+    {% country_url 'servicios:otros_servicios_menu' as url_otros %}
   {% endif %}
   {% if url_otros %}
     <a href="{{ url_otros }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
@@ -254,7 +252,7 @@
       <div class="h-6 w-px bg-cyan-700"></div>
 
       <!-- Configuración -->
-      {% url 'taller:configuracion' as url_config %}
+      {% country_url 'configuracion' as url_config %}
       {% if url_config %}
         <a href="{{ url_config }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
           <span>⚙️</span>

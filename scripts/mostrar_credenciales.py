@@ -2,6 +2,7 @@
 """
 Script para mostrar credenciales de prueba
 """
+
 import os
 
 import django

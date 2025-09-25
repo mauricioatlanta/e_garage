@@ -7,16 +7,16 @@
     </linearGradient>
     <filter id="glow">
       <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-      <feMerge> 
+      <feMerge>
         <feMergeNode in="coloredBlur"/>
         <feMergeNode in="SourceGraphic"/>
       </feMerge>
     </filter>
   </defs>
-  
+
   <!-- Fondo del logo -->
   <rect x="0" y="0" width="200" height="60" rx="15" fill="rgba(0,0,0,0.8)" stroke="url(#logoGradient)" stroke-width="2"/>
-  
+
   <!-- Icono de garage/herramienta -->
   <g transform="translate(15,15)">
     <!-- Herramienta principal -->
@@ -27,14 +27,14 @@
     <!-- Líneas de energía -->
     <path d="M2 8 L8 8 M2 12 L6 12 M2 16 L4 16" stroke="#00ffff" stroke-width="1" opacity="0.7"/>
   </g>
-  
+
   <!-- Texto eGarage -->
   <text x="50" y="25" font-family="Orbitron, monospace" font-size="16" font-weight="bold" fill="url(#logoGradient)" filter="url(#glow)">e</text>
   <text x="62" y="25" font-family="Orbitron, monospace" font-size="20" font-weight="900" fill="#ffffff">Garage</text>
-  
+
   <!-- Subtítulo -->
   <text x="50" y="42" font-family="Inter, sans-serif" font-size="8" fill="#00ffff" opacity="0.8">DIGITAL WORKSHOP</text>
-  
+
   <!-- Elementos decorativos -->
   <circle cx="180" cy="15" r="2" fill="#00ffff" opacity="0.6">
     <animate attributeName="opacity" values="0.6;1;0.6" dur="2s" repeatCount="indefinite"/>

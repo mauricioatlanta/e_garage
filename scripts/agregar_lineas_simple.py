@@ -2,6 +2,7 @@
 """
 Script simple para agregar líneas de ejemplo a documentos
 """
+
 import os
 import sys
 from decimal import Decimal

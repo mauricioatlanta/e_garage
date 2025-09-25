@@ -36,7 +36,7 @@ class VehiculoForm(forms.ModelForm):
         # BLINDAJE MULTI-TENANT: Extraer user y filtrar por empresa
         self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
-        
+
         if self.user and hasattr(self.user, 'empresa'):
             # Filtrar clientes por empresa del usuario
             self.fields['cliente'].queryset = Cliente.objects.filter(empresa=self.user.empresa)
@@ -81,14 +81,14 @@ class VehiculoForm(forms.ModelForm):
 
 ## 🎯 RESULTADO FINAL
 
-**Estado:** 🟢 **COMPLETAMENTE BLINDADO**  
-**Vulnerabilidades:** 🔒 **0 DETECTADAS**  
+**Estado:** 🟢 **COMPLETAMENTE BLINDADO**
+**Vulnerabilidades:** 🔒 **0 DETECTADAS**
 **Seguridad multi-tenant:** 🛡️ **MÁXIMA**
 
 ---
 
-**✅ MISIÓN CUMPLIDA: Separación perfecta entre datos CL/US**  
-**✅ CACHE LIMPIO: Sin contaminación cruzada**  
+**✅ MISIÓN CUMPLIDA: Separación perfecta entre datos CL/US**
+**✅ CACHE LIMPIO: Sin contaminación cruzada**
 **✅ FORMULARIOS SEGUROS: Todos blindados con filtrado por empresa**
 
 La mezcla de datos entre empresas CL/US ha sido **completamente eliminada**.

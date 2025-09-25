@@ -27,7 +27,7 @@ class AIReportEngine:
         self.empresa = empresa
         self.config_pais = get_configuracion_pais(empresa)
         self.moneda = self.config_pais['moneda']
-        
+
     def _generate_ai_insights(self, documentos, vehiculos, clientes):
         # Insights específicos por país
         if self.empresa.pais == 'US':
@@ -38,7 +38,7 @@ class AIReportEngine:
             })
         else:
             insights.append({
-                'title': 'Análisis Mercado Chileno', 
+                'title': 'Análisis Mercado Chileno',
                 'description': 'Servicios preventivo con crecimiento del 18%',
                 'confidence': 0.85
             })
@@ -80,7 +80,7 @@ class AIReportEngine:
 
 **APIs implementadas**:
 - 📈 `/analytics/revenue-api/` - Ingresos en tiempo real
-- 🚗 `/analytics/vehicle-api/` - Distribución de vehículos  
+- 🚗 `/analytics/vehicle-api/` - Distribución de vehículos
 - 🤖 `/analytics/ai-insights/` - Insights generados por IA
 - ⏱️ `/analytics/real-time/` - Métricas en vivo
 - 🔮 `/analytics/predictive-api/` - Análisis predictivo
@@ -109,7 +109,7 @@ def real_time_metrics_api(request):
 - 🏢 **Insights**: "Análisis Mercado Chileno", "Optimización de Costos"
 - 📊 **Reportes**: "IVA incluido según normativa SII"
 
-### **Estados Unidos (US)**  
+### **Estados Unidos (US)**
 - 💰 **Moneda**: USD (con decimales) - `$1,500.50 USD`
 - 📅 **Formato fecha**: MM/DD/YYYY
 - 🏢 **Insights**: "US Market Analysis", "Winter Service Demand"
@@ -145,7 +145,7 @@ def real_time_metrics_api(request):
 - 📊 Análisis de rentabilidad por servicio
 - 🎯 Recomendaciones de precios
 
-**2. Análisis Operacional**  
+**2. Análisis Operacional**
 - ⚡ Optimización de flujo de trabajo
 - 📦 Gestión inteligente de inventario
 - 🔧 Eficiencia de mecánicos
@@ -159,7 +159,7 @@ def real_time_metrics_api(request):
 ```json
 {
     "type": "demand_forecast",
-    "title": "Service Demand Prediction", 
+    "title": "Service Demand Prediction",
     "description": "34% increase in brake service demand predicted",
     "confidence": 0.91,
     "action": "Stock brake components and schedule training",
@@ -211,7 +211,7 @@ def real_time_metrics_api(request):
 📊 PRUEBA SIMPLIFICADA - SISTEMA ANALYTICS AI
 ============================================================
 ✅ __init__.py - Creado correctamente
-✅ ai_reports.py - Creado correctamente  
+✅ ai_reports.py - Creado correctamente
 ✅ views.py - Creado correctamente
 ✅ urls.py - Creado correctamente
 ✅ dashboard_ai.html - Template creado
@@ -222,7 +222,7 @@ def real_time_metrics_api(request):
 
 ⚙️ Test 3: Métodos principales
 ✅ get_dashboard_data - Método implementado
-✅ _format_currency - Método implementado  
+✅ _format_currency - Método implementado
 ✅ _generate_ai_insights - Método implementado
 ✅ _get_predictive_data - Método implementado
 ✅ export_financial_report - Método implementado

@@ -21,7 +21,6 @@ logger = logging.getLogger(__name__)
 logger.debug("CARGANDO taller/urls_extra/chile.py")
 from django.http import HttpResponseRedirect
 
-from taller import ajax_views
 from taller.taller_views import dashboard_suscripciones
 from taller.views_extra.ajax import buscar_clientes, vehiculos_por_cliente
 from taller.views_extra.company_settings_views import company_settings_view
@@ -35,6 +34,9 @@ from taller.views_extra.views_configuracion import (
     configuracion_empresa,
     configuracion_tecnicos,
 )
+from taller.views_extra.views_trial_activate import activar_trial
+
+# from taller.views_extra.crear_motor_caja import crear_motor, crear_caja, crear_color  # ❌ Desactivado - usando views_create_parts
 
 app_name = "chile"
 
@@ -74,21 +76,21 @@ urlpatterns = [
         TemplateView.as_view(template_name="registration/login.html"),
         name="account_login",
     ),
+    # Activación de trial para Chile
+    path("activar-trial/", activar_trial, name="activar_trial"),
     # Registro para Chile (español por defecto)
-    path("registro/", include(("scripts.onboarding_urls", "onboarding"), namespace="chile_onboarding")),
+    path(
+        "registro/",
+        include(
+            ("scripts.onboarding_urls", "onboarding"), namespace="chile_onboarding"
+        ),
+    ),
     # === AJAX JERÁRQUICO - VEHÍCULOS ===
-    path(
-        "taller/ajax/load-modelos/", ajax_views.load_modelos, name="ajax_load_modelos"
-    ),
-    path(
-        "taller/ajax/load-motores/", ajax_views.load_motores, name="ajax_load_motores"
-    ),
-    path("taller/ajax/load-cajas/", ajax_views.load_cajas, name="ajax_load_cajas"),
-    path(
-        "taller/ajax/load-motores-cajas/",
-        ajax_views.load_motores_cajas,
-        name="ajax_load_motores_cajas",
-    ),
+    # ❌ DESACTIVADOS: Endpoints legacy que no filtran por modelo
+    # path("taller/ajax/load-modelos/", ajax_views.load_modelos, name="ajax_load_modelos"),
+    # path("taller/ajax/load-motores/", ajax_views.load_motores, name="ajax_load_motores"),
+    # path("taller/ajax/load-cajas/", ajax_views.load_cajas, name="ajax_load_cajas"),
+    # path("taller/ajax/load-motores-cajas/", ajax_views.load_motores_cajas, name="ajax_load_motores_cajas"),
     # Módulos principales (incluir cuando estén funcionando)
     # === MÓDULOS PRINCIPALES ===
     # NOTA: Los submódulos principales (clientes, vehiculos, repuestos, servicios,
@@ -131,9 +133,16 @@ urlpatterns = [
     ),
     # === MÓDULOS PRINCIPALES ===
     # Incluir URLs principales de taller (clientes, vehiculos, repuestos, etc.)
-    path("", include(("taller.taller_main_urls", "taller"), namespace="taller")),
+    path("", include(("taller.urls", "taller"), namespace="taller")),
     # path('api/', include('taller.api.urls')),
-    # path('autocomplete/', include('taller.autocomplete.urls')),
+    path(
+        "autocomplete/",
+        include(("taller.autocomplete.urls", "autocomplete"), namespace="autocomplete"),
+    ),
+    # Crear nuevos motores, cajas y colores (usando views_create_parts)
+    # path('vehiculos/crear-motor/', crear_motor, name='crear_motor'),  # ❌ Desactivado - usar vehiculos:crear_motor
+    # path('vehiculos/crear-caja/', crear_caja, name='crear_caja'),    # ❌ Desactivado - usar vehiculos:crear_caja
+    # path('vehiculos/crear-color/', crear_color, name='crear_color'), # ❌ Desactivado - usar vehiculos:crear_color
     # path('analytics/', include('taller.analytics.urls')),
     # path('gestion/', include('gestion_taller.urls')),
 ]

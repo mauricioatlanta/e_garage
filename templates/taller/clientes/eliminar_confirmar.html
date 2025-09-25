@@ -1,3 +1,4 @@
+{% load country_url %}
 {% extends 'base.html' %}
 
 {% block content %}
@@ -6,7 +7,7 @@
 <p class="mb-6 text-gray-700">Cliente: <strong>{{ cliente }}</strong></p>
 <form class="flex justify-between items-center" method="post">
     {% csrf_token %}
-    {% url 'taller:clientes:lista_clientes' as url_lista_clientes %}
+    {% country_url 'clientes:lista_clientes' as url_lista_clientes %}
     <a class="px-6 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition" href="{{ url_lista_clientes|default:'#' }}">Cancelar</a>
 <button class="px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition btn-futuristic" type="submit">Eliminar</button>
 </form>

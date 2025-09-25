@@ -28,7 +28,7 @@
    ```javascript
    // ANTES
    fetch(`/api/modelos/?marca_id=${marcaId}`)
-   
+
    // DESPUÉS
    fetch(`/api/modelos/${marcaId}/`)
    ```
@@ -41,8 +41,8 @@
        // ...
      }
      data.forEach(modelo => {
-   
-   // DESPUÉS  
+
+   // DESPUÉS
    .then(data => {
      const modelos = data.modelos || [];
      if (modelos.length === 0) {
@@ -55,7 +55,7 @@
    ```javascript
    // ANTES
    fetch(`/api/clientes/?q=${encodeURIComponent(query)}`)
-   
+
    // DESPUÉS
    fetch(`/vehiculos/api/clientes/?q=${encodeURIComponent(query)}`)
    ```

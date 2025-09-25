@@ -5,6 +5,7 @@ Middleware personalizado para activación automática de idioma basado en:
 2. País de la empresa (Chile → es, USA → en)
 3. Fallback a español por defecto
 """
+
 from django.utils import translation
 
 

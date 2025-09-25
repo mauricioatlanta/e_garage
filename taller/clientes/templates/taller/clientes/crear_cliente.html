@@ -17,7 +17,7 @@ body {
   position: fixed;
   top: 0; left: 0; width: 100vw; height: 100vh;
   z-index: -2;
-  background: 
+  background:
     radial-gradient(circle at 20% 20%, rgba(0, 255, 231, 0.1) 0%, transparent 50%),
     radial-gradient(circle at 80% 80%, rgba(30, 144, 255, 0.1) 0%, transparent 50%),
     radial-gradient(circle at 40% 60%, rgba(138, 43, 226, 0.1) 0%, transparent 50%);
@@ -29,7 +29,7 @@ body {
   position: fixed;
   top: 0; left: 0; width: 100vw; height: 100vh;
   z-index: -1;
-  background-image: 
+  background-image:
     linear-gradient(rgba(0, 255, 231, 0.1) 1px, transparent 1px),
     linear-gradient(90deg, rgba(0, 255, 231, 0.1) 1px, transparent 1px);
   background-size: 50px 50px;
@@ -72,7 +72,7 @@ body {
 .cyber-form {
   background: linear-gradient(135deg, rgba(10, 25, 47, 0.95) 0%, rgba(20, 30, 60, 0.95) 100%);
   border-radius: 2rem;
-  box-shadow: 
+  box-shadow:
     0 0 60px 15px rgba(0, 255, 231, 0.3),
     0 0 0 2px rgba(0, 255, 231, 0.5),
     inset 0 0 50px rgba(0, 255, 231, 0.1);
@@ -130,7 +130,7 @@ textarea.cyber-input {
   font-family: 'Share Tech Mono', 'Orbitron', monospace !important;
   font-size: 1.1rem !important;
   padding: 0.8rem 1rem !important;
-  box-shadow: 
+  box-shadow:
     0 0 15px rgba(0, 255, 231, 0.3),
     inset 0 0 10px rgba(0, 255, 231, 0.1) !important;
   transition: all 0.3s ease;
@@ -142,7 +142,7 @@ select.cyber-input:focus,
 textarea.cyber-input:focus {
   outline: none !important;
   border-color: #00ffe7 !important;
-  box-shadow: 
+  box-shadow:
     0 0 25px rgba(0, 255, 231, 0.5),
     inset 0 0 15px rgba(0, 255, 231, 0.2) !important;
   transform: scale(1.02);
@@ -162,7 +162,7 @@ textarea.cyber-input::placeholder {
   font-size: 1.3rem;
   font-weight: bold;
   border-radius: 1.2rem;
-  box-shadow: 
+  box-shadow:
     0 0 30px rgba(0, 255, 231, 0.6),
     0 5px 15px rgba(0, 0, 0, 0.3);
   padding: 1rem 3rem;
@@ -185,7 +185,7 @@ textarea.cyber-input::placeholder {
 
 .cyber-btn:hover {
   transform: scale(1.05) translateY(-2px);
-  box-shadow: 
+  box-shadow:
     0 0 40px rgba(0, 255, 231, 0.8),
     0 10px 25px rgba(0, 0, 0, 0.4);
 }
@@ -201,8 +201,8 @@ textarea.cyber-input::placeholder {
   color: #00ffe7;
   text-align: center;
   margin-bottom: 3rem;
-  text-shadow: 
-    0 0 20px rgba(0, 255, 231, 0.8), 
+  text-shadow:
+    0 0 20px rgba(0, 255, 231, 0.8),
     0 0 40px rgba(0, 255, 231, 0.6),
     0 0 2px #fff;
   letter-spacing: 0.3em;
@@ -286,10 +286,10 @@ textarea.cyber-input::placeholder {
   </div>
 
   <h1 class="cyber-title">🚀 CREAR CLIENTE ESPACIAL</h1>
-  
+
   <form class="space-y-8" method="post">
     {% csrf_token %}
-    
+
     {% if form.errors %}
       <div class="error-panel">
         <h3 class="text-red-300 font-bold mb-3 text-lg">⚠️ Errores en el formulario:</h3>
@@ -303,38 +303,38 @@ textarea.cyber-input::placeholder {
         {% endfor %}
       </div>
     {% endif %}
-    
+
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
       <!-- Nombre -->
       <div class="field-container">
         <label class="cyber-label" for="id_nombre">👤 Nombre:</label>
         {{ form.nombre|add_class:'cyber-input' }}
       </div>
-      
+
       <!-- Apellido -->
       <div class="field-container">
         <label class="cyber-label" for="id_apellido">👥 Apellido:</label>
         {{ form.apellido|add_class:'cyber-input' }}
       </div>
-      
+
       <!-- Email -->
       <div class="field-container">
         <label class="cyber-label" for="id_email">📧 Correo electrónico:</label>
         {{ form.email|add_class:'cyber-input' }}
       </div>
-      
+
       <!-- Teléfono -->
       <div class="field-container">
         <label class="cyber-label" for="id_telefono">📱 Teléfono:</label>
         {{ form.telefono|add_class:'cyber-input' }}
       </div>
-      
+
       <!-- Dirección (ANTES de región y ciudad) -->
       <div class="field-container md:col-span-2">
         <label class="cyber-label" for="id_direccion">🏠 Dirección:</label>
         {{ form.direccion|add_class:'cyber-input' }}
       </div>
-      
+
       {% if form.pais == 'US' %}
         <!-- Estados Unidos -->
         <div class="field-container">
@@ -361,7 +361,7 @@ textarea.cyber-input::placeholder {
         </div>
       {% endif %}
     </div>
-    
+
     <div class="text-center pt-8">
       <button class="cyber-btn" type="submit">
         🚀 GUARDAR CLIENTE
@@ -375,21 +375,21 @@ textarea.cyber-input::placeholder {
 document.addEventListener('DOMContentLoaded', function() {
   // Create floating particles
   createParticles();
-  
+
   // Handle Chile regions/cities
   const regionSelect = document.getElementById('id_region');
   const ciudadSelect = document.getElementById('id_ciudad');
-  
+
   if(regionSelect && ciudadSelect) {
     function cargarCiudades(regionId, selectedCiudadId = null) {
       console.log('🌍 Cargando ciudades para región:', regionId);
-      
+
       // Clear cities and show loading
       ciudadSelect.innerHTML = '<option value="">⏳ Cargando ciudades...</option>';
       ciudadSelect.disabled = true;
-      
+
       if(regionId) {
-        fetch(`{% url 'clientes:obtener_ciudades' %}?region_id=${regionId}`)
+        fetch(`{% url 'taller:clientes:obtener_ciudades' %}?region_id=${regionId}`)
           .then(response => {
             if (!response.ok) {
               throw new Error('Network response was not ok');
@@ -399,7 +399,7 @@ document.addEventListener('DOMContentLoaded', function() {
           .then(data => {
             console.log('🏙️ Ciudades recibidas:', data);
             ciudadSelect.innerHTML = '<option value="">--- Seleccionar Ciudad ---</option>';
-            
+
             if(data.length === 0) {
               ciudadSelect.innerHTML = '<option value="">❌ No hay ciudades disponibles</option>';
             } else {
@@ -425,37 +425,37 @@ document.addEventListener('DOMContentLoaded', function() {
         ciudadSelect.disabled = false;
       }
     }
-    
+
     // Load cities if region is already selected
     if(regionSelect.value) {
       cargarCiudades(regionSelect.value, ciudadSelect.getAttribute('data-selected'));
     }
-    
+
     // Handle region change
     regionSelect.addEventListener('change', function() {
       cargarCiudades(this.value);
     });
   }
-  
+
   // Handle USA states/cities
   {% if form.pais == 'US' %}
   const estadoSelect = document.getElementById('id_estado_usa');
   const ciudadUsaSelect = document.getElementById('id_ciudad_usa');
-  
+
   if(estadoSelect && ciudadUsaSelect) {
     function cargarCiudadesUsa(estadoId, selectedCiudadId = null) {
       console.log('🇺🇸 Cargando ciudades USA para estado:', estadoId);
-      
+
       ciudadUsaSelect.innerHTML = '<option value="">⏳ Loading cities...</option>';
       ciudadUsaSelect.disabled = true;
-      
+
       if(estadoId) {
-        fetch(`{% url 'clientes:obtener_ciudades_usa' %}?estado_id=${estadoId}`)
+        fetch(`{% url 'taller:clientes:obtener_ciudades_usa' %}?estado_id=${estadoId}`)
           .then(response => response.json())
           .then(data => {
             console.log('🏙️ Ciudades USA recibidas:', data);
             ciudadUsaSelect.innerHTML = '<option value="">--- Select City ---</option>';
-            
+
             if(data.length === 0) {
               ciudadUsaSelect.innerHTML = '<option value="">❌ No cities available</option>';
             } else {
@@ -481,11 +481,11 @@ document.addEventListener('DOMContentLoaded', function() {
         ciudadUsaSelect.disabled = false;
       }
     }
-    
+
     if(estadoSelect.value) {
       cargarCiudadesUsa(estadoSelect.value, ciudadUsaSelect.getAttribute('data-selected'));
     }
-    
+
     estadoSelect.addEventListener('change', function() {
       cargarCiudadesUsa(this.value);
     });
@@ -496,7 +496,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function createParticles() {
   const particlesContainer = document.getElementById('particles');
   const particleCount = 50;
-  
+
   for(let i = 0; i < particleCount; i++) {
     const particle = document.createElement('div');
     particle.className = 'particle';
@@ -548,7 +548,7 @@ function createParticles() {
   <h1 class="futuristic-title">🪐 Crear Cliente Espacial</h1>
   <form class="space-y-6" method="post">
     {% csrf_token %}
-    
+
     {% if form.errors %}
       <div class="bg-red-900 border border-red-500 rounded p-4 mb-4">
         <h3 class="text-red-300 font-bold mb-2">⚠️ Errores en el formulario:</h3>
@@ -562,7 +562,7 @@ function createParticles() {
         {% endfor %}
       </div>
     {% endif %}
-    
+
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div>
         <label class="futuristic-label mb-2" for="id_nombre">Nombre:</label>
@@ -618,7 +618,7 @@ function createParticles() {
                 ciudadUsaSelect.innerHTML = '<option value="">---------</option>';
                 if(estadoId) {
                   console.log('Solicitando ciudades USA para estado:', estadoId);
-                  fetch(`{% url 'clientes:obtener_ciudades_usa' %}?estado_id=${estadoId}`)
+                  fetch(`{% url 'taller:clientes:obtener_ciudades_usa' %}?estado_id=${estadoId}`)
                     .then(response => response.json())
                     .then(data => {
                       console.log('Ciudades USA recibidas:', data);
@@ -670,7 +670,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function cargarCiudades(regionId, selectedCiudadId = null) {
       ciudadSelect.innerHTML = '<option value="">---------</option>';
       if(regionId) {
-        fetch(`{% url 'clientes:obtener_ciudades' %}?region_id=${regionId}`)
+        fetch(`{% url 'taller:clientes:obtener_ciudades' %}?region_id=${regionId}`)
           .then(response => response.json())
           .then(data => {
             data.forEach(function(ciudad) {

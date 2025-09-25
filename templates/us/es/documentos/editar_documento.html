@@ -78,19 +78,19 @@
     border-color: #00f2fe !important;
     box-shadow: 0 0 8px rgba(0, 242, 254, 0.5);
   }
-  
+
   /* Estilos específicos para campos de fecha y select */
   input[type="date"].form-input {
     background: rgba(40, 40, 80, 0.95) !important;
     color: #ffffff !important;
     color-scheme: dark;
   }
-  
+
   select.form-input {
     background: rgba(40, 40, 80, 0.95) !important;
     color: #ffffff !important;
   }
-  
+
   select.form-input option {
     background: rgba(20, 20, 40, 0.95) !important;
     color: #ffffff !important;
@@ -195,7 +195,7 @@
     margin: 1rem 0;
     color: #00ccff;
   }
-  
+
   /* ESTILOS ESPECIALES PARA EL CAMPO CLIENTE */
   .cliente-especial {
     grid-column: span 2; /* Ocupa toda la fila */
@@ -206,7 +206,7 @@
     margin: 1rem 0;
     position: relative;
   }
-  
+
   .cliente-label {
     color: #00ff88 !important;
     font-size: 1.2rem !important;
@@ -216,14 +216,14 @@
     align-items: center;
     gap: 0.5rem;
   }
-  
+
   .cliente-info-hint {
     font-size: 0.9rem;
     color: rgba(0, 255, 136, 0.7);
     font-weight: normal;
     margin-left: auto;
   }
-  
+
   .cliente-select {
     font-size: 1.1rem !important;
     padding: 1rem !important;
@@ -232,13 +232,13 @@
     color: #00ff88 !important;
     font-weight: bold;
   }
-  
+
   .cliente-select:focus {
     border-color: #00ff88 !important;
     box-shadow: 0 0 16px rgba(0, 255, 136, 0.6) !important;
     background: rgba(0, 50, 25, 0.9) !important;
   }
-  
+
   .cliente-info-panel {
     background: rgba(0, 255, 136, 0.15);
     border: 1px solid rgba(0, 255, 136, 0.3);
@@ -247,29 +247,29 @@
     margin-top: 0.5rem;
     animation: fadeIn 0.3s ease;
   }
-  
+
   .cliente-datos {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
   }
-  
+
   .cliente-nombre {
     color: #00ff88;
     font-weight: bold;
     font-size: 1.1rem;
   }
-  
+
   .cliente-contacto {
     color: rgba(0, 255, 136, 0.8);
     font-size: 0.9rem;
   }
-  
+
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
   }
-  
+
   /* Mejorar Select2 para el cliente */
   .select2-container--default .select2-selection--single {
     background: rgba(0, 50, 25, 0.8) !important;
@@ -278,19 +278,19 @@
     height: 3rem !important;
     line-height: 3rem !important;
   }
-  
+
   .select2-container--default .select2-selection--single .select2-selection__rendered {
     color: #00ff88 !important;
     font-weight: bold !important;
     padding-left: 1rem !important;
     line-height: 3rem !important;
   }
-  
+
   .select2-container--default .select2-selection--single .select2-selection__arrow {
     height: 3rem !important;
     right: 1rem !important;
   }
-  
+
   /* DROPDOWN MEJORADO - FONDO OSCURO CON CONTRASTE */
   .select2-dropdown {
     background: rgba(10, 10, 30, 0.98) !important;
@@ -299,13 +299,13 @@
     box-shadow: 0 8px 32px rgba(0, 255, 136, 0.3) !important;
     backdrop-filter: blur(10px);
   }
-  
+
   .select2-container--default .select2-search--dropdown {
     background: rgba(10, 10, 30, 0.9) !important;
     border-bottom: 2px solid rgba(0, 255, 136, 0.3) !important;
     padding: 0.5rem !important;
   }
-  
+
   .select2-container--default .select2-search--dropdown .select2-search__field {
     background: rgba(0, 50, 25, 0.9) !important;
     border: 1px solid rgba(0, 255, 136, 0.5) !important;
@@ -315,22 +315,22 @@
     padding: 0.8rem !important;
     font-size: 1rem !important;
   }
-  
+
   .select2-container--default .select2-search--dropdown .select2-search__field:focus {
     border-color: #00ff88 !important;
     box-shadow: 0 0 8px rgba(0, 255, 136, 0.5) !important;
     outline: none !important;
   }
-  
+
   .select2-results {
     background: rgba(10, 10, 30, 0.95) !important;
   }
-  
+
   .select2-results__options {
     max-height: 300px !important;
     background: rgba(10, 10, 30, 0.95) !important;
   }
-  
+
   .select2-results__option {
     background: rgba(15, 15, 35, 0.9) !important;
     color: #00ff88 !important;
@@ -339,7 +339,7 @@
     font-weight: 500 !important;
     transition: all 0.2s ease !important;
   }
-  
+
   .select2-results__option:hover,
   .select2-results__option--highlighted {
     background: rgba(0, 255, 136, 0.25) !important;
@@ -348,14 +348,14 @@
     border-left: 4px solid #00ff88 !important;
     padding-left: 1.2rem !important;
   }
-  
+
   .select2-results__option[aria-selected="true"] {
     background: rgba(0, 255, 136, 0.4) !important;
     color: #ffffff !important;
     font-weight: bold !important;
     border-left: 4px solid #ffffff !important;
   }
-  
+
   /* Mensaje cuando no hay resultados */
   .select2-results__option--loading,
   .select2-results__message {
@@ -365,28 +365,28 @@
     text-align: center !important;
     font-style: italic !important;
   }
-  
+
   /* Placeholder del campo de búsqueda */
   .select2-container--default .select2-selection--single .select2-selection__placeholder {
     color: rgba(0, 255, 136, 0.7) !important;
     font-style: italic !important;
   }
-  
+
   /* Scrollbar del dropdown */
   .select2-results__options::-webkit-scrollbar {
     width: 8px;
   }
-  
+
   .select2-results__options::-webkit-scrollbar-track {
     background: rgba(0, 0, 0, 0.3);
     border-radius: 4px;
   }
-  
+
   .select2-results__options::-webkit-scrollbar-thumb {
     background: rgba(0, 255, 136, 0.6);
     border-radius: 4px;
   }
-  
+
   .select2-results__options::-webkit-scrollbar-thumb:hover {
     background: #00ff88;
   }
@@ -441,17 +441,17 @@
           {{ form.tecnico_responsable|add_class:"form-input" }}
         </div>
       </div>
-      
+
       <div class="form-group">
         <label class="form-label">Kilometraje:</label>
         {{ form.kilometraje|add_class:"form-input" }}
       </div>
-      
+
       <div class="form-group">
         <label class="form-label">Observaciones:</label>
         {{ form.observaciones|add_class:"form-input" }}
       </div>
-      
+
       <div class="form-group">
         <label class="form-label">
           {{ form.incluir_iva }}
@@ -466,7 +466,7 @@
       <div class="alerta-info">
         💡 <strong>Editando repuestos:</strong> Modifique los datos existentes o agregue nuevos repuestos usando los botones de abajo.
       </div>
-      
+
       <table class="items-table" id="tabla-repuestos">
         <thead>
           <tr>
@@ -498,7 +498,7 @@
           </tr>
         </tfoot>
       </table>
-      
+
       <div style="text-align: center;">
         <button type="button" class="btn-agregar" onclick="agregarRepuesto()">➕ Agregar Repuesto</button>
         <button type="button" class="btn-ejemplo" onclick="agregarRepuestoEjemplo()">📋 Ejemplo</button>
@@ -511,7 +511,7 @@
       <div class="alerta-info">
         🔧 <strong>Editando servicios:</strong> Modifique los servicios existentes o agregue nuevos usando los botones de abajo.
       </div>
-      
+
       <table class="items-table" id="tabla-servicios">
         <thead>
           <tr>
@@ -537,7 +537,7 @@
           </tr>
         </tfoot>
       </table>
-      
+
       <div style="text-align: center;">
         <button type="button" class="btn-agregar" onclick="agregarServicio()">🔧 Agregar Servicio</button>
         <button type="button" class="btn-ejemplo" onclick="agregarServicioEjemplo()">📋 Ejemplo</button>
@@ -569,12 +569,12 @@
     <!-- Botones de acción -->
     <div style="text-align: center; margin-top: 3rem;">
   {% if request.path|slice:":3" == "/cl" %}
-  <a href="{% url 'documentos_cl:ver_documento' documento_id=documento.id %}" 
+  <a href="{% url 'documentos_cl:ver_documento' documento_id=documento.id %}"
          style="background: #666; color: #fff; padding: 1rem 2rem; border-radius: 1rem; text-decoration: none; margin-right: 1rem;">
         ← Cancelar
       </a>
   {% else %}
-  <a href="{% url 'documentos_us:ver_documento' documento_id=documento.id %}" 
+  <a href="{% url 'documentos_us:ver_documento' documento_id=documento.id %}"
          style="background: #666; color: #fff; padding: 1rem 2rem; border-radius: 1rem; text-decoration: none; margin-right: 1rem;">
         ← Cancelar
       </a>
@@ -594,7 +594,7 @@ $(document).ready(function() {
   console.log('Documento ID:', {{ documento.id }});
   console.log('Repuestos cargados:', {{ repuestos|length }});
   console.log('Servicios cargados:', {{ servicios|length }});
-  
+
   // Inicializar Select2 para los campos de selección
   $('#id_mecanico').select2({
     placeholder: 'Seleccionar técnico...',
@@ -602,14 +602,14 @@ $(document).ready(function() {
     width: '100%',
     theme: 'default'
   });
-  
+
   // Asegurar que el técnico select sea visible
   $('#id_mecanico').next('.select2-container').css({
     'background': 'rgba(40, 40, 80, 0.95)',
     'border': '1px solid rgba(0, 242, 254, 0.5)',
     'border-radius': '0.5rem'
   });
-  
+
   $('#id_mecanico').next('.select2-container').find('.select2-selection').css({
     'background': 'rgba(40, 40, 80, 0.95)',
     'color': '#ffffff',
@@ -617,7 +617,7 @@ $(document).ready(function() {
     'height': '3rem',
     'line-height': '3rem'
   });
-  
+
   // Configuración especial para el cliente con información detallada
   $('#id_cliente').select2({
     placeholder: '🔍 Buscar cliente por nombre o teléfono...',
@@ -650,7 +650,7 @@ $(document).ready(function() {
       cache: true
     }
   });
-  
+
   // Configuración especial para el vehículo que depende del cliente
   $('#id_vehiculo').select2({
     placeholder: '🚗 Selecciona un cliente primero...',
@@ -686,27 +686,27 @@ $(document).ready(function() {
       cache: true
     }
   });
-  
+
   // Mostrar información del cliente cuando se selecciona Y actualizar vehículos
   $('#id_cliente').on('select2:select', function (e) {
     const cliente = e.params.data;
     console.log('Cliente seleccionado:', cliente);
-    
+
     // Mostrar información del cliente
     if (cliente.nombre) {
       const panel = document.getElementById('cliente-info-panel');
       const nombreEl = document.getElementById('cliente-nombre');
       const contactoEl = document.getElementById('cliente-contacto');
-      
+
       nombreEl.textContent = `${cliente.nombre} ${cliente.apellido || ''}`;
       contactoEl.innerHTML = `
-        📞 ${cliente.telefono || 'No disponible'} | 
+        📞 ${cliente.telefono || 'No disponible'} |
         📧 ${cliente.email || 'No disponible'}
       `;
-      
+
       panel.style.display = 'block';
     }
-    
+
     // Habilitar y actualizar vehículos
     $('#id_vehiculo').prop('disabled', false);
     $('#id_vehiculo').val(null).trigger('change');
@@ -741,7 +741,7 @@ $(document).ready(function() {
       }
     });
   });
-  
+
   // Ocultar información cuando se limpia la selección Y deshabilitar vehículo
   $('#id_cliente').on('select2:clear', function (e) {
     document.getElementById('cliente-info-panel').style.display = 'none';
@@ -754,7 +754,7 @@ $(document).ready(function() {
       disabled: true
     });
   });
-  
+
   // Si ya hay un cliente seleccionado, mostrar su información y habilitar vehículos
   const clienteActual = $('#id_cliente').val();
   if (clienteActual) {
@@ -764,12 +764,12 @@ $(document).ready(function() {
       const panel = document.getElementById('cliente-info-panel');
       const nombreEl = document.getElementById('cliente-nombre');
       const contactoEl = document.getElementById('cliente-contacto');
-      
+
       nombreEl.textContent = clienteTexto.split(' - ')[0] || 'Cliente seleccionado';
       contactoEl.textContent = '✅ Cliente asignado al documento';
       panel.style.display = 'block';
     }
-    
+
     // Habilitar y configurar vehículos para el cliente actual
     $('#id_vehiculo').prop('disabled', false);
     $('#id_vehiculo').select2('destroy').select2({
@@ -803,22 +803,22 @@ $(document).ready(function() {
       }
     });
   }
-  
+
   // Activar autocompletar para filas existentes
   $('#tabla-repuestos tbody tr').each(function() {
     activarAutocompleteRepuesto(this);
   });
-  
+
   $('#tabla-servicios tbody tr').each(function() {
     activarAutocompleteServicio(this);
   });
-  
+
   // Conectar eventos de cálculo a inputs existentes y recalcular totales generales
   function recalcularTotales() {
     let totalRepuestos = 0;
     let totalServicios = 0;
     let totalOtrosServicios = 0;
-    
+
     // Calcular total repuestos y actualizar subtotales por fila
     $('#tabla-repuestos tbody tr').each(function() {
       const cantidad = parseInt($(this).find('.cantidad-input').val() || '1');
@@ -827,13 +827,13 @@ $(document).ready(function() {
       $(this).find('.subtotal-repuesto').text('$' + subtotal.toLocaleString());
       totalRepuestos += subtotal;
     });
-    
+
     // Calcular total servicios
     $('#tabla-servicios tbody tr').each(function() {
       const precio = parseInt($(this).find('.precio-servicio-input').val() || '0');
       totalServicios += precio;
     });
-    
+
     // Calcular total otros servicios
     $('#tabla-otros-servicios tbody tr').each(function() {
       const precio = parseInt($(this).find('.precio-otro-servicio-input').val() || '0');
@@ -841,15 +841,15 @@ $(document).ready(function() {
       // Actualizar ganancia en cada fila
       actualizarGananciaOtroServicio(this);
     });
-    
+
     const subtotal = totalRepuestos + totalServicios + totalOtrosServicios;
-    
+
     // IVA solo sobre repuestos (regla de negocio Chile)
     const baseIVA = totalRepuestos; // 19% SOLO sobre repuestos (CL)
     const incluirIva = $('#id_incluir_iva').is(':checked');
     const iva = incluirIva ? Math.round(baseIVA * 0.19) : 0;
     const total = subtotal + iva;
-    
+
     // Actualizar displays
     $('#display-total-repuestos').text('$' + totalRepuestos.toLocaleString());
     $('#display-total-servicios').text('$' + totalServicios.toLocaleString());
@@ -857,7 +857,7 @@ $(document).ready(function() {
     $('#display-subtotal').text('$' + subtotal.toLocaleString());
     $('#display-iva').text('$' + iva.toLocaleString());
     $('#display-total').text('$' + total.toLocaleString());
-    
+
     // Mostrar/ocultar fila del IVA
     if (incluirIva) {
       $('#iva-label').show();
@@ -866,7 +866,7 @@ $(document).ready(function() {
       $('#iva-label').hide();
       $('#display-iva').hide();
     }
-    
+
     // También actualizar el total en el pie de tabla
     $('#total-repuestos').text('$' + totalRepuestos.toLocaleString());
     $('#total-servicios').text('$' + totalServicios.toLocaleString());
@@ -881,14 +881,14 @@ $(document).ready(function() {
   $(document).on('click', '.btn-eliminar', function() {
     setTimeout(recalcularTotales, 100);
   });
-  
+
   // === FUNCIONES PARA OTROS SERVICIOS ===
-  
+
   // Autocompletado inteligente para otros servicios
   function activarAutocompleteOtroServicio(tr) {
     const nombreInput = tr.querySelector('.nombre-otro-servicio-input');
     if (!nombreInput) return;
-    
+
     $(nombreInput).autocomplete({
       source: function(request, response) {
         $.getJSON('/autocomplete/servicio/', {q: request.term}, function(data) {
@@ -901,7 +901,7 @@ $(document).ready(function() {
       minLength: 2
     });
   }
-  
+
   // Función para agregar otros servicios
   window.agregarOtroServicio = function() {
     const tbody = document.querySelector('#tabla-otros-servicios tbody');
@@ -916,20 +916,20 @@ $(document).ready(function() {
       <td><button type="button" class="btn-eliminar" onclick="this.closest('tr').remove(); actualizarTotalOtrosServicios();">✖</button></td>
     `;
     tbody.appendChild(tr);
-    
+
     // Activar autocompletado
     activarAutocompleteOtroServicio(tr);
-    
+
     // Eventos para calcular ganancia
     $(tr).find('.costo-interno-input, .precio-otro-servicio-input').on('input', function() {
       actualizarGananciaOtroServicio(tr);
       recalcularTotales();
     });
-    
+
     // Enfocar en el campo de nombre
     tr.querySelector('.nombre-otro-servicio-input').focus();
   };
-  
+
   // Función para agregar ejemplo de otro servicio
   window.agregarOtroServicioEjemplo = function() {
     agregarOtroServicio();
@@ -944,7 +944,7 @@ $(document).ready(function() {
       recalcularTotales();
     }
   };
-  
+
   // Actualizar ganancia de un otro servicio
   function actualizarGananciaOtroServicio(tr) {
     const costo = parseInt(tr.querySelector('.costo-interno-input').value || '0');
@@ -952,7 +952,7 @@ $(document).ready(function() {
     const ganancia = precio - costo;
     tr.querySelector('.ganancia-otro-servicio').textContent = '$' + ganancia.toLocaleString();
   }
-  
+
   // Actualizar total de otros servicios
   function actualizarTotalOtrosServicios() {
     let total = 0;
@@ -963,7 +963,7 @@ $(document).ready(function() {
     $('#total-otros-servicios').text('$' + total.toLocaleString());
     $('#display-total-otros-servicios').text('$' + total.toLocaleString());
   }
-  
+
   // Activar autocompletado en filas existentes
   $('#tabla-otros-servicios tbody tr').each(function() {
     const tr = this;
@@ -972,25 +972,25 @@ $(document).ready(function() {
       actualizarGananciaOtroServicio(tr);
     });
   });
-  
+
   // Recalcular al agregar filas (debería llamarse después de agregar)
   window.recalcularTotales = recalcularTotales;
   // Calcular totales iniciales
   recalcularTotales();
-  
+
   // === ENVÍO DEL FORMULARIO ===
   $('form').on('submit', function(e) {
     console.log('[SUBMIT] Preparando envío del formulario');
-    
+
     const items = [];
-    
+
     // Procesar repuestos
     $('#tabla-repuestos tbody tr').each(function() {
       const partnumber = $(this).find('.partnumber-input').val() || '';
       const nombre = $(this).find('.nombre-input').val() || '';
       const cantidad = parseInt($(this).find('.cantidad-input').val() || '1');
       const precio = parseInt($(this).find('.precio-input').val() || '0');
-      
+
       if (nombre.trim() && precio > 0 && cantidad > 0) {
         items.push({
           tipo: 'repuesto',
@@ -1002,12 +1002,12 @@ $(document).ready(function() {
         console.log('[SUBMIT] Repuesto agregado:', { partnumber, nombre, cantidad, precio });
       }
     });
-    
+
     // Procesar servicios
     $('#tabla-servicios tbody tr').each(function() {
       const nombre = $(this).find('.nombre-servicio-input').val() || '';
       const precio = parseInt($(this).find('.precio-servicio-input').val() || '0');
-      
+
       if (nombre.trim() && precio > 0) {
         items.push({
           tipo: 'servicio',
@@ -1017,7 +1017,7 @@ $(document).ready(function() {
         console.log('[SUBMIT] Servicio agregado:', { nombre, precio });
       }
     });
-    
+
     // Procesar otros servicios
     $('#tabla-otros-servicios tbody tr').each(function() {
       const nombre = $(this).find('.nombre-otro-servicio-input').val() || '';
@@ -1025,7 +1025,7 @@ $(document).ready(function() {
       const costo = parseInt($(this).find('.costo-interno-input').val() || '0');
       const precio = parseInt($(this).find('.precio-otro-servicio-input').val() || '0');
       const observaciones = $(this).find('.observaciones-otro-input').val() || '';
-      
+
       if (nombre.trim() && precio > 0) {
         items.push({
           tipo: 'otro_servicio',
@@ -1038,11 +1038,11 @@ $(document).ready(function() {
         console.log('[SUBMIT] Otro servicio agregado:', { nombre, empresa, costo, precio, observaciones });
       }
     });
-    
+
     // Guardar JSON en el campo oculto
     $('#json_items').val(JSON.stringify(items));
     console.log('[SUBMIT] json_items generado:', JSON.stringify(items, null, 2));
-    
+
     return true; // Permitir envío
   });
 });

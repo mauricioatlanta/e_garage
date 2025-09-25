@@ -6,7 +6,7 @@ Se han corregido **todas las URLs problemáticas** que tenían duplicación del 
 
 ### 🔍 **Análisis del Problema Principal**
 
-**Error identificado:** 
+**Error identificado:**
 - Se estaba editando el template incorrecto (`taller/documentos/crear_documento.html`)
 - El template real en uso es `documentos/crear_documento_moderno.html`
 - **Múltiples APIs** tenían duplicación del prefijo de país
@@ -123,7 +123,7 @@ El sistema de creación de documentos está **completamente funcional**:
 
 - ✅ **`templates/documentos/crear_documento_moderno.html`**
   - Línea 931: API obtener número documento
-  - Línea 1017: API vehículos cliente  
+  - Línea 1017: API vehículos cliente
   - Línea 1100: API buscar repuestos
   - Línea 1195: API buscar servicios internos
 

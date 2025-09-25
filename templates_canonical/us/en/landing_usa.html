@@ -13,7 +13,7 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://egarage.com/us/">
   <meta property="og:image" content="{{ og_image|default:'/static/img/og_usa_landing.png' }}">
-  
+
   <style>
     :root {
       --primary-blue: #1a365d;
@@ -26,13 +26,13 @@
       --bg-card: rgba(26, 54, 93, 0.1);
       --border-glow: 0 0 20px rgba(0, 212, 255, 0.3);
     }
-    
+
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
-    
+
     body {
       font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
       background: linear-gradient(135deg, #0f1419 0%, #1a365d 50%, #2d3748 100%);
@@ -41,7 +41,7 @@
       overflow-x: hidden;
       position: relative;
     }
-    
+
     /* Futuristic background pattern */
     body::before {
       content: '';
@@ -50,13 +50,13 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background-image: 
+      background-image:
         radial-gradient(circle at 20% 80%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
         radial-gradient(circle at 80% 20%, rgba(128, 90, 213, 0.1) 0%, transparent 50%),
         radial-gradient(circle at 40% 40%, rgba(0, 212, 255, 0.05) 0%, transparent 50%);
       z-index: -1;
     }
-    
+
     /* Animated grid pattern */
     .grid-pattern {
       position: fixed;
@@ -64,7 +64,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background-image: 
+      background-image:
         linear-gradient(rgba(0, 212, 255, 0.1) 1px, transparent 1px),
         linear-gradient(90deg, rgba(0, 212, 255, 0.1) 1px, transparent 1px);
       background-size: 50px 50px;
@@ -72,7 +72,7 @@
       z-index: -1;
       opacity: 0.3;
     }
-    
+
     @keyframes grid-move {
       0% { transform: translate(0, 0); }
       100% { transform: translate(50px, 50px); }
@@ -85,25 +85,25 @@
       margin-top: 5rem;
       margin-bottom: 1.5rem;
     }
-    
+
     .logo img {
       width: 100px;
       height: 100px;
       filter: drop-shadow(0 0 15px rgba(0, 212, 255, 0.6));
       animation: logo-glow 3s ease-in-out infinite alternate;
     }
-    
+
     @keyframes logo-glow {
-      0% { 
+      0% {
         filter: drop-shadow(0 0 15px rgba(0, 212, 255, 0.6));
         transform: scale(1);
       }
-      100% { 
+      100% {
         filter: drop-shadow(0 0 25px rgba(0, 212, 255, 0.8)) drop-shadow(0 0 35px rgba(128, 90, 213, 0.4));
         transform: scale(1.02);
       }
     }
-    
+
     .hero {
       text-align: center;
       margin-bottom: 4rem;
@@ -119,7 +119,7 @@
       margin-right: auto;
       box-shadow: var(--border-glow);
     }
-    
+
     .hero::before {
       content: '';
       position: absolute;
@@ -130,12 +130,12 @@
       background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
       animation: scan-line 3s ease-in-out infinite;
     }
-    
+
     @keyframes scan-line {
       0%, 100% { transform: translateX(-100%); }
       50% { transform: translateX(100%); }
     }
-    
+
     .hero h1 {
       font-size: 3.5rem;
       font-weight: 800;
@@ -146,7 +146,7 @@
       margin-bottom: 1.5rem;
       letter-spacing: -0.02em;
     }
-    
+
     .hero p {
       font-size: 1.4rem;
       color: var(--text-muted);
@@ -156,14 +156,14 @@
       margin-left: auto;
       margin-right: auto;
     }
-    
+
     .cta-buttons {
       display: flex;
       gap: 1.5rem;
       justify-content: center;
       flex-wrap: wrap;
     }
-    
+
     .cta-btn {
       background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
       color: white;
@@ -179,7 +179,7 @@
       position: relative;
       overflow: hidden;
     }
-    
+
     .cta-btn::before {
       content: '';
       position: absolute;
@@ -190,23 +190,23 @@
       background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
       transition: left 0.5s;
     }
-    
+
     .cta-btn:hover::before {
       left: 100%;
     }
-    
+
     .cta-btn.secondary {
       background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
       border-color: rgba(128, 90, 213, 0.3);
     }
-    
+
     .cta-btn:hover {
       transform: translateY(-2px);
       box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4);
       text-decoration: none;
       color: white;
     }
-    
+
     .section {
       margin-top: 4rem;
       max-width: 1200px;
@@ -214,20 +214,20 @@
       margin-right: auto;
       padding: 0 2rem;
     }
-    
+
     .section h2 {
       text-align: center;
       font-size: 2rem;
       font-weight: 900;
       margin-bottom: 2rem;
     }
-    
+
     .features-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
       gap: 2rem;
     }
-    
+
     .feature-card {
       background: var(--bg-card);
       border-radius: 20px;
@@ -239,7 +239,7 @@
       position: relative;
       overflow: hidden;
     }
-    
+
     .feature-card::before {
       content: '';
       position: absolute;
@@ -249,37 +249,37 @@
       height: 1px;
       background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
     }
-    
+
     .feature-card:hover {
       transform: translateY(-5px);
       border-color: rgba(0, 212, 255, 0.4);
       box-shadow: 0 20px 40px rgba(0, 212, 255, 0.1);
     }
-    
+
     .feature-card h3 {
       font-size: 1.4rem;
       margin-bottom: 1rem;
       font-weight: 600;
     }
-    
+
     .feature-card p {
       color: var(--text-muted);
       line-height: 1.6;
     }
-    
+
     .feature-icon {
       font-size: 2.5rem;
       margin-bottom: 1rem;
       display: block;
     }
-    
+
     .pricing-grid {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       gap: 2rem;
     }
-    
+
     .pricing-card {
       background: var(--bg-card);
       border-radius: 20px;
@@ -292,7 +292,7 @@
       position: relative;
       overflow: hidden;
     }
-    
+
     .pricing-card::before {
       content: '';
       position: absolute;
@@ -302,29 +302,29 @@
       height: 1px;
       background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
     }
-    
+
     .pricing-card.featured {
       border-color: rgba(128, 90, 213, 0.4);
       transform: scale(1.05);
       box-shadow: 0 20px 40px rgba(128, 90, 213, 0.2);
     }
-    
+
     .pricing-card:hover {
       transform: translateY(-5px);
       border-color: rgba(0, 212, 255, 0.4);
       box-shadow: 0 20px 40px rgba(0, 212, 255, 0.1);
     }
-    
+
     .pricing-card.featured:hover {
       transform: scale(1.05) translateY(-5px);
     }
-    
+
     .pricing-card h3 {
       font-size: 1.6rem;
       margin-bottom: 1rem;
       font-weight: 600;
     }
-    
+
     .price {
       font-size: 2.5rem;
       color: var(--accent-cyan);
@@ -332,13 +332,13 @@
       margin-bottom: 1.5rem;
       text-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
     }
-    
+
     .testimonials-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
       gap: 2rem;
     }
-    
+
     .testimonial-card {
       background: var(--bg-card);
       border-radius: 20px;
@@ -349,7 +349,7 @@
       position: relative;
       overflow: hidden;
     }
-    
+
     .testimonial-card::before {
       content: '';
       position: absolute;
@@ -359,13 +359,13 @@
       height: 1px;
       background: linear-gradient(90deg, transparent, var(--accent-purple), transparent);
     }
-    
+
     .testimonial-card:hover {
       transform: translateY(-5px);
       border-color: rgba(128, 90, 213, 0.4);
       box-shadow: 0 20px 40px rgba(128, 90, 213, 0.1);
     }
-    
+
     .testimonial-card blockquote {
       font-style: italic;
       color: var(--text-light);
@@ -373,13 +373,13 @@
       font-size: 1.1rem;
       line-height: 1.6;
     }
-    
+
     .testimonial-author {
       color: var(--accent-purple);
       font-weight: 600;
       font-size: 1rem;
     }
-    
+
     .footer {
       margin-top: 4rem;
       padding: 3rem 0;
@@ -388,11 +388,11 @@
       text-align: center;
       backdrop-filter: blur(20px);
     }
-    
+
     .footer-links {
       margin-top: 1.5rem;
     }
-    
+
     .footer-links a {
       color: var(--accent-cyan);
       font-weight: 500;
@@ -400,11 +400,11 @@
       text-decoration: none;
       transition: color 0.3s ease;
     }
-    
+
     .footer-links a:hover {
       color: var(--accent-purple);
     }
-    
+
     /* Main Header */
     .main-header {
       position: fixed;
@@ -420,34 +420,34 @@
       justify-content: space-between;
       align-items: center;
     }
-    
+
     .header-left {
       display: flex;
       align-items: center;
     }
-    
+
     .header-right {
       display: flex;
       align-items: center;
     }
-    
+
     /* Cuando no hay selector de idioma (Chile), centrar el header */
     .header-right:empty {
       display: none;
     }
-    
+
     .main-header:has(.header-right:empty) .header-left {
       justify-content: center;
       width: 100%;
     }
-    
+
     /* Auth Buttons */
     .auth-buttons {
       display: flex;
       gap: 1rem;
       align-items: center;
     }
-    
+
     .auth-btn {
       padding: 0.6rem 1.2rem;
       border-radius: 8px;
@@ -457,26 +457,26 @@
       transition: all 0.3s ease;
       border: 1px solid transparent;
     }
-    
+
     .login-btn {
       background: transparent;
       color: var(--text-light);
       border-color: rgba(0, 212, 255, 0.3);
     }
-    
+
     .login-btn:hover {
       background: rgba(0, 212, 255, 0.1);
       border-color: var(--accent-cyan);
       color: var(--accent-cyan);
       text-decoration: none;
     }
-    
+
     .register-btn {
       background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
       color: white;
       border-color: var(--accent-cyan);
     }
-    
+
     .register-btn:hover {
       background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
       transform: translateY(-1px);
@@ -484,7 +484,7 @@
       text-decoration: none;
       color: white;
     }
-    
+
     /* Language Selector */
     .language-selector {
       background: rgba(0, 0, 0, 0.2);
@@ -495,7 +495,7 @@
       display: flex;
       gap: 0.3rem;
     }
-    
+
     .lang-btn {
       background: transparent;
       border: 1px solid rgba(0, 212, 255, 0.3);
@@ -507,77 +507,77 @@
       transition: all 0.3s ease;
       font-size: 0.9rem;
     }
-    
+
     .lang-btn:hover {
       background: rgba(0, 212, 255, 0.1);
       border-color: var(--accent-cyan);
       color: var(--accent-cyan);
       text-decoration: none;
     }
-    
+
     .lang-btn.active {
       background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
       border-color: var(--accent-cyan);
       color: white;
     }
-    
+
     @keyframes pulse {
-      0%, 100% { 
-        box-shadow: 0 0 0 0 #0ff; 
+      0%, 100% {
+        box-shadow: 0 0 0 0 #0ff;
       }
-      50% { 
-        box-shadow: 0 0 16px 4px #0ff; 
+      50% {
+        box-shadow: 0 0 16px 4px #0ff;
       }
     }
-    
+
     @media (max-width: 768px) {
       .main-header {
         padding: 0.8rem 1rem;
         flex-direction: column;
         gap: 0.8rem;
       }
-      
+
       .header-left, .header-right {
         width: 100%;
         justify-content: center;
       }
-      
+
       .auth-buttons {
         gap: 0.8rem;
       }
-      
+
       .auth-btn {
         padding: 0.5rem 1rem;
         font-size: 0.85rem;
       }
-      
+
       .language-selector {
         padding: 0.2rem;
       }
-      
+
       .lang-btn {
         padding: 0.3rem 0.6rem;
         font-size: 0.8rem;
       }
-      
+
       .hero {
         margin-top: 6rem;
         padding: 3rem 1.5rem;
       }
-      
+
       .hero h1 {
         font-size: 2.5rem;
       }
-      
+
       .hero p {
         font-size: 1.1rem;
       }
-      
+
       .cta-buttons {
         flex-direction: column;
         align-items: center;
       }
-      
+
       .cta-btn {
         width: 100%;
         max-width: 300px;
@@ -587,7 +587,7 @@
 </head>
 <body>
   <div class="grid-pattern"></div>
-  
+
   <!-- Header with Login/Register and Language Selector -->
   <header class="main-header">
     <div class="header-left">
@@ -614,7 +614,7 @@
       {% endif %}
     </div>
   </header>
-  
+
   <div class="logo">
     <img src="{% static 'img/TallerPro_logo.png' %}" alt="eGarage Logo" class="object-contain mx-auto" />
   </div>
@@ -886,7 +886,7 @@
       // Get current language from Django context or URL
       const currentLang = '{{ current_language|default:"en" }}';
       const isChileMarket = {{ is_chile_market|yesno:"true,false" }};
-      
+
       // Update active language button based on market and current language
       document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.classList.remove('active');
@@ -896,22 +896,22 @@
           btn.classList.add('active');
         }
       });
-      
+
       // Handle language switching
       document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.addEventListener('click', function(e) {
           e.preventDefault();
           const lang = this.href.split('lang=')[1];
-          
+
           // Update URL without page reload
           const newUrl = new URL(window.location);
           newUrl.searchParams.set('lang', lang);
           window.history.pushState({}, '', newUrl);
-          
+
           // Update active button
           document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
           this.classList.add('active');
-          
+
           // Reload page to apply language change
           window.location.reload();
         });

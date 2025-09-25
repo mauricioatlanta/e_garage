@@ -79,11 +79,11 @@ def enviar_correo_prueba(email_destino, nombre="Usuario"):
         # Mensaje simple para prueba
         mensaje = f"""
         Hola {nombre},
-        
+
         Este es un correo de prueba para verificar la conexión SMTP de eGarage.
-        
+
         Si recibes este mensaje, significa que el sistema de emails está funcionando correctamente.
-        
+
         Saludos,
         Equipo eGarage
         """
@@ -132,13 +132,13 @@ def enviar_correo_activacion_cuenta(usuario, codigo_activacion):
         # Mensaje simple (luego se puede hacer una plantilla HTML)
         mensaje = f"""
         Hola {context['nombre_usuario']},
-        
+
         Gracias por registrarte en eGarage.
-        
+
         Tu código de activación es: {codigo_activacion}
-        
+
         Para activar tu cuenta, ingresa este código en la página de activación.
-        
+
         Saludos,
         Equipo eGarage
         """

@@ -45,10 +45,10 @@ Esta guía explica cómo aplicar el estilo gráfico futurista de la página de s
     <div class="twinkling"></div>
     <div class="clouds"></div>
   </div>
-  
+
   <!-- Partículas flotantes -->
   <div id="particles" class="particles-container"></div>
-  
+
   <div class="content-container max-w-7xl mx-auto">
     <!-- Contenido aquí -->
   </div>
@@ -79,7 +79,7 @@ Esta guía explica cómo aplicar el estilo gráfico futurista de la página de s
         </div>
         <div class="relative group">
           <div class="absolute -inset-1 rounded-lg bg-gradient-to-r from-emerald-500 via-lime-500 to-green-500 opacity-30 blur group-hover:opacity-50 transition-opacity"></div>
-          <a href="{% url 'crear_item' %}" 
+          <a href="{% url 'crear_item' %}"
              class="relative inline-flex items-center space-x-2 px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-600 via-lime-600 to-green-600 hover:from-emerald-500 hover:via-lime-500 hover:to-green-500 text-white font-bold text-sm shadow-lg shadow-emerald-800/40 transition-all duration-300 border border-emerald-400/40">
             <div class="w-4 h-4 rounded-md bg-white/20 flex items-center justify-center">
               <span class="text-sm">➕</span>
@@ -100,8 +100,8 @@ Esta guía explica cómo aplicar el estilo gráfico futurista de la página de s
   <div class="glow-bg"></div>
   <div class="input-container">
     <div class="search-icon">🔍</div>
-    <input type="search" id="searchInput" name="q" 
-           placeholder="Buscar..." 
+    <input type="search" id="searchInput" name="q"
+           placeholder="Buscar..."
            class="w-full px-3 py-2 bg-transparent text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-400/50 text-sm">
     <button type="button" id="searchBtn" class="search-btn">
       ESCANEAR
@@ -128,13 +128,13 @@ Esta guía explica cómo aplicar el estilo gráfico futurista de la página de s
 <!-- Items Grid - Futuristic Style -->
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3" id="itemsContainer">
   {% for item in items %}
-  <div class="group relative futuristic-card transform hover:scale-105 transition-all duration-300" 
-       data-name="{{ item.nombre|default:'' }}" 
+  <div class="group relative futuristic-card transform hover:scale-105 transition-all duration-300"
+       data-name="{{ item.nombre|default:'' }}"
        data-categoria="{{ item.categoria.get_label|default:'' }}"
        data-categoria-code="{{ item.categoria.code|default:'' }}">
     <!-- Glow effect -->
     <div class="glow-effect"></div>
-    
+
     <!-- Main card -->
     <div class="relative rounded-lg border border-gray-700/50 bg-black/40 backdrop-blur-sm hover:border-cyan-400/30 transition-all duration-300 h-48 flex flex-col">
       <!-- Header with ID -->
@@ -152,16 +152,16 @@ Esta guía explica cómo aplicar el estilo gráfico futurista de la página de s
           <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
         </div>
       </div>
-      
+
       <!-- Content -->
       <div class="p-3 space-y-2 flex-1">
         <!-- Contenido específico del item -->
       </div>
-      
+
       <!-- Actions -->
       <div class="p-3 border-t border-gray-700/30 flex-shrink-0">
         <div class="flex justify-between space-x-1">
-          <a href="{% url 'ver_item' item.pk %}" 
+          <a href="{% url 'ver_item' item.pk %}"
              class="flex-1 group/btn relative px-2 py-1.5 rounded-md bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border border-cyan-400/40 text-cyan-300 hover:from-cyan-500/30 hover:to-blue-500/30 hover:text-cyan-200 transition-all duration-200 text-xs font-medium text-center">
             <span class="relative z-10 flex items-center justify-center space-x-1">
               <span>👁️</span>
@@ -169,7 +169,7 @@ Esta guía explica cómo aplicar el estilo gráfico futurista de la página de s
             </span>
             <div class="absolute inset-0 rounded-md bg-gradient-to-r from-cyan-600 to-blue-600 opacity-0 group-hover/btn:opacity-20 transition-opacity"></div>
           </a>
-          <a href="{% url 'editar_item' item.pk %}" 
+          <a href="{% url 'editar_item' item.pk %}"
              class="flex-1 group/btn relative px-2 py-1.5 rounded-md bg-gradient-to-r from-emerald-600/20 to-green-600/20 border border-emerald-400/40 text-emerald-300 hover:from-emerald-500/30 hover:to-green-500/30 hover:text-emerald-200 transition-all duration-200 text-xs font-medium text-center">
             <span class="relative z-10 flex items-center justify-center space-x-1">
               <span>⚙️</span>
@@ -177,7 +177,7 @@ Esta guía explica cómo aplicar el estilo gráfico futurista de la página de s
             </span>
             <div class="absolute inset-0 rounded-md bg-gradient-to-r from-emerald-600 to-green-600 opacity-0 group-hover/btn:opacity-20 transition-opacity"></div>
           </a>
-          <button onclick="confirmarEliminacion({{ item.pk }}, '{{ item.nombre|escapejs }}', '{% url 'eliminar_item' item.pk %}')" 
+          <button onclick="confirmarEliminacion({{ item.pk }}, '{{ item.nombre|escapejs }}', '{% url 'eliminar_item' item.pk %}')"
                   class="flex-1 group/btn relative px-2 py-1.5 rounded-md bg-gradient-to-r from-red-600/20 to-pink-600/20 border border-red-400/40 text-red-300 hover:from-red-500/30 hover:to-pink-500/30 hover:text-red-200 transition-all duration-200 text-xs font-medium text-center">
             <span class="relative z-10 flex items-center justify-center space-x-1">
               <span>🗑️</span>
@@ -220,7 +220,7 @@ Esta guía explica cómo aplicar el estilo gráfico futurista de la página de s
         <h3 class="text-xl font-bold text-gray-200 mb-2 modal-title">Confirmar Eliminación</h3>
         <p class="text-gray-400 mb-6 modal-message">¿Está seguro de que desea eliminar <span class="item-name text-red-400 font-semibold"></span>?</p>
         <div class="flex space-x-3">
-          <button onclick="cerrarModal()" 
+          <button onclick="cerrarModal()"
                   class="flex-1 px-4 py-2 rounded-lg bg-gradient-to-r from-gray-600/20 to-gray-700/20 border border-gray-500/40 text-gray-300 hover:from-gray-500/30 hover:to-gray-600/30 transition-all duration-200 text-sm font-medium">
             Cancelar
           </button>
@@ -247,7 +247,7 @@ document.addEventListener('DOMContentLoaded', function() {
       items: '.futuristic-card'
     });
   }
-  
+
   // Código específico del módulo aquí
 });
 </script>

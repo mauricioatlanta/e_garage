@@ -11,13 +11,13 @@
 https://e-garage-atlantareciclajes.pythonanywhere.com/bienvenida/cl/
 
 **Características:**
-- ✅ Interfaz en español 
+- ✅ Interfaz en español
 - ✅ Precios en Pesos Chilenos (CLP)
 - ✅ Regiones y ciudades de Chile
 - ✅ Documentos con IVA chileno
 - ✅ Soporte en español
 
-### 🇺🇸 USA  
+### 🇺🇸 USA
 **URL Principal:**
 https://e-garage-atlantareciclajes.pythonanywhere.com/bienvenida/usa/
 
@@ -26,7 +26,7 @@ https://e-garage-atlantareciclajes.pythonanywhere.com/welcome/us/
 
 **Características:**
 - ✅ English interface
-- ✅ Prices in US Dollars (USD) 
+- ✅ Prices in US Dollars (USD)
 - ✅ All US states and cities
 - ✅ US tax compliance
 - ✅ English support
@@ -68,7 +68,7 @@ https://e-garage-atlantareciclajes.pythonanywhere.com/welcome/us/
 ### ✅ COMPLETADO
 - [x] URLs configuradas en gestion_taller/urls.py
 - [x] Plantilla HTML para Chile (bienvenida_chile.html)
-- [x] Plantilla HTML para USA (bienvenida_usa.html)  
+- [x] Plantilla HTML para USA (bienvenida_usa.html)
 - [x] Diseño responsive con Bootstrap 5
 - [x] Iconografía y animaciones
 - [x] Enlaces de navegación funcionales
@@ -94,6 +94,6 @@ Las URLs de bienvenida están completamente configuradas y listas para usar en:
 - Estructura semántica completa
 
 ---
-**📅 Fecha:** 24 de julio de 2025  
-**🚀 Estado:** PRODUCCIÓN READY ✅  
+**📅 Fecha:** 24 de julio de 2025
+**🚀 Estado:** PRODUCCIÓN READY ✅
 **🌐 Servidor:** PythonAnywhere

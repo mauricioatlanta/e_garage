@@ -2,6 +2,7 @@
 """
 Prueba de humo para verificar documentos y líneas
 """
+
 import os
 import sys
 
@@ -16,7 +17,6 @@ print("🔍 PRUEBA DE HUMO - DOCUMENTOS")
 print("=" * 40)
 
 try:
-
     from taller.models import Documento
 
     d = Documento.objects.order_by("-id").first()

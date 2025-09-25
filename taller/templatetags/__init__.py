@@ -1,1 +1,1 @@
-# Template tags para eGarage
+# Template tags package

@@ -8,7 +8,7 @@ Django mostraba 10 warnings de namespaces duplicados:
 WARNINGS:
 ?: (urls.W005) URL namespace 'chile:taller' isn't unique. You may not be able to reverse all URLs in this namespace
 ?: (urls.W005) URL namespace 'chile:taller:admin_monitoring' isn't unique
-?: (urls.W005) URL namespace 'chile:taller:api' isn't unique  
+?: (urls.W005) URL namespace 'chile:taller:api' isn't unique
 ?: (urls.W005) URL namespace 'chile:taller:business_intelligence' isn't unique
 ?: (urls.W005) URL namespace 'chile:taller:clientes' isn't unique
 ?: (urls.W005) URL namespace 'chile:taller:emails' isn't unique
@@ -22,13 +22,13 @@ WARNINGS:
 
 **Duplicación de namespace `'taller'`** en dos archivos:
 
-1. **`gestion_taller/urls.py` línea 90**: 
+1. **`gestion_taller/urls.py` línea 90**:
    ```python
    path('taller/', include(('taller.urls', 'taller'), namespace='taller'))
    ```
 
 2. **`taller/urls_extra/chile.py` línea 56**:
-   ```python  
+   ```python
    path('taller/', include(('taller.taller_main_urls', 'taller'), namespace='taller'))
    ```
 
@@ -46,7 +46,7 @@ path('taller/', include(('taller.taller_main_urls', 'taller'), namespace='taller
 
 **DESPUÉS**:
 ```python
-# chile.py  
+# chile.py
 path('taller/', include(('taller.taller_main_urls', 'taller'), namespace='taller_main')),
 ```
 

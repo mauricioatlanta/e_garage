@@ -2,6 +2,7 @@
 """
 Script para verificar el estado del documento 45 y los usuarios
 """
+
 import os
 
 import django

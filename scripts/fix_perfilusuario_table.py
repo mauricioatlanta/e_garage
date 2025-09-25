@@ -30,14 +30,14 @@ try:
     # Crear índices
     cursor.execute(
         """
-        CREATE INDEX IF NOT EXISTS taller_perfilusuario_empresa_id_7c7b5c99 
+        CREATE INDEX IF NOT EXISTS taller_perfilusuario_empresa_id_7c7b5c99
         ON taller_perfilusuario (empresa_id);
     """
     )
 
     cursor.execute(
         """
-        CREATE UNIQUE INDEX IF NOT EXISTS taller_perfilusuario_user_id_8b4b0c4f_uniq 
+        CREATE UNIQUE INDEX IF NOT EXISTS taller_perfilusuario_user_id_8b4b0c4f_uniq
         ON taller_perfilusuario (user_id);
     """
     )

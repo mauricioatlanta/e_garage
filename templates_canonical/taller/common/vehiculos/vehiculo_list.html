@@ -1,17 +1,18 @@
 {% extends "base.html" %}
 {% load i18n static %}
+{% load country_url %}
 
 {% block extra_head %}
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-  
+
   body {
     font-family: 'Inter', sans-serif;
   }
-  
+
   /* Futuristic Background */
   .futuristic-bg {
-    background: 
+    background:
       radial-gradient(circle at 20% 80%, rgba(168, 85, 247, 0.1) 0%, transparent 50%),
       radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.1) 0%, transparent 50%),
       radial-gradient(circle at 40% 40%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
@@ -23,9 +24,9 @@
     height: 100%;
     z-index: -2;
   }
-  
+
   .tech-grid {
-    background-image: 
+    background-image:
       linear-gradient(rgba(168, 85, 247, 0.1) 1px, transparent 1px),
       linear-gradient(90deg, rgba(168, 85, 247, 0.1) 1px, transparent 1px);
     background-size: 40px 40px;
@@ -38,12 +39,12 @@
     opacity: 0.3;
     animation: gridMove 20s linear infinite;
   }
-  
+
   @keyframes gridMove {
     0% { transform: translate(0, 0); }
     100% { transform: translate(40px, 40px); }
   }
-  
+
   /* Floating Particles */
   .particles {
     position: fixed;
@@ -54,7 +55,7 @@
     z-index: -1;
     pointer-events: none;
   }
-  
+
   .particle {
     position: absolute;
     width: 2px;
@@ -63,12 +64,12 @@
     border-radius: 50%;
     animation: float 6s ease-in-out infinite;
   }
-  
+
   @keyframes float {
     0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0; }
     50% { transform: translateY(-100px) rotate(180deg); opacity: 1; }
   }
-  
+
   /* Futuristic Cards */
   .futuristic-card {
     background: rgba(0, 0, 0, 0.4);
@@ -79,7 +80,7 @@
     overflow: hidden;
     transition: all 0.3s ease;
   }
-  
+
   .futuristic-card::before {
     content: '';
     position: absolute;
@@ -90,20 +91,20 @@
     background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.1), transparent);
     transition: left 0.5s ease;
   }
-  
+
   .futuristic-card:hover::before {
     left: 100%;
   }
-  
+
   .futuristic-card:hover {
     transform: translateY(-5px) scale(1.02);
     border-color: rgba(168, 85, 247, 0.5);
-    box-shadow: 
+    box-shadow:
       0 20px 40px rgba(168, 85, 247, 0.1),
       0 0 20px rgba(168, 85, 247, 0.2),
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
-  
+
   /* Vehicle Cards - Compact and Transparent */
   .vehicle-card {
     background: rgba(0, 0, 0, 0.2);
@@ -116,7 +117,7 @@
     overflow: hidden;
     cursor: pointer;
   }
-  
+
   .vehicle-card::before {
     content: '';
     position: absolute;
@@ -128,19 +129,19 @@
     transform: scaleX(0);
     transition: transform 0.3s ease;
   }
-  
+
   .vehicle-card:hover::before {
     transform: scaleX(1);
   }
-  
+
   .vehicle-card:hover {
     transform: translateY(-3px);
     border-color: rgba(168, 85, 247, 0.6);
-    box-shadow: 
+    box-shadow:
       0 10px 25px rgba(0, 0, 0, 0.3),
       0 0 20px rgba(168, 85, 247, 0.2);
   }
-  
+
   /* Interactive Elements */
   .interactive-btn {
     background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(236, 72, 153, 0.2));
@@ -154,7 +155,7 @@
     position: relative;
     overflow: hidden;
   }
-  
+
   .interactive-btn::before {
     content: '';
     position: absolute;
@@ -165,18 +166,18 @@
     background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
     transition: left 0.3s ease;
   }
-  
+
   .interactive-btn:hover::before {
     left: 100%;
   }
-  
+
   .interactive-btn:hover {
     background: linear-gradient(135deg, rgba(168, 85, 247, 0.4), rgba(236, 72, 153, 0.4));
     border-color: rgba(168, 85, 247, 0.8);
     color: #d8b4fe;
     transform: translateY(-1px);
   }
-  
+
   /* Futuristic Header */
   .futuristic-header {
     background: rgba(0, 0, 0, 0.5);
@@ -187,7 +188,7 @@
     position: relative;
     overflow: hidden;
   }
-  
+
   .futuristic-header::before {
     content: '';
     position: absolute;
@@ -195,21 +196,21 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: 
+    background:
       radial-gradient(circle at 30% 30%, rgba(168, 85, 247, 0.1) 0%, transparent 50%),
       radial-gradient(circle at 70% 70%, rgba(236, 72, 153, 0.1) 0%, transparent 50%);
     z-index: -1;
   }
-  
+
   /* Glowing Text */
   .glow-text {
     color: #a855f7;
-    text-shadow: 
+    text-shadow:
       0 0 10px rgba(168, 85, 247, 0.5),
       0 0 20px rgba(168, 85, 247, 0.3),
       0 0 30px rgba(168, 85, 247, 0.1);
   }
-  
+
   /* Status Indicators */
   .status-indicator {
     width: 8px;
@@ -218,22 +219,22 @@
     position: relative;
     animation: pulse 2s ease-in-out infinite;
   }
-  
+
   .status-active {
     background: #a855f7;
     box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
   }
-  
+
   .status-inactive {
     background: #ff4444;
     box-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
   }
-  
+
   @keyframes pulse {
     0%, 100% { opacity: 1; transform: scale(1); }
     50% { opacity: 0.7; transform: scale(1.2); }
   }
-  
+
   /* Search Interface */
   .futuristic-search {
     background: rgba(0, 0, 0, 0.6);
@@ -243,7 +244,7 @@
     padding: 20px;
     position: relative;
   }
-  
+
   .futuristic-search::before {
     content: '';
     position: absolute;
@@ -255,7 +256,7 @@
     border-radius: 16px;
     z-index: -1;
   }
-  
+
   .search-input {
     background: rgba(0, 0, 0, 0.4);
     border: 1px solid rgba(168, 85, 247, 0.3);
@@ -265,31 +266,31 @@
     font-size: 14px;
     transition: all 0.3s ease;
   }
-  
+
   .search-input:focus {
     outline: none;
     border-color: #a855f7;
     box-shadow: 0 0 15px rgba(168, 85, 247, 0.3);
     background: rgba(0, 0, 0, 0.6);
   }
-  
+
   .search-input::placeholder {
     color: rgba(168, 85, 247, 0.5);
   }
-  
+
   /* Grid Layout for Compact Cards */
   .vehicles-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 12px;
   }
-  
+
   /* Responsive Design */
   @media (max-width: 768px) {
     .vehicles-grid {
       grid-template-columns: 1fr;
     }
-    
+
     .vehicle-card {
       padding: 10px;
     }
@@ -339,13 +340,13 @@
   {% include "taller/common/vehiculos/_add_button.html" %}
   {% include "taller/common/vehiculos/_footer.html" %}
           </div>
-          
+
 <script>
 // Generate floating particles
 function createParticles() {
   const particlesContainer = document.getElementById('particles');
   const particleCount = 50;
-  
+
   for (let i = 0; i < particleCount; i++) {
     const particle = document.createElement('div');
     particle.className = 'particle';
@@ -360,14 +361,14 @@ function createParticles() {
 // Initialize particles on load
 document.addEventListener('DOMContentLoaded', function() {
   createParticles();
-  
+
   // Add interactive effects to vehicle cards
   const vehicleCards = document.querySelectorAll('.vehicle-card');
   vehicleCards.forEach(card => {
     card.addEventListener('mouseenter', function() {
       this.style.transform = 'translateY(-5px) scale(1.02)';
     });
-    
+
     card.addEventListener('mouseleave', function() {
       this.style.transform = 'translateY(0) scale(1)';
     });

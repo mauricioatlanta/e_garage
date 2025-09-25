@@ -105,7 +105,7 @@
         <div class="icon">🛡️</div>
         <h1>Demasiados Intentos</h1>
         <p>Por tu seguridad, hemos bloqueado temporalmente el acceso desde tu ubicación debido a múltiples intentos de {{ action }}.</p>
-        
+
         <div class="countdown">
             <div>⏰ Tiempo Restante</div>
             <div class="countdown-timer" id="countdown">
@@ -113,7 +113,7 @@
             </div>
             <small>Podrás intentar nuevamente cuando termine este tiempo</small>
         </div>
-        
+
         <div class="security-info">
             <h3>🔒 ¿Por qué veo esto?</h3>
             <p>Este mensaje aparece cuando:</p>
@@ -123,7 +123,7 @@
                 <li>Como medida preventiva contra ataques de seguridad</li>
             </ul>
         </div>
-        
+
         <div class="tips">
             <h4>💡 Consejos para evitar este bloqueo:</h4>
             <ul>
@@ -133,9 +133,9 @@
                 <li><strong>Restablece tu contraseña</strong> si la has olvidado</li>
             </ul>
         </div>
-        
+
         <a href="/" class="back-button">🏠 Volver al Inicio</a>
-        
+
         <p style="margin-top: 30px; font-size: 14px; color: #95a5a6;">
             Si necesitas ayuda inmediata, contacta a nuestro soporte:<br>
             📧 soporte@egarage.com | 📞 +57 300 123 4567
@@ -145,14 +145,14 @@
     <script>
         // Countdown timer
         let totalSeconds = {{ remaining_time }};
-        
+
         function updateCountdown() {
             const minutes = Math.floor(totalSeconds / 60);
             const seconds = totalSeconds % 60;
-            
+
             document.getElementById('minutes').textContent = minutes;
             document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
-            
+
             if (totalSeconds <= 0) {
                 // Tiempo agotado, recargar página
                 location.reload();
@@ -160,10 +160,10 @@
                 totalSeconds--;
             }
         }
-        
+
         // Actualizar cada segundo
         setInterval(updateCountdown, 1000);
-        
+
         // Auto-reload cuando termine el tiempo
         setTimeout(() => {
             location.reload();

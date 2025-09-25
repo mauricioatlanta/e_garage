@@ -73,11 +73,11 @@ input[type="text"]::placeholder {
     <a class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow"
        href="{% country_url 'crear_vehiculo' app_namespace='vehiculos' %}">+ Agregar Vehículo</a>
   </div>
-  
+
   <div class="mb-4">
     <input class="w-full rounded px-4 py-2 text-black" id="busqueda-vehiculo" placeholder="Buscar vehículo por patente, modelo, VIN o marca..." type="text"/>
   </div>
-  
+
   <div class="overflow-x-auto">
     <table class="min-w-full text-sm text-left">
       <thead class="bg-gray-700 text-white">
@@ -99,9 +99,9 @@ input[type="text"]::placeholder {
           <td class="px-4 py-2">{{ vehiculo.anio }}</td>
           <td class="px-4 py-2">{{ vehiculo.cliente.nombre }} {{ vehiculo.cliente.apellido }}</td>
           <td class="px-4 py-2 space-x-2">
-            <a class="text-blue-600 hover:underline" href="{% url 'vehiculos:ver_vehiculo' vehiculo.id %}" title="Ver">👁️</a>
-            <a class="text-yellow-600 hover:underline" href="{% url 'vehiculos:editar_vehiculo' vehiculo_id=vehiculo.id %}" title="Editar">✏️</a>
-            <a class="text-red-600 hover:underline" href="{% url 'vehiculos:eliminar_vehiculo' vehiculo_id=vehiculo.id %}" title="Eliminar">🗑️</a>
+            <a class="text-blue-600 hover:underline" href="{% url 'chile:taller:vehiculos:ver_vehiculo' vehiculo.id %}" title="Ver">👁️</a>
+            <a class="text-yellow-600 hover:underline" href="{% url 'chile:taller:vehiculos:editar_vehiculo' vehiculo_id=vehiculo.id %}" title="Editar">✏️</a>
+            <a class="text-red-600 hover:underline" href="{% url 'chile:taller:vehiculos:eliminar_vehiculo' vehiculo_id=vehiculo.id %}" title="Eliminar">🗑️</a>
           </td>
         </tr>
         {% empty %}
@@ -116,7 +116,7 @@ input[type="text"]::placeholder {
   document.addEventListener('DOMContentLoaded', function() {
     const input = document.getElementById('busqueda-vehiculo');
     const filas = document.querySelectorAll('#tabla-vehiculos tr');
-    
+
     input.addEventListener('input', function() {
       const filtro = this.value.toLowerCase();
       filas.forEach(fila => {

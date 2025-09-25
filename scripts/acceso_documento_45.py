@@ -2,6 +2,7 @@
 """
 Script para crear una sesión de usuario para acceder al documento 45
 """
+
 import os
 
 import django

@@ -2,6 +2,7 @@
 """
 Sistema de reportes de auditoría
 """
+
 import os
 from datetime import datetime, timedelta
 

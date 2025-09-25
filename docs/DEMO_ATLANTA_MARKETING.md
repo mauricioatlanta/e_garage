@@ -63,7 +63,7 @@ ATLANTA2025: {
     duracion: 3 meses GRATIS
     beneficios: [
         "Complete TallerPro system access",
-        "AI-powered recommendations", 
+        "AI-powered recommendations",
         "Georgia tax calculations",
         "Customer management system",
         "Inventory tracking",
@@ -104,7 +104,7 @@ PEACHTREE: {
 
 #### Paso 3: Código Especial
 ```
-"¿Te gusta lo que ves? 
+"¿Te gusta lo que ves?
 Los primeros 10 talleres de Atlanta obtienen 3 MESES GRATIS
 🎟️ Código: ATLANTA2025
 💰 Valor: $297"
@@ -186,7 +186,7 @@ We built a live demo just for Atlanta mechanics:
 First 10 Atlanta shops get 3 MONTHS FREE 🎟️
 Code: ATLANTA2025 (worth $297)
 
-Try it now - no login required! 
+Try it now - no login required!
 #Atlanta #AutoShop #TallerPro #Peachtree
 ```
 
@@ -201,7 +201,7 @@ gtag('event', 'demo_page_view', {
 });
 
 gtag('event', 'quote_calculator_used', {
-  'event_category': 'atlanta_demo', 
+  'event_category': 'atlanta_demo',
   'event_label': 'interactive_engagement'
 });
 
@@ -229,13 +229,13 @@ gtag('event', 'register_click', {
 1. **Facebook Ads**: Targeting "Auto Repair" businesses en Atlanta metro
 2. **Google Ads**: "auto shop software Atlanta"
 3. **LinkedIn**: Direct message a dueños de talleres
-4. **Cold calling**: Lista de talleres en Atlanta 
+4. **Cold calling**: Lista de talleres en Atlanta
 5. **Email marketing**: Lista comprada de talleres de Georgia
 6. **Referrals**: Cada cliente refiere otro taller (bonus)
 
 #### Budget Recomendado:
 - **Facebook Ads**: $200/semana
-- **Google Ads**: $300/semana  
+- **Google Ads**: $300/semana
 - **Cold calling**: $500/semana (VA)
 - **Email marketing**: $100/mes
 - **Total mensual**: ~$2,500

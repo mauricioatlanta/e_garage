@@ -116,7 +116,8 @@ def reporte_repuestos(request):
     # Top 10 repuestos más vendidos - FILTRADO POR EMPRESA
     repuesto_ventas = (
         LineaRepuesto.objects.filter(
-            documento__tipo="FAC", documento__empresa=empresa  # 🔒 FILTRO EMPRESA
+            documento__tipo="FAC",
+            documento__empresa=empresa,  # 🔒 FILTRO EMPRESA
         )
         .values("codigo", "nombre")
         .annotate(
@@ -163,7 +164,8 @@ def reporte_repuestos(request):
 
     # Repuestos con bajo stock - FILTRADO POR EMPRESA
     bajo_stock = Repuesto.objects.filter(
-        stock__lte=5, empresa=empresa  # 🔒 FILTRO EMPRESA
+        stock__lte=5,
+        empresa=empresa,  # 🔒 FILTRO EMPRESA
     ).values("part_number", "nombre", "stock")
     bajo_stock = [
         {"codigo": r["part_number"], "nombre": r["nombre"], "stock": r["stock"]}
@@ -173,7 +175,8 @@ def reporte_repuestos(request):
     # Histórico de ventas mensuales - FILTRADO POR EMPRESA
     ventas = (
         LineaRepuesto.objects.filter(
-            documento__tipo="FAC", documento__empresa=empresa  # 🔒 FILTRO EMPRESA
+            documento__tipo="FAC",
+            documento__empresa=empresa,  # 🔒 FILTRO EMPRESA
         )
         .annotate(mes=F("documento__fecha_emision"))
         .values("mes")
@@ -190,7 +193,8 @@ def reporte_repuestos(request):
     # Repuestos nunca vendidos - FILTRADO POR EMPRESA
     vendidos_codigos = set(
         LineaRepuesto.objects.filter(
-            documento__tipo="FAC", documento__empresa=empresa  # 🔒 FILTRO EMPRESA
+            documento__tipo="FAC",
+            documento__empresa=empresa,  # 🔒 FILTRO EMPRESA
         ).values_list("codigo", flat=True)
     )
     nunca_vendidos = Repuesto.objects.filter(empresa=empresa).exclude(
@@ -540,7 +544,8 @@ def dashboard_inteligencia_operativa(request):
 
     # Calcular métricas adicionales para KPIs - FILTRADO POR EMPRESA
     total_documentos = Documento.objects.filter(
-        tipo="FAC", empresa=empresa  # 🔒 FILTRO EMPRESA
+        tipo="FAC",
+        empresa=empresa,  # 🔒 FILTRO EMPRESA
     ).count()
     total_clientes = Cliente.objects.filter(
         empresa=empresa
@@ -622,7 +627,8 @@ def dashboard_inteligencia_operativa(request):
     # Datos para gráfico de servicios más demandados - FILTRADO POR EMPRESA
     servicios_demandados = (
         LineaServicio.objects.filter(
-            documento__tipo="FAC", documento__empresa=empresa  # 🔒 FILTRO EMPRESA
+            documento__tipo="FAC",
+            documento__empresa=empresa,  # 🔒 FILTRO EMPRESA
         )
         .values("nombre")
         .annotate(total_servicios=Count("id"), total_ingresos=Sum("precio_unitario"))
@@ -634,7 +640,9 @@ def dashboard_inteligencia_operativa(request):
     for i in range(28):  # Últimas 4 semanas
         fecha = hoy - timedelta(days=i)
         servicios_dia = Documento.objects.filter(
-            tipo="FAC", fecha_emision=fecha, empresa=empresa  # 🔒 FILTRO EMPRESA
+            tipo="FAC",
+            fecha_emision=fecha,
+            empresa=empresa,  # 🔒 FILTRO EMPRESA
         ).count()
         servicios_por_dia.append(
             {

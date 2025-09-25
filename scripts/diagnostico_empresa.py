@@ -2,6 +2,7 @@
 """
 Diagnóstico de problemas con empresa/usuario
 """
+
 import os
 import sqlite3
 

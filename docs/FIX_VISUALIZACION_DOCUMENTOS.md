@@ -7,7 +7,7 @@ Al ver el detalle del documento F-882, no aparecían los repuestos y servicios a
 
 ### Documento F-882 - Estado en Base de Datos:
 - ✅ **Documento existe**: ID 16, Factura F-882
-- ✅ **Cliente**: Alexander Alvarado  
+- ✅ **Cliente**: Alexander Alvarado
 - ✅ **Vehículo**: rtrf22 - Morning
 - ✅ **Repuesto guardado**: Filtro de aceite Toyota ($15,000)
 - ✅ **Total calculado**: $15,000
@@ -25,16 +25,16 @@ Al ver el detalle del documento F-882, no aparecían los repuestos y servicios a
 def ver_documento(request, documento_id):
     print(f"[DEBUG VER] Solicitando documento ID: {documento_id}")
     print(f"[DEBUG VER] Usuario: {request.user.username}")
-    
+
     # Verificación de empresa y documento
     empresa = request.user.empresa_usuario
     documento = get_object_or_404(Documento, id=documento_id, empresa=empresa)
-    
+
     # Consulta directa para evitar problemas de related_name
     from taller.models.documento import RepuestoDocumento, ServicioDocumento
     repuestos = RepuestoDocumento.objects.filter(documento=documento)
     servicios = ServicioDocumento.objects.filter(documento=documento)
-    
+
     print(f"[DEBUG VER] Repuestos encontrados: {repuestos.count()}")
     print(f"[DEBUG VER] Servicios encontrados: {servicios.count()}")
 ```
@@ -97,7 +97,7 @@ Código    Nombre                 Cantidad  Precio unitario  Total
 FIL001    Filtro de aceite Toyota    1      $15,000         $15,000
 
 Subtotal: $15,000
-IVA (19%): $2,850  
+IVA (19%): $2,850
 Total: $17,850
 ```
 

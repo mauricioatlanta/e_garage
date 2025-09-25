@@ -1,3 +1,4 @@
+{% load country_url %}
 {% extends 'base.html' %}
 {% load static %}
 {% load humanize %}
@@ -197,7 +198,7 @@ body {
 
 {% block content %}
 <div class="max-w-7xl mx-auto p-6">
-    
+
     <!-- 🏢 Cabecera del Centro de Operaciones -->
     <div class="cyber-container p-6 mb-6">
         <div class="flex items-center justify-between">
@@ -218,35 +219,35 @@ body {
 
     <!-- 📊 KPIs Principales -->
     <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-6">
-        
+
         <!-- Documentos -->
         <div class="kpi-card">
             <div class="kpi-value">{{ documentos_hoy }}</div>
             <div class="kpi-label">Docs Hoy</div>
         </div>
-        
+
         <div class="kpi-card">
             <div class="kpi-value">{{ documentos_semana }}</div>
             <div class="kpi-label">Docs Semana</div>
         </div>
-        
+
         <!-- Facturación -->
         <div class="kpi-card">
             <div class="kpi-value">{{ moneda }}{{ facturacion_hoy|floatformat:0|intcomma }}</div>
             <div class="kpi-label">Ventas Hoy</div>
         </div>
-        
+
         <div class="kpi-card">
             <div class="kpi-value">{{ moneda }}{{ facturacion_mes|floatformat:0|intcomma }}</div>
             <div class="kpi-label">Ventas Mes</div>
         </div>
-        
+
         <!-- Clientes -->
         <div class="kpi-card">
             <div class="kpi-value">{{ clientes_atendidos_semana }}</div>
             <div class="kpi-label">Clientes Semana</div>
         </div>
-        
+
         <!-- Técnicos -->
         <div class="kpi-card">
             <div class="kpi-value">{{ tecnicos_activos }}</div>
@@ -256,7 +257,7 @@ body {
 
     <!-- 📈 Estado Operativo -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        
+
         <!-- Estado de Documentos -->
         <div class="cyber-container p-6">
             <h3 class="section-title">📋 Estado de Documentos</h3>
@@ -275,7 +276,7 @@ body {
                 </div>
             </div>
         </div>
-        
+
         <!-- Métricas de Eficiencia -->
         <div class="cyber-container p-6">
             <h3 class="section-title">🎯 Métricas de Eficiencia</h3>
@@ -294,7 +295,7 @@ body {
                 </div>
             </div>
         </div>
-        
+
         <!-- Proyecciones IA -->
         <div class="cyber-container p-6">
             <h3 class="section-title">🤖 Proyecciones IA</h3>
@@ -313,7 +314,7 @@ body {
 
     <!-- 🔧 Rankings y Tops -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        
+
         <!-- Top Servicios -->
         <div class="cyber-container p-6">
             <h3 class="section-title">⚙️ Servicios Más Demandados</h3>
@@ -331,7 +332,7 @@ body {
             <div class="text-center text-gray-400 py-4">No hay datos de servicios</div>
             {% endfor %}
         </div>
-        
+
         <!-- Top Técnicos -->
         <div class="cyber-container p-6">
             <h3 class="section-title">👨‍🔧 Técnicos Más Productivos</h3>
@@ -373,50 +374,50 @@ body {
     <div class="cyber-container p-6">
         <h3 class="section-title">🚀 Acceso Rápido a Funciones</h3>
         <div class="nav-grid">
-            
+
             <a href="/cl/reportes/" class="nav-card">
                 <div class="text-3xl mb-2">📊</div>
                 <div class="font-semibold">Reportes Completos</div>
                 <div class="text-sm text-gray-400">Análisis detallados</div>
             </a>
-            
+
             <a href="/cl/reportes/inteligencia/" class="nav-card">
                 <div class="text-3xl mb-2">🚀</div>
                 <div class="font-semibold">Inteligencia Operativa</div>
                 <div class="text-sm text-gray-400">Dashboard futurista</div>
             </a>
-            
+
             <a href="/cl/taller/reportes/mecanicos/" class="nav-card">
                 <div class="text-3xl mb-2">👨‍🔧</div>
                 <div class="font-semibold">Reportes por Técnico</div>
                 <div class="text-sm text-gray-400">Productividad individual</div>
             </a>
-            
+
             <a href="/analytics/" class="nav-card">
                 <div class="text-3xl mb-2">📈</div>
                 <div class="font-semibold">Business Intelligence</div>
                 <div class="text-sm text-gray-400">Análisis avanzado</div>
             </a>
-            
+
             <a href="/documentos/" class="nav-card">
                 <div class="text-3xl mb-2">📄</div>
                 <div class="font-semibold">Gestión Documentos</div>
                 <div class="text-sm text-gray-400">Crear y administrar</div>
             </a>
-            
+
             <a href="/cl/clientes/" class="nav-card">
                 <div class="text-3xl mb-2">👥</div>
                 <div class="font-semibold">Gestión Clientes</div>
                 <div class="text-sm text-gray-400">Base de clientes</div>
             </a>
-            
+
             <a href="/cl/vehiculos/" class="nav-card">
                 <div class="text-3xl mb-2">🚗</div>
                 <div class="font-semibold">Gestión Vehículos</div>
                 <div class="text-sm text-gray-400">Flota de vehículos</div>
             </a>
-            
-            <a href="{% url 'taller:configuracion' %}" class="nav-card">
+
+            <a href="{% country_url 'configuracion' %}" class="nav-card">
                 <div class="text-3xl mb-2">⚙️</div>
                 <div class="font-semibold">Configuración</div>
                 <div class="text-sm text-gray-400">Ajustes del taller</div>
@@ -437,7 +438,7 @@ body {
 <!-- JavaScript para gráficos y animaciones -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    
+
     // Animación de contadores
     function animateCounters() {
         const counters = document.querySelectorAll('.kpi-value');
@@ -457,10 +458,10 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
+
     // Ejecutar animaciones
     animateCounters();
-    
+
     // Gráfico de tendencias (placeholder)
     const ctx = document.getElementById('chartTendencias');
     if (ctx && window.Chart) {
@@ -499,7 +500,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
+
     // Actualización automática cada 5 minutos
     setInterval(() => {
         location.reload();

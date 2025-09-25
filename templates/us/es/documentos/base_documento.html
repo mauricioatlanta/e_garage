@@ -12,7 +12,7 @@
     min-height: 100vh;
     font-family: 'Orbitron', 'Montserrat', Arial, sans-serif;
   }
-  
+
   .documento-container {
     background: rgba(20, 20, 40, 0.97);
     border-radius: 1.5rem;
@@ -25,7 +25,7 @@
     position: relative;
     overflow: hidden;
   }
-  
+
   .documento-title {
     color: #00f2fe;
     text-shadow: 0 0 8px #7f00ff;
@@ -34,7 +34,7 @@
     margin-bottom: 2rem;
     text-align: center;
   }
-  
+
   .seccion-card {
     background: rgba(30, 30, 60, 0.8);
     border-radius: 1rem;
@@ -42,7 +42,7 @@
     margin-bottom: 2rem;
     border: 1px solid rgba(0, 242, 254, 0.3);
   }
-  
+
   .seccion-title {
     color: #00f2fe;
     font-size: 1.3rem;
@@ -50,36 +50,36 @@
     margin-bottom: 1rem;
     text-shadow: 0 0 4px #7f00ff;
   }
-  
+
   .form-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 1rem;
   }
-  
+
   .form-group {
     display: flex;
     flex-direction: column;
   }
-  
+
   .form-group.full-width {
     grid-column: 1 / -1;
   }
-  
+
   .error-message {
     color: #ff4444;
     font-size: 0.875rem;
     margin-top: 0.25rem;
     text-shadow: 0 0 4px rgba(255, 68, 68, 0.5);
   }
-  
+
   .form-label {
     color: #00f2fe;
     font-weight: bold;
     margin-bottom: 0.5rem;
     text-shadow: 0 0 2px #7f00ff;
   }
-  
+
   .form-input {
     background: rgba(40, 40, 80, 0.9);
     border: 1px solid #7f00ff;
@@ -89,13 +89,13 @@
     font-size: 1rem;
     transition: all 0.3s ease;
   }
-  
+
   .form-input:focus {
     outline: none;
     border-color: #00f2fe;
     box-shadow: 0 0 8px #7f00ff;
   }
-  
+
   /* Estilos para campos de precio de compra ocultos */
   .precio-compra-input {
     color: transparent !important;
@@ -105,7 +105,7 @@
     box-shadow: none !important;
     cursor: default;
   }
-  
+
   .precio-compra-input:focus,
   .precio-compra-input:active,
   .precio-compra-input:hover {
@@ -115,14 +115,14 @@
     outline: none !important;
     box-shadow: none !important;
   }
-  
+
   /* Ocultar la columna de precio de compra en la cabecera */
   #tabla-repuestos th:nth-child(4) {
     color: transparent !important;
     background: transparent !important;
     border-color: transparent !important;
   }
-  
+
   .form-select {
     background: rgba(40, 40, 80, 0.9);
     border: 1px solid #7f00ff;
@@ -133,18 +133,18 @@
     transition: all 0.3s ease;
     width: 100%;
   }
-  
+
   .form-select:focus {
     outline: none;
     border-color: #00f2fe;
     box-shadow: 0 0 8px #7f00ff;
   }
-  
+
   .form-select option {
     background: #1a1a2e;
     color: #fff;
   }
-  
+
   .btn-primary {
     background: linear-gradient(45deg, #7f00ff, #00f2fe);
     border: none;
@@ -158,12 +158,12 @@
     text-transform: uppercase;
     letter-spacing: 1px;
   }
-  
+
   .btn-primary:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 16px rgba(127, 0, 255, 0.4);
   }
-  
+
   .btn-secondary {
     background: rgba(108, 117, 125, 0.8);
     border: 1px solid #6c757d;
@@ -174,12 +174,12 @@
     cursor: pointer;
     transition: all 0.3s ease;
   }
-  
+
   .btn-secondary:hover {
     background: rgba(108, 117, 125, 1);
     transform: translateY(-1px);
   }
-  
+
   .table-futurista {
     width: 100%;
     border-collapse: collapse;
@@ -188,7 +188,7 @@
     border-radius: 0.5rem;
     overflow: hidden;
   }
-  
+
   .table-futurista th {
     background: linear-gradient(45deg, #7f00ff, #00f2fe);
     color: #fff;
@@ -198,49 +198,49 @@
     text-transform: uppercase;
     letter-spacing: 1px;
   }
-  
+
   .table-futurista td {
     padding: 0.75rem 1rem;
     border-bottom: 1px solid rgba(127, 0, 255, 0.3);
     color: #fff;
   }
-  
+
   .table-futurista tr:hover {
     background: rgba(127, 0, 255, 0.1);
   }
-  
+
   .input-number {
     text-align: right;
   }
-  
+
   .total-row {
     background: rgba(127, 0, 255, 0.2) !important;
     font-weight: bold;
   }
-  
+
   .total-row td {
     color: #00f2fe !important;
     font-size: 1.1rem;
     text-shadow: 0 0 4px #7f00ff;
   }
-  
+
   .total-row td {
     border-top: 2px solid #00f2fe;
     color: #00f2fe;
     text-shadow: 0 0 4px #7f00ff;
   }
-  
+
   /* Estilos para formularios */
   .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1rem;
   }
-  
+
   .form-group.full-width {
     grid-column: 1 / -1;
   }
-  
+
   .form-label {
     display: block;
     margin-bottom: 0.5rem;
@@ -250,7 +250,7 @@
     letter-spacing: 1px;
     font-size: 0.9rem;
   }
-  
+
   .form-input, .form-select, .form-textarea {
     width: 100%;
     padding: 0.75rem;
@@ -261,24 +261,24 @@
     font-size: 1rem;
     transition: all 0.3s ease;
   }
-  
+
   .form-input:focus, .form-select:focus, .form-textarea:focus {
     outline: none;
     border-color: #00f2fe;
     box-shadow: 0 0 8px rgba(0, 242, 254, 0.3);
     background: rgba(20, 20, 40, 0.95);
   }
-  
+
   .form-textarea {
     resize: vertical;
     min-height: 80px;
   }
-  
+
   /* Estilos para autocompletado */
   .autocomplete-container {
     position: relative;
   }
-  
+
   .autocomplete-results {
     position: absolute;
     top: 100%;
@@ -293,39 +293,39 @@
     display: none;
     box-shadow: 0 4px 20px rgba(0, 242, 254, 0.3);
   }
-  
+
   .autocomplete-item {
     padding: 0.75rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     cursor: pointer;
     transition: background-color 0.2s;
   }
-  
+
   .autocomplete-item:hover, .autocomplete-item.selected {
     background: rgba(127, 0, 255, 0.3);
   }
-  
+
   .autocomplete-item:last-child {
     border-bottom: none;
   }
-  
+
   .autocomplete-item-name {
     color: #00f2fe;
     font-weight: bold;
     margin-bottom: 0.25rem;
   }
-  
+
   .autocomplete-item-details {
     color: #ccc;
     font-size: 0.9rem;
   }
-  
+
   .autocomplete-item-precio {
     color: #00ff88;
     font-weight: bold;
     float: right;
   }
-  
+
   .autocomplete-create {
     background: rgba(0, 255, 136, 0.2);
     border-top: 2px solid #00ff88;
@@ -333,7 +333,7 @@
     font-weight: bold;
     text-align: center;
   }
-  
+
   .autocomplete-create:hover {
     background: rgba(0, 255, 136, 0.4);
   }
@@ -378,7 +378,7 @@
         </div>
       {% endfor %}
     </div>
-    
+
     <style>
       @keyframes fadeInSlide {
         from {

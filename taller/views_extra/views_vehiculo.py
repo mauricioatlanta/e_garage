@@ -30,7 +30,7 @@ def crear_vehiculo(request):
             vehiculo = form.save(commit=False)
             vehiculo.empresa = perfil.empresa
             vehiculo.save()
-            return redirect("vehiculos:lista_vehiculos")
+            return redirect("chile:taller:vehiculos:lista_vehiculos")
     else:
         form = VehiculoForm(user=request.user)
     # FILTRADO POR EMPRESA - No exponer todos los clientes

@@ -42,7 +42,7 @@ def agregar_servicios_sql():
                 # Insertar líneas de servicio usando SQL directo
                 cursor.execute(
                     """
-                    INSERT INTO taller_lineaservicio 
+                    INSERT INTO taller_lineaservicio
                     (documento_id, servicio_id, nombre, cantidad, precio_unitario, descuento, observaciones)
                     VALUES (44, NULL, 'Cambio de aceite motor', 1, '30.00', '0.00', '')
                 """
@@ -50,7 +50,7 @@ def agregar_servicios_sql():
 
                 cursor.execute(
                     """
-                    INSERT INTO taller_lineaservicio 
+                    INSERT INTO taller_lineaservicio
                     (documento_id, servicio_id, nombre, cantidad, precio_unitario, descuento, observaciones)
                     VALUES (44, NULL, 'Revisión de frenos', 1, '25.00', '0.00', '')
                 """
@@ -71,7 +71,7 @@ def agregar_servicios_sql():
 
                 cursor.execute(
                     """
-                    INSERT INTO taller_lineaotroservicio 
+                    INSERT INTO taller_lineaotroservicio
                     (documento_id, servicio_externo_id, servicio_id, nombre, empresa_externa, cantidad, costo_interno, precio_cliente, observaciones)
                     VALUES (44, NULL, NULL, 'Instalación de Audio', 'AudioCar Professional', 1, '25.00', '40.00', '')
                 """
@@ -79,7 +79,7 @@ def agregar_servicios_sql():
 
                 cursor.execute(
                     """
-                    INSERT INTO taller_lineaotroservicio 
+                    INSERT INTO taller_lineaotroservicio
                     (documento_id, servicio_externo_id, servicio_id, nombre, empresa_externa, cantidad, costo_interno, precio_cliente, observaciones)
                     VALUES (44, NULL, NULL, 'Polarizado de ventanas', 'TintPro Services', 1, '35.00', '60.00', '')
                 """
@@ -105,14 +105,14 @@ def agregar_servicios_sql():
             # Actualizar totales del documento
             cursor.execute(
                 """
-                UPDATE taller_documento 
+                UPDATE taller_documento
                 SET neto_servicios = (
-                    SELECT COALESCE(SUM(cantidad * precio_unitario), 0) 
-                    FROM taller_lineaservicio 
+                    SELECT COALESCE(SUM(cantidad * precio_unitario), 0)
+                    FROM taller_lineaservicio
                     WHERE documento_id = 44
                 ) + (
-                    SELECT COALESCE(SUM(cantidad * precio_cliente), 0) 
-                    FROM taller_lineaotroservicio 
+                    SELECT COALESCE(SUM(cantidad * precio_cliente), 0)
+                    FROM taller_lineaotroservicio
                     WHERE documento_id = 44
                 )
                 WHERE id = 44

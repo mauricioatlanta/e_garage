@@ -33,7 +33,7 @@ Write-Host "📂 VERIFICACIÓN DE TEMPLATES_CANONICAL:" -ForegroundColor Green
 if (Test-Path "templates_canonical") {
     $totalFiles = (Get-ChildItem -Path "templates_canonical" -Recurse -File | Measure-Object).Count
     Write-Host "   ✅ Directorio existe con $totalFiles archivos" -ForegroundColor Green
-    
+
     $commonDir = Get-ChildItem -Path "templates_canonical" -Recurse -Directory -Name "common" | Select-Object -First 1
     if ($commonDir) {
         Write-Host "   ✅ Subdirectorio 'common' encontrado" -ForegroundColor Green

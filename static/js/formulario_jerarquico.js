@@ -19,21 +19,21 @@ $(document).ready(function() {
         }
         return cookieValue;
     }
-    
+
     const csrftoken = getCookie('csrftoken');
-    
+
     // Función para limpiar y deshabilitar select
     function clearAndDisableSelect(selectId, placeholder = 'Seleccione...') {
         const $select = $(selectId);
         $select.empty().append(`<option value="">${placeholder}</option>`);
         $select.prop('disabled', true);
     }
-    
+
     // Función para habilitar y llenar select
     function populateSelect(selectId, data, valueField = 'id', textField = 'nombre') {
         const $select = $(selectId);
         $select.empty().append('<option value="">Seleccione...</option>');
-        
+
         if (data && data.length > 0) {
             data.forEach(item => {
                 const value = item[valueField];
@@ -45,7 +45,7 @@ $(document).ready(function() {
             $select.prop('disabled', true);
         }
     }
-    
+
     // Evento: Cambio de Marca (desactivado, DAL/Select2 maneja modelos)
     /*
     $('#id_marca').change(function() {
@@ -72,17 +72,17 @@ $(document).ready(function() {
             });
     });
     */
-    
+
     // Evento: Cambio de Modelo
     $('#id_modelo').change(function() {
         const modeloId = $(this).val();
-        
+
         // Limpiar campos dependientes
         clearAndDisableSelect('#id_motor', 'Seleccione modelo primero');
         clearAndDisableSelect('#id_caja', 'Seleccione modelo primero');
-        
+
         if (!modeloId) return;
-        
+
         // Cargar motores y cajas via AJAX combinado
         $.get('/ajax/load-motores-cajas/', {modelo_id: modeloId})
             .done(function(data) {
@@ -90,19 +90,19 @@ $(document).ready(function() {
                     alert('Error: ' + data.error);
                     return;
                 }
-                
+
                 // Poblar motores
                 populateSelect('#id_motor', data.motores);
                 if (data.motores.length === 0) {
                     $('#id_motor').append('<option value="">No hay motores disponibles</option>');
                 }
-                
+
                 // Poblar cajas
                 populateSelect('#id_caja', data.cajas);
                 if (data.cajas.length === 0) {
                     $('#id_caja').append('<option value="">No hay cajas disponibles</option>');
                 }
-                
+
                 // Opcional: Mostrar información del modelo
                 console.log(`Cargado: ${data.marca} ${data.modelo} (${data.pais})`);
             })
@@ -110,7 +110,7 @@ $(document).ready(function() {
                 alert('Error al cargar motores y cajas');
             });
     });
-    
+
     // Inicialización: Deshabilitar campos dependientes
     clearAndDisableSelect('#id_modelo', 'Seleccione marca primero');
     clearAndDisableSelect('#id_motor', 'Seleccione modelo primero');

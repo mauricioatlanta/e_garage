@@ -10,13 +10,13 @@ El usuario reportó que al seleccionar una nueva imagen en la página de configu
 
 #### 1. Configuración del Sistema ✅
 - **MEDIA_URL**: `/media/` - Correcto
-- **MEDIA_ROOT**: `C:\projecto\projecto_1\e_garage\media` - Correcto  
+- **MEDIA_ROOT**: `C:\projecto\projecto_1\e_garage\media` - Correcto
 - **Directorio de logos**: `media/logos_talleres/` - Existe y funcional
 - **URLs de archivos media**: Configuradas correctamente en `e_garage/urls.py`
 
 #### 2. Problema Principal Encontrado ❌
 - La empresa "Taller Mecánico El Turbo" (usuario: mauricio1) tenía un logo corrupto en la BD
-- Referencia: `logos_talleres/logo_turbo_auto.png` 
+- Referencia: `logos_talleres/logo_turbo_auto.png`
 - El archivo existía físicamente pero causaba errores 404 en el servidor
 - Esto generaba problemas en la carga de la página de configuración
 
@@ -59,7 +59,7 @@ def configuracion(request):
                 print(f"  📁 Archivo logo: {logo_file.name}")
                 print(f"  📏 Tamaño: {logo_file.size} bytes")
                 print(f"  🔍 Tipo: {logo_file.content_type}")
-            
+
             empresa_form = EmpresaForm(request.POST, request.FILES, instance=empresa)
             if empresa_form.is_valid():
                 empresa_form.save()
@@ -96,13 +96,13 @@ document.getElementById('id_logo').addEventListener('change', function(e) {
             alert('❌ El archivo es muy grande. Máximo 5MB.');
             return;
         }
-        
+
         // Validar tipo
         if (!file.type.startsWith('image/')) {
             alert('❌ Solo se permiten archivos de imagen.');
             return;
         }
-        
+
         // Mostrar información
         document.getElementById('file-name').textContent = file.name;
         document.getElementById('file-size').textContent = (file.size / 1024).toFixed(1) + ' KB';

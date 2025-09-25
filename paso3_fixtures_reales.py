@@ -3,6 +3,7 @@
 🎯 PASO 3: FIXTURES REALES PARA CL/US CON DATOS DEMO
 Creación de datos realistas, coherentes y variados para pruebas funcionales
 """
+
 import os
 
 import django

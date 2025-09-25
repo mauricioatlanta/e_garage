@@ -160,13 +160,13 @@
             <div class="stat-value">{{ total_otros_servicios }}</div>
             <div class="stat-label">Otros Servicios</div>
         </div>
-        
+
         <div class="stat-card">
             <div class="stat-icon">👨‍🔧</div>
             <div class="stat-value">{{ total_mano_obra }}</div>
             <div class="stat-label">Mano de Obra</div>
         </div>
-        
+
         <div class="stat-card">
             <div class="stat-icon">💰</div>
             <div class="stat-value">${{ valor_total|floatformat:0|default:0 }}</div>
@@ -203,7 +203,7 @@
     {% if otros_servicios %}
     <div style="background: rgba(10, 10, 15, 0.9); border: 1px solid var(--electric-yellow); border-radius: 15px; padding: 2rem; margin-bottom: 2rem;">
         <h3 style="color: var(--electric-yellow); margin-bottom: 1.5rem;">⚡ Otros Servicios Registrados</h3>
-        
+
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 1rem;">
             {% for servicio in otros_servicios %}
             <div style="background: rgba(255, 255, 0, 0.1); border: 1px solid var(--electric-yellow); border-radius: 10px; padding: 1rem;">
@@ -229,7 +229,7 @@
     {% if documentos_resumen %}
     <div style="background: rgba(10, 10, 15, 0.9); border: 1px solid var(--cyber-blue); border-radius: 15px; padding: 2rem;">
         <h3 style="color: var(--cyber-blue); margin-bottom: 1.5rem;">📋 Resumen por Documento</h3>
-        
+
         <table class="cyber-table">
             <thead>
                 <tr>

@@ -19,12 +19,12 @@ let currentPaletteTab = 'repuestos';
 function formatCurrency(n) {
   if (country === 'US') {
     return new Intl.NumberFormat('en-US', {
-      style: 'currency', 
+      style: 'currency',
       currency: 'USD'
     }).format(n || 0);
   } else {
     return new Intl.NumberFormat('es-CL', {
-      style: 'currency', 
+      style: 'currency',
       currency: 'CLP'
     }).format(n || 0);
   }
@@ -35,10 +35,10 @@ function showToast(message, type = 'info') {
   toast.className = `toast ${type}`;
   toast.textContent = message;
   document.body.appendChild(toast);
-  
+
   // Animación de entrada
   setTimeout(() => toast.style.transform = 'translateX(0)', 10);
-  
+
   // Remover después de 3 segundos
   setTimeout(() => {
     toast.style.transform = 'translateX(100%)';
@@ -60,34 +60,34 @@ function initTipoDocumento() {
     console.warn('⚠️ Campo hidden "tipo" no encontrado');
     return;
   }
-  
+
   const currentTipo = hidden.value || 'COT';
   applyBg(currentTipo);
-  
+
   // Activar botón correspondiente
   document.querySelectorAll('#doc-type-switch .btn-type').forEach(b => {
     if (b.dataset.tipo === currentTipo) {
       b.classList.add('active');
     }
-    
+
     b.addEventListener('click', (e) => {
       e.preventDefault();
       const tipo = b.dataset.tipo;
-      
+
       // Actualizar hidden input
       hidden.value = tipo;
-      
+
       // Actualizar clase active
       document.querySelectorAll('#doc-type-switch .btn-type').forEach(x => x.classList.remove('active'));
       b.classList.add('active');
-      
+
       // Cambiar fondo
       applyBg(tipo);
-      
+
       // Efecto visual
       b.style.transform = 'scale(0.95)';
       setTimeout(() => b.style.transform = 'scale(1)', 150);
-      
+
       showToast(`Tipo cambiado a: ${tipo}`, 'info');
     });
   });
@@ -97,7 +97,7 @@ function initTipoDocumento() {
 async function searchClientes(q) {
   console.log('🔍 BUSCANDO CLIENTES:', q);
   try {
-    const url = `/api/v1/clientes/?q=${encodeURIComponent(q)}`;
+    const url = `/cl/documentos/autocomplete/cliente/?q=${encodeURIComponent(q)}`;
     console.log('📡 URL de búsqueda:', url);
     const response = await fetch(url);
     console.log('📥 Respuesta de API:', response.status, response.statusText);
@@ -121,13 +121,13 @@ function initClienteSearch() {
   const clienteSearch = document.getElementById('cliente-search');
   const clienteSelect = document.getElementById('cliente');
   const vehiculoSelect = document.getElementById('vehiculo');
-  
+
   console.log('🔎 ELEMENTOS ENCONTRADOS:', {
     clienteSearch: !!clienteSearch,
     clienteSelect: !!clienteSelect,
     vehiculoSelect: !!vehiculoSelect
   });
-  
+
   if (!clienteSearch || !clienteSelect || !vehiculoSelect) {
     console.error('❌ ELEMENTOS DE BÚSQUEDA DE CLIENTE NO ENCONTRADOS');
     console.log('🔍 DOM Elements disponibles:');
@@ -139,7 +139,7 @@ function initClienteSearch() {
 
   console.log('✅ TODOS LOS ELEMENTOS ENCONTRADOS, CONFIGURANDO EVENT LISTENERS...');
   let searchTimeout;
-  
+
   clienteSearch.addEventListener('input', () => {
     console.log('⌨️ CLIENTE SEARCH INPUT DETECTADO');
     clearTimeout(searchTimeout);
@@ -151,18 +151,18 @@ function initClienteSearch() {
         clienteSelect.innerHTML = '<option value="">Seleccione un cliente...</option>';
         return;
       }
-      
+
       console.log('🔄 INICIANDO BUSQUEDA DE CLIENTES...');
       clienteSelect.classList.add('loading');
       const data = await searchClientes(q);
       clienteSelect.classList.remove('loading');
-      
+
       console.log('🏗️ CONSTRUYENDO OPTIONS CON:', data.results);
-      clienteSelect.innerHTML = '<option value="">Seleccione...</option>' + 
-        data.results.map(c => 
+      clienteSelect.innerHTML = '<option value="">Seleccione...</option>' +
+        data.results.map(c =>
           `<option value="${c.id}">${c.nombre} — ${c.identificador}</option>`
         ).join('');
-        
+
       if (data.results.length > 0) {
         console.log('🎉 MOSTRANDO TOAST CON RESULTADOS');
         showToast(`${data.results.length} cliente(s) encontrado(s)`, 'info');
@@ -176,27 +176,27 @@ function initClienteSearch() {
   clienteSelect.addEventListener('change', async () => {
     const id = clienteSelect.value;
     vehiculoSelect.innerHTML = '<option value="">Cargando...</option>';
-    
+
     if (!id) {
       vehiculoSelect.innerHTML = '<option value="">Seleccione un cliente primero…</option>';
       return;
     }
-    
+
     try {
       vehiculoSelect.classList.add('loading');
       const response = await fetch(`/api/v1/vehiculos/${id}/`);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      
+
       const data = await response.json();
       vehiculoSelect.classList.remove('loading');
-      
-      vehiculoSelect.innerHTML = data.length ? 
+
+      vehiculoSelect.innerHTML = data.length ?
         '<option value="">Seleccione vehículo...</option>' +
-        data.map(v => 
+        data.map(v =>
           `<option value="${v.id}">${v.patente || v.vin} — ${v.marca} ${v.modelo}</option>`
         ).join('') :
         '<option value="">(Sin vehículos)</option>';
-        
+
       if (data.length > 0) {
         showToast(`${data.length} vehículo(s) encontrado(s)`, 'info');
       }
@@ -215,19 +215,19 @@ function createRepuestoLine() {
   const line = document.createElement('div');
   line.className = 'repuesto-line item-line grid grid-responsive gap-3 items-center slide-in';
   line.innerHTML = `
-    <input class="col-span-2 futurista-input part-code" 
+    <input class="col-span-2 futurista-input part-code"
            placeholder="Código" name="repuestos[${repuestoCounter}][codigo]">
-    <input class="col-span-3 futurista-input part-name" 
+    <input class="col-span-3 futurista-input part-name"
            placeholder="Nombre" readonly name="repuestos[${repuestoCounter}][nombre]">
-    <input class="col-span-2 futurista-input part-cost hidden-cost" 
+    <input class="col-span-2 futurista-input part-cost hidden-cost"
            placeholder="Costo (oculto)" name="repuestos[${repuestoCounter}][precio_compra]">
-    <input class="col-span-2 futurista-input part-price" 
+    <input class="col-span-2 futurista-input part-price"
            placeholder="Precio venta" name="repuestos[${repuestoCounter}][precio_venta]" type="number" step="0.01">
-    <input class="col-span-1 futurista-input part-qty" 
+    <input class="col-span-1 futurista-input part-qty"
            placeholder="Cant." value="1" name="repuestos[${repuestoCounter}][cantidad]" type="number" step="0.01">
     <div class="col-span-1 text-right font-semibold subtotal text-cyan-400">$0</div>
     <label class="col-span-1 flex items-center gap-2 text-sm">
-      <input type="checkbox" class="adhoc-toggle" name="repuestos[${repuestoCounter}][ad_hoc]"> 
+      <input type="checkbox" class="adhoc-toggle" name="repuestos[${repuestoCounter}][ad_hoc]">
       <span class="text-cyan-200">Ad-hoc</span>
     </label>
     <button type="button" class="col-span-1 text-red-400 hover:text-red-300 transition p-2 rounded" onclick="removeRepuestoLine(this)" title="Eliminar línea">
@@ -242,11 +242,11 @@ function createServicioLine() {
   const line = document.createElement('div');
   line.className = 'serv-line item-line grid grid-responsive gap-3 items-center slide-in';
   line.innerHTML = `
-    <input class="col-span-5 futurista-input serv-search" 
+    <input class="col-span-5 futurista-input serv-search"
            placeholder="Buscar servicio (nombre, categoría)">
-    <input class="col-span-3 futurista-input serv-name" 
+    <input class="col-span-3 futurista-input serv-name"
            placeholder="Nombre" name="servicios[${servicioCounter}][nombre]">
-    <input class="col-span-3 futurista-input serv-price" 
+    <input class="col-span-3 futurista-input serv-price"
            placeholder="Valor servicio" name="servicios[${servicioCounter}][precio]" type="number" step="0.01">
     <div class="col-span-1 text-right font-semibold serv-subtotal text-cyan-400">$0</div>
     <button type="button" class="col-span-1 text-red-400 hover:text-red-300 transition p-2 rounded" onclick="removeServicioLine(this)" title="Eliminar línea">
@@ -261,13 +261,13 @@ function createOtroServicioLine() {
   const line = document.createElement('div');
   line.className = 'otro-serv-line item-line grid grid-responsive gap-3 items-center slide-in';
   line.innerHTML = `
-    <input class="col-span-3 futurista-input prov-name" 
+    <input class="col-span-3 futurista-input prov-name"
            placeholder="Proveedor externo" name="otros_servicios[${otroServicioCounter}][proveedor]">
-    <input class="col-span-4 futurista-input otro-serv-search" 
+    <input class="col-span-4 futurista-input otro-serv-search"
            placeholder="Buscar/Nombre servicio" name="otros_servicios[${otroServicioCounter}][nombre]">
-    <input class="col-span-2 futurista-input costo-interno" 
+    <input class="col-span-2 futurista-input costo-interno"
            placeholder="Costo interno" name="otros_servicios[${otroServicioCounter}][costo_interno]" type="number" step="0.01">
-    <input class="col-span-2 futurista-input precio-cliente" 
+    <input class="col-span-2 futurista-input precio-cliente"
            placeholder="Precio cliente" name="otros_servicios[${otroServicioCounter}][precio_cliente]" type="number" step="0.01">
     <div class="col-span-1 text-right font-semibold ganancia text-cyan-400">$0</div>
     <button type="button" class="col-span-1 text-red-400 hover:text-red-300 transition p-2 rounded" onclick="removeOtroServicioLine(this)" title="Eliminar línea">
@@ -313,7 +313,7 @@ function initAddButtons() {
   const addRepuestoBtn = document.getElementById('add-repuesto');
   const addServBtn = document.getElementById('add-serv');
   const addOtroServBtn = document.getElementById('add-otro-serv');
-  
+
   if (addRepuestoBtn) {
     addRepuestoBtn.addEventListener('click', () => {
       const container = document.getElementById('repuestos-container');
@@ -325,7 +325,7 @@ function initAddButtons() {
       }
     });
   }
-  
+
   if (addServBtn) {
     addServBtn.addEventListener('click', () => {
       const container = document.getElementById('servicios-container');
@@ -337,7 +337,7 @@ function initAddButtons() {
       }
     });
   }
-  
+
   if (addOtroServBtn) {
     addOtroServBtn.addEventListener('click', () => {
       const container = document.getElementById('otros-servicios-container');
@@ -366,7 +366,7 @@ async function searchRepuesto(code) {
 // RECÁLCULO DE TOTALES
 function recalcTotals() {
   let sumRep = 0, sumServ = 0, sumOtros = 0;
-  
+
   // Sumar repuestos
   document.querySelectorAll('.repuesto-line').forEach(l => {
     const price = parseFloat(l.querySelector('.part-price').value || 0);
@@ -375,14 +375,14 @@ function recalcTotals() {
     sumRep += subtotal;
     l.querySelector('.subtotal').textContent = formatCurrency(subtotal);
   });
-  
+
   // Sumar servicios
   document.querySelectorAll('.serv-line').forEach(l => {
     const price = parseFloat(l.querySelector('.serv-price').value || 0);
     sumServ += price;
     l.querySelector('.serv-subtotal').textContent = formatCurrency(price);
   });
-  
+
   // Sumar otros servicios
   document.querySelectorAll('.otro-serv-line').forEach(l => {
     const ci = parseFloat(l.querySelector('.costo-interno').value || 0);
@@ -393,7 +393,7 @@ function recalcTotals() {
 
   const rateInput = document.getElementById('tax-rate');
   const includeInput = document.getElementById('include-tax');
-  
+
   let taxAmt = 0;
   if (rateInput && includeInput) {
     const rate = parseFloat(rateInput.value || 0) / 100;
@@ -403,7 +403,7 @@ function recalcTotals() {
     const taxBase = country === 'CL' ? sumRep : (sumRep + sumServ + sumOtros);
     taxAmt = include ? taxBase * rate : 0;
   }
-  
+
   const total = sumRep + sumServ + sumOtros + taxAmt;
 
   // Actualizar displays
@@ -414,7 +414,7 @@ function recalcTotals() {
     'tax-amt': taxAmt,
     'grand-total': total
   };
-  
+
   Object.entries(elements).forEach(([id, value]) => {
     const element = document.getElementById(id);
     if (element) {
@@ -440,12 +440,12 @@ function initEventListeners() {
       if (code.length >= 2) {
         const line = e.target.closest('.repuesto-line');
         const repuesto = await searchRepuesto(code);
-        
+
         if (repuesto) {
           line.querySelector('.part-name').value = repuesto.nombre || '';
           line.querySelector('.part-cost').value = repuesto.precio_compra || '';
           line.querySelector('.part-price').value = repuesto.precio_venta_sugerido || '';
-          
+
           // Mostrar stock si no es ad-hoc
           const adhocToggle = line.querySelector('.adhoc-toggle');
           if (!adhocToggle.checked && repuesto.stock !== undefined) {
@@ -455,18 +455,18 @@ function initEventListeners() {
               showToast(`📦 Stock disponible: ${repuesto.stock}`, 'info');
             }
           }
-          
+
           recalcTotals();
         }
       }
     }
-    
+
     // Cálculos en tiempo real
     if (['part-price', 'part-qty', 'serv-price', 'costo-interno', 'precio-cliente'].some(c => e.target.classList.contains(c))) {
       recalcTotals();
     }
   });
-  
+
   // Change events
   document.addEventListener('change', (e) => {
     if (e.target.id === 'include-tax' || e.target.id === 'tax-rate') {
@@ -485,7 +485,7 @@ function initKeyboardShortcuts() {
       if (btn) btn.click();
       return;
     }
-    
+
     // Alt+S: Agregar servicio
     if (e.altKey && e.key === 's') {
       e.preventDefault();
@@ -493,14 +493,14 @@ function initKeyboardShortcuts() {
       if (btn) btn.click();
       return;
     }
-    
+
     // Ctrl+K: Abrir command palette
     if (e.ctrlKey && e.key === 'k') {
       e.preventDefault();
       openCommandPalette();
       return;
     }
-    
+
     // Escape: Cerrar command palette
     if (e.key === 'Escape') {
       closeCommandPalette();
@@ -533,14 +533,14 @@ function closeCommandPalette() {
 // INICIALIZACIÓN PRINCIPAL
 function initDocumentoForm() {
   console.log('🔧 Inicializando formulario de documento...');
-  
+
   // Inicializar componentes
   initTipoDocumento();
   initClienteSearch();
   initAddButtons();
   initEventListeners();
   initKeyboardShortcuts();
-  
+
   // Agregar primera línea de repuesto si el contenedor está vacío
   setTimeout(() => {
     const container = document.getElementById('repuestos-container');
@@ -549,10 +549,10 @@ function initDocumentoForm() {
       if (addBtn) addBtn.click();
     }
   }, 100);
-  
+
   // Recalcular totales inicial
   setTimeout(recalcTotals, 200);
-  
+
   console.log('✅ Formulario de documento inicializado correctamente');
 }
 

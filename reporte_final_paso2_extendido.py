@@ -3,6 +3,7 @@
 🎯 REPORTE FINAL - PASO 2 EXTENDIDO COMPLETADO
 Sistema robusto de validaciones de consistencia implementado
 """
+
 import os
 
 import django
@@ -92,7 +93,7 @@ def generar_reporte_final_paso2_extendido():
         # Buscar constraint de tipo en servicios
         cursor.execute(
             """
-            SELECT name FROM sqlite_master 
+            SELECT name FROM sqlite_master
             WHERE type='table' AND name='taller_servicio'
         """
         )
@@ -102,7 +103,7 @@ def generar_reporte_final_paso2_extendido():
         # Verificar índices
         cursor.execute(
             """
-            SELECT name FROM sqlite_master 
+            SELECT name FROM sqlite_master
             WHERE type='index' AND tbl_name='taller_servicio'
         """
         )

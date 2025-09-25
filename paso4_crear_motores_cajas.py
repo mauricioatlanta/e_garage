@@ -3,6 +3,7 @@
 🎯 PASO 4: CREAR DATOS DEMO PARA MOTORES Y CAJAS
 Crear motores y cajas para los modelos de vehículos existentes
 """
+
 import os
 
 import django
@@ -90,32 +91,34 @@ def crear_motores_cajas_demo():
         if modelo.nombre in mapeo_modelos:
             tipo_motor, tipos_caja = mapeo_modelos[modelo.nombre]
         else:
-            # Valores por defecto para modelos no mapeados
-            tipo_motor = "compactos"
-            tipos_caja = ["manual", "automatica"]
+            # NO crear motores/cajas para modelos no mapeados
+            print("   ⚠️  Modelo no mapeado - saltando creación de motores/cajas")
+            continue
 
         # Crear motores para este modelo
         motores_modelo = motores_datos[tipo_motor]
         for motor_nombre in motores_modelo:
-            motor, created = MotorVehiculo.objects.get_or_create(
-                modelo=modelo, nombre=motor_nombre, defaults={"country": modelo.country}
-            )
+            motor, created = MotorVehiculo.objects.get_or_create(nombre=motor_nombre)
             if created:
                 motores_creados += 1
                 print(f"   ⚙️ Motor: {motor_nombre}")
+
+            # Agregar el modelo a la relación ManyToMany si no está ya asociado
+            if modelo not in motor.modelos.all():
+                motor.modelos.add(modelo)
 
         # Crear cajas para este modelo
         for tipo_caja in tipos_caja:
             cajas_tipo = cajas_datos[tipo_caja]
             for caja_nombre in cajas_tipo:
-                caja, created = CajaVehiculo.objects.get_or_create(
-                    modelo=modelo,
-                    nombre=caja_nombre,
-                    defaults={"country": modelo.country},
-                )
+                caja, created = CajaVehiculo.objects.get_or_create(nombre=caja_nombre)
                 if created:
                     cajas_creadas += 1
                     print(f"   🔧 Caja: {caja_nombre}")
+
+                # Agregar el modelo a la relación ManyToMany si no está ya asociado
+                if modelo not in caja.modelos.all():
+                    caja.modelos.add(modelo)
 
     print("\n📊 RESUMEN:")
     print(f"   ⚙️ Motores creados: {motores_creados}")

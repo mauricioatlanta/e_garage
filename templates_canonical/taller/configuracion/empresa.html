@@ -29,7 +29,7 @@ body {
     background: linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
     border-radius: 20px;
     border: 1px solid var(--border-glow);
-    box-shadow: 
+    box-shadow:
         0 8px 32px rgba(0, 245, 255, 0.1),
         inset 0 1px 0 rgba(255, 255, 255, 0.1);
     padding: 2rem;
@@ -353,16 +353,16 @@ body {
     .config-title {
         font-size: 2rem;
     }
-    
+
     .stats-grid {
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 1rem;
     }
-    
+
     .action-buttons {
         flex-direction: column;
     }
-    
+
     .quick-actions {
         grid-template-columns: 1fr;
         gap: 1rem;
@@ -405,41 +405,41 @@ body {
                 <span class="section-icon">🏢</span>
                 Información de la Empresa
             </h2>
-            
+
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
                     <div>
                         <div class="form-group">
                             <label class="form-label" for="nombre_taller">🏷️ Nombre del Taller</label>
-                            <input type="text" id="nombre_taller" name="nombre_taller" class="form-input" 
+                            <input type="text" id="nombre_taller" name="nombre_taller" class="form-input"
                                    value="{{ empresa.nombre_taller }}" required>
                         </div>
-                        
+
                         <div class="form-group">
                             <label class="form-label" for="empresa_nombre">🏢 Nombre de la Empresa</label>
-                            <input type="text" id="empresa_nombre" name="empresa_nombre" class="form-input" 
+                            <input type="text" id="empresa_nombre" name="empresa_nombre" class="form-input"
                                    value="{{ empresa.empresa }}">
                         </div>
-                        
+
                         <div class="form-group">
                             <label class="form-label" for="telefono">📞 Teléfono</label>
-                            <input type="tel" id="telefono" name="telefono" class="form-input" 
+                            <input type="tel" id="telefono" name="telefono" class="form-input"
                                    value="{{ empresa.telefono }}">
                         </div>
-                        
+
                         <div class="form-group">
                             <label class="form-label" for="email">📧 Email</label>
-                            <input type="email" id="email" name="email" class="form-input" 
+                            <input type="email" id="email" name="email" class="form-input"
                                    value="{{ empresa.email }}" placeholder="contacto@empresa.com">
                         </div>
-                        
+
                         <div class="form-group">
                             <label class="form-label" for="direccion">📍 Dirección</label>
                             <textarea id="direccion" name="direccion" class="form-input" rows="3">{{ empresa.direccion }}</textarea>
                         </div>
                     </div>
-                    
+
                     <div>
                         <div class="form-group">
                             <label class="form-label">📷 Logo Actual</label>
@@ -454,7 +454,7 @@ body {
                                 </div>
                             {% endif %}
                         </div>
-                        
+
                         <div class="form-group">
                             <label class="form-label" for="logo">🎨 Cambiar Logo</label>
                             <div class="file-input-wrapper">
@@ -470,7 +470,7 @@ body {
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="action-buttons">
                     <button type="submit" name="actualizar_empresa" class="btn-futuristic">
                         💾 Actualizar Información
@@ -489,14 +489,14 @@ body {
             <div class="action-title">Gestión de Técnicos</div>
             <div class="action-description">Agregar, editar y gestionar técnicos del taller</div>
         </a>
-        
+
         {% country_url 'lista_documentos' app_namespace='documentos' as url_documentos %}
         <a href="{{ url_documentos|default:'/taller/documentos/' }}" class="action-card">
             <div class="action-icon">📋</div>
             <div class="action-title">Documentos</div>
             <div class="action-description">Ver y gestionar todos los documentos</div>
         </a>
-        
+
         <div class="action-card" onclick="location.reload()">
             <div class="action-icon">🔄</div>
             <div class="action-title">Actualizar Sistema</div>

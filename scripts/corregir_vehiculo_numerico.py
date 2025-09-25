@@ -2,6 +2,7 @@
 """
 Script para corregir el vehículo con datos numéricos problemáticos
 """
+
 import os
 
 import django

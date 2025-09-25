@@ -3,7 +3,7 @@
     "model": "taller.region",
     "pk": 1,
     "fields": {
-      "nombre": "Región de Arica y Parinacota"
+      "nombre": "Regi\u00f3n de Arica y Parinacota"
     }
   },
   {
@@ -26,7 +26,7 @@
     "model": "taller.region",
     "pk": 2,
     "fields": {
-      "nombre": "Región de Tarapacá"
+      "nombre": "Regi\u00f3n de Tarapac\u00e1"
     }
   },
   {
@@ -57,7 +57,7 @@
     "model": "taller.region",
     "pk": 3,
     "fields": {
-      "nombre": "Región de Antofagasta"
+      "nombre": "Regi\u00f3n de Antofagasta"
     }
   },
   {
@@ -88,14 +88,14 @@
     "model": "taller.region",
     "pk": 4,
     "fields": {
-      "nombre": "Región de Atacama"
+      "nombre": "Regi\u00f3n de Atacama"
     }
   },
   {
     "model": "taller.ciudad",
     "pk": 9,
     "fields": {
-      "nombre": "Copiapó",
+      "nombre": "Copiap\u00f3",
       "region": 4
     }
   },
@@ -111,7 +111,7 @@
     "model": "taller.region",
     "pk": 5,
     "fields": {
-      "nombre": "Región de Coquimbo"
+      "nombre": "Regi\u00f3n de Coquimbo"
     }
   },
   {
@@ -142,14 +142,14 @@
     "model": "taller.region",
     "pk": 6,
     "fields": {
-      "nombre": "Región de Valparaíso"
+      "nombre": "Regi\u00f3n de Valpara\u00edso"
     }
   },
   {
     "model": "taller.ciudad",
     "pk": 14,
     "fields": {
-      "nombre": "Valparaíso",
+      "nombre": "Valpara\u00edso",
       "region": 6
     }
   },
@@ -157,7 +157,7 @@
     "model": "taller.ciudad",
     "pk": 15,
     "fields": {
-      "nombre": "Viña del Mar",
+      "nombre": "Vi\u00f1a del Mar",
       "region": 6
     }
   },
@@ -173,7 +173,7 @@
     "model": "taller.region",
     "pk": 7,
     "fields": {
-      "nombre": "Región Metropolitana"
+      "nombre": "Regi\u00f3n Metropolitana"
     }
   },
   {
@@ -196,7 +196,7 @@
     "model": "taller.ciudad",
     "pk": 19,
     "fields": {
-      "nombre": "Maipú",
+      "nombre": "Maip\u00fa",
       "region": 7
     }
   },
@@ -204,7 +204,7 @@
     "model": "taller.region",
     "pk": 8,
     "fields": {
-      "nombre": "Región del Libertador General Bernardo O’Higgins"
+      "nombre": "Regi\u00f3n del Libertador General Bernardo O\u2019Higgins"
     }
   },
   {
@@ -227,7 +227,7 @@
     "model": "taller.region",
     "pk": 9,
     "fields": {
-      "nombre": "Región del Maule"
+      "nombre": "Regi\u00f3n del Maule"
     }
   },
   {
@@ -242,7 +242,7 @@
     "model": "taller.ciudad",
     "pk": 23,
     "fields": {
-      "nombre": "Curicó",
+      "nombre": "Curic\u00f3",
       "region": 9
     }
   },
@@ -258,14 +258,14 @@
     "model": "taller.region",
     "pk": 10,
     "fields": {
-      "nombre": "Región de Ñuble"
+      "nombre": "Regi\u00f3n de \u00d1uble"
     }
   },
   {
     "model": "taller.ciudad",
     "pk": 25,
     "fields": {
-      "nombre": "Chillán",
+      "nombre": "Chill\u00e1n",
       "region": 10
     }
   },
@@ -281,14 +281,14 @@
     "model": "taller.region",
     "pk": 11,
     "fields": {
-      "nombre": "Región del Biobío"
+      "nombre": "Regi\u00f3n del Biob\u00edo"
     }
   },
   {
     "model": "taller.ciudad",
     "pk": 27,
     "fields": {
-      "nombre": "Concepción",
+      "nombre": "Concepci\u00f3n",
       "region": 11
     }
   },
@@ -296,7 +296,7 @@
     "model": "taller.ciudad",
     "pk": 28,
     "fields": {
-      "nombre": "Los Ángeles",
+      "nombre": "Los \u00c1ngeles",
       "region": 11
     }
   },
@@ -312,7 +312,7 @@
     "model": "taller.region",
     "pk": 12,
     "fields": {
-      "nombre": "Región de La Araucanía"
+      "nombre": "Regi\u00f3n de La Araucan\u00eda"
     }
   },
   {
@@ -343,7 +343,7 @@
     "model": "taller.region",
     "pk": 13,
     "fields": {
-      "nombre": "Región de Los Ríos"
+      "nombre": "Regi\u00f3n de Los R\u00edos"
     }
   },
   {
@@ -358,7 +358,7 @@
     "model": "taller.ciudad",
     "pk": 34,
     "fields": {
-      "nombre": "La Unión",
+      "nombre": "La Uni\u00f3n",
       "region": 13
     }
   },
@@ -366,7 +366,7 @@
     "model": "taller.region",
     "pk": 14,
     "fields": {
-      "nombre": "Región de Los Lagos"
+      "nombre": "Regi\u00f3n de Los Lagos"
     }
   },
   {
@@ -397,7 +397,7 @@
     "model": "taller.region",
     "pk": 15,
     "fields": {
-      "nombre": "Región de Aysén"
+      "nombre": "Regi\u00f3n de Ays\u00e9n"
     }
   },
   {
@@ -412,7 +412,7 @@
     "model": "taller.ciudad",
     "pk": 39,
     "fields": {
-      "nombre": "Puerto Aysén",
+      "nombre": "Puerto Ays\u00e9n",
       "region": 15
     }
   },
@@ -420,7 +420,7 @@
     "model": "taller.region",
     "pk": 16,
     "fields": {
-      "nombre": "Región de Magallanes"
+      "nombre": "Regi\u00f3n de Magallanes"
     }
   },
   {

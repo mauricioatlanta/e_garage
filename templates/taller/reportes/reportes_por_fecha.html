@@ -262,11 +262,11 @@
         .form-grid {
             grid-template-columns: 1fr;
         }
-        
+
         .cyber-title {
             font-size: 2rem;
         }
-        
+
         .tipo-cards {
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
         }
@@ -291,12 +291,12 @@
                 <label class="input-label">📅 Fecha Desde</label>
                 <input type="date" name="desde" value="{{ request.GET.desde }}" required class="cyber-input" />
             </div>
-            
+
             <div class="input-group">
                 <label class="input-label">📅 Fecha Hasta</label>
                 <input type="date" name="hasta" value="{{ request.GET.hasta }}" required class="cyber-input" />
             </div>
-            
+
             <div class="input-group">
                 <label class="input-label">🔍 Tipo de Reporte</label>
                 <select name="tipo" class="cyber-select">
@@ -309,7 +309,7 @@
                     <option value="otros" {% if request.GET.tipo == 'otros' %}selected{% endif %}>📦 Otros Servicios</option>
                 </select>
             </div>
-            
+
             <div class="input-group">
                 <button type="submit" class="btn-cyber">🚀 Generar Reporte</button>
             </div>
@@ -365,7 +365,7 @@
                         </span>
                     </td>
                     <td>
-                        <a href="{% url 'documentos:ver_documento' doc.id %}" 
+                        <a href="{% url 'documentos:ver_documento' doc.id %}"
                            style="color: var(--matrix-green); text-decoration: none;">
                             👁️ Ver
                         </a>

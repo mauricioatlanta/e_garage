@@ -98,7 +98,7 @@ Click "Limpiar" → Formulario limpiado → Campo "Part Number" enfocado → Lis
 ```javascript
 document.addEventListener('DOMContentLoaded', function() {
     // ... código existente ...
-    
+
     // Enfocar automáticamente el campo de búsqueda de repuesto al cargar la página
     buscarRepuesto.focus();
 });
@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', function() {
 limpiarRepuestoBtn.addEventListener('click', function() {
     buscarRepuesto.value = '';
     // ... limpiar otros campos ...
-    
+
     // Enfocar el campo de búsqueda para facilitar la entrada del siguiente repuesto
     buscarRepuesto.focus();
 });

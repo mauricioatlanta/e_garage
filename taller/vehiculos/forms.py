@@ -5,7 +5,6 @@ from taller.models.vehiculos import Vehiculo
 
 
 class VehiculoForm(forms.ModelForm):
-
     # Años 2026 -> 1970 (pedido del usuario)
     anio = forms.TypedChoiceField(
         choices=[(str(y), str(y)) for y in range(2026, 1969, -1)],
@@ -652,3 +651,26 @@ class VehiculoForm(forms.ModelForm):
                 }
             ),
         }
+
+    def clean(self):
+        """
+        Validación de compatibilidad entre Modelo, Motor y Caja
+        """
+        cleaned_data = super().clean()
+        modelo = cleaned_data.get("modelo")
+        motor = cleaned_data.get("motor")
+        caja = cleaned_data.get("caja")
+
+        # Validar compatibilidad Motor-Modelo
+        if modelo and motor and not motor.modelos.filter(pk=modelo.pk).exists():
+            self.add_error(
+                "motor", "El motor no es compatible con el modelo seleccionado."
+            )
+
+        # Validar compatibilidad Caja-Modelo
+        if modelo and caja and not caja.modelos.filter(pk=modelo.pk).exists():
+            self.add_error(
+                "caja", "La caja no es compatible con el modelo seleccionado."
+            )
+
+        return cleaned_data

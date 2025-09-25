@@ -199,24 +199,44 @@ from taller.models.clientes import Cliente
 # Autocompletado de clientes para documentos
 def autocomplete_cliente(request):
     q = request.GET.get("q", "").strip()
-    if not q:
-        return JsonResponse([], safe=False)
-    clientes = Cliente.objects.filter(
-        models.Q(nombre__icontains=q)
-        | models.Q(apellido__icontains=q)
-        | models.Q(email__icontains=q)
-        | models.Q(telefono__icontains=q)
-    )[:20]
-    data = [
-        {
-            "id": c.pk,
-            "nombre": c.nombre,
-            "apellido": c.apellido,
-            "email": c.email,
-            "telefono": c.telefono,
-        }
-        for c in clientes
-    ]
+
+    # Obtener empresa del usuario autenticado
+    empresa = None
+    if request.user.is_authenticated and hasattr(request.user, "empresa"):
+        empresa = request.user.empresa
+
+    # Si no hay empresa, retornar vacío
+    if not empresa:
+        return JsonResponse({"results": []})
+
+    # Filtrar clientes por empresa
+    clientes = Cliente.objects.filter(empresa=empresa)
+
+    # Si hay término de búsqueda, filtrar por él
+    if q:
+        clientes = clientes.filter(
+            models.Q(nombre__icontains=q)
+            | models.Q(apellido__icontains=q)
+            | models.Q(email__icontains=q)
+            | models.Q(telefono__icontains=q)
+        )[:20]
+    else:
+        # Si no hay término, mostrar los primeros 20 clientes
+        clientes = clientes[:20]
+
+    data = {
+        "results": [
+            {
+                "id": c.pk,
+                "text": f"{c.nombre} {c.apellido or ''} - {c.telefono or 'Sin teléfono'}",
+                "nombre": c.nombre,
+                "apellido": c.apellido,
+                "email": c.email,
+                "telefono": c.telefono,
+            }
+            for c in clientes
+        ]
+    }
     return JsonResponse(data, safe=False)
 
 

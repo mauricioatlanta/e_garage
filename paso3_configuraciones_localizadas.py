@@ -3,6 +3,7 @@
 🎯 PASO 3: CONFIGURACIONES LOCALIZADAS POR MERCADO
 Configurar ajustes específicos por país para empresas demo
 """
+
 import os
 
 import django

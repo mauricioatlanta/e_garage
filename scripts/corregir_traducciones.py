@@ -2,6 +2,7 @@
 """
 Script mejorado para completar traducciones específicas
 """
+
 import os
 
 import django

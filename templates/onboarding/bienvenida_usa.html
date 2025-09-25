@@ -21,47 +21,47 @@
        min-height: 100vh;
        overflow-x: hidden;
      }
-     
+
      /* Tipografías especializadas */
      .font-futuristic {
        font-family: 'Orbitron', monospace;
        letter-spacing: 0.05em;
      }
-     
+
      .font-tech {
        font-family: 'JetBrains Mono', monospace;
        letter-spacing: 0.02em;
      }
-     
+
      .font-display {
        font-family: 'Exo 2', sans-serif;
        font-weight: 300;
        letter-spacing: 0.03em;
      }
-     
+
      .font-bold-tech {
        font-family: 'Exo 2', sans-serif;
        font-weight: 700;
        letter-spacing: 0.02em;
      }
-    
+
     .futuristic-glow {
       text-shadow: 0 0 30px rgba(34, 211, 238, 0.8);
     }
-    
+
     .glass-card, .glass {
       background: linear-gradient(135deg, rgba(34, 211, 238, 0.1) 0%, rgba(96, 165, 250, 0.05) 100%);
       backdrop-filter: blur(25px);
       border-radius: 1.5rem;
       border: 1px solid rgba(34, 211, 238, 0.3);
       transition: all 0.4s ease;
-      box-shadow: 
+      box-shadow:
         0 8px 32px rgba(34, 211, 238, 0.15),
         inset 0 1px 0 rgba(255, 255, 255, 0.1);
       position: relative;
       overflow: hidden;
     }
-    
+
     .glass-card::before, .glass::before {
       content: '';
       position: absolute;
@@ -72,20 +72,20 @@
       background: linear-gradient(90deg, transparent, rgba(34, 211, 238, 0.1), transparent);
       transition: left 0.5s ease;
     }
-    
+
     .glass-card:hover::before, .glass:hover::before {
       left: 100%;
     }
-    
+
     .glass-card:hover, .glass:hover {
       border-color: rgba(34, 211, 238, 0.8);
       transform: translateY(-6px) scale(1.02);
-      box-shadow: 
+      box-shadow:
         0 25px 50px rgba(34, 211, 238, 0.3),
         0 0 0 1px rgba(34, 211, 238, 0.2),
         inset 0 1px 0 rgba(255, 255, 255, 0.2);
     }
-    
+
     /* Tarjetas especiales con efectos neón */
     .neon-card {
       background: linear-gradient(135deg, rgba(34, 211, 238, 0.15) 0%, rgba(96, 165, 250, 0.08) 50%, rgba(167, 139, 250, 0.05) 100%);
@@ -93,14 +93,14 @@
       border-radius: 1.5rem;
       border: 2px solid rgba(34, 211, 238, 0.4);
       transition: all 0.5s ease;
-      box-shadow: 
+      box-shadow:
         0 10px 40px rgba(34, 211, 238, 0.2),
         0 0 20px rgba(34, 211, 238, 0.1),
         inset 0 1px 0 rgba(255, 255, 255, 0.15);
       position: relative;
       overflow: hidden;
     }
-    
+
     .neon-card::after {
       content: '';
       position: absolute;
@@ -114,20 +114,20 @@
       opacity: 0;
       transition: opacity 0.5s ease;
     }
-    
+
     .neon-card:hover::after {
       opacity: 0.3;
     }
-    
+
     .neon-card:hover {
       border-color: rgba(34, 211, 238, 0.9);
       transform: translateY(-8px) scale(1.03);
-      box-shadow: 
+      box-shadow:
         0 30px 60px rgba(34, 211, 238, 0.4),
         0 0 30px rgba(34, 211, 238, 0.2),
         inset 0 1px 0 rgba(255, 255, 255, 0.3);
     }
-    
+
     /* Tarjetas de métricas con efecto de pulso */
     .metric-card {
       background: linear-gradient(135deg, rgba(34, 211, 238, 0.12) 0%, rgba(96, 165, 250, 0.06) 100%);
@@ -135,13 +135,13 @@
       border-radius: 1.5rem;
       border: 1px solid rgba(34, 211, 238, 0.3);
       transition: all 0.4s ease;
-      box-shadow: 
+      box-shadow:
         0 8px 32px rgba(34, 211, 238, 0.15),
         inset 0 1px 0 rgba(255, 255, 255, 0.1);
       position: relative;
       overflow: hidden;
     }
-    
+
     .metric-card::before {
       content: '';
       position: absolute;
@@ -153,20 +153,20 @@
       opacity: 0;
       transition: opacity 0.4s ease;
     }
-    
+
     .metric-card:hover::before {
       opacity: 1;
     }
-    
+
     .metric-card:hover {
       border-color: rgba(34, 211, 238, 0.7);
       transform: translateY(-4px);
-      box-shadow: 
+      box-shadow:
         0 20px 40px rgba(34, 211, 238, 0.25),
         0 0 0 1px rgba(34, 211, 238, 0.2),
         inset 0 1px 0 rgba(255, 255, 255, 0.2);
     }
-    
+
     .sticky-cta {
       position: fixed;
       bottom: 1.5rem;
@@ -176,7 +176,7 @@
       align-items: center;
       gap: 0.5rem;
     }
-    
+
     @media (max-width: 640px) {
       .sticky-cta {
         right: 0.5rem;
@@ -185,33 +185,33 @@
         justify-content: center;
       }
     }
-    
+
     .icon-float {
       transition: transform 0.3s ease;
       color: #22d3ee;
       filter: drop-shadow(0 0 10px rgba(34, 211, 238, 0.5));
     }
-    
+
     .icon-float:hover {
       transform: scale(1.2);
       color: #60a5fa;
       filter: drop-shadow(0 0 20px rgba(34, 211, 238, 0.8));
     }
-    
+
     /* Grid animada de fondo más visible */
     .grid-bg {
-      background-image: 
+      background-image:
         linear-gradient(rgba(34, 211, 238, 0.15) 1px, transparent 1px),
         linear-gradient(90deg, rgba(34, 211, 238, 0.15) 1px, transparent 1px);
       background-size: 40px 40px;
       animation: grid-move 20s linear infinite;
     }
-    
+
     @keyframes grid-move {
       0% { transform: translate(0, 0); }
       100% { transform: translate(40px, 40px); }
     }
-    
+
     /* Líneas de energía */
     .energy-lines {
       position: absolute;
@@ -222,7 +222,7 @@
       overflow: hidden;
       z-index: -1;
     }
-    
+
     .energy-line {
       position: absolute;
       width: 2px;
@@ -230,13 +230,13 @@
       background: linear-gradient(to bottom, transparent, #22d3ee, transparent);
       animation: energy-flow 3s linear infinite;
     }
-    
+
     @keyframes energy-flow {
       0% { transform: translateY(-100px); opacity: 0; }
       50% { opacity: 1; }
       100% { transform: translateY(100vh); opacity: 0; }
     }
-    
+
     /* Partículas flotantes */
     .particles {
       position: absolute;
@@ -247,7 +247,7 @@
       overflow: hidden;
       z-index: -1;
     }
-    
+
     .particle {
       position: absolute;
       width: 4px;
@@ -256,14 +256,14 @@
       border-radius: 50%;
       animation: particle-float 6s linear infinite;
     }
-    
+
     @keyframes particle-float {
       0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
       10% { opacity: 1; }
       90% { opacity: 1; }
       100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
     }
-    
+
     /* Efecto de escaneo */
     .scan-line {
       position: absolute;
@@ -275,12 +275,12 @@
       animation: scan 4s linear infinite;
       z-index: 1;
     }
-    
+
     @keyframes scan {
       0% { transform: translateY(-100vh); }
       100% { transform: translateY(100vh); }
     }
-    
+
     /* Botones con efecto neón */
     .neon-button {
       background: linear-gradient(45deg, #22d3ee, #60a5fa);
@@ -288,12 +288,12 @@
       box-shadow: 0 0 20px rgba(34, 211, 238, 0.5);
       transition: all 0.3s ease;
     }
-    
+
     .neon-button:hover {
       box-shadow: 0 0 30px rgba(34, 211, 238, 0.8);
       transform: translateY(-2px);
     }
-    
+
     /* Títulos con efecto holográfico */
     .holographic-text {
       background: linear-gradient(45deg, #22d3ee, #60a5fa, #a78bfa, #22d3ee);
@@ -303,7 +303,7 @@
       background-clip: text;
       animation: holographic 3s ease-in-out infinite;
     }
-    
+
     @keyframes holographic {
       0%, 100% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
@@ -330,7 +330,7 @@
   <div id="vanta-globe" class="fixed inset-0 -z-10"></div>
   <div id="vanta-dots" class="fixed inset-0 -z-20"></div>
   <div class="grid-bg fixed inset-0 -z-30"></div>
-  
+
   <!-- Líneas de energía -->
   <div class="energy-lines">
     <div class="energy-line" style="left: 10%; animation-delay: 0s;"></div>
@@ -339,7 +339,7 @@
     <div class="energy-line" style="left: 70%; animation-delay: 0.5s;"></div>
     <div class="energy-line" style="left: 90%; animation-delay: 1.5s;"></div>
   </div>
-  
+
   <!-- Partículas flotantes -->
   <div class="particles">
     <div class="particle" style="left: 5%; animation-delay: 0s;"></div>
@@ -353,22 +353,22 @@
     <div class="particle" style="left: 85%; animation-delay: 2.5s;"></div>
     <div class="particle" style="left: 95%; animation-delay: 3.5s;"></div>
   </div>
-  
+
   <!-- Línea de escaneo -->
   <div class="scan-line"></div>
-  
+
   <main class="relative z-10">
     <!-- Hero Section -->
     <section class="text-center py-24 px-6 relative" data-aos="fade-up">
       <img src="{% static 'img/logo.png' %}" alt="eGarage Logo" class="mx-auto mb-8 w-32 md:w-40 animate-spin-slow" style="filter: drop-shadow(0 0 30px rgba(34, 211, 238, 0.9));">
-      
+
              <h1 class="text-3xl md:text-6xl font-futuristic font-extrabold tracking-tight
                   holographic-text mb-6">
          {% trans "The #1 Auto Shop Platform in the USA" %}
        </h1>
-      
+
              <p class="text-xl text-cyan-300 mb-8 font-tech font-medium">{% trans "Trusted by mechanics across America. Real features. Bilingual support. No risk." %}</p>
-      
+
              <div class="mt-10 flex flex-col md:flex-row gap-4 justify-center">
          <a href="/registro/" class="px-10 py-4 neon-button text-black font-futuristic font-bold rounded-full text-xl">🚀 {% trans "Start Free Trial" %}</a>
          <a href="#pricing" class="px-10 py-4 bg-black/60 backdrop-blur border border-cyan-400/50 text-cyan-400 font-futuristic font-bold rounded-full text-xl hover:bg-black/80 transition-all">💰 {% trans "See Pricing" %}</a>
@@ -637,12 +637,12 @@
        </h2>
       <a href="/registro/" class="mt-8 px-10 py-4 neon-button text-black text-xl font-bold rounded-2xl">{% trans "Start Free Today" %}</a>
     </section>
-    
+
     <footer class="mt-20 text-center text-cyan-300 text-sm pb-10">
       <p>&copy; 2025 eGarage USA. {% trans "Built with AI for mechanics" %}</p>
     </footer>
   </main>
-  
+
   <!-- Scripts -->
   <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
   <script>
@@ -661,7 +661,7 @@
       backgroundColor: 0x0a0a0a,
       size: 1.00
     });
-    
+
     // Vanta.js Dots
     VANTA.DOTS({
       el: "#vanta-dots",
@@ -679,7 +679,7 @@
       spacing: 35.00,
       showLines: false
     });
-    
+
     // AOS.js animaciones scroll
     AOS.init({
       duration: 900,
@@ -688,7 +688,7 @@
       delay: 100,
       easing: 'ease-in-out-cubic'
     });
-    
+
     // Inicialización completa
     document.addEventListener('DOMContentLoaded', function() {
       console.log('Página cargada completamente');

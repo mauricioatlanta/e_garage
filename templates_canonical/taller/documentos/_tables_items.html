@@ -2,7 +2,7 @@
 <!-- Tablas de items (repuestos, servicios, otros) -->
 <div class="seccion-card">
   <h3 class="seccion-title">🛠️ Repuestos</h3>
-  
+
   <div style="margin-bottom: 1rem;">
     <div style="display: flex; gap: 0.5rem; align-items: center;">
       <button type="button" id="btn-agregar-repuesto" class="btn-secondary">+ Agregar Repuesto</button>
@@ -12,7 +12,7 @@
       </div>
     </div>
   </div>
-  
+
   <table class="table-futurista" id="tabla-repuestos">
     <thead>
       <tr>
@@ -32,9 +32,9 @@
         <td>{{ repuesto.nombre }}</td>
         <td>{{ repuesto.cantidad }}</td>
         <td style="color: transparent; background: black;">
-          <input type="number" class="precio-compra-input" 
-                 style="color: transparent; background: black; border: none; width: 80px;" 
-                 value="{{ repuesto.precio_compra|default:0 }}" 
+          <input type="number" class="precio-compra-input"
+                 style="color: transparent; background: black; border: none; width: 80px;"
+                 value="{{ repuesto.precio_compra|default:0 }}"
                  min="0" step="0.01">
         </td>
         <td>
@@ -54,7 +54,7 @@
       {% endfor %}
     </tbody>
   </table>
-  
+
   <div style="text-align: right; margin-top: 1rem;">
     <strong style="color: #00f2fe;">Subtotal Repuestos: <span id="total-repuestos">{% if company_country == 'CL' %}${% elif company_country == 'US' %}${% else %}${% endif %}{{ subtotal_repuestos|default:0|floatformat:0 }}</span></strong>
   </div>
@@ -62,7 +62,7 @@
 
 <div class="seccion-card">
   <h3 class="seccion-title">⚙️ Servicios</h3>
-  
+
   <div style="margin-bottom: 1rem;">
     <div style="display: flex; gap: 0.5rem; align-items: center;">
       <button type="button" id="btn-agregar-servicio" class="btn-secondary">+ Agregar Servicio</button>
@@ -72,7 +72,7 @@
       </div>
     </div>
   </div>
-  
+
   <table class="table-futurista" id="tabla-servicios">
     <thead>
       <tr>
@@ -99,7 +99,7 @@
       {% endfor %}
     </tbody>
   </table>
-  
+
   <div style="text-align: right; margin-top: 1rem;">
     <strong style="color: #00f2fe;">Subtotal Servicios: <span id="total-servicios">{% if company_country == 'CL' %}${% elif company_country == 'US' %}${% else %}${% endif %}{{ subtotal_servicios|default:0|floatformat:0 }}</span></strong>
   </div>
@@ -107,7 +107,7 @@
 
 <div class="seccion-card">
   <h3 class="seccion-title">🏢 Otros Servicios</h3>
-  
+
   <div style="margin-bottom: 1rem;">
     <div style="display: flex; gap: 0.5rem; align-items: center;">
       <button type="button" id="btn-agregar-otro" class="btn-secondary">+ Agregar Otro Servicio</button>
@@ -117,7 +117,7 @@
       </div>
     </div>
   </div>
-  
+
   <table class="table-futurista" id="tabla-otros">
     <thead>
       <tr>
@@ -154,7 +154,7 @@
       {% endfor %}
     </tbody>
   </table>
-  
+
   <div style="text-align: right; margin-top: 1rem;">
     <strong style="color: #00f2fe;">Subtotal Otros: <span id="total-otros-servicios">{% if company_country == 'CL' %}${% elif company_country == 'US' %}${% else %}${% endif %}{{ subtotal_otros|default:0|floatformat:0 }}</span></strong>
   </div>

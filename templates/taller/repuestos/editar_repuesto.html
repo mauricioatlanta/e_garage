@@ -1,3 +1,4 @@
+{% load country_url %}
 {% extends 'base.html' %}
 {% load widget_tweaks %}
 
@@ -75,14 +76,14 @@
         </div>
       {% endif %}
     </div>
-    
+
     {% if repuesto.observaciones or form.observaciones %}
     <div class="col-span-2">
       <label for="id_observaciones" class="text-white">Observaciones</label>
       <textarea id="id_observaciones" name="observaciones" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring focus:ring-indigo-300 text-black">{{ repuesto.observaciones|default:'' }}</textarea>
     </div>
     {% endif %}
-    
+
     {% if form.non_field_errors %}
     <div class="col-span-2 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
         <strong>Errores:</strong>
@@ -93,9 +94,9 @@
         </ul>
     </div>
     {% endif %}
-    
+
     <div class="col-span-2 flex justify-end gap-4">
-  {% url 'taller:repuestos:lista_repuestos' as url_lista_repuestos %}
+  {% country_url 'repuestos:lista_repuestos' as url_lista_repuestos %}
   <a class="bg-gray-300 text-gray-700 px-5 py-2 rounded hover:bg-gray-400 shadow" href="{{ url_lista_repuestos|default:'#' }}">Cancelar</a>
       <button class="bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700 shadow btn-futuristic" type="submit">Actualizar</button>
     </div>
@@ -150,9 +151,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     formNuevaTienda.addEventListener('submit', function(e) {
         e.preventDefault();
-        
+
         const formData = new FormData(formNuevaTienda);
-        
+
         fetch('{% url "repuestos:crear_tienda" %}', {
             method: 'POST',
             body: formData,
@@ -166,7 +167,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Agregar nueva opción al select
                 const option = new Option(data.tienda.nombre, data.tienda.id, true, true);
                 selectTienda.add(option);
-                
+
                 // Cerrar modal y limpiar formulario
                 modal.classList.add('hidden');
                 formNuevaTienda.reset();

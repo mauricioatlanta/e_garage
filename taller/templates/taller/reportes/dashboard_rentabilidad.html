@@ -128,24 +128,24 @@
             </div>
             <div class="chart-container">
                 <h5 class="text-lg font-semibold text-gray-800 mb-4">🎯 Métricas Clave</h5>
-                
+
                 <div class="metric-box">
                     <strong>🔧 Servicios Internos:</strong> {{ ingresos_internos|formatear_pesos }}
                     <div class="text-gray-600 text-sm">{{ ingresos_internos|floatformat:2|add:"0"|length }}% del total</div>
                 </div>
-                
+
                 <div class="metric-box">
                     <strong>🤝 Servicios Externos:</strong> {{ ingresos_externos|formatear_pesos }}
                     <div class="text-gray-600 text-sm">Margen promedio: {{ margen_general }}%</div>
                 </div>
-                
+
                 {% if mejor_proveedor %}
                 <div class="success-box">
                     <strong>🏆 Mejor Proveedor:</strong> {{ mejor_proveedor.empresa_externa }}
                     <div class="text-gray-600 text-sm">Margen: {{ mejor_proveedor.margen_promedio|floatformat:1 }}%</div>
                 </div>
                 {% endif %}
-                
+
                 {% if peor_proveedor %}
                 <div class="warning-box">
                     <strong>⚠️ Revisar Proveedor:</strong> {{ peor_proveedor.empresa_externa }}

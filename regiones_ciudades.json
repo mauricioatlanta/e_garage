@@ -15,17 +15,17 @@
     ]
   },
   {
-    "region": "Tarapacá",
+    "region": "Tarapac\u00e1",
     "ciudades": [
       "Iquique",
       "Alto Hospicio",
       "Pozo Almonte",
       "Pica",
       "Huara",
-      "Camiña",
+      "Cami\u00f1a",
       "Colchane",
       "La Tirana",
-      "Mamiña",
+      "Mami\u00f1a",
       "Chanavayita"
     ]
   },
@@ -37,9 +37,9 @@
       "Tocopilla",
       "Mejillones",
       "Taltal",
-      "María Elena",
+      "Mar\u00eda Elena",
       "Sierra Gorda",
-      "Ollagüe",
+      "Ollag\u00fce",
       "Hornitos",
       "Quillagua"
     ]
@@ -47,10 +47,10 @@
   {
     "region": "Atacama",
     "ciudades": [
-      "Copiapó",
+      "Copiap\u00f3",
       "Vallenar",
       "Caldera",
-      "Chañaral",
+      "Cha\u00f1aral",
       "El Salvador",
       "Tierra Amarilla",
       "Diego de Almagro",
@@ -66,7 +66,7 @@
       "Coquimbo",
       "Ovalle",
       "Illapel",
-      "Vicuña",
+      "Vicu\u00f1a",
       "Salamanca",
       "Los Vilos",
       "Andacollo",
@@ -75,12 +75,12 @@
     ]
   },
   {
-    "region": "Valparaíso",
+    "region": "Valpara\u00edso",
     "ciudades": [
-      "Valparaíso",
-      "Viña del Mar",
+      "Valpara\u00edso",
+      "Vi\u00f1a del Mar",
       "San Antonio",
-      "Quilpué",
+      "Quilpu\u00e9",
       "Villa Alemana",
       "Quillota",
       "La Calera",
@@ -90,54 +90,54 @@
     ]
   },
   {
-    "region": "Región Metropolitana",
+    "region": "Regi\u00f3n Metropolitana",
     "ciudades": [
       "Santiago",
       "Puente Alto",
-      "Maipú",
+      "Maip\u00fa",
       "La Florida",
-      "Peñalolén",
+      "Pe\u00f1alol\u00e9n",
       "Las Condes",
       "San Bernardo",
       "Pudahuel",
-      "Ñuñoa",
+      "\u00d1u\u00f1oa",
       "La Pintana"
     ]
   },
   {
-    "region": "O’Higgins",
+    "region": "O\u2019Higgins",
     "ciudades": [
       "Rancagua",
       "San Fernando",
       "Rengo",
       "Santa Cruz",
-      "Machalí",
+      "Machal\u00ed",
       "Graneros",
       "Chimbarongo",
       "Pichilemu",
       "San Vicente",
-      "Doñihue"
+      "Do\u00f1ihue"
     ]
   },
   {
     "region": "Maule",
     "ciudades": [
       "Talca",
-      "Curicó",
+      "Curic\u00f3",
       "Linares",
-      "Constitución",
+      "Constituci\u00f3n",
       "Parral",
       "Cauquenes",
       "San Javier",
       "Molina",
       "Romeral",
-      "Longaví"
+      "Longav\u00ed"
     ]
   },
   {
-    "region": "Ñuble",
+    "region": "\u00d1uble",
     "ciudades": [
-      "Chillán",
+      "Chill\u00e1n",
       "San Carlos",
       "Bulnes",
       "Quirihue",
@@ -145,46 +145,46 @@
       "Coihueco",
       "El Carmen",
       "Pemuco",
-      "Quillón",
+      "Quill\u00f3n",
       "Ninhue"
     ]
   },
   {
-    "region": "Biobío",
+    "region": "Biob\u00edo",
     "ciudades": [
-      "Concepción",
+      "Concepci\u00f3n",
       "Talcahuano",
-      "Los Ángeles",
+      "Los \u00c1ngeles",
       "Coronel",
       "San Pedro de la Paz",
       "Chiguayante",
-      "Hualpén",
+      "Hualp\u00e9n",
       "Lota",
-      "Tomé",
+      "Tom\u00e9",
       "Curanilahue"
     ]
   },
   {
-    "region": "La Araucanía",
+    "region": "La Araucan\u00eda",
     "ciudades": [
       "Temuco",
       "Villarrica",
       "Angol",
-      "Pucón",
+      "Puc\u00f3n",
       "Padre Las Casas",
       "Nueva Imperial",
       "Lautaro",
       "Victoria",
       "Carahue",
-      "Traiguén"
+      "Traigu\u00e9n"
     ]
   },
   {
-    "region": "Los Ríos",
+    "region": "Los R\u00edos",
     "ciudades": [
       "Valdivia",
-      "La Unión",
-      "Río Bueno",
+      "La Uni\u00f3n",
+      "R\u00edo Bueno",
       "Panguipulli",
       "Futrono",
       "Lanco",
@@ -202,7 +202,7 @@
       "Castro",
       "Ancud",
       "Puerto Varas",
-      "Quellón",
+      "Quell\u00f3n",
       "Frutillar",
       "Calbuco",
       "Chonchi",
@@ -210,16 +210,16 @@
     ]
   },
   {
-    "region": "Aysén",
+    "region": "Ays\u00e9n",
     "ciudades": [
       "Coyhaique",
-      "Puerto Aysén",
+      "Puerto Ays\u00e9n",
       "Chile Chico",
       "Cochrane",
       "Puerto Cisnes",
-      "Puerto Ingeniero Ibáñez",
+      "Puerto Ingeniero Ib\u00e1\u00f1ez",
       "Melinka",
-      "Río Ibáñez",
+      "R\u00edo Ib\u00e1\u00f1ez",
       "Guaitecas",
       "Tortel"
     ]
@@ -232,7 +232,7 @@
       "Porvenir",
       "Puerto Williams",
       "Laguna Blanca",
-      "Río Verde",
+      "R\u00edo Verde",
       "San Gregorio",
       "Primavera",
       "Cabo de Hornos",

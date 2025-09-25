@@ -9,7 +9,7 @@
         max-width: 800px;
         margin: 0 auto;
     }
-    
+
     .document-header {
         background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
         color: white;
@@ -19,7 +19,7 @@
         margin-bottom: 2rem;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
-    
+
     .delivery-option {
         background: white;
         border-radius: 12px;
@@ -29,31 +29,31 @@
         transition: all 0.3s ease;
         border: 2px solid transparent;
     }
-    
+
     .delivery-option:hover {
         transform: translateY(-4px);
         box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
         border-color: #007bff;
     }
-    
+
     .option-icon {
         font-size: 3rem;
         margin-bottom: 1rem;
     }
-    
+
     .option-title {
         font-size: 1.25rem;
         font-weight: 600;
         color: #2c3e50;
         margin-bottom: 0.5rem;
     }
-    
+
     .option-description {
         color: #6c757d;
         margin-bottom: 1rem;
         line-height: 1.5;
     }
-    
+
     .option-status {
         padding: 0.5rem 1rem;
         border-radius: 20px;
@@ -61,22 +61,22 @@
         font-weight: 500;
         margin-bottom: 1rem;
     }
-    
+
     .status-available {
         background: #d4edda;
         color: #155724;
     }
-    
+
     .status-unavailable {
         background: #f8d7da;
         color: #721c24;
     }
-    
+
     .status-partial {
         background: #fff3cd;
         color: #856404;
     }
-    
+
     .btn-delivery {
         display: inline-block;
         padding: 0.75rem 1.5rem;
@@ -89,55 +89,55 @@
         margin-right: 0.5rem;
         margin-bottom: 0.5rem;
     }
-    
+
     .btn-primary {
         background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
         color: white;
     }
-    
+
     .btn-primary:hover {
         color: white;
         text-decoration: none;
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
     }
-    
+
     .btn-success {
         background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
         color: white;
     }
-    
+
     .btn-success:hover {
         color: white;
         text-decoration: none;
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
     }
-    
+
     .btn-warning {
         background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
         color: #212529;
     }
-    
+
     .btn-warning:hover {
         color: #212529;
         text-decoration: none;
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
     }
-    
+
     .btn-secondary {
         background: #6c757d;
         color: white;
     }
-    
+
     .btn-secondary:hover {
         color: white;
         text-decoration: none;
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
     }
-    
+
     .document-info {
         background: #f8f9fa;
         border-left: 4px solid #007bff;
@@ -145,19 +145,19 @@
         border-radius: 0 8px 8px 0;
         margin-bottom: 2rem;
     }
-    
+
     .contact-info {
         background: #e7f3ff;
         padding: 1rem;
         border-radius: 8px;
         margin-top: 1rem;
     }
-    
+
     .modal-header {
         background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
         color: white;
     }
-    
+
     .whatsapp-preview {
         background: #25D366;
         color: white;
@@ -179,7 +179,7 @@
             <p class="mb-1 opacity-90">Cliente: {{ cliente.nombre }}</p>
             <p class="mb-0 opacity-90">Fecha: {{ documento.fecha|date:"d/m/Y" }}</p>
         </div>
-        
+
         <!-- Información del Documento -->
         <div class="document-info">
             <h5 class="text-primary mb-3">Información del Documento</h5>
@@ -200,7 +200,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Opciones de Entrega -->
         <div class="row">
             <!-- Descargar PDF -->
@@ -222,7 +222,7 @@
                     </button>
                 </div>
             </div>
-            
+
             <!-- Enviar por Email -->
             <div class="col-md-6 mb-4">
                 <div class="delivery-option text-center">
@@ -248,7 +248,7 @@
                     {% endif %}
                 </div>
             </div>
-            
+
             <!-- Enviar por WhatsApp -->
             <div class="col-md-6 mb-4">
                 <div class="delivery-option text-center">
@@ -274,7 +274,7 @@
                     {% endif %}
                 </div>
             </div>
-            
+
             <!-- Imprimir -->
             <div class="col-md-6 mb-4">
                 <div class="delivery-option text-center">
@@ -292,18 +292,18 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Información de Contacto -->
         {% if not tiene_email or not tiene_telefono %}
         <div class="contact-info">
             <h6 class="text-primary">💡 Consejo</h6>
             <p class="mb-0">
-                Para una mejor experiencia, considera actualizar la información de contacto del cliente 
+                Para una mejor experiencia, considera actualizar la información de contacto del cliente
                 (email y teléfono) para tener todas las opciones de entrega disponibles.
             </p>
         </div>
         {% endif %}
-        
+
         <!-- Botón Volver -->
         <div class="text-center mt-4">
             <a href="{{ request.META.HTTP_REFERER|default:'/taller/documentos/' }}" class="btn-delivery btn-secondary">
@@ -385,7 +385,7 @@ const whatsappUrl = "{{ whatsapp_url }}";
 
 function generarWhatsApp(telefono) {
     const url = `${whatsappUrl}?telefono=${encodeURIComponent(telefono)}`;
-    
+
     fetch(url)
         .then(response => response.json())
         .then(data => {
@@ -412,7 +412,7 @@ function confirmarWhatsApp() {
         alert('Por favor ingresa un número de teléfono');
         return;
     }
-    
+
     bootstrap.Modal.getInstance(document.getElementById('telefonoModal')).hide();
     generarWhatsApp(telefono);
 }
@@ -424,11 +424,11 @@ function mostrarWhatsApp(data) {
             <h6>📱 Mensaje generado para WhatsApp</h6>
             <p class="text-muted">Teléfono: ${data.telefono}</p>
         </div>
-        
+
         <div class="whatsapp-preview">
             ${data.mensaje}
         </div>
-        
+
         <div class="text-center">
             <a href="${data.whatsapp_link}" target="_blank" class="btn btn-success btn-lg">
                 📲 Abrir WhatsApp
@@ -438,7 +438,7 @@ function mostrarWhatsApp(data) {
             </p>
         </div>
     `;
-    
+
     const modal = new bootstrap.Modal(document.getElementById('whatsappModal'));
     modal.show();
 }
@@ -486,7 +486,7 @@ function mostrarVistaPrevia(data) {
                 ${data.cliente.telefono ? `<p><strong>Teléfono:</strong> ${data.cliente.telefono}</p>` : ''}
             </div>
         </div>
-        
+
         ${data.vehiculo ? `
         <div class="mt-3">
             <h6 class="text-primary">🚗 Vehículo</h6>
@@ -495,7 +495,7 @@ function mostrarVistaPrevia(data) {
             <p><strong>Patente:</strong> ${data.vehiculo.patente}</p>
         </div>
         ` : ''}
-        
+
         <div class="mt-3">
             <h6 class="text-primary">💰 Totales</h6>
             <div class="row">
@@ -511,13 +511,13 @@ function mostrarVistaPrevia(data) {
                 </div>
             </div>
         </div>
-        
+
         <div class="mt-3">
             <h6 class="text-primary">📊 Resumen de Items</h6>
             <p>Repuestos: ${data.items.repuestos_count} | Servicios: ${data.items.servicios_count} | Otros: ${data.items.otros_servicios_count}</p>
         </div>
     `;
-    
+
     const modal = new bootstrap.Modal(document.getElementById('previsualizacionModal'));
     modal.show();
 }

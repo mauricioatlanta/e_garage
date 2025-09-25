@@ -8,7 +8,7 @@ El problema ha sido **identificado y diagnosticado** completamente:
 Los documentos existen en la base de datos, pero **NO tienen líneas de repuestos ni servicios asociadas**.
 Por esto, cuando la plantilla llama a:
 - `{{ doc.total_repuestos }}` → devuelve $0 (no hay líneas de repuesto)
-- `{{ doc.total_servicios }}` → devuelve $0 (no hay líneas de servicio)  
+- `{{ doc.total_servicios }}` → devuelve $0 (no hay líneas de servicio)
 - `{{ doc.total_general }}` → devuelve $0 (suma de los anteriores)
 
 ### 📊 **EVIDENCIA DEL PROBLEMA**
@@ -46,7 +46,7 @@ La plantilla `templates/taller/documentos/lista_documentos.html` llama correctam
 
 ### 1. **ADMIN DE DJANGO** (Recomendado para casos puntuales)
 - Acceder a http://127.0.0.1:8000/admin/
-- Ir a "Linea repuestos" y "Linea servicios" 
+- Ir a "Linea repuestos" y "Linea servicios"
 - Agregar líneas para documentos existentes
 
 ### 2. **SCRIPT PYTHON** (Para automatizar)
@@ -61,7 +61,7 @@ Los archivos creados están listos para usar:
 
 Una vez agregadas las líneas de documento:
 - Los totales de repuestos mostrarán valores reales (ej: $75.000)
-- Los totales de servicios mostrarán valores reales (ej: $58.250)  
+- Los totales de servicios mostrarán valores reales (ej: $58.250)
 - Los totales generales mostrarán la suma correcta (ej: $133.250)
 
 ## 📝 **CONCLUSIÓN**

@@ -1,11 +1,12 @@
 {% extends "base.html" %}
+{% load country_url %}
 {% load i18n static %}
 
 {% block content %}
 <style>
   /* Sistema de IA Futurista para Repuestos */
   @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
-  
+
   .ai-system-bg {
     background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #533483 100%);
     background-size: 400% 400%;
@@ -14,13 +15,13 @@
     position: relative;
     overflow: hidden;
   }
-  
+
   @keyframes ai-gradient-shift {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
   }
-  
+
   /* Partículas de IA flotantes */
   .ai-particles {
     position: absolute;
@@ -31,7 +32,7 @@
     pointer-events: none;
     z-index: 1;
   }
-  
+
   .ai-particle {
     position: absolute;
     width: 3px;
@@ -41,34 +42,34 @@
     animation: ai-float 8s ease-in-out infinite;
     box-shadow: 0 0 15px #00ffff;
   }
-  
+
   /* Partículas neon adicionales */
   .ai-particle:nth-child(2n) {
     background: #00ff88;
     box-shadow: 0 0 15px #00ff88;
   }
-  
+
   .ai-particle:nth-child(3n) {
     background: #ff0080;
     box-shadow: 0 0 15px #ff0080;
   }
-  
+
   .ai-particle:nth-child(4n) {
     background: #8800ff;
     box-shadow: 0 0 15px #8800ff;
   }
-  
+
   @keyframes ai-float {
-    0%, 100% { 
+    0%, 100% {
       transform: translateY(0px) scale(1);
       opacity: 0.3;
     }
-    50% { 
+    50% {
       transform: translateY(-30px) scale(1.8);
       opacity: 1;
     }
   }
-  
+
   /* Contenedor principal con efectos holográficos */
   .ai-main-container {
     position: relative;
@@ -77,7 +78,7 @@
     max-width: 1400px;
     margin: 0 auto;
   }
-  
+
   /* Título principal con efectos de IA */
   .ai-main-title {
     font-family: 'Orbitron', monospace;
@@ -94,13 +95,13 @@
     text-shadow: 0 0 40px rgba(0, 255, 255, 0.5);
     letter-spacing: 4px;
   }
-  
+
   @keyframes ai-title-gradient {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
   }
-  
+
   /* Panel de búsqueda inteligente */
   .ai-search-panel {
     background: rgba(0, 0, 0, 0.8);
@@ -108,14 +109,14 @@
     border-radius: 20px;
     padding: 2rem;
     margin-bottom: 2rem;
-    box-shadow: 
+    box-shadow:
       0 0 40px rgba(0, 255, 255, 0.4),
       inset 0 0 40px rgba(0, 255, 255, 0.1);
     backdrop-filter: blur(20px);
     position: relative;
     overflow: hidden;
   }
-  
+
   .ai-search-panel::before {
     content: '';
     position: absolute;
@@ -123,19 +124,19 @@
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, 
-      transparent, 
-      rgba(0, 255, 255, 0.2), 
+    background: linear-gradient(90deg,
+      transparent,
+      rgba(0, 255, 255, 0.2),
       transparent);
     animation: ai-sweep 3s ease-in-out infinite;
   }
-  
+
   @keyframes ai-sweep {
     0% { left: -100%; }
     50% { left: 100%; }
     100% { left: 100%; }
   }
-  
+
   .ai-search-input {
     background: rgba(0, 0, 0, 0.9);
     border: 2px solid #00ffff;
@@ -149,37 +150,37 @@
     transition: all 0.3s ease;
     box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
   }
-  
+
   .ai-search-input:focus {
     border-color: #00ff88;
-    box-shadow: 
+    box-shadow:
       0 0 30px rgba(0, 255, 136, 0.5),
       0 0 0 4px rgba(0, 255, 136, 0.2);
     transform: scale(1.02);
   }
-  
+
   .ai-search-input::placeholder {
     color: rgba(0, 255, 255, 0.6);
   }
-  
+
   /* Tabla futurista con efectos de IA */
   .ai-table-container {
     background: rgba(0, 0, 0, 0.8);
     border: 2px solid #00ffff;
     border-radius: 20px;
     overflow: hidden;
-    box-shadow: 
+    box-shadow:
       0 0 40px rgba(0, 255, 255, 0.4),
       inset 0 0 40px rgba(0, 255, 255, 0.1);
     backdrop-filter: blur(20px);
   }
-  
+
   .ai-table {
     width: 100%;
     border-collapse: collapse;
     font-family: 'Orbitron', monospace;
   }
-  
+
   .ai-table th {
     background: linear-gradient(90deg, #00ffff, #00ff88);
     color: #000;
@@ -191,21 +192,21 @@
     letter-spacing: 2px;
     border-bottom: 3px solid #00ffff;
   }
-  
+
   .ai-table td {
     padding: 1.2rem 1rem;
     border-bottom: 1px solid rgba(0, 255, 255, 0.3);
     color: #ffffff;
     transition: all 0.3s ease;
   }
-  
+
   .ai-table tr:hover td {
     background: rgba(0, 255, 136, 0.1);
     color: #00ff88;
     text-shadow: 0 0 10px #00ff88;
     transform: scale(1.01);
   }
-  
+
   /* Botones con efectos de IA */
   .ai-btn {
     background: linear-gradient(45deg, #00ffff, #00ff88);
@@ -220,13 +221,13 @@
     letter-spacing: 1px;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 
+    box-shadow:
       0 0 20px rgba(0, 255, 255, 0.5),
       inset 0 0 20px rgba(255, 255, 255, 0.2);
     position: relative;
     overflow: hidden;
   }
-  
+
   .ai-btn::before {
     content: '';
     position: absolute;
@@ -234,33 +235,33 @@
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, 
-      transparent, 
-      rgba(255, 255, 255, 0.4), 
+    background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.4),
       transparent);
     transition: left 0.5s;
   }
-  
+
   .ai-btn:hover::before {
     left: 100%;
   }
-  
+
   .ai-btn:hover {
     transform: translateY(-3px) scale(1.05);
-    box-shadow: 
+    box-shadow:
       0 0 30px rgba(0, 255, 255, 0.8),
       0 0 60px rgba(0, 255, 136, 0.6),
       inset 0 0 20px rgba(255, 255, 255, 0.3);
   }
-  
+
   .ai-btn-primary {
     background: linear-gradient(45deg, #00ff88, #ffff00);
   }
-  
+
   .ai-btn-secondary {
     background: linear-gradient(45deg, #ff0080, #8800ff);
   }
-  
+
   /* Enlaces con efectos de IA */
   .ai-link {
     color: #00ffff;
@@ -269,7 +270,7 @@
     transition: all 0.3s ease;
     position: relative;
   }
-  
+
   .ai-link::after {
     content: '';
     position: absolute;
@@ -280,16 +281,16 @@
     background: linear-gradient(90deg, #00ffff, #00ff88);
     transition: width 0.3s ease;
   }
-  
+
   .ai-link:hover::after {
     width: 100%;
   }
-  
+
   .ai-link:hover {
     color: #00ff88;
     text-shadow: 0 0 10px #00ff88;
   }
-  
+
   /* Paginación futurista */
   .ai-pagination {
     display: flex;
@@ -298,7 +299,7 @@
     gap: 1rem;
     margin: 2rem 0;
   }
-  
+
   .ai-pagination a {
     background: rgba(0, 0, 0, 0.8);
     border: 2px solid #00ffff;
@@ -311,21 +312,21 @@
     transition: all 0.3s ease;
     box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
   }
-  
+
   .ai-pagination a:hover {
     background: #00ffff;
     color: #000;
     box-shadow: 0 0 30px rgba(0, 255, 255, 0.8);
     transform: translateY(-2px);
   }
-  
+
   .ai-pagination span {
     color: #00ffff;
     font-family: 'Orbitron', monospace;
     font-weight: 600;
     padding: 0.8rem 1.2rem;
   }
-  
+
   /* Estado del sistema IA */
   .ai-system-status {
     position: fixed;
@@ -341,7 +342,7 @@
     z-index: 1000;
     box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
   }
-  
+
   .ai-status-indicator {
     display: inline-block;
     width: 8px;
@@ -352,28 +353,28 @@
     animation: ai-pulse 2s ease-in-out infinite;
     box-shadow: 0 0 10px #00ff88;
   }
-  
+
   @keyframes ai-pulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.5; }
   }
-  
+
   @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
   }
-  
+
   /* Responsive */
   @media (max-width: 768px) {
     .ai-main-title {
       font-size: 2.5rem;
       letter-spacing: 2px;
     }
-    
+
     .ai-main-container {
       padding: 1rem;
     }
-    
+
     .ai-table th,
     .ai-table td {
       padding: 0.8rem 0.5rem;
@@ -395,26 +396,26 @@
     <div class="ai-particle" style="top: 70%; left: 25%; animation-delay: 6s;"></div>
     <div class="ai-particle" style="top: 15%; left: 75%; animation-delay: 7s;"></div>
   </div>
-  
+
   <!-- Estado del sistema IA -->
   <div class="ai-system-status">
     <span class="ai-status-indicator"></span>
     SISTEMA IA: OPERATIVO
   </div>
-  
+
   <!-- Contenedor principal -->
   <div class="ai-main-container">
 
-    
+
     <!-- Panel de búsqueda inteligente -->
     <div class="ai-search-panel">
       <form method="get" class="flex gap-4 items-center">
         <div class="flex-1">
-          <input type="search" 
-                 name="q" 
+          <input type="search"
+                 name="q"
                  id="searchInput"
-                 value="{{ request.GET.q }}" 
-                 placeholder="🔍 Búsqueda inteligente: nombre, código, categoría..." 
+                 value="{{ request.GET.q }}"
+                 placeholder="🔍 Búsqueda inteligente: nombre, código, categoría..."
                  class="ai-search-input">
           <div id="searchStatus" style="font-size: 0.8rem; color: #00ff88; margin-top: 5px; text-align: center; font-weight: 500;">
             🚀 Búsqueda en tiempo real activa
@@ -424,22 +425,22 @@
           🔍 BUSCAR
         </button>
         {% if request.GET.q %}
-        <a href="{% url 'taller:repuestos:lista_repuestos' %}" class="ai-btn ai-btn-secondary">
+        <a href="{% country_url 'repuestos:lista_repuestos' %}" class="ai-btn ai-btn-secondary">
           ❌ LIMPIAR
         </a>
         {% endif %}
       </form>
-      
+
       {% if request.GET.q %}
       <div class="mt-4 text-center">
         <p class="text-cyan-300 font-orbitron text-sm">
-          🔍 <strong>Búsqueda:</strong> "{{ request.GET.q }}" | 
+          🔍 <strong>Búsqueda:</strong> "{{ request.GET.q }}" |
           📊 <strong>Resultados:</strong> {{ object_list|length }}
         </p>
       </div>
       {% endif %}
     </div>
-    
+
     <!-- Tabla futurista -->
     <div class="ai-table-container">
       <table class="ai-table">
@@ -483,9 +484,9 @@
             </td>
             <td>
               <div class="flex gap-2">
-                <a href="{% url 'taller:repuestos:ver_repuesto' repuesto.pk %}" 
+                <a href="{% url 'taller:repuestos:ver_repuesto' repuesto.pk %}"
                    class="ai-link">👁️ VER</a>
-                <a href="{% url 'taller:repuestos:editar_repuesto' repuesto.pk %}" 
+                <a href="{% url 'taller:repuestos:editar_repuesto' repuesto.pk %}"
                    class="ai-link">✏️ EDITAR</a>
               </div>
             </td>
@@ -497,7 +498,7 @@
                 <div class="text-6xl">📋</div>
                 <h3 class="text-xl font-bold text-cyan-300">No se encontraron repuestos</h3>
                 <p class="text-gray-400">El sistema de IA no detectó repuestos que coincidan con los criterios de búsqueda.</p>
-                <a href="{% url 'taller:repuestos:crear_repuesto' %}" class="ai-btn ai-btn-primary">
+                <a href="{% country_url 'repuestos:crear_repuesto' %}" class="ai-btn ai-btn-primary">
                   ➕ REGISTRAR PRIMER REPUESTO
                 </a>
               </div>
@@ -507,7 +508,7 @@
         </tbody>
       </table>
     </div>
-    
+
     <!-- Paginación futurista -->
     {% if is_paginated %}
     <div class="ai-pagination">
@@ -519,11 +520,11 @@
           ⬅️ ANTERIOR
         </a>
       {% endif %}
-      
+
       <span>
         📄 PÁGINA {{ page_obj.number }} DE {{ page_obj.paginator.num_pages }}
       </span>
-      
+
       {% if page_obj.has_next %}
         <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">
           SIGUIENTE ➡️
@@ -534,10 +535,10 @@
       {% endif %}
     </div>
     {% endif %}
-    
+
     <!-- Botón para agregar repuesto -->
     <div class="text-center mt-8">
-      <a href="{% url 'taller:repuestos:crear_repuesto' %}" class="ai-btn ai-btn-primary">
+      <a href="{% country_url 'repuestos:crear_repuesto' %}" class="ai-btn ai-btn-primary">
         ➕ AGREGAR NUEVO REPUESTO
       </a>
     </div>
@@ -551,7 +552,7 @@ document.addEventListener('DOMContentLoaded', function() {
   console.log('🔮 MÓDULO DE GESTIÓN INTELIGENTE ACTIVO');
   console.log('📊 INTERFAZ HOLOGRÁFICA 3D CARGADA');
   console.log('🔍 SISTEMA DE BÚSQUEDA EN TIEMPO REAL ACTIVADO');
-  
+
   // Crear partículas adicionales dinámicamente
   setInterval(() => {
     const particle = document.createElement('div');
@@ -560,7 +561,7 @@ document.addEventListener('DOMContentLoaded', function() {
     particle.style.left = Math.random() * 100 + '%';
     particle.style.animationDelay = Math.random() * 8 + 's';
     document.querySelector('.ai-particles').appendChild(particle);
-    
+
     // Remover partícula después de la animación
     setTimeout(() => {
       if (particle.parentNode) {
@@ -568,7 +569,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }, 8000);
   }, 4000);
-  
+
   // Efectos de hover en la tabla
   const tableRows = document.querySelectorAll('.ai-table tbody tr');
   tableRows.forEach(row => {
@@ -576,38 +577,38 @@ document.addEventListener('DOMContentLoaded', function() {
       this.style.transform = 'scale(1.01)';
       this.style.boxShadow = '0 0 30px rgba(0, 255, 255, 0.3)';
     });
-    
+
     row.addEventListener('mouseleave', function() {
       this.style.transform = 'scale(1)';
       this.style.boxShadow = 'none';
     });
   });
-  
+
   // SISTEMA DE BÚSQUEDA EN TIEMPO REAL
   const searchInput = document.getElementById('searchInput');
   let searchTimeout;
-  
+
   if (searchInput) {
     console.log('✅ Campo de búsqueda detectado e inicializado');
-    
+
     // Efectos visuales del campo de búsqueda
     searchInput.addEventListener('focus', function() {
       this.style.transform = 'scale(1.02)';
       this.style.boxShadow = '0 0 40px rgba(0, 255, 255, 0.6)';
       this.style.borderColor = '#00ff88';
     });
-    
+
     searchInput.addEventListener('blur', function() {
       this.style.transform = 'scale(1)';
       this.style.boxShadow = '0 0 20px rgba(0, 255, 255, 0.3)';
       this.style.borderColor = '#00ffff';
     });
-    
+
     // Búsqueda en tiempo real
     searchInput.addEventListener('input', function() {
       clearTimeout(searchTimeout);
       const query = this.value.trim();
-      
+
       // Mostrar indicador de escritura
       const searchStatus = document.getElementById('searchStatus');
       if (query.length > 0) {
@@ -621,7 +622,7 @@ document.addEventListener('DOMContentLoaded', function() {
         this.style.borderColor = '#00ffff';
         this.style.boxShadow = '0 0 20px rgba(0, 255, 255, 0.3)';
       }
-      
+
       // Solo buscar si hay al menos 3 caracteres o si se borró todo
       if (query.length >= 3 || query.length === 0) {
         // Debounce para evitar demasiadas peticiones
@@ -651,15 +652,15 @@ document.addEventListener('DOMContentLoaded', function() {
   } else {
     console.error('❌ Campo de búsqueda no encontrado');
   }
-  
+
   // FUNCIÓN DE BÚSQUEDA EN TIEMPO REAL
   function performRealTimeSearch(query) {
     const currentUrl = new URL(window.location);
     currentUrl.searchParams.set('q', query);
-    
+
     // Mostrar indicador de carga
     showSearchLoading();
-    
+
     // Realizar búsqueda AJAX
     fetch(currentUrl.toString(), {
       method: 'GET',
@@ -677,19 +678,19 @@ document.addEventListener('DOMContentLoaded', function() {
       // Parsear la respuesta HTML
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, 'text/html');
-      
+
       // Actualizar tabla de repuestos
       const newTableBody = doc.querySelector('.ai-table tbody');
       const currentTableBody = document.querySelector('.ai-table tbody');
-      
+
       if (newTableBody && currentTableBody) {
         currentTableBody.innerHTML = newTableBody.innerHTML;
       }
-      
+
       // Actualizar resumen de búsqueda
       const newSearchSummary = doc.querySelector('[style*="text-cyan-300"]');
       const currentSearchContainer = document.querySelector('.ai-search-panel');
-      
+
       if (newSearchSummary && currentSearchContainer) {
         // Buscar si ya existe un resumen y reemplazarlo
         const existingSummary = currentSearchContainer.querySelector('[style*="text-cyan-300"]');
@@ -698,18 +699,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         currentSearchContainer.appendChild(newSearchSummary);
       }
-      
+
       // Actualizar paginación
       const newPagination = doc.querySelector('.ai-pagination');
       const currentPagination = document.querySelector('.ai-pagination');
-      
+
       if (newPagination && currentPagination) {
         currentPagination.innerHTML = newPagination.innerHTML;
       }
-      
+
       // Ocultar indicador de carga
       hideSearchLoading();
-      
+
       // Actualizar estado de búsqueda
       const searchStatus = document.getElementById('searchStatus');
       if (searchStatus) {
@@ -721,14 +722,14 @@ document.addEventListener('DOMContentLoaded', function() {
           searchStatus.textContent = '✅ Todos los repuestos mostrados';
           searchStatus.style.color = '#00ff88';
         }
-        
+
         // Limpiar estado después de 3 segundos
         setTimeout(() => {
           searchStatus.textContent = '🚀 Búsqueda en tiempo real activa';
           searchStatus.style.color = '#00ff88';
         }, 3000);
       }
-      
+
       // Re-aplicar efectos de hover a las nuevas filas
       const newTableRows = document.querySelectorAll('.ai-table tbody tr');
       newTableRows.forEach(row => {
@@ -736,23 +737,23 @@ document.addEventListener('DOMContentLoaded', function() {
           this.style.transform = 'scale(1.01)';
           this.style.boxShadow = '0 0 30px rgba(0, 255, 255, 0.3)';
         });
-        
+
         row.addEventListener('mouseleave', function() {
           this.style.transform = 'scale(1)';
           this.style.boxShadow = 'none';
         });
       });
-      
+
       // Actualizar URL sin recargar la página
       window.history.pushState({}, '', currentUrl.toString());
-      
+
       // Log de éxito
       console.log(`🔍 Búsqueda completada para: "${query}"`);
     })
     .catch(error => {
       console.error('❌ Error en búsqueda:', error);
       hideSearchLoading();
-      
+
       // Mostrar error en el estado
       const searchStatus = document.getElementById('searchStatus');
       if (searchStatus) {
@@ -765,12 +766,12 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
-  
+
   // FUNCIÓN PARA MOSTRAR INDICADOR DE CARGA
   function showSearchLoading() {
     const searchPanel = document.querySelector('.ai-search-panel');
     let loadingDiv = searchPanel.querySelector('.search-loading');
-    
+
     if (!loadingDiv) {
       loadingDiv = document.createElement('div');
       loadingDiv.className = 'search-loading';
@@ -787,11 +788,11 @@ document.addEventListener('DOMContentLoaded', function() {
       `;
       searchPanel.appendChild(loadingDiv);
     }
-    
+
     loadingDiv.style.display = 'block';
     console.log('🔄 Mostrando indicador de carga...');
   }
-  
+
   // FUNCIÓN PARA OCULTAR INDICADOR DE CARGA
   function hideSearchLoading() {
     const loadingDiv = document.querySelector('.search-loading');

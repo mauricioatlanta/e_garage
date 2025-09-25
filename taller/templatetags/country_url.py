@@ -1,77 +1,63 @@
 from django import template
-from django.urls import NoReverseMatch, reverse
+from django.urls import reverse
 
 register = template.Library()
 
 
-@register.simple_tag(takes_context=True)
-def country_url(context, url_name, *args, **kwargs):
+def _country_ns_from_path(path: str) -> str:
     """
-    Genera URLs con namespace específico del país
-    Uso: {% country_url 'nombre_url' app_namespace='app' %}
+    Devuelve 'usa' o 'chile' según el prefijo de la ruta actual
+    """
+    if path.startswith("/us/") or path == "/us":
+        return "usa"
+    return "chile"
+
+
+@register.simple_tag(takes_context=True)
+def country_url(context, view_path, *args, app_namespace="taller", **kwargs):
+    """
+    Construye una URL namespaced con el país actual.
+
+    Ejemplos de uso:
+      {% country_url 'clientes:lista_clientes' as url_clientes %}
+      {% country_url 'documentos:lista_documentos' app_namespace='taller' %}
+      {% country_url 'company_settings' %}
+      {% country_url 'vehiculos:lista_vehiculos' %}
+      {% country_url 'clientes:ver_cliente' cliente.pk %}
     """
     request = context.get("request")
     if not request:
-        return ""
-
-    # Extraer app_namespace de los kwargs
-    app_namespace = kwargs.pop("app_namespace", None)
-
-    path = request.path
-    # Detecta prefijo de país
-    if path.startswith("/cl/"):
+        # Fallback conservador a chile
         country_ns = "chile"
-    elif path.startswith("/us/"):
-        country_ns = "usa"
     else:
-        country_ns = None
+        country_ns = _country_ns_from_path(request.path or "/")
 
-    # Manejar namespaces específicos por país
-    if country_ns and app_namespace:
-        # Mapeo especial para vehículos
-        if app_namespace == "vehiculos":
-            if country_ns == "usa":
-                app_namespace = "vehiculos_usa"
-            # Chile mantiene 'vehiculos'
-
-        # Mapeo especial para reportes
-        if app_namespace == "reportes":
-            if country_ns == "chile":
-                app_namespace = "reportes_cl"
-            elif country_ns == "usa":
-                app_namespace = "reportes_us"
-
-        # Mapeo especial para documentos
-        if app_namespace == "documentos":
-            if country_ns == "chile":
-                app_namespace = "documentos_cl_es"
-            elif country_ns == "usa":
-                app_namespace = "documentos_us_en"
-
-        # Mapeo especial para taller - en USA las URLs de taller están directamente bajo el namespace usa
-        if app_namespace == "taller" and country_ns == "usa":
-            full_url_name = f"{country_ns}:{url_name}"
+    # view_path puede ser "clientes:lista_clientes" o "lista_clientes"
+    if ":" in view_path:
+        # Si ya tiene namespace (ej: vehiculos:lista_vehiculos), agregar el país y taller
+        full_name = f"{country_ns}:{app_namespace}:{view_path}"
+    else:
+        # Sin subnamespace
+        if app_namespace == "direct":
+            # Para URLs definidas directamente en el namespace del país (ej: usa:futuristic_company_settings)
+            full_name = f"{country_ns}:{view_path}"
         else:
-            full_url_name = f"{country_ns}:{app_namespace}:{url_name}"
-    elif country_ns:
-        full_url_name = f"{country_ns}:{url_name}"
-    elif app_namespace:
-        full_url_name = f"{app_namespace}:{url_name}"
-    else:
-        full_url_name = url_name
+            # URLs definidas en sub-namespaces (ej: usa:taller:company_settings)
+            full_name = f"{country_ns}:{app_namespace}:{view_path}"
 
-    # Intentar resolver la URL
-    try:
-        return reverse(full_url_name, args=args, kwargs=kwargs)
-    except NoReverseMatch:
-        # Fallback: intentar sin namespace de país
-        if app_namespace:
-            try:
-                return reverse(f"{app_namespace}:{url_name}", args=args, kwargs=kwargs)
-            except NoReverseMatch:
-                pass
-        # Último fallback: URL básica
-        try:
-            return reverse(url_name, args=args, kwargs=kwargs)
-        except NoReverseMatch:
-            return ""
+    # Convertir args de tuple a lista para evitar problemas con reverse
+    args_list = list(args) if args else []
+
+    return reverse(full_name, args=args_list, kwargs=kwargs)
+
+
+@register.simple_tag(takes_context=True)
+def country_url_direct(context, view_path, *args, app_namespace="taller", **kwargs):
+    """
+    Versión directa que retorna la URL sin usar 'as' variable.
+    Útil para casos donde necesitas la URL directamente en el template.
+
+    Ejemplo:
+      <a href="{% country_url_direct 'clientes:lista_clientes' %}">Clientes</a>
+    """
+    return country_url(context, view_path, app_namespace, *args, **kwargs)

@@ -3843,7 +3843,7 @@
     "model": "taller.modelo",
     "pk": 481,
     "fields": {
-      "nombre": "H6 Coupé",
+      "nombre": "H6 Coup\u00e9",
       "marca": 36
     }
   },
@@ -5131,7 +5131,7 @@
     "model": "taller.modelo",
     "pk": 642,
     "fields": {
-      "nombre": "Huracán",
+      "nombre": "Hurac\u00e1n",
       "marca": 52
     }
   },
@@ -5147,7 +5147,7 @@
     "model": "taller.modelo",
     "pk": 644,
     "fields": {
-      "nombre": "Murciélago",
+      "nombre": "Murci\u00e9lago",
       "marca": 52
     }
   },
@@ -5155,7 +5155,7 @@
     "model": "taller.modelo",
     "pk": 645,
     "fields": {
-      "nombre": "Reventón",
+      "nombre": "Revent\u00f3n",
       "marca": 52
     }
   },

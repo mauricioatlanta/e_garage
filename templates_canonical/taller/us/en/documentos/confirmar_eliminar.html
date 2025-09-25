@@ -16,7 +16,7 @@
             <h2 class="text-2xl font-bold mb-4 text-red-600">
                 {% trans "Confirmar Eliminación" %}
             </h2>
-            
+
             <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded">
                 <p class="text-red-800">
                     {% trans "¿Estás seguro de que quieres eliminar este documento?" %}
@@ -30,15 +30,15 @@
                 </p>
                 {% endif %}
             </div>
-            
+
             <form method="post" class="space-y-4">
                 {% csrf_token %}
                 <div class="flex space-x-4">
-                    <button type="submit" 
+                    <button type="submit"
                             class="flex-1 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
                         {% trans "Sí, eliminar" %}
                     </button>
-                    <a href="{% url 'documentos:lista_documentos' %}" 
+                    <a href="{% url 'documentos:lista_documentos' %}"
                        class="flex-1 bg-gray-300 text-gray-800 px-4 py-2 rounded text-center hover:bg-gray-400">
                         {% trans "Cancelar" %}
                     </a>

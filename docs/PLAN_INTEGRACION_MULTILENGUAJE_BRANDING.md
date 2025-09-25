@@ -28,21 +28,21 @@ def unified_branding_multilang_context(request):
     - Contexto de país/idioma del usuario actual
     - Defaults inteligentes por país
     """
-    
+
     # 1. Detectar país/idioma del usuario
     current_country = get_country_from_request(request)
     current_language = get_language_from_request(request)
-    
+
     # 2. Identificar suscriptor (empresa dueña del sistema)
     subscriber_user = get_subscriber_user(request)
-    
+
     # 3. Cache key único por suscriptor + país + idioma
     cache_key = f'unified_context_{subscriber_user.id if subscriber_user else "default"}_{current_country}_{current_language}'
-    
+
     cached_context = cache.get(cache_key)
     if cached_context:
         return cached_context
-    
+
     # 4. Construir contexto base multilenguaje
     context = {
         # Contexto país/idioma
@@ -52,68 +52,68 @@ def unified_branding_multilang_context(request):
         'country_flag': get_country_flag(current_country),
         'language_name': get_language_display_name(current_language),
         'country_name': get_country_display_name(current_country),
-        
+
         # URLs localizadas
         'country_url_prefix': f'/{current_country.lower()}',
         'switch_country_urls': get_country_switch_urls(request),
-        
+
         # Configuración regional
         'currency_symbol': get_currency_for_country(current_country),
         'date_format': get_date_format_for_country(current_country),
         'number_format': get_number_format_for_country(current_country),
     }
-    
+
     # 5. Agregar branding personalizado del suscriptor
     if subscriber_user:
         try:
             company_settings = CompanySettings.objects.get(user=subscriber_user)
-            
+
             # Branding visual personalizado
             context.update({
                 'company_name': company_settings.get_localized_company_name(current_language),
                 'company_tagline': company_settings.get_localized_tagline(current_language),
                 'company_logo': company_settings.get_logo_url(),
                 'company_favicon': company_settings.get_favicon_url(),
-                
+
                 # Paleta de colores personalizada
                 'primary_color': company_settings.primary_color,
                 'secondary_color': company_settings.secondary_color,
                 'accent_color': company_settings.accent_color,
                 'background_color': company_settings.background_color,
                 'text_color': company_settings.text_color,
-                
+
                 # Tipografía personalizada
                 'font_family': company_settings.get_font_family(),
                 'font_size_base': company_settings.font_size_base,
                 'font_weight': company_settings.font_weight,
-                
+
                 # Estilo visual
                 'border_radius': company_settings.border_radius,
                 'shadow_style': company_settings.shadow_style,
                 'layout_style': company_settings.layout_style,
-                
+
                 # Información de contacto localizada
                 'company_address': company_settings.get_localized_address(current_country),
                 'company_phone': company_settings.get_localized_phone(current_country),
                 'company_email': company_settings.email,
                 'company_website': company_settings.website,
-                
+
                 # Configuración de documentos
                 'document_header_style': company_settings.document_header_style,
                 'invoice_prefix': company_settings.get_localized_prefix('invoice', current_country),
                 'quote_prefix': company_settings.get_localized_prefix('quote', current_country),
                 'work_order_prefix': company_settings.get_localized_prefix('work_order', current_country),
-                
+
                 # Flags de personalización
                 'has_custom_branding': True,
                 'branding_tier': company_settings.get_branding_tier(),
                 'customization_level': company_settings.get_customization_level(),
             })
-            
+
             # CSS Variables dinámicas
             context['css_variables'] = company_settings.get_css_variables()
             context['custom_css'] = company_settings.get_custom_css()
-            
+
         except CompanySettings.DoesNotExist:
             # Fallback a branding por defecto del país
             context.update(get_default_branding_for_country(current_country))
@@ -122,7 +122,7 @@ def unified_branding_multilang_context(request):
         # Usuario no asociado a suscriptor - branding por defecto
         context.update(get_default_branding_for_country(current_country))
         context['has_custom_branding'] = False
-    
+
     # 6. Configuración de la aplicación
     context.update({
         'app_version': settings.APP_VERSION,
@@ -130,7 +130,7 @@ def unified_branding_multilang_context(request):
         'help_url': get_help_url_for_language(current_language),
         'terms_url': get_terms_url_for_country(current_country),
     })
-    
+
     # Cache por 10 minutos
     cache.set(cache_key, context, 600)
     return context
@@ -142,30 +142,30 @@ def get_subscriber_user(request):
     """
     if not request.user.is_authenticated:
         return None
-    
+
     # Si es superuser, no tiene branding personalizado
     if request.user.is_superuser:
         return None
-    
+
     # Lógica para identificar el suscriptor:
     # 1. Si el usuario tiene CompanySettings, es el suscriptor
     if hasattr(request.user, 'companysettings'):
         return request.user
-    
+
     # 2. Si es empleado, buscar el propietario del workspace
     if hasattr(request.user, 'employee_profile'):
         return request.user.employee_profile.company_owner
-    
+
     # 3. Si pertenece a un grupo específico, buscar el admin del grupo
     # (implementar según tu lógica de grupos/organizaciones)
-    
+
     return request.user  # Default: el mismo usuario
 
 def get_country_switch_urls(request):
     """Genera URLs para cambiar de país manteniendo la página actual"""
     current_path = request.path
     available_countries = get_available_countries()
-    
+
     urls = {}
     for country in available_countries:
         # Reemplazar prefijo de país en URL
@@ -175,7 +175,7 @@ def get_country_switch_urls(request):
             'name': get_country_display_name(country),
             'flag': get_country_flag(country)
         }
-    
+
     return urls
 ```
 
@@ -185,19 +185,19 @@ def get_country_switch_urls(request):
 # taller/models/company_settings.py - Extensiones multilenguaje
 class CompanySettings(models.Model):
     # ... campos existentes ...
-    
+
     # NUEVOS CAMPOS - Localización multilenguaje
     company_name_es = models.CharField(
-        max_length=100, 
+        max_length=100,
         blank=True,
         help_text="Nombre de la empresa en español"
     )
     company_name_en = models.CharField(
         max_length=100,
-        blank=True, 
+        blank=True,
         help_text="Company name in English"
     )
-    
+
     tagline_es = models.CharField(
         max_length=200,
         blank=True,
@@ -208,7 +208,7 @@ class CompanySettings(models.Model):
         blank=True,
         help_text="Tagline in English"
     )
-    
+
     # Direcciones por país
     address_cl = models.TextField(
         blank=True,
@@ -222,7 +222,7 @@ class CompanySettings(models.Model):
         blank=True,
         help_text="Dirección en México"
     )
-    
+
     # Teléfonos por país
     phone_cl = models.CharField(
         max_length=20,
@@ -239,7 +239,7 @@ class CompanySettings(models.Model):
         blank=True,
         help_text="Teléfono México (+52)"
     )
-    
+
     # Prefijos de documentos por país
     invoice_prefix_cl = models.CharField(
         max_length=10,
@@ -251,7 +251,7 @@ class CompanySettings(models.Model):
         default='INV',
         help_text="Invoice prefix USA"
     )
-    
+
     quote_prefix_cl = models.CharField(
         max_length=10,
         default='C',
@@ -262,7 +262,7 @@ class CompanySettings(models.Model):
         default='QTE',
         help_text="Quote prefix USA"
     )
-    
+
     # Métodos de localización
     def get_localized_company_name(self, language):
         """Nombre de empresa localizado"""
@@ -271,7 +271,7 @@ class CompanySettings(models.Model):
         elif language == 'en' and self.company_name_en:
             return self.company_name_en
         return self.company_name  # Fallback
-    
+
     def get_localized_tagline(self, language):
         """Eslogan localizado"""
         if language == 'es' and self.tagline_es:
@@ -279,29 +279,29 @@ class CompanySettings(models.Model):
         elif language == 'en' and self.tagline_en:
             return self.tagline_en
         return self.tagline  # Fallback
-    
+
     def get_localized_address(self, country):
         """Dirección localizada por país"""
         address_field = f'address_{country.lower()}'
         localized_address = getattr(self, address_field, None)
         return localized_address if localized_address else self.address
-    
+
     def get_localized_phone(self, country):
         """Teléfono localizado por país"""
         phone_field = f'phone_{country.lower()}'
         localized_phone = getattr(self, phone_field, None)
         return localized_phone if localized_phone else self.phone
-    
+
     def get_localized_prefix(self, document_type, country):
         """Prefijo de documento localizado"""
         prefix_field = f'{document_type}_prefix_{country.lower()}'
         localized_prefix = getattr(self, prefix_field, None)
         if localized_prefix:
             return localized_prefix
-        
+
         # Fallback a prefijo general
         return getattr(self, f'{document_type}_prefix', 'DOC')
-    
+
     def get_branding_summary(self, country, language):
         """Resumen completo de branding para país/idioma específico"""
         return {
@@ -328,19 +328,19 @@ class CompanySettings(models.Model):
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+
     <!-- Título dinámico con branding -->
     <title>
         {% block title %}{{ company_name }}{% if has_custom_branding %} | {{ company_tagline }}{% endif %}{% endblock %}
     </title>
-    
+
     <!-- Favicon personalizado -->
     {% if company_favicon %}
         <link rel="icon" href="{{ company_favicon }}" type="image/x-icon">
     {% else %}
         <link rel="icon" href="{% url 'static' %}img/favicon-{{ current_country|lower }}.ico">
     {% endif %}
-    
+
     <!-- CSS Variables dinámicas -->
     <style>
         :root {
@@ -350,50 +350,50 @@ class CompanySettings(models.Model):
             --accent-color: {{ accent_color }};
             --background-color: {{ background_color }};
             --text-color: {{ text_color }};
-            
+
             /* Typography */
             --font-family: {{ font_family }};
             --font-size-base: {{ font_size_base }}px;
-            
+
             /* Visual style */
             --border-radius: {{ border_radius }}px;
             --shadow-style: {{ shadow_style }};
-            
+
             /* Country-specific */
             --country-code: "{{ current_country }}";
             --language-code: "{{ current_language }}";
             --currency-symbol: "{{ currency_symbol }}";
         }
-        
+
         {% if has_custom_branding %}
         /* CSS personalizado del suscriptor */
         {{ custom_css|safe }}
         {% endif %}
-        
+
         /* Estilos específicos por país */
         body[data-country="CL"] {
             --accent-secondary: #d32f2f; /* Rojo chileno */
         }
-        
+
         body[data-country="US"] {
             --accent-secondary: #1565c0; /* Azul americano */
         }
     </style>
-    
+
     <!-- Bootstrap y CSS base -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    
+
     <!-- Google Fonts (si se usa tipografía personalizada) -->
     {% if font_family != 'system' %}
         <link href="https://fonts.googleapis.com/css2?family={{ font_family|urlencode }}:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     {% endif %}
-    
+
     {% block extra_css %}{% endblock %}
 </head>
 
 <body data-country="{{ current_country }}" data-language="{{ current_language }}" {% if has_custom_branding %}data-custom-branding="true"{% endif %}>
-    
+
     <!-- Header con branding personalizado -->
     <header class="main-header">
         <nav class="navbar navbar-expand-lg">
@@ -408,7 +408,7 @@ class CompanySettings(models.Model):
                         <small class="brand-tagline d-none d-md-inline">{{ company_tagline }}</small>
                     {% endif %}
                 </a>
-                
+
                 <!-- Selector de país/idioma -->
                 <div class="country-language-selector">
                     <div class="dropdown">
@@ -428,11 +428,11 @@ class CompanySettings(models.Model):
                         </ul>
                     </div>
                 </div>
-                
+
                 <!-- Navegación principal -->
                 <div class="navbar-nav ms-auto">
                     <a class="nav-link" href="{{ country_url_prefix }}/dashboard/">
-                        <i class="fas fa-tachometer-alt"></i> 
+                        <i class="fas fa-tachometer-alt"></i>
                         {% if current_language == 'es' %}Dashboard{% else %}Dashboard{% endif %}
                     </a>
                     <a class="nav-link" href="{{ country_url_prefix }}/clients/">
@@ -443,7 +443,7 @@ class CompanySettings(models.Model):
                         <i class="fas fa-wrench"></i>
                         {% if current_language == 'es' %}Servicios{% else %}Services{% endif %}
                     </a>
-                    
+
                     <!-- Settings (solo para suscriptores) -->
                     {% if has_custom_branding and user.companysettings %}
                         <a class="nav-link" href="{{ country_url_prefix }}/settings/">
@@ -455,12 +455,12 @@ class CompanySettings(models.Model):
             </div>
         </nav>
     </header>
-    
+
     <!-- Contenido principal -->
     <main class="main-content">
         {% block content %}{% endblock %}
     </main>
-    
+
     <!-- Footer con información localizada -->
     <footer class="main-footer">
         <div class="container">
@@ -511,10 +511,10 @@ class CompanySettings(models.Model):
             </div>
         </div>
     </footer>
-    
+
     <!-- JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     <!-- Context JavaScript global -->
     <script>
         window.eGarageContext = {
@@ -530,7 +530,7 @@ class CompanySettings(models.Model):
             }
         };
     </script>
-    
+
     {% block extra_js %}{% endblock %}
 </body>
 </html>
@@ -548,18 +548,18 @@ from taller.views import home_redirect
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    
+
     # Redirect root to default country
     path('', home_redirect, name='home_redirect'),
-    
+
     # Country-specific URLs
     path('cl/', include('taller.urls.chile')),  # Chile (español)
     path('us/', include('taller.urls.usa')),    # USA (inglés)
     path('mx/', include('taller.urls.mexico')), # México (español)
-    
+
     # API global (sin país específico)
     path('api/', include('taller.api.urls')),
-    
+
     # Settings global para suscriptores
     path('settings/', include('taller.urls.settings')),
 ]

@@ -50,13 +50,13 @@ Los cambios se aplicaron a todos los templates AI:
 ```html
 <!-- Action Buttons -->
 <div style="display: flex; gap: 8px; margin-top: 15px;">
-  <a href="{% url 'taller:vehiculos:ver_vehiculo' vehiculo.id %}" 
-     class="ai-action-btn" 
+  <a href="{% url 'taller:vehiculos:ver_vehiculo' vehiculo.id %}"
+     class="ai-action-btn"
      style="flex: 1; text-align: center; text-decoration: none; font-size: 0.8rem; padding: 8px 12px;">
     👁️ VER
   </a>
-  <a href="{% url 'taller:vehiculos:editar_vehiculo' vehiculo.id %}" 
-     class="ai-action-btn" 
+  <a href="{% url 'taller:vehiculos:editar_vehiculo' vehiculo.id %}"
+     class="ai-action-btn"
      style="flex: 1; text-align: center; text-decoration: none; font-size: 0.8rem; padding: 8px 12px;">
     ✏️ EDITAR
   </a>
@@ -92,7 +92,7 @@ urlpatterns = [
 ```
 
 ---
-**Estado**: ✅ **RESUELTO**  
-**Fecha**: 3 de septiembre de 2025  
-**Tiempo de Resolución**: ~15 minutos  
+**Estado**: ✅ **RESUELTO**
+**Fecha**: 3 de septiembre de 2025
+**Tiempo de Resolución**: ~15 minutos
 **Impacto**: Error crítico que impedía el acceso a la lista de vehículos

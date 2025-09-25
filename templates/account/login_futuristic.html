@@ -14,14 +14,14 @@ document.addEventListener("DOMContentLoaded", () => {
     background: { color: { value: "transparent" } },
     particles: {
       number: { value: 120 },
-      color: { 
-        value: ["#00ff88", "#00d4ff", "#8844ff", "#ff4488", "#ffaa00"] 
+      color: {
+        value: ["#00ff88", "#00d4ff", "#8844ff", "#ff4488", "#ffaa00"]
       },
       shape: {
         type: ["circle", "triangle", "polygon"],
         polygon: { sides: 6 }
       },
-      size: { 
+      size: {
         value: { min: 0.5, max: 3 },
         animation: {
           enable: true,
@@ -29,8 +29,8 @@ document.addEventListener("DOMContentLoaded", () => {
           minimumValue: 0.3
         }
       },
-      move: { 
-        enable: true, 
+      move: {
+        enable: true,
         speed: { min: 0.1, max: 1.5 },
         direction: "none",
         outModes: { default: "bounce" }
@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const scanlines = document.createElement('div');
   scanlines.className = 'cyberpunk-scanlines';
   document.body.appendChild(scanlines);
-  
+
   // Efecto de glitch en el logo
   setInterval(() => {
     const logo = document.querySelector('.egarage-logo');
@@ -85,38 +85,38 @@ document.addEventListener("DOMContentLoaded", () => {
   canvas.className = 'matrix-canvas';
   document.body.appendChild(canvas);
   const ctx = canvas.getContext('2d');
-  
+
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
-  
+
   const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890@#$%^&*()';
   const lettersArray = letters.split('');
   const fontSize = 14;
   const columns = canvas.width / fontSize;
   const drops = [];
-  
+
   for(let x = 0; x < columns; x++) {
     drops[x] = 1;
   }
-  
+
   function drawMatrix() {
     ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
+
     ctx.fillStyle = '#00ff88';
     ctx.font = fontSize + 'px monospace';
-    
+
     for(let i = 0; i < drops.length; i++) {
       const text = lettersArray[Math.floor(Math.random() * lettersArray.length)];
       ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-      
+
       if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
         drops[i] = 0;
       }
       drops[i]++;
     }
   }
-  
+
   setInterval(drawMatrix, 50);
 });
 </script>
@@ -132,7 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
   <!-- Holographic Frame Container -->
   <div class="holographic-frame">
     <div class="hologram-card">
-      
+
       <!-- Logo eGarage como obra de arte futurista -->
       <div class="logo-masterpiece">
         <div class="logo-hologram">
@@ -146,7 +146,7 @@ document.addEventListener("DOMContentLoaded", () => {
               <div class="ring ring-3"></div>
             </div>
           </div>
-          
+
           <!-- Texto eGarage con efectos matrix -->
           <div class="logo-text-container">
             <h1 class="egarage-title">
@@ -157,7 +157,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="subtitle-tech">AUTOMOTIVE AI PLATFORM</div>
             <div class="version-badge">v2.0 QUANTUM</div>
           </div>
-          
+
           <!-- Bandera holográfica según el país -->
           <div class="country-hologram">
             {% if request.current_country == 'chile' %}
@@ -188,7 +188,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <form class="cyber-form" method="POST">
         {% csrf_token %}
         {{ form.non_field_errors }}
-        
+
         <!-- Neural Input Fields -->
         <div class="neural-field-group">
           <!-- Campo de Usuario/Email -->
@@ -208,7 +208,7 @@ document.addEventListener("DOMContentLoaded", () => {
               </div>
             {% endif %}
           </div>
-          
+
           <!-- Campo de Contraseña -->
           <div class="neural-field">
             <label class="neural-label" for="id_password">
@@ -226,7 +226,7 @@ document.addEventListener("DOMContentLoaded", () => {
               </div>
             {% endif %}
           </div>
-          
+
           <!-- Campo Remember Me -->
           {% if form.remember %}
           <div class="neural-checkbox">
@@ -262,7 +262,7 @@ document.addEventListener("DOMContentLoaded", () => {
           {% trans "CREATE NEW NEURAL ID" %}
         </a>
       </div>
-      
+
       <!-- Botones de idioma para USA -->
       {% if '/us/' in request.path %}
       <div class="language-matrix">
@@ -270,7 +270,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <a href="?lang=en" class="lang-chip eng-chip">🇺🇸 ENG</a>
       </div>
       {% endif %}
-      
+
       <!-- Créditos futuristas -->
       <div class="neural-credits">
         <div class="credits-header">POWERED BY</div>
@@ -305,7 +305,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: 
+    background:
         radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
         radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
         radial-gradient(circle at 40% 40%, rgba(120, 255, 198, 0.2) 0%, transparent 50%),
@@ -330,7 +330,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: 
+    background:
         repeating-linear-gradient(
             0deg,
             transparent,
@@ -366,9 +366,9 @@ body {
 }
 
 .hologram-card {
-    background: 
-        linear-gradient(135deg, 
-            rgba(0, 255, 136, 0.1) 0%, 
+    background:
+        linear-gradient(135deg,
+            rgba(0, 255, 136, 0.1) 0%,
             rgba(0, 212, 255, 0.05) 25%,
             rgba(136, 68, 255, 0.05) 50%,
             rgba(255, 68, 136, 0.05) 75%,
@@ -380,7 +380,7 @@ body {
     width: 100%;
     max-width: 480px;
     backdrop-filter: blur(20px) saturate(150%);
-    box-shadow: 
+    box-shadow:
         0 0 50px rgba(0, 255, 136, 0.3),
         inset 0 0 50px rgba(0, 255, 136, 0.05),
         0 0 100px rgba(0, 212, 255, 0.2);
@@ -401,9 +401,9 @@ body {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, 
-        transparent, 
-        rgba(0, 255, 136, 0.2), 
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(0, 255, 136, 0.2),
         transparent
     );
     animation: hologram-sweep 4s infinite;
@@ -438,12 +438,12 @@ body {
     border-radius: 50%;
     border: 3px solid rgba(0, 255, 136, 0.8);
     padding: 10px;
-    background: 
-        radial-gradient(circle, 
-            rgba(0, 255, 136, 0.1) 0%, 
+    background:
+        radial-gradient(circle,
+            rgba(0, 255, 136, 0.1) 0%,
             rgba(0, 0, 0, 0.8) 70%
         );
-    filter: 
+    filter:
         drop-shadow(0 0 20px rgba(0, 255, 136, 0.8))
         drop-shadow(0 0 40px rgba(0, 212, 255, 0.4));
     animation: logo-pulse 3s ease-in-out infinite;
@@ -452,19 +452,19 @@ body {
 
 .egarage-logo:hover {
     transform: scale(1.1);
-    filter: 
+    filter:
         drop-shadow(0 0 30px rgba(0, 255, 136, 1))
         drop-shadow(0 0 60px rgba(0, 212, 255, 0.6));
 }
 
 @keyframes logo-pulse {
-    0%, 100% { 
-        box-shadow: 
+    0%, 100% {
+        box-shadow:
             0 0 20px rgba(0, 255, 136, 0.8),
             0 0 40px rgba(0, 212, 255, 0.4);
     }
-    50% { 
-        box-shadow: 
+    50% {
+        box-shadow:
             0 0 40px rgba(0, 255, 136, 1),
             0 0 80px rgba(0, 212, 255, 0.6);
     }
@@ -477,9 +477,9 @@ body {
     right: -20px;
     bottom: -20px;
     border-radius: 50%;
-    background: 
-        radial-gradient(circle, 
-            rgba(0, 255, 136, 0.2) 0%, 
+    background:
+        radial-gradient(circle,
+            rgba(0, 255, 136, 0.2) 0%,
             transparent 70%
         );
     animation: aura-pulse 4s ease-in-out infinite;
@@ -564,10 +564,10 @@ body {
     font-family: 'Courier New', monospace;
     letter-spacing: 8px;
     margin: 0;
-    background: linear-gradient(45deg, 
-        #00ff88, 
-        #00d4ff, 
-        #8844ff, 
+    background: linear-gradient(45deg,
+        #00ff88,
+        #00d4ff,
+        #8844ff,
         #ff4488
     );
     background-size: 400% 400%;
@@ -765,7 +765,7 @@ body {
 
 .neural-input:focus {
     border-color: #00ff88 !important;
-    box-shadow: 
+    box-shadow:
         inset 0 0 20px rgba(0, 255, 136, 0.2),
         0 0 20px rgba(0, 255, 136, 0.5) !important;
     outline: none !important;
@@ -859,8 +859,8 @@ body {
 /* Botón de acceso neural */
 .neural-access-btn {
     width: 100%;
-    background: linear-gradient(45deg, 
-        rgba(0, 255, 136, 0.1), 
+    background: linear-gradient(45deg,
+        rgba(0, 255, 136, 0.1),
         rgba(0, 212, 255, 0.1)
     );
     border: 2px solid #00ff88;
@@ -880,11 +880,11 @@ body {
 }
 
 .neural-access-btn:hover {
-    background: linear-gradient(45deg, 
-        rgba(0, 255, 136, 0.2), 
+    background: linear-gradient(45deg,
+        rgba(0, 255, 136, 0.2),
         rgba(0, 212, 255, 0.2)
     );
-    box-shadow: 
+    box-shadow:
         0 0 30px rgba(0, 255, 136, 0.5),
         inset 0 0 30px rgba(0, 255, 136, 0.1);
     transform: translateY(-2px);
@@ -901,9 +901,9 @@ body {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, 
-        transparent, 
-        rgba(0, 255, 136, 0.3), 
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(0, 255, 136, 0.3),
         transparent
     );
     animation: btn-scan 3s infinite;
@@ -920,7 +920,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: 
+    background:
         radial-gradient(circle at 20% 20%, rgba(0, 255, 136, 0.3) 0%, transparent 50%),
         radial-gradient(circle at 80% 80%, rgba(0, 212, 255, 0.3) 0%, transparent 50%);
     opacity: 0;
@@ -1080,21 +1080,21 @@ body {
         padding: 2rem;
         margin: 1rem;
     }
-    
+
     .egarage-logo {
         width: 100px;
         height: 100px;
     }
-    
+
     .egarage-title {
         font-size: 2rem;
         letter-spacing: 4px;
     }
-    
+
     .neural-access-btn {
         font-size: 1rem;
     }
-    
+
     .credits-links {
         flex-direction: column;
     }

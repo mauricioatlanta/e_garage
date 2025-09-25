@@ -46,7 +46,7 @@
   position: absolute;
   width: 100%;
   height: 100%;
-  background-image: 
+  background-image:
     radial-gradient(2px 2px at 20px 30px, #eee, transparent),
     radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
     radial-gradient(1px 1px at 90px 40px, #fff, transparent),
@@ -61,7 +61,7 @@
   position: absolute;
   width: 100%;
   height: 100%;
-  background-image: 
+  background-image:
     radial-gradient(1px 1px at 25px 5px, white, transparent),
     radial-gradient(1px 1px at 50px 25px, white, transparent),
     radial-gradient(1px 1px at 125px 20px, white, transparent),
@@ -75,7 +75,7 @@
   position: absolute;
   width: 100%;
   height: 100%;
-  background-image: 
+  background-image:
     radial-gradient(20px 20px at 50px 50px, rgba(255,255,255,0.1), transparent),
     radial-gradient(15px 15px at 150px 30px, rgba(255,255,255,0.1), transparent),
     radial-gradient(25px 25px at 250px 70px, rgba(255,255,255,0.1), transparent);
@@ -138,9 +138,9 @@
   position: absolute;
   inset: -1px;
   border-radius: 0.5rem;
-  background: linear-gradient(45deg, 
-    rgba(34, 211, 238, 0.2), 
-    rgba(236, 72, 153, 0.2), 
+  background: linear-gradient(45deg,
+    rgba(34, 211, 238, 0.2),
+    rgba(236, 72, 153, 0.2),
     rgba(132, 204, 22, 0.2));
   opacity: 0;
   transition: opacity 0.3s ease;
@@ -157,8 +157,8 @@
   padding: 0.5rem 1rem;
   border-radius: 0.5rem;
   border: 1px solid rgba(34, 211, 238, 0.4);
-  background: linear-gradient(45deg, 
-    rgba(34, 211, 238, 0.2), 
+  background: linear-gradient(45deg,
+    rgba(34, 211, 238, 0.2),
     rgba(59, 130, 246, 0.2));
   color: rgb(34, 211, 238);
   font-weight: 600;
@@ -173,8 +173,8 @@
 }
 
 .futuristic-btn:hover {
-  background: linear-gradient(45deg, 
-    rgba(34, 211, 238, 0.3), 
+  background: linear-gradient(45deg,
+    rgba(34, 211, 238, 0.3),
     rgba(59, 130, 246, 0.3));
   border-color: rgba(34, 211, 238, 0.6);
   color: rgb(34, 211, 238);
@@ -186,8 +186,8 @@
   position: absolute;
   inset: 0;
   border-radius: 0.5rem;
-  background: linear-gradient(45deg, 
-    rgba(34, 211, 238, 0.2), 
+  background: linear-gradient(45deg,
+    rgba(34, 211, 238, 0.2),
     rgba(59, 130, 246, 0.2));
   opacity: 0;
   transition: opacity 0.2s ease;
@@ -207,9 +207,9 @@
   position: absolute;
   inset: -1px;
   border-radius: 0.75rem;
-  background: linear-gradient(45deg, 
-    rgba(34, 211, 238, 0.2), 
-    rgba(236, 72, 153, 0.2), 
+  background: linear-gradient(45deg,
+    rgba(34, 211, 238, 0.2),
+    rgba(236, 72, 153, 0.2),
     rgba(132, 204, 22, 0.2));
   opacity: 0.2;
   filter: blur(16px);
@@ -240,9 +240,9 @@
   position: absolute;
   inset: -0.5px;
   border-radius: 0.5rem;
-  background: linear-gradient(45deg, 
-    rgba(34, 211, 238, 0.3), 
-    rgba(236, 72, 153, 0.3), 
+  background: linear-gradient(45deg,
+    rgba(34, 211, 238, 0.3),
+    rgba(236, 72, 153, 0.3),
     rgba(132, 204, 22, 0.3));
   opacity: 0.3;
   filter: blur(4px);
@@ -288,8 +288,8 @@
 
 .futuristic-search .search-btn {
   padding: 0.5rem 1rem;
-  background: linear-gradient(45deg, 
-    rgba(34, 211, 238, 0.6), 
+  background: linear-gradient(45deg,
+    rgba(34, 211, 238, 0.6),
     rgba(59, 130, 246, 0.6));
   color: white;
   font-weight: 600;
@@ -299,8 +299,8 @@
 }
 
 .futuristic-search .search-btn:hover {
-  background: linear-gradient(45deg, 
-    rgba(34, 211, 238, 0.8), 
+  background: linear-gradient(45deg,
+    rgba(34, 211, 238, 0.8),
     rgba(59, 130, 246, 0.8));
   box-shadow: 0 2px 8px rgba(34, 211, 238, 0.4);
 }
@@ -339,9 +339,9 @@
   position: absolute;
   inset: -1px;
   border-radius: 0.75rem;
-  background: linear-gradient(45deg, 
-    rgba(34, 211, 238, 0.2), 
-    rgba(236, 72, 153, 0.2), 
+  background: linear-gradient(45deg,
+    rgba(34, 211, 238, 0.2),
+    rgba(236, 72, 153, 0.2),
     rgba(132, 204, 22, 0.2));
   opacity: 0.2;
   filter: blur(16px);
@@ -383,9 +383,9 @@
   position: absolute;
   inset: -1px;
   border-radius: 0.75rem;
-  background: linear-gradient(45deg, 
-    rgba(239, 68, 68, 0.3), 
-    rgba(236, 72, 153, 0.3), 
+  background: linear-gradient(45deg,
+    rgba(239, 68, 68, 0.3),
+    rgba(236, 72, 153, 0.3),
     rgba(239, 68, 68, 0.3));
   opacity: 0.3;
   filter: blur(16px);
@@ -403,9 +403,9 @@
 
 /* ===== UTILIDADES ===== */
 .text-gradient {
-  background: linear-gradient(45deg, 
-    rgb(34, 211, 238), 
-    rgb(236, 72, 153), 
+  background: linear-gradient(45deg,
+    rgb(34, 211, 238),
+    rgb(236, 72, 153),
     rgb(132, 204, 22));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;

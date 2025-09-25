@@ -2,6 +2,7 @@
 """
 Script para limpiar todo el caché relacionado con branding y configuración de empresas
 """
+
 import os
 
 import django

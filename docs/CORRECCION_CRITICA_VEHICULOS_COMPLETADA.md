@@ -1,5 +1,5 @@
-# CORRECCIÓN CRÍTICA MULTI-TENANT VEHICULOS 
-*Fecha: $(date +"%Y-%m-%d %H:%M")*  
+# CORRECCIÓN CRÍTICA MULTI-TENANT VEHICULOS
+*Fecha: $(date +"%Y-%m-%d %H:%M")*
 *Fase: Blindaje completo "crear vehículo"*
 
 ## 🚨 VULNERABILIDADES CRÍTICAS DETECTADAS Y CORREGIDAS
@@ -36,7 +36,7 @@
 
 ### **DESPUÉS (Blindado):**
 - ✅ **100% formularios** con parámetro `user` obligatorio
-- ✅ **0 consultas** sin filtro de empresa detectadas 
+- ✅ **0 consultas** sin filtro de empresa detectadas
 - ✅ **Cache deshabilitado** en autocompletados DAL
 - ✅ **Todas las rutas** de vehículos blindadas
 
@@ -48,7 +48,7 @@ def __init__(self, *args, **kwargs):
     # BLINDAJE MULTI-TENANT: Extraer user y filtrar por empresa
     self.user = kwargs.pop('user', None)
     super().__init__(*args, **kwargs)
-    
+
     if self.user and hasattr(self.user, 'empresa'):
         # Filtrar clientes por empresa del usuario
         self.fields['cliente'].queryset = Cliente.objects.filter(empresa=self.user.empresa)
@@ -91,6 +91,6 @@ python manage.py audit_tenant_isolation
 3. Refresh navegador → verificar cache limpio
 
 ---
-**🛡️ ESTADO: BLINDAJE MULTI-TENANT COMPLETADO** 
+**🛡️ ESTADO: BLINDAJE MULTI-TENANT COMPLETADO**
 **📊 VULNERABILIDADES CORREGIDAS: 15+**
 **🔒 NIVEL DE SEGURIDAD: MÁXIMO**

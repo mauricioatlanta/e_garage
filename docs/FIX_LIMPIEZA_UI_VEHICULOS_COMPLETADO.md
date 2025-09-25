@@ -2,10 +2,10 @@
 
 ## 🔍 Elementos Eliminados
 En `/es/vehiculos/` se eliminó la barra de navegación superior que contenía:
-- E-Garage Logo  
+- E-Garage Logo
 - E-Garage (texto)
 - Inicio usuario
-- Dashboard  
+- Dashboard
 - Mis vehículos
 - Correos
 - mauricio1 (username)

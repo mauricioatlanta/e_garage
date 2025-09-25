@@ -129,7 +129,7 @@ def enviar_documento_whatsapp(request, documento_id):
         )
 
         mensaje = f"""Hola {documento.cliente.nombre}!
-        
+
 Te enviamos tu {documento.tipo_documento.lower()} #{documento.numero_documento} de {documento.empresa.nombre}.
 
 Fecha: {fecha_str}

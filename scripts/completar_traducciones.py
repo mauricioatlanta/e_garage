@@ -3,6 +3,7 @@
 Script para completar traducciones faltantes
 Corrección de la advertencia encontrada en validaciones
 """
+
 import os
 
 import django

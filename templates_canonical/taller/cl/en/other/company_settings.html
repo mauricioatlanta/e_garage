@@ -9,30 +9,30 @@
         max-width: 1200px;
         margin: 0 auto;
     }
-    
+
     .settings-nav {
         background: #f8f9fa;
         border-radius: 10px;
         padding: 20px;
         margin-bottom: 30px;
     }
-    
+
     .settings-nav .nav-link {
         color: #495057;
         font-weight: 500;
         border-radius: 8px;
         transition: all 0.3s ease;
     }
-    
+
     .settings-nav .nav-link.active {
         background: var(--company-primary, #0d6efd);
         color: white;
     }
-    
+
     .settings-nav .nav-link:hover {
         background: rgba(13, 110, 253, 0.1);
     }
-    
+
     .form-section {
         background: white;
         border-radius: 15px;
@@ -40,7 +40,7 @@
         box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         margin-bottom: 30px;
     }
-    
+
     .form-section h4 {
         color: var(--company-primary, #0d6efd);
         margin-bottom: 20px;
@@ -48,7 +48,7 @@
         align-items: center;
         gap: 10px;
     }
-    
+
     .logo-preview {
         max-width: 200px;
         max-height: 100px;
@@ -59,46 +59,46 @@
         transition: all 0.3s ease;
         cursor: pointer;
     }
-    
+
     .logo-preview:hover {
         border-color: var(--company-primary, #0d6efd);
         background: rgba(13, 110, 253, 0.05);
     }
-    
+
     .logo-preview img {
         max-width: 100%;
         max-height: 60px;
         object-fit: contain;
     }
-    
+
     .color-picker-group {
         display: flex;
         gap: 20px;
         align-items: end;
     }
-    
+
     .color-picker-wrapper {
         flex: 1;
     }
-    
+
     .form-control-color {
         width: 100%;
         height: 50px;
         border-radius: 10px;
     }
-    
+
     .preview-section {
         position: sticky;
         top: 100px;
     }
-    
+
     .branding-preview {
         background: white;
         border-radius: 15px;
         padding: 20px;
         box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
-    
+
     .preview-navbar {
         background: #f8f9fa;
         border-radius: 10px;
@@ -108,25 +108,25 @@
         align-items: center;
         gap: 15px;
     }
-    
+
     .preview-logo {
         width: 40px;
         height: 40px;
         object-fit: contain;
     }
-    
+
     .btn-group-custom {
         gap: 10px;
         display: flex;
         flex-wrap: wrap;
     }
-    
+
     .alert-settings {
         border-radius: 10px;
         border: none;
         padding: 20px;
     }
-    
+
     .card-stats {
         background: linear-gradient(135deg, var(--company-primary, #0d6efd), var(--company-secondary, #6c757d));
         color: white;
@@ -134,21 +134,21 @@
         padding: 20px;
         text-align: center;
     }
-    
+
     .stats-icon {
         font-size: 2rem;
         margin-bottom: 10px;
     }
-    
+
     @media (max-width: 768px) {
         .color-picker-group {
             flex-direction: column;
         }
-        
+
         .btn-group-custom {
             flex-direction: column;
         }
-        
+
         .preview-section {
             position: static;
             margin-top: 30px;
@@ -168,7 +168,7 @@
             </h1>
             <p class="text-muted mb-0">Personaliza el branding y datos de tu taller</p>
         </div>
-        
+
         <div class="btn-group-custom">
             <button type="button" class="btn btn-outline-primary" onclick="previewChanges()">
                 <i class="fas fa-eye"></i> Vista Previa
@@ -219,7 +219,7 @@
         <div class="col-lg-8">
             <form method="post" enctype="multipart/form-data" id="settingsForm">
                 {% csrf_token %}
-                
+
                 <div class="tab-content" id="settingsTabsContent">
                     <!-- Branding Tab -->
                     <div class="tab-pane fade show active" id="branding" role="tabpanel">
@@ -228,7 +228,7 @@
                                 <i class="fas fa-image"></i>
                                 Logo y Colores
                             </h4>
-                            
+
                             <div class="row">
                                 <div class="col-md-6">
                                     <label class="form-label">Logo de la Empresa</label>
@@ -247,7 +247,7 @@
                                         <small class="form-text text-muted">{{ form.logo.help_text }}</small>
                                     {% endif %}
                                 </div>
-                                
+
                                 <div class="col-md-6">
                                     <div class="color-picker-group">
                                         <div class="color-picker-wrapper">
@@ -257,7 +257,7 @@
                                                 <small class="form-text text-muted">{{ form.primary_color.help_text }}</small>
                                             {% endif %}
                                         </div>
-                                        
+
                                         <div class="color-picker-wrapper">
                                             <label class="form-label">{{ form.secondary_color.label }}</label>
                                             {{ form.secondary_color }}
@@ -269,13 +269,13 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="form-section">
                             <h4>
                                 <i class="fas fa-tag"></i>
                                 Nombre y Eslogan
                             </h4>
-                            
+
                             <div class="row">
                                 <div class="col-md-8">
                                     <label class="form-label">{{ form.company_name.label }}</label>
@@ -284,7 +284,7 @@
                                         <small class="form-text text-muted">{{ form.company_name.help_text }}</small>
                                     {% endif %}
                                 </div>
-                                
+
                                 <div class="col-md-4">
                                     <label class="form-label">{{ form.tagline.label }}</label>
                                     {{ form.tagline }}
@@ -303,36 +303,36 @@
                                 <i class="fas fa-map-marker-alt"></i>
                                 Datos de Contacto
                             </h4>
-                            
+
                             <div class="row">
                                 <div class="col-md-12 mb-3">
                                     <label class="form-label">{{ form.address.label }}</label>
                                     {{ form.address }}
                                 </div>
-                                
+
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">{{ form.phone.label }}</label>
                                     {{ form.phone }}
                                 </div>
-                                
+
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">{{ form.email.label }}</label>
                                     {{ form.email }}
                                 </div>
-                                
+
                                 <div class="col-md-12 mb-3">
                                     <label class="form-label">{{ form.website.label }}</label>
                                     {{ form.website }}
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="form-section">
                             <h4>
                                 <i class="fas fa-receipt"></i>
                                 Información Fiscal
                             </h4>
-                            
+
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">{{ form.tax_id.label }}</label>
@@ -341,25 +341,25 @@
                                         <small class="form-text text-muted">{{ form.tax_id.help_text }}</small>
                                     {% endif %}
                                 </div>
-                                
+
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">{{ form.business_license.label }}</label>
                                     {{ form.business_license }}
                                 </div>
-                                
+
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">{{ form.currency.label }}</label>
                                     {{ form.currency }}
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="form-section">
                             <h4>
                                 <i class="fas fa-info-circle"></i>
                                 Acerca de Nosotros
                             </h4>
-                            
+
                             <div class="mb-3">
                                 <label class="form-label">{{ form.about_text.label }}</label>
                                 {{ form.about_text }}
@@ -377,7 +377,7 @@
                                 <i class="fas fa-file-invoice"></i>
                                 Prefijos de Documentos
                             </h4>
-                            
+
                             <div class="row">
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">{{ form.invoice_prefix.label }}</label>
@@ -386,7 +386,7 @@
                                         <small class="form-text text-muted">{{ form.invoice_prefix.help_text }}</small>
                                     {% endif %}
                                 </div>
-                                
+
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">{{ form.quote_prefix.label }}</label>
                                     {{ form.quote_prefix }}
@@ -394,7 +394,7 @@
                                         <small class="form-text text-muted">{{ form.quote_prefix.help_text }}</small>
                                     {% endif %}
                                 </div>
-                                
+
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">{{ form.work_order_prefix.label }}</label>
                                     {{ form.work_order_prefix }}
@@ -404,13 +404,13 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="form-section">
                             <h4>
                                 <i class="fas fa-gavel"></i>
                                 Términos y Condiciones
                             </h4>
-                            
+
                             <div class="mb-3">
                                 <label class="form-label">{{ form.terms_and_conditions.label }}</label>
                                 {{ form.terms_and_conditions }}
@@ -435,7 +435,7 @@
                                 Descartar Cambios
                             </button>
                         </div>
-                        
+
                         <div class="text-muted">
                             <small>
                                 <i class="fas fa-clock me-1"></i>
@@ -455,7 +455,7 @@
                         <i class="fas fa-eye text-primary me-2"></i>
                         Vista Previa
                     </h5>
-                    
+
                     <!-- Preview Navbar -->
                     <div class="preview-navbar">
                         <img src="{{ company_logo }}" alt="Logo" class="preview-logo" id="previewLogo">
@@ -466,14 +466,14 @@
                             {% endif %}
                         </div>
                     </div>
-                    
+
                     <!-- Sample Buttons -->
                     <div class="mb-3">
                         <h6>Botones de Ejemplo:</h6>
                         <button class="btn btn-primary btn-sm me-2" id="previewBtnPrimary">Primario</button>
                         <button class="btn btn-secondary btn-sm" id="previewBtnSecondary">Secundario</button>
                     </div>
-                    
+
                     <!-- Stats Card -->
                     <div class="card-stats">
                         <div class="stats-icon">
@@ -483,7 +483,7 @@
                         <small>Ejemplo de tarjeta personalizada</small>
                     </div>
                 </div>
-                
+
                 <!-- Quick Stats -->
                 {% if company_settings %}
                 <div class="mt-4">
@@ -529,13 +529,13 @@ let originalFormData = null;
 document.addEventListener('DOMContentLoaded', function() {
     // Guardar estado original del formulario
     originalFormData = new FormData(document.getElementById('settingsForm'));
-    
+
     // Setup logo preview
     setupLogoPreview();
-    
+
     // Setup color pickers
     setupColorPickers();
-    
+
     // Setup form changes listener
     setupFormListeners();
 });
@@ -550,7 +550,7 @@ function setupLogoPreview() {
                 reader.onload = function(e) {
                     const preview = document.getElementById('logoPreview');
                     preview.innerHTML = '<img src="' + e.target.result + '" alt="Logo preview">';
-                    
+
                     // Update sidebar preview
                     const sidebarLogo = document.getElementById('previewLogo');
                     if (sidebarLogo) {
@@ -566,12 +566,12 @@ function setupLogoPreview() {
 function setupColorPickers() {
     const primaryColorInput = document.getElementById('{{ form.primary_color.id_for_label }}');
     const secondaryColorInput = document.getElementById('{{ form.secondary_color.id_for_label }}');
-    
+
     if (primaryColorInput) {
         primaryColorInput.addEventListener('change', updateColorPreview);
         primaryColorInput.addEventListener('input', updateColorPreview);
     }
-    
+
     if (secondaryColorInput) {
         secondaryColorInput.addEventListener('change', updateColorPreview);
         secondaryColorInput.addEventListener('input', updateColorPreview);
@@ -581,22 +581,22 @@ function setupColorPickers() {
 function updateColorPreview() {
     const primaryColor = document.getElementById('{{ form.primary_color.id_for_label }}').value;
     const secondaryColor = document.getElementById('{{ form.secondary_color.id_for_label }}').value;
-    
+
     // Update CSS variables
     document.documentElement.style.setProperty('--company-primary', primaryColor);
     document.documentElement.style.setProperty('--company-secondary', secondaryColor);
     document.documentElement.style.setProperty('--bs-primary', primaryColor);
     document.documentElement.style.setProperty('--bs-secondary', secondaryColor);
-    
+
     // Update preview buttons
     const primaryBtn = document.getElementById('previewBtnPrimary');
     const secondaryBtn = document.getElementById('previewBtnSecondary');
-    
+
     if (primaryBtn) {
         primaryBtn.style.backgroundColor = primaryColor;
         primaryBtn.style.borderColor = primaryColor;
     }
-    
+
     if (secondaryBtn) {
         secondaryBtn.style.backgroundColor = secondaryColor;
         secondaryBtn.style.borderColor = secondaryColor;
@@ -606,7 +606,7 @@ function updateColorPreview() {
 function setupFormListeners() {
     const companyNameInput = document.getElementById('{{ form.company_name.id_for_label }}');
     const taglineInput = document.getElementById('{{ form.tagline.id_for_label }}');
-    
+
     if (companyNameInput) {
         companyNameInput.addEventListener('input', function() {
             const previewName = document.getElementById('previewCompanyName');
@@ -615,7 +615,7 @@ function setupFormListeners() {
             }
         });
     }
-    
+
     if (taglineInput) {
         taglineInput.addEventListener('input', function() {
             const previewTagline = document.getElementById('previewTagline');
@@ -629,7 +629,7 @@ function setupFormListeners() {
 
 function previewChanges() {
     const formData = new FormData(document.getElementById('settingsForm'));
-    
+
     {% url 'taller:preview_branding' as url_preview_branding %}
     fetch('{{ url_preview_branding|default:'#' }}', {
         method: 'POST',
@@ -650,15 +650,15 @@ function previewChanges() {
             const style = document.createElement('style');
             style.innerHTML = data.preview_css;
             style.id = 'preview-styles';
-            
+
             // Remove previous preview styles
             const existingPreview = document.getElementById('preview-styles');
             if (existingPreview) {
                 existingPreview.remove();
             }
-            
+
             document.head.appendChild(style);
-            
+
             // Show notification
             showToast('Vista previa aplicada', 'success');
         }
@@ -673,7 +673,7 @@ function resetBranding() {
     if (confirm('¿Está seguro de que desea restablecer toda la configuración de branding a los valores por defecto?')) {
         const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
         loadingModal.show();
-        
+
     {% url 'taller:reset_branding' as url_reset_branding %}
     fetch('{{ url_reset_branding|default:'#' }}', {
             method: 'POST',
@@ -743,7 +743,7 @@ function showToast(message, type = 'info') {
             </div>
         </div>
     `;
-    
+
     // Add to toast container
     let toastContainer = document.getElementById('toast-container');
     if (!toastContainer) {
@@ -753,14 +753,14 @@ function showToast(message, type = 'info') {
         toastContainer.style.zIndex = '9999';
         document.body.appendChild(toastContainer);
     }
-    
+
     toastContainer.insertAdjacentHTML('beforeend', toastHtml);
-    
+
     // Show toast
     const toastElement = toastContainer.lastElementChild;
     const toast = new bootstrap.Toast(toastElement);
     toast.show();
-    
+
     // Remove toast element after hiding
     toastElement.addEventListener('hidden.bs.toast', () => {
         toastElement.remove();
@@ -770,12 +770,12 @@ function showToast(message, type = 'info') {
 // Form submission with AJAX
 document.getElementById('settingsForm').addEventListener('submit', function(e) {
     e.preventDefault();
-    
+
     const formData = new FormData(this);
     const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
-    
+
     loadingModal.show();
-    
+
     fetch(this.action || window.location.href, {
         method: 'POST',
         body: formData,
@@ -786,26 +786,26 @@ document.getElementById('settingsForm').addEventListener('submit', function(e) {
     .then(response => response.json())
     .then(data => {
         loadingModal.hide();
-        
+
         if (data.success) {
             showToast(data.message, 'success');
-            
+
             // Update preview elements
             if (data.company_name) {
                 const previewName = document.getElementById('previewCompanyName');
                 if (previewName) previewName.textContent = data.company_name;
             }
-            
+
             if (data.logo_url) {
                 const previewLogo = document.getElementById('previewLogo');
                 if (previewLogo) previewLogo.src = data.logo_url;
             }
-            
+
             // Update page title
             if (data.company_name) {
                 document.title = document.title.replace(/- .+$/, '- ' + data.company_name);
             }
-            
+
         } else {
             // Show form errors
             let errorMessage = 'Por favor corrija los errores en el formulario:\n';

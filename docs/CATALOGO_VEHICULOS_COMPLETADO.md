@@ -16,7 +16,7 @@ Se ha implementado exitosamente un sistema completo de catálogo de vehículos p
 ```python
 class CatalogoModeloAuto:
     - marca: CharField(100) - Marca del vehículo
-    - modelo: CharField(100) - Modelo del vehículo 
+    - modelo: CharField(100) - Modelo del vehículo
     - activo: BooleanField - Estado activo/inactivo
     - fecha_creacion: DateTimeField - Timestamp de creación
     - unique_together: ['marca', 'modelo'] - Previene duplicados
@@ -131,7 +131,7 @@ $('#modelo').select2({
     ajax: {
         url: '/api/catalogo/modelos/',
         data: function (params) {
-            return { 
+            return {
                 q: params.term,
                 marca: $('#marca').val()
             };
@@ -191,6 +191,6 @@ El sistema de catálogo de vehículos está **100% funcional** y listo para prod
 - ✅ **Documentación** completa
 - ✅ **Optimizaciones** de performance
 
-**Fecha de implementación:** 19 de agosto de 2025  
-**Tiempo total:** Menos de 1 hora  
+**Fecha de implementación:** 19 de agosto de 2025
+**Tiempo total:** Menos de 1 hora
 **Estado:** ✅ Producción Ready

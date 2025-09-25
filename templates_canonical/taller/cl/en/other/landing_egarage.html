@@ -6,32 +6,32 @@
     <title>eGarage - Software N°1 para Talleres Técnicos | Prueba Gratis 30 Días</title>
     <meta name="description" content="Crea presupuestos, controla repuestos y mejora tu taller con eGarage. El software más completo para talleres técnicos. Prueba gratis 30 días sin compromiso.">
     <meta name="keywords" content="software taller técnico, gestión taller automotriz, presupuestos digitales, control repuestos, órdenes trabajo, facturación taller">
-    
+
     <!-- Meta tags Open Graph para redes sociales -->
     <meta property="og:title" content="eGarage - Software N°1 para Talleres Técnicos">
     <meta property="og:description" content="Digitaliza tu taller con eGarage. Presupuestos, inventario, facturación y más. Prueba gratis 30 días.">
     <meta property="og:image" content="https://tudominio.com/static/egarage-preview.jpg">
     <meta property="og:url" content="https://tudominio.com/egarage/">
     <meta property="og:type" content="website">
-    
+
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="eGarage - Software para Talleres Técnicos">
     <meta name="twitter:description" content="El software más completo para gestionar tu taller. Prueba gratis 30 días.">
     <meta name="twitter:image" content="https://tudominio.com/static/egarage-preview.jpg">
-    
+
     <!-- Canonical URL -->
     <link rel="canonical" href="https://tudominio.com/egarage/">
-    
+
     <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>">
-    
+
     <!-- Google tag (gtag.js) - Analytics 4 ACTIVO -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-EGARAGE2025"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-        
+
         // 🚨 REEMPLAZA 'G-EGARAGE2025' CON TU ID REAL DE GA4
         gtag('config', 'G-EGARAGE2025', {
             // Configuración optimizada para eCommerce y conversiones
@@ -48,7 +48,7 @@
                 'industry': 'automotive_services'
             }
         });
-        
+
         // Función para tracking de eventos mejorado
         function trackEvent(action, category, label, value) {
             gtag('event', action, {
@@ -57,7 +57,7 @@
                 'value': value
             });
         }
-        
+
         // Tracking específico para conversiones de eGarage
         function trackConversion(conversionType, planName, value) {
             // Evento de conversión principal
@@ -72,7 +72,7 @@
                     'conversion_source': 'landing_page'
                 }
             });
-            
+
             // Evento de eCommerce para planes
             gtag('event', 'add_to_cart', {
                 'currency': 'CLP',
@@ -86,7 +86,7 @@
                 }]
             });
         }
-        
+
         // Tracking automático de botones importantes
         document.addEventListener('DOMContentLoaded', function() {
             // Tracking botón WhatsApp
@@ -95,7 +95,7 @@
                     trackEvent('click', 'contact', 'whatsapp_cta', 1);
                 });
             });
-            
+
             // Tracking botones de planes
             document.querySelectorAll('button[data-plan]').forEach(function(element) {
                 element.addEventListener('click', function() {
@@ -104,7 +104,7 @@
             });
         });
     </script>
-    
+
     <style>
         .gradient-bg {
             background: linear-gradient(135deg, #1f2937 0%, #111827 50%, #374151 100%);
@@ -176,7 +176,7 @@
                 <circle cx="400" cy="700" r="100" fill="#00e6ff" fill-opacity="0.10"/>
             </svg>
         </div>
-        
+
         <div class="hero-animation relative z-10 max-w-4xl mx-auto">
             <div class="mb-6 flex flex-col items-center">
                 <img src="/static/img/logo.png" alt="eGarage Logo" class="h-64 w-auto mb-8 drop-shadow-2xl animate-pulse" style="background:rgba(0,230,255,0.13);border-radius:3rem;box-shadow:0 0 120px #00e6ffcc,0 0 0 24px #00e6ff22;max-width:600px;">
@@ -189,12 +189,12 @@
                 <span class="block mt-2 text-cyan-200 font-semibold">¡Digitaliza tu taller hoy mismo!</span>
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <a href="#suscripcion" 
+                <a href="#suscripcion"
                    class="bg-cyan-500 hover:bg-cyan-600 px-8 py-4 rounded-lg text-white font-bold text-lg transition-all duration-300 pulse-green shadow-xl"
                    onclick="trackEvent('click', 'hero', 'cta_demo_gratis', 1); scrollToSection('suscripcion');">
                     🚀 Prueba Gratis 30 Días
                 </a>
-                <a href="#beneficios" 
+                <a href="#beneficios"
                    class="border-2 border-cyan-300 hover:bg-cyan-300 hover:text-cyan-900 px-8 py-4 rounded-lg text-cyan-100 font-bold text-lg transition-all duration-300 shadow"
                    onclick="trackEvent('click', 'hero', 'ver_caracteristicas', 1);">
                     Ver Características
@@ -207,7 +207,7 @@
                 ✅ Sin tarjeta de crédito &nbsp;&nbsp; ✅ Soporte incluido &nbsp;&nbsp; ✅ Fácil de usar
             </div>
         </div>
-        
+
         <!-- Indicador de scroll -->
         <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
             <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -225,7 +225,7 @@
                     Transforma la gestión de tu taller con herramientas diseñadas específicamente para técnicos profesionales
                 </p>
             </div>
-            
+
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <div class="feature-card-futuristic border-l-4 border-green-400">
                     <span class="icon-futuristic">🧾</span>
@@ -444,7 +444,7 @@
                 <h2 class="text-3xl md:text-4xl font-bold mb-4 text-gray-900">Lo que dicen nuestros clientes</h2>
                 <p class="text-lg text-gray-600">Talleres de todo el país confían en eGarage para gestionar su negocio</p>
             </div>
-            
+
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <div class="bg-gray-50 rounded-xl p-6">
                     <div class="flex items-center mb-4">
@@ -459,7 +459,7 @@
                         ⭐⭐⭐⭐⭐
                     </div>
                 </div>
-                
+
                 <div class="bg-gray-50 rounded-xl p-6">
                     <div class="flex items-center mb-4">
                         <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-lg">MR</div>
@@ -473,7 +473,7 @@
                         ⭐⭐⭐⭐⭐
                     </div>
                 </div>
-                
+
                 <div class="bg-gray-50 rounded-xl p-6">
                     <div class="flex items-center mb-4">
                         <div class="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg">JS</div>
@@ -500,7 +500,7 @@
                     Déjanos tus datos y un especialista te contactará para crear una demo personalizada de tu taller.
                 </p>
             </div>
-            
+
             <div class="bg-black/60 backdrop-blur-md rounded-2xl shadow-xl p-8 md:p-12 text-white">
                 <form action="https://formsubmit.co/contacto@egarage.com" method="POST" class="space-y-6" id="contactForm">
                     <!-- FormSubmit Configuration -->
@@ -508,10 +508,10 @@
                     <input type="hidden" name="_captcha" value="false">
                     <input type="hidden" name="_template" value="table">
                     <input type="hidden" name="_next" value="https://tudominio.com/egarage/?success=1">
-                    
+
                     <!-- Honeypot para anti-spam -->
                     <input type="text" name="_honey" style="display:none">
-                    
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label for="nombre" class="block text-sm font-semibold text-gray-700 mb-2">
@@ -521,7 +521,7 @@
                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-300"
                                    placeholder="Ej: Juan Pérez">
                         </div>
-                        
+
                         <div>
                             <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">
                                 Email Corporativo *
@@ -531,7 +531,7 @@
                                    placeholder="Ej: juan@mitaller.com">
                         </div>
                     </div>
-                    
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label for="telefono" class="block text-sm font-semibold text-gray-700 mb-2">
@@ -541,7 +541,7 @@
                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-300"
                                    placeholder="Ej: +56 9 1234 5678">
                         </div>
-                        
+
                         <div>
                             <label for="taller" class="block text-sm font-semibold text-gray-700 mb-2">
                                 Nombre del Taller *
@@ -551,7 +551,7 @@
                                    placeholder="Ej: AutoService Los Pinos">
                         </div>
                     </div>
-                    
+
                     <div>
                         <label for="plan_interes" class="block text-sm font-semibold text-gray-700 mb-2">
                             Plan de Interés
@@ -565,7 +565,7 @@
                             <option value="consulta">Solo quiero más información</option>
                         </select>
                     </div>
-                    
+
                     <div>
                         <label for="comentarios" class="block text-sm font-semibold text-gray-700 mb-2">
                             Comentarios o Necesidades Específicas
@@ -574,18 +574,18 @@
                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-300"
                                   placeholder="Cuéntanos sobre tu taller: cuántos técnicos, qué servicios ofrecen, principales desafíos..."></textarea>
                     </div>
-                    
+
                     <div class="flex items-start">
                         <input type="checkbox" id="acepto_terminos" name="acepto_terminos" required
                                class="mt-1 h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded">
                         <label for="acepto_terminos" class="ml-3 text-sm text-gray-600">
-                            Acepto recibir información comercial sobre eGarage y sus servicios. 
+                            Acepto recibir información comercial sobre eGarage y sus servicios.
                             <a href="#" class="text-green-600 hover:text-green-800 underline">Política de Privacidad</a>
                         </label>
                     </div>
-                    
+
                     <div class="text-center">
-                        <button type="submit" 
+                        <button type="submit"
                                 class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold px-8 py-4 rounded-lg text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
                                 onclick="trackContactFormSubmit()">
                             🚀 Solicitar Demo Personalizada
@@ -615,7 +615,7 @@
                    onclick="trackWhatsAppClick('cta_final')">
                     <span>📱</span> Contactar por WhatsApp
                 </a>
-                <a href="#planes" 
+                <a href="#planes"
                    class="border-2 border-green-500 text-green-600 hover:bg-green-500 hover:text-white font-bold px-8 py-4 rounded-lg text-lg transition-all duration-300"
                    onclick="trackEvent('click', 'navigation', 'ver_planes_cta', 1)">
                     Ver Planes y Precios
@@ -634,28 +634,28 @@
             <p class="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
                 Recibe contenido exclusivo sobre gestión de talleres, tips de rentabilidad y novedades de eGarage.
             </p>
-            
+
             <form action="https://formsubmit.co/newsletter@egarage.com" method="POST" class="max-w-md mx-auto" id="newsletterForm">
                 <!-- FormSubmit Configuration -->
                 <input type="hidden" name="_subject" value="Nuevo Suscriptor Newsletter eGarage">
                 <input type="hidden" name="_captcha" value="false">
                 <input type="hidden" name="_template" value="table">
                 <input type="hidden" name="_next" value="https://tudominio.com/egarage/?newsletter=1">
-                
+
                 <!-- Honeypot para anti-spam -->
                 <input type="text" name="_honey" style="display:none">
-                
+
                 <div class="flex flex-col sm:flex-row gap-4">
                     <input type="email" name="email_newsletter" required
                            class="flex-1 px-4 py-3 rounded-lg text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-green-500"
                            placeholder="Tu email profesional">
-                    <button type="submit" 
+                    <button type="submit"
                             class="bg-green-500 hover:bg-green-600 text-white font-bold px-6 py-3 rounded-lg transition-all duration-300 whitespace-nowrap"
                             onclick="trackEvent('submit', 'newsletter', 'suscripcion_newsletter', 1)">
                         ✅ Suscribirme Gratis
                     </button>
                 </div>
-                
+
                 <p class="text-sm text-gray-400 mt-3">
                     Sin spam. Cancela cuando quieras. 📧 Solo contenido valioso para tu taller.
                 </p>
@@ -673,7 +673,7 @@
                         <span class="text-xl font-bold text-white">eGarage</span>
                     </div>
                     <p class="text-gray-400 mb-4 max-w-md">
-                        El software más completo para la gestión de talleres técnicos. 
+                        El software más completo para la gestión de talleres técnicos.
                         Digitaliza tu negocio y aumenta tu rentabilidad.
                     </p>
                     <div class="flex space-x-4">
@@ -691,7 +691,7 @@
                         </a>
                     </div>
                 </div>
-                
+
                 <div>
                     <h3 class="text-white font-semibold mb-4">Producto</h3>
                     <ul class="space-y-2">
@@ -701,7 +701,7 @@
                         <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Integraciones</a></li>
                     </ul>
                 </div>
-                
+
                 <div>
                     <h3 class="text-white font-semibold mb-4">Soporte</h3>
                     <ul class="space-y-2">
@@ -712,7 +712,7 @@
                     </ul>
                 </div>
             </div>
-            
+
             <div class="border-t border-gray-700 mt-8 pt-8">
                 <!-- Créditos de Atlanta Reciclajes -->
                 <div class="flex flex-col md:flex-row items-center justify-center gap-4 mb-4">
@@ -724,11 +724,11 @@
                         </div>
                     </div>
                     <div class="text-sm text-gray-400 text-center">
-                        
+
                         <a href="mailto:suscripcion@atlantareciclajes.cl" class="text-blue-400 hover:text-blue-300">suscripcion@atlantareciclajes.cl</a>
                     </div>
                 </div>
-                
+
                 <div class="text-center">
                     <p class="text-gray-400">© 2025 eGarage. Todos los derechos reservados.</p>
                     <p class="text-sm text-gray-500 mt-2">Desarrollado con ❤️ para talleres profesionales</p>
@@ -758,7 +758,7 @@
         function scrollToSection(sectionId) {
             const element = document.getElementById(sectionId);
             if (element) {
-                element.scrollIntoView({ 
+                element.scrollIntoView({
                     behavior: 'smooth',
                     block: 'start'
                 });
@@ -769,10 +769,10 @@
         function selectPlan(planName, price) {
             // Tracking de selección de plan
             trackEvent('select_item', 'pricing', planName, price);
-            
+
             // Tracking de conversión específico
             trackConversion('plan_selection', planName, price);
-            
+
             // Scroll to contact form
             setTimeout(() => {
                 scrollToSection('contacto');
@@ -793,7 +793,7 @@
         // WhatsApp click tracking
         function trackWhatsAppClick(location) {
             trackEvent('click', 'whatsapp', location, 1);
-            
+
             // Tracking específico para WhatsApp
             gtag('event', 'contact', {
                 'method': 'whatsapp',
@@ -801,7 +801,7 @@
                 'event_label': location
             });
         }
-        
+
         // Tracking específico para formulario de contacto
         function trackContactFormSubmit() {
             const selectedPlan = document.getElementById('plan_interes').value;
@@ -810,15 +810,15 @@
                 'semestral': 110000,
                 'anual': 200000
             };
-            
+
             const value = planValues[selectedPlan] || 0;
-            
+
             // Evento de lead generado
             trackConversion('form_submission', selectedPlan, value);
-            
+
             // Evento estándar
             trackEvent('submit', 'contact', 'formulario_contacto', value);
-            
+
             // Evento de lead para GA4
             gtag('event', 'generate_lead', {
                 'currency': 'CLP',
@@ -846,7 +846,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Check for success parameters
             const urlParams = new URLSearchParams(window.location.search);
-            
+
             if (urlParams.get('success') === '1') {
                 // Contact form submitted
                 showSuccessMessage('¡Gracias! Te contactaremos en menos de 24 horas hábiles. 🚀');
@@ -859,7 +859,7 @@
 
             // Add scroll-to-top functionality
             addScrollToTop();
-            
+
             // Track page view
             trackEvent('page_view', 'landing', 'egarage_landing', 1);
         });
@@ -875,12 +875,12 @@
                 </div>
             `;
             document.body.appendChild(successDiv);
-            
+
             // Animate in
             setTimeout(() => {
                 successDiv.classList.remove('translate-x-full');
             }, 100);
-            
+
             // Auto remove after 5 seconds
             setTimeout(() => {
                 successDiv.classList.add('translate-x-full');

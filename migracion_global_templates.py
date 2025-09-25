@@ -171,8 +171,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "{canonical_template}", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "{canonical_template}",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -242,13 +242,13 @@ return TemplateResponse(request, template_name, context)
     from taller.utils.templates import select_country_lang_template
     from django.utils.translation import get_language
     from django.template.response import TemplateResponse
-    
+
     template_name = select_country_lang_template(
-        "{new_template}", 
-        getattr(request.user.empresa, 'pais', 'cl').lower(), 
+        "{new_template}",
+        getattr(request.user.empresa, 'pais', 'cl').lower(),
         get_language()
     )
-    
+
     return TemplateResponse(request, template_name, \\1)"""
 
                         content = re.sub(old_pattern, new_code, content)

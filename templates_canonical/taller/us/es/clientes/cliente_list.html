@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load country_url %}
 {% load i18n %}
 {% block title %}Clientes · eGarage{% endblock %}
 {% block content %}
@@ -21,7 +22,7 @@
         <button type="button" id="search-btn" class="absolute top-1/2 -translate-y-1/2 right-3 text-cyan-300 hover:text-lime-300 transition"><i class="fas fa-search"></i></button>
         <div id="search-results" class="absolute top-full left-0 right-0 mt-1 bg-[#0f172a] border border-cyan-500/40 rounded-xl shadow-lg z-50 hidden max-h-60 overflow-y-auto"></div>
       </div>
-      <a href="{% url 'taller:clientes:crear_cliente' %}" class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 via-lime-500 to-fuchsia-500 text-[#0d1117] font-bold shadow-lg hover:shadow-cyan-500/40 text-sm md:text-base tracking-wide hover:scale-[1.03] transition active:scale-95"><span>➕</span><span>Nuevo Cliente</span></a>
+      <a href="{% country_url 'clientes:crear_cliente' %}" class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 via-lime-500 to-fuchsia-500 text-[#0d1117] font-bold shadow-lg hover:shadow-cyan-500/40 text-sm md:text-base tracking-wide hover:scale-[1.03] transition active:scale-95"><span>➕</span><span>Nuevo Cliente</span></a>
     </div>
   </div>
   <div class="relative rounded-3xl border border-cyan-400/20 bg-gradient-to-br from-[#0d1117] via-[#0f172a] to-[#111827] shadow-2xl overflow-hidden">
@@ -52,13 +53,13 @@
               <td class="px-5 py-4 hidden xl:table-cell text-gray-300">{% if cliente.ciudad %}{{ cliente.ciudad.nombre }}{% else %}—{% endif %}</td>
               <td class="px-5 py-4">
                 <div class="flex items-center gap-3">
-                  <a href="{% url 'taller:clientes:ver_cliente' cliente.pk %}" class="text-cyan-300 hover:text-lime-300 transition" title="Ver">
+                  <a href="{% country_url 'clientes:ver_cliente' cliente.pk %}" class="text-cyan-300 hover:text-lime-300 transition" title="Ver">
                     <i class="fas fa-eye"></i>
                   </a>
-                  <a href="{% url 'taller:clientes:editar_cliente' cliente.pk %}" class="text-cyan-300 hover:text-lime-300 transition" title="Editar">
+                  <a href="{% country_url 'clientes:editar_cliente' cliente.pk %}" class="text-cyan-300 hover:text-lime-300 transition" title="Editar">
                     <i class="fas fa-edit"></i>
                   </a>
-                  <a href="{% url 'taller:clientes:eliminar_cliente' cliente_id=cliente.pk %}" class="text-red-400 hover:text-red-300 transition" title="Eliminar" >
+                  <a href="{% country_url 'clientes:eliminar_cliente' cliente_id=cliente.pk %}" class="text-red-400 hover:text-red-300 transition" title="Eliminar" >
                     <i class="fas fa-trash"></i>
                   </a>
                 </div>
@@ -72,7 +73,7 @@
         </tbody>
       </table>
     </div>
-    
+
     <!-- Paginación -->
     {% if is_paginated %}
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 px-6 py-5 bg-[#0e1a2b]/60 border-t border-cyan-900/40">
@@ -87,11 +88,11 @@
           <span class="px-3 py-1 rounded-lg bg-[#101a29] text-gray-600 text-xs">««</span>
           <span class="px-3 py-1 rounded-lg bg-[#101a29] text-gray-600 text-xs">«</span>
         {% endif %}
-        
+
         <span class="px-4 py-1 rounded-lg bg-cyan-600/20 text-cyan-200 font-semibold tracking-wider text-xs">
           {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
         </span>
-        
+
         {% if page_obj.has_next %}
           <a href="?q={{ request.GET.q }}&page={{ page_obj.next_page_number }}" class="px-3 py-1 rounded-lg bg-[#132034] text-cyan-300 hover:bg-cyan-600/20 transition text-xs">»</a>
           <a href="?q={{ request.GET.q }}&page={{ page_obj.paginator.num_pages }}" class="px-3 py-1 rounded-lg bg-[#132034] text-cyan-300 hover:bg-cyan-600/20 transition text-xs">»»</a>
@@ -107,26 +108,26 @@
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
 <style>
-@keyframes spin-slow { 
-  0% { transform: rotate(0deg); } 
-  100% { transform: rotate(360deg); } 
-} 
-.animate-spin-slow { 
-  animation: spin-slow 30s linear infinite; 
-} 
-.scrollbar-thin::-webkit-scrollbar { 
-  height: 10px; 
-  width: 10px; 
-} 
-.scrollbar-thin::-webkit-scrollbar-track { 
-  background: transparent; 
-} 
-.scrollbar-thin::-webkit-scrollbar-thumb { 
-  background: #164159; 
-  border-radius: 6px; 
-} 
-.scrollbar-thin::-webkit-scrollbar-thumb:hover { 
-  background: #1d5a79; 
+@keyframes spin-slow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.animate-spin-slow {
+  animation: spin-slow 30s linear infinite;
+}
+.scrollbar-thin::-webkit-scrollbar {
+  height: 10px;
+  width: 10px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #164159;
+  border-radius: 6px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #1d5a79;
 }
 </style>
 
@@ -145,10 +146,10 @@ document.addEventListener('DOMContentLoaded', function() {
   // Real-time search as user types
   searchInput.addEventListener('input', function() {
     const query = this.value.trim();
-    
+
     // Clear previous timeout
     clearTimeout(searchTimeout);
-    
+
     if (query.length < 2) {
       searchResults.classList.add('hidden');
       return;
@@ -188,7 +189,7 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   function performSearch(query) {
-    fetch(`{% url 'taller:clientes:ajax_buscar_clientes' %}?q=${encodeURIComponent(query)}`)
+    fetch(`{% country_url 'clientes:ajax_buscar_clientes' %}?q=${encodeURIComponent(query)}`)
       .then(response => response.json())
       .then(data => {
         displaySearchResults(data);
@@ -216,7 +217,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function selectCliente(clienteId) {
     // Redirect to client detail page
-    window.location.href = `{% url 'taller:clientes:ver_cliente' 0 %}`.replace('0', clienteId);
+    window.location.href = `/us/clientes/${clienteId}/`;
   }
 });
 </script>

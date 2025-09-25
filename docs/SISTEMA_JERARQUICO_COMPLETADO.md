@@ -16,7 +16,7 @@
 ### 🌐 ENDPOINTS AJAX FUNCIONALES
 ```
 ✅ /cl/taller/ajax/load-modelos/?marca_id=X
-✅ /cl/taller/ajax/load-motores/?modelo_id=X  
+✅ /cl/taller/ajax/load-motores/?modelo_id=X
 ✅ /cl/taller/ajax/load-cajas/?modelo_id=X
 ✅ /cl/taller/ajax/load-motores-cajas/?modelo_id=X
 ```
@@ -52,7 +52,7 @@
 ### Para el Desarrollador:
 ```javascript
 // Flujo automático:
-Marca seleccionada → fetch('/cl/taller/ajax/load-modelos/') 
+Marca seleccionada → fetch('/cl/taller/ajax/load-modelos/')
 Modelo seleccionado → fetch('/cl/taller/ajax/load-motores/') + fetch('/cl/taller/ajax/load-cajas/')
 ```
 

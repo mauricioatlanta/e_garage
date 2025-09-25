@@ -1,3 +1,4 @@
+{% load country_url %}
 {% extends 'base.html' %}
 {% load static %}
 {% load i18n %}
@@ -27,7 +28,7 @@
 
     body {
         background: var(--dark-bg);
-        background-image: 
+        background-image:
             radial-gradient(circle at 25% 25%, #667eea22 0%, transparent 50%),
             radial-gradient(circle at 75% 75%, #764ba222 0%, transparent 50%);
         color: #ffffff;
@@ -356,16 +357,16 @@
         .header-title {
             font-size: 2rem;
         }
-        
+
         .search-container {
             flex-direction: column;
         }
-        
+
         .search-field,
         .filter-select {
             min-width: auto;
         }
-        
+
         .services-grid {
             grid-template-columns: 1fr;
         }
@@ -402,13 +403,13 @@
 
     <!-- Navegación -->
     <div class="navigation-tabs">
-        <a href="{% if request.resolver_match.namespace == 'chile:servicios' or request.resolver_match.namespace == 'usa:servicios' %}{% url request.resolver_match.namespace|add:':servicios_menu' %}{% else %}{% url 'taller:servicios:servicios_menu' %}{% endif %}" class="nav-tab active">
+        <a href="{% if request.resolver_match.namespace == 'chile:servicios' or request.resolver_match.namespace == 'usa:servicios' %}{% url request.resolver_match.namespace|add:':servicios_menu' %}{% else %}{% country_url 'servicios:servicios_menu' %}{% endif %}" class="nav-tab active">
             <i class="fas fa-cogs"></i> {% trans "Servicios Internos" %}
         </a>
-        <a href="{% if request.resolver_match.namespace == 'chile:servicios' or request.resolver_match.namespace == 'usa:servicios' %}{% url request.resolver_match.namespace|add:':otros_servicios_menu' %}{% else %}{% url 'taller:servicios:otros_servicios_menu' %}{% endif %}" class="nav-tab">
+        <a href="{% if request.resolver_match.namespace == 'chile:servicios' or request.resolver_match.namespace == 'usa:servicios' %}{% url request.resolver_match.namespace|add:':otros_servicios_menu' %}{% else %}{% country_url 'servicios:otros_servicios_menu' %}{% endif %}" class="nav-tab">
             <i class="fas fa-handshake"></i> {% trans "Servicios Externos" %}
         </a>
-        <a href="{% if request.resolver_match.namespace == 'chile:servicios' or request.resolver_match.namespace == 'usa:servicios' %}{% url request.resolver_match.namespace|add:':crear_servicio' %}{% else %}{% url 'taller:servicios:crear_servicio' %}{% endif %}" class="nav-tab">
+        <a href="{% if request.resolver_match.namespace == 'chile:servicios' or request.resolver_match.namespace == 'usa:servicios' %}{% url request.resolver_match.namespace|add:':crear_servicio' %}{% else %}{% country_url 'servicios:crear_servicio' %}{% endif %}" class="nav-tab">
             <i class="fas fa-plus"></i> {% trans "Nuevo Servicio" %}
         </a>
     </div>
@@ -420,9 +421,9 @@
         </h3>
         <div class="search-container">
             <div class="search-field">
-                <input type="text" 
-                       id="searchInput" 
-                       class="search-input" 
+                <input type="text"
+                       id="searchInput"
+                       class="search-input"
                        placeholder="{% trans 'Buscar servicios, categorías, subcategorías...' %}">
             </div>
             <select id="categoriaFilter" class="filter-select">
@@ -469,7 +470,7 @@
             <i class="fas fa-tools fa-3x mb-3 text-muted"></i>
             <h4>{% trans "No hay servicios disponibles" %}</h4>
             <p class="text-muted">{% trans "Comienza agregando servicios a tu taller." %}</p>
-            <a href="{% if request.resolver_match.namespace == 'chile:servicios' or request.resolver_match.namespace == 'usa:servicios' %}{% url request.resolver_match.namespace|add:':crear_servicio' %}{% else %}{% url 'taller:servicios:crear_servicio' %}{% endif %}" class="btn-futuristic btn-primary mt-3">
+            <a href="{% if request.resolver_match.namespace == 'chile:servicios' or request.resolver_match.namespace == 'usa:servicios' %}{% url request.resolver_match.namespace|add:':crear_servicio' %}{% else %}{% country_url 'servicios:crear_servicio' %}{% endif %}" class="btn-futuristic btn-primary mt-3">
                 <i class="fas fa-plus"></i> {% trans "Crear Primer Servicio" %}
             </a>
         </div>
@@ -500,7 +501,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function showResults(data) {
         hideLoading();
-        
+
         if (data.servicios.length === 0) {
             servicesGrid.style.display = 'none';
             noResults.style.display = 'block';
@@ -509,17 +510,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
         noResults.style.display = 'none';
         servicesGrid.style.display = 'grid';
-        
+
         // Limpiar grid
         servicesGrid.innerHTML = '';
-        
+
         // Agregar servicios
         data.servicios.forEach(servicio => {
             const serviceCard = document.createElement('div');
             serviceCard.className = 'service-card';
             serviceCard.style.opacity = '0';
             serviceCard.style.transform = 'translateY(20px)';
-            
+
             serviceCard.innerHTML = `
                 <div class="service-title">${servicio.nombre}</div>
                 <div class="service-category">
@@ -531,9 +532,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 ` : ''}
             `;
-            
+
             servicesGrid.appendChild(serviceCard);
-            
+
             // Animación de entrada
             setTimeout(() => {
                 serviceCard.style.transition = 'all 0.3s ease';
@@ -546,14 +547,14 @@ document.addEventListener('DOMContentLoaded', function() {
     function searchServices() {
         const query = searchInput.value.trim();
         const categoria = categoriaFilter.value;
-        
+
         showLoading();
-        
+
         const params = new URLSearchParams();
         if (query) params.append('q', query);
         if (categoria) params.append('categoria', categoria);
-        
-        fetch(`{% if request.resolver_match.namespace == 'chile:servicios' or request.resolver_match.namespace == 'usa:servicios' %}{% url request.resolver_match.namespace|add:':buscar_servicios_api' %}{% else %}{% url 'taller:servicios:buscar_servicios_api' %}{% endif %}?${params}`)
+
+        fetch(`{% if request.resolver_match.namespace == 'chile:servicios' or request.resolver_match.namespace == 'usa:servicios' %}{% url request.resolver_match.namespace|add:':buscar_servicios_api' %}{% else %}{% country_url 'servicios:buscar_servicios_api' %}{% endif %}?${params}`)
             .then(response => response.json())
             .then(data => {
                 showResults(data);

@@ -100,6 +100,7 @@ class EmpresaAdmin(admin.ModelAdmin):
 
     actions = ["extender_30_dias", "extender_60_dias", "marcar_como_pagado"]
 
+    @admin.display(description="Estado")
     def estado_suscripcion_display(self, obj):
         estado = obj.estado_suscripcion
         colores = {
@@ -115,8 +116,7 @@ class EmpresaAdmin(admin.ModelAdmin):
             estado.upper(),
         )
 
-    estado_suscripcion_display.short_description = "Estado"
-
+    @admin.display(description="Días Restantes")
     def dias_restantes_display(self, obj):
         dias = obj.dias_restantes
         if dias <= 0:
@@ -130,31 +130,26 @@ class EmpresaAdmin(admin.ModelAdmin):
         else:
             return format_html('<span style="color: green;">{} días</span>', dias)
 
-    dias_restantes_display.short_description = "Días Restantes"
-
+    @admin.action(description="Extender 30 días")
     def extender_30_dias(self, request, queryset):
         for empresa in queryset:
             empresa.extender_suscripcion(30)
         count = queryset.count()
         self.message_user(request, f"Se extendieron {count} suscripciones por 30 días.")
 
-    extender_30_dias.short_description = "Extender 30 días"
-
+    @admin.action(description="Extender 60 días")
     def extender_60_dias(self, request, queryset):
         for empresa in queryset:
             empresa.extender_suscripcion(60)
         count = queryset.count()
         self.message_user(request, f"Se extendieron {count} suscripciones por 60 días.")
 
-    extender_60_dias.short_description = "Extender 60 días"
-
+    @admin.action(description="Marcar como pagado (30 días)")
     def marcar_como_pagado(self, request, queryset):
         for empresa in queryset:
             empresa.marcar_pago_recibido()
         count = queryset.count()
         self.message_user(request, f"Se marcaron {count} empresas como pagadas.")
-
-    marcar_como_pagado.short_description = "Marcar como pagado (30 días)"
 
     def has_add_permission(self, request):
         """
@@ -219,6 +214,10 @@ class ClienteAdmin(admin.ModelAdmin):
         ("Empresa", {"fields": ("empresa",)}),
     )
 
+    @admin.display(
+        description="Color",
+        ordering="color__nombre",
+    )
     def color_display(self, obj):
         """Mostrar el color del cliente con preview visual"""
         if obj.color:
@@ -231,9 +230,6 @@ class ClienteAdmin(admin.ModelAdmin):
                 obj.color.nombre,
             )
         return "Sin color"
-
-    color_display.short_description = "Color"
-    color_display.admin_order_field = "color__nombre"
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
@@ -259,6 +255,10 @@ class ColorClienteAdmin(admin.ModelAdmin):
         ("Color", {"fields": ("codigo_color",)}),
     )
 
+    @admin.display(
+        description="Preview del Color",
+        ordering="codigo_color",
+    )
     def codigo_color_display(self, obj):
         """Mostrar el código de color con preview visual"""
         return format_html(
@@ -269,9 +269,6 @@ class ColorClienteAdmin(admin.ModelAdmin):
             obj.codigo_color,
             obj.codigo_color,
         )
-
-    codigo_color_display.short_description = "Preview del Color"
-    codigo_color_display.admin_order_field = "codigo_color"
 
     def get_queryset(self, request):
         return super().get_queryset(request).order_by("country", "orden", "nombre")
@@ -316,15 +313,13 @@ class CategoriaServicioAdmin(admin.ModelAdmin):
     search_fields = ("code", "names__label")
     inlines = [CategoriaServicioNameInline]
 
+    @admin.display(description="Nombre (ES)")
     def get_label_es(self, obj):
         return obj.get_label("es")
 
-    get_label_es.short_description = "Nombre (ES)"
-
+    @admin.display(description="Nombre (EN)")
     def get_label_en(self, obj):
         return obj.get_label("en")
-
-    get_label_en.short_description = "Nombre (EN)"
 
 
 class SubcategoriaServicioNameInline(admin.TabularInline):
@@ -347,15 +342,13 @@ class SubcategoriaServicioAdmin(admin.ModelAdmin):
     search_fields = ("code", "names__label")
     inlines = [SubcategoriaServicioNameInline]
 
+    @admin.display(description="Nombre (ES)")
     def get_label_es(self, obj):
         return obj.get_label("es")
 
-    get_label_es.short_description = "Nombre (ES)"
-
+    @admin.display(description="Nombre (EN)")
     def get_label_en(self, obj):
         return obj.get_label("en")
-
-    get_label_en.short_description = "Nombre (EN)"
 
 
 class ServicioNameInline(admin.TabularInline):
@@ -415,11 +408,11 @@ class ComprobantePagoAdmin(admin.ModelAdmin):
 
     actions = ["aprobar_comprobantes", "rechazar_comprobantes"]
 
+    @admin.display(description="Monto")
     def monto_display(self, obj):
         return f"${obj.monto:,.0f} {obj.moneda}"
 
-    monto_display.short_description = "Monto"
-
+    @admin.display(description="Estado")
     def estado_display(self, obj):
         colores = {"pendiente": "orange", "aprobado": "green", "rechazado": "red"}
         color = colores.get(obj.estado, "gray")
@@ -428,8 +421,6 @@ class ComprobantePagoAdmin(admin.ModelAdmin):
             color,
             obj.get_estado_display(),
         )
-
-    estado_display.short_description = "Estado"
 
     def aprobar_comprobantes(self, request, queryset):
         count = 0
@@ -502,12 +493,12 @@ class PrecioSuscripcionAdmin(admin.ModelAdmin):
         ),
     )
 
+    @admin.display(description="País")
     def pais_display(self, obj):
         flag = "🇨🇱" if obj.pais == "CL" else "🇺🇸"
         return f"{flag} {obj.get_pais_display()}"
 
-    pais_display.short_description = "País"
-
+    @admin.display(description="Características")
     def caracteristicas_preview(self, obj):
         caracteristicas = obj.caracteristicas_list()
         if len(caracteristicas) > 3:
@@ -516,10 +507,9 @@ class PrecioSuscripcionAdmin(admin.ModelAdmin):
             )
         return ", ".join(caracteristicas)
 
-    caracteristicas_preview.short_description = "Características"
-
     actions = ["duplicar_para_otro_pais"]
 
+    @admin.action(description="Duplicar para otro país")
     def duplicar_para_otro_pais(self, request, queryset):
         """Duplica precios para el otro país"""
         for precio in queryset:
@@ -556,8 +546,6 @@ class PrecioSuscripcionAdmin(admin.ModelAdmin):
             request, f"Duplicados {len(queryset)} precios para el otro país."
         )
 
-    duplicar_para_otro_pais.short_description = "Duplicar para otro país"
-
 
 @admin.register(CatalogoModeloAuto, site=admin_site)
 class CatalogoModeloAutoAdmin(admin.ModelAdmin):
@@ -586,18 +574,17 @@ class CatalogoModeloAutoAdmin(admin.ModelAdmin):
         "estadisticas_marcas",
     ]
 
+    @admin.action(description="Activar modelos seleccionados")
     def activar_seleccionados(self, request, queryset):
         count = queryset.update(activo=True)
         self.message_user(request, f"{count} modelos activados.")
 
-    activar_seleccionados.short_description = "Activar modelos seleccionados"
-
+    @admin.action(description="Desactivar modelos seleccionados")
     def desactivar_seleccionados(self, request, queryset):
         count = queryset.update(activo=False)
         self.message_user(request, f"{count} modelos desactivados.")
 
-    desactivar_seleccionados.short_description = "Desactivar modelos seleccionados"
-
+    @admin.action(description="Ver estadísticas de marcas")
     def estadisticas_marcas(self, request, queryset):
         from django.db.models import Count
 
@@ -613,8 +600,6 @@ class CatalogoModeloAutoAdmin(admin.ModelAdmin):
             [f"• {s['marca']}: {s['activos']}/{s['total']}" for s in stats]
         )
         self.message_user(request, mensaje)
-
-    estadisticas_marcas.short_description = "Ver estadísticas de marcas"
 
 
 @admin.register(ConfiguracionEmpresa, site=admin_site)

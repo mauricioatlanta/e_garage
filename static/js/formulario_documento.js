@@ -20,7 +20,7 @@ function initDocumentConfig() {
         documentConfig.currency = form.dataset.currency || 'CLP';
         documentConfig.taxBase = form.dataset.taxBase || 'parts_only';
         documentConfig.taxRate = parseFloat(form.dataset.taxRate || '0.19');
-        
+
         // Inicializar formateador de moneda
         currencyFormatter = new Intl.NumberFormat(documentConfig.locale, {
             style: 'currency',
@@ -60,7 +60,7 @@ function onTotalsChanged() {
     const subtotalElement = document.getElementById('subtotal-general');
     const taxElement = document.getElementById('iva-total');
     const totalElement = document.getElementById('total-general');
-    
+
     if (subtotalElement && window.calculatedSubtotal !== undefined) {
         subtotalElement.setAttribute('data-money', window.calculatedSubtotal);
     }
@@ -70,7 +70,7 @@ function onTotalsChanged() {
     if (totalElement && window.calculatedTotal !== undefined) {
         totalElement.setAttribute('data-money', window.calculatedTotal);
     }
-    
+
     formatAllMoney();
 }
 
@@ -86,7 +86,7 @@ function activarAutocompleteRepuesto(tr) {
     const precioInput = tr.querySelector('.precio-input');
     const precioCompraInput = tr.querySelector('.precio-compra-input');
     if (!partInput) return;
-    
+
     // Mostrar mensaje si el partnumber no existe y autocompletar si existe
     partInput.addEventListener('blur', function() {
         const valor = partInput.value.trim();
@@ -112,7 +112,7 @@ function activarAutocompleteRepuesto(tr) {
             }
         });
     });
-    
+
     $(partInput).autocomplete({
         source: function(request, response) {
             $.getJSON('/documentos/autocomplete_repuesto/', {q: request.term}, function(data) {
@@ -160,8 +160,8 @@ function agregarRepuesto() {
         <td><input type="text" class="nombre-input futurista-input border p-1 rounded w-full" placeholder="Nombre"></td>
         <td><input type="number" class="cantidad-input futurista-input border p-1 rounded w-20" value="1" min="1"></td>
         <td style="color: transparent; background: black;">
-            <input type="number" class="precio-compra-input" 
-                   style="color: transparent; background: black; border: none; width: 80px;" 
+            <input type="number" class="precio-compra-input"
+                   style="color: transparent; background: black; border: none; width: 80px;"
                    value="0" min="0" step="0.01" placeholder="0">
         </td>
         <td><input type="number" class="precio-input futurista-input border p-1 rounded w-24" value="0" min="0"></td>
@@ -170,16 +170,16 @@ function agregarRepuesto() {
     `;
     tbody.appendChild(tr);
     activarAutocompleteRepuesto(tr);
-    
+
     // Conectar eventos de cálculo a los inputs
     const cantidadInput = tr.querySelector('.cantidad-input');
     const precioInput = tr.querySelector('.precio-input');
     const precioCompraInput = tr.querySelector('.precio-compra-input');
-    
+
     if (cantidadInput) cantidadInput.addEventListener('input', actualizarTotalRepuestos);
     if (precioInput) precioInput.addEventListener('input', actualizarTotalRepuestos);
     if (precioCompraInput) precioCompraInput.addEventListener('input', actualizarTotalRepuestos);
-    
+
     // Calcular total al crear la fila
     actualizarTotalRepuestos();
 }
@@ -197,7 +197,7 @@ function agregarServicio() {
     activarAutocompleteServicio(tr);
     actualizarTotalServicios();
     tr.querySelector('.precio-servicio-input').addEventListener('input', actualizarTotalServicios);
-    
+
     // Poner el foco en el campo de nombre de servicio
     const inputNombre = tr.querySelector('.nombre-servicio-input');
     if (inputNombre) {
@@ -221,7 +221,7 @@ function actualizarTotalRepuestos() {
         }
         total += subtotal;
     });
-    
+
     // Si hay al menos un repuesto con subtotal > 0, mostrar el total
     const totalElement = document.getElementById('total-repuestos');
     if (totalElement) {
@@ -236,7 +236,7 @@ function actualizarTotalServicios() {
         const precio = parseInt(row.querySelector('.precio-servicio-input')?.value || '0');
         total += precio;
     });
-    
+
     const totalElement = document.getElementById('total-servicios');
     if (totalElement) {
         totalElement.textContent = money(total);
@@ -246,7 +246,7 @@ function actualizarTotalServicios() {
 
 function actualizarTotalesDocumento() {
     console.log('[DEBUG] Iniciando cálculo de totales...');
-    
+
     // En lugar de calcular desde inputs (que no existen en modo edición),
     // usar los valores que ya están en el DOM desde el contexto Django
     let totalRepuestos = 0;
@@ -255,70 +255,70 @@ function actualizarTotalesDocumento() {
     let subtotal = 0;
     let iva = 0;
     let granTotal = 0;
-    
+
     // TEMPORAL: Usar valores fijos mientras se arregla el contexto
     // Estos valores deben venir del contexto Django
     totalRepuestos = 18000;
     totalServicios = 45000;
     totalOtrosServicios = 0;
     subtotal = totalRepuestos + totalServicios + totalOtrosServicios;
-    
+
     // Intentar obtener valores desde elementos existentes (como respaldo)
     const subtotalRepuestosEl = document.getElementById('total-repuestos');
-    const subtotalServiciosEl = document.getElementById('total-servicios'); 
+    const subtotalServiciosEl = document.getElementById('total-servicios');
     const subtotalOtrosEl = document.getElementById('total-otros-servicios');
     const subtotalDocEl = document.getElementById('subtotal-doc');
     const ivaDocEl = document.getElementById('iva-doc');
     const totalDocEl = document.getElementById('gran-total-doc');
-    
+
     // Si existen elementos con valores pre-calculados, intentar usarlos
     if (subtotalRepuestosEl && subtotalRepuestosEl.textContent.replace(/[$,]/g, '') !== '0') {
         const text = subtotalRepuestosEl.textContent.replace(/[$,]/g, '');
         const valor = parseInt(text) || 0;
         if (valor > 0) totalRepuestos = valor;
     }
-    
+
     if (subtotalServiciosEl && subtotalServiciosEl.textContent.replace(/[$,]/g, '') !== '0') {
         const text = subtotalServiciosEl.textContent.replace(/[$,]/g, '');
         const valor = parseInt(text) || 0;
         if (valor > 0) totalServicios = valor;
     }
-    
+
     if (subtotalOtrosEl && subtotalOtrosEl.textContent.replace(/[$,]/g, '') !== '0') {
         const text = subtotalOtrosEl.textContent.replace(/[$,]/g, '');
         const valor = parseInt(text) || 0;
         if (valor > 0) totalOtrosServicios = valor;
     }
-    
+
     // Recalcular subtotal basado en los valores obtenidos
     subtotal = totalRepuestos + totalServicios + totalOtrosServicios;
-    
+
     // Verificar existencia de tablas (para debugging)
     const tablaRepuestos = document.querySelector('#tabla-repuestos tbody tr');
     const tablaServicios = document.querySelector('#tabla-servicios tbody tr');
     const tablaOtros = document.querySelector('#tabla-otros-servicios tbody tr');
-    
+
     console.log('[DEBUG] Tablas encontradas:', {
         repuestos: !!tablaRepuestos,
-        servicios: !!tablaServicios, 
+        servicios: !!tablaServicios,
         otros: !!tablaOtros
     });
-    
+
     // LÓGICA DE IMPUESTOS POR PAÍS
     const incluirIvaCheckbox = document.getElementById('invoice-incluir-iva');
     const incluirIvaHidden = document.getElementById('id_incluir_iva');
     let incluirIva = false;
-    
+
     // Priorizar checkbox visual, luego hidden input
     if (incluirIvaCheckbox) {
         incluirIva = incluirIvaCheckbox.checked;
     } else if (incluirIvaHidden) {
         incluirIva = incluirIvaHidden.value === 'on' || incluirIvaHidden.value === 'true';
     }
-    
+
     let base = 0;
     // iva ya está declarado arriba
-    
+
     if (incluirIva) {
         if (documentConfig.taxBase === "parts_only") {
             // Chile: IVA solo sobre repuestos
@@ -329,10 +329,10 @@ function actualizarTotalesDocumento() {
         }
         iva = Math.round(base * documentConfig.taxRate);
     }
-    
+
     // granTotal ya está declarado arriba, solo actualizarlo
     granTotal = subtotal + iva;
-    
+
     console.log('[DEBUG] Totales calculados:', {
         repuestos: totalRepuestos,
         servicios: totalServicios,
@@ -342,29 +342,29 @@ function actualizarTotalesDocumento() {
         iva: iva,
         total: granTotal
     });
-    
+
     // Almacenar valores calculados globalmente
     window.calculatedSubtotal = subtotal;
     window.calculatedTax = iva;
     window.calculatedTotal = granTotal;
-    
+
     // Actualizar elementos del DOM usando data-money
     const subtotalElement = document.getElementById('subtotal-general');
     const taxElement = document.getElementById('iva-total');
     const totalElement = document.getElementById('total-general');
-    
+
     if (subtotalElement) subtotalElement.setAttribute('data-money', subtotal);
     if (taxElement) taxElement.setAttribute('data-money', iva);
     if (totalElement) totalElement.setAttribute('data-money', granTotal);
-    
+
     // Actualizar otros subtotales
     updateElementText('subtotal-repuestos', formatoMoneda(totalRepuestos));
-    updateElementText('subtotal-servicios', formatoMoneda(totalServicios)); 
+    updateElementText('subtotal-servicios', formatoMoneda(totalServicios));
     updateElementText('subtotal-otros', formatoMoneda(totalOtrosServicios));
-    
+
     // Formatear todos los montos
     formatAllMoney();
-    
+
     // Compatibilidad con IDs antiguos
     updateElementText('subtotal-doc', formatoMoneda(subtotal));
     updateElementText('iva-doc', formatoMoneda(iva));
@@ -372,7 +372,7 @@ function actualizarTotalesDocumento() {
     updateElementText('total-repuestos', formatoMoneda(totalRepuestos));
     updateElementText('total-servicios', formatoMoneda(totalServicios));
     updateElementText('total-otros-servicios', formatoMoneda(totalOtrosServicios));
-    
+
     // Actualizar sección de facturación (invoice)
     updateElementText('subtotal-repuestos-invoice', formatoMoneda(totalRepuestos));
     updateElementText('subtotal-servicios-invoice', formatoMoneda(totalServicios));
@@ -396,7 +396,7 @@ function actualizarResumenTotales(totalRepuestos, totalServicios, totalOtrosServ
     const totalRepuestosResumen = document.getElementById('total-repuestos-resumen');
     const totalServiciosResumen = document.getElementById('total-servicios-resumen');
     const totalOtrosServiciosResumen = document.getElementById('total-otros-servicios-resumen');
-    
+
     if (totalRepuestosResumen) {
         totalRepuestosResumen.textContent = money(totalRepuestos);
     }
@@ -450,25 +450,25 @@ document.addEventListener('DOMContentLoaded', function () {
         if (cantidadInput) cantidadInput.addEventListener('input', actualizarTotalRepuestos);
         if (precioInput) precioInput.addEventListener('input', actualizarTotalRepuestos);
     });
-    
+
     document.querySelectorAll('#tabla-servicios tbody tr').forEach((tr) => {
         activarAutocompleteServicio(tr);
         const precioInput = tr.querySelector('.precio-servicio-input');
         if (precioInput) precioInput.addEventListener('input', actualizarTotalServicios);
     });
-    
+
     // Calcular totales iniciales
     setTimeout(() => {
         actualizarTotalRepuestos();
         actualizarTotalServicios();
     }, 100);
-    
+
     // Asegurar el evento para el checkbox de IVA
     const checkboxIva = document.getElementById('lleva_iva');
     if (checkboxIva) {
         checkboxIva.addEventListener('change', actualizarTotalesDocumento);
     }
-    
+
     // --- CONFIGURACIÓN DE TIPO DE DOCUMENTO ---
     const tipoDocSelect = document.getElementById('id_tipo_documento');
     const numeroInput = document.getElementById('id_numero_documento');
@@ -541,28 +541,28 @@ document.addEventListener('DOMContentLoaded', function () {
             const cliente = document.getElementById('id_cliente');
             const vehiculo = document.getElementById('id_vehiculo');
             const numeroDoc = document.getElementById('id_numero_documento');
-            
+
             // Validar que cliente esté seleccionado
             if (!cliente || !cliente.value) {
                 alert('⚠️ Debe seleccionar un cliente antes de guardar el documento.');
                 e.preventDefault();
                 return false;
             }
-            
+
             // Validar que vehículo esté seleccionado
             if (!vehiculo || !vehiculo.value) {
                 alert('⚠️ Debe seleccionar un vehículo antes de guardar el documento.');
                 e.preventDefault();
                 return false;
             }
-            
+
             // Validar número de documento
             if (!numeroDoc || !numeroDoc.value.trim()) {
                 alert('⚠️ Debe ingresar un número de documento.');
                 e.preventDefault();
                 return false;
             }
-            
+
             // --- PARCHE SELECT2 AJAX: asegurar que el valor seleccionado esté como <option> en el <select> ---
             ['id_cliente', 'id_vehiculo', 'id_tecnico_responsable'].forEach(function(id) {
                 const select = document.getElementById(id);
@@ -631,10 +631,10 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
-    
+
     // Inicializar configuración del documento
     initDocumentConfig();
-    
+
     // Formatear todos los montos al cargar
     formatAllMoney();
 });

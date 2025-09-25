@@ -1,9 +1,18 @@
 import json
-import pytest
-from django.test import override_settings
-from django.contrib.auth import get_user_model
 
-@override_settings(MIDDLEWARE=[m for m in __import__("django.conf").conf.settings.MIDDLEWARE if "country_prefix" not in m])
+import pytest
+
+from django.contrib.auth import get_user_model
+from django.test import override_settings
+
+
+@override_settings(
+    MIDDLEWARE=[
+        m
+        for m in __import__("django.conf").conf.settings.MIDDLEWARE
+        if "country_prefix" not in m
+    ]
+)
 @pytest.mark.django_db
 def test_company_settings_precede_country_tax(client):
     # Este test se salta si CompanySettings no existe o no es enlazable.
@@ -12,15 +21,22 @@ def test_company_settings_precede_country_tax(client):
     client.force_login(User.objects.create_user("tester", "x"))
 
     try:
-        from taller.models.empresa import Empresa
         from taller.models.clientes import Cliente
+        from taller.models.empresa import Empresa
         from taller.models.vehiculos import Vehiculo
     except Exception:
         pytest.skip("Modelos Empresa/Cliente/Vehiculo no disponibles")
 
     emp = Empresa.objects.create(user=user, nombre_taller="ACME CS", pais="CL")
     cli = Cliente.objects.create(empresa=emp, nombre="C", tax_id="1-9")
-    veh = Vehiculo.objects.create(empresa=emp, cliente=cli, patente="CST001", marca_texto="M", modelo_texto="X", anio=2024)
+    veh = Vehiculo.objects.create(
+        empresa=emp,
+        cliente=cli,
+        patente="CST001",
+        marca_texto="M",
+        modelo_texto="X",
+        anio=2024,
+    )
 
     # Intentamos importar CompanySettings y setear algún campo de tasa conocido
     try:
@@ -40,7 +56,13 @@ def test_company_settings_precede_country_tax(client):
 
     # Setear un campo de tasa; el código soporta varios nombres
     set_ok = False
-    for field, val in [("iva", 0.07), ("iva_porcentaje", 7), ("sales_tax", 7), ("tax_rate", 0.07), ("tasa_iva", 7)]:
+    for field, val in [
+        ("iva", 0.07),
+        ("iva_porcentaje", 7),
+        ("sales_tax", 7),
+        ("tax_rate", 0.07),
+        ("tasa_iva", 7),
+    ]:
         if hasattr(cs, field):
             setattr(cs, field, val)
             set_ok = True
@@ -57,9 +79,15 @@ def test_company_settings_precede_country_tax(client):
         "vehiculo_id": veh.id,
         "tipo": "FAC",
         "fecha_emision": "2025-01-01",
-        "lineas_servicio": [{"nombre": "Srv", "cantidad": 1, "precio_unitario": 1000, "descuento": 0}],
+        "lineas_servicio": [
+            {"nombre": "Srv", "cantidad": 1, "precio_unitario": 1000, "descuento": 0}
+        ],
     }
-    r = client.post("/cl/documentos/api/create/", data=json.dumps(payload), content_type="application/json")
+    r = client.post(
+        "/cl/documentos/api/create/",
+        data=json.dumps(payload),
+        content_type="application/json",
+    )
     assert r.status_code in (200, 201), r.content
     doc = r.json()["documento"]
     assert doc["subtotal"] == 1000

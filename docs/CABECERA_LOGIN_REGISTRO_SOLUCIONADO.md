@@ -70,7 +70,7 @@ Se agregó una cabecera profesional con:
 ```
 📋 VERIFICANDO ELEMENTOS DE LA CABECERA:
 ✅ Elemento <header>
-✅ Texto del logo  
+✅ Texto del logo
 ✅ Indicador de país
 ✅ Enlace de login
 ✅ Enlace de registro

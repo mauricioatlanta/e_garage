@@ -12,11 +12,11 @@ class DynamicEffects {
   // Inicializar efectos dinámicos
   init() {
     if (this.isInitialized) return;
-    
+
     this.createParticles();
     this.createRandomExplosions();
     this.setupEventListeners();
-    
+
     this.isInitialized = true;
   }
 
@@ -51,7 +51,7 @@ class DynamicEffects {
     explosion.style.left = x + 'px';
     explosion.style.top = y + 'px';
     document.body.appendChild(explosion);
-    
+
     setTimeout(() => {
       explosion.remove();
     }, 500);
@@ -131,7 +131,7 @@ class SearchAndFilter {
   performSearch() {
     const query = this.searchInput ? this.searchInput.value.toLowerCase().trim() : '';
     const filterValues = this.getFilterValues();
-    
+
     this.items.forEach(item => {
       const matches = this.itemMatches(item, query, filterValues);
       this.updateItemVisibility(item, matches);
@@ -152,9 +152,9 @@ class SearchAndFilter {
   // Verificar si un item coincide con la búsqueda
   itemMatches(item, query, filterValues) {
     const data = item.dataset;
-    
+
     // Búsqueda por texto
-    const textMatches = !query || 
+    const textMatches = !query ||
       (data.name && data.name.toLowerCase().includes(query)) ||
       (data.category && data.category.toLowerCase().includes(query)) ||
       (data.subcategory && data.subcategory.toLowerCase().includes(query));
@@ -283,8 +283,8 @@ document.addEventListener('DOMContentLoaded', function() {
     filters: '.futuristic-filters select',
     items: '.futuristic-card'
   };
-  
-  if (document.querySelector(searchSelectors.searchInput) || 
+
+  if (document.querySelector(searchSelectors.searchInput) ||
       document.querySelector(searchSelectors.items)) {
     searchAndFilter.init(searchSelectors);
   }
@@ -330,7 +330,7 @@ window.confirmarEliminacion = function(id, nombre, url) {
 // Función para eliminar item
 function eliminarItem(id, url) {
   const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-  
+
   fetch(url, {
     method: 'POST',
     headers: {

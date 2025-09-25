@@ -22,9 +22,6 @@ except Exception as e:
     sys.exit(1)
 
 
-
-
-
 def crear_vista_ajax_modelos():
     """Crear vista AJAX para cargar modelos por marca"""
     vista_content = '''
@@ -34,14 +31,14 @@ def load_modelos(request):
     Vista AJAX para cargar modelos filtrados por marca
     """
     marca_id = request.GET.get('marca_id')
-    
+
     if not marca_id:
         return JsonResponse({'modelos': []})
-    
+
     try:
         marca = get_object_or_404(Marca, id=marca_id)
         modelos = Modelo.objects.filter(marca=marca).order_by('nombre')
-        
+
         modelos_data = [
             {
                 'id': modelo.id,
@@ -50,12 +47,12 @@ def load_modelos(request):
             }
             for modelo in modelos
         ]
-        
+
         return JsonResponse({
             'modelos': modelos_data,
             'marca': marca.nombre
         })
-        
+
     except Exception as e:
         return JsonResponse({
             'error': str(e),
@@ -68,20 +65,20 @@ def load_modelos(request):
 def crear_vista_ajax_motores():
     """Crear vista AJAX para cargar motores por modelo"""
     vista_content = '''
-@require_GET  
+@require_GET
 def load_motores(request):
     """
     Vista AJAX para cargar motores filtrados por modelo
     """
     modelo_id = request.GET.get('modelo_id')
-    
+
     if not modelo_id:
         return JsonResponse({'motores': []})
-    
+
     try:
         modelo = get_object_or_404(Modelo, id=modelo_id)
         motores = MotorVehiculo.objects.filter(modelo=modelo).order_by('cilindrada', 'nombre')
-        
+
         motores_data = [
             {
                 'id': motor.id,
@@ -92,13 +89,13 @@ def load_motores(request):
             }
             for motor in motores
         ]
-        
+
         return JsonResponse({
             'motores': motores_data,
             'modelo': modelo.nombre,
             'marca': modelo.marca.nombre
         })
-        
+
     except Exception as e:
         return JsonResponse({
             'error': str(e),
@@ -117,14 +114,14 @@ def load_cajas(request):
     Vista AJAX para cargar cajas filtradas por modelo
     """
     modelo_id = request.GET.get('modelo_id')
-    
+
     if not modelo_id:
         return JsonResponse({'cajas': []})
-    
+
     try:
         modelo = get_object_or_404(Modelo, id=modelo_id)
         cajas = CajaVehiculo.objects.filter(modelo=modelo).order_by('tipo', 'velocidades')
-        
+
         cajas_data = [
             {
                 'id': caja.id,
@@ -135,13 +132,13 @@ def load_cajas(request):
             }
             for caja in cajas
         ]
-        
+
         return JsonResponse({
             'cajas': cajas_data,
             'modelo': modelo.nombre,
             'marca': modelo.marca.nombre
         })
-        
+
     except Exception as e:
         return JsonResponse({
             'error': str(e),
@@ -160,16 +157,16 @@ def load_motores_cajas(request):
     Vista AJAX combinada para cargar motores y cajas por modelo
     """
     modelo_id = request.GET.get('modelo_id')
-    
+
     if not modelo_id:
         return JsonResponse({
             'motores': [],
             'cajas': []
         })
-    
+
     try:
         modelo = get_object_or_404(Modelo, id=modelo_id)
-        
+
         # Cargar motores
         motores = MotorVehiculo.objects.filter(modelo=modelo).order_by('cilindrada', 'nombre')
         motores_data = [
@@ -182,7 +179,7 @@ def load_motores_cajas(request):
             }
             for motor in motores
         ]
-        
+
         # Cargar cajas
         cajas = CajaVehiculo.objects.filter(modelo=modelo).order_by('tipo', 'velocidades')
         cajas_data = [
@@ -195,7 +192,7 @@ def load_motores_cajas(request):
             }
             for caja in cajas
         ]
-        
+
         return JsonResponse({
             'motores': motores_data,
             'cajas': cajas_data,
@@ -203,7 +200,7 @@ def load_motores_cajas(request):
             'marca': modelo.marca.nombre,
             'pais': modelo.pais
         })
-        
+
     except Exception as e:
         return JsonResponse({
             'error': str(e),
@@ -295,21 +292,21 @@ $(document).ready(function() {
         }
         return cookieValue;
     }
-    
+
     const csrftoken = getCookie('csrftoken');
-    
+
     // Función para limpiar y deshabilitar select
     function clearAndDisableSelect(selectId, placeholder = 'Seleccione...') {
         const $select = $(selectId);
         $select.empty().append(`<option value="">${placeholder}</option>`);
         $select.prop('disabled', true);
     }
-    
+
     // Función para habilitar y llenar select
     function populateSelect(selectId, data, valueField = 'id', textField = 'nombre') {
         const $select = $(selectId);
         $select.empty().append('<option value="">Seleccione...</option>');
-        
+
         if (data && data.length > 0) {
             data.forEach(item => {
                 const value = item[valueField];
@@ -321,18 +318,18 @@ $(document).ready(function() {
             $select.prop('disabled', true);
         }
     }
-    
+
     // Evento: Cambio de Marca
     $('#id_marca').change(function() {
         const marcaId = $(this).val();
-        
+
         // Limpiar campos dependientes
         clearAndDisableSelect('#id_modelo', 'Seleccione marca primero');
         clearAndDisableSelect('#id_motor', 'Seleccione modelo primero');
         clearAndDisableSelect('#id_caja', 'Seleccione modelo primero');
-        
+
         if (!marcaId) return;
-        
+
         // Cargar modelos via AJAX
         $.get('/ajax/load-modelos/', {marca_id: marcaId})
             .done(function(data) {
@@ -340,9 +337,9 @@ $(document).ready(function() {
                     alert('Error: ' + data.error);
                     return;
                 }
-                
+
                 populateSelect('#id_modelo', data.modelos);
-                
+
                 if (data.modelos.length === 0) {
                     $('#id_modelo').append('<option value="">No hay modelos disponibles</option>');
                 }
@@ -351,17 +348,17 @@ $(document).ready(function() {
                 alert('Error al cargar modelos');
             });
     });
-    
+
     // Evento: Cambio de Modelo
     $('#id_modelo').change(function() {
         const modeloId = $(this).val();
-        
+
         // Limpiar campos dependientes
         clearAndDisableSelect('#id_motor', 'Seleccione modelo primero');
         clearAndDisableSelect('#id_caja', 'Seleccione modelo primero');
-        
+
         if (!modeloId) return;
-        
+
         // Cargar motores y cajas via AJAX combinado
         $.get('/ajax/load-motores-cajas/', {modelo_id: modeloId})
             .done(function(data) {
@@ -369,19 +366,19 @@ $(document).ready(function() {
                     alert('Error: ' + data.error);
                     return;
                 }
-                
+
                 // Poblar motores
                 populateSelect('#id_motor', data.motores);
                 if (data.motores.length === 0) {
                     $('#id_motor').append('<option value="">No hay motores disponibles</option>');
                 }
-                
+
                 // Poblar cajas
                 populateSelect('#id_caja', data.cajas);
                 if (data.cajas.length === 0) {
                     $('#id_caja').append('<option value="">No hay cajas disponibles</option>');
                 }
-                
+
                 // Opcional: Mostrar información del modelo
                 console.log(`Cargado: ${data.marca} ${data.modelo} (${data.pais})`);
             })
@@ -389,7 +386,7 @@ $(document).ready(function() {
                 alert('Error al cargar motores y cajas');
             });
     });
-    
+
     // Inicialización: Deshabilitar campos dependientes
     clearAndDisableSelect('#id_modelo', 'Seleccione marca primero');
     clearAndDisableSelect('#id_motor', 'Seleccione modelo primero');

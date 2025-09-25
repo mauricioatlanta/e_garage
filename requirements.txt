@@ -5,62 +5,66 @@
 # Python 3.12+
 # ===============================================================
 
-# 🌟 FRAMEWORK PRINCIPAL (compatible con matriz CI 5.0 / 5.1)
-Django>=5.0,<5.2
-djangorestframework==3.16.0
-
-# 🗄️ BASE DE DATOS (PostgreSQL para Render)
-psycopg2-binary==2.9.9
-dj-database-url==2.1.0
-
-# 🔐 AUTENTICACIÓN Y AUTORIZACIÓN
-django-allauth==65.9.0
-
-# 🎨 INTERFAZ DE USUARIO Y FORMULARIOS
-django-crispy-forms==2.4
-crispy-bootstrap4==2025.6
-crispy-bootstrap5==2025.6
-django-widget-tweaks==1.5.0
-django-autocomplete-light==3.9.5
-
-# 📄 PROCESAMIENTO DE DOCUMENTOS
-reportlab==4.4.2
-pypdf==5.7.0
-openpyxl==3.1.5
 arabic-reshaper==3.0.0
-python-bidi==0.6.6
-
-# 🖼️ PROCESAMIENTO DE IMÁGENES
-Pillow==11.3.0
-
-# 📊 ANÁLISIS DE DATOS
-pandas==2.3.1
-numpy==2.3.1
-
-# 🌐 SERVIDOR WEB Y ARCHIVOS ESTÁTICOS
-whitenoise
-gunicorn
-
-# 🔗 REQUESTS Y APIs
-requests==2.32.4
-django-cors-headers==4.6.0
-
-# 🌍 INTERNACIONALIZACIÓN
-pytz==2025.2
-
-# 🔧 UTILIDADES
-python-dateutil==2.9.0.post0
-django-extensions==4.1
-
-# 📈 MONITOREO Y LOGS
-sentry-sdk==2.25.0
-
-# ⚡ CACHE Y PERFORMANCE
-django-redis==5.4.0
-redis==4.5.5
 
 # 🔒 DEPENDENCIAS ADICIONALES
 asgiref==3.8.1
+black==24.10.0
+crispy-bootstrap4==2025.6
+crispy-bootstrap5==2025.6
+dj-database-url==2.1.0
+# 🌟 FRAMEWORK PRINCIPAL (compatible con matriz CI 5.0 / 5.1)
+Django>=5.0,<5.2
+
+# 🔐 AUTENTICACIÓN Y AUTORIZACIÓN
+django-allauth==65.9.0
+django-autocomplete-light==3.9.5
+django-cors-headers==4.6.0
+
+# 🎨 INTERFAZ DE USUARIO Y FORMULARIOS
+django-crispy-forms==2.4
+django-extensions==4.1
+
+# ⚡ CACHE Y PERFORMANCE
+django-redis==5.4.0
+django-widget-tweaks==1.5.0
+djangorestframework==3.16.0
+gunicorn
+isort==5.13.2
+numpy==2.3.1
+openpyxl==3.1.5
+
+# 📊 ANÁLISIS DE DATOS
+pandas==2.3.1
+
+# 🖼️ PROCESAMIENTO DE IMÁGENES
+Pillow==11.3.0
+pre-commit==4.0.1
+
+# 🗄️ BASE DE DATOS (PostgreSQL para Render)
+psycopg2-binary==2.9.9
+pypdf==5.7.0
+python-bidi==0.6.6
+
+# 🔧 UTILIDADES
+python-dateutil==2.9.0.post0
+
+# 🔧 HERRAMIENTAS DE DESARROLLO Y FORMATO
+python-dotenv==1.0.0
+
+# 🌍 INTERNACIONALIZACIÓN
+pytz==2025.2
+redis==4.5.5
+
+# 📄 PROCESAMIENTO DE DOCUMENTOS
+reportlab==4.4.2
+
+# 🔗 REQUESTS Y APIs
+requests==2.32.4
+ruff==0.8.4
+
+# 📈 MONITOREO Y LOGS
+sentry-sdk==2.25.0
 sqlparse==0.5.3
 tzdata==2025.2
 
@@ -75,12 +79,8 @@ tzdata==2025.2
 urllib3==2.5.0
 weasyprint==65.1
 webencodings==0.5.1
+
+# 🌐 SERVIDOR WEB Y ARCHIVOS ESTÁTICOS
+whitenoise
 xhtml2pdf==0.2.17
 zopfli==0.2.3.post1
-
-# 🔧 HERRAMIENTAS DE DESARROLLO Y FORMATO
-python-dotenv==1.0.0
-black==24.10.0
-isort==5.13.2
-ruff==0.8.4
-pre-commit==4.0.1

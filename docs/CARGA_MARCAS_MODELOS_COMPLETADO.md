@@ -71,7 +71,7 @@ GET /en/api/modelos/19/ -> {"modelos": [...], "total": 3} # Con modelos BMW
 La carga de datos se integra perfectamente con:
 
 1. **Correcciones previas de URLs**: `/api/modelos/{id}/` en lugar de `/api/modelos/?marca_id={id}`
-2. **Estructura JSON correcta**: El JavaScript maneja `data.modelos` correctamente  
+2. **Estructura JSON correcta**: El JavaScript maneja `data.modelos` correctamente
 3. **Filtrado funcional**: Solo modelos activos (`activo=True`)
 4. **Namespace correcto**: URLs funcionan con redirección a `/en/api/modelos/{id}/`
 
@@ -85,6 +85,6 @@ El sistema está completamente funcional para:
 
 ## Estado: COMPLETADO ✅
 
-**Fecha:** 9 de agosto de 2025  
-**Desarrollador:** GitHub Copilot  
+**Fecha:** 9 de agosto de 2025
+**Desarrollador:** GitHub Copilot
 **Integrado con:** FIX_API_MODELOS_VEHICULOS_COMPLETADO.md

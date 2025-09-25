@@ -304,11 +304,11 @@
         .features-grid {
             grid-template-columns: 1fr;
         }
-        
+
         .stats-grid {
             grid-template-columns: 1fr 1fr;
         }
-        
+
         .action-buttons {
             flex-direction: column;
             align-items: center;
@@ -339,17 +339,17 @@
                 <div class="stat-number">2,547</div>
                 <div class="stat-label">Visitas Este Mes</div>
             </div>
-            
+
             <div class="stat-item">
                 <div class="stat-number">38</div>
                 <div class="stat-label">Leads Generados</div>
             </div>
-            
+
             <div class="stat-item">
                 <div class="stat-number">67%</div>
                 <div class="stat-label">Tasa Conversión</div>
             </div>
-            
+
             <div class="stat-item">
                 <div class="stat-number">4.8★</div>
                 <div class="stat-label">Rating Google</div>
@@ -372,7 +372,7 @@
             <div class="feature-icon">📈</div>
             <h3 class="feature-title">Google Analytics 4</h3>
             <p class="feature-description">
-                Integración completa con GA4 para rastrear visitantes, conversiones 
+                Integración completa con GA4 para rastrear visitantes, conversiones
                 y comportamiento de clientes en tu sitio web.
             </p>
         </div>
@@ -390,7 +390,7 @@
             <div class="feature-icon">📱</div>
             <h3 class="feature-title">Móvil Optimizado</h3>
             <p class="feature-description">
-                Diseño responsive que se adapta perfectamente a móviles, donde el 
+                Diseño responsive que se adapta perfectamente a móviles, donde el
                 78% de tus clientes te buscarán.
             </p>
         </div>
@@ -403,10 +403,10 @@
             Conectado Automáticamente
         </h3>
         <p style="color: var(--glow-cyan); margin-bottom: 1.5rem;">
-            Tu taller ya está integrado con Google Analytics, Google My Business 
+            Tu taller ya está integrado con Google Analytics, Google My Business
             y Google Search Console para máxima visibilidad.
         </p>
-        
+
         <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
             <span style="background: rgba(57, 255, 20, 0.2); padding: 8px 16px; border-radius: 20px; color: var(--matrix-green); font-weight: bold;">
                 ✅ Analytics 4
@@ -425,16 +425,16 @@
         <h3 style="color: var(--cyber-blue); text-align: center; margin-bottom: 1.5rem;">
             🔍 Así te ve Google (Simulación)
         </h3>
-        
+
         <div class="search-preview">
             <div class="search-title">Taller Técnico Profesional - Servicios con IA | Mi Taller</div>
             <div class="search-url">https://mi-taller.e-garage.pro</div>
             <div class="search-description">
-                ⭐⭐⭐⭐⭐ Taller técnico con tecnología IA integrada. Diagnósticos precisos, 
+                ⭐⭐⭐⭐⭐ Taller técnico con tecnología IA integrada. Diagnósticos precisos,
                 reportes profesionales y gestión inteligente. Cotización online gratis.
             </div>
         </div>
-        
+
         <p style="color: var(--matrix-green); text-align: center; margin-top: 1rem; font-weight: bold;">
             🎯 Optimizado para aparecer en las primeras posiciones
         </p>
@@ -445,23 +445,23 @@
         <h3 style="color: var(--neon-purple); font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem; text-align: center;">
             🚀 Beneficios del SEO Integrado
         </h3>
-        
+
         <div class="benefit-item">
             Aparece en Google cuando busquen "taller técnico cerca de mí"
         </div>
-        
+
         <div class="benefit-item">
             Páginas optimizadas para cada servicio que ofreces
         </div>
-        
+
         <div class="benefit-item">
             Meta descriptions automáticas que aumentan clicks en 45%
         </div>
-        
+
         <div class="benefit-item">
             Schema markup para mostrar ratings y precios en Google
         </div>
-        
+
         <div class="benefit-item">
             Sitemap automático que se actualiza cuando agregues servicios
         </div>
@@ -505,11 +505,11 @@ function animarNumeros() {
     elementos.forEach(elem => {
         const valor = elem.textContent;
         const numero = parseInt(valor.replace(/[^\d]/g, ''));
-        
+
         if (!isNaN(numero)) {
             let contador = 0;
             const incremento = numero / 30; // 30 frames para la animación
-            
+
             const interval = setInterval(() => {
                 contador += incremento;
                 if (contador >= numero) {
@@ -531,7 +531,7 @@ function verAnalytics() {
           '✅ Eventos personalizados\n' +
           '✅ Audiencias definidas\n\n' +
           'Podrás ver estadísticas detalladas en tu dashboard.');
-    
+
     // Analytics event
     gtag('event', 'analytics_demo_click', {
         'event_category': 'onboarding_engagement',
@@ -545,7 +545,7 @@ function verAnalytics() {
 // Inicializar animaciones al cargar
 window.addEventListener('load', function() {
     setTimeout(animarNumeros, 500);
-    
+
     // Analytics
     gtag('event', 'seo_analytics_vista', {
         'event_category': 'onboarding_engagement',
@@ -562,7 +562,7 @@ document.querySelectorAll('.feature-card').forEach(card => {
     card.addEventListener('mouseenter', function() {
         this.style.transform = 'translateY(-5px) scale(1.02)';
     });
-    
+
     card.addEventListener('mouseleave', function() {
         this.style.transform = 'translateY(0) scale(1)';
     });

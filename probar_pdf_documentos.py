@@ -2,6 +2,7 @@
 """
 Script para probar la funcionalidad de impresión de documentos PDF
 """
+
 import os
 
 import django

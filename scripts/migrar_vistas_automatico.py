@@ -82,13 +82,13 @@ class TemplateViewMigrator:
     from taller.utils.templates import select_country_lang_template
     from django.utils.translation import get_language
     from django.template.response import TemplateResponse
-    
+
     template_name = select_country_lang_template(
-        "{relative_template}", 
-        getattr(request.user.empresa, 'pais', 'cl').lower(), 
+        "{relative_template}",
+        getattr(request.user.empresa, 'pais', 'cl').lower(),
         get_language()
     )
-    
+
     return TemplateResponse(request, template_name, {context_var})"""
 
                 # Reemplazar la línea original

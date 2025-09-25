@@ -194,7 +194,8 @@ def repuesto_by_code_api(request):
 
     try:
         repuesto = Repuesto.objects.filter(
-            part_number__iexact=code, empresa=empresa  # 🔒 FILTRO CRÍTICO POR EMPRESA
+            part_number__iexact=code,
+            empresa=empresa,  # 🔒 FILTRO CRÍTICO POR EMPRESA
         ).first()
 
         if not repuesto:

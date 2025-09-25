@@ -5,7 +5,7 @@
 ### 📅 **Cambios Realizados:**
 
 1. **Página de Bienvenida Chile** ✅
-   - Actualizado de "7 días" a "30 días" 
+   - Actualizado de "7 días" a "30 días"
    - Enlaces: `/accounts/signup/?trial=1`
    - Textos: "⚡ Prueba Gratis 30 días" y "🎯 Prueba Gratis 30 días – Sin tarjeta"
 
@@ -16,7 +16,7 @@
    - URLs configuradas: `/registro-trial/` y `/activar-trial/`
 
 3. **Templates Actualizados** ✅
-   - `registro_trial.html` (CL/US, ES/EN) - "30 días gratis" 
+   - `registro_trial.html` (CL/US, ES/EN) - "30 días gratis"
    - `activar_trial.html` - "prueba de 30 días"
    - Mensaje mejorado con "30 días completos sin restricciones"
 
@@ -48,11 +48,11 @@
 
 ### 📊 **Verificación del Sistema:**
 
-✅ **Modelo funcionando**: Cálculo correcto de 30 días  
-✅ **URLs configuradas**: `/registro-trial/` y `/activar-trial/`  
-✅ **Vistas funcionando**: Registro y activación operativos  
-✅ **Templates actualizados**: Textos consistentes "30 días"  
-✅ **Middleware disponible**: Listo para activar en producción  
+✅ **Modelo funcionando**: Cálculo correcto de 30 días
+✅ **URLs configuradas**: `/registro-trial/` y `/activar-trial/`
+✅ **Vistas funcionando**: Registro y activación operativos
+✅ **Templates actualizados**: Textos consistentes "30 días"
+✅ **Middleware disponible**: Listo para activar en producción
 
 ### 🚀 **Flujo de Usuario:**
 
@@ -80,7 +80,7 @@ Hola [Nombre],
 Tu código de instalación seguro es: [CÓDIGO]
 
 Para activar tu cuenta, haz clic en el siguiente enlace e ingresa tu código de activación:
-https://egarage.cl/activar-trial/?email=[EMAIL]
+https://egarage.cl/cl/es/activar-trial/?email=[EMAIL]
 
 Gracias por probar E-Garage.
 ```
@@ -96,10 +96,10 @@ Gracias por probar E-Garage.
 
 ## 🎯 **RESUMEN EJECUTIVO:**
 
-✅ **Sistema de 30 días completamente funcional**  
-✅ **Página de bienvenida actualizada**  
-✅ **Backend preparado para producción**  
-✅ **Templates consistentes en todos los idiomas**  
+✅ **Sistema de 30 días completamente funcional**
+✅ **Página de bienvenida actualizada**
+✅ **Backend preparado para producción**
+✅ **Templates consistentes en todos los idiomas**
 
-**Estado**: ✅ LISTO PARA PRODUCCIÓN  
+**Estado**: ✅ LISTO PARA PRODUCCIÓN
 **Próximo paso**: Activar middleware en producción y configurar SMTP

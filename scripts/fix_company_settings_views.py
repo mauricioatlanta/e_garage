@@ -5,7 +5,6 @@ que usan campos inexistentes del modelo ConfiguracionEmpresa
 """
 
 
-
 def fix_company_settings_views():
     """Corrige las funciones con campos incorrectos"""
     file_path = "e:/projecto/e_garage/taller/views_extra/company_settings_views.py"

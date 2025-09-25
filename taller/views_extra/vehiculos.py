@@ -27,7 +27,7 @@ def crear_vehiculo(request):
         if form.is_valid():
             form.instance.empresa = request.empresa
             form.save()
-            return redirect("vehiculos:lista_vehiculos")
+            return redirect("chile:taller:vehiculos:lista_vehiculos")
     else:
         form = VehiculoForm(user=request.user)  # BLINDAJE: Agregar user
     return render(request, "crear_vehiculo.html", {"form": form})

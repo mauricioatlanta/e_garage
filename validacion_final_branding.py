@@ -2,6 +2,7 @@
 """
 Validación FINAL del sistema de branding después de aplicar correcciones
 """
+
 import os
 
 import django

@@ -88,7 +88,7 @@
 class MotorDiagnosticoIA:
     - analizar_servicios_completo()
     - _detectar_servicios_crecimiento()
-    - _detectar_servicios_declive() 
+    - _detectar_servicios_declive()
     - _analizar_estacionalidad()
     - _generar_comparativa_mercado()
     - _generar_recomendaciones_ia()
@@ -114,7 +114,7 @@ class MotorDiagnosticoIA:
 ### ✅ **Servicios en Crecimiento**
 ```
 • Cambio de Aceite: +15.5% ($125,000/mes)
-• Alineación: +12.3% ($85,000/mes)  
+• Alineación: +12.3% ($85,000/mes)
 • Frenos: +9.8% ($195,000/mes)
 ```
 

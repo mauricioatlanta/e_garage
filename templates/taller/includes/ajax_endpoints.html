@@ -1,0 +1,30 @@
+<!-- Endpoints AJAX dinámicos para JavaScript -->
+<script>
+// Endpoints AJAX disponibles globalmente
+// Usar el namespace correcto según el país
+{% if request.empresa and request.empresa.pais == "US" %}
+window.AJAX_ENDPOINTS = {
+  buscarClientes: "{% url 'usa:taller:ajax:buscar_clientes' %}",
+  vehiculosPorCliente: "{% url 'usa:taller:ajax:vehiculos_por_cliente' %}",
+  ciudadesPorRegion: "{% url 'usa:taller:ajax:ciudades_por_region' %}",
+  marcas: "{% url 'usa:taller:ajax:ajax_marcas' %}",
+  modelos: "{% url 'usa:taller:ajax:ajax_modelos' %}",
+  motores: "{% url 'usa:taller:ajax:ajax_motores' %}",
+  cajas: "{% url 'usa:taller:ajax:ajax_cajas' %}",
+  repuestoPorCodigo: "{% url 'usa:taller:repuestos:api_repuesto_por_codigo' %}",
+  nextNumber: "{% url 'usa:taller:documentos:api_obtener_numero_documento' %}",
+};
+{% else %}
+window.AJAX_ENDPOINTS = {
+  buscarClientes: "{% url 'chile:taller:ajax:buscar_clientes' %}",
+  vehiculosPorCliente: "{% url 'chile:taller:ajax:vehiculos_por_cliente' %}",
+  ciudadesPorRegion: "{% url 'chile:taller:ajax:ciudades_por_region' %}",
+  marcas: "{% url 'chile:taller:ajax:ajax_marcas' %}",
+  modelos: "{% url 'chile:taller:ajax:ajax_modelos' %}",
+  motores: "{% url 'chile:taller:ajax:ajax_motores' %}",
+  cajas: "{% url 'chile:taller:ajax:ajax_cajas' %}",
+  repuestoPorCodigo: "{% url 'chile:taller:repuestos:api_repuesto_por_codigo' %}",
+  nextNumber: "{% url 'chile:taller:documentos:api_obtener_numero_documento' %}",
+};
+{% endif %}
+</script>

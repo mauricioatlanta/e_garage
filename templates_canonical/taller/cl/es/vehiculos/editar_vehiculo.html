@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load country_url %}
 {% load static %}
 {% load widget_tweaks %}
 {% load i18n %}
@@ -7,10 +8,10 @@
 <div class="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black text-white relative overflow-hidden">
   <!-- Starfield Background -->
   <canvas id="starfield" class="absolute inset-0 w-full h-full"></canvas>
-  
+
   <!-- Content -->
   <div class="relative z-10 container mx-auto px-4 py-8">
-    
+
     <!-- Header -->
     <div class="text-center mb-8">
       <div class="inline-flex items-center justify-center p-6 rounded-full bg-gradient-to-r from-cyan-500/20 to-blue-500/20 backdrop-blur-sm border border-cyan-400/30 mb-6">
@@ -22,12 +23,12 @@
 
     <!-- Formulario -->
     <div class="max-w-4xl mx-auto">
-      <form id="form-editar-vehiculo" 
-            method="post" 
-            action="{% url 'taller:vehiculos:editar_vehiculo' vehiculo.id %}"
+      <form id="form-editar-vehiculo"
+            method="post"
+            action="{% url 'chile:taller:vehiculos:editar_vehiculo' vehiculo.id %}"
             class="space-y-6">
         {% csrf_token %}
-        
+
         <!-- Información del Cliente -->
         <div class="relative">
           <div class="absolute -inset-1 rounded-xl bg-gradient-to-r from-cyan-500/20 via-blue-500/20 to-purple-500/20 blur-xl"></div>
@@ -36,7 +37,7 @@
               <span class="text-2xl mr-3">👤</span>
               {% trans "Información del Cliente" %}
             </h3>
-            
+
             <!-- Campo Cliente -->
             <div class="mb-4">
               <label for="id_cliente" class="block text-sm font-medium text-gray-300 mb-2">
@@ -58,7 +59,7 @@
               <span class="text-2xl mr-3">🚗</span>
               {% trans "Datos del Vehículo" %}
             </h3>
-            
+
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
               <!-- Primera fila: Año, Marca, Modelo -->
               <div>
@@ -173,13 +174,13 @@
 
         <!-- Botones de acción -->
         <div class="flex flex-col sm:flex-row gap-4 pt-6">
-          <a href="{% url 'taller:vehiculos:lista_vehiculos' %}"
+          <a href="{% url 'chile:taller:vehiculos:lista_vehiculos' %}"
              class="group flex-1 relative inline-flex items-center justify-center space-x-2 px-8 py-4 rounded-xl bg-gradient-to-r from-gray-600 via-gray-700 to-gray-800 hover:from-gray-500 hover:via-gray-600 hover:to-gray-700 text-white font-bold shadow-lg shadow-gray-800/40 transition-all duration-300 border border-gray-400/40">
             <span class="text-lg">⟲</span>
             <span>{% trans "Cancelar" %}</span>
           </a>
-          
-          <button type="submit" 
+
+          <button type="submit"
                   class="group flex-1 relative inline-flex items-center justify-center space-x-2 px-8 py-4 rounded-xl bg-gradient-to-r from-emerald-600 via-lime-600 to-green-600 hover:from-emerald-500 hover:via-lime-500 hover:to-green-500 text-white font-bold shadow-lg shadow-emerald-800/40 transition-all duration-300 border border-emerald-400/40">
             <span class="text-lg">💾</span>
             <span>{% trans "Actualizar Vehículo" %}</span>
@@ -195,7 +196,7 @@
         {% trans "Modifica los datos del vehículo y haz clic en 'Actualizar Vehículo' para guardar los cambios." %}
       </p>
     </div>
-    
+
   </div>
 </div>
 

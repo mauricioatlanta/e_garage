@@ -176,7 +176,7 @@ def mostrar_instrucciones_finales(zip_name):
 
 🎯 ARCHIVOS CRÍTICOS (MÍNIMO NECESARIO):
 ✅ gestion_taller/urls.py
-✅ templates/onboarding/bienvenida_chile.html  
+✅ templates/onboarding/bienvenida_chile.html
 ✅ templates/onboarding/bienvenida_usa.html
 
 📱 VERIFICACIÓN:

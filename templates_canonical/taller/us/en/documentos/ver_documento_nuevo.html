@@ -159,7 +159,7 @@
     border-radius: 0.5rem;
     margin: 1rem 0;
   }
-  
+
   /* Estilos para estados de pago */
   .estado-pago {
     padding: 6px 12px;
@@ -204,7 +204,7 @@
     gap: 0.5rem;
     min-width: 200px;
   }
-  
+
   .pricing-row {
     display: flex;
     justify-content: space-between;
@@ -212,7 +212,7 @@
     padding: 0.25rem 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
-  
+
   .pricing-row.ganancia {
     border-bottom: 2px solid #00f2fe;
     font-weight: bold;
@@ -226,11 +226,11 @@
      data-locale="{% if company_country == 'US' %}en-US{% else %}es-CL{% endif %}"
      data-currency="{% if company_country == 'US' %}USD{% else %}CLP{% endif %}">
   <div class="estado-documento">✅ Guardado</div>
-  
+
   <h1 class="documento-title">
     {{ documento.tipo_documento }} #{{ documento.numero_documento }}
   </h1>
-  
+
   <!-- Información del documento -->
   <div class="info-grid">
     <div class="info-item">
@@ -422,23 +422,23 @@
   <!-- Acciones -->
   <div class="acciones">
   {% if request.path|slice:":3" == "/cl" %}
-    <a href="{% url 'documentos_cl:lista_documentos' %}" class="btn-accion">
+    <a href="{% url 'documentos_cl_es:lista_documentos' %}" class="btn-accion">
         ← Volver al Listado
       </a>
-    <a href="{% url 'documentos_cl:editar_documento' pk=documento.id %}" class="btn-accion">
+    <a href="{% url 'documentos_cl_es:editar_documento' pk=documento.id %}" class="btn-accion">
         ✏️ Editar Documento
       </a>
-    <a href="{% url 'documentos_cl:exportar_documento_pdf' documento_id=documento.id %}" class="btn-accion" target="_blank">
+    <a href="{% url 'documentos_cl_es:exportar_documento_pdf' documento_id=documento.id %}" class="btn-accion" target="_blank">
         📄 Exportar PDF
       </a>
   {% else %}
-    <a href="{% url 'documentos_us:lista_documentos' %}" class="btn-accion">
+    <a href="{% url 'documentos_us_en:lista_documentos' %}" class="btn-accion">
         ← Volver al Listado
       </a>
-    <a href="{% url 'documentos_us:editar_documento' pk=documento.id %}" class="btn-accion">
+    <a href="{% url 'documentos_us_en:editar_documento' pk=documento.id %}" class="btn-accion">
         ✏️ Editar Documento
       </a>
-    <a href="{% url 'documentos_us:exportar_documento_pdf' documento_id=documento.id %}" class="btn-accion" target="_blank">
+    <a href="{% url 'documentos_us_en:exportar_documento_pdf' documento_id=documento.id %}" class="btn-accion" target="_blank">
         📄 Exportar PDF
       </a>
   {% endif %}
@@ -476,10 +476,10 @@ function formatMoney() {
     setTimeout(formatMoney, 100);
     return;
   }
-  
+
   const locale = root.dataset.locale || 'es-CL';
   const currency = root.dataset.currency || 'CLP';
-  
+
   // Asegurar que el locale sea correcto para USA
   let finalLocale = locale;
   if (currency === 'USD') {
@@ -487,11 +487,11 @@ function formatMoney() {
   } else if (currency === 'CLP') {
     finalLocale = 'es-CL';
   }
-  
+
   console.log('Formateando monedas con:', { locale: finalLocale, currency });
-  
-  const fmt = new Intl.NumberFormat(finalLocale, { 
-    style: 'currency', 
+
+  const fmt = new Intl.NumberFormat(finalLocale, {
+    style: 'currency',
     currency: currency,
     minimumFractionDigits: currency === 'USD' ? 2 : 0,
     maximumFractionDigits: currency === 'USD' ? 2 : 0
@@ -499,7 +499,7 @@ function formatMoney() {
 
   const moneyElements = document.querySelectorAll('[data-money]');
   console.log('Elementos encontrados con data-money:', moneyElements.length);
-  
+
   moneyElements.forEach((el, index) => {
     const raw = Number(el.getAttribute('data-money') || 0);
     const formatted = fmt.format(isNaN(raw) ? 0 : raw);

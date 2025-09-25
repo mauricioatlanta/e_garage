@@ -97,6 +97,9 @@ def country_aware_login(request):
     # Usar la vista original de allauth con contexto corregido
     from allauth.account.views import login as allauth_login
 
+    from django.template.response import TemplateResponse
+    from django.utils.translation import get_language
+
     from taller.forms.custom_login import CustomLoginForm
 
     # Asegurar que el formulario se pase correctamente
@@ -112,5 +115,33 @@ def country_aware_login(request):
     if hasattr(response, "context_data"):
         response.context_data["form"] = form
         response.context_data["debug"] = True  # Para debugging
+
+        # Forzar el template correcto basado en el país detectado
+        country = getattr(request, "country", "CL")
+        lang = get_language() or "es"
+
+        if country == "US":
+            # Para USA, usar template específico en inglés
+            if lang == "es":
+                # Si se selecciona español, usar template de Chile
+                template_name = "taller/cl/es/account/login.html"
+            else:
+                # Por defecto inglés para USA
+                template_name = "taller/us/en/account/login.html"
+        else:
+            # Para Chile, usar template específico
+            if lang == "en":
+                template_name = "taller/cl/en/auth/login.html"
+            else:
+                # Por defecto español para Chile
+                template_name = "taller/cl/es/account/login.html"
+
+        # Crear nueva respuesta con el template correcto
+        context = response.context_data.copy()
+        context["form"] = form
+        context["country"] = country
+        context["LANGUAGE_CODE"] = lang
+
+        return TemplateResponse(request, template_name, context)
 
     return response

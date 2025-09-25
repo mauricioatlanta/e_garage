@@ -73,7 +73,7 @@ class LogAuditoria(models.Model):
 
         if request:
             ip_address = cls.get_client_ip(request)
-            user_agent = request.META.get("HTTP_USER_AGENT", "")[:500]
+            user_agent = request.headers.get("user-agent", "")[:500]
 
         return cls.objects.create(
             empresa=empresa,
@@ -91,7 +91,7 @@ class LogAuditoria(models.Model):
     @staticmethod
     def get_client_ip(request):
         """Obtener IP real del cliente"""
-        x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+        x_forwarded_for = request.headers.get("x-forwarded-for")
         if x_forwarded_for:
             ip = x_forwarded_for.split(",")[0]
         else:

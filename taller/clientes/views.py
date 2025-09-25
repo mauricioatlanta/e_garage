@@ -162,7 +162,7 @@ def cliente_delete(request, pk=None, cliente_id=None):
             messages.success(
                 request, f"Cliente {cliente.nombre} eliminado exitosamente."
             )
-            return redirect("taller:clientes:lista_clientes")
+            return redirect("chile:taller:clientes:lista_clientes")
         except ProtectedError as e:
             # Obtener los objetos protegidos
             protected_objects = e.args[1]

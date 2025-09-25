@@ -9,6 +9,7 @@ Prueba completa con datos reales de Mauricio:
 
 IMPORTANTE: Para Gmail necesitas configurar contraseña de aplicación
 """
+
 import os
 from datetime import datetime, timedelta
 

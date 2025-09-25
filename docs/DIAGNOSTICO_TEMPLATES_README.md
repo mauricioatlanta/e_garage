@@ -63,7 +63,7 @@ X-TPL-base: E:\proyecto\e_garage\otra_app\templates\base.html ❌
 **Qué muestra:**
 ```
 CP Snapshot (esta vista):
-ID=4 | ADDRESS=Av. Siempre Viva 123 | PHONE=+56 2 2345 6789 | 
+ID=4 | ADDRESS=Av. Siempre Viva 123 | PHONE=+56 2 2345 6789 |
 EMAIL=contacto@empresa.cl | WEB=www.empresa.cl | TAX=19.00
 ```
 
@@ -89,7 +89,7 @@ python verificar_empresa.py
 
 ### Problema: Template base.html viejo
 **Síntoma:** X-TPL-base apunta a otra carpeta
-**Solución:** 
+**Solución:**
 1. Buscar y eliminar el base.html duplicado
 2. Verificar que `templates_canonical` esté en DIRS
 3. Reiniciar el servidor
@@ -154,7 +154,7 @@ python verificar_empresa.py
 
 Pega aquí los valores de:
 - X-TPL-base
-- X-TPL-common-footer-company  
+- X-TPL-common-footer-company
 - X-Settings-Module
 - X-TPL-Loader
 - Salida JSON de /debug/company-header/?empresa_id=...

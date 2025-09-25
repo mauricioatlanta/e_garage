@@ -3,7 +3,6 @@
 Script para probar el idioma que se muestra en la web
 """
 
-
 import requests
 
 

@@ -16,7 +16,7 @@ regiones = [
     "Los Ríos",
     "Los Lagos",
     "Aysén del General Carlos Ibáñez del Campo",
-    "Magallanes y de la Antártica Chilena"
+    "Magallanes y de la Antártica Chilena",
 ]
 
 for nombre in regiones:

@@ -242,15 +242,15 @@
   </div>
   <div class="futurista-actions">
   {% if request.path|slice:":3" == "/cl" %}
-    <a href="{% url 'documentos_cl:lista_documentos' %}" class="futurista-link">← Volver al listado</a>
-    <a href="{% url 'documentos_cl:exportar_documento_pdf' documento_id=documento.id %}"
+    <a href="{% url 'documentos_cl_es:lista_documentos' %}" class="futurista-link">← Volver al listado</a>
+    <a href="{% url 'documentos_cl_es:exportar_documento_pdf' documento_id=documento.id %}"
          class="futurista-btn"
          target="_blank">
         🧾 Exportar a PDF
       </a>
   {% else %}
-    <a href="{% url 'documentos_us:lista_documentos' %}" class="futurista-link">← Volver al listado</a>
-    <a href="{% url 'documentos_us:exportar_documento_pdf' documento_id=documento.id %}"
+    <a href="{% url 'documentos_us_en:lista_documentos' %}" class="futurista-link">← Volver al listado</a>
+    <a href="{% url 'documentos_us_en:exportar_documento_pdf' documento_id=documento.id %}"
          class="futurista-btn"
          target="_blank">
         🧾 Exportar a PDF

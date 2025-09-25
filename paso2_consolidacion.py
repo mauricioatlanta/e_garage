@@ -3,6 +3,7 @@
 🎯 PASO 2 COMPLETADO - CONSOLIDACIÓN DE VALIDACIONES
 Resumen ejecutivo de todas las validaciones de consistencia
 """
+
 import os
 
 import django

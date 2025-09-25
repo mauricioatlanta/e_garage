@@ -91,7 +91,7 @@
         </div>
       </div>
     </div>
-    
+
     <div class="flex items-center gap-4">
       <a href="#pricing" class="hidden md:inline-block text-slate-300 hover:text-white px-4 py-2 rounded-lg transition">
         Pricing
@@ -334,7 +334,7 @@
   <section class="mx-auto max-w-7xl px-6 py-20">
     <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">Loved by U.S. shops</h2>
     <p class="text-center text-xl text-slate-300/90 mb-12">Real feedback from real businesses</p>
-    
+
     <div class="grid md:grid-cols-3 gap-8">
       <figure class="rounded-2xl bg-slate-900/40 ring-1 ring-white/10 p-8 eg-card-hover">
         <div class="flex text-yellow-400 mb-4">
@@ -348,7 +348,7 @@
           <div class="text-sm">Austin TX • <span class="text-emerald-400">Auto Repair</span></div>
         </figcaption>
       </figure>
-      
+
       <figure class="rounded-2xl bg-slate-900/40 ring-1 ring-white/10 p-8 eg-card-hover">
         <div class="flex text-yellow-400 mb-4">
           ⭐⭐⭐⭐⭐
@@ -361,7 +361,7 @@
           <div class="text-sm">Orlando FL • <span class="text-sky-400">Parts Store</span></div>
         </figcaption>
       </figure>
-      
+
       <figure class="rounded-2xl bg-slate-900/40 ring-1 ring-white/10 p-8 eg-card-hover">
         <div class="flex text-yellow-400 mb-4">
           ⭐⭐⭐⭐⭐
@@ -418,11 +418,11 @@
   const toggle = document.getElementById('billingToggle');
   const knob = document.getElementById('knob');
   let isAnnual = false;
-  
+
   toggle?.addEventListener('click', () => {
     isAnnual = !isAnnual;
     knob.style.transform = isAnnual ? 'translateX(84px)' : 'translateX(0)';
-    
+
     document.querySelectorAll('[data-price-month]').forEach(el => {
       const monthly = el.getAttribute('data-price-month');
       const annual = el.getAttribute('data-price-annual');

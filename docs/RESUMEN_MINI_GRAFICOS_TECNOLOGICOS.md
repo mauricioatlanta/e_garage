@@ -6,7 +6,7 @@
 📊 MEJORAS EN GRÁFICOS:
 - 🚀 CSS agresivo con !important para forzar tamaños mini
 - 📏 Widgets de resumen: máximo 80px de altura
-- 📏 Mini-charts: máximo 60px de altura  
+- 📏 Mini-charts: máximo 60px de altura
 - 📏 Gráficos de categorías: máximo 50px de altura
 - 🔒 Overflow: hidden para prevenir desbordamiento
 - ⚡ JavaScript optimizado con aspectRatio y devicePixelRatio controlados
@@ -33,7 +33,7 @@
 
 📋 CATEGORÍAS OPTIMIZADAS:
 ✅ Repuestos - Botones con gradiente cyan
-✅ Servicios - Botones con gradiente cyan  
+✅ Servicios - Botones con gradiente cyan
 ✅ Otros Servicios - Botones con gradiente orange
 ✅ Técnicos - Botones con gradiente cyan
 ✅ Clientes - Botones con gradiente cyan

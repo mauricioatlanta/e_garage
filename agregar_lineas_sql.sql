@@ -13,18 +13,18 @@ SELECT COUNT(*) as total_lineas_servicio FROM taller_lineaservicio;
 
 -- Insertar líneas de repuesto (ajustar documento_id según sea necesario)
 INSERT INTO taller_linearepuesto (documento_id, codigo, nombre, cantidad, precio_unitario, descuento, repuesto_id, observaciones)
-VALUES 
+VALUES
 (1, 'REP001', 'Filtro de Aceite', 2, 15000.00, 0.00, NULL, 'Línea de prueba para totales'),
 (1, 'REP002', 'Pastillas de Freno', 1, 45000.00, 10.00, NULL, 'Línea de prueba con descuento');
 
 -- Insertar líneas de servicio
 INSERT INTO taller_lineaservicio (documento_id, codigo, nombre, cantidad, precio_unitario, descuento, servicio_id, observaciones)
-VALUES 
+VALUES
 (1, 'SER001', 'Cambio de Aceite', 1, 25000.00, 0.00, NULL, 'Servicio de prueba'),
 (1, 'SER002', 'Revisión General', 1, 35000.00, 5.00, NULL, 'Servicio con descuento');
 
 -- Verificar los totales después de insertar
-SELECT 
+SELECT
     d.id,
     d.numero,
     d.tipo,

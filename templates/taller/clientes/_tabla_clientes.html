@@ -20,14 +20,15 @@
       <td class="py-3 px-4">{% if cliente.region %}{{ cliente.region.nombre }}{% endif %}</td>
       <td class="py-3 px-4">{% if cliente.ciudad %}{{ cliente.ciudad.nombre }}{% endif %}</td>
       <td class="py-3 px-4 text-center">
-  {% url 'taller:clientes:ver_cliente' cliente.id as url_ver_cliente %}
-  {% url 'taller:clientes:editar_cliente' cliente.id as url_editar_cliente %}
-  {% url 'taller:clientes:delete' pk=cliente.id as url_eliminar_cliente %}
+  {% load country_url %}
+  {% country_url 'clientes:ver_cliente' cliente.id as url_ver_cliente %}
+  {% country_url 'clientes:editar_cliente' cliente.id as url_editar_cliente %}
+  {% country_url 'clientes:eliminar_cliente' pk=cliente.id as url_eliminar_cliente %}
   <div class="inline-flex items-center gap-2 justify-center">
     <a href="{{ url_ver_cliente|default:'#' }}" class="btn-small view-btn" title="Ver cliente">👁️ Ver</a>
     <a href="{{ url_editar_cliente|default:'#' }}" class="btn-small edit-btn" title="Editar cliente">✏️ Editar</a>
-    <a href="{{ url_eliminar_cliente|default:'#' }}" 
-       class="btn-small delete-btn" 
+    <a href="{{ url_eliminar_cliente|default:'#' }}"
+       class="btn-small delete-btn"
        onclick="return confirmarEliminacion('{{ cliente.nombre }}{% if cliente.apellido %} {{ cliente.apellido }}{% endif %}')">🗑️ Eliminar</a>
   </div>
       </td>

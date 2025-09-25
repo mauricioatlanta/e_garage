@@ -1,3 +1,4 @@
+{% load country_url %}
 {% extends 'base.html' %}
 {% load static %}
 {% load humanize %}
@@ -21,7 +22,7 @@
   <div class="relative z-20 max-w-7xl mx-auto py-16 px-6">
     <div class="flex justify-between items-center mb-6">
       <h1 class="text-4xl font-bold text-white">🔩 Dashboard de Repuestos</h1>
-      <a href="{% url 'taller:repuestos:crear_repuesto' %}" class="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2 rounded shadow-lg">
+      <a href="{% country_url 'repuestos:crear_repuesto' %}" class="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2 rounded shadow-lg">
         ➕ Agregar Repuesto
       </a>
     </div>
@@ -48,8 +49,8 @@
             <td class="px-4 py-2 text-right">{{ repuesto.stock }}</td>
             <td class="px-4 py-2 text-right">${{ repuesto.precio_venta|floatformat:0|intcomma }}</td>
             <td class="px-4 py-2 text-center">
-              <a href="{% url 'taller:repuestos:editar_repuesto' repuesto.id %}" class="text-blue-600 hover:underline">✏️</a>
-              <a href="{% url 'taller:repuestos:eliminar_repuesto' repuesto.id %}" class="text-red-600 hover:underline ml-2">🗑️</a>
+              <a href="{% country_url 'repuestos:editar_repuesto' repuesto.id  %}" class="text-blue-600 hover:underline">✏️</a>
+              <a href="{% country_url 'repuestos:eliminar_repuesto' repuesto.id  %}" class="text-red-600 hover:underline ml-2">🗑️</a>
             </td>
           </tr>
           {% empty %}

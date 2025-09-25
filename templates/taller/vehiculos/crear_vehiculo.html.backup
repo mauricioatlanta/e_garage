@@ -174,7 +174,7 @@
         method="post"
         action="{% url 'taller:vehiculos:crear_vehiculo' %}">
     {% csrf_token %}
-    
+
     <!-- 🔧 DEBUG TEMPORAL - Mostrar errores del formulario -->
     {% if form.errors %}
       <div class="bg-red-900/50 border border-red-400 rounded-xl p-4 mb-6">
@@ -257,10 +257,10 @@
               <select id="id_modelo" name="modelo" class="w-full px-4 py-2 rounded-xl bg-black/70 text-cyan-200 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400">
                 <option value="">Selecciona primero una marca...</option>
               </select>
-              <button type="button" 
-                      onclick="abrirModalNuevoModelo()" 
+              <button type="button"
+                      onclick="abrirModalNuevoModelo()"
                       class="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-xl font-bold transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                      id="btn-nuevo-modelo" 
+                      id="btn-nuevo-modelo"
                       disabled>
                 ➕
               </button>
@@ -275,19 +275,19 @@
                 </div>
                 <div class="mb-4">
                   <label for="nuevo-modelo-nombre" class="block text-sm font-medium text-gray-300 mb-2">Nombre del Modelo:</label>
-                  <input type="text" 
-                         id="nuevo-modelo-nombre" 
+                  <input type="text"
+                         id="nuevo-modelo-nombre"
                          class="w-full px-3 py-2 rounded-lg bg-black border border-cyan-500/30 text-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-400"
                          placeholder="Ej: Corolla, Civic, etc.">
                 </div>
                 <div class="flex justify-end space-x-3">
-                  <button type="button" 
-                          onclick="cerrarModalNuevoModelo()" 
+                  <button type="button"
+                          onclick="cerrarModalNuevoModelo()"
                           class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors duration-200">
                     Cancelar
                   </button>
-                  <button type="button" 
-                          onclick="guardarNuevoModelo()" 
+                  <button type="button"
+                          onclick="guardarNuevoModelo()"
                           class="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg transition-colors duration-200">
                     Guardar
                   </button>
@@ -324,9 +324,9 @@
               Agregar nuevo color...
             </option>
           </select>
-          <input type="text" name="color_nuevo" id="input_color_nuevo" 
+          <input type="text" name="color_nuevo" id="input_color_nuevo"
                  value="{{ form.data.color_nuevo|default:'' }}"
-                 class="w-full px-4 py-2 rounded-xl bg-black/70 text-cyan-200 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400 mt-2 {% if form.data.color != '__nuevo__' %}hidden{% endif %}" 
+                 class="w-full px-4 py-2 rounded-xl bg-black/70 text-cyan-200 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400 mt-2 {% if form.data.color != '__nuevo__' %}hidden{% endif %}"
                  placeholder="Escribe el nuevo color...">
         </div>
         {{ form.color.errors }}
@@ -348,9 +348,9 @@
               Agregar nuevo motor...
             </option>
           </select>
-          <input type="text" name="motor_nuevo" id="input_motor_nuevo" 
+          <input type="text" name="motor_nuevo" id="input_motor_nuevo"
                  value="{{ form.data.motor_nuevo|default:'' }}"
-                 class="w-full px-4 py-2 rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400 mt-2 {% if form.data.motor != '__nuevo__' %}hidden{% endif %}" 
+                 class="w-full px-4 py-2 rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400 mt-2 {% if form.data.motor != '__nuevo__' %}hidden{% endif %}"
                  placeholder="Escribe el nuevo motor...">
         </div>
         {{ form.motor.errors }}
@@ -365,9 +365,9 @@
               Agregar nueva caja...
             </option>
           </select>
-          <input type="text" name="caja_nueva" id="input_caja_nueva" 
+          <input type="text" name="caja_nueva" id="input_caja_nueva"
                  value="{{ form.data.caja_nueva|default:'' }}"
-                 class="w-full px-4 py-2 rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400 mt-2 {% if form.data.caja != '__nuevo__' %}hidden{% endif %}" 
+                 class="w-full px-4 py-2 rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400 mt-2 {% if form.data.caja != '__nuevo__' %}hidden{% endif %}"
                  placeholder="Escribe la nueva caja...">
         </div>
         {{ form.caja.errors }}
@@ -423,9 +423,9 @@ if(MODELOS_USA_URL === '#') { console.warn('[DEBUG] No se resolvió URL api_mode
 // --- Carga modelos USA simplificada ---
 async function cargarModelosUsa(marcaId, preselectId = null) {
   if (!selectModeloUsa || !MODELOS_USA_URL || MODELOS_USA_URL === '#') return;
-  if (!marcaId) { 
-    setOptions(selectModeloUsa, '<option value="">---------</option>'); 
-    return; 
+  if (!marcaId) {
+    setOptions(selectModeloUsa, '<option value="">---------</option>');
+    return;
   }
 
   // Estado cargando
@@ -441,7 +441,7 @@ async function cargarModelosUsa(marcaId, preselectId = null) {
     let items = Array.isArray(json) ? json : (json.results || []);
     const data = items.map(m => {
       if (typeof m === 'string') return { id: m, nombre: m };
-      return { 
+      return {
         id: String(m.id ?? m.value ?? m.slug ?? m.nombre ?? m.text),
         nombre: String(m.nombre ?? m.text ?? m.label ?? m.modelo ?? m.name ?? m.id)
       };
@@ -454,7 +454,7 @@ async function cargarModelosUsa(marcaId, preselectId = null) {
 
     // Preselección si se especifica
     if (preselectId) selectModeloUsa.value = String(preselectId);
-    
+
     console.log(`✅ Modelos cargados: ${data.length}`);
   } catch (err) {
     console.error('Error cargando modelos USA:', err);
@@ -469,7 +469,7 @@ if (selectMarcaUsa) {
   selectMarcaUsa.addEventListener('change', (e) => {
     cargarModelosUsa(e.target.value);
   });
-  
+
   // Pre-carga si ya viene una marca seleccionada
   if (selectMarcaUsa.value) {
     const preselectModelo = "{{ form.data.modelo_usa|default:'' }}";
@@ -675,7 +675,7 @@ if (selectColor && inputColorNuevo) {
     color:#46f5e4 !important; opacity:.8;
   }
   </style>
-  
+
   <script>
   document.addEventListener('DOMContentLoaded', function() {
     console.log('🌍 País detectado: {{ country }}');
@@ -683,24 +683,24 @@ if (selectColor && inputColorNuevo) {
     {% if country == 'CL' %}
     // FUNCIONALIDAD PARA CHILE
     console.log('🇨🇱 Configurando carga de modelos para Chile...');
-    
+
     const marcaSelect = document.getElementById('id_marca');
     const modeloSelect = document.getElementById('id_modelo');
     const btnNuevoModelo = document.getElementById('btn-nuevo-modelo');
-    
+
     if (marcaSelect && modeloSelect) {
       marcaSelect.addEventListener('change', function() {
         const marcaId = this.value;
         console.log('Marca seleccionada:', marcaId);
-        
+
         // Limpiar modelos
         modeloSelect.innerHTML = '<option value="">---------</option>';
-        
+
         // Habilitar/deshabilitar botón de nuevo modelo
         if (btnNuevoModelo) {
           btnNuevoModelo.disabled = !marcaId;
         }
-        
+
         if (marcaId) {
           fetch(`/taller/vehiculos/api/modelos/?marca_id=${marcaId}`)
             .then(response => response.json())
@@ -724,18 +724,18 @@ if (selectColor && inputColorNuevo) {
     {% if country == 'US' %}
     // FUNCIONALIDAD PARA USA
     console.log('🇺🇸 Configurando carga de modelos para USA...');
-    
+
     const marcaSelect = document.getElementById('id_marca');
     const modeloSelect = document.getElementById('id_modelo');
-    
+
     if (marcaSelect && modeloSelect) {
       marcaSelect.addEventListener('change', function() {
         const marcaSeleccionada = this.value;
         console.log('Marca seleccionada (USA):', marcaSeleccionada);
-        
+
         // Limpiar modelos
         modeloSelect.innerHTML = '<option value="">---------</option>';
-        
+
         if (marcaSeleccionada) {
           // TEMPORAL: Usar datos del contexto en lugar de API
           console.log('Usando datos del contexto para modelos USA');
@@ -745,13 +745,13 @@ if (selectColor && inputColorNuevo) {
     }
     {% endif %}
   });
-  
+
   // FUNCIONES PARA MANEJAR EL MODAL DE NUEVOS MODELOS
   function abrirModalNuevoModelo() {
     const marcaSelect = document.getElementById('id_marca');
     const marcaSeleccionada = document.getElementById('marca-seleccionada');
     const modal = document.getElementById('modal-nuevo-modelo');
-    
+
     if (marcaSelect.value) {
       const marcaOption = marcaSelect.options[marcaSelect.selectedIndex];
       marcaSeleccionada.textContent = marcaOption.textContent;
@@ -760,28 +760,28 @@ if (selectColor && inputColorNuevo) {
       alert('Por favor selecciona una marca primero');
     }
   }
-  
+
   function cerrarModalNuevoModelo() {
     const modal = document.getElementById('modal-nuevo-modelo');
     const input = document.getElementById('nuevo-modelo-nombre');
     modal.classList.add('hidden');
     input.value = '';
   }
-  
+
   async function guardarNuevoModelo() {
     const marcaSelect = document.getElementById('id_marca');
     const input = document.getElementById('nuevo-modelo-nombre');
     const modeloSelect = document.getElementById('id_modelo');
     const modal = document.getElementById('modal-nuevo-modelo');
-    
+
     const marcaId = marcaSelect.value;
     const modeloNombre = input.value.trim();
-    
+
     if (!modeloNombre) {
       alert('Por favor ingresa el nombre del modelo');
       return;
     }
-    
+
     try {
       const response = await fetch('/taller/vehiculos/api/modelos/crear/', {
         method: 'POST',
@@ -794,22 +794,22 @@ if (selectColor && inputColorNuevo) {
           nombre: modeloNombre
         })
       });
-      
+
       const data = await response.json();
-      
+
       if (response.ok) {
         // Agregar el nuevo modelo al select
         const option = document.createElement('option');
         option.value = data.id;
         option.textContent = data.nombre;
         modeloSelect.appendChild(option);
-        
+
         // Seleccionar el nuevo modelo
         modeloSelect.value = data.id;
-        
+
         // Cerrar modal
         cerrarModalNuevoModelo();
-        
+
         // Mostrar mensaje de éxito
         alert('✅ Modelo agregado exitosamente');
       } else {
@@ -820,7 +820,7 @@ if (selectColor && inputColorNuevo) {
       alert('❌ Error de conexión');
     }
   }
-  
+
   // Cerrar modal al hacer clic fuera de él
   document.addEventListener('click', function(event) {
     const modal = document.getElementById('modal-nuevo-modelo');
@@ -828,17 +828,17 @@ if (selectColor && inputColorNuevo) {
       cerrarModalNuevoModelo();
     }
   });
-  
+
   // Cerrar modal con Escape
   document.addEventListener('keydown', function(event) {
     if (event.key === 'Escape') {
       cerrarModalNuevoModelo();
     }
   });
-  
+
   // FUNCIONES PARA CARGAR MOTORES Y CAJAS DINÁMICAMENTE
-  function setOptions(el, html) { 
-    if (el) el.innerHTML = html; 
+  function setOptions(el, html) {
+    if (el) el.innerHTML = html;
   }
 
   async function cargarOpciones(endpoint, modeloId) {
@@ -870,21 +870,21 @@ if (selectColor && inputColorNuevo) {
 
       // construir options para motor
       let htmlMotor = '<option value="">---------</option>';
-      motores.forEach(m => { 
-        htmlMotor += `<option value="${m.id}">${m.nombre}</option>`; 
+      motores.forEach(m => {
+        htmlMotor += `<option value="${m.id}">${m.nombre}</option>`;
       });
       setOptions(selMotor, htmlMotor);
 
       // construir options para caja
       let htmlCaja = '<option value="">---------</option>';
-      cajas.forEach(c => { 
-        htmlCaja += `<option value="${c.id}">${c.nombre}</option>`; 
+      cajas.forEach(c => {
+        htmlCaja += `<option value="${c.id}">${c.nombre}</option>`;
       });
       setOptions(selCaja, htmlCaja);
 
       console.log(`✅ Motores cargados: ${motores.length}, Cajas cargadas: ${cajas.length}`);
-    } catch(e) { 
-      console.error('Error recargando motor/caja:', e); 
+    } catch(e) {
+      console.error('Error recargando motor/caja:', e);
     }
   }
 

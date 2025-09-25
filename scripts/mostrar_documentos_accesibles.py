@@ -2,6 +2,7 @@
 """
 Script para mostrar documentos accesibles y crear uno de prueba si es necesario
 """
+
 import os
 
 import django

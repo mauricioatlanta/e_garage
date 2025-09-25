@@ -199,7 +199,7 @@ def api_motores_por_modelo(request):
         )
         data = list(qs)
 
-    return JsonResponse(data, safe=False)
+    return JsonResponse({"motores": data})
 
 
 @login_required
@@ -216,7 +216,7 @@ def api_cajas_por_modelo(request):
         )
         data = list(qs)
 
-    return JsonResponse(data, safe=False)
+    return JsonResponse({"cajas": data})
 
 
 from django.db import transaction

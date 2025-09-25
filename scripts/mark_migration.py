@@ -16,7 +16,7 @@ try:
     # Insertar registro en django_migrations para marcar la migración como aplicada
     cursor.execute(
         """
-        INSERT INTO django_migrations (app, name, applied) 
+        INSERT INTO django_migrations (app, name, applied)
         VALUES ('taller', '0003_fix_perfilusuario', datetime('now'));
     """
     )

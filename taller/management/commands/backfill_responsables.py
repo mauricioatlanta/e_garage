@@ -1,82 +1,87 @@
-from django.core.management.base import BaseCommand
+from django.core.management import BaseCommand
 from django.db import transaction
 
-from taller.models import Documento
+from taller.models.lineas_documento import (
+    LineaOtroServicio,
+    LineaRepuesto,
+    LineaServicio,
+)
 
 
 class Command(BaseCommand):
-    help = "Completa Documento.tecnico_responsable y hereda a líneas sin mecanico (repuesto/servicio/otros)."
+    help = "Rellena tecnico_responsable en líneas desde el documento cuando esté vacío."
 
     def add_arguments(self, parser):
         parser.add_argument(
             "--dry-run",
             action="store_true",
-            help="Muestra lo que haría sin escribir cambios.",
+            help="Mostrar qué se haría sin ejecutar cambios",
         )
 
     @transaction.atomic
-    def handle(self, *args, **opts):
-        dry = opts["dry_run"]
-        docs = Documento.objects.all()
-        set_responsable = 0
-        set_lineas_rep = 0
-        set_lineas_srv = 0
-        set_lineas_otros = 0
+    def handle(self, *args, **options):
+        dry_run = options["dry_run"]
 
-        for d in docs.iterator():
-            # 1) Completar tecnico_responsable si falta
-            if d.tecnico_responsable_id is None:
-                cand = getattr(getattr(d, "created_by", None), "tecnico", None)
-                cfg = getattr(getattr(d, "empresa", None), "config", None)
-                if cand and getattr(cand, "empresa_id", None) == getattr(
-                    d, "empresa_id", None
-                ):
-                    if not dry:
-                        d.tecnico_responsable = cand
-                        d.save(update_fields=["tecnico_responsable"])
-                    set_responsable += 1
-                elif cfg and getattr(cfg, "tecnico_por_defecto_id", None):
-                    if not dry:
-                        d.tecnico_responsable_id = cfg.tecnico_por_defecto_id
-                        d.save(update_fields=["tecnico_responsable"])
-                    set_responsable += 1
+        if dry_run:
+            self.stdout.write(
+                self.style.WARNING("🔍 MODO DRY-RUN - No se realizarán cambios")
+            )
 
-            # 2) Heredar a líneas vacías (solo si hay responsable)
-            if d.tecnico_responsable_id:
-                # Repuestos
-                if hasattr(d, "lineas_repuesto"):
-                    qs = d.lineas_repuesto.filter(mecanico__isnull=True)
-                    if not dry:
-                        set_lineas_rep += qs.update(
-                            mecanico_id=d.tecnico_responsable_id
-                        )
-                    else:
-                        set_lineas_rep += qs.count()
+        # Procesar LineaServicio
+        qs_servicio = LineaServicio.objects.filter(
+            tecnico_responsable__isnull=True,
+            documento__tecnico_responsable__isnull=False,
+        )
 
-                # Servicios (si existen en esta empresa)
-                if hasattr(d, "lineas_servicio"):
-                    qs = d.lineas_servicio.filter(mecanico__isnull=True)
-                    if not dry:
-                        set_lineas_srv += qs.update(
-                            mecanico_id=d.tecnico_responsable_id
-                        )
-                    else:
-                        set_lineas_srv += qs.count()
+        updated_servicio = 0
+        for ls in qs_servicio.iterator():
+            if not dry_run:
+                ls.tecnico_responsable = ls.documento.tecnico_responsable
+                ls.save(update_fields=["tecnico_responsable"])
+            updated_servicio += 1
 
-                # Otros servicios (si aplica)
-                if hasattr(d, "lineas_otro_servicio"):
-                    qs = d.lineas_otro_servicio.filter(mecanico__isnull=True)
-                    if not dry:
-                        set_lineas_otros += qs.update(
-                            mecanico_id=d.tecnico_responsable_id
-                        )
-                    else:
-                        set_lineas_otros += qs.count()
+        # Procesar LineaRepuesto
+        qs_repuesto = LineaRepuesto.objects.filter(
+            tecnico_responsable__isnull=True,
+            documento__tecnico_responsable__isnull=False,
+        )
+
+        updated_repuesto = 0
+        for lr in qs_repuesto.iterator():
+            if not dry_run:
+                lr.tecnico_responsable = lr.documento.tecnico_responsable
+                lr.save(update_fields=["tecnico_responsable"])
+            updated_repuesto += 1
+
+        # Procesar LineaOtroServicio
+        qs_otro = LineaOtroServicio.objects.filter(
+            tecnico_responsable__isnull=True,
+            documento__tecnico_responsable__isnull=False,
+        )
+
+        updated_otro = 0
+        for lo in qs_otro.iterator():
+            if not dry_run:
+                lo.tecnico_responsable = lo.documento.tecnico_responsable
+                lo.save(update_fields=["tecnico_responsable"])
+            updated_otro += 1
+
+        total_updated = updated_servicio + updated_repuesto + updated_otro
 
         self.stdout.write(
             self.style.SUCCESS(
-                f"Backfill OK. tecnico_responsable seteado en {set_responsable} documentos; "
-                f"líneas actualizadas: rep={set_lineas_rep}, srv={set_lineas_srv}, otros={set_lineas_otros} "
-                f"{'(dry-run)' if dry else ''}"
+                f"✅ Actualizadas: {updated_servicio} líneas de servicio, "
+                f"{updated_repuesto} líneas de repuesto, "
+                f"{updated_otro} líneas de otro servicio"
             )
         )
+        self.stdout.write(
+            self.style.SUCCESS(f"📊 Total: {total_updated} líneas procesadas")
+        )
+
+        if dry_run:
+            self.stdout.write(
+                self.style.WARNING(
+                    "💡 Para ejecutar los cambios reales, ejecuta sin --dry-run"
+                )
+            )

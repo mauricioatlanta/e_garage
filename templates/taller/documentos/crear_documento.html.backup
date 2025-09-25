@@ -163,7 +163,7 @@
       padding: 0;
       margin: 0;
     }
-    
+
     /* Estilos específicos para mejorar contraste del campo cliente */
     #id_cliente + .select2-container .select2-selection--single {
       background: #0d1421 !important;
@@ -173,19 +173,19 @@
       font-weight: 700 !important;
       color: #ffffff !important;
     }
-    
+
     #id_cliente + .select2-container .select2-selection__rendered {
       color: #ffffff !important;
       font-weight: 700 !important;
       text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8) !important;
     }
-    
+
     #id_cliente + .select2-container .select2-selection--single:hover {
       border-color: #ffffff !important;
       box-shadow: 0 0 25px rgba(255, 255, 255, 0.8) !important;
       transform: scale(1.02) !important;
     }
-    
+
     /* Mejorar el dropdown del cliente */
     .select2-dropdown {
       background: #0d1421 !important;
@@ -193,7 +193,7 @@
       border-radius: 0.7rem !important;
       box-shadow: 0 0 25px rgba(0, 242, 254, 0.7) !important;
     }
-    
+
     .select2-results__option {
       background: #0d1421 !important;
       color: #ffffff !important;
@@ -201,7 +201,7 @@
       font-weight: 600 !important;
       border-bottom: 1px solid rgba(0, 242, 254, 0.2) !important;
     }
-    
+
     .select2-results__option--highlighted {
       background: rgba(0, 242, 254, 0.3) !important;
       color: #ffffff !important;
@@ -283,7 +283,7 @@
 
     <div class="mt-8">
       <h2 class="futurista-label text-xl mb-2">Repuestos</h2>
-      
+
       <!-- Banner informativo -->
       <!-- Sección de Repuestos -->      <table class="futurista-table mb-4" id="tabla-repuestos">
         <thead>
@@ -316,7 +316,7 @@
 
     <div class="mt-8">
       <h2 class="futurista-label text-xl mb-2">Servicios</h2>
-      
+
       <!-- Banner informativo -->
       <!-- Sección de Servicios -->
       <table class="futurista-table mb-4" id="tabla-servicios">
@@ -338,7 +338,7 @@
           </tr>
         </tfoot>
       </table>
-      
+
       <div class="flex gap-2 mt-4">
         <button class="btn-premium" onclick="agregarServicio()" type="button">🔧 Agregar Servicio</button>
         <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded" onclick="agregarServicioEjemplo()" type="button">📋 Ejemplo</button>
@@ -348,7 +348,7 @@
     <!-- Sección de Otros Servicios -->
     <div class="mt-8">
       <h2 class="futurista-label text-xl mb-2">Otros Servicios</h2>
-      
+
       <table class="futurista-table mb-4" id="tabla-otros-servicios">
         <thead>
           <tr>
@@ -368,7 +368,7 @@
           </tr>
         </tfoot>
       </table>
-      
+
       <div class="flex gap-2 mt-4">
         <button class="btn-premium" onclick="agregarOtroServicio()" type="button">⚙️ Agregar Otro Servicio</button>
         <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded" onclick="agregarOtroServicioEjemplo()" type="button">📋 Ejemplo</button>
@@ -420,7 +420,7 @@ function agregarOtroServicioEjemplo() {
 
     <div class="mt-8 bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl p-6 border border-cyan-400 shadow-2xl">
       <h3 class="text-xl font-bold text-cyan-400 mb-4 text-center">💰 Resumen de Totales</h3>
-      
+
       <!-- Totales por categoría -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div class="bg-gray-800 rounded-lg p-4 border border-gray-600">
@@ -430,7 +430,7 @@ function agregarOtroServicioEjemplo() {
             <span class="futurista-label font-bold" id="total-servicios-resumen">$0</span>
           </div>
         </div>
-        
+
         <div class="bg-gray-800 rounded-lg p-4 border border-gray-600">
           <h4 class="font-semibold text-purple-400 mb-2">⚙️ Otros Servicios</h4>
           <div class="flex justify-between">
@@ -438,7 +438,7 @@ function agregarOtroServicioEjemplo() {
             <span class="futurista-label font-bold" id="total-otros-servicios-resumen">$0</span>
           </div>
         </div>
-        
+
         <div class="bg-gray-800 rounded-lg p-4 border border-gray-600">
           <h4 class="font-semibold text-blue-400 mb-2">🔩 Repuestos</h4>
           <div class="flex justify-between">
@@ -447,14 +447,14 @@ function agregarOtroServicioEjemplo() {
           </div>
         </div>
       </div>
-      
+
       <!-- Totales finales -->
       <div class="border-t border-gray-600 pt-4 space-y-3">
         <div class="flex justify-between text-lg">
           <span class="font-bold futurista-label">Subtotal (Sin IVA):</span>
           <span class="futurista-label font-bold" id="subtotal-doc">$0</span>
         </div>
-        
+
         <div class="flex justify-between items-center">
           <label class="flex items-center gap-2 futurista-label" for="lleva_iva">
             <input type="checkbox" id="lleva_iva" name="lleva_iva" checked class="accent-cyan-400 scale-125">
@@ -462,7 +462,7 @@ function agregarOtroServicioEjemplo() {
           </label>
           <span class="futurista-label font-bold" id="iva-doc">$0</span>
         </div>
-        
+
         <div class="bg-cyan-900 bg-opacity-50 rounded-lg p-4 border border-cyan-400">
           <div class="flex justify-between items-center text-2xl">
             <span class="font-bold text-cyan-300">💵 GRAN TOTAL:</span>
@@ -485,7 +485,7 @@ function agregarOtroServicioEjemplo() {
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 <script>
 $(document).ready(function () {
-  /* 
+  /*
   // TÉCNICO: COMENTADO - Ahora usamos select clásico en lugar de Select2
   $('#id_mecanico').select2({
     placeholder: 'Seleccionar técnico existente o escribir nuevo...',
@@ -497,16 +497,16 @@ $(document).ready(function () {
       dataType: 'json',
       delay: 150,
       data: function (params) {
-        return { 
+        return {
           q: params.term || '',  // Permitir búsqueda vacía para mostrar todos
-          existing_only: false 
+          existing_only: false
         };
       },
       processResults: function (data) {
         var results = data.results.map(function (item) {
           return { id: item.id, text: item.nombre };
         });
-        
+
         // Si no hay término de búsqueda, mostrar mensaje informativo
         if (!params.term) {
           results.unshift({
@@ -515,7 +515,7 @@ $(document).ready(function () {
             disabled: true
           });
         }
-        
+
         return { results: results };
       },
       cache: true
@@ -523,7 +523,7 @@ $(document).ready(function () {
     createTag: function (params) {
       var term = $.trim(params.term);
       if (term === '') return null;
-      
+
       return {
         id: term,
         text: term + ' ✨ (crear nuevo)',
@@ -538,7 +538,7 @@ $(document).ready(function () {
     if (data.newTag) {
       // Extraer solo el nombre (quitar " ✨ (crear nuevo)")
       var nombreLimpio = data.text.replace(' ✨ (crear nuevo)', '');
-      
+
       $.ajax({
         url: '/documentos/api/crear_tecnico/',
         method: 'POST',
@@ -562,7 +562,7 @@ $(document).ready(function () {
     }
   });
   */
-  
+
 // ...existing code...
   const $cliente = $('#id_cliente');
   const $vehiculo = $('#id_vehiculo');
@@ -600,7 +600,7 @@ $(document).ready(function () {
       'border-color': '#00f2fe transparent transparent transparent !important',
       'border-width': '6px 6px 0 6px !important'
     });
-    
+
     // Mejorar dropdown
     $('.select2-dropdown').css({
       'background': '#1a1a2e !important',
@@ -680,28 +680,28 @@ $(document).ready(function () {
   $cliente.on('change', function () {
     const clienteId = $(this).val();
     console.log('Cliente cambiado a:', clienteId);
-    
+
     // Limpiar selección de vehículo
     $vehiculo.val(null).trigger('change');
     $vehiculo.empty();
-    
+
     if (clienteId) {
       $vehiculoWrapper.removeClass('hidden');
       console.log('Mostrando selector de vehículos y cargando lista...');
-      
+
       // Cargar vehículos del cliente seleccionado usando URL relativa
       const apiUrl = `api/vehiculos-cliente/?cliente_id=${clienteId}`;
-      
+
       console.log('Calling relative API URL:', apiUrl);
-      
+
       $.get(apiUrl)
         .done(function(data) {
           console.log('Vehículos recibidos:', data);
-          
+
           // Limpiar y agregar opciones de vehículos
           $vehiculo.empty();
           $vehiculo.append('<option value="">Seleccione un vehículo</option>');
-          
+
           if (data.vehiculos && data.vehiculos.length > 0) {
             data.vehiculos.forEach(function(vehiculo) {
               const texto = `${vehiculo.patente} - ${vehiculo.marca} ${vehiculo.modelo} (${vehiculo.anio})`;
@@ -767,7 +767,7 @@ function cargarServicios() {
 function agregarEjemplos() {
   {% if not editando %}
   console.log('[EJEMPLO] Agregando datos de ejemplo...');
-  
+
   // Agregar repuesto de ejemplo
   if (typeof window.agregarRepuesto === 'function') {
     window.agregarRepuesto();
@@ -780,8 +780,8 @@ function agregarEjemplos() {
       if (window.actualizarTotalRepuestos) window.actualizarTotalRepuestos();
     }
   }
-  
-  // Agregar servicio de ejemplo  
+
+  // Agregar servicio de ejemplo
   if (typeof window.agregarServicio === 'function') {
     window.agregarServicio();
     const lastServicioRow = document.querySelector('#tabla-servicios tbody tr:last-child');
@@ -791,7 +791,7 @@ function agregarEjemplos() {
       if (window.actualizarTotalServicios) window.actualizarTotalServicios();
     }
   }
-  
+
   console.log('[EJEMPLO] Datos de ejemplo agregados');
   {% endif %}
 }
@@ -800,11 +800,11 @@ function agregarEjemplos() {
 function mostrarServicios(categorias) {
   const $acordeon = $('#acordeon-categorias');
   $acordeon.empty();
-  
+
   categorias.forEach(categoria => {
     const $categoria = $(`
       <div class="border border-gray-600 rounded-lg overflow-hidden">
-        <button class="w-full p-4 bg-gray-700 hover:bg-gray-600 text-left flex justify-between items-center categoria-toggle" 
+        <button class="w-full p-4 bg-gray-700 hover:bg-gray-600 text-left flex justify-between items-center categoria-toggle"
                 data-categoria="${categoria.id}">
           <span class="font-semibold text-cyan-300">${categoria.nombre}</span>
           <span class="text-cyan-400">▼</span>
@@ -815,9 +815,9 @@ function mostrarServicios(categorias) {
               <h5 class="font-medium text-yellow-300 mb-2">${sub.nombre}</h5>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                 ${sub.servicios.map(servicio => `
-                  <label class="flex items-center p-2 bg-gray-700 rounded hover:bg-gray-600 cursor-pointer servicio-item" 
+                  <label class="flex items-center p-2 bg-gray-700 rounded hover:bg-gray-600 cursor-pointer servicio-item"
                          data-servicio-id="${servicio.id}">
-                    <input type="checkbox" class="mr-3 accent-cyan-400 servicio-checkbox" 
+                    <input type="checkbox" class="mr-3 accent-cyan-400 servicio-checkbox"
                            value="${servicio.id}" data-nombre="${servicio.nombre}">
                     <span class="text-white text-sm">${servicio.nombre}</span>
                   </label>
@@ -828,24 +828,24 @@ function mostrarServicios(categorias) {
         </div>
       </div>
     `);
-    
+
     $acordeon.append($categoria);
   });
-  
+
   // Toggle de categorías
   $('.categoria-toggle').on('click', function() {
     const $contenido = $(this).next('.categoria-contenido');
     const $icono = $(this).find('span:last');
-    
+
     $contenido.toggleClass('hidden');
     $icono.text($contenido.hasClass('hidden') ? '▼' : '▲');
   });
-  
+
   // Manejar selección de servicios
   $('.servicio-checkbox').on('change', function() {
     const servicioId = $(this).val();
     const servicioNombre = $(this).data('nombre');
-    
+
     if ($(this).is(':checked')) {
       if (!serviciosSeleccionados.find(s => s.id === servicioId)) {
         serviciosSeleccionados.push({
@@ -856,7 +856,7 @@ function mostrarServicios(categorias) {
     } else {
       serviciosSeleccionados = serviciosSeleccionados.filter(s => s.id !== servicioId);
     }
-    
+
     actualizarContadorServicios();
   });
 }
@@ -876,14 +876,14 @@ function buscarServicios(query) {
 function mostrarResultadosBusqueda(servicios) {
   const $resultados = $('#lista-resultados');
   $resultados.empty();
-  
+
   if (servicios.length === 0) {
     $resultados.html('<p class="text-gray-400">No se encontraron servicios</p>');
   } else {
     servicios.forEach(servicio => {
       const $servicio = $(`
         <label class="flex items-center p-3 bg-gray-700 rounded hover:bg-gray-600 cursor-pointer">
-          <input type="checkbox" class="mr-3 accent-cyan-400 servicio-checkbox-busqueda" 
+          <input type="checkbox" class="mr-3 accent-cyan-400 servicio-checkbox-busqueda"
                  value="${servicio.id}" data-nombre="${servicio.nombre}">
           <div>
             <span class="text-white font-medium">${servicio.nombre}</span>
@@ -893,12 +893,12 @@ function mostrarResultadosBusqueda(servicios) {
       `);
       $resultados.append($servicio);
     });
-    
+
     // Manejar selección en resultados de búsqueda
     $('.servicio-checkbox-busqueda').on('change', function() {
       const servicioId = $(this).val();
       const servicioNombre = $(this).data('nombre');
-      
+
       if ($(this).is(':checked')) {
         if (!serviciosSeleccionados.find(s => s.id === servicioId)) {
           serviciosSeleccionados.push({
@@ -909,11 +909,11 @@ function mostrarResultadosBusqueda(servicios) {
       } else {
         serviciosSeleccionados = serviciosSeleccionados.filter(s => s.id !== servicioId);
       }
-      
+
       actualizarContadorServicios();
     });
   }
-  
+
   $('#resultados-busqueda').removeClass('hidden');
   $('#servicios-categorias').addClass('hidden');
 }
@@ -921,12 +921,12 @@ function mostrarResultadosBusqueda(servicios) {
 // Crear servicio personalizado
 $('#btn-crear-servicio').on('click', function() {
   const nombre = $('#nuevo-servicio-nombre').val().trim();
-  
+
   if (!nombre) {
     alert('Por favor ingrese el nombre del servicio');
     return;
   }
-  
+
   $.ajax({
     url: '/documentos/api/crear-servicio/',
     method: 'POST',
@@ -942,10 +942,10 @@ $('#btn-crear-servicio').on('click', function() {
           id: data.servicio.id,
           nombre: data.servicio.nombre
         });
-        
+
         $('#nuevo-servicio-nombre').val('');
         actualizarContadorServicios();
-        
+
         if (data.mensaje) {
           alert(data.mensaje);
         } else {
@@ -971,7 +971,7 @@ $('#confirmar-servicios').on('click', function() {
   serviciosSeleccionados.forEach(servicio => {
     agregarServicioATabla(servicio.nombre);
   });
-  
+
   serviciosSeleccionados = [];
   $('#modal-servicios').addClass('hidden');
   $('#buscar-servicios').val('');
@@ -988,7 +988,7 @@ function actualizarContadorServicios() {
 function agregarServicioATabla(nombre, precio = 0) {
   const $tbody = $('#tabla-servicios tbody');
   const servicioId = 'servicio_' + Date.now();
-  
+
   const $fila = $(`
     <tr data-id="${servicioId}">
       <td><input type="text" name="servicios_nombre[]" value="${nombre}" class="futurista-input w-full nombre-servicio-input"></td>
@@ -996,9 +996,9 @@ function agregarServicioATabla(nombre, precio = 0) {
       <td><button type="button" class="btn-eliminar-servicio text-red-400 hover:text-red-600">🗑️</button></td>
     </tr>
   `);
-  
+
   $tbody.append($fila);
-  
+
   // Manejar eliminación
   $fila.find('.btn-eliminar-servicio').on('click', function() {
     $fila.remove();
@@ -1006,25 +1006,25 @@ function agregarServicioATabla(nombre, precio = 0) {
       window.actualizarTotalesDocumento();
     }
   });
-  
+
   // Manejar cambio de precio
   $fila.find('.precio-servicio-input').on('input', function() {
     if (window.actualizarTotalesDocumento) {
       window.actualizarTotalesDocumento();
     }
   });
-  
+
   if (window.actualizarTotalesDocumento) {
     window.actualizarTotalesDocumento();
   }
-  
+
   // Cargar datos existentes en modo edición
   {% if editando and documento %}
   console.log('[EDICIÓN] Modo edición activado');
   console.log('[EDICIÓN] Documento ID: {{ documento.id }}');
   console.log('[EDICIÓN] Repuestos disponibles: {{ repuestos|length }}');
   console.log('[EDICIÓN] Servicios disponibles: {{ servicios|length }}');
-  
+
   // Cargar repuestos existentes
   {% for repuesto in repuestos %}
   setTimeout(function() {
@@ -1043,7 +1043,7 @@ function agregarServicioATabla(nombre, precio = 0) {
     }
   }, {{ forloop.counter0 }}00);
   {% endfor %}
-  
+
   // Cargar servicios existentes
   {% for servicio in servicios %}
   setTimeout(function() {
@@ -1060,7 +1060,7 @@ function agregarServicioATabla(nombre, precio = 0) {
     }
   }, {{ forloop.counter0|add:repuestos|length }}00);
   {% endfor %}
-  
+
   // Actualizar totales finales después de cargar todo
   setTimeout(function() {
     if (window.actualizarTotalRepuestos) window.actualizarTotalRepuestos();
@@ -1068,7 +1068,7 @@ function agregarServicioATabla(nombre, precio = 0) {
     if (window.actualizarTotalesDocumento) window.actualizarTotalesDocumento();
     console.log('[EDICIÓN] Totales actualizados');
   }, {{ repuestos|length|add:servicios|length|add:1 }}00);
-  
+
   console.log('[EDICIÓN] Carga de datos programada: {{ repuestos|length }} repuestos, {{ servicios|length }} servicios');
   {% else %}
   console.log('[EDICIÓN] Modo creación (no hay datos existentes)');
@@ -1085,16 +1085,16 @@ $('#lleva_iva').on('change', function() {
 // SERIALIZACIÓN DE DATOS DINÁMICOS ANTES DEL ENVÍO
 $('form').on('submit', function (e) {
   console.log('[SUBMIT] Procesando datos dinámicos...');
-  
+
   const items = []; // Array unificado con tipo de item
-  
+
   // Procesar repuestos
   $('#tabla-repuestos tbody tr').each(function () {
     const partnumber = $(this).find('.partnumber-input').val() || '';
     const nombre = $(this).find('.nombre-input').val() || '';
     const cantidad = parseFloat($(this).find('.cantidad-input').val()) || 0;
     const precio = parseFloat($(this).find('.precio-input').val()) || 0;
-    
+
     if (nombre.trim() && precio > 0 && cantidad > 0) {
       items.push({
         tipo: 'repuesto',
@@ -1111,7 +1111,7 @@ $('form').on('submit', function (e) {
   $('#tabla-servicios tbody tr').each(function () {
     const nombre = $(this).find('.nombre-servicio-input').val() || '';
     const precio = parseFloat($(this).find('.precio-servicio-input').val()) || 0;
-    
+
     if (nombre.trim() && precio > 0) {
       items.push({
         tipo: 'servicio',
@@ -1126,7 +1126,7 @@ $('form').on('submit', function (e) {
   $('#tabla-otros-servicios tbody tr').each(function () {
     const nombre = $(this).find('.nombre-otro-servicio-input').val() || '';
     const precio = parseFloat($(this).find('.precio-otro-servicio-input').val()) || 0;
-    
+
     if (nombre.trim() && precio > 0) {
       items.push({
         tipo: 'otro_servicio',
@@ -1139,10 +1139,10 @@ $('form').on('submit', function (e) {
 
   const jsonData = JSON.stringify(items);
   $('#json_items').val(jsonData);
-  
+
   console.log('[SUBMIT] Datos serializados:', jsonData);
   console.log('[SUBMIT] Total items:', items.length);
-  
+
   // Validación: advertir si no hay items
   if (items.length === 0) {
     // Mostrar alerta visual más prominente
@@ -1174,19 +1174,19 @@ $('form').on('submit', function (e) {
       <button id="continuar-sin-items" style="background: #666; color: white; padding: 10px 20px; border: none; border-radius: 5px; margin-right: 10px; cursor: pointer;">Continuar sin items</button>
       <button id="cancelar-envio" style="background: #00f2fe; color: black; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">Cancelar y agregar items</button>
     `;
-    
+
     document.body.appendChild(alertaDiv);
-    
+
     // Manejar botones de la alerta
     const continuarBtn = alertaDiv.querySelector('#continuar-sin-items');
     const cancelarBtn = alertaDiv.querySelector('#cancelar-envio');
-    
+
     return new Promise((resolve) => {
       continuarBtn.onclick = () => {
         document.body.removeChild(alertaDiv);
         resolve(true); // Continuar con el envío
       };
-      
+
       cancelarBtn.onclick = () => {
         document.body.removeChild(alertaDiv);
         resolve(false); // Cancelar el envío
@@ -1201,7 +1201,7 @@ $('form').on('submit', function (e) {
       return true;
     });
   }
-  
+
   console.log('[SUBMIT] Formulario listo para envío');
 });
 
@@ -1244,7 +1244,7 @@ function mostrarResultadosBusquedaOtros(servicios) {
     servicios.forEach(servicio => {
       const $servicio = $(`
         <label class="flex items-center p-3 bg-gray-700 rounded hover:bg-gray-600 cursor-pointer">
-          <input type="checkbox" class="mr-3 accent-purple-400 otro-servicio-checkbox-busqueda" 
+          <input type="checkbox" class="mr-3 accent-purple-400 otro-servicio-checkbox-busqueda"
                  value="${servicio.id}" data-nombre="${servicio.nombre}">
           <div>
             <span class="text-white font-medium">${servicio.nombre}</span>
@@ -1319,7 +1319,7 @@ function agregarOtroServicioEjemplo() {
 function agregarOtroServicioATabla(nombre, precio = 0) {
   const $tbody = $('#tabla-otros-servicios tbody');
   const servicioId = 'otro_servicio_' + Date.now();
-  
+
   const $fila = $(`
     <tr data-id="${servicioId}">
       <td><input type="text" name="otros_servicios_nombre[]" value="${nombre}" class="futurista-input w-full nombre-otro-servicio-input bg-gray-900 text-white" autocomplete="off"></td>
@@ -1327,9 +1327,9 @@ function agregarOtroServicioATabla(nombre, precio = 0) {
       <td><button type="button" class="btn-eliminar-otro-servicio text-red-400 hover:text-red-600">🗑️</button></td>
     </tr>
   `);
-  
+
   $tbody.append($fila);
-  
+
   // Manejar eliminación
   $fila.find('.btn-eliminar-otro-servicio').on('click', function() {
     $fila.remove();
@@ -1337,14 +1337,14 @@ function agregarOtroServicioATabla(nombre, precio = 0) {
       window.actualizarTotalesDocumento();
     }
   });
-  
+
   // Manejar cambio de precio
   $fila.find('.precio-otro-servicio-input').on('input', function() {
     if (window.actualizarTotalesDocumento) {
       window.actualizarTotalesDocumento();
     }
   });
-  
+
   if (window.actualizarTotalesDocumento) {
     window.actualizarTotalesDocumento();
   }

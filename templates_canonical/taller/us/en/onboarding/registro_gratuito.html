@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Únete a E-Garage - Gratis para siempre</title>
-    
+
     <!-- SEO Meta Tags -->
     <meta name="description" content="Sistema de gestión para talleres técnicos. Gratis para siempre. Clientes, vehículos, documentos, reportes con IA.">
     <meta name="keywords" content="taller técnico, gestión automotriz, software taller, gratis, IA">
     <meta property="og:title" content="E-Garage - Gestión de Talleres Gratis">
     <meta property="og:description" content="El sistema más completo para talleres técnicos. Gratis para siempre.">
     <meta property="og:image" content="/static/img/og-image.jpg">
-    
+
     <!-- Google Analytics 4 -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
     <script>
@@ -20,10 +20,10 @@
         gtag('js', new Date());
         gtag('config', 'G-XXXXXXXXXX');
     </script>
-    
+
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
-    
+
     <style>
         :root {
             --cyber-blue: #00d4ff;
@@ -296,15 +296,15 @@
             .container {
                 padding: 1rem;
             }
-            
+
             .registro-card {
                 padding: 2rem;
             }
-            
+
             .logo h1 {
                 font-size: 2.5rem;
             }
-            
+
             .features-grid {
                 grid-template-columns: 1fr;
             }
@@ -313,9 +313,9 @@
 </head>
 <body>
     <div id="particles-js"></div>
-    
+
     <!-- WhatsApp Float Button -->
-    <a href="https://wa.me/56912345678?text=Hola%2C%20necesito%20ayuda%20con%20E-Garage" 
+    <a href="https://wa.me/56912345678?text=Hola%2C%20necesito%20ayuda%20con%20E-Garage"
        class="whatsapp-float" target="_blank">
         📲 ¿Necesitas ayuda?
     </a>
@@ -333,25 +333,25 @@
             <form id="registroForm">
                 <div class="form-group">
                     <label for="nombre_taller">🏢 Nombre de tu taller</label>
-                    <input type="text" id="nombre_taller" name="nombre_taller" class="form-control" 
+                    <input type="text" id="nombre_taller" name="nombre_taller" class="form-control"
                            placeholder="Ej: Taller San Miguel" required>
                 </div>
 
                 <div class="form-group">
                     <label for="nombre_usuario">👤 Tu nombre</label>
-                    <input type="text" id="nombre_usuario" name="nombre_usuario" class="form-control" 
+                    <input type="text" id="nombre_usuario" name="nombre_usuario" class="form-control"
                            placeholder="Ej: Juan Pérez" required>
                 </div>
 
                 <div class="form-group">
                     <label for="email">📧 Email</label>
-                    <input type="email" id="email" name="email" class="form-control" 
+                    <input type="email" id="email" name="email" class="form-control"
                            placeholder="tu@email.com" required>
                 </div>
 
                 <div class="form-group">
                     <label for="password">🔒 Contraseña</label>
-                    <input type="password" id="password" name="password" class="form-control" 
+                    <input type="password" id="password" name="password" class="form-control"
                            placeholder="Mínimo 6 caracteres" required minlength="6">
                 </div>
 
@@ -428,7 +428,7 @@
         // Manejo del formulario
         document.getElementById('registroForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            
+
             const formData = new FormData(this);
             const data = {
                 nombre_taller: formData.get('nombre_taller'),
@@ -436,25 +436,25 @@
                 email: formData.get('email'),
                 password: formData.get('password')
             };
-            
+
             // Validaciones
             if (!data.nombre_taller || !data.email || !data.password) {
                 showError('Todos los campos son obligatorios');
                 return;
             }
-            
+
             if (data.password.length < 6) {
                 showError('La contraseña debe tener al menos 6 caracteres');
                 return;
             }
-            
+
             // Mostrar loading
             const btn = document.getElementById('btnRegistro');
             const spinner = document.getElementById('loadingSpinner');
             btn.disabled = true;
             spinner.style.display = 'inline-block';
             btn.innerHTML = '<span class="loading-spinner"></span> Creando tu taller...';
-            
+
             // Enviar datos
             fetch('/registro-gratuito/', {
                 method: 'POST',
@@ -472,7 +472,7 @@
                         'event_category': 'user_engagement',
                         'event_label': 'registro_gratuito'
                     });
-                    
+
                     // Redireccionar
                     window.location.href = result.redirect_url;
                 } else {

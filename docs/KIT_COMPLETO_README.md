@@ -4,11 +4,11 @@
 
 Se ha implementado **todo el kit completo** para Settings de empresa y gestión de técnicos:
 
-✅ **Forms** - Configuración empresa + técnicos  
-✅ **Vistas** - Settings + CRUD técnicos + toggle activo/inactivo  
-✅ **URLs** - Todas las rutas configuradas  
-✅ **Templates** - En `templates_canonical/` (directorio que Django lee)  
-✅ **Base HTML** - Mínimo con footer de empresa  
+✅ **Forms** - Configuración empresa + técnicos
+✅ **Vistas** - Settings + CRUD técnicos + toggle activo/inactivo
+✅ **URLs** - Todas las rutas configuradas
+✅ **Templates** - En `templates_canonical/` (directorio que Django lee)
+✅ **Base HTML** - Mínimo con footer de empresa
 
 ## 🗂️ ESTRUCTURA DE ARCHIVOS
 

@@ -1,3 +1,4 @@
+{% load country_url %}
 {% extends 'taller/base.html' %}
 {% load static %}
 <!-- 🟣 TEMPLATE OBSOLETA - CONFIGURACION EMPRESA (TEMPLATES) -->
@@ -33,7 +34,7 @@ body {
     background: linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
     border-radius: 20px;
     border: 1px solid var(--border-glow);
-    box-shadow: 
+    box-shadow:
         0 8px 32px rgba(0, 245, 255, 0.1),
         inset 0 1px 0 rgba(255, 255, 255, 0.1);
     padding: 2rem;
@@ -357,16 +358,16 @@ body {
     .config-title {
         font-size: 2rem;
     }
-    
+
     .stats-grid {
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 1rem;
     }
-    
+
     .action-buttons {
         flex-direction: column;
     }
-    
+
     .quick-actions {
         grid-template-columns: 1fr;
         gap: 1rem;
@@ -484,7 +485,7 @@ body {
     overflow: hidden;
     border-right: 3px solid var(--neon-blue);
     white-space: nowrap;
-    animation: 
+    animation:
         typing 3.5s steps(40, end),
         blink-caret 0.75s step-end infinite;
 }
@@ -508,7 +509,7 @@ body {
     height: 100%;
     opacity: 0.1;
     pointer-events: none;
-    background-image: 
+    background-image:
         linear-gradient(90deg, var(--neon-blue) 1px, transparent 1px),
         linear-gradient(180deg, var(--neon-green) 1px, transparent 1px);
     background-size: 50px 50px;
@@ -652,41 +653,41 @@ body {
                 <span class="section-icon">🏢</span>
                 Información de la Empresa
             </h2>
-            
+
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
                     <div>
                         <div class="form-group">
                             <label class="form-label" for="nombre_taller">🏷️ Nombre del Taller</label>
-                            <input type="text" id="nombre_taller" name="nombre_taller" class="form-input" 
+                            <input type="text" id="nombre_taller" name="nombre_taller" class="form-input"
                                    value="{{ empresa.nombre_taller }}" required>
                         </div>
-                        
+
                         <div class="form-group">
                             <label class="form-label" for="empresa_nombre">🏢 Nombre de la Empresa</label>
-                            <input type="text" id="empresa_nombre" name="empresa_nombre" class="form-input" 
+                            <input type="text" id="empresa_nombre" name="empresa_nombre" class="form-input"
                                    value="{{ empresa.empresa }}">
                         </div>
-                        
+
                         <div class="form-group">
                             <label class="form-label" for="telefono">📞 Teléfono</label>
-                            <input type="tel" id="telefono" name="telefono" class="form-input" 
+                            <input type="tel" id="telefono" name="telefono" class="form-input"
                                    value="{{ empresa.telefono }}">
                         </div>
-                        
+
                         <div class="form-group">
                             <label class="form-label" for="email">📧 Email</label>
-                            <input type="email" id="email" name="email" class="form-input" 
+                            <input type="email" id="email" name="email" class="form-input"
                                    value="{{ empresa.email }}" placeholder="contacto@empresa.com">
                         </div>
-                        
+
                         <div class="form-group">
                             <label class="form-label" for="direccion">📍 Dirección</label>
                             <textarea id="direccion" name="direccion" class="form-input" rows="3">{{ empresa.direccion }}</textarea>
                         </div>
                     </div>
-                    
+
                     <div>
                         <div class="form-group">
                             <label class="form-label">📷 Logo Actual</label>
@@ -701,7 +702,7 @@ body {
                                 </div>
                             {% endif %}
                         </div>
-                        
+
                         <div class="form-group">
                             <label class="form-label" for="logo">🎨 Cambiar Logo</label>
                             <div class="file-input-wrapper">
@@ -717,7 +718,7 @@ body {
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="action-buttons">
                     <button type="submit" name="actualizar_empresa" class="btn-futuristic">
                         💾 Actualizar Información
@@ -729,19 +730,19 @@ body {
 
     <!-- Acciones Rápidas -->
     <div class="quick-actions">
-    {% url 'taller:configuracion_tecnicos' as url_config_tecnicos %}
+    {% country_url 'configuracion_tecnicos' as url_config_tecnicos %}
     <a href="{{ url_config_tecnicos|default:'#' }}" class="action-card">
             <div class="action-icon">👨‍🔧</div>
             <div class="action-title">Gestión de Técnicos</div>
             <div class="action-description">Agregar, editar y gestionar técnicos del taller</div>
         </a>
-        
+
         <a href="{% url 'documentos:lista_documentos' %}" class="action-card">
             <div class="action-icon">📋</div>
             <div class="action-title">Documentos</div>
             <div class="action-description">Ver y gestionar todos los documentos</div>
         </a>
-        
+
         <div class="action-card" onclick="location.reload()">
             <div class="action-icon">🔄</div>
             <div class="action-title">Actualizar Sistema</div>
@@ -763,15 +764,15 @@ document.addEventListener('DOMContentLoaded', function() {
         particle.style.animationDuration = (Math.random() * 4 + 3) + 's';
         particle.style.animationDelay = Math.random() * 2 + 's';
         document.body.appendChild(particle);
-        
+
         setTimeout(() => {
             particle.remove();
         }, 8000);
     }
-    
+
     // Crear partículas periódicamente
     setInterval(createParticle, 1500);
-    
+
     // Crear líneas de escaneo láser
     function createScanLine() {
         const sections = document.querySelectorAll('.section-card');
@@ -779,29 +780,29 @@ document.addEventListener('DOMContentLoaded', function() {
             const scanLine = document.createElement('div');
             scanLine.className = 'scan-line';
             section.appendChild(scanLine);
-            
+
             setTimeout(() => {
                 scanLine.remove();
             }, 4000);
         });
     }
-    
+
     // Activar escaneo cada 10 segundos
     setInterval(createScanLine, 10000);
-    
+
     // Crear efecto matriz digital de fondo
     function createMatrixEffect() {
         const matrixContainer = document.createElement('div');
         matrixContainer.className = 'matrix-bg';
         document.body.appendChild(matrixContainer);
-        
+
         for (let i = 0; i < 20; i++) {
             const column = document.createElement('div');
             column.className = 'matrix-column';
             column.style.left = Math.random() * 100 + 'vw';
             column.style.animationDuration = (Math.random() * 10 + 5) + 's';
             column.style.animationDelay = Math.random() * 5 + 's';
-            
+
             // Caracteres aleatorios para el efecto matriz
             const chars = '0123456789ABCDEF';
             let text = '';
@@ -809,24 +810,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 text += chars[Math.floor(Math.random() * chars.length)] + '\n';
             }
             column.textContent = text;
-            
+
             matrixContainer.appendChild(column);
         }
     }
-    
+
     // Inicializar efecto matriz
     createMatrixEffect();
-    
+
     // Efecto de hover en las tarjetas de estadísticas
     const statCards = document.querySelectorAll('.stat-card');
     statCards.forEach(card => {
         // Agregar efecto holográfico
         card.classList.add('hologram-effect');
-        
+
         card.addEventListener('mouseenter', function() {
             this.style.transform = 'translateY(-15px) scale(1.05) rotateY(5deg)';
             this.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
-            
+
             // Crear efecto de pulso de energía
             const energyRing = document.createElement('div');
             energyRing.style.position = 'absolute';
@@ -839,21 +840,21 @@ document.addEventListener('DOMContentLoaded', function() {
             energyRing.style.transform = 'translate(-50%, -50%)';
             energyRing.style.animation = 'energy-expand 0.6s ease-out forwards';
             energyRing.style.opacity = '0.7';
-            
+
             this.appendChild(energyRing);
-            
+
             setTimeout(() => {
                 if (energyRing.parentNode) {
                     energyRing.remove();
                 }
             }, 600);
         });
-        
+
         card.addEventListener('mouseleave', function() {
             this.style.transform = 'translateY(0) scale(1) rotateY(0deg)';
         });
     });
-    
+
     // Agregar animación de energía expansiva
     const style = document.createElement('style');
     style.textContent = `
@@ -871,7 +872,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     `;
     document.head.appendChild(style);
-    
+
     // Validación del formulario con efectos visuales
     const form = document.querySelector('form');
     if (form) {
@@ -879,18 +880,18 @@ document.addEventListener('DOMContentLoaded', function() {
             const nombreTaller = this.querySelector('input[name="nombre_taller"]');
             if (nombreTaller && nombreTaller.value.trim().length < 2) {
                 e.preventDefault();
-                
+
                 // Efecto de error visual
                 nombreTaller.style.border = '2px solid var(--neon-red)';
                 nombreTaller.style.boxShadow = '0 0 20px rgba(255, 0, 64, 0.5)';
                 nombreTaller.style.animation = 'shake 0.5s ease-in-out';
-                
+
                 setTimeout(() => {
                     nombreTaller.style.border = '1px solid rgba(255, 255, 255, 0.2)';
                     nombreTaller.style.boxShadow = 'none';
                     nombreTaller.style.animation = 'none';
                 }, 2000);
-                
+
                 // Mostrar mensaje de error futurista
                 const errorMsg = document.createElement('div');
                 errorMsg.innerHTML = '⚠️ ERROR: El nombre del taller debe tener al menos 2 caracteres';
@@ -904,21 +905,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 errorMsg.style.zIndex = '9999';
                 errorMsg.style.animation = 'slide-in 0.3s ease-out';
                 document.body.appendChild(errorMsg);
-                
+
                 setTimeout(() => {
                     errorMsg.remove();
                 }, 4000);
-                
+
                 nombreTaller.focus();
                 return false;
             }
-            
+
             const submitBtn = this.querySelector('button[type="submit"]');
             if (submitBtn) {
                 submitBtn.innerHTML = '⏳ <span class="loading-effect">Procesando</span>...';
                 submitBtn.disabled = true;
                 submitBtn.style.background = 'linear-gradient(45deg, var(--neon-orange), var(--neon-red))';
-                
+
                 // Efecto de loading animado
                 const loadingDots = submitBtn.querySelector('.loading-effect');
                 let dotCount = 0;
@@ -926,7 +927,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     dotCount = (dotCount + 1) % 4;
                     loadingDots.textContent = 'Procesando' + '.'.repeat(dotCount);
                 }, 500);
-                
+
                 // Limpiar intervalo si el formulario se envía
                 setTimeout(() => {
                     clearInterval(loadingInterval);
@@ -934,7 +935,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
+
     // Efectos de entrada animados mejorados
     const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry, index) => {
@@ -942,10 +943,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 setTimeout(() => {
                     entry.target.style.opacity = '1';
                     entry.target.style.transform = 'translateY(0) rotateX(0deg)';
-                    
+
                     // Efecto de materialización
                     entry.target.style.filter = 'blur(0px)';
-                    
+
                     // Agregar indicador de estado
                     const statusIndicator = document.createElement('div');
                     statusIndicator.className = 'status-indicator';
@@ -954,12 +955,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     statusIndicator.style.right = '10px';
                     entry.target.style.position = 'relative';
                     entry.target.appendChild(statusIndicator);
-                    
+
                 }, index * 150);
             }
         });
     });
-    
+
     document.querySelectorAll('.section-card, .stat-card, .action-card').forEach(el => {
         el.style.opacity = '0';
         el.style.transform = 'translateY(30px) rotateX(10deg)';
@@ -967,7 +968,7 @@ document.addEventListener('DOMContentLoaded', function() {
         el.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
         observer.observe(el);
     });
-    
+
     // Efecto de distorsión en el título principal
     const title = document.querySelector('.config-title');
     if (title) {
@@ -975,13 +976,13 @@ document.addEventListener('DOMContentLoaded', function() {
             this.style.transform = 'scale(1.1) skewX(-5deg)';
             this.style.textShadow = '0 0 50px rgba(0, 245, 255, 0.8)';
         });
-        
+
         title.addEventListener('mouseleave', function() {
             this.style.transform = 'scale(1) skewX(0deg)';
             this.style.textShadow = '0 0 30px rgba(0, 245, 255, 0.5)';
         });
     }
-    
+
     // Agregar efecto de glitch ocasional al título
     function glitchEffect() {
         if (title) {
@@ -991,14 +992,14 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 500);
         }
     }
-    
+
     // Activar glitch aleatoriamente
     setInterval(() => {
         if (Math.random() < 0.1) { // 10% de probabilidad
             glitchEffect();
         }
     }, 5000);
-    
+
     // Agregar animación de glitch
     const glitchStyle = document.createElement('style');
     glitchStyle.textContent = `
@@ -1009,13 +1010,13 @@ document.addEventListener('DOMContentLoaded', function() {
             60% { transform: translateX(-2px) skewX(2deg); }
             80% { transform: translateX(2px) skewX(-2deg); }
         }
-        
+
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             25% { transform: translateX(-5px); }
             75% { transform: translateX(5px); }
         }
-        
+
         @keyframes slide-in {
             0% {
                 transform: translateX(100%);
@@ -1028,7 +1029,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     `;
     document.head.appendChild(glitchStyle);
-    
+
     // Sistema de notificaciones futuristas
     function showFuturisticNotification(message, type = 'info') {
         const notification = document.createElement('div');
@@ -1043,7 +1044,7 @@ document.addEventListener('DOMContentLoaded', function() {
         notification.style.backdropFilter = 'blur(10px)';
         notification.style.border = '1px solid rgba(255, 255, 255, 0.2)';
         notification.style.animation = 'slide-in 0.5s ease-out';
-        
+
         // Estilos según el tipo
         switch(type) {
             case 'success':
@@ -1062,9 +1063,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 notification.style.background = 'linear-gradient(45deg, var(--neon-blue), rgba(0, 245, 255, 0.8))';
                 notification.innerHTML = 'ℹ️ ' + message;
         }
-        
+
         document.body.appendChild(notification);
-        
+
         // Auto-remove después de 4 segundos
         setTimeout(() => {
             notification.style.animation = 'slide-out 0.5s ease-in';
@@ -1075,7 +1076,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 500);
         }, 4000);
     }
-    
+
     // Crear sistema de ondas de energía de fondo
     function createEnergyWaves() {
         const waveContainer = document.createElement('div');
@@ -1087,7 +1088,7 @@ document.addEventListener('DOMContentLoaded', function() {
         waveContainer.style.pointerEvents = 'none';
         waveContainer.style.zIndex = '-1';
         waveContainer.style.overflow = 'hidden';
-        
+
         for (let i = 0; i < 5; i++) {
             const wave = document.createElement('div');
             wave.style.position = 'absolute';
@@ -1099,13 +1100,13 @@ document.addEventListener('DOMContentLoaded', function() {
             wave.style.top = Math.random() * 100 + '%';
             wave.style.animation = `energy-wave ${5 + Math.random() * 10}s infinite linear`;
             wave.style.animationDelay = Math.random() * 5 + 's';
-            
+
             waveContainer.appendChild(wave);
         }
-        
+
         document.body.appendChild(waveContainer);
     }
-    
+
     // Crear efecto de campo de fuerza
     function createForceField() {
         const container = document.querySelector('.config-container');
@@ -1123,12 +1124,12 @@ document.addEventListener('DOMContentLoaded', function() {
             forceField.style.animation = 'force-field-pulse 3s ease-in-out infinite';
             forceField.style.zIndex = '-1';
             forceField.style.filter = 'blur(1px)';
-            
+
             container.style.position = 'relative';
             container.appendChild(forceField);
         }
     }
-    
+
     // Sistema de constelaciones interactivas
     function createConstellation() {
         const constellation = document.createElement('div');
@@ -1139,7 +1140,7 @@ document.addEventListener('DOMContentLoaded', function() {
         constellation.style.height = '100%';
         constellation.style.pointerEvents = 'none';
         constellation.style.zIndex = '-3';
-        
+
         // Crear estrellas
         for (let i = 0; i < 50; i++) {
             const star = document.createElement('div');
@@ -1153,13 +1154,13 @@ document.addEventListener('DOMContentLoaded', function() {
             star.style.boxShadow = `0 0 ${Math.random() * 20 + 5}px currentColor`;
             star.style.animation = `twinkle ${Math.random() * 4 + 2}s infinite ease-in-out`;
             star.style.animationDelay = Math.random() * 4 + 's';
-            
+
             constellation.appendChild(star);
         }
-        
+
         document.body.appendChild(constellation);
     }
-    
+
     // Efecto de terminal hacker
     function createHackerTerminal() {
         const terminal = document.createElement('div');
@@ -1181,7 +1182,7 @@ document.addEventListener('DOMContentLoaded', function() {
         terminal.style.boxShadow = '0 0 20px rgba(57, 255, 20, 0.3)';
         terminal.style.cursor = 'pointer';
         terminal.style.transition = 'all 0.3s ease';
-        
+
         const terminalContent = document.createElement('div');
         terminalContent.innerHTML = `
             <div style="color: var(--neon-blue);">[SYSTEM] E-Garage v2.5 Initialized</div>
@@ -1192,9 +1193,9 @@ document.addEventListener('DOMContentLoaded', function() {
             <div style="color: var(--neon-purple);">[AI] Assistant ready for deployment</div>
             <div style="animation: blink-cursor 1s infinite;">█ System ready_</div>
         `;
-        
+
         terminal.appendChild(terminalContent);
-        
+
         // Minimizar/maximizar al hacer clic
         let isMinimized = false;
         terminal.addEventListener('click', function() {
@@ -1208,9 +1209,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 isMinimized = true;
             }
         });
-        
+
         document.body.appendChild(terminal);
-        
+
         // Simular actividad del terminal
         setInterval(() => {
             if (!isMinimized) {
@@ -1222,13 +1223,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     '[PERFORMANCE] All systems optimal',
                     '[NETWORK] Connection stable - 1000Mbps'
                 ];
-                
+
                 const newLine = document.createElement('div');
                 newLine.textContent = activities[Math.floor(Math.random() * activities.length)];
                 newLine.style.animation = 'fade-in 0.5s ease-in';
-                
+
                 terminalContent.insertBefore(newLine, terminalContent.lastElementChild);
-                
+
                 // Mantener solo las últimas 6 líneas
                 const lines = terminalContent.children;
                 if (lines.length > 7) {
@@ -1237,13 +1238,13 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }, 3000 + Math.random() * 2000);
     }
-    
+
     // Inicializar todos los efectos avanzados
     createEnergyWaves();
     createForceField();
     createConstellation();
     createHackerTerminal();
-    
+
     // Agregar estilos adicionales para los nuevos efectos
     const advancedStyles = document.createElement('style');
     advancedStyles.textContent = `
@@ -1261,7 +1262,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 opacity: 0;
             }
         }
-        
+
         @keyframes force-field-pulse {
             0%, 100% {
                 background-position: 0% 50%;
@@ -1272,7 +1273,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 opacity: 0.8;
             }
         }
-        
+
         @keyframes twinkle {
             0%, 100% {
                 opacity: 0.3;
@@ -1283,17 +1284,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 transform: scale(1.5);
             }
         }
-        
+
         @keyframes blink-cursor {
             0%, 50% { opacity: 1; }
             51%, 100% { opacity: 0; }
         }
-        
+
         @keyframes fade-in {
             0% { opacity: 0; transform: translateY(10px); }
             100% { opacity: 1; transform: translateY(0); }
         }
-        
+
         @keyframes slide-out {
             0% {
                 transform: translateX(0);
@@ -1306,16 +1307,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     `;
     document.head.appendChild(advancedStyles);
-    
+
     // Ejemplo de uso de notificaciones (pueden ser activadas por eventos del servidor)
     setTimeout(() => {
         showFuturisticNotification('Sistema de configuración inicializado correctamente', 'success');
     }, 2000);
-    
+
     setTimeout(() => {
         showFuturisticNotification('Efectos visuales avanzados activados', 'info');
     }, 4000);
-    
+
     console.log('🚀 Sistema de configuración E-Garage v2.5 cargado con efectos futuristas avanzados activados');
     console.log('🔮 Efectos incluidos: Partículas, Ondas de energía, Campo de fuerza, Constelaciones, Terminal hacker');
 });

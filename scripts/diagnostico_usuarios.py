@@ -2,6 +2,7 @@
 """
 Diagnóstico completo de usuarios y configuraciones
 """
+
 import os
 
 import django

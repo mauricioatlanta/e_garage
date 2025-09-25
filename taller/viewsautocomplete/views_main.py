@@ -63,8 +63,8 @@ def crear_cliente(request):
     # Usar template resolution en lugar de template hardcodeado
     from django.template.response import TemplateResponse
 
-    # TEMPORAL: Usar template simple para testing mientras arreglamos la estructura
-    template_name = "taller/clientes/crear_cliente_simple.html"
+    # TEMPORAL: Usar template existente para testing mientras arreglamos la estructura
+    template_name = "taller/clientes/crear_cliente.html"
 
     return TemplateResponse(
         request,

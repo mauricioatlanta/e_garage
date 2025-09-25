@@ -1,7 +1,7 @@
 
 {% extends 'base.html' %}
-{% extends 'base.html' %}
 {% load i18n %}
+{% load country_url %}
 {% block title %}{% if LANGUAGE_CODE == 'es' %}Clientes{% else %}Clients{% endif %} · eGarage{% endblock %}
 {% block content %}
 <div class="relative mx-auto max-w-7xl px-6 mt-10">
@@ -22,8 +22,7 @@
         <input type="text" name="q" value="{{ q }}" placeholder="{% if LANGUAGE_CODE == 'es' %}Buscar por nombre o apellido...{% else %}Search by first or last name...{% endif %}" class="w-full bg-[#0f172a] border border-cyan-500/40 focus:border-cyan-400/70 rounded-xl px-5 py-3 text-cyan-100 placeholder-gray-500 shadow-lg focus:ring-2 focus:ring-cyan-400/40 transition outline-none font-mono" />
         <button type="submit" class="absolute top-1/2 -translate-y-1/2 right-3 text-cyan-300 hover:text-lime-300 transition"><i class="fas fa-search"></i></button>
       </form>
-      {% url 'taller:clientes:crear_cliente' as url_crear %}
-      {% if not url_crear %}{% url 'taller:clientes:crear_cliente' as url_crear %}{% endif %}
+      {% country_url 'clientes:crear_cliente' as url_crear %}
       <a href="{{ url_crear }}" class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 via-lime-500 to-fuchsia-500 text-[#0d1117] font-bold shadow-lg hover:shadow-cyan-500/40 text-sm md:text-base tracking-wide hover:scale-[1.03] transition active:scale-95"><span>➕</span><span>{% if LANGUAGE_CODE == 'es' %}Nuevo Cliente{% else %}New Client{% endif %}</span></a>
     </div>
   </div>
@@ -48,7 +47,7 @@
               <td class="px-5 py-4 hidden md:table-cell text-gray-300">{{ c.email|default:'—' }}</td>
               <td class="px-5 py-4 hidden md:table-cell text-gray-300">{{ c.telefono|default:'—' }}</td>
               <td class="px-5 py-4 hidden xl:table-cell text-gray-300">{% if c.ciudad %}{{ c.ciudad.nombre }}{% else %}—{% endif %}</td>
-              <td class="px-5 py-4"><div class="flex items-center gap-3">{% url 'taller:clientes:ver_cliente' c.pk as url_ver %}{% if not url_ver %}{% url 'taller:clientes:ver_cliente' c.pk as url_ver %}{% endif %}<a href="{{ url_ver }}" class="text-cyan-300 hover:text-lime-300 transition" title="Ver"><i class="fas fa-eye"></i></a>{% url 'taller:clientes:editar_cliente' c.pk as url_editar %}{% if not url_editar %}{% url 'taller:clientes:editar_cliente' c.pk as url_editar %}{% endif %}<a href="{{ url_editar }}" class="text-cyan-300 hover:text-lime-300 transition" title="Editar"><i class="fas fa-edit"></i></a>{% url 'taller:clientes:eliminar_cliente' c.pk as url_eliminar %}{% if not url_eliminar %}{% url 'taller:clientes:eliminar_cliente' c.pk as url_eliminar %}{% endif %}<a href="{{ url_eliminar }}" class="text-red-400 hover:text-red-300 transition" title="Eliminar" onclick="return confirmarEliminacion('{{ c.nombre }} {{ c.apellido }}');"><i class="fas fa-trash"></i></a></div></td>
+              <td class="px-5 py-4"><div class="flex items-center gap-3">{% country_url 'clientes:ver_cliente' c.pk as url_ver %}<a href="{{ url_ver }}" class="text-cyan-300 hover:text-lime-300 transition" title="Ver"><i class="fas fa-eye"></i></a>{% country_url 'clientes:editar_cliente' c.pk as url_editar %}<a href="{{ url_editar }}" class="text-cyan-300 hover:text-lime-300 transition" title="Editar"><i class="fas fa-edit"></i></a>{% country_url 'clientes:eliminar_cliente' c.pk as url_eliminar %}<a href="{{ url_eliminar }}" class="text-red-400 hover:text-red-300 transition" title="Eliminar"><i class="fas fa-trash"></i></a></div></td>
             </tr>
           {% empty %}
             <tr><td colspan="6" class="px-5 py-12 text-center text-gray-400">{% if LANGUAGE_CODE == 'es' %}No hay clientes registrados.{% else %}No clients found.{% endif %}</td></tr>

@@ -19,8 +19,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "dashboard/centro_operaciones_espacial.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "dashboard/centro_operaciones_espacial.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -41,8 +41,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "dashboard/suscripciones_dashboard.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "dashboard/suscripciones_dashboard.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -63,8 +63,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "dashboard/suscripciones_dashboard.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "dashboard/suscripciones_dashboard.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -85,8 +85,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "dashboard/dashboard_admin.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "dashboard/dashboard_admin.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -107,8 +107,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "dashboard/dashboard_avanzado.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "dashboard/dashboard_avanzado.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -129,8 +129,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "dashboard/dashboard_avanzado.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "dashboard/dashboard_avanzado.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -151,8 +151,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "dashboard/dashboard_ai.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "dashboard/dashboard_ai.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -173,8 +173,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "dashboard/subscription_dashboard.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "dashboard/subscription_dashboard.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -195,8 +195,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "dashboard/dashboard.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "dashboard/dashboard.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -217,8 +217,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "dashboard/dashboard_usa.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "dashboard/dashboard_usa.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -239,8 +239,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "dashboard/dashboard_chile.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "dashboard/dashboard_chile.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -261,8 +261,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "dashboard/dashboard_usa.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "dashboard/dashboard_usa.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -283,8 +283,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "dashboard/dashboard.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "dashboard/dashboard.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -307,8 +307,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "onboarding/registro_gratuito.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "onboarding/registro_gratuito.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -329,8 +329,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "onboarding/bienvenida.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "onboarding/bienvenida.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -351,8 +351,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "onboarding/bienvenida_chile.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "onboarding/bienvenida_chile.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -373,8 +373,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "onboarding/bienvenida_usa.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "onboarding/bienvenida_usa.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -395,8 +395,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "onboarding/bienvenida_usa.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "onboarding/bienvenida_usa.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -417,8 +417,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "onboarding/bienvenida_chile.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "onboarding/bienvenida_chile.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -439,8 +439,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "onboarding/bienvenida_usa.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "onboarding/bienvenida_usa.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -461,8 +461,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "onboarding/bienvenida_usa.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "onboarding/bienvenida_usa.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -483,8 +483,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "onboarding/bienvenida_chile.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "onboarding/bienvenida_chile.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -505,8 +505,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "onboarding/bienvenida_usa.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "onboarding/bienvenida_usa.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -527,8 +527,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "onboarding/bienvenida_chile.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "onboarding/bienvenida_chile.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -551,8 +551,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "auth/signup_country_select.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "auth/signup_country_select.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -573,8 +573,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "auth/signup_success.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "auth/signup_success.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -595,8 +595,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "auth/signup.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "auth/signup.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -617,8 +617,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "auth/signup_success.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "auth/signup_success.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -639,8 +639,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "auth/signup.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "auth/signup.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -661,8 +661,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "auth/login.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "auth/login.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -683,8 +683,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "auth/login.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "auth/login.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -705,8 +705,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "auth/login.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "auth/login.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -727,8 +727,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "auth/login.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "auth/login.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -749,8 +749,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "auth/login.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "auth/login.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -771,8 +771,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "auth/login.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "auth/login.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -793,8 +793,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "auth/login.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "auth/login.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -817,8 +817,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/sugerencias_basicas.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/sugerencias_basicas.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -839,8 +839,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/test_info.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/test_info.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -861,8 +861,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/landing_chile.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/landing_chile.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -883,8 +883,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/landing_inicio_en.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/landing_inicio_en.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -905,8 +905,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/landing_chile.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/landing_chile.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -927,8 +927,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/landing_inicio_en.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/landing_inicio_en.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -949,8 +949,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/selector-pais-egarage.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/selector-pais-egarage.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -971,8 +971,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/password_reset_form.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/password_reset_form.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -993,8 +993,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/password_reset_email.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/password_reset_email.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1015,8 +1015,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/password_reset_done.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/password_reset_done.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1037,8 +1037,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/password_reset_confirm.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/password_reset_confirm.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1059,8 +1059,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/password_reset_complete.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/password_reset_complete.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1081,8 +1081,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/selector-pais-egarage.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/selector-pais-egarage.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1103,8 +1103,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/changelog.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/changelog.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1125,8 +1125,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/changelog.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/changelog.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1147,8 +1147,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/demo_catalogo_vehiculos.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/demo_catalogo_vehiculos.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1169,8 +1169,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/landing_inicio.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/landing_inicio.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1191,8 +1191,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/contacto_tailwind.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/contacto_tailwind.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1213,8 +1213,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/landing_inicio.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/landing_inicio.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1235,8 +1235,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/contacto_tailwind.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/contacto_tailwind.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1257,8 +1257,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/sugerencias_basicas.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/sugerencias_basicas.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1279,8 +1279,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/demo_vehiculo.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/demo_vehiculo.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1301,8 +1301,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/landing_inicio.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/landing_inicio.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1323,8 +1323,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/landing.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/landing.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1345,8 +1345,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/contacto_tailwind.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/contacto_tailwind.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1367,8 +1367,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/landing_mecanicos.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/landing_mecanicos.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1389,8 +1389,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/landing_repuestos.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/landing_repuestos.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1411,8 +1411,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/landing_servicios.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/landing_servicios.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1433,8 +1433,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/landing_reportes.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/landing_reportes.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1455,8 +1455,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/landing_clientes.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/landing_clientes.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1477,8 +1477,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/landing_ia.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/landing_ia.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1499,8 +1499,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/registro_enviado.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/registro_enviado.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1521,8 +1521,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/registro_enviado.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/registro_enviado.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1543,8 +1543,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/registro.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/registro.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1565,8 +1565,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/landing_inicio_en.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/landing_inicio_en.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1587,8 +1587,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/suscripcion_bloqueada.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/suscripcion_bloqueada.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1609,8 +1609,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/debug_autocomplete_cliente.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/debug_autocomplete_cliente.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1631,8 +1631,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/detalle_suscriptor.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/detalle_suscriptor.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1653,8 +1653,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/test_info.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/test_info.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1675,8 +1675,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/ver_documento_nuevo.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/ver_documento_nuevo.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1697,8 +1697,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/crear_documento.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/crear_documento.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1719,8 +1719,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/editar_documento_nuevo.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/editar_documento_nuevo.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1741,8 +1741,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/documento_form.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/documento_form.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1763,8 +1763,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/documento_form.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/documento_form.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1785,8 +1785,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/lista_documentos.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/lista_documentos.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1807,8 +1807,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/lista_documentos.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/lista_documentos.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1829,8 +1829,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/crear_documento.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/crear_documento.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1851,8 +1851,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/ver_documento_nuevo.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/ver_documento_nuevo.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1873,8 +1873,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/editar_documento_nuevo.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/editar_documento_nuevo.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1895,8 +1895,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/confirmar_eliminar.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/confirmar_eliminar.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1917,8 +1917,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/debug_documento.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/debug_documento.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1939,8 +1939,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/rate_limit.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/rate_limit.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1961,8 +1961,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/rate_limit.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/rate_limit.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -1983,8 +1983,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/usuario_existente.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/usuario_existente.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2005,8 +2005,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/servicios_menu.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/servicios_menu.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2027,8 +2027,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/otros_servicios_menu.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/otros_servicios_menu.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2049,8 +2049,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/registrar_cliente_y_vehiculo.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/registrar_cliente_y_vehiculo.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2071,8 +2071,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/agregar.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/agregar.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2093,8 +2093,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/email_confirm_empty.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/email_confirm_empty.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2115,8 +2115,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/subscription_list.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/subscription_list.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2137,8 +2137,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/subscription_analytics.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/subscription_analytics.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2159,8 +2159,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/subscription_detail.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/subscription_detail.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2181,8 +2181,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/error.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/error.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2203,8 +2203,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/error.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/error.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2225,8 +2225,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/company_settings.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/company_settings.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2247,8 +2247,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/atlanta_publico.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/atlanta_publico.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2269,8 +2269,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/atlanta_publico.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/atlanta_publico.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2291,8 +2291,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/test_email.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/test_email.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2313,8 +2313,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/test_email.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/test_email.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2335,8 +2335,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/empresa_form.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/empresa_form.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2357,8 +2357,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/usa_landing.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/usa_landing.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2379,8 +2379,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/documentos.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/documentos.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2401,8 +2401,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/solicitar_presupuesto.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/solicitar_presupuesto.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2423,8 +2423,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/mis_solicitudes.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/mis_solicitudes.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2445,8 +2445,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/vehiculos.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/vehiculos.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2467,8 +2467,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/resend_email.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/resend_email.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2489,8 +2489,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/resend_email.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/resend_email.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2511,8 +2511,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/resend_email.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/resend_email.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2533,8 +2533,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/suscripcion_bloqueada.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/suscripcion_bloqueada.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2555,8 +2555,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/usuario_existente.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/usuario_existente.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2577,8 +2577,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/prueba_ya_usada.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/prueba_ya_usada.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2599,8 +2599,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/registro_enviado.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/registro_enviado.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2621,8 +2621,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/registro.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/registro.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2643,8 +2643,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/error_activacion.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/error_activacion.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2665,8 +2665,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/activado.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/activado.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2687,8 +2687,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/error_activacion.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/error_activacion.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2709,8 +2709,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/activar_codigo.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/activar_codigo.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2731,8 +2731,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/test_i18n.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/test_i18n.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2753,8 +2753,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/crear_vehiculo.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/crear_vehiculo.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2775,8 +2775,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/empresa_form.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/empresa_form.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2797,8 +2797,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/registro_enviado.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/registro_enviado.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2819,8 +2819,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/registro_enviado.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/registro_enviado.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2841,8 +2841,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/registro.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/registro.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2863,8 +2863,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/bloqueada.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/bloqueada.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2885,8 +2885,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/debug_autocomplete_cliente.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/debug_autocomplete_cliente.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2907,8 +2907,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/landing_egarage.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/landing_egarage.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2929,8 +2929,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/lista_clientes.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/lista_clientes.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2951,8 +2951,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/crear_cliente.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/crear_cliente.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2973,8 +2973,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/detalle_cliente.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/detalle_cliente.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -2995,8 +2995,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/listar_compras.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/listar_compras.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -3017,8 +3017,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/crear_compra.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/crear_compra.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -3039,8 +3039,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/detalle_compra.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/detalle_compra.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -3061,8 +3061,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/listar_inspecciones.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/listar_inspecciones.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -3083,8 +3083,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/crear_inspeccion.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/crear_inspeccion.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -3105,8 +3105,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/detalle_inspeccion.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/detalle_inspeccion.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -3127,8 +3127,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/landing_egarage.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/landing_egarage.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -3149,8 +3149,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/lista_repuestos.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/lista_repuestos.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -3171,8 +3171,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/crear_repuesto.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/crear_repuesto.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -3193,8 +3193,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/detalle_repuesto.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/detalle_repuesto.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -3215,8 +3215,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/lista_servicios.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/lista_servicios.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -3237,8 +3237,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/crear_servicio.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/crear_servicio.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -3259,8 +3259,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/detalle_servicio.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/detalle_servicio.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -3281,8 +3281,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/listar_solicitudes.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/listar_solicitudes.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -3303,8 +3303,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/crear_solicitud.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/crear_solicitud.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -3325,8 +3325,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/detalle_solicitud.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/detalle_solicitud.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -3347,8 +3347,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/registro_enviado.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/registro_enviado.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -3369,8 +3369,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/registro.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/registro.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -3391,8 +3391,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/suspension.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/suspension.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -3413,8 +3413,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/subir_comprobante.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/subir_comprobante.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -3435,8 +3435,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/precios.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/precios.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -3457,8 +3457,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/registro_trial.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/registro_trial.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -3479,8 +3479,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/activar_trial.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/activar_trial.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -3501,8 +3501,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/listar_ventas.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/listar_ventas.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -3523,8 +3523,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/crear_venta.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/crear_venta.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -3545,8 +3545,8 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/detalle_venta.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/detalle_venta.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
@@ -3567,10 +3567,9 @@ from django.template.response import TemplateResponse
 
 # DESPUÉS:
 template_name = select_country_lang_template(
-    "other/registro_ubicacion.html", 
-    getattr(request.user.empresa, 'pais', 'cl').lower(), 
+    "other/registro_ubicacion.html",
+    getattr(request.user.empresa, 'pais', 'cl').lower(),
     get_language()
 )
 return TemplateResponse(request, template_name, context)
 ```
-

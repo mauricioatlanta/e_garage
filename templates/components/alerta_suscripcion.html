@@ -26,27 +26,27 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="flex-shrink-0 space-x-2">
-                    <a href="{% url 'subir_comprobante' %}" 
+                    <a href="{% url 'subir_comprobante' %}"
                        class="bg-white text-red-600 hover:bg-gray-100 font-bold py-2 px-4 rounded-lg transition-colors text-sm">
                         <i class="fas fa-upload mr-1"></i>
                         Renovar
                     </a>
-                    <button onclick="document.getElementById('alerta-suscripcion').style.display='none'" 
+                    <button onclick="document.getElementById('alerta-suscripcion').style.display='none'"
                             class="text-white hover:text-orange-200 p-2">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
             </div>
-            
+
             <!-- Barra de progreso -->
             {% if request.empresa.dias_restantes > 0 %}
                 <div class="mt-3">
                     <div class="bg-white bg-opacity-20 rounded-full h-2">
                         {% with dias_totales=30 dias_restantes=request.empresa.dias_restantes %}
                             {% widthratio dias_restantes dias_totales 100 as porcentaje %}
-                            <div class="bg-white rounded-full h-2 transition-all duration-300" 
+                            <div class="bg-white rounded-full h-2 transition-all duration-300"
                                  style="width: {{ porcentaje }}%"></div>
                         {% endwith %}
                     </div>
@@ -57,7 +57,7 @@
                 </div>
             {% endif %}
         </div>
-        
+
         <!-- Mini contador regresivo -->
         <div class="bg-black bg-opacity-20 px-4 py-2">
             <div class="flex items-center justify-between text-sm">
@@ -72,16 +72,16 @@
                         Mantén tu taller protegido
                     </div>
                 </div>
-                
+
                 <div class="flex items-center space-x-2 text-xs">
-                    <a href="https://wa.me/56912345678?text=Necesito%20ayuda%20con%20mi%20suscripción%20de%20eGarage" 
-                       target="_blank" 
+                    <a href="https://wa.me/56912345678?text=Necesito%20ayuda%20con%20mi%20suscripción%20de%20eGarage"
+                       target="_blank"
                        class="text-white hover:text-orange-200 transition-colors">
                         <i class="fab fa-whatsapp mr-1"></i>
                         Ayuda
                     </a>
                     <span class="text-orange-300">|</span>
-                    <a href="{% url 'precios' %}" 
+                    <a href="{% url 'precios' %}"
                        class="text-white hover:text-orange-200 transition-colors">
                         <i class="fas fa-tag mr-1"></i>
                         Ver Planes
@@ -90,7 +90,7 @@
             </div>
         </div>
     </div>
-    
+
     <script>
         // Actualizar contador cada hora
         setInterval(function() {
@@ -99,7 +99,7 @@
                 .then(data => {
                     if (data.dias_restantes !== undefined) {
                         document.getElementById('contador-dias').textContent = data.dias_restantes;
-                        
+
                         // Si se vence, recargar página
                         if (data.debe_bloquear) {
                             window.location.reload();
@@ -108,7 +108,7 @@
                 })
                 .catch(error => console.log('Error actualizando contador:', error));
         }, 3600000); // Cada hora
-        
+
         // Animación de pulso para llamar la atención
         document.getElementById('alerta-suscripcion').classList.add('animate-pulse');
         setTimeout(function() {
@@ -123,7 +123,7 @@
         0%, 100% { opacity: 1; }
         50% { opacity: 0.8; }
     }
-    
+
     .animate-pulse-soft {
         animation: pulse-soft 2s infinite;
     }

@@ -23,7 +23,7 @@ class Modelo(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.marca.nombre} {self.nombre}"
+        return self.nombre
 
     def save(self, *args, **kwargs):
         # Asegurar que el country coincida con el de la marca

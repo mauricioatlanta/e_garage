@@ -7,7 +7,7 @@
 <div class="container-fluid py-5">
     <div class="row justify-content-center">
         <div class="col-12 col-xl-10">
-            
+
             <!-- Header Section -->
             <div class="glass-card p-5 mb-5 text-center">
                 <div class="row align-items-center">
@@ -50,7 +50,7 @@
                         </div>
                         <h5 class="mb-3">Gestión de Clientes</h5>
                         <p class="text-secondary mb-3">Administra tu base de clientes y vehículos</p>
-                        <a href="{% url 'taller:clientes:lista_clientes' %}" class="btn btn-futuristic btn-sm w-100">
+                        <a href="{% country_url 'clientes:lista_clientes' %}" class="btn btn-futuristic btn-sm w-100">
                             <i class="fas fa-arrow-right me-2"></i>Gestionar Clientes
                         </a>
                     </div>
@@ -63,7 +63,7 @@
                         </div>
                         <h5 class="mb-3">Vehículos</h5>
                         <p class="text-secondary mb-3">Registra y gestiona vehículos de clientes</p>
-                        <a href="{% url 'taller:vehiculos:lista_vehiculos' %}" class="btn btn-futuristic btn-sm w-100">
+                        <a href="{% country_url 'vehiculos:lista_vehiculos' %}" class="btn btn-futuristic btn-sm w-100">
                             <i class="fas fa-arrow-right me-2"></i>Gestionar Vehículos
                         </a>
                     </div>
@@ -76,7 +76,7 @@
                         </div>
                         <h5 class="mb-3">Servicios</h5>
                         <p class="text-secondary mb-3">Catálogo de servicios y repuestos</p>
-                        <a href="{% url 'taller:servicios:servicios_menu' %}" class="btn btn-futuristic btn-sm w-100">
+                        <a href="{% country_url 'servicios:servicios_menu' %}" class="btn btn-futuristic btn-sm w-100">
                             <i class="fas fa-arrow-right me-2"></i>Gestionar Servicios
                         </a>
                     </div>
@@ -89,7 +89,7 @@
                         </div>
                         <h5 class="mb-3">Documentos</h5>
                         <p class="text-secondary mb-3">Facturas, boletas y presupuestos</p>
-                        <a href="{% url 'taller:documentos:lista_documentos' %}" class="btn btn-futuristic btn-sm w-100">
+                        <a href="{% country_url 'documentos:lista_documentos' %}" class="btn btn-futuristic btn-sm w-100">
                             <i class="fas fa-arrow-right me-2"></i>Gestionar Documentos
                         </a>
                     </div>
@@ -193,12 +193,12 @@
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         transition: all 0.3s ease;
     }
-    
+
     .glass-card:hover {
         transform: translateY(-5px);
         box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
     }
-    
+
     .btn-futuristic {
         background: linear-gradient(135deg, #007bff, #0056b3);
         border: none;
@@ -208,19 +208,19 @@
         padding: 12px 24px;
         transition: all 0.3s ease;
     }
-    
+
     .btn-futuristic:hover {
         background: linear-gradient(135deg, #0056b3, #004085);
         transform: translateY(-2px);
         box-shadow: 0 8px 25px rgba(0, 123, 255, 0.3);
         color: white;
     }
-    
+
     .badge {
         border-radius: 20px;
         font-weight: 500;
     }
-    
+
     .display-4 {
         font-weight: 700;
         background: linear-gradient(135deg, #007bff, #00d4ff);

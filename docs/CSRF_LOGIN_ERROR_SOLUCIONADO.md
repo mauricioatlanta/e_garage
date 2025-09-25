@@ -39,7 +39,7 @@ def country_aware_login(request):
     Vista funcional de login que detecta país desde 'next' parameter
     """
     next_url = request.GET.get('next', '')
-    
+
     # Detectar país desde next parameter
     if next_url.startswith('/us/'):
         request.country = 'US'
@@ -51,7 +51,7 @@ def country_aware_login(request):
         # Por defecto Chile si no hay next o no tiene prefijo
         request.country = 'CL'
         request.country_code = 'CL'
-    
+
     # Usar la vista original de allauth con contexto corregido
     from allauth.account.views import login as allauth_login
     return allauth_login(request)
@@ -67,7 +67,7 @@ Modificadas las URLs para usar la vista personalizada:
 urlpatterns = [
     # Login personalizado con contexto de país
     path('accounts/login/', country_aware_login, name='account_login'),
-    # Allauth para el resto de funcionalidades  
+    # Allauth para el resto de funcionalidades
     path('accounts/', include('allauth.urls')),
     # ... resto de URLs
 ]
@@ -104,7 +104,7 @@ next_url = request.GET.get('next', '')
 if next_url.startswith('/us/'):
     request.country = 'US'      # Contexto US
 elif next_url.startswith('/cl/'):
-    request.country = 'CL'      # Contexto CL  
+    request.country = 'CL'      # Contexto CL
 else:
     request.country = 'CL'      # Por defecto CL
 ```

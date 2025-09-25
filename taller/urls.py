@@ -1,6 +1,10 @@
 from django.urls import include, path
 
 from taller.views_extra.company_settings_views import company_settings_view
+from taller.views_extra.dashboard_empresa import (
+    dashboard_centro_operaciones,
+    dashboard_centro_operaciones_espacial,
+)
 from taller.views_extra.views import dashboard
 from taller.views_extra.views_configuracion import configuracion_empresa
 
@@ -52,17 +56,25 @@ urlpatterns = [
     # === RUTAS PRINCIPALES PARA COMPATIBILIDAD ===
     path("dashboard/", dashboard, name="dashboard"),  # Dashboard principal
     path(
+        "centro-operaciones/", dashboard_centro_operaciones, name="centro_operaciones"
+    ),
+    path(
+        "centro-operaciones-espacial/",
+        dashboard_centro_operaciones_espacial,
+        name="centro_operaciones_espacial",
+    ),
+    path(
         "configuracion/", configuracion_empresa, name="configuracion"
     ),  # Configuración empresa
     # Rutas principales de taller (dashboard, settings, etc.)
     # path('', include('taller.taller_main_urls')),  # Eliminado para evitar conflicto de namespace
     # Puedes agregar aquí otras rutas globales si es necesario
-    path("vehiculos/ajax/", include("taller.ajax_urls")),
+    path("ajax/", include("taller.ajax_urls")),
     # Company settings
     path("settings/", company_settings_view, name="company_settings"),
-    # URLs de autocomplete para los formularios
-    path(
-        "autocomplete/",
-        include(("taller.autocomplete.urls", "autocomplete"), namespace="autocomplete"),
-    ),
+    # URLs de autocomplete para los formularios (movidas a URLs específicas de país)
+    # path(
+    #     "autocomplete/",
+    #     include(("taller.autocomplete.urls", "autocomplete"), namespace="autocomplete"),
+    # ),
 ]

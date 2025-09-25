@@ -1,4 +1,19 @@
-﻿repos:
+﻿# Configuración global
+default_language_version:
+  python: python3.13   # usa la versión disponible en el sistema
+
+# ignora basura/respaldos en TODOS los hooks
+exclude: |
+  (?x)
+  (
+    ^templates_backup_.* |
+    ^_disabled_templates/ |
+    ^templates/_quarantine/ |
+    \.zip$ |
+    ^.*\.html\.py$
+  )
+
+repos:
   # Ruff - Linter y formatter rápido
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.6.9
@@ -55,16 +70,17 @@
 
   # General - Hooks generales
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v4.6.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-yaml
       - id: check-json
+      - id: pretty-format-json
+        args: [--autofix, --indent, "2", --no-sort-keys]
       - id: check-merge-conflict
       - id: check-added-large-files
       - id: check-case-conflict
-      - id: check-merge-conflict
       - id: debug-statements
       - id: check-docstring-first
       - id: requirements-txt-fixer
@@ -81,11 +97,17 @@
     hooks:
       - id: pytest
         name: pytest
-        entry: pytest
-        language: system
+        entry: pytest -q
+        language: python
         pass_filenames: false
-        always_run: true
-        args: [--maxfail=1, -q]
+        types: [python]
+        # evita autoload de plugins globales y asegura deps
+        env:
+          - PYTEST_DISABLE_PLUGIN_AUTOLOAD=1
+        additional_dependencies:
+          - pytest==8.3.2
+          - coverage==7.6.1
+          - pytest-cov==5.0.0
 
 # Configuración global
 default_stages: [commit, push]

@@ -2,6 +2,7 @@
 """
 Script para crear las tablas faltantes manualmente
 """
+
 import os
 import sys
 

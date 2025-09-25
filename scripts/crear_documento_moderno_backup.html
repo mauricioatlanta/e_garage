@@ -406,11 +406,11 @@
         .tipo-documento-selector {
             flex-direction: column;
         }
-        
+
         .tipo-btn {
             min-width: auto;
         }
-        
+
         .documento-title {
             font-size: 2rem;
         }
@@ -433,14 +433,14 @@
 
         <form id="documentoForm" method="post">
             {% csrf_token %}
-            
+
             <!-- Selector de Tipo de Documento -->
             <div class="form-section">
                 <h3><i class="fas fa-tags me-2"></i>{% trans "Tipo de Documento" %}</h3>
                 <div class="tipo-documento-selector">
                     {% for tipo in tipos_documento %}
-                    <div class="tipo-btn" 
-                         data-tipo="{{ tipo.value }}" 
+                    <div class="tipo-btn"
+                         data-tipo="{{ tipo.value }}"
                          data-color="{{ tipo.color }}"
                          data-numero="{{ tipo.numero_preview }}">
                         <div class="tipo-content">
@@ -467,13 +467,13 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label">{% trans "Fecha" %}</label>
-                        <input type="date" name="fecha" class="form-control" 
+                        <input type="date" name="fecha" class="form-control"
                                value="{% now 'Y-m-d' %}" required>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">{% trans "Cliente" %}</label>
                         <div class="search-container">
-                            <input type="text" class="form-control" id="clienteSearch" 
+                            <input type="text" class="form-control" id="clienteSearch"
                                    placeholder="🔍 Buscar cliente..." autocomplete="off">
                             <select name="cliente" class="form-control" id="clienteSelect" required>
                                 <option value="">{% trans "Seleccionar cliente..." %}</option>
@@ -513,9 +513,9 @@
                                 {% trans "Kilometraje" %}
                             {% endif %}
                         </label>
-                        <div class="kilometraje-input" 
+                        <div class="kilometraje-input"
                              data-unit="{% if empresa.pais == 'US' %}miles{% else %}km{% endif %}">
-                            <input type="number" name="kilometraje" class="form-control" 
+                            <input type="number" name="kilometraje" class="form-control"
                                    placeholder="0" min="0">
                         </div>
                     </div>
@@ -528,7 +528,7 @@
                 <div class="row mb-3">
                     <div class="col-md-8">
                         <div class="position-relative">
-                            <input type="text" class="form-control" id="buscarRepuesto" 
+                            <input type="text" class="form-control" id="buscarRepuesto"
                                    placeholder="{% trans 'Buscar repuesto...' %}">
                             <div class="search-results" id="repuestosResults"></div>
                         </div>
@@ -548,7 +548,7 @@
                 <div class="row mb-3">
                     <div class="col-md-8">
                         <div class="position-relative">
-                            <input type="text" class="form-control" id="buscarServicio" 
+                            <input type="text" class="form-control" id="buscarServicio"
                                    placeholder="{% trans 'Buscar servicio...' %}">
                             <div class="search-results" id="serviciosResults"></div>
                         </div>
@@ -570,7 +570,7 @@
                         <select class="form-control" id="servicioExternoSelect">
                             <option value="">{% trans "Seleccionar servicio externo..." %}</option>
                             {% for servicio in servicios_externos %}
-                            <option value="{{ servicio.id }}" 
+                            <option value="{{ servicio.id }}"
                                     data-nombre="{{ servicio.nombre }}"
                                     data-empresa="{{ servicio.empresa_externa }}"
                                     data-precio="{{ servicio.precio_cliente }}">
@@ -663,39 +663,39 @@ document.addEventListener('DOMContentLoaded', function() {
     let serviciosSeleccionados = [];
     let serviciosExternosSeleccionados = [];
     let selectedRepuesto = null;
-    
+
     // Elementos del DOM
     const tipoButtons = document.querySelectorAll('.tipo-btn');
     const tipoInput = document.getElementById('tipoDocumento');
     const clienteSelect = document.getElementById('clienteSelect');
     const vehiculoSelect = document.getElementById('vehiculoSelect');
     const incluirImpuestoCheck = document.getElementById('incluir_impuestos');
-    
+
     // Selector de tipo de documento
     tipoButtons.forEach(btn => {
         btn.addEventListener('click', function() {
             tipoButtons.forEach(b => b.classList.remove('active'));
             this.classList.add('active');
             tipoInput.value = this.dataset.tipo;
-            
+
             // Cambiar colores del tema
             const color = this.dataset.color;
             document.documentElement.style.setProperty('--current-doc-color', color);
-            
+
             // Obtener número de documento via AJAX
             obtenerNumeroDocumento(this.dataset.tipo, color);
         });
     });
-    
+
     // Función para obtener el número de documento
     function obtenerNumeroDocumento(tipo, color) {
         const numeroText = document.getElementById('numeroDocumentoText');
         const numeroContainer = document.getElementById('numeroDocumentoPreview');
-        
+
         // Mostrar loading
         numeroText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> {% trans "Generando..." %}';
         numeroContainer.style.display = 'block';
-        
+
         const countryPrefix = '{{ empresa.pais|lower }}';
         fetch(`/${countryPrefix}/taller/documentos/api/obtener-numero-documento/?tipo=${encodeURIComponent(tipo)}`)
             .then(response => response.json())
@@ -719,24 +719,24 @@ document.addEventListener('DOMContentLoaded', function() {
     // Funcionalidad del buscador de clientes
     const clienteSearch = document.getElementById('clienteSearch');
     const clienteDropdown = document.getElementById('clienteDropdown');
-    
+
     // Obtener todas las opciones de clientes
     const clienteOptions = Array.from(clienteSelect.options).slice(1); // Saltar la primera opción vacía
-    
+
     clienteSearch.addEventListener('input', function() {
         const searchTerm = this.value.toLowerCase().trim();
-        
+
         if (searchTerm.length === 0) {
             clienteDropdown.style.display = 'none';
             return;
         }
-        
+
         // Filtrar clientes
         const filteredClientes = clienteOptions.filter(option => {
             const searchData = option.getAttribute('data-search');
             return searchData && searchData.includes(searchTerm);
         });
-        
+
         // Mostrar resultados
         if (filteredClientes.length > 0) {
             clienteDropdown.innerHTML = filteredClientes.map(option => `
@@ -750,35 +750,35 @@ document.addEventListener('DOMContentLoaded', function() {
             clienteDropdown.style.display = 'block';
         }
     });
-    
+
     // Manejar selección de cliente
     clienteDropdown.addEventListener('click', function(e) {
         const item = e.target.closest('.search-result-item');
         if (item && item.dataset.value) {
             const clienteId = item.dataset.value;
             const clienteText = item.textContent.replace('👤', '').trim();
-            
+
             // Actualizar campos
             clienteSearch.value = clienteText;
             clienteSelect.value = clienteId;
             clienteDropdown.style.display = 'none';
-            
+
             // Cargar vehículos del cliente
             cargarVehiculos(clienteId);
         }
     });
-    
+
     // Ocultar dropdown al hacer clic fuera
     document.addEventListener('click', function(e) {
         if (!e.target.closest('.search-container')) {
             clienteDropdown.style.display = 'none';
         }
     });
-    
+
     // Función para cargar vehículos del cliente seleccionado
     function cargarVehiculos(clienteId) {
         vehiculoSelect.innerHTML = '<option value="">{% trans "Cargando vehículos..." %}</option>';
-        
+
         if (clienteId) {
             const countryPrefix = '{{ empresa.pais|lower }}';
             fetch(`/${countryPrefix}/taller/documentos/api/vehiculos-cliente/?cliente_id=${clienteId}`)
@@ -800,12 +800,12 @@ document.addEventListener('DOMContentLoaded', function() {
             vehiculoSelect.innerHTML = '<option value="">{% trans "Seleccionar vehículo..." %}</option>';
         }
     }
-    
+
     // Cargar vehículos cuando se selecciona cliente
     clienteSelect.addEventListener('change', function() {
         const clienteId = this.value;
         vehiculoSelect.innerHTML = '<option value="">{% trans "Seleccionar vehículo..." %}</option>';
-        
+
         if (clienteId) {
             const countryPrefix = '{{ empresa.pais|lower }}';
             fetch(`/${countryPrefix}/taller/documentos/api/vehiculos-cliente/?cliente_id=${clienteId}`)
@@ -821,18 +821,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 .catch(error => console.error('Error:', error));
         }
     });
-    
+
     // Búsqueda de repuestos
     const buscarRepuesto = document.getElementById('buscarRepuesto');
     const repuestosResults = document.getElementById('repuestosResults');
-    
+
     buscarRepuesto.addEventListener('input', function() {
         const query = this.value;
         if (query.length < 2) {
             repuestosResults.style.display = 'none';
             return;
         }
-        
+
         fetch(`/taller/documentos/api/buscar-repuestos/?q=${encodeURIComponent(query)}`)
             .then(response => response.json())
             .then(data => {
@@ -855,37 +855,37 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch(error => console.error('Error:', error));
     });
-    
+
     // Agregar repuesto
     document.getElementById('agregarRepuesto').addEventListener('click', function() {
         if (!selectedRepuesto) return;
-        
+
         const item = {
             id: selectedRepuesto.id,
             nombre: selectedRepuesto.nombre,
             precio: selectedRepuesto.precio_venta,
             cantidad: 1
         };
-        
+
         repuestosSeleccionados.push(item);
         renderRepuestos();
         buscarRepuesto.value = '';
         selectedRepuesto = null;
         calcularTotales();
     });
-    
+
     // Búsqueda de servicios
     const buscarServicio = document.getElementById('buscarServicio');
     const serviciosResults = document.getElementById('serviciosResults');
     let selectedServicio = null;
-    
+
     buscarServicio.addEventListener('input', function() {
         const query = this.value;
         if (query.length < 2) {
             serviciosResults.style.display = 'none';
             return;
         }
-        
+
         fetch(`/taller/documentos/api/buscar-servicios-internos/?q=${encodeURIComponent(query)}`)
             .then(response => response.json())
             .then(data => {
@@ -908,35 +908,35 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch(error => console.error('Error:', error));
     });
-    
+
     // Agregar servicio
     document.getElementById('agregarServicio').addEventListener('click', function() {
         if (!selectedServicio) return;
-        
+
         const precio = prompt('Ingrese el precio del servicio:', '0');
         if (!precio || isNaN(precio)) return;
-        
+
         const item = {
             id: selectedServicio.id,
             nombre: selectedServicio.nombre,
             precio: parseFloat(precio),
             cantidad: 1
         };
-        
+
         serviciosSeleccionados.push(item);
         renderServicios();
         buscarServicio.value = '';
         selectedServicio = null;
         calcularTotales();
     });
-    
+
     // Agregar servicio externo
     document.getElementById('agregarServicioExterno').addEventListener('click', function() {
         const select = document.getElementById('servicioExternoSelect');
         const option = select.options[select.selectedIndex];
-        
+
         if (!option.value) return;
-        
+
         const item = {
             id: option.value,
             nombre: option.dataset.nombre,
@@ -944,18 +944,18 @@ document.addEventListener('DOMContentLoaded', function() {
             precio: parseFloat(option.dataset.precio),
             cantidad: 1
         };
-        
+
         serviciosExternosSeleccionados.push(item);
         renderServiciosExternos();
         select.selectedIndex = 0;
         calcularTotales();
     });
-    
+
     // Render functions
     function renderRepuestos() {
         const container = document.getElementById('repuestosContainer');
         container.innerHTML = '';
-        
+
         repuestosSeleccionados.forEach((item, index) => {
             const div = document.createElement('div');
             div.className = 'linea-item';
@@ -968,11 +968,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         <strong>${item.nombre}</strong>
                     </div>
                     <div class="col-md-2">
-                        <input type="number" class="form-control" value="${item.cantidad}" 
+                        <input type="number" class="form-control" value="${item.cantidad}"
                                onchange="actualizarCantidadRepuesto(${index}, this.value)" min="1">
                     </div>
                     <div class="col-md-2">
-                        <input type="number" class="form-control" value="${item.precio}" 
+                        <input type="number" class="form-control" value="${item.precio}"
                                onchange="actualizarPrecioRepuesto(${index}, this.value)" step="0.01" min="0">
                     </div>
                     <div class="col-md-3 text-end">
@@ -982,14 +982,14 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
             container.appendChild(div);
         });
-        
+
         document.getElementById('repuestosData').value = JSON.stringify(repuestosSeleccionados);
     }
-    
+
     function renderServicios() {
         const container = document.getElementById('serviciosContainer');
         container.innerHTML = '';
-        
+
         serviciosSeleccionados.forEach((item, index) => {
             const div = document.createElement('div');
             div.className = 'linea-item';
@@ -1002,11 +1002,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         <strong>${item.nombre}</strong>
                     </div>
                     <div class="col-md-2">
-                        <input type="number" class="form-control" value="${item.cantidad}" 
+                        <input type="number" class="form-control" value="${item.cantidad}"
                                onchange="actualizarCantidadServicio(${index}, this.value)" min="1">
                     </div>
                     <div class="col-md-2">
-                        <input type="number" class="form-control" value="${item.precio}" 
+                        <input type="number" class="form-control" value="${item.precio}"
                                onchange="actualizarPrecioServicio(${index}, this.value)" step="0.01" min="0">
                     </div>
                     <div class="col-md-3 text-end">
@@ -1016,14 +1016,14 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
             container.appendChild(div);
         });
-        
+
         document.getElementById('serviciosData').value = JSON.stringify(serviciosSeleccionados);
     }
-    
+
     function renderServiciosExternos() {
         const container = document.getElementById('serviciosExternosContainer');
         container.innerHTML = '';
-        
+
         serviciosExternosSeleccionados.forEach((item, index) => {
             const div = document.createElement('div');
             div.className = 'linea-item';
@@ -1037,7 +1037,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <small style="color: var(--cyber-blue);">${item.empresa}</small>
                     </div>
                     <div class="col-md-2">
-                        <input type="number" class="form-control" value="${item.cantidad}" 
+                        <input type="number" class="form-control" value="${item.cantidad}"
                                onchange="actualizarCantidadServicioExterno(${index}, this.value)" min="1">
                     </div>
                     <div class="col-md-4 text-end">
@@ -1047,77 +1047,77 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
             container.appendChild(div);
         });
-        
+
         document.getElementById('otrosServiciosData').value = JSON.stringify(serviciosExternosSeleccionados);
     }
-    
+
     // Funciones globales para eliminar y actualizar
     window.eliminarRepuesto = function(index) {
         repuestosSeleccionados.splice(index, 1);
         renderRepuestos();
         calcularTotales();
     };
-    
+
     window.eliminarServicio = function(index) {
         serviciosSeleccionados.splice(index, 1);
         renderServicios();
         calcularTotales();
     };
-    
+
     window.eliminarServicioExterno = function(index) {
         serviciosExternosSeleccionados.splice(index, 1);
         renderServiciosExternos();
         calcularTotales();
     };
-    
+
     window.actualizarCantidadRepuesto = function(index, cantidad) {
         repuestosSeleccionados[index].cantidad = parseInt(cantidad) || 1;
         renderRepuestos();
         calcularTotales();
     };
-    
+
     window.actualizarPrecioRepuesto = function(index, precio) {
         repuestosSeleccionados[index].precio = parseFloat(precio) || 0;
         renderRepuestos();
         calcularTotales();
     };
-    
+
     window.actualizarCantidadServicio = function(index, cantidad) {
         serviciosSeleccionados[index].cantidad = parseInt(cantidad) || 1;
         renderServicios();
         calcularTotales();
     };
-    
+
     window.actualizarPrecioServicio = function(index, precio) {
         serviciosSeleccionados[index].precio = parseFloat(precio) || 0;
         renderServicios();
         calcularTotales();
     };
-    
+
     window.actualizarCantidadServicioExterno = function(index, cantidad) {
         serviciosExternosSeleccionados[index].cantidad = parseInt(cantidad) || 1;
         renderServiciosExternos();
         calcularTotales();
     };
-    
+
     // Calcular totales
     function calcularTotales() {
-        const subtotalRepuestos = repuestosSeleccionados.reduce((sum, item) => 
+        const subtotalRepuestos = repuestosSeleccionados.reduce((sum, item) =>
             sum + (item.cantidad * item.precio), 0);
-        
-        const subtotalServicios = serviciosSeleccionados.reduce((sum, item) => 
+
+        const subtotalServicios = serviciosSeleccionados.reduce((sum, item) =>
             sum + (item.cantidad * item.precio), 0);
-        
-        const subtotalServiciosExternos = serviciosExternosSeleccionados.reduce((sum, item) => 
+
+        const subtotalServiciosExternos = serviciosExternosSeleccionados.reduce((sum, item) =>
             sum + (item.cantidad * item.precio), 0);
-        
+
         const subtotal = subtotalRepuestos + subtotalServicios + subtotalServiciosExternos;
-        
+
         const incluirImpuesto = incluirImpuestoCheck.checked;
         const tasaImpuesto = {% if empresa.pais == 'US' %}0.085{% else %}0.19{% endif %};
         const impuesto = incluirImpuesto ? subtotal * tasaImpuesto : 0;
         const total = subtotal + impuesto;
-        
+
         // Actualizar interfaz
         document.getElementById('subtotalRepuestos').textContent = `$${subtotalRepuestos.toFixed(2)}`;
         document.getElementById('subtotalServicios').textContent = `$${subtotalServicios.toFixed(2)}`;
@@ -1125,14 +1125,14 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`;
         document.getElementById('impuesto').textContent = `$${impuesto.toFixed(2)}`;
         document.getElementById('total').textContent = `$${total.toFixed(2)}`;
-        
+
         // Mostrar/ocultar línea de impuesto
         document.getElementById('impuestoLine').style.display = incluirImpuesto ? 'flex' : 'none';
     }
-    
+
     // Event listener para cambio de impuesto
     incluirImpuestoCheck.addEventListener('change', calcularTotales);
-    
+
     // Ocultar resultados de búsqueda al hacer clic fuera
     document.addEventListener('click', function(e) {
         if (!e.target.closest('.position-relative')) {

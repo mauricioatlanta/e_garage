@@ -73,7 +73,7 @@ Total: 52 modelos para 29 marcas
 - ✅ **Datos realistas:** Modelos populares y actuales para cada marca
 
 ### Para el Sistema:
-- ✅ **Base de datos completa:** 193 modelos vs 52 anteriores  
+- ✅ **Base de datos completa:** 193 modelos vs 52 anteriores
 - ✅ **Cobertura total:** 100% de marcas con modelos
 - ✅ **Escalabilidad:** Estructura preparada para más modelos
 

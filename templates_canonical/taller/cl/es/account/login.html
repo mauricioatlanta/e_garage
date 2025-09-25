@@ -1,12 +1,14 @@
 {% extends "taller/common/base_auth.html" %}
 {% load i18n static %}
 
-{% block title %}eGarage — Iniciar sesión{% endblock %}
+{% block title %}Iniciar sesión{% endblock %}
 
 {% block content %}
 <section class="eg-card eg-glow">
   <header class="eg-card-head">
-    <div class="eg-logo">eGarage</div>
+    <div class="eg-logo">
+      <img src="{% static 'img/logo.png' %}" alt="E-Garage Logo" class="w-14 h-14 rounded-lg shadow-lg border-2 border-cyan-400" style="width: 56px !important; height: 56px !important;">
+    </div>
     <h1 class="eg-h1">Iniciar sesión</h1>
     <p class="eg-sub">Bienvenido de nuevo. Ingresa tus credenciales.</p>
   </header>

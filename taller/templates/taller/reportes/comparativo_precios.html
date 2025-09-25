@@ -17,7 +17,7 @@
         position: relative;
         overflow-x: hidden;
     }
-    
+
     body::before {
         content: '';
         position: fixed;
@@ -25,7 +25,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: 
+        background:
             radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
             radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
             radial-gradient(circle at 40% 80%, rgba(120, 219, 255, 0.3) 0%, transparent 50%);
@@ -33,19 +33,19 @@
         pointer-events: none;
         z-index: -1;
     }
-    
+
     @keyframes gradientShift {
         0% { background-position: 0% 50%; }
         50% { background-position: 100% 50%; }
         100% { background-position: 0% 50%; }
     }
-    
+
     @keyframes float {
         0%, 100% { transform: translateX(0px) translateY(0px) rotate(0deg); }
         33% { transform: translateX(30px) translateY(-30px) rotate(120deg); }
         66% { transform: translateX(-20px) translateY(20px) rotate(240deg); }
     }
-    
+
     /* Partículas flotantes */
     .particles {
         position: fixed;
@@ -56,7 +56,7 @@
         pointer-events: none;
         z-index: -1;
     }
-    
+
     .particle {
         position: absolute;
         width: 2px;
@@ -65,21 +65,21 @@
         border-radius: 50%;
         animation: particleFloat 20s linear infinite;
     }
-    
+
     @keyframes particleFloat {
         0% { transform: translateY(100vh) translateX(0px); opacity: 0; }
         10% { opacity: 1; }
         90% { opacity: 1; }
         100% { transform: translateY(-100px) translateX(100px); opacity: 0; }
     }
-    
+
     /* Contenedor principal futurista */
     .futuristic-container {
         background: rgba(255, 255, 255, 0.05);
         backdrop-filter: blur(20px);
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 20px;
-        box-shadow: 
+        box-shadow:
             0 8px 32px rgba(0, 0, 0, 0.3),
             inset 0 1px 0 rgba(255, 255, 255, 0.1);
         padding: 30px;
@@ -88,7 +88,7 @@
         position: relative;
         overflow: hidden;
     }
-    
+
     .futuristic-container::before {
         content: '';
         position: absolute;
@@ -99,12 +99,12 @@
         background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
         animation: scan 3s infinite;
     }
-    
+
     @keyframes scan {
         0% { left: -100%; }
         100% { left: 100%; }
     }
-    
+
     /* Título futurista */
     .title-futuristic {
         color: #fff;
@@ -119,19 +119,19 @@
         -webkit-text-fill-color: transparent;
         animation: gradientText 3s ease infinite;
     }
-    
+
     @keyframes gradientText {
         0%, 100% { background-position: 0% 50%; }
         50% { background-position: 100% 50%; }
     }
-    
+
     .subtitle-futuristic {
         color: rgba(255, 255, 255, 0.7);
         text-align: center;
         margin-bottom: 30px;
         font-size: 1.1rem;
     }
-    
+
     /* Tarjetas de gráficos mejoradas */
     .chart-card-futuristic {
         background: rgba(255, 255, 255, 0.08);
@@ -145,13 +145,13 @@
         box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
         transition: all 0.3s ease;
     }
-    
+
     .chart-card-futuristic:hover {
         transform: translateY(-5px);
         box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
         border-color: rgba(64, 224, 255, 0.3);
     }
-    
+
     .chart-card-futuristic::before {
         content: '';
         position: absolute;
@@ -162,12 +162,12 @@
         background: linear-gradient(90deg, #40e0ff, #ff40e0, #40ff40);
         animation: borderGlow 2s ease infinite;
     }
-    
+
     @keyframes borderGlow {
         0%, 100% { opacity: 0.7; }
         50% { opacity: 1; }
     }
-    
+
     .chart-title-futuristic {
         color: #fff;
         font-size: 1.3rem;
@@ -176,7 +176,7 @@
         text-align: center;
         text-shadow: 0 0 10px rgba(64, 224, 255, 0.3);
     }
-    
+
     /* Tabla futurista */
     .table-futuristic {
         background: rgba(255, 255, 255, 0.05);
@@ -185,7 +185,7 @@
         overflow: hidden;
         border: 1px solid rgba(255, 255, 255, 0.1);
     }
-    
+
     .table-futuristic thead th {
         background: rgba(64, 224, 255, 0.2);
         color: #fff;
@@ -196,24 +196,24 @@
         font-size: 0.85rem;
         letter-spacing: 1px;
     }
-    
+
     .table-futuristic tbody tr {
         background: rgba(255, 255, 255, 0.03);
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         transition: all 0.3s ease;
     }
-    
+
     .table-futuristic tbody tr:hover {
         background: rgba(64, 224, 255, 0.1);
         transform: scale(1.01);
     }
-    
+
     .table-futuristic tbody td {
         color: rgba(255, 255, 255, 0.9);
         padding: 12px 15px;
         border: none;
     }
-    
+
     /* Badges futuristas */
     .badge-futuristic {
         background: linear-gradient(45deg, #40e0ff, #ff40e0);
@@ -227,16 +227,16 @@
         box-shadow: 0 4px 15px rgba(64, 224, 255, 0.3);
         animation: pulse 2s ease infinite;
     }
-    
+
     @keyframes pulse {
         0%, 100% { box-shadow: 0 4px 15px rgba(64, 224, 255, 0.3); }
         50% { box-shadow: 0 6px 20px rgba(64, 224, 255, 0.5); }
     }
-    
+
     .badge-success-futuristic { background: linear-gradient(45deg, #40ff40, #00ff88); }
     .badge-warning-futuristic { background: linear-gradient(45deg, #ffaa40, #ff6040); }
     .badge-danger-futuristic { background: linear-gradient(45deg, #ff4040, #ff40aa); }
-    
+
     /* Botón de regreso futurista */
     .btn-futuristic {
         background: linear-gradient(45deg, #40e0ff, #8040ff);
@@ -252,14 +252,14 @@
         text-decoration: none;
         display: inline-block;
     }
-    
+
     .btn-futuristic:hover {
         transform: translateY(-2px);
         box-shadow: 0 8px 25px rgba(64, 224, 255, 0.5);
         color: white;
         text-decoration: none;
     }
-    
+
     /* Responsive */
     @media (max-width: 768px) {
         .futuristic-container { margin: 10px; padding: 20px; }
@@ -472,7 +472,7 @@ new Chart(ctxComparativo, {
             label: 'Línea de Equilibrio (Sin Ganancia)',
             data: [
                 {x: 0, y: 0},
-                {x: Math.max(...[{% for servicio in analisis_servicios %}{{ servicio.precio_promedio }}{% if not forloop.last %},{% endif %}{% endfor %}]), 
+                {x: Math.max(...[{% for servicio in analisis_servicios %}{{ servicio.precio_promedio }}{% if not forloop.last %},{% endif %}{% endfor %}]),
                  y: Math.max(...[{% for servicio in analisis_servicios %}{{ servicio.precio_promedio }}{% if not forloop.last %},{% endif %}{% endfor %}])}
             ],
             type: 'line',
@@ -486,7 +486,7 @@ new Chart(ctxComparativo, {
             label: 'Zona de Margen Óptimo (30%)',
             data: [
                 {x: 0, y: 0},
-                {x: Math.max(...[{% for servicio in analisis_servicios %}{{ servicio.costo_promedio }}{% if not forloop.last %},{% endif %}{% endfor %}]), 
+                {x: Math.max(...[{% for servicio in analisis_servicios %}{{ servicio.costo_promedio }}{% if not forloop.last %},{% endif %}{% endfor %}]),
                  y: Math.max(...[{% for servicio in analisis_servicios %}{{ servicio.costo_promedio }}{% if not forloop.last %},{% endif %}{% endfor %}]) * 1.43}
             ],
             type: 'line',

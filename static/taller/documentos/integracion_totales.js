@@ -4,16 +4,16 @@
 
   // Función que conecta el sistema existente con el nuevo
   function integrarTotalesPorPais() {
-    
+
     // Cuando se actualicen los totales en el sistema existente, también actualizar el nuevo
     const originalActualizarTotales = window.actualizarTotalesDocumento;
-    
+
     window.actualizarTotalesDocumento = function() {
       // Ejecutar la función original primero
       if (originalActualizarTotales) {
         originalActualizarTotales();
       }
-      
+
       // Luego ejecutar el nuevo sistema
       if (window.recalcDocumentoTotales) {
         window.recalcDocumentoTotales();
@@ -49,7 +49,7 @@
       if (!tr.classList.contains('js-line')) {
         tr.classList.add('js-line');
         tr.setAttribute('data-kind', 'repuesto');
-        
+
         const subtotalCell = tr.querySelector('.subtotal-repuesto');
         if (subtotalCell && !subtotalCell.classList.contains('js-subtotal')) {
           subtotalCell.classList.add('js-subtotal');
@@ -63,7 +63,7 @@
       if (!tr.classList.contains('js-line')) {
         tr.classList.add('js-line');
         tr.setAttribute('data-kind', 'servicio');
-        
+
         const precioInput = tr.querySelector('.precio-servicio-input');
         if (precioInput && !precioInput.classList.contains('js-subtotal')) {
           precioInput.classList.add('js-subtotal');
@@ -100,7 +100,7 @@
       integrarTotalesPorPais();
       agregarClasesAFilas();
       configurarObservers();
-      
+
       // Forzar un recálculo inicial
       if (window.actualizarTotalesDocumento) {
         window.actualizarTotalesDocumento();

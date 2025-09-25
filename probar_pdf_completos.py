@@ -2,6 +2,7 @@
 """
 Script para probar PDF con documentos completos de mauricio1 y testuser_usa
 """
+
 import os
 
 import django

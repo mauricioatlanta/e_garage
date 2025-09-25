@@ -9,11 +9,12 @@ from django.views.generic import RedirectView, TemplateView
 from django.views.i18n import JavaScriptCatalog  # 👈 Para catálogo JS
 
 from taller.views.country_aware_auth import country_aware_login
+from taller.views_extra.lang_switch import set_language_us
 from taller.views_extra.login_redirector import login_redirector
 from taller.views_extra.logout_redirect_view import logout_redirect_view
 
 # Importar vista de suscripción bloqueada
-from taller.views_extra.suscripcion import suscripcion_bloqueada
+from taller.views_extra.suscripcion import registro, suscripcion_bloqueada
 
 # Importar vistas de trial
 from taller.views_extra.views_trial import registro_trial
@@ -91,6 +92,8 @@ urlpatterns = [
     path("registro-trial/", registro_trial, name="registro_trial"),
     path("activar-trial/", activar_trial, name="activar_trial"),
     path("activar/", activar_trial, name="activar_trial_short"),
+    # URL de registro general
+    path("registro/", registro, name="registro"),
     # Contacto de ventas
     path(
         "contacto-ventas/",
@@ -163,6 +166,8 @@ urlpatterns = [
     path(
         "jsi18n/", JavaScriptCatalog.as_view(), name="javascript-catalog"
     ),  # 👈 Catálogo JS para gettext
+    # Cambio de idioma para USA
+    path("lang/set/", set_language_us, name="set_language_us"),
     path(
         "changelog/",
         TemplateView.as_view(template_name="changelog.html"),
@@ -177,6 +182,57 @@ urlpatterns = [
     path(
         "cl/es/",
         include(("taller.urls_extra.chile", "chile"), namespace="chile"),
+    ),
+    # Chile - Specific routes before general redirect
+    path(
+        "cl/vehiculos/",
+        RedirectView.as_view(url="/cl/es/vehiculos/", permanent=False),
+        name="cl_vehiculos_redirect",
+    ),
+    path(
+        "cl/vehiculos/<int:pk>/",
+        RedirectView.as_view(url="/cl/es/vehiculos/%(pk)s/", permanent=False),
+        name="cl_vehiculo_detail_redirect",
+    ),
+    path(
+        "cl/vehiculos/crear/",
+        RedirectView.as_view(url="/cl/es/vehiculos/crear/", permanent=False),
+        name="cl_vehiculo_create_redirect",
+    ),
+    path(
+        "cl/vehiculos/<int:vehiculo_id>/editar/",
+        RedirectView.as_view(
+            url="/cl/es/vehiculos/%(vehiculo_id)s/editar/", permanent=False
+        ),
+        name="cl_vehiculo_edit_redirect",
+    ),
+    path(
+        "cl/clientes/",
+        RedirectView.as_view(url="/cl/es/clientes/", permanent=False),
+        name="cl_clientes_redirect",
+    ),
+    path(
+        "cl/servicios/",
+        RedirectView.as_view(url="/cl/es/servicios/", permanent=False),
+        name="cl_servicios_redirect",
+    ),
+    path(
+        "cl/configuracion/",
+        RedirectView.as_view(url="/cl/es/configuracion/", permanent=False),
+        name="cl_configuracion_redirect",
+    ),
+    path(
+        "cl/centro-operaciones-espacial/",
+        RedirectView.as_view(
+            url="/cl/es/centro-operaciones-espacial/", permanent=False
+        ),
+        name="cl_centro_operaciones_redirect",
+    ),
+    # Redirect cl/ to cl/egarage/ (Chile welcome page) - MUST come before other cl/ patterns
+    path(
+        "cl/",
+        RedirectView.as_view(url="/cl/egarage/", permanent=False),
+        name="cl_home_redirect",
     ),
     # Página de bienvenida específica para /cl/egarage/
     path(
@@ -198,6 +254,11 @@ urlpatterns = [
     # ),
     # Si agregas más combinaciones, repite este patrón: un solo include por prefijo.
     # path("taller/", include(("taller.urls", "taller"), namespace="taller")),  # ELIMINADO: URLs sin prefijo de país
+    # Compatibilidad: reexponer namespace 'taller' para widgets antiguos (DAL, etc.)
+    path(
+        "compat/",
+        include(("taller.urls", "taller"), namespace="taller"),
+    ),
     # APIs globales (sin prefijo de país)
     path("api/v1/", include("taller.api.urls")),
     # Redirección de documentos sin país a Chile por defecto
