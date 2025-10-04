@@ -730,7 +730,7 @@ body {
 
     <!-- Acciones Rápidas -->
     <div class="quick-actions">
-    {% country_url 'configuracion_tecnicos' as url_config_tecnicos %}
+    {% country_url 'configuracion_tecnicos' app_namespace='direct' as url_config_tecnicos %}
     <a href="{{ url_config_tecnicos|default:'#' }}" class="action-card">
             <div class="action-icon">👨‍🔧</div>
             <div class="action-title">Gestión de Técnicos</div>

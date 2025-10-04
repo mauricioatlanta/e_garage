@@ -48,7 +48,7 @@
       </div>
 
       <a
-  {% country_url 'configuracion_tecnicos' as url_config_tecnicos %}
+  {% country_url 'configuracion_tecnicos' app_namespace='direct' as url_config_tecnicos %}
   href="{{ url_config_tecnicos|default:'#' }}"
         class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg inline-block text-center transition-colors"
       >
