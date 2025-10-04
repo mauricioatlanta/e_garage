@@ -469,6 +469,10 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 {% endblock %}
 
+{% block extra_head %}
+{{ form.media }}
+{% endblock %}
+
 {% block fondo_extra %}
 <div id="tsparticles" class="fixed inset-0 -z-10"></div>
 {% endblock %}

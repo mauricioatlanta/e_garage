@@ -10,7 +10,7 @@ from taller.utils.dal_helpers import get_autocomplete_url
 
 # Helper centralizado para namespaces de autocompletado
 def _ns(country: str) -> str:
-    return "usa:autocomplete" if (country or "").upper() == "US" else "cl:autocomplete"
+    return "usa_autocomplete" if (country or "").upper() == "US" else "cl_autocomplete"
 
 
 class DocumentoForm(forms.ModelForm):
