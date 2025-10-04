@@ -8,6 +8,10 @@ from taller.models.documento import Documento
 from taller.models.vehiculos import Vehiculo
 from taller.utils.dal_helpers import get_autocomplete_url
 
+# Helper centralizado para namespaces de autocompletado
+def _ns(country: str) -> str:
+    return "usa:autocomplete" if (country or "").upper() == "US" else "cl:autocomplete"
+
 
 class DocumentoForm(forms.ModelForm):
     """
@@ -75,8 +79,8 @@ class DocumentoForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         
         # Configurar URLs de autocompletado dinámicamente
-        self.fields['cliente'].widget.url = get_autocomplete_url(self.country, "cliente")
-        self.fields['vehiculo'].widget.url = get_autocomplete_url(self.country, "vehiculo")
+        self.fields['cliente'].widget.url = f"{_ns(self.country)}:cliente"
+        self.fields['vehiculo'].widget.url = f"{_ns(self.country)}:vehiculo"
         
         # Configurar querysets filtrados por empresa
         if self.empresa:

@@ -17,6 +17,7 @@ from taller.models.tecnico import Tecnico
 from taller.models.vehiculos import Vehiculo
 from taller.servicios.models import Servicio
 from taller.utils.dal_helpers import get_template_by_country
+from taller.documentos.utils.template_selector import template_crear
 
 from .forms import DocumentoForm
 from .formsets import OtroServicioFormSet, RepuestoFormSet, ServicioFormSet
@@ -232,13 +233,13 @@ def crear_documento(request):
             logger.debug(f"OTR ERR: {otro_fs.errors if otro_fs.errors else 'N/A'}")
 
             ctx = build_context(request, doc_form, rep_fs, serv_fs, otro_fs)
-            template = get_template_by_country(country, "documentos/crear_documento.html")
+            template = template_crear(country)
             return render(request, template, ctx, status=400)
 
         # GET - Mostrar formularios vacíos
         logger.debug("Procesando GET...")
         ctx = build_context(request)
-        template = get_template_by_country(country, "documentos/crear_documento.html")
+        template = template_crear(country)
         return render(request, template, ctx)
 
     except Exception as e:
@@ -249,7 +250,7 @@ def crear_documento(request):
         traceback.print_exc()
         messages.error(request, f"Error inesperado al crear documento: {str(e)}")
         ctx = build_context(request)
-        template = get_template_by_country(country, "documentos/crear_documento.html")
+        template = template_crear(country)
         return render(request, template, ctx, status=500)
 
 

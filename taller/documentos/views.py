@@ -13,6 +13,7 @@ def lista_documentos_cl(request):
 
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
 
 from taller.models.tecnico import Tecnico
 

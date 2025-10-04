@@ -2,7 +2,7 @@ from decimal import Decimal
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render
 
-from .models import Documento
+from taller.models.documento import Documento  # ← import absoluto correcto
 
 
 @login_required
