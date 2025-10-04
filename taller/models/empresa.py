@@ -171,7 +171,7 @@ class Empresa(models.Model):
     # TZ helpers (versión Django-friendly)
     def _tz(self):
         # return ZoneInfo(self.zona_horaria)  # si usas zoneinfo
-        return timezone.pytz.timezone(self.zona_horaria)  # si mantienes pytz
+        return pytz.timezone(self.zona_horaria)  # usando pytz importado directamente
 
     def convert_to_local_time(self, dt):
         if dt is None:
