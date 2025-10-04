@@ -698,15 +698,6 @@ body {
                 <div class="modern-description">Gestión de servicios</div>
             </a>
 
-            <a href="{% if request.path|slice:':3' == '/us' %}/us/servicios/otros/{% else %}{% country_url 'servicios:otros_servicios_menu' %}{% endif %}" class="command-panel modern-panel">
-                <div class="modern-icon-container">
-                    <div class="main-icon">🌟</div>
-                    <div class="secondary-icon">🚀</div>
-                </div>
-                <div class="modern-title">EXTRA SERVICES</div>
-                <div class="modern-subtitle">Additional Services</div>
-                <div class="modern-description">Otros servicios</div>
-            </a>
 
                         <a href="{% if request.path|slice:':3' == '/us' %}/us/settings/{% else %}{% country_url 'configuracion' %}{% endif %}" class="command-panel modern-panel" style="border: 5px solid #00ff00 !important; background: rgba(0, 255, 0, 0.2) !important;">
                 <div class="modern-icon-container">
