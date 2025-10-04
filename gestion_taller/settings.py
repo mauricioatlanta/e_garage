@@ -25,10 +25,14 @@ ALLOWED_HOSTS = env_list(
 
 # ---------- CSRF / HTTPS (solo si no estás detrás de proxy que ya haga esto) ----------
 # En producción: define DJANGO_CSRF_TRUSTED_ORIGINS="https://egarage.cl, https://www.egarage.cl"
-CSRF_TRUSTED_ORIGINS = [
-    h if h.startswith("http") else f"https://{h}"
-    for h in env_list("DJANGO_CSRF_TRUSTED_ORIGINS", "")
-] if env_list("DJANGO_CSRF_TRUSTED_ORIGINS", "") else []
+csrf_origins_env = env_list("DJANGO_CSRF_TRUSTED_ORIGINS", "")
+if csrf_origins_env:
+    CSRF_TRUSTED_ORIGINS = [
+        h if h.startswith("http") else f"https://{h}"
+        for h in csrf_origins_env
+    ]
+else:
+    CSRF_TRUSTED_ORIGINS = []
 SECURE_SSL_REDIRECT = env_bool("DJANGO_SECURE_SSL_REDIRECT", not DEBUG)
 SESSION_COOKIE_SECURE = env_bool("DJANGO_SESSION_COOKIE_SECURE", not DEBUG)
 CSRF_COOKIE_SECURE = env_bool("DJANGO_CSRF_COOKIE_SECURE", not DEBUG)
@@ -52,21 +56,7 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 USE_X_FORWARDED_HOST = True
 
 # ---------- CSRF trusted desde ALLOWED_HOSTS si no se define explícito ----------
-if not CSRF_TRUSTED_ORIGINS:
-    if DEBUG:
-        # En desarrollo, agregar localhost y 127.0.0.1
-        CSRF_TRUSTED_ORIGINS = [
-            "http://127.0.0.1:8000",
-            "http://localhost:8000",
-            "http://127.0.0.1:3000",
-            "http://localhost:3000",
-        ]
-    else:
-        CSRF_TRUSTED_ORIGINS = [
-            f"https://{h}"
-            for h in ALLOWED_HOSTS
-            if h not in {"*", "localhost", "127.0.0.1"}
-        ]
+# (Movido al final del archivo)
 
 # ---------- Sites / Allauth ----------
 SITE_ID = 1
@@ -280,3 +270,20 @@ LOGGING = {
 # ---------- Extra headers ----------
 SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin"
 SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# ---------- CSRF trusted desde ALLOWED_HOSTS si no se define explícito ----------
+if len(CSRF_TRUSTED_ORIGINS) == 0:
+    if DEBUG:
+        # En desarrollo, agregar localhost y 127.0.0.1
+        CSRF_TRUSTED_ORIGINS = [
+            "http://127.0.0.1:8000",
+            "http://localhost:8000",
+            "http://127.0.0.1:3000",
+            "http://localhost:3000",
+        ]
+    else:
+        CSRF_TRUSTED_ORIGINS = [
+            f"https://{h}"
+            for h in ALLOWED_HOSTS
+            if h not in {"*", "localhost", "127.0.0.1"}
+        ]

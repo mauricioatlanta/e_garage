@@ -19,11 +19,11 @@ urlpatterns = [
     # Estas rutas las voy a importar dinámicamente para evitar imports circulares
     # === NUEVAS RUTAS PARA REPORTES POR MECÁNICO ===
     path("mecanicos/", views.reportes_mecanicos, name="reportes_mecanicos"),
-    path(
-        "mecanicos/excel/",
-        views.exportar_mecanicos_excel,
-        name="exportar_mecanicos_excel",
-    ),
+    # path(
+    #     "mecanicos/excel/",
+    #     views.exportar_mecanicos_excel,
+    #     name="exportar_mecanicos_excel",
+    # ),
     path(
         "mecanicos/pdf/<int:mecanico_id>/",
         views.generar_pdf_mecanico,

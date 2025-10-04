@@ -2,8 +2,8 @@
 
 from datetime import date, timedelta
 
-import openpyxl
-from openpyxl.utils import get_column_letter
+# import openpyxl
+# from openpyxl.utils import get_column_letter
 
 from django.db.models import Count, DecimalField, ExpressionWrapper, F, Sum
 from django.db.models.functions import Coalesce
@@ -15,85 +15,86 @@ from taller.models import Documento
 # from taller.utils import get_or_create_empresa  # Eliminado: usamos la función local
 
 
-@login_required_default
-def exportar_mecanicos_excel(request):
-    """Exporta a Excel el reporte de mecánicos en el rango filtrado"""
-    empresa = get_or_create_empresa(request)
+# @login_required_default
+# TEMPORALMENTE COMENTADO POR PROBLEMA DE MEMORIA CON OPENPYXL
+# def exportar_mecanicos_excel(request):
+#     """Exporta a Excel el reporte de mecánicos en el rango filtrado"""
+#     empresa = get_or_create_empresa(request)
 
-    # Obtener filtros (igual que en reportes_mecanicos)
-    fecha_desde = request.GET.get("fecha_desde") or (
-        date.today() - timedelta(days=30)
-    ).strftime("%Y-%m-%d")
-    fecha_hasta = request.GET.get("fecha_hasta") or date.today().strftime("%Y-%m-%d")
-    mecanico_id = request.GET.get("mecanico_id")
+#     # Obtener filtros (igual que en reportes_mecanicos)
+#     fecha_desde = request.GET.get("fecha_desde") or (
+#         date.today() - timedelta(days=30)
+#     ).strftime("%Y-%m-%d")
+#     fecha_hasta = request.GET.get("fecha_hasta") or date.today().strftime("%Y-%m-%d")
+#     mecanico_id = request.GET.get("mecanico_id")
 
-    documentos_qs = Documento.objects.filter(
-        fecha_emision__range=[fecha_desde, fecha_hasta],
-        tecnico_responsable__isnull=False,
-        empresa=empresa,
-        tipo="FAC",  # usamos código de factura
-    ).select_related("tecnico_responsable")
+#     documentos_qs = Documento.objects.filter(
+#         fecha_emision__range=[fecha_desde, fecha_hasta],
+#         tecnico_responsable__isnull=False,
+#         empresa=empresa,
+#         tipo="FAC",  # usamos código de factura
+#     ).select_related("tecnico_responsable")
 
-    if mecanico_id and mecanico_id != "todos":
-        documentos_qs = documentos_qs.filter(tecnico_responsable_id=mecanico_id)
+#     if mecanico_id and mecanico_id != "todos":
+#         documentos_qs = documentos_qs.filter(tecnico_responsable_id=mecanico_id)
 
-    # Crear libro Excel
-    wb = openpyxl.Workbook()
-    ws = wb.active
-    ws.title = "Reporte Mecánicos"
+#     # Crear libro Excel
+#     wb = openpyxl.Workbook()
+#     ws = wb.active
+#     ws.title = "Reporte Mecánicos"
 
-    # Encabezados
-    headers = ["Mecánico", "Fecha", "Cliente", "Vehículo", "Monto Total"]
-    ws.append(headers)
+#     # Encabezados
+#     headers = ["Mecánico", "Fecha", "Cliente", "Vehículo", "Monto Total"]
+#     ws.append(headers)
 
-    # Ajustar ancho de columnas
-    for col_num, header in enumerate(headers, 1):
-        col_letter = get_column_letter(col_num)
-        ws.column_dimensions[col_letter].width = 20
+#     # Ajustar ancho de columnas
+#     for col_num, header in enumerate(headers, 1):
+#         col_letter = get_column_letter(col_num)
+#         ws.column_dimensions[col_letter].width = 20
 
     # Rellenar datos
-    for doc in documentos_qs:
-        ws.append(
-            [
-                doc.tecnico_responsable.nombre,
-                doc.fecha_emision.strftime("%Y-%m-%d"),
-                str(doc.cliente),
-                str(doc.vehiculo),
-                doc.total,
-            ]
-        )
+#     for doc in documentos_qs:
+#         ws.append(
+#             [
+#                 doc.tecnico_responsable.nombre,
+#                 doc.fecha_emision.strftime("%Y-%m-%d"),
+#                 str(doc.cliente),
+#                 str(doc.vehiculo),
+#                 doc.total,
+#             ]
+#         )
 
     # Respuesta HTTP
-    response = HttpResponse(
-        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
-    filename = f"reporte_mecanicos_{fecha_desde}_a_{fecha_hasta}.xlsx"
-    response["Content-Disposition"] = f'attachment; filename="{filename}"'
+#     response = HttpResponse(
+#         content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+#     )
+#     filename = f"reporte_mecanicos_{fecha_desde}_a_{fecha_hasta}.xlsx"
+#     response["Content-Disposition"] = f'attachment; filename="{filename}"'
 
-    wb.save(response)
-    return response
+#     wb.save(response)
+#     return response
 
 
-from collections import defaultdict
-from datetime import datetime
-from decimal import Decimal
+# from collections import defaultdict
+# from datetime import datetime
+# from decimal import Decimal
 
-from django.db.models import FloatField
-from django.http import JsonResponse
-from django.shortcuts import render
-from django.utils import timezone
+# from django.db.models import FloatField
+# from django.http import JsonResponse
+# from django.shortcuts import render
+# from django.utils import timezone
 
-from taller.models.clientes import Cliente
-from taller.models.documento import Documento
-from taller.models.lineas_documento import (
-    LineaOtroServicio,
-    LineaRepuesto,
-    LineaServicio,
-)
-from taller.models.tecnico import Tecnico
-from taller.models.vehiculos import Vehiculo
-from taller.utils.empresa import get_or_create_empresa
-from taller.utils.motor_ia import MotorDiagnosticoIA
+# from taller.models.clientes import Cliente
+# from taller.models.documento import Documento
+# from taller.models.lineas_documento import (
+#     LineaOtroServicio,
+#     LineaRepuesto,
+#     LineaServicio,
+# )
+# from taller.models.tecnico import Tecnico
+# from taller.models.vehiculos import Vehiculo
+# from taller.utils.empresa import get_or_create_empresa
+# from taller.utils.motor_ia import MotorDiagnosticoIA
 
 
 @login_required_default
