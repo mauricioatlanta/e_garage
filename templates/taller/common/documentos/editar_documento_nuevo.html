@@ -1035,10 +1035,47 @@ function handleVatCheckboxes() {
   }
 }
 
+// Debug DAL forward
+function debugDALForward() {
+  console.log('🔍 Debug DAL Forward...');
+  
+  const clienteSelect = document.getElementById('id_cliente');
+  const vehiculoSelect = document.getElementById('id_vehiculo');
+  
+  if (clienteSelect) {
+    console.log('✅ Cliente select found:', clienteSelect);
+    console.log('🔗 Cliente select URL:', clienteSelect.getAttribute('data-autocomplete-light-url'));
+    
+    // Escuchar cambios en cliente
+    $(clienteSelect).on('select2:select', function (e) {
+      const data = e.params.data;
+      console.log('👤 Cliente seleccionado:', data.id, data.text);
+      
+      // Verificar si el campo vehículo se actualiza
+      setTimeout(() => {
+        if (vehiculoSelect) {
+          console.log('🚗 Campo vehículo después de seleccionar cliente:', vehiculoSelect.value);
+          console.log('🔗 Vehículo select URL:', vehiculoSelect.getAttribute('data-autocomplete-light-url'));
+        }
+      }, 1000);
+    });
+  } else {
+    console.log('❌ Cliente select not found');
+  }
+  
+  if (vehiculoSelect) {
+    console.log('✅ Vehículo select found:', vehiculoSelect);
+    console.log('🔗 Vehículo select URL:', vehiculoSelect.getAttribute('data-autocomplete-light-url'));
+  } else {
+    console.log('❌ Vehículo select not found');
+  }
+}
+
 // Inicializar cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', function() {
   handleVatCheckboxes();
   recalcTotales();
+  debugDALForward();
 });
 </script>
 
