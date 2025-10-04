@@ -28,7 +28,7 @@ ALLOWED_HOSTS = env_list(
 CSRF_TRUSTED_ORIGINS = [
     h if h.startswith("http") else f"https://{h}"
     for h in env_list("DJANGO_CSRF_TRUSTED_ORIGINS", "")
-]
+] if env_list("DJANGO_CSRF_TRUSTED_ORIGINS", "") else []
 SECURE_SSL_REDIRECT = env_bool("DJANGO_SECURE_SSL_REDIRECT", not DEBUG)
 SESSION_COOKIE_SECURE = env_bool("DJANGO_SESSION_COOKIE_SECURE", not DEBUG)
 CSRF_COOKIE_SECURE = env_bool("DJANGO_CSRF_COOKIE_SECURE", not DEBUG)
