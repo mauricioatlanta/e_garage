@@ -1,4 +1,4 @@
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -34,6 +34,7 @@ class Documento(AuditMixin, models.Model):
         db_index=True,
     )
     numero = models.CharField(max_length=32, blank=True, default="", db_index=True)
+    numero_documento_db = models.CharField(max_length=32, blank=True, default="", db_index=True)
     correlativo = models.PositiveIntegerField(
         default=0, help_text=_("Número correlativo interno")
     )
@@ -110,25 +111,213 @@ class Documento(AuditMixin, models.Model):
         blank=True, null=True, help_text=_("Notas u observaciones sobre el documento")
     )
 
+    # Campos de forma de pago
+    metodo_pago = models.CharField(
+        max_length=20,
+        choices=[
+            ("efectivo", _("Efectivo")),
+            ("transferencia", _("Transferencia")),
+            ("tarjeta", _("Tarjeta")),
+            ("cheque", _("Cheque")),
+        ],
+        blank=True,
+        null=True,
+        help_text=_("Método de pago utilizado")
+    )
+    ult4 = models.CharField(
+        max_length=4,
+        blank=True,
+        null=True,
+        help_text=_("Últimos 4 dígitos de tarjeta (si aplica)")
+    )
+    monto_pagado = models.DecimalField(
+        max_digits=14, decimal_places=2, default=Decimal("0.00"),
+        help_text=_("Monto efectivamente pagado")
+    )
+    saldo_pendiente = models.DecimalField(
+        max_digits=14, decimal_places=2, default=Decimal("0.00"),
+        help_text=_("Saldo pendiente de pago")
+    )
+    fecha_pago = models.DateTimeField(
+        blank=True, null=True,
+        help_text=_("Fecha y hora del pago")
+    )
+    nota_pago = models.TextField(
+        blank=True, null=True,
+        help_text=_("Notas adicionales sobre el pago")
+    )
+
+    # --------- Helpers internos ---------
+    def _decimals(self):
+        """
+        Decimales por país/moneda: US -> 2, CL -> 0 (según regla eGarage).
+        """
+        try:
+            pais = (self.empresa.pais or "CL").upper()
+        except Exception:
+            pais = "CL"
+        return 2 if pais == "US" else 0
+
+    def _q(self, value, decs=None):
+        """
+        Quantize con HALF_UP según decimales de la empresa.
+        """
+        if value is None:
+            value = Decimal("0")
+        if not isinstance(value, Decimal):
+            value = Decimal(str(value))
+        if decs is None:
+            decs = self._decimals()
+        q = Decimal("1") if decs == 0 else Decimal("0." + "0" * (decs - 1) + "1")
+        return value.quantize(q, rounding=ROUND_HALF_UP)
+
+    def _resolve_tax_rate(self):
+        """
+        Resuelve la tasa: si el campo ya viene seteado, la usa.
+        Si CL y no viene, 19.0. Si US y no viene, 0.0 por defecto.
+        (Puedes conectar aquí ConfiguracionEmpresa si la tienes).
+        """
+        if getattr(self, "tax_rate_applied", None) not in (None, ""):
+            try:
+                return Decimal(str(self.tax_rate_applied))
+            except Exception:
+                pass
+        try:
+            pais = (self.empresa.pais or "CL").upper()
+        except Exception:
+            pais = "CL"
+        return Decimal("19.0") if pais == "CL" else Decimal("0.0")
+
+    def _sum_repuesto(self):
+        # Calcula cantidad*precio_unitario - descuento línea
+        qs = getattr(self, "lineas_repuesto", None)
+        if not qs:
+            return Decimal("0")
+        
+        # Calcular subtotal con descuento en porcentaje
+        expr = ExpressionWrapper(
+            F("cantidad") * F("precio_unitario") * (1 - F("descuento") / 100),
+            output_field=DecimalField(max_digits=14, decimal_places=2),
+        )
+        total = qs.aggregate(s=Sum(expr)).get("s") or Decimal("0")
+        return Decimal(total)
+
+    def _sum_servicio(self):
+        # Calcula cantidad*precio_unitario - descuento línea
+        qs = getattr(self, "lineas_servicio", None)
+        if not qs:
+            return Decimal("0")
+        
+        # Calcular subtotal con descuento en porcentaje
+        expr = ExpressionWrapper(
+            F("cantidad") * F("precio_unitario") * (1 - F("descuento") / 100),
+            output_field=DecimalField(max_digits=14, decimal_places=2),
+        )
+        total = qs.aggregate(s=Sum(expr)).get("s") or Decimal("0")
+        return Decimal(total)
+
+    def _sum_otro_servicio(self):
+        # Calcula cantidad * precio_cliente
+        qs = getattr(self, "lineas_otro_servicio", None)
+        if not qs:
+            return Decimal("0")
+        
+        # precio_cliente puede ser null → coalesce 0
+        expr = ExpressionWrapper(
+            F("cantidad") * F("precio_cliente"),
+            output_field=DecimalField(max_digits=14, decimal_places=2),
+        )
+        total = qs.aggregate(s=Sum(expr)).get("s") or Decimal("0")
+        return Decimal(total)
+
+    def recompute_totals(self, persist=False):
+        """
+        Recalcula netos, impuesto y total conforme reglas:
+        - CL: IVA 19% SOLO sobre repuestos
+        - US: por defecto 0% (usa tax_rate_applied si viene)
+        """
+        rep = self._sum_repuesto()
+        srv = self._sum_servicio()
+        osrv = self._sum_otro_servicio()
+
+        rep = self._q(rep)
+        srv = self._q(srv)
+        osrv = self._q(osrv)
+
+        # Descuento a nivel documento (si existe). Se asume aplicado al total final.
+        desc = getattr(self, "descuento", Decimal("0")) or Decimal("0")
+        desc = self._q(desc)
+
+        # Tasa
+        rate = self._resolve_tax_rate()  # ej. 19.0 o 0.0
+        # Base imponible por país
+        try:
+            pais = (self.empresa.pais or "CL").upper()
+        except Exception:
+            pais = "CL"
+
+        if pais == "CL":
+            tax_base = rep  # IVA solo a repuestos
+        else:  # US por defecto solo repuestos, puedes ampliar si decides gravar servicios
+            # Si tienes un flag, por ejemplo self.apply_vat (checkbox), podrías hacer:
+            # tax_base = rep + (srv if getattr(self, "apply_vat", False) else Decimal("0"))
+            tax_base = rep
+
+        tax_amount = (tax_base * rate / Decimal("100.0"))
+        tax_amount = self._q(tax_amount)
+
+        subtotal_general = rep + srv + osrv
+        total = subtotal_general - desc + tax_amount
+        total = self._q(total)
+
+        # Asigna en instancia (no guardes aún salvo que persist=True)
+        self.neto_repuestos = rep
+        self.neto_servicios = srv
+        self.neto_otros_servicios = osrv
+        self.tax_rate_applied = rate
+        self.tax_amount = tax_amount
+        self.total = total
+
+        if persist:
+            self.save(update_fields=[
+                "neto_repuestos", "neto_servicios", "neto_otros_servicios",
+                "tax_rate_applied", "tax_amount", "total"
+            ])
+
     def clean(self):
         super().clean()
         empresa_id = getattr(self, "empresa_id", None)
-        tecnico = getattr(self, "tecnico_responsable", None)
-        tecnico_empresa_id = getattr(tecnico, "empresa_id", None) if tecnico else None
-        if (
-            empresa_id is not None
-            and tecnico_empresa_id is not None
-            and empresa_id != tecnico_empresa_id
-        ):
-            raise ValidationError(
-                "El técnico responsable debe pertenecer a la misma empresa del documento."
-            )
 
-        # Validar que millas solo se use en USA
+        # Técnico pertenece a la empresa
+        tecnico = getattr(self, "tecnico_responsable", None)
+        if tecnico and empresa_id and tecnico.empresa_id != empresa_id:
+            raise ValidationError("El técnico responsable debe pertenecer a la misma empresa del documento.")
+
+        # Millas solo en USA
         if self.millas is not None and self.country != "US":
-            raise ValidationError(
-                "El campo millas solo puede usarse en documentos de USA"
-            )
+            raise ValidationError("El campo millas solo puede usarse en documentos de USA")
+
+        # ✔ Consistencias críticas Cliente/Vehículo/Empresa
+        if self.vehiculo_id:
+            if not self.cliente_id:
+                raise ValidationError("Debe seleccionar un cliente antes de asignar un vehículo.")
+
+            # El vehículo debe pertenecer a la misma empresa del documento
+            if hasattr(self.vehiculo, "empresa_id") and empresa_id and self.vehiculo.empresa_id != empresa_id:
+                raise ValidationError("El vehículo seleccionado no pertenece a la empresa del documento.")
+
+            # El vehículo debe pertenecer al cliente del documento
+            if hasattr(self.vehiculo, "cliente_id") and self.vehiculo.cliente_id != self.cliente_id:
+                raise ValidationError("El vehículo seleccionado no pertenece al cliente del documento.")
+
+        # Validar que cliente pertenece a la empresa del documento
+        if self.cliente_id and empresa_id and hasattr(self.cliente, "empresa_id") and self.cliente.empresa_id != empresa_id:
+            raise ValidationError("El cliente seleccionado no pertenece a la empresa del documento.")
+
+        # Recalcular en validación (para vistas admin/FBV/CBV)
+        # Nota: en creación con formsets, las líneas aún no existen → quedará 0
+        # Por eso también recalculamos en save() y/o señales de líneas.
+        self.recompute_totals(persist=False)
 
     @property
     def numero_documento(self):
@@ -193,10 +382,27 @@ class Documento(AuditMixin, models.Model):
         return self.numero
 
     def save(self, *args, **kwargs):
-        """Override save para generar número automáticamente"""
+        """Override save para generar número automáticamente y recalcular totales"""
+        # Asegura moneda/país por empresa si los tienes en el modelo de Documento
+        if not getattr(self, "moneda", None) and getattr(self, "empresa", None):
+            self.moneda = "USD" if self.empresa.pais == "US" else "CLP"
+        if not getattr(self, "country", None) and getattr(self, "empresa", None):
+            self.country = self.empresa.pais
+
         if not self.numero:
             self.generar_numero_documento()
+
+        # Primer guardado para obtener PK si no la tiene
+        is_create = self.pk is None
         super().save(*args, **kwargs)
+
+        # Solo recalcular si no estamos ya en una actualización de campos específicos
+        if 'update_fields' not in kwargs:
+            # Tras guardar, ya existen líneas (si se guardaron antes),
+            # así que recalculamos y persistimos.
+            # Evita loop infinito: no llames self.save() completo; solo update_fields.
+            self.refresh_from_db()  # para ver líneas actuales
+            self.recompute_totals(persist=True)
 
     @property
     def tipo_documento(self):
@@ -206,131 +412,30 @@ class Documento(AuditMixin, models.Model):
     def incluir_iva(self):
         return self.tax_rate_applied > 0
 
+    # Métodos de compatibilidad (usando los nuevos campos calculados)
     def total_repuestos(self):
-        # Calcular usando campos reales de BD (cantidad * precio_unitario * (1 - descuento/100))
-        from django.db.models import DecimalField, F, Sum, Value
-        from django.db.models.functions import Coalesce
-
-        return (
-            self.lineas_repuesto.aggregate(
-                total=Coalesce(
-                    Sum(
-                        F("cantidad")
-                        * F("precio_unitario")
-                        * (1 - F("descuento") / 100),
-                        output_field=DecimalField(max_digits=12, decimal_places=2),
-                    ),
-                    Value(
-                        0, output_field=DecimalField(max_digits=12, decimal_places=2)
-                    ),
-                )
-            )["total"]
-            or 0
-        )
+        """Compatibilidad: retorna neto_repuestos"""
+        return self.neto_repuestos or Decimal("0")
 
     def total_servicios(self):
-        # Calcular usando campos reales de BD (cantidad * precio_unitario * (1 - descuento/100))
-        from django.db.models import DecimalField, F, Sum, Value
-        from django.db.models.functions import Coalesce
-
-        return (
-            self.lineas_servicio.aggregate(
-                total=Coalesce(
-                    Sum(
-                        F("cantidad")
-                        * F("precio_unitario")
-                        * (1 - F("descuento") / 100),
-                        output_field=DecimalField(max_digits=12, decimal_places=2),
-                    ),
-                    Value(
-                        0, output_field=DecimalField(max_digits=12, decimal_places=2)
-                    ),
-                )
-            )["total"]
-            or 0
-        )
+        """Compatibilidad: retorna neto_servicios"""
+        return self.neto_servicios or Decimal("0")
 
     def total_otros_servicios(self):
-        # LineaOtroServicio no siempre tiene 'subtotal'; calculamos precio_cliente * cantidad
-        from django.db.models import DecimalField, F, Sum, Value
-        from django.db.models.functions import Coalesce
-
-        return (
-            self.lineas_otro_servicio.aggregate(
-                total=Coalesce(
-                    Sum(
-                        F("precio_cliente") * F("cantidad"),
-                        output_field=DecimalField(max_digits=12, decimal_places=2),
-                    ),
-                    Value(
-                        0, output_field=DecimalField(max_digits=12, decimal_places=2)
-                    ),
-                )
-            )["total"]
-            or 0
-        )
+        """Compatibilidad: retorna neto_otros_servicios"""
+        return self.neto_otros_servicios or Decimal("0")
 
     def iva(self):
-        subtotal = (
-            self.total_repuestos()
-            + self.total_servicios()
-            + self.total_otros_servicios()
-            - float(self.descuento)
-        )
-        return subtotal * float(self.tax_rate_applied) / 100 if self.incluir_iva else 0
+        """Compatibilidad: retorna tax_amount"""
+        return self.tax_amount or Decimal("0")
 
     def total_general(self):
-        return (
-            (self.total_repuestos() or 0)
-            + (self.total_servicios() or 0)
-            + (self.total_otros_servicios() or 0)
-        )
+        """Compatibilidad: retorna total"""
+        return self.total or Decimal("0")
 
     def recalcular_totales(self):
-        """Recalcula y actualiza los totales del documento aplicando IVA solo a repuestos"""
-
-        # Subtotales "autoridad" en servidor
-        rep_sub = (
-            self.lineas_repuesto.annotate(
-                sub=ExpressionWrapper(
-                    F("cantidad") * F("precio_unitario"),
-                    output_field=DecimalField(max_digits=12, decimal_places=2),
-                )
-            ).aggregate(total=Sum("sub"))["total"]
-            or 0
-        )
-
-        serv_sub = (
-            self.lineas_servicio.annotate(
-                sub=ExpressionWrapper(
-                    F("cantidad") * F("precio_unitario"),
-                    output_field=DecimalField(max_digits=12, decimal_places=2),
-                )
-            ).aggregate(total=Sum("sub"))["total"]
-            or 0
-        )
-
-        otros_sub = (
-            self.lineas_otro_servicio.annotate(
-                sub=ExpressionWrapper(
-                    F("cantidad") * F("precio_cliente"),
-                    output_field=DecimalField(max_digits=12, decimal_places=2),
-                )
-            ).aggregate(total=Sum("sub"))["total"]
-            or 0
-        )
-
-        self.neto_repuestos = rep_sub
-        self.neto_servicios = serv_sub + otros_sub
-
-        # IVA Chile solo sobre repuestos
-        if self.country == "CL" and (self.apply_vat or self.apply_vat is None):
-            self.tax_rate_applied = self.tax_rate_applied or 19
-            self.tax_amount = rep_sub * (self.tax_rate_applied / 100)
-        else:
-            self.tax_amount = 0
-
-        self.total = self.neto_repuestos + self.neto_servicios + self.tax_amount
+        """Compatibilidad: llama al nuevo método"""
+        self.recompute_totals(persist=True)
 
     # Propiedades retrocompatibles para compatibilidad con código y plantillas antiguas
     @property

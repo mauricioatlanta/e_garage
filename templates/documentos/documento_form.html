@@ -1,11 +1,56 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load country_url %}
+
+<!-- Endpoints country-aware (sin hardcode) -->
+<script>
+  // Prefijo robusto desde la URL actual (/cl/es/ o /us/en/)
+  window.__EG_PREFIX__ = (function(){
+    const m = location.pathname.match(/^\/(cl|us)(?:\/(es|en))?\//i);
+    const country = (m?.[1] || 'cl').toLowerCase();
+    const lang    = (m?.[2] || 'es').toLowerCase();
+    return `/${country}/${lang}/`;
+  })();
+
+  // Endpoints country-aware (Django los genera con el tag country_url)
+  window.EG = window.EG || {};
+  window.EG.endpoints = {
+    buscarClientes: "{% country_url 'taller:ajax_buscar_clientes' %}" || window.__EG_PREFIX__ + "ajax/clientes/buscar/",
+    vehiculosPorCliente: "{% country_url 'taller:ajax_vehiculos_por_cliente' %}" || window.__EG_PREFIX__ + "ajax/vehiculos-por-cliente/",
+    numeroDocumento: "{% country_url 'taller:api_obtener_numero_documento' %}" || window.__EG_PREFIX__ + "documentos/api/obtener-numero-documento/",
+    repuestoPorCodigo: "{% country_url 'taller:api_repuesto_por_codigo' %}" || window.__EG_PREFIX__ + "repuestos/api/repuesto-por-codigo/",
+  };
+  
+  console.log('🔍 EG endpoints generados:', window.EG.endpoints);
+
+  // Parche: si por alguna razón faltara el tag, caemos a prefijo inferido
+  for (const [k,v] of Object.entries(window.EG.endpoints)) {
+    if (!v || v === 'None') {
+      if (k === 'buscarClientes')     window.EG.endpoints[k] = window.__EG_PREFIX__ + "ajax/clientes/buscar/";
+      if (k === 'vehiculosPorCliente')window.EG.endpoints[k] = window.__EG_PREFIX__ + "ajax/vehiculos-por-cliente/";
+      if (k === 'numeroDocumento')    window.EG.endpoints[k] = window.__EG_PREFIX__ + "documentos/api/obtener-numero-documento/";
+      if (k === 'repuestoPorCodigo')  window.EG.endpoints[k] = window.__EG_PREFIX__ + "repuestos/api/repuesto-por-codigo/";
+    }
+  }
+
+  // Parche DAL: corrige /autocomplete/cliente → /cl/es/autocomplete/cliente
+  (function(){
+    if (!window.jQuery) return;
+    $.ajaxPrefilter(function (options) {
+      if (/^\/?autocomplete\/cliente\/?(\?|$)/i.test(options.url)) {
+        options.url = options.url.replace(/^\/?autocomplete\/cliente\/?/i, window.__EG_PREFIX__ + 'autocomplete/cliente/');
+        console.log('🔁 Reescrito DAL →', options.url);
+      }
+    });
+  })();
+</script>
 
 {% block title %}
+<!-- DEBUG: LANGUAGE_CODE={{ LANGUAGE_CODE }}, request.path={{ request.path }} -->
 {% if es_edicion %}
-Editando: {{ documento.tipo }} #{{ documento.numero_documento }}
+{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Editing: {{ documento.tipo }} #{{ documento.numero_documento }}{% else %}Editando: {{ documento.tipo }} #{{ documento.numero_documento }}{% endif %}
 {% else %}
-Nuevo Documento
+{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}New Document{% else %}Nuevo Documento{% endif %}
 {% endif %}
 {% endblock %}
 
@@ -434,28 +479,32 @@ document.addEventListener("DOMContentLoaded", () => {
     <div class="page-header">
         <div class="d-flex justify-content-between align-items-center">
             <div>
+                <!-- DEBUG: LANGUAGE_CODE={{ LANGUAGE_CODE }}, request.path={{ request.path }}, country={{ country }} -->
+                <div style="background: #ffff00; color: #000; padding: 5px; margin: 5px; border-radius: 3px; font-size: 12px;">
+                    DEBUG: LANGUAGE_CODE={{ LANGUAGE_CODE }}, request.path={{ request.path }}, country={{ country }}
+                </div>
                 {% if es_edicion %}
                     <h1 class="mb-2">
                         <i class="fas fa-edit"></i>
-                        ✏️ Editando: {{ documento.tipo }} #{{ documento.numero_documento }}
+                        ✏️ {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Editing: {{ documento.tipo }} #{{ documento.numero_documento }}{% else %}Editando: {{ documento.tipo }} #{{ documento.numero_documento }}{% endif %}
                     </h1>
-                    <p style="color: #00ccee; margin: 0;">Modificar información del documento</p>
+                    <p style="color: #00ccee; margin: 0;">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Modify document information{% else %}Modificar información del documento{% endif %}</p>
                 {% else %}
                     <h1 class="mb-2">
                         <i class="fas fa-plus-circle"></i>
-                        ➕ Nuevo Documento
+                        ➕ {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}New Document{% else %}Nuevo Documento{% endif %}
                     </h1>
-                    <p style="color: #00ccee; margin: 0;">Complete la información del documento</p>
+                    <p style="color: #00ccee; margin: 0;">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Complete the document information{% else %}Complete la información del documento{% endif %}</p>
                 {% endif %}
             </div>
             <div class="d-flex align-items-center gap-3">
             {% if es_edicion %}
                 <span id="badge-pago" class="badge badge-pagado {% if documento.pagado %}badge-pagado-si{% else %}badge-no-pagado{% endif %}">
-                    {% if documento.pagado %}✅ Pagado{% else %}❌ No Pagado{% endif %}
+                    {% if documento.pagado %}{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}✅ Paid{% else %}✅ Pagado{% endif %}{% else %}{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}❌ Not Paid{% else %}❌ No Pagado{% endif %}{% endif %}
                 </span>
             {% endif %}
-            <a href="{% url 'documentos_cl:lista_documentos' %}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Volver
+            <a href="{% country_url 'documentos:lista_documentos' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Back{% else %}Volver{% endif %}
             </a>
             </div>
         </div>
@@ -479,31 +528,53 @@ document.addEventListener("DOMContentLoaded", () => {
             <!-- Información del Documento -->
             <div class="col-lg-6">
                 <div class="form-section">
-                    <h3><i class="fas fa-file-alt text-primary"></i> Información del Documento</h3>
+                    <h3><i class="fas fa-file-alt text-primary"></i> {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Document Information{% else %}Información del Documento{% endif %}</h3>
 
                     <div class="form-group">
-                        <label class="form-label">Tipo de Documento</label>
+                        <label class="form-label">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Document Type{% else %}{{ form.tipo.label }}{% endif %}</label>
+                        {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}
+                        <select name="tipo" class="form-select" id="id_tipo">
+                            <option value="OT">🔧 Work Order</option>
+                            <option value="PRES">📋 Estimate</option>
+                            <option value="REC">🧾 Receipt/Invoice</option>
+                        </select>
+                        {% else %}
                         {{ form.tipo }}
+                        {% endif %}
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Número de Documento</label>
+                        <label class="form-label">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Document Number{% else %}{{ form.numero.label }}{% endif %}</label>
+                        {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}
+                        <input type="text" name="numero" class="form-control" readonly>
+                        {% else %}
                         {{ form.numero }}
+                        {% endif %}
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Fecha</label>
+                        <label class="form-label">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Date{% else %}{{ form.fecha_emision.label }}{% endif %}</label>
+                        {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}
+                        <input type="date" name="fecha_emision" class="form-control">
+                        {% else %}
                         {{ form.fecha_emision }}
+                        {% endif %}
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Estado de Pago</label>
+                        <label class="form-label">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Payment Status{% else %}{{ form.pagado.label }}{% endif %}</label>
                         <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" name="pagado" id="switchPagado"
-                                   {% if documento.pagado %}checked{% endif %} onchange="actualizarBadgePago()">
+                            {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}
+                            <input type="checkbox" name="pagado" class="form-check-input" id="switchPagado">
+                            <label class="form-check-label" for="switchPagado">
+                                Document Paid
+                            </label>
+                            {% else %}
+                            {{ form.pagado }}
                             <label class="form-check-label" for="switchPagado">
                                 Documento Pagado
                             </label>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -512,29 +583,50 @@ document.addEventListener("DOMContentLoaded", () => {
             <!-- Información del Cliente -->
             <div class="col-lg-6">
                 <div class="form-section">
-                    <h3><i class="fas fa-user text-primary"></i> Cliente y Vehículo</h3>
+                    <h3><i class="fas fa-user text-primary"></i> {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Customer and Vehicle{% else %}Cliente y Vehículo{% endif %}</h3>
 
                     <div class="form-group">
-                        <label class="form-label">Cliente</label>
+                        <label class="form-label">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Customer{% else %}{{ form.cliente.label }}{% endif %}</label>
+                        {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}
+                        <select name="cliente" class="form-select" id="id_cliente">
+                            <option value="">Select customer first...</option>
+                        </select>
+                        {% else %}
                         {{ form.cliente }}
+                        {% endif %}
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Vehículo</label>
+                        <label class="form-label">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Vehicle{% else %}{{ form.vehiculo.label }}{% endif %}</label>
+                        {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}
+                        <select name="vehiculo" class="form-select" id="id_vehiculo">
+                            <option value="">Select customer first...</option>
+                        </select>
+                        {% else %}
                         {{ form.vehiculo }}
+                        {% endif %}
                     </div>
 
                     {% if country == 'US' %}
                     <div class="form-group">
-                        <label class="form-label">Mileage</label>
-                        <input type="number" name="millas" class="form-control" placeholder="0"
-                               value="{% if documento.millas %}{{ documento.millas }}{% endif %}">
+                        <label class="form-label">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Mileage{% else %}{{ form.kilometraje.label }}{% endif %}</label>
+                        {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}
+                        <input type="number" name="kilometraje" class="form-input input-number" step="1" min="0" placeholder="0">
+                        {% else %}
+                        {{ form.kilometraje }}
+                        {% endif %}
                     </div>
                     {% endif %}
 
                     <div class="form-group">
-                        <label class="form-label">Técnico Asignado</label>
+                        <label class="form-label">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Assigned Technician{% else %}{{ form.tecnico_responsable.label }}{% endif %}</label>
+                        {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}
+                        <select name="tecnico_responsable" class="form-select">
+                            <option value="">Select technician...</option>
+                        </select>
+                        {% else %}
                         {{ form.tecnico_responsable }}
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -542,9 +634,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
         <!-- Observaciones -->
         <div class="form-section">
-            <h3><i class="fas fa-comment-alt text-primary"></i> Observaciones</h3>
+            <h3><i class="fas fa-comment-alt text-primary"></i> {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Observations{% else %}Observaciones{% endif %}</h3>
             <div class="form-group">
+                <label class="form-label">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Observations{% else %}{{ form.observaciones.label }}{% endif %}</label>
+                {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}
+                <textarea name="observaciones" class="form-control" rows="4" placeholder="Additional notes - Can be left empty if no additional information..."></textarea>
+                {% else %}
                 {{ form.observaciones }}
+                {% endif %}
             </div>
         </div>
 
@@ -553,18 +650,18 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="col-12">
                 <!-- Repuestos -->
                 <div class="form-section">
-                    <h3><i class="fas fa-cogs text-primary"></i> Repuestos</h3>
+                    <h3><i class="fas fa-cogs text-primary"></i> {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Parts{% else %}Repuestos{% endif %}</h3>
                     <div class="table-responsive">
                         <table class="table table-bordered" id="tabla-repuestos">
                             <thead>
                                 <tr>
-                                    <th>Código</th>
-                                    <th>Descripción</th>
-                                    <th>Cantidad</th>
-                                    <th>Precio Unit.</th>
-                                    <th>Descuento %</th>
-                                    <th>Subtotal</th>
-                                    <th>Acciones</th>
+                                    <th>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Code{% else %}Código{% endif %}</th>
+                                    <th>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Description{% else %}Descripción{% endif %}</th>
+                                    <th>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Quantity{% else %}Cantidad{% endif %}</th>
+                                    <th>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Unit Price{% else %}Precio Unit.{% endif %}</th>
+                                    <th>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Discount %{% else %}Descuento %{% endif %}</th>
+                                    <th>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Subtotal{% else %}Subtotal{% endif %}</th>
+                                    <th>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Actions{% else %}Acciones{% endif %}</th>
                                 </tr>
                             </thead>
                             <tbody id="repuestos-tbody">
@@ -572,25 +669,25 @@ document.addEventListener("DOMContentLoaded", () => {
                             </tbody>
                         </table>
                         <button type="button" class="btn btn-success btn-sm" onclick="agregarRepuesto()">
-                            <i class="fas fa-plus"></i> Agregar Repuesto
+                            <i class="fas fa-plus"></i> {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Add Part{% else %}Agregar Repuesto{% endif %}
                         </button>
                     </div>
                 </div>
 
                 <!-- Servicios -->
                 <div class="form-section">
-                    <h3><i class="fas fa-wrench text-primary"></i> Servicios</h3>
+                    <h3><i class="fas fa-wrench text-primary"></i> {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Services{% else %}Servicios{% endif %}</h3>
                     <div class="table-responsive">
                         <table class="table table-bordered" id="tabla-servicios">
                             <thead>
                                 <tr>
-                                    <th>Código</th>
-                                    <th>Descripción</th>
-                                    <th>Cantidad</th>
-                                    <th>Precio Unit.</th>
-                                    <th>Descuento %</th>
-                                    <th>Subtotal</th>
-                                    <th>Acciones</th>
+                                    <th>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Code{% else %}Código{% endif %}</th>
+                                    <th>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Description{% else %}Descripción{% endif %}</th>
+                                    <th>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Quantity{% else %}Cantidad{% endif %}</th>
+                                    <th>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Unit Price{% else %}Precio Unit.{% endif %}</th>
+                                    <th>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Discount %{% else %}Descuento %{% endif %}</th>
+                                    <th>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Subtotal{% else %}Subtotal{% endif %}</th>
+                                    <th>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Actions{% else %}Acciones{% endif %}</th>
                                 </tr>
                             </thead>
                             <tbody id="servicios-tbody">
@@ -598,24 +695,24 @@ document.addEventListener("DOMContentLoaded", () => {
                             </tbody>
                         </table>
                         <button type="button" class="btn btn-success btn-sm" onclick="agregarServicio()">
-                            <i class="fas fa-plus"></i> Agregar Servicio
+                            <i class="fas fa-plus"></i> {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Add Service{% else %}Agregar Servicio{% endif %}
                         </button>
                     </div>
                 </div>
 
                 <!-- Otros Servicios -->
                 <div class="form-section">
-                    <h3><i class="fas fa-external-link-alt text-primary"></i> Servicios Externos</h3>
+                    <h3><i class="fas fa-external-link-alt text-primary"></i> {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}External Services{% else %}Servicios Externos{% endif %}</h3>
                     <div class="table-responsive">
                         <table class="table table-bordered" id="tabla-otros">
                             <thead>
                                 <tr>
-                                    <th>Servicio</th>
-                                    <th>Empresa Externa</th>
-                                    <th>Cantidad</th>
-                                    <th>Costo Interno</th>
-                                    <th>Precio Cliente</th>
-                                    <th>Acciones</th>
+                                    <th>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Service{% else %}Servicio{% endif %}</th>
+                                    <th>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}External Company{% else %}Empresa Externa{% endif %}</th>
+                                    <th>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Quantity{% else %}Cantidad{% endif %}</th>
+                                    <th>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Internal Cost{% else %}Costo Interno{% endif %}</th>
+                                    <th>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Customer Price{% else %}Precio Cliente{% endif %}</th>
+                                    <th>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Actions{% else %}Acciones{% endif %}</th>
                                 </tr>
                             </thead>
                             <tbody id="otros-tbody">
@@ -623,7 +720,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             </tbody>
                         </table>
                         <button type="button" class="btn btn-success btn-sm" onclick="agregarOtroServicio()">
-                            <i class="fas fa-plus"></i> Agregar Servicio Externo
+                            <i class="fas fa-plus"></i> {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Add External Service{% else %}Agregar Servicio Externo{% endif %}
                         </button>
                     </div>
                 </div>
@@ -635,20 +732,20 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="col-lg-8"></div>
             <div class="col-lg-4">
                 <div class="total-card">
-                    <h4 class="mb-3"><i class="fas fa-calculator"></i> Resumen de Facturación</h4>
+                    <h4 class="mb-3"><i class="fas fa-calculator"></i> {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Receipt/Invoice Summary{% else %}Resumen de Recibos/Boletas{% endif %}</h4>
 
                     <div class="total-row">
-                        <span>Subtotal Repuestos:</span>
+                        <span>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Parts Subtotal:{% else %}Subtotal Repuestos:{% endif %}</span>
                         <span id="subtotal-repuestos">$0.00</span>
                     </div>
 
                     <div class="total-row">
-                        <span>Subtotal Servicios:</span>
+                        <span>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Services Subtotal:{% else %}Subtotal Servicios:{% endif %}</span>
                         <span id="subtotal-servicios">$0.00</span>
                     </div>
 
                     <div class="total-row">
-                        <span>Subtotal Externos:</span>
+                        <span>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}External Subtotal:{% else %}Subtotal Externos:{% endif %}</span>
                         <span id="subtotal-otros">$0.00</span>
                     </div>
 
@@ -679,10 +776,10 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="text-center mt-4">
             <button type="submit" class="btn btn-primary btn-lg me-2">
                 <i class="fas fa-save"></i>
-                {% if es_edicion %}Guardar Cambios{% else %}Crear Documento{% endif %}
+                {% if es_edicion %}{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Save Changes{% else %}Guardar Cambios{% endif %}{% else %}{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Create Document{% else %}Crear Documento{% endif %}{% endif %}
             </button>
-            <a href="{% url 'documentos_cl:lista_documentos' %}" class="btn btn-secondary btn-lg">
-                <i class="fas fa-times"></i> Cancelar
+            <a href="{% country_url 'documentos:lista_documentos' %}" class="btn btn-secondary btn-lg">
+                <i class="fas fa-times"></i> {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Cancel{% else %}Cancelar{% endif %}
             </a>
         </div>
     </form>
@@ -716,10 +813,10 @@ function actualizarBadgePago() {
     if (badge) {
         if (checkbox.checked) {
             badge.className = 'badge badge-pagado badge-pagado-si';
-            badge.textContent = '✅ Pagado';
+            badge.textContent = window.COUNTRY === 'US' ? '✅ Paid' : '✅ Pagado';
         } else {
             badge.className = 'badge badge-pagado badge-no-pagado';
-            badge.textContent = '❌ No Pagado';
+            badge.textContent = window.COUNTRY === 'US' ? '❌ Not Paid' : '❌ No Pagado';
         }
     }
 }
@@ -750,11 +847,11 @@ function agregarRepuesto(data = null) {
         <td>
             <input type="hidden" name="lineas_repuesto[repuesto_id][]" value="${data?.repuesto_id || ''}">
             <input type="text" class="form-control" name="lineas_repuesto[codigo][]"
-                   value="${data?.codigo || ''}" placeholder="Código">
+                   value="${data?.codigo || ''}" placeholder="Code">
         </td>
         <td>
             <input type="text" class="form-control" name="lineas_repuesto[nombre][]"
-                   value="${data?.nombre || ''}" placeholder="Descripción" required>
+                   value="${data?.nombre || ''}" placeholder="Description" required>
         </td>
         <td>
             <input type="number" class="form-control" name="lineas_repuesto[cantidad][]"
@@ -789,11 +886,11 @@ function agregarServicio(data = null) {
         <td>
             <input type="hidden" name="lineas_servicio[servicio_id][]" value="${data?.servicio_id || ''}">
             <input type="text" class="form-control" name="lineas_servicio[codigo][]"
-                   value="${data?.codigo || ''}" placeholder="Código">
+                   value="${data?.codigo || ''}" placeholder="Code">
         </td>
         <td>
             <input type="text" class="form-control" name="lineas_servicio[descripcion][]"
-                   value="${data?.descripcion || ''}" placeholder="Descripción" required>
+                   value="${data?.descripcion || ''}" placeholder="Description" required>
         </td>
         <td>
             <input type="number" class="form-control" name="lineas_servicio[cantidad][]"
@@ -827,11 +924,11 @@ function agregarOtroServicio(data = null) {
     row.innerHTML = `
         <td>
             <input type="text" class="form-control" name="lineas_otro[servicio][]"
-                   value="${data?.servicio || ''}" placeholder="Servicio" required>
+                   value="${data?.servicio || ''}" placeholder="Service" required>
         </td>
         <td>
             <input type="text" class="form-control" name="lineas_otro[empresa_externa][]"
-                   value="${data?.empresa_externa || ''}" placeholder="Empresa">
+                   value="${data?.empresa_externa || ''}" placeholder="Company">
         </td>
         <td>
             <input type="number" class="form-control" name="lineas_otro[cantidad][]"
@@ -932,5 +1029,133 @@ function recalcularTotales() {
         document.getElementById('total-final').textContent = `$${total.toFixed(2)}`;
     }
 }
+
+// Usa SIEMPRE los endpoints absolutos del include
+const urlBuscarClientes = window.EG.endpoints.buscarClientes;
+const urlVeh            = window.EG.endpoints.vehiculosPorCliente;
+const urlNextNumber     = window.EG.endpoints.numeroDocumento;
+const urlRep            = window.EG.endpoints.repuestoPorCodigo;
+
+console.log('🔌 URLs:', { urlBuscarClientes, urlVeh, urlNextNumber, urlRep });
+
+// 1) Buscador de clientes (debounce + tolerante a formatos)
+async function buscarClientes(query) {
+  const resultados = document.getElementById('cliente-resultados');
+  if (!query || query.trim().length < 2) {
+    resultados?.classList.add('hidden');
+    return;
+  }
+  const url = `${urlBuscarClientes}?q=${encodeURIComponent(query.trim())}`;
+  console.log('🔍 Searching customers:', { query, url });
+
+  try {
+    const resp = await fetch(url, {
+      headers: { 'X-Requested-With': 'XMLHttpRequest' },
+      credentials: 'same-origin'
+    });
+
+    if (!resp.ok) {
+      console.error('❌ HTTP Error buscarClientes:', resp.status, resp.statusText, url);
+      resultados.innerHTML = '<div class="p-3 text-red-400">❌ Server Error</div>';
+      resultados.classList.remove('hidden');
+      return;
+    }
+
+    const data = await resp.json().catch(() => null);
+    let clientes = [];
+    if (Array.isArray(data)) clientes = data;
+    else if (data?.results)  clientes = data.results;
+    else if (data?.items)    clientes = data.items;
+
+    mostrarResultadosClientes(clientes || []);
+  } catch (err) {
+    console.error('❌ Network Error buscarClientes:', err);
+    resultados.innerHTML = '<div class="p-3 text-red-400">❌ Connection Error</div>';
+    resultados.classList.remove('hidden');
+  }
+}
+
+// 2) Selección de cliente → carga de vehículos (acepta cliente_id o cliente)
+async function cargarVehiculosPorCliente(clienteId) {
+  const selVeh = document.getElementById('id_vehiculo');
+  if (!selVeh || !clienteId) {
+    if (selVeh) selVeh.innerHTML = '<option value="">Select customer first...</option>';
+    return;
+  }
+
+  // Intento con cliente_id y fallback a cliente
+  const tries = [
+    `${urlVeh}?cliente_id=${encodeURIComponent(clienteId)}`,
+    `${urlVeh}?cliente=${encodeURIComponent(clienteId)}`,
+  ];
+
+  selVeh.innerHTML = '<option value="">-- Loading vehicles... --</option>';
+
+  for (const apiURL of tries) {
+    try {
+      console.log('🚗 Fetch vehicles @', apiURL);
+      const r = await fetch(apiURL, { headers:{'X-Requested-With':'XMLHttpRequest'}, credentials:'same-origin' });
+      if (!r.ok) continue;
+      const data  = await r.json();
+      const items = Array.isArray(data) ? data : (data.results || []);
+      if (!Array.isArray(items)) continue;
+
+      if (!items.length) {
+        selVeh.innerHTML = '<option value="">-- No vehicles registered --</option>';
+        return;
+      }
+
+      selVeh.innerHTML = '<option value="">Select vehicle...</option>' +
+        items.map(v => {
+          const label = v.text || [v.patente, v.marca, v.modelo].filter(Boolean).join(' ') || `Vehicle #${v.id}`;
+          return `<option value="${v.id}">${label}</option>`;
+        }).join('');
+      return; // listo
+    } catch (e) {
+      console.warn('⚠️ Attempt failed @', apiURL, e);
+    }
+  }
+
+  selVeh.innerHTML = '<option value="">-- Error loading vehicles --</option>';
+}
+
+// 3) Numeración de documento con endpoint correcto
+async function updateDocumentNumber(tipo) {
+  if (!tipo) return;
+  
+  try {
+    const response = await fetch(`${urlNextNumber}?tipo=${encodeURIComponent(tipo)}`, {
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      if (data.numero) {
+        document.getElementById('id_numero').value = data.numero;
+      }
+    }
+  } catch (error) {
+    console.error('Error getting document number:', error);
+  }
+}
+
+// Event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    const selectCliente = document.getElementById('id_cliente');
+    if (selectCliente) {
+        selectCliente.addEventListener('change', function() {
+            const clienteId = this.value;
+            console.log('👤 Customer selected:', clienteId);
+            cargarVehiculosPorCliente(clienteId);
+        });
+    }
+    
+    const selectTipo = document.getElementById('id_tipo');
+    if (selectTipo) {
+        selectTipo.addEventListener('change', function() {
+            updateDocumentNumber(this.value);
+        });
+    }
+});
 </script>
 {% endblock %}

@@ -1,0 +1,633 @@
+{% extends 'base.html' %}
+{% load static %}
+
+<!-- 🔵 CRUZ AZUL - TEMPLATE CANONICAL -->
+<div style="position: fixed; top: 10px; left: 70px; width: 50px; height: 50px; background-color: #0000ff; z-index: 9999; border: 3px solid #fff; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px;">CANON</div>
+
+{% block title %}{{ empresa.nombre_taller }} - Centro de Comandos{% endblock %}
+
+{% block extra_css %}
+<style>
+/* 🚀 Estilo de Estación Espacial para Dashboard */
+:root {
+    --space-blue: #00d4ff;
+    --space-cyan: #00ffff;
+    --space-green: #00ff88;
+    --space-gold: #ffd700;
+    --space-red: #ff3b3b;
+    --space-purple: #8a2be2;
+    --dark-space: #0a0a0f;
+    --panel-bg: rgba(5, 15, 25, 0.95);
+    --glass-bg: rgba(255, 255, 255, 0.06);
+    --holo-glow: 0 0 20px;
+}
+
+body {
+    background:
+        radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(120, 200, 255, 0.2) 0%, transparent 50%),
+        linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+    color: #ffffff;
+    font-family: 'Orbitron', 'Segoe UI', monospace;
+    overflow-x: hidden;
+}
+
+.space-container {
+    background: var(--panel-bg);
+    border: 2px solid var(--space-cyan);
+    border-radius: 20px;
+    backdrop-filter: blur(15px);
+    box-shadow:
+        var(--holo-glow) var(--space-cyan),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.space-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--space-cyan), transparent);
+    animation: scan-line 3s infinite;
+}
+
+@keyframes scan-line {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 1; }
+}
+
+.command-panel {
+    background: var(--glass-bg);
+    border: 1px solid var(--space-purple);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.command-panel:hover {
+    border-color: var(--space-gold);
+    transform: translateY(-8px) rotateX(5deg);
+    box-shadow:
+        var(--holo-glow) var(--space-gold),
+        0 15px 35px rgba(255, 215, 0, 0.3);
+    color: inherit;
+    text-decoration: none;
+}
+
+.command-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.1), transparent);
+    transition: left 0.6s;
+}
+
+.command-panel:hover::before {
+    left: 100%;
+}
+
+.nav-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+/* 🚀 SUPER FICHA UNIFICADA - DISEÑO ESPECIAL */
+.super-unified-panel {
+    grid-column: span 2 !important;
+    background: linear-gradient(135deg,
+        rgba(0, 212, 255, 0.15) 0%,
+        rgba(138, 43, 226, 0.15) 35%,
+        rgba(255, 215, 0, 0.15) 70%,
+        rgba(0, 255, 136, 0.15) 100%);
+    border: 2px solid var(--space-gold);
+    position: relative;
+    min-height: 200px;
+    overflow: hidden;
+}
+
+.super-unified-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg,
+        var(--space-cyan),
+        var(--space-purple),
+        var(--space-gold),
+        var(--space-green));
+    animation: unified-scan 2s infinite;
+}
+
+.super-unified-panel:hover {
+    transform: translateY(-12px) rotateX(3deg);
+    box-shadow:
+        0 0 30px var(--space-gold),
+        0 0 60px rgba(255, 215, 0, 0.4),
+        inset 0 0 20px rgba(255, 255, 255, 0.1);
+    border-color: var(--space-cyan);
+}
+
+.unified-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.unified-icons { display: flex; gap: 10px; }
+.icon-trio { font-size: 1.8rem; animation: icon-glow 3s infinite alternate; }
+.icon-trio:nth-child(1) { animation-delay: 0s; }
+.icon-trio:nth-child(2) { animation-delay: 0.5s; }
+.icon-trio:nth-child(3) { animation-delay: 1s; }
+
+.unified-pulse {
+    width: 12px;
+    height: 12px;
+    background: var(--space-green);
+    border-radius: 50%;
+    animation: mega-pulse 1.5s infinite;
+    box-shadow: 0 0 15px var(--space-green);
+}
+
+.unified-title { text-align: center; margin-bottom: 15px; }
+.main-title {
+    font-size: 1.4rem; font-weight: 900; color: var(--space-gold);
+    text-shadow: 0 0 10px var(--space-gold); font-family: 'Orbitron', monospace; letter-spacing: 2px;
+}
+.sub-title {
+    font-size: 0.9rem; color: var(--space-cyan); font-family: 'Courier New', monospace;
+    margin-top: 3px; letter-spacing: 3px;
+}
+
+.unified-features {
+    display: flex; justify-content: center; gap: 8px; margin-bottom: 15px; flex-wrap: wrap;
+}
+
+.feature-tag {
+    background: rgba(0, 212, 255, 0.2);
+    border: 1px solid var(--space-cyan);
+    border-radius: 15px;
+    padding: 4px 10px;
+    font-size: 0.7rem;
+    color: var(--space-cyan);
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    animation: tag-glow 2s infinite alternate;
+}
+.feature-tag:nth-child(2) { background: rgba(138, 43, 226, 0.2); border-color: var(--space-purple); color: var(--space-purple); animation-delay: 0.3s; }
+.feature-tag:nth-child(3) { background: rgba(255, 215, 0, 0.2); border-color: var(--space-gold); color: var(--space-gold); animation-delay: 0.6s; }
+
+.unified-description { font-size: 0.8rem; color: #b0c4de; font-family: 'Courier New', monospace; line-height: 1.4; }
+.desc-line { margin-bottom: 3px; opacity: 0.9; }
+
+@keyframes unified-scan { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+@keyframes icon-glow { 0% { text-shadow: 0 0 5px currentColor; transform: scale(1); } 100% { text-shadow: 0 0 20px currentColor; transform: scale(1.1); } }
+@keyframes mega-pulse { 0% { box-shadow: 0 0 15px var(--space-green); transform: scale(1); } 50% { box-shadow: 0 0 30px var(--space-green); transform: scale(1.2); } 100% { box-shadow: 0 0 15px var(--space-green); transform: scale(1); } }
+@keyframes tag-glow { 0% { box-shadow: 0 0 5px currentColor; transform: scale(1); } 100% { box-shadow: 0 0 15px currentColor; transform: scale(1.05); } }
+
+/* Responsive super card */
+@media (max-width: 768px) {
+    .super-unified-panel { grid-column: span 1 !important; min-height: 180px; }
+    .main-title { font-size: 1.1rem; }
+    .unified-features { gap: 5px; }
+    .feature-tag { font-size: 0.6rem; padding: 3px 8px; }
+}
+
+/* 🚀 Módulos modernos */
+.modern-panel {
+    background: linear-gradient(135deg,
+        rgba(0, 212, 255, 0.08) 0%,
+        rgba(138, 43, 226, 0.08) 50%,
+        rgba(255, 215, 0, 0.08) 100%);
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    padding: 1.2rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.modern-panel:hover {
+    border-color: var(--space-gold);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.4),
+                0 15px 35px rgba(0, 212, 255, 0.2),
+                inset 0 0 15px rgba(255, 255, 255, 0.1);
+}
+.modern-panel::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--space-cyan), var(--space-purple), var(--space-gold), transparent);
+    animation: modern-scan 3s infinite;
+}
+@keyframes modern-scan { 0% { transform: translateX(-100%); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateX(100%); opacity: 0; } }
+
+.modern-icon-container { position: relative; display: flex; justify-content: center; align-items: center; margin-bottom: 15px; height: 60px; }
+.main-icon { font-size: 2.5rem; z-index: 2; animation: main-icon-float 3s ease-in-out infinite; }
+.secondary-icon { position: absolute; font-size: 1.2rem; bottom: 0; right: 0; opacity: 0.7; animation: secondary-icon-pulse 2s infinite; color: var(--space-gold); }
+@keyframes main-icon-float { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-5px) scale(1.05); } }
+@keyframes secondary-icon-pulse { 0%, 100% { opacity: 0.7; transform: scale(1); } 50% { opacity: 1; transform: scale(1.2); } }
+
+.modern-title { font-size: 1rem; font-weight: 900; color: var(--space-cyan); text-align: center; font-family: 'Orbitron', monospace; letter-spacing: 1.5px; text-shadow: 0 0 10px rgba(0, 212, 255, 0.5); margin-bottom: 5px; }
+.modern-subtitle { font-size: 0.75rem; color: var(--space-purple); text-align: center; font-family: 'Courier New', monospace; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; opacity: 0.9; }
+.modern-description { font-size: 0.7rem; color: #b0c4de; text-align: center; font-family: 'Courier New', monospace; opacity: 0.8; line-height: 1.3; }
+
+.console-text { font-family: 'Courier New', monospace; color: var(--space-green); font-size: 0.9rem; }
+.chart-hologram { background: var(--dark-space); border: 1px solid var(--space-blue); border-radius: 12px; padding: 1.5rem; height: 350px; position: relative; overflow: hidden; }
+
+/* 🪟 Estilo Mosaico Windows */
+.windows-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: repeat(4, 140px);
+    gap: 15px;
+    height: 580px;
+    margin-top: 20px;
+}
+.windows-tile {
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(138, 43, 226, 0.1) 100%);
+    border: 1px solid var(--space-cyan);
+    border-radius: 8px;
+    padding: 15px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    cursor: pointer;
+}
+.windows-tile:hover {
+    transform: scale(1.02) translateY(-2px);
+    border-color: var(--space-gold);
+    box-shadow: 0 8px 32px rgba(0, 212, 255, 0.3), var(--holo-glow) var(--space-gold);
+}
+.windows-tile::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--space-cyan), var(--space-purple), var(--space-cyan));
+    opacity: 0.7;
+}
+.tile-large { grid-column: span 3; grid-row: span 2; }
+.tile-medium { grid-column: span 2; grid-row: span 2; }
+.tile-small { grid-column: span 1; grid-row: span 1; }
+
+.tile-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(0, 255, 255, 0.2); }
+.tile-title { font-size: 12px; font-weight: bold; color: var(--space-cyan); text-transform: uppercase; letter-spacing: 1px; font-family: 'Orbitron', monospace; }
+.tile-live { width: 8px; height: 8px; background: var(--space-green); border-radius: 50%; animation: pulse 2s infinite; box-shadow: 0 0 10px var(--space-green); }
+
+.tile-content { height: calc(100% - 35px); display: flex; flex-direction: column; justify-content: center; align-items: center; }
+.metric-tile { text-align: center; }
+.metric-big { font-size: 2.5rem; font-weight: 900; color: var(--space-cyan); text-shadow: var(--holo-glow) var(--space-cyan); font-family: 'Orbitron', monospace; line-height: 1; }
+.metric-small { font-size: 0.8rem; color: #b0c4de; margin-top: 5px; font-family: 'Courier New', monospace; }
+
+@media (max-width: 1200px) {
+    .windows-grid { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(5, 130px); height: 670px; }
+    .tile-large { grid-column: span 2; grid-row: span 2; }
+}
+@media (max-width: 768px) {
+    .windows-grid { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(8, 120px); height: 980px; }
+    .tile-large, .tile-medium { grid-column: span 2; grid-row: span 1; }
+    .tile-small { grid-column: span 1; grid-row: span 1; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- 🔵 IDENTIFICATION SQUARE - CHILE SPANISH TEMPLATE -->
+<div style="position: fixed; top: 10px; right: 10px; width: 50px; height: 50px; background-color: #0000ff; z-index: 9999; border: 3px solid #fff; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px;">CL-ES</div>
+
+<div class="max-w-7xl mx-auto p-6">
+
+    <!-- 🚀 Panel de Comandos -->
+    <div class="space-container p-6">
+        <h3 class="text-xl font-bold text-cyan-400 mb-4 console-text">🚀 PANEL DE COMANDOS DE MISIÓN</h3>
+        <div class="nav-grid">
+
+            <!-- SUPER FICHA UNIFICADA - INTELIGENCIA TÁCTICA TOTAL -->
+            <a href="/cl/business-intelligence/dashboard/" class="command-panel super-unified-panel">
+                <div class="unified-header">
+                    <div class="unified-icons">
+                        <span class="icon-trio">🧠</span>
+                        <span class="icon-trio">⚡</span>
+                        <span class="icon-trio">💎</span>
+                    </div>
+                    <div class="unified-pulse"></div>
+                </div>
+                <div class="unified-title">
+                    <div class="main-title">INTELIGENCIA TÁCTICA</div>
+                    <div class="sub-title">COMMAND CENTER</div>
+                </div>
+                <div class="unified-features">
+                    <span class="feature-tag">📊 REPORTES</span>
+                    <span class="feature-tag">🚀 IA AVANZADA</span>
+                    <span class="feature-tag">💼 BUSINESS INTEL</span>
+                </div>
+                <div class="unified-description">
+                    <div class="desc-line">• Análisis estratégicos unificados</div>
+                    <div class="desc-line">• IA operativa predictiva</div>
+                    <div class="desc-line">• Control estratégico total</div>
+                </div>
+            </a>
+
+            <a href="/cl/taller/reportes/mecanicos/" class="command-panel">
+                <div class="text-3xl mb-2">👨‍🔧</div>
+                <div class="font-semibold console-text">PERSONAL TÉCNICO</div>
+                <div class="text-sm text-gray-400 console-text">Análisis individual</div>
+            </a>
+
+            <a href="/documentos/" class="command-panel modern-panel">
+                <div class="modern-icon-container">
+                    <div class="main-icon">📄</div>
+                    <div class="secondary-icon">🚀</div>
+                </div>
+                <div class="modern-title">DOC ENGINE</div>
+                <div class="modern-subtitle">Digital Workflow</div>
+                <div class="modern-description">Gestión documental AI</div>
+            </a>
+
+            <a href="/cl/clientes/" class="command-panel modern-panel">
+                <div class="modern-icon-container">
+                    <div class="main-icon">🌐</div>
+                    <div class="secondary-icon">💫</div>
+                </div>
+                <div class="modern-title">CLIENT MATRIX</div>
+                <div class="modern-subtitle">360° Database</div>
+                <div class="modern-description">Ecosystem relacional</div>
+            </a>
+
+            <a href="/cl/vehiculos/" class="command-panel modern-panel">
+                <div class="modern-icon-container">
+                    <div class="main-icon">🚗</div>
+                    <div class="secondary-icon">⚡</div>
+                </div>
+                <div class="modern-title">FLEET CMD</div>
+                <div class="modern-subtitle">Vehicle Control</div>
+                <div class="modern-description">Sistema vehicular smart</div>
+            </a>
+
+            {% url 'chile:configuracion' as url_configuracion %}
+            <a href="{{ url_configuracion|default:'#' }}" class="command-panel modern-panel">
+                <div class="modern-icon-container">
+                    <div class="main-icon">⚙️</div>
+                    <div class="secondary-icon">💎</div>
+                </div>
+                <div class="modern-title">SYSTEM CORE</div>
+                <div class="modern-subtitle">Config Center</div>
+                <div class="modern-description">Configuración avanzada</div>
+            </a>
+        </div>
+    </div>
+
+    <!-- 📊 Mosaico de Windows - Dashboard Inteligente -->
+    <div class="space-container p-6 mt-6">
+        <h3 class="text-xl font-bold text-cyan-400 mb-4 console-text">📊 MOSAICO INTELIGENTE - WINDOWS STYLE</h3>
+
+        <div class="windows-grid">
+
+            <!-- Tile Grande - Gráfico Principal -->
+            <div class="windows-tile tile-large">
+                <div class="tile-header">
+                    <span class="tile-title">💹 INGRESOS OPERACIONALES</span>
+                    <span class="tile-live">●</span>
+                </div>
+                <div class="tile-content">
+                    <canvas id="chartIngresos" height="180"></canvas>
+                </div>
+            </div>
+
+            <!-- Tile Mediano - Servicios -->
+            <div class="windows-tile tile-medium">
+                <div class="tile-header">
+                    <span class="tile-title">⚙️ TOP SERVICIOS</span>
+                    <span class="tile-live">●</span>
+                </div>
+                <div class="tile-content">
+                    <canvas id="chartServicios" height="140"></canvas>
+                </div>
+            </div>
+
+            <!-- Tile Pequeño - Métricas -->
+            <div class="windows-tile tile-small">
+                <div class="tile-header">
+                    <span class="tile-title">📈 DOCS HOY</span>
+                </div>
+                <div class="tile-content metric-tile">
+                    <div class="metric-big">{{ documentos_hoy|default:0 }}</div>
+                    <div class="metric-small">+15% vs ayer</div>
+                </div>
+            </div>
+
+            <!-- Tile Pequeño - Clientes -->
+            <div class="windows-tile tile-small">
+                <div class="tile-header">
+                    <span class="tile-title">👥 CLIENTES</span>
+                </div>
+                <div class="tile-content metric-tile">
+                    <div class="metric-big">{{ clientes_atendidos_semana|default:0 }}</div>
+                    <div class="metric-small">Semana actual</div>
+                </div>
+            </div>
+
+            <!-- Tile Mediano - Técnicos -->
+            <div class="windows-tile tile-medium">
+                <div class="tile-header">
+                    <span class="tile-title">👨‍🔧 PRODUCTIVIDAD TÉCNICOS</span>
+                    <span class="tile-live">●</span>
+                </div>
+                <div class="tile-content">
+                    <canvas id="chartTecnicos" height="140"></canvas>
+                </div>
+            </div>
+
+            <!-- Tile Pequeño - Eficiencia -->
+            <div class="windows-tile tile-small">
+                <div class="tile-header">
+                    <span class="tile-title">🎯 EFICIENCIA</span>
+                </div>
+                <div class="tile-content metric-tile">
+                    <div class="metric-big">94%</div>
+                    <div class="metric-small">Conversión</div>
+                </div>
+            </div>
+
+            <!-- Tile Pequeño - Estado -->
+            <div class="windows-tile tile-small">
+                <div class="tile-header">
+                    <span class="tile-title">🔋 SISTEMA</span>
+                </div>
+                <div class="tile-content metric-tile">
+                    <div class="metric-big text-green-400">ONLINE</div>
+                    <div class="metric-small">Todos los módulos</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { x: { display: false }, y: { display: false } },
+        elements: { point: { radius: 3, hoverRadius: 5 } }
+    };
+
+    // Helpers por si vienen vacíos del contexto
+    const labelsMeses = {{ labels_meses|default:"[]"|safe }};
+    const ingresosMes = {{ ingresos_por_mes|default:"[]"|safe }};
+    const catServicios = {{ categorias_servicios|default:"[]"|safe }};
+    const datosServicios = {{ datos_servicios|default:"[]"|safe }};
+    const nombresTecnicos = {{ nombres_tecnicos|default:"[]"|safe }};
+    const rendimientoTecnicos = {{ rendimiento_tecnicos|default:"[]"|safe }};
+
+    // 📈 Ingresos
+    const ctxIngresos = document.getElementById('chartIngresos');
+    if (ctxIngresos && window.Chart) {
+        new Chart(ctxIngresos, {
+            type: 'line',
+            data: {
+                labels: labelsMeses,
+                datasets: [{
+                    data: ingresosMes,
+                    borderColor: '#00ffff',
+                    backgroundColor: 'rgba(0, 255, 255, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    borderWidth: 3,
+                    pointBackgroundColor: '#00ffff',
+                    pointBorderColor: '#ffffff'
+                }]
+            },
+            options: {
+                ...commonOptions,
+                scales: {
+                    x: { display: true, ticks: { color: '#00ffff', font: { size: 10 } }, grid: { display: false } },
+                    y: { display: true, ticks: { color: '#00ffff', font: { size: 10 } }, grid: { color: 'rgba(0, 255, 255, 0.1)', lineWidth: 1 } }
+                }
+            }
+        });
+    }
+
+    // 🔧 Servicios
+    const ctxServicios = document.getElementById('chartServicios');
+    if (ctxServicios && window.Chart) {
+        new Chart(ctxServicios, {
+            type: 'doughnut',
+            data: {
+                labels: catServicios,
+                datasets: [{
+                    data: datosServicios,
+                    backgroundColor: ['#00ffff', '#8a2be2', '#ffd700', '#00ff88'],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                ...commonOptions,
+                cutout: '60%',
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom',
+                        labels: { color: '#00ffff', font: { size: 10 }, boxWidth: 12, padding: 10 }
+                    }
+                }
+            }
+        });
+    }
+
+    // 👨‍🔧 Técnicos
+    const ctxTecnicos = document.getElementById('chartTecnicos');
+    if (ctxTecnicos && window.Chart) {
+        new Chart(ctxTecnicos, {
+            type: 'bar',
+            data: {
+                labels: nombresTecnicos,
+                datasets: [{
+                    data: rendimientoTecnicos,
+                    backgroundColor: ['rgba(0, 255, 255, 0.8)','rgba(138, 43, 226, 0.8)','rgba(255, 215, 0, 0.8)','rgba(0, 255, 136, 0.8)'],
+                    borderColor: ['#00ffff', '#8a2be2', '#ffd700', '#00ff88'],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                ...commonOptions,
+                scales: {
+                    x: { display: true, ticks: { color: '#00ffff', font: { size: 9 } }, grid: { display: false } },
+                    y: {
+                        display: true,
+                        ticks: { color: '#00ffff', font: { size: 9 }, callback: (v) => v + '%' },
+                        grid: { color: 'rgba(0, 255, 255, 0.1)', lineWidth: 1 },
+                        max: 100
+                    }
+                }
+            }
+        });
+    }
+
+    // Animaciones de mosaico
+    function animateCounters() {
+        const metrics = document.querySelectorAll('.metric-big');
+        metrics.forEach(metric => {
+            if (!metric.textContent.includes('%') && !metric.textContent.includes('ONLINE')) {
+                const target = parseInt(metric.textContent.replace(/[^\d]/g, '')) || 0;
+                if (target > 0) {
+                    let current = 0;
+                    const increment = Math.max(1, Math.floor(target / 30));
+                    const timer = setInterval(() => {
+                        current += increment;
+                        if (current >= target) {
+                            current = target;
+                            clearInterval(timer);
+                        }
+                        metric.textContent = current;
+                    }, 50);
+                }
+            }
+        });
+    }
+
+    function simulateRealTimeUpdate() {
+        const liveIndicators = document.querySelectorAll('.tile-live');
+        liveIndicators.forEach(indicator => {
+            indicator.style.opacity = indicator.style.opacity === '0.3' ? '1' : '0.3';
+        });
+    }
+
+    setTimeout(animateCounters, 500);
+    setInterval(simulateRealTimeUpdate, 2000);
+
+    const tiles = document.querySelectorAll('.windows-tile');
+    tiles.forEach(tile => {
+        tile.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.02) translateY(-2px)';
+        });
+        tile.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1) translateY(0)';
+        });
+    });
+});
+</script>
+{% endblock %}

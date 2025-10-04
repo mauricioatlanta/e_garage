@@ -61,7 +61,7 @@ body {
   letter-spacing: 0.5px;
   margin-bottom: 8px;
 }
-.form-control {
+.form-control, select, input {
   width: 100%;
   padding: 12px;
   background: rgba(0,230,208,0.1) !important;
@@ -70,7 +70,7 @@ body {
   color: #fff !important;
   font-size: 16px;
 }
-.form-control:focus {
+.form-control:focus, select:focus, input:focus {
   outline: none;
   border-color: #00e6d0 !important;
   background: rgba(0,230,208,0.15) !important;
@@ -166,15 +166,75 @@ body {
           {% endif %}
         </div>
 
+        <div class="form-group">
+          <label for="{{ form.marca.id_for_label }}">Marca</label>
+          {{ form.marca }}
+          {% if form.marca.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.marca.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.modelo.id_for_label }}">Modelo</label>
+          {{ form.modelo }}
+          {% if form.modelo.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.modelo.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.color.id_for_label }}">Color</label>
+          {{ form.color }}
+          {% if form.color.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.color.errors.0 }}</div>
+          {% endif %}
+          <!-- Campo para nuevo color (oculto por defecto) -->
+          <div id="color-nuevo-container" style="display: none;" class="mt-2">
+            <input type="text" 
+                   name="color_nuevo" 
+                   id="color_nuevo"
+                   placeholder="Ingresa el nombre del nuevo color"
+                   class="form-control"
+                   style="background: rgba(0,230,208,0.1) !important; border: 1px solid rgba(0,230,208,0.3) !important; color: #fff !important;">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.motor.id_for_label }}">Motor</label>
+          {{ form.motor }}
+          {% if form.motor.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.motor.errors.0 }}</div>
+          {% endif %}
+          <!-- Campo para nuevo motor (oculto por defecto) -->
+          <div id="motor-nuevo-container" style="display: none;" class="mt-2">
+            <input type="text" 
+                   name="motor_nuevo" 
+                   id="motor_nuevo"
+                   placeholder="Ingresa el nombre del nuevo motor"
+                   class="form-control"
+                   style="background: rgba(0,230,208,0.1) !important; border: 1px solid rgba(0,230,208,0.3) !important; color: #fff !important;">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.caja.id_for_label }}">Caja/Transmisión</label>
+          {{ form.caja }}
+          {% if form.caja.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.caja.errors.0 }}</div>
+          {% endif %}
+          <!-- Campo para nueva caja (oculto por defecto) -->
+          <div id="caja-nueva-container" style="display: none;" class="mt-2">
+            <input type="text" 
+                   name="caja_nuevo" 
+                   id="caja_nuevo"
+                   placeholder="Ingresa el nombre de la nueva caja/transmisión"
+                   class="form-control"
+                   style="background: rgba(0,230,208,0.1) !important; border: 1px solid rgba(0,230,208,0.3) !important; color: #fff !important;">
+          </div>
+        </div>
+
       </div>
 
-      <div class="form-group">
-        <label for="{{ form.observaciones.id_for_label }}">Observaciones</label>
-        {{ form.observaciones }}
-        {% if form.observaciones.errors %}
-          <div class="text-red-400 text-sm mt-1">{{ form.observaciones.errors.0 }}</div>
-        {% endif %}
-      </div>
 
       <div class="flex gap-3 mt-8 pt-6 border-t border-gray-600">
         <button type="submit" class="btn-futuristic">
@@ -190,4 +250,254 @@ body {
     </form>
   </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const marcaSelect = document.getElementById('id_marca');
+    const modeloSelect = document.getElementById('id_modelo');
+    
+    if (marcaSelect && modeloSelect) {
+        // Función para cargar modelos por marca
+        function cargarModelos(marcaId, modeloSeleccionado = null) {
+            // Limpiar opciones del modelo
+            modeloSelect.innerHTML = '<option value="">---------</option>';
+            
+            if (marcaId) {
+                // Mostrar loading
+                const loadingOption = document.createElement('option');
+                loadingOption.value = '';
+                loadingOption.textContent = 'Cargando modelos...';
+                modeloSelect.appendChild(loadingOption);
+                
+                // Hacer petición AJAX para obtener modelos de la marca
+                fetch(`/us/vehiculos/ajax/modelos-por-marca/?marca_id=${marcaId}`)
+                    .then(response => {
+                        console.log('Response status:', response.status);
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Modelos data:', data);
+                        // Limpiar opciones
+                        modeloSelect.innerHTML = '<option value="">---------</option>';
+                        
+                        // data es un array de objetos {id, nombre}
+                        if (Array.isArray(data)) {
+                            data.forEach(modelo => {
+                                const option = document.createElement('option');
+                                option.value = modelo.id;
+                                option.textContent = modelo.nombre;
+                                
+                                // Seleccionar el modelo si coincide
+                                if (modeloSeleccionado && modelo.id == modeloSeleccionado) {
+                                    option.selected = true;
+                                }
+                                
+                                modeloSelect.appendChild(option);
+                            });
+                        } else {
+                            console.error('Data is not an array:', data);
+                            modeloSelect.innerHTML = '<option value="">Error: formato de datos incorrecto</option>';
+                        }
+                        
+                        // Si hay un modelo seleccionado, cargar sus motores y cajas
+                        if (modeloSeleccionado) {
+                            const motorSelect = document.getElementById('id_motor');
+                            const cajaSelect = document.getElementById('id_caja');
+                            const motorActual = motorSelect ? motorSelect.value : null;
+                            const cajaActual = cajaSelect ? cajaSelect.value : null;
+                            cargarMotoresYCajas(modeloSeleccionado, motorActual, cajaActual);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error al cargar modelos:', error);
+                        modeloSelect.innerHTML = '<option value="">Error al cargar</option>';
+                    });
+            }
+        }
+        
+        // Función para cargar motores y cajas por modelo
+        function cargarMotoresYCajas(modeloId, motorSeleccionado = null, cajaSeleccionada = null) {
+            const motorSelect = document.getElementById('id_motor');
+            const cajaSelect = document.getElementById('id_caja');
+            
+            if (!motorSelect || !cajaSelect) return;
+            
+            // Obtener valores actuales si no se proporcionan
+            if (!motorSeleccionado) motorSeleccionado = motorSelect.value;
+            if (!cajaSeleccionada) cajaSeleccionada = cajaSelect.value;
+            
+            // Limpiar y mostrar loading en motores
+            motorSelect.innerHTML = '<option value="">Cargando motores...</option>';
+            cajaSelect.innerHTML = '<option value="">Cargando cajas...</option>';
+            
+            // Cargar motores
+            fetch(`/us/vehiculos/ajax/motores-por-modelo/?modelo_id=${modeloId}`)
+                .then(response => response.json())
+                .then(data => {
+                    motorSelect.innerHTML = '<option value="">---------</option>';
+                    data.results.forEach(motor => {
+                        const option = document.createElement('option');
+                        option.value = motor.id;
+                        option.textContent = motor.text;
+                        
+                        // Seleccionar el motor si coincide
+                        if (motorSeleccionado && motor.id == motorSeleccionado) {
+                            option.selected = true;
+                        }
+                        
+                        motorSelect.appendChild(option);
+                    });
+                    motorSelect.innerHTML += '<option value="__nuevo__">Agregar nuevo motor...</option>';
+                    
+                    // Si el valor seleccionado es __nuevo__, seleccionarlo
+                    if (motorSeleccionado === '__nuevo__') {
+                        motorSelect.value = '__nuevo__';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al cargar motores:', error);
+                    motorSelect.innerHTML = '<option value="">Error al cargar motores</option>';
+                });
+            
+            // Cargar cajas
+            fetch(`/us/vehiculos/ajax/cajas-por-modelo/?modelo_id=${modeloId}`)
+                .then(response => response.json())
+                .then(data => {
+                    cajaSelect.innerHTML = '<option value="">---------</option>';
+                    data.results.forEach(caja => {
+                        const option = document.createElement('option');
+                        option.value = caja.id;
+                        option.textContent = caja.text;
+                        
+                        // Seleccionar la caja si coincide
+                        if (cajaSeleccionada && caja.id == cajaSeleccionada) {
+                            option.selected = true;
+                        }
+                        
+                        cajaSelect.appendChild(option);
+                    });
+                    cajaSelect.innerHTML += '<option value="__nuevo__">Agregar nueva caja...</option>';
+                    
+                    // Si el valor seleccionado es __nuevo__, seleccionarlo
+                    if (cajaSeleccionada === '__nuevo__') {
+                        cajaSelect.value = '__nuevo__';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al cargar cajas:', error);
+                    cajaSelect.innerHTML = '<option value="">Error al cargar cajas</option>';
+                });
+        }
+        
+        // Event listener para cambio de marca
+        marcaSelect.addEventListener('change', function() {
+            cargarModelos(this.value);
+            // Limpiar motores y cajas cuando cambia la marca
+            const motorSelect = document.getElementById('id_motor');
+            const cajaSelect = document.getElementById('id_caja');
+            if (motorSelect) motorSelect.innerHTML = '<option value="">Selecciona un modelo primero</option>';
+            if (cajaSelect) cajaSelect.innerHTML = '<option value="">Selecciona un modelo primero</option>';
+        });
+        
+        // Event listener para cambio de modelo
+        modeloSelect.addEventListener('change', function() {
+            if (this.value) {
+                cargarMotoresYCajas(this.value);
+            } else {
+                // Limpiar motores y cajas si no hay modelo seleccionado
+                const motorSelect = document.getElementById('id_motor');
+                const cajaSelect = document.getElementById('id_caja');
+                if (motorSelect) motorSelect.innerHTML = '<option value="">Selecciona un modelo primero</option>';
+                if (cajaSelect) cajaSelect.innerHTML = '<option value="">Selecciona un modelo primero</option>';
+            }
+        });
+        
+        // Cargar modelos iniciales si ya hay una marca seleccionada
+        if (marcaSelect.value) {
+            cargarModelos(marcaSelect.value, modeloSelect.value);
+        }
+        
+        // Cargar motores y cajas iniciales si ya hay un modelo seleccionado
+        if (modeloSelect.value) {
+            cargarMotoresYCajas(modeloSelect.value);
+        }
+    }
+    
+    // Manejar campo de color
+    const colorSelect = document.getElementById('id_color');
+    const colorNuevoContainer = document.getElementById('color-nuevo-container');
+    const colorNuevoInput = document.getElementById('color_nuevo');
+    
+    if (colorSelect && colorNuevoContainer && colorNuevoInput) {
+        colorSelect.addEventListener('change', function() {
+            if (this.value === '__nuevo__') {
+                colorNuevoContainer.style.display = 'block';
+                colorNuevoInput.required = true;
+                colorNuevoInput.focus();
+            } else {
+                colorNuevoContainer.style.display = 'none';
+                colorNuevoInput.required = false;
+                colorNuevoInput.value = '';
+            }
+        });
+        
+        // Verificar estado inicial
+        if (colorSelect.value === '__nuevo__') {
+            colorNuevoContainer.style.display = 'block';
+            colorNuevoInput.required = true;
+        }
+    }
+    
+    // Manejar campo de motor
+    const motorSelect = document.getElementById('id_motor');
+    const motorNuevoContainer = document.getElementById('motor-nuevo-container');
+    const motorNuevoInput = document.getElementById('motor_nuevo');
+    
+    if (motorSelect && motorNuevoContainer && motorNuevoInput) {
+        motorSelect.addEventListener('change', function() {
+            if (this.value === '__nuevo__') {
+                motorNuevoContainer.style.display = 'block';
+                motorNuevoInput.required = true;
+                motorNuevoInput.focus();
+            } else {
+                motorNuevoContainer.style.display = 'none';
+                motorNuevoInput.required = false;
+                motorNuevoInput.value = '';
+            }
+        });
+        
+        // Verificar estado inicial
+        if (motorSelect.value === '__nuevo__') {
+            motorNuevoContainer.style.display = 'block';
+            motorNuevoInput.required = true;
+        }
+    }
+    
+    // Manejar campo de caja
+    const cajaSelect = document.getElementById('id_caja');
+    const cajaNuevaContainer = document.getElementById('caja-nueva-container');
+    const cajaNuevoInput = document.getElementById('caja_nuevo');
+    
+    if (cajaSelect && cajaNuevaContainer && cajaNuevoInput) {
+        cajaSelect.addEventListener('change', function() {
+            if (this.value === '__nuevo__') {
+                cajaNuevaContainer.style.display = 'block';
+                cajaNuevoInput.required = true;
+                cajaNuevoInput.focus();
+            } else {
+                cajaNuevaContainer.style.display = 'none';
+                cajaNuevoInput.required = false;
+                cajaNuevoInput.value = '';
+            }
+        });
+        
+        // Verificar estado inicial
+        if (cajaSelect.value === '__nuevo__') {
+            cajaNuevaContainer.style.display = 'block';
+            cajaNuevoInput.required = true;
+        }
+    }
+});
+</script>
+
 {% endblock %}

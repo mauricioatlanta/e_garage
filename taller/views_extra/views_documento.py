@@ -3,7 +3,7 @@ import json
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
-from taller.forms import DocumentoForm
+from taller.forms.documento_form import DocumentoForm
 from taller.models.documento import Documento
 from taller.models.lineas_documento import LineaRepuesto, LineaServicio
 from taller.models.tecnico import Tecnico
@@ -119,6 +119,7 @@ def crear_documento(request):
         {
             "form": form,
             "mecanicos": mecanicos,
+            "tecnicos": mecanicos,  # Alias para compatibilidad con templates
         },
     )
 

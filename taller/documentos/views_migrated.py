@@ -7,6 +7,7 @@ from decimal import Decimal
 
 from django.contrib.auth.decorators import login_required
 from django.db.models import DecimalField, ExpressionWrapper, F, Sum
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.generic import (
@@ -17,7 +18,7 @@ from django.views.generic import (
     UpdateView,
 )
 
-from taller.forms.documento import DocumentoForm
+from taller.forms.documento_form import DocumentoForm
 from taller.mixins import CountryLangTemplateMixin
 from taller.models import Documento, Tecnico
 
@@ -30,6 +31,17 @@ class DocumentoListView(CountryLangTemplateMixin, ListView):
     context_object_name = "documentos"
     base_template_name = "documentos/lista_documentos.html"
     paginate_by = 20
+
+    def get_template_names(self):
+        """Forzar template específico para US/EN"""
+        if self.request.path.startswith("/us/"):
+            template_name = "taller/us/en/documentos/lista_documentos.html"
+            print(f"[DEBUG] DocumentoListView - Using US/EN template: {template_name}")
+            return [template_name]
+        else:
+            template_names = super().get_template_names()
+            print(f"[DEBUG] DocumentoListView - Using default templates: {template_names}")
+            return template_names
 
     def get_queryset(self):
         """Filtrar documentos por empresa del usuario"""
@@ -96,12 +108,22 @@ class DocumentoListView(CountryLangTemplateMixin, ListView):
 
 
 @method_decorator(login_required, name="dispatch")
-class DocumentoCreateView(CountryLangTemplateMixin, CreateView):
+class DocumentoCreateView(CreateView):
     """Vista para crear documentos"""
 
     model = Documento
     form_class = DocumentoForm
-    base_template_name = "documentos/crear_documento.html"
+    
+    def get_template_names(self):
+        """Priorizar template US/EN si existe"""
+        if self.request.path.startswith("/us/"):
+            template_name = "taller/us/en/documentos/editar_documento_nuevo.html"
+            print(f"[DEBUG] DocumentoCreateView - Using US/EN template: {template_name}")
+            return [template_name]
+        else:
+            template_name = "taller/common/documentos/editar_documento_nuevo.html"
+            print(f"[DEBUG] DocumentoCreateView - Using common template: {template_name}")
+            return [template_name]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -113,19 +135,129 @@ class DocumentoCreateView(CountryLangTemplateMixin, CreateView):
         context.update(
             {
                 "mecanicos": mecanicos,
+                "tecnicos": mecanicos,  # Alias para compatibilidad con templates
                 "es_edicion": False,
                 "company_country": getattr(self.request, "company_country", None),
                 "today": timezone.now().date(),  # Agregar fecha actual
+                "template_name": self.get_template_names()[0],
+                "pais_emoji": "🇺🇸" if self.request.path.startswith("/us/") else "🇨🇱",
+                "empresa": empresa,
+                "total": 0,
+                "subtotal_repuestos": 0,
+                "subtotal_servicios": 0,
+                "subtotal_otros_servicios": 0,
+                "iva": 0,
+                "repuestos": [],
             }
         )
         return context
+    
+    def get_form_kwargs(self):
+        """Obtener argumentos para el formulario"""
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        kwargs["empresa"] = getattr(self.request.user, "empresa", None)
+        kwargs["country"] = "US" if self.request.path.startswith("/us/") else "CL"
+        return kwargs
 
+    def get_success_url(self):
+        """Redirigir a la lista de documentos después de crear uno exitosamente"""
+        if self.request.path.startswith("/us/"):
+            return reverse('documentos_us_en:lista_documentos')
+        else:
+            return reverse('documentos_cl_es:lista_documentos')
+    
     def form_valid(self, form):
+        print(f"[DEBUG DocumentoCreateView] form_valid llamado")
+        print(f"[DEBUG DocumentoCreateView] Cliente en form.cleaned_data: {form.cleaned_data.get('cliente', 'NO ENCONTRADO')}")
+        print(f"[DEBUG DocumentoCreateView] Cliente en form.instance: {getattr(form.instance, 'cliente', 'NO ENCONTRADO')}")
+        print(f"[DEBUG DocumentoCreateView] CSRF token: {self.request.POST.get('csrfmiddlewaretoken', 'NO ENCONTRADO')}")
+        
         form.instance.empresa = self.request.user.empresa
-        return super().form_valid(form)
+        
+        # Guardar el documento primero
+        response = super().form_valid(form)
+        
+        # Procesar items dinámicos después de guardar
+        self.procesar_items_dinamicos(form)
+        
+        # Agregar mensaje de éxito
+        from django.contrib import messages
+        messages.success(
+            self.request, 
+            f'Documento {form.instance.numero_documento} creado exitosamente para {form.instance.cliente.nombre}.'
+        )
+        
+        return response
+    
+    def form_invalid(self, form):
+        print(f"[DEBUG DocumentoCreateView] form_invalid llamado")
+        print(f"[DEBUG DocumentoCreateView] Errores: {form.errors}")
+        print(f"[DEBUG DocumentoCreateView] Datos POST: {self.request.POST}")
+        return super().form_invalid(form)
+
+    def procesar_items_dinamicos(self, form):
+        """Procesa los campos dinámicos de repuestos, servicios y otros servicios"""
+        documento = form.instance
+        
+        # Procesar repuestos dinámicos
+        self.procesar_repuestos_dinamicos(documento)
+        
+        # Procesar servicios dinámicos
+        self.procesar_servicios_dinamicos(documento)
+
+    def procesar_repuestos_dinamicos(self, documento):
+        """Procesa los repuestos agregados dinámicamente"""
+        from taller.models.lineas_documento import LineaRepuesto
+        
+        # Obtener datos del POST
+        codigos = self.request.POST.getlist("rep-0-codigo")
+        nombres = self.request.POST.getlist("rep-0-nombre")
+        cantidades = self.request.POST.getlist("rep-0-cantidad")
+        precios = self.request.POST.getlist("rep-0-precio_unitario")
+        
+        print(f"[DEBUG] Procesando repuestos: {len(codigos)} elementos")
+        
+        for i, codigo in enumerate(codigos):
+            if codigo and nombres[i] and cantidades[i] and precios[i]:
+                try:
+                    LineaRepuesto.objects.create(
+                        documento=documento,
+                        codigo=codigo,
+                        nombre=nombres[i],
+                        cantidad=int(cantidades[i]),
+                        precio_unitario=float(precios[i])
+                    )
+                    print(f"[DEBUG] Repuesto creado: {codigo} - {nombres[i]}")
+                except Exception as e:
+                    print(f"[DEBUG] Error creando repuesto: {e}")
+
+    def procesar_servicios_dinamicos(self, documento):
+        """Procesa los servicios agregados dinámicamente"""
+        from taller.models.lineas_documento import LineaServicio
+        
+        # Obtener datos del POST
+        nombres = self.request.POST.getlist("serv-0-nombre")
+        precios = self.request.POST.getlist("serv-0-precio_unitario")
+        
+        print(f"[DEBUG] Procesando servicios: {len(nombres)} elementos")
+        
+        for i, nombre in enumerate(nombres):
+            if nombre and precios[i]:
+                try:
+                    LineaServicio.objects.create(
+                        documento=documento,
+                        nombre=nombre,
+                        precio_unitario=float(precios[i]),
+                        cantidad=1
+                    )
+                    print(f"[DEBUG] Servicio creado: {nombre}")
+                except Exception as e:
+                    print(f"[DEBUG] Error creando servicio: {e}")
 
     def render_to_response(self, context, **response_kwargs):
-        return self.render_country_lang(self.request, context)
+        """Renderizar usando el template correcto"""
+        return super().render_to_response(context, **response_kwargs)
 
 
 @method_decorator(login_required, name="dispatch")
@@ -223,6 +355,17 @@ class DocumentoUpdateView(CountryLangTemplateMixin, UpdateView):
         subtotal_repuestos = sum(
             linea.precio_unitario * linea.cantidad for linea in repuestos
         )
+        subtotal_servicios = sum(
+            linea.precio_unitario * linea.cantidad for linea in servicios
+        )
+        subtotal_otros_servicios = sum(
+            getattr(otro, "precio_cliente", Decimal("0.00")) for otro in otros_servicios
+        )
+        
+        # Calcular totales
+        subtotal = subtotal_repuestos + subtotal_servicios + subtotal_otros_servicios
+        iva = subtotal * Decimal("0.19")
+        total = subtotal + iva
 
         # Cargar mecánicos activos del taller
         mecanicos = Tecnico.objects.filter(empresa=empresa, activo=True)
@@ -234,11 +377,21 @@ class DocumentoUpdateView(CountryLangTemplateMixin, UpdateView):
                 "repuestos": repuestos,
                 "otros_servicios": otros_servicios,
                 "subtotal_repuestos": subtotal_repuestos,
+                "subtotal_servicios": subtotal_servicios,
+                "subtotal_otros_servicios": subtotal_otros_servicios,
+                "subtotal": subtotal,
+                "iva": iva,
+                "total": total,
                 "mecanicos": mecanicos,
+                "tecnicos": mecanicos,  # Alias para compatibilidad con templates
                 "es_edicion": True,
             }
         )
         return context
+
+    def get_success_url(self):
+        """Redirigir a la vista del documento después de editarlo exitosamente"""
+        return reverse('documentos_cl_es:ver_documento', kwargs={'pk': self.object.pk})
 
     def render_to_response(self, context, **response_kwargs):
         return self.render_country_lang(self.request, context)

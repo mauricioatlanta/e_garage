@@ -1,0 +1,162 @@
+[
+  {
+    "model": "taller.preciosuscripcion",
+    "pk": 1,
+    "fields": {
+      "tipo_plan": "mensual",
+      "pais": "CL",
+      "precio": "25000.00",
+      "moneda": "CLP",
+      "activo": true,
+      "nombre_plan": "Plan Mensual Chile",
+      "descripcion": "Plan mensual básico para talleres en Chile. Ideal para pequeños talleres que están comenzando.",
+      "documentos_ilimitados": true,
+      "usuarios_incluidos": 5,
+      "soporte_prioritario": true,
+      "reportes_avanzados": false,
+      "diagnostico_ia": false,
+      "api_incluida": false,
+      "multisucursal": false
+    }
+  },
+  {
+    "model": "taller.preciosuscripcion",
+    "pk": 2,
+    "fields": {
+      "tipo_plan": "semestral",
+      "pais": "CL",
+      "precio": "120000.00",
+      "moneda": "CLP",
+      "activo": true,
+      "nombre_plan": "Plan Semestral Chile",
+      "descripcion": "Plan semestral con descuento del 20%. Perfecto para talleres que buscan estabilidad.",
+      "documentos_ilimitados": true,
+      "usuarios_incluidos": 8,
+      "soporte_prioritario": true,
+      "reportes_avanzados": true,
+      "diagnostico_ia": true,
+      "api_incluida": false,
+      "multisucursal": false
+    }
+  },
+  {
+    "model": "taller.preciosuscripcion",
+    "pk": 3,
+    "fields": {
+      "tipo_plan": "anual",
+      "pais": "CL",
+      "precio": "200000.00",
+      "moneda": "CLP",
+      "activo": true,
+      "nombre_plan": "Plan Anual Chile",
+      "descripcion": "Plan anual con descuento del 33%. La mejor opción para talleres establecidos.",
+      "documentos_ilimitados": true,
+      "usuarios_incluidos": 15,
+      "soporte_prioritario": true,
+      "reportes_avanzados": true,
+      "diagnostico_ia": true,
+      "api_incluida": true,
+      "multisucursal": true
+    }
+  },
+  {
+    "model": "taller.preciosuscripcion",
+    "pk": 4,
+    "fields": {
+      "tipo_plan": "mensual",
+      "pais": "US",
+      "precio": "25.99",
+      "moneda": "USD",
+      "activo": true,
+      "nombre_plan": "Monthly Plan USA",
+      "descripcion": "Monthly plan for US workshops. Perfect for small shops getting started.",
+      "documentos_ilimitados": true,
+      "usuarios_incluidos": 5,
+      "soporte_prioritario": true,
+      "reportes_avanzados": false,
+      "diagnostico_ia": false,
+      "api_incluida": false,
+      "multisucursal": false
+    }
+  },
+  {
+    "model": "taller.preciosuscripcion",
+    "pk": 5,
+    "fields": {
+      "tipo_plan": "semestral",
+      "pais": "US",
+      "precio": "119.99",
+      "moneda": "USD",
+      "activo": true,
+      "nombre_plan": "Semi-Annual Plan USA",
+      "descripcion": "6-month plan with 23% discount. Great for established workshops.",
+      "documentos_ilimitados": true,
+      "usuarios_incluidos": 8,
+      "soporte_prioritario": true,
+      "reportes_avanzados": true,
+      "diagnostico_ia": true,
+      "api_incluida": false,
+      "multisucursal": false
+    }
+  },
+  {
+    "model": "taller.preciosuscripcion",
+    "pk": 6,
+    "fields": {
+      "tipo_plan": "anual",
+      "pais": "US",
+      "precio": "199.99",
+      "moneda": "USD",
+      "activo": true,
+      "nombre_plan": "Annual Plan USA",
+      "descripcion": "Annual plan with 36% discount. Best value for growing workshops.",
+      "documentos_ilimitados": true,
+      "usuarios_incluidos": 15,
+      "soporte_prioritario": true,
+      "reportes_avanzados": true,
+      "diagnostico_ia": true,
+      "api_incluida": true,
+      "multisucursal": true
+    }
+  },
+  {
+    "model": "taller.preciosuscripcion",
+    "pk": 7,
+    "fields": {
+      "tipo_plan": "mensual",
+      "pais": "CL",
+      "precio": "20000.00",
+      "moneda": "CLP",
+      "activo": false,
+      "nombre_plan": "Plan Mensual Chile (Histórico)",
+      "descripcion": "Precio histórico del plan mensual (antes del aumento).",
+      "documentos_ilimitados": true,
+      "usuarios_incluidos": 5,
+      "soporte_prioritario": true,
+      "reportes_avanzados": false,
+      "diagnostico_ia": false,
+      "api_incluida": false,
+      "multisucursal": false
+    }
+  },
+  {
+    "model": "taller.preciosuscripcion",
+    "pk": 8,
+    "fields": {
+      "tipo_plan": "mensual",
+      "pais": "US",
+      "precio": "19.99",
+      "moneda": "USD",
+      "activo": false,
+      "nombre_plan": "Monthly Plan USA (Histórico)",
+      "descripcion": "Historical monthly plan price (before increase).",
+      "documentos_ilimitados": true,
+      "usuarios_incluidos": 5,
+      "soporte_prioritario": true,
+      "reportes_avanzados": false,
+      "diagnostico_ia": false,
+      "api_incluida": false,
+      "multisucursal": false
+    }
+  }
+]

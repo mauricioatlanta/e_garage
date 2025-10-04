@@ -91,12 +91,15 @@ class ClienteAutocomplete(autocomplete.Select2QuerySetView):
             return Cliente.objects.none()
 
         qs = Cliente.objects.filter(empresa=empresa)
-        if self.q:
+        
+        # Obtener el término de búsqueda
+        q = self.request.GET.get('q', '')
+        if q:
             qs = qs.filter(
-                Q(nombre__icontains=self.q)
-                | Q(apellido__icontains=self.q)
-                | Q(email__icontains=self.q)
-                | Q(telefono__icontains=self.q)
+                Q(nombre__icontains=q)
+                | Q(apellido__icontains=q)
+                | Q(email__icontains=q)
+                | Q(telefono__icontains=q)
             )
         return qs.order_by("nombre", "apellido")
 
@@ -131,12 +134,14 @@ class VehiculoAutocomplete(autocomplete.Select2QuerySetView):
             except (TypeError, ValueError):
                 return Vehiculo.objects.none()
 
-        if self.q:
+        # Obtener el término de búsqueda
+        q = self.request.GET.get('q', '')
+        if q:
             qs = qs.filter(
-                Q(patente__icontains=self.q)
-                | Q(modelo__nombre__icontains=self.q)
-                | Q(marca__nombre__icontains=self.q)
-                | Q(vin__icontains=self.q)
+                Q(patente__icontains=q)
+                | Q(modelo__nombre__icontains=q)
+                | Q(marca__nombre__icontains=q)
+                | Q(vin__icontains=q)
             )
 
         return qs.order_by("patente")

@@ -103,10 +103,8 @@ def precios(request):
     elif request.GET.get("country"):
         pais_usuario = request.GET.get("country").upper()
 
-    # Obtener precios según el país
-    planes_precios = PrecioSuscripcion.objects.filter(
-        pais=pais_usuario, activo=True
-    ).order_by("precio")
+    # Obtener precios según el país usando el nuevo manager
+    planes_precios = PrecioSuscripcion.objects.activos().para_pais(pais_usuario).order_by("precio")
 
     # Si no hay precios configurados, usar valores por defecto
     if not planes_precios.exists():

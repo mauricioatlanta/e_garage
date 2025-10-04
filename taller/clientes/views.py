@@ -242,6 +242,62 @@ from django.views.decorators.http import require_http_methods
 
 
 @require_http_methods(["POST"])
+def agregar_ciudad_usa(request):
+    """
+    Vista AJAX para agregar una nueva ciudad a un estado de USA
+    """
+    if not request.user.is_authenticated:
+        return JsonResponse({"success": False, "error": "User not authenticated"})
+
+    # Verificar que el usuario tiene empresa
+    empresa = getattr(request.user, "empresa", None)
+    if not empresa:
+        return JsonResponse({"success": False, "error": "User without company"})
+
+    try:
+        data = json.loads(request.body)
+        nombre_ciudad = data.get("nombre", "").strip()
+        estado_id = data.get("estado_id")
+
+        if not nombre_ciudad:
+            return JsonResponse({"success": False, "error": "City name is required"})
+
+        if not estado_id:
+            return JsonResponse({"success": False, "error": "State is required"})
+
+        # Verificar que el estado existe
+        try:
+            from taller.models.ubicacion import Estado
+            estado = Estado.objects.get(id=estado_id)
+        except Estado.DoesNotExist:
+            return JsonResponse({"success": False, "error": "State not found"})
+
+        # Verificar si la ciudad ya existe en ese estado
+        if Ciudad.objects.filter(nombre__iexact=nombre_ciudad, estado=estado).exists():
+            return JsonResponse({"success": False, "error": "City already exists in this state"})
+
+        # Crear la nueva ciudad
+        nueva_ciudad = Ciudad.objects.create(
+            nombre=nombre_ciudad,
+            estado=estado
+        )
+
+        return JsonResponse({
+            "success": True,
+            "ciudad": {
+                "id": nueva_ciudad.id,
+                "nombre": nueva_ciudad.nombre
+            }
+        })
+
+    except json.JSONDecodeError:
+        return JsonResponse({"success": False, "error": "Invalid JSON data"})
+    except Exception as e:
+        print(f"[ERROR] Error creating USA city: {e}")
+        return JsonResponse({"success": False, "error": "Error creating city"})
+
+
+@require_http_methods(["POST"])
 def agregar_ciudad(request):
     """
     Vista AJAX para agregar una nueva ciudad a una región

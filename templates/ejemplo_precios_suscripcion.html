@@ -1,0 +1,158 @@
+{% load country_url %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Precios de Suscripción - eGarage</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-bold text-gray-900 mb-4">
+                    Planes de Suscripción
+                </h1>
+                <p class="text-xl text-gray-600">
+                    Elige el plan que mejor se adapte a tu taller
+                </p>
+            </div>
+
+            <!-- Detector de país -->
+            <div class="mb-8 text-center">
+                <div class="inline-flex items-center bg-white rounded-lg shadow-md p-4">
+                    <span class="text-sm text-gray-600 mr-2">Mostrando precios para:</span>
+                    {% if empresa.pais == 'US' %}
+                        <span class="text-lg font-semibold text-blue-600">🇺🇸 Estados Unidos</span>
+                    {% else %}
+                        <span class="text-lg font-semibold text-red-600">🇨🇱 Chile</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Grid de planes -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {% for plan in planes %}
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                    <!-- Header del plan -->
+                    <div class="bg-gradient-to-r from-blue-600 to-purple-600 p-6 text-white">
+                        <h3 class="text-2xl font-bold mb-2">
+                            {{ plan.get_tipo_plan_display }}
+                        </h3>
+                        <div class="text-sm opacity-90">
+                            {{ plan.get_pais_display }}
+                        </div>
+                    </div>
+
+                    <!-- Precio -->
+                    <div class="p-6 text-center border-b">
+                        <div class="text-4xl font-bold text-gray-900 mb-2">
+                            {{ plan.precio_formateado }}
+                        </div>
+                        <div class="text-sm text-gray-500">
+                            {% if plan.tipo_plan == 'mensual' %}
+                                por mes
+                            {% elif plan.tipo_plan == 'semestral' %}
+                                por 6 meses
+                            {% else %}
+                                por año
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Características -->
+                    <div class="p-6">
+                        <h4 class="font-semibold text-gray-900 mb-4">Características incluidas:</h4>
+                        <ul class="space-y-3">
+                            {% for caracteristica in plan.caracteristicas_list %}
+                            <li class="flex items-center">
+                                <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                                <span class="text-gray-700">{{ caracteristica }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <!-- Botón de acción -->
+                    <div class="p-6 pt-0">
+                        <button class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200">
+                            {% if plan.tipo_plan == 'mensual' %}
+                                Suscribirse Mensual
+                            {% elif plan.tipo_plan == 'semestral' %}
+                                Suscribirse Semestral
+                            {% else %}
+                                Suscribirse Anual
+                            {% endif %}
+                        </button>
+                    </div>
+
+                    <!-- Badge de descuento -->
+                    {% if plan.tipo_plan == 'anual' %}
+                    <div class="absolute top-4 right-4">
+                        <span class="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                            -33% OFF
+                        </span>
+                    </div>
+                    {% elif plan.tipo_plan == 'semestral' %}
+                    <div class="absolute top-4 right-4">
+                        <span class="bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                            -20% OFF
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+                {% empty %}
+                <div class="col-span-full text-center py-12">
+                    <div class="text-gray-500 text-lg">
+                        No hay planes disponibles para tu país.
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Información adicional -->
+            <div class="mt-12 bg-white rounded-lg shadow-md p-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">¿Por qué elegir eGarage?</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="font-semibold text-gray-900 mb-2">Rápido y Eficiente</h3>
+                        <p class="text-gray-600 text-sm">Gestión completa de tu taller en minutos, no horas.</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="font-semibold text-gray-900 mb-2">Soporte 24/7</h3>
+                        <p class="text-gray-600 text-sm">Asistencia técnica cuando la necesites.</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="font-semibold text-gray-900 mb-2">Datos Seguros</h3>
+                        <p class="text-gray-600 text-sm">Tus datos están protegidos con encriptación de grado bancario.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="mt-12 text-center text-gray-500 text-sm">
+                <p>¿Tienes preguntas? <a href="mailto:soporte@egarage.com" class="text-blue-600 hover:underline">Contáctanos</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

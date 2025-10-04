@@ -12,37 +12,53 @@ from .models import CategoriaServicio, Servicio, SubcategoriaServicio
 def servicios_menu(request):
     # Obtener empresa del usuario
     empresa = getattr(request.user, "empresa", None)
+    
+    # Obtener país e idioma del request
+    country_code = empresa.pais if empresa else "CL"
+    lang = get_language() or "es"
 
     # Obtener servicios con filtros básicos
     servicios = (
         Servicio.objects.filter(empresa=empresa) if empresa else Servicio.objects.none()
     )
-    categorias = CategoriaServicio.objects.all()
-    subcategorias = SubcategoriaServicio.objects.all()
+    
+    # Filtrar categorías por país
+    categorias = CategoriaServicio.objects.filter(country=country_code).prefetch_related('names')
+    subcategorias = SubcategoriaServicio.objects.filter(country=country_code).prefetch_related('names')
+    
+    # Agrupar servicios por categoría para mejor organización
+    servicios_por_categoria = {}
+    for categoria in categorias:
+        servicios_cat = servicios.filter(categoria=categoria).select_related('subcategoria')
+        if servicios_cat.exists():
+            servicios_por_categoria[categoria] = servicios_cat
 
     # Estadísticas para el dashboard
     stats = {
         "total_servicios": servicios.count(),
         "total_categorias": categorias.count(),
         "total_subcategorias": subcategorias.count(),
+        "categorias_con_servicios": len(servicios_por_categoria),
     }
 
     context = {
         "servicios": servicios[:50],  # Limitar para performance inicial
+        "servicios_por_categoria": servicios_por_categoria,
         "categorias": categorias,
         "subcategorias": subcategorias,
         "stats": stats,
         "empresa": empresa,
+        "country_code": country_code,
+        "language": lang,
     }
 
-    # Obtener país e idioma del request
-    country = getattr(request.user, "empresa", None)
-    country_code = country.pais if country else "CL"
-    lang = get_language() or "es"
-
-    template_name = select_country_lang_template(
-        "servicios/servicios_menu.html", country_code, lang
-    )
+    # Para usuarios de USA, usar template específico
+    if country_code == "US":
+        template_name = "taller/us/en/servicios/servicios_menu.html"
+    else:
+        template_name = select_country_lang_template(
+            "servicios/servicios_menu.html", country_code, lang
+        )
     return render(request, template_name, context)
 
 

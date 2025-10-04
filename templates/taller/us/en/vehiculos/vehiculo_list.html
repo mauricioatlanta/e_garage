@@ -3,6 +3,10 @@
 {% load country_url %}
 
 {% block content %}
+{# Depuración visual: solo en DEBUG #}
+{% if debug %}
+  <div style="position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; font-size: 100px; color: yellow; text-shadow: 0 0 20px yellow;">❌</div>
+{% endif %}
 <!-- Fondo animado -->
 <div class="fixed inset-0 overflow-hidden pointer-events-none">
   <div class="absolute inset-0 bg-gradient-to-br from-[#0a0a0a] via-[#0d1117] to-[#0f172a]"></div>
@@ -30,8 +34,14 @@
           </div>
         </div>
 
-        <a href="/us/vehiculos/crear/"
-           class="inline-flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600/20 to-green-600/20 border border-emerald-400/40 text-emerald-300 hover:from-emerald-500/30 hover:to-green-500/30 hover:text-emerald-200 transition-all duration-300">
+        {% if request.path|slice:":4" == "/us/" %}
+          {% url 'usa:taller:vehiculos:crear_vehiculo' as url_crear_vehiculo %}
+        {% else %}
+          {% url 'chile:taller:vehiculos:crear_vehiculo' as url_crear_vehiculo %}
+        {% endif %}
+        <a href="{{ url_crear_vehiculo }}"
+           class="inline-flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600/20 to-green-600/20 border border-emerald-400/40 text-emerald-300 hover:from-emerald-500/30 hover:to-green-500/30 hover:text-emerald-200 transition-all duration-300"
+           aria-label="{% trans 'Add new vehicle' %}">
           <span>➕</span>
           <span class="hidden sm:inline">{% trans "Add Vehicle" %}</span>
         </a>
@@ -44,6 +54,15 @@
     {% if vehiculos %}
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {% for vehiculo in vehiculos %}
+          {# Generar URLs correctamente según país #}
+          {% if request.path|slice:":4" == "/us/" %}
+            {% url 'usa:taller:vehiculos:ver_vehiculo' vehiculo.pk as url_ver %}
+            {% url 'usa:taller:vehiculos:editar_vehiculo' vehiculo.pk as url_edit %}
+          {% else %}
+            {% url 'chile:taller:vehiculos:ver_vehiculo' vehiculo.pk as url_ver %}
+            {% url 'chile:taller:vehiculos:editar_vehiculo' vehiculo.pk as url_edit %}
+          {% endif %}
+          
           <div class="relative group">
             <div class="absolute -inset-1 rounded-xl bg-gradient-to-r from-emerald-500/20 via-lime-500/20 to-green-500/20 blur-xl group-hover:opacity-100 opacity-0 transition-opacity duration-300"></div>
             <div class="relative rounded-xl border border-emerald-400/30 bg-gradient-to-r from-[#0d1117]/90 to-[#111827]/90 backdrop-blur-sm p-6 hover:border-emerald-400/50 transition-all duration-300">
@@ -54,20 +73,22 @@
                   </div>
                   <div>
                     <h3 class="text-lg font-bold text-emerald-300">
-                      {{ vehiculo.marca_texto|default:vehiculo.marca.nombre|default:"Unknown" }} {{ vehiculo.modelo_texto|default:vehiculo.modelo.nombre|default:"Model" }}
+                      {{ vehiculo.marca_texto|default:vehiculo.marca.nombre|default:"-" }} {{ vehiculo.modelo_texto|default:vehiculo.modelo.nombre|default:"-" }}
                     </h3>
                     <p class="text-gray-400 text-sm">{{ vehiculo.anio|default:"N/A" }}</p>
                   </div>
                 </div>
                 <div class="flex space-x-2">
-                  <a href="/us/vehiculos/{{ vehiculo.pk }}/"
+                  <a href="{{ url_ver }}"
                      class="p-2 rounded-lg bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border border-cyan-400/40 text-cyan-300 hover:from-cyan-500/30 hover:to-blue-500/30 transition-all duration-200"
-                     title="{% trans 'View Details' %}">
+                     title="{% trans 'View Details' %}"
+                     aria-label="{% trans 'View vehicle details' %}">
                     👁️
                   </a>
-                  <a href="/us/vehiculos/{{ vehiculo.pk }}/editar/"
+                  <a href="{{ url_edit }}"
                      class="p-2 rounded-lg bg-gradient-to-r from-orange-600/20 to-yellow-600/20 border border-orange-400/40 text-orange-300 hover:from-orange-500/30 hover:to-yellow-500/30 transition-all duration-200"
-                     title="{% trans 'Edit' %}">
+                     title="{% trans 'Edit' %}"
+                     aria-label="{% trans 'Edit vehicle' %}">
                     ✏️
                   </a>
                 </div>
@@ -87,7 +108,7 @@
                 {% if vehiculo.color %}
                   <div class="flex items-center space-x-2 text-sm">
                     <span class="text-gray-400">🎨</span>
-                    <span class="text-gray-300">{{ vehiculo.color }}</span>
+                    <span class="text-gray-300">{{ vehiculo.color.nombre|default:"-" }}</span>
                   </div>
                 {% endif %}
                 {% if vehiculo.vin %}
@@ -108,8 +129,14 @@
         </div>
         <h3 class="text-xl font-bold text-gray-300 mb-2">{% trans "No vehicles found" %}</h3>
         <p class="text-gray-400 mb-6">{% trans "Start by adding your first vehicle to the system" %}</p>
-        <a href="/us/vehiculos/crear/"
-           class="inline-flex items-center space-x-2 px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-600/20 to-green-600/20 border border-emerald-400/40 text-emerald-300 hover:from-emerald-500/30 hover:to-green-500/30 hover:text-emerald-200 transition-all duration-300">
+        {% if request.path|slice:":4" == "/us/" %}
+          {% url 'usa:taller:vehiculos:crear_vehiculo' as url_crear_vehiculo_empty %}
+        {% else %}
+          {% url 'chile:taller:vehiculos:crear_vehiculo' as url_crear_vehiculo_empty %}
+        {% endif %}
+        <a href="{{ url_crear_vehiculo_empty }}"
+           class="inline-flex items-center space-x-2 px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-600/20 to-green-600/20 border border-emerald-400/40 text-emerald-300 hover:from-emerald-500/30 hover:to-green-500/30 hover:text-emerald-200 transition-all duration-300"
+           aria-label="{% trans 'Add your first vehicle' %}">
           <span>➕</span>
           <span>{% trans "Add First Vehicle" %}</span>
         </a>
@@ -117,4 +144,13 @@
     {% endif %}
   </div>
 </div>
+
+<style>
+/* Respetar preferencia de movimiento reducido (accesibilidad) */
+@media (prefers-reduced-motion: reduce) {
+  .animate-ping, .animate-pulse, .animate-bounce {
+    animation: none !important;
+  }
+}
+</style>
 {% endblock %}

@@ -1,0 +1,1046 @@
+{% extends "taller/common/documentos/base_documento.html" %}
+
+{% load static %}
+{% load humanize %}
+{% load country_url %}
+
+
+{% block documento_content %}
+<form method="post" id="document-form" class="max-w-7xl mx-auto">
+  {% csrf_token %}
+
+  <!-- Campos ocultos requeridos -->
+  <input type="hidden" name="empresa" value="{{ empresa.id }}">
+  <input type="hidden" name="correlativo" value="{{ object.correlativo }}">
+  <input type="hidden" name="moneda" value="{{ object.moneda }}">
+  <input type="hidden" name="country" value="{{ object.country }}">
+  <input type="hidden" name="neto_repuestos" id="neto_repuestos" value="{{ subtotal_repuestos }}">
+  <input type="hidden" name="neto_servicios" id="neto_servicios" value="{{ subtotal_servicios }}">
+  <input type="hidden" name="neto_otros_servicios" id="neto_otros_servicios" value="{{ subtotal_otros_servicios }}">
+  <input type="hidden" name="descuento" id="descuento_total" value="{{ object.descuento }}">
+  <input type="hidden" name="tax_rate_applied" id="tax_rate_applied" value="0.19">
+  <input type="hidden" name="tax_amount" id="tax_amount" value="{{ iva }}">
+  <input type="hidden" name="total" id="total_documento" value="{{ total }}">
+  <input type="hidden" name="created_at" value="{{ object.created_at|date:'Y-m-d' }}">
+
+  <!-- Mensajes del sistema -->
+  {% if messages %}
+  {% for message in messages %}
+  <div class="alert {{ message.tags }} bg-{% if message.tags == 'error' %}red{% elif message.tags == 'success' %}green{% else %}blue{% endif %}-900/50 border border-{% if message.tags == 'error' %}red{% elif message.tags == 'success' %}green{% else %}blue{% endif %}-400 rounded-xl p-4 mb-6">
+    <div class="text-{% if message.tags == 'error' %}red{% elif message.tags == 'success' %}green{% else %}blue{% endif %}-200 font-semibold">{{ message }}</div>
+  </div>
+  {% endfor %}
+  {% endif %}
+
+  <!-- Header del formulario -->
+  <div class="bg-gray-800/50 backdrop-blur-lg rounded-xl border border-cyan-400/30 p-6 mb-6">
+    <h1 class="text-3xl font-bold text-cyan-200 mb-2">
+      {% block form_header_title %}✏️ Editar Documento{% endblock %}
+    </h1>
+    <p class="text-cyan-300">
+      {% block form_header_subtitle %}Modificando: {{ object.numero_documento }} - {{ object.get_tipo_display }}{% endblock %}
+    </p>
+    <!-- Información del documento -->
+    <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+      {% block form_header_totals %}
+      <div class="p-3 bg-blue-900/50 border border-blue-400 rounded">
+        <p class="text-blue-200 text-sm">
+          <strong>💰 Total Documento:</strong><br>
+          ${{ total|floatformat:0 }}
+        </p>
+      </div>
+      <div class="p-3 bg-green-900/50 border border-green-400 rounded">
+        <p class="text-green-200 text-sm">
+          <strong>🔧 {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Spare Parts{% else %}Repuestos{% endif %}:</strong><br>
+          ${{ subtotal_repuestos|floatformat:0 }} ({{ repuestos|length }} items)
+        </p>
+      </div>
+      <div class="p-3 bg-purple-900/50 border border-purple-400 rounded">
+        <p class="text-purple-200 text-sm">
+          <strong>📊 Estado:</strong><br>
+          {{ object.get_estado_pago_display }} - {{ object.get_estado_display }}
+        </p>
+      </div>
+      {% endblock %}
+    </div>
+  </div>
+
+  <!-- Información básica del documento -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+    <!-- Tipo de documento -->
+    <div>
+      <label class="form-label">{% block field_label_tipo %}{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Document Type{% else %}Tipo de Documento{% endif %}{% endblock %}</label>
+      {{ form.tipo }}
+      {% if form.tipo.errors %}
+        <div class="text-red-400 text-sm mt-1">{{ form.tipo.errors.0 }}</div>
+      {% endif %}
+    </div>
+
+    <!-- Estado de pago -->
+    <div>
+      <label class="form-label">{% block field_label_estado_pago %}{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Payment Status{% else %}Estado de Pago{% endif %}{% endblock %}</label>
+      {{ form.estado_pago }}
+      {% if form.estado_pago.errors %}
+        <div class="text-red-400 text-sm mt-1">{{ form.estado_pago.errors.0 }}</div>
+      {% endif %}
+    </div>
+
+    <!-- Número (readonly) -->
+    <div>
+      <label class="form-label">{% block field_label_numero %}{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Number{% else %}Número{% endif %}{% endblock %}</label>
+      <div class="form-control w-full bg-gray-800 text-cyan-300 font-mono text-center py-3" id="id_numero">
+        {{ object.numero_documento }}
+      </div>
+      <input type="hidden" name="numero_documento" id="numero_documento" value="{{ object.numero_documento }}">
+      <input type="hidden" name="numero_documento_db" id="numero_documento_db" value="{{ object.numero_documento_db }}">
+    </div>
+  </div>
+
+  <!-- Cliente y Vehículo -->
+  <div class="space-y-4">
+    <label class="form-label">{% block field_label_cliente %}{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Customer{% else %}Cliente{% endif %}{% endblock %}</label>
+    <div class="relative">
+      {{ form.cliente }}
+      {% if form.cliente.errors %}
+        <div class="text-red-400 text-sm mt-1">{{ form.cliente.errors.0 }}</div>
+      {% endif %}
+    </div>
+    
+    <!-- Campo oculto de respaldo para cliente -->
+    <input type="hidden" id="cliente_backup" name="cliente_backup" value="{{ object.cliente.id }}">
+
+    <!-- Información del cliente seleccionado -->
+    <div id="cliente-info" class="p-3 bg-cyan-900/20 border border-cyan-400 rounded-lg">
+      <div class="text-cyan-200 text-sm">
+        <strong id="cliente-nombre">{{ object.cliente.nombre }} {{ object.cliente.apellido }}</strong><br>
+        <span id="cliente-email">{{ object.cliente.email|default:"Sin email" }}</span><br>
+        <span id="cliente-telefono">{{ object.cliente.telefono|default:"Sin teléfono" }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vehículo -->
+  <div class="mt-4">
+    <label class="form-label">{% block field_label_vehicle %}{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Vehicle{% else %}Vehículo{% endif %}{% endblock %}</label>
+    {{ form.vehiculo }}
+    {% if form.vehiculo.errors %}
+      <div class="text-red-400 text-sm mt-1">{{ form.vehiculo.errors.0 }}</div>
+    {% endif %}
+  </div>
+
+  <!-- Técnico responsable -->
+  <div class="mt-4">
+    <label class="form-label">{% block field_label_tech %}{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Assigned Technician{% else %}Técnico Responsable{% endif %}{% endblock %}</label>
+    {{ form.tecnico_responsable }}
+    {% if form.tecnico_responsable.errors %}
+      <div class="text-red-400 text-sm mt-1">{{ form.tecnico_responsable.errors.0 }}</div>
+    {% endif %}
+  </div>
+
+  <!-- Fecha de emisión -->
+  <div class="mt-4">
+    <label class="form-label">{% block field_label_issue_date %}{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Issue Date{% else %}Fecha de Emisión{% endif %}{% endblock %}</label>
+    {{ form.fecha_emision }}
+    {% if form.fecha_emision.errors %}
+      <div class="text-red-400 text-sm mt-1">{{ form.fecha_emision.errors.0 }}</div>
+    {% endif %}
+  </div>
+
+  <!-- Kilometraje -->
+  <div class="mt-4">
+    <label class="form-label">{% block field_label_mileage %}{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Mileage{% else %}Kilometraje{% endif %}{% endblock %}</label>
+    {{ form.kilometraje }}
+    {% if form.kilometraje.errors %}
+      <div class="text-red-400 text-sm mt-1">{{ form.kilometraje.errors.0 }}</div>
+    {% endif %}
+  </div>
+
+  <!-- Checkboxes de IVA -->
+  <div class="mb-4">
+    <div class="flex flex-wrap gap-6 items-center">
+      <label class="flex items-center text-cyan-200">
+        <input type="checkbox" id="id_apply_vat" name="apply_vat" class="form-check-input" 
+               {% if object.apply_vat %}checked{% endif %}>
+        <span class="ml-2">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Apply Tax (19%){% else %}Aplicar IVA (19%){% endif %}</span>
+      </label>
+      <label class="flex items-center text-cyan-200">
+        <input type="checkbox" id="id_exclude_vat" name="exclude_vat" class="form-check-input"
+               {% if not object.apply_vat %}checked{% endif %}>
+        <span class="ml-2">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Exclude Tax{% else %}Excluir IVA{% endif %}</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Repuestos -->
+  <div class="bg-gray-800/50 backdrop-blur-lg rounded-xl border border-cyan-400/30 p-6 mb-6">
+    <h3 class="text-xl font-semibold text-cyan-200 mb-4 flex items-center">
+      🔧 {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Spare Parts{% else %}Repuestos{% endif %}
+      <button type="button" id="add-repuesto" class="ml-4 px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-sm">
+        ➕ {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Add{% else %}Agregar{% endif %}
+      </button>
+    </h3>
+    
+    <div id="repuestos-container">
+      <!-- Los repuestos existentes se cargarán aquí -->
+      <!-- DEBUG: Repuestos disponibles: {{ repuestos|length }} -->
+      {% for repuesto in repuestos %}
+      <div class="repuesto-row grid grid-cols-1 md:grid-cols-6 gap-4 mb-4 p-4 bg-gray-700/30 rounded-lg border border-gray-600">
+        <div>
+          <label class="block text-cyan-200 text-sm mb-1">Código</label>
+          <input type="text" name="rep-{{ forloop.counter0 }}-codigo" value="{{ repuesto.codigo }}" 
+                 class="form-control rep-codigo" placeholder="Código">
+        </div>
+        <div class="md:col-span-2">
+          <label class="block text-cyan-200 text-sm mb-1">Descripción</label>
+          <input type="text" name="rep-{{ forloop.counter0 }}-nombre" value="{{ repuesto.nombre }}" 
+                 class="form-control rep-nombre" placeholder="Descripción">
+        </div>
+        <div>
+          <label class="block text-cyan-200 text-sm mb-1">Cantidad</label>
+          <input type="number" name="rep-{{ forloop.counter0 }}-cantidad" value="{{ repuesto.cantidad }}" 
+                 class="form-control rep-cantidad" placeholder="1" min="0" step="1">
+        </div>
+        <div>
+          <label class="block text-cyan-200 text-sm mb-1">Precio Unit.</label>
+          <input type="number" name="rep-{{ forloop.counter0 }}-precio_unitario" value="{{ repuesto.precio_unitario|floatformat:0 }}" 
+                 class="form-control rep-precio" placeholder="0" min="0" step="0.01">
+        </div>
+        <div>
+          <label class="block text-cyan-200 text-sm mb-1">Subtotal</label>
+          <input type="text" class="form-control rep-subtotal" readonly value="${{ repuesto.subtotal|floatformat:0 }}">
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Servicios -->
+  <div class="bg-gray-800/50 backdrop-blur-lg rounded-xl border border-cyan-400/30 p-6 mb-6">
+    <h3 class="text-xl font-semibold text-cyan-200 mb-4 flex items-center">
+      ⚙️ {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Services{% else %}Servicios{% endif %}
+      <button type="button" id="add-servicio" class="ml-4 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm">
+        ➕ {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Add{% else %}Agregar{% endif %}
+      </button>
+    </h3>
+    
+    <div id="servicios-container">
+      <!-- Los servicios existentes se cargarán aquí -->
+      {% for servicio in object.lineas_servicio.all %}
+      <div class="servicio-row grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 p-4 bg-gray-700/30 rounded-lg border border-gray-600">
+        <div class="md:col-span-2">
+          <label class="block text-cyan-200 text-sm mb-1">Descripción</label>
+          <input type="text" name="serv-{{ forloop.counter0 }}-nombre" value="{{ servicio.nombre }}" 
+                 class="form-control serv-nombre" placeholder="Descripción del servicio">
+        </div>
+        <div>
+          <label class="block text-cyan-200 text-sm mb-1">Precio</label>
+          <input type="number" name="serv-{{ forloop.counter0 }}-precio_unitario" value="{{ servicio.precio_unitario }}" 
+                 class="form-control serv-precio" placeholder="0" min="0" step="0.01">
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Otros Servicios -->
+  <div class="bg-gray-800/50 backdrop-blur-lg rounded-xl border border-cyan-400/30 p-6 mb-6">
+    <h3 class="text-xl font-semibold text-cyan-200 mb-4 flex items-center">
+      🏢 {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Other Services{% else %}Otros Servicios{% endif %}
+      <button type="button" id="add-otro" class="ml-4 px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-sm">
+        ➕ {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Add{% else %}Agregar{% endif %}
+      </button>
+    </h3>
+    
+    <!-- Management forms para otros servicios -->
+    <input type="hidden" id="id_otr-TOTAL_FORMS" name="otr-TOTAL_FORMS" value="0">
+    <input type="hidden" name="otr-INITIAL_FORMS" value="0">
+    <input type="hidden" name="otr-MIN_NUM_FORMS" value="0">
+    <input type="hidden" name="otr-MAX_NUM_FORMS" value="1000">
+    
+    <!-- Encabezados de otros servicios -->
+    <div class="otros-headers mb-2" style="display: none;">
+      <div class="flex flex-wrap gap-4 items-end">
+        <div class="flex-1 min-w-[200px]">
+          <label class="block text-cyan-200 text-sm mb-1">Servicio</label>
+        </div>
+        <div class="flex-1 min-w-[150px]">
+          <label class="block text-cyan-200 text-sm mb-1">Empresa Externa</label>
+        </div>
+        <div class="w-24">
+          <label class="block text-cyan-200 text-sm mb-1">Precio Taller</label>
+        </div>
+        <div class="w-24">
+          <label class="block text-cyan-200 text-sm mb-1">Precio Cliente</label>
+        </div>
+        <div class="w-32">
+          <label class="block text-cyan-200 text-sm mb-1">Subtotal <span class="text-xs text-gray-400">(Precio Cliente)</span></label>
+        </div>
+      </div>
+    </div>
+    
+    <div id="otros-container">
+      <!-- Se llenará dinámicamente -->
+    </div>
+  </div>
+
+  <!-- Resumen de totales -->
+  <div class="bg-gray-800/50 backdrop-blur-lg rounded-xl border border-cyan-400/30 p-6 mb-6">
+    <h3 class="text-xl font-semibold text-cyan-200 mb-4">💰 {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Totals Summary{% else %}Resumen de Totales{% endif %}</h3>
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
+      <div>
+        <p class="text-gray-400 text-sm">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Spare Parts{% else %}Repuestos{% endif %}</p>
+        <p class="text-lg font-semibold text-cyan-300" id="t_rep">${{ subtotal_repuestos|floatformat:0 }}</p>
+      </div>
+      <div>
+        <p class="text-gray-400 text-sm">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Services{% else %}Servicios{% endif %}</p>
+        <p class="text-lg font-semibold text-cyan-300" id="t_serv">${{ subtotal_servicios|floatformat:0 }}</p>
+      </div>
+      <div>
+        <p class="text-gray-400 text-sm">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Other{% else %}Otros{% endif %}</p>
+        <p class="text-lg font-semibold text-cyan-300" id="t_otros">${{ subtotal_otros_servicios|floatformat:0 }}</p>
+      </div>
+      <div>
+        <p class="text-gray-400 text-sm">IVA</p>
+        <p class="text-lg font-semibold text-yellow-400" id="t_iva">${{ iva|floatformat:0 }}</p>
+      </div>
+      <div>
+        <p class="text-gray-400 text-sm">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Total{% else %}Total{% endif %}</p>
+        <p class="text-2xl font-bold text-green-400" id="t_total">${{ total|floatformat:0 }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Observaciones -->
+  <div class="mb-6">
+    <label class="form-label">{% block field_label_notes %}{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Observations{% else %}Observaciones{% endif %}{% endblock %}</label>
+    {{ form.observaciones }}
+    {% if form.observaciones.errors %}
+      <div class="text-red-400 text-sm mt-1">{{ form.observaciones.errors.0 }}</div>
+    {% endif %}
+  </div>
+
+  <!-- Botones de acción -->
+  <div class="flex flex-wrap gap-4 justify-center">
+    {% if object.pk %}
+      <!-- Documento existente - botón cancelar va a ver documento -->
+      <a href="{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}{% url 'documentos_us_en:ver_documento' object.pk %}{% else %}{% url 'documentos_cl_es:ver_documento' object.pk %}{% endif %}" 
+         class="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors">
+        ← {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Cancel{% else %}Cancelar{% endif %}
+      </a>
+    {% else %}
+      <!-- Documento nuevo - botón cancelar va a lista -->
+      <a href="{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}{% url 'documentos_us_en:lista_documentos' %}{% else %}{% url 'documentos_cl_es:lista_documentos' %}{% endif %}" 
+         class="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors">
+        ← {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Back to List{% else %}Volver a la Lista{% endif %}
+      </a>
+    {% endif %}
+    
+    <button type="submit" class="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors">
+      💾 {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Save Document{% else %}Guardar Documento{% endif %}
+    </button>
+  </div>
+
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Variables globales
+const COUNTRY = '{{ object.country|default:"CL" }}';
+let repuestoCounter = {{ repuestos|length }};
+let servicioCounter = {{ servicios|length }};
+let otroCounter = 0;
+
+// Inicializar valores al cargar la página
+function inicializarTotales() {
+  console.log('🔧 Inicializando valores del documento...');
+  
+  // Actualizar totales con los valores del documento usando innerHTML directamente
+  const tRep = document.getElementById('t_rep');
+  const tServ = document.getElementById('t_serv');
+  const tOtros = document.getElementById('t_otros');
+  const tIva = document.getElementById('t_iva');
+  const tTotal = document.getElementById('t_total');
+  
+  console.log('🔍 Elementos encontrados:', {
+    tRep: tRep ? 'encontrado' : 'NO encontrado',
+    tServ: tServ ? 'encontrado' : 'NO encontrado',
+    tIva: tIva ? 'encontrado' : 'NO encontrado',
+    tTotal: tTotal ? 'encontrado' : 'NO encontrado'
+  });
+  
+  if (tRep) {
+    tRep.innerHTML = '${{ subtotal_repuestos|floatformat:0 }}';
+    console.log('✅ t_rep actualizado a: ${{ subtotal_repuestos|floatformat:0 }}');
+  }
+  if (tServ) {
+    tServ.innerHTML = '${{ subtotal_servicios|floatformat:0 }}';
+    console.log('✅ t_serv actualizado a: ${{ subtotal_servicios|floatformat:0 }}');
+  }
+  if (tOtros) {
+    tOtros.innerHTML = '${{ subtotal_otros_servicios|floatformat:0 }}';
+    console.log('✅ t_otros actualizado a: ${{ subtotal_otros_servicios|floatformat:0 }}');
+  }
+  if (tIva) {
+    tIva.innerHTML = '${{ iva|floatformat:0 }}';
+    console.log('✅ t_iva actualizado a: ${{ iva|floatformat:0 }}');
+  }
+  if (tTotal) {
+    tTotal.innerHTML = '${{ total|floatformat:0 }}';
+    console.log('✅ t_total actualizado a: ${{ total|floatformat:0 }}');
+  }
+  
+  console.log('✅ Valores inicializados:', {
+    repuestos: '{{ subtotal_repuestos|floatformat:0 }}',
+    servicios: '{{ subtotal_servicios|floatformat:0 }}',
+    otros: '{{ subtotal_otros_servicios|floatformat:0 }}',
+    iva: '{{ iva|floatformat:0 }}',
+    total: '{{ total|floatformat:0 }}'
+  });
+}
+
+// Función para inicializar la generación automática del número de documento
+function inicializarGeneracionNumero() {
+  console.log('🔢 Inicializando generación automática del número de documento...');
+  
+  const tipoField = document.getElementById('id_tipo');
+  const numeroField = document.getElementById('id_numero');
+  const numeroHidden = document.getElementById('numero_documento');
+  const numeroDbHidden = document.getElementById('numero_documento_db');
+  
+  if (!tipoField) {
+    console.log('⚠️ Campo tipo no encontrado');
+    return;
+  }
+  
+  // Función para generar número
+  function generarNumero(tipo) {
+    if (!tipo) {
+      console.log('⚠️ Tipo vacío, no se puede generar número');
+      return;
+    }
+    
+    console.log('🔢 Generando número para tipo:', tipo);
+    
+    // Determinar la URL del endpoint según el país
+    const isUS = window.location.pathname.startsWith('/us/');
+    const endpointUrl = isUS ? '/us/documentos/api/obtener-numero-documento/' : '/cl/documentos/api/obtener-numero-documento/';
+    
+    fetch(`${endpointUrl}?tipo=${tipo}`)
+      .then(response => response.json())
+      .then(data => {
+        console.log('✅ Número generado:', data);
+        
+        if (data.numero) {
+          // Actualizar el campo visible
+          if (numeroField) {
+            numeroField.textContent = data.numero;
+          }
+          
+          // Actualizar campos ocultos
+          if (numeroHidden) {
+            numeroHidden.value = data.numero;
+          }
+          if (numeroDbHidden) {
+            numeroDbHidden.value = data.numero;
+          }
+          
+          console.log('✅ Número actualizado en todos los campos:', data.numero);
+        } else {
+          console.log('⚠️ No se recibió número del servidor');
+        }
+      })
+      .catch(error => {
+        console.error('❌ Error generando número:', error);
+        if (numeroField) {
+          numeroField.textContent = 'Error generando número';
+        }
+      });
+  }
+  
+  // Configurar evento de cambio
+  tipoField.addEventListener('change', function() {
+    const tipo = this.value;
+    console.log('🔄 Tipo de documento cambiado a:', tipo);
+    generarNumero(tipo);
+  });
+  
+  // Generar número inicial si ya hay un tipo seleccionado
+  if (tipoField.value) {
+    console.log('🔄 Generando número inicial para tipo:', tipoField.value);
+    generarNumero(tipoField.value);
+  } else {
+    // Si no hay tipo seleccionado, mostrar mensaje
+    if (numeroField) {
+      numeroField.textContent = '{% if LANGUAGE_CODE == "en" or request.path|slice:":3" == "/us" %}Will be generated automatically{% else %}Se generará automáticamente{% endif %}';
+    }
+  }
+  
+  console.log('✅ Generación automática de número configurada');
+}
+
+// Función para debug del autocompletado
+function debugAutocomplete() {
+  console.log('🔍 Debugging autocomplete...');
+  
+  // Buscar el campo de cliente
+  const clienteField = document.querySelector('select[name="cliente"]');
+  const clienteInput = document.querySelector('input[name="cliente"]');
+  
+  console.log('🔍 Cliente field (select):', clienteField);
+  console.log('🔍 Cliente field (input):', clienteInput);
+  
+  // Buscar elementos de Select2
+  const select2Elements = document.querySelectorAll('.select2-container');
+  console.log('🔍 Select2 elements found:', select2Elements.length);
+  
+  // Buscar elementos de DAL
+  const dalElements = document.querySelectorAll('[data-autocomplete-light-url]');
+  console.log('🔍 DAL elements found:', dalElements.length);
+  
+  // Verificar si hay errores de JavaScript
+  window.addEventListener('error', function(e) {
+    console.error('❌ JavaScript error:', e.error);
+  });
+  
+  console.log('✅ Autocomplete debug completed');
+}
+
+// Función para cargar vehículos por cliente
+async function cargarVehiculosPorCliente(clienteId) {
+  const selVeh = document.getElementById('id_vehiculo');
+  if (!selVeh || !clienteId) {
+    if (selVeh) selVeh.innerHTML = '<option value="">Select customer first...</option>';
+    return;
+  }
+
+  // Determinar la URL del endpoint según el país
+  const isUS = window.location.pathname.startsWith('/us/');
+  const baseUrl = isUS ? '/us/api/vehiculos/' : '/cl/api/vehiculos/';
+  const apiURL = `${baseUrl}${encodeURIComponent(clienteId)}/`;
+
+  selVeh.innerHTML = '<option value="">-- Loading vehicles... --</option>';
+
+  try {
+    console.log('🚗 Fetch vehicles @', apiURL);
+    const response = await fetch(apiURL, {
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      credentials: 'same-origin'
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+    const items = Array.isArray(data.results) ? data.results : [];
+
+    if (!items.length) {
+      selVeh.innerHTML = '<option value="">-- No vehicles registered --</option>';
+      return;
+    }
+
+    selVeh.innerHTML = '<option value="">Select vehicle...</option>' +
+      items.map(v => {
+        const label = [v.patente, v.marca, v.modelo, v.anio].filter(Boolean).join(' ') || `Vehicle #${v.id}`;
+        return `<option value="${v.id}">${label}</option>`;
+      }).join('');
+    
+    console.log('✅ Vehicles loaded:', items.length);
+  } catch (error) {
+    console.error('❌ Error loading vehicles:', error);
+    selVeh.innerHTML = '<option value="">-- Error loading vehicles --</option>';
+  }
+}
+
+// Función para cargar información del cliente
+async function cargarInfoCliente(clienteId) {
+  if (!clienteId) {
+    // Limpiar información del cliente
+    const clienteNombre = document.getElementById('cliente-nombre');
+    const clienteEmail = document.getElementById('cliente-email');
+    const clienteTelefono = document.getElementById('cliente-telefono');
+    
+    if (clienteNombre) clienteNombre.textContent = '';
+    if (clienteEmail) clienteEmail.textContent = 'No email';
+    if (clienteTelefono) clienteTelefono.textContent = 'No phone';
+    return;
+  }
+
+  // Determinar la URL del endpoint según el país
+  const isUS = window.location.pathname.startsWith('/us/');
+  const baseUrl = isUS ? '/us/api/clientes/' : '/cl/api/clientes/';
+  const apiURL = `${baseUrl}${encodeURIComponent(clienteId)}/`;
+
+  try {
+    console.log('👤 Fetch client info @', apiURL);
+    const response = await fetch(apiURL, {
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      credentials: 'same-origin'
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    // Actualizar información del cliente
+    const clienteNombre = document.getElementById('cliente-nombre');
+    const clienteEmail = document.getElementById('cliente-email');
+    const clienteTelefono = document.getElementById('cliente-telefono');
+    
+    if (clienteNombre) {
+      clienteNombre.textContent = `${data.nombre || ''} ${data.apellido || ''}`.trim();
+    }
+    if (clienteEmail) {
+      clienteEmail.textContent = data.email || 'No email';
+    }
+    if (clienteTelefono) {
+      clienteTelefono.textContent = data.telefono || 'No phone';
+    }
+    
+    console.log('✅ Client info loaded:', data);
+  } catch (error) {
+    console.error('❌ Error loading client info:', error);
+    
+    // Fallback: usar información del select option
+    const selectCliente = document.getElementById('id_cliente');
+    const selectedOption = selectCliente?.options[selectCliente.selectedIndex];
+    
+    if (selectedOption && selectedOption.textContent) {
+      const clienteNombre = document.getElementById('cliente-nombre');
+      if (clienteNombre) {
+        clienteNombre.textContent = selectedOption.textContent;
+      }
+    }
+  }
+}
+
+// Ejecutar cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', function() {
+  inicializarTotales();
+  inicializarGeneracionNumero();
+  debugAutocomplete();
+  
+  // Configurar event listener para selección de cliente
+  const selectCliente = document.getElementById('id_cliente');
+  if (selectCliente) {
+    selectCliente.addEventListener('change', function() {
+      const clienteId = this.value;
+      console.log('👤 Customer selected:', clienteId);
+      
+      // Cargar vehículos del cliente
+      cargarVehiculosPorCliente(clienteId);
+      
+      // Cargar información del cliente
+      cargarInfoCliente(clienteId);
+    });
+    
+    // Cargar información inicial si ya hay un cliente seleccionado
+    if (selectCliente.value) {
+      console.log('👤 Initial client selected:', selectCliente.value);
+      cargarVehiculosPorCliente(selectCliente.value);
+      cargarInfoCliente(selectCliente.value);
+    }
+  }
+});
+
+// También ejecutar con un pequeño delay por si acaso
+setTimeout(inicializarTotales, 100);
+setTimeout(inicializarGeneracionNumero, 100);
+
+// Función recalcTotales para evitar que el template base la sobrescriba
+window.recalcTotales = function() {
+  console.log('🔄 recalcTotales llamado - calculando totales dinámicos');
+  
+  // Calcular totales dinámicos
+  const rep = sumValues('.rep-subtotal');
+  const serv = sumValues('.serv-subtotal');
+  const otros = sumValues('.otr-subtotal');
+  
+  // Calcular IVA (19% para Chile)
+  let iva = 0;
+  if (COUNTRY === 'CL') {
+    iva = Math.round((rep + serv + otros) * 0.19);
+  }
+  
+  const total = rep + serv + otros + iva;
+  
+  // Actualizar elementos
+  const tRep = document.getElementById('t_rep');
+  const tServ = document.getElementById('t_serv');
+  const tOtros = document.getElementById('t_otros');
+  const tIva = document.getElementById('t_iva');
+  const tTotal = document.getElementById('t_total');
+  
+  if (tRep) tRep.innerHTML = money(rep);
+  if (tServ) tServ.innerHTML = money(serv);
+  if (tOtros) tOtros.innerHTML = money(otros);
+  if (tIva) tIva.innerHTML = money(iva);
+  if (tTotal) tTotal.innerHTML = money(total);
+  
+  // Actualizar campos ocultos
+  const netoRepuestos = document.getElementById('neto_repuestos');
+  const netoServicios = document.getElementById('neto_servicios');
+  const netoOtrosServicios = document.getElementById('neto_otros_servicios');
+  const taxAmount = document.getElementById('tax_amount');
+  const totalDocumento = document.getElementById('total_documento');
+  
+  if (netoRepuestos) netoRepuestos.value = rep;
+  if (netoServicios) netoServicios.value = serv;
+  if (netoOtrosServicios) netoOtrosServicios.value = otros;
+  if (taxAmount) taxAmount.value = iva;
+  if (totalDocumento) totalDocumento.value = total;
+  
+  console.log('✅ Totales recalculados:', { rep, serv, otros, iva, total });
+};
+
+// Funciones para otros servicios
+function addOtroServicio() {
+  console.log('🏢 addOtroServicio llamado');
+  
+  const container = document.getElementById('otros-container');
+  const headers = document.querySelector('.otros-headers');
+  
+  console.log('🔍 Container encontrado:', container ? 'SÍ' : 'NO');
+  console.log('🔍 Headers encontrados:', headers ? 'SÍ' : 'NO');
+  
+  if (!container) {
+    console.error('❌ No se encontró el container otros-container');
+    return;
+  }
+  
+  if (headers) {
+    headers.style.display = 'block';
+    console.log('✅ Headers mostrados');
+  }
+  
+  const newRow = document.createElement('div');
+  newRow.className = 'otro-row flex flex-wrap gap-4 items-end mb-4 p-4 bg-gray-700/30 rounded-lg border border-gray-600';
+  newRow.innerHTML = `
+    <div class="flex-1 min-w-[200px]">
+      <input type="text" name="otr-${otroCounter}-servicio" class="otr-search form-control" placeholder="Buscar servicio..." autocomplete="off">
+      <input type="hidden" name="otr-${otroCounter}-servicio_id" class="otr-servicio-id">
+      <div class="otr-resultados absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
+    </div>
+    <div class="flex-1 min-w-[150px]">
+      <input type="text" name="otr-${otroCounter}-empresa" class="form-control" placeholder="Empresa externa">
+    </div>
+    <div class="w-24">
+      <input type="number" name="otr-${otroCounter}-precio_taller" class="otr-precio form-control" placeholder="$0" min="0" step="0.01">
+    </div>
+    <div class="w-24">
+      <input type="number" name="otr-${otroCounter}-precio_cliente" class="otr-precio form-control" placeholder="$0" min="0" step="0.01">
+    </div>
+    <div class="w-32">
+      <input type="hidden" class="otr-subtotal" value="0">
+      <div class="otr-subtotal-view text-right font-bold text-cyan-300">$0</div>
+    </div>
+    <div class="w-16">
+      <button type="button" class="remove-otro px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-sm">✕</button>
+    </div>
+  `;
+  
+  container.appendChild(newRow);
+  wireOtroRow(newRow);
+  otroCounter++;
+  
+  console.log('✅ Nueva fila agregada, contador:', otroCounter);
+  
+  // Actualizar contador de formularios
+  const totalForms = document.getElementById('id_otr-TOTAL_FORMS');
+  if (totalForms) {
+    totalForms.value = otroCounter;
+    console.log('✅ Contador de formularios actualizado:', otroCounter);
+  }
+}
+
+function wireOtroRow(row) {
+  console.log('🔧 wireOtroRow llamado para:', row);
+  
+  const precioTallerEl = row.querySelector('input[name*="precio_taller"]');
+  const precioClienteEl = row.querySelector('input[name*="precio_cliente"]');
+  const subtotalEl = row.querySelector('.otr-subtotal');
+  const subtotalViewEl = row.querySelector('.otr-subtotal-view');
+  const removeBtn = row.querySelector('.remove-otro');
+  const searchEl = row.querySelector('.otr-search');
+  const resultadosEl = row.querySelector('.otr-resultados');
+  
+  console.log('🔍 Elementos encontrados:', {
+    precioTallerEl: precioTallerEl ? 'SÍ' : 'NO',
+    precioClienteEl: precioClienteEl ? 'SÍ' : 'NO',
+    subtotalEl: subtotalEl ? 'SÍ' : 'NO',
+    subtotalViewEl: subtotalViewEl ? 'SÍ' : 'NO',
+    removeBtn: removeBtn ? 'SÍ' : 'NO',
+    searchEl: searchEl ? 'SÍ' : 'NO',
+    resultadosEl: resultadosEl ? 'SÍ' : 'NO'
+  });
+  
+  function recalc() {
+    // Usar el precio cliente para el subtotal
+    const precioTaller = parseFloat(precioTallerEl?.value) || 0;
+    const precioCliente = parseFloat(precioClienteEl?.value) || 0;
+    
+    console.log('💰 Recalculando otros servicios:', {
+      precioTaller,
+      precioCliente,
+      subtotal: precioCliente
+    });
+    
+    if (subtotalEl) subtotalEl.value = precioCliente;
+    if (subtotalViewEl) subtotalViewEl.textContent = money(precioCliente);
+    window.recalcTotales?.();
+  }
+  
+  // Función de búsqueda de servicios
+  function buscarServicios(termino) {
+    console.log('🔍 buscarServicios llamado con término:', termino);
+    
+    const servicios = [
+      { id: 1, nombre: 'Grúa', precio: 50000 },
+      { id: 2, nombre: 'Grúa de 3.5 toneladas', precio: 60000 },
+      { id: 3, nombre: 'Grúa de 5 toneladas', precio: 80000 },
+      { id: 4, nombre: 'Grúa de 10 toneladas', precio: 120000 },
+      { id: 5, nombre: 'Grúa de 15 toneladas', precio: 150000 },
+      { id: 6, nombre: 'Grúa de 20 toneladas', precio: 180000 },
+      { id: 7, nombre: 'Grúa de 25 toneladas', precio: 200000 },
+      { id: 8, nombre: 'Grúa de 30 toneladas', precio: 250000 },
+      { id: 9, nombre: 'Grúa de 40 toneladas', precio: 300000 },
+      { id: 10, nombre: 'Grúa de 50 toneladas', precio: 350000 },
+      { id: 11, nombre: 'Grúa de 60 toneladas', precio: 400000 },
+      { id: 12, nombre: 'Grúa de 70 toneladas', precio: 450000 },
+      { id: 13, nombre: 'Grúa de 80 toneladas', precio: 500000 },
+      { id: 14, nombre: 'Grúa de 90 toneladas', precio: 550000 },
+      { id: 15, nombre: 'Grúa de 100 toneladas', precio: 600000 },
+      { id: 16, nombre: 'Grúa de 120 toneladas', precio: 700000 },
+      { id: 17, nombre: 'Grúa de 150 toneladas', precio: 800000 },
+      { id: 18, nombre: 'Grúa de 200 toneladas', precio: 1000000 },
+      { id: 19, nombre: 'Grúa de 250 toneladas', precio: 1200000 },
+      { id: 20, nombre: 'Grúa de 300 toneladas', precio: 1500000 }
+    ];
+    
+    const resultados = servicios.filter(servicio => 
+      servicio.nombre.toLowerCase().includes(termino.toLowerCase())
+    );
+    
+    console.log('🔍 Resultados de búsqueda:', resultados.length, 'servicios encontrados');
+    console.log('🔍 Servicios encontrados:', resultados.map(s => s.nombre));
+    
+    return resultados;
+  }
+  
+  function mostrarResultados(termino) {
+    console.log('🔍 mostrarResultados llamado con término:', termino);
+    
+    if (!resultadosEl) {
+      console.error('❌ No se encontró resultadosEl');
+      return;
+    }
+    
+    if (termino.length < 2) {
+      resultadosEl.classList.add('hidden');
+      console.log('🔍 Término muy corto, ocultando resultados');
+      return;
+    }
+    
+    const servicios = buscarServicios(termino);
+    console.log('🔍 Servicios encontrados:', servicios.length);
+    resultadosEl.innerHTML = '';
+    
+    if (servicios.length === 0) {
+      resultadosEl.innerHTML = '<div class="p-2 text-gray-400">No se encontraron servicios</div>';
+      console.log('🔍 No se encontraron servicios');
+    } else {
+      servicios.forEach(servicio => {
+        const item = document.createElement('div');
+        item.className = 'p-2 hover:bg-gray-700 cursor-pointer border-b border-gray-600';
+        item.innerHTML = `
+          <div class="font-semibold text-cyan-200">${servicio.nombre}</div>
+          <div class="text-sm text-green-400">$${servicio.precio.toLocaleString()}</div>
+        `;
+        item.addEventListener('click', function() {
+          seleccionarServicio(servicio);
+        });
+        resultadosEl.appendChild(item);
+      });
+    }
+    
+    resultadosEl.classList.remove('hidden');
+  }
+  
+  function seleccionarServicio(servicio) {
+    if (searchEl) searchEl.value = servicio.nombre;
+    if (resultadosEl) resultadosEl.classList.add('hidden');
+    
+    // Llenar los precios automáticamente
+    if (precioTallerEl) {
+      precioTallerEl.value = servicio.precio; // Precio taller (costo)
+    }
+    if (precioClienteEl) {
+      // Precio cliente con margen del 20% sobre el precio taller
+      const precioConMargen = Math.round(servicio.precio * 1.2);
+      precioClienteEl.value = precioConMargen;
+    }
+    
+    recalc();
+  }
+  
+  if (precioClienteEl) {
+    precioClienteEl.addEventListener('input', recalc);
+  }
+  
+  if (searchEl) {
+    searchEl.addEventListener('input', function(e) {
+      mostrarResultados(e.target.value);
+    });
+    
+    // Ocultar resultados al hacer clic fuera
+    document.addEventListener('click', function(e) {
+      if (!row.contains(e.target)) {
+        if (resultadosEl) resultadosEl.classList.add('hidden');
+      }
+    });
+  }
+  
+  if (removeBtn) {
+    removeBtn.addEventListener('click', function() {
+      row.remove();
+      window.recalcTotales?.();
+    });
+  }
+}
+
+// Event listener para agregar otro servicio
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('🔧 Configurando event listeners...');
+  
+  // Esperar un poco para asegurar que el DOM esté completamente cargado
+  setTimeout(function() {
+    const addOtroBtn = document.getElementById('add-otro');
+    console.log('🔍 Botón add-otro encontrado:', addOtroBtn ? 'SÍ' : 'NO');
+    
+    if (addOtroBtn) {
+      // Remover cualquier event listener existente
+      addOtroBtn.removeEventListener('click', addOtroServicio);
+      
+      // Agregar el nuevo event listener
+      addOtroBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('🖱️ Click en botón agregar otro servicio');
+        addOtroServicio();
+      });
+      console.log('✅ Event listener agregado al botón add-otro');
+    } else {
+      console.error('❌ No se encontró el botón add-otro');
+    }
+  }, 500);
+});
+
+// Función para formatear números como moneda
+function money(amount) {
+  return '$' + Math.round(amount).toLocaleString();
+}
+
+// Función para sumar valores de una clase
+function sumValues(selector) {
+  let total = 0;
+  document.querySelectorAll(selector).forEach(function(element) {
+    const value = parseFloat(element.value) || 0;
+    total += value;
+  });
+  return total;
+}
+
+// Función para establecer texto
+function setTxt(selector, text) {
+  const el = document.querySelector(selector);
+  if (el) el.textContent = text;
+}
+
+// Función para recalcular totales
+window.recalcTotales = function(){
+  const rep = sumValues('.rep-subtotal');
+  const serv = sumValues('.serv-subtotal');
+  const otros = sumValues('.otr-subtotal');
+  const applyVat = document.getElementById('id_apply_vat')?.checked;
+  const excludeVat = document.getElementById('id_exclude_vat')?.checked;
+  
+  // Lógica de IVA: si está marcado "Excluir IVA", no se aplica IVA
+  // Si está marcado "Aplicar IVA" y no está marcado "Excluir IVA", se aplica IVA
+  let iva = 0;
+  let taxRate = 0;
+  if (COUNTRY === 'CL' && applyVat && !excludeVat) {
+    taxRate = 19;
+    iva = Math.round((rep + serv + otros) * 0.19);
+  }
+  
+  const tot = rep + serv + otros + iva;
+
+  // Actualizar campos visibles
+  setTxt('#t_rep',  money(rep));
+  setTxt('#t_serv', money(serv));
+  setTxt('#t_otros', money(otros));
+  setTxt('#t_iva',  money(iva));
+  setTxt('#t_total',money(tot));
+
+  // Actualizar campos ocultos para el envío del formulario
+  const netoRepuestos = document.getElementById('neto_repuestos');
+  const netoServicios = document.getElementById('neto_servicios');
+  const netoOtrosServicios = document.getElementById('neto_otros_servicios');
+  const descuentoTotal = document.getElementById('descuento_total');
+  const taxRateApplied = document.getElementById('tax_rate_applied');
+  const taxAmount = document.getElementById('tax_amount');
+  const totalDocumento = document.getElementById('total_documento');
+  const clienteBackup = document.getElementById('cliente_backup');
+  const clienteHidden = document.getElementById('id_cliente');
+
+  if (netoRepuestos) netoRepuestos.value = rep;
+  if (netoServicios) netoServicios.value = serv;
+  if (netoOtrosServicios) netoOtrosServicios.value = otros;
+  if (descuentoTotal) descuentoTotal.value = 0;
+  if (taxRateApplied) taxRateApplied.value = taxRate;
+  if (taxAmount) taxAmount.value = iva;
+  if (totalDocumento) totalDocumento.value = tot;
+  
+  if (clienteBackup && clienteHidden) {
+    clienteBackup.value = clienteHidden.value || '';
+  }
+};
+
+// Función para hacer checkboxes mutuamente excluyentes
+function handleVatCheckboxes() {
+  const applyVat = document.getElementById('id_apply_vat');
+  const excludeVat = document.getElementById('id_exclude_vat');
+  
+  if (applyVat && excludeVat) {
+    applyVat.addEventListener('change', function() {
+      if (this.checked) {
+        excludeVat.checked = false;
+      }
+      recalcTotales();
+    });
+    
+    excludeVat.addEventListener('change', function() {
+      if (this.checked) {
+        applyVat.checked = false;
+      }
+      recalcTotales();
+    });
+  }
+}
+
+// Inicializar cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', function() {
+  handleVatCheckboxes();
+  recalcTotales();
+});
+</script>
+
+{% block js_strings %}{% endblock %}
+{% endblock %}

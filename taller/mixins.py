@@ -38,16 +38,41 @@ class CountryLangTemplateMixin:
             if hasattr(request, "user") and request.user.is_authenticated
             else None
         )
-        country = getattr(empresa, "pais", "CL") if empresa else "CL"
-        lang = get_language() or "es"
+        
+        # Determinar país: prioridad empresa.pais > request.country > URL path > CL
+        country = "CL"  # default
+        if empresa and hasattr(empresa, "pais") and empresa.pais:
+            country = empresa.pais
+        elif hasattr(request, "country") and request.country:
+            country = request.country
+        elif request.path.startswith("/us/"):
+            country = "US"
+        elif request.path.startswith("/cl/"):
+            country = "CL"
+        
+        # Use the language set by LanguagePolicyMiddleware
+        lang = getattr(request, "LANGUAGE_CODE", None) or get_language() or "es"
+
+        # Debug logging
+        print(f"[DEBUG] CountryLangTemplateMixin: base_template={base_template}, country={country}, lang={lang}")
+        print(f"[DEBUG] User: {request.user.username if request.user.is_authenticated else 'Anonymous'}")
+        print(f"[DEBUG] Empresa: {empresa.nombre_taller if empresa else 'None'}")
+        print(f"[DEBUG] Empresa.pais: {getattr(empresa, 'pais', 'NO_ATTR') if empresa else 'NO_EMPRESA'}")
+        print(f"[DEBUG] Request.path: {request.path}")
+        print(f"[DEBUG] Request.country: {getattr(request, 'country', 'NO_ATTR')}")
+        print(f"[DEBUG] Request.company: {getattr(request, 'company', 'NO_ATTR')}")
 
         # Seleccionar template apropiado
         try:
             template_name = select_country_lang_template(base_template, country, lang)
+            print(f"[DEBUG] Selected template: {template_name}")
             return [template_name]
-        except Exception:
+        except Exception as e:
+            print(f"[DEBUG] Template selection error: {e}")
             # Fallback a template base si hay problemas
-            return [f"taller/common/{base_template}", f"taller/{base_template}"]
+            fallback_templates = [f"taller/common/{base_template}", f"taller/{base_template}"]
+            print(f"[DEBUG] Using fallback templates: {fallback_templates}")
+            return fallback_templates
 
     def render_country_lang(self, request, context):
         """

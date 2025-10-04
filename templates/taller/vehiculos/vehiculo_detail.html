@@ -1,5 +1,5 @@
-{% load country_url %}
 {% extends 'base.html' %}
+{% load country_url %}
 {% load static %}
 
 {% block content %}
@@ -25,7 +25,7 @@
         </h1>
       </div>
       <div class="text-cyan-300 text-xl font-light tracking-wider">
-        Sistema de Gestión Vehicular • ID: {{ object.id }}
+        Sistema de Gestión Vehicular • ID: {{ vehiculo.id }}
       </div>
     </div>
 
@@ -35,9 +35,9 @@
         <!-- Información principal -->
         <div class="space-y-6">
           <div class="text-center lg:text-left">
-            <h2 class="text-4xl font-bold text-cyan-400 mb-2">{{ object.patente }}</h2>
-            <p class="text-xl text-gray-300">{{ object.marca.nombre }} {{ object.modelo.nombre }}</p>
-            <p class="text-lg text-gray-400">{{ object.anio }}</p>
+            <h2 class="text-4xl font-bold text-cyan-400 mb-2">{{ vehiculo.patente|default:"Sin patente" }}</h2>
+            <p class="text-xl text-gray-300">{{ vehiculo.marca_texto|default:vehiculo.marca.nombre|default:"-" }} {{ vehiculo.modelo_texto|default:vehiculo.modelo.nombre|default:"-" }}</p>
+            <p class="text-lg text-gray-400">{{ vehiculo.anio|default:"N/A" }}</p>
           </div>
 
           <!-- Especificaciones técnicas -->
@@ -49,25 +49,25 @@
             <div class="grid grid-cols-2 gap-4">
               <div class="bg-black/30 rounded-xl p-4 border border-cyan-400/20">
                 <div class="text-cyan-400 text-sm font-semibold uppercase tracking-wider">VIN</div>
-                <div class="text-white font-mono text-lg">{{ object.vin|default:"No especificado" }}</div>
+                <div class="text-white font-mono text-lg">{{ vehiculo.vin|default:"No especificado" }}</div>
               </div>
 
               <div class="bg-black/30 rounded-xl p-4 border border-cyan-400/20">
                 <div class="text-cyan-400 text-sm font-semibold uppercase tracking-wider">Color</div>
-                <div class="text-white text-lg">{{ object.color.nombre }}</div>
+                <div class="text-white text-lg">{{ vehiculo.color.nombre|default:"No especificado" }}</div>
               </div>
 
-              {% if object.motor %}
+              {% if vehiculo.motor %}
               <div class="bg-black/30 rounded-xl p-4 border border-cyan-400/20">
                 <div class="text-cyan-400 text-sm font-semibold uppercase tracking-wider">Motor</div>
-                <div class="text-white text-lg">{{ object.motor.nombre }}</div>
+                <div class="text-white text-lg">{{ vehiculo.motor.nombre }}</div>
               </div>
               {% endif %}
 
-              {% if object.caja %}
+              {% if vehiculo.caja %}
               <div class="bg-black/30 rounded-xl p-4 border border-cyan-400/20">
                 <div class="text-cyan-400 text-sm font-semibold uppercase tracking-wider">Caja</div>
-                <div class="text-white text-lg">{{ object.caja.nombre }}</div>
+                <div class="text-white text-lg">{{ vehiculo.caja.nombre }}</div>
               </div>
               {% endif %}
             </div>
@@ -88,17 +88,17 @@
                 </svg>
               </div>
               <div>
-                <h4 class="text-xl font-bold text-white">{{ object.cliente.nombre }} {{ object.cliente.apellido }}</h4>
-                <p class="text-cyan-300">{{ object.cliente.email }}</p>
+                <h4 class="text-xl font-bold text-white">{{ vehiculo.cliente.nombre }} {{ vehiculo.cliente.apellido }}</h4>
+                <p class="text-cyan-300">{{ vehiculo.cliente.email|default:"" }}</p>
               </div>
             </div>
 
-            {% if object.cliente.telefono %}
+            {% if vehiculo.cliente.telefono %}
             <div class="flex items-center space-x-2 text-gray-300">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
               </svg>
-              <span>{{ object.cliente.telefono }}</span>
+              <span>{{ vehiculo.cliente.telefono }}</span>
             </div>
             {% endif %}
           </div>
@@ -106,7 +106,7 @@
           <!-- Información de la empresa -->
           <div class="bg-black/30 rounded-xl p-4 border border-cyan-400/20">
             <div class="text-cyan-400 text-sm font-semibold uppercase tracking-wider mb-2">Empresa</div>
-            <div class="text-white text-lg">{{ object.empresa.nombre }}</div>
+            <div class="text-white text-lg">{{ vehiculo.empresa.nombre_taller|default:vehiculo.empresa|default:"-" }}</div>
           </div>
         </div>
       </div>
@@ -122,7 +122,7 @@
         Volver a la Lista
       </a>
 
-      <a href="{% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{{ object.id }}/editar/{% else %}/cl/vehiculos/{{ object.id }}/editar/{% endif %}"
+      <a href="{% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{{ vehiculo.id }}/editar/{% else %}/cl/vehiculos/{{ vehiculo.id }}/editar/{% endif %}"
          class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-lg">
         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
@@ -152,9 +152,9 @@
           </svg>
         </div>
         <h3 class="text-2xl font-bold text-white mb-2">Confirmar Eliminación</h3>
-        <p class="text-gray-300 mb-6">¿Estás seguro de que quieres eliminar el vehículo <strong>{{ object.patente }}</strong>? Esta acción no se puede deshacer.</p>
+        <p class="text-gray-300 mb-6">¿Estás seguro de que quieres eliminar el vehículo <strong>{{ vehiculo.patente }}</strong>? Esta acción no se puede deshacer.</p>
 
-        <form method="post" action="{% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{{ object.id }}/eliminar/{% else %}/cl/vehiculos/{{ object.id }}/eliminar/{% endif %}">
+        <form method="post" action="{% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{{ vehiculo.id }}/eliminar/{% else %}/cl/vehiculos/{{ vehiculo.id }}/eliminar/{% endif %}">
           {% csrf_token %}
           <div class="flex space-x-4">
             <button type="button" onclick="cerrarModal()"

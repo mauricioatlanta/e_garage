@@ -45,7 +45,7 @@ const urlBuscarClientes = "/cl/ajax/clientes/buscar/";
 <!-- ✅ URLs dinámicas con country_url -->
 {% load country_url %}
 
-<div id="doc-shell" 
+<div id="doc-shell"
      data-endpoint-buscar-clientes="{% country_url 'ajax:buscar_clientes' %}"
      data-endpoint-vehiculos-por-cliente="{% country_url 'ajax:vehiculos_por_cliente' %}"
      data-endpoint-next-number="{% country_url 'documentos:api_obtener_numero_documento' %}">
@@ -139,10 +139,10 @@ const response = await fetch(`${urlBuscarClientes}?q=${encodeURIComponent(query)
 ### **Prueba de Resolución de URLs:**
 ```python
 # Chile
-country_url(context, 'ajax:buscar_clientes') 
+country_url(context, 'ajax:buscar_clientes')
 # → "/cl/es/ajax/clientes/buscar/"
 
-# USA  
+# USA
 country_url(context, 'ajax:buscar_clientes')
 # → "/us/ajax/clientes/buscar/"
 ```

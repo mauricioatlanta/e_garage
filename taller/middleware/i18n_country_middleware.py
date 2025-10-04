@@ -82,11 +82,16 @@ class CountryLanguageMiddleware(MiddlewareMixin):
             if hasattr(request, "session"):
                 request.session[LANGUAGE_SESSION_KEY] = lang
         else:
-            # FORZAR idioma según el país del usuario (ignorar cookies incorrectas)
+            # Configurar idioma según el país del usuario
             if country == "US":
-                lang = "en"  # Inglés para usuarios de USA
+                # USA: inglés predeterminado con opción a español
+                user_cookie = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME)
+                if user_cookie and user_cookie in ALLOWED_LANGS:
+                    lang = user_cookie  # Respetar preferencia del usuario
+                else:
+                    lang = "en"  # Inglés por defecto para USA
             elif country == "CL":
-                lang = "es"  # Español para usuarios de Chile
+                lang = "es"  # Español fijo para Chile
             else:
                 # Solo usar cookie si no hay país definido
                 user_cookie = request.COOKIES.get(settings.LANGUAGE_COOKIE_NAME)

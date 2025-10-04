@@ -62,8 +62,15 @@ class ClienteCreateView(
 ):
     def get_success_url(self):
         from django.urls import reverse
-
-        return reverse("chile:taller:clientes:lista_clientes")
+        
+        # Obtener el país de la empresa del usuario
+        empresa = getattr(self.request.user, "empresa", None)
+        if empresa and empresa.pais == "US":
+            # Usuario de USA: redirigir a namespace de USA
+            return reverse("usa:taller:clientes:lista_clientes")
+        else:
+            # Usuario de Chile o fallback: redirigir a namespace de Chile
+            return reverse("chile:taller:clientes:lista_clientes")
 
     def form_valid(self, form):
         from django.db import IntegrityError

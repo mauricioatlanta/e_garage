@@ -1,5 +1,5 @@
-{% load country_url %}
 {% extends 'base.html' %}
+{% load country_url %}
 {% load i18n %}
 {% block title %}{% if LANGUAGE_CODE == 'es' %}Confirmar Eliminación{% else %}Confirm Delete{% endif %} · {{ cliente }}{% endblock %}
 {% block content %}
@@ -14,14 +14,18 @@
         </h1>
         <p class="mt-3 text-gray-300 leading-relaxed">
           {% if LANGUAGE_CODE == 'es' %}
-            Estás a punto de eliminar al cliente <strong class="text-cyan-200">{{ cliente }}</strong>.
+            Estás a punto de eliminar al cliente <strong class="text-cyan-200">{{ cliente.nombre }} {{ cliente.apellido }}</strong>.
             Esta acción es <span class="text-red-400 font-semibold">irreversible</span>.
           {% else %}
-            You are about to delete client <strong class="text-cyan-200">{{ cliente }}</strong>.
+            You are about to delete client <strong class="text-cyan-200">{{ cliente.nombre }} {{ cliente.apellido }}</strong>.
             This action is <span class="text-red-400 font-semibold">irreversible</span>.
           {% endif %}
         </p>
-        <div class="mt-6 grid gap-4 sm:grid-cols-3">
+        <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div class="p-4 rounded-xl bg-black/30 border border-cyan-900/40 backdrop-blur">
+            <p class="text-xs uppercase tracking-wider text-gray-400">{% if LANGUAGE_CODE == 'es' %}Nombre{% else %}Name{% endif %}</p>
+            <p class="mt-1 font-medium text-gray-200">{{ cliente.nombre }} {{ cliente.apellido }}</p>
+          </div>
           <div class="p-4 rounded-xl bg-black/30 border border-cyan-900/40 backdrop-blur">
             <p class="text-xs uppercase tracking-wider text-gray-400">ID</p>
             <p class="mt-1 font-mono text-cyan-300">#{{ cliente.pk }}</p>

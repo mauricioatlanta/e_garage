@@ -1,14 +1,18 @@
 from datetime import timedelta
 from decimal import Decimal
+from math import ceil
 
 import pytz
 
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models import CheckConstraint, Q
 from django.utils import timezone
+# Si usas Django ≥4, evita pytz y usa zoneinfo:
+# from zoneinfo import ZoneInfo
+# from django.utils.timezone import localtime  # recomendado
 
 
-# Modelo que representa al suscriptor/empresa dueña de los datos
 class Empresa(models.Model):
     PLAN_CHOICES = [
         ("trial", "Prueba Gratuita"),
@@ -17,13 +21,9 @@ class Empresa(models.Model):
         ("enterprise", "Plan Empresarial"),
     ]
 
-    # 🌎 Países soportados
-    PAIS_CHOICES = [
-        ("CL", "Chile"),
-        ("US", "United States"),
-    ]
+    PAIS_CHOICES = [("CL", "Chile"), ("US", "United States")]
+    MONEDA_CHOICES = [("CLP", "CLP"), ("USD", "USD")]
 
-    # Zonas horarias comunes para USA
     TIMEZONE_CHOICES = [
         ("America/New_York", "Eastern Time (ET)"),
         ("America/Chicago", "Central Time (CT)"),
@@ -32,262 +32,194 @@ class Empresa(models.Model):
         ("America/Anchorage", "Alaska Time (AT)"),
         ("Pacific/Honolulu", "Hawaii Time (HT)"),
         ("America/Phoenix", "Arizona Time (MST)"),
-        ("America/Santiago", "Chile Time (CLT)"),  # Para clientes existentes
+        ("America/Santiago", "Chile Time (CLT)"),
     ]
+
+    # Whitelists por país (evita pisar configuraciones válidas del usuario)
+    US_TZS = {
+        "America/New_York", "America/Chicago", "America/Denver",
+        "America/Los_Angeles", "America/Anchorage", "Pacific/Honolulu",
+        "America/Phoenix",
+    }
+    CL_TZS = {"America/Santiago"}
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="empresa")
     nombre_taller = models.CharField(max_length=100, default="Mi Taller")
-    empresa = models.CharField(
-        max_length=100, blank=True, help_text="Nombre de la empresa/compañía"
-    )
+    empresa = models.CharField(max_length=100, blank=True, help_text="Razón social o compañía")
 
-    # 🌎 País del suscriptor - determina catálogos, moneda e idioma
-    pais = models.CharField(
-        max_length=2,
-        choices=PAIS_CHOICES,
-        default="CL",
-        help_text="País del suscriptor - determina catálogos de vehículos, moneda y configuraciones regionales",
-    )
+    pais = models.CharField(max_length=2, choices=PAIS_CHOICES, default="CL",
+                            help_text="Define catálogos, moneda y regionalización")
 
     logo = models.ImageField(upload_to="logos_talleres/", null=True, blank=True)
     direccion = models.CharField(max_length=200, blank=True)
     telefono = models.CharField(max_length=20, blank=True)
-    email = models.EmailField(
-        max_length=100, blank=True, help_text="Email de contacto de la empresa"
-    )
+    email = models.EmailField(max_length=100, blank=True, help_text="Email de contacto")
 
-    # 🇺🇸 Zona horaria para localización USA
-    zona_horaria = models.CharField(
-        max_length=50,
-        choices=TIMEZONE_CHOICES,
-        default="America/New_York",
-        help_text="Zona horaria del taller para reportes y alertas precisas",
-    )
+    zona_horaria = models.CharField(max_length=50, choices=TIMEZONE_CHOICES,
+                                    default="America/New_York",
+                                    help_text="Zona horaria del taller")
 
-    # Sistema de suscripciones mejorado
     fecha_inicio = models.DateTimeField(default=timezone.now)
     fecha_fin = models.DateTimeField(null=True, blank=True)
     plan = models.CharField(max_length=20, choices=PLAN_CHOICES, default="trial")
     dias_prueba = models.PositiveIntegerField(default=30)
     suscripcion_activa = models.BooleanField(default=True)
 
-    # Campos para gestión de pagos
     ultimo_pago = models.DateTimeField(null=True, blank=True)
-    valor_mensual = models.DecimalField(
-        max_digits=10, decimal_places=2, default=Decimal("0.00")
-    )
-    moneda = models.CharField(max_length=3, default="CLP")
+    valor_mensual = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"))
+    moneda = models.CharField(max_length=3, choices=MONEDA_CHOICES, default="CLP")
 
-    # Control de notificaciones
     notificacion_5_dias = models.BooleanField(default=False)
     notificacion_1_dia = models.BooleanField(default=False)
     notificacion_vencido = models.BooleanField(default=False)
+    # Opcional: timestamps de notificación
+    # notificado_5_dias_en = models.DateTimeField(null=True, blank=True)
+    # notificado_1_dia_en = models.DateTimeField(null=True, blank=True)
+    # notificado_vencido_en = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.nombre_taller
 
     def save(self, *args, **kwargs):
-        """Al crear o actualizar una empresa, establecer configuraciones automáticamente"""
-        # Para empresas nuevas, establecer fecha_fin
+        # Set de fecha_fin solo al crear si viene vacía
         if not self.pk and not self.fecha_fin:
             self.fecha_fin = self.fecha_inicio + timedelta(days=self.dias_prueba)
 
-        # Actualizar configuración según país (para empresas nuevas y existentes)
-        if self.pais == "US":
+        # Asignación de moneda por país (no pisa manual)
+        if self.pais == "US" and self.moneda != "USD":
             self.moneda = "USD"
-            # Solo cambiar zona horaria si está en Chile o no está definida
-            if not self.zona_horaria or self.zona_horaria == "America/Santiago":
-                self.zona_horaria = "America/New_York"
-        else:  # Chile por defecto
+        elif self.pais == "CL" and self.moneda != "CLP":
             self.moneda = "CLP"
-            # Solo cambiar zona horaria si está en USA o no está definida
-            if (
-                not self.zona_horaria
-                or "America/New_York" in self.zona_horaria
-                or "America/Chicago" in self.zona_horaria
-                or "America/Los_Angeles" in self.zona_horaria
-            ):
+
+        # Normaliza zona horaria solo si es inválida para el país o está vacía
+        if self.pais == "US":
+            if not self.zona_horaria or self.zona_horaria not in self.US_TZS:
+                self.zona_horaria = "America/New_York"
+        else:  # CL
+            if not self.zona_horaria or self.zona_horaria not in self.CL_TZS:
                 self.zona_horaria = "America/Santiago"
 
         super().save(*args, **kwargs)
 
     @property
-    def es_usa(self):
-        """Retorna True si la empresa está en Estados Unidos"""
-        return self.pais == "US"
+    def es_usa(self): return self.pais == "US"
 
     @property
-    def es_chile(self):
-        """Retorna True si la empresa está en Chile"""
-        return self.pais == "CL"
+    def es_chile(self): return self.pais == "CL"
 
     @property
     def simbolo_moneda(self):
-        """Retorna el símbolo de moneda según el país"""
-        return "$" if self.pais in ["US", "CL"] else self.moneda
+        # Para UI local: "$"; para documentos externos, usa self.moneda para prefijo
+        return "$"
 
     @property
     def formato_moneda(self):
-        """Retorna el formato de moneda para templates"""
-        return {
-            "simbolo": self.simbolo_moneda,
-            "codigo": self.moneda,
-            "decimales": 2 if self.pais == "US" else 0,
-        }
+        return {"simbolo": self.simbolo_moneda, "codigo": self.moneda,
+                "decimales": 2 if self.es_usa else 0}
 
     @property
     def fecha_expiracion(self):
-        """Retorna la fecha de expiración de la suscripción"""
-        if self.fecha_fin:
-            return self.fecha_fin
-        return self.fecha_inicio + timedelta(days=self.dias_prueba)
+        return self.fecha_fin or (self.fecha_inicio + timedelta(days=self.dias_prueba))
 
     @property
     def dias_restantes(self):
-        """Calcula los días restantes de suscripción"""
         now = timezone.now()
-        if self.fecha_expiracion > now:
-            return (self.fecha_expiracion - now).days
-        return 0
+        if self.fecha_expiracion <= now:
+            return 0
+        # ceil de días con mínimo 0
+        delta = self.fecha_expiracion - now
+        return max(0, ceil(delta.total_seconds() / 86400))
 
     @property
     def debe_bloquear(self):
-        """Determina si la cuenta debe ser bloqueada"""
-        return timezone.now() > self.fecha_expiracion and not self.suscripcion_activa
+        return (timezone.now() > self.fecha_expiracion) and (not self.suscripcion_activa)
 
     @property
     def estado_suscripcion(self):
-        """Retorna el estado actual de la suscripción"""
-        dias = self.dias_restantes
         if self.debe_bloquear:
             return "vencida"
-        elif dias <= 1:
+        dias = self.dias_restantes
+        if dias <= 1:
             return "critico"
-        elif dias <= 5:
+        if dias <= 5:
             return "advertencia"
-        else:
-            return "activa"
+        return "activa"
 
     @property
     def color_estado(self):
-        """Retorna el color para mostrar el estado"""
-        estado = self.estado_suscripcion
-        colores = {
-            "activa": "green",
-            "advertencia": "orange",
-            "critico": "red",
-            "vencida": "gray",
-        }
-        return colores.get(estado, "gray")
+        return {"activa": "green", "advertencia": "orange", "critico": "red", "vencida": "gray"}.get(
+            self.estado_suscripcion, "gray"
+        )
 
     def extender_suscripcion(self, dias=30):
-        """Extiende la suscripción por X días"""
-        if self.fecha_fin:
-            # Si ya expiró, extender desde hoy
-            if self.fecha_fin < timezone.now():
-                self.fecha_fin = timezone.now() + timedelta(days=dias)
-            else:
-                # Si aún está activa, extender desde la fecha actual de fin
-                self.fecha_fin = self.fecha_fin + timedelta(days=dias)
-        else:
-            self.fecha_fin = timezone.now() + timedelta(days=dias)
-
+        base = self.fecha_fin if self.fecha_fin and self.fecha_fin > timezone.now() else timezone.now()
+        self.fecha_fin = base + timedelta(days=dias)
         self.suscripcion_activa = True
         self.ultimo_pago = timezone.now()
-
-        # Resetear notificaciones
         self.notificacion_5_dias = False
         self.notificacion_1_dia = False
         self.notificacion_vencido = False
-
         self.save()
 
     def marcar_pago_recibido(self, monto=None, plan=None):
-        """Marca que se recibió un pago y extiende la suscripción"""
-        if monto:
+        if monto is not None:
             self.valor_mensual = Decimal(str(monto))
         if plan:
             self.plan = plan
-
-        # Extender suscripción por 30 días
         self.extender_suscripcion(30)
 
-    # 🇺🇸 MÉTODOS PARA MANEJO DE TIMEZONE USA
-    def get_timezone_obj(self):
-        """Retorna objeto pytz de la zona horaria"""
-        return pytz.timezone(self.zona_horaria)
+    # TZ helpers (versión Django-friendly)
+    def _tz(self):
+        # return ZoneInfo(self.zona_horaria)  # si usas zoneinfo
+        return timezone.pytz.timezone(self.zona_horaria)  # si mantienes pytz
 
     def convert_to_local_time(self, dt):
-        """Convierte datetime UTC a hora local del taller"""
         if dt is None:
             return None
-
-        # Si ya tiene timezone info, convertir a UTC primero
-        if dt.tzinfo is not None:
-            dt = dt.astimezone(pytz.UTC)
-        else:
-            # Asumir que es UTC
-            dt = pytz.UTC.localize(dt)
-
-        # Convertir a timezone local
-        local_tz = self.get_timezone_obj()
-        return dt.astimezone(local_tz)
+        # return localtime(dt, self._tz())  # recomendado
+        # Manteniendo tu enfoque con pytz:
+        if dt.tzinfo is None:
+            dt = timezone.make_aware(dt, timezone.utc)
+        return dt.astimezone(self._tz())
 
     def format_local_datetime(self, dt, format_type="full"):
-        """Formatea datetime en hora local con formato USA"""
-        if dt is None:
-            return ""
-
         local_dt = self.convert_to_local_time(dt)
-        if local_dt is None:
+        if not local_dt:
             return ""
-
         if format_type == "full":
-            # MM/DD/YYYY – hh:mm AM/PM
             return local_dt.strftime("%m/%d/%Y – %I:%M %p")
-        elif format_type == "date":
-            # MM/DD/YYYY
+        if format_type == "date":
             return local_dt.strftime("%m/%d/%Y")
-        elif format_type == "time":
-            # hh:mm AM/PM
+        if format_type == "time":
             return local_dt.strftime("%I:%M %p")
-        elif format_type == "short":
-            # MM/DD – hh:mm AM/PM
+        if format_type == "short":
             return local_dt.strftime("%m/%d – %I:%M %p")
-        else:
-            return local_dt.strftime("%m/%d/%Y – %I:%M %p")
+        return local_dt.strftime("%m/%d/%Y – %I:%M %p")
 
     def now_local(self):
-        """Retorna el datetime actual en la zona horaria local"""
-        utc_now = timezone.now()
-        return self.convert_to_local_time(utc_now)
+        return self.convert_to_local_time(timezone.now())
 
     @property
     def timezone_display(self):
-        """Nombre legible de la zona horaria"""
-        timezone_names = dict(self.TIMEZONE_CHOICES)
-        return timezone_names.get(self.zona_horaria, self.zona_horaria)
-        print(
-            f"✅ Pago procesado para {self.nombre_taller}. Nueva fecha de vencimiento: {self.fecha_fin}"
-        )
+        return dict(self.TIMEZONE_CHOICES).get(self.zona_horaria, self.zona_horaria)
 
     def debe_mostrar_alerta(self):
-        """Determina si debe mostrar alerta de vencimiento"""
-        return self.dias_restantes <= 5 and not self.debe_bloquear
+        return (self.dias_restantes <= 5) and (not self.debe_bloquear)
 
     def get_mensaje_alerta(self):
-        """Retorna el mensaje de alerta apropiado"""
         dias = self.dias_restantes
         if dias <= 0:
-            return (
-                "Tu suscripción ha vencido. Renueva para continuar usando el sistema."
-            )
-        elif dias == 1:
+            return "Tu suscripción ha vencido. Renueva para continuar usando el sistema."
+        if dias == 1:
             return "⚠️ Tu suscripción vence mañana. ¡Renueva ahora!"
-        elif dias <= 5:
+        if dias <= 5:
             return f"⚠️ Tu suscripción vence en {dias} días. Considera renovar pronto."
         return ""
 
     class Meta:
         verbose_name = "Empresa"
         verbose_name_plural = "Empresas"
+        constraints = [
+            CheckConstraint(check=Q(dias_prueba__gte=0), name="empresa_dias_prueba_gte_0"),
+            CheckConstraint(check=Q(valor_mensual__gte=0), name="empresa_valor_mensual_gte_0"),
+        ]

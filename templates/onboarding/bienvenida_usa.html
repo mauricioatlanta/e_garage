@@ -1,26 +1,62 @@
 {% load i18n static %}
+{% load country_url %}
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE }}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% trans "Welcome to eGarage USA" %}</title>
+
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="{% trans 'Auto shop platform: work orders, inventory, client portal, analytics in the USA.' %}">
+  <link rel="canonical" href="{{ request.build_absolute_uri }}">
+
+  <!-- Open Graph Meta Tags -->
+  <meta property="og:title" content="{% trans 'eGarage USA — Auto Shop Platform' %}">
+  <meta property="og:description" content="{% trans 'Work smarter with digital documents, reminders and analytics.' %}">
+  <meta property="og:image" content="{% static 'img/og-us.png' %}">
+  <meta property="og:url" content="{{ request.build_absolute_uri }}">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="eGarage">
+
+  <!-- Twitter Card Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{% trans 'eGarage USA — Auto Shop Platform' %}">
+  <meta name="twitter:description" content="{% trans 'Work smarter with digital documents, reminders and analytics.' %}">
+  <meta name="twitter:image" content="{% static 'img/og-us.png' %}">
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
-  <script src="https://cdn.lordicon.com/lordicon.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.net.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.globe.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.dots.min.js"></script>
+  <script src="https://cdn.lordicon.com/lordicon.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.net.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.globe.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.dots.min.js" defer></script>
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js" defer></script>
   <style>
-         body {
-       background: #0a0a0a !important;
-       font-family: 'Exo 2', sans-serif;
-       color: #ffffff;
-       min-height: 100vh;
-       overflow-x: hidden;
-     }
+    /* Definir animate-spin-slow para Tailwind CDN */
+    @keyframes spin {
+      to { transform: rotate(360deg) }
+    }
+    .animate-spin-slow {
+      animation: spin 6s linear infinite;
+    }
+
+    /* Respeta reduce-motion para accesibilidad */
+    @media (prefers-reduced-motion: reduce) {
+      .animate-spin-slow {
+        animation: none !important;
+      }
+    }
+
+    body {
+      background: #0a0a0a !important;
+      font-family: 'Exo 2', sans-serif;
+      color: #ffffff;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
 
      /* Tipografías especializadas */
      .font-futuristic {
@@ -311,20 +347,40 @@
   </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between">
-  <!-- Language Selector -->
-  <div class="fixed top-4 right-4 z-50">
-    <div class="bg-black/80 backdrop-blur-sm border border-cyan-400/50 rounded-full px-4 py-2 flex items-center gap-3 shadow-lg">
-      <span class="text-cyan-400 text-sm font-medium">{% trans "Language" %}:</span>
-      <form action="{% url 'set_language' %}" method="post" class="inline">
-        {% csrf_token %}
-        <input type="hidden" name="next" value="{{ request.get_full_path }}">
-        <select name="language" onchange="this.form.submit()" class="bg-transparent text-cyan-400 text-sm font-medium border-none outline-none cursor-pointer">
-          <option value="en" {% if request.LANGUAGE_CODE == 'en' %}selected{% endif %}>🇺🇸 English</option>
-          <option value="es" {% if request.LANGUAGE_CODE == 'es' %}selected{% endif %}>🇪🇸 Español</option>
-        </select>
-      </form>
+  <!-- Header con Login/Registro -->
+  <header class="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-sm border-b border-cyan-400/30">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <!-- Logo -->
+      <div class="flex items-center gap-3">
+        <img src="{% static 'img/logo.png' %}" alt="eGarage" class="w-8 h-8" style="filter: drop-shadow(0 0 10px rgba(34, 211, 238, 0.8));">
+        <span class="text-cyan-400 font-futuristic font-bold text-lg">eGarage</span>
+      </div>
+
+      <!-- Navegación -->
+      <nav class="hidden md:flex items-center gap-6">
+        <a href="#pricing" class="text-cyan-300 hover:text-cyan-400 transition-colors font-tech" aria-label="{% trans 'View pricing plans' %}">{% trans "Pricing" %}</a>
+        <a href="#virtues" class="text-cyan-300 hover:text-cyan-400 transition-colors font-tech" aria-label="{% trans 'View features' %}">{% trans "Features" %}</a>
+      </nav>
+
+      <!-- Botones de Acción -->
+      <div class="flex items-center gap-3">
+        <a href="{% url 'usa:account_login' %}" class="px-4 py-2 text-cyan-400 hover:text-cyan-300 transition-colors font-tech" aria-label="{% trans 'Login to your account' %}">{% trans "Login" %}</a>
+        <a href="{% url 'usa:usa_onboarding:registro_gratuito' %}" class="px-4 py-2 neon-button text-black font-futuristic font-bold rounded-full text-sm" aria-label="{% trans 'Start free trial' %}">🚀 {% trans "Start Free" %}</a>
+
+        <!-- Language Selector -->
+        <div class="ml-3">
+          <form action="{% url 'set_language' %}" method="post" class="inline">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <select name="language" onchange="this.form.submit()" class="bg-transparent text-cyan-400 text-sm font-medium border-none outline-none cursor-pointer">
+              <option value="en" {% if request.LANGUAGE_CODE == 'en' %}selected{% endif %}>🇺🇸</option>
+              <option value="es" {% if request.LANGUAGE_CODE == 'es' %}selected{% endif %}>🇪🇸</option>
+            </select>
+          </form>
+        </div>
+      </div>
     </div>
-  </div>
+  </header>
 
   <!-- Fondos animados múltiples -->
   <div id="vanta-globe" class="fixed inset-0 -z-10"></div>
@@ -359,7 +415,7 @@
 
   <main class="relative z-10">
     <!-- Hero Section -->
-    <section class="text-center py-24 px-6 relative" data-aos="fade-up">
+    <section class="text-center py-24 px-6 relative pt-32" data-aos="fade-up">
       <img src="{% static 'img/logo.png' %}" alt="eGarage Logo" class="mx-auto mb-8 w-32 md:w-40 animate-spin-slow" style="filter: drop-shadow(0 0 30px rgba(34, 211, 238, 0.9));">
 
              <h1 class="text-3xl md:text-6xl font-futuristic font-extrabold tracking-tight
@@ -370,52 +426,53 @@
              <p class="text-xl text-cyan-300 mb-8 font-tech font-medium">{% trans "Trusted by mechanics across America. Real features. Bilingual support. No risk." %}</p>
 
              <div class="mt-10 flex flex-col md:flex-row gap-4 justify-center">
-         <a href="/registro/" class="px-10 py-4 neon-button text-black font-futuristic font-bold rounded-full text-xl">🚀 {% trans "Start Free Trial" %}</a>
-         <a href="#pricing" class="px-10 py-4 bg-black/60 backdrop-blur border border-cyan-400/50 text-cyan-400 font-futuristic font-bold rounded-full text-xl hover:bg-black/80 transition-all">💰 {% trans "See Pricing" %}</a>
+         <a href="{% url 'usa:usa_onboarding:registro_gratuito' %}" class="px-10 py-4 neon-button text-black font-futuristic font-bold rounded-full text-xl" aria-label="{% trans 'Start your free trial' %}">🚀 {% trans "Start Free Trial" %}</a>
+         <a href="{% url 'usa:account_login' %}" class="px-10 py-4 bg-black/60 backdrop-blur border border-cyan-400/50 text-cyan-400 font-futuristic font-bold rounded-full text-xl hover:bg-black/80 transition-all" aria-label="{% trans 'Login to your account' %}">🔑 {% trans "Login" %}</a>
+         <a href="#pricing" class="px-10 py-4 bg-black/60 backdrop-blur border border-cyan-400/50 text-cyan-400 font-futuristic font-bold rounded-full text-xl hover:bg-black/80 transition-all" aria-label="{% trans 'View pricing plans' %}">💰 {% trans "See Pricing" %}</a>
        </div>
     </section>
 
          <!-- Botón sticky CTA flotante -->
      <div class="sticky-cta">
-       <a href="#cta" class="neon-button text-black px-6 py-3 rounded-full text-lg font-futuristic font-bold">🚀 {% trans "Start Now" %}</a>
+       <a href="#cta" class="neon-button text-black px-6 py-3 rounded-full text-lg font-futuristic font-bold" aria-label="{% trans 'Start your free trial now' %}">🚀 {% trans "Start Now" %}</a>
      </div>
 
     <!-- Sección de Rubros -->
     <section class="mx-auto max-w-6xl px-4 py-16">
              <h2 class="text-2xl md:text-4xl font-futuristic font-bold text-cyan-400 mb-8 text-center holographic-text">
-         Sectores que potenciamos
+         Sectors We Empower
        </h2>
       <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
                  <!-- Taller Mecánico -->
          <article class="neon-card p-6" data-aos="fade-up">
            <div class="text-4xl mb-4">🔧</div>
-           <h3 class="text-lg font-bold-tech text-white mb-3">Taller Mecánico</h3>
+           <h3 class="text-lg font-bold-tech text-white mb-3">Auto Repair Shop</h3>
            <p class="text-sm font-tech text-cyan-200">
-             Órdenes de trabajo, checklist de recepción, tiempos y desempeño por técnico.
+             Work orders, reception checklists, technician times and performance tracking.
            </p>
          </article>
          <!-- Vulcanización / Neumáticos -->
          <article class="neon-card p-6" data-aos="fade-up" data-aos-delay="100">
            <div class="text-4xl mb-4">🛞</div>
-           <h3 class="text-lg font-bold-tech text-white mb-3">Vulcanización y Neumáticos</h3>
+           <h3 class="text-lg font-bold-tech text-white mb-3">Tire & Vulcanization</h3>
            <p class="text-sm font-tech text-cyan-200">
-             Rotación, balanceo, historial por juego, alertas de stock y cotizaciones rápidas.
+             Rotation, balancing, tire set history, stock alerts and quick quotes.
            </p>
          </article>
          <!-- Pintura y Hojalatería -->
          <article class="neon-card p-6" data-aos="fade-up" data-aos-delay="200">
            <div class="text-4xl mb-4">🎨</div>
-           <h3 class="text-lg font-bold-tech text-white mb-3">Pintura y Hojalatería</h3>
+           <h3 class="text-lg font-bold-tech text-white mb-3">Paint & Body Shop</h3>
            <p class="text-sm font-tech text-cyan-200">
-             Etapas del proceso, materiales por trabajo, fotos antes/después y presupuestos.
+             Process stages, materials per job, before/after photos and estimates.
            </p>
          </article>
          <!-- Casa de Repuestos -->
          <article class="neon-card p-6" data-aos="fade-up" data-aos-delay="300">
            <div class="text-4xl mb-4">🧩</div>
-           <h3 class="text-lg font-bold-tech text-white mb-3">Casa de Repuestos</h3>
+           <h3 class="text-lg font-bold-tech text-white mb-3">Parts Store</h3>
            <p class="text-sm font-tech text-cyan-200">
-             Catálogo, part number, márgenes, ventas e integración con documentos digitales.
+             Catalog, part numbers, margins, sales and digital document integration.
            </p>
          </article>
       </div>
@@ -513,55 +570,55 @@
     <!-- Precios actualizados sin decimales -->
     <section id="pricing" class="mx-auto max-w-6xl px-4 py-20">
              <h2 class="text-2xl md:text-4xl font-futuristic font-bold text-cyan-400 text-center mb-10 holographic-text">
-         Planes simples y sin letra chica
+         Simple Plans, No Fine Print
        </h2>
 
       <div class="grid gap-6 md:grid-cols-3">
         <!-- Mensual -->
         <div class="neon-card p-8" data-aos="fade-up">
-                     <h3 class="text-white text-xl font-bold-tech mb-4">Mensual</h3>
+                     <h3 class="text-white text-xl font-bold-tech mb-4">Monthly</h3>
            <p class="text-4xl font-futuristic font-extrabold text-white mb-2">$20</p>
-           <p class="text-cyan-300 mb-6 font-tech">por mes</p>
+           <p class="text-cyan-300 mb-6 font-tech">per month</p>
           <ul class="space-y-2 text-cyan-200 text-sm mb-8">
-            <li>✓ Usuarios ilimitados</li>
-            <li>✓ Documentos digitales</li>
-            <li>✓ Soporte bilingüe</li>
+            <li>✓ Unlimited users</li>
+            <li>✓ Digital documents</li>
+            <li>✓ Bilingual support</li>
           </ul>
-          <a href="/registro/" class="inline-flex items-center justify-center w-full rounded-xl neon-button text-black font-semibold py-3">
-            Empezar
+          <a href="{% url 'usa:usa_onboarding:registro_gratuito' %}" class="inline-flex items-center justify-center w-full rounded-xl neon-button text-black font-semibold py-3" aria-label="{% trans 'Start monthly plan' %}">
+            {% trans "Start" %}
           </a>
         </div>
 
         <!-- Semestral -->
         <div class="neon-card p-8" data-aos="fade-up" data-aos-delay="100" style="border-color: rgba(34, 211, 238, 0.8); box-shadow: 0 0 40px rgba(34, 211, 238, 0.3);">
           <div class="inline-block text-xs px-3 py-1 rounded-full bg-cyan-400/30 text-cyan-300 border border-cyan-300/50 mb-4">
-            ⭐ Recomendado
+            ⭐ Recommended
           </div>
-                     <h3 class="text-white text-xl font-bold-tech mb-4">Semestral</h3>
+                     <h3 class="text-white text-xl font-bold-tech mb-4">Semi-Annual</h3>
            <p class="text-4xl font-futuristic font-extrabold text-white mb-2">$110</p>
-           <p class="text-cyan-300 mb-6 font-tech">cada 6 meses</p>
+           <p class="text-cyan-300 mb-6 font-tech">every 6 months</p>
           <ul class="space-y-2 text-cyan-200 text-sm mb-8">
-            <li>✓ Todo del plan Mensual</li>
-            <li>✓ Recordatorios automáticos</li>
-            <li>✓ Reportes de utilidad</li>
+            <li>✓ Everything from Monthly plan</li>
+            <li>✓ Automatic reminders</li>
+            <li>✓ Profit reports</li>
           </ul>
-          <a href="/registro/" class="inline-flex items-center justify-center w-full rounded-xl neon-button text-black font-semibold py-3">
-            Elegir Semestral
+          <a href="{% url 'usa:usa_onboarding:registro_gratuito' %}" class="inline-flex items-center justify-center w-full rounded-xl neon-button text-black font-semibold py-3" aria-label="{% trans 'Choose semi-annual plan' %}">
+            {% trans "Choose Semi-Annual" %}
           </a>
         </div>
 
         <!-- Anual -->
         <div class="neon-card p-8" data-aos="fade-up" data-aos-delay="200">
-                     <h3 class="text-white text-xl font-bold-tech mb-4">Anual</h3>
+                     <h3 class="text-white text-xl font-bold-tech mb-4">Annual</h3>
            <p class="text-4xl font-futuristic font-extrabold text-white mb-2">$200</p>
-           <p class="text-cyan-300 mb-6 font-tech">por año</p>
+           <p class="text-cyan-300 mb-6 font-tech">per year</p>
           <ul class="space-y-2 text-cyan-200 text-sm mb-8">
-            <li>✓ Todo del plan Semestral</li>
-            <li>✓ Descuentos por volumen</li>
-            <li>✓ Soporte priorizado</li>
+            <li>✓ Everything from Semi-Annual plan</li>
+            <li>✓ Volume discounts</li>
+            <li>✓ Priority support</li>
           </ul>
-          <a href="/registro/" class="inline-flex items-center justify-center w-full rounded-xl neon-button text-black font-semibold py-3">
-            Elegir Anual
+          <a href="{% url 'usa:usa_onboarding:registro_gratuito' %}" class="inline-flex items-center justify-center w-full rounded-xl neon-button text-black font-semibold py-3" aria-label="{% trans 'Choose annual plan' %}">
+            {% trans "Choose Annual" %}
           </a>
         </div>
       </div>
@@ -570,22 +627,22 @@
     <!-- Testimonios modernos -->
     <section class="mx-auto max-w-6xl px-4 py-20">
              <h2 class="text-2xl md:text-4xl font-futuristic font-bold text-cyan-400 text-center mb-10 holographic-text">
-         Historias reales de talleres reales
+         Real Stories from Real Shops
        </h2>
 
       <!-- Métricas arriba -->
       <div class="grid gap-4 md:grid-cols-3 mb-10">
         <div class="metric-card p-6 text-center" data-aos="fade-up">
           <div class="text-3xl font-extrabold text-white mb-2">+38%</div>
-          <div class="text-cyan-200 text-sm">Mayor facturación promedio</div>
+          <div class="text-cyan-200 text-sm">Higher average revenue</div>
         </div>
         <div class="metric-card p-6 text-center" data-aos="fade-up" data-aos-delay="100">
           <div class="text-3xl font-extrabold text-white mb-2">-27%</div>
-          <div class="text-cyan-200 text-sm">Menos tiempo en recepción</div>
+          <div class="text-cyan-200 text-sm">Less time in reception</div>
         </div>
         <div class="metric-card p-6 text-center" data-aos="fade-up" data-aos-delay="200">
           <div class="text-3xl font-extrabold text-white mb-2">4.9/5</div>
-          <div class="text-cyan-200 text-sm">Satisfacción de clientes</div>
+          <div class="text-cyan-200 text-sm">Customer satisfaction</div>
         </div>
       </div>
 
@@ -600,7 +657,7 @@
              </div>
           </div>
           <p class="text-cyan-200">
-            "Este software cambió cómo trabajamos; ahora todo queda trazado y cobramos más rápido."
+            "This software changed how we work; now everything is tracked and we get paid faster."
           </p>
         </article>
         <article class="neon-card p-6" data-aos="fade-up" data-aos-delay="100">
@@ -612,7 +669,7 @@
              </div>
           </div>
           <p class="text-cyan-200">
-            "Soporte bilingüe y migración rápida. Ideal para talleres que crecen."
+            "Bilingual support and quick migration. Perfect for growing shops."
           </p>
         </article>
         <article class="neon-card p-6" data-aos="fade-up" data-aos-delay="200">
@@ -624,7 +681,7 @@
              </div>
           </div>
           <p class="text-cyan-200">
-            "La prueba gratis nos convenció. Hoy todo es digital y los clientes lo notan."
+            "The free trial convinced us. Now everything is digital and customers notice."
           </p>
         </article>
       </div>
@@ -635,7 +692,7 @@
              <h2 class="text-5xl text-cyan-400 font-futuristic font-bold text-center mb-8 holographic-text">
          {% trans "Ready to upgrade your workshop into a smart force?" %}
        </h2>
-      <a href="/registro/" class="mt-8 px-10 py-4 neon-button text-black text-xl font-bold rounded-2xl">{% trans "Start Free Today" %}</a>
+      <a href="{% url 'usa:usa_onboarding:registro_gratuito' %}" class="mt-8 px-10 py-4 neon-button text-black text-xl font-bold rounded-2xl" aria-label="{% trans 'Start your free trial today' %}">{% trans "Start Free Today" %}</a>
     </section>
 
     <footer class="mt-20 text-center text-cyan-300 text-sm pb-10">
@@ -644,53 +701,62 @@
   </main>
 
   <!-- Scripts -->
-  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
-  <script>
-    // Vanta.js Globe
-    VANTA.GLOBE({
-      el: "#vanta-globe",
-      mouseControls: true,
-      touchControls: true,
-      gyroControls: false,
-      minHeight: 200.00,
-      minWidth: 200.00,
-      scale: 1.00,
-      scaleMobile: 1.00,
-      color: 0x22d3ee,
-      color2: 0x60a5fa,
-      backgroundColor: 0x0a0a0a,
-      size: 1.00
-    });
+  <script defer>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Respeta reduce-motion para accesibilidad
+      const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // Vanta.js Dots
-    VANTA.DOTS({
-      el: "#vanta-dots",
-      mouseControls: true,
-      touchControls: true,
-      gyroControls: false,
-      minHeight: 200.00,
-      minWidth: 200.00,
-      scale: 1.00,
-      scaleMobile: 1.00,
-      color: 0x22d3ee,
-      color2: 0x60a5fa,
-      backgroundColor: 0x0a0a0a,
-      size: 3.00,
-      spacing: 35.00,
-      showLines: false
-    });
+      if (!reduce) {
+        // Vanta.js Globe
+        if (typeof VANTA !== 'undefined' && VANTA.GLOBE) {
+          VANTA.GLOBE({
+            el: "#vanta-globe",
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.00,
+            minWidth: 200.00,
+            scale: 1.00,
+            scaleMobile: 1.00,
+            color: 0x22d3ee,
+            color2: 0x60a5fa,
+            backgroundColor: 0x0a0a0a,
+            size: 1.00
+          });
+        }
 
-    // AOS.js animaciones scroll
-    AOS.init({
-      duration: 900,
-      once: true,
-      offset: 80,
-      delay: 100,
-      easing: 'ease-in-out-cubic'
-    });
+        // Vanta.js Dots
+        if (typeof VANTA !== 'undefined' && VANTA.DOTS) {
+          VANTA.DOTS({
+            el: "#vanta-dots",
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.00,
+            minWidth: 200.00,
+            scale: 1.00,
+            scaleMobile: 1.00,
+            color: 0x22d3ee,
+            color2: 0x60a5fa,
+            backgroundColor: 0x0a0a0a,
+            size: 3.00,
+            spacing: 35.00,
+            showLines: false
+          });
+        }
 
-    // Inicialización completa
-    document.addEventListener('DOMContentLoaded', function() {
+        // AOS.js animaciones scroll
+        if (typeof AOS !== 'undefined') {
+          AOS.init({
+            duration: 900,
+            once: true,
+            offset: 80,
+            delay: 100,
+            easing: 'ease-in-out-cubic'
+          });
+        }
+      }
+
       console.log('Página cargada completamente');
     });
   </script>

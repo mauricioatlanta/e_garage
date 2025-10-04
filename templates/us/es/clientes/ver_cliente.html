@@ -51,7 +51,7 @@
     </div>
     <div class="mt-10 flex justify-end">
   {% country_url 'clientes:lista_clientes' as url_lista_clientes %}
-  <a href="{{ url_lista_clientes|default:'#' }}" class="cta-btn-premium px-8 py-3 rounded-2xl font-bold text-lg shadow-xl transition-all hover:scale-105">
+  <a href="{{ url_lista_clientes|default:'#' }}" class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-8 py-3 rounded-2xl font-bold text-lg shadow-xl transition-all hover:scale-105 border border-cyan-400/50 hover:border-cyan-300/70">
         <i class="fas fa-arrow-left mr-2"></i> Volver a la lista
       </a>
     </div>

@@ -1,0 +1,1137 @@
+{% extends "base.html" %}
+{% load i18n static widget_tweaks country_url %}
+
+{% block content %}
+<style>
+/* Improved contrast and visibility styles */
+.vehicle-form-container {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  border: 2px solid #0ea5e9;
+  border-radius: 20px;
+  box-shadow: 0 0 30px rgba(14, 165, 233, 0.3);
+}
+
+.form-title {
+  background: linear-gradient(135deg, #0ea5e9, #06b6d4, #10b981);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 0 20px rgba(14, 165, 233, 0.5);
+  font-weight: 900;
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.form-label {
+  color: #e2e8f0;
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  display: block;
+  text-shadow: 0 0 10px rgba(14, 165, 233, 0.3);
+}
+
+.form-input {
+  background: rgba(15, 23, 42, 0.8);
+  border: 2px solid #475569;
+  border-radius: 10px;
+  padding: 12px 16px;
+  color: #f1f5f9;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.form-input:focus {
+  border-color: #0ea5e9;
+  background: rgba(15, 23, 42, 0.95);
+  box-shadow: 0 0 20px rgba(14, 165, 233, 0.4);
+  outline: none;
+}
+
+.form-select {
+  background: rgba(15, 23, 42, 0.8);
+  border: 2px solid #475569;
+  border-radius: 10px;
+  padding: 12px 16px;
+  color: #f1f5f9;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.form-select:focus {
+  border-color: #0ea5e9;
+  background: rgba(15, 23, 42, 0.95);
+  box-shadow: 0 0 20px rgba(14, 165, 233, 0.4);
+  outline: none;
+}
+
+.form-textarea {
+  background: rgba(15, 23, 42, 0.8);
+  border: 2px solid #475569;
+  border-radius: 10px;
+  padding: 12px 16px;
+  color: #f1f5f9;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  width: 100%;
+  min-height: 100px;
+  resize: vertical;
+}
+
+.form-textarea:focus {
+  border-color: #0ea5e9;
+  background: rgba(15, 23, 42, 0.95);
+  box-shadow: 0 0 20px rgba(14, 165, 233, 0.4);
+  outline: none;
+}
+
+.form-help {
+  color: #94a3b8;
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
+  font-style: italic;
+}
+
+.form-error {
+  color: #ef4444;
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
+  font-weight: 600;
+  text-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #0ea5e9, #06b6d4);
+  border: none;
+  border-radius: 12px;
+  padding: 14px 28px;
+  color: white;
+  font-weight: 700;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(14, 165, 233, 0.4);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #0284c7, #0891b2);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(14, 165, 233, 0.6);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #64748b, #475569);
+  border: none;
+  border-radius: 12px;
+  padding: 14px 28px;
+  color: white;
+  font-weight: 700;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(100, 116, 139, 0.4);
+}
+
+.btn-secondary:hover {
+  background: linear-gradient(135deg, #475569, #334155);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(100, 116, 139, 0.6);
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: #0ea5e9;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: underline;
+}
+
+.btn-link:hover {
+  color: #06b6d4;
+  text-shadow: 0 0 10px rgba(14, 165, 233, 0.5);
+}
+
+.modal-content {
+  background: linear-gradient(135deg, #1e293b, #334155);
+  border: 2px solid #0ea5e9;
+  border-radius: 15px;
+  box-shadow: 0 0 30px rgba(14, 165, 233, 0.5);
+}
+
+.modal-title {
+  color: #e2e8f0;
+  font-weight: 700;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.field-group {
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid #475569;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.field-group:hover {
+  border-color: #0ea5e9;
+  background: rgba(30, 41, 59, 0.7);
+  box-shadow: 0 0 15px rgba(14, 165, 233, 0.2);
+}
+
+/* Client search styles */
+.client-suggestion {
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid #475569;
+  transition: all 0.2s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.client-suggestion:hover {
+  background: rgba(14, 165, 233, 0.1);
+  border-color: #0ea5e9;
+}
+
+.client-suggestion:last-child {
+  border-bottom: none;
+}
+
+.client-info {
+  flex: 1;
+}
+
+.client-name {
+  color: #e2e8f0;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.client-details {
+  color: #94a3b8;
+  font-size: 0.875rem;
+  margin-top: 2px;
+}
+
+.client-id {
+  color: #64748b;
+  font-size: 0.75rem;
+  font-family: monospace;
+}
+
+.client-suggestion.selected {
+  background: rgba(14, 165, 233, 0.2);
+  border-color: #0ea5e9;
+}
+
+.client-search-loading {
+  padding: 12px 16px;
+  text-align: center;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.client-search-empty {
+  padding: 12px 16px;
+  text-align: center;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+/* Color Picker Styles */
+.color-option {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  border: 2px solid #e5e7eb;
+}
+
+.color-option:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 15px rgba(14, 165, 233, 0.5);
+  border-color: #0ea5e9;
+}
+
+.color-option.selected {
+  border-color: #10b981;
+  border-width: 3px;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.6);
+  transform: scale(1.05);
+}
+
+.color-option.selected::after {
+  content: "✓";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #000;
+  font-weight: bold;
+  font-size: 16px;
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.color-option[data-color="White"].selected::after {
+  color: #000;
+}
+
+.color-option[data-color="Black"].selected::after {
+  color: #fff;
+}
+
+.selected-color-display {
+  padding: 8px 12px;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid #0ea5e9;
+  border-radius: 8px;
+  margin-top: 8px;
+  font-size: 0.9rem;
+  color: #e2e8f0;
+}
+</style>
+
+<!-- Data endpoints para JavaScript -->
+<script
+  id="vehiculos-endpoints"
+  type="application/json"
+  data-modelos-url="{{ url_api_modelos }}"
+  data-motores-url="{{ url_api_motores }}"
+  data-cajas-url="{{ url_api_cajas }}"
+  data-colores-url="{% url 'usa:taller:vehiculos:api_colores' %}"
+  data-agregar-motor-url="{% url 'usa:taller:vehiculos:ajax_agregar_motor' %}"
+  data-agregar-caja-url="{% url 'usa:taller:vehiculos:ajax_agregar_caja' %}"
+  data-clientes-url="{{ url_api_clientes }}">
+</script>
+
+<!-- USA English Template Badge -->
+<div style="position: fixed; top: 10px; right: 10px; width: 60px; height: 60px; background: linear-gradient(135deg, #00ff00, #00cc00); z-index: 9999; border: 3px solid #fff; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #000; font-weight: bold; font-size: 11px; text-align: center; line-height: 1.2; box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);">
+USA EN<br>VEHICLE
+</div>
+
+<div class="max-w-6xl mx-auto p-6">
+  <div class="vehicle-form-container p-8">
+    <h1 class="form-title">🚗 CREATE VEHICLE</h1>
+
+    <!-- Django Messages -->
+    {% if messages %}
+      <div class="mb-6">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} p-4 rounded-lg border-l-4 {% if message.tags == 'error' %}bg-red-900/20 border-red-500 text-red-200{% elif message.tags == 'success' %}bg-green-900/20 border-green-500 text-green-200{% elif message.tags == 'warning' %}bg-yellow-900/20 border-yellow-500 text-yellow-200{% else %}bg-blue-900/20 border-blue-500 text-blue-200{% endif %}">
+            <div class="flex items-center">
+              <span class="text-lg mr-3">
+                {% if message.tags == 'error' %}❌{% elif message.tags == 'success' %}✅{% elif message.tags == 'warning' %}⚠️{% else %}ℹ️{% endif %}
+              </span>
+              <span>{{ message }}</span>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <form id="form-vehiculo" method="post" novalidate class="space-y-8">
+      {% csrf_token %}
+
+      <!-- Client Information -->
+      <div class="field-group">
+        <label class="form-label">👤 Client *</label>
+        <div class="relative">
+          <input type="text" id="client-search" class="form-input" placeholder="Type to search clients..." autocomplete="off">
+          <input type="hidden" name="cliente" id="cliente-id" value="{{ form.cliente.value|default:'' }}">
+          <div id="client-suggestions" class="absolute top-full left-0 right-0 bg-gray-800 border border-gray-600 rounded-lg mt-1 max-h-60 overflow-y-auto z-50 hidden">
+            <!-- Client suggestions will be populated here -->
+          </div>
+        </div>
+        <!-- Hide the original client field -->
+        <div style="display: none;">
+          {{ form.cliente }}
+        </div>
+        <div class="form-help">Type to search by name, email or phone number</div>
+        {% if form.cliente.errors %}<div class="form-error">{{ form.cliente.errors.0 }}</div>{% endif %}
+      </div>
+
+      <!-- Vehicle Basic Information -->
+      <div class="field-group">
+        <h2 class="text-xl font-bold text-cyan-300 mb-4 border-b border-cyan-500/30 pb-2">🚗 Vehicle Information</h2>
+        
+        <div class="grid md:grid-cols-2 gap-6 mb-6">
+          <!-- Year -->
+          <div>
+            <label class="form-label">📅 Year *</label>
+            {{ form.anio|add_class:"form-select" }}
+            {% if form.anio.errors %}<div class="form-error">{{ form.anio.errors.0 }}</div>{% endif %}
+          </div>
+
+          <!-- Brand -->
+          <div>
+            <label class="form-label">🏷️ Brand *</label>
+            {{ form.marca|add_class:"form-select" }}
+            {% if form.marca.errors %}<div class="form-error">{{ form.marca.errors.0 }}</div>{% endif %}
+          </div>
+        </div>
+
+        <!-- Model -->
+        <div class="mb-6">
+          <label class="form-label">🚙 Model *</label>
+          {{ form.modelo|add_class:"form-select" }}
+          <div class="form-help">Select brand and year first to load available models</div>
+          {% if form.modelo.errors %}<div class="form-error">{{ form.modelo.errors.0 }}</div>{% endif %}
+        </div>
+      </div>
+
+      <!-- Technical Specifications -->
+      <div class="field-group">
+        <h2 class="text-xl font-bold text-cyan-300 mb-4 border-b border-cyan-500/30 pb-2">⚙️ Technical Specifications</h2>
+        
+        <div class="grid md:grid-cols-2 gap-6">
+          <!-- Engine -->
+          <div>
+            <label class="form-label">🔧 Engine</label>
+            {{ form.motor|add_class:"form-select" }}
+            {% if form.motor.errors %}<div class="form-error">{{ form.motor.errors.0 }}</div>{% endif %}
+            <button type="button" id="btn-agregar-motor" class="btn-link mt-2">+ Add New Engine</button>
+          </div>
+
+          <!-- Transmission -->
+          <div>
+            <label class="form-label">🔀 Transmission</label>
+            {{ form.caja|add_class:"form-select" }}
+            {% if form.caja.errors %}<div class="form-error">{{ form.caja.errors.0 }}</div>{% endif %}
+            <button type="button" id="btn-agregar-caja" class="btn-link mt-2">+ Add New Transmission</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vehicle Details -->
+      <div class="field-group">
+        <h2 class="text-xl font-bold text-cyan-300 mb-4 border-b border-cyan-500/30 pb-2">📋 Vehicle Details</h2>
+        
+        <div class="grid md:grid-cols-3 gap-6 mb-6">
+          <!-- VIN -->
+          <div>
+            <label class="form-label">🆔 VIN</label>
+            {{ form.vin|add_class:"form-input" }}
+            <div class="form-help">Vehicle Identification Number</div>
+            {% if form.vin.errors %}<div class="form-error">{{ form.vin.errors.0 }}</div>{% endif %}
+          </div>
+
+          <!-- License Plate -->
+          <div>
+            <label class="form-label">🚗 License Plate</label>
+            {{ form.patente|add_class:"form-input" }}
+            <div class="form-help">License plate number</div>
+            {% if form.patente.errors %}<div class="form-error">{{ form.patente.errors.0 }}</div>{% endif %}
+          </div>
+
+          <!-- Color -->
+          <div>
+            <label class="form-label">🎨 Color</label>
+            <div class="relative">
+              <!-- Color Picker Grid -->
+              <div class="grid grid-cols-7 gap-2 mb-3" id="color-grid">
+                <button type="button" class="color-option" data-color="White" data-hex="#FFFFFF" style="background: #FFFFFF; border: 2px solid #e5e7eb;" title="White"></button>
+                <button type="button" class="color-option" data-color="Black" data-hex="#000000" style="background: #000000; border: 2px solid #e5e7eb;" title="Black"></button>
+                <button type="button" class="color-option" data-color="Red" data-hex="#DC2626" style="background: #DC2626; border: 2px solid #e5e7eb;" title="Red"></button>
+                <button type="button" class="color-option" data-color="Blue" data-hex="#2563EB" style="background: #2563EB; border: 2px solid #e5e7eb;" title="Blue"></button>
+                <button type="button" class="color-option" data-color="Green" data-hex="#16A34A" style="background: #16A34A; border: 2px solid #e5e7eb;" title="Green"></button>
+                <button type="button" class="color-option" data-color="Silver" data-hex="#9CA3AF" style="background: #9CA3AF; border: 2px solid #e5e7eb;" title="Silver"></button>
+                <button type="button" class="color-option" data-color="Gray" data-hex="#6B7280" style="background: #6B7280; border: 2px solid #e5e7eb;" title="Gray"></button>
+              </div>
+              
+              <!-- Custom Color Input -->
+              <div class="flex gap-2">
+                <input type="text" id="custom-color-input" class="form-input flex-1" placeholder="Enter custom color..." style="display: none;">
+                <button type="button" id="btn-custom-color" class="btn-link">+ Add Custom Color</button>
+              </div>
+              
+              <!-- Hidden field to store the selected color -->
+              <input type="hidden" name="color" id="selected-color" value="{{ form.color.value|default:'' }}">
+              <input type="hidden" id="selected-color-hex" value="">
+              
+              <!-- Hide the original Django color field -->
+              <div style="display: none;">
+                {{ form.color }}
+              </div>
+            </div>
+            {% if form.color.errors %}<div class="form-error">{{ form.color.errors.0 }}</div>{% endif %}
+            <div class="form-help">Click a color or add a custom one</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Additional Information -->
+      <div class="field-group">
+        <h2 class="text-xl font-bold text-cyan-300 mb-4 border-b border-cyan-500/30 pb-2">📝 Additional Information</h2>
+        
+        <div>
+          <label class="form-label">📄 Notes & Comments</label>
+          {{ form.informacion_adicional|add_class:"form-textarea" }}
+          <div class="form-help">Any additional information about this vehicle</div>
+          {% if form.informacion_adicional.errors %}<div class="form-error">{{ form.informacion_adicional.errors.0 }}</div>{% endif %}
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex gap-6 justify-center pt-8">
+        <button type="submit" class="btn-primary">
+          ✅ Create Vehicle
+        </button>
+        <a href="{% country_url 'vehiculos:lista_vehiculos' %}" class="btn-secondary">
+          ❌ Cancel
+        </a>
+      </div>
+    </form>
+</div>
+
+<!-- Modal for adding new engine -->
+<div id="modal-motor" class="fixed inset-0 bg-black bg-opacity-70 hidden z-50">
+  <div class="flex items-center justify-center min-h-screen p-4">
+    <div class="modal-content p-8 w-full max-w-md">
+      <h3 class="modal-title">🔧 Add New Engine</h3>
+      <form id="form-motor">
+        <div class="mb-6">
+          <label class="form-label">Engine Name</label>
+          <input type="text" id="input-motor" class="form-input" required>
+          <div class="form-help">Enter the engine name or model</div>
+        </div>
+        <div class="flex gap-4 justify-end">
+          <button type="submit" class="btn-primary">✅ Add Engine</button>
+          <button type="button" id="cancelar-motor" class="btn-secondary">❌ Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for adding new transmission -->
+<div id="modal-caja" class="fixed inset-0 bg-black bg-opacity-70 hidden z-50">
+  <div class="flex items-center justify-center min-h-screen p-4">
+    <div class="modal-content p-8 w-full max-w-md">
+      <h3 class="modal-title">🔀 Add New Transmission</h3>
+      <form id="form-caja">
+        <div class="mb-6">
+          <label class="form-label">Transmission Name</label>
+          <input type="text" id="input-caja" class="form-input" required>
+          <div class="form-help">Enter the transmission type or model</div>
+        </div>
+        <div class="flex gap-4 justify-end">
+          <button type="submit" class="btn-primary">✅ Add Transmission</button>
+          <button type="button" id="cancelar-caja" class="btn-secondary">❌ Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const endpoints = document.getElementById('vehiculos-endpoints').dataset;
+    
+    // Client search functionality
+    const clientSearchInput = document.querySelector('#client-search');
+    const clienteIdInput = document.querySelector('#cliente-id');
+    const clientSuggestions = document.querySelector('#client-suggestions');
+    let searchTimeout = null;
+    let selectedClient = null;
+    let currentSuggestions = [];
+
+    function searchClients(query) {
+        if (query.length < 2) {
+            hideSuggestions();
+            return;
+        }
+
+        showLoading();
+        
+        fetch(`${endpoints.clientesUrl}?q=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(data => {
+                currentSuggestions = data;
+                displaySuggestions(data);
+            })
+            .catch(error => {
+                console.error('Error searching clients:', error);
+                showError('Error searching clients');
+            });
+    }
+
+    function showLoading() {
+        clientSuggestions.innerHTML = '<div class="client-search-loading">🔍 Searching clients...</div>';
+        clientSuggestions.classList.remove('hidden');
+    }
+
+    function showError(message) {
+        clientSuggestions.innerHTML = `<div class="client-search-empty">❌ ${message}</div>`;
+        clientSuggestions.classList.remove('hidden');
+    }
+
+    function displaySuggestions(clients) {
+        if (clients.length === 0) {
+            clientSuggestions.innerHTML = '<div class="client-search-empty">No clients found</div>';
+            clientSuggestions.classList.remove('hidden');
+            return;
+        }
+
+        const html = clients.map(client => `
+            <div class="client-suggestion" data-client-id="${client.id}" data-client-name="${client.nombre} ${client.apellido}">
+                <div class="client-info">
+                    <div class="client-name">${client.nombre} ${client.apellido}</div>
+                    <div class="client-details">
+                        ${client.email ? `📧 ${client.email}` : ''} 
+                        ${client.telefono ? `📞 ${client.telefono}` : ''}
+                    </div>
+                </div>
+                <div class="client-id">ID: ${client.id}</div>
+            </div>
+        `).join('');
+
+        clientSuggestions.innerHTML = html;
+        clientSuggestions.classList.remove('hidden');
+
+        // Add click handlers to suggestions
+        clientSuggestions.querySelectorAll('.client-suggestion').forEach(suggestion => {
+            suggestion.addEventListener('click', () => {
+                const clientId = suggestion.dataset.clientId;
+                const clientName = suggestion.dataset.clientName;
+                selectClient(clientId, clientName);
+            });
+
+            suggestion.addEventListener('mouseenter', () => {
+                // Remove selected class from all suggestions
+                clientSuggestions.querySelectorAll('.client-suggestion').forEach(s => s.classList.remove('selected'));
+                // Add selected class to current suggestion
+                suggestion.classList.add('selected');
+            });
+        });
+    }
+
+    function selectClient(clientId, clientName) {
+        selectedClient = { id: clientId, name: clientName };
+        clientSearchInput.value = clientName;
+        clienteIdInput.value = clientId;
+        hideSuggestions();
+        
+        // Add visual feedback
+        clientSearchInput.style.borderColor = '#10b981';
+        setTimeout(() => {
+            clientSearchInput.style.borderColor = '';
+        }, 1000);
+    }
+
+    function hideSuggestions() {
+        clientSuggestions.classList.add('hidden');
+    }
+
+    function clearSelection() {
+        selectedClient = null;
+        clientSearchInput.value = '';
+        clienteIdInput.value = '';
+        hideSuggestions();
+    }
+
+    // Event listeners
+    if (clientSearchInput) {
+        clientSearchInput.addEventListener('input', (e) => {
+            const query = e.target.value.trim();
+            
+            if (query === '') {
+                clearSelection();
+                return;
+            }
+
+            // Clear timeout if user is still typing
+            if (searchTimeout) {
+                clearTimeout(searchTimeout);
+            }
+
+            // Search after user stops typing for 300ms
+            searchTimeout = setTimeout(() => {
+                searchClients(query);
+            }, 300);
+        });
+
+        clientSearchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                hideSuggestions();
+                clientSearchInput.blur();
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                const firstSuggestion = clientSuggestions.querySelector('.client-suggestion');
+                if (firstSuggestion && !clientSuggestions.classList.contains('hidden')) {
+                    firstSuggestion.classList.add('selected');
+                    firstSuggestion.focus();
+                }
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                const selectedSuggestion = clientSuggestions.querySelector('.client-suggestion.selected');
+                if (selectedSuggestion) {
+                    const clientId = selectedSuggestion.dataset.clientId;
+                    const clientName = selectedSuggestion.dataset.clientName;
+                    selectClient(clientId, clientName);
+                }
+            }
+        });
+
+        clientSearchInput.addEventListener('blur', () => {
+            // Delay hiding to allow clicks on suggestions
+            setTimeout(() => {
+                hideSuggestions();
+            }, 200);
+        });
+
+        clientSearchInput.addEventListener('focus', () => {
+            if (clientSearchInput.value.length >= 2) {
+                searchClients(clientSearchInput.value);
+            }
+        });
+    }
+
+    // Hide suggestions when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('#client-search') && !e.target.closest('#client-suggestions')) {
+            hideSuggestions();
+        }
+    });
+
+    // Color Picker Functionality
+    const colorOptions = document.querySelectorAll('.color-option');
+    const selectedColorInput = document.getElementById('selected-color');
+    const selectedColorHexInput = document.getElementById('selected-color-hex');
+    const customColorInput = document.getElementById('custom-color-input');
+    const btnCustomColor = document.getElementById('btn-custom-color');
+    
+    let selectedColorDisplay = null;
+    
+    // Create selected color display element
+    function createSelectedColorDisplay() {
+        if (!selectedColorDisplay) {
+            selectedColorDisplay = document.createElement('div');
+            selectedColorDisplay.className = 'selected-color-display';
+            document.getElementById('color-grid').parentNode.appendChild(selectedColorDisplay);
+        }
+        return selectedColorDisplay;
+    }
+    
+    // Update selected color display
+    function updateSelectedColorDisplay(colorName, hexValue) {
+        const display = createSelectedColorDisplay();
+        display.innerHTML = `Selected: <strong>${colorName}</strong> <span style="display: inline-block; width: 16px; height: 16px; background: ${hexValue}; border-radius: 3px; border: 1px solid #e5e7eb; vertical-align: middle; margin-left: 8px;"></span>`;
+    }
+    
+    // Select color from predefined options
+    colorOptions.forEach(option => {
+        option.addEventListener('click', () => {
+            // Remove previous selection
+            colorOptions.forEach(opt => opt.classList.remove('selected'));
+            
+            // Select current option
+            option.classList.add('selected');
+            
+            // Update hidden inputs
+            const colorName = option.dataset.color;
+            const hexValue = option.dataset.hex;
+            selectedColorInput.value = colorName;
+            selectedColorHexInput.value = hexValue;
+            
+            // Update display
+            updateSelectedColorDisplay(colorName, hexValue);
+            
+            // Hide custom input if shown
+            customColorInput.style.display = 'none';
+            btnCustomColor.textContent = '+ Add Custom Color';
+        });
+    });
+    
+    // Custom color functionality
+    btnCustomColor.addEventListener('click', () => {
+        if (customColorInput.style.display === 'none') {
+            // Show custom input
+            customColorInput.style.display = 'block';
+            customColorInput.focus();
+            btnCustomColor.textContent = 'Cancel';
+            
+            // Clear any selected predefined color
+            colorOptions.forEach(opt => opt.classList.remove('selected'));
+            selectedColorInput.value = '';
+            selectedColorHexInput.value = '';
+            
+            // Clear display
+            if (selectedColorDisplay) {
+                selectedColorDisplay.innerHTML = '';
+            }
+        } else {
+            // Hide custom input
+            customColorInput.style.display = 'none';
+            btnCustomColor.textContent = '+ Add Custom Color';
+            customColorInput.value = '';
+        }
+    });
+    
+    // Handle custom color input
+    customColorInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            const customColor = customColorInput.value.trim();
+            if (customColor) {
+                // Update hidden inputs
+                selectedColorInput.value = customColor;
+                selectedColorHexInput.value = '';
+                
+                // Update display
+                updateSelectedColorDisplay(customColor, '#9CA3AF'); // Default gray for custom colors
+                
+                // Hide custom input
+                customColorInput.style.display = 'none';
+                btnCustomColor.textContent = '+ Add Custom Color';
+                customColorInput.value = '';
+            }
+        }
+    });
+    
+    // Initialize with existing value if any
+    const existingColor = selectedColorInput.value;
+    if (existingColor) {
+        // Try to find matching predefined color
+        const matchingOption = Array.from(colorOptions).find(option => 
+            option.dataset.color.toLowerCase() === existingColor.toLowerCase()
+        );
+        
+        if (matchingOption) {
+            matchingOption.click();
+        } else {
+            // Show as custom color
+            updateSelectedColorDisplay(existingColor, '#9CA3AF');
+        }
+    }
+
+    // Form submission handling
+    const form = document.getElementById('form-vehiculo');
+    if (form) {
+        form.addEventListener('submit', (e) => {
+            // Ensure the hidden client field is properly set
+            const clientId = clienteIdInput.value;
+            const clientSearch = clientSearchInput.value.trim();
+            
+            if (!clientId && clientSearch) {
+                e.preventDefault();
+                alert('Please select a client from the search results');
+                clientSearchInput.focus();
+                return false;
+            }
+            
+            if (!clientId) {
+                e.preventDefault();
+                alert('Please select a client');
+                clientSearchInput.focus();
+                return false;
+            }
+            
+            // Sync the hidden field with the selected client
+            const originalClientField = document.querySelector('select[name="cliente"]');
+            if (originalClientField) {
+                originalClientField.value = clientId;
+            }
+        });
+    }
+    
+    // Model filtering by brand and year
+    const marcaField = document.querySelector('#id_marca');
+    const anioField = document.querySelector('#id_anio');
+    const modeloField = document.querySelector('#id_modelo');
+    
+    
+    function updateModelos() {
+        const marcaId = marcaField.value;
+        const anio = anioField.value;
+        
+        if (marcaId) {
+            modeloField.innerHTML = '<option value="">Loading models...</option>';
+            
+            
+            fetch(`${endpoints.modelosUrl}?marca=${marcaId}&anio=${anio}`)
+                .then(response => response.json())
+                .then(data => {
+                    
+                    modeloField.innerHTML = '<option value="">Select model</option>';
+                    
+                    // Handle both formats: direct array or {results: [...]}
+                    const models = data.results || data || [];
+                    
+                    if (models.length === 0) {
+                        modeloField.innerHTML = '<option value="">No models found</option>';
+                        return;
+                    }
+                    
+                    models.forEach(modelo => {
+                        const option = document.createElement('option');
+                        option.value = modelo.id;
+                        option.textContent = modelo.text || modelo.nombre || modelo.name || 'Unknown Model';
+                        modeloField.appendChild(option);
+                    });
+                    
+                    // Clear engines and transmissions when model list changes
+                    updateMotores();
+                    updateCajas();
+                })
+                .catch(error => {
+                    console.error('Error loading models:', error);
+                    modeloField.innerHTML = '<option value="">Error loading models</option>';
+                    // Clear engines and transmissions on error
+                    updateMotores();
+                    updateCajas();
+                });
+        } else {
+            modeloField.innerHTML = '<option value="">Select brand first</option>';
+            // Clear engines and transmissions when no brand selected
+            updateMotores();
+            updateCajas();
+        }
+    }
+    
+    if (marcaField) marcaField.addEventListener('change', updateModelos);
+    if (anioField) anioField.addEventListener('change', updateModelos);
+    
+    // Engine loading functionality
+    const motorField = document.querySelector('#id_motor');
+    
+    function updateMotores() {
+        const modeloId = modeloField ? modeloField.value : null;
+        
+        if (modeloId) {
+            motorField.innerHTML = '<option value="">Loading engines...</option>';
+            
+            fetch(`${endpoints.motoresUrl}?modelo=${modeloId}`)
+                .then(response => response.json())
+                .then(data => {
+                    motorField.innerHTML = '<option value="">Select engine</option>';
+                    
+                    const engines = data.results || data || [];
+                    engines.forEach(engine => {
+                        const option = document.createElement('option');
+                        option.value = engine.id;
+                        option.textContent = engine.text || engine.nombre || engine;
+                        motorField.appendChild(option);
+                    });
+                    
+                    // Add option to add new engine
+                    const addOption = document.createElement('option');
+                    addOption.value = '__nuevo__';
+                    addOption.textContent = 'Add new engine...';
+                    motorField.appendChild(addOption);
+                })
+                .catch(error => {
+                    console.error('Error loading engines:', error);
+                    motorField.innerHTML = '<option value="">Error loading engines</option>';
+                });
+        } else {
+            motorField.innerHTML = '<option value="">Select model first</option>';
+        }
+    }
+    
+    // Transmission loading functionality
+    const cajaField = document.querySelector('#id_caja');
+    
+    function updateCajas() {
+        const modeloId = modeloField ? modeloField.value : null;
+        
+        if (modeloId) {
+            cajaField.innerHTML = '<option value="">Loading transmissions...</option>';
+            
+            fetch(`${endpoints.cajasUrl}?modelo=${modeloId}`)
+                .then(response => response.json())
+                .then(data => {
+                    cajaField.innerHTML = '<option value="">Select transmission</option>';
+                    
+                    const transmissions = data.results || data || [];
+                    transmissions.forEach(transmission => {
+                        const option = document.createElement('option');
+                        option.value = transmission.id;
+                        option.textContent = transmission.text || transmission.nombre || transmission;
+                        cajaField.appendChild(option);
+                    });
+                    
+                    // Add option to add new transmission
+                    const addOption = document.createElement('option');
+                    addOption.value = '__nuevo__';
+                    addOption.textContent = 'Add new transmission...';
+                    cajaField.appendChild(addOption);
+                })
+                .catch(error => {
+                    console.error('Error loading transmissions:', error);
+                    cajaField.innerHTML = '<option value="">Error loading transmissions</option>';
+                });
+        } else {
+            cajaField.innerHTML = '<option value="">Select model first</option>';
+        }
+    }
+    
+    // Update engines and transmissions when model changes
+    if (modeloField) {
+        modeloField.addEventListener('change', () => {
+            updateMotores();
+            updateCajas();
+        });
+    }
+    
+    // Engine modal
+    const btnAgregarMotor = document.getElementById('btn-agregar-motor');
+    const modalMotor = document.getElementById('modal-motor');
+    const formMotor = document.getElementById('form-motor');
+    const inputMotor = document.getElementById('input-motor');
+    const cancelarMotor = document.getElementById('cancelar-motor');
+    
+    if (btnAgregarMotor && modalMotor) {
+        btnAgregarMotor.addEventListener('click', () => {
+            // Get the selected model ID
+            const modeloField = document.querySelector('#id_modelo');
+            const modeloId = modeloField ? modeloField.value : null;
+            
+            if (!modeloId) {
+                alert('Please select a model first before adding an engine');
+                return;
+            }
+            
+            // Store the model ID in the modal for later use
+            modalMotor.dataset.modeloId = modeloId;
+            modalMotor.classList.remove('hidden');
+            inputMotor.focus();
+        });
+        
+        cancelarMotor.addEventListener('click', () => {
+            modalMotor.classList.add('hidden');
+            inputMotor.value = '';
+        });
+        
+        formMotor.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const nombre = inputMotor.value.trim();
+            const modeloId = modalMotor.dataset.modeloId;
+            
+            if (nombre && modeloId) {
+                // Add new engine via AJAX
+                fetch(endpoints.agregarMotorUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: JSON.stringify({ 
+                        nombre: nombre,
+                        modelo_id: modeloId
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Add to select and select it
+                        const motorSelect = document.querySelector('#id_motor');
+                        const option = document.createElement('option');
+                        option.value = data.motor.id;
+                        option.textContent = data.motor.nombre;
+                        option.selected = true;
+                        motorSelect.appendChild(option);
+                        modalMotor.classList.add('hidden');
+                        inputMotor.value = '';
+                        
+                        // Show success message
+                        console.log('✅ Engine added successfully:', data.motor.nombre);
+                    } else {
+                        console.error('❌ Error adding engine:', data.error);
+                        alert('Error adding engine: ' + (data.error || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('❌ Network error adding engine:', error);
+                    alert('Network error. Please try again.');
+                });
+            }
+        });
+    }
+    
+    // Transmission modal
+    const btnAgregarCaja = document.getElementById('btn-agregar-caja');
+    const modalCaja = document.getElementById('modal-caja');
+    const formCaja = document.getElementById('form-caja');
+    const inputCaja = document.getElementById('input-caja');
+    const cancelarCaja = document.getElementById('cancelar-caja');
+    
+    if (btnAgregarCaja && modalCaja) {
+        btnAgregarCaja.addEventListener('click', () => {
+            // Get the selected model ID
+            const modeloField = document.querySelector('#id_modelo');
+            const modeloId = modeloField ? modeloField.value : null;
+            
+            if (!modeloId) {
+                alert('Please select a model first before adding a transmission');
+                return;
+            }
+            
+            // Store the model ID in the modal for later use
+            modalCaja.dataset.modeloId = modeloId;
+            modalCaja.classList.remove('hidden');
+            inputCaja.focus();
+        });
+        
+        cancelarCaja.addEventListener('click', () => {
+            modalCaja.classList.add('hidden');
+            inputCaja.value = '';
+        });
+        
+        formCaja.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const nombre = inputCaja.value.trim();
+            const modeloId = modalCaja.dataset.modeloId;
+            
+            if (nombre && modeloId) {
+                // Add new transmission via AJAX
+                fetch(endpoints.agregarCajaUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: JSON.stringify({ 
+                        nombre: nombre,
+                        modelo_id: modeloId
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Add to select and select it
+                        const cajaSelect = document.querySelector('#id_caja');
+                        const option = document.createElement('option');
+                        option.value = data.caja.id;
+                        option.textContent = data.caja.nombre;
+                        option.selected = true;
+                        cajaSelect.appendChild(option);
+                        modalCaja.classList.add('hidden');
+                        inputCaja.value = '';
+                        
+                        // Show success message
+                        console.log('✅ Transmission added successfully:', data.caja.nombre);
+                    } else {
+                        console.error('❌ Error adding transmission:', data.error);
+                        alert('Error adding transmission: ' + (data.error || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('❌ Network error adding transmission:', error);
+                    alert('Network error. Please try again.');
+                });
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

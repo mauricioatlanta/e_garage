@@ -78,6 +78,23 @@ def redirect_cl_to_es(request, path=None):
     return redirect(new_path)
 
 
+def country_aware_clientes_redirect(request):
+    """Redirect /cl/clientes/ to the correct country-specific URL based on user's company"""
+    # If user is authenticated and has a company, redirect to their country
+    if request.user.is_authenticated:
+        try:
+            if hasattr(request.user, "empresa") and request.user.empresa:
+                if request.user.empresa.pais == "US":
+                    return redirect("/us/clientes/")
+                elif request.user.empresa.pais == "CL":
+                    return redirect("/cl/es/clientes/")
+        except Exception:
+            pass
+    
+    # Fallback: redirect to Chile (original behavior)
+    return redirect("/cl/es/clientes/")
+
+
 urlpatterns = [
     # Página de inicio - redirige según el usuario
     path("", redirect_to_home, name="home"),
@@ -178,6 +195,11 @@ urlpatterns = [
         "us/",
         include(("taller.urls_extra.usa", "usa"), namespace="usa"),
     ),
+    # 🇺🇸 USA - Inglés específico
+    path(
+        "us/en/",
+        include(("taller.urls_extra.usa", "usa"), namespace="usa_en"),
+    ),
     # 🇨🇱 Chile - Español
     path(
         "cl/es/",
@@ -188,6 +210,36 @@ urlpatterns = [
         "cl/vehiculos/",
         RedirectView.as_view(url="/cl/es/vehiculos/", permanent=False),
         name="cl_vehiculos_redirect",
+    ),
+    # USA - Specific routes before general redirect
+    path(
+        "us/vehiculos/",
+        RedirectView.as_view(url="/us/en/vehiculos/", permanent=False),
+        name="us_vehiculos_redirect",
+    ),
+    path(
+        "us/vehiculos/<int:pk>/",
+        RedirectView.as_view(url="/us/en/vehiculos/%(pk)s/", permanent=False),
+        name="us_vehiculo_detail_redirect",
+    ),
+    path(
+        "us/vehiculos/crear/",
+        RedirectView.as_view(url="/us/en/vehiculos/crear/", permanent=False),
+        name="us_vehiculo_create_redirect",
+    ),
+    path(
+        "us/vehiculos/<int:vehiculo_id>/editar/",
+        RedirectView.as_view(
+            url="/us/en/vehiculos/%(vehiculo_id)s/editar/", permanent=False
+        ),
+        name="us_vehiculo_edit_redirect",
+    ),
+    path(
+        "us/vehiculos/<int:vehiculo_id>/eliminar/",
+        RedirectView.as_view(
+            url="/us/en/vehiculos/%(vehiculo_id)s/eliminar/", permanent=False
+        ),
+        name="us_vehiculo_eliminar_redirect",
     ),
     path(
         "cl/vehiculos/<int:pk>/",
@@ -208,7 +260,7 @@ urlpatterns = [
     ),
     path(
         "cl/clientes/",
-        RedirectView.as_view(url="/cl/es/clientes/", permanent=False),
+        country_aware_clientes_redirect,
         name="cl_clientes_redirect",
     ),
     path(
@@ -228,17 +280,11 @@ urlpatterns = [
         ),
         name="cl_centro_operaciones_redirect",
     ),
-    # Redirect cl/ to cl/egarage/ (Chile welcome page) - MUST come before other cl/ patterns
+    # Página de bienvenida para Chile - /cl/ directamente
     path(
         "cl/",
-        RedirectView.as_view(url="/cl/egarage/", permanent=False),
-        name="cl_home_redirect",
-    ),
-    # Página de bienvenida específica para /cl/egarage/
-    path(
-        "cl/egarage/",
-        TemplateView.as_view(template_name="onboarding/bienvenida_chile_simple.html"),
-        name="cl_egarage_bienvenida",
+        TemplateView.as_view(template_name="landing_inicio.html"),
+        name="cl_home_welcome",
     ),
     # Redirect cl/ to cl/es/ preserving the rest of the path - DESHABILITADO - Causa bucles infinitos
     # path(
@@ -287,6 +333,15 @@ urlpatterns = [
             ("taller.documentos.urls", "documentos_us_en"), namespace="documentos_us_en"
         ),
     ),
+    # Autocomplete URLs por país
+    path(
+        "cl/autocomplete/",
+        include(("taller.autocomplete_urls", "autocomplete"), namespace="cl_autocomplete"),
+    ),
+    path(
+        "us/autocomplete/",
+        include(("taller.autocomplete_urls", "autocomplete"), namespace="usa_autocomplete"),
+    ),
     path(
         "cl/reportes/",
         include(("taller.reportes.urls", "reportes_cl_es"), namespace="reportes_cl_es"),
@@ -304,6 +359,12 @@ urlpatterns = [
         "taller/vehiculos/",
         RedirectView.as_view(url="/cl/vehiculos/", permanent=False),
         name="vehiculos_redirect_legacy",
+    ),
+    # Redirect específico para eliminación de vehículos
+    path(
+        "taller/vehiculos/<int:pk>/eliminar/",
+        RedirectView.as_view(url="/cl/es/vehiculos/%(pk)s/eliminar/", permanent=False),
+        name="vehiculo_eliminar_redirect_legacy",
     ),
     # Redirect para URLs antiguas de taller/settings
     path(
@@ -333,6 +394,19 @@ urlpatterns = [
     path("debug/branding/", include("taller.views_extra.debug_urls")),
     # Suscripción bloqueada - disponible globalmente
     path("suscripcion-bloqueada/", suscripcion_bloqueada, name="suscripcion_bloqueada"),
+    
+    # === REDIRECCIONES PARA ENDPOINTS AJAX HARDCODEADOS ===
+    # Plan B: redirecciones suaves para cualquier hardcode viejo
+    path("cl/ajax/clientes/buscar/", RedirectView.as_view(url="/cl/es/ajax/clientes/buscar/", permanent=False)),
+    path("cl/ajax/vehiculos-por-cliente/", RedirectView.as_view(url="/cl/es/ajax/vehiculos-por-cliente/", permanent=False)),
+    path("cl/repuestos/api/repuesto-por-codigo/", RedirectView.as_view(url="/cl/es/repuestos/api/repuesto-por-codigo/", permanent=False)),
+    path("cl/documentos/api/obtener-numero-documento/", RedirectView.as_view(url="/cl/es/documentos/api/obtener-numero-documento/", permanent=False)),
+    
+    # Redirecciones para USA (si las necesitas)
+    path("us/ajax/clientes/buscar/", RedirectView.as_view(url="/us/en/ajax/clientes/buscar/", permanent=False)),
+    path("us/ajax/vehiculos-por-cliente/", RedirectView.as_view(url="/us/en/ajax/vehiculos-por-cliente/", permanent=False)),
+    path("us/repuestos/api/repuesto-por-codigo/", RedirectView.as_view(url="/us/en/repuestos/api/repuesto-por-codigo/", permanent=False)),
+    path("us/documentos/api/obtener-numero-documento/", RedirectView.as_view(url="/us/en/documentos/api/obtener-numero-documento/", permanent=False)),
 ]
 
 if settings.DEBUG:

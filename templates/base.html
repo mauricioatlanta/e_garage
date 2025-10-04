@@ -1,198 +1,539 @@
 {% load static %}
-{% load i18n %}  {# Cargar i18n al principio #}
-{% load country_url %}  {# Template tag para URLs por país #}
+{% load i18n %}
+{% load country_url %}
 <!DOCTYPE html>
-<html lang="{{ LANGUAGE_CODE }}">  {# Idioma dinámico #}
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
+<!-- Badge anti-equivocaciones -->
+<div style="position:fixed;top:8px;right:8px;z-index:9999;padding:.35rem .6rem;border:2px solid #22c55e;border-radius:.6rem;background:#052e16;color:#a7f3d0;font:700 11px/1 ui-monospace,monospace;">
+{% if request.path|slice:':3' == '/cl' %}CL/ES{% elif request.path|slice:':3' == '/us' %}US/EN{% else %}DEFAULT{% endif %} :: {{ request.path }}
+</div>
+
+<!-- Selector de idioma en la esquina superior derecha -->
+<div style="position:fixed;top:8px;right:200px;z-index:9999;">
+  <form action="{% url 'set_language' %}" method="post" style="display:inline;">
+    {% csrf_token %}
+    <input name="next" type="hidden" value="{{ request.get_full_path }}">
+    <select name="language" onchange="this.form.submit()" style="background:#000;color:#00ffff;border:1px solid #00ffff;border-radius:4px;padding:4px 8px;font-size:12px;font-weight:bold;">
+      {% if request.path|slice:':3' == '/us' %}
+        <option value="en" {% if LANGUAGE_CODE == 'en' %}selected{% endif %}>🇺🇸 EN</option>
+        <option value="es" {% if LANGUAGE_CODE == 'es' %}selected{% endif %}>🇺🇸 ES</option>
+      {% else %}
+        <option value="es" {% if LANGUAGE_CODE == 'es' %}selected{% endif %}>🇨🇱 ES</option>
+        <option value="en" {% if LANGUAGE_CODE == 'en' %}selected{% endif %}>🇨🇱 EN</option>
+      {% endif %}
+    </select>
+  </form>
+</div>
   <meta charset="UTF-8">
   <title>{% block title %}{{ company_name|default:"eGarage" }}{% endblock %}</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- Catálogo JavaScript para gettext -->
+
+  {# --- Catálogo i18n --- #}
   <script src="{% url 'javascript-catalog' %}"></script>
 
-  <!-- Estilos principales -->
+  {# --- CSS principales SIEMPRE cargan --- #}
   <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
   <link rel="stylesheet" href="{% static 'css/output.css' %}">
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" referrerpolicy="no-referrer" />
-  {# Fondo espacial opcional #}
+
+  {# --- Starfield SOLO controla su CSS --- #}
   {% if enable_space_bg|default:1 %}
     <link rel="stylesheet" href="{% static 'css/starfield.css' %}">
   {% endif %}
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
+  {# --- Branding variables --- #}
+  <style>
+    :root{
+      --company-primary: {{ company_color|default:"#0d6efd" }};
+      --company-secondary: {{ secondary_color|default:"#6c757d" }};
+      --bs-primary: {{ company_color|default:"#0d6efd" }};
+      --bs-secondary: {{ secondary_color|default:"#6c757d" }};
+    }
+    .text-primary,.navbar-brand{color:var(--company-primary)!important}
+    .bg-primary{background-color:var(--company-primary)!important}
+    .btn-primary{background-color:var(--company-primary)!important;border-color:var(--company-primary)!important}
+    .btn-primary:hover{
+      background-color: color-mix(in srgb, var(--company-primary) 85%, black)!important;
+      border-color: color-mix(in srgb, var(--company-primary) 85%, black)!important;
+    }
+    .border-primary{border-color:var(--company-primary)!important}
+    .company-logo{max-height:80px;max-width:200px;object-fit:contain}
+    .company-header{background:linear-gradient(135deg,#1f2937 0%,#374151 50%,#1f2937 100%);border-bottom:4px solid var(--company-primary);box-shadow:0 10px 30px rgba(0,0,0,.3)}
+    .company-title{color:var(--company-primary);text-shadow:0 0 20px var(--company-primary),0 0 40px var(--company-primary);filter:drop-shadow(0 4px 8px rgba(0,0,0,.3))}
+  </style>
 
-  <!-- Meta tags para SEO -->
-  <meta name="description" content="{% block meta_description %}Sistema de gestión para talleres automotrices{% endblock %}">
-  <meta name="keywords" content="{% block meta_keywords %}taller, automotriz, gestión, repuestos, servicios{% endblock %}">
+  {# --- Font Awesome --- #}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" referrerpolicy="no-referrer" />
 
-  <!-- Open Graph / Facebook -->
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="{{ request.build_absolute_uri }}">
-  <meta property="og:title" content="{% block og_title %}{{ company_name|default:"eGarage" }}{% endblock %}">
-  <meta property="og:description" content="{% block og_description %}Sistema de gestión para talleres automotrices{% endblock %}">
-  <meta property="og:image" content="{% block og_image %}{% static 'images/og-image.jpg' %}{% endblock %}">
+  {# --- jQuery / DAL --- #}
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+  <script src="{% static 'autocomplete_light_custom/jquery.init.js' %}"></script>
+  <script src="{% static 'autocomplete_light_custom/select2.js' %}"></script>
+  <script src="{% static 'autocomplete_light_custom/autocomplete_light.js' %}"></script>
+  <script src="{% static 'autocomplete_light_custom/autocomplete.init.js' %}"></script>
 
-  <!-- Twitter -->
-  <meta property="twitter:card" content="summary_large_image">
-  <meta property="twitter:url" content="{{ request.build_absolute_uri }}">
-  <meta property="twitter:title" content="{% block twitter_title %}{{ company_name|default:"eGarage" }}{% endblock %}">
-  <meta property="twitter:description" content="{% block twitter_description %}Sistema de gestión para talleres automotrices{% endblock %}">
-  <meta property="twitter:image" content="{% block twitter_image %}{% static 'images/og-image.jpg' %}{% endblock %}">
-
-  <!-- Estilos adicionales del bloque -->
+  {% block extra_head %}{% endblock %}
   {% block extra_css %}{% endblock %}
 </head>
-<body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-screen text-white">
-  <!-- Fondo espacial opcional -->
+
+<body class="min-h-screen flex flex-col">
+
+
+  {# --- Fondo estelar SOLO su HTML cuando flag activo --- #}
   {% if enable_space_bg|default:1 %}
-    <div id="starfield"></div>
+    <div id="bg-starfield" aria-hidden="true">
+      <div class="stars layer1"></div>
+      {% if enable_space_bg != 2 %}
+        <div class="stars layer2"></div>
+        <div class="stars layer3"></div>
+      {% endif %}
+    </div>
   {% endif %}
 
-  <!-- Header principal -->
+  {# --- Header --- #}
   {% if request.path != '/accounts/login/' %}
-  <header class="relative z-10 bg-black/20 backdrop-blur-md border-b border-cyan-500/20">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between items-center py-4">
-        <!-- Logo y nombre de empresa -->
-        <div class="flex items-center gap-4">
-          {% if company_logo_url %}
-            <img src="{{ company_logo_url }}" alt="{{ company_name|default:'eGarage' }}" class="h-10 w-10 rounded-lg object-cover">
-          {% else %}
-            <div class="h-10 w-10 rounded-lg bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center">
-              <span class="text-white font-bold text-lg">E</span>
-            </div>
-          {% endif %}
-          <div>
-            <h1 class="text-xl font-bold text-white">{{ company_name|default:"eGarage" }}</h1>
-            {% if company_tagline %}
-              <p class="text-sm text-gray-400">{{ company_tagline }}</p>
-            {% endif %}
-          </div>
-        </div>
+  <header class="company-header flex items-center gap-6 p-6">
 
-        <!-- Navegación principal -->
-        <nav class="hidden md:flex items-center gap-6">
-          {% if request.user.is_authenticated %}
-            <!-- Botones de navegación principal -->
-            {% country_url 'clientes:lista_clientes' as url_clientes %}
-            <a href="{{ url_clientes }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
-              <span>👥</span>
-              <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Clientes{% else %}Clients{% endif %}</span>
-            </a>
-
-            {% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{% else %}/cl/vehiculos/{% endif %} as url_vehiculos
-            <a href="{{ url_vehiculos }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
-              <span>🚗</span>
-              <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Vehículos{% else %}Vehicles{% endif %}</span>
-            </a>
-
-            {% country_url 'repuestos:lista_repuestos' as url_repuestos %}
-            <a href="{{ url_repuestos }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
-              <span>🔧</span>
-              <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Repuestos{% else %}Parts{% endif %}</span>
-            </a>
-
-            {% country_url 'servicios:servicios_menu' as url_servicios %}
-            <a href="{{ url_servicios }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
-              <span>🧰</span>
-              <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Servicios{% else %}Services{% endif %}</span>
-            </a>
-
-            <!-- Otros Servicios -->
-            {% country_url 'servicios:otros_servicios_menu' as url_otros %}
-            <a href="{{ url_otros }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
-              <span>🌟</span>
-              <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Otros{% else %}Others{% endif %}</span>
-            </a>
-
-            <!-- Documentos -->
-            {% if request.path|slice:':3' == '/us' %}
-              {% country_url 'documentos:lista_documentos' app_namespace='documentos_us_en' as url_documentos %}
-            {% else %}
-              {% country_url 'documentos:lista_documentos' app_namespace='documentos_cl_es' as url_documentos %}
-            {% endif %}
-            <a href="{{ url_documentos }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
-              <span>📄</span>
-              <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Documentos{% else %}Documents{% endif %}</span>
-            </a>
-
-            <!-- Reportes -->
-            {% if request.path|slice:':3' == '/us' %}
-              {% country_url 'reportes:reportes_dashboard' app_namespace='reportes_us_en' as url_reportes %}
-            {% else %}
-              {% country_url 'reportes:reportes_dashboard' app_namespace='reportes_cl_es' as url_reportes %}
-            {% endif %}
-            <a href="{{ url_reportes }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
-              <span>📊</span>
-              <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Reportes{% else %}Reports{% endif %}</span>
-            </a>
-
-            <!-- Dashboard -->
-            {% country_url 'dashboard' as url_dashboard %}
-            <a href="{{ url_dashboard }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
-              <span>🏠</span>
-              <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Dashboard{% else %}Dashboard{% endif %}</span>
-            </a>
-
-            <!-- Mis vehículos -->
-            {% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{% else %}/cl/vehiculos/{% endif %} as url_mis_vehiculos
-            <a href="{{ url_mis_vehiculos }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
-              <span>🚗</span>
-              <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Mis vehículos{% else %}My Vehicles{% endif %}</span>
-            </a>
-
-            <!-- Configuración -->
-            {% country_url 'company_settings' as settings_url %}
-            <a href="{{ settings_url }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
-              <span>⚙️</span>
-              <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Settings{% else %}Settings{% endif %}</span>
-            </a>
-          {% endif %}
-        </nav>
-
-        <!-- Menú móvil -->
-        <div class="md:hidden">
-          <button id="mobile-menu-button" class="text-cyan-300 hover:text-lime-300 transition">
-            <i class="fas fa-bars text-xl"></i>
-          </button>
-        </div>
+    {% if company_logo_url %}
+      <img src="{{ company_logo_url }}" alt="{{ company_name }} Logo"
+           class="company-logo h-20 w-auto rounded-lg shadow-lg border-2 border-opacity-30"
+           style="border-color: {{ company_color|default:'#00ffff' }};">
+    {% else %}
+      <div class="company-logo h-20 w-20 rounded-lg flex items-center justify-center shadow-lg border-2 border-opacity-30"
+           style="background: linear-gradient(135deg, {{ company_color|default:'#00ffff' }}80, {{ company_color|default:'#00ffff' }}40); border-color: {{ company_color|default:'#00ffff' }};">
+        <span class="text-3xl font-bold text-white">🏢</span>
       </div>
+    {% endif %}
+
+    <div class="flex flex-col">
+      <h1 class="company-title text-4xl font-bold drop-shadow-lg">{{ company_name|default:"eGarage" }}</h1>
+      {% if company_tagline %}
+        <span class="text-xl text-gray-300 font-medium mt-1">{{ company_tagline }}</span>
+      {% elif request.user.is_authenticated %}
+        <span class="text-xl text-gray-300 font-medium mt-1">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Welcome{% else %}Bienvenido{% endif %}</span>
+      {% endif %}
+    </div>
+
+    <div class="ml-auto flex items-center gap-4">
+      {% if request.user.is_authenticated and request.user.is_staff %}
+        {% country_url 'company_settings' as settings_url %}
+        {% if settings_url %}
+          <a href="{{ settings_url }}" class="flex items-center gap-2 px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition" title="Configuración de Empresa">
+            <i class="fas fa-cog"></i>
+          </a>
+        {% endif %}
+      {% endif %}
     </div>
   </header>
   {% endif %}
 
-  <!-- Contenido principal -->
-  <main class="relative z-10">
+  {# --- Navegación principal --- #}
+  {% if request.path != '/accounts/login/' %}
+  <div id="main-navigation" class="flex items-center justify-center mt-4">
+    <div class="flex flex-wrap items-center justify-center gap-3 max-w-7xl w-full px-4">
+    {% if request.user.is_authenticated %}
+      <!-- Botones de navegación principal -->
+
+      <!-- Clientes -->
+      <a href="{% country_url 'clientes:lista_clientes' %}" class="group relative nav-button-tech transform transition-all duration-300 hover:scale-105">
+          <div class="relative overflow-hidden">
+            <!-- Fondo ultra oscuro con patrón -->
+            <div class="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black rounded-xl"></div>
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(34,211,238,0.1),transparent_50%)] rounded-xl"></div>
+            <!-- Borde neon brillante con animación -->
+            <div class="absolute inset-0 rounded-xl border-2 border-cyan-400/60 group-hover:border-cyan-300 transition-all duration-300 shadow-[0_0_25px_rgba(34,211,238,0.4)] group-hover:shadow-[0_0_40px_rgba(34,211,238,0.8)] group-hover:shadow-[0_0_60px_rgba(34,211,238,0.3)]"></div>
+            <!-- Efecto de escaneo neon diagonal -->
+            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-400/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 transform -skew-x-12 group-hover:animate-pulse"></div>
+            <!-- Efecto de partículas -->
+            <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+              <div class="absolute top-2 left-2 w-1 h-1 bg-cyan-400 rounded-full animate-ping"></div>
+              <div class="absolute top-4 right-3 w-1 h-1 bg-cyan-300 rounded-full animate-ping" style="animation-delay: 0.5s;"></div>
+              <div class="absolute bottom-3 left-4 w-1 h-1 bg-cyan-500 rounded-full animate-ping" style="animation-delay: 1s;"></div>
+            </div>
+            <!-- Contenido -->
+            <div class="relative flex items-center gap-3 px-6 py-4 rounded-xl">
+              <div class="w-6 h-6 bg-gradient-to-br from-cyan-400 to-cyan-600 rounded-lg flex items-center justify-center shadow-lg group-hover:shadow-cyan-400/80 transition-all duration-300 group-hover:rotate-12">
+                <div class="w-3 h-3 bg-white rounded-sm opacity-90 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </div>
+              <span class="font-bold text-sm text-white group-hover:text-cyan-200 transition-colors duration-300 tracking-wider uppercase drop-shadow-lg group-hover:drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}CLIENTS{% else %}CLIENTES{% endif %}</span>
+            </div>
+            <!-- Efecto de brillo superior neon -->
+            <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 shadow-[0_0_15px_rgba(34,211,238,0.9)]"></div>
+            <!-- Efecto de brillo inferior -->
+            <div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          </div>
+        </a>
+
+      <!-- Vehículos -->
+      <a href="{% country_url 'vehiculos:lista_vehiculos' %}" class="group relative nav-button-tech transform transition-all duration-300 hover:scale-105">
+          <div class="relative overflow-hidden">
+            <!-- Fondo ultra oscuro con patrón -->
+            <div class="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black rounded-xl"></div>
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(52,211,153,0.1),transparent_50%)] rounded-xl"></div>
+            <!-- Borde neon brillante con animación -->
+            <div class="absolute inset-0 rounded-xl border-2 border-emerald-400/60 group-hover:border-emerald-300 transition-all duration-300 shadow-[0_0_25px_rgba(52,211,153,0.4)] group-hover:shadow-[0_0_40px_rgba(52,211,153,0.8)] group-hover:shadow-[0_0_60px_rgba(52,211,153,0.3)]"></div>
+            <!-- Efecto de escaneo neon diagonal -->
+            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-400/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 transform -skew-x-12 group-hover:animate-pulse"></div>
+            <!-- Efecto de partículas -->
+            <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+              <div class="absolute top-2 left-2 w-1 h-1 bg-emerald-400 rounded-full animate-ping"></div>
+              <div class="absolute top-4 right-3 w-1 h-1 bg-emerald-300 rounded-full animate-ping" style="animation-delay: 0.5s;"></div>
+              <div class="absolute bottom-3 left-4 w-1 h-1 bg-emerald-500 rounded-full animate-ping" style="animation-delay: 1s;"></div>
+            </div>
+            <!-- Contenido -->
+            <div class="relative flex items-center gap-3 px-6 py-4 rounded-xl">
+              <div class="w-6 h-6 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-lg flex items-center justify-center shadow-lg group-hover:shadow-emerald-400/80 transition-all duration-300 group-hover:rotate-12">
+                <div class="w-3 h-3 bg-white rounded-sm opacity-90 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </div>
+              <span class="font-bold text-sm text-white group-hover:text-emerald-200 transition-colors duration-300 tracking-wider uppercase drop-shadow-lg group-hover:drop-shadow-[0_0_8px_rgba(52,211,153,0.8)]">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}VEHICLES{% else %}VEHÍCULOS{% endif %}</span>
+            </div>
+            <!-- Efecto de brillo superior neon -->
+            <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-emerald-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 shadow-[0_0_15px_rgba(52,211,153,0.9)]"></div>
+            <!-- Efecto de brillo inferior -->
+            <div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-emerald-400/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          </div>
+        </a>
+
+      <!-- Servicios -->
+      <a href="{% country_url 'servicios:servicios_menu' %}" class="group relative nav-button-tech transform transition-all duration-300 hover:scale-105">
+          <div class="relative overflow-hidden">
+            <!-- Fondo ultra oscuro con patrón -->
+            <div class="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black rounded-xl"></div>
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(139,92,246,0.1),transparent_50%)] rounded-xl"></div>
+            <!-- Borde neon brillante con animación -->
+            <div class="absolute inset-0 rounded-xl border-2 border-violet-400/60 group-hover:border-violet-300 transition-all duration-300 shadow-[0_0_25px_rgba(139,92,246,0.4)] group-hover:shadow-[0_0_40px_rgba(139,92,246,0.8)] group-hover:shadow-[0_0_60px_rgba(139,92,246,0.3)]"></div>
+            <!-- Efecto de escaneo neon diagonal -->
+            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-violet-400/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 transform -skew-x-12 group-hover:animate-pulse"></div>
+            <!-- Efecto de partículas -->
+            <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+              <div class="absolute top-2 left-2 w-1 h-1 bg-violet-400 rounded-full animate-ping"></div>
+              <div class="absolute top-4 right-3 w-1 h-1 bg-violet-300 rounded-full animate-ping" style="animation-delay: 0.5s;"></div>
+              <div class="absolute bottom-3 left-4 w-1 h-1 bg-violet-500 rounded-full animate-ping" style="animation-delay: 1s;"></div>
+            </div>
+            <!-- Contenido -->
+            <div class="relative flex items-center gap-3 px-6 py-4 rounded-xl">
+              <div class="w-6 h-6 bg-gradient-to-br from-violet-400 to-violet-600 rounded-lg flex items-center justify-center shadow-lg group-hover:shadow-violet-400/80 transition-all duration-300 group-hover:rotate-12">
+                <div class="w-3 h-3 bg-white rounded-sm opacity-90 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </div>
+              <span class="font-bold text-sm text-white group-hover:text-violet-200 transition-colors duration-300 tracking-wider uppercase drop-shadow-lg group-hover:drop-shadow-[0_0_8px_rgba(139,92,246,0.8)]">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}SERVICES{% else %}SERVICIOS{% endif %}</span>
+            </div>
+            <!-- Efecto de brillo superior neon -->
+            <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-violet-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 shadow-[0_0_15px_rgba(139,92,246,0.9)]"></div>
+            <!-- Efecto de brillo inferior -->
+            <div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-violet-400/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          </div>
+        </a>
+
+      <!-- Repuestos -->
+      <a href="{% country_url 'repuestos:lista_repuestos' %}" class="group relative nav-button-tech transform transition-all duration-300 hover:scale-105">
+          <div class="relative overflow-hidden">
+            <!-- Fondo ultra oscuro con patrón -->
+            <div class="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black rounded-xl"></div>
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(251,191,36,0.1),transparent_50%)] rounded-xl"></div>
+            <!-- Borde neon brillante con animación -->
+            <div class="absolute inset-0 rounded-xl border-2 border-amber-400/60 group-hover:border-amber-300 transition-all duration-300 shadow-[0_0_25px_rgba(251,191,36,0.4)] group-hover:shadow-[0_0_40px_rgba(251,191,36,0.8)] group-hover:shadow-[0_0_60px_rgba(251,191,36,0.3)]"></div>
+            <!-- Efecto de escaneo neon diagonal -->
+            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-amber-400/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 transform -skew-x-12 group-hover:animate-pulse"></div>
+            <!-- Efecto de partículas -->
+            <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+              <div class="absolute top-2 left-2 w-1 h-1 bg-amber-400 rounded-full animate-ping"></div>
+              <div class="absolute top-4 right-3 w-1 h-1 bg-amber-300 rounded-full animate-ping" style="animation-delay: 0.5s;"></div>
+              <div class="absolute bottom-3 left-4 w-1 h-1 bg-amber-500 rounded-full animate-ping" style="animation-delay: 1s;"></div>
+            </div>
+            <!-- Contenido -->
+            <div class="relative flex items-center gap-3 px-6 py-4 rounded-xl">
+              <div class="w-6 h-6 bg-gradient-to-br from-amber-400 to-amber-600 rounded-lg flex items-center justify-center shadow-lg group-hover:shadow-amber-400/80 transition-all duration-300 group-hover:rotate-12">
+                <div class="w-3 h-3 bg-white rounded-sm opacity-90 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </div>
+              <span class="font-bold text-sm text-white group-hover:text-amber-200 transition-colors duration-300 tracking-wider uppercase drop-shadow-lg group-hover:drop-shadow-[0_0_8px_rgba(251,191,36,0.8)]">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}SPARE PARTS{% else %}REPUESTOS{% endif %}</span>
+            </div>
+            <!-- Efecto de brillo superior neon -->
+            <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-amber-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 shadow-[0_0_15px_rgba(251,191,36,0.9)]"></div>
+            <!-- Efecto de brillo inferior -->
+            <div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-amber-400/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          </div>
+        </a>
+
+      <!-- Documentos -->
+      <a href="{% country_url 'documentos:lista_documentos' %}" class="group relative nav-button-tech transform transition-all duration-300 hover:scale-105">
+          <div class="relative overflow-hidden">
+            <!-- Fondo ultra oscuro con patrón -->
+            <div class="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black rounded-xl"></div>
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(45,212,191,0.1),transparent_50%)] rounded-xl"></div>
+            <!-- Borde neon brillante con animación -->
+            <div class="absolute inset-0 rounded-xl border-2 border-teal-400/60 group-hover:border-teal-300 transition-all duration-300 shadow-[0_0_25px_rgba(45,212,191,0.4)] group-hover:shadow-[0_0_40px_rgba(45,212,191,0.8)] group-hover:shadow-[0_0_60px_rgba(45,212,191,0.3)]"></div>
+            <!-- Efecto de escaneo neon diagonal -->
+            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-teal-400/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 transform -skew-x-12 group-hover:animate-pulse"></div>
+            <!-- Efecto de partículas -->
+            <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+              <div class="absolute top-2 left-2 w-1 h-1 bg-teal-400 rounded-full animate-ping"></div>
+              <div class="absolute top-4 right-3 w-1 h-1 bg-teal-300 rounded-full animate-ping" style="animation-delay: 0.5s;"></div>
+              <div class="absolute bottom-3 left-4 w-1 h-1 bg-teal-500 rounded-full animate-ping" style="animation-delay: 1s;"></div>
+            </div>
+            <!-- Contenido -->
+            <div class="relative flex items-center gap-3 px-6 py-4 rounded-xl">
+              <div class="w-6 h-6 bg-gradient-to-br from-teal-400 to-teal-600 rounded-lg flex items-center justify-center shadow-lg group-hover:shadow-teal-400/80 transition-all duration-300 group-hover:rotate-12">
+                <div class="w-3 h-3 bg-white rounded-sm opacity-90 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </div>
+              <span class="font-bold text-sm text-white group-hover:text-teal-200 transition-colors duration-300 tracking-wider uppercase drop-shadow-lg group-hover:drop-shadow-[0_0_8px_rgba(45,212,191,0.8)]">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}DOCUMENTS{% else %}DOCUMENTOS{% endif %}</span>
+            </div>
+            <!-- Efecto de brillo superior neon -->
+            <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-teal-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 shadow-[0_0_15px_rgba(45,212,191,0.9)]"></div>
+            <!-- Efecto de brillo inferior -->
+            <div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-teal-400/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          </div>
+        </a>
+
+      <!-- Otros Servicios -->
+      <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="group relative nav-button-tech transform transition-all duration-300 hover:scale-105">
+          <div class="relative overflow-hidden">
+            <!-- Fondo ultra oscuro con patrón -->
+            <div class="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black rounded-xl"></div>
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(251,113,133,0.1),transparent_50%)] rounded-xl"></div>
+            <!-- Borde neon brillante con animación -->
+            <div class="absolute inset-0 rounded-xl border-2 border-rose-400/60 group-hover:border-rose-300 transition-all duration-300 shadow-[0_0_25px_rgba(251,113,133,0.4)] group-hover:shadow-[0_0_40px_rgba(251,113,133,0.8)] group-hover:shadow-[0_0_60px_rgba(251,113,133,0.3)]"></div>
+            <!-- Efecto de escaneo neon diagonal -->
+            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-rose-400/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 transform -skew-x-12 group-hover:animate-pulse"></div>
+            <!-- Efecto de partículas -->
+            <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+              <div class="absolute top-2 left-2 w-1 h-1 bg-rose-400 rounded-full animate-ping"></div>
+              <div class="absolute top-4 right-3 w-1 h-1 bg-rose-300 rounded-full animate-ping" style="animation-delay: 0.5s;"></div>
+              <div class="absolute bottom-3 left-4 w-1 h-1 bg-rose-500 rounded-full animate-ping" style="animation-delay: 1s;"></div>
+            </div>
+            <!-- Contenido -->
+            <div class="relative flex items-center gap-3 px-6 py-4 rounded-xl">
+              <div class="w-6 h-6 bg-gradient-to-br from-rose-400 to-rose-600 rounded-lg flex items-center justify-center shadow-lg group-hover:shadow-rose-400/80 transition-all duration-300 group-hover:rotate-12">
+                <div class="w-3 h-3 bg-white rounded-sm opacity-90 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </div>
+              <span class="font-bold text-sm text-white group-hover:text-rose-200 transition-colors duration-300 tracking-wider uppercase drop-shadow-lg group-hover:drop-shadow-[0_0_8px_rgba(251,113,133,0.8)]">{% if LANGUAGE_CODE == 'en' %}EXTRA{% else %}EXTRA{% endif %}</span>
+            </div>
+            <!-- Efecto de brillo superior neon -->
+            <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-rose-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 shadow-[0_0_15px_rgba(251,113,133,0.9)]"></div>
+            <!-- Efecto de brillo inferior -->
+            <div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-rose-400/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          </div>
+        </a>
+
+      <!-- Centro de Investigación -->
+      <a href="{% country_url 'centro_operaciones_espacial' %}" class="group relative nav-button-tech transform transition-all duration-300 hover:scale-105">
+        <div class="relative overflow-hidden">
+          <!-- Fondo ultra oscuro con patrón -->
+          <div class="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black rounded-xl"></div>
+          <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(251,146,60,0.1),transparent_50%)] rounded-xl"></div>
+          <!-- Borde neon brillante con animación -->
+          <div class="absolute inset-0 rounded-xl border-2 border-orange-400/60 group-hover:border-orange-300 transition-all duration-300 shadow-[0_0_25px_rgba(251,146,60,0.4)] group-hover:shadow-[0_0_40px_rgba(251,146,60,0.8)] group-hover:shadow-[0_0_60px_rgba(251,146,60,0.3)]"></div>
+          <!-- Efecto de escaneo neon diagonal -->
+          <div class="absolute inset-0 bg-gradient-to-r from-transparent via-orange-400/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 transform -skew-x-12 group-hover:animate-pulse"></div>
+          <!-- Efecto de partículas -->
+          <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+            <div class="absolute top-2 left-2 w-1 h-1 bg-orange-400 rounded-full animate-ping"></div>
+            <div class="absolute top-4 right-3 w-1 h-1 bg-orange-300 rounded-full animate-ping" style="animation-delay: 0.5s;"></div>
+            <div class="absolute bottom-3 left-4 w-1 h-1 bg-orange-500 rounded-full animate-ping" style="animation-delay: 1s;"></div>
+          </div>
+          <!-- Contenido -->
+          <div class="relative flex items-center gap-3 px-6 py-4 rounded-xl">
+            <div class="w-6 h-6 bg-gradient-to-br from-orange-400 to-orange-600 rounded-lg flex items-center justify-center shadow-lg group-hover:shadow-orange-400/80 transition-all duration-300 group-hover:rotate-12">
+              <div class="w-3 h-3 bg-white rounded-sm opacity-90 group-hover:opacity-100 transition-opacity duration-300"></div>
+            </div>
+            <span class="font-bold text-sm text-white group-hover:text-orange-200 transition-colors duration-300 tracking-wider uppercase drop-shadow-lg group-hover:drop-shadow-[0_0_8px_rgba(251,146,60,0.8)]">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}COMMAND CENTER{% else %}CENTRO{% endif %}</span>
+          </div>
+          <!-- Efecto de brillo superior neon -->
+          <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-orange-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 shadow-[0_0_15px_rgba(251,146,60,0.9)]"></div>
+          <!-- Efecto de brillo inferior -->
+          <div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-orange-400/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        </div>
+      </a>
+
+      <!-- Reportes -->
+      <a href="{% country_url 'reportes:reportes_dashboard' %}" class="group relative nav-button-tech transform transition-all duration-300 hover:scale-105">
+        <div class="relative overflow-hidden">
+          <!-- Fondo ultra oscuro con patrón -->
+          <div class="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black rounded-xl"></div>
+          <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(52,211,153,0.1),transparent_50%)] rounded-xl"></div>
+          <!-- Borde neon brillante con animación -->
+          <div class="absolute inset-0 rounded-xl border-2 border-emerald-400/60 group-hover:border-emerald-300 transition-all duration-300 shadow-[0_0_25px_rgba(52,211,153,0.4)] group-hover:shadow-[0_0_40px_rgba(52,211,153,0.8)] group-hover:shadow-[0_0_60px_rgba(52,211,153,0.3)]"></div>
+          <!-- Efecto de escaneo neon diagonal -->
+          <div class="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-400/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 transform -skew-x-12 group-hover:animate-pulse"></div>
+          <!-- Efecto de partículas -->
+          <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+            <div class="absolute top-2 left-2 w-1 h-1 bg-emerald-400 rounded-full animate-ping"></div>
+            <div class="absolute top-4 right-3 w-1 h-1 bg-emerald-300 rounded-full animate-ping" style="animation-delay: 0.5s;"></div>
+            <div class="absolute bottom-3 left-4 w-1 h-1 bg-emerald-500 rounded-full animate-ping" style="animation-delay: 1s;"></div>
+          </div>
+          <!-- Contenido -->
+          <div class="relative flex items-center gap-3 px-6 py-4 rounded-xl">
+            <div class="w-6 h-6 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-lg flex items-center justify-center shadow-lg group-hover:shadow-emerald-400/80 transition-all duration-300 group-hover:rotate-12">
+              <div class="w-3 h-3 bg-white rounded-sm opacity-90 group-hover:opacity-100 transition-opacity duration-300"></div>
+            </div>
+            <span class="font-bold text-sm text-white group-hover:text-emerald-200 transition-colors duration-300 tracking-wider uppercase drop-shadow-lg group-hover:drop-shadow-[0_0_8px_rgba(52,211,153,0.8)]">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}REPORTS{% else %}REPORTES{% endif %}</span>
+          </div>
+          <!-- Efecto de brillo superior neon -->
+          <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-emerald-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 shadow-[0_0_15px_rgba(52,211,153,0.9)]"></div>
+          <!-- Efecto de brillo inferior -->
+          <div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-emerald-400/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        </div>
+      </a>
+
+      <!-- Otros Servicios -->
+      <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="group relative nav-button-tech transform transition-all duration-300 hover:scale-105">
+        <div class="relative overflow-hidden">
+          <!-- Fondo ultra oscuro con patrón -->
+          <div class="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black rounded-xl"></div>
+          <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(232,121,249,0.1),transparent_50%)] rounded-xl"></div>
+          <!-- Borde neon brillante con animación -->
+          <div class="absolute inset-0 rounded-xl border-2 border-fuchsia-400/60 group-hover:border-fuchsia-300 transition-all duration-300 shadow-[0_0_25px_rgba(232,121,249,0.4)] group-hover:shadow-[0_0_40px_rgba(232,121,249,0.8)] group-hover:shadow-[0_0_60px_rgba(232,121,249,0.3)]"></div>
+          <!-- Efecto de escaneo neon diagonal -->
+          <div class="absolute inset-0 bg-gradient-to-r from-transparent via-fuchsia-400/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 transform -skew-x-12 group-hover:animate-pulse"></div>
+          <!-- Efecto de partículas -->
+          <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+            <div class="absolute top-2 left-2 w-1 h-1 bg-fuchsia-400 rounded-full animate-ping"></div>
+            <div class="absolute top-4 right-3 w-1 h-1 bg-fuchsia-300 rounded-full animate-ping" style="animation-delay: 0.5s;"></div>
+            <div class="absolute bottom-3 left-4 w-1 h-1 bg-fuchsia-500 rounded-full animate-ping" style="animation-delay: 1s;"></div>
+          </div>
+          <!-- Contenido -->
+          <div class="relative flex items-center gap-3 px-6 py-4 rounded-xl">
+            <div class="w-6 h-6 bg-gradient-to-br from-fuchsia-400 to-fuchsia-600 rounded-lg flex items-center justify-center shadow-lg group-hover:shadow-fuchsia-400/80 transition-all duration-300 group-hover:rotate-12">
+              <div class="w-3 h-3 bg-white rounded-sm opacity-90 group-hover:opacity-100 transition-opacity duration-300"></div>
+            </div>
+            <span class="font-bold text-sm text-white group-hover:text-fuchsia-200 transition-colors duration-300 tracking-wider uppercase drop-shadow-lg group-hover:drop-shadow-[0_0_8px_rgba(232,121,249,0.8)]">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}OTHER SERVICES{% else %}OTROS SERVICIOS{% endif %}</span>
+          </div>
+          <!-- Efecto de brillo superior neon -->
+          <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-fuchsia-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 shadow-[0_0_15px_rgba(232,121,249,0.9)]"></div>
+          <!-- Efecto de brillo inferior -->
+          <div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-fuchsia-400/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        </div>
+      </a>
+
+      <!-- AJUSTES -->
+      <a href="{% country_url 'company_settings' %}" class="group relative nav-button-tech transform transition-all duration-300 hover:scale-105">
+        <div class="relative overflow-hidden">
+          <!-- Fondo ultra oscuro con patrón -->
+          <div class="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black rounded-xl"></div>
+          <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(99,102,241,0.1),transparent_50%)] rounded-xl"></div>
+          <!-- Borde neon brillante con animación -->
+          <div class="absolute inset-0 rounded-xl border-2 border-indigo-400/60 group-hover:border-indigo-300 transition-all duration-300 shadow-[0_0_25px_rgba(99,102,241,0.4)] group-hover:shadow-[0_0_40px_rgba(99,102,241,0.8)] group-hover:shadow-[0_0_60px_rgba(99,102,241,0.3)]"></div>
+          <!-- Efecto de escaneo neon diagonal -->
+          <div class="absolute inset-0 bg-gradient-to-r from-transparent via-indigo-400/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 transform -skew-x-12 group-hover:animate-pulse"></div>
+          <!-- Efecto de partículas -->
+          <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+            <div class="absolute top-2 left-2 w-1 h-1 bg-indigo-400 rounded-full animate-ping"></div>
+            <div class="absolute top-4 right-3 w-1 h-1 bg-indigo-300 rounded-full animate-ping" style="animation-delay: 0.5s;"></div>
+            <div class="absolute bottom-3 left-4 w-1 h-1 bg-indigo-500 rounded-full animate-ping" style="animation-delay: 1s;"></div>
+          </div>
+          <!-- Contenido -->
+          <div class="relative flex items-center gap-3 px-6 py-4 rounded-xl">
+            <div class="w-6 h-6 bg-gradient-to-br from-indigo-400 to-indigo-600 rounded-lg flex items-center justify-center shadow-lg group-hover:shadow-indigo-400/80 transition-all duration-300 group-hover:rotate-12">
+              <div class="w-3 h-3 bg-white rounded-sm opacity-90 group-hover:opacity-100 transition-opacity duration-300"></div>
+            </div>
+            <span class="font-bold text-sm text-white group-hover:text-indigo-200 transition-colors duration-300 tracking-wider uppercase drop-shadow-lg group-hover:drop-shadow-[0_0_8px_rgba(99,102,241,0.8)]">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}SETTINGS{% else %}AJUSTES{% endif %}</span>
+          </div>
+          <!-- Efecto de brillo superior neon -->
+          <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-indigo-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 shadow-[0_0_15px_rgba(99,102,241,0.9)]"></div>
+          <!-- Efecto de brillo inferior -->
+          <div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-indigo-400/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        </div>
+      </a>
+
+      <!-- SALIR -->
+      <form action="{% url 'account_logout' %}" method="post" class="inline-block">
+        {% csrf_token %}
+        <button type="submit" class="group relative nav-button-tech transform transition-all duration-300 hover:scale-105">
+          <div class="relative overflow-hidden">
+            <!-- Fondo ultra oscuro con patrón -->
+            <div class="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black rounded-xl"></div>
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(239,68,68,0.1),transparent_50%)] rounded-xl"></div>
+            <!-- Borde neon brillante con animación -->
+            <div class="absolute inset-0 rounded-xl border-2 border-red-400/60 group-hover:border-red-300 transition-all duration-300 shadow-[0_0_25px_rgba(239,68,68,0.4)] group-hover:shadow-[0_0_40px_rgba(239,68,68,0.8)] group-hover:shadow-[0_0_60px_rgba(239,68,68,0.3)]"></div>
+            <!-- Efecto de escaneo neon diagonal -->
+            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-red-400/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 transform -skew-x-12 group-hover:animate-pulse"></div>
+            <!-- Efecto de partículas -->
+            <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+              <div class="absolute top-2 left-2 w-1 h-1 bg-red-400 rounded-full animate-ping"></div>
+              <div class="absolute top-4 right-3 w-1 h-1 bg-red-300 rounded-full animate-ping" style="animation-delay: 0.5s;"></div>
+              <div class="absolute bottom-3 left-4 w-1 h-1 bg-red-500 rounded-full animate-ping" style="animation-delay: 1s;"></div>
+            </div>
+            <!-- Contenido -->
+            <div class="relative flex items-center gap-3 px-6 py-4 rounded-xl">
+              <div class="w-6 h-6 bg-gradient-to-br from-red-400 to-red-600 rounded-lg flex items-center justify-center shadow-lg group-hover:shadow-red-400/80 transition-all duration-300 group-hover:rotate-12">
+                <div class="w-3 h-3 bg-white rounded-sm opacity-90 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </div>
+              <span class="font-bold text-sm text-white group-hover:text-red-200 transition-colors duration-300 tracking-wider uppercase drop-shadow-lg group-hover:drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}LOGOUT{% else %}SALIR{% endif %}</span>
+            </div>
+            <!-- Efecto de brillo superior neon -->
+            <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-red-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 shadow-[0_0_15px_rgba(239,68,68,0.9)]"></div>
+            <!-- Efecto de brillo inferior -->
+            <div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-red-400/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          </div>
+        </button>
+      </form>
+
+    {% else %}
+      <!-- Login button for non-authenticated users -->
+      <a href="{% url 'account_login' %}" class="nav-button flex items-center gap-2 px-4 py-2 bg-[#0a0f1a] border border-cyan-400 rounded-lg hover:bg-[#0f172a] transition-all duration-300 text-cyan-300 hover:text-white">
+        <div class="w-4 h-4 bg-cyan-400 rounded-sm flex items-center justify-center">
+          <div class="w-2 h-2 bg-white rounded-full"></div>
+        </div>
+        <span class="font-medium text-sm">{% if LANGUAGE_CODE == 'es' %}INICIAR SESIÓN{% else %}LOGIN{% endif %}</span>
+      </a>
+    {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  {# --- CONTENIDO --- #}
+  {% block fondo_extra %}{% endblock %}
+  <main class="flex-1">
     {% block content %}{% endblock %}
   </main>
 
-  <!-- Footer -->
-  <footer class="relative z-10 bg-black/20 backdrop-blur-md border-t border-cyan-500/20 mt-auto">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-        <div class="text-center md:text-left">
-          <p class="text-gray-400 text-sm">
-            © 2024 {{ company_name|default:"eGarage" }}. Todos los derechos reservados.
-          </p>
-        </div>
-        <div class="flex items-center gap-4">
-          <a href="{% url 'changelog' %}" class="text-cyan-300 hover:text-lime-300 transition text-sm">
-            Changelog
-          </a>
-          <a href="{% url 'contacto_ventas' %}" class="text-cyan-300 hover:text-lime-300 transition text-sm">
-            Contacto
-          </a>
-        </div>
+  {# --- FOOTER ÚNICO --- #}
+  <footer class="bg-black/80 border-t border-cyan-700/40 py-4 mt-auto">
+    <div class="container mx-auto px-4 text-center">
+      {% if company_settings.address or company_settings.phone or company_settings.email %}
+        <span class="text-xs text-gray-400 block">
+          {% if company_settings.address %}{{ company_settings.address }} {% endif %}
+          {% if company_settings.phone %}• {{ company_settings.phone }} {% endif %}
+          {% if company_settings.email %}• {{ company_settings.email }}{% endif %}
+        </span>
+      {% endif %}
+      <div class="mt-3 flex items-center justify-center gap-3 text-gray-400 text-sm">
+        <span class="font-medium">eGarage</span>
+        <span aria-hidden="true">•</span>
+        <span>© 2024</span>
+        <span aria-hidden="true">•</span>
+        <a href="/legal/" class="text-cyan-400 hover:underline">Legal</a>
       </div>
     </div>
   </footer>
 
-  <!-- Scripts -->
-  <script src="{% static 'js/dashboard.js' %}"></script>
-  <script src="{% static 'js/starfield.js' %}"></script>
+  {# --- JS extra + Starfield JS si aplica --- #}
   {% block extra_js %}{% endblock %}
+  {% if enable_space_bg|default:1 and enable_space_bg != 2 %}
+    <script src="{% static 'js/starfield.js' %}"></script>
+  {% endif %}
+
+  <script>
+    // CSRF helper
+    function getCookie(name){
+      let v=null; if(document.cookie && document.cookie!==''){
+        const cs=document.cookie.split(';');
+        for(let i=0;i<cs.length;i++){
+          const c=cs[i].trim(); if(c.substring(0,name.length+1)===(name+'=')){ v=decodeURIComponent(c.substring(name.length+1)); break; }
+        }
+      } return v;
+    }
+    const csrftoken=getCookie('csrftoken');
+
+    // Confirmación eliminar
+    function confirmarEliminacion(nombreCliente){
+      const isSpanish=document.documentElement.lang==='es';
+      const message=isSpanish
+        ? `⚠️ ¿Está seguro de eliminar a "${nombreCliente}"?\n\nEsta acción NO se puede deshacer.`
+        : `⚠️ Are you sure you want to delete "${nombreCliente}"?\n\nThis action CANNOT be undone.`;
+      return confirm(message);
+    }
+  </script>
 </body>
 </html>

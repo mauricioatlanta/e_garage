@@ -57,6 +57,10 @@ class LanguagePolicyMiddleware:
         else:
             lang = default_lang or "es"
 
+        # Debug logging
+        print(f"[DEBUG] LanguagePolicyMiddleware: pais={pais}, selected_lang={lang}")
+        print(f"[DEBUG] User: {request.user.username if request.user.is_authenticated else 'Anonymous'}")
+
         # Activar
         translation.activate(lang)
         request.LANGUAGE_CODE = lang

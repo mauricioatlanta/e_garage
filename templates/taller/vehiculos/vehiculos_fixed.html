@@ -1,3 +1,5 @@
+<!-- CRUZ AZUL - VEHICULOS_FIXED -->
+<div style="position: fixed; top: 20%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; font-size: 100px; color: blue; text-shadow: 0 0 20px blue;">❌</div>
 {% extends 'base.html' %}
 {% load custom_filters %}
 {% load country_url %}
@@ -99,9 +101,9 @@ input[type="text"]::placeholder {
           <td class="px-4 py-2">{{ vehiculo.anio }}</td>
           <td class="px-4 py-2">{{ vehiculo.cliente.nombre }} {{ vehiculo.cliente.apellido }}</td>
           <td class="px-4 py-2 space-x-2">
-            {% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{{ vehiculo.id }}/{% else %}/cl/vehiculos/{{ vehiculo.id }}/{% endif %} as url_ver_vehiculo
-            {% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{{ vehiculo.id }}/editar/{% else %}/cl/vehiculos/{{ vehiculo.id }}/editar/{% endif %} as url_editar_vehiculo
-            {% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{{ vehiculo.id }}/eliminar/{% else %}/cl/vehiculos/{{ vehiculo.id }}/eliminar/{% endif %} as url_eliminar_vehiculo
+            {% if request.path|slice:":4" == "/us/" %}/us/en/vehiculos/{{ vehiculo.id }}/{% else %}/cl/es/vehiculos/{{ vehiculo.id }}/{% endif %} as url_ver_vehiculo
+            {% if request.path|slice:":4" == "/us/" %}/us/en/vehiculos/{{ vehiculo.id }}/editar/{% else %}/cl/es/vehiculos/{{ vehiculo.id }}/editar/{% endif %} as url_editar_vehiculo
+            {% if request.path|slice:":4" == "/us/" %}/us/en/vehiculos/{{ vehiculo.id }}/eliminar/{% else %}/cl/es/vehiculos/{{ vehiculo.id }}/eliminar/{% endif %} as url_eliminar_vehiculo
             <a class="text-blue-600 hover:underline" href="{{ url_ver_vehiculo|default:'#' }}" title="Ver">👁️</a>
             <a class="text-yellow-600 hover:underline" href="{{ url_editar_vehiculo|default:'#' }}" title="Editar">✏️</a>
             <a class="text-red-600 hover:underline" href="{{ url_eliminar_vehiculo|default:'#' }}" title="Eliminar">🗑️</a>

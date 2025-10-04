@@ -3,6 +3,7 @@ from django.urls import path
 from . import dal_views
 from .views import (
     agregar_ciudad,
+    agregar_ciudad_usa,
     ajax_buscar_clientes,
     cliente_delete,
     clientes_stats,
@@ -29,6 +30,7 @@ urlpatterns = [
     path("ajax/ciudades/", obtener_ciudades, name="obtener_ciudades"),
     path("ajax/ciudades_usa/", obtener_ciudades_usa, name="obtener_ciudades_usa"),
     path("ajax/agregar_ciudad/", agregar_ciudad, name="agregar_ciudad"),
+    path("ajax/agregar_ciudad_usa/", agregar_ciudad_usa, name="agregar_ciudad_usa"),
     path("ajax/buscar/", ajax_buscar_clientes, name="ajax_buscar_clientes"),
     path("stats/", clientes_stats, name="clientes_stats"),
     # DAL autocomplete

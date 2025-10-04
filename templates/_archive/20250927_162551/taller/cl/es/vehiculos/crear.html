@@ -1,0 +1,402 @@
+{% extends "base.html" %}
+{% load i18n static widget_tweaks %}
+
+{% block content %}
+<!-- Data endpoints para JavaScript -->
+<script
+  id="vehiculos-endpoints"
+  type="application/json"
+  data-modelos-url="{% url 'chile:taller:vehiculos:ajax_modelos_por_marca_anio' %}"
+  data-motores-url="{{ url_api_motores }}"
+  data-cajas-url="{{ url_api_cajas }}"
+  data-colores-url="{% url 'chile:taller:vehiculos:api_colores' %}"
+  data-agregar-motor-url="{% url 'chile:taller:vehiculos:ajax_agregar_motor' %}"
+  data-agregar-caja-url="{% url 'chile:taller:vehiculos:ajax_agregar_caja' %}"
+  data-clientes-url="{% url 'chile:taller:vehiculos:api_busqueda_clientes' %}">
+</script>
+<div class="max-w-5xl mx-auto p-4">
+  <h1 class="text-2xl font-bold mb-4">Crear vehículo (CL)</h1>
+
+  <form id="form-vehiculo" method="post" novalidate class="space-y-6">
+    {% csrf_token %}
+
+    <!-- Cliente (AJAX buscable) -->
+    <div>
+      <label class="block text-sm font-medium mb-1">Cliente *</label>
+      {{ form.cliente|add_class:"w-full" }}
+      <small class="text-gray-500">Escribe para buscar por nombre, email o teléfono.</small>
+      {% if form.cliente.errors %}<p class="text-red-500 text-sm">{{ form.cliente.errors.0 }}</p>{% endif %}
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-4">
+      <!-- Año -->
+      <div>
+        <label class="block text-sm font-medium mb-1">Año *</label>
+        {{ form.anio|add_class:"w-full" }}
+        {% if form.anio.errors %}<p class="text-red-500 text-sm">{{ form.anio.errors.0 }}</p>{% endif %}
+      </div>
+
+      <!-- Marca -->
+      <div>
+        <label class="block text-sm font-medium mb-1">Marca *</label>
+        {{ form.marca|add_class:"w-full" }}
+        {% if form.marca.errors %}<p class="text-red-500 text-sm">{{ form.marca.errors.0 }}</p>{% endif %}
+      </div>
+    </div>
+
+    <!-- Modelo (filtrado por año+marca) -->
+    <div>
+      <label class="block text-sm font-medium mb-1">Modelo *</label>
+      {{ form.modelo|add_class:"w-full" }}
+      <small class="text-gray-500">Se carga al elegir año y marca.</small>
+      {% if form.modelo.errors %}<p class="text-red-500 text-sm">{{ form.modelo.errors.0 }}</p>{% endif %}
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-4">
+      <!-- Motor (filtrado por modelo) + crear -->
+      <div>
+        <label class="block text-sm font-medium mb-1">Motor *</label>
+        <div class="flex gap-2">
+          {{ form.motor|add_class:"w-full" }}
+          <button id="btn-crear-motor" type="button" class="px-3 py-2 border rounded">➕</button>
+        </div>
+        <small class="text-gray-500">Filtrado por modelo. Usa ➕ para crear uno nuevo.</small>
+        {% if form.motor.errors %}<p class="text-red-500 text-sm">{{ form.motor.errors.0 }}</p>{% endif %}
+      </div>
+
+      <!-- Caja (filtrado por modelo) + crear -->
+      <div>
+        <label class="block text-sm font-medium mb-1">Caja</label>
+        <div class="flex gap-2">
+          {{ form.caja|add_class:"w-full" }}
+          <button id="btn-crear-caja" type="button" class="px-3 py-2 border rounded">➕</button>
+        </div>
+        <small class="text-gray-500">Filtrado por modelo. Usa ➕ para crear una nueva.</small>
+        {% if form.caja.errors %}<p class="text-red-500 text-sm">{{ form.caja.errors.0 }}</p>{% endif %}
+      </div>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-4">
+      <!-- Patente -->
+      <div>
+        <label class="block text-sm font-medium mb-1">Patente</label>
+        {{ form.patente|add_class:"w-full" }}
+        {% if form.patente.errors %}<p class="text-red-500 text-sm">{{ form.patente.errors.0 }}</p>{% endif %}
+      </div>
+
+      <!-- VIN -->
+      <div>
+        <label class="block text-sm font-medium mb-1">VIN</label>
+        {{ form.vin|add_class:"w-full" }}
+        {% if form.vin.errors %}<p class="text-red-500 text-sm">{{ form.vin.errors.0 }}</p>{% endif %}
+      </div>
+    </div>
+
+            <!-- Color (lista + crear) -->
+            <div>
+              <label class="block text-sm font-medium mb-1">Color</label>
+              <div class="flex gap-2">
+                <select name="color" class="form-control w-full" style="width:100%" id="id_color">
+                  <option value="">Seleccionar color...</option>
+                  <option value="1">Blanco</option>
+                  <option value="2">Negro</option>
+                  <option value="3">Rojo</option>
+                  <option value="4">Azul</option>
+                  <option value="5">Verde</option>
+                  <option value="6">Gris</option>
+                </select>
+                <button id="btn-crear-color" type="button" class="px-3 py-2 border rounded">➕</button>
+              </div>
+              <small class="text-gray-500">Selecciona un color o usa ➕ para crear uno nuevo.</small>
+              {% if form.color.errors %}<p class="text-red-500 text-sm">{{ form.color.errors.0 }}</p>{% endif %}
+            </div>
+
+    <div class="flex justify-end gap-3">
+      <a href="{% url 'taller:vehiculos:lista_vehiculos' %}" class="px-4 py-2 border rounded">Cancelar</a>
+      <button type="submit" class="px-4 py-2 bg-emerald-600 text-white rounded">Guardar vehículo</button>
+    </div>
+  </form>
+</div>
+
+        <script>
+        /* ----------------- util ----------------- */
+        function countryPrefix(){ return location.pathname.startsWith("/us/") ? "/us/" : "/cl/es/"; }
+        // getCookie y csrftoken ya están declarados en el template base
+
+        // Obtener endpoints desde data-attributes
+        const endpointsTag = document.getElementById("vehiculos-endpoints");
+        const URL_MODELOS = endpointsTag.dataset.modelosUrl;
+        const URL_MOTORES = endpointsTag.dataset.motoresUrl;
+        const URL_CAJAS = endpointsTag.dataset.cajasUrl;
+        const URL_COLORES = endpointsTag.dataset.coloresUrl;
+        const URL_AGREGAR_MOTOR = endpointsTag.dataset.agregarMotorUrl;
+        const URL_AGREGAR_CAJA = endpointsTag.dataset.agregarCajaUrl;
+        const URL_CLIENTES = endpointsTag.dataset.clientesUrl;
+
+        // Cache-busting: agregar timestamp a URLs para forzar recarga
+        const cacheBuster = '?_t=' + Date.now();
+
+        // Log de URLs cargadas
+        console.log("🚀 URLs cargadas:");
+        console.log("  URL_MODELOS:", URL_MODELOS);
+        console.log("  URL_MOTORES:", URL_MOTORES);
+        console.log("  URL_CAJAS:", URL_CAJAS);
+        console.log("  URL_COLORES:", URL_COLORES);
+
+        async function fetchJSON(url, opts){
+          const res = await fetch(url, Object.assign({headers:{"X-Requested-With":"XMLHttpRequest"}}, opts||{}));
+          if(!res.ok) throw new Error("HTTP "+res.status);
+          return res.json();
+        }
+
+/* ----------------- DOM ----------------- */
+document.addEventListener('DOMContentLoaded', function(){
+  const $ = window.jQuery;
+
+  const cliente   = document.getElementById('id_cliente');
+  const anio      = document.getElementById('id_anio');
+  const marca     = document.getElementById('id_marca');
+  const modelo    = document.getElementById('id_modelo');
+  const motor     = document.getElementById('id_motor');
+  const caja      = document.getElementById('id_caja');
+  const color     = document.getElementById('id_color');
+  const btnCrearMotor = document.getElementById('btn-crear-motor');
+  const btnCrearCaja  = document.getElementById('btn-crear-caja');
+  const form = document.getElementById('form-vehiculo');
+
+  // Requisitos
+  cliente?.setAttribute('required','required');
+  anio?.setAttribute('required','required');
+  marca?.setAttribute('required','required');
+  modelo?.setAttribute('required','required');
+  motor?.setAttribute('required','required');
+
+  // Helpers select
+  function disableAndClear(selectEl, placeholder){
+    if(!selectEl) return;
+    selectEl.innerHTML = "";
+    const opt = document.createElement('option');
+    opt.value = "";
+    opt.textContent = placeholder || "Seleccionar...";
+    selectEl.appendChild(opt);
+    selectEl.value = "";
+    selectEl.disabled = true;
+  }
+  function fillSelect(selectEl, items){
+    if(!selectEl) return;
+    selectEl.disabled = false;
+    selectEl.innerHTML = "";
+    const emptyOpt = document.createElement('option');
+    emptyOpt.value = "";
+    emptyOpt.textContent = "Seleccionar...";
+    selectEl.appendChild(emptyOpt);
+    for(const it of (items||[])){
+      const opt = document.createElement('option');
+      opt.value = String(it.id);
+      opt.textContent = it.text;
+      selectEl.appendChild(opt);
+    }
+  }
+
+  // Estado inicial
+  console.log("🚀 Inicializando selects...");
+  disableAndClear(modelo, "Seleccionar modelo...");
+  disableAndClear(motor,  "Seleccionar motor...");
+  disableAndClear(caja,   "Seleccionar caja...");
+  console.log("✅ Selects inicializados");
+
+  // 1) CLIENTE: select2 remoto
+  if($ && $.fn && $.fn.select2 && cliente){
+    $(cliente).select2({
+      placeholder: "Buscar cliente...",
+      allowClear: true,
+      minimumInputLength: 2,
+      ajax: {
+        delay: 250,
+                transport: function (params, success, failure) {
+                  const q = params.data.q || "";
+                  fetch(`${URL_CLIENTES}?q=${encodeURIComponent(q)}`,
+                        {headers:{"X-Requested-With":"XMLHttpRequest"}})
+                    .then(r=>r.json()).then(success).catch(failure);
+                },
+        processResults: data => ({
+          results: (data||[]).map(c => ({
+            id: c.id,
+            text: [c.nombre, c.apellido].filter(Boolean).join(" ") +
+                  (c.email ? " · "+c.email : (c.telefono? " · "+c.telefono : ""))
+          }))
+        })
+      }
+    });
+  }
+
+  // 2) MARCA => MODELO (sin depender del año)
+  async function onMarcaChange(){
+    console.log("🔄 Marca cambió:", marca?.value);
+    disableAndClear(modelo, "Seleccionar modelo...");
+    disableAndClear(motor,  "Seleccionar motor...");
+    disableAndClear(caja,   "Seleccionar caja...");
+
+    const m = marca?.value || "";
+    if(!m) return;
+
+    try{
+      console.log("📡 Buscando modelos para marca:", m);
+      const y = anio?.value || "";
+      const data = await fetchJSON(`${URL_MODELOS}?marca_id=${encodeURIComponent(m)}&anio=${encodeURIComponent(y)}`);
+      console.log("📋 Modelos encontrados:", data.results?.length || 0);
+      fillSelect(modelo, data.results || []);
+      if(window.jQuery && jQuery.fn && jQuery.fn.select2 && modelo){
+        jQuery(modelo).trigger('change.select2'); // refresca UI
+      }
+    }catch(e){ console.error("❌ Error modelos:", e); }
+  }
+  marca?.addEventListener('change', onMarcaChange);
+
+  // 3) MODELO => MOTOR & CAJA
+  async function onModeloChange(){
+    console.log("🔄 Modelo cambió:", modelo?.value);
+    console.log("🔍 URL_MOTORES:", URL_MOTORES);
+    console.log("🔍 URL_CAJAS:", URL_CAJAS);
+
+    disableAndClear(motor, "Seleccionar motor...");
+    disableAndClear(caja,  "Seleccionar caja...");
+
+    const mid = modelo?.value || "";
+    if(!mid) {
+      console.log("❌ No hay modelo seleccionado");
+      return;
+    }
+
+    try{
+      console.log("📡 Buscando motor/caja para modelo:", mid);
+      console.log("📡 URL Motores:", `${URL_MOTORES}?modelo_id=${encodeURIComponent(mid)}`);
+      console.log("📡 URL Cajas:", `${URL_CAJAS}?modelo_id=${encodeURIComponent(mid)}`);
+
+      const [mot,cj] = await Promise.all([
+        fetchJSON(`${URL_MOTORES}?modelo_id=${encodeURIComponent(mid)}${cacheBuster}`),
+        fetchJSON(`${URL_CAJAS}?modelo_id=${encodeURIComponent(mid)}${cacheBuster}`)
+      ]);
+      console.log("🔧 Respuesta Motores:", mot);
+      console.log("⚙️ Respuesta Cajas:", cj);
+      console.log("🔧 Motores encontrados:", mot.results?.length || 0);
+      console.log("⚙️ Cajas encontradas:", cj.results?.length || 0);
+
+      fillSelect(motor, mot.results || []);
+      fillSelect(caja,  cj.results  || []);
+
+      if(window.jQuery && jQuery.fn && jQuery.fn.select2){
+        jQuery(motor).trigger('change.select2');
+        jQuery(caja).trigger('change.select2');
+      }
+    }catch(e){
+      console.error("❌ Error motor/caja:", e);
+      console.error("❌ Error detalles:", e.message);
+    }
+  }
+  modelo?.addEventListener('change', onModeloChange);
+
+  // 4) COLOR: select simple con 6 opciones predefinidas + botón crear
+  if($ && $.fn && $.fn.select2 && color){
+    $(color).select2({
+      placeholder: "Seleccionar color...",
+      allowClear: true
+    });
+  }
+
+  // 4.5) COLOR: crear inline (sin popup)
+  const btnCrearColor = document.getElementById('btn-crear-color');
+  btnCrearColor?.addEventListener('click', async function(){
+    const nombre = prompt("Nombre del color:");
+    if(!nombre) return;
+    try{
+      const res = await fetch(URL_COLORES, {
+        method: "POST",
+        headers: {"Content-Type":"application/json","X-Requested-With":"XMLHttpRequest","X-CSRFToken": csrftoken},
+        body: JSON.stringify({ nombre })
+      });
+      const data = await res.json();
+      if(!data.success) throw new Error(data.error||"No se pudo crear");
+      const opt = new Option(data.color.nombre, String(data.color.id), true, true);
+      color.add(opt);
+      color.value = String(data.color.id);
+      if(window.jQuery && jQuery.fn && jQuery.fn.select2){
+        jQuery(color).trigger('change');
+      }
+    }catch(e){ alert("Error creando color: "+e.message); }
+  });
+
+  // 5) MOTOR/Caja: crear inline (sin popup)
+  btnCrearMotor?.addEventListener('click', async function(){
+    const mid = modelo?.value;
+    if(!mid){ alert("Primero selecciona el modelo."); return; }
+    const nombre = prompt("Nombre del motor:");
+    if(!nombre) return;
+            try{
+              const res = await fetch(URL_AGREGAR_MOTOR, {
+                method: "POST",
+                headers: {"Content-Type":"application/json","X-Requested-With":"XMLHttpRequest","X-CSRFToken": csrftoken},
+                body: JSON.stringify({ nombre, modelo_id: mid, country: "CL" })
+              });
+      const data = await res.json();
+      if(!data.success) throw new Error(data.error||"No se pudo crear");
+      const opt = new Option(data.motor.nombre, String(data.motor.id), true, true);
+      motor.add(opt);
+      motor.value = String(data.motor.id);
+      motor.disabled = false;
+      motor.dispatchEvent(new Event('change', {bubbles:true}));
+    }catch(e){ alert("Error creando motor: "+e.message); }
+  });
+
+  btnCrearCaja?.addEventListener('click', async function(){
+    const mid = modelo?.value;
+    if(!mid){ alert("Primero selecciona el modelo."); return; }
+    const nombre = prompt("Nombre de la caja:");
+    if(!nombre) return;
+            try{
+              const res = await fetch(URL_AGREGAR_CAJA, {
+                method: "POST",
+                headers: {"Content-Type":"application/json","X-Requested-With":"XMLHttpRequest","X-CSRFToken": csrftoken},
+                body: JSON.stringify({ nombre, modelo_id: mid, country: "CL" })
+              });
+      const data = await res.json();
+      if(!data.success) throw new Error(data.error||"No se pudo crear");
+      const opt = new Option(data.caja.nombre, String(data.caja.id), true, true);
+      caja.add(opt);
+      caja.value = String(data.caja.id);
+      caja.disabled = false;
+      caja.dispatchEvent(new Event('change', {bubbles:true}));
+    }catch(e){ alert("Error creando caja: "+e.message); }
+  });
+
+  // 6) Validación mínima en submit (por si el form Django no la hace)
+  form?.addEventListener('submit', function(e){
+    const required = [
+      [cliente, "cliente"],
+      [anio, "año"],
+      [marca, "marca"],
+      [modelo, "modelo"],
+      [motor, "motor"]
+    ];
+    for(const [el, name] of required){
+      if(!el || el.disabled || !el.value){
+        e.preventDefault();
+        alert("Falta seleccionar "+name+".");
+        (el||{}).focus && el.focus();
+        return false;
+      }
+    }
+
+  });
+
+  // Select2 para otros selects si lo tienes cargado (opcional)
+  if($ && $.fn && $.fn.select2){
+    jQuery('#id_anio').select2({ placeholder:"Seleccionar año..." });
+    jQuery('#id_marca').select2({ placeholder:"Seleccionar marca..." });
+    jQuery('#id_modelo').select2({ placeholder:"Seleccionar modelo..." });
+    jQuery('#id_motor').select2({ placeholder:"Seleccionar motor..." });
+    jQuery('#id_caja').select2({ placeholder:"Seleccionar caja..." });
+  }
+});
+</script>
+{% endblock %}

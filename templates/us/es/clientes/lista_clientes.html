@@ -100,7 +100,7 @@
         clearTimeout(timeout);
         timeout = setTimeout(() => {
           const q = input.value;
-          fetch(`ajax/buscar/?q=${encodeURIComponent(q)}`)
+          fetch(`../../ajax/clientes/buscar/?q=${encodeURIComponent(q)}`)
             .then(r => r.json())
             .then(data => {
               document.getElementById('tabla-clientes').innerHTML = data.html;

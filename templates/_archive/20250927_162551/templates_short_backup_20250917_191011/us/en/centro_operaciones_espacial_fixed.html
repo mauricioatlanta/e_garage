@@ -1,0 +1,573 @@
+{% extends 'taller/us/en/base.html' %}{% load static %}
+{% load country_url %}
+{% load i18n %}
+
+{% block title %}{{ empresa.nombre_taller }} · Space Command Center{% endblock %}
+
+{% block extra_css %}
+<style>
+/* 🚀 Space Station Style for Dashboard */
+:root {
+    --space-blue: #00d4ff;
+    --space-cyan: #00ffff;
+    --space-green: #00ff88;
+    --space-gold: #ffd700;
+    --space-red: #ff3b3b;
+    --space-purple: #8a2be2;
+    --dark-space: #0a0a0f;
+    --panel-bg: rgba(5, 15, 25, 0.95);
+    --glass-bg: rgba(255, 255, 255, 0.06);
+    --holo-glow: 0 0 20px;
+}
+
+/* Accessibility: Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+body {
+    background:
+        radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(120, 200, 255, 0.2) 0%, transparent 50%),
+        linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+    color: #ffffff;
+    font-family: 'Orbitron', 'Segoe UI', monospace;
+    overflow-x: hidden;
+}
+
+.space-container {
+    background: var(--panel-bg);
+    border: 2px solid var(--space-cyan);
+    border-radius: 20px;
+    backdrop-filter: blur(15px);
+    box-shadow:
+        var(--holo-glow) var(--space-cyan),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.space-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent 30%, rgba(0, 255, 255, 0.03) 50%, transparent 70%);
+    animation: space-scan 8s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes space-scan {
+    0% { transform: translateX(-100%) translateY(-100%); }
+    100% { transform: translateX(100%) translateY(100%); }
+}
+
+/* Header Styles */
+.space-header {
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(138, 43, 226, 0.1) 100%);
+    border-bottom: 2px solid var(--space-cyan);
+    padding: 2rem;
+    text-align: center;
+    position: relative;
+}
+
+.space-title {
+    color: var(--space-cyan);
+    text-shadow: 0 0 20px var(--space-cyan);
+    font-family: 'Orbitron', monospace;
+    font-size: 2.5rem;
+    font-weight: 900;
+    margin-bottom: 0.5rem;
+    letter-spacing: 2px;
+}
+
+.space-subtitle {
+    color: var(--space-green);
+    font-family: 'Courier New', monospace;
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+/* Language Switcher */
+.language-switcher {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+    background: var(--panel-bg);
+    border: 1px solid var(--space-cyan);
+    border-radius: 25px;
+    padding: 5px;
+    backdrop-filter: blur(10px);
+}
+
+.language-switcher a {
+    padding: 8px 16px;
+    border-radius: 20px;
+    text-decoration: none;
+    color: var(--space-cyan);
+    font-family: 'Orbitron', monospace;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.language-switcher a:hover,
+.language-switcher a.active {
+    background: var(--space-cyan);
+    color: var(--dark-space);
+    box-shadow: 0 0 15px var(--space-cyan);
+}
+
+/* Navigation Grid */
+.nav-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    padding: 2rem;
+    background: var(--glass-bg);
+    border-radius: 15px;
+    margin: 20px;
+    border: 1px solid var(--space-cyan);
+}
+
+/* Modern Panel Styles */
+.modern-panel {
+    background: linear-gradient(135deg,
+        rgba(0, 212, 255, 0.08) 0%,
+        rgba(138, 43, 226, 0.08) 50%,
+        rgba(255, 215, 0, 0.08) 100%);
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    padding: 1.2rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border-radius: 15px;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.modern-panel:hover {
+    border-color: var(--space-gold);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.4),
+                0 15px 35px rgba(0, 212, 255, 0.2),
+                inset 0 0 15px rgba(255, 255, 255, 0.1);
+    text-decoration: none;
+    color: inherit;
+}
+
+.modern-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--space-cyan), var(--space-purple), var(--space-gold), transparent);
+    animation: modern-scan 3s infinite;
+}
+
+@keyframes modern-scan {
+    0% { transform: translateX(-100%); opacity: 0; }
+    50% { opacity: 1; }
+    100% { transform: translateX(100%); opacity: 0; }
+}
+
+.modern-icon-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 15px;
+    height: 60px;
+}
+
+.main-icon {
+    font-size: 2.5rem;
+    z-index: 2;
+    animation: main-icon-float 3s ease-in-out infinite;
+}
+
+.secondary-icon {
+    position: absolute;
+    font-size: 1.2rem;
+    bottom: 0;
+    right: 0;
+    opacity: 0.7;
+    animation: secondary-icon-pulse 2s infinite;
+    color: var(--space-gold);
+}
+
+@keyframes main-icon-float {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-5px) scale(1.05); }
+}
+
+@keyframes secondary-icon-pulse {
+    0%, 100% { opacity: 0.7; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.2); }
+}
+
+.modern-title {
+    font-size: 1rem;
+    font-weight: 900;
+    color: var(--space-cyan);
+    text-align: center;
+    font-family: 'Orbitron', monospace;
+    letter-spacing: 1.5px;
+    text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+    margin-bottom: 5px;
+}
+
+.modern-subtitle {
+    font-size: 0.75rem;
+    color: var(--space-purple);
+    text-align: center;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    opacity: 0.9;
+}
+
+.modern-description {
+    font-size: 0.7rem;
+    color: #b0c4de;
+    text-align: center;
+    font-family: 'Courier New', monospace;
+    opacity: 0.8;
+    line-height: 1.3;
+}
+
+/* Windows Grid - Responsive */
+.windows-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-auto-rows: minmax(120px, auto);
+    gap: 15px;
+    padding: 20px;
+    background: var(--glass-bg);
+    border-radius: 15px;
+    border: 1px solid var(--space-cyan);
+    box-shadow: var(--holo-glow) var(--space-cyan);
+    margin: 20px;
+}
+
+@media (max-width: 1200px) {
+    .windows-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+@media (max-width: 768px) {
+    .windows-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.windows-tile {
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(138, 43, 226, 0.1) 100%);
+    border: 1px solid var(--space-cyan);
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.windows-tile:hover {
+    border-color: var(--space-gold);
+    transform: scale(1.05);
+    box-shadow: 0 0 20px var(--space-gold);
+}
+
+.windows-tile:nth-child(1) { grid-row: span 2; }
+.windows-tile:nth-child(2) { grid-row: span 2; }
+.windows-tile:nth-child(3) { grid-row: span 2; }
+.windows-tile:nth-child(4) { grid-row: span 2; }
+.windows-tile:nth-child(5) { grid-row: span 2; }
+.windows-tile:nth-child(6) { grid-row: span 2; }
+.windows-tile:nth-child(7) { grid-row: span 3; }
+.windows-tile:nth-child(8) { grid-row: span 3; }
+.windows-tile:nth-child(9) { grid-row: span 3; }
+.windows-tile:nth-child(10) { grid-row: span 3; }
+.windows-tile:nth-child(11) { grid-row: span 3; }
+.windows-tile:nth-child(12) { grid-row: span 3; }
+.windows-tile:nth-child(13) { grid-row: span 4; }
+.windows-tile:nth-child(14) { grid-row: span 4; }
+.windows-tile:nth-child(15) { grid-row: span 4; }
+.windows-tile:nth-child(16) { grid-row: span 4; }
+.windows-tile:nth-child(17) { grid-row: span 4; }
+.windows-tile:nth-child(18) { grid-row: span 4; }
+
+.tile-title {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: var(--space-cyan);
+    margin-bottom: 8px;
+    font-family: 'Orbitron', monospace;
+}
+
+.metric-big {
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--space-green);
+    text-shadow: 0 0 10px var(--space-green);
+    font-family: 'Orbitron', monospace;
+}
+
+.metric-small {
+    font-size: 0.8rem;
+    color: var(--space-gold);
+    font-family: 'Courier New', monospace;
+    opacity: 0.9;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .space-title { font-size: 1.8rem; }
+    .space-subtitle { font-size: 0.9rem; }
+    .nav-grid { grid-template-columns: 1fr; padding: 1rem; }
+    .windows-grid { grid-template-columns: repeat(2, 1fr); }
+    .language-switcher { position: static; margin: 10px auto; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="space-container">
+    <!-- Header -->
+    <div class="space-header">
+        <!-- Language Switcher -->
+        <div class="language-switcher" role="navigation" aria-label="Language switcher">
+            <a href="/us/centro-operaciones-espacial/"
+               class="{% if LANGUAGE_CODE == 'en' %}active{% endif %}">EN</a>
+            <a href="/us/centro-operaciones-espacial/"
+               class="{% if LANGUAGE_CODE == 'es' %}active{% endif %}">ES</a>
+        </div>
+
+        <h1 class="space-title">
+            🚀 {% trans "Space Command Center" %}
+        </h1>
+        <p class="space-subtitle">
+            {{ empresa.nombre_taller }} — {% trans "Advanced Operations Control" %}
+        </p>
+    </div>
+
+    <!-- Navigation Grid -->
+    <div class="nav-grid">
+        <!-- Documents Module -->
+        <a href="{% url 'us:documentos:$1' %} %}" class="modern-panel">
+            <div class="modern-icon-container">
+                <span class="main-icon">📄</span>
+                <span class="secondary-icon">+</span>
+            </div>
+            <div class="modern-title">{% trans "Documents" %}</div>
+            <div class="modern-subtitle">{% trans "Management" %}</div>
+            <div class="modern-description">{% trans "Create and manage documents" %}</div>
+        </a>
+
+        <!-- Reports Module -->
+        <a href="{% url 'us:reportes:reportes_por_fecha' %} %}" class="modern-panel">
+            <div class="modern-icon-container">
+                <span class="main-icon">📊</span>
+                <span class="secondary-icon">📈</span>
+            </div>
+            <div class="modern-title">{% trans "Reports" %}</div>
+            <div class="modern-subtitle">{% trans "Analytics" %}</div>
+            <div class="modern-description">{% trans "Generate and view reports" %}</div>
+        </a>
+
+        <!-- Clients Module -->
+        <a href="{% url 'us:clientes:$1' %} %}" class="modern-panel">
+            <div class="modern-icon-container">
+                <span class="main-icon">👥</span>
+                <span class="secondary-icon">👤</span>
+            </div>
+            <div class="modern-title">{% trans "Clients" %}</div>
+            <div class="modern-subtitle">{% trans "Database" %}</div>
+            <div class="modern-description">{% trans "Manage client information" %}</div>
+        </a>
+
+        <!-- Vehicles Module -->
+        <a href="{% url 'us:vehiculos:lista_vehiculos' %} %}" class="modern-panel">
+            <div class="modern-icon-container">
+                <span class="main-icon">🚗</span>
+                <span class="secondary-icon">🔧</span>
+            </div>
+            <div class="modern-title">{% trans "Vehicles" %}</div>
+            <div class="modern-subtitle">{% trans "Fleet" %}</div>
+            <div class="modern-description">{% trans "Manage vehicle fleet" %}</div>
+        </a>
+
+        <!-- Technicians Module -->
+        <a href="{% url 'us:$1' %} %}" class="modern-panel">
+            <div class="modern-icon-container">
+                <span class="main-icon">👨‍🔧</span>
+                <span class="secondary-icon">⚙️</span>
+            </div>
+            <div class="modern-title">{% trans "Technicians" %}</div>
+            <div class="modern-subtitle">{% trans "Staff" %}</div>
+            <div class="modern-description">{% trans "Manage technician profiles" %}</div>
+        </a>
+
+        <!-- Services Module -->
+        <a href="{% url 'us:servicios:lista_servicios' %} %}" class="modern-panel">
+            <div class="modern-icon-container">
+                <span class="main-icon">🛠️</span>
+                <span class="secondary-icon">⚡</span>
+            </div>
+            <div class="modern-title">{% trans "Services" %}</div>
+            <div class="modern-subtitle">{% trans "Operations" %}</div>
+            <div class="modern-description">{% trans "Manage service operations" %}</div>
+        </a>
+    </div>
+
+    <!-- Windows Grid - KPIs -->
+    <div class="windows-grid">
+        <!-- Monthly Revenue -->
+        <div class="windows-tile">
+            <div class="tile-title">{% trans "Monthly" %}</div>
+            <div class="metric-big">
+                {% with curr=empresa.moneda|default:"USD" %}
+                    {{ curr }} {{ facturacion_mes|default_if_none:0|floatformat:0 }}
+                {% endwith %}
+            </div>
+            <div class="metric-small">{% trans "This month" %}</div>
+        </div>
+
+        <!-- Average Ticket -->
+        <div class="windows-tile">
+            <div class="tile-title">{% trans "Avg. Ticket" %}</div>
+            <div class="metric-big">
+                {% with curr=empresa.moneda|default:"USD" %}
+                    {{ curr }} {{ ticket_promedio|default_if_none:0|floatformat:0 }}
+                {% endwith %}
+            </div>
+            <div class="metric-small">{% trans "Per service" %}</div>
+        </div>
+
+        <!-- Total Documents -->
+        <div class="windows-tile">
+            <div class="tile-title">{% trans "Documents" %}</div>
+            <div class="metric-big">{{ documentos_total|default:0 }}</div>
+            <div class="metric-small">{% trans "Total count" %}</div>
+        </div>
+
+        <!-- Active Vehicles -->
+        <div class="windows-tile">
+            <div class="tile-title">{% trans "Vehicles" %}</div>
+            <div class="metric-big">{{ vehiculos_activos|default:0 }}</div>
+            <div class="metric-small">{% trans "Active fleet" %}</div>
+        </div>
+
+        <!-- Pending Services -->
+        <div class="windows-tile">
+            <div class="tile-title">{% trans "Pending" %}</div>
+            <div class="metric-big">{{ servicios_pendientes|default:0 }}</div>
+            <div class="metric-small">{% trans "Services" %}</div>
+        </div>
+
+        <!-- Completed Services -->
+        <div class="windows-tile">
+            <div class="tile-title">{% trans "Completed" %}</div>
+            <div class="metric-big">{{ servicios_completados|default:0 }}</div>
+            <div class="metric-small">{% trans "This month" %}</div>
+        </div>
+
+        <!-- Revenue Chart -->
+        <div class="windows-tile">
+            <div class="tile-title">{% trans "Revenue Trend" %}</div>
+            <div class="metric-big">📈</div>
+            <div class="metric-small">{% trans "Last 6 months" %}</div>
+        </div>
+
+        <!-- Service Efficiency -->
+        <div class="windows-tile">
+            <div class="tile-title">{% trans "Efficiency" %}</div>
+            <div class="metric-big">{{ eficiencia_servicios|default:0 }}%</div>
+            <div class="metric-small">{% trans "Service rate" %}</div>
+        </div>
+
+        <!-- Client Satisfaction -->
+        <div class="windows-tile">
+            <div class="tile-title">{% trans "Satisfaction" %}</div>
+            <div class="metric-big">{{ satisfaccion_clientes|default:0 }}%</div>
+            <div class="metric-small">{% trans "Client rating" %}</div>
+        </div>
+
+        <!-- Parts Inventory -->
+        <div class="windows-tile">
+            <div class="tile-title">{% trans "Inventory" %}</div>
+            <div class="metric-big">{{ inventario_repuestos|default:0 }}</div>
+            <div class="metric-small">{% trans "Parts available" %}</div>
+        </div>
+
+        <!-- Low Stock Alert -->
+        <div class="windows-tile">
+            <div class="tile-title">{% trans "Low Stock" %}</div>
+            <div class="metric-big">{{ stock_bajo|default:0 }}</div>
+            <div class="metric-small">{% trans "Items to reorder" %}</div>
+        </div>
+
+        <!-- Monthly Growth -->
+        <div class="windows-tile">
+            <div class="tile-title">{% trans "Growth" %}</div>
+            <div class="metric-big">{{ crecimiento_mensual|default:0 }}%</div>
+            <div class="metric-small">{% trans "vs last month" %}</div>
+        </div>
+
+        <!-- Active Technicians -->
+        <div class="windows-tile">
+            <div class="tile-title">{% trans "Technicians" %}</div>
+            <div class="metric-big">{{ tecnicos_activos|default:0 }}</div>
+            <div class="metric-small">{% trans "On duty" %}</div>
+        </div>
+
+        <!-- Work Orders -->
+        <div class="windows-tile">
+            <div class="tile-title">{% trans "Work Orders" %}</div>
+            <div class="metric-big">{{ ordenes_trabajo|default:0 }}</div>
+            <div class="metric-small">{% trans "In progress" %}</div>
+        </div>
+
+        <!-- Quality Score -->
+        <div class="windows-tile">
+            <div class="tile-title">{% trans "Quality" %}</div>
+            <div class="metric-big">{{ puntuacion_calidad|default:0 }}%</div>
+            <div class="metric-small">{% trans "Service quality" %}</div>
+        </div>
+
+        <!-- Response Time -->
+        <div class="windows-tile">
+            <div class="tile-title">{% trans "Response" %}</div>
+            <div class="metric-big">{{ tiempo_respuesta|default:0 }}h</div>
+            <div class="metric-small">{% trans "Avg. response" %}</div>
+        </div>
+
+        <!-- Customer Retention -->
+        <div class="windows-tile">
+            <div class="tile-title">{% trans "Retention" %}</div>
+            <div class="metric-big">{{ retencion_clientes|default:0 }}%</div>
+            <div class="metric-small">{% trans "Customer loyalty" %}</div>
+        </div>
+
+        <!-- Profit Margin -->
+        <div class="windows-tile">
+            <div class="tile-title">{% trans "Profit" %}</div>
+            <div class="metric-big">{{ margen_ganancia|default:0 }}%</div>
+            <div class="metric-small">{% trans "Profit margin" %}</div>
+        </div>
+    </div>
+</div>
+{% endblock %}

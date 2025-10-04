@@ -11,35 +11,48 @@ def lista_documentos_cl(request):
     return redirect("documentos:lista_documentos", country="cl")
 
 
-from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 
 from taller.models.tecnico import Tecnico
 
 
-# API para crear técnicos
-@csrf_exempt
+# API para crear técnicos (SEGURO)
+@login_required
+@require_POST
 def api_crear_tecnico(request):
-    if request.method != "POST":
-        return JsonResponse({"error": "Solo se permite POST"}, status=405)
+    """
+    API segura para crear técnicos.
+    - Requiere autenticación (@login_required)
+    - Solo acepta POST (@require_POST)
+    - Usa empresa del usuario autenticado (no del cliente)
+    """
     try:
         data = json.loads(request.body.decode())
-        nombre = data.get("nombre")
-        empresa_id = data.get("empresa_id")
-        if not nombre or not empresa_id:
-            return JsonResponse({"error": "Faltan datos obligatorios"}, status=400)
-        tecnico, created = Tecnico.objects.get_or_create(
-            nombre=nombre, empresa_id=empresa_id
+        nombre = (data.get("nombre") or "").strip()
+        
+        if not nombre:
+            return JsonResponse({"error": "Nombre requerido"}, status=400)
+        
+        # Usar empresa del usuario autenticado (seguridad)
+        empresa = getattr(request.user, "empresa", None)
+        if not empresa:
+            return JsonResponse({"error": "Usuario sin empresa asociada"}, status=400)
+        
+        tecnico = Tecnico.objects.create(
+            empresa=empresa,
+            nombre=nombre,
+            activo=True,
         )
-        return JsonResponse(
-            {
-                "id": tecnico.pk,
-                "nombre": tecnico.nombre,
-                "empresa_id": tecnico.empresa_id,
-                "creado": created,
-            }
-        )
+        
+        return JsonResponse({
+            "ok": True,
+            "id": tecnico.id,
+            "nombre": tecnico.nombre,
+        })
+        
     except Exception as e:
-        return JsonResponse({"error": str(e)}, status=400)
+        return JsonResponse({"error": str(e)}, status=500)
 
 
 # Alias para autocompletar servicios por nombre
@@ -76,19 +89,29 @@ from taller.servicios.models import Servicio
 # Autocompletado de servicios para documentos
 def autocomplete_servicio(request):
     q = request.GET.get("q", "").strip()
-    if not q:
+    
+    # Obtener empresa del usuario
+    empresa = getattr(request.user, "empresa", None)
+    if not empresa:
         return JsonResponse([], safe=False)
 
-    servicios = Servicio.objects.filter(
-        models.Q(nombre__icontains=q) | models.Q(descripcion__icontains=q)
-    ).order_by("nombre")[:20]
+    # Filtrar servicios por empresa y búsqueda
+    servicios = Servicio.objects.filter(empresa=empresa)
+    
+    if q:
+        servicios = servicios.filter(
+            models.Q(nombre__icontains=q) | 
+            models.Q(categoria__code__icontains=q)
+        )
+    
+    servicios = servicios.order_by("nombre")[:20]
 
     data = [
         {
             "id": s.pk,
             "nombre": s.nombre,
-            "descripcion": getattr(s, "descripcion", ""),
-            "precio": float(getattr(s, "precio", 0)),
+            "descripcion": f"{s.categoria} - {s.nombre}",
+            "precio": 15000,  # Precio por defecto, ya que el modelo no tiene campo precio
         }
         for s in servicios
     ]
@@ -534,6 +557,7 @@ def crear_documento(request):
         {
             "form": form,
             "mecanicos": mecanicos,
+            "tecnicos": mecanicos,  # Alias para compatibilidad con templates
             "es_edicion": False,
             "country": country,  # 🚀 BISTURÍ: Pasar país desde empresa
             "company_country": getattr(
@@ -1020,6 +1044,7 @@ def editar_documento(request, documento_id):
             "total": total,
             "editando": True,  # Indicar que estamos editando
             "mecanicos": mecanicos,
+            "tecnicos": mecanicos,  # Alias para compatibilidad con templates
             "es_edicion": bool(documento.pk),
             "company_country": getattr(
                 request, "company_country", None
@@ -1133,13 +1158,14 @@ def exportar_documento_pdf(request, documento_id):
     )
 
     subtotal = total_repuestos + total_servicios + total_otros_servicios
-    iva = subtotal * Decimal("0.19") if doc.incluir_iva else Decimal("0")
+    # Forzar IVA al 19% para Chile
+    iva = subtotal * Decimal("0.19")
     total_general = subtotal + iva
 
     # Obtener información de la empresa desde ConfiguracionEmpresa
+    from taller.models import ConfiguracionEmpresa
+    
     try:
-        from taller.models import ConfiguracionEmpresa
-
         config_empresa = ConfiguracionEmpresa.objects.get(empresa=doc.empresa)
         company_info = {
             "COMPANY_ADDRESS": config_empresa.direccion,
@@ -1148,6 +1174,7 @@ def exportar_documento_pdf(request, documento_id):
             "COMPANY_WEBSITE": config_empresa.sitio_web,
         }
     except ConfiguracionEmpresa.DoesNotExist:
+        config_empresa = None
         company_info = {
             "COMPANY_ADDRESS": "",
             "COMPANY_PHONE": "",
@@ -1159,6 +1186,7 @@ def exportar_documento_pdf(request, documento_id):
     context = {
         "documento": doc,
         "empresa": doc.empresa,  # Agregar empresa al contexto
+        "config_empresa": config_empresa,  # Agregar config_empresa al contexto
         "total_repuestos": total_repuestos,
         "total_servicios": total_servicios,
         "total_otros_servicios": total_otros_servicios,
@@ -1168,6 +1196,37 @@ def exportar_documento_pdf(request, documento_id):
         "country": country,
         **company_info,  # Incluir información de la empresa
     }
+    
+    # Agregar logo en base64 si existe configuración
+    if config_empresa:
+        # Agregar logo en base64 para el PDF
+        if config_empresa.logo:
+            import os
+            import base64
+            from django.conf import settings
+            try:
+                logo_path = os.path.join(settings.MEDIA_ROOT, config_empresa.logo.name)
+                with open(logo_path, 'rb') as logo_file:
+                    logo_data = base64.b64encode(logo_file.read()).decode('utf-8')
+                    # Determinar el tipo de imagen por la extensión
+                    ext = os.path.splitext(logo_path)[1].lower()
+                    if ext == '.png':
+                        mime_type = 'image/png'
+                    elif ext in ['.jpg', '.jpeg']:
+                        mime_type = 'image/jpeg'
+                    elif ext == '.gif':
+                        mime_type = 'image/gif'
+                    else:
+                        mime_type = 'image/png'  # fallback
+                    
+                    context["logo_base64"] = f"data:{mime_type};base64,{logo_data}"
+            except Exception as e:
+                print(f"Error cargando logo: {e}")
+                context["logo_base64"] = None
+        else:
+            context["logo_base64"] = None
+    else:
+        context["logo_base64"] = None
 
     template = get_template("taller/pdf/documento.html")
     html = template.render(context)
@@ -1200,3 +1259,66 @@ def enviar_por_whatsapp(request, documento_id):
     enlace_whatsapp = f"https://wa.me/56{telefono}?text={mensaje.replace(' ', '%20')}"
 
     return redirect(enlace_whatsapp)
+
+
+def enviar_documento_whatsapp(request, documento_id):
+    """
+    Vista para enviar documento por WhatsApp
+    """
+    from taller.models import Documento
+    from django.http import JsonResponse
+    import re
+    
+    try:
+        documento = Documento.objects.get(id=documento_id, empresa=request.user.empresa)
+    except Documento.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'error': 'Documento no encontrado'
+        }, status=404)
+    
+    # Verificar que el cliente tenga teléfono
+    if not documento.cliente.telefono:
+        return JsonResponse({
+            'success': False,
+            'error': 'El cliente no tiene número de teléfono registrado'
+        })
+    
+    # Limpiar y validar número de teléfono
+    telefono = documento.cliente.telefono.replace('+', '').replace(' ', '').replace('-', '').replace('(', '').replace(')', '')
+    
+    # Validar formato chileno
+    if not re.match(r'^(\+56|56)?[2-9]\d{8}$', telefono):
+        return JsonResponse({
+            'success': False,
+            'error': 'Número de teléfono inválido. Debe ser un número chileno válido'
+        })
+    
+    # Formatear número para WhatsApp
+    if not telefono.startswith('56'):
+        telefono = '56' + telefono
+    
+    # Crear mensaje personalizado
+    mensaje = f"""Hola {documento.cliente.nombre},
+
+Adjunto encontrará el documento del taller.
+
+📄 {documento.get_tipo_display()} #{documento.numero_documento}
+🏢 {documento.empresa.nombre_taller}
+📅 Fecha: {documento.fecha_emision.strftime('%d/%m/%Y')}
+💰 Total: ${documento.total_general():,.0f}
+
+Para ver el documento completo, visite:
+{request.build_absolute_uri(f'/cl/documentos/{documento.id}/')}
+
+¡Gracias por confiar en nuestros servicios!"""
+    
+    # Crear URL de WhatsApp
+    url_whatsapp = f"https://wa.me/{telefono}?text={mensaje.replace(' ', '%20').replace('\n', '%0A')}"
+    
+    return JsonResponse({
+        'success': True,
+        'url_whatsapp': url_whatsapp,
+        'telefono': telefono,
+        'mensaje': mensaje
+    })

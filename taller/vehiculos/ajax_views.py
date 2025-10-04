@@ -36,3 +36,21 @@ def modelos_por_marca(request):
     data = [{"id": m.pk, "text": str(m), "nombre": m.nombre} for m in qs]
 
     return JsonResponse({"results": data})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -297,6 +297,8 @@ class TecnicoAdmin(admin.ModelAdmin):
     list_editable = ()
 
 
+
+
 # === ADMINISTRACIÓN DE SERVICIOS MULTILENGUAJE ===
 
 

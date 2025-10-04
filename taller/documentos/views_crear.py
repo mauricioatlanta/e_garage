@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
@@ -7,19 +9,24 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils import timezone
 
+logger = logging.getLogger(__name__)
+
 from taller.models.clientes import Cliente
 from taller.models.sequence import DocumentSequence
 from taller.models.tecnico import Tecnico
 from taller.models.vehiculos import Vehiculo
 from taller.servicios.models import Servicio
+from taller.utils.dal_helpers import get_template_by_country
 
 from .forms import DocumentoForm
 from .formsets import OtroServicioFormSet, RepuestoFormSet, ServicioFormSet
 
 
+from taller.documentos.utils.prefix import doc_prefix
+
 def _prefix(tipo):
     """Mapea tipos de documento a prefijos de numeración"""
-    return {"OT": "OT", "FAC": "F", "PRES": "P"}.get(tipo, "D")
+    return doc_prefix(tipo)
 
 
 def build_context(request, form=None, rep_fs=None, serv_fs=None, otro_fs=None):
@@ -69,9 +76,9 @@ def build_context(request, form=None, rep_fs=None, serv_fs=None, otro_fs=None):
 def crear_documento(request):
     """Vista robusta para crear documentos con formsets - NUNCA deja pantalla en blanco"""
 
-    print("[DOC][DEBUG] ========== INICIO CREAR DOCUMENTO ==========")
-    print(f"[DOC][DEBUG] Usuario: {request.user.username}")
-    print(f"[DOC][DEBUG] Método: {request.method}")
+    logger.debug("========== INICIO CREAR DOCUMENTO ==========")
+    logger.debug(f"Usuario: {request.user.username}")
+    logger.debug(f"Método: {request.method}")
 
     try:
         # Obtener empresa del usuario (común para GET y POST)
@@ -82,11 +89,11 @@ def crear_documento(request):
             )
         except AttributeError:
             empresa = None
-            print("[DOC][DEBUG] Usuario sin empresa")
+            logger.warning("Usuario sin empresa")
 
         if request.method == "POST":
-            print("[DOC][DEBUG] Procesando POST...")
-            print(f"[DOC][POST] Datos recibidos: {dict(request.POST)}")
+            logger.debug("Procesando POST...")
+            logger.debug(f"Datos recibidos: {dict(request.POST)}")
 
             # Crear formularios con datos POST
             doc_form = DocumentoForm(request.POST, user=request.user)
@@ -112,10 +119,10 @@ def crear_documento(request):
                 ]
             )
 
-            print(f"[DOC][DEBUG] Formularios válidos: {forms_valid}")
+            logger.debug(f"Formularios válidos: {forms_valid}")
 
             if forms_valid:
-                print("[DOC][DEBUG] Todos los formularios son válidos, guardando...")
+                logger.debug("Todos los formularios son válidos, guardando...")
 
                 try:
                     # Crear documento
@@ -128,7 +135,7 @@ def crear_documento(request):
                         doc.correlativo = n
                         pref = {"OT": "OT", "FAC": "F", "PRES": "P"}.get(doc.tipo, "D")
                         doc.numero = f"{pref}{n:03d}"
-                        print(f"[DOC][DEBUG] Número generado: {doc.numero}")
+                        logger.debug(f"Número generado: {doc.numero}")
 
                     # Configurar campos automáticos
                     doc.country = getattr(empresa, "pais", "CL")
@@ -168,20 +175,20 @@ def crear_documento(request):
 
                     # Guardar documento
                     doc.save()
-                    print(f"[DOC][DEBUG] Documento guardado con ID: {doc.id}")
+                    logger.debug(f"Documento guardado con ID: {doc.id}")
 
                     # Guardar líneas
                     rep_fs.instance = doc
                     rep_fs.save()
-                    print("[DOC][DEBUG] Líneas de repuestos guardadas")
+                    logger.debug("Líneas de repuestos guardadas")
 
                     serv_fs.instance = doc
                     serv_fs.save()
-                    print("[DOC][DEBUG] Líneas de servicios guardadas")
+                    logger.debug("Líneas de servicios guardadas")
 
                     otro_fs.instance = doc
                     otro_fs.save()
-                    print("[DOC][DEBUG] Líneas de otros servicios guardadas")
+                    logger.debug("Líneas de otros servicios guardadas")
 
                     # Recalcular totales en servidor (autoridad)
                     try:
@@ -194,19 +201,19 @@ def crear_documento(request):
                                 "total",
                             ]
                         )
-                        print(f"[DOC][DEBUG] Totales recalculados: {doc.total}")
+                        logger.debug(f"Totales recalculados: {doc.total}")
                     except Exception as e:
-                        print(f"[DOC][WARN] Error al recalcular totales: {e}")
+                        logger.warning(f"Error al recalcular totales: {e}")
 
                     messages.success(
                         request, f"Documento {doc.numero} creado correctamente."
                     )
                     url = reverse("taller:documentos:lista_documentos")
-                    print(f"[DOC][DEBUG] Redirect exitoso a: {url}")
+                    logger.debug(f"Redirect exitoso a: {url}")
                     return redirect(url)
 
                 except Exception as e:
-                    print(f"[DOC][ERROR] Error al guardar documento: {e}")
+                    logger.error(f"Error al guardar documento: {e}", exc_info=True)
                     messages.error(request, f"Error al guardar documento: {str(e)}")
                     # Re-renderizar con contexto completo
                     ctx = build_context(request, doc_form, rep_fs, serv_fs, otro_fs)
@@ -218,39 +225,32 @@ def crear_documento(request):
                     )
 
             # Si hay errores, re-render con errores visibles (nunca en blanco)
-            print("[DOC][DEBUG] Formularios inválidos, mostrando errores...")
-            print(
-                f"[DOC][ERROR] DOC ERR: {doc_form.errors.as_json() if doc_form.errors else 'N/A'}"
-            )
-            print(f"[DOC][ERROR] REP ERR: {rep_fs.errors if rep_fs.errors else 'N/A'}")
-            print(
-                f"[DOC][ERROR] SERV ERR: {serv_fs.errors if serv_fs.errors else 'N/A'}"
-            )
-            print(
-                f"[DOC][ERROR] OTR ERR: {otro_fs.errors if otro_fs.errors else 'N/A'}"
-            )
+            logger.debug("Formularios inválidos, mostrando errores...")
+            logger.debug(f"DOC ERR: {doc_form.errors.as_json() if doc_form.errors else 'N/A'}")
+            logger.debug(f"REP ERR: {rep_fs.errors if rep_fs.errors else 'N/A'}")
+            logger.debug(f"SERV ERR: {serv_fs.errors if serv_fs.errors else 'N/A'}")
+            logger.debug(f"OTR ERR: {otro_fs.errors if otro_fs.errors else 'N/A'}")
 
             ctx = build_context(request, doc_form, rep_fs, serv_fs, otro_fs)
-            return render(
-                request, "taller/cl/es/documentos/crear_documento.html", ctx, status=400
-            )
+            template = get_template_by_country(country, "documentos/crear_documento.html")
+            return render(request, template, ctx, status=400)
 
         # GET - Mostrar formularios vacíos
-        print("[DOC][DEBUG] Procesando GET...")
+        logger.debug("Procesando GET...")
         ctx = build_context(request)
-        return render(request, "taller/cl/es/documentos/crear_documento.html", ctx)
+        template = get_template_by_country(country, "documentos/crear_documento.html")
+        return render(request, template, ctx)
 
     except Exception as e:
         # En desarrollo, deja rastro y evita respuesta vacía
-        print(f"[DOC][ERROR 500] Error inesperado: {repr(e)}")
+        logger.error(f"Error inesperado: {repr(e)}", exc_info=True)
         import traceback
 
         traceback.print_exc()
         messages.error(request, f"Error inesperado al crear documento: {str(e)}")
         ctx = build_context(request)
-        return render(
-            request, "taller/cl/es/documentos/crear_documento.html", ctx, status=500
-        )
+        template = get_template_by_country(country, "documentos/crear_documento.html")
+        return render(request, template, ctx, status=500)
 
 
 @login_required

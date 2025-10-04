@@ -472,7 +472,13 @@ def dashboard_centro_operaciones_espacial(request):
     from taller.utils.templates import select_country_lang_template
 
     # Forzar template correcto basado en la URL y idioma
-    if request.path.startswith("/us/"):
+    # Verificar si el usuario tiene empresa de USA
+    if hasattr(empresa, 'pais') and empresa.pais == 'US':
+        # Usuario de USA - usar template específico de USA
+        template_name = "taller/us/en/dashboard/centro_operaciones_espacial.html"
+        contexto["use_usa_base"] = True
+        print(f"[DEBUG] Using USA template for user {request.user.username}")
+    elif request.path.startswith("/us/"):
         # Para USA, usar template en inglés por defecto, pero permitir español
         if get_language() == "es":
             # Si se selecciona español, usar template de Chile

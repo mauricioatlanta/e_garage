@@ -1,221 +1,24 @@
-{% extends "taller/cl/es/documentos/base_documento.html" %}
+{% extends "taller/common/documentos/base_documento.html" %}
 {% load static %}
 {% load country_url %}
-
-{% block extra_head %}
-{% include 'taller/includes/ajax_endpoints.html' %}
-{{ block.super }}
-<style>
-/* Temas sobrios (sin efectos llamativos) */
-.theme-ot {
-  background: #0f172a;                 /* slate-950 */
-  border: 1px solid #334155;           /* slate-600 */
-}
-.theme-pres {
-  background: #111827;                 /* gray-900 */
-  border: 1px solid #374151;           /* gray-700 */
-}
-.theme-rec {
-  background: #0b1220;                 /* azul petróleo oscuro */
-  border: 1px solid #3f4a5a;           /* borde sobrio */
-}
-
-/* Botones discretos */
-.btn-primary {
-  background: #1f2937;                 /* gray-800 */
-  color: #e5e7eb;                      /* gray-200 */
-  font-weight: 600;
-  padding: 0.7em 1.4em;
-  border-radius: 0.75em;
-  border: 1px solid #374151;
-}
-.btn-primary:hover { background: #111827; }
-
-.btn-secondary {
-  background: #0b1220;
-  color: #e5e7eb;
-  font-weight: 600;
-  padding: 0.7em 1.2em;
-  border-radius: 0.75em;
-  border: 1px solid #3f4a5a;
-}
-.btn-secondary:hover { background: #0a0f1a; }
-
-/* Inputs discretos */
-.form-control, .form-select {
-  background: #0a0f1a;
-  color: #e5e7eb;
-  border: 1px solid #334155;
-  border-radius: 0.6em;
-  padding: 0.9em 1.1em;
-}
-.form-control:focus, .form-select:focus {
-  outline: none;
-  border-color: #475569;
-}
-
-/* Filas y totales */
-.linea-row {
-  background: #0e1626;
-  border: 1px solid #2e3b4d;
-  border-radius: 0.6em;
-  padding: 1em;
-  margin-bottom: 1em;
-}
-.subtotal-field {
-  background: #0a0f1a;
-  color: #e5e7eb;
-  border: 1px solid #334155;
-  border-radius: 0.4em;
-  padding: 0.5em;
-  text-align: right;
-  font-weight: 600;
-}
-.totales-section {
-  background: #0a0f1a;
-  border: 1px solid #334155;
-  border-radius: 0.75em;
-  padding: 1.2em;
-  margin: 1em 0;
-}
-
-.old-btn-primary {
-  background: linear-gradient(90deg, #22d3ee 0%, #1a2980 100%);
-  color: #111;
-  font-weight: bold;
-  padding: 0.8em 2em;
-  border-radius: 1em;
-  border: none;
-  transition: all 0.2s;
-}
-
-.btn-primary:hover {
-  background: linear-gradient(90deg, #1a2980 0%, #22d3ee 100%);
-  color: #22d3ee;
-  box-shadow: 0 0 32px 8px #22d3ee;
-}
-
-.btn-secondary {
-  background: linear-gradient(90deg, #64748b 0%, #475569 100%);
-  color: white;
-  font-weight: bold;
-  padding: 0.8em 2em;
-  border-radius: 1em;
-  border: none;
-  transition: all 0.2s;
-}
-
-.btn-secondary:hover {
-  background: linear-gradient(90deg, #475569 0%, #64748b 100%);
-  box-shadow: 0 0 32px 8px #64748b;
-}
-
-/* Estilos para formularios */
-.form-control, .form-select {
-  background: linear-gradient(135deg, #111 60%, #1a2980 100%);
-  color: #00ffe7;
-  border: 2.5px solid #00ffe7;
-  border-radius: 1em;
-  padding: 1em 1.4em;
-  box-shadow: 0 0 24px 6px #00ffe7 inset;
-}
-
-.form-control:focus, .form-select:focus {
-  outline: none;
-  box-shadow: 0 0 32px 8px #00ffe7;
-}
-
-/* Estilos para líneas de documento */
-.linea-row {
-  background: rgba(0,0,0,0.3);
-  border: 1px solid #00ffe7;
-  border-radius: 1em;
-  padding: 1em;
-  margin-bottom: 1em;
-}
-
-.subtotal-field {
-  background: #333;
-  color: #00ffe7;
-  border: 1px solid #666;
-  border-radius: 0.5em;
-  padding: 0.5em;
-  text-align: right;
-  font-weight: bold;
-}
-
-/* Totales */
-.totales-section {
-  background: rgba(0,0,0,0.5);
-  border: 2px solid #00ffe7;
-  border-radius: 1em;
-  padding: 1.5em;
-  margin: 1em 0;
-}
-
-/* Estilos para búsqueda AJAX de clientes */
-.cliente-item:hover {
-  background: rgba(34, 211, 238, 0.2) !important;
-}
-
-#cliente-resultados {
-  scrollbar-width: thin;
-  scrollbar-color: #00ffe7 #1a1a2e;
-}
-
-#cliente-resultados::-webkit-scrollbar {
-  width: 8px;
-}
-
-#cliente-resultados::-webkit-scrollbar-track {
-  background: #1a1a2e;
-}
-
-#cliente-resultados::-webkit-scrollbar-thumb {
-  background: #00ffe7;
-  border-radius: 4px;
-}
-
-#cliente-resultados::-webkit-scrollbar-thumb:hover {
-  background: #22d3ee;
-}
-
-.totales-row {
-  display: flex;
-  justify-content: space-between;
-  margin: 0.5em 0;
-  font-size: 1.1em;
-}
-
-.totales-total {
-  border-top: 2px solid #00ffe7;
-  padding-top: 0.5em;
-  font-size: 1.3em;
-  font-weight: bold;
-}
-
-/* Checkbox styling */
-input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  accent-color: #00ffe7;
-}
-</style>
-{% endblock %}
-
-{% block documento_title %}
-<div class="flex justify-between items-center">
-<h1 class="documento-title">📝 Crear Documento</h1>
-  <label class="flex items-center text-cyan-200 font-semibold">
-    <input type="checkbox" id="id_pagado" name="pagado" class="mr-2">
-    Documento pagado
-  </label>
-</div>
-{% endblock %}
 
 {% block documento_content %}
 <form method="post" id="document-form" class="max-w-7xl mx-auto">
   {% csrf_token %}
+
+  <!-- Campos ocultos requeridos -->
+  <input type="hidden" name="empresa" value="{{ empresa.id }}">
+  <input type="hidden" name="correlativo" value="1">
+  <input type="hidden" name="moneda" value="CLP">
+  <input type="hidden" name="country" value="{{ empresa.pais|default:'CL' }}">
+  <input type="hidden" name="neto_repuestos" id="neto_repuestos" value="0">
+  <input type="hidden" name="neto_servicios" id="neto_servicios" value="0">
+  <input type="hidden" name="neto_otros_servicios" id="neto_otros_servicios" value="0">
+  <input type="hidden" name="descuento" id="descuento_total" value="0">
+  <input type="hidden" name="tax_rate_applied" id="tax_rate_applied" value="19">
+  <input type="hidden" name="tax_amount" id="tax_amount" value="0">
+  <input type="hidden" name="total" id="total_documento" value="0">
+  <input type="hidden" name="created_at" value="{{ today|date:'Y-m-d' }}">
 
   <!-- Mensajes del sistema -->
   {% if messages %}
@@ -227,55 +30,39 @@ input[type="checkbox"] {
   {% endif %}
 
   <!-- Errores de validación -->
-  {% if form.errors or rep_fs.non_form_errors or serv_fs.non_form_errors or otro_fs.non_form_errors %}
-    <div class="bg-red-900/50 border border-red-400 rounded-xl p-4 mb-6">
-      <h3 class="text-red-400 font-bold text-lg mb-2">Errores de Validación:</h3>
-      <div class="text-red-200 text-sm">
         {% if form.errors %}
-          <div class="mb-2">
-            <strong>Errores del formulario principal:</strong>
-            <pre class="whitespace-pre-wrap">{{ form.errors }}</pre>
-          </div>
-        {% endif %}
-        {% if rep_fs.non_form_errors %}
-          <div class="mb-2">
-            <strong>Errores de repuestos:</strong>
-            <pre class="whitespace-pre-wrap">{{ rep_fs.non_form_errors }}</pre>
-          </div>
-        {% endif %}
-        {% if serv_fs.non_form_errors %}
-          <div class="mb-2">
-            <strong>Errores de servicios:</strong>
-            <pre class="whitespace-pre-wrap">{{ serv_fs.non_form_errors }}</pre>
-          </div>
-        {% endif %}
-        {% if otro_fs.non_form_errors %}
-          <div class="mb-2">
-            <strong>Errores de otros servicios:</strong>
-            <pre class="whitespace-pre-wrap">{{ otro_fs.non_form_errors }}</pre>
-          </div>
-        {% endif %}
-      </div>
+    <div class="bg-red-900/50 border border-red-400 rounded-xl p-4 mb-6">
+      <div class="text-red-200 font-semibold mb-2">Errores de validación:</div>
+      {{ form.errors }}
     </div>
   {% endif %}
 
   <!-- Shell del documento con tema dinámico -->
   <div id="doc-shell" 
        class="rounded-3xl p-6 theme-ot border-2"
-       data-endpoint-buscar-clientes="{% country_url 'ajax:buscar_clientes' %}"
-       data-endpoint-vehiculos-por-cliente="{% country_url 'ajax:vehiculos_por_cliente' %}"
-       data-endpoint-next-number="{% country_url 'documentos:api_obtener_numero_documento' %}">
+       data-url-veh="{% url 'chile:cl_ajax_vehiculos_por_cliente' %}"
+       data-url-rep="{% url 'taller:repuestos:api_repuesto_por_codigo' %}"
+       data-url-clientes="{% url 'chile:cl_ajax_buscar_clientes' %}"
+       data-url-nextnum="{% url 'taller:documentos:api_obtener_numero_documento' %}"
+       data-country="{{ empresa.pais|default:'CL' }}">
 
     <!-- Cabecera del documento -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
 
-      <!-- Tipo de documento -->
+      <!-- Tipo de documento y Estado de pago -->
       <div class="space-y-4">
         <label class="block text-cyan-200 font-semibold">Tipo de Documento</label>
         <select id="id_tipo" name="tipo" class="form-select w-full">
-          <option value="OT">{% if request.empresa.pais == 'US' %}Work Order{% else %}Orden de Trabajo{% endif %}</option>
-          <option value="PRES">{% if request.empresa.pais == 'US' %}Estimate{% else %}Presupuesto{% endif %}</option>
-          <option value="REC">{% if request.empresa.pais == 'US' %}Receipt{% else %}Recibo/Boleta{% endif %}</option>
+          <option value="OT">Orden de Trabajo</option>
+          <option value="REC">Recibo/Boleta</option>
+          <option value="PRES">Presupuesto</option>
+        </select>
+
+        <label class="block text-cyan-200 font-semibold">Estado de Pago</label>
+        <select name="estado_pago" class="form-select w-full">
+          <option value="NO_PAGADO" selected>No Pagado</option>
+          <option value="PAGADO">Pagado</option>
+          <option value="PARCIAL">Pago Parcial</option>
         </select>
 
                  <!-- Número (readonly) -->
@@ -283,6 +70,8 @@ input[type="checkbox"] {
          <div class="form-control w-full bg-gray-800 text-cyan-300 font-mono text-center py-3" id="id_numero">
            Se generará automáticamente
          </div>
+        <input type="hidden" name="numero_documento" id="numero_documento">
+        <input type="hidden" name="numero_documento_db" id="numero_documento_db">
       </div>
 
       <!-- Cliente y Vehículo -->
@@ -295,13 +84,15 @@ input[type="checkbox"] {
           <div id="cliente-resultados" class="absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
         </div>
 
-        <!-- Campo de selección oculto -->
-        <select id="id_cliente" name="cliente" class="form-select w-full hidden">
-          <option value="">Seleccione cliente...</option>
-          {% for cliente in clientes %}
-            <option value="{{ cliente.id }}">{{ cliente.nombre }} {{ cliente.apellido }}</option>
-          {% endfor %}
-        </select>
+        <!-- Campo de selección de cliente - ELIMINADO: Se usa solo el sistema de búsqueda AJAX -->
+        
+        <!-- Campo oculto para almacenar el ID del cliente seleccionado -->
+        <input type="hidden" id="id_cliente" name="cliente" value="">
+        
+        <!-- Campo oculto de respaldo para cliente -->
+        <input type="hidden" id="cliente_backup" name="cliente_backup" value="">
+        
+        <!-- DEBUG: Campo cliente forzado - ELIMINADO: Causaba duplicación -->
 
         <!-- Información del cliente seleccionado -->
         <div id="cliente-info" class="hidden p-3 bg-cyan-900/20 border border-cyan-400 rounded-lg">
@@ -329,7 +120,7 @@ input[type="checkbox"] {
         </select>
 
         <label class="block text-cyan-200 font-semibold">Fecha de Emisión</label>
-        <input type="date" name="fecha_emision" class="form-control w-full" value="{{ form.fecha_emision.value|default:now|date:'Y-m-d' }}">
+        <input type="date" name="fecha_emision" class="form-control w-full" value="{{ today|date:'Y-m-d' }}">
       </div>
     </div>
 
@@ -342,109 +133,112 @@ input[type="checkbox"] {
     </div>
 
     <!-- Líneas de repuestos -->
+    <!-- Management forms para repuestos -->
+    <input type="hidden" id="id_rep-TOTAL_FORMS" name="rep-TOTAL_FORMS" value="0">
+    <input type="hidden" name="rep-INITIAL_FORMS" value="0">
+    <input type="hidden" name="rep-MIN_NUM_FORMS" value="0">
+    <input type="hidden" name="rep-MAX_NUM_FORMS" value="1000">
+
     <div class="mb-8">
       <h3 class="text-2xl font-bold text-cyan-300 mb-4">🔧 Repuestos</h3>
-      {{ rep_fs.management_form }}
-      <div id="repuestos-container">
-                 {% for form in rep_fs.forms %}
-           <div class="rep-row linea-row">
+      
+      <!-- Encabezados de repuestos -->
+      <div class="rep-headers mb-2" style="display: none;">
              <div class="flex flex-wrap gap-4 items-end">
                                <div class="w-20">
                   <label class="block text-cyan-200 text-sm mb-1">Código</label>
-                  {{ form.codigo.as_widget(attrs={"class":"rep-codigo form-control w-full","placeholder":"Código"}) }}
                 </div>
                 <div class="flex-1 min-w-[150px]">
                   <label class="block text-cyan-200 text-sm mb-1">Nombre</label>
-                  {{ form.nombre.as_widget(attrs={"class":"rep-nombre form-control w-full","readonly":"readonly"}) }}
                 </div>
                 <div class="w-20">
                   <label class="block text-cyan-200 text-sm mb-1">Cantidad</label>
-                  {{ form.cantidad.as_widget(attrs={"class":"rep-cantidad form-control w-full","min":"1","max":"99"}) }}
                 </div>
                 <div class="w-24">
                    <label class="block text-cyan-200 text-sm mb-1">Precio Compra</label>
-                   <input type="text" name="precio_compra" class="rep-precio-compra form-control w-full" readonly placeholder="$0">
                  </div>
                  <div class="w-24">
                    <label class="block text-cyan-200 text-sm mb-1">Precio Venta</label>
-                   {{ form.precio_unitario.as_widget(attrs={"class":"rep-precio-venta form-control w-full","placeholder":"$0"}) }}
                  </div>
                  <div class="w-20">
                    <label class="block text-cyan-200 text-sm mb-1">Descuento %</label>
-                   {{ form.descuento.as_widget(attrs={"class":"form-control w-full","min":"0","max":"100"}) }}
                  </div>
                  <div class="w-32">
                    <label class="block text-cyan-200 text-sm mb-1">Subtotal</label>
-                   <input type="hidden" class="rep-subtotal" value="0">
-                   <div class="rep-subtotal-view subtotal-field w-full text-right font-bold">$0</div>
                  </div>
              </div>
            </div>
-         {% endfor %}
+      
+      <div id="repuestos-container">
+        <!-- Se llenará dinámicamente -->
       </div>
       <button type="button" id="add-repuesto" class="btn-secondary">+ Agregar Repuesto</button>
     </div>
 
     <!-- Líneas de servicios -->
+    <!-- Management forms para servicios -->
+    <input type="hidden" id="id_serv-TOTAL_FORMS" name="serv-TOTAL_FORMS" value="0">
+    <input type="hidden" name="serv-INITIAL_FORMS" value="0">
+    <input type="hidden" name="serv-MIN_NUM_FORMS" value="0">
+    <input type="hidden" name="serv-MAX_NUM_FORMS" value="1000">
+
     <div class="mb-8">
       <h3 class="text-2xl font-bold text-cyan-300 mb-4">🛠️ Servicios</h3>
-      {{ serv_fs.management_form }}
-      <div id="servicios-container">
-        {% for form in serv_fs.forms %}
-                     <div class="serv-row linea-row">
+      
+      <!-- Encabezados de servicios -->
+      <div class="serv-headers mb-2" style="display: none;">
              <div class="flex flex-wrap gap-4 items-end">
                                <div class="flex-1 min-w-[200px]">
                   <label class="block text-cyan-200 text-sm mb-1">Servicio</label>
-                  {{ form.servicio.as_widget(attrs={"class":"form-select w-full"}) }}
                 </div>
                 <div class="w-24">
                   <label class="block text-cyan-200 text-sm mb-1">Precio Cliente</label>
-                  {{ form.precio_unitario.as_widget(attrs={"class":"serv-precio form-control w-full","placeholder":"$0"}) }}
                 </div>
                 <div class="w-32">
                   <label class="block text-cyan-200 text-sm mb-1">Subtotal</label>
-                  <input type="hidden" class="serv-subtotal" value="0">
-                  <div class="serv-subtotal-view subtotal-field w-full text-right font-bold">$0</div>
                 </div>
              </div>
            </div>
-        {% endfor %}
+      
+      <div id="servicios-container">
+        <!-- Se llenará dinámicamente -->
       </div>
       <button type="button" id="add-servicio" class="btn-secondary">+ Agregar Servicio</button>
     </div>
 
     <!-- Líneas de otros servicios -->
+    <!-- Management forms para otros servicios -->
+    <input type="hidden" id="id_otr-TOTAL_FORMS" name="otr-TOTAL_FORMS" value="0">
+    <input type="hidden" name="otr-INITIAL_FORMS" value="0">
+    <input type="hidden" name="otr-MIN_NUM_FORMS" value="0">
+    <input type="hidden" name="otr-MAX_NUM_FORMS" value="1000">
+
     <div class="mb-8">
       <h3 class="text-2xl font-bold text-cyan-300 mb-4">🏢 Otros Servicios</h3>
-      {{ otro_fs.management_form }}
-      <div id="otros-container">
-        {% for form in otro_fs.forms %}
-                     <div class="otr-row linea-row">
+      
+      <!-- Encabezados de otros servicios -->
+      <div class="otros-headers mb-2" style="display: none;">
              <div class="flex flex-wrap gap-4 items-end">
                                <div class="flex-1 min-w-[200px]">
                   <label class="block text-cyan-200 text-sm mb-1">Servicio</label>
-                  {{ form.servicio.as_widget(attrs={"class":"form-select w-full"}) }}
                 </div>
                 <div class="flex-1 min-w-[150px]">
                   <label class="block text-cyan-200 text-sm mb-1">Empresa Externa</label>
-                  {{ form.empresa_externa.as_widget(attrs={"class":"form-control w-full"}) }}
                 </div>
                 <div class="w-24">
                   <label class="block text-cyan-200 text-sm mb-1">Precio Taller</label>
-                  <input type="text" class="otr-precio-taller form-control w-full" readonly placeholder="$0">
                 </div>
                 <div class="w-24">
                   <label class="block text-cyan-200 text-sm mb-1">Precio Cliente</label>
-                  {{ form.precio_cliente.as_widget(attrs={"class":"otr-precio form-control w-full","placeholder":"$0"}) }}
                 </div>
                 <div class="w-32">
                   <label class="block text-cyan-200 text-sm mb-1">Subtotal</label>
-                  <input type="hidden" class="otr-subtotal" value="0">
-                  <div class="otr-subtotal-view subtotal-field w-full text-right font-bold">$0</div>
                 </div>
              </div>
            </div>
-        {% endfor %}
+      
+      <div id="otros-container">
+        <!-- Se llenará dinámicamente -->
       </div>
       <button type="button" id="add-otro" class="btn-secondary">+ Agregar Otro Servicio</button>
     </div>
@@ -458,10 +252,7 @@ input[type="checkbox"] {
           name="observaciones"
           class="form-control w-full h-32 resize-y"
           placeholder="Observaciones opcionales - Puede dejarse vacío si no hay información adicional..."
-        >{{ form.observaciones.value|default:'' }}</textarea>
-        {% if form.observaciones.errors %}
-          <div class="text-red-400 text-sm">{{ form.observaciones.errors.0 }}</div>
-        {% endif %}
+        ></textarea>
       </div>
     </div>
 
@@ -469,12 +260,18 @@ input[type="checkbox"] {
     <div class="totales-section">
       <h3 class="text-2xl font-bold text-cyan-300 mb-4">💰 Totales</h3>
 
-      <!-- Checkbox IVA junto a totales -->
+      <!-- Checkboxes IVA junto a totales -->
       <div class="mb-4">
-        <label class="flex items-center text-cyan-200">
-          <input type="checkbox" id="id_apply_vat" name="apply_vat" checked class="mr-2">
-          Aplicar IVA (19%)
-        </label>
+        <div class="flex flex-wrap gap-6 items-center">
+          <label class="flex items-center text-cyan-200">
+            <input type="checkbox" id="id_apply_vat" name="apply_vat" class="form-check-input" checked>
+            <span class="ml-2">Aplicar IVA (19%)</span>
+          </label>
+          <label class="flex items-center text-cyan-200">
+            <input type="checkbox" id="id_exclude_vat" name="exclude_vat" class="form-check-input">
+            <span class="ml-2">Excluir IVA</span>
+          </label>
+        </div>
       </div>
 
              <div class="space-y-2">
@@ -503,7 +300,7 @@ input[type="checkbox"] {
 
     <!-- Botones de acción -->
     <div class="flex justify-between mt-8">
-      <a href="{% country_url 'documentos:lista_documentos' %}" class="btn-secondary">← Volver</a>
+      <a href="/cl/es/documentos/" class="btn-secondary">← Volver</a>
       <button type="submit" class="btn-primary">💾 Guardar Documento</button>
     </div>
 
@@ -512,61 +309,32 @@ input[type="checkbox"] {
 
 <!-- JavaScript para funcionalidad interactiva -->
 <script>
-/* URLs resueltas por Django (respetan /cl o /us, namespaces, etc.) */
-// Verificar que AJAX_ENDPOINTS esté disponible
-if (typeof window.AJAX_ENDPOINTS === 'undefined') {
-  console.error('❌ CRÍTICO: window.AJAX_ENDPOINTS no está definido');
-  console.error('❌ Esto significa que ajax_endpoints.html no se cargó correctamente');
-  // Fallback a URLs hardcodeadas para Chile
-  window.AJAX_ENDPOINTS = {
-    buscarClientes: "/cl/es/ajax/clientes/buscar/",
-    vehiculosPorCliente: "/cl/es/ajax/vehiculos/por-cliente/",
-    repuestoPorCodigo: "/cl/es/repuestos/api/repuesto-por-codigo/",
-    nextNumber: "/cl/es/documentos/api/obtener-numero-documento/",
-  };
-  console.log('🔧 Usando fallback de URLs para Chile');
-}
+/* URLs y configuración leídas del DOM */
+const shell = document.getElementById('doc-shell');
+const urlVeh = shell.dataset.urlVeh;
+const urlRep = shell.dataset.urlRep;
+const urlBuscarClientes = shell.dataset.urlClientes;
+const urlNextNumber = shell.dataset.urlNextnum;
+const COUNTRY = shell.dataset.country || "CL";
 
-console.log('🔍 DEBUG: window.AJAX_ENDPOINTS:', window.AJAX_ENDPOINTS);
-console.log('🔍 DEBUG: typeof window.AJAX_ENDPOINTS:', typeof window.AJAX_ENDPOINTS);
-
-// Leer endpoints desde data-attributes del doc-shell
-const docShell = document.getElementById('doc-shell');
-const urlBuscarClientes = docShell?.dataset?.endpointBuscarClientes;
-const urlVeh = docShell?.dataset?.endpointVehiculosPorCliente;
-const urlNextNumber = docShell?.dataset?.endpointNextNumber;
-const urlRep = window.AJAX_ENDPOINTS?.repuestoPorCodigo; // Mantener este del sistema anterior
-
-// Validar que los endpoints críticos estén disponibles
-if (!urlBuscarClientes) {
-  console.error('❌ CRÍTICO: endpoint-buscar-clientes no configurado en data-attributes');
-}
-if (!urlNextNumber) {
-  console.error('❌ CRÍTICO: endpoint-next-number no configurado en data-attributes');
-}
-
-console.log('🔍 DEBUG: urlBuscarClientes:', urlBuscarClientes);
-console.log('🔍 DEBUG: urlVeh:', urlVeh);
-console.log('🔍 DEBUG: urlNextNumber:', urlNextNumber);
-
-/* País para formato de moneda (robusto) */
-const COUNTRY = "{{ request.empresa.pais|default:'CL' }}";
-
-console.log('URLs canónicas configuradas:', { urlVeh, urlRep, urlBuscarClientes });
+console.log('🚀 TEMPLATE NUEVO CHILE CARGADO');
+console.log('🔗 URLs cargadas:', {
+  urlVeh,
+  urlRep,
+  urlBuscarClientes,
+  urlNextNumber,
+  COUNTRY
+});
 
 // 1) Saneador robusto: "$15.000", "15,000.50", "  15000  " -> número
 function numRaw(v) {
   if (typeof v === 'number') return v;
   v = (v ?? '').toString().trim();
   if (!v) return 0;
-  // deja sólo dígitos, coma, punto y signo
   v = v.replace(/[^\d,.\-]/g, '');
   if (COUNTRY === 'CL') {
-    // CLP: miles con ".", a veces traen "," -> unifica a punto decimal y elimina miles
-    // "15.000" -> "15000" ; "15,5" -> "15.5"
     v = v.replace(/\./g, '').replace(',', '.');
   } else {
-    // US: "15,000.50" -> "15000.50"
     v = v.replace(/,/g, '');
   }
   const n = parseFloat(v);
@@ -581,51 +349,6 @@ function money(n){
   return COUNTRY==='CL' ? formatCLP(n) : new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(Number(n)||0);
 }
 
-// Funciones para manejo de precios
-function formatPriceInput(input) {
-  let value = input.value.replace(/[^\d.-]/g, '');
-
-  if (value === '' || value === '-') {
-    input.value = '';
-    return;
-  }
-
-  let numValue = parseFloat(value);
-  if (isNaN(numValue)) {
-    input.value = '';
-    return;
-  }
-
-  // Formatear según el país
-  if (COUNTRY === 'US') {
-    input.value = numValue.toFixed(2);
-  } else {
-    input.value = Math.round(numValue);
-  }
-}
-
-function handlePriceInput(input) {
-  // Formatear al perder el foco
-  input.addEventListener('blur', () => {
-    formatPriceInput(input);
-  });
-
-  // Permitir solo números, punto decimal y guión
-  input.addEventListener('input', (e) => {
-    const value = e.target.value;
-    if (!/^[\d.-]*$/.test(value)) {
-      e.target.value = value.replace(/[^\d.-]/g, '');
-    }
-  });
-
-  // Prevenir múltiples puntos decimales
-  input.addEventListener('keydown', (e) => {
-    if (e.key === '.' && e.target.value.includes('.')) {
-      e.preventDefault();
-    }
-  });
-}
-
 // util para setear texto seguro
 function setTxt(selOrEl, v){
   const el = typeof selOrEl==='string' ? document.querySelector(selOrEl) : selOrEl;
@@ -633,51 +356,61 @@ function setTxt(selOrEl, v){
 }
 
 // Cambio de tema por tipo de documento
-const shell = document.getElementById('doc-shell');
 const selTipo = document.getElementById('id_tipo');
 
 function applyTheme(tipo) {
-  shell.classList.remove('theme-ot', 'theme-pres', 'theme-rec');
-  if (tipo === 'PRES') shell.classList.add('theme-pres');
-  else if (tipo === 'REC') shell.classList.add('theme-rec');
-  else shell.classList.add('theme-ot'); // OT por defecto
+  shell.classList.remove('theme-ot', 'theme-rec', 'theme-pres');
+  if (tipo === 'REC') shell.classList.add('theme-rec');
+  else if (tipo === 'PRES') shell.classList.add('theme-pres');
+  else shell.classList.add('theme-ot');
 
-  // Actualizar número automáticamente
   updateDocumentNumber();
 }
 
-// Evita ráfagas de llamadas
-let nnTimer;
-async function updateDocumentNumber() {
-  clearTimeout(nnTimer);
-  nnTimer = setTimeout(async () => {
-    const tipo = (selTipo.value || 'OT').toUpperCase();
-    const numeroField = document.getElementById('id_numero');
+ async function updateDocumentNumber() {
+   const tipo = selTipo.value;
+   const numeroField = document.getElementById('id_numero');
+   const numeroHidden = document.getElementById('numero_documento');
+   const numeroDbHidden = document.getElementById('numero_documento_db');
 
-    try {
-      console.log('🔢 Obteniendo próximo número:', { tipo, url: urlNextNumber });
+   if (!tipo || !urlNextNumber) {
+     numeroField.textContent = 'Se generará automáticamente';
+     numeroHidden.value = '';
+     numeroDbHidden.value = '';
+     return;
+   }
 
-      const response = await fetch(`${urlNextNumber}?tipo=${encodeURIComponent(tipo)}`, {
-        headers: {'X-Requested-With': 'XMLHttpRequest'},
-        credentials: 'same-origin'
-      });
+   try {
+       console.log('🔢 Obteniendo próximo número:', { tipo, url: urlNextNumber });
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log('📄 Número obtenido:', data);
-        numeroField.textContent = data.numero || `Se generará (${tipo})`;
-      } else {
-        console.warn('⚠️ Error al obtener número:', response.status);
-        numeroField.textContent = `Se generará (${tipo})`;
-      }
-    } catch (error) {
-      console.error('❌ Error al obtener número:', error);
-      numeroField.textContent = `Se generará (${tipo})`;
-    }
-  }, 150);
-}
+       const response = await fetch(`${urlNextNumber}?tipo=${encodeURIComponent(tipo)}`, {
+         headers: {
+           'X-Requested-With': 'XMLHttpRequest'
+         }
+       });
 
-// Función simplificada y robusta para cargar vehículos por cliente
+       if (response.ok) {
+         const data = await response.json();
+         const num = data.numero || '';
+         numeroField.textContent = num || `Se generará automáticamente (${tipo})`;
+         numeroHidden.value = num;
+         numeroDbHidden.value = num;
+         console.log('✅ Número obtenido:', data.numero);
+       } else {
+         console.warn('⚠️ No se pudo obtener número automático');
+         numeroField.textContent = `Se generará automáticamente (${tipo})`;
+         numeroHidden.value = '';
+         numeroDbHidden.value = '';
+       }
+     } catch (error) {
+       console.error('❌ Error obteniendo número:', error);
+       numeroField.textContent = `Se generará automáticamente (${tipo})`;
+       numeroHidden.value = '';
+       numeroDbHidden.value = '';
+     }
+ }
+
+// Función para cargar vehículos por cliente
 async function cargarVehiculosPorCliente(clienteId) {
   const selVeh = document.getElementById('id_vehiculo');
   if (!selVeh || !clienteId) {
@@ -754,7 +487,6 @@ async function buscarClientes(query) {
       contentType: response.headers.get('content-type')
     });
 
-    // Verificar si es un redirect de login
     if (response.status === 302 || response.status === 401) {
       console.error('❌ Usuario no autenticado - redirigiendo a login');
       clienteResultados.innerHTML = '<div class="p-3 text-red-400">⚠️ Sesión expirada. <a href="/accounts/login/" class="underline text-cyan-200">Inicia sesión</a></div>';
@@ -774,7 +506,6 @@ async function buscarClientes(query) {
       const data = await response.json();
       console.log('✅ Datos recibidos:', data);
 
-      // Normalizar datos - manejar diferentes formatos
       let clientes = [];
       if (Array.isArray(data)) {
         clientes = data;
@@ -807,67 +538,131 @@ function mostrarResultadosClientes(clientes) {
     return;
   }
 
-  clienteResultados.innerHTML = clientes.map(cliente => {
-    // Manejar diferentes formatos de datos de cliente
-    const nombre = cliente.text ||
-                   cliente.nombre_completo ||
-                   cliente.nombre ||
-                   cliente.razon_social ||
-                   `Cliente #${cliente.id}` ||
-                   'Cliente sin nombre';
-
-    const email = cliente.email || '';
-    const telefono = cliente.telefono || '';
-    const rut = cliente.rut || '';
-
-    console.log('📋 Procesando cliente:', { id: cliente.id, nombre, email, telefono, rut });
-
-    return `
-      <div class="cliente-item p-3 hover:bg-cyan-700 cursor-pointer border-b border-cyan-600 last:border-b-0"
-           data-id="${cliente.id || ''}"
-           data-nombre="${nombre}"
-           data-email="${email}"
-           data-telefono="${telefono}">
-        <div class="font-semibold text-cyan-200">${nombre}</div>
-        <div class="text-sm text-gray-300">
-          ${rut ? `RUT: ${rut}` : ''}
-          ${rut && (telefono || email) ? ' | ' : ''}
-          ${telefono ? `📞 ${telefono}` : ''}
-          ${telefono && email ? ' | ' : ''}
-          ${email ? `📧 ${email}` : ''}
-          ${!rut && !telefono && !email ? 'Sin información adicional' : ''}
-        </div>
-      </div>
-    `;
-  }).join('');
+  clienteResultados.replaceChildren(); // limpia
+  const frag = document.createDocumentFragment();
+  
+  for (const cliente of clientes) {
+    const item = document.createElement('div');
+    item.className = 'cliente-item p-3 hover:bg-cyan-700 cursor-pointer border-b border-cyan-600 last:border-b-0';
+    item.dataset.id = cliente.id || '';
+    
+    const nombre = (cliente.text || cliente.nombre_completo || cliente.nombre || cliente.razon_social || `Cliente #${cliente.id}` || '').toString();
+    const email = (cliente.email || '').toString();
+    const telefono = (cliente.telefono || '').toString();
+    const rut = (cliente.rut || '').toString();
+    
+    item.dataset.nombre = nombre; 
+    item.dataset.email = email; 
+    item.dataset.telefono = telefono;
+    item.dataset.rut = rut;
+    
+    const title = document.createElement('div'); 
+    title.className = 'font-semibold text-cyan-200'; 
+    title.textContent = nombre;
+    
+    const meta = document.createElement('div'); 
+    meta.className = 'text-sm text-gray-300';
+    const bits = []; 
+    if (rut) bits.push(`RUT: ${rut}`); 
+    if (telefono) bits.push(`📞 ${telefono}`); 
+    if (email) bits.push(`📧 ${email}`);
+    meta.textContent = bits.join(' | ') || 'Sin información adicional';
+    
+    item.append(title, meta);
+    frag.appendChild(item);
+  }
+  
+  clienteResultados.appendChild(frag);
 
   clienteResultados.classList.remove('hidden');
   console.log('✅ Resultados de clientes mostrados:', clientes.length);
 }
 
 async function seleccionarCliente(clienteId, nombre, email, telefono) {
-  // Ocultar resultados
   clienteResultados.classList.add('hidden');
-
-  // Limpiar campo de búsqueda
   clienteBusqueda.value = nombre;
+  
+  // Usar el campo oculto en lugar del select
+  const clienteHidden = document.getElementById('id_cliente');
+  if (clienteHidden) {
+    clienteHidden.value = clienteId;
+  }
 
-  // Seleccionar en el select oculto
-  clienteSelect.value = clienteId;
-
-  // Mostrar información del cliente
   document.getElementById('cliente-nombre').textContent = nombre;
   document.getElementById('cliente-email').textContent = email || 'Sin email';
   document.getElementById('cliente-telefono').textContent = telefono || 'Sin teléfono';
   clienteInfo.classList.remove('hidden');
 
-  // Cargar vehículos directamente
   await cargarVehiculosPorCliente(clienteId);
 }
 
+// Función para cargar clientes en el select - ELIMINADA: Ya no usamos select
+
+// Recalcular totales
+function sumValues(selectorList){
+  const nodes = document.querySelectorAll(selectorList);
+  let acc = 0;
+  nodes.forEach(el => {
+    const v = ('value' in el) ? el.value : el.textContent;
+    acc += numRaw(v);
+  });
+  return acc;
+}
+
+window.recalcTotales = function(){
+  const rep = sumValues('.rep-subtotal');
+  const serv = sumValues('.serv-subtotal');
+  const otros = sumValues('.otr-subtotal');
+  const applyVat = document.getElementById('id_apply_vat')?.checked;
+  const excludeVat = document.getElementById('id_exclude_vat')?.checked;
+  
+  // Lógica de IVA: si está marcado "Excluir IVA", no se aplica IVA
+  // Si está marcado "Aplicar IVA" y no está marcado "Excluir IVA", se aplica IVA
+  let iva = 0;
+  let taxRate = 0;
+  if (COUNTRY === 'CL' && applyVat && !excludeVat) {
+    taxRate = 19;
+    iva = Math.round((rep + serv + otros) * 0.19);
+  }
+  
+  const tot = rep + serv + otros + iva;
+
+  // Actualizar campos visibles
+  setTxt('#t_rep',  money(rep));
+  setTxt('#t_serv', money(serv));
+  setTxt('#t_otros', money(otros));
+  setTxt('#t_iva',  money(iva));
+  setTxt('#t_total',money(tot));
+
+         // Actualizar campos ocultos para el envío del formulario
+         const netoRepuestos = document.getElementById('neto_repuestos');
+         const netoServicios = document.getElementById('neto_servicios');
+         const netoOtrosServicios = document.getElementById('neto_otros_servicios');
+         const descuentoTotal = document.getElementById('descuento_total');
+         const taxRateApplied = document.getElementById('tax_rate_applied');
+         const taxAmount = document.getElementById('tax_amount');
+         const totalDocumento = document.getElementById('total_documento');
+         const clienteBackup = document.getElementById('cliente_backup');
+         const clienteSelect = document.getElementById('id_cliente');
+
+         if (netoRepuestos) netoRepuestos.value = rep;
+         if (netoServicios) netoServicios.value = serv;
+         if (netoOtrosServicios) netoOtrosServicios.value = otros;
+         if (descuentoTotal) descuentoTotal.value = 0; // Por ahora sin descuentos globales
+         if (taxRateApplied) taxRateApplied.value = taxRate;
+         if (taxAmount) taxAmount.value = iva;
+         if (totalDocumento) totalDocumento.value = tot;
+         
+         // Asegurar que el cliente se envíe
+         const clienteHidden = document.getElementById('id_cliente');
+         if (clienteBackup && clienteHidden) {
+           clienteBackup.value = clienteHidden.value || '';
+         }
+};
+
+// Event listeners
 selTipo?.addEventListener('change', e => applyTheme(e.target.value));
 
-// Event listeners para búsqueda de clientes
 clienteBusqueda?.addEventListener('input', (e) => {
   clearTimeout(searchTimeout);
   searchTimeout = setTimeout(() => {
@@ -881,14 +676,13 @@ clienteBusqueda?.addEventListener('focus', () => {
   }
 });
 
-// Cerrar resultados al hacer clic fuera
 document.addEventListener('click', (e) => {
-  if (!clienteBusqueda.contains(e.target) && !clienteResultados.contains(e.target)) {
+  if (clienteBusqueda && clienteResultados && 
+      !clienteBusqueda.contains(e.target) && !clienteResultados.contains(e.target)) {
     clienteResultados.classList.add('hidden');
   }
 });
 
-// Seleccionar cliente al hacer clic en resultado
 clienteResultados?.addEventListener('click', (e) => {
   const clienteItem = e.target.closest('.cliente-item');
   if (clienteItem) {
@@ -900,87 +694,314 @@ clienteResultados?.addEventListener('click', (e) => {
   }
 });
 
+// Event listener para cuando se selecciona un cliente del select - ELIMINADO: Ya no usamos select
+
+// Función para manejar la lógica mutuamente excluyente de los checkboxes de IVA
+function handleVatCheckboxes() {
+  const applyVat = document.getElementById('id_apply_vat');
+  const excludeVat = document.getElementById('id_exclude_vat');
+  
+  if (applyVat && excludeVat) {
+    // Si se marca "Excluir IVA", desmarcar "Aplicar IVA"
+    excludeVat.addEventListener('change', function() {
+      if (this.checked) {
+        applyVat.checked = false;
+      }
+      window.recalcTotales();
+    });
+    
+    // Si se marca "Aplicar IVA", desmarcar "Excluir IVA"
+    applyVat.addEventListener('change', function() {
+      if (this.checked) {
+        excludeVat.checked = false;
+      }
+      window.recalcTotales();
+    });
+  }
+}
+
+// Inicializar la lógica de checkboxes
+handleVatCheckboxes();
+
 document.addEventListener('DOMContentLoaded', () => {
   applyTheme(selTipo?.value);
   updateDocumentNumber();
+  
+  // Cargar clientes en el select - ELIMINADO: Ya no usamos select
 
-  // 🚀 Inicializar búsqueda de clientes con Select2
-  console.log('🔧 Configurando búsqueda de clientes...');
+  // Inicializar totales con formato chileno
+  setTimeout(() => {
+    window.recalcTotales();
+  }, 100);
+});
 
-  try {
-    const clienteSelect = $('#id_cliente');
-    if (clienteSelect.length && typeof $.fn.select2 === 'function') {
-      clienteSelect.select2({
-        ajax: {
-          url: urlBuscarClientes,
-          dataType: 'json',
-          delay: 300,
-          data: function (params) {
-            return {
-              q: params.term,
-              page: params.page || 1
-            };
-          },
-          processResults: function (data) {
-            console.log('📊 Resultados de búsqueda:', data);
-            const results = Array.isArray(data) ? data : (data.results || []);
-            return {
-              results: results.map(item => ({
-                id: item.id,
-                text: item.text || `${item.nombre || item.razon_social || 'Cliente'} (RUT: ${item.rut || 'N/A'})`
-              }))
-            };
-          },
-          transport: function (params, success, failure) {
-            const request = $.ajax({
-              url: params.url,
-              data: params.data,
-              headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-              }
-            });
-            request.then(success).catch(failure);
-            return request;
-          }
-        },
-        placeholder: 'Buscar cliente...',
-        minimumInputLength: 2,
-        language: 'es',
-        allowClear: true
-      });
+// Agregar filas dinámicamente
+document.getElementById('add-repuesto')?.addEventListener('click', () => {
+  const container = document.getElementById('repuestos-container');
+  const formCount = document.getElementById('id_rep-TOTAL_FORMS');
+  const currentCount = parseInt(formCount?.value || 0);
 
-      console.log('✅ Select2 configurado correctamente');
-    } else {
-      console.log('⚠️ Select2 no disponible, usando búsqueda básica');
+  const newRow = document.createElement('div');
+  newRow.className = 'rep-row linea-row';
+  newRow.innerHTML = `
+    <div class="flex flex-wrap gap-4 items-end">
+      <div class="w-20">
+        <input type="text" name="rep-${currentCount}-codigo" class="rep-codigo form-control w-full" placeholder="Código">
+      </div>
+      <div class="flex-1 min-w-[150px]">
+        <input type="text" name="rep-${currentCount}-nombre" class="rep-nombre form-control w-full" readonly placeholder="Nombre">
+      </div>
+      <div class="w-20">
+        <input type="number" name="rep-${currentCount}-cantidad" class="rep-cantidad form-control w-full" min="1" max="99" value="1" placeholder="Cant.">
+      </div>
+      <div class="w-24">
+        <input type="text" name="precio_compra" class="rep-precio-compra form-control w-full" readonly placeholder="$0" title="Precio Compra">
+      </div>
+      <div class="w-24">
+        <input type="text" name="rep-${currentCount}-precio_unitario" class="rep-precio-venta form-control w-full" placeholder="$0" title="Precio Venta">
+      </div>
+      <div class="w-20">
+        <input type="number" name="rep-${currentCount}-descuento" class="form-control w-full" min="0" max="100" value="0" placeholder="Desc.%" title="Descuento %">
+      </div>
+      <div class="w-32">
+        <input type="hidden" class="rep-subtotal" value="0">
+        <div class="rep-subtotal-view subtotal-field w-full text-right font-bold">$0</div>
+      </div>
+    </div>
+  `;
+
+  container.appendChild(newRow);
+  if (formCount) formCount.value = currentCount + 1;
+
+  // Mostrar encabezados cuando se agrega el primer repuesto
+  if (currentCount === 0) {
+    const headers = document.querySelector('.rep-headers');
+    if (headers) {
+      headers.style.display = 'block';
     }
+  }
 
-    // Configurar evento de cambio de cliente
-    $('#id_cliente').on('change', function() {
-      const clienteId = $(this).val();
-      console.log('🔄 Cliente seleccionado:', clienteId);
-      if (clienteId) {
-        cargarVehiculosPorCliente(clienteId);
-      } else {
-        const selVeh = document.getElementById('id_vehiculo');
-        if (selVeh) {
-          selVeh.innerHTML = '<option value="">Seleccione cliente primero...</option>';
-        }
-      }
-    });
+  // Wire la nueva fila
+  wireRepRow(newRow);
 
-  } catch (error) {
-    console.error('❌ Error configurando búsqueda de clientes:', error);
+  // Posicionar cursor en el campo "código" (part number) para todas las filas
+  const newCodeField = newRow.querySelector('.rep-codigo');
+  if (newCodeField) {
+    // Usar setTimeout para asegurar que el campo esté completamente renderizado
+    setTimeout(() => {
+      newCodeField.focus();
+      // Seleccionar todo el texto si hay alguno para facilitar la edición
+      newCodeField.select();
+    }, 50);
   }
 });
 
-// Cargar vehículos por cliente (event listener para el select oculto)
-const selCliente = document.getElementById('id_cliente');
-selCliente?.addEventListener('change', async () => {
-  await cargarVehiculosPorCliente(selCliente.value);
+document.getElementById('add-servicio')?.addEventListener('click', () => {
+  const container = document.getElementById('servicios-container');
+  const formCount = document.getElementById('id_serv-TOTAL_FORMS');
+  const currentCount = parseInt(formCount?.value || 0);
+
+  const newRow = document.createElement('div');
+  newRow.className = 'serv-row linea-row';
+  newRow.innerHTML = `
+    <div class="flex flex-wrap gap-4 items-end">
+      <div class="flex-1 min-w-[200px] relative">
+        <input type="text" name="serv-${currentCount}-servicio-search" class="serv-search form-control w-full" placeholder="Buscar servicio..." autocomplete="off">
+        <input type="hidden" name="serv-${currentCount}-servicio" class="serv-servicio-id" value="">
+        <div class="serv-resultados absolute z-50 bg-gray-900 border border-cyan-500 rounded-lg max-h-48 overflow-y-auto hidden w-full" style="top: 100%; left: 0;"></div>
+      </div>
+      <div class="w-24">
+        <input type="text" name="serv-${currentCount}-precio_unitario" class="serv-precio form-control w-full" placeholder="$0" title="Precio Cliente">
+      </div>
+      <div class="w-32">
+        <input type="hidden" class="serv-subtotal" value="0">
+        <div class="serv-subtotal-view subtotal-field w-full text-right font-bold">$0</div>
+      </div>
+    </div>
+  `;
+
+  container.appendChild(newRow);
+  if (formCount) formCount.value = currentCount + 1;
+
+  // Mostrar encabezados cuando se agrega el primer servicio
+  if (currentCount === 0) {
+    const headers = document.querySelector('.serv-headers');
+    if (headers) {
+      headers.style.display = 'block';
+    }
+  }
+
+  // Wire la nueva fila
+  wireServRow(newRow);
+
+  // Posicionar cursor en el campo de búsqueda de servicio
+  const newSearchField = newRow.querySelector('.serv-search');
+  if (newSearchField) {
+    // Usar setTimeout para asegurar que el campo esté completamente renderizado
+    setTimeout(() => {
+      newSearchField.focus();
+      // Seleccionar todo el texto si hay alguno para facilitar la edición
+      newSearchField.select();
+    }, 50);
+  }
 });
 
-// Autocompletar repuestos por código
+document.getElementById('add-otro')?.addEventListener('click', () => {
+  const container = document.getElementById('otros-container');
+  const formCount = document.getElementById('id_otr-TOTAL_FORMS');
+  const currentCount = parseInt(formCount?.value || 0);
+
+  const newRow = document.createElement('div');
+  newRow.className = 'otr-row linea-row';
+  newRow.innerHTML = `
+    <div class="flex flex-wrap gap-4 items-end">
+      <div class="flex-1 min-w-[200px] relative">
+        <input type="text" name="otr-${currentCount}-servicio-search" class="otr-search form-control w-full" placeholder="Buscar servicio..." autocomplete="off">
+        <input type="hidden" name="otr-${currentCount}-servicio" class="otr-servicio-id" value="">
+        <div class="otr-resultados absolute z-50 bg-gray-900 border border-cyan-500 rounded-lg max-h-48 overflow-y-auto hidden w-full" style="top: 100%; left: 0;"></div>
+      </div>
+      <div class="flex-1 min-w-[150px]">
+        <input type="text" name="otr-${currentCount}-empresa_externa" class="form-control w-full" placeholder="Empresa Externa" title="Empresa Externa">
+      </div>
+      <div class="w-24">
+        <input type="text" name="precio_taller" class="otr-precio-taller form-control w-full" placeholder="$0" title="Precio Taller">
+      </div>
+      <div class="w-24">
+        <input type="text" name="otr-${currentCount}-precio_cliente" class="otr-precio form-control w-full" placeholder="$0" title="Precio Cliente">
+      </div>
+      <div class="w-32">
+        <input type="hidden" class="otr-subtotal" value="0">
+        <div class="otr-subtotal-view subtotal-field w-full text-right font-bold">$0</div>
+      </div>
+    </div>
+  `;
+
+  container.appendChild(newRow);
+  if (formCount) formCount.value = currentCount + 1;
+
+  // Mostrar encabezados cuando se agrega el primer otro servicio
+  if (currentCount === 0) {
+    const headers = document.querySelector('.otros-headers');
+    if (headers) {
+      headers.style.display = 'block';
+    }
+  }
+
+  // Wire la nueva fila
+  wireOtroRow(newRow);
+});
+
+// Funciones para autocompletado de repuestos
+let repuestoDropdown = null;
+
+function hideRepuestoDropdown() {
+  if (repuestoDropdown) {
+    repuestoDropdown.remove();
+    repuestoDropdown = null;
+  }
+}
+
+function showRepuestoDropdown(suggestions, inputElement, nameField, pcField, pvField) {
+  // Ocultar dropdown anterior si existe
+  hideRepuestoDropdown();
+  
+  if (!suggestions || suggestions.length === 0) {
+    return;
+  }
+  
+  // Crear dropdown
+  repuestoDropdown = document.createElement('div');
+  repuestoDropdown.className = 'repuesto-dropdown';
+  repuestoDropdown.style.cssText = `
+    position: absolute;
+    background: rgba(20, 20, 40, 0.95);
+    border: 2px solid #00f2fe;
+    border-radius: 0.5rem;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    min-width: 300px;
+    box-shadow: 0 8px 25px rgba(0, 242, 254, 0.4);
+    backdrop-filter: blur(10px);
+  `;
+  
+  // Agregar cada sugerencia
+  suggestions.forEach(repuesto => {
+    const item = document.createElement('div');
+    item.className = 'repuesto-suggestion';
+    item.style.cssText = `
+      padding: 0.75rem;
+      cursor: pointer;
+      border-bottom: 1px solid rgba(0, 242, 254, 0.2);
+      color: #fff;
+      transition: background 0.2s;
+    `;
+    
+    item.innerHTML = `
+      <div style="font-weight: bold; color: #00f2fe;">${repuesto.codigo || 'Sin código'}</div>
+      <div style="font-size: 0.9rem; color: #94a3b8;">${repuesto.nombre || 'Sin nombre'}</div>
+      <div style="font-size: 0.8rem; color: #7f00ff;">Precio: $${repuesto.precio_venta || '0'}</div>
+    `;
+    
+    // Eventos de hover
+    item.addEventListener('mouseenter', () => {
+      item.style.background = 'rgba(0, 242, 254, 0.2)';
+    });
+    
+    item.addEventListener('mouseleave', () => {
+      item.style.background = 'transparent';
+    });
+    
+    // Seleccionar repuesto al hacer click
+    item.addEventListener('click', () => {
+      inputElement.value = repuesto.codigo;
+      nameField.value = repuesto.nombre || '';
+      pcField.value = money(repuesto.precio_compra || '0');
+      pvField.value = money(repuesto.precio_venta || '0');
+      hideRepuestoDropdown();
+      recalc();
+      console.log('✅ Repuesto seleccionado:', repuesto);
+    });
+    
+    repuestoDropdown.appendChild(item);
+  });
+  
+  // Posicionar el dropdown
+  const rect = inputElement.getBoundingClientRect();
+  repuestoDropdown.style.left = rect.left + 'px';
+  repuestoDropdown.style.top = (rect.bottom + window.scrollY + 5) + 'px';
+  
+  // Agregar al documento
+  document.body.appendChild(repuestoDropdown);
+  
+  // Ocultar al hacer click fuera
+  setTimeout(() => {
+    document.addEventListener('click', hideRepuestoDropdown, { once: true });
+  }, 100);
+}
+
+async function fetchRepuestosSuggestions(code, inputElement, nameField, pcField, pvField) {
+  try {
+    console.log('🔧 Buscando sugerencias para:', code);
+    
+    const response = await fetch(`${urlRep}?codigo=${encodeURIComponent(code)}`);
+    if (!response.ok) return;
+    
+    const data = await response.json();
+    console.log('🔧 Sugerencias recibidas:', data);
+    
+    if (data && data.results && data.results.length > 0) {
+      showRepuestoDropdown(data.results, inputElement, nameField, pcField, pvField);
+    } else {
+      hideRepuestoDropdown();
+    }
+  } catch (error) {
+    console.error('❌ Error buscando sugerencias:', error);
+    hideRepuestoDropdown();
+  }
+}
+
+// Funciones para wire de filas
 function wireRepRow(row) {
   const inpCode = row.querySelector('.rep-codigo');
   const inpName = row.querySelector('.rep-nombre');
@@ -996,14 +1017,36 @@ function wireRepRow(row) {
       const r = await fetch(`${urlRep}?codigo=${encodeURIComponent(c)}`);
       if (!r.ok) return;
       const j = await r.json();
-      if (j && j.id) {
+      
+      console.log('🔧 Respuesta de repuestos:', j);
+      
+      // Manejar nueva estructura con results
+      if (j && j.results && j.results.length > 0) {
+        // Tomar el primer resultado que coincida exactamente, o el primero si no hay coincidencia exacta
+        let repuesto = j.results.find(r => r.codigo && r.codigo.toLowerCase() === c.toLowerCase());
+        if (!repuesto) {
+          repuesto = j.results[0]; // Tomar el primero si no hay coincidencia exacta
+        }
+        
+        if (repuesto && repuesto.id) {
+          inpName.value = repuesto.nombre || '';
+          inpPC.value = money(repuesto.precio_compra || '0');
+          inpPV.value = money(repuesto.precio_venta || '0');
+          recalc();
+          console.log('✅ Repuesto encontrado:', repuesto);
+        }
+      } else if (j && j.id) {
+        // Compatibilidad con estructura anterior
         inpName.value = j.nombre || '';
         inpPC.value = money(j.precio_compra || '0');
         inpPV.value = money(j.precio_venta || '0');
         recalc();
+        console.log('✅ Repuesto encontrado (formato anterior):', j);
+      } else {
+        console.log('⚠️ No se encontraron repuestos para:', c);
       }
     } catch (error) {
-      console.error('Error buscando repuesto:', error);
+      console.error('❌ Error buscando repuesto:', error);
     }
   }
 
@@ -1011,264 +1054,293 @@ function wireRepRow(row) {
     const q = numRaw(qEl?.value);
     const pv = numRaw(inpPV?.value);
     const s = (q * pv) || 0;
-    if (sub) sub.value = Math.round(s);     // número crudo para POST (CLP sin decimales)
-    if (view) view.textContent = money(s);   // bonito
+    if (sub) sub.value = Math.round(s);
+    if (view) view.textContent = money(s);
     window.recalcTotales?.();
   }
 
+  // Búsqueda en tiempo real mientras escribes
+  let searchTimeout;
+  inpCode?.addEventListener('input', (e) => {
+    const value = e.target.value.trim();
+    
+    // Limpiar timeout anterior
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+    
+    // Búsqueda con debounce (esperar 300ms después de que deje de escribir)
+    if (value.length >= 2) {
+      searchTimeout = setTimeout(() => {
+        fetchRepuestosSuggestions(value, inpCode, inpName, inpPC, inpPV);
+      }, 300);
+    } else {
+      // Limpiar campos si no hay suficientes caracteres
+      inpName.value = '';
+      inpPC.value = '';
+      inpPV.value = '';
+      hideRepuestoDropdown();
+    }
+  });
+  
+  // También mantener la búsqueda en change para compatibilidad
   inpCode?.addEventListener('change', () => fetchByCode(inpCode.value.trim()));
   qEl?.addEventListener('input', recalc);
   inpPV?.addEventListener('input', recalc);
 
-  // Aplicar manejo de precios al campo de precio de venta
-  if (inpPV) {
-    handlePriceInput(inpPV);
-  }
-
   recalc(); // Inicializar
 }
 
-// Wire servicios rows
 function wireServRow(row) {
-  const qEl = row.querySelector('.serv-cantidad'); // puede no existir
+  const searchEl = row.querySelector('.serv-search');
+  const idEl = row.querySelector('.serv-servicio-id');
   const pEl = row.querySelector('.serv-precio');
   const sub = row.querySelector('.serv-subtotal');
   const view = row.querySelector('.serv-subtotal-view');
+  const resultadosEl = row.querySelector('.serv-resultados');
 
   function recalc() {
-    const q = qEl ? numRaw(qEl.value) : 1;
     const p = numRaw(pEl?.value);
-    const s = (q * p) || 0;
+    const s = p || 0; // Los servicios no tienen cantidad, solo precio
     if (sub) sub.value = Math.round(s);
     if (view) view.textContent = money(s);
     window.recalcTotales?.();
   }
 
-  qEl?.addEventListener('input', recalc);
+  // Búsqueda de servicios
+  let searchTimeout;
+  async function buscarServicios(query) {
+    if (!query || query.length < 2) {
+      resultadosEl.classList.add('hidden');
+      return;
+    }
+
+    console.log('🔍 Buscando servicios:', query);
+
+    try {
+      const response = await fetch(`/cl/documentos/api/autocomplete-servicio/?q=${encodeURIComponent(query)}`, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      });
+
+      if (response.ok) {
+        const servicios = await response.json();
+        mostrarResultadosServicios(servicios);
+      } else {
+        console.error('❌ Error buscando servicios:', response.status);
+        resultadosEl.classList.add('hidden');
+      }
+    } catch (error) {
+      console.error('❌ Error buscando servicios:', error);
+      resultadosEl.classList.add('hidden');
+    }
+  }
+
+  function mostrarResultadosServicios(servicios) {
+    if (servicios.length === 0) {
+      resultadosEl.innerHTML = '<div class="p-3 text-gray-400">No se encontraron servicios</div>';
+      resultadosEl.classList.remove('hidden');
+      return;
+    }
+
+    resultadosEl.replaceChildren();
+    const frag = document.createDocumentFragment();
+
+    servicios.forEach(servicio => {
+      const item = document.createElement('div');
+      item.className = 'servicio-item p-3 hover:bg-cyan-700 cursor-pointer border-b border-cyan-600 last:border-b-0';
+      item.dataset.id = servicio.id || '';
+      item.dataset.nombre = servicio.nombre || '';
+      item.dataset.precio = servicio.precio || '0';
+
+      const title = document.createElement('div');
+      title.className = 'font-semibold text-cyan-200';
+      title.textContent = servicio.nombre || 'Servicio sin nombre';
+
+      const meta = document.createElement('div');
+      meta.className = 'text-sm text-gray-300';
+      meta.textContent = `Precio: ${money(servicio.precio || 0)}`;
+
+      item.append(title, meta);
+      frag.appendChild(item);
+    });
+
+    resultadosEl.appendChild(frag);
+    resultadosEl.classList.remove('hidden');
+    console.log('✅ Resultados de servicios mostrados:', servicios.length);
+  }
+
+  async function seleccionarServicio(servicioId, nombre, precio) {
+    resultadosEl.classList.add('hidden');
+    if (searchEl) searchEl.value = nombre;
+    if (idEl) idEl.value = servicioId;
+  if (pEl) {
+      pEl.value = money(precio);
+      recalc();
+    }
+    console.log('✅ Servicio seleccionado:', { id: servicioId, nombre, precio });
+  }
+
+  // Event listeners
+  searchEl?.addEventListener('input', (e) => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+      buscarServicios(e.target.value);
+    }, 300);
+  });
+
+  searchEl?.addEventListener('focus', () => {
+    if (searchEl.value.length >= 2) {
+      buscarServicios(searchEl.value);
+    }
+  });
+
+  resultadosEl?.addEventListener('click', (e) => {
+    const servicioItem = e.target.closest('.servicio-item');
+    if (servicioItem) {
+      const id = servicioItem.dataset.id;
+      const nombre = servicioItem.dataset.nombre;
+      const precio = servicioItem.dataset.precio;
+      seleccionarServicio(id, nombre, precio);
+    }
+  });
+
   pEl?.addEventListener('input', recalc);
 
-  // Aplicar manejo de precios al campo de precio
-  if (pEl) {
-    handlePriceInput(pEl);
-  }
+  // Ocultar resultados al hacer click fuera
+  document.addEventListener('click', (e) => {
+    if (searchEl && resultadosEl && 
+        !searchEl.contains(e.target) && !resultadosEl.contains(e.target)) {
+      resultadosEl.classList.add('hidden');
+    }
+  });
 
   recalc(); // Inicializar
 }
 
-// Wire otros servicios rows
 function wireOtroRow(row) {
-  const qEl = row.querySelector('.otr-cantidad'); // opcional
+  const searchEl = row.querySelector('.otr-search');
+  const idEl = row.querySelector('.otr-servicio-id');
   const pEl = row.querySelector('.otr-precio');
   const sub = row.querySelector('.otr-subtotal');
   const view = row.querySelector('.otr-subtotal-view');
+  const resultadosEl = row.querySelector('.otr-resultados');
 
   function recalc() {
-    const q = qEl ? numRaw(qEl.value) : 1;
     const p = numRaw(pEl?.value);
-    const s = (q * p) || 0;
+    const s = p || 0; // Los otros servicios no tienen cantidad, solo precio
     if (sub) sub.value = Math.round(s);
     if (view) view.textContent = money(s);
     window.recalcTotales?.();
   }
 
-  qEl?.addEventListener('input', recalc);
+  // Búsqueda de servicios
+  let searchTimeout;
+  async function buscarServicios(query) {
+    if (!query || query.length < 2) {
+      resultadosEl.classList.add('hidden');
+      return;
+    }
+
+    console.log('🔍 Buscando servicios (otros):', query);
+
+    try {
+      const response = await fetch(`/cl/documentos/api/autocomplete-servicio/?q=${encodeURIComponent(query)}`, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      });
+
+      if (response.ok) {
+        const servicios = await response.json();
+        mostrarResultadosServicios(servicios);
+      } else {
+        console.error('❌ Error buscando servicios:', response.status);
+        resultadosEl.classList.add('hidden');
+      }
+    } catch (error) {
+      console.error('❌ Error buscando servicios:', error);
+      resultadosEl.classList.add('hidden');
+    }
+  }
+
+  function mostrarResultadosServicios(servicios) {
+    if (servicios.length === 0) {
+      resultadosEl.innerHTML = '<div class="p-3 text-gray-400">No se encontraron servicios</div>';
+      resultadosEl.classList.remove('hidden');
+      return;
+    }
+
+    resultadosEl.replaceChildren();
+    const frag = document.createDocumentFragment();
+
+    servicios.forEach(servicio => {
+      const item = document.createElement('div');
+      item.className = 'servicio-item p-3 hover:bg-cyan-700 cursor-pointer border-b border-cyan-600 last:border-b-0';
+      item.dataset.id = servicio.id || '';
+      item.dataset.nombre = servicio.nombre || '';
+      item.dataset.precio = servicio.precio || '0';
+
+      const title = document.createElement('div');
+      title.className = 'font-semibold text-cyan-200';
+      title.textContent = servicio.nombre || 'Servicio sin nombre';
+
+      const meta = document.createElement('div');
+      meta.className = 'text-sm text-gray-300';
+      meta.textContent = `Precio: ${money(servicio.precio || 0)}`;
+
+      item.append(title, meta);
+      frag.appendChild(item);
+    });
+
+    resultadosEl.appendChild(frag);
+    resultadosEl.classList.remove('hidden');
+    console.log('✅ Resultados de servicios (otros) mostrados:', servicios.length);
+  }
+
+  async function seleccionarServicio(servicioId, nombre, precio) {
+    resultadosEl.classList.add('hidden');
+    if (searchEl) searchEl.value = nombre;
+    if (idEl) idEl.value = servicioId;
+    if (pEl) {
+      pEl.value = money(precio);
+      recalc();
+    }
+    console.log('✅ Servicio (otros) seleccionado:', { id: servicioId, nombre, precio });
+  }
+
+// Event listeners
+  searchEl?.addEventListener('input', (e) => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+      buscarServicios(e.target.value);
+    }, 300);
+  });
+
+  searchEl?.addEventListener('focus', () => {
+    if (searchEl.value.length >= 2) {
+      buscarServicios(searchEl.value);
+    }
+  });
+
+  resultadosEl?.addEventListener('click', (e) => {
+    const servicioItem = e.target.closest('.servicio-item');
+    if (servicioItem) {
+      const id = servicioItem.dataset.id;
+      const nombre = servicioItem.dataset.nombre;
+      const precio = servicioItem.dataset.precio;
+      seleccionarServicio(id, nombre, precio);
+    }
+  });
+
   pEl?.addEventListener('input', recalc);
 
-  // Aplicar manejo de precios al campo de precio
-  if (pEl) {
-    handlePriceInput(pEl);
-  }
-
-  // Aplicar manejo de precios al campo de precio de taller
-  const inpPrecioTaller = row.querySelector('.otr-precio-taller');
-  if (inpPrecioTaller) {
-    handlePriceInput(inpPrecioTaller);
-  }
+  // Ocultar resultados al hacer click fuera
+  document.addEventListener('click', (e) => {
+    if (searchEl && resultadosEl && 
+        !searchEl.contains(e.target) && !resultadosEl.contains(e.target)) {
+      resultadosEl.classList.add('hidden');
+    }
+  });
 
   recalc(); // Inicializar
 }
-
-
-
-// Recalcular totales
-function sumValues(selectorList){
-  // acepta múltiples selectores separados por coma
-  const nodes = document.querySelectorAll(selectorList);
-  let acc = 0;
-  nodes.forEach(el => {
-    const v = ('value' in el) ? el.value : el.textContent;
-    acc += numRaw(v);
-  });
-  return acc;
-}
-
-window.recalcTotales = function(){
-  // usa *-subtotal (inputs hidden numéricos) como fuente de verdad en el front
-  const rep = sumValues('.rep-subtotal');
-  const serv = sumValues('.serv-subtotal');
-  const otros = sumValues('.otr-subtotal');
-  const ivaOn = document.getElementById('id_apply_vat')?.checked;
-  const iva = (COUNTRY==='CL' && ivaOn) ? Math.round(rep * 0.19) : 0;
-  const tot = rep + serv + otros + iva;
-
-  setTxt('#t_rep',  money(rep));
-  setTxt('#t_serv', money(serv));
-  setTxt('#t_otros', money(otros));
-  setTxt('#t_iva',  money(iva));
-  setTxt('#t_total',money(tot));
-};
-
-// Event listeners
-document.getElementById('id_apply_vat')?.addEventListener('change', window.recalcTotales);
-document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('.rep-row').forEach(wireRepRow);
-  document.querySelectorAll('.serv-row').forEach(wireServRow);
-  document.querySelectorAll('.otr-row').forEach(wireOtroRow);
-
-  // Inicializar totales con formato chileno
-  setTimeout(() => {
-    window.recalcTotales();
-  }, 100);
-});
-
-// Agregar filas dinámicamente
-document.getElementById('add-repuesto')?.addEventListener('click', () => {
-  const container = document.getElementById('repuestos-container');
-  const formCount = document.getElementById('id_rep-TOTAL_FORMS');
-  const currentCount = parseInt(formCount.value);
-
-     // Crear nueva fila de repuesto
-   const newRow = document.createElement('div');
-   newRow.className = 'rep-row linea-row';
-   newRow.innerHTML = `
-           <div class="flex flex-wrap gap-4 items-end">
-        <div class="w-20">
-          <label class="block text-cyan-200 text-sm mb-1">Código</label>
-          <input type="text" name="rep-${currentCount}-codigo" class="rep-codigo form-control w-full" placeholder="Código">
-        </div>
-        <div class="flex-1 min-w-[150px]">
-          <label class="block text-cyan-200 text-sm mb-1">Nombre</label>
-          <input type="text" name="rep-${currentCount}-nombre" class="rep-nombre form-control w-full" readonly>
-        </div>
-        <div class="w-20">
-          <label class="block text-cyan-200 text-sm mb-1">Cantidad</label>
-          <input type="number" name="rep-${currentCount}-cantidad" class="rep-cantidad form-control w-full" min="1" max="99" value="1">
-        </div>
-        <div class="w-24">
-          <label class="block text-cyan-200 text-sm mb-1">Precio Compra</label>
-          <input type="text" name="precio_compra" class="rep-precio-compra form-control w-full" readonly placeholder="$0">
-        </div>
-        <div class="w-24">
-          <label class="block text-cyan-200 text-sm mb-1">Precio Venta</label>
-          <input type="text" name="rep-${currentCount}-precio_unitario" class="rep-precio-venta form-control w-full" placeholder="$0">
-        </div>
-        <div class="w-20">
-          <label class="block text-cyan-200 text-sm mb-1">Descuento %</label>
-          <input type="number" name="rep-${currentCount}-descuento" class="form-control w-full" min="0" max="100" value="0">
-        </div>
-                 <div class="w-32">
-           <label class="block text-cyan-200 text-sm mb-1">Subtotal</label>
-           <input type="hidden" class="rep-subtotal" value="0">
-           <div class="rep-subtotal-view subtotal-field w-full text-right font-bold">$0</div>
-         </div>
-      </div>
-   `;
-
-  container.appendChild(newRow);
-  formCount.value = currentCount + 1;
-
-     // Wire la nueva fila
-   wireRepRow(newRow);
-
-   // Posicionar cursor en el campo código de la nueva fila
-   const newCodeField = newRow.querySelector('.rep-codigo');
-   if (newCodeField) {
-     newCodeField.focus();
-   }
-});
-
-document.getElementById('add-servicio')?.addEventListener('click', () => {
-  const container = document.getElementById('servicios-container');
-  const formCount = document.getElementById('id_serv-TOTAL_FORMS');
-  const currentCount = parseInt(formCount.value);
-
-     // Crear nueva fila de servicio
-   const newRow = document.createElement('div');
-   newRow.className = 'serv-row linea-row';
-   newRow.innerHTML = `
-           <div class="flex flex-wrap gap-4 items-end">
-        <div class="flex-1 min-w-[200px]">
-          <label class="block text-cyan-200 text-sm mb-1">Servicio</label>
-          <select name="serv-${currentCount}-servicio" class="form-select w-full">
-            <option value="">Seleccione servicio...</option>
-            {% for servicio in servicios %}
-              <option value="{{ servicio.id }}">{{ servicio.nombre }}</option>
-            {% endfor %}
-          </select>
-        </div>
-        <div class="w-24">
-          <label class="block text-cyan-200 text-sm mb-1">Precio Cliente</label>
-          <input type="text" name="serv-${currentCount}-precio_unitario" class="serv-precio form-control w-full" placeholder="$0">
-        </div>
-                 <div class="w-32">
-           <label class="block text-cyan-200 text-sm mb-1">Subtotal</label>
-           <input type="hidden" class="serv-subtotal" value="0">
-           <div class="serv-subtotal-view subtotal-field w-full text-right font-bold">$0</div>
-         </div>
-      </div>
-   `;
-
-  container.appendChild(newRow);
-  formCount.value = currentCount + 1;
-
-  // Wire la nueva fila
-  wireServRow(newRow);
-});
-
-document.getElementById('add-otro')?.addEventListener('click', () => {
-  const container = document.getElementById('otros-container');
-  const formCount = document.getElementById('id_otr-TOTAL_FORMS');
-  const currentCount = parseInt(formCount.value);
-
-     // Crear nueva fila de otro servicio
-   const newRow = document.createElement('div');
-   newRow.className = 'otr-row linea-row';
-   newRow.innerHTML = `
-           <div class="flex flex-wrap gap-4 items-end">
-        <div class="flex-1 min-w-[200px]">
-          <label class="block text-cyan-200 text-sm mb-1">Servicio</label>
-          <select name="otr-${currentCount}-servicio" class="form-select w-full">
-            <option value="">Seleccione servicio...</option>
-            {% for servicio in servicios %}
-              <option value="{{ servicio.id }}">{{ servicio.nombre }}</option>
-            {% endfor %}
-          </select>
-        </div>
-        <div class="flex-1 min-w-[150px]">
-          <label class="block text-cyan-200 text-sm mb-1">Empresa Externa</label>
-          <input type="text" name="otr-${currentCount}-empresa_externa" class="form-control w-full">
-        </div>
-        <div class="w-24">
-          <label class="block text-cyan-200 text-sm mb-1">Precio Taller</label>
-          <input type="text" name="precio_taller" class="otr-precio-taller form-control w-full" placeholder="$0">
-        </div>
-        <div class="w-24">
-          <label class="block text-cyan-200 text-sm mb-1">Precio Cliente</label>
-          <input type="text" name="otr-${currentCount}-precio_cliente" class="otr-precio form-control w-full" placeholder="$0">
-        </div>
-                 <div class="w-32">
-           <label class="block text-cyan-200 text-sm mb-1">Subtotal</label>
-           <input type="hidden" class="otr-subtotal" value="0">
-           <div class="otr-subtotal-view subtotal-field w-full text-right font-bold">$0</div>
-         </div>
-      </div>
-   `;
-
-  container.appendChild(newRow);
-  formCount.value = currentCount + 1;
-
-  // Wire la nueva fila
-  wireOtroRow(newRow);
-});
 </script>
 {% endblock %}

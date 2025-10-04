@@ -52,6 +52,12 @@ urlpatterns = [
         views.exportar_documento_pdf,
         name="exportar_documento_pdf",
     ),
+    # Enviar por WhatsApp
+    path(
+        "<int:documento_id>/enviar_whatsapp/",
+        views.enviar_documento_whatsapp,
+        name="enviar_documento_whatsapp",
+    ),
     # APIs principales
     path(
         "api/buscar-repuestos/",

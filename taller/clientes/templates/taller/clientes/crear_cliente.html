@@ -285,7 +285,7 @@ textarea.cyber-input::placeholder {
     {% endif %}
   </div>
 
-  <h1 class="cyber-title">🚀 CREAR CLIENTE ESPACIAL</h1>
+  <h1 class="cyber-title">[CREATE] CLIENTE ESPACIAL</h1>
 
   <form class="space-y-8" method="post">
     {% csrf_token %}
@@ -364,7 +364,7 @@ textarea.cyber-input::placeholder {
 
     <div class="text-center pt-8">
       <button class="cyber-btn" type="submit">
-        🚀 GUARDAR CLIENTE
+        [SAVE] GUARDAR CLIENTE
       </button>
     </div>
   </form>
@@ -401,7 +401,7 @@ document.addEventListener('DOMContentLoaded', function() {
             ciudadSelect.innerHTML = '<option value="">--- Seleccionar Ciudad ---</option>';
 
             if(data.length === 0) {
-              ciudadSelect.innerHTML = '<option value="">❌ No hay ciudades disponibles</option>';
+              ciudadSelect.innerHTML = '<option value="">[ERROR] No hay ciudades disponibles</option>';
             } else {
               data.forEach(function(ciudad) {
                 const option = document.createElement('option');
@@ -416,8 +416,8 @@ document.addEventListener('DOMContentLoaded', function() {
             ciudadSelect.disabled = false;
           })
           .catch(error => {
-            console.error('❌ Error al cargar ciudades:', error);
-            ciudadSelect.innerHTML = '<option value="">❌ Error al cargar ciudades</option>';
+            console.error('[ERROR] Error al cargar ciudades:', error);
+            ciudadSelect.innerHTML = '<option value="">[ERROR] Error al cargar ciudades</option>';
             ciudadSelect.disabled = false;
           });
       } else {
@@ -457,7 +457,7 @@ document.addEventListener('DOMContentLoaded', function() {
             ciudadUsaSelect.innerHTML = '<option value="">--- Select City ---</option>';
 
             if(data.length === 0) {
-              ciudadUsaSelect.innerHTML = '<option value="">❌ No cities available</option>';
+              ciudadUsaSelect.innerHTML = '<option value="">[ERROR] No cities available</option>';
             } else {
               data.forEach(function(ciudad) {
                 const option = document.createElement('option');
@@ -472,8 +472,8 @@ document.addEventListener('DOMContentLoaded', function() {
             ciudadUsaSelect.disabled = false;
           })
           .catch(error => {
-            console.error('❌ Error loading USA cities:', error);
-            ciudadUsaSelect.innerHTML = '<option value="">❌ Error loading cities</option>';
+            console.error('[ERROR] Error loading USA cities:', error);
+            ciudadUsaSelect.innerHTML = '<option value="">[ERROR] Error loading cities</option>';
             ciudadUsaSelect.disabled = false;
           });
       } else {
@@ -657,7 +657,7 @@ function createParticles() {
     </div>
     <div class="text-center pt-6">
       <button class="futuristic-btn" type="submit">
-        🚀 Guardar Cliente
+        [SAVE] Guardar Cliente
       </button>
     </div>
   </form>

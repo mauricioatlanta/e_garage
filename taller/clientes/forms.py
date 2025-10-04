@@ -144,13 +144,13 @@ class ClienteForm(forms.ModelForm):
             self.pais = "CL"  # Default a Chile
 
         # Debug logging
-        print(f"🔍 [ClienteForm] empresa: {self.empresa}")
+        print(f"[DEBUG] [ClienteForm] empresa: {self.empresa}")
         if self.empresa:
             print(
-                f"🔍 [ClienteForm] empresa.pais: {getattr(self.empresa, 'pais', 'NO_HAY_PAIS')}"
+                f"[DEBUG] [ClienteForm] empresa.pais: {getattr(self.empresa, 'pais', 'NO_HAY_PAIS')}"
             )
         else:
-            print("🔍 [ClienteForm] NO HAY EMPRESA")
+            print("[DEBUG] [ClienteForm] NO HAY EMPRESA")
 
         # Chile: región/ciudad
         if "region" in self.data and self.data.get("region") not in [None, ""]:
@@ -196,14 +196,14 @@ class ClienteForm(forms.ModelForm):
             pais = self.instance.empresa.pais
         self.pais = pais
 
-        print(f"🔍 [ClienteForm] pais detectado: {self.pais}")
+        print(f"[DEBUG] [ClienteForm] pais detectado: {self.pais}")
 
         # Configurar colores según el país
         if self.pais:
             colores_disponibles = ColorCliente.get_colores_para_pais(self.pais)
             self.fields["color"].queryset = colores_disponibles
             print(
-                f"🔍 [ClienteForm] Colores disponibles para {self.pais}: {colores_disponibles.count()}"
+                f"[DEBUG] [ClienteForm] Colores disponibles para {self.pais}: {colores_disponibles.count()}"
             )
         else:
             # Fallback: mostrar todos los colores activos
@@ -211,11 +211,11 @@ class ClienteForm(forms.ModelForm):
 
         # Ocultar campos según el país
         if self.pais == "US":
-            print("🔍 [ClienteForm] Ocultando campos de Chile para USA")
+            print("[DEBUG] [ClienteForm] Ocultando campos de Chile para USA")
             self.fields["region"].widget = forms.HiddenInput()
             self.fields["ciudad"].widget = forms.HiddenInput()
         else:
-            print("🔍 [ClienteForm] Ocultando campos de USA para Chile")
+            print("[DEBUG] [ClienteForm] Ocultando campos de USA para Chile")
             self.fields["estado_usa"].widget = forms.HiddenInput()
             self.fields["ciudad_usa"].widget = forms.HiddenInput()
             self.fields["zipcode"].widget = forms.HiddenInput()

@@ -21,7 +21,7 @@ log = logging.getLogger(__name__)
 
 # Modelos centrales
 # Form
-from taller.forms.vehiculo_simple import VehiculoFormSimple as VehiculoForm
+from taller.vehiculos.forms import VehiculoForm
 from taller.models.clientes import Cliente
 
 # Extras de vehículo (definir aquí la fuente AUTORITATIVA)
@@ -31,7 +31,7 @@ from taller.models.modelo import Modelo
 from taller.models.vehiculos import Vehiculo  # Modelo Vehiculo principal
 
 # CBVs "shim"
-from .views_cbv import VehiculoDetailView, VehiculoListView, VehiculoUpdateView
+# from .views_cbv import VehiculoDetailView, VehiculoListView, VehiculoUpdateView  # No utilizados
 
 # Catálogo USA (opcional)
 try:
@@ -44,21 +44,72 @@ except ImportError:
 # Utilidades
 # ---------------------------
 def _get_country(request, default="CL"):
+    """Detección robusta de país con fallback por path y normalización."""
+    # 1) user.empresa.pais
     empresa = getattr(request.user, "empresa", None)
-    raw = getattr(empresa, "pais", None) or getattr(request, "country", None) or default
-    c = str(raw).strip().upper()
-    return c if c in ("CL", "US") else default
+    raw = getattr(empresa, "pais", None)
+
+    # 2) request.country si algún middleware/context processor lo define
+    if not raw:
+        raw = getattr(request, "country", None)
+
+    # 3) Path fallback: /us/..., /cl/...
+    if not raw:
+        p = (request.path or "").lower()
+        if p.startswith("/us/"):
+            raw = "US"
+        elif p.startswith("/cl/"):
+            raw = "CL"
+
+    c = str(raw or default).strip().upper()
+    return "US" if c in ("US", "USA") else "CL"
 
 
-def _safe_redirect(*candidates):
+def has_field(model_cls, field_name: str) -> bool:
+    """Verifica si un modelo tiene un campo específico de forma segura."""
+    from django.core.exceptions import FieldDoesNotExist
+    try:
+        model_cls._meta.get_field(field_name)
+        return True
+    except FieldDoesNotExist:
+        return False
+
+
+def _safe_redirect(request, *candidates):
     """Intenta redirigir por nombre; cae al primero válido."""
     from django.urls import NoReverseMatch, reverse
 
-    for name in candidates:
+    # Si tenemos request, priorizar según el país
+    country = _get_country(request) if request else "CL"
+    
+    # Función auxiliar para reordenar candidatos
+    def order_candidates(names):
+        ordered = []
+        for name in names:
+            if country == "US":
+                if "usa:" in name:
+                    ordered.insert(0, name)
+                elif "chile:" in name:
+                    ordered.append(name)
+                else:
+                    ordered.insert(1 if ordered else 0, name)
+            else:  # CL
+                if "chile:" in name:
+                    ordered.insert(0, name)
+                elif "usa:" in name:
+                    ordered.append(name)
+                else:
+                    ordered.insert(1 if ordered else 0, name)
+        return ordered
+
+    # Intentar cada candidato en orden
+    for name in order_candidates(candidates):
         try:
-            return redirect(name)
+            url = reverse(name)  # ✅ FIX: reversear primero para lanzar NoReverseMatch
+            return redirect(url)
         except NoReverseMatch:
             continue
+    
     # Fallback muy conservador
     try:
         return redirect(reverse("taller:vehiculos:lista_vehiculos"))
@@ -66,78 +117,185 @@ def _safe_redirect(*candidates):
         return redirect("/")  # último recurso
 
 
-def _render_form_with_context(request, form, country, empresa):
-    """Contexto limpio para crear vehículo."""
-    from django.urls import reverse
-    from django.urls.exceptions import NoReverseMatch
+# ---------------------------
+# Vistas principales
+# ---------------------------
+@login_required
+def lista_vehiculos(request):
+    """Lista vehículos de la empresa del usuario."""
+    empresa = getattr(request.user, "empresa", None)
+    if not empresa:
+        messages.error(request, "Usuario sin empresa asignada")
+        return redirect("/")
+    
+    vehiculos = Vehiculo.objects.filter(empresa=empresa).select_related(
+        "cliente", "marca", "modelo", "motor", "caja", "color"
+    ).order_by("-id")
+    
+    # Usar template específico según la URL (no el país de la empresa)
+    if request.path.startswith("/us/"):
+        template = "taller/us/en/vehiculos/lista_vehiculos.html"
+    else:
+        template = "taller/vehiculos/vehiculos.html"
+    
+    return render(request, template, {"vehiculos": vehiculos})
 
-    # Intentar diferentes namespaces según el contexto
-    namespace_candidates = [
-        "chile:taller:vehiculos:ajax_motores_por_modelo",
-        "usa:taller:vehiculos:ajax_motores_por_modelo",
-        "taller:vehiculos:ajax_motores_por_modelo",
-        "vehiculos:ajax_motores_por_modelo",
-    ]
 
-    url_api_motores = None
-    url_api_cajas = None
+@login_required
+def crear_vehiculo(request):
+    """Crear vehículo con reglas CL/US y multi-tenant."""
+    empresa = getattr(request.user, "empresa", None)
+    country = _get_country(request)
+    
+    if not empresa:
+        messages.error(request, "Usuario sin empresa asignada")
+        return redirect("/")
 
-    for candidate in namespace_candidates:
-        try:
-            url_api_motores = reverse(candidate)
-            url_api_cajas = reverse(candidate.replace("motores", "cajas"))
-            break
-        except NoReverseMatch:
-            continue
-
-    # Fallback a URLs relativas si no se encuentra namespace
-    if not url_api_motores:
-        url_api_motores = "/cl/es/vehiculos/ajax/motores-por-modelo/"
-        url_api_cajas = "/cl/es/vehiculos/ajax/cajas-por-modelo/"
-
+    if request.method == "POST":
+        form = VehiculoForm(request.POST, user=request.user)
+        
+        if form.is_valid():
+            try:
+                with transaction.atomic():
+                    vehiculo = form.save(commit=False)
+                    vehiculo.empresa = empresa
+                    vehiculo.save()
+                    
+                    messages.success(request, f"Vehículo {vehiculo.patente or 'sin patente'} creado exitosamente")
+                    return _safe_redirect(
+                        request,
+                        f"{country.lower()}:taller:vehiculos:lista_vehiculos",
+                        "taller:vehiculos:lista_vehiculos",
+                        "chile:taller:vehiculos:lista_vehiculos",
+                        "usa:taller:vehiculos:lista_vehiculos"
+                    )
+            except Exception as e:
+                log.error(f"Error creando vehículo: {e}")
+                messages.error(request, f"Error al crear vehículo: {str(e)}")
+        else:
+            messages.error(request, "Por favor corrige los errores en el formulario")
+    else:
+        form = VehiculoForm(user=request.user)
+    
+    # Contexto para el template
     ctx = {
-        "country": country,
         "form": form,
-        "clientes": Cliente.objects.filter(empresa=empresa)[:500],
-        "colores": ColorVehiculo.objects.all().order_by("nombre"),
-        "marcas": Marca.objects.filter(country=country).order_by("nombre"),
-        "url_api_motores": url_api_motores,
-        "url_api_cajas": url_api_cajas,
+        "country": country,
+        "empresa": empresa,
     }
-    return render(request, "taller/cl/es/vehiculos/crear.html", ctx)
+    
+    return render(request, "taller/vehiculos/crear_vehiculo.html", ctx)
+
+
+@login_required
+def ver_vehiculo(request, vehiculo_id):
+    """Ver detalles de un vehículo."""
+    empresa = getattr(request.user, "empresa", None)
+    vehiculo = get_object_or_404(Vehiculo, id=vehiculo_id, empresa=empresa)
+    
+    return render(request, "taller/vehiculos/vehiculo_detail.html", {"vehiculo": vehiculo})
+
+
+@login_required
+def editar_vehiculo(request, vehiculo_id):
+    """Editar un vehículo existente."""
+    empresa = getattr(request.user, "empresa", None)
+    vehiculo = get_object_or_404(Vehiculo, id=vehiculo_id, empresa=empresa)
+    
+    if request.method == "POST":
+        form = VehiculoForm(request.POST, instance=vehiculo, user=request.user)
+        
+        if form.is_valid():
+            try:
+                with transaction.atomic():
+                    form.save()
+                    messages.success(request, f"Vehículo {vehiculo.patente or 'sin patente'} actualizado exitosamente")
+                    return _safe_redirect(
+                        request,
+                        f"{_get_country(request).lower()}:taller:vehiculos:lista_vehiculos",
+                        "taller:vehiculos:lista_vehiculos",
+                        "chile:taller:vehiculos:lista_vehiculos",
+                        "usa:taller:vehiculos:lista_vehiculos"
+                    )
+            except Exception as e:
+                log.error(f"Error actualizando vehículo: {e}")
+                messages.error(request, f"Error al actualizar vehículo: {str(e)}")
+        else:
+            messages.error(request, "Por favor corrige los errores en el formulario")
+    else:
+        form = VehiculoForm(instance=vehiculo, user=request.user)
+    
+    return render(request, "taller/vehiculos/editar_vehiculo.html", {
+        "form": form,
+        "vehiculo": vehiculo
+    })
+
+
+@login_required
+def eliminar_vehiculo(request, vehiculo_id):
+    """Eliminar un vehículo."""
+    empresa = getattr(request.user, "empresa", None)
+    vehiculo = get_object_or_404(Vehiculo, id=vehiculo_id, empresa=empresa)
+    
+    if request.method == "POST":
+        try:
+            patente = vehiculo.patente or "sin patente"
+            vehiculo.delete()
+            messages.success(request, f"Vehículo {patente} eliminado exitosamente")
+        except Exception as e:
+            log.error(f"Error eliminando vehículo: {e}")
+            messages.error(request, f"Error al eliminar vehículo: {str(e)}")
+        
+        return _safe_redirect(
+            request,
+            f"{_get_country(request).lower()}:taller:vehiculos:lista_vehiculos",
+            "taller:vehiculos:lista_vehiculos",
+            "chile:taller:vehiculos:lista_vehiculos",
+            "usa:taller:vehiculos:lista_vehiculos"
+        )
+    
+    return render(request, "taller/vehiculos/eliminar_vehiculo.html", {"vehiculo": vehiculo})
 
 
 # ---------------------------
 # API / AJAX
 # ---------------------------
 @require_GET
+@login_required
 def api_marcas(request):
-    """Marcas por país del usuario. Requiere auth."""
-    if not request.user.is_authenticated:
-        return JsonResponse([], safe=False)
+    """Marcas por país del usuario."""
     country = _get_country(request)
-    data = list(
-        Marca.objects.filter(country=country).order_by("nombre").values("id", "nombre")
-    )
+    empresa = getattr(request.user, "empresa", None)
+    
+    qs = Marca.objects.filter(country=country)
+    # Si Marca tiene FK empresa, descomenta:
+    # if hasattr(Marca, "empresa") and empresa:
+    #     qs = qs.filter(empresa=empresa)
+    
+    data = list(qs.order_by("nombre").values("id", "nombre"))
     return JsonResponse(data, safe=False)
 
 
 @require_GET
 @login_required
 def api_busqueda_clientes(request):
-    """Busca clientes solo de la empresa del usuario."""
+    """Busca clientes solo de la empresa del usuario (top 20, orden determinista)."""
     empresa = getattr(request.user, "empresa", None)
     if not empresa:
         return JsonResponse([], safe=False)
     q = (request.GET.get("q") or "").strip()
     if not q:
         return JsonResponse([], safe=False)
-    clientes = Cliente.objects.filter(empresa=empresa).filter(
-        models.Q(nombre__icontains=q)
-        | models.Q(apellido__icontains=q)
-        | models.Q(email__icontains=q)
-        | models.Q(telefono__icontains=q)
-    )[:20]
+    clientes = (
+        Cliente.objects.filter(empresa=empresa)
+        .filter(
+            models.Q(nombre__icontains=q)
+            | models.Q(apellido__icontains=q)
+            | models.Q(email__icontains=q)
+            | models.Q(telefono__icontains=q)
+        )
+        .order_by("nombre", "apellido", "id")[:20]
+    )
     data = [
         {
             "id": c.pk,
@@ -152,6 +310,38 @@ def api_busqueda_clientes(request):
 
 
 @require_GET
+@login_required
+def api_colores(request):
+    """Colores disponibles para el país del usuario."""
+    country = _get_country(request)
+    empresa = getattr(request.user, "empresa", None)
+    colores = ColorVehiculo.get_colores_para_pais(country, empresa)
+    data = [{"id": c.pk, "nombre": c.nombre} for c in colores]
+    return JsonResponse(data, safe=False)
+
+
+@require_GET
+@login_required
+def api_modelos_usa(request):
+    """Modelos para USA desde catálogo."""
+    marca_param = request.GET.get("marca", "").strip()
+    if not marca_param:
+        return JsonResponse([], safe=False)
+
+    try:
+        if CatalogoModeloAuto:
+            modelos = list(CatalogoModeloAuto.get_modelos_por_marca(marca_param))[:100]
+            data = [{"id": modelo, "nombre": modelo} for modelo in modelos]
+            return JsonResponse(data, safe=False)
+        else:
+            return JsonResponse([], safe=False)
+    except Exception as e:
+        log.error(f"Error en api_modelos_usa: {e}")
+        return JsonResponse([], safe=False)
+
+
+@require_GET
+@login_required
 def ajax_modelos_por_marca(request):
     """Modelos filtrados por marca (y por country del usuario)."""
     marca_id = request.GET.get("marca_id")
@@ -167,398 +357,315 @@ def ajax_modelos_por_marca(request):
 
 
 @require_GET
+@login_required
 def ajax_modelos_por_marca_anio(request):
-    """Modelos por marca+yAÑO (si Modelo tiene 'anio' exacto)."""
+    """Modelos por marca + (opcional) año, filtrados por country, formato Select2."""
     marca_id = request.GET.get("marca_id") or request.GET.get("marca")
-    anio = request.GET.get("anio")
-
+    anio_str = request.GET.get("anio")
+    
     if not marca_id:
         return JsonResponse({"results": []})
 
     country = _get_country(request)
     qs = Modelo.objects.filter(country=country, marca_id=marca_id)
 
-    # Si el modelo tiene campo año, filtrar por año
-    # Nota: Modelo no tiene campo año directo, pero podrías agregarlo si necesitas
-    # if anio:
-    #     try:
-    #         anio_i = int(anio)
-    #         qs = qs.filter(anio=anio_i)
-    #     except ValueError:
-    #         qs = qs.none()
+    # Filtrar por año si se proporciona y el modelo tiene campo 'anio'
+    if anio_str:
+        try:
+            anio = int(anio_str)
+            # Si el modelo tiene campo 'anio', filtrar por él
+            if has_field(Modelo, "anio"):
+                qs = qs.filter(anio=anio)
+            # Si tiene rango (anio_desde/anio_hasta), ajustar aquí
+            elif has_field(Modelo, "anio_desde") and has_field(Modelo, "anio_hasta"):
+                qs = qs.filter(anio_desde__lte=anio, anio_hasta__gte=anio)
+        except (ValueError, TypeError):
+            pass  # Ignorar si el año no es válido
 
-    data = [{"id": m.pk, "text": str(m)} for m in qs.order_by("nombre")]
+    data = [{"id": m.pk, "text": str(m)} for m in qs.order_by("nombre")[:200]]
     return JsonResponse({"results": data})
 
 
 @require_GET
 @login_required
-def api_modelos_usa(request):
-    """Modelos USA por marca (vía catálogo opcional)."""
-    marca = (request.GET.get("marca") or "").strip()
-    if not marca:
-        return JsonResponse({"results": []})
-    try:
-        if CatalogoModeloAuto:
-            modelos = CatalogoModeloAuto.get_modelos_por_marca(marca)
-            results = [{"id": modelo, "text": modelo} for modelo in modelos]
-        else:
-            results = []
-        return JsonResponse({"results": results})
-    except Exception as e:
-        log.error(f"Error en api_modelos_usa: {e}")
-        return JsonResponse({"results": [], "error": str(e)})
-
-
-@login_required
-def api_colores(request):
-    """Colores con soporte GET (buscar) y POST (crear)."""
-    if request.method == "GET":
-        # Buscar colores existentes
-        q = (request.GET.get("q") or "").strip()
-        qs = ColorVehiculo.objects.all()
-        if q:
-            qs = qs.filter(nombre__icontains=q)
-        data = [{"id": c.id, "text": c.nombre} for c in qs.order_by("nombre")[:50]]
-        return JsonResponse({"results": data})
-
-    elif request.method == "POST":
-        # Crear nuevo color
-        try:
-            payload = json.loads(request.body or "{}")
-            nombre = (payload.get("nombre") or "").strip()
-            if not nombre:
-                return JsonResponse(
-                    {"success": False, "error": "Nombre requerido"}, status=400
-                )
-
-            color, created = ColorVehiculo.objects.get_or_create(
-                nombre__iexact=nombre, defaults={"nombre": nombre}
-            )
-            return JsonResponse(
-                {"success": True, "color": {"id": color.id, "nombre": color.nombre}}
-            )
-        except Exception as e:
-            return JsonResponse({"success": False, "error": str(e)}, status=500)
-
-    return JsonResponse({"error": "Método no permitido"}, status=405)
-
-
-# ---- Motores / Cajas por modelo (regla importante: sin modelo => lista vacía)
-@require_GET
-@login_required
 def ajax_motores_por_modelo(request):
-    modelo_id = request.GET.get("modelo_id") or request.GET.get("modelo")
-    if not (modelo_id and modelo_id.isdigit()):
-        return JsonResponse({"results": []})
-
-    empresa = getattr(request.user, "empresa", None)
-    if not empresa:
-        return JsonResponse({"results": []})
-
-    # Filtrar motores por modelo usando M2M + país para evitar contaminación
-    qs = (
-        MotorVehiculo.objects.filter(
-            modelos__id=modelo_id, modelos__marca__country=empresa.pais
-        )
-        .distinct()
-        .order_by("nombre")
-        .values("id", "nombre")
-    )
-    return JsonResponse({"results": [{"id": r["id"], "text": r["nombre"]} for r in qs]})
+    """Motores filtrados por modelo."""
+    modelo_id = request.GET.get("modelo_id")
+    if not modelo_id:
+        return JsonResponse({"success": True, "motores": []})
+    
+    try:
+        country = _get_country(request)
+        
+        # Para USA, buscar motores que estén asociados a modelos equivalentes
+        if country == "US":
+            # Buscar el modelo USA
+            try:
+                from taller.models.marcas_usa import ModeloVehiculo as ModeloUSA
+                modelo_usa = ModeloUSA.objects.get(pk=modelo_id)
+                
+                # Buscar el modelo equivalente en el sistema Chile
+                from taller.models.modelo import Modelo
+                from taller.models.marca import Marca
+                
+                marca_chile = Marca.objects.filter(
+                    nombre=modelo_usa.marca.nombre, 
+                    country="US"
+                ).first()
+                
+                if marca_chile:
+                    modelo_chile = Modelo.objects.filter(
+                        nombre=modelo_usa.nombre,
+                        marca=marca_chile,
+                        country="US"
+                    ).first()
+                    
+                    if modelo_chile:
+                        motores = (
+                            MotorVehiculo.objects.filter(modelos=modelo_chile, country=country)
+                            .order_by("nombre")
+                            .values("id", "nombre")
+                        )
+                    else:
+                        motores = MotorVehiculo.objects.none()
+                else:
+                    motores = MotorVehiculo.objects.none()
+                    
+            except ModeloUSA.DoesNotExist:
+                return JsonResponse({"success": True, "motores": []})
+        else:
+            # Para Chile, usar el sistema normal
+            try:
+                modelo = Modelo.objects.get(pk=modelo_id, country=country)
+                motores = (
+                    MotorVehiculo.objects.filter(modelos=modelo, country=country)
+                    .order_by("nombre")
+                    .values("id", "nombre")
+                )
+            except Modelo.DoesNotExist:
+                return JsonResponse({"success": True, "motores": []})
+        
+        return JsonResponse({"success": True, "motores": list(motores)})
+    except Exception as e:
+        empresa = getattr(request.user, "empresa", None)
+        log.error("Error en ajax_motores_por_modelo: %s", e, extra={
+            "user_id": request.user.id,
+            "empresa_id": getattr(empresa, "id", None)
+        })
+        return JsonResponse({"success": False, "error": str(e)}, status=500)
 
 
 @require_GET
 @login_required
 def ajax_cajas_por_modelo(request):
-    modelo_id = request.GET.get("modelo_id") or request.GET.get("modelo")
-    if not (modelo_id and modelo_id.isdigit()):
-        return JsonResponse({"results": []})
+    """Cajas filtradas por modelo."""
+    modelo_id = request.GET.get("modelo_id")
+    if not modelo_id:
+        return JsonResponse({"success": True, "cajas": []})
+    
+    try:
+        country = _get_country(request)
+        
+        # Para USA, buscar cajas que estén asociadas a modelos equivalentes
+        if country == "US":
+            # Buscar el modelo USA
+            try:
+                from taller.models.marcas_usa import ModeloVehiculo as ModeloUSA
+                modelo_usa = ModeloUSA.objects.get(pk=modelo_id)
+                
+                # Buscar el modelo equivalente en el sistema Chile
+                from taller.models.modelo import Modelo
+                from taller.models.marca import Marca
+                
+                marca_chile = Marca.objects.filter(
+                    nombre=modelo_usa.marca.nombre, 
+                    country="US"
+                ).first()
+                
+                if marca_chile:
+                    modelo_chile = Modelo.objects.filter(
+                        nombre=modelo_usa.nombre,
+                        marca=marca_chile,
+                        country="US"
+                    ).first()
+                    
+                    if modelo_chile:
+                        cajas = (
+                            CajaVehiculo.objects.filter(modelos=modelo_chile, country=country)
+                            .order_by("nombre")
+                            .values("id", "nombre")
+                        )
+                    else:
+                        cajas = CajaVehiculo.objects.none()
+                else:
+                    cajas = CajaVehiculo.objects.none()
+                    
+            except ModeloUSA.DoesNotExist:
+                return JsonResponse({"success": True, "cajas": []})
+        else:
+            # Para Chile, usar el sistema normal
+            try:
+                modelo = Modelo.objects.get(pk=modelo_id, country=country)
+                cajas = (
+                    CajaVehiculo.objects.filter(modelos=modelo, country=country)
+                    .order_by("nombre")
+                    .values("id", "nombre")
+                )
+            except Modelo.DoesNotExist:
+                return JsonResponse({"success": True, "cajas": []})
+        
+        return JsonResponse({"success": True, "cajas": list(cajas)})
+    except Exception as e:
+        empresa = getattr(request.user, "empresa", None)
+        log.error("Error en ajax_cajas_por_modelo: %s", e, extra={
+            "user_id": request.user.id,
+            "empresa_id": getattr(empresa, "id", None)
+        })
+        return JsonResponse({"success": False, "error": str(e)}, status=500)
 
-    empresa = getattr(request.user, "empresa", None)
-    if not empresa:
-        return JsonResponse({"results": []})
 
-    # Filtrar cajas por modelo usando M2M + país para evitar contaminación
-    qs = (
-        CajaVehiculo.objects.filter(
-            modelos__id=modelo_id, modelos__marca__country=empresa.pais
-        )
-        .distinct()
-        .order_by("nombre")
-        .values("id", "nombre")
-    )
-    return JsonResponse({"results": [{"id": r["id"], "text": r["nombre"]} for r in qs]})
-
-
-# ---- Crear nuevas entidades (AJAX JSON)
 @require_POST
 @login_required
 def ajax_agregar_marca(request):
-    data = json.loads(request.body or "{}")
-    nombre = (data.get("nombre") or "").strip()
-    country = _get_country(request)
-    if not nombre:
-        return JsonResponse(
-            {"success": False, "error": "El nombre de la marca es requerido"}
-        )
-    if Marca.objects.filter(nombre__iexact=nombre, country=country).exists():
-        return JsonResponse(
-            {"success": False, "error": f"La marca '{nombre}' ya existe"}
-        )
-    nueva = Marca.objects.create(nombre=nombre, country=country)
-    return JsonResponse(
-        {"success": True, "marca": {"id": nueva.id, "nombre": nueva.nombre}}
-    )
+    """Agregar nueva marca via AJAX."""
+    try:
+        data = json.loads(request.body)
+        nombre = data.get("nombre", "").strip()
+        if not nombre:
+            return JsonResponse({"success": False, "error": "Nombre requerido"}, status=400)
+        
+        country = _get_country(request)
+        empresa = getattr(request.user, "empresa", None)
+        
+        # Evitar duplicados por case
+        try:
+            marca = Marca.objects.get(country=country, nombre__iexact=nombre)
+            created = False
+        except Marca.DoesNotExist:
+            marca = Marca.objects.create(country=country, nombre=nombre)
+            created = True
+        
+        return JsonResponse({
+            "success": True,
+            "marca": {"id": str(marca.pk), "nombre": marca.nombre},
+            "created": created
+        })
+    except Exception as e:
+        empresa = getattr(request.user, "empresa", None)
+        log.error("Error agregando marca: %s", e, extra={
+            "user_id": request.user.id,
+            "empresa_id": getattr(empresa, "id", None)
+        })
+        return JsonResponse({"success": False, "error": str(e)}, status=500)
 
 
 @require_POST
 @login_required
 def ajax_agregar_modelo(request):
-    data = json.loads(request.body or "{}")
-    nombre = (data.get("nombre") or "").strip()
-    marca_id = data.get("marca_id")
-    country = _get_country(request)
-    if not nombre:
-        return JsonResponse(
-            {"success": False, "error": "El nombre del modelo es requerido"}
-        )
-    if not marca_id:
-        return JsonResponse({"success": False, "error": "La marca es requerida"})
+    """Agregar nuevo modelo via AJAX."""
     try:
-        marca = Marca.objects.get(id=marca_id, country=country)
-    except Marca.DoesNotExist:
-        return JsonResponse({"success": False, "error": "Marca no encontrada"})
-    if Modelo.objects.filter(
-        nombre__iexact=nombre, marca=marca, country=country
-    ).exists():
-        return JsonResponse(
-            {
-                "success": False,
-                "error": f"El modelo '{nombre}' ya existe para '{marca.nombre}'",
-            }
-        )
-    nuevo = Modelo.objects.create(nombre=nombre, marca=marca, country=country)
-    return JsonResponse(
-        {"success": True, "modelo": {"id": nuevo.id, "nombre": nuevo.nombre}}
-    )
+        data = json.loads(request.body)
+        nombre = data.get("nombre", "").strip()
+        marca_id = data.get("marca_id")
+        
+        if not nombre or not marca_id:
+            return JsonResponse({"success": False, "error": "Nombre y marca requeridos"}, status=400)
+        
+        country = _get_country(request)
+        empresa = getattr(request.user, "empresa", None)
+        
+        # Validar que marca pertenece al país
+        marca = get_object_or_404(Marca, id=marca_id, country=country)
+        
+        # Evitar duplicados por case
+        try:
+            modelo = Modelo.objects.get(country=country, marca=marca, nombre__iexact=nombre)
+            created = False
+        except Modelo.DoesNotExist:
+            modelo = Modelo.objects.create(country=country, marca=marca, nombre=nombre)
+            created = True
+        
+        return JsonResponse({
+            "success": True,
+            "modelo": {"id": str(modelo.pk), "nombre": modelo.nombre},
+            "created": created
+        })
+    except Exception as e:
+        empresa = getattr(request.user, "empresa", None)
+        log.error("Error agregando modelo: %s", e, extra={
+            "user_id": request.user.id,
+            "empresa_id": getattr(empresa, "id", None)
+        })
+        return JsonResponse({"success": False, "error": str(e)}, status=500)
 
 
 @require_POST
 @login_required
 def ajax_agregar_motor(request):
-    data = json.loads(request.body or "{}")
-    nombre = (data.get("nombre") or "").strip()
-    modelo_id = data.get("modelo_id")
-
-    if not nombre:
-        return JsonResponse(
-            {"success": False, "error": "El nombre del motor es requerido"}
-        )
-    if not (modelo_id and str(modelo_id).isdigit()):
-        return JsonResponse({"success": False, "error": "El modelo es requerido"})
-
-    empresa = getattr(request.user, "empresa", None)
-    if not empresa:
-        return JsonResponse({"success": False, "error": "Empresa no encontrada"})
-
+    """Agregar nuevo motor via AJAX."""
     try:
-        modelo = Modelo.objects.get(id=modelo_id)
-    except Modelo.DoesNotExist:
-        return JsonResponse({"success": False, "error": "Modelo no encontrado"})
-
-    # Verificar si el motor ya existe para este modelo específico
-    if MotorVehiculo.objects.filter(
-        nombre__iexact=nombre, modelos__id=modelo_id
-    ).exists():
-        return JsonResponse(
-            {
-                "success": False,
-                "error": f"El motor '{nombre}' ya existe para este modelo",
-            }
-        )
-
-    # Buscar motor existente o crear uno nuevo
-    motor, created = MotorVehiculo.objects.get_or_create(
-        nombre__iexact=nombre, defaults={"nombre": nombre}
-    )
-    motor.modelos.add(modelo)
-    return JsonResponse(
-        {"success": True, "motor": {"id": motor.id, "nombre": motor.nombre}}
-    )
+        data = json.loads(request.body)
+        nombre = data.get("nombre", "").strip()
+        modelo_id = data.get("modelo_id")
+        
+        if not nombre or not modelo_id:
+            return JsonResponse({"success": False, "error": "Nombre y modelo requeridos"}, status=400)
+        
+        country = _get_country(request)
+        empresa = getattr(request.user, "empresa", None)
+        
+        # Validar que modelo pertenece al país
+        modelo = get_object_or_404(Modelo, id=modelo_id, country=country)
+        
+        # Crear motor con country (y empresa si aplica)
+        kwargs = {"nombre": nombre, "country": country}
+        # if hasattr(MotorVehiculo, "empresa") and empresa:
+        #     kwargs["empresa"] = empresa
+        
+        motor, created = MotorVehiculo.objects.get_or_create(**kwargs)
+        motor.modelos.add(modelo)
+        
+        return JsonResponse({
+            "success": True,
+            "motor": {"id": str(motor.pk), "nombre": motor.nombre},
+            "created": created
+        })
+    except Exception as e:
+        log.error(f"Error agregando motor: {e}")
+        return JsonResponse({"success": False, "error": str(e)}, status=500)
 
 
 @require_POST
 @login_required
 def ajax_agregar_caja(request):
-    data = json.loads(request.body or "{}")
-    nombre = (data.get("nombre") or "").strip()
-    modelo_id = data.get("modelo_id")
-
-    if not nombre:
-        return JsonResponse(
-            {"success": False, "error": "El nombre de la caja es requerido"}
-        )
-    if not (modelo_id and str(modelo_id).isdigit()):
-        return JsonResponse({"success": False, "error": "El modelo es requerido"})
-
-    empresa = getattr(request.user, "empresa", None)
-    if not empresa:
-        return JsonResponse({"success": False, "error": "Empresa no encontrada"})
-
+    """Agregar nueva caja via AJAX."""
     try:
-        modelo = Modelo.objects.get(id=modelo_id)
-    except Modelo.DoesNotExist:
-        return JsonResponse({"success": False, "error": "Modelo no encontrado"})
-
-    # Verificar si la caja ya existe para este modelo específico
-    if CajaVehiculo.objects.filter(
-        nombre__iexact=nombre, modelos__id=modelo_id
-    ).exists():
-        return JsonResponse(
-            {
-                "success": False,
-                "error": f"La caja '{nombre}' ya existe para este modelo",
-            }
-        )
-
-    # Buscar caja existente o crear una nueva
-    caja, created = CajaVehiculo.objects.get_or_create(
-        nombre__iexact=nombre, defaults={"nombre": nombre}
-    )
-    caja.modelos.add(modelo)
-    return JsonResponse(
-        {"success": True, "caja": {"id": caja.id, "nombre": caja.nombre}}
-    )
-
-
-# ---------------------------
-# FBVs básicas (shim a CBVs)
-# ---------------------------
-def lista_vehiculos(request, *args, **kwargs):
-    log.info("FBV shim: lista_vehiculos")
-    return VehiculoListView.as_view()(request, *args, **kwargs)
-
-
-def ver_vehiculo(request, *args, **kwargs):
-    log.info("FBV shim: ver_vehiculo")
-    return VehiculoDetailView.as_view()(request, *args, **kwargs)
-
-
-def editar_vehiculo(request, *args, **kwargs):
-    log.info("FBV shim: editar_vehiculo")
-    vehiculo_id = kwargs.pop("vehiculo_id", None)
-    if vehiculo_id is not None:
-        kwargs["pk"] = vehiculo_id
-    return VehiculoUpdateView.as_view()(request, *args, **kwargs)
-
-
-@login_required
-def crear_vehiculo(request):
-    """Crear vehículo con reglas CL/US y multi-tenant."""
-    empresa = getattr(request.user, "empresa", None)
-    country = _get_country(request)
-
-    if request.method == "POST":
-        # Validaciones mínimas + persistencia
-        form = VehiculoForm(request.POST, user=request.user, empresa=empresa)
-        if not request.POST.get("cliente"):
-            messages.error(request, "Debe seleccionar un cliente")
-            return _render_form_with_context(request, form, country, empresa)
-        if not request.POST.get("marca"):
-            messages.error(request, "Debe seleccionar una marca")
-            return _render_form_with_context(request, form, country, empresa)
-        if not request.POST.get("modelo"):
-            messages.error(request, "Debe seleccionar un modelo")
-            return _render_form_with_context(request, form, country, empresa)
-        if not request.POST.get("color"):
-            messages.error(request, "Debe seleccionar un color")
-            return _render_form_with_context(request, form, country, empresa)
-        if not (request.POST.get("patente") or "").strip():
-            messages.error(request, "Debe especificar la patente")
-            return _render_form_with_context(request, form, country, empresa)
-        if not request.POST.get("anio"):
-            messages.error(request, "Debe seleccionar el año")
-            return _render_form_with_context(request, form, country, empresa)
-
-        # Construcción manual para mantener tu lógica actual
-        try:
-            with transaction.atomic():
-                # Verificar si ya existe un vehículo con esta patente en la empresa
-                patente = (request.POST.get("patente") or "").strip()
-                if Vehiculo.objects.filter(empresa=empresa, patente=patente).exists():
-                    messages.error(
-                        request,
-                        f"Ya existe un vehículo con la patente {patente} en esta empresa",
-                    )
-                    return _render_form_with_context(request, form, country, empresa)
-
-                v = Vehiculo()
-                # Cliente (scoped por empresa)
-                v.cliente = Cliente.objects.get(
-                    id=request.POST["cliente"], empresa=empresa
-                )
-                # Marca/Modelo por country
-                v.marca = Marca.objects.get(id=request.POST["marca"], country=country)
-                v.modelo = Modelo.objects.get(
-                    id=request.POST["modelo"], marca=v.marca, country=country
-                )
-
-                # Color (nuevo o existente)
-                color_id = request.POST.get("color")
-                if color_id == "__nuevo__":
-                    color_nuevo = (request.POST.get("color_nuevo") or "").strip()
-                    if not color_nuevo:
-                        messages.error(
-                            request, "Debe especificar el nombre del nuevo color"
-                        )
-                        return _render_form_with_context(
-                            request, form, country, empresa
-                        )
-                    v.color, _ = ColorVehiculo.objects.get_or_create(nombre=color_nuevo)
-                else:
-                    v.color = ColorVehiculo.objects.get(id=color_id)
-
-                v.patente = patente
-                v.anio = int(request.POST["anio"])
-                v.vin = (request.POST.get("vin") or "").strip()
-
-                # Opcionales (relaciones M2M viven en Motor/Caja, aquí FK opcional)
-                motor_id = request.POST.get("motor")
-                if motor_id:
-                    v.motor = MotorVehiculo.objects.get(id=motor_id)
-                caja_id = request.POST.get("caja")
-                if caja_id:
-                    v.caja = CajaVehiculo.objects.get(id=caja_id)
-
-                v.empresa = empresa
-                v.save()
-                messages.success(request, f"Vehículo {v.patente} creado exitosamente")
-
-                # Namespaces robustos
-                return _safe_redirect(
-                    "chile:taller:vehiculos:lista_vehiculos",
-                    "usa:taller:vehiculos:lista_vehiculos",
-                    "taller:vehiculos:lista_vehiculos",
-                )
-        except Exception as e:
-            log.error(f"[crear_vehiculo] Error: {e}", exc_info=True)
-            messages.error(request, f"Error al crear el vehículo: {str(e)}")
-            return _render_form_with_context(request, form, country, empresa)
-    else:
-        form = VehiculoForm(user=request.user, empresa=empresa)
-        return _render_form_with_context(request, form, country, empresa)
-
-
-@login_required
-def eliminar_vehiculo(request, vehiculo_id, *args, **kwargs):
-    v = get_object_or_404(Vehiculo, pk=vehiculo_id)
-    if request.method == "POST":
-        v.delete()
-        messages.success(request, f"Vehículo {v.patente} eliminado correctamente.")
-        return _safe_redirect(
-            "chile:taller:vehiculos:lista_vehiculos",
-            "usa:taller:vehiculos:lista_vehiculos",
-            "taller:vehiculos:lista_vehiculos",
-        )
-    return render(request, "taller/vehiculos/eliminar_confirmar.html", {"object": v})
+        data = json.loads(request.body)
+        nombre = data.get("nombre", "").strip()
+        modelo_id = data.get("modelo_id")
+        
+        if not nombre or not modelo_id:
+            return JsonResponse({"success": False, "error": "Nombre y modelo requeridos"}, status=400)
+        
+        country = _get_country(request)
+        empresa = getattr(request.user, "empresa", None)
+        
+        # Validar que modelo pertenece al país
+        modelo = get_object_or_404(Modelo, id=modelo_id, country=country)
+        
+        # Crear caja con country (y empresa si aplica)
+        kwargs = {"nombre": nombre, "country": country}
+        # if hasattr(CajaVehiculo, "empresa") and empresa:
+        #     kwargs["empresa"] = empresa
+        
+        caja, created = CajaVehiculo.objects.get_or_create(**kwargs)
+        caja.modelos.add(modelo)
+        
+        return JsonResponse({
+            "success": True,
+            "caja": {"id": str(caja.pk), "nombre": caja.nombre},
+            "created": created
+        })
+    except Exception as e:
+        log.error(f"Error agregando caja: {e}")
+        return JsonResponse({"success": False, "error": str(e)}, status=500)

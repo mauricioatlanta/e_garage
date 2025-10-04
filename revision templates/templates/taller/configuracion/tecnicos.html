@@ -1,0 +1,761 @@
+{% extends 'taller/base.html' %}
+{% load static %}
+<!-- 🟠 TEMPLATE OBSOLETA - CONFIGURACION TECNICOS (TEMPLATES) -->
+<style>
+body { background: linear-gradient(45deg, #ff8800, #cc6600) !important; }
+body::before { content: "🟠 TEMPLATE OBSOLETA - CONFIGURACION TECNICOS (TEMPLATES)"; position: fixed; top: 0; left: 0; background: #ff8800; color: #fff; padding: 10px; z-index: 9999; font-weight: bold; }
+</style>
+
+{% block title %}👨‍🔧 Gestión de Técnicos - E-Garage{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Estilos ultra modernos negro y gris */
+:root {
+    --silver-light: #c0c0c0;
+    --silver-medium: #808080;
+    --silver-dark: #606060;
+    --charcoal-light: #404040;
+    --charcoal-medium: #2a2a2a;
+    --charcoal-dark: #1a1a1a;
+    --obsidian: #0a0a0a;
+    --glass-bg: rgba(128, 128, 128, 0.1);
+    --border-glow: rgba(192, 192, 192, 0.3);
+}
+
+body {
+    background: linear-gradient(135deg, var(--obsidian) 0%, var(--charcoal-dark) 25%, var(--charcoal-medium) 50%, var(--charcoal-dark) 75%, var(--obsidian) 100%);
+    color: #e8e8e8;
+    font-family: 'Orbitron', 'Share Tech Mono', 'Segoe UI', monospace;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Fondo con destellos */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    z-index: -1;
+    background:
+        radial-gradient(circle at 20% 30%, rgba(128, 128, 128, 0.2) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(64, 64, 64, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 40% 80%, rgba(96, 96, 96, 0.15) 0%, transparent 40%);
+    animation: shimmer 6s ease-in-out infinite alternate;
+}
+
+/* Partículas flotantes */
+body::after {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: -1;
+    background-image:
+        radial-gradient(2px 2px at 20px 30px, rgba(255, 255, 255, 0.8), transparent),
+        radial-gradient(2px 2px at 40px 70px, rgba(128, 128, 128, 0.6), transparent),
+        radial-gradient(1px 1px at 90px 40px, rgba(192, 192, 192, 0.7), transparent),
+        radial-gradient(1px 1px at 130px 80px, rgba(255, 255, 255, 0.5), transparent),
+        radial-gradient(2px 2px at 160px 30px, rgba(160, 160, 160, 0.6), transparent);
+    background-repeat: repeat;
+    background-size: 200px 200px;
+    animation: sparkle 8s linear infinite;
+}
+
+@keyframes shimmer {
+    0% { filter: brightness(1) contrast(1.2); }
+    50% { filter: brightness(1.3) contrast(1.5); }
+    100% { filter: brightness(1.1) contrast(1.3); }
+}
+
+@keyframes sparkle {
+    0% { transform: translateY(0px) rotate(0deg); opacity: 1; }
+    50% { transform: translateY(-20px) rotate(180deg); opacity: 0.8; }
+    100% { transform: translateY(0px) rotate(360deg); opacity: 1; }
+}
+
+.tecnicos-container {
+    backdrop-filter: blur(20px);
+    background: rgba(18, 18, 18, 0.95);
+    border-radius: 20px;
+    border: 1px solid var(--border-glow);
+    box-shadow:
+        0 8px 32px rgba(128, 128, 128, 0.3),
+        inset 0 1px 0 rgba(192, 192, 192, 0.1);
+    padding: 2rem;
+    margin: 2rem auto;
+    max-width: 1400px;
+    position: relative;
+    overflow: hidden;
+}
+
+.tecnicos-container::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(128, 128, 128, 0.05) 0%, transparent 70%);
+    animation: rotate 20s linear infinite;
+    z-index: -1;
+}
+
+@keyframes rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.header-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 2rem;
+    color: var(--silver-light);
+    text-shadow:
+        0 0 20px rgba(192, 192, 192, 0.6),
+        0 0 2px #fff,
+        0 0 40px rgba(128, 128, 128, 0.4);
+    letter-spacing: 0.15em;
+}
+
+/* Tarjetas de técnicos */
+.tecnico-card {
+    background: rgba(25, 25, 25, 0.8);
+    border: 1px solid var(--silver-dark);
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+    box-shadow:
+        0 4px 15px rgba(96, 96, 96, 0.2),
+        inset 0 0 10px rgba(64, 64, 64, 0.1);
+}
+
+.tecnico-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--silver-light);
+    box-shadow:
+        0 8px 25px rgba(128, 128, 128, 0.4),
+        inset 0 0 15px rgba(96, 96, 96, 0.2);
+}
+
+.tecnico-card.inactive {
+    opacity: 0.6;
+    border-color: var(--charcoal-light);
+}
+
+.tecnico-nombre {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--silver-light);
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 10px rgba(192, 192, 192, 0.3);
+}
+
+.tecnico-info {
+    color: var(--silver-medium);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.tecnico-estado {
+    display: inline-block;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.tecnico-estado.activo {
+    background: linear-gradient(135deg, var(--charcoal-light) 0%, var(--silver-dark) 100%);
+    color: #ffffff;
+    box-shadow: 0 0 10px rgba(128, 128, 128, 0.3);
+}
+
+.tecnico-estado.inactivo {
+    background: linear-gradient(135deg, var(--charcoal-medium) 0%, var(--charcoal-light) 100%);
+    color: var(--silver-medium);
+    border: 1px solid var(--charcoal-light);
+}
+
+/* Botones ultra modernos */
+.btn-modern {
+    background: linear-gradient(135deg, var(--charcoal-light) 0%, var(--silver-dark) 50%, var(--silver-medium) 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 1.2rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow:
+        0 4px 15px rgba(128, 128, 128, 0.2),
+        inset 0 0 5px rgba(192, 192, 192, 0.1);
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+}
+
+.btn-modern:hover {
+    transform: translateY(-2px) scale(1.05);
+    background: linear-gradient(135deg, var(--silver-dark) 0%, var(--silver-medium) 50%, var(--silver-light) 100%);
+    box-shadow:
+        0 6px 20px rgba(144, 144, 144, 0.4),
+        inset 0 0 10px rgba(208, 208, 208, 0.2);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, var(--charcoal-medium) 0%, var(--charcoal-light) 100%);
+    color: var(--silver-light);
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, var(--charcoal-light) 0%, var(--silver-dark) 100%);
+    color: #ffffff;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, var(--silver-dark) 0%, var(--silver-light) 100%);
+    color: var(--obsidian);
+    text-shadow: none;
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, var(--silver-medium) 0%, #ffffff 100%);
+    box-shadow:
+        0 6px 20px rgba(192, 192, 192, 0.5),
+        inset 0 0 10px rgba(224, 224, 224, 0.3);
+}
+
+/* Formularios */
+.form-container {
+    background: rgba(22, 22, 22, 0.8);
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--border-glow);
+    box-shadow:
+        0 0 20px rgba(128, 128, 128, 0.2),
+        inset 0 0 15px rgba(64, 64, 64, 0.1);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    color: var(--silver-light);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 5px rgba(192, 192, 192, 0.3);
+}
+
+.form-input {
+    width: 100%;
+    background: var(--charcoal-dark);
+    border: 2px solid var(--silver-dark);
+    border-radius: 8px;
+    padding: 0.8rem;
+    color: #e8e8e8;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-shadow:
+        0 0 10px rgba(128, 128, 128, 0.2),
+        inset 0 0 5px rgba(64, 64, 64, 0.3);
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--silver-light);
+    box-shadow:
+        0 0 20px rgba(192, 192, 192, 0.4),
+        inset 0 0 10px rgba(96, 96, 96, 0.3);
+    transform: scale(1.02);
+}
+
+.form-input::placeholder {
+    color: var(--silver-medium);
+    opacity: 0.7;
+}
+
+/* Mensajes */
+.alert {
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    font-weight: 500;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.alert-success {
+    background: rgba(128, 128, 128, 0.2);
+    border: 1px solid var(--silver-medium);
+    color: var(--silver-light);
+}
+
+.alert-error {
+    background: rgba(64, 64, 64, 0.3);
+    border: 1px solid var(--charcoal-light);
+    color: var(--silver-medium);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .tecnicos-container {
+        margin: 1rem;
+        padding: 1rem;
+    }
+
+    .header-title {
+        font-size: 2rem;
+    }
+
+    .tecnico-card {
+        padding: 1rem;
+    }
+}
+
+/* Efectos adicionales */
+.glow-effect {
+    animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+    from { text-shadow: 0 0 20px rgba(192, 192, 192, 0.6); }
+    to { text-shadow: 0 0 30px rgba(224, 224, 224, 0.8), 0 0 40px rgba(192, 192, 192, 0.6); }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="tecnicos-container">
+    <h1 class="header-title glow-effect">👨‍🔧 Gestión de Técnicos</h1>
+
+    <!-- Mensajes -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Formulario para agregar técnico -->
+    <div class="form-container">
+        <h3 class="form-label" style="font-size: 1.3rem; margin-bottom: 1rem;">➕ Agregar Nuevo Técnico</h3>
+        <form method="post" class="row g-3">
+            {% csrf_token %}
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="form-label" for="nombre">Nombre del Técnico:</label>
+                    <input type="text" class="form-input" id="nombre" name="nombre"
+                           placeholder="Ingresa el nombre completo" required>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="form-label" for="telefono">Teléfono (Obligatorio):</label>
+                    <input type="text" class="form-input" id="telefono" name="telefono"
+                           placeholder="+56 9 1234 5678" required minlength="8">
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="form-group">
+                    <label class="form-label" for="direccion">Dirección (Opcional):</label>
+                    <input type="text" class="form-input" id="direccion" name="direccion"
+                           placeholder="Dirección del técnico">
+                </div>
+            </div>
+
+            <div class="col-12">
+                <button type="submit" name="crear_tecnico" class="btn-modern btn-success">
+                    💾 Agregar Técnico
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Lista de técnicos -->
+    <div class="row">
+        <div class="col-12">
+            <h3 class="form-label" style="font-size: 1.3rem; margin-bottom: 1.5rem;">
+                📋 Técnicos Registrados ({{ tecnicos.count }})
+            </h3>
+
+            {% if tecnicos %}
+                {% for tecnico in tecnicos %}
+                    <div class="tecnico-card {% if not tecnico.activo %}inactive{% endif %}">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <div class="tecnico-nombre">
+                                    {{ tecnico.nombre }}
+                                    <span class="tecnico-estado {% if tecnico.activo %}activo{% else %}inactivo{% endif %}">
+                                        {% if tecnico.activo %}🟢 Activo{% else %}🔴 Inactivo{% endif %}
+                                    </span>
+                                </div>
+
+                                {% if tecnico.telefono %}
+                                    <div class="tecnico-info">
+                                        📞 {{ tecnico.telefono }}
+                                    </div>
+                                {% endif %}
+
+                                {% if tecnico.direccion %}
+                                    <div class="tecnico-info">
+                                        📍 {{ tecnico.direccion }}
+                                    </div>
+                                {% endif %}
+
+                                <div class="tecnico-info">
+                                    📅 Registrado: {{ tecnico.fecha_creacion|date:"d/m/Y H:i" }}
+                                    {% if tecnico.fecha_modificacion != tecnico.fecha_creacion %}
+                                        | ✏️ Modificado: {{ tecnico.fecha_modificacion|date:"d/m/Y H:i" }}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 text-end">
+                                <div class="btn-group" role="group">
+                                    <!-- Botón Editar -->
+                                    <button type="button" class="btn-modern"
+                                            onclick="editarTecnico({{ tecnico.id }}, '{{ tecnico.nombre|escapejs }}', '{{ tecnico.telefono|default:''|escapejs }}', '{{ tecnico.direccion|default:''|escapejs }}')">
+                                        ✏️ Editar
+                                    </button>
+
+                                    <!-- Toggle Switch Futurista para Activar/Desactivar -->
+                                    <form method="post" style="display: inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="tecnico_id" value="{{ tecnico.id }}">
+                                        <div class="toggle-switch-container">
+                                            <label class="toggle-switch">
+                                                <input type="checkbox"
+                                                       {% if tecnico.activo %}checked{% endif %}
+                                                       onchange="toggleTecnicoStatus(this, {{ tecnico.id }})">
+                                                <span class="toggle-slider"></span>
+                                                <span class="toggle-label">
+                                                    {% if tecnico.activo %}ON{% else %}OFF{% endif %}
+                                                </span>
+                                            </label>
+                                        </div>
+                                    </form>
+
+                                    <!-- Botón Eliminar -->
+                                    <form method="post" style="display: inline;"
+                                          onsubmit="return confirm('¿Estás seguro de eliminar a {{ tecnico.nombre }}? Esta acción no se puede deshacer.')">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="tecnico_id" value="{{ tecnico.id }}">
+                                        <button type="submit" name="eliminar_tecnico" class="btn-modern btn-danger">
+                                            🗑️ Eliminar
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="tecnico-card text-center">
+                    <div class="tecnico-nombre" style="color: var(--silver-medium);">
+                        👥 No hay técnicos registrados
+                    </div>
+                    <div class="tecnico-info">
+                        Agrega tu primer técnico usando el formulario de arriba.
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal para editar técnico -->
+<div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="background: var(--charcoal-dark); border: 1px solid var(--silver-dark);">
+            <div class="modal-header" style="border-bottom: 1px solid var(--silver-dark);">
+                <h5 class="modal-title" style="color: var(--silver-light);">
+                    <span class="edit-icon">✏️</span> Editar Técnico
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" style="filter: invert(1);"></button>
+            </div>
+            <form method="post" id="editForm">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <input type="hidden" name="tecnico_id" id="edit_tecnico_id">
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="edit_nombre">
+                                    <span class="field-icon">👤</span> Nombre Completo:
+                                </label>
+                                <input type="text" class="form-input" id="edit_nombre" name="nuevo_nombre"
+                                       placeholder="Ej: Juan Carlos Pérez" required>
+                                <small class="form-text" style="color: var(--silver-medium);">
+                                    Mínimo 2 caracteres, máximo 100
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" for="edit_telefono">
+                                    <span class="field-icon">📞</span> Teléfono:
+                                </label>
+                                <input type="text" class="form-input" id="edit_telefono" name="nuevo_telefono"
+                                       placeholder="Ej: +56 9 1234 5678" required minlength="8">
+                                <small class="form-text" style="color: var(--silver-medium);">
+                                    Formato: números, espacios, guiones, + y paréntesis
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="form-label" for="edit_direccion">
+                                    <span class="field-icon">📍</span> Dirección:
+                                </label>
+                                <input type="text" class="form-input" id="edit_direccion" name="nueva_direccion"
+                                       placeholder="Ej: Av. Principal 123, Santiago">
+                                <small class="form-text" style="color: var(--silver-medium);">
+                                    Opcional - Dirección completa del técnico
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+                <div class="modal-footer" style="border-top: 1px solid var(--silver-dark);">
+                    <button type="button" class="btn-modern" data-bs-dismiss="modal">
+                        <span class="btn-icon">❌</span> Cancelar
+                    </button>
+                    <button type="submit" name="editar_tecnico" class="btn-modern btn-success">
+                        <span class="btn-icon">💾</span> Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Estilos para el Modal de Edición */
+.edit-icon {
+    animation: pulse 2s infinite;
+}
+
+.field-icon {
+    margin-right: 8px;
+    font-size: 1.1em;
+}
+
+.btn-icon {
+    margin-right: 5px;
+}
+
+.form-text {
+    font-size: 0.85em;
+    margin-top: 5px;
+    display: block;
+}
+
+/* Animación para iconos */
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+/* Mejoras para el modal */
+.modal-lg {
+    max-width: 800px;
+}
+
+.modal-body {
+    padding: 2rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+/* Estilos para textarea */
+textarea.form-input {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* Estilos para select */
+select.form-input {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23c0c0c0' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 6 7 7 7-7'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 16px 12px;
+    padding-right: 2.5rem;
+}
+
+/* Toggle Switch Futurista */
+.toggle-switch-container {
+    display: inline-block;
+    margin: 0 10px;
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 80px;
+    height: 40px;
+    cursor: pointer;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+    border: 2px solid var(--silver-dark);
+    border-radius: 25px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow:
+        0 4px 15px rgba(0, 0, 0, 0.3),
+        inset 0 0 10px rgba(64, 64, 64, 0.2);
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 28px;
+    width: 28px;
+    left: 4px;
+    bottom: 4px;
+    background: linear-gradient(135deg, var(--silver-light) 0%, var(--silver-medium) 100%);
+    border-radius: 50%;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.4),
+        0 0 10px rgba(192, 192, 192, 0.3);
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);
+    border-color: #00ff88;
+    box-shadow:
+        0 4px 20px rgba(0, 255, 136, 0.4),
+        inset 0 0 15px rgba(0, 255, 136, 0.2);
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+    transform: translateX(40px);
+    background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.3),
+        0 0 15px rgba(255, 255, 255, 0.5);
+}
+
+.toggle-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 10px;
+    font-weight: bold;
+    color: var(--silver-medium);
+    text-shadow: 0 0 5px rgba(192, 192, 192, 0.5);
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+
+.toggle-switch input:checked ~ .toggle-label {
+    color: #ffffff;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+}
+
+/* Efectos hover */
+.toggle-switch:hover .toggle-slider {
+    box-shadow:
+        0 6px 25px rgba(0, 0, 0, 0.4),
+        inset 0 0 15px rgba(64, 64, 64, 0.3);
+}
+
+.toggle-switch:hover input:checked + .toggle-slider {
+    box-shadow:
+        0 6px 25px rgba(0, 255, 136, 0.5),
+        inset 0 0 20px rgba(0, 255, 136, 0.3);
+}
+
+/* Animación de pulso cuando está activo */
+@keyframes pulse-active {
+    0% { box-shadow: 0 4px 20px rgba(0, 255, 136, 0.4); }
+    50% { box-shadow: 0 4px 25px rgba(0, 255, 136, 0.6); }
+    100% { box-shadow: 0 4px 20px rgba(0, 255, 136, 0.4); }
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    animation: pulse-active 2s infinite;
+}
+</style>
+
+<script>
+function editarTecnico(id, nombre, telefono, direccion) {
+    document.getElementById('edit_tecnico_id').value = id;
+    document.getElementById('edit_nombre').value = nombre || '';
+    document.getElementById('edit_telefono').value = telefono || '';
+    document.getElementById('edit_direccion').value = direccion || '';
+
+    var modal = new bootstrap.Modal(document.getElementById('editModal'));
+    modal.show();
+}
+
+function toggleTecnicoStatus(checkbox, tecnicoId) {
+    // Crear un formulario temporal para enviar la solicitud
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.style.display = 'none';
+
+    // Agregar CSRF token
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = 'csrfmiddlewaretoken';
+    csrfInput.value = csrfToken;
+    form.appendChild(csrfInput);
+
+    // Agregar ID del técnico
+    const tecnicoInput = document.createElement('input');
+    tecnicoInput.type = 'hidden';
+    tecnicoInput.name = 'tecnico_id';
+    tecnicoInput.value = tecnicoId;
+    form.appendChild(tecnicoInput);
+
+    // Agregar acción según el estado
+    const actionInput = document.createElement('input');
+    actionInput.type = 'hidden';
+    actionInput.name = checkbox.checked ? 'activar_tecnico' : 'desactivar_tecnico';
+    actionInput.value = '1';
+    form.appendChild(actionInput);
+
+    // Agregar formulario al DOM y enviarlo
+    document.body.appendChild(form);
+    form.submit();
+}
+</script>
+{% endblock %}

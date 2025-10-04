@@ -41,3 +41,21 @@ def get_country_from_path(path: str) -> str:
     if path.startswith("/us/") or path == "/us":
         return "usa"
     return "chile"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

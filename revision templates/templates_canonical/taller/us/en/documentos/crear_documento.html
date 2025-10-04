@@ -1,0 +1,742 @@
+{% extends "taller/us/en/documentos/base_documento.html" %}
+{% load static %}
+{% load country_url %}
+
+{% block documento_title %}
+<div class="flex justify-between items-center">
+  <h1 class="documento-title">📝 Create Document</h1>
+  <label class="flex items-center text-cyan-200 font-semibold">
+    <input type="checkbox" id="id_pagado" name="pagado" class="mr-2">
+    Document paid
+  </label>
+</div>
+{% endblock %}
+
+{% block documento_content %}
+<form method="post" id="document-form" class="max-w-7xl mx-auto">
+  {% csrf_token %}
+
+  <!-- System messages -->
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert {{ message.tags }} bg-{% if message.tags == 'error' %}red{% elif message.tags == 'success' %}green{% else %}blue{% endif %}-900/50 border border-{% if message.tags == 'error' %}red{% elif message.tags == 'success' %}green{% else %}blue{% endif %}-400 rounded-xl p-4 mb-6">
+        <div class="text-{% if message.tags == 'error' %}red{% elif message.tags == 'success' %}green{% else %}blue{% endif %}-200 font-semibold">{{ message }}</div>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- Validation errors -->
+  {% if form.errors %}
+    <div class="bg-red-900/50 border border-red-400 rounded-xl p-4 mb-6">
+      <div class="text-red-200 font-semibold mb-2">Validation errors:</div>
+      {{ form.errors }}
+    </div>
+  {% endif %}
+
+  <!-- Document shell with dynamic theme -->
+  <div id="doc-shell" class="rounded-3xl p-6 theme-ot border-2">
+
+    <!-- Document header -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+
+      <!-- Document type -->
+      <div class="space-y-4">
+        <label class="block text-cyan-200 font-semibold">Document Type</label>
+        <select id="id_tipo" name="tipo" class="form-select w-full">
+          <option value="OT">Work Order</option>
+          <option value="REC">Invoice/Receipt</option>
+          <option value="PRES">Estimate</option>
+        </select>
+
+        <!-- Number (readonly) -->
+        <label class="block text-cyan-200 font-semibold">Number</label>
+        <div class="form-control w-full bg-gray-800 text-cyan-300 font-mono text-center py-3" id="id_numero">
+          Will be generated automatically
+        </div>
+      </div>
+
+      <!-- Client and Vehicle -->
+      <div class="space-y-4">
+        <label class="block text-cyan-200 font-semibold">Client</label>
+        <div class="relative">
+          <input type="text" id="cliente-busqueda" class="form-control w-full" placeholder="Type to search clients..." autocomplete="off">
+          <div id="cliente-resultados" class="absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
+        </div>
+
+        <select id="id_cliente" name="cliente" class="form-select w-full hidden">
+          <option value="">Select client...</option>
+        </select>
+
+        <!-- Selected client information -->
+        <div id="cliente-info" class="hidden p-3 bg-cyan-900/20 border border-cyan-400 rounded-lg">
+          <div class="text-cyan-200">
+            <strong id="cliente-nombre"></strong><br>
+            <span id="cliente-email"></span><br>
+            <span id="cliente-telefono"></span>
+          </div>
+        </div>
+
+        <label class="block text-cyan-200 font-semibold">Vehicle</label>
+        <select id="id_vehiculo" name="vehiculo" class="form-select w-full">
+          <option value="">Select client first...</option>
+        </select>
+      </div>
+
+      <!-- Additional information -->
+      <div class="space-y-4">
+        <label class="block text-cyan-200 font-semibold">Responsible Technician</label>
+        <select name="tecnico_responsable" class="form-select w-full">
+          <option value="">Select technician...</option>
+          <option value="1">John Smith</option>
+          <option value="2">Mike Johnson</option>
+          <option value="3">Sarah Wilson</option>
+        </select>
+
+        <label class="block text-cyan-200 font-semibold">Issue Date</label>
+        <input type="date" name="fecha_emision" class="form-control w-full" value="{{ today|date:'Y-m-d' }}">
+
+        <label class="block text-cyan-200 font-semibold">Mileage</label>
+        <input type="number" name="kilometraje" min="0" class="form-control w-full" placeholder="0">
+      </div>
+    </div>
+
+    <!-- Dynamic sections -->
+    <div class="space-y-6">
+      <div class="seccion-card">
+        <h3 class="seccion-title">🔧 Parts & Services</h3>
+        <div class="flex gap-4 mb-4">
+          <button type="button" id="add-repuesto" class="btn-secondary">+ Add Part</button>
+          <button type="button" id="add-servicio" class="btn-secondary">+ Add Service</button>
+          <button type="button" id="add-otro" class="btn-secondary">+ Add Other Service</button>
+        </div>
+        
+        <!-- Parts container -->
+        <div id="repuestos-container" class="space-y-4">
+          <!-- Dynamic parts will be added here -->
+        </div>
+
+        <!-- Services container -->
+        <div id="servicios-container" class="space-y-4">
+          <!-- Dynamic services will be added here -->
+        </div>
+
+        <!-- Other services container -->
+        <div id="otros-container" class="space-y-4">
+          <!-- Dynamic other services will be added here -->
+        </div>
+      </div>
+
+      <!-- Observations -->
+      <div class="seccion-card">
+        <label class="block text-cyan-200 font-semibold mb-2">Observations</label>
+        <textarea name="observaciones" class="form-control w-full h-32"
+          placeholder="Optional observations - Can be left empty if no additional information..."
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- Totals -->
+    <div class="totales-section">
+      <h3 class="text-2xl font-bold text-cyan-300 mb-4">💰 Totals</h3>
+      
+      <!-- VAT checkbox next to totals -->
+      <div class="mb-4">
+        <label class="flex items-center text-cyan-200">
+          <input type="checkbox" id="id_apply_vat" name="apply_vat" checked class="mr-2">
+          Apply tax
+        </label>
+      </div>
+
+      <div class="space-y-2">
+        <div class="totales-row">
+          <span class="text-cyan-300">Parts Subtotal:</span>
+          <span id="t_repuestos" class="text-cyan-300 font-bold">$0</span>
+        </div>
+        <div class="totales-row">
+          <span class="text-cyan-300">Services Subtotal:</span>
+          <span id="t_servicios" class="text-cyan-300 font-bold">$0</span>
+        </div>
+        <div class="totales-row">
+          <span class="text-cyan-300">Other Services Subtotal:</span>
+          <span id="t_otros" class="text-cyan-300 font-bold">$0</span>
+        </div>
+        <div class="totales-row">
+          <span class="text-cyan-300">Tax:</span>
+          <span id="t_iva" class="text-cyan-300 font-bold">$0</span>
+        </div>
+        <div class="totales-row totales-total">
+          <span class="text-cyan-300 font-bold text-lg">Total:</span>
+          <span id="t_total" class="text-cyan-300 font-bold text-xl">$0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="flex justify-between items-center mt-8">
+      <a href="/us/en/documentos/" class="btn-secondary">← Back</a>
+      <button type="submit" class="btn-primary">💾 Save Document</button>
+    </div>
+  </div>
+</form>
+
+<script>
+// Configuration
+const COUNTRY = 'US';
+const urlVeh            = "/us/ajax/vehiculos-por-cliente/";
+const urlRep            = "/us/repuestos/api/repuesto-por-codigo/";
+const urlBuscarClientes = "/us/ajax/clientes/buscar/";
+
+// Utility functions
+function getEl(selOrEl) {
+  const el = typeof selOrEl==='string' ? document.querySelector(selOrEl) : selOrEl;
+  return el;
+}
+
+function setTxt(selOrEl, txt) {
+  const el = getEl(selOrEl);
+  if (el) el.textContent = txt;
+}
+
+function setVal(selOrEl, val) {
+  const el = getEl(selOrEl);
+  if (el) el.value = val;
+}
+
+function formatMoney(n) {
+  if (typeof v === 'number') return v;
+  if (!v) return 0;
+  const num = Number(n);
+  if (isNaN(num)) return 0;
+  return isNaN(n) ? 0 : n;
+}
+
+function formatUSD(n) {
+  return new Intl.NumberFormat('en-US', { style:'currency', currency:'USD', maximumFractionDigits:2 }).format(Number(n)||0);
+}
+
+function money(n) {
+  return COUNTRY==='US' ? formatUSD(n) : new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP'}).format(Number(n)||0);
+}
+
+// Theme change by document type
+const shell = document.getElementById('doc-shell');
+const selTipo = document.getElementById('id_tipo');
+
+function applyTheme(tipo) {
+  shell.classList.remove('theme-ot', 'theme-fac', 'theme-pres');
+  if (tipo === 'FAC') shell.classList.add('theme-fac');
+  else if (tipo === 'PRES') shell.classList.add('theme-pres');
+  else shell.classList.add('theme-ot');
+  
+  updateDocumentNumber();
+}
+
+// Update document number
+async function updateDocumentNumber() {
+   const numeroField = document.getElementById('id_numero');
+   if (!numeroField) return;
+   
+   const tipo = document.getElementById('id_tipo')?.value;
+   if (!tipo) return;
+
+   try {
+       const urlNextNumber = "/us/documentos/api/obtener-numero-documento/";
+       const response = await fetch(`${urlNextNumber}?tipo=${encodeURIComponent(tipo)}`);
+       if (response.ok) {
+         const data = await response.json();
+         numeroField.textContent = data.numero || 'Auto-generated';
+       }
+     } catch (error) {
+       console.error('❌ Error getting number:', error);
+     }
+}
+
+// Load vehicles by client
+async function cargarVehiculosPorCliente(clienteId) {
+  const selVeh = document.getElementById('id_vehiculo');
+  if (!selVeh || !clienteId) {
+    if (selVeh) selVeh.innerHTML = '<option value="">Select client first...</option>';
+    console.log('❌ Cannot load vehicles:', { selVeh: !!selVeh, clienteId });
+    return;
+  }
+
+  console.log('🔄 Loading vehicles for client:', clienteId, 'URL:', urlVeh);
+
+  try {
+    const r = await fetch(`${urlVeh}?cliente=${encodeURIComponent(clienteId)}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || '',
+      },
+    });
+
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const data = await r.json();
+    console.log('📋 Vehicle response:', data);
+
+    const items = Array.isArray(data) ? data : (data.results || []);
+    if (!items.length) {
+      selVeh.innerHTML = '<option value="">No vehicles registered</option>';
+      console.log('⚠️ Client has no registered vehicles');
+      return;
+    }
+
+    selVeh.innerHTML = '<option value="">Select vehicle...</option>' +
+      items.map(v => {
+        const label = `${v.marca || 'Unknown'} ${v.modelo || ''} - ${v.patente || v.vin || 'No plate'}`;
+        return `<option value="${v.id}">${label}</option>`;
+      }).join('');
+
+    console.log(`✅ ${items.length} vehicles loaded successfully`);
+  } catch (err) {
+    console.error('❌ Error loading vehicles:', err);
+    selVeh.innerHTML = '<option value="">-- Error loading vehicles --</option>';
+  }
+}
+
+// AJAX client search
+let searchTimeout;
+const clienteBusqueda = document.getElementById('cliente-busqueda');
+const clienteResultados = document.getElementById('cliente-resultados');
+const clienteSelect = document.getElementById('id_cliente');
+const clienteInfo = document.getElementById('cliente-info');
+
+async function buscarClientes(query) {
+  if (!query || query.length < 2) {
+    clienteResultados.classList.add('hidden');
+    return;
+  }
+
+  console.log('🔍 Searching clients with:', query, 'URL:', urlBuscarClientes);
+
+  try {
+    const response = await fetch(`${urlBuscarClientes}?q=${encodeURIComponent(query)}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || '',
+      },
+      credentials: 'same-origin',
+    });
+
+    console.log('📋 Client search response:', response.status, response.statusText);
+
+    if (response.status === 302) {
+      console.error('❌ User not authenticated - redirecting to login');
+      clienteResultados.innerHTML = '<div class="p-3 text-red-400">⚠️ Session expired. <a href="/accounts/login/" class="underline text-cyan-200">Login</a></div>';
+      clienteResultados.classList.remove('hidden');
+      return;
+    }
+
+    if (!response.ok) {
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        console.error('❌ Response is not JSON:', contentType);
+        clienteResultados.innerHTML = '<div class="p-3 text-red-400">❌ Error: invalid server response</div>';
+        clienteResultados.classList.remove('hidden');
+        return;
+      }
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('📋 Client data received:', data);
+
+    let clientes = [];
+    if (Array.isArray(data)) {
+      clientes = data;
+    } else if (data && Array.isArray(data.results)) {
+      clientes = data.results;
+    } else if (data && Array.isArray(data.items)) {
+      clientes = data.items;
+    } else {
+      console.error('❌ Unexpected data structure:', data);
+      clientes = [];
+    }
+
+    mostrarResultadosClientes(clientes);
+
+  } catch (error) {
+    console.error('❌ HTTP Error:', response.status, response.statusText);
+    clienteResultados.innerHTML = '<div class="p-3 text-red-400">❌ Server error</div>';
+    clienteResultados.classList.remove('hidden');
+  } catch (error) {
+    console.error('❌ Complete error:', error);
+    clienteResultados.innerHTML = '<div class="p-3 text-red-400">❌ Connection error</div>';
+    clienteResultados.classList.remove('hidden');
+  }
+}
+
+function mostrarResultadosClientes(clientes) {
+  if (clientes.length === 0) {
+    clienteResultados.innerHTML = '<div class="p-3 text-gray-400">No clients found</div>';
+    clienteResultados.classList.remove('hidden');
+    return;
+  }
+
+  clienteResultados.innerHTML = clientes.map(cliente => {
+    const nombre = cliente.text ||
+                   cliente.nombre_completo ||
+                   cliente.nombre ||
+                   cliente.razon_social ||
+                   `Client #${cliente.id}` ||
+                   'Client without name';
+
+    const email = cliente.email || '';
+    const telefono = cliente.telefono || '';
+    const rut = cliente.rut || '';
+
+    console.log('📋 Processing client:', { id: cliente.id, nombre, email, telefono, rut });
+
+    return `
+      <div class="cliente-item p-3 hover:bg-cyan-700 cursor-pointer border-b border-cyan-600 last:border-b-0"
+           data-id="${cliente.id || ''}"
+           data-nombre="${nombre}"
+           data-email="${email}"
+           data-telefono="${telefono}"
+           data-rut="${rut}">
+        <div class="font-semibold text-cyan-200">${nombre}</div>
+        ${email ? `<div class="text-sm text-gray-300">📧 ${email}</div>` : ''}
+        ${telefono ? `<div class="text-sm text-gray-300">📞 ${telefono}</div>` : ''}
+        ${rut ? `<div class="text-sm text-gray-300">🆔 ${rut}</div>` : ''}
+        ${!rut && !telefono && !email ? 'No additional information' : ''}
+      </div>
+    `;
+  }).join('');
+
+  clienteResultados.classList.remove('hidden');
+  console.log('✅ Client results displayed:', clientes.length);
+}
+
+async function seleccionarCliente(clienteId, nombre, email, telefono) {
+  clienteResultados.classList.add('hidden');
+  clienteBusqueda.value = nombre;
+  clienteSelect.value = clienteId;
+
+  // Update client info display
+  document.getElementById('cliente-nombre').textContent = nombre;
+  document.getElementById('cliente-email').textContent = email || 'No email';
+  document.getElementById('cliente-telefono').textContent = telefono || 'No phone';
+  clienteInfo.classList.remove('hidden');
+
+  // Load vehicles for this client
+  await cargarVehiculosPorCliente(clienteId);
+}
+
+// Recalculate totals
+function sumValues(selectorList){
+  const nodes = document.querySelectorAll(selectorList);
+  return Array.from(nodes).reduce((acc, el) => {
+    const val = Number(el.value || el.textContent?.replace(/[^0-9.-]/g, '') || 0);
+    return acc + (isNaN(val) ? 0 : val);
+  }, 0);
+}
+
+window.recalcTotales = function(){
+  const rep = sumValues('.rep-subtotal');
+  const serv = sumValues('.serv-subtotal');
+  const otros = sumValues('.otr-subtotal');
+  const ivaOn = document.getElementById('id_apply_vat')?.checked;
+  const subtot = rep + serv + otros;
+  const iva = ivaOn ? subtot * 0.19 : 0; // 19% for Chile, adjust for USA
+  const tot = subtot + iva;
+  
+  setTxt('#t_repuestos',money(rep));
+  setTxt('#t_servicios',money(serv));
+  setTxt('#t_otros',money(otros));
+  setTxt('#t_iva',money(iva));
+  setTxt('#t_total',money(tot));
+};
+
+// Event listeners
+selTipo?.addEventListener('change', e => applyTheme(e.target.value));
+
+clienteBusqueda?.addEventListener('input', (e) => {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => {
+    buscarClientes(e.target.value);
+  }, 300);
+});
+
+clienteBusqueda?.addEventListener('focus', () => {
+  if (clienteBusqueda.value.length >= 2) {
+    buscarClientes(clienteBusqueda.value);
+  }
+});
+
+document.addEventListener('click', (e) => {
+  if (!clienteBusqueda.contains(e.target) && !clienteResultados.contains(e.target)) {
+    clienteResultados.classList.add('hidden');
+  }
+});
+
+clienteResultados?.addEventListener('click', (e) => {
+  const clienteItem = e.target.closest('.cliente-item');
+  if (clienteItem) {
+    const id = clienteItem.dataset.id;
+    const nombre = clienteItem.dataset.nombre;
+    const email = clienteItem.dataset.email;
+    const telefono = clienteItem.dataset.telefono;
+    seleccionarCliente(id, nombre, email, telefono);
+  }
+});
+
+document.getElementById('id_apply_vat')?.addEventListener('change', window.recalcTotales);
+
+document.addEventListener('DOMContentLoaded', () => {
+  applyTheme(document.getElementById('id_tipo')?.value || 'OT');
+  updateDocumentNumber();
+  
+  // Initialize totals with US format
+  if (COUNTRY === 'US') {
+    window.recalcTotales();
+  }
+});
+
+// Add part button
+document.getElementById('add-repuesto')?.addEventListener('click', () => {
+  const container = document.getElementById('repuestos-container');
+  const formCount = document.getElementById('id_rep-TOTAL_FORMS');
+  const currentCount = formCount ? parseInt(formCount.value) : 0;
+  
+  const newRow = document.createElement('div');
+  newRow.className = 'dynamic-element';
+  newRow.innerHTML = `
+    <div class="flex flex-wrap gap-4 items-end">
+      <div class="flex-1 min-w-48">
+        <label class="block text-cyan-200 text-sm mb-1">Code</label>
+        <input type="text" name="rep-${currentCount}-codigo" class="rep-codigo form-control w-full" placeholder="Code">
+      </div>
+      <div class="flex-1 min-w-48">
+        <label class="block text-cyan-200 text-sm mb-1">Name</label>
+        <input type="text" name="rep-${currentCount}-nombre" class="rep-nombre form-control w-full" readonly>
+      </div>
+      <div class="w-24">
+        <label class="block text-cyan-200 text-sm mb-1">Qty</label>
+        <input type="number" name="rep-${currentCount}-cantidad" class="rep-cantidad form-control w-full" min="1" max="99" value="1">
+      </div>
+      <div class="w-32">
+        <label class="block text-cyan-200 text-sm mb-1">Cost Price</label>
+        <input type="text" name="precio_compra" class="rep-precio-compra form-control w-full" readonly placeholder="$0">
+      </div>
+      <div class="w-32">
+        <label class="block text-cyan-200 text-sm mb-1">Sale Price</label>
+        <input type="text" name="rep-${currentCount}-precio_unitario" class="rep-precio-venta form-control w-full" placeholder="$0">
+      </div>
+      <div class="w-24">
+        <label class="block text-cyan-200 text-sm mb-1">Discount %</label>
+        <input type="number" name="rep-${currentCount}-descuento" class="form-control w-full" min="0" max="100" value="0">
+      </div>
+      <div class="w-32">
+        <label class="block text-cyan-200 text-sm mb-1">Subtotal</label>
+        <input type="hidden" class="rep-subtotal" value="0">
+        <div class="rep-subtotal-view subtotal-field w-full text-right font-bold">$0</div>
+      </div>
+      <div class="w-16">
+        <button type="button" class="btn-secondary w-full" onclick="this.parentElement.parentElement.parentElement.remove()">✕</button>
+      </div>
+    </div>
+  `;
+  
+  container.appendChild(newRow);
+  if (formCount) formCount.value = currentCount + 1;
+  
+  // Add event listeners for the new row
+  const newCodeField = newRow.querySelector('.rep-codigo');
+  setupRepuestoRow(newRow);
+  
+  if (newCodeField) {
+    newCodeField.focus();
+  }
+});
+
+// Add service button
+document.getElementById('add-servicio')?.addEventListener('click', () => {
+  const container = document.getElementById('servicios-container');
+  const formCount = document.getElementById('id_serv-TOTAL_FORMS');
+  const currentCount = formCount ? parseInt(formCount.value) : 0;
+  
+  const newRow = document.createElement('div');
+  newRow.className = 'dynamic-element';
+  newRow.innerHTML = `
+    <div class="flex flex-wrap gap-4 items-end">
+      <div class="flex-1 min-w-48">
+        <label class="block text-cyan-200 text-sm mb-1">Service</label>
+        <select name="serv-${currentCount}-servicio" class="form-select w-full">
+          <option value="">Select service...</option>
+          <option value="1">Oil Change</option>
+          <option value="2">Brake Service</option>
+          <option value="3">Engine Tune-up</option>
+        </select>
+      </div>
+      <div class="w-32">
+        <label class="block text-cyan-200 text-sm mb-1">Client Price</label>
+        <input type="text" name="serv-${currentCount}-precio_unitario" class="serv-precio form-control w-full" placeholder="$0">
+      </div>
+      <div class="w-32">
+        <label class="block text-cyan-200 text-sm mb-1">Subtotal</label>
+        <input type="hidden" class="serv-subtotal" value="0">
+        <div class="serv-subtotal-view subtotal-field w-full text-right font-bold">$0</div>
+      </div>
+      <div class="w-16">
+        <button type="button" class="btn-secondary w-full" onclick="this.parentElement.parentElement.parentElement.remove()">✕</button>
+      </div>
+    </div>
+  `;
+  
+  container.appendChild(newRow);
+  if (formCount) formCount.value = currentCount + 1;
+  
+  setupServicioRow(newRow);
+});
+
+// Add other service button
+document.getElementById('add-otro')?.addEventListener('click', () => {
+  const container = document.getElementById('otros-container');
+  const formCount = document.getElementById('id_otr-TOTAL_FORMS');
+  const currentCount = formCount ? parseInt(formCount.value) : 0;
+  
+  const newRow = document.createElement('div');
+  newRow.className = 'dynamic-element';
+  newRow.innerHTML = `
+    <div class="flex flex-wrap gap-4 items-end">
+      <div class="flex-1 min-w-48">
+        <label class="block text-cyan-200 text-sm mb-1">Service</label>
+        <select name="otr-${currentCount}-servicio" class="form-select w-full">
+          <option value="">Select service...</option>
+          <option value="1">Tire Change</option>
+          <option value="2">AC Service</option>
+          <option value="3">Transmission Service</option>
+        </select>
+      </div>
+      <div class="flex-1 min-w-48">
+        <label class="block text-cyan-200 text-sm mb-1">External Company</label>
+        <input type="text" name="otr-${currentCount}-empresa_externa" class="form-control w-full">
+      </div>
+      <div class="w-32">
+        <label class="block text-cyan-200 text-sm mb-1">Shop Price</label>
+        <input type="text" name="precio_taller" class="otr-precio-taller form-control w-full" placeholder="$0">
+      </div>
+      <div class="w-32">
+        <label class="block text-cyan-200 text-sm mb-1">Client Price</label>
+        <input type="text" name="otr-${currentCount}-precio_cliente" class="otr-precio form-control w-full" placeholder="$0">
+      </div>
+      <div class="w-32">
+        <label class="block text-cyan-200 text-sm mb-1">Subtotal</label>
+        <input type="hidden" class="otr-subtotal" value="0">
+        <div class="otr-subtotal-view subtotal-field w-full text-right font-bold">$0</div>
+      </div>
+      <div class="w-16">
+        <button type="button" class="btn-secondary w-full" onclick="this.parentElement.parentElement.parentElement.remove()">✕</button>
+      </div>
+    </div>
+  `;
+  
+  container.appendChild(newRow);
+  if (formCount) formCount.value = currentCount + 1;
+  
+  setupOtroRow(newRow);
+});
+
+// Setup functions for dynamic rows
+function setupRepuestoRow(row) {
+  const inpCode = row.querySelector('.rep-codigo');
+  const inpName = row.querySelector('.rep-nombre');
+  const inpPC = row.querySelector('.rep-precio-compra');
+  const inpPV = row.querySelector('.rep-precio-venta');
+  const qEl = row.querySelector('.rep-cantidad');
+  const sub = row.querySelector('.rep-subtotal');
+  const view = row.querySelector('.rep-subtotal-view');
+
+  async function fetchByCode(c) {
+    if (!c || urlRep === '#') return;
+    try {
+      const r = await fetch(`${urlRep}?codigo=${encodeURIComponent(c)}`);
+      if (!r.ok) return;
+      const data = await r.json();
+      if (data && data.nombre) {
+        inpName.value = data.nombre;
+        inpPV.value = data.precio_venta || '';
+        inpPC.value = data.precio_compra || '';
+        recalc();
+      }
+    } catch (error) {
+      console.error('Error searching part:', error);
+    }
+  }
+
+  function recalc() {
+    const q = Number(qEl?.value || 0);
+    const p = Number(inpPV?.value?.replace(/[^0-9.-]/g, '') || 0);
+    const subtotal = q * p;
+    if (sub) sub.value = subtotal;
+    if (view) view.textContent = money(subtotal);
+    window.recalcTotales();
+  }
+
+  inpCode?.addEventListener('change', () => fetchByCode(inpCode.value.trim()));
+  qEl?.addEventListener('input', recalc);
+  inpPV?.addEventListener('input', recalc);
+}
+
+function setupServicioRow(row) {
+  const qEl = row.querySelector('.serv-cantidad');
+  const pEl = row.querySelector('.serv-precio');
+  const sub = row.querySelector('.serv-subtotal');
+  const view = row.querySelector('.serv-subtotal-view');
+
+  function recalc() {
+    const q = Number(qEl?.value || 1);
+    const p = Number(pEl?.value?.replace(/[^0-9.-]/g, '') || 0);
+    const subtotal = q * p;
+    if (sub) sub.value = subtotal;
+    if (view) view.textContent = money(subtotal);
+    window.recalcTotales();
+  }
+
+  qEl?.addEventListener('input', recalc);
+  pEl?.addEventListener('input', recalc);
+}
+
+function setupOtroRow(row) {
+  const qEl = row.querySelector('.otr-cantidad');
+  const pEl = row.querySelector('.otr-precio');
+  const sub = row.querySelector('.otr-subtotal');
+  const view = row.querySelector('.otr-subtotal-view');
+
+  function recalc() {
+    const q = Number(qEl?.value || 1);
+    const p = Number(pEl?.value?.replace(/[^0-9.-]/g, '') || 0);
+    const subtotal = q * p;
+    if (sub) sub.value = subtotal;
+    if (view) view.textContent = money(subtotal);
+    window.recalcTotales();
+  }
+
+  qEl?.addEventListener('input', recalc);
+  pEl?.addEventListener('input', recalc);
+}
+
+// Setup for other service row
+function setupOtroRow(row) {
+  const qEl = row.querySelector('.otr-cantidad');
+  const pEl = row.querySelector('.otr-precio');
+  const sub = row.querySelector('.otr-subtotal');
+  const view = row.querySelector('.otr-subtotal-view');
+  const inpPrecioTaller = row.querySelector('.otr-precio-taller');
+
+  function recalc() {
+    const q = Number(qEl?.value || 1);
+    const p = Number(pEl?.value?.replace(/[^0-9.-]/g, '') || 0);
+    const subtotal = q * p;
+    if (sub) sub.value = subtotal;
+    if (view) view.textContent = money(subtotal);
+    window.recalcTotales();
+  }
+
+  qEl?.addEventListener('input', recalc);
+  pEl?.addEventListener('input', recalc);
+}
+</script>
+{% endblock %}

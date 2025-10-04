@@ -1,0 +1,22 @@
+{% extends 'taller/base_inicio.html' %}
+{% block content %}
+  <style>
+    body, .cuadro, .cuadro *, table, thead, tbody, th, td, label, input, select, textarea, option {
+      color: #111 !important;
+    }
+    input[type="text"]::placeholder, textarea::placeholder {
+      color: #444 !important;
+    }
+  </style>
+<div class="max-w-xl mx-auto bg-slate-800 text-white p-6 mt-10 rounded shadow-lg">
+<h2 class="text-2xl font-bold text-red-400 mb-4">⚠️ Confirmar Eliminación</h2>
+<p class="mb-6">¿Estás seguro que deseas eliminar el repuesto <strong>{{ object.nombre_repuesto }}</strong>?</p>
+<form method="post">
+    {% csrf_token %}
+    <div class="flex justify-end space-x-4">
+<a class="bg-slate-600 hover:bg-slate-700 px-4 py-2 rounded" href="{% url 'lista_repuestos' %}">Cancelar</a>
+<button class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white btn-futuristic" type="submit">Eliminar</button>
+</div>
+</form>
+</div>
+{% endblock %}

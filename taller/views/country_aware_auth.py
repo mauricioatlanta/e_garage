@@ -131,7 +131,8 @@ def country_aware_login(request):
         else:
             # Para Chile, usar template específico
             if lang == "en":
-                template_name = "taller/cl/en/auth/login.html"
+                # No existe template en inglés para Chile, usar el de USA
+                template_name = "taller/us/en/account/login.html"
             else:
                 # Por defecto español para Chile
                 template_name = "taller/cl/es/account/login.html"

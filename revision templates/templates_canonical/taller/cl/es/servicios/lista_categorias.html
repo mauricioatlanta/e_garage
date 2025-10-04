@@ -1,0 +1,9 @@
+{% extends 'taller/base.html' %}
+{% block content %}
+  <h1 class="text-2xl font-bold">Categorías de Servicio</h1>
+  <ul class="mt-4 list-disc list-inside">
+    {% for categoria in categorias %}
+      <li>{{ categoria }}</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

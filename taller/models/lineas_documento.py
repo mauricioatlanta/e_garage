@@ -188,6 +188,11 @@ class LineaOtroServicio(models.Model):
         return super().save(*args, **kwargs)
 
     @property
+    def subtotal(self):
+        """Calcular subtotal (precio_cliente * cantidad)"""
+        return self.precio_cliente * self.cantidad
+
+    @property
     def ganancia(self):
         """Calcular ganancia por línea"""
         return (self.precio_cliente - self.costo_interno) * self.cantidad

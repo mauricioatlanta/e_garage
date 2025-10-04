@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Color</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0f172a;
+            color: #e6f0ff;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #94a3b8;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            background: #0b1020;
+            color: #e6f0ff;
+            font-size: 14px;
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #22d3ee;
+            box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.25);
+        }
+        .color-preview {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #334155;
+            border-radius: 8px;
+            margin-top: 10px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #22d3ee, #06b6d4);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #06b6d4, #0891b2);
+        }
+        .btn-secondary {
+            background: #374151;
+            color: #e6f0ff;
+            margin-left: 10px;
+        }
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+        .messages {
+            margin-bottom: 20px;
+        }
+        .alert {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .alert-success {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #22c55e;
+        }
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+        .alert-info {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #3b82f6;
+        }
+        .help-text {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 style="text-align: center; margin-bottom: 30px; color: #22d3ee;">Crear Nuevo Color</h2>
+
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="nombre">Nombre del Color *</label>
+                <input type="text" id="nombre" name="nombre" required
+                       placeholder="Ej: Rojo, Azul, Verde..."
+                       value="{{ request.POST.nombre|default:'' }}">
+            </div>
+
+            <div class="form-group">
+                <label for="hex">Código Hex (opcional)</label>
+                <input type="text" id="hex" name="hex"
+                       placeholder="#FF0000"
+                       value="{{ request.POST.hex|default:'' }}"
+                       pattern="^#([0-9a-f]{3}|[0-9a-f]{6})$"
+                       title="Formato: #FF0000 o #F00">
+                <div class="help-text">
+                    Formato: #FF0000 (6 dígitos) o #F00 (3 dígitos)
+                </div>
+                <div id="color-preview" class="color-preview" style="background: #999999;"></div>
+            </div>
+
+            <div style="text-align: center;">
+                <button type="submit" class="btn btn-primary">Crear Color</button>
+                <button type="button" class="btn btn-secondary" onclick="window.close()">Cancelar</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Preview del color en tiempo real
+        document.getElementById('hex').addEventListener('input', function(e) {
+            const hex = e.target.value;
+            const preview = document.getElementById('color-preview');
+
+            if (/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(hex)) {
+                preview.style.background = hex;
+            } else {
+                preview.style.background = '#999999';
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+
+

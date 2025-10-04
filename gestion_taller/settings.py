@@ -103,7 +103,7 @@ INSTALLED_APPS = [
     "widget_tweaks",
     "rest_framework",
     # Project
-    "taller",
+    "taller.apps.TallerConfig",
     "ubicacion.apps.UbicacionConfig",
     # Django contrib
     "django.contrib.admin",
@@ -161,7 +161,7 @@ WSGI_APPLICATION = "gestion_taller.wsgi.application"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "templates_canonical"],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [

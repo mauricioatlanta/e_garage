@@ -125,6 +125,26 @@ class CompanySettings(models.Model):
         help_text="Moneda utilizada en los documentos",
     )
 
+    tax_rate = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        default=19.00,
+        verbose_name="Tasa de impuesto",
+        help_text="Tasa de impuesto por defecto (ej: 19.00 para Chile, 0.00 para USA)",
+    )
+
+    apply_tax_by_default = models.BooleanField(
+        default=True,
+        verbose_name="Aplicar impuesto por defecto",
+        help_text="Aplicar impuesto automáticamente en nuevos documentos",
+    )
+
+    separate_by_technician = models.BooleanField(
+        default=False,
+        verbose_name="Separar por técnico",
+        help_text="Mostrar reportes separados por técnico",
+    )
+
     timezone = models.CharField(
         max_length=50,
         default="America/Santiago",

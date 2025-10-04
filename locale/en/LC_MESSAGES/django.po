@@ -81,31 +81,31 @@ msgid "Language"
 msgstr "Idioma"
 
 msgid "Start Now"
-msgstr "Comenzar Ahora"
+msgstr "Start Now"
 
 msgid "Start Free Trial"
-msgstr "Comenzar Prueba Gratuita"
+msgstr "Start Free Trial"
 
 msgid "See Pricing"
-msgstr "Ver Precios"
+msgstr "See Pricing"
 
 msgid "Recommended"
 msgstr "Recomendado"
 
 msgid "Choose Semi-Annual"
-msgstr "Elegir Semestral"
+msgstr "Choose Semi-Annual"
 
 msgid "Choose Annual"
-msgstr "Elegir Anual"
+msgstr "Choose Annual"
 
 msgid "per month"
-msgstr "por mes"
+msgstr "per month"
 
 msgid "every 6 months"
-msgstr "cada 6 meses"
+msgstr "every 6 months"
 
 msgid "per year"
-msgstr "por año"
+msgstr "per year"
 
 msgid "Unlimited users"
 msgstr "Usuarios ilimitados"

@@ -1,383 +1,870 @@
 {% extends "common/base.html" %}
 {% load static %}
 {% load country_url %}
-<!-- 🔵 TEMPLATE ALTERNATIVA - SETTINGS -->
-<style>
-body { background: linear-gradient(45deg, #0000ff, #0000cc) !important; }
-body::before { content: "🔵 TEMPLATE ALTERNATIVA - SETTINGS"; position: fixed; top: 0; left: 0; background: #0000ff; color: #fff; padding: 10px; z-index: 9999; font-weight: bold; }
-</style>
 
-{% block title %}Configuración de Empresa{% endblock %}
-
-{% if debug_payload %}
-<!-- DEBUG VISUAL: VER LO QUE ESTÁ GUARDADO EN BD -->
-<div style="background:#0b1220;border:1px solid #1f2a44;color:#9fdcff;padding:8px;border-radius:8px;margin-bottom:12px;font-size:12px">
-  <b>DEBUG:</b> empresa={{ debug_payload.empresa_id }} |
-  addr={{ debug_payload.address|default:"" }} |
-  phone={{ debug_payload.phone|default:"" }} |
-  email={{ debug_payload.email|default:"" }} |
-  web={{ debug_payload.website|default:"" }} |
-  currency={{ debug_payload.currency }} |
-  tax={{ debug_payload.tax }} |
-  tax_default={{ debug_payload.tax_default }}
-</div>
-{% endif %}
+{% block title %}⚙️ SYSTEM CONFIGURATION{% endblock %}
 
 {% block extra_css %}
 <style>
-    .form-section {
-        background: white;
-        border-radius: 12px;
-        padding: 24px;
-        margin-bottom: 24px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        border: 1px solid #e5e7eb;
-    }
+  /* Futuristic Cyberpunk Theme */
+  :root {
+    --primary-cyan: #00ffff;
+    --secondary-purple: #8b5cf6;
+    --accent-green: #00ff88;
+    --warning-orange: #ff6b35;
+    --danger-red: #ff3366;
+    --dark-bg: #0a0a0f;
+    --darker-bg: #050508;
+    --card-bg: rgba(15, 15, 25, 0.8);
+    --border-glow: rgba(0, 255, 255, 0.3);
+    --text-primary: #ffffff;
+    --text-secondary: #cccccc;
+    --field-bg: #000000;
+    --field-text: #ffffff;
+  }
 
-    .form-section h4 {
-        color: #1f2937;
-        margin-bottom: 20px;
-        font-size: 1.25rem;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
+  /* Futuristic Font */
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
 
-    .form-section h4 i {
-        color: #3b82f6;
-        font-size: 1.1em;
-    }
+  body {
+    background: linear-gradient(135deg, var(--dark-bg) 0%, var(--darker-bg) 100%);
+    color: var(--text-primary);
+    font-family: 'Rajdhani', 'Orbitron', 'Segoe UI', sans-serif;
+    font-weight: 400;
+    overflow-x: hidden;
+  }
 
-    .form-label {
-        font-weight: 500;
-        color: #374151;
-        margin-bottom: 8px;
-        display: block;
-    }
+  /* Animated Background */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+      radial-gradient(circle at 20% 80%, rgba(0, 255, 255, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, rgba(0, 255, 136, 0.05) 0%, transparent 50%);
+    animation: backgroundPulse 8s ease-in-out infinite;
+    z-index: -1;
+  }
 
-    .form-control, .form-select {
-        border: 1px solid #d1d5db;
-        border-radius: 6px;
-        padding: 10px 12px;
-        font-size: 14px;
-        transition: border-color 0.2s;
-    }
+  @keyframes backgroundPulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.6; }
+  }
 
-    .form-control:focus, .form-select:focus {
-        outline: none;
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
+  /* Main Container */
+  .cyber-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+    position: relative;
+  }
 
-    .form-check-input {
-        width: 18px;
-        height: 18px;
-        margin-right: 8px;
-    }
+  /* Header Section */
+  .cyber-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    position: relative;
+  }
 
-    .btn-update {
-        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-        color: white;
-        border: none;
-        padding: 12px 24px;
-        border-radius: 8px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-    }
+  .cyber-title {
+    font-family: 'Orbitron', 'Rajdhani', monospace;
+    font-size: 3rem;
+    font-weight: 900;
+    background: linear-gradient(45deg, var(--primary-cyan), var(--secondary-purple), var(--accent-green));
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientShift 3s ease-in-out infinite;
+    text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+    margin-bottom: 1rem;
+    letter-spacing: 3px;
+  }
 
-    .btn-update:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-    }
+  @keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
 
-    .btn-update:active {
-        transform: translateY(0);
-    }
+  .cyber-subtitle {
+    font-family: 'Rajdhani', 'Orbitron', sans-serif;
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+  }
 
-    .current-logo {
-        max-width: 120px;
-        max-height: 120px;
-        border-radius: 8px;
-        border: 2px solid #e5e7eb;
-    }
+  /* Status Panel */
+  .status-panel {
+    background: rgba(15, 15, 25, 0.9);
+    border: 2px solid rgba(0, 255, 255, 0.4);
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    backdrop-filter: blur(15px);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+  }
 
-    .logo-section {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        margin-bottom: 16px;
-    }
+  .status-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--primary-cyan), transparent);
+    animation: scanLine 3s linear infinite;
+  }
 
-    .logo-info {
-        flex: 1;
-    }
+  @keyframes scanLine {
+    0% { left: -100%; }
+    100% { left: 100%; }
+  }
 
-    .logo-actions {
-        display: flex;
-        gap: 8px;
-    }
+  .status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
 
-    .btn-clear {
-        background: #ef4444;
-        color: white;
-        border: none;
-        padding: 6px 12px;
-        border-radius: 6px;
-        font-size: 12px;
-        cursor: pointer;
-    }
+  .status-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem;
+    background: rgba(0, 255, 255, 0.15);
+    border-radius: 10px;
+    border: 1px solid rgba(0, 255, 255, 0.4);
+    box-shadow: 0 4px 15px rgba(0, 255, 255, 0.1);
+    transition: all 0.3s ease;
+  }
 
-    .btn-clear:hover {
-        background: #dc2626;
-    }
+  .status-item:hover {
+    background: rgba(0, 255, 255, 0.2);
+    border-color: rgba(0, 255, 255, 0.6);
+    transform: translateY(-2px);
+  }
 
-    .help-text {
-        font-size: 12px;
-        color: #6b7280;
-        margin-top: 4px;
-    }
+  .status-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--accent-green);
+    animation: pulse 2s infinite;
+  }
 
-    .error-message {
-        color: #dc2626;
-        font-size: 14px;
-        margin-top: 8px;
-    }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
 
-    .space-y-8 {
-        margin-bottom: 32px;
+  /* Configuration Cards */
+  .config-card {
+    background: rgba(15, 15, 25, 0.9);
+    border: 2px solid rgba(0, 255, 255, 0.3);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(0, 255, 255, 0.1);
+    position: relative;
+    transition: all 0.3s ease;
+  }
+
+  .config-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 50px rgba(0, 255, 255, 0.2);
+    border-color: var(--primary-cyan);
+  }
+
+  .config-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-cyan), var(--secondary-purple), var(--accent-green));
+    border-radius: 20px 20px 0 0;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .card-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--primary-cyan), var(--secondary-purple));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 255, 255, 0.3);
+  }
+
+  .card-title {
+    font-family: 'Orbitron', 'Rajdhani', monospace;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    letter-spacing: 1px;
+  }
+
+  .card-subtitle {
+    font-family: 'Rajdhani', 'Orbitron', sans-serif;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin: 0;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+  }
+
+  /* Form Elements */
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .form-group {
+    position: relative;
+  }
+
+  .form-label {
+    display: block;
+    font-family: 'Orbitron', 'Rajdhani', monospace;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--primary-cyan);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+    filter: drop-shadow(0 0 8px rgba(0, 255, 255, 0.3));
+  }
+
+  .form-control, .form-select {
+    width: 100%;
+    padding: 1rem;
+    background: var(--field-bg) !important;
+    border: 2px solid rgba(0, 255, 255, 0.6);
+    border-radius: 10px;
+    color: var(--field-text) !important;
+    font-family: 'Orbitron', 'Rajdhani', monospace;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5), inset 0 1px 3px rgba(255, 255, 255, 0.1);
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+  }
+
+  .form-control:focus, .form-select:focus {
+    outline: none;
+    border-color: var(--primary-cyan);
+    box-shadow: 0 0 25px rgba(0, 255, 255, 0.8), 0 4px 20px rgba(0, 0, 0, 0.6), inset 0 1px 3px rgba(255, 255, 255, 0.2);
+    background: var(--field-bg) !important;
+    color: var(--field-text) !important;
+    transform: translateY(-2px);
+  }
+
+  .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.6) !important;
+    font-family: 'Orbitron', 'Rajdhani', monospace;
+    font-weight: 400;
+    text-shadow: 0 0 3px rgba(255, 255, 255, 0.2);
+  }
+
+  .form-control:hover, .form-select:hover {
+    border-color: rgba(0, 255, 255, 0.8);
+    background: var(--field-bg) !important;
+    color: var(--field-text) !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), 0 0 15px rgba(0, 255, 255, 0.3), inset 0 1px 3px rgba(255, 255, 255, 0.15);
+  }
+
+  /* Logo Section */
+  .logo-section {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    padding: 1.5rem;
+    background: rgba(0, 255, 255, 0.05);
+    border: 1px solid rgba(0, 255, 255, 0.2);
+    border-radius: 15px;
+    margin-bottom: 1rem;
+  }
+
+  .current-logo {
+    width: 120px;
+    height: 120px;
+    border-radius: 15px;
+    border: 2px solid var(--primary-cyan);
+    object-fit: cover;
+    box-shadow: 0 8px 25px rgba(0, 255, 255, 0.3);
+  }
+
+  .logo-info {
+    flex: 1;
+  }
+
+  .logo-info h4 {
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+  }
+
+  .logo-info p {
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  /* Buttons */
+  .cyber-btn {
+    background: linear-gradient(135deg, var(--primary-cyan), var(--secondary-purple));
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    font-family: 'Orbitron', 'Rajdhani', monospace;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    box-shadow: 0 4px 15px rgba(0, 255, 255, 0.3);
+    position: relative;
+    overflow: hidden;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  }
+
+  .cyber-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+  }
+
+  .cyber-btn:hover::before {
+    left: 100%;
+  }
+
+  .cyber-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 255, 255, 0.5);
+  }
+
+  .cyber-btn:active {
+    transform: translateY(0);
+  }
+
+  /* Quick Actions */
+  .quick-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .action-btn {
+    background: rgba(15, 15, 25, 0.9);
+    border: 2px solid rgba(0, 255, 255, 0.3);
+    border-radius: 15px;
+    padding: 1.5rem;
+    text-align: center;
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+  }
+
+  .action-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(139, 92, 246, 0.1));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .action-btn:hover::before {
+    opacity: 1;
+  }
+
+  .action-btn:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary-cyan);
+    box-shadow: 0 10px 30px rgba(0, 255, 255, 0.2);
+  }
+
+  .action-icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    display: block;
+  }
+
+  .action-title {
+    font-family: 'Orbitron', 'Rajdhani', monospace;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    letter-spacing: 1px;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+  }
+
+  .action-desc {
+    font-family: 'Rajdhani', 'Orbitron', sans-serif;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: 400;
+    letter-spacing: 0.5px;
+  }
+
+  /* Messages */
+  .alert {
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    border: 1px solid;
+    backdrop-filter: blur(10px);
+  }
+
+  .alert-success {
+    background: rgba(0, 255, 136, 0.2);
+    border-color: var(--accent-green);
+    color: var(--accent-green);
+    box-shadow: 0 4px 15px rgba(0, 255, 136, 0.2);
+    text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+  }
+
+  .alert-error {
+    background: rgba(255, 51, 102, 0.2);
+    border-color: var(--danger-red);
+    color: var(--danger-red);
+    box-shadow: 0 4px 15px rgba(255, 51, 102, 0.2);
+    text-shadow: 0 0 10px rgba(255, 51, 102, 0.3);
+  }
+
+  .alert-info {
+    background: rgba(0, 255, 255, 0.2);
+    border-color: var(--primary-cyan);
+    color: var(--primary-cyan);
+    box-shadow: 0 4px 15px rgba(0, 255, 255, 0.2);
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .cyber-container {
+      padding: 1rem;
     }
+    
+    .cyber-title {
+      font-size: 2rem;
+    }
+    
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .quick-actions {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Loading Animation */
+  .loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(0, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: var(--primary-cyan);
+    animation: spin 1s ease-in-out infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Force black background for all form elements */
+  input[type="text"], 
+  input[type="email"], 
+  input[type="tel"], 
+  input[type="url"], 
+  input[type="number"], 
+  input[type="file"], 
+  textarea, 
+  select {
+    background: #000000 !important;
+    color: #ffffff !important;
+    font-family: 'Orbitron', 'Rajdhani', monospace !important;
+    font-weight: 500 !important;
+    border: 2px solid rgba(0, 255, 255, 0.6) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5), inset 0 1px 3px rgba(255, 255, 255, 0.1) !important;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.3) !important;
+  }
+
+  input[type="text"]:focus, 
+  input[type="email"]:focus, 
+  input[type="tel"]:focus, 
+  input[type="url"]:focus, 
+  input[type="number"]:focus, 
+  input[type="file"]:focus, 
+  textarea:focus, 
+  select:focus {
+    background: #000000 !important;
+    color: #ffffff !important;
+    border-color: #00ffff !important;
+    box-shadow: 0 0 25px rgba(0, 255, 255, 0.8), 0 4px 20px rgba(0, 0, 0, 0.6), inset 0 1px 3px rgba(255, 255, 255, 0.2) !important;
+  }
+
+  input[type="text"]::placeholder, 
+  input[type="email"]::placeholder, 
+  input[type="tel"]::placeholder, 
+  input[type="url"]::placeholder, 
+  input[type="number"]::placeholder, 
+  textarea::placeholder {
+    color: rgba(255, 255, 255, 0.6) !important;
+    font-family: 'Orbitron', 'Rajdhani', monospace !important;
+    text-shadow: 0 0 3px rgba(255, 255, 255, 0.2) !important;
+  }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-
-  {% include "common/_tpl_marker.html" with marker_from="settings/company_settings.html" %}
-
-  <!-- 🚨 CRUZ ROJA DE CONFIRMACIÓN - TEMPLATE CORRECTA -->
-  <div style="background:#dc2626;color:white;padding:12px;border-radius:8px;margin-bottom:16px;text-align:center;font-weight:bold;font-size:18px;border:3px solid #991b1b;box-shadow:0 4px 12px rgba(220,38,38,0.3)">
-    🚨 CRUZ ROJA DE CONFIRMACIÓN 🚨<br>
-    <small style="font-size:14px;opacity:0.9;">✅ TEMPLATE CORRECTA - PARCHES APLICADOS</small>
+<div class="cyber-container">
+  <!-- Header -->
+  <div class="cyber-header">
+    <h1 class="cyber-title">⚙️ SYSTEM CONFIGURATION</h1>
+    <p class="cyber-subtitle">Advanced Company Settings & Control Panel</p>
   </div>
 
-  <div class="row">
-    <div class="col-12">
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0">
-          <i class="fas fa-cog text-primary"></i>
-          ⚙️ SYSTEM CONFIGURATION
-        </h1>
-        <div class="text-muted">
-          <small>Advanced Company Settings & Control Panel</small>
-        </div>
+  <!-- Status Panel -->
+  <div class="status-panel">
+    <div class="status-grid">
+      <div class="status-item">
+        <div class="status-icon"></div>
+        <span>System Online</span>
       </div>
-
-      <div class="alert alert-info">
-        <strong>SYSTEM ONLINE</strong><br>
-        Company ID: {{ empresa.id }}
+      <div class="status-item">
+        <div class="status-icon"></div>
+        <span>Company ID: {{ empresa.id }}</span>
       </div>
-
-      <!-- CONFIG SNAPSHOT (desde la vista/BD) -->
-      <div style="margin:8px 0; padding:8px; background:#111827; color:#93c5fd; border-radius:8px; font-size:12px">
-        <b>CONFIG SNAPSHOT (desde la vista/BD):</b>
-        ID={{ empresa.id }} |
-        addr={{ config.direccion|default:"-" }} |
-        phone={{ config.telefono|default:"-" }} |
-        email={{ config.email_contacto|default:"-" }} |
-        web={{ config.sitio_web|default:"-" }} |
-        currency={{ config.moneda|default:"-" }} |
-        tax={{ config.tasa_impuesto|default:"-" }}
+      <div class="status-item">
+        <div class="status-icon"></div>
+        <span>Configuration Active</span>
       </div>
-
-      {% if messages %}
-        {% for m in messages %}
-          <div class="alert alert-{{ m.tags|default:'info' }} mb-2">{{ m }}</div>
-        {% endfor %}
-      {% endif %}
     </div>
   </div>
 
-  <!-- ========== FORM 1: PROFILE ========== -->
-  <form method="post" enctype="multipart/form-data" class="space-y-8">
-    {% csrf_token %}
-    <input type="hidden" name="section" value="profile">
-    <div class="form-section">
-      <h4><i class="fas fa-building"></i> 🏢 COMPANY PROFILE</h4>
+  <!-- Messages -->
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags|default:'info' }}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
 
-      <div class="row">
-        <div class="col-md-6">
-          <label class="form-label">{{ form.nombre_publico.label }}</label>
-          {{ form.nombre_publico }}
-          {% if form.nombre_publico.errors %}<div class="error-message">{{ form.nombre_publico.errors.0 }}</div>{% endif %}
+  <!-- Company Profile Configuration -->
+  <div class="config-card">
+    <div class="card-header">
+      <div class="card-icon">🏢</div>
+      <div>
+        <h2 class="card-title">Company Profile</h2>
+        <p class="card-subtitle">Configure your company information and branding</p>
+      </div>
+    </div>
+
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <input type="hidden" name="section" value="profile">
+      
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">{{ form.company_name.label }}</label>
+          {{ form.company_name }}
+          {% if form.company_name.errors %}
+            <div class="alert alert-error">{{ form.company_name.errors.0 }}</div>
+          {% endif %}
         </div>
-        <div class="col-md-6">
+
+        <div class="form-group">
           <label class="form-label">{{ form.tagline.label }}</label>
           {{ form.tagline }}
-          {% if form.tagline.errors %}<div class="error-message">{{ form.tagline.errors.0 }}</div>{% endif %}
+          {% if form.tagline.errors %}
+            <div class="alert alert-error">{{ form.tagline.errors.0 }}</div>
+          {% endif %}
         </div>
       </div>
 
-      <div class="row mt-3">
-        <div class="col-md-12">
-          <label class="form-label">{{ form.logo.label }}</label>
-          <div class="logo-section">
-            {% if config.logo %}
-              <img src="{{ config.logo.url }}" alt="Logo actual" class="current-logo">
-              <div class="logo-info"><strong>Actualmente:</strong> {{ config.logo.name }}</div>
-            {% else %}
-              <div class="logo-info"><small class="text-muted">No hay logo actual</small></div>
-            {% endif %}
-          </div>
-          {{ form.logo }}
-          {% if form.logo.errors %}<div class="error-message">{{ form.logo.errors.0 }}</div>{% endif %}
+      <div class="form-group">
+        <label class="form-label">{{ form.logo.label }}</label>
+        <div class="logo-section">
+          {% if config.logo %}
+            <img src="{{ config.logo.url }}" alt="Current Logo" class="current-logo">
+            <div class="logo-info">
+              <h4>Current Logo</h4>
+              <p>{{ config.logo.name }}</p>
+            </div>
+          {% else %}
+            <div class="logo-info">
+              <h4>No Logo Set</h4>
+              <p>Upload a logo to enhance your brand identity</p>
+            </div>
+          {% endif %}
+        </div>
+        {{ form.logo }}
+        {% if form.logo.errors %}
+          <div class="alert alert-error">{{ form.logo.errors.0 }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">{{ form.address.label }}</label>
+          {{ form.address }}
+          {% if form.address.errors %}
+            <div class="alert alert-error">{{ form.address.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">{{ form.phone.label }}</label>
+          {{ form.phone }}
+          {% if form.phone.errors %}
+            <div class="alert alert-error">{{ form.phone.errors.0 }}</div>
+          {% endif %}
         </div>
       </div>
 
-      <div class="row mt-3">
-        <div class="col-md-12">
-          <label class="form-label">{{ form.direccion.label }}</label>
-          {{ form.direccion }}
-          {% if form.direccion.errors %}<div class="error-message">{{ form.direccion.errors.0 }}</div>{% endif %}
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">{{ form.email.label }}</label>
+          {{ form.email }}
+          {% if form.email.errors %}
+            <div class="alert alert-error">{{ form.email.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">{{ form.website.label }}</label>
+          {{ form.website }}
+          {% if form.website.errors %}
+            <div class="alert alert-error">{{ form.website.errors.0 }}</div>
+          {% endif %}
         </div>
       </div>
 
-      <div class="row mt-3">
-        <div class="col-md-6">
-          <label class="form-label">{{ form.telefono.label }}</label>
-          {{ form.telefono }}
-          {% if form.telefono.errors %}<div class="error-message">{{ form.telefono.errors.0 }}</div>{% endif %}
-        </div>
-        <div class="col-md-6">
-          <label class="form-label">{{ form.email_contacto.label }}</label>
-          {{ form.email_contacto }}
-          {% if form.email_contacto.errors %}<div class="error-message">{{ form.email_contacto.errors.0 }}</div>{% endif %}
-        </div>
-      </div>
-
-      <div class="row mt-3">
-        <div class="col-md-12">
-          <label class="form-label">{{ form.sitio_web.label }}</label>
-          {{ form.sitio_web }}
-          {% if form.sitio_web.errors %}<div class="error-message">{{ form.sitio_web.errors.0 }}</div>{% endif %}
-        </div>
-      </div>
-
-      <button type="submit" class="btn-update mt-4">
-        <i class="fas fa-save"></i> 💾 UPDATE PROFILE
+      <button type="submit" class="cyber-btn">
+        <span class="loading"></span>
+        💾 Update Profile
       </button>
-    </div>
-  </form>
-
-  <!-- ========== FORM 2: FINANCIAL ========== -->
-  <form method="post" class="space-y-8">
-    {% csrf_token %}
-    <input type="hidden" name="section" value="financial">
-    <div class="form-section">
-      <h4><i class="fas fa-coins"></i> 💰 FINANCIAL CONFIG</h4>
-
-      <div class="row">
-        <div class="col-md-4">
-          <label class="form-label">{{ form.moneda.label }}</label>
-          {{ form.moneda }}
-          {% if form.moneda.errors %}<div class="error-message">{{ form.moneda.errors.0 }}</div>{% endif %}
-        </div>
-        <div class="col-md-4">
-          <label class="form-label">{{ form.tasa_impuesto.label }}</label>
-          {{ form.tasa_impuesto }}
-          {% if form.tasa_impuesto.errors %}<div class="error-message">{{ form.tasa_impuesto.errors.0 }}</div>{% endif %}
-        </div>
-        <div class="col-md-4">
-          <div class="mt-4">
-            <label class="form-label d-flex align-items-center">
-              {{ form.aplicar_impuesto_por_defecto }}
-              <span class="ms-2">Apply Tax by Default</span>
-            </label>
-            {% if form.aplicar_impuesto_por_defecto.errors %}<div class="error-message">{{ form.aplicar_impuesto_por_defecto.errors.0 }}</div>{% endif %}
-          </div>
-        </div>
-      </div>
-
-      <p class="text-xs opacity-70 mt-2"><strong>Nota:</strong> En Chile usa 19.00; en USA usa 0.00 o el sales tax local.</p>
-
-      <button type="submit" class="btn-update mt-4">
-        <i class="fas fa-save"></i> 💱 UPDATE FINANCIAL
-      </button>
-    </div>
-  </form>
-
-  <!-- ========== FORM 3: THEME ========== -->
-  <form method="post" class="space-y-8">
-    {% csrf_token %}
-    <input type="hidden" name="section" value="theme">
-    <div class="form-section">
-      <h4><i class="fas fa-palette"></i> 🎨 VISUAL THEME</h4>
-
-      <div class="row">
-        <div class="col-md-6">
-          <label class="form-label">{{ form.brand_color.label }}</label>
-          {{ form.brand_color }}
-          {% if form.brand_color.errors %}<div class="error-message">{{ form.brand_color.errors.0 }}</div>{% endif %}
-        </div>
-        <div class="col-md-6">
-          <div class="mt-4">
-            <label class="form-label d-flex align-items-center">
-              {{ form.dividir_por_tecnico }}
-              <span class="ms-2">Separate by Technician</span>
-            </label>
-            {% if form.dividir_por_tecnico.errors %}<div class="error-message">{{ form.dividir_por_tecnico.errors.0 }}</div>{% endif %}
-          </div>
-        </div>
-      </div>
-
-      <button type="submit" class="btn-update mt-4">
-        <i class="fas fa-save"></i> 🎨 UPDATE THEME
-      </button>
-    </div>
-  </form>
-
-  <!-- QUICK ACTIONS (igual que antes) -->
-  <div class="form-section">
-    <h4><i class="fas fa-bolt"></i> ⚡ QUICK ACTIONS</h4>
-    <div class="row">
-      <div class="col-md-3">
-        <a href="{% country_url 'configuracion_tecnicos' app_namespace='direct' %}" class="btn btn-outline-primary w-100">
-          <i class="fas fa-tools"></i> 👨‍🔧 MANAGE TECHNICIANS
-        </a>
-      </div>
-      <div class="col-md-3">
-        <a href="{% country_url 'centro_operaciones' app_namespace='direct' %}" class="btn btn-outline-info w-100">
-          <i class="fas fa-satellite"></i> 🛰️ SPACE CENTER
-        </a>
-      </div>
-      <div class="col-md-3">
-        <a href="/us/documentos/" class="btn btn-outline-success w-100">
-          <i class="fas fa-file-alt"></i> 📄 DOCUMENTS
-        </a>
-      </div>
-      <div class="col-md-3">
-        <button type="button" onclick="location.reload()" class="btn btn-outline-secondary w-100">
-          <i class="fas fa-sync-alt"></i> 🔄 REFRESH SYSTEM
-        </button>
-      </div>
-    </div>
+    </form>
   </div>
 
-  <!-- CP Snapshot (esta vista) -->
-  <div style="margin-top:14px;padding:8px;border:2px solid #dc2626;border-radius:8px;font-size:12px;color:#333;background:#fef2f2;position:relative;">
-    <div style="position:absolute;top:-8px;left:16px;background:#dc2626;color:white;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:bold;">🚨 DIAGNÓSTICO ACTIVO</div>
-    <b>CP Snapshot (esta vista):</b><br>
-    ID={{ COMPANY_ID|default:"-" }}
-    | ADDRESS={{ COMPANY_ADDRESS|default:"-" }}
-    | PHONE={{ COMPANY_PHONE|default:"-" }}
-    | EMAIL={{ COMPANY_EMAIL|default:"-" }}
-    | WEB={{ COMPANY_WEBSITE|default:"-" }}
-    | TAX={{ COMPANY_TAX_RATE|default:"-" }}
+  <!-- Financial Configuration -->
+  <div class="config-card">
+    <div class="card-header">
+      <div class="card-icon">💰</div>
+      <div>
+        <h2 class="card-title">Financial Settings</h2>
+        <p class="card-subtitle">Configure currency, tax rates, and financial parameters</p>
+      </div>
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="section" value="financial">
+      
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">{{ form.currency.label }}</label>
+          {{ form.currency }}
+          {% if form.currency.errors %}
+            <div class="alert alert-error">{{ form.currency.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">{{ form.tax_rate.label }}</label>
+          {{ form.tax_rate }}
+          {% if form.tax_rate.errors %}
+            <div class="alert alert-error">{{ form.tax_rate.errors.0 }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">
+          {{ form.apply_tax_by_default }}
+          Apply Tax by Default
+        </label>
+        {% if form.apply_tax_by_default.errors %}
+          <div class="alert alert-error">{{ form.apply_tax_by_default.errors.0 }}</div>
+        {% endif %}
+      </div>
+
+      {% if not request.path|slice:':3' == '/us' %}
+      <div class="alert alert-info">
+        <strong>Note:</strong> In Chile use 19.00; in USA use 0.00 or local sales tax.
+      </div>
+      {% endif %}
+
+      <button type="submit" class="cyber-btn">
+        <span class="loading"></span>
+        💱 Update Financial
+      </button>
+    </form>
   </div>
 
+  <!-- Visual Theme Configuration -->
+  <div class="config-card">
+    <div class="card-header">
+      <div class="card-icon">🎨</div>
+      <div>
+        <h2 class="card-title">Visual Theme</h2>
+        <p class="card-subtitle">Customize your brand colors and visual preferences</p>
+      </div>
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="section" value="theme">
+      
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">{{ form.primary_color.label }}</label>
+          {{ form.primary_color }}
+          {% if form.primary_color.errors %}
+            <div class="alert alert-error">{{ form.primary_color.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">{{ form.secondary_color.label }}</label>
+          {{ form.secondary_color }}
+          {% if form.secondary_color.errors %}
+            <div class="alert alert-error">{{ form.secondary_color.errors.0 }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">
+          {{ form.separate_by_technician }}
+          Separate by Technician
+        </label>
+        {% if form.separate_by_technician.errors %}
+          <div class="alert alert-error">{{ form.separate_by_technician.errors.0 }}</div>
+        {% endif %}
+      </div>
+      </div>
+
+      <button type="submit" class="cyber-btn">
+        <span class="loading"></span>
+        🎨 Update Theme
+      </button>
+    </form>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="config-card">
+    <div class="card-header">
+      <div class="card-icon">⚡</div>
+      <div>
+        <h2 class="card-title">Quick Actions</h2>
+        <p class="card-subtitle">Access frequently used system functions</p>
+      </div>
+    </div>
+
+    <div class="quick-actions">
+      <a href="{% country_url 'configuracion_tecnicos' app_namespace='direct' %}" class="action-btn">
+        <span class="action-icon">👨‍🔧</span>
+        <div class="action-title">Manage Technicians</div>
+        <div class="action-desc">Configure technician profiles and permissions</div>
+      </a>
+
+      <a href="{% country_url 'centro_operaciones' app_namespace='direct' %}" class="action-btn">
+        <span class="action-icon">🛰️</span>
+        <div class="action-title">Space Center</div>
+        <div class="action-desc">Access the main operations dashboard</div>
+      </a>
+
+      <a href="/cl/documentos/" class="action-btn">
+        <span class="action-icon">📄</span>
+        <div class="action-title">Documents</div>
+        <div class="action-desc">Manage invoices and service records</div>
+      </a>
+
+      <button type="button" onclick="location.reload()" class="action-btn">
+        <span class="action-icon">🔄</span>
+        <div class="action-title">Refresh System</div>
+        <div class="action-desc">Reload configuration and clear cache</div>
+      </button>
+    </div>
+  </div>
 </div>
+
+<script>
+// Add some interactive effects
+document.addEventListener('DOMContentLoaded', function() {
+  // Animate cards on scroll
+  const cards = document.querySelectorAll('.config-card');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  });
+
+  cards.forEach(card => {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(20px)';
+    card.style.transition = 'all 0.6s ease';
+    observer.observe(card);
+  });
+
+  // Add loading effect to buttons
+  const buttons = document.querySelectorAll('.cyber-btn');
+  buttons.forEach(button => {
+    button.addEventListener('click', function() {
+      const loading = this.querySelector('.loading');
+      if (loading) {
+        loading.style.display = 'inline-block';
+        this.style.opacity = '0.7';
+      }
+    });
+  });
+});
+</script>
 {% endblock %}

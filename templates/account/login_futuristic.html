@@ -4,8 +4,14 @@
 {% load i18n %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/force_black_text.css' %}">
-<script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<link rel="stylesheet" href="{% static 'css/force_black_text.css' %}?v=20250928">
+<script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js" crossorigin="anonymous"></script>
+<script src="{% static 'js/login_effects.js' %}" defer></script>
+<!-- Script inline comentado - ahora se usa login_effects.js -->
+<!--
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   // Configuración futurista de partículas
@@ -120,6 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setInterval(drawMatrix, 50);
 });
 </script>
+-->
 {% endblock %}
 
 {% block fondo_extra %}
@@ -154,30 +161,32 @@ document.addEventListener("DOMContentLoaded", () => {
               <span class="hyphen">-</span>
               <span class="garage-text">GARAGE</span>
             </h1>
-            <div class="subtitle-tech">AUTOMOTIVE AI PLATFORM</div>
-            <div class="version-badge">v2.0 QUANTUM</div>
+            <div class="subtitle-tech">AUTOMOTIVE BUSINESS MANAGEMENT SYSTEM</div>
+            <div class="version-badge">Professional Edition</div>
           </div>
 
           <!-- Bandera holográfica según el país -->
+          {% with ctry=request.current_country|default:request.user.empresa.pais|default:"CL"|lower %}
           <div class="country-hologram">
-            {% if request.current_country == 'chile' %}
+            {% if ctry == 'chile' or ctry == 'cl' %}
             <div class="flag-hologram chile-flag">🇨🇱</div>
-            {% elif request.current_country == 'usa' %}
+            {% elif ctry == 'usa' or ctry == 'us' %}
             <div class="flag-hologram usa-flag">🇺🇸</div>
             {% endif %}
           </div>
+          {% endwith %}
         </div>
       </div>
 
       <!-- Título de login futurista -->
       <h2 class="cyber-title">
         <span class="cyber-bracket">[</span>
-        {% trans "NEURAL ACCESS REQUIRED" %}
+        {% trans "AUTHORIZED ACCESS REQUIRED" %}
         <span class="cyber-bracket">]</span>
       </h2>
 
       <!-- Debug info con estilo cyberpunk -->
-      {% if settings.DEBUG %}
+      {% if debug %}
       <div class="debug-panel">
         <div class="debug-line">COUNTRY: {{ country|default:'UNKNOWN' }}</div>
         <div class="debug-line">REDIRECT: {{ request.GET.next|default:'ROOT' }}</div>
@@ -185,8 +194,9 @@ document.addEventListener("DOMContentLoaded", () => {
       {% endif %}
 
       <!-- Formulario de login futurista -->
-      <form class="cyber-form" method="POST">
+      <form class="cyber-form" method="POST" action="{% url 'account_login' %}">
         {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.GET.next }}">
         {{ form.non_field_errors }}
 
         <!-- Neural Input Fields -->
@@ -195,7 +205,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="neural-field">
             <label class="neural-label" for="id_login">
               <span class="label-icon">👤</span>
-              {% trans "NEURAL ID" %}
+                  {% trans "USER CREDENTIALS" %}
             </label>
             <div class="input-container">
               {{ form.login|add_class:"neural-input" }}
@@ -203,7 +213,7 @@ document.addEventListener("DOMContentLoaded", () => {
               <div class="input-focus-effect"></div>
             </div>
             {% if form.login.errors %}
-              <div class="neural-error">
+              <div class="neural-error" aria-live="polite">
                 {% for error in form.login.errors %}{{ error }}{% endfor %}
               </div>
             {% endif %}
@@ -213,7 +223,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="neural-field">
             <label class="neural-label" for="id_password">
               <span class="label-icon">🔐</span>
-              {% trans "SECURITY CODE" %}
+                  {% trans "ACCESS CODE" %}
             </label>
             <div class="input-container">
               {{ form.password|add_class:"neural-input" }}
@@ -221,7 +231,7 @@ document.addEventListener("DOMContentLoaded", () => {
               <div class="input-focus-effect"></div>
             </div>
             {% if form.password.errors %}
-              <div class="neural-error">
+              <div class="neural-error" aria-live="polite">
                 {% for error in form.password.errors %}{{ error }}{% endfor %}
               </div>
             {% endif %}
@@ -241,7 +251,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         <!-- Botón de acceso neural -->
         <button type="submit" class="neural-access-btn">
-          <span class="btn-text">{% trans "INITIALIZE NEURAL LINK" %}</span>
+          <span class="btn-text">{% trans "AUTHENTICATE" %}</span>
           <div class="btn-scanner"></div>
           <div class="btn-particles"></div>
         </button>
@@ -251,15 +261,15 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="cyber-links">
         <a class="cyber-link" href="{% url 'account_reset_password' %}">
           <span class="link-icon">🔧</span>
-          {% trans "MEMORY RECOVERY" %}
+              {% trans "RECOVER ACCESS" %}
         </a>
       </div>
 
       <!-- Registro -->
       <div class="cyber-register">
-        {% trans "NEURAL PROFILE NOT FOUND?" %}
+        {% trans "Need system access?" %}
         <a class="register-link" href="/signup/">
-          {% trans "CREATE NEW NEURAL ID" %}
+            {% trans "REQUEST ACCESS" %}
         </a>
       </div>
 
@@ -414,7 +424,7 @@ body {
     100% { left: 100%; }
 }
 
-/* Logo masterpiece */
+/* Logo masterpiece - Updated 2025-09-28 22:45 */
 .logo-masterpiece {
     text-align: center;
     margin-bottom: 2rem;
@@ -432,12 +442,13 @@ body {
     margin-bottom: 1rem;
 }
 
+/* Logo size fixed - 120px instead of 250px - 2025-09-28 22:45 */
 .egarage-logo {
     width: 120px;
     height: 120px;
     border-radius: 50%;
     border: 3px solid rgba(0, 255, 136, 0.8);
-    padding: 10px;
+    padding: 12px;
     background:
         radial-gradient(circle,
             rgba(0, 255, 136, 0.1) 0%,
@@ -472,10 +483,10 @@ body {
 
 .logo-aura {
     position: absolute;
-    top: -20px;
-    left: -20px;
-    right: -20px;
-    bottom: -20px;
+    top: -15px;
+    left: -15px;
+    right: -15px;
+    bottom: -15px;
     border-radius: 50%;
     background:
         radial-gradient(circle,
@@ -507,20 +518,20 @@ body {
 }
 
 .ring-1 {
-    width: 180px;
-    height: 180px;
+    width: 340px;
+    height: 340px;
     animation: ring-rotate-1 10s linear infinite;
 }
 
 .ring-2 {
-    width: 220px;
-    height: 220px;
+    width: 380px;
+    height: 380px;
     animation: ring-rotate-2 15s linear infinite reverse;
 }
 
 .ring-3 {
-    width: 260px;
-    height: 260px;
+    width: 420px;
+    height: 420px;
     animation: ring-rotate-3 20s linear infinite;
 }
 
@@ -559,10 +570,10 @@ body {
 }
 
 .egarage-title {
-    font-size: 3rem;
+    font-size: 4rem;
     font-weight: 900;
     font-family: 'Courier New', monospace;
-    letter-spacing: 8px;
+    letter-spacing: 10px;
     margin: 0;
     background: linear-gradient(45deg,
         #00ff88,
@@ -1082,13 +1093,13 @@ body {
     }
 
     .egarage-logo {
-        width: 100px;
-        height: 100px;
+        width: 200px;
+        height: 200px;
     }
 
     .egarage-title {
-        font-size: 2rem;
-        letter-spacing: 4px;
+        font-size: 2.5rem;
+        letter-spacing: 5px;
     }
 
     .neural-access-btn {
@@ -1111,6 +1122,23 @@ body {
 .hologram-card select,
 .hologram-card textarea {
     color: inherit !important;
+}
+
+/* Prefers reduced motion - desactivar animaciones para usuarios que lo prefieren */
+@media (prefers-reduced-motion: reduce) {
+  .matrix-canvas,
+  #tsparticles,
+  .logo-rings,
+  .cyberpunk-scanlines,
+  .egarage-logo,
+  .subtitle-tech,
+  .version-badge,
+  .cyber-title,
+  .btn-scanner,
+  .btn-particles {
+    animation: none !important;
+    transition: none !important;
+  }
 }
 </style>
 {% endblock %}

@@ -46,3 +46,21 @@ class ClientesAutocomplete(
         ein = getattr(obj, "ein", "") or ""
         id_show = rut or ein
         return f"{nombre} — {id_show}" if id_show else nombre
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

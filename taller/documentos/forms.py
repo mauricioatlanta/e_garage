@@ -1,174 +1,178 @@
 from django import forms
+from django.core.exceptions import ValidationError
+from dal import autocomplete
 
 from taller.models.clientes import Cliente
-from taller.models.tecnico import Tecnico
+from taller.models.documento import Documento
 from taller.models.vehiculos import Vehiculo
-
-from .models import Documento
 
 
 class DocumentoForm(forms.ModelForm):
-    # Campo de búsqueda AJAX para clientes
-    cliente_busqueda = forms.CharField(
-        label="Buscar Cliente",
-        required=False,
-        widget=forms.TextInput(
+    # Autocomplete: parte en none() para no cargar todo ni filtrar mal
+    cliente = forms.ModelChoiceField(
+        queryset=Cliente.objects.none(),
+        widget=autocomplete.ModelSelect2(
+            url="cl_autocomplete:cliente",  # se sobrescribe según país más abajo
             attrs={
-                "class": "form-control",
-                "placeholder": "Escribe para buscar clientes...",
-                "autocomplete": "off",
-                "id": "cliente-busqueda",
-            }
+                "data-placeholder": "🔍 Buscar cliente...",
+                "data-minimum-input-length": 2,
+            },
         ),
+        required=False,
     )
-
-    # Campo personalizado para millas/kilometraje del vehículo
-    kilometraje = forms.CharField(
-        label="Kilometraje/Millas",
-        required=False,
-        widget=forms.TextInput(
+    
+    vehiculo = forms.ModelChoiceField(
+        queryset=Vehiculo.objects.none(),
+        widget=autocomplete.ModelSelect2(
+            url="cl_autocomplete:vehiculo",  # se sobrescribe según país
+            forward=["cliente"],  # DAL enviará el cliente elegido
             attrs={
-                "class": "form-input input-number",
-                "type": "number",
-                "step": "1",
-                "min": "0",
-                "placeholder": "0",
-            }
+                "data-placeholder": "🔍 Buscar vehículo...",
+                "data-minimum-input-length": 1,
+            },
         ),
+        required=False,
     )
 
     def __init__(self, *args, **kwargs):
+        # Extras
+        self.user = kwargs.pop("user", None)
         self.empresa = kwargs.pop("empresa", None)
-        self.user = kwargs.pop("user", None)  # Agregar soporte para user
+        self.country = kwargs.pop("country", "CL")
         super().__init__(*args, **kwargs)
 
-        # Configurar widgets con clases CSS
-        widget_attrs = {"class": "form-control"}
-        for field_name, field in self.fields.items():
-            if field_name not in [
-                "pagado",
-                "cliente_busqueda",
-            ]:  # Excepto campos que ya tienen widgets específicos
-                if hasattr(field.widget, "attrs"):
-                    field.widget.attrs.update(widget_attrs)
+        # Resolver empresa segura
+        empresa = self.empresa or (getattr(self.user, "empresa", None))
 
-        # Inicializar campo kilometraje con valor del vehículo
-        if (
-            self.instance
-            and hasattr(self.instance, "vehiculo")
-            and self.instance.vehiculo
-            and hasattr(self.instance.vehiculo, "millas")
-            and self.instance.vehiculo.millas
-        ):
-            self.fields["kilometraje"].initial = self.instance.vehiculo.millas
+        # Normaliza namespace de país para URLs DAL
+        ns = "usa_autocomplete" if (self.country or "").upper() == "US" else "cl_autocomplete"
+        self.fields["cliente"].widget.url = f"{ns}:cliente"
+        self.fields["vehiculo"].widget.url = f"{ns}:vehiculo"
 
-        # Configurar queryset de técnicos incluyendo el actual
-        # Usar la empresa pasada por parámetro o la del documento
-        empresa = self.empresa or (
-            self.instance.empresa
-            if self.instance and self.instance.empresa_id
-            else None
-        )
-        if self.user and hasattr(self.user, "empresa"):
-            empresa = empresa or self.user.empresa
+        # Labels y choices según país (solo si el campo existe en el form)
+        if self.country.upper() == "US":
+            if "tipo" in self.fields:
+                self.fields["tipo"].label = "Document Type"
+                self.fields["tipo"].choices = [
+                    ("OT", "Work Order"),
+                    ("PRES", "Estimate"),
+                    ("REC", "Receipt/Invoice"),
+                ]
+            if "cliente" in self.fields: self.fields["cliente"].label = "Customer"
+            if "vehiculo" in self.fields: self.fields["vehiculo"].label = "Vehicle"
+            if "tecnico_responsable" in self.fields: self.fields["tecnico_responsable"].label = "Assigned Technician"
+            if "fecha_emision" in self.fields: self.fields["fecha_emision"].label = "Issue Date"
+            if "kilometraje" in self.fields: self.fields["kilometraje"].label = "Mileage"
+            if "observaciones" in self.fields: self.fields["observaciones"].label = "Observations"
+            if "pagado" in self.fields: self.fields["pagado"].label = "Paid"
+            if "numero" in self.fields: self.fields["numero"].label = "Number"
+            # Placeholders
+            self.fields["cliente"].widget.attrs["data-placeholder"] = "🔍 Search customer..."
+            self.fields["vehiculo"].widget.attrs["data-placeholder"] = "🔍 Search vehicle..."
+        else:
+            if "tipo" in self.fields:
+                self.fields["tipo"].label = "Tipo de Documento"
+                self.fields["tipo"].choices = [
+                    ("OT", "Orden de Trabajo"),
+                    ("PRES", "Presupuesto"),
+                    ("REC", "Recibo/Boleta"),
+                ]
+            if "cliente" in self.fields: self.fields["cliente"].label = "Cliente"
+            if "vehiculo" in self.fields: self.fields["vehiculo"].label = "Vehículo"
+            if "tecnico_responsable" in self.fields: self.fields["tecnico_responsable"].label = "Técnico Responsable"
+            if "fecha_emision" in self.fields: self.fields["fecha_emision"].label = "Fecha de Emisión"
+            if "kilometraje" in self.fields: self.fields["kilometraje"].label = "Kilometraje"
+            if "observaciones" in self.fields: self.fields["observaciones"].label = "Observaciones"
+            if "pagado" in self.fields: self.fields["pagado"].label = "Pagado"
+            if "numero" in self.fields: self.fields["numero"].label = "Número"
+            # Placeholders
+            self.fields["cliente"].widget.attrs["data-placeholder"] = "🔍 Buscar cliente..."
+            self.fields["vehiculo"].widget.attrs["data-placeholder"] = "🔍 Buscar vehículo..."
 
+        # Asegurar IDs únicos para JavaScript
+        self.fields['tipo'].widget.attrs.setdefault("id", "id_tipo")
+        self.fields['numero'].widget.attrs.setdefault("id", "id_numero")
+        self.fields['fecha_emision'].widget.attrs.setdefault("id", "id_fecha_emision")
+        self.fields['cliente'].widget.attrs.setdefault("id", "id_cliente")
+        self.fields['vehiculo'].widget.attrs.setdefault("id", "id_vehiculo")
+        self.fields['tecnico_responsable'].widget.attrs.setdefault("id", "id_tecnico_responsable")
+        self.fields['kilometraje'].widget.attrs.setdefault("id", "id_kilometraje")
+        self.fields['observaciones'].widget.attrs.setdefault("id", "id_observaciones")
+        self.fields['pagado'].widget.attrs.setdefault("id", "id_pagado")
+
+        # Filtra querysets por empresa (y asegura que la instancia actual sea visible)
         if empresa:
-            # Configurar querysets por empresa para evitar "Select a valid choice"
-            self.fields["tecnico_responsable"].queryset = Tecnico.objects.filter(
-                empresa=empresa
-            )
-            self.fields["cliente"].queryset = Cliente.objects.filter(empresa=empresa)
+            if "tecnico_responsable" in self.fields:
+                from taller.models.tecnico import Tecnico  # importar aquí para mantener este archivo limpio de modelos no usados
+                self.fields["tecnico_responsable"].queryset = Tecnico.objects.filter(empresa=empresa)
 
-            # Para vehículos, mostrar solo los del cliente seleccionado o todos si no hay cliente
-            if (
-                self.instance
-                and hasattr(self.instance, "cliente")
-                and self.instance.cliente
-            ):
-                self.fields["vehiculo"].queryset = Vehiculo.objects.filter(
-                    empresa=empresa, cliente=self.instance.cliente
-                )
+            # Cliente: si hay instance o POST, incluye el seleccionado
+            qs_cli = Cliente.objects.filter(empresa=empresa)
+            cliente_id = self.data.get("cliente") or getattr(self.instance, "cliente_id", None)
+            if cliente_id:
+                try:
+                    qs_cli = qs_cli | Cliente.objects.filter(pk=int(cliente_id), empresa=empresa)
+                except (ValueError, TypeError):
+                    pass
+            self.fields["cliente"].queryset = qs_cli.distinct()
+
+            # Vehículo: filtra por empresa y, si hay cliente (POST/instance), por cliente
+            qs_veh = Vehiculo.objects.filter(empresa=empresa)
+            if cliente_id:
+                try:
+                    qs_veh = qs_veh.filter(cliente_id=int(cliente_id))
+                except (ValueError, TypeError):
+                    qs_veh = Vehiculo.objects.none()
             else:
-                self.fields["vehiculo"].queryset = Vehiculo.objects.filter(
-                    empresa=empresa
-                )
+                # si venía un vehiculo en instance, inclúyelo para renderizar
+                if getattr(self.instance, "vehiculo_id", None):
+                    qs_veh = Vehiculo.objects.filter(pk=self.instance.vehiculo_id, empresa=empresa)
+            self.fields["vehiculo"].queryset = qs_veh.distinct()
+        else:
+            # sin empresa -> nada visible
+            self.fields["cliente"].queryset = Cliente.objects.none()
+            self.fields["vehiculo"].queryset = Vehiculo.objects.none()
+            if "tecnico_responsable" in self.fields:
+                from taller.models.tecnico import Tecnico
+                self.fields["tecnico_responsable"].queryset = Tecnico.objects.none()
+    
+    # Validación multi-tenant y coherencia cliente↔vehículo
+    def clean(self):
+        cleaned = super().clean()
+        empresa = self.empresa or (getattr(self.user, "empresa", None))
+        cliente = cleaned.get("cliente")
+        vehiculo = cleaned.get("vehiculo")
 
-        # Configurar widget para el campo pagado
-        self.fields["pagado"].widget = forms.CheckboxInput(
-            attrs={"class": "form-check-input", "id": "switchPagado"}
-        )
+        if empresa and cliente and cliente.empresa_id != empresa.id:
+            raise ValidationError("El cliente no pertenece a tu empresa.")
 
-    def save(self, commit=True):
-        instance = super().save(commit=False)
+        if empresa and vehiculo and vehiculo.empresa_id != empresa.id:
+            raise ValidationError("El vehículo no pertenece a tu empresa.")
 
-        # Manejar el campo kilometraje personalizado
-        kilometraje_val = self.cleaned_data.get("kilometraje")
-        if kilometraje_val:
-            try:
-                val = int(kilometraje_val)
-                if (
-                    self.instance
-                    and hasattr(self.instance, "vehiculo")
-                    and self.instance.vehiculo
-                ):
-                    v = self.instance.vehiculo
-                    if val is not None:
-                        if hasattr(v, "millas"):
-                            v.millas = val
-                            if commit:
-                                v.save(update_fields=["millas"])
-                        elif hasattr(v, "kilometraje"):
-                            v.kilometraje = val
-                            if commit:
-                                v.save(update_fields=["kilometraje"])
-            except (ValueError, TypeError) as e:
-                # Manejar errores de conversión de tipo
-                print(f"Error al guardar kilometraje: {e}")
+        if cliente and vehiculo and vehiculo.cliente_id != cliente.id:
+            raise ValidationError("El vehículo seleccionado no pertenece al cliente.")
 
-        return instance
+        return cleaned
+    
 
     class Meta:
         model = Documento
-        exclude = (
-            "numero",
-            "correlativo",
-            "moneda",
-            "country",
-            "estado_pago",
-            "empresa",
-            "neto_repuestos",
-            "neto_servicios",
-            "neto_otros_servicios",
-            "descuento",
-            "tax_rate_applied",
-            "tax_amount",
-            "total",
-            "created_at",
-        )
+        # 🔒 Lista blanca — ajusta a tus campos públicos editables
+        fields = [
+            "tipo",
+            "numero", 
+            "fecha_emision",
+            "cliente",
+            "vehiculo",
+            "tecnico_responsable",
+            "kilometraje",  # Campo existe en el modelo
+            "observaciones",
+            "pagado",
+        ]
         widgets = {
-            "tipo": forms.Select(attrs={"class": "form-select", "id": "id_tipo"}),
-            "numero": forms.TextInput(
-                attrs={"class": "form-control", "readonly": "readonly"}
-            ),
-            "fecha_emision": forms.DateInput(
-                attrs={"class": "form-control", "type": "date"}
-            ),
-            "cliente": forms.Select(attrs={"class": "form-select", "id": "id_cliente"}),
-            "vehiculo": forms.Select(
-                attrs={"class": "form-select", "id": "id_vehiculo"}
-            ),
-            "tecnico_responsable": forms.Select(attrs={"class": "form-select"}),
-            "kilometraje": forms.NumberInput(
-                attrs={"class": "form-control", "min": "0"}
-            ),
-            "moneda": forms.Select(attrs={"class": "form-select"}),
-            "pagado": forms.CheckboxInput(
-                attrs={"class": "form-check-input", "id": "switchPagado"}
-            ),
-            "apply_vat": forms.CheckboxInput(attrs={"class": "form-check-input"}),
-            "observaciones": forms.Textarea(
-                attrs={"class": "form-control", "rows": "4"}
-            ),
+            "numero": forms.TextInput(attrs={"class": "form-control", "readonly": "readonly"}),
+            "fecha_emision": forms.DateInput(attrs={"class": "form-control", "type": "date"}),
+            "observaciones": forms.Textarea(attrs={"class": "form-control", "rows": "4"}),
         }
 
 

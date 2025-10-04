@@ -64,7 +64,7 @@ class RepuestoForm(forms.ModelForm):
 
 
 RepuestoFormSet = formset_factory(
-    RepuestoForm, extra=1, can_delete=True, formset=BaseFormSet
+    RepuestoForm, extra=0, can_delete=True, min_num=1, validate_min=True, formset=BaseFormSet
 )
 
 
@@ -112,7 +112,7 @@ class ServicioForm(forms.ModelForm):
 
 
 ServicioFormSet = formset_factory(
-    ServicioForm, extra=1, can_delete=True, formset=BaseFormSet
+    ServicioForm, extra=0, can_delete=True, formset=BaseFormSet
 )
 
 
@@ -172,5 +172,31 @@ class OtroServicioForm(forms.ModelForm):
 
 
 OtroServicioFormSet = formset_factory(
-    OtroServicioForm, extra=1, can_delete=True, formset=BaseFormSet
+    OtroServicioForm, extra=0, can_delete=True, formset=BaseFormSet
 )
+
+
+def guardar_formset(formset, doc, empresa, user):
+    """
+    Guarda líneas amarrándolas al documento/empresa y completando auditoría.
+    Aplica reglas básicas; reglas de IVA/sales tax deben ir en los forms o servicios.
+    """
+    if not formset.is_valid():
+        return False
+    saved_any = False
+    for form in formset:
+        if not getattr(form, "cleaned_data", None) or form.cleaned_data.get("DELETE"):
+            continue
+        obj = form.save(commit=False)
+        # Multi-tenant & herencia básica
+        if hasattr(obj, "documento"):
+            obj.documento = doc
+        if hasattr(obj, "empresa"):
+            obj.empresa = empresa
+        if hasattr(obj, "created_by") and not getattr(obj, "pk", None):
+            obj.created_by = user
+        if hasattr(obj, "updated_by"):
+            obj.updated_by = user
+        obj.save()
+        saved_any = True
+    return saved_any
