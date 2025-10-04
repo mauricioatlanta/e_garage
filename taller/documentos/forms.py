@@ -64,6 +64,7 @@ class DocumentoForm(forms.ModelForm):
             if "fecha_emision" in self.fields: self.fields["fecha_emision"].label = "Issue Date"
             if "kilometraje" in self.fields: self.fields["kilometraje"].label = "Mileage"
             if "observaciones" in self.fields: self.fields["observaciones"].label = "Observations"
+            if "estado_pago" in self.fields: self.fields["estado_pago"].label = "Payment Status"
             if "pagado" in self.fields: self.fields["pagado"].label = "Paid"
             if "numero" in self.fields: self.fields["numero"].label = "Number"
             # Placeholders
@@ -83,6 +84,7 @@ class DocumentoForm(forms.ModelForm):
             if "fecha_emision" in self.fields: self.fields["fecha_emision"].label = "Fecha de Emisión"
             if "kilometraje" in self.fields: self.fields["kilometraje"].label = "Kilometraje"
             if "observaciones" in self.fields: self.fields["observaciones"].label = "Observaciones"
+            if "estado_pago" in self.fields: self.fields["estado_pago"].label = "Estado de Pago"
             if "pagado" in self.fields: self.fields["pagado"].label = "Pagado"
             if "numero" in self.fields: self.fields["numero"].label = "Número"
             # Placeholders
@@ -97,6 +99,7 @@ class DocumentoForm(forms.ModelForm):
         self.fields['vehiculo'].widget.attrs.setdefault("id", "id_vehiculo")
         self.fields['tecnico_responsable'].widget.attrs.setdefault("id", "id_tecnico_responsable")
         self.fields['kilometraje'].widget.attrs.setdefault("id", "id_kilometraje")
+        self.fields['estado_pago'].widget.attrs.setdefault("id", "id_estado_pago")
         self.fields['observaciones'].widget.attrs.setdefault("id", "id_observaciones")
         self.fields['pagado'].widget.attrs.setdefault("id", "id_pagado")
 
@@ -167,12 +170,15 @@ class DocumentoForm(forms.ModelForm):
             "tecnico_responsable",
             "kilometraje",  # Campo existe en el modelo
             "observaciones",
+            "estado_pago",  # Payment Status
             "pagado",
         ]
         widgets = {
             "numero": forms.TextInput(attrs={"class": "form-control", "readonly": "readonly"}),
             "fecha_emision": forms.DateInput(attrs={"class": "form-control", "type": "date"}),
             "observaciones": forms.Textarea(attrs={"class": "form-control", "rows": "4"}),
+            "estado_pago": forms.Select(attrs={"class": "form-control"}),
+            "pagado": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
 
 
