@@ -244,9 +244,9 @@ def configuracion_tecnicos(request):
         from django.shortcuts import redirect
 
         if hasattr(request.user, "empresa") and request.user.empresa.pais == "US":
-            return redirect("/us/taller/configuracion/tecnicos/")
+            return redirect("/us/configuracion/tecnicos/")
         else:
-            return redirect("/cl/taller/configuracion/tecnicos/")
+            return redirect("/cl/configuracion/tecnicos/")
 
     # Obtener técnicos ordenados: primero los activos, luego por nombre
     tecnicos = Tecnico.objects.filter(empresa=empresa).order_by("-activo", "nombre")
