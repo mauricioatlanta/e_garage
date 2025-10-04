@@ -58,14 +58,32 @@ body {
 }
 
 .form-label {
-    color: #e2e8f0 !important;
+    color: #ffffff !important;
     font-size: 0.9rem;
     font-weight: bold;
     text-transform: uppercase;
     letter-spacing: 1px;
     margin-bottom: 0.5rem;
     display: block;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* 🎯 ESTILOS PARA ETIQUETAS - MEJOR CONTRASTE */
+label,
+.form-label,
+.form-group label,
+.form-check-label {
+    color: #ffffff !important;
+    font-weight: bold !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
+}
+
+/* Estilos para etiquetas de campos específicos */
+#document-form label,
+#document-form .form-label {
+    color: #ffffff !important;
+    font-weight: bold !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
 }
 
 /* 🎨 ESTILOS UNIFICADOS PARA TODOS LOS CAMPOS DE FORMULARIO - MEJORADO PARA MEJOR CONTRASTE */
@@ -78,8 +96,12 @@ input[type="date"],
 input[type="number"],
 input[type="email"],
 input[type="tel"],
+input[type="password"],
+input[type="search"],
+input[type="url"],
 select,
-textarea {
+textarea,
+input {
     background: rgba(15, 15, 35, 0.98) !important;
     border: 2px solid var(--cyber-purple) !important;
     border-radius: 12px !important;
@@ -93,6 +115,103 @@ textarea {
     box-shadow: 0 4px 15px rgba(128, 0, 255, 0.15) !important;
     min-height: 48px !important;
     line-height: 1.4 !important;
+}
+
+/* 🎯 FORZAR ESTILOS NEGROS PARA TODOS LOS INPUTS - SIN EXCEPCIONES */
+*[type="text"],
+*[type="date"],
+*[type="number"],
+*[type="email"],
+*[type="tel"],
+*[type="password"],
+*[type="search"],
+*[type="url"],
+*[type="hidden"],
+select,
+textarea,
+input,
+.form-control,
+.form-select,
+.form-input,
+.form-textarea {
+    background: rgba(15, 15, 35, 0.98) !important;
+    color: #ffffff !important;
+    border: 2px solid var(--cyber-purple) !important;
+}
+
+/* 🎯 ESPECÍFICO PARA CAMPOS DAL (Django Autocomplete Light) */
+.select2-container .select2-selection--single,
+.select2-container .select2-selection--multiple,
+.select2-dropdown {
+    background: rgba(15, 15, 35, 0.98) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    color: #ffffff !important;
+}
+
+.select2-container .select2-selection--single .select2-selection__rendered,
+.select2-container .select2-selection--multiple .select2-selection__choice {
+    color: #ffffff !important;
+}
+
+.select2-results__option {
+    background: rgba(15, 15, 35, 0.98) !important;
+    color: #ffffff !important;
+}
+
+.select2-results__option--highlighted {
+    background: rgba(0, 255, 136, 0.3) !important;
+    color: #ffffff !important;
+}
+
+/* 🎯 ESTILOS ADICIONALES PARA ASEGURAR FONDO NEGRO EN TODOS LOS CAMPOS */
+/* Forzar estilos en todos los elementos del formulario */
+form input,
+form select,
+form textarea,
+form .form-control,
+form .form-select,
+form .form-input,
+form .form-textarea {
+    background: rgba(15, 15, 35, 0.98) !important;
+    color: #ffffff !important;
+    border: 2px solid var(--cyber-purple) !important;
+}
+
+/* Estilos para campos específicos del formulario de documentos */
+#document-form input,
+#document-form select,
+#document-form textarea {
+    background: rgba(15, 15, 35, 0.98) !important;
+    color: #ffffff !important;
+    border: 2px solid var(--cyber-purple) !important;
+}
+
+/* Estilos para tablas y elementos adicionales */
+.table input,
+.table select,
+.table textarea {
+    background: rgba(15, 15, 35, 0.98) !important;
+    color: #ffffff !important;
+    border: 2px solid var(--cyber-purple) !important;
+}
+
+/* Estilos para elementos de Bootstrap que puedan interferir */
+.form-control,
+.form-select,
+.form-input,
+.form-textarea {
+    background: rgba(15, 15, 35, 0.98) !important;
+    color: #ffffff !important;
+    border: 2px solid var(--cyber-purple) !important;
+}
+
+/* Estilos para elementos de Django forms */
+.django-form input,
+.django-form select,
+.django-form textarea {
+    background: rgba(15, 15, 35, 0.98) !important;
+    color: #ffffff !important;
+    border: 2px solid var(--cyber-purple) !important;
 }
 
 .form-input:focus,
