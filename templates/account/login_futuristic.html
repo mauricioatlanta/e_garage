@@ -161,8 +161,8 @@ document.addEventListener("DOMContentLoaded", () => {
               <span class="hyphen">-</span>
               <span class="garage-text">GARAGE</span>
             </h1>
-            <div class="subtitle-tech">AUTOMOTIVE BUSINESS MANAGEMENT SYSTEM</div>
-            <div class="version-badge">Professional Edition</div>
+            <div class="subtitle-tech">AUTOMOTIVE WORKSHOP MANAGEMENT</div>
+            <div class="version-badge">Professional</div>
           </div>
 
           <!-- Bandera holográfica según el país -->
@@ -178,10 +178,10 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
       </div>
 
-      <!-- Título de login futurista -->
+      <!-- Título de login -->
       <h2 class="cyber-title">
         <span class="cyber-bracket">[</span>
-        {% trans "AUTHORIZED ACCESS REQUIRED" %}
+        {% trans "LOGIN TO YOUR ACCOUNT" %}
         <span class="cyber-bracket">]</span>
       </h2>
 
@@ -205,7 +205,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="neural-field">
             <label class="neural-label" for="id_login">
               <span class="label-icon">👤</span>
-                  {% trans "USER CREDENTIALS" %}
+                  {% trans "USERNAME OR EMAIL" %}
             </label>
             <div class="input-container">
               {{ form.login|add_class:"neural-input" }}
@@ -223,7 +223,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="neural-field">
             <label class="neural-label" for="id_password">
               <span class="label-icon">🔐</span>
-                  {% trans "ACCESS CODE" %}
+                  {% trans "PASSWORD" %}
             </label>
             <div class="input-container">
               {{ form.password|add_class:"neural-input" }}
@@ -249,9 +249,9 @@ document.addEventListener("DOMContentLoaded", () => {
           {% endif %}
         </div>
 
-        <!-- Botón de acceso neural -->
+        <!-- Botón de login -->
         <button type="submit" class="neural-access-btn">
-          <span class="btn-text">{% trans "AUTHENTICATE" %}</span>
+          <span class="btn-text">{% trans "LOGIN" %}</span>
           <div class="btn-scanner"></div>
           <div class="btn-particles"></div>
         </button>
@@ -261,15 +261,15 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="cyber-links">
         <a class="cyber-link" href="{% url 'account_reset_password' %}">
           <span class="link-icon">🔧</span>
-              {% trans "RECOVER ACCESS" %}
+              {% trans "FORGOT PASSWORD?" %}
         </a>
       </div>
 
       <!-- Registro -->
       <div class="cyber-register">
-        {% trans "Need system access?" %}
+        {% trans "Don't have an account?" %}
         <a class="register-link" href="/signup/">
-            {% trans "REQUEST ACCESS" %}
+            {% trans "SIGN UP" %}
         </a>
       </div>
 
@@ -281,16 +281,16 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
       {% endif %}
 
-      <!-- Créditos futuristas -->
+      <!-- Créditos -->
       <div class="neural-credits">
         <div class="credits-header">POWERED BY</div>
-        <div class="credits-company">ATLANTA RECICLAJES™</div>
+        <div class="credits-company">E-GARAGE™</div>
         <div class="credits-links">
-          <a href="mailto:suscripcion@atlantareciclajes.cl" class="credit-link">
-            📧 NEURAL.CONTACT
+          <a href="mailto:support@egarage.com" class="credit-link">
+            📧 SUPPORT
           </a>
-          <a href="http://www.atlantareciclajes.cl" class="credit-link">
-            🌐 MATRIX.PORTAL
+          <a href="https://www.egarage.com" class="credit-link">
+            🌐 WEBSITE
           </a>
         </div>
       </div>
