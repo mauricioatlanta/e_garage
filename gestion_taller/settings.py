@@ -32,6 +32,9 @@ CSRF_TRUSTED_ORIGINS = [
 SECURE_SSL_REDIRECT = env_bool("DJANGO_SECURE_SSL_REDIRECT", not DEBUG)
 SESSION_COOKIE_SECURE = env_bool("DJANGO_SESSION_COOKIE_SECURE", not DEBUG)
 CSRF_COOKIE_SECURE = env_bool("DJANGO_CSRF_COOKIE_SECURE", not DEBUG)
+CSRF_COOKIE_HTTPONLY = False  # Permitir acceso desde JavaScript si es necesario
+CSRF_COOKIE_SAMESITE = 'Lax'  # Más permisivo para desarrollo
+CSRF_USE_SESSIONS = False  # Usar cookies en lugar de sesiones para CSRF
 SECURE_HSTS_SECONDS = int(
     os.getenv("DJANGO_SECURE_HSTS_SECONDS", "0" if DEBUG else "31536000")
 )
@@ -50,11 +53,20 @@ USE_X_FORWARDED_HOST = True
 
 # ---------- CSRF trusted desde ALLOWED_HOSTS si no se define explícito ----------
 if not CSRF_TRUSTED_ORIGINS:
-    CSRF_TRUSTED_ORIGINS = [
-        f"https://{h}"
-        for h in ALLOWED_HOSTS
-        if h not in {"*", "localhost", "127.0.0.1"}
-    ]
+    if DEBUG:
+        # En desarrollo, agregar localhost y 127.0.0.1
+        CSRF_TRUSTED_ORIGINS = [
+            "http://127.0.0.1:8000",
+            "http://localhost:8000",
+            "http://127.0.0.1:3000",
+            "http://localhost:3000",
+        ]
+    else:
+        CSRF_TRUSTED_ORIGINS = [
+            f"https://{h}"
+            for h in ALLOWED_HOSTS
+            if h not in {"*", "localhost", "127.0.0.1"}
+        ]
 
 # ---------- Sites / Allauth ----------
 SITE_ID = 1
