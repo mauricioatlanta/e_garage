@@ -56,7 +56,7 @@ El error específico indica que el carácter `\xf1` (la letra **ñ**) en la posi
    ```bash
    # Si usas systemctl
    sudo systemctl restart gunicorn
-   
+
    # O simplemente detener y volver a iniciar el servidor de desarrollo
    python manage.py runserver
    ```
@@ -104,9 +104,3 @@ Al crear cuentas de email para aplicaciones Django/Python:
 ---
 
 **Nota:** Este es un problema conocido de Python's `smtplib` que no soporta autenticación con passwords UTF-8. No es un bug de Django ni de eGarage, sino una limitación del protocolo SMTP AUTH PLAIN.
-
-
-
-
-
-

@@ -187,7 +187,7 @@ PC (Desarrollo)  →  Git (GitHub/GitLab)  →  Servidor (PythonAnywhere)
 ## 📞 En Caso de Emergencia
 
 1. **Rollback inmediato**: Ver sección "Rollback" arriba
-2. **Restaurar backup**: 
+2. **Restaurar backup**:
    ```bash
    cd /home/atlantareciclajes/apps/egarage
    tar -xzf ~/backups/egarage_TIMESTAMP.tar.gz
@@ -198,4 +198,3 @@ PC (Desarrollo)  →  Git (GitHub/GitLab)  →  Servidor (PythonAnywhere)
 
 **Última actualización**: $(date)
 **Mantenido por**: Tu equipo
-

@@ -1,6 +1,6 @@
 # 🌍 Sistema de Detección de País - eGarage
 
-**Fecha:** 27 de Octubre, 2025  
+**Fecha:** 27 de Octubre, 2025
 **Pregunta:** ¿Cómo reconoce la app que un suscriptor es de USA o de Chile?
 
 ---
@@ -202,11 +202,11 @@ if not country:
 **Campo:** `pais`
 
 ```sql
-SELECT user_id, nombre_taller, pais 
+SELECT user_id, nombre_taller, pais
 FROM taller_empresa;
 
 user_id | nombre_taller      | pais
---------|--------------------|----- 
+--------|--------------------|-----
 1       | Atlanta Auto Shop  | US
 2       | Taller Central     | CL
 3       | Miami Garage       | US
@@ -236,7 +236,7 @@ user_id | nombre_taller      | pais
 # En views.py
 def dashboard(request):
     pais = request.empresa.pais  # "US" o "CL"
-    
+
     if pais == "US":
         precios_en_usd()
     else:
@@ -296,7 +296,7 @@ def signup_view(request):
         pais = 'US'
     else:
         pais = 'CL'
-    
+
     # Crear empresa con país
     empresa = Empresa.objects.create(
         user=new_user,
@@ -314,16 +314,16 @@ def signup_view(request):
 ```python
 MIDDLEWARE = [
     # ... otros middlewares
-    
+
     # 1. Detecta empresa del usuario
     'taller.middleware.empresa_middleware.EmpresaMiddleware',
-    
+
     # 2. Detecta país y redirige si es necesario
     'taller.middleware.simple_country_redirect.SimpleCountryRedirectMiddleware',
-    
+
     # 3. Establece idioma según país
     'taller.middleware.lang_policy.LanguagePolicyMiddleware',
-    
+
     # ... otros middlewares
 ]
 ```
@@ -447,15 +447,15 @@ class CountryContextMiddleware:
             country = 'US'
         elif request.path.startswith('/cl/'):
             country = 'CL'
-        
+
         # 2. Desde usuario autenticado
         elif request.user.is_authenticated:
             country = request.user.empresa.pais
-        
+
         # 3. Default
         else:
             country = 'CL'
-        
+
         request.country = country
         return None
 ```
@@ -490,19 +490,19 @@ def country_aware_login(request):
     # 1. Parámetro 'next' en URL
     if next_url.startswith("/us/"):
         request.country = "US"
-    
+
     # 2. Usuario autenticado
     elif request.user.empresa.pais:
         request.country = request.user.empresa.pais
-    
+
     # 3. Parámetro country
     elif request.GET.get("country") == "US":
         request.country = "US"
-    
+
     # 4. Default
     else:
         request.country = "CL"
-    
+
     # Usar template específico
     if request.country == "US":
         template = "taller/us/en/account/login.html"
@@ -530,23 +530,23 @@ def country_aware_login(request):
 ```
 Paso 1: Usuario en USA visita landing
   URL: http://egarage.com/
-  
+
 Paso 2: Selecciona país
   Clic en: 🇺🇸 United States
   URL: http://egarage.com/us/
-  
+
 Paso 3: Hace signup
   URL: http://egarage.com/us/signup/
   Formulario detecta automáticamente país = "US"
-  
+
 Paso 4: Crea cuenta
   Sistema crea:
     - Usuario: joe@example.com
     - Empresa: pais = "US"
-  
+
 Paso 5: Login automático
   Redirige a: http://egarage.com/us/dashboard/
-  
+
 ✅ De ahora en adelante:
   - TODAS las páginas en inglés
   - TODOS los precios en USD
@@ -560,23 +560,23 @@ Paso 5: Login automático
 ```
 Paso 1: Usuario en Chile visita landing
   URL: http://egarage.com/
-  
+
 Paso 2: Selecciona país
   Clic en: 🇨🇱 Chile
   URL: http://egarage.com/cl/
-  
+
 Paso 3: Hace signup
   URL: http://egarage.com/cl/signup/
   Formulario detecta automáticamente país = "CL"
-  
+
 Paso 4: Crea cuenta
   Sistema crea:
     - Usuario: juan@example.cl
     - Empresa: pais = "CL"
-  
+
 Paso 5: Login automático
   Redirige a: http://egarage.com/cl/dashboard/
-  
+
 ✅ De ahora en adelante:
   - TODAS las páginas en español
   - TODOS los precios en CLP
@@ -688,12 +688,6 @@ print(f"Usuarios Chile: {chile_users.count()}")
 
 ---
 
-**Documento creado:** 27 de Octubre, 2025  
-**Sistema:** Multi-país con detección automática ✅  
+**Documento creado:** 27 de Octubre, 2025
+**Sistema:** Multi-país con detección automática ✅
 **Países soportados:** USA 🇺🇸 y Chile 🇨🇱
-
-
-
-
-
-

@@ -1,7 +1,7 @@
 # 🚀 Mejoras Visuales: Página de Pricing
 
-**Fecha:** 27 de Octubre, 2025  
-**Archivo:** `templates/suspension/precios.html`  
+**Fecha:** 27 de Octubre, 2025
+**Archivo:** `templates/suspension/precios.html`
 **Estado:** ✅ COMPLETADO
 
 ---
@@ -199,9 +199,9 @@ Glow:              rgba(0, 230, 255, 0.5)
 
 ### Clases de Tipografía
 ```css
-.font-futuristic { 
-    font-family: 'Orbitron', monospace; 
-    letter-spacing: 0.05em; 
+.font-futuristic {
+    font-family: 'Orbitron', monospace;
+    letter-spacing: 0.05em;
 }
 ```
 
@@ -359,8 +359,8 @@ opacity: 0.3 → 0.6 → 0.3
 ### Scrollbar Personalizado
 ```css
 ::-webkit-scrollbar { width: 10px; }
-::-webkit-scrollbar-thumb { 
-    background: linear-gradient(180deg, #00e6ff, #6366f1); 
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #00e6ff, #6366f1);
 }
 ```
 - Barra delgada
@@ -434,15 +434,9 @@ Sin efecto → Alto impacto visual
 
 ---
 
-**Implementado por:** AI Assistant  
-**Fecha:** 27 de Octubre, 2025  
-**Tiempo de desarrollo:** ~45 minutos  
+**Implementado por:** AI Assistant
+**Fecha:** 27 de Octubre, 2025
+**Tiempo de desarrollo:** ~45 minutos
 **Líneas de código:** ~800+ líneas (HTML + CSS)
 
 **¡Listo para impresionar! 🎉**
-
-
-
-
-
-

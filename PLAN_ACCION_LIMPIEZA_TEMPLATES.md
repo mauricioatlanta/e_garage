@@ -1,7 +1,7 @@
 # PLAN DE ACCIÓN: LIMPIEZA Y ORGANIZACIÓN DE TEMPLATES
 
-**Proyecto:** e_garage  
-**Fecha de creación:** 27 de Octubre, 2025  
+**Proyecto:** e_garage
+**Fecha de creación:** 27 de Octubre, 2025
 **Versión:** 1.0
 
 ---
@@ -38,7 +38,7 @@ Move-Item "document_payment_status.html" "templates\components\payment_status_sn
 **Comandos de verificación:**
 ```powershell
 # Buscar referencias al archivo antiguo
-Get-ChildItem -Path "taller" -Filter "*.py" -Recurse | 
+Get-ChildItem -Path "taller" -Filter "*.py" -Recurse |
     Select-String "document_payment_status.html"
 ```
 
@@ -175,21 +175,21 @@ $cutoffDate = (Get-Date).AddDays(-30)
 foreach ($folder in $backupFolders) {
     if ($folder.CreationTime -lt $cutoffDate) {
         Write-Host "Comprimiendo backup antiguo: $($folder.Name)"
-        
+
         # Comprimir
         Compress-Archive -Path $folder.FullName `
             -DestinationPath "_archives\$($folder.Name).zip" `
             -CompressionLevel Optimal
-        
+
         # Eliminar original
         Remove-Item $folder.FullName -Recurse -Force
-        
+
         Write-Host "✅ Backup comprimido y eliminado: $($folder.Name)"
     }
 }
 
 # Eliminar backups comprimidos mayores a 90 días
-$oldArchives = Get-ChildItem -Path "_archives\_backup_templates_*.zip" | 
+$oldArchives = Get-ChildItem -Path "_archives\_backup_templates_*.zip" |
     Where-Object { $_.CreationTime -lt (Get-Date).AddDays(-90) }
 
 foreach ($archive in $oldArchives) {
@@ -244,8 +244,8 @@ Remove-Item "_disabled_templates" -Recurse -Force
 # Listar todos los archivos de clientes
 Write-Host "`n=== TEMPLATES DE CLIENTES ===" -ForegroundColor Cyan
 
-Get-ChildItem -Path "templates" -Filter "*cliente*.html" -Recurse | 
-    Select-Object Name, DirectoryName | 
+Get-ChildItem -Path "templates" -Filter "*cliente*.html" -Recurse |
+    Select-Object Name, DirectoryName |
     Format-Table -AutoSize
 
 # Identificar duplicados por nombre
@@ -282,8 +282,8 @@ $duplicates | ForEach-Object {
 **Acción:**
 ```powershell
 # Listar dashboards
-Get-ChildItem -Path "templates" -Filter "*dashboard*.html" -Recurse | 
-    Select-Object Name, FullName | 
+Get-ChildItem -Path "templates" -Filter "*dashboard*.html" -Recurse |
+    Select-Object Name, FullName |
     Format-Table -AutoSize
 ```
 
@@ -336,11 +336,11 @@ fc "templates\taller\configuracion.html" "taller\templates\taller\configuracion.
    ```powershell
    # Eliminar duplicado
    Remove-Item "path/to/duplicate.html"
-   
+
    # Buscar referencias en código
-   Get-ChildItem -Path "taller" -Filter "*.py" -Recurse | 
+   Get-ChildItem -Path "taller" -Filter "*.py" -Recurse |
        Select-String "duplicate.html"
-   
+
    # Actualizar referencias para apuntar a versión canónica
    ```
 
@@ -377,8 +377,8 @@ templates/taller/us/en/clientes/customer_list.html  (inglés)
 **Acción:**
 ```powershell
 # Buscar todas las referencias a templates
-Get-ChildItem -Path "taller" -Filter "*.py" -Recurse | 
-    Select-String "\.html" | 
+Get-ChildItem -Path "taller" -Filter "*.py" -Recurse |
+    Select-String "\.html" |
     Out-File "template_references.txt"
 
 # Revisar manualmente y actualizar según consolidaciones
@@ -484,11 +484,11 @@ templates/
 **Identificar templates sin i18n:**
 ```powershell
 # Buscar templates en common/ sin {% load i18n %}
-Get-ChildItem -Path "templates\taller\common" -Filter "*.html" -Recurse | 
-    Where-Object { 
+Get-ChildItem -Path "templates\taller\common" -Filter "*.html" -Recurse |
+    Where-Object {
         $content = Get-Content $_.FullName -Raw
         $content -notmatch "{%\s*load\s+i18n\s*%}"
-    } | 
+    } |
     Select-Object Name, FullName
 ```
 
@@ -569,15 +569,15 @@ foreach ($folder in $backupFolders) {
     if ($folder.CreationTime -lt $cutoffDate) {
         $zipName = "$($folder.Name).zip"
         $zipPath = "_archives\$zipName"
-        
+
         Write-Host "📦 Comprimiendo: $($folder.Name)..."
-        
+
         try {
             Compress-Archive -Path $folder.FullName `
                 -DestinationPath $zipPath `
                 -CompressionLevel Optimal `
                 -Force
-            
+
             Remove-Item $folder.FullName -Recurse -Force
             Write-Host "   ✅ Comprimido y eliminado" -ForegroundColor Green
             $compressed++
@@ -593,7 +593,7 @@ if ($compressed -eq 0) {
 }
 
 # 2. Eliminar archives mayores a 90 días
-$oldArchives = Get-ChildItem -Path "_archives\_backup_templates_*.zip" -ErrorAction SilentlyContinue | 
+$oldArchives = Get-ChildItem -Path "_archives\_backup_templates_*.zip" -ErrorAction SilentlyContinue |
     Where-Object { $_.CreationTime -lt (Get-Date).AddDays(-90) }
 
 if ($oldArchives) {
@@ -753,22 +753,22 @@ Get-ChildItem -Path "templates\taller" -Directory | ForEach-Object {
 } | Format-Table -AutoSize
 
 # Archivos más grandes
-Get-ChildItem -Path "templates" -Filter "*.html" -Recurse | 
-    Sort-Object Length -Descending | 
+Get-ChildItem -Path "templates" -Filter "*.html" -Recurse |
+    Sort-Object Length -Descending |
     Select-Object -First 10 Name, @{Name="Tamaño (KB)";Expression={[math]::Round($_.Length/1KB,2)}}, FullName
 ```
 
 ### Buscar templates no referenciadas:
 ```powershell
 # Listar todas las templates
-$allTemplates = Get-ChildItem -Path "templates" -Filter "*.html" -Recurse | 
+$allTemplates = Get-ChildItem -Path "templates" -Filter "*.html" -Recurse |
     Select-Object -ExpandProperty Name
 
 # Buscar referencias en código Python
 foreach ($template in $allTemplates) {
-    $refs = Get-ChildItem -Path "taller" -Filter "*.py" -Recurse | 
+    $refs = Get-ChildItem -Path "taller" -Filter "*.py" -Recurse |
         Select-String $template
-    
+
     if (-not $refs) {
         Write-Host "⚠️  Sin referencias: $template"
     }
@@ -778,10 +778,10 @@ foreach ($template in $allTemplates) {
 ### Verificar uso de i18n:
 ```powershell
 # Templates sin i18n en common/
-Get-ChildItem -Path "templates\taller\common" -Filter "*.html" -Recurse | 
-    Where-Object { 
-        (Get-Content $_.FullName -Raw) -notmatch "{%\s*load\s+i18n\s*%}" 
-    } | 
+Get-ChildItem -Path "templates\taller\common" -Filter "*.html" -Recurse |
+    Where-Object {
+        (Get-Content $_.FullName -Raw) -notmatch "{%\s*load\s+i18n\s*%}"
+    } |
     Select-Object Name, FullName
 ```
 
@@ -800,10 +800,3 @@ Si tienes dudas durante la ejecución:
 **Buena suerte con la limpieza! 🚀**
 
 **Próxima revisión recomendada:** 3 meses después de completar este plan
-
-
-
-
-
-
-

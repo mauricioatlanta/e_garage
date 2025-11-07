@@ -274,4 +274,3 @@ echo "  cd /home/atlantareciclajes/apps/egarage"
 echo "  ln -sfn releases/RELEASE_ANTERIOR current"
 echo "  touch $WSGI_FILE"
 echo ""
-

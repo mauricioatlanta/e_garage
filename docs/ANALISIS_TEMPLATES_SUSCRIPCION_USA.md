@@ -1,6 +1,6 @@
 # Análisis: Templates de Suscripción USA
 
-**Fecha:** 27 de Octubre, 2025  
+**Fecha:** 27 de Octubre, 2025
 **Objetivo:** Agregar botón de suscripción a planes de pago en `/us/`
 
 ---
@@ -9,8 +9,8 @@
 
 ### Templates que se usan en `/us/`
 
-**URL:** `http://127.0.0.1:8000/us/`  
-**Vista:** `bienvenida_usa` en `taller/views_extra/bienvenida_usa.py`  
+**URL:** `http://127.0.0.1:8000/us/`
+**Vista:** `bienvenida_usa` en `taller/views_extra/bienvenida_usa.py`
 **Template:** `templates/onboarding/bienvenida_usa.html`
 
 ### Botones Actuales en la Página
@@ -43,16 +43,16 @@
 ## 📁 Templates de Suscripción Existentes
 
 ### 1. ✅ `templates/suscripcion/registro.html`
-**Propósito:** Registro inicial con opción de trial o pago  
-**Estado:** EXISTE y FUNCIONA  
+**Propósito:** Registro inicial con opción de trial o pago
+**Estado:** EXISTE y FUNCIONA
 **Botones:**
 - 🚀 Free 30-day trial
 - Paid subscription
 
-**Vista:** `registro()` en `taller/views_extra/suscripcion.py`  
+**Vista:** `registro()` en `taller/views_extra/suscripcion.py`
 **URL:** `/registro/` (definida en `gestion_taller/urls.py`)
 
-**Evaluación:** 
+**Evaluación:**
 - ✅ Bien ubicada en `templates/suscripcion/`
 - ✅ Funcional
 - ✅ Tiene lógica de negocio implementada
@@ -60,15 +60,15 @@
 ---
 
 ### 2. ✅ `templates/suspension/precios.html`
-**Propósito:** Página de planes y precios con detalles  
-**Estado:** TEMPLATE EXISTE pero NO tiene URL ni vista configurada  
+**Propósito:** Página de planes y precios con detalles
+**Estado:** TEMPLATE EXISTE pero NO tiene URL ni vista configurada
 **Contenido:**
 - Plan Mensual: $20 USD / mes
 - Plan Semestral: $110 USD / 6 meses (⭐ Recomendado)
 - Plan Anual: $200 USD / año
 - Botones de WhatsApp para contacto
 
-**Vista:** ❌ NO EXISTE  
+**Vista:** ❌ NO EXISTE
 **URL:** ❌ NO CONFIGURADA
 
 **Evaluación:**
@@ -79,21 +79,21 @@
 ---
 
 ### 3. ✅ `templates/suspension/suspension.html`
-**Propósito:** Página cuando la suscripción está suspendida  
-**Estado:** FUNCIONA  
-**Vista:** `suspension()` en `taller/views_extra/views_suscripciones.py`  
+**Propósito:** Página cuando la suscripción está suspendida
+**Estado:** FUNCIONA
+**Vista:** `suspension()` en `taller/views_extra/views_suscripciones.py`
 **URL:** ❌ NO encontrada en urls.py (podría estar en otro lugar)
 
 ---
 
 ### 4. ✅ `templates/suscripcion/activar_codigo.html`
-**Propósito:** Activar códigos promocionales  
+**Propósito:** Activar códigos promocionales
 **Estado:** EXISTE
 
 ---
 
 ### 5. ✅ `templates/suscripcion/usuario_existente.html`
-**Propósito:** Usuario que ya tiene cuenta  
+**Propósito:** Usuario que ya tiene cuenta
 **Estado:** EXISTE
 
 ---
@@ -116,7 +116,7 @@ path("suscripcion-bloqueada/", suscripcion_bloqueada, name="suscripcion_bloquead
 1. **`registro()`** - Funcional ✅
    - Archivo: `taller/views_extra/suscripcion.py`
    - Permite elegir entre trial y pago
-   
+
 2. **`suscripcion_bloqueada()`** - Funcional ✅
    - Archivo: `taller/views_extra/suscripcion.py`
    - Muestra cuando está bloqueado
@@ -131,7 +131,7 @@ path("suscripcion-bloqueada/", suscripcion_bloqueada, name="suscripcion_bloquead
 
 ### Opción 1: Usar template de registro existente (RECOMENDADO) ✅
 
-**Ventaja:** Ya existe y funciona  
+**Ventaja:** Ya existe y funciona
 **Desventaja:** Tiene formulario de registro completo
 
 **Implementación:**
@@ -141,9 +141,9 @@ path("suscripcion-bloqueada/", suscripcion_bloqueada, name="suscripcion_bloquead
 
 ```html
 <!-- Agregar en bienvenida_usa.html -->
-<a href="/registro/?tipo_registro=pago" 
-   class="px-10 py-4 bg-gradient-to-r from-green-600 to-emerald-600 
-          hover:from-green-500 hover:to-emerald-500 
+<a href="/registro/?tipo_registro=pago"
+   class="px-10 py-4 bg-gradient-to-r from-green-600 to-emerald-600
+          hover:from-green-500 hover:to-emerald-500
           text-white font-futuristic font-bold rounded-full text-xl">
     💳 Subscribe Now
 </a>
@@ -153,7 +153,7 @@ path("suscripcion-bloqueada/", suscripcion_bloqueada, name="suscripcion_bloquead
 
 ### Opción 2: Crear vista para página de precios (IDEAL) ✨
 
-**Ventaja:** Página dedicada con mejor UX  
+**Ventaja:** Página dedicada con mejor UX
 **Desventaja:** Requiere crear vista y configurar URL
 
 **Implementación:**
@@ -165,11 +165,11 @@ path("suscripcion-bloqueada/", suscripcion_bloqueada, name="suscripcion_bloquead
 
 def planes_precios(request):
     """Vista de planes y precios para suscripción"""
-    
+
     # Detectar país del usuario
     pais_usuario = getattr(request, 'pais', 'US')
     es_usa = pais_usuario.upper() == 'US'
-    
+
     # Definir planes según país
     if es_usa:
         planes = {
@@ -247,14 +247,14 @@ def planes_precios(request):
             }
         }
         whatsapp_contacto = "https://wa.me/56912345678"
-    
+
     context = {
         'planes': planes,
         'pais_usuario': pais_usuario,
         'es_usa': es_usa,
         'whatsapp_contacto': whatsapp_contacto,
     }
-    
+
     return render(request, 'suspension/precios.html', context)
 ```
 
@@ -271,17 +271,17 @@ path("precios/", planes_precios, name="precios"),
 
 ```html
 <!-- En header (línea ~368) -->
-<a href="/us/pricing/" 
-   class="px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 
-          hover:from-green-500 hover:to-emerald-500 
+<a href="/us/pricing/"
+   class="px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600
+          hover:from-green-500 hover:to-emerald-500
           text-white font-futuristic font-bold rounded-full text-sm">
     💳 Subscribe
 </a>
 
 <!-- En hero section (línea ~431) -->
-<a href="/us/pricing/" 
-   class="px-10 py-4 bg-gradient-to-r from-green-600 to-emerald-600 
-          hover:from-green-500 hover:to-emerald-500 
+<a href="/us/pricing/"
+   class="px-10 py-4 bg-gradient-to-r from-green-600 to-emerald-600
+          hover:from-green-500 hover:to-emerald-500
           text-white font-futuristic font-bold rounded-full text-xl">
     💳 Subscribe to a Plan
 </a>
@@ -329,11 +329,5 @@ path("precios/", planes_precios, name="precios"),
 
 ---
 
-**Documento creado:** 27 de Octubre, 2025  
+**Documento creado:** 27 de Octubre, 2025
 **Próximo paso:** Implementar solución
-
-
-
-
-
-

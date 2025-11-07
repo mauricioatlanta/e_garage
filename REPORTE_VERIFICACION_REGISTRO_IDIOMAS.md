@@ -1,7 +1,7 @@
 # Reporte de Verificación: Sistema de Registro por País e Idiomas
 
-**Fecha**: 7 de Noviembre, 2025  
-**Sistema**: eGarage - Plataforma de Gestión de Talleres  
+**Fecha**: 7 de Noviembre, 2025
+**Sistema**: eGarage - Plataforma de Gestión de Talleres
 **Tester**: Verificación Automatizada
 
 ---
@@ -302,7 +302,7 @@ MIDDLEWARE = [
    ```bash
    # USA (inglés)
    http://localhost:8000/accounts/signup/?from=us
-   
+
    # Chile (español)
    http://localhost:8000/accounts/signup/?from=cl
    ```
@@ -323,12 +323,11 @@ MIDDLEWARE = [
 
 ## 📝 Firma
 
-**Verificación completada por**: Sistema Automatizado de Testing  
-**Fecha**: 7 de Noviembre, 2025  
-**Versión del sistema**: eGarage 1.0  
+**Verificación completada por**: Sistema Automatizado de Testing
+**Fecha**: 7 de Noviembre, 2025
+**Versión del sistema**: eGarage 1.0
 **Estado final**: ✅ **APROBADO** (95.5% de tests pasados)
 
 ---
 
 > **Nota**: Este reporte se generó automáticamente. Para más detalles, consulta el script `test_registro_idiomas.py`.
-

@@ -1,8 +1,8 @@
 # 🔐 Mejoras: Página de Login
 
-**Fecha:** 27 de Octubre, 2025  
-**URL:** `http://127.0.0.1:8000/accounts/login/`  
-**Archivo:** `templates/account/login.html`  
+**Fecha:** 27 de Octubre, 2025
+**URL:** `http://127.0.0.1:8000/accounts/login/`
+**Archivo:** `templates/account/login.html`
 **Estado:** ✅ COMPLETADO
 
 ---
@@ -275,7 +275,7 @@ White:            #ffffff  ████████
 
 ### 2. Logo con Pulso
 ```html
-<img src="logo.png" class="logo"> 
+<img src="logo.png" class="logo">
 <!-- Animación de pulso con glow -->
 ```
 
@@ -384,9 +384,3 @@ White:            #ffffff  ████████
 ---
 
 **Transformación completa del login page! 🎉**
-
-
-
-
-
-

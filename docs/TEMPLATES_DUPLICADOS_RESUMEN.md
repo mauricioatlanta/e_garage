@@ -32,7 +32,7 @@ El proyecto tiene soporte multi-país/multi-idioma. Es **NORMAL y CORRECTO** ten
 ```
 templates/taller/clientes/lista.html          # Genérico (fallback)
 templates/cl/es/clientes/lista.html           # Chile - Español
-templates/us/en/clientes/lista.html           # USA - Inglés  
+templates/us/en/clientes/lista.html           # USA - Inglés
 templates/us/es/clientes/lista.html           # USA - Español
 ```
 
@@ -59,7 +59,7 @@ templates/us/es/clientes/lista.html           # USA - Español
 
 ## ⚠️ Duplicados a REVISAR (Opcional)
 
-### Carpeta `taller/common/` 
+### Carpeta `taller/common/`
 
 Algunos templates aparecen en:
 - `templates/taller/clientes/lista.html`
@@ -125,7 +125,7 @@ Para análisis detallado, ver:
 
 ## 🎉 CONCLUSIÓN
 
-**Tu proyecto está bien organizado.** 
+**Tu proyecto está bien organizado.**
 
 Los "duplicados" que encontramos son parte del diseño del sistema multi-país. No necesitas hacer cambios urgentes.
 
@@ -134,9 +134,3 @@ Si quieres optimizar la carpeta `common/`, puedes hacerlo, pero NO es necesario 
 ---
 
 **¡El análisis muestra que la estructura está correcta! ✅**
-
-
-
-
-
-

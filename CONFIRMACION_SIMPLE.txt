@@ -29,7 +29,7 @@ He verificado tu sistema completamente y confirmo que:
 ✓ Default: Inglés
 
 
-🇨🇱 REGISTRO CHILE  
+🇨🇱 REGISTRO CHILE
 ──────────────────
 ✓ Idioma único: ESPAÑOL (forzado)
 ✓ Puede cambiar a inglés: NO (bloqueado)
@@ -101,7 +101,7 @@ Estado: ✅ APROBADO
                  🎉 TODO FUNCIONA CORRECTAMENTE 🎉
 
   Los templates están en los idiomas correctos que solicitaste:
-  
+
   🇺🇸 USA:   Inglés + opción Español ✓
   🇨🇱 Chile: Solo Español ✓
 
@@ -111,4 +111,3 @@ Estado: ✅ APROBADO
 
 
 ¿Necesitas ayuda con algo más? 😊
-

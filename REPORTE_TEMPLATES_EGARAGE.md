@@ -1,6 +1,6 @@
 # REPORTE COMPLETO: ANÁLISIS DE TEMPLATES EN E_GARAGE
 
-**Fecha:** 27 de Octubre, 2025  
+**Fecha:** 27 de Octubre, 2025
 **Sistema:** e_garage - Aplicación de suscripción para mercado chileno (español) y estadounidense (inglés/español)
 
 ---
@@ -19,7 +19,7 @@ E_garage cuenta con **291 archivos HTML activos** distribuidos en diferentes ubi
 
 **Archivos en carpetas de backup/deshabilitadas:**
 - `_backup_templates_20251026_215347/`: 270 archivos HTML
-- `_backup_templates_20251026_215527/`: ~270 archivos HTML  
+- `_backup_templates_20251026_215527/`: ~270 archivos HTML
 - `_disabled_templates/`: 3 archivos HTML
 - `revision templates/`: 758 archivos HTML
 - `scripts/`: 6 archivos HTML (herramientas de desarrollo)
@@ -188,7 +188,7 @@ Esta carpeta contiene templates específicas de la aplicación `taller` (usando 
 - **Tipo:** Snippet/componente HTML
 - **Contenido:** Bloque HTML para campo de estado de pago (Pending, Paid, Partial, Canceled)
 - **Estado:** ⚠️ REVISAR - No es un template completo, es un snippet de referencia
-- **Recomendación:** 
+- **Recomendación:**
   - **MOVER** a `templates/components/` o `templates/common/components/`
   - O **ELIMINAR** si ya está integrado en las templates de documentos
 
@@ -202,7 +202,7 @@ Archivos de desarrollo/testing:
 5. `landing_egarage.html` - Landing de prueba
 6. `legacy_documentos/templates/documentos/lista.html` - Template legacy
 
-**Estado:** ⚠️ HERRAMIENTAS DE DESARROLLO  
+**Estado:** ⚠️ HERRAMIENTAS DE DESARROLLO
 **Recomendación:** **MANTENER** si son útiles para desarrollo, o **MOVER** a una carpeta `dev_tools/` o `testing/`
 
 ### 2.3 Carpeta `actualizacion_pythonanywhere/` (2 archivos)
@@ -210,14 +210,14 @@ Archivos de desarrollo/testing:
 1. `bienvenida_chile.html`
 2. `bienvenida_usa.html`
 
-**Estado:** ⚠️ DUPLICADOS  
+**Estado:** ⚠️ DUPLICADOS
 **Recomendación:** Verificar si son diferentes a las versiones en `templates/`. Si son duplicados, **ELIMINAR**.
 
 ### 2.4 Carpeta `deploy_pythonanywhere/templates/onboarding/` (2 archivos)
 
 Templates para despliegue en PythonAnywhere.
 
-**Estado:** ⚠️ DEPLOY  
+**Estado:** ⚠️ DEPLOY
 **Recomendación:** **MANTENER** solo si son específicas del despliegue, sino consolidar con templates principales.
 
 ---
@@ -229,9 +229,9 @@ Templates para despliegue en PythonAnywhere.
 **`_backup_templates_20251026_215347/`** - 270 archivos HTML
 **`_backup_templates_20251026_215527/`** - ~270 archivos HTML
 
-**Fecha:** 26 de Octubre, 2025 (hace 1 día)  
-**Estado:** 🔵 BACKUP RECIENTE  
-**Recomendación:** 
+**Fecha:** 26 de Octubre, 2025 (hace 1 día)
+**Estado:** 🔵 BACKUP RECIENTE
+**Recomendación:**
 - **MANTENER** por 30 días como backup de seguridad
 - Después de 30 días, **COMPRIMIR** en archivo .zip o **ELIMINAR** si no se necesitan
 
@@ -243,8 +243,8 @@ Contiene:
 - `templates_legacy_quarantine/` - 1 archivo
 - Varios backups adicionales
 
-**Estado:** 🟡 REVISIÓN/ARCHIVO HISTÓRICO  
-**Recomendación:** 
+**Estado:** 🟡 REVISIÓN/ARCHIVO HISTÓRICO
+**Recomendación:**
 - **COMPRIMIR** en archivo .zip (`revision_templates_archive_2025.zip`)
 - **MOVER** fuera del proyecto activo o a carpeta `_archives/`
 - **ELIMINAR** si se confirma que no se necesitan
@@ -259,8 +259,8 @@ Contiene templates deshabilitadas y experimentales:
 
 **Archivos HTML reales:** Solo 3 archivos .html, el resto son .html.py (archivos de debug) o .html.backup
 
-**Estado:** 🟡 DESHABILITADO  
-**Recomendación:** 
+**Estado:** 🟡 DESHABILITADO
+**Recomendación:**
 - **MANTENER** si contienen código de referencia útil
 - **ELIMINAR** `vehiculos_old/` si ya no se necesita (contiene 5 versiones antiguas)
 
@@ -284,7 +284,7 @@ E_garage tiene una **estrategia mixta de internacionalización**:
 
 ### Patrones de Templates:
 
-1. **Templates comunes** (`taller/common/`): 
+1. **Templates comunes** (`taller/common/`):
    - Usan tags i18n de Django (`{% trans %}`, `{% blocktrans %}`)
    - Se adaptan según `LANGUAGE_CODE`
 
@@ -312,7 +312,7 @@ E_garage tiene una **estrategia mixta de internacionalización**:
    - `templates/cl/es/clientes/` (9 archivos)
    - `templates/us/en/clientes/` (5 archivos)
    - `templates/us/es/clientes/` (5 archivos)
-   
+
    **Recomendación:** Verificar si hay duplicación real o son versiones localizadas.
 
 2. **Dashboards:**
@@ -321,14 +321,14 @@ E_garage tiene una **estrategia mixta de internacionalización**:
    - `templates/cl/es/dashboard/` (1 archivo)
    - `templates/us/en/` (dashboard USA)
    - `templates/common/dashboard/` (1 archivo)
-   
+
    **Recomendación:** Consolidar en `taller/common/dashboard/` con extensión por país.
 
 3. **Configuración:**
    - `templates/taller/configuracion.html`
    - `templates/taller/configuracion/` (5 archivos)
    - `taller/templates/taller/configuracion.html`
-   
+
    **Recomendación:** Unificar en una sola ubicación.
 
 ---
@@ -416,26 +416,19 @@ Get-ChildItem -Path "taller" -Filter "*.py" -Recurse | Select-String "\.html"
 
 ### Identificar templates grandes:
 ```powershell
-Get-ChildItem -Path "templates" -Filter "*.html" -Recurse | 
-    Where-Object { $_.Length -gt 10KB } | 
-    Sort-Object Length -Descending | 
+Get-ChildItem -Path "templates" -Filter "*.html" -Recurse |
+    Where-Object { $_.Length -gt 10KB } |
+    Sort-Object Length -Descending |
     Select-Object Name, Length, FullName
 ```
 
 ### Verificar uso de i18n:
 ```powershell
-Get-ChildItem -Path "templates\taller" -Filter "*.html" -Recurse | 
-    Select-String "{% trans" | 
+Get-ChildItem -Path "templates\taller" -Filter "*.html" -Recurse |
+    Select-String "{% trans" |
     Group-Object Path
 ```
 
 ---
 
 **Fin del reporte**
-
-
-
-
-
-
-

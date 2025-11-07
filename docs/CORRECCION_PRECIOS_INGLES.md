@@ -1,7 +1,7 @@
 # ✅ Corrección: Precios en Inglés
 
-**Fecha:** 27 de Octubre, 2025  
-**URL:** `http://127.0.0.1:8000/us/pricing/`  
+**Fecha:** 27 de Octubre, 2025
+**URL:** `http://127.0.0.1:8000/us/pricing/`
 **Estado:** COMPLETADO ✅
 
 ---
@@ -38,7 +38,7 @@ $119.99 USD
 def caracteristicas_list(self, lang='en'):
     """
     Retorna características en el idioma especificado.
-    
+
     Args:
         lang: 'en' para inglés, 'es' para español
     """
@@ -203,12 +203,6 @@ http://127.0.0.1:8000/us/pricing/
 
 ---
 
-**Archivo modificado:** 2 archivos  
-**Idioma:** 100% inglés para USA ✅  
+**Archivo modificado:** 2 archivos
+**Idioma:** 100% inglés para USA ✅
 **Estado:** Corregido y listo 🎉
-
-
-
-
-
-

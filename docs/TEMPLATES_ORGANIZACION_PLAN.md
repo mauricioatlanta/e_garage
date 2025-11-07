@@ -40,7 +40,7 @@ Contiene **276 archivos** organizados en:
 
 **Módulos de Aplicación Genéricos:**
 - `app/` - Templates de módulos de aplicación
-  - `clientes/`, `configuracion/`, `dashboard/`, `documentos/`, 
+  - `clientes/`, `configuracion/`, `dashboard/`, `documentos/`,
   - `otros_servicios/`, `reportes/`, `repuestos/`, `servicios/`,
   - `suscriptor/`, `tecnicos/`, `vehiculos/`
 
@@ -370,12 +370,6 @@ Según las mejores prácticas de Django:
 
 ---
 
-**Documento creado por:** AI Assistant  
-**Fecha:** 27 de Octubre, 2025  
+**Documento creado por:** AI Assistant
+**Fecha:** 27 de Octubre, 2025
 **Proyecto:** eGarage - Gestión de Talleres
-
-
-
-
-
-

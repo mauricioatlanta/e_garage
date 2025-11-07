@@ -1,6 +1,6 @@
 # ANÁLISIS DE INTERNACIONALIZACIÓN (i18n) - TEMPLATES E_GARAGE
 
-**Fecha:** 27 de Octubre, 2025  
+**Fecha:** 27 de Octubre, 2025
 **Contexto:** E_garage es una aplicación de suscripción para mercado chileno (español) y estadounidense (inglés/español)
 
 ---
@@ -440,17 +440,17 @@ Get-ChildItem -Path "templates\us\en" -Filter "*.html" -Recurse
 ### Buscar templates sin i18n:
 ```powershell
 # Buscar archivos en common/ sin {% load i18n %}
-Get-ChildItem -Path "templates\taller\common" -Filter "*.html" -Recurse | 
-    Where-Object { 
-        (Get-Content $_.FullName -Raw) -notmatch "{%\s*load\s+i18n\s*%}" 
-    } | 
+Get-ChildItem -Path "templates\taller\common" -Filter "*.html" -Recurse |
+    Where-Object {
+        (Get-Content $_.FullName -Raw) -notmatch "{%\s*load\s+i18n\s*%}"
+    } |
     Select-Object Name, FullName
 ```
 
 ### Contar uso de trans vs texto hardcodeado:
 ```powershell
 # Contar tags {% trans %}
-(Get-Content "templates\taller\common\clientes\lista_clientes.html" | 
+(Get-Content "templates\taller\common\clientes\lista_clientes.html" |
     Select-String "{% trans").Count
 ```
 
@@ -482,10 +482,3 @@ Get-ChildItem -Path "templates\taller\common" -Filter "*.html" -Recurse |
 ---
 
 **Fin del análisis i18n**
-
-
-
-
-
-
-

@@ -518,13 +518,7 @@ Si encuentras problemas después de la reorganización:
 
 ---
 
-**Documento generado por:** AI Assistant  
-**Fecha de reorganización:** 27 de Octubre, 2025  
-**Proyecto:** eGarage - Sistema de Gestión de Talleres Automotrices  
+**Documento generado por:** AI Assistant
+**Fecha de reorganización:** 27 de Octubre, 2025
+**Proyecto:** eGarage - Sistema de Gestión de Talleres Automotrices
 **Versión:** 1.0
-
-
-
-
-
-

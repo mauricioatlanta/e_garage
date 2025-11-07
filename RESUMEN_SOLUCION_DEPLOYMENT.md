@@ -237,4 +237,3 @@ Todo cambio pasa por Git, y tienes historial completo de todo.
 **Fecha**: 2025-11-07
 **Autor**: Tu equipo de desarrollo
 **Versión**: 1.0
-
