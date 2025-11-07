@@ -10,10 +10,17 @@ class ClienteAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         if not self.request.user.is_authenticated:
             return Cliente.objects.none()
-        qs = Cliente.objects.filter(empresa=self.request.user.empresa)
+        
+        empresa = getattr(self.request.user, 'empresa', None)
+        if not empresa:
+            return Cliente.objects.none()
+        
+        qs = Cliente.objects.filter(empresa=empresa)
+        
         q = self.q or ""
         if q:
-            qs = qs.filter(Q(nombre__icontains=q) | Q(tax_id__icontains=q) | Q(email__icontains=q))
+            qs = qs.filter(Q(nombre__icontains=q) | Q(apellido__icontains=q) | Q(tax_id__icontains=q) | Q(email__icontains=q))
+        
         return qs.order_by("nombre")
 
 

@@ -1,0 +1,795 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Create Account" %} - eGarage{% endblock %}
+
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.net.min.js" defer></script>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #0a0a0a;
+    font-family: 'Inter', sans-serif;
+    color: #ffffff;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+.grid-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        linear-gradient(rgba(34, 211, 238, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(34, 211, 238, 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+    z-index: 1;
+}
+
+.signup-container {
+    position: relative;
+    z-index: 10;
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.glass-card {
+    background: linear-gradient(135deg, rgba(34, 211, 238, 0.08) 0%, rgba(96, 165, 250, 0.05) 100%);
+    backdrop-filter: blur(25px);
+    border-radius: 24px;
+    border: 1px solid rgba(34, 211, 238, 0.3);
+    box-shadow: 0 8px 32px rgba(34, 211, 238, 0.15);
+    padding: 48px 40px;
+}
+
+.logo-section {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.logo {
+    width: 70px;
+    height: 70px;
+    margin-bottom: 16px;
+    filter: drop-shadow(0 0 15px rgba(34, 211, 238, 0.6));
+}
+
+.brand-name {
+    font-size: 32px;
+    font-weight: 900;
+    color: #22d3ee;
+    font-family: 'Orbitron', monospace;
+    text-shadow: 0 0 20px rgba(34, 211, 238, 0.6);
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    color: #94a3b8;
+    font-size: 14px;
+}
+
+.signup-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #22d3ee;
+    margin-bottom: 32px;
+    text-align: center;
+    font-family: 'Orbitron', monospace;
+}
+
+.form-section {
+    margin-bottom: 32px;
+}
+
+.section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #22d3ee;
+    margin-bottom: 16px;
+    font-family: 'Orbitron', monospace;
+    letter-spacing: 0.05em;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #22d3ee;
+    margin-bottom: 8px;
+}
+
+.form-input, .form-select {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 15px;
+    font-family: 'Inter', sans-serif;
+    color: #ffffff;
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid rgba(34, 211, 238, 0.3);
+    border-radius: 10px;
+    transition: all 0.3s;
+}
+
+.form-input:focus, .form-select:focus {
+    outline: none;
+    border-color: #22d3ee;
+    background: rgba(0, 0, 0, 0.7);
+    box-shadow: 0 0 20px rgba(34, 211, 238, 0.3);
+}
+
+.form-input::placeholder {
+    color: #64748b;
+}
+
+.help-text {
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 4px;
+}
+
+.error-message {
+    color: #f87171;
+    font-size: 13px;
+    margin-top: 6px;
+    font-weight: 500;
+}
+
+/* Pricing Cards */
+.pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.plan-card {
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid rgba(34, 211, 238, 0.2);
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s;
+    cursor: pointer;
+    position: relative;
+}
+
+.plan-card:hover {
+    border-color: #22d3ee;
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(34, 211, 238, 0.3);
+}
+
+.plan-card.selected {
+    border-color: #22d3ee;
+    background: rgba(34, 211, 238, 0.1);
+    box-shadow: 0 0 30px rgba(34, 211, 238, 0.4);
+}
+
+.plan-card.recommended {
+    border-color: #fbbf24;
+}
+
+.plan-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #22d3ee, #3b82f6);
+    color: #000;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.plan-badge.gold {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+}
+
+.plan-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 12px;
+    font-family: 'Orbitron', monospace;
+}
+
+.plan-price {
+    font-size: 28px;
+    font-weight: 900;
+    color: #22d3ee;
+    margin-bottom: 4px;
+    font-family: 'Orbitron', monospace;
+}
+
+.plan-period {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-bottom: 12px;
+}
+
+.plan-savings {
+    background: rgba(34, 211, 238, 0.15);
+    color: #22d3ee;
+    padding: 4px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.plan-features {
+    list-style: none;
+    padding: 0;
+    margin-top: 16px;
+    font-size: 13px;
+    color: #94a3b8;
+    text-align: left;
+}
+
+.plan-features li {
+    margin-bottom: 8px;
+    padding-left: 20px;
+    position: relative;
+}
+
+.plan-features li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #22d3ee;
+    font-weight: 700;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 20px 0;
+}
+
+.form-checkbox {
+    width: 20px;
+    height: 20px;
+    accent-color: #22d3ee;
+    cursor: pointer;
+}
+
+.checkbox-label {
+    font-size: 14px;
+    color: #94a3b8;
+    cursor: pointer;
+}
+
+.checkbox-label a {
+    color: #22d3ee;
+    text-decoration: none;
+}
+
+.checkbox-label a:hover {
+    text-decoration: underline;
+}
+
+.signup-button {
+    width: 100%;
+    padding: 18px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #000000;
+    background: linear-gradient(135deg, #22d3ee 0%, #3b82f6 100%);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 0 25px rgba(34, 211, 238, 0.5);
+    font-family: 'Orbitron', monospace;
+    letter-spacing: 0.05em;
+}
+
+.signup-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 35px rgba(34, 211, 238, 0.8);
+}
+
+.login-link {
+    text-align: center;
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(34, 211, 238, 0.2);
+}
+
+.login-text {
+    font-size: 14px;
+    color: #94a3b8;
+}
+
+.login-link a {
+    color: #22d3ee;
+    text-decoration: none;
+    font-weight: 600;
+    margin-left: 4px;
+}
+
+.login-link a:hover {
+    text-shadow: 0 0 10px rgba(34, 211, 238, 0.8);
+}
+
+@media (max-width: 768px) {
+    .glass-card {
+        padding: 32px 24px;
+    }
+    
+    .pricing-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Vanta.js background -->
+<div id="vanta-bg" style="position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: 0;"></div>
+<div class="grid-bg"></div>
+
+<div class="signup-container">
+    <div class="glass-card">
+        <!-- Logo -->
+        <div class="logo-section">
+            <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage Logo" class="logo">
+            <div class="brand-name">eGarage</div>
+            <div class="subtitle">{% trans "Professional Automotive Management" %}</div>
+        </div>
+        
+        <h2 class="signup-title">{% trans "Create Your Account" %}</h2>
+        
+        <!-- Mensajes -->
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <form method="POST" id="signup-form">
+            {% csrf_token %}
+            
+            <!-- SECCIÓN 1: Datos Personales -->
+            <div class="form-section">
+                <h3 class="section-title">{% trans "Personal Information" %}</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label class="form-label">{% trans "First Name" %}</label>
+                        {{ form.nombre }}
+                        {% if form.nombre.errors %}
+                        <div class="error-message">{{ form.nombre.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">{% trans "Last Name" %}</label>
+                        {{ form.apellido }}
+                        {% if form.apellido.errors %}
+                        <div class="error-message">{{ form.apellido.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">{% trans "Email" %}</label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                    <div class="error-message">{{ form.email.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- SECCIÓN 2: Datos de la Empresa -->
+            <div class="form-section">
+                <h3 class="section-title">{% trans "Business Information" %}</h3>
+                
+                <div class="form-group">
+                    <label class="form-label">{% trans "Company Name" %}</label>
+                    {{ form.nombre_taller }}
+                    <div class="help-text">{{ form.nombre_taller.help_text }}</div>
+                    {% if form.nombre_taller.errors %}
+                    <div class="error-message">{{ form.nombre_taller.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label class="form-label">{% trans "Phone" %}</label>
+                        {{ form.telefono }}
+                        {% if form.telefono.errors %}
+                        <div class="error-message">{{ form.telefono.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">{% trans "Country" %}</label>
+                        {{ form.pais }}
+                        {% if form.pais.errors %}
+                        <div class="error-message">{{ form.pais.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- SECCIÓN 3: Selección de Plan -->
+            <div class="form-section">
+                <h3 class="section-title">{% trans "Select Your Plan" %}</h3>
+                
+                <div class="form-group">
+                    {{ form.plan }}
+                    {% if form.plan.errors %}
+                    <div class="error-message">{{ form.plan.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <!-- Pricing Cards -->
+                <div class="pricing-grid">
+                    <!-- Trial -->
+                    <div class="plan-card" data-plan="trial" onclick="selectPlan('trial')">
+                        <div class="plan-badge">{% trans "FREE" %}</div>
+                        <div class="plan-name">Trial</div>
+                        <div class="plan-price">$0</div>
+                        <div class="plan-period">30 {% trans "days" %}</div>
+                        <ul class="plan-features">
+                            <li>{% trans "Full access" %}</li>
+                            <li>{% trans "No credit card" %}</li>
+                            <li>{% trans "Cancel anytime" %}</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Mensual -->
+                    <div class="plan-card" data-plan="mensual" onclick="selectPlan('mensual')">
+                        <div class="plan-name">{% trans "Monthly" %}</div>
+                        <div class="plan-price">
+                            <span class="price-cl">$20.000</span>
+                            <span class="price-us" style="display:none;">$20</span>
+                        </div>
+                        <div class="plan-period">
+                            <span class="period-cl">/ mes</span>
+                            <span class="period-us" style="display:none;">/ month</span>
+                        </div>
+                        <ul class="plan-features">
+                            <li>{% trans "Unlimited users" %}</li>
+                            <li>{% trans "All features" %}</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Semestral -->
+                    <div class="plan-card recommended" data-plan="semestral" onclick="selectPlan('semestral')">
+                        <div class="plan-badge gold">⭐ {% trans "BEST VALUE" %}</div>
+                        <div class="plan-name">{% trans "Semi-Annual" %}</div>
+                        <div class="plan-price">
+                            <span class="price-cl">$100.000</span>
+                            <span class="price-us" style="display:none;">$110</span>
+                        </div>
+                        <div class="plan-period">
+                            <span class="period-cl">/ 6 meses</span>
+                            <span class="period-us" style="display:none;">/ 6 months</span>
+                        </div>
+                        <div class="plan-savings">{% trans "Save" %} 17%</div>
+                        <ul class="plan-features">
+                            <li>{% trans "Everything in Monthly" %}</li>
+                            <li>{% trans "Priority support" %}</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Anual -->
+                    <div class="plan-card" data-plan="anual" onclick="selectPlan('anual')">
+                        <div class="plan-badge gold">💎 {% trans "BEST PRICE" %}</div>
+                        <div class="plan-name">{% trans "Annual" %}</div>
+                        <div class="plan-price">
+                            <span class="price-cl">$200.000</span>
+                            <span class="price-us" style="display:none;">$200</span>
+                        </div>
+                        <div class="plan-period">
+                            <span class="period-cl">/ año</span>
+                            <span class="period-us" style="display:none;">/ year</span>
+                        </div>
+                        <div class="plan-savings">{% trans "Save" %} 17%</div>
+                        <ul class="plan-features">
+                            <li>{% trans "Everything in Semi-Annual" %}</li>
+                            <li>{% trans "Best value" %}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- SECCIÓN 4: Contraseña -->
+            <div class="form-section">
+                <h3 class="section-title">{% trans "Security" %}</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label class="form-label">{% trans "Password" %}</label>
+                        {{ form.password1 }}
+                        <div class="help-text">{{ form.password1.help_text }}</div>
+                        {% if form.password1.errors %}
+                        <div class="error-message">{{ form.password1.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">{% trans "Confirm Password" %}</label>
+                        {{ form.password2 }}
+                        {% if form.password2.errors %}
+                        <div class="error-message">{{ form.password2.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Términos -->
+            <div class="checkbox-container">
+                {{ form.acepta_terminos }}
+                <label for="id_acepta_terminos" class="checkbox-label">
+                    {% trans "I accept the" %} <a href="/legal/">{% trans "terms and conditions" %}</a>
+                </label>
+            </div>
+            {% if form.acepta_terminos.errors %}
+            <div class="error-message">{{ form.acepta_terminos.errors }}</div>
+            {% endif %}
+            
+            <!-- Errores generales -->
+            {% if form.non_field_errors %}
+            <div class="error-message">{{ form.non_field_errors }}</div>
+            {% endif %}
+            
+            <!-- Botón Submit -->
+            <button type="submit" class="signup-button">
+                {% trans "CREATE ACCOUNT" %}
+            </button>
+        </form>
+        
+        <!-- Link a Login -->
+        <div class="login-link">
+            <span class="login-text">{% trans "Already have an account?" %}</span>
+            <a href="/accounts/login/">{% trans "Sign in" %}</a>
+        </div>
+    </div>
+</div>
+
+<script>
+// Initialize Vanta.js
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof VANTA !== 'undefined' && VANTA.NET) {
+        VANTA.NET({
+            el: "#vanta-bg",
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.00,
+            minWidth: 200.00,
+            scale: 1.00,
+            scaleMobile: 1.00,
+            color: 0x22d3ee,
+            backgroundColor: 0x0a0a0a,
+            points: 8.00,
+            maxDistance: 20.00,
+            spacing: 18.00
+        });
+    }
+});
+
+// Actualizar precios según país
+function updatePlanPrices(country) {
+    const showCL = country === 'CL';
+    const showUS = country === 'US';
+    
+    document.querySelectorAll('.price-cl, .period-cl').forEach(el => {
+        el.style.display = showCL ? 'inline' : 'none';
+    });
+    
+    document.querySelectorAll('.price-us, .period-us').forEach(el => {
+        el.style.display = showUS ? 'inline' : 'none';
+    });
+}
+
+// Seleccionar plan
+function selectPlan(planName) {
+    // Actualizar select
+    document.getElementById('id_plan').value = planName;
+    
+    // Visual feedback
+    document.querySelectorAll('.plan-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    
+    const selected = document.querySelector(`[data-plan="${planName}"]`);
+    if (selected) {
+        selected.classList.add('selected');
+    }
+}
+
+// Highlight plan cuando se selecciona del dropdown
+document.getElementById('id_plan').addEventListener('change', function() {
+    selectPlan(this.value);
+});
+
+// 🌍 CAMBIO DINÁMICO DE IDIOMA SEGÚN PAÍS
+const translations = {
+    'CL': {
+        // Sección 1: Información Personal
+        'Personal Information': 'Información Personal',
+        'First Name': 'Nombre',
+        'Last Name': 'Apellido',
+        'Email': 'Correo Electrónico',
+        'Phone': 'Teléfono',
+        'Country': 'País',
+        
+        // Sección 2: Información de la Empresa
+        'Company Information': 'Información de la Empresa',
+        'Company Name': 'Nombre de la Empresa',
+        
+        // Sección 3: Plan
+        'Choose Your Plan': 'Elige tu Plan',
+        'Free Trial': 'Prueba Gratis',
+        '30 days free': '30 días gratis',
+        'No credit card required': 'Sin tarjeta de crédito',
+        'Full access': 'Acceso completo',
+        'Monthly': 'Mensual',
+        'Everything in Trial': 'Todo de Prueba',
+        'Unlimited users': 'Usuarios ilimitados',
+        'Semi-Annual': 'Semestral',
+        'Everything in Monthly': 'Todo del plan Mensual',
+        'Save': 'Ahorra',
+        'Annual': 'Anual',
+        'Everything in Semi-Annual': 'Todo del plan Semestral',
+        'Best value': 'Mejor valor',
+        
+        // Sección 4: Seguridad
+        'Security': 'Seguridad',
+        'Password': 'Contraseña',
+        'Confirm Password': 'Confirmar Contraseña',
+        
+        // Términos
+        'I accept the': 'Acepto los',
+        'terms and conditions': 'términos y condiciones',
+        
+        // Botón
+        'CREATE ACCOUNT': 'CREAR CUENTA',
+        
+        // Login link
+        'Already have an account?': '¿Ya tienes una cuenta?',
+        'Sign in': 'Iniciar sesión'
+    },
+    'US': {
+        // Keep English as is
+        'Personal Information': 'Personal Information',
+        'First Name': 'First Name',
+        'Last Name': 'Last Name',
+        'Email': 'Email',
+        'Phone': 'Phone',
+        'Country': 'Country',
+        'Company Information': 'Company Information',
+        'Company Name': 'Company Name',
+        'Choose Your Plan': 'Choose Your Plan',
+        'Free Trial': 'Free Trial',
+        '30 days free': '30 days free',
+        'No credit card required': 'No credit card required',
+        'Full access': 'Full access',
+        'Monthly': 'Monthly',
+        'Everything in Trial': 'Everything in Trial',
+        'Unlimited users': 'Unlimited users',
+        'Semi-Annual': 'Semi-Annual',
+        'Everything in Monthly': 'Everything in Monthly',
+        'Save': 'Save',
+        'Annual': 'Annual',
+        'Everything in Semi-Annual': 'Everything in Semi-Annual',
+        'Best value': 'Best value',
+        'Security': 'Security',
+        'Password': 'Password',
+        'Confirm Password': 'Confirm Password',
+        'I accept the': 'I accept the',
+        'terms and conditions': 'terms and conditions',
+        'CREATE ACCOUNT': 'CREATE ACCOUNT',
+        'Already have an account?': 'Already have an account?',
+        'Sign in': 'Sign in'
+    }
+};
+
+// Función para cambiar idioma de todo el formulario
+function changeLanguage(country) {
+    const lang = translations[country] || translations['US'];
+    
+    // Cambiar títulos de sección
+    document.querySelectorAll('.section-title').forEach(el => {
+        const currentText = el.textContent.trim();
+        if (lang[currentText]) {
+            el.textContent = lang[currentText];
+        }
+    });
+    
+    // Cambiar labels de formulario
+    document.querySelectorAll('.form-label').forEach(el => {
+        const currentText = el.textContent.trim();
+        if (lang[currentText]) {
+            el.textContent = lang[currentText];
+        }
+    });
+    
+    // Cambiar título principal
+    const signupTitle = document.querySelector('.signup-title');
+    if (signupTitle) {
+        signupTitle.textContent = country === 'CL' ? '🚀 Crear Cuenta' : '🚀 Create Account';
+    }
+    
+    // Cambiar placeholders si es necesario
+    const placeholders = {
+        'CL': {
+            'id_nombre': 'Juan',
+            'id_apellido': 'Pérez',
+            'id_email': 'juan@empresa.cl',
+            'id_telefono': '+56912345678',
+            'id_nombre_taller': 'Mi Taller'
+        },
+        'US': {
+            'id_nombre': 'John',
+            'id_apellido': 'Doe',
+            'id_email': 'john@company.com',
+            'id_telefono': '+1(555)123-4567',
+            'id_nombre_taller': 'My Auto Shop'
+        }
+    };
+    
+    Object.keys(placeholders[country] || {}).forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field) {
+            field.placeholder = placeholders[country][fieldId];
+        }
+    });
+    
+    // Cambiar botón submit
+    const submitBtn = document.querySelector('.signup-button');
+    if (submitBtn) {
+        submitBtn.textContent = lang['CREATE ACCOUNT'];
+    }
+    
+    // Cambiar texto de login link
+    const loginText = document.querySelector('.login-text');
+    if (loginText) {
+        loginText.textContent = lang['Already have an account?'];
+    }
+    
+    const loginLink = document.querySelector('.login-link a');
+    if (loginLink) {
+        loginLink.textContent = lang['Sign in'];
+    }
+}
+
+// Actualizar precios Y idioma cuando cambia país
+document.getElementById('id_pais').addEventListener('change', function() {
+    updatePlanPrices(this.value);
+    changeLanguage(this.value);
+});
+
+// Inicializar con país por defecto si ya hay uno seleccionado
+window.addEventListener('load', function() {
+    const paisSelect = document.getElementById('id_pais');
+    if (paisSelect.value) {
+        updatePlanPrices(paisSelect.value);
+        changeLanguage(paisSelect.value);
+    }
+});
+</script>
+{% endblock %}
+

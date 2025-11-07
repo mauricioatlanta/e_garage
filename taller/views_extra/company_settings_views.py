@@ -99,10 +99,17 @@ def company_settings_view(request):
                     cache_key = f"company_branding_{request.user.id}"
                     cache.delete(cache_key)
 
-                    messages.success(
-                        request,
-                        f"✅ {section.title()} configuration updated successfully. Changes will be reflected across all pages.",
-                    )
+                    # Mensaje específico si se subió logo
+                    if section == "profile" and 'logo' in request.FILES:
+                        messages.success(
+                            request,
+                            f"✅ Logo uploaded successfully! Your logo will now appear across all pages. Refresh any open pages to see it.",
+                        )
+                    else:
+                        messages.success(
+                            request,
+                            f"✅ {section.title()} configuration updated successfully. Changes will be reflected across all pages.",
+                        )
                     return redirect(request.path)
                 except Exception as e:
                     messages.error(

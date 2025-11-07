@@ -28,14 +28,13 @@ def buscar_clientes(request):
         empresa = get_or_create_empresa(request)
         print(f"🏢 Empresa obtenida: {empresa}")
         
-        qs = Cliente.objects.all()
-        print(f"[DEBUG] Total clientes antes del filtro: {qs.count()}")
-        
-        if empresa:
-            qs = qs.filter(empresa=empresa)
-            print(f"[DEBUG] Total clientes después del filtro de empresa: {qs.count()}")
-        else:
+        # 🔒 SEGURIDAD: Solo clientes de esta empresa
+        if not empresa:
             print("⚠️ No se encontró empresa para el usuario")
+            return JsonResponse({"results": []})
+        
+        qs = Cliente.objects.filter(empresa=empresa)
+        print(f"[DEBUG] Total clientes de la empresa: {qs.count()}")
             
         # Búsqueda más inteligente
         qs = qs.filter(
@@ -204,6 +203,7 @@ def vehiculos_por_cliente(request):
     )
 
     def _name(v):
+        anio = getattr(v, "anio", None)
         marca = (
             v.get_marca_display()
             if hasattr(v, "get_marca_display")
@@ -222,9 +222,26 @@ def vehiculos_por_cliente(request):
                 or ""
             )
         )
-        tag = getattr(v, "patente", None) or getattr(v, "vin", None) or ""
-        parts = [p for p in [marca, modelo, tag] if p]
-        return " ".join(parts) if parts else f"Vehículo #{v.pk}"
+        patente = getattr(v, "patente", None) or ""
+        vin = getattr(v, "vin", None) or ""
+        
+        # Formato: "año, marca, modelo, placa"
+        parts = []
+        if anio:
+            parts.append(str(anio))
+        if marca:
+            parts.append(marca)
+        if modelo:
+            parts.append(modelo)
+        if patente:
+            parts.append(patente)
+        
+        if parts:
+            return ", ".join(parts)
+        elif vin:
+            return f"VIN: {vin}"
+        else:
+            return f"Vehicle #{v.pk}"
 
     return JsonResponse({"results": [{"id": v.pk, "text": _name(v)} for v in qs]})
 

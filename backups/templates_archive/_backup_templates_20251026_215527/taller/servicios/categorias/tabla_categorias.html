@@ -1,0 +1,38 @@
+
+{% extends 'taller/base_inicio.html' %}
+{% block content %}
+<div class="max-w-5xl mx-auto mt-10 p-6 translucent-card shadow rounded animate__animated animate__fadeIn">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">📁 Categorías de Servicios</h1>
+    <a href="{% url 'crear_categoria' %}" class="bg-cyan-600 text-white px-4 py-2 rounded hover:bg-cyan-700 shadow">➕ Nueva Categoría</a>
+  </div>
+
+  <form method="get" class="mb-4 flex">
+    <input type="text" name="buscar" placeholder="🔍 Buscar categoría..." value="{{ request.GET.buscar }}" class="border p-2 w-full rounded shadow" />
+  </form>
+
+  <table class="w-full table-auto border border-gray-300 shadow-sm">
+    <thead class="translucent-card text-gray-700">
+      <tr>
+        <th class="border px-4 py-2 text-left">Nombre</th>
+        <th class="border px-4 py-2 text-left">Descripción</th>
+        <th class="border px-4 py-2 text-center">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for categoria in categorias %}
+      <tr class="hover:bg-gray-50">
+        <td class="border px-4 py-2">{{ categoria.nombre }}</td>
+        <td class="border px-4 py-2">{{ categoria.descripcion|default:"(sin descripción)" }}</td>
+        <td class="border px-4 py-2 text-center space-x-2">
+          <a href="{% url 'editar_categoria' categoria.id %}" class="text-blue-600 hover:underline">✏️</a>
+          <a href="{% url 'eliminar_categoria' categoria.id %}" class="text-red-600 hover:underline">🗑️</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="3" class="text-center text-gray-500 py-4">No hay categorías registradas.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

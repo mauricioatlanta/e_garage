@@ -108,22 +108,61 @@ class PrecioSuscripcion(models.Model):
             return f"${self.precio:,.2f} USD"
         return f"${self.precio:,.0f} CLP"
 
-    def caracteristicas_list(self):
+    def caracteristicas_list(self, lang='en'):
+        """
+        Retorna lista de características del plan.
+        
+        Args:
+            lang: 'en' para inglés, 'es' para español
+        """
         feats = []
-        if self.documentos_ilimitados:
-            feats.append("Documentos ilimitados")
-        if self.usuarios_incluidos:
-            feats.append(f"Hasta {self.usuarios_incluidos} usuarios")
-        if self.reportes_avanzados:
-            feats.append("Reportes avanzados")
-        if self.diagnostico_ia:
-            feats.append("Diagnóstico IA incluido")
-        if self.soporte_prioritario:
-            feats.append("Soporte prioritario")
-        if self.api_incluida:
-            feats.append("API personalizada")
-        if self.multisucursal:
-            feats.append("Multi-sucursales")
+        
+        # Traducciones
+        if lang == 'en':
+            if self.documentos_ilimitados:
+                feats.append("Unlimited documents")
+            if self.usuarios_incluidos:
+                # Si es 999 o más, mostrar como "ilimitados"
+                if self.usuarios_incluidos >= 999:
+                    feats.append("Unlimited users")
+                else:
+                    feats.append(f"Up to {self.usuarios_incluidos} users")
+            if self.reportes_avanzados:
+                feats.append("Advanced reports")
+            if self.diagnostico_ia:
+                feats.append("AI diagnostics included")
+            if self.soporte_prioritario:
+                feats.append("Priority support")
+            if self.api_incluida:
+                feats.append("Custom API")
+            if self.multisucursal:
+                feats.append("Multi-location support")
+            # Agregar soporte 24/7 si es prioritario
+            if self.soporte_prioritario:
+                feats.append("24/7 Premium support")
+        else:  # español
+            if self.documentos_ilimitados:
+                feats.append("Documentos ilimitados")
+            if self.usuarios_incluidos:
+                # Si es 999 o más, mostrar como "ilimitados"
+                if self.usuarios_incluidos >= 999:
+                    feats.append("Usuarios ilimitados")
+                else:
+                    feats.append(f"Hasta {self.usuarios_incluidos} usuarios")
+            if self.reportes_avanzados:
+                feats.append("Reportes avanzados")
+            if self.diagnostico_ia:
+                feats.append("Diagnóstico IA incluido")
+            if self.soporte_prioritario:
+                feats.append("Soporte prioritario")
+            if self.api_incluida:
+                feats.append("API personalizada")
+            if self.multisucursal:
+                feats.append("Multi-sucursales")
+            # Agregar soporte 24/7 si es prioritario
+            if self.soporte_prioritario:
+                feats.append("Soporte 24/7 Premium")
+        
         return feats
 
     # Accesos directos típicos en vistas/templates

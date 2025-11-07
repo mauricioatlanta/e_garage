@@ -7,22 +7,13 @@ from django.db import models
 
 
 def validate_logo_size(image):
-    """Valida que el logo tenga dimensiones apropiadas"""
+    """Valida que el logo tenga dimensiones apropiadas (flexible)"""
     if image:
-        img = Image.open(image)
-        width, height = img.size
-
-        # Máximo 1000x1000 px
-        if width > 1000 or height > 1000:
-            raise ValidationError("El logo debe ser menor a 1000x1000 píxeles")
-
-        # Mínimo 100x100 px
-        if width < 100 or height < 100:
-            raise ValidationError("El logo debe ser mayor a 100x100 píxeles")
-
-        # Máximo 2MB
-        if image.size > 2 * 1024 * 1024:
-            raise ValidationError("El logo debe ser menor a 2MB")
+        # Máximo 10MB (muy permisivo)
+        if image.size > 10 * 1024 * 1024:
+            raise ValidationError("El logo debe ser menor a 10MB")
+        
+        # No validar dimensiones aquí - se redimensionarán automáticamente en save()
 
 
 class CompanySettings(models.Model):
@@ -55,11 +46,11 @@ class CompanySettings(models.Model):
         null=True,
         blank=True,
         validators=[
-            FileExtensionValidator(allowed_extensions=["png", "jpg", "jpeg", "svg"]),
+            FileExtensionValidator(allowed_extensions=["png", "jpg", "jpeg", "svg", "webp"]),
             validate_logo_size,
         ],
         verbose_name="Logo de la empresa",
-        help_text="Logo personalizado (máx. 1000x1000px, 2MB). Formatos: PNG, JPG, SVG",
+        help_text="Logo personalizado (cualquier tamaño, se redimensionará automáticamente). Formatos: PNG, JPG, JPEG, SVG, WEBP",
     )
 
     primary_color = models.CharField(
@@ -230,15 +221,32 @@ class CompanySettings(models.Model):
             self._resize_logo()
 
     def _resize_logo(self):
-        """Redimensiona el logo si excede las dimensiones máximas"""
+        """Redimensiona el logo si excede las dimensiones máximas y optimiza el tamaño"""
         try:
             img = Image.open(self.logo.path)
-            if img.height > 400 or img.width > 400:
-                # Mantener proporción, máximo 400px en cualquier dimensión
-                img.thumbnail((400, 400), Image.Resampling.LANCZOS)
-                img.save(self.logo.path)
-        except Exception:
-            # Si falla el redimensionamiento, continúa sin error
+            original_size = (img.width, img.height)
+            
+            # Convertir a RGB si es necesario (para PNG con transparencia)
+            if img.mode in ('RGBA', 'LA', 'P'):
+                background = Image.new('RGB', img.size, (255, 255, 255))
+                if img.mode == 'P':
+                    img = img.convert('RGBA')
+                background.paste(img, mask=img.split()[3] if img.mode == 'RGBA' else None)
+                img = background
+            
+            # Redimensionar si es muy grande (máximo 800px)
+            max_size = 800
+            if img.height > max_size or img.width > max_size:
+                img.thumbnail((max_size, max_size), Image.Resampling.LANCZOS)
+                print(f"Logo redimensionado de {original_size} a {img.size}")
+            
+            # Guardar optimizado
+            img.save(self.logo.path, 'JPEG', quality=90, optimize=True)
+            print(f"✅ Logo optimizado: {self.logo.path}")
+            
+        except Exception as e:
+            # Si falla el redimensionamiento, registrar pero no bloquear
+            print(f"⚠️ No se pudo redimensionar el logo: {e}")
             pass
 
 

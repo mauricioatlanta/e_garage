@@ -96,9 +96,16 @@ def precios(request):
     """Vista pública con información de precios diferenciada por país"""
     from taller.models.precio_suscripcion import PrecioSuscripcion
 
-    # Detectar país del usuario
-    pais_usuario = "CL"  # Default Chile
-    if request.user.is_authenticated and hasattr(request.user, "empresa"):
+    # Detectar país del usuario desde la URL o empresa
+    pais_usuario = "US"  # Default USA para la ruta /us/pricing/
+    
+    # Detectar desde la ruta
+    if request.path.startswith('/us/'):
+        pais_usuario = "US"
+    elif request.path.startswith('/cl/'):
+        pais_usuario = "CL"
+    # Override si el usuario está autenticado
+    elif request.user.is_authenticated and hasattr(request.user, "empresa"):
         pais_usuario = request.user.empresa.pais
     elif request.GET.get("country"):
         pais_usuario = request.GET.get("country").upper()
@@ -109,50 +116,136 @@ def precios(request):
     # Si no hay precios configurados, usar valores por defecto
     if not planes_precios.exists():
         # Crear estructura de precios por defecto
-        planes = {
-            "mensual": {
-                "nombre": "Plan Mensual",
-                "precio": 20000 if pais_usuario == "CL" else 20,
-                "moneda": "CLP" if pais_usuario == "CL" else "USD",
-                "caracteristicas": [
-                    "Documentos ilimitados",
-                    "Hasta 5 usuarios",
-                    "Reportes básicos",
-                    "Soporte por email",
-                ],
-            },
-            "semestral": {
-                "nombre": "Plan Semestral",
-                "precio": 110000 if pais_usuario == "CL" else 110,
-                "moneda": "CLP" if pais_usuario == "CL" else "USD",
-                "caracteristicas": [
-                    "Todo del Plan Mensual",
-                    "Reportes avanzados",
-                    "Diagnóstico IA incluido",
-                    "Soporte prioritario",
-                ],
-            },
-            "anual": {
-                "nombre": "Plan Anual",
-                "precio": 200000 if pais_usuario == "CL" else 200,
-                "moneda": "CLP" if pais_usuario == "CL" else "USD",
-                "caracteristicas": [
-                    "Todo del Plan Semestral",
-                    "API personalizada",
-                    "Multi-sucursales",
-                    "Soporte 24/7",
-                ],
-            },
-        }
+        if pais_usuario == "US":
+            # Precios USA en dólares
+            # Características IGUALES para todos los planes
+            caracteristicas_usa = [
+                "Unlimited documents",
+                "Unlimited users",
+                "Advanced reports",
+                "AI diagnostics included",
+                "Priority support",
+                "Custom API",
+                "Multi-location support",
+                "24/7 Premium support",
+            ]
+            
+            planes = {
+                "mensual": {
+                    "nombre": "Monthly Plan USA",
+                    "nombre_en": "Monthly Plan USA",
+                    "nombre_es": "Plan Mensual USA",
+                    "precio": 20,
+                    "moneda": "USD",
+                    "caracteristicas": caracteristicas_usa,
+                    "caracteristicas_en": caracteristicas_usa,
+                    "caracteristicas_es": [
+                        "Documentos ilimitados",
+                        "Usuarios ilimitados", 
+                        "Reportes avanzados",
+                        "Diagnóstico IA incluido",
+                        "Soporte prioritario",
+                        "API personalizada",
+                        "Multi-sucursales",
+                        "Soporte 24/7 Premium",
+                    ],
+                },
+                "semestral": {
+                    "nombre": "Semi-Annual Plan USA",
+                    "nombre_en": "Semi-Annual Plan USA",
+                    "nombre_es": "Plan Semestral USA",
+                    "precio": 100,
+                    "moneda": "USD",
+                    "caracteristicas": caracteristicas_usa,
+                    "caracteristicas_en": caracteristicas_usa,
+                    "caracteristicas_es": [
+                        "Documentos ilimitados",
+                        "Usuarios ilimitados",
+                        "Reportes avanzados", 
+                        "Diagnóstico IA incluido",
+                        "Soporte prioritario",
+                        "API personalizada",
+                        "Multi-sucursales",
+                        "Soporte 24/7 Premium",
+                    ],
+                },
+                "anual": {
+                    "nombre": "Annual Plan USA",
+                    "nombre_en": "Annual Plan USA",
+                    "nombre_es": "Plan Anual USA",
+                    "precio": 200,
+                    "moneda": "USD",
+                    "caracteristicas": caracteristicas_usa,
+                    "caracteristicas_en": caracteristicas_usa,
+                    "caracteristicas_es": [
+                        "Documentos ilimitados",
+                        "Usuarios ilimitados",
+                        "Reportes avanzados",
+                        "Diagnóstico IA incluido", 
+                        "Soporte prioritario",
+                        "API personalizada",
+                        "Multi-sucursales",
+                        "Soporte 24/7 Premium",
+                    ],
+                },
+            }
+        else:
+            # Precios Chile en pesos
+            # Características IGUALES para todos los planes
+            caracteristicas_chile = [
+                "Documentos ilimitados",
+                "Usuarios ilimitados",
+                "Reportes avanzados",
+                "Diagnóstico IA incluido",
+                "Soporte prioritario",
+                "API personalizada",
+                "Multi-sucursales",
+                "Soporte 24/7 Premium",
+            ]
+            
+            planes = {
+                "mensual": {
+                    "nombre": "Plan Mensual",
+                    "precio": 20000,
+                    "moneda": "CLP",
+                    "caracteristicas": caracteristicas_chile,
+                },
+                "semestral": {
+                    "nombre": "Plan Semestral",
+                    "precio": 100000,
+                    "moneda": "CLP",
+                    "caracteristicas": caracteristicas_chile,
+                },
+                "anual": {
+                    "nombre": "Plan Anual",
+                    "precio": 200000,
+                    "moneda": "CLP",
+                    "caracteristicas": caracteristicas_chile,
+                },
+            }
     else:
         # Usar precios de la base de datos
+        # Determinar idioma según país
+        lang = 'en' if pais_usuario == 'US' else 'es'
+        
         planes = {}
         for precio in planes_precios:
+            # Traducir nombres de planes si es USA
+            nombre_plan = precio.nombre_plan
+            if pais_usuario == 'US':
+                # Traducir nombres al inglés y agregar "USA"
+                if 'mensual' in precio.tipo_plan.lower():
+                    nombre_plan = "Monthly Plan USA"
+                elif 'semestral' in precio.tipo_plan.lower():
+                    nombre_plan = "Semi-Annual Plan USA"
+                elif 'anual' in precio.tipo_plan.lower():
+                    nombre_plan = "Annual Plan USA"
+            
             planes[precio.tipo_plan] = {
-                "nombre": precio.nombre_plan,
+                "nombre": nombre_plan,
                 "precio": precio.precio,
                 "moneda": precio.moneda,
-                "caracteristicas": precio.caracteristicas_list(),
+                "caracteristicas": precio.caracteristicas_list(lang=lang),
                 "precio_formateado": precio.precio_formateado(),
             }
 

@@ -1,0 +1,44 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Debug Autocomplete Cliente</title>
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.full.min.js"></script>
+</head>
+<body>
+  <h2>🧪 Campo Cliente - Autocomplete Debug</h2>
+  <label for="id_cliente">Cliente:</label>
+  <select id="id_cliente" data-autocomplete-light-url="/autocomplete/cliente/" data-autocomplete-light-function="select2" data-placeholder="Buscar cliente...">
+    <option value="">---------</option>
+  </select>
+
+  <script>
+    $(document).ready(function () {
+      console.log("🔧 Inicializando campo cliente...");
+      $('#id_cliente').select2({
+        width: '100%',
+        ajax: {
+          url: '/autocomplete/cliente/',
+          dataType: 'json',
+          delay: 250,
+          data: function (params) {
+            return {
+              q: params.term
+            };
+          },
+          processResults: function (data) {
+            return {
+              results: data.results
+            };
+          }
+        },
+        placeholder: 'Buscar cliente...',
+        language: 'es'
+      });
+    });
+  </script>
+</body>
+</html>

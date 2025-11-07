@@ -17,6 +17,7 @@ from taller.views_extra.views_configuracion import (
     configuracion_empresa,
     configuracion_tecnicos,
 )
+from taller.views_extra.views_suscripciones import precios
 from taller.views_extra.views_trial_activate import activar_trial
 
 # from taller.views_extra.crear_motor_caja import crear_motor, crear_caja, crear_color  # ❌ Desactivado - usando views_create_parts
@@ -76,6 +77,9 @@ urlpatterns = [
         "registro/",
         include(("scripts.onboarding_urls", "onboarding"), namespace="usa_onboarding"),
     ),
+    # 4.5) Pricing and subscription
+    path("pricing/", precios, name="pricing"),
+    path("plans/", precios, name="plans"),
     # 5) AJAX específicos USA
     path("ajax/load-modelos/", ajax_views.load_modelos, name="ajax_load_modelos"),
     path("ajax/load-motores/", ajax_views.load_motores, name="ajax_load_motores"),
@@ -99,6 +103,35 @@ urlpatterns = [
     # path("vehiculos/crear-motor/", crear_motor, name="crear_motor"),  # ❌ Desactivado - usar vehiculos:crear_motor
     # path("vehiculos/crear-caja/", crear_caja, name="crear_caja"),    # ❌ Desactivado - usar vehiculos:crear_caja
     # path("vehiculos/crear-color/", crear_color, name="crear_color"), # ❌ Desactivado - usar vehiculos:crear_color
+    # 6) Módulos principales del sistema (antes de taller.urls)
+    path(
+        "clientes/",
+        include(("taller.clientes.urls", "clientes"), namespace="clientes"),
+    ),
+    path(
+        "vehiculos/",
+        include(("taller.vehiculos.urls", "vehiculos"), namespace="vehiculos"),
+    ),
+    path(
+        "documentos/",
+        include(("taller.documentos.urls", "documentos"), namespace="documentos"),
+    ),
+    path(
+        "repuestos/",
+        include(("taller.repuestos.urls", "repuestos"), namespace="repuestos"),
+    ),
+    path(
+        "servicios/",
+        include(("taller.servicios.urls", "servicios"), namespace="servicios"),
+    ),
+    path(
+        "reportes/",
+        include(("taller.reportes.urls", "reportes"), namespace="reportes"),
+    ),
+    path(
+        "tecnicos/",
+        include(("taller.tecnicos.urls", "tecnicos"), namespace="tecnicos"),
+    ),
     # 7) Analytics (antes de taller si sus rutas son más específicas)
     path("", include("taller.analytics.urls_suscriptor")),
     # 8) Núcleo de taller (último para que no opaque lo anterior)

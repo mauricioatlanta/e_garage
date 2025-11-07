@@ -3,1126 +3,550 @@
 {% load widget_tweaks %}
 {% load i18n %}
 
-<!-- Badge de confirmación -->
-<div style="position:fixed;top:8px;right:8px;z-index:9999;padding:.35rem .6rem;border:2px solid #22c55e;border-radius:.6rem;background:#052e16;color:#a7f3d0;font:700 11px/1 ui-monospace,monospace;">
-USA EN LOGIN :: account/login.html
-</div>
+{% block title %}{% trans "Sign In" %} - eGarage{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/force_black_text.css' %}">
-<script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  // Configuración futurista de partículas
-  tsParticles.load("tsparticles", {
-    fullScreen: { enable: false },
-    background: { color: { value: "transparent" } },
-    particles: {
-      number: { value: 120 },
-      color: {
-        value: ["#00ff88", "#00d4ff", "#8844ff", "#ff4488", "#ffaa00"]
-      },
-      shape: {
-        type: ["circle", "triangle", "polygon"],
-        polygon: { sides: 6 }
-      },
-      size: {
-        value: { min: 0.5, max: 3 },
-        animation: {
-          enable: true,
-          speed: 2,
-          minimumValue: 0.3
-        }
-      },
-      move: {
-        enable: true,
-        speed: { min: 0.1, max: 1.5 },
-        direction: "none",
-        outModes: { default: "bounce" }
-      },
-      opacity: {
-        value: { min: 0.1, max: 0.8 },
-        animation: {
-          enable: true,
-          speed: 1
-        }
-      },
-      links: {
-        enable: true,
-        distance: 100,
-        color: "#00ff88",
-        opacity: 0.2,
-        width: 1
-      }
-    },
-    interactivity: {
-      events: {
-        onHover: {
-          enable: true,
-          mode: "repulse"
-        }
-      },
-      modes: {
-        repulse: {
-          distance: 80,
-          duration: 0.4
-        }
-      }
-    }
-  });
-
-  // Efecto de scan lines cyberpunk
-  const scanlines = document.createElement('div');
-  scanlines.className = 'cyberpunk-scanlines';
-  document.body.appendChild(scanlines);
-
-  // Efecto de glitch en el logo
-  setInterval(() => {
-    const logo = document.querySelector('.egarage-logo');
-    if (logo && Math.random() < 0.1) {
-      logo.classList.add('glitch-effect');
-      setTimeout(() => logo.classList.remove('glitch-effect'), 200);
-    }
-  }, 3000);
-
-  // Efecto matrix rain
-  const canvas = document.createElement('canvas');
-  canvas.className = 'matrix-canvas';
-  document.body.appendChild(canvas);
-  const ctx = canvas.getContext('2d');
-
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-
-  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890@#$%^&*()';
-  const lettersArray = letters.split('');
-  const fontSize = 14;
-  const columns = canvas.width / fontSize;
-  const drops = [];
-
-  for(let x = 0; x < columns; x++) {
-    drops[x] = 1;
-  }
-
-  function drawMatrix() {
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    ctx.fillStyle = '#00ff88';
-    ctx.font = fontSize + 'px monospace';
-
-    for(let i = 0; i < drops.length; i++) {
-      const text = lettersArray[Math.floor(Math.random() * lettersArray.length)];
-      ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-      if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-        drops[i] = 0;
-      }
-      drops[i]++;
-    }
-  }
-
-  setInterval(drawMatrix, 50);
-});
-</script>
-{% endblock %}
-
-{% block fondo_extra %}
-<div id="tsparticles" class="fixed inset-0 -z-10"></div>
-<div class="cyberpunk-bg"></div>
-{% endblock %}
-
-{% block content %}
-<div class="min-h-screen flex items-center justify-center px-4 cyberpunk-login-container">
-  <!-- Holographic Frame Container -->
-  <div class="holographic-frame">
-    <div class="hologram-card">
-
-      <!-- Logo eGarage como obra de arte futurista -->
-      <div class="logo-masterpiece">
-        <div class="logo-hologram">
-          <!-- Logo principal con efectos holográficos -->
-          <div class="egarage-logo-container">
-            <img src="{% static 'img/TallerPro_logo.png' %}" alt="E-Garage Logo" class="egarage-logo">
-            <div class="logo-aura"></div>
-            <div class="logo-rings">
-              <div class="ring ring-1"></div>
-              <div class="ring ring-2"></div>
-              <div class="ring ring-3"></div>
-            </div>
-          </div>
-
-          <!-- Texto eGarage con efectos matrix -->
-          <div class="logo-text-container">
-            <h1 class="egarage-title">
-              <span class="letter-e">E</span>
-              <span class="hyphen">-</span>
-              <span class="garage-text">GARAGE</span>
-            </h1>
-            <div class="subtitle-tech">AUTOMOTIVE AI PLATFORM</div>
-            <div class="version-badge">v2.0 QUANTUM</div>
-          </div>
-
-          <!-- Bandera holográfica de USA -->
-          <div class="country-hologram">
-            <div class="flag-hologram usa-flag">🇺🇸</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Título de login futurista -->
-      <h2 class="cyber-title">
-        <span class="cyber-bracket">[</span>
-        {% trans "NEURAL ACCESS REQUIRED" %}
-        <span class="cyber-bracket">]</span>
-      </h2>
-
-      <!-- Debug info con estilo cyberpunk -->
-      {% if settings.DEBUG %}
-      <div class="debug-panel">
-        <div class="debug-line">COUNTRY: {{ country|default:'UNKNOWN' }}</div>
-        <div class="debug-line">REDIRECT: {{ request.GET.next|default:'ROOT' }}</div>
-      </div>
-      {% endif %}
-
-      <!-- Formulario de login futurista -->
-      <form class="cyber-form" method="POST">
-        {% csrf_token %}
-        {{ form.non_field_errors }}
-
-        <!-- Neural Input Fields -->
-        <div class="neural-field-group">
-          <!-- Campo de Usuario/Email -->
-          <div class="neural-field">
-            <label class="neural-label" for="id_login">
-              <span class="label-icon">👤</span>
-              {% trans "NEURAL ID" %}
-            </label>
-            <div class="input-container">
-              {{ form.login|add_class:"neural-input" }}
-              <div class="input-underline"></div>
-              <div class="input-focus-effect"></div>
-            </div>
-            {% if form.login.errors %}
-              <div class="neural-error">
-                {% for error in form.login.errors %}{{ error }}{% endfor %}
-              </div>
-            {% endif %}
-          </div>
-
-          <!-- Campo de Contraseña -->
-          <div class="neural-field">
-            <label class="neural-label" for="id_password">
-              <span class="label-icon">🔐</span>
-              {% trans "SECURITY CODE" %}
-            </label>
-            <div class="input-container">
-              {{ form.password|add_class:"neural-input" }}
-              <div class="input-underline"></div>
-              <div class="input-focus-effect"></div>
-            </div>
-            {% if form.password.errors %}
-              <div class="neural-error">
-                {% for error in form.password.errors %}{{ error }}{% endfor %}
-              </div>
-            {% endif %}
-          </div>
-
-          <!-- Campo Remember Me -->
-          {% if form.remember %}
-          <div class="neural-checkbox">
-            <label class="checkbox-container">
-              {{ form.remember|add_class:"neural-check" }}
-              <span class="checkmark"></span>
-              <span class="checkbox-label">{{ form.remember.label }}</span>
-            </label>
-          </div>
-          {% endif %}
-        </div>
-
-        <!-- Botón de acceso neural -->
-        <button type="submit" class="neural-access-btn">
-          <span class="btn-text">{% trans "INITIALIZE NEURAL LINK" %}</span>
-          <div class="btn-scanner"></div>
-          <div class="btn-particles"></div>
-        </button>
-      </form>
-
-      <!-- Enlaces adicionales -->
-      <div class="cyber-links">
-        <a class="cyber-link" href="{% url 'account_reset_password' %}">
-          <span class="link-icon">🔧</span>
-          {% trans "MEMORY RECOVERY" %}
-        </a>
-      </div>
-
-      <!-- Registro -->
-      <div class="cyber-register">
-        {% trans "NEURAL PROFILE NOT FOUND?" %}
-        <a class="register-link" href="/signup/">
-          {% trans "CREATE NEW NEURAL ID" %}
-        </a>
-      </div>
-
-      <!-- Botones de idioma para USA -->
-      {% if '/us/' in request.path %}
-      <div class="language-matrix">
-        <a href="?lang=es" class="lang-chip esp-chip">🇪🇸 ESP</a>
-        <a href="?lang=en" class="lang-chip eng-chip">🇺🇸 ENG</a>
-      </div>
-      {% endif %}
-
-      <!-- Créditos futuristas -->
-      <div class="neural-credits">
-        <div class="credits-header">POWERED BY</div>
-        <div class="credits-company">ATLANTA RECICLAJES™</div>
-        <div class="credits-links">
-          <a href="mailto:suscripcion@atlantareciclajes.cl" class="credit-link">
-            📧 NEURAL.CONTACT
-          </a>
-          <a href="http://www.atlantareciclajes.cl" class="credit-link">
-            🌐 MATRIX.PORTAL
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
 <style>
-/* Reset y base */
-body {
+* {
     margin: 0;
     padding: 0;
-    background: #000;
-    font-family: 'Courier New', monospace;
-    overflow-x: hidden;
+    box-sizing: border-box;
 }
 
-/* Fondo cyberpunk */
-.cyberpunk-bg {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background:
-        radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
-        radial-gradient(circle at 40% 40%, rgba(120, 255, 198, 0.2) 0%, transparent 50%),
-        linear-gradient(180deg, #000 0%, #0a0a0a 50%, #000 100%);
-    z-index: -2;
-}
-
-.matrix-canvas {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0.1;
-    z-index: -1;
-    pointer-events: none;
-}
-
-.cyberpunk-scanlines {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background:
-        repeating-linear-gradient(
-            0deg,
-            transparent,
-            transparent 2px,
-            rgba(0, 255, 136, 0.03) 2px,
-            rgba(0, 255, 136, 0.03) 4px
-        );
-    z-index: 1;
-    pointer-events: none;
-    animation: scanlines 0.1s linear infinite;
-}
-
-@keyframes scanlines {
-    0% { transform: translateY(0); }
-    100% { transform: translateY(4px); }
-}
-
-/* Container principal */
-.cyberpunk-login-container {
-    position: relative;
-    z-index: 10;
+body {
+    background: linear-gradient(135deg, #0a0a23 0%, #1a1a2e 50%, #16213e 100%);
+    font-family: 'Exo 2', sans-serif;
+    color: #ffffff;
     min-height: 100vh;
+    overflow-x: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 2rem;
-}
-
-/* Frame holográfico */
-.holographic-frame {
     position: relative;
-    perspective: 1000px;
 }
 
-.hologram-card {
-    background:
-        linear-gradient(135deg,
-            rgba(0, 255, 136, 0.1) 0%,
-            rgba(0, 212, 255, 0.05) 25%,
-            rgba(136, 68, 255, 0.05) 50%,
-            rgba(255, 68, 136, 0.05) 75%,
-            rgba(0, 255, 136, 0.1) 100%
-        );
-    border: 2px solid rgba(0, 255, 136, 0.5);
-    border-radius: 20px;
-    padding: 3rem;
+.font-futuristic {
+    font-family: 'Orbitron', monospace;
+    letter-spacing: 0.05em;
+}
+
+/* Grid animado de fondo */
+.tech-grid {
+    background-image:
+        linear-gradient(rgba(0, 230, 255, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 230, 255, 0.08) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: grid-move 20s linear infinite;
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+}
+
+@keyframes grid-move {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(50px, 50px); }
+}
+
+/* Partículas flotantes */
+.particles {
+    position: fixed;
+    inset: 0;
+    z-index: 2;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.particle {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: #00e6ff;
+    border-radius: 50%;
+    animation: particle-float 10s linear infinite;
+    box-shadow: 0 0 10px #00e6ff;
+}
+
+@keyframes particle-float {
+    0% { transform: translateY(100vh) translateX(0) rotate(0deg); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(-100px) translateX(100px) rotate(360deg); opacity: 0; }
+}
+
+/* Login container */
+.login-container {
+    position: relative;
+    z-index: 10;
     width: 100%;
-    max-width: 480px;
-    backdrop-filter: blur(20px) saturate(150%);
-    box-shadow:
-        0 0 50px rgba(0, 255, 136, 0.3),
-        inset 0 0 50px rgba(0, 255, 136, 0.05),
-        0 0 100px rgba(0, 212, 255, 0.2);
+    max-width: 500px;
+    padding: 20px;
+}
+
+/* Glass morphism card */
+.glass-card {
+    background: linear-gradient(135deg, rgba(0, 230, 255, 0.1) 0%, rgba(99, 102, 241, 0.05) 100%);
+    backdrop-filter: blur(30px);
+    border-radius: 2rem;
+    border: 2px solid rgba(0, 230, 255, 0.3);
+    box-shadow: 
+        0 20px 60px rgba(0, 230, 255, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    padding: 3rem 2.5rem;
     position: relative;
     overflow: hidden;
-    animation: hologram-float 6s ease-in-out infinite;
 }
 
-@keyframes hologram-float {
-    0%, 100% { transform: translateY(0) rotateX(0); }
-    50% { transform: translateY(-10px) rotateX(2deg); }
-}
-
-.hologram-card::before {
+.glass-card::before {
     content: '';
     position: absolute;
     top: 0;
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg,
-        transparent,
-        rgba(0, 255, 136, 0.2),
-        transparent
-    );
-    animation: hologram-sweep 4s infinite;
+    background: linear-gradient(90deg, transparent, rgba(0, 230, 255, 0.15), transparent);
+    animation: shimmer 4s infinite;
 }
 
-@keyframes hologram-sweep {
+@keyframes shimmer {
     0% { left: -100%; }
     100% { left: 100%; }
 }
 
-/* Logo masterpiece */
-.logo-masterpiece {
+/* Logo section */
+.logo-section {
     text-align: center;
-    margin-bottom: 2rem;
-    position: relative;
+    margin-bottom: 2.5rem;
 }
 
-.logo-hologram {
-    position: relative;
-    display: inline-block;
-}
-
-.egarage-logo-container {
+.logo-container {
     position: relative;
     display: inline-block;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
 }
 
-.egarage-logo {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    border: 4px solid rgba(0, 255, 136, 0.8);
-    padding: 20px;
-    background:
-        radial-gradient(circle,
-            rgba(0, 255, 136, 0.1) 0%,
-            rgba(0, 0, 0, 0.8) 70%
-        );
-    filter:
-        drop-shadow(0 0 30px rgba(0, 255, 136, 0.8))
-        drop-shadow(0 0 60px rgba(0, 212, 255, 0.4));
-    animation: logo-pulse 3s ease-in-out infinite;
-    transition: all 0.3s ease;
+.logo {
+    height: 100px;
+    width: auto;
+    filter: drop-shadow(0 0 30px rgba(0, 230, 255, 0.8));
+    animation: pulse-glow 3s ease-in-out infinite;
 }
 
-.egarage-logo:hover {
-    transform: scale(1.1);
-    filter:
-        drop-shadow(0 0 30px rgba(0, 255, 136, 1))
-        drop-shadow(0 0 60px rgba(0, 212, 255, 0.6));
-}
-
-@keyframes logo-pulse {
-    0%, 100% {
-        box-shadow:
-            0 0 20px rgba(0, 255, 136, 0.8),
-            0 0 40px rgba(0, 212, 255, 0.4);
+@keyframes pulse-glow {
+    0%, 100% { 
+        filter: drop-shadow(0 0 30px rgba(0, 230, 255, 0.8));
+        transform: scale(1);
     }
-    50% {
-        box-shadow:
-            0 0 40px rgba(0, 255, 136, 1),
-            0 0 80px rgba(0, 212, 255, 0.6);
+    50% { 
+        filter: drop-shadow(0 0 40px rgba(0, 230, 255, 1));
+        transform: scale(1.02);
     }
 }
 
-.logo-aura {
-    position: absolute;
-    top: -20px;
-    left: -20px;
-    right: -20px;
-    bottom: -20px;
-    border-radius: 50%;
-    background:
-        radial-gradient(circle,
-            rgba(0, 255, 136, 0.2) 0%,
-            transparent 70%
-        );
-    animation: aura-pulse 4s ease-in-out infinite;
+.welcome-text {
+    font-size: 1rem;
+    color: #94a3b8;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
 }
 
-@keyframes aura-pulse {
-    0%, 100% { transform: scale(1); opacity: 0.5; }
-    50% { transform: scale(1.2); opacity: 1; }
-}
-
-.logo-rings {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-
-.ring {
-    position: absolute;
-    border: 1px solid rgba(0, 255, 136, 0.3);
-    border-radius: 50%;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-
-.ring-1 {
-    width: 140px;
-    height: 140px;
-    animation: ring-rotate-1 10s linear infinite;
-}
-
-.ring-2 {
-    width: 160px;
-    height: 160px;
-    animation: ring-rotate-2 15s linear infinite reverse;
-}
-
-.ring-3 {
-    width: 180px;
-    height: 180px;
-    animation: ring-rotate-3 20s linear infinite;
-}
-
-@keyframes ring-rotate-1 {
-    from { transform: translate(-50%, -50%) rotate(0deg); }
-    to { transform: translate(-50%, -50%) rotate(360deg); }
-}
-
-@keyframes ring-rotate-2 {
-    from { transform: translate(-50%, -50%) rotate(0deg); }
-    to { transform: translate(-50%, -50%) rotate(360deg); }
-}
-
-@keyframes ring-rotate-3 {
-    from { transform: translate(-50%, -50%) rotate(0deg); }
-    to { transform: translate(-50%, -50%) rotate(360deg); }
-}
-
-/* Efecto glitch */
-.glitch-effect {
-    animation: glitch 0.2s ease-in-out;
-}
-
-@keyframes glitch {
-    0% { transform: translate(0); }
-    20% { transform: translate(-2px, 2px); }
-    40% { transform: translate(-2px, -2px); }
-    60% { transform: translate(2px, 2px); }
-    80% { transform: translate(2px, -2px); }
-    100% { transform: translate(0); }
-}
-
-/* Texto del logo */
-.logo-text-container {
-    margin-top: 1rem;
-}
-
-.egarage-title {
-    font-size: 2.5rem;
-    font-weight: 900;
-    font-family: 'Courier New', monospace;
-    letter-spacing: 5px;
-    margin: 0;
-    background: linear-gradient(45deg,
-        #00ff88,
-        #00d4ff,
-        #8844ff,
-        #ff4488
-    );
-    background-size: 400% 400%;
+.subtitle-text {
+    font-size: 0.875rem;
+    background: linear-gradient(45deg, #00e6ff, #6366f1);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: gradient-text 3s ease infinite;
-    text-shadow: 0 0 30px rgba(0, 255, 136, 0.8);
+    background-clip: text;
+    font-weight: 600;
 }
 
-@keyframes gradient-text {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-
-.letter-e {
+.country-badge {
     display: inline-block;
-    animation: letter-bounce-1 2s ease-in-out infinite;
+    background: linear-gradient(135deg, rgba(0, 230, 255, 0.15), rgba(99, 102, 241, 0.1));
+    border: 1px solid rgba(0, 230, 255, 0.4);
+    color: #00e6ff;
+    padding: 8px 20px;
+    border-radius: 25px;
+    font-size: 0.875rem;
+    font-weight: 700;
+    margin-top: 1rem;
+    box-shadow: 0 0 15px rgba(0, 230, 255, 0.3);
 }
 
-.hyphen {
-    display: inline-block;
-    animation: letter-bounce-2 2s ease-in-out infinite 0.1s;
-}
-
-.garage-text {
-    display: inline-block;
-    animation: letter-bounce-3 2s ease-in-out infinite 0.2s;
-}
-
-@keyframes letter-bounce-1 {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
-}
-
-@keyframes letter-bounce-2 {
-    0%, 100% { transform: translateY(0) rotateZ(0deg); }
-    50% { transform: translateY(-3px) rotateZ(180deg); }
-}
-
-@keyframes letter-bounce-3 {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
-}
-
-.subtitle-tech {
-    font-size: 0.9rem;
-    color: rgba(0, 255, 136, 0.8);
-    font-weight: 300;
-    letter-spacing: 3px;
-    margin-top: 0.5rem;
-    animation: subtitle-glow 2s ease-in-out infinite alternate;
-}
-
-@keyframes subtitle-glow {
-    from { text-shadow: 0 0 10px rgba(0, 255, 136, 0.5); }
-    to { text-shadow: 0 0 20px rgba(0, 255, 136, 0.8); }
-}
-
-.version-badge {
-    display: inline-block;
-    background: rgba(136, 68, 255, 0.2);
-    border: 1px solid rgba(136, 68, 255, 0.8);
-    color: rgba(136, 68, 255, 1);
-    padding: 0.3rem 0.8rem;
-    border-radius: 15px;
-    font-size: 0.7rem;
-    font-weight: bold;
-    margin-top: 0.8rem;
-    animation: badge-pulse 3s ease-in-out infinite;
-}
-
-@keyframes badge-pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-}
-
-/* Bandera holográfica */
-.country-hologram {
-    position: absolute;
-    top: -10px;
-    right: -10px;
-}
-
-.flag-hologram {
-    font-size: 2rem;
-    animation: flag-wave 3s ease-in-out infinite;
-    filter: drop-shadow(0 0 10px rgba(0, 255, 136, 0.5));
-}
-
-@keyframes flag-wave {
-    0%, 100% { transform: rotate(-5deg); }
-    50% { transform: rotate(5deg); }
-}
-
-/* Título cyber */
-.cyber-title {
-    font-size: 1.5rem;
-    font-weight: bold;
-    text-align: center;
-    color: #00ff88;
-    margin-bottom: 2rem;
-    font-family: 'Courier New', monospace;
-    letter-spacing: 2px;
-    animation: title-flicker 4s ease-in-out infinite;
-}
-
-@keyframes title-flicker {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.8; }
-    51% { opacity: 1; }
-    52% { opacity: 0.8; }
-    53% { opacity: 1; }
-}
-
-.cyber-bracket {
-    color: #00d4ff;
-    font-weight: 900;
-    animation: bracket-glow 2s ease-in-out infinite alternate;
-}
-
-@keyframes bracket-glow {
-    from { text-shadow: 0 0 5px #00d4ff; }
-    to { text-shadow: 0 0 15px #00d4ff; }
-}
-
-/* Panel debug */
-.debug-panel {
-    background: rgba(0, 0, 0, 0.8);
-    border: 1px solid rgba(255, 68, 136, 0.5);
-    border-radius: 5px;
-    padding: 0.5rem;
-    margin-bottom: 1rem;
-    font-size: 0.7rem;
-    font-family: 'Courier New', monospace;
-}
-
-.debug-line {
-    color: #ff4488;
-    margin: 0.2rem 0;
-}
-
-/* Formulario neural */
-.cyber-form {
-    width: 100%;
-}
-
-.neural-field-group {
-    margin-bottom: 2rem;
-}
-
-.neural-field {
+/* Form styles */
+.form-group {
     margin-bottom: 1.5rem;
-    position: relative;
 }
 
-.neural-label {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: #00ff88;
-    font-size: 0.9rem;
-    font-weight: bold;
+.form-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #00e6ff;
     margin-bottom: 0.5rem;
-    font-family: 'Courier New', monospace;
-    letter-spacing: 1px;
-}
-
-.label-icon {
-    font-size: 1.2rem;
-    animation: icon-pulse 2s ease-in-out infinite;
-}
-
-@keyframes icon-pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-}
-
-.input-container {
-    position: relative;
-}
-
-.neural-input {
-    width: 100% !important;
-    background: rgba(0, 0, 0, 0.8) !important;
-    border: 2px solid rgba(0, 255, 136, 0.3) !important;
-    border-radius: 10px !important;
-    padding: 1rem !important;
-    color: #fff !important;
-    font-family: 'Courier New', monospace !important;
-    font-size: 1rem !important;
-    transition: all 0.3s ease !important;
-    box-shadow: inset 0 0 20px rgba(0, 255, 136, 0.1) !important;
-}
-
-.neural-input:focus {
-    border-color: #00ff88 !important;
-    box-shadow:
-        inset 0 0 20px rgba(0, 255, 136, 0.2),
-        0 0 20px rgba(0, 255, 136, 0.5) !important;
-    outline: none !important;
-}
-
-.neural-input::placeholder {
-    color: rgba(0, 255, 136, 0.5) !important;
-    font-family: 'Courier New', monospace !important;
-}
-
-.input-underline {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background: linear-gradient(90deg, #00ff88, #00d4ff);
-    transition: width 0.3s ease;
-}
-
-.neural-input:focus + .input-underline {
-    width: 100%;
-}
-
-.input-focus-effect {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border-radius: 10px;
-    background: rgba(0, 255, 136, 0.05);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    pointer-events: none;
-}
-
-.neural-input:focus + .input-underline + .input-focus-effect {
-    opacity: 1;
-}
-
-.neural-error {
-    color: #ff4488;
-    font-size: 0.8rem;
-    margin-top: 0.5rem;
-    font-family: 'Courier New', monospace;
-}
-
-/* Checkbox neural */
-.neural-checkbox {
-    margin: 1rem 0;
-}
-
-.checkbox-container {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    font-size: 0.9rem;
-    color: #00ff88;
-    font-family: 'Courier New', monospace;
-}
-
-.neural-check {
-    appearance: none;
-    width: 20px;
-    height: 20px;
-    border: 2px solid rgba(0, 255, 136, 0.5);
-    border-radius: 3px;
-    background: rgba(0, 0, 0, 0.8);
-    margin-right: 0.8rem;
-    position: relative;
-    transition: all 0.3s ease;
-}
-
-.neural-check:checked {
-    background: rgba(0, 255, 136, 0.2);
-    border-color: #00ff88;
-}
-
-.neural-check:checked::after {
-    content: '✓';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: #00ff88;
-    font-size: 0.8rem;
-    font-weight: bold;
-}
-
-/* Botón de acceso neural */
-.neural-access-btn {
-    width: 100%;
-    background: linear-gradient(45deg,
-        rgba(0, 255, 136, 0.1),
-        rgba(0, 212, 255, 0.1)
-    );
-    border: 2px solid #00ff88;
-    border-radius: 15px;
-    padding: 1.2rem;
-    color: #00ff88;
-    font-family: 'Courier New', monospace;
-    font-size: 1.1rem;
-    font-weight: bold;
-    letter-spacing: 2px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    margin: 2rem 0;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
 }
 
-.neural-access-btn:hover {
-    background: linear-gradient(45deg,
-        rgba(0, 255, 136, 0.2),
-        rgba(0, 212, 255, 0.2)
-    );
-    box-shadow:
-        0 0 30px rgba(0, 255, 136, 0.5),
-        inset 0 0 30px rgba(0, 255, 136, 0.1);
-    transform: translateY(-2px);
-}
-
-.btn-text {
-    position: relative;
-    z-index: 2;
-}
-
-.btn-scanner {
-    position: absolute;
-    top: 0;
-    left: -100%;
+.form-input {
     width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg,
-        transparent,
-        rgba(0, 255, 136, 0.3),
-        transparent
-    );
-    animation: btn-scan 3s infinite;
-}
-
-@keyframes btn-scan {
-    0% { left: -100%; }
-    100% { left: 100%; }
-}
-
-.btn-particles {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background:
-        radial-gradient(circle at 20% 20%, rgba(0, 255, 136, 0.3) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(0, 212, 255, 0.3) 0%, transparent 50%);
-    opacity: 0;
-    animation: btn-particles 4s ease-in-out infinite;
-}
-
-@keyframes btn-particles {
-    0%, 100% { opacity: 0; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.05); }
-}
-
-/* Enlaces cyber */
-.cyber-links {
-    text-align: center;
-    margin: 1.5rem 0;
-}
-
-.cyber-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: #00d4ff;
-    text-decoration: none;
-    font-family: 'Courier New', monospace;
-    font-size: 0.9rem;
-    padding: 0.5rem 1rem;
-    border: 1px solid rgba(0, 212, 255, 0.3);
-    border-radius: 20px;
-    transition: all 0.3s ease;
-}
-
-.cyber-link:hover {
-    background: rgba(0, 212, 255, 0.1);
-    box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
-    text-decoration: none;
-    color: #00d4ff;
-}
-
-.link-icon {
-    animation: icon-rotate 3s linear infinite;
-}
-
-@keyframes icon-rotate {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-/* Registro */
-.cyber-register {
-    text-align: center;
-    margin: 2rem 0;
-    color: rgba(0, 255, 136, 0.7);
-    font-family: 'Courier New', monospace;
-    font-size: 0.9rem;
-}
-
-.register-link {
-    color: #00ff88;
-    text-decoration: none;
-    font-weight: bold;
-    margin-left: 0.5rem;
-    transition: all 0.3s ease;
-}
-
-.register-link:hover {
-    text-shadow: 0 0 10px #00ff88;
-    text-decoration: none;
-    color: #00ff88;
-}
-
-/* Matriz de idiomas */
-.language-matrix {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin: 1.5rem 0;
-}
-
-.lang-chip {
-    padding: 0.5rem 1rem;
-    border: 1px solid rgba(0, 255, 136, 0.5);
-    border-radius: 20px;
-    color: #00ff88;
-    text-decoration: none;
-    font-family: 'Courier New', monospace;
-    font-size: 0.8rem;
-    transition: all 0.3s ease;
-    background: rgba(0, 0, 0, 0.8);
-}
-
-.lang-chip:hover {
-    background: rgba(0, 255, 136, 0.1);
-    box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
-    text-decoration: none;
-    color: #00ff88;
-}
-
-/* Créditos neurales */
-.neural-credits {
-    margin-top: 3rem;
-    padding-top: 2rem;
-    border-top: 1px solid rgba(0, 255, 136, 0.3);
-    text-align: center;
-}
-
-.credits-header {
-    font-size: 0.7rem;
-    color: rgba(0, 255, 136, 0.5);
-    font-family: 'Courier New', monospace;
-    letter-spacing: 2px;
-    margin-bottom: 0.5rem;
-}
-
-.credits-company {
+    padding: 1rem;
     font-size: 1rem;
-    color: #00ff88;
-    font-weight: bold;
-    font-family: 'Courier New', monospace;
-    letter-spacing: 1px;
-    margin-bottom: 1rem;
-    animation: company-glow 3s ease-in-out infinite alternate;
-}
-
-@keyframes company-glow {
-    from { text-shadow: 0 0 10px rgba(0, 255, 136, 0.5); }
-    to { text-shadow: 0 0 20px rgba(0, 255, 136, 0.8); }
-}
-
-.credits-links {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    align-items: center;
-}
-
-.credit-link {
-    color: #00d4ff;
-    text-decoration: none;
-    font-family: 'Courier New', monospace;
-    font-size: 0.8rem;
+    color: #ffffff;
+    background: rgba(0, 0, 0, 0.4);
+    border: 2px solid rgba(0, 230, 255, 0.3);
+    border-radius: 0.75rem;
     transition: all 0.3s ease;
-    padding: 0.3rem 0.8rem;
-    border-radius: 10px;
-    border: 1px solid rgba(0, 212, 255, 0.2);
 }
 
-.credit-link:hover {
-    background: rgba(0, 212, 255, 0.1);
-    text-shadow: 0 0 10px #00d4ff;
+.form-input:focus {
+    outline: none;
+    border-color: #00e6ff;
+    background: rgba(0, 0, 0, 0.6);
+    box-shadow: 0 0 20px rgba(0, 230, 255, 0.4);
+}
+
+.form-input::placeholder {
+    color: #64748b;
+}
+
+.error-message {
+    color: #ef4444;
+    font-size: 0.8125rem;
+    margin-top: 0.5rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.remember-me input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-right: 12px;
+    cursor: pointer;
+    accent-color: #00e6ff;
+    border: 2px solid rgba(0, 230, 255, 0.5);
+    border-radius: 4px;
+}
+
+.remember-me label {
+    font-size: 0.875rem;
+    color: #94a3b8;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Botón principal */
+.login-button {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #000000;
+    background: linear-gradient(135deg, #00e6ff 0%, #6366f1 100%);
+    border: none;
+    border-radius: 0.75rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 30px rgba(0, 230, 255, 0.5);
+    font-family: 'Orbitron', monospace;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    position: relative;
+    overflow: hidden;
+}
+
+.login-button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.login-button:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.login-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 40px rgba(0, 230, 255, 0.8);
+}
+
+.forgot-password {
+    text-align: center;
+    margin-top: 1.25rem;
+}
+
+.forgot-password a {
+    color: #00e6ff;
     text-decoration: none;
-    color: #00d4ff;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: all 0.2s;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .hologram-card {
-        padding: 2rem;
-        margin: 1rem;
-    }
-
-    .egarage-logo {
-        width: 100px;
-        height: 100px;
-    }
-
-    .egarage-title {
-        font-size: 1.8rem;
-        letter-spacing: 3px;
-    }
-
-    .neural-access-btn {
-        font-size: 1rem;
-    }
-
-    .credits-links {
-        flex-direction: column;
-    }
+.forgot-password a:hover {
+    text-shadow: 0 0 10px rgba(0, 230, 255, 0.8);
 }
 
-/* Sobrescribir force_black_text.css */
-.hologram-card *,
-.hologram-card label,
-.hologram-card h1,
-.hologram-card h2,
-.hologram-card h3,
-.hologram-card form label,
-.hologram-card input,
-.hologram-card select,
-.hologram-card textarea {
-    color: inherit !important;
+.signup-section {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(0, 230, 255, 0.2);
+}
+
+.signup-text {
+    font-size: 0.875rem;
+    color: #94a3b8;
+}
+
+.signup-link {
+    color: #00e6ff;
+    text-decoration: none;
+    font-weight: 700;
+    margin-left: 0.5rem;
+    transition: all 0.2s;
+}
+
+.signup-link:hover {
+    text-shadow: 0 0 10px rgba(0, 230, 255, 0.8);
+}
+
+/* Alert messages */
+.alert {
+    padding: 1rem;
+    border-radius: 0.75rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border: 1px solid;
+}
+
+.alert-error {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border-color: #ef4444;
+}
+
+.alert-success {
+    background: rgba(0, 230, 255, 0.1);
+    color: #00e6ff;
+    border-color: #00e6ff;
+}
+
+/* Botón de regreso */
+.back-button {
+    position: absolute;
+    top: 1.5rem;
+    left: 1.5rem;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: rgba(0, 230, 255, 0.1);
+    border: 1px solid rgba(0, 230, 255, 0.3);
+    border-radius: 0.75rem;
+    color: #00e6ff;
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.back-button:hover {
+    background: rgba(0, 230, 255, 0.2);
+    border-color: #00e6ff;
+    box-shadow: 0 0 20px rgba(0, 230, 255, 0.4);
+    transform: translateX(-3px);
+}
+
+@media (max-width: 640px) {
+    .glass-card {
+        padding: 2rem 1.5rem;
+    }
+    
+    .logo {
+        height: 80px;
+    }
+    
+    .back-button {
+        top: 1rem;
+        left: 1rem;
+        padding: 0.5rem 1rem;
+        font-size: 0.8125rem;
+    }
 }
 </style>
 {% endblock %}
 
+{% block content %}
+<!-- Grid de fondo -->
+<div class="tech-grid"></div>
 
+<!-- Partículas flotantes -->
+<div class="particles">
+    <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
+    <div class="particle" style="left: 25%; animation-delay: 2s;"></div>
+    <div class="particle" style="left: 40%; animation-delay: 4s;"></div>
+    <div class="particle" style="left: 55%; animation-delay: 1s;"></div>
+    <div class="particle" style="left: 70%; animation-delay: 3s;"></div>
+    <div class="particle" style="left: 85%; animation-delay: 5s;"></div>
+</div>
 
+<!-- Botón de regreso -->
+<a href="{% if request.country == 'US' %}/us/{% elif request.country == 'CL' %}/cl/{% else %}/{% endif %}" class="back-button font-futuristic">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+    </svg>
+    <span>{% trans "Back" %}</span>
+</a>
 
+<div class="login-container">
+    <div class="glass-card">
+        <!-- Logo -->
+        <div class="logo-section">
+            <div class="logo-container">
+                <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage" class="logo">
+            </div>
+            <div class="welcome-text">{% trans "Welcome back to" %}</div>
+            <div class="subtitle-text font-futuristic">{% trans "Professional Automotive Management System" %}</div>
+            
+            {% if request.country == 'CL' %}
+            <div class="country-badge font-futuristic">🇨🇱 CHILE</div>
+            {% elif request.country == 'US' %}
+            <div class="country-badge font-futuristic">🇺🇸 UNITED STATES</div>
+            {% endif %}
+        </div>
 
+        <!-- Mensajes de error generales -->
+        {% if form.non_field_errors %}
+        <div class="alert alert-error">
+            {% for error in form.non_field_errors %}
+                <div class="flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                    </svg>
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
 
+        <!-- Mensajes de éxito -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
 
+        <!-- Formulario -->
+        <form method="POST" action="{% url 'account_login' %}" class="space-y-6">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.GET.next }}">
 
+            <!-- Email/Usuario -->
+            <div class="form-group">
+                <label for="id_login" class="form-label font-futuristic">
+                    {% trans "Email or Username" %}
+                </label>
+                {{ form.login|add_class:"form-input"|attr:"placeholder:Enter your credentials"|attr:"autocomplete:email" }}
+                {% if form.login.errors %}
+                <div class="error-message">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                    </svg>
+                    {% for error in form.login.errors %}{{ error }}{% endfor %}
+                </div>
+                {% endif %}
+            </div>
 
+            <!-- Contraseña -->
+            <div class="form-group">
+                <label for="id_password" class="form-label font-futuristic">
+                    {% trans "Password" %}
+                </label>
+                {{ form.password|add_class:"form-input"|attr:"placeholder:Enter your secure password"|attr:"type:password"|attr:"autocomplete:current-password" }}
+                {% if form.password.errors %}
+                <div class="error-message">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                    </svg>
+                    {% for error in form.password.errors %}{{ error }}{% endfor %}
+                </div>
+                {% endif %}
+            </div>
 
+            <!-- Remember Me -->
+            {% if form.remember %}
+            <div class="remember-me">
+                {{ form.remember }}
+                <label for="id_remember">{% trans "Keep me signed in" %}</label>
+            </div>
+            {% endif %}
 
+            <!-- Botón Submit -->
+            <button type="submit" class="login-button">
+                <span class="relative z-10">
+                    <svg class="inline-block w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                    </svg>
+                    {% trans "Access System" %}
+                </span>
+            </button>
+        </form>
+
+        <!-- Forgot Password -->
+        <div class="forgot-password">
+            <a href="{% url 'account_reset_password' %}" class="font-futuristic">
+                <svg class="inline-block w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                </svg>
+                {% trans "Reset password" %}
+            </a>
+        </div>
+
+        <!-- Sign Up -->
+        <div class="signup-section">
+            <div class="signup-text">{% trans "New to eGarage?" %}</div>
+            <a href="{% url 'account_signup' %}" class="signup-link font-futuristic">
+                {% trans "Create your account" %} →
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+// Animación de entrada
+document.addEventListener('DOMContentLoaded', function() {
+    const card = document.querySelector('.glass-card');
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(30px)';
+    
+    setTimeout(() => {
+        card.style.transition = 'all 0.8s ease-out';
+        card.style.opacity = '1';
+        card.style.transform = 'translateY(0)';
+    }, 100);
+});
+</script>
+{% endblock %}

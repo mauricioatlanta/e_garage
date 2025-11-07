@@ -1,33 +1,10 @@
-{% extends "taller/common/base_usa_space.html" %}
+{% extends "base.html" %}
 {% load country_url %}
 {% load i18n static %}
 
 {% block title %}{% trans "Vehicles" %} - {{ empresa.nombre_taller }}{% endblock %}
 
-{% block space_icon %}🚗{% endblock %}
-{% block space_title %}{% trans "Vehicle Fleet" %}{% endblock %}
-{% block space_subtitle %}{% trans "Advanced vehicle management system" %}{% endblock %}
-
-{% block space_actions %}
-<div class="relative group">
-    <div class="absolute -inset-1 rounded-lg bg-gradient-to-r from-emerald-500 via-lime-500 to-green-500 opacity-30 blur group-hover:opacity-50 transition-opacity"></div>
-    <a href="{% country_url 'vehiculos:crear_vehiculo' %}" class="space-button" id="add-vehicle-btn">
-        <div class="w-4 h-4 rounded-md bg-white/20 flex items-center justify-center">
-            <span class="text-sm">➕</span>
-        </div>
-        <span>{% trans "Add Vehicle" %}</span>
-    </a>
-</div>
-
-<!-- DEBUG: URL del botón -->
-<div style="position: fixed; top: 10px; right: 10px; background: yellow; color: black; padding: 10px; z-index: 9999; font-size: 12px;">
-    DEBUG: Add Vehicle URL: {% country_url 'vehiculos:crear_vehiculo' %}<br>
-    Request Path: {{ request.path }}<br>
-    <button onclick="testNavigation()">Test Navigation</button>
-</div>
-{% endblock %}
-
-{% block space_main_content %}
+{% block content %}
 {% csrf_token %}
 
 <!-- Animated Background -->

@@ -48,6 +48,13 @@ class DocumentoForm(forms.ModelForm):
         required=False,
     )
 
+    # Campos JSON para filas dinámicas
+    repuestos_json = forms.CharField(widget=forms.HiddenInput(), required=False)
+    servicios_json = forms.CharField(widget=forms.HiddenInput(), required=False)
+    otros_json = forms.CharField(widget=forms.HiddenInput(), required=False)
+    payment_status = forms.CharField(required=False)
+    apply_vat = forms.BooleanField(required=False)
+
     class Meta:
         model = Documento
         fields = [
@@ -69,6 +76,9 @@ class DocumentoForm(forms.ModelForm):
             'nota_pago',
             'descuento',
         ]
+        
+        # Campos obligatorios: solo los esenciales
+        required_fields = ['tipo', 'numero', 'fecha_emision', 'cliente']
 
     def __init__(self, *args, **kwargs):
         # Extraer argumentos personalizados
@@ -96,6 +106,9 @@ class DocumentoForm(forms.ModelForm):
         
         # Configurar widgets con IDs únicos para JavaScript
         self._configure_widget_ids()
+        
+        # Configurar campos requeridos: solo los esenciales
+        self._configure_required_fields()
 
     def _configure_labels_by_country(self):
         """Configura labels dinámicos según el país"""
@@ -144,7 +157,7 @@ class DocumentoForm(forms.ModelForm):
             self.fields['tipo'].choices = [
                 ("OT", "Work Order"),
                 ("PRES", "Estimate"),
-                ("REC", "Receipt/Invoice"),
+                ("FAC", "Invoice/Receipt"),  # Cambiado de "REC" a "FAC"
             ]
             
             # Millas solo en USA
@@ -155,7 +168,7 @@ class DocumentoForm(forms.ModelForm):
             self.fields['tipo'].choices = [
                 ("OT", "Orden de Trabajo"),
                 ("PRES", "Presupuesto"),
-                ("REC", "Recibo/Boleta"),
+                ("FAC", "Factura/Boleta"),  # Cambiado de "REC" a "FAC"
             ]
             
             # Kilometraje en Chile, millas no aplica
@@ -189,6 +202,20 @@ class DocumentoForm(forms.ModelForm):
             if field_name in self.fields:
                 self.fields[field_name].widget.attrs.setdefault("id", widget_id)
 
+    def _configure_required_fields(self):
+        """Configura qué campos son requeridos: solo los esenciales"""
+        # Campos obligatorios: solo los esenciales
+        required_fields = ['tipo', 'numero', 'fecha_emision', 'cliente']
+        
+        # Marcar todos los campos como no requeridos por defecto
+        for field_name in self.fields:
+            self.fields[field_name].required = False
+        
+        # Marcar solo los campos esenciales como requeridos
+        for field_name in required_fields:
+            if field_name in self.fields:
+                self.fields[field_name].required = True
+
     def clean(self):
         """Validaciones robustas multi-tenant"""
         cleaned_data = super().clean()
@@ -218,3 +245,72 @@ class DocumentoForm(forms.ModelForm):
                 raise forms.ValidationError("Debe especificar al menos kilometraje o millas.")
         
         return cleaned_data
+
+    def save(self, commit=True):
+        """Override save para procesar datos JSON y crear líneas del documento"""
+        documento = super().save(commit=commit)
+        
+        if commit:
+            # Procesar datos JSON solo si el documento se guardó
+            self._process_json_data(documento)
+        
+        return documento
+
+    def _process_json_data(self, documento):
+        """Procesa los datos JSON y crea las líneas del documento"""
+        import json
+        
+        # Procesar repuestos
+        repuestos_data = self.cleaned_data.get('repuestos_json', '[]')
+        if repuestos_data:
+            try:
+                repuestos = json.loads(repuestos_data)
+                for rep_data in repuestos:
+                    if rep_data.get('codigo') or rep_data.get('nombre'):
+                        from taller.models.lineas_documento import LineaRepuesto
+                        LineaRepuesto.objects.create(
+                            documento=documento,
+                            codigo=rep_data.get('codigo', ''),
+                            nombre=rep_data.get('nombre', ''),
+                            cantidad=rep_data.get('cantidad', 1),
+                            precio_unitario=rep_data.get('precio', 0),
+                            descuento=rep_data.get('descuento', 0),
+                        )
+            except (json.JSONDecodeError, ValueError):
+                pass  # Ignorar datos JSON inválidos
+        
+        # Procesar servicios (SIN cantidad: forzamos cantidad=1)
+        servicios_data = self.cleaned_data.get('servicios_json', '[]')
+        if servicios_data:
+            try:
+                servicios = json.loads(servicios_data)
+                for serv_data in servicios:
+                    if serv_data.get('servicio_id'):
+                        from taller.models.lineas_documento import LineaServicio
+                        LineaServicio.objects.create(
+                            documento=documento,
+                            servicio_id=serv_data.get('servicio_id'),
+                            cantidad=1,  # forzamos 1 (sin cantidad en UI)
+                            precio_unitario=serv_data.get('precio', 0),
+                        )
+            except (json.JSONDecodeError, ValueError):
+                pass  # Ignorar datos JSON inválidos
+        
+        # Procesar otros servicios
+        otros_data = self.cleaned_data.get('otros_json', '[]')
+        if otros_data:
+            try:
+                otros = json.loads(otros_data)
+                for otro_data in otros:
+                    if otro_data.get('servicio_id'):
+                        from taller.models.lineas_documento import LineaOtroServicio
+                        LineaOtroServicio.objects.create(
+                            documento=documento,
+                            servicio_id=otro_data.get('servicio_id'),
+                            empresa_externa=otro_data.get('empresa_ext', ''),
+                            cantidad=otro_data.get('cantidad', 1),
+                            precio_taller=otro_data.get('precio_taller', 0),
+                            precio_cliente=otro_data.get('precio', 0),
+                        )
+            except (json.JSONDecodeError, ValueError):
+                pass  # Ignorar datos JSON inválidos

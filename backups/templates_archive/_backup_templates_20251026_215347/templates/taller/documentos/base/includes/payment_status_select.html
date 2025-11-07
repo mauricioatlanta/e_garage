@@ -1,0 +1,13 @@
+{# Selector de estado de pago (multi-idioma) #}
+{% load i18n %}
+<div id="payment-status-group" class="form-row">
+  <label for="id_payment_status" class="form-label">
+    {% trans "Payment Status" %}
+  </label>
+  <select id="id_payment_status" name="payment_status" class="futurista-input">
+    <option value="pending">{% trans "Pending" %}</option>
+    <option value="paid">{% trans "Paid" %}</option>
+    <option value="partial">{% trans "Partial" %}</option>
+    <option value="canceled">{% trans "Canceled" %}</option>
+  </select>
+</div>

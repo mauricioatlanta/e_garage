@@ -1,0 +1,116 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eGarage - Selecciona tu país</title>
+  <link rel="stylesheet" href="{% static 'css/tailwind.output.css' %}" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      background: #000;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', 'Roboto', sans-serif;
+      color: #fff;
+      overflow: hidden;
+    }
+    .selector-card {
+      background: rgba(20,20,20,0.85);
+      border-radius: 32px;
+      box-shadow: 0 8px 32px #00e6ff44;
+      padding: 3rem 2rem 2.5rem 2rem;
+      max-width: 440px;
+      text-align: center;
+      position: relative;
+      margin: auto;
+    }
+    .neon-border {
+      border: 2px solid #00e6ff;
+      box-shadow:
+        0 0 24px 1px #00e6ff,
+        0 0 60px 6px #00e6ff44,
+        0 0 0 1px #00e6ff;
+      animation: neon-glow 2s infinite alternate;
+      border-radius: 50%;
+      background:rgba(0,0,0,0.15);
+      margin-bottom: 2rem;
+    }
+    @keyframes neon-glow {
+      0% {
+        box-shadow:
+          0 0 24px 1px #00e6ff,
+          0 0 60px 6px #00e6ff44,
+          0 0 0 1px #00e6ff;
+      }
+      100% {
+        box-shadow:
+          0 0 48px 4px #00e6ff,
+          0 0 120px 10px #00e6ff88,
+          0 0 0 2px #00e6ff;
+      }
+    }
+    .selector-card h1 {
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: #00e6ff;
+      margin-bottom: 1.2rem;
+      font-family: 'Orbitron', 'Segoe UI', sans-serif;
+      letter-spacing: 2px;
+    }
+    .selector-card p {
+      color: #fff;
+      font-size: 1.2rem;
+      margin-bottom: 2.2rem;
+      font-family: 'Segoe UI', 'Roboto', sans-serif;
+    }
+    .country-btn {
+      display: block;
+      width: 100%;
+      margin-bottom: 1.2rem;
+      padding: 1.1rem;
+      font-size: 1.3rem;
+      font-weight: bold;
+      border-radius: 16px;
+      border: none;
+      cursor: pointer;
+      transition: box-shadow 0.2s, transform 0.2s;
+      background: linear-gradient(90deg, #00e6ff 60%, #fff 100%);
+      color: #002868;
+      box-shadow: 0 2px 12px #00e6ff44;
+    }
+    .country-btn.usa {
+      background: linear-gradient(90deg, #002868 70%, #00e6ff 100%);
+      color: #fff;
+      box-shadow: 0 2px 12px #00e6ff44;
+    }
+    .country-btn.chile {
+      background: linear-gradient(90deg, #d52b1e 70%, #fff 100%);
+      color: #002868;
+      box-shadow: 0 2px 12px #d52b1e44;
+    }
+    .country-btn:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 6px 24px #00e6ff88;
+    }
+    .flag {
+      font-size: 2rem;
+      margin-right: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="fixed inset-0 z-10 flex flex-col justify-center items-center text-center">
+    <img src="{% static 'img/TallerPro_logo.png' %}" alt="E-Garage Logo"
+      class="mb-8 w-40 h-40 md:w-56 md:h-56 object-contain mx-auto neon-border" />
+    <div class="selector-card">
+      <h1>eGarage</h1>
+      <p>¿Desde dónde accedes?<br>Selecciona tu país para continuar:</p>
+      <button class="country-btn usa" onclick="window.location.href='/usa/'"><span class="flag">🇺🇸</span> USA</button>
+      <button class="country-btn chile" onclick="window.location.href='/egarage/'"><span class="flag">🇨🇱</span> Chile</button>
+    </div>
+  </div>
+</body>
+</html>

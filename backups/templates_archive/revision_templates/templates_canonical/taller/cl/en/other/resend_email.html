@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="card shadow-lg mx-auto" style="max-width: 480px;">
+        <div class="card-body text-center">
+            <h2 class="mb-4">Reenviar correo de confirmación</h2>
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+            {% if not autenticado %}
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        {{ form.email.label_tag }}
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                            <div class="text-danger small">{{ form.email.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Reenviar confirmación</button>
+                </form>
+            {% else %}
+                <p>Si tu correo aún no estaba verificado, se ha reenviado el email de confirmación a tu dirección principal.</p>
+            {% endif %}
+            {% load country_url %}
+            <a href="{% country_url 'account_login' %}" class="btn btn-link mt-3">Volver al login</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

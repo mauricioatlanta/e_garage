@@ -1,0 +1,2 @@
+src,size_kb,sha256,suggested_action,reason,suggested_dest_under_static,ref_hits_in_templates
+E:\projecto\e_garage\tools\quarantine\static_deletes_20251006_140242\scripts\input.css,0.06,cc1a7ad0d019ddb1,delete,duplicado: ya existe dentro de /static,css\input.css,0

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 py-10 text-gray-200">
+  <h1 class="text-2xl font-bold mb-6">Historial de cambios</h1>
+  <p class="mb-6 text-sm text-gray-400">eGarage {{ APP_VERSION }} — {{ COPYRIGHT_TEXT }}</p>
+  <div class="space-y-6">
+    {% for c in cambios %}
+      <div class="rounded-xl border border-gray-700/50 p-5">
+        <h2 class="text-xl font-semibold text-cyan-300">{{ c.version }}</h2>
+        <p class="text-sm text-gray-400">{{ c.fecha }}</p>
+        <ul class="list-disc list-inside mt-3 space-y-1">
+          {% for i in c.items %}
+            <li>{{ i }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

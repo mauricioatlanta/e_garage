@@ -1,0 +1,56 @@
+<!-- Bloque Payment Status - Snippet para agregar al template -->
+<!-- Ubicación sugerida: después del campo "Document Number" o en la sección de información del documento -->
+
+<div id="payment-status-group" class="form-group">
+  <label for="id_payment_status" class="form-label">
+    {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Payment Status{% else %}Estado de pago{% endif %}
+  </label>
+  <select id="id_payment_status" name="payment_status" class="futurista-input form-select">
+    <option value="pending">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Pending{% else %}Pendiente{% endif %}</option>
+    <option value="paid">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Paid{% else %}Pagado{% endif %}</option>
+    <option value="partial">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Partial{% else %}Parcial{% endif %}</option>
+    <option value="canceled">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Canceled{% else %}Anulado{% endif %}</option>
+  </select>
+</div>
+
+<!-- 
+INSTRUCCIONES DE USO:
+
+1. Copia este bloque HTML y pégalo en tu template donde debe aparecer el campo Payment Status
+2. Asegúrate de que esté dentro del formulario (<form>...</form>)
+3. Si usas Django Forms, también puedes agregar el campo al ModelForm:
+   
+   class DocumentoForm(forms.ModelForm):
+       class Meta:
+           model = Documento
+           fields = ['payment_status', ...]  # incluir payment_status
+           # O usar widgets si necesitas personalizar:
+           widgets = {
+               'payment_status': forms.Select(choices=[
+                   ('pending', 'Pending/Pendiente'),
+                   ('paid', 'Paid/Pagado'),
+                   ('partial', 'Partial/Parcial'),
+                   ('canceled', 'Canceled/Anulado'),
+               ])
+           }
+
+4. Si el campo ya existe en el modelo pero no se muestra, verifica que no esté en 'exclude'
+5. El JavaScript automáticamente detectará y desocultará el campo si tiene clases CSS que lo oculten
+
+ESTILOS CSS SUGERIDOS (si no tienes .futurista-input):
+.futurista-input {
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    color: #e2e8f0;
+    border-radius: 8px;
+    padding: 8px 12px;
+    transition: all 0.2s ease;
+}
+
+.futurista-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+-->
+

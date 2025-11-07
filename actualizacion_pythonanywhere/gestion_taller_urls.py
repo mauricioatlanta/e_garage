@@ -39,7 +39,7 @@ urlpatterns = [
     # Landings internacionales
     path(
         "chile/",
-        TemplateView.as_view(template_name="public/landing_chile.html"),
+        TemplateView.as_view(template_name="public/landing_chile_completa.html"),
         name="landing_chile",
     ),
     path(

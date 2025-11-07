@@ -56,6 +56,7 @@ def company_branding(request):
             "company_logo": "/static/images/egarage_default_logo.png",
             "company_logo_url": "/static/images/egarage_default_logo.png",
             "primary_color": "#0d6efd",
+            "company_color": "#0d6efd",  # Alias para compatibilidad
             "secondary_color": "#6c757d",
         }
 
@@ -135,6 +136,7 @@ def company_branding(request):
                 "company_logo": logo_url,
                 "company_logo_url": logo_url,
                 "primary_color": primary_color,
+                "company_color": primary_color,  # Alias para compatibilidad
                 "secondary_color": "#6c757d",
             }
 
@@ -157,6 +159,7 @@ def company_branding(request):
                 "company_logo": "/static/images/egarage_default_logo.png",
                 "company_logo_url": "/static/images/egarage_default_logo.png",
                 "primary_color": "#0d6efd",
+                "company_color": "#0d6efd",  # Alias para compatibilidad
                 "secondary_color": "#6c757d",
             }
 
@@ -167,6 +170,7 @@ def company_branding(request):
             "company_logo": "/static/images/egarage_default_logo.png",
             "company_logo_url": "/static/images/egarage_default_logo.png",
             "primary_color": "#0d6efd",
+            "company_color": "#0d6efd",  # Alias para compatibilidad
             "secondary_color": "#6c757d",
         }
 

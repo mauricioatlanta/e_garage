@@ -1,75 +1,9 @@
-{% extends "taller/common/base_usa_space.html" %}
+{% extends "base.html" %}
 {% load country_url %}
 {% load static %}
 {% load i18n %}
 
 {% block title %}{{ empresa.nombre_taller }} - Command Center{% endblock %}
-
-{% block space_icon %}🚀{% endblock %}
-{% block space_title %}{% trans "Command Center" %}{% endblock %}
-{% block space_subtitle %}{% trans "Advanced Operations Hub" %}{% endblock %}
-
-{% block space_actions %}
-<div class="flex items-center space-x-4">
-    <!-- Company Logo and Info -->
-    {% if company_logo_url %}
-    <div class="flex items-center space-x-3">
-        <img src="{{ company_logo_url }}" alt="{{ company_name }}" class="w-12 h-12 rounded-lg object-contain bg-white/10 p-1">
-        <div class="text-right">
-            <div class="text-sm font-bold text-cyan-400">{{ company_name }}</div>
-            {% if company_tagline %}
-            <div class="text-xs text-gray-400">{{ company_tagline }}</div>
-            {% else %}
-            <div class="text-xs text-yellow-400">⚠️ Configure your tagline in Settings</div>
-            {% endif %}
-        </div>
-    </div>
-    {% else %}
-    <div class="flex items-center space-x-3">
-        <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-lg font-bold text-black">
-            {{ company_name|slice:":2"|upper }}
-        </div>
-        <div class="text-right">
-            <div class="text-sm font-bold text-cyan-400">{{ company_name }}</div>
-            {% if company_tagline %}
-            <div class="text-xs text-gray-400">{{ company_tagline }}</div>
-            {% else %}
-            <div class="text-xs text-yellow-400">⚠️ Configure branding in Settings</div>
-            {% endif %}
-        </div>
-    </div>
-    {% endif %}
-    
-    <!-- Settings Button -->
-    <div class="relative group">
-        <div class="absolute -inset-1 rounded-lg bg-gradient-to-r from-emerald-500 via-lime-500 to-green-500 opacity-30 blur group-hover:opacity-50 transition-opacity"></div>
-        <a href="/us/settings/" class="space-button">
-            <div class="w-4 h-4 rounded-md bg-white/20 flex items-center justify-center">
-                <span class="text-sm">⚙️</span>
-            </div>
-            <span>{% trans "Settings" %}</span>
-        </a>
-    </div>
-</div>
-{% endblock %}
-
-<!-- 🟢 GREEN CROSS - USA ENGLISH TEMPLATE -->
-<div style="position: fixed; top: 10px; right: 10px; width: 120px; height: 120px; background-color: #00ff00; z-index: 9999; border: 5px solid #fff; display: flex; align-items: center; justify-content: center; color: black; font-weight: bold; font-size: 16px; text-align: center; line-height: 1.2; box-shadow: 0 0 20px rgba(0, 255, 0, 0.8);">USA<br/>EN<br/>ALL<br/>BUTTONS<br/>FIXED</div>
-
-<!-- 🔍 DEBUG: Company Branding Info -->
-<div style="position: fixed; top: 10px; left: 10px; width: 300px; height: 200px; background-color: #000; z-index: 9999; border: 3px solid #00ff00; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; color: #00ff00; font-weight: bold; font-size: 10px; padding: 10px; overflow-y: auto;">
-  <div style="color: #ffff00; font-size: 12px; margin-bottom: 5px;">🔍 COMPANY BRANDING DEBUG:</div>
-  <div>company_name: {{ company_name|default:"NOT SET" }}</div>
-  <div>company_logo_url: {{ company_logo_url|default:"NOT SET" }}</div>
-  <div>company_tagline: {{ company_tagline|default:"NOT SET" }}</div>
-  <div>company_color: {{ company_color|default:"NOT SET" }}</div>
-  <div>COMPANY_NAME: {{ COMPANY_NAME|default:"NOT SET" }}</div>
-  <div>COMPANY_TAGLINE: {{ COMPANY_TAGLINE|default:"NOT SET" }}</div>
-  <div>COMPANY_LOGO: {{ COMPANY_LOGO|default:"NOT SET" }}</div>
-  <div>empresa.nombre_taller: {{ empresa.nombre_taller|default:"NOT SET" }}</div>
-  <div>empresa.logo: {{ empresa.logo|default:"NOT SET" }}</div>
-  <div>empresa.tagline: {{ empresa.tagline|default:"NOT SET" }}</div>
-</div>
 
 {% block extra_css %}
 <style>
@@ -665,14 +599,8 @@ body {
 </style>
 {% endblock %}
 
-{% block space_main_content %}
+{% block content %}
 <div class="max-w-7xl mx-auto p-6">
-
-    <!-- Language selector -->
-    <div class="absolute top-6 right-8 z-20 flex gap-2">
-        <a href="?lang=es" class="px-3 py-1 rounded-full text-sm font-bold transition-all shadow-md bg-cyan-100 text-cyan-900 hover:bg-cyan-300 {% if request.GET.lang == 'es' %}ring-2 ring-fuchsia-400{% endif %}">{% trans "Español" %}</a>
-        <a href="?lang=en" class="px-3 py-1 rounded-full text-sm font-bold transition-all shadow-md bg-cyan-500/80 text-white hover:bg-cyan-700 {% if request.GET.lang == 'en' or not request.GET.lang %}ring-2 ring-yellow-300{% endif %}">{% trans "English" %}</a>
-    </div>
 
     <!-- 🚀 Mission Command Panel -->
     <div class="space-container p-6">
@@ -863,7 +791,9 @@ body {
     </div>
 
 </div>
+{% endblock %}
 
+{% block extra_js %}
 <!-- JavaScript for space effects -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>

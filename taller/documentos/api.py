@@ -49,7 +49,7 @@ def api_vehiculos_por_cliente(request):
         Vehiculo.objects
         .filter(cliente_id=cid, empresa=request.user.empresa)
         .select_related("marca", "modelo")
-        .values("id", "patente", "vin", "marca__nombre", "modelo__nombre")
+        .values("id", "patente", "vin", "anio", "marca__nombre", "modelo__nombre", "marca_texto", "modelo_texto")
         .order_by("patente", "id")
     )
     return _json_ok(list(qs))

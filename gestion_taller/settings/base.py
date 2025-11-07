@@ -177,9 +177,9 @@ EMAIL_HOST = "srv24.cpanelhost.cl"
 EMAIL_PORT = 465
 EMAIL_USE_SSL = True
 EMAIL_USE_TLS = False
-EMAIL_HOST_USER = "subcription@egarage.cl"
-EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_PASSWORD", "tu_contraseña_aqui")
-DEFAULT_FROM_EMAIL = "eGarage <subcription@egarage.cl>"
+EMAIL_HOST_USER = "subscription@egarage.cl"
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_PASSWORD", "laila2013-")
+DEFAULT_FROM_EMAIL = "eGarage <subscription@egarage.cl>"
 
 # Logging útil (errores reales)
 if SAFE_MODE:

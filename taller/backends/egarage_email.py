@@ -1,5 +1,6 @@
 import logging
 import os
+import smtplib
 
 from django.conf import settings
 from django.core.mail.backends.smtp import EmailBackend
@@ -65,6 +66,70 @@ class EgarageEmailBackend(EmailBackend):
             ssl_certfile=ssl_certfile,
             **kwargs,
         )
+
+    def open(self):
+        """
+        Override para manejar passwords con caracteres UTF-8 (como ñ)
+        que causan problemas con smtplib en Python 3.13
+        
+        El error 'ascii' codec can't encode character ocurre porque smtplib
+        usa el método de autenticación PLAIN que requiere ASCII puro.
+        """
+        if self.connection:
+            return False
+
+        connection_params = {}
+        if self.timeout is not None:
+            connection_params['timeout'] = self.timeout
+        if self.use_ssl:
+            connection_params['context'] = self.ssl_context
+            
+        try:
+            self.connection = smtplib.SMTP_SSL(
+                self.host, self.port, **connection_params
+            )
+            
+            # SOLUCIÓN: Verificar si el password tiene caracteres no-ASCII
+            # y advertir al usuario que debe cambiar el password del servidor
+            if self.username and self.password:
+                try:
+                    # Intentar codificar el password como ASCII
+                    self.password.encode('ascii')
+                    # Si funciona, hacer login normal
+                    self.connection.login(self.username, self.password)
+                except UnicodeEncodeError as ue:
+                    # El password contiene caracteres especiales (ñ, á, etc.)
+                    logger.error(
+                        "❌ ERROR CRÍTICO: La contraseña del email contiene caracteres "
+                        "especiales que no son compatibles con SMTP AUTH PLAIN.\n"
+                        f"   Character problemático: {ue}\n"
+                        "   SOLUCIÓN: Cambiar la contraseña de la cuenta "
+                        f"'{self.username}' en el panel de cPanel para usar solo:\n"
+                        "   - Letras (a-z, A-Z)\n"
+                        "   - Números (0-9)\n"
+                        "   - Símbolos básicos (!@#$%^&*-_=+)"
+                    )
+                    # Cerrar conexión
+                    if self.connection:
+                        try:
+                            self.connection.quit()
+                        except:
+                            pass
+                    self.connection = None
+                    raise RuntimeError(
+                        "Email password contains non-ASCII characters (like 'ñ'). "
+                        "Please change the email account password to use only ASCII characters."
+                    )
+            return True
+        except smtplib.SMTPException as e:
+            logger.error(f"Error SMTP al conectar: {e}")
+            if not self.fail_silently:
+                raise
+        except Exception as e:
+            logger.error(f"Error al conectar con el servidor SMTP: {e}")
+            if not self.fail_silently:
+                raise
+            return False
 
     def send_messages(self, email_messages):
         if not email_messages:

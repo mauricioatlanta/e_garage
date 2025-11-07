@@ -5,14 +5,14 @@ from django.utils.translation import get_language
 
 from taller.utils.templates import select_country_lang_template
 
-from .models import CategoriaServicio, Servicio, SubcategoriaServicio
+from .models import CategoriaServicio, Servicio, ServicioExterno, SubcategoriaServicio
 
 
 # Menú principal de servicios con diseño moderno
 def servicios_menu(request):
     # Obtener empresa del usuario
     empresa = getattr(request.user, "empresa", None)
-    
+
     # Obtener país e idioma del request
     country_code = empresa.pais if empresa else "CL"
     lang = get_language() or "es"
@@ -21,15 +21,21 @@ def servicios_menu(request):
     servicios = (
         Servicio.objects.filter(empresa=empresa) if empresa else Servicio.objects.none()
     )
-    
+
     # Filtrar categorías por país
-    categorias = CategoriaServicio.objects.filter(country=country_code).prefetch_related('names')
-    subcategorias = SubcategoriaServicio.objects.filter(country=country_code).prefetch_related('names')
-    
+    categorias = CategoriaServicio.objects.filter(
+        country=country_code
+    ).prefetch_related("names")
+    subcategorias = SubcategoriaServicio.objects.filter(
+        country=country_code
+    ).prefetch_related("names")
+
     # Agrupar servicios por categoría para mejor organización
     servicios_por_categoria = {}
     for categoria in categorias:
-        servicios_cat = servicios.filter(categoria=categoria).select_related('subcategoria')
+        servicios_cat = servicios.filter(categoria=categoria).select_related(
+            "subcategoria"
+        )
         if servicios_cat.exists():
             servicios_por_categoria[categoria] = servicios_cat
 
@@ -112,7 +118,9 @@ def buscar_servicios_api(request):
 # Menú de otros servicios (placeholder)
 def otros_servicios_menu(request):
     """Vista para el menú de otros servicios (servicios externos) con búsqueda inteligente"""
-    from taller.servicios.models import CategoriaServicio, ServicioExterno
+
+    # Determinar el país basándose en la URL
+    country_code = "US" if request.path.startswith("/us/") else "CL"
 
     # Obtener empresa del usuario
     empresa = getattr(request.user, "empresa", None)
@@ -124,8 +132,9 @@ def otros_servicios_menu(request):
     else:
         otros_servicios = ServicioExterno.objects.none()
 
-    # Obtener categorías para el formulario
-    categorias = CategoriaServicio.objects.all()
+    # Obtener categorías y subcategorías para el formulario
+    categorias = CategoriaServicio.objects.filter(country=country_code)
+    subcategorias = SubcategoriaServicio.objects.filter(country=country_code)
 
     # Estadísticas
     stats = {
@@ -140,15 +149,23 @@ def otros_servicios_menu(request):
     }
 
     # Obtener país e idioma del request
-    country = getattr(request.user, "empresa", None)
-    country_code = country.pais if country else "CL"
-    lang = get_language() or "es"
+    empresa = getattr(request.user, "empresa", None)
+    country_code = empresa.pais if empresa else "CL"
+
+    # Override country detection based on URL path for USA routes
+    if request.path.startswith("/us/"):
+        country_code = "US"
+        lang = "en"
+    else:
+        lang = get_language() or "es"
 
     context = {
         "otros_servicios": otros_servicios,
         "categorias": categorias,
+        "subcategorias": subcategorias,
         "stats": stats,
         "country": country_code,
+        "empresa": empresa,
     }
 
     template_name = select_country_lang_template(
@@ -161,8 +178,14 @@ def otros_servicios_menu(request):
 def crear_otro_servicio(request):
     """Vista para crear servicios externos"""
     from django.contrib import messages
+    from django.shortcuts import render
 
     from taller.servicios.models import CategoriaServicio, ServicioExterno
+    from taller.utils.templates import select_country_lang_template
+
+    # Determinar el país basándose en la URL
+    country_code = "US" if request.path.startswith("/us/") else "CL"
+    lang = "en" if country_code == "US" else "es"
 
     if request.method == "POST":
         try:
@@ -210,7 +233,27 @@ def crear_otro_servicio(request):
         except Exception as e:
             messages.error(request, f"Error al crear servicio externo: {str(e)}")
 
-    return redirect("servicios:otros_servicios_menu")
+        return redirect("taller:servicios:otros_servicios_menu")
+
+    # GET: Mostrar formulario
+    categorias = CategoriaServicio.objects.filter(country=country_code)
+    
+    # Debug: imprimir categorías encontradas
+    print(f"[DEBUG] País: {country_code}")
+    print(f"[DEBUG] Categorías encontradas: {categorias.count()}")
+    for cat in categorias:
+        print(f"[DEBUG] - {cat.id}: {cat.get_label()}")
+    
+    context = {
+        "categorias": categorias,
+        "country": country_code,
+    }
+    
+    template_name = select_country_lang_template(
+        "servicios/crear_otro_servicio.html", country_code, lang
+    )
+    
+    return render(request, template_name, context)
 
 
 import logging

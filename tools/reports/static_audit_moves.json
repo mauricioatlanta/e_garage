@@ -1,0 +1,202 @@
+[
+  {
+    "src": "E:\\projecto\\e_garage\\playwright.config.js",
+    "dest": "E:\\projecto\\e_garage\\static\\js\\playwright.config.js",
+    "overwrote": false
+  },
+  {
+    "src": "E:\\projecto\\e_garage\\frontend\\public\\favicon.ico",
+    "dest": "E:\\projecto\\e_garage\\static\\images\\favicon.ico",
+    "overwrote": false
+  },
+  {
+    "src": "E:\\projecto\\e_garage\\frontend\\public\\logo192.png",
+    "dest": "E:\\projecto\\e_garage\\static\\images\\logo192.png",
+    "overwrote": false
+  },
+  {
+    "src": "E:\\projecto\\e_garage\\frontend\\public\\logo512.png",
+    "dest": "E:\\projecto\\e_garage\\static\\images\\logo512.png",
+    "overwrote": false
+  },
+  {
+    "src": "E:\\projecto\\e_garage\\frontend\\src\\App.css",
+    "dest": "E:\\projecto\\e_garage\\static\\css\\App.css",
+    "overwrote": false
+  },
+  {
+    "src": "E:\\projecto\\e_garage\\frontend\\src\\App.js",
+    "dest": "E:\\projecto\\e_garage\\static\\js\\App.js",
+    "overwrote": false
+  },
+  {
+    "src": "E:\\projecto\\e_garage\\frontend\\src\\index.css",
+    "dest": "E:\\projecto\\e_garage\\static\\css\\index.css",
+    "overwrote": false
+  },
+  {
+    "src": "E:\\projecto\\e_garage\\frontend\\src\\index.js",
+    "dest": "E:\\projecto\\e_garage\\static\\js\\index.js",
+    "overwrote": false
+  },
+  {
+    "src": "E:\\projecto\\e_garage\\frontend\\src\\logo.svg",
+    "dest": "E:\\projecto\\e_garage\\static\\images\\logo.svg",
+    "overwrote": false
+  },
+  {
+    "src": "E:\\projecto\\e_garage\\frontend\\src\\reportWebVitals.js",
+    "dest": "E:\\projecto\\e_garage\\static\\js\\reportWebVitals.js",
+    "overwrote": false
+  },
+  {
+    "src": "E:\\projecto\\e_garage\\frontend\\src\\setupTests.js",
+    "dest": "E:\\projecto\\e_garage\\static\\js\\setupTests.js",
+    "overwrote": false
+  },
+  {
+    "src": "E:\\projecto\\e_garage\\htmlcov\\coverage_html_cb_497bf287.js",
+    "dest": "E:\\projecto\\e_garage\\static\\js\\coverage_html_cb_497bf287.js",
+    "overwrote": false
+  },
+  {
+    "src": "E:\\projecto\\e_garage\\htmlcov\\favicon_32_cb_58284776.png",
+    "dest": "E:\\projecto\\e_garage\\static\\images\\favicon_32_cb_58284776.png",
+    "overwrote": false
+  },
+  {
+    "src": "E:\\projecto\\e_garage\\htmlcov\\keybd_closed_cb_ce680311.png",
+    "dest": "E:\\projecto\\e_garage\\static\\images\\keybd_closed_cb_ce680311.png",
+    "overwrote": false
+  },
+  {
+    "src": "E:\\projecto\\e_garage\\htmlcov\\style_cb_dca529e9.css",
+    "dest": "E:\\projecto\\e_garage\\static\\css\\style_cb_dca529e9.css",
+    "overwrote": false
+  },
+  {
+    "src": "E:\\projecto\\e_garage\\tests\\e2e\\test_busqueda_repuestos_frontend.spec.js",
+    "dest": "E:\\projecto\\e_garage\\static\\js\\test_busqueda_repuestos_frontend.spec.js",
+    "overwrote": false
+  },
+  {
+    "src": "E:\\projecto\\e_garage\\tests\\e2e\\test_busqueda_servicios_frontend.spec.js",
+    "dest": "E:\\projecto\\e_garage\\static\\js\\test_busqueda_servicios_frontend.spec.js",
+    "overwrote": false
+  },
+  {
+    "src": "E:\\projecto\\e_garage\\tests\\e2e\\test_formulario_documento_completo.spec.js",
+    "dest": "E:\\projecto\\e_garage\\static\\js\\test_formulario_documento_completo.spec.js",
+    "overwrote": false
+  },
+  {
+    "src": "E:\\projecto\\e_garage\\tools\\backups\\static_moves_20251006_135058\\playwright.config.js",
+    "dest": "E:\\projecto\\e_garage\\static\\js\\playwright.config.js",
+    "overwrote": true
+  },
+  {
+    "src": "E:\\projecto\\e_garage\\tools\\backups\\static_moves_20251006_135058\\frontend\\public\\favicon.ico",
+    "dest": "E:\\projecto\\e_garage\\static\\images\\favicon.ico",
+    "overwrote": true
+  },
+  {
+    "src": "E:\\projecto\\e_garage\\tools\\backups\\static_moves_20251006_135058\\frontend\\public\\logo192.png",
+    "dest": "E:\\projecto\\e_garage\\static\\images\\logo192.png",
+    "overwrote": true
+  },
+  {
+    "src": "E:\\projecto\\e_garage\\tools\\backups\\static_moves_20251006_135058\\frontend\\public\\logo512.png",
+    "dest": "E:\\projecto\\e_garage\\static\\images\\logo512.png",
+    "overwrote": true
+  },
+  {
+    "src": "E:\\projecto\\e_garage\\tools\\backups\\static_moves_20251006_135058\\frontend\\src\\App.css",
+    "dest": "E:\\projecto\\e_garage\\static\\css\\App.css",
+    "overwrote": true
+  },
+  {
+    "src": "E:\\projecto\\e_garage\\tools\\backups\\static_moves_20251006_135058\\frontend\\src\\App.js",
+    "dest": "E:\\projecto\\e_garage\\static\\js\\App.js",
+    "overwrote": true
+  },
+  {
+    "src": "E:\\projecto\\e_garage\\tools\\backups\\static_moves_20251006_135058\\frontend\\src\\index.css",
+    "dest": "E:\\projecto\\e_garage\\static\\css\\index.css",
+    "overwrote": true
+  },
+  {
+    "src": "E:\\projecto\\e_garage\\tools\\backups\\static_moves_20251006_135058\\frontend\\src\\index.js",
+    "dest": "E:\\projecto\\e_garage\\static\\js\\index.js",
+    "overwrote": true
+  },
+  {
+    "src": "E:\\projecto\\e_garage\\tools\\backups\\static_moves_20251006_135058\\frontend\\src\\logo.svg",
+    "dest": "E:\\projecto\\e_garage\\static\\images\\logo.svg",
+    "overwrote": true
+  },
+  {
+    "src": "E:\\projecto\\e_garage\\tools\\backups\\static_moves_20251006_135058\\frontend\\src\\reportWebVitals.js",
+    "dest": "E:\\projecto\\e_garage\\static\\js\\reportWebVitals.js",
+    "overwrote": true
+  },
+  {
+    "src": "E:\\projecto\\e_garage\\tools\\backups\\static_moves_20251006_135058\\frontend\\src\\setupTests.js",
+    "dest": "E:\\projecto\\e_garage\\static\\js\\setupTests.js",
+    "overwrote": true
+  },
+  {
+    "src": "E:\\projecto\\e_garage\\tools\\backups\\static_moves_20251006_135058\\htmlcov\\coverage_html_cb_497bf287.js",
+    "dest": "E:\\projecto\\e_garage\\static\\js\\coverage_html_cb_497bf287.js",
+    "overwrote": true
+  },
+  {
+    "src": "E:\\projecto\\e_garage\\tools\\backups\\static_moves_20251006_135058\\htmlcov\\favicon_32_cb_58284776.png",
+    "dest": "E:\\projecto\\e_garage\\static\\images\\favicon_32_cb_58284776.png",
+    "overwrote": true
+  },
+  {
+    "src": "E:\\projecto\\e_garage\\tools\\backups\\static_moves_20251006_135058\\htmlcov\\keybd_closed_cb_ce680311.png",
+    "dest": "E:\\projecto\\e_garage\\static\\images\\keybd_closed_cb_ce680311.png",
+    "overwrote": true
+  },
+  {
+    "src": "E:\\projecto\\e_garage\\tools\\backups\\static_moves_20251006_135058\\htmlcov\\style_cb_dca529e9.css",
+    "dest": "E:\\projecto\\e_garage\\static\\css\\style_cb_dca529e9.css",
+    "overwrote": true
+  },
+  {
+    "src": "E:\\projecto\\e_garage\\tools\\backups\\static_moves_20251006_135058\\tests\\e2e\\test_busqueda_repuestos_frontend.spec.js",
+    "dest": "E:\\projecto\\e_garage\\static\\js\\test_busqueda_repuestos_frontend.spec.js",
+    "overwrote": true
+  },
+  {
+    "src": "E:\\projecto\\e_garage\\tools\\backups\\static_moves_20251006_135058\\tests\\e2e\\test_busqueda_servicios_frontend.spec.js",
+    "dest": "E:\\projecto\\e_garage\\static\\js\\test_busqueda_servicios_frontend.spec.js",
+    "overwrote": true
+  },
+  {
+    "src": "E:\\projecto\\e_garage\\tools\\backups\\static_moves_20251006_135058\\tests\\e2e\\test_formulario_documento_completo.spec.js",
+    "dest": "E:\\projecto\\e_garage\\static\\js\\test_formulario_documento_completo.spec.js",
+    "overwrote": true
+  },
+  {
+    "src": "E:\\projecto\\e_garage\\tools\\backups\\static_moves_20251006_135058\\ubicacion\\static\\ubicacion\\js\\ubicacion.js",
+    "dest": "E:\\projecto\\e_garage\\static\\js\\ubicacion.js",
+    "overwrote": false
+  },
+  {
+    "src": "E:\\projecto\\e_garage\\tools\\backups\\static_moves_20251006_135058\\_backup\\e_garage_legacy\\es.js",
+    "dest": "E:\\projecto\\e_garage\\static\\js\\es.js",
+    "overwrote": false
+  },
+  {
+    "src": "E:\\projecto\\e_garage\\ubicacion\\static\\ubicacion\\js\\ubicacion.js",
+    "dest": "E:\\projecto\\e_garage\\static\\js\\ubicacion.js",
+    "overwrote": true
+  },
+  {
+    "src": "E:\\projecto\\e_garage\\_backup\\e_garage_legacy\\es.js",
+    "dest": "E:\\projecto\\e_garage\\static\\js\\es.js",
+    "overwrote": true
+  }
+]

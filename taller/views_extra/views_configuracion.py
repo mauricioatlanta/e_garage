@@ -137,6 +137,16 @@ def configuracion_tecnicos(request):
                     request,
                     "❌ El apellido del técnico debe tener al menos 2 caracteres.",
                 )
+            elif not telefono or len(telefono.strip()) < 8:
+                messages.error(
+                    request,
+                    "❌ El teléfono es obligatorio y debe tener al menos 8 caracteres.",
+                )
+            elif not re.match(r"^[\d\s\-\+\(\)]+$", telefono):
+                messages.error(
+                    request,
+                    "❌ Formato de teléfono inválido. Solo números, espacios, guiones, + y paréntesis.",
+                )
             elif Tecnico.objects.filter(
                 empresa=empresa, nombre__iexact=nombre_completo
             ).exists():
@@ -157,7 +167,17 @@ def configuracion_tecnicos(request):
                 )
 
         elif "desactivar_tecnico" in request.POST:
-            tecnico_id = request.POST.get("tecnico_id")
+            tecnico_id = request.POST.get("tecnico_id", "").strip()
+            if not tecnico_id:
+                messages.error(request, "❌ ID de técnico no proporcionado.")
+                return redirect("configuracion_tecnicos")
+
+            try:
+                tecnico_id = int(tecnico_id)
+            except ValueError:
+                messages.error(request, "❌ ID de técnico inválido.")
+                return redirect("configuracion_tecnicos")
+
             tecnico = Tecnico.objects.filter(id=tecnico_id, empresa=empresa).first()
             if tecnico:
                 tecnico.activo = False
@@ -168,7 +188,17 @@ def configuracion_tecnicos(request):
                 )
 
         elif "activar_tecnico" in request.POST:
-            tecnico_id = request.POST.get("tecnico_id")
+            tecnico_id = request.POST.get("tecnico_id", "").strip()
+            if not tecnico_id:
+                messages.error(request, "❌ ID de técnico no proporcionado.")
+                return redirect("configuracion_tecnicos")
+
+            try:
+                tecnico_id = int(tecnico_id)
+            except ValueError:
+                messages.error(request, "❌ ID de técnico inválido.")
+                return redirect("configuracion_tecnicos")
+
             tecnico = Tecnico.objects.filter(id=tecnico_id, empresa=empresa).first()
             if tecnico:
                 tecnico.activo = True
@@ -176,10 +206,22 @@ def configuracion_tecnicos(request):
                 messages.success(request, f'✅ Técnico "{tecnico.nombre}" reactivado.')
 
         elif "editar_tecnico" in request.POST:
-            tecnico_id = request.POST.get("tecnico_id")
+            tecnico_id = request.POST.get("tecnico_id", "").strip()
             nuevo_nombre = request.POST.get("nuevo_nombre", "").strip()
             nuevo_telefono = request.POST.get("nuevo_telefono", "").strip()
             nueva_direccion = request.POST.get("nueva_direccion", "").strip()
+
+            # Validar que tecnico_id no esté vacío y sea un número válido
+            if not tecnico_id:
+                messages.error(request, "❌ ID de técnico no proporcionado.")
+                return redirect("configuracion_tecnicos")
+
+            try:
+                tecnico_id = int(tecnico_id)
+            except ValueError:
+                messages.error(request, "❌ ID de técnico inválido.")
+                return redirect("configuracion_tecnicos")
+
             tecnico = Tecnico.objects.filter(id=tecnico_id, empresa=empresa).first()
 
             # Validar campos obligatorios
@@ -219,7 +261,17 @@ def configuracion_tecnicos(request):
                 )
 
         elif "action" in request.POST and request.POST["action"] == "delete":
-            tecnico_id = request.POST.get("tecnico_id")
+            tecnico_id = request.POST.get("tecnico_id", "").strip()
+            if not tecnico_id:
+                messages.error(request, "❌ ID de técnico no proporcionado.")
+                return redirect("configuracion_tecnicos")
+
+            try:
+                tecnico_id = int(tecnico_id)
+            except ValueError:
+                messages.error(request, "❌ ID de técnico inválido.")
+                return redirect("configuracion_tecnicos")
+
             tecnico = Tecnico.objects.filter(id=tecnico_id, empresa=empresa).first()
             if tecnico:
                 # Verificar si el técnico tiene documentos asociados

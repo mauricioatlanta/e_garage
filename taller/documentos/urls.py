@@ -70,6 +70,11 @@ urlpatterns = [
         name="api_buscar_servicios",
     ),
     path(
+        "ajax/servicios/buscar/",
+        views_moderno.api_buscar_servicios_inteligente,
+        name="ajax_buscar_servicios",
+    ),
+    path(
         "api/vehiculos-cliente/",
         views_moderno.api_vehiculos_cliente,
         name="api_vehiculos_cliente",

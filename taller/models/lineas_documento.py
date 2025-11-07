@@ -5,8 +5,10 @@ Modelos de líneas de documento con validaciones de consistencia robustas
 
 from django.core.exceptions import ValidationError
 from django.db import models
+from decimal import Decimal
 
 from taller.servicios.models import Servicio
+from .utils_monedas import money_quantize
 
 
 class ValidacionConsistencia:
@@ -90,7 +92,11 @@ class LineaServicio(models.Model):
             pass
 
     def save(self, *args, **kwargs):
-        """Llamar validaciones antes de guardar"""
+        """Calcular subtotal y llamar validaciones antes de guardar"""
+        pais = getattr(getattr(self.documento, 'empresa', None), 'pais', 'CL')
+        bruto = (self.cantidad or 0) * (self.precio_unitario or 0)
+        neto = Decimal(bruto) - Decimal(self.descuento or 0)
+        self.subtotal = money_quantize(neto if neto > 0 else Decimal("0"), pais)
         self.full_clean()
         return super().save(*args, **kwargs)
 

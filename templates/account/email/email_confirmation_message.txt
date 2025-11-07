@@ -1,11 +1,17 @@
-Hola {{ user_display }},
+{% load i18n %}
+{% autoescape off %}
+{% trans "Hola" %} {{ user.first_name|default:user.username }},
 
-¡Gracias por registrarte en E-Garage!
+{% trans "¡Gracias por registrarte en eGarage!" %}
 
-Para activar tu cuenta, haz clic en el siguiente enlace:
+{% trans "Para completar tu registro y activar tu cuenta, por favor confirma tu dirección de email haciendo clic en el siguiente enlace:" %}
+
 {{ activate_url }}
 
-Si no solicitaste esta cuenta, puedes ignorar este mensaje.
+{% trans "Este enlace expira en" %} {{ expiration_days }} {% trans "días" %}.
 
-¡Bienvenido!
-El equipo de E-Garage
+{% trans "Si no solicitaste este registro, simplemente ignora este email." %}
+
+{% trans "Saludos," %}
+{% trans "Equipo eGarage" %}
+{% endautoescape %}

@@ -39,4 +39,4 @@ def landing_chile(request):
         "current_language": "es",  # Siempre español para Chile
         "spanish_only": True,  # Flag para ocultar selector de idioma
     }
-    return render(request, "public/landing_chile.html", context)
+    return render(request, "public/landing_chile_completa.html", context)

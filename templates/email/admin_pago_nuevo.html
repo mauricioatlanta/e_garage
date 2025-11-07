@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuevo Pago Pendiente</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Helvetica', 'Arial', sans-serif; background-color: #0a0a0a; color: #ffffff;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #0a0a0a;">
+        <tr>
+            <td align="center" style="padding: 40px 20px;">
+                <table width="600" cellpadding="0" cellspacing="0" style="background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(245, 158, 11, 0.08) 100%); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 16px; padding: 40px;">
+                    <!-- Logo y alerta -->
+                    <tr>
+                        <td align="center" style="padding-bottom: 20px;">
+                            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                                <span style="font-size: 48px;">🔔</span>
+                            </div>
+                            <h1 style="color: #fbbf24; font-size: 32px; margin: 10px 0 0 0; font-weight: bold;">🚀 eGarage Admin</h1>
+                        </td>
+                    </tr>
+                    
+                    <!-- Título -->
+                    <tr>
+                        <td align="center" style="padding-bottom: 20px;">
+                            <h2 style="color: #ffffff; font-size: 24px; margin: 0;">Nuevo Pago Pendiente de Verificación</h2>
+                        </td>
+                    </tr>
+                    
+                    <!-- Mensaje principal -->
+                    <tr>
+                        <td style="color: #cbd5e1; font-size: 16px; line-height: 1.6; padding-bottom: 30px;">
+                            <p>Se ha recibido un nuevo comprobante de pago que requiere tu verificación.</p>
+                            
+                            <!-- Detalles del pago -->
+                            <div style="background: rgba(0, 0, 0, 0.3); border-left: 4px solid #fbbf24; padding: 20px; margin: 20px 0; border-radius: 8px;">
+                                <table width="100%" style="color: #ffffff;">
+                                    <tr>
+                                        <td style="padding: 8px 0;"><strong>Empresa:</strong></td>
+                                        <td style="padding: 8px 0; text-align: right;">{{ empresa.nombre_taller }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0;"><strong>Contacto:</strong></td>
+                                        <td style="padding: 8px 0; text-align: right;">{{ empresa.email }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0;"><strong>Plan:</strong></td>
+                                        <td style="padding: 8px 0; text-align: right;">{{ plan|title }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0;"><strong>Monto:</strong></td>
+                                        <td style="padding: 8px 0; text-align: right; font-size: 20px; color: #fbbf24;">${{ monto|floatformat:0 }} {{ moneda }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0;"><strong>Fecha:</strong></td>
+                                        <td style="padding: 8px 0; text-align: right;">{{ fecha }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0;"><strong>ID Pago:</strong></td>
+                                        <td style="padding: 8px 0; text-align: right; font-family: monospace;">{{ pago_id }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <!-- Botones de acción -->
+                    <tr>
+                        <td align="center" style="padding: 20px 0;">
+                            <table cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td style="padding: 0 10px;">
+                                        <a href="https://www.egarage.cl/admin/taller/pagopendiente/{{ pago_id }}/change/" style="display: inline-block; padding: 14px 30px; background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); color: #000000; text-decoration: none; border-radius: 50px; font-size: 16px; font-weight: bold;">
+                                            👁️ Ver Comprobante
+                                        </a>
+                                    </td>
+                                    <td style="padding: 0 10px;">
+                                        <a href="https://www.egarage.cl/admin/aprobar-pago/{{ pago_id }}/" style="display: inline-block; padding: 14px 30px; background: linear-gradient(135deg, #10b981 0%, #22d3ee 100%); color: #ffffff; text-decoration: none; border-radius: 50px; font-size: 16px; font-weight: bold;">
+                                            ✅ Aprobar
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <!-- Acceso rápido al admin -->
+                    <tr>
+                        <td style="background: rgba(34, 211, 238, 0.1); border-radius: 8px; padding: 20px; margin-top: 20px;">
+                            <p style="color: #22d3ee; font-weight: bold; margin: 0 0 10px 0;">🔗 Enlaces Rápidos:</p>
+                            <ul style="color: #cbd5e1; margin: 0; padding-left: 20px; line-height: 2;">
+                                <li><a href="https://www.egarage.cl/admin/taller/pagopendiente/" style="color: #22d3ee; text-decoration: none;">Ver todos los pagos pendientes</a></li>
+                                <li><a href="https://www.egarage.cl/admin/taller/empresa/{{ empresa.id }}/change/" style="color: #22d3ee; text-decoration: none;">Ver perfil de la empresa</a></li>
+                            </ul>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td align="center" style="padding-top: 30px; color: #64748b; font-size: 14px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+                            <p style="margin-top: 20px; font-size: 12px;">
+                                🤖 Este es un email automático del sistema eGarage<br>
+                                📧 subcription@egarage.cl | 🌐 www.egarage.cl
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+

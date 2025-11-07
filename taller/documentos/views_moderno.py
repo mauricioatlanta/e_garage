@@ -85,6 +85,7 @@ from taller.models.lineas_documento import (
 from taller.models.repuesto import Repuesto
 from taller.models.tecnico import Tecnico
 from taller.models.vehiculos import Vehiculo
+from taller.servicios.models import Servicio
 from taller.servicios.models import Servicio as ServicioInterno
 from taller.servicios.models import ServicioExterno
 
@@ -1132,3 +1133,37 @@ def documento_form(request, pk=None):
             "settings_url": settings_url,
         },
     )
+
+
+@login_required
+def api_buscar_servicios_inteligente(request):
+    """
+    Búsqueda 'inteligente' de servicios:
+      - icontains sobre nombre, código, categoría, subcategoría y sinónimos (si existen)
+      - prioriza empresa del usuario (multi-tenant)
+      - retorna hasta 20 resultados con id, text y precio_sugerido
+    """
+    from django.db.models import Q, Value
+    from django.db.models.functions import Coalesce
+    
+    emp = getattr(request.user, "empresa", None)
+    q = (request.GET.get("q") or "").strip()
+
+    qs = Servicio.objects.filter(empresa=emp)
+
+    if q:
+        # Búsqueda inteligente en múltiples campos
+        qs = qs.filter(
+            Q(nombre__icontains=q) |
+            Q(categoria__code__icontains=q) |
+            Q(subcategoria__code__icontains=q)
+        )
+
+    data = [{
+        "id": s.id,
+        "text": s.nombre,            # texto que dibujará el dropdown
+        "precio": 0.0,  # El modelo Servicio no tiene precio, usar 0 como default
+        "codigo": getattr(s.categoria, "code", "") or ""
+    } for s in qs.order_by("nombre")[:20]]
+
+    return JsonResponse({"results": data})

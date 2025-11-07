@@ -1,26 +1,10 @@
-{% extends "taller/common/base_usa_space.html" %}
+{% extends "base.html" %}
 {% load country_url %}
 {% load i18n static %}
 
 {% block title %}{% trans "Clients" %} - {{ empresa.nombre_taller }}{% endblock %}
 
-{% block space_icon %}👥{% endblock %}
-{% block space_title %}{% trans "Client Database" %}{% endblock %}
-{% block space_subtitle %}{% trans "Advanced client management system" %}{% endblock %}
-
-{% block space_actions %}
-<div class="relative group">
-    <div class="absolute -inset-1 rounded-lg bg-gradient-to-r from-emerald-500 via-lime-500 to-green-500 opacity-30 blur group-hover:opacity-50 transition-opacity"></div>
-    <a href="{% country_url 'clientes:crear_cliente' %}" class="space-button">
-        <div class="w-4 h-4 rounded-md bg-white/20 flex items-center justify-center">
-            <span class="text-sm">➕</span>
-        </div>
-        <span>{% trans "Add Client" %}</span>
-    </a>
-</div>
-{% endblock %}
-
-{% block space_main_content %}
+{% block content %}
 {% csrf_token %}
 
 <!-- Search Section -->
@@ -71,17 +55,17 @@
          data-telefono="{{ cliente.telefono|default:'' }}"
          data-ciudad="{{ cliente.ciudad.nombre|default:'' }}"
          data-estado="{{ cliente.ciudad.estado.nombre|default:'' }}">
-        
+
         <div class="flex items-center justify-between mb-2">
             <div class="w-6 h-6 rounded bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-xs">
                 👤
             </div>
             <div class="flex space-x-1">
-                <a href="{% country_url 'clientes:detalle_cliente' cliente.id %}" 
+                <a href="{% country_url 'clientes:detalle_cliente' cliente.id %}"
                    class="text-xs space-text hover:text-cyan-400 transition-colors">
                     👁️
                 </a>
-                <a href="{% country_url 'clientes:editar_cliente' cliente.id %}" 
+                <a href="{% country_url 'clientes:editar_cliente' cliente.id %}"
                    class="text-xs space-text hover:text-cyan-400 transition-colors">
                     ✏️
                 </a>
@@ -91,21 +75,21 @@
                 </button>
             </div>
         </div>
-        
+
         <h3 class="space-title text-sm font-bold mb-1">{{ cliente.nombre }} {{ cliente.apellido }}</h3>
-        
+
         {% if cliente.email %}
         <p class="space-text-muted text-xs mb-1">
             <span class="text-cyan-300">📧</span> {{ cliente.email }}
         </p>
         {% endif %}
-        
+
         {% if cliente.telefono %}
         <p class="space-text-muted text-xs mb-1">
             <span class="text-cyan-300">📞</span> {{ cliente.telefono }}
         </p>
         {% endif %}
-        
+
         {% if cliente.ciudad %}
         <div class="mt-2 pt-2 border-t border-gray-700">
             <p class="space-text-muted text-xs">
@@ -113,7 +97,7 @@
             </p>
         </div>
         {% endif %}
-        
+
         {% if cliente.vehiculos.all %}
         <div class="mt-2 pt-2 border-t border-gray-700">
             <p class="space-text-muted text-xs">
@@ -306,14 +290,3 @@ window.eliminarCliente = function() {
 };
 </script>
 {% endblock %}
-
-
-
-
-
-
-
-
-
-
-

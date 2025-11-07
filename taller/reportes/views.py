@@ -5,12 +5,24 @@ from datetime import date, timedelta
 # import openpyxl
 # from openpyxl.utils import get_column_letter
 
-from django.db.models import Count, DecimalField, ExpressionWrapper, F, Sum
+from collections import defaultdict
+from datetime import datetime
+from decimal import Decimal
+
+from django.db.models import Count, DecimalField, ExpressionWrapper, F, FloatField, Sum
 from django.db.models.functions import Coalesce
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import render
+from django.utils import timezone
 
 from taller.auth.decorators import login_required_default
 from taller.models import Documento
+from taller.models.clientes import Cliente
+from taller.models.lineas_documento import LineaOtroServicio, LineaRepuesto, LineaServicio
+from taller.models.tecnico import Tecnico
+from taller.models.vehiculos import Vehiculo
+from taller.utils.empresa import get_or_create_empresa
+from taller.utils.motor_ia import MotorDiagnosticoIA
 
 # from taller.utils import get_or_create_empresa  # Eliminado: usamos la función local
 
@@ -104,11 +116,6 @@ def reportes_dashboard(request):
 
 @login_required_default
 def reporte_repuestos(request):
-    from collections import defaultdict
-
-    from django.db.models import ExpressionWrapper, F, Sum
-
-    from taller.models.lineas_documento import LineaRepuesto
     from taller.models.repuesto import Repuesto
 
     # 🔒 FILTRO CRÍTICO POR EMPRESA
@@ -234,8 +241,6 @@ def reporte_servicios(request):
     )
 
     # Por periodo (últimos 6 meses) - FILTRADO POR EMPRESA
-    from datetime import date, timedelta
-
     hoy = date.today()
     hace_6_meses = hoy - timedelta(days=180)
     facturacion_periodo_qs = (
@@ -360,9 +365,6 @@ def reporte_servicios(request):
         nunca_vendidos = [{"nombre": s.nombre} for s in nunca_vendidos]
 
     # Rankings de vehículos atendidos
-    from taller.models.clientes import Cliente
-    from taller.models.documento import Documento
-    from taller.models.vehiculos import Vehiculo
 
     # Solo documentos con servicios realizados
     doc_ids = LineaServicio.objects.values_list("documento_id", flat=True)
@@ -413,8 +415,6 @@ def reporte_servicios(request):
     ]
 
     # Panel de clientes
-    from datetime import date, timedelta
-
     hoy = date.today()
     hace_3_meses = hoy - timedelta(days=90)
     # Clientes activos: con más documentos en los últimos 6 meses
@@ -509,7 +509,7 @@ def reporte_servicios(request):
         "facturacion_cliente": facturacion_cliente,
         "turnos_proximos": turnos_proximos,
     }
-    return render(request, "taller/cl/es/reportes/reporte_servicios.html", context)
+    return render(request, "taller/reportes/reporte_servicios.html", context)
 
 
 @login_required_default
@@ -518,10 +518,7 @@ def dashboard_inteligencia_operativa(request):
     🚀 Centro de Inteligencia Operativa - Dashboard Futurista 360°
     Análisis predictivo y KPIs avanzados para talleres automotrices
     """
-    from datetime import timedelta
-    from decimal import Decimal, InvalidOperation
-
-    from django.db.models import Count, F, Sum
+    from decimal import InvalidOperation
 
     # 🔒 FILTRO CRÍTICO POR EMPRESA - Usuario autenticado garantizado
     empresa = get_or_create_empresa(request)
@@ -842,7 +839,6 @@ def reportes_mecanicos(request):
     total_documentos = documentos_qs.count()
 
     # Calcular total generado correctamente (incluyendo cantidad y descuentos)
-    from django.db.models import Count, DecimalField, ExpressionWrapper, F, Sum
 
     # Total de servicios
     total_servicios = (
@@ -1067,8 +1063,6 @@ def reportes_mecanicos(request):
 def generar_pdf_mecanico(request, mecanico_id):
     """Genera un PDF con el reporte del mecánico específico"""
     # Implementación básica para evitar errores de importación
-    from django.http import HttpResponse
-
     return HttpResponse("PDF en desarrollo", content_type="text/plain")
 
 

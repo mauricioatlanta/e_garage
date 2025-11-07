@@ -1,0 +1,16 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% trans "Test Template Resolution" %}</title>
+</head>
+<body>
+    <h1>🧪 {% trans "Template Resolution Test" %}</h1>
+    <p>País: CL | Idioma: ES</p>
+    <p>Template path: taller/cl/es/common/clientes/cliente_list.html</p>
+    <div>
+        <h2>{% trans "Sistema de Resolución Funcionando" %}</h2>
+        <p>Este template fue cargado exitosamente usando el sistema de resolución país + idioma.</p>
+    </div>
+</body>
+</html>

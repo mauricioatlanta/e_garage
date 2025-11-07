@@ -10,6 +10,7 @@ from taller.models.color_cliente import ColorCliente
 from taller.models.comprobante_pago import ComprobantePago
 from taller.models.documento import Documento
 from taller.models.empresa import Empresa
+from taller.models.pago import PagoPendiente
 from taller.models.perfil_usuario import PerfilUsuario
 from taller.models.precio_suscripcion import PrecioSuscripcion
 from taller.models.tecnico import Tecnico

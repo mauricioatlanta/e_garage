@@ -58,18 +58,8 @@ class DocumentoListView(CountryLangTemplateMixin, ListView):
                 .order_by("-fecha_emision", "-id")
             )
 
-            # Calcular totales usando anotaciones
-            qs = qs.annotate(
-                total_repuestos=Sum(
-                    ExpressionWrapper(
-                        F("lineas_repuesto__cantidad")
-                        * F("lineas_repuesto__precio_unitario"),
-                        output_field=DecimalField(max_digits=12, decimal_places=2),
-                    )
-                ),
-                total_servicios=Sum("lineas_servicio__precio_unitario"),
-                total_otros=Sum("lineas_otro_servicio__precio_cliente"),
-            )
+            # Los totales ahora se calculan automáticamente en el modelo
+            # No necesitamos anotaciones ya que tenemos campos reales
 
             return qs
         except AttributeError:
@@ -79,27 +69,8 @@ class DocumentoListView(CountryLangTemplateMixin, ListView):
         context = super().get_context_data(**kwargs)
         context["country"] = getattr(self.request.user.empresa, "pais", "cl").lower()
 
-        # Calcular totales para cada documento en el listado
-        for documento in context["documentos"]:
-            # Obtener totales de las anotaciones
-            total_rep = documento.total_repuestos or 0
-            total_serv = documento.total_servicios or 0
-            total_otros = documento.total_otros or 0
-
-            # Calcular subtotal
-            subtotal = total_rep + total_serv + total_otros
-
-            # Calcular IVA (19% solo sobre repuestos según la lógica de negocio)
-            iva = total_rep * Decimal("0.19")
-            total = subtotal + iva
-
-            # Agregar totales al objeto documento
-            documento.total_repuestos = total_rep
-            documento.total_servicios = total_serv
-            documento.total_otros = total_otros
-            documento.subtotal = subtotal
-            documento.iva = iva
-            documento.total = total
+        # Los totales ya están calculados automáticamente en el modelo
+        # No necesitamos calcularlos manualmente aquí
 
         return context
 
@@ -108,22 +79,12 @@ class DocumentoListView(CountryLangTemplateMixin, ListView):
 
 
 @method_decorator(login_required, name="dispatch")
-class DocumentoCreateView(CreateView):
+class DocumentoCreateView(CountryLangTemplateMixin, CreateView):
     """Vista para crear documentos"""
 
     model = Documento
     form_class = DocumentoForm
-    
-    def get_template_names(self):
-        """Priorizar template US/EN si existe"""
-        if self.request.path.startswith("/us/"):
-            template_name = "taller/us/en/documentos/editar_documento_nuevo.html"
-            print(f"[DEBUG] DocumentoCreateView - Using US/EN template: {template_name}")
-            return [template_name]
-        else:
-            template_name = "taller/common/documentos/editar_documento_nuevo.html"
-            print(f"[DEBUG] DocumentoCreateView - Using common template: {template_name}")
-            return [template_name]
+    base_template_name = "documentos/document_form.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -131,6 +92,7 @@ class DocumentoCreateView(CreateView):
 
         # Cargar mecánicos activos del taller
         mecanicos = Tecnico.objects.filter(empresa=empresa, activo=True)
+
 
         context.update(
             {
@@ -148,6 +110,7 @@ class DocumentoCreateView(CreateView):
                 "subtotal_otros_servicios": 0,
                 "iva": 0,
                 "repuestos": [],
+                "debug": True,  # Habilitar debug en template
             }
         )
         return context
@@ -335,7 +298,34 @@ class DocumentoUpdateView(CountryLangTemplateMixin, UpdateView):
 
     model = Documento
     form_class = DocumentoForm
-    base_template_name = "documentos/editar_documento_nuevo.html"
+    base_template_name = "documentos/document_edit.html"
+
+    def get_template_names(self):
+        """Sistema robusto de fallback para templates de edición de documentos"""
+        from django.template.loader import select_template
+        from django.template import TemplateDoesNotExist
+        from django.utils.translation import get_language
+        
+        # País/idioma desde empresa y request
+        empresa = getattr(self.request.user, "empresa", None)
+        country = (getattr(empresa, "pais", "CL") or "CL").strip().lower()  # cl/us
+        lang = (get_language() or "es").strip().lower()                    # es/en
+
+        candidates = [
+            f"taller/{country}/{lang}/documentos/document_edit.html",
+            f"taller/{country}/{lang}/documentos/editar_documento.html",
+            "taller/common/documentos/document_edit.html",                 # el que pide la vista
+            "taller/common/documentos/editar_documento_nuevo.html",        # template funcional actual
+            "taller/documentos/editar_documento_nuevo.html",               # fallback legacy
+        ]
+        
+        # Devuelve el primero que exista
+        try:
+            t = select_template(candidates)
+            return [t.template.name]
+        except TemplateDoesNotExist as e:
+            e.args = (", ".join(candidates),)
+            raise
 
     def get_queryset(self):
         """Asegurar que solo se editen documentos de la empresa"""

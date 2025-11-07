@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🇺🇸 eGarage United States - Professional Automotive Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Futuristic gradient backgrounds */
+        .gradient-bg {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 35%, #334155 65%, #0a0f1c 100%);
+            position: relative;
+        }
+        .gradient-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(ellipse at center top, rgba(59, 130, 246, 0.15) 0%, rgba(99, 102, 241, 0.08) 35%, transparent 70%);
+        }
+
+        /* Advanced animations */
+        .floating-animation {
+            animation: advancedFloat 8s ease-in-out infinite;
+        }
+        @keyframes advancedFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
+            25% { transform: translateY(-15px) rotate(1deg) scale(1.02); }
+            50% { transform: translateY(-8px) rotate(0deg) scale(1.03); }
+            75% { transform: translateY(-12px) rotate(-1deg) scale(1.01); }
+        }
+
+        /* Holographic effects */
+        .holographic {
+            background: linear-gradient(145deg, rgba(59, 130, 246, 0.1), rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.1));
+            backdrop-filter: blur(20px) saturate(1.5);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        /* Advanced pulse effect */
+        .pulse-glow {
+            animation: advancedPulse 3s ease-in-out infinite;
+            position: relative;
+        }
+        @keyframes advancedPulse {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(99, 102, 241, 0.6), 0 0 40px rgba(59, 130, 246, 0.4);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(99, 102, 241, 0.8), 0 0 60px rgba(59, 130, 246, 0.6);
+                transform: scale(1.05);
+            }
+        }
+
+        /* Neon text with multiple colors */
+        .neon-text {
+            background: linear-gradient(45deg, #3b82f6, #6366f1, #8b5cf6, #3b82f6);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 4s ease-in-out infinite;
+            text-shadow: 0 0 30px rgba(99, 102, 241, 0.5);
+        }
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        /* Particle system */
+        .particle {
+            position: absolute;
+            background: rgba(99, 102, 241, 0.8);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        /* Glitch effect */
+        .glitch {
+            position: relative;
+        }
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .glitch::before {
+            animation: glitch-1 0.5s infinite linear alternate-reverse;
+            color: #ff0080;
+            z-index: -1;
+        }
+        .glitch::after {
+            animation: glitch-2 0.5s infinite linear alternate-reverse;
+            color: #00ff80;
+            z-index: -1;
+        }
+        @keyframes glitch-1 {
+            0% { transform: translateX(-2px) skew(-5deg); }
+            100% { transform: translateX(2px) skew(5deg); }
+        }
+        @keyframes glitch-2 {
+            0% { transform: translateX(2px) skew(-5deg); }
+            100% { transform: translateX(-2px) skew(5deg); }
+        }
+
+        /* Tech grid */
+        .tech-grid {
+            background-image:
+                linear-gradient(rgba(99, 102, 241, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 102, 241, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        /* Glass morphism card */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(99, 102, 241, 0.4);
+            box-shadow: 0 20px 60px rgba(99, 102, 241, 0.2);
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+<body class="gradient-bg text-white tech-grid">
+
+    <!-- Futuristic Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 holographic border-b border-indigo-500/30 py-4 px-6">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <!-- Logo Section -->
+            <div class="flex items-center gap-4">
+                <div class="relative">
+                    <img src="/static/img/logo.png" alt="eGarage Logo" class="h-12 w-auto floating-animation">
+                    <div class="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full blur-xl scale-110"></div>
+                </div>
+                <div>
+                    <span class="text-2xl font-bold neon-text">
+                        eGarage
+                    </span>
+                    <div class="text-xs text-indigo-300/80 font-medium">
+                        🇺🇸 United States
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center gap-4">
+                <a href="#trial"
+                   class="holographic hover:bg-indigo-500/20 text-indigo-200 hover:text-white px-6 py-2 rounded-xl font-bold text-sm transition-all duration-300">
+                    <span>🚀</span> Start Free Trial
+                </a>
+                <a href="/us/pricing/"
+                   class="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white px-6 py-2 rounded-xl font-bold text-sm transition-all duration-300">
+                    <span>💳</span> Subscribe
+                </a>
+                <a href="/accounts/login/"
+                   class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white px-6 py-2 rounded-xl font-bold text-sm transition-all duration-300 pulse-glow">
+                    <span>⚡</span> Sign In
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section Futurista -->
+    <section class="min-h-screen flex flex-col justify-center items-center text-center px-6 lg:px-20 pt-20 relative overflow-hidden">
+        <!-- Partículas animadas de fondo -->
+        <div class="absolute inset-0 z-0">
+            <div class="particle" style="width: 4px; height: 4px; top: 20%; left: 10%; animation: particleFloat 8s linear infinite;"></div>
+            <div class="particle" style="width: 6px; height: 6px; top: 40%; left: 80%; animation: particleFloat 12s linear infinite 2s;"></div>
+            <div class="particle" style="width: 3px; height: 3px; top: 60%; left: 20%; animation: particleFloat 10s linear infinite 4s;"></div>
+            <div class="particle" style="width: 5px; height: 5px; top: 30%; left: 70%; animation: particleFloat 9s linear infinite 1s;"></div>
+            <div class="particle" style="width: 4px; height: 4px; top: 80%; left: 60%; animation: particleFloat 11s linear infinite 3s;"></div>
+        </div>
+
+        <!-- Elementos geométricos de fondo -->
+        <div class="absolute inset-0 z-0 opacity-10">
+            <svg width="100%" height="100%" class="w-full h-full">
+                <defs>
+                    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:0.3" />
+                        <stop offset="100%" style="stop-color:#6366f1;stop-opacity:0.3" />
+                    </linearGradient>
+                </defs>
+                <polygon points="0,0 400,200 0,400" fill="url(#grad1)" opacity="0.1"/>
+                <polygon points="1200,100 1400,0 1400,300" fill="url(#grad1)" opacity="0.08"/>
+                <circle cx="300" cy="300" r="120" fill="#3b82f6" opacity="0.05"/>
+                <circle cx="1100" cy="500" r="180" fill="#6366f1" opacity="0.05"/>
+            </svg>
+        </div>
+
+        <div class="relative z-10 max-w-6xl mx-auto">
+            <!-- Logo principal -->
+            <div class="mb-10 flex justify-center">
+                <div class="relative">
+                    <img src="/static/img/logo.png" alt="eGarage Logo" class="h-40 w-auto floating-animation drop-shadow-2xl">
+                    <div class="absolute inset-0 bg-gradient-to-r from-indigo-400/30 to-purple-400/30 rounded-full blur-2xl scale-125"></div>
+                </div>
+            </div>
+
+            <!-- Título principal con efecto glitch -->
+            <h1 class="text-5xl lg:text-8xl font-black mb-8 leading-tight">
+                <span class="block glitch neon-text" data-text="eGarage">eGarage</span>
+                <span class="block text-2xl lg:text-3xl text-indigo-300/90 font-normal mt-4">
+                    🇺🇸 Professional Automotive Management
+                </span>
+            </h1>
+
+            <!-- Subtítulo -->
+            <p class="text-lg lg:text-2xl text-indigo-200/90 mb-12 max-w-4xl mx-auto leading-relaxed">
+                The most advanced platform for automotive businesses in the United States.
+                <span class="block mt-4 text-xl lg:text-2xl font-semibold text-white">
+                    🚀 AI-Powered Management • Real-Time Analytics • Future-Ready Technology
+                </span>
+            </p>
+
+            <!-- Botones de acción futuristas -->
+            <div class="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
+                <a href="#trial" class="group relative overflow-hidden bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 px-12 py-5 rounded-2xl text-white font-bold text-xl shadow-2xl pulse-glow transition-all duration-300">
+                    <span class="relative z-10 flex items-center gap-3">
+                        <span>🚀</span>
+                        Start Free Trial
+                    </span>
+                    <div class="absolute inset-0 bg-gradient-to-r from-purple-600 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </a>
+
+                <a href="/us/pricing/" class="glass-card px-12 py-5 rounded-2xl bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-bold text-xl transition-all duration-300 shadow-2xl">
+                    <span class="flex items-center gap-3">
+                        <span>💳</span>
+                        Subscribe to a Plan
+                    </span>
+                </a>
+
+                <a href="/accounts/login/" class="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 px-12 py-5 rounded-2xl text-white font-bold text-xl shadow-2xl transition-all duration-300">
+                    <span class="flex items-center gap-3">
+                        <span>⚡</span>
+                        Sign In
+                    </span>
+                </a>
+            </div>
+
+            <!-- Características destacadas -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 text-base text-indigo-200/80 max-w-4xl mx-auto">
+                <div class="flex items-center justify-center gap-2 glass-card px-4 py-3 rounded-xl">
+                    <span class="text-green-400">✓</span>
+                    No Credit Card Required
+                </div>
+                <div class="flex items-center justify-center gap-2 glass-card px-4 py-3 rounded-xl">
+                    <span class="text-green-400">✓</span>
+                    24/7 Premium Support
+                </div>
+                <div class="flex items-center justify-center gap-2 glass-card px-4 py-3 rounded-xl">
+                    <span class="text-green-400">✓</span>
+                    Setup in 24 Hours
+                </div>
+            </div>
+        </div>
+
+        <!-- Indicador de scroll mejorado -->
+        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20">
+            <div class="flex flex-col items-center gap-2 animate-bounce">
+                <span class="text-indigo-300/60 text-sm font-medium">Discover More</span>
+                <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                </svg>
+            </div>
+        </div>
+
+        <style>
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(100vh) translateX(-50px);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) translateX(50px);
+                opacity: 0;
+            }
+        }
+        </style>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-20 px-6">
+        <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div class="space-y-8">
+                <div>
+                    <h2 class="text-4xl lg:text-5xl font-bold mb-6 neon-text">The Most Complete Platform</h2>
+                    <p class="text-xl text-indigo-200/90 mb-8 leading-relaxed">
+                        Whether you run a <strong class="text-white">repair shop</strong>, a <strong class="text-white">collision center</strong>, a <strong class="text-white">parts store</strong>, or a <strong class="text-white">multi-service automotive business</strong>, eGarage adapts perfectly to your needs.
+                    </p>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="glass-card p-6 rounded-2xl">
+                        <div class="flex items-center gap-4 mb-3">
+                            <span class="text-3xl">🚗</span>
+                            <h3 class="text-xl font-bold text-white">Vehicle Management</h3>
+                        </div>
+                        <p class="text-indigo-200/80">Complete history, maintenance records, and intelligent service scheduling with AI recommendations.</p>
+                    </div>
+
+                    <div class="glass-card p-6 rounded-2xl">
+                        <div class="flex items-center gap-4 mb-3">
+                            <span class="text-3xl">👥</span>
+                            <h3 class="text-xl font-bold text-white">Customer CRM</h3>
+                        </div>
+                        <p class="text-indigo-200/80">Advanced relationship management, loyalty programs, and automated communication systems.</p>
+                    </div>
+
+                    <div class="glass-card p-6 rounded-2xl">
+                        <div class="flex items-center gap-4 mb-3">
+                            <span class="text-3xl">📦</span>
+                            <h3 class="text-xl font-bold text-white">Smart Inventory</h3>
+                        </div>
+                        <p class="text-indigo-200/80">Real-time control, predictive reorder points, and intelligent supplier management.</p>
+                    </div>
+
+                    <div class="glass-card p-6 rounded-2xl">
+                        <div class="flex items-center gap-4 mb-3">
+                            <span class="text-3xl">📊</span>
+                            <h3 class="text-xl font-bold text-white">AI Analytics</h3>
+                        </div>
+                        <p class="text-indigo-200/80">Advanced KPIs, performance dashboards, and predictive business insights powered by AI.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="relative">
+                <div class="glass-card p-8 rounded-3xl floating-animation">
+                    <img src="/static/img/usa_dashboard_mockup.png" alt="eGarage USA Dashboard" class="rounded-2xl w-full shadow-2xl">
+                    <div class="absolute top-4 right-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-bold py-2 px-4 rounded-full shadow-lg pulse-glow">
+                        <span>🔴</span> Live Demo
+                    </div>
+                </div>
+
+                <!-- Elementos decorativos -->
+                <div class="absolute -z-10 top-10 left-10 w-20 h-20 bg-indigo-500/20 rounded-full blur-xl"></div>
+                <div class="absolute -z-10 bottom-10 right-10 w-32 h-32 bg-purple-500/20 rounded-full blur-2xl"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Business Types Section -->
+    <section class="py-20 px-6 relative overflow-hidden">
+        <!-- Fondo con gradiente y efectos -->
+        <div class="absolute inset-0 bg-gradient-to-br from-indigo-900/50 to-purple-900/50 backdrop-blur-sm"></div>
+
+        <div class="max-w-6xl mx-auto text-center relative z-10">
+            <h2 class="text-4xl lg:text-5xl font-bold mb-8 neon-text">Why Choose eGarage USA?</h2>
+            <p class="text-xl text-indigo-200/90 mb-12 max-w-4xl mx-auto leading-relaxed">
+                Trusted by automotive professionals across multiple countries.
+                Designed to <strong class="text-white">simplify operations</strong>, <strong class="text-white">boost sales</strong>, and <strong class="text-white">keep customers coming back</strong>.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="glass-card p-8 rounded-2xl hover:scale-105 transition-all duration-300 group">
+                    <div class="text-5xl mb-6 group-hover:scale-110 transition-transform duration-300">🔧</div>
+                    <h3 class="font-bold text-2xl mb-4 text-white">Specialized Shops</h3>
+                    <p class="text-indigo-200/80 leading-relaxed">Perfect for auto repair shops, tire stores, or paint & body businesses that need smart, powerful, and intuitive tools.</p>
+                    <div class="mt-6 flex justify-center">
+                        <div class="w-16 h-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full"></div>
+                    </div>
+                </div>
+
+                <div class="glass-card p-8 rounded-2xl hover:scale-105 transition-all duration-300 group">
+                    <div class="text-5xl mb-6 group-hover:scale-110 transition-transform duration-300">🏭</div>
+                    <h3 class="font-bold text-2xl mb-4 text-white">Multi-Service Centers</h3>
+                    <p class="text-indigo-200/80 leading-relaxed">Manage repairs, parts sales, tire services, and more — all in one integrated, AI-powered platform.</p>
+                    <div class="mt-6 flex justify-center">
+                        <div class="w-16 h-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"></div>
+                    </div>
+                </div>
+
+                <div class="glass-card p-8 rounded-2xl hover:scale-105 transition-all duration-300 group">
+                    <div class="text-5xl mb-6 group-hover:scale-110 transition-transform duration-300">📈</div>
+                    <h3 class="font-bold text-2xl mb-4 text-white">Growth-Oriented Owners</h3>
+                    <p class="text-indigo-200/80 leading-relaxed">Track advanced KPIs, increase efficiency, and gain real-time insights into profitability with predictive analytics.</p>
+                    <div class="mt-6 flex justify-center">
+                        <div class="w-16 h-1 bg-gradient-to-r from-pink-500 to-red-500 rounded-full"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional features grid -->
+            <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                <div class="space-y-2">
+                    <div class="text-2xl">📱</div>
+                    <span class="text-sm text-indigo-200/80">Mobile Ready</span>
+                </div>
+                <div class="space-y-2">
+                    <div class="text-2xl">🧠</div>
+                    <span class="text-sm text-indigo-200/80">AI-Powered</span>
+                </div>
+                <div class="space-y-2">
+                    <div class="text-2xl">🔒</div>
+                    <span class="text-sm text-indigo-200/80">Bank-Level Security</span>
+                </div>
+                <div class="space-y-2">
+                    <div class="text-2xl">⚡</div>
+                    <span class="text-sm text-indigo-200/80">Lightning Fast</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action Section -->
+    <section id="trial" class="py-20 px-6 relative overflow-hidden">
+        <!-- Fondo futurista -->
+        <div class="absolute inset-0 bg-gradient-to-r from-indigo-600/80 via-purple-600/80 to-pink-600/80"></div>
+        <div class="absolute inset-0 tech-grid opacity-20"></div>
+
+        <div class="max-w-4xl mx-auto text-center relative z-10">
+            <div class="mb-8">
+                <span class="text-6xl floating-animation inline-block">🚀</span>
+            </div>
+
+            <h2 class="text-4xl lg:text-6xl font-bold mb-8 neon-text">Ready to Transform Your Business?</h2>
+            <p class="text-xl lg:text-2xl mb-12 text-indigo-100 leading-relaxed max-w-3xl mx-auto">
+                Join thousands of automotive professionals who trust eGarage to manage their operations with
+                <strong class="text-white">cutting-edge technology</strong> and <strong class="text-white">intelligent automation</strong>.
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-6 justify-center items-center">
+                <a href="/accounts/login/"
+                   class="group relative overflow-hidden bg-white text-indigo-600 font-bold px-12 py-5 rounded-2xl text-xl shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105">
+                    <span class="relative z-10 flex items-center gap-3">
+                        <span>⚡</span>
+                        Get Started Now
+                    </span>
+                    <div class="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <span class="absolute inset-0 group-hover:text-white transition-colors duration-300 flex items-center justify-center gap-3 font-bold text-xl">
+                        <span>⚡</span>
+                        Get Started Now
+                    </span>
+                </a>
+
+                <a href="#demo"
+                   class="glass-card border-2 border-white/30 hover:border-white/60 text-white font-bold px-12 py-5 rounded-2xl text-xl hover:bg-white/10 transition-all duration-300">
+                    <span class="flex items-center gap-3">
+                        <span>🎬</span>
+                        Schedule Demo
+                    </span>
+                </a>
+            </div>
+
+            <!-- Trust indicators -->
+            <div class="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
+                <div class="glass-card px-6 py-4 rounded-xl">
+                    <div class="text-2xl mb-2">⚡</div>
+                    <div class="text-white font-semibold">Setup in 24h</div>
+                    <div class="text-indigo-200/80 text-sm">Quick onboarding</div>
+                </div>
+                <div class="glass-card px-6 py-4 rounded-xl">
+                    <div class="text-2xl mb-2">🛡️</div>
+                    <div class="text-white font-semibold">100% Secure</div>
+                    <div class="text-indigo-200/80 text-sm">Bank-level encryption</div>
+                </div>
+                <div class="glass-card px-6 py-4 rounded-xl">
+                    <div class="text-2xl mb-2">📞</div>
+                    <div class="text-white font-semibold">24/7 Support</div>
+                    <div class="text-indigo-200/80 text-sm">Always here to help</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Futurista -->
+    <footer class="py-16 px-6 relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-t from-black to-gray-900/90"></div>
+
+        <div class="max-w-6xl mx-auto relative z-10">
+            <!-- Logo y descripción principal -->
+            <div class="text-center mb-12">
+                <div class="flex justify-center items-center gap-4 mb-6">
+                    <img src="/static/img/logo.png" alt="eGarage Logo" class="h-12 w-auto floating-animation">
+                    <span class="text-3xl font-bold neon-text">eGarage</span>
+                </div>
+                <p class="text-lg text-indigo-200/80 max-w-2xl mx-auto leading-relaxed">
+                    The future of automotive business management. Powered by AI, designed for professionals.
+                </p>
+            </div>
+
+            <!-- Enlaces de navegación -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+                <div class="space-y-4">
+                    <h3 class="text-white font-bold text-lg">Platform</h3>
+                    <ul class="space-y-2 text-indigo-200/80">
+                        <li><a href="#trial" class="hover:text-white transition-colors">Free Trial</a></li>
+                        <li><a href="#demo" class="hover:text-white transition-colors">Live Demo</a></li>
+                        <li><a href="/pricing" class="hover:text-white transition-colors">Pricing</a></li>
+                        <li><a href="/features" class="hover:text-white transition-colors">Features</a></li>
+                    </ul>
+                </div>
+
+                <div class="space-y-4">
+                    <h3 class="text-white font-bold text-lg">Support</h3>
+                    <ul class="space-y-2 text-indigo-200/80">
+                        <li><a href="/support" class="hover:text-white transition-colors">Help Center</a></li>
+                        <li><a href="/contact" class="hover:text-white transition-colors">Contact</a></li>
+                        <li><a href="/training" class="hover:text-white transition-colors">Training</a></li>
+                        <li><a href="/status" class="hover:text-white transition-colors">System Status</a></li>
+                    </ul>
+                </div>
+
+                <div class="space-y-4">
+                    <h3 class="text-white font-bold text-lg">Company</h3>
+                    <ul class="space-y-2 text-indigo-200/80">
+                        <li><a href="/about" class="hover:text-white transition-colors">About</a></li>
+                        <li><a href="/careers" class="hover:text-white transition-colors">Careers</a></li>
+                        <li><a href="/blog" class="hover:text-white transition-colors">Blog</a></li>
+                        <li><a href="/news" class="hover:text-white transition-colors">News</a></li>
+                    </ul>
+                </div>
+
+                <div class="space-y-4">
+                    <h3 class="text-white font-bold text-lg">Legal</h3>
+                    <ul class="space-y-2 text-indigo-200/80">
+                        <li><a href="/privacy" class="hover:text-white transition-colors">Privacy</a></li>
+                        <li><a href="/terms" class="hover:text-white transition-colors">Terms</a></li>
+                        <li><a href="/security" class="hover:text-white transition-colors">Security</a></li>
+                        <li><a href="/compliance" class="hover:text-white transition-colors">Compliance</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Copyright y badges -->
+            <div class="border-t border-indigo-800/30 pt-8">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div class="text-center md:text-left">
+                        <p class="text-indigo-200/70 mb-2">© 2025 eGarage United States. All rights reserved.</p>
+                        <p class="text-sm text-indigo-300/60 flex items-center justify-center md:justify-start gap-2">
+                            <span>🇺🇸</span>
+                            Proudly serving automotive businesses across the United States
+                        </p>
+                    </div>
+
+                    <!-- Trust badges -->
+                    <div class="flex items-center gap-4">
+                        <div class="glass-card px-4 py-2 rounded-lg">
+                            <span class="text-green-400 text-sm font-semibold">🔒 SSL Secured</span>
+                        </div>
+                        <div class="glass-card px-4 py-2 rounded-lg">
+                            <span class="text-blue-400 text-sm font-semibold">☁️ Cloud-Native</span>
+                        </div>
+                        <div class="glass-card px-4 py-2 rounded-lg">
+                            <span class="text-purple-400 text-sm font-semibold">🤖 AI-Powered</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript for smooth scrolling -->
+    <script>
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

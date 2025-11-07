@@ -1,0 +1,238 @@
+path_in_zip,filename,ext,size_bytes,role_guess,suggested_action,reason
+ZIPS/run_backup.bat,run_backup.bat,.bat,81,Script (shell/PS),🔴 Safe to delete,Backup/archive at project root
+ZIPS/audit_code_hits.csv,audit_code_hits.csv,.csv,4,Data (.csv),🔴 Safe to delete or move to /data,Data dump should not live at project root
+ZIPS/audit_folders_vehiculos.csv,audit_folders_vehiculos.csv,.csv,1974,Data (.csv),🔴 Safe to delete or move to /data,Data dump should not live at project root
+ZIPS/audit_templates_canonical_hits.csv,audit_templates_canonical_hits.csv,.csv,124225,Data (.csv),🔴 Safe to delete or move to /data,Data dump should not live at project root
+ZIPS/audit_templates_hits.csv,audit_templates_hits.csv,.csv,218046,Data (.csv),🔴 Safe to delete or move to /data,Data dump should not live at project root
+ZIPS/agregar_lineas_sql.sql,agregar_lineas_sql.sql,.sql,1896,SQL dump (.sql),🔴 Safe to delete or move to /data,Data dump should not live at project root
+ZIPS/.aider.chat.history.md,.aider.chat.history.md,.md,178544,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/AJUSTES_VIEWS_FBV.md,AJUSTES_VIEWS_FBV.md,.md,16101,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/API_DOCUMENTOS_MEJORADA.md,API_DOCUMENTOS_MEJORADA.md,.md,8194,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/AUTOCOMPLETADO_CLIENTES_IMPLEMENTADO.md,AUTOCOMPLETADO_CLIENTES_IMPLEMENTADO.md,.md,6332,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/BRANDING_EMPRESA_IMPLEMENTADO.md,BRANDING_EMPRESA_IMPLEMENTADO.md,.md,7697,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/CAMBIOS_APLICADOS_FINAL.md,CAMBIOS_APLICADOS_FINAL.md,.md,10509,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/COMANDOS_PDF_EJEMPLO.md,COMANDOS_PDF_EJEMPLO.md,.md,5018,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/CORRECCIONES_HALLAZGOS_IMPLEMENTADAS.md,CORRECCIONES_HALLAZGOS_IMPLEMENTADAS.md,.md,10797,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/CORRECCION_DOCUMENTOS_URLS_COMPLETADA.md,CORRECCION_DOCUMENTOS_URLS_COMPLETADA.md,.md,6335,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/CORRECCION_JS_URLS_COMPLETADA.md,CORRECCION_JS_URLS_COMPLETADA.md,.md,4972,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/DOCUMENTO_FIRMAS_PDF_IMPLEMENTADO.md,DOCUMENTO_FIRMAS_PDF_IMPLEMENTADO.md,.md,7149,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/DOCUMENTO_FORM_DAL_IMPLEMENTACION_COMPLETA.md,DOCUMENTO_FORM_DAL_IMPLEMENTACION_COMPLETA.md,.md,7101,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/DOCUMENTO_IVA_SALES_TAX_IMPLEMENTADO.md,DOCUMENTO_IVA_SALES_TAX_IMPLEMENTADO.md,.md,9348,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/DOCUMENTO_LIMPIEZA_FORMULARIOS_IMPLEMENTADA.md,DOCUMENTO_LIMPIEZA_FORMULARIOS_IMPLEMENTADA.md,.md,9513,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/DOCUMENTO_MODO_OSCURO_Y_PDF_IMPLEMENTADO.md,DOCUMENTO_MODO_OSCURO_Y_PDF_IMPLEMENTADO.md,.md,8179,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/DOCUMENTO_TEMA_DINAMICO_IMPLEMENTADO.md,DOCUMENTO_TEMA_DINAMICO_IMPLEMENTADO.md,.md,6237,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/DOCUMENTO_TOTALES_PDF_IMPLEMENTADO.md,DOCUMENTO_TOTALES_PDF_IMPLEMENTADO.md,.md,7592,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/ESTADO_FINAL_CORRECCIONES.md,ESTADO_FINAL_CORRECCIONES.md,.md,4274,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/FIX_CONFIGURACION_TECNICOS_404_APLICADO.md,FIX_CONFIGURACION_TECNICOS_404_APLICADO.md,.md,4819,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/FIX_CONFIGURACION_TECNICOS_404_FINAL.md,FIX_CONFIGURACION_TECNICOS_404_FINAL.md,.md,6226,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/FIX_CONFIGURACION_TECNICOS_URL_FINAL.md,FIX_CONFIGURACION_TECNICOS_URL_FINAL.md,.md,3324,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/FIX_CSRF_ERROR_APLICADO.md,FIX_CSRF_ERROR_APLICADO.md,.md,4238,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/FIX_DAL_FORWARD_APLICADO.md,FIX_DAL_FORWARD_APLICADO.md,.md,4475,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/FIX_DOCUMENT_FORM_ISSUES_APLICADO.md,FIX_DOCUMENT_FORM_ISSUES_APLICADO.md,.md,6197,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/FIX_LOGIN_TEXTS_PROFESSIONAL_APLICADO.md,FIX_LOGIN_TEXTS_PROFESSIONAL_APLICADO.md,.md,4465,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/FIX_LOGO_ANIMATIONS_APLICADO.md,FIX_LOGO_ANIMATIONS_APLICADO.md,.md,3574,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/FIX_REMOVE_EXTRA_BUTTON_APLICADO.md,FIX_REMOVE_EXTRA_BUTTON_APLICADO.md,.md,7969,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/FIX_TIMEZONE_ERROR_APLICADO.md,FIX_TIMEZONE_ERROR_APLICADO.md,.md,2971,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/INTERNACIONALIZACION_DOCUMENTO_FORM_COMPLETADA.md,INTERNACIONALIZACION_DOCUMENTO_FORM_COMPLETADA.md,.md,5490,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/JAVASCRIPT_SENTINEL_IMPLEMENTADO.md,JAVASCRIPT_SENTINEL_IMPLEMENTADO.md,.md,5383,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/MANAGEMENT_COMMAND_AUDIT_VEHICULOS_COMPLETADO.md,MANAGEMENT_COMMAND_AUDIT_VEHICULOS_COMPLETADO.md,.md,7212,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/MEJORAS_API_VIEWS_COMPLETADAS.md,MEJORAS_API_VIEWS_COMPLETADAS.md,.md,7044,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/MEJORAS_DETALLE_DOCUMENTO.md,MEJORAS_DETALLE_DOCUMENTO.md,.md,11918,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/MEJORAS_EMPRESA_MODEL_COMPLETADAS.md,MEJORAS_EMPRESA_MODEL_COMPLETADAS.md,.md,9544,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/MEJORAS_PRECIO_SUSCRIPCION_IMPLEMENTADAS.md,MEJORAS_PRECIO_SUSCRIPCION_IMPLEMENTADAS.md,.md,7195,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/MEJORAS_TECNICO_MODEL_MULTI_TENANT_COMPLETADAS.md,MEJORAS_TECNICO_MODEL_MULTI_TENANT_COMPLETADAS.md,.md,8847,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/MEJORAS_TEMPLATE_CONSISTENCIA_COMPLETADAS.md,MEJORAS_TEMPLATE_CONSISTENCIA_COMPLETADAS.md,.md,5711,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/MEJORAS_VEHICULO_MODEL_COMPLETADAS.md,MEJORAS_VEHICULO_MODEL_COMPLETADAS.md,.md,11199,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/MEJORAS_VIEWS_FBV_COMPLETADAS.md,MEJORAS_VIEWS_FBV_COMPLETADAS.md,.md,7466,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/MIGRACIONES_EMPRESA_APLICADAS_COMPLETADAS.md,MIGRACIONES_EMPRESA_APLICADAS_COMPLETADAS.md,.md,8722,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/MIGRACION_COMPLETADA.md,MIGRACION_COMPLETADA.md,.md,5458,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/MIGRACION_EXTRAS_VEHICULO.md,MIGRACION_EXTRAS_VEHICULO.md,.md,11045,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/PARCHES_FORMS_COMPLETADOS.md,PARCHES_FORMS_COMPLETADOS.md,.md,6110,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/PATCH_APLICADO_EXITOSAMENTE.md,PATCH_APLICADO_EXITOSAMENTE.md,.md,3411,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/PATCH_UNIFICADO_APLICADO_EXITOSAMENTE.md,PATCH_UNIFICADO_APLICADO_EXITOSAMENTE.md,.md,5342,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/REFACTOR_API_VIEWS_COMPLETADO.md,REFACTOR_API_VIEWS_COMPLETADO.md,.md,5939,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/RENDER_ENVIRONMENT_VARIABLES.md,RENDER_ENVIRONMENT_VARIABLES.md,.md,1170,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/RENDER_SHELL_COMMANDS.md,RENDER_SHELL_COMMANDS.md,.md,1137,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/RESUMEN_EJECUTIVO_MULTI_TENANT.md,RESUMEN_EJECUTIVO_MULTI_TENANT.md,.md,13151,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/RESUMEN_FINAL_PRECIO_SUSCRIPCION_COMPLETADO.md,RESUMEN_FINAL_PRECIO_SUSCRIPCION_COMPLETADO.md,.md,5830,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/RESUMEN_IMPLEMENTACION_COMPLETA.md,RESUMEN_IMPLEMENTACION_COMPLETA.md,.md,6772,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/SECURITY_CHECKLIST.md,SECURITY_CHECKLIST.md,.md,4402,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/SERVIDOR_INICIADO_EXITOSAMENTE.md,SERVIDOR_INICIADO_EXITOSAMENTE.md,.md,3615,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/SIGNALS_MEJORADOS.md,SIGNALS_MEJORADOS.md,.md,8736,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/SNIPPETS_CANONICOS_URLS.md,SNIPPETS_CANONICOS_URLS.md,.md,11611,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/SOLUCION_COMPAT_URLS_COMPLETADA.md,SOLUCION_COMPAT_URLS_COMPLETADA.md,.md,5122,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/SOLUCION_COMPLETA_CLIENTE_VEHICULO_EMPRESA_FINAL.md,SOLUCION_COMPLETA_CLIENTE_VEHICULO_EMPRESA_FINAL.md,.md,9528,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/SOLUCION_COMPLETA_DAL_NAMESPACE.md,SOLUCION_COMPLETA_DAL_NAMESPACE.md,.md,4666,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/SOLUCION_CREAR_VEHICULO_ENGLISH_COMPLETADA.md,SOLUCION_CREAR_VEHICULO_ENGLISH_COMPLETADA.md,.md,7329,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/SOLUCION_CREAR_VEHICULO_TODOS_INGLES_COMPLETADA.md,SOLUCION_CREAR_VEHICULO_TODOS_INGLES_COMPLETADA.md,.md,5618,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/SOLUCION_DAL_TEMPLATE.md,SOLUCION_DAL_TEMPLATE.md,.md,4903,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/SOLUCION_ELIMINAR_VEHICULO_URL_COMPLETADA.md,SOLUCION_ELIMINAR_VEHICULO_URL_COMPLETADA.md,.md,3187,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/SOLUCION_FORMULARIOS_SECCION_COMPLETADA.md,SOLUCION_FORMULARIOS_SECCION_COMPLETADA.md,.md,4199,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/SOLUCION_FORMULARIO_JERARQUICO_BULLETPROOF_COMPLETADA.md,SOLUCION_FORMULARIO_JERARQUICO_BULLETPROOF_COMPLETADA.md,.md,6392,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/SOLUCION_FORMULARIO_JERARQUICO_COMPLETADA.md,SOLUCION_FORMULARIO_JERARQUICO_COMPLETADA.md,.md,6083,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/SOLUCION_FORMULARIO_MOTORES_CAJAS_COMPLETADA.md,SOLUCION_FORMULARIO_MOTORES_CAJAS_COMPLETADA.md,.md,5409,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/SOLUCION_INCONSISTENCIA_CLIENTE_VEHICULO_EMPRESA_COMPLETADA.md,SOLUCION_INCONSISTENCIA_CLIENTE_VEHICULO_EMPRESA_COMPLETADA.md,.md,10169,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/SOLUCION_MOTORES_CAJAS_USA_COMPLETADA.md,SOLUCION_MOTORES_CAJAS_USA_COMPLETADA.md,.md,3990,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/SOLUCION_NAVEGACION_USA_COMPLETADA.md,SOLUCION_NAVEGACION_USA_COMPLETADA.md,.md,5559,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/SOLUCION_NAVEGACION_VEHICULOS_COMPLETADA.md,SOLUCION_NAVEGACION_VEHICULOS_COMPLETADA.md,.md,3825,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/SOLUCION_URLS_USA_COMPLETADA.md,SOLUCION_URLS_USA_COMPLETADA.md,.md,3286,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/STACK_MULTI_TENANT_COMPLETADO.md,STACK_MULTI_TENANT_COMPLETADO.md,.md,6912,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/TEMPLATE_VER_DOCUMENTO_IMPLEMENTADO.md,TEMPLATE_VER_DOCUMENTO_IMPLEMENTADO.md,.md,7162,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/TESTING_COUNTRY_MIDDLEWARE.md,TESTING_COUNTRY_MIDDLEWARE.md,.md,14676,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/VISTA_VER_DOCUMENTO_MEJORADA.md,VISTA_VER_DOCUMENTO_MEJORADA.md,.md,7050,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/estructura_archivos.md,estructura_archivos.md,.md,5177,Markdown note (.md),🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/diagrama_organizacion.txt,diagrama_organizacion.txt,.txt,8868,Text/Log,🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/tmp_block_content_dups.txt,tmp_block_content_dups.txt,.txt,0,Text/Log,🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/usuarios_django.txt,usuarios_django.txt,.txt,1098,Text/Log,🟡 Consider moving to /docs,Note/readme at project root
+ZIPS/arreglar_taller2.py,arreglar_taller2.py,.py,3088,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/assign_admin_empresa.py,assign_admin_empresa.py,.py,1105,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/backfill_responsable.py,backfill_responsable.py,.py,1811,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/change_country_direct.py,change_country_direct.py,.py,1130,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/change_password.py,change_password.py,.py,549,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/check_data_consistency.py,check_data_consistency.py,.py,7663,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/checklist_egarage.py,checklist_egarage.py,.py,4027,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/create_demo_branding.py,create_demo_branding.py,.py,2580,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/create_docs_simple.py,create_docs_simple.py,.py,1994,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/create_missing_tables.py,create_missing_tables.py,.py,2946,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/create_test_data_vehiculos.py,create_test_data_vehiculos.py,.py,4432,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/debug_dal_forward.py,debug_dal_forward.py,.py,4240,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/debug_dal_vehiculos.py,debug_dal_vehiculos.py,.py,3252,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/demo_audit_vehiculos_inconsistente.py,demo_audit_vehiculos_inconsistente.py,.py,3703,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/demostrar_corrección.py,demostrar_corrección.py,.py,1879,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/ejemplo_precio_suscripcion_mejorado.py,ejemplo_precio_suscripcion_mejorado.py,.py,7106,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/ejemplo_vista_precios.py,ejemplo_vista_precios.py,.py,6486,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/enviar_real_mauricio.py,enviar_real_mauricio.py,.py,3206,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/force_cache_clear.py,force_cache_clear.py,.py,1065,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/force_country_sql.py,force_country_sql.py,.py,2501,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/kpi_sanity_check.py,kpi_sanity_check.py,.py,2566,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/paso2_consolidacion.py,paso2_consolidacion.py,.py,3638,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/paso3_configuraciones_localizadas.py,paso3_configuraciones_localizadas.py,.py,9254,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/paso3_documentos_demo.py,paso3_documentos_demo.py,.py,10133,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/paso3_fixtures_reales.py,paso3_fixtures_reales.py,.py,39292,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/paso4_crear_motores_cajas.py,paso4_crear_motores_cajas.py,.py,5273,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/paso4_urls_ajax.py,paso4_urls_ajax.py,.py,619,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/paso4_verificar_jerarquia.py,paso4_verificar_jerarquia.py,.py,7240,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/poblar_estados_ciudades.py,poblar_estados_ciudades.py,.py,15860,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/populate_services_multilang.py,populate_services_multilang.py,.py,9728,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/probar_numeros_documento.py,probar_numeros_documento.py,.py,1867,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/probar_pdf_completos.py,probar_pdf_completos.py,.py,2877,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/probar_pdf_documentos.py,probar_pdf_documentos.py,.py,3085,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/probar_servicios_externos.py,probar_servicios_externos.py,.py,2929,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/probar_vistas_documento.py,probar_vistas_documento.py,.py,4340,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/procesador_notificaciones.py,procesador_notificaciones.py,.py,10946,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/prueba_humo_docs.py,prueba_humo_docs.py,.py,1439,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/prueba_real_mauricio.py,prueba_real_mauricio.py,.py,10427,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/quick_diagnostic.py,quick_diagnostic.py,.py,2814,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/quick_test.py,quick_test.py,.py,2117,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/reparar_perfiles.py,reparar_perfiles.py,.py,1668,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/reporte_final_paso2_extendido.py,reporte_final_paso2_extendido.py,.py,7457,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/reportes_auditoria.py,reportes_auditoria.py,.py,10169,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/reproducir_problema_OF.py,reproducir_problema_OF.py,.py,10818,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/simple_fix.py,simple_fix.py,.py,3289,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/solucionar_totales.py,solucionar_totales.py,.py,3776,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/tabla_mecanico_actual.py,tabla_mecanico_actual.py,.py,379,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/test_calculo_simple.py,test_calculo_simple.py,.py,2831,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/test_formulario_unificado.py,test_formulario_unificado.py,.py,4622,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/test_mejoras_empresa.py,test_mejoras_empresa.py,.py,8372,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/test_unicidad_condicional.py,test_unicidad_condicional.py,.py,3634,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/test_validaciones_cliente.py,test_validaciones_cliente.py,.py,5762,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/test_validaciones_tecnico.py,test_validaciones_tecnico.py,.py,5349,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/test_validaciones_vehiculo.py,test_validaciones_vehiculo.py,.py,5687,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/tests_regresion_documentos.py,tests_regresion_documentos.py,.py,8259,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/update_neto_otros.py,update_neto_otros.py,.py,988,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/urls_signup.py,urls_signup.py,.py,279,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/validacion_final.py,validacion_final.py,.py,6052,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/validaciones_avanzadas.py,validaciones_avanzadas.py,.py,12234,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/validaciones_consistencia.py,validaciones_consistencia.py,.py,13370,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/validaciones_consistencia_extendidas.py,validaciones_consistencia_extendidas.py,.py,30531,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/validar_dashboard_espacial.py,validar_dashboard_espacial.py,.py,4120,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/validar_rutas_url.py,validar_rutas_url.py,.py,7071,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/verificar_duplicados_extras.py,verificar_duplicados_extras.py,.py,9533,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/verificar_integridad_cliente_vehiculo.py,verificar_integridad_cliente_vehiculo.py,.py,9607,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/views_documento_mejorado.py,views_documento_mejorado.py,.py,15600,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/views_signup.py,views_signup.py,.py,4105,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/vista_vehiculo_mejorada.py,vista_vehiculo_mejorada.py,.py,3193,Django module (.py),🟡 Move into app,"Python module should live inside an app package (e.g., taller/, gestion_taller/)"
+ZIPS/postcss.config.js,postcss.config.js,.js,82,JavaScript (.js),🟡 Move into proper folder,Frontend asset or template found outside canonical template/static dirs
+ZIPS/tailwind.config.js,tailwind.config.js,.js,1110,JavaScript (.js),🟡 Move into proper folder,Frontend asset or template found outside canonical template/static dirs
+ZIPS/regiones_ciudades.json,regiones_ciudades.json,.json,4447,Data/Config (.json),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/.aider.input.history,.aider.input.history,.history,19942,Other,🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/.coverage,.coverage,,147456,Other,🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/.coveragerc,.coveragerc,,4953,Other,🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/.env.example,.env.example,.example,2168,Other,🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/.gitattributes,.gitattributes,,484,Other,🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/.gitignore,.gitignore,,1857,Other,🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/.pre-commit-config.yaml,.pre-commit-config.yaml,.yaml,2934,Other,🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/coverage.xml,coverage.xml,.xml,439895,Other,🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/db.sqlite3,db.sqlite3,.sqlite3,1626112,Other,🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/eg_documentos_patch.diff,eg_documentos_patch.diff,.diff,11399,Other,🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/eg_patch.diff,eg_patch.diff,.diff,11143,Other,🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/env.example,env.example,.example,1984,Other,🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/pytest.ini,pytest.ini,.ini,588,Other,🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/render.yaml,render.yaml,.yaml,2817,Other,🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/t -q -k qs_tools_complex or language_middleware_smoke,t -q -k qs_tools_complex or language_middleware_smoke,,822,Other,🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/tatus,tatus,,822,Other,🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/tatus --porcelain,tatus --porcelain,,364,Other,🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/__init__.py,__init__.py,.py,64,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/add_debug_to_templates.py,add_debug_to_templates.py,.py,0,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/add_stars_to_templates.py,add_stars_to_templates.py,.py,0,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/analyze_indexes.py,analyze_indexes.py,.py,3359,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/clean_debug_templates.py,clean_debug_templates.py,.py,0,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/cleanup_templates_from_remap.py,cleanup_templates_from_remap.py,.py,5797,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/complete_docs.py,complete_docs.py,.py,3055,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/configuracion_empresa.py,configuracion_empresa.py,.py,0,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/copy_confirm_templates.py,copy_confirm_templates.py,.py,0,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/create_mo.py,create_mo.py,.py,2935,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/create_mo_safe.py,create_mo_safe.py,.py,2998,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/deployment_guide.py,deployment_guide.py,.py,12145,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/diagnose_delete_loop.py,diagnose_delete_loop.py,.py,0,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/finalize_templates_layout.py,finalize_templates_layout.py,.py,5761,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/find_deletable_cliente.py,find_deletable_cliente.py,.py,0,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/informe_final_seguridad.py,informe_final_seguridad.py,.py,4775,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/instalar_reportes_mecanicos.py,instalar_reportes_mecanicos.py,.py,2704,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/integrar_notificaciones_documentos.py,integrar_notificaciones_documentos.py,.py,0,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/migracion_global_templates.py,migracion_global_templates.py,.py,11309,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/paso4_vistas_ajax_jerarquicas.py,paso4_vistas_ajax_jerarquicas.py,.py,12846,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/prefer_country_layout.py,prefer_country_layout.py,.py,5550,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/preparar_actualizacion_pythonanywhere.py,preparar_actualizacion_pythonanywhere.py,.py,5490,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/probar_admin_chile.py,probar_admin_chile.py,.py,5083,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/probar_chile_idioma.py,probar_chile_idioma.py,.py,5914,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/probar_idioma_con_login.py,probar_idioma_con_login.py,.py,5411,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/probar_idioma_web.py,probar_idioma_web.py,.py,3543,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/propagar_template_anio.py,propagar_template_anio.py,.py,897,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/propagar_template_crear_vehiculo.py,propagar_template_crear_vehiculo.py,.py,2207,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/propagar_template_formulario.py,propagar_template_formulario.py,.py,1754,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/propagar_vehiculo_template.py,propagar_vehiculo_template.py,.py,7675,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/reparar_dashboard_espacial.py,reparar_dashboard_espacial.py,.py,58,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/reparar_formulario_vehiculo.py,reparar_formulario_vehiculo.py,.py,4638,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/reporte_final_100.py,reporte_final_100.py,.py,5912,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/resetear_passwords_demo.py,resetear_passwords_demo.py,.py,402,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/reshape_templates_to_original_paths.py,reshape_templates_to_original_paths.py,.py,3338,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/scan_auth_templates.py,scan_auth_templates.py,.py,4528,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/shell_commands.py,shell_commands.py,.py,2796,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/simple_add_services.py,simple_add_services.py,.py,2671,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/simple_complete.py,simple_complete.py,.py,3150,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/simplificar_dashboard_espacial.py,simplificar_dashboard_espacial.py,.py,2531,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/sincronizar_pythonanywhere.py,sincronizar_pythonanywhere.py,.py,7479,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/smtp_diagnostico.py,smtp_diagnostico.py,.py,6994,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/split_zip.py,split_zip.py,.py,7025,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/totales.py,totales.py,.py,0,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/validacion_final_branding.py,validacion_final_branding.py,.py,2774,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/validar_cabecera_navegacion.py,validar_cabecera_navegacion.py,.py,7541,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/validar_cabecera_simple.py,validar_cabecera_simple.py,.py,6194,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/validar_produccion.py,validar_produccion.py,.py,3631,Python script (.py),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/buscar_duplicados.ps1,buscar_duplicados.ps1,.ps1,1757,Script (shell/PS),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/buscar_duplicados_canonical.ps1,buscar_duplicados_canonical.ps1,.ps1,2940,Script (shell/PS),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/fix_allauth_pythonanywhere.sh,fix_allauth_pythonanywhere.sh,.sh,0,Script (shell/PS),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/run_monitoring.bat,run_monitoring.bat,.bat,81,Script (shell/PS),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/start.bat,start.bat,.bat,529,Script (shell/PS),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/start_e_garage_dashboard.bat,start_e_garage_dashboard.bat,.bat,121,Script (shell/PS),🟡 Review,Unknown file at root; likely can be moved or deleted if duplicate
+ZIPS/SOLUCION_SETTINGS_USA_COMPLETADA.md,SOLUCION_SETTINGS_USA_COMPLETADA.md,.md,4645,Markdown note (.md),🟢 Keep,Core project/config file
+ZIPS/pyproject.toml,pyproject.toml,.toml,911,Other,🟢 Keep,Core project/config file
+ZIPS/manage.py,manage.py,.py,1288,Python script (.py),🟢 Keep,Core project/config file
+ZIPS/wsgi_production.py,wsgi_production.py,.py,5674,Python script (.py),🟢 Keep,Core project/config file
+ZIPS/wsgi_pythonanywhere.py,wsgi_pythonanywhere.py,.py,795,Python script (.py),🟢 Keep,Core project/config file
+ZIPS/requirements-dev.txt,requirements-dev.txt,.txt,3645,Text/Log,🟢 Keep,Core project/config file
+ZIPS/requirements.txt,requirements.txt,.txt,2106,Text/Log,🟢 Keep,Core project/config file
+ZIPS/requirements_num2words.txt,requirements_num2words.txt,.txt,58,Text/Log,🟢 Keep,Core project/config file
+ZIPS/requirements_production.txt,requirements_production.txt,.txt,2052,Text/Log,🟢 Keep,Core project/config file
+ZIPS/requirements_pythonanywhere.txt,requirements_pythonanywhere.txt,.txt,1206,Text/Log,🟢 Keep,Core project/config file

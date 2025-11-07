@@ -1,0 +1,196 @@
+{% load static %}
+{% load i18n %}  {# Cargar i18n al principio #}
+{% load country_url %}  {# Template tag para URLs por país #}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">  {# Idioma dinámico #}
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}{{ company_name|default:"eGarage" }}{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Catálogo JavaScript para gettext -->
+  <script src="{% url 'javascript-catalog' %}"></script>
+
+  <!-- Estilos principales -->
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+  <link rel="stylesheet" href="{% static 'css/output.css' %}">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" referrerpolicy="no-referrer" />
+  {# Fondo espacial opcional #}
+  {% if enable_space_bg|default:1 %}
+    <link rel="stylesheet" href="{% static 'css/starfield.css' %}">
+  {% endif %}
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
+
+  <!-- Meta tags para SEO -->
+  <meta name="description" content="{% block meta_description %}Sistema de gestión para talleres automotrices{% endblock %}">
+  <meta name="keywords" content="{% block meta_keywords %}taller, automotriz, gestión, repuestos, servicios{% endblock %}">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{{ request.build_absolute_uri }}">
+  <meta property="og:title" content="{% block og_title %}{{ company_name|default:"eGarage" }}{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}Sistema de gestión para talleres automotrices{% endblock %}">
+  <meta property="og:image" content="{% block og_image %}{% static 'images/og-image.jpg' %}{% endblock %}">
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="{{ request.build_absolute_uri }}">
+  <meta property="twitter:title" content="{% block twitter_title %}{{ company_name|default:"eGarage" }}{% endblock %}">
+  <meta property="twitter:description" content="{% block twitter_description %}Sistema de gestión para talleres automotrices{% endblock %}">
+  <meta property="twitter:image" content="{% block twitter_image %}{% static 'images/og-image.jpg' %}{% endblock %}">
+
+  <!-- Estilos adicionales del bloque -->
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-screen text-white">
+  <!-- Fondo espacial opcional -->
+  {% if enable_space_bg|default:1 %}
+    <div id="starfield"></div>
+  {% endif %}
+
+  <!-- Header principal -->
+  <header class="relative z-10 bg-black/20 backdrop-blur-md border-b border-cyan-500/20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center py-4">
+        <!-- Logo y nombre de empresa -->
+        <div class="flex items-center gap-4">
+          {% if company_logo_url %}
+            <img src="{{ company_logo_url }}" alt="{{ company_name|default:'eGarage' }}" class="h-10 w-10 rounded-lg object-cover">
+          {% else %}
+            <div class="h-10 w-10 rounded-lg bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center">
+              <span class="text-white font-bold text-lg">E</span>
+            </div>
+          {% endif %}
+          <div>
+            <h1 class="text-xl font-bold text-white">{{ company_name|default:"eGarage" }}</h1>
+            {% if company_tagline %}
+              <p class="text-sm text-gray-400">{{ company_tagline }}</p>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Navegación principal -->
+        <nav class="hidden md:flex items-center gap-6">
+          {% if request.user.is_authenticated %}
+            <!-- Botones de navegación principal -->
+            {% country_url 'clientes:lista_clientes' as url_clientes %}
+            <a href="{{ url_clientes }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
+              <span>👥</span>
+              <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Clientes{% else %}Clients{% endif %}</span>
+            </a>
+
+            {% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{% else %}/cl/vehiculos/{% endif %} as url_vehiculos
+            <a href="{{ url_vehiculos }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
+              <span>🚗</span>
+              <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Vehículos{% else %}Vehicles{% endif %}</span>
+            </a>
+
+            {% country_url 'repuestos:lista_repuestos' as url_repuestos %}
+            <a href="{{ url_repuestos }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
+              <span>🔧</span>
+              <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Repuestos{% else %}Parts{% endif %}</span>
+            </a>
+
+            {% country_url 'servicios:servicios_menu' as url_servicios %}
+            <a href="{{ url_servicios }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
+              <span>🧰</span>
+              <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Servicios{% else %}Services{% endif %}</span>
+            </a>
+
+            <!-- Otros Servicios -->
+            {% country_url 'servicios:otros_servicios_menu' as url_otros %}
+            <a href="{{ url_otros }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
+              <span>🌟</span>
+              <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Otros{% else %}Others{% endif %}</span>
+            </a>
+
+            <!-- Documentos -->
+            {% if request.path|slice:':3' == '/us' %}
+              {% country_url 'documentos:lista_documentos' app_namespace='documentos_us_en' as url_documentos %}
+            {% else %}
+              {% country_url 'documentos:lista_documentos' app_namespace='documentos_cl_es' as url_documentos %}
+            {% endif %}
+            <a href="{{ url_documentos }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
+              <span>📄</span>
+              <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Documentos{% else %}Documents{% endif %}</span>
+            </a>
+
+            <!-- Reportes -->
+            {% if request.path|slice:':3' == '/us' %}
+              {% country_url 'reportes:reportes_dashboard' app_namespace='reportes_us_en' as url_reportes %}
+            {% else %}
+              {% country_url 'reportes:reportes_dashboard' app_namespace='reportes_cl_es' as url_reportes %}
+            {% endif %}
+            <a href="{{ url_reportes }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
+              <span>📊</span>
+              <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Reportes{% else %}Reports{% endif %}</span>
+            </a>
+
+            <!-- Dashboard -->
+            {% country_url 'dashboard' as url_dashboard %}
+            <a href="{{ url_dashboard }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
+              <span>🏠</span>
+              <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Dashboard{% else %}Dashboard{% endif %}</span>
+            </a>
+
+            <!-- Mis vehículos -->
+            {% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{% else %}/cl/vehiculos/{% endif %} as url_mis_vehiculos
+            <a href="{{ url_mis_vehiculos }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
+              <span>🚗</span>
+              <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Mis vehículos{% else %}My Vehicles{% endif %}</span>
+            </a>
+
+            <!-- Configuración -->
+            {% country_url 'company_settings' as settings_url %}
+            <a href="{{ settings_url }}" class="text-cyan-300 hover:text-lime-300 transition flex items-center gap-2">
+              <span>⚙️</span>
+              <span class="hidden md:inline">{% if LANGUAGE_CODE == 'es' %}Settings{% else %}Settings{% endif %}</span>
+            </a>
+          {% endif %}
+        </nav>
+
+        <!-- Menú móvil -->
+        <div class="md:hidden">
+          <button id="mobile-menu-button" class="text-cyan-300 hover:text-lime-300 transition">
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Contenido principal -->
+  <main class="relative z-10">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  <footer class="relative z-10 bg-black/20 backdrop-blur-md border-t border-cyan-500/20 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="text-center md:text-left">
+          <p class="text-gray-400 text-sm">
+            © 2024 {{ company_name|default:"eGarage" }}. Todos los derechos reservados.
+          </p>
+        </div>
+        <div class="flex items-center gap-4">
+          <a href="{% url 'changelog' %}" class="text-cyan-300 hover:text-lime-300 transition text-sm">
+            Changelog
+          </a>
+          <a href="{% url 'contacto_ventas' %}" class="text-cyan-300 hover:text-lime-300 transition text-sm">
+            Contacto
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="{% static 'js/dashboard.js' %}"></script>
+  <script src="{% static 'js/starfield.js' %}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

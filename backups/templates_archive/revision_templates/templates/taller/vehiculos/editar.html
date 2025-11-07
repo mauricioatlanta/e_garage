@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto mt-12 translucent-card p-8 rounded-xl shadow-md">
+<h1 class="text-3xl font-bold text-black mb-6">Editar Vehículo</h1>
+<form class="space-y-6 text-black" method="post">
+    {% csrf_token %}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="campo-vehiculo" data-campo="cliente">
+<label class="block mb-1 font-medium text-sm" for="id_cliente">Cliente</label>
+        {{ form.cliente }}
+        {% if form.cliente.errors %}
+          <p class="text-red-400 text-sm mt-1">{{ form.cliente.errors }}</p>
+        {% endif %}
+      </div>
+<div class="campo-vehiculo" data-campo="anio">
+<label class="block mb-1 font-medium text-sm" for="id_anio">Año</label>
+        {{ form.anio }}
+        {% if form.anio.errors %}
+          <p class="text-red-400 text-sm mt-1">{{ form.anio.errors }}</p>
+        {% endif %}
+      </div>
+<div class="campo-vehiculo" data-campo="marca">
+<label class="block mb-1 font-medium text-sm" for="id_marca">Marca</label>
+        {{ form.marca }}
+        {% if form.marca.errors %}
+          <p class="text-red-400 text-sm mt-1">{{ form.marca.errors }}</p>
+        {% endif %}
+      </div>
+<div class="campo-vehiculo" data-campo="modelo">
+<label class="block mb-1 font-medium text-sm" for="id_modelo">Modelo</label>
+        {{ form.modelo }}
+        {% if form.modelo.errors %}
+          <p class="text-red-400 text-sm mt-1">{{ form.modelo.errors }}</p>
+        {% endif %}
+      </div>
+<div class="campo-vehiculo" data-campo="patente">
+<label class="block mb-1 font-medium text-sm" for="id_patente">Patente</label>
+        {{ form.patente }}
+        {% if form.patente.errors %}
+          <p class="text-red-400 text-sm mt-1">{{ form.patente.errors }}</p>
+        {% endif %}
+      </div>
+<div class="campo-vehiculo" data-campo="vin">
+<label class="block mb-1 font-medium text-sm" for="id_vin">VIN</label>
+        {{ form.vin }}
+        <small class="text-gray-500">(VIN: número de chasis)</small>
+        {% if form.vin.errors %}
+          <p class="text-red-400 text-sm mt-1">{{ form.vin.errors }}</p>
+        {% endif %}
+      </div>
+<div class="campo-vehiculo" data-campo="color">
+<label class="block mb-1 font-medium text-sm" for="id_color">Color</label>
+        {{ form.color }}
+        {% if form.color.errors %}
+          <p class="text-red-400 text-sm mt-1">{{ form.color.errors }}</p>
+        {% endif %}
+      </div>
+</div>
+<div class="flex justify-end">
+<button class="bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700 transition btn-futuristic" type="submit">
+        Guardar Cambios
+      </button>
+</div>
+</form>
+</div>
+<script src="{% static 'js/formulario_vehiculo.js' %}"></script>
+
+{% endblock %}

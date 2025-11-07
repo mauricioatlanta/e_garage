@@ -109,13 +109,35 @@ urlpatterns = [
         "taller/reportes/",
         include(("taller.reportes.urls", "reportes"), namespace="reportes_cl"),
     ),
-    # Servicios también bajo /cl/servicios/ para disponibilidad global del namespace
+    # Módulos principales del sistema (disponibilidad directa bajo /cl/es/)
+    path(
+        "clientes/",
+        include(("taller.clientes.urls", "clientes"), namespace="clientes"),
+    ),
+    path(
+        "vehiculos/",
+        include(("taller.vehiculos.urls", "vehiculos"), namespace="vehiculos"),
+    ),
+    path(
+        "documentos/",
+        include(("taller.documentos.urls", "documentos"), namespace="documentos"),
+    ),
+    path(
+        "repuestos/",
+        include(("taller.repuestos.urls", "repuestos"), namespace="repuestos"),
+    ),
     path(
         "servicios/",
         include(("taller.servicios.urls", "servicios"), namespace="servicios"),
     ),
-    # DOCUMENTOS MOVIDO A gestion_taller/urls.py para evitar duplicación
-    # path('documentos/', include(('taller.documentos.urls', 'documentos'), namespace='documentos_global')),
+    path(
+        "reportes/",
+        include(("taller.reportes.urls", "reportes"), namespace="reportes"),
+    ),
+    path(
+        "tecnicos/",
+        include(("taller.tecnicos.urls", "tecnicos"), namespace="tecnicos"),
+    ),
     # Business Intelligence bajo /cl/business-intelligence/
     path(
         "business-intelligence/",

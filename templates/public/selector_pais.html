@@ -1,0 +1,213 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eGarage - Selecciona tu país</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: linear-gradient(135deg, #0a0a23 0%, #1a1a2e 100%);
+      font-family: 'Orbitron', 'Segoe UI', sans-serif;
+      color: #fff;
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* Partículas de fondo */
+    .bg-particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(0, 230, 255, 0.3);
+      animation: float 20s infinite ease-in-out;
+    }
+    .particle:nth-child(1) { width: 80px; height: 80px; left: 10%; top: 20%; animation-delay: 0s; }
+    .particle:nth-child(2) { width: 60px; height: 60px; left: 80%; top: 30%; animation-delay: 2s; }
+    .particle:nth-child(3) { width: 100px; height: 100px; left: 50%; top: 60%; animation-delay: 4s; }
+    .particle:nth-child(4) { width: 70px; height: 70px; left: 20%; top: 80%; animation-delay: 6s; }
+    @keyframes float {
+      0%, 100% { transform: translateY(0) translateX(0); opacity: 0.3; }
+      50% { transform: translateY(-30px) translateX(30px); opacity: 0.6; }
+    }
+
+    .selector-container {
+      position: relative;
+      z-index: 10;
+      background: rgba(20, 40, 80, 0.95);
+      border-radius: 32px;
+      box-shadow: 0 0 60px rgba(0, 230, 255, 0.3);
+      padding: 3.5rem 2.5rem 2.5rem;
+      text-align: center;
+      max-width: 480px;
+      width: 90%;
+      border: 1px solid rgba(0, 230, 255, 0.2);
+    }
+    
+    .logo-container {
+      margin-bottom: 3rem;
+      position: relative;
+    }
+    .logo {
+      height: 140px;
+      width: auto;
+      filter: drop-shadow(0 4px 12px rgba(0, 230, 255, 0.4));
+      animation: pulse 3s infinite ease-in-out;
+    }
+    @keyframes pulse {
+      0%, 100% { 
+        transform: scale(1); 
+        filter: drop-shadow(0 4px 12px rgba(0, 230, 255, 0.4));
+      }
+      50% { 
+        transform: scale(1.03); 
+        filter: drop-shadow(0 6px 18px rgba(0, 230, 255, 0.6));
+      }
+    }
+    
+    .country-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+    
+    .country-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      width: 100%;
+      padding: 1.5rem;
+      font-size: 1.5rem;
+      font-weight: bold;
+      border-radius: 16px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      font-family: 'Orbitron', sans-serif;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .country-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+    
+    .country-btn:hover::before {
+      left: 100%;
+    }
+    
+    .country-btn.usa {
+      background: linear-gradient(135deg, #002868 0%, #0050b3 100%);
+      color: #fff;
+      border-color: #0050b3;
+      box-shadow: 0 4px 20px rgba(0, 80, 179, 0.4);
+    }
+    
+    .country-btn.usa:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 8px 30px rgba(0, 80, 179, 0.6);
+      border-color: #00e6ff;
+    }
+    
+    .country-btn.chile {
+      background: linear-gradient(135deg, #d52b1e 0%, #0033a0 100%);
+      color: #fff;
+      border-color: #d52b1e;
+      box-shadow: 0 4px 20px rgba(213, 43, 30, 0.4);
+    }
+    
+    .country-btn.chile:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 8px 30px rgba(213, 43, 30, 0.6);
+      border-color: #00e6ff;
+    }
+    
+    .flag {
+      font-size: 2.5rem;
+    }
+    
+    .country-name {
+      flex: 1;
+      text-align: left;
+    }
+    
+    @media (max-width: 600px) {
+      .selector-container {
+        padding: 2.5rem 1.5rem 1.5rem;
+      }
+      .country-btn {
+        font-size: 1.25rem;
+        padding: 1.25rem;
+      }
+      .flag {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-particles">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
+
+  <div class="selector-container">
+    <div class="logo-container">
+      <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage Logo" class="logo">
+    </div>
+    
+    <div class="country-buttons">
+      <a href="/us/" class="country-btn usa">
+        <span class="flag">🇺🇸</span>
+        <span class="country-name">United States</span>
+      </a>
+      
+      <a href="/cl/" class="country-btn chile">
+        <span class="flag">🇨🇱</span>
+        <span class="country-name">Chile</span>
+      </a>
+    </div>
+  </div>
+
+  <script>
+    // Agregar efecto de entrada
+    document.addEventListener('DOMContentLoaded', function() {
+      const container = document.querySelector('.selector-container');
+      container.style.opacity = '0';
+      container.style.transform = 'translateY(30px)';
+      
+      setTimeout(() => {
+        container.style.transition = 'all 0.8s ease-out';
+        container.style.opacity = '1';
+        container.style.transform = 'translateY(0)';
+      }, 100);
+    });
+  </script>
+</body>
+</html>
+

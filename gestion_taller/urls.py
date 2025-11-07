@@ -1,4 +1,4 @@
-from urllib.parse import urlencode
+﻿from urllib.parse import urlencode
 
 from django.conf import settings
 from django.conf.urls.static import static
@@ -9,9 +9,20 @@ from django.views.generic import RedirectView, TemplateView
 from django.views.i18n import JavaScriptCatalog  # 👈 Para catálogo JS
 
 from taller.views.country_aware_auth import country_aware_login
+from taller.views_extra.signup_complete import signup_complete
 from taller.views_extra.lang_switch import set_language_us
+from taller.views_extra.payment_views import (
+    payment_chile,
+    payment_usa,
+    subir_comprobante,
+    payment_success,
+    payment_cancel,
+)
+from taller.views_extra.paypal_webhook import paypal_webhook
+from taller.views_extra.admin_payment_views import aprobar_pago, rechazar_pago
 from taller.views_extra.login_redirector import login_redirector
 from taller.views_extra.logout_redirect_view import logout_redirect_view
+from taller.views_health import health_check, health_simple
 
 # Importar vista de suscripción bloqueada
 from taller.views_extra.suscripcion import registro, suscripcion_bloqueada
@@ -96,9 +107,13 @@ def country_aware_clientes_redirect(request):
 
 
 urlpatterns = [
-    # Página de inicio - redirige según el usuario
-    path("", redirect_to_home, name="home"),
+    path("clientes/", include(("taller.urls_clientes","clientes"), namespace="clientes")),
+    # Página de inicio - Selector de país
+    path("", TemplateView.as_view(template_name="public/selector_pais.html"), name="home"),
     path("admin/", admin.site.urls),
+    # Health check para monitoreo
+    path("health/", health_check, name="health_check"),
+    path("health-simple/", health_simple, name="health_simple"),
     # Vista temporal para verificar documentos
     path(
         "verificar-docs/",
@@ -122,12 +137,14 @@ urlpatterns = [
     # Páginas de bienvenida por país
     path(
         "bienvenida/cl/",
-        TemplateView.as_view(template_name="taller/bienvenida_chile.html"),
+        TemplateView.as_view(template_name="public/landing_chile_completa.html"),
         name="bienvenida_chile",
     ),
     # Login personalizado con contexto de país
     path("accounts/login/", country_aware_login, name="account_login"),
-    # Allauth para el resto de funcionalidades
+    # Signup personalizado con selección de país y plan
+    path("accounts/signup/", signup_complete, name="account_signup"),
+    # Allauth para el resto de funcionalidades (excluyendo signup)
     path("accounts/", include("allauth.urls")),
     # Wrappers country-aware para login y signup
     path("cl/accounts/login/", redirect_qs("/accounts/login/")),
@@ -283,7 +300,7 @@ urlpatterns = [
     # Página de bienvenida para Chile - /cl/ directamente
     path(
         "cl/",
-        TemplateView.as_view(template_name="landing_inicio.html"),
+        TemplateView.as_view(template_name="public/landing_chile_completa.html"),
         name="cl_home_welcome",
     ),
     # Redirect cl/ to cl/es/ preserving the rest of the path - DESHABILITADO - Causa bucles infinitos
@@ -395,6 +412,21 @@ urlpatterns = [
     # Suscripción bloqueada - disponible globalmente
     path("suscripcion-bloqueada/", suscripcion_bloqueada, name="suscripcion_bloqueada"),
     
+    # === SISTEMA DE PAGOS ===
+    # Páginas de pago por país
+    path("cl/es/suscripcion/pago/", payment_chile, name="pago_chile"),
+    path("us/en/subscription/payment/", payment_usa, name="payment_usa"),
+    path("subir-comprobante/", subir_comprobante, name="subir_comprobante"),
+    path("us/en/payment/success/", payment_success, name="payment_success"),
+    path("us/en/payment/cancel/", payment_cancel, name="payment_cancel"),
+    
+    # Admin - Aprobar/Rechazar pagos
+    path("admin/aprobar-pago/<int:pago_id>/", aprobar_pago, name="aprobar_pago"),
+    path("admin/rechazar-pago/<int:pago_id>/", rechazar_pago, name="rechazar_pago"),
+    
+    # === WEBHOOK DE PAYPAL ===
+    path("webhooks/paypal/", paypal_webhook, name="paypal_webhook"),
+    
     # === REDIRECCIONES PARA ENDPOINTS AJAX HARDCODEADOS ===
     # Plan B: redirecciones suaves para cualquier hardcode viejo
     path("cl/ajax/clientes/buscar/", RedirectView.as_view(url="/cl/es/ajax/clientes/buscar/", permanent=False)),
@@ -413,3 +445,6 @@ if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     """Redirige registro al nivel global (alias para signup)"""
+
+
+

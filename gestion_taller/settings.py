@@ -72,12 +72,10 @@ AUTHENTICATION_BACKENDS = (
 # Allauth correcto
 ACCOUNT_AUTHENTICATION_METHOD = "username_email"  # <- en vez de ACCOUNT_LOGIN_METHODS
 ACCOUNT_EMAIL_VERIFICATION = os.getenv(
-    "ACCOUNT_EMAIL_VERIFICATION", "none" if DEBUG else "mandatory"
+    "ACCOUNT_EMAIL_VERIFICATION", "mandatory"  # 🔒 Siempre obligatorio
 )
-ACCOUNT_EMAIL_REQUIRED = False  # TODO: en prod normalmente True
-ACCOUNT_CONFIRM_EMAIL_ON_GET = env_bool(
-    "ACCOUNT_CONFIRM_EMAIL_ON_GET", False if not DEBUG else True
-)
+ACCOUNT_EMAIL_REQUIRED = True  # 🔒 Email es REQUERIDO
+ACCOUNT_CONFIRM_EMAIL_ON_GET = True  # Confirmar email con un solo clic
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 2
 ACCOUNT_RATE_LIMITS = {"confirm_email": "1/m"}
 
@@ -139,6 +137,8 @@ REST_FRAMEWORK = {
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    # LocaleMiddleware debe ir DESPUÉS de SessionMiddleware
+    "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -248,7 +248,7 @@ _email_pwd = os.getenv("EMAIL_PASSWORD")
 if _email_pwd:
     EMAIL_HOST_PASSWORD = _email_pwd
 elif DEBUG:
-    EMAIL_HOST_PASSWORD = "dev-placeholder"  # NO usar en prod
+    EMAIL_HOST_PASSWORD = "laila2013-"  # Nueva contraseña ASCII
 else:
     raise RuntimeError("EMAIL_PASSWORD must be set in production")
 

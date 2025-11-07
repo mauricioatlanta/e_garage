@@ -1,14 +1,16 @@
 from decimal import Decimal, ROUND_HALF_UP
 
 from django.core.exceptions import ValidationError
-from django.db import models
-from django.db.models import DecimalField, ExpressionWrapper, F, Sum
+from django.db import models, transaction
+from django.db.models import DecimalField, ExpressionWrapper, F, Sum, Value
+from django.db.models.functions import Coalesce
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _  # 👈 Para traducciones
 
 from taller.models.clientes import Cliente
 from taller.models.mixins import AuditMixin
 from taller.models.vehiculos import Vehiculo
+from .utils_monedas import money_quantize
 
 
 class Documento(AuditMixin, models.Model):
@@ -27,17 +29,15 @@ class Documento(AuditMixin, models.Model):
         choices=[
             ("OT", _("Orden de Trabajo")),
             ("PRES", _("Presupuesto")),
-            ("REC", _("Recibo/Boleta")),
-            # ("FAC", _("Factura (LEGACY)")),  # Legacy, no mostrar en forms
+            ("FAC", _("Factura/Boleta")),
+            # ("REC", _("Recibo/Boleta (LEGACY)")),  # Legacy, no mostrar en forms
             # ("BOL", _("Boleta (LEGACY)")),   # Legacy, no mostrar en forms
         ],
         db_index=True,
     )
     numero = models.CharField(max_length=32, blank=True, default="", db_index=True)
-    numero_documento_db = models.CharField(max_length=32, blank=True, default="", db_index=True)
-    correlativo = models.PositiveIntegerField(
-        default=0, help_text=_("Número correlativo interno")
-    )
+    # numero_documento_db removido - era duplicado de numero
+    # correlativo removido - no se actualizaba automáticamente
     # estado del documento (borrador/emitido/anulado, etc.)
     ESTADOS_DOC = (
         ("BORRADOR", "Borrador"),
@@ -81,6 +81,17 @@ class Documento(AuditMixin, models.Model):
     total = models.DecimalField(
         max_digits=14, decimal_places=2, default=Decimal("0.00")
     )
+    
+    # Campos de totales con nombres estándar para compatibilidad con frontend
+    total_repuestos = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    total_servicios = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    total_otros = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    iva = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    total_general = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    
+    # Opcional: estado de pago
+    payment_status = models.CharField(max_length=20, blank=True, default='pending')
+    
     created_at = models.DateTimeField(default=timezone.now)
 
     # Campos nuevos para tracking de pagos y observaciones
@@ -148,6 +159,10 @@ class Documento(AuditMixin, models.Model):
     )
 
     # --------- Helpers internos ---------
+    def vat_percent(self) -> int:
+        """IVA por país (regla del proyecto)"""
+        return 19 if getattr(self.empresa, "pais", "CL") == "CL" else 0
+
     def _decimals(self):
         """
         Decimales por país/moneda: US -> 2, CL -> 0 (según regla eGarage).
@@ -174,14 +189,24 @@ class Documento(AuditMixin, models.Model):
     def _resolve_tax_rate(self):
         """
         Resuelve la tasa: si el campo ya viene seteado, la usa.
-        Si CL y no viene, 19.0. Si US y no viene, 0.0 por defecto.
-        (Puedes conectar aquí ConfiguracionEmpresa si la tienes).
+        Si no, obtiene la tasa de ConfiguracionEmpresa o usa valores por defecto.
         """
         if getattr(self, "tax_rate_applied", None) not in (None, ""):
             try:
                 return Decimal(str(self.tax_rate_applied))
             except Exception:
                 pass
+        
+        # Intentar obtener tasa de ConfiguracionEmpresa
+        try:
+            from taller.models.empresa import ConfiguracionEmpresa
+            config = ConfiguracionEmpresa.objects.filter(empresa=self.empresa).first()
+            if config and hasattr(config, 'tasa_iva') and config.tasa_iva is not None:
+                return Decimal(str(config.tasa_iva))
+        except (ImportError, AttributeError, Exception):
+            pass
+        
+        # Valores por defecto por país
         try:
             pais = (self.empresa.pais or "CL").upper()
         except Exception:
@@ -258,10 +283,13 @@ class Documento(AuditMixin, models.Model):
 
         if pais == "CL":
             tax_base = rep  # IVA solo a repuestos
-        else:  # US por defecto solo repuestos, puedes ampliar si decides gravar servicios
-            # Si tienes un flag, por ejemplo self.apply_vat (checkbox), podrías hacer:
-            # tax_base = rep + (srv if getattr(self, "apply_vat", False) else Decimal("0"))
-            tax_base = rep
+        else:  # US - usar apply_vat para determinar base imponible
+            # Si apply_vat=True, aplicar impuesto a repuestos + servicios
+            # Si apply_vat=False, no aplicar impuesto
+            if getattr(self, "apply_vat", True):
+                tax_base = rep + srv  # Repuestos + servicios
+            else:
+                tax_base = Decimal("0")  # Sin impuesto
 
         tax_amount = (tax_base * rate / Decimal("100.0"))
         tax_amount = self._q(tax_amount)
@@ -317,7 +345,9 @@ class Documento(AuditMixin, models.Model):
         # Recalcular en validación (para vistas admin/FBV/CBV)
         # Nota: en creación con formsets, las líneas aún no existen → quedará 0
         # Por eso también recalculamos en save() y/o señales de líneas.
-        self.recompute_totals(persist=False)
+        # Solo recalcular si el documento ya tiene ID (no en creación)
+        if self.pk:
+            self.recompute_totals(persist=False)
 
     @property
     def numero_documento(self):
@@ -389,6 +419,20 @@ class Documento(AuditMixin, models.Model):
         if not getattr(self, "country", None) and getattr(self, "empresa", None):
             self.country = self.empresa.pais
 
+        # Inicializar campos de totales si no tienen valor
+        if not hasattr(self, 'total_repuestos') or self.total_repuestos is None:
+            self.total_repuestos = Decimal("0")
+        if not hasattr(self, 'total_servicios') or self.total_servicios is None:
+            self.total_servicios = Decimal("0")
+        if not hasattr(self, 'total_otros') or self.total_otros is None:
+            self.total_otros = Decimal("0")
+        if not hasattr(self, 'iva') or self.iva is None:
+            self.iva = Decimal("0")
+        if not hasattr(self, 'total_general') or self.total_general is None:
+            self.total_general = Decimal("0")
+        if not hasattr(self, 'payment_status') or not self.payment_status:
+            self.payment_status = "pending"
+
         if not self.numero:
             self.generar_numero_documento()
 
@@ -397,7 +441,8 @@ class Documento(AuditMixin, models.Model):
         super().save(*args, **kwargs)
 
         # Solo recalcular si no estamos ya en una actualización de campos específicos
-        if 'update_fields' not in kwargs:
+        # y si no estamos en una operación de bulk
+        if 'update_fields' not in kwargs and not kwargs.get('bulk_create', False):
             # Tras guardar, ya existen líneas (si se guardaron antes),
             # así que recalculamos y persistimos.
             # Evita loop infinito: no llames self.save() completo; solo update_fields.
@@ -433,9 +478,72 @@ class Documento(AuditMixin, models.Model):
         """Compatibilidad: retorna total"""
         return self.total or Decimal("0")
 
-    def recalcular_totales(self):
-        """Compatibilidad: llama al nuevo método"""
-        self.recompute_totals(persist=True)
+    @transaction.atomic
+    def recalcular_totales(self, save=True):
+        """
+        Recalcula sumas usando ORM:
+        - Repuestos: Sum(cantidad*precio_unitario - descuento)
+        - Servicios: Sum(cantidad*precio_unitario - descuento)
+        - Otros:     Sum(precio_cliente * cantidad)
+        - IVA:       solo sobre repuestos (CL 19%, US 0)
+        """
+        pais = getattr(self.empresa, "pais", "CL")
+
+        # Expresiones por tipo
+        rep_expr = ExpressionWrapper(
+            (F("cantidad") * F("precio_unitario")) - Coalesce(F("descuento"), Value(0)),
+            output_field=DecimalField(max_digits=14, decimal_places=2),
+        )
+        serv_expr = ExpressionWrapper(
+            (F("cantidad") * F("precio_unitario")) - Coalesce(F("descuento"), Value(0)),
+            output_field=DecimalField(max_digits=14, decimal_places=2),
+        )
+        otros_expr = ExpressionWrapper(
+            (F("cantidad") * F("precio_cliente")),
+            output_field=DecimalField(max_digits=14, decimal_places=2),
+        )
+
+        rep = self.lineas_repuesto.aggregate(total=Coalesce(Sum(rep_expr), Value(0)))["total"]
+        srv = self.lineas_servicio.aggregate(total=Coalesce(Sum(serv_expr), Value(0)))["total"]
+        otr = self.lineas_otro_servicio.aggregate(total=Coalesce(Sum(otros_expr), Value(0)))["total"]
+
+        rep = Decimal(rep or 0)
+        srv = Decimal(srv or 0)
+        otr = Decimal(otr or 0)
+
+        iva_pct = self.vat_percent()
+        iva_val = (rep * Decimal(iva_pct)) / Decimal(100)
+
+        total = rep + srv + otr + iva_val
+
+        # Redondeo por país
+        self.total_repuestos = money_quantize(rep, pais)
+        self.total_servicios = money_quantize(srv, pais)
+        self.total_otros = money_quantize(otr, pais)
+        self.iva = money_quantize(iva_val, pais)
+        self.total_general = money_quantize(total, pais)
+
+        if save:
+            self.save(update_fields=["total_repuestos", "total_servicios", "total_otros", "iva", "total_general"])
+
+        return {
+            "repuestos": self.total_repuestos,
+            "servicios": self.total_servicios,
+            "otros": self.total_otros,
+            "iva": self.iva,
+            "total": self.total_general,
+        }
+    
+    @classmethod
+    def recalcular_totales_bulk(cls, documento_ids):
+        """
+        Recalcula totales para múltiples documentos de forma eficiente.
+        Útil para operaciones en lote o tareas asíncronas.
+        """
+        documentos = cls.objects.filter(id__in=documento_ids).select_related('empresa')
+        for doc in documentos:
+            doc.recompute_totals(persist=True)
+        return len(documentos)
 
     # Propiedades retrocompatibles para compatibilidad con código y plantillas antiguas
     @property

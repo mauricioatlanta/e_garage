@@ -1,29 +1,10 @@
-{% extends "taller/common/base_usa_space.html" %}
+{% extends "base.html" %}
 {% load country_url %}
 {% load i18n static %}
 
 {% block title %}Automotive Services - {{ empresa.nombre_taller }}{% endblock %}
 
-{% block space_icon %}🔧{% endblock %}
-{% block space_title %}Automotive Services{% endblock %}
-{% block space_subtitle %}Professional automotive service management system{% endblock %}
-
-{% block space_actions %}
-<div class="relative group">
-    <div class="absolute -inset-1 rounded-lg bg-gradient-to-r from-emerald-500 via-lime-500 to-green-500 opacity-30 blur group-hover:opacity-50 transition-opacity"></div>
-    <a href="{% country_url 'servicios:crear_servicio' %}" class="space-button">
-        <div class="w-4 h-4 rounded-md bg-white/20 flex items-center justify-center">
-            <span class="text-sm">➕</span>
-        </div>
-        <span>Add Service</span>
-    </a>
-</div>
-{% endblock %}
-
-<!-- 🟢 USA SERVICES TEMPLATE DEBUG -->
-<div style="position: fixed; top: 10px; right: 10px; width: 120px; height: 120px; background-color: #00ff00; z-index: 9999; border: 5px solid #fff; display: flex; align-items: center; justify-content: center; color: black; font-weight: bold; font-size: 14px; text-align: center; line-height: 1.2; box-shadow: 0 0 20px rgba(0, 255, 0, 0.8);">USA<br/>SERVICES<br/>TEMPLATE<br/>LOADED</div>
-
-{% block space_main_content %}
+{% block content %}
 {% csrf_token %}
 
 <!-- Search Section -->

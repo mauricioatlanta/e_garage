@@ -1,0 +1,239 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
+<link href="/static/css/estilo_futurista.css" rel="stylesheet">
+
+<style>
+  /* ESTILOS PARA LISTA DE DOCUMENTOS */
+  .documento-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 1rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 242, 254, 0.3);
+  }
+
+  .documento-title {
+    color: #00f2fe;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+    text-shadow: 0 0 10px #7f00ff;
+    text-align: center;
+  }
+
+  .btn-primary {
+    background: linear-gradient(45deg, #7f00ff, #00f2fe);
+    border: none;
+    border-radius: 0.75rem;
+    color: #fff;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(127, 0, 255, 0.4);
+  }
+
+  .documentos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+
+  .documento-card {
+    background: rgba(20, 20, 40, 0.9);
+    border: 2px solid #00f2fe;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0, 242, 254, 0.2);
+  }
+
+  .documento-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 242, 254, 0.4);
+    border-color: #7f00ff;
+  }
+
+  .documento-header {
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .documento-numero {
+    color: #00f2fe;
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+
+  .documento-tipo {
+    background: linear-gradient(45deg, #7f00ff, #00f2fe);
+    color: #000;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+
+  .documento-info {
+    color: #fff;
+    margin-bottom: 0.5rem;
+  }
+
+  .documento-info strong {
+    color: #00f2fe;
+  }
+
+  .documento-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .btn-small {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .btn-view {
+    background: rgba(0, 242, 254, 0.2);
+    color: #00f2fe;
+    border: 1px solid #00f2fe;
+  }
+
+  .btn-view:hover {
+    background: #00f2fe;
+    color: #000;
+  }
+
+  .btn-edit {
+    background: rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+    border: 1px solid #ffc107;
+  }
+
+  .btn-edit:hover {
+    background: #ffc107;
+    color: #000;
+  }
+
+  .btn-delete {
+    background: rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+    border: 1px solid #dc3545;
+  }
+
+  .btn-delete:hover {
+    background: #dc3545;
+    color: #fff;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #94a3b8;
+  }
+
+  .empty-state h3 {
+    color: #00f2fe;
+    margin-bottom: 1rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="documento-container">
+  <div style="position: fixed; top: 10px; left: 10px; z-index: 9999; background: red; color: white; padding: 10px; border-radius: 5px; font-weight: bold;">
+    🔴 TEMPLATE LISTA DOCUMENTOS CHILE CARGADO 🔴
+  </div>
+
+  <h1 class="documento-title">📋 Lista de Documentos</h1>
+  
+  <div class="text-center mb-4">
+    <a href="{% url 'documentos_cl_es:crear_documento' %}" class="btn-primary">
+      ➕ Crear Nuevo Documento
+    </a>
+  </div>
+
+  {% if object_list %}
+    <div class="documentos-grid">
+      {% for documento in object_list %}
+        <div class="documento-card">
+          <div class="documento-header">
+            <span class="documento-numero">{{ documento.numero }}</span>
+            <span class="documento-tipo">{{ documento.get_tipo_display }}</span>
+          </div>
+          
+          <div class="documento-info">
+            <strong>Cliente:</strong> {{ documento.cliente.nombre|default:"Sin cliente" }}
+          </div>
+          
+          {% if documento.vehiculo %}
+          <div class="documento-info">
+            <strong>Vehículo:</strong> {{ documento.vehiculo.patente|default:"Sin patente" }}
+          </div>
+          {% endif %}
+          
+          <div class="documento-info">
+            <strong>Fecha:</strong> {{ documento.fecha_emision|date:"d/m/Y" }}
+          </div>
+          
+          {% if documento.total %}
+          <div class="documento-info">
+            <strong>Total:</strong> ${{ documento.total|floatformat:0 }}
+          </div>
+          {% endif %}
+          
+          <div class="documento-info">
+            <strong>Estado:</strong> 
+            {% if documento.pagado %}
+              <span style="color: #28a745;">✅ Pagado</span>
+            {% else %}
+              <span style="color: #ffc107;">⏳ Pendiente</span>
+            {% endif %}
+          </div>
+          
+          <div class="documento-actions">
+            <a href="{% url 'documentos_cl_es:ver_documento' documento.pk %}" class="btn-small btn-view">
+              👁️ Ver
+            </a>
+            <a href="{% url 'documentos_cl_es:documento_editar' documento.pk %}" class="btn-small btn-edit">
+              ✏️ Editar
+            </a>
+            <a href="{% url 'documentos_cl_es:eliminar_documento' documento.pk %}" class="btn-small btn-delete">
+              🗑️ Eliminar
+            </a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <h3>📄 No hay documentos creados</h3>
+      <p>Comienza creando tu primer documento haciendo clic en el botón de arriba.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

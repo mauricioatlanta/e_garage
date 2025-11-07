@@ -332,29 +332,57 @@
     margin: 0;
   }
 
-  /* Buttons */
+  /* Buttons - Futuristic with Glowing Borders */
   .cyber-btn {
-    background: linear-gradient(135deg, var(--primary-cyan), var(--secondary-purple));
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(15, 15, 30, 0.9));
     color: white;
-    border: none;
-    padding: 1rem 2rem;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    padding: 1rem 2.5rem;
     border-radius: 12px;
     font-family: 'Orbitron', 'Rajdhani', monospace;
     font-size: 1rem;
     font-weight: 700;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
+    justify-content: center;
+    gap: 0.8rem;
     text-transform: uppercase;
     letter-spacing: 2px;
-    box-shadow: 0 4px 15px rgba(0, 255, 255, 0.3);
     position: relative;
     overflow: hidden;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    box-shadow: 
+      0 0 15px rgba(255, 255, 255, 0.3),
+      0 0 30px rgba(0, 255, 255, 0.2),
+      0 4px 15px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    animation: border-glow 2s ease-in-out infinite;
   }
 
+  /* Animated glowing border */
+  @keyframes border-glow {
+    0%, 100% {
+      box-shadow: 
+        0 0 15px rgba(255, 255, 255, 0.3),
+        0 0 30px rgba(0, 255, 255, 0.2),
+        0 4px 15px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.8);
+    }
+    50% {
+      box-shadow: 
+        0 0 25px rgba(255, 255, 255, 0.5),
+        0 0 50px rgba(0, 255, 255, 0.4),
+        0 0 75px rgba(138, 92, 246, 0.2),
+        0 4px 20px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      border-color: rgba(0, 255, 255, 1);
+    }
+  }
+
+  /* Scanning light effect */
   .cyber-btn::before {
     content: '';
     position: absolute;
@@ -362,21 +390,54 @@
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: left 0.5s;
+    background: linear-gradient(90deg, 
+      transparent, 
+      rgba(255, 255, 255, 0.3), 
+      rgba(0, 255, 255, 0.3), 
+      transparent);
+    animation: scan-sweep 3s ease-in-out infinite;
   }
 
-  .cyber-btn:hover::before {
-    left: 100%;
+  @keyframes scan-sweep {
+    0% { left: -100%; }
+    50% { left: 100%; }
+    100% { left: 100%; }
+  }
+
+  /* Particle effect on hover */
+  .cyber-btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+
+  .cyber-btn:hover::after {
+    width: 300px;
+    height: 300px;
+    opacity: 0;
   }
 
   .cyber-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 255, 255, 0.5);
+    transform: translateY(-4px) scale(1.03);
+    border-color: #ffffff;
+    background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(138, 92, 246, 0.2));
+    box-shadow: 
+      0 0 30px rgba(255, 255, 255, 0.6),
+      0 0 60px rgba(0, 255, 255, 0.5),
+      0 0 90px rgba(138, 92, 246, 0.3),
+      0 8px 30px rgba(0, 0, 0, 0.6),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
   }
 
   .cyber-btn:active {
-    transform: translateY(0);
+    transform: translateY(-2px) scale(1.01);
   }
 
   /* Quick Actions */
@@ -388,19 +449,56 @@
   }
 
   .action-btn {
-    background: rgba(15, 15, 25, 0.9);
-    border: 2px solid rgba(0, 255, 255, 0.3);
-    border-radius: 15px;
-    padding: 1.5rem;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.7), rgba(15, 15, 30, 0.8));
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    border-radius: 16px;
+    padding: 2rem 1.5rem;
     text-align: center;
     text-decoration: none;
     color: var(--text-primary);
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     position: relative;
     overflow: hidden;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+    box-shadow: 
+      0 0 15px rgba(255, 255, 255, 0.2),
+      0 0 30px rgba(0, 255, 255, 0.15),
+      0 8px 25px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    animation: action-border-glow 3s ease-in-out infinite;
   }
 
+  /* Glowing border animation for action buttons */
+  @keyframes action-border-glow {
+    0%, 100% {
+      box-shadow: 
+        0 0 15px rgba(255, 255, 255, 0.2),
+        0 0 30px rgba(0, 255, 255, 0.15),
+        0 8px 25px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.6);
+    }
+    33% {
+      box-shadow: 
+        0 0 20px rgba(0, 255, 255, 0.4),
+        0 0 40px rgba(0, 255, 255, 0.3),
+        0 0 60px rgba(0, 255, 255, 0.15),
+        0 8px 30px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(0, 255, 255, 0.2);
+      border-color: rgba(0, 255, 255, 0.9);
+    }
+    66% {
+      box-shadow: 
+        0 0 20px rgba(138, 92, 246, 0.4),
+        0 0 40px rgba(138, 92, 246, 0.3),
+        0 0 60px rgba(138, 92, 246, 0.15),
+        0 8px 30px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(138, 92, 246, 0.2);
+      border-color: rgba(138, 92, 246, 0.9);
+    }
+  }
+
+  /* Gradient overlay */
   .action-btn::before {
     content: '';
     position: absolute;
@@ -408,34 +506,100 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(139, 92, 246, 0.1));
+    background: linear-gradient(135deg, 
+      rgba(0, 255, 255, 0.1) 0%, 
+      rgba(138, 92, 246, 0.1) 50%,
+      rgba(0, 255, 136, 0.1) 100%);
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.4s ease;
   }
 
   .action-btn:hover::before {
     opacity: 1;
   }
 
+  /* Scanning line effect */
+  .action-btn::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #ffffff, transparent);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    animation: action-scan 4s linear infinite;
+  }
+
+  @keyframes action-scan {
+    0% { left: -100%; top: 0; }
+    25% { left: 100%; top: 0; }
+    26% { left: 100%; top: 100%; }
+    50% { left: -100%; top: 100%; }
+    51% { left: -100%; top: 50%; }
+    75% { left: 100%; top: 50%; }
+    76% { left: 100%; top: 0; }
+    100% { left: -100%; top: 0; }
+  }
+
   .action-btn:hover {
-    transform: translateY(-5px);
-    border-color: var(--primary-cyan);
-    box-shadow: 0 10px 30px rgba(0, 255, 255, 0.2);
+    transform: translateY(-8px) scale(1.05) rotateX(5deg);
+    border-color: #ffffff;
+    box-shadow: 
+      0 0 25px rgba(255, 255, 255, 0.5),
+      0 0 50px rgba(0, 255, 255, 0.4),
+      0 0 75px rgba(138, 92, 246, 0.2),
+      0 12px 40px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
   }
 
   .action-icon {
-    font-size: 2rem;
+    font-size: 2.5rem;
     margin-bottom: 1rem;
     display: block;
+    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.5));
+    animation: icon-pulse 2s ease-in-out infinite;
+    position: relative;
+    z-index: 10;
+  }
+
+  @keyframes icon-pulse {
+    0%, 100% {
+      filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.5));
+      transform: scale(1);
+    }
+    50% {
+      filter: drop-shadow(0 0 25px rgba(0, 255, 255, 0.8));
+      transform: scale(1.1);
+    }
+  }
+
+  .action-btn:hover .action-icon {
+    animation: icon-spin-glow 1s ease-in-out;
+    filter: drop-shadow(0 0 30px rgba(255, 255, 255, 1));
+  }
+
+  @keyframes icon-spin-glow {
+    0% { transform: scale(1) rotate(0deg); }
+    50% { transform: scale(1.2) rotate(180deg); }
+    100% { transform: scale(1.1) rotate(360deg); }
   }
 
   .action-title {
     font-family: 'Orbitron', 'Rajdhani', monospace;
     font-size: 1.1rem;
-    font-weight: 600;
+    font-weight: 700;
     margin-bottom: 0.5rem;
-    letter-spacing: 1px;
-    text-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+    letter-spacing: 1.5px;
+    text-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
+    position: relative;
+    z-index: 10;
+    color: var(--primary-cyan);
+  }
+
+  .action-btn:hover .action-title {
+    text-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+    color: #ffffff;
   }
 
   .action-desc {
@@ -444,6 +608,13 @@
     color: var(--text-secondary);
     font-weight: 400;
     letter-spacing: 0.5px;
+    position: relative;
+    z-index: 10;
+    line-height: 1.4;
+  }
+
+  .action-btn:hover .action-desc {
+    color: rgba(255, 255, 255, 0.9);
   }
 
   /* Messages */
@@ -555,6 +726,70 @@
     font-family: 'Orbitron', 'Rajdhani', monospace !important;
     text-shadow: 0 0 3px rgba(255, 255, 255, 0.2) !important;
   }
+
+  /* Sparkle particles on buttons */
+  .cyber-btn .sparkle,
+  .action-btn .sparkle {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    pointer-events: none;
+    animation: sparkle-float 3s ease-in-out infinite;
+  }
+
+  @keyframes sparkle-float {
+    0%, 100% {
+      opacity: 0;
+      transform: translateY(0) scale(0);
+    }
+    10% {
+      opacity: 1;
+      transform: translateY(-5px) scale(1);
+    }
+    90% {
+      opacity: 1;
+      transform: translateY(-30px) scale(0.5);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-35px) scale(0);
+    }
+  }
+
+  /* Corner glows on cards */
+  .config-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, rgba(0, 255, 255, 0.3) 0%, transparent 70%);
+    border-radius: 0 0 20px 0;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .config-card:hover::after {
+    opacity: 1;
+  }
+
+  /* Pulsing glow for status icons */
+  @keyframes status-glow {
+    0%, 100% {
+      box-shadow: 0 0 10px var(--accent-green);
+    }
+    50% {
+      box-shadow: 0 0 20px var(--accent-green), 0 0 30px rgba(0, 255, 136, 0.5);
+    }
+  }
+
+  .status-icon {
+    animation: pulse 2s infinite, status-glow 2s infinite;
+  }
 </style>
 {% endblock %}
 
@@ -627,17 +862,28 @@
 
       <div class="form-group">
         <label class="form-label">{{ form.logo.label }}</label>
-        <div class="logo-section">
+        <div class="logo-section" style="border: 2px solid rgba(0, 255, 255, 0.4); box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);">
           {% if config.logo %}
-            <img src="{{ config.logo.url }}" alt="Current Logo" class="current-logo">
+            <img src="{{ config.logo.url }}" alt="Current Logo" class="current-logo" id="logo-preview" style="border: 2px solid #00ffff; box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);">
             <div class="logo-info">
-              <h4>Current Logo</h4>
-              <p>{{ config.logo.name }}</p>
+              <h4 style="color: #00ffff; text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);">✅ Current Logo</h4>
+              <p style="color: #00ff88;">{{ config.logo.name }}</p>
+              <p style="color: #ffffff; margin-top: 0.5rem; font-size: 0.85rem;">
+                💡 This logo appears on all pages in the header
+              </p>
             </div>
           {% else %}
             <div class="logo-info">
-              <h4>No Logo Set</h4>
-              <p>Upload a logo to enhance your brand identity</p>
+              <h4 style="color: #ff6b35; text-shadow: 0 0 10px rgba(255, 107, 53, 0.5);">⚠️ No Logo Set</h4>
+              <p>Upload a logo to enhance your brand identity across all pages</p>
+              <div style="margin-top: 1rem; padding: 1rem; background: rgba(0, 255, 255, 0.1); border-radius: 8px; border: 1px solid rgba(0, 255, 255, 0.3);">
+                <p style="color: #00ffff; font-size: 0.9rem; margin: 0;">
+                  ✨ Upload ANY size - It will be auto-resized to fit perfectly!
+                </p>
+                <p style="color: #00ff88; font-size: 0.85rem; margin-top: 0.5rem;">
+                  📌 Formats: PNG, JPG, JPEG, SVG, WEBP (max 10MB)
+                </p>
+              </div>
             </div>
           {% endif %}
         </div>
@@ -645,6 +891,9 @@
         {% if form.logo.errors %}
           <div class="alert alert-error">{{ form.logo.errors.0 }}</div>
         {% endif %}
+        <p style="color: #b0c4de; font-size: 0.85rem; margin-top: 0.5rem; font-family: 'Courier New', monospace;">
+          💡 After uploading, the logo will appear in the header of ALL pages automatically. Large images will be auto-resized.
+        </p>
       </div>
 
       <div class="form-grid">
@@ -834,7 +1083,7 @@
 </div>
 
 <script>
-// Add some interactive effects
+// Add futuristic interactive effects
 document.addEventListener('DOMContentLoaded', function() {
   // Animate cards on scroll
   const cards = document.querySelectorAll('.config-card');
@@ -847,10 +1096,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  cards.forEach(card => {
+  cards.forEach((card, index) => {
     card.style.opacity = '0';
     card.style.transform = 'translateY(20px)';
-    card.style.transition = 'all 0.6s ease';
+    card.style.transition = `all 0.6s ease ${index * 0.1}s`;
     observer.observe(card);
   });
 
@@ -865,6 +1114,111 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   });
+
+  // Create sparkle particles on button hover
+  function createSparkle(button) {
+    const sparkle = document.createElement('div');
+    sparkle.className = 'sparkle';
+    
+    // Random position within button
+    const rect = button.getBoundingClientRect();
+    const x = Math.random() * rect.width;
+    const y = Math.random() * rect.height;
+    
+    sparkle.style.left = x + 'px';
+    sparkle.style.top = y + 'px';
+    sparkle.style.animationDelay = Math.random() * 2 + 's';
+    
+    button.appendChild(sparkle);
+    
+    // Remove after animation
+    setTimeout(() => {
+      sparkle.remove();
+    }, 3000);
+  }
+
+  // Add sparkle effect to all buttons
+  const allButtons = document.querySelectorAll('.cyber-btn, .action-btn');
+  allButtons.forEach(button => {
+    button.addEventListener('mouseenter', function() {
+      // Create multiple sparkles
+      for (let i = 0; i < 3; i++) {
+        setTimeout(() => createSparkle(this), i * 300);
+      }
+    });
+  });
+
+  // Add hover sound effect (optional - visual feedback)
+  allButtons.forEach(button => {
+    button.addEventListener('mouseenter', function() {
+      this.style.transition = 'all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+    });
+    
+    button.addEventListener('mouseleave', function() {
+      this.style.transition = 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+    });
+  });
+
+  // Pulsing effect for action icons
+  const actionIcons = document.querySelectorAll('.action-icon');
+  actionIcons.forEach(icon => {
+    setInterval(() => {
+      icon.style.animation = 'none';
+      setTimeout(() => {
+        icon.style.animation = 'icon-pulse 2s ease-in-out infinite';
+      }, 10);
+    }, 4000);
+  });
+
+  // Preview del logo antes de subir
+  const logoInput = document.querySelector('input[type="file"][name="logo"]');
+  if (logoInput) {
+    logoInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          // Buscar la imagen de preview
+          let preview = document.getElementById('logo-preview');
+          
+          if (!preview) {
+            // Si no existe, crear una nueva
+            const logoSection = document.querySelector('.logo-section');
+            preview = document.createElement('img');
+            preview.id = 'logo-preview';
+            preview.className = 'current-logo';
+            preview.style.border = '2px solid #00ffff';
+            preview.style.boxShadow = '0 0 15px rgba(0, 255, 255, 0.5)';
+            logoSection.insertBefore(preview, logoSection.firstChild);
+            
+            // Actualizar el texto
+            const logoInfo = logoSection.querySelector('.logo-info');
+            if (logoInfo) {
+              logoInfo.innerHTML = `
+                <h4 style="color: #00ffff; text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);">📸 Preview</h4>
+                <p style="color: #00ff88;">${file.name}</p>
+                <p style="color: #ffd700; margin-top: 0.5rem; font-size: 0.85rem; animation: pulse 2s infinite;">
+                  ⚠️ Click "💾 UPDATE PROFILE" to save this logo
+                </p>
+              `;
+            }
+          }
+          
+          preview.src = event.target.result;
+          
+          // Añadir efecto de aparición
+          preview.style.opacity = '0';
+          preview.style.transform = 'scale(0.8)';
+          preview.style.transition = 'all 0.5s ease';
+          setTimeout(() => {
+            preview.style.opacity = '1';
+            preview.style.transform = 'scale(1)';
+          }, 50);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
 });
 </script>
 {% endblock %}
