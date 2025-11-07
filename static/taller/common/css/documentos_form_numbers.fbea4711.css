@@ -1,0 +1,57 @@
+/* eGarage documentos_form_numbers.css - Micro estilos para preview de numeración */
+
+#numero_preview { 
+  padding: 0 .25rem; 
+  transition: opacity 0.2s ease;
+}
+
+#numero_preview:empty::after { 
+  content: "—"; 
+  opacity: .7; 
+}
+
+/* Estados visuales */
+#numero_preview.loading {
+  opacity: 0.6;
+  font-style: italic;
+}
+
+#numero_preview.error {
+  color: #ff6b6b;
+  font-weight: bold;
+}
+
+#numero_preview.success {
+  color: #51cf66;
+  font-weight: bold;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  #numero_preview {
+    font-size: 0.9rem;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

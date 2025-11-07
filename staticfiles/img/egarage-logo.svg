@@ -1,0 +1,7 @@
+<svg width="200" height="80" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="80" rx="10" fill="white" stroke="#00ffff" stroke-width="2"/>
+  <text x="100" y="30" font-family="Arial" font-size="24" font-weight="bold" text-anchor="middle" fill="#00ffff">e</text>
+  <text x="100" y="55" font-family="Arial" font-size="28" font-weight="900" text-anchor="middle" fill="#333333">Garage</text>
+  <text x="100" y="70" font-family="Arial" font-size="10" text-anchor="middle" fill="#666666">DIGITAL WORKSHOP</text>
+</svg>
+
