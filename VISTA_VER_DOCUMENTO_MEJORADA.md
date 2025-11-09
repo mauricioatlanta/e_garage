@@ -1,7 +1,7 @@
 # ✅ Vista ver_documento Mejorada - COMPLETADA
 
-**Fecha:** 1 de octubre, 2025  
-**Estado:** ✅ COMPLETADO  
+**Fecha:** 1 de octubre, 2025
+**Estado:** ✅ COMPLETADO
 **Archivo:** `taller/documentos/ver_documento_function.py`
 
 ---
@@ -225,5 +225,3 @@ detalles = list(lineas_repuesto) + list(lineas_servicio) + list(lineas_otro_serv
 **¡Vista ver_documento mejorada exitosamente!** 🚀
 
 **Ahora es segura, precisa, consistente y flexible.** ✨
-
-

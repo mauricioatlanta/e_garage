@@ -111,7 +111,7 @@ wkhtmltopdf \
 
 ### **Tema Dinámico:**
 - 🔧 **OT** - Gris profesional
-- 📋 **PRES** - Ámbar cálido  
+- 📋 **PRES** - Ámbar cálido
 - 🧾 **REC** - Verde esmeralda
 
 ### **Modo Oscuro:**
@@ -134,7 +134,7 @@ wkhtmltopdf \
 
 ```
 ✅ Formulario válido para Chile y USA
-✅ URLs DAL funcionando correctamente  
+✅ URLs DAL funcionando correctamente
 ✅ Vistas de autocomplete importadas y funcionales
 ✅ Namespaces únicos sin conflictos
 ✅ Validaciones multi-tenant funcionando

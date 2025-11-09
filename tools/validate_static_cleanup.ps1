@@ -38,7 +38,7 @@ Write-Host "`n📁 VALIDANDO ESTRUCTURA DE DIRECTORIOS..." -ForegroundColor Blue
 
 $expectedDirs = @(
   "taller\common\css",
-  "taller\common\js", 
+  "taller\common\js",
   "taller\common\img",
   "taller\common\fonts",
   "taller\common\media",
@@ -65,7 +65,7 @@ Write-Host "`n🚫 VALIDANDO AUSENCIA DE ARCHIVOS PROBLEMÁTICOS..." -Foreground
 
 $problematicPatterns = @(
   "*.map",
-  "*.psd", 
+  "*.psd",
   "*.ai",
   "*.fig",
   "*.zip",
@@ -117,22 +117,22 @@ Write-Host "`n🏷️ VALIDANDO NOMBRES DE ARCHIVOS..." -ForegroundColor Blue
 $allFiles = Get-ChildItem -Path $StaticDir -Recurse -File -ErrorAction SilentlyContinue
 foreach ($file in $allFiles) {
   $fileName = $file.Name
-  
+
   # Verificar mayúsculas
   if ($fileName -cmatch '[A-Z]') {
     Add-Warning "Archivo con mayúsculas: $fileName"
   }
-  
+
   # Verificar espacios
   if ($fileName -match ' ') {
     Add-Error "Archivo con espacios: $fileName"
   }
-  
+
   # Verificar caracteres especiales
   if ($fileName -match '[^\w\-\.]') {
     Add-Warning "Archivo con caracteres especiales: $fileName"
   }
-  
+
   # Verificar nombres problemáticos
   if ($fileName -match '(experimental|temp|tmp|test|debug|old|backup|copy|v\d+)$') {
     Add-Warning "Archivo con nombre problemático: $fileName"
@@ -173,7 +173,7 @@ Write-Host "`n🎯 VALIDANDO ARCHIVOS CRÍTICOS..." -ForegroundColor Blue
 
 $criticalFiles = @(
   "taller\common\css\style.css",
-  "taller\common\css\dashboard.css", 
+  "taller\common\css\dashboard.css",
   "taller\common\js\main.js",
   "taller\common\img\logo.png"
 )
@@ -192,7 +192,7 @@ Write-Host "`n📋 RESUMEN DE VALIDACIÓN" -ForegroundColor Cyan
 Write-Host "========================" -ForegroundColor Cyan
 
 Write-Host "✅ Éxitos: $($success.Count)" -ForegroundColor Green
-Write-Host "⚠️ Warnings: $($warnings.Count)" -ForegroundColor Yellow  
+Write-Host "⚠️ Warnings: $($warnings.Count)" -ForegroundColor Yellow
 Write-Host "❌ Errores: $($errors.Count)" -ForegroundColor Red
 
 if ($errors.Count -eq 0) {

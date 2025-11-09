@@ -1,6 +1,7 @@
 from django.urls import path
 
 from . import dal_views
+from .ajax_views import ajax_crear_ciudad_usa, ajax_crear_estado_usa
 from .views import (
     agregar_ciudad,
     agregar_ciudad_usa,
@@ -31,6 +32,9 @@ urlpatterns = [
     path("ajax/ciudades_usa/", obtener_ciudades_usa, name="obtener_ciudades_usa"),
     path("ajax/agregar_ciudad/", agregar_ciudad, name="agregar_ciudad"),
     path("ajax/agregar_ciudad_usa/", agregar_ciudad_usa, name="agregar_ciudad_usa"),
+    # Nuevas vistas AJAX para crear estado y ciudad dinámicamente
+    path("ajax/crear_estado_usa/", ajax_crear_estado_usa, name="ajax_crear_estado_usa"),
+    path("ajax/crear_ciudad_usa/", ajax_crear_ciudad_usa, name="ajax_crear_ciudad_usa"),
     path("ajax/buscar/", ajax_buscar_clientes, name="ajax_buscar_clientes"),
     path("stats/", clientes_stats, name="clientes_stats"),
     # DAL autocomplete

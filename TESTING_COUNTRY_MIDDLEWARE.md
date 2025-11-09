@@ -20,7 +20,7 @@ for path in test_paths:
     request = RequestFactory().get(path)
     middleware = CountryContextMiddleware(get_response=lambda r: r)
     response = middleware.process_request(request)
-    
+
     assert response is None  # No debe redirigir
     assert request.country == "CL"  # Default
     assert request._country_source == "whitelist"
@@ -112,7 +112,7 @@ assert response.status_code == 307  # Mantiene método POST
 assert response.url == "/cl/vehiculos/crear/"
 ```
 
-**Resultado esperado:** 
+**Resultado esperado:**
 - ✅ GET → 302 (temporal)
 - ✅ POST → 307 (mantiene método y body)
 
@@ -298,7 +298,7 @@ class TestWhitelist:
         assert _is_whitelisted("/media/uploads/image.jpg")
         assert _is_whitelisted("/admin/login/")
         assert _is_whitelisted("/favicon.ico")
-    
+
     def test_normal_routes_not_whitelisted(self):
         assert not _is_whitelisted("/cl/vehiculos/")
         assert not _is_whitelisted("/us/dashboard/")
@@ -308,25 +308,25 @@ class TestCanonicalRedirects:
     @pytest.fixture
     def middleware(self):
         return CountryContextMiddleware(get_response=lambda r: r)
-    
+
     def test_es_redirects_to_cl(self, middleware):
         request = RequestFactory().get("/es/vehiculos/")
         response = middleware.process_request(request)
-        
+
         assert response.status_code == 301
         assert response.url == "/cl/vehiculos/"
-    
+
     def test_en_redirects_to_us(self, middleware):
         request = RequestFactory().get("/en/dashboard/")
         response = middleware.process_request(request)
-        
+
         assert response.status_code == 301
         assert response.url == "/us/dashboard/"
-    
+
     def test_query_string_preserved(self, middleware):
         request = RequestFactory().get("/es/vehiculos/?page=2")
         response = middleware.process_request(request)
-        
+
         assert response.url == "/cl/vehiculos/?page=2"
 
 
@@ -334,38 +334,38 @@ class TestConflictRedirects:
     @pytest.fixture
     def middleware(self):
         return CountryContextMiddleware(get_response=lambda r: r)
-    
+
     @pytest.fixture
     def user_cl(self):
         user = Mock()
         user.is_authenticated = True
         user.empresa = Mock(pais="CL")
         return user
-    
+
     def test_get_conflict_302(self, middleware, user_cl):
         request = RequestFactory().get("/us/vehiculos/")
         request.user = user_cl
-        
+
         response = middleware.process_request(request)
-        
+
         assert response.status_code == 302
         assert response.url == "/cl/vehiculos/"
-    
+
     def test_post_conflict_307(self, middleware, user_cl):
         request = RequestFactory().post("/us/vehiculos/crear/")
         request.user = user_cl
-        
+
         response = middleware.process_request(request)
-        
+
         assert response.status_code == 307  # Mantiene método
         assert response.url == "/cl/vehiculos/crear/"
-    
+
     def test_no_conflict_no_redirect(self, middleware, user_cl):
         request = RequestFactory().get("/cl/vehiculos/")
         request.user = user_cl
-        
+
         response = middleware.process_request(request)
-        
+
         assert response is None  # No redirige
         assert request.country == "CL"
 
@@ -374,22 +374,22 @@ class TestDetectionHierarchy:
     @pytest.fixture
     def middleware(self):
         return CountryContextMiddleware(get_response=lambda r: r)
-    
+
     def test_url_overrides_subdomain(self, middleware):
         request = RequestFactory().get("/us/dashboard/", HTTP_HOST="cl.myapp.com")
         request.user = Mock(is_authenticated=False)
-        
+
         middleware.process_request(request)
-        
+
         assert request.country == "US"
         assert request._country_source == "url"
-    
+
     def test_subdomain_when_no_url(self, middleware):
         request = RequestFactory().get("/dashboard/", HTTP_HOST="us.myapp.com")
         request.user = Mock(is_authenticated=False)
-        
+
         middleware.process_request(request)
-        
+
         assert request.country == "US"
         assert request._country_source == "subdomain"
 
@@ -398,19 +398,19 @@ class TestSwapPrefix:
     def test_basic_swap(self):
         from taller.middleware.country_context import CountryContextMiddleware
         swap = CountryContextMiddleware._swap_prefix
-        
+
         assert swap("/cl/vehiculos", "/cl", "/us") == "/us/vehiculos"
         assert swap("/us/dashboard", "/us", "/cl") == "/cl/dashboard"
-    
+
     def test_swap_with_trailing_slash(self):
         swap = CountryContextMiddleware._swap_prefix
-        
+
         assert swap("/cl/", "/cl", "/us") == "/us/"
         assert swap("/cl", "/cl", "/us") == "/us"
-    
+
     def test_swap_without_prefix(self):
         swap = CountryContextMiddleware._swap_prefix
-        
+
         # Inyecta prefijo si no existe
         assert swap("/vehiculos", "/cl", "/us") == "/us/vehiculos"
 
@@ -490,16 +490,13 @@ curl -I http://localhost:8000/us/vehiculos/ \
 
 Con estos tests garantizas:
 
-✅ **Sin bucles** de redirección  
-✅ **Canonical URLs** (/es → /cl, /en → /us)  
-✅ **Whitelist** respetada (static/admin/webhooks)  
-✅ **POST seguro** con 307  
-✅ **Query string** siempre preservado  
-✅ **Multi-tenant** estricto (URL vs empresa)  
-✅ **Regex robusto** (sin slicing frágil)  
-✅ **Idioma** con Accept-Language fallback  
+✅ **Sin bucles** de redirección
+✅ **Canonical URLs** (/es → /cl, /en → /us)
+✅ **Whitelist** respetada (static/admin/webhooks)
+✅ **POST seguro** con 307
+✅ **Query string** siempre preservado
+✅ **Multi-tenant** estricto (URL vs empresa)
+✅ **Regex robusto** (sin slicing frágil)
+✅ **Idioma** con Accept-Language fallback
 
 **Próximo paso**: Ejecutar suite completa con `pytest -v --cov=taller.middleware`
-
-
-

@@ -1,6 +1,8 @@
 import pytest
-from django.urls import get_resolver, reverse, NoReverseMatch
+
 from django.contrib.auth import get_user_model
+from django.urls import NoReverseMatch, get_resolver, reverse
+
 
 @pytest.mark.django_db
 def test_named_urls_require_or_allow_auth(client):

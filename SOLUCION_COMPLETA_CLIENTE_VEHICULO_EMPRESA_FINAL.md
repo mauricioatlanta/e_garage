@@ -14,7 +14,7 @@ El problema de "lista vacía de vehículos en USA" ha sido completamente solucio
 def clean(self):
     """Validaciones de consistencia por país"""
     from django.core.exceptions import ValidationError
-    
+
     super().clean()
 
     # País de la empresa (siempre debería existir con TenantScoped)
@@ -48,27 +48,27 @@ def clean(self):
 @login_required
 def vehiculos_por_cliente(request):
     """Obtener vehículos de un cliente específico - Filtrado por empresa y cliente (drop-in correcto)"""
-    
+
     # ✅ FILTRO CRÍTICO: empresa + cliente (como sugieres)
     qs = Vehiculo.objects.filter(
         empresa=empresa,
         cliente_id=cliente_id
     ).select_related('marca', 'modelo').order_by("-id")[:50]
-    
+
     # Formatear respuesta como sugiere tu snippet
     data = []
     for v in qs:
         # Crear label usando el patrón sugerido
         label_parts = [v.patente, v.vin, v.get_marca_display(), v.get_modelo_display()]
         label = " · ".join([x for x in label_parts if x and x not in ["Sin marca", "Sin modelo"]])
-        
+
         data.append({
             "id": v.id,
             "text": label or f"Vehículo {v.id}",
             "label": label or f"Vehículo {v.id}",  # Compatibilidad con diferentes frontends
             # ... más campos
         })
-    
+
     return JsonResponse({"results": data})
 ```
 

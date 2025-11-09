@@ -12,7 +12,7 @@ La página de configuración de USA (`/us/settings/`) tenía errores al cargar y
 **Solución**:
 ```python
 return render(
-    request, "settings/company_settings.html", 
+    request, "settings/company_settings.html",
     {"form": form, "tecnicos": tecnicos, "config": config}
 )
 ```
@@ -66,7 +66,7 @@ work_order_prefix = forms.CharField(required=False, ...)
 # Agregar método clean para valores por defecto
 def clean(self):
     cleaned_data = super().clean()
-    
+
     # Asegurar que los prefijos tengan valores por defecto
     if not cleaned_data.get("invoice_prefix"):
         cleaned_data["invoice_prefix"] = "FAC"
@@ -74,7 +74,7 @@ def clean(self):
         cleaned_data["quote_prefix"] = "COT"
     if not cleaned_data.get("work_order_prefix"):
         cleaned_data["work_order_prefix"] = "OT"
-        
+
     return cleaned_data
 ```
 
@@ -133,5 +133,3 @@ La página `/us/settings/` ahora funciona correctamente y permite:
 - Subir logos personalizados
 
 Todos los errores de carga y guardado han sido resueltos.
-
-

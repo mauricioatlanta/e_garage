@@ -57,37 +57,37 @@ def vehiculos_por_cliente(request):
     """Obtener vehículos de un cliente específico - Filtrado por empresa y cliente"""
     try:
         cliente_id = request.GET.get("cliente_id") or request.GET.get("cliente")
-        
+
         # Validar que cliente_id sea un número válido
         try:
             cliente_id = int(cliente_id)
         except (ValueError, TypeError):
             return JsonResponse({"error": "ID de cliente inválido", "results": []})
-            
+
         empresa = get_or_create_empresa(request)
-        
+
         if not empresa:
             return JsonResponse({"error": "Empresa no encontrada", "results": []})
-        
+
         # Filtrar vehículos por cliente y empresa (consistencia crítica)
         qs = Vehiculo.objects.filter(
             cliente_id=cliente_id,
             empresa=empresa
         ).select_related('marca', 'modelo').order_by("-id")[:50]
-        
+
         items = []
         for v in qs:
             display_text = v.patente or "Sin patente"
             marca_str = v.get_marca_display()
             modelo_str = v.get_modelo_display()
-            
+
             if marca_str and marca_str != "Sin marca":
                 display_text += f" - {marca_str}"
             if modelo_str and modelo_str != "Sin modelo":
                 display_text += f" {modelo_str}"
             if hasattr(v, "anio") and v.anio:
                 display_text += f" ({v.anio})"
-                
+
             items.append({
                 "id": v.id,
                 "text": display_text,
@@ -97,9 +97,9 @@ def vehiculos_por_cliente(request):
                 "modelo": modelo_str,
                 "anio": getattr(v, "anio", None),
             })
-            
+
         return JsonResponse({"results": items})
-        
+
     except Exception as e:
         return JsonResponse({"error": "Error obteniendo vehículos", "results": []})
 ```
@@ -159,14 +159,14 @@ async function cargarVehiculosPorCliente(clienteId) {
 
   for (const apiURL of tries) {
     try {
-      const r = await fetch(apiURL, { 
-        headers: {'X-Requested-With':'XMLHttpRequest'}, 
-        credentials: 'same-origin' 
+      const r = await fetch(apiURL, {
+        headers: {'X-Requested-With':'XMLHttpRequest'},
+        credentials: 'same-origin'
       });
       if (!r.ok) continue;
       const data = await r.json();
       const items = Array.isArray(data) ? data : (data.results || []);
-      
+
       if (!items.length) {
         selVeh.innerHTML = '<option value="">-- No vehicles registered --</option>';
         return;
@@ -283,7 +283,7 @@ python manage.py fix_data_consistency --fix
 ## 📊 Beneficios Obtenidos
 
 1. **🔒 Seguridad de Datos**: Validaciones previenen inconsistencias
-2. **⚡ Rendimiento**: Índices optimizan consultas críticas  
+2. **⚡ Rendimiento**: Índices optimizan consultas críticas
 3. **🛡️ Robustez**: Manejo de errores en frontend y backend
 4. **🔧 Mantenibilidad**: Herramientas de diagnóstico automatizadas
 5. **🌍 Multi-tenant**: Soporte completo para múltiples países/empresas

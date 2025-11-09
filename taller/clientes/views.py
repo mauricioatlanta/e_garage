@@ -268,27 +268,26 @@ def agregar_ciudad_usa(request):
         # Verificar que el estado existe
         try:
             from taller.models.ubicacion import Estado
+
             estado = Estado.objects.get(id=estado_id)
         except Estado.DoesNotExist:
             return JsonResponse({"success": False, "error": "State not found"})
 
         # Verificar si la ciudad ya existe en ese estado
         if Ciudad.objects.filter(nombre__iexact=nombre_ciudad, estado=estado).exists():
-            return JsonResponse({"success": False, "error": "City already exists in this state"})
+            return JsonResponse(
+                {"success": False, "error": "City already exists in this state"}
+            )
 
         # Crear la nueva ciudad
-        nueva_ciudad = Ciudad.objects.create(
-            nombre=nombre_ciudad,
-            estado=estado
-        )
+        nueva_ciudad = Ciudad.objects.create(nombre=nombre_ciudad, estado=estado)
 
-        return JsonResponse({
-            "success": True,
-            "ciudad": {
-                "id": nueva_ciudad.id,
-                "nombre": nueva_ciudad.nombre
+        return JsonResponse(
+            {
+                "success": True,
+                "ciudad": {"id": nueva_ciudad.id, "nombre": nueva_ciudad.nombre},
             }
-        })
+        )
 
     except json.JSONDecodeError:
         return JsonResponse({"success": False, "error": "Invalid JSON data"})

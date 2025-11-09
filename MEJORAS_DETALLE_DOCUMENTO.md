@@ -2,8 +2,8 @@
 
 ## 📋 Resumen de Cambios
 
-Archivo: `taller/documentos/models.py`  
-Modelo: `DetalleDocumento`  
+Archivo: `taller/documentos/models.py`
+Modelo: `DetalleDocumento`
 Cambios: **7 mejoras críticas**
 
 ---
@@ -62,8 +62,8 @@ tipo_item = models.CharField(
 **Antes:**
 ```python
 subtotal = models.DecimalField(
-    max_digits=12, 
-    decimal_places=2, 
+    max_digits=12,
+    decimal_places=2,
     blank=True,      # ❌ Permite null
     null=True,       # ❌ Puede ser None
     default=Decimal("0.00")
@@ -133,8 +133,8 @@ subtotal = Decimal("1000000000.00")    # $1.000M CLP ✅ Ahora soportado
 **Antes:**
 ```python
 precio_venta = models.DecimalField(
-    max_digits=10, 
-    decimal_places=2, 
+    max_digits=10,
+    decimal_places=2,
     default=Decimal("0.00")
     # ❌ Sin validación de valores negativos
 )
@@ -196,15 +196,15 @@ def save(self, *args, **kwargs):
 def clean(self):
     """Validaciones de integridad y multi-tenant."""
     super().clean()
-    
+
     # Validar precio positivo
     if self.precio_venta and self.precio_venta < 0:
         raise ValidationError({"precio_venta": "El precio no puede ser negativo"})
-    
+
     # Validar cantidad mínima
     if self.cantidad and self.cantidad < 1:
         raise ValidationError({"cantidad": "La cantidad debe ser al menos 1"})
-    
+
     # Validación multi-tenant (comentado, listo para activar)
     # if self.documento and hasattr(self.documento, "empresa_id"):
     #     if hasattr(self, "empresa_id") and self.empresa_id:
@@ -256,13 +256,13 @@ def get_precio_total(self):
 def get_precio_con_descuento(self, descuento_pct=Decimal("0.00")):
     """
     Calcula precio con descuento.
-    
+
     Args:
         descuento_pct: Porcentaje (0-100)
-    
+
     Returns:
         Decimal: Subtotal con descuento
-    
+
     Example:
         >>> detalle.subtotal = Decimal("100.00")
         >>> detalle.get_precio_con_descuento(Decimal("10.00"))
@@ -281,7 +281,7 @@ total = sum(d.get_precio_total() for d in self.detalles.all())
 
 # Con descuento del 15%
 total_con_descuento = sum(
-    d.get_precio_con_descuento(Decimal("15.00")) 
+    d.get_precio_con_descuento(Decimal("15.00"))
     for d in self.detalles.all()
 )
 ```
@@ -405,12 +405,12 @@ Si tienes datos existentes con `tipo_item` inconsistente:
 
 def normalizar_tipos(apps, schema_editor):
     DetalleDocumento = apps.get_model('documentos', 'DetalleDocumento')
-    
+
     # Normalizar variaciones
     DetalleDocumento.objects.filter(tipo_item__iexact="repuesto").update(tipo_item="REPUESTO")
     DetalleDocumento.objects.filter(tipo_item__iexact="servicio").update(tipo_item="SERVICIO")
     DetalleDocumento.objects.filter(tipo_item__iexact="service").update(tipo_item="SERVICIO")
-    
+
     # Valores no reconocidos → OTRO
     validos = ["REPUESTO", "SERVICIO", "OTRO"]
     DetalleDocumento.objects.exclude(tipo_item__in=validos).update(tipo_item="OTRO")
@@ -475,15 +475,12 @@ form = DetalleDocumentoForm(instance=detalle)
 
 **DetalleDocumento ahora tiene:**
 
-✅ **Validación robusta** - Choices, MinValueValidator, clean()  
-✅ **Cálculos seguros** - Subtotal siempre correcto, no editable  
-✅ **Soporte CLP grande** - Hasta $10.000M por línea  
-✅ **Multi-tenant ready** - Validación preparada (comentada)  
-✅ **Mejor UX** - __str__ descriptivo con formato moneda  
-✅ **Helpers útiles** - get_precio_con_descuento()  
-✅ **Performance** - Índice compuesto  
+✅ **Validación robusta** - Choices, MinValueValidator, clean()
+✅ **Cálculos seguros** - Subtotal siempre correcto, no editable
+✅ **Soporte CLP grande** - Hasta $10.000M por línea
+✅ **Multi-tenant ready** - Validación preparada (comentada)
+✅ **Mejor UX** - __str__ descriptivo con formato moneda
+✅ **Helpers útiles** - get_precio_con_descuento()
+✅ **Performance** - Índice compuesto
 
 **Listo para producción** 🚀
-
-
-

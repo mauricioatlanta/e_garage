@@ -388,11 +388,25 @@ USA ENGLISH<br>TEMPLATE<br>LOADED ✅
         <!-- United States -->
         <div class="field-container">
           <label class="cyber-label" for="id_estado_usa">State:</label>
-          {{ form.estado_usa|add_class:'cyber-input' }}
+          <div class="flex gap-2">
+            {{ form.estado_usa|add_class:'cyber-input' }}
+            <button type="button" onclick="mostrarModalEstado()"
+                    class="px-4 py-2 bg-gradient-to-r from-green-600/30 to-emerald-600/30 border border-green-400/50 text-green-300 rounded-lg hover:from-green-500/40 hover:to-emerald-500/40 transition-all whitespace-nowrap"
+                    title="Add new state">
+              ➕ Add
+            </button>
+          </div>
         </div>
         <div class="field-container">
           <label class="cyber-label" for="id_ciudad_usa">City:</label>
-          {{ form.ciudad_usa|add_class:'cyber-input' }}
+          <div class="flex gap-2">
+            {{ form.ciudad_usa|add_class:'cyber-input' }}
+            <button type="button" onclick="mostrarModalCiudad()"
+                    class="px-4 py-2 bg-gradient-to-r from-blue-600/30 to-cyan-600/30 border border-blue-400/50 text-blue-300 rounded-lg hover:from-blue-500/40 hover:to-cyan-500/40 transition-all whitespace-nowrap"
+                    title="Add new city">
+              ➕ Add
+            </button>
+          </div>
         </div>
         <div class="field-container">
           <label class="cyber-label" for="id_zipcode">Zip Code:</label>
@@ -493,6 +507,110 @@ function createParticles() {
     particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
     particlesContainer.appendChild(particle);
   }
+}
+
+// Funciones para modales de Estado y Ciudad
+function mostrarModalEstado() {
+  const nombre = prompt('Enter the State name (e.g., California):');
+  const codigo = prompt('Enter the State code (e.g., CA):');
+
+  if (!nombre || !codigo) {
+    alert('❌ State name and code are required');
+    return;
+  }
+
+  // Obtener CSRF token
+  const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+  // Crear FormData
+  const formData = new FormData();
+  formData.append('nombre', nombre);
+  formData.append('codigo', codigo.toUpperCase());
+
+  // Enviar petición AJAX
+  fetch('{% country_url "clientes:ajax_crear_estado_usa" %}', {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': csrftoken
+    },
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      alert('✅ ' + data.message);
+
+      // Agregar el nuevo estado al select
+      const estadoSelect = document.getElementById('id_estado_usa');
+      const option = document.createElement('option');
+      option.value = data.estado.id;
+      option.textContent = `${data.estado.nombre} (${data.estado.codigo})`;
+      option.selected = true;
+      estadoSelect.appendChild(option);
+
+      // Trigger change event para cargar ciudades
+      estadoSelect.dispatchEvent(new Event('change'));
+    } else {
+      alert('❌ Error: ' + data.error);
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('❌ Error creating state');
+  });
+}
+
+function mostrarModalCiudad() {
+  const estadoSelect = document.getElementById('id_estado_usa');
+
+  if (!estadoSelect.value) {
+    alert('⚠️ Please select a State first');
+    return;
+  }
+
+  const nombre = prompt('Enter the City name:');
+
+  if (!nombre) {
+    alert('❌ City name is required');
+    return;
+  }
+
+  // Obtener CSRF token
+  const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+  // Crear FormData
+  const formData = new FormData();
+  formData.append('nombre', nombre);
+  formData.append('estado_id', estadoSelect.value);
+
+  // Enviar petición AJAX
+  fetch('{% country_url "clientes:ajax_crear_ciudad_usa" %}', {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': csrftoken
+    },
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      alert('✅ ' + data.message);
+
+      // Agregar la nueva ciudad al select
+      const ciudadUsaSelect = document.getElementById('id_ciudad_usa');
+      const option = document.createElement('option');
+      option.value = data.ciudad.id;
+      option.textContent = data.ciudad.nombre;
+      option.selected = true;
+      ciudadUsaSelect.appendChild(option);
+    } else {
+      alert('❌ Error: ' + data.error);
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('❌ Error creating city');
+  });
 }
 </script>
 {% endblock %}

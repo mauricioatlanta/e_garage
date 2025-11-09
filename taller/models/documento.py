@@ -1,4 +1,4 @@
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import ROUND_HALF_UP, Decimal
 
 from django.core.exceptions import ValidationError
 from django.db import models, transaction
@@ -10,6 +10,7 @@ from django.utils.translation import gettext_lazy as _  # 👈 Para traducciones
 from taller.models.clientes import Cliente
 from taller.models.mixins import AuditMixin
 from taller.models.vehiculos import Vehiculo
+
 from .utils_monedas import money_quantize
 
 
@@ -81,17 +82,17 @@ class Documento(AuditMixin, models.Model):
     total = models.DecimalField(
         max_digits=14, decimal_places=2, default=Decimal("0.00")
     )
-    
+
     # Campos de totales con nombres estándar para compatibilidad con frontend
     total_repuestos = models.DecimalField(max_digits=14, decimal_places=2, default=0)
     total_servicios = models.DecimalField(max_digits=14, decimal_places=2, default=0)
     total_otros = models.DecimalField(max_digits=14, decimal_places=2, default=0)
     iva = models.DecimalField(max_digits=14, decimal_places=2, default=0)
     total_general = models.DecimalField(max_digits=14, decimal_places=2, default=0)
-    
+
     # Opcional: estado de pago
-    payment_status = models.CharField(max_length=20, blank=True, default='pending')
-    
+    payment_status = models.CharField(max_length=20, blank=True, default="pending")
+
     created_at = models.DateTimeField(default=timezone.now)
 
     # Campos nuevos para tracking de pagos y observaciones
@@ -133,29 +134,31 @@ class Documento(AuditMixin, models.Model):
         ],
         blank=True,
         null=True,
-        help_text=_("Método de pago utilizado")
+        help_text=_("Método de pago utilizado"),
     )
     ult4 = models.CharField(
         max_length=4,
         blank=True,
         null=True,
-        help_text=_("Últimos 4 dígitos de tarjeta (si aplica)")
+        help_text=_("Últimos 4 dígitos de tarjeta (si aplica)"),
     )
     monto_pagado = models.DecimalField(
-        max_digits=14, decimal_places=2, default=Decimal("0.00"),
-        help_text=_("Monto efectivamente pagado")
+        max_digits=14,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        help_text=_("Monto efectivamente pagado"),
     )
     saldo_pendiente = models.DecimalField(
-        max_digits=14, decimal_places=2, default=Decimal("0.00"),
-        help_text=_("Saldo pendiente de pago")
+        max_digits=14,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        help_text=_("Saldo pendiente de pago"),
     )
     fecha_pago = models.DateTimeField(
-        blank=True, null=True,
-        help_text=_("Fecha y hora del pago")
+        blank=True, null=True, help_text=_("Fecha y hora del pago")
     )
     nota_pago = models.TextField(
-        blank=True, null=True,
-        help_text=_("Notas adicionales sobre el pago")
+        blank=True, null=True, help_text=_("Notas adicionales sobre el pago")
     )
 
     # --------- Helpers internos ---------
@@ -196,16 +199,17 @@ class Documento(AuditMixin, models.Model):
                 return Decimal(str(self.tax_rate_applied))
             except Exception:
                 pass
-        
+
         # Intentar obtener tasa de ConfiguracionEmpresa
         try:
             from taller.models.empresa import ConfiguracionEmpresa
+
             config = ConfiguracionEmpresa.objects.filter(empresa=self.empresa).first()
-            if config and hasattr(config, 'tasa_iva') and config.tasa_iva is not None:
+            if config and hasattr(config, "tasa_iva") and config.tasa_iva is not None:
                 return Decimal(str(config.tasa_iva))
         except (ImportError, AttributeError, Exception):
             pass
-        
+
         # Valores por defecto por país
         try:
             pais = (self.empresa.pais or "CL").upper()
@@ -218,7 +222,7 @@ class Documento(AuditMixin, models.Model):
         qs = getattr(self, "lineas_repuesto", None)
         if not qs:
             return Decimal("0")
-        
+
         # Calcular subtotal con descuento en porcentaje
         expr = ExpressionWrapper(
             F("cantidad") * F("precio_unitario") * (1 - F("descuento") / 100),
@@ -232,7 +236,7 @@ class Documento(AuditMixin, models.Model):
         qs = getattr(self, "lineas_servicio", None)
         if not qs:
             return Decimal("0")
-        
+
         # Calcular subtotal con descuento en porcentaje
         expr = ExpressionWrapper(
             F("cantidad") * F("precio_unitario") * (1 - F("descuento") / 100),
@@ -246,7 +250,7 @@ class Documento(AuditMixin, models.Model):
         qs = getattr(self, "lineas_otro_servicio", None)
         if not qs:
             return Decimal("0")
-        
+
         # precio_cliente puede ser null → coalesce 0
         expr = ExpressionWrapper(
             F("cantidad") * F("precio_cliente"),
@@ -291,7 +295,7 @@ class Documento(AuditMixin, models.Model):
             else:
                 tax_base = Decimal("0")  # Sin impuesto
 
-        tax_amount = (tax_base * rate / Decimal("100.0"))
+        tax_amount = tax_base * rate / Decimal("100.0")
         tax_amount = self._q(tax_amount)
 
         subtotal_general = rep + srv + osrv
@@ -307,10 +311,16 @@ class Documento(AuditMixin, models.Model):
         self.total = total
 
         if persist:
-            self.save(update_fields=[
-                "neto_repuestos", "neto_servicios", "neto_otros_servicios",
-                "tax_rate_applied", "tax_amount", "total"
-            ])
+            self.save(
+                update_fields=[
+                    "neto_repuestos",
+                    "neto_servicios",
+                    "neto_otros_servicios",
+                    "tax_rate_applied",
+                    "tax_amount",
+                    "total",
+                ]
+            )
 
     def clean(self):
         super().clean()
@@ -319,28 +329,52 @@ class Documento(AuditMixin, models.Model):
         # Técnico pertenece a la empresa
         tecnico = getattr(self, "tecnico_responsable", None)
         if tecnico and empresa_id and tecnico.empresa_id != empresa_id:
-            raise ValidationError("El técnico responsable debe pertenecer a la misma empresa del documento.")
+            raise ValidationError(
+                "El técnico responsable debe pertenecer a la misma empresa del documento."
+            )
 
         # Millas solo en USA
         if self.millas is not None and self.country != "US":
-            raise ValidationError("El campo millas solo puede usarse en documentos de USA")
+            raise ValidationError(
+                "El campo millas solo puede usarse en documentos de USA"
+            )
 
         # ✔ Consistencias críticas Cliente/Vehículo/Empresa
         if self.vehiculo_id:
             if not self.cliente_id:
-                raise ValidationError("Debe seleccionar un cliente antes de asignar un vehículo.")
+                raise ValidationError(
+                    "Debe seleccionar un cliente antes de asignar un vehículo."
+                )
 
             # El vehículo debe pertenecer a la misma empresa del documento
-            if hasattr(self.vehiculo, "empresa_id") and empresa_id and self.vehiculo.empresa_id != empresa_id:
-                raise ValidationError("El vehículo seleccionado no pertenece a la empresa del documento.")
+            if (
+                hasattr(self.vehiculo, "empresa_id")
+                and empresa_id
+                and self.vehiculo.empresa_id != empresa_id
+            ):
+                raise ValidationError(
+                    "El vehículo seleccionado no pertenece a la empresa del documento."
+                )
 
             # El vehículo debe pertenecer al cliente del documento
-            if hasattr(self.vehiculo, "cliente_id") and self.vehiculo.cliente_id != self.cliente_id:
-                raise ValidationError("El vehículo seleccionado no pertenece al cliente del documento.")
+            if (
+                hasattr(self.vehiculo, "cliente_id")
+                and self.vehiculo.cliente_id != self.cliente_id
+            ):
+                raise ValidationError(
+                    "El vehículo seleccionado no pertenece al cliente del documento."
+                )
 
         # Validar que cliente pertenece a la empresa del documento
-        if self.cliente_id and empresa_id and hasattr(self.cliente, "empresa_id") and self.cliente.empresa_id != empresa_id:
-            raise ValidationError("El cliente seleccionado no pertenece a la empresa del documento.")
+        if (
+            self.cliente_id
+            and empresa_id
+            and hasattr(self.cliente, "empresa_id")
+            and self.cliente.empresa_id != empresa_id
+        ):
+            raise ValidationError(
+                "El cliente seleccionado no pertenece a la empresa del documento."
+            )
 
         # Recalcular en validación (para vistas admin/FBV/CBV)
         # Nota: en creación con formsets, las líneas aún no existen → quedará 0
@@ -420,17 +454,17 @@ class Documento(AuditMixin, models.Model):
             self.country = self.empresa.pais
 
         # Inicializar campos de totales si no tienen valor
-        if not hasattr(self, 'total_repuestos') or self.total_repuestos is None:
+        if not hasattr(self, "total_repuestos") or self.total_repuestos is None:
             self.total_repuestos = Decimal("0")
-        if not hasattr(self, 'total_servicios') or self.total_servicios is None:
+        if not hasattr(self, "total_servicios") or self.total_servicios is None:
             self.total_servicios = Decimal("0")
-        if not hasattr(self, 'total_otros') or self.total_otros is None:
+        if not hasattr(self, "total_otros") or self.total_otros is None:
             self.total_otros = Decimal("0")
-        if not hasattr(self, 'iva') or self.iva is None:
+        if not hasattr(self, "iva") or self.iva is None:
             self.iva = Decimal("0")
-        if not hasattr(self, 'total_general') or self.total_general is None:
+        if not hasattr(self, "total_general") or self.total_general is None:
             self.total_general = Decimal("0")
-        if not hasattr(self, 'payment_status') or not self.payment_status:
+        if not hasattr(self, "payment_status") or not self.payment_status:
             self.payment_status = "pending"
 
         if not self.numero:
@@ -442,7 +476,7 @@ class Documento(AuditMixin, models.Model):
 
         # Solo recalcular si no estamos ya en una actualización de campos específicos
         # y si no estamos en una operación de bulk
-        if 'update_fields' not in kwargs and not kwargs.get('bulk_create', False):
+        if "update_fields" not in kwargs and not kwargs.get("bulk_create", False):
             # Tras guardar, ya existen líneas (si se guardaron antes),
             # así que recalculamos y persistimos.
             # Evita loop infinito: no llames self.save() completo; solo update_fields.
@@ -503,9 +537,15 @@ class Documento(AuditMixin, models.Model):
             output_field=DecimalField(max_digits=14, decimal_places=2),
         )
 
-        rep = self.lineas_repuesto.aggregate(total=Coalesce(Sum(rep_expr), Value(0)))["total"]
-        srv = self.lineas_servicio.aggregate(total=Coalesce(Sum(serv_expr), Value(0)))["total"]
-        otr = self.lineas_otro_servicio.aggregate(total=Coalesce(Sum(otros_expr), Value(0)))["total"]
+        rep = self.lineas_repuesto.aggregate(total=Coalesce(Sum(rep_expr), Value(0)))[
+            "total"
+        ]
+        srv = self.lineas_servicio.aggregate(total=Coalesce(Sum(serv_expr), Value(0)))[
+            "total"
+        ]
+        otr = self.lineas_otro_servicio.aggregate(
+            total=Coalesce(Sum(otros_expr), Value(0))
+        )["total"]
 
         rep = Decimal(rep or 0)
         srv = Decimal(srv or 0)
@@ -524,7 +564,15 @@ class Documento(AuditMixin, models.Model):
         self.total_general = money_quantize(total, pais)
 
         if save:
-            self.save(update_fields=["total_repuestos", "total_servicios", "total_otros", "iva", "total_general"])
+            self.save(
+                update_fields=[
+                    "total_repuestos",
+                    "total_servicios",
+                    "total_otros",
+                    "iva",
+                    "total_general",
+                ]
+            )
 
         return {
             "repuestos": self.total_repuestos,
@@ -533,14 +581,14 @@ class Documento(AuditMixin, models.Model):
             "iva": self.iva,
             "total": self.total_general,
         }
-    
+
     @classmethod
     def recalcular_totales_bulk(cls, documento_ids):
         """
         Recalcula totales para múltiples documentos de forma eficiente.
         Útil para operaciones en lote o tareas asíncronas.
         """
-        documentos = cls.objects.filter(id__in=documento_ids).select_related('empresa')
+        documentos = cls.objects.filter(id__in=documento_ids).select_related("empresa")
         for doc in documentos:
             doc.recompute_totals(persist=True)
         return len(documentos)

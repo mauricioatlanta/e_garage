@@ -29,23 +29,23 @@ class Pais(models.TextChoices):
 class PrecioSuscripcionQuerySet(models.QuerySet):
     def activos(self):
         return self.filter(activo=True)
-    
+
     def para_pais(self, pais: str):
         return self.filter(pais=pais)
-    
+
     def vigente(self, pais: str, tipo_plan: str):
         return self.activos().filter(pais=pais, tipo_plan=tipo_plan).first()
 
 class PrecioSuscripcionManager(models.Manager):
     def get_queryset(self):
         return PrecioSuscripcionQuerySet(model=self.model, using=self._db, hints=None)
-    
+
     def activos(self):
         return self.get_queryset().activos()
-    
+
     def para_pais(self, pais: str):
         return self.get_queryset().para_pais(pais)
-    
+
     def vigente(self, pais: str, tipo_plan: str):
         return self.get_queryset().vigente(pais, tipo_plan)
 ```
@@ -166,7 +166,7 @@ Se actualizó el admin de Django para aprovechar las nuevas funcionalidades:
 class PrecioSuscripcionAdmin(admin.ModelAdmin):
     list_display = (
         "nombre_plan",
-        "tipo_plan", 
+        "tipo_plan",
         "pais_display",
         "precio_formateado",
         "activo",
@@ -189,7 +189,7 @@ class PrecioSuscripcionAdmin(admin.ModelAdmin):
 ```python
 # Consulta compleja y propensa a errores
 precios = PrecioSuscripcion.objects.filter(
-    pais="CL", 
+    pais="CL",
     activo=True
 ).order_by("precio")
 

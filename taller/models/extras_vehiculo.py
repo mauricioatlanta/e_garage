@@ -1,10 +1,9 @@
-from django.db import models
 from django.core.validators import RegexValidator
+from django.db import models
 from django.db.models.functions import Lower
 
 # from taller.models.empresa import Empresa  # Descomenta cuando migres a multi-tenant completo
 from .modelo import Modelo
-
 
 hex_validator = RegexValidator(
     regex=r"^#(?:[0-9a-fA-F]{3}){1,2}$",
@@ -17,8 +16,9 @@ class ColorVehiculo(models.Model):
     Colores de vehículos con scoping por país (y opcionalmente por empresa).
     Permite tener "Blanco" en CL y "White" en US sin colisiones.
     """
+
     # empresa = models.ForeignKey(
-    #     Empresa, null=True, blank=True, on_delete=models.CASCADE, 
+    #     Empresa, null=True, blank=True, on_delete=models.CASCADE,
     #     related_name="colores", db_index=True
     # )
     country = models.CharField(
@@ -44,7 +44,8 @@ class ColorVehiculo(models.Model):
         constraints = [
             # Unicidad por país + nombre case-insensitive
             models.UniqueConstraint(
-                Lower("nombre"), "country",
+                Lower("nombre"),
+                "country",
                 name="uniq_color_country_lowernombre",
             ),
             # Para multi-tenant estricto (empresa), reemplaza el constraint de arriba con:
@@ -77,15 +78,35 @@ class ColorVehiculo(models.Model):
         """
         seed = {
             "CL": [
-                "Blanco", "Negro", "Rojo", "Azul", "Verde", "Amarillo",
-                "Gris", "Plateado", "Dorado", "Café", "Morado", "Naranja"
+                "Blanco",
+                "Negro",
+                "Rojo",
+                "Azul",
+                "Verde",
+                "Amarillo",
+                "Gris",
+                "Plateado",
+                "Dorado",
+                "Café",
+                "Morado",
+                "Naranja",
             ],
             "US": [
-                "White", "Black", "Red", "Blue", "Green", "Yellow",
-                "Gray", "Silver", "Gold", "Brown", "Purple", "Orange"
+                "White",
+                "Black",
+                "Red",
+                "Blue",
+                "Green",
+                "Yellow",
+                "Gray",
+                "Silver",
+                "Gold",
+                "Brown",
+                "Purple",
+                "Orange",
             ],
         }.get(country, [])
-        
+
         created = []
         for nombre in seed:
             kwargs = {"nombre": nombre, "country": country}
@@ -111,6 +132,7 @@ class MotorVehiculo(models.Model):
     Motores de vehículos con scoping por país (y opcionalmente por empresa).
     Asociados a modelos via M2M.
     """
+
     # empresa = models.ForeignKey(
     #     Empresa, null=True, blank=True, on_delete=models.CASCADE,
     #     related_name="motores", db_index=True
@@ -132,7 +154,8 @@ class MotorVehiculo(models.Model):
         constraints = [
             # Evita duplicar motores por país (case-insensitive)
             models.UniqueConstraint(
-                Lower("nombre"), "country",
+                Lower("nombre"),
+                "country",
                 name="uniq_motor_country_lowernombre",
             ),
             # Para multi-tenant estricto (empresa):
@@ -162,6 +185,7 @@ class CajaVehiculo(models.Model):
     Cajas de transmisión de vehículos con scoping por país (y opcionalmente por empresa).
     Asociadas a modelos via M2M.
     """
+
     # empresa = models.ForeignKey(
     #     Empresa, null=True, blank=True, on_delete=models.CASCADE,
     #     related_name="cajas", db_index=True
@@ -183,7 +207,8 @@ class CajaVehiculo(models.Model):
         constraints = [
             # Evita duplicar cajas por país (case-insensitive)
             models.UniqueConstraint(
-                Lower("nombre"), "country",
+                Lower("nombre"),
+                "country",
                 name="uniq_caja_country_lowernombre",
             ),
             # Para multi-tenant estricto (empresa):

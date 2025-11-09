@@ -139,7 +139,7 @@ input[type="text"]::placeholder {
   <!-- CRUZ ROJA DE DEPURACIÓN -->
   <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; font-size: 100px; color: red; text-shadow: 0 0 20px red;">❌</div>
   {% endif %}
-  
+
   <!-- Grid de mosaicos futuristas -->
   <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3" id="grid-vehiculos">
     {% for vehiculo in vehiculos %}
@@ -148,10 +148,10 @@ input[type="text"]::placeholder {
       {% url 'taller:vehiculos:editar_vehiculo' vehiculo.id as url_editar_vehiculo %}
       {% url 'taller:vehiculos:eliminar_vehiculo' vehiculo.id as url_eliminar_vehiculo %}
 
-    <div class="vehiculo-card translucent-card hover:scale-105 transition-transform duration-300 cursor-pointer" 
-         data-patente="{{ vehiculo.patente|lower }}" 
-         data-marca="{{ vehiculo.marca|sin_pais|lower }}" 
-         data-modelo="{{ vehiculo.modelo|lower }}" 
+    <div class="vehiculo-card translucent-card hover:scale-105 transition-transform duration-300 cursor-pointer"
+         data-patente="{{ vehiculo.patente|lower }}"
+         data-marca="{{ vehiculo.marca|sin_pais|lower }}"
+         data-modelo="{{ vehiculo.modelo|lower }}"
          data-cliente="{{ vehiculo.cliente.nombre|lower }} {{ vehiculo.cliente.apellido|lower }}"
          onclick="window.location.href='{{ url_ver_vehiculo }}'">
       <div class="text-center">
@@ -161,17 +161,17 @@ input[type="text"]::placeholder {
         <div class="text-xs text-yellow-400 mb-2">{{ vehiculo.anio }}</div>
         <div class="text-xs text-gray-400 mb-2">{{ vehiculo.cliente.nombre }} {{ vehiculo.cliente.apellido }}</div>
         <div class="flex justify-center space-x-1" onclick="event.stopPropagation();">
-          <a class="text-blue-400 hover:text-blue-300 text-xs" 
-             href="{{ url_ver_vehiculo }}" 
-             title="Ver vehículo" 
+          <a class="text-blue-400 hover:text-blue-300 text-xs"
+             href="{{ url_ver_vehiculo }}"
+             title="Ver vehículo"
              aria-label="Ver vehículo {{ vehiculo.patente }}">👁️</a>
-          <a class="text-yellow-400 hover:text-yellow-300 text-xs" 
-             href="{{ url_editar_vehiculo }}" 
-             title="Editar vehículo" 
+          <a class="text-yellow-400 hover:text-yellow-300 text-xs"
+             href="{{ url_editar_vehiculo }}"
+             title="Editar vehículo"
              aria-label="Editar vehículo {{ vehiculo.patente }}">✏️</a>
-          <a class="text-red-400 hover:text-red-300 text-xs" 
-             href="{{ url_eliminar_vehiculo }}" 
-             title="Eliminar vehículo" 
+          <a class="text-red-400 hover:text-red-300 text-xs"
+             href="{{ url_eliminar_vehiculo }}"
+             title="Eliminar vehículo"
              aria-label="Eliminar vehículo {{ vehiculo.patente }}">🗑️</a>
         </div>
       </div>
@@ -204,9 +204,9 @@ input[type="text"]::placeholder {
         const marca = tarjeta.dataset.marca || '';
         const modelo = tarjeta.dataset.modelo || '';
         const cliente = tarjeta.dataset.cliente || '';
-        
+
         const textoCompleto = `${patente} ${marca} ${modelo} ${cliente}`;
-        
+
         tarjeta.style.display = textoCompleto.includes(filtro) ? 'flex' : 'none';
       });
     };

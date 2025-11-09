@@ -50,7 +50,7 @@ class VehiculoFormSimple(forms.ModelForm):
             # Motor y caja empiezan vacíos - se llenan solo si hay modelo seleccionado
             self.fields["motor"].queryset = MotorVehiculo.objects.none()
             self.fields["caja"].queryset = CajaVehiculo.objects.none()
-            
+
             # Hacer cliente y patente opcionales
             self.fields["cliente"].required = False
             self.fields["patente"].required = False
@@ -61,7 +61,7 @@ class VehiculoFormSimple(forms.ModelForm):
             self.fields["modelo"].queryset = Modelo.objects.none()
             self.fields["motor"].queryset = MotorVehiculo.objects.none()
             self.fields["caja"].queryset = CajaVehiculo.objects.none()
-            
+
             # Hacer cliente y patente opcionales
             self.fields["cliente"].required = False
             self.fields["patente"].required = False

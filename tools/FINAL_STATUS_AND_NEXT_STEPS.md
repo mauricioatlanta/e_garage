@@ -149,8 +149,8 @@ Una vez resuelto el problema de restricción NOT NULL:
 
 ---
 
-**Fecha**: 2025-10-06  
-**Versión**: 1.0  
-**Estado**: ✅ **IMPLEMENTACIÓN 95% COMPLETA**  
-**Pendiente**: ⚠️ **Resolver restricción NOT NULL**  
+**Fecha**: 2025-10-06
+**Versión**: 1.0
+**Estado**: ✅ **IMPLEMENTACIÓN 95% COMPLETA**
+**Pendiente**: ⚠️ **Resolver restricción NOT NULL**
 **Tiempo estimado**: 5-10 minutos para completar

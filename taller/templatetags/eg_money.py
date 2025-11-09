@@ -1,14 +1,16 @@
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import ROUND_HALF_UP, Decimal
+
 from django import template
 
 register = template.Library()
+
 
 def _fmt_currency(amount: Decimal, code: str, decs: int):
     if amount is None:
         amount = Decimal("0")
     if not isinstance(amount, Decimal):
         amount = Decimal(str(amount))
-    q = Decimal("1") if decs == 0 else Decimal("0." + "0"*(decs-1) + "1")
+    q = Decimal("1") if decs == 0 else Decimal("0." + "0" * (decs - 1) + "1")
     amount = amount.quantize(q, rounding=ROUND_HALF_UP)
     # Separadores: miles con punto y decimales con coma (CL) / punto (US)
     s = f"{amount:,.{decs}f}"
@@ -18,6 +20,7 @@ def _fmt_currency(amount: Decimal, code: str, decs: int):
         if decs == 0:
             s = s.split(",")[0]
     return s
+
 
 @register.filter
 def money_fmt(value, moneda_dict):
@@ -37,6 +40,7 @@ def money_fmt(value, moneda_dict):
         prefix = "CLP$" if decs > 0 else "$"
     return f"{prefix}{num}"
 
+
 def _num_to_words_es(amount: Decimal, code: str):
     try:
         from num2words import num2words  # opcional si lo tienes en requirements
@@ -50,6 +54,7 @@ def _num_to_words_es(amount: Decimal, code: str):
         return f"{num2words(entero, lang='es')} {moneda} con {num2words(cent, lang='es')} centavos"
     return f"{num2words(entero, lang='es')} {moneda}"
 
+
 def _num_to_words_en(amount: Decimal, code: str):
     try:
         from num2words import num2words
@@ -61,6 +66,7 @@ def _num_to_words_en(amount: Decimal, code: str):
     if cent > 0:
         return f"{num2words(entero, lang='en')} {currency} and {num2words(cent, lang='en')} cents"
     return f"{num2words(entero, lang='en')} {currency}"
+
 
 @register.filter
 def money_words(value, moneda_dict):
@@ -74,7 +80,7 @@ def money_words(value, moneda_dict):
         value = Decimal("0")
     if not isinstance(value, Decimal):
         value = Decimal(str(value))
-    q = Decimal("1") if decs == 0 else Decimal("0." + "0"*(decs-1) + "1")
+    q = Decimal("1") if decs == 0 else Decimal("0." + "0" * (decs - 1) + "1")
     amount = value.quantize(q, rounding=ROUND_HALF_UP)
 
     if code == "USD":

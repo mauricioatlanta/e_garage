@@ -30,7 +30,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: 
+    background-image:
         linear-gradient(rgba(34, 211, 238, 0.03) 1px, transparent 1px),
         linear-gradient(90deg, rgba(34, 211, 238, 0.03) 1px, transparent 1px);
     background-size: 50px 50px;
@@ -332,7 +332,7 @@ body {
     .glass-card {
         padding: 32px 24px;
     }
-    
+
     .pricing-grid {
         grid-template-columns: 1fr;
     }
@@ -353,9 +353,9 @@ body {
             <div class="brand-name">eGarage</div>
             <div class="subtitle">{% trans "Professional Automotive Management" %}</div>
         </div>
-        
+
         <h2 class="signup-title">{% trans "Create Your Account" %}</h2>
-        
+
         <!-- Mensajes -->
         {% if messages %}
         <div class="messages">
@@ -364,14 +364,14 @@ body {
             {% endfor %}
         </div>
         {% endif %}
-        
+
         <form method="POST" id="signup-form">
             {% csrf_token %}
-            
+
             <!-- SECCIÓN 1: Datos Personales -->
             <div class="form-section">
                 <h3 class="section-title">{% trans "Personal Information" %}</h3>
-                
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="form-group">
                         <label class="form-label">{% trans "First Name" %}</label>
@@ -380,7 +380,7 @@ body {
                         <div class="error-message">{{ form.nombre.errors }}</div>
                         {% endif %}
                     </div>
-                    
+
                     <div class="form-group">
                         <label class="form-label">{% trans "Last Name" %}</label>
                         {{ form.apellido }}
@@ -389,7 +389,7 @@ body {
                         {% endif %}
                     </div>
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">{% trans "Email" %}</label>
                     {{ form.email }}
@@ -398,11 +398,11 @@ body {
                     {% endif %}
                 </div>
             </div>
-            
+
             <!-- SECCIÓN 2: Datos de la Empresa -->
             <div class="form-section">
                 <h3 class="section-title">{% trans "Business Information" %}</h3>
-                
+
                 <div class="form-group">
                     <label class="form-label">{% trans "Company Name" %}</label>
                     {{ form.nombre_taller }}
@@ -411,7 +411,7 @@ body {
                     <div class="error-message">{{ form.nombre_taller.errors }}</div>
                     {% endif %}
                 </div>
-                
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="form-group">
                         <label class="form-label">{% trans "Phone" %}</label>
@@ -420,7 +420,7 @@ body {
                         <div class="error-message">{{ form.telefono.errors }}</div>
                         {% endif %}
                     </div>
-                    
+
                     <div class="form-group">
                         <label class="form-label">{% trans "Country" %}</label>
                         {{ form.pais }}
@@ -430,18 +430,18 @@ body {
                     </div>
                 </div>
             </div>
-            
+
             <!-- SECCIÓN 3: Selección de Plan -->
             <div class="form-section">
                 <h3 class="section-title">{% trans "Select Your Plan" %}</h3>
-                
+
                 <div class="form-group">
                     {{ form.plan }}
                     {% if form.plan.errors %}
                     <div class="error-message">{{ form.plan.errors }}</div>
                     {% endif %}
                 </div>
-                
+
                 <!-- Pricing Cards -->
                 <div class="pricing-grid">
                     <!-- Trial -->
@@ -456,12 +456,12 @@ body {
                             <li>{% trans "Cancel anytime" %}</li>
                         </ul>
                     </div>
-                    
+
                     <!-- Mensual -->
                     <div class="plan-card" data-plan="mensual" onclick="selectPlan('mensual')">
                         <div class="plan-name">{% trans "Monthly" %}</div>
                         <div class="plan-price">
-                            <span class="price-cl">$10.000</span>
+                            <span class="price-cl">$20.000</span>
                             <span class="price-us" style="display:none;">$20</span>
                         </div>
                         <div class="plan-period">
@@ -473,32 +473,32 @@ body {
                             <li>{% trans "All features" %}</li>
                         </ul>
                     </div>
-                    
+
                     <!-- Semestral -->
                     <div class="plan-card recommended" data-plan="semestral" onclick="selectPlan('semestral')">
                         <div class="plan-badge gold">⭐ {% trans "BEST VALUE" %}</div>
                         <div class="plan-name">{% trans "Semi-Annual" %}</div>
                         <div class="plan-price">
-                            <span class="price-cl">$55.000</span>
+                            <span class="price-cl">$100.000</span>
                             <span class="price-us" style="display:none;">$110</span>
                         </div>
                         <div class="plan-period">
                             <span class="period-cl">/ 6 meses</span>
                             <span class="period-us" style="display:none;">/ 6 months</span>
                         </div>
-                        <div class="plan-savings">{% trans "Save" %} 8%</div>
+                        <div class="plan-savings">{% trans "Save" %} 17%</div>
                         <ul class="plan-features">
                             <li>{% trans "Everything in Monthly" %}</li>
                             <li>{% trans "Priority support" %}</li>
                         </ul>
                     </div>
-                    
+
                     <!-- Anual -->
                     <div class="plan-card" data-plan="anual" onclick="selectPlan('anual')">
                         <div class="plan-badge gold">💎 {% trans "BEST PRICE" %}</div>
                         <div class="plan-name">{% trans "Annual" %}</div>
                         <div class="plan-price">
-                            <span class="price-cl">$100.000</span>
+                            <span class="price-cl">$200.000</span>
                             <span class="price-us" style="display:none;">$200</span>
                         </div>
                         <div class="plan-period">
@@ -513,11 +513,11 @@ body {
                     </div>
                 </div>
             </div>
-            
+
             <!-- SECCIÓN 4: Contraseña -->
             <div class="form-section">
                 <h3 class="section-title">{% trans "Security" %}</h3>
-                
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="form-group">
                         <label class="form-label">{% trans "Password" %}</label>
@@ -527,7 +527,7 @@ body {
                         <div class="error-message">{{ form.password1.errors }}</div>
                         {% endif %}
                     </div>
-                    
+
                     <div class="form-group">
                         <label class="form-label">{% trans "Confirm Password" %}</label>
                         {{ form.password2 }}
@@ -537,7 +537,7 @@ body {
                     </div>
                 </div>
             </div>
-            
+
             <!-- Términos -->
             <div class="checkbox-container">
                 {{ form.acepta_terminos }}
@@ -548,18 +548,18 @@ body {
             {% if form.acepta_terminos.errors %}
             <div class="error-message">{{ form.acepta_terminos.errors }}</div>
             {% endif %}
-            
+
             <!-- Errores generales -->
             {% if form.non_field_errors %}
             <div class="error-message">{{ form.non_field_errors }}</div>
             {% endif %}
-            
+
             <!-- Botón Submit -->
             <button type="submit" class="signup-button">
                 {% trans "CREATE ACCOUNT" %}
             </button>
         </form>
-        
+
         <!-- Link a Login -->
         <div class="login-link">
             <span class="login-text">{% trans "Already have an account?" %}</span>
@@ -594,11 +594,11 @@ document.addEventListener('DOMContentLoaded', function() {
 function updatePlanPrices(country) {
     const showCL = country === 'CL';
     const showUS = country === 'US';
-    
+
     document.querySelectorAll('.price-cl, .period-cl').forEach(el => {
         el.style.display = showCL ? 'inline' : 'none';
     });
-    
+
     document.querySelectorAll('.price-us, .period-us').forEach(el => {
         el.style.display = showUS ? 'inline' : 'none';
     });
@@ -608,12 +608,12 @@ function updatePlanPrices(country) {
 function selectPlan(planName) {
     // Actualizar select
     document.getElementById('id_plan').value = planName;
-    
+
     // Visual feedback
     document.querySelectorAll('.plan-card').forEach(card => {
         card.classList.remove('selected');
     });
-    
+
     const selected = document.querySelector(`[data-plan="${planName}"]`);
     if (selected) {
         selected.classList.add('selected');
@@ -639,4 +639,3 @@ window.addEventListener('load', function() {
 });
 </script>
 {% endblock %}
-

@@ -99,6 +99,6 @@ El cambio está listo y funcionando. Los usuarios ahora verán el nombre complet
 
 ---
 
-**Fecha**: 2025-10-06  
-**Estado**: ✅ **COMPLETADO**  
+**Fecha**: 2025-10-06
+**Estado**: ✅ **COMPLETADO**
 **Impacto**: Mejora en la identificación de clientes en listas de documentos

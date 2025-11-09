@@ -1,104 +1,104 @@
 [
   {
-    "model": "taller.categoriaservicio",
-    "pk": 1,
     "fields": {
       "nombre": "Mantenimiento"
-    }
-  },
-  {
-    "model": "taller.servicio",
-    "pk": 1,
-    "fields": {
-      "nombre": "Cambio de aceite",
-      "categoria": 1,
-      "precio_venta": 15000
-    }
-  },
-  {
-    "model": "taller.servicio",
-    "pk": 2,
-    "fields": {
-      "nombre": "Cambio de filtro de aire",
-      "categoria": 1,
-      "precio_venta": 15000
-    }
-  },
-  {
-    "model": "taller.servicio",
-    "pk": 3,
-    "fields": {
-      "nombre": "Revisi\u00f3n general",
-      "categoria": 1,
-      "precio_venta": 15000
-    }
-  },
-  {
+    },
     "model": "taller.categoriaservicio",
-    "pk": 2,
+    "pk": 1
+  },
+  {
+    "fields": {
+      "categoria": 1,
+      "nombre": "Cambio de aceite",
+      "precio_venta": 15000
+    },
+    "model": "taller.servicio",
+    "pk": 1
+  },
+  {
+    "fields": {
+      "categoria": 1,
+      "nombre": "Cambio de filtro de aire",
+      "precio_venta": 15000
+    },
+    "model": "taller.servicio",
+    "pk": 2
+  },
+  {
+    "fields": {
+      "categoria": 1,
+      "nombre": "Revisi\u00f3n general",
+      "precio_venta": 15000
+    },
+    "model": "taller.servicio",
+    "pk": 3
+  },
+  {
     "fields": {
       "nombre": "Sistema de Frenos"
-    }
-  },
-  {
-    "model": "taller.servicio",
-    "pk": 4,
-    "fields": {
-      "nombre": "Cambio de pastillas de freno",
-      "categoria": 2,
-      "precio_venta": 15000
-    }
-  },
-  {
-    "model": "taller.servicio",
-    "pk": 5,
-    "fields": {
-      "nombre": "Cambio de discos de freno",
-      "categoria": 2,
-      "precio_venta": 15000
-    }
-  },
-  {
-    "model": "taller.servicio",
-    "pk": 6,
-    "fields": {
-      "nombre": "Purgado de frenos",
-      "categoria": 2,
-      "precio_venta": 15000
-    }
-  },
-  {
+    },
     "model": "taller.categoriaservicio",
-    "pk": 3,
+    "pk": 2
+  },
+  {
+    "fields": {
+      "categoria": 2,
+      "nombre": "Cambio de pastillas de freno",
+      "precio_venta": 15000
+    },
+    "model": "taller.servicio",
+    "pk": 4
+  },
+  {
+    "fields": {
+      "categoria": 2,
+      "nombre": "Cambio de discos de freno",
+      "precio_venta": 15000
+    },
+    "model": "taller.servicio",
+    "pk": 5
+  },
+  {
+    "fields": {
+      "categoria": 2,
+      "nombre": "Purgado de frenos",
+      "precio_venta": 15000
+    },
+    "model": "taller.servicio",
+    "pk": 6
+  },
+  {
     "fields": {
       "nombre": "Sistema El\u00e9ctrico"
-    }
+    },
+    "model": "taller.categoriaservicio",
+    "pk": 3
   },
   {
-    "model": "taller.servicio",
-    "pk": 7,
     "fields": {
+      "categoria": 3,
       "nombre": "Cambio de bater\u00eda",
-      "categoria": 3,
       "precio_venta": 15000
-    }
+    },
+    "model": "taller.servicio",
+    "pk": 7
   },
   {
-    "model": "taller.servicio",
-    "pk": 8,
     "fields": {
+      "categoria": 3,
       "nombre": "Revisi\u00f3n de alternador",
-      "categoria": 3,
       "precio_venta": 15000
-    }
+    },
+    "model": "taller.servicio",
+    "pk": 8
   },
   {
-    "model": "taller.servicio",
-    "pk": 9,
     "fields": {
-      "nombre": "Instalaci\u00f3n de luces LED",
       "categoria": 3,
+      "nombre": "Instalaci\u00f3n de luces LED",
       "precio_venta": 15000
-    }
+    },
+    "model": "taller.servicio",
+    "pk": 9
   }
 ]

@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
@@ -10,8 +9,8 @@ que estén FUERA de la carpeta /static, sugiere un destino correcto dentro de /s
 detecta duplicados por hash, y opcionalmente los mueve de forma segura.
 
 Uso (Windows PowerShell o CMD):
-  py eg_static_audit.py --root "E:\projecto\e_garage" --static-root "E:\projecto\e_garage\static" --report "E:\projecto\e_garage\tools\reports\static_audit"
-  py eg_static_audit.py --root "E:\projecto\e_garage" --static-root "E:\projecto\e_garage\static" --move
+  py eg_static_audit.py --root "E:\\projecto\\e_garage" --static-root "E:\\projecto\\e_garage\\static" --report "E:\\projecto\\e_garage\tools\reports\\static_audit"
+  py eg_static_audit.py --root "E:\\projecto\\e_garage" --static-root "E:\\projecto\\e_garage\\static" --move
 
 Por defecto es dry-run (no mueve nada). Use --move para ejecutar.
 """
@@ -61,11 +60,30 @@ EXT_MAP: Dict[str, str] = {
 
 # --- Carpetas a ignorar durante el recorrido ---
 DEFAULT_EXCLUDE_DIRS = {
-    ".git", ".hg", ".svn", "__pycache__", ".pytest_cache", ".mypy_cache",
-    "node_modules", "dist", "build", ".next", ".nuxt",
-    "venv", ".venv", "env", ".env",
-    "migrations", "media", "staticfiles", "collectstatic",
-    ".idea", ".vscode", ".DS_Store", "tools\\reports", "tools/reports",
+    ".git",
+    ".hg",
+    ".svn",
+    "__pycache__",
+    ".pytest_cache",
+    ".mypy_cache",
+    "node_modules",
+    "dist",
+    "build",
+    ".next",
+    ".nuxt",
+    "venv",
+    ".venv",
+    "env",
+    ".env",
+    "migrations",
+    "media",
+    "staticfiles",
+    "collectstatic",
+    ".idea",
+    ".vscode",
+    ".DS_Store",
+    "tools\\reports",
+    "tools/reports",
 }
 
 # --- Patrones de archivo a ignorar (copias/temporal) para reportes severos ---
@@ -75,12 +93,15 @@ IGNORE_FILE_PATTERNS = [
 
 TEMPLATE_EXTS = {".html", ".jinja", ".jinja2", ".htm"}
 
+
 def norm(p: Path) -> str:
     return str(p).replace("/", os.sep).replace("\\", os.sep)
+
 
 def is_hidden(p: Path) -> bool:
     name = p.name
     return name.startswith(".") and name not in {".env", ".env.example"}
+
 
 def sha256_of_file(path: Path, blocksize: int = 65536) -> str:
     h = hashlib.sha256()
@@ -88,6 +109,7 @@ def sha256_of_file(path: Path, blocksize: int = 65536) -> str:
         for chunk in iter(lambda: f.read(blocksize), b""):
             h.update(chunk)
     return h.hexdigest()
+
 
 def should_scan_dir(d: Path, excludes: set) -> bool:
     name = d.name
@@ -98,12 +120,17 @@ def should_scan_dir(d: Path, excludes: set) -> bool:
         return False
     return True
 
-def collect_static_like_files(root: Path, static_root: Path, excludes: set) -> Tuple[List[Path], List[Path]]:
+
+def collect_static_like_files(
+    root: Path, static_root: Path, excludes: set
+) -> Tuple[List[Path], List[Path]]:
     static_inside: List[Path] = []
     static_outside: List[Path] = []
     for dirpath, dirnames, filenames in os.walk(root):
         # Filtrar subdirectorios
-        dirnames[:] = [d for d in dirnames if should_scan_dir(Path(dirpath) / d, excludes)]
+        dirnames[:] = [
+            d for d in dirnames if should_scan_dir(Path(dirpath) / d, excludes)
+        ]
         for fname in filenames:
             p = Path(dirpath) / fname
             ext = p.suffix.lower()
@@ -113,6 +140,7 @@ def collect_static_like_files(root: Path, static_root: Path, excludes: set) -> T
                 else:
                     static_outside.append(p)
     return static_inside, static_outside
+
 
 def find_duplicates_by_hash(paths: List[Path]) -> Dict[str, List[Path]]:
     dup_map: Dict[str, List[Path]] = {}
@@ -125,6 +153,7 @@ def find_duplicates_by_hash(paths: List[Path]) -> Dict[str, List[Path]]:
         dup_map.setdefault(h, []).append(p)
     # Quedarse con solo los que tienen más de 1
     return {k: v for k, v in dup_map.items() if len(v) > 1}
+
 
 def suggest_destination(static_root: Path, src: Path) -> Path:
     """Sugiere destino bajo /static con subcarpeta por extensión y nombre seguro."""
@@ -143,6 +172,7 @@ def suggest_destination(static_root: Path, src: Path) -> Path:
         dest = target_dir / f"{stem}.{h}{ext}"
     return dest
 
+
 def scan_template_references(root: Path) -> Dict[str, int]:
     """
     Cuenta referencias simples a recursos estáticos en templates.
@@ -153,7 +183,11 @@ def scan_template_references(root: Path) -> Dict[str, int]:
     static_tag_re = re.compile(r"\{%\s*static\s+['\"]([^'\"]+)['\"]\s*%\}")
     href_src_re = re.compile(r"""(?:href|src)\s*=\s*['"]([^'"]+)['"]""")
     for dirpath, dirnames, filenames in os.walk(root):
-        dirnames[:] = [d for d in dirnames if should_scan_dir(Path(dirpath) / d, DEFAULT_EXCLUDE_DIRS)]
+        dirnames[:] = [
+            d
+            for d in dirnames
+            if should_scan_dir(Path(dirpath) / d, DEFAULT_EXCLUDE_DIRS)
+        ]
         for fname in filenames:
             p = Path(dirpath) / fname
             if p.suffix.lower() in TEMPLATE_EXTS:
@@ -167,13 +201,34 @@ def scan_template_references(root: Path) -> Dict[str, int]:
                     REF_COUNTER[m.group(1)] = REF_COUNTER.get(m.group(1), 0) + 1
     return REF_COUNTER
 
+
 def main():
-    parser = argparse.ArgumentParser(description="Audita y migra estáticos hacia /static")
-    parser.add_argument("--root", required=True, help="Ruta raíz del proyecto (ej. E:\\projecto\\e_garage)")
-    parser.add_argument("--static-root", required=True, help="Ruta de la carpeta /static del proyecto")
-    parser.add_argument("--report", default="", help="Prefijo de salida para reportes (CSV y JSON). Si no se indica, usa ./static_audit_report_YYYYmmdd_HHMMSS")
-    parser.add_argument("--move", action="store_true", help="Mover archivos sugeridos (por defecto es dry-run)")
-    parser.add_argument("--include-ts", action="store_true", help="Incluir archivos .ts (TypeScript) en el plan")
+    parser = argparse.ArgumentParser(
+        description="Audita y migra estáticos hacia /static"
+    )
+    parser.add_argument(
+        "--root",
+        required=True,
+        help="Ruta raíz del proyecto (ej. E:\\projecto\\e_garage)",
+    )
+    parser.add_argument(
+        "--static-root", required=True, help="Ruta de la carpeta /static del proyecto"
+    )
+    parser.add_argument(
+        "--report",
+        default="",
+        help="Prefijo de salida para reportes (CSV y JSON). Si no se indica, usa ./static_audit_report_YYYYmmdd_HHMMSS",
+    )
+    parser.add_argument(
+        "--move",
+        action="store_true",
+        help="Mover archivos sugeridos (por defecto es dry-run)",
+    )
+    parser.add_argument(
+        "--include-ts",
+        action="store_true",
+        help="Incluir archivos .ts (TypeScript) en el plan",
+    )
     args = parser.parse_args()
 
     root = Path(args.root).resolve()
@@ -186,7 +241,9 @@ def main():
         static_root.mkdir(parents=True, exist_ok=True)
 
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-    report_prefix = Path(args.report) if args.report else Path.cwd() / f"static_audit_report_{ts}"
+    report_prefix = (
+        Path(args.report) if args.report else Path.cwd() / f"static_audit_report_{ts}"
+    )
     report_csv = Path(str(report_prefix) + ".csv")
     report_json = Path(str(report_prefix) + ".json")
 
@@ -235,8 +292,10 @@ def main():
 
         # Si es copia temporal/backup por nombre
         name_lower = src.name.lower()
-        if any(re.search(pat, src.name) for pat in IGNORE_FILE_PATTERNS) or \
-           any(tok in name_lower for tok in ["backup", "copy", "old", "temp", "tmp", "(1)", "(2)"]):
+        if any(re.search(pat, src.name) for pat in IGNORE_FILE_PATTERNS) or any(
+            tok in name_lower
+            for tok in ["backup", "copy", "old", "temp", "tmp", "(1)", "(2)"]
+        ):
             # Si pesa poco y parece backup, sugerir borrar
             if size < 1024 * 1024 * 3:  # < 3MB
                 action = "delete"
@@ -260,38 +319,60 @@ def main():
             if src.name in k:
                 ref_hits += v
 
-        plan_rows.append({
-            "src": norm(src),
-            "size_kb": round(size/1024, 2),
-            "sha256": sha[:16],
-            "suggested_action": action,
-            "reason": reason,
-            "suggested_dest_under_static": norm(rel_dest),
-            "ref_hits_in_templates": ref_hits,
-        })
+        plan_rows.append(
+            {
+                "src": norm(src),
+                "size_kb": round(size / 1024, 2),
+                "sha256": sha[:16],
+                "suggested_action": action,
+                "reason": reason,
+                "suggested_dest_under_static": norm(rel_dest),
+                "ref_hits_in_templates": ref_hits,
+            }
+        )
 
     # Guardar reportes
     report_csv.parent.mkdir(parents=True, exist_ok=True)
     with open(report_csv, "w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=list(plan_rows[0].keys()) if plan_rows else ["src","size_kb","sha256","suggested_action","reason","suggested_dest_under_static","ref_hits_in_templates"])
+        w = csv.DictWriter(
+            f,
+            fieldnames=(
+                list(plan_rows[0].keys())
+                if plan_rows
+                else [
+                    "src",
+                    "size_kb",
+                    "sha256",
+                    "suggested_action",
+                    "reason",
+                    "suggested_dest_under_static",
+                    "ref_hits_in_templates",
+                ]
+            ),
+        )
         w.writeheader()
         for row in plan_rows:
             w.writerow(row)
 
     with open(report_json, "w", encoding="utf-8") as f:
-        json.dump({
-            "generated_at": ts,
-            "root": norm(root),
-            "static_root": norm(static_root),
-            "totals": {
-                "inside_static": len(inside),
-                "outside_static": len(outside),
-                "duplicates_groups": len(dups_all),
+        json.dump(
+            {
+                "generated_at": ts,
+                "root": norm(root),
+                "static_root": norm(static_root),
+                "totals": {
+                    "inside_static": len(inside),
+                    "outside_static": len(outside),
+                    "duplicates_groups": len(dups_all),
+                },
+                "plan": plan_rows,
             },
-            "plan": plan_rows,
-        }, f, indent=2, ensure_ascii=False)
+            f,
+            indent=2,
+            ensure_ascii=False,
+        )
 
-    print(f"[DONE] Reportes generados:")
+    print("[DONE] Reportes generados:")
     print(f" - CSV : {report_csv}")
     print(f" - JSON: {report_json}")
 
@@ -306,11 +387,13 @@ def main():
                 try:
                     dest_exists = dest.exists()
                     shutil.move(str(src), str(dest))
-                    moved_rows.append({
-                        "src": row["src"],
-                        "dest": norm(dest),
-                        "overwrote": dest_exists,
-                    })
+                    moved_rows.append(
+                        {
+                            "src": row["src"],
+                            "dest": norm(dest),
+                            "overwrote": dest_exists,
+                        }
+                    )
                 except Exception as e:
                     print(f"[ERROR] No se pudo mover: {src} -> {dest} :: {e}")
 
@@ -319,6 +402,7 @@ def main():
         with open(moves_log, "w", encoding="utf-8") as f:
             json.dump(moved_rows, f, indent=2, ensure_ascii=False)
         print(f"[DONE] Movimientos registrados en: {moves_log}")
+
 
 if __name__ == "__main__":
     main()

@@ -1,7 +1,8 @@
 import pytest
+
 from django.contrib.auth import get_user_model
 from django.test import Client
-from django.urls import reverse, NoReverseMatch
+from django.urls import NoReverseMatch, reverse
 
 CANDS = [
     (["taller:vehiculos_lista"], "/cl/vehiculos/"),
@@ -11,13 +12,15 @@ CANDS = [
     (["taller:servicios_lista"], "/cl/servicios/"),
 ]
 
+
 def _rev(names, fb):
     for n in names:
-        try: 
+        try:
             return reverse(n)
-        except NoReverseMatch: 
+        except NoReverseMatch:
             pass
     return fb
+
 
 @pytest.mark.django_db
 def test_bulk_post_csrf_smoke():
@@ -29,8 +32,11 @@ def test_bulk_post_csrf_smoke():
 
     # Crear una empresa para el usuario autenticado para evitar errores de contexto
     from taller.models.empresa import Empresa
+
     if not Empresa.objects.filter(user=user).exists():
-        Empresa.objects.create(user=user, nombre_taller="Test Bulk", pais="CL", logo=None)
+        Empresa.objects.create(
+            user=user, nombre_taller="Test Bulk", pais="CL", logo=None
+        )
 
     for names, fb in CANDS:
         url = _rev(names, fb)

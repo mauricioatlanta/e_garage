@@ -3,19 +3,21 @@ from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 from django.shortcuts import redirect, render
 
-from taller.forms.configuracion_empresa import ConfiguracionEmpresaForm
 from taller.forms.company_settings_forms import (
-    CompanySettingsForm, CompanyProfileForm, FinancialSettingsForm, ThemeSettingsForm
+    CompanyProfileForm,
+    CompanySettingsForm,
+    FinancialSettingsForm,
+    ThemeSettingsForm,
 )
-from taller.models.company_settings import CompanySettings
 from taller.models import Tecnico
+from taller.models.company_settings import CompanySettings
 from taller.utils.empresa import get_or_create_empresa  # tu helper
 
 
 @login_required(login_url=None)  # usa tu LOGIN_URL global
 def company_settings_view(request):
     empresa = get_or_create_empresa(request)
-    
+
     # Usar CompanySettings en lugar de ConfiguracionEmpresa
     try:
         config = CompanySettings.objects.get(user=request.user)
@@ -27,7 +29,7 @@ def company_settings_view(request):
             tagline="",
             primary_color="#0d6efd",
             secondary_color="#6c757d",
-            currency="CLP" if empresa.pais == "CL" else "USD"
+            currency="CLP" if empresa.pais == "CL" else "USD",
         )
 
     if request.method == "POST":
@@ -47,13 +49,27 @@ def company_settings_view(request):
                         empresa=empresa,
                         activo=True,
                     )
-                    messages.success(
-                        request, f"✅ Técnico '{nombre}' creado exitosamente."
-                    )
+                    # Mensaje en español para Chile, inglés para USA
+                    if empresa.pais == "CL":
+                        messages.success(
+                            request, f"✅ Técnico '{nombre}' creado exitosamente."
+                        )
+                    else:
+                        messages.success(
+                            request, f"✅ Technician '{nombre}' created successfully."
+                        )
                 except Exception as e:
-                    messages.error(request, f"❌ Error al crear técnico: {str(e)}")
+                    if empresa.pais == "CL":
+                        messages.error(request, f"❌ Error al crear técnico: {str(e)}")
+                    else:
+                        messages.error(
+                            request, f"❌ Error creating technician: {str(e)}"
+                        )
             else:
-                messages.error(request, "❌ El nombre del técnico es obligatorio.")
+                if empresa.pais == "CL":
+                    messages.error(request, "❌ El nombre del técnico es obligatorio.")
+                else:
+                    messages.error(request, "❌ Technician name is required.")
 
             return redirect(request.path)
 
@@ -64,14 +80,29 @@ def company_settings_view(request):
                 tecnico = Tecnico.objects.get(id=tecnico_id, empresa=empresa)
                 tecnico.activo = not tecnico.activo
                 tecnico.save()
-                estado = "activado" if tecnico.activo else "desactivado"
-                messages.success(
-                    request, f"✅ Técnico '{tecnico.nombre}' {estado} exitosamente."
-                )
+
+                # Mensaje en español para Chile, inglés para USA
+                if empresa.pais == "CL":
+                    estado = "activado" if tecnico.activo else "desactivado"
+                    messages.success(
+                        request, f"✅ Técnico '{tecnico.nombre}' {estado} exitosamente."
+                    )
+                else:
+                    estado = "activated" if tecnico.activo else "deactivated"
+                    messages.success(
+                        request,
+                        f"✅ Technician '{tecnico.nombre}' {estado} successfully.",
+                    )
             except Tecnico.DoesNotExist:
-                messages.error(request, "❌ Técnico no encontrado.")
+                if empresa.pais == "CL":
+                    messages.error(request, "❌ Técnico no encontrado.")
+                else:
+                    messages.error(request, "❌ Technician not found.")
             except Exception as e:
-                messages.error(request, f"❌ Error al actualizar técnico: {str(e)}")
+                if empresa.pais == "CL":
+                    messages.error(request, f"❌ Error al actualizar técnico: {str(e)}")
+                else:
+                    messages.error(request, f"❌ Error updating technician: {str(e)}")
 
             return redirect(request.path)
 
@@ -79,7 +110,7 @@ def company_settings_view(request):
         else:
             # Obtener la sección del formulario
             section = request.POST.get("section", "profile")
-            
+
             # Seleccionar el formulario apropiado según la sección
             if section == "profile":
                 form = CompanyProfileForm(request.POST, request.FILES, instance=config)
@@ -90,7 +121,7 @@ def company_settings_view(request):
             else:
                 # Fallback al formulario completo
                 form = CompanySettingsForm(request.POST, request.FILES, instance=config)
-            
+
             if form.is_valid():
                 try:
                     cfg = form.save()
@@ -100,37 +131,75 @@ def company_settings_view(request):
                     cache.delete(cache_key)
 
                     # Mensaje específico si se subió logo
-                    if section == "profile" and 'logo' in request.FILES:
-                        messages.success(
-                            request,
-                            f"✅ Logo uploaded successfully! Your logo will now appear across all pages. Refresh any open pages to see it.",
-                        )
+                    if section == "profile" and "logo" in request.FILES:
+                        if empresa.pais == "CL":
+                            messages.success(
+                                request,
+                                "✅ ¡Logo subido exitosamente! Su logo ahora aparecerá en todas las páginas. Refresque las páginas abiertas para verlo.",
+                            )
+                        else:
+                            messages.success(
+                                request,
+                                "✅ Logo uploaded successfully! Your logo will now appear across all pages. Refresh any open pages to see it.",
+                            )
                     else:
-                        messages.success(
-                            request,
-                            f"✅ {section.title()} configuration updated successfully. Changes will be reflected across all pages.",
-                        )
+                        if empresa.pais == "CL":
+                            section_names = {
+                                "profile": "Perfil",
+                                "financial": "Financiera",
+                                "theme": "Tema",
+                            }
+                            section_name = section_names.get(section, section.title())
+                            messages.success(
+                                request,
+                                f"✅ Configuración {section_name} actualizada exitosamente. Los cambios se reflejarán en todas las páginas.",
+                            )
+                        else:
+                            messages.success(
+                                request,
+                                f"✅ {section.title()} configuration updated successfully. Changes will be reflected across all pages.",
+                            )
                     return redirect(request.path)
                 except Exception as e:
-                    messages.error(
-                        request, f"❌ Error saving configuration: {str(e)}"
-                    )
+                    if empresa.pais == "CL":
+                        messages.error(
+                            request, f"❌ Error al guardar la configuración: {str(e)}"
+                        )
+                    else:
+                        messages.error(
+                            request, f"❌ Error saving configuration: {str(e)}"
+                        )
             else:
                 # Mostrar errores específicos del formulario
                 error_messages = []
                 for field, errors in form.errors.items():
                     for error in errors:
                         error_messages.append(f"{field}: {error}")
-                
-                messages.error(
-                    request, f"❌ Please check the form fields: {'; '.join(error_messages)}"
-                )
+
+                if empresa.pais == "CL":
+                    messages.error(
+                        request,
+                        f"❌ Por favor revise los campos del formulario: {'; '.join(error_messages)}",
+                    )
+                else:
+                    messages.error(
+                        request,
+                        f"❌ Please check the form fields: {'; '.join(error_messages)}",
+                    )
     else:
         form = CompanySettingsForm(instance=config)
 
     # Obtener técnicos de la empresa
     tecnicos = Tecnico.objects.filter(empresa=empresa).order_by("nombre")
 
+    # Seleccionar el template apropiado según el país
+    if empresa.pais == "CL":
+        template_name = "settings/company_settings_es.html"
+    else:
+        template_name = "settings/company_settings.html"
+
     return render(
-        request, "settings/company_settings.html", {"form": form, "tecnicos": tecnicos, "config": config}
+        request,
+        template_name,
+        {"form": form, "tecnicos": tecnicos, "config": config, "empresa": empresa},
     )

@@ -127,7 +127,7 @@ body {
         <h2 class="text-2xl font-bold text-cyan-400 mb-6 text-center">
             📋 {% trans "Work Orders" %}
         </h2>
-        
+
         {% if documentos %}
             <div class="space-y-4">
             {% for documento in documentos %}
@@ -140,7 +140,7 @@ body {
                         {{ documento.estado|default:"{% trans 'Pending' %}"|title }}
                     </div>
                 </div>
-                
+
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4 text-sm">
                     <div>
                         <div class="text-gray-400 uppercase text-xs">{% trans "Customer" %}</div>
@@ -163,7 +163,7 @@ body {
                         <div class="text-white font-bold">{{ documento.tecnico_responsable.nombre|default:"{% trans 'Unassigned' %}" }}</div>
                     </div>
                 </div>
-                
+
                 <div class="flex gap-2 flex-wrap">
                     <a href="{% country_url 'documentos:ver_documento' documento.id %}" class="action-button">
                         👁️ {% trans "View" %}
@@ -217,11 +217,3 @@ body {
     </div>
 </div>
 {% endblock %}
-
-
-
-
-
-
-
-

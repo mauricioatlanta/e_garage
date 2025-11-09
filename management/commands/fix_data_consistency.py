@@ -12,38 +12,37 @@ from django.db import transaction
 from django.db.models import F
 
 from taller.models.clientes import Cliente
-from taller.models.vehiculos import Vehiculo
 from taller.models.documento import Documento
-from taller.models.empresa import Empresa
+from taller.models.vehiculos import Vehiculo
 
 
 class Command(BaseCommand):
-    help = 'Verificar y corregir inconsistencias en datos Cliente ↔ Vehículo ↔ Empresa'
+    help = "Verificar y corregir inconsistencias en datos Cliente ↔ Vehículo ↔ Empresa"
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--check',
-            action='store_true',
-            help='Solo verificar inconsistencias',
+            "--check",
+            action="store_true",
+            help="Solo verificar inconsistencias",
         )
         parser.add_argument(
-            '--fix',
-            action='store_true',
-            help='Verificar y corregir inconsistencias',
+            "--fix",
+            action="store_true",
+            help="Verificar y corregir inconsistencias",
         )
         parser.add_argument(
-            '--dry-run',
-            action='store_true',
-            help='Simular correcciones sin aplicar',
+            "--dry-run",
+            action="store_true",
+            help="Simular correcciones sin aplicar",
         )
 
     def handle(self, *args, **options):
-        check_only = options['check']
-        fix_data = options['fix']
-        dry_run = options['dry_run']
+        check_only = options["check"]
+        fix_data = options["fix"]
+        dry_run = options["dry_run"]
 
         if not any([check_only, fix_data, dry_run]):
-            raise CommandError('Debe especificar --check, --fix o --dry-run')
+            raise CommandError("Debe especificar --check, --fix o --dry-run")
 
         # Siempre verificar primero
         issues = self.check_inconsistencies()
@@ -61,16 +60,16 @@ class Command(BaseCommand):
                 if dry_run:
                     self.stdout.write(
                         self.style.SUCCESS(
-                            f"\n💡 Para aplicar las correcciones, ejecuta: python manage.py fix_data_consistency --fix"
+                            "\n💡 Para aplicar las correcciones, ejecuta: python manage.py fix_data_consistency --fix"
                         )
                     )
                 else:
                     self.stdout.write(
-                        self.style.SUCCESS(f"\n✅ Correcciones aplicadas exitosamente")
+                        self.style.SUCCESS("\n✅ Correcciones aplicadas exitosamente")
                     )
             else:
                 self.stdout.write(
-                    self.style.SUCCESS(f"\n✅ No hay correcciones necesarias")
+                    self.style.SUCCESS("\n✅ No hay correcciones necesarias")
                 )
 
     def check_inconsistencies(self):
@@ -95,11 +94,13 @@ class Command(BaseCommand):
 
         # 2. Vehículos con empresa diferente a la del cliente
         vehiculos_empresa_inconsistente = Vehiculo.objects.exclude(
-            empresa=F('cliente__empresa')
+            empresa=F("cliente__empresa")
         )
         if vehiculos_empresa_inconsistente.exists():
             count = vehiculos_empresa_inconsistente.count()
-            issues.append(f"❌ {count} vehículos con empresa diferente a la del cliente")
+            issues.append(
+                f"❌ {count} vehículos con empresa diferente a la del cliente"
+            )
             self.stdout.write(f"   Vehículos con empresa inconsistente: {count}")
 
             # Mostrar algunos ejemplos
@@ -119,13 +120,11 @@ class Command(BaseCommand):
 
             # Mostrar algunos ejemplos
             for c in clientes_sin_empresa[:5]:
-                self.stdout.write(
-                    f"     - Cliente ID {c.id}: {c.nombre} {c.apellido}"
-                )
+                self.stdout.write(f"     - Cliente ID {c.id}: {c.nombre} {c.apellido}")
 
         # 4. Documentos con inconsistencias
         documentos_problematicos = []
-        for doc in Documento.objects.select_related('cliente', 'vehiculo', 'empresa'):
+        for doc in Documento.objects.select_related("cliente", "vehiculo", "empresa"):
             has_issue = False
 
             # Cliente no pertenece a la empresa del documento
@@ -147,7 +146,9 @@ class Command(BaseCommand):
             issues.append(
                 f"❌ {len(documentos_problematicos)} documentos con inconsistencias"
             )
-            self.stdout.write(f"   Documentos problemáticos: {len(documentos_problematicos)}")
+            self.stdout.write(
+                f"   Documentos problemáticos: {len(documentos_problematicos)}"
+            )
 
             # Mostrar algunos ejemplos
             for doc in documentos_problematicos[:3]:
@@ -201,7 +202,7 @@ class Command(BaseCommand):
 
         # 2. Corregir vehículos con empresa inconsistente
         vehiculos_empresa_inconsistente = Vehiculo.objects.exclude(
-            empresa=F('cliente__empresa')
+            empresa=F("cliente__empresa")
         )
         for v in vehiculos_empresa_inconsistente:
             if v.cliente and v.cliente.empresa:
@@ -220,7 +221,7 @@ class Command(BaseCommand):
             # Buscar la empresa más común entre los vehículos del cliente
             vehiculos_empresas = (
                 Vehiculo.objects.filter(cliente=c, empresa__isnull=False)
-                .values_list('empresa', flat=True)
+                .values_list("empresa", flat=True)
                 .distinct()
             )
             if vehiculos_empresas:

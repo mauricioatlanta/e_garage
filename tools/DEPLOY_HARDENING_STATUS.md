@@ -153,8 +153,8 @@ Una vez resuelto el problema de restricción, el sistema estará **100% listo pa
 
 ---
 
-**Fecha**: 2025-10-06  
-**Versión**: 1.0  
-**Estado**: ✅ **DEPLOY HARDENING 98% COMPLETO**  
-**Pendiente**: ⚠️ **Resolver NOT NULL constraint (2 minutos)**  
+**Fecha**: 2025-10-06
+**Versión**: 1.0
+**Estado**: ✅ **DEPLOY HARDENING 98% COMPLETO**
+**Pendiente**: ⚠️ **Resolver NOT NULL constraint (2 minutos)**
 **Tiempo estimado**: 5-10 minutos para completar

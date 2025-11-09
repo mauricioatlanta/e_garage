@@ -1,6 +1,6 @@
 # 📧 FLUJO DE REGISTRO Y PAGO - DOCUMENTACIÓN COMPLETA
 
-**Fecha**: 26 de octubre de 2025  
+**Fecha**: 26 de octubre de 2025
 **Estado**: Desarrollo → Producción
 
 ---
@@ -478,10 +478,10 @@ def notificar_admin_pago_nuevo(sender, instance, created, **kwargs):
 # Actualizar: taller/models/pago.py
 def aprobar_pago(self, admin_user):
     # ... código actual ...
-    
+
     # AGREGAR:
     from django.core.mail import send_mail
-    
+
     send_mail(
         subject='✅ ¡Tu pago ha sido confirmado!',
         message=f'Hola {self.empresa.user.first_name}, tu suscripción está activa.',
@@ -632,4 +632,3 @@ Puedo implementar:
 ---
 
 **Creado**: 26 de octubre de 2025, 23:55 hrs
-

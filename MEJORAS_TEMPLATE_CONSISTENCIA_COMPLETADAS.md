@@ -22,10 +22,10 @@ Se agregaron estilos CSS personalizados al final del template para garantizar co
 }
 
 /* Ensure all input fields have consistent styling */
-input[type="text"], 
-input[type="email"], 
-input[type="tel"], 
-select, 
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+select,
 textarea {
   @apply bg-black border border-emerald-500/30 text-emerald-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400;
 }
@@ -137,7 +137,7 @@ Se agregaron estilos específicos para los campos Select2 (DAL autocomplete):
 El template ahora tiene **100% de consistencia visual**:
 
 - ✅ **9/9 campos principales** con estilo consistente
-- ✅ **2/2 campos ocultos** con estilo consistente  
+- ✅ **2/2 campos ocultos** con estilo consistente
 - ✅ **1/1 modal** con estilo consistente
 - ✅ **6/6 reglas CSS** implementadas
 - ✅ **6/6 elementos de contraste** optimizados
@@ -150,5 +150,3 @@ Todos los campos del formulario de creación de vehículos ahora tienen:
 - **Placeholders grises** para diferenciación
 
 El formulario mantiene el diseño futurista mientras garantiza excelente legibilidad y consistencia visual en todos los campos 🚗✨
-
-

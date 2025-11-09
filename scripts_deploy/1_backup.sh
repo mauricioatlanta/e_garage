@@ -91,4 +91,3 @@ echo "   backup_completo_${BACKUP_DATE}.tar.gz"
 echo ""
 echo "⏭️  Siguiente paso: Subir archivos de actualización"
 echo "======================================================"
-

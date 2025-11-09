@@ -1,11 +1,15 @@
-import pytest
+from datetime import datetime
 from decimal import Decimal
 from importlib import import_module
-from datetime import datetime
+
+import pytest
+
 from django.contrib.auth import get_user_model
+
 
 def _has_field(model, name):
     return name in {f.name for f in model._meta.fields}
+
 
 @pytest.mark.django_db
 def test_linea_otro_servicio_ganancia():
@@ -14,20 +18,43 @@ def test_linea_otro_servicio_ganancia():
         Empresa = import_module("taller.models.empresa").Empresa
         Documento = import_module("taller.models.documento").Documento
         Lineas = import_module("taller.models.lineas_documento")
-        LOS = getattr(Lineas, "LineaOtroServicio")
+        LOS = Lineas.LineaOtroServicio
     except Exception:
         pytest.skip("No existe LineaOtroServicio en este proyecto")
 
     User = get_user_model()
-    user = User.objects.create_user(username="user_ext", email="user_ext@test.com", password="testpass")
-    
-    emp = Empresa.objects.create(nombre_taller="EXT", empresa="EXT", pais="CL", direccion="Test", telefono="123", email="test@test.com", zona_horaria="UTC", fecha_inicio=datetime.now(), plan="mensual", dias_prueba=30, suscripcion_activa=True, valor_mensual=100, moneda="CLP", notificacion_5_dias=False, notificacion_1_dia=False, notificacion_vencido=False, user_id=user.id)
-    
+    user = User.objects.create_user(
+        username="user_ext", email="user_ext@test.com", password="testpass"
+    )
+
+    emp = Empresa.objects.create(
+        nombre_taller="EXT",
+        empresa="EXT",
+        pais="CL",
+        direccion="Test",
+        telefono="123",
+        email="test@test.com",
+        zona_horaria="UTC",
+        fecha_inicio=datetime.now(),
+        plan="mensual",
+        dias_prueba=30,
+        suscripcion_activa=True,
+        valor_mensual=100,
+        moneda="CLP",
+        notificacion_5_dias=False,
+        notificacion_1_dia=False,
+        notificacion_vencido=False,
+        user_id=user.id,
+    )
+
     # Crear cliente requerido para el documento
     from taller.models.clientes import Cliente
+
     cliente = Cliente.objects.create(empresa=emp, nombre="Cliente EXT")
-    
-    doc = Documento.objects.create(empresa=emp, tipo="FAC", fecha_emision="2025-02-01", cliente=cliente)
+
+    doc = Documento.objects.create(
+        empresa=emp, tipo="FAC", fecha_emision="2025-02-01", cliente=cliente
+    )
 
     data = dict(documento=doc, nombre="Alineación externa", cantidad=1)
     if _has_field(LOS, "costo_interno"):

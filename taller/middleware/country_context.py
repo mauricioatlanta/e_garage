@@ -18,10 +18,10 @@ Características:
 """
 
 import re
+
 from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.utils.deprecation import MiddlewareMixin
-
 
 # =========================
 # Constantes
@@ -68,16 +68,17 @@ def _is_whitelisted(path: str) -> bool:
 # Middleware Principal
 # =========================
 
+
 class CountryContextMiddleware(MiddlewareMixin):
     """
     Detección y armonización de país con redirección segura y canónica.
-    
+
     Flujo:
       1. Detecta país desde múltiples fuentes (URL > subdominio > usuario > default)
       2. Verifica conflictos entre URL y empresa del usuario
       3. Canonicaliza rutas legacy (/es → /cl, /en → /us)
       4. Setea request.country y request._country_source
-    
+
     Seguridad:
       - Whitelist para rutas estáticas/admin/webhooks
       - Uso de regex para evitar slicing frágil
@@ -87,7 +88,7 @@ class CountryContextMiddleware(MiddlewareMixin):
 
     def process_request(self, request):
         path = request.path
-        
+
         # Whitelist: No tocar rutas estáticas/admin/webhooks
         if _is_whitelisted(path):
             request.country = getattr(settings, "DEFAULT_COUNTRY", COUNTRY_CL)
@@ -114,7 +115,9 @@ class CountryContextMiddleware(MiddlewareMixin):
         request._country_source = (
             "url"
             if url_country
-            else ("subdomain" if subd_country else ("user" if user_country else "default"))
+            else (
+                "subdomain" if subd_country else ("user" if user_country else "default")
+            )
         )
 
         # ----- Conflicto URL vs empresa -----
@@ -123,7 +126,7 @@ class CountryContextMiddleware(MiddlewareMixin):
             # Política para POST/PUT/PATCH:
             # Opción A: NO redirigir (confiar en URL para esta request)
             # Opción B: Redirigir con 307 (mantiene método/body)
-            
+
             # Usando Opción B (estricto multi-tenant)
             if request.method in ("POST", "PUT", "PATCH"):
                 return self._redirect_conflict(
@@ -139,13 +142,17 @@ class CountryContextMiddleware(MiddlewareMixin):
             canonical = COUNTRY_PREFIX[LEGACY_TO_COUNTRY[url_prefix]]
             # Evitar bucles: si ya estamos en la ruta canónica, no hacer nada
             if not path.startswith(canonical + "/") and path != canonical:
-                new_url = self._swap_prefix(path, from_prefix=url_prefix, to_prefix=canonical)
+                new_url = self._swap_prefix(
+                    path, from_prefix=url_prefix, to_prefix=canonical
+                )
                 if request.GET:
                     new_url += "?" + request.GET.urlencode()
-                
+
                 if getattr(settings, "DEBUG", False):
-                    print(f"🔄 Canonical Redirect: {path} → {new_url} ({url_prefix} → {canonical})")
-                
+                    print(
+                        f"🔄 Canonical Redirect: {path} → {new_url} ({url_prefix} → {canonical})"
+                    )
+
                 # 301 (permanente) para SEO
                 resp = HttpResponseRedirect(new_url)
                 resp.status_code = 301
@@ -166,10 +173,10 @@ class CountryContextMiddleware(MiddlewareMixin):
     def _detect_country_from_url(self, path: str):
         """
         Detecta país desde prefijo de URL.
-        
+
         Returns:
             tuple: (country, prefix_detectado) o (None, None)
-        
+
         Soporta:
           - Canónicos: /cl, /us
           - Legacy: /es (→ CL), /en (→ US)
@@ -191,25 +198,25 @@ class CountryContextMiddleware(MiddlewareMixin):
     def _detect_country_from_subdomain(self, request):
         """
         Detecta país desde subdominio: us.* o cl.*
-        
+
         Cubre casos como:
           - us.local:8000
           - cl.miapp.com
           - us.staging.miapp.com
         """
         host = request.get_host().lower()  # incluye puerto si lo hay
-        
+
         if host.startswith("us."):
             return COUNTRY_US
         if host.startswith("cl."):
             return COUNTRY_CL
-        
+
         return None
 
     def _detect_country_from_user(self, request):
         """
         Detecta país desde configuración del usuario/empresa.
-        
+
         Jerarquía:
           1. user.empresa.pais
           2. user.perfil.pais
@@ -217,26 +224,26 @@ class CountryContextMiddleware(MiddlewareMixin):
         u = getattr(request, "user", None)
         if not u or not getattr(u, "is_authenticated", False):
             return None
-        
+
         try:
             # Empresa tiene prioridad
             if hasattr(u, "empresa") and hasattr(u.empresa, "pais"):
                 pais = (u.empresa.pais or "").strip().upper()
                 return pais if pais in (COUNTRY_CL, COUNTRY_US) else None
-            
+
             # Fallback a perfil
             if hasattr(u, "perfil") and hasattr(u.perfil, "pais"):
                 pais = (u.perfil.pais or "").strip().upper()
                 return pais if pais in (COUNTRY_CL, COUNTRY_US) else None
         except Exception:
             return None
-        
+
         return None
 
     def _detect_country_from_ip(self, request):
         """
         Detecta país desde geolocalización de IP (último recurso).
-        
+
         TODO: Implementar con GeoIP2 o servicio externo
         """
         # Placeholder para futura implementación
@@ -248,16 +255,18 @@ class CountryContextMiddleware(MiddlewareMixin):
     # Helpers de Redirección
     # =========================
 
-    def _redirect_conflict(self, request, from_country: str, to_country: str, code: int = 302):
+    def _redirect_conflict(
+        self, request, from_country: str, to_country: str, code: int = 302
+    ):
         """
         Maneja conflictos entre país de URL y país de empresa.
-        
+
         Args:
             request: HttpRequest
             from_country: País detectado en URL (ej: "US")
             to_country: País correcto de la empresa (ej: "CL")
             code: Código HTTP (302=temporal, 307=mantiene método POST)
-        
+
         Returns:
             HttpResponseRedirect con el código especificado
         """
@@ -266,7 +275,7 @@ class CountryContextMiddleware(MiddlewareMixin):
         to_prefix = COUNTRY_PREFIX.get(to_country, f"/{to_country.lower()}")
 
         new_url = self._swap_prefix(path, from_prefix, to_prefix)
-        
+
         # Preservar query string
         if request.GET:
             new_url += "?" + request.GET.urlencode()
@@ -284,21 +293,21 @@ class CountryContextMiddleware(MiddlewareMixin):
     def _swap_prefix(path: str, from_prefix: str, to_prefix: str) -> str:
         """
         Reemplaza el prefijo de país de forma segura usando regex.
-        
+
         Ejemplos:
           /cl         → /us
           /cl/        → /us/
           /cl/vehiculos → /us/vehiculos
           /es/taller  → /cl/taller
-        
+
         Si la ruta no tiene el prefijo de origen, lo inyecta:
           /vehiculos  → /us/vehiculos
-        
+
         Args:
             path: Ruta actual
             from_prefix: Prefijo a reemplazar (ej: "/cl")
             to_prefix: Prefijo nuevo (ej: "/us")
-        
+
         Returns:
             Nueva ruta con el prefijo cambiado
         """
@@ -312,12 +321,12 @@ class CountryContextMiddleware(MiddlewareMixin):
         # Usa (?P<rest>...) para capturar el resto
         patt = re.compile(rf"^({re.escape(from_prefix)})(?P<rest>/.*|$)", re.IGNORECASE)
         m = patt.match(path)
-        
+
         if not m:
             # Si no hay prefijo de origen, inyecta el nuevo al inicio
             rest = path if path.startswith("/") else "/" + path
             return f"{to_prefix}{rest}"
-        
+
         rest = m.group("rest") or ""
         return f"{to_prefix}{rest}"
 
@@ -326,11 +335,12 @@ class CountryContextMiddleware(MiddlewareMixin):
 # Middleware de Idioma
 # =========================
 
+
 class LanguageContextMiddleware(MiddlewareMixin):
     """
     Middleware que detecta idioma preferido del usuario.
     Se ejecuta después de CountryContextMiddleware.
-    
+
     Jerarquía:
       1. Configuración de usuario (user.perfil.idioma_preferido)
       2. Prefijo de URL (/en/, /es/)
@@ -340,15 +350,15 @@ class LanguageContextMiddleware(MiddlewareMixin):
 
     def process_request(self, request):
         language = self._detect_language_from_user(request)
-        
+
         if not language:
             language = self._detect_language_from_url(request)
-        
+
         if not language:
             # Fallback basado en país
             country = getattr(request, "country", COUNTRY_CL)
             language = "en" if country == COUNTRY_US else "es"
-        
+
         if not language:
             # Último recurso: Accept-Language header
             language = self._detect_language_from_header(request)
@@ -388,7 +398,7 @@ class LanguageContextMiddleware(MiddlewareMixin):
             return "en"
         elif re.match(r"^/es(/|$)", path):
             return "es"
-        
+
         # Canónicos: /us/ → en, /cl/ → es
         if re.match(r"^/us(/|$)", path):
             return "en"
@@ -399,7 +409,7 @@ class LanguageContextMiddleware(MiddlewareMixin):
 
     def _detect_language_from_header(self, request):
         """Detecta idioma desde Accept-Language header."""
-        accept_lang = request.META.get("HTTP_ACCEPT_LANGUAGE", "")
+        accept_lang = request.headers.get("accept-language", "")
         if accept_lang:
             # Simplificado: toma el primer idioma
             lang = accept_lang.lower().split(",")[0].split(";")[0].strip()

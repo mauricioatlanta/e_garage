@@ -1,7 +1,7 @@
 # ✅ API de Documentos - PARCHE DE SEGURIDAD APLICADO
 
-**Fecha:** 1 de octubre, 2025  
-**Estado:** ✅ COMPLETADO Y PROBADO  
+**Fecha:** 1 de octubre, 2025
+**Estado:** ✅ COMPLETADO Y PROBADO
 **Archivo:** `taller/documentos/api.py`
 
 ---
@@ -330,5 +330,3 @@ taller/documentos/api_backup.py    ✅ Backup del archivo original
 ---
 
 **¡Parche de seguridad aplicado exitosamente!** 🛡️
-
-

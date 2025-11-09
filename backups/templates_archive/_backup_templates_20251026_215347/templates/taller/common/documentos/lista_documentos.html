@@ -357,7 +357,7 @@ body {
     <!-- 📋 Lista de Documentos -->
     <div class="cyber-container p-6">
         <h2 class="section-title">📋 {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Workshop Documents{% else %}Documentos del Taller{% endif %}</h2>
-        
+
         {% if documentos %}
             {% for documento in documentos %}
             <div class="document-card">
@@ -369,7 +369,7 @@ body {
                         {{ documento.estado|default:"Pendiente"|title }}
                     </div>
                 </div>
-                
+
                 <div class="document-info">
                     <div class="info-item">
                         <div class="info-label">Cliente</div>
@@ -396,7 +396,7 @@ body {
                         <div class="info-value">{{ documento.servicios.count|default:"0" }} servicios</div>
                     </div>
                 </div>
-                
+
                 <div class="document-actions">
                     <a href="{% country_url 'documentos:ver_documento' documento.id %}" class="action-button">👁️ {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}View{% else %}Ver{% endif %}</a>
                     <a href="{% country_url 'documentos:documento_editar' documento.id %}" class="action-button secondary">✏️ {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Edit{% else %}Editar{% endif %}</a>
@@ -445,14 +445,14 @@ body {
 <!-- JavaScript para funcionalidades -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    
+
     // Animación de hover en las tarjetas
     const documentCards = document.querySelectorAll('.document-card');
     documentCards.forEach(card => {
         card.addEventListener('mouseenter', function() {
             this.style.transform = 'translateY(-4px) scale(1.01)';
         });
-        
+
         card.addEventListener('mouseleave', function() {
             this.style.transform = 'translateY(0) scale(1)';
         });
@@ -513,13 +513,13 @@ function enviarWhatsApp(documentoId, telefono, nombreCliente) {
         alert('❌ El cliente no tiene número de teléfono registrado.');
         return;
     }
-    
+
     // Mostrar indicador de carga
     const boton = event.target;
     const textoOriginal = boton.textContent;
     boton.textContent = '⏳ Enviando...';
     boton.disabled = true;
-    
+
     // Llamar a la API del backend
     fetch(`/cl/documentos/${documentoId}/enviar_whatsapp/`, {
         method: 'GET',
@@ -533,10 +533,10 @@ function enviarWhatsApp(documentoId, telefono, nombreCliente) {
         if (data.success) {
             // Abrir WhatsApp con el mensaje generado
             const ventanaWhatsApp = window.open(data.url_whatsapp, '_blank', 'width=800,height=600');
-            
+
             if (!ventanaWhatsApp) {
                 // Si no se puede abrir ventana, mostrar mensaje alternativo
-                alert(`📱 WhatsApp no disponible. 
+                alert(`📱 WhatsApp no disponible.
 
 Número del cliente: ${data.telefono}
 Mensaje a enviar:

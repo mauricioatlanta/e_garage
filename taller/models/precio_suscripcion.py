@@ -1,4 +1,5 @@
 from decimal import Decimal
+
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q, UniqueConstraint
@@ -19,7 +20,6 @@ class PrecioSuscripcionManager(models.Manager):
     def get_queryset(self):
         return PrecioSuscripcionQuerySet(model=self.model, using=self._db, hints=None)
 
-    # Atajos en el manager
     def activos(self):
         return self.get_queryset().activos()
 
@@ -42,20 +42,13 @@ class PrecioSuscripcion(models.Model):
         CL = "CL", "Chile"
         US = "US", "Estados Unidos"
 
-    tipo_plan = models.CharField(max_length=20, choices=TipoPlan.choices, db_index=True)
-    pais = models.CharField(max_length=2, choices=Pais.choices, db_index=True)
-
-    # Precio y moneda (en BD guardamos números, la moneda va atada al país)
+    tipo_plan = models.CharField(max_length=20, choices=TipoPlan, db_index=True)
+    pais = models.CharField(max_length=2, choices=Pais, db_index=True)
     precio = models.DecimalField(max_digits=10, decimal_places=2)
     moneda = models.CharField(max_length=3, default="CLP")
-
     activo = models.BooleanField(default=True, db_index=True)
-
-    # Metadatos del plan
     nombre_plan = models.CharField(max_length=100, default="Plan Estándar")
     descripcion = models.TextField(blank=True)
-
-    # Características incluidas
     documentos_ilimitados = models.BooleanField(default=True)
     usuarios_incluidos = models.PositiveIntegerField(default=5)
     soporte_prioritario = models.BooleanField(default=True)
@@ -71,7 +64,6 @@ class PrecioSuscripcion(models.Model):
         verbose_name_plural = "Precios de Suscripciones"
         ordering = ["pais", "tipo_plan", "-activo"]
         constraints = [
-            # Evita duplicados activos por (pais, tipo_plan); permite históricos inactivos
             UniqueConstraint(
                 fields=["tipo_plan", "pais"],
                 condition=Q(activo=True),
@@ -86,87 +78,77 @@ class PrecioSuscripcion(models.Model):
     def __str__(self):
         return f"{self.get_pais_display()} - {self.get_tipo_plan_display()}: {self.precio_formateado()}"
 
-    # --- Validaciones de negocio ---
     def clean(self):
-        # Precio no negativo
         if self.precio is None or self.precio < Decimal("0"):
             raise ValidationError("El precio debe ser mayor o igual a 0.")
-
-        # Usuarios incluidos al menos 1
         if self.usuarios_incluidos < 1:
             raise ValidationError("Debe incluir al menos 1 usuario.")
-
-        # Moneda coherente por país
         moneda_esperada = "USD" if self.pais == self.Pais.US else "CLP"
         if self.moneda != moneda_esperada:
-            # Normalizamos en vez de bloquear
             self.moneda = moneda_esperada
 
-    # --- Helpers de presentación / negocio ---
     def precio_formateado(self) -> str:
         if self.pais == self.Pais.US:
             return f"${self.precio:,.2f} USD"
         return f"${self.precio:,.0f} CLP"
 
-    def caracteristicas_list(self, lang='en'):
-        """
-        Retorna lista de características del plan.
-        
-        Args:
-            lang: 'en' para inglés, 'es' para español
-        """
-        feats = []
-        
-        # Traducciones
-        if lang == 'en':
-            if self.documentos_ilimitados:
-                feats.append("Unlimited documents")
-            if self.usuarios_incluidos:
-                # Si es 999 o más, mostrar como "ilimitados"
-                if self.usuarios_incluidos >= 999:
-                    feats.append("Unlimited users")
-                else:
-                    feats.append(f"Up to {self.usuarios_incluidos} users")
-            if self.reportes_avanzados:
-                feats.append("Advanced reports")
-            if self.diagnostico_ia:
-                feats.append("AI diagnostics included")
-            if self.soporte_prioritario:
-                feats.append("Priority support")
-            if self.api_incluida:
-                feats.append("Custom API")
-            if self.multisucursal:
-                feats.append("Multi-location support")
-            # Agregar soporte 24/7 si es prioritario
-            if self.soporte_prioritario:
-                feats.append("24/7 Premium support")
-        else:  # español
-            if self.documentos_ilimitados:
-                feats.append("Documentos ilimitados")
-            if self.usuarios_incluidos:
-                # Si es 999 o más, mostrar como "ilimitados"
-                if self.usuarios_incluidos >= 999:
-                    feats.append("Usuarios ilimitados")
-                else:
-                    feats.append(f"Hasta {self.usuarios_incluidos} usuarios")
-            if self.reportes_avanzados:
-                feats.append("Reportes avanzados")
-            if self.diagnostico_ia:
-                feats.append("Diagnóstico IA incluido")
-            if self.soporte_prioritario:
-                feats.append("Soporte prioritario")
-            if self.api_incluida:
-                feats.append("API personalizada")
-            if self.multisucursal:
-                feats.append("Multi-sucursales")
-            # Agregar soporte 24/7 si es prioritario
-            if self.soporte_prioritario:
-                feats.append("Soporte 24/7 Premium")
-        
-        return feats
+    def caracteristicas_list(self, lang="en"):
+        """Copywriting optimizado - todos tienen mismas funciones"""
+        if lang == "en":
+            if self.tipo_plan == "mensual":
+                return [
+                    "Unlimited work orders & invoices",
+                    "Complete inventory management",
+                    "Customer database & history",
+                    "AI-powered diagnostics",
+                    "Real-time analytics dashboard",
+                    "Priority email support",
+                ]
+            elif self.tipo_plan == "semestral":
+                return [
+                    "Everything in Monthly, plus:",
+                    "Advanced predictive analytics",
+                    "Enhanced AI diagnostic reports",
+                    "Performance tracking & KPIs",
+                    "Automated customer reminders",
+                    "Quarterly business reviews",
+                ]
+            return [
+                "Everything in Semi-Annual, plus:",
+                "VIP dedicated account manager",
+                "Custom API integrations",
+                "Advanced multi-location management",
+                "Exclusive early access to new features",
+                "Free migration & onboarding assistance",
+            ]
+        else:
+            if self.tipo_plan == "mensual":
+                return [
+                    "Órdenes de trabajo ilimitadas",
+                    "Gestión completa de inventario",
+                    "Base de datos de clientes",
+                    "Diagnósticos con IA avanzada",
+                    "Dashboard de analíticas en tiempo real",
+                    "Soporte prioritario por email",
+                ]
+            elif self.tipo_plan == "semestral":
+                return [
+                    "Todo del plan Mensual, más:",
+                    "Analíticas predictivas avanzadas",
+                    "Reportes IA mejorados",
+                    "Seguimiento de rendimiento y KPIs",
+                    "Recordatorios automáticos a clientes",
+                    "Revisiones de negocio trimestrales",
+                ]
+            return [
+                "Todo del plan Semestral, más:",
+                "Gerente de cuenta VIP dedicado",
+                "Integraciones API personalizadas",
+                "Gestión avanzada multi-sucursal",
+                "Acceso anticipado a nuevas funciones",
+                "Migración y capacitación gratuita",
+            ]
 
-    # Accesos directos típicos en vistas/templates
     @classmethod
     def get_vigente(cls, pais: str, tipo_plan: str):
-        """Devuelve el plan activo actual para un país y tipo (o None)."""
         return cls.objects.vigente(pais, tipo_plan)

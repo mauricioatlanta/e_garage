@@ -18,58 +18,60 @@ def buscar_clientes(request):
     """Búsqueda AJAX de clientes con mejor manejo de errores"""
     try:
         term = (request.GET.get("q") or "").strip()
-        
+
         # Debug logging
         print(f"[DEBUG] Buscando clientes: '{term}', Usuario: {request.user}")
-        
+
         if not term or len(term) < 2:
             return JsonResponse({"results": []})
-        
+
         empresa = get_or_create_empresa(request)
         print(f"🏢 Empresa obtenida: {empresa}")
-        
+
         # 🔒 SEGURIDAD: Solo clientes de esta empresa
         if not empresa:
             print("⚠️ No se encontró empresa para el usuario")
             return JsonResponse({"results": []})
-        
+
         qs = Cliente.objects.filter(empresa=empresa)
         print(f"[DEBUG] Total clientes de la empresa: {qs.count()}")
-            
+
         # Búsqueda más inteligente
         qs = qs.filter(
-            Q(nombre__icontains=term) | 
-            Q(apellido__icontains=term) |
-            Q(tax_id__icontains=term) | 
-            Q(telefono__icontains=term) | 
-            Q(email__icontains=term)
+            Q(nombre__icontains=term)
+            | Q(apellido__icontains=term)
+            | Q(tax_id__icontains=term)
+            | Q(telefono__icontains=term)
+            | Q(email__icontains=term)
         )
-        
+
         qs = qs.order_by("nombre")[:20]
         print(f"[DEBUG] Total clientes después de la búsqueda: {qs.count()}")
-        
+
         results = []
         for c in qs:
             # Crear texto de visualización más completo
             display_text = f"{c.nombre}"
-            if hasattr(c, 'apellido') and c.apellido:
+            if hasattr(c, "apellido") and c.apellido:
                 display_text += f" {c.apellido}"
             if c.tax_id:
                 display_text += f" (RUT: {c.tax_id})"
-                
-            results.append({
-                "id": c.id, 
-                "text": display_text,
-                "nombre": c.nombre,
-                "apellido": getattr(c, 'apellido', ''),
-                "rut": c.tax_id or "", 
-                "telefono": getattr(c, "telefono", ""),
-                "email": getattr(c, "email", "")
-            })
-        
+
+            results.append(
+                {
+                    "id": c.id,
+                    "text": display_text,
+                    "nombre": c.nombre,
+                    "apellido": getattr(c, "apellido", ""),
+                    "rut": c.tax_id or "",
+                    "telefono": getattr(c, "telefono", ""),
+                    "email": getattr(c, "email", ""),
+                }
+            )
+
         print(f"[OK] Encontrados {len(results)} clientes")
         return JsonResponse({"results": results})
-        
+
     except Exception as e:
         print(f"[ERROR] Error en búsqueda de clientes: {e}")
         return JsonResponse({"error": "Error en la búsqueda", "results": []})
@@ -80,49 +82,58 @@ def vehiculos_por_cliente(request):
     """Obtener vehículos de un cliente específico - Filtrado por empresa y cliente (drop-in correcto)"""
     try:
         cliente_id = request.GET.get("cliente_id") or request.GET.get("cliente")
-        
-        print(f"🚗 Buscando vehículos para cliente: {cliente_id}, Usuario: {request.user}")
-        
+
+        print(
+            f"🚗 Buscando vehículos para cliente: {cliente_id}, Usuario: {request.user}"
+        )
+
         if not cliente_id:
             print("⚠️ No se proporcionó ID de cliente")
             return JsonResponse({"results": []})
-        
+
         # Validar que cliente_id sea un número válido
         try:
             cliente_id = int(cliente_id)
         except (ValueError, TypeError):
             print(f"⚠️ ID de cliente inválido: {cliente_id}")
             return JsonResponse({"error": "ID de cliente inválido", "results": []})
-            
+
         empresa = get_or_create_empresa(request)
         print(f"🏢 Empresa obtenida: {empresa}")
-        
+
         if not empresa:
             print("⚠️ No se pudo obtener empresa del usuario")
             return JsonResponse({"error": "Empresa no encontrada", "results": []})
-        
+
         # ✅ FILTRO CRÍTICO: empresa + cliente usando el nuevo manager
-        qs = Vehiculo.objects.de_empresa(empresa).de_cliente(cliente_id).select_related('marca', 'modelo').order_by("-id")[:50]
-        
+        qs = (
+            Vehiculo.objects.de_empresa(empresa)
+            .de_cliente(cliente_id)
+            .select_related("marca", "modelo")
+            .order_by("-id")[:50]
+        )
+
         print(f"[DEBUG] Total vehículos encontrados: {qs.count()}")
-        
+
         # Formatear respuesta usando el nuevo método display_label()
         data = []
         for v in qs:
-            data.append({
-                "id": v.id,
-                "text": v.display_label(),
-                "label": v.display_label(),  # Compatibilidad con diferentes frontends
-                "patente": v.patente or "",
-                "vin": v.vin or "",
-                "marca": v.get_marca_display(),
-                "modelo": v.get_modelo_display(),
-                "anio": getattr(v, "anio", None),
-            })
-            
+            data.append(
+                {
+                    "id": v.id,
+                    "text": v.display_label(),
+                    "label": v.display_label(),  # Compatibilidad con diferentes frontends
+                    "patente": v.patente or "",
+                    "vin": v.vin or "",
+                    "marca": v.get_marca_display(),
+                    "modelo": v.get_modelo_display(),
+                    "anio": getattr(v, "anio", None),
+                }
+            )
+
         print(f"[OK] Encontrados {len(data)} vehículos")
         return JsonResponse({"results": data})
-        
+
     except Exception as e:
         print(f"[ERROR] Error obteniendo vehículos: {e}")
         return JsonResponse({"error": "Error obteniendo vehículos", "results": []})
@@ -224,7 +235,7 @@ def vehiculos_por_cliente(request):
         )
         patente = getattr(v, "patente", None) or ""
         vin = getattr(v, "vin", None) or ""
-        
+
         # Formato: "año, marca, modelo, placa"
         parts = []
         if anio:
@@ -235,7 +246,7 @@ def vehiculos_por_cliente(request):
             parts.append(modelo)
         if patente:
             parts.append(patente)
-        
+
         if parts:
             return ", ".join(parts)
         elif vin:

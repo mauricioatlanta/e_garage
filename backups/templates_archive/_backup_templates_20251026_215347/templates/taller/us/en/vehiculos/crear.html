@@ -363,7 +363,7 @@ USA EN<br>VEHICLE
       <!-- Vehicle Basic Information -->
       <div class="field-group">
         <h2 class="text-xl font-bold text-cyan-300 mb-4 border-b border-cyan-500/30 pb-2">🚗 Vehicle Information</h2>
-        
+
         <div class="grid md:grid-cols-2 gap-6 mb-6">
           <!-- Year -->
           <div>
@@ -392,7 +392,7 @@ USA EN<br>VEHICLE
       <!-- Technical Specifications -->
       <div class="field-group">
         <h2 class="text-xl font-bold text-cyan-300 mb-4 border-b border-cyan-500/30 pb-2">⚙️ Technical Specifications</h2>
-        
+
         <div class="grid md:grid-cols-2 gap-6">
           <!-- Engine -->
           <div>
@@ -415,7 +415,7 @@ USA EN<br>VEHICLE
       <!-- Vehicle Details -->
       <div class="field-group">
         <h2 class="text-xl font-bold text-cyan-300 mb-4 border-b border-cyan-500/30 pb-2">📋 Vehicle Details</h2>
-        
+
         <div class="grid md:grid-cols-3 gap-6 mb-6">
           <!-- VIN -->
           <div>
@@ -447,17 +447,17 @@ USA EN<br>VEHICLE
                 <button type="button" class="color-option" data-color="Silver" data-hex="#9CA3AF" style="background: #9CA3AF; border: 2px solid #e5e7eb;" title="Silver"></button>
                 <button type="button" class="color-option" data-color="Gray" data-hex="#6B7280" style="background: #6B7280; border: 2px solid #e5e7eb;" title="Gray"></button>
               </div>
-              
+
               <!-- Custom Color Input -->
               <div class="flex gap-2">
                 <input type="text" id="custom-color-input" class="form-input flex-1" placeholder="Enter custom color..." style="display: none;">
                 <button type="button" id="btn-custom-color" class="btn-link">+ Add Custom Color</button>
               </div>
-              
+
               <!-- Hidden field to store the selected color -->
               <input type="hidden" name="color" id="selected-color" value="{{ form.color.value|default:'' }}">
               <input type="hidden" id="selected-color-hex" value="">
-              
+
               <!-- Hide the original Django color field -->
               <div style="display: none;">
                 {{ form.color }}
@@ -473,7 +473,7 @@ USA EN<br>VEHICLE
       <!-- Additional Information -->
       <div class="field-group">
         <h2 class="text-xl font-bold text-cyan-300 mb-4 border-b border-cyan-500/30 pb-2">📝 Additional Information</h2>
-        
+
         <div>
           <label class="form-label">📄 Notes & Comments</label>
           {{ form.informacion_adicional|add_class:"form-textarea" }}
@@ -537,7 +537,7 @@ USA EN<br>VEHICLE
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const endpoints = document.getElementById('vehiculos-endpoints').dataset;
-    
+
     // Client search functionality
     const clientSearchInput = document.querySelector('#client-search');
     const clienteIdInput = document.querySelector('#cliente-id');
@@ -553,7 +553,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         showLoading();
-        
+
         fetch(`${endpoints.clientesUrl}?q=${encodeURIComponent(query)}`)
             .then(response => response.json())
             .then(data => {
@@ -588,7 +588,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="client-info">
                     <div class="client-name">${client.nombre} ${client.apellido}</div>
                     <div class="client-details">
-                        ${client.email ? `📧 ${client.email}` : ''} 
+                        ${client.email ? `📧 ${client.email}` : ''}
                         ${client.telefono ? `📞 ${client.telefono}` : ''}
                     </div>
                 </div>
@@ -621,7 +621,7 @@ document.addEventListener('DOMContentLoaded', function() {
         clientSearchInput.value = clientName;
         clienteIdInput.value = clientId;
         hideSuggestions();
-        
+
         // Add visual feedback
         clientSearchInput.style.borderColor = '#10b981';
         setTimeout(() => {
@@ -644,7 +644,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (clientSearchInput) {
         clientSearchInput.addEventListener('input', (e) => {
             const query = e.target.value.trim();
-            
+
             if (query === '') {
                 clearSelection();
                 return;
@@ -710,9 +710,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const selectedColorHexInput = document.getElementById('selected-color-hex');
     const customColorInput = document.getElementById('custom-color-input');
     const btnCustomColor = document.getElementById('btn-custom-color');
-    
+
     let selectedColorDisplay = null;
-    
+
     // Create selected color display element
     function createSelectedColorDisplay() {
         if (!selectedColorDisplay) {
@@ -722,37 +722,37 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         return selectedColorDisplay;
     }
-    
+
     // Update selected color display
     function updateSelectedColorDisplay(colorName, hexValue) {
         const display = createSelectedColorDisplay();
         display.innerHTML = `Selected: <strong>${colorName}</strong> <span style="display: inline-block; width: 16px; height: 16px; background: ${hexValue}; border-radius: 3px; border: 1px solid #e5e7eb; vertical-align: middle; margin-left: 8px;"></span>`;
     }
-    
+
     // Select color from predefined options
     colorOptions.forEach(option => {
         option.addEventListener('click', () => {
             // Remove previous selection
             colorOptions.forEach(opt => opt.classList.remove('selected'));
-            
+
             // Select current option
             option.classList.add('selected');
-            
+
             // Update hidden inputs
             const colorName = option.dataset.color;
             const hexValue = option.dataset.hex;
             selectedColorInput.value = colorName;
             selectedColorHexInput.value = hexValue;
-            
+
             // Update display
             updateSelectedColorDisplay(colorName, hexValue);
-            
+
             // Hide custom input if shown
             customColorInput.style.display = 'none';
             btnCustomColor.textContent = '+ Add Custom Color';
         });
     });
-    
+
     // Custom color functionality
     btnCustomColor.addEventListener('click', () => {
         if (customColorInput.style.display === 'none') {
@@ -760,12 +760,12 @@ document.addEventListener('DOMContentLoaded', function() {
             customColorInput.style.display = 'block';
             customColorInput.focus();
             btnCustomColor.textContent = 'Cancel';
-            
+
             // Clear any selected predefined color
             colorOptions.forEach(opt => opt.classList.remove('selected'));
             selectedColorInput.value = '';
             selectedColorHexInput.value = '';
-            
+
             // Clear display
             if (selectedColorDisplay) {
                 selectedColorDisplay.innerHTML = '';
@@ -777,7 +777,7 @@ document.addEventListener('DOMContentLoaded', function() {
             customColorInput.value = '';
         }
     });
-    
+
     // Handle custom color input
     customColorInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
@@ -786,10 +786,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Update hidden inputs
                 selectedColorInput.value = customColor;
                 selectedColorHexInput.value = '';
-                
+
                 // Update display
                 updateSelectedColorDisplay(customColor, '#9CA3AF'); // Default gray for custom colors
-                
+
                 // Hide custom input
                 customColorInput.style.display = 'none';
                 btnCustomColor.textContent = '+ Add Custom Color';
@@ -797,15 +797,15 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
-    
+
     // Initialize with existing value if any
     const existingColor = selectedColorInput.value;
     if (existingColor) {
         // Try to find matching predefined color
-        const matchingOption = Array.from(colorOptions).find(option => 
+        const matchingOption = Array.from(colorOptions).find(option =>
             option.dataset.color.toLowerCase() === existingColor.toLowerCase()
         );
-        
+
         if (matchingOption) {
             matchingOption.click();
         } else {
@@ -821,21 +821,21 @@ document.addEventListener('DOMContentLoaded', function() {
             // Ensure the hidden client field is properly set
             const clientId = clienteIdInput.value;
             const clientSearch = clientSearchInput.value.trim();
-            
+
             if (!clientId && clientSearch) {
                 e.preventDefault();
                 alert('Please select a client from the search results');
                 clientSearchInput.focus();
                 return false;
             }
-            
+
             if (!clientId) {
                 e.preventDefault();
                 alert('Please select a client');
                 clientSearchInput.focus();
                 return false;
             }
-            
+
             // Sync the hidden field with the selected client
             const originalClientField = document.querySelector('select[name="cliente"]');
             if (originalClientField) {
@@ -843,42 +843,42 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
+
     // Model filtering by brand and year
     const marcaField = document.querySelector('#id_marca');
     const anioField = document.querySelector('#id_anio');
     const modeloField = document.querySelector('#id_modelo');
-    
-    
+
+
     function updateModelos() {
         const marcaId = marcaField.value;
         const anio = anioField.value;
-        
+
         if (marcaId) {
             modeloField.innerHTML = '<option value="">Loading models...</option>';
-            
-            
+
+
             fetch(`${endpoints.modelosUrl}?marca=${marcaId}&anio=${anio}`)
                 .then(response => response.json())
                 .then(data => {
-                    
+
                     modeloField.innerHTML = '<option value="">Select model</option>';
-                    
+
                     // Handle both formats: direct array or {results: [...]}
                     const models = data.results || data || [];
-                    
+
                     if (models.length === 0) {
                         modeloField.innerHTML = '<option value="">No models found</option>';
                         return;
                     }
-                    
+
                     models.forEach(modelo => {
                         const option = document.createElement('option');
                         option.value = modelo.id;
                         option.textContent = modelo.text || modelo.nombre || modelo.name || 'Unknown Model';
                         modeloField.appendChild(option);
                     });
-                    
+
                     // Clear engines and transmissions when model list changes
                     updateMotores();
                     updateCajas();
@@ -897,24 +897,24 @@ document.addEventListener('DOMContentLoaded', function() {
             updateCajas();
         }
     }
-    
+
     if (marcaField) marcaField.addEventListener('change', updateModelos);
     if (anioField) anioField.addEventListener('change', updateModelos);
-    
+
     // Engine loading functionality
     const motorField = document.querySelector('#id_motor');
-    
+
     function updateMotores() {
         const modeloId = modeloField ? modeloField.value : null;
-        
+
         if (modeloId) {
             motorField.innerHTML = '<option value="">Loading engines...</option>';
-            
+
             fetch(`${endpoints.motoresUrl}?modelo=${modeloId}`)
                 .then(response => response.json())
                 .then(data => {
                     motorField.innerHTML = '<option value="">Select engine</option>';
-                    
+
                     const engines = data.results || data || [];
                     engines.forEach(engine => {
                         const option = document.createElement('option');
@@ -922,7 +922,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         option.textContent = engine.text || engine.nombre || engine;
                         motorField.appendChild(option);
                     });
-                    
+
                     // Add option to add new engine
                     const addOption = document.createElement('option');
                     addOption.value = '__nuevo__';
@@ -937,21 +937,21 @@ document.addEventListener('DOMContentLoaded', function() {
             motorField.innerHTML = '<option value="">Select model first</option>';
         }
     }
-    
+
     // Transmission loading functionality
     const cajaField = document.querySelector('#id_caja');
-    
+
     function updateCajas() {
         const modeloId = modeloField ? modeloField.value : null;
-        
+
         if (modeloId) {
             cajaField.innerHTML = '<option value="">Loading transmissions...</option>';
-            
+
             fetch(`${endpoints.cajasUrl}?modelo=${modeloId}`)
                 .then(response => response.json())
                 .then(data => {
                     cajaField.innerHTML = '<option value="">Select transmission</option>';
-                    
+
                     const transmissions = data.results || data || [];
                     transmissions.forEach(transmission => {
                         const option = document.createElement('option');
@@ -959,7 +959,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         option.textContent = transmission.text || transmission.nombre || transmission;
                         cajaField.appendChild(option);
                     });
-                    
+
                     // Add option to add new transmission
                     const addOption = document.createElement('option');
                     addOption.value = '__nuevo__';
@@ -974,7 +974,7 @@ document.addEventListener('DOMContentLoaded', function() {
             cajaField.innerHTML = '<option value="">Select model first</option>';
         }
     }
-    
+
     // Update engines and transmissions when model changes
     if (modeloField) {
         modeloField.addEventListener('change', () => {
@@ -982,41 +982,41 @@ document.addEventListener('DOMContentLoaded', function() {
             updateCajas();
         });
     }
-    
+
     // Engine modal
     const btnAgregarMotor = document.getElementById('btn-agregar-motor');
     const modalMotor = document.getElementById('modal-motor');
     const formMotor = document.getElementById('form-motor');
     const inputMotor = document.getElementById('input-motor');
     const cancelarMotor = document.getElementById('cancelar-motor');
-    
+
     if (btnAgregarMotor && modalMotor) {
         btnAgregarMotor.addEventListener('click', () => {
             // Get the selected model ID
             const modeloField = document.querySelector('#id_modelo');
             const modeloId = modeloField ? modeloField.value : null;
-            
+
             if (!modeloId) {
                 alert('Please select a model first before adding an engine');
                 return;
             }
-            
+
             // Store the model ID in the modal for later use
             modalMotor.dataset.modeloId = modeloId;
             modalMotor.classList.remove('hidden');
             inputMotor.focus();
         });
-        
+
         cancelarMotor.addEventListener('click', () => {
             modalMotor.classList.add('hidden');
             inputMotor.value = '';
         });
-        
+
         formMotor.addEventListener('submit', (e) => {
             e.preventDefault();
             const nombre = inputMotor.value.trim();
             const modeloId = modalMotor.dataset.modeloId;
-            
+
             if (nombre && modeloId) {
                 // Add new engine via AJAX
                 fetch(endpoints.agregarMotorUrl, {
@@ -1025,7 +1025,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         'Content-Type': 'application/json',
                         'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
                     },
-                    body: JSON.stringify({ 
+                    body: JSON.stringify({
                         nombre: nombre,
                         modelo_id: modeloId
                     })
@@ -1042,7 +1042,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         motorSelect.appendChild(option);
                         modalMotor.classList.add('hidden');
                         inputMotor.value = '';
-                        
+
                         // Show success message
                         console.log('✅ Engine added successfully:', data.motor.nombre);
                     } else {
@@ -1057,41 +1057,41 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
+
     // Transmission modal
     const btnAgregarCaja = document.getElementById('btn-agregar-caja');
     const modalCaja = document.getElementById('modal-caja');
     const formCaja = document.getElementById('form-caja');
     const inputCaja = document.getElementById('input-caja');
     const cancelarCaja = document.getElementById('cancelar-caja');
-    
+
     if (btnAgregarCaja && modalCaja) {
         btnAgregarCaja.addEventListener('click', () => {
             // Get the selected model ID
             const modeloField = document.querySelector('#id_modelo');
             const modeloId = modeloField ? modeloField.value : null;
-            
+
             if (!modeloId) {
                 alert('Please select a model first before adding a transmission');
                 return;
             }
-            
+
             // Store the model ID in the modal for later use
             modalCaja.dataset.modeloId = modeloId;
             modalCaja.classList.remove('hidden');
             inputCaja.focus();
         });
-        
+
         cancelarCaja.addEventListener('click', () => {
             modalCaja.classList.add('hidden');
             inputCaja.value = '';
         });
-        
+
         formCaja.addEventListener('submit', (e) => {
             e.preventDefault();
             const nombre = inputCaja.value.trim();
             const modeloId = modalCaja.dataset.modeloId;
-            
+
             if (nombre && modeloId) {
                 // Add new transmission via AJAX
                 fetch(endpoints.agregarCajaUrl, {
@@ -1100,7 +1100,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         'Content-Type': 'application/json',
                         'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
                     },
-                    body: JSON.stringify({ 
+                    body: JSON.stringify({
                         nombre: nombre,
                         modelo_id: modeloId
                     })
@@ -1117,7 +1117,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         cajaSelect.appendChild(option);
                         modalCaja.classList.add('hidden');
                         inputCaja.value = '';
-                        
+
                         // Show success message
                         console.log('✅ Transmission added successfully:', data.caja.nombre);
                     } else {

@@ -122,4 +122,3 @@ TEMPLATES = [
 | **Login override** | ❌ No funcionaba | ✅ Funcionando |
 | **Botón "Otros Servicios"** | ❌ No visible | ✅ Visible |
 | **Organización** | 🔀 Caótica | 🎯 Limpia |
-

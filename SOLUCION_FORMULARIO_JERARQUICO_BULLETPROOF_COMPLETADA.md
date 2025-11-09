@@ -51,7 +51,7 @@ function handleMarcaChange() {
 
   // Capturar keepValue ANTES de limpiar
   const keep = $('#id_modelo').val();
-  
+
   clearAndDisableSelect('#id_modelo', 'Select brand/year first');
   // ... resto de la lógica
   populateSelect('#id_modelo', modelos, { keepValue: keep });
@@ -202,5 +202,3 @@ if (motorCount > 0) {
 - ✅ **Modo edición y creación**
 
 El formulario jerárquico ahora es verdaderamente "a prueba de balas" y está listo para producción con todas las mejoras implementadas según las mejores prácticas de desarrollo frontend.
-
-

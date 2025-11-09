@@ -1,6 +1,6 @@
 # 📧 GUÍA DE CONFIGURACIÓN Y PRUEBAS - SISTEMA DE EMAILS
 
-**Fecha**: 26 de octubre de 2025  
+**Fecha**: 26 de octubre de 2025
 **Estado**: ✅ Sistema Completo Implementado
 
 ---
@@ -18,19 +18,19 @@ ACCOUNT_EMAIL_REQUIRED = True             # ✅ Activado
 ```
 1. templates/account/email/email_confirmation_message.html
    - Email de confirmación de cuenta (allauth)
-   
+
 2. templates/email/comprobante_recibido.html
    - Notifica al cliente que recibimos su comprobante
-   
+
 3. templates/email/pago_confirmado.html
    - Notifica que el pago fue aprobado y suscripción activa
-   
+
 4. templates/email/recordatorio_vencimiento.html
    - Recordatorio 7 días antes de vencer
-   
+
 5. templates/email/suscripcion_vencida.html
    - Notifica que la suscripción venció
-   
+
 6. templates/email/admin_pago_nuevo.html
    - Notifica al admin de nuevo pago pendiente
 ```
@@ -444,6 +444,5 @@ Válido hasta: 26/11/2025
 
 ---
 
-**Creado**: 26 de octubre de 2025, 00:30 hrs  
+**Creado**: 26 de octubre de 2025, 00:30 hrs
 **Status**: ✅ SISTEMA COMPLETO - LISTO PARA PROBAR
-

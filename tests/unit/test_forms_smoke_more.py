@@ -1,13 +1,25 @@
 import pytest
-from django.test import RequestFactory
 
 CANDS = [
-    ("taller.forms.empresa",    "EmpresaForm", {"nombre":"ACME","pais":"CL"}),
-    ("taller.forms.vehiculo",   "VehiculoForm", {"patente":"AAA11","marca":"X","modelo":"Y","anio":2024}),
-    ("taller.forms.documento",  "DocumentoForm", {"tipo":"FAC","fecha_emision":"2025-01-01"}),
-    ("taller.forms.repuesto",   "RepuestoForm", {"nombre":"Filtro","precio":1000}),
-    ("taller.forms.servicios",  "ServicioForm", {"nombre":"Alineación","precio":5000}),
+    ("taller.forms.empresa", "EmpresaForm", {"nombre": "ACME", "pais": "CL"}),
+    (
+        "taller.forms.vehiculo",
+        "VehiculoForm",
+        {"patente": "AAA11", "marca": "X", "modelo": "Y", "anio": 2024},
+    ),
+    (
+        "taller.forms.documento",
+        "DocumentoForm",
+        {"tipo": "FAC", "fecha_emision": "2025-01-01"},
+    ),
+    ("taller.forms.repuesto", "RepuestoForm", {"nombre": "Filtro", "precio": 1000}),
+    (
+        "taller.forms.servicios",
+        "ServicioForm",
+        {"nombre": "Alineación", "precio": 5000},
+    ),
 ]
+
 
 @pytest.mark.django_db
 @pytest.mark.parametrize("mod,cls,min_data", CANDS)

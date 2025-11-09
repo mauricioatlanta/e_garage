@@ -23,6 +23,7 @@ os.environ.setdefault("DEBUG", "False")
 
 # --- Aplicación WSGI ---
 from django.core.wsgi import get_wsgi_application
+
 application = get_wsgi_application()
 
 # ---- SERVIR STATIC/MEDIA EN NGINX DE PA (se configura en el panel Web) ----

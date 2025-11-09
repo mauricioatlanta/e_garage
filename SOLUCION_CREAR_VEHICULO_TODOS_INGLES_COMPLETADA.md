@@ -132,5 +132,3 @@ La página `/us/vehiculos/crear/` ahora está **completamente en inglés**:
 - Consistencia en todo el template
 
 El template de crear vehículo ahora cumple completamente con el requisito de tener todos los títulos y subtítulos en inglés, proporcionando una experiencia de usuario profesional y consistente para usuarios de habla inglesa.
-
-

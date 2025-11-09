@@ -168,8 +168,8 @@ Una vez resuelto el problema de restricción, el sistema estará **100% funciona
 
 ---
 
-**Fecha**: 2025-10-06  
-**Versión**: 1.0  
-**Estado**: ✅ **IMPLEMENTACIÓN 98% COMPLETA**  
-**Pendiente**: ⚠️ **Resolver restricción NOT NULL (5 minutos)**  
+**Fecha**: 2025-10-06
+**Versión**: 1.0
+**Estado**: ✅ **IMPLEMENTACIÓN 98% COMPLETA**
+**Pendiente**: ⚠️ **Resolver restricción NOT NULL (5 minutos)**
 **Tiempo estimado**: 5-10 minutos para completar

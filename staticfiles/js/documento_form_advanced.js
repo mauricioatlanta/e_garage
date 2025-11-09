@@ -13,34 +13,34 @@ let currentVehicle = null;
 function updateDocumentNumber() {
     const tipoInput = document.getElementById('tipo');
     const numberDisplay = document.getElementById('document-number');
-    
+
     if (!tipoInput || !numberDisplay) {
         console.log('⚠️ No se encontraron elementos para actualizar número de documento');
         return;
     }
-    
+
     const tipo = tipoInput.value;
     if (!tipo) {
         numberDisplay.textContent = 'Will be generated automatically';
         return;
     }
-    
+
     // Mapear los valores del formulario a los valores esperados por la API
     const tipoMapping = {
         'FAC': 'FACTURA',
-        'COT': 'PRESUPUESTO', 
+        'COT': 'PRESUPUESTO',
         'ORD': 'ORDEN DE TRABAJO',
         'REC': 'RECIBO'
     };
-    
+
     const apiTipo = tipoMapping[tipo] || tipo;
-    
+
     // Detectar país desde la URL
     const countryPrefix = window.location.pathname.startsWith('/us/') ? 'us' : 'cl';
     const apiUrl = `/${countryPrefix}/documentos/api/obtener-numero-documento/?tipo=${apiTipo}`;
-    
+
     console.log('📡 Obteniendo número de documento para tipo:', tipo);
-    
+
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => {
@@ -66,24 +66,24 @@ function initClientSearch() {
     const searchInput = document.getElementById('cliente-search');
     const resultsContainer = document.getElementById('cliente-results');
     const clienteSelect = document.getElementById('id_cliente');
-    
+
     if (!searchInput) return;
-    
+
     searchInput.addEventListener('input', function(e) {
         const query = e.target.value.trim();
-        
+
         if (query.length < 2) {
             resultsContainer.classList.add('hidden');
             return;
         }
-        
+
         // Debounce la búsqueda
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
             searchClients(query);
         }, 300);
     });
-    
+
     // Ocultar resultados al hacer clic fuera
     document.addEventListener('click', function(e) {
         if (!searchInput.contains(e.target) && !resultsContainer.contains(e.target)) {
@@ -94,11 +94,11 @@ function initClientSearch() {
 
 function searchClients(query) {
     const resultsContainer = document.getElementById('cliente-results');
-    
+
     // Detectar país desde la URL
     const countryPrefix = window.location.pathname.startsWith('/us/') ? 'us' : 'cl';
     const apiUrl = `/${countryPrefix}/documentos/api/clientes/search/?q=${encodeURIComponent(query)}`;
-    
+
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => {
@@ -118,9 +118,9 @@ function searchClients(query) {
 
 function displayClientResults(clientes) {
     const resultsContainer = document.getElementById('cliente-results');
-    
+
     const html = clientes.map(cliente => `
-        <div class="p-3 hover:bg-gray-700 cursor-pointer border-b border-gray-600 last:border-b-0 cliente-result-item" 
+        <div class="p-3 hover:bg-gray-700 cursor-pointer border-b border-gray-600 last:border-b-0 cliente-result-item"
              data-cliente-id="${cliente.id}"
              data-cliente-nombre="${cliente.nombre}"
              data-cliente-identificador="${cliente.identificador || ''}">
@@ -129,10 +129,10 @@ function displayClientResults(clientes) {
             ${cliente.email ? `<div class="text-xs text-gray-500">${cliente.email}</div>` : ''}
         </div>
     `).join('');
-    
+
     resultsContainer.innerHTML = html;
     resultsContainer.classList.remove('hidden');
-    
+
     // Agregar event listeners a los resultados
     resultsContainer.querySelectorAll('.cliente-result-item').forEach(item => {
         item.addEventListener('click', function() {
@@ -145,19 +145,19 @@ function selectClient(clienteId, nombre, identificador) {
     const clienteSelect = document.getElementById('id_cliente');
     const searchInput = document.getElementById('cliente-search');
     const resultsContainer = document.getElementById('cliente-results');
-    
+
     // Seleccionar en el dropdown
     clienteSelect.value = clienteId;
-    
+
     // Actualizar el campo de búsqueda
     searchInput.value = `${nombre} - ${identificador}`;
-    
+
     // Ocultar resultados
     resultsContainer.classList.add('hidden');
-    
+
     // Cargar vehículos del cliente
     loadClientVehicles(clienteId);
-    
+
     currentClient = { id: clienteId, nombre, identificador };
 }
 
@@ -167,20 +167,20 @@ function selectClient(clienteId, nombre, identificador) {
 
 function loadClientVehicles(clienteId) {
     const vehiculoSelect = document.getElementById('id_vehiculo');
-    
+
     // Limpiar opciones actuales
     vehiculoSelect.innerHTML = '<option value="">Cargando vehículos...</option>';
-    
+
     // Detectar país desde la URL
     const countryPrefix = window.location.pathname.startsWith('/us/') ? 'us' : 'cl';
     const apiUrl = `/${countryPrefix}/documentos/api/vehiculos-cliente/?cliente_id=${clienteId}`;
-    
+
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => {
             if (data.vehiculos && data.vehiculos.length > 0) {
                 vehiculoSelect.innerHTML = '<option value="">Select a vehicle...</option>';
-                
+
                 data.vehiculos.forEach(vehiculo => {
                     const option = document.createElement('option');
                     option.value = vehiculo.id;
@@ -188,7 +188,7 @@ function loadClientVehicles(clienteId) {
                     option.dataset.vehiculoData = JSON.stringify(vehiculo);
                     vehiculoSelect.appendChild(option);
                 });
-                
+
                 // Agregar event listener para mostrar info del vehículo
                 vehiculoSelect.addEventListener('change', function() {
                     if (this.value) {
@@ -198,7 +198,7 @@ function loadClientVehicles(clienteId) {
                         hideVehicleInfo();
                     }
                 });
-                
+
             } else {
                 vehiculoSelect.innerHTML = '<option value="">This client has no registered vehicles</option>';
             }
@@ -218,17 +218,17 @@ function showVehicleInfo(vehiculo) {
     const yearInput = document.getElementById('vehicle-year');
     const modelInput = document.getElementById('vehicle-model');
     const mileageInput = document.getElementById('vehicle-mileage');
-    
+
     if (!vehicleInfoDiv) return;
-    
+
     // Llenar información del vehículo
     yearInput.value = vehiculo.año || '';
     modelInput.value = `${vehiculo.marca} ${vehiculo.modelo}` || '';
     mileageInput.value = vehiculo.kilometraje || vehiculo.millas || '';
-    
+
     // Mostrar el contenedor
     vehicleInfoDiv.classList.remove('hidden');
-    
+
     currentVehicle = vehiculo;
 }
 
@@ -247,25 +247,25 @@ function hideVehicleInfo() {
 function initRepuestoSearch() {
     const searchInput = document.getElementById('quick-rep-search');
     const resultsContainer = document.getElementById('quick-rep-results');
-    
+
     if (!searchInput) return;
-    
+
     let repSearchTimeout = null;
-    
+
     searchInput.addEventListener('input', function(e) {
         const query = e.target.value.trim();
-        
+
         if (query.length < 2) {
             resultsContainer.classList.add('hidden');
             return;
         }
-        
+
         clearTimeout(repSearchTimeout);
         repSearchTimeout = setTimeout(() => {
             searchRepuestos(query);
         }, 300);
     });
-    
+
     // Ocultar resultados al hacer clic fuera
     document.addEventListener('click', function(e) {
         if (!searchInput.contains(e.target) && !resultsContainer.contains(e.target)) {
@@ -276,11 +276,11 @@ function initRepuestoSearch() {
 
 function searchRepuestos(query) {
     const resultsContainer = document.getElementById('quick-rep-results');
-    
+
     // Detectar país desde la URL
     const countryPrefix = window.location.pathname.startsWith('/us/') ? 'us' : 'cl';
     const apiUrl = `/${countryPrefix}/documentos/api/repuestos/search/?q=${encodeURIComponent(query)}`;
-    
+
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => {
@@ -300,9 +300,9 @@ function searchRepuestos(query) {
 
 function displayRepuestoResults(repuestos) {
     const resultsContainer = document.getElementById('quick-rep-results');
-    
+
     const html = repuestos.map(repuesto => `
-        <div class="p-3 hover:bg-gray-700 cursor-pointer border-b border-gray-600 last:border-b-0 repuesto-result-item" 
+        <div class="p-3 hover:bg-gray-700 cursor-pointer border-b border-gray-600 last:border-b-0 repuesto-result-item"
              data-repuesto-id="${repuesto.id}"
              data-repuesto-nombre="${repuesto.nombre}"
              data-repuesto-codigo="${repuesto.codigo || ''}"
@@ -312,10 +312,10 @@ function displayRepuestoResults(repuestos) {
             <div class="text-sm text-green-400">Precio: $${parseFloat(repuesto.precio || 0).toLocaleString()}</div>
         </div>
     `).join('');
-    
+
     resultsContainer.innerHTML = html;
     resultsContainer.classList.remove('hidden');
-    
+
     // Agregar event listeners
     resultsContainer.querySelectorAll('.repuesto-result-item').forEach(item => {
         item.addEventListener('click', function() {
@@ -328,10 +328,10 @@ function displayRepuestoResults(repuestos) {
 function addRepuestoFromSearch(repuestoData) {
     // Esta función debería integrarse con el sistema existente de agregar repuestos
     console.log('Agregando repuesto:', repuestoData);
-    
+
     // Aquí deberías llamar a la función existente que agrega repuestos
     // Por ejemplo: addRepuestoLine(repuestoData);
-    
+
     // Limpiar el campo de búsqueda
     document.getElementById('quick-rep-search').value = '';
 }
@@ -343,25 +343,25 @@ function addRepuestoFromSearch(repuestoData) {
 function initServicioSearch() {
     const searchInput = document.getElementById('quick-serv-search');
     const resultsContainer = document.getElementById('quick-serv-results');
-    
+
     if (!searchInput) return;
-    
+
     let servSearchTimeout = null;
-    
+
     searchInput.addEventListener('input', function(e) {
         const query = e.target.value.trim();
-        
+
         if (query.length < 2) {
             resultsContainer.classList.add('hidden');
             return;
         }
-        
+
         clearTimeout(servSearchTimeout);
         servSearchTimeout = setTimeout(() => {
             searchServicios(query);
         }, 300);
     });
-    
+
     // Ocultar resultados al hacer clic fuera
     document.addEventListener('click', function(e) {
         if (!searchInput.contains(e.target) && !resultsContainer.contains(e.target)) {
@@ -372,11 +372,11 @@ function initServicioSearch() {
 
 function searchServicios(query) {
     const resultsContainer = document.getElementById('quick-serv-results');
-    
+
     // Detectar país desde la URL
     const countryPrefix = window.location.pathname.startsWith('/us/') ? 'us' : 'cl';
     const apiUrl = `/${countryPrefix}/documentos/api/servicios/search/?q=${encodeURIComponent(query)}`;
-    
+
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => {
@@ -396,9 +396,9 @@ function searchServicios(query) {
 
 function displayServicioResults(servicios) {
     const resultsContainer = document.getElementById('quick-serv-results');
-    
+
     const html = servicios.map(servicio => `
-        <div class="p-3 hover:bg-gray-700 cursor-pointer border-b border-gray-600 last:border-b-0 servicio-result-item" 
+        <div class="p-3 hover:bg-gray-700 cursor-pointer border-b border-gray-600 last:border-b-0 servicio-result-item"
              data-servicio-id="${servicio.id}"
              data-servicio-nombre="${servicio.nombre}"
              data-servicio-codigo="${servicio.codigo || ''}"
@@ -408,10 +408,10 @@ function displayServicioResults(servicios) {
             <div class="text-sm text-green-400">Precio: $${parseFloat(servicio.precio || 0).toLocaleString()}</div>
         </div>
     `).join('');
-    
+
     resultsContainer.innerHTML = html;
     resultsContainer.classList.remove('hidden');
-    
+
     // Agregar event listeners
     resultsContainer.querySelectorAll('.servicio-result-item').forEach(item => {
         item.addEventListener('click', function() {
@@ -423,7 +423,7 @@ function displayServicioResults(servicios) {
 
 function addServicioFromSearch(servicioData) {
     console.log('Agregando servicio:', servicioData);
-    
+
     // Limpiar el campo de búsqueda
     document.getElementById('quick-serv-search').value = '';
 }
@@ -434,46 +434,46 @@ function addServicioFromSearch(servicioData) {
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 Initializing advanced document form functionalities');
-    
+
     // 1. Generación automática de número de documento
     updateDocumentNumber();
-    
+
     // Event listeners para los botones de tipo de documento
     const tipoButtons = document.querySelectorAll('.btn-type');
     const tipoInput = document.getElementById('tipo');
-    
+
     tipoButtons.forEach(button => {
         button.addEventListener('click', function() {
             // Remover clase active de todos los botones
             tipoButtons.forEach(btn => btn.classList.remove('active'));
             // Agregar clase active al botón clickeado
             this.classList.add('active');
-            
+
             // Actualizar el valor del input hidden
             const tipo = this.dataset.tipo;
             if (tipoInput) {
                 tipoInput.value = tipo;
             }
-            
+
             // Actualizar el número de documento
             updateDocumentNumber();
         });
     });
-    
+
     // Event listener para el input hidden (fallback)
     if (tipoInput) {
         tipoInput.addEventListener('change', updateDocumentNumber);
     }
-    
+
     // 2. Búsqueda de clientes
     initClientSearch();
-    
+
     // 3. Búsqueda de repuestos
     initRepuestoSearch();
-    
+
     // 4. Búsqueda de servicios
     initServicioSearch();
-    
+
     console.log('✅ Advanced functionalities initialized');
 });
 
@@ -515,27 +515,27 @@ window.updateDocumentNumber = updateDocumentNumber;
 function filterVehiclesByClient() {
     const clienteSelect = document.getElementById('id_cliente');
     const vehiculoSelect = document.getElementById('id_vehiculo');
-    
+
     if (!clienteSelect || !vehiculoSelect) {
         console.log('⚠️ No se encontraron elementos cliente o vehículo');
         return;
     }
-    
+
     // Agregar event listener para cambio de cliente
     clienteSelect.addEventListener('change', function() {
         const clienteId = this.value;
         console.log('🔄 Cliente seleccionado:', clienteId);
-        
+
         if (!clienteId) {
             // Si no hay cliente seleccionado, mostrar todos los vehículos
             loadAllVehicles();
             return;
         }
-        
+
         // Filtrar vehículos por cliente
         loadVehiclesByClient(clienteId);
     });
-    
+
     // Cargar vehículos iniciales si ya hay un cliente seleccionado
     if (clienteSelect.value) {
         loadVehiclesByClient(clienteSelect.value);
@@ -545,16 +545,16 @@ function filterVehiclesByClient() {
 function loadVehiclesByClient(clienteId) {
     const vehiculoSelect = document.getElementById('id_vehiculo');
     if (!vehiculoSelect) return;
-    
+
     // Detectar país desde la URL
     const countryPrefix = window.location.pathname.startsWith('/us/') ? 'us' : 'cl';
     const apiUrl = `/${countryPrefix}/documentos/api/vehiculos-por-cliente/?cliente=${clienteId}`;
-    
+
     console.log('📡 Cargando vehículos para cliente:', clienteId);
-    
+
     // Mostrar loading
     vehiculoSelect.innerHTML = '<option value="">Cargando vehículos...</option>';
-    
+
     fetch(apiUrl)
         .then(response => {
             if (!response.ok) {
@@ -565,7 +565,7 @@ function loadVehiclesByClient(clienteId) {
         .then(data => {
             console.log('📊 Vehículos recibidos:', data);
             vehiculoSelect.innerHTML = '<option value="">Seleccione un vehículo...</option>';
-            
+
             if (data.vehiculos && data.vehiculos.length > 0) {
                 data.vehiculos.forEach(vehiculo => {
                     const option = document.createElement('option');
@@ -588,16 +588,16 @@ function loadVehiclesByClient(clienteId) {
 function loadAllVehicles() {
     const vehiculoSelect = document.getElementById('id_vehiculo');
     if (!vehiculoSelect) return;
-    
+
     // Detectar país desde la URL
     const countryPrefix = window.location.pathname.startsWith('/us/') ? 'us' : 'cl';
     const apiUrl = `/${countryPrefix}/documentos/api/todos-vehiculos/`;
-    
+
     console.log('📡 Cargando todos los vehículos');
-    
+
     // Mostrar loading
     vehiculoSelect.innerHTML = '<option value="">Cargando vehículos...</option>';
-    
+
     fetch(apiUrl)
         .then(response => {
             if (!response.ok) {
@@ -608,7 +608,7 @@ function loadAllVehicles() {
         .then(data => {
             console.log('📊 Todos los vehículos recibidos:', data);
             vehiculoSelect.innerHTML = '<option value="">Seleccione un vehículo...</option>';
-            
+
             if (data.vehiculos && data.vehiculos.length > 0) {
                 data.vehiculos.forEach(vehiculo => {
                     const option = document.createElement('option');

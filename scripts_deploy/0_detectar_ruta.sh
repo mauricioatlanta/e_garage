@@ -48,11 +48,11 @@ else
     echo ""
     echo "   ${RUTA_ENCONTRADA}"
     echo ""
-    
+
     # Verificar contenido
     echo "📁 Contenido del proyecto:"
     ls -la "${RUTA_ENCONTRADA}" | head -20
-    
+
     echo ""
     echo "📊 Base de datos:"
     if [ -f "${RUTA_ENCONTRADA}/db.sqlite3" ]; then
@@ -62,7 +62,7 @@ else
         echo "   ⚠️  No se encontró db.sqlite3"
         echo "   ¿Usas MySQL/PostgreSQL?"
     fi
-    
+
     echo ""
     echo "======================================================"
     echo "📝 GUARDA ESTA RUTA:"
@@ -75,4 +75,3 @@ else
 fi
 
 echo "======================================================"
-

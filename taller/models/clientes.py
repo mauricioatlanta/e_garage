@@ -140,7 +140,7 @@ class Cliente(AuditModelMixin, TenantScoped):
     def clean(self):
         """Validaciones de consistencia por país"""
         from django.core.exceptions import ValidationError
-        
+
         super().clean()
 
         # País de la empresa (siempre debería existir con TenantScoped)
@@ -153,7 +153,9 @@ class Cliente(AuditModelMixin, TenantScoped):
         # Reglas CL
         if pais == "CL":
             if self.estado_usa_id or self.ciudad_usa_id or self.zipcode:
-                raise ValidationError("Para clientes de Chile no se deben completar campos de USA.")
+                raise ValidationError(
+                    "Para clientes de Chile no se deben completar campos de USA."
+                )
             # (Opcional) exigir región/ciudad chilenas si tu flujo lo requiere:
             # if not self.region_id or not self.ciudad_id:
             #     raise ValidationError("Seleccione región y ciudad (Chile).")
@@ -161,7 +163,9 @@ class Cliente(AuditModelMixin, TenantScoped):
         # Reglas US
         if pais == "US":
             if self.region_id or self.ciudad_id:
-                raise ValidationError("Para clientes de USA no se deben completar región/ciudad de Chile.")
+                raise ValidationError(
+                    "Para clientes de USA no se deben completar región/ciudad de Chile."
+                )
             # (Opcional) exigir estado/ciudad USA si tu flujo lo requiere:
             # if not self.estado_usa_id or not self.ciudad_usa_id:
             #     raise ValidationError("Seleccione Estado y Ciudad (USA).")

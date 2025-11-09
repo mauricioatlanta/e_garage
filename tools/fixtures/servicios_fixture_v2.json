@@ -1,280 +1,280 @@
 [
   {
-    "model": "taller.categoriaservicio",
-    "pk": 1,
     "fields": {
       "nombre": "1. Mantenimiento Preventivo y Servicios Peri\u00f3dicos"
-    }
+    },
+    "model": "taller.categoriaservicio",
+    "pk": 1
   },
   {
-    "model": "taller.servicio",
-    "pk": 1,
     "fields": {
       "nombre": "Afinamiento completo (buj\u00edas, filtros, inyectores, sensores)",
       "subcategoria": null
-    }
+    },
+    "model": "taller.servicio",
+    "pk": 1
   },
   {
-    "model": "taller.servicio",
-    "pk": 2,
     "fields": {
       "nombre": "Alineaci\u00f3n y balanceo computarizado de ruedas",
       "subcategoria": null
-    }
+    },
+    "model": "taller.servicio",
+    "pk": 2
   },
   {
-    "model": "taller.servicio",
-    "pk": 3,
     "fields": {
       "nombre": "Cambio de aceite y filtro (motor)",
       "subcategoria": null
-    }
+    },
+    "model": "taller.servicio",
+    "pk": 3
   },
   {
-    "model": "taller.servicio",
-    "pk": 4,
     "fields": {
       "nombre": "Cambio de correas (distribuci\u00f3n, alternador, accesorios)",
       "subcategoria": null
-    }
+    },
+    "model": "taller.servicio",
+    "pk": 4
   },
   {
-    "model": "taller.servicio",
-    "pk": 5,
     "fields": {
       "nombre": "Cambio de filtro de aire",
       "subcategoria": null
-    }
+    },
+    "model": "taller.servicio",
+    "pk": 5
   },
   {
-    "model": "taller.servicio",
-    "pk": 6,
     "fields": {
       "nombre": "Cambio de filtro de combustible",
       "subcategoria": null
-    }
+    },
+    "model": "taller.servicio",
+    "pk": 6
   },
   {
-    "model": "taller.servicio",
-    "pk": 7,
     "fields": {
       "nombre": "Cambio de filtro de cabina (habit\u00e1culo)",
       "subcategoria": null
-    }
+    },
+    "model": "taller.servicio",
+    "pk": 7
   },
   {
-    "model": "taller.servicio",
-    "pk": 8,
     "fields": {
       "nombre": "Chequeo y cambio de l\u00edquidos (refrigerante, frenos, hidr\u00e1ulico, transmisi\u00f3n)",
       "subcategoria": null
-    }
+    },
+    "model": "taller.servicio",
+    "pk": 8
   },
   {
-    "model": "taller.servicio",
-    "pk": 9,
     "fields": {
       "nombre": "Diagn\u00f3stico computarizado con esc\u00e1ner OBD-II",
       "subcategoria": null
-    }
+    },
+    "model": "taller.servicio",
+    "pk": 9
   },
   {
-    "model": "taller.servicio",
-    "pk": 10,
     "fields": {
       "nombre": "Inspecci\u00f3n de suspensi\u00f3n, r\u00f3tulas y amortiguadores",
       "subcategoria": null
-    }
+    },
+    "model": "taller.servicio",
+    "pk": 10
   },
   {
-    "model": "taller.servicio",
-    "pk": 11,
     "fields": {
       "nombre": "Lubricaci\u00f3n de bisagras, cerraduras y componentes m\u00f3viles",
       "subcategoria": null
-    }
+    },
+    "model": "taller.servicio",
+    "pk": 11
   },
   {
-    "model": "taller.servicio",
-    "pk": 12,
     "fields": {
       "nombre": "Revisi\u00f3n y ajuste del sistema de frenos",
       "subcategoria": null
-    }
+    },
+    "model": "taller.servicio",
+    "pk": 12
   },
   {
-    "model": "taller.servicio",
-    "pk": 13,
     "fields": {
       "nombre": "Revisi\u00f3n de presi\u00f3n y estado de neum\u00e1ticos",
       "subcategoria": null
-    }
+    },
+    "model": "taller.servicio",
+    "pk": 13
   },
   {
-    "model": "taller.servicio",
-    "pk": 14,
     "fields": {
       "nombre": "Revisi\u00f3n del sistema de escape y catalizador",
       "subcategoria": null
-    }
+    },
+    "model": "taller.servicio",
+    "pk": 14
   },
   {
-    "model": "taller.servicio",
-    "pk": 15,
     "fields": {
       "nombre": "Rotaci\u00f3n cruzada de neum\u00e1ticos",
       "subcategoria": null
-    }
+    },
+    "model": "taller.servicio",
+    "pk": 15
   },
   {
-    "model": "taller.servicio",
-    "pk": 16,
     "fields": {
       "nombre": "Test de bater\u00eda y sistema de carga el\u00e9ctrica",
       "subcategoria": null
-    }
+    },
+    "model": "taller.servicio",
+    "pk": 16
   },
   {
-    "model": "taller.categoriaservicio",
-    "pk": 2,
     "fields": {
       "nombre": "2. Reparaciones Mec\u00e1nicas Generales"
-    }
+    },
+    "model": "taller.categoriaservicio",
+    "pk": 2
   },
   {
-    "model": "taller.servicio",
-    "pk": 17,
     "fields": {
       "nombre": "Ajuste y sincronizaci\u00f3n electr\u00f3nica del motor",
       "subcategoria": null
-    }
+    },
+    "model": "taller.servicio",
+    "pk": 17
   },
   {
-    "model": "taller.servicio",
-    "pk": 18,
     "fields": {
       "nombre": "Cambio de alternador",
       "subcategoria": null
-    }
+    },
+    "model": "taller.servicio",
+    "pk": 18
   },
   {
-    "model": "taller.servicio",
-    "pk": 19,
     "fields": {
       "nombre": "Cambio de bomba de agua",
       "subcategoria": null
-    }
+    },
+    "model": "taller.servicio",
+    "pk": 19
   },
   {
-    "model": "taller.servicio",
-    "pk": 20,
     "fields": {
       "nombre": "Cambio de cadena o correa de distribuci\u00f3n",
       "subcategoria": null
-    }
+    },
+    "model": "taller.servicio",
+    "pk": 20
   },
   {
-    "model": "taller.servicio",
-    "pk": 21,
     "fields": {
       "nombre": "Cambio de empaquetadura de culata",
       "subcategoria": null
-    }
+    },
+    "model": "taller.servicio",
+    "pk": 21
   },
   {
-    "model": "taller.servicio",
-    "pk": 22,
     "fields": {
       "nombre": "Cambio de empaquetaduras y retenes generales",
       "subcategoria": null
-    }
+    },
+    "model": "taller.servicio",
+    "pk": 22
   },
   {
-    "model": "taller.servicio",
-    "pk": 23,
     "fields": {
       "nombre": "Cambio de motor de arranque",
       "subcategoria": null
-    }
+    },
+    "model": "taller.servicio",
+    "pk": 23
   },
   {
-    "model": "taller.servicio",
-    "pk": 24,
     "fields": {
       "nombre": "Cambio de pistones, anillos y metales",
       "subcategoria": null
-    }
+    },
+    "model": "taller.servicio",
+    "pk": 24
   },
   {
-    "model": "taller.servicio",
-    "pk": 25,
     "fields": {
       "nombre": "Cambio de radiador y componentes de refrigeraci\u00f3n",
       "subcategoria": null
-    }
+    },
+    "model": "taller.servicio",
+    "pk": 25
   },
   {
-    "model": "taller.servicio",
-    "pk": 26,
     "fields": {
       "nombre": "Cambio de sensores (MAP, MAF, O2, temperatura, cig\u00fce\u00f1al, etc.)",
       "subcategoria": null
-    }
+    },
+    "model": "taller.servicio",
+    "pk": 26
   },
   {
-    "model": "taller.servicio",
-    "pk": 27,
     "fields": {
       "nombre": "Cambio de soportes de motor",
       "subcategoria": null
-    }
+    },
+    "model": "taller.servicio",
+    "pk": 27
   },
   {
-    "model": "taller.servicio",
-    "pk": 28,
     "fields": {
       "nombre": "Diagn\u00f3stico y reparaci\u00f3n de fallas de motor",
       "subcategoria": null
-    }
+    },
+    "model": "taller.servicio",
+    "pk": 28
   },
   {
-    "model": "taller.servicio",
-    "pk": 29,
     "fields": {
       "nombre": "Limpieza ultras\u00f3nica de inyectores",
       "subcategoria": null
-    }
+    },
+    "model": "taller.servicio",
+    "pk": 29
   },
   {
-    "model": "taller.servicio",
-    "pk": 30,
     "fields": {
       "nombre": "Rectificaci\u00f3n de culata y prueba hidr\u00e1ulica",
       "subcategoria": null
-    }
+    },
+    "model": "taller.servicio",
+    "pk": 30
   },
   {
-    "model": "taller.servicio",
-    "pk": 31,
     "fields": {
       "nombre": "Reparaci\u00f3n de fugas de aceite y refrigerante",
       "subcategoria": null
-    }
+    },
+    "model": "taller.servicio",
+    "pk": 31
   },
   {
-    "model": "taller.servicio",
-    "pk": 32,
     "fields": {
       "nombre": "Reparaci\u00f3n de sistema de inyecci\u00f3n (common rail, TBI)",
       "subcategoria": null
-    }
+    },
+    "model": "taller.servicio",
+    "pk": 32
   },
   {
-    "model": "taller.servicio",
-    "pk": 33,
     "fields": {
       "nombre": "Revisi\u00f3n y reparaci\u00f3n de sistema de escape (flexibles, catalizador)",
       "subcategoria": null
-    }
+    },
+    "model": "taller.servicio",
+    "pk": 33
   }
 ]

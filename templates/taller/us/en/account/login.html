@@ -434,6 +434,16 @@ body {
             {% elif request.country == 'US' %}
             <div class="country-badge font-futuristic">🇺🇸 UNITED STATES</div>
             {% endif %}
+            
+            <!-- Selector de País -->
+            <div class="mt-4 flex justify-center gap-2">
+                <a href="/accounts/login/?country=CL" class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all {% if request.country == 'CL' %}bg-cyan-500/20 border-2 border-cyan-400 text-cyan-300{% else %}bg-gray-800/50 border border-gray-600 text-gray-400 hover:border-gray-400{% endif %}">
+                    <span>🇨🇱</span> Chile
+                </a>
+                <a href="/accounts/login/?country=US" class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all {% if request.country == 'US' %}bg-blue-500/20 border-2 border-blue-400 text-blue-300{% else %}bg-gray-800/50 border border-gray-600 text-gray-400 hover:border-gray-400{% endif %}">
+                    <span>🇺🇸</span> USA
+                </a>
+            </div>
         </div>
 
         <!-- Mensajes de error generales -->

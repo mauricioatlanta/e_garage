@@ -1,9 +1,9 @@
-from django.db import models
-from django.urls import reverse
 from django.core.exceptions import ValidationError
+from django.db import models
 from django.db.models import Q
+from django.urls import reverse
 
-from core.models import TenantManager, TenantScoped
+from core.models import TenantScoped
 
 from .clientes import Cliente
 from .extras_vehiculo import CajaVehiculo, ColorVehiculo, MotorVehiculo
@@ -13,15 +13,15 @@ from .modelo import Modelo
 
 class VehiculoQuerySet(models.QuerySet):
     """QuerySet personalizado para Vehiculo con métodos de conveniencia"""
-    
+
     def de_empresa(self, empresa):
         """Filtrar por empresa"""
         return self.filter(empresa=empresa)
-    
+
     def de_cliente(self, cliente_id):
         """Filtrar por cliente"""
         return self.filter(cliente_id=cliente_id)
-    
+
     def con_vin(self):
         """Filtrar vehículos que tienen VIN"""
         return self.exclude(Q(vin__isnull=True) | Q(vin=""))
@@ -108,17 +108,17 @@ class Vehiculo(TenantScoped):
             parts.append(self.patente)
         elif self.vin:
             parts.append(self.vin)
-        
+
         marca = self.get_marca_display()
         modelo = self.get_modelo_display()
-        
+
         if marca and marca != "Sin marca":
             parts.append(marca)
         if modelo and modelo != "Sin modelo":
             parts.append(modelo)
         if self.anio:
             parts.append(str(self.anio))
-        
+
         return " · ".join(parts) or f"Vehículo {self.pk}"
 
     def clean(self):
@@ -126,8 +126,14 @@ class Vehiculo(TenantScoped):
         super().clean()
 
         # 1) Empresa coherente con cliente
-        if self.empresa_id and self.cliente_id and self.cliente.empresa_id != self.empresa_id:
-            raise ValidationError("El cliente del vehículo debe pertenecer a la misma empresa del vehículo.")
+        if (
+            self.empresa_id
+            and self.cliente_id
+            and self.cliente.empresa_id != self.empresa_id
+        ):
+            raise ValidationError(
+                "El cliente del vehículo debe pertenecer a la misma empresa del vehículo."
+            )
 
         # 2) Reglas de país por empresa (siempre deberíamos tener empresa con TenantScoped)
         pais = getattr(getattr(self, "empresa", None), "pais", None)
@@ -141,7 +147,9 @@ class Vehiculo(TenantScoped):
         # Si usas catálogos FK en CL, evita mezclar con *_texto.
         if pais == "CL":
             if self.marca_texto or self.modelo_texto:
-                raise ValidationError("En Chile use marca/modelo del catálogo (no *_texto).")
+                raise ValidationError(
+                    "En Chile use marca/modelo del catálogo (no *_texto)."
+                )
         elif pais == "US":
             # En USA permitimos *_texto. Si además vienen FK, está bien si quieres híbrido;
             # si NO lo quieres, puedes forzar a que sólo se usen *_texto:
@@ -150,16 +158,34 @@ class Vehiculo(TenantScoped):
             pass
 
         # 4) Coherencia motor/caja con empresa (y con modelo si corresponde)
-        if self.motor_id and hasattr(self.motor, "empresa_id") and self.motor.empresa_id != self.empresa_id:
+        if (
+            self.motor_id
+            and hasattr(self.motor, "empresa_id")
+            and self.motor.empresa_id != self.empresa_id
+        ):
             raise ValidationError("El motor seleccionado no pertenece a la empresa.")
-        if self.caja_id and hasattr(self.caja, "empresa_id") and self.caja.empresa_id != self.empresa_id:
+        if (
+            self.caja_id
+            and hasattr(self.caja, "empresa_id")
+            and self.caja.empresa_id != self.empresa_id
+        ):
             raise ValidationError("La caja seleccionada no pertenece a la empresa.")
 
         # Si en CL tus motores/cajas están ligados a un Modelo específico, valida eso:
         if pais == "CL" and self.modelo_id:
-            if self.motor_id and hasattr(self.motor, "modelo_id") and self.motor.modelo_id and self.motor.modelo_id != self.modelo_id:
+            if (
+                self.motor_id
+                and hasattr(self.motor, "modelo_id")
+                and self.motor.modelo_id
+                and self.motor.modelo_id != self.modelo_id
+            ):
                 raise ValidationError("El motor no corresponde al modelo seleccionado.")
-            if self.caja_id and hasattr(self.caja, "modelo_id") and self.caja.modelo_id and self.caja.modelo_id != self.modelo_id:
+            if (
+                self.caja_id
+                and hasattr(self.caja, "modelo_id")
+                and self.caja.modelo_id
+                and self.caja.modelo_id != self.modelo_id
+            ):
                 raise ValidationError("La caja no corresponde al modelo seleccionado.")
 
     def get_absolute_url(self):  # usado por CreateView en tests
@@ -187,7 +213,9 @@ class Vehiculo(TenantScoped):
             models.Index(fields=["empresa"]),
             models.Index(fields=["empresa", "patente"]),
             models.Index(fields=["empresa", "vin"]),
-            models.Index(fields=["empresa", "cliente"]),  # ✅ CRÍTICO: Para endpoint vehiculos-por-cliente
+            models.Index(
+                fields=["empresa", "cliente"]
+            ),  # ✅ CRÍTICO: Para endpoint vehiculos-por-cliente
             models.Index(
                 fields=["marca_texto"]
             ),  # Índice para búsquedas por marca texto

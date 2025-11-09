@@ -1143,9 +1143,8 @@ def api_buscar_servicios_inteligente(request):
       - prioriza empresa del usuario (multi-tenant)
       - retorna hasta 20 resultados con id, text y precio_sugerido
     """
-    from django.db.models import Q, Value
-    from django.db.models.functions import Coalesce
-    
+    from django.db.models import Q
+
     emp = getattr(request.user, "empresa", None)
     q = (request.GET.get("q") or "").strip()
 
@@ -1154,16 +1153,19 @@ def api_buscar_servicios_inteligente(request):
     if q:
         # Búsqueda inteligente en múltiples campos
         qs = qs.filter(
-            Q(nombre__icontains=q) |
-            Q(categoria__code__icontains=q) |
-            Q(subcategoria__code__icontains=q)
+            Q(nombre__icontains=q)
+            | Q(categoria__code__icontains=q)
+            | Q(subcategoria__code__icontains=q)
         )
 
-    data = [{
-        "id": s.id,
-        "text": s.nombre,            # texto que dibujará el dropdown
-        "precio": 0.0,  # El modelo Servicio no tiene precio, usar 0 como default
-        "codigo": getattr(s.categoria, "code", "") or ""
-    } for s in qs.order_by("nombre")[:20]]
+    data = [
+        {
+            "id": s.id,
+            "text": s.nombre,  # texto que dibujará el dropdown
+            "precio": 0.0,  # El modelo Servicio no tiene precio, usar 0 como default
+            "codigo": getattr(s.categoria, "code", "") or "",
+        }
+        for s in qs.order_by("nombre")[:20]
+    ]
 
     return JsonResponse({"results": data})

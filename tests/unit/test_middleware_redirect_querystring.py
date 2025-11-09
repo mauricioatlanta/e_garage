@@ -5,10 +5,13 @@ This ensures that when users are redirected from /us/ to /cl/ URLs,
 important parameters like ?next= are preserved.
 """
 
-import pytest
 import json
-from django.test import Client
+
+import pytest
+
 from django.contrib.auth import get_user_model
+from django.test import Client
+
 from tests.test_utils.http_asserts import assert_redirect_preserves_querystring
 
 
@@ -23,12 +26,12 @@ def test_redirect_preserves_querystring_get():
 
     # Test GET request with querystring that should be preserved
     response = c.get("/us/documentos/api/create/?next=/us/vehiculos/&param=value")
-    
+
     # Should redirect and preserve querystring
     assert_redirect_preserves_querystring(
-        response, 
+        response,
         expected_base_path="/cl/documentos/api/create/",
-        expected_params={"next": "/us/vehiculos/", "param": "value"}
+        expected_params={"next": "/us/vehiculos/", "param": "value"},
     )
 
 
@@ -43,14 +46,17 @@ def test_redirect_preserves_querystring_post():
 
     # Test POST request with querystring that should be preserved
     data = {"test": "data"}
-    response = c.post("/us/documentos/api/create/?next=/us/vehiculos/&param=value", 
-                     data=json.dumps(data), content_type="application/json")
-    
+    response = c.post(
+        "/us/documentos/api/create/?next=/us/vehiculos/&param=value",
+        data=json.dumps(data),
+        content_type="application/json",
+    )
+
     # Should redirect and preserve querystring
     assert_redirect_preserves_querystring(
-        response, 
+        response,
         expected_base_path="/cl/documentos/api/create/",
-        expected_params={"next": "/us/vehiculos/", "param": "value"}
+        expected_params={"next": "/us/vehiculos/", "param": "value"},
     )
 
 
@@ -66,17 +72,17 @@ def test_redirect_preserves_complex_querystring():
     # Test with complex querystring including special characters
     complex_qs = "/us/documentos/api/create/?next=/us/vehiculos/&search=test%20query&page=2&filter=active"
     response = c.get(complex_qs)
-    
+
     # Should redirect and preserve all parameters
     assert_redirect_preserves_querystring(
-        response, 
+        response,
         expected_base_path="/cl/documentos/api/create/",
         expected_params={
-            "next": "/us/vehiculos/", 
+            "next": "/us/vehiculos/",
             "search": "test query",  # URL decoded
-            "page": "2", 
-            "filter": "active"
-        }
+            "page": "2",
+            "filter": "active",
+        },
     )
 
 
@@ -91,11 +97,13 @@ def test_redirect_without_querystring():
 
     # Test simple redirect without querystring
     response = c.get("/us/documentos/api/create/")
-    
+
     # Should redirect to clean URL
     assert response.status_code == 302
     location = response.headers.get("Location", "")
-    assert location == "/cl/documentos/api/create/", f"Expected clean redirect, got {location}"
+    assert (
+        location == "/cl/documentos/api/create/"
+    ), f"Expected clean redirect, got {location}"
 
 
 @pytest.mark.django_db
@@ -113,13 +121,13 @@ def test_redirect_preserves_querystring_different_endpoints():
         "/us/clientes/api/create/",
         "/us/repuestos/api/create/",
     ]
-    
+
     for endpoint in endpoints:
         expected_cl_endpoint = endpoint.replace("/us/", "/cl/")
         response = c.get(f"{endpoint}?next=/us/dashboard/&param=test")
-        
+
         assert_redirect_preserves_querystring(
             response,
             expected_base_path=expected_cl_endpoint,
-            expected_params={"next": "/us/dashboard/", "param": "test"}
+            expected_params={"next": "/us/dashboard/", "param": "test"},
         )

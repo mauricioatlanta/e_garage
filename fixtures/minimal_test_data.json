@@ -1,156 +1,156 @@
 [
   {
-    "model": "taller.cliente",
-    "pk": 1,
     "fields": {
-      "nombre": "Juan Pérez",
-      "apellido": "García",
-      "email": "juan.perez@example.com",
-      "telefono": "+56912345678",
+      "activo": true,
+      "apellido": "Garc\u00eda",
       "direccion": "Av. Principal 123, Santiago",
+      "email": "juan.perez@example.com",
+      "empresa": 1,
       "fecha_registro": "2024-01-15T10:30:00Z",
-      "activo": true,
-      "empresa": 1
-    }
-  },
-  {
+      "nombre": "Juan P\u00e9rez",
+      "telefono": "+56912345678"
+    },
     "model": "taller.cliente",
-    "pk": 2,
+    "pk": 1
+  },
+  {
     "fields": {
-      "nombre": "María",
-      "apellido": "Rodríguez",
-      "email": "maria.rodriguez@example.com",
-      "telefono": "+56987654321",
-      "direccion": "Calle Secundaria 456, Valparaíso",
-      "fecha_registro": "2024-01-20T14:15:00Z",
       "activo": true,
-      "empresa": 1
-    }
+      "apellido": "Rodr\u00edguez",
+      "direccion": "Calle Secundaria 456, Valpara\u00edso",
+      "email": "maria.rodriguez@example.com",
+      "empresa": 1,
+      "fecha_registro": "2024-01-20T14:15:00Z",
+      "nombre": "Mar\u00eda",
+      "telefono": "+56987654321"
+    },
+    "model": "taller.cliente",
+    "pk": 2
   },
   {
-    "model": "taller.marca",
-    "pk": 1,
     "fields": {
+      "activa": true,
       "nombre": "Toyota",
-      "pais_origen": "Japón",
-      "activa": true
-    }
-  },
-  {
+      "pais_origen": "Jap\u00f3n"
+    },
     "model": "taller.marca",
-    "pk": 2,
+    "pk": 1
+  },
+  {
     "fields": {
+      "activa": true,
       "nombre": "Ford",
-      "pais_origen": "Estados Unidos",
-      "activa": true
-    }
+      "pais_origen": "Estados Unidos"
+    },
+    "model": "taller.marca",
+    "pk": 2
   },
   {
-    "model": "taller.modelo",
-    "pk": 1,
     "fields": {
-      "nombre": "Corolla",
+      "activo": true,
+      "a\u00f1o_fin": null,
+      "a\u00f1o_inicio": 2020,
       "marca": 1,
-      "año_inicio": 2020,
-      "año_fin": null,
-      "activo": true
-    }
-  },
-  {
+      "nombre": "Corolla"
+    },
     "model": "taller.modelo",
-    "pk": 2,
-    "fields": {
-      "nombre": "Focus",
-      "marca": 2,
-      "año_inicio": 2019,
-      "año_fin": null,
-      "activo": true
-    }
+    "pk": 1
   },
   {
-    "model": "taller.vehiculo",
-    "pk": 1,
     "fields": {
+      "activo": true,
+      "a\u00f1o_fin": null,
+      "a\u00f1o_inicio": 2019,
+      "marca": 2,
+      "nombre": "Focus"
+    },
+    "model": "taller.modelo",
+    "pk": 2
+  },
+  {
+    "fields": {
+      "activo": true,
+      "a\u00f1o": 2021,
       "cliente": 1,
+      "color": "Blanco",
+      "empresa": 1,
+      "fecha_registro": "2024-01-15T10:30:00Z",
+      "kilometraje": 15000,
       "marca": 1,
       "modelo": 1,
-      "año": 2021,
       "patente": "ABC123",
-      "color": "Blanco",
-      "kilometraje": 15000,
-      "vin": "1HGBH41JXMN109186",
-      "fecha_registro": "2024-01-15T10:30:00Z",
-      "activo": true,
-      "empresa": 1
-    }
+      "vin": "1HGBH41JXMN109186"
+    },
+    "model": "taller.vehiculo",
+    "pk": 1
   },
   {
-    "model": "taller.vehiculo",
-    "pk": 2,
     "fields": {
+      "activo": true,
+      "a\u00f1o": 2020,
       "cliente": 2,
+      "color": "Azul",
+      "empresa": 1,
+      "fecha_registro": "2024-01-20T14:15:00Z",
+      "kilometraje": 25000,
       "marca": 2,
       "modelo": 2,
-      "año": 2020,
       "patente": "XYZ789",
-      "color": "Azul",
-      "kilometraje": 25000,
-      "vin": "2HGBH41JXMN109187",
-      "fecha_registro": "2024-01-20T14:15:00Z",
-      "activo": true,
-      "empresa": 1
-    }
+      "vin": "2HGBH41JXMN109187"
+    },
+    "model": "taller.vehiculo",
+    "pk": 2
   },
   {
-    "model": "taller.servicio",
-    "pk": 1,
     "fields": {
-      "nombre": "Cambio de aceite",
+      "activo": true,
       "descripcion": "Cambio de aceite del motor y filtro",
-      "precio": 25000,
       "duracion_minutos": 30,
-      "activo": true,
-      "empresa": 1
-    }
-  },
-  {
+      "empresa": 1,
+      "nombre": "Cambio de aceite",
+      "precio": 25000
+    },
     "model": "taller.servicio",
-    "pk": 2,
-    "fields": {
-      "nombre": "Revisión técnica",
-      "descripcion": "Revisión completa del vehículo",
-      "precio": 45000,
-      "duracion_minutos": 60,
-      "activo": true,
-      "empresa": 1
-    }
+    "pk": 1
   },
   {
-    "model": "taller.repuesto",
-    "pk": 1,
     "fields": {
-      "nombre": "Filtro de aceite",
+      "activo": true,
+      "descripcion": "Revisi\u00f3n completa del veh\u00edculo",
+      "duracion_minutos": 60,
+      "empresa": 1,
+      "nombre": "Revisi\u00f3n t\u00e9cnica",
+      "precio": 45000
+    },
+    "model": "taller.servicio",
+    "pk": 2
+  },
+  {
+    "fields": {
+      "activo": true,
       "codigo": "FIL001",
       "descripcion": "Filtro de aceite para motor",
+      "empresa": 1,
+      "nombre": "Filtro de aceite",
       "precio": 8500,
       "stock": 50,
-      "stock_minimo": 10,
-      "activo": true,
-      "empresa": 1
-    }
+      "stock_minimo": 10
+    },
+    "model": "taller.repuesto",
+    "pk": 1
   },
   {
-    "model": "taller.repuesto",
-    "pk": 2,
     "fields": {
-      "nombre": "Pastillas de freno",
+      "activo": true,
       "codigo": "PAST001",
       "descripcion": "Pastillas de freno delanteras",
+      "empresa": 1,
+      "nombre": "Pastillas de freno",
       "precio": 35000,
       "stock": 20,
-      "stock_minimo": 5,
-      "activo": true,
-      "empresa": 1
-    }
+      "stock_minimo": 5
+    },
+    "model": "taller.repuesto",
+    "pk": 2
   }
 ]

@@ -20,7 +20,7 @@
     numeroDocumento: "{% country_url 'taller:api_obtener_numero_documento' %}" || window.__EG_PREFIX__ + "documentos/api/obtener-numero-documento/",
     repuestoPorCodigo: "{% country_url 'taller:api_repuesto_por_codigo' %}" || window.__EG_PREFIX__ + "repuestos/api/repuesto-por-codigo/",
   };
-  
+
   console.log('🔍 EG endpoints generados:', window.EG.endpoints);
 
   // Parche: si por alguna razón faltara el tag, caemos a prefijo inferido
@@ -1126,12 +1126,12 @@ async function cargarVehiculosPorCliente(clienteId) {
 // 3) Numeración de documento con endpoint correcto
 async function updateDocumentNumber(tipo) {
   if (!tipo) return;
-  
+
   try {
     const response = await fetch(`${urlNextNumber}?tipo=${encodeURIComponent(tipo)}`, {
       headers: { 'X-Requested-With': 'XMLHttpRequest' }
     });
-    
+
     if (response.ok) {
       const data = await response.json();
       if (data.numero) {
@@ -1153,7 +1153,7 @@ document.addEventListener('DOMContentLoaded', function() {
             cargarVehiculosPorCliente(clienteId);
         });
     }
-    
+
     const selectTipo = document.getElementById('id_tipo');
     if (selectTipo) {
         selectTipo.addEventListener('change', function() {

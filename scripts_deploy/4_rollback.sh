@@ -96,4 +96,3 @@ echo "   3. Clic en 'Reload atlantareciclajes.pythonanywhere.com'"
 echo "   4. El sitio volverá al estado anterior"
 echo ""
 echo "======================================================"
-

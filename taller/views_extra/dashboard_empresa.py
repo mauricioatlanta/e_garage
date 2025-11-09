@@ -473,7 +473,7 @@ def dashboard_centro_operaciones_espacial(request):
 
     # Forzar template correcto basado en la URL y idioma
     # Verificar si el usuario tiene empresa de USA
-    if hasattr(empresa, 'pais') and empresa.pais == 'US':
+    if hasattr(empresa, "pais") and empresa.pais == "US":
         # Usuario de USA - usar template específico de USA
         template_name = "taller/us/en/dashboard/centro_operaciones_espacial.html"
         contexto["use_usa_base"] = True

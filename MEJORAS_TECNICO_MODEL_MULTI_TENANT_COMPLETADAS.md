@@ -98,14 +98,14 @@ class TecnicoQuerySet(models.QuerySet):
 
     def buscar_por_nombre(self, texto):
         return self.filter(nombre__icontains=texto)
-    
+
     def por_rol(self, rol):
         return self.filter(rol=rol)
 
 class TecnicoManager(models.Manager):
     def get_queryset(self):
         return TecnicoQuerySet(self.model, using=self._db)
-    
+
     # Métodos delegados al QuerySet
     def activos(self):
         return self.get_queryset().activos()

@@ -1,9 +1,10 @@
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 
 from taller.models.marca import Marca
-from django.core.exceptions import ObjectDoesNotExist
+
 
 # -------------------------------------------------------------------
 # Helpers
@@ -14,15 +15,19 @@ def _scope(request):
     pais = (getattr(empresa, "pais", None) or "CL").strip().upper()
     return empresa, pais
 
+
 def _bad_request(msg):
     return JsonResponse({"success": False, "error": msg}, status=400)
+
 
 def _ok(payload):
     return JsonResponse({"success": True, **payload})
 
+
 def _to_option(obj):
     """Serializa opcionalmente un objeto con pk y nombre, id siempre str."""
     return {"id": str(obj.pk), "nombre": getattr(obj, "nombre", str(obj))}
+
 
 def _parse_int(value, name="id"):
     try:
@@ -30,9 +35,11 @@ def _parse_int(value, name="id"):
     except (TypeError, ValueError):
         raise ValueError(f"Parámetro '{name}' inválido")
 
+
 # -------------------------------------------------------------------
 # Endpoints
 # -------------------------------------------------------------------
+
 
 @login_required
 @require_http_methods(["GET"])
@@ -49,6 +56,7 @@ def ajax_marcas(request):
         return _ok({"marcas": marcas})
     except Exception as e:
         return JsonResponse({"success": False, "error": str(e)}, status=500)
+
 
 @login_required
 @require_http_methods(["GET"])
@@ -98,6 +106,7 @@ def ajax_modelos(request):
     except Exception as e:
         return JsonResponse({"success": False, "error": str(e)}, status=500)
 
+
 @login_required
 @require_http_methods(["GET"])
 def ajax_motores(request):
@@ -115,7 +124,9 @@ def ajax_motores(request):
         empresa, pais = _scope(request)
 
         try:
-            modelo = Modelo.objects.select_related("marca").get(pk=modelo_id, country=pais)
+            modelo = Modelo.objects.select_related("marca").get(
+                pk=modelo_id, country=pais
+            )
             # Si Modelo tiene empresa:
             # if hasattr(Modelo, "empresa") and empresa and modelo.empresa_id != empresa.id:
             #     return _bad_request("El modelo no pertenece a tu empresa")
@@ -138,6 +149,7 @@ def ajax_motores(request):
     except Exception as e:
         return JsonResponse({"success": False, "error": str(e)}, status=500)
 
+
 @login_required
 @require_http_methods(["GET"])
 def ajax_cajas(request):
@@ -155,7 +167,9 @@ def ajax_cajas(request):
         empresa, pais = _scope(request)
 
         try:
-            modelo = Modelo.objects.select_related("marca").get(pk=modelo_id, country=pais)
+            modelo = Modelo.objects.select_related("marca").get(
+                pk=modelo_id, country=pais
+            )
             # if hasattr(Modelo, "empresa") and empresa and modelo.empresa_id != empresa.id:
             #     return _bad_request("El modelo no pertenece a tu empresa")
         except ObjectDoesNotExist:
@@ -176,6 +190,7 @@ def ajax_cajas(request):
     except Exception as e:
         return JsonResponse({"success": False, "error": str(e)}, status=500)
 
+
 @login_required
 @require_http_methods(["GET"])
 def ajax_motores_cajas(request):
@@ -193,7 +208,9 @@ def ajax_motores_cajas(request):
         empresa, pais = _scope(request)
 
         try:
-            modelo = Modelo.objects.select_related("marca").get(pk=modelo_id, country=pais)
+            modelo = Modelo.objects.select_related("marca").get(
+                pk=modelo_id, country=pais
+            )
             # if hasattr(Modelo, "empresa") and empresa and modelo.empresa_id != empresa.id:
             #     return _bad_request("El modelo no pertenece a tu empresa")
         except ObjectDoesNotExist:
@@ -205,17 +222,24 @@ def ajax_motores_cajas(request):
         motores = [_to_option(m) for m in motores_qs]
         cajas = [_to_option(c) for c in cajas_qs]
 
-        return _ok({
-            "motores": motores,
-            "cajas": cajas,
-            "modelo": getattr(modelo, "nombre", str(modelo)),
-            "marca": getattr(modelo.marca, "nombre", "N/A") if getattr(modelo, "marca", None) else "N/A",
-        })
+        return _ok(
+            {
+                "motores": motores,
+                "cajas": cajas,
+                "modelo": getattr(modelo, "nombre", str(modelo)),
+                "marca": (
+                    getattr(modelo.marca, "nombre", "N/A")
+                    if getattr(modelo, "marca", None)
+                    else "N/A"
+                ),
+            }
+        )
 
     except ValueError as ve:
         return _bad_request(str(ve))
     except Exception as e:
         return JsonResponse({"success": False, "error": str(e)}, status=500)
+
 
 # -------------------------------------------------------------------
 # Endpoints de compatibilidad (decorados también)
@@ -225,20 +249,24 @@ def ajax_motores_cajas(request):
 def load_modelos(request):
     return ajax_modelos(request)
 
+
 @login_required
 @require_http_methods(["GET"])
 def load_marcas(request):
     return ajax_marcas(request)
+
 
 @login_required
 @require_http_methods(["GET"])
 def load_motores(request):
     return ajax_motores(request)
 
+
 @login_required
 @require_http_methods(["GET"])
 def load_cajas(request):
     return ajax_cajas(request)
+
 
 @login_required
 @require_http_methods(["GET"])

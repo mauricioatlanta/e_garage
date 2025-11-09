@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("taller", "0005_alter_detalledocumento_options_cajavehiculo_country_and_more"),
     ]

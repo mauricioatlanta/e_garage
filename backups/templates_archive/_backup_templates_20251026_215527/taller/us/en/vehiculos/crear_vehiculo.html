@@ -98,8 +98,8 @@
                 </label>
                 <div class="flex gap-2">
                   {% render_field form.modelo class="flex-1 px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400" %}
-                  <button type="button" 
-                          onclick="openAddModelModal()" 
+                  <button type="button"
+                          onclick="openAddModelModal()"
                           class="px-4 py-3 rounded-lg bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-medium transition-all duration-200 flex items-center gap-2 border border-emerald-500/30">
                     <span class="text-lg">+</span>
                     <span class="hidden sm:inline">Add</span>
@@ -159,8 +159,8 @@
                 {% endif %}
                 <!-- Field for new engine (hidden by default) -->
                 <div id="motor-nuevo-container" style="display: none;" class="mt-2">
-                  <input type="text" 
-                         name="nuevo_motor" 
+                  <input type="text"
+                         name="nuevo_motor"
                          id="nuevo_motor"
                          placeholder="Enter the name of the new engine"
                          class="w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400">
@@ -181,8 +181,8 @@
               {% endif %}
               <!-- Field for new transmission (hidden by default) -->
               <div id="caja-nueva-container" style="display: none;" class="mt-2">
-                <input type="text" 
-                       name="nuevo_caja" 
+                <input type="text"
+                       name="nuevo_caja"
                        id="nuevo_caja"
                        placeholder="Enter the name of the new transmission"
                        class="w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400">
@@ -234,27 +234,27 @@
   <div id="addModelModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
     <div class="bg-gradient-to-r from-[#0d1117] to-[#111827] rounded-xl border border-emerald-400/30 p-6 w-full max-w-md">
       <h3 class="text-xl font-semibold text-emerald-300 mb-4">Add New Model</h3>
-      
+
       <form id="addModelForm">
         <div class="mb-4">
           <label for="newModelName" class="block text-sm font-medium text-gray-300 mb-2">
             Model Name *
           </label>
-          <input type="text" 
-                 id="newModelName" 
-                 name="nombre" 
+          <input type="text"
+                 id="newModelName"
+                 name="nombre"
                  required
                  class="w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400"
                  placeholder="Enter model name">
         </div>
-        
+
         <div class="flex gap-3">
-          <button type="button" 
-                  onclick="closeAddModelModal()" 
+          <button type="button"
+                  onclick="closeAddModelModal()"
                   class="flex-1 px-4 py-3 rounded-lg bg-gray-600 hover:bg-gray-700 text-white font-medium transition">
             Cancel
           </button>
-          <button type="submit" 
+          <button type="submit"
                   class="flex-1 px-4 py-3 rounded-lg bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-medium transition">
             Add Model
           </button>
@@ -288,7 +288,7 @@ document.addEventListener('DOMContentLoaded', function() {
       console.log('[Create Vehicle] FormData:', new FormData(f));
     });
   }
-  
+
   // Additional configuration for customer autocomplete
   if (typeof $ !== 'undefined' && $.fn.select2) {
     // Customize Select2 style to match the theme
@@ -311,25 +311,25 @@ function closeAddModelModal() {
 // Handle the add model form submission
 document.getElementById('addModelForm').addEventListener('submit', function(e) {
   e.preventDefault();
-  
+
   const modelName = document.getElementById('newModelName').value.trim();
   if (!modelName) {
     alert('Please enter a model name');
     return;
   }
-  
+
   // Get the selected brand
   const marcaSelect = document.getElementById('id_marca');
   const marcaId = marcaSelect.value;
-  
+
   if (!marcaId) {
     alert('Please select a brand first');
     return;
   }
-  
+
   // Send data to server
   const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-  
+
   fetch('{% country_url "vehiculos:ajax_agregar_modelo" %}', {
     method: 'POST',
     headers: {
@@ -351,10 +351,10 @@ document.getElementById('addModelForm').addEventListener('submit', function(e) {
       newOption.textContent = data.modelo.nombre;
       newOption.selected = true;
       modeloSelect.appendChild(newOption);
-      
+
       // Close the modal
       closeAddModelModal();
-      
+
       // Show success message
       alert('Model added successfully!');
     } else {
@@ -381,64 +381,64 @@ document.getElementById('addModelModal').addEventListener('click', function(e) {
   .form-field {
     @apply w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400 placeholder-gray-500;
   }
-  
+
   .form-field:focus {
     @apply bg-black border-emerald-400 text-emerald-100;
   }
-  
+
   .form-field::placeholder {
     @apply text-gray-500;
   }
-  
+
   /* Select2 customization for better contrast */
   .select2-container--default .select2-selection--single {
     @apply bg-black border border-emerald-500/30 text-emerald-200 rounded-lg h-12;
   }
-  
+
   .select2-container--default .select2-selection--single .select2-selection__rendered {
     @apply text-emerald-200 px-4 py-3;
   }
-  
+
   .select2-container--default .select2-selection--single .select2-selection__placeholder {
     @apply text-gray-500;
   }
-  
+
   .select2-container--default .select2-selection--single:focus {
     @apply border-emerald-400;
   }
-  
+
   .select2-dropdown {
     @apply bg-black border border-emerald-500/30 rounded-lg;
   }
-  
+
   .select2-container--default .select2-results__option {
     @apply text-emerald-200 bg-black;
   }
-  
+
   .select2-container--default .select2-results__option--highlighted[aria-selected] {
     @apply bg-emerald-600 text-white;
   }
-  
+
   /* Ensure all input fields have consistent styling */
-  input[type="text"], 
-  input[type="email"], 
-  input[type="tel"], 
-  select, 
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  select,
   textarea {
     @apply bg-black border border-emerald-500/30 text-emerald-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400;
   }
-  
-  input[type="text"]:focus, 
-  input[type="email"]:focus, 
-  input[type="tel"]:focus, 
-  select:focus, 
+
+  input[type="text"]:focus,
+  input[type="email"]:focus,
+  input[type="tel"]:focus,
+  select:focus,
   textarea:focus {
     @apply bg-black border-emerald-400 text-emerald-100;
   }
-  
-  input[type="text"]::placeholder, 
-  input[type="email"]::placeholder, 
-  input[type="tel"]::placeholder, 
+
+  input[type="text"]::placeholder,
+  input[type="email"]::placeholder,
+  input[type="tel"]::placeholder,
   textarea::placeholder {
     @apply text-gray-500;
   }
@@ -449,30 +449,30 @@ document.addEventListener('DOMContentLoaded', function() {
     const marcaSelect = document.getElementById('id_marca');
     const modeloSelect = document.getElementById('id_modelo');
     const anioSelect = document.getElementById('id_anio');
-    
+
     console.log('🚗 Inicializando formulario de vehículo');
     console.log('Marca:', marcaSelect);
     console.log('Modelo:', modeloSelect);
     console.log('Año:', anioSelect);
-    
+
     if (marcaSelect && modeloSelect && anioSelect) {
         // Función para cargar modelos por marca y año
         function cargarModelos(marcaId, anio = null, modeloSeleccionado = null) {
             console.log(`📋 Cargando modelos para marca=${marcaId}, año=${anio}`);
-            
+
             // Limpiar opciones del modelo
             modeloSelect.innerHTML = '<option value="">Loading models...</option>';
             modeloSelect.disabled = true;
-            
+
             if (marcaId) {
                 // Construir URL con parámetros
                 let url = `/us/vehiculos/ajax/modelos-por-marca-anio/?marca_id=${marcaId}`;
                 if (anio) {
                     url += `&anio=${anio}`;
                 }
-                
+
                 console.log('🌐 Fetching:', url);
-                
+
                 // Hacer petición AJAX
                 fetch(url)
                     .then(response => {
@@ -484,24 +484,24 @@ document.addEventListener('DOMContentLoaded', function() {
                     })
                     .then(data => {
                         console.log('📦 Modelos recibidos:', data);
-                        
+
                         // Limpiar opciones
                         modeloSelect.innerHTML = '<option value="">--- Select model ---</option>';
-                        
+
                         // Verificar si data.results existe (formato Select2) o si es un array directo
                         const modelos = data.results || data;
-                        
+
                         if (Array.isArray(modelos) && modelos.length > 0) {
                             modelos.forEach(modelo => {
                                 const option = document.createElement('option');
                                 // data.results usa {id, text}, array directo usa {id, nombre}
                                 option.value = modelo.id;
                                 option.textContent = modelo.text || modelo.nombre;
-                                
+
                                 if (modeloSeleccionado && modelo.id == modeloSeleccionado) {
                                     option.selected = true;
                                 }
-                                
+
                                 modeloSelect.appendChild(option);
                             });
                             console.log(`✅ ${modelos.length} modelos cargados`);
@@ -509,7 +509,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             modeloSelect.innerHTML = '<option value="">No models available</option>';
                             console.log('⚠️ No hay modelos disponibles');
                         }
-                        
+
                         modeloSelect.disabled = false;
                     })
                     .catch(error => {
@@ -522,14 +522,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 modeloSelect.disabled = false;
             }
         }
-        
+
         // Event listener para cambio de marca
         marcaSelect.addEventListener('change', function() {
             console.log('🔄 Marca cambiada a:', this.value);
             const anio = anioSelect.value;
             cargarModelos(this.value, anio);
         });
-        
+
         // Event listener para cambio de año
         anioSelect.addEventListener('change', function() {
             console.log('📅 Año cambiado a:', this.value);
@@ -538,7 +538,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 cargarModelos(marcaId, this.value);
             }
         });
-        
+
         // Cargar modelos iniciales si ya hay una marca seleccionada
         if (marcaSelect.value) {
             const anio = anioSelect.value;

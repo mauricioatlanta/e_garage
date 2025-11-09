@@ -452,7 +452,7 @@ select.cyber-input option:checked {
 console.log('🔍 Template loaded');
 document.addEventListener('DOMContentLoaded', function() {
   console.log('🔍 DOM Content Loaded');
-  
+
   // Debug: Listar todos los formularios en la página
   const allForms = document.querySelectorAll('form');
   console.log('🔍 Total forms found:', allForms.length);
@@ -461,39 +461,39 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log(`🔍 Form ${index} action:`, form.action);
     console.log(`🔍 Form ${index} method:`, form.method);
   });
-  
+
   // Seleccionar el formulario correcto (el que contiene el botón de crear cliente)
   const submitBtn = document.getElementById('btn-guardar-cliente');
   console.log('🔍 Submit button:', submitBtn);
-  
+
   if (submitBtn) {
     console.log('🔍 Submit button parent:', submitBtn.parentElement);
     console.log('🔍 Submit button parent parent:', submitBtn.parentElement?.parentElement);
     console.log('🔍 Submit button closest form:', submitBtn.closest('form'));
-    
+
     const form = submitBtn.closest('form');
-    
+
     if (form) {
       console.log('✅ Form found:', form);
       console.log('🔍 Form action:', form.action);
       console.log('🔍 Form method:', form.method);
-      
+
       form.addEventListener('submit', function(e) {
         console.log('🔍 Form submit event triggered');
         console.log('🔍 Form action:', form.action);
         console.log('🔍 Form method:', form.method);
         console.log('🔍 Form data:', new FormData(form));
-        
+
         // No preventDefault - let the form submit normally
       });
     } else {
       console.log('❌ Form not found via closest()');
-      
+
       // Intentar encontrar el formulario manualmente
       const manualForm = document.querySelector('form[method="post"]:not([action*="logout"])');
       if (manualForm) {
         console.log('✅ Form found manually:', manualForm);
-        
+
         manualForm.addEventListener('submit', function(e) {
           console.log('🔍 Manual form submit event triggered');
           console.log('🔍 Form action:', manualForm.action);
@@ -501,12 +501,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
       }
     }
-    
+
     submitBtn.addEventListener('click', function(e) {
       console.log('🔍 Submit button clicked');
       console.log('🔍 Button form:', this.form);
       console.log('🔍 Button closest form:', this.closest('form'));
-      
+
       // Intentar enviar el formulario manualmente si es necesario
       const form = this.closest('form') || document.querySelector('form[method="post"]:not([action*="logout"])');
       if (form) {
@@ -1200,7 +1200,7 @@ select.cyber-input option:checked {
 console.log('🔍 Template loaded');
 document.addEventListener('DOMContentLoaded', function() {
   console.log('🔍 DOM Content Loaded');
-  
+
   // Debug: Listar todos los formularios en la página
   const allForms = document.querySelectorAll('form');
   console.log('🔍 Total forms found:', allForms.length);
@@ -1209,39 +1209,39 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log(`🔍 Form ${index} action:`, form.action);
     console.log(`🔍 Form ${index} method:`, form.method);
   });
-  
+
   // Seleccionar el formulario correcto (el que contiene el botón de crear cliente)
   const submitBtn = document.getElementById('btn-guardar-cliente');
   console.log('🔍 Submit button:', submitBtn);
-  
+
   if (submitBtn) {
     console.log('🔍 Submit button parent:', submitBtn.parentElement);
     console.log('🔍 Submit button parent parent:', submitBtn.parentElement?.parentElement);
     console.log('🔍 Submit button closest form:', submitBtn.closest('form'));
-    
+
     const form = submitBtn.closest('form');
-    
+
     if (form) {
       console.log('✅ Form found:', form);
       console.log('🔍 Form action:', form.action);
       console.log('🔍 Form method:', form.method);
-      
+
       form.addEventListener('submit', function(e) {
         console.log('🔍 Form submit event triggered');
         console.log('🔍 Form action:', form.action);
         console.log('🔍 Form method:', form.method);
         console.log('🔍 Form data:', new FormData(form));
-        
+
         // No preventDefault - let the form submit normally
       });
     } else {
       console.log('❌ Form not found via closest()');
-      
+
       // Intentar encontrar el formulario manualmente
       const manualForm = document.querySelector('form[method="post"]:not([action*="logout"])');
       if (manualForm) {
         console.log('✅ Form found manually:', manualForm);
-        
+
         manualForm.addEventListener('submit', function(e) {
           console.log('🔍 Manual form submit event triggered');
           console.log('🔍 Form action:', manualForm.action);
@@ -1249,12 +1249,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
       }
     }
-    
+
     submitBtn.addEventListener('click', function(e) {
       console.log('🔍 Submit button clicked');
       console.log('🔍 Button form:', this.form);
       console.log('🔍 Button closest form:', this.closest('form'));
-      
+
       // Intentar enviar el formulario manualmente si es necesario
       const form = this.closest('form') || document.querySelector('form[method="post"]:not([action*="logout"])');
       if (form) {

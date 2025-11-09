@@ -1,5 +1,7 @@
-import pytest
 from importlib import import_module
+
+import pytest
+
 
 def _import_or_skip(path, name):
     try:
@@ -8,6 +10,7 @@ def _import_or_skip(path, name):
     except Exception:
         pytest.skip(f"No disponible: {path}.{name}")
 
+
 @pytest.mark.django_db
 def test_vehiculo_form_empty_is_invalid():
     VehiculoForm = _import_or_skip("taller.forms.vehiculo", "VehiculoForm")
@@ -15,6 +18,7 @@ def test_vehiculo_form_empty_is_invalid():
     assert not form.is_valid()
     # Debe tener algún error (al menos un campo requerido)
     assert form.errors
+
 
 @pytest.mark.django_db
 def test_empresa_form_empty_is_invalid():
@@ -28,6 +32,7 @@ def test_empresa_form_empty_is_invalid():
     form = EmpresaForm(data={})
     assert not form.is_valid()
     assert form.errors
+
 
 @pytest.mark.django_db
 def test_documento_form_loads_if_present():

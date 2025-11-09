@@ -15,20 +15,20 @@ from django.http import HttpResponse
 
 def documento_pdf_weasyprint(request, pk):
     obj = get_object_or_404(Documento, pk=pk, empresa=request.user.empresa)
-    
+
     context = {
         "obj": obj,
         "pdf_mode": True,
         "empresa_nombre": empresa.nombre_taller,
         # ... más contexto
     }
-    
+
     # Generar HTML
     html = render_to_string("taller/documentos/pdf_base.html", context)
-    
+
     # Convertir a PDF
     pdf = HTML(string=html).write_pdf()
-    
+
     # Retornar como descarga
     response = HttpResponse(pdf, content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="documento_{pk}.pdf"'
@@ -75,19 +75,19 @@ from django.conf import settings
 
 def documento_pdf_wkhtmltopdf(request, pk):
     obj = get_object_or_404(Documento, pk=pk, empresa=request.user.empresa)
-    
+
     # URLs absolutas
     base_url = request.build_absolute_uri('/')
     header_url = request.build_absolute_uri(reverse('pdf:header', args=[pk]))
     footer_url = request.build_absolute_uri(reverse('pdf:footer', args=[pk]))
     content_url = request.build_absolute_uri(reverse('documentos:pdf_html', args=[pk]))
-    
+
     # Comando wkhtmltopdf
     cmd = [
         'wkhtmltopdf',
         '--page-size', 'A4',
         '--margin-top', '28mm',
-        '--margin-bottom', '22mm', 
+        '--margin-bottom', '22mm',
         '--margin-left', '14mm',
         '--margin-right', '14mm',
         '--header-html', header_url,
@@ -95,14 +95,14 @@ def documento_pdf_wkhtmltopdf(request, pk):
         content_url,
         f'/tmp/documento_{pk}.pdf'
     ]
-    
+
     # Ejecutar comando
     result = subprocess.run(cmd, capture_output=True, text=True)
-    
+
     if result.returncode == 0:
         with open(f'/tmp/documento_{pk}.pdf', 'rb') as f:
             pdf_content = f.read()
-        
+
         response = HttpResponse(pdf_content, content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="documento_{pk}.pdf"'
         return response

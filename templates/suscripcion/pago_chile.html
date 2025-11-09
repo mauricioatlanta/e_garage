@@ -208,14 +208,14 @@ body {
         <div class="payment-title">💳 Completa tu Suscripción</div>
         <div class="payment-subtitle">{{ empresa.nombre_taller }} - 🇨🇱 Chile</div>
     </div>
-    
+
     <!-- Plan Info -->
     <div class="plan-info">
         <div class="plan-name">Plan {{ plan_info.nombre }}</div>
         <div class="plan-price">${{ plan_info.valor|intcomma }} CLP</div>
         <div class="plan-period">{{ plan_info.dias }} días de acceso</div>
     </div>
-    
+
     <!-- Instrucciones -->
     <div class="instructions">
         <div class="instructions-title">📋 Instrucciones de Pago</div>
@@ -227,28 +227,28 @@ body {
             <li>Tu suscripción será activada en <strong>24-48 horas</strong></li>
         </ol>
     </div>
-    
+
     <!-- Datos Bancarios -->
     <div class="bank-details">
         <div class="bank-title">
             🏦 Datos Bancarios
         </div>
-        
+
         <div class="bank-row">
             <span class="bank-label">Banco:</span>
             <span class="bank-value">{{ datos_banco.banco }}</span>
         </div>
-        
+
         <div class="bank-row">
             <span class="bank-label">Tipo de Cuenta:</span>
             <span class="bank-value">{{ datos_banco.tipo_cuenta }}</span>
         </div>
-        
+
         <div class="bank-row">
             <span class="bank-label">Titular:</span>
             <span class="bank-value">{{ datos_banco.titular }}</span>
         </div>
-        
+
         <div class="bank-row">
             <span class="bank-label">RUT:</span>
             <span class="bank-value">
@@ -256,7 +256,7 @@ body {
                 <button class="copy-btn" onclick="copyToClipboard('{{ datos_banco.rut }}')">Copiar</button>
             </span>
         </div>
-        
+
         <div class="bank-row">
             <span class="bank-label">N° Cuenta:</span>
             <span class="bank-value">
@@ -264,7 +264,7 @@ body {
                 <button class="copy-btn" onclick="copyToClipboard('{{ datos_banco.numero_cuenta }}')">Copiar</button>
             </span>
         </div>
-        
+
         <div class="bank-row">
             <span class="bank-label">Monto a Transferir:</span>
             <span class="bank-value" style="color: #667eea; font-size: 20px;">
@@ -272,7 +272,7 @@ body {
                 <button class="copy-btn" onclick="copyToClipboard('{{ monto_pagar }}')">Copiar</button>
             </span>
         </div>
-        
+
         <div class="bank-row">
             <span class="bank-label">Referencia:</span>
             <span class="bank-value">
@@ -281,23 +281,23 @@ body {
             </span>
         </div>
     </div>
-    
+
     <!-- Alert -->
     <div class="alert alert-info">
         <strong>📧 Confirmación:</strong> Enviaremos un email a <strong>{{ empresa.email }}</strong> cuando tu suscripción sea activada.
     </div>
-    
+
     <!-- Upload Section -->
     <div class="upload-section">
         <h3 style="margin-bottom: 16px; color: #1a202c;">📤 Subir Comprobante</h3>
         <p style="color: #718096; margin-bottom: 20px;">Adjunta tu comprobante de transferencia</p>
-        
+
         <form method="POST" action="{% url 'subir_comprobante' %}" enctype="multipart/form-data">
             {% csrf_token %}
             <input type="hidden" name="plan" value="{{ plan }}">
             <input type="hidden" name="monto" value="{{ monto_pagar }}">
-            
-            <input type="file" name="comprobante" accept="image/*,.pdf" required 
+
+            <input type="file" name="comprobante" accept="image/*,.pdf" required
                    style="margin-bottom: 16px;">
             <br>
             <button type="submit" class="upload-button">
@@ -305,7 +305,7 @@ body {
             </button>
         </form>
     </div>
-    
+
     <!-- Back Link -->
     <div class="back-link">
         <a href="/cl/es/dashboard/">← Volver al Dashboard</a>
@@ -320,4 +320,3 @@ function copyToClipboard(text) {
 }
 </script>
 {% endblock %}
-

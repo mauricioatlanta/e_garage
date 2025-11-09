@@ -7,10 +7,8 @@ sys.path.append(".")
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings_sqlite")
 django.setup()
 
-from django.contrib.auth.models import User
 
-from taller.models.documento import (Documento, RepuestoDocumento,
-                                     ServicioDocumento)
+from taller.models.documento import Documento, RepuestoDocumento, ServicioDocumento
 from taller.models.empresa import Empresa
 
 
@@ -58,12 +56,12 @@ def debug_problema_multiempresa():
 
             # Estado del documento
             if repuestos.exists() or servicios.exists():
-                print(f"      - Estado: ✅ Tiene datos")
+                print("      - Estado: ✅ Tiene datos")
             else:
-                print(f"      - Estado: ❌ Sin repuestos/servicios")
+                print("      - Estado: ❌ Sin repuestos/servicios")
 
     # 2. Buscar documentos problemáticos (sin datos)
-    print(f"\n🔍 DOCUMENTOS PROBLEMÁTICOS (sin repuestos ni servicios):")
+    print("\n🔍 DOCUMENTOS PROBLEMÁTICOS (sin repuestos ni servicios):")
     docs_vacios = []
     for doc in Documento.objects.all():
         repuestos = RepuestoDocumento.objects.filter(documento=doc)
@@ -77,21 +75,21 @@ def debug_problema_multiempresa():
                 f"   ❌ Doc #{doc.id} ({doc.empresa.nombre_taller}): {doc.tipo_documento} {doc.numero_documento}"
             )
     else:
-        print(f"   ✅ No hay documentos vacíos")
+        print("   ✅ No hay documentos vacíos")
 
     # 3. URLs de testing por empresa
-    print(f"\n🌐 URLS PARA TESTING POR EMPRESA:")
+    print("\n🌐 URLS PARA TESTING POR EMPRESA:")
     for empresa in empresas:
         usuario = empresa.usuario
         if usuario:
             print(f"   🏢 {empresa.nombre_taller} (Usuario: {usuario.username}):")
-            print(f"      📄 Crear: http://127.0.0.1:8000/documentos/nuevo/")
-            print(f"      📋 Lista: http://127.0.0.1:8000/documentos/")
+            print("      📄 Crear: http://127.0.0.1:8000/documentos/nuevo/")
+            print("      📋 Lista: http://127.0.0.1:8000/documentos/")
 
 
 def crear_documento_test_empresa():
     """Crear un documento de prueba para testing en taller2"""
-    print(f"\n🧪 CREANDO DOCUMENTO TEST PARA TODAS LAS EMPRESAS")
+    print("\n🧪 CREANDO DOCUMENTO TEST PARA TODAS LAS EMPRESAS")
 
     # Obtener todas las empresas
     empresas = Empresa.objects.all()
@@ -104,7 +102,6 @@ def crear_documento_test_empresa():
         from datetime import date
 
         from taller.models.clientes import Cliente
-        from taller.models.tecnico import Mecanico
 
         # Obtener o crear cliente para esta empresa
         cliente = Cliente.objects.filter(empresa=empresa).first()

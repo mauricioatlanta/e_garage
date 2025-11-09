@@ -21,10 +21,10 @@ class CompanyProfileForm(forms.ModelForm):
     class Meta:
         model = CompanySettings
         fields = [
-            'company_name', 'tagline', 'logo', 'address', 
+            'company_name', 'tagline', 'logo', 'address',
             'phone', 'email', 'website', 'tax_id', 'business_license'
         ]
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Hacer todos los campos opcionales excepto company_name
@@ -39,7 +39,7 @@ class FinancialSettingsForm(forms.ModelForm):
     class Meta:
         model = CompanySettings
         fields = ['currency', 'tax_rate', 'apply_tax_by_default']
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Hacer todos los campos opcionales
@@ -53,7 +53,7 @@ class ThemeSettingsForm(forms.ModelForm):
     class Meta:
         model = CompanySettings
         fields = ['primary_color', 'secondary_color', 'separate_by_technician']
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Hacer todos los campos opcionales
@@ -98,7 +98,7 @@ else:
 ## Pruebas Realizadas
 
 ✅ **Formulario de Perfil**: Valida solo campos de perfil
-✅ **Formulario Financiero**: Valida solo campos financieros  
+✅ **Formulario Financiero**: Valida solo campos financieros
 ✅ **Formulario de Tema**: Valida solo campos de tema
 ✅ **Guardado independiente**: Cada sección se guarda sin errores
 
@@ -111,5 +111,3 @@ La página `/us/settings/` ahora permite:
 - ✅ Guardado exitoso de cada formulario
 
 El error de campos requeridos ha sido completamente resuelto.
-
-

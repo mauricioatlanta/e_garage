@@ -6,7 +6,6 @@ Esto reemplaza las vistas FBV que están en views.py con plantillas hardcodeadas
 from decimal import Decimal
 
 from django.contrib.auth.decorators import login_required
-from django.db.models import DecimalField, ExpressionWrapper, F, Sum
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
@@ -40,7 +39,9 @@ class DocumentoListView(CountryLangTemplateMixin, ListView):
             return [template_name]
         else:
             template_names = super().get_template_names()
-            print(f"[DEBUG] DocumentoListView - Using default templates: {template_names}")
+            print(
+                f"[DEBUG] DocumentoListView - Using default templates: {template_names}"
+            )
             return template_names
 
     def get_queryset(self):
@@ -93,7 +94,6 @@ class DocumentoCreateView(CountryLangTemplateMixin, CreateView):
         # Cargar mecánicos activos del taller
         mecanicos = Tecnico.objects.filter(empresa=empresa, activo=True)
 
-
         context.update(
             {
                 "mecanicos": mecanicos,
@@ -114,7 +114,7 @@ class DocumentoCreateView(CountryLangTemplateMixin, CreateView):
             }
         )
         return context
-    
+
     def get_form_kwargs(self):
         """Obtener argumentos para el formulario"""
         kwargs = super().get_form_kwargs()
@@ -126,35 +126,42 @@ class DocumentoCreateView(CountryLangTemplateMixin, CreateView):
     def get_success_url(self):
         """Redirigir a la lista de documentos después de crear uno exitosamente"""
         if self.request.path.startswith("/us/"):
-            return reverse('documentos_us_en:lista_documentos')
+            return reverse("documentos_us_en:lista_documentos")
         else:
-            return reverse('documentos_cl_es:lista_documentos')
-    
+            return reverse("documentos_cl_es:lista_documentos")
+
     def form_valid(self, form):
-        print(f"[DEBUG DocumentoCreateView] form_valid llamado")
-        print(f"[DEBUG DocumentoCreateView] Cliente en form.cleaned_data: {form.cleaned_data.get('cliente', 'NO ENCONTRADO')}")
-        print(f"[DEBUG DocumentoCreateView] Cliente en form.instance: {getattr(form.instance, 'cliente', 'NO ENCONTRADO')}")
-        print(f"[DEBUG DocumentoCreateView] CSRF token: {self.request.POST.get('csrfmiddlewaretoken', 'NO ENCONTRADO')}")
-        
+        print("[DEBUG DocumentoCreateView] form_valid llamado")
+        print(
+            f"[DEBUG DocumentoCreateView] Cliente en form.cleaned_data: {form.cleaned_data.get('cliente', 'NO ENCONTRADO')}"
+        )
+        print(
+            f"[DEBUG DocumentoCreateView] Cliente en form.instance: {getattr(form.instance, 'cliente', 'NO ENCONTRADO')}"
+        )
+        print(
+            f"[DEBUG DocumentoCreateView] CSRF token: {self.request.POST.get('csrfmiddlewaretoken', 'NO ENCONTRADO')}"
+        )
+
         form.instance.empresa = self.request.user.empresa
-        
+
         # Guardar el documento primero
         response = super().form_valid(form)
-        
+
         # Procesar items dinámicos después de guardar
         self.procesar_items_dinamicos(form)
-        
+
         # Agregar mensaje de éxito
         from django.contrib import messages
+
         messages.success(
-            self.request, 
-            f'Documento {form.instance.numero_documento} creado exitosamente para {form.instance.cliente.nombre}.'
+            self.request,
+            f"Documento {form.instance.numero_documento} creado exitosamente para {form.instance.cliente.nombre}.",
         )
-        
+
         return response
-    
+
     def form_invalid(self, form):
-        print(f"[DEBUG DocumentoCreateView] form_invalid llamado")
+        print("[DEBUG DocumentoCreateView] form_invalid llamado")
         print(f"[DEBUG DocumentoCreateView] Errores: {form.errors}")
         print(f"[DEBUG DocumentoCreateView] Datos POST: {self.request.POST}")
         return super().form_invalid(form)
@@ -162,25 +169,25 @@ class DocumentoCreateView(CountryLangTemplateMixin, CreateView):
     def procesar_items_dinamicos(self, form):
         """Procesa los campos dinámicos de repuestos, servicios y otros servicios"""
         documento = form.instance
-        
+
         # Procesar repuestos dinámicos
         self.procesar_repuestos_dinamicos(documento)
-        
+
         # Procesar servicios dinámicos
         self.procesar_servicios_dinamicos(documento)
 
     def procesar_repuestos_dinamicos(self, documento):
         """Procesa los repuestos agregados dinámicamente"""
         from taller.models.lineas_documento import LineaRepuesto
-        
+
         # Obtener datos del POST
         codigos = self.request.POST.getlist("rep-0-codigo")
         nombres = self.request.POST.getlist("rep-0-nombre")
         cantidades = self.request.POST.getlist("rep-0-cantidad")
         precios = self.request.POST.getlist("rep-0-precio_unitario")
-        
+
         print(f"[DEBUG] Procesando repuestos: {len(codigos)} elementos")
-        
+
         for i, codigo in enumerate(codigos):
             if codigo and nombres[i] and cantidades[i] and precios[i]:
                 try:
@@ -189,7 +196,7 @@ class DocumentoCreateView(CountryLangTemplateMixin, CreateView):
                         codigo=codigo,
                         nombre=nombres[i],
                         cantidad=int(cantidades[i]),
-                        precio_unitario=float(precios[i])
+                        precio_unitario=float(precios[i]),
                     )
                     print(f"[DEBUG] Repuesto creado: {codigo} - {nombres[i]}")
                 except Exception as e:
@@ -198,13 +205,13 @@ class DocumentoCreateView(CountryLangTemplateMixin, CreateView):
     def procesar_servicios_dinamicos(self, documento):
         """Procesa los servicios agregados dinámicamente"""
         from taller.models.lineas_documento import LineaServicio
-        
+
         # Obtener datos del POST
         nombres = self.request.POST.getlist("serv-0-nombre")
         precios = self.request.POST.getlist("serv-0-precio_unitario")
-        
+
         print(f"[DEBUG] Procesando servicios: {len(nombres)} elementos")
-        
+
         for i, nombre in enumerate(nombres):
             if nombre and precios[i]:
                 try:
@@ -212,7 +219,7 @@ class DocumentoCreateView(CountryLangTemplateMixin, CreateView):
                         documento=documento,
                         nombre=nombre,
                         precio_unitario=float(precios[i]),
-                        cantidad=1
+                        cantidad=1,
                     )
                     print(f"[DEBUG] Servicio creado: {nombre}")
                 except Exception as e:
@@ -302,23 +309,23 @@ class DocumentoUpdateView(CountryLangTemplateMixin, UpdateView):
 
     def get_template_names(self):
         """Sistema robusto de fallback para templates de edición de documentos"""
-        from django.template.loader import select_template
         from django.template import TemplateDoesNotExist
+        from django.template.loader import select_template
         from django.utils.translation import get_language
-        
+
         # País/idioma desde empresa y request
         empresa = getattr(self.request.user, "empresa", None)
         country = (getattr(empresa, "pais", "CL") or "CL").strip().lower()  # cl/us
-        lang = (get_language() or "es").strip().lower()                    # es/en
+        lang = (get_language() or "es").strip().lower()  # es/en
 
         candidates = [
             f"taller/{country}/{lang}/documentos/document_edit.html",
             f"taller/{country}/{lang}/documentos/editar_documento.html",
-            "taller/common/documentos/document_edit.html",                 # el que pide la vista
-            "taller/common/documentos/editar_documento_nuevo.html",        # template funcional actual
-            "taller/documentos/editar_documento_nuevo.html",               # fallback legacy
+            "taller/common/documentos/document_edit.html",  # el que pide la vista
+            "taller/common/documentos/editar_documento_nuevo.html",  # template funcional actual
+            "taller/documentos/editar_documento_nuevo.html",  # fallback legacy
         ]
-        
+
         # Devuelve el primero que exista
         try:
             t = select_template(candidates)
@@ -351,7 +358,7 @@ class DocumentoUpdateView(CountryLangTemplateMixin, UpdateView):
         subtotal_otros_servicios = sum(
             getattr(otro, "precio_cliente", Decimal("0.00")) for otro in otros_servicios
         )
-        
+
         # Calcular totales
         subtotal = subtotal_repuestos + subtotal_servicios + subtotal_otros_servicios
         iva = subtotal * Decimal("0.19")
@@ -381,7 +388,7 @@ class DocumentoUpdateView(CountryLangTemplateMixin, UpdateView):
 
     def get_success_url(self):
         """Redirigir a la vista del documento después de editarlo exitosamente"""
-        return reverse('documentos_cl_es:ver_documento', kwargs={'pk': self.object.pk})
+        return reverse("documentos_cl_es:ver_documento", kwargs={"pk": self.object.pk})
 
     def render_to_response(self, context, **response_kwargs):
         return self.render_country_lang(self.request, context)

@@ -6,7 +6,7 @@
 {% block content %}
 <div class="container mx-auto px-4 py-8">
     <h1 class="text-3xl font-bold mb-8">Ejemplo Context Processor Empresa</h1>
-    
+
     <!-- Banner de alerta de suscripción -->
     {% if empresa_debe_mostrar_alerta %}
     <div class="mb-6 p-4 rounded-lg bg-{{ empresa_color_estado }}-100 border-l-4 border-{{ empresa_color_estado }}-500">
@@ -24,11 +24,11 @@
         </div>
     </div>
     {% endif %}
-    
+
     <!-- Información de la empresa -->
     <div class="bg-white shadow rounded-lg p-6 mb-8">
         <h2 class="text-xl font-semibold mb-4">Información de la Empresa</h2>
-        
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
                 <h3 class="font-medium text-gray-900">Datos Básicos</h3>
@@ -51,7 +51,7 @@
                     </div>
                 </dl>
             </div>
-            
+
             <div>
                 <h3 class="font-medium text-gray-900">Suscripción</h3>
                 <dl class="mt-2 space-y-2">
@@ -75,11 +75,11 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Ejemplo de uso de moneda -->
     <div class="bg-white shadow rounded-lg p-6 mb-8">
         <h2 class="text-xl font-semibold mb-4">Ejemplo de Formato de Moneda</h2>
-        
+
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="text-center">
                 <h3 class="font-medium text-gray-900 mb-2">Precio Básico</h3>
@@ -88,7 +88,7 @@
                     <span class="text-sm text-gray-500">{{ empresa_moneda.codigo }}</span>
                 </p>
             </div>
-            
+
             <div class="text-center">
                 <h3 class="font-medium text-gray-900 mb-2">Precio Premium</h3>
                 <p class="text-2xl font-bold text-blue-600">
@@ -96,7 +96,7 @@
                     <span class="text-sm text-gray-500">{{ empresa_moneda.codigo }}</span>
                 </p>
             </div>
-            
+
             <div class="text-center">
                 <h3 class="font-medium text-gray-900 mb-2">Precio Enterprise</h3>
                 <p class="text-2xl font-bold text-purple-600">
@@ -106,11 +106,11 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Ejemplo de compatibilidad con código existente -->
     <div class="bg-white shadow rounded-lg p-6 mb-8">
         <h2 class="text-xl font-semibold mb-4">Compatibilidad con Código Existente</h2>
-        
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
                 <h3 class="font-medium text-gray-900 mb-2">Variables Existentes</h3>
@@ -135,7 +135,7 @@
                     </div>
                 </dl>
             </div>
-            
+
             <div>
                 <h3 class="font-medium text-gray-900 mb-2">Nuevas Variables</h3>
                 <dl class="space-y-2">
@@ -157,11 +157,11 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Código de ejemplo -->
     <div class="bg-gray-50 rounded-lg p-6">
         <h2 class="text-xl font-semibold mb-4">Código de Ejemplo</h2>
-        
+
         <div class="space-y-4">
             <div>
                 <h3 class="font-medium text-gray-900 mb-2">Banner de Alerta</h3>
@@ -171,12 +171,12 @@
   </div>
 {% endif %}{% endverbatim %}</code></pre>
             </div>
-            
+
             <div>
                 <h3 class="font-medium text-gray-900 mb-2">Formato de Moneda</h3>
                 <pre class="bg-gray-800 text-green-400 p-4 rounded text-sm overflow-x-auto"><code>{% verbatim %}<span>{{ empresa_moneda.simbolo }}{{ precio|floatformat:empresa_moneda.decimales }}</span>{% endverbatim %}</code></pre>
             </div>
-            
+
             <div>
                 <h3 class="font-medium text-gray-900 mb-2">Footer con Información</h3>
                 <pre class="bg-gray-800 text-green-400 p-4 rounded text-sm overflow-x-auto"><code>{% verbatim %}<footer class="mt-10 text-sm text-gray-500">

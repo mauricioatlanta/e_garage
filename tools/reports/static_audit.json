@@ -1,21 +1,21 @@
 {
   "generated_at": "20251006_140458",
+  "plan": [
+    {
+      "reason": "duplicado: ya existe dentro de /static",
+      "ref_hits_in_templates": 0,
+      "sha256": "cc1a7ad0d019ddb1",
+      "size_kb": 0.06,
+      "src": "E:\\projecto\\e_garage\\tools\\quarantine\\static_deletes_20251006_140242\\scripts\\input.css",
+      "suggested_action": "delete",
+      "suggested_dest_under_static": "css\\input.css"
+    }
+  ],
   "root": "E:\\projecto\\e_garage",
   "static_root": "E:\\projecto\\e_garage\\static",
   "totals": {
+    "duplicates_groups": 11,
     "inside_static": 139,
-    "outside_static": 1,
-    "duplicates_groups": 11
-  },
-  "plan": [
-    {
-      "src": "E:\\projecto\\e_garage\\tools\\quarantine\\static_deletes_20251006_140242\\scripts\\input.css",
-      "size_kb": 0.06,
-      "sha256": "cc1a7ad0d019ddb1",
-      "suggested_action": "delete",
-      "reason": "duplicado: ya existe dentro de /static",
-      "suggested_dest_under_static": "css\\input.css",
-      "ref_hits_in_templates": 0
-    }
-  ]
+    "outside_static": 1
+  }
 }

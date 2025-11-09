@@ -27,8 +27,8 @@ Para USA, las URLs correctas deben incluir el prefijo `/us/`:
 $.getJSON(`/vehiculos/ajax/modelos-por-marca-anio/`, ...)
 
 // Después (dinámico):
-const baseUrl = window.location.pathname.includes('/us/') 
-  ? '/us/vehiculos/ajax/modelos-por-marca-anio/' 
+const baseUrl = window.location.pathname.includes('/us/')
+  ? '/us/vehiculos/ajax/modelos-por-marca-anio/'
   : '/cl/vehiculos/ajax/modelos-por-marca-anio/';
 $.getJSON(baseUrl, ...)
 ```
@@ -50,22 +50,22 @@ $modelo.append($("<option>").val(item.id).text(item.text || item.nombre));
 
 **Modelos:**
 ```javascript
-const baseUrl = window.location.pathname.includes('/us/') 
-  ? '/us/vehiculos/ajax/modelos-por-marca-anio/' 
+const baseUrl = window.location.pathname.includes('/us/')
+  ? '/us/vehiculos/ajax/modelos-por-marca-anio/'
   : '/cl/vehiculos/ajax/modelos-por-marca-anio/';
 ```
 
 **Motores:**
 ```javascript
-const motoresUrl = window.location.pathname.includes('/us/') 
-  ? '/us/vehiculos/ajax/motores-por-modelo/' 
+const motoresUrl = window.location.pathname.includes('/us/')
+  ? '/us/vehiculos/ajax/motores-por-modelo/'
   : '/cl/vehiculos/ajax/motores-por-modelo/';
 ```
 
 **Cajas:**
 ```javascript
-const cajasUrl = window.location.pathname.includes('/us/') 
-  ? '/us/vehiculos/ajax/cajas-por-modelo/' 
+const cajasUrl = window.location.pathname.includes('/us/')
+  ? '/us/vehiculos/ajax/cajas-por-modelo/'
   : '/cl/vehiculos/ajax/cajas-por-modelo/';
 ```
 
@@ -103,18 +103,18 @@ const isUSA = window.location.pathname.includes('/us/');
 ### **2. URLs Dinámicas:**
 ```javascript
 // Modelos
-const baseUrl = isUSA 
-  ? '/us/vehiculos/ajax/modelos-por-marca-anio/' 
+const baseUrl = isUSA
+  ? '/us/vehiculos/ajax/modelos-por-marca-anio/'
   : '/cl/vehiculos/ajax/modelos-por-marca-anio/';
 
 // Motores
-const motoresUrl = isUSA 
-  ? '/us/vehiculos/ajax/motores-por-modelo/' 
+const motoresUrl = isUSA
+  ? '/us/vehiculos/ajax/motores-por-modelo/'
   : '/cl/vehiculos/ajax/motores-por-modelo/';
 
 // Cajas
-const cajasUrl = isUSA 
-  ? '/us/vehiculos/ajax/cajas-por-modelo/' 
+const cajasUrl = isUSA
+  ? '/us/vehiculos/ajax/cajas-por-modelo/'
   : '/cl/vehiculos/ajax/cajas-por-modelo/';
 ```
 
@@ -154,5 +154,3 @@ El problema está **completamente resuelto**. El JavaScript ahora:
 - ✅ **Filtrado Funcional**: Modelos se cargan después de seleccionar marca
 
 El formulario de creación de vehículos en USA ahora funciona correctamente y carga los modelos después de seleccionar la marca 🚗✨
-
-

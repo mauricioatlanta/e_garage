@@ -4,7 +4,7 @@ import os
 import django
 
 # Configurar Django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings")
 django.setup()
 
 from taller.models.region_ciudad import TallerCiudad, TallerRegion
@@ -24,7 +24,7 @@ else:
 # Verificar también las regiones usando utils.pais
 from utils.pais import get_regiones
 
-regiones_utils = get_regiones('CL')
+regiones_utils = get_regiones("CL")
 print(f"Regiones desde utils.pais: {len(regiones_utils)}")
 if regiones_utils:
     print(f"Primera región utils: {regiones_utils[0]}")

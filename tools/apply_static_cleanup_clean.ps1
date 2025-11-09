@@ -46,14 +46,14 @@ function Move-ToQuarantine {
     $relativePath = $FilePath.Replace("$StaticDir\", "")
     $quarantinePath = Join-Path $quarantineSubDir $relativePath
     $quarantineParent = Split-Path $quarantinePath -Parent
-    
+
     New-Item -ItemType Directory -Force -Path $quarantineParent | Out-Null
     Move-Item $FilePath $quarantinePath -Force
-    
+
     # Log del motivo
     $logFile = Join-Path $quarantineSubDir "deletion_log.txt"
     Add-Content -Path $logFile -Value "$(Get-Date): $relativePath - $Reason"
-    
+
     return $quarantinePath
   }
   return $null
@@ -76,14 +76,14 @@ function Normalize-Filename {
 # Función para determinar directorio objetivo
 function Get-TargetDirectory {
   param([string]$FilePath, [string]$FileType)
-  
+
   $pathLower = $FilePath.ToLower()
-  
+
   # Determinar país/idioma
   $country = "common"
   if ($pathLower -match '\bcl\b|chile') { $country = "cl" }
   elseif ($pathLower -match '\bus\b|usa|united') { $country = "us" }
-  
+
   # Mapeo de tipos a directorios
   switch ($FileType) {
     "CSS" { return "taller\$country\css" }
@@ -122,29 +122,29 @@ foreach ($file in $auditData) {
   $fileType = $file.type
   $isDuplicate = $file.is_duplicate -eq "True"
   $hasIssues = $file.has_issues -eq "True"
-  
+
   # Reglas de borrado para producción
   $shouldDelete = $false
   $deleteReason = ""
-  
+
   # 1. Archivos .map (source maps)
   if ($fileName -match '\.map$') {
     $shouldDelete = $true
     $deleteReason = "Source map (no necesario en produccion)"
   }
-  
+
   # 2. Archivos de diseño (.psd, .ai, .fig)
   elseif ($fileName -match '\.(psd|ai|fig)$') {
     $shouldDelete = $true
     $deleteReason = "Archivo de diseno (no necesario en produccion)"
   }
-  
+
   # 3. Archivos comprimidos (.zip, .rar)
   elseif ($fileName -match '\.(zip|rar|7z)$') {
     $shouldDelete = $true
     $deleteReason = "Archivo comprimido (no necesario en produccion)"
   }
-  
+
   # 4. Archivos no-minificados cuando existe el .min
   elseif ($fileType -in @("CSS", "JS") -and $fileName -notmatch '\.min\.') {
     $minFile = $fileName -replace '\.(css|js)$', '.min.$1'
@@ -154,7 +154,7 @@ foreach ($file in $auditData) {
       $deleteReason = "Archivo no-minificado (existe version minificada)"
     }
   }
-  
+
   # 5. Duplicados por hash (mantener solo uno)
   elseif ($isDuplicate) {
     # Mantener el primero, borrar los demás
@@ -165,13 +165,13 @@ foreach ($file in $auditData) {
       $deleteReason = "Duplicado por hash (mantener: $($firstOccurrence.path))"
     }
   }
-  
+
   # 6. Archivos experimentales o temporales
   elseif ($fileName -match '(experimental|temp|tmp|test|debug|old|backup|copy|v\d+)$') {
     $shouldDelete = $true
     $deleteReason = "Archivo experimental/temporal"
   }
-  
+
   if ($shouldDelete) {
     $toDelete += @{
       Path = $filePath
@@ -206,7 +206,7 @@ if ($toDelete.Count -gt 0) {
 # PASO 3: Aplicar borrados
 if ($toDelete.Count -gt 0) {
   Write-Host "`nPASO 3: Aplicando borrados..." -ForegroundColor Red
-  
+
   if ($DryRun) {
     Write-Host "   [DRY RUN] Se borrarian $($toDelete.Count) archivos" -ForegroundColor Yellow
   } else {
@@ -227,17 +227,17 @@ if ($toDelete.Count -gt 0) {
 # PASO 4: Reorganizar archivos restantes
 if ($toMove.Count -gt 0) {
   Write-Host "`nPASO 4: Reorganizando archivos..." -ForegroundColor Blue
-  
+
   $moved = 0
   $errors = 0
-  
+
   foreach ($item in $toMove) {
     $originalPath = $item.Path
     $fileName = Split-Path $originalPath -Leaf
     $normalizedName = Normalize-Filename -Filename $fileName
     $targetDir = Get-TargetDirectory -FilePath $item.OriginalPath -FileType $item.Type
     $targetPath = Join-Path $StaticDir $targetDir $normalizedName
-    
+
     # Evitar colisiones
     $counter = 1
     $originalTarget = $targetPath
@@ -247,32 +247,32 @@ if ($toMove.Count -gt 0) {
       $targetPath = Join-Path (Split-Path $originalTarget -Parent) "$stem-$counter$ext"
       $counter++
     }
-    
+
     if ($DryRun) {
       Write-Host "   [DRY RUN] $($item.OriginalPath) -> $($targetPath.Replace('$StaticDir\', ''))" -ForegroundColor Yellow
     } else {
       try {
         # Crear backup
         $backupPath = Backup-File -FilePath $originalPath
-        
+
         # Crear directorio objetivo
         $targetParent = Split-Path $targetPath -Parent
         New-Item -ItemType Directory -Force -Path $targetParent | Out-Null
-        
+
         # Mover archivo
         Move-Item $originalPath $targetPath -Force
         $moved++
-        
+
         $status = if ($item.HasIssues) { "WARNING" } else { "OK" }
         Write-Host "   $status $($item.OriginalPath) -> $($targetPath.Replace('$StaticDir\', ''))" -ForegroundColor Green
-        
+
       } catch {
         $errors++
         Write-Host "   ERROR moviendo $($item.OriginalPath): $($_.Exception.Message)" -ForegroundColor Red
       }
     }
   }
-  
+
   if (-not $DryRun) {
     Write-Host "   Total movidos: $moved" -ForegroundColor Green
     Write-Host "   Errores: $errors" -ForegroundColor $(if ($errors -gt 0) { 'Red' } else { 'Green' })

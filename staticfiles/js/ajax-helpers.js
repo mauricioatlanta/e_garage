@@ -12,20 +12,20 @@ async function buscarClientes(q) {
     console.error('❌ Endpoint buscarClientes no disponible');
     return [];
   }
-  
+
   const url = `${window.AJAX_ENDPOINTS.buscarClientes}?q=${encodeURIComponent(q)}`;
   console.log("🔍 Buscando clientes con:", q, "URL:", url);
-  
+
   try {
-    const resp = await fetch(url, { 
+    const resp = await fetch(url, {
       headers: { "X-Requested-With": "XMLHttpRequest" }
     });
-    
+
     if (!resp.ok) {
       console.error("❌ Error HTTP:", resp.status, resp.statusText);
       return [];
     }
-    
+
     const data = await resp.json();
     console.log("📡 Respuesta:", data);
     return data.results || [];
@@ -41,20 +41,20 @@ async function vehiculosPorCliente(clienteId) {
     console.error('❌ Endpoint vehiculosPorCliente no disponible');
     return [];
   }
-  
+
   const url = `${window.AJAX_ENDPOINTS.vehiculosPorCliente}?cliente=${clienteId}`;
   console.log("🚗 Buscando vehículos para cliente:", clienteId, "URL:", url);
-  
+
   try {
-    const resp = await fetch(url, { 
+    const resp = await fetch(url, {
       headers: { "X-Requested-With": "XMLHttpRequest" }
     });
-    
+
     if (!resp.ok) {
       console.error("❌ Error HTTP:", resp.status, resp.statusText);
       return [];
     }
-    
+
     const data = await resp.json();
     console.log("📡 Respuesta:", data);
     return data.results || [];
@@ -70,20 +70,20 @@ async function ciudadesPorRegion(pais, region) {
     console.error('❌ Endpoint ciudadesPorRegion no disponible');
     return [];
   }
-  
+
   const url = `${window.AJAX_ENDPOINTS.ciudadesPorRegion}?pais=${pais}&region=${region}`;
   console.log("🌍 Buscando ciudades para:", pais, region, "URL:", url);
-  
+
   try {
-    const resp = await fetch(url, { 
+    const resp = await fetch(url, {
       headers: { "X-Requested-With": "XMLHttpRequest" }
     });
-    
+
     if (!resp.ok) {
       console.error("❌ Error HTTP:", resp.status, resp.statusText);
       return [];
     }
-    
+
     const data = await resp.json();
     console.log("📡 Respuesta:", data);
     return data.ciudades || [];

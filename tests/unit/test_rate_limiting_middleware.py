@@ -1,6 +1,9 @@
-import pytest
 import importlib
-from django.test import override_settings, Client
+
+import pytest
+
+from django.test import Client, override_settings
+
 
 @pytest.mark.django_db
 def test_rate_limiting_smoke():
@@ -9,9 +12,11 @@ def test_rate_limiting_smoke():
     except ModuleNotFoundError:
         pytest.skip("No hay middleware de rate limiting")
 
-    @override_settings(MIDDLEWARE=[
-        "taller.middleware.rate_limiting.RateLimitMiddleware",
-    ])
+    @override_settings(
+        MIDDLEWARE=[
+            "taller.middleware.rate_limiting.RateLimitMiddleware",
+        ]
+    )
     def _run():
         c = Client()
         got_429 = False

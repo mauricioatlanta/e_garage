@@ -1,4 +1,5 @@
 import pytest
+
 from django.urls import reverse
 
 
@@ -32,8 +33,8 @@ def test_actions_grid_two_rows(client):
     r = client.get(url)
     html = r.content.decode()
     # Verifica CSS Grid de 2 filas
-    assert 'grid grid-cols-2' in html
-    assert 'col-span-2' in html  # delete centrado en fila 2
+    assert "grid grid-cols-2" in html
+    assert "col-span-2" in html  # delete centrado en fila 2
 
 
 @pytest.mark.django_db
@@ -42,16 +43,16 @@ def test_language_switch_sets_cookie(client):
     # Test cambio a español
     resp = client.post(reverse("set_language"), {"language": "es", "next": "/"})
     assert resp.status_code in (302, 303)  # Redirección
-    
+
     # Verifica que el contenido está en español
     r = client.get("/")
     html = r.content.decode()
     assert "Español" in html or "Inicio" in html or "Dashboard" in html
-    
+
     # Test cambio a inglés
     resp = client.post(reverse("set_language"), {"language": "en", "next": "/"})
     assert resp.status_code in (302, 303)
-    
+
     # Verifica que el contenido está en inglés
     r = client.get("/")
     html = r.content.decode()

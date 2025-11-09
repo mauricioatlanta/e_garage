@@ -1,7 +1,7 @@
 # ✅ Template ver_documento.html Implementado - COMPLETADO
 
-**Fecha:** 1 de octubre, 2025  
-**Estado:** ✅ COMPLETADO  
+**Fecha:** 1 de octubre, 2025
+**Estado:** ✅ COMPLETADO
 **Archivo:** `templates/taller/documentos/ver_documento.html`
 
 ---
@@ -99,16 +99,16 @@
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
   <!-- Neto Repuestos - Cyan -->
   <div class="rounded-2xl border border-cyan-500/30 bg-slate-800/60 p-4">
-  
+
   <!-- Neto Servicios - Cyan -->
   <div class="rounded-2xl border border-cyan-500/30 bg-slate-800/60 p-4">
-  
+
   <!-- Subtotal - Emerald -->
   <div class="rounded-2xl border border-emerald-500/30 bg-slate-800/60 p-4">
-  
+
   <!-- IVA/Impuesto - Fuchsia -->
   <div class="rounded-2xl border border-fuchsia-500/30 bg-slate-800/60 p-4">
-  
+
   <!-- Total - Indigo -->
   <div class="rounded-2xl border border-indigo-500/30 bg-slate-800/60 p-4">
 </div>
@@ -265,5 +265,3 @@
 ---
 
 **¡Template implementado exitosamente!** 🚀✨
-
-

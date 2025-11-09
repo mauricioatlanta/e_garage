@@ -3,14 +3,14 @@ API endpoints para documentos - Versión Segura y Multi-Tenant
 Corrige: seguridad, IVA solo sobre repuestos, precisión Decimal, numeración segura
 """
 
-from decimal import Decimal, ROUND_HALF_UP
 import json
+from decimal import ROUND_HALF_UP, Decimal
 
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.http import JsonResponse
-from django.views.decorators.http import require_GET, require_POST
 from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.http import require_GET, require_POST
 
 from taller.models.repuesto import Repuesto
 from taller.models.sequence import DocumentSequence
@@ -25,7 +25,9 @@ def _json_ok(data, status=200):
 def _to_dec(x, default="0"):
     """Convierte a Decimal con manejo de errores"""
     try:
-        return (Decimal(str(x)) if x is not None else Decimal(default)).quantize(Decimal("0.01"))
+        return (Decimal(str(x)) if x is not None else Decimal(default)).quantize(
+            Decimal("0.01")
+        )
     except Exception:
         return Decimal(default)
 
@@ -46,10 +48,18 @@ def api_vehiculos_por_cliente(request):
         return _json_ok([], 200)
 
     qs = (
-        Vehiculo.objects
-        .filter(cliente_id=cid, empresa=request.user.empresa)
+        Vehiculo.objects.filter(cliente_id=cid, empresa=request.user.empresa)
         .select_related("marca", "modelo")
-        .values("id", "patente", "vin", "anio", "marca__nombre", "modelo__nombre", "marca_texto", "modelo_texto")
+        .values(
+            "id",
+            "patente",
+            "vin",
+            "anio",
+            "marca__nombre",
+            "modelo__nombre",
+            "marca_texto",
+            "modelo_texto",
+        )
         .order_by("patente", "id")
     )
     return _json_ok(list(qs))
@@ -64,8 +74,7 @@ def api_repuesto_por_codigo(request):
     if code:
         try:
             r = Repuesto.objects.get(
-                empresa=request.user.empresa,
-                part_number__iexact=code
+                empresa=request.user.empresa, part_number__iexact=code
             )
             data = {
                 "id": r.id,
@@ -99,6 +108,7 @@ def api_next_number(request):
 
 
 # === Impuestos & settings ===
+
 
 def _get_company_settings(emp):
     """Obtiene configuración de la empresa con fallbacks"""
@@ -134,10 +144,15 @@ def _tax_rate_for_empresa(emp) -> Decimal:
                     continue
                 if val >= 0:
                     return (val / Decimal("100")) if val > 1 else val
-    return Decimal("0.19") if (getattr(emp, "pais", "") or "").upper() == "CL" else Decimal("0.00")
+    return (
+        Decimal("0.19")
+        if (getattr(emp, "pais", "") or "").upper() == "CL"
+        else Decimal("0.00")
+    )
 
 
 # === Creación de documento ===
+
 
 @login_required
 @csrf_protect
@@ -206,11 +221,9 @@ def api_create(request):
     # (Opcional recomendado) Reservar y asignar correlativo aquí de manera segura
     # si tu Documento tiene un campo 'numero'
     if "numero" in doc_fields:
-        seq = (
-            DocumentSequence.objects
-            .select_for_update()
-            .get_or_create(empresa=emp, tipo=tipo, defaults={"current": 0})[0]
-        )
+        seq = DocumentSequence.objects.select_for_update().get_or_create(
+            empresa=emp, tipo=tipo, defaults={"current": 0}
+        )[0]
         seq.current = (seq.current or 0) + 1
         seq.save(update_fields=["current"])
         prefix = {"OT": "OT", "PRES": "P", "REC": "R"}[tipo]
@@ -223,6 +236,7 @@ def api_create(request):
     if tecnico_id and "tecnico_responsable" in doc_fields:
         try:
             from taller.models.tecnico import Tecnico
+
             tecnico_obj = Tecnico.objects.get(id=tecnico_id, empresa=emp)
             doc.tecnico_responsable = tecnico_obj
             doc.save(update_fields=["tecnico_responsable"])
@@ -293,7 +307,9 @@ def api_create(request):
         )
         lr_fields = {f.name for f in LineaRepuesto._meta.fields}
         if "codigo" in lr_fields:
-            lr_kwargs["codigo"] = (d.get("codigo") or f"REP-{doc.id}-{d['nombre'][:8]}").upper()
+            lr_kwargs["codigo"] = (
+                d.get("codigo") or f"REP-{doc.id}-{d['nombre'][:8]}"
+            ).upper()
         lr_kwargs.update(_responsable_kwargs(LineaRepuesto, tecnico_obj))
         LineaRepuesto.objects.create(**lr_kwargs)
         subtotal_rep += (precio * cantidad) - descuento

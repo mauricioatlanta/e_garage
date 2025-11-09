@@ -157,10 +157,10 @@ curl https://yourdomain.com/us/documentos/
 
 ---
 
-**Fecha**: 2025-10-06  
-**Versión**: 1.1  
-**Estado**: ✅ **100% LISTO PARA PRODUCCIÓN**  
-**Tiempo de implementación**: Completado  
+**Fecha**: 2025-10-06
+**Versión**: 1.1
+**Estado**: ✅ **100% LISTO PARA PRODUCCIÓN**
+**Tiempo de implementación**: Completado
 **Próximo paso**: Despliegue en producción
 
 ---

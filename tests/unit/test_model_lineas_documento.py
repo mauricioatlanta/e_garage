@@ -1,6 +1,4 @@
 from django.test import TestCase
-from django.core.exceptions import ValidationError
-from decimal import Decimal
 
 
 class ModelLineasDocumentoTest(TestCase):
@@ -8,31 +6,19 @@ class ModelLineasDocumentoTest(TestCase):
 
     def test_linea_repuesto_subtotal_calculation(self):
         """Test cálculo de subtotal en línea de repuesto"""
-        from taller.models.empresa import Empresa
-        from taller.models.documento import Documento
-        from taller.models.lineas_documento import LineaRepuesto
-        from taller.models.clientes import Cliente
         from django.contrib.auth.models import User
 
+        from taller.models.clientes import Cliente
+        from taller.models.documento import Documento
+        from taller.models.empresa import Empresa
+        from taller.models.lineas_documento import LineaRepuesto
+
         # Crear empresa, documento y repuesto mínimos
-        user = User.objects.create_user(
-            username='testuser_lineas',
-            password='testpass'
-        )
-        emp = Empresa.objects.create(
-            nombre_taller="Test SA",
-            pais="CL",
-            user=user
-        )
-        cli = Cliente.objects.create(
-            empresa=emp,
-            nombre="Cliente Test"
-        )
+        user = User.objects.create_user(username="testuser_lineas", password="testpass")
+        emp = Empresa.objects.create(nombre_taller="Test SA", pais="CL", user=user)
+        cli = Cliente.objects.create(empresa=emp, nombre="Cliente Test")
         doc = Documento.objects.create(
-            empresa=emp,
-            cliente=cli,
-            tipo="FAC",
-            fecha_emision="2025-01-01"
+            empresa=emp, cliente=cli, tipo="FAC", fecha_emision="2025-01-01"
         )
         item = LineaRepuesto.objects.create(
             documento=doc,
@@ -42,37 +28,27 @@ class ModelLineasDocumentoTest(TestCase):
             precio_unitario=5000,
             descuento=0,
         )
-        
+
         # Verificar cálculo de subtotal
         subtotal = getattr(item, "subtotal", item.cantidad * item.precio_unitario)
         assert subtotal == 10000
 
     def test_linea_servicio_validation_amounts(self):
         """Test validación de montos en línea de servicio"""
-        from taller.models.empresa import Empresa
-        from taller.models.documento import Documento
-        from taller.models.lineas_documento import LineaServicio
-        from taller.models.clientes import Cliente
         from django.contrib.auth.models import User
 
+        from taller.models.clientes import Cliente
+        from taller.models.documento import Documento
+        from taller.models.empresa import Empresa
+        from taller.models.lineas_documento import LineaServicio
+
         user = User.objects.create_user(
-            username='testuser_servicio',
-            password='testpass'
+            username="testuser_servicio", password="testpass"
         )
-        emp = Empresa.objects.create(
-            nombre_taller="Test SA",
-            pais="CL",
-            user=user
-        )
-        cli = Cliente.objects.create(
-            empresa=emp,
-            nombre="Cliente Test"
-        )
+        emp = Empresa.objects.create(nombre_taller="Test SA", pais="CL", user=user)
+        cli = Cliente.objects.create(empresa=emp, nombre="Cliente Test")
         doc = Documento.objects.create(
-            empresa=emp,
-            cliente=cli,
-            tipo="FAC",
-            fecha_emision="2025-01-01"
+            empresa=emp, cliente=cli, tipo="FAC", fecha_emision="2025-01-01"
         )
         ls = LineaServicio(
             documento=doc,
@@ -85,30 +61,18 @@ class ModelLineasDocumentoTest(TestCase):
 
     def test_linea_otro_servicio_validation(self):
         """Test validación de línea de otro servicio"""
-        from taller.models.empresa import Empresa
-        from taller.models.documento import Documento
-        from taller.models.lineas_documento import LineaOtroServicio
-        from taller.models.clientes import Cliente
         from django.contrib.auth.models import User
 
-        user = User.objects.create_user(
-            username='testuser_otro',
-            password='testpass'
-        )
-        emp = Empresa.objects.create(
-            nombre_taller="Test SA",
-            pais="CL",
-            user=user
-        )
-        cli = Cliente.objects.create(
-            empresa=emp,
-            nombre="Cliente Test"
-        )
+        from taller.models.clientes import Cliente
+        from taller.models.documento import Documento
+        from taller.models.empresa import Empresa
+        from taller.models.lineas_documento import LineaOtroServicio
+
+        user = User.objects.create_user(username="testuser_otro", password="testpass")
+        emp = Empresa.objects.create(nombre_taller="Test SA", pais="CL", user=user)
+        cli = Cliente.objects.create(empresa=emp, nombre="Cliente Test")
         doc = Documento.objects.create(
-            empresa=emp,
-            cliente=cli,
-            tipo="FAC",
-            fecha_emision="2025-01-01"
+            empresa=emp, cliente=cli, tipo="FAC", fecha_emision="2025-01-01"
         )
         los = LineaOtroServicio(
             documento=doc,
@@ -122,30 +86,18 @@ class ModelLineasDocumentoTest(TestCase):
 
     def test_linea_repuesto_str_method(self):
         """Test método __str__ de línea de repuesto"""
-        from taller.models.empresa import Empresa
-        from taller.models.documento import Documento
-        from taller.models.lineas_documento import LineaRepuesto
-        from taller.models.clientes import Cliente
         from django.contrib.auth.models import User
 
-        user = User.objects.create_user(
-            username='testuser_str',
-            password='testpass'
-        )
-        emp = Empresa.objects.create(
-            nombre_taller="Test SA",
-            pais="CL",
-            user=user
-        )
-        cli = Cliente.objects.create(
-            empresa=emp,
-            nombre="Cliente Test"
-        )
+        from taller.models.clientes import Cliente
+        from taller.models.documento import Documento
+        from taller.models.empresa import Empresa
+        from taller.models.lineas_documento import LineaRepuesto
+
+        user = User.objects.create_user(username="testuser_str", password="testpass")
+        emp = Empresa.objects.create(nombre_taller="Test SA", pais="CL", user=user)
+        cli = Cliente.objects.create(empresa=emp, nombre="Cliente Test")
         doc = Documento.objects.create(
-            empresa=emp,
-            cliente=cli,
-            tipo="FAC",
-            fecha_emision="2025-01-01"
+            empresa=emp, cliente=cli, tipo="FAC", fecha_emision="2025-01-01"
         )
         item = LineaRepuesto.objects.create(
             documento=doc,
@@ -155,7 +107,7 @@ class ModelLineasDocumentoTest(TestCase):
             precio_unitario=5000,
             descuento=0,
         )
-        
+
         # Verificar que __str__ retorna algo válido
         str_repr = str(item)
         assert str_repr
@@ -163,30 +115,20 @@ class ModelLineasDocumentoTest(TestCase):
 
     def test_linea_servicio_str_method(self):
         """Test método __str__ de línea de servicio"""
-        from taller.models.empresa import Empresa
-        from taller.models.documento import Documento
-        from taller.models.lineas_documento import LineaServicio
-        from taller.models.clientes import Cliente
         from django.contrib.auth.models import User
 
+        from taller.models.clientes import Cliente
+        from taller.models.documento import Documento
+        from taller.models.empresa import Empresa
+        from taller.models.lineas_documento import LineaServicio
+
         user = User.objects.create_user(
-            username='testuser_str_serv',
-            password='testpass'
+            username="testuser_str_serv", password="testpass"
         )
-        emp = Empresa.objects.create(
-            nombre_taller="Test SA",
-            pais="CL",
-            user=user
-        )
-        cli = Cliente.objects.create(
-            empresa=emp,
-            nombre="Cliente Test"
-        )
+        emp = Empresa.objects.create(nombre_taller="Test SA", pais="CL", user=user)
+        cli = Cliente.objects.create(empresa=emp, nombre="Cliente Test")
         doc = Documento.objects.create(
-            empresa=emp,
-            cliente=cli,
-            tipo="FAC",
-            fecha_emision="2025-01-01"
+            empresa=emp, cliente=cli, tipo="FAC", fecha_emision="2025-01-01"
         )
         ls = LineaServicio.objects.create(
             documento=doc,
@@ -195,7 +137,7 @@ class ModelLineasDocumentoTest(TestCase):
             precio_unitario=15000,
             descuento=0,
         )
-        
+
         # Verificar que __str__ retorna algo válido
         str_repr = str(ls)
         assert str_repr

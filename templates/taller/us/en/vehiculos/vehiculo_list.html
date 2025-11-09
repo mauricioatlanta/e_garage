@@ -35,9 +35,9 @@
         </div>
 
         {% if request.path|slice:":4" == "/us/" %}
-          {% url 'usa:taller:vehiculos:crear_vehiculo' as url_crear_vehiculo %}
+          {% url 'usa:vehiculos:crear_vehiculo' as url_crear_vehiculo %}
         {% else %}
-          {% url 'chile:taller:vehiculos:crear_vehiculo' as url_crear_vehiculo %}
+          {% url 'chile:vehiculos:crear_vehiculo' as url_crear_vehiculo %}
         {% endif %}
         <a href="{{ url_crear_vehiculo }}"
            class="inline-flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600/20 to-green-600/20 border border-emerald-400/40 text-emerald-300 hover:from-emerald-500/30 hover:to-green-500/30 hover:text-emerald-200 transition-all duration-300"
@@ -56,13 +56,13 @@
         {% for vehiculo in vehiculos %}
           {# Generar URLs correctamente según país #}
           {% if request.path|slice:":4" == "/us/" %}
-            {% url 'usa:taller:vehiculos:ver_vehiculo' vehiculo.pk as url_ver %}
-            {% url 'usa:taller:vehiculos:editar_vehiculo' vehiculo.pk as url_edit %}
+            {% url 'usa:vehiculos:ver_vehiculo' vehiculo.pk as url_ver %}
+            {% url 'usa:vehiculos:editar_vehiculo' vehiculo.pk as url_edit %}
           {% else %}
-            {% url 'chile:taller:vehiculos:ver_vehiculo' vehiculo.pk as url_ver %}
-            {% url 'chile:taller:vehiculos:editar_vehiculo' vehiculo.pk as url_edit %}
+            {% url 'chile:vehiculos:ver_vehiculo' vehiculo.pk as url_ver %}
+            {% url 'chile:vehiculos:editar_vehiculo' vehiculo.pk as url_edit %}
           {% endif %}
-          
+
           <div class="relative group">
             <div class="absolute -inset-1 rounded-xl bg-gradient-to-r from-emerald-500/20 via-lime-500/20 to-green-500/20 blur-xl group-hover:opacity-100 opacity-0 transition-opacity duration-300"></div>
             <div class="relative rounded-xl border border-emerald-400/30 bg-gradient-to-r from-[#0d1117]/90 to-[#111827]/90 backdrop-blur-sm p-6 hover:border-emerald-400/50 transition-all duration-300">
@@ -130,9 +130,9 @@
         <h3 class="text-xl font-bold text-gray-300 mb-2">{% trans "No vehicles found" %}</h3>
         <p class="text-gray-400 mb-6">{% trans "Start by adding your first vehicle to the system" %}</p>
         {% if request.path|slice:":4" == "/us/" %}
-          {% url 'usa:taller:vehiculos:crear_vehiculo' as url_crear_vehiculo_empty %}
+          {% url 'usa:vehiculos:crear_vehiculo' as url_crear_vehiculo_empty %}
         {% else %}
-          {% url 'chile:taller:vehiculos:crear_vehiculo' as url_crear_vehiculo_empty %}
+          {% url 'chile:vehiculos:crear_vehiculo' as url_crear_vehiculo_empty %}
         {% endif %}
         <a href="{{ url_crear_vehiculo_empty }}"
            class="inline-flex items-center space-x-2 px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-600/20 to-green-600/20 border border-emerald-400/40 text-emerald-300 hover:from-emerald-500/30 hover:to-green-500/30 hover:text-emerald-200 transition-all duration-300"

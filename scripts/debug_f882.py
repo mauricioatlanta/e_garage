@@ -7,8 +7,7 @@ sys.path.append(".")
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings_sqlite")
 django.setup()
 
-from taller.models.documento import (Documento, RepuestoDocumento,
-                                     ServicioDocumento)
+from taller.models.documento import Documento, RepuestoDocumento, ServicioDocumento
 
 
 def debug_documento_f882():
@@ -21,7 +20,7 @@ def debug_documento_f882():
         # Buscar el documento F-882
         documento = Documento.objects.get(numero_documento="F-882")
 
-        print(f"📋 DOCUMENTO ENCONTRADO:")
+        print("📋 DOCUMENTO ENCONTRADO:")
         print(f"   ID: {documento.id}")
         print(f"   Tipo: {documento.tipo_documento}")
         print(f"   Número: {documento.numero_documento}")
@@ -70,13 +69,13 @@ def debug_documento_f882():
         total_servicios = sum(s.precio for s in servicios)
         total_general = total_repuestos + total_servicios
 
-        print(f"\n💰 TOTALES:")
+        print("\n💰 TOTALES:")
         print(f"   Repuestos: ${total_repuestos}")
         print(f"   Servicios: ${total_servicios}")
         print(f"   TOTAL: ${total_general}")
 
         # URLs para testing
-        print(f"\n🔗 URLS:")
+        print("\n🔗 URLS:")
         print(f"   Ver: http://127.0.0.1:8000/documentos/{documento.id}/")
         print(f"   Editar: http://127.0.0.1:8000/documentos/editar/{documento.id}/")
 
@@ -89,7 +88,7 @@ def debug_documento_f882():
         documentos_factura = Documento.objects.filter(
             tipo_documento="Factura"
         ).order_by("-id")[:5]
-        print(f"\n📋 ÚLTIMAS 5 FACTURAS:")
+        print("\n📋 ÚLTIMAS 5 FACTURAS:")
         for doc in documentos_factura:
             repuestos_count = RepuestoDocumento.objects.filter(documento=doc).count()
             servicios_count = ServicioDocumento.objects.filter(documento=doc).count()
@@ -115,7 +114,7 @@ def verificar_vista_detalle():
         if repuestos.exists():
             documentos_con_repuestos.append((doc, repuestos.count()))
 
-    print(f"📊 DOCUMENTOS CON REPUESTOS:")
+    print("📊 DOCUMENTOS CON REPUESTOS:")
     for doc, count in documentos_con_repuestos:
         print(f"   - {doc.numero_documento}: {count} repuestos")
         print(f"     URL: http://127.0.0.1:8000/documentos/{doc.id}/")
@@ -144,7 +143,7 @@ def agregar_repuesto_test_f882():
             precio=15000,
         )
 
-        print(f"✅ Repuesto agregado:")
+        print("✅ Repuesto agregado:")
         print(f"   ID: {repuesto.id}")
         print(f"   Código: {repuesto.codigo}")
         print(f"   Nombre: {repuesto.nombre}")

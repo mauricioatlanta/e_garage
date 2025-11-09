@@ -92,13 +92,13 @@ La vista ahora renderiza la landing page con header:
 def bienvenida_usa(request):
     translation.activate("en")
     request.LANGUAGE_CODE = "en"
-    
+
     context = {
         'LANGUAGE_CODE': 'en',
         'page_title': 'eGarage USA - Professional Automotive Management',
         'is_usa_market': True,
     }
-    
+
     return render(request, "us/en/landing_usa.html", context)
 ```
 
@@ -118,14 +118,14 @@ def bienvenida_usa(request):
   - Links de navegación (Funcionalidades, Precios)
   - Botón "Iniciar Sesión"
   - Botón "Registrarse"
-  
+
 - **Hero Section** con:
   - Badge de sistema funcional
   - Título grande
   - Descripción del servicio
   - Tres botones de acción (Comenzar, Iniciar Sesión, Ver Funcionalidades)
   - Lista de beneficios
-  
+
 - **Sección de Funcionalidades** con 6 cards:
   - Gestión de Vehículos
   - CRM de Clientes
@@ -133,7 +133,7 @@ def bienvenida_usa(request):
   - Facturación e IVA
   - Analytics y KPIs
   - Listo para Móviles
-  
+
 - **CTA Final** con botones de registro
 - **Footer** simple
 
@@ -143,7 +143,7 @@ def bienvenida_usa(request):
   - Badge de país (🇺🇸 United States)
   - Links de navegación (Pricing, Features)
   - Botón "Sign In"
-  
+
 - **Hero Section** animado con:
   - Fondo con gradientes y partículas
   - Badge de sistema funcional
@@ -151,7 +151,7 @@ def bienvenida_usa(request):
   - Tres botones de acción
   - Lista de beneficios
   - Imagen de preview
-  
+
 - **Features Section** con 6 cards
 - **Pricing Section** con 3 planes (Starter, Semiannual, Annual)
 - **Testimonios** de clientes USA
@@ -252,9 +252,3 @@ Selector de País
 
 **Última actualización**: 26 de octubre de 2025
 **Autor**: Sistema de Gestión eGarage
-
-
-
-
-
-

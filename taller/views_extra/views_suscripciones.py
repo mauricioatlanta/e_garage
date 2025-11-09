@@ -98,11 +98,11 @@ def precios(request):
 
     # Detectar país del usuario desde la URL o empresa
     pais_usuario = "US"  # Default USA para la ruta /us/pricing/
-    
+
     # Detectar desde la ruta
-    if request.path.startswith('/us/'):
+    if request.path.startswith("/us/"):
         pais_usuario = "US"
-    elif request.path.startswith('/cl/'):
+    elif request.path.startswith("/cl/"):
         pais_usuario = "CL"
     # Override si el usuario está autenticado
     elif request.user.is_authenticated and hasattr(request.user, "empresa"):
@@ -111,7 +111,9 @@ def precios(request):
         pais_usuario = request.GET.get("country").upper()
 
     # Obtener precios según el país usando el nuevo manager
-    planes_precios = PrecioSuscripcion.objects.activos().para_pais(pais_usuario).order_by("precio")
+    planes_precios = (
+        PrecioSuscripcion.objects.activos().para_pais(pais_usuario).order_by("precio")
+    )
 
     # Si no hay precios configurados, usar valores por defecto
     if not planes_precios.exists():
@@ -129,7 +131,7 @@ def precios(request):
                 "Multi-location support",
                 "24/7 Premium support",
             ]
-            
+
             planes = {
                 "mensual": {
                     "nombre": "Monthly Plan USA",
@@ -141,7 +143,7 @@ def precios(request):
                     "caracteristicas_en": caracteristicas_usa,
                     "caracteristicas_es": [
                         "Documentos ilimitados",
-                        "Usuarios ilimitados", 
+                        "Usuarios ilimitados",
                         "Reportes avanzados",
                         "Diagnóstico IA incluido",
                         "Soporte prioritario",
@@ -161,7 +163,7 @@ def precios(request):
                     "caracteristicas_es": [
                         "Documentos ilimitados",
                         "Usuarios ilimitados",
-                        "Reportes avanzados", 
+                        "Reportes avanzados",
                         "Diagnóstico IA incluido",
                         "Soporte prioritario",
                         "API personalizada",
@@ -181,7 +183,7 @@ def precios(request):
                         "Documentos ilimitados",
                         "Usuarios ilimitados",
                         "Reportes avanzados",
-                        "Diagnóstico IA incluido", 
+                        "Diagnóstico IA incluido",
                         "Soporte prioritario",
                         "API personalizada",
                         "Multi-sucursales",
@@ -202,7 +204,7 @@ def precios(request):
                 "Multi-sucursales",
                 "Soporte 24/7 Premium",
             ]
-            
+
             planes = {
                 "mensual": {
                     "nombre": "Plan Mensual",
@@ -226,21 +228,21 @@ def precios(request):
     else:
         # Usar precios de la base de datos
         # Determinar idioma según país
-        lang = 'en' if pais_usuario == 'US' else 'es'
-        
+        lang = "en" if pais_usuario == "US" else "es"
+
         planes = {}
         for precio in planes_precios:
             # Traducir nombres de planes si es USA
             nombre_plan = precio.nombre_plan
-            if pais_usuario == 'US':
+            if pais_usuario == "US":
                 # Traducir nombres al inglés y agregar "USA"
-                if 'mensual' in precio.tipo_plan.lower():
+                if "mensual" in precio.tipo_plan.lower():
                     nombre_plan = "Monthly Plan USA"
-                elif 'semestral' in precio.tipo_plan.lower():
+                elif "semestral" in precio.tipo_plan.lower():
                     nombre_plan = "Semi-Annual Plan USA"
-                elif 'anual' in precio.tipo_plan.lower():
+                elif "anual" in precio.tipo_plan.lower():
                     nombre_plan = "Annual Plan USA"
-            
+
             planes[precio.tipo_plan] = {
                 "nombre": nombre_plan,
                 "precio": precio.precio,

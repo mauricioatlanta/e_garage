@@ -1,7 +1,7 @@
     # 🚀 GUÍA DE ACTUALIZACIÓN EGARAGE - ATLANTARECICLAJES
 
-**Cuenta PythonAnywhere**: atlantareciclajes  
-**URL**: https://atlantareciclajes.pythonanywhere.com/  
+**Cuenta PythonAnywhere**: atlantareciclajes
+**URL**: https://atlantareciclajes.pythonanywhere.com/
 **Fecha**: 26 de octubre de 2025
 
 ---
@@ -547,7 +547,6 @@ Backup: /home/atlantareciclajes/egarage_backup_completo_*.tar.gz
 
 ---
 
-**Última actualización**: 26 de octubre de 2025  
-**Para**: atlantareciclajes  
+**Última actualización**: 26 de octubre de 2025
+**Para**: atlantareciclajes
 **Proyecto**: eGarage
-

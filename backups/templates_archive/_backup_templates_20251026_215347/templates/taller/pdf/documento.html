@@ -10,11 +10,11 @@
       size: A4;
       margin: 0.3in;
     }
-    
+
     * {
       box-sizing: border-box;
     }
-    
+
     body {
       font-family: 'Calibri', 'Arial', sans-serif;
       font-size: 11px;
@@ -24,7 +24,7 @@
       line-height: 1.3;
       background: #ffffff;
     }
-    
+
     /* Header principal */
     .invoice-header {
       background: white;
@@ -35,19 +35,19 @@
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
       border: 2px solid #333;
     }
-    
+
     .header-content {
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    
+
     .header-single-line {
       display: flex;
       align-items: center;
       margin-bottom: 8px;
     }
-    
+
     .logo-inline {
       width: 40px;
       height: 40px;
@@ -55,7 +55,7 @@
       border: 1px solid #333;
       margin-right: 15px;
     }
-    
+
     .company-name {
       font-size: 20px;
       font-weight: 700;
@@ -63,31 +63,31 @@
       flex: 1;
       margin-right: 20px;
     }
-    
+
     .document-info {
       font-size: 14px;
       font-weight: 600;
       color: black !important;
       margin-right: 20px;
     }
-    
+
     .document-date {
       font-size: 12px;
       color: black !important;
     }
-    
+
     .company-section {
       display: flex;
       align-items: center;
       flex: 1;
     }
-    
+
     .company-info {
       display: flex;
       flex-direction: column;
       margin-left: 10px;
     }
-    
+
     .logo {
       width: 50px;
       height: 50px;
@@ -96,7 +96,7 @@
       background: rgba(255,255,255,0.1);
       padding: 3px;
     }
-    
+
     .company-info h1 {
       font-size: 18px;
       font-weight: 700;
@@ -105,7 +105,7 @@
       letter-spacing: 0.5px;
       color: black !important;
     }
-    
+
     .company-details {
       font-size: 11px;
       opacity: 1.0;
@@ -113,11 +113,11 @@
       color: black !important;
       font-weight: normal;
     }
-    
+
     .company-details * {
       color: black !important;
     }
-    
+
     .invoice-meta {
       text-align: right;
       background: #f8f9fa;
@@ -126,7 +126,7 @@
       border: 1px solid #333;
       color: black !important;
     }
-    
+
     .invoice-number {
       font-size: 16px;
       font-weight: 700;
@@ -134,13 +134,13 @@
       text-shadow: none;
       color: black !important;
     }
-    
+
     .invoice-date {
       font-size: 10px;
       opacity: 1.0;
       color: black !important;
     }
-    
+
     /* Información del cliente */
     .client-section {
       background: #f8f9fa;
@@ -150,7 +150,7 @@
       border-radius: 0 4px 4px 0;
       box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
-    
+
     .client-title {
       font-size: 10px;
       font-weight: 600;
@@ -159,21 +159,21 @@
       text-transform: uppercase;
       letter-spacing: 0.3px;
     }
-    
+
     .client-title:first-child {
       color: #667eea;
     }
-    
+
     .client-title:last-child {
       color: #28a745;
     }
-    
+
     .client-info {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
       gap: 2px;
     }
-    
+
     .client-single-line {
       font-size: 8px;
       color: #2c3e50;
@@ -181,12 +181,12 @@
       line-height: 1.3;
       padding: 2px 0;
     }
-    
+
     .info-item {
       display: flex;
       flex-direction: column;
     }
-    
+
     .info-label {
       font-size: 7px;
       color: #6c757d;
@@ -195,19 +195,19 @@
       margin-bottom: 0px;
       letter-spacing: 0.2px;
     }
-    
+
     .info-value {
       font-size: 8px;
       color: #2c3e50;
       font-weight: 500;
       line-height: 1.2;
     }
-    
+
     /* Tabla de productos */
     .products-section {
       margin: 8px 0;
     }
-    
+
     .section-title {
       font-size: 12px;
       font-weight: 600;
@@ -218,7 +218,7 @@
       text-transform: uppercase;
       letter-spacing: 0.3px;
     }
-    
+
     .products-table {
       width: 100%;
       border-collapse: collapse;
@@ -227,12 +227,12 @@
       overflow: hidden;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
-    
+
     .products-table thead {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
     }
-    
+
     .products-table th {
       padding: 6px 8px;
       text-align: left;
@@ -241,22 +241,22 @@
       text-transform: uppercase;
       letter-spacing: 0.3px;
     }
-    
+
     .products-table td {
       padding: 6px 8px;
       border-bottom: 1px solid #e9ecef;
       vertical-align: top;
       font-size: 10px;
     }
-    
+
     .products-table tbody tr:hover {
       background: #f8f9fa;
     }
-    
+
     .products-table tbody tr:last-child td {
       border-bottom: none;
     }
-    
+
     .product-type {
       background: #667eea;
       color: white;
@@ -267,36 +267,36 @@
       text-transform: uppercase;
       letter-spacing: 0.3px;
     }
-    
+
     .product-name {
       font-weight: 500;
       color: #2c3e50;
       font-size: 8px;
     }
-    
+
     .product-description {
       font-size: 7px;
       color: #6c757d;
       margin-top: 1px;
     }
-    
+
     .quantity, .price, .total {
       text-align: right;
       font-weight: 500;
       font-size: 8px;
     }
-    
+
     .price, .total {
       color: #28a745;
     }
-    
+
     /* Totales */
     .totals-section {
       margin-top: 8px;
       display: flex;
       justify-content: flex-end;
     }
-    
+
     .totals-table {
       width: 250px;
       border-collapse: collapse;
@@ -305,30 +305,30 @@
       overflow: hidden;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
-    
+
     .totals-table td {
       padding: 6px 12px;
       border-bottom: 1px solid #e9ecef;
     }
-    
+
     .totals-table tr:last-child td {
       border-bottom: none;
     }
-    
+
     .total-label {
       text-align: left;
       font-weight: 500;
       color: #6c757d;
       font-size: 10px;
     }
-    
+
     .total-value {
       text-align: right;
       font-weight: 600;
       color: #2c3e50;
       font-size: 10px;
     }
-    
+
     .grand-total {
       background: #f8f9fa;
       border: 2px solid #28a745;
@@ -336,12 +336,12 @@
       font-size: 12px;
       font-weight: 700;
     }
-    
+
     .grand-total .total-label,
     .grand-total .total-value {
       color: black !important;
     }
-    
+
     /* Footer */
     .invoice-footer {
       margin-top: 20px;
@@ -351,13 +351,13 @@
       text-align: center;
       border-top: 2px solid #667eea;
     }
-    
+
     .footer-text {
       font-size: 7px;
       color: #6c757d;
       line-height: 1.3;
     }
-    
+
     .observations {
       background: #fff3cd;
       border: 1px solid #ffeaa7;
@@ -365,20 +365,20 @@
       padding: 8px;
       margin: 10px 0;
     }
-    
+
     .observations-title {
       font-weight: 600;
       color: #856404;
       margin-bottom: 4px;
       font-size: 8px;
     }
-    
+
     .observations-text {
       color: #856404;
       font-size: 7px;
       line-height: 1.3;
     }
-    
+
     /* Responsive adjustments */
     @media print {
       .invoice-header {
@@ -386,25 +386,25 @@
         border-radius: 0;
         padding: 10px 15px;
       }
-      
+
       body {
         font-size: 8px;
         line-height: 1.1;
       }
-      
+
       .client-section {
         margin: 8px 0;
         padding: 8px 10px;
       }
-      
+
       .products-section {
         margin: 10px 0;
       }
-      
+
       .totals-section {
         margin-top: 10px;
       }
-      
+
       .invoice-footer {
         margin-top: 15px;
         padding: 8px;
@@ -426,29 +426,29 @@
     </div>
     <div class="company-details">
       {% if config_empresa.direccion %}
-        DIRECCION: {{ config_empresa.direccion }} | 
+        DIRECCION: {{ config_empresa.direccion }} |
       {% elif COMPANY_ADDRESS %}
-        DIRECCION: {{ COMPANY_ADDRESS }} | 
+        DIRECCION: {{ COMPANY_ADDRESS }} |
       {% elif empresa.direccion %}
-        DIRECCION: {{ empresa.direccion }} | 
+        DIRECCION: {{ empresa.direccion }} |
       {% endif %}
-      
+
       {% if config_empresa.telefono %}
-        TELEFONO: {{ config_empresa.telefono }} | 
+        TELEFONO: {{ config_empresa.telefono }} |
       {% elif COMPANY_PHONE %}
-        TELEFONO: {{ COMPANY_PHONE }} | 
+        TELEFONO: {{ COMPANY_PHONE }} |
       {% elif empresa.telefono %}
-        TELEFONO: {{ empresa.telefono }} | 
+        TELEFONO: {{ empresa.telefono }} |
       {% endif %}
-      
+
       {% if config_empresa.email_contacto %}
-        EMAIL: {{ config_empresa.email_contacto }} | 
+        EMAIL: {{ config_empresa.email_contacto }} |
       {% elif COMPANY_EMAIL %}
-        EMAIL: {{ COMPANY_EMAIL }} | 
+        EMAIL: {{ COMPANY_EMAIL }} |
       {% elif empresa.email %}
-        EMAIL: {{ empresa.email }} | 
+        EMAIL: {{ empresa.email }} |
       {% endif %}
-      
+
       {% if config_empresa.sitio_web %}
         WEB: {{ config_empresa.sitio_web }}
       {% elif COMPANY_WEBSITE %}
@@ -461,11 +461,11 @@
   <div class="client-section">
     <div class="client-title">👤 Información del Cliente</div>
     <div class="client-single-line">
-      <strong>Nombre:</strong> {{ documento.cliente.nombre }} {{ documento.cliente.apellido|default:"" }} | 
-      <strong>Dirección:</strong> {{ documento.cliente.direccion|default:"N/A" }} | 
-      <strong>Teléfono:</strong> {{ documento.cliente.telefono|default:"N/A" }} | 
-      <strong>Email:</strong> {{ documento.cliente.email|default:"N/A" }} | 
-      <strong>RUT:</strong> {{ documento.cliente.rut|default:"N/A" }} | 
+      <strong>Nombre:</strong> {{ documento.cliente.nombre }} {{ documento.cliente.apellido|default:"" }} |
+      <strong>Dirección:</strong> {{ documento.cliente.direccion|default:"N/A" }} |
+      <strong>Teléfono:</strong> {{ documento.cliente.telefono|default:"N/A" }} |
+      <strong>Email:</strong> {{ documento.cliente.email|default:"N/A" }} |
+      <strong>RUT:</strong> {{ documento.cliente.rut|default:"N/A" }} |
       <strong>Estado:</strong> {{ documento.get_estado_pago_display }}
     </div>
   </div>
@@ -474,14 +474,14 @@
   <div class="client-section">
     <div class="client-title">🚗 Información del Vehículo</div>
     <div class="client-single-line">
-      <strong>Patente:</strong> {{ documento.vehiculo.patente }} | 
-      <strong>Marca/Modelo:</strong> {{ documento.vehiculo.marca }} {{ documento.vehiculo.modelo }} | 
-      <strong>Año:</strong> {{ documento.vehiculo.ano|default:"N/A" }} | 
-      <strong>Color:</strong> {{ documento.vehiculo.color|default:"N/A" }} | 
-      <strong>VIN:</strong> {{ documento.vehiculo.vin|default:"N/A" }} | 
-      <strong>Motor:</strong> {{ documento.vehiculo.motor|default:"N/A" }} | 
-      <strong>Caja:</strong> {{ documento.vehiculo.caja|default:"N/A" }} | 
-      <strong>Km:</strong> {{ documento.vehiculo.kilometraje|default:"N/A" }} | 
+      <strong>Patente:</strong> {{ documento.vehiculo.patente }} |
+      <strong>Marca/Modelo:</strong> {{ documento.vehiculo.marca }} {{ documento.vehiculo.modelo }} |
+      <strong>Año:</strong> {{ documento.vehiculo.ano|default:"N/A" }} |
+      <strong>Color:</strong> {{ documento.vehiculo.color|default:"N/A" }} |
+      <strong>VIN:</strong> {{ documento.vehiculo.vin|default:"N/A" }} |
+      <strong>Motor:</strong> {{ documento.vehiculo.motor|default:"N/A" }} |
+      <strong>Caja:</strong> {{ documento.vehiculo.caja|default:"N/A" }} |
+      <strong>Km:</strong> {{ documento.vehiculo.kilometraje|default:"N/A" }} |
       <strong>Garantía:</strong> {{ documento.vehiculo.garantia|default:"N/A" }}
     </div>
   </div>
@@ -575,7 +575,7 @@
   <!-- Footer -->
   <div class="invoice-footer">
     <div class="footer-text">
-      <strong>{{ config_empresa.nombre_publico|default:empresa.nombre_taller }}</strong> | 
+      <strong>{{ config_empresa.nombre_publico|default:empresa.nombre_taller }}</strong> |
       {% if config_empresa.telefono %}
         {{ config_empresa.telefono }}
       {% elif empresa.telefono %}

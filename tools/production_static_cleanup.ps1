@@ -174,7 +174,7 @@ foreach ($pat in $variants) {
   $files = @()
   $files += Get-ChildItem $js_dir -Filter $pat -ErrorAction SilentlyContinue
   $files += Get-ChildItem (Join-Path $staticDir "taller\common\js") -Filter $pat -ErrorAction SilentlyContinue
-  
+
   foreach ($file in $files) {
     if ($DryRun) {
       Write-Host "  [DRY RUN] BORRAR VARIANTE: $($file.FullName)" -ForegroundColor Yellow

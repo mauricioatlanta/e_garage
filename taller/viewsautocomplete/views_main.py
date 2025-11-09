@@ -1,3 +1,5 @@
+"""eGarage — módulo limpiado para pre-commit (docstring al inicio)."""
+
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.http import JsonResponse
@@ -114,16 +116,16 @@ def editar_cliente(request, pk):
     )
 
 
-"""Vista legacy de eliminación eliminada.
+# """Vista legacy de eliminación eliminada.
 
-Se delega ahora en ``taller.clientes.views.eliminar_cliente`` que acepta
-``pk`` o ``cliente_id``. Si en algún punto se estaba importando esta
-función desde aquí, puede hacerse:
+# Se delega ahora en ``taller.clientes.views.eliminar_cliente`` que acepta
+# ``pk`` o ``cliente_id``. Si en algún punto se estaba importando esta
+# función desde aquí, puede hacerse:
 
-    from taller.clientes.views import eliminar_cliente
+#     from taller.clientes.views import eliminar_cliente
 
-Esto evita mantener dos implementaciones divergentes.
-"""
+# Esto evita mantener dos implementaciones divergentes.
+# """
 
 
 def ver_cliente(request, pk):

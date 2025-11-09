@@ -2,8 +2,8 @@
 
 ## 🎉 Estado: 100% COMPLETADO
 
-Fecha: 1 de octubre, 2025  
-Archivo: `taller/vehiculos/views_fbv.py`  
+Fecha: 1 de octubre, 2025
+Archivo: `taller/vehiculos/views_fbv.py`
 Total de parches aplicados: **9/9** ✅
 
 ---
@@ -11,7 +11,7 @@ Total de parches aplicados: **9/9** ✅
 ## 📝 Parches Aplicados
 
 ### ✅ Parche 1: `api_marcas` (líneas 232-245)
-**Problema:** Sin `@login_required`, check manual de auth  
+**Problema:** Sin `@login_required`, check manual de auth
 **Solución:**
 ```python
 @require_GET
@@ -19,7 +19,7 @@ Total de parches aplicados: **9/9** ✅
 def api_marcas(request):
     country = _get_country(request)
     empresa = getattr(request.user, "empresa", None)
-    
+
     qs = Marca.objects.filter(country=country)
     # Si Marca tiene FK empresa, descomenta:
     # if hasattr(Marca, "empresa") and empresa:
@@ -30,7 +30,7 @@ def api_marcas(request):
 ---
 
 ### ✅ Parche 2: `api_colores` (líneas 277-285)
-**Problema:** Sin `@login_required`, no pasaba empresa al helper  
+**Problema:** Sin `@login_required`, no pasaba empresa al helper
 **Solución:**
 ```python
 @require_GET
@@ -45,7 +45,7 @@ def api_colores(request):
 ---
 
 ### ✅ Parche 3: `api_modelos_usa` (líneas 288-305)
-**Problema:** Sin `@login_required`, check manual  
+**Problema:** Sin `@login_required`, check manual
 **Solución:**
 ```python
 @require_GET
@@ -59,7 +59,7 @@ def api_modelos_usa(request):
 ---
 
 ### ✅ Parche 4: `ajax_motores_por_modelo` (líneas 354-381)
-**Problema:** Formato `[]` inconsistente, sin validación de país  
+**Problema:** Formato `[]` inconsistente, sin validación de país
 **Solución:**
 ```python
 @require_GET
@@ -68,16 +68,16 @@ def ajax_motores_por_modelo(request):
     modelo_id = request.GET.get("modelo_id")
     if not modelo_id:
         return JsonResponse({"success": True, "motores": []})  # ← Formato estandarizado
-    
+
     try:
         country = _get_country(request)
-        
+
         # Validar que modelo existe y pertenece al país
         try:
             modelo = Modelo.objects.get(pk=modelo_id, country=country)  # ← Validación país
         except Modelo.DoesNotExist:
             return JsonResponse({"success": True, "motores": []})
-        
+
         motores = MotorVehiculo.objects.filter(modelos=modelo).order_by("nombre")
         data = [{"id": str(m.pk), "nombre": m.nombre} for m in motores]  # ← IDs como str
         return JsonResponse({"success": True, "motores": data})  # ← Formato estandarizado
@@ -87,7 +87,7 @@ def ajax_motores_por_modelo(request):
 ---
 
 ### ✅ Parche 5: `ajax_cajas_por_modelo` (líneas 384-411)
-**Problema:** Formato `[]` inconsistente, sin validación de país  
+**Problema:** Formato `[]` inconsistente, sin validación de país
 **Solución:**
 ```python
 @require_GET
@@ -101,24 +101,24 @@ def ajax_cajas_por_modelo(request):
 ---
 
 ### ✅ Parche 6: `ajax_agregar_marca` (líneas 414-441)
-**Problema:** Check manual auth, sin scoping empresa, respuesta inconsistente  
+**Problema:** Check manual auth, sin scoping empresa, respuesta inconsistente
 **Solución:**
 ```python
 @require_POST
 @login_required  # ← Agregado
 def ajax_agregar_marca(request):
     # Eliminado check manual
-    
+
     country = _get_country(request)
     empresa = getattr(request.user, "empresa", None)
-    
+
     kwargs = {"nombre": nombre, "country": country}
     # Si Marca tiene empresa:
     # if hasattr(Marca, "empresa") and empresa:
     #     kwargs["empresa"] = empresa  # ← Scoping preparado
-    
+
     marca, created = Marca.objects.get_or_create(**kwargs)
-    
+
     return JsonResponse({
         "success": True,
         "marca": {"id": str(marca.pk), "nombre": marca.nombre},  # ← Objeto anidado
@@ -130,7 +130,7 @@ def ajax_agregar_marca(request):
 ---
 
 ### ✅ Parche 7: `ajax_agregar_modelo` (líneas 444-476)
-**Problema:** Check manual auth, sin scoping empresa  
+**Problema:** Check manual auth, sin scoping empresa
 **Solución:**
 ```python
 @require_POST
@@ -146,7 +146,7 @@ def ajax_agregar_modelo(request):
 ---
 
 ### ✅ Parche 8: `ajax_agregar_motor` (líneas 479-512)
-**Problema:** `get_or_create(nombre=nombre)` sin `country` → basura global  
+**Problema:** `get_or_create(nombre=nombre)` sin `country` → basura global
 **Solución:**
 ```python
 @require_POST
@@ -154,15 +154,15 @@ def ajax_agregar_modelo(request):
 def ajax_agregar_motor(request):
     country = _get_country(request)
     empresa = getattr(request.user, "empresa", None)
-    
+
     # Validar que modelo pertenece al país
     modelo = get_object_or_404(Modelo, id=modelo_id, country=country)  # ← Validación
-    
+
     # Crear motor con country (y empresa si aplica)
     kwargs = {"nombre": nombre, "country": country}  # ← CRÍTICO
     # if hasattr(MotorVehiculo, "empresa") and empresa:
     #     kwargs["empresa"] = empresa
-    
+
     motor, created = MotorVehiculo.objects.get_or_create(**kwargs)  # ← Scoped
 ```
 **Impacto:** 🌍 Multi-tenant estricto (sin basura global)
@@ -170,7 +170,7 @@ def ajax_agregar_motor(request):
 ---
 
 ### ✅ Parche 9: `ajax_agregar_caja` (líneas 515-548)
-**Problema:** `get_or_create(nombre=nombre)` sin `country` → basura global  
+**Problema:** `get_or_create(nombre=nombre)` sin `country` → basura global
 **Solución:**
 ```python
 @require_POST
@@ -180,7 +180,7 @@ def ajax_agregar_caja(request):
     kwargs = {"nombre": nombre, "country": country}  # ← CRÍTICO
     # if hasattr(CajaVehiculo, "empresa") and empresa:
     #     kwargs["empresa"] = empresa
-    
+
     caja, created = CajaVehiculo.objects.get_or_create(**kwargs)  # ← Scoped
 ```
 **Impacto:** 🌍 Multi-tenant estricto (sin basura global)
@@ -343,18 +343,15 @@ return JsonResponse({"success": True, "motores": data})
 
 ## 🏆 Logros Alcanzados
 
-✅ **Seguridad:** Todos los endpoints protegidos con `@login_required`  
-✅ **Multi-Tenant:** Aislamiento completo CL/US con `country` en todos los creates  
-✅ **Formato:** Respuestas API 100% estandarizadas  
-✅ **Type Safety:** IDs siempre como `str(pk)` en todo el stack  
-✅ **Scoping:** Preparado para filtrar por empresa (listo para activar)  
-✅ **Validación:** País validado en toda la cadena marca→modelo→motor/caja  
-✅ **UX:** Sin race conditions, preservación de selección  
-✅ **Documentación:** 1,200+ líneas de guías y ejemplos  
+✅ **Seguridad:** Todos los endpoints protegidos con `@login_required`
+✅ **Multi-Tenant:** Aislamiento completo CL/US con `country` en todos los creates
+✅ **Formato:** Respuestas API 100% estandarizadas
+✅ **Type Safety:** IDs siempre como `str(pk)` en todo el stack
+✅ **Scoping:** Preparado para filtrar por empresa (listo para activar)
+✅ **Validación:** País validado en toda la cadena marca→modelo→motor/caja
+✅ **UX:** Sin race conditions, preservación de selección
+✅ **Documentación:** 1,200+ líneas de guías y ejemplos
 
 ---
 
 **¡Stack Multi-Tenant CL/US 100% Listo para Producción! 🚀**
-
-
-

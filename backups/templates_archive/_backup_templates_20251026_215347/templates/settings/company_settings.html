@@ -42,7 +42,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: 
+    background:
       radial-gradient(circle at 20% 80%, rgba(0, 255, 255, 0.1) 0%, transparent 50%),
       radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
       radial-gradient(circle at 40% 40%, rgba(0, 255, 136, 0.05) 0%, transparent 50%);
@@ -484,15 +484,15 @@
     .cyber-container {
       padding: 1rem;
     }
-    
+
     .cyber-title {
       font-size: 2rem;
     }
-    
+
     .form-grid {
       grid-template-columns: 1fr;
     }
-    
+
     .quick-actions {
       grid-template-columns: 1fr;
     }
@@ -514,13 +514,13 @@
   }
 
   /* Force black background for all form elements */
-  input[type="text"], 
-  input[type="email"], 
-  input[type="tel"], 
-  input[type="url"], 
-  input[type="number"], 
-  input[type="file"], 
-  textarea, 
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="url"],
+  input[type="number"],
+  input[type="file"],
+  textarea,
   select {
     background: #000000 !important;
     color: #ffffff !important;
@@ -531,13 +531,13 @@
     text-shadow: 0 0 5px rgba(255, 255, 255, 0.3) !important;
   }
 
-  input[type="text"]:focus, 
-  input[type="email"]:focus, 
-  input[type="tel"]:focus, 
-  input[type="url"]:focus, 
-  input[type="number"]:focus, 
-  input[type="file"]:focus, 
-  textarea:focus, 
+  input[type="text"]:focus,
+  input[type="email"]:focus,
+  input[type="tel"]:focus,
+  input[type="url"]:focus,
+  input[type="number"]:focus,
+  input[type="file"]:focus,
+  textarea:focus,
   select:focus {
     background: #000000 !important;
     color: #ffffff !important;
@@ -545,11 +545,11 @@
     box-shadow: 0 0 25px rgba(0, 255, 255, 0.8), 0 4px 20px rgba(0, 0, 0, 0.6), inset 0 1px 3px rgba(255, 255, 255, 0.2) !important;
   }
 
-  input[type="text"]::placeholder, 
-  input[type="email"]::placeholder, 
-  input[type="tel"]::placeholder, 
-  input[type="url"]::placeholder, 
-  input[type="number"]::placeholder, 
+  input[type="text"]::placeholder,
+  input[type="email"]::placeholder,
+  input[type="tel"]::placeholder,
+  input[type="url"]::placeholder,
+  input[type="number"]::placeholder,
   textarea::placeholder {
     color: rgba(255, 255, 255, 0.6) !important;
     font-family: 'Orbitron', 'Rajdhani', monospace !important;
@@ -606,7 +606,7 @@
     <form method="post" enctype="multipart/form-data">
       {% csrf_token %}
       <input type="hidden" name="section" value="profile">
-      
+
       <div class="form-grid">
         <div class="form-group">
           <label class="form-label">{{ form.company_name.label }}</label>
@@ -703,7 +703,7 @@
     <form method="post">
       {% csrf_token %}
       <input type="hidden" name="section" value="financial">
-      
+
       <div class="form-grid">
         <div class="form-group">
           <label class="form-label">{{ form.currency.label }}</label>
@@ -758,7 +758,7 @@
     <form method="post">
       {% csrf_token %}
       <input type="hidden" name="section" value="theme">
-      
+
       <div class="form-grid">
         <div class="form-group">
           <label class="form-label">{{ form.primary_color.label }}</label>

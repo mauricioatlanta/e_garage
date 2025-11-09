@@ -1,6 +1,6 @@
 # 🚀 SCRIPTS DE ACTUALIZACIÓN AUTOMÁTICA - EGARAGE
 
-**Para**: atlantareciclajes @ PythonAnywhere  
+**Para**: atlantareciclajes @ PythonAnywhere
 **Fecha**: 26 de octubre de 2025
 
 ---
@@ -426,4 +426,3 @@ Impacto: Mínimo (menos usuarios activos)
 ---
 
 **¡Actualización automatizada lista!** 🚀
-

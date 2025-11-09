@@ -149,5 +149,3 @@ El JavaScript está **completamente implementado y funcionando**. El sistema aho
 - ✅ **Validación Robusta**: Backend valida pertenencia M2M
 
 El formulario de vehículos está listo para producción con funcionalidad completa de filtrado jerárquico y creación dinámica de motores/cajas 🚗✨
-
-

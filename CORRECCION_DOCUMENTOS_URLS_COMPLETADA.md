@@ -149,5 +149,3 @@ El problema está **completamente resuelto**. El template de lista de documentos
 - ✅ **Sin Hardcoding**: No más URLs fijas para Chile
 
 El botón "➕ Crear Nuevo Documento" en `/us/documentos/` ahora lleva correctamente a `/us/documentos/form/` en lugar de redirigir a Chile 🚗✨
-
-

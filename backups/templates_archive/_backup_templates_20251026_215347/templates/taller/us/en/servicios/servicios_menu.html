@@ -79,7 +79,7 @@
                     <p class="text-sm space-text-muted">{{ servicios_cat.count }} services available</p>
                 </div>
             </div>
-            
+
             <!-- Services Grid for this Category -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 mb-6">
                 {% for servicio in servicios_cat %}
@@ -90,13 +90,13 @@
                      data-categoria-code="{{ servicio.categoria.code|default:'' }}"
                      data-subcategoria-code="{{ servicio.subcategoria.code|default:'' }}"
                      onclick="window.location.href='{% country_url 'servicios:editar_servicio' servicio.id %}'">
-                    
+
                     <div class="flex items-center justify-between mb-2">
                         <div class="w-6 h-6 rounded bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-xs">
                             🔧
                         </div>
                         <div class="flex space-x-1">
-                            <a href="{% country_url 'servicios:editar_servicio' servicio.id %}" 
+                            <a href="{% country_url 'servicios:editar_servicio' servicio.id %}"
                                class="text-xs space-text hover:text-cyan-400 transition-colors"
                                onclick="event.stopPropagation()">
                                 ✏️
@@ -107,7 +107,7 @@
                             </button>
                         </div>
                     </div>
-                    
+
                     <h3 class="space-title text-sm font-bold mb-1">{{ servicio.nombre }}</h3>
                     {% if servicio.subcategoria %}
                     <p class="space-text-muted text-xs">{{ servicio.subcategoria.get_label }}</p>

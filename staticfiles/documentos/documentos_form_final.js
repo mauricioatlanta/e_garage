@@ -76,11 +76,11 @@
   ["clientes","vehiculosCliente","repuestos","servicios","otros","nextNumber"].forEach(k=>{
     CFG[k] = trail(CFG[k] || "");
   });
-  
+
   // Saneamiento de country y taxRate
   CFG.country = (CFG.country || 'US').toUpperCase();
   CFG.taxRate = Number(CFG.taxRate || 0) || 0;
-  
+
   window.__DOC_CFG__ = CFG;
   console.table(CFG);
 
@@ -273,22 +273,22 @@
   // ===== SCROLL FUNCTIONALITY =====
   (function() {
     console.log('🔄 Initializing scroll functionality...');
-    
+
     const scrollTopBtn = document.getElementById('btn-scroll-top');
     const scrollBottomBtn = document.getElementById('btn-scroll-bottom');
-    
+
     console.log('🔍 Scroll buttons found:', {
       top: !!scrollTopBtn,
       bottom: !!scrollBottomBtn
     });
-    
+
     if (scrollTopBtn) {
       scrollTopBtn.addEventListener('click', () => {
         console.log('🔼 Scroll to top clicked');
         window.scrollTo({ top: 0, behavior: 'smooth' });
       });
     }
-    
+
     if (scrollBottomBtn) {
       scrollBottomBtn.addEventListener('click', () => {
         console.log('🔽 Scroll to bottom clicked');
@@ -303,7 +303,7 @@
         window.scrollTo({ top: maxScroll, behavior: 'smooth' });
       });
     }
-    
+
     // Mostrar/ocultar botones según posición del scroll
     function toggleScrollButtons() {
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
@@ -312,9 +312,9 @@
         document.body.scrollHeight,
         document.documentElement.scrollHeight
       );
-      
+
       const isScrollable = documentHeight > windowHeight;
-      
+
       if (scrollTopBtn) {
         if (isScrollable && scrollTop > 100) {
           scrollTopBtn.style.display = 'block';
@@ -324,7 +324,7 @@
           scrollTopBtn.style.opacity = '0';
         }
       }
-      
+
       if (scrollBottomBtn) {
         if (isScrollable && (scrollTop + windowHeight) < (documentHeight - 100)) {
           scrollBottomBtn.style.display = 'block';
@@ -334,7 +334,7 @@
           scrollBottomBtn.style.opacity = '0';
         }
       }
-      
+
       // Debug info
       if (scrollTop % 100 === 0) { // Log every 100px of scroll
         console.log('📜 Scroll position:', {
@@ -347,7 +347,7 @@
         });
       }
     }
-    
+
     // Escuchar eventos de scroll solo si existen botones
     if (scrollTopBtn || scrollBottomBtn) {
       window.addEventListener('scroll', toggleScrollButtons);
@@ -356,7 +356,7 @@
         console.log('🔄 Scroll buttons initialized and toggled');
       }, 100);
     }
-    
+
     // Force make page scrollable if it's not
     setTimeout(() => {
       const documentHeight = Math.max(
@@ -364,14 +364,14 @@
         document.documentElement.scrollHeight
       );
       const windowHeight = window.innerHeight;
-      
+
       if (documentHeight <= windowHeight) {
         console.log('⚠️ Page is not scrollable, adding extra height...');
         document.body.style.minHeight = (windowHeight + 500) + 'px';
         toggleScrollButtons();
       }
     }, 500);
-    
+
   })();
 
 })();

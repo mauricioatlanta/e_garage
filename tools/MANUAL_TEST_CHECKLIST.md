@@ -186,6 +186,6 @@ Verificar todas las funciones clave del flujo "crear documento" (frontend):
 
 ---
 
-**Fecha**: 2025-10-06  
-**Versión**: 1.0  
+**Fecha**: 2025-10-06
+**Versión**: 1.0
 **Estado**: Listo para testing

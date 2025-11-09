@@ -204,7 +204,7 @@ python manage.py shell < tools/test_backend_frontend_coherence.py
 
 ---
 
-**Fecha**: 2025-10-06  
-**Versión**: 1.0  
-**Estado**: ✅ **IMPLEMENTACIÓN COMPLETA**  
+**Fecha**: 2025-10-06
+**Versión**: 1.0
+**Estado**: ✅ **IMPLEMENTACIÓN COMPLETA**
 **Coherencia**: ✅ **BACKEND == FRONTEND GARANTIZADA**

@@ -108,4 +108,3 @@
 │ Botón "Otros"   │   ❌ No visible  │   ✅ Visible     │
 │ Organización    │   🔀 Caótica     │   🎯 Limpia      │
 └─────────────────┴─────────────────┴─────────────────┘
-

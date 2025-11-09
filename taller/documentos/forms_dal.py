@@ -38,15 +38,21 @@ class DocumentoFormDAL(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         # Extraer argumentos personalizados
-        self.country = kwargs.pop('country', 'CL')
-        
+        self.country = kwargs.pop("country", "CL")
+
         super().__init__(*args, **kwargs)
-        
+
         # Configurar URLs de autocompletado dinámicamente
-        self.fields["cliente"].widget.url = get_autocomplete_url(self.country, "cliente")
-        self.fields["vehiculo"].widget.url = get_autocomplete_url(self.country, "vehiculo")
-        self.fields["tecnico_responsable"].widget.url = get_autocomplete_url(self.country, "tecnico")
-        
+        self.fields["cliente"].widget.url = get_autocomplete_url(
+            self.country, "cliente"
+        )
+        self.fields["vehiculo"].widget.url = get_autocomplete_url(
+            self.country, "vehiculo"
+        )
+        self.fields["tecnico_responsable"].widget.url = get_autocomplete_url(
+            self.country, "tecnico"
+        )
+
         # Opcional: inicializar querysets vacíos para que DAL mande a buscar vía endpoint
         self.fields["cliente"].queryset = Cliente.objects.none()
         self.fields["vehiculo"].queryset = Vehiculo.objects.none()

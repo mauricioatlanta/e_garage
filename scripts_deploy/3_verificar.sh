@@ -118,4 +118,3 @@ echo "   Ver en: https://www.pythonanywhere.com/user/atlantareciclajes/"
 echo "   Pestaña Web → Error log"
 echo ""
 echo "======================================================"
-

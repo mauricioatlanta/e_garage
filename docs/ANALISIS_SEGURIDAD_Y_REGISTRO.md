@@ -1,6 +1,6 @@
 # 🔒 ANÁLISIS DE SEGURIDAD DE DATOS Y FLUJO DE REGISTRO
 
-**Fecha**: 26 de octubre de 2025  
+**Fecha**: 26 de octubre de 2025
 **Objetivo**: Verificar aislamiento de datos y diseñar flujo de registro perfecto
 
 ---
@@ -26,9 +26,9 @@ class TenantScoped(models.Model):
     empresa = models.ForeignKey('taller.Empresa', on_delete=models.CASCADE, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     objects = TenantManager()  # ← Manager personalizado que filtra automáticamente
-    
+
     class Meta:
         abstract = True
 ```
@@ -54,18 +54,18 @@ class TenantManager(models.Manager):
     def for_request(self, request):
         if not request.user.is_authenticated:
             return self.none()  # ← Sin datos para anónimos
-        
+
         empresa = request.user.empresa
         if not empresa:
             return self.none()  # ← Sin datos si no tiene empresa
-        
+
         return self.filter(empresa=empresa)  # ← SOLO sus datos
 
 
 # CAPA 2: Vistas - TenantViewMixin
 class ClienteListView(TenantViewMixin, ListView):
     model = Cliente
-    
+
     def get_queryset(self):
         # AUTOMÁTICAMENTE filtra por request.user.empresa
         return super().get_queryset()  # ← Ya filtrado
@@ -152,17 +152,17 @@ marcas = get_marcas_por_pais(request.user)
 
 def buscar_clientes(request):
     query = request.GET.get('q', '')
-    
+
     # ❌ PELIGRO: Si hicieran esto
     # clientes = Cliente.objects.filter(nombre__icontains=query)
     # → Mostraría clientes de TODAS las empresas
-    
+
     # ✅ CORRECTO: Lo que tienen
     clientes = Cliente.objects.filter(
         empresa=request.user.empresa,  # ← Filtro por empresa
         nombre__icontains=query
     )
-    
+
     return JsonResponse([...])
 ```
 
@@ -217,20 +217,20 @@ class Cliente(TenantScoped):
     # Chile
     region = ForeignKey(TallerRegion, null=True)
     ciudad = ForeignKey(TallerCiudad, null=True)
-    
+
     # USA
     estado_usa = ForeignKey(EstadoUSA, null=True)
     ciudad_usa = ForeignKey(CiudadUSA, null=True)
     zipcode = CharField(max_length=10, null=True)
-    
+
     def clean(self):
         pais = self.empresa.pais
-        
+
         # ✅ Validación: Chile NO puede tener campos USA
         if pais == 'CL':
             if self.estado_usa or self.ciudad_usa or self.zipcode:
                 raise ValidationError("❌ Cliente de Chile no puede tener datos USA")
-        
+
         # ✅ Validación: USA NO puede tener campos Chile
         if pais == 'US':
             if self.region or self.ciudad:
@@ -303,7 +303,7 @@ class RegistroCompletoForm(forms.Form):
     """
     Formulario completo de registro con selección de país y plan
     """
-    
+
     # === DATOS PERSONALES ===
     nombre = forms.CharField(
         max_length=50,
@@ -313,7 +313,7 @@ class RegistroCompletoForm(forms.Form):
             'placeholder': 'Juan',
         })
     )
-    
+
     apellido = forms.CharField(
         max_length=50,
         label='Apellido',
@@ -322,7 +322,7 @@ class RegistroCompletoForm(forms.Form):
             'placeholder': 'Pérez',
         })
     )
-    
+
     email = forms.EmailField(
         label='Email',
         widget=forms.EmailInput(attrs={
@@ -330,7 +330,7 @@ class RegistroCompletoForm(forms.Form):
             'placeholder': 'juan@example.com',
         })
     )
-    
+
     # === DATOS DE LA EMPRESA/TALLER ===
     nombre_taller = forms.CharField(
         max_length=200,
@@ -341,7 +341,7 @@ class RegistroCompletoForm(forms.Form):
             'placeholder': 'Taller Mecánico Los Ángeles',
         })
     )
-    
+
     telefono = forms.CharField(
         max_length=20,
         label='Teléfono',
@@ -350,7 +350,7 @@ class RegistroCompletoForm(forms.Form):
             'placeholder': '+56912345678 o (555) 123-4567',
         })
     )
-    
+
     # === SELECCIÓN DE PAÍS ===
     pais = forms.ChoiceField(
         choices=[
@@ -364,7 +364,7 @@ class RegistroCompletoForm(forms.Form):
             'onchange': 'updatePlanPrices(this.value)'  # JS para actualizar precios
         })
     )
-    
+
     # === SELECCIÓN DE PLAN ===
     plan = forms.ChoiceField(
         choices=[
@@ -379,7 +379,7 @@ class RegistroCompletoForm(forms.Form):
             'class': 'form-input',
         })
     )
-    
+
     # === CONTRASEÑA ===
     password1 = forms.CharField(
         label='Contraseña',
@@ -390,7 +390,7 @@ class RegistroCompletoForm(forms.Form):
         min_length=8,
         help_text='Mínimo 8 caracteres'
     )
-    
+
     password2 = forms.CharField(
         label='Confirmar Contraseña',
         widget=forms.PasswordInput(attrs={
@@ -398,24 +398,24 @@ class RegistroCompletoForm(forms.Form):
             'placeholder': '••••••••',
         })
     )
-    
+
     # === TÉRMINOS Y CONDICIONES ===
     acepta_terminos = forms.BooleanField(
         label='Acepto los términos y condiciones',
         required=True
     )
-    
+
     # === VALIDACIONES ===
     def clean_email(self):
         email = self.cleaned_data['email']
         if User.objects.filter(email=email).exists():
             raise forms.ValidationError('Ya existe una cuenta con este email')
         return email
-    
+
     def clean_telefono(self):
         telefono = self.cleaned_data['telefono']
         pais = self.cleaned_data.get('pais')
-        
+
         # Validación básica por país
         if pais == 'CL':
             if not telefono.startswith('+56') and not telefono.startswith('56'):
@@ -425,17 +425,17 @@ class RegistroCompletoForm(forms.Form):
             cleaned = ''.join(filter(str.isdigit, telefono))
             if len(cleaned) != 10:
                 raise forms.ValidationError('Teléfono USA debe tener 10 dígitos')
-        
+
         return telefono
-    
+
     def clean(self):
         cleaned_data = super().clean()
         password1 = cleaned_data.get('password1')
         password2 = cleaned_data.get('password2')
-        
+
         if password1 and password2 and password1 != password2:
             raise forms.ValidationError('Las contraseñas no coinciden')
-        
+
         return cleaned_data
 ```
 
@@ -463,7 +463,7 @@ def registro_completo(request):
     """
     if request.method == 'POST':
         form = RegistroCompletoForm(request.POST)
-        
+
         if form.is_valid():
             # Extraer datos
             nombre = form.cleaned_data['nombre']
@@ -474,7 +474,7 @@ def registro_completo(request):
             pais = form.cleaned_data['pais']
             plan = form.cleaned_data['plan']
             password = form.cleaned_data['password1']
-            
+
             try:
                 with transaction.atomic():
                     # 1. CREAR USUARIO
@@ -485,7 +485,7 @@ def registro_completo(request):
                         first_name=nombre,
                         last_name=apellido
                     )
-                    
+
                     # 2. DETERMINAR CONFIGURACIÓN POR PLAN
                     plan_config = {
                         'trial': {
@@ -513,9 +513,9 @@ def registro_completo(request):
                             'plan_nombre': 'anual',
                         },
                     }
-                    
+
                     config = plan_config[plan]
-                    
+
                     # 3. CREAR EMPRESA (SUSCRIPTOR)
                     empresa = Empresa.objects.create(
                         user=user,
@@ -532,10 +532,10 @@ def registro_completo(request):
                         fecha_fin=timezone.now() + timedelta(days=config['dias']),
                         suscripcion_activa=config['suscripcion_activa'],
                     )
-                    
+
                     # 4. LOGIN AUTOMÁTICO
                     login(request, user)
-                    
+
                     # 5. REDIRIGIR SEGÚN PAÍS Y PLAN
                     if plan == 'trial':
                         # Trial: directo al dashboard
@@ -549,13 +549,13 @@ def registro_completo(request):
                             return redirect(f'/cl/es/suscripcion/pago/?plan={plan}')
                         else:
                             return redirect(f'/us/en/subscription/payment/?plan={plan}')
-            
+
             except Exception as e:
                 form.add_error(None, f'Error al crear cuenta: {str(e)}')
-    
+
     else:
         form = RegistroCompletoForm()
-    
+
     return render(request, 'auth/signup.html', {
         'form': form,
         'precios_cl': {
@@ -585,10 +585,10 @@ def registro_completo(request):
     <div class="glass-card">
         <h1>{% trans "Create Your Account" %}</h1>
         <p>{% trans "Start managing your business today" %}</p>
-        
+
         <form method="POST" id="signup-form">
             {% csrf_token %}
-            
+
             <!-- Datos Personales -->
             <div class="form-section">
                 <h3>{% trans "Personal Information" %}</h3>
@@ -596,7 +596,7 @@ def registro_completo(request):
                 {{ form.apellido }}
                 {{ form.email }}
             </div>
-            
+
             <!-- Datos de la Empresa -->
             <div class="form-section">
                 <h3>{% trans "Business Information" %}</h3>
@@ -604,12 +604,12 @@ def registro_completo(request):
                 {{ form.telefono }}
                 {{ form.pais }}
             </div>
-            
+
             <!-- Selección de Plan -->
             <div class="form-section">
                 <h3>{% trans "Select Your Plan" %}</h3>
                 {{ form.plan }}
-                
+
                 <!-- Pricing Display -->
                 <div id="pricing-display" class="pricing-cards">
                     <!-- Trial -->
@@ -624,7 +624,7 @@ def registro_completo(request):
                             <li>✓ Cancel anytime</li>
                         </ul>
                     </div>
-                    
+
                     <!-- Mensual -->
                     <div class="plan-card" data-plan="mensual">
                         <h4>Monthly</h4>
@@ -634,7 +634,7 @@ def registro_completo(request):
                         </p>
                         <p class="plan-duration">per month</p>
                     </div>
-                    
+
                     <!-- Semestral -->
                     <div class="plan-card recommended" data-plan="semestral">
                         <span class="plan-badge">⭐ BEST VALUE</span>
@@ -646,7 +646,7 @@ def registro_completo(request):
                         <p class="plan-duration">every 6 months</p>
                         <p class="plan-savings">Save 8%!</p>
                     </div>
-                    
+
                     <!-- Anual -->
                     <div class="plan-card" data-plan="anual">
                         <span class="plan-badge">💎 BEST PRICE</span>
@@ -660,19 +660,19 @@ def registro_completo(request):
                     </div>
                 </div>
             </div>
-            
+
             <!-- Contraseña -->
             <div class="form-section">
                 <h3>{% trans "Security" %}</h3>
                 {{ form.password1 }}
                 {{ form.password2 }}
             </div>
-            
+
             <!-- Términos -->
             <div class="form-section">
                 {{ form.acepta_terminos }}
             </div>
-            
+
             <!-- Botón Submit -->
             <button type="submit" class="register-button">
                 {% trans "Create Account" %}
@@ -698,7 +698,7 @@ document.getElementById('id_plan').addEventListener('change', function() {
     document.querySelectorAll('.plan-card').forEach(card => {
         card.classList.remove('selected');
     });
-    
+
     const selected = document.querySelector(`[data-plan="${this.value}"]`);
     if (selected) {
         selected.classList.add('selected');

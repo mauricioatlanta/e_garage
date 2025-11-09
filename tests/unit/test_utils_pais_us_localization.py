@@ -1,5 +1,7 @@
-import pytest
 import importlib
+
+import pytest
+
 
 @pytest.mark.django_db
 def test_pais_utils_basic_calls():
@@ -10,12 +12,13 @@ def test_pais_utils_basic_calls():
         if callable(fn):
             # prueba de humo con inputs comunes
             try:
-                _ = fn("CL")    # Chile
-                _ = fn("US")    # USA
+                _ = fn("CL")  # Chile
+                _ = fn("US")  # USA
             except Exception:
                 # no falla el test, pero cubre las líneas
                 pass
     assert mod is not None
+
 
 @pytest.mark.django_db
 def test_us_localization_smoke():
@@ -35,7 +38,7 @@ def test_us_localization_smoke():
                 except TypeError:
                     pass
                 try:
-                    fn("GA")     # estado
+                    fn("GA")  # estado
                     executed += 1
                     continue
                 except TypeError:

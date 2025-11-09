@@ -26,7 +26,6 @@ def empresa_contexto(request):
                 "empresa": empresa,
                 "nombre_taller": empresa.nombre_taller,
                 "logo_taller": logo_url,
-                
                 # Nuevas funcionalidades del modelo refinado
                 "empresa_nombre": empresa.nombre_taller,
                 "empresa_logo": empresa.logo.url if empresa.logo else None,

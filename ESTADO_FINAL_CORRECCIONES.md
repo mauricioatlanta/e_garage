@@ -42,7 +42,7 @@
   doc.country = getattr(empresa, "pais", "CL")
   doc.moneda = "USD" if empresa.pais == "US" else "CLP"
   doc.save()
-  
+
   rep_fs.instance = doc
   rep_fs.save()
   ```

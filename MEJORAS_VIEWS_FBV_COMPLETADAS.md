@@ -5,7 +5,7 @@
 Se han aplicado **8 mejoras quirúrgicas** al archivo `taller/vehiculos/views_fbv.py` para hacerlo "a prueba de balas" con foco en:
 
 - ✅ **Multi-tenancy robusta**
-- ✅ **Rendimiento optimizado** 
+- ✅ **Rendimiento optimizado**
 - ✅ **Seguridad mejorada**
 - ✅ **Mantenibilidad**
 
@@ -277,5 +277,3 @@ python test_views_fbv_improvements.py
 - 🧹 **Código limpio**
 
 ¡Listo para producción! 🚀
-
-

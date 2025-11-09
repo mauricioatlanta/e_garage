@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import ROUND_HALF_UP, Decimal
 
-CLP_PLACES = Decimal("1")      # 0 decimales
-USD_PLACES = Decimal("0.01")   # 2 decimales
+CLP_PLACES = Decimal("1")  # 0 decimales
+USD_PLACES = Decimal("0.01")  # 2 decimales
+
 
 def money_quantize(amount: Decimal, pais: str) -> Decimal:
     if amount is None:

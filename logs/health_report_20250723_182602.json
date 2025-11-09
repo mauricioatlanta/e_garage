@@ -1,17 +1,17 @@
 {
-  "timestamp": "2025-07-23T18:26:02.567269",
-  "health_score": 66.66666666666666,
   "checks": {
     "database": true,
-    "empresas": true,
-    "usuarios": true,
     "documentos_recientes": false,
+    "empresas": true,
     "espacio_disco": false,
-    "logs_auditoria": true
+    "logs_auditoria": true,
+    "usuarios": true
   },
+  "health_score": 66.66666666666666,
   "problemas": [
     "Error documentos: Cannot resolve keyword 'created_at' into field. Choices are: cliente, cliente_id, empresa, empresa_id, fecha, id, incluir_iva, kilometraje, mecanico, mecanico_id, notificacionenviada, numero_documento, observaciones, otros_servicios, recordatoriomantenimiento, repuestos, servicios, tipo_documento, vehiculo, vehiculo_id, venta",
     "Poco espacio en disco: 3.1% libre"
   ],
-  "status": "critical"
+  "status": "critical",
+  "timestamp": "2025-07-23T18:26:02.567269"
 }

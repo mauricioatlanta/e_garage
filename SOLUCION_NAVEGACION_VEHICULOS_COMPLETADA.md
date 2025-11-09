@@ -23,17 +23,17 @@ def lista_vehiculos(request):
     if not empresa:
         messages.error(request, "Usuario sin empresa asignada")
         return redirect("/")
-    
+
     vehiculos = Vehiculo.objects.filter(empresa=empresa).select_related(
         "cliente", "marca", "modelo", "motor", "caja", "color"
     ).order_by("-id")
-    
+
     # Usar template específico según la URL (no el país de la empresa)
     if request.path.startswith("/us/"):
         template = "taller/us/en/vehiculos/lista_vehiculos.html"
     else:
         template = "taller/vehiculos/vehiculos.html"
-    
+
     return render(request, template, {"vehiculos": vehiculos})
 ```
 
@@ -87,5 +87,3 @@ def lista_vehiculos(request):
 5. **Multi-tenant**: Filtros por empresa funcionan correctamente
 
 El problema está **completamente resuelto**. Los usuarios pueden ahora navegar correctamente en la lista de vehículos, usar todos los botones de acción, y acceder a todas las funcionalidades sin problemas de redirección.
-
-

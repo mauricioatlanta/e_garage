@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import ROUND_HALF_UP, Decimal
+
 from django.db import migrations, models
 
-
-CLP_PLACES = Decimal("1")      # 0 decimales
-USD_PLACES = Decimal("0.01")   # 2 decimales
+CLP_PLACES = Decimal("1")  # 0 decimales
+USD_PLACES = Decimal("0.01")  # 2 decimales
 
 
 def _money_quantize(amount: Decimal, pais: str) -> Decimal:
@@ -21,7 +20,9 @@ def backfill_lineas(apps, schema_editor):
     LineaOtroServicio = apps.get_model("taller", "LineaOtroServicio")
 
     # --- Repuestos: subtotal = cantidad * precio_unitario - descuento (>=0)
-    for lr in LineaRepuesto.objects.select_related("documento__empresa").all().iterator():
+    for lr in (
+        LineaRepuesto.objects.select_related("documento__empresa").all().iterator()
+    ):
         try:
             pais = getattr(getattr(lr.documento, "empresa", None), "pais", "CL")
         except Exception:
@@ -34,7 +35,9 @@ def backfill_lineas(apps, schema_editor):
         LineaRepuesto.objects.filter(pk=lr.pk).update(subtotal=subtotal)
 
     # --- Servicios: subtotal = cantidad * precio_unitario - descuento (>=0)
-    for ls in LineaServicio.objects.select_related("documento__empresa").all().iterator():
+    for ls in (
+        LineaServicio.objects.select_related("documento__empresa").all().iterator()
+    ):
         try:
             pais = getattr(getattr(ls.documento, "empresa", None), "pais", "CL")
         except Exception:
@@ -49,7 +52,9 @@ def backfill_lineas(apps, schema_editor):
     # --- Otros/Externos:
     # subtotal = precio_cliente * cantidad
     # ganancia = (precio_cliente - costo_interno) * cantidad
-    for lo in LineaOtroServicio.objects.select_related("documento__empresa").all().iterator():
+    for lo in (
+        LineaOtroServicio.objects.select_related("documento__empresa").all().iterator()
+    ):
         try:
             pais = getattr(getattr(lo.documento, "empresa", None), "pais", "CL")
         except Exception:
@@ -59,11 +64,14 @@ def backfill_lineas(apps, schema_editor):
         precio_cli = Decimal(lo.precio_cliente or 0)
         subtotal = _money_quantize(cantidad * precio_cli, pais)
         ganancia = _money_quantize((precio_cli - costo) * cantidad, pais)
-        LineaOtroServicio.objects.filter(pk=lo.pk).update(subtotal=subtotal, ganancia=ganancia)
+        LineaOtroServicio.objects.filter(pk=lo.pk).update(
+            subtotal=subtotal, ganancia=ganancia
+        )
 
     # Opcional: recalcular totales del documento si existe el método en el modelo vivo
     try:
         from taller.models import Documento as LiveDocumento  # noqa
+
         use_live = hasattr(LiveDocumento, "recalcular_totales")
     except Exception:
         use_live = False
@@ -84,7 +92,6 @@ def noop_reverse(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("taller", "0017_auto_20251006_1931"),
     ]
@@ -115,7 +122,6 @@ class Migration(migrations.Migration):
             model_name="linearepuesto",
             index=models.Index(fields=["documento"], name="idx_lr_doc"),
         ),
-
         # ---------- Servicio ----------
         migrations.AddField(
             model_name="lineaservicio",
@@ -141,7 +147,6 @@ class Migration(migrations.Migration):
             model_name="lineaservicio",
             index=models.Index(fields=["documento"], name="idx_ls_doc"),
         ),
-
         # ---------- Otros/Externos ----------
         migrations.AddField(
             model_name="lineaotroservicio",
@@ -172,7 +177,6 @@ class Migration(migrations.Migration):
             model_name="lineaotroservicio",
             index=models.Index(fields=["documento"], name="idx_los_doc"),
         ),
-
         # ---------- Backfill ----------
         migrations.RunPython(backfill_lineas, reverse_code=noop_reverse),
     ]

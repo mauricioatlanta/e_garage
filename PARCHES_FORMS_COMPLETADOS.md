@@ -105,7 +105,7 @@ self.fields["motor"] = forms.CharField(
 ```python
 def clean_motor(self):
     # ... validación de sentinel ...
-    
+
     # ✅ Verificar pertenencia al modelo seleccionado (M2M)
     modelo = self.cleaned_data.get("modelo")
     if modelo and hasattr(motor_obj, "modelos"):
@@ -118,7 +118,7 @@ def clean_motor(self):
 ```python
 def save(self, commit=True):
     # ... lógica simplificada ...
-    
+
     # Motor
     if getattr(self, "_motor_nuevo", False) and request and request.POST.get("nuevo_motor"):
         # ... crear motor ...
@@ -160,5 +160,3 @@ Los parches están **completamente implementados y funcionando**. El `VehiculoFo
 - ✅ **Funcionalidad**: Filtrado y creación funcionan correctamente
 
 El formulario está listo para producción y maneja correctamente el filtrado Motor/Caja por Modelo sin problemas de validación con campos dinámicos.
-
-

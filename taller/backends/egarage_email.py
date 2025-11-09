@@ -71,7 +71,7 @@ class EgarageEmailBackend(EmailBackend):
         """
         Override para manejar passwords con caracteres UTF-8 (como ñ)
         que causan problemas con smtplib en Python 3.13
-        
+
         El error 'ascii' codec can't encode character ocurre porque smtplib
         usa el método de autenticación PLAIN que requiere ASCII puro.
         """
@@ -80,21 +80,21 @@ class EgarageEmailBackend(EmailBackend):
 
         connection_params = {}
         if self.timeout is not None:
-            connection_params['timeout'] = self.timeout
+            connection_params["timeout"] = self.timeout
         if self.use_ssl:
-            connection_params['context'] = self.ssl_context
-            
+            connection_params["context"] = self.ssl_context
+
         try:
             self.connection = smtplib.SMTP_SSL(
                 self.host, self.port, **connection_params
             )
-            
+
             # SOLUCIÓN: Verificar si el password tiene caracteres no-ASCII
             # y advertir al usuario que debe cambiar el password del servidor
             if self.username and self.password:
                 try:
                     # Intentar codificar el password como ASCII
-                    self.password.encode('ascii')
+                    self.password.encode("ascii")
                     # Si funciona, hacer login normal
                     self.connection.login(self.username, self.password)
                 except UnicodeEncodeError as ue:

@@ -30,26 +30,27 @@ if __name__ == "__main__":
     # Para ejecutar manualmente
     import os
     import sys
+
     import django
-    
+
     # Agregar el directorio del proyecto al path
     sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-    
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings.dev')
+
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings.dev")
     django.setup()
-    
+
     print("🧪 Ejecutando tests anti-duplicados...")
-    
+
     try:
         test_unique_url_names()
         print("✅ test_unique_url_names: PASSED")
     except Exception as e:
         print(f"❌ test_unique_url_names: FAILED - {e}")
-    
+
     try:
         test_core_routes_exist()
         print("✅ test_core_routes_exist: PASSED")
     except Exception as e:
         print(f"❌ test_core_routes_exist: FAILED - {e}")
-    
+
     print("🎯 Tests anti-duplicados completados!")

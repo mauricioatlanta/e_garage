@@ -45,29 +45,29 @@ foreach ($file in $auditData) {
   $fileType = $file.type
   $isDuplicate = $file.is_duplicate -eq "True"
   $hasIssues = $file.has_issues -eq "True"
-  
+
   # Reglas de borrado para producción
   $shouldDelete = $false
   $deleteReason = ""
-  
+
   # 1. Archivos .map (source maps)
   if ($fileName -match '\.map$') {
     $shouldDelete = $true
     $deleteReason = "Source map (no necesario en produccion)"
   }
-  
+
   # 2. Archivos de diseño (.psd, .ai, .fig)
   elseif ($fileName -match '\.(psd|ai|fig)$') {
     $shouldDelete = $true
     $deleteReason = "Archivo de diseno (no necesario en produccion)"
   }
-  
+
   # 3. Archivos comprimidos (.zip, .rar)
   elseif ($fileName -match '\.(zip|rar|7z)$') {
     $shouldDelete = $true
     $deleteReason = "Archivo comprimido (no necesario en produccion)"
   }
-  
+
   # 4. Archivos no-minificados cuando existe el .min
   elseif ($fileType -in @("CSS", "JS") -and $fileName -notmatch '\.min\.') {
     $minFile = $fileName -replace '\.(css|js)$', '.min.$1'
@@ -77,7 +77,7 @@ foreach ($file in $auditData) {
       $deleteReason = "Archivo no-minificado (existe version minificada)"
     }
   }
-  
+
   # 5. Duplicados por hash (mantener solo uno)
   elseif ($isDuplicate) {
     # Mantener el primero, borrar los demás
@@ -88,31 +88,31 @@ foreach ($file in $auditData) {
       $deleteReason = "Duplicado por hash (mantener: $($firstOccurrence.path))"
     }
   }
-  
+
   # 6. Archivos experimentales o temporales
   elseif ($fileName -match '(experimental|temp|tmp|test|debug|old|backup|copy|v\d+)$') {
     $shouldDelete = $true
     $deleteReason = "Archivo experimental/temporal"
   }
-  
+
   # 7. Excluir archivos críticos de DAL
   elseif ($file.path -match 'autocomplete_light_custom.*\.(init|autocomplete\.init)\.') {
     # NO mover estos archivos - son críticos para DAL
     $shouldDelete = $false
   }
-  
+
   # 8. Excluir archivos de video de fondo (ya movidos a ubicación correcta)
   elseif ($fileName -match '(bg_particles\.webm|bg_intro_6s\.mp4)$') {
     # NO mover estos archivos - ya están en ubicación correcta
     $shouldDelete = $false
   }
-  
+
   # 9. Excluir script de inicialización de video de fondo
   elseif ($fileName -match 'eg\.bg\.init\.min\.js$') {
     # NO mover este archivo - ya está en ubicación correcta
     $shouldDelete = $false
   }
-  
+
   if ($shouldDelete) {
     $toDelete += @{
       Path = $filePath
@@ -156,7 +156,7 @@ if ($toDelete.Count -gt 0) {
 # PASO 3: Aplicar borrados
 if ($toDelete.Count -gt 0) {
   Write-Host "`nPASO 3: Aplicando borrados..." -ForegroundColor Red
-  
+
   if ($DryRun) {
     Write-Host "   [DRY RUN] Se borrarian $($toDelete.Count) archivos" -ForegroundColor Yellow
   } else {
@@ -169,14 +169,14 @@ if ($toDelete.Count -gt 0) {
         $relativePath = $item.Path.Replace("$StaticDir\", "")
         $quarantinePath = Join-Path $quarantineSubDir $relativePath
         $quarantineParent = Split-Path $quarantinePath -Parent
-        
+
         New-Item -ItemType Directory -Force -Path $quarantineParent | Out-Null
         Move-Item $item.Path $quarantinePath -Force
-        
+
         # Log del motivo
         $logFile = Join-Path $quarantineSubDir "deletion_log.txt"
         Add-Content -Path $logFile -Value "$(Get-Date): $relativePath - $($item.Reason)"
-        
+
         $deleted++
         Write-Host "   Borrado: $($item.OriginalPath)" -ForegroundColor Green
       }
@@ -188,26 +188,26 @@ if ($toDelete.Count -gt 0) {
 # PASO 4: Reorganizar archivos restantes
 if ($toMove.Count -gt 0) {
   Write-Host "`nPASO 4: Reorganizando archivos..." -ForegroundColor Blue
-  
+
   $moved = 0
   $errors = 0
-  
+
   foreach ($item in $toMove) {
     $originalPath = $item.Path
     $fileName = Split-Path $originalPath -Leaf
-    
+
     # Normalizar nombre de archivo
     $normalizedName = $fileName.ToLower()
     $normalizedName = $normalizedName -replace '[^\w\-\.]', '-'
     $normalizedName = $normalizedName -replace '-+', '-'
     $normalizedName = $normalizedName.Trim('-')
-    
+
     # Determinar directorio objetivo
     $pathLower = $item.OriginalPath.ToLower()
     $country = "common"
     if ($pathLower -match '\bcl\b|chile') { $country = "cl" }
     elseif ($pathLower -match '\bus\b|usa|united') { $country = "us" }
-    
+
     $targetDir = switch ($item.Type) {
       "CSS" { "taller\$country\css" }
       "JS" { "taller\$country\js" }
@@ -217,9 +217,9 @@ if ($toMove.Count -gt 0) {
       "AUDIO" { "taller\$country\media" }
       default { "taller\$country\media" }
     }
-    
+
     $targetPath = Join-Path $StaticDir $targetDir $normalizedName
-    
+
     # Evitar colisiones
     $counter = 1
     $originalTarget = $targetPath
@@ -229,7 +229,7 @@ if ($toMove.Count -gt 0) {
       $targetPath = Join-Path (Split-Path $originalTarget -Parent) "$stem-$counter$ext"
       $counter++
     }
-    
+
     if ($DryRun) {
       $relativeTarget = $targetPath.Replace("$StaticDir\", "")
       Write-Host "   [DRY RUN] $($item.OriginalPath) -> $relativeTarget" -ForegroundColor Yellow
@@ -241,26 +241,26 @@ if ($toMove.Count -gt 0) {
         $backupParent = Split-Path $backupPath -Parent
         New-Item -ItemType Directory -Force -Path $backupParent | Out-Null
         Copy-Item $originalPath $backupPath -Force
-        
+
         # Crear directorio objetivo
         $targetParent = Split-Path $targetPath -Parent
         New-Item -ItemType Directory -Force -Path $targetParent | Out-Null
-        
+
         # Mover archivo
         Move-Item $originalPath $targetPath -Force
         $moved++
-        
+
         $status = if ($item.HasIssues) { "WARNING" } else { "OK" }
         $relativeTarget = $targetPath.Replace("$StaticDir\", "")
         Write-Host "   $status $($item.OriginalPath) -> $relativeTarget" -ForegroundColor Green
-        
+
       } catch {
         $errors++
         Write-Host "   ERROR moviendo $($item.OriginalPath): $($_.Exception.Message)" -ForegroundColor Red
       }
     }
   }
-  
+
   if (-not $DryRun) {
     Write-Host "   Total movidos: $moved" -ForegroundColor Green
     Write-Host "   Errores: $errors" -ForegroundColor $(if ($errors -gt 0) { 'Red' } else { 'Green' })

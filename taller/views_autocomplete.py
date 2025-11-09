@@ -91,9 +91,9 @@ class ClienteAutocomplete(autocomplete.Select2QuerySetView):
             return Cliente.objects.none()
 
         qs = Cliente.objects.filter(empresa=empresa)
-        
+
         # Obtener el término de búsqueda
-        q = self.request.GET.get('q', '')
+        q = self.request.GET.get("q", "")
         if q:
             qs = qs.filter(
                 Q(nombre__icontains=q)
@@ -135,7 +135,7 @@ class VehiculoAutocomplete(autocomplete.Select2QuerySetView):
                 return Vehiculo.objects.none()
 
         # Obtener el término de búsqueda
-        q = self.request.GET.get('q', '')
+        q = self.request.GET.get("q", "")
         if q:
             qs = qs.filter(
                 Q(patente__icontains=q)

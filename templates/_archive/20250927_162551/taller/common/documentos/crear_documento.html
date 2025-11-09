@@ -24,7 +24,7 @@
   {% endif %}
 
   <!-- Shell del documento con tema dinámico -->
-  <div id="doc-shell" 
+  <div id="doc-shell"
        class="rounded-3xl p-6 theme-ot border-2"
        data-url-veh="{% url 'chile:cl_ajax_vehiculos_por_cliente' %}"
        data-url-rep="{% url 'taller:repuestos:api_repuesto_por_codigo' %}"
@@ -114,7 +114,7 @@
 
     <div class="mb-8">
       <h3 class="text-2xl font-bold text-cyan-300 mb-4">🔧 Repuestos</h3>
-      
+
       <div id="repuestos-container">
         <!-- Se llenará dinámicamente -->
       </div>
@@ -130,7 +130,7 @@
 
     <div class="mb-8">
       <h3 class="text-2xl font-bold text-cyan-300 mb-4">🛠️ Servicios</h3>
-      
+
       <div id="servicios-container">
         <!-- Se llenará dinámicamente -->
       </div>
@@ -146,7 +146,7 @@
 
     <div class="mb-8">
       <h3 class="text-2xl font-bold text-cyan-300 mb-4">🏢 Otros Servicios</h3>
-      
+
       <div id="otros-container">
         <!-- Se llenará dinámicamente -->
       </div>
@@ -266,18 +266,18 @@ async function updateDocumentNumber() {
   const tipo = selTipo.value;
   const numeroField = document.getElementById('id_numero');
   const numeroHidden = document.getElementById('numero_documento');
-  
-  if (!tipo || !urlNextNumber) { 
-    numeroField.textContent = 'Se generará automáticamente'; 
-    numeroHidden.value = ''; 
-    return; 
+
+  if (!tipo || !urlNextNumber) {
+    numeroField.textContent = 'Se generará automáticamente';
+    numeroHidden.value = '';
+    return;
   }
-  
+
   try {
-    const r = await fetch(`${urlNextNumber}?tipo=${encodeURIComponent(tipo)}`, { 
-      headers: {'X-Requested-With':'XMLHttpRequest'} 
+    const r = await fetch(`${urlNextNumber}?tipo=${encodeURIComponent(tipo)}`, {
+      headers: {'X-Requested-With':'XMLHttpRequest'}
     });
-    
+
     if (r.ok) {
       const data = await r.json();
       const num = data.numero || '';
@@ -423,38 +423,38 @@ function mostrarResultadosClientes(clientes) {
 
   clienteResultados.replaceChildren(); // limpia
   const frag = document.createDocumentFragment();
-  
+
   for (const cliente of clientes) {
     const item = document.createElement('div');
     item.className = 'cliente-item p-3 hover:bg-cyan-700 cursor-pointer border-b border-cyan-600 last:border-b-0';
     item.dataset.id = cliente.id || '';
-    
+
     const nombre = (cliente.text || cliente.nombre_completo || cliente.nombre || cliente.razon_social || `Cliente #${cliente.id}` || '').toString();
     const email = (cliente.email || '').toString();
     const telefono = (cliente.telefono || '').toString();
     const rut = (cliente.rut || '').toString();
-    
-    item.dataset.nombre = nombre; 
-    item.dataset.email = email; 
+
+    item.dataset.nombre = nombre;
+    item.dataset.email = email;
     item.dataset.telefono = telefono;
     item.dataset.rut = rut;
-    
-    const title = document.createElement('div'); 
-    title.className = 'font-semibold text-cyan-200'; 
+
+    const title = document.createElement('div');
+    title.className = 'font-semibold text-cyan-200';
     title.textContent = nombre;
-    
-    const meta = document.createElement('div'); 
+
+    const meta = document.createElement('div');
     meta.className = 'text-sm text-gray-300';
-    const bits = []; 
-    if (rut) bits.push(`RUT: ${rut}`); 
-    if (telefono) bits.push(`📞 ${telefono}`); 
+    const bits = [];
+    if (rut) bits.push(`RUT: ${rut}`);
+    if (telefono) bits.push(`📞 ${telefono}`);
     if (email) bits.push(`📧 ${email}`);
     meta.textContent = bits.join(' | ') || 'Sin información adicional';
-    
+
     item.append(title, meta);
     frag.appendChild(item);
   }
-  
+
   clienteResultados.appendChild(frag);
 
   clienteResultados.classList.remove('hidden');

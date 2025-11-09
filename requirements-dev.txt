@@ -3,7 +3,6 @@
 
 bandit>=1.7.5
 beautifulsoup4>=4.12.0
-beautifulsoup4>=4.12.0
 black>=24.8.0
 
 # Herramientas de validación de datos
@@ -18,22 +17,16 @@ django-cors-headers>=4.3.0
 # Herramientas de validación
 django-crispy-forms>=2.0.0
 django-csp>=3.7.0
-django-csp>=3.7.0
-django-csp>=3.7.0
 
 # Herramientas de backup
 django-dbbackup>=3.3.0
 
 # Django específico
 django-debug-toolbar>=4.2.0
-django-debug-toolbar>=4.2.0
-django-debug-toolbar>=4.2.0
-django-debug-toolbar>=4.2.0
-django-debug-toolbar>=4.2.0
-django-extensions>=3.2.0
 
 # Herramientas de base de datos
 django-extensions>=3.2.0  # Para shell_plus, etc.
+django-extensions>=3.2.0
 
 # Herramientas de filtros
 django-filter>=23.3.0
@@ -54,55 +47,40 @@ django-redis>=5.4.0
 django-security>=0.20.0
 
 # Herramientas de testing de seguridad
-django-security>=0.20.0
 
 # Herramientas de testing de seguridad
-django-security>=0.20.0
 
 # Monitoreo y profiling
 django-silk>=5.0.0
 
 # Herramientas de performance
-django-silk>=5.0.0
 
 # Herramientas de testing de performance
-django-silk>=5.0.0
 
 # Herramientas de testing de performance
-django-silk>=5.0.0
 
 # Herramientas de testing de performance
-django-silk>=5.0.0
 
 # Herramientas de testing de base de datos
 django-test-plus>=2.4.0
 
 # Herramientas de testing de integración
-django-test-plus>=2.4.0
 
 # Herramientas de testing de regresión
-django-test-plus>=2.4.0
 
 # Herramientas de testing de smoke
-django-test-plus>=2.4.0
 
 # Herramientas de testing de end-to-end
-django-test-plus>=2.4.0
 
 # Herramientas de testing de base de datos
-django-test-plus>=2.4.0
 
 # Herramientas de testing de integración
-django-test-plus>=2.4.0
 
 # Herramientas de testing de regresión
-django-test-plus>=2.4.0
 
 # Herramientas de testing de smoke
-django-test-plus>=2.4.0
 
 # Herramientas de testing de end-to-end
-django-test-plus>=2.4.0
 django-upgrade>=1.15.0
 
 # Herramientas de API
@@ -121,7 +99,6 @@ freezegun>=1.2.0
 # Herramientas de deployment
 gunicorn>=21.2.0
 httpx>=0.24.0
-httpx>=0.24.0
 
 # Herramientas de desarrollo
 ipython>=8.15.0
@@ -133,7 +110,6 @@ line-profiler>=4.1.0
 locust>=2.17.0
 
 # Herramientas de testing de carga
-locust>=2.17.0
 marshmallow>=3.20.0
 memory-profiler>=0.61.0
 
@@ -167,7 +143,6 @@ radon>=6.0.0
 requests>=2.31.0
 
 # Herramientas de testing de API
-requests>=2.31.0
 
 # Linting y formateo
 ruff>=0.6.9
@@ -179,7 +154,6 @@ safety>=2.3.0
 selenium>=4.15.0
 
 # Herramientas de testing de frontend
-selenium>=4.15.0
 
 # Herramientas de monitoreo
 sentry-sdk>=1.32.0

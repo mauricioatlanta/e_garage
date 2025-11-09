@@ -130,7 +130,7 @@ class CompanySettingsForm(forms.ModelForm):
                 "step": "0.01",
                 "min": "0",
                 "max": "100",
-                "placeholder": "19.00"
+                "placeholder": "19.00",
             }
         ),
         help_text="Tasa de impuesto por defecto (ej: 19.00 para Chile, 0.00 para USA)",
@@ -259,7 +259,7 @@ class CompanySettingsForm(forms.ModelForm):
     def clean(self):
         """Validación general del formulario"""
         cleaned_data = super().clean()
-        
+
         # Asegurar que los prefijos tengan valores por defecto
         if not cleaned_data.get("invoice_prefix"):
             cleaned_data["invoice_prefix"] = "FAC"
@@ -267,7 +267,7 @@ class CompanySettingsForm(forms.ModelForm):
             cleaned_data["quote_prefix"] = "COT"
         if not cleaned_data.get("work_order_prefix"):
             cleaned_data["work_order_prefix"] = "OT"
-            
+
         return cleaned_data
 
 
@@ -317,49 +317,91 @@ class LogoUploadForm(forms.Form):
 
 class CompanyProfileForm(forms.ModelForm):
     """Formulario específico para la sección de perfil de empresa"""
-    
+
     class Meta:
         model = CompanySettings
         fields = [
-            'company_name', 'tagline', 'logo', 'address', 
-            'phone', 'email', 'website', 'tax_id', 'business_license'
+            "company_name",
+            "tagline",
+            "logo",
+            "address",
+            "phone",
+            "email",
+            "website",
+            "tax_id",
+            "business_license",
         ]
         widgets = {
-            'company_name': forms.TextInput(attrs={"class": "form-control", "placeholder": "Nombre de su empresa"}),
-            'tagline': forms.TextInput(attrs={"class": "form-control", "placeholder": "Su eslogan aquí (opcional)"}),
-            'logo': forms.FileInput(attrs={"class": "form-control", "accept": "image/*"}),
-            'address': forms.Textarea(attrs={"class": "form-control", "rows": 3, "placeholder": "Dirección completa de su taller"}),
-            'phone': forms.TextInput(attrs={"class": "form-control", "placeholder": "+56 9 1234 5678"}),
-            'email': forms.EmailInput(attrs={"class": "form-control", "placeholder": "contacto@mitaller.com"}),
-            'website': forms.URLInput(attrs={"class": "form-control", "placeholder": "https://www.mitaller.com"}),
-            'tax_id': forms.TextInput(attrs={"class": "form-control", "placeholder": "12.345.678-9"}),
-            'business_license': forms.TextInput(attrs={"class": "form-control", "placeholder": "Licencia comercial o registro"}),
+            "company_name": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "Nombre de su empresa"}
+            ),
+            "tagline": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Su eslogan aquí (opcional)",
+                }
+            ),
+            "logo": forms.FileInput(
+                attrs={"class": "form-control", "accept": "image/*"}
+            ),
+            "address": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 3,
+                    "placeholder": "Dirección completa de su taller",
+                }
+            ),
+            "phone": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "+56 9 1234 5678"}
+            ),
+            "email": forms.EmailInput(
+                attrs={"class": "form-control", "placeholder": "contacto@mitaller.com"}
+            ),
+            "website": forms.URLInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "https://www.mitaller.com",
+                }
+            ),
+            "tax_id": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "12.345.678-9"}
+            ),
+            "business_license": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Licencia comercial o registro",
+                }
+            ),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Hacer todos los campos opcionales excepto company_name
         for field_name, field in self.fields.items():
-            if field_name != 'company_name':
+            if field_name != "company_name":
                 field.required = False
 
 
 class FinancialSettingsForm(forms.ModelForm):
     """Formulario específico para la sección financiera"""
-    
+
     class Meta:
         model = CompanySettings
-        fields = ['currency', 'tax_rate', 'apply_tax_by_default']
+        fields = ["currency", "tax_rate", "apply_tax_by_default"]
         widgets = {
-            'currency': forms.Select(attrs={"class": "form-select"}),
-            'tax_rate': forms.NumberInput(attrs={
-                "class": "form-control",
-                "step": "0.01",
-                "min": "0",
-                "max": "100",
-                "placeholder": "19.00"
-            }),
-            'apply_tax_by_default': forms.CheckboxInput(attrs={"class": "form-check-input"}),
+            "currency": forms.Select(attrs={"class": "form-select"}),
+            "tax_rate": forms.NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "step": "0.01",
+                    "min": "0",
+                    "max": "100",
+                    "placeholder": "19.00",
+                }
+            ),
+            "apply_tax_by_default": forms.CheckboxInput(
+                attrs={"class": "form-check-input"}
+            ),
         }
 
     def __init__(self, *args, **kwargs):
@@ -371,22 +413,28 @@ class FinancialSettingsForm(forms.ModelForm):
 
 class ThemeSettingsForm(forms.ModelForm):
     """Formulario específico para la sección de tema"""
-    
+
     class Meta:
         model = CompanySettings
-        fields = ['primary_color', 'secondary_color', 'separate_by_technician']
+        fields = ["primary_color", "secondary_color", "separate_by_technician"]
         widgets = {
-            'primary_color': forms.TextInput(attrs={
-                "type": "color",
-                "class": "form-control form-control-color",
-                "title": "Seleccionar color primario",
-            }),
-            'secondary_color': forms.TextInput(attrs={
-                "type": "color",
-                "class": "form-control form-control-color",
-                "title": "Seleccionar color secundario",
-            }),
-            'separate_by_technician': forms.CheckboxInput(attrs={"class": "form-check-input"}),
+            "primary_color": forms.TextInput(
+                attrs={
+                    "type": "color",
+                    "class": "form-control form-control-color",
+                    "title": "Seleccionar color primario",
+                }
+            ),
+            "secondary_color": forms.TextInput(
+                attrs={
+                    "type": "color",
+                    "class": "form-control form-control-color",
+                    "title": "Seleccionar color secundario",
+                }
+            ),
+            "separate_by_technician": forms.CheckboxInput(
+                attrs={"class": "form-check-input"}
+            ),
         }
 
     def __init__(self, *args, **kwargs):

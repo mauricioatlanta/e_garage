@@ -53,21 +53,21 @@ def assign_country_to_extras(apps, schema_editor):
     ColorVehiculo = apps.get_model('taller', 'ColorVehiculo')
     MotorVehiculo = apps.get_model('taller', 'MotorVehiculo')
     CajaVehiculo = apps.get_model('taller', 'CajaVehiculo')
-    
+
     # Colores en inglés → US, resto → CL
     colores_us = [
         "White", "Black", "Red", "Blue", "Green", "Yellow",
         "Gray", "Silver", "Gold", "Brown", "Purple", "Orange"
     ]
-    
+
     ColorVehiculo.objects.filter(nombre__in=colores_us).update(country="US")
     ColorVehiculo.objects.exclude(nombre__in=colores_us).update(country="CL")
-    
+
     # Si tienes lógica para detectar motores/cajas US vs CL, aplícala aquí
     # Por defecto, todos a CL (ajusta según tu caso)
     MotorVehiculo.objects.all().update(country="CL")
     CajaVehiculo.objects.all().update(country="CL")
-    
+
     print(f"✅ Asignado country a {ColorVehiculo.objects.count()} colores")
     print(f"✅ Asignado country a {MotorVehiculo.objects.count()} motores")
     print(f"✅ Asignado country a {CajaVehiculo.objects.count()} cajas")
@@ -172,7 +172,7 @@ Ya actualizado para filtrar por `country`:
 def ajax_motores(request):
     empresa, pais = _scope(request)
     modelo = Modelo.objects.get(pk=modelo_id, country=pais)
-    
+
     qs = MotorVehiculo.objects.filter(modelos=modelo, country=pais)
     # Si MotorVehiculo tiene empresa:
     # if hasattr(MotorVehiculo, "empresa") and empresa:
@@ -344,16 +344,13 @@ python manage.py check
 
 Con este parche:
 
-✅ **CL y US tienen catálogos separados** sin colisiones  
-✅ **Unicidad case-insensitive** evita "Rojo"/"rojo"  
-✅ **Scoping automático** en forms/endpoints  
-✅ **Seed controlado** sin basura global  
-✅ **Preparado para empresa** cuando migres a multi-tenant completo  
-✅ **Stack 100% consistente** con forms.py, ajax_views.py, JS  
+✅ **CL y US tienen catálogos separados** sin colisiones
+✅ **Unicidad case-insensitive** evita "Rojo"/"rojo"
+✅ **Scoping automático** en forms/endpoints
+✅ **Seed controlado** sin basura global
+✅ **Preparado para empresa** cuando migres a multi-tenant completo
+✅ **Stack 100% consistente** con forms.py, ajax_views.py, JS
 
 ---
 
 **Siguiente paso recomendado**: Ejecutar migración en ambiente de desarrollo y probar el flujo completo de creación/edición de vehículos en ambos países.
-
-
-

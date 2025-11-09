@@ -1,5 +1,4 @@
 from django.utils import translation
-from django.conf import settings
 
 ALLOWED_BY_COUNTRY = {
     "US": ("en", "es"),  # USA puede en/es
@@ -12,7 +11,7 @@ DEFAULT_BY_COUNTRY = {
 }
 
 # Django i18n usa esta clave por defecto
-DJANGO_LANGUAGE_SESSION_KEY = 'django_language'  # Clave estándar de Django
+DJANGO_LANGUAGE_SESSION_KEY = "django_language"  # Clave estándar de Django
 SESSION_KEY = "preferred_lang"  # clave alternativa si queremos
 
 
@@ -33,25 +32,25 @@ class LanguagePolicyMiddleware:
         try:
             # Detectar país desde empresa O desde request.country (URL)
             pais = getattr(getattr(request, "empresa", None), "pais", None)
-            
+
             # Si no hay empresa (usuario no autenticado), usar request.country desde URL
             if not pais:
                 pais = getattr(request, "country", None)
-            
+
             # Si aún no hay país, detectar desde URL directamente
             if not pais:
-                if request.path.startswith('/us/'):
+                if request.path.startswith("/us/"):
                     pais = "US"
-                elif request.path.startswith('/cl/'):
+                elif request.path.startswith("/cl/"):
                     pais = "CL"
-            
+
             # SOLUCIÓN SIMPLE: Solo para USA, respetar preferencia de sesión
             if pais == "US":
                 session_lang = request.session.get(DJANGO_LANGUAGE_SESSION_KEY)
                 print(f"[DEBUG] USA - Idioma en sesión: {session_lang}")
-                
+
                 # Si hay idioma en sesión y es válido para USA, usarlo
-                if session_lang in ['en', 'es']:
+                if session_lang in ["en", "es"]:
                     lang = session_lang
                     print(f"[DEBUG] USA - Usando idioma de sesión: {lang}")
                 else:
@@ -65,16 +64,16 @@ class LanguagePolicyMiddleware:
             # Activar idioma
             translation.activate(lang)
             request.LANGUAGE_CODE = lang
-            
-            print(f"[DEBUG] ===== LanguagePolicyMiddleware =====")
+
+            print("[DEBUG] ===== LanguagePolicyMiddleware =====")
             print(f"[DEBUG] País: {pais}")
             print(f"[DEBUG] Idioma aplicado: {lang}")
             print(f"[DEBUG] URL: {request.path}")
-            print(f"[DEBUG] ===========================================")
+            print("[DEBUG] ===========================================")
 
             response = self.get_response(request)
             return response
-            
+
         except Exception as e:
             print(f"[ERROR] LanguagePolicyMiddleware: {e}")
             # En caso de error, continuar sin modificar idioma

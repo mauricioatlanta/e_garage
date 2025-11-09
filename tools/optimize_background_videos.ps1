@@ -34,25 +34,25 @@ $webmOutput = Join-Path $bgDir "bg_particles_optimized.webm"
 
 if (Test-Path $webmInput) {
   Write-Host "`nOptimizando WebM..." -ForegroundColor Blue
-  
+
   $webmCmd = "ffmpeg -i `"$webmInput`" -c:v libvpx-vp9 -b:v 1500k -crf 30 -an -movflags +faststart `"$webmOutput`""
-  
+
   if ($DryRun) {
     Write-Host "[DRY RUN] Comando: $webmCmd" -ForegroundColor Yellow
   } else {
     Write-Host "Ejecutando: $webmCmd" -ForegroundColor Gray
     Invoke-Expression $webmCmd
-    
+
     if (Test-Path $webmOutput) {
       $originalSize = (Get-Item $webmInput).Length
       $optimizedSize = (Get-Item $webmOutput).Length
       $savings = [math]::Round((($originalSize - $optimizedSize) / $originalSize) * 100, 2)
-      
+
       Write-Host "WebM optimizado:" -ForegroundColor Green
       Write-Host "  Original: $([math]::Round($originalSize / 1MB, 2)) MB" -ForegroundColor Gray
       Write-Host "  Optimizado: $([math]::Round($optimizedSize / 1MB, 2)) MB" -ForegroundColor Gray
       Write-Host "  Ahorro: $savings%" -ForegroundColor Green
-      
+
       # Reemplazar original
       Move-Item $webmOutput $webmInput -Force
     }
@@ -65,25 +65,25 @@ $mp4Output = Join-Path $bgDir "bg_intro_6s_optimized.mp4"
 
 if (Test-Path $mp4Input) {
   Write-Host "`nOptimizando MP4..." -ForegroundColor Blue
-  
+
   $mp4Cmd = "ffmpeg -i `"$mp4Input`" -c:v libx264 -preset slow -crf 23 -an -movflags +faststart `"$mp4Output`""
-  
+
   if ($DryRun) {
     Write-Host "[DRY RUN] Comando: $mp4Cmd" -ForegroundColor Yellow
   } else {
     Write-Host "Ejecutando: $mp4Cmd" -ForegroundColor Gray
     Invoke-Expression $mp4Cmd
-    
+
     if (Test-Path $mp4Output) {
       $originalSize = (Get-Item $mp4Input).Length
       $optimizedSize = (Get-Item $mp4Output).Length
       $savings = [math]::Round((($originalSize - $optimizedSize) / $originalSize) * 100, 2)
-      
+
       Write-Host "MP4 optimizado:" -ForegroundColor Green
       Write-Host "  Original: $([math]::Round($originalSize / 1MB, 2)) MB" -ForegroundColor Gray
       Write-Host "  Optimizado: $([math]::Round($optimizedSize / 1MB, 2)) MB" -ForegroundColor Gray
       Write-Host "  Ahorro: $savings%" -ForegroundColor Green
-      
+
       # Reemplazar original
       Move-Item $mp4Output $mp4Input -Force
     }

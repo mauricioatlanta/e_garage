@@ -9,10 +9,8 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings_sqlite")
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 django.setup()
 
-from django.contrib.auth.models import User
 
-from taller.models.documento import (Documento, RepuestoDocumento,
-                                     ServicioDocumento)
+from taller.models.documento import Documento, RepuestoDocumento, ServicioDocumento
 from taller.models.empresa import Empresa
 
 print("=== DEBUG DOCUMENTO VACÍO ===")
@@ -43,13 +41,13 @@ for serv in servicios:
     print(f"   - {serv.nombre} (${serv.precio})")
 
 # Verificar todos los repuestos y servicios recientes
-print(f"\n📊 ESTADÍSTICAS GENERALES:")
+print("\n📊 ESTADÍSTICAS GENERALES:")
 print(f"   Total documentos: {Documento.objects.count()}")
 print(f"   Total repuestos en documentos: {RepuestoDocumento.objects.count()}")
 print(f"   Total servicios en documentos: {ServicioDocumento.objects.count()}")
 
 # Verificar últimos 5 documentos
-print(f"\n📋 ÚLTIMOS 5 DOCUMENTOS:")
+print("\n📋 ÚLTIMOS 5 DOCUMENTOS:")
 ultimos = Documento.objects.order_by("-id")[:5]
 for doc in ultimos:
     rep_count = RepuestoDocumento.objects.filter(documento=doc).count()
@@ -57,7 +55,7 @@ for doc in ultimos:
     print(f"   {doc.numero_documento}: {rep_count} repuestos, {serv_count} servicios")
 
 # Verificar si hay problemas de empresa/multiempresa
-print(f"\n🏢 VERIFICACIÓN MULTIEMPRESA:")
+print("\n🏢 VERIFICACIÓN MULTIEMPRESA:")
 empresas = Empresa.objects.all()
 for empresa in empresas:
     docs_empresa = Documento.objects.filter(empresa=empresa).count()

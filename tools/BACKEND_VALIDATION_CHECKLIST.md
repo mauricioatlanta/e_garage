@@ -181,6 +181,6 @@ for doc in docs:
 
 ---
 
-**Fecha**: 2025-10-06  
-**Versión**: 1.0  
+**Fecha**: 2025-10-06
+**Versión**: 1.0
 **Estado**: Listo para testing backend

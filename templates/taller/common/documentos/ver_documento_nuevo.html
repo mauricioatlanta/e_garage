@@ -10,7 +10,7 @@
 {% block content %}
 <div class="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
   <div class="container mx-auto px-4 py-8">
-    
+
     <!-- Header del documento -->
     <div class="bg-gray-800/50 backdrop-blur-lg rounded-xl border border-cyan-400/30 p-6 mb-6">
       <div class="flex justify-between items-start">
@@ -25,13 +25,13 @@
             Fecha: {{ documento.fecha_emision|date:"d/m/Y" }}
           </p>
         </div>
-        
+
         <div class="text-right">
           <div class="text-2xl font-bold text-green-400">
             ${{ total|floatformat:0|intcomma }}
           </div>
           <div class="text-sm text-gray-400">
-            Estado: 
+            Estado:
             <span class="px-2 py-1 rounded text-xs font-semibold
               {% if documento.estado_pago == 'PAGADO' %}bg-green-600 text-white
               {% elif documento.estado_pago == 'NO_PAGADO' %}bg-red-600 text-white
@@ -52,18 +52,18 @@
         </h3>
         <div class="space-y-2">
           <p class="text-white">
-            <span class="text-cyan-300">Nombre:</span> 
+            <span class="text-cyan-300">Nombre:</span>
             {{ documento.cliente.nombre }} {{ documento.cliente.apellido }}
           </p>
           {% if documento.cliente.email %}
           <p class="text-white">
-            <span class="text-cyan-300">Email:</span> 
+            <span class="text-cyan-300">Email:</span>
             {{ documento.cliente.email }}
           </p>
           {% endif %}
           {% if documento.cliente.telefono %}
           <p class="text-white">
-            <span class="text-cyan-300">Teléfono:</span> 
+            <span class="text-cyan-300">Teléfono:</span>
             {{ documento.cliente.telefono }}
           </p>
           {% endif %}
@@ -78,20 +78,20 @@
         </h3>
         <div class="space-y-2">
           <p class="text-white">
-            <span class="text-cyan-300">Patente:</span> 
+            <span class="text-cyan-300">Patente:</span>
             {{ documento.vehiculo.patente }}
           </p>
           <p class="text-white">
-            <span class="text-cyan-300">Marca:</span> 
+            <span class="text-cyan-300">Marca:</span>
             {{ documento.vehiculo.marca }}
           </p>
           <p class="text-white">
-            <span class="text-cyan-300">Modelo:</span> 
+            <span class="text-cyan-300">Modelo:</span>
             {{ documento.vehiculo.modelo }}
           </p>
           {% if documento.vehiculo.ano %}
           <p class="text-white">
-            <span class="text-cyan-300">Año:</span> 
+            <span class="text-cyan-300">Año:</span>
             {{ documento.vehiculo.ano }}
           </p>
           {% endif %}
@@ -246,17 +246,17 @@
 
     <!-- Botones de acción -->
     <div class="flex flex-wrap gap-4 justify-center">
-      <a href="{% url 'documentos_cl_es:lista_documentos' %}" 
+      <a href="{% url 'documentos_cl_es:lista_documentos' %}"
          class="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors">
         ← Volver a la Lista
       </a>
-      
-      <a href="{% url 'documentos_cl_es:documento_editar' documento.pk %}" 
+
+      <a href="{% url 'documentos_cl_es:documento_editar' documento.pk %}"
          class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
         ✏️ Editar Documento
       </a>
-      
-      <a href="{% url 'documentos_cl_es:exportar_documento_pdf' documento.pk %}" 
+
+      <a href="{% url 'documentos_cl_es:exportar_documento_pdf' documento.pk %}"
          class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors">
         📄 Exportar PDF
       </a>

@@ -114,7 +114,7 @@ input[type="checkbox"] {
       <!-- Columna 1: FECHA primero + TIPO + NÚMERO -->
       <div class="space-y-4">
                 <label for="id_fecha_emision" class="block text-cyan-200 font-semibold">{% trans "Issue Date" %}</label>
-                <input id="id_fecha_emision" type="date" name="fecha_emision" class="form-control w-full" 
+                <input id="id_fecha_emision" type="date" name="fecha_emision" class="form-control w-full"
                        value="{{ form.fecha_emision.value|default:None|default_if_none:''|date:'Y-m-d' }}">
 
         <label for="id_tipo" class="block text-cyan-200 font-semibold">{% trans "Document Type" %}</label>
@@ -189,7 +189,7 @@ input[type="checkbox"] {
           <button type="button" id="add-servicio" class="btn-secondary">+ {% trans "Add Service" %}</button>
           <button type="button" id="add-otro" class="btn-secondary">+ {% trans "Add Other Service" %}</button>
         </div>
-        
+
         <!-- Parts container -->
         <div id="repuestos-container" class="space-y-4">
           <!-- Dynamic parts will be added here -->
@@ -218,7 +218,7 @@ input[type="checkbox"] {
     <!-- Totals -->
     <div class="totales-section">
       <h3 class="text-2xl font-bold text-cyan-300 mb-4">💰 {% trans "Totals" %}</h3>
-      
+
       <!-- VAT checkbox next to totals -->
       <div class="mb-4">
         <label for="id_apply_vat" class="flex items-center text-cyan-200">
@@ -670,7 +670,7 @@ function setupRepuestoRow(row){
   qEl?.addEventListener('input', recalc);
   inpPV?.addEventListener('input', recalc);
   $('.rep-descuento', row)?.addEventListener('input', recalc);
-  
+
   // Toggle cost price visibility on sale price click
   inpPV?.addEventListener('click', (e) => {
     const costContainer = row.querySelector('.cost-price-container');
@@ -804,8 +804,8 @@ function setupServicioRow(row){
   drop?.addEventListener('keydown', (e)=>{
     const item = e.target.closest('[role="option"]');
     if (!item) return;
-    if (e.key === 'Enter') { 
-      seleccionarServicio(item); 
+    if (e.key === 'Enter') {
+      seleccionarServicio(item);
     }
   });
 
@@ -918,7 +918,7 @@ clienteResultados?.addEventListener('click', (e)=>{
 clienteResultados?.addEventListener('keydown', (e)=>{
   const item = e.target.closest('[role="option"]');
   if (!item) return;
-  if (e.key === 'Enter') { 
+  if (e.key === 'Enter') {
     seleccionarCliente({
       id: item.dataset.id,
       nombre: item.dataset.nombre,
@@ -932,7 +932,7 @@ clienteResultados?.addEventListener('keydown', (e)=>{
 // Serializar filas dinámicas antes de enviar
 function serializeRows(){
   console.log('🔍 Serializando filas dinámicas...');
-  
+
   const rep = $$('#repuestos-container .dynamic-element').map(row=>({
     codigo:   $('.rep-codigo', row)?.value?.trim() || '',
     nombre:   $('.rep-nombre', row)?.value?.trim() || '',
@@ -952,15 +952,15 @@ function serializeRows(){
     precio_taller: Number(($('.otr-precio-taller', row)?.value||'').replace(/[^\d.-]/g,''))||0,
     precio:        Number(($('.otr-precio', row)?.value||'').replace(/[^\d.-]/g,''))||0,
   }));
-  
+
   console.log('📦 Repuestos encontrados:', rep.length, rep);
   console.log('🔧 Servicios encontrados:', serv.length, serv);
   console.log('🌐 Otros servicios encontrados:', otros.length, otros);
-  
+
   $('#id_repuestos_json').value = JSON.stringify(rep);
   $('#id_servicios_json').value = JSON.stringify(serv);
   $('#id_otros_json').value     = JSON.stringify(otros);
-  
+
   console.log('💾 JSON guardado:');
   console.log('  - repuestos_json:', $('#id_repuestos_json').value);
   console.log('  - servicios_json:', $('#id_servicios_json').value);
@@ -983,14 +983,14 @@ document.querySelector('#id_apply_vat')?.addEventListener('change', (e)=>{
 // Serializar antes de enviar
 document.querySelector('#document-form')?.addEventListener('submit', (e)=>{
   const form = document.querySelector('#document-form');
-  if (form.dataset.submitting === '1') { 
-    e.preventDefault(); 
-    return; 
+  if (form.dataset.submitting === '1') {
+    e.preventDefault();
+    return;
   }
-  
+
   // Limpiar errores anteriores
   $$('.text-red-300.eg-hint').forEach(n=>n.remove());
-  
+
   const required = [
     ['#id_fecha_emision', I18N.issue_date_required],
     ['#id_tipo', I18N.document_type_required],
@@ -1021,21 +1021,21 @@ document.querySelector('#document-form')?.addEventListener('submit', (e)=>{
           applyTheme(selTipo?.value || 'OT');
           updateDocumentNumber();
           recalcTotales();
-          
+
           // Establecer fecha por defecto si está vacía
           const fechaInput = document.getElementById('id_fecha_emision');
           if (fechaInput && !fechaInput.value) {
             const today = new Date().toISOString().slice(0,10);
             fechaInput.value = today;
           }
-          
+
           // Sincronizar estado inicial de pagado ↔ payment_status
           const chk = document.querySelector('#id_pagado');
           const sel = document.querySelector('#id_payment_status');
           if (chk && sel) {
             chk.checked = (sel.value === 'paid');
           }
-  
+
   // Cargar otros servicios dinámicamente
   const selects = $$('.otr-servicio');
   if (selects.length && EG.cfg.URL_OUTSOURCED_SERVICES){

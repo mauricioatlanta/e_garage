@@ -1,10 +1,13 @@
 import json
-import pytest
 from decimal import Decimal
+
+import pytest
+
 from django.contrib.auth import get_user_model
 from django.test import Client
-from django.urls import reverse, NoReverseMatch
-from tests.test_utils.http_asserts import assert_ok_or_redirect, assert_json_response
+from django.urls import NoReverseMatch, reverse
+
+from tests.test_utils.http_asserts import assert_ok_or_redirect
 
 
 def _rev(cands, fb):
@@ -21,28 +24,39 @@ def _rev(cands, fb):
 def test_documentos_descuentos_edge_cases():
     """Test document creation with edge cases for discounts: 0%, 100%, negative, >100%"""
     try:
-        from taller.models.empresa import Empresa
         from taller.models.clientes import Cliente
-        from taller.models.vehiculos import Vehiculo
         from taller.models.documento import Documento
-        from taller.models.lineas_documento import LineaServicio, LineaRepuesto
+        from taller.models.empresa import Empresa
+        from taller.models.lineas_documento import LineaRepuesto, LineaServicio
+        from taller.models.vehiculos import Vehiculo
     except ImportError:
         pytest.skip("Required models not found")
 
     User = get_user_model()
     user = User.objects.create_user(username="test_descuentos", password="test")
-    
-    empresa = Empresa.objects.create(user=user, nombre_taller="Test Descuentos", pais="CL")
-    cliente = Cliente.objects.create(empresa=empresa, nombre="Test Client", tax_id="1-9")
+
+    empresa = Empresa.objects.create(
+        user=user, nombre_taller="Test Descuentos", pais="CL"
+    )
+    cliente = Cliente.objects.create(
+        empresa=empresa, nombre="Test Client", tax_id="1-9"
+    )
     vehiculo = Vehiculo.objects.create(
-        empresa=empresa, cliente=cliente, patente="TEST123",
-        marca_texto="Test", modelo_texto="Model", anio=2024
+        empresa=empresa,
+        cliente=cliente,
+        patente="TEST123",
+        marca_texto="Test",
+        modelo_texto="Model",
+        anio=2024,
     )
 
     c = Client()
     c.force_login(user)
-    url = _rev(["taller:documentos_api_create", "documentos:api_create"], "/cl/documentos/api/create/")
-    
+    url = _rev(
+        ["taller:documentos_api_create", "documentos:api_create"],
+        "/cl/documentos/api/create/",
+    )
+
     # Test cases for discount edge cases
     discount_cases = [
         # (descuento, should_succeed, description)
@@ -69,13 +83,13 @@ def test_documentos_descuentos_edge_cases():
                     "nombre": f"Service {description}",
                     "cantidad": 1,
                     "precio_unitario": "1000.00",
-                    "descuento": descuento
+                    "descuento": descuento,
                 }
-            ]
+            ],
         }
-        
+
         response = c.post(url, data=json.dumps(data), content_type="application/json")
-        
+
         if should_succeed:
             assert_ok_or_redirect(response, "/cl/documentos/api/create/")
             if response.status_code in (200, 201):
@@ -83,40 +97,56 @@ def test_documentos_descuentos_edge_cases():
                 doc_id = response.json()["id"]
                 documento = Documento.objects.get(id=doc_id)
                 linea = LineaServicio.objects.filter(documento=documento).first()
-                assert linea is not None, f"Service line should be created for {description}"
+                assert (
+                    linea is not None
+                ), f"Service line should be created for {description}"
         else:
             if response.status_code == 302:
                 assert_ok_or_redirect(response, "/cl/documentos/api/create/")
             else:
-                assert response.status_code in (400, 422), f"Should fail for {description}: {response.status_code}"
+                assert response.status_code in (
+                    400,
+                    422,
+                ), f"Should fail for {description}: {response.status_code}"
 
 
 @pytest.mark.django_db
 def test_documentos_cantidades_decimales():
     """Test document creation with decimal quantities and precise calculations"""
     try:
-        from taller.models.empresa import Empresa
         from taller.models.clientes import Cliente
-        from taller.models.vehiculos import Vehiculo
         from taller.models.documento import Documento
+        from taller.models.empresa import Empresa
         from taller.models.lineas_documento import LineaServicio
+        from taller.models.vehiculos import Vehiculo
     except ImportError:
         pytest.skip("Required models not found")
 
     User = get_user_model()
     user = User.objects.create_user(username="test_cantidades", password="test")
-    
-    empresa = Empresa.objects.create(user=user, nombre_taller="Test Cantidades", pais="CL")
-    cliente = Cliente.objects.create(empresa=empresa, nombre="Test Client", tax_id="1-9")
+
+    empresa = Empresa.objects.create(
+        user=user, nombre_taller="Test Cantidades", pais="CL"
+    )
+    cliente = Cliente.objects.create(
+        empresa=empresa, nombre="Test Client", tax_id="1-9"
+    )
     vehiculo = Vehiculo.objects.create(
-        empresa=empresa, cliente=cliente, patente="TEST123",
-        marca_texto="Test", modelo_texto="Model", anio=2024
+        empresa=empresa,
+        cliente=cliente,
+        patente="TEST123",
+        marca_texto="Test",
+        modelo_texto="Model",
+        anio=2024,
     )
 
     c = Client()
     c.force_login(user)
-    url = _rev(["taller:documentos_api_create", "documentos:api_create"], "/cl/documentos/api/create/")
-    
+    url = _rev(
+        ["taller:documentos_api_create", "documentos:api_create"],
+        "/cl/documentos/api/create/",
+    )
+
     # Test cases for decimal quantities
     quantity_cases = [
         # (cantidad, precio_unitario, expected_subtotal, description)
@@ -141,57 +171,74 @@ def test_documentos_cantidades_decimales():
                     "nombre": f"Service {description}",
                     "cantidad": cantidad,
                     "precio_unitario": precio_unitario,
-                    "descuento": "0.00"
+                    "descuento": "0.00",
                 }
-            ]
+            ],
         }
-        
+
         response = c.post(url, data=json.dumps(data), content_type="application/json")
-        
+
         assert_ok_or_redirect(response, "/cl/documentos/api/create/")
-        
+
         if response.status_code in (200, 201):
             doc_id = response.json()["id"]
             documento = Documento.objects.get(id=doc_id)
             linea = LineaServicio.objects.filter(documento=documento).first()
-            
-            assert linea is not None, f"Service line should be created for {description}"
-            
+
+            assert (
+                linea is not None
+            ), f"Service line should be created for {description}"
+
             # Check that quantity is stored correctly
-            assert str(linea.cantidad) == cantidad, f"Quantity should match for {description}"
-            
+            assert (
+                str(linea.cantidad) == cantidad
+            ), f"Quantity should match for {description}"
+
             # Check subtotal calculation (be tolerant to rounding differences)
-            if hasattr(linea, 'subtotal'):
-                assert isinstance(linea.subtotal, (int, float, Decimal)), f"Subtotal should be numeric for {description}"
-                assert linea.subtotal >= 0, f"Subtotal should be non-negative for {description}"
+            if hasattr(linea, "subtotal"):
+                assert isinstance(
+                    linea.subtotal, (int, float, Decimal)
+                ), f"Subtotal should be numeric for {description}"
+                assert (
+                    linea.subtotal >= 0
+                ), f"Subtotal should be non-negative for {description}"
 
 
 @pytest.mark.django_db
 def test_documentos_precios_4_decimales():
     """Test document creation with 4-decimal precision prices and rounding"""
     try:
-        from taller.models.empresa import Empresa
         from taller.models.clientes import Cliente
-        from taller.models.vehiculos import Vehiculo
         from taller.models.documento import Documento
+        from taller.models.empresa import Empresa
         from taller.models.lineas_documento import LineaServicio
+        from taller.models.vehiculos import Vehiculo
     except ImportError:
         pytest.skip("Required models not found")
 
     User = get_user_model()
     user = User.objects.create_user(username="test_precios", password="test")
-    
+
     empresa = Empresa.objects.create(user=user, nombre_taller="Test Precios", pais="CL")
-    cliente = Cliente.objects.create(empresa=empresa, nombre="Test Client", tax_id="1-9")
+    cliente = Cliente.objects.create(
+        empresa=empresa, nombre="Test Client", tax_id="1-9"
+    )
     vehiculo = Vehiculo.objects.create(
-        empresa=empresa, cliente=cliente, patente="TEST123",
-        marca_texto="Test", modelo_texto="Model", anio=2024
+        empresa=empresa,
+        cliente=cliente,
+        patente="TEST123",
+        marca_texto="Test",
+        modelo_texto="Model",
+        anio=2024,
     )
 
     c = Client()
     c.force_login(user)
-    url = _rev(["taller:documentos_api_create", "documentos:api_create"], "/cl/documentos/api/create/")
-    
+    url = _rev(
+        ["taller:documentos_api_create", "documentos:api_create"],
+        "/cl/documentos/api/create/",
+    )
+
     # Test cases for 4-decimal precision prices
     price_cases = [
         # (precio_unitario, description)
@@ -216,53 +263,70 @@ def test_documentos_precios_4_decimales():
                     "nombre": f"Service {description}",
                     "cantidad": 1,
                     "precio_unitario": precio_unitario,
-                    "descuento": "0.00"
+                    "descuento": "0.00",
                 }
-            ]
+            ],
         }
-        
+
         response = c.post(url, data=json.dumps(data), content_type="application/json")
-        
+
         assert_ok_or_redirect(response, "/cl/documentos/api/create/")
-        
+
         if response.status_code in (200, 201):
             doc_id = response.json()["id"]
             documento = Documento.objects.get(id=doc_id)
             linea = LineaServicio.objects.filter(documento=documento).first()
-            
-            assert linea is not None, f"Service line should be created for {description}"
-            
+
+            assert (
+                linea is not None
+            ), f"Service line should be created for {description}"
+
             # Check that price is stored correctly (may be rounded by model)
-            assert isinstance(linea.precio_unitario, (int, float, Decimal)), f"Price should be numeric for {description}"
-            assert linea.precio_unitario >= 0, f"Price should be non-negative for {description}"
+            assert isinstance(
+                linea.precio_unitario, (int, float, Decimal)
+            ), f"Price should be numeric for {description}"
+            assert (
+                linea.precio_unitario >= 0
+            ), f"Price should be non-negative for {description}"
 
 
 @pytest.mark.django_db
 def test_documentos_negativos_bordes():
     """Test document creation with negative values and edge cases"""
     try:
-        from taller.models.empresa import Empresa
         from taller.models.clientes import Cliente
-        from taller.models.vehiculos import Vehiculo
         from taller.models.documento import Documento
+        from taller.models.empresa import Empresa
         from taller.models.lineas_documento import LineaServicio
+        from taller.models.vehiculos import Vehiculo
     except ImportError:
         pytest.skip("Required models not found")
 
     User = get_user_model()
     user = User.objects.create_user(username="test_negativos", password="test")
-    
-    empresa = Empresa.objects.create(user=user, nombre_taller="Test Negativos", pais="CL")
-    cliente = Cliente.objects.create(empresa=empresa, nombre="Test Client", tax_id="1-9")
+
+    empresa = Empresa.objects.create(
+        user=user, nombre_taller="Test Negativos", pais="CL"
+    )
+    cliente = Cliente.objects.create(
+        empresa=empresa, nombre="Test Client", tax_id="1-9"
+    )
     vehiculo = Vehiculo.objects.create(
-        empresa=empresa, cliente=cliente, patente="TEST123",
-        marca_texto="Test", modelo_texto="Model", anio=2024
+        empresa=empresa,
+        cliente=cliente,
+        patente="TEST123",
+        marca_texto="Test",
+        modelo_texto="Model",
+        anio=2024,
     )
 
     c = Client()
     c.force_login(user)
-    url = _rev(["taller:documentos_api_create", "documentos:api_create"], "/cl/documentos/api/create/")
-    
+    url = _rev(
+        ["taller:documentos_api_create", "documentos:api_create"],
+        "/cl/documentos/api/create/",
+    )
+
     # Test cases for negative values and edge cases
     negative_cases = [
         # (cantidad, precio_unitario, descuento, should_succeed, description)
@@ -279,7 +343,13 @@ def test_documentos_negativos_bordes():
         ("1", "1000.00", "invalid", False, "Invalid discount"),
     ]
 
-    for cantidad, precio_unitario, descuento, should_succeed, description in negative_cases:
+    for (
+        cantidad,
+        precio_unitario,
+        descuento,
+        should_succeed,
+        description,
+    ) in negative_cases:
         data = {
             "empresa": empresa.id,
             "cliente": cliente.id,
@@ -291,48 +361,62 @@ def test_documentos_negativos_bordes():
                     "nombre": f"Service {description}",
                     "cantidad": cantidad,
                     "precio_unitario": precio_unitario,
-                    "descuento": descuento
+                    "descuento": descuento,
                 }
-            ]
+            ],
         }
-        
+
         response = c.post(url, data=json.dumps(data), content_type="application/json")
-        
+
         if should_succeed:
             assert_ok_or_redirect(response, "/cl/documentos/api/create/")
         else:
             if response.status_code == 302:
                 assert_ok_or_redirect(response, "/cl/documentos/api/create/")
             else:
-                assert response.status_code in (400, 422), f"Should fail for {description}: {response.status_code}"
+                assert response.status_code in (
+                    400,
+                    422,
+                ), f"Should fail for {description}: {response.status_code}"
 
 
 @pytest.mark.django_db
 def test_documentos_rounding_precision():
     """Test document creation with rounding precision edge cases"""
     try:
-        from taller.models.empresa import Empresa
         from taller.models.clientes import Cliente
-        from taller.models.vehiculos import Vehiculo
         from taller.models.documento import Documento
+        from taller.models.empresa import Empresa
         from taller.models.lineas_documento import LineaServicio
+        from taller.models.vehiculos import Vehiculo
     except ImportError:
         pytest.skip("Required models not found")
 
     User = get_user_model()
     user = User.objects.create_user(username="test_rounding", password="test")
-    
-    empresa = Empresa.objects.create(user=user, nombre_taller="Test Rounding", pais="CL")
-    cliente = Cliente.objects.create(empresa=empresa, nombre="Test Client", tax_id="1-9")
+
+    empresa = Empresa.objects.create(
+        user=user, nombre_taller="Test Rounding", pais="CL"
+    )
+    cliente = Cliente.objects.create(
+        empresa=empresa, nombre="Test Client", tax_id="1-9"
+    )
     vehiculo = Vehiculo.objects.create(
-        empresa=empresa, cliente=cliente, patente="TEST123",
-        marca_texto="Test", modelo_texto="Model", anio=2024
+        empresa=empresa,
+        cliente=cliente,
+        patente="TEST123",
+        marca_texto="Test",
+        modelo_texto="Model",
+        anio=2024,
     )
 
     c = Client()
     c.force_login(user)
-    url = _rev(["taller:documentos_api_create", "documentos:api_create"], "/cl/documentos/api/create/")
-    
+    url = _rev(
+        ["taller:documentos_api_create", "documentos:api_create"],
+        "/cl/documentos/api/create/",
+    )
+
     # Test cases for rounding precision
     rounding_cases = [
         # (cantidad, precio_unitario, descuento, description)
@@ -356,27 +440,38 @@ def test_documentos_rounding_precision():
                     "nombre": f"Service {description}",
                     "cantidad": cantidad,
                     "precio_unitario": precio_unitario,
-                    "descuento": descuento
+                    "descuento": descuento,
                 }
-            ]
+            ],
         }
-        
+
         response = c.post(url, data=json.dumps(data), content_type="application/json")
-        
+
         # Should handle rounding gracefully
         if response.status_code in (200, 201, 302):
             assert_ok_or_redirect(response, "/cl/documentos/api/create/")
         else:
-            assert response.status_code in (400, 422), f"Should handle rounding for {description}: {response.status_code}"
-        
+            assert response.status_code in (
+                400,
+                422,
+            ), f"Should handle rounding for {description}: {response.status_code}"
+
         if response.status_code in (200, 201):
             doc_id = response.json()["id"]
             documento = Documento.objects.get(id=doc_id)
             linea = LineaServicio.objects.filter(documento=documento).first()
-            
-            assert linea is not None, f"Service line should be created for {description}"
-            
+
+            assert (
+                linea is not None
+            ), f"Service line should be created for {description}"
+
             # Check that values are stored with appropriate precision
-            assert isinstance(linea.cantidad, (int, float, Decimal)), f"Quantity should be numeric for {description}"
-            assert isinstance(linea.precio_unitario, (int, float, Decimal)), f"Price should be numeric for {description}"
-            assert isinstance(linea.descuento, (int, float, Decimal)), f"Discount should be numeric for {description}"
+            assert isinstance(
+                linea.cantidad, (int, float, Decimal)
+            ), f"Quantity should be numeric for {description}"
+            assert isinstance(
+                linea.precio_unitario, (int, float, Decimal)
+            ), f"Price should be numeric for {description}"
+            assert isinstance(
+                linea.descuento, (int, float, Decimal)
+            ), f"Discount should be numeric for {description}"

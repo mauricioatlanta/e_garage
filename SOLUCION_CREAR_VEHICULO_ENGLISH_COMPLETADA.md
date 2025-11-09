@@ -37,8 +37,8 @@
 ```html
 <div class="flex gap-2">
   {% render_field form.modelo class="flex-1 px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400" %}
-  <button type="button" 
-          onclick="openAddModelModal()" 
+  <button type="button"
+          onclick="openAddModelModal()"
           class="px-4 py-3 rounded-lg bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-medium transition-all duration-200 flex items-center gap-2 border border-emerald-500/30">
     <span class="text-lg">+</span>
     <span class="hidden sm:inline">Add</span>
@@ -51,27 +51,27 @@
 <div id="addModelModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
   <div class="bg-gradient-to-r from-[#0d1117] to-[#111827] rounded-xl border border-emerald-400/30 p-6 w-full max-w-md">
     <h3 class="text-xl font-semibold text-emerald-300 mb-4">Add New Model</h3>
-    
+
     <form id="addModelForm">
       <div class="mb-4">
         <label for="newModelName" class="block text-sm font-medium text-gray-300 mb-2">
           Model Name *
         </label>
-        <input type="text" 
-               id="newModelName" 
-               name="nombre" 
+        <input type="text"
+               id="newModelName"
+               name="nombre"
                required
                class="w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400"
                placeholder="Enter model name">
       </div>
-      
+
       <div class="flex gap-3">
-        <button type="button" 
-                onclick="closeAddModelModal()" 
+        <button type="button"
+                onclick="closeAddModelModal()"
                 class="flex-1 px-4 py-3 rounded-lg bg-gray-600 hover:bg-gray-700 text-white font-medium transition">
           Cancel
         </button>
-        <button type="submit" 
+        <button type="submit"
                 class="flex-1 px-4 py-3 rounded-lg bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-medium transition">
           Add Model
         </button>
@@ -97,25 +97,25 @@ function closeAddModelModal() {
 // Manejar el envío del formulario de agregar modelo
 document.getElementById('addModelForm').addEventListener('submit', function(e) {
   e.preventDefault();
-  
+
   const modelName = document.getElementById('newModelName').value.trim();
   if (!modelName) {
     alert('Please enter a model name');
     return;
   }
-  
+
   // Obtener la marca seleccionada
   const marcaSelect = document.getElementById('id_marca');
   const marcaId = marcaSelect.value;
-  
+
   if (!marcaId) {
     alert('Please select a brand first');
     return;
   }
-  
+
   // Enviar datos al servidor
   const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-  
+
   fetch('{% country_url "vehiculos:ajax_agregar_modelo" %}', {
     method: 'POST',
     headers: {
@@ -137,10 +137,10 @@ document.getElementById('addModelForm').addEventListener('submit', function(e) {
       newOption.textContent = data.modelo.nombre;
       newOption.selected = true;
       modeloSelect.appendChild(newOption);
-      
+
       // Cerrar el modal
       closeAddModelModal();
-      
+
       // Mostrar mensaje de éxito
       alert('Model added successfully!');
     } else {
@@ -212,5 +212,3 @@ La página `/us/vehiculos/crear/` ahora:
 - Maneja errores del servidor apropiadamente
 
 El template de crear vehículo ahora está completamente en inglés y permite agregar nuevos modelos de manera intuitiva y eficiente.
-
-

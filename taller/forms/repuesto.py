@@ -1,4 +1,5 @@
 from decimal import Decimal, InvalidOperation
+
 from django import forms
 
 from taller.models.repuesto import CategoriaRepuesto, Repuesto
@@ -169,9 +170,9 @@ class RepuestoForm(forms.ModelForm):
                 valor_str = str(valor)
             else:
                 valor_str = str(valor)
-            
+
             decimal_valor = Decimal(valor_str)
-            
+
             # Verificar que no tenga más de 2 decimales
             if decimal_valor.as_tuple().exponent < -2:
                 is_english = (
@@ -185,7 +186,7 @@ class RepuestoForm(forms.ModelForm):
                     else "Asegúrese de que no haya más de 2 dígitos decimales."
                 )
                 raise forms.ValidationError(error_msg)
-            
+
             return decimal_valor
         except (ValueError, TypeError, InvalidOperation):
             is_english = (
@@ -212,9 +213,9 @@ class RepuestoForm(forms.ModelForm):
                 valor_str = str(valor)
             else:
                 valor_str = str(valor)
-            
+
             decimal_valor = Decimal(valor_str)
-            
+
             # Verificar que no tenga más de 2 decimales
             if decimal_valor.as_tuple().exponent < -2:
                 is_english = (
@@ -228,7 +229,7 @@ class RepuestoForm(forms.ModelForm):
                     else "Asegúrese de que no haya más de 2 dígitos decimales."
                 )
                 raise forms.ValidationError(error_msg)
-            
+
             return decimal_valor
         except (ValueError, TypeError, InvalidOperation):
             is_english = (

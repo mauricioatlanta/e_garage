@@ -1,5 +1,6 @@
 import pytest
 
+
 @pytest.mark.django_db
 def test_empresa_cliente_vehiculo_minimal_creation():
     # Importa las clases reales (Cliente está en 'clientes.py')
@@ -11,21 +12,16 @@ def test_empresa_cliente_vehiculo_minimal_creation():
 
     # Empresa mínima - necesita un User primero
     from django.contrib.auth.models import User
+
     user = User.objects.create_user(username="testuser", email="test@example.com")
-    
+
     try:
         emp = Empresa.objects.create(
-            user=user,
-            nombre_taller="Acme Taller", 
-            empresa="Acme Corp",
-            pais="CL"
+            user=user, nombre_taller="Acme Taller", empresa="Acme Corp", pais="CL"
         )
     except TypeError:
         # Si tu Empresa pide otros campos obligatorios sin default, agrega aquí
-        emp = Empresa.objects.create(
-            user=user,
-            nombre_taller="Acme Taller"
-        )
+        emp = Empresa.objects.create(user=user, nombre_taller="Acme Taller")
 
     # Cliente mínimo
     cli_kwargs = {"empresa": emp, "nombre": "Juan"}

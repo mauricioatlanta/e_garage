@@ -253,8 +253,8 @@ class DocumentoCreateView(
     def get_form_kwargs(self):
         """Pasar empresa y usuario al formulario"""
         kwargs = super().get_form_kwargs()
-        kwargs['user'] = self.request.user
-        kwargs['empresa'] = getattr(self.request.user, 'empresa', None)
+        kwargs["user"] = self.request.user
+        kwargs["empresa"] = getattr(self.request.user, "empresa", None)
         return kwargs
 
     def render_to_response(self, context, **response_kwargs):

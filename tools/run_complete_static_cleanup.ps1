@@ -54,7 +54,7 @@ if (-not $SkipBackup -and -not $DryRun) {
   Write-Host "`n💾 PASO 3: Creando backup..." -ForegroundColor Green
   $backupDir = Join-Path $Root "tools\backup\static_backup_$(Get-Date -Format 'yyyyMMdd_HHmmss')"
   New-Item -ItemType Directory -Force -Path $backupDir | Out-Null
-  
+
   try {
     Copy-Item "$Root\static\*" $backupDir -Recurse -Force
     Write-Host "   ✅ Backup creado en: $backupDir" -ForegroundColor Green
@@ -68,7 +68,7 @@ Write-Host "`n🧹 PASO 4: Aplicando limpieza..." -ForegroundColor Green
 try {
   $cleanupParams = @("-Root", $Root)
   if ($DryRun) { $cleanupParams += "-DryRun" }
-  
+
   & .\tools\apply_static_cleanup.ps1 @cleanupParams
   if ($LASTEXITCODE -ne 0) {
     throw "Error en limpieza"
@@ -87,7 +87,7 @@ try {
   if ($LASTEXITCODE -ne 0) {
     throw "Error en dry run de referencias"
   }
-  
+
   if (-not $DryRun) {
     # Aplicar cambios
     & python tools/clean/update_template_refs.py --templates "$Root\templates" --static "$Root\static" --manifest "$reportsDir\manifest.json"

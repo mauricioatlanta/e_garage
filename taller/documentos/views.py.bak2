@@ -31,27 +31,27 @@ def api_crear_tecnico(request):
     try:
         data = json.loads(request.body.decode())
         nombre = (data.get("nombre") or "").strip()
-        
+
         if not nombre:
             return JsonResponse({"error": "Nombre requerido"}, status=400)
-        
+
         # Usar empresa del usuario autenticado (seguridad)
         empresa = getattr(request.user, "empresa", None)
         if not empresa:
             return JsonResponse({"error": "Usuario sin empresa asociada"}, status=400)
-        
+
         tecnico = Tecnico.objects.create(
             empresa=empresa,
             nombre=nombre,
             activo=True,
         )
-        
+
         return JsonResponse({
             "ok": True,
             "id": tecnico.id,
             "nombre": tecnico.nombre,
         })
-        
+
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
 
@@ -90,7 +90,7 @@ from taller.servicios.models import Servicio
 # Autocompletado de servicios para documentos
 def autocomplete_servicio(request):
     q = request.GET.get("q", "").strip()
-    
+
     # Obtener empresa del usuario
     empresa = getattr(request.user, "empresa", None)
     if not empresa:
@@ -98,13 +98,13 @@ def autocomplete_servicio(request):
 
     # Filtrar servicios por empresa y búsqueda
     servicios = Servicio.objects.filter(empresa=empresa)
-    
+
     if q:
         servicios = servicios.filter(
-            models.Q(nombre__icontains=q) | 
+            models.Q(nombre__icontains=q) |
             models.Q(categoria__code__icontains=q)
         )
-    
+
     servicios = servicios.order_by("nombre")[:20]
 
     data = [
@@ -1179,7 +1179,7 @@ def exportar_documento_pdf(request, documento_id):
 
     # Obtener información de la empresa desde ConfiguracionEmpresa
     from taller.models import ConfiguracionEmpresa
-    
+
     try:
         config_empresa = ConfiguracionEmpresa.objects.get(empresa=doc.empresa)
         company_info = {
@@ -1211,7 +1211,7 @@ def exportar_documento_pdf(request, documento_id):
         "country": country,
         **company_info,  # Incluir información de la empresa
     }
-    
+
     # Agregar logo en base64 si existe configuración
     if config_empresa:
         # Agregar logo en base64 para el PDF
@@ -1233,7 +1233,7 @@ def exportar_documento_pdf(request, documento_id):
                         mime_type = 'image/gif'
                     else:
                         mime_type = 'image/png'  # fallback
-                    
+
                     context["logo_base64"] = f"data:{mime_type};base64,{logo_data}"
             except Exception as e:
                 print(f"Error cargando logo: {e}")
@@ -1283,7 +1283,7 @@ def enviar_documento_whatsapp(request, documento_id):
     from taller.models import Documento
     from django.http import JsonResponse
     import re
-    
+
     try:
         documento = Documento.objects.get(id=documento_id, empresa=request.user.empresa)
     except Documento.DoesNotExist:
@@ -1291,28 +1291,28 @@ def enviar_documento_whatsapp(request, documento_id):
             'success': False,
             'error': 'Documento no encontrado'
         }, status=404)
-    
+
     # Verificar que el cliente tenga teléfono
     if not documento.cliente.telefono:
         return JsonResponse({
             'success': False,
             'error': 'El cliente no tiene número de teléfono registrado'
         })
-    
+
     # Limpiar y validar número de teléfono
     telefono = documento.cliente.telefono.replace('+', '').replace(' ', '').replace('-', '').replace('(', '').replace(')', '')
-    
+
     # Validar formato chileno
     if not re.match(r'^(\+56|56)?[2-9]\d{8}$', telefono):
         return JsonResponse({
             'success': False,
             'error': 'Número de teléfono inválido. Debe ser un número chileno válido'
         })
-    
+
     # Formatear número para WhatsApp
     if not telefono.startswith('56'):
         telefono = '56' + telefono
-    
+
     # Crear mensaje personalizado
     mensaje = f"""Hola {documento.cliente.nombre},
 
@@ -1327,14 +1327,13 @@ Para ver el documento completo, visite:
 {request.build_absolute_uri(f'/cl/documentos/{documento.id}/')}
 
 ¡Gracias por confiar en nuestros servicios!"""
-    
+
     # Crear URL de WhatsApp
     url_whatsapp = f"https://wa.me/{telefono}?text={mensaje.replace(' ', '%20').replace('\n', '%0A')}"
-    
+
     return JsonResponse({
         'success': True,
         'url_whatsapp': url_whatsapp,
         'telefono': telefono,
         'mensaje': mensaje
     })
-

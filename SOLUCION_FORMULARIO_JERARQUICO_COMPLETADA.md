@@ -151,5 +151,3 @@ if (modeloInicial) {
    - Solo se cargan cuando se selecciona un modelo válido
 
 El formulario jerárquico ahora funciona correctamente con todos los textos en inglés y respeta las dependencias entre modelo, motor y caja.
-
-

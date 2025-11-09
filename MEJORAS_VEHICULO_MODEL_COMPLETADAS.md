@@ -60,15 +60,15 @@ def clean(self):
 ```python
 class VehiculoQuerySet(models.QuerySet):
     """QuerySet personalizado para Vehiculo con métodos de conveniencia"""
-    
+
     def de_empresa(self, empresa):
         """Filtrar por empresa"""
         return self.filter(empresa=empresa)
-    
+
     def de_cliente(self, cliente_id):
         """Filtrar por cliente"""
         return self.filter(cliente_id=cliente_id)
-    
+
     def con_vin(self):
         """Filtrar vehículos que tienen VIN"""
         return self.exclude(Q(vin__isnull=True) | Q(vin=""))
@@ -81,7 +81,7 @@ objects = VehiculoQuerySet.as_manager()
 
 **Métodos disponibles**:
 - ✅ `de_empresa(empresa)` - Filtrar por empresa
-- ✅ `de_cliente(cliente_id)` - Filtrar por cliente  
+- ✅ `de_cliente(cliente_id)` - Filtrar por cliente
 - ✅ `con_vin()` - Filtrar vehículos con VIN
 
 ### 3. **🏷️ Helper display_label() para AJAX**
@@ -94,17 +94,17 @@ def display_label(self):
         parts.append(self.patente)
     elif self.vin:
         parts.append(self.vin)
-    
+
     marca = self.get_marca_display()
     modelo = self.get_modelo_display()
-    
+
     if marca and marca != "Sin marca":
         parts.append(marca)
     if modelo and modelo != "Sin modelo":
         parts.append(modelo)
     if self.anio:
         parts.append(str(self.anio))
-    
+
     return " · ".join(parts) or f"Vehículo {self.pk}"
 ```
 

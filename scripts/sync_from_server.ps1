@@ -76,13 +76,13 @@ if ($changes) {
     if ($showDiff -eq "s") {
         git diff
     }
-    
+
     # 5. Commit de los cambios del servidor
     Write-Host ""
     Write-Host "6. Commiteando cambios del servidor..." -ForegroundColor Cyan
     git add -A
     git commit -m "sync: Cambios rescatados del servidor ($(Get-Date -Format 'yyyy-MM-dd HH:mm'))"
-    
+
     Write-Host ""
     Write-Host "CAMBIOS DEL SERVIDOR GUARDADOS EN BRANCH: $branchName" -ForegroundColor Green
     Write-Host ""

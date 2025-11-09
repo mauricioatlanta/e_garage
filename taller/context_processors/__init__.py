@@ -43,138 +43,126 @@ def empresa_contexto(request):  # noqa: D401
 
 
 def company_branding(request):
-    """Inyecta configuración extendida de branding.
-
-    Usa caché por usuario para reducir consultas.
-    Importa el modelo de forma perezosa para evitar ciclos.
     """
-    user = getattr(request, "user", None)
-    if not user or not user.is_authenticated:
-        return {
-            "company_settings": None,
-            "company_name": "eGarage",
-            "company_logo": "/static/images/egarage_default_logo.png",
-            "company_logo_url": "/static/images/egarage_default_logo.png",
-            "primary_color": "#0d6efd",
-            "company_color": "#0d6efd",  # Alias para compatibilidad
-            "secondary_color": "#6c757d",
-        }
+    Context processor unificado de branding.
+    Retorna objeto BRAND con todas las propiedades de marca.
+    Usa empresa del request (middleware) o del usuario.
+    """
+    from django.conf import settings
+    from django.contrib.auth.models import AnonymousUser
 
     from taller.models import ConfiguracionEmpresa
     from taller.models.company_settings import CompanySettings
     from taller.models.empresa import Empresa
 
-    cache_key = f"company_branding_{user.id}"
-    cached_data = cache.get(cache_key)
+    user = getattr(request, "user", None)
 
-    if cached_data is None:
-        try:
-            # Buscar empresa del usuario
-            empresa = None
-            try:
-                empresa = Empresa.objects.get(user=user)
-            except Empresa.DoesNotExist:
-                try:
-                    empresa = Empresa.objects.filter(usuario=user).first()
-                except:
-                    pass
+    # Defaults del sistema
+    brand = {
+        "logo_url": getattr(settings, "DEFAULT_BRAND_LOGO_URL", None),
+        "name": getattr(settings, "DEFAULT_BRAND_NAME", "eGarage"),
+        "tagline": getattr(
+            settings, "DEFAULT_BRAND_TAGLINE", "Mission Control for your Workshop"
+        ),
+        "country": getattr(settings, "DEFAULT_BRAND_COUNTRY", "cl"),
+        "currency": getattr(settings, "DEFAULT_BRAND_CURRENCY", "CLP"),
+        "primary_color": getattr(settings, "DEFAULT_BRAND_PRIMARY_COLOR", "#0d6efd"),
+        "secondary_color": getattr(
+            settings, "DEFAULT_BRAND_SECONDARY_COLOR", "#6c757d"
+        ),
+    }
 
-            # Buscar configuración de empresa (nueva tabla CompanySettings)
-            company_settings = None
-            try:
-                company_settings = CompanySettings.objects.get(user=user)
-            except CompanySettings.DoesNotExist:
-                # Fallback a la configuración antigua
-                if empresa:
-                    try:
-                        company_settings = empresa.config
-                    except ConfiguracionEmpresa.DoesNotExist:
-                        pass
-
-            # Determinar logo URL
-            logo_url = "/static/images/egarage_default_logo.png"
-            if (
-                company_settings
-                and hasattr(company_settings, "logo")
-                and company_settings.logo
-            ):
-                logo_url = company_settings.logo.url
-
-            # Determinar nombre de empresa
-            company_name = "eGarage"
-            if company_settings:
-                if (
-                    hasattr(company_settings, "company_name")
-                    and company_settings.company_name
-                ):
-                    company_name = company_settings.company_name
-                elif (
-                    hasattr(company_settings, "nombre_publico")
-                    and company_settings.nombre_publico
-                ):
-                    company_name = company_settings.nombre_publico
-            elif empresa:
-                company_name = empresa.nombre_taller
-
-            # Determinar colores
-            primary_color = "#0d6efd"
-            if company_settings:
-                if (
-                    hasattr(company_settings, "primary_color")
-                    and company_settings.primary_color
-                ):
-                    primary_color = company_settings.primary_color
-                elif (
-                    hasattr(company_settings, "brand_color")
-                    and company_settings.brand_color
-                ):
-                    primary_color = company_settings.brand_color
-
-            cached_data = {
-                "company_settings": company_settings,
-                "company_name": company_name,
-                "company_logo": logo_url,
-                "company_logo_url": logo_url,
-                "primary_color": primary_color,
-                "company_color": primary_color,  # Alias para compatibilidad
-                "secondary_color": "#6c757d",
-            }
-
-            if company_settings:
-                # Agregar campos adicionales según el tipo de configuración
-                if hasattr(company_settings, "tagline") and company_settings.tagline:
-                    cached_data["company_tagline"] = company_settings.tagline
-                if hasattr(company_settings, "currency") and company_settings.currency:
-                    cached_data["company_currency"] = company_settings.currency
-                elif hasattr(company_settings, "moneda") and company_settings.moneda:
-                    cached_data["company_currency"] = company_settings.moneda
-
-            cache.set(cache_key, cached_data, 3600)
-        except Exception as e:
-            print(f"Error en company_branding: {e}")
-            cache.set(cache_key, "error", 600)
-            cached_data = {
-                "company_settings": None,
-                "company_name": "eGarage",
-                "company_logo": "/static/images/egarage_default_logo.png",
-                "company_logo_url": "/static/images/egarage_default_logo.png",
-                "primary_color": "#0d6efd",
-                "company_color": "#0d6efd",  # Alias para compatibilidad
-                "secondary_color": "#6c757d",
-            }
-
-    if cached_data == "error":
-        cached_data = {
-            "company_settings": None,
-            "company_name": "eGarage",
-            "company_logo": "/static/images/egarage_default_logo.png",
-            "company_logo_url": "/static/images/egarage_default_logo.png",
-            "primary_color": "#0d6efd",
-            "company_color": "#0d6efd",  # Alias para compatibilidad
-            "secondary_color": "#6c757d",
+    # Si no hay usuario autenticado, retornar defaults
+    if not user or not user.is_authenticated or isinstance(user, AnonymousUser):
+        return {
+            "BRAND": brand,
+            "company_name": brand["name"],
+            "company_logo_url": brand["logo_url"],
+            "company_tagline": brand.get("tagline"),
+            "primary_color": brand["primary_color"],
+            "secondary_color": brand["secondary_color"],
+            "company_color": brand["primary_color"],
         }
 
-    return cached_data
+    # Buscar empresa del usuario
+    empresa = getattr(request, "empresa_actual", None)
+    if not empresa:
+        try:
+            empresa = Empresa.objects.get(user=user)
+        except Empresa.DoesNotExist:
+            try:
+                empresa = Empresa.objects.filter(usuario=user).first()
+            except:
+                pass
+
+    if empresa:
+        # 1. PRIORIDAD MÁXIMA: CompanySettings (tabla nueva)
+        try:
+            company_settings = CompanySettings.objects.get(user=user)
+            if company_settings.logo:
+                brand["logo_url"] = company_settings.logo.url
+            if (
+                hasattr(company_settings, "company_name")
+                and company_settings.company_name
+            ):
+                brand["name"] = company_settings.company_name
+            if hasattr(company_settings, "tagline") and company_settings.tagline:
+                brand["tagline"] = company_settings.tagline
+            if (
+                hasattr(company_settings, "primary_color")
+                and company_settings.primary_color
+            ):
+                brand["primary_color"] = company_settings.primary_color
+            if (
+                hasattr(company_settings, "secondary_color")
+                and company_settings.secondary_color
+            ):
+                brand["secondary_color"] = company_settings.secondary_color
+        except CompanySettings.DoesNotExist:
+            pass
+
+        # 2. SEGUNDA PRIORIDAD: ConfiguracionEmpresa (si no hay CompanySettings)
+        if not brand["logo_url"]:
+            try:
+                conf = ConfiguracionEmpresa.objects.get(empresa=empresa)
+                if conf.logo:
+                    brand["logo_url"] = conf.logo.url
+                if hasattr(conf, "nombre_publico") and conf.nombre_publico:
+                    brand["name"] = conf.nombre_publico
+                if hasattr(conf, "tagline") and conf.tagline:
+                    brand["tagline"] = conf.tagline
+                if hasattr(conf, "brand_color") and conf.brand_color:
+                    brand["primary_color"] = conf.brand_color
+                if hasattr(conf, "moneda") and conf.moneda:
+                    brand["currency"] = conf.moneda
+                if hasattr(conf, "pais") and conf.pais:
+                    brand["country"] = conf.pais
+            except ConfiguracionEmpresa.DoesNotExist:
+                pass
+
+        # 3. TERCERA PRIORIDAD: Empresa directamente (fallback)
+        if not brand["logo_url"] and hasattr(empresa, "logo") and empresa.logo:
+            brand["logo_url"] = empresa.logo.url
+        if brand["name"] == getattr(settings, "DEFAULT_BRAND_NAME", "eGarage"):
+            brand["name"] = empresa.nombre_taller
+        if hasattr(empresa, "pais") and empresa.pais:
+            brand["country"] = empresa.pais.lower()
+        if hasattr(empresa, "moneda") and empresa.moneda:
+            brand["currency"] = empresa.moneda
+
+    # Retornar objeto BRAND + variables de compatibilidad
+    return {
+        "BRAND": brand,
+        # Backwards compatibility
+        "company_name": brand["name"],
+        "company_logo_url": brand["logo_url"],
+        "company_tagline": brand.get("tagline"),
+        "primary_color": brand["primary_color"],
+        "secondary_color": brand["secondary_color"],
+        "company_color": brand["primary_color"],
+        "company_country": brand["country"],
+        "company_currency": brand["currency"],
+    }
 
 
 def company_country(request):

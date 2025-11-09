@@ -1,6 +1,6 @@
 # 🚀 GUÍA DE ACTUALIZACIÓN SEGURA - PythonAnywhere
 
-**Fecha**: 26 de octubre de 2025  
+**Fecha**: 26 de octubre de 2025
 **Objetivo**: Actualizar eGarage sin perder datos de suscriptores
 
 ---
@@ -423,7 +423,7 @@ python manage.py shell
 
 >>> from django.contrib.auth.models import User
 >>> User.objects.count()  # Mismo número que antes
->>> 
+>>>
 >>> from taller.models.empresa import Empresa
 >>> Empresa.objects.count()  # Mismo número que antes
 >>>
@@ -612,4 +612,3 @@ tail -f /var/log/tu_usuario.pythonanywhere.com.error.log
 **NUNCA actualices producción sin backup. NUNCA.**
 
 ¿Tienes preguntas antes de comenzar? 🎯
-

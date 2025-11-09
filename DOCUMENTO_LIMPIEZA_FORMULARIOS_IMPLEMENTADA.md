@@ -132,14 +132,14 @@ class DocumentoForm(forms.ModelForm):
 def clean(self):
     """Validaciones robustas multi-tenant"""
     cleaned_data = super().clean()
-    
+
     # Validar que cliente pertenece a la empresa
     cliente = cleaned_data.get('cliente')
     vehiculo = cleaned_data.get('vehiculo')
-    
+
     if cliente and self.empresa and cliente.empresa != self.empresa:
         raise forms.ValidationError("El cliente seleccionado no pertenece a tu empresa.")
-    
+
     # Validaciones específicas por país
     if self.country == "CL":
         if cleaned_data.get('millas'):
@@ -147,7 +147,7 @@ def clean(self):
     elif self.country == "US":
         if not cleaned_data.get('kilometraje') and not cleaned_data.get('millas'):
             raise forms.ValidationError("Debe especificar al menos kilometraje o millas.")
-    
+
     return cleaned_data
 ```
 
@@ -187,12 +187,12 @@ from taller.forms import DocumentoForm
 def documento_crear(request):
     empresa = getattr(request.user, "empresa", None)
     country = empresa.pais if empresa else "CL"
-    
+
     if request.method == "POST":
         form = DocumentoForm(
-            request.POST, 
-            user=request.user, 
-            empresa=empresa, 
+            request.POST,
+            user=request.user,
+            empresa=empresa,
             country=country
         )
         if form.is_valid():
@@ -200,11 +200,11 @@ def documento_crear(request):
             return redirect('documentos:detalle', pk=documento.pk)
     else:
         form = DocumentoForm(
-            user=request.user, 
-            empresa=empresa, 
+            user=request.user,
+            empresa=empresa,
             country=country
         )
-    
+
     return render(request, 'documentos/crear.html', {'form': form})
 ```
 
@@ -236,7 +236,7 @@ def get_autocomplete_url(country, target):
     """Helper para generar URLs de autocompletado según el país"""
     country_mapping = {
         "US": "usa:autocomplete",
-        "CL": "cl:autocomplete", 
+        "CL": "cl:autocomplete",
         "MX": "mx:autocomplete",  # Nuevo país
         "AR": "ar:autocomplete",  # Nuevo país
     }

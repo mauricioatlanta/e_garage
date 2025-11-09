@@ -382,11 +382,11 @@ body {
     .glass-card {
         padding: 2rem 1.5rem;
     }
-    
+
     .logo {
         height: 80px;
     }
-    
+
     .back-button {
         top: 1rem;
         left: 1rem;
@@ -428,12 +428,6 @@ body {
             </div>
             <div class="welcome-text">{% trans "Welcome back to" %}</div>
             <div class="subtitle-text font-futuristic">{% trans "Professional Automotive Management System" %}</div>
-            
-            {% if request.country == 'CL' %}
-            <div class="country-badge font-futuristic">🇨🇱 CHILE</div>
-            {% elif request.country == 'US' %}
-            <div class="country-badge font-futuristic">🇺🇸 UNITED STATES</div>
-            {% endif %}
         </div>
 
         <!-- Mensajes de error generales -->
@@ -541,7 +535,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const card = document.querySelector('.glass-card');
     card.style.opacity = '0';
     card.style.transform = 'translateY(30px)';
-    
+
     setTimeout(() => {
         card.style.transition = 'all 0.8s ease-out';
         card.style.opacity = '1';

@@ -118,4 +118,3 @@ echo "      /home/atlantareciclajes/egarage_update/"
 echo "   3. Ejecutar: ./2_actualizar_FIXED.sh"
 echo ""
 echo "======================================================"
-

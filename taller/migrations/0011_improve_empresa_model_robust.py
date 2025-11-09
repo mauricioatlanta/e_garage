@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("taller", "0010_improve_tecnico_model_multi_tenant"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),

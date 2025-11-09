@@ -1,7 +1,7 @@
 # ✅ Autocompletado Inteligente de Clientes - IMPLEMENTADO
 
-**Fecha:** 1 de octubre, 2025  
-**Estado:** ✅ COMPLETADO Y FUNCIONANDO  
+**Fecha:** 1 de octubre, 2025
+**Estado:** ✅ COMPLETADO Y FUNCIONANDO
 **URL:** http://127.0.0.1:8000/us/vehiculos/crear/
 
 ---
@@ -50,7 +50,7 @@ class ClienteAutocomplete(autocomplete.Select2QuerySetView):
         # Filtrado por empresa del usuario
         empresa = getattr(self.request.user, "empresa", None)
         qs = Cliente.objects.filter(empresa=empresa)
-        
+
         # Búsqueda multi-campo case-insensitive
         if self.q:
             qs = qs.filter(
@@ -60,7 +60,7 @@ class ClienteAutocomplete(autocomplete.Select2QuerySetView):
                 Q(telefono__icontains=self.q) |
                 Q(tax_id__icontains=self.q)
             )
-        
+
         return qs
 ```
 
@@ -244,5 +244,3 @@ cache_key = f"clientes_empresa_{empresa.id}_{self.q}"
 ---
 
 **¡Implementación completada exitosamente!** 🚀
-
-

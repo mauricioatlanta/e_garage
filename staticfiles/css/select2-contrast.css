@@ -1,67 +1,45 @@
 /* Select2 contraste perfecto para tema oscuro */
-.select2-container { 
-  width: 100% !important; 
-  font-family: 'Montserrat', Arial, sans-serif; 
+.select2-container {
+  width: 100% !important;
+  font-family: 'Montserrat', Arial, sans-serif;
 }
 
 .select2-container .select2-selection--single {
-  background: #0b1020; 
-  border: 1px solid #334155; 
+  background: #0b1020;
+  border: 1px solid #334155;
   color: #e6f0ff;
-  min-height: 42px; 
+  min-height: 42px;
   border-radius: 10px;
 }
 
 .select2-container--default .select2-selection--single .select2-selection__rendered {
-  color: #e6f0ff; 
-  line-height: 40px; 
+  color: #e6f0ff;
+  line-height: 40px;
   padding-left: 12px;
 }
 
-.select2-container--default .select2-selection--single .select2-selection__placeholder { 
-  color: #8ea3c0; 
+.select2-container--default .select2-selection--single .select2-selection__placeholder {
+  color: #8ea3c0;
 }
 
-.select2-container--default .select2-results__options { 
-  background: #0b1020; 
-  color: #e6f0ff; 
+.select2-container--default .select2-results__options {
+  background: #0b1020;
+  color: #e6f0ff;
 }
 
-.select2-container--default .select2-results__option--highlighted { 
-  background: #1e293b; 
-  color: #e6f0ff; 
+.select2-container--default .select2-results__option--highlighted {
+  background: #1e293b;
+  color: #e6f0ff;
 }
 
 .select2-container--default.select2-container--focus .select2-selection--single,
 .select2-container--default .select2-selection--single:focus {
-  border-color: #22d3ee; 
+  border-color: #22d3ee;
   box-shadow: 0 0 0 2px rgba(34,211,238,.25);
 }
 
 .select2-container .select2-search--dropdown .select2-search__field {
-  background: #0f172a; 
-  border: 1px solid #334155; 
+  background: #0f172a;
+  border: 1px solid #334155;
   color: #e6f0ff;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

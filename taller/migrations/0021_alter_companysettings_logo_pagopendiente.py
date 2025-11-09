@@ -3,13 +3,13 @@
 import django.core.validators
 import django.db.models.deletion
 import django.utils.timezone
-import taller.models.company_settings
 from django.conf import settings
 from django.db import migrations, models
 
+import taller.models.company_settings
+
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("taller", "0020_remove_lineaotroservicio_idx_los_doc_and_more"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),

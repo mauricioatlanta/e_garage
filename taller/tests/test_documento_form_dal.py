@@ -1,13 +1,14 @@
 import json
+
 import pytest
+
+from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils import timezone
 
-from taller.models.documento import Documento
 from taller.models.clientes import Cliente
-from taller.models.vehiculos import Vehiculo
 from taller.models.empresa import Empresa
-from django.contrib.auth.models import User
+from taller.models.vehiculos import Vehiculo
 
 
 # ---------- Fixtures simples ----------
@@ -15,15 +16,21 @@ from django.contrib.auth.models import User
 @pytest.mark.django_db
 def user_cl(db):
     u = User.objects.create_user(username="mauri", password="pass")
-    Empresa.objects.create(user=u, nombre_taller="EG Chile", pais="CL")  # moneda CLP por save()
+    Empresa.objects.create(
+        user=u, nombre_taller="EG Chile", pais="CL"
+    )  # moneda CLP por save()
     return u
+
 
 @pytest.fixture
 @pytest.mark.django_db
 def user_us(db):
     u = User.objects.create_user(username="john", password="pass")
-    Empresa.objects.create(user=u, nombre_taller="EG USA", pais="US")  # moneda USD por save()
+    Empresa.objects.create(
+        user=u, nombre_taller="EG USA", pais="US"
+    )  # moneda USD por save()
     return u
+
 
 @pytest.fixture
 @pytest.mark.django_db
@@ -32,15 +39,23 @@ def cliente_y_vehiculos(user_cl):
     c1 = Cliente.objects.create(empresa=emp, nombre="Acme Ltda.")
     c2 = Cliente.objects.create(empresa=emp, nombre="Otro Cliente")
 
-    v1 = Vehiculo.objects.create(empresa=emp, cliente=c1, patente="AAA11", vin="VIN-111", anio=2020)
-    v2 = Vehiculo.objects.create(empresa=emp, cliente=c1, patente="BBB22", vin="VIN-222", anio=2021)
-    v3 = Vehiculo.objects.create(empresa=emp, cliente=c2, patente="CCC33", vin="VIN-333", anio=2022)
+    v1 = Vehiculo.objects.create(
+        empresa=emp, cliente=c1, patente="AAA11", vin="VIN-111", anio=2020
+    )
+    v2 = Vehiculo.objects.create(
+        empresa=emp, cliente=c1, patente="BBB22", vin="VIN-222", anio=2021
+    )
+    v3 = Vehiculo.objects.create(
+        empresa=emp, cliente=c2, patente="CCC33", vin="VIN-333", anio=2022
+    )
     return c1, c2, v1, v2, v3
 
 
 # ---------- Tests del Form ----------
 @pytest.mark.django_db
-def test_form_filtra_vehiculos_por_cliente_en_post(client, user_cl, cliente_y_vehiculos):
+def test_form_filtra_vehiculos_por_cliente_en_post(
+    client, user_cl, cliente_y_vehiculos
+):
     c1, c2, v1, v2, v3 = cliente_y_vehiculos
     client.login(username="mauri", password="pass")
 
@@ -50,8 +65,8 @@ def test_form_filtra_vehiculos_por_cliente_en_post(client, user_cl, cliente_y_ve
         "tipo": "OT",
         "numero": "",
         "fecha_emision": timezone.now().date(),
-        "cliente": str(c1.id),                # ← cliente posteado
-        "vehiculo": str(v1.id),               # ← pertenece a c1
+        "cliente": str(c1.id),  # ← cliente posteado
+        "vehiculo": str(v1.id),  # ← pertenece a c1
         "observaciones": "",
         "pagado": "",
     }
@@ -60,13 +75,18 @@ def test_form_filtra_vehiculos_por_cliente_en_post(client, user_cl, cliente_y_ve
 
     # Ahora intenta usar vehículo de OTRO cliente
     data["vehiculo"] = str(v3.id)  # v3 pertenece a c2
-    form2 = DocumentoForm(data=data, user=user_cl, empresa=user_cl.empresa, country="CL")
+    form2 = DocumentoForm(
+        data=data, user=user_cl, empresa=user_cl.empresa, country="CL"
+    )
     assert not form2.is_valid()
     # Verificar que hay errores de validación
     assert form2.errors
     # El error puede estar en __all__ o en el campo específico
     if "__all__" in form2.errors:
-        assert "El vehículo seleccionado no pertenece al cliente." in form2.errors["__all__"][0]
+        assert (
+            "El vehículo seleccionado no pertenece al cliente."
+            in form2.errors["__all__"][0]
+        )
     else:
         # Si no está en __all__, debe estar en el campo vehiculo
         assert "vehiculo" in form2.errors
@@ -77,12 +97,16 @@ def test_form_restringe_cliente_y_vehiculo_a_empresa(client, user_cl, user_us):
     # Datos en CL
     emp_cl = user_cl.empresa
     c_cl = Cliente.objects.create(empresa=emp_cl, nombre="Cliente CL")
-    v_cl = Vehiculo.objects.create(empresa=emp_cl, cliente=c_cl, patente="CLP11", vin="VIN-CLP", anio=2020)
+    v_cl = Vehiculo.objects.create(
+        empresa=emp_cl, cliente=c_cl, patente="CLP11", vin="VIN-CLP", anio=2020
+    )
 
     # Datos en US
     emp_us = user_us.empresa
     c_us = Cliente.objects.create(empresa=emp_us, nombre="Customer US")
-    v_us = Vehiculo.objects.create(empresa=emp_us, cliente=c_us, patente="USA22", vin="VIN-USA", anio=2020)
+    v_us = Vehiculo.objects.create(
+        empresa=emp_us, cliente=c_us, patente="USA22", vin="VIN-USA", anio=2020
+    )
 
     from taller.documentos.forms import DocumentoForm
 
@@ -112,12 +136,12 @@ def test_form_restringe_cliente_y_vehiculo_a_empresa(client, user_cl, user_us):
 @pytest.mark.django_db
 def test_form_labels_por_pais(client, user_cl, user_us):
     from taller.documentos.forms import DocumentoForm
-    
+
     # Test Chile
     form_cl = DocumentoForm(user=user_cl, empresa=user_cl.empresa, country="CL")
     assert form_cl.fields["cliente"].label == "Cliente"
     assert form_cl.fields["vehiculo"].label == "Vehículo"
-    
+
     # Test USA
     form_us = DocumentoForm(user=user_us, empresa=user_us.empresa, country="US")
     assert form_us.fields["cliente"].label == "Customer"
@@ -127,12 +151,12 @@ def test_form_labels_por_pais(client, user_cl, user_us):
 @pytest.mark.django_db
 def test_form_urls_dal_por_pais(client, user_cl, user_us):
     from taller.documentos.forms import DocumentoForm
-    
+
     # Test Chile
     form_cl = DocumentoForm(user=user_cl, empresa=user_cl.empresa, country="CL")
     assert "/cl/autocomplete/cliente/" in form_cl.fields["cliente"].widget.url
     assert "/cl/autocomplete/vehiculo/" in form_cl.fields["vehiculo"].widget.url
-    
+
     # Test USA
     form_us = DocumentoForm(user=user_us, empresa=user_us.empresa, country="US")
     assert "/us/autocomplete/cliente/" in form_us.fields["cliente"].widget.url
@@ -142,7 +166,7 @@ def test_form_urls_dal_por_pais(client, user_cl, user_us):
 @pytest.mark.django_db
 def test_form_forward_dal_vehiculo(client, user_cl):
     from taller.documentos.forms import DocumentoForm
-    
+
     form = DocumentoForm(user=user_cl, empresa=user_cl.empresa, country="CL")
     assert "cliente" in form.fields["vehiculo"].widget.forward
 
@@ -169,7 +193,9 @@ def test_cliente_autocomplete_filtra_por_empresa(client, user_cl):
 
 
 @pytest.mark.django_db
-def test_vehiculo_autocomplete_filtra_por_cliente_forward(client, user_cl, cliente_y_vehiculos):
+def test_vehiculo_autocomplete_filtra_por_cliente_forward(
+    client, user_cl, cliente_y_vehiculos
+):
     client.login(username="mauri", password="pass")
     c1, c2, v1, v2, v3 = cliente_y_vehiculos
 
@@ -201,16 +227,19 @@ def test_autocomplete_usa_namespace(client, user_us):
 @pytest.mark.django_db
 def test_form_widget_ids_set_correctly(client, user_cl):
     from taller.documentos.forms import DocumentoForm
-    
+
     form = DocumentoForm(user=user_cl, empresa=user_cl.empresa, country="CL")
-    
+
     # Verificar que todos los campos tienen IDs únicos
-    assert form.fields['tipo'].widget.attrs.get('id') == 'id_tipo'
-    assert form.fields['numero'].widget.attrs.get('id') == 'id_numero'
-    assert form.fields['fecha_emision'].widget.attrs.get('id') == 'id_fecha_emision'
-    assert form.fields['cliente'].widget.attrs.get('id') == 'id_cliente'
-    assert form.fields['vehiculo'].widget.attrs.get('id') == 'id_vehiculo'
-    assert form.fields['tecnico_responsable'].widget.attrs.get('id') == 'id_tecnico_responsable'
-    assert form.fields['kilometraje'].widget.attrs.get('id') == 'id_kilometraje'
-    assert form.fields['observaciones'].widget.attrs.get('id') == 'id_observaciones'
-    assert form.fields['pagado'].widget.attrs.get('id') == 'id_pagado'
+    assert form.fields["tipo"].widget.attrs.get("id") == "id_tipo"
+    assert form.fields["numero"].widget.attrs.get("id") == "id_numero"
+    assert form.fields["fecha_emision"].widget.attrs.get("id") == "id_fecha_emision"
+    assert form.fields["cliente"].widget.attrs.get("id") == "id_cliente"
+    assert form.fields["vehiculo"].widget.attrs.get("id") == "id_vehiculo"
+    assert (
+        form.fields["tecnico_responsable"].widget.attrs.get("id")
+        == "id_tecnico_responsable"
+    )
+    assert form.fields["kilometraje"].widget.attrs.get("id") == "id_kilometraje"
+    assert form.fields["observaciones"].widget.attrs.get("id") == "id_observaciones"
+    assert form.fields["pagado"].widget.attrs.get("id") == "id_pagado"

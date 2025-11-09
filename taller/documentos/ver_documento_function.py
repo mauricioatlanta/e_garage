@@ -1,4 +1,5 @@
 from decimal import Decimal
+
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render
 
@@ -9,7 +10,7 @@ from taller.models.documento import Documento  # ← import absoluto correcto
 def ver_documento(request, documento_id):
     """
     Vista para mostrar un documento con validación multi-tenant y cálculos precisos.
-    
+
     Características:
     - 🔒 Seguro: filtra por empresa=request.user.empresa
     - 📐 Preciso: usa Decimal, evita floats
@@ -33,14 +34,16 @@ def ver_documento(request, documento_id):
     # Cargar líneas relacionadas usando related_names correctos
     # Los modelos tienen related_names específicos:
     # - LineaRepuesto: related_name="lineas_repuesto"
-    # - LineaServicio: related_name="lineas_servicio"  
+    # - LineaServicio: related_name="lineas_servicio"
     # - LineaOtroServicio: related_name="lineas_otro_servicio"
     lineas_repuesto = documento.lineas_repuesto.all()
     lineas_servicio = documento.lineas_servicio.all()
     lineas_otro_servicio = documento.lineas_otro_servicio.all()
-    
+
     # Para compatibilidad con templates existentes, combinar todas las líneas
-    detalles = list(lineas_repuesto) + list(lineas_servicio) + list(lineas_otro_servicio)
+    detalles = (
+        list(lineas_repuesto) + list(lineas_servicio) + list(lineas_otro_servicio)
+    )
 
     return render(
         request,

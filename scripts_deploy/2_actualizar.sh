@@ -211,4 +211,3 @@ echo "   4. Esperar 10-15 segundos"
 echo "   5. Probar: https://atlantareciclajes.pythonanywhere.com/"
 echo ""
 echo "======================================================"
-

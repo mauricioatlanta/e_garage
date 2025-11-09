@@ -19,12 +19,12 @@
   // Configuración global para el formulario de documentos
   window.EG = window.EG || {};
   window.EG.endpoints = window.EG.endpoints || {};
-  
+
   // Endpoints específicos del formulario
   {% if request.resolver_match.url_name == 'documento_editar' %}
     window.EG.endpoints.docNextNumberUrl = "{% url 'documentos:api_next_number' %}";
   {% endif %}
-  
+
   // Configuración de país
   window.EG.config = window.EG.config || {};
   window.EG.config.COUNTRY = "{{ request.user.empresa.pais|default:'CL' }}";

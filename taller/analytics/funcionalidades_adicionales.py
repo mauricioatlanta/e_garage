@@ -1,7 +1,9 @@
-"""
-🚀 FUNCIONALIDADES ADICIONALES PARA EL DASHBOARD ADMIN
-Implementaciones avanzadas sugeridas por el usuario
-"""
+"""eGarage — módulo limpiado para pre-commit (docstring al inicio)."""
+
+# """
+# 🚀 FUNCIONALIDADES ADICIONALES PARA EL DASHBOARD ADMIN
+# Implementaciones avanzadas sugeridas por el usuario
+# """
 
 from collections import defaultdict
 from datetime import timedelta
@@ -536,12 +538,12 @@ def real_time_metrics_api(request):
 # ===============================================
 
 # Agregar estas URLs a taller/analytics/urls.py:
-"""
-    # === FUNCIONALIDADES ADICIONALES ===
-    path('admin/dashboard/predictive/', predictive_indicators_api, name='predictive_api'),
-    path('admin/dashboard/geographic/', geographic_map_api, name='geographic_api'),
-    path('admin/dashboard/alertas/', alertas_expiracion_api, name='alertas_api'),
-    path('admin/dashboard/recordatorio/<int:empresa_id>/', enviar_recordatorio_expiracion, name='enviar_recordatorio'),
-    path('admin/dashboard/behavior/', user_behavior_api, name='behavior_api'),
-    path('admin/dashboard/realtime/', real_time_metrics_api, name='realtime_api'),
-"""
+# """
+#     # === FUNCIONALIDADES ADICIONALES ===
+#     path('admin/dashboard/predictive/', predictive_indicators_api, name='predictive_api'),
+#     path('admin/dashboard/geographic/', geographic_map_api, name='geographic_api'),
+#     path('admin/dashboard/alertas/', alertas_expiracion_api, name='alertas_api'),
+#     path('admin/dashboard/recordatorio/<int:empresa_id>/', enviar_recordatorio_expiracion, name='enviar_recordatorio'),
+#     path('admin/dashboard/behavior/', user_behavior_api, name='behavior_api'),
+#     path('admin/dashboard/realtime/', real_time_metrics_api, name='realtime_api'),
+# """

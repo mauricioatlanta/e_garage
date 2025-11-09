@@ -237,22 +237,22 @@ def crear_otro_servicio(request):
 
     # GET: Mostrar formulario
     categorias = CategoriaServicio.objects.filter(country=country_code)
-    
+
     # Debug: imprimir categorías encontradas
     print(f"[DEBUG] País: {country_code}")
     print(f"[DEBUG] Categorías encontradas: {categorias.count()}")
     for cat in categorias:
         print(f"[DEBUG] - {cat.id}: {cat.get_label()}")
-    
+
     context = {
         "categorias": categorias,
         "country": country_code,
     }
-    
+
     template_name = select_country_lang_template(
         "servicios/crear_otro_servicio.html", country_code, lang
     )
-    
+
     return render(request, template_name, context)
 
 

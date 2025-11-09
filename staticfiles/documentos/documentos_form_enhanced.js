@@ -5,34 +5,34 @@ console.log("📄 JavaScript externo cargado");
 function updateDocumentNumber() {
   const tipoInput = document.getElementById('tipo') || document.querySelector('input[name="tipo"]');
   const numberDisplay = document.getElementById('document-number');
-  
+
   if (!tipoInput || !numberDisplay) {
     console.log('⚠️ No se encontraron elementos para actualizar número de documento');
     return;
   }
-  
+
   const tipo = tipoInput.value;
   if (!tipo) {
     numberDisplay.textContent = 'Se generará automáticamente';
     return;
   }
-  
+
   // Mapear los valores del formulario a los valores esperados por la API
   const tipoMapping = {
     'FAC': 'FACTURA',
-    'COT': 'PRESUPUESTO', 
+    'COT': 'PRESUPUESTO',
     'ORD': 'ORDEN DE TRABAJO',
     'REC': 'RECIBO'
   };
-  
+
   const apiTipo = tipoMapping[tipo] || tipo;
-  
+
   // Detectar país desde la URL
   const countryPrefix = window.location.pathname.startsWith('/us/') ? 'us' : 'cl';
   const apiUrl = `/${countryPrefix}/documentos/api/next-number/?tipo=${apiTipo}`;
-  
+
   console.log('📡 Obteniendo número de documento para tipo:', tipo);
-  
+
   fetch(apiUrl)
     .then(response => response.json())
     .then(data => {
@@ -43,7 +43,7 @@ function updateDocumentNumber() {
         if (numeroField) {
           numeroField.value = data.numero;
         }
-        
+
         // También llenar el campo numero_documento_db
         const numeroDocumentoField = document.getElementById('id_numero_documento_db');
         if (numeroDocumentoField) {
@@ -79,21 +79,21 @@ function formatChileanPriceInput(input) {
     input.value = '';
     return;
   }
-  
+
   const numValue = parseInt(value);
   const formatted = new Intl.NumberFormat('es-CL', {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
     useGrouping: true
   }).format(numValue);
-  
+
   input.value = formatted;
 }
 
 // Función para recalcular totales con formato chileno
 function recalcTotalsChilean() {
   let sumRep = 0, sumServ = 0, sumOtros = 0;
-  
+
   // Sumar repuestos
   document.querySelectorAll('.repuesto-line, [data-repuesto-index]').forEach(l => {
     const priceInput = l.querySelector('input[name*="precio_venta"], input[name*="precio_unitario"]');
@@ -103,7 +103,7 @@ function recalcTotalsChilean() {
       const qty = parseFloat(qtyInput.value || 0);
       const subtotal = price * qty;
       sumRep += subtotal;
-      
+
       // Actualizar subtotal si existe
       const subtotalEl = l.querySelector('.subtotal, [data-subtotal]');
       if (subtotalEl) {
@@ -111,7 +111,7 @@ function recalcTotalsChilean() {
       }
     }
   });
-  
+
   // Sumar servicios
   document.querySelectorAll('.servicio-line, [data-servicio-index]').forEach(l => {
     const priceInput = l.querySelector('.servicio-valor, input[name*="precio"], input[name*="valor"]');
@@ -120,14 +120,14 @@ function recalcTotalsChilean() {
       sumServ += price;
     }
   });
-  
+
   // Sumar otros servicios
   document.querySelectorAll('.otro-servicio-line, [data-otro-servicio-index]').forEach(l => {
     const priceInput = l.querySelector('input[name*="precio"], input[name*="valor"]');
     if (priceInput) {
       const price = parseFloat(priceInput.value.replace(/[^\d]/g, '') || 0);
       sumOtros += price;
-      
+
       // Actualizar subtotal si existe
       const subtotalEl = l.querySelector('.subtotal, [data-subtotal]');
       if (subtotalEl) {
@@ -135,12 +135,12 @@ function recalcTotalsChilean() {
       }
     }
   });
-  
+
   const subtotal = sumRep + sumServ + sumOtros;
   const taxRate = 0.19; // 19% IVA Chile
   const tax = subtotal * taxRate;
   const total = subtotal + tax;
-  
+
   // Actualizar totales en la página
   const elements = {
     'total-repuestos': sumRep,
@@ -150,14 +150,14 @@ function recalcTotalsChilean() {
     'monto-impuestos': tax,
     'gran-total': total
   };
-  
+
   Object.entries(elements).forEach(([id, value]) => {
     const element = document.getElementById(id) || document.querySelector(`[data-total="${id}"]`);
     if (element) {
       element.value = formatChileanCurrency(value);
     }
   });
-  
+
   console.log('💰 Totales recalculados:', { sumRep, sumServ, sumOtros, subtotal, tax, total });
 }
 
@@ -166,7 +166,7 @@ document.addEventListener('DOMContentLoaded', function() {
   console.log("🔐 Usuario autenticado:", document.body.dataset.user || "No disponible");
   console.log("🍪 Cookies:", document.cookie);
   console.log("📄 URL actual:", window.location.href);
-  
+
   // Test simple para verificar que el JavaScript se está ejecutando
   console.log("✅ JavaScript cargado correctamente");
 
@@ -205,7 +205,7 @@ document.addEventListener('DOMContentLoaded', function() {
     vehiculoSelect: !!vehiculoSelect,
     searchResults: !!searchResults
   });
-  
+
   // Debug específico para filtrado de vehículos
   console.log("🚗 DEBUG VEHÍCULOS:", {
     clienteSelect: clienteSelect,
@@ -213,20 +213,20 @@ document.addEventListener('DOMContentLoaded', function() {
     clienteSelectId: clienteSelect?.id,
     vehiculoSelectId: vehiculoSelect?.id
   });
-  
+
   // Debug de todos los elementos del DOM
   console.log("🔍 TODOS LOS ELEMENTOS DEL DOM:");
   console.log("  - select[name='cliente']:", document.querySelector("select[name='cliente']"));
   console.log("  - select[name='vehiculo']:", document.querySelector("select[name='vehiculo']"));
   console.log("  - #id_cliente_search:", document.getElementById("id_cliente_search"));
   console.log("  - #cliente_search_results:", document.getElementById("cliente_search_results"));
-  
+
   // Debug adicional - buscar todos los selects
   console.log("🔍 TODOS LOS SELECTS EN LA PÁGINA:");
   console.log("  - Todos los selects:", document.querySelectorAll("select"));
   console.log("  - Selects con name='cliente':", document.querySelectorAll("select[name='cliente']"));
   console.log("  - Selects con name='vehiculo':", document.querySelectorAll("select[name='vehiculo']"));
-  
+
   // Verificar si los elementos existen realmente
   setTimeout(() => {
     console.log("🔍 VERIFICACIÓN DESPUÉS DE 1 SEGUNDO:");
@@ -243,7 +243,7 @@ document.addEventListener('DOMContentLoaded', function() {
       element: select
     });
   });
-  
+
 
   // Variables para control de búsqueda
   let searchTimeout = null;
@@ -282,18 +282,18 @@ document.addEventListener('DOMContentLoaded', function() {
       if (data.ok) {
         const numeroValue = data.preview || "";
         numeroField.value = numeroValue;
-        
+
         // También llenar el campo numero_documento_db
         const numeroDocumentoField = document.getElementById('id_numero_documento_db');
         if (numeroDocumentoField) {
           numeroDocumentoField.value = numeroValue;
         }
-        
+
         console.log("✅ Número actualizado:", data.preview);
       } else {
         console.error("❌ Error en respuesta:", data);
         numeroField.value = "";
-        
+
         // También limpiar el campo numero_documento_db
         const numeroDocumentoField = document.getElementById('id_numero_documento_db');
         if (numeroDocumentoField) {
@@ -303,7 +303,7 @@ document.addEventListener('DOMContentLoaded', function() {
     } catch (e) {
       console.error("❌ Error en preview:", e);
       numeroField.value = "";
-      
+
       // También limpiar el campo numero_documento_db
       const numeroDocumentoField = document.getElementById('id_numero_documento_db');
       if (numeroDocumentoField) {
@@ -393,7 +393,7 @@ document.addEventListener('DOMContentLoaded', function() {
       if (option) {
         clienteSelect.value = clienteId;
         console.log("✅ Cliente seleccionado en el select");
-        
+
         // IMPORTANTE: Disparar el evento change para activar el filtrado de vehículos
         const changeEvent = new Event('change', { bubbles: true });
         clienteSelect.dispatchEvent(changeEvent);
@@ -421,7 +421,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (clienteSearch) {
     clienteSearch.addEventListener("input", (e) => {
       const query = e.target.value.trim();
-      
+
       // Cancelar búsqueda anterior si existe
       if (searchTimeout) {
         clearTimeout(searchTimeout);
@@ -479,7 +479,7 @@ document.addEventListener('DOMContentLoaded', function() {
       url.searchParams.set("part_number", partNumber);
       console.log("🌐 Llamando a:", url.toString());
 
-      const res = await fetch(url, { 
+      const res = await fetch(url, {
         credentials: "same-origin",
         headers: {
           "X-Requested-With": "XMLHttpRequest"
@@ -598,40 +598,40 @@ document.addEventListener('DOMContentLoaded', function() {
             <input type="text" class="input repuesto-part-number" placeholder="Part number..." autocomplete="off" style="background: rgba(30, 41, 59, 0.85) !important; color: #e0faff !important; border: 1px solid #00eaff !important; font-size: 0.9rem; padding: 6px 8px;">
             <div class="repuesto-search-results" style="display: none; position: absolute; top: 100%; left: 0; right: 0; z-index: 1000; background: rgba(30, 41, 59, 0.95); border: 1px solid #00eaff; border-radius: 8px; max-height: 200px; overflow-y: auto;"></div>
           </div>
-          
+
           <div class="field">
             <label class="label" style="font-size: 0.8rem; margin-bottom: 4px;">Nombre del Repuesto</label>
             <input type="text" class="input repuesto-nombre" readonly style="background: rgba(30, 41, 59, 0.85) !important; color: #e0faff !important; border: 1px solid #00eaff !important; font-size: 0.9rem; padding: 6px 8px;">
           </div>
-          
+
           <div class="field">
             <label class="label" style="font-size: 0.8rem; margin-bottom: 4px;">Precio Compra</label>
             <input type="text" class="input repuesto-precio-compra" readonly style="background: rgba(30, 41, 59, 0.85) !important; color: #e0faff !important; border: 1px solid #00eaff !important; font-size: 0.9rem; padding: 6px 8px;">
           </div>
-          
+
           <div class="field">
             <label class="label" style="font-size: 0.8rem; margin-bottom: 4px;">Precio Venta</label>
             <input type="text" class="input repuesto-precio-venta" readonly style="background: rgba(30, 41, 59, 0.85) !important; color: #e0faff !important; border: 1px solid #00eaff !important; font-size: 0.9rem; padding: 6px 8px;">
           </div>
-          
+
           <div class="field">
             <label class="label" style="font-size: 0.8rem; margin-bottom: 4px;">Cantidad</label>
             <input type="number" class="input repuesto-cantidad" min="1" max="999" value="1" step="1" maxlength="3" style="background: rgba(30, 41, 59, 0.85) !important; color: #e0faff !important; border: 1px solid #00eaff !important; font-size: 0.9rem; padding: 6px 8px; width: 60px;">
           </div>
-          
+
           <div class="field">
             <button type="button" class="btn btn-remove-repuesto" style="font-size: 0.8rem; padding: 6px 12px;">Eliminar</button>
           </div>
         </div>
       </div>
     `;
-    
+
     repuestosContainer.insertAdjacentHTML('beforeend', newRepuestoHTML);
-    
+
     // Configurar event listeners para el nuevo repuesto
     const newRepuestoItem = repuestosContainer.lastElementChild;
     setupRepuestoEventListeners(newRepuestoItem);
-    
+
     // Limitar cantidad a máximo 3 dígitos
     const cantidadInput = newRepuestoItem.querySelector('.repuesto-cantidad');
     if (cantidadInput) {
@@ -645,7 +645,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       });
     }
-    
+
     console.log("✅ Nuevo repuesto agregado:", repuestoIndex);
   }
 
@@ -664,10 +664,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Búsqueda de repuestos
     if (partNumberInput) {
       let searchTimeout = null;
-      
+
       partNumberInput.addEventListener("input", (e) => {
         const partNumber = e.target.value.trim();
-        
+
         if (searchTimeout) {
           clearTimeout(searchTimeout);
         }
@@ -744,7 +744,7 @@ document.addEventListener('DOMContentLoaded', function() {
       url.searchParams.set("q", query);
       console.log("🌐 Llamando a:", url.toString());
 
-      const res = await fetch(url, { 
+      const res = await fetch(url, {
         credentials: "same-origin",
         headers: {
           "X-Requested-With": "XMLHttpRequest"
@@ -776,7 +776,7 @@ document.addEventListener('DOMContentLoaded', function() {
       servicioItem: !!servicioItem,
       searchResultsElement: searchResults
     });
-    
+
     if (!searchResults) {
       console.error("❌ No se encontró el contenedor de resultados");
       return;
@@ -857,12 +857,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function addServicio() {
     console.log("➕ Agregando nuevo servicio...");
-    
+
     servicioIndex++;
     const newServicioItem = document.createElement('div');
     newServicioItem.className = 'servicio-item';
     newServicioItem.setAttribute('data-servicio-index', servicioIndex);
-    
+
     newServicioItem.innerHTML = `
       <div class="servicio-fields">
         <div class="field" style="position: relative;">
@@ -870,41 +870,41 @@ document.addEventListener('DOMContentLoaded', function() {
           <input type="text" class="input servicio-search" placeholder="Ingrese nombre del servicio..." autocomplete="off" style="background: rgba(30, 41, 59, 0.85) !important; color: #e0faff !important; border: 1px solid #00eaff !important;">
           <div class="servicio-search-results" style="display: none; position: absolute; top: 100%; left: 0; right: 0; z-index: 1000; background: rgba(30, 41, 59, 0.95); border: 1px solid #00eaff; border-radius: 8px; max-height: 200px; overflow-y: auto;"></div>
         </div>
-        
+
         <div class="field">
           <label class="label">Nombre del Servicio</label>
           <input type="text" class="input servicio-nombre" readonly style="background: rgba(30, 41, 59, 0.85) !important; color: #e0faff !important; border: 1px solid #00eaff !important;">
         </div>
-        
+
         <div class="field">
           <label class="label">Valor del Servicio</label>
           <input type="text" class="input servicio-valor" placeholder="$0" style="background: rgba(30, 41, 59, 0.85) !important; color: #e0faff !important; border: 1px solid #00eaff !important;">
         </div>
-        
-        
+
+
         <div class="field">
           <button type="button" class="btn btn-remove-servicio">Eliminar</button>
         </div>
       </div>
     `;
-    
+
     serviciosContainer.appendChild(newServicioItem);
     setupServicioEventListeners(newServicioItem);
-    
+
     // Mostrar botón de eliminar en el primer servicio si hay más de uno
     if (servicioIndex > 0) {
       document.querySelectorAll('.btn-remove-servicio').forEach(btn => {
         btn.style.display = 'block';
       });
     }
-    
+
     console.log("✅ Servicio agregado con índice:", servicioIndex);
   }
 
   function removeServicio(servicioItem) {
     console.log("🗑️ Eliminando servicio...");
     servicioItem.remove();
-    
+
     // Ocultar botones de eliminar si solo queda uno
     const remainingServicios = document.querySelectorAll('.servicio-item');
     if (remainingServicios.length <= 1) {
@@ -912,7 +912,7 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.style.display = 'none';
       });
     }
-    
+
     console.log("✅ Servicio eliminado");
   }
 
@@ -941,7 +941,7 @@ document.addEventListener('DOMContentLoaded', function() {
     valorInput.addEventListener("input", () => {
       // Formatear el input en tiempo real
       formatChileanPriceInput(valorInput);
-      
+
       // Recalcular totales generales
       if (typeof recalculateAllTotals === 'function') {
         recalculateAllTotals();
@@ -958,7 +958,7 @@ document.addEventListener('DOMContentLoaded', function() {
       console.log("➕ Agregando servicio inicial...");
       addServicio();
     }
-    
+
     document.querySelectorAll(".servicio-item").forEach(servicioItem => {
       setupServicioEventListeners(servicioItem);
     });
@@ -1025,7 +1025,7 @@ document.addEventListener('DOMContentLoaded', function() {
       otroServicioItem: !!otroServicioItem,
       resultsContainerElement: resultsContainer
     });
-    
+
     if (!resultsContainer) {
       console.error("❌ No se encontró el contenedor de resultados de otros servicios");
       return;
@@ -1076,11 +1076,11 @@ document.addEventListener('DOMContentLoaded', function() {
   function selectOtroServicio(servicio, otroServicioItem) {
     const nombreInput = otroServicioItem.querySelector(".otro-servicio-nombre");
     const searchInput = otroServicioItem.querySelector(".otro-servicio-search");
-    
+
     if (nombreInput) {
       nombreInput.value = servicio.nombre;
     }
-    
+
     if (searchInput) {
       searchInput.value = servicio.nombre;
     }
@@ -1090,7 +1090,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (typeof recalculateAllTotals === 'function') {
       recalculateAllTotals();
     }
-    
+
     console.log("✅ Otro servicio seleccionado:", servicio.nombre);
   }
 
@@ -1112,18 +1112,18 @@ document.addEventListener('DOMContentLoaded', function() {
             <input type="text" class="input otro-servicio-search" placeholder="Buscar servicio..." autocomplete="off" style="background: rgba(30, 41, 59, 0.85) !important; color: #e0faff !important; border: 1px solid #00eaff !important; font-size: 0.9rem; padding: 6px 8px;">
             <div class="otro-servicio-search-results" style="display: none; position: absolute; top: 100%; left: 0; right: 0; z-index: 1000; background: rgba(30, 41, 59, 0.95); border: 1px solid #00eaff; border-radius: 8px; max-height: 200px; overflow-y: auto;"></div>
           </div>
-          
+
           <div class="field">
             <label class="label" style="font-size: 0.8rem; margin-bottom: 4px;">Nombre del Servicio</label>
             <input type="text" class="input otro-servicio-nombre" readonly style="background: rgba(30, 41, 59, 0.85) !important; color: #e0faff !important; border: 1px solid #00eaff !important; font-size: 0.9rem; padding: 6px 8px;">
           </div>
-          
+
           <div class="field">
             <label class="label" style="font-size: 0.8rem; margin-bottom: 4px;">Valor</label>
             <input type="text" class="input otro-servicio-valor" placeholder="$0" style="background: rgba(30, 41, 59, 0.85) !important; color: #e0faff !important; border: 1px solid #00eaff !important; font-size: 0.9rem; padding: 6px 8px;">
           </div>
-          
-          
+
+
           <div class="field">
             <button type="button" class="btn btn-remove-otro-servicio" style="font-size: 0.8rem; padding: 6px 12px;">
               Eliminar
@@ -1143,14 +1143,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Configurar event listeners para el nuevo otro servicio
     const newOtroServicioItem = document.querySelector(`[data-otro-servicio-index="${nextIndex}"]`);
     setupOtroServicioEventListeners(newOtroServicioItem);
-    
+
     console.log("✅ Nuevo otro servicio agregado:", nextIndex);
   }
 
   // Función para eliminar un otro servicio
   function removeOtroServicio(otroServicioItem) {
     otroServicioItem.remove();
-    
+
     // Ocultar botones de eliminar si solo queda uno
     const remainingOtrosServicios = document.querySelectorAll('.otro-servicio-item');
     if (remainingOtrosServicios.length <= 1) {
@@ -1158,7 +1158,7 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.style.display = 'none';
       });
     }
-    
+
     console.log("🗑️ Otro servicio eliminado");
   }
 
@@ -1187,7 +1187,7 @@ document.addEventListener('DOMContentLoaded', function() {
     valorInput.addEventListener("input", () => {
       // Formatear el input en tiempo real
       formatChileanPriceInput(valorInput);
-      
+
       // Recalcular totales generales
       if (typeof recalculateAllTotals === 'function') {
         recalculateAllTotals();
@@ -1204,7 +1204,7 @@ document.addEventListener('DOMContentLoaded', function() {
       console.log("➕ Agregando otro servicio inicial...");
       addOtroServicio();
     }
-    
+
     document.querySelectorAll(".otro-servicio-item").forEach(otroServicioItem => {
       setupOtroServicioEventListeners(otroServicioItem);
     });
@@ -1239,18 +1239,18 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.repuesto-item').forEach(item => {
       const precioInput = item.querySelector('.repuesto-precio-venta');
       const cantidadInput = item.querySelector('.repuesto-cantidad');
-      
+
       if (precioInput && cantidadInput) {
         const precio = parseFloat(precioInput.value.replace(/[^\d]/g, '') || 0);
         const cantidad = parseInt(cantidadInput.value || 1);
         total += precio * cantidad;
       }
     });
-    
+
     if (totalRepuestos) {
       totalRepuestos.value = formatChileanCurrency(total);
     }
-    
+
     console.log("🔧 Total repuestos:", total);
     return total;
   }
@@ -1262,11 +1262,11 @@ document.addEventListener('DOMContentLoaded', function() {
       const value = parseFloat(input.value.replace(/[^\d]/g, '') || 0);
       total += value;
     });
-    
+
     if (totalServicios) {
       totalServicios.value = formatChileanCurrency(total);
     }
-    
+
     console.log("🔧 Total servicios:", total);
     return total;
   }
@@ -1278,11 +1278,11 @@ document.addEventListener('DOMContentLoaded', function() {
       const value = parseFloat(input.value.replace(/[^\d]/g, '') || 0);
       total += value;
     });
-    
+
     if (totalOtrosServicios) {
       totalOtrosServicios.value = formatChileanCurrency(total);
     }
-    
+
     console.log("🔧 Total otros servicios:", total);
     return total;
   }
@@ -1292,13 +1292,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const totalRep = calculateTotalRepuestos();
     const totalServ = calculateTotalServicios();
     const totalOtros = calculateTotalOtrosServicios();
-    
+
     const subtotalValue = totalRep + totalServ + totalOtros;
-    
+
     if (subtotal) {
       subtotal.value = formatChileanCurrency(subtotalValue);
     }
-    
+
     console.log("💰 Subtotal:", subtotalValue);
     return subtotalValue;
   }
@@ -1307,11 +1307,11 @@ document.addEventListener('DOMContentLoaded', function() {
   function calculateTaxes() {
     const subtotalValue = parseFloat(subtotal.value.replace(/[^\d]/g, '') || 0);
     const taxAmount = subtotalValue * taxRate;
-    
+
     if (montoImpuestos) {
       montoImpuestos.value = formatChileanCurrency(taxAmount);
     }
-    
+
     console.log("💰 Impuestos:", taxAmount, "Tasa:", taxRate);
     return taxAmount;
   }
@@ -1321,11 +1321,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const subtotalValue = parseFloat(subtotal.value.replace(/[^\d]/g, '') || 0);
     const taxAmount = incluirImpuestos && incluirImpuestos.checked ? calculateTaxes() : 0;
     const grandTotalValue = subtotalValue + taxAmount;
-    
+
     if (granTotal) {
       granTotal.value = formatChileanCurrency(grandTotalValue);
     }
-    
+
     console.log("💰 Gran total:", grandTotalValue);
     return grandTotalValue;
   }
@@ -1349,7 +1349,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function setupTotalEventListeners(element) {
     // Buscar todos los inputs de total dentro del elemento
     const totalInputs = element.querySelectorAll('input[class*="total"]');
-    
+
     totalInputs.forEach(input => {
       input.addEventListener('input', () => {
         console.log("📊 Input de total cambiado:", input.className, input.value);
@@ -1368,8 +1368,8 @@ document.addEventListener('DOMContentLoaded', function() {
     mutations.forEach((mutation) => {
       mutation.addedNodes.forEach((node) => {
         if (node.nodeType === 1) { // Element node
-          if (node.classList && (node.classList.contains('repuesto-item') || 
-                                node.classList.contains('servicio-item') || 
+          if (node.classList && (node.classList.contains('repuesto-item') ||
+                                node.classList.contains('servicio-item') ||
                                 node.classList.contains('otro-servicio-item'))) {
             console.log("🆕 Nuevo elemento detectado, configurando totales:", node.className);
             setupTotalEventListeners(node);
@@ -1397,43 +1397,43 @@ document.addEventListener('DOMContentLoaded', function() {
   // ========================================
   // FILTRADO DE VEHÍCULOS POR CLIENTE
   // ========================================
-  
+
   function filterVehiclesByClient() {
     console.log("🚗 Inicializando filtrado de vehículos por cliente");
-    
+
     // Buscar elementos por nombre en lugar de ID
     const clienteSelect = document.querySelector("select[name='cliente']");
     const vehiculoSelect = document.querySelector("select[name='vehiculo']");
-    
+
     console.log("🔍 Elementos encontrados:", {
       clienteSelect: clienteSelect,
       vehiculoSelect: vehiculoSelect,
       clienteSelectExists: !!clienteSelect,
       vehiculoSelectExists: !!vehiculoSelect
     });
-    
+
     if (!clienteSelect || !vehiculoSelect) {
       console.log("⚠️ No se encontraron elementos cliente o vehículo");
       console.log("🔍 Cliente select:", clienteSelect);
       console.log("🔍 Vehículo select:", vehiculoSelect);
       return;
     }
-    
+
     // Agregar event listener para cambio de cliente
     clienteSelect.addEventListener('change', function() {
       const clienteId = this.value;
       console.log('🔄 Cliente seleccionado:', clienteId);
-      
+
       if (!clienteId) {
         // Si no hay cliente seleccionado, mostrar todos los vehículos
         loadAllVehicles();
         return;
       }
-      
+
       // Filtrar vehículos por cliente
       loadVehiclesByClient(clienteId);
     });
-    
+
     // Cargar vehículos iniciales si ya hay un cliente seleccionado
     if (clienteSelect && clienteSelect.value) {
       loadVehiclesByClient(clienteSelect.value);
@@ -1443,16 +1443,16 @@ document.addEventListener('DOMContentLoaded', function() {
   function loadVehiclesByClient(clienteId) {
     const vehiculoSelect = document.querySelector("select[name='vehiculo']");
     if (!vehiculoSelect) return;
-    
+
     // Detectar país desde la URL
     const countryPrefix = window.location.pathname.startsWith('/us/') ? 'us' : 'cl';
     const apiUrl = `/${countryPrefix}/documentos/api/vehiculos-por-cliente/?cliente=${clienteId}`;
-    
+
     console.log('📡 Cargando vehículos para cliente:', clienteId);
-    
+
     // Mostrar loading
     vehiculoSelect.innerHTML = '<option value="">Cargando vehículos...</option>';
-    
+
     fetch(apiUrl)
       .then(response => {
         if (!response.ok) {
@@ -1463,7 +1463,7 @@ document.addEventListener('DOMContentLoaded', function() {
       .then(data => {
         console.log('📊 Vehículos recibidos:', data);
         vehiculoSelect.innerHTML = '<option value="">Seleccione un vehículo...</option>';
-        
+
         if (data.vehiculos && data.vehiculos.length > 0) {
           data.vehiculos.forEach(vehiculo => {
             const option = document.createElement('option');
@@ -1486,16 +1486,16 @@ document.addEventListener('DOMContentLoaded', function() {
   function loadAllVehicles() {
     const vehiculoSelect = document.querySelector("select[name='vehiculo']");
     if (!vehiculoSelect) return;
-    
+
     // Detectar país desde la URL
     const countryPrefix = window.location.pathname.startsWith('/us/') ? 'us' : 'cl';
     const apiUrl = `/${countryPrefix}/documentos/api/todos-vehiculos/`;
-    
+
     console.log('📡 Cargando todos los vehículos');
-    
+
     // Mostrar loading
     vehiculoSelect.innerHTML = '<option value="">Cargando vehículos...</option>';
-    
+
     fetch(apiUrl)
       .then(response => {
         if (!response.ok) {
@@ -1506,7 +1506,7 @@ document.addEventListener('DOMContentLoaded', function() {
       .then(data => {
         console.log('📊 Todos los vehículos recibidos:', data);
         vehiculoSelect.innerHTML = '<option value="">Seleccione un vehículo...</option>';
-        
+
         if (data.vehiculos && data.vehiculos.length > 0) {
           data.vehiculos.forEach(vehiculo => {
             const option = document.createElement('option');
@@ -1535,7 +1535,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (e.target.matches('input[name*="precio"], input[name*="valor"], input[name*="costo"]')) {
       formatChileanPriceInput(e.target);
     }
-    
+
     // Recalcular totales cuando cambien precios o cantidades
     if (e.target.matches('input[name*="precio"], input[name*="valor"], input[name*="cantidad"], input[name*="costo"]')) {
       setTimeout(recalcTotalsChilean, 100); // Pequeño delay para que se actualice el valor
@@ -1548,26 +1548,26 @@ document.addEventListener('DOMContentLoaded', function() {
   // Event listeners para los botones de tipo de documento
   const tipoButtons = document.querySelectorAll('.btn-type, [data-tipo]');
   const tipoInput = document.getElementById('tipo') || document.querySelector('input[name="tipo"]');
-  
+
   console.log('🔘 Botones de tipo encontrados:', tipoButtons.length);
   console.log('📝 Input tipo encontrado:', !!tipoInput);
-  
+
   tipoButtons.forEach(button => {
     button.addEventListener('click', function() {
       console.log('🖱️ Botón de tipo clickeado:', this.dataset.tipo);
-      
+
       // Remover clase active de todos los botones
       tipoButtons.forEach(btn => btn.classList.remove('active'));
       // Agregar clase active al botón clickeado
       this.classList.add('active');
-      
+
       // Actualizar el valor del input hidden
       const tipo = this.dataset.tipo;
       if (tipoInput) {
         tipoInput.value = tipo;
         console.log('📝 Tipo actualizado a:', tipo);
       }
-      
+
       // Actualizar el número de documento
       updateDocumentNumber();
     });

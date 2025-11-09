@@ -1,11 +1,13 @@
 import pytest
-from django.urls import get_resolver
+
 from django.test import Client
+from django.urls import get_resolver
+
 
 @pytest.mark.django_db
 def test_urls_without_kwargs_do_not_500():
     c = Client()
-    for (pattern, _) in get_resolver().reverse_dict.items():
+    for pattern, _ in get_resolver().reverse_dict.items():
         # saltar pattern no-string (funciones o view objs)
         if not isinstance(pattern, str):
             continue

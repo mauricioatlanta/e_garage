@@ -240,7 +240,7 @@ class SubscriptionMiddleware:
                 allowed_paths = ['/login/', '/billing/', '/soporte/']
                 if not any(request.path.startswith(path) for path in allowed_paths):
                     return redirect('billing:renovar')
-        
+
         response = self.get_response(request)
         return response
 ```

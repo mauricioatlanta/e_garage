@@ -66,7 +66,33 @@ def country_aware_login(request):
         request.country = "CL"
         request.country_code = "CL"
 
-    # PRIORIDAD 3: Si el usuario ya está autenticado, usar su país
+    # PRIORIDAD 3: Detectar desde sesión (preferencia guardada)
+    elif request.session.get("preferred_country"):
+        saved_country = request.session.get("preferred_country", "").upper()
+        if saved_country in ["US", "USA"]:
+            request.country = "US"
+            request.country_code = "US"
+        elif saved_country in ["CL", "CHILE"]:
+            request.country = "CL"
+            request.country_code = "CL"
+        else:
+            request.country = "CL"
+            request.country_code = "CL"
+
+    # PRIORIDAD 4: Detectar desde HTTP_REFERER (de dónde viene el usuario)
+    elif request.headers.get("referer"):
+        referer = request.headers.get("referer", "")
+        if "/us/" in referer or "/usa/" in referer:
+            request.country = "US"
+            request.country_code = "US"
+        elif "/cl/" in referer or "/chile/" in referer:
+            request.country = "CL"
+            request.country_code = "CL"
+        else:
+            request.country = "CL"
+            request.country_code = "CL"
+
+    # PRIORIDAD 5: Si el usuario ya está autenticado, usar su país
     elif request.user.is_authenticated:
         try:
             # Buscar en empresa
@@ -89,10 +115,13 @@ def country_aware_login(request):
             request.country = "CL"
             request.country_code = "CL"
 
-    # PRIORIDAD 4: Por defecto Chile
+    # PRIORIDAD 6: Por defecto Chile
     else:
         request.country = "CL"
         request.country_code = "CL"
+
+    # Guardar preferencia en sesión para futuras visitas
+    request.session["preferred_country"] = request.country
 
     # Usar la vista original de allauth con contexto corregido
     from allauth.account.views import login as allauth_login

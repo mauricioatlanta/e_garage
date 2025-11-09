@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import os
-import sys
 
 import django
 
@@ -9,12 +8,10 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings")
 django.setup()
 
 from django.contrib.auth.models import User
-from django.template.loader import render_to_string
 from django.test import Client, RequestFactory
 
 from taller.documentos.forms import DocumentoForm
-from taller.models.documento import (Documento, RepuestoDocumento,
-                                     ServicioDocumento)
+from taller.models.documento import Documento, RepuestoDocumento, ServicioDocumento
 
 # Crear request factory
 factory = RequestFactory()
@@ -71,11 +68,11 @@ if user:
         fecha_field = form["fecha"]
         mecanico_field = form["mecanico"]
 
-        print(f"\\n🎯 Análisis de campos:")
-        print(f"   📅 Campo fecha:")
+        print("\\n🎯 Análisis de campos:")
+        print("   📅 Campo fecha:")
         print(f"      - Valor: {fecha_field.value()}")
         print(f"      - HTML: {str(fecha_field)[:100]}...")
-        print(f"   🔧 Campo mecánico:")
+        print("   🔧 Campo mecánico:")
         print(f"      - Valor: {mecanico_field.value()}")
         print(f"      - HTML: {str(mecanico_field)[:200]}...")
 

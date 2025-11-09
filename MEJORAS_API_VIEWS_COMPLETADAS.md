@@ -227,5 +227,3 @@ El archivo `taller/api/views.py` ahora es **completamente sólido**:
 - ✅ **Mantenible**: Código limpio y bien documentado
 
 La API está lista para manejar 500+ suscriptores con excelente rendimiento y seguridad 🔒⚡✨
-
-

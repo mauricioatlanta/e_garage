@@ -24,7 +24,7 @@
   {% endif %}
 
   <!-- Shell del documento con tema dinámico -->
-  <div id="doc-shell" 
+  <div id="doc-shell"
        class="rounded-3xl p-6 theme-ot border-2"
        data-url-veh="{% url 'chile:cl_ajax_vehiculos_por_cliente' %}"
        data-url-rep="{% url 'taller:repuestos:api_repuesto_por_codigo' %}"
@@ -114,7 +114,7 @@
 
     <div class="mb-8">
       <h3 class="text-2xl font-bold text-cyan-300 mb-4">🔧 Repuestos</h3>
-      
+
       <!-- Encabezados de repuestos -->
       <div class="rep-headers mb-2" style="display: none;">
         <div class="flex flex-wrap gap-4 items-end">
@@ -141,7 +141,7 @@
           </div>
         </div>
       </div>
-      
+
       <div id="repuestos-container">
         <!-- Se llenará dinámicamente -->
       </div>
@@ -157,7 +157,7 @@
 
     <div class="mb-8">
       <h3 class="text-2xl font-bold text-cyan-300 mb-4">🛠️ Servicios</h3>
-      
+
       <!-- Encabezados de servicios -->
       <div class="serv-headers mb-2" style="display: none;">
         <div class="flex flex-wrap gap-4 items-end">
@@ -172,7 +172,7 @@
           </div>
         </div>
       </div>
-      
+
       <div id="servicios-container">
         <!-- Se llenará dinámicamente -->
       </div>
@@ -188,7 +188,7 @@
 
     <div class="mb-8">
       <h3 class="text-2xl font-bold text-cyan-300 mb-4">🏢 Otros Servicios</h3>
-      
+
       <!-- Encabezados de otros servicios -->
       <div class="otros-headers mb-2" style="display: none;">
         <div class="flex flex-wrap gap-4 items-end">
@@ -209,7 +209,7 @@
           </div>
         </div>
       </div>
-      
+
       <div id="otros-container">
         <!-- Se llenará dinámicamente -->
       </div>
@@ -780,11 +780,11 @@ function hideRepuestoDropdown() {
 function showRepuestoDropdown(suggestions, inputElement, nameField, pcField, pvField) {
   // Ocultar dropdown anterior si existe
   hideRepuestoDropdown();
-  
+
   if (!suggestions || suggestions.length === 0) {
     return;
   }
-  
+
   // Crear dropdown
   repuestoDropdown = document.createElement('div');
   repuestoDropdown.className = 'repuesto-dropdown';
@@ -800,7 +800,7 @@ function showRepuestoDropdown(suggestions, inputElement, nameField, pcField, pvF
     box-shadow: 0 8px 25px rgba(0, 242, 254, 0.4);
     backdrop-filter: blur(10px);
   `;
-  
+
   // Agregar cada sugerencia
   suggestions.forEach(repuesto => {
     const item = document.createElement('div');
@@ -812,22 +812,22 @@ function showRepuestoDropdown(suggestions, inputElement, nameField, pcField, pvF
       color: #fff;
       transition: background 0.2s;
     `;
-    
+
     item.innerHTML = `
       <div style="font-weight: bold; color: #00f2fe;">${repuesto.codigo || 'Sin código'}</div>
       <div style="font-size: 0.9rem; color: #94a3b8;">${repuesto.nombre || 'Sin nombre'}</div>
       <div style="font-size: 0.8rem; color: #7f00ff;">Precio: $${repuesto.precio_venta || '0'}</div>
     `;
-    
+
     // Eventos de hover
     item.addEventListener('mouseenter', () => {
       item.style.background = 'rgba(0, 242, 254, 0.2)';
     });
-    
+
     item.addEventListener('mouseleave', () => {
       item.style.background = 'transparent';
     });
-    
+
     // Seleccionar repuesto al hacer click
     item.addEventListener('click', () => {
       inputElement.value = repuesto.codigo;
@@ -838,18 +838,18 @@ function showRepuestoDropdown(suggestions, inputElement, nameField, pcField, pvF
       recalc();
       console.log('✅ Repuesto seleccionado:', repuesto);
     });
-    
+
     repuestoDropdown.appendChild(item);
   });
-  
+
   // Posicionar el dropdown
   const rect = inputElement.getBoundingClientRect();
   repuestoDropdown.style.left = rect.left + 'px';
   repuestoDropdown.style.top = (rect.bottom + window.scrollY + 5) + 'px';
-  
+
   // Agregar al documento
   document.body.appendChild(repuestoDropdown);
-  
+
   // Ocultar al hacer click fuera
   setTimeout(() => {
     document.addEventListener('click', hideRepuestoDropdown, { once: true });
@@ -859,13 +859,13 @@ function showRepuestoDropdown(suggestions, inputElement, nameField, pcField, pvF
 async function fetchRepuestosSuggestions(code, inputElement, nameField, pcField, pvField) {
   try {
     console.log('🔧 Buscando sugerencias para:', code);
-    
+
     const response = await fetch(`${urlRep}?codigo=${encodeURIComponent(code)}`);
     if (!response.ok) return;
-    
+
     const data = await response.json();
     console.log('🔧 Sugerencias recibidas:', data);
-    
+
     if (data && data.results && data.results.length > 0) {
       showRepuestoDropdown(data.results, inputElement, nameField, pcField, pvField);
     } else {
@@ -893,9 +893,9 @@ function wireRepRow(row) {
       const r = await fetch(`${urlRep}?codigo=${encodeURIComponent(c)}`);
       if (!r.ok) return;
       const j = await r.json();
-      
+
       console.log('🔧 Respuesta de repuestos:', j);
-      
+
       // Manejar nueva estructura con results
       if (j && j.results && j.results.length > 0) {
         // Tomar el primer resultado que coincida exactamente, o el primero si no hay coincidencia exacta
@@ -903,7 +903,7 @@ function wireRepRow(row) {
         if (!repuesto) {
           repuesto = j.results[0]; // Tomar el primero si no hay coincidencia exacta
         }
-        
+
         if (repuesto && repuesto.id) {
           inpName.value = repuesto.nombre || '';
           inpPC.value = money(repuesto.precio_compra || '0');
@@ -939,12 +939,12 @@ function wireRepRow(row) {
   let searchTimeout;
   inpCode?.addEventListener('input', (e) => {
     const value = e.target.value.trim();
-    
+
     // Limpiar timeout anterior
     if (searchTimeout) {
       clearTimeout(searchTimeout);
     }
-    
+
     // Búsqueda con debounce (esperar 300ms después de que deje de escribir)
     if (value.length >= 2) {
       searchTimeout = setTimeout(() => {
@@ -958,7 +958,7 @@ function wireRepRow(row) {
       hideRepuestoDropdown();
     }
   });
-  
+
   // También mantener la búsqueda en change para compatibilidad
   inpCode?.addEventListener('change', () => fetchByCode(inpCode.value.trim()));
   qEl?.addEventListener('input', recalc);
@@ -1084,7 +1084,7 @@ function wireServRow(row) {
 
   // Ocultar resultados al hacer click fuera
   document.addEventListener('click', (e) => {
-    if (searchEl && resultadosEl && 
+    if (searchEl && resultadosEl &&
         !searchEl.contains(e.target) && !resultadosEl.contains(e.target)) {
       resultadosEl.classList.add('hidden');
     }
@@ -1210,7 +1210,7 @@ function wireOtroRow(row) {
 
   // Ocultar resultados al hacer click fuera
   document.addEventListener('click', (e) => {
-    if (searchEl && resultadosEl && 
+    if (searchEl && resultadosEl &&
         !searchEl.contains(e.target) && !resultadosEl.contains(e.target)) {
       resultadosEl.classList.add('hidden');
     }

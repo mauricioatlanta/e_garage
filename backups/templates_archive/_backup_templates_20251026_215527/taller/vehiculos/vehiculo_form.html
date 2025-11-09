@@ -190,8 +190,8 @@ body {
           {% endif %}
           <!-- Campo para nuevo color (oculto por defecto) -->
           <div id="color-nuevo-container" style="display: none;" class="mt-2">
-            <input type="text" 
-                   name="color_nuevo" 
+            <input type="text"
+                   name="color_nuevo"
                    id="color_nuevo"
                    placeholder="Ingresa el nombre del nuevo color"
                    class="form-control"
@@ -207,8 +207,8 @@ body {
           {% endif %}
           <!-- Campo para nuevo motor (oculto por defecto) -->
           <div id="motor-nuevo-container" style="display: none;" class="mt-2">
-            <input type="text" 
-                   name="motor_nuevo" 
+            <input type="text"
+                   name="motor_nuevo"
                    id="motor_nuevo"
                    placeholder="Ingresa el nombre del nuevo motor"
                    class="form-control"
@@ -224,8 +224,8 @@ body {
           {% endif %}
           <!-- Campo para nueva caja (oculto por defecto) -->
           <div id="caja-nueva-container" style="display: none;" class="mt-2">
-            <input type="text" 
-                   name="caja_nuevo" 
+            <input type="text"
+                   name="caja_nuevo"
                    id="caja_nuevo"
                    placeholder="Ingresa el nombre de la nueva caja/transmisión"
                    class="form-control"
@@ -255,20 +255,20 @@ body {
 document.addEventListener('DOMContentLoaded', function() {
     const marcaSelect = document.getElementById('id_marca');
     const modeloSelect = document.getElementById('id_modelo');
-    
+
     if (marcaSelect && modeloSelect) {
         // Función para cargar modelos por marca
         function cargarModelos(marcaId, modeloSeleccionado = null) {
             // Limpiar opciones del modelo
             modeloSelect.innerHTML = '<option value="">---------</option>';
-            
+
             if (marcaId) {
                 // Mostrar loading
                 const loadingOption = document.createElement('option');
                 loadingOption.value = '';
                 loadingOption.textContent = 'Cargando modelos...';
                 modeloSelect.appendChild(loadingOption);
-                
+
                 // Hacer petición AJAX para obtener modelos de la marca
                 fetch(`/us/vehiculos/ajax/modelos-por-marca/?marca_id=${marcaId}`)
                     .then(response => {
@@ -279,26 +279,26 @@ document.addEventListener('DOMContentLoaded', function() {
                         console.log('Modelos data:', data);
                         // Limpiar opciones
                         modeloSelect.innerHTML = '<option value="">---------</option>';
-                        
+
                         // data es un array de objetos {id, nombre}
                         if (Array.isArray(data)) {
                             data.forEach(modelo => {
                                 const option = document.createElement('option');
                                 option.value = modelo.id;
                                 option.textContent = modelo.nombre;
-                                
+
                                 // Seleccionar el modelo si coincide
                                 if (modeloSeleccionado && modelo.id == modeloSeleccionado) {
                                     option.selected = true;
                                 }
-                                
+
                                 modeloSelect.appendChild(option);
                             });
                         } else {
                             console.error('Data is not an array:', data);
                             modeloSelect.innerHTML = '<option value="">Error: formato de datos incorrecto</option>';
                         }
-                        
+
                         // Si hay un modelo seleccionado, cargar sus motores y cajas
                         if (modeloSeleccionado) {
                             const motorSelect = document.getElementById('id_motor');
@@ -314,22 +314,22 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
             }
         }
-        
+
         // Función para cargar motores y cajas por modelo
         function cargarMotoresYCajas(modeloId, motorSeleccionado = null, cajaSeleccionada = null) {
             const motorSelect = document.getElementById('id_motor');
             const cajaSelect = document.getElementById('id_caja');
-            
+
             if (!motorSelect || !cajaSelect) return;
-            
+
             // Obtener valores actuales si no se proporcionan
             if (!motorSeleccionado) motorSeleccionado = motorSelect.value;
             if (!cajaSeleccionada) cajaSeleccionada = cajaSelect.value;
-            
+
             // Limpiar y mostrar loading en motores
             motorSelect.innerHTML = '<option value="">Cargando motores...</option>';
             cajaSelect.innerHTML = '<option value="">Cargando cajas...</option>';
-            
+
             // Cargar motores
             fetch(`/us/vehiculos/ajax/motores-por-modelo/?modelo_id=${modeloId}`)
                 .then(response => response.json())
@@ -339,16 +339,16 @@ document.addEventListener('DOMContentLoaded', function() {
                         const option = document.createElement('option');
                         option.value = motor.id;
                         option.textContent = motor.text;
-                        
+
                         // Seleccionar el motor si coincide
                         if (motorSeleccionado && motor.id == motorSeleccionado) {
                             option.selected = true;
                         }
-                        
+
                         motorSelect.appendChild(option);
                     });
                     motorSelect.innerHTML += '<option value="__nuevo__">Agregar nuevo motor...</option>';
-                    
+
                     // Si el valor seleccionado es __nuevo__, seleccionarlo
                     if (motorSeleccionado === '__nuevo__') {
                         motorSelect.value = '__nuevo__';
@@ -358,7 +358,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.error('Error al cargar motores:', error);
                     motorSelect.innerHTML = '<option value="">Error al cargar motores</option>';
                 });
-            
+
             // Cargar cajas
             fetch(`/us/vehiculos/ajax/cajas-por-modelo/?modelo_id=${modeloId}`)
                 .then(response => response.json())
@@ -368,16 +368,16 @@ document.addEventListener('DOMContentLoaded', function() {
                         const option = document.createElement('option');
                         option.value = caja.id;
                         option.textContent = caja.text;
-                        
+
                         // Seleccionar la caja si coincide
                         if (cajaSeleccionada && caja.id == cajaSeleccionada) {
                             option.selected = true;
                         }
-                        
+
                         cajaSelect.appendChild(option);
                     });
                     cajaSelect.innerHTML += '<option value="__nuevo__">Agregar nueva caja...</option>';
-                    
+
                     // Si el valor seleccionado es __nuevo__, seleccionarlo
                     if (cajaSeleccionada === '__nuevo__') {
                         cajaSelect.value = '__nuevo__';
@@ -388,7 +388,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     cajaSelect.innerHTML = '<option value="">Error al cargar cajas</option>';
                 });
         }
-        
+
         // Event listener para cambio de marca
         marcaSelect.addEventListener('change', function() {
             cargarModelos(this.value);
@@ -398,7 +398,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (motorSelect) motorSelect.innerHTML = '<option value="">Selecciona un modelo primero</option>';
             if (cajaSelect) cajaSelect.innerHTML = '<option value="">Selecciona un modelo primero</option>';
         });
-        
+
         // Event listener para cambio de modelo
         modeloSelect.addEventListener('change', function() {
             if (this.value) {
@@ -411,23 +411,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (cajaSelect) cajaSelect.innerHTML = '<option value="">Selecciona un modelo primero</option>';
             }
         });
-        
+
         // Cargar modelos iniciales si ya hay una marca seleccionada
         if (marcaSelect.value) {
             cargarModelos(marcaSelect.value, modeloSelect.value);
         }
-        
+
         // Cargar motores y cajas iniciales si ya hay un modelo seleccionado
         if (modeloSelect.value) {
             cargarMotoresYCajas(modeloSelect.value);
         }
     }
-    
+
     // Manejar campo de color
     const colorSelect = document.getElementById('id_color');
     const colorNuevoContainer = document.getElementById('color-nuevo-container');
     const colorNuevoInput = document.getElementById('color_nuevo');
-    
+
     if (colorSelect && colorNuevoContainer && colorNuevoInput) {
         colorSelect.addEventListener('change', function() {
             if (this.value === '__nuevo__') {
@@ -440,19 +440,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 colorNuevoInput.value = '';
             }
         });
-        
+
         // Verificar estado inicial
         if (colorSelect.value === '__nuevo__') {
             colorNuevoContainer.style.display = 'block';
             colorNuevoInput.required = true;
         }
     }
-    
+
     // Manejar campo de motor
     const motorSelect = document.getElementById('id_motor');
     const motorNuevoContainer = document.getElementById('motor-nuevo-container');
     const motorNuevoInput = document.getElementById('motor_nuevo');
-    
+
     if (motorSelect && motorNuevoContainer && motorNuevoInput) {
         motorSelect.addEventListener('change', function() {
             if (this.value === '__nuevo__') {
@@ -465,19 +465,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 motorNuevoInput.value = '';
             }
         });
-        
+
         // Verificar estado inicial
         if (motorSelect.value === '__nuevo__') {
             motorNuevoContainer.style.display = 'block';
             motorNuevoInput.required = true;
         }
     }
-    
+
     // Manejar campo de caja
     const cajaSelect = document.getElementById('id_caja');
     const cajaNuevaContainer = document.getElementById('caja-nueva-container');
     const cajaNuevoInput = document.getElementById('caja_nuevo');
-    
+
     if (cajaSelect && cajaNuevaContainer && cajaNuevoInput) {
         cajaSelect.addEventListener('change', function() {
             if (this.value === '__nuevo__') {
@@ -490,7 +490,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 cajaNuevoInput.value = '';
             }
         });
-        
+
         // Verificar estado inicial
         if (cajaSelect.value === '__nuevo__') {
             cajaNuevaContainer.style.display = 'block';

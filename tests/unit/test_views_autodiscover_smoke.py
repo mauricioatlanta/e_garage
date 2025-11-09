@@ -1,5 +1,7 @@
 import pytest
-from django.urls import get_resolver, reverse, NoReverseMatch
+
+from django.urls import NoReverseMatch, get_resolver, reverse
+
 
 @pytest.mark.django_db
 def test_zero_arg_named_urls_smoke(client):
@@ -13,7 +15,7 @@ def test_zero_arg_named_urls_smoke(client):
             url = reverse(name)
         except NoReverseMatch:
             continue  # requiere args
-        
+
         try:
             resp = client.get(url)
             assert resp.status_code in (200, 301, 302, 401, 403, 405)

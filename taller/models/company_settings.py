@@ -12,7 +12,7 @@ def validate_logo_size(image):
         # Máximo 10MB (muy permisivo)
         if image.size > 10 * 1024 * 1024:
             raise ValidationError("El logo debe ser menor a 10MB")
-        
+
         # No validar dimensiones aquí - se redimensionarán automáticamente en save()
 
 
@@ -46,7 +46,9 @@ class CompanySettings(models.Model):
         null=True,
         blank=True,
         validators=[
-            FileExtensionValidator(allowed_extensions=["png", "jpg", "jpeg", "svg", "webp"]),
+            FileExtensionValidator(
+                allowed_extensions=["png", "jpg", "jpeg", "svg", "webp"]
+            ),
             validate_logo_size,
         ],
         verbose_name="Logo de la empresa",
@@ -225,25 +227,27 @@ class CompanySettings(models.Model):
         try:
             img = Image.open(self.logo.path)
             original_size = (img.width, img.height)
-            
+
             # Convertir a RGB si es necesario (para PNG con transparencia)
-            if img.mode in ('RGBA', 'LA', 'P'):
-                background = Image.new('RGB', img.size, (255, 255, 255))
-                if img.mode == 'P':
-                    img = img.convert('RGBA')
-                background.paste(img, mask=img.split()[3] if img.mode == 'RGBA' else None)
+            if img.mode in ("RGBA", "LA", "P"):
+                background = Image.new("RGB", img.size, (255, 255, 255))
+                if img.mode == "P":
+                    img = img.convert("RGBA")
+                background.paste(
+                    img, mask=img.split()[3] if img.mode == "RGBA" else None
+                )
                 img = background
-            
+
             # Redimensionar si es muy grande (máximo 800px)
             max_size = 800
             if img.height > max_size or img.width > max_size:
                 img.thumbnail((max_size, max_size), Image.Resampling.LANCZOS)
                 print(f"Logo redimensionado de {original_size} a {img.size}")
-            
+
             # Guardar optimizado
-            img.save(self.logo.path, 'JPEG', quality=90, optimize=True)
+            img.save(self.logo.path, "JPEG", quality=90, optimize=True)
             print(f"✅ Logo optimizado: {self.logo.path}")
-            
+
         except Exception as e:
             # Si falla el redimensionamiento, registrar pero no bloquear
             print(f"⚠️ No se pudo redimensionar el logo: {e}")

@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+
 from taller.models import Empresa, Suscripcion
 
 User = get_user_model()
@@ -30,21 +31,21 @@ except Exception as e:
 
 print("\n=== CREAR SUSCRIPCIÓN PARA testuser_usa ===")
 try:
-    user = User.objects.get(username='testuser_usa')
+    user = User.objects.get(username="testuser_usa")
     empresa = user.empresa
-    
+
     # Crear suscripción de prueba
     suscripcion = Suscripcion.objects.create(
         empresa=empresa,
-        plan='trial',
-        estado='activa',
-        fecha_inicio='2025-10-06',
-        fecha_fin='2025-11-06'
+        plan="trial",
+        estado="activa",
+        fecha_inicio="2025-10-06",
+        fecha_fin="2025-11-06",
     )
     print(f"Suscripción creada para {empresa.nombre_taller}")
     print(f"  Plan: {suscripcion.plan}")
     print(f"  Estado: {suscripcion.estado}")
     print(f"  Vigente: {suscripcion.esta_vigente()}")
-    
+
 except Exception as e:
     print(f"Error al crear suscripción: {e}")

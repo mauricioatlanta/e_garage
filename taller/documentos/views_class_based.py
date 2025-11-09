@@ -1,6 +1,7 @@
+from djangodamelalistadearchttp import Http404
+
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from djangodame la lista de archttp import Http404
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils.timezone import now
@@ -21,14 +22,14 @@ class DocumentoFormView(CountryLangTemplateMixin, LoginRequiredMixin, CreateView
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["user"] = self.request.user
-        
+
         # Get country from empresa
         try:
             empresa = self.request.user.empresa
             country = getattr(empresa, "pais", "CL") if empresa else "CL"
         except AttributeError:
             country = "CL"
-        
+
         kwargs["country"] = country
         return kwargs
 
@@ -100,14 +101,14 @@ class DocumentoUpdateView(CountryLangTemplateMixin, LoginRequiredMixin, UpdateVi
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["user"] = self.request.user
-        
+
         # Get country from empresa
         try:
             empresa = self.request.user.empresa
             country = getattr(empresa, "pais", "CL") if empresa else "CL"
         except AttributeError:
             country = "CL"
-        
+
         kwargs["country"] = country
         return kwargs
 

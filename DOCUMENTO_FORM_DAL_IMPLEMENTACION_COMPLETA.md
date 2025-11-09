@@ -44,7 +44,7 @@ fields = [
 # Chile
 path("cl/autocomplete/", include(("taller.autocomplete_urls", "autocomplete"), namespace="cl_autocomplete"))
 
-# USA  
+# USA
 path("us/autocomplete/", include(("taller.autocomplete_urls", "autocomplete"), namespace="usa_autocomplete"))
 ```
 
@@ -90,12 +90,12 @@ from taller.documentos.forms import DocumentoForm
 def documento_crear(request):
     empresa = getattr(request.user, "empresa", None)
     country = empresa.pais if empresa else "CL"
-    
+
     if request.method == "POST":
         form = DocumentoForm(
-            request.POST, 
-            user=request.user, 
-            empresa=empresa, 
+            request.POST,
+            user=request.user,
+            empresa=empresa,
             country=country
         )
         if form.is_valid():
@@ -103,11 +103,11 @@ def documento_crear(request):
             return redirect("documentos:editar", pk=obj.pk)
     else:
         form = DocumentoForm(
-            user=request.user, 
-            empresa=empresa, 
+            user=request.user,
+            empresa=empresa,
             country=country
         )
-    
+
     return render(request, "taller/documentos/crear.html", {"form": form})
 ```
 
@@ -134,7 +134,7 @@ $('#id_cliente').select2({
 ### Validaciones Implementadas:
 1. **Filtrado por empresa** en todos los querysets
 2. **Validación de pertenencia** cliente → empresa
-3. **Validación de pertenencia** vehículo → empresa  
+3. **Validación de pertenencia** vehículo → empresa
 4. **Validación de relación** vehículo → cliente
 5. **Lista blanca de campos** - No exposición de campos internos
 
@@ -162,7 +162,7 @@ $('#id_cliente').select2({
 ```
 9 tests passed in 80.56s
 ✅ Formulario válido para Chile y USA
-✅ URLs DAL funcionando correctamente  
+✅ URLs DAL funcionando correctamente
 ✅ Vistas de autocomplete importadas y funcionales
 ✅ Namespaces únicos sin conflictos
 ✅ Validaciones multi-tenant funcionando

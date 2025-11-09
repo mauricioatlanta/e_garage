@@ -4,13 +4,14 @@ from django.db.models import Q, UniqueConstraint
 from django.db.models.functions import Lower
 
 from .empresa import Empresa
+
 # Si ya tienes AuditMixin, úsalo:
 # from taller.models.mixins import AuditMixin
 
 
 class TecnicoQuerySet(models.QuerySet):
     """QuerySet personalizado para Tecnico con métodos de conveniencia"""
-    
+
     def activos(self):
         """Filtrar solo técnicos activos"""
         return self.filter(activo=True)
@@ -22,7 +23,7 @@ class TecnicoQuerySet(models.QuerySet):
     def buscar_por_nombre(self, texto):
         """Búsqueda por nombre (case-insensitive)"""
         return self.filter(nombre__icontains=texto)
-    
+
     def por_rol(self, rol):
         """Filtrar por rol específico"""
         return self.filter(rol=rol)
@@ -30,7 +31,7 @@ class TecnicoQuerySet(models.QuerySet):
 
 class TecnicoManager(models.Manager):
     """Manager personalizado para Tecnico"""
-    
+
     def get_queryset(self):
         return TecnicoQuerySet(self.model, using=self._db)
 
@@ -42,14 +43,14 @@ class TecnicoManager(models.Manager):
 
     def buscar_por_nombre(self, texto):
         return self.get_queryset().buscar_por_nombre(texto)
-    
+
     def por_rol(self, rol):
         return self.get_queryset().por_rol(rol)
 
 
 class Tecnico(models.Model):
     """Modelo unificado de Técnico/Vendedor con validaciones multi-tenant"""
-    
+
     class Rol(models.TextChoices):
         TECNICO = "TECNICO", "Técnico"
         VENDEDOR = "VENDEDOR", "Vendedor"
@@ -59,17 +60,22 @@ class Tecnico(models.Model):
         Empresa,
         on_delete=models.CASCADE,
         related_name="tecnicos",
-        null=True,   # ← mantiene compatibilidad; valida en clean() para producción
+        null=True,  # ← mantiene compatibilidad; valida en clean() para producción
         blank=True,
     )
     nombre = models.CharField(max_length=100)
     telefono = models.CharField(
-        max_length=20, blank=True, null=True, help_text="Teléfono de contacto del técnico"
+        max_length=20,
+        blank=True,
+        null=True,
+        help_text="Teléfono de contacto del técnico",
     )
-    direccion = models.TextField(blank=True, null=True, help_text="Dirección del técnico")
+    direccion = models.TextField(
+        blank=True, null=True, help_text="Dirección del técnico"
+    )
 
     # Unificación técnico/vendedor
-    rol = models.CharField(max_length=12, choices=Rol.choices, default=Rol.MIXTO, db_index=True)
+    rol = models.CharField(max_length=12, choices=Rol, default=Rol.MIXTO, db_index=True)
 
     activo = models.BooleanField(default=True, db_index=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
@@ -79,7 +85,9 @@ class Tecnico(models.Model):
 
     def __str__(self):
         estado = "✅" if self.activo else "❌"
-        rol_display = f" ({self.get_rol_display()})" if self.rol != self.Rol.MIXTO else ""
+        rol_display = (
+            f" ({self.get_rol_display()})" if self.rol != self.Rol.MIXTO else ""
+        )
         return f"{estado} {self.nombre}{rol_display}"
 
     def clean(self):
@@ -89,12 +97,13 @@ class Tecnico(models.Model):
         if self.empresa_id is None:
             # Si aún estás migrando datos, cambia a warning/log. En estable, levanta error:
             from django.core.exceptions import ValidationError
+
             raise ValidationError("Todo Técnico debe pertenecer a una empresa.")
 
     def es_vendedor(self):
         """Helper para verificar si es vendedor (incluye MIXTO)"""
         return self.rol in [self.Rol.VENDEDOR, self.Rol.MIXTO]
-    
+
     def es_tecnico(self):
         """Helper para verificar si es técnico (incluye MIXTO)"""
         return self.rol in [self.Rol.TECNICO, self.Rol.MIXTO]
@@ -106,7 +115,8 @@ class Tecnico(models.Model):
         constraints = [
             # Unicidad por empresa + nombre case-insensitive
             UniqueConstraint(
-                Lower("nombre"), "empresa",
+                Lower("nombre"),
+                "empresa",
                 name="uq_tecnico_empresa_nombre_lower",
                 condition=Q(nombre__isnull=False) & ~Q(nombre=""),
             ),

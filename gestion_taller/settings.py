@@ -28,8 +28,7 @@ ALLOWED_HOSTS = env_list(
 csrf_origins_env = env_list("DJANGO_CSRF_TRUSTED_ORIGINS", "")
 if csrf_origins_env:
     CSRF_TRUSTED_ORIGINS = [
-        h if h.startswith("http") else f"https://{h}"
-        for h in csrf_origins_env
+        h if h.startswith("http") else f"https://{h}" for h in csrf_origins_env
     ]
 else:
     CSRF_TRUSTED_ORIGINS = []
@@ -37,7 +36,7 @@ SECURE_SSL_REDIRECT = env_bool("DJANGO_SECURE_SSL_REDIRECT", not DEBUG)
 SESSION_COOKIE_SECURE = env_bool("DJANGO_SESSION_COOKIE_SECURE", not DEBUG)
 CSRF_COOKIE_SECURE = env_bool("DJANGO_CSRF_COOKIE_SECURE", not DEBUG)
 CSRF_COOKIE_HTTPONLY = False  # Permitir acceso desde JavaScript si es necesario
-CSRF_COOKIE_SAMESITE = 'Lax'  # Más permisivo para desarrollo
+CSRF_COOKIE_SAMESITE = "Lax"  # Más permisivo para desarrollo
 CSRF_USE_SESSIONS = False  # Usar cookies en lugar de sesiones para CSRF
 SECURE_HSTS_SECONDS = int(
     os.getenv("DJANGO_SECURE_HSTS_SECONDS", "0" if DEBUG else "31536000")
@@ -72,7 +71,8 @@ AUTHENTICATION_BACKENDS = (
 # Allauth correcto
 ACCOUNT_AUTHENTICATION_METHOD = "username_email"  # <- en vez de ACCOUNT_LOGIN_METHODS
 ACCOUNT_EMAIL_VERIFICATION = os.getenv(
-    "ACCOUNT_EMAIL_VERIFICATION", "mandatory"  # 🔒 Siempre obligatorio
+    "ACCOUNT_EMAIL_VERIFICATION",
+    "mandatory",  # 🔒 Siempre obligatorio
 )
 ACCOUNT_EMAIL_REQUIRED = True  # 🔒 Email es REQUERIDO
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True  # Confirmar email con un solo clic
@@ -210,10 +210,10 @@ USE_TZ = True
 # ---------- Static / Media ----------
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
-STATIC_ROOT = BASE_DIR / "staticfiles"
+STATIC_ROOT = Path(os.getenv("STATIC_ROOT", str(BASE_DIR / "staticfiles")))
 
 MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_ROOT = Path(os.getenv("MEDIA_ROOT", str(BASE_DIR / "media")))
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 APPEND_SLASH = True
@@ -287,3 +287,13 @@ if len(CSRF_TRUSTED_ORIGINS) == 0:
             for h in ALLOWED_HOSTS
             if h not in {"*", "localhost", "127.0.0.1"}
         ]
+
+# ---------- Branding Defaults ----------
+# Fallbacks amables para cuando no hay empresa configurada
+DEFAULT_BRAND_LOGO_URL = "/static/branding/egarage_logo.svg"
+DEFAULT_BRAND_NAME = "eGarage"
+DEFAULT_BRAND_TAGLINE = "Mission Control for your Workshop"
+DEFAULT_BRAND_COUNTRY = "cl"
+DEFAULT_BRAND_CURRENCY = "CLP"
+DEFAULT_BRAND_PRIMARY_COLOR = "#0d6efd"
+DEFAULT_BRAND_SECONDARY_COLOR = "#6c757d"

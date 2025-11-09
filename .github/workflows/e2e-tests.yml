@@ -10,40 +10,40 @@ jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
-    
+
     steps:
     - uses: actions/checkout@v4
-    
+
     - uses: actions/setup-python@v4
       with:
         python-version: '3.11'
-        
+
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        
+
     - name: Install Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '18'
-        
+
     - name: Install Playwright dependencies
       run: |
         npm install
         npx playwright install --with-deps
-        
+
     - name: Run Django migrations
       run: |
         python manage.py migrate
-        
+
     - name: Create test data
       run: |
         python manage.py shell -c "
         from django.contrib.auth.models import User
         from taller.models.empresa import Empresa
         from taller.servicios.models import CategoriaServicio, Servicio
-        
+
         # Crear usuario de prueba
         user, created = User.objects.get_or_create(
             username='testuser',
@@ -52,7 +52,7 @@ jobs:
         if created:
             user.set_password('testpass123')
             user.save()
-            
+
         # Crear empresa
         empresa, created = Empresa.objects.get_or_create(
             user=user,
@@ -62,14 +62,14 @@ jobs:
                 'moneda': 'USD'
             }
         )
-        
+
         # Crear categoría de servicios
         categoria, created = CategoriaServicio.objects.get_or_create(
             country='US',
             code='MAINT',
             defaults={}
         )
-        
+
         # Crear servicios de prueba
         Servicio.objects.get_or_create(
             nombre='Oil Change Service',
@@ -83,15 +83,15 @@ jobs:
         )
         print('Test data created successfully')
         "
-        
+
     - name: Start Django server
       run: |
         python manage.py runserver 127.0.0.1:8000 &
         sleep 10
-        
+
     - name: Run Playwright tests
       run: npx playwright test
-      
+
     - name: Upload test results
       uses: actions/upload-artifact@v4
       if: always()

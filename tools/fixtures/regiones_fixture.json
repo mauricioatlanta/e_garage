@@ -1,107 +1,107 @@
 [
   {
-    "model": "taller.region",
-    "pk": 1,
     "fields": {
-      "nombre": "Región Metropolitana de Santiago"
-    }
+      "nombre": "Regi\u00f3n Metropolitana de Santiago"
+    },
+    "model": "taller.region",
+    "pk": 1
   },
   {
-    "model": "taller.region",
-    "pk": 2,
     "fields": {
-      "nombre": "Región de Valparaíso"
-    }
+      "nombre": "Regi\u00f3n de Valpara\u00edso"
+    },
+    "model": "taller.region",
+    "pk": 2
   },
   {
-    "model": "taller.region",
-    "pk": 3,
     "fields": {
-      "nombre": "Región de Tarapacá"
-    }
+      "nombre": "Regi\u00f3n de Tarapac\u00e1"
+    },
+    "model": "taller.region",
+    "pk": 3
   },
   {
-    "model": "taller.region",
-    "pk": 4,
     "fields": {
-      "nombre": "Región de Antofagasta"
-    }
+      "nombre": "Regi\u00f3n de Antofagasta"
+    },
+    "model": "taller.region",
+    "pk": 4
   },
   {
-    "model": "taller.region",
-    "pk": 5,
     "fields": {
-      "nombre": "Región de Atacama"
-    }
+      "nombre": "Regi\u00f3n de Atacama"
+    },
+    "model": "taller.region",
+    "pk": 5
   },
   {
-    "model": "taller.region",
-    "pk": 6,
     "fields": {
-      "nombre": "Región de Coquimbo"
-    }
+      "nombre": "Regi\u00f3n de Coquimbo"
+    },
+    "model": "taller.region",
+    "pk": 6
   },
   {
-    "model": "taller.region",
-    "pk": 7,
     "fields": {
-      "nombre": "Región del Libertador General Bernardo O'Higgins"
-    }
+      "nombre": "Regi\u00f3n del Libertador General Bernardo O'Higgins"
+    },
+    "model": "taller.region",
+    "pk": 7
   },
   {
-    "model": "taller.region",
-    "pk": 8,
     "fields": {
-      "nombre": "Región del Maule"
-    }
+      "nombre": "Regi\u00f3n del Maule"
+    },
+    "model": "taller.region",
+    "pk": 8
   },
   {
-    "model": "taller.region",
-    "pk": 9,
     "fields": {
-      "nombre": "Región de Ñuble"
-    }
+      "nombre": "Regi\u00f3n de \u00d1uble"
+    },
+    "model": "taller.region",
+    "pk": 9
   },
   {
-    "model": "taller.region",
-    "pk": 10,
     "fields": {
-      "nombre": "Región del Biobío"
-    }
+      "nombre": "Regi\u00f3n del Biob\u00edo"
+    },
+    "model": "taller.region",
+    "pk": 10
   },
   {
-    "model": "taller.region",
-    "pk": 11,
     "fields": {
-      "nombre": "Región de La Araucanía"
-    }
+      "nombre": "Regi\u00f3n de La Araucan\u00eda"
+    },
+    "model": "taller.region",
+    "pk": 11
   },
   {
-    "model": "taller.region",
-    "pk": 12,
     "fields": {
-      "nombre": "Región de Los Ríos"
-    }
+      "nombre": "Regi\u00f3n de Los R\u00edos"
+    },
+    "model": "taller.region",
+    "pk": 12
   },
   {
-    "model": "taller.region",
-    "pk": 13,
     "fields": {
-      "nombre": "Región de Los Lagos"
-    }
+      "nombre": "Regi\u00f3n de Los Lagos"
+    },
+    "model": "taller.region",
+    "pk": 13
   },
   {
-    "model": "taller.region",
-    "pk": 14,
     "fields": {
-      "nombre": "Región de Aysén del General Carlos Ibáñez del Campo"
-    }
+      "nombre": "Regi\u00f3n de Ays\u00e9n del General Carlos Ib\u00e1\u00f1ez del Campo"
+    },
+    "model": "taller.region",
+    "pk": 14
   },
   {
-    "model": "taller.region",
-    "pk": 15,
     "fields": {
-      "nombre": "Región de Magallanes y de la Antártica Chilena"
-    }
+      "nombre": "Regi\u00f3n de Magallanes y de la Ant\u00e1rtica Chilena"
+    },
+    "model": "taller.region",
+    "pk": 15
   }
 ]

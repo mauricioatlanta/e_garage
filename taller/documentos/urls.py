@@ -89,6 +89,12 @@ urlpatterns = [
         views_moderno.api_obtener_numero_documento,
         name="api_obtener_numero_documento",
     ),
+    # Alias para compatibilidad con templates
+    path(
+        "api/next-number/",
+        views_moderno.api_obtener_numero_documento,
+        name="api_next_number",
+    ),
     # APIs de autocompletado
     path(
         "api/autocomplete-servicio/",

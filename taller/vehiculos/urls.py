@@ -11,7 +11,7 @@ Seguridad aplicada:
 Formato de respuesta estandarizado:
   - Éxito: {"success": true, "marcas": [...], "modelos": [...], etc.}
   - Error:  {"success": false, "error": "mensaje"}
-  
+
 Multi-tenant:
   - Clientes: filtrados por empresa del usuario
   - Catálogos (marca/modelo/motor/caja): filtrados por country + empresa (opcional)
@@ -44,99 +44,83 @@ urlpatterns = [
         views.eliminar_vehiculo,
         name="eliminar_vehiculo",
     ),
-    
     # =========================
     # APIs de Lectura (GET)
     # =========================
     # Seguridad: @login_required + @require_GET
     # Multi-tenant: Filtran por país y empresa del usuario
-    
     # Marcas disponibles para el país del usuario
     path("api/marcas/", views.api_marcas, name="api_marcas"),
-    
     # Búsqueda de clientes (solo de la empresa del usuario)
     path(
         "api/clientes/",
         views.api_busqueda_clientes,
         name="api_busqueda_clientes",
     ),
-    
     # Autocompletado de clientes (DAL Select2)
     path(
         "autocomplete/cliente/",
         ClienteAutocomplete.as_view(),
         name="cliente_autocomplete",
     ),
-    
     # Colores disponibles para el país del usuario
     path("api/colores/", views.api_colores, name="api_colores"),
-    
     # Modelos USA desde catálogo (legacy - mantener solo si DAL lo usa)
     # Considera deprecar si ajax_modelos_por_marca_anio cubre el caso
     path("api/modelos-usa/", views.api_modelos_usa, name="api_modelos_usa"),
-    
     # =========================
     # AJAX Dinámico (GET)
     # =========================
     # Usado por formulario_jerarquico.js
     # Formato: {success: true, modelos: [{id, nombre}]}
-    
     # Modelos por marca (sin año)
     path(
         "ajax/modelos-por-marca/",
         views.ajax_modelos_por_marca,
         name="ajax_modelos_por_marca",
     ),
-    
     # Modelos por marca + año (★ PREFERIDO por el frontend)
     path(
         "ajax/modelos-por-marca-anio/",
         views.ajax_modelos_por_marca_anio,
         name="ajax_modelos_por_marca_anio",
     ),
-    
     # Motores filtrados por modelo
     path(
         "ajax/motores-por-modelo/",
         views.ajax_motores_por_modelo,
         name="ajax_motores_por_modelo",
     ),
-    
     # Cajas filtradas por modelo
     path(
         "ajax/cajas-por-modelo/",
         views.ajax_cajas_por_modelo,
         name="ajax_cajas_por_modelo",
     ),
-    
     # =========================
     # AJAX Escritura (POST)
     # =========================
     # Seguridad: @login_required + @require_POST + CSRF automático (SessionAuth)
     # Permiso: Considera agregar @user_passes_test(is_staff) para catálogo
     # Multi-tenant: Crea con country y empresa del usuario
-    
     # Agregar nueva marca
     path(
         "ajax/agregar-marca/",
         views.ajax_agregar_marca,
         name="ajax_agregar_marca",
     ),
-    
     # Agregar nuevo modelo
     path(
         "ajax/agregar-modelo/",
         views.ajax_agregar_modelo,
         name="ajax_agregar_modelo",
     ),
-    
     # Agregar nuevo motor
     path(
         "ajax/agregar-motor/",
         views.ajax_agregar_motor,
         name="ajax_agregar_motor",
     ),
-    
     # Agregar nueva caja
     path(
         "ajax/agregar-caja/",
@@ -161,17 +145,17 @@ urlpatterns = [
 # Testing Rápido
 # =========================
 # from django.urls import reverse, resolve
-# 
+#
 # # Verificar resolución
 # assert resolve("/cl/es/vehiculos/crear/").url_name == "crear_vehiculo"
 # assert reverse("vehiculos:ajax_modelos_por_marca_anio").endswith("/ajax/modelos-por-marca-anio/")
-# 
+#
 # # Test AJAX (con pytest-django)
 # def test_ajax_modelos_requiere_login(client):
 #     url = reverse("vehiculos:ajax_modelos_por_marca_anio")
 #     resp = client.get(url)
 #     assert resp.status_code == 302  # Redirect a login
-# 
+#
 # def test_ajax_modelos_retorna_json(client, user):
 #     client.force_login(user)
 #     url = reverse("vehiculos:ajax_modelos_por_marca_anio")

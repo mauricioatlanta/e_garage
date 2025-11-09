@@ -4,24 +4,24 @@ Test de unicidad condicional en PrecioSuscripcion
 """
 
 import os
-import sys
+
 import django
-from django.conf import settings
 
 # Setup Django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings")
 django.setup()
 
 from django.db import IntegrityError
+
 from taller.models.precio_suscripcion import PrecioSuscripcion
 
 
 def test_unicidad_condicional():
     """Prueba la unicidad condicional del modelo"""
-    
+
     print("🔒 TEST DE UNICIDAD CONDICIONAL")
     print("=" * 50)
-    
+
     # 1. Verificar que existe un plan mensual activo para Chile
     print("\n1️⃣ Verificando plan mensual activo para Chile:")
     plan_activo = PrecioSuscripcion.objects.vigente("CL", "mensual")
@@ -31,7 +31,7 @@ def test_unicidad_condicional():
     else:
         print("   ❌ No hay plan mensual activo para Chile")
         return
-    
+
     # 2. Intentar crear otro plan mensual activo para Chile (debería fallar)
     print("\n2️⃣ Intentando crear otro plan mensual activo para Chile:")
     try:
@@ -40,12 +40,12 @@ def test_unicidad_condicional():
             pais=PrecioSuscripcion.Pais.CL,
             precio=30000,  # Precio diferente
             nombre_plan="Plan Mensual Duplicado",
-            activo=True  # ← Esto debería causar el error
+            activo=True,  # ← Esto debería causar el error
         )
         print("   ❌ Error: Se creó un duplicado activo (no debería pasar)")
     except IntegrityError as e:
         print(f"   ✅ Unicidad funcionó: {e}")
-    
+
     # 3. Crear plan mensual INACTIVO para Chile (debería funcionar)
     print("\n3️⃣ Creando plan mensual INACTIVO para Chile:")
     try:
@@ -54,21 +54,21 @@ def test_unicidad_condicional():
             pais=PrecioSuscripcion.Pais.CL,
             precio=15000,
             nombre_plan="Plan Mensual Histórico",
-            activo=False  # ← Inactivo, debería funcionar
+            activo=False,  # ← Inactivo, debería funcionar
         )
         print(f"   ✅ Plan histórico creado: {plan_historico}")
-        
+
         # Limpiar el plan de prueba
         plan_historico.delete()
         print("   🧹 Plan de prueba eliminado")
-        
+
     except IntegrityError as e:
         print(f"   ❌ Error inesperado: {e}")
-    
+
     # 4. Verificar que solo hay un plan activo por tipo/país
     print("\n4️⃣ Verificando unicidad en todos los planes activos:")
     planes_activos = PrecioSuscripcion.objects.activos().order_by("pais", "tipo_plan")
-    
+
     combinaciones = {}
     for plan in planes_activos:
         clave = f"{plan.pais}_{plan.tipo_plan}"
@@ -78,9 +78,9 @@ def test_unicidad_condicional():
             print(f"      Plan 2: {plan}")
         else:
             combinaciones[clave] = plan
-    
+
     print(f"   ✅ {len(combinaciones)} combinaciones únicas verificadas")
-    
+
     # 5. Mostrar resumen de planes por país
     print("\n5️⃣ Resumen de planes por país:")
     for pais in ["CL", "US"]:
@@ -88,7 +88,7 @@ def test_unicidad_condicional():
         activos = planes_pais.filter(activo=True).count()
         inactivos = planes_pais.filter(activo=False).count()
         print(f"   {pais}: {activos} activos, {inactivos} inactivos")
-    
+
     print("\n" + "=" * 50)
     print("✅ TEST DE UNICIDAD COMPLETADO")
 

@@ -233,7 +233,7 @@ async function guardarDocumento() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(formData)
     });
-    
+
     if (response.ok) {
       // Documento guardado exitosamente
       window.egNumero?.invalidate(); // Refrescar correlativo

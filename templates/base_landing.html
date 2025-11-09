@@ -5,18 +5,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}E-Garage - Gestión de Talleres{% endblock %}</title>
-    
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+
     <!-- Custom Tailwind Config -->
     <script>
         tailwind.config = {
@@ -45,7 +45,7 @@
             }
         }
     </script>
-    
+
     {% block extra_head %}{% endblock %}
 </head>
 
@@ -65,11 +65,11 @@
             </a>
         </div>
     </header>
-    
+
     {% block fondo_extra %}{% endblock %}
-    
+
     {% block content %}{% endblock %}
-    
+
     <!-- Footer simple para páginas de bienvenida -->
     <footer class="bg-black/80 border-t border-blue-700/40 py-4 mt-auto">
         <div class="max-w-6xl mx-auto px-6 text-center">
@@ -82,7 +82,7 @@
             </div>
         </div>
     </footer>
-    
+
     {% block extra_js %}{% endblock %}
 </body>
 </html>

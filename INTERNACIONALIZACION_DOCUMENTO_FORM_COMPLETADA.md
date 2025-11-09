@@ -161,4 +161,3 @@ El template `documento_form.html` ahora está **completamente internacionalizado
 - ✅ **Consistencia**: Mismo patrón en todo el template
 
 El formulario de documentos en `/us/documentos/form/` ahora muestra **todo en inglés** para los usuarios de USA, mientras mantiene el español para Chile 🇺🇸🇨🇱✨
-

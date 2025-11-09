@@ -1,23 +1,21 @@
-from datetime import timedelta
 import json
+from datetime import timedelta
 
 from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.db import models
-from django.http import JsonResponse, HttpResponseBadRequest
+from django.http import JsonResponse
 from django.utils import timezone
-from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST
 
 from taller.models.clientes import Cliente
 from taller.models.documento import Documento
 from taller.models.extras_vehiculo import CajaVehiculo, MotorVehiculo
-from taller.models.marcas_usa import ModeloVehiculo  # Asegúrate: este es el modelo correcto en USA
 from taller.models.repuesto import Repuesto
+from taller.models.tienda import Tienda
 from taller.models.vehiculos import Vehiculo
 from taller.servicios.models import Servicio
-from taller.models.tienda import Tienda
 
 
 # ==========
@@ -50,24 +48,24 @@ def _paginate(qs, request, default_limit=None, max_limit=None):
     """Paginación configurable desde settings."""
     default_limit = default_limit or getattr(settings, "API_DEFAULT_LIMIT", 100)
     max_limit = max_limit or getattr(settings, "API_MAX_LIMIT", 200)
-    
+
     limit = _parse_int(request.GET.get("limit")) or default_limit
     offset = _parse_int(request.GET.get("offset")) or 0
     limit = min(max(limit, 1), max_limit)
     offset = max(offset, 0)
-    
+
     # Contar total antes de paginar
     total_count = qs.count()
     has_more = (offset + limit) < total_count
-    
+
     return {
-        'queryset': qs[offset : offset + limit],
-        'pagination': {
-            'count': total_count,
-            'limit': limit,
-            'offset': offset,
-            'has_more': has_more
-        }
+        "queryset": qs[offset : offset + limit],
+        "pagination": {
+            "count": total_count,
+            "limit": limit,
+            "offset": offset,
+            "has_more": has_more,
+        },
     }
 
 
@@ -91,12 +89,14 @@ def _get_modelo_cls(country: str):
     except LookupError:
         # Fallback al import directo si no se encuentra en apps
         from taller.models.marcas_usa import ModeloVehiculo
+
         return ModeloVehiculo
 
 
 # =========================================
 # AJAX: Motores / Cajas / Modelos (USA/CL)
 # =========================================
+
 
 @login_required
 @require_GET
@@ -125,7 +125,7 @@ def buscar_motores_api(request):
         return JsonResponse({"results": [], "error": "modelo_id inválido"}, status=400)
 
     qs = MotorVehiculo.objects.all()
-    
+
     # Filtro por país (preferido)
     if hasattr(MotorVehiculo, "country"):
         qs = qs.filter(country=country)
@@ -142,11 +142,8 @@ def buscar_motores_api(request):
         qs = qs.filter(nombre__icontains=q)
 
     paginated = _paginate(qs.order_by("nombre"), request)
-    data = [_format_item(m, fmt) for m in paginated['queryset']]
-    return JsonResponse({
-        "results": data,
-        "pagination": paginated['pagination']
-    })
+    data = [_format_item(m, fmt) for m in paginated["queryset"]]
+    return JsonResponse({"results": data, "pagination": paginated["pagination"]})
 
 
 @login_required
@@ -176,7 +173,7 @@ def buscar_cajas_api(request):
         return JsonResponse({"results": [], "error": "modelo_id inválido"}, status=400)
 
     qs = CajaVehiculo.objects.all()
-    
+
     # Filtro por país (preferido)
     if hasattr(CajaVehiculo, "country"):
         qs = qs.filter(country=country)
@@ -193,11 +190,8 @@ def buscar_cajas_api(request):
         qs = qs.filter(nombre__icontains=q)
 
     paginated = _paginate(qs.order_by("nombre"), request)
-    data = [_format_item(c, fmt) for c in paginated['queryset']]
-    return JsonResponse({
-        "results": data,
-        "pagination": paginated['pagination']
-    })
+    data = [_format_item(c, fmt) for c in paginated["queryset"]]
+    return JsonResponse({"results": data, "pagination": paginated["pagination"]})
 
 
 @login_required
@@ -215,7 +209,7 @@ def buscar_modelos_api(request):
     # Usar modelo dinámico según país
     Modelo = _get_modelo_cls(country)
     qs = Modelo.objects.all()
-    
+
     # Filtro por país (preferido)
     if hasattr(Modelo, "country"):
         qs = qs.filter(country=country)
@@ -232,16 +226,14 @@ def buscar_modelos_api(request):
         qs = qs.filter(nombre__icontains=q)
 
     paginated = _paginate(qs.order_by("nombre"), request)
-    data = [_format_item(m, fmt) for m in paginated['queryset']]
-    return JsonResponse({
-        "results": data,
-        "pagination": paginated['pagination']
-    })
+    data = [_format_item(m, fmt) for m in paginated["queryset"]]
+    return JsonResponse({"results": data, "pagination": paginated["pagination"]})
 
 
 # ===========================
 # Salud del sistema / Status
 # ===========================
+
 
 @login_required
 @require_GET
@@ -278,6 +270,7 @@ def api_root_status(request):
 # Crear Tienda (POST)
 # ====================
 
+
 @login_required
 @require_POST
 def crear_tienda_api(request):
@@ -299,7 +292,9 @@ def crear_tienda_api(request):
 
     # Evitar duplicados por nombre dentro de la empresa
     if Tienda.objects.filter(empresa=empresa, nombre__iexact=nombre).exists():
-        return JsonResponse({"error": "Ya existe una tienda con ese nombre"}, status=409)
+        return JsonResponse(
+            {"error": "Ya existe una tienda con ese nombre"}, status=409
+        )
 
     tienda = Tienda.objects.create(
         nombre=nombre,
@@ -313,6 +308,7 @@ def crear_tienda_api(request):
 # ==========================
 # Búsqueda de entidades
 # ==========================
+
 
 @login_required
 @require_GET
@@ -334,10 +330,10 @@ def buscar_clientes_api(request):
         )
 
     paginated = _paginate(clientes.order_by("nombre", "apellido"), request)
-    
+
     # Etiqueta de identificador según país
     id_label = "RUT" if country == "CL" else "EIN"
-    
+
     data = [
         {
             "id": c.pk,
@@ -346,12 +342,9 @@ def buscar_clientes_api(request):
             "identificador_label": id_label,
             "email": c.email or "",
         }
-        for c in paginated['queryset']
+        for c in paginated["queryset"]
     ]
-    return JsonResponse({
-        "results": data,
-        "pagination": paginated['pagination']
-    })
+    return JsonResponse({"results": data, "pagination": paginated["pagination"]})
 
 
 @login_required
@@ -368,15 +361,17 @@ def info_cliente_api(request, cliente_id):
 
     try:
         cliente = Cliente.objects.get(pk=cid, empresa=empresa)
-        return JsonResponse({
-            "id": cliente.pk,
-            "nombre": cliente.nombre,
-            "apellido": cliente.apellido,
-            "email": cliente.email,
-            "telefono": cliente.telefono,
-            "tax_id": cliente.tax_id,
-            "ciudad": str(cliente.ciudad) if cliente.ciudad else "",
-        })
+        return JsonResponse(
+            {
+                "id": cliente.pk,
+                "nombre": cliente.nombre,
+                "apellido": cliente.apellido,
+                "email": cliente.email,
+                "telefono": cliente.telefono,
+                "tax_id": cliente.tax_id,
+                "ciudad": str(cliente.ciudad) if cliente.ciudad else "",
+            }
+        )
     except Cliente.DoesNotExist:
         return JsonResponse({"error": "Cliente no encontrado"}, status=404)
 
@@ -393,28 +388,28 @@ def vehiculos_cliente_api(request, cliente_id):
         return JsonResponse({"error": "cliente_id inválido"}, status=400)
 
     # Optimización: select_related para evitar N+1 queries
-    qs = (Vehiculo.objects
-          .filter(cliente_id=cid, cliente__empresa=empresa)  # 🔒 CRÍTICO
-          .select_related("marca", "modelo")
-          .order_by("-id"))
+    qs = (
+        Vehiculo.objects.filter(cliente_id=cid, cliente__empresa=empresa)  # 🔒 CRÍTICO
+        .select_related("marca", "modelo")
+        .order_by("-id")
+    )
 
     paginated = _paginate(qs, request)
-    
+
     def as_dict(v):
         return {
             "id": v.pk,
             "patente": getattr(v, "patente", "") or getattr(v, "placa", ""),
             "vin": getattr(v, "vin", ""),
-            "marca": getattr(getattr(v, "marca", None), "nombre", "") or str(getattr(v, "marca", "") or ""),
-            "modelo": getattr(getattr(v, "modelo", None), "nombre", "") or str(getattr(v, "modelo", "") or ""),
+            "marca": getattr(getattr(v, "marca", None), "nombre", "")
+            or str(getattr(v, "marca", "") or ""),
+            "modelo": getattr(getattr(v, "modelo", None), "nombre", "")
+            or str(getattr(v, "modelo", "") or ""),
             "anio": getattr(v, "anio", getattr(v, "año", "")),
         }
-    
-    data = [as_dict(v) for v in paginated['queryset']]
-    return JsonResponse({
-        "results": data,
-        "pagination": paginated['pagination']
-    })
+
+    data = [as_dict(v) for v in paginated["queryset"]]
+    return JsonResponse({"results": data, "pagination": paginated["pagination"]})
 
 
 @login_required
@@ -472,12 +467,9 @@ def buscar_repuestos_api(request):
             "precio_venta_sugerido": float(getattr(r, "precio_venta", 0) or 0),
             "stock": getattr(r, "cantidad_stock", 0) or 0,
         }
-        for r in paginated['queryset']
+        for r in paginated["queryset"]
     ]
-    return JsonResponse({
-        "results": data,
-        "pagination": paginated['pagination']
-    })
+    return JsonResponse({"results": data, "pagination": paginated["pagination"]})
 
 
 @login_required
@@ -492,19 +484,19 @@ def buscar_servicios_api(request):
         return JsonResponse({"results": []})
 
     qs = Servicio.objects.filter(empresa=empresa)
-    
+
     # Feature-detect con hasattr para evitar except amplio
     if hasattr(Servicio, "categoria"):
         qs = qs.filter(
-            models.Q(nombre__icontains=q) |
-            models.Q(categoria__names__label__icontains=q)
+            models.Q(nombre__icontains=q)
+            | models.Q(categoria__names__label__icontains=q)
         )
     else:
         qs = qs.filter(nombre__icontains=q)
-    
+
     qs = qs.distinct().order_by("nombre")
     paginated = _paginate(qs, request)
-    
+
     data = [
         {
             "id": getattr(s, "pk", None) or f"temp_{i}",
@@ -512,12 +504,9 @@ def buscar_servicios_api(request):
             "categoria": str(getattr(s, "categoria", "General")),
             "precio_sugerido": 0,  # el precio se define en el documento
         }
-        for i, s in enumerate(paginated['queryset'])
+        for i, s in enumerate(paginated["queryset"])
     ]
-    return JsonResponse({
-        "results": data,
-        "pagination": paginated['pagination']
-    })
+    return JsonResponse({"results": data, "pagination": paginated["pagination"]})
 
 
 @login_required
@@ -551,6 +540,7 @@ def buscar_otros_servicios_api(request):
 # KPIs / Command Center
 # ==========================
 
+
 @login_required
 @require_GET
 def ops_metrics_api(request):
@@ -567,16 +557,16 @@ def ops_metrics_api(request):
     ayer = hoy - timedelta(days=1)
     hace_7_dias = hoy - timedelta(days=7)
 
-    docs_today = Documento.objects.filter(
-        empresa=empresa, fecha_emision=hoy
-    ).count()
+    docs_today = Documento.objects.filter(empresa=empresa, fecha_emision=hoy).count()
 
     docs_yesterday = Documento.objects.filter(
         empresa=empresa, fecha_emision=ayer
     ).count()
 
     docs_delta = (
-        (docs_today - docs_yesterday) / docs_yesterday if docs_yesterday else (1.0 if docs_today else 0.0)
+        (docs_today - docs_yesterday) / docs_yesterday
+        if docs_yesterday
+        else (1.0 if docs_today else 0.0)
     )
 
     clients_week = (
@@ -602,11 +592,13 @@ def ops_metrics_api(request):
 
     efficiency = (docs_cerrados / docs_totales_semana) if docs_totales_semana else 0.0
 
-    return JsonResponse({
-        "docs_today": docs_today,
-        "docs_delta": round(docs_delta, 2),
-        "clients_week": clients_week,
-        "system_online": True,
-        "system_msg": "All modules active",
-        "efficiency": round(efficiency, 2),
-    })
+    return JsonResponse(
+        {
+            "docs_today": docs_today,
+            "docs_delta": round(docs_delta, 2),
+            "clients_week": clients_week,
+            "system_online": True,
+            "system_msg": "All modules active",
+            "efficiency": round(efficiency, 2),
+        }
+    )

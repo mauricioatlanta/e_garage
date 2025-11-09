@@ -57,7 +57,7 @@
       width: 90%;
       border: 1px solid rgba(0, 230, 255, 0.2);
     }
-    
+
     .logo-container {
       margin-bottom: 2rem;
       position: relative;
@@ -69,16 +69,16 @@
       animation: pulse 3s infinite ease-in-out;
     }
     @keyframes pulse {
-      0%, 100% { 
-        transform: scale(1); 
+      0%, 100% {
+        transform: scale(1);
         filter: drop-shadow(0 4px 12px rgba(0, 230, 255, 0.4));
       }
-      50% { 
-        transform: scale(1.03); 
+      50% {
+        transform: scale(1.03);
         filter: drop-shadow(0 6px 18px rgba(0, 230, 255, 0.6));
       }
     }
-    
+
     .selector-title {
       font-size: 2.5rem;
       color: #00e6ff;
@@ -86,7 +86,7 @@
       font-weight: 900;
       letter-spacing: 1px;
     }
-    
+
     .selector-subtitle {
       font-size: 1.1rem;
       color: #cbd5e1;
@@ -94,13 +94,13 @@
       font-family: 'Segoe UI', sans-serif;
       line-height: 1.6;
     }
-    
+
     .country-buttons {
       display: flex;
       flex-direction: column;
       gap: 1.25rem;
     }
-    
+
     .country-btn {
       display: flex;
       align-items: center;
@@ -119,7 +119,7 @@
       position: relative;
       overflow: hidden;
     }
-    
+
     .country-btn::before {
       content: '';
       position: absolute;
@@ -130,46 +130,46 @@
       background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
       transition: left 0.5s;
     }
-    
+
     .country-btn:hover::before {
       left: 100%;
     }
-    
+
     .country-btn.usa {
       background: linear-gradient(135deg, #002868 0%, #0050b3 100%);
       color: #fff;
       border-color: #0050b3;
       box-shadow: 0 4px 20px rgba(0, 80, 179, 0.4);
     }
-    
+
     .country-btn.usa:hover {
       transform: translateY(-3px) scale(1.02);
       box-shadow: 0 8px 30px rgba(0, 80, 179, 0.6);
       border-color: #00e6ff;
     }
-    
+
     .country-btn.chile {
       background: linear-gradient(135deg, #d52b1e 0%, #0033a0 100%);
       color: #fff;
       border-color: #d52b1e;
       box-shadow: 0 4px 20px rgba(213, 43, 30, 0.4);
     }
-    
+
     .country-btn.chile:hover {
       transform: translateY(-3px) scale(1.02);
       box-shadow: 0 8px 30px rgba(213, 43, 30, 0.6);
       border-color: #00e6ff;
     }
-    
+
     .flag {
       font-size: 2.5rem;
     }
-    
+
     .country-name {
       flex: 1;
       text-align: left;
     }
-    
+
     @media (max-width: 600px) {
       .selector-container {
         padding: 2.5rem 1.5rem 1.5rem;
@@ -199,19 +199,19 @@
     <div class="logo-container">
       <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage Logo" class="logo">
     </div>
-    
+
     <h1 class="selector-title">eGarage</h1>
     <p class="selector-subtitle">
       Gestión Profesional Automotriz<br>
       <strong>Selecciona tu país para continuar</strong>
     </p>
-    
+
     <div class="country-buttons">
       <a href="/us/" class="country-btn usa">
         <span class="flag">🇺🇸</span>
         <span class="country-name">United States</span>
       </a>
-      
+
       <a href="/cl/" class="country-btn chile">
         <span class="flag">🇨🇱</span>
         <span class="country-name">Chile</span>
@@ -225,7 +225,7 @@
       const container = document.querySelector('.selector-container');
       container.style.opacity = '0';
       container.style.transform = 'translateY(30px)';
-      
+
       setTimeout(() => {
         container.style.transition = 'all 0.8s ease-out';
         container.style.opacity = '1';
@@ -235,4 +235,3 @@
   </script>
 </body>
 </html>
-

@@ -1,7 +1,7 @@
 # 🌍 Análisis de Arquitectura Multi-País - eGarage
 
-**Fecha de Análisis**: 26 de octubre de 2025  
-**Analista**: Sistema de Gestión eGarage  
+**Fecha de Análisis**: 26 de octubre de 2025
+**Analista**: Sistema de Gestión eGarage
 **Objetivo**: Evaluar si la app está correctamente diseñada para múltiples países y su escalabilidad
 
 ---
@@ -48,13 +48,13 @@ class Empresa(models.Model):
 ```python
 # Para agregar México:
 PAIS_CHOICES = [
-    ('CL', 'Chile'), 
+    ('CL', 'Chile'),
     ('US', 'United States'),
     ('MX', 'México'),  # ← Agregar aquí
 ]
 
 MONEDA_CHOICES = [
-    ('CLP', 'CLP'), 
+    ('CLP', 'CLP'),
     ('USD', 'USD'),
     ('MXN', 'MXN'),  # ← Agregar aquí
 ]
@@ -70,7 +70,7 @@ MONEDA_CHOICES = [
 class Marca(models.Model):
     nombre = models.CharField(max_length=50)
     country = models.CharField(max_length=2, choices=[('CL', 'Chile'), ('US', 'Estados Unidos')])
-    
+
     class Meta:
         unique_together = [('country', 'nombre')]
         indexes = [models.Index(fields=['country', 'nombre'])]
@@ -79,7 +79,7 @@ class Modelo(models.Model):
     nombre = models.CharField(max_length=50)
     marca = models.ForeignKey(Marca, on_delete=models.CASCADE)
     country = models.CharField(max_length=2, default='CL', choices=[...])
-    
+
     class Meta:
         unique_together = [('country', 'marca', 'nombre')]
 ```
@@ -96,7 +96,7 @@ class Vehiculo(TenantScoped):
     # Sistema Chile: ForeignKeys
     marca = models.ForeignKey(Marca, ...)
     modelo = models.ForeignKey(Modelo, ...)
-    
+
     # Sistema USA: Texto libre (catálogo global)
     marca_texto = models.CharField(max_length=100, ...)
     modelo_texto = models.CharField(max_length=150, ...)
@@ -126,20 +126,20 @@ class Cliente(TenantScoped):
     # Campos Chile
     region = models.ForeignKey(TallerRegion, ...)  # I, II, III, RM, etc.
     ciudad = models.ForeignKey(TallerCiudad, ...)  # Santiago, Valparaíso, etc.
-    
+
     # Campos USA
     estado_usa = models.ForeignKey(EstadoUSA, ...)  # California, Texas, etc.
     ciudad_usa = models.ForeignKey(CiudadUSA, ...)  # Los Angeles, Houston, etc.
     zipcode = models.CharField(max_length=10, ...)  # 90210, 10001, etc.
-    
+
     def clean(self):
         # Validación: Chile NO puede tener campos USA y viceversa
         pais = self.empresa.pais
-        
+
         if pais == 'CL':
             if self.estado_usa or self.ciudad_usa or self.zipcode:
                 raise ValidationError("Clientes de Chile no usan campos USA")
-        
+
         if pais == 'US':
             if self.region or self.ciudad:
                 raise ValidationError("Clientes de USA no usan campos Chile")
@@ -156,7 +156,7 @@ class Cliente(TenantScoped):
 # Para agregar México:
 class Cliente(TenantScoped):
     # ... campos existentes ...
-    
+
     # Campos México
     estado_mx = models.ForeignKey(EstadoMexico, ...)
     municipio_mx = models.ForeignKey(MunicipioMexico, ...)
@@ -248,7 +248,7 @@ def validar_patente(patente, pais):
         regex = r"^[A-Z]{2}\d{4}$"  # AA1234
     elif pais == "US":
         regex = r"^[A-Z0-9]{2,7}$"  # ABC123 (más flexible)
-    
+
     return re.match(regex, patente)
 
 # Teléfonos por país
@@ -337,13 +337,13 @@ path('mx/', include('taller.urls_extra.mexico', namespace='mexico'))
 ```python
 # taller/models/empresa.py
 PAIS_CHOICES = [
-    ('CL', 'Chile'), 
+    ('CL', 'Chile'),
     ('US', 'United States'),
     ('MX', 'México'),  # ← AGREGAR
 ]
 
 MONEDA_CHOICES = [
-    ('CLP', 'CLP'), 
+    ('CLP', 'CLP'),
     ('USD', 'USD'),
     ('MXN', 'MXN'),  # ← AGREGAR
 ]
@@ -376,7 +376,7 @@ class MunicipioMexico(models.Model):
 # taller/models/clientes.py
 class Cliente(TenantScoped):
     # ... campos existentes ...
-    
+
     # Campos México
     estado_mx = models.ForeignKey(EstadoMexico, null=True, blank=True)
     municipio_mx = models.ForeignKey(MunicipioMexico, null=True, blank=True)
@@ -611,7 +611,7 @@ La app tiene:
 ### **¿Está lista para extender a nuevos países?**
 ✅ **SÍ, CON MÍNIMO ESFUERZO**
 
-**Tiempo estimado para agregar un país nuevo**: 
+**Tiempo estimado para agregar un país nuevo**:
 - **Técnico**: 20 horas de desarrollo
 - **Datos**: 10 horas de importación/fixtures
 - **Testing**: 10 horas
@@ -646,7 +646,7 @@ class Cliente(TenantScoped):
 ```python
 class Marca(models.Model):
     country = models.CharField(...)  # ← Filtrado automático
-    
+
     class Meta:
         unique_together = [('country', 'nombre')]
 ```
@@ -709,7 +709,7 @@ request.country  # ← Disponible en TODAS las vistas
 - Reportes de impuestos (muy específicos por país)
 - Páginas de landing (marketing diferente)
 
-**RECOMENDACIÓN**: 
+**RECOMENDACIÓN**:
 - 70% templates únicos con i18n
 - 30% templates específicos por país (documentos, reportes)
 
@@ -752,4 +752,3 @@ request.country  # ← Disponible en TODAS las vistas
 ---
 
 **¿Te queda claro?** ¿Quieres que continuemos con la reestructuración de templates para llevarla al 9.5/10? 🚀
-

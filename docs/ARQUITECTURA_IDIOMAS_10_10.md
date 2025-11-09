@@ -1,6 +1,6 @@
 # 🌍 ARQUITECTURA DE IDIOMAS PERFECTA - 10/10
 
-**Fecha**: 26 de octubre de 2025  
+**Fecha**: 26 de octubre de 2025
 **Objetivo**: Diseñar sistema de idiomas escalable para expansión global
 
 ---
@@ -47,7 +47,7 @@ COUNTRY_CONFIG = {
         'phone_regex': r'^\+?56\d{8,9}$',
         'plate_regex': r'^[A-Z]{2}\d{4}$',
         'date_format': '%d/%m/%Y',
-        
+
         # 🔥 CONFIGURACIÓN DE IDIOMAS
         'languages': {
             'available': ['es'],           # Solo español
@@ -56,7 +56,7 @@ COUNTRY_CONFIG = {
             'primary': 'es',
         },
     },
-    
+
     'US': {
         'name': 'United States',
         'name_es': 'Estados Unidos',
@@ -71,7 +71,7 @@ COUNTRY_CONFIG = {
         'phone_regex': r'^\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$',
         'plate_regex': r'^[A-Z0-9]{2,7}$',
         'date_format': '%m/%d/%Y',
-        
+
         # 🔥 CONFIGURACIÓN DE IDIOMAS
         'languages': {
             'available': ['en', 'es'],     # Inglés Y español
@@ -81,7 +81,7 @@ COUNTRY_CONFIG = {
             'secondary': 'es',             # Secundario: español
         },
     },
-    
+
     'MX': {
         'name': 'México',
         'name_es': 'México',
@@ -96,7 +96,7 @@ COUNTRY_CONFIG = {
         'phone_regex': r'^\+?52\d{10}$',
         'plate_regex': r'^[A-Z]{3}\d{4}$',
         'date_format': '%d/%m/%Y',
-        
+
         # 🔥 CONFIGURACIÓN DE IDIOMAS
         'languages': {
             'available': ['es'],           # Solo español
@@ -105,7 +105,7 @@ COUNTRY_CONFIG = {
             'primary': 'es',
         },
     },
-    
+
     'BR': {
         'name': 'Brasil',
         'name_pt': 'Brasil',
@@ -121,7 +121,7 @@ COUNTRY_CONFIG = {
         'phone_regex': r'^\+?55\d{10,11}$',
         'plate_regex': r'^[A-Z]{3}\d[A-Z0-9]\d{2}$',  # ABC1D23 (Mercosul)
         'date_format': '%d/%m/%Y',
-        
+
         # 🔥 CONFIGURACIÓN DE IDIOMAS
         'languages': {
             'available': ['pt'],           # Solo portugués
@@ -130,7 +130,7 @@ COUNTRY_CONFIG = {
             'primary': 'pt',
         },
     },
-    
+
     'CA': {
         'name': 'Canada',
         'name_en': 'Canada',
@@ -146,7 +146,7 @@ COUNTRY_CONFIG = {
         'phone_regex': r'^\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$',
         'plate_regex': r'^[A-Z0-9]{2,7}$',
         'date_format': '%Y-%m-%d',
-        
+
         # 🔥 CONFIGURACIÓN DE IDIOMAS
         'languages': {
             'available': ['en', 'fr'],     # Inglés Y francés
@@ -156,7 +156,7 @@ COUNTRY_CONFIG = {
             'secondary': 'fr',             # Secundario: francés
         },
     },
-    
+
     'ES': {  # España
         'name': 'España',
         'name_es': 'España',
@@ -171,7 +171,7 @@ COUNTRY_CONFIG = {
         'phone_regex': r'^\+?34\d{9}$',
         'plate_regex': r'^\d{4}[A-Z]{3}$',
         'date_format': '%d/%m/%Y',
-        
+
         # 🔥 CONFIGURACIÓN DE IDIOMAS
         'languages': {
             'available': ['es', 'en'],     # Español Y inglés
@@ -223,10 +223,10 @@ class UserLanguagePreference(models.Model):
     Preferencia de idioma del usuario
     Solo aplica para países bi-idioma
     """
-    user = models.OneToOneField(User, on_delete=models.CASCADE, 
+    user = models.OneToOneField(User, on_delete=models.CASCADE,
                                 related_name='language_pref')
     language = models.CharField(max_length=5, choices=settings.LANGUAGES)
-    
+
     def __str__(self):
         return f"{self.user.username} - {self.language}"
 ```
@@ -246,20 +246,20 @@ class SmartLanguageMiddleware:
     2. Preferencia del usuario (si el país lo permite)
     3. Idioma default del país
     """
-    
+
     def __init__(self, get_response):
         self.get_response = get_response
-    
+
     def __call__(self, request):
         # Si el usuario está autenticado
         if request.user.is_authenticated and hasattr(request.user, 'empresa'):
             pais = request.user.empresa.pais
             config = COUNTRY_CONFIG.get(pais, COUNTRY_CONFIG['CL'])
             lang_config = config['languages']
-            
+
             # Idioma a usar
             idioma = None
-            
+
             # Si el país permite cambio de idioma
             if lang_config['allow_switch']:
                 # 1. Intentar obtener preferencia del usuario
@@ -268,30 +268,30 @@ class SmartLanguageMiddleware:
                     # Validar que sea un idioma disponible para ese país
                     if user_lang in lang_config['available']:
                         idioma = user_lang
-                
+
                 # 2. Intentar obtener de sesión/cookie
                 if not idioma:
                     session_lang = request.session.get('django_language')
                     if session_lang in lang_config['available']:
                         idioma = session_lang
-                
+
                 # 3. Usar default del país
                 if not idioma:
                     idioma = lang_config['default']
-            
+
             else:
                 # País mono-idioma: usar default forzado
                 idioma = lang_config['default']
-            
+
             # Activar idioma
             translation.activate(idioma)
             request.LANGUAGE_CODE = idioma
-            
+
             # Inyectar config de idiomas al request
             request.lang_config = lang_config
             request.can_switch_language = lang_config['allow_switch']
             request.available_languages = lang_config['available']
-        
+
         else:
             # Usuario no autenticado: detectar por URL
             if '/us/' in request.path:
@@ -303,13 +303,13 @@ class SmartLanguageMiddleware:
             else:
                 config = COUNTRY_CONFIG['CL']
                 idioma = config['languages']['default']
-            
+
             translation.activate(idioma)
             request.LANGUAGE_CODE = idioma
             request.lang_config = config['languages']
             request.can_switch_language = config['languages']['allow_switch']
             request.available_languages = config['languages']['available']
-        
+
         response = self.get_response(request)
         return response
 ```
@@ -330,36 +330,36 @@ def cambiar_idioma(request):
     """
     if request.method == 'POST':
         nuevo_idioma = request.POST.get('language')
-        
+
         # Validar que el usuario puede cambiar idioma
         if not request.can_switch_language:
             return JsonResponse({
                 'success': False,
                 'error': 'Tu país no permite cambio de idioma'
             }, status=400)
-        
+
         # Validar que el idioma está disponible para ese país
         if nuevo_idioma not in request.available_languages:
             return JsonResponse({
                 'success': False,
                 'error': 'Idioma no disponible para tu país'
             }, status=400)
-        
+
         # Guardar en sesión
         request.session['django_language'] = nuevo_idioma
-        
+
         # Si está autenticado, guardar en BD (preferencia persistente)
         if request.user.is_authenticated:
             UserLanguagePreference.objects.update_or_create(
                 user=request.user,
                 defaults={'language': nuevo_idioma}
             )
-        
+
         return JsonResponse({
             'success': True,
             'language': nuevo_idioma
         })
-    
+
     return JsonResponse({'success': False}, status=405)
 ```
 
@@ -372,11 +372,11 @@ def cambiar_idioma(request):
 {% if request.can_switch_language %}
 <div class="language-selector">
     {% for lang_code in request.available_languages %}
-        <a href="#" 
+        <a href="#"
            class="lang-btn {% if request.LANGUAGE_CODE == lang_code %}active{% endif %}"
            data-lang="{{ lang_code }}"
            onclick="switchLanguage('{{ lang_code }}'); return false;">
-            
+
             {% if lang_code == 'en' %}🇺🇸 English
             {% elif lang_code == 'es' %}🇪🇸 Español
             {% elif lang_code == 'pt' %}🇧🇷 Português
@@ -522,7 +522,7 @@ msgstr "Province"
 
 <div class="page-header">
     <h1>{% trans "Clients" %}</h1>
-    
+
     {# Selector de idioma - Solo si el país lo permite #}
     {% include "components/language_selector.html" %}
 </div>
@@ -534,7 +534,7 @@ msgstr "Province"
                 <th>{% trans "Name" %}</th>
                 <th>{% trans "Email" %}</th>
                 <th>{% trans "Phone" %}</th>
-                
+
                 {# Campo específico por país #}
                 {% if request.country == 'CL' %}
                     <th>{% trans "Region" %}</th>
@@ -543,7 +543,7 @@ msgstr "Province"
                 {% elif request.country == 'BR' %}
                     <th>{% trans "State" %}</th>
                 {% endif %}
-                
+
                 <th>{% trans "Actions" %}</th>
             </tr>
         </thead>
@@ -553,7 +553,7 @@ msgstr "Province"
                 <td>{{ cliente.nombre }} {{ cliente.apellido }}</td>
                 <td>{{ cliente.email }}</td>
                 <td>{{ cliente.telefono }}</td>
-                
+
                 {# Mostrar ubicación según país #}
                 {% if request.country == 'CL' %}
                     <td>{{ cliente.region.nombre }}</td>
@@ -562,7 +562,7 @@ msgstr "Province"
                 {% elif request.country == 'BR' %}
                     <td>{{ cliente.estado_br.nome }}</td>
                 {% endif %}
-                
+
                 <td>
                     <a href="{% url 'clientes:editar' cliente.pk %}">
                         {% trans "Edit" %}
@@ -901,4 +901,3 @@ Misma lógica, diferente combinación:
 ---
 
 **¿Qué opción prefieres?** ¿Vamos por el 10/10 completo? 🚀
-

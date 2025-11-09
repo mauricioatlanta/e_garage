@@ -712,7 +712,7 @@ document.addEventListener('DOMContentLoaded', function() {
       // Handle form submission
       formNuevaCiudadUsa.addEventListener('submit', function(e) {
         e.preventDefault();
-        
+
         const nombreCiudad = inputNombreCiudadUsa.value.trim();
         if(!nombreCiudad) {
           errorCiudadUsa.textContent = 'City name is required';
@@ -740,7 +740,7 @@ document.addEventListener('DOMContentLoaded', function() {
             option.textContent = data.ciudad.nombre;
             option.selected = true;
             ciudadUsaSelect.appendChild(option);
-            
+
             cerrarModal();
           } else {
             errorCiudadUsa.textContent = data.error || 'Error creating city';

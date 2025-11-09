@@ -41,7 +41,7 @@ chmod +x 0_detectar_ruta.sh
    - Ir a: E:\projecto\e_garage\
    - Crear carpeta: deploy_atlantareciclajes\
    - Copiar SOLO estos archivos de tu proyecto:
-     
+
      deploy_atlantareciclajes\
      ├── templates\
      │   ├── email\          ← Carpeta completa
@@ -173,4 +173,3 @@ chmod +x *_FIXED.sh
 Luego sigue los pasos de la guía.
 
 **¿Listo?** 🚀
-

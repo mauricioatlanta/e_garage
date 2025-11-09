@@ -99,6 +99,6 @@ Con la suscripción activa, el usuario `testuser_usa` puede acceder a:
 
 ---
 
-**Fecha**: 2025-10-06  
-**Estado**: ✅ **PROBLEMA RESUELTO**  
+**Fecha**: 2025-10-06
+**Estado**: ✅ **PROBLEMA RESUELTO**
 **Acceso**: ✅ **FUNCIONAL**

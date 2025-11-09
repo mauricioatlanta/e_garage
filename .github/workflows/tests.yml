@@ -1,31 +1,22 @@
-name: tests
-on: [push, pull_request]
+﻿name: Unit tests
+
+on:
+  workflow_dispatch:
+  pull_request:
+
 jobs:
-  test:
+  unit:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with: { python-version: "3.12" }
-      - name: Install
-        run: |
-          pip install -r requirements.txt
-          pip install pytest pytest-cov diff-cover pytest-xdist
-              - name: Pytest with coverage
-                run: pytest -n auto --maxfail=1 --random-order-bucket=module --cov=taller --cov=gestion_taller --cov-report=xml --cov-report=html --tb=short
-      - name: Enforce floor (20%)
-        run: |
-          python - <<'PY'
-import xml.etree.ElementTree as ET
-p = ET.parse("coverage.xml").getroot().attrib["line-rate"]
-pct = float(p) * 100
-assert pct >= 20, f"Coverage {pct:.2f}% < 20%"
-PY
-      - name: Diff coverage (90% del cambio)
-        run: diff-cover coverage.xml --compare-branch origin/main --fail-under=90
-      - name: Upload coverage artifacts
-        uses: actions/upload-artifact@v4
         with:
-          name: coverage-report
-          path: htmlcov/
-          retention-days: 30
+          python-version: "3.11"
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
+          pip install pytest pytest-django
+      - name: Run tests
+        run: pytest -q

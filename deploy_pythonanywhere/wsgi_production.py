@@ -1,18 +1,20 @@
-"""
-===============================================================
-🚀 CONFIGURACIÓN WSGI PARA PYTHONANYWHERE - eGARAGE
-===============================================================
-Configuración WSGI optimizada para el despliegue en PythonAnywhere
-URL: https://e-garage-atlantareciclajes.pythonanywhere.com
-Usuario: atlantareciclajes
-Fecha: 24 de julio de 2025
+"""eGarage — módulo limpiado para pre-commit (docstring al inicio)."""
 
-INSTRUCCIONES PARA PYTHONANYWHERE:
-1. Copiar este archivo como wsgi.py en el directorio principal
-2. Asegurarse de que la ruta del proyecto sea correcta
-3. Verificar que el módulo de configuración esté disponible
-===============================================================
-"""
+# """
+# ===============================================================
+# 🚀 CONFIGURACIÓN WSGI PARA PYTHONANYWHERE - eGARAGE
+# ===============================================================
+# Configuración WSGI optimizada para el despliegue en PythonAnywhere
+# URL: https://e-garage-atlantareciclajes.pythonanywhere.com
+# Usuario: atlantareciclajes
+# Fecha: 24 de julio de 2025
+
+# INSTRUCCIONES PARA PYTHONANYWHERE:
+# 1. Copiar este archivo como wsgi.py en el directorio principal
+# 2. Asegurarse de que la ruta del proyecto sea correcta
+# 3. Verificar que el módulo de configuración esté disponible
+# ===============================================================
+# """
 
 import os
 import sys
@@ -127,33 +129,33 @@ def application_with_logging(environ, start_response):
 # ============================================================
 # 📝 NOTAS IMPORTANTES PARA PYTHONANYWHERE:
 # ============================================================
-"""
-CONFIGURACIÓN EN PYTHONANYWHERE WEB APP:
+# """
+# CONFIGURACIÓN EN PYTHONANYWHERE WEB APP:
 
-1. WSGI configuration file:
-   - Ubicación: /var/www/atlantareciclajes_pythonanywhere_com_wsgi.py
-   - Copiar este contenido al archivo WSGI de PythonAnywhere
+# 1. WSGI configuration file:
+#    - Ubicación: /var/www/atlantareciclajes_pythonanywhere_com_wsgi.py
+#    - Copiar este contenido al archivo WSGI de PythonAnywhere
 
-2. Static files:
-   - URL: /static/
-   - Directory: /home/atlantareciclajes/e_garage/staticfiles/
+# 2. Static files:
+#    - URL: /static/
+#    - Directory: /home/atlantareciclajes/e_garage/staticfiles/
 
-3. Media files:
-   - URL: /media/
-   - Directory: /home/atlantareciclajes/e_garage/media/
+# 3. Media files:
+#    - URL: /media/
+#    - Directory: /home/atlantareciclajes/e_garage/media/
 
-4. Virtualenv:
-   - Path: /home/atlantareciclajes/.virtualenvs/e_garage_env
+# 4. Virtualenv:
+#    - Path: /home/atlantareciclajes/.virtualenvs/e_garage_env
 
-5. Source code:
-   - Path: /home/atlantareciclajes/e_garage
+# 5. Source code:
+#    - Path: /home/atlantareciclajes/e_garage
 
-COMANDOS POST-DESPLIEGUE:
-- python manage.py collectstatic --noinput
-- python manage.py migrate
-- python manage.py createsuperuser (si es necesario)
+# COMANDOS POST-DESPLIEGUE:
+# - python manage.py collectstatic --noinput
+# - python manage.py migrate
+# - python manage.py createsuperuser (si es necesario)
 
-VARIABLES DE ENTORNO:
-- Configurar en .bashrc o en el dashboard de PythonAnywhere
-- DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DJANGO_SECRET_KEY
-"""
+# VARIABLES DE ENTORNO:
+# - Configurar en .bashrc o en el dashboard de PythonAnywhere
+# - DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DJANGO_SECRET_KEY
+# """

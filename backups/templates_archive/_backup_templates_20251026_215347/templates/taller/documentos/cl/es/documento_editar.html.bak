@@ -37,7 +37,7 @@
 
                 <form id="document-form" method="post" novalidate>
                     {% csrf_token %}
-                    
+
                     <!-- Grid de campos principales -->
                     <div class="grid sm:grid-cols-2 gap-4 mb-6">
                         <div>
@@ -49,7 +49,7 @@
                                 <div class="text-red-500 text-sm mt-1">{{ form.tipo.errors }}</div>
                             {% endif %}
                         </div>
-                        
+
                         <div>
                             <label class="block text-sm mb-1" for="id_numero">
                                 {{ form.numero.label }}
@@ -59,7 +59,7 @@
                                 <div class="text-red-500 text-sm mt-1">{{ form.numero.errors }}</div>
                             {% endif %}
                         </div>
-                        
+
                         <div>
                             <label class="block text-sm mb-1" for="id_fecha_emision">
                                 {{ form.fecha_emision.label }}
@@ -69,7 +69,7 @@
                                 <div class="text-red-500 text-sm mt-1">{{ form.fecha_emision.errors }}</div>
                             {% endif %}
                         </div>
-                        
+
                         <div>
                             <label class="block text-sm mb-1" for="id_tecnico_responsable">
                                 {{ form.tecnico_responsable.label }}
@@ -92,7 +92,7 @@
                                 <div class="text-red-500 text-sm mt-1">{{ form.cliente.errors }}</div>
                             {% endif %}
                         </div>
-                        
+
                         <div>
                             <label class="block text-sm mb-1" for="id_vehiculo">
                                 {{ form.vehiculo.label }}
@@ -115,7 +115,7 @@
                                 <div class="text-red-500 text-sm mt-1">{{ form.kilometraje.errors }}</div>
                             {% endif %}
                         </div>
-                        
+
                         <div class="flex items-center">
                             <div class="form-check">
                                 {{ form.pagado }}
@@ -176,7 +176,7 @@ $(document).ready(function() {
         allowClear: true,
         minimumInputLength: 2
     });
-    
+
     $('#id_vehiculo').select2({
         placeholder: "{% if country == 'US' %}Search vehicle...{% else %}Buscar vehículo...{% endif %}",
         allowClear: true,
@@ -187,13 +187,13 @@ $(document).ready(function() {
     $('#id_cliente').on('change', function() {
         var clienteId = $(this).val();
         var vehiculoSelect = $('#id_vehiculo');
-        
+
         if (clienteId) {
             // Habilitar vehículos y cargar solo los del cliente seleccionado
             vehiculoSelect.prop('disabled', false);
             vehiculoSelect.empty();
             vehiculoSelect.append('<option value="">{% if country == "US" %}Loading vehicles...{% else %}Cargando vehículos...{% endif %}</option>');
-            
+
             // La lógica de filtrado se maneja automáticamente por DAL con forward
             vehiculoSelect.trigger('change');
         } else {
@@ -203,7 +203,7 @@ $(document).ready(function() {
             vehiculoSelect.append('<option value="">{% if country == "US" %}Select customer first{% else %}Seleccione cliente primero{% endif %}</option>');
         }
     });
-    
+
     // Inicializar estado de vehículos
     if (!$('#id_cliente').val()) {
         $('#id_vehiculo').prop('disabled', true);

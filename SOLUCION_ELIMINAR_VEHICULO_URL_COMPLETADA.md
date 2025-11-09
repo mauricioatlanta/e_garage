@@ -42,7 +42,7 @@ Cuando se usa `{% country_url 'vehiculos:eliminar_vehiculo' 0 %}`:
 // ANTES
 fetch(`{% url 'vehiculos:eliminar_vehiculo' 0 %}`.replace('0', window.vehiculoAEliminar), {
 
-// DESPUÉS  
+// DESPUÉS
 fetch(`{% country_url 'vehiculos:eliminar_vehiculo' 0 %}`.replace('0', window.vehiculoAEliminar), {
 ```
 
@@ -88,5 +88,3 @@ La página `/us/vehiculos/` ahora funciona completamente y permite:
 - ✅ **Eliminar vehículos** (funcionalidad corregida)
 
 El error `NoReverseMatch` en la funcionalidad de eliminar vehículos ha sido completamente resuelto.
-
-

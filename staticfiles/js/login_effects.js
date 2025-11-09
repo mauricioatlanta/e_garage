@@ -85,5 +85,3 @@ document.addEventListener("DOMContentLoaded", () => {
     else if (!prefersReduced) loop();
   });
 });
-
-

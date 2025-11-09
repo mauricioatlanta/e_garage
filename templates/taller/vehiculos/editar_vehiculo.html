@@ -144,8 +144,8 @@
                 {% endif %}
                 <!-- Campo para nuevo motor (oculto por defecto) -->
                 <div id="motor-nuevo-container" style="display: none;" class="mt-2">
-                  <input type="text" 
-                         name="nuevo_motor" 
+                  <input type="text"
+                         name="nuevo_motor"
                          id="nuevo_motor"
                          placeholder="{% trans 'Ingresa el nombre del nuevo motor' %}"
                          class="w-full px-4 py-3 rounded-lg bg-black/50 border border-emerald-400/50 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400">
@@ -166,8 +166,8 @@
               {% endif %}
               <!-- Campo para nueva caja (oculto por defecto) -->
               <div id="caja-nueva-container" style="display: none;" class="mt-2">
-                <input type="text" 
-                       name="nuevo_caja" 
+                <input type="text"
+                       name="nuevo_caja"
                        id="nuevo_caja"
                        placeholder="{% trans 'Ingresa el nombre de la nueva caja/transmisión' %}"
                        class="w-full px-4 py-3 rounded-lg bg-black/50 border border-emerald-400/50 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400">
@@ -233,7 +233,7 @@
     }
   });
   {% endif %}
-  
+
   {% if vehiculo.caja_id %}
   document.addEventListener('DOMContentLoaded', function() {
     const cajaSelect = document.getElementById('id_caja');
@@ -254,34 +254,34 @@ document.addEventListener('DOMContentLoaded', function() {
   console.log('===========================================');
   console.log('🔍 DEBUG EDITAR VEHÍCULO');
   console.log('===========================================');
-  
+
   // Verificar que los elementos existan
   const marca = document.getElementById('id_marca');
   const anio = document.getElementById('id_anio');
   const modelo = document.getElementById('id_modelo');
   const motor = document.getElementById('id_motor');
   const caja = document.getElementById('id_caja');
-  
+
   console.log('Elementos encontrados:');
   console.log('  - Marca:', marca ? '✅' : '❌', marca ? marca.value : '');
   console.log('  - Año:', anio ? '✅' : '❌', anio ? anio.value : '');
   console.log('  - Modelo:', modelo ? '✅' : '❌', modelo ? modelo.value : '');
   console.log('  - Motor:', motor ? '✅' : '❌', motor ? `${motor.options.length} opciones` : '');
   console.log('  - Caja:', caja ? '✅' : '❌', caja ? `${caja.options.length} opciones` : '');
-  
+
   // Agregar listener directo para debugging
   if (marca) {
     marca.addEventListener('change', function() {
       console.log('🔄 [NATIVE] Marca changed:', this.value);
     });
   }
-  
+
   if (modelo) {
     modelo.addEventListener('change', function() {
       console.log('🔄 [NATIVE] Modelo changed:', this.value);
     });
   }
-  
+
   // Logger simple para confirmar que el submit ocurre
   const f = document.getElementById('form-editar-vehiculo');
   if (f) {
@@ -290,7 +290,7 @@ document.addEventListener('DOMContentLoaded', function() {
       console.log('[Editar Vehículo] FormData:', new FormData(f));
     });
   }
-  
+
   console.log('===========================================');
 });
 </script>

@@ -52,7 +52,7 @@ Write-Host "`nPASO 3: Aplicando limpieza..." -ForegroundColor Green
 try {
   $cleanupParams = @("-Root", $Root)
   if ($DryRun) { $cleanupParams += "-DryRun" }
-  
+
   & .\tools\apply_static_cleanup.ps1 @cleanupParams
   if ($LASTEXITCODE -ne 0) {
     throw "Error en limpieza"

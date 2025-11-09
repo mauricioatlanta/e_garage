@@ -1,12 +1,9 @@
 # ==================== EXPORTAR MECÁNICOS A EXCEL ====================
 
-from datetime import date, timedelta
-
 # import openpyxl
 # from openpyxl.utils import get_column_letter
-
 from collections import defaultdict
-from datetime import datetime
+from datetime import date, datetime, timedelta
 from decimal import Decimal
 
 from django.db.models import Count, DecimalField, ExpressionWrapper, F, FloatField, Sum
@@ -18,7 +15,11 @@ from django.utils import timezone
 from taller.auth.decorators import login_required_default
 from taller.models import Documento
 from taller.models.clientes import Cliente
-from taller.models.lineas_documento import LineaOtroServicio, LineaRepuesto, LineaServicio
+from taller.models.lineas_documento import (
+    LineaOtroServicio,
+    LineaRepuesto,
+    LineaServicio,
+)
 from taller.models.tecnico import Tecnico
 from taller.models.vehiculos import Vehiculo
 from taller.utils.empresa import get_or_create_empresa
@@ -64,7 +65,7 @@ from taller.utils.motor_ia import MotorDiagnosticoIA
 #         col_letter = get_column_letter(col_num)
 #         ws.column_dimensions[col_letter].width = 20
 
-    # Rellenar datos
+# Rellenar datos
 #     for doc in documentos_qs:
 #         ws.append(
 #             [
@@ -76,7 +77,7 @@ from taller.utils.motor_ia import MotorDiagnosticoIA
 #             ]
 #         )
 
-    # Respuesta HTTP
+# Respuesta HTTP
 #     response = HttpResponse(
 #         content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 #     )

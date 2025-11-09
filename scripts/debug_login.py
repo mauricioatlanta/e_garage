@@ -2,6 +2,7 @@
 """
 Test específico para debugging de login
 """
+
 import re
 
 import requests

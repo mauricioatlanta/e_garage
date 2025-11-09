@@ -39,7 +39,7 @@ El template tag `country_url` construye URLs automáticamente:
 ```python
 def country_url(context, view_path, *args, app_namespace="taller", **kwargs):
     country_ns = _country_ns_from_path(request.path)  # "usa" para /us/
-    
+
     if ":" in view_path:
         # Si ya tiene namespace, agregar país y app
         full_name = f"{country_ns}:{app_namespace}:{view_path}"
@@ -111,5 +111,3 @@ La página `/us/vehiculos/` ahora funciona correctamente y permite:
 - ✅ Usar todas las funcionalidades sin errores de URL
 
 El error `NoReverseMatch` ha sido completamente resuelto.
-
-

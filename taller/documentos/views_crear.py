@@ -11,19 +11,17 @@ from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 
+from taller.documentos.utils.prefix import doc_prefix
+from taller.documentos.utils.template_selector import template_crear
 from taller.models.clientes import Cliente
 from taller.models.sequence import DocumentSequence
 from taller.models.tecnico import Tecnico
 from taller.models.vehiculos import Vehiculo
 from taller.servicios.models import Servicio
-from taller.utils.dal_helpers import get_template_by_country
-from taller.documentos.utils.template_selector import template_crear
 
 from .forms import DocumentoForm
 from .formsets import OtroServicioFormSet, RepuestoFormSet, ServicioFormSet
 
-
-from taller.documentos.utils.prefix import doc_prefix
 
 def _prefix(tipo):
     """Mapea tipos de documento a prefijos de numeración"""
@@ -227,7 +225,9 @@ def crear_documento(request):
 
             # Si hay errores, re-render con errores visibles (nunca en blanco)
             logger.debug("Formularios inválidos, mostrando errores...")
-            logger.debug(f"DOC ERR: {doc_form.errors.as_json() if doc_form.errors else 'N/A'}")
+            logger.debug(
+                f"DOC ERR: {doc_form.errors.as_json() if doc_form.errors else 'N/A'}"
+            )
             logger.debug(f"REP ERR: {rep_fs.errors if rep_fs.errors else 'N/A'}")
             logger.debug(f"SERV ERR: {serv_fs.errors if serv_fs.errors else 'N/A'}")
             logger.debug(f"OTR ERR: {otro_fs.errors if otro_fs.errors else 'N/A'}")

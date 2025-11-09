@@ -26,7 +26,7 @@
         <!-- Monto en palabras -->
       </div>
     </div>
-    
+
     <div class="tg-col right">  <!-- Forma de pago -->
       <div class="card">
         <div class="tt">Forma de Pago</div>

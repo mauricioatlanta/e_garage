@@ -1,11 +1,15 @@
-import pytest
-from importlib import import_module
-from django.core.exceptions import ValidationError
 from datetime import datetime
+from importlib import import_module
+
+import pytest
+
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
+
 
 def _fields(model):
     return {f.name for f in model._meta.fields}
+
 
 @pytest.mark.django_db
 def test_documento_empresa_consistente_en_fks():
@@ -14,12 +18,52 @@ def test_documento_empresa_consistente_en_fks():
     User = get_user_model()
 
     # Crear usuarios reales
-    user1 = User.objects.create_user(username="user1", email="user1@test.com", password="testpass")
-    user2 = User.objects.create_user(username="user2", email="user2@test.com", password="testpass")
+    user1 = User.objects.create_user(
+        username="user1", email="user1@test.com", password="testpass"
+    )
+    user2 = User.objects.create_user(
+        username="user2", email="user2@test.com", password="testpass"
+    )
 
-    emp1 = Empresa.objects.create(nombre_taller="A", empresa="A", pais="CL", direccion="Test", telefono="123", email="test@test.com", zona_horaria="UTC", fecha_inicio=datetime.now(), plan="mensual", dias_prueba=30, suscripcion_activa=True, valor_mensual=100, moneda="CLP", notificacion_5_dias=False, notificacion_1_dia=False, notificacion_vencido=False, user_id=user1.id)
+    emp1 = Empresa.objects.create(
+        nombre_taller="A",
+        empresa="A",
+        pais="CL",
+        direccion="Test",
+        telefono="123",
+        email="test@test.com",
+        zona_horaria="UTC",
+        fecha_inicio=datetime.now(),
+        plan="mensual",
+        dias_prueba=30,
+        suscripcion_activa=True,
+        valor_mensual=100,
+        moneda="CLP",
+        notificacion_5_dias=False,
+        notificacion_1_dia=False,
+        notificacion_vencido=False,
+        user_id=user1.id,
+    )
 
-    emp2 = Empresa.objects.create(nombre_taller="B", empresa="B", pais="US", direccion="Test", telefono="123", email="test@test.com", zona_horaria="UTC", fecha_inicio=datetime.now(), plan="mensual", dias_prueba=30, suscripcion_activa=True, valor_mensual=100, moneda="USD", notificacion_5_dias=False, notificacion_1_dia=False, notificacion_vencido=False, user_id=user2.id)
+    emp2 = Empresa.objects.create(
+        nombre_taller="B",
+        empresa="B",
+        pais="US",
+        direccion="Test",
+        telefono="123",
+        email="test@test.com",
+        zona_horaria="UTC",
+        fecha_inicio=datetime.now(),
+        plan="mensual",
+        dias_prueba=30,
+        suscripcion_activa=True,
+        valor_mensual=100,
+        moneda="USD",
+        notificacion_5_dias=False,
+        notificacion_1_dia=False,
+        notificacion_vencido=False,
+        user_id=user2.id,
+    )
 
     # Crear cliente para el documento
     Cliente = None
@@ -27,11 +71,13 @@ def test_documento_empresa_consistente_en_fks():
         Cliente = import_module("taller.models.clientes").Cliente
     except Exception:
         pytest.skip("No hay modelo de Cliente")
-    
+
     cliente1 = Cliente.objects.create(empresa=emp1, nombre="Cliente Test 1")
-    
+
     # Documento en CL
-    doc = Documento(empresa=emp1, tipo="FAC", fecha_emision="2025-01-01", cliente=cliente1)
+    doc = Documento(
+        empresa=emp1, tipo="FAC", fecha_emision="2025-01-01", cliente=cliente1
+    )
 
     # Si Documento tiene FK cliente/vehiculo, creamos uno de empresa distinta para forzar inconsistencia
     Vehiculo = None
@@ -43,9 +89,11 @@ def test_documento_empresa_consistente_en_fks():
     # Crear cliente de empresa distinta para forzar inconsistencia
     cliente2 = Cliente.objects.create(empresa=emp2, nombre="Juan")  # empresa distinta
     doc.cliente = cliente2
-    
+
     if Vehiculo and "vehiculo" in _fields(Documento):
-        v = Vehiculo.objects.create(empresa=emp2, cliente=cliente2, patente="ZZZ999", anio=2020)
+        v = Vehiculo.objects.create(
+            empresa=emp2, cliente=cliente2, patente="ZZZ999", anio=2020
+        )
         doc.vehiculo = v
 
     # Si el modelo Documento no tiene validación de consistencia, el test pasa sin error
@@ -58,6 +106,7 @@ def test_documento_empresa_consistente_en_fks():
         # Si lanza ValidationError, también está bien (validación implementada)
         assert True
 
+
 @pytest.mark.django_db
 def test_herencia_responsable_a_lineas_si_flag_off():
     # Según el pack: si "dividir por técnico/vendedor" está OFF, las líneas heredan responsable del documento
@@ -65,10 +114,12 @@ def test_herencia_responsable_a_lineas_si_flag_off():
     Documento = import_module("taller.models.documento").Documento
     Lineas = import_module("taller.models.lineas_documento")
     User = get_user_model()
-    
+
     # Crear usuario real
-    user = User.objects.create_user(username="user3", email="user3@test.com", password="testpass")
-    
+    user = User.objects.create_user(
+        username="user3", email="user3@test.com", password="testpass"
+    )
+
     Tecnico = None
     try:
         Tecnico = import_module("taller.models.tecnico").Tecnico
@@ -87,7 +138,25 @@ def test_herencia_responsable_a_lineas_si_flag_off():
         except Exception:
             continue
     # creamos empresa y opcionalmente settings con flag OFF
-    emp = Empresa.objects.create(nombre_taller="Garage CL", empresa="Garage CL", pais="CL", direccion="Test", telefono="123", email="test@test.com", zona_horaria="UTC", fecha_inicio=datetime.now(), plan="mensual", dias_prueba=30, suscripcion_activa=True, valor_mensual=100, moneda="CLP", notificacion_5_dias=False, notificacion_1_dia=False, notificacion_vencido=False, user_id=user.id)
+    emp = Empresa.objects.create(
+        nombre_taller="Garage CL",
+        empresa="Garage CL",
+        pais="CL",
+        direccion="Test",
+        telefono="123",
+        email="test@test.com",
+        zona_horaria="UTC",
+        fecha_inicio=datetime.now(),
+        plan="mensual",
+        dias_prueba=30,
+        suscripcion_activa=True,
+        valor_mensual=100,
+        moneda="CLP",
+        notificacion_5_dias=False,
+        notificacion_1_dia=False,
+        notificacion_vencido=False,
+        user_id=user.id,
+    )
     if Settings:
         # busca un modelo que tenga flag de partición por técnico
         ModelSettings = None
@@ -99,7 +168,11 @@ def test_herencia_responsable_a_lineas_si_flag_off():
         if ModelSettings:
             s = ModelSettings(empresa=emp)
             # intenta setear una bandera tipo "dividir_por_tecnico" o similar a False
-            for flag in ("dividir_por_tecnico", "split_by_seller", "split_by_technician"):
+            for flag in (
+                "dividir_por_tecnico",
+                "split_by_seller",
+                "split_by_technician",
+            ):
                 if flag in _fields(ModelSettings):
                     setattr(s, flag, False)
             try:
@@ -109,16 +182,18 @@ def test_herencia_responsable_a_lineas_si_flag_off():
             s.save()
 
     t = Tecnico.objects.create(empresa=emp, nombre="Ana")
-    
+
     # Crear cliente requerido para el documento
     Cliente = None
     try:
         Cliente = import_module("taller.models.clientes").Cliente
     except Exception:
         pytest.skip("No hay modelo de Cliente")
-    
+
     cliente = Cliente.objects.create(empresa=emp, nombre="Cliente Test")
-    doc = Documento.objects.create(empresa=emp, tipo="FAC", fecha_emision="2025-01-02", cliente=cliente)
+    doc = Documento.objects.create(
+        empresa=emp, tipo="FAC", fecha_emision="2025-01-02", cliente=cliente
+    )
     # si el doc tiene campo de responsable
     for resp_field in ("tecnico_responsable", "responsable", "mecanico"):
         if resp_field in _fields(Documento):
@@ -133,16 +208,16 @@ def test_herencia_responsable_a_lineas_si_flag_off():
             M = getattr(Lineas, model_name)
             # Campos específicos por tipo de línea
             data = {
-                "documento": doc, 
-                "nombre": "X", 
-                "cantidad": 1, 
-                "precio_unitario": 1000, 
-                "descuento": 0
+                "documento": doc,
+                "nombre": "X",
+                "cantidad": 1,
+                "precio_unitario": 1000,
+                "descuento": 0,
             }
             # LineaRepuesto requiere codigo
             if model_name == "LineaRepuesto" and "codigo" in _fields(M):
                 data["codigo"] = "COD001"
-            
+
             item = M.objects.create(**data)
             created.append(item)
 

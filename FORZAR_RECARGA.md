@@ -82,4 +82,3 @@ País pre-seleccionado: Chile ✅
 ---
 
 **¡Haz Ctrl+Shift+R y prueba de nuevo!** 🎯
-

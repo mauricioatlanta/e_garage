@@ -1,6 +1,6 @@
 # 💰 GUÍA RÁPIDA PARA EMPEZAR A COBRAR - eGarage
 
-**Fecha**: 26 de octubre de 2025  
+**Fecha**: 26 de octubre de 2025
 **Estado**: ✅ SISTEMA LISTO PARA GENERAR INGRESOS
 
 ---
@@ -116,7 +116,7 @@ Ya configurado en el código:
    ├─ Monto: $55.000 CLP
    ├─ Botón: "Subir Comprobante"
    └─ Cliente transfiere y sube screenshot
-   
+
    USA:
    ├─ Botón PayPal
    ├─ Monto: $110 USD
@@ -300,7 +300,7 @@ http://127.0.0.1:8000/accounts/signup/
 
 # 7. Ir al admin:
    http://127.0.0.1:8000/admin/
-   
+
 # 8. Ver "Pagos Pendientes"
    ✅ Debe aparecer el pago
    ✅ Clic en "Aprobar"
@@ -327,7 +327,7 @@ http://127.0.0.1:8000/accounts/signup/
 # 1. Registrar usuario USA
    País: United States
    Plan: Monthly
-   
+
 # 2. Ir a página de pago
    http://127.0.0.1:8000/us/en/subscription/payment/?plan=mensual
 
@@ -335,7 +335,7 @@ http://127.0.0.1:8000/accounts/signup/
    → Redirige a PayPal
    → Login con tu cuenta PayPal de prueba
    → Confirmar pago $20 USD
-   
+
 # 4. PayPal redirige a: /us/en/payment/success/
    → Sistema activa suscripción
    → Cliente accede al dashboard ✅
@@ -571,10 +571,10 @@ Objetivo: > $300 USD
 
 ### **El sistema está:**
 
-✅ **100% funcional** para USA y Chile  
-✅ **Seguro** (datos aislados entre suscriptores)  
-✅ **Escalable** (agregar países fácilmente)  
-✅ **Profesional** (UX de nivel enterprise)  
+✅ **100% funcional** para USA y Chile
+✅ **Seguro** (datos aislados entre suscriptores)
+✅ **Escalable** (agregar países fácilmente)
+✅ **Profesional** (UX de nivel enterprise)
 ✅ **Probado** (flujos validados)
 
 ### **Solo necesitas:**
@@ -593,6 +593,5 @@ Objetivo: > $300 USD
 
 ---
 
-**Creado**: 26 de octubre de 2025  
+**Creado**: 26 de octubre de 2025
 **Estado**: ✅ LISTO PARA PRODUCCIÓN
-

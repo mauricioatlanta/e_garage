@@ -24,7 +24,7 @@
         <div class="push-end">Fecha: 15/12/2024</div>
       </div>
     </div>
-    
+
     <div class="sig-col">  <!-- Empresa -->
       <div class="sig-box">
         <div class="sig-title">Autorizado por</div>
@@ -38,7 +38,7 @@
       </div>
     </div>
   </div>
-  
+
   <!-- Sello de pago -->
   <div style="margin-top: 8mm;">
     <span class="stamp stamp-paid">Pagado</span>

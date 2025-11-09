@@ -28,7 +28,7 @@ if (Test-Path $canonicalJs) {
 Write-Host "`n2. Verificando ausencia de variantes antiguas..." -ForegroundColor Blue
 $oldVariants = @(
   "documentos_form_final*.js",
-  "documentos_form_numbers*.js", 
+  "documentos_form_numbers*.js",
   "documentos_form_patch*.js",
   "documentos_form_v*.js",
   "documento_form_futurista*.js",
@@ -54,7 +54,7 @@ if (-not $foundOld) {
 Write-Host "`n3. Verificando ausencia de archivos de test/coverage..." -ForegroundColor Blue
 $testPatterns = @(
   "*test*.js",
-  "*coverage*.js", 
+  "*coverage*.js",
   "*playwright*.js",
   "*postcss*.js",
   "*setupTests*.js",
@@ -101,7 +101,7 @@ Write-Host "`n5. Verificando estructura de directorios..." -ForegroundColor Blue
 $requiredDirs = @(
   "vendor\jquery",
   "vendor\dist\js",
-  "vendor\dist\css", 
+  "vendor\dist\css",
   "taller\common\css",
   "taller\common\js",
   "taller\js",
@@ -155,7 +155,7 @@ Write-Host "`n8. Verificando ausencia de referencias antiguas..." -ForegroundCol
 $oldRefs = Get-ChildItem -Recurse -Include *.html -Path $templatesDir | Select-String -Pattern "documento_form_futurista|documentos_form_final|documentos_form_patch|documentos_form_numbers|formulario_documento|documentos_form_v"
 if ($oldRefs) {
   Write-Host "   ❌ Referencias a archivos antiguos encontradas:" -ForegroundColor Red
-  $oldRefs | ForEach-Object { 
+  $oldRefs | ForEach-Object {
     # Verificar que el archivo realmente existe y tiene contenido
     $filePath = Join-Path $templatesDir $_.Filename
     if (Test-Path $filePath) {

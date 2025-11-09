@@ -223,10 +223,17 @@
               <label class="block text-purple-300 text-lg font-semibold mb-3 group-focus-within:text-purple-200 transition-colors">
                 State
               </label>
-              <div class="relative">
-                {{ form.estado_usa|add_class:"w-full p-4 bg-white/95 border-2 border-gray-300 rounded-xl text-black text-lg focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 focus:bg-white transition-all duration-300 backdrop-blur-sm" }}
-                <div class="absolute inset-0 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                <div class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-400 to-pink-400 group-focus-within:w-full transition-all duration-500"></div>
+              <div class="flex gap-2">
+                <div class="relative flex-1">
+                  {{ form.estado_usa|add_class:"w-full p-4 bg-white/95 border-2 border-gray-300 rounded-xl text-black text-lg focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 focus:bg-white transition-all duration-300 backdrop-blur-sm" }}
+                  <div class="absolute inset-0 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                  <div class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-400 to-pink-400 group-focus-within:w-full transition-all duration-500"></div>
+                </div>
+                <button type="button" onclick="mostrarModalEstado()"
+                        class="px-4 py-2 bg-gradient-to-r from-green-600/30 to-emerald-600/30 border-2 border-green-400/50 text-green-300 rounded-xl hover:from-green-500/40 hover:to-emerald-500/40 transition-all font-bold whitespace-nowrap"
+                        title="Add new state">
+                  ➕ Add
+                </button>
               </div>
               {% if form.estado_usa.errors %}
                 <div class="mt-2 text-red-400 text-sm animate-pulse">{{ form.estado_usa.errors.0 }}</div>
@@ -238,10 +245,17 @@
               <label class="block text-purple-300 text-lg font-semibold mb-3 group-focus-within:text-purple-200 transition-colors">
                 City
               </label>
-              <div class="relative">
-                {{ form.ciudad_usa|add_class:"w-full p-4 bg-white/95 border-2 border-gray-300 rounded-xl text-black text-lg focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 focus:bg-white transition-all duration-300 backdrop-blur-sm" }}
-                <div class="absolute inset-0 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                <div class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-400 to-pink-400 group-focus-within:w-full transition-all duration-500"></div>
+              <div class="flex gap-2">
+                <div class="relative flex-1">
+                  {{ form.ciudad_usa|add_class:"w-full p-4 bg-white/95 border-2 border-gray-300 rounded-xl text-black text-lg focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 focus:bg-white transition-all duration-300 backdrop-blur-sm" }}
+                  <div class="absolute inset-0 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                  <div class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-400 to-pink-400 group-focus-within:w-full transition-all duration-500"></div>
+                </div>
+                <button type="button" onclick="mostrarModalCiudad()"
+                        class="px-4 py-2 bg-gradient-to-r from-blue-600/30 to-cyan-600/30 border-2 border-blue-400/50 text-blue-300 rounded-xl hover:from-blue-500/40 hover:to-cyan-500/40 transition-all font-bold whitespace-nowrap"
+                        title="Add new city">
+                  ➕ Add
+                </button>
               </div>
               {% if form.ciudad_usa.errors %}
                 <div class="mt-2 text-red-400 text-sm animate-pulse">{{ form.ciudad_usa.errors.0 }}</div>
@@ -438,6 +452,110 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Funciones para crear Estado y Ciudad dinámicamente
+function mostrarModalEstado() {
+  const nombre = prompt('Enter the State name (e.g., California):');
+  const codigo = prompt('Enter the State code (e.g., CA):');
+
+  if (!nombre || !codigo) {
+    alert('❌ State name and code are required');
+    return;
+  }
+
+  // Obtener CSRF token
+  const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+  // Crear FormData
+  const formData = new FormData();
+  formData.append('nombre', nombre);
+  formData.append('codigo', codigo.toUpperCase());
+
+  // Enviar petición AJAX
+  fetch('{% country_url "clientes:ajax_crear_estado_usa" %}', {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': csrftoken
+    },
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      alert('✅ ' + data.message);
+
+      // Agregar el nuevo estado al select
+      const estadoSelect = document.getElementById('id_estado_usa');
+      const option = document.createElement('option');
+      option.value = data.estado.id;
+      option.textContent = `${data.estado.nombre} (${data.estado.codigo})`;
+      option.selected = true;
+      estadoSelect.appendChild(option);
+
+      // Trigger change event para cargar ciudades
+      estadoSelect.dispatchEvent(new Event('change'));
+    } else {
+      alert('❌ Error: ' + data.error);
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('❌ Error creating state');
+  });
+}
+
+function mostrarModalCiudad() {
+  const estadoSelect = document.getElementById('id_estado_usa');
+
+  if (!estadoSelect.value) {
+    alert('⚠️ Please select a State first');
+    return;
+  }
+
+  const nombre = prompt('Enter the City name:');
+
+  if (!nombre) {
+    alert('❌ City name is required');
+    return;
+  }
+
+  // Obtener CSRF token
+  const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+  // Crear FormData
+  const formData = new FormData();
+  formData.append('nombre', nombre);
+  formData.append('estado_id', estadoSelect.value);
+
+  // Enviar petición AJAX
+  fetch('{% country_url "clientes:ajax_crear_ciudad_usa" %}', {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': csrftoken
+    },
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      alert('✅ ' + data.message);
+
+      // Agregar la nueva ciudad al select
+      const ciudadUsaSelect = document.getElementById('id_ciudad_usa');
+      const option = document.createElement('option');
+      option.value = data.ciudad.id;
+      option.textContent = data.ciudad.nombre;
+      option.selected = true;
+      ciudadUsaSelect.appendChild(option);
+    } else {
+      alert('❌ Error: ' + data.error);
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('❌ Error creating city');
+  });
+}
 </script>
 
 <!-- Estilos CSS adicionales para efectos avanzados -->

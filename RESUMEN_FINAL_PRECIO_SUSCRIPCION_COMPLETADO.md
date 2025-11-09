@@ -160,7 +160,7 @@ plan_mensual = PrecioSuscripcion.get_vigente("CL", "mensual")
 ## 🎯 **Beneficios Obtenidos**
 
 1. **🔒 Robustez**: Validaciones previenen datos incorrectos
-2. **⚡ Performance**: Índices optimizan consultas críticas  
+2. **⚡ Performance**: Índices optimizan consultas críticas
 3. **🛠️ Mantenibilidad**: API limpia y métodos expresivos
 4. **📊 Flexibilidad**: Histórico de precios sin duplicados activos
 5. **🌍 Internacionalización**: Formateo automático por país

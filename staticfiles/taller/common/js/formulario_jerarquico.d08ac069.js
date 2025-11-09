@@ -35,7 +35,7 @@ $(function () {
     }
     // Construir URL basada en la ruta actual
     const baseUrl = window.location.pathname.includes('/us/') ? '/us/vehiculos/ajax/modelos-por-marca-anio/' : '/cl/vehiculos/ajax/modelos-por-marca-anio/';
-    
+
     $.getJSON(baseUrl, { marca_id: marcaId, anio: year }, function (data) {
       $modelo.empty().append($("<option>").val("").text("Seleccione un modelo"));
       $.each(data.results || data, function (_, item) {

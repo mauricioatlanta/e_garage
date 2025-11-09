@@ -15,7 +15,7 @@ class Command(BaseCommand):
         )
         with open(json_path, encoding="utf-8") as f:
             data = json.load(f)
-        
+
         # Solo borrar si no hay clientes usando estas ciudades
         if Ciudad.objects.count() > 0:
             self.stdout.write(
@@ -23,7 +23,7 @@ class Command(BaseCommand):
                     "Ya existen ciudades en la BD. Se omitirá el borrado para evitar conflictos."
                 )
             )
-        
+
         estados_creados = 0
         ciudades_creadas = 0
         # Diccionario de nombre de estado a código oficial
@@ -84,12 +84,11 @@ class Command(BaseCommand):
         for estado_nombre in data.keys():
             codigo_estado = state_codes.get(estado_nombre, estado_nombre[:2].upper())
             estado, created = Estado.objects.get_or_create(
-                nombre=estado_nombre,
-                defaults={"codigo": codigo_estado}
+                nombre=estado_nombre, defaults={"codigo": codigo_estado}
             )
             if created:
                 estados_creados += 1
-        
+
         # Crear ciudades si no existen
         estados_dict = {e.nombre: e for e in Estado.objects.all()}
         ciudades_objs = []
@@ -98,8 +97,7 @@ class Command(BaseCommand):
                 estado = estados_dict[estado_nombre]
                 for ciudad_nombre in ciudades:
                     ciudad, created = Ciudad.objects.get_or_create(
-                        nombre=ciudad_nombre,
-                        estado=estado
+                        nombre=ciudad_nombre, estado=estado
                     )
                     if created:
                         ciudades_creadas += 1

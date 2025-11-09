@@ -170,7 +170,7 @@
   </div>
 
   <h1 class="documento-title">📋 Lista de Documentos</h1>
-  
+
   <div class="text-center mb-4">
     <a href="{% url 'taller:documentos:crear_documento' %}" class="btn-primary">
       ➕ Crear Nuevo Documento
@@ -185,36 +185,36 @@
             <span class="documento-numero">{{ documento.numero }}</span>
             <span class="documento-tipo">{{ documento.get_tipo_display }}</span>
           </div>
-          
+
           <div class="documento-info">
             <strong>Cliente:</strong> {{ documento.cliente.nombre|default:"Sin cliente" }}
           </div>
-          
+
           {% if documento.vehiculo %}
           <div class="documento-info">
             <strong>Vehículo:</strong> {{ documento.vehiculo.patente|default:"Sin patente" }}
           </div>
           {% endif %}
-          
+
           <div class="documento-info">
             <strong>Fecha:</strong> {{ documento.fecha_emision|date:"d/m/Y" }}
           </div>
-          
+
           {% if documento.total %}
           <div class="documento-info">
             <strong>Total:</strong> ${{ documento.total|floatformat:0 }}
           </div>
           {% endif %}
-          
+
           <div class="documento-info">
-            <strong>Estado:</strong> 
+            <strong>Estado:</strong>
             {% if documento.pagado %}
               <span style="color: #28a745;">✅ Pagado</span>
             {% else %}
               <span style="color: #ffc107;">⏳ Pendiente</span>
             {% endif %}
           </div>
-          
+
           <div class="documento-actions">
             <a href="{% url 'taller:documentos:ver_documento' documento.pk %}" class="btn-small btn-view">
               👁️ Ver

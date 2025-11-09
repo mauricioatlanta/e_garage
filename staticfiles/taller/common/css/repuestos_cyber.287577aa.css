@@ -1,6 +1,6 @@
-/* 
+/*
  * Estilos futuristas y tecnológicos optimizados para USA
- * 
+ *
  * ESTRATEGIA DE ESPECIFICIDAD:
  * - Usamos selectores .repuestos-us y body para mayor especificidad
  * - !important en reglas críticas para evitar conflictos con Tailwind
@@ -10,8 +10,8 @@
  */
 
 /* Ocultar company-header por si se carga desde otra base */
-.company-header { 
-  display: none !important; 
+.company-header {
+  display: none !important;
 }
 
 /* Ocultar completamente el menú lateral de la base template */
@@ -45,7 +45,7 @@ body .holographic-card {
   background: rgba(255, 255, 255, 0.05) !important;
   backdrop-filter: blur(20px) !important;
   border: 1px solid rgba(0, 255, 255, 0.2) !important;
-  box-shadow: 
+  box-shadow:
     0 0 20px rgba(0, 255, 255, 0.3),
     inset 0 0 20px rgba(0, 255, 255, 0.1) !important;
   transition: all 0.3s ease !important;
@@ -54,14 +54,14 @@ body .holographic-card {
 .repuestos-us .holographic-card:hover,
 body .holographic-card:hover {
   border-color: rgba(0, 255, 255, 0.5) !important;
-  box-shadow: 
+  box-shadow:
     0 0 30px rgba(0, 255, 255, 0.5),
     inset 0 0 30px rgba(0, 255, 255, 0.2) !important;
   transform: translateY(-2px) !important;
 }
 
 .neon-text {
-  text-shadow: 
+  text-shadow:
     0 0 5px currentColor,
     0 0 10px currentColor,
     0 0 15px currentColor;
@@ -84,7 +84,7 @@ body .cyber-button {
   font-family: 'Orbitron', monospace !important;
   text-transform: uppercase !important;
   letter-spacing: 1px !important;
-  box-shadow: 
+  box-shadow:
     0 0 20px rgba(0, 255, 255, 0.5),
     inset 0 0 20px rgba(255, 255, 255, 0.2) !important;
   transition: all 0.3s ease !important;
@@ -110,7 +110,7 @@ body .cyber-button {
 .cyber-button:hover,
 .cyber-button:focus {
   transform: translateY(-2px);
-  box-shadow: 
+  box-shadow:
     0 0 30px rgba(0, 255, 255, 0.8),
     inset 0 0 30px rgba(255, 255, 255, 0.3);
   outline: 2px solid rgba(255, 255, 255, 0.5);
@@ -236,7 +236,7 @@ body .data-table tr:hover {
 }
 
 .cyber-grid {
-  background-image: 
+  background-image:
     linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
     linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
   background-size: 20px 20px;

@@ -28,7 +28,7 @@
                         <div class="tg-col left">
                             <div class="card">
                                 <div class="tt">Resumen</div>
-                                
+
                                 <div class="kv">
                                     <span class="muted">Subtotal Repuestos</span>
                                     <span>$450.000</span>
@@ -37,45 +37,45 @@
                                     <span class="muted">Subtotal Servicios</span>
                                     <span>$180.000</span>
                                 </div>
-                                
+
                                 <div class="hr"></div>
-                                
+
                                 <div class="kv">
                                     <span class="muted">IVA (19%)</span>
                                     <span>$85.500</span>
                                 </div>
-                                
+
                                 <div class="kv grand">
                                     <span>Total General</span>
                                     <span>$715.500</span>
                                 </div>
-                                
+
                                 <div class="hr"></div>
-                                
+
                                 <div class="muted">Monto en palabras:</div>
                                 <div>setecientos quince mil quinientos pesos chilenos</div>
                             </div>
                         </div>
-                        
+
                         <div class="tg-col right">
                             <div class="card">
                                 <div class="tt">Forma de Pago</div>
-                                
+
                                 <div class="kv">
                                     <span class="muted">Método</span>
                                     <span>Transferencia</span>
                                 </div>
-                                
+
                                 <div class="kv">
                                     <span class="muted">Pagado</span>
                                     <span>$715.500</span>
                                 </div>
-                                
+
                                 <div class="kv">
                                     <span class="muted">Saldo</span>
                                     <span>$0</span>
                                 </div>
-                                
+
                                 <div class="kv">
                                     <span class="muted">Fecha de pago</span>
                                     <span>15/12/2024 14:30</span>
@@ -96,7 +96,7 @@
                         <div class="tg-col left">
                             <div class="card">
                                 <div class="tt">Summary</div>
-                                
+
                                 <div class="kv">
                                     <span class="muted">Parts Subtotal</span>
                                     <span>US$450.00</span>
@@ -105,45 +105,45 @@
                                     <span class="muted">Services Subtotal</span>
                                     <span>US$180.00</span>
                                 </div>
-                                
+
                                 <div class="hr"></div>
-                                
+
                                 <div class="kv">
                                     <span class="muted">Sales Tax (8.5%)</span>
                                     <span>US$53.55</span>
                                 </div>
-                                
+
                                 <div class="kv grand">
                                     <span>Grand Total</span>
                                     <span>US$683.55</span>
                                 </div>
-                                
+
                                 <div class="hr"></div>
-                                
+
                                 <div class="muted">Amount in words:</div>
                                 <div>six hundred eighty-three dollars and fifty-five cents</div>
                             </div>
                         </div>
-                        
+
                         <div class="tg-col right">
                             <div class="card">
                                 <div class="tt">Payment Details</div>
-                                
+
                                 <div class="kv">
                                     <span class="muted">Method</span>
                                     <span>Credit Card <span class="pill">**** 1234</span></span>
                                 </div>
-                                
+
                                 <div class="kv">
                                     <span class="muted">Paid</span>
                                     <span>US$683.55</span>
                                 </div>
-                                
+
                                 <div class="kv">
                                     <span class="muted">Balance</span>
                                     <span>US$0.00</span>
                                 </div>
-                                
+
                                 <div class="kv">
                                     <span class="muted">Paid on</span>
                                     <span>12/15/2024 14:30</span>

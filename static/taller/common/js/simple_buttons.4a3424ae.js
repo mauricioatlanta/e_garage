@@ -8,7 +8,7 @@ function addRepuestoLine() {
         console.error('❌ Contenedor repuestos no encontrado');
         return;
     }
-    
+
     const lineNumber = container.children.length;
     const newLine = document.createElement('div');
     newLine.className = 'repuesto-row grid grid-cols-1 md:grid-cols-6 gap-4 mb-4 p-4 bg-gray-700/30 rounded-lg border border-gray-600';
@@ -39,7 +39,7 @@ function addRepuestoLine() {
             </button>
         </div>
     `;
-    
+
     container.appendChild(newLine);
     console.log('✅ Línea de repuesto agregada');
 }
@@ -51,7 +51,7 @@ function addServicioLine() {
         console.error('❌ Contenedor servicios no encontrado');
         return;
     }
-    
+
     const lineNumber = container.children.length;
     const newLine = document.createElement('div');
     newLine.className = 'servicio-row grid grid-cols-1 md:grid-cols-6 gap-4 mb-4 p-4 bg-gray-700/30 rounded-lg border border-gray-600';
@@ -82,7 +82,7 @@ function addServicioLine() {
             </button>
         </div>
     `;
-    
+
     container.appendChild(newLine);
     console.log('✅ Línea de servicio agregada');
 }
@@ -90,17 +90,17 @@ function addServicioLine() {
 // Inicialización cuando el DOM esté listo
 function initSimpleButtons() {
     console.log('🚀 Inicializando botones simples...');
-    
+
     // Esperar un poco para que todo esté cargado
     setTimeout(function() {
         console.log('🔍 Buscando botones...');
-        
+
         const addRepuestoBtn = document.getElementById('add-repuesto');
         const addServicioBtn = document.getElementById('add-servicio');
-        
+
         console.log('Botón repuesto encontrado:', !!addRepuestoBtn);
         console.log('Botón servicio encontrado:', !!addServicioBtn);
-        
+
         if (addRepuestoBtn) {
             console.log('✅ Configurando botón repuesto...');
             addRepuestoBtn.onclick = function(e) {
@@ -109,7 +109,7 @@ function initSimpleButtons() {
                 addRepuestoLine();
             };
         }
-        
+
         if (addServicioBtn) {
             console.log('✅ Configurando botón servicio...');
             addServicioBtn.onclick = function(e) {
@@ -118,7 +118,7 @@ function initSimpleButtons() {
                 addServicioLine();
             };
         }
-        
+
         console.log('✅ Botones configurados');
     }, 1000);
 }
@@ -129,6 +129,3 @@ if (document.readyState === 'loading') {
 } else {
     initSimpleButtons();
 }
-
-
-

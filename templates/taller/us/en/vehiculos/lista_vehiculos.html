@@ -42,7 +42,7 @@
                        placeholder="{% trans 'Search by license plate, brand, model...' %}"
                        class="glass-input pl-10">
             </div>
-            
+
             <!-- Filters -->
             <div class="flex gap-3">
                 <select id="marcaFilter" class="glass-select">
@@ -78,10 +78,10 @@
          data-marca="{{ vehiculo.marca.nombre|default:'' }}"
          data-modelo="{{ vehiculo.modelo.nombre|default:'' }}"
          data-año="{{ vehiculo.anio|default:'' }}">
-        
+
         <!-- Card Glow Effect -->
         <div class="card-glow"></div>
-        
+
         <!-- Main Card Content -->
         <div class="card-content">
             <!-- Header with Actions -->
@@ -91,17 +91,17 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
                     </svg>
                 </div>
-                
+
                 <!-- Action Buttons -->
                 <div class="action-buttons">
-                    <a href="{% country_url 'vehiculos:ver_vehiculo' vehiculo.id %}" 
+                    <a href="{% country_url 'vehiculos:ver_vehiculo' vehiculo.id %}"
                        class="action-btn view-btn" title="View">
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                         </svg>
                     </a>
-                    <a href="{% country_url 'vehiculos:editar_vehiculo' vehiculo.id %}" 
+                    <a href="{% country_url 'vehiculos:editar_vehiculo' vehiculo.id %}"
                        class="action-btn edit-btn" title="Edit">
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -115,14 +115,14 @@
                     </button>
                 </div>
             </div>
-            
+
             <!-- Vehicle Info -->
             <div class="vehicle-info">
                 <div class="license-plate">
                     <span class="plate-text">{{ vehiculo.patente }}</span>
                     <div class="plate-glow"></div>
                 </div>
-                
+
                 <div class="vehicle-details">
                     <div class="detail-row">
                         <span class="detail-label">Brand:</span>
@@ -145,7 +145,7 @@
                     </div>
                     {% endif %}
                 </div>
-                
+
                 {% if vehiculo.cliente %}
                 <div class="client-info">
                     <div class="client-avatar">
@@ -159,7 +159,7 @@
                 </div>
                 {% endif %}
             </div>
-            
+
             <!-- Status Indicator -->
             <div class="status-indicator">
                 <div class="status-dot active"></div>
@@ -353,7 +353,7 @@
 }
 
 .bg-grid-pattern {
-    background-image: 
+    background-image:
         linear-gradient(rgba(34, 197, 94, 0.1) 1px, transparent 1px),
         linear-gradient(90deg, rgba(34, 197, 94, 0.1) 1px, transparent 1px);
     background-size: 50px 50px;
@@ -411,7 +411,7 @@
     left: -2px;
     right: -2px;
     bottom: -2px;
-    background: linear-gradient(45deg, 
+    background: linear-gradient(45deg,
         rgba(34, 197, 94, 0.3),
         rgba(59, 130, 246, 0.3),
         rgba(168, 85, 247, 0.3),
@@ -525,7 +525,7 @@
     transform: translate(-50%, -50%);
     width: 120%;
     height: 140%;
-    background: linear-gradient(45deg, 
+    background: linear-gradient(45deg,
         rgba(34, 197, 94, 0.2),
         rgba(34, 197, 94, 0.1)
     );
@@ -642,11 +642,11 @@
     .vehicle-card {
         padding: 20px;
     }
-    
+
     .plate-text {
         font-size: 20px;
     }
-    
+
     .action-buttons {
         opacity: 1;
         transform: translateX(0);
@@ -779,7 +779,7 @@ window.testNavigation = function() {
     if (addBtn) {
         console.log('Add Vehicle Button URL:', addBtn.href);
         console.log('Add Vehicle Button Text:', addBtn.textContent);
-        
+
         // Probar navegación
         if (addBtn.href && addBtn.href !== '#' && !addBtn.href.includes('undefined')) {
             console.log('Navigating to:', addBtn.href);
@@ -799,21 +799,21 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('=== VEHICLES PAGE DEBUG ===');
     console.log('Request Path:', '{{ request.path }}');
     console.log('Add Vehicle URL:', '{% country_url "vehiculos:crear_vehiculo" %}');
-    
+
     const addBtn = document.getElementById('add-vehicle-btn');
     if (addBtn) {
         console.log('Add Vehicle Button found:', addBtn);
         console.log('Add Vehicle Button href:', addBtn.href);
         console.log('Add Vehicle Button computed styles:', window.getComputedStyle(addBtn));
         console.log('Add Vehicle Button position:', addBtn.getBoundingClientRect());
-        
+
         // Verificar si el botón tiene un href válido
         if (!addBtn.href || addBtn.href === '#' || addBtn.href.includes('undefined')) {
             console.error('❌ Add Vehicle button has invalid URL');
         } else {
             console.log('✅ Add Vehicle button has valid URL');
         }
-        
+
         // Agregar event listener para debug
         addBtn.addEventListener('click', function(e) {
             console.log('🔍 Add Vehicle button clicked!', e);
@@ -821,24 +821,24 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Event currentTarget:', e.currentTarget);
             console.log('Event defaultPrevented:', e.defaultPrevented);
         });
-        
+
         // Verificar si hay elementos que cubren el botón
         const elementsAtPoint = document.elementsFromPoint(
             addBtn.getBoundingClientRect().left + addBtn.getBoundingClientRect().width / 2,
             addBtn.getBoundingClientRect().top + addBtn.getBoundingClientRect().height / 2
         );
         console.log('Elements at button center:', elementsAtPoint);
-        
+
     } else {
         console.error('❌ Add Vehicle button not found');
     }
-    
+
     // Verificar todos los enlaces de acción
     const actionLinks = document.querySelectorAll('a[href*="vehiculos:"]');
     console.log('Action links found:', actionLinks.length);
     actionLinks.forEach((link, index) => {
         console.log(`Action link ${index}:`, link.href, link.textContent.trim());
-        
+
         // Agregar event listener a cada enlace
         link.addEventListener('click', function(e) {
             console.log(`🔍 Action link ${index} clicked!`, e);
@@ -847,7 +847,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Event defaultPrevented:', e.defaultPrevented);
         });
     });
-    
+
     // Verificar si hay elementos con pointer-events: none
     const allElements = document.querySelectorAll('*');
     const pointerEventsNone = Array.from(allElements).filter(el => {
@@ -855,7 +855,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return style.pointerEvents === 'none';
     });
     console.log('Elements with pointer-events: none:', pointerEventsNone);
-    
+
     // Verificar z-index de elementos superpuestos
     const highZIndexElements = Array.from(allElements).filter(el => {
         const style = window.getComputedStyle(el);
@@ -863,17 +863,17 @@ document.addEventListener('DOMContentLoaded', function() {
         return !isNaN(zIndex) && zIndex > 100;
     });
     console.log('High z-index elements:', highZIndexElements);
-    
+
     // FIX: Forzar que todos los enlaces funcionen
     const allLinks = document.querySelectorAll('a[href]');
     allLinks.forEach(link => {
         // Remover cualquier event listener que pueda estar bloqueando
         link.onclick = null;
-        
+
         // Agregar event listener que force la navegación
         link.addEventListener('click', function(e) {
             console.log('🔗 Link clicked:', this.href);
-            
+
             // Si es un enlace interno, navegar
             if (this.href && !this.href.includes('javascript:') && !this.href.includes('#')) {
                 console.log('🚀 Navigating to:', this.href);
@@ -882,14 +882,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 return false;
             }
         });
-        
+
         // Asegurar que el enlace sea clickeable
         link.style.pointerEvents = 'auto';
         link.style.cursor = 'pointer';
         link.style.zIndex = '1000';
         link.style.position = 'relative';
     });
-    
+
     console.log('✅ Applied fixes to', allLinks.length, 'links');
 });
 </script>

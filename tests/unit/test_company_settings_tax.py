@@ -1,20 +1,64 @@
-import pytest
-from importlib import import_module
 from datetime import datetime
+from importlib import import_module
+
+import pytest
+
 from django.contrib.auth import get_user_model
+
 
 def _fields(model):
     return {f.name for f in model._meta.fields}
+
 
 @pytest.mark.django_db
 def test_configuracion_empresa_impuesto_por_pais():
     Empresa = import_module("taller.models.empresa").Empresa
     User = get_user_model()
-    user1 = User.objects.create_user(username="user_cl", email="user_cl@test.com", password="testpass")
-    user2 = User.objects.create_user(username="user_us", email="user_us@test.com", password="testpass")
-    
-    emp_cl = Empresa.objects.create(nombre_taller="CL", empresa="CL", pais="CL", direccion="Test", telefono="123", email="test@test.com", zona_horaria="UTC", fecha_inicio=datetime.now(), plan="mensual", dias_prueba=30, suscripcion_activa=True, valor_mensual=100, moneda="CLP", notificacion_5_dias=False, notificacion_1_dia=False, notificacion_vencido=False, user_id=user1.id)
-    emp_us = Empresa.objects.create(nombre_taller="US", empresa="US", pais="US", direccion="Test", telefono="123", email="test@test.com", zona_horaria="UTC", fecha_inicio=datetime.now(), plan="mensual", dias_prueba=30, suscripcion_activa=True, valor_mensual=100, moneda="USD", notificacion_5_dias=False, notificacion_1_dia=False, notificacion_vencido=False, user_id=user2.id)
+    user1 = User.objects.create_user(
+        username="user_cl", email="user_cl@test.com", password="testpass"
+    )
+    user2 = User.objects.create_user(
+        username="user_us", email="user_us@test.com", password="testpass"
+    )
+
+    emp_cl = Empresa.objects.create(
+        nombre_taller="CL",
+        empresa="CL",
+        pais="CL",
+        direccion="Test",
+        telefono="123",
+        email="test@test.com",
+        zona_horaria="UTC",
+        fecha_inicio=datetime.now(),
+        plan="mensual",
+        dias_prueba=30,
+        suscripcion_activa=True,
+        valor_mensual=100,
+        moneda="CLP",
+        notificacion_5_dias=False,
+        notificacion_1_dia=False,
+        notificacion_vencido=False,
+        user_id=user1.id,
+    )
+    emp_us = Empresa.objects.create(
+        nombre_taller="US",
+        empresa="US",
+        pais="US",
+        direccion="Test",
+        telefono="123",
+        email="test@test.com",
+        zona_horaria="UTC",
+        fecha_inicio=datetime.now(),
+        plan="mensual",
+        dias_prueba=30,
+        suscripcion_activa=True,
+        valor_mensual=100,
+        moneda="USD",
+        notificacion_5_dias=False,
+        notificacion_1_dia=False,
+        notificacion_vencido=False,
+        user_id=user2.id,
+    )
 
     SettingsMod = None
     for path in ("taller.models.company_settings", "taller.models.configuracion"):

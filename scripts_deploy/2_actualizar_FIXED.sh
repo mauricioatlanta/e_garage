@@ -271,4 +271,3 @@ echo ""
 echo "Luego ejecuta: ./3_verificar_FIXED.sh"
 echo ""
 echo "======================================================"
-

@@ -64,7 +64,12 @@ class RepuestoForm(forms.ModelForm):
 
 
 RepuestoFormSet = formset_factory(
-    RepuestoForm, extra=0, can_delete=True, min_num=1, validate_min=True, formset=BaseFormSet
+    RepuestoForm,
+    extra=0,
+    can_delete=True,
+    min_num=1,
+    validate_min=True,
+    formset=BaseFormSet,
 )
 
 

@@ -132,11 +132,11 @@ const formatMoney = (value) => {
 ```html
 <tr data-linea-documento data-type="repuesto" data-subtotal="0">
   <td>
-    <input type="number" name="repuesto_cantidad" min="1" value="1" 
+    <input type="number" name="repuesto_cantidad" min="1" value="1"
            class="futurista-input w-20 text-right" data-role="qty">
   </td>
   <td>
-    <input type="number" name="repuesto_precio" min="0" value="0" 
+    <input type="number" name="repuesto_precio" min="0" value="0"
            class="futurista-input w-28 text-right" data-role="price">
   </td>
   <td>
@@ -184,16 +184,16 @@ const formatMoney = (value) => {
 
 ## 🎉 **ESTADO: IMPLEMENTACIÓN COMPLETADA**
 
-**Fecha**: 2025-10-06  
-**Archivo**: `static/taller/common/js/documentos_form.js`  
-**Funcionalidades**: 100% operativas  
-**Event delegation**: ✅ Implementado  
-**MutationObserver**: ✅ Funcionando  
-**Mini-API**: ✅ Expuesta  
-**Subtotales**: ✅ Automáticos  
-**Eliminación**: ✅ Funcional  
-**Numeración**: ✅ Automática  
-**Payment Status**: ✅ Sincronizado  
+**Fecha**: 2025-10-06
+**Archivo**: `static/taller/common/js/documentos_form.js`
+**Funcionalidades**: 100% operativas
+**Event delegation**: ✅ Implementado
+**MutationObserver**: ✅ Funcionando
+**Mini-API**: ✅ Expuesta
+**Subtotales**: ✅ Automáticos
+**Eliminación**: ✅ Funcional
+**Numeración**: ✅ Automática
+**Payment Status**: ✅ Sincronizado
 **Cliente-Vehículo**: ✅ Forward implementado
 
 **¡El formulario dinámico está completamente implementado y listo para producción!** 🚀

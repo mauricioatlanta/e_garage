@@ -71,27 +71,27 @@ def api_crear_tecnico(request):
     try:
         data = json.loads(request.body.decode())
         nombre = (data.get("nombre") or "").strip()
-        
+
         if not nombre:
             return JsonResponse({"error": "Nombre requerido"}, status=400)
-        
+
         # Usar empresa del usuario autenticado (seguridad)
         empresa = getattr(request.user, "empresa", None)
         if not empresa:
             return JsonResponse({"error": "Usuario sin empresa asociada"}, status=400)
-        
+
         tecnico = Tecnico.objects.create(
             empresa=empresa,
             nombre=nombre,
             activo=True,
         )
-        
+
         return JsonResponse({
             "ok": True,
             "id": tecnico.id,
             "nombre": tecnico.nombre,
         })
-        
+
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
 ```
@@ -236,7 +236,7 @@ class DocumentoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.country = kwargs.pop('country', 'CL')
         super().__init__(*args, **kwargs)
-        
+
         self.fields['cliente'].widget.url = get_autocomplete_url(self.country, "cliente")
         self.fields['vehiculo'].widget.url = get_autocomplete_url(self.country, "vehiculo")
 ```
@@ -247,7 +247,7 @@ from taller.utils.dal_helpers import get_template_by_country
 
 def crear_documento(request):
     country = empresa.pais if empresa else "CL"
-    
+
     # En errores y éxito
     template = get_template_by_country(country, "documentos/crear_documento.html")
     return render(request, template, ctx)

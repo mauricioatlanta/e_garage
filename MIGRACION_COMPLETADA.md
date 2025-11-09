@@ -1,7 +1,7 @@
 # ✅ Migración Multi-Tenant Completada Exitosamente
 
-**Fecha:** 1 de octubre, 2025  
-**Migración:** `taller.0005_alter_detalledocumento_options_cajavehiculo_country_and_more`  
+**Fecha:** 1 de octubre, 2025
+**Migración:** `taller.0005_alter_detalledocumento_options_cajavehiculo_country_and_more`
 **Estado:** ✅ COMPLETADA
 
 ---
@@ -135,7 +135,7 @@ python manage.py runserver
 # Crear vehículo en US con color nuevo
 # → Debe crearse con country="US"
 
-# Crear vehículo en CL con color nuevo  
+# Crear vehículo en CL con color nuevo
 # → Debe crearse con country="CL"
 ```
 
@@ -168,11 +168,11 @@ print(f"CajaVehiculo CL: {CajaVehiculo.objects.filter(country='CL').count()}")
 
 ## 🎉 Migración Exitosa
 
-✅ **Base de datos actualizada**  
-✅ **Duplicados eliminados**  
-✅ **Constraints aplicados**  
-✅ **Índices creados**  
-✅ **Multi-tenant activo**  
+✅ **Base de datos actualizada**
+✅ **Duplicados eliminados**
+✅ **Constraints aplicados**
+✅ **Índices creados**
+✅ **Multi-tenant activo**
 
 **El servidor ahora debe funcionar sin errores.** 🚀
 
@@ -182,6 +182,3 @@ python manage.py runserver
 ```
 
 Luego accede a: http://127.0.0.1:8000/us/vehiculos/
-
-
-

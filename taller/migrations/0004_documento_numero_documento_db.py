@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("taller", "0003_convert_fac_bol_to_rec"),
     ]

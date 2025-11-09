@@ -238,5 +238,3 @@ Se ha implementado un sistema completo de branding personalizado que permite a c
 **El sistema está listo para producción** 🚀
 
 Los suscriptores ahora pueden configurar su propio branding y verlo reflejado en toda la interfaz, reemplazando completamente el branding por defecto de eGarage.
-
-

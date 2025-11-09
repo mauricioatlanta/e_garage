@@ -7,8 +7,7 @@ sys.path.append(".")
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings_sqlite")
 django.setup()
 
-from taller.models.documento import (Documento, RepuestoDocumento,
-                                     ServicioDocumento)
+from taller.models.documento import Documento, RepuestoDocumento, ServicioDocumento
 
 
 def debug_documento_edicion():
@@ -75,7 +74,7 @@ def debug_documento_edicion():
         if campos_vacios:
             print(f"   ⚠️ Campos faltantes: {', '.join(campos_vacios)}")
         else:
-            print(f"   ✅ Documento completo")
+            print("   ✅ Documento completo")
 
         print(f"   🔗 URL editar: http://127.0.0.1:8000/documentos/editar/{doc.id}/")
 
@@ -90,7 +89,6 @@ def crear_documento_test_completo():
 
     from taller.models.cliente import Cliente
     from taller.models.empresa import Empresa
-    from taller.models.tecnico import Mecanico
     from taller.models.vehiculos import Vehiculo
 
     # Obtener usuario y empresa

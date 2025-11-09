@@ -21,7 +21,7 @@
   .theme-rec  { border-color: #047857 !important; } /* emerald-700 */
 
   /* Chip compacto para cabecera */
-  .doc-chip  { 
+  .doc-chip  {
     border-radius: 9999px;
     padding: 2px 8px;
     font-size: 11px;

@@ -22,14 +22,14 @@ El usuario reportó que al intentar agregar un Toyota Corolla con un nuevo motor
 ```python
 def clean_motor(self):
     motor_id = self.cleaned_data.get("motor")
-    
+
     if motor_id == "__add_new__":  # ← Cambiado de __nuevo__
         self._motor_nuevo = True
         return None
 
 def clean_caja(self):
     caja_id = self.cleaned_data.get("caja")
-    
+
     if caja_id == "__add_new__":  # ← Cambiado de __nuevo__
         self._caja_nuevo = True
         return None
@@ -47,7 +47,7 @@ def save(self, commit=True):
     if getattr(self, "_motor_nuevo", False) and request.POST.get("nuevo_motor"):
         kwargs = {"nombre": request.POST["nuevo_motor"]}
         # ... crear motor
-    
+
     # Caja: usar nuevo_caja en lugar de caja_nuevo
     if getattr(self, "_caja_nuevo", False) and request.POST.get("nuevo_caja"):
         kwargs = {"nombre": request.POST["nuevo_caja"]}
@@ -67,20 +67,20 @@ if modelo and hasattr(motor_obj, "modelos"):
     if pais == "US":
         from taller.models.modelo import Modelo as ModeloChile
         from taller.models.marca import Marca
-        
+
         # Buscar el modelo equivalente en el sistema Chile
         marca_chile = Marca.objects.filter(
-            nombre=modelo.marca.nombre, 
+            nombre=modelo.marca.nombre,
             country="US"
         ).first()
-        
+
         if marca_chile:
             modelo_chile = ModeloChile.objects.filter(
                 nombre=modelo.nombre,
                 marca=marca_chile,
                 country="US"
             ).first()
-            
+
             if modelo_chile:
                 motor_obj.modelos.add(modelo_chile)
     else:
@@ -132,5 +132,3 @@ if modelo and hasattr(motor_obj, "modelos"):
 5. **UX Mejorada**: Proceso fluido sin errores de validación
 
 El problema está **completamente resuelto**. Los usuarios pueden ahora agregar nuevos motores y transmisiones al crear vehículos sin recibir errores de "ID no válido". El sistema crea automáticamente los nuevos motores y cajas y los asocia correctamente al modelo seleccionado.
-
-

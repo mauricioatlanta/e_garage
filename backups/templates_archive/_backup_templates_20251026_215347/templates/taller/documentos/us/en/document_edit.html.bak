@@ -92,7 +92,7 @@
 {% block documento_actions %}
   <div class="form-actions">
     <button type="submit" class="btn-primary" form="document-form">💾 Save Changes</button>
-    
+
     {% country_url 'documentos:lista_documentos' as url_lista %}
     {% if url_lista %}
       <a href="{{ url_lista }}" class="btn-secondary">← Cancel</a>
@@ -214,25 +214,25 @@ console.log('🔍 JavaScript cargado en template USA');
 function updateDocumentNumber() {
     const tipoSelect = document.getElementById('id_tipo');
     const numeroField = document.getElementById('id_numero_documento');
-    
+
     if (!tipoSelect || !numeroField) {
         console.log('⚠️ Elementos no encontrados');
         return;
     }
-    
+
     const tipo = tipoSelect.value;
     if (!tipo) {
         numeroField.value = 'Will be generated automatically';
         return;
     }
-    
+
     console.log('📡 Obteniendo número para tipo:', tipo);
     numeroField.value = 'Generating...';
-    
+
     // Detectar país desde la URL
     const countryPrefix = window.location.pathname.startsWith('/us/') ? 'us' : 'cl';
     const apiUrl = `/${countryPrefix}/documentos/api/obtener-numero-documento/?tipo=${tipo}`;
-    
+
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => {
@@ -266,7 +266,7 @@ function hideProblematicTabs() {
 // Función para llenar información del cliente
 function fillClientInfo(clientData) {
     console.log('📝 Llenando información del cliente:', clientData);
-    
+
     // Verificar que los elementos existan antes de llenarlos
     const campos = {
         'id_cliente_nombre': clientData.nombre || '',
@@ -275,7 +275,7 @@ function fillClientInfo(clientData) {
         'id_cliente_telefono': clientData.telefono || '',
         'id_cliente_direccion': clientData.direccion || ''
     };
-    
+
     // Llenar campos uno por uno con verificación
     Object.keys(campos).forEach(fieldId => {
         const elemento = document.getElementById(fieldId);
@@ -286,7 +286,7 @@ function fillClientInfo(clientData) {
             console.log(`⚠️ Campo ${fieldId} no encontrado`);
         }
     });
-    
+
     // Mostrar la sección de información del cliente
     const clienteInfoSection = document.getElementById('cliente-info');
     if (clienteInfoSection) {
@@ -300,14 +300,14 @@ function fillClientInfo(clientData) {
 // Función para limpiar información del cliente
 function clearClientInfo() {
     console.log('🧹 Limpiando información del cliente');
-    
+
     // Limpiar campos
     document.getElementById('id_cliente_nombre').value = '';
     document.getElementById('id_cliente_apellido').value = '';
     document.getElementById('id_cliente_email').value = '';
     document.getElementById('id_cliente_telefono').value = '';
     document.getElementById('id_cliente_direccion').value = '';
-    
+
     // Ocultar la sección de información del cliente
     const clienteInfoSection = document.getElementById('cliente-info');
     if (clienteInfoSection) {
@@ -318,7 +318,7 @@ function clearClientInfo() {
 // Función para buscar cliente por nombre y obtener su ID
 function buscarClientePorNombre(nombreCompleto) {
     console.log('🔍 Buscando cliente:', nombreCompleto);
-    
+
     // Mapeo directo de nombres conocidos a IDs (solución temporal)
     const clientesConocidos = {
         'michael jackson - +17701111111': 16,
@@ -326,20 +326,20 @@ function buscarClientePorNombre(nombreCompleto) {
         'john lennon': 14,
         'fernando zampedri': 9
     };
-    
+
     // Buscar en el mapeo
     let clientId = clientesConocidos[nombreCompleto.toLowerCase()];
     if (!clientId) {
         // Intentar búsqueda parcial
         for (const [nombre, id] of Object.entries(clientesConocidos)) {
-            if (nombre.toLowerCase().includes(nombreCompleto.toLowerCase()) || 
+            if (nombre.toLowerCase().includes(nombreCompleto.toLowerCase()) ||
                 nombreCompleto.toLowerCase().includes(nombre.toLowerCase())) {
                 clientId = id;
                 break;
             }
         }
     }
-    
+
     if (clientId) {
         console.log('✅ Cliente encontrado en mapeo:', clientId);
         loadClientVehicles(clientId);
@@ -352,23 +352,23 @@ function buscarClientePorNombre(nombreCompleto) {
 // Función para cargar vehículos de un cliente
 function loadClientVehicles(clientId) {
     console.log('🚗 Cargando vehículos para cliente ID:', clientId);
-    
+
     const vehiculoSelect = document.getElementById('id_vehiculo');
     console.log('🔍 Campo vehículo encontrado:', vehiculoSelect);
     if (!vehiculoSelect) {
         console.log('⚠️ Campo vehículo no encontrado');
         return;
     }
-    
+
     // Mostrar loading
     vehiculoSelect.innerHTML = '<option value="">Cargando vehículos...</option>';
-    
+
     // Detectar país desde la URL
     const countryPrefix = window.location.pathname.startsWith('/us/') ? 'us' : 'cl';
     const apiUrl = `/${countryPrefix}/documentos/api/vehiculos-cliente/?cliente_id=${clientId}`;
-    
+
     console.log('📡 URL de la API de vehículos:', apiUrl);
-    
+
     fetch(apiUrl)
         .then(response => {
             console.log('📡 Respuesta de la API de vehículos:', response.status);
@@ -379,17 +379,17 @@ function loadClientVehicles(clientId) {
         })
         .then(data => {
             console.log('📊 Vehículos recibidos:', data);
-            
+
             if (data.vehiculos && data.vehiculos.length > 0) {
                 vehiculoSelect.innerHTML = '<option value="">Seleccione un vehículo...</option>';
-                
+
                 data.vehiculos.forEach(vehiculo => {
                     const option = document.createElement('option');
                     option.value = vehiculo.id;
                     option.textContent = `${vehiculo.marca} ${vehiculo.modelo} - ${vehiculo.patente || vehiculo.placa}`;
                     vehiculoSelect.appendChild(option);
                 });
-                
+
                 console.log(`✅ Cargados ${data.vehiculos.length} vehículos`);
             } else {
                 vehiculoSelect.innerHTML = '<option value="">No hay vehículos para este cliente</option>';
@@ -405,51 +405,51 @@ function loadClientVehicles(clientId) {
 // Event listener
 document.addEventListener('DOMContentLoaded', function() {
     console.log(' DOM cargado, configurando event listeners');
-    
+
     // Esperar un poco para que todos los elementos estén completamente cargados
     setTimeout(function() {
         const tipoSelect = document.getElementById('id_tipo');
         if (tipoSelect) {
             console.log('🔍 Campo tipo encontrado:', tipoSelect);
             console.log('🔍 Valor actual del tipo:', tipoSelect.value);
-            
+
             tipoSelect.addEventListener('change', updateDocumentNumber);
             console.log('✅ Event listener agregado para tipo');
-            
+
             // Forzar valor inicial si está vacío
             if (!tipoSelect.value) {
                 tipoSelect.value = 'OT';
                 console.log('🔧 Valor inicial establecido: OT');
             }
-            
+
             // Actualizar inmediatamente
             updateDocumentNumber();
         } else {
             console.log('⚠️ Campo tipo no encontrado');
         }
     }, 500); // Esperar 500ms para que todo esté cargado
-    
+
     // Configurar event listener para el campo cliente
     const clienteSelect = document.getElementById('id_cliente');
     console.log('🔍 Buscando campo cliente:', clienteSelect);
-    
+
     if (clienteSelect) {
         console.log('✅ Campo cliente encontrado, configurando eventos');
-        
+
         // Esperar a que Select2 esté completamente inicializado
         setTimeout(function() {
             console.log('⏰ Configurando eventos Select2 después del delay');
-            
+
             // Event listener para cuando se selecciona un cliente
             $(clienteSelect).on('select2:select', function (e) {
                 console.log('👤 EVENTO: Cliente seleccionado');
                 const data = e.params.data;
                 console.log('👤 Datos del cliente:', data);
-                
+
                 // Usar el valor del campo HTML directamente
                 const fieldValue = clienteSelect.value;
                 console.log('📡 Valor del campo:', fieldValue);
-                
+
                 if (fieldValue && fieldValue !== '') {
                     // Verificar si el valor es numérico
                     if (!isNaN(fieldValue)) {
@@ -465,21 +465,21 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.log('⚠️ Campo cliente vacío');
                 }
             });
-            
+
             // Event listener para cuando se limpia la selección
             $(clienteSelect).on('select2:clear', function (e) {
                 console.log('🧹 Cliente deseleccionado');
                 clearClientInfo();
             });
-            
+
             console.log('✅ Event listeners de Select2 configurados');
         }, 1000); // Esperar 1 segundo para que Select2 se inicialice
-        
+
         console.log('✅ Event listeners agregados para cliente');
     } else {
         console.log('⚠️ Campo cliente no encontrado');
     }
-    
+
     // Configurar observador para ocultar pestañas cuando aparezcan
     const observer = new MutationObserver(function(mutations) {
         mutations.forEach(function(mutation) {
@@ -488,13 +488,13 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-    
+
     // Observar cambios en el body para detectar cuando se abre el dropdown
     observer.observe(document.body, {
         childList: true,
         subtree: true
     });
-    
+
     // También ocultar inmediatamente
     setTimeout(hideProblematicTabs, 100);
 });

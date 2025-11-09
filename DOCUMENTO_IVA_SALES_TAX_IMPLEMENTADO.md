@@ -163,7 +163,7 @@ def recalcular_totales(self):
 def save(self, *args, **kwargs):
     # ... lógica de guardado ...
     super().save(*args, **kwargs)
-    
+
     # Solo recalcular si no estamos ya en una actualización de campos específicos
     if 'update_fields' not in kwargs:
         self.refresh_from_db()

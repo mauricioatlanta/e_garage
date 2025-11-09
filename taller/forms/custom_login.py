@@ -18,17 +18,21 @@ class CustomLoginForm(LoginForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Agregar clases CSS y atributos de accesibilidad a los campos existentes
-        self.fields["login"].widget.attrs.update({
-            "class": "premium-input", 
-            "placeholder": "Usuario o email",
-            "autocomplete": "username",
-            "inputmode": "email"
-        })
-        self.fields["password"].widget.attrs.update({
-            "class": "premium-input", 
-            "placeholder": "Contraseña",
-            "autocomplete": "current-password"
-        })
+        self.fields["login"].widget.attrs.update(
+            {
+                "class": "premium-input",
+                "placeholder": "Usuario o email",
+                "autocomplete": "username",
+                "inputmode": "email",
+            }
+        )
+        self.fields["password"].widget.attrs.update(
+            {
+                "class": "premium-input",
+                "placeholder": "Contraseña",
+                "autocomplete": "current-password",
+            }
+        )
 
     def login(self, request, redirect_url=None):
         """

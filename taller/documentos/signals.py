@@ -3,7 +3,8 @@ Signals para recálculo automático de totales de documentos
 Versión mejorada: performance, precisión, concurrencia
 """
 
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import ROUND_HALF_UP, Decimal
+
 from django.db import transaction
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
@@ -26,11 +27,15 @@ def _q2(x: Decimal) -> Decimal:
     return x.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
 
-@receiver([post_save, post_delete], sender=LineaDocumento, dispatch_uid="doc_recalc_on_line_change_v2")
+@receiver(
+    [post_save, post_delete],
+    sender=LineaDocumento,
+    dispatch_uid="doc_recalc_on_line_change_v2",
+)
 def recalc_on_line_change(sender, instance, raw=False, using=None, **kwargs):
     """
     Recalcula totales del documento cuando cambian las líneas.
-    
+
     Mejoras implementadas:
     - Evita loops durante loaddata/migraciones (raw=True)
     - Performance: ORM Sum + Coalesce (1 query por tipo)
@@ -49,9 +54,11 @@ def recalc_on_line_change(sender, instance, raw=False, using=None, **kwargs):
     # Asegura consistencia si se guardan varias líneas en paralelo
     with transaction.atomic():
         # Lock sobre el documento; evita carreras entre pestañas/hilos
-        doc = Documento.objects.select_for_update().only(
-            "id", "estado", "descuento", "tax_rate_applied"
-        ).get(pk=doc_id)
+        doc = (
+            Documento.objects.select_for_update()
+            .only("id", "estado", "descuento", "tax_rate_applied")
+            .get(pk=doc_id)
+        )
 
         # Solo recalcular en borradores
         if doc.estado != ESTADO_DRAFT:
@@ -75,7 +82,9 @@ def recalc_on_line_change(sender, instance, raw=False, using=None, **kwargs):
         rate_pct = Decimal(doc.tax_rate_applied or Decimal("0.00"))
 
         # CL por defecto: impuesto solo sobre repuestos (si en US cambia, ajusta fuente/base)
-        rate = (rate_pct / Decimal("100")).quantize(Decimal("0.0001"))  # precisión extra antes de q2
+        rate = (rate_pct / Decimal("100")).quantize(
+            Decimal("0.0001")
+        )  # precisión extra antes de q2
         tax_amount = _q2(net_parts * rate)
 
         # Total = repuestos + servicios - descuento + impuesto
@@ -88,4 +97,6 @@ def recalc_on_line_change(sender, instance, raw=False, using=None, **kwargs):
         doc.neto_servicios = neto_servicios
         doc.tax_amount = tax_amount
         doc.total = total
-        doc.save(update_fields=["neto_repuestos", "neto_servicios", "tax_amount", "total"])
+        doc.save(
+            update_fields=["neto_repuestos", "neto_servicios", "tax_amount", "total"]
+        )

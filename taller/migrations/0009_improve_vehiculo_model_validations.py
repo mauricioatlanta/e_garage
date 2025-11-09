@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("taller", "0008_improve_precio_suscripcion_model"),
     ]

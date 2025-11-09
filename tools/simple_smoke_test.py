@@ -1,5 +1,5 @@
-from django.test import Client
 from django.contrib.auth import get_user_model
+from django.test import Client
 
 User = get_user_model()
 
@@ -10,10 +10,10 @@ client = Client()
 # Test Chile
 print("\n1. Testing Chile (CLP + IVA 19%)")
 try:
-    login_success = client.login(username='admin_chile', password='admin123')
+    login_success = client.login(username="admin_chile", password="admin123")
     if login_success:
         print("✅ Login CL exitoso")
-        response = client.get('/cl/es/documentos/form/')
+        response = client.get("/cl/es/documentos/form/")
         print(f"📄 Form CL: {response.status_code}")
         if response.status_code == 200:
             print("✅ Formulario CL cargado")
@@ -27,10 +27,10 @@ except Exception as e:
 # Test USA
 print("\n2. Testing USA (USD + Sales Tax 0%)")
 try:
-    login_success = client.login(username='testuser_usa', password='TestUSA2025!')
+    login_success = client.login(username="testuser_usa", password="TestUSA2025!")
     if login_success:
         print("✅ Login US exitoso")
-        response = client.get('/us/en/documentos/form/')
+        response = client.get("/us/en/documentos/form/")
         print(f"📄 Form US: {response.status_code}")
         if response.status_code == 200:
             print("✅ Formulario US cargado")
@@ -44,13 +44,13 @@ except Exception as e:
 # Test JavaScript
 print("\n3. Testing JavaScript")
 try:
-    response = client.get('/static/taller/common/js/documentos_form.js')
+    response = client.get("/static/taller/common/js/documentos_form.js")
     if response.status_code == 200:
         print("✅ JavaScript cargado")
-        content = response.content.decode('utf-8')
-        if 'recalcTotals' in content:
+        content = response.content.decode("utf-8")
+        if "recalcTotals" in content:
             print("✅ Función recalcTotals encontrada")
-        if 'VAT_PCT' in content:
+        if "VAT_PCT" in content:
             print("✅ Variable VAT_PCT encontrada")
     else:
         print("❌ JavaScript no cargado")

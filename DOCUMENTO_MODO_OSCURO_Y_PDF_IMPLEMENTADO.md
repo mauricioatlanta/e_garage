@@ -21,7 +21,7 @@
 
 #### Paletas Modo Oscuro:
 - **OT**: `border-slate-400/45` con `bg-gray-900 text-gray-200`
-- **PRES**: `border-amber-500/45` con `bg-amber-900 text-amber-200`  
+- **PRES**: `border-amber-500/45` con `bg-amber-900 text-amber-200`
 - **REC**: `border-emerald-500/45` con `bg-emerald-900 text-emerald-200`
 
 ### 2. **Estilos PDF** (`templates/taller/documentos/_document_theme_print.html`)
@@ -37,8 +37,8 @@
 #### Optimizaciones PDF:
 ```css
 @media print {
-  @page { 
-    size: A4; 
+  @page {
+    size: A4;
     margin: 18mm 14mm 20mm 14mm;
     @top-center { content: element(pdf-header); }
     @bottom-right { content: element(pdf-footer); }
@@ -96,7 +96,7 @@
     <span class="doc-chip chip-{{ tipo|lower }}">🔧 OT #123</span>
     <div>Mi Empresa • CLP</div>
   </div>
-  
+
   <!-- Información del documento -->
   <!-- Cliente y vehículo -->
   <!-- Observaciones -->

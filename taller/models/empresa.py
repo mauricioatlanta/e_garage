@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import CheckConstraint, Q
 from django.utils import timezone
+
 # Si usas Django ≥4, evita pytz y usa zoneinfo:
 # from zoneinfo import ZoneInfo
 # from django.utils.timezone import localtime  # recomendado
@@ -37,27 +38,40 @@ class Empresa(models.Model):
 
     # Whitelists por país (evita pisar configuraciones válidas del usuario)
     US_TZS = {
-        "America/New_York", "America/Chicago", "America/Denver",
-        "America/Los_Angeles", "America/Anchorage", "Pacific/Honolulu",
+        "America/New_York",
+        "America/Chicago",
+        "America/Denver",
+        "America/Los_Angeles",
+        "America/Anchorage",
+        "Pacific/Honolulu",
         "America/Phoenix",
     }
     CL_TZS = {"America/Santiago"}
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="empresa")
     nombre_taller = models.CharField(max_length=100, default="Mi Taller")
-    empresa = models.CharField(max_length=100, blank=True, help_text="Razón social o compañía")
+    empresa = models.CharField(
+        max_length=100, blank=True, help_text="Razón social o compañía"
+    )
 
-    pais = models.CharField(max_length=2, choices=PAIS_CHOICES, default="CL",
-                            help_text="Define catálogos, moneda y regionalización")
+    pais = models.CharField(
+        max_length=2,
+        choices=PAIS_CHOICES,
+        default="CL",
+        help_text="Define catálogos, moneda y regionalización",
+    )
 
     logo = models.ImageField(upload_to="logos_talleres/", null=True, blank=True)
     direccion = models.CharField(max_length=200, blank=True)
     telefono = models.CharField(max_length=20, blank=True)
     email = models.EmailField(max_length=100, blank=True, help_text="Email de contacto")
 
-    zona_horaria = models.CharField(max_length=50, choices=TIMEZONE_CHOICES,
-                                    default="America/New_York",
-                                    help_text="Zona horaria del taller")
+    zona_horaria = models.CharField(
+        max_length=50,
+        choices=TIMEZONE_CHOICES,
+        default="America/New_York",
+        help_text="Zona horaria del taller",
+    )
 
     fecha_inicio = models.DateTimeField(default=timezone.now)
     fecha_fin = models.DateTimeField(null=True, blank=True)
@@ -66,7 +80,9 @@ class Empresa(models.Model):
     suscripcion_activa = models.BooleanField(default=True)
 
     ultimo_pago = models.DateTimeField(null=True, blank=True)
-    valor_mensual = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"))
+    valor_mensual = models.DecimalField(
+        max_digits=10, decimal_places=2, default=Decimal("0.00")
+    )
     moneda = models.CharField(max_length=3, choices=MONEDA_CHOICES, default="CLP")
 
     notificacion_5_dias = models.BooleanField(default=False)
@@ -102,10 +118,12 @@ class Empresa(models.Model):
         super().save(*args, **kwargs)
 
     @property
-    def es_usa(self): return self.pais == "US"
+    def es_usa(self):
+        return self.pais == "US"
 
     @property
-    def es_chile(self): return self.pais == "CL"
+    def es_chile(self):
+        return self.pais == "CL"
 
     @property
     def simbolo_moneda(self):
@@ -114,8 +132,11 @@ class Empresa(models.Model):
 
     @property
     def formato_moneda(self):
-        return {"simbolo": self.simbolo_moneda, "codigo": self.moneda,
-                "decimales": 2 if self.es_usa else 0}
+        return {
+            "simbolo": self.simbolo_moneda,
+            "codigo": self.moneda,
+            "decimales": 2 if self.es_usa else 0,
+        }
 
     @property
     def fecha_expiracion(self):
@@ -132,7 +153,9 @@ class Empresa(models.Model):
 
     @property
     def debe_bloquear(self):
-        return (timezone.now() > self.fecha_expiracion) and (not self.suscripcion_activa)
+        return (timezone.now() > self.fecha_expiracion) and (
+            not self.suscripcion_activa
+        )
 
     @property
     def estado_suscripcion(self):
@@ -147,12 +170,19 @@ class Empresa(models.Model):
 
     @property
     def color_estado(self):
-        return {"activa": "green", "advertencia": "orange", "critico": "red", "vencida": "gray"}.get(
-            self.estado_suscripcion, "gray"
-        )
+        return {
+            "activa": "green",
+            "advertencia": "orange",
+            "critico": "red",
+            "vencida": "gray",
+        }.get(self.estado_suscripcion, "gray")
 
     def extender_suscripcion(self, dias=30):
-        base = self.fecha_fin if self.fecha_fin and self.fecha_fin > timezone.now() else timezone.now()
+        base = (
+            self.fecha_fin
+            if self.fecha_fin and self.fecha_fin > timezone.now()
+            else timezone.now()
+        )
         self.fecha_fin = base + timedelta(days=dias)
         self.suscripcion_activa = True
         self.ultimo_pago = timezone.now()
@@ -209,7 +239,9 @@ class Empresa(models.Model):
     def get_mensaje_alerta(self):
         dias = self.dias_restantes
         if dias <= 0:
-            return "Tu suscripción ha vencido. Renueva para continuar usando el sistema."
+            return (
+                "Tu suscripción ha vencido. Renueva para continuar usando el sistema."
+            )
         if dias == 1:
             return "⚠️ Tu suscripción vence mañana. ¡Renueva ahora!"
         if dias <= 5:
@@ -220,6 +252,10 @@ class Empresa(models.Model):
         verbose_name = "Empresa"
         verbose_name_plural = "Empresas"
         constraints = [
-            CheckConstraint(check=Q(dias_prueba__gte=0), name="empresa_dias_prueba_gte_0"),
-            CheckConstraint(check=Q(valor_mensual__gte=0), name="empresa_valor_mensual_gte_0"),
+            CheckConstraint(
+                check=Q(dias_prueba__gte=0), name="empresa_dias_prueba_gte_0"
+            ),
+            CheckConstraint(
+                check=Q(valor_mensual__gte=0), name="empresa_valor_mensual_gte_0"
+            ),
         ]

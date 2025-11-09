@@ -23,7 +23,7 @@ $IgnoreDirs = @(
 
 $files = Get-ChildItem -Path $Root -File -Recurse -Force | Where-Object {
   $p = $_.FullName
-  -not ($IgnoreDirs | ForEach-Object { $p -match [regex]::Escape($_) } | Where-Object { $_ }) 
+  -not ($IgnoreDirs | ForEach-Object { $p -match [regex]::Escape($_) } | Where-Object { $_ })
 }
 
 # mapa hash → lista de archivos (para duplicados exactos)

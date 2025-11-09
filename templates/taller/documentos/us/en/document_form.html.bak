@@ -111,7 +111,7 @@
           <button type="button" id="add-servicio" class="btn-secondary">+ Add Service</button>
           <button type="button" id="add-otro" class="btn-secondary">+ Add Other Service</button>
         </div>
-        
+
         <!-- Parts container -->
         <div id="repuestos-container" class="space-y-4">
           <!-- Dynamic parts will be added here -->
@@ -140,7 +140,7 @@
     <!-- Totals -->
     <div class="totales-section">
       <h3 class="text-2xl font-bold text-cyan-300 mb-4">💰 Totals</h3>
-      
+
       <!-- VAT checkbox next to totals -->
       <div class="mb-4">
         <label class="flex items-center text-cyan-200">
@@ -229,7 +229,7 @@ function applyTheme(tipo) {
   if (tipo === 'FAC') shell.classList.add('theme-fac');
   else if (tipo === 'PRES') shell.classList.add('theme-pres');
   else shell.classList.add('theme-ot');
-  
+
   updateDocumentNumber();
 }
 
@@ -237,7 +237,7 @@ function applyTheme(tipo) {
 async function updateDocumentNumber() {
    const numeroField = document.getElementById('id_numero');
    if (!numeroField) return;
-   
+
    const tipo = document.getElementById('id_tipo')?.value;
    if (!tipo) return;
 
@@ -443,7 +443,7 @@ window.recalcTotales = function(){
   const subtot = rep + serv + otros;
   const iva = ivaOn ? subtot * 0.19 : 0; // 19% for Chile, adjust for USA
   const tot = subtot + iva;
-  
+
   setTxt('#t_repuestos',money(rep));
   setTxt('#t_servicios',money(serv));
   setTxt('#t_otros',money(otros));
@@ -489,7 +489,7 @@ document.getElementById('id_apply_vat')?.addEventListener('change', window.recal
 document.addEventListener('DOMContentLoaded', () => {
   applyTheme(document.getElementById('id_tipo')?.value || 'OT');
   updateDocumentNumber();
-  
+
   // Initialize totals with US format
   if (COUNTRY === 'US') {
     window.recalcTotales();
@@ -501,7 +501,7 @@ document.getElementById('add-repuesto')?.addEventListener('click', () => {
   const container = document.getElementById('repuestos-container');
   const formCount = document.getElementById('id_rep-TOTAL_FORMS');
   const currentCount = formCount ? parseInt(formCount.value) : 0;
-  
+
   const newRow = document.createElement('div');
   newRow.className = 'dynamic-element';
   newRow.innerHTML = `
@@ -540,14 +540,14 @@ document.getElementById('add-repuesto')?.addEventListener('click', () => {
       </div>
     </div>
   `;
-  
+
   container.appendChild(newRow);
   if (formCount) formCount.value = currentCount + 1;
-  
+
   // Add event listeners for the new row
   const newCodeField = newRow.querySelector('.rep-codigo');
   setupRepuestoRow(newRow);
-  
+
   if (newCodeField) {
     newCodeField.focus();
   }
@@ -558,7 +558,7 @@ document.getElementById('add-servicio')?.addEventListener('click', () => {
   const container = document.getElementById('servicios-container');
   const formCount = document.getElementById('id_serv-TOTAL_FORMS');
   const currentCount = formCount ? parseInt(formCount.value) : 0;
-  
+
   const newRow = document.createElement('div');
   newRow.className = 'dynamic-element';
   newRow.innerHTML = `
@@ -586,10 +586,10 @@ document.getElementById('add-servicio')?.addEventListener('click', () => {
       </div>
     </div>
   `;
-  
+
   container.appendChild(newRow);
   if (formCount) formCount.value = currentCount + 1;
-  
+
   setupServicioRow(newRow);
 });
 
@@ -598,7 +598,7 @@ document.getElementById('add-otro')?.addEventListener('click', () => {
   const container = document.getElementById('otros-container');
   const formCount = document.getElementById('id_otr-TOTAL_FORMS');
   const currentCount = formCount ? parseInt(formCount.value) : 0;
-  
+
   const newRow = document.createElement('div');
   newRow.className = 'dynamic-element';
   newRow.innerHTML = `
@@ -634,10 +634,10 @@ document.getElementById('add-otro')?.addEventListener('click', () => {
       </div>
     </div>
   `;
-  
+
   container.appendChild(newRow);
   if (formCount) formCount.value = currentCount + 1;
-  
+
   setupOtroRow(newRow);
 });
 

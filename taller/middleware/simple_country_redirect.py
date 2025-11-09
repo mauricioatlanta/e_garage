@@ -17,7 +17,7 @@ class SimpleCountryRedirectMiddleware(MiddlewareMixin):
         # Debug: mostrar información del request
         print(f"[DEBUG] SimpleCountryRedirect: {request.path}")
         print(f"   User authenticated: {request.user.is_authenticated}")
-        
+
         # Solo procesar si el usuario está autenticado
         if not request.user.is_authenticated:
             print("   [SKIP] Usuario no autenticado")
@@ -31,7 +31,7 @@ class SimpleCountryRedirectMiddleware(MiddlewareMixin):
         # Obtener el país de la empresa del usuario
         user_country = request.user.empresa.pais
         print(f"   User country: {user_country}")
-        
+
         if not user_country:
             print("   [SKIP] Usuario no tiene país")
             return None
@@ -69,21 +69,23 @@ class SimpleCountryRedirectMiddleware(MiddlewareMixin):
         # Verificar si hay conflicto de país
         if url_country and url_country != user_country:
             # Conflicto de país - redirigir
-            print(f"   [REDIRECT] CONFLICTO DE PAÍS DETECTADO! Redirigiendo...")
+            print("   [REDIRECT] CONFLICTO DE PAÍS DETECTADO! Redirigiendo...")
             redirect_needed = True
         # Verificar si hay conflicto de idioma (mismo país pero idioma incorrecto)
         elif url_country == user_country and url_lang and url_lang != correct_lang:
             # Conflicto de idioma - redirigir
-            print(f"   [REDIRECT] CONFLICTO DE IDIOMA DETECTADO! Redirigiendo...")
+            print("   [REDIRECT] CONFLICTO DE IDIOMA DETECTADO! Redirigiendo...")
             redirect_needed = True
         # Verificar si falta el idioma (mismo país pero sin idioma)
         elif url_country == user_country and not url_lang:
             # Falta idioma - redirigir
-            print(f"   [REDIRECT] FALTA IDIOMA DETECTADO! Redirigiendo...")
+            print("   [REDIRECT] FALTA IDIOMA DETECTADO! Redirigiendo...")
             redirect_needed = True
         else:
             # No hay conflicto
-            print(f"   [OK] No hay conflicto (URL: {url_country}/{url_lang}, User: {user_country}/{correct_lang})")
+            print(
+                f"   [OK] No hay conflicto (URL: {url_country}/{url_lang}, User: {user_country}/{correct_lang})"
+            )
             return None
 
         # Redirigir a la URL correcta
@@ -108,13 +110,9 @@ class SimpleCountryRedirectMiddleware(MiddlewareMixin):
 
         # Debug logging
         print(f"[REDIRECT] SimpleCountryRedirect: {path} -> {new_url}")
-        print(f"   User: {request.user.username}, Empresa: {request.user.empresa.nombre_taller}, País: {user_country}")
+        print(
+            f"   User: {request.user.username}, Empresa: {request.user.empresa.nombre_taller}, País: {user_country}"
+        )
 
         # Redirección 302 (temporal)
         return HttpResponseRedirect(new_url)
-
-
-
-
-
-

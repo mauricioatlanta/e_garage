@@ -1,7 +1,7 @@
 # Corrección de Namespaces URL - eGarage
 
-**Fecha**: 26 de octubre de 2025  
-**Problema**: `NoReverseMatch: 'clientes' is not a registered namespace`  
+**Fecha**: 26 de octubre de 2025
+**Problema**: `NoReverseMatch: 'clientes' is not a registered namespace`
 **Ubicación**: `/us/centro-operaciones-espacial/`
 
 ## 🔴 Problema Detectado
@@ -17,7 +17,7 @@ Agregados los módulos principales con namespaces propios:
 ```python
 urlpatterns = [
     # ... otras rutas ...
-    
+
     # Módulos principales del sistema
     path("clientes/", include(("taller.clientes.urls", "clientes"), namespace="clientes")),
     path("vehiculos/", include(("taller.vehiculos.urls", "vehiculos"), namespace="vehiculos")),
@@ -36,7 +36,7 @@ Mismos módulos agregados para consistencia:
 ```python
 urlpatterns = [
     # ... otras rutas ...
-    
+
     # Módulos principales del sistema
     path("clientes/", include(("taller.clientes.urls", "clientes"), namespace="clientes")),
     path("vehiculos/", include(("taller.vehiculos.urls", "vehiculos"), namespace="vehiculos")),
@@ -116,6 +116,5 @@ chile:
 
 ---
 
-**Estado**: ✅ Completado  
+**Estado**: ✅ Completado
 **Probado en**: Producción (www.egarage.cl)
-

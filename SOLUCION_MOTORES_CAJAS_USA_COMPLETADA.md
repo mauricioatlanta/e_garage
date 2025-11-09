@@ -22,23 +22,23 @@ El usuario reportó que no podía agregar motor o transmisión después de elegi
 if country == "US":
     # Buscar el modelo USA
     modelo_usa = ModeloVehiculo.objects.get(pk=modelo_id)
-    
+
     # Buscar el modelo equivalente en el sistema Chile
     marca_chile = Marca.objects.filter(
-        nombre=modelo_usa.marca.nombre, 
+        nombre=modelo_usa.marca.nombre,
         country="US"
     ).first()
-    
+
     if marca_chile:
         modelo_chile = Modelo.objects.filter(
             nombre=modelo_usa.nombre,
             marca=marca_chile,
             country="US"
         ).first()
-        
+
         if modelo_chile:
             motores = MotorVehiculo.objects.filter(
-                modelos=modelo_chile, 
+                modelos=modelo_chile,
                 country=country
             )
 ```
@@ -112,5 +112,3 @@ if country == "US":
 - `templates/taller/vehiculos/crear_vehiculo.html` - Endpoints inyectados
 
 El problema está **completamente resuelto**. Los usuarios pueden ahora seleccionar un modelo y ver las opciones de motores y transmisiones disponibles, así como agregar nuevos motores y transmisiones cuando sea necesario.
-
-
