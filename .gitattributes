@@ -1,29 +1,3 @@
-﻿# Texto por defecto LF en el repo
 * text=auto eol=lf
-
-# Windows scripts CRLF
-*.ps1  text eol=crlf
-*.bat  text eol=crlf
-*.cmd  text eol=crlf
-
-# Archivos que deben ser LF
-*.py   text eol=lf
-*.sh   text eol=lf
-*.html text eol=lf
-*.css  text eol=lf
-*.js   text eol=lf
-*.md   text eol=lf
-*.yml  text eol=lf
-*.yaml text eol=lf
-*.toml text eol=lf
-*.json text eol=lf
-*.csv  text eol=lf
-
-# Binarios
-*.png  -text
-*.jpg  -text
-*.jpeg -text
-*.gif  -text
-*.pdf  -text
-*.zip  -text
-*.7z   -text
+*.ps1 text eol=crlf
+*.bat text eol=crlf
