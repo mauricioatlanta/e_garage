@@ -40,18 +40,14 @@ class Command(BaseCommand):
             # Payload mínimo usando valores actuales del doc:
             payload = {
                 "tipo": doc.tipo,  # ⚠️ si 'tipo' es read-only en UI, el form aún lo espera
-                "fecha_emision": (
-                    doc.fecha_emision or timezone.now().date()
-                ).isoformat(),
+                "fecha_emision": (doc.fecha_emision or timezone.now().date()).isoformat(),
                 "cliente": getattr(doc.cliente, "pk", ""),
                 "vehiculo": getattr(doc.vehiculo, "pk", ""),
                 "tecnico_responsable": getattr(doc.tecnico_responsable, "pk", "") or "",
                 "pagado": "on" if getattr(doc, "pagado", False) else "",
             }
             # Simula US tax widgets si aplica
-            payload["apply_sales_tax"] = (
-                "1" if getattr(doc, "country", None) == "US" else ""
-            )
+            payload["apply_sales_tax"] = "1" if getattr(doc, "country", None) == "US" else ""
             payload["sales_tax_rate"] = "8.5"  # tolerante; el server normaliza
 
             # Nota: si usas arrays de líneas por JS, este probe solo verifica campos del Documento.
@@ -68,19 +64,13 @@ class Command(BaseCommand):
             try:
                 ctx = getattr(resp, "context", None)
                 if ctx and "form" in ctx and ctx["form"].errors:
-                    self.stdout.write(
-                        self.style.WARNING(f"Errors: {ctx['form'].errors.as_json()}")
-                    )
+                    self.stdout.write(self.style.WARNING(f"Errors: {ctx['form'].errors.as_json()}"))
                 else:
                     # Rely on server logs (previo paso)
                     self.stdout.write(
-                        self.style.WARNING(
-                            "Sin ctx de errores; revisa logs del servidor."
-                        )
+                        self.style.WARNING("Sin ctx de errores; revisa logs del servidor.")
                     )
             except Exception:
                 self.stdout.write(
-                    self.style.WARNING(
-                        "No se pudo leer contexto; revisa logs del servidor."
-                    )
+                    self.style.WARNING("No se pudo leer contexto; revisa logs del servidor.")
                 )

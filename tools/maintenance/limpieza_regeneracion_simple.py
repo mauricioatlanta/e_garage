@@ -695,9 +695,7 @@ except Exception as e:
 
     print("\n📋 PRÓXIMOS PASOS:")
     print("1. 📄 Revisar archivo: pruebas_suscripciones_creadas.md")
-    print(
-        "2. 🌐 Probar login: https://atlantareciclajes.pythonanywhere.com/accounts/login/"
-    )
+    print("2. 🌐 Probar login: https://atlantareciclajes.pythonanywhere.com/accounts/login/")
     print("3. 🔍 Verificar datos: /analytics/admin/test/info/ (como admin)")
     print("4. 📊 Probar dashboards:")
     print("   - Principal: /analytics/dashboard/")

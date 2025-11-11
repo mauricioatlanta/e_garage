@@ -22,9 +22,7 @@ class PagoPendiente(models.Model):
     monto = models.DecimalField(max_digits=12, decimal_places=2)
     comprobante = models.FileField(upload_to="comprobantes_pago/")
 
-    estado = models.CharField(
-        max_length=20, choices=ESTADO_CHOICES, default="pendiente"
-    )
+    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default="pendiente")
     fecha_subida = models.DateTimeField(default=timezone.now)
     fecha_verificacion = models.DateTimeField(null=True, blank=True)
     verificado_por = models.ForeignKey(

@@ -134,9 +134,7 @@ servicios_por_categoria = {
     ],
 }
 
-categoria_padre, _ = CategoriaServicio.objects.get_or_create(
-    nombre="Servicios Automotrices"
-)
+categoria_padre, _ = CategoriaServicio.objects.get_or_create(nombre="Servicios Automotrices")
 
 contador_categorias = 1
 contador_subcategorias = 0
@@ -149,9 +147,7 @@ for nombre_subcat, lista_servicios in servicios_por_categoria.items():
     if creada:
         contador_subcategorias += 1
     for servicio in lista_servicios:
-        _, creado = Servicio.objects.get_or_create(
-            nombre=servicio, subcategoria=subcategoria
-        )
+        _, creado = Servicio.objects.get_or_create(nombre=servicio, subcategoria=subcategoria)
         if creado:
             contador_servicios += 1
 

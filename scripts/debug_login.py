@@ -22,9 +22,7 @@ try:
     print(f"2. Login page: {login_page.status_code}")
 
     # Obtener CSRF
-    csrf_match = re.search(
-        r'name="csrfmiddlewaretoken" value="([^"]*)"', login_page.text
-    )
+    csrf_match = re.search(r'name="csrfmiddlewaretoken" value="([^"]*)"', login_page.text)
     if not csrf_match:
         print("❌ No se encontró CSRF token")
         print("Primeros 500 chars de la página:")

@@ -14,9 +14,7 @@ from taller.models.catalogo import CatalogoModeloAuto
 
 
 class Command(BaseCommand):
-    help = (
-        "Importa Marca,Modelo desde el CSV generado por el scraper (USA 1970–presente)"
-    )
+    help = "Importa Marca,Modelo desde el CSV generado por el scraper (USA 1970–presente)"
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -58,16 +56,12 @@ class Command(BaseCommand):
         if clear_first:
             if is_dry_run:
                 current_count = CatalogoModeloAuto.objects.count()
-                self.stdout.write(
-                    f"🗑️  DRY-RUN: Se eliminarían {current_count} registros"
-                )
+                self.stdout.write(f"🗑️  DRY-RUN: Se eliminarían {current_count} registros")
             else:
                 deleted_count = CatalogoModeloAuto.objects.count()
                 CatalogoModeloAuto.objects.all().delete()
                 self.stdout.write(
-                    self.style.WARNING(
-                        f"🗑️  Eliminados {deleted_count} registros existentes"
-                    )
+                    self.style.WARNING(f"🗑️  Eliminados {deleted_count} registros existentes")
                 )
 
         # Leer y procesar CSV
@@ -79,9 +73,7 @@ class Command(BaseCommand):
             with csv_path.open("r", encoding="utf-8", newline="") as f:
                 reader = csv.DictReader(f)
 
-                for line_num, record in enumerate(
-                    reader, start=2
-                ):  # +2 porque line 1 es header
+                for line_num, record in enumerate(reader, start=2):  # +2 porque line 1 es header
                     marca = (record.get("Marca") or "").strip()
                     modelo = (record.get("Modelo") or "").strip()
 
@@ -118,9 +110,7 @@ class Command(BaseCommand):
                     chunk = rows[i : i + chunk_size]
 
                     # bulk_create con ignore_conflicts evita errores por duplicados
-                    created = CatalogoModeloAuto.objects.bulk_create(
-                        chunk, ignore_conflicts=True
-                    )
+                    created = CatalogoModeloAuto.objects.bulk_create(chunk, ignore_conflicts=True)
                     created_count += len(created)
 
                     # Progreso cada chunk

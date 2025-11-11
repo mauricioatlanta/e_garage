@@ -20,14 +20,10 @@ class Command(BaseCommand):
                 if empresa.pais != "US":
                     empresa.pais = "US"
                     empresa.save()
-                    self.stdout.write(
-                        self.style.SUCCESS(f"✅ País actualizado a: {empresa.pais}")
-                    )
+                    self.stdout.write(self.style.SUCCESS(f"✅ País actualizado a: {empresa.pais}"))
                 else:
                     self.stdout.write(
-                        self.style.SUCCESS(
-                            "✅ El país ya está configurado correctamente como US"
-                        )
+                        self.style.SUCCESS("✅ El país ya está configurado correctamente como US")
                     )
 
             except Empresa.DoesNotExist:
@@ -56,9 +52,7 @@ class Command(BaseCommand):
                 )
             else:
                 self.stdout.write(
-                    self.style.ERROR(
-                        "❌ Algo salió mal, el país no se actualizó correctamente."
-                    )
+                    self.style.ERROR("❌ Algo salió mal, el país no se actualizó correctamente.")
                 )
 
         except User.DoesNotExist:

@@ -46,9 +46,7 @@ class StaticTemplateVerifier:
                     if "base_template_name" in content:
                         self.log(f"✅ {view_file} - Usa base_template_name")
                     else:
-                        self.log(
-                            f"❌ {view_file} - NO usa base_template_name", "WARNING"
-                        )
+                        self.log(f"❌ {view_file} - NO usa base_template_name", "WARNING")
             else:
                 self.log(f"⚠️  {view_file} - Archivo no encontrado", "WARNING")
 
@@ -90,9 +88,7 @@ class StaticTemplateVerifier:
                         "WARNING",
                     )
                 else:
-                    self.log(
-                        f"✅ {structure_path} - Todos los templates requeridos presentes"
-                    )
+                    self.log(f"✅ {structure_path} - Todos los templates requeridos presentes")
             else:
                 self.log(f"❌ {structure_path} - Directorio NO existe", "ERROR")
 
@@ -106,9 +102,7 @@ class StaticTemplateVerifier:
                 content = f.read()
 
                 if "templates_canonical" in content:
-                    self.log(
-                        "✅ settings.py - Configurado para usar templates_canonical"
-                    )
+                    self.log("✅ settings.py - Configurado para usar templates_canonical")
                 else:
                     self.log(
                         "❌ settings.py - NO configurado para templates_canonical",
@@ -116,9 +110,7 @@ class StaticTemplateVerifier:
                     )
 
                 if "company_context" in content:
-                    self.log(
-                        "✅ settings.py - Context processor company_context configurado"
-                    )
+                    self.log("✅ settings.py - Context processor company_context configurado")
                 else:
                     self.log(
                         "❌ settings.py - Context processor company_context NO configurado",
@@ -144,9 +136,7 @@ class StaticTemplateVerifier:
 
                 # Verificar que no use vistas hardcodeadas
                 if "views_moderno.documento_form" in content:
-                    self.log(
-                        "⚠️  URLs - Aún usa views_moderno.documento_form", "WARNING"
-                    )
+                    self.log("⚠️  URLs - Aún usa views_moderno.documento_form", "WARNING")
 
                 if ".as_view()" in content:
                     self.log("✅ URLs - Usa vistas basadas en clases")

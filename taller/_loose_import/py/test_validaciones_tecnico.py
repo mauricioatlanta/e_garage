@@ -119,14 +119,10 @@ def test_unicidad_case_insensitive():
         try:
             # Intentar crear con el mismo nombre pero diferente capitalización
             nombre_variante = (
-                nombre_existente.upper()
-                if nombre_existente.islower()
-                else nombre_existente.lower()
+                nombre_existente.upper() if nombre_existente.islower() else nombre_existente.lower()
             )
 
-            tecnico_duplicado = Tecnico.objects.create(
-                nombre=nombre_variante, empresa=empresa
-            )
+            tecnico_duplicado = Tecnico.objects.create(nombre=nombre_variante, empresa=empresa)
             print(f"   ❌ Error: Se creó técnico duplicado '{nombre_variante}'")
             tecnico_duplicado.delete()  # Limpiar
         except Exception as e:

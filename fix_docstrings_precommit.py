@@ -46,9 +46,7 @@ def fix_file(path: pathlib.Path):
     # 2) Asegura una docstring en la línea 1
     # Si el archivo no empieza con triple-quote, insértala
     start = new_src.lstrip()
-    has_header = (
-        start.startswith('"""') or start.startswith("r'''") or start.startswith("'''")
-    )
+    has_header = start.startswith('"""') or start.startswith("r'''") or start.startswith("'''")
     if not has_header:
         new_src = HEADER + new_src
 

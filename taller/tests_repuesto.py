@@ -6,9 +6,7 @@ from taller.models.empresa import Empresa
 
 class RepuestoFormTest(TestCase):
     def setUp(self):
-        self.empresa = Empresa.objects.create(
-            nombre_taller="Empresa Test", empresa="Empresa Test"
-        )
+        self.empresa = Empresa.objects.create(nombre_taller="Empresa Test", empresa="Empresa Test")
         from taller.models.tienda import Tienda
 
         self.tienda = Tienda.objects.create(nombre="Tienda Test")

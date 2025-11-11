@@ -32,9 +32,7 @@ def check_1_modelo_y_datos():
     print("\n1️⃣ MODELO Y DATOS")
     print("-" * 30)
 
-    print(
-        "📁 Archivo del modelo: e:\\projecto\\e_garage\\taller\\models\\configuracion.py"
-    )
+    print("📁 Archivo del modelo: e:\\projecto\\e_garage\\taller\\models\\configuracion.py")
     print(f"📊 Total configuraciones: {ConfiguracionEmpresa.objects.count()}")
 
     configs = ConfiguracionEmpresa.objects.select_related("empresa").all()
@@ -133,9 +131,7 @@ def check_4_template_variables():
     print("-" * 30)
 
     # Ver qué variables están disponibles en base.html
-    base_template_path = os.path.join(
-        settings.BASE_DIR, "templates_canonical", "base.html"
-    )
+    base_template_path = os.path.join(settings.BASE_DIR, "templates_canonical", "base.html")
     if os.path.exists(base_template_path):
         print(f"✅ Base template existe: {base_template_path}")
 

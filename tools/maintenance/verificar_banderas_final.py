@@ -71,9 +71,7 @@ def verificar_banderas_templates():
     print()
     print("📊 RESUMEN:")
     print(f"   • Templates con bandera: {banderas_encontradas}/{total_templates}")
-    print(
-        f"   • Porcentaje completado: {(banderas_encontradas/total_templates)*100:.1f}%"
-    )
+    print(f"   • Porcentaje completado: {(banderas_encontradas/total_templates)*100:.1f}%")
 
     if banderas_encontradas == total_templates:
         print("🎉 ¡PERFECTO! Todas las secciones tienen banderas")

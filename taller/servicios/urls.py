@@ -13,7 +13,5 @@ urlpatterns = [
     path("<int:servicio_id>/editar/", views.editar_servicio, name="editar_servicio"),
     # path('<int:servicio_id>/eliminar/', views.eliminar_servicio, name='eliminar_servicio'),  # Función no existe
     path("otros-servicios/", views.otros_servicios_menu, name="otros_servicios_menu"),
-    path(
-        "otros-servicios/crear/", views.crear_otro_servicio, name="crear_otro_servicio"
-    ),
+    path("otros-servicios/crear/", views.crear_otro_servicio, name="crear_otro_servicio"),
 ]

@@ -25,9 +25,7 @@ def debug_problema_multiempresa():
     for empresa in empresas:
         documentos = Documento.objects.filter(empresa=empresa)
         print(f"\n🏢 EMPRESA: {empresa.nombre_taller}")
-        print(
-            f"   👤 Usuario: {empresa.usuario.username if empresa.usuario else 'Sin usuario'}"
-        )
+        print(f"   👤 Usuario: {empresa.usuario.username if empresa.usuario else 'Sin usuario'}")
         print(f"   📄 Documentos: {documentos.count()}")
 
         # Analizar documentos recientes de esta empresa
@@ -37,12 +35,8 @@ def debug_problema_multiempresa():
             servicios = ServicioDocumento.objects.filter(documento=doc)
 
             print(f"   📋 Doc #{doc.id} ({doc.tipo_documento} {doc.numero_documento}):")
-            print(
-                f"      - Cliente: {doc.cliente.nombre if doc.cliente else 'Sin cliente'}"
-            )
-            print(
-                f"      - Mecánico: {doc.mecanico.nombre if doc.mecanico else 'Sin mecánico'}"
-            )
+            print(f"      - Cliente: {doc.cliente.nombre if doc.cliente else 'Sin cliente'}")
+            print(f"      - Mecánico: {doc.mecanico.nombre if doc.mecanico else 'Sin mecánico'}")
             print(f"      - Repuestos: {repuestos.count()}")
             for rep in repuestos:
                 print(f"        * {rep.nombre}: ${rep.precio} x {rep.cantidad}")

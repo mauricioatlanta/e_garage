@@ -14,9 +14,7 @@ print("=" * 50)
 
 # Estadísticas
 total_clientes = Cliente.objects.count()
-clientes_con_email = (
-    Cliente.objects.exclude(email__isnull=True).exclude(email__exact="").count()
-)
+clientes_con_email = Cliente.objects.exclude(email__isnull=True).exclude(email__exact="").count()
 total_documentos = Documento.objects.count()
 
 print(f"👥 Total clientes: {total_clientes}")

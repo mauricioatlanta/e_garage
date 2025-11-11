@@ -107,13 +107,9 @@ def country_aware_clientes_redirect(request):
 
 
 urlpatterns = [
-    path(
-        "clientes/", include(("taller.urls_clientes", "clientes"), namespace="clientes")
-    ),
+    path("clientes/", include(("taller.urls_clientes", "clientes"), namespace="clientes")),
     # Página de inicio - Selector de país
-    path(
-        "", TemplateView.as_view(template_name="public/selector_pais.html"), name="home"
-    ),
+    path("", TemplateView.as_view(template_name="public/selector_pais.html"), name="home"),
     path("admin/", admin.site.urls),
     # Health check para monitoreo
     path("health/", health_check, name="health_check"),
@@ -250,16 +246,12 @@ urlpatterns = [
     ),
     path(
         "us/vehiculos/<int:vehiculo_id>/editar/",
-        RedirectView.as_view(
-            url="/us/en/vehiculos/%(vehiculo_id)s/editar/", permanent=False
-        ),
+        RedirectView.as_view(url="/us/en/vehiculos/%(vehiculo_id)s/editar/", permanent=False),
         name="us_vehiculo_edit_redirect",
     ),
     path(
         "us/vehiculos/<int:vehiculo_id>/eliminar/",
-        RedirectView.as_view(
-            url="/us/en/vehiculos/%(vehiculo_id)s/eliminar/", permanent=False
-        ),
+        RedirectView.as_view(url="/us/en/vehiculos/%(vehiculo_id)s/eliminar/", permanent=False),
         name="us_vehiculo_eliminar_redirect",
     ),
     path(
@@ -274,9 +266,7 @@ urlpatterns = [
     ),
     path(
         "cl/vehiculos/<int:vehiculo_id>/editar/",
-        RedirectView.as_view(
-            url="/cl/es/vehiculos/%(vehiculo_id)s/editar/", permanent=False
-        ),
+        RedirectView.as_view(url="/cl/es/vehiculos/%(vehiculo_id)s/editar/", permanent=False),
         name="cl_vehiculo_edit_redirect",
     ),
     path(
@@ -296,9 +286,7 @@ urlpatterns = [
     ),
     path(
         "cl/centro-operaciones-espacial/",
-        RedirectView.as_view(
-            url="/cl/es/centro-operaciones-espacial/", permanent=False
-        ),
+        RedirectView.as_view(url="/cl/es/centro-operaciones-espacial/", permanent=False),
         name="cl_centro_operaciones_redirect",
     ),
     # Página de bienvenida para Chile - /cl/ directamente
@@ -335,37 +323,25 @@ urlpatterns = [
         name="documentos_redirect_root",
     ),
     # Redirecciones de compatibilidad para URLs antiguas con patrón duplicado
-    path(
-        "cl/documentos/cl/", RedirectView.as_view(url="/cl/documentos/", permanent=True)
-    ),
-    path(
-        "us/documentos/us/", RedirectView.as_view(url="/us/documentos/", permanent=True)
-    ),
+    path("cl/documentos/cl/", RedirectView.as_view(url="/cl/documentos/", permanent=True)),
+    path("us/documentos/us/", RedirectView.as_view(url="/us/documentos/", permanent=True)),
     # URLs con prefijo de país específico - NAMESPACES ÚNICOS
     path(
         "cl/documentos/",
-        include(
-            ("taller.documentos.urls", "documentos_cl_es"), namespace="documentos_cl_es"
-        ),
+        include(("taller.documentos.urls", "documentos_cl_es"), namespace="documentos_cl_es"),
     ),
     path(
         "us/documentos/",
-        include(
-            ("taller.documentos.urls", "documentos_us_en"), namespace="documentos_us_en"
-        ),
+        include(("taller.documentos.urls", "documentos_us_en"), namespace="documentos_us_en"),
     ),
     # Autocomplete URLs por país
     path(
         "cl/autocomplete/",
-        include(
-            ("taller.autocomplete_urls", "autocomplete"), namespace="cl_autocomplete"
-        ),
+        include(("taller.autocomplete_urls", "autocomplete"), namespace="cl_autocomplete"),
     ),
     path(
         "us/autocomplete/",
-        include(
-            ("taller.autocomplete_urls", "autocomplete"), namespace="usa_autocomplete"
-        ),
+        include(("taller.autocomplete_urls", "autocomplete"), namespace="usa_autocomplete"),
     ),
     path(
         "cl/reportes/",
@@ -441,9 +417,7 @@ urlpatterns = [
     ),
     path(
         "cl/repuestos/api/repuesto-por-codigo/",
-        RedirectView.as_view(
-            url="/cl/es/repuestos/api/repuesto-por-codigo/", permanent=False
-        ),
+        RedirectView.as_view(url="/cl/es/repuestos/api/repuesto-por-codigo/", permanent=False),
     ),
     path(
         "cl/documentos/api/obtener-numero-documento/",
@@ -462,9 +436,7 @@ urlpatterns = [
     ),
     path(
         "us/repuestos/api/repuesto-por-codigo/",
-        RedirectView.as_view(
-            url="/us/en/repuestos/api/repuesto-por-codigo/", permanent=False
-        ),
+        RedirectView.as_view(url="/us/en/repuestos/api/repuesto-por-codigo/", permanent=False),
     ),
     path(
         "us/documentos/api/obtener-numero-documento/",

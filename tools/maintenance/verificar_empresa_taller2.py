@@ -48,9 +48,7 @@ def verificar_empresa_taller2():
             print(f"✅ user.empresa_usuario funciona: {empresa_usuario.nombre_taller}")
         except AttributeError as e:
             print(f"❌ ERROR: user.empresa_usuario no funciona: {e}")
-            print(
-                "⚠️ Esto explicaría por qué los documentos no se guardan correctamente"
-            )
+            print("⚠️ Esto explicaría por qué los documentos no se guardan correctamente")
 
             # Verificar todas las empresas
             print("\n📋 Empresas en el sistema:")
@@ -67,9 +65,7 @@ def verificar_empresa_taller2():
         print(f"   PerfilUsuario.empresa.usuario: {perfil.empresa.usuario}")
 
         if perfil.empresa.usuario != user:
-            print(
-                "❌ PROBLEMA: La empresa del PerfilUsuario no está asociada al usuario taller2"
-            )
+            print("❌ PROBLEMA: La empresa del PerfilUsuario no está asociada al usuario taller2")
             print("   Corrigiendo asociación...")
             perfil.empresa.usuario = user
             perfil.empresa.save()

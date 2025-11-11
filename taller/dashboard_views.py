@@ -28,6 +28,4 @@ def dashboard_view(request):
         .order_by("-id")[:5]
     )
 
-    return render(
-        request, "taller/dashboard.html", {"vehiculos": vehiculos, "empresa": empresa}
-    )
+    return render(request, "taller/dashboard.html", {"vehiculos": vehiculos, "empresa": empresa})

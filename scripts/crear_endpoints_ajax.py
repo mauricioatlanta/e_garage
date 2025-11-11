@@ -254,9 +254,7 @@ def update_main_urls():
         for i, line in enumerate(lines):
             if line.strip() == "]" and "urlpatterns" in "".join(lines[:i]):
                 # Insertar la nueva URL antes del ]
-                lines.insert(
-                    i, "    path('vehiculos/ajax/', include('taller.ajax_urls')),"
-                )
+                lines.insert(i, "    path('vehiculos/ajax/', include('taller.ajax_urls')),")
                 break
 
         content = "\n".join(lines)

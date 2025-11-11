@@ -71,9 +71,7 @@ def verificar_usuarios_test():
                 if empresa.pais == pais_esperado:
                     print(f"✅ {username}: País {empresa.pais} ✓")
                 else:
-                    print(
-                        f"⚠️  {username}: País {empresa.pais} (esperado: {pais_esperado})"
-                    )
+                    print(f"⚠️  {username}: País {empresa.pais} (esperado: {pais_esperado})")
             except:
                 print(f"⚠️  {username}: Sin empresa")
         except User.DoesNotExist:

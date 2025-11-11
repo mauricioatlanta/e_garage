@@ -43,9 +43,7 @@ def dashboard_admin(request):
     total_empresas = Empresa.objects.count()
     empresas_activas = Empresa.objects.filter(suscripcion_activa=True).count()
     empresas_trial = Empresa.objects.filter(plan="trial").count()
-    empresas_premium = Empresa.objects.filter(
-        plan__in=["basic", "premium", "enterprise"]
-    ).count()
+    empresas_premium = Empresa.objects.filter(plan__in=["basic", "premium", "enterprise"]).count()
 
     # === DISTRIBUCIÓN POR PAÍS ===
     empresas_chile = Empresa.objects.filter(pais="CL").count()
@@ -54,9 +52,7 @@ def dashboard_admin(request):
     # === ESTADÍSTICAS POR PLAN ===
     stats_planes = (
         Empresa.objects.values("plan")
-        .annotate(
-            total=Count("id"), activas=Count("id", filter=Q(suscripcion_activa=True))
-        )
+        .annotate(total=Count("id"), activas=Count("id", filter=Q(suscripcion_activa=True)))
         .order_by("plan")
     )
 
@@ -83,14 +79,10 @@ def dashboard_admin(request):
         fecha_fin__lte=proximos_7_dias, fecha_fin__gte=hoy, suscripcion_activa=True
     ).count()
 
-    vencidas = Empresa.objects.filter(
-        fecha_fin__lt=hoy, suscripcion_activa=True
-    ).count()
+    vencidas = Empresa.objects.filter(fecha_fin__lt=hoy, suscripcion_activa=True).count()
 
     # === ÚLTIMOS REGISTRADOS ===
-    ultimos_registros = Empresa.objects.select_related("user").order_by(
-        "-fecha_inicio"
-    )[:10]
+    ultimos_registros = Empresa.objects.select_related("user").order_by("-fecha_inicio")[:10]
 
     # === ESTADÍSTICAS DE TRIAL ===
     trials_pendientes = TrialRegistro.objects.filter(
@@ -321,11 +313,7 @@ def exportar_suscriptores_csv(request):
                 empresa.nombre_taller,
                 empresa.get_pais_display(),
                 empresa.get_plan_display(),
-                (
-                    empresa.fecha_inicio.strftime("%Y-%m-%d")
-                    if empresa.fecha_inicio
-                    else ""
-                ),
+                (empresa.fecha_inicio.strftime("%Y-%m-%d") if empresa.fecha_inicio else ""),
                 empresa.fecha_fin.strftime("%Y-%m-%d") if empresa.fecha_fin else "",
                 empresa.dias_restantes,
                 "Activa" if empresa.suscripcion_activa else "Inactiva",
@@ -348,9 +336,7 @@ def detalle_suscriptor(request, empresa_id):
         empresa = Empresa.objects.select_related("user").get(id=empresa_id)
 
         # Obtener comprobantes de pago
-        comprobantes = ComprobantePago.objects.filter(empresa=empresa).order_by(
-            "-fecha_subida"
-        )[:5]
+        comprobantes = ComprobantePago.objects.filter(empresa=empresa).order_by("-fecha_subida")[:5]
 
         # Calcular estadísticas de la empresa
         ahora = timezone.now()

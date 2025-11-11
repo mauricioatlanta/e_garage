@@ -29,9 +29,7 @@ class CompanyInfoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Estilos opcionales
-        self.fields["logo"].widget.attrs.update(
-            {"class": "form-control", "accept": "image/*"}
-        )
+        self.fields["logo"].widget.attrs.update({"class": "form-control", "accept": "image/*"})
         self.fields["nombre_publico"].widget.attrs.update({"class": "form-control"})
         self.fields["tagline"].widget.attrs.update({"class": "form-control"})
         self.fields["telefono"].widget.attrs.update(
@@ -85,9 +83,7 @@ class ConfiguracionEmpresaForm(forms.ModelForm):
                     "placeholder": "Su eslogan aquí (opcional)",
                 }
             ),
-            "logo": forms.FileInput(
-                attrs={"class": "form-control", "accept": "image/*"}
-            ),
+            "logo": forms.FileInput(attrs={"class": "form-control", "accept": "image/*"}),
             "direccion": forms.Textarea(
                 attrs={
                     "class": "form-control",
@@ -113,12 +109,8 @@ class ConfiguracionEmpresaForm(forms.ModelForm):
             "aplicar_impuesto_por_defecto": forms.CheckboxInput(
                 attrs={"class": "form-check-input"}
             ),
-            "dividir_por_tecnico": forms.CheckboxInput(
-                attrs={"class": "form-check-input"}
-            ),
-            "brand_color": forms.TextInput(
-                attrs={"class": "form-control", "type": "color"}
-            ),
+            "dividir_por_tecnico": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+            "brand_color": forms.TextInput(attrs={"class": "form-control", "type": "color"}),
         }
 
     def __init__(self, *args, **kwargs):

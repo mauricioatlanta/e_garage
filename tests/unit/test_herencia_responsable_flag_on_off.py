@@ -36,9 +36,7 @@ def test_herencia_off_inherita_y_on_no(django_user_model):
     try:
         from taller.models.configuracion import ConfiguracionEmpresa as CS
 
-        CS.objects.update_or_create(
-            empresa=emp, defaults={"dividir_por_tecnico": False}
-        )
+        CS.objects.update_or_create(empresa=emp, defaults={"dividir_por_tecnico": False})
     except ImportError:
         # Si ConfiguracionEmpresa no existe, simulamos el comportamiento
         pass
@@ -57,9 +55,7 @@ def test_herencia_off_inherita_y_on_no(django_user_model):
 
     # Verificar que la línea se creó correctamente
     assert l_off.id is not None, "LineaServicio debe haberse creado correctamente"
-    assert (
-        l_off.documento == doc_off
-    ), "LineaServicio debe estar asociada al documento correcto"
+    assert l_off.documento == doc_off, "LineaServicio debe estar asociada al documento correcto"
 
     # Test con flag ON → no debe heredar automáticamente
     try:
@@ -82,9 +78,7 @@ def test_herencia_off_inherita_y_on_no(django_user_model):
 
     # Verificar que la línea se creó correctamente
     assert l_on.id is not None, "LineaServicio debe haberse creado correctamente"
-    assert (
-        l_on.documento == doc_on
-    ), "LineaServicio debe estar asociada al documento correcto"
+    assert l_on.documento == doc_on, "LineaServicio debe estar asociada al documento correcto"
 
 
 @pytest.mark.django_db
@@ -208,12 +202,8 @@ def test_herencia_responsable_con_company_settings():
     # Verificar que las líneas se crearon correctamente
     assert l_off.id is not None, "Línea OFF debe haberse creado correctamente"
     assert l_on.id is not None, "Línea ON debe haberse creado correctamente"
-    assert (
-        l_off.documento == doc_off
-    ), "Línea OFF debe estar asociada al documento correcto"
-    assert (
-        l_on.documento == doc_on
-    ), "Línea ON debe estar asociada al documento correcto"
+    assert l_off.documento == doc_off, "Línea OFF debe estar asociada al documento correcto"
+    assert l_on.documento == doc_on, "Línea ON debe estar asociada al documento correcto"
 
     # Con flag ON, la línea no debe heredar automáticamente el responsable del documento
     # (esto verifica que el flag dividir_por_tecnico funciona correctamente)

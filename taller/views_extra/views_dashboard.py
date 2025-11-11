@@ -18,9 +18,7 @@ def registrar_vehiculo(request):
         perfil = PerfilUsuario.objects.get(user=request.user)
         vehiculo.empresa = perfil.empresa
         vehiculo.save()
-        return JsonResponse(
-            {"success": True, "msg": "Vehículo registrado correctamente."}
-        )
+        return JsonResponse({"success": True, "msg": "Vehículo registrado correctamente."})
     return JsonResponse({"success": False, "errors": form.errors}, status=400)
 
 
@@ -36,9 +34,7 @@ def registrar_documento(request):
         perfil = PerfilUsuario.objects.get(user=request.user)
         documento.empresa = perfil.empresa
         documento.save()
-        return JsonResponse(
-            {"success": True, "msg": "Documento emitido correctamente."}
-        )
+        return JsonResponse({"success": True, "msg": "Documento emitido correctamente."})
     return JsonResponse({"success": False, "errors": form.errors}, status=400)
 
 

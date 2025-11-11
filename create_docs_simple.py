@@ -69,6 +69,4 @@ for i, tipo in enumerate(tipos):
         f"✅ Documento {doc.id} ({doc.tipo}): {doc.lineas_repuesto.count()} repuestos, Total=${doc.total}"
     )
 
-print(
-    f"\n🎉 Total documentos USA Test Garage: {Documento.objects.filter(empresa=emp).count()}"
-)
+print(f"\n🎉 Total documentos USA Test Garage: {Documento.objects.filter(empresa=emp).count()}")

@@ -87,9 +87,7 @@ def encontrar_problema_url():
         from django.conf import settings
 
         print(f"  DEBUG: {settings.DEBUG}")
-        print(
-            f"  DEFAULT_COUNTRY: {getattr(settings, 'DEFAULT_COUNTRY', 'No definido')}"
-        )
+        print(f"  DEFAULT_COUNTRY: {getattr(settings, 'DEFAULT_COUNTRY', 'No definido')}")
     except Exception as e:
         print(f"  Error obteniendo configuración: {e}")
 

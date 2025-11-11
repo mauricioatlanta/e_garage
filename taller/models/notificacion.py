@@ -74,12 +74,8 @@ class NotificacionEnviada(models.Model):
     mensaje = models.TextField()
 
     # Referencias opcionales
-    documento = models.ForeignKey(
-        Documento, on_delete=models.CASCADE, null=True, blank=True
-    )
-    cliente = models.ForeignKey(
-        Cliente, on_delete=models.CASCADE, null=True, blank=True
-    )
+    documento = models.ForeignKey(Documento, on_delete=models.CASCADE, null=True, blank=True)
+    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, null=True, blank=True)
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
     estado = models.CharField(max_length=20, choices=ESTADOS, default="PENDIENTE")
@@ -190,9 +186,7 @@ class RecordatorioMantenimiento(models.Model):
     empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE)
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
     vehiculo = models.ForeignKey("Vehiculo", on_delete=models.CASCADE)
-    documento_origen = models.ForeignKey(
-        Documento, on_delete=models.CASCADE, null=True, blank=True
-    )
+    documento_origen = models.ForeignKey(Documento, on_delete=models.CASCADE, null=True, blank=True)
 
     tipo_mantenimiento = models.CharField(max_length=30, choices=TIPOS_MANTENIMIENTO)
     descripcion = models.TextField()
@@ -220,7 +214,9 @@ class RecordatorioMantenimiento(models.Model):
         ordering = ["fecha_programada"]
 
     def __str__(self):
-        return f"{self.get_tipo_mantenimiento_display()} - {self.vehiculo} ({self.fecha_programada})"
+        return (
+            f"{self.get_tipo_mantenimiento_display()} - {self.vehiculo} ({self.fecha_programada})"
+        )
 
     @property
     def dias_hasta_mantenimiento(self):

@@ -102,9 +102,7 @@ if not DEBUG:
     STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
 
 # Overrides de archivos estáticos para django-autocomplete-light (Select2)
-DAL_SELECT2_CSS = {
-    "all": ("autocomplete_light_custom/vendor/select2/dist/css/select2.min.css",)
-}
+DAL_SELECT2_CSS = {"all": ("autocomplete_light_custom/vendor/select2/dist/css/select2.min.css",)}
 
 DAL_SELECT2_JS = (
     "autocomplete_light_custom/vendor/select2/dist/js/select2.full.min.js",

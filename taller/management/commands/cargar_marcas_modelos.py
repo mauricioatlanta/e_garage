@@ -1296,7 +1296,5 @@ class Command(BaseCommand):
                     )
 
         self.stdout.write(
-            self.style.SUCCESS(
-                f"✅ Creadas {contador_marcas} marcas y {contador_modelos} modelos."
-            )
+            self.style.SUCCESS(f"✅ Creadas {contador_marcas} marcas y {contador_modelos} modelos.")
         )

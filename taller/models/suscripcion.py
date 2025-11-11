@@ -13,9 +13,7 @@ TIPOS_SUSCRIPCION = [
 
 
 class Suscripcion(models.Model):
-    user = models.OneToOneField(
-        User, on_delete=models.CASCADE, related_name="suscripcion"
-    )
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="suscripcion")
     tipo = models.CharField(max_length=20, choices=TIPOS_SUSCRIPCION, default="trial")
     fecha_inicio = models.DateField(null=True, blank=True)
     fecha_fin = models.DateField(null=True, blank=True)

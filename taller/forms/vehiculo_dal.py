@@ -15,9 +15,7 @@ class VehiculoFormDAL(forms.ModelForm):
 
         # Filtrar por empresa/tenant
         if self.empresa:
-            self.fields["cliente"].queryset = Cliente.objects.filter(
-                empresa=self.empresa
-            )
+            self.fields["cliente"].queryset = Cliente.objects.filter(empresa=self.empresa)
             # Determinar país basado en la empresa
             country = getattr(self.empresa, "pais", "CL")
             self.fields["marca"].queryset = Marca.objects.filter(country=country)
@@ -25,9 +23,7 @@ class VehiculoFormDAL(forms.ModelForm):
             self.fields["motor"].queryset = (
                 MotorVehiculo.objects.all()
             )  # Motor no tiene campo empresa
-            self.fields["caja"].queryset = (
-                CajaVehiculo.objects.all()
-            )  # Caja no tiene campo empresa
+            self.fields["caja"].queryset = CajaVehiculo.objects.all()  # Caja no tiene campo empresa
         else:
             self.fields["cliente"].queryset = Cliente.objects.none()
             self.fields["marca"].queryset = Marca.objects.none()

@@ -4,9 +4,7 @@ from .empresa import Empresa
 
 
 class Tienda(models.Model):
-    empresa = models.ForeignKey(
-        Empresa, on_delete=models.CASCADE, related_name="tiendas"
-    )
+    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name="tiendas")
     nombre = models.CharField(max_length=100)
     direccion = models.CharField(max_length=255, blank=True, null=True)
     telefono = models.CharField(max_length=20, blank=True, null=True)

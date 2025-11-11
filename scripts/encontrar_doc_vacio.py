@@ -48,9 +48,7 @@ def encontrar_documento_vacio_taller2():
 
         if not tiene_datos:
             print(f"   🔗 URL Ver: http://127.0.0.1:8000/documentos/{doc.id}/")
-            print(
-                f"   🔗 URL Editar: http://127.0.0.1:8000/documentos/editar/{doc.id}/"
-            )
+            print(f"   🔗 URL Editar: http://127.0.0.1:8000/documentos/editar/{doc.id}/")
             print("   ⚠️ ESTE ES EL DOCUMENTO PROBLEMÁTICO")
 
 

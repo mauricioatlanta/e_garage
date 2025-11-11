@@ -26,9 +26,7 @@ class CountryAwareAccountAdapter(DefaultAccountAdapter):
             return "CL"
         return None
 
-    def _reverse_by_country(
-        self, country_code, view_path="taller:dashboard", *args, **kwargs
-    ):
+    def _reverse_by_country(self, country_code, view_path="taller:dashboard", *args, **kwargs):
         """
         view_path puede ser 'taller:dashboard' o 'clientes:lista_clientes', etc.
         """
@@ -86,9 +84,7 @@ class CountryAwareAccountAdapter(DefaultAccountAdapter):
             sess_country_ns = (request.session.get("country") or "").strip().lower()
             # Mapear ns de sesión -> código país
             country = (
-                "US"
-                if sess_country_ns == "usa"
-                else ("CL" if sess_country_ns == "chile" else None)
+                "US" if sess_country_ns == "usa" else ("CL" if sess_country_ns == "chile" else None)
             )
 
         if country:

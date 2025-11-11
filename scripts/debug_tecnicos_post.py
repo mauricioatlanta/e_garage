@@ -61,9 +61,7 @@ def verificar_POST_debug():
                     direccion=direccion,
                     activo=True,
                 )
-                print(
-                    f"✅ Técnico creado exitosamente: {tecnico.nombre} (ID: {tecnico.id})"
-                )
+                print(f"✅ Técnico creado exitosamente: {tecnico.nombre} (ID: {tecnico.id})")
 
                 # Limpiar
                 tecnico.delete()

@@ -50,18 +50,14 @@ def validacion_final_sistema():
 
     # 4. Verificar integridad de datos en documentos recientes
     print("\n🔍 VERIFICANDO INTEGRIDAD DE DOCUMENTOS RECIENTES:")
-    documentos_recientes = documentos.order_by("-id")[
-        :3
-    ]  # Usar id en lugar de fecha_creacion
+    documentos_recientes = documentos.order_by("-id")[:3]  # Usar id en lugar de fecha_creacion
 
     for doc in documentos_recientes:
         print(f"\n📋 Documento #{doc.id} ({doc.tipo_documento})")
         print(f"   📅 Fecha: {getattr(doc, 'fecha', 'N/A')}")
         print(f"   👤 Cliente: {doc.cliente.nombre if doc.cliente else 'Sin cliente'}")
         print(f"   🔧 Técnico: {doc.tecnico.nombre if doc.tecnico else 'Sin técnico'}")
-        print(
-            f"   🚗 Vehículo: {doc.vehiculo.patente if doc.vehiculo else 'Sin vehículo'}"
-        )
+        print(f"   🚗 Vehículo: {doc.vehiculo.patente if doc.vehiculo else 'Sin vehículo'}")
 
         # Verificar repuestos
         repuestos = LineaRepuesto.objects.filter(documento=doc)
@@ -69,9 +65,7 @@ def validacion_final_sistema():
         for rep in repuestos[:2]:  # Mostrar solo los primeros 2
             precio = getattr(rep, "precio_unitario", getattr(rep, "precio", "N/A"))
             cantidad = getattr(rep, "cantidad", "N/A")
-            print(
-                f"      - {getattr(rep, 'nombre', 'Repuesto')}: ${precio} x {cantidad}"
-            )
+            print(f"      - {getattr(rep, 'nombre', 'Repuesto')}: ${precio} x {cantidad}")
 
         # Verificar servicios
         servicios = LineaServicio.objects.filter(documento=doc)
@@ -82,8 +76,7 @@ def validacion_final_sistema():
 
         # Calcular totales
         total_repuestos = sum(
-            getattr(r, "precio_unitario", getattr(r, "precio", 0))
-            * getattr(r, "cantidad", 0)
+            getattr(r, "precio_unitario", getattr(r, "precio", 0)) * getattr(r, "cantidad", 0)
             for r in repuestos
         )
         total_servicios = sum(
@@ -103,18 +96,12 @@ def validacion_final_sistema():
     print("\n🌐 URLS DEL SISTEMA:")
     if documentos.exists():
         doc_ejemplo = documentos.first()
-        print(
-            f"   📄 Ver documento: http://127.0.0.1:8000/documentos/{doc_ejemplo.id}/"
-        )
-        print(
-            f"   ✏️ Editar documento: http://127.0.0.1:8000/documentos/editar/{doc_ejemplo.id}/"
-        )
+        print(f"   📄 Ver documento: http://127.0.0.1:8000/documentos/{doc_ejemplo.id}/")
+        print(f"   ✏️ Editar documento: http://127.0.0.1:8000/documentos/editar/{doc_ejemplo.id}/")
 
     print("   ➕ Crear documento: http://127.0.0.1:8000/documentos/nuevo/")
     print("   📋 Lista documentos: http://127.0.0.1:8000/documentos/")
-    print(
-        "   🔧 API crear mecánico: http://127.0.0.1:8000/documentos/api/crear_mecanico/"
-    )
+    print("   🔧 API crear mecánico: http://127.0.0.1:8000/documentos/api/crear_mecanico/")
 
     # 6. Verificar archivos críticos
     print("\n📁 ARCHIVOS CRÍTICOS:")

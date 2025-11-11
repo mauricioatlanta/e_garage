@@ -52,11 +52,7 @@ def probar_pdf_cuentas_test():
             print(f"      🔧 Servicios: {servicios.count()}")
             print(f"      🏢 Otros servicios: {otros_servicios.count()}")
 
-            if (
-                repuestos.count() > 0
-                or servicios.count() > 0
-                or otros_servicios.count() > 0
-            ):
+            if repuestos.count() > 0 or servicios.count() > 0 or otros_servicios.count() > 0:
                 try:
                     # Generar PDF
                     exporter = DocumentoPDFExporter(doc)
@@ -66,9 +62,7 @@ def probar_pdf_cuentas_test():
                         filename = f"invoice_{empresa.pais}_{doc.id}.pdf"
                         with open(filename, "wb") as f:
                             f.write(pdf_content)
-                        print(
-                            f"      ✅ PDF generado: {filename} ({len(pdf_content):,} bytes)"
-                        )
+                        print(f"      ✅ PDF generado: {filename} ({len(pdf_content):,} bytes)")
                     else:
                         print("      ❌ PDF vacío")
 

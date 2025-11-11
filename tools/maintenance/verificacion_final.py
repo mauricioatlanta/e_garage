@@ -59,9 +59,7 @@ def verificar_completamente():
     response = client.get("/cl/ajax/clientes/buscar/", {"q": "john", "page": 1})
     if response.status_code == 200 and response.json().get("results"):
         cliente_id = response.json()["results"][0]["id"]
-        response_vehiculos = client.get(
-            "/cl/ajax/vehiculos-por-cliente/", {"cliente": cliente_id}
-        )
+        response_vehiculos = client.get("/cl/ajax/vehiculos-por-cliente/", {"cliente": cliente_id})
         print(f"   Status: {response_vehiculos.status_code}")
         if response_vehiculos.status_code == 200:
             vehiculos_data = response_vehiculos.json()
@@ -77,9 +75,7 @@ def verificar_completamente():
     response = client.get("/us/ajax/clientes/buscar/", {"q": "john", "page": 1})
     if response.status_code == 200 and response.json().get("results"):
         cliente_id = response.json()["results"][0]["id"]
-        response_vehiculos = client.get(
-            "/us/ajax/vehiculos-por-cliente/", {"cliente": cliente_id}
-        )
+        response_vehiculos = client.get("/us/ajax/vehiculos-por-cliente/", {"cliente": cliente_id})
         print(f"   Status: {response_vehiculos.status_code}")
         if response_vehiculos.status_code == 200:
             vehiculos_data = response_vehiculos.json()

@@ -115,9 +115,7 @@ def diagnosticar_problema_usa():
                 import json
 
                 data = json.loads(response.content)
-                print(
-                    f"   ✅ Respuesta JSON: {len(data.get('results', []))} clientes encontrados"
-                )
+                print(f"   ✅ Respuesta JSON: {len(data.get('results', []))} clientes encontrados")
             except:
                 print("   ⚠️  Respuesta no es JSON válido")
         elif response.status_code == 404:

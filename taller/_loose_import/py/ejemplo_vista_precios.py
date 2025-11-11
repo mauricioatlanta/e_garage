@@ -33,9 +33,7 @@ def vista_precios_ejemplo(request):
     # 🚀 USANDO EL MANAGER REFINADO
     # Antes: PrecioSuscripcion.objects.filter(pais=pais_usuario, activo=True)
     # Ahora: Mucho más expresivo y limpio
-    planes_activos = (
-        PrecioSuscripcion.objects.activos().para_pais(pais_usuario).order_by("precio")
-    )
+    planes_activos = PrecioSuscripcion.objects.activos().para_pais(pais_usuario).order_by("precio")
 
     # Obtener plan específico vigente
     plan_mensual_vigente = PrecioSuscripcion.get_vigente(pais_usuario, "mensual")
@@ -57,9 +55,7 @@ def vista_precios_ejemplo(request):
         "total_planes": total_planes,
         "planes_activos_total": planes_activos_total,
         "empresa": (
-            getattr(request.user, "empresa", None)
-            if request.user.is_authenticated
-            else None
+            getattr(request.user, "empresa", None) if request.user.is_authenticated else None
         ),
     }
 
@@ -85,9 +81,7 @@ def demo_uso_api():
     plan_usa_mensual = PrecioSuscripcion.get_vigente("US", "mensual")
     if plan_usa_mensual:
         print(f"   {plan_usa_mensual}")
-        print(
-            f"   Características: {', '.join(plan_usa_mensual.caracteristicas_list())}"
-        )
+        print(f"   Características: {', '.join(plan_usa_mensual.caracteristicas_list())}")
     else:
         print("   No hay plan mensual vigente en USA")
 
@@ -100,9 +94,7 @@ def demo_uso_api():
 
     # 4. Mostrar histórico (planes inactivos)
     print("\n4️⃣ Histórico de precios (planes inactivos):")
-    planes_inactivos = PrecioSuscripcion.objects.filter(activo=False).order_by(
-        "pais", "tipo_plan"
-    )
+    planes_inactivos = PrecioSuscripcion.objects.filter(activo=False).order_by("pais", "tipo_plan")
     for plan in planes_inactivos:
         print(
             f"   {plan.get_pais_display()} - {plan.get_tipo_plan_display()}: {plan.precio_formateado()} (Histórico)"
@@ -169,13 +161,9 @@ def demo_validaciones():
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(
-        description="Demo de uso de PrecioSuscripcion refinado"
-    )
+    parser = argparse.ArgumentParser(description="Demo de uso de PrecioSuscripcion refinado")
     parser.add_argument("--api", action="store_true", help="Demo de uso de API")
-    parser.add_argument(
-        "--validaciones", action="store_true", help="Demo de validaciones"
-    )
+    parser.add_argument("--validaciones", action="store_true", help="Demo de validaciones")
     parser.add_argument("--todo", action="store_true", help="Ejecutar todas las demos")
 
     args = parser.parse_args()

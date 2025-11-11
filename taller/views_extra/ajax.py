@@ -83,9 +83,7 @@ def vehiculos_por_cliente(request):
     try:
         cliente_id = request.GET.get("cliente_id") or request.GET.get("cliente")
 
-        print(
-            f"🚗 Buscando vehículos para cliente: {cliente_id}, Usuario: {request.user}"
-        )
+        print(f"🚗 Buscando vehículos para cliente: {cliente_id}, Usuario: {request.user}")
 
         if not cliente_id:
             print("⚠️ No se proporcionó ID de cliente")

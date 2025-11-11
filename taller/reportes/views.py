@@ -131,11 +131,7 @@ def reporte_repuestos(request):
         .values("codigo", "nombre")
         .annotate(
             cantidad_total=Sum("cantidad"),
-            ingresos=Sum(
-                ExpressionWrapper(
-                    F("cantidad") * F("precio"), output_field=FloatField()
-                )
-            ),
+            ingresos=Sum(ExpressionWrapper(F("cantidad") * F("precio"), output_field=FloatField())),
         )
         .order_by("-cantidad_total", "-documento__fecha_emision")
     )
@@ -152,8 +148,7 @@ def reporte_repuestos(request):
                 ingresos=Coalesce(
                     Sum(
                         ExpressionWrapper(
-                            F("lineas_repuesto__cantidad")
-                            * F("lineas_repuesto__precio_unitario"),
+                            F("lineas_repuesto__cantidad") * F("lineas_repuesto__precio_unitario"),
                             output_field=FloatField(),
                         )
                     ),
@@ -177,8 +172,7 @@ def reporte_repuestos(request):
         empresa=empresa,  # 🔒 FILTRO EMPRESA
     ).values("part_number", "nombre", "stock")
     bajo_stock = [
-        {"codigo": r["part_number"], "nombre": r["nombre"], "stock": r["stock"]}
-        for r in bajo_stock
+        {"codigo": r["part_number"], "nombre": r["nombre"], "stock": r["stock"]} for r in bajo_stock
     ]
 
     # Histórico de ventas mensuales - FILTRADO POR EMPRESA
@@ -209,9 +203,7 @@ def reporte_repuestos(request):
     nunca_vendidos = Repuesto.objects.filter(empresa=empresa).exclude(
         part_number__in=vendidos_codigos
     )  # 🔒 FILTRO EMPRESA
-    nunca_vendidos = [
-        {"codigo": r.part_number, "nombre": r.nombre} for r in nunca_vendidos
-    ]
+    nunca_vendidos = [{"codigo": r.part_number, "nombre": r.nombre} for r in nunca_vendidos]
 
     context = {
         "top_repuestos": top_repuestos,
@@ -233,9 +225,7 @@ def reporte_servicios(request):
     facturacion_total = (
         LineaServicio.objects.filter(documento__empresa=empresa).aggregate(
             total=Sum(
-                ExpressionWrapper(
-                    F("precio_unitario") * F("cantidad"), output_field=DecimalField()
-                )
+                ExpressionWrapper(F("precio_unitario") * F("cantidad"), output_field=DecimalField())
             )
         )["total"]
         or 0
@@ -297,9 +287,7 @@ def reporte_servicios(request):
         {
             "cliente": (f["documento__cliente__nombre"] or "")
             + (
-                " " + f["documento__cliente__apellido"]
-                if f["documento__cliente__apellido"]
-                else ""
+                " " + f["documento__cliente__apellido"] if f["documento__cliente__apellido"] else ""
             ),
             "total": f["total"],
         }
@@ -372,9 +360,7 @@ def reporte_servicios(request):
     vehiculos = Vehiculo.objects.filter(documentos__id__in=doc_ids).distinct()
     # Ranking de modelos
     ranking_modelos = (
-        vehiculos.values("modelo__nombre")
-        .annotate(cantidad=Count("id"))
-        .order_by("-cantidad")[:10]
+        vehiculos.values("modelo__nombre").annotate(cantidad=Count("id")).order_by("-cantidad")[:10]
     )
     ranking_modelos = [
         {"modelo": r["modelo__nombre"] or "Sin modelo", "cantidad": r["cantidad"]}
@@ -382,9 +368,7 @@ def reporte_servicios(request):
     ]
     # Ranking de marcas
     ranking_marcas = (
-        vehiculos.values("marca__nombre")
-        .annotate(cantidad=Count("id"))
-        .order_by("-cantidad")[:10]
+        vehiculos.values("marca__nombre").annotate(cantidad=Count("id")).order_by("-cantidad")[:10]
     )
     ranking_marcas = [
         {"marca": r["marca__nombre"] or "Sin marca", "cantidad": r["cantidad"]}
@@ -392,13 +376,10 @@ def reporte_servicios(request):
     ]
     # Ranking de años
     ranking_anios = (
-        vehiculos.values("anio")
-        .annotate(cantidad=Count("id"))
-        .order_by("-cantidad")[:10]
+        vehiculos.values("anio").annotate(cantidad=Count("id")).order_by("-cantidad")[:10]
     )
     ranking_anios = [
-        {"anio": r["anio"] or "Sin año", "cantidad": r["cantidad"]}
-        for r in ranking_anios
+        {"anio": r["anio"] or "Sin año", "cantidad": r["cantidad"]} for r in ranking_anios
     ]
     # Ranking de clientes frecuentes
     ranking_clientes = (
@@ -426,9 +407,7 @@ def reporte_servicios(request):
         .values("nombre", "apellido", "cantidad")[:10]
     )
     for c in clientes_activos:
-        c["nombre"] = (c["nombre"] or "") + (
-            " " + c["apellido"] if c["apellido"] else ""
-        )
+        c["nombre"] = (c["nombre"] or "") + (" " + c["apellido"] if c["apellido"] else "")
     # Clientes nuevos: creados en los últimos 3 meses
     clientes_nuevos = list(
         Cliente.objects.filter(documentos__fecha_emision__gte=hace_3_meses)
@@ -438,9 +417,7 @@ def reporte_servicios(request):
         .distinct()[:10]
     )
     for c in clientes_nuevos:
-        c["nombre"] = (c["nombre"] or "") + (
-            " " + c["apellido"] if c["apellido"] else ""
-        )
+        c["nombre"] = (c["nombre"] or "") + (" " + c["apellido"] if c["apellido"] else "")
     # Clientes históricos: con más documentos en total
     clientes_historicos = list(
         Cliente.objects.annotate(cantidad=Count("documentos"))
@@ -448,9 +425,7 @@ def reporte_servicios(request):
         .values("nombre", "apellido", "cantidad")[:10]
     )
     for c in clientes_historicos:
-        c["nombre"] = (c["nombre"] or "") + (
-            " " + c["apellido"] if c["apellido"] else ""
-        )
+        c["nombre"] = (c["nombre"] or "") + (" " + c["apellido"] if c["apellido"] else "")
     # Clientes recurrentes: más de 1 documento en el último año
     clientes_recurrentes = list(
         Cliente.objects.filter(documentos__fecha_emision__gte=hoy - timedelta(days=365))
@@ -460,9 +435,7 @@ def reporte_servicios(request):
         .values("nombre", "apellido", "cantidad")[:10]
     )
     for c in clientes_recurrentes:
-        c["nombre"] = (c["nombre"] or "") + (
-            " " + c["apellido"] if c["apellido"] else ""
-        )
+        c["nombre"] = (c["nombre"] or "") + (" " + c["apellido"] if c["apellido"] else "")
 
     # Agenda y turnos: próximos turnos (documentos con fecha futura)
     turnos_proximos = list(
@@ -531,9 +504,7 @@ def dashboard_inteligencia_operativa(request):
             documento__empresa=empresa,  # 🔒 FILTRO EMPRESA
         ).aggregate(
             total=Sum(
-                ExpressionWrapper(
-                    F("precio_unitario") * F("cantidad"), output_field=DecimalField()
-                )
+                ExpressionWrapper(F("precio_unitario") * F("cantidad"), output_field=DecimalField())
             )
         )[
             "total"
@@ -546,24 +517,16 @@ def dashboard_inteligencia_operativa(request):
         tipo="FAC",
         empresa=empresa,  # 🔒 FILTRO EMPRESA
     ).count()
-    total_clientes = Cliente.objects.filter(
-        empresa=empresa
-    ).count()  # 🔒 FILTRO EMPRESA
-    total_vehiculos = Vehiculo.objects.filter(
-        empresa=empresa
-    ).count()  # 🔒 FILTRO EMPRESA
+    total_clientes = Cliente.objects.filter(empresa=empresa).count()  # 🔒 FILTRO EMPRESA
+    total_vehiculos = Vehiculo.objects.filter(empresa=empresa).count()  # 🔒 FILTRO EMPRESA
 
     # Facturación del mes actual vs mes anterior - FILTRADO POR EMPRESA
     hoy = timezone.now().date()
     inicio_mes_actual = hoy.replace(day=1)
     if inicio_mes_actual.month == 1:
-        inicio_mes_anterior = inicio_mes_actual.replace(
-            year=inicio_mes_actual.year - 1, month=12
-        )
+        inicio_mes_anterior = inicio_mes_actual.replace(year=inicio_mes_actual.year - 1, month=12)
     else:
-        inicio_mes_anterior = inicio_mes_actual.replace(
-            month=inicio_mes_actual.month - 1
-        )
+        inicio_mes_anterior = inicio_mes_actual.replace(month=inicio_mes_actual.month - 1)
 
     facturacion_mes_actual = (
         LineaServicio.objects.filter(
@@ -711,9 +674,7 @@ def dashboard_inteligencia_operativa(request):
         "satisfaccion_cliente": 4.8,  # Simulado por ahora
     }
 
-    return render(
-        request, "taller/reportes/dashboard_inteligencia_operativa.html", context
-    )
+    return render(request, "taller/reportes/dashboard_inteligencia_operativa.html", context)
 
 
 @login_required_default
@@ -773,9 +734,7 @@ def reportes_mecanicos(request):
     elif path_info.startswith("/cl/") and empresa.pais not in ("CL", "CHILE"):
         print(f"DEBUG - ⚠️ Empresa {empresa.pais} accediendo a ruta Chile: {path_info}")
 
-    print(
-        f"DEBUG - 🌍 Empresa: {empresa.nombre_taller}, País: {empresa.pais}, Ruta: {path_info}"
-    )
+    print(f"DEBUG - 🌍 Empresa: {empresa.nombre_taller}, País: {empresa.pais}, Ruta: {path_info}")
 
     # Obtener filtros
     fecha_desde = request.GET.get("fecha_desde")
@@ -794,9 +753,7 @@ def reportes_mecanicos(request):
             # Validar que sea un número válido
             mecanico_id_int = int(mecanico_id)
             tecnico_verificar = Tecnico.objects.get(pk=mecanico_id_int, empresa=empresa)
-            print(
-                f"DEBUG - ✅ Técnico encontrado: {tecnico_verificar.nombre} (ID: {mecanico_id})"
-            )
+            print(f"DEBUG - ✅ Técnico encontrado: {tecnico_verificar.nombre} (ID: {mecanico_id})")
         except (ValueError, Tecnico.DoesNotExist):
             print(
                 f"DEBUG - ⚠️ Técnico con ID {mecanico_id} no válido o no existe en la empresa {empresa.nombre_taller}"
@@ -869,8 +826,7 @@ def reportes_mecanicos(request):
     total_otros = (
         documentos_qs.aggregate(
             total=Sum(
-                F("lineas_otro_servicio__cantidad")
-                * F("lineas_otro_servicio__precio_cliente")
+                F("lineas_otro_servicio__cantidad") * F("lineas_otro_servicio__precio_cliente")
             )
         )["total"]
         or 0
@@ -913,9 +869,7 @@ def reportes_mecanicos(request):
         # Servicios del técnico
         total_servicios_tecnico = (
             servicios_tecnico.aggregate(
-                total=Sum(
-                    F("cantidad") * F("precio_unitario") * (1 - F("descuento") / 100)
-                )
+                total=Sum(F("cantidad") * F("precio_unitario") * (1 - F("descuento") / 100))
             )["total"]
             or 0
         )
@@ -924,9 +878,7 @@ def reportes_mecanicos(request):
         repuestos_tecnico = LineaRepuesto.objects.filter(documento__in=docs_tecnico)
         total_repuestos_tecnico = (
             repuestos_tecnico.aggregate(
-                total=Sum(
-                    F("cantidad") * F("precio_unitario") * (1 - F("descuento") / 100)
-                )
+                total=Sum(F("cantidad") * F("precio_unitario") * (1 - F("descuento") / 100))
             )["total"]
             or 0
         )
@@ -957,11 +909,7 @@ def reportes_mecanicos(request):
 
         # Promedio por documento del técnico
         promedio_tecnico = round(
-            (
-                total_generado_tecnico / total_docs_tecnico
-                if total_docs_tecnico > 0
-                else 0
-            ),
+            (total_generado_tecnico / total_docs_tecnico if total_docs_tecnico > 0 else 0),
             0,
         )
 
@@ -1009,9 +957,7 @@ def reportes_mecanicos(request):
                     "documento__vehiculo__modelo",
                 )
                 .annotate(
-                    precio_total=F("cantidad")
-                    * F("precio_unitario")
-                    * (1 - F("descuento") / 100)
+                    precio_total=F("cantidad") * F("precio_unitario") * (1 - F("descuento") / 100)
                 )
             )
 

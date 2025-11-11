@@ -38,9 +38,7 @@ for username in usuarios_a_reparar:
             print(f"📍 Empresa encontrada para {username}: {empresa.nombre_taller}")
 
             # Crear perfil
-            perfil = PerfilUsuario.objects.create(
-                user=user, empresa=empresa, rol="admin"
-            )
+            perfil = PerfilUsuario.objects.create(user=user, empresa=empresa, rol="admin")
             print(f"✅ Perfil creado para {username}")
 
         except Empresa.DoesNotExist:

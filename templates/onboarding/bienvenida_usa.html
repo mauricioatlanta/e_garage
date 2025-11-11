@@ -458,9 +458,19 @@
        </div>
     </section>
 
-         <!-- Botón sticky CTA flotante -->
-     <div class="sticky-cta">
+         <!-- Botón sticky CTA flotante con Quick Actions -->
+     <div class="sticky-cta flex flex-col gap-3">
        <a href="#cta" class="neon-button text-black px-6 py-3 rounded-full text-lg font-futuristic font-bold" aria-label="{% trans 'Start your free trial now' %}">🚀 <span class="lang-en">Start Now</span><span class="lang-es" style="display: none;">Comenzar Ahora</span></a>
+       
+       <!-- Quick Actions Dropdown -->
+       <div class="flex gap-2">
+         <button onclick="openClienteModal()" class="px-4 py-2 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white font-bold rounded-full text-sm transition-all shadow-lg hover:shadow-emerald-500/50">
+           ➕ <span class="lang-en">Add Client</span><span class="lang-es" style="display: none;">Agregar Cliente</span>
+         </button>
+         <button onclick="openVehiculoModal()" class="px-4 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold rounded-full text-sm transition-all shadow-lg hover:shadow-cyan-500/50">
+           🚗 <span class="lang-en">Add Vehicle</span><span class="lang-es" style="display: none;">Agregar Vehículo</span>
+         </button>
+       </div>
      </div>
 
     <!-- Sección de Rubros -->
@@ -752,6 +762,191 @@
     </footer>
   </main>
 
+  <!-- Modal para Crear Cliente -->
+  <div id="clienteModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+    <div class="glass-card max-w-2xl w-full p-8 relative">
+      <button onclick="closeClienteModal()" class="absolute top-4 right-4 text-cyan-400 hover:text-cyan-300 text-2xl">
+        ✕
+      </button>
+      <h3 class="text-2xl font-futuristic font-bold text-cyan-400 mb-6">
+        <span class="lang-en">➕ Add New Client</span>
+        <span class="lang-es" style="display: none;">➕ Agregar Nuevo Cliente</span>
+      </h3>
+      
+      <form id="form-crear-cliente" class="space-y-4">
+        {% csrf_token %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">
+              <span class="lang-en">First Name *</span>
+              <span class="lang-es" style="display: none;">Nombre *</span>
+            </label>
+            <input type="text" name="nombre" required
+                   class="w-full px-4 py-3 rounded-lg bg-black border border-cyan-500/30 text-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-400/50">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">
+              <span class="lang-en">Last Name *</span>
+              <span class="lang-es" style="display: none;">Apellido *</span>
+            </label>
+            <input type="text" name="apellido" required
+                   class="w-full px-4 py-3 rounded-lg bg-black border border-cyan-500/30 text-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-400/50">
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">
+              <span class="lang-en">Email</span>
+              <span class="lang-es" style="display: none;">Correo Electrónico</span>
+            </label>
+            <input type="email" name="email"
+                   class="w-full px-4 py-3 rounded-lg bg-black border border-cyan-500/30 text-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-400/50">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">
+              <span class="lang-en">Phone *</span>
+              <span class="lang-es" style="display: none;">Teléfono *</span>
+            </label>
+            <input type="tel" name="telefono" required
+                   class="w-full px-4 py-3 rounded-lg bg-black border border-cyan-500/30 text-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-400/50">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-2">
+            <span class="lang-en">Address</span>
+            <span class="lang-es" style="display: none;">Dirección</span>
+          </label>
+          <input type="text" name="direccion"
+                 class="w-full px-4 py-3 rounded-lg bg-black border border-cyan-500/30 text-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-400/50">
+        </div>
+        
+        <div id="cliente-error-message" class="hidden text-red-400 text-sm p-3 bg-red-900/20 rounded-lg"></div>
+        <div id="cliente-success-message" class="hidden text-green-400 text-sm p-3 bg-green-900/20 rounded-lg"></div>
+        
+        <div class="flex gap-3 pt-4">
+          <button type="button" onclick="closeClienteModal()"
+                  class="flex-1 px-6 py-3 rounded-lg bg-gray-600 hover:bg-gray-700 text-white font-medium transition">
+            <span class="lang-en">Cancel</span>
+            <span class="lang-es" style="display: none;">Cancelar</span>
+          </button>
+          <button type="submit"
+                  class="flex-1 px-6 py-3 rounded-lg neon-button text-black font-bold transition">
+            <span class="lang-en">✓ Create Client</span>
+            <span class="lang-es" style="display: none;">✓ Crear Cliente</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal para Crear Vehículo -->
+  <div id="vehiculoModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+    <div class="glass-card max-w-2xl w-full p-8 relative max-h-[90vh] overflow-y-auto">
+      <button onclick="closeVehiculoModal()" class="absolute top-4 right-4 text-cyan-400 hover:text-cyan-300 text-2xl">
+        ✕
+      </button>
+      <h3 class="text-2xl font-futuristic font-bold text-cyan-400 mb-6">
+        <span class="lang-en">🚗 Add New Vehicle</span>
+        <span class="lang-es" style="display: none;">🚗 Agregar Nuevo Vehículo</span>
+      </h3>
+      
+      <form id="form-crear-vehiculo" class="space-y-4">
+        {% csrf_token %}
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-2">
+            <span class="lang-en">Client *</span>
+            <span class="lang-es" style="display: none;">Cliente *</span>
+          </label>
+          <select name="cliente_id" id="vehiculo-cliente-select" required
+                  class="w-full px-4 py-3 rounded-lg bg-black border border-cyan-500/30 text-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-400/50">
+            <option value="">
+              <span class="lang-en">Select a client...</span>
+              <span class="lang-es" style="display: none;">Seleccione un cliente...</span>
+            </option>
+          </select>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">
+              <span class="lang-en">Year *</span>
+              <span class="lang-es" style="display: none;">Año *</span>
+            </label>
+            <select name="anio" id="vehiculo-anio" required
+                    class="w-full px-4 py-3 rounded-lg bg-black border border-cyan-500/30 text-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-400/50">
+              <option value="">Select year...</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">
+              <span class="lang-en">License Plate *</span>
+              <span class="lang-es" style="display: none;">Patente *</span>
+            </label>
+            <input type="text" name="patente" required
+                   class="w-full px-4 py-3 rounded-lg bg-black border border-cyan-500/30 text-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-400/50">
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">
+              <span class="lang-en">Brand *</span>
+              <span class="lang-es" style="display: none;">Marca *</span>
+            </label>
+            <select name="marca_id" id="vehiculo-marca" required
+                    class="w-full px-4 py-3 rounded-lg bg-black border border-cyan-500/30 text-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-400/50">
+              <option value="">
+                <span class="lang-en">Select brand...</span>
+                <span class="lang-es" style="display: none;">Seleccione marca...</span>
+              </option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">
+              <span class="lang-en">Model *</span>
+              <span class="lang-es" style="display: none;">Modelo *</span>
+            </label>
+            <select name="modelo_id" id="vehiculo-modelo" required
+                    class="w-full px-4 py-3 rounded-lg bg-black border border-cyan-500/30 text-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-400/50">
+              <option value="">
+                <span class="lang-en">Select model...</span>
+                <span class="lang-es" style="display: none;">Seleccione modelo...</span>
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-2">
+            <span class="lang-en">VIN</span>
+            <span class="lang-es" style="display: none;">VIN</span>
+          </label>
+          <input type="text" name="vin"
+                 class="w-full px-4 py-3 rounded-lg bg-black border border-cyan-500/30 text-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-400/50">
+        </div>
+        
+        <div id="vehiculo-error-message" class="hidden text-red-400 text-sm p-3 bg-red-900/20 rounded-lg"></div>
+        <div id="vehiculo-success-message" class="hidden text-green-400 text-sm p-3 bg-green-900/20 rounded-lg"></div>
+        
+        <div class="flex gap-3 pt-4">
+          <button type="button" onclick="closeVehiculoModal()"
+                  class="flex-1 px-6 py-3 rounded-lg bg-gray-600 hover:bg-gray-700 text-white font-medium transition">
+            <span class="lang-en">Cancel</span>
+            <span class="lang-es" style="display: none;">Cancelar</span>
+          </button>
+          <button type="submit"
+                  class="flex-1 px-6 py-3 rounded-lg neon-button text-black font-bold transition">
+            <span class="lang-en">✓ Create Vehicle</span>
+            <span class="lang-es" style="display: none;">✓ Crear Vehículo</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Scripts -->
   <script defer>
     // Sistema de idiomas con Django i18n
@@ -836,6 +1031,203 @@
       }
 
       console.log('Página cargada completamente');
+    });
+
+    // ==================== MODAL MANAGEMENT ====================
+    function openClienteModal() {
+      document.getElementById('clienteModal').classList.remove('hidden');
+      document.getElementById('form-crear-cliente').reset();
+      document.getElementById('cliente-error-message').classList.add('hidden');
+      document.getElementById('cliente-success-message').classList.add('hidden');
+    }
+
+    function closeClienteModal() {
+      document.getElementById('clienteModal').classList.add('hidden');
+    }
+
+    function openVehiculoModal() {
+      document.getElementById('vehiculoModal').classList.remove('hidden');
+      document.getElementById('form-crear-vehiculo').reset();
+      document.getElementById('vehiculo-error-message').classList.add('hidden');
+      document.getElementById('vehiculo-success-message').classList.add('hidden');
+      loadClientes();
+      loadMarcas();
+      populateYears();
+    }
+
+    function closeVehiculoModal() {
+      document.getElementById('vehiculoModal').classList.add('hidden');
+    }
+
+    // Make functions globally available
+    window.openClienteModal = openClienteModal;
+    window.closeClienteModal = closeClienteModal;
+    window.openVehiculoModal = openVehiculoModal;
+    window.closeVehiculoModal = closeVehiculoModal;
+
+    // ==================== CLIENTE FORM ====================
+    document.getElementById('form-crear-cliente').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(this);
+      const errorDiv = document.getElementById('cliente-error-message');
+      const successDiv = document.getElementById('cliente-success-message');
+      
+      errorDiv.classList.add('hidden');
+      successDiv.classList.add('hidden');
+      
+      fetch('/us/api/clientes/crear/', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          successDiv.textContent = data.message || 'Client created successfully!';
+          successDiv.classList.remove('hidden');
+          
+          setTimeout(() => {
+            closeClienteModal();
+            if (typeof loadClientes === 'function') {
+              loadClientes();
+            }
+          }, 1500);
+        } else {
+          errorDiv.textContent = data.error || 'Error creating client';
+          errorDiv.classList.remove('hidden');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        errorDiv.textContent = 'Connection error. Please try again.';
+        errorDiv.classList.remove('hidden');
+      });
+    });
+
+    // ==================== VEHICULO FORM ====================
+    function populateYears() {
+      const currentYear = new Date().getFullYear();
+      const yearSelect = document.getElementById('vehiculo-anio');
+      yearSelect.innerHTML = '<option value="">Select year...</option>';
+      
+      for (let year = currentYear + 1; year >= 1970; year--) {
+        const option = document.createElement('option');
+        option.value = year;
+        option.textContent = year;
+        yearSelect.appendChild(option);
+      }
+    }
+
+    function loadClientes() {
+      fetch('/us/api/clientes/')
+        .then(response => response.json())
+        .then(data => {
+          const select = document.getElementById('vehiculo-cliente-select');
+          select.innerHTML = '<option value="">Select a client...</option>';
+          
+          data.forEach(cliente => {
+            const option = document.createElement('option');
+            option.value = cliente.id;
+            option.textContent = `${cliente.nombre} ${cliente.apellido}`;
+            select.appendChild(option);
+          });
+        })
+        .catch(error => console.error('Error loading clients:', error));
+    }
+
+    function loadMarcas() {
+      fetch('/us/vehiculos/api/marcas/')
+        .then(response => response.json())
+        .then(data => {
+          const select = document.getElementById('vehiculo-marca');
+          select.innerHTML = '<option value="">Select brand...</option>';
+          
+          data.forEach(marca => {
+            const option = document.createElement('option');
+            option.value = marca.id;
+            option.textContent = marca.nombre;
+            select.appendChild(option);
+          });
+        })
+        .catch(error => console.error('Error loading brands:', error));
+    }
+
+    // Load models when marca and year change
+    document.getElementById('vehiculo-marca').addEventListener('change', loadModelos);
+    document.getElementById('vehiculo-anio').addEventListener('change', loadModelos);
+
+    function loadModelos() {
+      const marcaId = document.getElementById('vehiculo-marca').value;
+      const anio = document.getElementById('vehiculo-anio').value;
+      const modeloSelect = document.getElementById('vehiculo-modelo');
+      
+      modeloSelect.innerHTML = '<option value="">Select model...</option>';
+      
+      if (!marcaId || !anio) return;
+      
+      fetch(`/us/vehiculos/ajax/modelos-por-marca-anio/?marca_id=${marcaId}&anio=${anio}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.success && data.modelos) {
+            data.modelos.forEach(modelo => {
+              const option = document.createElement('option');
+              option.value = modelo.id;
+              option.textContent = modelo.nombre;
+              modeloSelect.appendChild(option);
+            });
+          }
+        })
+        .catch(error => console.error('Error loading models:', error));
+    }
+
+    document.getElementById('form-crear-vehiculo').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(this);
+      const errorDiv = document.getElementById('vehiculo-error-message');
+      const successDiv = document.getElementById('vehiculo-success-message');
+      
+      errorDiv.classList.add('hidden');
+      successDiv.classList.add('hidden');
+      
+      fetch('/us/api/vehiculos/crear/', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          successDiv.textContent = data.message || 'Vehicle created successfully!';
+          successDiv.classList.remove('hidden');
+          
+          setTimeout(() => {
+            closeVehiculoModal();
+          }, 1500);
+        } else {
+          errorDiv.textContent = data.error || 'Error creating vehicle';
+          errorDiv.classList.remove('hidden');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        errorDiv.textContent = 'Connection error. Please try again.';
+        errorDiv.classList.remove('hidden');
+      });
+    });
+
+    // Close modals when clicking outside
+    document.getElementById('clienteModal').addEventListener('click', function(e) {
+      if (e.target === this) closeClienteModal();
+    });
+
+    document.getElementById('vehiculoModal').addEventListener('click', function(e) {
+      if (e.target === this) closeVehiculoModal();
     });
   </script>
 </body>

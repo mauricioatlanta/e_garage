@@ -86,9 +86,7 @@ try:
         cantidad=Decimal("1"),
         precio_cliente=Decimal("3000"),
     )
-    print(
-        f"✅ Otro servicio: {linea_otro.nombre} - Precio cliente: ${linea_otro.precio_cliente}"
-    )
+    print(f"✅ Otro servicio: {linea_otro.nombre} - Precio cliente: ${linea_otro.precio_cliente}")
     print(f"   Subtotal calculado: ${linea_otro.subtotal}")
 
     # Recalcular totales

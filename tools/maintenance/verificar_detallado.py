@@ -39,9 +39,7 @@ print(f"Marcas con modelos: {total_marcas - marcas_sin_modelos}")
 print("\n🔍 VERIFICACIÓN DE MODELOS ESPECÍFICOS:")
 problematicos = ["Camry", "Corolla", "Civic", "Accord"]
 for nombre_modelo in problematicos:
-    modelos = ModeloVehiculo.objects.filter(
-        nombre__icontains=nombre_modelo, activo=True
-    )
+    modelos = ModeloVehiculo.objects.filter(nombre__icontains=nombre_modelo, activo=True)
     if modelos.exists():
         for modelo in modelos:
             print(f"- {modelo.nombre} está asignado a: {modelo.marca.nombre}")

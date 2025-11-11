@@ -58,12 +58,8 @@ def track_company_settings_changes(sender, instance, **kwargs):
                     changes.append(
                         {
                             "field": field,
-                            "old_value": (
-                                str(old_value) if old_value is not None else ""
-                            ),
-                            "new_value": (
-                                str(new_value) if new_value is not None else ""
-                            ),
+                            "old_value": (str(old_value) if old_value is not None else ""),
+                            "new_value": (str(new_value) if new_value is not None else ""),
                         }
                     )
 

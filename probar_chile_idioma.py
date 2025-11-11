@@ -25,15 +25,11 @@ def probar_chile_idioma():
         login_page = session.get("http://127.0.0.1:8000/accounts/login/")
 
         if login_page.status_code != 200:
-            print(
-                f"❌ Error al obtener página de login (Status: {login_page.status_code})"
-            )
+            print(f"❌ Error al obtener página de login (Status: {login_page.status_code})")
             return
 
         # Extraer CSRF token
-        csrf_match = re.search(
-            r'name="csrfmiddlewaretoken" value="([^"]+)"', login_page.text
-        )
+        csrf_match = re.search(r'name="csrfmiddlewaretoken" value="([^"]+)"', login_page.text)
         if not csrf_match:
             print("❌ No se encontró CSRF token")
             return
@@ -55,9 +51,7 @@ def probar_chile_idioma():
                 "password": "testpass123",
             }
 
-            login_response = session.post(
-                "http://127.0.0.1:8000/accounts/login/", data=login_data
-            )
+            login_response = session.post("http://127.0.0.1:8000/accounts/login/", data=login_data)
 
             if login_response.status_code == 200 and "login" not in login_response.url:
                 print(f"✅ Login exitoso como: {usuario}")
@@ -75,9 +69,7 @@ def probar_chile_idioma():
                 "password": "testpass123",
             }
 
-            login_response = session.post(
-                "http://127.0.0.1:8000/accounts/login/", data=login_data
-            )
+            login_response = session.post("http://127.0.0.1:8000/accounts/login/", data=login_data)
 
             if login_response.status_code == 200 and "login" not in login_response.url:
                 print("✅ Login exitoso como testuser_usa (para comparar)")
@@ -90,9 +82,7 @@ def probar_chile_idioma():
         clientes_response = session.get("http://127.0.0.1:8000/taller/clientes/")
 
         if clientes_response.status_code != 200:
-            print(
-                f"❌ Error al acceder a clientes (Status: {clientes_response.status_code})"
-            )
+            print(f"❌ Error al acceder a clientes (Status: {clientes_response.status_code})")
             return
 
         print("✅ Página de clientes cargada")
@@ -128,9 +118,7 @@ def probar_chile_idioma():
                 print(f"   ✅ Inglés: '{boton}'")
 
         # Verificar headers
-        content_language = clientes_response.headers.get(
-            "Content-Language", "No especificado"
-        )
+        content_language = clientes_response.headers.get("Content-Language", "No especificado")
         print(f"   📋 Content-Language: {content_language}")
 
         # Buscar información del país
@@ -162,9 +150,7 @@ def probar_chile_idioma():
             print("   ⚠️ INDETERMINADO: No se puede determinar el idioma")
 
     except requests.exceptions.ConnectionError:
-        print(
-            "❌ No se puede conectar al servidor. ¿Está corriendo en http://127.0.0.1:8000?"
-        )
+        print("❌ No se puede conectar al servidor. ¿Está corriendo en http://127.0.0.1:8000?")
     except Exception as e:
         print(f"❌ Error: {e}")
         import traceback

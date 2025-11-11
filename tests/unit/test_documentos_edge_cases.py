@@ -35,12 +35,8 @@ def test_documentos_descuentos_edge_cases():
     User = get_user_model()
     user = User.objects.create_user(username="test_descuentos", password="test")
 
-    empresa = Empresa.objects.create(
-        user=user, nombre_taller="Test Descuentos", pais="CL"
-    )
-    cliente = Cliente.objects.create(
-        empresa=empresa, nombre="Test Client", tax_id="1-9"
-    )
+    empresa = Empresa.objects.create(user=user, nombre_taller="Test Descuentos", pais="CL")
+    cliente = Cliente.objects.create(empresa=empresa, nombre="Test Client", tax_id="1-9")
     vehiculo = Vehiculo.objects.create(
         empresa=empresa,
         cliente=cliente,
@@ -97,9 +93,7 @@ def test_documentos_descuentos_edge_cases():
                 doc_id = response.json()["id"]
                 documento = Documento.objects.get(id=doc_id)
                 linea = LineaServicio.objects.filter(documento=documento).first()
-                assert (
-                    linea is not None
-                ), f"Service line should be created for {description}"
+                assert linea is not None, f"Service line should be created for {description}"
         else:
             if response.status_code == 302:
                 assert_ok_or_redirect(response, "/cl/documentos/api/create/")
@@ -125,12 +119,8 @@ def test_documentos_cantidades_decimales():
     User = get_user_model()
     user = User.objects.create_user(username="test_cantidades", password="test")
 
-    empresa = Empresa.objects.create(
-        user=user, nombre_taller="Test Cantidades", pais="CL"
-    )
-    cliente = Cliente.objects.create(
-        empresa=empresa, nombre="Test Client", tax_id="1-9"
-    )
+    empresa = Empresa.objects.create(user=user, nombre_taller="Test Cantidades", pais="CL")
+    cliente = Cliente.objects.create(empresa=empresa, nombre="Test Client", tax_id="1-9")
     vehiculo = Vehiculo.objects.create(
         empresa=empresa,
         cliente=cliente,
@@ -185,23 +175,17 @@ def test_documentos_cantidades_decimales():
             documento = Documento.objects.get(id=doc_id)
             linea = LineaServicio.objects.filter(documento=documento).first()
 
-            assert (
-                linea is not None
-            ), f"Service line should be created for {description}"
+            assert linea is not None, f"Service line should be created for {description}"
 
             # Check that quantity is stored correctly
-            assert (
-                str(linea.cantidad) == cantidad
-            ), f"Quantity should match for {description}"
+            assert str(linea.cantidad) == cantidad, f"Quantity should match for {description}"
 
             # Check subtotal calculation (be tolerant to rounding differences)
             if hasattr(linea, "subtotal"):
                 assert isinstance(
                     linea.subtotal, (int, float, Decimal)
                 ), f"Subtotal should be numeric for {description}"
-                assert (
-                    linea.subtotal >= 0
-                ), f"Subtotal should be non-negative for {description}"
+                assert linea.subtotal >= 0, f"Subtotal should be non-negative for {description}"
 
 
 @pytest.mark.django_db
@@ -220,9 +204,7 @@ def test_documentos_precios_4_decimales():
     user = User.objects.create_user(username="test_precios", password="test")
 
     empresa = Empresa.objects.create(user=user, nombre_taller="Test Precios", pais="CL")
-    cliente = Cliente.objects.create(
-        empresa=empresa, nombre="Test Client", tax_id="1-9"
-    )
+    cliente = Cliente.objects.create(empresa=empresa, nombre="Test Client", tax_id="1-9")
     vehiculo = Vehiculo.objects.create(
         empresa=empresa,
         cliente=cliente,
@@ -277,17 +259,13 @@ def test_documentos_precios_4_decimales():
             documento = Documento.objects.get(id=doc_id)
             linea = LineaServicio.objects.filter(documento=documento).first()
 
-            assert (
-                linea is not None
-            ), f"Service line should be created for {description}"
+            assert linea is not None, f"Service line should be created for {description}"
 
             # Check that price is stored correctly (may be rounded by model)
             assert isinstance(
                 linea.precio_unitario, (int, float, Decimal)
             ), f"Price should be numeric for {description}"
-            assert (
-                linea.precio_unitario >= 0
-            ), f"Price should be non-negative for {description}"
+            assert linea.precio_unitario >= 0, f"Price should be non-negative for {description}"
 
 
 @pytest.mark.django_db
@@ -305,12 +283,8 @@ def test_documentos_negativos_bordes():
     User = get_user_model()
     user = User.objects.create_user(username="test_negativos", password="test")
 
-    empresa = Empresa.objects.create(
-        user=user, nombre_taller="Test Negativos", pais="CL"
-    )
-    cliente = Cliente.objects.create(
-        empresa=empresa, nombre="Test Client", tax_id="1-9"
-    )
+    empresa = Empresa.objects.create(user=user, nombre_taller="Test Negativos", pais="CL")
+    cliente = Cliente.objects.create(empresa=empresa, nombre="Test Client", tax_id="1-9")
     vehiculo = Vehiculo.objects.create(
         empresa=empresa,
         cliente=cliente,
@@ -395,12 +369,8 @@ def test_documentos_rounding_precision():
     User = get_user_model()
     user = User.objects.create_user(username="test_rounding", password="test")
 
-    empresa = Empresa.objects.create(
-        user=user, nombre_taller="Test Rounding", pais="CL"
-    )
-    cliente = Cliente.objects.create(
-        empresa=empresa, nombre="Test Client", tax_id="1-9"
-    )
+    empresa = Empresa.objects.create(user=user, nombre_taller="Test Rounding", pais="CL")
+    cliente = Cliente.objects.create(empresa=empresa, nombre="Test Client", tax_id="1-9")
     vehiculo = Vehiculo.objects.create(
         empresa=empresa,
         cliente=cliente,
@@ -461,9 +431,7 @@ def test_documentos_rounding_precision():
             documento = Documento.objects.get(id=doc_id)
             linea = LineaServicio.objects.filter(documento=documento).first()
 
-            assert (
-                linea is not None
-            ), f"Service line should be created for {description}"
+            assert linea is not None, f"Service line should be created for {description}"
 
             # Check that values are stored with appropriate precision
             assert isinstance(

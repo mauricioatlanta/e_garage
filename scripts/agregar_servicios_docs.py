@@ -48,9 +48,7 @@ if servicios.count() == 0:
 
 print("\n🔧 Servicios disponibles para usar:")
 for servicio in servicios[:4]:
-    precio = getattr(
-        servicio, "precio_cliente", getattr(servicio, "precio_base", "N/A")
-    )
+    precio = getattr(servicio, "precio_cliente", getattr(servicio, "precio_base", "N/A"))
     print(f"   - {servicio.nombre}: ${precio}")
 
 # Agregar servicios a cada documento
@@ -112,8 +110,6 @@ for doc in Documento.objects.filter(empresa=empresa).order_by("id"):
     otros_count = LineaServicio.objects.filter(documento=doc).count()  # Provisional
     millas = doc.vehiculo.millas if doc.vehiculo else "No especificado"
 
-    print(
-        f"Doc {doc.pk} ({doc.tipo}): MILLAS={millas}, #SERV={serv_count}, TOTAL=${doc.total}"
-    )
+    print(f"Doc {doc.pk} ({doc.tipo}): MILLAS={millas}, #SERV={serv_count}, TOTAL=${doc.total}")
 
 print("\n✅ Agregado servicios a todos los documentos!")

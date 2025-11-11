@@ -56,15 +56,11 @@ def get_company(country: str, name: str | None):
     if country.upper() == "US":
         emp = Empresa.objects.filter(pais="US").order_by("id").first()
         if not emp:
-            emp = Empresa.objects.create(
-                nombre_taller="USA Test Garage", pais="US", moneda="USD"
-            )
+            emp = Empresa.objects.create(nombre_taller="USA Test Garage", pais="US", moneda="USD")
         return emp
     emp = Empresa.objects.filter(pais="CL").order_by("id").first()
     if not emp:
-        emp = Empresa.objects.create(
-            nombre_taller="Chile Demo", pais="CL", moneda="CLP"
-        )
+        emp = Empresa.objects.create(nombre_taller="Chile Demo", pais="CL", moneda="CLP")
     return emp
 
 
@@ -82,9 +78,7 @@ def get_basics(emp):
 
     # Crear marca y modelo si no existen (usan country en lugar de empresa)
     marca, _ = Marca.objects.get_or_create(country=emp.pais, nombre="Toyota")
-    modelo, _ = Modelo.objects.get_or_create(
-        country=emp.pais, marca=marca, nombre="Corolla"
-    )
+    modelo, _ = Modelo.objects.get_or_create(country=emp.pais, marca=marca, nombre="Corolla")
 
     # Vehículo: usa el primero si existe; si no, crea el mínimo posible
     veh = Vehiculo.objects.filter(empresa=emp).order_by("id").first()
@@ -197,9 +191,7 @@ class Command(BaseCommand):
     help = "Crea N documentos por tipo (3 tipos) con millas, ≥3 repuestos, ≥3 servicios y ≥3 otros servicios."
 
     def add_arguments(self, parser):
-        parser.add_argument(
-            "--empresa", type=str, default="", help="Nombre de empresa (opcional)"
-        )
+        parser.add_argument("--empresa", type=str, default="", help="Nombre de empresa (opcional)")
         parser.add_argument("--country", type=str, default="US", help="US o CL")
         parser.add_argument(
             "--per-type", type=int, default=10, help="Documentos por tipo (default 10)"

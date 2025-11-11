@@ -18,13 +18,34 @@ class ConfiguracionEmpresa(models.Model):
     logo = models.ImageField(upload_to="logos/", null=True, blank=True)
 
     # —— CAMPOS DE CONTACTO ——
+    # Campo legacy de dirección (deprecar progresivamente)
     direccion = models.CharField(
         max_length=200,
         blank=True,
         default="",
         verbose_name="Dirección",
-        help_text="Dirección completa de la empresa",
+        help_text="[LEGACY] Dirección de texto plano - Usar legal_address en su lugar",
     )
+
+    # Nueva dirección estructurada usando modelo Address
+    legal_address = models.ForeignKey(
+        "ubicacion.Address",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="company_legal_addresses",
+        verbose_name="Dirección Legal",
+        help_text="Dirección legal/fiscal de la empresa (estructurada con ciudad, estado, país)",
+    )
+
+    # Feature flag para rollout gradual de Address v2
+    use_address_v2 = models.BooleanField(
+        default=False,
+        verbose_name="Usar Address v2",
+        help_text="Activar para usar el nuevo sistema de direcciones estructuradas (Address). "
+        "Desactivar para seguir usando campos legacy (direccion, region, ciudad).",
+    )
+
     telefono = models.CharField(
         max_length=40,
         blank=True,
@@ -100,7 +121,5 @@ class ConfiguracionEmpresa(models.Model):
     def save(self, *args, **kwargs):
         # Normalización automática de moneda según país
         if not self.moneda and hasattr(self, "empresa") and self.empresa:
-            self.moneda = (
-                "CLP" if getattr(self.empresa, "pais", "CL") == "CL" else "USD"
-            )
+            self.moneda = "CLP" if getattr(self.empresa, "pais", "CL") == "CL" else "USD"
         super().save(*args, **kwargs)

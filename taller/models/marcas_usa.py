@@ -48,9 +48,7 @@ class MarcaVehiculo(models.Model):
 class ModeloVehiculo(models.Model):
     """Modelos específicos de cada marca"""
 
-    marca = models.ForeignKey(
-        MarcaVehiculo, on_delete=models.CASCADE, related_name="modelos"
-    )
+    marca = models.ForeignKey(MarcaVehiculo, on_delete=models.CASCADE, related_name="modelos")
     nombre = models.CharField(_("Nombre"), max_length=100)
     nombre_en = models.CharField(_("Nombre en Inglés"), max_length=100, blank=True)
     anio_inicio = models.PositiveIntegerField(

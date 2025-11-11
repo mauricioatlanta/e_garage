@@ -38,9 +38,7 @@ def verificar_restriccion_usuario_unico():
     empresas_count = Empresa.objects.count()
 
     if users_count == empresas_count:
-        print(
-            f"   ✅ Relación 1:1 correcta: {users_count} usuarios = {empresas_count} empresas"
-        )
+        print(f"   ✅ Relación 1:1 correcta: {users_count} usuarios = {empresas_count} empresas")
     else:
         print(f"   ❌ ERROR: {users_count} usuarios ≠ {empresas_count} empresas")
 
@@ -62,9 +60,7 @@ def verificar_restriccion_usuario_unico():
         # Intentar crear una segunda empresa para un usuario existente
         user_existente = User.objects.first()
         if user_existente:
-            nueva_empresa = Empresa(
-                user=user_existente, nombre_taller="Empresa Duplicada"
-            )
+            nueva_empresa = Empresa(user=user_existente, nombre_taller="Empresa Duplicada")
             nueva_empresa.save()
             print("   ❌ ERROR: Se permitió crear empresa duplicada")
         else:

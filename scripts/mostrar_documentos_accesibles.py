@@ -33,9 +33,7 @@ def main():
             if docs.exists():
                 for doc in docs[:3]:
                     print(f"   - Documento {doc.pk}: {doc.tipo} - {doc.estado}")
-                    print(
-                        f"     URL: http://127.0.0.1:8000/us/documentos/form/{doc.pk}/"
-                    )
+                    print(f"     URL: http://127.0.0.1:8000/us/documentos/form/{doc.pk}/")
             else:
                 print("   - Sin documentos")
 

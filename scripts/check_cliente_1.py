@@ -16,9 +16,7 @@ try:
     cliente = Cliente.objects.get(id=1)
     print(f"Cliente: {cliente.nombre} {cliente.apellido}")
     print(f'Empresa: {cliente.empresa if cliente.empresa else "Sin empresa"}')
-    print(
-        f'País de la empresa: {cliente.empresa.pais if cliente.empresa else "Sin país"}'
-    )
+    print(f'País de la empresa: {cliente.empresa.pais if cliente.empresa else "Sin país"}')
     print(f"Estado USA: {cliente.estado_usa}")
     print(f"Ciudad USA: {cliente.ciudad_usa}")
     print(f"ZIP Code: {cliente.zipcode}")

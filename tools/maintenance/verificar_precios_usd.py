@@ -27,9 +27,7 @@ def get_empresa_by_name(company_name: str):
         try:
             return Empresa.objects.get(empresa__iexact=company_name)
         except Empresa.DoesNotExist:
-            raise Empresa.DoesNotExist(
-                f"No se encontró la Empresa con nombre '{company_name}'"
-            )
+            raise Empresa.DoesNotExist(f"No se encontró la Empresa con nombre '{company_name}'")
 
 
 class Command(BaseCommand):
@@ -209,12 +207,8 @@ class Command(BaseCommand):
 
         # Verificar repuestos
         if repuestos.exists() and hasattr(repuestos.first(), "precio_venta"):
-            max_precio_rep = repuestos.aggregate(max_precio=Max("precio_venta"))[
-                "max_precio"
-            ]
-            if (
-                max_precio_rep > 500
-            ):  # Si hay precios mayores a $500, probablemente están en pesos
+            max_precio_rep = repuestos.aggregate(max_precio=Max("precio_venta"))["max_precio"]
+            if max_precio_rep > 500:  # Si hay precios mayores a $500, probablemente están en pesos
                 self.stdout.write(
                     self.style.WARNING(
                         f"⚠️  Precio máximo de repuestos muy alto: ${max_precio_rep:.2f}"
@@ -224,12 +218,10 @@ class Command(BaseCommand):
 
         # Verificar servicios
         if lineas_servicios.exists():
-            max_precio_serv = lineas_servicios.aggregate(
-                max_precio=Max("precio_unitario")
-            )["max_precio"]
-            if (
-                max_precio_serv > 200
-            ):  # Si hay precios mayores a $200, probablemente están en pesos
+            max_precio_serv = lineas_servicios.aggregate(max_precio=Max("precio_unitario"))[
+                "max_precio"
+            ]
+            if max_precio_serv > 200:  # Si hay precios mayores a $200, probablemente están en pesos
                 self.stdout.write(
                     self.style.WARNING(
                         f"⚠️  Precio máximo de servicios muy alto: ${max_precio_serv:.2f}"
@@ -239,9 +231,7 @@ class Command(BaseCommand):
 
         if precios_ok:
             self.stdout.write(
-                self.style.SUCCESS(
-                    "✅ Todos los precios están en rangos realistas para USD"
-                )
+                self.style.SUCCESS("✅ Todos los precios están en rangos realistas para USD")
             )
         else:
             self.stdout.write(

@@ -25,9 +25,7 @@ def debug_documento_f882():
         print(f"   Tipo: {documento.tipo_documento}")
         print(f"   Número: {documento.numero_documento}")
         print(f"   Fecha: {documento.fecha}")
-        print(
-            f"   Cliente: {documento.cliente.nombre if documento.cliente else 'Sin cliente'}"
-        )
+        print(f"   Cliente: {documento.cliente.nombre if documento.cliente else 'Sin cliente'}")
         print(
             f"   Vehículo: {documento.vehiculo.patente if documento.vehiculo else 'Sin vehículo'}"
         )
@@ -85,9 +83,7 @@ def debug_documento_f882():
         print("❌ Documento F-882 no encontrado")
 
         # Buscar documentos similares
-        documentos_factura = Documento.objects.filter(
-            tipo_documento="Factura"
-        ).order_by("-id")[:5]
+        documentos_factura = Documento.objects.filter(tipo_documento="Factura").order_by("-id")[:5]
         print("\n📋 ÚLTIMAS 5 FACTURAS:")
         for doc in documentos_factura:
             repuestos_count = RepuestoDocumento.objects.filter(documento=doc).count()
@@ -150,9 +146,7 @@ def agregar_repuesto_test_f882():
         print(f"   Precio: ${repuesto.precio}")
         print(f"   Total: ${repuesto.total}")
 
-        print(
-            f"\n🔗 Ver documento actualizado: http://127.0.0.1:8000/documentos/{documento.id}/"
-        )
+        print(f"\n🔗 Ver documento actualizado: http://127.0.0.1:8000/documentos/{documento.id}/")
 
         return repuesto
 

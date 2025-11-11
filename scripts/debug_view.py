@@ -7,9 +7,7 @@ from taller.models.clientes import Cliente
 def debug_cliente(request, cliente_id):
     """Vista de debug para verificar campos del cliente"""
     cliente = get_object_or_404(
-        Cliente.objects.select_related(
-            "empresa", "estado_usa", "ciudad_usa", "region", "ciudad"
-        ),
+        Cliente.objects.select_related("empresa", "estado_usa", "ciudad_usa", "region", "ciudad"),
         id=cliente_id,
     )
 

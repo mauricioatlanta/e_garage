@@ -85,9 +85,7 @@ def scan_django_templates():
                 print(f"⚠️  {template_name:<25} → Error: {e}")
 
     except ImportError:
-        print(
-            "❌ Django no disponible. Ejecuta con --django para usar resolución real."
-        )
+        print("❌ Django no disponible. Ejecuta con --django para usar resolución real.")
     except Exception as e:
         print(f"❌ Error configurando Django: {e}")
 
@@ -120,9 +118,7 @@ def check_template_override():
 
 def main():
     parser = argparse.ArgumentParser(description="Escanea templates de autenticación")
-    parser.add_argument(
-        "--django", action="store_true", help="Usar resolución real de Django"
-    )
+    parser.add_argument("--django", action="store_true", help="Usar resolución real de Django")
 
     args = parser.parse_args()
 

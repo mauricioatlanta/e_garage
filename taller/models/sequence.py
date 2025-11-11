@@ -19,9 +19,7 @@ class DocumentSequence(models.Model):
     def next(cls, empresa, tipo):
         """Obtiene el siguiente número de secuencia de forma segura para concurrencia"""
         with transaction.atomic():
-            obj, _ = cls.objects.select_for_update().get_or_create(
-                empresa=empresa, tipo=tipo
-            )
+            obj, _ = cls.objects.select_for_update().get_or_create(empresa=empresa, tipo=tipo)
             obj.current += 1
             obj.save(update_fields=["current"])
             return obj.current

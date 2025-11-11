@@ -82,9 +82,7 @@ print("\n🎯 Resumen final:")
 for doc in docs:
     rep_count = doc.lineas_repuesto.count() if hasattr(doc, "lineas_repuesto") else 0
     serv_count = doc.lineas_servicio.count() if hasattr(doc, "lineas_servicio") else 0
-    otros_count = (
-        doc.lineas_otroservicio.count() if hasattr(doc, "lineas_otroservicio") else 0
-    )
+    otros_count = doc.lineas_otroservicio.count() if hasattr(doc, "lineas_otroservicio") else 0
 
     print(
         f"Doc {doc.id}: REP={rep_count}, SERV={serv_count}, OTROS={otros_count}, TOTAL=${doc.total}"

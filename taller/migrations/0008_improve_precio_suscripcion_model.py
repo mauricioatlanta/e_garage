@@ -55,15 +55,11 @@ class Migration(migrations.Migration):
         ),
         migrations.AddIndex(
             model_name="preciosuscripcion",
-            index=models.Index(
-                fields=["pais", "tipo_plan"], name="taller_prec_pais_f354f7_idx"
-            ),
+            index=models.Index(fields=["pais", "tipo_plan"], name="taller_prec_pais_f354f7_idx"),
         ),
         migrations.AddIndex(
             model_name="preciosuscripcion",
-            index=models.Index(
-                fields=["activo", "pais"], name="taller_prec_activo_118db6_idx"
-            ),
+            index=models.Index(fields=["activo", "pais"], name="taller_prec_activo_118db6_idx"),
         ),
         migrations.AddConstraint(
             model_name="preciosuscripcion",

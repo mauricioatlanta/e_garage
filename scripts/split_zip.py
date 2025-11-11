@@ -47,9 +47,7 @@ def collect_files(root: Path, exclude_terms):
     for dirpath, dirnames, filenames in os.walk(root):
         dpath = Path(dirpath)
         # Filtra dirnames in-place para acelerar (no descender en dirs excluidas)
-        dirnames[:] = [
-            d for d in dirnames if not should_exclude(dpath / d, exclude_terms)
-        ]
+        dirnames[:] = [d for d in dirnames if not should_exclude(dpath / d, exclude_terms)]
         for fn in filenames:
             fpath = dpath / fn
             if should_exclude(fpath, exclude_terms):
@@ -103,15 +101,9 @@ def main():
         description="Divide una carpeta en varios ZIPs con límite de tamaño."
     )
     ap.add_argument("source", help="Carpeta origen (proyecto grande)")
-    ap.add_argument(
-        "--out", default="export_parts", help="Carpeta de salida para los ZIPs"
-    )
-    ap.add_argument(
-        "--part-mb", type=int, default=90, help="Tamaño objetivo por ZIP (MB)"
-    )
-    ap.add_argument(
-        "--prefix", default="eg_app_part_", help="Prefijo del nombre de las partes"
-    )
+    ap.add_argument("--out", default="export_parts", help="Carpeta de salida para los ZIPs")
+    ap.add_argument("--part-mb", type=int, default=90, help="Tamaño objetivo por ZIP (MB)")
+    ap.add_argument("--prefix", default="eg_app_part_", help="Prefijo del nombre de las partes")
     ap.add_argument(
         "--exclude",
         nargs="*",
@@ -125,9 +117,7 @@ def main():
     outdir.mkdir(parents=True, exist_ok=True)
 
     if not root.exists() or not root.is_dir():
-        print(
-            f"ERROR: Carpeta origen no existe o no es carpeta: {root}", file=sys.stderr
-        )
+        print(f"ERROR: Carpeta origen no existe o no es carpeta: {root}", file=sys.stderr)
         sys.exit(1)
 
     part_bytes_target = args.part_mb * 1024 * 1024
@@ -140,9 +130,7 @@ def main():
 
     files = collect_files(root, args.exclude)
     total_size = sum(sz for _, _, sz in files)
-    print(
-        f"✅ Archivos: {len(files)} | Tamaño total (sin comprimir): {human(total_size)}"
-    )
+    print(f"✅ Archivos: {len(files)} | Tamaño total (sin comprimir): {human(total_size)}")
 
     if not files:
         print("No se encontraron archivos para empaquetar (verifica exclusiones).")
@@ -201,9 +189,7 @@ def main():
         )
 
     manifest_path = outdir / "manifest.json"
-    manifest_path.write_text(
-        json.dumps(manifest, indent=2, ensure_ascii=False), encoding="utf-8"
-    )
+    manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False), encoding="utf-8")
     print(f"📝 Manifest: {manifest_path}")
 
     if warnings:

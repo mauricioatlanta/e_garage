@@ -44,9 +44,7 @@ def configuracion(request):
 
             if empresa_form.is_valid():
                 empresa_form.save()
-                messages.success(
-                    request, "✅ Datos de la empresa actualizados correctamente!"
-                )
+                messages.success(request, "✅ Datos de la empresa actualizados correctamente!")
                 return redirect("configuracion")
             else:
                 messages.error(
@@ -65,9 +63,7 @@ def configuracion(request):
                 user.email = datos_form.cleaned_data["email"]
                 user.save()
 
-                messages.success(
-                    request, "✅ Datos personales actualizados correctamente!"
-                )
+                messages.success(request, "✅ Datos personales actualizados correctamente!")
                 return redirect("configuracion")
             else:
                 messages.error(

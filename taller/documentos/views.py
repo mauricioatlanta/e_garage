@@ -166,9 +166,7 @@ def api_crear_servicio(request):
         descripcion = data.get("descripcion", "").strip()
 
         if not nombre:
-            return JsonResponse(
-                {"error": "El nombre del servicio es obligatorio"}, status=400
-            )
+            return JsonResponse({"error": "El nombre del servicio es obligatorio"}, status=400)
 
         # Verificar si ya existe
         servicio_existente = Servicio.objects.filter(nombre__iexact=nombre).first()
@@ -185,9 +183,7 @@ def api_crear_servicio(request):
             )
 
         # Crear nuevo servicio
-        servicio = Servicio.objects.create(
-            nombre=nombre, precio=precio, descripcion=descripcion
-        )
+        servicio = Servicio.objects.create(nombre=nombre, precio=precio, descripcion=descripcion)
 
         return JsonResponse(
             {
@@ -281,9 +277,9 @@ def obtener_vehiculos_por_cliente(request):
         return JsonResponse([], safe=False)
 
     # Filtrar vehículos por cliente y empresa
-    vehiculos = Vehiculo.objects.filter(
-        cliente_id=cliente_id, cliente__empresa=empresa
-    ).values("id", "patente", "marca_id", "modelo_id")
+    vehiculos = Vehiculo.objects.filter(cliente_id=cliente_id, cliente__empresa=empresa).values(
+        "id", "patente", "marca_id", "modelo_id"
+    )
 
     return JsonResponse(list(vehiculos), safe=False)
 
@@ -333,8 +329,10 @@ def editar_documento(request, *args, **kwargs):
 
 import os
 
-from weasyprint import HTML
-from xhtml2pdf import pisa
+# IMPORTS PESADOS (weasyprint / xhtml2pdf) deben cargarse de forma perezosa
+# porque al importar el módulo a nivel de módulo pueden fallar dependencias
+# externas (p.ej. pyhanko) y bloquear el arranque del servidor.
+# Se realizan imports locales dentro de las funciones que generan PDFs.
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -351,9 +349,7 @@ from taller.models.documento import Documento
 
 @login_required
 def crear_documento(request):
-    print(
-        "[DEBUG CREAR] ========== VERSIÓN CORREGIDA - INICIO CREAR DOCUMENTO =========="
-    )
+    print("[DEBUG CREAR] ========== VERSIÓN CORREGIDA - INICIO CREAR DOCUMENTO ==========")
     print(f"[DEBUG CREAR] Usuario: {request.user.username}")
     print(f"[DEBUG CREAR] Método: {request.method}")
 
@@ -384,9 +380,7 @@ def crear_documento(request):
         if mecanico_id and not mecanico_id.isdigit():
             from taller.models.tecnico import Tecnico
 
-            mecanico_obj, _ = Tecnico.objects.get_or_create(
-                nombre=mecanico_id, empresa=empresa
-            )
+            mecanico_obj, _ = Tecnico.objects.get_or_create(nombre=mecanico_id, empresa=empresa)
             post_data["mecanico"] = mecanico_obj.pk
             print(
                 f"[DEBUG CREAR] Mecánico creado/encontrado: {mecanico_obj.nombre} (ID: {mecanico_obj.pk})"
@@ -401,12 +395,7 @@ def crear_documento(request):
             # Generar número de documento si no existe
             if not documento.numero_documento:
                 tipo = documento.tipo.lower().replace(" ", "_")
-                count = (
-                    Documento.objects.filter(
-                        tipo=documento.tipo, empresa=empresa
-                    ).count()
-                    + 1
-                )
+                count = Documento.objects.filter(tipo=documento.tipo, empresa=empresa).count() + 1
                 documento.numero = count
                 print(f"[DEBUG CREAR] Número generado: {documento.numero_documento}")
 
@@ -440,9 +429,7 @@ def crear_documento(request):
                                 cantidad=int(item.get("cantidad", 1)),
                                 precio_unitario=precio,
                             )
-                            print(
-                                f"[DEBUG CREAR] ✅ Repuesto guardado: {nombre} (${precio})"
-                            )
+                            print(f"[DEBUG CREAR] ✅ Repuesto guardado: {nombre} (${precio})")
 
                         elif tipo == "servicio" and nombre and precio > 0:
                             LineaServicio.objects.create(
@@ -451,9 +438,7 @@ def crear_documento(request):
                                 precio_unitario=precio,
                                 cantidad=int(item.get("cantidad", 1)),
                             )
-                            print(
-                                f"[DEBUG CREAR] ✅ Servicio guardado: {nombre} (${precio})"
-                            )
+                            print(f"[DEBUG CREAR] ✅ Servicio guardado: {nombre} (${precio})")
 
                         elif tipo == "otro_servicio" and nombre and precio > 0:
                             # Buscar o crear el servicio en el catálogo por nombre localizado
@@ -506,14 +491,10 @@ def crear_documento(request):
 
                     traceback.print_exc()
             else:
-                print(
-                    "[DEBUG CREAR] json_items es None o vacío - no se recibieron items"
-                )
+                print("[DEBUG CREAR] json_items es None o vacío - no se recibieron items")
 
             # Redirigir al listado de documentos después de crear exitosamente
-            print(
-                "[DEBUG CREAR] ✅ DOCUMENTO CREADO EXITOSAMENTE - REDIRIGIENDO AL LISTADO"
-            )
+            print("[DEBUG CREAR] ✅ DOCUMENTO CREADO EXITOSAMENTE - REDIRIGIENDO AL LISTADO")
             return redirect("documentos:lista_documentos")
         else:
             print(f"[DEBUG CREAR] Formulario inválido: {form.errors}")
@@ -562,9 +543,7 @@ def crear_documento(request):
             "tecnicos": mecanicos,  # Alias para compatibilidad con templates
             "es_edicion": False,
             "country": country,  # 🚀 BISTURÍ: Pasar país desde empresa
-            "company_country": getattr(
-                request, "company_country", None
-            ),  # viene del middleware
+            "company_country": getattr(request, "company_country", None),  # viene del middleware
         },
     )
 
@@ -596,9 +575,7 @@ def ver_documento(request, documento_id):
 
         # Primero verificar si el documento existe
         if not Documento.objects.filter(id=documento_id).exists():
-            print(
-                f"[DEBUG VER] ❌ Documento {documento_id} NO EXISTE en la base de datos"
-            )
+            print(f"[DEBUG VER] ❌ Documento {documento_id} NO EXISTE en la base de datos")
             from django.http import Http404
 
             raise Http404(f"Documento {documento_id} no encontrado")
@@ -659,9 +636,7 @@ def ver_documento(request, documento_id):
 
     print(f"[DEBUG VER] Otros servicios encontrados: {otros_servicios.count()}")
     for otro in otros_servicios:
-        nombre_otro = getattr(
-            otro, "nombre", getattr(otro, "nombre_servicio", "Otro servicio")
-        )
+        nombre_otro = getattr(otro, "nombre", getattr(otro, "nombre_servicio", "Otro servicio"))
         precio_otro = getattr(otro, "precio_cliente", getattr(otro, "precio", 0))
         print(
             f"[DEBUG VER]   - {nombre_otro} ({getattr(otro, 'empresa_externa', '')}): ${precio_otro}"
@@ -753,9 +728,7 @@ def lista_documentos(request):
                         * (1 - F("lineas_repuesto__descuento") / 100),
                         output_field=DecimalField(max_digits=12, decimal_places=2),
                     ),
-                    Value(
-                        0, output_field=DecimalField(max_digits=12, decimal_places=2)
-                    ),
+                    Value(0, output_field=DecimalField(max_digits=12, decimal_places=2)),
                 ),
                 sum_serv=Coalesce(
                     Sum(
@@ -764,9 +737,7 @@ def lista_documentos(request):
                         * (1 - F("lineas_servicio__descuento") / 100),
                         output_field=DecimalField(max_digits=12, decimal_places=2),
                     ),
-                    Value(
-                        0, output_field=DecimalField(max_digits=12, decimal_places=2)
-                    ),
+                    Value(0, output_field=DecimalField(max_digits=12, decimal_places=2)),
                 ),
                 sum_out=Coalesce(
                     Sum(
@@ -774,9 +745,7 @@ def lista_documentos(request):
                         * F("lineas_otro_servicio__cantidad"),
                         output_field=DecimalField(max_digits=12, decimal_places=2),
                     ),
-                    Value(
-                        0, output_field=DecimalField(max_digits=12, decimal_places=2)
-                    ),
+                    Value(0, output_field=DecimalField(max_digits=12, decimal_places=2)),
                 ),
             )
             .annotate(total_general_anotado=F("sum_rep") + F("sum_serv") + F("sum_out"))
@@ -826,9 +795,7 @@ def editar_documento(request, documento_id):
         documento = get_object_or_404(
             Documento.objects.select_related(
                 "cliente", "vehiculo", "tecnico_responsable"
-            ).prefetch_related(
-                "lineas_repuesto", "lineas_servicio", "lineas_otro_servicio"
-            ),
+            ).prefetch_related("lineas_repuesto", "lineas_servicio", "lineas_otro_servicio"),
             id=documento_id,
             empresa=empresa,
         )
@@ -849,9 +816,7 @@ def editar_documento(request, documento_id):
             # Si el valor no es un ID, es un nombre nuevo o existente
             from taller.models.tecnico import Tecnico
 
-            mecanico_obj, _ = Tecnico.objects.get_or_create(
-                nombre=mecanico_nombre, empresa=empresa
-            )
+            mecanico_obj, _ = Tecnico.objects.get_or_create(nombre=mecanico_nombre, empresa=empresa)
             post_data["mecanico"] = mecanico_obj.pk
             print(
                 f"[DEBUG EDICIÓN] Mecánico creado/encontrado: {mecanico_obj.nombre} (ID: {mecanico_obj.pk})"
@@ -907,9 +872,7 @@ def editar_documento(request, documento_id):
                                 precio_unitario=precio,
                                 descuento=float(item.get("descuento", 0)),
                             )
-                            print(
-                                f"[DEBUG EDICIÓN] ✅ Repuesto guardado: {nombre} (${precio})"
-                            )
+                            print(f"[DEBUG EDICIÓN] ✅ Repuesto guardado: {nombre} (${precio})")
                         elif tipo == "servicio" and nombre and precio > 0:
                             LineaServicio.objects.create(
                                 documento=documento,
@@ -919,9 +882,7 @@ def editar_documento(request, documento_id):
                                 cantidad=int(item.get("cantidad", 1)),
                                 descuento=float(item.get("descuento", 0)),
                             )
-                            print(
-                                f"[DEBUG EDICIÓN] ✅ Servicio guardado: {nombre} (${precio})"
-                            )
+                            print(f"[DEBUG EDICIÓN] ✅ Servicio guardado: {nombre} (${precio})")
                         elif tipo == "otro_servicio" and nombre and precio > 0:
                             # Buscar o crear el servicio en el catálogo por nombre localizado
                             from taller.servicios.models import Servicio, ServicioName
@@ -969,9 +930,7 @@ def editar_documento(request, documento_id):
 
                     traceback.print_exc()
             else:
-                print(
-                    "[DEBUG EDICIÓN] json_items es None o vacío - no se recibieron items"
-                )
+                print("[DEBUG EDICIÓN] json_items es None o vacío - no se recibieron items")
             return redirect("documentos:editar_documento", documento_id=documento.id)
         else:
             print(f"[DEBUG EDICIÓN] Formulario inválido: {form.errors}")
@@ -986,14 +945,10 @@ def editar_documento(request, documento_id):
     print(f"[DEBUG EDITAR] Servicios encontrados: {servicios.count()}")
     for serv in servicios:
         precio_serv = getattr(serv, "precio_unitario", getattr(serv, "precio", 0))
-        print(
-            f"[DEBUG EDITAR]   - {getattr(serv, 'nombre', 'Servicio')}: ${precio_serv}"
-        )
+        print(f"[DEBUG EDITAR]   - {getattr(serv, 'nombre', 'Servicio')}: ${precio_serv}")
     print(f"[DEBUG EDITAR] Otros servicios encontrados: {otros_servicios.count()}")
     for otro in otros_servicios:
-        nombre_otro = getattr(
-            otro, "nombre", getattr(otro, "nombre_servicio", "Otro servicio")
-        )
+        nombre_otro = getattr(otro, "nombre", getattr(otro, "nombre_servicio", "Otro servicio"))
         precio_otro = getattr(otro, "precio_cliente", getattr(otro, "precio", 0))
         print(
             f"[DEBUG EDITAR]   - {nombre_otro} ({getattr(otro, 'empresa_externa', '')}): ${precio_otro}"
@@ -1048,9 +1003,7 @@ def editar_documento(request, documento_id):
             "mecanicos": mecanicos,
             "tecnicos": mecanicos,  # Alias para compatibilidad con templates
             "es_edicion": bool(documento.pk),
-            "company_country": getattr(
-                request, "company_country", None
-            ),  # viene del middleware
+            "company_country": getattr(request, "company_country", None),  # viene del middleware
         },
     )
 
@@ -1149,15 +1102,9 @@ def exportar_documento_pdf(request, documento_id):
     doc = get_object_or_404(Documento, id=documento_id)
 
     # Calcular totales
-    total_repuestos = sum(
-        r.precio_unitario * r.cantidad for r in doc.lineas_repuesto.all()
-    )
-    total_servicios = sum(
-        s.precio_unitario * s.cantidad for s in doc.lineas_servicio.all()
-    )
-    total_otros_servicios = sum(
-        os.precio_cliente for os in doc.lineas_otro_servicio.all()
-    )
+    total_repuestos = sum(r.precio_unitario * r.cantidad for r in doc.lineas_repuesto.all())
+    total_servicios = sum(s.precio_unitario * s.cantidad for s in doc.lineas_servicio.all())
+    total_otros_servicios = sum(os.precio_cliente for os in doc.lineas_otro_servicio.all())
 
     subtotal = total_repuestos + total_servicios + total_otros_servicios
     # Forzar IVA al 19% para Chile
@@ -1236,6 +1183,16 @@ def exportar_documento_pdf(request, documento_id):
     html = template.render(context)
 
     response = HttpResponse(content_type="application/pdf")
+    # Importar xhtml2pdf de forma perezosa y manejar errores de importación
+    try:
+        from xhtml2pdf import pisa
+    except Exception as e:
+        # No queremos que la app no arranque si faltan dependencias opcionales.
+        # Responder de forma informativa cuando se intente generar el PDF.
+        err_msg = f"PDF generation not available (xhtml2pdf import failed): {e}"
+        print(err_msg)
+        return HttpResponse(err_msg, status=500, content_type="text/plain")
+
     pisa.CreatePDF(html, dest=response)
     return response
 
@@ -1246,6 +1203,14 @@ def enviar_por_whatsapp(request, documento_id):
     # Renderizar PDF y guardar archivo
     template = get_template("taller/documentos/documento_pdf.html")
     html_string = template.render({"documento": documento})
+    # Importar weasyprint de forma perezosa (evita fallos en startup si no está instalado)
+    try:
+        from weasyprint import HTML
+    except Exception as e:
+        err_msg = f"PDF generation not available (weasyprint import failed): {e}"
+        print(err_msg)
+        return HttpResponse(err_msg, status=500, content_type="text/plain")
+
     pdf = HTML(string=html_string, base_url=request.build_absolute_uri()).write_pdf()
 
     # Guardar el archivo en /media/pdfs/
@@ -1278,9 +1243,7 @@ def enviar_documento_whatsapp(request, documento_id):
     try:
         documento = Documento.objects.get(id=documento_id, empresa=request.user.empresa)
     except Documento.DoesNotExist:
-        return JsonResponse(
-            {"success": False, "error": "Documento no encontrado"}, status=404
-        )
+        return JsonResponse({"success": False, "error": "Documento no encontrado"}, status=404)
 
     # Verificar que el cliente tenga teléfono
     if not documento.cliente.telefono:
@@ -1329,7 +1292,9 @@ Para ver el documento completo, visite:
 ¡Gracias por confiar en nuestros servicios!"""
 
     # Crear URL de WhatsApp
-    url_whatsapp = f"https://wa.me/{telefono}?text={mensaje.replace(' ', '%20').replace('\n', '%0A')}"
+    url_whatsapp = (
+        f"https://wa.me/{telefono}?text={mensaje.replace(' ', '%20').replace('\n', '%0A')}"
+    )
 
     return JsonResponse(
         {

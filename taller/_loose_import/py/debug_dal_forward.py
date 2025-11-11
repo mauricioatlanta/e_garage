@@ -46,9 +46,7 @@ def debug_dal_forward():
     empresa = empresas.first()
 
     print(f"👤 Usando usuario: {user.username}")
-    print(
-        f"🏢 Usando empresa: {empresa.nombre_taller} (país: {getattr(empresa, 'pais', 'CL')})"
-    )
+    print(f"🏢 Usando empresa: {empresa.nombre_taller} (país: {getattr(empresa, 'pais', 'CL')})")
 
     # 3. Crear cliente de prueba si no existe
     cliente, created = Cliente.objects.get_or_create(
@@ -64,9 +62,7 @@ def debug_dal_forward():
         from taller.models.marca import Marca
         from taller.models.modelo import Modelo
 
-        marca, _ = Marca.objects.get_or_create(
-            nombre="Toyota", country=empresa.pais or "CL"
-        )
+        marca, _ = Marca.objects.get_or_create(nombre="Toyota", country=empresa.pais or "CL")
 
         modelo, _ = Modelo.objects.get_or_create(
             nombre="Corolla", marca=marca, country=empresa.pais or "CL"

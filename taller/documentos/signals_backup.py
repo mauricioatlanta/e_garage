@@ -27,6 +27,4 @@ def recalc_on_line_change(sender, instance, **kwargs):
         doc.total = (
             doc.neto_repuestos + doc.neto_servicios - doc.descuento + doc.tax_amount
         ).quantize(Decimal("0.01"))
-        doc.save(
-            update_fields=["neto_repuestos", "neto_servicios", "tax_amount", "total"]
-        )
+        doc.save(update_fields=["neto_repuestos", "neto_servicios", "tax_amount", "total"])

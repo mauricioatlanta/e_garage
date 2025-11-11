@@ -47,14 +47,11 @@ def main():
             if campo in form.fields:
                 field = form.fields[campo]
                 es_oculto = (
-                    hasattr(field.widget, "input_type")
-                    and field.widget.input_type == "hidden"
+                    hasattr(field.widget, "input_type") and field.widget.input_type == "hidden"
                 )
                 widget_type = field.widget.__class__.__name__
 
-                print(
-                    f"  Campo '{campo}': {widget_type} - {'OCULTO' if es_oculto else 'VISIBLE'}"
-                )
+                print(f"  Campo '{campo}': {widget_type} - {'OCULTO' if es_oculto else 'VISIBLE'}")
 
                 if campo == "region" and not es_oculto:
                     # Verificar que tiene opciones

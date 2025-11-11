@@ -7,9 +7,7 @@ from taller.viewsautocomplete.views import eliminar_vehiculo  # legacy
 
 urlpatterns = [
     # Mantiene cliente_id por compatibilidad; la vista acepta cliente_id o pk
-    path(
-        "clientes/eliminar/<int:cliente_id>/", eliminar_cliente, name="eliminar_cliente"
-    ),
+    path("clientes/eliminar/<int:cliente_id>/", eliminar_cliente, name="eliminar_cliente"),
     path(
         "vehiculos/eliminar/<int:vehiculo_id>/",
         eliminar_vehiculo,

@@ -149,12 +149,8 @@ urlpatterns = [
         name="documentos_redirect_root",
     ),
     # Redirecciones de compatibilidad para URLs antiguas con patrón duplicado
-    path(
-        "cl/documentos/cl/", RedirectView.as_view(url="/cl/documentos/", permanent=True)
-    ),
-    path(
-        "us/documentos/us/", RedirectView.as_view(url="/us/documentos/", permanent=True)
-    ),
+    path("cl/documentos/cl/", RedirectView.as_view(url="/cl/documentos/", permanent=True)),
+    path("us/documentos/us/", RedirectView.as_view(url="/us/documentos/", permanent=True)),
     # URLs con prefijo de país específico - EVITAR GRUPOS REGEX DUPLICADOS
     path(
         "cl/documentos/",

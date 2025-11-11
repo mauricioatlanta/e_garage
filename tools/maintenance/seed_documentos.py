@@ -161,9 +161,7 @@ def seed_documentos():
         pref = {"OT": "OT", "FAC": "F", "PRES": "P"}.get(tipo, "D")
         return f"{pref}{n:03d}", n
 
-    def crear_doc(
-        cliente, vehiculo, tipo="FAC", rep_lines=None, serv_lines=None, km=10000
-    ):
+    def crear_doc(cliente, vehiculo, tipo="FAC", rep_lines=None, serv_lines=None, km=10000):
         numero, correl = next_num(emp, tipo)
         doc = Documento.objects.create(
             empresa=emp,
@@ -256,11 +254,7 @@ def seed_documentos():
             km=8000,
         )
     )
-    docs.append(
-        crear_doc(
-            c1, v1, "PRES", rep_lines=[("r004", 1, 32000)], serv_lines=[], km=16000
-        )
-    )
+    docs.append(crear_doc(c1, v1, "PRES", rep_lines=[("r004", 1, 32000)], serv_lines=[], km=16000))
     docs.append(
         crear_doc(
             c2,

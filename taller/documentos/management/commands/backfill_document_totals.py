@@ -21,13 +21,9 @@ class Command(BaseCommand):
         count = 0
         updated = 0
 
-        self.stdout.write(
-            self.style.SUCCESS("🔄 Iniciando recálculo de totales de documentos...")
-        )
+        self.stdout.write(self.style.SUCCESS("🔄 Iniciando recálculo de totales de documentos..."))
         if dry_run:
-            self.stdout.write(
-                self.style.WARNING("⚠️  MODO DRY-RUN - No se harán cambios")
-            )
+            self.stdout.write(self.style.WARNING("⚠️  MODO DRY-RUN - No se harán cambios"))
 
         for doc in Documento.objects.all().prefetch_related(
             "lineas_repuesto", "lineas_servicio", "lineas_otro_servicio"
@@ -58,11 +54,7 @@ class Command(BaseCommand):
             # Para US sería sobre el subtotal total, pero por simplicidad mantenemos CL
             tax_rate = Decimal("0.19") if doc.country == "CL" else Decimal("0.08")
             base_tax = sum_rep if doc.country == "CL" else subtotal
-            iva = (
-                base_tax * tax_rate
-                if getattr(doc, "incluir_iva", True)
-                else Decimal("0.00")
-            )
+            iva = base_tax * tax_rate if getattr(doc, "incluir_iva", True) else Decimal("0.00")
             total = subtotal + iva
 
             # Verificar si necesita actualización

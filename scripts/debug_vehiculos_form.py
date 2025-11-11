@@ -65,9 +65,7 @@ def debug_vehiculos_form():
     # Crear formulario como lo hace la vista
     form = DocumentoForm(user=user)
     vehiculo_queryset = form.fields["vehiculo"].queryset
-    print(
-        f"Queryset de vehículos en el formulario: {vehiculo_queryset.count()} elementos"
-    )
+    print(f"Queryset de vehículos en el formulario: {vehiculo_queryset.count()} elementos")
 
     for vehiculo in vehiculo_queryset:
         print(f"  - {vehiculo.patente} - {vehiculo.marca} {vehiculo.modelo}")
@@ -81,15 +79,11 @@ def debug_vehiculos_form():
     print(f"SQL Query: {manual_qs.query}")
 
     if vehiculo_queryset.count() == 0 and manual_qs.count() > 0:
-        print(
-            "🚨 PROBLEMA: El formulario no está obteniendo los vehículos correctamente"
-        )
+        print("🚨 PROBLEMA: El formulario no está obteniendo los vehículos correctamente")
     elif vehiculo_queryset.count() == manual_qs.count():
         print("✅ El formulario obtiene los vehículos correctamente")
     else:
-        print(
-            f"⚠️ Diferencia: Formulario {vehiculo_queryset.count()} vs Manual {manual_qs.count()}"
-        )
+        print(f"⚠️ Diferencia: Formulario {vehiculo_queryset.count()} vs Manual {manual_qs.count()}")
 
 
 if __name__ == "__main__":

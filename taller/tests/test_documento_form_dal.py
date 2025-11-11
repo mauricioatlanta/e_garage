@@ -16,9 +16,7 @@ from taller.models.vehiculos import Vehiculo
 @pytest.mark.django_db
 def user_cl(db):
     u = User.objects.create_user(username="mauri", password="pass")
-    Empresa.objects.create(
-        user=u, nombre_taller="EG Chile", pais="CL"
-    )  # moneda CLP por save()
+    Empresa.objects.create(user=u, nombre_taller="EG Chile", pais="CL")  # moneda CLP por save()
     return u
 
 
@@ -26,9 +24,7 @@ def user_cl(db):
 @pytest.mark.django_db
 def user_us(db):
     u = User.objects.create_user(username="john", password="pass")
-    Empresa.objects.create(
-        user=u, nombre_taller="EG USA", pais="US"
-    )  # moneda USD por save()
+    Empresa.objects.create(user=u, nombre_taller="EG USA", pais="US")  # moneda USD por save()
     return u
 
 
@@ -39,23 +35,15 @@ def cliente_y_vehiculos(user_cl):
     c1 = Cliente.objects.create(empresa=emp, nombre="Acme Ltda.")
     c2 = Cliente.objects.create(empresa=emp, nombre="Otro Cliente")
 
-    v1 = Vehiculo.objects.create(
-        empresa=emp, cliente=c1, patente="AAA11", vin="VIN-111", anio=2020
-    )
-    v2 = Vehiculo.objects.create(
-        empresa=emp, cliente=c1, patente="BBB22", vin="VIN-222", anio=2021
-    )
-    v3 = Vehiculo.objects.create(
-        empresa=emp, cliente=c2, patente="CCC33", vin="VIN-333", anio=2022
-    )
+    v1 = Vehiculo.objects.create(empresa=emp, cliente=c1, patente="AAA11", vin="VIN-111", anio=2020)
+    v2 = Vehiculo.objects.create(empresa=emp, cliente=c1, patente="BBB22", vin="VIN-222", anio=2021)
+    v3 = Vehiculo.objects.create(empresa=emp, cliente=c2, patente="CCC33", vin="VIN-333", anio=2022)
     return c1, c2, v1, v2, v3
 
 
 # ---------- Tests del Form ----------
 @pytest.mark.django_db
-def test_form_filtra_vehiculos_por_cliente_en_post(
-    client, user_cl, cliente_y_vehiculos
-):
+def test_form_filtra_vehiculos_por_cliente_en_post(client, user_cl, cliente_y_vehiculos):
     c1, c2, v1, v2, v3 = cliente_y_vehiculos
     client.login(username="mauri", password="pass")
 
@@ -75,18 +63,13 @@ def test_form_filtra_vehiculos_por_cliente_en_post(
 
     # Ahora intenta usar vehículo de OTRO cliente
     data["vehiculo"] = str(v3.id)  # v3 pertenece a c2
-    form2 = DocumentoForm(
-        data=data, user=user_cl, empresa=user_cl.empresa, country="CL"
-    )
+    form2 = DocumentoForm(data=data, user=user_cl, empresa=user_cl.empresa, country="CL")
     assert not form2.is_valid()
     # Verificar que hay errores de validación
     assert form2.errors
     # El error puede estar en __all__ o en el campo específico
     if "__all__" in form2.errors:
-        assert (
-            "El vehículo seleccionado no pertenece al cliente."
-            in form2.errors["__all__"][0]
-        )
+        assert "El vehículo seleccionado no pertenece al cliente." in form2.errors["__all__"][0]
     else:
         # Si no está en __all__, debe estar en el campo vehiculo
         assert "vehiculo" in form2.errors
@@ -193,9 +176,7 @@ def test_cliente_autocomplete_filtra_por_empresa(client, user_cl):
 
 
 @pytest.mark.django_db
-def test_vehiculo_autocomplete_filtra_por_cliente_forward(
-    client, user_cl, cliente_y_vehiculos
-):
+def test_vehiculo_autocomplete_filtra_por_cliente_forward(client, user_cl, cliente_y_vehiculos):
     client.login(username="mauri", password="pass")
     c1, c2, v1, v2, v3 = cliente_y_vehiculos
 
@@ -236,10 +217,7 @@ def test_form_widget_ids_set_correctly(client, user_cl):
     assert form.fields["fecha_emision"].widget.attrs.get("id") == "id_fecha_emision"
     assert form.fields["cliente"].widget.attrs.get("id") == "id_cliente"
     assert form.fields["vehiculo"].widget.attrs.get("id") == "id_vehiculo"
-    assert (
-        form.fields["tecnico_responsable"].widget.attrs.get("id")
-        == "id_tecnico_responsable"
-    )
+    assert form.fields["tecnico_responsable"].widget.attrs.get("id") == "id_tecnico_responsable"
     assert form.fields["kilometraje"].widget.attrs.get("id") == "id_kilometraje"
     assert form.fields["observaciones"].widget.attrs.get("id") == "id_observaciones"
     assert form.fields["pagado"].widget.attrs.get("id") == "id_pagado"

@@ -21,9 +21,7 @@ from django.db import connection
 
 from taller.models import Documento, Empresa, LogAuditoria
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -161,9 +159,7 @@ class MonitoringSetup:
             "checks": checks,
             "problemas": problemas,
             "status": (
-                "healthy"
-                if health_score >= 90
-                else "warning" if health_score >= 70 else "critical"
+                "healthy" if health_score >= 90 else "warning" if health_score >= 70 else "critical"
             ),
         }
 
@@ -192,29 +188,19 @@ class MonitoringSetup:
                 },
                 "documentos": {
                     "total": Documento.objects.count(),
-                    "creados_7d": Documento.objects.filter(
-                        created_at__gte=hace_7_dias
-                    ).count(),
-                    "creados_24h": Documento.objects.filter(
-                        created_at__gte=hace_24h
-                    ).count(),
+                    "creados_7d": Documento.objects.filter(created_at__gte=hace_7_dias).count(),
+                    "creados_24h": Documento.objects.filter(created_at__gte=hace_24h).count(),
                 },
                 "auditoria": {
                     "total_eventos": LogAuditoria.objects.count(),
-                    "eventos_7d": LogAuditoria.objects.filter(
-                        timestamp__gte=hace_7_dias
-                    ).count(),
-                    "eventos_24h": LogAuditoria.objects.filter(
-                        timestamp__gte=hace_24h
-                    ).count(),
+                    "eventos_7d": LogAuditoria.objects.filter(timestamp__gte=hace_7_dias).count(),
+                    "eventos_24h": LogAuditoria.objects.filter(timestamp__gte=hace_24h).count(),
                 },
             }
 
             # Calcular empresas activas (con logs en los últimos 7 días)
             empresas_activas = (
-                LogAuditoria.objects.filter(
-                    timestamp__gte=hace_7_dias, empresa__isnull=False
-                )
+                LogAuditoria.objects.filter(timestamp__gte=hace_7_dias, empresa__isnull=False)
                 .values("empresa")
                 .distinct()
                 .count()
@@ -224,9 +210,7 @@ class MonitoringSetup:
 
             # Calcular usuarios activos
             usuarios_activos = (
-                LogAuditoria.objects.filter(
-                    timestamp__gte=hace_7_dias, usuario__isnull=False
-                )
+                LogAuditoria.objects.filter(timestamp__gte=hace_7_dias, usuario__isnull=False)
                 .values("usuario")
                 .distinct()
                 .count()
@@ -271,9 +255,7 @@ class MonitoringSetup:
             # Verificar antigüedad
             import time
 
-            antiguedad_horas = (
-                time.time() - backup_mas_reciente.stat().st_mtime
-            ) / 3600
+            antiguedad_horas = (time.time() - backup_mas_reciente.stat().st_mtime) / 3600
 
             status = {
                 "backup_mas_reciente": backup_mas_reciente.name,
@@ -302,25 +284,17 @@ class MonitoringSetup:
 
         # 1. Verificar salud del sistema
         salud = self.verificar_salud_sistema()
-        logger.info(
-            f"Salud del sistema: {salud['health_score']:.1f}% ({salud['status']})"
-        )
+        logger.info(f"Salud del sistema: {salud['health_score']:.1f}% ({salud['status']})")
 
         # 2. Verificar backups
         backup_status = self.verificar_backups()
-        logger.info(
-            f"Estado backups: {backup_status['status']} - {backup_status['mensaje']}"
-        )
+        logger.info(f"Estado backups: {backup_status['status']} - {backup_status['mensaje']}")
 
         # 3. Generar reporte de uso
         reporte_uso = self.generar_reporte_uso()
         if reporte_uso:
-            logger.info(
-                f"Documentos últimas 24h: {reporte_uso['documentos']['creados_24h']}"
-            )
-            logger.info(
-                f"Usuarios activos (7d): {reporte_uso['usuarios']['activos_7d']}"
-            )
+            logger.info(f"Documentos últimas 24h: {reporte_uso['documentos']['creados_24h']}")
+            logger.info(f"Usuarios activos (7d): {reporte_uso['usuarios']['activos_7d']}")
 
         # 4. Enviar alertas si es necesario
         alertas_enviadas = 0
@@ -375,9 +349,7 @@ class MonitoringSetup:
         except Exception as e:
             logger.error(f"Error guardando reportes: {e}")
 
-        logger.info(
-            f"=== MONITOREO COMPLETADO - Alertas enviadas: {alertas_enviadas} ==="
-        )
+        logger.info(f"=== MONITOREO COMPLETADO - Alertas enviadas: {alertas_enviadas} ===")
 
         return {
             "salud": salud,

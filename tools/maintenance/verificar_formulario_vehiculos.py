@@ -40,9 +40,7 @@ def main():
         print(f"   📡 GET /taller/ajax/load-modelos/?marca_id={marca_test.id}")
         print(f"   📦 Respuesta: {modelos_toyota.count()} modelos encontrados")
         if modelos_toyota.exists():
-            ejemplo_json = [
-                {"id": m.id, "nombre": m.nombre} for m in modelos_toyota[:3]
-            ]
+            ejemplo_json = [{"id": m.id, "nombre": m.nombre} for m in modelos_toyota[:3]]
             print(f"   📄 JSON ejemplo: {ejemplo_json}")
 
     print("\n🎉 ESTADO FINAL:")

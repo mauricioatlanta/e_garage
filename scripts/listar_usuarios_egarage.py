@@ -17,9 +17,7 @@ User = get_user_model()
 
 print("\nUSUARIOS REGISTRADOS EN E-GARAGE\n")
 print(
-    "{:<15} {:<30} {:<10} {:<10} {:<10}".format(
-        "Username", "Email", "Activo", "Staff", "Superuser"
-    )
+    "{:<15} {:<30} {:<10} {:<10} {:<10}".format("Username", "Email", "Activo", "Staff", "Superuser")
 )
 print("-" * 80)
 for user in User.objects.all():

@@ -73,18 +73,16 @@ class MotorDiagnosticoIA:
 
         # Agrupar por servicio y mes
         servicios_mes = (
-            df.groupby(["servicio", df["fecha"].dt.to_period("M")])["total"]
-            .sum()
-            .reset_index()
+            df.groupby(["servicio", df["fecha"].dt.to_period("M")])["total"].sum().reset_index()
         )
         servicios_mes["fecha"] = servicios_mes["fecha"].dt.to_timestamp()
 
         servicios_crecimiento = []
 
         for servicio in df["servicio"].unique():
-            data_servicio = servicios_mes[
-                servicios_mes["servicio"] == servicio
-            ].sort_values("fecha")
+            data_servicio = servicios_mes[servicios_mes["servicio"] == servicio].sort_values(
+                "fecha"
+            )
 
             if len(data_servicio) >= 3:
                 # Calcular tendencia de últimos 3 meses
@@ -98,18 +96,14 @@ class MotorDiagnosticoIA:
                                 "servicio": servicio,
                                 "crecimiento": round(crecimiento, 1),
                                 "ingresos_ultimo_mes": round(ultimos_3[-1], 0),
-                                "prediccion": round(
-                                    ultimos_3[-1] * (1 + crecimiento / 100), 0
-                                ),
+                                "prediccion": round(ultimos_3[-1] * (1 + crecimiento / 100), 0),
                                 "recomendacion": self._generar_recomendacion_crecimiento(
                                     servicio, crecimiento
                                 ),
                             }
                         )
 
-        return sorted(
-            servicios_crecimiento, key=lambda x: x["crecimiento"], reverse=True
-        )[:5]
+        return sorted(servicios_crecimiento, key=lambda x: x["crecimiento"], reverse=True)[:5]
 
     def _detectar_servicios_declive(self, df):
         """Detecta servicios en declive que podrían eliminarse"""
@@ -117,18 +111,16 @@ class MotorDiagnosticoIA:
             return []
 
         servicios_mes = (
-            df.groupby(["servicio", df["fecha"].dt.to_period("M")])["total"]
-            .sum()
-            .reset_index()
+            df.groupby(["servicio", df["fecha"].dt.to_period("M")])["total"].sum().reset_index()
         )
         servicios_mes["fecha"] = servicios_mes["fecha"].dt.to_timestamp()
 
         servicios_declive = []
 
         for servicio in df["servicio"].unique():
-            data_servicio = servicios_mes[
-                servicios_mes["servicio"] == servicio
-            ].sort_values("fecha")
+            data_servicio = servicios_mes[servicios_mes["servicio"] == servicio].sort_values(
+                "fecha"
+            )
 
             if len(data_servicio) >= 3:
                 ultimos_3 = data_servicio.tail(3)["total"].values
@@ -140,9 +132,7 @@ class MotorDiagnosticoIA:
                             {
                                 "servicio": servicio,
                                 "declive": round(abs(declive), 1),
-                                "ingresos_perdidos": round(
-                                    ultimos_3[0] - ultimos_3[-1], 0
-                                ),
+                                "ingresos_perdidos": round(ultimos_3[0] - ultimos_3[-1], 0),
                                 "accion_recomendada": self._generar_accion_declive(
                                     servicio, declive
                                 ),
@@ -174,16 +164,12 @@ class MotorDiagnosticoIA:
 
         estacionalidad["estacion"] = estacionalidad["mes"].apply(obtener_estacion)
         estacional_por_servicio = (
-            estacionalidad.groupby(["servicio", "estacion"])["total"]
-            .sum()
-            .reset_index()
+            estacionalidad.groupby(["servicio", "estacion"])["total"].sum().reset_index()
         )
 
         resultados = []
         for servicio in df["servicio"].unique()[:6]:
-            data_servicio = estacional_por_servicio[
-                estacional_por_servicio["servicio"] == servicio
-            ]
+            data_servicio = estacional_por_servicio[estacional_por_servicio["servicio"] == servicio]
             if not data_servicio.empty:
                 mejor_estacion = data_servicio.loc[data_servicio["total"].idxmax()]
                 resultados.append(

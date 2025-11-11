@@ -40,9 +40,7 @@ if marcas_chile.exists():
     print(f"Modelos encontrados: {modelos_api.count()}")
 
     # Simular respuesta JSON
-    response_data = [
-        {"id": modelo.id, "nombre": modelo.nombre} for modelo in modelos_api
-    ]
+    response_data = [{"id": modelo.id, "nombre": modelo.nombre} for modelo in modelos_api]
 
     print("Respuesta JSON simulada:")
     import json

@@ -361,9 +361,7 @@ class Command(BaseCommand):
             ],
         }
 
-        self.stdout.write(
-            self.style.SUCCESS("🇨🇱 Cargando marcas y modelos para Chile...")
-        )
+        self.stdout.write(self.style.SUCCESS("🇨🇱 Cargando marcas y modelos para Chile..."))
 
         total_marcas = 0
         total_modelos = 0
@@ -390,14 +388,10 @@ class Command(BaseCommand):
             # Crear los nuevos modelos
             for modelo_nombre in modelos_lista:
                 try:
-                    Modelo.objects.create(
-                        nombre=modelo_nombre, marca=marca, country="CL"
-                    )
+                    Modelo.objects.create(nombre=modelo_nombre, marca=marca, country="CL")
                     self.stdout.write(f"   ✅ {modelo_nombre}")
                 except Exception as e:
-                    self.stdout.write(
-                        self.style.ERROR(f"   ❌ Error creando {modelo_nombre}: {e}")
-                    )
+                    self.stdout.write(self.style.ERROR(f"   ❌ Error creando {modelo_nombre}: {e}"))
 
             total_marcas += 1
             total_modelos += len(modelos_lista)

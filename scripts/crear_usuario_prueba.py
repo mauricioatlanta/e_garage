@@ -44,9 +44,7 @@ def crear_y_probar():
         # Probar la API
         client = Client()
         client.force_login(user)
-        response = client.get(
-            f"/cl/documentos/api/vehiculos-cliente/?cliente_id={cliente.id}"
-        )
+        response = client.get(f"/cl/documentos/api/vehiculos-cliente/?cliente_id={cliente.id}")
         print(f"✅ API Status: {response.status_code}")
 
         if response.status_code == 200:

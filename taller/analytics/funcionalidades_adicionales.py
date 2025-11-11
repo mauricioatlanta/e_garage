@@ -69,16 +69,12 @@ def predictive_indicators_api(request):
     conversion_rate = 0.25  # 25% de trials se convierten
     valor_promedio_suscripcion = 25000  # CLP
 
-    ingresos_predichos = (
-        prediccion_siguiente_mes * conversion_rate * valor_promedio_suscripcion
-    )
+    ingresos_predichos = prediccion_siguiente_mes * conversion_rate * valor_promedio_suscripcion
 
     data = {
         "prediccion_suscriptores": round(prediccion_siguiente_mes),
         "tendencia": (
-            "crecimiento"
-            if tendencia > 0
-            else "decrecimiento" if tendencia < 0 else "estable"
+            "crecimiento" if tendencia > 0 else "decrecimiento" if tendencia < 0 else "estable"
         ),
         "porcentaje_crecimiento": round(porcentaje_crecimiento, 1),
         "ingresos_predichos": round(ingresos_predichos),
@@ -117,9 +113,7 @@ def geographic_map_api(request):
 
     # Datos detallados por zona horaria (aproximación de ubicación)
     zonas_data = (
-        Empresa.objects.values("zona_horaria")
-        .annotate(total=Count("id"))
-        .order_by("-total")
+        Empresa.objects.values("zona_horaria").annotate(total=Count("id")).order_by("-total")
     )
 
     # Mapear zonas horarias a coordenadas aproximadas
@@ -193,8 +187,7 @@ def alertas_expiracion_api(request):
     # Trials próximos a expirar
     trials_proximos = TrialRegistro.objects.filter(
         prueba_activa=True,
-        fecha_activacion__lte=timezone.now()
-        - timedelta(days=25),  # Activos hace más de 25 días
+        fecha_activacion__lte=timezone.now() - timedelta(days=25),  # Activos hace más de 25 días
     )
 
     alertas = []
@@ -369,9 +362,7 @@ def user_behavior_api(request):
 
     # Usuarios activos (login en últimos 30 días)
     hace_30_dias = timezone.now() - timedelta(days=30)
-    usuarios_activos = Empresa.objects.filter(
-        user__last_login__gte=hace_30_dias
-    ).count()
+    usuarios_activos = Empresa.objects.filter(user__last_login__gte=hace_30_dias).count()
 
     # Usuarios inactivos (sin login en 30 días)
     usuarios_inactivos = Empresa.objects.filter(
@@ -380,9 +371,9 @@ def user_behavior_api(request):
 
     # Estadísticas de login por día de la semana
     logins_por_dia = defaultdict(int)
-    empresas_con_login = Empresa.objects.filter(
-        user__last_login__isnull=False
-    ).select_related("user")
+    empresas_con_login = Empresa.objects.filter(user__last_login__isnull=False).select_related(
+        "user"
+    )
 
     for empresa in empresas_con_login:
         dia_semana = empresa.user.last_login.strftime("%A")
@@ -432,8 +423,7 @@ def user_behavior_api(request):
             "usuarios_activos": usuarios_activos,
             "usuarios_inactivos": usuarios_inactivos,
             "tasa_actividad": round(
-                (usuarios_activos / max(usuarios_activos + usuarios_inactivos, 1))
-                * 100,
+                (usuarios_activos / max(usuarios_activos + usuarios_inactivos, 1)) * 100,
                 1,
             ),
         },
@@ -442,8 +432,7 @@ def user_behavior_api(request):
         "usuarios_problematicos": problematicos,
         "metricas": {
             "promedio_dias_desde_login": round(
-                sum(u["dias_desde_login"] for u in top_activos)
-                / max(len(top_activos), 1),
+                sum(u["dias_desde_login"] for u in top_activos) / max(len(top_activos), 1),
                 1,
             ),
             "usuarios_login_hoy": Empresa.objects.filter(
@@ -480,9 +469,7 @@ def real_time_metrics_api(request):
 
     # Métricas de la hora actual
     hace_1_hora = ahora - timedelta(hours=1)
-    actividad_ultima_hora = Empresa.objects.filter(
-        user__last_login__gte=hace_1_hora
-    ).count()
+    actividad_ultima_hora = Empresa.objects.filter(user__last_login__gte=hace_1_hora).count()
 
     # Estado general del sistema
     total_empresas = Empresa.objects.count()
@@ -506,25 +493,17 @@ def real_time_metrics_api(request):
         "estado_sistema": {
             "total_empresas": total_empresas,
             "empresas_activas": empresas_activas,
-            "tasa_actividad": round(
-                (empresas_activas / max(total_empresas, 1)) * 100, 1
-            ),
+            "tasa_actividad": round((empresas_activas / max(total_empresas, 1)) * 100, 1),
             "salud_sistema": (
                 "excelente"
                 if empresas_activas / max(total_empresas, 1) > 0.8
-                else (
-                    "buena"
-                    if empresas_activas / max(total_empresas, 1) > 0.6
-                    else "regular"
-                )
+                else ("buena" if empresas_activas / max(total_empresas, 1) > 0.6 else "regular")
             ),
         },
         "tendencias_inmediatas": {
             "crecimiento_diario": nuevos_hoy,
             "conversion_trials": (
-                round((nuevos_hoy / max(trials_hoy, 1)) * 100, 1)
-                if trials_hoy > 0
-                else 0
+                round((nuevos_hoy / max(trials_hoy, 1)) * 100, 1) if trials_hoy > 0 else 0
             ),
             "actividad_promedio": actividad_ultima_hora,
         },

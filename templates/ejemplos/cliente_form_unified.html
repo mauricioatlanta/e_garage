@@ -1,0 +1,296 @@
+{% extends "base.html" %}
+{% load static i18n %}
+
+{% block title %}{% trans "Create Client" %} - eGarage{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-10">
+      
+      <h2 class="mb-4">
+        <i class="fas fa-user-plus"></i>
+        {% trans "New Client" %}
+      </h2>
+      
+      <form method="post" id="customer-form">
+        {% csrf_token %}
+        
+        <!-- Información Básica -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5>{% trans "Basic Information" %}</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  {{ form.nombre.label_tag }}
+                  {{ form.nombre }}
+                  {% if form.nombre.errors %}
+                    <div class="text-danger">{{ form.nombre.errors }}</div>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  {{ form.apellido.label_tag }}
+                  {{ form.apellido }}
+                  {% if form.apellido.errors %}
+                    <div class="text-danger">{{ form.apellido.errors }}</div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  {{ form.telefono.label_tag }}
+                  {{ form.telefono }}
+                  {% if form.telefono.errors %}
+                    <div class="text-danger">{{ form.telefono.errors }}</div>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  {{ form.email.label_tag }}
+                  {{ form.email }}
+                  {% if form.email.errors %}
+                    <div class="text-danger">{{ form.email.errors }}</div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Identificación Tributaria -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5>{% trans "Tax Identification" %}</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-4">
+                <div class="mb-3">
+                  {{ form.tax_id_type.label_tag }}
+                  {{ form.tax_id_type }}
+                  <small class="form-text text-muted">
+                    RUT/EIN/SSN/CPF/CNPJ/RUC/RIF
+                  </small>
+                </div>
+              </div>
+              <div class="col-md-8">
+                <div class="mb-3">
+                  {{ form.tax_id.label_tag }}
+                  {{ form.tax_id }}
+                  <small class="form-text text-muted" id="tax-id-hint">
+                    <!-- Hints dinámicos según tax_id_type -->
+                  </small>
+                  {% if form.tax_id.errors %}
+                    <div class="text-danger">{{ form.tax_id.errors }}</div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Dirección de Facturación -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5>{% trans "Billing Address" %}</h5>
+          </div>
+          <div class="card-body">
+            <!-- País / Estado / Ciudad -->
+            <div class="row">
+              <div class="col-md-4">
+                <div class="mb-3">
+                  {{ form.country.label_tag }}
+                  {{ form.country }}
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="id_state">{% trans "State/Department" %}</label>
+                  <select id="id_state" name="state" class="form-control" disabled>
+                    <option value="">--</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  {{ form.city.label_tag }}
+                  {{ form.city }}
+                </div>
+              </div>
+            </div>
+            
+            <!-- Dirección -->
+            <div class="row">
+              <div class="col-md-8">
+                <div class="mb-3">
+                  {{ form.line1.label_tag }}
+                  {{ form.line1 }}
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  {{ form.postal_code.label_tag }}
+                  {{ form.postal_code }}
+                </div>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-12">
+                <div class="mb-3">
+                  {{ form.line2.label_tag }}
+                  {{ form.line2 }}
+                </div>
+              </div>
+            </div>
+            
+            <!-- Info adicional: sales tax calculado -->
+            <div class="alert alert-info" id="address-info" style="display: none;">
+              <i class="fas fa-info-circle"></i>
+              <strong>{% trans "Tax Information:" %}</strong>
+              <span id="sales-tax-info"></span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Botones -->
+        <div class="d-flex justify-content-between">
+          <a href="{% url 'clientes:lista' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i>
+            {% trans "Cancel" %}
+          </a>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i>
+            {% trans "Save Client" %}
+          </button>
+        </div>
+        
+      </form>
+      
+    </div>
+  </div>
+</div>
+
+<!-- JavaScript para cascada Country → State → City -->
+<script type="module">
+  import { bindCountryStateCity, detectCountryFromPath } from "{% static 'js/locations.js' %}";
+  
+  // Bind automático de selectores
+  await bindCountryStateCity('#id_country', '#id_state', '#id_city', {
+    loadingText: '{% trans "Loading..." %}',
+    emptyText: '{% trans "Select..." %}',
+    debug: true
+  });
+  
+  // Auto-detectar país desde URL si no hay valor
+  const countrySelect = document.getElementById('id_country');
+  if (!countrySelect.value) {
+    const detectedCountry = detectCountryFromPath();
+    if (detectedCountry) {
+      countrySelect.value = detectedCountry;
+      countrySelect.dispatchEvent(new Event('change'));
+    }
+  }
+  
+  // Hints dinámicos para tax_id según tipo
+  const taxIdTypeSelect = document.getElementById('id_tax_id_type');
+  const taxIdInput = document.getElementById('id_tax_id');
+  const taxIdHint = document.getElementById('tax-id-hint');
+  
+  const TAX_ID_HINTS = {
+    'CL_RUT': '{% trans "Format: 12.345.678-9" %}',
+    'US_EIN': '{% trans "Format: 12-3456789" %}',
+    'US_SSN': '{% trans "Format: 123-45-6789" %}',
+    'BR_CPF': '{% trans "Format: 123.456.789-01" %}',
+    'BR_CNPJ': '{% trans "Format: 12.345.678/0001-90" %}',
+    'PE_RUC': '{% trans "Format: 20123456789" %}',
+    'VE_RIF': '{% trans "Format: J-12345678-9" %}',
+  };
+  
+  const TAX_ID_PLACEHOLDERS = {
+    'CL_RUT': '12.345.678-9',
+    'US_EIN': '12-3456789',
+    'US_SSN': '123-45-6789',
+    'BR_CPF': '123.456.789-01',
+    'BR_CNPJ': '12.345.678/0001-90',
+    'PE_RUC': '20123456789',
+    'VE_RIF': 'J-12345678-9',
+  };
+  
+  if (taxIdTypeSelect && taxIdInput && taxIdHint) {
+    taxIdTypeSelect.addEventListener('change', function() {
+      const type = this.value;
+      taxIdHint.textContent = TAX_ID_HINTS[type] || '';
+      taxIdInput.placeholder = TAX_ID_PLACEHOLDERS[type] || '';
+    });
+    
+    // Trigger inicial
+    taxIdTypeSelect.dispatchEvent(new Event('change'));
+  }
+  
+  // Mostrar sales tax cuando se selecciona ciudad
+  const citySelect = document.getElementById('id_city');
+  const addressInfo = document.getElementById('address-info');
+  const salesTaxInfo = document.getElementById('sales-tax-info');
+  
+  if (citySelect && addressInfo && salesTaxInfo) {
+    citySelect.addEventListener('change', async function() {
+      const cityId = this.value;
+      
+      if (cityId) {
+        try {
+          // Obtener info de la ciudad (incluye sales tax)
+          const response = await fetch(`/api/locations/cities/${cityId}/`);
+          const data = await response.json();
+          
+          if (data.cities && data.cities.length > 0) {
+            const cityData = data.cities[0];
+            
+            // Mostrar info de sales tax (si existe en el endpoint)
+            addressInfo.style.display = 'block';
+            salesTaxInfo.textContent = `${data.country} - ${data.state}`;
+          }
+        } catch (error) {
+          console.error('Error loading city info:', error);
+        }
+      } else {
+        addressInfo.style.display = 'none';
+      }
+    });
+  }
+</script>
+
+<style>
+  .card {
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-weight: 600;
+  }
+  
+  .card-header h5 {
+    margin: 0;
+    font-size: 1.1rem;
+  }
+  
+  .form-control:disabled {
+    background-color: #e9ecef;
+    cursor: not-allowed;
+  }
+</style>
+{% endblock %}
+

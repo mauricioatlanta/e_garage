@@ -12,9 +12,7 @@ class Command(BaseCommand):
     help = "Imprime empresa y país de un usuario"
 
     def add_arguments(self, parser):
-        parser.add_argument(
-            "--username", required=True, help="Nombre de usuario a verificar"
-        )
+        parser.add_argument("--username", required=True, help="Nombre de usuario a verificar")
 
     def handle(self, *args, **opts):
         User = get_user_model()
@@ -22,9 +20,7 @@ class Command(BaseCommand):
         try:
             user = User.objects.get(username=opts["username"])
         except User.DoesNotExist:
-            self.stdout.write(
-                self.style.ERROR(f"Usuario '{opts['username']}' no existe")
-            )
+            self.stdout.write(self.style.ERROR(f"Usuario '{opts['username']}' no existe"))
             return
 
         try:
@@ -46,15 +42,11 @@ class Command(BaseCommand):
         self.stdout.write(f"🌍 País: {getattr(empresa, 'pais', 'None')}")
 
         if empresa:
-            self.stdout.write(
-                self.style.SUCCESS("✅ Usuario tiene empresa configurada")
-            )
+            self.stdout.write(self.style.SUCCESS("✅ Usuario tiene empresa configurada"))
             if empresa.pais in ["US", "CL"]:
                 self.stdout.write(self.style.SUCCESS(f"✅ País válido: {empresa.pais}"))
             else:
-                self.stdout.write(
-                    self.style.WARNING(f"⚠️  País no estándar: {empresa.pais}")
-                )
+                self.stdout.write(self.style.WARNING(f"⚠️  País no estándar: {empresa.pais}"))
         else:
             self.stdout.write(self.style.ERROR("❌ Usuario SIN empresa configurada"))
 

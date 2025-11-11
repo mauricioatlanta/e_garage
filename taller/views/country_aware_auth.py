@@ -96,15 +96,11 @@ def country_aware_login(request):
     elif request.user.is_authenticated:
         try:
             # Buscar en empresa
-            if hasattr(request.user, "empresa") and hasattr(
-                request.user.empresa, "pais"
-            ):
+            if hasattr(request.user, "empresa") and hasattr(request.user.empresa, "pais"):
                 request.country = request.user.empresa.pais
                 request.country_code = request.user.empresa.pais
             # Buscar en perfil
-            elif hasattr(request.user, "perfil") and hasattr(
-                request.user.perfil, "pais"
-            ):
+            elif hasattr(request.user, "perfil") and hasattr(request.user.perfil, "pais"):
                 request.country = request.user.perfil.pais
                 request.country_code = request.user.perfil.pais
             else:

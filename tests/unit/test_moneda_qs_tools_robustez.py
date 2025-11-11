@@ -80,12 +80,8 @@ class TestMonedaQsToolsRobustez(TestCase):
             with self.subTest(value=input_value):
                 result_cl = template_cl.render(Context({"value": input_value}))
                 result_us = template_us.render(Context({"value": input_value}))
-                self.assertEqual(
-                    result_cl, expected_cl, f"CL failed for input: {input_value}"
-                )
-                self.assertEqual(
-                    result_us, expected_us, f"US failed for input: {input_value}"
-                )
+                self.assertEqual(result_cl, expected_cl, f"CL failed for input: {input_value}")
+                self.assertEqual(result_us, expected_us, f"US failed for input: {input_value}")
 
     def test_qs_count_edge_cases(self):
         """Test del filtro qs_count con inputs edge cases"""
@@ -144,9 +140,7 @@ class TestMonedaQsToolsRobustez(TestCase):
                 # No debe lanzar excepción
                 try:
                     result_clp = template_clp.render(Context({"value": extreme_input}))
-                    result_money = template_money.render(
-                        Context({"value": extreme_input})
-                    )
+                    result_money = template_money.render(Context({"value": extreme_input}))
                     # Si llega aquí, el test pasa
                     self.assertTrue(
                         True,
@@ -174,6 +168,4 @@ class TestMonedaQsToolsRobustez(TestCase):
         for input_value, expected in precision_cases:
             with self.subTest(value=input_value):
                 result = template.render(Context({"value": input_value}))
-                self.assertEqual(
-                    result, expected, f"Precision failed for input: {input_value}"
-                )
+                self.assertEqual(result, expected, f"Precision failed for input: {input_value}")

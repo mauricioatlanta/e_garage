@@ -128,9 +128,7 @@ def collect_static_like_files(
     static_outside: List[Path] = []
     for dirpath, dirnames, filenames in os.walk(root):
         # Filtrar subdirectorios
-        dirnames[:] = [
-            d for d in dirnames if should_scan_dir(Path(dirpath) / d, excludes)
-        ]
+        dirnames[:] = [d for d in dirnames if should_scan_dir(Path(dirpath) / d, excludes)]
         for fname in filenames:
             p = Path(dirpath) / fname
             ext = p.suffix.lower()
@@ -184,9 +182,7 @@ def scan_template_references(root: Path) -> Dict[str, int]:
     href_src_re = re.compile(r"""(?:href|src)\s*=\s*['"]([^'"]+)['"]""")
     for dirpath, dirnames, filenames in os.walk(root):
         dirnames[:] = [
-            d
-            for d in dirnames
-            if should_scan_dir(Path(dirpath) / d, DEFAULT_EXCLUDE_DIRS)
+            d for d in dirnames if should_scan_dir(Path(dirpath) / d, DEFAULT_EXCLUDE_DIRS)
         ]
         for fname in filenames:
             p = Path(dirpath) / fname
@@ -203,9 +199,7 @@ def scan_template_references(root: Path) -> Dict[str, int]:
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Audita y migra estáticos hacia /static"
-    )
+    parser = argparse.ArgumentParser(description="Audita y migra estáticos hacia /static")
     parser.add_argument(
         "--root",
         required=True,
@@ -241,9 +235,7 @@ def main():
         static_root.mkdir(parents=True, exist_ok=True)
 
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-    report_prefix = (
-        Path(args.report) if args.report else Path.cwd() / f"static_audit_report_{ts}"
-    )
+    report_prefix = Path(args.report) if args.report else Path.cwd() / f"static_audit_report_{ts}"
     report_csv = Path(str(report_prefix) + ".csv")
     report_json = Path(str(report_prefix) + ".json")
 
@@ -293,8 +285,7 @@ def main():
         # Si es copia temporal/backup por nombre
         name_lower = src.name.lower()
         if any(re.search(pat, src.name) for pat in IGNORE_FILE_PATTERNS) or any(
-            tok in name_lower
-            for tok in ["backup", "copy", "old", "temp", "tmp", "(1)", "(2)"]
+            tok in name_lower for tok in ["backup", "copy", "old", "temp", "tmp", "(1)", "(2)"]
         ):
             # Si pesa poco y parece backup, sugerir borrar
             if size < 1024 * 1024 * 3:  # < 3MB

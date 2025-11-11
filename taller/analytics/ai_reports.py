@@ -78,9 +78,7 @@ class AIReportEngine:
                 "moneda": self.moneda,
                 "simbolo": self.simbolo,
                 "timezone": self.empresa.zona_horaria,
-                "formato_fecha": (
-                    "MM/DD/YYYY" if self.empresa.pais == "US" else "DD/MM/YYYY"
-                ),
+                "formato_fecha": ("MM/DD/YYYY" if self.empresa.pais == "US" else "DD/MM/YYYY"),
             },
         }
 
@@ -125,9 +123,9 @@ class AIReportEngine:
         for i in range(dias):
             fecha = timezone.now() - timedelta(days=dias - i)
             valor = (
-                queryset.filter(fecha_creacion__date=fecha.date()).aggregate(
-                    Sum(field)
-                )[f"{field}__sum"]
+                queryset.filter(fecha_creacion__date=fecha.date()).aggregate(Sum(field))[
+                    f"{field}__sum"
+                ]
                 or 0
             )
 
@@ -197,10 +195,7 @@ class AIReportEngine:
 
         # Insights generales con datos reales
         top_vehicle_brand = (
-            vehiculos.values("marca__nombre")
-            .annotate(count=Count("id"))
-            .order_by("-count")
-            .first()
+            vehiculos.values("marca__nombre").annotate(count=Count("id")).order_by("-count").first()
         )
 
         if top_vehicle_brand:

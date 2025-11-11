@@ -39,9 +39,7 @@ class DocumentoListView(CountryLangTemplateMixin, ListView):
             return [template_name]
         else:
             template_names = super().get_template_names()
-            print(
-                f"[DEBUG] DocumentoListView - Using default templates: {template_names}"
-            )
+            print(f"[DEBUG] DocumentoListView - Using default templates: {template_names}")
             return template_names
 
     def get_queryset(self):
@@ -252,12 +250,8 @@ class DocumentoDetailView(CountryLangTemplateMixin, DetailView):
         otros_servicios = documento.lineas_otro_servicio.all()
 
         # Calcular subtotales
-        subtotal_repuestos = sum(
-            linea.precio_unitario * linea.cantidad for linea in repuestos
-        )
-        subtotal_servicios = sum(
-            linea.precio_unitario * linea.cantidad for linea in servicios
-        )
+        subtotal_repuestos = sum(linea.precio_unitario * linea.cantidad for linea in repuestos)
+        subtotal_servicios = sum(linea.precio_unitario * linea.cantidad for linea in servicios)
         subtotal_otros_servicios = sum(
             getattr(otro, "precio_cliente", Decimal("0.00")) for otro in otros_servicios
         )
@@ -349,12 +343,8 @@ class DocumentoUpdateView(CountryLangTemplateMixin, UpdateView):
         otros_servicios = documento.lineas_otro_servicio.all()
 
         # Calcular subtotales
-        subtotal_repuestos = sum(
-            linea.precio_unitario * linea.cantidad for linea in repuestos
-        )
-        subtotal_servicios = sum(
-            linea.precio_unitario * linea.cantidad for linea in servicios
-        )
+        subtotal_repuestos = sum(linea.precio_unitario * linea.cantidad for linea in repuestos)
+        subtotal_servicios = sum(linea.precio_unitario * linea.cantidad for linea in servicios)
         subtotal_otros_servicios = sum(
             getattr(otro, "precio_cliente", Decimal("0.00")) for otro in otros_servicios
         )

@@ -199,9 +199,7 @@ def ver_vehiculo(request, vehiculo_id):
     empresa = getattr(request.user, "empresa", None)
     vehiculo = get_object_or_404(Vehiculo, id=vehiculo_id, empresa=empresa)
 
-    return render(
-        request, "taller/vehiculos/vehiculo_detail.html", {"vehiculo": vehiculo}
-    )
+    return render(request, "taller/vehiculos/vehiculo_detail.html", {"vehiculo": vehiculo})
 
 
 @login_required
@@ -266,9 +264,7 @@ def eliminar_vehiculo(request, vehiculo_id):
             "usa:taller:vehiculos:lista_vehiculos",
         )
 
-    return render(
-        request, "taller/vehiculos/eliminar_vehiculo.html", {"vehiculo": vehiculo}
-    )
+    return render(request, "taller/vehiculos/eliminar_vehiculo.html", {"vehiculo": vehiculo})
 
 
 # ---------------------------
@@ -434,9 +430,7 @@ def ajax_motores_por_modelo(request):
 
                     if modelo_chile:
                         motores = (
-                            MotorVehiculo.objects.filter(
-                                modelos=modelo_chile, country=country
-                            )
+                            MotorVehiculo.objects.filter(modelos=modelo_chile, country=country)
                             .order_by("nombre")
                             .values("id", "nombre")
                         )
@@ -507,9 +501,7 @@ def ajax_cajas_por_modelo(request):
 
                     if modelo_chile:
                         cajas = (
-                            CajaVehiculo.objects.filter(
-                                modelos=modelo_chile, country=country
-                            )
+                            CajaVehiculo.objects.filter(modelos=modelo_chile, country=country)
                             .order_by("nombre")
                             .values("id", "nombre")
                         )
@@ -554,9 +546,7 @@ def ajax_agregar_marca(request):
         data = json.loads(request.body)
         nombre = data.get("nombre", "").strip()
         if not nombre:
-            return JsonResponse(
-                {"success": False, "error": "Nombre requerido"}, status=400
-            )
+            return JsonResponse({"success": False, "error": "Nombre requerido"}, status=400)
 
         country = _get_country(request)
         empresa = getattr(request.user, "empresa", None)
@@ -611,9 +601,7 @@ def ajax_agregar_modelo(request):
 
         # Evitar duplicados por case
         try:
-            modelo = Modelo.objects.get(
-                country=country, marca=marca, nombre__iexact=nombre
-            )
+            modelo = Modelo.objects.get(country=country, marca=marca, nombre__iexact=nombre)
             created = False
         except Modelo.DoesNotExist:
             modelo = Modelo.objects.create(country=country, marca=marca, nombre=nombre)

@@ -15,9 +15,7 @@ class Command(BaseCommand):
         self.stdout.write(f"📄 Total documentos: {documentos.count()}")
 
         if not documentos.exists():
-            self.stdout.write(
-                self.style.ERROR("❌ No hay documentos en la base de datos")
-            )
+            self.stdout.write(self.style.ERROR("❌ No hay documentos en la base de datos"))
             return
 
         # Verificar líneas existentes
@@ -29,9 +27,7 @@ class Command(BaseCommand):
 
         # Tomar el primer documento para agregar líneas
         documento = documentos.first()
-        self.stdout.write(
-            f"🎯 Trabajando con documento: {documento.numero} ({documento.tipo})"
-        )
+        self.stdout.write(f"🎯 Trabajando con documento: {documento.numero} ({documento.tipo})")
 
         # Verificar estado actual del documento
         lineas_rep_actual = documento.lineas_repuesto.count()

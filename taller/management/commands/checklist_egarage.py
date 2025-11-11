@@ -52,9 +52,7 @@ class Command(BaseCommand):
             resultados.append(True)
 
         except Exception as e:
-            self.stdout.write(
-                self.style.ERROR(f"   ❌ Error verificando URLs específicas: {e}")
-            )
+            self.stdout.write(self.style.ERROR(f"   ❌ Error verificando URLs específicas: {e}"))
             resultados.append(False)
 
         # 4. Test anti-duplicados de nombres de URL
@@ -67,9 +65,7 @@ class Command(BaseCommand):
             self.stdout.write("   ✅ Test anti-duplicados OK")
             resultados.append(True)
         except Exception as e:
-            self.stdout.write(
-                self.style.ERROR(f"   ❌ Error en test anti-duplicados: {e}")
-            )
+            self.stdout.write(self.style.ERROR(f"   ❌ Error en test anti-duplicados: {e}"))
             resultados.append(False)
 
         # 5. KPIs usando solo fecha_emision
@@ -104,15 +100,11 @@ class Command(BaseCommand):
 
         if checks_ok == total_checks:
             self.stdout.write(self.style.SUCCESS("\n🎉 ¡TODOS LOS CHECKS PASARON!"))
-            self.stdout.write(
-                self.style.SUCCESS("✅ El sistema está listo para producción")
-            )
+            self.stdout.write(self.style.SUCCESS("✅ El sistema está listo para producción"))
         else:
             self.stdout.write(
                 self.style.WARNING(f"\n⚠️  {total_checks - checks_ok} checks fallaron")
             )
-            self.stdout.write(
-                self.style.ERROR("❌ Revisar los errores antes de continuar")
-            )
+            self.stdout.write(self.style.ERROR("❌ Revisar los errores antes de continuar"))
 
         return checks_ok == total_checks

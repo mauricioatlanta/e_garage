@@ -112,9 +112,7 @@ def verificar_necesidades_implementacion():
     print("=" * 60)
 
     # Verificar si Servicio tiene campo tipo
-    servicio_tiene_tipo = hasattr(
-        Servicio._meta.get_field("id"), "choices"
-    )  # Dummy check
+    servicio_tiene_tipo = hasattr(Servicio._meta.get_field("id"), "choices")  # Dummy check
     try:
         Servicio._meta.get_field("tipo")
         servicio_tiene_tipo = True

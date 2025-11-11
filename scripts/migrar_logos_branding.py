@@ -63,9 +63,7 @@ def migrar_logos_empresa_a_configuracion():
                     new_name = f"logos/{original_name}"
 
                     # Crear el archivo en ConfiguracionEmpresa
-                    config.logo.save(
-                        original_name, ContentFile(logo_content), save=False
-                    )
+                    config.logo.save(original_name, ContentFile(logo_content), save=False)
                     config.save()
 
                     print(f"   ✅ Logo migrado a: {config.logo.url}")
@@ -74,9 +72,7 @@ def migrar_logos_empresa_a_configuracion():
                     print(f"   ❌ Archivo físico no existe: {empresa.logo.name}")
                     errores += 1
             elif config.logo:
-                print(
-                    f"   ✅ Logo ya existe en ConfiguracionEmpresa: {config.logo.url}"
-                )
+                print(f"   ✅ Logo ya existe en ConfiguracionEmpresa: {config.logo.url}")
             else:
                 print("   ⚠️ No hay logo para migrar")
 
@@ -128,6 +124,4 @@ if __name__ == "__main__":
     print("\n🎯 MIGRACIÓN COMPLETADA")
     print("=" * 30)
     print("Ahora los context processors deberían mostrar los logos correctamente.")
-    print(
-        "Usa la vista de configuración en /taller/settings/editar/ para subir nuevos logos."
-    )
+    print("Usa la vista de configuración en /taller/settings/editar/ para subir nuevos logos.")

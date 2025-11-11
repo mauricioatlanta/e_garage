@@ -56,9 +56,7 @@ def test_email_view(request):
                         f"✅ Correo de prueba enviado exitosamente a {email_destino}",
                     )
                 else:
-                    messages.error(
-                        request, f"❌ Error enviando correo de prueba a {email_destino}"
-                    )
+                    messages.error(request, f"❌ Error enviando correo de prueba a {email_destino}")
 
         except Exception as e:
             messages.error(request, f"❌ Error inesperado: {str(e)}")

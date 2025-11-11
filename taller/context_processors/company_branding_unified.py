@@ -21,24 +21,20 @@ def company_branding(request):
         and not isinstance(request.user, AnonymousUser)
     ):
         # Intentar múltiples formas de obtener la empresa
-        empresa = getattr(
-            getattr(request.user, "perfil", None), "empresa", None
-        ) or getattr(request.user, "empresa", None)
+        empresa = getattr(getattr(request.user, "perfil", None), "empresa", None) or getattr(
+            request.user, "empresa", None
+        )
 
     brand = {
         "logo_url": getattr(
             settings, "DEFAULT_BRAND_LOGO_URL", "/static/branding/egarage_logo.svg"
         ),
         "name": getattr(settings, "DEFAULT_BRAND_NAME", "eGarage"),
-        "tagline": getattr(
-            settings, "DEFAULT_BRAND_TAGLINE", "Mission Control for your Workshop"
-        ),
+        "tagline": getattr(settings, "DEFAULT_BRAND_TAGLINE", "Mission Control for your Workshop"),
         "country": getattr(settings, "DEFAULT_BRAND_COUNTRY", "cl"),
         "currency": getattr(settings, "DEFAULT_BRAND_CURRENCY", "CLP"),
         "primary_color": getattr(settings, "DEFAULT_BRAND_PRIMARY_COLOR", "#0d6efd"),
-        "secondary_color": getattr(
-            settings, "DEFAULT_BRAND_SECONDARY_COLOR", "#6c757d"
-        ),
+        "secondary_color": getattr(settings, "DEFAULT_BRAND_SECONDARY_COLOR", "#6c757d"),
     }
 
     if empresa:
@@ -52,9 +48,7 @@ def company_branding(request):
                     pass
 
             # Nombre de la empresa
-            brand["name"] = (
-                getattr(empresa, "nombre_taller", brand["name"]) or brand["name"]
-            )
+            brand["name"] = getattr(empresa, "nombre_taller", brand["name"]) or brand["name"]
 
             # Tagline/lema (si existe en ConfiguracionEmpresa)
             if hasattr(conf, "lema") and conf.lema:
@@ -64,18 +58,12 @@ def company_branding(request):
 
             # País y moneda
             if hasattr(conf, "pais"):
-                brand["country"] = (
-                    getattr(conf, "pais", brand["country"]) or brand["country"]
-                )
+                brand["country"] = getattr(conf, "pais", brand["country"]) or brand["country"]
             elif hasattr(empresa, "pais"):
-                brand["country"] = (
-                    getattr(empresa, "pais", brand["country"]) or brand["country"]
-                )
+                brand["country"] = getattr(empresa, "pais", brand["country"]) or brand["country"]
 
             if hasattr(conf, "moneda"):
-                brand["currency"] = (
-                    getattr(conf, "moneda", brand["currency"]) or brand["currency"]
-                )
+                brand["currency"] = getattr(conf, "moneda", brand["currency"]) or brand["currency"]
             elif hasattr(empresa, "moneda"):
                 brand["currency"] = (
                     getattr(empresa, "moneda", brand["currency"]) or brand["currency"]

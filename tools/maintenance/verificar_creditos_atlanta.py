@@ -65,23 +65,17 @@ def verificar_templates():
                     creditos_encontrados.append(credito)
 
             if len(creditos_encontrados) >= 3:  # Al menos 3 de 4 créditos
-                print(
-                    f"✅ {template_path} - Créditos OK ({len(creditos_encontrados)}/4)"
-                )
+                print(f"✅ {template_path} - Créditos OK ({len(creditos_encontrados)}/4)")
                 templates_ok += 1
             else:
-                print(
-                    f"⚠️ {template_path} - Créditos parciales ({len(creditos_encontrados)}/4)"
-                )
+                print(f"⚠️ {template_path} - Créditos parciales ({len(creditos_encontrados)}/4)")
                 print(f"   Encontrados: {creditos_encontrados}")
 
         except Exception as e:
             print(f"❌ {template_path} - Error leyendo archivo: {e}")
 
     print("\n" + "=" * 50)
-    print(
-        f"📊 RESUMEN: {templates_ok}/{total_templates} templates con créditos completos"
-    )
+    print(f"📊 RESUMEN: {templates_ok}/{total_templates} templates con créditos completos")
 
     # Verificar logo
     logo_path = PROJECT_ROOT / "static/img/logo.png"

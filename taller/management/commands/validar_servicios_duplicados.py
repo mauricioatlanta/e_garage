@@ -17,14 +17,8 @@ class Command(BaseCommand):
         for clave, ids in grupos.items():
             if len(ids) > 1:
                 duplicados += len(ids) - 1
-                self.stdout.write(
-                    self.style.ERROR(f"Duplicados para {clave}: pks={ids}")
-                )
+                self.stdout.write(self.style.ERROR(f"Duplicados para {clave}: pks={ids}"))
         if duplicados == 0:
-            self.stdout.write(
-                self.style.SUCCESS("No hay servicios ni otros servicios duplicados.")
-            )
+            self.stdout.write(self.style.SUCCESS("No hay servicios ni otros servicios duplicados."))
         else:
-            self.stdout.write(
-                self.style.ERROR(f"Hay {duplicados} servicios duplicados.")
-            )
+            self.stdout.write(self.style.ERROR(f"Hay {duplicados} servicios duplicados."))

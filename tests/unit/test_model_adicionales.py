@@ -53,9 +53,7 @@ class ModelAdicionalesTest(TestCase):
         """Test método __str__ de CatalogoModeloAuto"""
         from taller.models.catalogo import CatalogoModeloAuto
 
-        catalogo = CatalogoModeloAuto.objects.create(
-            marca="Toyota", modelo="Yaris", activo=True
-        )
+        catalogo = CatalogoModeloAuto.objects.create(marca="Toyota", modelo="Yaris", activo=True)
 
         str_repr = str(catalogo)
         assert str_repr

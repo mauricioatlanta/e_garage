@@ -33,9 +33,7 @@ class TemplateVerifier:
         # Obtener CSRF token
         response = self.session.get(f"{BASE_URL}/cl/login/")
         if response.status_code != 200:
-            self.log(
-                f"Error obteniendo página de login: {response.status_code}", "ERROR"
-            )
+            self.log(f"Error obteniendo página de login: {response.status_code}", "ERROR")
             return False
 
         # Extraer CSRF token (simple parsing)
@@ -79,9 +77,7 @@ class TemplateVerifier:
             if response.status_code == 200:
                 # Verificar que se cargó correctamente
                 if "DOCTYPE html" in response.text:
-                    self.log(
-                        f"✅ {url_path} - Template cargado correctamente", "SUCCESS"
-                    )
+                    self.log(f"✅ {url_path} - Template cargado correctamente", "SUCCESS")
 
                     # Verificar elementos específicos según el template
                     checks_passed = 0
@@ -98,9 +94,7 @@ class TemplateVerifier:
                         f"📊 Verificación de contenido: {checks_passed}/{total_checks} ({success_rate:.1f}%)"
                     )
 
-                    return response.status_code == 200 and checks_passed >= (
-                        total_checks * 0.8
-                    )
+                    return response.status_code == 200 and checks_passed >= (total_checks * 0.8)
                 else:
                     self.log(f"❌ {url_path} - Respuesta no es HTML válido", "ERROR")
                     return False
@@ -139,9 +133,7 @@ class TemplateVerifier:
 
         all_passed = True
         for test_case in test_cases:
-            success = self.test_template_resolution(
-                test_case["url"], test_case["checks"]
-            )
+            success = self.test_template_resolution(test_case["url"], test_case["checks"])
 
             self.results.append(
                 {"test": test_case["name"], "url": test_case["url"], "passed": success}

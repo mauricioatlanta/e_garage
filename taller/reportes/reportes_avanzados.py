@@ -46,9 +46,9 @@ def reportes_rentabilidad(request):
 
     # Comparativa rentabilidad: interno vs externo
     total_interno = (
-        LineaServicio.objects.filter(documento__tipo="FAC").aggregate(
-            total=Sum("precio_unitario")
-        )["total"]
+        LineaServicio.objects.filter(documento__tipo="FAC").aggregate(total=Sum("precio_unitario"))[
+            "total"
+        ]
         or 0
     )
 
@@ -100,9 +100,9 @@ def reportes_rentabilidad(request):
             }
         )
 
-    servicios_alto_margen = sorted(
-        servicios_alto_margen, key=lambda x: x["margen"], reverse=True
-    )[:10]
+    servicios_alto_margen = sorted(servicios_alto_margen, key=lambda x: x["margen"], reverse=True)[
+        :10
+    ]
 
     context = {
         "servicios_internos": servicios_internos,
@@ -126,9 +126,7 @@ def reporte_comparativo_precios(request):
     analisis_servicios = []
 
     servicios_unicos = (
-        LineaOtroServicio.objects.filter(documento__tipo="FAC")
-        .values("nombre_servicio")
-        .distinct()
+        LineaOtroServicio.objects.filter(documento__tipo="FAC").values("nombre_servicio").distinct()
     )
 
     for servicio in servicios_unicos:
@@ -148,8 +146,7 @@ def reporte_comparativo_precios(request):
 
         if stats["precio_promedio"] and stats["costo_promedio"]:
             margen_promedio = (
-                (stats["precio_promedio"] - stats["costo_promedio"])
-                / stats["precio_promedio"]
+                (stats["precio_promedio"] - stats["costo_promedio"]) / stats["precio_promedio"]
             ) * 100
 
             analisis_servicios.append(
@@ -165,9 +162,7 @@ def reporte_comparativo_precios(request):
                 }
             )
 
-    analisis_servicios = sorted(
-        analisis_servicios, key=lambda x: x["ganancia_total"], reverse=True
-    )
+    analisis_servicios = sorted(analisis_servicios, key=lambda x: x["ganancia_total"], reverse=True)
 
     # Alertas de márgenes bajos
     margenes_bajos = [s for s in analisis_servicios if s["margen_promedio"] < 20]
@@ -181,8 +176,7 @@ def reporte_comparativo_precios(request):
             documento__tipo="FAC", documento__fecha_emision__gte=hace_6_meses
         )
         .annotate(
-            mes=F("documento__fecha_emision__year") * 100
-            + F("documento__fecha_emision__month")
+            mes=F("documento__fecha_emision__year") * 100 + F("documento__fecha_emision__month")
         )
         .values("mes")
         .annotate(
@@ -232,9 +226,7 @@ def reporte_servicios_subcontratados(request):
 
     tendencia_mensual = defaultdict(lambda: {"cantidad": 0, "volumen": 0})
 
-    servicios_periodo = LineaOtroServicio.objects.filter(
-        documento__fecha_emision__gte=hace_6_meses
-    )
+    servicios_periodo = LineaOtroServicio.objects.filter(documento__fecha_emision__gte=hace_6_meses)
 
     for servicio in servicios_periodo:
         mes_key = (
@@ -253,9 +245,7 @@ def reporte_servicios_subcontratados(request):
     # Distribución por tipo de vehículo
     vehiculos_servicios = (
         LineaOtroServicio.objects.filter(documento__vehiculo__isnull=False)
-        .values(
-            "documento__vehiculo__marca__nombre", "documento__vehiculo__modelo__nombre"
-        )
+        .values("documento__vehiculo__marca__nombre", "documento__vehiculo__modelo__nombre")
         .annotate(cantidad=Count("id"))
         .order_by("-cantidad")[:10]
     )
@@ -295,9 +285,9 @@ def dashboard_rentabilidad(request):
     """
     # KPIs principales
     total_facturado = (
-        LineaServicio.objects.filter(documento__tipo="FAC").aggregate(
-            total=Sum("precio_unitario")
-        )["total"]
+        LineaServicio.objects.filter(documento__tipo="FAC").aggregate(total=Sum("precio_unitario"))[
+            "total"
+        ]
         or 0
     ) + (
         LineaOtroServicio.objects.filter(documento__tipo="FAC").aggregate(
@@ -317,9 +307,9 @@ def dashboard_rentabilidad(request):
 
     # Distribución de ingresos
     ingresos_internos = (
-        LineaServicio.objects.filter(documento__tipo="FAC").aggregate(
-            total=Sum("precio_unitario")
-        )["total"]
+        LineaServicio.objects.filter(documento__tipo="FAC").aggregate(total=Sum("precio_unitario"))[
+            "total"
+        ]
         or 0
     )
     ingresos_externos = (
@@ -336,9 +326,7 @@ def dashboard_rentabilidad(request):
         .annotate(
             margen_promedio=Avg(
                 ExpressionWrapper(
-                    (F("precio_cliente") - F("costo_interno"))
-                    * 100.0
-                    / F("precio_cliente"),
+                    (F("precio_cliente") - F("costo_interno")) * 100.0 / F("precio_cliente"),
                     output_field=FloatField(),
                 )
             )
@@ -346,14 +334,10 @@ def dashboard_rentabilidad(request):
     )
 
     mejor_proveedor = (
-        proveedor_margenes.order_by("-margen_promedio").first()
-        if proveedor_margenes
-        else None
+        proveedor_margenes.order_by("-margen_promedio").first() if proveedor_margenes else None
     )
     peor_proveedor = (
-        proveedor_margenes.order_by("margen_promedio").first()
-        if proveedor_margenes
-        else None
+        proveedor_margenes.order_by("margen_promedio").first() if proveedor_margenes else None
     )
 
     margen_general = (ganancia_neta * 100.0 / total_facturado) if total_facturado else 0

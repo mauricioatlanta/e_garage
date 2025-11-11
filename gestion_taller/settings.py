@@ -19,17 +19,13 @@ def env_list(key, default=""):
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", get_random_secret_key())
 DEBUG = env_bool("DJANGO_DEBUG", True)
-ALLOWED_HOSTS = env_list(
-    "DJANGO_ALLOWED_HOSTS", "*"
-)  # e.g. "egarage.cl, www.egarage.cl"
+ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", "*")  # e.g. "egarage.cl, www.egarage.cl"
 
 # ---------- CSRF / HTTPS (solo si no estás detrás de proxy que ya haga esto) ----------
 # En producción: define DJANGO_CSRF_TRUSTED_ORIGINS="https://egarage.cl, https://www.egarage.cl"
 csrf_origins_env = env_list("DJANGO_CSRF_TRUSTED_ORIGINS", "")
 if csrf_origins_env:
-    CSRF_TRUSTED_ORIGINS = [
-        h if h.startswith("http") else f"https://{h}" for h in csrf_origins_env
-    ]
+    CSRF_TRUSTED_ORIGINS = [h if h.startswith("http") else f"https://{h}" for h in csrf_origins_env]
 else:
     CSRF_TRUSTED_ORIGINS = []
 SECURE_SSL_REDIRECT = env_bool("DJANGO_SECURE_SSL_REDIRECT", not DEBUG)
@@ -38,12 +34,8 @@ CSRF_COOKIE_SECURE = env_bool("DJANGO_CSRF_COOKIE_SECURE", not DEBUG)
 CSRF_COOKIE_HTTPONLY = False  # Permitir acceso desde JavaScript si es necesario
 CSRF_COOKIE_SAMESITE = "Lax"  # Más permisivo para desarrollo
 CSRF_USE_SESSIONS = False  # Usar cookies en lugar de sesiones para CSRF
-SECURE_HSTS_SECONDS = int(
-    os.getenv("DJANGO_SECURE_HSTS_SECONDS", "0" if DEBUG else "31536000")
-)
-SECURE_HSTS_INCLUDE_SUBDOMAINS = env_bool(
-    "DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS", not DEBUG
-)
+SECURE_HSTS_SECONDS = int(os.getenv("DJANGO_SECURE_HSTS_SECONDS", "0" if DEBUG else "31536000"))
+SECURE_HSTS_INCLUDE_SUBDOMAINS = env_bool("DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS", not DEBUG)
 SECURE_HSTS_PRELOAD = env_bool("DJANGO_SECURE_HSTS_PRELOAD", not DEBUG)
 SECURE_REFERRER_POLICY = os.getenv(
     "DJANGO_SECURE_REFERRER_POLICY", "strict-origin-when-cross-origin"
@@ -122,9 +114,7 @@ AUTOCOMPLETE_LIGHT = {"SELECT2": {"i18n": False, "language": None}}
 
 # ---------- DRF mínimos seguros ----------
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.SessionAuthentication"
-    ],
+    "DEFAULT_AUTHENTICATION_CLASSES": ["rest_framework.authentication.SessionAuthentication"],
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
 }
 
@@ -188,9 +178,7 @@ TEMPLATES = [
 if os.getenv("DATABASE_URL"):
     import dj_database_url
 
-    DATABASES = {
-        "default": dj_database_url.parse(os.getenv("DATABASE_URL"), conn_max_age=600)
-    }
+    DATABASES = {"default": dj_database_url.parse(os.getenv("DATABASE_URL"), conn_max_age=600)}
 else:
     DATABASES = {
         "default": {
@@ -239,9 +227,7 @@ EMAIL_PORT = int(os.getenv("EMAIL_PORT", "465"))
 EMAIL_USE_SSL = env_bool("EMAIL_USE_SSL", True)
 EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS", False)
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "subscription@egarage.cl")
-DEFAULT_FROM_EMAIL = os.getenv(
-    "DEFAULT_FROM_EMAIL", "eGarage <subscription@egarage.cl>"
-)
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "eGarage <subscription@egarage.cl>")
 
 # En dev, evita KeyError; en prod exige la var.
 _email_pwd = os.getenv("EMAIL_PASSWORD")
@@ -283,9 +269,7 @@ if len(CSRF_TRUSTED_ORIGINS) == 0:
         ]
     else:
         CSRF_TRUSTED_ORIGINS = [
-            f"https://{h}"
-            for h in ALLOWED_HOSTS
-            if h not in {"*", "localhost", "127.0.0.1"}
+            f"https://{h}" for h in ALLOWED_HOSTS if h not in {"*", "localhost", "127.0.0.1"}
         ]
 
 # ---------- Branding Defaults ----------

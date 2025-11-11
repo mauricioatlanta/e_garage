@@ -62,9 +62,7 @@ def main():
                 docs_count = Documento.objects.filter(empresa=empresa).count()
                 if docs_count > 0:
                     docs = list(
-                        Documento.objects.filter(empresa=empresa).values_list(
-                            "id", flat=True
-                        )[:3]
+                        Documento.objects.filter(empresa=empresa).values_list("id", flat=True)[:3]
                     )
                     print(f"- {user.username}: {docs_count} documentos {docs}")
             except Exception:
@@ -87,16 +85,13 @@ def documentos(request):
     )
 
     if any(f.name == "gran_total" for f in Documento._meta.get_fields()):
-        total_facturas = (
-            qs.aggregate(total=Coalesce(Sum("gran_total"), 0))["total"] or 0
-        )
+        total_facturas = qs.aggregate(total=Coalesce(Sum("gran_total"), 0))["total"] or 0
     else:
         rep_bruto = qs.aggregate(
             v=Coalesce(
                 Sum(
                     ExpressionWrapper(
-                        F("lineas_repuesto__cantidad")
-                        * F("lineas_repuesto__precio_unitario")
+                        F("lineas_repuesto__cantidad") * F("lineas_repuesto__precio_unitario")
                         - F("lineas_repuesto__descuento"),
                         output_field=MONEY,
                     )
@@ -109,8 +104,7 @@ def documentos(request):
             v=Coalesce(
                 Sum(
                     ExpressionWrapper(
-                        F("lineas_servicio__cantidad")
-                        * F("lineas_servicio__precio_unitario")
+                        F("lineas_servicio__cantidad") * F("lineas_servicio__precio_unitario")
                         - F("lineas_servicio__descuento"),
                         output_field=MONEY,
                     )

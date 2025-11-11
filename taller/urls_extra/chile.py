@@ -46,9 +46,7 @@ urlpatterns = [
     # URLs principales de taller (configuración, settings, etc.)
     # Incluir las rutas específicas que necesitamos
     path("dashboard/", dashboard, name="dashboard"),
-    path(
-        "centro-operaciones/", dashboard_centro_operaciones, name="centro_operaciones"
-    ),
+    path("centro-operaciones/", dashboard_centro_operaciones, name="centro_operaciones"),
     path(
         "centro-operaciones-espacial/",
         dashboard_centro_operaciones_espacial,
@@ -56,9 +54,7 @@ urlpatterns = [
     ),
     path("admin/dashboard/", dashboard_suscripciones, name="dashboard_suscripciones"),
     path("configuracion/", configuracion_empresa, name="configuracion"),
-    path(
-        "configuracion/tecnicos/", configuracion_tecnicos, name="configuracion_tecnicos"
-    ),
+    path("configuracion/tecnicos/", configuracion_tecnicos, name="configuracion_tecnicos"),
     path("settings/", company_settings_view, name="company_settings"),
     # Dashboard principal Chile (requiere autenticación) - Usar el de taller_main_urls
     # path("dashboard/", dashboard_cl_view, name="dashboard"),
@@ -81,9 +77,7 @@ urlpatterns = [
     # Registro para Chile (español por defecto)
     path(
         "registro/",
-        include(
-            ("scripts.onboarding_urls", "onboarding"), namespace="chile_onboarding"
-        ),
+        include(("scripts.onboarding_urls", "onboarding"), namespace="chile_onboarding"),
     ),
     # === AJAX JERÁRQUICO - VEHÍCULOS ===
     # ❌ DESACTIVADOS: Endpoints legacy que no filtran por modelo
@@ -146,6 +140,8 @@ urlpatterns = [
             namespace="business_intelligence",
         ),
     ),
+    # === APIs ===
+    path("api/", include(("taller.api.urls", "api"), namespace="api")),
     # === AJAX ENDPOINTS ESPECÍFICOS PARA CHILE ===
     path("ajax/clientes/buscar/", buscar_clientes, name="cl_ajax_buscar_clientes"),
     path(

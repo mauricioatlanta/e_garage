@@ -116,9 +116,7 @@ def main():
                         with open(file_path, encoding="utf-8") as f:
                             content = f.read()
                         if re.search(pattern, content, re.IGNORECASE):
-                            print(
-                                f"❌ Script duplicado encontrado: {pattern} en {file_path}"
-                            )
+                            print(f"❌ Script duplicado encontrado: {pattern} en {file_path}")
                             duplicate_ok = False
                     except:
                         pass

@@ -31,9 +31,7 @@ def crear_motor(request):
         modelo_id = data.get("modelo_id")
 
         if not nombre:
-            return JsonResponse(
-                {"success": False, "error": "El nombre del motor es requerido"}
-            )
+            return JsonResponse({"success": False, "error": "El nombre del motor es requerido"})
 
         if not modelo_id:
             return JsonResponse({"success": False, "error": "El modelo es requerido"})
@@ -91,9 +89,7 @@ def crear_caja(request):
         modelo_id = data.get("modelo_id")
 
         if not nombre:
-            return JsonResponse(
-                {"success": False, "error": "El nombre de la caja es requerido"}
-            )
+            return JsonResponse({"success": False, "error": "El nombre de la caja es requerido"})
 
         if not modelo_id:
             return JsonResponse({"success": False, "error": "El modelo es requerido"})
@@ -150,15 +146,11 @@ def crear_color(request):
         nombre = data.get("nombre", "").strip()
 
         if not nombre:
-            return JsonResponse(
-                {"success": False, "error": "El nombre del color es requerido"}
-            )
+            return JsonResponse({"success": False, "error": "El nombre del color es requerido"})
 
         # Verificar que no existe un color con el mismo nombre
         if ColorVehiculo.objects.filter(nombre=nombre).exists():
-            return JsonResponse(
-                {"success": False, "error": "Ya existe un color con este nombre"}
-            )
+            return JsonResponse({"success": False, "error": "Ya existe un color con este nombre"})
 
         # Crear el nuevo color
         color = ColorVehiculo.objects.create(nombre=nombre)

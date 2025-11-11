@@ -33,37 +33,27 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="documento",
             name="total_repuestos",
-            field=models.DecimalField(
-                null=True, blank=True, max_digits=14, decimal_places=2
-            ),
+            field=models.DecimalField(null=True, blank=True, max_digits=14, decimal_places=2),
         ),
         migrations.AlterField(
             model_name="documento",
             name="total_servicios",
-            field=models.DecimalField(
-                null=True, blank=True, max_digits=14, decimal_places=2
-            ),
+            field=models.DecimalField(null=True, blank=True, max_digits=14, decimal_places=2),
         ),
         migrations.AlterField(
             model_name="documento",
             name="total_otros",
-            field=models.DecimalField(
-                null=True, blank=True, max_digits=14, decimal_places=2
-            ),
+            field=models.DecimalField(null=True, blank=True, max_digits=14, decimal_places=2),
         ),
         migrations.AlterField(
             model_name="documento",
             name="iva",
-            field=models.DecimalField(
-                null=True, blank=True, max_digits=14, decimal_places=2
-            ),
+            field=models.DecimalField(null=True, blank=True, max_digits=14, decimal_places=2),
         ),
         migrations.AlterField(
             model_name="documento",
             name="total_general",
-            field=models.DecimalField(
-                null=True, blank=True, max_digits=14, decimal_places=2
-            ),
+            field=models.DecimalField(null=True, blank=True, max_digits=14, decimal_places=2),
         ),
         # Set default values
         migrations.RunPython(set_document_defaults, reverse_code=noop_reverse),

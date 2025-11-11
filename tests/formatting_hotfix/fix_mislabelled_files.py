@@ -78,9 +78,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", default=".", help="Project root")
     ap.add_argument("--apply", action="store_true", help="Actually rename/move files")
-    ap.add_argument(
-        "--skip-dirs", nargs="*", default=DEFAULT_SKIP, help="Directories to skip"
-    )
+    ap.add_argument("--skip-dirs", nargs="*", default=DEFAULT_SKIP, help="Directories to skip")
     args = ap.parse_args()
 
     root = Path(args.root).resolve()

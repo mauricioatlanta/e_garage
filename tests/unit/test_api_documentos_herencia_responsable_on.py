@@ -36,14 +36,10 @@ def test_herencia_responsable_on_documento():
     user = User.objects.create_user(username="test_herencia_on", password="test")
 
     # Create empresa
-    empresa = Empresa.objects.create(
-        user=user, nombre_taller="Test Herencia ON", pais="CL"
-    )
+    empresa = Empresa.objects.create(user=user, nombre_taller="Test Herencia ON", pais="CL")
 
     # Create cliente and vehiculo
-    cliente = Cliente.objects.create(
-        empresa=empresa, nombre="Test Client", tax_id="1-9"
-    )
+    cliente = Cliente.objects.create(empresa=empresa, nombre="Test Client", tax_id="1-9")
     vehiculo = Vehiculo.objects.create(
         empresa=empresa,
         cliente=cliente,
@@ -54,9 +50,7 @@ def test_herencia_responsable_on_documento():
     )
 
     # Create tecnico
-    tecnico = Tecnico.objects.create(
-        empresa=empresa, nombre="Test Tecnico", activo=True
-    )
+    tecnico = Tecnico.objects.create(empresa=empresa, nombre="Test Tecnico", activo=True)
 
     c = Client()
     c.force_login(user)
@@ -115,9 +109,7 @@ def test_herencia_responsable_on_documento():
 
         # Verify document has tecnico_responsable
         documento = Documento.objects.get(id=documento_id)
-        assert (
-            documento.tecnico_responsable == tecnico
-        ), "Document should have tecnico_responsable"
+        assert documento.tecnico_responsable == tecnico, "Document should have tecnico_responsable"
 
         # Verify lines inherit tecnico_responsable
         lineas_servicio = LineaServicio.objects.filter(documento=documento)
@@ -154,14 +146,10 @@ def test_herencia_responsable_on_vs_off():
     user = User.objects.create_user(username="test_herencia_compare", password="test")
 
     # Create empresa
-    empresa = Empresa.objects.create(
-        user=user, nombre_taller="Test Herencia Compare", pais="CL"
-    )
+    empresa = Empresa.objects.create(user=user, nombre_taller="Test Herencia Compare", pais="CL")
 
     # Create cliente and vehiculo
-    cliente = Cliente.objects.create(
-        empresa=empresa, nombre="Test Client", tax_id="1-9"
-    )
+    cliente = Cliente.objects.create(empresa=empresa, nombre="Test Client", tax_id="1-9")
     vehiculo = Vehiculo.objects.create(
         empresa=empresa,
         cliente=cliente,
@@ -172,12 +160,8 @@ def test_herencia_responsable_on_vs_off():
     )
 
     # Create tecnicos
-    tecnico_doc = Tecnico.objects.create(
-        empresa=empresa, nombre="Tecnico Doc", activo=True
-    )
-    tecnico_linea = Tecnico.objects.create(
-        empresa=empresa, nombre="Tecnico Linea", activo=True
-    )
+    tecnico_doc = Tecnico.objects.create(empresa=empresa, nombre="Tecnico Doc", activo=True)
+    tecnico_linea = Tecnico.objects.create(empresa=empresa, nombre="Tecnico Linea", activo=True)
 
     c = Client()
     c.force_login(user)
@@ -212,9 +196,7 @@ def test_herencia_responsable_on_vs_off():
     if response_on.status_code in (200, 201):
         doc_on = Documento.objects.get(id=response_on.json()["id"])
         linea_on = LineaServicio.objects.filter(documento=doc_on).first()
-        assert (
-            linea_on.tecnico_responsable == tecnico_doc
-        ), "ON: Line should inherit from document"
+        assert linea_on.tecnico_responsable == tecnico_doc, "ON: Line should inherit from document"
 
     # Test 2: Inheritance OFF (should use line-specific tecnico)
     data_off = {
@@ -236,9 +218,7 @@ def test_herencia_responsable_on_vs_off():
         ],
     }
 
-    response_off = c.post(
-        url, data=json.dumps(data_off), content_type="application/json"
-    )
+    response_off = c.post(url, data=json.dumps(data_off), content_type="application/json")
     assert_ok_or_redirect(response_off, "/cl/documentos/api/create/")
 
     if response_off.status_code in (200, 201):
@@ -265,12 +245,8 @@ def test_herencia_responsable_edge_cases():
     User = get_user_model()
     user = User.objects.create_user(username="test_herencia_edge", password="test")
 
-    empresa = Empresa.objects.create(
-        user=user, nombre_taller="Test Herencia Edge", pais="CL"
-    )
-    cliente = Cliente.objects.create(
-        empresa=empresa, nombre="Test Client", tax_id="1-9"
-    )
+    empresa = Empresa.objects.create(user=user, nombre_taller="Test Herencia Edge", pais="CL")
+    cliente = Cliente.objects.create(empresa=empresa, nombre="Test Client", tax_id="1-9")
     vehiculo = Vehiculo.objects.create(
         empresa=empresa,
         cliente=cliente,
@@ -279,9 +255,7 @@ def test_herencia_responsable_edge_cases():
         modelo_texto="Model",
         anio=2024,
     )
-    tecnico = Tecnico.objects.create(
-        empresa=empresa, nombre="Test Tecnico", activo=True
-    )
+    tecnico = Tecnico.objects.create(empresa=empresa, nombre="Test Tecnico", activo=True)
 
     c = Client()
     c.force_login(user)
@@ -308,9 +282,7 @@ def test_herencia_responsable_edge_cases():
         ],
     }
 
-    response = c.post(
-        url, data=json.dumps(data_no_tecnico), content_type="application/json"
-    )
+    response = c.post(url, data=json.dumps(data_no_tecnico), content_type="application/json")
 
     # Should handle gracefully (either succeed with None or fail gracefully)
     if response.status_code in (200, 201, 302):

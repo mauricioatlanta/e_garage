@@ -114,9 +114,7 @@ def main():
                     marca_existentes += 1
                     total_existentes += 1
 
-            print(
-                f"  📊 {marca_nombre}: {marca_creados} creados, {marca_existentes} existentes"
-            )
+            print(f"  📊 {marca_nombre}: {marca_creados} creados, {marca_existentes} existentes")
             print()
 
         except Marca.DoesNotExist:
@@ -126,9 +124,7 @@ def main():
     print("🎉 RESUMEN FINAL:")
     print(f"✅ Total modelos creados: {total_creados}")
     print(f"📍 Total modelos ya existentes: {total_existentes}")
-    print(
-        f"🚙 Total modelos Chile: {Modelo.objects.filter(marca__country='CL').count()}"
-    )
+    print(f"🚙 Total modelos Chile: {Modelo.objects.filter(marca__country='CL').count()}")
 
 
 if __name__ == "__main__":

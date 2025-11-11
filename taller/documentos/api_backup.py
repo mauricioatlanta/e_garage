@@ -12,9 +12,9 @@ def api_vehiculos_por_cliente(request):
     cid = request.GET.get("cliente_id")
     qs = Vehiculo.objects.none()
     if cid:
-        qs = Vehiculo.objects.filter(
-            cliente_id=cid, empresa=request.user.empresa
-        ).values("id", "patente", "vin", "marca__nombre", "modelo__nombre")
+        qs = Vehiculo.objects.filter(cliente_id=cid, empresa=request.user.empresa).values(
+            "id", "patente", "vin", "marca__nombre", "modelo__nombre"
+        )
     return JsonResponse(list(qs), safe=False)
 
 
@@ -25,9 +25,7 @@ def api_repuesto_por_codigo(request):
     data = {}
     if code:
         try:
-            r = Repuesto.objects.get(
-                empresa=request.user.empresa, part_number__iexact=code
-            )
+            r = Repuesto.objects.get(empresa=request.user.empresa, part_number__iexact=code)
             data = {
                 "id": r.id,
                 "nombre": r.nombre,
@@ -210,9 +208,7 @@ def api_create(request):
         )
         ls_kwargs.update(_responsable_kwargs(LineaServicio, tecnico_obj))
         LineaServicio.objects.create(**ls_kwargs)
-        subtotal += (ls_kwargs["cantidad"] * ls_kwargs["precio_unitario"]) - ls_kwargs[
-            "descuento"
-        ]
+        subtotal += (ls_kwargs["cantidad"] * ls_kwargs["precio_unitario"]) - ls_kwargs["descuento"]
 
     # Crear líneas de repuesto
     for d in payload.get("lineas_repuesto") or []:
@@ -233,9 +229,7 @@ def api_create(request):
                 lr_kwargs["codigo"] = f"REP-{doc.id}-{d['nombre'][:8]}".upper()
         lr_kwargs.update(_responsable_kwargs(LineaRepuesto, tecnico_obj))
         LineaRepuesto.objects.create(**lr_kwargs)
-        subtotal += (lr_kwargs["cantidad"] * lr_kwargs["precio_unitario"]) - lr_kwargs[
-            "descuento"
-        ]
+        subtotal += (lr_kwargs["cantidad"] * lr_kwargs["precio_unitario"]) - lr_kwargs["descuento"]
 
     # Cálculo de impuesto usando CompanySettings con fallback
     tasa = _tax_rate_for_empresa(emp)

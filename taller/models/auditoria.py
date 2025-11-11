@@ -37,12 +37,8 @@ class LogAuditoria(models.Model):
     ip_address = models.GenericIPAddressField(null=True, blank=True)
     user_agent = models.TextField(null=True, blank=True)
     fecha_hora = models.DateTimeField(default=timezone.now)
-    datos_antes = models.JSONField(
-        null=True, blank=True, help_text="Estado anterior del objeto"
-    )
-    datos_despues = models.JSONField(
-        null=True, blank=True, help_text="Estado posterior del objeto"
-    )
+    datos_antes = models.JSONField(null=True, blank=True, help_text="Estado anterior del objeto")
+    datos_despues = models.JSONField(null=True, blank=True, help_text="Estado posterior del objeto")
 
     class Meta:
         verbose_name = "Log de Auditoría"
@@ -50,9 +46,7 @@ class LogAuditoria(models.Model):
         ordering = ["-fecha_hora"]
 
     def __str__(self):
-        return (
-            f"{self.usuario.username} - {self.accion} {self.modelo} [{self.fecha_hora}]"
-        )
+        return f"{self.usuario.username} - {self.accion} {self.modelo} [{self.fecha_hora}]"
 
     @classmethod
     def log_accion(

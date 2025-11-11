@@ -63,19 +63,11 @@ class Vehiculo(TenantScoped):
 
     patente = models.CharField(max_length=20, db_index=True)
     anio = models.PositiveIntegerField(verbose_name="Año")
-    color = models.ForeignKey(
-        ColorVehiculo, on_delete=models.SET_NULL, null=True, blank=True
-    )
+    color = models.ForeignKey(ColorVehiculo, on_delete=models.SET_NULL, null=True, blank=True)
     vin = models.CharField(max_length=50, blank=True, null=True, db_index=True)
-    motor = models.ForeignKey(
-        MotorVehiculo, on_delete=models.SET_NULL, null=True, blank=True
-    )
-    caja = models.ForeignKey(
-        CajaVehiculo, on_delete=models.SET_NULL, null=True, blank=True
-    )
-    millas = models.PositiveIntegerField(
-        blank=True, null=True, verbose_name="Millas/Kilometraje"
-    )
+    motor = models.ForeignKey(MotorVehiculo, on_delete=models.SET_NULL, null=True, blank=True)
+    caja = models.ForeignKey(CajaVehiculo, on_delete=models.SET_NULL, null=True, blank=True)
+    millas = models.PositiveIntegerField(blank=True, null=True, verbose_name="Millas/Kilometraje")
 
     objects = VehiculoQuerySet.as_manager()
 
@@ -126,11 +118,7 @@ class Vehiculo(TenantScoped):
         super().clean()
 
         # 1) Empresa coherente con cliente
-        if (
-            self.empresa_id
-            and self.cliente_id
-            and self.cliente.empresa_id != self.empresa_id
-        ):
+        if self.empresa_id and self.cliente_id and self.cliente.empresa_id != self.empresa_id:
             raise ValidationError(
                 "El cliente del vehículo debe pertenecer a la misma empresa del vehículo."
             )
@@ -147,9 +135,7 @@ class Vehiculo(TenantScoped):
         # Si usas catálogos FK en CL, evita mezclar con *_texto.
         if pais == "CL":
             if self.marca_texto or self.modelo_texto:
-                raise ValidationError(
-                    "En Chile use marca/modelo del catálogo (no *_texto)."
-                )
+                raise ValidationError("En Chile use marca/modelo del catálogo (no *_texto).")
         elif pais == "US":
             # En USA permitimos *_texto. Si además vienen FK, está bien si quieres híbrido;
             # si NO lo quieres, puedes forzar a que sólo se usen *_texto:
@@ -200,9 +186,7 @@ class Vehiculo(TenantScoped):
         ordering = ["marca", "modelo", "patente"]
         verbose_name = "Vehículo"
         constraints = [
-            models.UniqueConstraint(
-                fields=["empresa", "patente"], name="uq_empresa_patente"
-            ),
+            models.UniqueConstraint(fields=["empresa", "patente"], name="uq_empresa_patente"),
             models.UniqueConstraint(
                 fields=["empresa", "vin"],
                 condition=Q(vin__isnull=False) & ~Q(vin=""),
@@ -216,10 +200,6 @@ class Vehiculo(TenantScoped):
             models.Index(
                 fields=["empresa", "cliente"]
             ),  # ✅ CRÍTICO: Para endpoint vehiculos-por-cliente
-            models.Index(
-                fields=["marca_texto"]
-            ),  # Índice para búsquedas por marca texto
-            models.Index(
-                fields=["modelo_texto"]
-            ),  # Índice para búsquedas por modelo texto
+            models.Index(fields=["marca_texto"]),  # Índice para búsquedas por marca texto
+            models.Index(fields=["modelo_texto"]),  # Índice para búsquedas por modelo texto
         ]

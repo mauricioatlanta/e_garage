@@ -31,9 +31,7 @@ try:
     # Verificar líneas existentes
     total_lineas_rep = LineaRepuesto.objects.count()
     total_lineas_serv = LineaServicio.objects.count()
-    print(
-        f"📊 Líneas existentes - Repuestos: {total_lineas_rep}, Servicios: {total_lineas_serv}"
-    )
+    print(f"📊 Líneas existentes - Repuestos: {total_lineas_rep}, Servicios: {total_lineas_serv}")
 
     # Tomar primer documento
     documento = documentos.first()

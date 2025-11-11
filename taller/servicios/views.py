@@ -18,24 +18,18 @@ def servicios_menu(request):
     lang = get_language() or "es"
 
     # Obtener servicios con filtros básicos
-    servicios = (
-        Servicio.objects.filter(empresa=empresa) if empresa else Servicio.objects.none()
-    )
+    servicios = Servicio.objects.filter(empresa=empresa) if empresa else Servicio.objects.none()
 
     # Filtrar categorías por país
-    categorias = CategoriaServicio.objects.filter(
-        country=country_code
-    ).prefetch_related("names")
-    subcategorias = SubcategoriaServicio.objects.filter(
-        country=country_code
-    ).prefetch_related("names")
+    categorias = CategoriaServicio.objects.filter(country=country_code).prefetch_related("names")
+    subcategorias = SubcategoriaServicio.objects.filter(country=country_code).prefetch_related(
+        "names"
+    )
 
     # Agrupar servicios por categoría para mejor organización
     servicios_por_categoria = {}
     for categoria in categorias:
-        servicios_cat = servicios.filter(categoria=categoria).select_related(
-            "subcategoria"
-        )
+        servicios_cat = servicios.filter(categoria=categoria).select_related("subcategoria")
         if servicios_cat.exists():
             servicios_por_categoria[categoria] = servicios_cat
 
@@ -76,9 +70,7 @@ def buscar_servicios_api(request):
     # Obtener empresa del usuario
     empresa = getattr(request.user, "empresa", None)
 
-    servicios = (
-        Servicio.objects.filter(empresa=empresa) if empresa else Servicio.objects.none()
-    )
+    servicios = Servicio.objects.filter(empresa=empresa) if empresa else Servicio.objects.none()
 
     # Aplicar filtros de búsqueda
     if query:
@@ -98,9 +90,7 @@ def buscar_servicios_api(request):
             {
                 "pk": servicio.pk,
                 "nombre": servicio.nombre,
-                "categoria": (
-                    servicio.categoria.get_label() if servicio.categoria else ""
-                ),
+                "categoria": (servicio.categoria.get_label() if servicio.categoria else ""),
                 "subcategoria": (
                     servicio.subcategoria.get_label() if servicio.subcategoria else ""
                 ),
@@ -140,12 +130,8 @@ def otros_servicios_menu(request):
     stats = {
         "total_otros_servicios": otros_servicios.count(),
         "total_categorias": otros_servicios.values("categoria").distinct().count(),
-        "total_subcategorias": otros_servicios.values("subcategoria")
-        .distinct()
-        .count(),
-        "total_empresas_externas": otros_servicios.values("empresa_externa")
-        .distinct()
-        .count(),
+        "total_subcategorias": otros_servicios.values("subcategoria").distinct().count(),
+        "total_empresas_externas": otros_servicios.values("empresa_externa").distinct().count(),
     }
 
     # Obtener país e idioma del request
@@ -204,12 +190,8 @@ def crear_otro_servicio(request):
             tiempo_estimado = request.POST.get("tiempo_estimado", "")
 
             # Validaciones básicas
-            if not all(
-                [nombre, empresa_externa, categoria_id, costo_taller, precio_cliente]
-            ):
-                messages.error(
-                    request, "Todos los campos requeridos deben ser completados"
-                )
+            if not all([nombre, empresa_externa, categoria_id, costo_taller, precio_cliente]):
+                messages.error(request, "Todos los campos requeridos deben ser completados")
                 return redirect("servicios:otros_servicios_menu")
 
             # Crear servicio externo
@@ -226,9 +208,7 @@ def crear_otro_servicio(request):
                 activo=True,
             )
 
-            messages.success(
-                request, f"Servicio externo '{servicio.nombre}' creado exitosamente"
-            )
+            messages.success(request, f"Servicio externo '{servicio.nombre}' creado exitosamente")
 
         except Exception as e:
             messages.error(request, f"Error al crear servicio externo: {str(e)}")

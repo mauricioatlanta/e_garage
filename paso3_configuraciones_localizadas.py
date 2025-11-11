@@ -25,9 +25,7 @@ class ConfiguracionesLocalizadas:
         print("🇨🇱 CONFIGURANDO EMPRESAS CHILE")
         print("-" * 50)
 
-        empresas_cl = Empresa.objects.filter(
-            pais="CL", user__username__startswith="demo_"
-        )
+        empresas_cl = Empresa.objects.filter(pais="CL", user__username__startswith="demo_")
 
         configuraciones_cl = {
             "moneda": "CLP",
@@ -67,9 +65,7 @@ class ConfiguracionesLocalizadas:
 
                 print(f"   ✅ {empresa.nombre_taller}")
                 print(f"      Zona horaria: {empresa.zona_horaria}")
-                print(
-                    f"      Colores: {settings.primary_color} / {settings.secondary_color}"
-                )
+                print(f"      Colores: {settings.primary_color} / {settings.secondary_color}")
 
             except Exception:
                 print(f"      ⚠️ Sin CompanySettings: {empresa.nombre_taller}")
@@ -81,9 +77,7 @@ class ConfiguracionesLocalizadas:
         print("🇺🇸 CONFIGURANDO EMPRESAS USA")
         print("-" * 50)
 
-        empresas_us = Empresa.objects.filter(
-            pais="US", user__username__startswith="demo_"
-        )
+        empresas_us = Empresa.objects.filter(pais="US", user__username__startswith="demo_")
 
         configuraciones_us = {
             "moneda": "USD",
@@ -123,9 +117,7 @@ class ConfiguracionesLocalizadas:
 
                 print(f"   ✅ {empresa.nombre_taller}")
                 print(f"      Time zone: {empresa.zona_horaria}")
-                print(
-                    f"      Colors: {settings.primary_color} / {settings.secondary_color}"
-                )
+                print(f"      Colors: {settings.primary_color} / {settings.secondary_color}")
 
             except Exception:
                 print(f"      ⚠️ No CompanySettings: {empresa.nombre_taller}")
@@ -142,12 +134,8 @@ class ConfiguracionesLocalizadas:
         print(f"👤 Usuarios demo: {usuarios_demo.count()}")
 
         # Contar empresas demo por país
-        empresas_cl = Empresa.objects.filter(
-            pais="CL", user__username__startswith="demo_"
-        )
-        empresas_us = Empresa.objects.filter(
-            pais="US", user__username__startswith="demo_"
-        )
+        empresas_cl = Empresa.objects.filter(pais="CL", user__username__startswith="demo_")
+        empresas_us = Empresa.objects.filter(pais="US", user__username__startswith="demo_")
 
         print(f"🏢 Empresas demo CL: {empresas_cl.count()}")
         print(f"🏢 Empresas demo US: {empresas_us.count()}")
@@ -239,9 +227,7 @@ class ConfiguracionesLocalizadas:
         print("\n🔐 ACCESO A EMPRESAS DEMO:")
         empresas_demo = Empresa.objects.filter(user__username__startswith="demo_")
         for empresa in empresas_demo:
-            print(
-                f"   {empresa.user.username} → {empresa.nombre_taller} ({empresa.pais})"
-            )
+            print(f"   {empresa.user.username} → {empresa.nombre_taller} ({empresa.pais})")
 
         print("\n🎉 CONFIGURACIONES COMPLETADAS")
         print("✅ Sistema listo con localizaciones específicas")

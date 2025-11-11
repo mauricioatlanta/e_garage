@@ -24,9 +24,7 @@ def configurar_timezone(request):
             empresa.zona_horaria = nueva_zona
             empresa.save()
 
-            messages.success(
-                request, f"Zona horaria actualizada a {empresa.timezone_display}"
-            )
+            messages.success(request, f"Zona horaria actualizada a {empresa.timezone_display}")
             return redirect("configurar_timezone")
         else:
             messages.error(request, "Zona horaria no válida")
@@ -64,9 +62,7 @@ def cambiar_timezone_ajax(request):
                     "success": True,
                     "message": f"Zona horaria actualizada a {empresa.timezone_display}",
                     "new_timezone": empresa.timezone_display,
-                    "current_time": empresa.format_local_datetime(
-                        empresa.now_local(), "full"
-                    ),
+                    "current_time": empresa.format_local_datetime(empresa.now_local(), "full"),
                 }
             )
         else:

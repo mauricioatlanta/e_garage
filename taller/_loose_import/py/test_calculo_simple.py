@@ -28,9 +28,7 @@ def test_calculo_simple():
         username="testuser_simple", email="test@example.com", password="testpass123"
     )
 
-    empresa_cl = Empresa.objects.create(
-        nombre_taller="Taller Chile Test", pais="CL", user=user
-    )
+    empresa_cl = Empresa.objects.create(nombre_taller="Taller Chile Test", pais="CL", user=user)
 
     # Crear cliente
     cliente = Cliente.objects.create(

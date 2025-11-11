@@ -30,9 +30,7 @@ def ver_documento_nuevo(request, documento_id):
             user=request.user,
             defaults={"nombre_taller": f"Taller de {request.user.username}"},
         )
-        print(
-            f"[VER_NUEVO] Empresa {'creada' if created else 'obtenida'}: {empresa.nombre_taller}"
-        )
+        print(f"[VER_NUEVO] Empresa {'creada' if created else 'obtenida'}: {empresa.nombre_taller}")
 
     # Obtener documento con filtro de empresa
     documento = get_object_or_404(Documento, id=documento_id, empresa=empresa)
@@ -147,9 +145,7 @@ def editar_documento_nuevo(request, documento_id):
                     # ELIMINAR TODAS LAS LÍNEAS EXISTENTES
                     repuestos_eliminados = documento.lineas_repuesto.count()
                     servicios_eliminados = documento.lineas_servicio.count()
-                    otros_eliminados = LineaOtroServicio.objects.filter(
-                        documento=documento
-                    ).count()
+                    otros_eliminados = LineaOtroServicio.objects.filter(documento=documento).count()
 
                     documento.lineas_repuesto.all().delete()
                     documento.lineas_servicio.all().delete()
@@ -186,8 +182,7 @@ def editar_documento_nuevo(request, documento_id):
                             # Crear repuesto
                             repuesto = LineaRepuesto.objects.create(
                                 documento=documento,
-                                codigo=item.get("partnumber", "").strip()
-                                or f"EDIT-{i+1:03d}",
+                                codigo=item.get("partnumber", "").strip() or f"EDIT-{i+1:03d}",
                                 nombre=nombre,
                                 cantidad=int(item.get("cantidad", 1)),
                                 precio_unitario=precio,
@@ -263,9 +258,7 @@ def editar_documento_nuevo(request, documento_id):
     # Importar LineaOtroServicio
     from taller.models.lineas_documento import LineaOtroServicio
 
-    otros_servicios_query = LineaOtroServicio.objects.filter(
-        documento=documento
-    ).order_by("id")
+    otros_servicios_query = LineaOtroServicio.objects.filter(documento=documento).order_by("id")
 
     print("[EDITAR_NUEVO] ===== DEBUG DATOS =====")
     print(f"[EDITAR_NUEVO] Documento ID: {documento.id}")
@@ -285,9 +278,7 @@ def editar_documento_nuevo(request, documento_id):
                 "total": rep.subtotal,
             }
         )
-        print(
-            f"[EDITAR_NUEVO] Repuesto: {rep.nombre} - ${rep.precio_unitario} x {rep.cantidad}"
-        )
+        print(f"[EDITAR_NUEVO] Repuesto: {rep.nombre} - ${rep.precio_unitario} x {rep.cantidad}")
 
     servicios = []
     for serv in servicios_query:

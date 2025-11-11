@@ -80,9 +80,7 @@ def get_user_scope(request):
             qs = qs.filter(empresa=empresa)
     """
     empresa = getattr(request.user, "empresa", None)
-    raw_pais = (
-        getattr(empresa, "pais", None) or getattr(request, "country", None) or "CL"
-    )
+    raw_pais = getattr(empresa, "pais", None) or getattr(request, "country", None) or "CL"
     pais = str(raw_pais).strip().upper()
     pais = pais if pais in ("CL", "US") else "CL"
     return empresa, pais

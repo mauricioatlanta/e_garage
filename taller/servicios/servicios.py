@@ -40,18 +40,12 @@ def eliminar_servicio(request, servicio_id):
 
 
 def lista_servicios(request):
-    categorias = CategoriaServicio.objects.prefetch_related(
-        "subcategorias__servicio_set"
-    ).all()
-    return render(
-        request, "taller/servicios/lista_servicios.html", {"categorias": categorias}
-    )
+    categorias = CategoriaServicio.objects.prefetch_related("subcategorias__servicio_set").all()
+    return render(request, "taller/servicios/lista_servicios.html", {"categorias": categorias})
 
 
 def explorador_servicios(request):
-    categorias = CategoriaServicio.objects.prefetch_related(
-        "subcategorias__servicios"
-    ).all()
+    categorias = CategoriaServicio.objects.prefetch_related("subcategorias__servicios").all()
     return render(
         request,
         "taller/servicios/explorador_servicios.html",

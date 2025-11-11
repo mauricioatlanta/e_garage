@@ -20,9 +20,7 @@ def _set_if_field(kwargs, model, name, value):
 @pytest.mark.django_db
 def test_precio_suscripcion_chile_calculo_iva():
     try:
-        Precio = importlib.import_module(
-            "taller.models.precio_suscripcion"
-        ).PrecioSuscripcion
+        Precio = importlib.import_module("taller.models.precio_suscripcion").PrecioSuscripcion
     except ModuleNotFoundError:
         pytest.skip("PrecioSuscripcion no disponible")
 
@@ -108,9 +106,7 @@ def test_precio_suscripcion_chile_calculo_iva():
 @pytest.mark.django_db
 def test_precio_suscripcion_usa_sales_tax_smoke():
     try:
-        Precio = importlib.import_module(
-            "taller.models.precio_suscripcion"
-        ).PrecioSuscripcion
+        Precio = importlib.import_module("taller.models.precio_suscripcion").PrecioSuscripcion
     except ModuleNotFoundError:
         pytest.skip("PrecioSuscripcion no disponible")
 
@@ -146,9 +142,7 @@ def test_precio_suscripcion_usa_sales_tax_smoke():
     for price_field in ("precio", "monto", "valor", "precio_base"):
         _set_if_field(data, Precio, price_field, base)
     for tax_field in ("sales_tax_percent", "tax_percent", "impuesto_porcentaje"):
-        _set_if_field(
-            data, Precio, tax_field, Decimal("0.00")
-        )  # si existe, lo fijamos a 0
+        _set_if_field(data, Precio, tax_field, Decimal("0.00"))  # si existe, lo fijamos a 0
 
     obj = Precio(**data)
     try:

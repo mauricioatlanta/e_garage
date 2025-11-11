@@ -65,9 +65,7 @@ def probar_idioma_web():
             print(f"   • Idioma detectado: {idioma_detectado}")
 
             # Verificar headers de idioma
-            content_language = response.headers.get(
-                "Content-Language", "No especificado"
-            )
+            content_language = response.headers.get("Content-Language", "No especificado")
             print(f"   • Content-Language header: {content_language}")
 
             # Buscar información del país
@@ -88,9 +86,7 @@ def probar_idioma_web():
             print(f"❌ Error al cargar la página (Status: {response.status_code})")
 
     except requests.exceptions.ConnectionError:
-        print(
-            "❌ No se puede conectar al servidor. ¿Está corriendo en http://127.0.0.1:8000?"
-        )
+        print("❌ No se puede conectar al servidor. ¿Está corriendo en http://127.0.0.1:8000?")
     except Exception as e:
         print(f"❌ Error: {e}")
 

@@ -35,9 +35,7 @@ if empresas.count() == 0:
         nombre_taller="Taller Demo Chile", pais="CL", ciudad="Santiago"
     )
 
-    cliente = Cliente.objects.create(
-        empresa=empresa, nombre="Cliente Demo", email="demo@test.com"
-    )
+    cliente = Cliente.objects.create(empresa=empresa, nombre="Cliente Demo", email="demo@test.com")
 
     documento = Documento.objects.create(
         empresa=empresa, cliente=cliente, tipo="PRES", numero=1, total=100000

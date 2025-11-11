@@ -54,9 +54,7 @@ def verificar_integridad_datos():
     print("\n3️⃣ INCONSISTENCIAS CLIENTE-VEHÍCULO-EMPRESA:")
 
     # Vehículos con cliente de diferente empresa
-    vehiculos_empresa_inconsistente = Vehiculo.objects.exclude(
-        empresa=F("cliente__empresa")
-    )
+    vehiculos_empresa_inconsistente = Vehiculo.objects.exclude(empresa=F("cliente__empresa"))
     if vehiculos_empresa_inconsistente.exists():
         print(
             f"   ❌ {vehiculos_empresa_inconsistente.count()} vehículos con empresa diferente a la del cliente"
@@ -78,17 +76,13 @@ def verificar_integridad_datos():
 
         # Test 1: Vehículos del cliente (sin filtro de empresa)
         vehiculos_cliente_total = Vehiculo.objects.filter(cliente=cliente_usa).count()
-        print(
-            f"   Vehículos del cliente (sin filtro empresa): {vehiculos_cliente_total}"
-        )
+        print(f"   Vehículos del cliente (sin filtro empresa): {vehiculos_cliente_total}")
 
         # Test 2: Vehículos del cliente con filtro de empresa (como usa el endpoint)
         vehiculos_cliente_empresa = Vehiculo.objects.filter(
             cliente=cliente_usa, empresa=cliente_usa.empresa
         ).count()
-        print(
-            f"   Vehículos del cliente (con filtro empresa): {vehiculos_cliente_empresa}"
-        )
+        print(f"   Vehículos del cliente (con filtro empresa): {vehiculos_cliente_empresa}")
 
         if vehiculos_cliente_total > vehiculos_cliente_empresa:
             print(
@@ -147,9 +141,7 @@ def verificar_integridad_datos():
     # 6. Resumen y recomendaciones
     print("\n6️⃣ RESUMEN Y RECOMENDACIONES:")
 
-    total_inconsistencias = vehiculos_empresa_inconsistente.count() + len(
-        documentos_problematicos
-    )
+    total_inconsistencias = vehiculos_empresa_inconsistente.count() + len(documentos_problematicos)
 
     if total_inconsistencias > 0:
         print(f"   🚨 SE ENCONTRARON {total_inconsistencias} INCONSISTENCIAS")
@@ -219,9 +211,7 @@ def corregir_inconsistencias():
             old_empresa = v.empresa
             v.empresa = v.cliente.empresa
             v.save()
-            print(
-                f"   ✅ Vehículo {v.id} ({v.patente}): {old_empresa} → {v.cliente.empresa}"
-            )
+            print(f"   ✅ Vehículo {v.id} ({v.patente}): {old_empresa} → {v.cliente.empresa}")
             fixed_count += 1
 
     print(f"\n📊 TOTAL CORRECCIONES APLICADAS: {fixed_count}")
@@ -230,21 +220,11 @@ def corregir_inconsistencias():
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(
-        description="Verificar integridad Cliente-Vehículo-Empresa"
-    )
-    parser.add_argument(
-        "--check", action="store_true", help="Solo verificar inconsistencias"
-    )
-    parser.add_argument(
-        "--fix", action="store_true", help="Verificar y corregir inconsistencias"
-    )
-    parser.add_argument(
-        "--test-endpoint", action="store_true", help="Simular endpoint AJAX"
-    )
-    parser.add_argument(
-        "--all", action="store_true", help="Ejecutar todas las verificaciones"
-    )
+    parser = argparse.ArgumentParser(description="Verificar integridad Cliente-Vehículo-Empresa")
+    parser.add_argument("--check", action="store_true", help="Solo verificar inconsistencias")
+    parser.add_argument("--fix", action="store_true", help="Verificar y corregir inconsistencias")
+    parser.add_argument("--test-endpoint", action="store_true", help="Simular endpoint AJAX")
+    parser.add_argument("--all", action="store_true", help="Ejecutar todas las verificaciones")
 
     args = parser.parse_args()
 

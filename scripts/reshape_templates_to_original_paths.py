@@ -18,12 +18,8 @@ def rewrite_promoted_path(root: Path, new_rel: str, assume_promoted: bool) -> st
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", default=".", help="Project root with ./templates")
-    ap.add_argument(
-        "--remap", required=True, help="Path to reports/templates_remap.csv"
-    )
-    ap.add_argument(
-        "--apply", action="store_true", help="Actually perform file operations"
-    )
+    ap.add_argument("--remap", required=True, help="Path to reports/templates_remap.csv")
+    ap.add_argument("--apply", action="store_true", help="Actually perform file operations")
     ap.add_argument(
         "--mode",
         choices=["copy", "move"],

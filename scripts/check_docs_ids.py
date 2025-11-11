@@ -15,9 +15,7 @@ print(f"Total: {docs.count()} documentos")
 for d in docs:
     empresa_nombre = d.empresa.nombre_taller if d.empresa else "N/A"
     empresa_pais = d.empresa.pais if d.empresa else "N/A"
-    print(
-        f"  {d.pk:2d} - {d.tipo}-{d.numero:3d} | Empresa: {empresa_nombre} ({empresa_pais})"
-    )
+    print(f"  {d.pk:2d} - {d.tipo}-{d.numero:3d} | Empresa: {empresa_nombre} ({empresa_pais})")
 
 print("\n=== ANÁLISIS ===")
 print(f"IDs existentes: {list(docs.values_list('pk', flat=True))}")

@@ -50,9 +50,7 @@ def revenue_analytics_api(request):
 
     data = {
         "revenue_timeline": engine._get_revenue_timeline(periodo),
-        "growth_rate": engine._calculate_growth(
-            engine.empresa.documento_set.all(), "total"
-        ),
+        "growth_rate": engine._calculate_growth(engine.empresa.documento_set.all(), "total"),
         "currency": engine.moneda,
         "symbol": engine.simbolo,
     }

@@ -13,9 +13,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ============================================================
 # 🔐 CONFIGURACIÓN DE SEGURIDAD PARA PRODUCCIÓN
 # ============================================================
-SECRET_KEY = os.environ.get(
-    "DJANGO_SECRET_KEY", "laila2013-production-key-change-in-server"
-)
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "laila2013-production-key-change-in-server")
 DEBUG = False
 
 # Dominios permitidos para PythonAnywhere
@@ -103,9 +101,7 @@ DATABASES = {
         "NAME": os.environ.get("DB_NAME", "atlantareciclajes$egarage"),
         "USER": os.environ.get("DB_USER", "atlantareciclajes"),
         "PASSWORD": os.environ.get("DB_PASSWORD", "laila2013"),
-        "HOST": os.environ.get(
-            "DB_HOST", "atlantareciclajes.mysql.pythonanywhere-services.com"
-        ),
+        "HOST": os.environ.get("DB_HOST", "atlantareciclajes.mysql.pythonanywhere-services.com"),
         "PORT": os.environ.get("DB_PORT", "3306"),
         "OPTIONS": {
             "charset": "utf8mb4",

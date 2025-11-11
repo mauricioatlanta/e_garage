@@ -15,10 +15,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 ALLOWED_LANGS = {
-    code
-    for code, _ in getattr(
-        settings, "LANGUAGES", (("es", "Español"), ("en", "English"))
-    )
+    code for code, _ in getattr(settings, "LANGUAGES", (("es", "Español"), ("en", "English")))
 }
 
 
@@ -38,9 +35,7 @@ class CountryLanguageMiddleware(MiddlewareMixin):
 
         # Determinar país basado en URL y usuario logueado
         url_country = (
-            "CL"
-            if path.startswith("/cl/")
-            else ("US" if path.startswith("/us/") else None)
+            "CL" if path.startswith("/cl/") else ("US" if path.startswith("/us/") else None)
         )
 
         # Si el usuario está logueado, usar su país de empresa
@@ -49,10 +44,7 @@ class CountryLanguageMiddleware(MiddlewareMixin):
             try:
                 if hasattr(request.user, "empresa") and request.user.empresa:
                     user_country = request.user.empresa.pais
-                elif (
-                    hasattr(request.user, "perfilusuario")
-                    and request.user.perfilusuario
-                ):
+                elif hasattr(request.user, "perfilusuario") and request.user.perfilusuario:
                     user_country = request.user.perfilusuario.pais
             except:
                 pass
@@ -120,9 +112,7 @@ class CountryLanguageMiddleware(MiddlewareMixin):
         response.headers["Content-Language"] = lang
 
         # No overwrites: sólo refuerza si no hay cookie
-        if not request.COOKIES.get(
-            getattr(settings, "LANGUAGE_COOKIE_NAME", "django_language")
-        ):
+        if not request.COOKIES.get(getattr(settings, "LANGUAGE_COOKIE_NAME", "django_language")):
             response.set_cookie(
                 settings.LANGUAGE_COOKIE_NAME,
                 lang,

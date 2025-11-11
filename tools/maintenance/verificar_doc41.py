@@ -41,13 +41,10 @@ try:
 
     # Calcular total
     total_repuestos = sum(
-        getattr(r, "precio_unitario", getattr(r, "precio", 0))
-        * getattr(r, "cantidad", 1)
+        getattr(r, "precio_unitario", getattr(r, "precio", 0)) * getattr(r, "cantidad", 1)
         for r in repuestos
     )
-    total_servicios = sum(
-        getattr(s, "precio_unitario", getattr(s, "precio", 0)) for s in servicios
-    )
+    total_servicios = sum(getattr(s, "precio_unitario", getattr(s, "precio", 0)) for s in servicios)
     total_documento = total_repuestos + total_servicios
 
     print("\n💰 Totales:")

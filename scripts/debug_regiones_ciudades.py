@@ -67,10 +67,7 @@ def main():
         campos_visibles = []
 
         for field_name, field in form.fields.items():
-            if (
-                hasattr(field.widget, "input_type")
-                and field.widget.input_type == "hidden"
-            ):
+            if hasattr(field.widget, "input_type") and field.widget.input_type == "hidden":
                 campos_ocultos.append(field_name)
             elif field_name in [
                 "region",
@@ -113,10 +110,7 @@ def main():
         campos_visibles = []
 
         for field_name, field in form.fields.items():
-            if (
-                hasattr(field.widget, "input_type")
-                and field.widget.input_type == "hidden"
-            ):
+            if hasattr(field.widget, "input_type") and field.widget.input_type == "hidden":
                 campos_ocultos.append(field_name)
             elif field_name in [
                 "region",

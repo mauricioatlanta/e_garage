@@ -6,9 +6,7 @@ from taller.models.empresa import Empresa
 
 
 class Venta(models.Model):
-    empresa = models.ForeignKey(
-        Empresa, on_delete=models.CASCADE
-    )  # Multiempresa obligatorio
+    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE)  # Multiempresa obligatorio
     fecha = models.DateField(auto_now_add=True)
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
     total = models.DecimalField(max_digits=12, decimal_places=2)

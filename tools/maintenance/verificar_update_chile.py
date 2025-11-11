@@ -30,9 +30,7 @@ def verificar_chile_profesional():
             views_content = f.read()
 
         if "dashboard_chile.html" in views_content:
-            print(
-                "✅ Vista dashboard_cl_view actualizada para usar dashboard_chile.html"
-            )
+            print("✅ Vista dashboard_cl_view actualizada para usar dashboard_chile.html")
         else:
             print("❌ Vista aún usa template anterior")
             return False

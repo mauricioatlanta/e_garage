@@ -36,9 +36,7 @@ def resend_email_view(request):
                 User = get_user_model()
                 user = User.objects.filter(email=email).first()
                 if user:
-                    email_obj = EmailAddress.objects.filter(
-                        user=user, email=email
-                    ).first()
+                    email_obj = EmailAddress.objects.filter(user=user, email=email).first()
                     if email_obj and not email_obj.verified:
                         send_email_confirmation(request, user, email)
                         messages.success(
@@ -59,6 +57,4 @@ def resend_email_view(request):
                 )
         else:
             form = ResendEmailForm()
-        return render(
-            request, "account/resend_email.html", {"form": form, "autenticado": False}
-        )
+        return render(request, "account/resend_email.html", {"form": form, "autenticado": False})

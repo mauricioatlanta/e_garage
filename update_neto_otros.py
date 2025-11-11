@@ -16,9 +16,7 @@ from taller.documentos.models import Documento, LineaOtroServicio
 print("Actualizando campo neto_otros_servicios para documentos...")
 
 # Buscar documentos con otros servicios
-docs_with_otros = Documento.objects.filter(
-    lineas_otro_servicio__isnull=False
-).distinct()
+docs_with_otros = Documento.objects.filter(lineas_otro_servicio__isnull=False).distinct()
 
 for doc in docs_with_otros:
     # Calcular el total de otros servicios
@@ -29,8 +27,6 @@ for doc in docs_with_otros:
     doc.neto_otros_servicios = Decimal(str(total_otros))
     doc.save()
 
-    print(
-        f"Documento {doc.pk} ({doc.tipo}): neto_otros_servicios = ${doc.neto_otros_servicios}"
-    )
+    print(f"Documento {doc.pk} ({doc.tipo}): neto_otros_servicios = ${doc.neto_otros_servicios}")
 
 print("¡Actualización completada!")

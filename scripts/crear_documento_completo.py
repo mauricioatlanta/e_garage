@@ -59,9 +59,7 @@ try:
             cantidad=rep_data["cantidad"],
             precio_unitario=rep_data["precio"],
         )
-        print(
-            f"🔧 Repuesto: {repuesto.nombre} x{repuesto.cantidad} = ${repuesto.total}"
-        )
+        print(f"🔧 Repuesto: {repuesto.nombre} x{repuesto.cantidad} = ${repuesto.total}")
 
     # Crear múltiples servicios
     servicios_data = [
@@ -81,8 +79,7 @@ try:
 
     # Calcular totales
     total_repuestos = sum(
-        getattr(r, "precio_unitario", getattr(r, "precio", 0))
-        * getattr(r, "cantidad", 1)
+        getattr(r, "precio_unitario", getattr(r, "precio", 0)) * getattr(r, "cantidad", 1)
         for r in documento.lineas_repuesto.all()
     )
     total_servicios = sum(

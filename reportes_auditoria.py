@@ -34,9 +34,9 @@ class ReporteAuditoria:
         usuario = User.objects.get(id=usuario_id)
         perfil = PerfilUsuario.objects.get(user=usuario)
 
-        logs = LogAuditoria.objects.filter(
-            usuario=usuario, fecha_hora__gte=fecha_desde
-        ).order_by("-fecha_hora")
+        logs = LogAuditoria.objects.filter(usuario=usuario, fecha_hora__gte=fecha_desde).order_by(
+            "-fecha_hora"
+        )
 
         print("📊 === REPORTE ACTIVIDAD USUARIO ===")
         print(f"👤 Usuario: {usuario.username}")
@@ -115,9 +115,7 @@ class ReporteAuditoria:
                 docs_accedidos[doc_id] += 1
 
         print("📊 DOCUMENTOS MÁS ACCEDIDOS:")
-        docs_ordenados = sorted(
-            docs_accedidos.items(), key=lambda x: x[1], reverse=True
-        )
+        docs_ordenados = sorted(docs_accedidos.items(), key=lambda x: x[1], reverse=True)
         for doc_id, accesos in docs_ordenados[:5]:
             print(f"   Documento ID {doc_id}: {accesos} accesos")
 
@@ -135,9 +133,9 @@ class ReporteAuditoria:
         ).order_by("-fecha_hora")
 
         # Logins
-        logins = LogAuditoria.objects.filter(
-            accion="LOGIN", fecha_hora__gte=fecha_desde
-        ).order_by("-fecha_hora")
+        logins = LogAuditoria.objects.filter(accion="LOGIN", fecha_hora__gte=fecha_desde).order_by(
+            "-fecha_hora"
+        )
 
         print("🔒 === REPORTE SEGURIDAD ===")
         print(f"📅 Período: Últimos {dias} días")
@@ -150,9 +148,7 @@ class ReporteAuditoria:
             for log in accesos_denegados[:10]:
                 fecha_str = log.fecha_hora.strftime("%d/%m/%Y %H:%M")
                 ip = log.ip_address or "IP desconocida"
-                print(
-                    f"   {fecha_str} - {log.usuario.username} ({ip}): {log.descripcion}"
-                )
+                print(f"   {fecha_str} - {log.usuario.username} ({ip}): {log.descripcion}")
             print()
 
         # IPs más activas
@@ -165,9 +161,7 @@ class ReporteAuditoria:
 
         if ips_actividad:
             print("🌐 IPs MÁS ACTIVAS:")
-            ips_ordenadas = sorted(
-                ips_actividad.items(), key=lambda x: x[1], reverse=True
-            )
+            ips_ordenadas = sorted(ips_actividad.items(), key=lambda x: x[1], reverse=True)
             for ip, actividad in ips_ordenadas[:5]:
                 print(f"   {ip}: {actividad} acciones")
 
@@ -195,9 +189,7 @@ class ReporteAuditoria:
             empresas_actividad[empresa] += 1
 
         print("🏢 ACTIVIDAD POR EMPRESA:")
-        empresas_ordenadas = sorted(
-            empresas_actividad.items(), key=lambda x: x[1], reverse=True
-        )
+        empresas_ordenadas = sorted(empresas_actividad.items(), key=lambda x: x[1], reverse=True)
         for empresa, actividad in empresas_ordenadas:
             print(f"   {empresa}: {actividad} actividades")
         print()
@@ -211,9 +203,7 @@ class ReporteAuditoria:
             actividad_diaria[fecha] += 1
 
         print("📅 ACTIVIDAD POR DÍA (últimos 7 días):")
-        fechas_ordenadas = sorted(
-            actividad_diaria.items(), key=lambda x: x[0], reverse=True
-        )
+        fechas_ordenadas = sorted(actividad_diaria.items(), key=lambda x: x[0], reverse=True)
         for fecha, actividad in fechas_ordenadas[:7]:
             fecha_str = fecha.strftime("%d/%m/%Y")
             print(f"   {fecha_str}: {actividad} actividades")
@@ -228,9 +218,7 @@ class ReporteAuditoria:
 
         print()
         print("👤 USUARIOS MÁS ACTIVOS:")
-        usuarios_ordenados = sorted(
-            usuarios_actividad.items(), key=lambda x: x[1], reverse=True
-        )
+        usuarios_ordenados = sorted(usuarios_actividad.items(), key=lambda x: x[1], reverse=True)
         for username, actividad in usuarios_ordenados[:5]:
             print(f"   {username}: {actividad} actividades")
 

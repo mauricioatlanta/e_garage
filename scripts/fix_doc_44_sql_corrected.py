@@ -84,9 +84,7 @@ def agregar_servicios_documento_44():
     cursor.execute("SELECT COUNT(*) FROM taller_lineaservicio WHERE documento_id = 44")
     servicios_count = cursor.fetchone()[0]
 
-    cursor.execute(
-        "SELECT COUNT(*) FROM taller_lineaotroservicio WHERE documento_id = 44"
-    )
+    cursor.execute("SELECT COUNT(*) FROM taller_lineaotroservicio WHERE documento_id = 44")
     otros_servicios_count = cursor.fetchone()[0]
 
     print(f"✅ Servicios agregados: {servicios_count}")

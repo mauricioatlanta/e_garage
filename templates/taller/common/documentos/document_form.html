@@ -5,77 +5,178 @@
 {% load country_url %}
 
 <style>
-/* Estilos consistentes para todos los campos del formulario */
-.form-control, .form-select, input[type="text"], input[type="number"], input[type="date"], textarea, select {
-  background-color: #000000 !important;
-  border: 2px solid #00ffff !important;
-  color: #00ffff !important;
-  border-radius: 8px !important;
-  padding: 12px 16px !important;
-  font-size: 14px !important;
-  font-weight: 500 !important;
+/* ==================== ESTILOS MEJORADOS CON MÁXIMO CONTRASTE ==================== */
+
+/* Campos de formulario - CONTRASTE ULTRA MEJORADO */
+.form-control, .form-select, input[type="text"], input[type="number"], input[type="date"], input[type="email"], input[type="tel"], textarea, select {
+  background-color: rgba(5, 5, 20, 0.98) !important;
+  border: 2.5px solid #00f2fe !important;
+  color: #ffffff !important;
+  border-radius: 10px !important;
+  padding: 14px 18px !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  font-family: 'Montserrat', 'Segoe UI', 'Arial', sans-serif !important;
   transition: all 0.3s ease !important;
+  box-shadow: 0 0 10px rgba(0, 242, 254, 0.3), inset 0 2px 6px rgba(0, 0, 0, 0.5) !important;
+  letter-spacing: 0.3px !important;
 }
 
-.form-control:focus, .form-select:focus, input[type="text"]:focus, input[type="number"]:focus, input[type="date"]:focus, textarea:focus, select:focus {
-  background-color: #111111 !important;
+/* Focus state - MUY VISIBLE */
+.form-control:focus, .form-select:focus, input[type="text"]:focus, input[type="number"]:focus, input[type="date"]:focus, input[type="email"]:focus, input[type="tel"]:focus, textarea:focus, select:focus {
+  background-color: rgba(10, 10, 30, 1) !important;
   border-color: #00ffff !important;
-  box-shadow: 0 0 10px rgba(0, 255, 255, 0.5) !important;
+  border-width: 3px !important;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.8), inset 0 2px 6px rgba(0, 0, 0, 0.5) !important;
   outline: none !important;
+  color: #ffffff !important;
+  transform: scale(1.01) !important;
 }
 
+/* Placeholders - MÁS VISIBLES */
 .form-control::placeholder, input::placeholder, textarea::placeholder {
-  color: #666666 !important;
+  color: rgba(150, 200, 255, 0.6) !important;
   opacity: 1 !important;
+  font-weight: 500 !important;
+  font-style: italic !important;
 }
 
-/* Estilos para opciones de select */
+/* Opciones de select - MÁXIMO CONTRASTE */
 select option {
   background-color: #000000 !important;
-  color: #00ffff !important;
-  padding: 8px !important;
+  color: #ffffff !important;
+  padding: 12px !important;
+  font-weight: 600 !important;
+  font-size: 15px !important;
 }
 
-/* Estilos para checkboxes */
+select option:hover, select option:checked {
+  background-color: #00f2fe !important;
+  color: #000000 !important;
+}
+
+/* Checkboxes - MÁS GRANDES Y VISIBLES */
 input[type="checkbox"] {
-  background-color: #000000 !important;
-  border: 2px solid #00ffff !important;
-  border-radius: 4px !important;
-  width: 18px !important;
-  height: 18px !important;
-  accent-color: #00ffff !important;
+  background-color: rgba(5, 5, 20, 0.98) !important;
+  border: 2.5px solid #00f2fe !important;
+  border-radius: 5px !important;
+  width: 22px !important;
+  height: 22px !important;
+  accent-color: #00f2fe !important;
+  cursor: pointer !important;
+  box-shadow: 0 0 8px rgba(0, 242, 254, 0.4) !important;
 }
 
-/* Estilos para campos de subtotal */
+input[type="checkbox"]:checked {
+  background-color: #00f2fe !important;
+  box-shadow: 0 0 15px rgba(0, 242, 254, 0.8) !important;
+  border-color: #ffffff !important;
+}
+
+/* Campos de subtotal - ULTRA VISIBLE */
 .subtotal-field {
-  background-color: #000000 !important;
-  border: 2px solid #00ffff !important;
-  color: #00ffff !important;
-  border-radius: 8px !important;
-  padding: 12px 16px !important;
-  font-weight: bold !important;
+  background-color: rgba(5, 5, 20, 0.98) !important;
+  border: 2.5px solid #00f2fe !important;
+  color: #ffffff !important;
+  border-radius: 10px !important;
+  padding: 14px 18px !important;
+  font-weight: 700 !important;
+  font-size: 17px !important;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.5) !important;
 }
 
-/* Estilos para dropdowns de resultados */
+/* Dropdowns de resultados - CONTRASTE MEJORADO */
 .cliente-item, .srv-dropdown {
-  background-color: #000000 !important;
-  border: 2px solid #00ffff !important;
-  color: #00ffff !important;
+  background-color: rgba(5, 5, 20, 0.98) !important;
+  border: 2px solid rgba(0, 242, 254, 0.5) !important;
+  color: #ffffff !important;
+  padding: 12px !important;
+  transition: all 0.2s ease !important;
+  font-weight: 600 !important;
 }
 
 .cliente-item:hover {
-  background-color: #111111 !important;
+  background-color: rgba(0, 242, 254, 0.3) !important;
+  border-color: #00ffff !important;
+  cursor: pointer !important;
+  transform: translateX(4px) !important;
+  box-shadow: 0 0 15px rgba(0, 242, 254, 0.6) !important;
+}
+
+/* Labels - ULTRA VISIBLES */
+label {
+  color: #00ffff !important;
+  font-weight: 700 !important;
+  font-size: 15px !important;
+  text-shadow: 0 0 10px rgba(0, 242, 254, 0.6) !important;
+  letter-spacing: 0.5px !important;
+  text-transform: uppercase !important;
+  margin-bottom: 8px !important;
+  display: block !important;
+}
+
+/* Botones - CONTRASTE MÁXIMO */
+.btn-primary, button[type="submit"] {
+  background: linear-gradient(135deg, #7f00ff, #00f2fe) !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  font-size: 17px !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+  box-shadow: 0 0 20px rgba(0, 242, 254, 0.6) !important;
+  border: 2px solid #00f2fe !important;
+}
+
+.btn-primary:hover, button[type="submit"]:hover {
+  box-shadow: 0 0 30px rgba(0, 242, 254, 0.9) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Campos deshabilitados - VISIBLES */
+input:disabled, select:disabled, textarea:disabled {
+  background-color: rgba(40, 40, 60, 0.6) !important;
+  color: rgba(255, 255, 255, 0.5) !important;
+  cursor: not-allowed !important;
+  opacity: 0.7 !important;
 }
 </style>
 
 {% block documento_title %}
-<div class="flex justify-between items-center">
-  <h1 class="documento-title">📝 {% trans "Create Document" %}</h1>
-  <label class="flex items-center text-cyan-200 font-semibold">
-    <input type="checkbox" id="id_pagado" name="pagado" class="mr-2 form-control">
-    {% trans "Document paid" %}
-  </label>
+<div class="flex justify-between items-center mb-4">
+  <h1 class="documento-title mb-0">📝 {% trans "Create Document" %}</h1>
+  
+  <div class="flex items-center gap-4">
+    <!-- Language Selector -->
+    <form id="language-form-doc" action="/i18n/setlang/" method="post" class="inline">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.get_full_path }}">
+      <input type="hidden" name="language" id="language-input-doc" value="en">
+      <div class="flex items-center gap-2 bg-black/40 px-3 py-2 rounded-lg border border-cyan-400/50" style="box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);">
+        <button type="button" onclick="submitLanguageDoc('en')" id="lang-en-doc" 
+                class="px-3 py-1 rounded-md text-sm font-bold transition-all duration-300 {% if LANGUAGE_CODE == 'en' %}bg-gradient-to-r from-cyan-500 to-blue-500 text-white{% else %}text-gray-400 hover:text-cyan-300{% endif %}"
+                style="{% if LANGUAGE_CODE == 'en' %}box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);{% endif %}">
+          🇺🇸 EN
+        </button>
+        <button type="button" onclick="submitLanguageDoc('es')" id="lang-es-doc" 
+                class="px-3 py-1 rounded-md text-sm font-bold transition-all duration-300 {% if LANGUAGE_CODE == 'es' %}bg-gradient-to-r from-cyan-500 to-blue-500 text-white{% else %}text-gray-400 hover:text-cyan-300{% endif %}"
+                style="{% if LANGUAGE_CODE == 'es' %}box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);{% endif %}">
+          🇪🇸 ES
+        </button>
+      </div>
+    </form>
+    
+    <label class="flex items-center text-cyan-200 font-semibold">
+      <input type="checkbox" id="id_pagado" name="pagado" class="mr-2 form-control">
+      {% trans "Document paid" %}
+    </label>
+  </div>
 </div>
+
+<script>
+function submitLanguageDoc(lang) {
+  document.getElementById('language-input-doc').value = lang;
+  document.getElementById('language-form-doc').submit();
+}
+</script>
 {% endblock %}
 
 {% block documento_content %}
@@ -132,7 +233,12 @@ input[type="checkbox"] {
 
       <!-- Columna 2: Cliente/Vehículo -->
       <div class="space-y-4">
-        <label class="block text-cyan-200 font-semibold">{% trans "Client" %}</label>
+        <div class="flex justify-between items-center">
+          <label class="block text-cyan-200 font-semibold">{% trans "Client" %}</label>
+          <button type="button" onclick="openClienteModal()" class="px-3 py-1 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white font-bold rounded-lg text-sm transition-all">
+            ➕ {% trans "New" %}
+          </button>
+        </div>
         <div class="relative">
           <input type="text" id="cliente-busqueda" class="form-control w-full" placeholder="{% trans 'Type to search clients...' %}" autocomplete="off">
           <div id="cliente-resultados" class="absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
@@ -151,7 +257,12 @@ input[type="checkbox"] {
           </div>
         </div>
 
-        <label for="id_vehiculo" class="block text-cyan-200 font-semibold">{% trans "Vehicle" %}</label>
+        <div class="flex justify-between items-center">
+          <label for="id_vehiculo" class="block text-cyan-200 font-semibold">{% trans "Vehicle" %}</label>
+          <button type="button" onclick="openVehiculoModal()" class="px-3 py-1 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold rounded-lg text-sm transition-all">
+            🚗 {% trans "New" %}
+          </button>
+        </div>
         <select id="id_vehiculo" name="vehiculo" class="form-select w-full">
           <option value="">{% trans "Select client first..." %}</option>
         </select>
@@ -240,8 +351,11 @@ input[type="checkbox"] {
           <span class="text-cyan-300">{% trans "Other Services Subtotal" %}:</span>
           <span id="t_otros" class="text-cyan-300 font-bold">$0</span>
         </div>
-        <div class="totales-row">
-          <span class="text-cyan-300">{% trans "Tax" %}:</span>
+        <div class="totales-row items-center">
+          <label class="flex items-center text-cyan-300 cursor-pointer">
+            <input type="checkbox" id="include_tax" checked class="mr-2 cursor-pointer">
+            <span>{% trans "Include Tax" %} (IVA):</span>
+          </label>
           <span id="t_iva" class="text-cyan-300 font-bold">$0</span>
         </div>
         <div class="totales-row totales-total">
@@ -562,7 +676,9 @@ function recalcTotales(){
 
           console.log(`Totales: rep=${rep}, serv=${serv}, otros=${otros}`);
 
-          const ivaOn = $('#id_apply_vat')?.checked ?? false;
+          // Obtener checkbox de include_tax (el nuevo) o id_apply_vat (el viejo)
+          const includeTaxCheckbox = $('#include_tax') || $('#id_apply_vat');
+          const ivaOn = includeTaxCheckbox?.checked ?? false;
           let tax = 0;
 
           if (COUNTRY_REF==='CL') {
@@ -579,6 +695,12 @@ function recalcTotales(){
           setText('#t_total',     money(rep + serv + otros + tax));
         }
 window.recalcTotales = recalcTotales;
+
+// Agregar event listener al checkbox de TAX
+const includeTaxCheckbox = $('#include_tax');
+if (includeTaxCheckbox) {
+  includeTaxCheckbox.addEventListener('change', recalcTotales);
+}
 
 // ===============
 // FILAS DINÁMICAS
@@ -1052,5 +1174,992 @@ document.querySelector('#document-form')?.addEventListener('submit', (e)=>{
   }
 });
 
+// ==================== ALMACENAMIENTO TEMPORAL ====================
+// Almacenamiento temporal de nuevos estados y ciudades personalizados
+let customStates = [];
+let customCitiesByState = {};
+
+// ==================== MODAL FUNCTIONS ====================
+function openClienteModal() {
+  document.getElementById('clienteModal').classList.remove('hidden');
+  document.getElementById('form-crear-cliente').reset();
+  document.getElementById('cliente-error-message').classList.add('hidden');
+  document.getElementById('cliente-success-message').classList.add('hidden');
+  
+  // Cargar estados si estamos en USA
+  const country = window.location.pathname.startsWith('/cl/') ? 'cl' : 'us';
+  if (country === 'us') {
+    console.log('Opening client modal for USA'); // Debug
+    loadEstadosUSA();
+    
+    // Registrar listeners después de un pequeño delay para asegurar que el DOM está listo
+    setTimeout(() => {
+      setupClienteEstadoListener();
+      setupClienteCiudadListener();
+    }, 100);
+  }
+}
+
+function closeClienteModal() {
+  document.getElementById('clienteModal').classList.add('hidden');
+}
+
+// Lista hardcodeada de estados de USA como fallback
+const USA_STATES = [
+  {id: 'AL', nombre: 'Alabama'}, {id: 'AK', nombre: 'Alaska'}, {id: 'AZ', nombre: 'Arizona'},
+  {id: 'AR', nombre: 'Arkansas'}, {id: 'CA', nombre: 'California'}, {id: 'CO', nombre: 'Colorado'},
+  {id: 'CT', nombre: 'Connecticut'}, {id: 'DE', nombre: 'Delaware'}, {id: 'FL', nombre: 'Florida'},
+  {id: 'GA', nombre: 'Georgia'}, {id: 'HI', nombre: 'Hawaii'}, {id: 'ID', nombre: 'Idaho'},
+  {id: 'IL', nombre: 'Illinois'}, {id: 'IN', nombre: 'Indiana'}, {id: 'IA', nombre: 'Iowa'},
+  {id: 'KS', nombre: 'Kansas'}, {id: 'KY', nombre: 'Kentucky'}, {id: 'LA', nombre: 'Louisiana'},
+  {id: 'ME', nombre: 'Maine'}, {id: 'MD', nombre: 'Maryland'}, {id: 'MA', nombre: 'Massachusetts'},
+  {id: 'MI', nombre: 'Michigan'}, {id: 'MN', nombre: 'Minnesota'}, {id: 'MS', nombre: 'Mississippi'},
+  {id: 'MO', nombre: 'Missouri'}, {id: 'MT', nombre: 'Montana'}, {id: 'NE', nombre: 'Nebraska'},
+  {id: 'NV', nombre: 'Nevada'}, {id: 'NH', nombre: 'New Hampshire'}, {id: 'NJ', nombre: 'New Jersey'},
+  {id: 'NM', nombre: 'New Mexico'}, {id: 'NY', nombre: 'New York'}, {id: 'NC', nombre: 'North Carolina'},
+  {id: 'ND', nombre: 'North Dakota'}, {id: 'OH', nombre: 'Ohio'}, {id: 'OK', nombre: 'Oklahoma'},
+  {id: 'OR', nombre: 'Oregon'}, {id: 'PA', nombre: 'Pennsylvania'}, {id: 'RI', nombre: 'Rhode Island'},
+  {id: 'SC', nombre: 'South Carolina'}, {id: 'SD', nombre: 'South Dakota'}, {id: 'TN', nombre: 'Tennessee'},
+  {id: 'TX', nombre: 'Texas'}, {id: 'UT', nombre: 'Utah'}, {id: 'VT', nombre: 'Vermont'},
+  {id: 'VA', nombre: 'Virginia'}, {id: 'WA', nombre: 'Washington'}, {id: 'WV', nombre: 'West Virginia'},
+  {id: 'WI', nombre: 'Wisconsin'}, {id: 'WY', nombre: 'Wyoming'}
+];
+
+// Cargar estados de USA
+function loadEstadosUSA() {
+  const select = document.getElementById('cliente-estado');
+  if (!select) {
+    console.error('Estado select element not found');
+    return;
+  }
+  
+  console.log('Fetching estados from: /us/api/estados/'); // Debug
+  
+  fetch('/us/api/estados/')
+    .then(response => {
+      console.log('Estados response status:', response.status); // Debug
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('Estados data received:', data); // Debug
+      
+      // La API retorna {estados: [...]}
+      const estados = data.estados || data || [];
+      
+      if (!Array.isArray(estados)) {
+        console.error('Estados is not an array:', estados);
+        throw new Error('Invalid data format');
+      }
+      
+      select.innerHTML = '<option value="">Seleccione estado...</option>';
+      
+      if (estados.length === 0) {
+        console.warn('No states in database, using hardcoded list');
+        // Usar lista hardcodeada si la BD está vacía
+        USA_STATES.forEach(estado => {
+          const option = document.createElement('option');
+          option.value = estado.id;
+          option.textContent = estado.nombre;
+          select.appendChild(option);
+        });
+        console.log(`✅ Loaded ${USA_STATES.length} states (hardcoded)`);
+      } else {
+        estados.forEach(estado => {
+          const option = document.createElement('option');
+          option.value = estado.id;
+          option.textContent = estado.nombre;
+          select.appendChild(option);
+        });
+        console.log(`✅ Successfully loaded ${estados.length} states from database`);
+      }
+      
+      // Agregar estados personalizados si existen
+      customStates.forEach(estado => {
+        const option = document.createElement('option');
+        option.value = estado.id;
+        option.textContent = estado.nombre + ' ✨';
+        option.style.color = '#10b981';
+        option.style.fontWeight = 'bold';
+        select.appendChild(option);
+      });
+      
+      // Agregar opción para nuevo estado
+      const newOption = document.createElement('option');
+      newOption.value = '__nuevo_estado__';
+      newOption.textContent = '➕ Agregar nuevo estado...';
+      newOption.style.color = '#10b981';
+      newOption.style.fontWeight = 'bold';
+      select.appendChild(newOption);
+    })
+    .catch(error => {
+      console.error('❌ Error loading states from API, using hardcoded list:', error);
+      // Fallback a lista hardcodeada si la API falla
+      select.innerHTML = '<option value="">Seleccione estado...</option>';
+      USA_STATES.forEach(estado => {
+        const option = document.createElement('option');
+        option.value = estado.id;
+        option.textContent = estado.nombre;
+        select.appendChild(option);
+      });
+      
+      // Agregar estados personalizados si existen
+      customStates.forEach(estado => {
+        const option = document.createElement('option');
+        option.value = estado.id;
+        option.textContent = estado.nombre + ' (personalizado)';
+        select.appendChild(option);
+      });
+      
+      // Agregar opción para nuevo estado
+      const newOption = document.createElement('option');
+      newOption.value = '__nuevo_estado__';
+      newOption.textContent = '➕ Agregar nuevo estado...';
+      newOption.style.color = '#10b981';
+      newOption.style.fontWeight = 'bold';
+      select.appendChild(newOption);
+      
+      console.log(`✅ Loaded ${USA_STATES.length} states (hardcoded fallback)`);
+    });
+}
+
+// Función para cargar ciudades cuando se selecciona un estado
+function loadCiudadesUSA(estadoId) {
+  const ciudadSelect = document.getElementById('cliente-ciudad');
+  
+  if (!ciudadSelect) {
+    console.error('Ciudad select element not found');
+    return;
+  }
+  
+  if (!estadoId) {
+    ciudadSelect.innerHTML = '<option value="">Seleccione estado primero...</option>';
+    return;
+  }
+  
+  console.log('Loading cities for state:', estadoId); // Debug
+  
+  // Ciudades principales por estado (hardcoded como fallback)
+  const CITIES_BY_STATE = {
+    'CA': ['Los Angeles', 'San Francisco', 'San Diego', 'San Jose', 'Sacramento', 'Fresno', 'Oakland'],
+    'TX': ['Houston', 'Dallas', 'Austin', 'San Antonio', 'Fort Worth', 'El Paso'],
+    'FL': ['Miami', 'Tampa', 'Orlando', 'Jacksonville', 'Fort Lauderdale'],
+    'NY': ['New York', 'Buffalo', 'Rochester', 'Syracuse', 'Albany'],
+    'GA': ['Atlanta', 'Augusta', 'Columbus', 'Savannah', 'Athens', 'Sandy Springs'],
+    'IL': ['Chicago', 'Aurora', 'Naperville', 'Joliet', 'Rockford'],
+    'PA': ['Philadelphia', 'Pittsburgh', 'Allentown', 'Erie', 'Reading'],
+    'AZ': ['Phoenix', 'Tucson', 'Mesa', 'Chandler', 'Scottsdale'],
+    'WA': ['Seattle', 'Spokane', 'Tacoma', 'Vancouver', 'Bellevue'],
+    'MA': ['Boston', 'Worcester', 'Springfield', 'Cambridge', 'Lowell'],
+    'MI': ['Detroit', 'Grand Rapids', 'Warren', 'Sterling Heights', 'Ann Arbor'],
+    'NC': ['Charlotte', 'Raleigh', 'Greensboro', 'Durham', 'Winston-Salem'],
+    'NJ': ['Newark', 'Jersey City', 'Paterson', 'Elizabeth', 'Edison'],
+    'VA': ['Virginia Beach', 'Norfolk', 'Chesapeake', 'Richmond', 'Newport News'],
+    'OH': ['Columbus', 'Cleveland', 'Cincinnati', 'Toledo', 'Akron'],
+    'TN': ['Memphis', 'Nashville', 'Knoxville', 'Chattanooga', 'Clarksville'],
+    'IN': ['Indianapolis', 'Fort Wayne', 'Evansville', 'South Bend', 'Carmel'],
+    'MO': ['Kansas City', 'St. Louis', 'Springfield', 'Columbia', 'Independence'],
+    'MD': ['Baltimore', 'Frederick', 'Rockville', 'Gaithersburg', 'Bowie'],
+    'CO': ['Denver', 'Colorado Springs', 'Aurora', 'Fort Collins', 'Lakewood'],
+    'MN': ['Minneapolis', 'St. Paul', 'Rochester', 'Duluth', 'Bloomington'],
+    'SC': ['Charleston', 'Columbia', 'North Charleston', 'Mount Pleasant', 'Rock Hill'],
+    'AL': ['Birmingham', 'Montgomery', 'Mobile', 'Huntsville', 'Tuscaloosa'],
+    'LA': ['New Orleans', 'Baton Rouge', 'Shreveport', 'Lafayette', 'Lake Charles']
+  };
+  
+  // Intentar cargar desde API primero
+  fetch(`/us/api/ciudades/${estadoId}/`)
+    .then(response => {
+      console.log('Cities response status:', response.status);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('Cities data received:', data);
+      
+      const ciudades = data.ciudades || data || [];
+      
+      ciudadSelect.innerHTML = '<option value="">Seleccione ciudad...</option>';
+      
+      if (ciudades.length === 0) {
+        // Usar lista hardcodeada si no hay datos en BD
+        const citiesForState = CITIES_BY_STATE[estadoId] || [];
+        if (citiesForState.length > 0) {
+          console.log(`Using hardcoded cities for ${estadoId}`);
+          citiesForState.forEach(cityName => {
+            const option = document.createElement('option');
+            option.value = cityName;
+            option.textContent = cityName;
+            ciudadSelect.appendChild(option);
+          });
+          console.log(`✅ Loaded ${citiesForState.length} cities (hardcoded)`);
+        } else {
+          ciudadSelect.innerHTML += '<option value="" disabled>No hay ciudades disponibles</option>';
+          console.warn('No cities found for state:', estadoId);
+        }
+      } else {
+        ciudades.forEach(ciudad => {
+          const option = document.createElement('option');
+          option.value = ciudad.id;
+          option.textContent = ciudad.nombre;
+          ciudadSelect.appendChild(option);
+        });
+        console.log(`✅ Loaded ${ciudades.length} cities from database`);
+      }
+      
+      // Agregar ciudades personalizadas para este estado
+      const customCities = customCitiesByState[estadoId] || [];
+      customCities.forEach(ciudad => {
+        const option = document.createElement('option');
+        option.value = ciudad;
+        option.textContent = ciudad + ' ✨';
+        option.style.color = '#10b981';
+        option.style.fontWeight = 'bold';
+        ciudadSelect.appendChild(option);
+      });
+      
+      // Agregar opción para nueva ciudad
+      const newCityOption = document.createElement('option');
+      newCityOption.value = '__nueva_ciudad__';
+      newCityOption.textContent = '➕ Agregar nueva ciudad...';
+      newCityOption.style.color = '#10b981';
+      newCityOption.style.fontWeight = 'bold';
+      ciudadSelect.appendChild(newCityOption);
+    })
+    .catch(error => {
+      console.error('❌ Error loading cities from API, using hardcoded list:', error);
+      
+      // Fallback a lista hardcodeada
+      const citiesForState = CITIES_BY_STATE[estadoId] || [];
+      ciudadSelect.innerHTML = '<option value="">Seleccione ciudad...</option>';
+      
+      if (citiesForState.length > 0) {
+        citiesForState.forEach(cityName => {
+          const option = document.createElement('option');
+          option.value = cityName;
+          option.textContent = cityName;
+          ciudadSelect.appendChild(option);
+        });
+        console.log(`✅ Loaded ${citiesForState.length} cities (hardcoded fallback)`);
+      } else {
+        ciudadSelect.innerHTML += '<option value="" disabled>No hay ciudades para este estado</option>';
+      }
+      
+      // Agregar ciudades personalizadas para este estado
+      const customCities = customCitiesByState[estadoId] || [];
+      customCities.forEach(ciudad => {
+        const option = document.createElement('option');
+        option.value = ciudad;
+        option.textContent = ciudad + ' ✨';
+        option.style.color = '#10b981';
+        option.style.fontWeight = 'bold';
+        ciudadSelect.appendChild(option);
+      });
+      
+      // Agregar opción para nueva ciudad
+      const newCityOption = document.createElement('option');
+      newCityOption.value = '__nueva_ciudad__';
+      newCityOption.textContent = '➕ Agregar nueva ciudad...';
+      newCityOption.style.color = '#10b981';
+      newCityOption.style.fontWeight = 'bold';
+      ciudadSelect.appendChild(newCityOption);
+    });
+}
+
+// Listener para detectar nueva ciudad
+function setupClienteCiudadListener() {
+  const ciudadSelect = document.getElementById('cliente-ciudad');
+  if (ciudadSelect && !ciudadSelect.dataset.listenerAdded) {
+    ciudadSelect.addEventListener('change', function() {
+      if (this.value === '__nueva_ciudad__') {
+        mostrarInputNuevaCiudad();
+      } else {
+        ocultarInputNuevaCiudad();
+      }
+    });
+    ciudadSelect.dataset.listenerAdded = 'true';
+  }
+}
+
+// Mostrar input para agregar nueva ciudad
+function mostrarInputNuevaCiudad() {
+  const input = document.getElementById('nueva-ciudad-input');
+  
+  if (input) {
+    input.classList.remove('hidden');
+    input.focus();
+    
+    // Event listener para guardar la nueva ciudad
+    if (!input.dataset.listenerAdded) {
+      input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          const nuevaCiudad = this.value.trim();
+          if (nuevaCiudad) {
+            agregarNuevaCiudad(nuevaCiudad);
+          }
+        }
+      });
+      
+      input.addEventListener('blur', function() {
+        const nuevaCiudad = this.value.trim();
+        if (nuevaCiudad) {
+          agregarNuevaCiudad(nuevaCiudad);
+        } else {
+          ocultarInputNuevaCiudad();
+        }
+      });
+      
+      input.dataset.listenerAdded = 'true';
+    }
+  }
+}
+
+function ocultarInputNuevaCiudad() {
+  const input = document.getElementById('nueva-ciudad-input');
+  if (input) {
+    input.classList.add('hidden');
+    input.value = '';
+  }
+}
+
+function agregarNuevaCiudad(nombre) {
+  const select = document.getElementById('cliente-ciudad');
+  const input = document.getElementById('nueva-ciudad-input');
+  const estadoSelect = document.getElementById('cliente-estado');
+  const estadoId = estadoSelect.value;
+  
+  // Inicializar array para este estado si no existe
+  if (!customCitiesByState[estadoId]) {
+    customCitiesByState[estadoId] = [];
+  }
+  
+  // Agregar a la lista de ciudades personalizadas
+  customCitiesByState[estadoId].push(nombre);
+  
+  // Buscar la opción "Agregar nueva..."
+  const optionNueva = Array.from(select.options).find(opt => opt.value === '__nueva_ciudad__');
+  
+  // Crear nueva opción antes de "Agregar nueva..."
+  const newOption = document.createElement('option');
+  newOption.value = nombre;
+  newOption.textContent = nombre + ' ✨';
+  newOption.style.color = '#10b981';
+  newOption.style.fontWeight = 'bold';
+  
+  if (optionNueva) {
+    select.insertBefore(newOption, optionNueva);
+  } else {
+    select.appendChild(newOption);
+  }
+  
+  // Seleccionar la nueva ciudad
+  select.value = nombre;
+  
+  // Ocultar input y limpiar
+  input.classList.add('hidden');
+  input.value = '';
+  
+  console.log(`✅ Nueva ciudad agregada: ${nombre} para estado ${estadoId}`);
+}
+
+// Listener para cargar ciudades cuando se selecciona un estado
+function setupClienteEstadoListener() {
+  const estadoSelect = document.getElementById('cliente-estado');
+  if (estadoSelect && !estadoSelect.dataset.listenerAdded) {
+    estadoSelect.addEventListener('change', function() {
+      console.log('State changed to:', this.value);
+      
+      // Verificar si se seleccionó "Agregar nuevo estado"
+      if (this.value === '__nuevo_estado__') {
+        mostrarInputNuevoEstado();
+      } else {
+        ocultarInputNuevoEstado();
+        loadCiudadesUSA(this.value);
+      }
+    });
+    estadoSelect.dataset.listenerAdded = 'true';
+    console.log('✅ Estado listener registered');
+  }
+}
+
+// Mostrar input para agregar nuevo estado
+function mostrarInputNuevoEstado() {
+  const input = document.getElementById('nuevo-estado-input');
+  const select = document.getElementById('cliente-estado');
+  
+  if (input) {
+    input.classList.remove('hidden');
+    input.focus();
+    
+    // Event listener para guardar el nuevo estado
+    if (!input.dataset.listenerAdded) {
+      input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          const nuevoEstado = this.value.trim();
+          if (nuevoEstado) {
+            agregarNuevoEstado(nuevoEstado);
+          }
+        }
+      });
+      
+      input.addEventListener('blur', function() {
+        const nuevoEstado = this.value.trim();
+        if (nuevoEstado) {
+          agregarNuevoEstado(nuevoEstado);
+        } else {
+          ocultarInputNuevoEstado();
+        }
+      });
+      
+      input.dataset.listenerAdded = 'true';
+    }
+  }
+}
+
+function ocultarInputNuevoEstado() {
+  const input = document.getElementById('nuevo-estado-input');
+  if (input) {
+    input.classList.add('hidden');
+    input.value = '';
+  }
+}
+
+function agregarNuevoEstado(nombre) {
+  const select = document.getElementById('cliente-estado');
+  const input = document.getElementById('nuevo-estado-input');
+  
+  // Generar ID único
+  const nuevoId = 'CUSTOM_' + nombre.toUpperCase().substring(0, 2) + '_' + Date.now();
+  
+  // Agregar a la lista de estados personalizados
+  customStates.push({id: nuevoId, nombre: nombre});
+  
+  // Buscar la opción "Agregar nuevo..."
+  const optionNuevo = Array.from(select.options).find(opt => opt.value === '__nuevo_estado__');
+  
+  // Crear nueva opción antes de "Agregar nuevo..."
+  const newOption = document.createElement('option');
+  newOption.value = nuevoId;
+  newOption.textContent = nombre + ' ✨';
+  newOption.style.color = '#10b981';
+  newOption.style.fontWeight = 'bold';
+  
+  if (optionNuevo) {
+    select.insertBefore(newOption, optionNuevo);
+  } else {
+    select.appendChild(newOption);
+  }
+  
+  // Seleccionar el nuevo estado
+  select.value = nuevoId;
+  
+  // Ocultar input y limpiar
+  input.classList.add('hidden');
+  input.value = '';
+  
+  console.log(`✅ Nuevo estado agregado: ${nombre}`);
+  
+  // Limpiar dropdown de ciudades
+  const ciudadSelect = document.getElementById('cliente-ciudad');
+  if (ciudadSelect) {
+    ciudadSelect.innerHTML = '<option value="">Seleccione ciudad...</option><option value="__nueva_ciudad__" style="color: #10b981; font-weight: bold;">➕ Agregar nueva ciudad...</option>';
+  }
+}
+
+function openVehiculoModal() {
+  document.getElementById('vehiculoModal').classList.remove('hidden');
+  document.getElementById('form-crear-vehiculo').reset();
+  document.getElementById('vehiculo-error-message').classList.add('hidden');
+  document.getElementById('vehiculo-success-message').classList.add('hidden');
+  loadClientesModal();
+  loadMarcasModal();
+  populateYearsModal();
+}
+
+function closeVehiculoModal() {
+  document.getElementById('vehiculoModal').classList.add('hidden');
+}
+
+// Make functions globally available
+window.openClienteModal = openClienteModal;
+window.closeClienteModal = closeClienteModal;
+window.openVehiculoModal = openVehiculoModal;
+window.closeVehiculoModal = closeVehiculoModal;
+
+// ==================== CLIENTE MODAL FORM ====================
+document.getElementById('form-crear-cliente')?.addEventListener('submit', function(e) {
+  e.preventDefault();
+  
+  console.log('=' .repeat(60));
+  console.log('🚀 SUBMIT FORMULARIO CLIENTE');
+  
+  const formData = new FormData(this);
+  const errorDiv = document.getElementById('cliente-error-message');
+  const successDiv = document.getElementById('cliente-success-message');
+  
+  // Log de datos que se están enviando
+  console.log('📦 Datos a enviar:');
+  for (let [key, value] of formData.entries()) {
+    console.log(`   ${key}: ${value}`);
+  }
+  
+  errorDiv.classList.add('hidden');
+  successDiv.classList.add('hidden');
+  
+  // Detect country from URL
+  const country = window.location.pathname.startsWith('/cl/') ? 'cl' : 'us';
+  const url = `/${country}/api/clientes/crear/`;
+  
+  console.log(`📡 Enviando POST a: ${url}`);
+  
+  fetch(url, {
+    method: 'POST',
+    body: formData,
+    headers: {
+      'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+    }
+  })
+  .then(response => {
+    console.log(`📥 Response status: ${response.status}`);
+    return response.json();
+  })
+  .then(data => {
+    console.log('📨 Respuesta completa de la API:', data);
+    
+    if (data.success) {
+      console.log('✅ SUCCESS: Cliente creado con ID:', data.cliente.id);
+      successDiv.textContent = data.message || 'Cliente creado exitosamente!';
+      successDiv.classList.remove('hidden');
+      
+      setTimeout(() => {
+        console.log('🔄 Cerrando modal y seleccionando cliente...');
+        closeClienteModal();
+        
+        // Seleccionar el cliente recién creado en el formulario principal
+        const clienteData = {
+          id: data.cliente.id,
+          nombre: `${data.cliente.nombre} ${data.cliente.apellido}`,
+          email: data.cliente.email || '',
+          telefono: data.cliente.telefono || ''
+        };
+        
+        console.log('🔄 Seleccionando cliente recién creado:', clienteData);
+        
+        // Usar la función existente de selección de cliente
+        if (typeof seleccionarCliente === 'function') {
+          seleccionarCliente(clienteData);
+          console.log('✅ Cliente seleccionado usando seleccionarCliente()');
+        } else {
+          // Fallback manual
+          const clienteBusqueda = document.getElementById('cliente-busqueda');
+          const clienteSelect = document.getElementById('id_cliente');
+          const clienteInfoBox = document.getElementById('cliente-info');
+          const cliNombre = document.getElementById('cliente-nombre');
+          const cliEmail = document.getElementById('cliente-email');
+          const cliFono = document.getElementById('cliente-telefono');
+          
+          if (clienteBusqueda) {
+            clienteBusqueda.value = clienteData.nombre;
+          }
+          
+          if (clienteSelect) {
+            clienteSelect.innerHTML = `<option value="${clienteData.id}" selected>${clienteData.nombre}</option>`;
+          }
+          
+          if (cliNombre) cliNombre.textContent = clienteData.nombre;
+          if (cliEmail) cliEmail.textContent = clienteData.email || '—';
+          if (cliFono) cliFono.textContent = clienteData.telefono || '—';
+          if (clienteInfoBox) clienteInfoBox.classList.remove('hidden');
+          
+          // Cargar vehículos del cliente
+          if (typeof cargarVehiculosPorCliente === 'function') {
+            cargarVehiculosPorCliente(clienteData.id);
+          }
+          
+          console.log('✅ Cliente seleccionado usando fallback manual');
+        }
+      }, 800);
+    } else {
+      console.error('❌ ERROR en respuesta:', data.error);
+      errorDiv.textContent = data.error || 'Error al crear cliente';
+      errorDiv.classList.remove('hidden');
+    }
+  })
+  .catch(error => {
+    console.error('❌❌ CATCH ERROR:', error);
+    errorDiv.textContent = 'Error de conexión. Por favor intente nuevamente.';
+    errorDiv.classList.remove('hidden');
+  });
+});
+
+console.log('✅ Event listener para form-crear-cliente registrado');
+
+// ==================== VEHICULO MODAL FUNCTIONS ====================
+function populateYearsModal() {
+  const currentYear = new Date().getFullYear();
+  const yearSelect = document.getElementById('vehiculo-anio');
+  if (!yearSelect) return;
+  yearSelect.innerHTML = '<option value="">Seleccione año...</option>';
+  
+  for (let year = currentYear + 1; year >= 1970; year--) {
+    const option = document.createElement('option');
+    option.value = year;
+    option.textContent = year;
+    yearSelect.appendChild(option);
+  }
+  
+  // Registrar event listeners después de cargar los años
+  setupVehiculoListeners();
+}
+
+function loadClientesModal() {
+  const country = window.location.pathname.startsWith('/cl/') ? 'cl' : 'us';
+  const url = `/${country}/api/clientes/`;
+  console.log(`📡 Cargando clientes desde: ${url}`);
+  fetch(url)
+    .then(response => response.json())
+    .then(data => {
+      const select = document.getElementById('vehiculo-cliente-select');
+      if (!select) return;
+      select.innerHTML = '<option value="">Seleccione un cliente...</option>';
+      
+      data.forEach(cliente => {
+        const option = document.createElement('option');
+        option.value = cliente.id;
+        option.textContent = `${cliente.nombre} ${cliente.apellido}`;
+        select.appendChild(option);
+      });
+    })
+    .catch(error => console.error('Error loading clients:', error));
+}
+
+function loadMarcasModal() {
+  const country = window.location.pathname.startsWith('/cl/') ? 'cl' : 'us';
+  const url = `/${country}/vehiculos/api/marcas/`;
+  console.log(`📡 Cargando marcas desde: ${url}`);
+  fetch(url)
+    .then(response => response.json())
+    .then(data => {
+      const select = document.getElementById('vehiculo-marca');
+      if (!select) return;
+      select.innerHTML = '<option value="">Seleccione marca...</option>';
+      
+      data.forEach(marca => {
+        const option = document.createElement('option');
+        option.value = marca.id;
+        option.textContent = marca.nombre;
+        select.appendChild(option);
+      });
+      
+      // Registrar event listeners después de cargar las marcas
+      setupVehiculoListeners();
+    })
+    .catch(error => console.error('Error loading brands:', error));
+}
+
+// Setup event listeners for vehiculo modal
+function setupVehiculoListeners() {
+  const marcaSelect = document.getElementById('vehiculo-marca');
+  const anioSelect = document.getElementById('vehiculo-anio');
+  
+  if (marcaSelect && !marcaSelect.dataset.listenerAdded) {
+    marcaSelect.addEventListener('change', loadModelosModal);
+    marcaSelect.dataset.listenerAdded = 'true';
+  }
+  
+  if (anioSelect && !anioSelect.dataset.listenerAdded) {
+    anioSelect.addEventListener('change', loadModelosModal);
+    anioSelect.dataset.listenerAdded = 'true';
+  }
+}
+
+function loadModelosModal() {
+  const marcaId = document.getElementById('vehiculo-marca')?.value;
+  const anio = document.getElementById('vehiculo-anio')?.value;
+  const modeloSelect = document.getElementById('vehiculo-modelo');
+  
+  console.log('loadModelosModal called:', {marcaId, anio}); // Debug
+  
+  if (!modeloSelect) {
+    console.error('Modelo select not found');
+    return;
+  }
+  
+  modeloSelect.innerHTML = '<option value="">Seleccione modelo...</option>';
+  
+  if (!marcaId || !anio) {
+    console.log('Missing marca or anio');
+    return;
+  }
+  
+  const country = window.location.pathname.startsWith('/cl/') ? 'cl' : 'us';
+  const url = `/${country}/vehiculos/ajax/modelos-por-marca-anio/?marca_id=${marcaId}&anio=${anio}`;
+  
+  console.log('📡 Cargando modelos desde:', url);
+  
+  fetch(url)
+    .then(response => {
+      console.log('Response status:', response.status); // Debug
+      return response.json();
+    })
+    .then(data => {
+      console.log('Models data received:', data); // Debug
+      
+      if (data.success && data.modelos && data.modelos.length > 0) {
+        data.modelos.forEach(modelo => {
+          const option = document.createElement('option');
+          option.value = modelo.id;
+          option.textContent = modelo.nombre;
+          modeloSelect.appendChild(option);
+        });
+        console.log(`Loaded ${data.modelos.length} models`);
+      } else {
+        console.warn('No models found or invalid response');
+        modeloSelect.innerHTML += '<option value="" disabled>No hay modelos disponibles</option>';
+      }
+    })
+    .catch(error => {
+      console.error('Error loading models:', error);
+      modeloSelect.innerHTML += '<option value="" disabled>Error al cargar modelos</option>';
+    });
+}
+
+document.getElementById('form-crear-vehiculo')?.addEventListener('submit', function(e) {
+  e.preventDefault();
+  
+  const formData = new FormData(this);
+  const errorDiv = document.getElementById('vehiculo-error-message');
+  const successDiv = document.getElementById('vehiculo-success-message');
+  
+  errorDiv.classList.add('hidden');
+  successDiv.classList.add('hidden');
+  
+  const country = window.location.pathname.startsWith('/cl/') ? 'cl' : 'us';
+  const url = `/${country}/api/vehiculos/crear/`;
+  
+  console.log(`📡 Enviando vehículo a: ${url}`);
+  
+  fetch(url, {
+    method: 'POST',
+    body: formData,
+    headers: {
+      'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      successDiv.textContent = data.message || 'Vehículo creado exitosamente!';
+      successDiv.classList.remove('hidden');
+      
+      setTimeout(() => {
+        closeVehiculoModal();
+        // Trigger vehicle reload for the client if selected
+        const clienteId = document.getElementById('id_cliente').value;
+        if (clienteId) {
+          EG.onClienteChange();
+        }
+      }, 1500);
+    } else {
+      errorDiv.textContent = data.error || 'Error al crear vehículo';
+      errorDiv.classList.remove('hidden');
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    errorDiv.textContent = 'Error de conexión. Por favor intente nuevamente.';
+    errorDiv.classList.remove('hidden');
+  });
+});
+
+// Close modals when clicking outside
+document.getElementById('clienteModal')?.addEventListener('click', function(e) {
+  if (e.target === this) closeClienteModal();
+});
+
+document.getElementById('vehiculoModal')?.addEventListener('click', function(e) {
+  if (e.target === this) closeVehiculoModal();
+});
+
 </script>
+
+<!-- Modal para Crear Cliente -->
+<div id="clienteModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+  <div class="max-w-2xl w-full p-8 relative" style="background: linear-gradient(135deg, rgba(34, 211, 238, 0.1) 0%, rgba(96, 165, 250, 0.05) 100%); backdrop-filter: blur(25px); border-radius: 1.5rem; border: 1px solid rgba(34, 211, 238, 0.3); box-shadow: 0 8px 32px rgba(34, 211, 238, 0.15);">
+    <button onclick="closeClienteModal()" class="absolute top-4 right-4 text-cyan-400 hover:text-cyan-300 text-2xl">
+      ✕
+    </button>
+    <h3 class="text-2xl font-bold text-cyan-400 mb-6">
+      ➕ {% trans "Add New Client" %}
+    </h3>
+    
+    <style>
+    /* Estilos específicos para inputs del modal - TEXTO BLANCO SIEMPRE */
+    #clienteModal input,
+    #clienteModal select,
+    #clienteModal textarea,
+    #vehiculoModal input,
+    #vehiculoModal select,
+    #vehiculoModal textarea {
+      color: #ffffff !important;
+      -webkit-text-fill-color: #ffffff !important;
+      caret-color: #00f2fe !important;
+    }
+    
+    /* Asegurar que el autofill también sea blanco */
+    #clienteModal input:-webkit-autofill,
+    #clienteModal select:-webkit-autofill,
+    #vehiculoModal input:-webkit-autofill,
+    #vehiculoModal select:-webkit-autofill {
+      -webkit-text-fill-color: #ffffff !important;
+      -webkit-box-shadow: 0 0 0px 1000px rgba(5, 5, 20, 0.98) inset !important;
+      box-shadow: 0 0 0px 1000px rgba(5, 5, 20, 0.98) inset !important;
+      color: #ffffff !important;
+    }
+    </style>
+    
+    <form id="form-crear-cliente" class="space-y-4">
+      {% csrf_token %}
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-cyan-300 mb-2">{% trans "First Name" %} *</label>
+          <input type="text" name="nombre" required class="form-control w-full">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-cyan-300 mb-2">{% trans "Last Name" %} *</label>
+          <input type="text" name="apellido" required class="form-control w-full">
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-cyan-300 mb-2">{% trans "Email" %}</label>
+          <input type="email" name="email" class="form-control w-full">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-cyan-300 mb-2">{% trans "Phone" %} *</label>
+          <input type="tel" name="telefono" required class="form-control w-full">
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-cyan-300 mb-2">{% trans "Address" %}</label>
+        <input type="text" name="direccion" class="form-control w-full">
+      </div>
+
+      <!-- Campos específicos de USA -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="cliente-usa-fields">
+        <div>
+          <label class="block text-sm font-medium text-cyan-300 mb-2">{% trans "State" %}</label>
+          <select name="estado_usa" id="cliente-estado" class="form-control w-full">
+            <option value="">{% trans "Select state..." %}</option>
+          </select>
+          <!-- Input para nuevo estado (oculto por defecto) -->
+          <input type="text" id="nuevo-estado-input" placeholder="Escriba nuevo estado..." 
+                 class="form-control w-full mt-2 hidden">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-cyan-300 mb-2">{% trans "City" %}</label>
+          <select name="ciudad_usa" id="cliente-ciudad" class="form-control w-full">
+            <option value="">{% trans "Select state first..." %}</option>
+          </select>
+          <!-- Input para nueva ciudad (oculto por defecto) -->
+          <input type="text" id="nueva-ciudad-input" placeholder="Escriba nueva ciudad..." 
+                 class="form-control w-full mt-2 hidden">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-cyan-300 mb-2">{% trans "ZIP Code" %}</label>
+          <input type="text" name="zipcode" class="form-control w-full" placeholder="12345">
+        </div>
+      </div>
+      
+      <div id="cliente-error-message" class="hidden text-red-400 text-sm p-3 bg-red-900/20 rounded-lg"></div>
+      <div id="cliente-success-message" class="hidden text-green-400 text-sm p-3 bg-green-900/20 rounded-lg"></div>
+      
+      <div class="flex gap-3 pt-4">
+        <button type="button" onclick="closeClienteModal()" class="flex-1 px-6 py-3 rounded-lg bg-gray-600 hover:bg-gray-700 text-white font-medium transition">
+          {% trans "Cancel" %}
+        </button>
+        <button type="submit" class="flex-1 px-6 py-3 rounded-lg bg-gradient-to-r from-emerald-600 to-green-600 text-white font-bold transition">
+          ✓ {% trans "Create Client" %}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal para Crear Vehículo -->
+<div id="vehiculoModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+  <div class="max-w-2xl w-full p-8 relative max-h-[90vh] overflow-y-auto" style="background: linear-gradient(135deg, rgba(34, 211, 238, 0.1) 0%, rgba(96, 165, 250, 0.05) 100%); backdrop-filter: blur(25px); border-radius: 1.5rem; border: 1px solid rgba(34, 211, 238, 0.3); box-shadow: 0 8px 32px rgba(34, 211, 238, 0.15);">
+    <button onclick="closeVehiculoModal()" class="absolute top-4 right-4 text-cyan-400 hover:text-cyan-300 text-2xl">
+      ✕
+    </button>
+    <h3 class="text-2xl font-bold text-cyan-400 mb-6">
+      🚗 {% trans "Add New Vehicle" %}
+    </h3>
+    
+    <form id="form-crear-vehiculo" class="space-y-4">
+      {% csrf_token %}
+      
+      <div>
+        <label class="block text-sm font-medium text-cyan-300 mb-2">{% trans "Client" %} *</label>
+        <select name="cliente_id" id="vehiculo-cliente-select" required class="form-control w-full">
+          <option value="">{% trans "Select a client..." %}</option>
+        </select>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-cyan-300 mb-2">{% trans "Year" %} *</label>
+          <select name="anio" id="vehiculo-anio" required class="form-control w-full">
+            <option value="">{% trans "Select year..." %}</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-cyan-300 mb-2">{% trans "License Plate" %} *</label>
+          <input type="text" name="patente" required class="form-control w-full">
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-cyan-300 mb-2">{% trans "Brand" %} *</label>
+          <select name="marca_id" id="vehiculo-marca" required class="form-control w-full">
+            <option value="">{% trans "Select brand..." %}</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-cyan-300 mb-2">{% trans "Model" %} *</label>
+          <select name="modelo_id" id="vehiculo-modelo" required class="form-control w-full">
+            <option value="">{% trans "Select model..." %}</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-cyan-300 mb-2">VIN</label>
+        <input type="text" name="vin" class="form-control w-full">
+      </div>
+      
+      <div id="vehiculo-error-message" class="hidden text-red-400 text-sm p-3 bg-red-900/20 rounded-lg"></div>
+      <div id="vehiculo-success-message" class="hidden text-green-400 text-sm p-3 bg-green-900/20 rounded-lg"></div>
+      
+      <div class="flex gap-3 pt-4">
+        <button type="button" onclick="closeVehiculoModal()" class="flex-1 px-6 py-3 rounded-lg bg-gray-600 hover:bg-gray-700 text-white font-medium transition">
+          {% trans "Cancel" %}
+        </button>
+        <button type="submit" class="flex-1 px-6 py-3 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-bold transition">
+          ✓ {% trans "Create Vehicle" %}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
 {% endblock %}

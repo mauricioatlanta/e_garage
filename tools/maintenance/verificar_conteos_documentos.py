@@ -24,31 +24,21 @@ def verificar_conteos():
     print("=== VERIFICACIÓN DE CONTEOS DE DOCUMENTOS ===\n")
 
     # Obtener documentos con anotaciones igual que en la vista
-    vehiculos_subquery = VehiculoDocumento.objects.filter(
-        documento=OuterRef("pk")
-    ).aggregate(
+    vehiculos_subquery = VehiculoDocumento.objects.filter(documento=OuterRef("pk")).aggregate(
         total_millas=Coalesce(Sum("kilometraje"), 0, output_field=IntegerField())
-    )[
-        "total_millas"
-    ]
+    )["total_millas"]
 
-    repuestos_subquery = RepuestoDocumento.objects.filter(
-        documento=OuterRef("pk")
-    ).aggregate(total_repuestos=Coalesce(Count("id"), 0, output_field=IntegerField()))[
-        "total_repuestos"
-    ]
+    repuestos_subquery = RepuestoDocumento.objects.filter(documento=OuterRef("pk")).aggregate(
+        total_repuestos=Coalesce(Count("id"), 0, output_field=IntegerField())
+    )["total_repuestos"]
 
-    servicios_subquery = ServicioDocumento.objects.filter(
-        documento=OuterRef("pk")
-    ).aggregate(total_servicios=Coalesce(Count("id"), 0, output_field=IntegerField()))[
-        "total_servicios"
-    ]
+    servicios_subquery = ServicioDocumento.objects.filter(documento=OuterRef("pk")).aggregate(
+        total_servicios=Coalesce(Count("id"), 0, output_field=IntegerField())
+    )["total_servicios"]
 
-    otros_subquery = ServicioExternoDocumento.objects.filter(
-        documento=OuterRef("pk")
-    ).aggregate(total_otros=Coalesce(Count("id"), 0, output_field=IntegerField()))[
-        "total_otros"
-    ]
+    otros_subquery = ServicioExternoDocumento.objects.filter(documento=OuterRef("pk")).aggregate(
+        total_otros=Coalesce(Count("id"), 0, output_field=IntegerField())
+    )["total_otros"]
 
     documentos = Documento.objects.annotate(
         total_millas=Subquery(vehiculos_subquery, output_field=IntegerField()),
@@ -67,9 +57,7 @@ def verificar_conteos():
     print("-" * 80)
 
     for doc in documentos:
-        fecha_str = (
-            doc.fecha_creacion.strftime("%Y-%m-%d") if doc.fecha_creacion else "N/A"
-        )
+        fecha_str = doc.fecha_creacion.strftime("%Y-%m-%d") if doc.fecha_creacion else "N/A"
         total_str = f"${doc.total_factura or 0:,.0f}"
 
         print(
@@ -87,9 +75,9 @@ def verificar_conteos():
 
         # Conteo directo sin anotaciones
         millas_directo = (
-            VehiculoDocumento.objects.filter(documento=doc).aggregate(
-                total=Sum("kilometraje")
-            )["total"]
+            VehiculoDocumento.objects.filter(documento=doc).aggregate(total=Sum("kilometraje"))[
+                "total"
+            ]
             or 0
         )
 
@@ -97,15 +85,9 @@ def verificar_conteos():
         servicios_directo = ServicioDocumento.objects.filter(documento=doc).count()
         otros_directo = ServicioExternoDocumento.objects.filter(documento=doc).count()
 
-        print(
-            f"  Millas - Anotación: {doc.total_millas or 0}, Directo: {millas_directo}"
-        )
-        print(
-            f"  Repuestos - Anotación: {doc.total_repuestos or 0}, Directo: {repuestos_directo}"
-        )
-        print(
-            f"  Servicios - Anotación: {doc.total_servicios or 0}, Directo: {servicios_directo}"
-        )
+        print(f"  Millas - Anotación: {doc.total_millas or 0}, Directo: {millas_directo}")
+        print(f"  Repuestos - Anotación: {doc.total_repuestos or 0}, Directo: {repuestos_directo}")
+        print(f"  Servicios - Anotación: {doc.total_servicios or 0}, Directo: {servicios_directo}")
         print(f"  Otros - Anotación: {doc.total_otros or 0}, Directo: {otros_directo}")
 
         # Verificar si hay diferencias
@@ -113,13 +95,9 @@ def verificar_conteos():
         if (doc.total_millas or 0) != millas_directo:
             diferencias.append(f"MILLAS: {doc.total_millas} vs {millas_directo}")
         if (doc.total_repuestos or 0) != repuestos_directo:
-            diferencias.append(
-                f"REPUESTOS: {doc.total_repuestos} vs {repuestos_directo}"
-            )
+            diferencias.append(f"REPUESTOS: {doc.total_repuestos} vs {repuestos_directo}")
         if (doc.total_servicios or 0) != servicios_directo:
-            diferencias.append(
-                f"SERVICIOS: {doc.total_servicios} vs {servicios_directo}"
-            )
+            diferencias.append(f"SERVICIOS: {doc.total_servicios} vs {servicios_directo}")
         if (doc.total_otros or 0) != otros_directo:
             diferencias.append(f"OTROS: {doc.total_otros} vs {otros_directo}")
 
@@ -141,9 +119,7 @@ def verificar_conteos():
         Documento.objects.filter(serviciodocumento__isnull=False).distinct().count()
     )
     docs_con_otros = (
-        Documento.objects.filter(servicioexternodocumento__isnull=False)
-        .distinct()
-        .count()
+        Documento.objects.filter(servicioexternodocumento__isnull=False).distinct().count()
     )
 
     print("=== ESTADÍSTICAS GENERALES ===")

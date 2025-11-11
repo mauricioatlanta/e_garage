@@ -4,9 +4,7 @@ from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):
-    help = (
-        "Crear datos de demo para Atlanta - talleres, clientes, vehículos y servicios"
-    )
+    help = "Crear datos de demo para Atlanta - talleres, clientes, vehículos y servicios"
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -23,9 +21,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        self.stdout.write(
-            self.style.SUCCESS("🚀 Iniciando creación de datos demo para Atlanta...")
-        )
+        self.stdout.write(self.style.SUCCESS("🚀 Iniciando creación de datos demo para Atlanta..."))
 
         if options["reset"]:
             self.limpiar_datos_demo()
@@ -37,9 +33,7 @@ class Command(BaseCommand):
         self.crear_cotizaciones_demo()
         self.mostrar_resumen_atlanta()
 
-        self.stdout.write(
-            self.style.SUCCESS("✅ Datos demo de Atlanta creados exitosamente!")
-        )
+        self.stdout.write(self.style.SUCCESS("✅ Datos demo de Atlanta creados exitosamente!"))
 
     def limpiar_datos_demo(self):
         """Limpiar datos demo existentes"""
@@ -321,14 +315,10 @@ class Command(BaseCommand):
             tax_amount = subtotal * (tax_rate / Decimal("100"))
             total = subtotal + tax_amount
 
-            self.stdout.write(
-                f'  💵 {cotizacion["cliente"]} - {cotizacion["vehiculo"]}:'
-            )
+            self.stdout.write(f'  💵 {cotizacion["cliente"]} - {cotizacion["vehiculo"]}:')
 
             for servicio in cotizacion["servicios"]:
-                self.stdout.write(
-                    f'    • {servicio["nombre"]}: ${servicio["precio"]:.2f}'
-                )
+                self.stdout.write(f'    • {servicio["nombre"]}: ${servicio["precio"]:.2f}')
 
             self.stdout.write(f"    Subtotal: ${subtotal:.2f}")
             self.stdout.write(f"    GA Tax ({tax_rate}%): ${tax_amount:.2f}")
@@ -364,7 +354,5 @@ class Command(BaseCommand):
         self.stdout.write("")
 
         self.stdout.write(
-            self.style.SUCCESS(
-                "✅ Demo de Atlanta listo para capturar los primeros 10 talleres!"
-            )
+            self.style.SUCCESS("✅ Demo de Atlanta listo para capturar los primeros 10 talleres!")
         )

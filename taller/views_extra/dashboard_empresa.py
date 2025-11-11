@@ -20,9 +20,7 @@ SUBTOTAL_EXPR = ExpressionWrapper(
     output_field=DecimalField(max_digits=14, decimal_places=2),
 )
 
-ZERO_DEC = Value(
-    Decimal("0.00"), output_field=DecimalField(max_digits=14, decimal_places=2)
-)
+ZERO_DEC = Value(Decimal("0.00"), output_field=DecimalField(max_digits=14, decimal_places=2))
 
 
 # --- HELPER FUNCTIONS ---
@@ -75,16 +73,12 @@ def dashboard_centro_operaciones(request):
         inicio_mes_dt = datetime(hoy.year, hoy.month, 1, 0, 0, 0, tzinfo=tz)
 
     # --- FALLBACK DECIMAL PARA COALESCE ---
-    ZERO_DEC = Value(
-        Decimal("0.00"), output_field=DecimalField(max_digits=14, decimal_places=2)
-    )
+    ZERO_DEC = Value(Decimal("0.00"), output_field=DecimalField(max_digits=14, decimal_places=2))
 
     # 📊 KPIs PRINCIPALES (filtrados por empresa)
 
     # Documentos
-    documentos_hoy = Documento.objects.filter(
-        empresa=empresa, fecha_emision=hoy
-    ).count()
+    documentos_hoy = Documento.objects.filter(empresa=empresa, fecha_emision=hoy).count()
     documentos_semana = Documento.objects.filter(
         empresa=empresa, fecha_emision__gte=hace_7_dias
     ).count()
@@ -122,9 +116,7 @@ def dashboard_centro_operaciones(request):
     total_repuestos_mes = total_repuestos(base_mes_fac_rep) or Decimal("0.00")
     iva_repuestos = Decimal("0.00")
     if empresa.pais == "CL":
-        iva_repuestos = (total_repuestos_mes * Decimal("0.19")).quantize(
-            Decimal("0.01")
-        )
+        iva_repuestos = (total_repuestos_mes * Decimal("0.19")).quantize(Decimal("0.01"))
 
     # --- SUMA TOTAL DEL MES (sin IVA) ---
     facturacion_mes_total = (facturacion_servicios_mes or Decimal("0")) + (
@@ -164,9 +156,7 @@ def dashboard_centro_operaciones(request):
     # 🔧 TÉCNICOS MÁS PRODUCTIVOS (Top 5) - KPI por técnico efectivo
 
     # Técnico efectivo: Coalesce(linea.tecnico_responsable, documento__tecnico_responsable)
-    tecnico_efectivo = Coalesce(
-        F("tecnico_responsable"), F("documento__tecnico_responsable")
-    )
+    tecnico_efectivo = Coalesce(F("tecnico_responsable"), F("documento__tecnico_responsable"))
 
     # Líneas del período (últimos 30 días, facturas)
     lineas_periodo = LineaServicio.objects.filter(
@@ -174,8 +164,7 @@ def dashboard_centro_operaciones(request):
         documento__fecha_emision__gte=hace_30_dias,
         documento__tipo="FAC",
     ).exclude(  # Excluir si ambos técnicos son nulos
-        Q(tecnico_responsable__isnull=True)
-        & Q(documento__tecnico_responsable__isnull=True)
+        Q(tecnico_responsable__isnull=True) & Q(documento__tecnico_responsable__isnull=True)
     )
 
     # Agregación por técnico efectivo
@@ -195,10 +184,7 @@ def dashboard_centro_operaciones(request):
     # Enriquecer con datos del técnico
     tecnicos_ids = [t["tecnico_id"] for t in tecnicos_productivos_raw]
     tecnicos_map = {
-        t.id: t
-        for t in Tecnico.objects.filter(id__in=tecnicos_ids).only(
-            "id", "nombre", "activo"
-        )
+        t.id: t for t in Tecnico.objects.filter(id__in=tecnicos_ids).only("id", "nombre", "activo")
     }
 
     # Transformar a lista rica para el template
@@ -212,9 +198,7 @@ def dashboard_centro_operaciones(request):
     ]
 
     # 📋 ESTADO DE DOCUMENTOS
-    presupuestos_pendientes = Documento.objects.filter(
-        empresa=empresa, tipo="PRES"
-    ).count()
+    presupuestos_pendientes = Documento.objects.filter(empresa=empresa, tipo="PRES").count()
 
     ordenes_en_proceso = Documento.objects.filter(empresa=empresa, tipo="OT").count()
 
@@ -230,10 +214,7 @@ def dashboard_centro_operaciones(request):
     # 🚗 VEHÍCULOS Y MARCAS
     vehiculos_registrados = Vehiculo.objects.filter(empresa=empresa).count()
     marcas_atendidas = (
-        Vehiculo.objects.filter(empresa=empresa)
-        .values("marca__nombre")
-        .distinct()
-        .count()
+        Vehiculo.objects.filter(empresa=empresa).values("marca__nombre").distinct().count()
     )
 
     # ⚠️ ALERTAS Y OPORTUNIDADES
@@ -277,9 +258,7 @@ def dashboard_centro_operaciones(request):
         dias_transcurridos = (hoy - inicio_mes).days + 1
         proyeccion_docs_mes = (documentos_mes / dias_transcurridos) * 30
         proyeccion_facturacion = (
-            (facturacion_mes_total / dias_transcurridos) * 30
-            if facturacion_mes_total > 0
-            else 0
+            (facturacion_mes_total / dias_transcurridos) * 30 if facturacion_mes_total > 0 else 0
         )
     else:
         proyeccion_docs_mes = 0
@@ -305,9 +284,7 @@ def dashboard_centro_operaciones(request):
     ticket_promedio = (monto_fac_mes / facturas_mes) if facturas_mes else Decimal("0")
 
     # 🎯 MÉTRICAS DE EFICIENCIA
-    eficiencia_conversion = (
-        facturas_mes / max(presupuestos_mes + facturas_mes, 1)
-    ) * 100
+    eficiencia_conversion = (facturas_mes / max(presupuestos_mes + facturas_mes, 1)) * 100
 
     context = {
         # Información de empresa
@@ -406,9 +383,7 @@ def dashboard_centro_operaciones_espacial(request):
     )
 
     # --- FALLBACK DECIMAL PARA COALESCE ---
-    ZERO_DEC = Value(
-        Decimal("0.00"), output_field=DecimalField(max_digits=14, decimal_places=2)
-    )
+    ZERO_DEC = Value(Decimal("0.00"), output_field=DecimalField(max_digits=14, decimal_places=2))
 
     # Datos básicos y seguros
     documentos_total = Documento.objects.filter(empresa=empresa).count()
@@ -430,16 +405,33 @@ def dashboard_centro_operaciones_espacial(request):
     ).aggregate(total=Coalesce(Sum(line_subtotal), ZERO_DEC))["total"]
 
     # Ticket promedio
-    ticket_promedio = (
-        facturacion_mes / documentos_mes if documentos_mes > 0 else Decimal("0")
-    )
+    ticket_promedio = facturacion_mes / documentos_mes if documentos_mes > 0 else Decimal("0")
 
     # Documentos por tipo (simplificado)
     presupuestos = Documento.objects.filter(empresa=empresa, tipo="PRES").count()
     facturas = Documento.objects.filter(empresa=empresa, tipo="FAC").count()
     ordenes = Documento.objects.filter(empresa=empresa, tipo="OT").count()
 
-    # Actualizar contexto con datos del dashboard
+    # Branding: preferir ConfiguracionEmpresa si existe (igual que context processor unificado)
+    from taller.models.configuracion import ConfiguracionEmpresa
+
+    conf = ConfiguracionEmpresa.objects.filter(empresa=empresa).first()
+    logo_url = None
+    tagline = None
+    if conf:
+        if getattr(conf, "logo", None):
+            try:
+                logo_url = conf.logo.url
+            except Exception:
+                logo_url = None
+        if hasattr(conf, "tagline") and conf.tagline:
+            tagline = conf.tagline
+    # Fallbacks si no hay config
+    if not logo_url:
+        logo_url = empresa.logo.url if getattr(empresa, "logo", None) else None
+    if not tagline:
+        tagline = getattr(empresa, "tagline", None)
+
     contexto.update(
         {
             "empresa": empresa,
@@ -455,15 +447,33 @@ def dashboard_centro_operaciones_espacial(request):
             "es_dashboard_espacial": True,
             # Variables para el template base
             "company_name": empresa.nombre_taller,
-            "company_logo_url": empresa.logo.url if empresa.logo else None,
+            "company_logo_url": logo_url,
             "company_color": (
-                empresa.color_primario
-                if hasattr(empresa, "color_primario")
-                else "#00ffff"
+                empresa.color_primario if hasattr(empresa, "color_primario") else "#00ffff"
             ),
-            "company_tagline": empresa.tagline if hasattr(empresa, "tagline") else None,
+            "company_tagline": tagline,
         }
     )
+
+    # --- Asegurar compatibilidad con el sistema de BRAND ---
+    # Algunos includes y templates leen BRAND.* (p.ej. templates/_includes/brand_header.html)
+    # Para evitar inconsistencias (BRAND distinto a company_*), exponemos un objeto BRAND
+    # construido a partir de la empresa actual. Esto garantiza que tanto variables
+    # company_* como BRAND.* apunten a la misma marca en la misma petición.
+    try:
+        brand_obj = {
+            "logo_url": contexto.get("company_logo_url"),
+            "name": contexto.get("company_name"),
+            "tagline": contexto.get("company_tagline"),
+            "primary_color": contexto.get("company_color"),
+            "secondary_color": contexto.get("company_color"),
+            "country": getattr(empresa, "pais", None),
+            "currency": getattr(empresa, "simbolo_moneda", None),
+        }
+        contexto["BRAND"] = brand_obj
+    except Exception:
+        # No bloquear la vista por problemas menores al construir BRAND
+        pass
 
     # Usar template resolution unificado
     from django.template.response import TemplateResponse

@@ -18,9 +18,7 @@ class Marca(models.Model):
     )
 
     objects = MarcaManager()
-    empresa = models.ForeignKey(
-        "Empresa", on_delete=models.CASCADE, related_name="marcas"
-    )
+    empresa = models.ForeignKey("Empresa", on_delete=models.CASCADE, related_name="marcas")
     nombre = models.CharField(max_length=100)
     codigo = models.CharField(max_length=10, blank=True)
     pais = models.CharField(max_length=2, choices=PAISES, default="CL")
@@ -35,9 +33,7 @@ class Marca(models.Model):
 class Modelo(models.Model):
     nombre = models.CharField(max_length=100)
     marca = models.ForeignKey(Marca, on_delete=models.CASCADE, related_name="modelos")
-    empresa = models.ForeignKey(
-        "Empresa", on_delete=models.CASCADE, related_name="modelos"
-    )
+    empresa = models.ForeignKey("Empresa", on_delete=models.CASCADE, related_name="modelos")
 
     class Meta:
         unique_together = ("nombre", "marca", "empresa")

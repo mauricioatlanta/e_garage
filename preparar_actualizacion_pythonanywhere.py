@@ -103,9 +103,7 @@ Después de estos pasos, las URLs de bienvenida funcionarán correctamente.
 Si hay problemas, verificar en "Error log" del tab Web.
 """
 
-    with open(
-        "actualizacion_pythonanywhere/INSTRUCCIONES_DEPLOY.md", "w", encoding="utf-8"
-    ) as f:
+    with open("actualizacion_pythonanywhere/INSTRUCCIONES_DEPLOY.md", "w", encoding="utf-8") as f:
         f.write(instrucciones)
 
     print("\n📝 INSTRUCCIONES GENERADAS:")

@@ -16,9 +16,7 @@ def lista_vehiculos(request):
         vehiculos = Vehiculo.objects.all()
     else:
         vehiculos = Vehiculo.objects.filter(empresa=perfil.empresa)
-    return render(
-        request, "taller/vehiculos/lista_vehiculos.html", {"vehiculos": vehiculos}
-    )
+    return render(request, "taller/vehiculos/lista_vehiculos.html", {"vehiculos": vehiculos})
 
 
 @login_required
@@ -51,6 +49,4 @@ def detalle_vehiculo(request, vehiculo_id):
         vehiculo = get_object_or_404(Vehiculo, id=vehiculo_id)
     else:
         vehiculo = get_object_or_404(Vehiculo, id=vehiculo_id, empresa=perfil.empresa)
-    return render(
-        request, "taller/vehiculos/detalle_vehiculo.html", {"vehiculo": vehiculo}
-    )
+    return render(request, "taller/vehiculos/detalle_vehiculo.html", {"vehiculo": vehiculo})

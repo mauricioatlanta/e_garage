@@ -76,9 +76,7 @@ def ajax_crear_ciudad_usa(request):
     try:
         estado = EstadoUSA.objects.get(pk=int(estado_id))
     except (EstadoUSA.DoesNotExist, ValueError):
-        return JsonResponse(
-            {"success": False, "error": "Invalid state selected"}, status=400
-        )
+        return JsonResponse({"success": False, "error": "Invalid state selected"}, status=400)
 
     # Verificar si ya existe
     if CiudadUSA.objects.filter(nombre=nombre, estado=estado).exists():

@@ -33,9 +33,7 @@ mostrar_seccion("ANÁLISIS PARA PORTAL DE CLIENTES")
 
 # Analizar estructura actual
 total_clientes = Cliente.objects.count()
-clientes_con_email = (
-    Cliente.objects.exclude(email__isnull=True).exclude(email__exact="").count()
-)
+clientes_con_email = Cliente.objects.exclude(email__isnull=True).exclude(email__exact="").count()
 total_documentos = Documento.objects.count()
 total_vehiculos = Vehiculo.objects.count()
 
@@ -47,9 +45,7 @@ print(f"   🚗 Total vehículos: {total_vehiculos}")
 
 # Mostrar algunos clientes de ejemplo
 print("\n👥 CLIENTES CON EMAIL (Candidatos para portal):")
-clientes_portal = Cliente.objects.exclude(email__isnull=True).exclude(email__exact="")[
-    :5
-]
+clientes_portal = Cliente.objects.exclude(email__isnull=True).exclude(email__exact="")[:5]
 for cliente in clientes_portal:
     docs_count = Documento.objects.filter(cliente=cliente).count()
     vehiculos_count = Vehiculo.objects.filter(cliente=cliente).count()

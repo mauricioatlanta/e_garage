@@ -58,9 +58,7 @@ class RepuestoForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         if self.empresa:
-            self.fields["repuesto"].queryset = Repuesto.objects.filter(
-                empresa=self.empresa
-            )
+            self.fields["repuesto"].queryset = Repuesto.objects.filter(empresa=self.empresa)
 
 
 RepuestoFormSet = formset_factory(
@@ -111,14 +109,10 @@ class ServicioForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         if self.empresa:
-            self.fields["servicio"].queryset = Servicio.objects.filter(
-                empresa=self.empresa
-            )
+            self.fields["servicio"].queryset = Servicio.objects.filter(empresa=self.empresa)
 
 
-ServicioFormSet = formset_factory(
-    ServicioForm, extra=0, can_delete=True, formset=BaseFormSet
-)
+ServicioFormSet = formset_factory(ServicioForm, extra=0, can_delete=True, formset=BaseFormSet)
 
 
 # Formset para otros servicios
@@ -171,9 +165,7 @@ class OtroServicioForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         if self.empresa:
-            self.fields["servicio"].queryset = Servicio.objects.filter(
-                empresa=self.empresa
-            )
+            self.fields["servicio"].queryset = Servicio.objects.filter(empresa=self.empresa)
 
 
 OtroServicioFormSet = formset_factory(

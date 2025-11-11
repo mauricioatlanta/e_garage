@@ -135,9 +135,7 @@ def crear_repuestos_y_documentos_mauricio1():
                 repuestos_elegidos = random.sample(repuestos, num_repuestos)
                 for repuesto in repuestos_elegidos:
                     cantidad = random.randint(1, 2)
-                    precio = max(
-                        1000, repuesto.precio_venta + random.randint(-2000, 8000)
-                    )
+                    precio = max(1000, repuesto.precio_venta + random.randint(-2000, 8000))
 
                     LineaRepuesto.objects.create(
                         documento=documento,
@@ -213,9 +211,7 @@ def crear_repuestos_y_documentos_mauricio1():
     print(
         f"  - Total otros servicios: {LineaOtroServicio.objects.filter(documento__empresa=empresa).count()}"
     )
-    print(
-        f"  - Total repuestos disponibles: {Repuesto.objects.filter(empresa=empresa).count()}"
-    )
+    print(f"  - Total repuestos disponibles: {Repuesto.objects.filter(empresa=empresa).count()}")
 
 
 if __name__ == "__main__":

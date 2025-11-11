@@ -44,9 +44,7 @@ def verificar_modelos():
 
         # Verificar modelo ComprobantePago
         comprobante_count = ComprobantePago.objects.count()
-        print(
-            f"✅ Modelo ComprobantePago: {comprobante_count} comprobantes registrados"
-        )
+        print(f"✅ Modelo ComprobantePago: {comprobante_count} comprobantes registrados")
 
         # Verificar campos específicos del sistema de suscripciones
         if empresa_count > 0:
@@ -108,9 +106,7 @@ def verificar_suscripciones():
 
         # Extender suscripción
         empresa.extender_suscripcion(30)
-        print(
-            f"   - Después de extender 30 días: debe_bloquear = {empresa.debe_bloquear}"
-        )
+        print(f"   - Después de extender 30 días: debe_bloquear = {empresa.debe_bloquear}")
 
         return True
     except Exception as e:

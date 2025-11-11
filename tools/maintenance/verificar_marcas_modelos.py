@@ -50,9 +50,7 @@ def main():
         # Mostrar algunos modelos de ejemplo para la primera marca
         primera_marca = Marca.objects.filter(country="CL").first()
         if primera_marca:
-            print(
-                f"\n🔍 MODELOS PARA MARCA '{primera_marca.nombre}' (ID: {primera_marca.id}):"
-            )
+            print(f"\n🔍 MODELOS PARA MARCA '{primera_marca.nombre}' (ID: {primera_marca.id}):")
             modelos = Modelo.objects.filter(marca=primera_marca, country="CL")[:5]
             for modelo in modelos:
                 print(f"  {modelo.id}: {modelo.nombre}")

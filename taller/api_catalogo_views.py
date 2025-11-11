@@ -61,12 +61,7 @@ def api_estadisticas_catalogo(request):
     from django.db.models import Count
 
     total_modelos = CatalogoModeloAuto.objects.filter(activo=True).count()
-    total_marcas = (
-        CatalogoModeloAuto.objects.filter(activo=True)
-        .values("marca")
-        .distinct()
-        .count()
-    )
+    total_marcas = CatalogoModeloAuto.objects.filter(activo=True).values("marca").distinct().count()
 
     # Top 10 marcas con más modelos
     top_marcas = (

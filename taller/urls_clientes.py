@@ -22,9 +22,7 @@ def pick(cbv, fbv, *alts):
     candidatos = (cbv,) + (fbv,) + alts
 
     def missing(request, *a, **kw):
-        return HttpResponseNotFound(
-            "Vista no encontrada. Crea alguna de: " + ", ".join(candidatos)
-        )
+        return HttpResponseNotFound("Vista no encontrada. Crea alguna de: " + ", ".join(candidatos))
 
     return missing
 

@@ -37,9 +37,7 @@ def verificar_datos_vehiculos():
             for vehiculo in vehiculos:
                 marca = vehiculo.marca.nombre if vehiculo.marca else "Sin marca"
                 modelo = vehiculo.modelo.nombre if vehiculo.modelo else "Sin modelo"
-                print(
-                    f"       - {vehiculo.patente} - {marca} {modelo} ({vehiculo.anio})"
-                )
+                print(f"       - {vehiculo.patente} - {marca} {modelo} ({vehiculo.anio})")
 
     print("\n=== RESUMEN ===")
     total_clientes = Cliente.objects.count()

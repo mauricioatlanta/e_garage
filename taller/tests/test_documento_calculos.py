@@ -56,9 +56,7 @@ class TestDocumentoCalculos:
 
         self.marca = Marca.objects.create(nombre="Toyota", country="CL")
 
-        self.modelo = Modelo.objects.create(
-            nombre="Corolla", marca=self.marca, country="CL"
-        )
+        self.modelo = Modelo.objects.create(nombre="Corolla", marca=self.marca, country="CL")
 
         # Crear vehículo
         self.vehiculo = Vehiculo.objects.create(
@@ -70,9 +68,7 @@ class TestDocumentoCalculos:
         )
 
         # Crear técnico
-        self.tecnico = Tecnico.objects.create(
-            nombre="Carlos Técnico", empresa=self.empresa_cl
-        )
+        self.tecnico = Tecnico.objects.create(nombre="Carlos Técnico", empresa=self.empresa_cl)
 
     def test_calculo_iva_chile_solo_repuestos(self):
         """Test: Chile aplica IVA 19% solo a repuestos"""
@@ -149,10 +145,7 @@ class TestDocumentoCalculos:
 
         # Total: (1000 + 500 + 250) - 50 + 0 = 1700
         expected_total = (
-            Decimal("1000.00")
-            + Decimal("500.00")
-            + Decimal("250.00")
-            - Decimal("50.00")
+            Decimal("1000.00") + Decimal("500.00") + Decimal("250.00") - Decimal("50.00")
         )
         assert doc.total == expected_total
 

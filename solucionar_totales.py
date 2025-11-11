@@ -107,9 +107,7 @@ def main():
     print(f"   - Total servicios: ${documento.total_servicios()}")
     print(f"   - Total general: ${documento.total_general()}")
 
-    print(
-        "\n🎉 ¡Problema solucionado! Los totales ahora deberían aparecer en la vista de lista."
-    )
+    print("\n🎉 ¡Problema solucionado! Los totales ahora deberían aparecer en la vista de lista.")
 
 
 if __name__ == "__main__":

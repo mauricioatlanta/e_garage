@@ -5,9 +5,7 @@ from taller.models.empresa import Empresa
 
 
 class Command(BaseCommand):
-    help = (
-        "Elimina todas las empresas y usuarios asociados con pais=US (Estados Unidos)"
-    )
+    help = "Elimina todas las empresas y usuarios asociados con pais=US (Estados Unidos)"
 
     def handle(self, *args, **options):
         empresas_usa = Empresa.objects.filter(pais="US")

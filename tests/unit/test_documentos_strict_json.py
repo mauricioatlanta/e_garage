@@ -29,9 +29,7 @@ def _rev(cands, fb):
 
 
 @pytest.mark.django_db
-@override_settings(
-    MIDDLEWARE=[m for m in settings.MIDDLEWARE if "country_prefix" not in m]
-)
+@override_settings(MIDDLEWARE=[m for m in settings.MIDDLEWARE if "country_prefix" not in m])
 def test_herencia_responsable_strict_json():
     """Test inheritance with strict JSON validation (no middleware redirects)"""
     try:
@@ -48,14 +46,10 @@ def test_herencia_responsable_strict_json():
     user = User.objects.create_user(username="test_strict_json", password="test")
 
     # Create empresa
-    empresa = Empresa.objects.create(
-        user=user, nombre_taller="Test Strict JSON", pais="CL"
-    )
+    empresa = Empresa.objects.create(user=user, nombre_taller="Test Strict JSON", pais="CL")
 
     # Create cliente and vehiculo
-    cliente = Cliente.objects.create(
-        empresa=empresa, nombre="Test Client", tax_id="1-9"
-    )
+    cliente = Cliente.objects.create(empresa=empresa, nombre="Test Client", tax_id="1-9")
     vehiculo = Vehiculo.objects.create(
         empresa=empresa,
         cliente=cliente,
@@ -66,9 +60,7 @@ def test_herencia_responsable_strict_json():
     )
 
     # Create tecnico
-    tecnico = Tecnico.objects.create(
-        empresa=empresa, nombre="Test Tecnico", activo=True
-    )
+    tecnico = Tecnico.objects.create(empresa=empresa, nombre="Test Tecnico", activo=True)
 
     c = Client()
     c.force_login(user)
@@ -116,9 +108,7 @@ def test_herencia_responsable_strict_json():
 
     # Verify document has tecnico_responsable
     documento = Documento.objects.get(id=documento_id)
-    assert (
-        documento.tecnico_responsable == tecnico
-    ), "Document should have tecnico_responsable"
+    assert documento.tecnico_responsable == tecnico, "Document should have tecnico_responsable"
 
     # Verify service lines were created
     linea_servicio = LineaServicio.objects.filter(documento=documento).first()
@@ -130,9 +120,7 @@ def test_herencia_responsable_strict_json():
 
 
 @pytest.mark.django_db
-@override_settings(
-    MIDDLEWARE=[m for m in settings.MIDDLEWARE if "country_prefix" not in m]
-)
+@override_settings(MIDDLEWARE=[m for m in settings.MIDDLEWARE if "country_prefix" not in m])
 def test_rounding_precision_strict_json():
     """Test rounding precision with strict JSON validation"""
     try:
@@ -147,12 +135,8 @@ def test_rounding_precision_strict_json():
     User = get_user_model()
     user = User.objects.create_user(username="test_rounding_strict", password="test")
 
-    empresa = Empresa.objects.create(
-        user=user, nombre_taller="Test Rounding Strict", pais="CL"
-    )
-    cliente = Cliente.objects.create(
-        empresa=empresa, nombre="Test Client", tax_id="1-9"
-    )
+    empresa = Empresa.objects.create(user=user, nombre_taller="Test Rounding Strict", pais="CL")
+    cliente = Cliente.objects.create(empresa=empresa, nombre="Test Client", tax_id="1-9")
     vehiculo = Vehiculo.objects.create(
         empresa=empresa,
         cliente=cliente,
@@ -203,9 +187,7 @@ def test_rounding_precision_strict_json():
 
 
 @pytest.mark.django_db
-@override_settings(
-    MIDDLEWARE=[m for m in settings.MIDDLEWARE if "country_prefix" not in m]
-)
+@override_settings(MIDDLEWARE=[m for m in settings.MIDDLEWARE if "country_prefix" not in m])
 def test_descuentos_extremos_strict_json():
     """Test extreme discount values with strict JSON validation"""
     try:
@@ -220,12 +202,8 @@ def test_descuentos_extremos_strict_json():
     User = get_user_model()
     user = User.objects.create_user(username="test_descuentos_strict", password="test")
 
-    empresa = Empresa.objects.create(
-        user=user, nombre_taller="Test Descuentos Strict", pais="CL"
-    )
-    cliente = Cliente.objects.create(
-        empresa=empresa, nombre="Test Client", tax_id="1-9"
-    )
+    empresa = Empresa.objects.create(user=user, nombre_taller="Test Descuentos Strict", pais="CL")
+    cliente = Cliente.objects.create(empresa=empresa, nombre="Test Client", tax_id="1-9")
     vehiculo = Vehiculo.objects.create(
         empresa=empresa,
         cliente=cliente,
@@ -269,12 +247,8 @@ def test_descuentos_extremos_strict_json():
     linea = LineaServicio.objects.filter(documento=documento).first()
 
     assert linea is not None, "Service line should be created"
-    assert linea.descuento == Decimal(
-        "100.00"
-    ), f"Discount should be 100%, got {linea.descuento}"
+    assert linea.descuento == Decimal("100.00"), f"Discount should be 100%, got {linea.descuento}"
 
     # Verify totals are calculated correctly (should be 0 with 100% discount)
     assert documento.total >= Decimal("0"), "Total should not be negative"
-    assert documento.neto_servicios >= Decimal(
-        "0"
-    ), "Neto servicios should not be negative"
+    assert documento.neto_servicios >= Decimal("0"), "Neto servicios should not be negative"

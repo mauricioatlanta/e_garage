@@ -216,9 +216,7 @@ def main():
 
     print("\n🔍 Sanity checks recomendados:")
     print("1. Abrir /cl/ajax/clientes/buscar/?q=a en navegador")
-    print(
-        '2. Verificar que devuelve JSON con estructura {"results":[...],"more":false}'
-    )
+    print('2. Verificar que devuelve JSON con estructura {"results":[...],"more":false}')
     print("3. En consola del navegador, no debe haber errores de Select2")
     print("4. En Network, peticiones AJAX deben tener status 200")
 

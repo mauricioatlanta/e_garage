@@ -71,9 +71,7 @@ urlpatterns = [
     path("api/estado-suscripcion/", estado_suscripcion, name="estado_suscripcion"),
     path("precios/", precios, name="precios"),
     path("", landing_inicio, name="inicio"),
-    path(
-        "landing/", landing_premium, name="landing_premium"
-    ),  # Nueva ruta para landing.html
+    path("landing/", landing_premium, name="landing_premium"),  # Nueva ruta para landing.html
     path(
         "egarage/", landing_egarage, name="landing_egarage"
     ),  # Landing page profesional de eGarage
@@ -117,9 +115,7 @@ urlpatterns = [
     # path('reportes/servicios-subcontratados/', reporte_servicios_subcontratados, name='reporte_servicios_subcontratados'),
     # rutas de apps
     path("taller/", include(("taller.urls", "taller"), namespace="taller")),
-    path(
-        "clientes/", include(("taller.clientes.urls", "clientes"), namespace="clientes")
-    ),
+    path("clientes/", include(("taller.clientes.urls", "clientes"), namespace="clientes")),
     path(
         "vehiculos/",
         include(("taller.vehiculos.urls", "vehiculos"), namespace="vehiculos"),
@@ -128,20 +124,14 @@ urlpatterns = [
         "repuestos/",
         include(("taller.repuestos.urls", "repuestos"), namespace="repuestos"),
     ),
-    path(
-        "reportes/", include(("taller.reportes.urls", "reportes"), namespace="reportes")
-    ),
+    path("reportes/", include(("taller.reportes.urls", "reportes"), namespace="reportes")),
     # Demo URL sin autenticación
     path("demo/reportes/", demo_reportes_por_fecha, name="demo_reportes"),
     path("documentos/", include("taller.documentos.urls")),
-    path(
-        "autocomplete/", include("taller.autocomplete.urls", namespace="autocomplete")
-    ),
+    path("autocomplete/", include("taller.autocomplete.urls", namespace="autocomplete")),
     path(
         "servicios/",
-        include(
-            ("taller.servicios.urls_servicios", "servicios"), namespace="servicios"
-        ),
+        include(("taller.servicios.urls_servicios", "servicios"), namespace="servicios"),
     ),
     path("configuracion/", include("taller.configuracion_urls")),
     path("api/ciudades/", obtener_ciudades, name="ciudades_por_region"),
@@ -180,9 +170,7 @@ usa_patterns = [
     path("demo-atlanta/", demo_atlanta_personalization, name="demo_atlanta_directo"),
     # 🎯 Demo público Atlanta (SIN LOGIN - para marketing)
     path("demo/atlanta/", demo_atlanta_publico, name="demo_atlanta_publico_directo"),
-    path(
-        "demo/atlanta/quote/", demo_cotizacion_ajax, name="demo_atlanta_quote_directo"
-    ),
+    path("demo/atlanta/quote/", demo_cotizacion_ajax, name="demo_atlanta_quote_directo"),
     path(
         "demo/atlanta/verify-code/",
         verificar_codigo_atlanta,
@@ -196,9 +184,7 @@ usa_patterns = [
         name="api_ciudades_usa",
     ),
     path("api-usa/marcas/", api_marcas_vehiculos_usa, name="api_marcas_usa"),
-    path(
-        "api-usa/modelos/<int:marca_id>/", api_modelos_por_marca, name="api_modelos_usa"
-    ),
+    path("api-usa/modelos/<int:marca_id>/", api_modelos_por_marca, name="api_modelos_usa"),
     path("api-usa/impuestos/", api_calcular_impuestos_usa, name="api_impuestos_usa"),
     path("api-usa/servicios/", api_traducir_servicios, name="api_servicios_usa"),
     path("cambiar-idioma/", cambiar_idioma, name="cambiar_idioma_usa"),

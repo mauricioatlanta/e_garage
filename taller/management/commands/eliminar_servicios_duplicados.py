@@ -29,8 +29,6 @@ class Command(BaseCommand):
                     )
                     s.delete()
                 total_duplicados += len(a_eliminar)
-        self.stdout.write(
-            self.style.SUCCESS(f"Eliminados {total_duplicados} servicios repetidos.")
-        )
+        self.stdout.write(self.style.SUCCESS(f"Eliminados {total_duplicados} servicios repetidos."))
         for d in detalles:
             self.stdout.write(self.style.NOTICE(d))

@@ -13,9 +13,7 @@ def main():
     templates_path = base_path / "templates_canonical"
 
     # Template fuente (el que acabamos de actualizar)
-    source_template = (
-        templates_path / "taller" / "cl" / "es" / "vehiculos" / "vehiculo_list.html"
-    )
+    source_template = templates_path / "taller" / "cl" / "es" / "vehiculos" / "vehiculo_list.html"
 
     # Lista de variantes de templates a actualizar
     variants = [

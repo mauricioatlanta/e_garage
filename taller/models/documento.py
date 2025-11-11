@@ -61,27 +61,15 @@ class Documento(AuditMixin, models.Model):
     )
     moneda = models.CharField(max_length=3, default="CLP")
     country = models.CharField(max_length=2, default="CL")
-    neto_repuestos = models.DecimalField(
-        max_digits=14, decimal_places=2, default=Decimal("0.00")
-    )
-    neto_servicios = models.DecimalField(
-        max_digits=14, decimal_places=2, default=Decimal("0.00")
-    )
+    neto_repuestos = models.DecimalField(max_digits=14, decimal_places=2, default=Decimal("0.00"))
+    neto_servicios = models.DecimalField(max_digits=14, decimal_places=2, default=Decimal("0.00"))
     neto_otros_servicios = models.DecimalField(
         max_digits=14, decimal_places=2, default=Decimal("0.00")
     )
-    descuento = models.DecimalField(
-        max_digits=14, decimal_places=2, default=Decimal("0.00")
-    )
-    tax_rate_applied = models.DecimalField(
-        max_digits=5, decimal_places=2, default=Decimal("0.00")
-    )
-    tax_amount = models.DecimalField(
-        max_digits=14, decimal_places=2, default=Decimal("0.00")
-    )
-    total = models.DecimalField(
-        max_digits=14, decimal_places=2, default=Decimal("0.00")
-    )
+    descuento = models.DecimalField(max_digits=14, decimal_places=2, default=Decimal("0.00"))
+    tax_rate_applied = models.DecimalField(max_digits=5, decimal_places=2, default=Decimal("0.00"))
+    tax_amount = models.DecimalField(max_digits=14, decimal_places=2, default=Decimal("0.00"))
+    total = models.DecimalField(max_digits=14, decimal_places=2, default=Decimal("0.00"))
 
     # Campos de totales con nombres estándar para compatibilidad con frontend
     total_repuestos = models.DecimalField(max_digits=14, decimal_places=2, default=0)
@@ -110,9 +98,7 @@ class Documento(AuditMixin, models.Model):
     pagado = models.BooleanField(
         default=False, help_text=_("Indica si el documento está pagado completamente")
     )
-    apply_vat = models.BooleanField(
-        default=True, help_text=_("Aplicar IVA al documento")
-    )
+    apply_vat = models.BooleanField(default=True, help_text=_("Aplicar IVA al documento"))
     kilometraje = models.PositiveIntegerField(
         null=True, blank=True, help_text=_("Kilometraje del vehículo")
     )
@@ -154,9 +140,7 @@ class Documento(AuditMixin, models.Model):
         default=Decimal("0.00"),
         help_text=_("Saldo pendiente de pago"),
     )
-    fecha_pago = models.DateTimeField(
-        blank=True, null=True, help_text=_("Fecha y hora del pago")
-    )
+    fecha_pago = models.DateTimeField(blank=True, null=True, help_text=_("Fecha y hora del pago"))
     nota_pago = models.TextField(
         blank=True, null=True, help_text=_("Notas adicionales sobre el pago")
     )
@@ -335,16 +319,12 @@ class Documento(AuditMixin, models.Model):
 
         # Millas solo en USA
         if self.millas is not None and self.country != "US":
-            raise ValidationError(
-                "El campo millas solo puede usarse en documentos de USA"
-            )
+            raise ValidationError("El campo millas solo puede usarse en documentos de USA")
 
         # ✔ Consistencias críticas Cliente/Vehículo/Empresa
         if self.vehiculo_id:
             if not self.cliente_id:
-                raise ValidationError(
-                    "Debe seleccionar un cliente antes de asignar un vehículo."
-                )
+                raise ValidationError("Debe seleccionar un cliente antes de asignar un vehículo.")
 
             # El vehículo debe pertenecer a la misma empresa del documento
             if (
@@ -357,10 +337,7 @@ class Documento(AuditMixin, models.Model):
                 )
 
             # El vehículo debe pertenecer al cliente del documento
-            if (
-                hasattr(self.vehiculo, "cliente_id")
-                and self.vehiculo.cliente_id != self.cliente_id
-            ):
+            if hasattr(self.vehiculo, "cliente_id") and self.vehiculo.cliente_id != self.cliente_id:
                 raise ValidationError(
                     "El vehículo seleccionado no pertenece al cliente del documento."
                 )
@@ -537,15 +514,11 @@ class Documento(AuditMixin, models.Model):
             output_field=DecimalField(max_digits=14, decimal_places=2),
         )
 
-        rep = self.lineas_repuesto.aggregate(total=Coalesce(Sum(rep_expr), Value(0)))[
+        rep = self.lineas_repuesto.aggregate(total=Coalesce(Sum(rep_expr), Value(0)))["total"]
+        srv = self.lineas_servicio.aggregate(total=Coalesce(Sum(serv_expr), Value(0)))["total"]
+        otr = self.lineas_otro_servicio.aggregate(total=Coalesce(Sum(otros_expr), Value(0)))[
             "total"
         ]
-        srv = self.lineas_servicio.aggregate(total=Coalesce(Sum(serv_expr), Value(0)))[
-            "total"
-        ]
-        otr = self.lineas_otro_servicio.aggregate(
-            total=Coalesce(Sum(otros_expr), Value(0))
-        )["total"]
 
         rep = Decimal(rep or 0)
         srv = Decimal(srv or 0)
@@ -612,9 +585,7 @@ class Documento(AuditMixin, models.Model):
         verbose_name_plural = _("Documentos")
         indexes = [
             # Índices optimizados para KPIs
-            models.Index(
-                fields=["empresa", "fecha_emision"]
-            ),  # KPI por empresa y fecha
+            models.Index(fields=["empresa", "fecha_emision"]),  # KPI por empresa y fecha
             models.Index(fields=["fecha_emision"]),  # KPI global por fecha
             models.Index(
                 fields=["tecnico_responsable", "fecha_emision"]

@@ -42,17 +42,13 @@ def normalize_empresa_data(apps, schema_editor):
                 old_tz = e.zona_horaria
                 e.zona_horaria = "America/New_York"
                 changed = True
-                print(
-                    f"  🌍 Empresa {e.id}: TZ cambiada a America/New_York (era {old_tz})"
-                )
+                print(f"  🌍 Empresa {e.id}: TZ cambiada a America/New_York (era {old_tz})")
         else:  # CL
             if tz not in CL_TZS:
                 old_tz = e.zona_horaria
                 e.zona_horaria = "America/Santiago"
                 changed = True
-                print(
-                    f"  🌍 Empresa {e.id}: TZ cambiada a America/Santiago (era {old_tz})"
-                )
+                print(f"  🌍 Empresa {e.id}: TZ cambiada a America/Santiago (era {old_tz})")
 
         if changed:
             e.save(update_fields=["moneda", "zona_horaria"])

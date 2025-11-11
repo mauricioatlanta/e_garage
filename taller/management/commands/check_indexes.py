@@ -60,9 +60,7 @@ class Command(BaseCommand):
 
                     self.stdout.write(f"   Índices existentes: {len(existing_indexes)}")
                     for idx in existing_indexes:
-                        self.stdout.write(
-                            f"   - {idx[1]} ({'UNIQUE' if idx[2] else 'INDEX'})"
-                        )
+                        self.stdout.write(f"   - {idx[1]} ({'UNIQUE' if idx[2] else 'INDEX'})")
 
                     # Verificar índices esperados
                     for expected_fields in expected:
@@ -71,17 +69,13 @@ class Command(BaseCommand):
                         # Buscar índice que contenga estos campos
                         found = False
                         for idx_name in existing_names:
-                            if self._index_contains_fields(
-                                cursor, idx_name, expected_fields
-                            ):
+                            if self._index_contains_fields(cursor, idx_name, expected_fields):
                                 found = True
                                 total_found += 1
                                 break
 
                         if found:
-                            self.stdout.write(
-                                self.style.SUCCESS(f"   ✅ {expected_fields}")
-                            )
+                            self.stdout.write(self.style.SUCCESS(f"   ✅ {expected_fields}"))
                         else:
                             self.stdout.write(
                                 self.style.ERROR(f"   ❌ {expected_fields} - FALTANTE")
@@ -89,9 +83,7 @@ class Command(BaseCommand):
                             missing_indexes.append((table, expected_fields))
 
             except Exception as e:
-                self.stdout.write(
-                    self.style.ERROR(f"   ❌ Error verificando {table}: {e}")
-                )
+                self.stdout.write(self.style.ERROR(f"   ❌ Error verificando {table}: {e}"))
                 missing_indexes.append((table, f"ERROR: {e}"))
 
         # Resumen
@@ -109,18 +101,14 @@ class Command(BaseCommand):
                 self.stdout.write(f"   - {table}: {fields}")
 
             if fail_on_missing:
-                self.stdout.write(
-                    self.style.ERROR("\n💥 FALLO: Índices faltantes detectados")
-                )
+                self.stdout.write(self.style.ERROR("\n💥 FALLO: Índices faltantes detectados"))
                 raise SystemExit(1)
             else:
                 self.stdout.write(
                     self.style.WARNING("\n⚠️  ADVERTENCIA: Índices faltantes detectados")
                 )
         else:
-            self.stdout.write(
-                self.style.SUCCESS("\n✅ TODOS LOS ÍNDICES ESTÁN PRESENTES")
-            )
+            self.stdout.write(self.style.SUCCESS("\n✅ TODOS LOS ÍNDICES ESTÁN PRESENTES"))
 
         self.stdout.write("\n💡 Para crear índices faltantes:")
         self.stdout.write("   python manage.py makemigrations taller")

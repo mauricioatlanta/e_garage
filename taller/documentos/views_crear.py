@@ -83,9 +83,7 @@ def crear_documento(request):
         # Obtener empresa del usuario (común para GET y POST)
         try:
             empresa = request.user.empresa
-            print(
-                f"[DOC][DEBUG] Empresa obtenida: {empresa.nombre_taller if empresa else 'None'}"
-            )
+            print(f"[DOC][DEBUG] Empresa obtenida: {empresa.nombre_taller if empresa else 'None'}")
         except AttributeError:
             empresa = None
             logger.warning("Usuario sin empresa")
@@ -139,10 +137,7 @@ def crear_documento(request):
                     # Configurar campos automáticos
                     doc.country = getattr(empresa, "pais", "CL")
                     doc.moneda = (
-                        getattr(
-                            getattr(empresa, "configuracion", None), "moneda", "CLP"
-                        )
-                        or "CLP"
+                        getattr(getattr(empresa, "configuracion", None), "moneda", "CLP") or "CLP"
                     )
                     if not doc.estado:
                         doc.estado = "EMITIDO"  # default seguro
@@ -164,9 +159,7 @@ def crear_documento(request):
                             "vehiculo",
                             "El vehículo no pertenece al cliente seleccionado.",
                         )
-                        raise ValidationError(
-                            "El vehículo no pertenece al cliente seleccionado."
-                        )
+                        raise ValidationError("El vehículo no pertenece al cliente seleccionado.")
 
                     # Configurar IVA para Chile
                     if getattr(doc, "country", "CL") == "CL":
@@ -204,9 +197,7 @@ def crear_documento(request):
                     except Exception as e:
                         logger.warning(f"Error al recalcular totales: {e}")
 
-                    messages.success(
-                        request, f"Documento {doc.numero} creado correctamente."
-                    )
+                    messages.success(request, f"Documento {doc.numero} creado correctamente.")
                     url = reverse("taller:documentos:lista_documentos")
                     logger.debug(f"Redirect exitoso a: {url}")
                     return redirect(url)
@@ -225,9 +216,7 @@ def crear_documento(request):
 
             # Si hay errores, re-render con errores visibles (nunca en blanco)
             logger.debug("Formularios inválidos, mostrando errores...")
-            logger.debug(
-                f"DOC ERR: {doc_form.errors.as_json() if doc_form.errors else 'N/A'}"
-            )
+            logger.debug(f"DOC ERR: {doc_form.errors.as_json() if doc_form.errors else 'N/A'}")
             logger.debug(f"REP ERR: {rep_fs.errors if rep_fs.errors else 'N/A'}")
             logger.debug(f"SERV ERR: {serv_fs.errors if serv_fs.errors else 'N/A'}")
             logger.debug(f"OTR ERR: {otro_fs.errors if otro_fs.errors else 'N/A'}")
@@ -289,9 +278,7 @@ def buscar_clientes_ajax(request):
                 info_adicional.append(f"📧 {cliente.email}")
 
             info_text = (
-                " | ".join(info_adicional)
-                if info_adicional
-                else "Sin información adicional"
+                " | ".join(info_adicional) if info_adicional else "Sin información adicional"
             )
 
             resultados.append(

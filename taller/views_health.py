@@ -29,18 +29,14 @@ def health_check(request):
     config_status = {
         "DEBUG": settings.DEBUG,
         "ALLOWED_HOSTS": settings.ALLOWED_HOSTS,
-        "STATICFILES_STORAGE": getattr(
-            settings, "STATICFILES_STORAGE", "Not configured"
-        ),
+        "STATICFILES_STORAGE": getattr(settings, "STATICFILES_STORAGE", "Not configured"),
     }
 
     # Verificar archivos estáticos críticos
     import os
 
     static_files = {
-        "documentos_form.js": os.path.exists(
-            "static/taller/common/js/documentos_form.js"
-        ),
+        "documentos_form.js": os.path.exists("static/taller/common/js/documentos_form.js"),
         "staticfiles_dir": os.path.exists(getattr(settings, "STATIC_ROOT", "")),
     }
 

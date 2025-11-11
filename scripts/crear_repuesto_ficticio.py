@@ -90,9 +90,7 @@ def crear_repuesto_ficticio():
 
             # Verificar que se guardó correctamente
             repuesto_verificado = Repuesto.objects.get(id=repuesto.id)
-            print(
-                f"\n✅ Verificación: Repuesto encontrado en BD con ID {repuesto_verificado.id}"
-            )
+            print(f"\n✅ Verificación: Repuesto encontrado en BD con ID {repuesto_verificado.id}")
 
         else:
             print("❌ Errores en el formulario:")

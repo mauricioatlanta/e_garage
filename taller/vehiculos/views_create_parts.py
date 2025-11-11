@@ -31,9 +31,7 @@ def crear_motor(request):
                 "obj": motor,
             },
         )
-    return render(
-        request, "taller/vehiculos/crear_motor_simple.html", {"modelo": modelo}
-    )
+    return render(request, "taller/vehiculos/crear_motor_simple.html", {"modelo": modelo})
 
 
 @login_required
@@ -58,6 +56,4 @@ def crear_caja(request):
                 "obj": caja,
             },
         )
-    return render(
-        request, "taller/vehiculos/crear_caja_simple.html", {"modelo": modelo}
-    )
+    return render(request, "taller/vehiculos/crear_caja_simple.html", {"modelo": modelo})

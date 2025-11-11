@@ -47,17 +47,11 @@ class Command(BaseCommand):
         count = bad_clientes.count()
 
         if count > 0:
-            self.stdout.write(
-                self.style.ERROR(f"❌ {count} clientes sin empresa asignada")
-            )
+            self.stdout.write(self.style.ERROR(f"❌ {count} clientes sin empresa asignada"))
             for cliente in bad_clientes[:5]:  # Mostrar primeros 5
-                self.stdout.write(
-                    f"  - Cliente ID: {cliente.pk}, Nombre: {cliente.nombre}"
-                )
+                self.stdout.write(f"  - Cliente ID: {cliente.pk}, Nombre: {cliente.nombre}")
         else:
-            self.stdout.write(
-                self.style.SUCCESS("✅ Todos los clientes tienen empresa")
-            )
+            self.stdout.write(self.style.SUCCESS("✅ Todos los clientes tienen empresa"))
 
     def audit_vehiculos(self):
         """Auditar vehículos con empresas inconsistentes"""
@@ -72,13 +66,9 @@ class Command(BaseCommand):
         if count > 0:
             self.stdout.write(self.style.ERROR(f"❌ {count} vehículos sin empresa"))
             for vehiculo in bad_vehiculos[:5]:
-                self.stdout.write(
-                    f"  - Vehículo ID: {vehiculo.pk}, Patente: {vehiculo.patente}"
-                )
+                self.stdout.write(f"  - Vehículo ID: {vehiculo.pk}, Patente: {vehiculo.patente}")
         else:
-            self.stdout.write(
-                self.style.SUCCESS("✅ Todos los vehículos tienen empresa")
-            )
+            self.stdout.write(self.style.SUCCESS("✅ Todos los vehículos tienen empresa"))
 
         # Vehículos con empresa diferente a su cliente
         try:
@@ -96,10 +86,6 @@ class Command(BaseCommand):
                 for vehiculo in inconsistent_vehiculos[:5]:
                     self.stdout.write(f"  - Vehículo ID: {vehiculo.pk}")
             else:
-                self.stdout.write(
-                    self.style.SUCCESS("✅ Vehículos tienen empresa consistente")
-                )
+                self.stdout.write(self.style.SUCCESS("✅ Vehículos tienen empresa consistente"))
         except Exception as e:
-            self.stdout.write(
-                self.style.WARNING(f"⚠️ No se pudo verificar consistencia: {e}")
-            )
+            self.stdout.write(self.style.WARNING(f"⚠️ No se pudo verificar consistencia: {e}"))

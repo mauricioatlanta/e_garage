@@ -33,9 +33,7 @@ class DocumentoTests(TestCase):
         )
 
         # Crear usuario de prueba
-        self.user = User.objects.create_user(
-            username="test_user", password="test_pass123"
-        )
+        self.user = User.objects.create_user(username="test_user", password="test_pass123")
 
         # Crear perfil de usuario
         self.perfil = PerfilUsuario.objects.create(
@@ -118,25 +116,19 @@ class DocumentoTests(TestCase):
         self.assertEqual(repuesto.codigo, "TEST001")
         self.assertEqual(repuesto.nombre, "Repuesto Test")
         self.assertEqual(repuesto.cantidad, 2)
-        precio_rep = getattr(
-            repuesto, "precio_unitario", getattr(repuesto, "precio", None)
-        )
+        precio_rep = getattr(repuesto, "precio_unitario", getattr(repuesto, "precio", None))
         self.assertEqual(precio_rep, 15000)
 
         # Verificar datos del servicio
         servicio = servicios.first()
         self.assertEqual(servicio.nombre, "Servicio Test")
-        precio_serv = getattr(
-            servicio, "precio_unitario", getattr(servicio, "precio", None)
-        )
+        precio_serv = getattr(servicio, "precio_unitario", getattr(servicio, "precio", None))
         self.assertEqual(precio_serv, 25000)
 
     def test_aislamiento_empresas(self):
         """Test que las empresas no ven documentos de otras"""
         # Crear segunda empresa
-        empresa2 = Empresa.objects.create(
-            nombre_taller="Taller Test 2", direccion="Otra Calle 456"
-        )
+        empresa2 = Empresa.objects.create(nombre_taller="Taller Test 2", direccion="Otra Calle 456")
 
         user2 = User.objects.create_user(username="test_user2", password="test_pass123")
 
@@ -228,8 +220,7 @@ class DocumentoTests(TestCase):
 
         # Calcular totales
         total_repuestos = sum(
-            getattr(r, "precio_unitario", getattr(r, "precio", 0))
-            * getattr(r, "cantidad", 1)
+            getattr(r, "precio_unitario", getattr(r, "precio", 0)) * getattr(r, "cantidad", 1)
             for r in documento.lineas_repuesto.all()
         )
         total_servicios = sum(

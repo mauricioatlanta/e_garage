@@ -16,14 +16,10 @@ def logout_redirect_view(request):
     if request.user.is_authenticated:
         try:
             # Buscar en empresa (prioridad más alta)
-            if hasattr(request.user, "empresa") and hasattr(
-                request.user.empresa, "pais"
-            ):
+            if hasattr(request.user, "empresa") and hasattr(request.user.empresa, "pais"):
                 country = request.user.empresa.pais
             # Buscar en perfil
-            elif hasattr(request.user, "perfil") and hasattr(
-                request.user.perfil, "pais"
-            ):
+            elif hasattr(request.user, "perfil") and hasattr(request.user.perfil, "pais"):
                 country = request.user.perfil.pais
         except Exception:
             pass

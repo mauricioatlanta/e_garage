@@ -30,9 +30,7 @@ def test_totales_cl_19_y_us_0():
         from django.contrib.auth.models import User
 
         user = User.objects.create_user(username=f"user_{emp_pais}", password="test")
-        emp = Empresa.objects.create(
-            user=user, nombre_taller=f"EMP-{emp_pais}", pais=emp_pais
-        )
+        emp = Empresa.objects.create(user=user, nombre_taller=f"EMP-{emp_pais}", pais=emp_pais)
         cli = Cliente.objects.create(empresa=emp, nombre="Cli", tax_id="1-9")
         veh = Vehiculo.objects.create(
             empresa=emp,

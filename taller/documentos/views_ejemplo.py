@@ -16,9 +16,7 @@ def documento_crear(request):
     country = empresa.pais if empresa else "CL"
 
     if request.method == "POST":
-        form = DocumentoForm(
-            request.POST, user=request.user, empresa=empresa, country=country
-        )
+        form = DocumentoForm(request.POST, user=request.user, empresa=empresa, country=country)
         if form.is_valid():
             obj = form.save()
             messages.success(request, "Documento creado.")
@@ -64,9 +62,7 @@ def documento_editar(request, pk):
             messages.success(request, "Documento actualizado.")
             return redirect("documentos:editar", pk=obj.pk)
     else:
-        form = DocumentoForm(
-            instance=obj, user=request.user, empresa=empresa, country=country
-        )
+        form = DocumentoForm(instance=obj, user=request.user, empresa=empresa, country=country)
 
     context = {
         "form": form,

@@ -97,9 +97,7 @@ def signup_complete(request):
                     config = plan_config[plan]
 
                     # Determinar valor según país
-                    valor_mensual = (
-                        config["valor_cl"] if pais == "CL" else config["valor_us"]
-                    )
+                    valor_mensual = config["valor_cl"] if pais == "CL" else config["valor_us"]
 
                     # 🔥 PASO 3: CREAR EMPRESA (SUSCRIPTOR)
                     empresa = Empresa.objects.create(
@@ -110,9 +108,7 @@ def signup_complete(request):
                         # Configuración por país (auto-asignado)
                         pais=pais,
                         moneda="CLP" if pais == "CL" else "USD",
-                        zona_horaria=(
-                            "America/Santiago" if pais == "CL" else "America/New_York"
-                        ),
+                        zona_horaria=("America/Santiago" if pais == "CL" else "America/New_York"),
                         # Configuración del plan
                         plan=config["plan_nombre"],
                         dias_prueba=config["dias"],

@@ -61,15 +61,11 @@ def company_branding(request):
     brand = {
         "logo_url": getattr(settings, "DEFAULT_BRAND_LOGO_URL", None),
         "name": getattr(settings, "DEFAULT_BRAND_NAME", "eGarage"),
-        "tagline": getattr(
-            settings, "DEFAULT_BRAND_TAGLINE", "Mission Control for your Workshop"
-        ),
+        "tagline": getattr(settings, "DEFAULT_BRAND_TAGLINE", "Mission Control for your Workshop"),
         "country": getattr(settings, "DEFAULT_BRAND_COUNTRY", "cl"),
         "currency": getattr(settings, "DEFAULT_BRAND_CURRENCY", "CLP"),
         "primary_color": getattr(settings, "DEFAULT_BRAND_PRIMARY_COLOR", "#0d6efd"),
-        "secondary_color": getattr(
-            settings, "DEFAULT_BRAND_SECONDARY_COLOR", "#6c757d"
-        ),
+        "secondary_color": getattr(settings, "DEFAULT_BRAND_SECONDARY_COLOR", "#6c757d"),
     }
 
     # Si no hay usuario autenticado, retornar defaults
@@ -101,22 +97,13 @@ def company_branding(request):
             company_settings = CompanySettings.objects.get(user=user)
             if company_settings.logo:
                 brand["logo_url"] = company_settings.logo.url
-            if (
-                hasattr(company_settings, "company_name")
-                and company_settings.company_name
-            ):
+            if hasattr(company_settings, "company_name") and company_settings.company_name:
                 brand["name"] = company_settings.company_name
             if hasattr(company_settings, "tagline") and company_settings.tagline:
                 brand["tagline"] = company_settings.tagline
-            if (
-                hasattr(company_settings, "primary_color")
-                and company_settings.primary_color
-            ):
+            if hasattr(company_settings, "primary_color") and company_settings.primary_color:
                 brand["primary_color"] = company_settings.primary_color
-            if (
-                hasattr(company_settings, "secondary_color")
-                and company_settings.secondary_color
-            ):
+            if hasattr(company_settings, "secondary_color") and company_settings.secondary_color:
                 brand["secondary_color"] = company_settings.secondary_color
         except CompanySettings.DoesNotExist:
             pass

@@ -26,9 +26,7 @@ class DocumentoForm(forms.ModelForm):
     def clean(self):
         cleaned = super().clean()
         if self.instance and self.instance.pk and self.instance.estado != "DRAFT":
-            raise forms.ValidationError(
-                "No puedes editar un documento emitido/anulado."
-            )
+            raise forms.ValidationError("No puedes editar un documento emitido/anulado.")
         return cleaned
 
 

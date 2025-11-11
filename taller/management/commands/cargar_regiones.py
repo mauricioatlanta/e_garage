@@ -17,9 +17,7 @@ class Command(BaseCommand):
             with open("regiones_ciudades.json", encoding="utf-8") as f:
                 data = json.load(f)
         except FileNotFoundError:
-            self.stdout.write(
-                self.style.ERROR("❌ Archivo regiones_ciudades.json no encontrado.")
-            )
+            self.stdout.write(self.style.ERROR("❌ Archivo regiones_ciudades.json no encontrado."))
             return
 
         self.stdout.write("📥 Cargando regiones y ciudades desde archivo...")
@@ -29,6 +27,4 @@ class Command(BaseCommand):
             for ciudad_name in item["ciudades"]:
                 TallerCiudad.objects.create(nombre=ciudad_name, region=region)
 
-        self.stdout.write(
-            self.style.SUCCESS("✅ Regiones y ciudades cargadas correctamente.")
-        )
+        self.stdout.write(self.style.SUCCESS("✅ Regiones y ciudades cargadas correctamente."))

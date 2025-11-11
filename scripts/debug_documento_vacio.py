@@ -21,9 +21,7 @@ if not ultimo_doc:
     print("❌ No hay documentos en la base de datos")
     sys.exit(1)
 
-print(
-    f"📄 Último documento: {ultimo_doc.numero_documento} ({ultimo_doc.tipo_documento})"
-)
+print(f"📄 Último documento: {ultimo_doc.numero_documento} ({ultimo_doc.tipo_documento})")
 print(f"   Cliente: {ultimo_doc.cliente}")
 print(f"   Empresa: {ultimo_doc.empresa}")
 print(f"   Fecha: {ultimo_doc.fecha}")

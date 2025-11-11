@@ -151,9 +151,7 @@ Vehículo: {vehiculo_info}
         )
 
     except Exception as e:
-        return JsonResponse(
-            {"success": False, "error": f"Error al generar enlace: {str(e)}"}
-        )
+        return JsonResponse({"success": False, "error": f"Error al generar enlace: {str(e)}"})
 
 
 @login_required_default
@@ -211,9 +209,7 @@ def enviar_documento_email(request, documento_id):
     except json.JSONDecodeError:
         return JsonResponse({"success": False, "error": "Datos JSON inválidos"})
     except Exception as e:
-        return JsonResponse(
-            {"success": False, "error": f"Error al enviar email: {str(e)}"}
-        )
+        return JsonResponse({"success": False, "error": f"Error al enviar email: {str(e)}"})
 
 
 @login_required_default
@@ -238,9 +234,7 @@ def vista_impresion_documento(request, documento_id):
     # Calcular totales
     total_repuestos = sum(r.total for r in documento.repuestos.all())
     total_servicios = sum(s.precio for s in documento.servicios.all())
-    total_otros_servicios = sum(
-        os.precio_cliente for os in documento.otros_servicios.all()
-    )
+    total_otros_servicios = sum(os.precio_cliente for os in documento.otros_servicios.all())
 
     subtotal = total_repuestos + total_servicios + total_otros_servicios
     iva = subtotal * 0.19 if documento.incluir_iva else 0

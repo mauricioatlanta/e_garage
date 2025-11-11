@@ -76,12 +76,8 @@ def main():
         print(f"❌ Error: {e}")
 
     print("\n" + "=" * 50)
-    print(
-        "🎉 RESULTADO: El problema del dropdown de vehículos vacío ha sido SOLUCIONADO"
-    )
-    print(
-        "✅ Los usuarios ahora tienen vehículos disponibles en el formulario de documentos"
-    )
+    print("🎉 RESULTADO: El problema del dropdown de vehículos vacío ha sido SOLUCIONADO")
+    print("✅ Los usuarios ahora tienen vehículos disponibles en el formulario de documentos")
     print("=" * 50)
 
 

@@ -63,15 +63,13 @@ for doc in documentos_recientes:
         if (repuestos > 0 and servicios > 0)
         else "⚠️" if (repuestos > 0 or servicios > 0) else "❌"
     )
-    print(
-        f"   {estado} Doc {doc.pk} ({doc.empresa.nombre_taller}): R:{repuestos} S:{servicios}"
-    )
+    print(f"   {estado} Doc {doc.pk} ({doc.empresa.nombre_taller}): R:{repuestos} S:{servicios}")
 
 # 4. Documentos de taller2 específicamente
 print("\n4️⃣ DOCUMENTOS DE TALLER2")
-docs_taller2 = Documento.objects.filter(
-    empresa__nombre_taller="Mecánica Express"
-).order_by("-pk")[:3]
+docs_taller2 = Documento.objects.filter(empresa__nombre_taller="Mecánica Express").order_by("-pk")[
+    :3
+]
 for doc in docs_taller2:
     repuestos = RepuestoDocumento.objects.filter(documento=doc)
     servicios = LineaServicio.objects.filter(documento=doc)
@@ -80,8 +78,7 @@ for doc in docs_taller2:
         return getattr(
             r,
             "subtotal",
-            getattr(r, "precio_unitario", getattr(r, "precio", 0))
-            * getattr(r, "cantidad", 1),
+            getattr(r, "precio_unitario", getattr(r, "precio", 0)) * getattr(r, "cantidad", 1),
         )
 
     def _precio_serv(s):
@@ -99,9 +96,7 @@ for doc in docs_taller2:
     print(f"   {estado} Doc {doc.pk}: {doc.numero_documento} - Total: ${total_doc:,}")
 
     for rep in repuestos:
-        print(
-            f'       📦 {rep.nombre} x{getattr(rep, "cantidad", 1)} = ${_subtotal_rep(rep):,}'
-        )
+        print(f'       📦 {rep.nombre} x{getattr(rep, "cantidad", 1)} = ${_subtotal_rep(rep):,}')
     for serv in servicios:
         print(f"       🔧 {serv.nombre} = ${_precio_serv(serv):,}")
 

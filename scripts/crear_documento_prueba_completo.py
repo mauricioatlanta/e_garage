@@ -131,12 +131,8 @@ print(f"   IVA (19%): ${iva:,}")
 print(f"   TOTAL: ${total:,}")
 
 print("\n🎯 URLS PARA PROBAR:")
-print(
-    f"   Ver documento nuevo: http://127.0.0.1:8000/documentos/nuevo-ver/{documento.id}/"
-)
-print(
-    f"   Editar documento nuevo: http://127.0.0.1:8000/documentos/nuevo-editar/{documento.id}/"
-)
+print(f"   Ver documento nuevo: http://127.0.0.1:8000/documentos/nuevo-ver/{documento.id}/")
+print(f"   Editar documento nuevo: http://127.0.0.1:8000/documentos/nuevo-editar/{documento.id}/")
 print(f"   Test de datos: http://127.0.0.1:8000/documentos/test-datos/{documento.id}/")
 
 print("\n✅ Documento de prueba completo creado exitosamente")

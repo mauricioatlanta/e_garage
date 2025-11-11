@@ -69,9 +69,7 @@ class Migration(migrations.Migration):
                 ("nombre", models.CharField(max_length=100, verbose_name="Nombre")),
                 (
                     "poblacion",
-                    models.IntegerField(
-                        blank=True, null=True, verbose_name="Población"
-                    ),
+                    models.IntegerField(blank=True, null=True, verbose_name="Población"),
                 ),
                 (
                     "es_capital",
@@ -198,21 +196,15 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "nombre",
-                    models.CharField(
-                        max_length=100, unique=True, verbose_name="Nombre"
-                    ),
+                    models.CharField(max_length=100, unique=True, verbose_name="Nombre"),
                 ),
                 (
                     "nombre_en",
-                    models.CharField(
-                        blank=True, max_length=100, verbose_name="Nombre en Inglés"
-                    ),
+                    models.CharField(blank=True, max_length=100, verbose_name="Nombre en Inglés"),
                 ),
                 (
                     "pais_origen",
-                    models.CharField(
-                        default="USA", max_length=50, verbose_name="País de Origen"
-                    ),
+                    models.CharField(default="USA", max_length=50, verbose_name="País de Origen"),
                 ),
                 ("activa", models.BooleanField(default=True, verbose_name="Activa")),
                 (
@@ -297,9 +289,7 @@ class Migration(migrations.Migration):
                 ("email", models.EmailField(max_length=254, unique=True)),
                 (
                     "telefono",
-                    models.CharField(
-                        default="Sin teléfono", max_length=20, unique=True
-                    ),
+                    models.CharField(default="Sin teléfono", max_length=20, unique=True),
                 ),
                 ("codigo", models.CharField(max_length=32, unique=True)),
                 (
@@ -422,9 +412,7 @@ class Migration(migrations.Migration):
                 ("apellido", models.CharField(blank=True, max_length=100, null=True)),
                 (
                     "telefono",
-                    models.CharField(
-                        blank=True, db_index=True, max_length=15, null=True
-                    ),
+                    models.CharField(blank=True, db_index=True, max_length=15, null=True),
                 ),
                 ("direccion", models.CharField(blank=True, max_length=255, null=True)),
                 (
@@ -438,9 +426,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "email",
-                    models.EmailField(
-                        blank=True, db_index=True, max_length=254, null=True
-                    ),
+                    models.EmailField(blank=True, db_index=True, max_length=254, null=True),
                 ),
                 (
                     "tax_id",
@@ -765,15 +751,11 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "numero",
-                    models.CharField(
-                        blank=True, db_index=True, default="", max_length=32
-                    ),
+                    models.CharField(blank=True, db_index=True, default="", max_length=32),
                 ),
                 (
                     "correlativo",
-                    models.PositiveIntegerField(
-                        default=0, help_text="Número correlativo interno"
-                    ),
+                    models.PositiveIntegerField(default=0, help_text="Número correlativo interno"),
                 ),
                 (
                     "estado",
@@ -797,45 +779,31 @@ class Migration(migrations.Migration):
                 ("country", models.CharField(default="CL", max_length=2)),
                 (
                     "neto_repuestos",
-                    models.DecimalField(
-                        decimal_places=2, default=Decimal("0.00"), max_digits=14
-                    ),
+                    models.DecimalField(decimal_places=2, default=Decimal("0.00"), max_digits=14),
                 ),
                 (
                     "neto_servicios",
-                    models.DecimalField(
-                        decimal_places=2, default=Decimal("0.00"), max_digits=14
-                    ),
+                    models.DecimalField(decimal_places=2, default=Decimal("0.00"), max_digits=14),
                 ),
                 (
                     "neto_otros_servicios",
-                    models.DecimalField(
-                        decimal_places=2, default=Decimal("0.00"), max_digits=14
-                    ),
+                    models.DecimalField(decimal_places=2, default=Decimal("0.00"), max_digits=14),
                 ),
                 (
                     "descuento",
-                    models.DecimalField(
-                        decimal_places=2, default=Decimal("0.00"), max_digits=14
-                    ),
+                    models.DecimalField(decimal_places=2, default=Decimal("0.00"), max_digits=14),
                 ),
                 (
                     "tax_rate_applied",
-                    models.DecimalField(
-                        decimal_places=2, default=Decimal("0.00"), max_digits=5
-                    ),
+                    models.DecimalField(decimal_places=2, default=Decimal("0.00"), max_digits=5),
                 ),
                 (
                     "tax_amount",
-                    models.DecimalField(
-                        decimal_places=2, default=Decimal("0.00"), max_digits=14
-                    ),
+                    models.DecimalField(decimal_places=2, default=Decimal("0.00"), max_digits=14),
                 ),
                 (
                     "total",
-                    models.DecimalField(
-                        decimal_places=2, default=Decimal("0.00"), max_digits=14
-                    ),
+                    models.DecimalField(decimal_places=2, default=Decimal("0.00"), max_digits=14),
                 ),
                 ("created_at", models.DateTimeField(default=django.utils.timezone.now)),
                 (
@@ -861,9 +829,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "apply_vat",
-                    models.BooleanField(
-                        default=True, help_text="Aplicar IVA al documento"
-                    ),
+                    models.BooleanField(default=True, help_text="Aplicar IVA al documento"),
                 ),
                 (
                     "kilometraje",
@@ -937,9 +903,7 @@ class Migration(migrations.Migration):
                 ("nombre", models.CharField(max_length=255)),
                 (
                     "precio_venta",
-                    models.DecimalField(
-                        decimal_places=2, default=Decimal("0.00"), max_digits=10
-                    ),
+                    models.DecimalField(decimal_places=2, default=Decimal("0.00"), max_digits=10),
                 ),
                 ("cantidad", models.PositiveIntegerField(default=1)),
                 (
@@ -997,9 +961,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "logo",
-                    models.ImageField(
-                        blank=True, null=True, upload_to="logos_talleres/"
-                    ),
+                    models.ImageField(blank=True, null=True, upload_to="logos_talleres/"),
                 ),
                 ("direccion", models.CharField(blank=True, max_length=200)),
                 ("telefono", models.CharField(blank=True, max_length=20)),
@@ -1052,9 +1014,7 @@ class Migration(migrations.Migration):
                 ("ultimo_pago", models.DateTimeField(blank=True, null=True)),
                 (
                     "valor_mensual",
-                    models.DecimalField(
-                        decimal_places=2, default=Decimal("0.00"), max_digits=10
-                    ),
+                    models.DecimalField(decimal_places=2, default=Decimal("0.00"), max_digits=10),
                 ),
                 ("moneda", models.CharField(default="CLP", max_length=3)),
                 ("notificacion_5_dias", models.BooleanField(default=False)),
@@ -1320,9 +1280,7 @@ class Migration(migrations.Migration):
                 ("nombre", models.CharField(max_length=100)),
                 (
                     "modelos",
-                    models.ManyToManyField(
-                        blank=True, related_name="cajas", to="taller.modelo"
-                    ),
+                    models.ManyToManyField(blank=True, related_name="cajas", to="taller.modelo"),
                 ),
             ],
             options={
@@ -1346,9 +1304,7 @@ class Migration(migrations.Migration):
                 ("nombre", models.CharField(max_length=100, verbose_name="Nombre")),
                 (
                     "nombre_en",
-                    models.CharField(
-                        blank=True, max_length=100, verbose_name="Nombre en Inglés"
-                    ),
+                    models.CharField(blank=True, max_length=100, verbose_name="Nombre en Inglés"),
                 ),
                 (
                     "anio_inicio",
@@ -1422,9 +1378,7 @@ class Migration(migrations.Migration):
                 ("nombre", models.CharField(max_length=100)),
                 (
                     "modelos",
-                    models.ManyToManyField(
-                        blank=True, related_name="motores", to="taller.modelo"
-                    ),
+                    models.ManyToManyField(blank=True, related_name="motores", to="taller.modelo"),
                 ),
             ],
             options={
@@ -1547,9 +1501,7 @@ class Migration(migrations.Migration):
                 ("updated_at", models.DateTimeField(auto_now=True)),
                 (
                     "part_number",
-                    models.CharField(
-                        blank=True, db_index=True, max_length=64, null=True
-                    ),
+                    models.CharField(blank=True, db_index=True, max_length=64, null=True),
                 ),
                 ("nombre", models.CharField(db_index=True, max_length=160)),
                 (
@@ -1652,15 +1604,11 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "language",
-                    models.CharField(
-                        choices=[("es", "Español"), ("en", "English")], max_length=2
-                    ),
+                    models.CharField(choices=[("es", "Español"), ("en", "English")], max_length=2),
                 ),
                 (
                     "label",
-                    models.CharField(
-                        help_text="Nombre canónico en este idioma", max_length=100
-                    ),
+                    models.CharField(help_text="Nombre canónico en este idioma", max_length=100),
                 ),
                 (
                     "aliases",
@@ -1778,9 +1726,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "descripcion",
-                    models.TextField(
-                        blank=True, help_text="Descripción del servicio", null=True
-                    ),
+                    models.TextField(blank=True, help_text="Descripción del servicio", null=True),
                 ),
                 (
                     "tiempo_estimado",
@@ -1793,9 +1739,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "activo",
-                    models.BooleanField(
-                        default=True, help_text="Si el servicio está disponible"
-                    ),
+                    models.BooleanField(default=True, help_text="Si el servicio está disponible"),
                 ),
                 (
                     "categoria",
@@ -1850,15 +1794,11 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "language",
-                    models.CharField(
-                        choices=[("es", "Español"), ("en", "English")], max_length=2
-                    ),
+                    models.CharField(choices=[("es", "Español"), ("en", "English")], max_length=2),
                 ),
                 (
                     "label",
-                    models.CharField(
-                        help_text="Nombre canónico en este idioma", max_length=100
-                    ),
+                    models.CharField(help_text="Nombre canónico en este idioma", max_length=100),
                 ),
                 (
                     "aliases",
@@ -2002,9 +1942,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "direccion",
-                    models.TextField(
-                        blank=True, help_text="Dirección del técnico", null=True
-                    ),
+                    models.TextField(blank=True, help_text="Dirección del técnico", null=True),
                 ),
                 ("activo", models.BooleanField(default=True)),
                 ("fecha_creacion", models.DateTimeField(auto_now_add=True)),
@@ -2176,15 +2114,11 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "nombre",
-                    models.CharField(
-                        help_text="Nombre del servicio externo", max_length=255
-                    ),
+                    models.CharField(help_text="Nombre del servicio externo", max_length=255),
                 ),
                 (
                     "empresa_externa",
-                    models.CharField(
-                        help_text="Empresa que realiza el servicio", max_length=255
-                    ),
+                    models.CharField(help_text="Empresa que realiza el servicio", max_length=255),
                 ),
                 ("cantidad", models.PositiveIntegerField(default=1)),
                 (
@@ -2449,9 +2383,7 @@ class Migration(migrations.Migration):
                 ("anio", models.PositiveIntegerField(verbose_name="Año")),
                 (
                     "vin",
-                    models.CharField(
-                        blank=True, db_index=True, max_length=50, null=True
-                    ),
+                    models.CharField(blank=True, db_index=True, max_length=50, null=True),
                 ),
                 (
                     "millas",
@@ -2587,15 +2519,11 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "language",
-                    models.CharField(
-                        choices=[("es", "Español"), ("en", "English")], max_length=2
-                    ),
+                    models.CharField(choices=[("es", "Español"), ("en", "English")], max_length=2),
                 ),
                 (
                     "label",
-                    models.CharField(
-                        help_text="Nombre canónico en este idioma", max_length=100
-                    ),
+                    models.CharField(help_text="Nombre canónico en este idioma", max_length=100),
                 ),
                 (
                     "aliases",
@@ -2653,9 +2581,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddIndex(
             model_name="categoriarepuesto",
-            index=models.Index(
-                fields=["empresa", "nombre"], name="taller_cate_empresa_206721_idx"
-            ),
+            index=models.Index(fields=["empresa", "nombre"], name="taller_cate_empresa_206721_idx"),
         ),
         migrations.AddConstraint(
             model_name="categoriarepuesto",
@@ -2694,9 +2620,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddIndex(
             model_name="repuesto",
-            index=models.Index(
-                fields=["empresa", "nombre"], name="taller_repu_empresa_b6d441_idx"
-            ),
+            index=models.Index(fields=["empresa", "nombre"], name="taller_repu_empresa_b6d441_idx"),
         ),
         migrations.AddIndex(
             model_name="repuesto",
@@ -2721,9 +2645,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddIndex(
             model_name="servicioexterno",
-            index=models.Index(
-                fields=["empresa", "nombre"], name="taller_serv_empresa_39cd74_idx"
-            ),
+            index=models.Index(fields=["empresa", "nombre"], name="taller_serv_empresa_39cd74_idx"),
         ),
         migrations.AddIndex(
             model_name="servicioexterno",
@@ -2740,9 +2662,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddIndex(
             model_name="servicioexterno",
-            index=models.Index(
-                fields=["empresa", "activo"], name="taller_serv_empresa_f84e7b_idx"
-            ),
+            index=models.Index(fields=["empresa", "activo"], name="taller_serv_empresa_f84e7b_idx"),
         ),
         migrations.AddConstraint(
             model_name="servicioexterno",
@@ -2753,9 +2673,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddIndex(
             model_name="servicio",
-            index=models.Index(
-                fields=["empresa", "nombre"], name="taller_serv_empresa_ae160e_idx"
-            ),
+            index=models.Index(fields=["empresa", "nombre"], name="taller_serv_empresa_ae160e_idx"),
         ),
         migrations.AddIndex(
             model_name="servicio",
@@ -2790,15 +2708,11 @@ class Migration(migrations.Migration):
         ),
         migrations.AddIndex(
             model_name="cliente",
-            index=models.Index(
-                fields=["empresa", "email"], name="taller_clie_empresa_d50b51_idx"
-            ),
+            index=models.Index(fields=["empresa", "email"], name="taller_clie_empresa_d50b51_idx"),
         ),
         migrations.AddIndex(
             model_name="cliente",
-            index=models.Index(
-                fields=["empresa", "tax_id"], name="taller_clie_empresa_163ef8_idx"
-            ),
+            index=models.Index(fields=["empresa", "tax_id"], name="taller_clie_empresa_163ef8_idx"),
         ),
         migrations.AddConstraint(
             model_name="cliente",
@@ -2860,9 +2774,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddIndex(
             model_name="lineaotroservicio",
-            index=models.Index(
-                fields=["empresa_externa"], name="taller_line_empresa_230933_idx"
-            ),
+            index=models.Index(fields=["empresa_externa"], name="taller_line_empresa_230933_idx"),
         ),
         migrations.AddIndex(
             model_name="lineaotroservicio",
@@ -2872,9 +2784,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddIndex(
             model_name="vehiculo",
-            index=models.Index(
-                fields=["empresa"], name="taller_vehi_empresa_9c8280_idx"
-            ),
+            index=models.Index(fields=["empresa"], name="taller_vehi_empresa_9c8280_idx"),
         ),
         migrations.AddIndex(
             model_name="vehiculo",
@@ -2884,21 +2794,15 @@ class Migration(migrations.Migration):
         ),
         migrations.AddIndex(
             model_name="vehiculo",
-            index=models.Index(
-                fields=["empresa", "vin"], name="taller_vehi_empresa_394c06_idx"
-            ),
+            index=models.Index(fields=["empresa", "vin"], name="taller_vehi_empresa_394c06_idx"),
         ),
         migrations.AddIndex(
             model_name="vehiculo",
-            index=models.Index(
-                fields=["marca_texto"], name="taller_vehi_marca_t_5ad5d7_idx"
-            ),
+            index=models.Index(fields=["marca_texto"], name="taller_vehi_marca_t_5ad5d7_idx"),
         ),
         migrations.AddIndex(
             model_name="vehiculo",
-            index=models.Index(
-                fields=["modelo_texto"], name="taller_vehi_modelo__412d36_idx"
-            ),
+            index=models.Index(fields=["modelo_texto"], name="taller_vehi_modelo__412d36_idx"),
         ),
         migrations.AddConstraint(
             model_name="vehiculo",
@@ -2915,9 +2819,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddIndex(
             model_name="documento",
-            index=models.Index(
-                fields=["fecha_emision"], name="taller_docu_fecha_e_60c72d_idx"
-            ),
+            index=models.Index(fields=["fecha_emision"], name="taller_docu_fecha_e_60c72d_idx"),
         ),
         migrations.AddIndex(
             model_name="documento",

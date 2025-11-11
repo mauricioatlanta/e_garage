@@ -15,9 +15,7 @@ class VehiculoForm(forms.ModelForm):
 
         if self.user and hasattr(self.user, "empresa"):
             # Filtrar clientes por empresa del usuario
-            self.fields["cliente"].queryset = Cliente.objects.filter(
-                empresa=self.user.empresa
-            )
+            self.fields["cliente"].queryset = Cliente.objects.filter(empresa=self.user.empresa)
             # Filtrar modelos por país de la empresa
             country = getattr(self.user.empresa, "pais", "CL")
             self.fields["modelo"].queryset = Modelo.objects.filter(country=country)

@@ -53,8 +53,10 @@
       box-shadow: 0 0 60px rgba(0, 230, 255, 0.3);
       padding: 3.5rem 2.5rem 2.5rem;
       text-align: center;
-      max-width: 480px;
+      max-width: 500px;
       width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
       border: 1px solid rgba(0, 230, 255, 0.2);
     }
 
@@ -63,7 +65,7 @@
       position: relative;
     }
     .logo {
-      height: 140px;
+      height: 120px;
       width: auto;
       filter: drop-shadow(0 4px 12px rgba(0, 230, 255, 0.4));
       animation: pulse 3s infinite ease-in-out;
@@ -82,7 +84,8 @@
     .country-buttons {
       display: flex;
       flex-direction: column;
-      gap: 1.25rem;
+      gap: 1rem;
+      margin-bottom: 1rem;
     }
 
     .country-btn {
@@ -91,8 +94,8 @@
       justify-content: center;
       gap: 1rem;
       width: 100%;
-      padding: 1.5rem;
-      font-size: 1.5rem;
+      padding: 1.3rem;
+      font-size: 1.3rem;
       font-weight: bold;
       border-radius: 16px;
       border: 2px solid transparent;
@@ -102,6 +105,7 @@
       font-family: 'Orbitron', sans-serif;
       position: relative;
       overflow: hidden;
+      min-height: 70px;
     }
 
     .country-btn::before {
@@ -145,6 +149,45 @@
       border-color: #00e6ff;
     }
 
+    .country-btn.brasil {
+      background: linear-gradient(135deg, #009c3b 0%, #ffdf00 100%);
+      color: #000;
+      border-color: #009c3b;
+      box-shadow: 0 4px 20px rgba(0, 156, 59, 0.4);
+    }
+
+    .country-btn.brasil:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 8px 30px rgba(0, 156, 59, 0.6);
+      border-color: #002776;
+    }
+
+    .country-btn.venezuela {
+      background: linear-gradient(135deg, #FFCC00 0%, #00247D 50%, #CF142B 100%);
+      color: #fff;
+      border-color: #FFCC00;
+      box-shadow: 0 4px 20px rgba(255, 204, 0, 0.4);
+    }
+
+    .country-btn.venezuela:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 8px 30px rgba(255, 204, 0, 0.6);
+      border-color: #CF142B;
+    }
+
+    .country-btn.peru {
+      background: linear-gradient(135deg, #DC143C 0%, #FFFFFF 50%, #DC143C 100%);
+      color: #000;
+      border-color: #DC143C;
+      box-shadow: 0 4px 20px rgba(220, 20, 60, 0.4);
+    }
+
+    .country-btn.peru:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 8px 30px rgba(220, 20, 60, 0.6);
+      border-color: #FFFFFF;
+    }
+
     .flag {
       font-size: 2.5rem;
     }
@@ -156,14 +199,18 @@
 
     @media (max-width: 600px) {
       .selector-container {
-        padding: 2.5rem 1.5rem 1.5rem;
+        padding: 2rem 1.2rem 1.5rem;
       }
       .country-btn {
-        font-size: 1.25rem;
-        padding: 1.25rem;
+        font-size: 1.1rem;
+        padding: 1rem;
+        min-height: 60px;
       }
       .flag {
-        font-size: 2rem;
+        font-size: 1.8rem;
+      }
+      .logo {
+        height: 100px;
       }
     }
   </style>
@@ -185,6 +232,21 @@
       <a href="/us/" class="country-btn usa">
         <span class="flag">🇺🇸</span>
         <span class="country-name">United States</span>
+      </a>
+
+      <a href="/br/" class="country-btn brasil">
+        <span class="flag">🇧🇷</span>
+        <span class="country-name">Brasil</span>
+      </a>
+
+      <a href="/ve/" class="country-btn venezuela">
+        <span class="flag">🇻🇪</span>
+        <span class="country-name">Venezuela</span>
+      </a>
+
+      <a href="/pe/" class="country-btn peru">
+        <span class="flag">🇵🇪</span>
+        <span class="country-name">Perú</span>
       </a>
 
       <a href="/cl/" class="country-btn chile">

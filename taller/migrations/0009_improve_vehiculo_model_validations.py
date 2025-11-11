@@ -24,9 +24,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="vehiculo",
             constraint=models.UniqueConstraint(
-                condition=models.Q(
-                    ("vin__isnull", False), models.Q(("vin", ""), _negated=True)
-                ),
+                condition=models.Q(("vin__isnull", False), models.Q(("vin", ""), _negated=True)),
                 fields=("empresa", "vin"),
                 name="uq_empresa_vin_present",
             ),

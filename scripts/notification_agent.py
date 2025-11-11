@@ -50,9 +50,7 @@ class NotificationAgent:
             subject = f"⚠️ Tu trial de eGarage expira en {days_remaining} día{'s' if days_remaining != 1 else ''}"
 
             # Email en HTML
-            html_message = render_to_string(
-                "emails/trial_expiration_warning.html", context
-            )
+            html_message = render_to_string("emails/trial_expiration_warning.html", context)
 
             # Email en texto plano
             plain_message = f"""
@@ -145,9 +143,7 @@ Equipo eGarage
             return True
 
         except Exception as e:
-            error_msg = (
-                f"Error enviando notificación de expiración a {user.email}: {str(e)}"
-            )
+            error_msg = f"Error enviando notificación de expiración a {user.email}: {str(e)}"
             self.errors.append(error_msg)
             smart_logger.subs_logger.error(error_msg)
             return False
@@ -169,9 +165,7 @@ Equipo eGarage
 
             subject = f"⏰ Tu suscripción a eGarage vence en {days_remaining} día{'s' if days_remaining != 1 else ''}"
 
-            html_message = render_to_string(
-                "emails/subscription_expiration_warning.html", context
-            )
+            html_message = render_to_string("emails/subscription_expiration_warning.html", context)
 
             plain_message = f"""
 Hola {context['user_name']},
@@ -205,9 +199,7 @@ Equipo eGarage
             return True
 
         except Exception as e:
-            error_msg = (
-                f"Error enviando notificación de suscripción a {user.email}: {str(e)}"
-            )
+            error_msg = f"Error enviando notificación de suscripción a {user.email}: {str(e)}"
             self.errors.append(error_msg)
             smart_logger.subs_logger.error(error_msg)
             return False
@@ -217,9 +209,7 @@ Equipo eGarage
         print("🔍 Verificando trials...")
 
         # Trials activos
-        active_trials = TrialRegistro.objects.filter(
-            activo=True, fecha_expiracion__gt=self.today
-        )
+        active_trials = TrialRegistro.objects.filter(activo=True, fecha_expiracion__gt=self.today)
 
         for trial in active_trials:
             days_remaining = trial.dias_restantes()
@@ -232,9 +222,7 @@ Equipo eGarage
                 self.send_trial_expiration_warning(trial, days_remaining)
 
         # Trials expirados hoy
-        expired_today = TrialRegistro.objects.filter(
-            activo=True, fecha_expiracion=self.today
-        )
+        expired_today = TrialRegistro.objects.filter(activo=True, fecha_expiracion=self.today)
 
         for trial in expired_today:
             print(f"🔒 Enviando notificación de expiración: {trial.user.email}")
@@ -253,18 +241,14 @@ Equipo eGarage
 
         for empresa in empresas_activas:
             if empresa.fecha_vencimiento_suscripcion:
-                days_until_expiration = (
-                    empresa.fecha_vencimiento_suscripcion - self.today
-                ).days
+                days_until_expiration = (empresa.fecha_vencimiento_suscripcion - self.today).days
 
                 # Notificaciones en días específicos: 15, 7, 3, 1
                 if days_until_expiration in [15, 7, 3, 1]:
                     print(
                         f"📧 Enviando aviso de suscripción (quedan {days_until_expiration} días): {empresa.usuario.email}"
                     )
-                    self.send_subscription_expiration_warning(
-                        empresa, days_until_expiration
-                    )
+                    self.send_subscription_expiration_warning(empresa, days_until_expiration)
 
     def run(self):
         """Ejecuta el agente de notificaciones"""

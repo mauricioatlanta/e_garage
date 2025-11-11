@@ -60,9 +60,7 @@ def test_comprobante_pago_chile_totales():
     data = {}
     _set_if_field(data, CP, "empresa", emp)
     if Documento and _has_field(CP, "documento"):
-        doc = Documento.objects.create(
-            empresa=emp, tipo="FAC", fecha_emision="2025-01-01"
-        )
+        doc = Documento.objects.create(empresa=emp, tipo="FAC", fecha_emision="2025-01-01")
         data["documento"] = doc
 
     # campos comunes de monto
@@ -94,8 +92,7 @@ def test_comprobante_pago_chile_totales():
             if isinstance(val, (int, float, Decimal)):
                 esperado = base * Decimal("1.19")
                 assert (
-                    Decimal(str(val)).quantize(Decimal("1"))
-                    >= esperado.quantize(Decimal("1")) - 1
+                    Decimal(str(val)).quantize(Decimal("1")) >= esperado.quantize(Decimal("1")) - 1
                 )
             break
 

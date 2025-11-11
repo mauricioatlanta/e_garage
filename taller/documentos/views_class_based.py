@@ -91,9 +91,7 @@ class DocumentoUpdateView(CountryLangTemplateMixin, LoginRequiredMixin, UpdateVi
             # Debug info en caso de error
             documento_exists = Documento.objects.filter(pk=pk).first()
             if documento_exists:
-                messages.error(
-                    self.request, f"Documento {pk} no pertenece a tu empresa"
-                )
+                messages.error(self.request, f"Documento {pk} no pertenece a tu empresa")
             else:
                 messages.error(self.request, f"Documento {pk} no encontrado")
             raise

@@ -149,9 +149,7 @@ class SignupCompleteForm(forms.Form):
     def clean_email(self):
         email = self.cleaned_data.get("email", "").lower().strip()
         if User.objects.filter(email=email).exists():
-            raise ValidationError(
-                "Ya existe una cuenta con este email. ¿Deseas iniciar sesión?"
-            )
+            raise ValidationError("Ya existe una cuenta con este email. ¿Deseas iniciar sesión?")
         return email
 
     def clean_telefono(self):
@@ -174,9 +172,7 @@ class SignupCompleteForm(forms.Form):
             # USA: debe tener 10 dígitos
             cleaned = "".join(filter(str.isdigit, telefono))
             if len(cleaned) != 10:
-                raise ValidationError(
-                    "Teléfono USA debe tener 10 dígitos: (555) 123-4567"
-                )
+                raise ValidationError("Teléfono USA debe tener 10 dígitos: (555) 123-4567")
 
         return telefono
 

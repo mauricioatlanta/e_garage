@@ -45,12 +45,8 @@ class Command(BaseCommand):
 
         # Verificar si la URL es correcta
         if "configuracion_tecnicos" in rendered and "/taller/" not in rendered:
-            self.stdout.write(
-                self.style.SUCCESS("✅ Tag country_url funciona correctamente")
-            )
+            self.stdout.write(self.style.SUCCESS("✅ Tag country_url funciona correctamente"))
         else:
-            self.stdout.write(
-                self.style.ERROR("❌ Tag country_url no funciona correctamente")
-            )
+            self.stdout.write(self.style.ERROR("❌ Tag country_url no funciona correctamente"))
 
         self.stdout.write("✅ Prueba completada.")

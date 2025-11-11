@@ -326,9 +326,7 @@ def generar_sugerencias_ia(request):
                 )
 
             # Calcular valor total estimado
-            sugerencias["valor_estimado"] = sum(
-                s["precio"] for s in sugerencias["servicios"]
-            )
+            sugerencias["valor_estimado"] = sum(s["precio"] for s in sugerencias["servicios"])
 
             return JsonResponse({"success": True, "sugerencias": sugerencias})
 

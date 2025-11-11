@@ -20,13 +20,9 @@ def test_kpi_tecnico_mes_actual_consistency():
     """Test que verifica consistencia entre kpi_helpers y agregación manual."""
 
     # Crear datos de prueba
-    empresa = Empresa.objects.create(
-        nombre_taller="Test Garage", pais="US", moneda="USD"
-    )
+    empresa = Empresa.objects.create(nombre_taller="Test Garage", pais="US", moneda="USD")
     tecnico = Tecnico.objects.create(empresa=empresa, nombre="Test Tech")
-    cliente = Cliente.objects.create(
-        empresa=empresa, nombre="Test Client", rut_ein="12-3456789"
-    )
+    cliente = Cliente.objects.create(empresa=empresa, nombre="Test Client", rut_ein="12-3456789")
     vehiculo = Vehiculo.objects.create(
         empresa=empresa,
         cliente=cliente,
@@ -82,9 +78,7 @@ def test_kpi_tecnico_mes_actual_consistency():
     )
 
     manual_results = list(
-        LineaServicio.objects.filter(
-            documento__fecha_emision__month=timezone.now().month
-        )
+        LineaServicio.objects.filter(documento__fecha_emision__month=timezone.now().month)
         .filter(documento__empresa=empresa)
         .annotate(monto=monto_manual)
         .values("documento__tecnico_responsable__nombre")
@@ -115,9 +109,7 @@ def test_kpi_calculator_consistency():
     """Test que verifica consistencia del KPICalculator."""
 
     # Crear datos de prueba
-    empresa = Empresa.objects.create(
-        nombre_taller="Test Garage 2", pais="CL", moneda="CLP"
-    )
+    empresa = Empresa.objects.create(nombre_taller="Test Garage 2", pais="CL", moneda="CLP")
     tecnico = Tecnico.objects.create(empresa=empresa, nombre="Test Tech 2")
     cliente = Cliente.objects.create(
         empresa=empresa, nombre="Test Client 2", rut_ein="12.345.678-9"
@@ -170,9 +162,7 @@ def test_kpi_calculator_consistency():
     )
 
     manual_results = list(
-        LineaServicio.objects.filter(
-            documento__fecha_emision__month=timezone.now().month
-        )
+        LineaServicio.objects.filter(documento__fecha_emision__month=timezone.now().month)
         .filter(documento__empresa=empresa)
         .annotate(monto=monto_manual)
         .values("documento__tecnico_responsable__nombre")
@@ -197,13 +187,9 @@ def test_kpi_documentos_por_estado_consistency():
     """Test que verifica consistencia de documentos por estado."""
 
     # Crear datos de prueba
-    empresa = Empresa.objects.create(
-        nombre_taller="Test Garage 3", pais="US", moneda="USD"
-    )
+    empresa = Empresa.objects.create(nombre_taller="Test Garage 3", pais="US", moneda="USD")
     tecnico = Tecnico.objects.create(empresa=empresa, nombre="Test Tech 3")
-    cliente = Cliente.objects.create(
-        empresa=empresa, nombre="Test Client 3", rut_ein="12-3456789"
-    )
+    cliente = Cliente.objects.create(empresa=empresa, nombre="Test Client 3", rut_ein="12-3456789")
     vehiculo = Vehiculo.objects.create(
         empresa=empresa,
         cliente=cliente,
@@ -265,9 +251,7 @@ def test_kpi_documentos_por_estado_consistency():
     # Verificar que los estados coinciden
     kpi_estados = {r["estado"] for r in kpi_results}
     manual_estados = {r["estado"] for r in manual_results}
-    assert (
-        kpi_estados == manual_estados
-    ), f"Estados diferentes: {kpi_estados} vs {manual_estados}"
+    assert kpi_estados == manual_estados, f"Estados diferentes: {kpi_estados} vs {manual_estados}"
 
 
 @pytest.mark.django_db
@@ -277,9 +261,7 @@ def test_kpi_helpers_monto_calculado():
     from taller.utils.kpi_helpers import KPIHelpers
 
     # Crear datos de prueba
-    empresa = Empresa.objects.create(
-        nombre_taller="Test Garage 4", pais="CL", moneda="CLP"
-    )
+    empresa = Empresa.objects.create(nombre_taller="Test Garage 4", pais="CL", moneda="CLP")
     tecnico = Tecnico.objects.create(empresa=empresa, nombre="Test Tech 4")
     cliente = Cliente.objects.create(
         empresa=empresa, nombre="Test Client 4", rut_ein="12.345.678-9"
@@ -330,11 +312,7 @@ def test_kpi_helpers_monto_calculado():
     monto_calculado = KPIHelpers.get_monto_calculado()
 
     # Aplicar el cálculo a la línea
-    resultado = (
-        LineaServicio.objects.filter(id=linea.id)
-        .annotate(monto=monto_calculado)
-        .first()
-    )
+    resultado = LineaServicio.objects.filter(id=linea.id).annotate(monto=monto_calculado).first()
 
     # Verificar que el cálculo es correcto
     assert abs(resultado.monto - monto_esperado) < Decimal(

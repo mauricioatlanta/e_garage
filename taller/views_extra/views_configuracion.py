@@ -67,9 +67,7 @@ def configuracion_empresa(request):
                         messages.success(request, "📷 Logo actualizado exitosamente.")
 
                 empresa.save()
-                messages.success(
-                    request, "✅ Información de la empresa actualizada exitosamente."
-                )
+                messages.success(request, "✅ Información de la empresa actualizada exitosamente.")
             else:
                 messages.error(request, "❌ El nombre del taller es obligatorio.")
 
@@ -147,9 +145,7 @@ def configuracion_tecnicos(request):
                     request,
                     "❌ Formato de teléfono inválido. Solo números, espacios, guiones, + y paréntesis.",
                 )
-            elif Tecnico.objects.filter(
-                empresa=empresa, nombre__iexact=nombre_completo
-            ).exists():
+            elif Tecnico.objects.filter(empresa=empresa, nombre__iexact=nombre_completo).exists():
                 messages.error(
                     request,
                     f'❌ Ya existe un técnico con el nombre "{nombre_completo}" en tu taller.',
@@ -162,9 +158,7 @@ def configuracion_tecnicos(request):
                     direccion=especialidad,  # Usar especialidad como dirección
                     activo=True,
                 )
-                messages.success(
-                    request, f'✅ Técnico "{nombre_completo}" agregado exitosamente.'
-                )
+                messages.success(request, f'✅ Técnico "{nombre_completo}" agregado exitosamente.')
 
         elif "desactivar_tecnico" in request.POST:
             tecnico_id = request.POST.get("tecnico_id", "").strip()
@@ -228,9 +222,7 @@ def configuracion_tecnicos(request):
             if not tecnico:
                 messages.error(request, "❌ Técnico no encontrado.")
             elif not nuevo_nombre or len(nuevo_nombre) < 2:
-                messages.error(
-                    request, "❌ El nombre debe tener al menos 2 caracteres."
-                )
+                messages.error(request, "❌ El nombre debe tener al menos 2 caracteres.")
             elif not nuevo_telefono or len(nuevo_telefono.strip()) < 8:
                 messages.error(
                     request,
@@ -288,9 +280,7 @@ def configuracion_tecnicos(request):
                 else:
                     nombre = tecnico.nombre
                     tecnico.delete()
-                    messages.success(
-                        request, f'🗑️ Técnico "{nombre}" eliminado completamente.'
-                    )
+                    messages.success(request, f'🗑️ Técnico "{nombre}" eliminado completamente.')
 
         # Redirección dinámica basada en el país del usuario
         from django.shortcuts import redirect

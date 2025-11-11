@@ -42,9 +42,7 @@ from datetime import datetime
 from pathlib import Path
 
 
-def move_or_delete(
-    path: Path, backup_root: Path, do_delete: bool, apply: bool, actions: list
-):
+def move_or_delete(path: Path, backup_root: Path, do_delete: bool, apply: bool, actions: list):
     if not path.exists():
         actions.append(("missing", str(path)))
         return
@@ -71,9 +69,7 @@ def move_or_delete(
             shutil.move(str(path), str(dst))
             actions.append(("moved_to_backup", f"{path} -> {dst}"))
     else:
-        actions.append(
-            ("would_delete" if do_delete else "would_move_to_backup", str(path))
-        )
+        actions.append(("would_delete" if do_delete else "would_move_to_backup", str(path)))
 
 
 def main():
@@ -85,9 +81,7 @@ def main():
         help="Path to finalize report JSON",
     )
     ap.add_argument("--apply", action="store_true", help="Apply changes")
-    ap.add_argument(
-        "--delete", action="store_true", help="Delete instead of moving to backup"
-    )
+    ap.add_argument("--delete", action="store_true", help="Delete instead of moving to backup")
     args = ap.parse_args()
 
     root = Path(args.root).resolve()
@@ -109,15 +103,9 @@ def main():
         short = entry.get("short", "")
         candidates = entry.get("candidates", [])
         # consider only filename, we only remove deep common copies
-        deep_common = [
-            c for c in candidates if "templates/taller/common/" in c.replace("\\", "/")
-        ]
-        deep_us = [
-            c for c in candidates if "templates/taller/us/en/" in c.replace("\\", "/")
-        ]
-        deep_cl = [
-            c for c in candidates if "templates/taller/cl/es/" in c.replace("\\", "/")
-        ]
+        deep_common = [c for c in candidates if "templates/taller/common/" in c.replace("\\", "/")]
+        deep_us = [c for c in candidates if "templates/taller/us/en/" in c.replace("\\", "/")]
+        deep_cl = [c for c in candidates if "templates/taller/cl/es/" in c.replace("\\", "/")]
         if deep_common and (deep_us or deep_cl):
             for c in deep_common:
                 p = (root / c).resolve()
@@ -137,9 +125,7 @@ def main():
             is_empty = False
             break
         if is_empty:
-            move_or_delete(
-                deep_common_dir, backup_root, args.delete, args.apply, actions
-            )
+            move_or_delete(deep_common_dir, backup_root, args.delete, args.apply, actions)
 
     summary = {
         "root": str(root),

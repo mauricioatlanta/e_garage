@@ -26,9 +26,7 @@ for rep in repuestos:
 print("\n=== SERVICIOS DOCUMENTO ===")
 servicios = ServicioDocumento.objects.all()
 for serv in servicios:
-    print(
-        f"Servicio ID {serv.id}: Doc {serv.documento_id} - {serv.nombre} - Precio: {serv.precio}"
-    )
+    print(f"Servicio ID {serv.id}: Doc {serv.documento_id} - {serv.nombre} - Precio: {serv.precio}")
 
 print("\n=== RELACIONES ===")
 for doc in docs:

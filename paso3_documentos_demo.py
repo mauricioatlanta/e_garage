@@ -30,9 +30,7 @@ class DocumentosDemo:
         print("🇨🇱 CREANDO DOCUMENTOS DEMO CHILE")
         print("-" * 50)
 
-        empresas_cl = Empresa.objects.filter(
-            pais="CL", user__username__startswith="demo_"
-        )
+        empresas_cl = Empresa.objects.filter(pais="CL", user__username__startswith="demo_")
 
         servicios_cl = Servicio.objects.filter(
             country="CL",
@@ -43,9 +41,7 @@ class DocumentosDemo:
         documentos_creados = 0
 
         for empresa in empresas_cl:
-            clientes = Cliente.objects.filter(empresa=empresa)[
-                :3
-            ]  # Solo 3 clientes por empresa
+            clientes = Cliente.objects.filter(empresa=empresa)[:3]  # Solo 3 clientes por empresa
 
             for cliente in clientes:
                 vehiculos = Vehiculo.objects.filter(cliente=cliente)
@@ -71,9 +67,7 @@ class DocumentosDemo:
                         # Crear línea de servicio (subtotal es calculado automáticamente)
                         from taller.models.lineas_documento import LineaServicio
 
-                        precio = servicio.precio_base or Decimal(
-                            "10000"
-                        )  # Precio por defecto
+                        precio = servicio.precio_base or Decimal("10000")  # Precio por defecto
                         linea = LineaServicio.objects.create(
                             documento=documento,
                             servicio=servicio,
@@ -95,9 +89,7 @@ class DocumentosDemo:
         print("🇺🇸 CREANDO DOCUMENTOS DEMO USA")
         print("-" * 50)
 
-        empresas_us = Empresa.objects.filter(
-            pais="US", user__username__startswith="demo_"
-        )
+        empresas_us = Empresa.objects.filter(pais="US", user__username__startswith="demo_")
 
         servicios_us = Servicio.objects.filter(
             country="US",
@@ -108,9 +100,7 @@ class DocumentosDemo:
         documentos_creados = 0
 
         for empresa in empresas_us:
-            clientes = Cliente.objects.filter(empresa=empresa)[
-                :3
-            ]  # Solo 3 clientes por empresa
+            clientes = Cliente.objects.filter(empresa=empresa)[:3]  # Solo 3 clientes por empresa
 
             for cliente in clientes:
                 vehiculos = Vehiculo.objects.filter(cliente=cliente)
@@ -136,9 +126,7 @@ class DocumentosDemo:
                         # Crear línea de servicio (subtotal es calculado automáticamente)
                         from taller.models.lineas_documento import LineaServicio
 
-                        precio = servicio.precio_base or Decimal(
-                            "50"
-                        )  # Precio por defecto en USD
+                        precio = servicio.precio_base or Decimal("50")  # Precio por defecto en USD
                         linea = LineaServicio.objects.create(
                             documento=documento,
                             servicio=servicio,

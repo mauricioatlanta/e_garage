@@ -155,10 +155,7 @@ def verificar_funcionalidad_documentos():
             print(f"   ⚙️  Servicios: {servicios.count()}")
 
             # Verificar datos JSON
-            if (
-                hasattr(documento_reciente, "repuestos_json")
-                and documento_reciente.repuestos_json
-            ):
+            if hasattr(documento_reciente, "repuestos_json") and documento_reciente.repuestos_json:
                 import json
 
                 try:
@@ -167,10 +164,7 @@ def verificar_funcionalidad_documentos():
                 except:
                     print("   ⚠️  Error en repuestos JSON")
 
-            if (
-                hasattr(documento_reciente, "servicios_json")
-                and documento_reciente.servicios_json
-            ):
+            if hasattr(documento_reciente, "servicios_json") and documento_reciente.servicios_json:
                 import json
 
                 try:

@@ -18,9 +18,7 @@ class Command(BaseCommand):
             if len(servicios) > 1:
                 encontrados += 1
                 self.stdout.write(
-                    self.style.ERROR(
-                        f"Nombre duplicado: '{clave[0]}' en país {clave[1]}:"
-                    )
+                    self.style.ERROR(f"Nombre duplicado: '{clave[0]}' en país {clave[1]}:")
                 )
                 for s in servicios:
                     self.stdout.write(
@@ -28,9 +26,7 @@ class Command(BaseCommand):
                     )
         if encontrados == 0:
             self.stdout.write(
-                self.style.SUCCESS(
-                    "No hay servicios con el mismo nombre en el mismo país."
-                )
+                self.style.SUCCESS("No hay servicios con el mismo nombre en el mismo país.")
             )
         else:
             self.stdout.write(

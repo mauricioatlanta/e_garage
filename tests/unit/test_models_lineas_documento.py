@@ -13,9 +13,7 @@ def test_linea_repuesto_subtotal_and_str():
     user = User.objects.create_user(username="testuser_subtotal", password="testpass")
     emp = Empresa.objects.create(nombre_taller="Test SA", pais="CL", user=user)
     cli = Cliente.objects.create(empresa=emp, nombre="Cliente Test")
-    doc = Documento.objects.create(
-        empresa=emp, cliente=cli, tipo="FAC", fecha_emision="2025-01-01"
-    )
+    doc = Documento.objects.create(empresa=emp, cliente=cli, tipo="FAC", fecha_emision="2025-01-01")
 
     item = LineaRepuesto.objects.create(
         documento=doc,

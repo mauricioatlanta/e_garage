@@ -28,15 +28,9 @@ class Command(BaseCommand):
 
         # Mostrar CSRF_TRUSTED_ORIGINS
         self.stdout.write(f"  - CSRF_TRUSTED_ORIGINS: {settings.CSRF_TRUSTED_ORIGINS}")
-        self.stdout.write(
-            f"  - CSRF_TRUSTED_ORIGINS type: {type(settings.CSRF_TRUSTED_ORIGINS)}"
-        )
-        self.stdout.write(
-            f"  - CSRF_TRUSTED_ORIGINS len: {len(settings.CSRF_TRUSTED_ORIGINS)}"
-        )
-        self.stdout.write(
-            f"  - CSRF_TRUSTED_ORIGINS bool: {bool(settings.CSRF_TRUSTED_ORIGINS)}"
-        )
+        self.stdout.write(f"  - CSRF_TRUSTED_ORIGINS type: {type(settings.CSRF_TRUSTED_ORIGINS)}")
+        self.stdout.write(f"  - CSRF_TRUSTED_ORIGINS len: {len(settings.CSRF_TRUSTED_ORIGINS)}")
+        self.stdout.write(f"  - CSRF_TRUSTED_ORIGINS bool: {bool(settings.CSRF_TRUSTED_ORIGINS)}")
 
         # Mostrar otras configuraciones CSRF
         self.stdout.write("⚙️ Otras configuraciones CSRF:")
@@ -55,8 +49,6 @@ class Command(BaseCommand):
 
         # Verificar middleware
         csrf_middleware = "django.middleware.csrf.CsrfViewMiddleware"
-        self.stdout.write(
-            f"🛡️ Middleware CSRF: {csrf_middleware in settings.MIDDLEWARE}"
-        )
+        self.stdout.write(f"🛡️ Middleware CSRF: {csrf_middleware in settings.MIDDLEWARE}")
 
         self.stdout.write("✅ Debug completado.")

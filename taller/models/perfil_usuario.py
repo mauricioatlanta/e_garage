@@ -5,9 +5,7 @@ from django.utils import timezone
 
 class PerfilUsuario(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    pais = models.CharField(
-        max_length=2, choices=[("CL", "Chile"), ("US", "USA")], default="CL"
-    )
+    pais = models.CharField(max_length=2, choices=[("CL", "Chile"), ("US", "USA")], default="CL")
     region = models.CharField(max_length=100, blank=True, null=True)
     from taller.models.ubicacion import Ciudad
 

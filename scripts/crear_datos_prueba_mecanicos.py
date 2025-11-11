@@ -92,14 +92,10 @@ def crear_datos_prueba():
 
     print("\n🎉 Datos de prueba creados exitosamente!")
     print("\n📝 Para probar:")
-    print(
-        f"1. Ve a http://127.0.0.1:8000/admin/ (usuario: {user.username}, password: admin123)"
-    )
+    print(f"1. Ve a http://127.0.0.1:8000/admin/ (usuario: {user.username}, password: admin123)")
     print("2. Ve a http://127.0.0.1:8000/documentos/ para ver documentos")
     print("3. Ve a http://127.0.0.1:8000/documentos/nuevo/ para crear un documento")
-    print(
-        "\n🔍 Deberías ver solo los mecánicos activos en el formulario de creación de documentos"
-    )
+    print("\n🔍 Deberías ver solo los mecánicos activos en el formulario de creación de documentos")
 
 
 if __name__ == "__main__":

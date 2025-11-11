@@ -64,9 +64,7 @@ def configurar_portal_empresas():
                 ),
                 "horario_atencion": "Lunes a Viernes: 8:00 - 18:00\nSábados: 8:00 - 13:00",
                 "telefono_contacto": (
-                    empresa.telefono_empresa
-                    if hasattr(empresa, "telefono_empresa")
-                    else ""
+                    empresa.telefono_empresa if hasattr(empresa, "telefono_empresa") else ""
                 ),
                 "email_contacto": (
                     empresa.email_empresa if hasattr(empresa, "email_empresa") else ""
@@ -117,9 +115,7 @@ def crear_usuarios_portal():
                 email=cliente.email_cliente,
                 first_name=cliente.nombre.split()[0] if cliente.nombre else "",
                 last_name=(
-                    " ".join(cliente.nombre.split()[1:])
-                    if len(cliente.nombre.split()) > 1
-                    else ""
+                    " ".join(cliente.nombre.split()[1:]) if len(cliente.nombre.split()) > 1 else ""
                 ),
                 password=make_password("cliente123"),  # Contraseña temporal
                 is_active=True,
@@ -137,9 +133,7 @@ def crear_usuarios_portal():
             )
 
             usuarios_creados += 1
-            print(
-                f"  ✅ Usuario creado para: {cliente.nombre} ({cliente.email_cliente})"
-            )
+            print(f"  ✅ Usuario creado para: {cliente.nombre} ({cliente.email_cliente})")
             print(f"     Username: {username}, Password: cliente123")
 
         except Exception as e:

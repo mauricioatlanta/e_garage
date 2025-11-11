@@ -80,9 +80,7 @@ def main():
         print(f"  Total: {colores.count()}")
         print(f"  En inglés: {len(colores_inglés)}")
         print(f"  En español: {len(colores_español)}")
-        print(
-            f"  Otros/neutros: {colores.count() - len(colores_inglés) - len(colores_español)}"
-        )
+        print(f"  Otros/neutros: {colores.count() - len(colores_inglés) - len(colores_español)}")
 
     except Exception as e:
         print(f"❌ Error durante verificación: {e}")

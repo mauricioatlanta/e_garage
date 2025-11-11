@@ -53,9 +53,7 @@ def test_kpi_total_por_fecha_emision_con_expressionwrapper():
         documento=doc, nombre="B", cantidad=1, precio_unitario=500, descuento=0
     )
 
-    expr = ExpressionWrapper(
-        F("cantidad") * F("precio_unitario"), output_field=DecimalField()
-    )
+    expr = ExpressionWrapper(F("cantidad") * F("precio_unitario"), output_field=DecimalField())
     agg = LineaServicio.objects.filter(documento__fecha_emision="2025-01-15").aggregate(
         total=Sum(expr)
     )

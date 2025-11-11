@@ -18,11 +18,7 @@ logger = logging.getLogger(__name__)
 
 # Helper para obtener el parámetro country del request
 def _country_from_request(request):
-    return (
-        getattr(request, "country_code", None)
-        or getattr(request, "country", None)
-        or "us"
-    )
+    return getattr(request, "country_code", None) or getattr(request, "country", None) or "us"
 
 
 # API para búsqueda en tiempo real de repuestos
@@ -154,9 +150,7 @@ def obtener_datos_formulario(empresa):
     tecnicos = Tecnico.objects.filter(empresa=empresa).order_by("nombre")
 
     # Obtener servicios internos
-    servicios_internos = ServicioInterno.objects.filter(empresa=empresa).select_related(
-        "categoria"
-    )
+    servicios_internos = ServicioInterno.objects.filter(empresa=empresa).select_related("categoria")
 
     # Obtener servicios externos
     servicios_externos = ServicioExterno.objects.filter(
@@ -190,9 +184,7 @@ def obtener_datos_formulario(empresa):
             .first()
         )
 
-        proximo_numero = (
-            (ultimo_doc.numero + 1) if ultimo_doc and ultimo_doc.numero else 1
-        )
+        proximo_numero = (ultimo_doc.numero + 1) if ultimo_doc and ultimo_doc.numero else 1
 
         # Generar preview del número de documento
         if empresa.pais == "US":
@@ -267,11 +259,7 @@ def procesar_documento_moderno(request, empresa):
 
         # Obtener objetos relacionados
         cliente = get_object_or_404(Cliente, id=cliente_id, empresa=empresa)
-        tecnico = (
-            get_object_or_404(Tecnico, id=tecnico_id, empresa=empresa)
-            if tecnico_id
-            else None
-        )
+        tecnico = get_object_or_404(Tecnico, id=tecnico_id, empresa=empresa) if tecnico_id else None
         vehiculo = get_object_or_404(Vehiculo, id=vehiculo_id) if vehiculo_id else None
 
         # 3) Crear/actualizar Documento
@@ -299,13 +287,9 @@ def procesar_documento_moderno(request, empresa):
 
         # Generar número de documento
         ultimo_doc = (
-            Documento.objects.filter(empresa=empresa, tipo=tipo)
-            .order_by("-numero")
-            .first()
+            Documento.objects.filter(empresa=empresa, tipo=tipo).order_by("-numero").first()
         )
-        proximo_numero = (
-            (ultimo_doc.numero + 1) if ultimo_doc and ultimo_doc.numero else 1
-        )
+        proximo_numero = (ultimo_doc.numero + 1) if ultimo_doc and ultimo_doc.numero else 1
         documento.numero = proximo_numero
         documento.save()
 
@@ -331,9 +315,9 @@ def procesar_documento_moderno(request, empresa):
             rep_ids = request.POST.getlist("repuestos_ids[]") or request.POST.getlist(
                 "repuesto_id[]"
             )
-            rep_parts = request.POST.getlist(
-                "repuestos_partnumber[]"
-            ) or request.POST.getlist("repuesto_partnumber[]")
+            rep_parts = request.POST.getlist("repuestos_partnumber[]") or request.POST.getlist(
+                "repuesto_partnumber[]"
+            )
             rep_cant = request.POST.getlist("repuestos_cantidades[]")
             rep_precio = request.POST.getlist("repuestos_precios[]")
             rep_desc = request.POST.getlist("repuestos_descuentos[]")
@@ -361,13 +345,9 @@ def procesar_documento_moderno(request, empresa):
                 len(rep_desc or []),
             )
             for i in range(total_items):
-                repuesto_id = (
-                    rep_ids[i] if rep_ids and len(rep_ids) > i and rep_ids[i] else None
-                )
+                repuesto_id = rep_ids[i] if rep_ids and len(rep_ids) > i and rep_ids[i] else None
                 partnum = (
-                    rep_parts[i]
-                    if rep_parts and len(rep_parts) > i and rep_parts[i]
-                    else None
+                    rep_parts[i] if rep_parts and len(rep_parts) > i and rep_parts[i] else None
                 )
                 if not repuesto_id and partnum:
                     rep_obj = Repuesto.objects.filter(
@@ -413,9 +393,7 @@ def procesar_documento_moderno(request, empresa):
                     )
 
         try:
-            otros_servicios_data = json.loads(
-                request.POST.get("otros_servicios_data", "[]")
-            )
+            otros_servicios_data = json.loads(request.POST.get("otros_servicios_data", "[]"))
         except (json.JSONDecodeError, TypeError):
             # Fallback a arrays de POST
             otro_emp = request.POST.getlist("otros_empresa_externa[]")
@@ -432,12 +410,8 @@ def procesar_documento_moderno(request, empresa):
                             "nombre": nom,
                             "empresa_externa": otro_emp[i] if i < len(otro_emp) else "",
                             "cantidad": otro_cant[i] if i < len(otro_cant) else 1,
-                            "costo_interno": (
-                                otro_costo[i] if i < len(otro_costo) else 0
-                            ),
-                            "precio_cliente": (
-                                otro_precio[i] if i < len(otro_precio) else 0
-                            ),
+                            "costo_interno": (otro_costo[i] if i < len(otro_costo) else 0),
+                            "precio_cliente": (otro_precio[i] if i < len(otro_precio) else 0),
                         }
                     )
 
@@ -460,18 +434,13 @@ def procesar_documento_moderno(request, empresa):
             LineaRepuesto.objects.create(
                 documento=documento,
                 repuesto=repuesto,
-                codigo=getattr(repuesto, "part_number", "")
-                or getattr(repuesto, "codigo", ""),
+                codigo=getattr(repuesto, "part_number", "") or getattr(repuesto, "codigo", ""),
                 nombre=repuesto.nombre,
                 cantidad=cantidad,
                 precio_unitario=precio,
                 descuento=descuento,
                 # herencia de técnico si aplica
-                **(
-                    {"tecnico_responsable": tecnico}
-                    if not dividir_por_tecnico and tecnico
-                    else {}
-                ),
+                **({"tecnico_responsable": tecnico} if not dividir_por_tecnico and tecnico else {}),
             )
 
         # 7) Crear líneas de Servicios
@@ -483,9 +452,7 @@ def procesar_documento_moderno(request, empresa):
             nombre = item.get("nombre", "")
             if hasattr(item, "get") and item.get("id"):
                 # Es un servicio existente
-                servicio = get_object_or_404(
-                    ServicioInterno, id=item["id"], empresa=empresa
-                )
+                servicio = get_object_or_404(ServicioInterno, id=item["id"], empresa=empresa)
                 nombre = servicio.nombre
                 codigo = getattr(servicio, "codigo", f'SER-{item["id"]}')
             else:
@@ -502,28 +469,18 @@ def procesar_documento_moderno(request, empresa):
 
             linea_servicio = LineaServicio.objects.create(
                 documento=documento,
-                servicio=(
-                    servicio if "servicio" in locals() and item.get("id") else None
-                ),
+                servicio=(servicio if "servicio" in locals() and item.get("id") else None),
                 codigo=codigo,
                 nombre=nombre,
                 cantidad=cantidad,
                 precio_unitario=precio,
                 descuento=descuento,
-                **(
-                    {"tecnico_responsable": tecnico}
-                    if not dividir_por_tecnico and tecnico
-                    else {}
-                ),
+                **({"tecnico_responsable": tecnico} if not dividir_por_tecnico and tecnico else {}),
             )
-            print(
-                f"[DEBUG] Línea de servicio creada: {linea_servicio.id} - {nombre} - ${precio}"
-            )
+            print(f"[DEBUG] Línea de servicio creada: {linea_servicio.id} - {nombre} - ${precio}")
 
         print(f"[DEBUG] otros_servicios_data recibido: {otros_servicios_data}")
-        print(
-            f"[DEBUG] Cantidad de otros servicios a procesar: {len(otros_servicios_data)}"
-        )
+        print(f"[DEBUG] Cantidad de otros servicios a procesar: {len(otros_servicios_data)}")
 
         # 8) Crear líneas de Otros Servicios Tercerizados
         for item in otros_servicios_data:
@@ -553,9 +510,7 @@ def procesar_documento_moderno(request, empresa):
             linea_otro_servicio = LineaOtroServicio.objects.create(
                 documento=documento,
                 servicio_externo=(
-                    servicio_externo
-                    if "servicio_externo" in locals() and item.get("id")
-                    else None
+                    servicio_externo if "servicio_externo" in locals() and item.get("id") else None
                 ),
                 nombre=nombre,
                 empresa_externa=empresa_externa,
@@ -563,11 +518,7 @@ def procesar_documento_moderno(request, empresa):
                 costo_interno=costo_interno,
                 precio_cliente=precio_cliente,
                 ganancia=precio_cliente - costo_interno,
-                **(
-                    {"tecnico_responsable": tecnico}
-                    if not dividir_por_tecnico and tecnico
-                    else {}
-                ),
+                **({"tecnico_responsable": tecnico} if not dividir_por_tecnico and tecnico else {}),
             )
             print(
                 f"[DEBUG] Línea de otro servicio creada: {linea_otro_servicio.id} - {nombre} - ${precio_cliente}"
@@ -591,10 +542,7 @@ def procesar_documento_moderno(request, empresa):
             ]
         )
         otro_subtotal = sum(
-            [
-                los.precio_cliente * los.cantidad
-                for los in documento.lineas_otro_servicio.all()
-            ]
+            [los.precio_cliente * los.cantidad for los in documento.lineas_otro_servicio.all()]
         )
 
         # Calcular IVA según el país y configuración
@@ -605,9 +553,7 @@ def procesar_documento_moderno(request, empresa):
             if empresa.pais == "CL":
                 # IVA 19% en Chile, solo sobre repuestos
                 iva_rate = Decimal("19.00")
-                tax_amount = (rep_subtotal * iva_rate / Decimal("100")).quantize(
-                    Decimal("0.01")
-                )
+                tax_amount = (rep_subtotal * iva_rate / Decimal("100")).quantize(Decimal("0.01"))
                 tax_rate_applied = iva_rate
             elif empresa.pais == "US":
                 # Tax sobre todo en USA
@@ -697,9 +643,7 @@ def api_vehiculos_cliente(request):
         # Verificar que el cliente pertenece a la empresa
         cliente = Cliente.objects.filter(id=cliente_id, empresa=empresa).first()
         if not cliente:
-            logger.warning(
-                f"Cliente {cliente_id} no encontrado para empresa {empresa.id}"
-            )
+            logger.warning(f"Cliente {cliente_id} no encontrado para empresa {empresa.id}")
             return JsonResponse({"vehiculos": []})
 
         logger.info(f"Cliente encontrado: {cliente.nombre}")
@@ -745,18 +689,16 @@ def api_buscar_servicios_internos(request):
                 # Si no existe la empresa demo, usar cualquier empresa USA
                 empresa = Empresa.objects.filter(pais="US").first()
                 if not empresa:
-                    return JsonResponse(
-                        {"error": "No hay empresa configurada"}, status=400
-                    )
+                    return JsonResponse({"error": "No hay empresa configurada"}, status=400)
 
         query = request.GET.get("q", "")
 
         if len(query) < 2:
             return JsonResponse({"servicios": []})
 
-        servicios = ServicioInterno.objects.filter(
-            empresa=empresa, nombre__icontains=query
-        ).values("id", "nombre")[:20]
+        servicios = ServicioInterno.objects.filter(empresa=empresa, nombre__icontains=query).values(
+            "id", "nombre"
+        )[:20]
 
         return JsonResponse({"servicios": list(servicios)})
     except Exception as e:
@@ -797,9 +739,7 @@ def api_obtener_numero_documento(request):
                 # Si no existe la empresa demo, usar cualquier empresa USA
                 empresa = Empresa.objects.filter(pais="US").first()
                 if not empresa:
-                    return JsonResponse(
-                        {"error": "No hay empresa configurada"}, status=400
-                    )
+                    return JsonResponse({"error": "No hay empresa configurada"}, status=400)
 
         # Mapear códigos de tipo a nombres completos para prefijos
         tipo_mapping = {
@@ -938,9 +878,7 @@ def documento_form(request, pk=None):
         documento = None
 
     # Obtener país desde el contexto de la empresa o request
-    company_country = getattr(
-        request, "company_country", getattr(empresa, "pais", None)
-    )
+    company_country = getattr(request, "company_country", getattr(empresa, "pais", None))
     if not company_country:
         # Fallback desde la URL
         path = request.path
@@ -963,12 +901,8 @@ def documento_form(request, pk=None):
             # ------------------------
             # Recalcular netos desde líneas (campos 'subtotal' existentes)
             # ------------------------
-            neto_rep = doc.lineas_repuesto.aggregate(s=Sum("subtotal"))["s"] or Decimal(
-                "0"
-            )
-            neto_serv = doc.lineas_servicio.aggregate(s=Sum("subtotal"))[
-                "s"
-            ] or Decimal("0")
+            neto_rep = doc.lineas_repuesto.aggregate(s=Sum("subtotal"))["s"] or Decimal("0")
+            neto_serv = doc.lineas_servicio.aggregate(s=Sum("subtotal"))["s"] or Decimal("0")
             neto_otros = doc.lineas_otro_servicio.aggregate(
                 s=Sum(
                     ExpressionWrapper(
@@ -988,9 +922,7 @@ def documento_form(request, pk=None):
                 tax_rate = Decimal("0.19")
             else:
                 apply_sales_tax = bool(request.POST.get("apply_sales_tax"))
-                rate = _to_decimal_pct(
-                    (request.POST.get("sales_tax_rate") or "").strip()
-                )
+                rate = _to_decimal_pct((request.POST.get("sales_tax_rate") or "").strip())
                 # fallback si no se envía tasa: conserva o 0
                 tax_rate = (
                     rate
@@ -1000,9 +932,7 @@ def documento_form(request, pk=None):
                 tax_base = (neto_rep + neto_serv) if apply_sales_tax else Decimal("0")
 
             tax_amount = (tax_base * tax_rate).quantize(Decimal("0.01"))
-            total = (neto_rep + neto_serv + neto_otros + tax_amount).quantize(
-                Decimal("0.01")
-            )
+            total = (neto_rep + neto_serv + neto_otros + tax_amount).quantize(Decimal("0.01"))
 
             # Persistir totales
             doc.neto_repuestos = neto_rep

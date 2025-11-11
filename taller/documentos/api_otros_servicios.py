@@ -14,9 +14,7 @@ def api_buscar_otros_servicios(request):
     subcat_code = request.GET.get("subcat_code", "especiales")
     if len(query) < 2:
         return JsonResponse({"servicios": []})
-    subcat = SubcategoriaServicio.objects.filter(
-        code=subcat_code, country=country
-    ).first()
+    subcat = SubcategoriaServicio.objects.filter(code=subcat_code, country=country).first()
     if not subcat:
         return JsonResponse({"servicios": []})
     servicios = Servicio.objects.filter(
@@ -62,13 +60,9 @@ def api_crear_otro_servicio_rapido(request):
         return JsonResponse({"error": "Nombre en inglés requerido"}, status=400)
 
     # Buscar o crear la subcategoría adecuada
-    subcat = SubcategoriaServicio.objects.filter(
-        code=subcat_code, country=country
-    ).first()
+    subcat = SubcategoriaServicio.objects.filter(code=subcat_code, country=country).first()
     if not subcat:
-        return JsonResponse(
-            {"error": "No existe la subcategoría para otros servicios"}, status=400
-        )
+        return JsonResponse({"error": "No existe la subcategoría para otros servicios"}, status=400)
 
     # Crear el servicio
     servicio, created = Servicio.objects.get_or_create(

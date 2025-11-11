@@ -44,13 +44,9 @@ def usa_signup_view(request):
 urlpatterns = [
     # 1) Home y páginas específicas USA
     path("", bienvenida_usa, name="home"),
-    path(
-        "dashboard/", dashboard, name="dashboard"
-    ),  # si existe en taller, este gana por orden
+    path("dashboard/", dashboard, name="dashboard"),  # si existe en taller, este gana por orden
     path("en/dashboard/", dashboard, name="dashboard_en_redirect"),
-    path(
-        "centro-operaciones/", dashboard_centro_operaciones, name="centro_operaciones"
-    ),
+    path("centro-operaciones/", dashboard_centro_operaciones, name="centro_operaciones"),
     path(
         "centro-operaciones-espacial/",
         dashboard_centro_operaciones_espacial,
@@ -59,9 +55,7 @@ urlpatterns = [
     path("admin/dashboard/", dashboard_suscripciones, name="dashboard_suscripciones"),
     # 2) Configuración
     path("configuracion/", configuracion_empresa, name="configuracion"),
-    path(
-        "configuracion/tecnicos/", configuracion_tecnicos, name="configuracion_tecnicos"
-    ),
+    path("configuracion/tecnicos/", configuracion_tecnicos, name="configuracion_tecnicos"),
     path("settings/", company_settings_view, name="company_settings"),
     path(
         "en/settings/",
@@ -95,7 +89,9 @@ urlpatterns = [
         vehiculos_por_cliente,
         name="us_ajax_vehiculos_por_cliente",
     ),
-    # 6) Autocomplete y creadores rápidos (verifica que no se dupliquen en taller.urls)
+    # 6) APIs
+    path("api/", include(("taller.api.urls", "api"), namespace="api")),
+    # 6.1) Autocomplete y creadores rápidos (verifica que no se dupliquen en taller.urls)
     path(
         "autocomplete/",
         include(("taller.autocomplete.urls", "autocomplete"), namespace="autocomplete"),

@@ -32,9 +32,7 @@ def get_empresa_by_name(company_name: str):
         try:
             return Empresa.objects.get(empresa__iexact=company_name)
         except Empresa.DoesNotExist:
-            raise Empresa.DoesNotExist(
-                f"No se encontró la Empresa con nombre '{company_name}'"
-            )
+            raise Empresa.DoesNotExist(f"No se encontró la Empresa con nombre '{company_name}'")
 
 
 class Command(BaseCommand):
@@ -47,9 +45,7 @@ class Command(BaseCommand):
             default="GEORGE AUTO REPAIR",
             help="Nombre de la empresa a corregir",
         )
-        parser.add_argument(
-            "--dry-run", action="store_true", help="Mostrar cambios sin aplicarlos"
-        )
+        parser.add_argument("--dry-run", action="store_true", help="Mostrar cambios sin aplicarlos")
 
     @transaction.atomic
     def handle(self, *args, **options):
@@ -67,9 +63,7 @@ class Command(BaseCommand):
         )
 
         if empresa.pais != "US":
-            self.stdout.write(
-                self.style.WARNING(f"⚠️  Empresa no es de USA (país: {empresa.pais})")
-            )
+            self.stdout.write(self.style.WARNING(f"⚠️  Empresa no es de USA (país: {empresa.pais})"))
 
         # ==========================================
         # 1. CORREGIR PRECIOS DE REPUESTOS
@@ -110,9 +104,7 @@ class Command(BaseCommand):
                     precio_compra = Decimal(
                         str(RND.randint(int(min_precio * 0.6), int(min_precio * 0.8)))
                     )
-                    precio_venta = Decimal(
-                        str(RND.randint(int(min_precio), int(max_precio)))
-                    )
+                    precio_venta = Decimal(str(RND.randint(int(min_precio), int(max_precio))))
                     break
 
             # Si no se encontró patrón, usar precios genéricos
@@ -120,10 +112,7 @@ class Command(BaseCommand):
                 precio_compra = Decimal(str(RND.randint(15, 45)))
                 precio_venta = Decimal(str(RND.randint(25, 85)))
 
-            if (
-                hasattr(repuesto, "precio_compra")
-                and repuesto.precio_compra != precio_compra
-            ):
+            if hasattr(repuesto, "precio_compra") and repuesto.precio_compra != precio_compra:
                 if not dry_run:
                     repuesto.precio_compra = precio_compra
                 self.stdout.write(
@@ -131,10 +120,7 @@ class Command(BaseCommand):
                 )
                 repuestos_corregidos += 1
 
-            if (
-                hasattr(repuesto, "precio_venta")
-                and repuesto.precio_venta != precio_venta
-            ):
+            if hasattr(repuesto, "precio_venta") and repuesto.precio_venta != precio_venta:
                 if not dry_run:
                     repuesto.precio_venta = precio_venta
                 self.stdout.write(
@@ -221,9 +207,7 @@ class Command(BaseCommand):
             if not dry_run:
                 linea.save()
 
-        self.stdout.write(
-            f"✅ Líneas de repuestos corregidas: {lineas_repuestos_corregidas}"
-        )
+        self.stdout.write(f"✅ Líneas de repuestos corregidas: {lineas_repuestos_corregidas}")
 
         # ==========================================
         # 4. CORREGIR LÍNEAS DE SERVICIOS
@@ -250,9 +234,7 @@ class Command(BaseCommand):
             if not dry_run:
                 linea.save()
 
-        self.stdout.write(
-            f"✅ Líneas de servicios corregidas: {lineas_servicios_corregidas}"
-        )
+        self.stdout.write(f"✅ Líneas de servicios corregidas: {lineas_servicios_corregidas}")
 
         # ==========================================
         # 5. CORREGIR LÍNEAS DE OTROS SERVICIOS
@@ -284,9 +266,7 @@ class Command(BaseCommand):
             if not dry_run:
                 linea.save()
 
-        self.stdout.write(
-            f"✅ Líneas de otros servicios corregidas: {lineas_otros_corregidas}"
-        )
+        self.stdout.write(f"✅ Líneas de otros servicios corregidas: {lineas_otros_corregidas}")
 
         # ==========================================
         # RESUMEN

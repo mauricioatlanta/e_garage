@@ -41,9 +41,7 @@ def check_inconsistencies():
             print(f"     - Vehículo ID {v.id}: {v.patente} (Cliente: {v.cliente})")
 
     # 2. Vehículos con empresa diferente a la del cliente
-    vehiculos_empresa_inconsistente = Vehiculo.objects.exclude(
-        empresa=F("cliente__empresa")
-    )
+    vehiculos_empresa_inconsistente = Vehiculo.objects.exclude(empresa=F("cliente__empresa"))
     if vehiculos_empresa_inconsistente.exists():
         count = vehiculos_empresa_inconsistente.count()
         issues.append(f"❌ {count} vehículos con empresa diferente a la del cliente")
@@ -87,9 +85,7 @@ def check_inconsistencies():
             documentos_problematicos.append(doc)
 
     if documentos_problematicos:
-        issues.append(
-            f"❌ {len(documentos_problematicos)} documentos con inconsistencias"
-        )
+        issues.append(f"❌ {len(documentos_problematicos)} documentos con inconsistencias")
         print(f"   Documentos problemáticos: {len(documentos_problematicos)}")
 
         # Mostrar algunos ejemplos
@@ -133,18 +129,14 @@ def fix_inconsistencies(dry_run=False):
             fixed_count += 1
 
     # 2. Corregir vehículos con empresa inconsistente
-    vehiculos_empresa_inconsistente = Vehiculo.objects.exclude(
-        empresa=F("cliente__empresa")
-    )
+    vehiculos_empresa_inconsistente = Vehiculo.objects.exclude(empresa=F("cliente__empresa"))
     for v in vehiculos_empresa_inconsistente:
         if v.cliente and v.cliente.empresa:
             old_empresa = v.empresa
             if not dry_run:
                 v.empresa = v.cliente.empresa
                 v.save()
-            print(
-                f"   ✅ Vehículo {v.id} ({v.patente}): {old_empresa} → {v.cliente.empresa}"
-            )
+            print(f"   ✅ Vehículo {v.id} ({v.patente}): {old_empresa} → {v.cliente.empresa}")
             fixed_count += 1
 
     # 3. Asignar empresa a clientes sin empresa (basado en los vehículos)
@@ -162,14 +154,10 @@ def fix_inconsistencies(dry_run=False):
             if not dry_run:
                 c.empresa_id = empresa_comun
                 c.save()
-            print(
-                f"   ✅ Cliente {c.id} ({c.nombre} {c.apellido}): empresa = {empresa_comun}"
-            )
+            print(f"   ✅ Cliente {c.id} ({c.nombre} {c.apellido}): empresa = {empresa_comun}")
             fixed_count += 1
 
-    print(
-        f"\n📊 TOTAL CORRECCIONES {'SIMULADAS' if dry_run else 'APLICADAS'}: {fixed_count}"
-    )
+    print(f"\n📊 TOTAL CORRECCIONES {'SIMULADAS' if dry_run else 'APLICADAS'}: {fixed_count}")
 
     return fixed_count
 
@@ -178,18 +166,10 @@ def main():
     """Función principal"""
     import argparse
 
-    parser = argparse.ArgumentParser(
-        description="Verificar y corregir inconsistencias en datos"
-    )
-    parser.add_argument(
-        "--check", action="store_true", help="Solo verificar inconsistencias"
-    )
-    parser.add_argument(
-        "--fix", action="store_true", help="Verificar y corregir inconsistencias"
-    )
-    parser.add_argument(
-        "--dry-run", action="store_true", help="Simular correcciones sin aplicar"
-    )
+    parser = argparse.ArgumentParser(description="Verificar y corregir inconsistencias en datos")
+    parser.add_argument("--check", action="store_true", help="Solo verificar inconsistencias")
+    parser.add_argument("--fix", action="store_true", help="Verificar y corregir inconsistencias")
+    parser.add_argument("--dry-run", action="store_true", help="Simular correcciones sin aplicar")
 
     args = parser.parse_args()
 
@@ -204,15 +184,11 @@ def main():
     # Aplicar correcciones si se solicita
     if args.fix or args.dry_run:
         if issues:
-            print(
-                f"\n⚠️  {'SIMULANDO' if args.dry_run else 'APLICANDO'} CORRECCIONES..."
-            )
+            print(f"\n⚠️  {'SIMULANDO' if args.dry_run else 'APLICANDO'} CORRECCIONES...")
             fixed_count = fix_inconsistencies(dry_run=args.dry_run)
 
             if args.dry_run:
-                print(
-                    f"\n💡 Para aplicar las correcciones, ejecuta: python {sys.argv[0]} --fix"
-                )
+                print(f"\n💡 Para aplicar las correcciones, ejecuta: python {sys.argv[0]} --fix")
             else:
                 print("\n✅ Correcciones aplicadas exitosamente")
         else:

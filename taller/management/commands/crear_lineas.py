@@ -13,14 +13,10 @@ class Command(BaseCommand):
         # Buscar el primer documento
         documento = Documento.objects.first()
         if not documento:
-            self.stdout.write(
-                self.style.ERROR("❌ No hay documentos en la base de datos")
-            )
+            self.stdout.write(self.style.ERROR("❌ No hay documentos en la base de datos"))
             return
 
-        self.stdout.write(
-            f"📄 Trabajando con documento: {documento.numero} ({documento.tipo})"
-        )
+        self.stdout.write(f"📄 Trabajando con documento: {documento.numero} ({documento.tipo})")
 
         # Agregar líneas de repuesto si no existen
         if not documento.lineas_repuesto.exists():
@@ -71,7 +67,5 @@ class Command(BaseCommand):
         self.stdout.write(f"   Total: ${documento.total_general()}")
 
         self.stdout.write(
-            self.style.SUCCESS(
-                "\n🎉 Datos creados. Recargar la vista para ver los totales!"
-            )
+            self.style.SUCCESS("\n🎉 Datos creados. Recargar la vista para ver los totales!")
         )

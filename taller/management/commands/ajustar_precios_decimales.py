@@ -32,9 +32,7 @@ def get_empresa_by_name(company_name: str):
         try:
             return Empresa.objects.get(empresa__iexact=company_name)
         except Empresa.DoesNotExist:
-            raise Empresa.DoesNotExist(
-                f"No se encontró la Empresa con nombre '{company_name}'"
-            )
+            raise Empresa.DoesNotExist(f"No se encontró la Empresa con nombre '{company_name}'")
 
 
 def generar_precio_con_decimales(base_precio, variacion=0.15):
@@ -79,9 +77,7 @@ class Command(BaseCommand):
             default="GEORGE AUTO REPAIR",
             help="Nombre de la empresa a ajustar",
         )
-        parser.add_argument(
-            "--dry-run", action="store_true", help="Mostrar cambios sin aplicarlos"
-        )
+        parser.add_argument("--dry-run", action="store_true", help="Mostrar cambios sin aplicarlos")
 
     @transaction.atomic
     def handle(self, *args, **options):
@@ -95,9 +91,7 @@ class Command(BaseCommand):
             return
 
         self.stdout.write(
-            self.style.SUCCESS(
-                f"🔧 Ajustando precios con decimales para: {empresa.nombre_taller}"
-            )
+            self.style.SUCCESS(f"🔧 Ajustando precios con decimales para: {empresa.nombre_taller}")
         )
 
         # ==========================================
@@ -140,9 +134,7 @@ class Command(BaseCommand):
             ) in precios_base_repuestos.items():
                 if nombre_patron.lower() in repuesto.nombre.lower():
                     precio_compra = generar_precio_con_decimales(min_precio * 0.7)
-                    precio_venta = generar_precio_con_decimales(
-                        RND.uniform(min_precio, max_precio)
-                    )
+                    precio_venta = generar_precio_con_decimales(RND.uniform(min_precio, max_precio))
                     break
 
             # Si no se encontró patrón, usar precios genéricos
@@ -150,10 +142,7 @@ class Command(BaseCommand):
                 precio_compra = generar_precio_con_decimales(RND.randint(15, 45))
                 precio_venta = generar_precio_con_decimales(RND.randint(25, 85))
 
-            if (
-                hasattr(repuesto, "precio_compra")
-                and repuesto.precio_compra != precio_compra
-            ):
+            if hasattr(repuesto, "precio_compra") and repuesto.precio_compra != precio_compra:
                 if not dry_run:
                     repuesto.precio_compra = precio_compra
                 self.stdout.write(
@@ -161,10 +150,7 @@ class Command(BaseCommand):
                 )
                 repuestos_ajustados += 1
 
-            if (
-                hasattr(repuesto, "precio_venta")
-                and repuesto.precio_venta != precio_venta
-            ):
+            if hasattr(repuesto, "precio_venta") and repuesto.precio_venta != precio_venta:
                 if not dry_run:
                     repuesto.precio_venta = precio_venta
                 self.stdout.write(
@@ -253,9 +239,7 @@ class Command(BaseCommand):
             if not dry_run:
                 linea.save()
 
-        self.stdout.write(
-            f"✅ Líneas de repuestos ajustadas: {lineas_repuestos_ajustadas}"
-        )
+        self.stdout.write(f"✅ Líneas de repuestos ajustadas: {lineas_repuestos_ajustadas}")
 
         # ==========================================
         # 4. AJUSTAR LÍNEAS DE SERVICIOS
@@ -282,9 +266,7 @@ class Command(BaseCommand):
             if not dry_run:
                 linea.save()
 
-        self.stdout.write(
-            f"✅ Líneas de servicios ajustadas: {lineas_servicios_ajustadas}"
-        )
+        self.stdout.write(f"✅ Líneas de servicios ajustadas: {lineas_servicios_ajustadas}")
 
         # ==========================================
         # 5. AJUSTAR LÍNEAS DE OTROS SERVICIOS
@@ -295,9 +277,7 @@ class Command(BaseCommand):
         for linea in LineaOtroServicio.objects.filter(documento__empresa=empresa):
             # Precios realistas para servicios externos con decimales
             nuevo_costo = generar_precio_con_decimales(RND.randint(20, 50))
-            nuevo_precio = nuevo_costo + generar_precio_con_decimales(
-                RND.randint(15, 40)
-            )
+            nuevo_precio = nuevo_costo + generar_precio_con_decimales(RND.randint(15, 40))
 
             if linea.costo_interno != nuevo_costo:
                 if not dry_run:
@@ -318,9 +298,7 @@ class Command(BaseCommand):
             if not dry_run:
                 linea.save()
 
-        self.stdout.write(
-            f"✅ Líneas de otros servicios ajustadas: {lineas_otros_ajustadas}"
-        )
+        self.stdout.write(f"✅ Líneas de otros servicios ajustadas: {lineas_otros_ajustadas}")
 
         # ==========================================
         # RESUMEN

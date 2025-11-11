@@ -288,9 +288,7 @@ def demo_cotizacion_ajax(request):
                         "diagnostic": "Computer Diagnostic",
                     }
 
-                    servicios_detalle.append(
-                        {"nombre": nombres[servicio_id], "precio": precio}
-                    )
+                    servicios_detalle.append({"nombre": nombres[servicio_id], "precio": precio})
 
             # Impuestos Georgia
             tax_rate = 8.9

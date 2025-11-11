@@ -189,9 +189,7 @@ def dashboard_suscripciones(request):
         # Usuario normal solo ve suscripciones relacionadas con su empresa
         try:
             empresa = request.user.empresa
-            suscripciones = Suscripcion.objects.filter(
-                empresa=empresa
-            )  # 🔒 FILTRO EMPRESA
+            suscripciones = Suscripcion.objects.filter(empresa=empresa)  # 🔒 FILTRO EMPRESA
         except:
             suscripciones = Suscripcion.objects.none()
 

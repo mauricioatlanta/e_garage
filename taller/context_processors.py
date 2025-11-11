@@ -19,18 +19,16 @@ def company_branding(request):
         and getattr(request, "user", None)
         and not isinstance(request.user, AnonymousUser)
     ):
-        empresa = getattr(
-            getattr(request.user, "perfil", None), "empresa", None
-        ) or getattr(request.user, "empresa", None)
+        empresa = getattr(getattr(request.user, "perfil", None), "empresa", None) or getattr(
+            request.user, "empresa", None
+        )
 
     brand = {
         "logo_url": getattr(
             settings, "DEFAULT_BRAND_LOGO_URL", "/static/branding/egarage_logo.svg"
         ),
         "name": getattr(settings, "DEFAULT_BRAND_NAME", "eGarage"),
-        "tagline": getattr(
-            settings, "DEFAULT_BRAND_TAGLINE", "Mission Control for your Workshop"
-        ),
+        "tagline": getattr(settings, "DEFAULT_BRAND_TAGLINE", "Mission Control for your Workshop"),
         "country": getattr(settings, "DEFAULT_BRAND_COUNTRY", "cl"),
         "currency": getattr(settings, "DEFAULT_BRAND_CURRENCY", "CLP"),
     }
@@ -47,11 +45,7 @@ def company_branding(request):
             # si guardas lema/tagline en ConfiguracionEmpresa, descomenta:
             # brand["tagline"] = getattr(conf, "lema", brand["tagline"]) or brand["tagline"]
             # si guardas país/moneda en settings de empresa:
-            brand["country"] = (
-                getattr(conf, "pais", brand["country"]) or brand["country"]
-            )
-            brand["currency"] = (
-                getattr(conf, "moneda", brand["currency"]) or brand["currency"]
-            )
+            brand["country"] = getattr(conf, "pais", brand["country"]) or brand["country"]
+            brand["currency"] = getattr(conf, "moneda", brand["currency"]) or brand["currency"]
 
     return {"BRAND": brand}

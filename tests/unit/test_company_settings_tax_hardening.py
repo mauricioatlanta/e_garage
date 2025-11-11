@@ -35,9 +35,7 @@ def test_tax_values_invalid_fallback():
         from django.contrib.auth.models import User
 
         user = User.objects.create_user(username=f"user_{emp_pais}", password="test")
-        emp = Empresa.objects.create(
-            user=user, nombre_taller=f"E-{emp_pais}", pais=emp_pais
-        )
+        emp = Empresa.objects.create(user=user, nombre_taller=f"E-{emp_pais}", pais=emp_pais)
 
         # Usar el prefijo de país correcto basado en la empresa
         country_prefix = "/cl/" if emp_pais == "CL" else "/us/"
@@ -74,31 +72,19 @@ def test_tax_values_invalid_fallback():
             "vehiculo_id": veh.id,
             "tipo": "FAC",
             "fecha_emision": "2025-01-01",
-            "lineas_servicio": [
-                {"nombre": "S", "cantidad": 1, "precio_unitario": 10000}
-            ],
+            "lineas_servicio": [{"nombre": "S", "cantidad": 1, "precio_unitario": 10000}],
         }
 
         # Crear un cliente separado para cada país y autenticar con el usuario correcto
         c_country = Client()
         c_country.force_login(user)
 
-        r = c_country.post(
-            url, data=json.dumps(payload), content_type="application/json"
-        )
+        r = c_country.post(url, data=json.dumps(payload), content_type="application/json")
         assert r.status_code in (200, 201), r.content
         return r.json()["documento"]
 
     d_cl = _mk("CL", "-5")  # string negativo → fallback 19%
-    assert (
-        d_cl["subtotal"] == 10000.0
-        and d_cl["iva"] == 1900.0
-        and d_cl["total"] == 11900.0
-    )
+    assert d_cl["subtotal"] == 10000.0 and d_cl["iva"] == 1900.0 and d_cl["total"] == 11900.0
 
     d_us = _mk("US", "abc")  # no convertible → fallback 0%
-    assert (
-        d_us["subtotal"] == 10000.0
-        and d_us["iva"] in (0, 0.0)
-        and d_us["total"] == 10000.0
-    )
+    assert d_us["subtotal"] == 10000.0 and d_us["iva"] in (0, 0.0) and d_us["total"] == 10000.0

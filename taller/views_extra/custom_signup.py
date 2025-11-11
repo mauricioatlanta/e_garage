@@ -43,9 +43,7 @@ class CustomSignupView(SignupView):
 
         # Hacer login del usuario con backend explícito
         # Django necesita saber qué backend usar cuando hay múltiples configurados
-        backend = settings.AUTHENTICATION_BACKENDS[
-            0
-        ]  # Usar el primer backend (ModelBackend)
+        backend = settings.AUTHENTICATION_BACKENDS[0]  # Usar el primer backend (ModelBackend)
         user.backend = backend
         login(self.request, user, backend=backend)
 
@@ -55,9 +53,7 @@ class CustomSignupView(SignupView):
                 self.request, "¡Cuenta creada exitosamente! Bienvenido a eGarage Chile."
             )
         else:
-            messages.success(
-                self.request, "Account created successfully! Welcome to eGarage USA."
-            )
+            messages.success(self.request, "Account created successfully! Welcome to eGarage USA.")
 
         # Redirigir según el país
         if country == "CL":

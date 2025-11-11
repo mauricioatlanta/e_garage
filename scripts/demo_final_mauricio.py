@@ -128,9 +128,7 @@ import time
 
 time.sleep(1)
 
-notificacion_nueva = NotificacionEnviada.objects.filter(
-    documento=documento_demo
-).first()
+notificacion_nueva = NotificacionEnviada.objects.filter(documento=documento_demo).first()
 
 if notificacion_nueva:
     print("🎉 ¡NOTIFICACIÓN AUTOMÁTICA CREADA!")

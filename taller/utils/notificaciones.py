@@ -55,14 +55,10 @@ class NotificacionManager:
         """Crear una notificación para envío"""
         try:
             # Buscar tipo de notificación para el evento
-            tipos_notificacion = TipoNotificacion.objects.filter(
-                evento=evento, activo=True
-            )
+            tipos_notificacion = TipoNotificacion.objects.filter(evento=evento, activo=True)
 
             if not tipos_notificacion.exists():
-                logger.warning(
-                    f"No hay tipos de notificación configurados para {evento}"
-                )
+                logger.warning(f"No hay tipos de notificación configurados para {evento}")
                 return []
 
             notificaciones_creadas = []
@@ -89,8 +85,7 @@ class NotificacionManager:
                     documento=documento,
                     cliente=cliente,
                     usuario=usuario,
-                    fecha_programada=timezone.now()
-                    + timedelta(days=tipo_notif.dias_anticipacion),
+                    fecha_programada=timezone.now() + timedelta(days=tipo_notif.dias_anticipacion),
                 )
 
                 notificaciones_creadas.append(notificacion)
@@ -171,9 +166,7 @@ class NotificacionManager:
         if es_fin_semana and not self.config.enviar_fines_semana:
             return False
 
-        return (
-            self.config.hora_inicio_envio <= hora_actual <= self.config.hora_fin_envio
-        )
+        return self.config.hora_inicio_envio <= hora_actual <= self.config.hora_fin_envio
 
     def _enviar_notificacion(self, notificacion):
         """Enviar una notificación específica"""
@@ -194,9 +187,7 @@ class NotificacionManager:
                 notificacion.fecha_enviado = timezone.now()
                 notificacion.error_mensaje = ""
             else:
-                notificacion.estado = (
-                    "ERROR" if notificacion.intentos >= 3 else "REINTENTO"
-                )
+                notificacion.estado = "ERROR" if notificacion.intentos >= 3 else "REINTENTO"
 
             notificacion.save()
             return success
@@ -215,9 +206,7 @@ class NotificacionManager:
                 return False
 
             # Configurar SMTP
-            server = smtplib.SMTP(
-                self.config.email_smtp_host, self.config.email_smtp_port
-            )
+            server = smtplib.SMTP(self.config.email_smtp_host, self.config.email_smtp_port)
             server.starttls()
             server.login(self.config.email_usuario, self.config.email_password)
 
@@ -280,14 +269,13 @@ class NotificacionManager:
     def _enviar_whatsapp(self, notificacion):
         """Enviar notificación por WhatsApp (usando API)"""
         try:
-            if (
-                not self.config.whatsapp_activo
-                or not notificacion.destinatario_telefono
-            ):
+            if not self.config.whatsapp_activo or not notificacion.destinatario_telefono:
                 return False
 
             # URL de API de WhatsApp Business (ejemplo)
-            url = f"https://graph.facebook.com/v17.0/{self.config.whatsapp_numero_business}/messages"
+            url = (
+                f"https://graph.facebook.com/v17.0/{self.config.whatsapp_numero_business}/messages"
+            )
 
             headers = {
                 "Authorization": f"Bearer {self.config.whatsapp_api_token}",
@@ -298,9 +286,7 @@ class NotificacionManager:
                 "messaging_product": "whatsapp",
                 "to": notificacion.destinatario_telefono,
                 "type": "text",
-                "text": {
-                    "body": f"🚗 *{self.empresa.nombre_taller}*\n\n{notificacion.mensaje}"
-                },
+                "text": {"body": f"🚗 *{self.empresa.nombre_taller}*\n\n{notificacion.mensaje}"},
             }
 
             response = requests.post(url, json=data, headers=headers, timeout=30)
@@ -309,9 +295,7 @@ class NotificacionManager:
                 logger.info(f"WhatsApp enviado a {notificacion.destinatario_telefono}")
                 return True
             else:
-                logger.error(
-                    f"Error WhatsApp API: {response.status_code} - {response.text}"
-                )
+                logger.error(f"Error WhatsApp API: {response.status_code} - {response.text}")
                 return False
 
         except Exception as e:
@@ -444,9 +428,7 @@ def verificar_recordatorios_mantenimiento():
                         evento="MANTENIMIENTO_RECORDATORIO",
                         destinatario_email=recordatorio.cliente.email,
                         destinatario_nombre=recordatorio.cliente.nombre,
-                        destinatario_telefono=getattr(
-                            recordatorio.cliente, "telefono", ""
-                        ),
+                        destinatario_telefono=getattr(recordatorio.cliente, "telefono", ""),
                         cliente=recordatorio.cliente,
                         datos_extra=datos_extra,
                     )
@@ -473,8 +455,6 @@ def procesar_cola_notificaciones():
             total_enviadas += enviadas
 
         except Exception as e:
-            logger.error(
-                f"Error procesando notificaciones de {empresa.nombre_taller}: {e}"
-            )
+            logger.error(f"Error procesando notificaciones de {empresa.nombre_taller}: {e}")
 
     return total_enviadas

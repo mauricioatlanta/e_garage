@@ -30,9 +30,7 @@ class Command(BaseCommand):
         vehiculos_procesados = 0
 
         # Obtener todos los vehículos con sus relaciones
-        vehiculos = Vehiculo.objects.select_related(
-            "cliente", "empresa", "cliente__empresa"
-        )
+        vehiculos = Vehiculo.objects.select_related("cliente", "empresa", "cliente__empresa")
 
         for v in vehiculos:
             vehiculos_procesados += 1
@@ -46,9 +44,7 @@ class Command(BaseCommand):
                     if v.cliente
                     else "   Cliente: Sin asignar"
                 )
-                self.stdout.write(
-                    f"   Empresa vehículo: {v.empresa} (ID: {v.empresa_id})"
-                )
+                self.stdout.write(f"   Empresa vehículo: {v.empresa} (ID: {v.empresa_id})")
                 if v.cliente:
                     self.stdout.write(
                         f"   Empresa cliente: {v.cliente.empresa} (ID: {v.cliente.empresa_id})"
@@ -57,9 +53,7 @@ class Command(BaseCommand):
             # Vehículo sin cliente
             if not v.cliente:
                 msg = f"Vehículo {v.id} sin cliente asignado (empresa={v.empresa_id})"
-                inconsistentes.append(
-                    {"vehiculo": v, "tipo": "sin_cliente", "mensaje": msg}
-                )
+                inconsistentes.append({"vehiculo": v, "tipo": "sin_cliente", "mensaje": msg})
                 continue
 
             # Empresa del vehículo distinta de la del cliente
@@ -80,9 +74,7 @@ class Command(BaseCommand):
 
         if inconsistentes:
             self.stdout.write(
-                self.style.WARNING(
-                    f"\n⚠️ INCONSISTENCIAS DETECTADAS ({len(inconsistentes)}):"
-                )
+                self.style.WARNING(f"\n⚠️ INCONSISTENCIAS DETECTADAS ({len(inconsistentes)}):")
             )
 
             # Agrupar por tipo
@@ -93,18 +85,14 @@ class Command(BaseCommand):
 
             if sin_cliente:
                 self.stdout.write(
-                    self.style.ERROR(
-                        f"\n🚫 Vehículos sin cliente asignado ({len(sin_cliente)}):"
-                    )
+                    self.style.ERROR(f"\n🚫 Vehículos sin cliente asignado ({len(sin_cliente)}):")
                 )
                 for item in sin_cliente:
                     self.stdout.write(f"   - {item['mensaje']}")
 
             if empresa_inconsistente:
                 self.stdout.write(
-                    self.style.ERROR(
-                        f"\n🔄 Empresa inconsistente ({len(empresa_inconsistente)}):"
-                    )
+                    self.style.ERROR(f"\n🔄 Empresa inconsistente ({len(empresa_inconsistente)}):")
                 )
                 for item in empresa_inconsistente:
                     self.stdout.write(f"   - {item['mensaje']}")
@@ -118,9 +106,7 @@ class Command(BaseCommand):
                 self.stdout.write("   python manage.py audit_vehiculos --fix")
 
         else:
-            self.stdout.write(
-                self.style.SUCCESS("\n✅ NO SE ENCONTRARON INCONSISTENCIAS")
-            )
+            self.stdout.write(self.style.SUCCESS("\n✅ NO SE ENCONTRARON INCONSISTENCIAS"))
             self.stdout.write(
                 "   Todos los vehículos están correctamente alineados con sus clientes y empresas."
             )
@@ -153,14 +139,10 @@ class Command(BaseCommand):
 
         if corregidos > 0:
             self.stdout.write(
-                self.style.SUCCESS(
-                    f"\n🎉 CORRECCIÓN COMPLETADA: {corregidos} vehículos corregidos"
-                )
+                self.style.SUCCESS(f"\n🎉 CORRECCIÓN COMPLETADA: {corregidos} vehículos corregidos")
             )
         else:
-            self.stdout.write(
-                "\nℹ️ No se pudieron corregir inconsistencias automáticamente"
-            )
+            self.stdout.write("\nℹ️ No se pudieron corregir inconsistencias automáticamente")
 
     def mostrar_estadisticas(self):
         """Muestra estadísticas adicionales"""
@@ -178,12 +160,8 @@ class Command(BaseCommand):
 
         # Vehículos con empresa inconsistente (usando F)
         try:
-            inconsistentes_count = Vehiculo.objects.exclude(
-                empresa=F("cliente__empresa")
-            ).count()
+            inconsistentes_count = Vehiculo.objects.exclude(empresa=F("cliente__empresa")).count()
             if inconsistentes_count > 0:
-                self.stdout.write(
-                    f"   Vehículos con empresa inconsistente: {inconsistentes_count}"
-                )
+                self.stdout.write(f"   Vehículos con empresa inconsistente: {inconsistentes_count}")
         except Exception as e:
             self.stdout.write(f"   Error calculando inconsistencias: {e}")

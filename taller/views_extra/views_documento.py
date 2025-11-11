@@ -28,9 +28,7 @@ def lista_documentos(request):
                         * (1 - F("lineas_repuesto__descuento") / 100),
                         output_field=DecimalField(max_digits=12, decimal_places=2),
                     ),
-                    Value(
-                        0, output_field=DecimalField(max_digits=12, decimal_places=2)
-                    ),
+                    Value(0, output_field=DecimalField(max_digits=12, decimal_places=2)),
                 ),
                 sum_serv=Coalesce(
                     Sum(
@@ -39,9 +37,7 @@ def lista_documentos(request):
                         * (1 - F("lineas_servicio__descuento") / 100),
                         output_field=DecimalField(max_digits=12, decimal_places=2),
                     ),
-                    Value(
-                        0, output_field=DecimalField(max_digits=12, decimal_places=2)
-                    ),
+                    Value(0, output_field=DecimalField(max_digits=12, decimal_places=2)),
                 ),
                 sum_out=Coalesce(
                     Sum(
@@ -49,9 +45,7 @@ def lista_documentos(request):
                         * F("lineas_otro_servicio__cantidad"),
                         output_field=DecimalField(max_digits=12, decimal_places=2),
                     ),
-                    Value(
-                        0, output_field=DecimalField(max_digits=12, decimal_places=2)
-                    ),
+                    Value(0, output_field=DecimalField(max_digits=12, decimal_places=2)),
                 ),
             )
             .annotate(total_general_anotado=F("sum_rep") + F("sum_serv") + F("sum_out"))
@@ -61,9 +55,7 @@ def lista_documentos(request):
         # Si el usuario no tiene empresa asignada, mostrar lista vacía
         documentos = Documento.objects.none()
 
-    return render(
-        request, "taller/documentos/lista_documentos.html", {"documentos": documentos}
-    )
+    return render(request, "taller/documentos/lista_documentos.html", {"documentos": documentos})
 
 
 @login_required
@@ -184,6 +176,4 @@ def editar_documento(request, documento_id):
 @login_required
 def detalle_documento(request, documento_id):
     documento = get_object_or_404(Documento, id=documento_id, user=request.user)
-    return render(
-        request, "taller/documentos/detalle_documento.html", {"documento": documento}
-    )
+    return render(request, "taller/documentos/detalle_documento.html", {"documento": documento})

@@ -251,9 +251,7 @@ def main():
         print("  # Fusionar colores duplicados")
         print("  color_mantener = ColorVehiculo.objects.get(id=1)")
         print("  color_eliminar = ColorVehiculo.objects.get(id=2)")
-        print(
-            "  Vehiculo.objects.filter(color=color_eliminar).update(color=color_mantener)"
-        )
+        print("  Vehiculo.objects.filter(color=color_eliminar).update(color=color_mantener)")
         print("  color_eliminar.delete()")
         sys.exit(1)
     else:

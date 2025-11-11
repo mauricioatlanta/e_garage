@@ -43,9 +43,7 @@ notificaciones_mauricio = NotificacionEnviada.objects.filter(
     destinatario_email="mauricioatlanta@gmail.com", estado="PENDIENTE"
 ).order_by("-created_at")
 
-print(
-    f"\n📮 Notificaciones pendientes para Mauricio: {notificaciones_mauricio.count()}"
-)
+print(f"\n📮 Notificaciones pendientes para Mauricio: {notificaciones_mauricio.count()}")
 
 if not notificaciones_mauricio.exists():
     print("No hay notificaciones pendientes")

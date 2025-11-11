@@ -26,9 +26,7 @@ def lista_vehiculos(request):
         .order_by("-id")
     )
 
-    return render(
-        request, "taller/us/en/vehiculos/lista_vehiculos.html", {"vehiculos": vehiculos}
-    )
+    return render(request, "taller/us/en/vehiculos/lista_vehiculos.html", {"vehiculos": vehiculos})
 
 
 @login_required
@@ -78,9 +76,7 @@ def ver_vehiculo(request, pk):
     empresa = getattr(request.user, "empresa", None)
     vehiculo = get_object_or_404(Vehiculo, id=pk, empresa=empresa)
 
-    return render(
-        request, "taller/us/en/vehiculos/detalle.html", {"vehiculo": vehiculo}
-    )
+    return render(request, "taller/us/en/vehiculos/detalle.html", {"vehiculo": vehiculo})
 
 
 @login_required

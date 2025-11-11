@@ -46,9 +46,7 @@ class CompanySettings(models.Model):
         null=True,
         blank=True,
         validators=[
-            FileExtensionValidator(
-                allowed_extensions=["png", "jpg", "jpeg", "svg", "webp"]
-            ),
+            FileExtensionValidator(allowed_extensions=["png", "jpg", "jpeg", "svg", "webp"]),
             validate_logo_size,
         ],
         verbose_name="Logo de la empresa",
@@ -81,9 +79,7 @@ class CompanySettings(models.Model):
         help_text="Teléfono principal",
     )
 
-    email = models.EmailField(
-        blank=True, verbose_name="Email", help_text="Email de contacto"
-    )
+    email = models.EmailField(blank=True, verbose_name="Email", help_text="Email de contacto")
 
     website = models.URLField(
         blank=True, verbose_name="Sitio web", help_text="URL del sitio web (opcional)"
@@ -233,9 +229,7 @@ class CompanySettings(models.Model):
                 background = Image.new("RGB", img.size, (255, 255, 255))
                 if img.mode == "P":
                     img = img.convert("RGBA")
-                background.paste(
-                    img, mask=img.split()[3] if img.mode == "RGBA" else None
-                )
+                background.paste(img, mask=img.split()[3] if img.mode == "RGBA" else None)
                 img = background
 
             # Redimensionar si es muy grande (máximo 800px)

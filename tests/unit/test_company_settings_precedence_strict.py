@@ -8,9 +8,7 @@ from django.test import override_settings
 
 @override_settings(
     MIDDLEWARE=[
-        m
-        for m in __import__("django.conf").conf.settings.MIDDLEWARE
-        if "country_prefix" not in m
+        m for m in __import__("django.conf").conf.settings.MIDDLEWARE if "country_prefix" not in m
     ]
 )
 @pytest.mark.django_db

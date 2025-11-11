@@ -51,9 +51,7 @@ def mostrar_paso(numero, descripcion):
 def notificar_documento_creado(sender, instance, created, **kwargs):
     if created:
         try:
-            tipo_notif = TipoNotificacion.objects.filter(
-                evento="DOCUMENTO_CREADO"
-            ).first()
+            tipo_notif = TipoNotificacion.objects.filter(evento="DOCUMENTO_CREADO").first()
 
             if not tipo_notif:
                 print("⚠️  No se encontró tipo de notificación DOCUMENTO_CREADO")
@@ -63,9 +61,7 @@ def notificar_documento_creado(sender, instance, created, **kwargs):
                 tipo_notificacion=tipo_notif,
                 empresa=instance.empresa,
                 destinatario_email=(
-                    instance.cliente.email
-                    if instance.cliente and instance.cliente.email
-                    else ""
+                    instance.cliente.email if instance.cliente and instance.cliente.email else ""
                 ),
                 destinatario_telefono=(
                     instance.cliente.telefono

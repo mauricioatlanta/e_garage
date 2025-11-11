@@ -440,3 +440,4 @@ Sin efecto → Alto impacto visual
 **Líneas de código:** ~800+ líneas (HTML + CSS)
 
 **¡Listo para impresionar! 🎉**
+

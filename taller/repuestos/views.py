@@ -54,9 +54,7 @@ def eliminar_repuesto(request, pk):
             log.error(f"Error al eliminar repuesto: {e}")
             return JsonResponse({"success": False, "error": str(e)}, status=500)
     else:
-        return JsonResponse(
-            {"success": False, "error": "Método no permitido"}, status=405
-        )
+        return JsonResponse({"success": False, "error": "Método no permitido"}, status=405)
 
 
 @login_required

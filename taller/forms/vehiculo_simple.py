@@ -11,9 +11,7 @@ class VehiculoFormSimple(forms.ModelForm):
     # Campo año dinámico
     anio = forms.TypedChoiceField(
         coerce=int,
-        choices=[
-            (y, y) for y in range(date.today().year + 1, 1969, -1)
-        ],  # 1970 → año actual + 1
+        choices=[(y, y) for y in range(date.today().year + 1, 1969, -1)],  # 1970 → año actual + 1
         required=True,
         label="Año",
     )
@@ -38,9 +36,7 @@ class VehiculoFormSimple(forms.ModelForm):
 
         if self.user and hasattr(self.user, "empresa"):
             # Filtrar clientes por empresa del usuario
-            self.fields["cliente"].queryset = Cliente.objects.filter(
-                empresa=self.user.empresa
-            )
+            self.fields["cliente"].queryset = Cliente.objects.filter(empresa=self.user.empresa)
             # Filtrar marcas por país de la empresa
             country = getattr(self.user.empresa, "pais", "CL")
             self.fields["marca"].queryset = Marca.objects.filter(country=country)
@@ -119,9 +115,7 @@ class VehiculoFormSimple(forms.ModelForm):
         if modelo and motor:
             # Verificar que el motor pertenezca al modelo
             if not motor.modelos.filter(id=modelo.id).exists():
-                self.add_error(
-                    "motor", "El motor no corresponde al modelo seleccionado."
-                )
+                self.add_error("motor", "El motor no corresponde al modelo seleccionado.")
 
         if modelo and caja:
             # Verificar que la caja pertenezca al modelo

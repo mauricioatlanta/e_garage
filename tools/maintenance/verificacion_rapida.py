@@ -37,9 +37,7 @@ try:
             ser_c = doc.lineas_servicio.count()
             otr_c = doc.lineas_otro_servicio.count()
             total_lineas = rep_c + ser_c + otr_c
-            print(
-                f"   Doc {doc.id} #{doc.numero_documento}: {total_lineas} líneas total"
-            )
+            print(f"   Doc {doc.id} #{doc.numero_documento}: {total_lineas} líneas total")
 
     else:
         print("❌ No hay documentos")

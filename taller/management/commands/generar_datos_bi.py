@@ -70,9 +70,7 @@ class Command(BaseCommand):
         repuestos = self.verificar_repuestos(empresa)
 
         # Generar documentos
-        self.generar_documentos(
-            empresa, mecanicos, clientes, repuestos, num_documentos, dias_atras
-        )
+        self.generar_documentos(empresa, mecanicos, clientes, repuestos, num_documentos, dias_atras)
 
         self.stdout.write(
             self.style.SUCCESS(
@@ -237,9 +235,7 @@ class Command(BaseCommand):
             # Crear documento
             documento = Documento.objects.create(
                 empresa=empresa,
-                tipo_documento=random.choice(
-                    ["Presupuesto", "Orden de trabajo", "Factura"]
-                ),
+                tipo_documento=random.choice(["Presupuesto", "Orden de trabajo", "Factura"]),
                 numero_documento=f"DOC-{random.randint(1000, 9999)}-{i}",
                 fecha=fecha_documento,
                 cliente=random.choice(clientes),
@@ -250,9 +246,7 @@ class Command(BaseCommand):
 
             # Agregar repuestos (0-5 repuestos por documento)
             num_repuestos = random.randint(0, 5)
-            repuestos_documento = random.sample(
-                repuestos, min(num_repuestos, len(repuestos))
-            )
+            repuestos_documento = random.sample(repuestos, min(num_repuestos, len(repuestos)))
 
             for repuesto in repuestos_documento:
                 cantidad = random.randint(1, 4)
@@ -289,8 +283,6 @@ class Command(BaseCommand):
                 )
 
             if (i + 1) % 10 == 0:
-                self.stdout.write(
-                    f"  📄 Generados {i + 1}/{num_documentos} documentos..."
-                )
+                self.stdout.write(f"  📄 Generados {i + 1}/{num_documentos} documentos...")
 
         self.stdout.write(f"  📊 Total documentos generados: {num_documentos}")

@@ -34,9 +34,7 @@ def test_bulk_post_csrf_smoke():
     from taller.models.empresa import Empresa
 
     if not Empresa.objects.filter(user=user).exists():
-        Empresa.objects.create(
-            user=user, nombre_taller="Test Bulk", pais="CL", logo=None
-        )
+        Empresa.objects.create(user=user, nombre_taller="Test Bulk", pais="CL", logo=None)
 
     for names, fb in CANDS:
         url = _rev(names, fb)

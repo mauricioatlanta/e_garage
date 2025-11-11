@@ -170,9 +170,7 @@ def crear_datos_prueba():
 
     # Mostrar estadísticas
     total_servicios = OtroServicioDocumento.objects.count()
-    total_ingresos = sum(
-        [s.precio_cliente for s in OtroServicioDocumento.objects.all()]
-    )
+    total_ingresos = sum([s.precio_cliente for s in OtroServicioDocumento.objects.all()])
     total_costos = sum([s.costo_interno for s in OtroServicioDocumento.objects.all()])
     ganancia_total = total_ingresos - total_costos
 

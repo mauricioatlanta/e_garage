@@ -120,9 +120,7 @@ def test_authenticated_routes():
                     print(f"⚠️  {route} → {response.status_code}")
             else:
                 if response.status_code in [302, 403]:
-                    print(
-                        f"✅ {route} → {response.status_code} (redirige o requiere login)"
-                    )
+                    print(f"✅ {route} → {response.status_code} (redirige o requiere login)")
                 else:
                     print(f"⚠️  {route} → {response.status_code}")
         except Exception as e:

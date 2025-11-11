@@ -70,9 +70,7 @@ class Tecnico(models.Model):
         null=True,
         help_text="Teléfono de contacto del técnico",
     )
-    direccion = models.TextField(
-        blank=True, null=True, help_text="Dirección del técnico"
-    )
+    direccion = models.TextField(blank=True, null=True, help_text="Dirección del técnico")
 
     # Unificación técnico/vendedor
     rol = models.CharField(max_length=12, choices=Rol, default=Rol.MIXTO, db_index=True)
@@ -85,9 +83,7 @@ class Tecnico(models.Model):
 
     def __str__(self):
         estado = "✅" if self.activo else "❌"
-        rol_display = (
-            f" ({self.get_rol_display()})" if self.rol != self.Rol.MIXTO else ""
-        )
+        rol_display = f" ({self.get_rol_display()})" if self.rol != self.Rol.MIXTO else ""
         return f"{estado} {self.nombre}{rol_display}"
 
     def clean(self):

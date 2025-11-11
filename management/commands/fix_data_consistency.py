@@ -68,9 +68,7 @@ class Command(BaseCommand):
                         self.style.SUCCESS("\n✅ Correcciones aplicadas exitosamente")
                     )
             else:
-                self.stdout.write(
-                    self.style.SUCCESS("\n✅ No hay correcciones necesarias")
-                )
+                self.stdout.write(self.style.SUCCESS("\n✅ No hay correcciones necesarias"))
 
     def check_inconsistencies(self):
         """Verifica inconsistencias en los datos"""
@@ -88,19 +86,13 @@ class Command(BaseCommand):
 
             # Mostrar algunos ejemplos
             for v in vehiculos_sin_empresa[:5]:
-                self.stdout.write(
-                    f"     - Vehículo ID {v.id}: {v.patente} (Cliente: {v.cliente})"
-                )
+                self.stdout.write(f"     - Vehículo ID {v.id}: {v.patente} (Cliente: {v.cliente})")
 
         # 2. Vehículos con empresa diferente a la del cliente
-        vehiculos_empresa_inconsistente = Vehiculo.objects.exclude(
-            empresa=F("cliente__empresa")
-        )
+        vehiculos_empresa_inconsistente = Vehiculo.objects.exclude(empresa=F("cliente__empresa"))
         if vehiculos_empresa_inconsistente.exists():
             count = vehiculos_empresa_inconsistente.count()
-            issues.append(
-                f"❌ {count} vehículos con empresa diferente a la del cliente"
-            )
+            issues.append(f"❌ {count} vehículos con empresa diferente a la del cliente")
             self.stdout.write(f"   Vehículos con empresa inconsistente: {count}")
 
             # Mostrar algunos ejemplos
@@ -143,18 +135,12 @@ class Command(BaseCommand):
                 documentos_problematicos.append(doc)
 
         if documentos_problematicos:
-            issues.append(
-                f"❌ {len(documentos_problematicos)} documentos con inconsistencias"
-            )
-            self.stdout.write(
-                f"   Documentos problemáticos: {len(documentos_problematicos)}"
-            )
+            issues.append(f"❌ {len(documentos_problematicos)} documentos con inconsistencias")
+            self.stdout.write(f"   Documentos problemáticos: {len(documentos_problematicos)}")
 
             # Mostrar algunos ejemplos
             for doc in documentos_problematicos[:3]:
-                self.stdout.write(
-                    f"     - Documento ID {doc.id}: {doc.tipo} #{doc.numero}"
-                )
+                self.stdout.write(f"     - Documento ID {doc.id}: {doc.tipo} #{doc.numero}")
                 self.stdout.write(f"       Empresa doc: {doc.empresa}")
                 self.stdout.write(
                     f"       Cliente: {doc.cliente} (empresa: {doc.cliente.empresa if doc.cliente else 'N/A'})"
@@ -166,24 +152,18 @@ class Command(BaseCommand):
         # Resumen
         self.stdout.write("\n" + "=" * 60)
         if issues:
-            self.stdout.write(
-                self.style.ERROR(f"🚨 ENCONTRADAS {len(issues)} INCONSISTENCIAS:")
-            )
+            self.stdout.write(self.style.ERROR(f"🚨 ENCONTRADAS {len(issues)} INCONSISTENCIAS:"))
             for issue in issues:
                 self.stdout.write(f"   {issue}")
         else:
-            self.stdout.write(
-                self.style.SUCCESS("✅ NO SE ENCONTRARON INCONSISTENCIAS")
-            )
+            self.stdout.write(self.style.SUCCESS("✅ NO SE ENCONTRARON INCONSISTENCIAS"))
 
         return issues
 
     @transaction.atomic
     def fix_inconsistencies(self, dry_run=False):
         """Corrige las inconsistencias encontradas"""
-        self.stdout.write(
-            f"\n🔧 {'SIMULANDO' if dry_run else 'APLICANDO'} CORRECCIONES..."
-        )
+        self.stdout.write(f"\n🔧 {'SIMULANDO' if dry_run else 'APLICANDO'} CORRECCIONES...")
         self.stdout.write("=" * 60)
 
         fixed_count = 0
@@ -201,9 +181,7 @@ class Command(BaseCommand):
                 fixed_count += 1
 
         # 2. Corregir vehículos con empresa inconsistente
-        vehiculos_empresa_inconsistente = Vehiculo.objects.exclude(
-            empresa=F("cliente__empresa")
-        )
+        vehiculos_empresa_inconsistente = Vehiculo.objects.exclude(empresa=F("cliente__empresa"))
         for v in vehiculos_empresa_inconsistente:
             if v.cliente and v.cliente.empresa:
                 old_empresa = v.empresa

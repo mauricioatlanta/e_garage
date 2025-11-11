@@ -101,9 +101,7 @@ class DjangoAdminLog(models.Model):
     object_repr = models.CharField(max_length=200)
     action_flag = models.PositiveSmallIntegerField()
     change_message = models.TextField()
-    content_type = models.ForeignKey(
-        "DjangoContentType", models.DO_NOTHING, blank=True, null=True
-    )
+    content_type = models.ForeignKey("DjangoContentType", models.DO_NOTHING, blank=True, null=True)
     user = models.ForeignKey(AuthUser, models.DO_NOTHING)
     action_time = models.DateTimeField()
 
@@ -194,9 +192,7 @@ class SocialaccountSocialtoken(models.Model):
     token_secret = models.TextField()
     expires_at = models.DateTimeField(blank=True, null=True)
     account = models.ForeignKey(SocialaccountSocialaccount, models.DO_NOTHING)
-    app = models.ForeignKey(
-        SocialaccountSocialapp, models.DO_NOTHING, blank=True, null=True
-    )
+    app = models.ForeignKey(SocialaccountSocialapp, models.DO_NOTHING, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -256,12 +252,8 @@ class TallerDetalledocumento(models.Model):
     comentario_mecanico = models.TextField(blank=True, null=True)
     imagen_evidencia = models.CharField(max_length=100, blank=True, null=True)
     documento = models.ForeignKey("Documento", models.DO_NOTHING)
-    repuesto = models.ForeignKey(
-        "TallerRepuesto", models.DO_NOTHING, blank=True, null=True
-    )
-    servicio = models.ForeignKey(
-        "TallerServicio", models.DO_NOTHING, blank=True, null=True
-    )
+    repuesto = models.ForeignKey("TallerRepuesto", models.DO_NOTHING, blank=True, null=True)
+    servicio = models.ForeignKey("TallerServicio", models.DO_NOTHING, blank=True, null=True)
 
     class Meta:
         managed = False

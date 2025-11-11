@@ -85,9 +85,7 @@ def analyze_index_usage():
     print("\n" + "=" * 50)
     print("💡 RECOMENDACIONES:")
     print("1. Si 'por_técnico_mes' usa doc_tec_fem_idx, podrías remover doc_tec_idx")
-    print(
-        "2. Si 'por_cliente_mes' usa doc_cli_fem_idx, podrías remover índice solo de cliente"
-    )
+    print("2. Si 'por_cliente_mes' usa doc_cli_fem_idx, podrías remover índice solo de cliente")
     print("3. Si 'por_fecha_solo' no usa índice, considera crear uno solo para fecha")
 
 

@@ -95,12 +95,8 @@ class DocumentoForm(forms.ModelForm):
 
         # Configurar querysets filtrados por empresa
         if self.empresa:
-            self.fields["cliente"].queryset = Cliente.objects.filter(
-                empresa=self.empresa
-            )
-            self.fields["vehiculo"].queryset = Vehiculo.objects.filter(
-                empresa=self.empresa
-            )
+            self.fields["cliente"].queryset = Cliente.objects.filter(empresa=self.empresa)
+            self.fields["vehiculo"].queryset = Vehiculo.objects.filter(empresa=self.empresa)
             self.fields["tecnico_responsable"].queryset = self.empresa.tecnicos.all()
 
         # Configurar labels según el país
@@ -225,9 +221,7 @@ class DocumentoForm(forms.ModelForm):
         # El campo número es opcional: si está vacío se autogenera
         if "numero" in self.fields:
             self.fields["numero"].required = False
-            self.fields["numero"].help_text = (
-                "Se generará automáticamente si se deja vacío"
-            )
+            self.fields["numero"].help_text = "Se generará automáticamente si se deja vacío"
 
     def clean(self):
         """Validaciones robustas multi-tenant"""
@@ -238,20 +232,14 @@ class DocumentoForm(forms.ModelForm):
         vehiculo = cleaned_data.get("vehiculo")
 
         if cliente and self.empresa and cliente.empresa != self.empresa:
-            raise forms.ValidationError(
-                "El cliente seleccionado no pertenece a tu empresa."
-            )
+            raise forms.ValidationError("El cliente seleccionado no pertenece a tu empresa.")
 
         if vehiculo and self.empresa and vehiculo.empresa != self.empresa:
-            raise forms.ValidationError(
-                "El vehículo seleccionado no pertenece a tu empresa."
-            )
+            raise forms.ValidationError("El vehículo seleccionado no pertenece a tu empresa.")
 
         # Validar que vehículo pertenece al cliente
         if vehiculo and cliente and vehiculo.cliente != cliente:
-            raise forms.ValidationError(
-                "El vehículo seleccionado no pertenece al cliente."
-            )
+            raise forms.ValidationError("El vehículo seleccionado no pertenece al cliente.")
 
         # Validaciones específicas por país
         if self.country == "CL":
@@ -263,9 +251,7 @@ class DocumentoForm(forms.ModelForm):
         elif self.country == "US":
             # En USA, al menos uno de kilometraje o millas debe tener valor
             if not cleaned_data.get("kilometraje") and not cleaned_data.get("millas"):
-                raise forms.ValidationError(
-                    "Debe especificar al menos kilometraje o millas."
-                )
+                raise forms.ValidationError("Debe especificar al menos kilometraje o millas.")
 
         return cleaned_data
 

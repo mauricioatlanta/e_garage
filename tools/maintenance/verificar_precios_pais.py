@@ -28,9 +28,7 @@ def verificar_precios_por_pais():
         print(f"\n🏛️ {nombre_pais} ({pais}):")
         print("-" * 30)
 
-        precios = PrecioSuscripcion.objects.filter(pais=pais, activo=True).order_by(
-            "precio"
-        )
+        precios = PrecioSuscripcion.objects.filter(pais=pais, activo=True).order_by("precio")
 
         if not precios.exists():
             print(f"   ❌ No hay precios configurados para {nombre_pais}")
@@ -83,9 +81,7 @@ def test_vista_precios():
     for pais, nombre_pais in [("CL", "Chile"), ("US", "Estados Unidos")]:
         print(f"\n📊 Precios para {nombre_pais}:")
 
-        precios = PrecioSuscripcion.objects.filter(pais=pais, activo=True).order_by(
-            "precio"
-        )
+        precios = PrecioSuscripcion.objects.filter(pais=pais, activo=True).order_by("precio")
 
         if precios.exists():
             for precio in precios:
@@ -118,9 +114,7 @@ def main():
         print("📋 Vista general de precios: http://127.0.0.1:8000/precios/")
         print("🇨🇱 Precios para Chile: http://127.0.0.1:8000/precios/?country=CL")
         print("🇺🇸 Precios para USA: http://127.0.0.1:8000/precios/?country=US")
-        print(
-            "⚙️ Admin de precios: http://127.0.0.1:8000/admin/taller/preciosuscripcion/"
-        )
+        print("⚙️ Admin de precios: http://127.0.0.1:8000/admin/taller/preciosuscripcion/")
 
         print("\n✅ VERIFICACIÓN COMPLETADA")
         print("=" * 30)

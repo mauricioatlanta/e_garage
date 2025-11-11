@@ -276,9 +276,7 @@ def ensure_repuestos(empresa, total_parts=15):
     return repuestos
 
 
-def create_clientes_y_vehiculos(
-    empresa, marcas_creadas, total_clients=10, extra_vehicle_clients=3
-):
+def create_clientes_y_vehiculos(empresa, marcas_creadas, total_clients=10, extra_vehicle_clients=3):
     first_names = [
         "George",
         "Anna",
@@ -316,9 +314,7 @@ def create_clientes_y_vehiculos(
         cli, _ = Cliente.objects.get_or_create(**kwargs)
         clientes.append(cli)
 
-    multi_idx = RND.sample(
-        range(total_clients), k=min(extra_vehicle_clients, total_clients)
-    )
+    multi_idx = RND.sample(range(total_clients), k=min(extra_vehicle_clients, total_clients))
     for idx, cli in enumerate(clientes):
         qty = RND.randint(2, 3) if idx in multi_idx else 1
         for v in range(qty):
@@ -343,9 +339,7 @@ def add_lineas_repuesto(doc, repuestos):
     count = RND.randint(2, 4)
     picks = RND.sample(repuestos, k=min(count, len(repuestos)))
     for rep in picks:
-        precio = getattr(rep, "precio_venta", None) or RND.randint(
-            25, 150
-        )  # USD: $25-$150
+        precio = getattr(rep, "precio_venta", None) or RND.randint(25, 150)  # USD: $25-$150
         codigo = getattr(rep, "part_number", None) or f"REP-{rep.pk:04d}"
         LineaRepuesto.objects.create(
             documento=doc,
@@ -362,9 +356,7 @@ def add_lineas_servicio(doc, servicios):
     count = RND.randint(2, 3)
     picks = RND.sample(servicios, k=min(count, len(servicios)))
     for s in picks:
-        precio_linea = getattr(s, "precio_base", None) or RND.randint(
-            45, 120
-        )  # USD: $45-$120
+        precio_linea = getattr(s, "precio_base", None) or RND.randint(45, 120)  # USD: $45-$120
         LineaServicio.objects.create(
             documento=doc,
             servicio=s,
@@ -405,9 +397,7 @@ def add_lineas_otro_servicio(doc, servicios):
         )
 
 
-def create_documentos(
-    empresa, clientes, vehiculos, repuestos, servicios, tecnicos, docs_count=20
-):
+def create_documentos(empresa, clientes, vehiculos, repuestos, servicios, tecnicos, docs_count=20):
     tipos = pick_document_types()
     docs = []
     for i in range(docs_count):
@@ -418,9 +408,7 @@ def create_documentos(
         fecha = timezone.now() - timedelta(days=RND.randint(0, 40))
         tecnico = RND.choice(tecnicos)  # Asignar técnico aleatorio
 
-        doc_kwargs = dict(
-            empresa=empresa, cliente=cliente, vehiculo=vehiculo, fecha_emision=fecha
-        )
+        doc_kwargs = dict(empresa=empresa, cliente=cliente, vehiculo=vehiculo, fecha_emision=fecha)
         if has_field(Documento, "tipo"):
             doc_kwargs["tipo"] = tipo_value
         if has_field(Documento, "estado"):
@@ -437,9 +425,7 @@ def create_documentos(
         if has_field(Documento, "numero"):
             doc_kwargs["numero"] = str(i + 1)
 
-        doc = Documento.objects.create(
-            **{k: v for k, v in doc_kwargs.items() if v is not None}
-        )
+        doc = Documento.objects.create(**{k: v for k, v in doc_kwargs.items() if v is not None})
         add_lineas_repuesto(doc, repuestos)
         add_lineas_servicio(doc, servicios)
         add_lineas_otro_servicio(doc, servicios)
@@ -469,15 +455,9 @@ def create_compras_con_detalle(empresa, repuestos):
     # Distribuye repuestos en 2 listas por proveedor si el campo existe
     if has_field(Repuesto, "proveedor"):
         rep_auto = [
-            r
-            for r in repuestos
-            if (getattr(r, "proveedor", None) or "").lower() == "autozone"
+            r for r in repuestos if (getattr(r, "proveedor", None) or "").lower() == "autozone"
         ]
-        rep_napa = [
-            r
-            for r in repuestos
-            if (getattr(r, "proveedor", None) or "").lower() == "napa"
-        ]
+        rep_napa = [r for r in repuestos if (getattr(r, "proveedor", None) or "").lower() == "napa"]
     else:
         half = len(repuestos) // 2
         rep_auto = repuestos[:half]
@@ -516,9 +496,7 @@ def create_compras_con_detalle(empresa, repuestos):
             "empresa_externa",
         ]:
             if has_field(Compra, fname):
-                compra_kwargs[fname] = (
-                    proveedor_obj if (Proveedor and proveedor_obj) else prov_name
-                )
+                compra_kwargs[fname] = proveedor_obj if (Proveedor and proveedor_obj) else prov_name
                 break
         # Otros campos comunes
         for fname in ["estado", "tipo", "numero", "documento_referencia"]:
@@ -535,15 +513,11 @@ def create_compras_con_detalle(empresa, repuestos):
             if not rep_list:
                 rep_list = RND.sample(repuestos, k=min(6, len(repuestos)))
 
-            used = RND.sample(
-                rep_list, k=min(max(4, len(rep_list) // 2), len(rep_list))
-            )
+            used = RND.sample(rep_list, k=min(max(4, len(rep_list) // 2), len(rep_list)))
             for rep in used:
                 cantidad = RND.randint(1, 5)
                 # precio = precio_compra del repuesto si existe, si no aleatorio
-                precio = getattr(rep, "precio_compra", None) or RND.randint(
-                    15, 80
-                )  # USD: $15-$80
+                precio = getattr(rep, "precio_compra", None) or RND.randint(15, 80)  # USD: $15-$80
                 subtotal = precio * cantidad
 
                 det_kwargs = {}
@@ -624,9 +598,7 @@ class Command(BaseCommand):
         # Crear marcas y modelos primero
         marcas_creadas = ensure_marcas_y_modelos(empresa)
         self.stdout.write(
-            self.style.SUCCESS(
-                f"Marcas y modelos creados: {len(marcas_creadas)} marcas"
-            )
+            self.style.SUCCESS(f"Marcas y modelos creados: {len(marcas_creadas)} marcas")
         )
 
         clientes, vehiculos = create_clientes_y_vehiculos(
@@ -644,9 +616,7 @@ class Command(BaseCommand):
         servicios = ensure_servicios_basicos(empresa)
         repuestos = ensure_repuestos(empresa, total_parts=parts_n)
         self.stdout.write(
-            self.style.SUCCESS(
-                f"Servicios base: {len(servicios)}; Repuestos: {len(repuestos)}"
-            )
+            self.style.SUCCESS(f"Servicios base: {len(servicios)}; Repuestos: {len(repuestos)}")
         )
 
         # NUEVO: Compras a AutoZone y NAPA

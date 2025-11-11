@@ -32,11 +32,7 @@ class TiendaForm(forms.ModelForm):
             "sitio_web": forms.URLInput(
                 attrs={"class": "form-control", "placeholder": "https://www.tienda.com"}
             ),
-            "ciudad": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "Ciudad"}
-            ),
-            "region": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "Región"}
-            ),
+            "ciudad": forms.TextInput(attrs={"class": "form-control", "placeholder": "Ciudad"}),
+            "region": forms.TextInput(attrs={"class": "form-control", "placeholder": "Región"}),
             "activo": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }

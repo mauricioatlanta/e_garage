@@ -33,9 +33,7 @@ class Command(BaseCommand):
         days = options.get("days")
 
         self.stdout.write(
-            self.style.SUCCESS(
-                f"🔍 Verificando reportes de mecánicos (últimos {days} días)..."
-            )
+            self.style.SUCCESS(f"🔍 Verificando reportes de mecánicos (últimos {days} días)...")
         )
 
         # Calcular fechas
@@ -53,9 +51,7 @@ class Command(BaseCommand):
                 )
         else:
             empresas = Empresa.objects.all()
-            self.stdout.write(
-                f"📋 Procesando todas las empresas ({empresas.count()} empresas)"
-            )
+            self.stdout.write(f"📋 Procesando todas las empresas ({empresas.count()} empresas)")
 
         for empresa in empresas:
             self.stdout.write(f"\n🏢 Empresa: {empresa.nombre_taller}")
@@ -90,27 +86,19 @@ class Command(BaseCommand):
                     continue
 
                 # Servicios del técnico
-                servicios_tecnico = LineaServicio.objects.filter(
-                    documento__in=docs_tecnico
-                )
+                servicios_tecnico = LineaServicio.objects.filter(documento__in=docs_tecnico)
                 total_servicios = servicios_tecnico.count()
 
                 # Cálculo correcto del total generado
                 total_generado = (
                     servicios_tecnico.aggregate(
-                        total=Sum(
-                            F("cantidad")
-                            * F("precio_unitario")
-                            * (1 - F("descuento") / 100)
-                        )
+                        total=Sum(F("cantidad") * F("precio_unitario") * (1 - F("descuento") / 100))
                     )["total"]
                     or 0
                 )
 
                 # Promedio por documento
-                promedio_doc = round(
-                    total_generado / total_docs if total_docs > 0 else 0, 0
-                )
+                promedio_doc = round(total_generado / total_docs if total_docs > 0 else 0, 0)
 
                 # Mostrar resultados
                 self.stdout.write(f"   📋 Documentos: {total_docs}")
@@ -138,9 +126,7 @@ class Command(BaseCommand):
                         )
 
                     if total_docs > 3:
-                        self.stdout.write(
-                            f"      ... y {total_docs - 3} documentos más"
-                        )
+                        self.stdout.write(f"      ... y {total_docs - 3} documentos más")
 
         self.stdout.write("\n" + "=" * 50)
         self.stdout.write(self.style.SUCCESS("✅ Verificación completada"))

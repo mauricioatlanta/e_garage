@@ -1,0 +1,153 @@
+{% load static %}
+{% load i18n %}
+{% load country_url %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}eGarage{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+  <link rel="stylesheet" href="{% static 'css/output.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" referrerpolicy="no-referrer" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <style>
+    :root {
+      --company-primary: {{ BRAND.primary_color|default:'#00d4ff' }};
+      --company-secondary: {{ BRAND.secondary_color|default:'#6c757d' }};
+    }
+    .company-header {
+      background: linear-gradient(135deg,#1f2937 0%,#374151 50%,#1f2937 100%);
+      border-bottom: 4px solid var(--company-primary);
+      box-shadow: 0 10px 30px rgba(0,0,0,.3);
+    }
+    .company-logo {
+      max-height: 80px;
+      max-width: 200px;
+      object-fit: contain;
+      border-radius: 10px;
+      border: 2px solid var(--company-primary);
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .company-title {
+      color: var(--company-primary);
+      text-shadow: 0 0 20px var(--company-primary),0 0 40px var(--company-primary);
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+    .company-tagline {
+      color: #b3e5fc;
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin-top: 2px;
+      letter-spacing: 1px;
+    }
+    .nav-btn-neon {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1.2rem;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      border-radius: 8px;
+      text-decoration: none;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 0.85rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      white-space: nowrap;
+      box-shadow:
+          0 0 10px rgba(255, 255, 255, 0.3),
+          0 0 20px rgba(255, 255, 255, 0.1),
+          inset 0 0 5px rgba(255, 255, 255, 0.1);
+      animation: neon-glow 2s infinite alternate;
+    }
+    .nav-btn-neon:hover {
+      transform: translateY(-2px);
+      border-color: #ffffff;
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow:
+          0 0 15px rgba(255, 255, 255, 0.6),
+          0 0 30px rgba(255, 255, 255, 0.4),
+          0 0 45px rgba(255, 255, 255, 0.2),
+          inset 0 0 10px rgba(255, 255, 255, 0.2);
+    }
+    @keyframes neon-glow {
+      0% {
+        box-shadow:
+            0 0 10px rgba(255, 255, 255, 0.3),
+            0 0 20px rgba(255, 255, 255, 0.1),
+            inset 0 0 5px rgba(255, 255, 255, 0.1);
+      }
+      100% {
+        box-shadow:
+            0 0 15px rgba(255, 255, 255, 0.5),
+            0 0 30px rgba(255, 255, 255, 0.3),
+            inset 0 0 8px rgba(255, 255, 255, 0.15);
+      }
+    }
+    .nav-btn-neon .nav-icon-sm {
+      font-size: 1rem;
+      filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.5));
+    }
+    .main-navigation {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin: 0 auto 1.5rem auto;
+      flex-wrap: wrap;
+      padding: 0.5rem 0;
+    }
+  </style>
+  {% block extra_head %}{% endblock %}
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-dark text-light">
+  <header class="company-header py-4 mb-3">
+    <div class="container d-flex align-items-center gap-4">
+      {% if company_logo_url %}
+        <img src="{{ company_logo_url }}" alt="Logo" class="company-logo">
+      {% endif %}
+      <div>
+        <div class="company-title">{{ company_name|default:"eGarage" }}</div>
+        {% if company_tagline %}
+          <div class="company-tagline">{{ company_tagline }}</div>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+  <nav class="main-navigation">
+    <a href="{% country_url 'clientes:lista_clientes' %}" class="nav-btn-neon"><span class="nav-icon-sm">👥</span> <span>{% trans "Clientes" %}</span></a>
+    <a href="{% country_url 'vehiculos:lista_vehiculos' %}" class="nav-btn-neon"><span class="nav-icon-sm">🚗</span> <span>{% trans "Vehículos" %}</span></a>
+    <a href="{% country_url 'servicios:servicios_menu' %}" class="nav-btn-neon"><span class="nav-icon-sm">🛠️</span> <span>{% trans "Servicios" %}</span></a>
+    <a href="{% country_url 'repuestos:lista_repuestos' %}" class="nav-btn-neon"><span class="nav-icon-sm">🔧</span> <span>{% trans "Repuestos" %}</span></a>
+    <a href="{% country_url 'documentos:lista_documentos' %}" class="nav-btn-neon"><span class="nav-icon-sm">📄</span> <span>{% trans "Documentos" %}</span></a>
+    <a href="{% country_url 'centro_operaciones_espacial' %}" class="nav-btn-neon"><span class="nav-icon-sm">🚀</span> <span>{% trans "Centro" %}</span></a>
+    <a href="{% country_url 'reportes:reportes_dashboard' %}" class="nav-btn-neon"><span class="nav-icon-sm">📊</span> <span>{% trans "Reportes" %}</span></a>
+    <a href="{% country_url 'company_settings' %}" class="nav-btn-neon"><span class="nav-icon-sm">⚙️</span> <span>{% trans "Config" %}</span></a>
+    <form action="{% url 'account_logout' %}" method="post" style="display: inline;">
+      {% csrf_token %}
+      <button type="submit" class="nav-btn-neon" style="cursor: pointer; background: rgba(0, 0, 0, 0.6);">
+        <span class="nav-icon-sm">🚪</span> <span>{% trans "Salir" %}</span>
+      </button>
+    </form>
+  </nav>
+  <main class="container mb-5">
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="text-center text-muted py-4 mt-5">
+    &copy; 2025 eGarage
+  </footer>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

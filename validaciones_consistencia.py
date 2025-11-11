@@ -237,9 +237,7 @@ class ValidadorConsistencia:
 
         # OtroServicioDocumento debe referenciar Servicio existente
         try:
-            otros_servicios_huerfanos = OtroServicioDocumento.objects.filter(
-                servicio__isnull=True
-            )
+            otros_servicios_huerfanos = OtroServicioDocumento.objects.filter(servicio__isnull=True)
 
             if otros_servicios_huerfanos.exists():
                 count = otros_servicios_huerfanos.count()
@@ -252,9 +250,7 @@ class ValidadorConsistencia:
                 print("✅ Todos los otros servicios tienen referencia válida")
 
         except Exception as e:
-            self.log_error(
-                "VALIDATION_ERROR", f"Error validando integridad referencial: {str(e)}"
-            )
+            self.log_error("VALIDATION_ERROR", f"Error validando integridad referencial: {str(e)}")
 
     def validar_7_datos_por_pais(self):
         """Validar distribución de datos por país"""
@@ -269,9 +265,7 @@ class ValidadorConsistencia:
             # Contar datos por país
             count_servicios = Servicio.objects.filter(country=pais).count()
             count_categorias = CategoriaServicio.objects.filter(country=pais).count()
-            count_subcategorias = SubcategoriaServicio.objects.filter(
-                country=pais
-            ).count()
+            count_subcategorias = SubcategoriaServicio.objects.filter(country=pais).count()
 
             print(f"   Servicios: {count_servicios}")
             print(f"   Categorías: {count_categorias}")
@@ -279,9 +273,7 @@ class ValidadorConsistencia:
 
             # Verificar balance mínimo
             if count_servicios == 0:
-                self.log_advertencia(
-                    "DATOS_FALTANTES", f"País {pais} no tiene servicios", Servicio
-                )
+                self.log_advertencia("DATOS_FALTANTES", f"País {pais} no tiene servicios", Servicio)
 
             if count_categorias == 0:
                 self.log_advertencia(

@@ -43,15 +43,11 @@ def test_core_modules_present():
 
     for module in modules:
         # Verificar US/EN (más flexible)
-        us_module_urls = [
-            name for name in names if "taller_us_en" in name and module in name
-        ]
+        us_module_urls = [name for name in names if "taller_us_en" in name and module in name]
         assert len(us_module_urls) > 0, f"No hay URLs para módulo {module} en US/EN"
 
         # Verificar CL/ES (más flexible)
-        cl_module_urls = [
-            name for name in names if "taller_cl_es" in name and module in name
-        ]
+        cl_module_urls = [name for name in names if "taller_cl_es" in name and module in name]
         assert len(cl_module_urls) > 0, f"No hay URLs para módulo {module} en CL/ES"
 
 

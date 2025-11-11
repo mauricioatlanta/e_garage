@@ -25,9 +25,7 @@ def crear_marca(request):
                     )
 
                     if created:
-                        messages.success(
-                            request, f"Marca '{nombre}' creada exitosamente"
-                        )
+                        messages.success(request, f"Marca '{nombre}' creada exitosamente")
                     else:
                         messages.info(request, f"La marca '{nombre}' ya existe")
 
@@ -76,9 +74,7 @@ def crear_modelo(request):
                     )
 
                     if created:
-                        messages.success(
-                            request, f"Modelo '{nombre}' creado exitosamente"
-                        )
+                        messages.success(request, f"Modelo '{nombre}' creado exitosamente")
                     else:
                         messages.info(request, f"El modelo '{nombre}' ya existe")
 
@@ -136,9 +132,7 @@ def crear_color(request):
                     )
 
                     if created:
-                        messages.success(
-                            request, f"Color '{nombre}' creado exitosamente"
-                        )
+                        messages.success(request, f"Color '{nombre}' creado exitosamente")
                     else:
                         messages.info(request, f"El color '{nombre}' ya existe")
 

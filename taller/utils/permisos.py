@@ -42,9 +42,7 @@ def verificar_objeto_empresa(modelo, campo_empresa="empresa"):
         def wrapper(request, *args, **kwargs):
             # Obtener ID del objeto desde kwargs
             objeto_id = (
-                kwargs.get("pk")
-                or kwargs.get("id")
-                or kwargs.get(f"{modelo.__name__.lower()}_id")
+                kwargs.get("pk") or kwargs.get("id") or kwargs.get(f"{modelo.__name__.lower()}_id")
             )
 
             if objeto_id:
@@ -153,9 +151,7 @@ def verificar_permisos_rol(roles_permitidos):
                     descripcion=f"Intento de acceso sin permisos. Rol: {perfil.rol}",
                     request=request,
                 )
-                raise PermissionDenied(
-                    f"Rol {perfil.rol} no tiene permisos para esta acción"
-                )
+                raise PermissionDenied(f"Rol {perfil.rol} no tiene permisos para esta acción")
 
             return view_func(request, *args, **kwargs)
 

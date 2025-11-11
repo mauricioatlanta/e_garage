@@ -56,9 +56,7 @@ def get_target_directory(file_type, current_path):
     }
 
     # Archivos de terceros van a vendor/
-    if any(
-        vendor in path_str for vendor in ["jquery", "select2", "bootstrap", "vendor"]
-    ):
+    if any(vendor in path_str for vendor in ["jquery", "select2", "bootstrap", "vendor"]):
         if file_type in ["CSS", "JS"]:
             return f'vendor/{current_path.parts[-2] if len(current_path.parts) > 1 else "unknown"}/{file_type.lower()}'
         else:
@@ -180,18 +178,12 @@ def suggest_moves(base_path, manifest_file, apply_changes=False):
         print(f"   ❌ Errores: {errors}")
     else:
         print("\n💡 Para aplicar los cambios, ejecuta:")
-        print(
-            f"   python suggest_moves.py --base {base_path} --manifest {manifest_file} --apply"
-        )
+        print(f"   python suggest_moves.py --base {base_path} --manifest {manifest_file} --apply")
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Sugiere reorganización de archivos estáticos"
-    )
-    parser.add_argument(
-        "--base", required=True, help="Directorio base de archivos estáticos"
-    )
+    parser = argparse.ArgumentParser(description="Sugiere reorganización de archivos estáticos")
+    parser.add_argument("--base", required=True, help="Directorio base de archivos estáticos")
     parser.add_argument("--manifest", required=True, help="Archivo JSON de manifest")
     parser.add_argument("--apply", action="store_true", help="Aplicar los cambios")
 

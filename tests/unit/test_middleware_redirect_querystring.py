@@ -70,7 +70,9 @@ def test_redirect_preserves_complex_querystring():
     c.force_login(user)
 
     # Test with complex querystring including special characters
-    complex_qs = "/us/documentos/api/create/?next=/us/vehiculos/&search=test%20query&page=2&filter=active"
+    complex_qs = (
+        "/us/documentos/api/create/?next=/us/vehiculos/&search=test%20query&page=2&filter=active"
+    )
     response = c.get(complex_qs)
 
     # Should redirect and preserve all parameters
@@ -101,9 +103,7 @@ def test_redirect_without_querystring():
     # Should redirect to clean URL
     assert response.status_code == 302
     location = response.headers.get("Location", "")
-    assert (
-        location == "/cl/documentos/api/create/"
-    ), f"Expected clean redirect, got {location}"
+    assert location == "/cl/documentos/api/create/", f"Expected clean redirect, got {location}"
 
 
 @pytest.mark.django_db

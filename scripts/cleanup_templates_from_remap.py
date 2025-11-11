@@ -72,9 +72,7 @@ def promote_canonical(root: Path, apply: bool, keep_quarantine: bool = False):
     tmpl = root / "templates"
     canonical = root / "templates_canonical"
     if not canonical.exists():
-        raise SystemExit(
-            f"Missing: {human(canonical)} - Run consolidate_templates.py first."
-        )
+        raise SystemExit(f"Missing: {human(canonical)} - Run consolidate_templates.py first.")
 
     # Prepare backup
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -93,9 +91,7 @@ def promote_canonical(root: Path, apply: bool, keep_quarantine: bool = False):
         actions.append(f"Backup {human(tmpl)} -> {human(backup_dir)}")
     for p in to_prune:
         actions.append(f"Remove {human(p)} (from canonical)")
-    actions.append(
-        f"Replace {human(tmpl)} with {human(canonical)} (move canonical -> templates)"
-    )
+    actions.append(f"Replace {human(tmpl)} with {human(canonical)} (move canonical -> templates)")
 
     if not apply:
         return {"actions": actions, "backup": human(backup_dir)}
@@ -118,9 +114,7 @@ def main():
         default=".",
         help="Project root where templates/ and templates_canonical/ live",
     )
-    ap.add_argument(
-        "--remap", required=True, help="Path to reports/templates_remap.csv"
-    )
+    ap.add_argument("--remap", required=True, help="Path to reports/templates_remap.csv")
     ap.add_argument(
         "--delete-duplicates",
         action="store_true",
@@ -159,9 +153,7 @@ def main():
         summary["promote_canonical"] = res
 
     if not args.delete_duplicates and not args.promote_canonical:
-        summary["note"] = (
-            "Nothing selected. Use --delete-duplicates and/or --promote-canonical."
-        )
+        summary["note"] = "Nothing selected. Use --delete-duplicates and/or --promote-canonical."
 
     import json
 

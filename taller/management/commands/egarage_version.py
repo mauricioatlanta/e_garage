@@ -18,9 +18,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.stdout.write("=" * 80)
         self.stdout.write(
-            self.style.SUCCESS(
-                "  🚀 eGarage - Sistema de Gestión de Talleres Automotrices"
-            )
+            self.style.SUCCESS("  🚀 eGarage - Sistema de Gestión de Talleres Automotrices")
         )
         self.stdout.write("=" * 80)
         self.stdout.write("")

@@ -49,9 +49,7 @@ class EgarageEmailBackend(EmailBackend):
         if not smtp_user:
             logger.warning("EMAIL_HOST_USER no configurado.")
         if not smtp_pass:
-            logger.error(
-                "EMAIL_HOST_PASSWORD no configurado. No se podrá enviar correo."
-            )
+            logger.error("EMAIL_HOST_PASSWORD no configurado. No se podrá enviar correo.")
 
         super().__init__(
             host=smtp_host,
@@ -85,9 +83,7 @@ class EgarageEmailBackend(EmailBackend):
             connection_params["context"] = self.ssl_context
 
         try:
-            self.connection = smtplib.SMTP_SSL(
-                self.host, self.port, **connection_params
-            )
+            self.connection = smtplib.SMTP_SSL(self.host, self.port, **connection_params)
 
             # SOLUCIÓN: Verificar si el password tiene caracteres no-ASCII
             # y advertir al usuario que debe cambiar el password del servidor

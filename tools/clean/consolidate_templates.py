@@ -24,9 +24,7 @@ def decide_bucket(path: Path) -> str:
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", default=".", help="project root containing templates/")
-    ap.add_argument(
-        "--dest", default="templates_canonical", help="output canonical tree"
-    )
+    ap.add_argument("--dest", default="templates_canonical", help="output canonical tree")
     ap.add_argument(
         "--prefer",
         nargs="*",
@@ -73,9 +71,7 @@ def main():
             shutil.copy2(winner, out)
 
             for p in paths:
-                w.writerow(
-                    [p.relative_to(root).as_posix(), out.relative_to(root).as_posix()]
-                )
+                w.writerow([p.relative_to(root).as_posix(), out.relative_to(root).as_posix()])
 
     print(f"✔ Canonical tree at: {dst}")
     print(f"✔ Remap written to: {remap_csv}")

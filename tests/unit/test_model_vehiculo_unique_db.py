@@ -37,8 +37,6 @@ def test_vehiculo_unique_empresa_patente_db_constraint():
             modelo_texto="B",
             anio=2021,
         )
-        pytest.skip(
-            "Aún no existe unique constraint (empresa, patente); recomendado añadirlo"
-        )
+        pytest.skip("Aún no existe unique constraint (empresa, patente); recomendado añadirlo")
     except IntegrityError:
         assert True

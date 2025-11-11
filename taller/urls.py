@@ -11,9 +11,7 @@ from taller.views_extra.views_configuracion import configuracion_empresa
 app_name = "taller"
 
 urlpatterns = [
-    path(
-        "clientes/", include(("taller.clientes.urls", "clientes"), namespace="clientes")
-    ),
+    path("clientes/", include(("taller.clientes.urls", "clientes"), namespace="clientes")),
     # CORREGIDO: Usar vista unificada country-aware en lugar de urls_chile
     path(
         "vehiculos/",
@@ -50,22 +48,16 @@ urlpatterns = [
         include(("taller.servicios.urls", "servicios"), namespace="servicios"),
     ),
     # Agregar el namespace de reportes para que funcione 'taller:reportes:reportes_dashboard'
-    path(
-        "reportes/", include(("taller.reportes.urls", "reportes"), namespace="reportes")
-    ),
+    path("reportes/", include(("taller.reportes.urls", "reportes"), namespace="reportes")),
     # === RUTAS PRINCIPALES PARA COMPATIBILIDAD ===
     path("dashboard/", dashboard, name="dashboard"),  # Dashboard principal
-    path(
-        "centro-operaciones/", dashboard_centro_operaciones, name="centro_operaciones"
-    ),
+    path("centro-operaciones/", dashboard_centro_operaciones, name="centro_operaciones"),
     path(
         "centro-operaciones-espacial/",
         dashboard_centro_operaciones_espacial,
         name="centro_operaciones_espacial",
     ),
-    path(
-        "configuracion/", configuracion_empresa, name="configuracion"
-    ),  # Configuración empresa
+    path("configuracion/", configuracion_empresa, name="configuracion"),  # Configuración empresa
     # Rutas principales de taller (dashboard, settings, etc.)
     # path('', include('taller.taller_main_urls')),  # Eliminado para evitar conflicto de namespace
     # Puedes agregar aquí otras rutas globales si es necesario

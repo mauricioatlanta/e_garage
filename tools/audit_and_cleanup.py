@@ -261,9 +261,7 @@ def count_templates(root: Path):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", type=str, default=".")
-    ap.add_argument(
-        "--apply", action="store_true", help="mover archivos (no solo informe)"
-    )
+    ap.add_argument("--apply", action="store_true", help="mover archivos (no solo informe)")
     args = ap.parse_args()
 
     root = Path(args.root).resolve()

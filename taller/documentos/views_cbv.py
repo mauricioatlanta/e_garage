@@ -37,8 +37,7 @@ class DocumentoListView(LoginRequiredMixin, TenantViewMixin, ListView):
         qs = qs.annotate(
             total_repuestos=Sum(
                 ExpressionWrapper(
-                    F("lineas_repuesto__cantidad")
-                    * F("lineas_repuesto__precio_unitario"),
+                    F("lineas_repuesto__cantidad") * F("lineas_repuesto__precio_unitario"),
                     output_field=DecimalField(max_digits=12, decimal_places=2),
                 )
             ),
@@ -78,9 +77,7 @@ class DocumentoListView(LoginRequiredMixin, TenantViewMixin, ListView):
             tax_base = ctx.get("doc_tax_base", "parts_only")
             rate = Decimal(str(ctx.get("doc_tax_rate", 0.0)))
             base = total_rep if tax_base == "parts_only" else subtotal
-            tax = (
-                round(base * rate, 2) if getattr(documento, "incluir_iva", True) else 0
-            )
+            tax = round(base * rate, 2) if getattr(documento, "incluir_iva", True) else 0
 
             # Calcular total general
             total = subtotal + tax
@@ -135,9 +132,7 @@ class DocumentoDetailView(
         lineas_rep = doc.lineas_repuesto.all()
         print(f"[DEBUG DocumentoDetailView] Líneas de repuesto: {lineas_rep.count()}")
         for lr in lineas_rep:
-            print(
-                f"  - {lr.codigo}: {lr.nombre} (x{lr.cantidad} @ ${lr.precio_unitario})"
-            )
+            print(f"  - {lr.codigo}: {lr.nombre} (x{lr.cantidad} @ ${lr.precio_unitario})")
 
         # Sumas servidor usando aggregates (sin depender de JS)
         sum_rep = (
@@ -152,14 +147,9 @@ class DocumentoDetailView(
             or 0
         )
 
-        sum_serv = (
-            doc.lineas_servicio.aggregate(total=Sum("precio_unitario"))["total"] or 0
-        )
+        sum_serv = doc.lineas_servicio.aggregate(total=Sum("precio_unitario"))["total"] or 0
 
-        sum_otros = (
-            doc.lineas_otro_servicio.aggregate(total=Sum("precio_cliente"))["total"]
-            or 0
-        )
+        sum_otros = doc.lineas_otro_servicio.aggregate(total=Sum("precio_cliente"))["total"] or 0
 
         subtotal = (sum_rep or 0) + (sum_serv or 0) + (sum_otros or 0)
 
@@ -167,9 +157,7 @@ class DocumentoDetailView(
         print(f"[DEBUG DocumentoDetailView] Subtotal: ${subtotal}")
 
         # País y reglas (del context processor que ya tienes)
-        tax_base = ctx.get(
-            "doc_tax_base", "parts_only"
-        )  # "parts_only" (CL) | "subtotal" (US)
+        tax_base = ctx.get("doc_tax_base", "parts_only")  # "parts_only" (CL) | "subtotal" (US)
         rate = Decimal(str(ctx.get("doc_tax_rate", 0.0)))  # 0.19 CL | ej. 0.08 US
         base = sum_rep if tax_base == "parts_only" else subtotal
         tax = round(base * rate, 2) if getattr(doc, "incluir_iva", True) else 0
@@ -181,9 +169,7 @@ class DocumentoDetailView(
             repuestos.append(
                 {
                     "codigo": lr.codigo
-                    or (
-                        lr.repuesto.part_number if getattr(lr, "repuesto", None) else ""
-                    ),
+                    or (lr.repuesto.part_number if getattr(lr, "repuesto", None) else ""),
                     "nombre": lr.nombre,
                     "cantidad": lr.cantidad,
                     "precio": float(lr.precio_unitario),
@@ -214,9 +200,7 @@ class DocumentoDetailView(
                     "empresa_externa": lo.empresa_externa or "",
                     "costo_interno": float(lo.costo_interno or 0),
                     "precio_cliente": float(lo.precio_cliente or 0),
-                    "ganancia": float(
-                        (lo.precio_cliente or 0) - (lo.costo_interno or 0)
-                    ),
+                    "ganancia": float((lo.precio_cliente or 0) - (lo.costo_interno or 0)),
                     "observaciones": getattr(lo, "observaciones", "") or "",
                 }
             )
@@ -235,9 +219,7 @@ class DocumentoDetailView(
             }
         )
 
-        print(
-            f"[DEBUG DocumentoDetailView] Contexto final - repuestos: {len(ctx['repuestos'])}"
-        )
+        print(f"[DEBUG DocumentoDetailView] Contexto final - repuestos: {len(ctx['repuestos'])}")
         print(f"[DEBUG DocumentoDetailView] Contexto final - total: ${ctx['total']}")
 
         return ctx
@@ -340,9 +322,7 @@ class DocumentoCreateView(
         costos = self.request.POST.getlist("otro_costo[]")
         precios = self.request.POST.getlist("otro_precio[]")
 
-        for servicio, empresa, costo, precio in zip(
-            servicios, empresas, costos, precios
-        ):
+        for servicio, empresa, costo, precio in zip(servicios, empresas, costos, precios):
             if servicio.strip():  # Solo crear si hay nombre de servicio
                 LineaOtroServicio.objects.create(
                     documento=documento,
@@ -465,9 +445,7 @@ class DocumentoUpdateView(
         costos = self.request.POST.getlist("otro_costo[]")
         precios = self.request.POST.getlist("otro_precio[]")
 
-        for servicio, empresa, costo, precio in zip(
-            servicios, empresas, costos, precios
-        ):
+        for servicio, empresa, costo, precio in zip(servicios, empresas, costos, precios):
             if servicio.strip():  # Solo crear si hay nombre de servicio
                 LineaOtroServicio.objects.create(
                     documento=documento,
@@ -527,21 +505,14 @@ class DocumentoUpdateView(
             or 0
         )
 
-        sum_serv = (
-            doc.lineas_servicio.aggregate(total=Sum("precio_unitario"))["total"] or 0
-        )
+        sum_serv = doc.lineas_servicio.aggregate(total=Sum("precio_unitario"))["total"] or 0
 
-        sum_otros = (
-            doc.lineas_otro_servicio.aggregate(total=Sum("precio_cliente"))["total"]
-            or 0
-        )
+        sum_otros = doc.lineas_otro_servicio.aggregate(total=Sum("precio_cliente"))["total"] or 0
 
         subtotal = (sum_rep or 0) + (sum_serv or 0) + (sum_otros or 0)
 
         # País y reglas (del context processor que ya tienes)
-        tax_base = ctx.get(
-            "doc_tax_base", "parts_only"
-        )  # "parts_only" (CL) | "subtotal" (US)
+        tax_base = ctx.get("doc_tax_base", "parts_only")  # "parts_only" (CL) | "subtotal" (US)
         rate = Decimal(str(ctx.get("doc_tax_rate", 0.0)))  # 0.19 CL | ej. 0.08 US
         base = sum_rep if tax_base == "parts_only" else subtotal
         tax = round(base * rate, 2) if getattr(doc, "incluir_iva", True) else 0
@@ -552,9 +523,7 @@ class DocumentoUpdateView(
         for lr in doc.lineas_repuesto.all().select_related():
             repuestos.append(
                 {
-                    "codigo": (
-                        lr.repuesto.part_number if getattr(lr, "repuesto", None) else ""
-                    ),
+                    "codigo": (lr.repuesto.part_number if getattr(lr, "repuesto", None) else ""),
                     "nombre": lr.nombre,
                     "cantidad": lr.cantidad,
                     "precio": float(lr.precio_unitario),
@@ -579,9 +548,7 @@ class DocumentoUpdateView(
                     "empresa_externa": lo.empresa_externa or "",
                     "costo_interno": float(lo.costo_interno or 0),
                     "precio_cliente": float(lo.precio_cliente or 0),
-                    "ganancia": float(
-                        (lo.precio_cliente or 0) - (lo.costo_interno or 0)
-                    ),
+                    "ganancia": float((lo.precio_cliente or 0) - (lo.costo_interno or 0)),
                     "observaciones": getattr(lo, "observaciones", "") or "",
                 }
             )

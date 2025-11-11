@@ -35,21 +35,15 @@ class Migration(migrations.Migration):
         ),
         migrations.AddIndex(
             model_name="tecnico",
-            index=models.Index(
-                fields=["empresa", "activo"], name="taller_tecn_empresa_18446f_idx"
-            ),
+            index=models.Index(fields=["empresa", "activo"], name="taller_tecn_empresa_18446f_idx"),
         ),
         migrations.AddIndex(
             model_name="tecnico",
-            index=models.Index(
-                fields=["empresa", "rol"], name="taller_tecn_empresa_cb03e6_idx"
-            ),
+            index=models.Index(fields=["empresa", "rol"], name="taller_tecn_empresa_cb03e6_idx"),
         ),
         migrations.AddIndex(
             model_name="tecnico",
-            index=models.Index(
-                fields=["empresa", "nombre"], name="taller_tecn_empresa_8a1a48_idx"
-            ),
+            index=models.Index(fields=["empresa", "nombre"], name="taller_tecn_empresa_8a1a48_idx"),
         ),
         migrations.AddConstraint(
             model_name="tecnico",

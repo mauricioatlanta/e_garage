@@ -146,9 +146,7 @@ try:
             logo_files = os.listdir(logos_dir)
             print(f"✅ Directorio logos/ existe con {len(logo_files)} archivos")
             if logo_files:
-                print(
-                    f"   Archivos: {logo_files[:5]}{'...' if len(logo_files) > 5 else ''}"
-                )
+                print(f"   Archivos: {logo_files[:5]}{'...' if len(logo_files) > 5 else ''}")
         else:
             print("⚠️  Directorio logos/ no existe")
     else:

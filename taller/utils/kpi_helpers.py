@@ -122,9 +122,7 @@ class KPICalculator:
             LineaServicio.objects.filter(filtro)
             .annotate(monto=self.monto_calculado)
             .values("servicio__nombre")
-            .annotate(
-                total=Sum("monto"), cantidad_veces=Count("id"), promedio=Avg("monto")
-            )
+            .annotate(total=Sum("monto"), cantidad_veces=Count("id"), promedio=Avg("monto"))
             .order_by("-total")
         )
 
@@ -193,9 +191,7 @@ class KPICalculator:
 
         return (
             LineaServicio.objects.filter(filtro)
-            .annotate(
-                mes=TruncMonth("documento__fecha_emision"), monto=self.monto_calculado
-            )
+            .annotate(mes=TruncMonth("documento__fecha_emision"), monto=self.monto_calculado)
             .values("mes")
             .annotate(
                 total=Sum("monto"),
@@ -219,9 +215,7 @@ class KPICalculator:
 
         return (
             LineaServicio.objects.filter(filtro)
-            .annotate(
-                ano=TruncYear("documento__fecha_emision"), monto=self.monto_calculado
-            )
+            .annotate(ano=TruncYear("documento__fecha_emision"), monto=self.monto_calculado)
             .values("ano")
             .annotate(
                 total=Sum("monto"),
@@ -256,9 +250,7 @@ class KPICalculator:
             .order_by("-cantidad_documentos")[:limite]
         )
 
-    def get_vehiculos_mas_serviciados(
-        self, fecha_inicio=None, fecha_fin=None, limite=10
-    ):
+    def get_vehiculos_mas_serviciados(self, fecha_inicio=None, fecha_fin=None, limite=10):
         """
         KPI: Vehículos más serviciados.
         """

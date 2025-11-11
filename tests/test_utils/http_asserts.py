@@ -20,9 +20,7 @@ def assert_ok_or_redirect(resp, expected_redirect_suffix=None):
     if resp.status_code in (200, 201):
         return
 
-    assert (
-        resp.status_code == 302
-    ), f"Expected 200/201/302, got {resp.status_code}: {resp.content}"
+    assert resp.status_code == 302, f"Expected 200/201/302, got {resp.status_code}: {resp.content}"
 
     if expected_redirect_suffix:
         location = resp.headers.get("Location", "")
@@ -52,14 +50,10 @@ def assert_json_response(resp, expected_status_codes=(200, 201)):
     try:
         return resp.json()
     except ValueError as e:
-        raise AssertionError(
-            f"Response is not valid JSON: {e}. Content: {resp.content}"
-        )
+        raise AssertionError(f"Response is not valid JSON: {e}. Content: {resp.content}")
 
 
-def assert_redirect_preserves_querystring(
-    resp, expected_base_path, expected_params=None
-):
+def assert_redirect_preserves_querystring(resp, expected_base_path, expected_params=None):
     """
     Assert that a redirect preserves querystring parameters.
 

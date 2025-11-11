@@ -1251,10 +1251,6 @@ class Command(BaseCommand):
                         },
                     )
                     if created:
-                        self.stdout.write(
-                            f"✅ Modelo creado: {marca.nombre} {modelo.nombre}"
-                        )
+                        self.stdout.write(f"✅ Modelo creado: {marca.nombre} {modelo.nombre}")
             except MarcaVehiculo.DoesNotExist:
-                self.stdout.write(
-                    self.style.WARNING(f"⚠️ Marca no encontrada: {marca_nombre}")
-                )
+                self.stdout.write(self.style.WARNING(f"⚠️ Marca no encontrada: {marca_nombre}"))

@@ -39,9 +39,7 @@ def agregar_lineas_documentos():
     print(f"📄 Encontrados {documentos.count()} documentos")
 
     for doc in documentos:
-        print(
-            f"\n📋 Procesando documento: {doc.numero_documento} ({doc.get_tipo_display()})"
-        )
+        print(f"\n📋 Procesando documento: {doc.numero_documento} ({doc.get_tipo_display()})")
 
         # Verificar si ya tiene líneas
         if doc.lineas_repuesto.exists() or doc.lineas_servicio.exists():
@@ -241,9 +239,7 @@ def agregar_lineas_documentos():
     print(f"   🛠️ Líneas de servicios: {total_lineas_servicio}")
     print(f"   🏢 Líneas otros servicios: {total_lineas_otros}")
 
-    print(
-        "\n🎉 Ahora los documentos deberían mostrar los totales correctos en el listado!"
-    )
+    print("\n🎉 Ahora los documentos deberían mostrar los totales correctos en el listado!")
 
 
 if __name__ == "__main__":

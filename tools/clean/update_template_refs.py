@@ -146,17 +146,11 @@ def update_template_references(templates_dir, static_dir, manifest_file, dry_run
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Actualiza referencias a archivos estáticos"
-    )
+    parser = argparse.ArgumentParser(description="Actualiza referencias a archivos estáticos")
     parser.add_argument("--templates", required=True, help="Directorio de templates")
-    parser.add_argument(
-        "--static", required=True, help="Directorio de archivos estáticos"
-    )
+    parser.add_argument("--static", required=True, help="Directorio de archivos estáticos")
     parser.add_argument("--manifest", required=True, help="Archivo JSON de manifest")
-    parser.add_argument(
-        "--dry", action="store_true", help="Solo mostrar cambios sin aplicarlos"
-    )
+    parser.add_argument("--dry", action="store_true", help="Solo mostrar cambios sin aplicarlos")
 
     args = parser.parse_args()
     update_template_references(args.templates, args.static, args.manifest, args.dry)

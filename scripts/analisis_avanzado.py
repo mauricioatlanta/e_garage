@@ -57,9 +57,7 @@ def buscar_funciones_sin_login():
 
                     if not tiene_login and (es_api or es_autocomplete or maneja_datos):
                         # Verificar si es una función que necesita login
-                        funcion_completa = lines[
-                            start_line : min(len(lines), start_line + 20)
-                        ]
+                        funcion_completa = lines[start_line : min(len(lines), start_line + 20)]
                         func_content = "\n".join(funcion_completa)
 
                         if any(
@@ -120,16 +118,11 @@ def verificar_validacion_empresa():
 
                             tiene_objects = "objects." in func_content
                             valida_empresa = (
-                                "request.user.empresa" in func_content
-                                or "empresa=" in func_content
+                                "request.user.empresa" in func_content or "empresa=" in func_content
                             )
                             es_get_object = "get_object_or_404" in func_content
 
-                            if (
-                                tiene_objects
-                                and not valida_empresa
-                                and not es_get_object
-                            ):
+                            if tiene_objects and not valida_empresa and not es_get_object:
                                 # Verificar si maneja datos críticos
                                 if any(
                                     critical in func_content.lower()

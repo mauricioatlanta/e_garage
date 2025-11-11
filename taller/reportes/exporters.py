@@ -69,16 +69,12 @@ def generar_pdf_mecanico(mecanico_id, fecha_desde=None, fecha_hasta=None):
 
     servicios_top = (
         servicios.values("nombre")
-        .annotate(
-            cantidad=Count("id"), ingresos=Sum(F("precio_unitario") * F("cantidad"))
-        )
+        .annotate(cantidad=Count("id"), ingresos=Sum(F("precio_unitario") * F("cantidad")))
         .order_by("-cantidad")[:10]
     )
 
     docs_por_tipo = (
-        documentos.values("tipo_documento")
-        .annotate(cantidad=Count("id"))
-        .order_by("-cantidad")
+        documentos.values("tipo_documento").annotate(cantidad=Count("id")).order_by("-cantidad")
     )
 
     context = {
@@ -149,20 +145,13 @@ def exportar_csv_personalizado(mecanico_id=None, fecha_desde=None, fecha_hasta=N
     for documento in documentos_qs:
         servicios = LineaServicio.objects.filter(documento=documento)
         total = (
-            servicios.aggregate(total=Sum(F("precio_unitario") * F("cantidad"))).get(
-                "total"
-            )
-            or 0
+            servicios.aggregate(total=Sum(F("precio_unitario") * F("cantidad"))).get("total") or 0
         )
         servicios_nombres = ", ".join(servicios.values_list("nombre", flat=True)[:3])
 
         writer.writerow(
             [
-                (
-                    documento.fecha.strftime("%d/%m/%Y")
-                    if getattr(documento, "fecha", None)
-                    else ""
-                ),
+                (documento.fecha.strftime("%d/%m/%Y") if getattr(documento, "fecha", None) else ""),
                 (
                     documento.tecnico_responsable.nombre
                     if getattr(documento, "tecnico_responsable", None)
@@ -205,21 +194,17 @@ def generar_estadisticas_avanzadas(fecha_desde=None, fecha_hasta=None):
         total_docs = docs_mecanico.count()
         total_servicios = servicios_mecanico.count()
         total_generado = (
-            servicios_mecanico.aggregate(
-                total=Sum(F("precio_unitario") * F("cantidad"))
-            ).get("total")
+            servicios_mecanico.aggregate(total=Sum(F("precio_unitario") * F("cantidad"))).get(
+                "total"
+            )
             or 0
         )
 
         if total_docs > 0:
             promedio_doc = total_generado / total_docs
-            promedio_servicio = (
-                total_generado / total_servicios if total_servicios > 0 else 0
-            )
+            promedio_servicio = total_generado / total_servicios if total_servicios > 0 else 0
             servicios_unicos = servicios_mecanico.values("nombre").distinct().count()
-            tipos_docs = list(
-                docs_mecanico.values("tipo_documento").annotate(count=Count("id"))
-            )
+            tipos_docs = list(docs_mecanico.values("tipo_documento").annotate(count=Count("id")))
 
             estadisticas[mecanico.id] = {
                 "mecanico": mecanico.nombre,
@@ -230,9 +215,7 @@ def generar_estadisticas_avanzadas(fecha_desde=None, fecha_hasta=None):
                 "promedio_por_documento": round(promedio_doc, 0),
                 "promedio_por_servicio": round(promedio_servicio, 0),
                 "tipos_documentos": tipos_docs,
-                "eficiencia": round(
-                    (total_servicios / total_docs) if total_docs > 0 else 0, 2
-                ),
+                "eficiencia": round((total_servicios / total_docs) if total_docs > 0 else 0, 2),
             }
 
     return estadisticas
@@ -252,16 +235,11 @@ class ReporteMecanicoWhatsApp:
         )
         servicios = LineaServicio.objects.filter(documento__in=documentos)
         total_generado = (
-            servicios.aggregate(total=Sum(F("precio_unitario") * F("cantidad"))).get(
-                "total"
-            )
-            or 0
+            servicios.aggregate(total=Sum(F("precio_unitario") * F("cantidad"))).get("total") or 0
         )
 
         servicios_top = (
-            servicios.values("nombre")
-            .annotate(cantidad=Count("id"))
-            .order_by("-cantidad")[:3]
+            servicios.values("nombre").annotate(cantidad=Count("id")).order_by("-cantidad")[:3]
         )
 
         mensaje = [
@@ -276,10 +254,7 @@ class ReporteMecanicoWhatsApp:
         ]
 
         mensaje.extend(
-            [
-                f"{i+1}. {s['nombre']} ({s['cantidad']}x)"
-                for i, s in enumerate(servicios_top)
-            ]
+            [f"{i+1}. {s['nombre']} ({s['cantidad']}x)" for i, s in enumerate(servicios_top)]
         )
         mensaje.append("")
         mensaje.append("💪 ¡Sigue así!")
@@ -298,37 +273,26 @@ class ReporteMecanicoWhatsApp:
         )
         servicios = LineaServicio.objects.filter(documento__in=documentos)
         total_generado = (
-            servicios.aggregate(total=Sum(F("precio_unitario") * F("cantidad"))).get(
+            servicios.aggregate(total=Sum(F("precio_unitario") * F("cantidad"))).get("total") or 0
+        )
+
+        fecha_mes_anterior_inicio = (date.today() - timedelta(days=60)).strftime("%Y-%m-%d")
+        fecha_mes_anterior_fin = (date.today() - timedelta(days=30)).strftime("%Y-%m-%d")
+        documentos_anterior = Documento.objects.filter(
+            mecanico=mecanico,
+            fecha__range=[fecha_mes_anterior_inicio, fecha_mes_anterior_fin],
+        )
+        servicios_anterior = LineaServicio.objects.filter(documento__in=documentos_anterior)
+        total_anterior = (
+            servicios_anterior.aggregate(total=Sum(F("precio_unitario") * F("cantidad"))).get(
                 "total"
             )
             or 0
         )
 
-        fecha_mes_anterior_inicio = (date.today() - timedelta(days=60)).strftime(
-            "%Y-%m-%d"
-        )
-        fecha_mes_anterior_fin = (date.today() - timedelta(days=30)).strftime(
-            "%Y-%m-%d"
-        )
-        documentos_anterior = Documento.objects.filter(
-            mecanico=mecanico,
-            fecha__range=[fecha_mes_anterior_inicio, fecha_mes_anterior_fin],
-        )
-        servicios_anterior = LineaServicio.objects.filter(
-            documento__in=documentos_anterior
-        )
-        total_anterior = (
-            servicios_anterior.aggregate(
-                total=Sum(F("precio_unitario") * F("cantidad"))
-            ).get("total")
-            or 0
-        )
-
         crecimiento = 0
         if total_anterior > 0:
-            crecimiento = round(
-                ((total_generado - total_anterior) / total_anterior) * 100, 1
-            )
+            crecimiento = round(((total_generado - total_anterior) / total_anterior) * 100, 1)
 
         emoji_tendencia = "📈" if crecimiento > 0 else "📉" if crecimiento < 0 else "➡️"
 

@@ -131,9 +131,7 @@ class InformeEjecutivoPDF:
         story = []
 
         story.append(
-            Paragraph(
-                "🎯 INDICADORES CLAVE DE RENDIMIENTO", self.styles["SubtituloSeccion"]
-            )
+            Paragraph("🎯 INDICADORES CLAVE DE RENDIMIENTO", self.styles["SubtituloSeccion"])
         )
 
         # Crear tabla de KPIs en 2 columnas
@@ -218,11 +216,7 @@ class InformeEjecutivoPDF:
         """Crear tabla de ranking de servicios"""
         story = []
 
-        story.append(
-            Paragraph(
-                "🔧 TOP SERVICIOS MÁS DEMANDADOS", self.styles["SubtituloSeccion"]
-            )
-        )
+        story.append(Paragraph("🔧 TOP SERVICIOS MÁS DEMANDADOS", self.styles["SubtituloSeccion"]))
 
         # Datos de servicios (usar datos reales de self.datos['servicios_demandados'])
         servicios_data = [
@@ -234,9 +228,7 @@ class InformeEjecutivoPDF:
             ["Alineación y Balanceo", "25", "$375,000"],
         ]
 
-        servicios_table = Table(
-            servicios_data, colWidths=[2.5 * inch, 1 * inch, 1.5 * inch]
-        )
+        servicios_table = Table(servicios_data, colWidths=[2.5 * inch, 1 * inch, 1.5 * inch])
         servicios_table.setStyle(
             TableStyle(
                 [
@@ -269,11 +261,7 @@ class InformeEjecutivoPDF:
         """Crear tabla de ranking de clientes"""
         story = []
 
-        story.append(
-            Paragraph(
-                "👑 TOP CLIENTES POR FACTURACIÓN", self.styles["SubtituloSeccion"]
-            )
-        )
+        story.append(Paragraph("👑 TOP CLIENTES POR FACTURACIÓN", self.styles["SubtituloSeccion"]))
 
         clientes_data = [
             ["Cliente", "Servicios", "Facturación Total"],
@@ -284,9 +272,7 @@ class InformeEjecutivoPDF:
             ["Pedro Rodríguez", "6", "$87,000"],
         ]
 
-        clientes_table = Table(
-            clientes_data, colWidths=[2.5 * inch, 1 * inch, 1.5 * inch]
-        )
+        clientes_table = Table(clientes_data, colWidths=[2.5 * inch, 1 * inch, 1.5 * inch])
         clientes_table.setStyle(
             TableStyle(
                 [
@@ -320,9 +306,7 @@ class InformeEjecutivoPDF:
         story = []
 
         story.append(
-            Paragraph(
-                "🤖 PROYECCIÓN INTELIGENTE DEL MES", self.styles["SubtituloSeccion"]
-            )
+            Paragraph("🤖 PROYECCIÓN INTELIGENTE DEL MES", self.styles["SubtituloSeccion"])
         )
 
         # Calcular proyección basada en datos actuales
@@ -382,9 +366,7 @@ class InformeEjecutivoPDF:
         story.extend(self._crear_seccion_kpis())
 
         # Gráfico de facturación
-        story.append(
-            Paragraph("📈 TENDENCIA DE FACTURACIÓN", self.styles["SubtituloSeccion"])
-        )
+        story.append(Paragraph("📈 TENDENCIA DE FACTURACIÓN", self.styles["SubtituloSeccion"]))
         story.append(self._crear_grafico_facturacion())
         story.append(Spacer(1, 20))
 
@@ -396,9 +378,7 @@ class InformeEjecutivoPDF:
         story.extend(self._crear_proyeccion_mes())
 
         # Construir PDF
-        doc.build(
-            story, onFirstPage=self._crear_footer, onLaterPages=self._crear_footer
-        )
+        doc.build(story, onFirstPage=self._crear_footer, onLaterPages=self._crear_footer)
 
         # Retornar buffer
         self.buffer.seek(0)

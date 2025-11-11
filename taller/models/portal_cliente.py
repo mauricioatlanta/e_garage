@@ -10,12 +10,8 @@ from .vehiculos import Vehiculo
 class ClienteUsuario(models.Model):
     """Vinculación entre Cliente y User de Django para el portal"""
 
-    cliente = models.OneToOneField(
-        Cliente, on_delete=models.CASCADE, related_name="usuario_portal"
-    )
-    user = models.OneToOneField(
-        User, on_delete=models.CASCADE, related_name="cliente_portal"
-    )
+    cliente = models.OneToOneField(Cliente, on_delete=models.CASCADE, related_name="usuario_portal")
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="cliente_portal")
     fecha_registro = models.DateTimeField(auto_now_add=True)
     activo = models.BooleanField(default=True)
     ultimo_acceso = models.DateTimeField(null=True, blank=True)
@@ -80,14 +76,10 @@ class SolicitudPresupuesto(models.Model):
     presupuesto_estimado = models.DecimalField(
         max_digits=10, decimal_places=2, null=True, blank=True
     )
-    tiempo_estimado = models.CharField(
-        max_length=100, blank=True, help_text="Ej: 2-3 días"
-    )
+    tiempo_estimado = models.CharField(max_length=100, blank=True, help_text="Ej: 2-3 días")
     respuesta_taller = models.TextField(blank=True)
     fecha_respuesta = models.DateTimeField(null=True, blank=True)
-    usuario_respuesta = models.ForeignKey(
-        User, on_delete=models.SET_NULL, null=True, blank=True
-    )
+    usuario_respuesta = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
 
     # Documento generado (si se aprueba)
     documento_generado = models.ForeignKey(
@@ -118,16 +110,12 @@ class SolicitudPresupuesto(models.Model):
 class PortalConfiguracion(models.Model):
     """Configuración del portal de clientes por empresa"""
 
-    empresa = models.OneToOneField(
-        Empresa, on_delete=models.CASCADE, related_name="portal_config"
-    )
+    empresa = models.OneToOneField(Empresa, on_delete=models.CASCADE, related_name="portal_config")
 
     # Configuración general
     portal_activo = models.BooleanField(default=True)
     titulo_portal = models.CharField(max_length=100, default="Portal de Clientes")
-    mensaje_bienvenida = models.TextField(
-        default="Bienvenido a nuestro portal de clientes"
-    )
+    mensaje_bienvenida = models.TextField(default="Bienvenido a nuestro portal de clientes")
 
     # Funcionalidades habilitadas
     permitir_solicitud_presupuestos = models.BooleanField(default=True)

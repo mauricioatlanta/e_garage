@@ -13,9 +13,7 @@ class Command(BaseCommand):
         json_path = Path("data/regiones_y_ciudades_chile.json")
         if not json_path.exists():
             self.stdout.write(
-                self.style.ERROR(
-                    "❌ No se encontró el archivo regiones_y_ciudades_chile.json"
-                )
+                self.style.ERROR("❌ No se encontró el archivo regiones_y_ciudades_chile.json")
             )
             return
 
@@ -26,16 +24,12 @@ class Command(BaseCommand):
         nuevas_ciudades = 0
 
         for nombre_region, ciudades in datos.items():
-            region, region_creada = TallerRegion.objects.get_or_create(
-                nombre=nombre_region
-            )
+            region, region_creada = TallerRegion.objects.get_or_create(nombre=nombre_region)
             if region_creada:
                 nuevas_regiones += 1
 
             for ciudad in ciudades:
-                _, ciudad_creada = TallerCiudad.objects.get_or_create(
-                    nombre=ciudad, region=region
-                )
+                _, ciudad_creada = TallerCiudad.objects.get_or_create(nombre=ciudad, region=region)
                 if ciudad_creada:
                     nuevas_ciudades += 1
 

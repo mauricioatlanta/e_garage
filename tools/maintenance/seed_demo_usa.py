@@ -107,9 +107,7 @@ class Command(BaseCommand):
                     empresa=empresa,
                     nombre=name,
                     activo=True,
-                    especialidad=random.choice(
-                        ["General", "Engine", "Transmission", "Electrical"]
-                    ),
+                    especialidad=random.choice(["General", "Engine", "Transmission", "Electrical"]),
                 )
                 tecnicos.append(tecnico)
 
@@ -153,9 +151,7 @@ class Command(BaseCommand):
 
             try:
                 # Intentar obtener marcas y modelos existentes
-                marcas_disponibles = list(
-                    Marca.objects.all()[:10]
-                )  # Limitar a 10 para eficiencia
+                marcas_disponibles = list(Marca.objects.all()[:10])  # Limitar a 10 para eficiencia
                 if marcas_disponibles:
                     marca = random.choice(marcas_disponibles)
                     # Buscar modelos de esta marca
@@ -167,16 +163,12 @@ class Command(BaseCommand):
                         modelo = Modelo.objects.create(
                             marca=marca,
                             nombre="Demo Model",
-                            country=(
-                                marca.country if hasattr(marca, "country") else "US"
-                            ),
+                            country=(marca.country if hasattr(marca, "country") else "US"),
                         )
                 else:
                     # Si no hay marcas, crear una básica
                     marca = Marca.objects.create(nombre="Demo Brand", country="US")
-                    modelo = Modelo.objects.create(
-                        marca=marca, nombre="Demo Model", country="US"
-                    )
+                    modelo = Modelo.objects.create(marca=marca, nombre="Demo Model", country="US")
 
                 vehiculo = Vehiculo.objects.create(
                     empresa=empresa,
@@ -195,9 +187,7 @@ class Command(BaseCommand):
                 continue
 
             if (i + 1) % 20 == 0:
-                self.stdout.write(
-                    f"  📊 Created {len(vehiculos)}/{n_vehiculos} vehicles"
-                )
+                self.stdout.write(f"  📊 Created {len(vehiculos)}/{n_vehiculos} vehicles")
 
         # 8) Crear repuestos catálogo
         n_repuestos = 50 * options["n"]
@@ -298,9 +288,7 @@ class Command(BaseCommand):
         for empresa_ext in empresas_externas:
             for servicio_tipo in ["Standard Service", "Premium Service"]:
                 costo = Decimal(random.randrange(5000, 30000)) / 100
-                precio = (costo * Decimal(random.uniform(1.25, 1.5))).quantize(
-                    Decimal("0.01")
-                )
+                precio = (costo * Decimal(random.uniform(1.25, 1.5))).quantize(Decimal("0.01"))
 
                 servicio_externo = ServicioExterno.objects.create(
                     empresa=empresa,
@@ -353,25 +341,19 @@ class Command(BaseCommand):
             cliente = random.choice(clientes)
             vehiculos_cliente = [v for v in vehiculos if v.cliente_id == cliente.id]
             vehiculo = (
-                random.choice(vehiculos_cliente)
-                if vehiculos_cliente
-                else random.choice(vehiculos)
+                random.choice(vehiculos_cliente) if vehiculos_cliente else random.choice(vehiculos)
             )
 
             # Crear documento de manera básica evitando campos problemáticos
             try:
                 # Generar número secuencial manualmente
                 last_doc = (
-                    Documento.objects.filter(empresa=empresa, tipo=tipo)
-                    .order_by("-numero")
-                    .first()
+                    Documento.objects.filter(empresa=empresa, tipo=tipo).order_by("-numero").first()
                 )
                 numero = (last_doc.numero if last_doc and last_doc.numero else 0) + 1
 
                 fecha_emision = fecha_aleatoria()
-                total_ejemplo = (
-                    Decimal(random.randrange(5000, 50000)) / 100
-                )  # USD 50-500
+                total_ejemplo = Decimal(random.randrange(5000, 50000)) / 100  # USD 50-500
 
                 # Crear documento con campos mínimos
                 documento = Documento(
@@ -426,9 +408,7 @@ class Command(BaseCommand):
                 continue
 
             if (i + 1) % 10 == 0:
-                self.stdout.write(
-                    f"  📊 Created {i + 1}/{len(tipos_documentos)} documents"
-                )
+                self.stdout.write(f"  📊 Created {i + 1}/{len(tipos_documentos)} documents")
 
         # Resumen final
         self.stdout.write(self.style.SUCCESS("\n🎉 USA Demo Data Seeding Completed!"))

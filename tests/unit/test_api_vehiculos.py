@@ -18,9 +18,7 @@ class VehiculosAPITest(TestCase):
         self.client = Client()
 
         # Crear usuario y empresa
-        self.user = User.objects.create_user(
-            username="testuser_api", password="testpass"
-        )
+        self.user = User.objects.create_user(username="testuser_api", password="testpass")
         self.empresa = Empresa.objects.create(
             nombre_taller="Test Garage API", pais="CL", user=self.user
         )
@@ -101,9 +99,7 @@ class VehiculosAPITest(TestCase):
         # Datos de prueba
         data = {"nombre": "Test Modelo", "marca": "1"}
 
-        response = self.client.post(
-            url, data=json.dumps(data), content_type="application/json"
-        )
+        response = self.client.post(url, data=json.dumps(data), content_type="application/json")
 
         # Puede retornar 200, 201 (éxito) o 400 (datos inválidos)
         self.assertIn(response.status_code, [200, 201, 400])

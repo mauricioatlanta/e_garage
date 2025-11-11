@@ -64,9 +64,7 @@ def test_kpis_por_tecnico_con_coalesce_y_fecha_emision_only(django_user_model):
     )
 
     # Cálculo de KPIs usando Coalesce y solo fecha_emision
-    monto = ExpressionWrapper(
-        F("cantidad") * F("precio_unitario"), output_field=DecimalField()
-    )
+    monto = ExpressionWrapper(F("cantidad") * F("precio_unitario"), output_field=DecimalField())
 
     qs = (
         LineaServicio.objects.filter(
@@ -78,9 +76,7 @@ def test_kpis_por_tecnico_con_coalesce_y_fecha_emision_only(django_user_model):
     )
 
     # Esperado: solo el documento A suma bajo t1 (el documento B no tiene responsable)
-    totales_por_resp = {
-        row["documento__tecnico_responsable"]: row["total"] for row in qs
-    }
+    totales_por_resp = {row["documento__tecnico_responsable"]: row["total"] for row in qs}
     assert t1.id in totales_por_resp
     assert totales_por_resp[t1.id] == Decimal("2000")  # 2*1000 (solo del documento A)
 
@@ -129,9 +125,7 @@ def test_kpis_por_tecnico_solo_fecha_emision_sin_created_at(django_user_model):
     )
 
     # Query que usa solo fecha_emision (no created_at)
-    monto = ExpressionWrapper(
-        F("cantidad") * F("precio_unitario"), output_field=DecimalField()
-    )
+    monto = ExpressionWrapper(F("cantidad") * F("precio_unitario"), output_field=DecimalField())
 
     # Debe incluir el documento porque fecha_emision está en enero
     qs_enero = (
@@ -143,9 +137,7 @@ def test_kpis_por_tecnico_solo_fecha_emision_sin_created_at(django_user_model):
         .annotate(total=Sum(monto))
     )
 
-    totales_enero = {
-        row["documento__tecnico_responsable"]: row["total"] for row in qs_enero
-    }
+    totales_enero = {row["documento__tecnico_responsable"]: row["total"] for row in qs_enero}
     assert t1.id in totales_enero
     assert totales_enero[t1.id] == Decimal("1000")
 
@@ -159,7 +151,5 @@ def test_kpis_por_tecnico_solo_fecha_emision_sin_created_at(django_user_model):
         .annotate(total=Sum(monto))
     )
 
-    totales_febrero = {
-        row["documento__tecnico_responsable"]: row["total"] for row in qs_febrero
-    }
+    totales_febrero = {row["documento__tecnico_responsable"]: row["total"] for row in qs_febrero}
     assert t1.id not in totales_febrero or totales_febrero.get(t1.id, 0) == 0

@@ -73,9 +73,7 @@ from pathlib import Path
 
 # Crear directorio de logs si no existe
 logs_dir = (
-    Path("/opt/render/project/src/logs")
-    if os.path.exists("/opt/render")
-    else BASE_DIR / "logs"
+    Path("/opt/render/project/src/logs") if os.path.exists("/opt/render") else BASE_DIR / "logs"
 )
 logs_dir.mkdir(exist_ok=True)
 

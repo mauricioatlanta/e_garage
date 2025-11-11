@@ -15,23 +15,17 @@ def agregar_servicios_sql():
     try:
         with connection.cursor() as cursor:
             # Verificar que el documento 44 existe
-            cursor.execute(
-                "SELECT id, numero_documento FROM taller_documento WHERE id = 44"
-            )
+            cursor.execute("SELECT id, numero_documento FROM taller_documento WHERE id = 44")
             doc_result = cursor.fetchone()
 
             if not doc_result:
                 print("❌ Documento 44 no encontrado")
                 return False
 
-            print(
-                f"✅ Documento encontrado: ID {doc_result[0]}, Número: {doc_result[1]}"
-            )
+            print(f"✅ Documento encontrado: ID {doc_result[0]}, Número: {doc_result[1]}")
 
             # Verificar servicios existentes
-            cursor.execute(
-                "SELECT COUNT(*) FROM taller_lineaservicio WHERE documento_id = 44"
-            )
+            cursor.execute("SELECT COUNT(*) FROM taller_lineaservicio WHERE documento_id = 44")
             servicios_count = cursor.fetchone()[0]
             print(f"Servicios existentes: {servicios_count}")
 
@@ -59,9 +53,7 @@ def agregar_servicios_sql():
                 print("✅ Servicios agregados vía SQL")
 
             # Verificar otros servicios existentes
-            cursor.execute(
-                "SELECT COUNT(*) FROM taller_lineaotroservicio WHERE documento_id = 44"
-            )
+            cursor.execute("SELECT COUNT(*) FROM taller_lineaotroservicio WHERE documento_id = 44")
             otros_count = cursor.fetchone()[0]
             print(f"Otros servicios existentes: {otros_count}")
 
@@ -88,14 +80,10 @@ def agregar_servicios_sql():
                 print("✅ Otros servicios agregados vía SQL")
 
             # Verificar que las líneas fueron creadas
-            cursor.execute(
-                "SELECT COUNT(*) FROM taller_lineaservicio WHERE documento_id = 44"
-            )
+            cursor.execute("SELECT COUNT(*) FROM taller_lineaservicio WHERE documento_id = 44")
             servicios_final = cursor.fetchone()[0]
 
-            cursor.execute(
-                "SELECT COUNT(*) FROM taller_lineaotroservicio WHERE documento_id = 44"
-            )
+            cursor.execute("SELECT COUNT(*) FROM taller_lineaotroservicio WHERE documento_id = 44")
             otros_final = cursor.fetchone()[0]
 
             print("\n💰 RESULTADO FINAL:")

@@ -44,9 +44,7 @@ for i in range(2):
 doc1.neto_repuestos = total1
 doc1.total = total1
 doc1.save()
-print(
-    f"Doc1: {doc1.id} - {doc1.tipo} - {doc1.lineas_repuesto.count()} rep - ${doc1.total}"
-)
+print(f"Doc1: {doc1.id} - {doc1.tipo} - {doc1.lineas_repuesto.count()} rep - ${doc1.total}")
 
 # Documento 2: FAC con 3 repuestos
 doc2 = Documento.objects.create(
@@ -74,9 +72,7 @@ for rep in repuestos:
 doc2.neto_repuestos = total2
 doc2.total = total2
 doc2.save()
-print(
-    f"Doc2: {doc2.id} - {doc2.tipo} - {doc2.lineas_repuesto.count()} rep - ${doc2.total}"
-)
+print(f"Doc2: {doc2.id} - {doc2.tipo} - {doc2.lineas_repuesto.count()} rep - ${doc2.total}")
 
 # Documento 3: PRES con 1 repuesto
 doc3 = Documento.objects.create(
@@ -102,8 +98,6 @@ lr = LineaRepuesto.objects.create(
 doc3.neto_repuestos = rep.precio_venta
 doc3.total = rep.precio_venta
 doc3.save()
-print(
-    f"Doc3: {doc3.id} - {doc3.tipo} - {doc3.lineas_repuesto.count()} rep - ${doc3.total}"
-)
+print(f"Doc3: {doc3.id} - {doc3.tipo} - {doc3.lineas_repuesto.count()} rep - ${doc3.total}")
 
 print(f"Total documentos: {Documento.objects.filter(empresa=emp).count()}")

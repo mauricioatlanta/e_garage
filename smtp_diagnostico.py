@@ -47,9 +47,7 @@ results = []
 for port in PORTS:
     for user in USERS:
         for auth_method in AUTH_METHODS:
-            print(
-                f"\n--- Probando puerto {port} | usuario '{user}' | AUTH {auth_method} ---"
-            )
+            print(f"\n--- Probando puerto {port} | usuario '{user}' | AUTH {auth_method} ---")
             try:
                 if port == 465:
                     context = ssl.create_default_context()

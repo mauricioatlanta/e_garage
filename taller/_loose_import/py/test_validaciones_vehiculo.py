@@ -136,12 +136,8 @@ def test_manager_methods():
 
     # Test combinado
     print("\n3️⃣ Métodos combinados:")
-    vehiculos_combinado = Vehiculo.objects.de_empresa(empresa_usa).de_cliente(
-        cliente_usa.id
-    )
-    print(
-        f"   Vehículos de empresa USA y cliente {cliente_usa}: {vehiculos_combinado.count()}"
-    )
+    vehiculos_combinado = Vehiculo.objects.de_empresa(empresa_usa).de_cliente(cliente_usa.id)
+    print(f"   Vehículos de empresa USA y cliente {cliente_usa}: {vehiculos_combinado.count()}")
 
     # Test con_vin
     print("\n4️⃣ Método con_vin():")

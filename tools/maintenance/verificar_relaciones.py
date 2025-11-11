@@ -15,9 +15,7 @@ print("=== EMPRESAS Y DOCUMENTOS ===")
 for e in Empresa.objects.all():
     docs = Documento.objects.filter(empresa=e).count()
     user_info = e.user.username if e.user else "Sin usuario"
-    print(
-        f"Empresa {e.pk}: {e.nombre_taller} - {docs} documentos - Usuario: {user_info}"
-    )
+    print(f"Empresa {e.pk}: {e.nombre_taller} - {docs} documentos - Usuario: {user_info}")
 
 print("\n=== USUARIOS Y EMPRESAS ===")
 for u in User.objects.all():

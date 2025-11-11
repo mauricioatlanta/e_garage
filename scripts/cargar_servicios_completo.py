@@ -199,6 +199,4 @@ print(f"   Categorías: {total_categorias}")
 print(f"   Subcategorías: {total_subcategorias}")
 print(f"   Servicios: {total_servicios}")
 
-print(
-    f"\n✅ ¡{total_servicios} servicios organizados en {total_subcategorias} categorías!"
-)
+print(f"\n✅ ¡{total_servicios} servicios organizados en {total_subcategorias} categorías!")

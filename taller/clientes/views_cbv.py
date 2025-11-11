@@ -7,9 +7,7 @@ from taller.mixins import CountryLangTemplateMixin
 from taller.models.clientes import Cliente
 
 
-class ClienteListView(
-    CountryLangTemplateMixin, LoginRequiredMixin, TenantViewMixin, ListView
-):
+class ClienteListView(CountryLangTemplateMixin, LoginRequiredMixin, TenantViewMixin, ListView):
     model = Cliente
     paginate_by = 50
     ordering = ("apellido", "nombre", "id")
@@ -38,9 +36,7 @@ class ClienteListView(
         return qs
 
 
-class ClienteDetailView(
-    CountryLangTemplateMixin, LoginRequiredMixin, TenantViewMixin, DetailView
-):
+class ClienteDetailView(CountryLangTemplateMixin, LoginRequiredMixin, TenantViewMixin, DetailView):
     model = Cliente
     base_template_name = "clientes/ver_cliente.html"
 
@@ -48,18 +44,14 @@ class ClienteDetailView(
         return (
             super()
             .get_queryset()
-            .select_related(
-                "empresa", "estado_usa", "ciudad_usa", "region", "ciudad", "color"
-            )
+            .select_related("empresa", "estado_usa", "ciudad_usa", "region", "ciudad", "color")
         )
 
     def render_to_response(self, context, **response_kwargs):
         return self.render_country_lang(self.request, context)
 
 
-class ClienteCreateView(
-    CountryLangTemplateMixin, LoginRequiredMixin, TenantViewMixin, CreateView
-):
+class ClienteCreateView(CountryLangTemplateMixin, LoginRequiredMixin, TenantViewMixin, CreateView):
     def get_success_url(self):
         from django.urls import reverse
 
@@ -79,9 +71,7 @@ class ClienteCreateView(
             return super().form_valid(form)
         except IntegrityError as e:
             if "taller_cliente.empresa_id, taller_cliente.email" in str(e):
-                form.add_error(
-                    "email", "Ya existe un cliente con este email para esta empresa."
-                )
+                form.add_error("email", "Ya existe un cliente con este email para esta empresa.")
                 return self.form_invalid(form)
             raise
 
@@ -131,9 +121,7 @@ class ClienteCreateView(
         return self.render_country_lang(self.request, context)
 
 
-class ClienteUpdateView(
-    CountryLangTemplateMixin, LoginRequiredMixin, TenantViewMixin, UpdateView
-):
+class ClienteUpdateView(CountryLangTemplateMixin, LoginRequiredMixin, TenantViewMixin, UpdateView):
     model = Cliente
     form_class = None  # Se setea en get_form_class
     base_template_name = "clientes/cliente_form.html"

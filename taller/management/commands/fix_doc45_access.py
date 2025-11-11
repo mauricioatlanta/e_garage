@@ -5,9 +5,7 @@ from taller.documentos.models import Documento
 
 
 class Command(BaseCommand):
-    help = (
-        "Cambiar la contraseña del usuario test_diagnostic para acceder al documento 45"
-    )
+    help = "Cambiar la contraseña del usuario test_diagnostic para acceder al documento 45"
 
     def handle(self, *args, **options):
         username = "test_diagnostic"
@@ -18,9 +16,7 @@ class Command(BaseCommand):
             user.set_password(new_password)
             user.save()
 
-            self.stdout.write(
-                self.style.SUCCESS(f"✓ Contraseña cambiada para {username}")
-            )
+            self.stdout.write(self.style.SUCCESS(f"✓ Contraseña cambiada para {username}"))
             self.stdout.write(f"Nueva contraseña: {new_password}")
             self.stdout.write(f"Empresa: {user.empresa.nombre_taller}")
 
@@ -30,9 +26,7 @@ class Command(BaseCommand):
 
             if docs.exists():
                 for doc in docs[:5]:
-                    self.stdout.write(
-                        f"- Documento {doc.id}: {doc.tipo} ({doc.estado})"
-                    )
+                    self.stdout.write(f"- Documento {doc.id}: {doc.tipo} ({doc.estado})")
 
             self.stdout.write("\nPara acceder al documento 45:")
             self.stdout.write("1. Ve a http://127.0.0.1:8000/us/accounts/login/")

@@ -21,9 +21,7 @@ def normalize_search_term(term):
 
     # Remover stopwords comunes
     stopwords = {"de", "del", "la", "el", "en", "y", "a", "con", "para", "por"}
-    words = [
-        word for word in normalized.split() if word not in stopwords and len(word) > 1
-    ]
+    words = [word for word in normalized.split() if word not in stopwords and len(word) > 1]
 
     return " ".join(words)
 
@@ -66,21 +64,13 @@ class ServiceSearchEngine:
         # 2. Búsqueda por prefijo en labels
         prefix_matches = self._search_prefix_labels(normalized_query)
         results.extend(
-            [
-                (service, 80)
-                for service in prefix_matches
-                if service not in [r[0] for r in results]
-            ]
+            [(service, 80) for service in prefix_matches if service not in [r[0] for r in results]]
         )
 
         # 3. Búsqueda en aliases
         alias_matches = self._search_aliases(normalized_query)
         results.extend(
-            [
-                (service, 70)
-                for service in alias_matches
-                if service not in [r[0] for r in results]
-            ]
+            [(service, 70) for service in alias_matches if service not in [r[0] for r in results]]
         )
 
         # 4. Búsqueda fuzzy
@@ -148,9 +138,7 @@ class ServiceSearchEngine:
 
         for service_name in service_names:
             # Comparar con label principal
-            similarity = calculate_similarity(
-                query, normalize_search_term(service_name.label)
-            )
+            similarity = calculate_similarity(query, normalize_search_term(service_name.label))
             if similarity >= min_similarity:
                 services_with_scores.append(
                     (service_name.servicio, int(similarity * 60))
@@ -222,9 +210,7 @@ def get_service_autocomplete_data(country="CL", language="es", category_id=None)
                 "aliases": aliases,
                 "category": service.subcategoria.categoria.get_label(language),
                 "subcategory": service.subcategoria.get_label(language),
-                "precio_base": (
-                    float(service.precio_base) if service.precio_base else None
-                ),
+                "precio_base": (float(service.precio_base) if service.precio_base else None),
             }
         )
 

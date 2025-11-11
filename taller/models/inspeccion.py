@@ -5,9 +5,7 @@ from taller.models.vehiculos import Vehiculo
 
 
 class Inspeccion(models.Model):
-    empresa = models.ForeignKey(
-        Empresa, on_delete=models.CASCADE
-    )  # Multiempresa obligatorio
+    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE)  # Multiempresa obligatorio
     vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE)
     detalle = models.TextField(blank=True, null=True)
     estado = models.CharField(max_length=50, default="pendiente")

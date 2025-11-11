@@ -12,8 +12,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="documento",
             name="numero_documento_db",
-            field=models.CharField(
-                blank=True, db_index=True, default="", max_length=32
-            ),
+            field=models.CharField(blank=True, db_index=True, default="", max_length=32),
         ),
     ]

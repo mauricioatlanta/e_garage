@@ -102,21 +102,15 @@ def obtener_modelos(request):
                 if CatalogoModeloAuto:
                     modelos = CatalogoModeloAuto.get_modelos_por_marca(marca_id)
                     # Convertir a formato compatible con la API
-                    modelos_data = [
-                        {"id": modelo, "nombre": modelo} for modelo in modelos
-                    ]
-                    print(
-                        f"[DEBUG API] Retornando {len(modelos_data)} modelos del catálogo USA"
-                    )
+                    modelos_data = [{"id": modelo, "nombre": modelo} for modelo in modelos]
+                    print(f"[DEBUG API] Retornando {len(modelos_data)} modelos del catálogo USA")
                     return JsonResponse(modelos_data, safe=False)
             except ImportError:
                 print("[DEBUG API] No se puede importar CatalogoModeloAuto")
                 pass
 
             # Si no se puede usar el catálogo, retornar lista vacía
-            print(
-                "[DEBUG API] No se pudo obtener modelos del catálogo, retornando lista vacía"
-            )
+            print("[DEBUG API] No se pudo obtener modelos del catálogo, retornando lista vacía")
             return JsonResponse([], safe=False)
 
     if q:
@@ -127,8 +121,7 @@ def obtener_modelos(request):
     print(f"[DEBUG API] Query final count: {modelos_qs.count()}")
 
     modelos = [
-        {"id": getattr(m, "id", None), "nombre": getattr(m, "nombre", "")}
-        for m in modelos_qs
+        {"id": getattr(m, "id", None), "nombre": getattr(m, "nombre", "")} for m in modelos_qs
     ]
     print(f"[DEBUG API] Retornando {len(modelos)} modelos: {modelos[:3]}...")
 
@@ -159,16 +152,12 @@ def crear_modelo(request):
         # Verificar que el modelo no existe ya para esta marca
         if Modelo.objects.filter(marca=marca, nombre__iexact=nombre).exists():
             return JsonResponse(
-                {
-                    "error": f'El modelo "{nombre}" ya existe para la marca "{marca.nombre}"'
-                },
+                {"error": f'El modelo "{nombre}" ya existe para la marca "{marca.nombre}"'},
                 status=400,
             )
 
         # Crear el nuevo modelo
-        modelo = Modelo.objects.create(
-            nombre=nombre, marca=marca, country=marca.country
-        )
+        modelo = Modelo.objects.create(nombre=nombre, marca=marca, country=marca.country)
 
         return JsonResponse(
             {

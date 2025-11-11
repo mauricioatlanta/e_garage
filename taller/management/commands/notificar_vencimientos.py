@@ -91,9 +91,7 @@ Equipo eGarage
 
             except Exception as e:
                 self.stdout.write(
-                    self.style.ERROR(
-                        f"Error enviando email a {empresa.nombre_taller}: {e}"
-                    )
+                    self.style.ERROR(f"Error enviando email a {empresa.nombre_taller}: {e}")
                 )
 
         return count
@@ -144,9 +142,7 @@ Equipo eGarage
 
             except Exception as e:
                 self.stdout.write(
-                    self.style.ERROR(
-                        f"Error enviando email a {empresa.nombre_taller}: {e}"
-                    )
+                    self.style.ERROR(f"Error enviando email a {empresa.nombre_taller}: {e}")
                 )
 
         return count
@@ -197,9 +193,7 @@ Equipo eGarage
 
             except Exception as e:
                 self.stdout.write(
-                    self.style.ERROR(
-                        f"Error enviando email a {empresa.nombre_taller}: {e}"
-                    )
+                    self.style.ERROR(f"Error enviando email a {empresa.nombre_taller}: {e}")
                 )
 
         return count

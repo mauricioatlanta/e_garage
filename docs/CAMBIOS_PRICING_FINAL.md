@@ -287,3 +287,4 @@ setLanguage(savedLang);
 **Estado:** ✅ LISTO PARA USAR
 
 🎊 **¡Página de pricing completamente renovada!**
+

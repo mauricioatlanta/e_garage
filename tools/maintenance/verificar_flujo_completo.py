@@ -21,9 +21,7 @@ except Exception as e:
 
 # Verificar URL de edición
 try:
-    editar_url = reverse(
-        "documentos:editar_documento_nuevo", kwargs={"documento_id": 107}
-    )
+    editar_url = reverse("documentos:editar_documento_nuevo", kwargs={"documento_id": 107})
     print(f"✅ URL edición: {editar_url}")
 except Exception as e:
     print(f"❌ Error URL edición: {e}")
@@ -31,9 +29,7 @@ except Exception as e:
 # Simular redirección
 try:
     redirect_response = redirect("documentos:lista_documentos")
-    print(
-        f"✅ Redirección simulada: {redirect_response.status_code} -> {redirect_response.url}"
-    )
+    print(f"✅ Redirección simulada: {redirect_response.status_code} -> {redirect_response.url}")
 except Exception as e:
     print(f"❌ Error redirección: {e}")
 

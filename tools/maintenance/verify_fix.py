@@ -29,6 +29,4 @@ try:
 except Exception as e:
     print(f"❌ Error al acceder al modelo PerfilUsuario: {e}")
 
-print(
-    "\n✅ Verificación completada. La tabla taller_perfilusuario está funcionando correctamente."
-)
+print("\n✅ Verificación completada. La tabla taller_perfilusuario está funcionando correctamente.")

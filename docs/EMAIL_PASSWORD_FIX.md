@@ -104,3 +104,4 @@ Al crear cuentas de email para aplicaciones Django/Python:
 ---
 
 **Nota:** Este es un problema conocido de Python's `smtplib` que no soporta autenticación con passwords UTF-8. No es un bug de Django ni de eGarage, sino una limitación del protocolo SMTP AUTH PLAIN.
+

@@ -65,8 +65,7 @@ class Command(BaseCommand):
             tecnicos_activos = calculator.get_tecnicos_mas_activos()
             for tecnico in tecnicos_activos:
                 self.stdout.write(
-                    f"   - {tecnico.nombre}: "
-                    f"{tecnico.cantidad_documentos} documentos"
+                    f"   - {tecnico.nombre}: " f"{tecnico.cantidad_documentos} documentos"
                 )
 
             # KPI 5: Rendimiento mensual

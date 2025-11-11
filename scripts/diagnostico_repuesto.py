@@ -39,15 +39,11 @@ def test_precio_cleaning():
 
     for input_value, expected in test_cases:
         # Simular la lógica del método clean_precio_*
-        limpio = (
-            str(input_value).replace("$", "").replace(".", "").replace(",", "").strip()
-        )
+        limpio = str(input_value).replace("$", "").replace(".", "").replace(",", "").strip()
         try:
             result = int(limpio)
             status = "✓ PASS" if result == expected else "❌ FAIL"
-            print(
-                f"{status} | Input: '{input_value}' -> Output: {result} (Esperado: {expected})"
-            )
+            print(f"{status} | Input: '{input_value}' -> Output: {result} (Esperado: {expected})")
         except ValueError as e:
             print(f"❌ ERROR | Input: '{input_value}' -> Error: {e}")
 
@@ -79,11 +75,7 @@ def test_form_validation():
     # Precio de compra
     precio_compra_raw = form_data["precio_compra"]
     precio_compra_clean = (
-        str(precio_compra_raw)
-        .replace("$", "")
-        .replace(".", "")
-        .replace(",", "")
-        .strip()
+        str(precio_compra_raw).replace("$", "").replace(".", "").replace(",", "").strip()
     )
     precio_compra = int(precio_compra_clean)
     print(f"  precio_compra: '{precio_compra_raw}' -> {precio_compra}")

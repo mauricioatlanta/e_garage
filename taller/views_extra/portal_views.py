@@ -48,9 +48,7 @@ def portal_login(request):
                 return render(request, "portal/login.html")
 
             # Autenticar
-            user = authenticate(
-                request, username=cliente_usuario.user.username, password=password
-            )
+            user = authenticate(request, username=cliente_usuario.user.username, password=password)
             if user:
                 login(request, user)
 
@@ -86,9 +84,7 @@ def portal_dashboard(request):
         cliente = cliente_usuario.cliente
 
         # Obtener configuración del portal
-        portal_config = PortalConfiguracion.objects.filter(
-            empresa=cliente.empresa
-        ).first()
+        portal_config = PortalConfiguracion.objects.filter(empresa=cliente.empresa).first()
 
         # Estadísticas básicas
         vehiculos = Vehiculo.objects.filter(id_cliente=cliente)
@@ -269,9 +265,7 @@ def portal_mis_solicitudes(request):
         cliente = cliente_usuario.cliente
 
         # Obtener solicitudes
-        solicitudes = SolicitudPresupuesto.objects.filter(cliente=cliente).order_by(
-            "-created_at"
-        )
+        solicitudes = SolicitudPresupuesto.objects.filter(cliente=cliente).order_by("-created_at")
 
         # Paginación
         paginator = Paginator(solicitudes, 10)

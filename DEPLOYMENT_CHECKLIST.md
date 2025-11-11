@@ -198,3 +198,4 @@ PC (Desarrollo)  →  Git (GitHub/GitLab)  →  Servidor (PythonAnywhere)
 
 **Última actualización**: $(date)
 **Mantenido por**: Tu equipo
+

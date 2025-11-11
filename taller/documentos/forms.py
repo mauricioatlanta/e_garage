@@ -46,11 +46,7 @@ class DocumentoForm(forms.ModelForm):
         empresa = self.empresa or (getattr(self.user, "empresa", None))
 
         # Normaliza namespace de país para URLs DAL
-        ns = (
-            "usa_autocomplete"
-            if (self.country or "").upper() == "US"
-            else "cl_autocomplete"
-        )
+        ns = "usa_autocomplete" if (self.country or "").upper() == "US" else "cl_autocomplete"
         self.fields["cliente"].widget.url = f"{ns}:cliente"
         self.fields["vehiculo"].widget.url = f"{ns}:vehiculo"
 
@@ -82,12 +78,8 @@ class DocumentoForm(forms.ModelForm):
             if "numero" in self.fields:
                 self.fields["numero"].label = "Number"
             # Placeholders
-            self.fields["cliente"].widget.attrs[
-                "data-placeholder"
-            ] = "🔍 Search customer..."
-            self.fields["vehiculo"].widget.attrs[
-                "data-placeholder"
-            ] = "🔍 Search vehicle..."
+            self.fields["cliente"].widget.attrs["data-placeholder"] = "🔍 Search customer..."
+            self.fields["vehiculo"].widget.attrs["data-placeholder"] = "🔍 Search vehicle..."
         else:
             if "tipo" in self.fields:
                 self.fields["tipo"].label = "Tipo de Documento"
@@ -115,24 +107,16 @@ class DocumentoForm(forms.ModelForm):
             if "numero" in self.fields:
                 self.fields["numero"].label = "Número"
             # Placeholders
-            self.fields["cliente"].widget.attrs[
-                "data-placeholder"
-            ] = "🔍 Buscar cliente..."
-            self.fields["vehiculo"].widget.attrs[
-                "data-placeholder"
-            ] = "🔍 Buscar vehículo..."
+            self.fields["cliente"].widget.attrs["data-placeholder"] = "🔍 Buscar cliente..."
+            self.fields["vehiculo"].widget.attrs["data-placeholder"] = "🔍 Buscar vehículo..."
 
         # Asegurar IDs únicos para JavaScript
         self.fields["tipo"].widget.attrs.setdefault("id", "id_tipo")
-        self.fields["numero_documento"].widget.attrs.setdefault(
-            "id", "id_numero_documento"
-        )
+        self.fields["numero_documento"].widget.attrs.setdefault("id", "id_numero_documento")
         self.fields["fecha_emision"].widget.attrs.setdefault("id", "id_fecha_emision")
         self.fields["cliente"].widget.attrs.setdefault("id", "id_cliente")
         self.fields["vehiculo"].widget.attrs.setdefault("id", "id_vehiculo")
-        self.fields["tecnico_responsable"].widget.attrs.setdefault(
-            "id", "id_tecnico_responsable"
-        )
+        self.fields["tecnico_responsable"].widget.attrs.setdefault("id", "id_tecnico_responsable")
         self.fields["kilometraje"].widget.attrs.setdefault("id", "id_kilometraje")
         self.fields["estado_pago"].widget.attrs.setdefault("id", "id_estado_pago")
         self.fields["observaciones"].widget.attrs.setdefault("id", "id_observaciones")
@@ -151,14 +135,10 @@ class DocumentoForm(forms.ModelForm):
 
             # Cliente: si hay instance o POST, incluye el seleccionado
             qs_cli = Cliente.objects.filter(empresa=empresa)
-            cliente_id = self.data.get("cliente") or getattr(
-                self.instance, "cliente_id", None
-            )
+            cliente_id = self.data.get("cliente") or getattr(self.instance, "cliente_id", None)
             if cliente_id:
                 try:
-                    qs_cli = qs_cli | Cliente.objects.filter(
-                        pk=int(cliente_id), empresa=empresa
-                    )
+                    qs_cli = qs_cli | Cliente.objects.filter(pk=int(cliente_id), empresa=empresa)
                 except (ValueError, TypeError):
                     pass
             self.fields["cliente"].queryset = qs_cli.distinct()
@@ -173,9 +153,7 @@ class DocumentoForm(forms.ModelForm):
             else:
                 # si venía un vehiculo en instance, inclúyelo para renderizar
                 if getattr(self.instance, "vehiculo_id", None):
-                    qs_veh = Vehiculo.objects.filter(
-                        pk=self.instance.vehiculo_id, empresa=empresa
-                    )
+                    qs_veh = Vehiculo.objects.filter(pk=self.instance.vehiculo_id, empresa=empresa)
             self.fields["vehiculo"].queryset = qs_veh.distinct()
         else:
             # sin empresa -> nada visible
@@ -220,15 +198,9 @@ class DocumentoForm(forms.ModelForm):
             "pagado",
         ]
         widgets = {
-            "numero": forms.TextInput(
-                attrs={"class": "form-control", "readonly": "readonly"}
-            ),
-            "fecha_emision": forms.DateInput(
-                attrs={"class": "form-control", "type": "date"}
-            ),
-            "observaciones": forms.Textarea(
-                attrs={"class": "form-control", "rows": "4"}
-            ),
+            "numero": forms.TextInput(attrs={"class": "form-control", "readonly": "readonly"}),
+            "fecha_emision": forms.DateInput(attrs={"class": "form-control", "type": "date"}),
+            "observaciones": forms.Textarea(attrs={"class": "form-control", "rows": "4"}),
             "estado_pago": forms.Select(attrs={"class": "form-control"}),
             "pagado": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }

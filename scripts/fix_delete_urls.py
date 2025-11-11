@@ -15,9 +15,7 @@ def fix_delete_urls_in_file(file_path):
 
         # Patrón para encontrar la URL incorrecta
         old_pattern = r"{% url 'taller:clientes:delete' pk=cliente\.pk %}"
-        new_pattern = (
-            "{% url 'taller:clientes:eliminar_cliente' cliente_id=cliente.pk %}"
-        )
+        new_pattern = "{% url 'taller:clientes:eliminar_cliente' cliente_id=cliente.pk %}"
 
         # Reemplazar si existe el patrón
         if re.search(old_pattern, content):
@@ -84,9 +82,7 @@ def main():
     print(f"   • Archivos corregidos: {corrected_count}")
     print(f"   • Archivos sin cambios: {total_files - corrected_count}")
     print("\n✅ CORRECCIÓN COMPLETADA!")
-    print(
-        "   Las URLs de eliminación ahora usan 'eliminar_cliente' en lugar de 'delete'"
-    )
+    print("   Las URLs de eliminación ahora usan 'eliminar_cliente' en lugar de 'delete'")
 
 
 if __name__ == "__main__":

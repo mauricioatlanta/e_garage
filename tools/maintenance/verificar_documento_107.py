@@ -20,9 +20,7 @@ if user:
         documentos = Documento.objects.filter(empresa=empresa).order_by("-id")[:10]
         print(f"📄 Últimos 10 documentos de {empresa.nombre_taller}:")
         for doc in documentos:
-            print(
-                f"   ID: {doc.id} - {doc.numero_documento} ({doc.tipo_documento}) - {doc.fecha}"
-            )
+            print(f"   ID: {doc.id} - {doc.numero_documento} ({doc.tipo_documento}) - {doc.fecha}")
 
         # Buscar documento 107 específicamente
         try:

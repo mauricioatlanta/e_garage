@@ -60,9 +60,7 @@ try:
         user = users.first()
         try:
             empresa = user.empresa
-            print(
-                f"\n🎯 Creando documento de prueba para {user.username} en {empresa.nombre}..."
-            )
+            print(f"\n🎯 Creando documento de prueba para {user.username} en {empresa.nombre}...")
 
             # Buscar o crear cliente
             cliente, created = Cliente.objects.get_or_create(
@@ -83,9 +81,7 @@ try:
                 descuento=Decimal("0.00"),
                 tax_rate_applied=Decimal("19.00"),
             )
-            print(
-                f"✅ Documento {documento.numero} creado para empresa {empresa.nombre}"
-            )
+            print(f"✅ Documento {documento.numero} creado para empresa {empresa.nombre}")
 
             # Agregar líneas de repuestos
             LineaRepuesto.objects.create(

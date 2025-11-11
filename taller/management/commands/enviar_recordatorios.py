@@ -30,17 +30,13 @@ class Command(BaseCommand):
             help="Días antes del vencimiento para enviar recordatorio (default: 7)",
         )
 
-        parser.add_argument(
-            "--dry-run", action="store_true", help="Simular sin enviar emails"
-        )
+        parser.add_argument("--dry-run", action="store_true", help="Simular sin enviar emails")
 
     def handle(self, *args, **options):
         dias_adelanto = options["dias"]
         dry_run = options["dry_run"]
 
-        self.stdout.write(
-            f"🔍 Buscando suscripciones que vencen en {dias_adelanto} días..."
-        )
+        self.stdout.write(f"🔍 Buscando suscripciones que vencen en {dias_adelanto} días...")
 
         # Fecha objetivo (ej: dentro de 7 días)
         fecha_objetivo = timezone.now() + timedelta(days=dias_adelanto)
@@ -58,9 +54,7 @@ class Command(BaseCommand):
         self.stdout.write(f"📊 Encontradas {total} empresas")
 
         if total == 0:
-            self.stdout.write(
-                self.style.SUCCESS("✅ No hay recordatorios para enviar hoy")
-            )
+            self.stdout.write(self.style.SUCCESS("✅ No hay recordatorios para enviar hoy"))
             return
 
         enviados = 0
@@ -89,9 +83,7 @@ class Command(BaseCommand):
                 if language == "en":
                     subject = f"⏰ Your subscription expires in {dias_restantes} days - eGarage"
                 else:
-                    subject = (
-                        f"⏰ Tu suscripción vence en {dias_restantes} días - eGarage"
-                    )
+                    subject = f"⏰ Tu suscripción vence en {dias_restantes} días - eGarage"
 
                 if dry_run:
                     self.stdout.write(
@@ -117,9 +109,7 @@ class Command(BaseCommand):
                 enviados += 1
 
             except Exception as e:
-                self.stdout.write(
-                    self.style.ERROR(f"❌ Error con {empresa.email}: {str(e)}")
-                )
+                self.stdout.write(self.style.ERROR(f"❌ Error con {empresa.email}: {str(e)}"))
                 errores += 1
 
         # Resumen
@@ -130,10 +120,6 @@ class Command(BaseCommand):
         self.stdout.write(f"   ❌ Errores: {errores}")
 
         if dry_run:
-            self.stdout.write(
-                self.style.WARNING("\n⚠️  Modo DRY-RUN: No se enviaron emails reales")
-            )
+            self.stdout.write(self.style.WARNING("\n⚠️  Modo DRY-RUN: No se enviaron emails reales"))
         else:
-            self.stdout.write(
-                self.style.SUCCESS("\n✅ Recordatorios enviados exitosamente")
-            )
+            self.stdout.write(self.style.SUCCESS("\n✅ Recordatorios enviados exitosamente"))

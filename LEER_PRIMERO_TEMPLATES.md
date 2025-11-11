@@ -183,3 +183,4 @@ Tu estructura de templates está ahora:
 ---
 
 **Para más información, consulta:** `TEMPLATES_ORGANIZACION_RESUMEN.md`
+

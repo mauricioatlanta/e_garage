@@ -51,20 +51,14 @@ def company_settings_view(request):
                     )
                     # Mensaje en español para Chile, inglés para USA
                     if empresa.pais == "CL":
-                        messages.success(
-                            request, f"✅ Técnico '{nombre}' creado exitosamente."
-                        )
+                        messages.success(request, f"✅ Técnico '{nombre}' creado exitosamente.")
                     else:
-                        messages.success(
-                            request, f"✅ Technician '{nombre}' created successfully."
-                        )
+                        messages.success(request, f"✅ Technician '{nombre}' created successfully.")
                 except Exception as e:
                     if empresa.pais == "CL":
                         messages.error(request, f"❌ Error al crear técnico: {str(e)}")
                     else:
-                        messages.error(
-                            request, f"❌ Error creating technician: {str(e)}"
-                        )
+                        messages.error(request, f"❌ Error creating technician: {str(e)}")
             else:
                 if empresa.pais == "CL":
                     messages.error(request, "❌ El nombre del técnico es obligatorio.")
@@ -162,13 +156,9 @@ def company_settings_view(request):
                     return redirect(request.path)
                 except Exception as e:
                     if empresa.pais == "CL":
-                        messages.error(
-                            request, f"❌ Error al guardar la configuración: {str(e)}"
-                        )
+                        messages.error(request, f"❌ Error al guardar la configuración: {str(e)}")
                     else:
-                        messages.error(
-                            request, f"❌ Error saving configuration: {str(e)}"
-                        )
+                        messages.error(request, f"❌ Error saving configuration: {str(e)}")
             else:
                 # Mostrar errores específicos del formulario
                 error_messages = []

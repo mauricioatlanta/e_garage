@@ -20,9 +20,7 @@ def test_country_url_migration_edge_cases():
     # Create empresa for the user
     from taller.models.empresa import Empresa
 
-    empresa = Empresa.objects.create(
-        user=user, nombre_taller="Test Migration", pais="CL"
-    )
+    empresa = Empresa.objects.create(user=user, nombre_taller="Test Migration", pais="CL")
 
     middleware = CountryUrlMigrationMiddleware(lambda r: None)
     factory = RequestFactory()
@@ -66,9 +64,7 @@ def test_country_url_migration_edge_cases():
         else:
             # Should redirect
             assert response is not None, f"Failed for {description}: should redirect"
-            assert (
-                response.status_code == 302
-            ), f"Failed for {description}: should be 302 redirect"
+            assert response.status_code == 302, f"Failed for {description}: should be 302 redirect"
             assert (
                 response.url == expected_redirect
             ), f"Failed for {description}: expected {expected_redirect}, got {response.url}"

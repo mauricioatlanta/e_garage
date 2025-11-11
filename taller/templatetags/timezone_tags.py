@@ -92,9 +92,7 @@ def timezone_widget(empresa):
         return {
             "timezone_display": empresa.timezone_display,
             "current_time": empresa.now_local(),
-            "formatted_time": empresa.format_local_datetime(
-                empresa.now_local(), "full"
-            ),
+            "formatted_time": empresa.format_local_datetime(empresa.now_local(), "full"),
         }
     except:
         return {"timezone_display": "UTC", "current_time": timezone.now()}

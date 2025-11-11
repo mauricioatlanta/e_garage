@@ -28,9 +28,7 @@ class RepuestoForm(forms.ModelForm):
             self.fields["categoria"].help_text = "Part category"
 
             self.fields["precio_compra"].label = "Purchase Price"
-            self.fields["precio_compra"].help_text = (
-                "Price at which you bought the part"
-            )
+            self.fields["precio_compra"].help_text = "Price at which you bought the part"
 
             self.fields["precio_venta"].label = "Sale Price"
             self.fields["precio_venta"].help_text = "Price at which you sell the part"
@@ -71,9 +69,7 @@ class RepuestoForm(forms.ModelForm):
             self.fields["categoria"].help_text = "Categoría de la parte"
 
             self.fields["precio_compra"].label = "Precio de Compra"
-            self.fields["precio_compra"].help_text = (
-                "Precio al que compraste el repuesto"
-            )
+            self.fields["precio_compra"].help_text = "Precio al que compraste el repuesto"
 
             self.fields["precio_venta"].label = "Precio de Venta"
             self.fields["precio_venta"].help_text = "Precio al que vendes el repuesto"
@@ -176,9 +172,7 @@ class RepuestoForm(forms.ModelForm):
             # Verificar que no tenga más de 2 decimales
             if decimal_valor.as_tuple().exponent < -2:
                 is_english = (
-                    self.user
-                    and hasattr(self.user, "empresa")
-                    and self.user.empresa.pais == "US"
+                    self.user and hasattr(self.user, "empresa") and self.user.empresa.pais == "US"
                 )
                 error_msg = (
                     "Ensure that there are no more than 2 decimal places."
@@ -190,9 +184,7 @@ class RepuestoForm(forms.ModelForm):
             return decimal_valor
         except (ValueError, TypeError, InvalidOperation):
             is_english = (
-                self.user
-                and hasattr(self.user, "empresa")
-                and self.user.empresa.pais == "US"
+                self.user and hasattr(self.user, "empresa") and self.user.empresa.pais == "US"
             )
             error_msg = (
                 "Purchase price must be a valid number"
@@ -219,9 +211,7 @@ class RepuestoForm(forms.ModelForm):
             # Verificar que no tenga más de 2 decimales
             if decimal_valor.as_tuple().exponent < -2:
                 is_english = (
-                    self.user
-                    and hasattr(self.user, "empresa")
-                    and self.user.empresa.pais == "US"
+                    self.user and hasattr(self.user, "empresa") and self.user.empresa.pais == "US"
                 )
                 error_msg = (
                     "Ensure that there are no more than 2 decimal places."
@@ -233,9 +223,7 @@ class RepuestoForm(forms.ModelForm):
             return decimal_valor
         except (ValueError, TypeError, InvalidOperation):
             is_english = (
-                self.user
-                and hasattr(self.user, "empresa")
-                and self.user.empresa.pais == "US"
+                self.user and hasattr(self.user, "empresa") and self.user.empresa.pais == "US"
             )
             error_msg = (
                 "Sale price must be a valid number"
@@ -256,9 +244,7 @@ class RepuestoForm(forms.ModelForm):
             empresa = self.user.empresa
 
             # Buscar repuestos existentes con el mismo part_number
-            existing_repuestos = Repuesto.objects.filter(
-                empresa=empresa, part_number=part_number
-            )
+            existing_repuestos = Repuesto.objects.filter(empresa=empresa, part_number=part_number)
 
             # Si estamos editando, excluir el repuesto actual
             if self.instance and self.instance.pk:

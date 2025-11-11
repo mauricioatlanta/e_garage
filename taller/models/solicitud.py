@@ -5,9 +5,7 @@ from taller.models.empresa import Empresa
 
 
 class Solicitud(models.Model):
-    empresa = models.ForeignKey(
-        Empresa, on_delete=models.CASCADE
-    )  # Multiempresa obligatorio
+    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE)  # Multiempresa obligatorio
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
     tipo = models.CharField(max_length=100)
     detalle = models.TextField(blank=True, null=True)

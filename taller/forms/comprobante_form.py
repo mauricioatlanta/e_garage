@@ -85,9 +85,7 @@ class ComprobantePagoForm(forms.ModelForm):
             valid_extensions = [".pdf", ".jpg", ".jpeg", ".png"]
             ext = archivo.name.lower().split(".")[-1]
             if f".{ext}" not in valid_extensions:
-                raise forms.ValidationError(
-                    "Solo se permiten archivos PDF, JPG, JPEG o PNG"
-                )
+                raise forms.ValidationError("Solo se permiten archivos PDF, JPG, JPEG o PNG")
 
         return archivo
 

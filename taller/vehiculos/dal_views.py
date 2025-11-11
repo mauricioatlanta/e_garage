@@ -13,9 +13,7 @@ class _EmpresaMixin:
         return qs.filter(empresa=empresa) if empresa else qs.none()
 
 
-class ModeloAutocomplete(
-    LoginRequiredMixin, _EmpresaMixin, autocomplete.Select2QuerySetView
-):
+class ModeloAutocomplete(LoginRequiredMixin, _EmpresaMixin, autocomplete.Select2QuerySetView):
     """Modelos del tenant filtrados por marca (forward='marca')."""
 
     def get_queryset(self):

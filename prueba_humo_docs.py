@@ -36,9 +36,7 @@ try:
 
         # Verificar total de documentos
         total_docs = Documento.objects.count()
-        docs_con_lineas = (
-            Documento.objects.filter(lineas_repuesto__isnull=False).distinct().count()
-        )
+        docs_con_lineas = Documento.objects.filter(lineas_repuesto__isnull=False).distinct().count()
 
         print(f"📊 Total docs: {total_docs}, con líneas rep: {docs_con_lineas}")
 

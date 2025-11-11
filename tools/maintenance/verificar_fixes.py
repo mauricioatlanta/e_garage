@@ -35,9 +35,7 @@ def verificar_urls():
         print(f"❌ URL crear falló: {e}")
 
     try:
-        url_procesar = reverse(
-            "documentos:procesar_documento", kwargs={"country": "cl"}
-        )
+        url_procesar = reverse("documentos:procesar_documento", kwargs={"country": "cl"})
         print(f"✅ URL procesar existe: {url_procesar}")
     except Exception as e:
         print(f"❌ URL procesar falló: {e}")
@@ -180,9 +178,7 @@ def test_http_documento():
     print(f"     Cliente: {documento_data['cliente']}")
     print(f"     Repuestos: {len(json.loads(documento_data['repuestos_data']))} items")
     print(f"     Servicios: {len(json.loads(documento_data['servicios_data']))} items")
-    print(
-        f"     Otros: {len(json.loads(documento_data['otros_servicios_data']))} items"
-    )
+    print(f"     Otros: {len(json.loads(documento_data['otros_servicios_data']))} items")
 
     docs_antes = Documento.objects.count()
     print(f"   Documentos ANTES: {docs_antes}")

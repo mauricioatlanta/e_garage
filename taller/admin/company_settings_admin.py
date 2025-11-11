@@ -127,8 +127,7 @@ class CompanySettingsAdmin(admin.ModelAdmin):
         default_secondary = "#6c757d"
 
         has_custom = (
-            obj.primary_color != default_primary
-            or obj.secondary_color != default_secondary
+            obj.primary_color != default_primary or obj.secondary_color != default_secondary
         )
 
         if has_custom:
@@ -166,9 +165,7 @@ class CompanySettingsAdmin(admin.ModelAdmin):
             color = "red"
             icon = "✗"
 
-        return format_html(
-            '<span style="color: {};">{} {}%</span>', color, icon, int(percentage)
-        )
+        return format_html('<span style="color: {};">{} {}%</span>', color, icon, int(percentage))
 
     def get_queryset(self, request):
         """Optimiza consultas"""
@@ -188,9 +185,7 @@ class CompanySettingsAdmin(admin.ModelAdmin):
                 obj.logo.delete(save=False)
             obj.save()
 
-        self.message_user(
-            request, f"{queryset.count()} configuraciones reseteadas exitosamente."
-        )
+        self.message_user(request, f"{queryset.count()} configuraciones reseteadas exitosamente.")
 
     @admin.action(description="Exportar configuraciones")
     def export_settings(self, request, queryset):
@@ -234,12 +229,8 @@ class CompanySettingsHistoryAdmin(admin.ModelAdmin):
     @admin.display(description="Cambio")
     def preview_change(self, obj):
         """Muestra preview del cambio"""
-        old_val = (
-            obj.old_value[:30] + "..." if len(obj.old_value) > 30 else obj.old_value
-        )
-        new_val = (
-            obj.new_value[:30] + "..." if len(obj.new_value) > 30 else obj.new_value
-        )
+        old_val = obj.old_value[:30] + "..." if len(obj.old_value) > 30 else obj.old_value
+        new_val = obj.new_value[:30] + "..." if len(obj.new_value) > 30 else obj.new_value
 
         return format_html(
             '<span style="color: red;">{}</span> → <span style="color: green;">{}</span>',
@@ -257,8 +248,4 @@ class CompanySettingsHistoryAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         """Optimizar consultas"""
-        return (
-            super()
-            .get_queryset(request)
-            .select_related("company_settings__user", "changed_by")
-        )
+        return super().get_queryset(request).select_related("company_settings__user", "changed_by")

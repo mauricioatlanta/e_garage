@@ -38,13 +38,9 @@ def verificar_empresa():
             print(f"   🌐 Sitio web: {config.sitio_web or 'Vacío'}")
             print(f"   💰 Moneda: {config.moneda or 'Vacía'}")
             print(f"   🧾 Tasa impuesto: {config.tasa_impuesto or 'Vacía'}")
-            print(
-                f"   🎯 Aplicar impuesto por defecto: {config.aplicar_impuesto_por_defecto}"
-            )
+            print(f"   🎯 Aplicar impuesto por defecto: {config.aplicar_impuesto_por_defecto}")
             print(f"   🎨 Color marca: {getattr(config, 'brand_color', 'N/A')}")
-            print(
-                f"   👥 Dividir por técnico: {getattr(config, 'dividir_por_tecnico', 'N/A')}"
-            )
+            print(f"   👥 Dividir por técnico: {getattr(config, 'dividir_por_tecnico', 'N/A')}")
 
         except ConfiguracionEmpresa.DoesNotExist:
             print("   ❌ NO HAY CONFIGURACIÓN")

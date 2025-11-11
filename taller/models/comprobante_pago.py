@@ -19,9 +19,7 @@ class ComprobantePago(models.Model):
         ("otro", "Otro"),
     ]
 
-    empresa = models.ForeignKey(
-        Empresa, on_delete=models.CASCADE, related_name="comprobantes"
-    )
+    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name="comprobantes")
     fecha_subida = models.DateTimeField(default=timezone.now)
     metodo_pago = models.CharField(max_length=20, choices=METODO_PAGO_CHOICES)
     monto = models.DecimalField(max_digits=10, decimal_places=2)
@@ -36,9 +34,7 @@ class ComprobantePago(models.Model):
     )
 
     # Estados
-    estado = models.CharField(
-        max_length=20, choices=ESTADO_CHOICES, default="pendiente"
-    )
+    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default="pendiente")
     fecha_procesado = models.DateTimeField(null=True, blank=True)
     procesado_por = models.CharField(max_length=100, blank=True)
 
@@ -47,9 +43,7 @@ class ComprobantePago(models.Model):
     notas_admin = models.TextField(blank=True, help_text="Notas administrativas")
 
     # Configuración de plan
-    plan_solicitado = models.CharField(
-        max_length=20, choices=Empresa.PLAN_CHOICES, default="basic"
-    )
+    plan_solicitado = models.CharField(max_length=20, choices=Empresa.PLAN_CHOICES, default="basic")
     meses_pagados = models.PositiveIntegerField(default=1)
 
     class Meta:
@@ -96,9 +90,7 @@ class ComprobantePago(models.Model):
 
         subject = f"✅ Pago Aprobado - {self.empresa.nombre_taller}"
         fecha_vencimiento = (
-            self.empresa.fecha_fin.strftime("%d/%m/%Y")
-            if self.empresa.fecha_fin
-            else "No definida"
+            self.empresa.fecha_fin.strftime("%d/%m/%Y") if self.empresa.fecha_fin else "No definida"
         )
         plan_display = dict(self.empresa.PLAN_CHOICES).get(
             self.plan_solicitado, self.plan_solicitado
@@ -168,9 +160,7 @@ class ComprobantePago(models.Model):
         plan_display = dict(self.empresa.PLAN_CHOICES).get(
             self.plan_solicitado, self.plan_solicitado
         )
-        metodo_display = dict(self.METODO_PAGO_CHOICES).get(
-            self.metodo_pago, self.metodo_pago
-        )
+        metodo_display = dict(self.METODO_PAGO_CHOICES).get(self.metodo_pago, self.metodo_pago)
 
         subject = f"💰 Nuevo Comprobante de Pago - {self.empresa.nombre_taller}"
         message = f"""

@@ -20,9 +20,7 @@ from taller.models.empresa import Empresa
 
 def backup_diario():
     """Ejecutar backup diario automático"""
-    print(
-        f"🕐 {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Iniciando backup diario..."
-    )
+    print(f"🕐 {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Iniciando backup diario...")
 
     try:
         # Ejecutar backup simple
@@ -36,9 +34,7 @@ def limpiar_logs_antiguos():
     """Limpiar logs de auditoría antiguos (más de 90 días)"""
     from datetime import timedelta
 
-    print(
-        f"🕐 {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Limpiando logs antiguos..."
-    )
+    print(f"🕐 {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Limpiando logs antiguos...")
 
     try:
         fecha_limite = datetime.now() - timedelta(days=90)
@@ -57,9 +53,7 @@ def limpiar_logs_antiguos():
 
 def reporte_semanal():
     """Generar reporte semanal automático"""
-    print(
-        f"🕐 {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Generando reporte semanal..."
-    )
+    print(f"🕐 {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Generando reporte semanal...")
 
     try:
         # Ejecutar reportes de auditoría

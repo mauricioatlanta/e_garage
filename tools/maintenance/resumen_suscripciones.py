@@ -66,9 +66,7 @@ for i, taller in enumerate(usuarios_taller, 1):
     print(f'   📧 Email: {taller["email"]}')
     print(f'   📱 Teléfono: {taller["telefono"]}')
     print(f'   📍 Dirección: {taller["direccion"]}')
-    print(
-        f'   🔐 Estado Login: {status} {"FUNCIONA" if taller["auth_ok"] else "REVISAR"}'
-    )
+    print(f'   🔐 Estado Login: {status} {"FUNCIONA" if taller["auth_ok"] else "REVISAR"}')
     print()
 
 print("📊 TIPOS DE SUSCRIPCIONES DISPONIBLES:")

@@ -39,9 +39,7 @@ empresas = Empresa.objects.all()
 print(f"Total empresas: {empresas.count()}")
 for empresa in empresas:
     usuario_asociado = empresa.usuario.username if empresa.usuario else "Ninguno"
-    print(
-        f"  - ID:{empresa.id} - {empresa.nombre_taller} (usuario: {usuario_asociado})"
-    )
+    print(f"  - ID:{empresa.id} - {empresa.nombre_taller} (usuario: {usuario_asociado})")
 
 print()
 print("🔧 === VERIFICAR TALLER2 ===")

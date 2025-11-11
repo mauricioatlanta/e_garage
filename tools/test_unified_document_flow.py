@@ -48,9 +48,7 @@ def test_api_endpoints():
             data = response.json()
             print(f"   Clientes encontrados: {len(data.get('clientes', []))}")
             for cliente in data.get("clientes", [])[:3]:
-                print(
-                    f"   - {cliente.get('nombre', 'N/A')} ({cliente.get('tax_id', 'N/A')})"
-                )
+                print(f"   - {cliente.get('nombre', 'N/A')} ({cliente.get('tax_id', 'N/A')})")
         else:
             print(f"   Error: {response.content.decode()}")
     except Exception as e:
@@ -67,9 +65,7 @@ def test_api_endpoints():
             data = response.json()
             print(f"   Repuestos encontrados: {len(data.get('repuestos', []))}")
             for repuesto in data.get("repuestos", [])[:3]:
-                print(
-                    f"   - {repuesto.get('nombre', 'N/A')} (${repuesto.get('precio', 0)})"
-                )
+                print(f"   - {repuesto.get('nombre', 'N/A')} (${repuesto.get('precio', 0)})")
         else:
             print(f"   Error: {response.content.decode()}")
     except Exception as e:
@@ -86,9 +82,7 @@ def test_api_endpoints():
             data = response.json()
             print(f"   Servicios encontrados: {len(data.get('servicios', []))}")
             for servicio in data.get("servicios", [])[:3]:
-                print(
-                    f"   - {servicio.get('nombre', 'N/A')} (${servicio.get('precio', 0)})"
-                )
+                print(f"   - {servicio.get('nombre', 'N/A')} (${servicio.get('precio', 0)})")
         else:
             print(f"   Error: {response.content.decode()}")
     except Exception as e:
@@ -98,9 +92,7 @@ def test_api_endpoints():
     print("\n4️⃣ Probando API de número de documento...")
     for tipo in ["FAC", "PRES", "OT"]:
         try:
-            request = factory.get(
-                f"/us/documentos/api/obtener-numero-documento/?tipo={tipo}"
-            )
+            request = factory.get(f"/us/documentos/api/obtener-numero-documento/?tipo={tipo}")
             request.user = user
             response = obtener_numero_documento(request)
             print(f"   {tipo}: Status {response.status_code}")

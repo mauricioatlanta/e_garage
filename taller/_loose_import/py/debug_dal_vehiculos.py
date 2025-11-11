@@ -64,9 +64,7 @@ def test_dal_vehiculos():
     # Simular request con cliente específico
     if clientes.exists():
         cliente_test = clientes.first()
-        request_con_cliente = factory.get(
-            f"/autocomplete/vehiculo/?cliente={cliente_test.id}"
-        )
+        request_con_cliente = factory.get(f"/autocomplete/vehiculo/?cliente={cliente_test.id}")
         request_con_cliente.user = user
         request_con_cliente.path = "/us/en/autocomplete/vehiculo/"
 
@@ -75,17 +73,11 @@ def test_dal_vehiculos():
         view_con_cliente.forwarded = {"cliente": str(cliente_test.id)}
 
         qs_con_cliente = view_con_cliente.get_queryset()
-        print(
-            f"🚗 Vehículos filtrados por cliente {cliente_test.id}: {qs_con_cliente.count()}"
-        )
+        print(f"🚗 Vehículos filtrados por cliente {cliente_test.id}: {qs_con_cliente.count()}")
 
         # Verificar vehículos de este cliente específico
-        vehiculos_cliente = Vehiculo.objects.filter(
-            empresa=empresa, cliente=cliente_test
-        )
-        print(
-            f"🚗 Vehículos reales del cliente {cliente_test.id}: {vehiculos_cliente.count()}"
-        )
+        vehiculos_cliente = Vehiculo.objects.filter(empresa=empresa, cliente=cliente_test)
+        print(f"🚗 Vehículos reales del cliente {cliente_test.id}: {vehiculos_cliente.count()}")
 
         for v in vehiculos_cliente:
             print(f"    - {v.patente} - {v.marca} {v.modelo}")

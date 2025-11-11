@@ -38,7 +38,5 @@ urlpatterns = [
     path("ajax/buscar/", ajax_buscar_clientes, name="ajax_buscar_clientes"),
     path("stats/", clientes_stats, name="clientes_stats"),
     # DAL autocomplete
-    path(
-        "autocomplete/", dal_views.ClientesAutocomplete.as_view(), name="autocomplete"
-    ),
+    path("autocomplete/", dal_views.ClientesAutocomplete.as_view(), name="autocomplete"),
 ]

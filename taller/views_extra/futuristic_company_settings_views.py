@@ -24,8 +24,7 @@ def futuristic_company_settings_view(request):
     company_settings, created = CompanySettings.objects.get_or_create(
         user=request.user,
         defaults={
-            "company_name": empresa.nombre_taller
-            or f"Taller de {request.user.username}",
+            "company_name": empresa.nombre_taller or f"Taller de {request.user.username}",
             "primary_color": "#00ffff",
             "currency": "USD" if empresa.pais == "US" else "CLP",
         },
@@ -48,9 +47,7 @@ def futuristic_company_settings_view(request):
         "empresa": empresa,
     }
 
-    return render(
-        request, "taller/us/en/settings/futuristic_company_settings.html", context
-    )
+    return render(request, "taller/us/en/settings/futuristic_company_settings.html", context)
 
 
 def handle_company_settings(request, company_settings):
@@ -124,9 +121,7 @@ def add_technician(request, empresa):
     direccion = request.POST.get("direccion", "").strip()
 
     if not nombre or len(nombre) < 2:
-        messages.error(
-            request, "❌ Technician name must be at least 2 characters long."
-        )
+        messages.error(request, "❌ Technician name must be at least 2 characters long.")
         return redirect(request.path)
 
     # Verificar si ya existe un técnico con ese nombre
@@ -159,9 +154,7 @@ def toggle_technician(request, empresa):
         tecnico.save()
 
         status = "activated" if activate else "deactivated"
-        messages.success(
-            request, f"✅ Technician '{tecnico.nombre}' {status} successfully!"
-        )
+        messages.success(request, f"✅ Technician '{tecnico.nombre}' {status} successfully!")
 
     except Tecnico.DoesNotExist:
         messages.error(request, "❌ Technician not found.")
@@ -198,9 +191,7 @@ def edit_technician(request, empresa):
     direccion = request.POST.get("direccion", "").strip()
 
     if not nombre or len(nombre) < 2:
-        messages.error(
-            request, "❌ Technician name must be at least 2 characters long."
-        )
+        messages.error(request, "❌ Technician name must be at least 2 characters long.")
         return redirect(request.path)
 
     try:

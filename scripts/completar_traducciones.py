@@ -48,9 +48,7 @@ def completar_traducciones_faltantes():
             }
 
             # Buscar traducción automática
-            label_en = traducciones_comunes.get(
-                traduccion_es.label, traduccion_es.label
-            )
+            label_en = traducciones_comunes.get(traduccion_es.label, traduccion_es.label)
 
             # Crear traducción al inglés
             ServicioName.objects.create(

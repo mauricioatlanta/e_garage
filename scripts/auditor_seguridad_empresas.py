@@ -173,12 +173,8 @@ def encontrar_problemas_seguridad():
                 print(f"   Código: {problema['contenido']}")
 
         print("\n🔧 ACCIONES REQUERIDAS:")
-        print(
-            "1. Agregar filtro .filter(empresa=empresa) en todos los queries críticos"
-        )
-        print(
-            "2. Verificar que request.user.empresa está disponible en todas las vistas"
-        )
+        print("1. Agregar filtro .filter(empresa=empresa) en todos los queries críticos")
+        print("2. Verificar que request.user.empresa está disponible en todas las vistas")
         print("3. Implementar middleware de empresa si no existe")
         print("4. Ejecutar tests con múltiples empresas para verificar separación")
 
@@ -216,9 +212,7 @@ def verificar_middleware_empresa():
                 print(f"❌ Error leyendo {path}: {e}")
 
     print("⚠️ No se encontró middleware de empresa específico")
-    print(
-        "💡 Recomendación: Implementar EmpresaMiddleware para inyectar request.empresa"
-    )
+    print("💡 Recomendación: Implementar EmpresaMiddleware para inyectar request.empresa")
     return False
 
 

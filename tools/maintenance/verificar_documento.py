@@ -20,9 +20,7 @@ print(f"=== ANÁLISIS DOCUMENTO ID: {doc.id} ===")
 print(f"Número: {doc.numero_documento}")
 print(f"Cliente: {doc.cliente.nombre} {doc.cliente.apellido}")
 print(f"Vehículo: {doc.vehiculo.patente} - {doc.vehiculo.marca} {doc.vehiculo.modelo}")
-print(
-    f"Kilometraje del vehículo: {getattr(doc.vehiculo, 'millas', 'No especificado')} millas/km"
-)
+print(f"Kilometraje del vehículo: {getattr(doc.vehiculo, 'millas', 'No especificado')} millas/km")
 
 # Verificar servicios directamente desde las tablas
 servicios = LineaServicio.objects.filter(documento=doc)
@@ -43,9 +41,7 @@ try:
     repuestos = doc.lineas_repuesto.all()
     print(f"\n=== REPUESTOS ({repuestos.count()}) ===")
     for r in repuestos:
-        print(
-            f"  ID: {r.id} - {r.repuesto.nombre}: ${r.precio_unitario} x {r.cantidad}"
-        )
+        print(f"  ID: {r.id} - {r.repuesto.nombre}: ${r.precio_unitario} x {r.cantidad}")
 except Exception as e:
     print(f"\n=== REPUESTOS (Error: {e}) ===")
 

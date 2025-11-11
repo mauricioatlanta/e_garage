@@ -20,9 +20,7 @@ class DocumentoModelTest(TestCase):
     def setUp(self):
         """Configuración inicial para los tests"""
         # Crear empresa de prueba
-        self.empresa_cl = Empresa.objects.create(
-            nombre="Taller Chile", pais="CL", rut="12345678-9"
-        )
+        self.empresa_cl = Empresa.objects.create(nombre="Taller Chile", pais="CL", rut="12345678-9")
 
         self.empresa_us = Empresa.objects.create(
             nombre="Auto Center USA", pais="US", rut="123456789"
@@ -43,9 +41,7 @@ class DocumentoModelTest(TestCase):
         )
 
         # Crear técnico
-        self.tecnico = Tecnico.objects.create(
-            nombre="Carlos Mecánico", empresa=self.empresa_cl
-        )
+        self.tecnico = Tecnico.objects.create(nombre="Carlos Mecánico", empresa=self.empresa_cl)
 
     def test_crear_documento_basico(self):
         """Test: Crear documento básico"""
@@ -69,21 +65,15 @@ class DocumentoModelTest(TestCase):
     def test_generar_numero_documento(self):
         """Test: Generación automática de número de documento"""
         # Primer documento
-        doc1 = Documento.objects.create(
-            empresa=self.empresa_cl, tipo="OT", cliente=self.cliente
-        )
+        doc1 = Documento.objects.create(empresa=self.empresa_cl, tipo="OT", cliente=self.cliente)
         self.assertEqual(doc1.numero, "1")
 
         # Segundo documento
-        doc2 = Documento.objects.create(
-            empresa=self.empresa_cl, tipo="OT", cliente=self.cliente
-        )
+        doc2 = Documento.objects.create(empresa=self.empresa_cl, tipo="OT", cliente=self.cliente)
         self.assertEqual(doc2.numero, "2")
 
         # Documento de diferente tipo
-        doc3 = Documento.objects.create(
-            empresa=self.empresa_cl, tipo="PRES", cliente=self.cliente
-        )
+        doc3 = Documento.objects.create(empresa=self.empresa_cl, tipo="PRES", cliente=self.cliente)
         self.assertEqual(doc3.numero, "1")  # Secuencia independiente por tipo
 
     def test_numero_documento_property(self):
@@ -103,9 +93,7 @@ class DocumentoModelTest(TestCase):
 
     def test_recompute_totals_chile(self):
         """Test: Recálculo de totales para Chile (IVA 19% solo en repuestos)"""
-        doc = Documento.objects.create(
-            empresa=self.empresa_cl, tipo="OT", cliente=self.cliente
-        )
+        doc = Documento.objects.create(empresa=self.empresa_cl, tipo="OT", cliente=self.cliente)
 
         # Simular líneas de repuesto (IVA aplicable)
         # Mock de las líneas para el test
@@ -116,9 +104,7 @@ class DocumentoModelTest(TestCase):
                 self.descuento = descuento
 
         # Mock del queryset
-        doc.lineas_repuesto = [
-            MockLineaRepuesto(2, Decimal("100.00"), 10)
-        ]  # 2 * 100 * 0.9 = 180
+        doc.lineas_repuesto = [MockLineaRepuesto(2, Decimal("100.00"), 10)]  # 2 * 100 * 0.9 = 180
         doc.lineas_servicio = [MockLineaRepuesto(1, Decimal("50.00"))]  # 1 * 50 = 50
         doc.lineas_otro_servicio = []
 
@@ -236,9 +222,7 @@ class DocumentoModelTest(TestCase):
         # Crear múltiples documentos
         docs = []
         for i in range(3):
-            doc = Documento.objects.create(
-                empresa=self.empresa_cl, tipo="OT", cliente=self.cliente
-            )
+            doc = Documento.objects.create(empresa=self.empresa_cl, tipo="OT", cliente=self.cliente)
             docs.append(doc)
 
         # Recalcular en lote
@@ -249,9 +233,7 @@ class DocumentoModelTest(TestCase):
 
     def test_propiedades_compatibilidad(self):
         """Test: Propiedades de compatibilidad con código antiguo"""
-        doc = Documento.objects.create(
-            empresa=self.empresa_cl, tipo="OT", cliente=self.cliente
-        )
+        doc = Documento.objects.create(empresa=self.empresa_cl, tipo="OT", cliente=self.cliente)
 
         # Verificar propiedades de compatibilidad
         self.assertEqual(doc.total_repuestos(), Decimal("0.00"))

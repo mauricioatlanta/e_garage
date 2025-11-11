@@ -89,8 +89,6 @@ class FormularioRegistro(forms.ModelForm):
 
         if commit:
             user.save()
-            Suscripcion.objects.create(
-                user=user, tipo=self.cleaned_data["plan"], activa=False
-            )
+            Suscripcion.objects.create(user=user, tipo=self.cleaned_data["plan"], activa=False)
             # TallerInfo se creará en la vista según el tipo de registro
         return user

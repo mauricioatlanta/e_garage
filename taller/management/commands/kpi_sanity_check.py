@@ -20,9 +20,7 @@ class Command(BaseCommand):
             )
 
             totales = (
-                LineaServicio.objects.filter(
-                    documento__fecha_emision__month=timezone.now().month
-                )
+                LineaServicio.objects.filter(documento__fecha_emision__month=timezone.now().month)
                 .annotate(monto=monto)
                 .values("documento__tecnico_responsable__nombre")
                 .annotate(total=Sum("monto"))
@@ -44,25 +42,19 @@ class Command(BaseCommand):
 
             self.stdout.write("   Resultados:")
             for estado in docs_por_estado:
-                self.stdout.write(
-                    f"   - {estado['estado']}: {estado['total']} documentos"
-                )
+                self.stdout.write(f"   - {estado['estado']}: {estado['total']} documentos")
 
             # KPI 3: Técnicos más activos
             self.stdout.write("\n3. Técnicos más activos:")
             tecnicos_activos = (
-                Tecnico.objects.filter(
-                    documento__fecha_emision__month=timezone.now().month
-                )
+                Tecnico.objects.filter(documento__fecha_emision__month=timezone.now().month)
                 .values("nombre")
                 .annotate(total_docs=Sum("documento__id"))
             )
 
             self.stdout.write("   Resultados:")
             for tecnico in tecnicos_activos:
-                self.stdout.write(
-                    f"   - {tecnico['nombre']}: {tecnico['total_docs']} documentos"
-                )
+                self.stdout.write(f"   - {tecnico['nombre']}: {tecnico['total_docs']} documentos")
 
             self.stdout.write(self.style.SUCCESS("\n✅ KPI sanity check completado"))
 

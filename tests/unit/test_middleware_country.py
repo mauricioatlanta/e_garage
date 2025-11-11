@@ -132,9 +132,7 @@ class CompanyCountryMiddlewareTest(TestCase):
         """Test middleware con empresa USA"""
         # Crear empresa USA
         user_usa = User.objects.create_user(username="testuser5", password="testpass")
-        empresa_usa = Empresa.objects.create(
-            nombre_taller="USA Garage", pais="US", user=user_usa
-        )
+        empresa_usa = Empresa.objects.create(nombre_taller="USA Garage", pais="US", user=user_usa)
 
         request = self.factory.get("/")
         request.session = {"empresa_id": empresa_usa.id}

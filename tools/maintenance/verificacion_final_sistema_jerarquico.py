@@ -61,25 +61,17 @@ if __name__ == "__main__":
         print(f"   🏆 Primer modelo: {modelos_data[0]['nombre']}")
 
         # Test load_motores
-        response = client.get(
-            f"/cl/taller/ajax/load-motores/?modelo_id={primer_modelo_id}"
-        )
+        response = client.get(f"/cl/taller/ajax/load-motores/?modelo_id={primer_modelo_id}")
         motores_data = response.json() if response.status_code == 200 else []
-        print(
-            f"   📡 load-motores: {response.status_code} (motores: {len(motores_data)})"
-        )
+        print(f"   📡 load-motores: {response.status_code} (motores: {len(motores_data)})")
 
         # Test load_cajas
-        response = client.get(
-            f"/cl/taller/ajax/load-cajas/?modelo_id={primer_modelo_id}"
-        )
+        response = client.get(f"/cl/taller/ajax/load-cajas/?modelo_id={primer_modelo_id}")
         cajas_data = response.json() if response.status_code == 200 else []
         print(f"   📡 load-cajas: {response.status_code} (cajas: {len(cajas_data)})")
 
         # Test load_motores_cajas (combinado)
-        response = client.get(
-            f"/cl/taller/ajax/load-motores-cajas/?modelo_id={primer_modelo_id}"
-        )
+        response = client.get(f"/cl/taller/ajax/load-motores-cajas/?modelo_id={primer_modelo_id}")
         if response.status_code == 200:
             combinado_data = response.json()
             print(
@@ -114,9 +106,7 @@ if __name__ == "__main__":
     # 4. Verificar JavaScript en template
     print("\n📝 4. INTEGRACIÓN JAVASCRIPT:")
     try:
-        with open(
-            "templates/taller/vehiculos/crear_vehiculo.html", encoding="utf-8"
-        ) as f:
+        with open("templates/taller/vehiculos/crear_vehiculo.html", encoding="utf-8") as f:
             template_content = f.read()
 
         checks = {
@@ -126,8 +116,7 @@ if __name__ == "__main__":
             "URL AJAX motores": "/taller/ajax/load-motores/" in template_content,
             "URL AJAX cajas": "/taller/ajax/load-cajas/" in template_content,
             "Event listener marca": "selectMarca.addEventListener" in template_content,
-            "Event listener modelo": "selectModelo.addEventListener"
-            in template_content,
+            "Event listener modelo": "selectModelo.addEventListener" in template_content,
         }
 
         for check, result in checks.items():
@@ -169,9 +158,7 @@ if __name__ == "__main__":
     ):
         print("✅ ESTADO: Sistema jerárquico COMPLETAMENTE FUNCIONAL")
         print("🚀 El formulario de creación de vehículos está listo para producción")
-        print(
-            "🎯 Los usuarios podrán seleccionar Marca → Modelo → Motor/Caja dinámicamente"
-        )
+        print("🎯 Los usuarios podrán seleccionar Marca → Modelo → Motor/Caja dinámicamente")
         print("\n📋 INSTRUCCIONES DE USO:")
         print("   1. Acceder a /cl/vehiculos/crear/")
         print("   2. Seleccionar una marca")

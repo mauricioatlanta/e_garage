@@ -26,15 +26,11 @@ def limpiar_cookies_y_probar():
         login_page = session.get("http://127.0.0.1:8000/accounts/login/")
 
         if login_page.status_code != 200:
-            print(
-                f"❌ Error al obtener página de login (Status: {login_page.status_code})"
-            )
+            print(f"❌ Error al obtener página de login (Status: {login_page.status_code})")
             return
 
         # Extraer CSRF token
-        csrf_match = re.search(
-            r'name="csrfmiddlewaretoken" value="([^"]+)"', login_page.text
-        )
+        csrf_match = re.search(r'name="csrfmiddlewaretoken" value="([^"]+)"', login_page.text)
         if not csrf_match:
             print("❌ No se encontró CSRF token")
             return
@@ -50,9 +46,7 @@ def limpiar_cookies_y_probar():
             "password": "testpass123",
         }
 
-        login_response = session.post(
-            "http://127.0.0.1:8000/accounts/login/", data=login_data
-        )
+        login_response = session.post("http://127.0.0.1:8000/accounts/login/", data=login_data)
 
         if login_response.status_code == 200 and "login" not in login_response.url:
             print("✅ Login exitoso")
@@ -70,9 +64,7 @@ def limpiar_cookies_y_probar():
         clientes_response = session.get("http://127.0.0.1:8000/taller/clientes/")
 
         if clientes_response.status_code != 200:
-            print(
-                f"❌ Error al acceder a clientes (Status: {clientes_response.status_code})"
-            )
+            print(f"❌ Error al acceder a clientes (Status: {clientes_response.status_code})")
             return
 
         print("✅ Página de clientes cargada")
@@ -117,9 +109,7 @@ def limpiar_cookies_y_probar():
                 print(f"   ✅ Inglés: '{texto}'")
 
         # Verificar headers
-        content_language = clientes_response.headers.get(
-            "Content-Language", "No especificado"
-        )
+        content_language = clientes_response.headers.get("Content-Language", "No especificado")
         print(f"   📋 Content-Language: {content_language}")
 
         # Determinar idioma predominante
@@ -146,9 +136,7 @@ def limpiar_cookies_y_probar():
             print("   ⚠️ INDETERMINADO: No se puede determinar el idioma")
 
     except requests.exceptions.ConnectionError:
-        print(
-            "❌ No se puede conectar al servidor. ¿Está corriendo en http://127.0.0.1:8000?"
-        )
+        print("❌ No se puede conectar al servidor. ¿Está corriendo en http://127.0.0.1:8000?")
     except Exception as e:
         print(f"❌ Error: {e}")
         import traceback

@@ -14,10 +14,7 @@ def crear_documento(request):
             if not documento.numero_documento:
                 tipo = documento.tipo_documento.lower().replace(" ", "_")
                 count = (
-                    Documento.objects.filter(
-                        tipo_documento=documento.tipo_documento
-                    ).count()
-                    + 1
+                    Documento.objects.filter(tipo_documento=documento.tipo_documento).count() + 1
                 )
                 documento.numero_documento = f"{tipo[:3].upper()}-{count:05d}"
             documento.save()

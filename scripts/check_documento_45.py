@@ -47,9 +47,7 @@ def main():
     print("\n=== EMPRESAS DISPONIBLES ===")
     empresas = Empresa.objects.all()[:10]
     for empresa in empresas:
-        print(
-            f"- Empresa {empresa.id}: {empresa.nombre_taller} (Usuario: {empresa.user.username})"
-        )
+        print(f"- Empresa {empresa.id}: {empresa.nombre_taller} (Usuario: {empresa.user.username})")
 
 
 if __name__ == "__main__":

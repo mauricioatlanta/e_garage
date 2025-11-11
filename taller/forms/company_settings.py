@@ -14,9 +14,7 @@ phone_re = RegexValidator(r"^[0-9\-\+\(\)\s]{6,20}$", "Teléfono no válido.")
 def _default_tax_for_country(pais: str | None) -> float:
     if (pais or "").upper() == "CL":
         return 19.0
-    return (
-        0.0  # Global default para USA u otros; el cálculo real puede ser por documento
-    )
+    return 0.0  # Global default para USA u otros; el cálculo real puede ser por documento
 
 
 class ConfiguracionEmpresaForm(forms.ModelForm):
@@ -56,18 +54,14 @@ class ConfiguracionEmpresaForm(forms.ModelForm):
                 attrs={"class": "form-control", "placeholder": "https://tu-sitio.com"}
             ),
             "moneda": forms.Select(attrs={"class": "form-select"}),
-            "tasa_impuesto": forms.NumberInput(
-                attrs={"class": "form-control", "step": "0.01"}
-            ),
+            "tasa_impuesto": forms.NumberInput(attrs={"class": "form-control", "step": "0.01"}),
             "aplicar_impuesto_por_defecto": forms.CheckboxInput(
                 attrs={"class": "form-check-input"}
             ),
             "brand_color": forms.TextInput(
                 attrs={"type": "color", "class": "form-control form-control-color"}
             ),
-            "dividir_por_tecnico": forms.CheckboxInput(
-                attrs={"class": "form-check-input"}
-            ),
+            "dividir_por_tecnico": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -98,10 +92,7 @@ class ConfiguracionEmpresaForm(forms.ModelForm):
             )
             if self.instance.pk is None or not self.instance.tasa_impuesto:
                 self.fields["tasa_impuesto"].initial = 19.0
-            if (
-                "aplicar_impuesto_por_defecto" in self.fields
-                and self.instance.pk is None
-            ):
+            if "aplicar_impuesto_por_defecto" in self.fields and self.instance.pk is None:
                 self.fields["aplicar_impuesto_por_defecto"].initial = True
         else:
             self.fields["tasa_impuesto"].label = _("Sales tax por defecto (%)")
@@ -110,10 +101,7 @@ class ConfiguracionEmpresaForm(forms.ModelForm):
             )
             if self.instance.pk is None or not self.instance.tasa_impuesto:
                 self.fields["tasa_impuesto"].initial = 0.0
-            if (
-                "aplicar_impuesto_por_defecto" in self.fields
-                and self.instance.pk is None
-            ):
+            if "aplicar_impuesto_por_defecto" in self.fields and self.instance.pk is None:
                 self.fields["aplicar_impuesto_por_defecto"].initial = False
 
     def clean_tasa_impuesto(self):
@@ -129,9 +117,7 @@ class ConfiguracionEmpresaForm(forms.ModelForm):
         try:
             val = float(val)
         except (TypeError, ValueError):
-            raise ValidationError(
-                _("Ingrese un número válido para la tasa de impuesto.")
-            )
+            raise ValidationError(_("Ingrese un número válido para la tasa de impuesto."))
         if not (0.0 <= val <= 100.0):
             raise ValidationError(_("La tasa debe estar entre 0 y 100."))
         return val
@@ -149,9 +135,7 @@ class ConfiguracionEmpresaForm(forms.ModelForm):
         # MIME (cuando está disponible)
         content_type = getattr(logo, "content_type", None)
         if content_type and content_type.lower() not in ALLOWED_IMAGE_MIMES:
-            raise ValidationError(
-                _("Formato de imagen no permitido. Usa PNG, JPEG, WEBP o GIF.")
-            )
+            raise ValidationError(_("Formato de imagen no permitido. Usa PNG, JPEG, WEBP o GIF."))
         return logo
 
     def clean_telefono(self):

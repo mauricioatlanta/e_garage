@@ -122,9 +122,7 @@ def generar_resumen_final():
 
     print("\n🧪 VALIDACIONES ACTIVAS:")
     print("   ✅ Country consistency (Documento.empresa.pais == Servicio.country)")
-    print(
-        "   ✅ Tipo separation (LineaServicio → interno, LineaOtroServicio → externo)"
-    )
+    print("   ✅ Tipo separation (LineaServicio → interno, LineaOtroServicio → externo)")
     print("   ✅ Multiempresa isolation (cliente.empresa == documento.empresa)")
     print("   ✅ Cross-country prevention")
     print("   ✅ Database constraints enforcement")

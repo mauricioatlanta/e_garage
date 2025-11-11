@@ -30,9 +30,7 @@ class Command(BaseCommand):
         dry_run = options.get("dry_run")
 
         self.stdout.write(
-            self.style.SUCCESS(
-                "🚀 Iniciando proceso de marcado de documentos como pagados..."
-            )
+            self.style.SUCCESS("🚀 Iniciando proceso de marcado de documentos como pagados...")
         )
 
         # Obtener empresa(s)
@@ -46,9 +44,7 @@ class Command(BaseCommand):
                 )
         else:
             empresas = Empresa.objects.all()
-            self.stdout.write(
-                f"📋 Procesando todas las empresas ({empresas.count()} empresas)"
-            )
+            self.stdout.write(f"📋 Procesando todas las empresas ({empresas.count()} empresas)")
 
         total_documentos = 0
         documentos_actualizados = 0
@@ -68,9 +64,7 @@ class Command(BaseCommand):
                 self.stdout.write("   ✅ Todos los documentos ya están pagados")
                 continue
 
-            self.stdout.write(
-                f"   📄 Encontrados {empresa_total} documentos no pagados"
-            )
+            self.stdout.write(f"   📄 Encontrados {empresa_total} documentos no pagados")
 
             if dry_run:
                 # Solo mostrar qué se haría
@@ -85,9 +79,7 @@ class Command(BaseCommand):
                 with transaction.atomic():
                     updated = documentos.update(estado_pago="PAGADO", pagado=True)
                     documentos_actualizados += updated
-                    self.stdout.write(
-                        f"   ✅ Marcados {updated} documentos como pagados"
-                    )
+                    self.stdout.write(f"   ✅ Marcados {updated} documentos como pagados")
 
         # Resumen final
         self.stdout.write("\n" + "=" * 50)
@@ -106,6 +98,4 @@ class Command(BaseCommand):
             )
             self.stdout.write(f"📊 Total de documentos procesados: {total_documentos}")
 
-        self.stdout.write(
-            self.style.SUCCESS("🎉 ¡Proceso de marcado de documentos completado!")
-        )
+        self.stdout.write(self.style.SUCCESS("🎉 ¡Proceso de marcado de documentos completado!"))

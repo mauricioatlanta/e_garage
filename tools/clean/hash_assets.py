@@ -129,21 +129,13 @@ def hash_assets(base_path, manifest_file, apply_changes=False):
         print(f"   ❌ Errores: {errors}")
     else:
         print("\n💡 Para aplicar los cambios, ejecuta:")
-        print(
-            f"   python hash_assets.py --base {base_path} --manifest {manifest_file} --apply"
-        )
+        print(f"   python hash_assets.py --base {base_path} --manifest {manifest_file} --apply")
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Aplica cache-busting a archivos estáticos"
-    )
-    parser.add_argument(
-        "--base", required=True, help="Directorio base de archivos estáticos"
-    )
-    parser.add_argument(
-        "--manifest", required=True, help="Archivo JSON de manifest con hashes"
-    )
+    parser = argparse.ArgumentParser(description="Aplica cache-busting a archivos estáticos")
+    parser.add_argument("--base", required=True, help="Directorio base de archivos estáticos")
+    parser.add_argument("--manifest", required=True, help="Archivo JSON de manifest con hashes")
     parser.add_argument("--apply", action="store_true", help="Aplicar los cambios")
 
     args = parser.parse_args()

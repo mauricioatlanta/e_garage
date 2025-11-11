@@ -22,9 +22,7 @@ class Command(BaseCommand):
 
         try:
             with transaction.atomic():
-                documentos = Documento.objects.select_related(
-                    "tecnico_responsable"
-                ).all()
+                documentos = Documento.objects.select_related("tecnico_responsable").all()
                 total_docs = documentos.count()
 
                 self.stdout.write(f"📊 Procesando {total_docs} documentos...")
@@ -43,27 +41,19 @@ class Command(BaseCommand):
                             )
 
                             if i % 100 == 0:
-                                self.stdout.write(
-                                    f"   Procesados {i}/{total_docs} documentos..."
-                                )
+                                self.stdout.write(f"   Procesados {i}/{total_docs} documentos...")
                     else:
                         self.stdout.write(
-                            self.style.WARNING(
-                                f"   ⚠️  Documento {d.pk} sin técnico responsable"
-                            )
+                            self.style.WARNING(f"   ⚠️  Documento {d.pk} sin técnico responsable")
                         )
 
                 if dry_run:
                     self.stdout.write(
-                        self.style.SUCCESS(
-                            f"✅ Dry-run completado para {total_docs} documentos"
-                        )
+                        self.style.SUCCESS(f"✅ Dry-run completado para {total_docs} documentos")
                     )
                 else:
                     self.stdout.write(
-                        self.style.SUCCESS(
-                            f"✅ Backfill completado para {total_docs} documentos"
-                        )
+                        self.style.SUCCESS(f"✅ Backfill completado para {total_docs} documentos")
                     )
 
         except Exception as e:

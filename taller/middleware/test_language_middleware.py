@@ -24,12 +24,8 @@ class TestLanguageMiddleware(MiddlewareMixin):
 
             # Si la URL contiene /es/, establecer español
             if "/es/" in path:
-                print(
-                    f"🇪🇸 TestLanguageMiddleware: Setting language to 'es' for path: {path}"
-                )
-                logger.info(
-                    f"🇪🇸 TestLanguageMiddleware: Setting language to 'es' for path: {path}"
-                )
+                print(f"🇪🇸 TestLanguageMiddleware: Setting language to 'es' for path: {path}")
+                logger.info(f"🇪🇸 TestLanguageMiddleware: Setting language to 'es' for path: {path}")
                 translation.activate("es")
                 request.LANGUAGE_CODE = "es"
             else:

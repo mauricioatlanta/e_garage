@@ -31,8 +31,6 @@ toyota = MarcaVehiculo.objects.get(nombre="Toyota")
 honda = MarcaVehiculo.objects.get(nombre="Honda")
 
 print(f"Ford (ID {ford.pk}): http://127.0.0.1:8000/api/modelos/{ford.pk}/")
-print(
-    f"Chevrolet (ID {chevrolet.pk}): http://127.0.0.1:8000/api/modelos/{chevrolet.pk}/"
-)
+print(f"Chevrolet (ID {chevrolet.pk}): http://127.0.0.1:8000/api/modelos/{chevrolet.pk}/")
 print(f"Toyota (ID {toyota.pk}): http://127.0.0.1:8000/api/modelos/{toyota.pk}/")
 print(f"Honda (ID {honda.pk}): http://127.0.0.1:8000/api/modelos/{honda.pk}/")

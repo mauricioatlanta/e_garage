@@ -305,3 +305,4 @@ Si encuentras algún problema:
 > **Última actualización**: 7 de Noviembre, 2025
 > **Versión**: 1.0
 > **Sistema**: eGarage
+

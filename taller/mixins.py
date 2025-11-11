@@ -107,13 +107,9 @@ class CountryLangTemplateMixin:
 
         # Seleccionar template apropiado
         try:
-            template_name = select_country_lang_template(
-                self.base_template_name, country, lang
-            )
+            template_name = select_country_lang_template(self.base_template_name, country, lang)
         except Exception:
             # Fallback a template base si hay problemas
             template_name = f"taller/common/{self.base_template_name}"
 
-        return self.response_class(
-            request=request, template=template_name, context=context
-        )
+        return self.response_class(request=request, template=template_name, context=context)

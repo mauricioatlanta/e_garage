@@ -36,9 +36,7 @@ def main():
     print("\n🔍 Verificando usuarios de Chile:")
     usuarios_chile = User.objects.filter(empresa__pais="CL")
     for user in usuarios_chile[:3]:
-        print(
-            f"  👤 {user.username} - Empresa: {user.empresa.nombre if user.empresa else 'N/A'}"
-        )
+        print(f"  👤 {user.username} - Empresa: {user.empresa.nombre if user.empresa else 'N/A'}")
 
 
 if __name__ == "__main__":

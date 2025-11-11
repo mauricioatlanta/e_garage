@@ -32,9 +32,7 @@ class TenantManager(models.Manager):
 
 
 class TenantScoped(models.Model):
-    empresa = models.ForeignKey(
-        "taller.Empresa", on_delete=models.CASCADE, db_index=True
-    )
+    empresa = models.ForeignKey("taller.Empresa", on_delete=models.CASCADE, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

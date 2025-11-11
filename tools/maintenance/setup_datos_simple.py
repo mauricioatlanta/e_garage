@@ -30,16 +30,12 @@ empresa, created = Empresa.objects.get_or_create(
         "email": "taller@test.com",
     },
 )
-print(
-    f"{'✅ Empresa creada' if created else 'ℹ️ Empresa ya existe'}: {empresa.nombre_taller}"
-)
+print(f"{'✅ Empresa creada' if created else 'ℹ️ Empresa ya existe'}: {empresa.nombre_taller}")
 
 # 3. Crear perfil
 from taller.models.perfil_usuario import PerfilUsuario
 
-perfil, created = PerfilUsuario.objects.get_or_create(
-    user=user, defaults={"empresa": empresa}
-)
+perfil, created = PerfilUsuario.objects.get_or_create(user=user, defaults={"empresa": empresa})
 print(f"{'✅ Perfil creado' if created else 'ℹ️ Perfil ya existe'}")
 
 # 4. Crear técnicos

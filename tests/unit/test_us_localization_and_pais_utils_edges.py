@@ -32,9 +32,7 @@ def test_us_localization_currency_formatting_edges():
         try:
             # Test currency formatting
             result = format_currency(value)
-            assert isinstance(
-                result, str
-            ), f"format_currency should return string for {value}"
+            assert isinstance(result, str), f"format_currency should return string for {value}"
         except Exception as e:
             # If it crashes, that's a bug we want to catch
             pytest.fail(f"format_currency crashed on {value}: {e}")
@@ -43,9 +41,7 @@ def test_us_localization_currency_formatting_edges():
         try:
             # Test percentage formatting
             result = format_percentage(value)
-            assert isinstance(
-                result, str
-            ), f"format_percentage should return string for {value}"
+            assert isinstance(result, str), f"format_percentage should return string for {value}"
         except Exception as e:
             # If it crashes, that's a bug we want to catch
             pytest.fail(f"format_percentage crashed on {value}: {e}")
@@ -101,9 +97,7 @@ def test_pais_utils_edge_cases():
     for rate in tax_rates:
         try:
             result = format_tax_rate(rate)
-            assert isinstance(
-                result, str
-            ), f"format_tax_rate should return string for {rate}"
+            assert isinstance(result, str), f"format_tax_rate should return string for {rate}"
         except Exception as e:
             # If it crashes, that's a bug we want to catch
             pytest.fail(f"format_tax_rate crashed on {rate}: {e}")

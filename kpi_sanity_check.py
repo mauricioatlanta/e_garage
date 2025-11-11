@@ -33,9 +33,7 @@ def kpi_sanity_check():
         )
 
         totales = (
-            LineaServicio.objects.filter(
-                documento__fecha_emision__month=timezone.now().month
-            )
+            LineaServicio.objects.filter(documento__fecha_emision__month=timezone.now().month)
             .annotate(monto=monto)
             .values("documento__tecnico_responsable__nombre")
             .annotate(total=Sum("monto"))
@@ -43,9 +41,7 @@ def kpi_sanity_check():
 
         print("   Resultados:")
         for total in totales:
-            print(
-                f"   - {total['documento__tecnico_responsable__nombre']}: ${total['total']}"
-            )
+            print(f"   - {total['documento__tecnico_responsable__nombre']}: ${total['total']}")
 
         # KPI 2: Documentos por estado en el mes actual
         print("\n2. Documentos por estado en el mes actual:")

@@ -25,14 +25,10 @@ urlpatterns = [
     path("form/", DocumentoCreateView.as_view(), name="documento_crear"),
     path("form/<int:pk>/", MigratedUpdateView.as_view(), name="documento_editar"),
     # Alias adicional para editar (compatibilidad con URL esperada)
-    path(
-        "editar/<int:pk>/", MigratedUpdateView.as_view(), name="documento_editar_alias"
-    ),
+    path("editar/<int:pk>/", MigratedUpdateView.as_view(), name="documento_editar_alias"),
     # Detalle y eliminación con template resolution
     path("ver/<int:pk>/", MigratedDetailView.as_view(), name="ver_documento"),
-    path(
-        "eliminar/<int:pk>/", DocumentoDeleteView.as_view(), name="eliminar_documento"
-    ),
+    path("eliminar/<int:pk>/", DocumentoDeleteView.as_view(), name="eliminar_documento"),
     # Compatibilidad con rutas antiguas - CON PRESERVACIÓN DE PAÍS
     path("nuevo/", redirect_documento_crear, name="crear_documento"),
     path("nuevo-editar/<int:pk>/", redirect_documento_editar, name="editar_documento"),
@@ -114,9 +110,7 @@ urlpatterns = [
     path("api/crear-servicio/", views.api_crear_servicio, name="api_crear_servicio"),
     path("api/create/", api.api_create, name="api_create"),
     # Autocompletado de clientes
-    path(
-        "autocomplete/cliente/", views.autocomplete_cliente, name="autocomplete_cliente"
-    ),
+    path("autocomplete/cliente/", views.autocomplete_cliente, name="autocomplete_cliente"),
     # Endpoint de diagnóstico
     # path("lista-debug/", lista_debug, name="lista_debug"),  # Función no existe
 ]

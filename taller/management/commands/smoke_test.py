@@ -12,13 +12,9 @@ class Command(BaseCommand):
 
         try:
             # Crear empresa
-            emp, created = Empresa.objects.get_or_create(
-                nombre="Demo US", pais="US", moneda="USD"
-            )
+            emp, created = Empresa.objects.get_or_create(nombre="Demo US", pais="US", moneda="USD")
             if created:
-                self.stdout.write(
-                    self.style.SUCCESS(f"✅ Empresa creada: {emp.nombre}")
-                )
+                self.stdout.write(self.style.SUCCESS(f"✅ Empresa creada: {emp.nombre}"))
             else:
                 self.stdout.write(f"✅ Empresa existente: {emp.nombre}")
 
@@ -27,9 +23,7 @@ class Command(BaseCommand):
                 empresa=emp, nombre="Alex Tech", activo=True
             )
             if created:
-                self.stdout.write(
-                    self.style.SUCCESS(f"✅ Técnico creado: {tec.nombre}")
-                )
+                self.stdout.write(self.style.SUCCESS(f"✅ Técnico creado: {tec.nombre}"))
             else:
                 self.stdout.write(f"✅ Técnico existente: {tec.nombre}")
 
@@ -38,9 +32,7 @@ class Command(BaseCommand):
                 empresa=emp, nombre="John Doe", rut_ein="12-3456789"
             )
             if created:
-                self.stdout.write(
-                    self.style.SUCCESS(f"✅ Cliente creado: {cli.nombre}")
-                )
+                self.stdout.write(self.style.SUCCESS(f"✅ Cliente creado: {cli.nombre}"))
             else:
                 self.stdout.write(f"✅ Cliente existente: {cli.nombre}")
 

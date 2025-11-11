@@ -176,17 +176,13 @@ def audit_static_directory(base_path, output_csv):
                 for issue in file_data["issues"].split("; "):
                     issue_counts[issue] = issue_counts.get(issue, 0) + 1
 
-        for issue, count in sorted(
-            issue_counts.items(), key=lambda x: x[1], reverse=True
-        ):
+        for issue, count in sorted(issue_counts.items(), key=lambda x: x[1], reverse=True):
             print(f"   {issue}: {count} archivos")
 
 
 def main():
     parser = argparse.ArgumentParser(description="Audita archivos estáticos")
-    parser.add_argument(
-        "--base", required=True, help="Directorio base de archivos estáticos"
-    )
+    parser.add_argument("--base", required=True, help="Directorio base de archivos estáticos")
     parser.add_argument("--out", required=True, help="Archivo CSV de salida")
 
     args = parser.parse_args()

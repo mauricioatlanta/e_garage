@@ -59,12 +59,8 @@ def find_deep_candidates(templates_root: Path, filename: str):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", default=".", help="Project root with ./templates")
-    ap.add_argument(
-        "--apply", action="store_true", help="Apply changes (otherwise, dry run)"
-    )
-    ap.add_argument(
-        "--delete", action="store_true", help="Delete instead of backup-move"
-    )
+    ap.add_argument("--apply", action="store_true", help="Apply changes (otherwise, dry run)")
+    ap.add_argument("--delete", action="store_true", help="Delete instead of backup-move")
     ap.add_argument(
         "--only", nargs="*", help="Limit to these short prefixes (cl/es, us/en, common)"
     )

@@ -133,9 +133,7 @@ def crear_servicios_externos():
 
             if created:
                 servicios_creados.append(servicio)
-                print(
-                    f"✅ Servicio externo creado: {servicio.nombre} - {servicio.empresa_externa}"
-                )
+                print(f"✅ Servicio externo creado: {servicio.nombre} - {servicio.empresa_externa}")
                 print(
                     f"   💰 Costo: ${servicio.costo_taller} | Cliente: ${servicio.precio_cliente} | Ganancia: ${servicio.ganancia}"
                 )
@@ -147,9 +145,7 @@ def crear_servicios_externos():
 
     print("\n🎉 Proceso completado!")
     print(f"📊 Servicios externos creados: {len(servicios_creados)}")
-    print(
-        f"📊 Total servicios externos: {ServicioExterno.objects.filter(empresa=empresa).count()}"
-    )
+    print(f"📊 Total servicios externos: {ServicioExterno.objects.filter(empresa=empresa).count()}")
 
     # Mostrar estadísticas
     if servicios_creados:

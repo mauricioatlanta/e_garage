@@ -29,9 +29,7 @@ def verify_security_settings():
     checks.append(f"{debug_status} DEBUG = {settings.DEBUG}")
 
     # Verificar ALLOWED_HOSTS
-    allowed_hosts_ok = (
-        len(settings.ALLOWED_HOSTS) > 0 and "*" not in settings.ALLOWED_HOSTS
-    )
+    allowed_hosts_ok = len(settings.ALLOWED_HOSTS) > 0 and "*" not in settings.ALLOWED_HOSTS
     hosts_status = "✅" if allowed_hosts_ok else "❌"
     checks.append(f"{hosts_status} ALLOWED_HOSTS = {settings.ALLOWED_HOSTS}")
 
@@ -41,9 +39,7 @@ def verify_security_settings():
 
     # Verificar cookies seguras
     cookies_status = "✅" if settings.SESSION_COOKIE_SECURE else "❌"
-    checks.append(
-        f"{cookies_status} SESSION_COOKIE_SECURE = {settings.SESSION_COOKIE_SECURE}"
-    )
+    checks.append(f"{cookies_status} SESSION_COOKIE_SECURE = {settings.SESSION_COOKIE_SECURE}")
 
     # Verificar CSRF
     csrf_status = "✅" if settings.CSRF_COOKIE_SECURE else "❌"

@@ -14,9 +14,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="documento",
             name="fecha_pago",
-            field=models.DateTimeField(
-                blank=True, help_text="Fecha y hora del pago", null=True
-            ),
+            field=models.DateTimeField(blank=True, help_text="Fecha y hora del pago", null=True),
         ),
         migrations.AddField(
             model_name="documento",

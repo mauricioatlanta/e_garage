@@ -67,9 +67,7 @@ def verificar_documento_41():
             if doc.vehiculo.cliente == doc.cliente:
                 print("\n✅ El vehículo del documento pertenece al cliente correcto")
             else:
-                print(
-                    "\n❌ PROBLEMA: El vehículo del documento NO pertenece al cliente"
-                )
+                print("\n❌ PROBLEMA: El vehículo del documento NO pertenece al cliente")
                 print(f"   Vehículo cliente: {doc.vehiculo.cliente}")
                 print(f"   Documento cliente: {doc.cliente}")
         else:

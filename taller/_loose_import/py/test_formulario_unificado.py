@@ -26,9 +26,7 @@ def test_formulario_unificado():
         username="testuser_form", email="test@example.com", password="testpass123"
     )
 
-    empresa_cl = Empresa.objects.create(
-        nombre_taller="Taller Chile Test", pais="CL", user=user
-    )
+    empresa_cl = Empresa.objects.create(nombre_taller="Taller Chile Test", pais="CL", user=user)
 
     cliente = Cliente.objects.create(
         nombre="Juan Pérez Test", email="juan@example.com", empresa=empresa_cl
@@ -77,9 +75,7 @@ def test_formulario_unificado():
 
     # Test 3: Formulario USA
     print("\n🇺🇸 Test formulario USA:")
-    empresa_us = Empresa.objects.create(
-        nombre_taller="Taller USA Test", pais="US", user=user
-    )
+    empresa_us = Empresa.objects.create(nombre_taller="Taller USA Test", pais="US", user=user)
 
     form_us = DocumentoForm(user=user, empresa=empresa_us, country="US")
 

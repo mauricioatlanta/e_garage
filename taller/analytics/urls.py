@@ -36,9 +36,7 @@ urlpatterns = [
     # === DASHBOARD ADMIN SUSCRIPTORES ===
     path("admin/dashboard/", dashboard_admin, name="dashboard_admin"),
     path("admin/dashboard/api/charts/", api_admin_charts, name="admin_charts_api"),
-    path(
-        "admin/dashboard/exportar-csv/", exportar_suscriptores_csv, name="exportar_csv"
-    ),
+    path("admin/dashboard/exportar-csv/", exportar_suscriptores_csv, name="exportar_csv"),
     path(
         "admin/dashboard/suscriptor/<int:empresa_id>/",
         detalle_suscriptor,
@@ -51,9 +49,7 @@ urlpatterns = [
         name="dashboard_avanzado",
     ),
     # === FUNCIONALIDADES ADICIONALES ORIGINALES ===
-    path(
-        "admin/dashboard/predictive/", predictive_indicators_api, name="predictive_api"
-    ),
+    path("admin/dashboard/predictive/", predictive_indicators_api, name="predictive_api"),
     path("admin/dashboard/geographic/", geographic_map_api, name="geographic_api"),
     path("admin/dashboard/alertas/", alertas_expiracion_api, name="alertas_api"),
     path(

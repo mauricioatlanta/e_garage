@@ -100,13 +100,9 @@ def main():
                         }
                     )
                 else:
-                    templates_unicos_taller.append(
-                        {"rel_path": rel_path, "file": taller_file}
-                    )
+                    templates_unicos_taller.append({"rel_path": rel_path, "file": taller_file})
             else:
-                templates_unicos_taller.append(
-                    {"rel_path": rel_path, "file": taller_file}
-                )
+                templates_unicos_taller.append({"rel_path": rel_path, "file": taller_file})
 
     # Reportar resultados
     print("=" * 80)
@@ -143,9 +139,7 @@ def main():
                 print()
 
     if templates_unicos_taller:
-        print(
-            f"📝 TEMPLATES ÚNICOS en taller/templates/ ({len(templates_unicos_taller)}):"
-        )
+        print(f"📝 TEMPLATES ÚNICOS en taller/templates/ ({len(templates_unicos_taller)}):")
         print("   (Deben moverse a /templates/)")
         print()
         for tmpl in templates_unicos_taller:
@@ -177,17 +171,13 @@ def main():
             for dup in diferentes:
                 f.write(f"### {dup['rel_path']}\n\n")
                 f.write(f"- **Similitud:** {dup['similarity']*100:.1f}%\n")
-                f.write(
-                    f"- **Ubicación 1:** `/templates/{dup.get('alt_path', dup['rel_path'])}`\n"
-                )
+                f.write(f"- **Ubicación 1:** `/templates/{dup.get('alt_path', dup['rel_path'])}`\n")
                 f.write(f"- **Ubicación 2:** `/taller/templates/{dup['rel_path']}`\n")
                 f.write("- **Acción:** Revisar manualmente y consolidar\n\n")
 
         if templates_unicos_taller:
             f.write("## Templates Únicos (Para Mover)\n\n")
-            f.write(
-                "Estos templates deben moverse de /taller/templates/ a /templates/:\n\n"
-            )
+            f.write("Estos templates deben moverse de /taller/templates/ a /templates/:\n\n")
             for tmpl in templates_unicos_taller:
                 f.write(f"- `{tmpl['rel_path']}`\n")
             f.write("\n")

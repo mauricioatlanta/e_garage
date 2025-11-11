@@ -172,9 +172,7 @@ def rate_limit(action="login", per_ip=True, per_user=False):
 
                 if not allowed:
                     # Rate limit excedido
-                    remaining_time = rate_limiter.get_remaining_block_time(
-                        action, identifier
-                    )
+                    remaining_time = rate_limiter.get_remaining_block_time(action, identifier)
 
                     # Log del bloqueo
                     smart_logger.log_security_alert(
@@ -211,9 +209,7 @@ def rate_limit(action="login", per_ip=True, per_user=False):
                             "remaining_minutes": remaining_time // 60,
                             "remaining_seconds": remaining_time % 60,
                         }
-                        return render(
-                            request, "errors/rate_limit.html", context, status=429
-                        )
+                        return render(request, "errors/rate_limit.html", context, status=429)
 
             # Continuar con la vista
             response = view_func(request, *args, **kwargs)
@@ -320,14 +316,10 @@ class RateLimitMiddleware:
                 action = "general"
 
             # Verificar rate limit
-            allowed, attempts_left, reset_time = rate_limiter.check_rate_limit(
-                action, f"ip:{ip}"
-            )
+            allowed, attempts_left, reset_time = rate_limiter.check_rate_limit(action, f"ip:{ip}")
 
             if not allowed:
-                remaining_time = rate_limiter.get_remaining_block_time(
-                    action, f"ip:{ip}"
-                )
+                remaining_time = rate_limiter.get_remaining_block_time(action, f"ip:{ip}")
 
                 # Log del bloqueo
                 smart_logger.log_security_alert(
@@ -361,9 +353,7 @@ class RateLimitMiddleware:
                         "remaining_minutes": remaining_time // 60,
                         "path": path,
                     }
-                    return render(
-                        request, "errors/rate_limit.html", context, status=429
-                    )
+                    return render(request, "errors/rate_limit.html", context, status=429)
 
         response = self.get_response(request)
         return response

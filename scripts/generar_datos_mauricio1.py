@@ -115,9 +115,7 @@ def crear_documentos_mauricio1():
                     vehiculo = random.choice(vehiculos)
                     vehiculo.cliente = cliente
                     vehiculo.save()
-                    print(
-                        f"    📝 Vehículo {vehiculo.patente} asignado a cliente {cliente.nombre}"
-                    )
+                    print(f"    📝 Vehículo {vehiculo.patente} asignado a cliente {cliente.nombre}")
                 else:
                     vehiculo = random.choice(vehiculos_cliente)
 
@@ -134,9 +132,7 @@ def crear_documentos_mauricio1():
                     kilometraje=random.randint(5000, 200000),
                     observaciones=f"Documento de prueba {tipo} #{i+1}. Cliente: {cliente.nombre} {cliente.apellido or ''}. Vehículo: {vehiculo.marca.nombre if vehiculo.marca else 'N/A'} {vehiculo.modelo.nombre if vehiculo.modelo else 'N/A'}.",
                     tax_rate_applied=(
-                        Decimal("19.00")
-                        if random.choice([True, False])
-                        else Decimal("0.00")
+                        Decimal("19.00") if random.choice([True, False]) else Decimal("0.00")
                     ),
                     fecha=datetime.now().date() - timedelta(days=random.randint(0, 30)),
                 )
@@ -147,9 +143,7 @@ def crear_documentos_mauricio1():
                     repuestos_elegidos = random.sample(repuestos, num_repuestos)
                     for repuesto in repuestos_elegidos:
                         cantidad = random.randint(1, 3)
-                        precio = max(
-                            1000, repuesto.precio_venta + random.randint(-3000, 10000)
-                        )
+                        precio = max(1000, repuesto.precio_venta + random.randint(-3000, 10000))
 
                         LineaRepuesto.objects.create(
                             documento=documento,
@@ -166,9 +160,7 @@ def crear_documentos_mauricio1():
                     servicios_elegidos = random.sample(servicios, num_servicios)
                     for servicio in servicios_elegidos:
                         precio_base = servicio.precio_base or 25000
-                        precio = max(
-                            5000, int(precio_base) + random.randint(-5000, 15000)
-                        )
+                        precio = max(5000, int(precio_base) + random.randint(-5000, 15000))
 
                         LineaServicio.objects.create(
                             documento=documento,

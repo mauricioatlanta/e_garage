@@ -49,9 +49,7 @@ class TemplateViewMigrator:
             if not target_path.exists():
                 shutil.copy2(full_template_path, target_path)
                 self.templates_copied.append(str(target_path))
-                self.log(
-                    f"✅ Copiado: {template_path} → {canonical_dir}/{relative_path}"
-                )
+                self.log(f"✅ Copiado: {template_path} → {canonical_dir}/{relative_path}")
 
         return True
 

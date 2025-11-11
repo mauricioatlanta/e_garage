@@ -35,9 +35,7 @@ class Command(BaseCommand):
             self.stdout.write("Limpiando tokens CSRF...")
             with connection.cursor() as cursor:
                 # Limpiar tabla de sesiones que puede contener tokens CSRF
-                cursor.execute(
-                    "DELETE FROM django_session WHERE session_data LIKE '%csrf%'"
-                )
+                cursor.execute("DELETE FROM django_session WHERE session_data LIKE '%csrf%'")
                 csrf_deleted = cursor.rowcount
                 self.stdout.write(f"  - Tokens CSRF eliminados: {csrf_deleted}")
 

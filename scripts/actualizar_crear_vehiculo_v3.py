@@ -229,9 +229,7 @@ def main():
         print(f"✅ {success_count}/{len(TEMPLATE_VARIANTS)} variantes actualizadas")
         return True
     else:
-        print(
-            f"\n⚠️  Actualización parcial: {success_count}/{len(TEMPLATE_VARIANTS)} variantes"
-        )
+        print(f"\n⚠️  Actualización parcial: {success_count}/{len(TEMPLATE_VARIANTS)} variantes")
         return False
 
 

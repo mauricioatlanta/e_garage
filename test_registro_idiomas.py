@@ -49,11 +49,7 @@ def print_header(text):
 
 def print_test(name, passed, details=""):
     """Imprime resultado de un test"""
-    status = (
-        f"{Colors.GREEN}✓ PASS{Colors.END}"
-        if passed
-        else f"{Colors.RED}✗ FAIL{Colors.END}"
-    )
+    status = f"{Colors.GREEN}✓ PASS{Colors.END}" if passed else f"{Colors.RED}✗ FAIL{Colors.END}"
     print(f"{status} | {name}")
     if details:
         print(f"      └─ {details}")
@@ -83,9 +79,7 @@ def test_usa_registration():
     # Verificar que el idioma es inglés
     has_english = "Create Account" in content or "Create Your Account" in content
     has_english_month = "Monthly" in content or "month" in content
-    results.append(
-        ("Idioma inglés detectado", has_english, f"Encontrado: {has_english}")
-    )
+    results.append(("Idioma inglés detectado", has_english, f"Encontrado: {has_english}"))
     results.append(
         (
             "Términos en inglés (Monthly)",
@@ -95,9 +89,7 @@ def test_usa_registration():
     )
 
     # Verificar que hay traducción (tags {% trans %})
-    has_i18n = (
-        "{% trans" in open("templates/account/signup.html", encoding="utf-8").read()
-    )
+    has_i18n = "{% trans" in open("templates/account/signup.html", encoding="utf-8").read()
     results.append(
         (
             "Template usa i18n ({% trans %})",
@@ -106,9 +98,7 @@ def test_usa_registration():
         )
     )
 
-    print(
-        f"\n{Colors.BOLD}Test 1.2: Registro USA - Español como alternativa{Colors.END}"
-    )
+    print(f"\n{Colors.BOLD}Test 1.2: Registro USA - Español como alternativa{Colors.END}")
     request = factory.get("/accounts/signup/?from=us")
     request.user = AnonymousUser()
     request.session = {"django_language": "es"}
@@ -138,9 +128,7 @@ def test_usa_registration():
             f"Idiomas permitidos: {usa_allowed}",
         )
     )
-    results.append(
-        ("USA default es inglés", usa_default == "en", f"Default: {usa_default}")
-    )
+    results.append(("USA default es inglés", usa_default == "en", f"Default: {usa_default}"))
 
     print()
     for name, passed, details in results:
@@ -188,9 +176,7 @@ def test_chile_registration():
             f"Idiomas permitidos: {chile_allowed}",
         )
     )
-    results.append(
-        ("Chile default es español", chile_default == "es", f"Default: {chile_default}")
-    )
+    results.append(("Chile default es español", chile_default == "es", f"Default: {chile_default}"))
 
     # Verificar que NO hay opción de cambiar a inglés
     results.append(
@@ -282,18 +268,14 @@ def test_url_routing():
         url = reverse("account_signup")
         results.append(("URL account_signup existe", True, f"URL: {url}"))
     except:
-        results.append(
-            ("URL account_signup existe", False, "No se pudo resolver la URL")
-        )
+        results.append(("URL account_signup existe", False, "No se pudo resolver la URL"))
 
     # Verificar bienvenida Chile
     try:
         url = reverse("bienvenida_chile")
         results.append(("URL bienvenida_chile existe", True, f"URL: {url}"))
     except:
-        results.append(
-            ("URL bienvenida_chile existe", False, "No se pudo resolver la URL")
-        )
+        results.append(("URL bienvenida_chile existe", False, "No se pudo resolver la URL"))
 
     print()
     for name, passed, details in results:
@@ -345,9 +327,7 @@ def test_middleware_configuration():
     )
 
     # Verificar i18n habilitado
-    results.append(
-        ("i18n habilitado", settings.USE_I18N, f"USE_I18N = {settings.USE_I18N}")
-    )
+    results.append(("i18n habilitado", settings.USE_I18N, f"USE_I18N = {settings.USE_I18N}"))
 
     print()
     for name, passed, details in results:
@@ -371,12 +351,8 @@ def generate_summary(test_results):
     percentage = (passed / total * 100) if total > 0 else 0
 
     if percentage == 100:
-        print(
-            f"\n{Colors.GREEN}{Colors.BOLD}🎉 ¡TODOS LOS TESTS PASARON! 🎉{Colors.END}"
-        )
-        print(
-            f"\n{Colors.GREEN}✅ La configuración de idiomas por país está correcta:{Colors.END}"
-        )
+        print(f"\n{Colors.GREEN}{Colors.BOLD}🎉 ¡TODOS LOS TESTS PASARON! 🎉{Colors.END}")
+        print(f"\n{Colors.GREEN}✅ La configuración de idiomas por país está correcta:{Colors.END}")
         print(f"{Colors.GREEN}   • USA: Inglés con opción a español ✓{Colors.END}")
         print(f"{Colors.GREEN}   • Chile: Solo español ✓{Colors.END}")
     elif percentage >= 80:
@@ -388,9 +364,7 @@ def generate_summary(test_results):
         print(
             f"\n{Colors.RED}{Colors.BOLD}❌ Hay problemas con la configuración ({percentage:.0f}% pasó){Colors.END}"
         )
-        print(
-            f"{Colors.RED}Revisa la implementación del sistema de idiomas.{Colors.END}"
-        )
+        print(f"{Colors.RED}Revisa la implementación del sistema de idiomas.{Colors.END}")
 
     print(f"\n{Colors.CYAN}{'='*70}{Colors.END}\n")
 

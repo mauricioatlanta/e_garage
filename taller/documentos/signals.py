@@ -97,6 +97,4 @@ def recalc_on_line_change(sender, instance, raw=False, using=None, **kwargs):
         doc.neto_servicios = neto_servicios
         doc.tax_amount = tax_amount
         doc.total = total
-        doc.save(
-            update_fields=["neto_repuestos", "neto_servicios", "tax_amount", "total"]
-        )
+        doc.save(update_fields=["neto_repuestos", "neto_servicios", "tax_amount", "total"])

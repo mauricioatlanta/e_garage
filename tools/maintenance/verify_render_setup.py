@@ -123,9 +123,7 @@ def main():
         return 0
     else:
         print("❌ Hay problemas que deben resolverse antes del despliegue")
-        print(
-            "\n🔧 Revisa los errores arriba y corrige los archivos faltantes o mal configurados"
-        )
+        print("\n🔧 Revisa los errores arriba y corrige los archivos faltantes o mal configurados")
         return 1
 
 

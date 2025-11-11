@@ -17,9 +17,7 @@ try:
     print(f"Cliente: {cliente.nombre} {cliente.apellido}")
     print(f"Empresa: {cliente.empresa}")
     print(f'Empresa ID: {cliente.empresa.id if cliente.empresa else "None"}')
-    print(
-        f'País de la empresa: "{cliente.empresa.pais}" (tipo: {type(cliente.empresa.pais)})'
-    )
+    print(f'País de la empresa: "{cliente.empresa.pais}" (tipo: {type(cliente.empresa.pais)})')
     print(f'País == "US": {cliente.empresa.pais == "US"}')
     print(f'País == "CL": {cliente.empresa.pais == "CL"}')
     print(f"Repr del país: {repr(cliente.empresa.pais)}")

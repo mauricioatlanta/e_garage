@@ -138,9 +138,7 @@ def sugerir_solucion():
     """Sugiere soluciones basadas en el diagnóstico"""
 
     print("\n💡 Posibles soluciones:")
-    print(
-        "1. Verificar que los campos del template coincidan con los esperados por la vista"
-    )
+    print("1. Verificar que los campos del template coincidan con los esperados por la vista")
     print("2. Asegurar que la vista procese correctamente los datos POST")
     print("3. Verificar que el formulario VehiculoForm valide correctamente")
     print("4. Comprobar que el redirect apunte a la URL correcta")

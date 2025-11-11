@@ -30,23 +30,15 @@ class TestApiBuscarServicios(TestCase):
         categoria = CategoriaServicio.objects.create(country="US", code="MAINT")
 
         # --- Crea servicios de la empresa del usuario ---
-        Servicio.objects.create(
-            nombre="Oil Change", empresa=empresa, categoria=categoria
-        )
-        Servicio.objects.create(
-            nombre="Brake Service", empresa=empresa, categoria=categoria
-        )
-        Servicio.objects.create(
-            nombre="Air Filter", empresa=empresa, categoria=categoria
-        )
+        Servicio.objects.create(nombre="Oil Change", empresa=empresa, categoria=categoria)
+        Servicio.objects.create(nombre="Brake Service", empresa=empresa, categoria=categoria)
+        Servicio.objects.create(nombre="Air Filter", empresa=empresa, categoria=categoria)
 
         # --- Servicio de otra empresa (no debería aparecer) ---
         from taller.models.empresa import Empresa
 
         otra_user = User.objects.create_user(username="otro", password="123")
-        otra = Empresa.objects.create(
-            user=otra_user, nombre_taller="Otra", pais="CL", moneda="CLP"
-        )
+        otra = Empresa.objects.create(user=otra_user, nombre_taller="Otra", pais="CL", moneda="CLP")
         Servicio.objects.create(nombre="Tire Change", empresa=otra, categoria=categoria)
 
         self.client.force_login(user)

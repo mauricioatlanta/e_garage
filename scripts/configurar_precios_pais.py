@@ -116,18 +116,14 @@ def verificar_configuracion():
 
     for pais, nombre_pais in [("CL", "Chile"), ("US", "Estados Unidos")]:
         print(f"\n🏛️ {nombre_pais}:")
-        precios = PrecioSuscripcion.objects.filter(pais=pais, activo=True).order_by(
-            "precio"
-        )
+        precios = PrecioSuscripcion.objects.filter(pais=pais, activo=True).order_by("precio")
 
         if not precios.exists():
             print(f"   ❌ No hay precios configurados para {nombre_pais}")
             continue
 
         for precio in precios:
-            print(
-                f"   💰 {precio.get_tipo_plan_display()}: {precio.precio_formateado()}"
-            )
+            print(f"   💰 {precio.get_tipo_plan_display()}: {precio.precio_formateado()}")
             print(f"      👥 Usuarios: {precio.usuarios_incluidos}")
             print(f"      🔧 API: {'✅' if precio.api_incluida else '❌'}")
             print(f"      🏢 Multi-sucursal: {'✅' if precio.multisucursal else '❌'}")
@@ -152,16 +148,12 @@ def main():
         print("=" * 45)
         print("✅ Chile: Precios en CLP (sin decimales)")
         print("✅ USA: Precios en USD (con decimales)")
-        print(
-            "\n📋 Los precios ahora se mostrarán automáticamente según el país del usuario"
-        )
+        print("\n📋 Los precios ahora se mostrarán automáticamente según el país del usuario")
         print("🌐 Vista de precios: /precios/")
 
     except Exception as e:
         print(f"\n❌ ERROR: {e}")
-        print(
-            "Verifique que la base de datos esté disponible y las migraciones aplicadas"
-        )
+        print("Verifique que la base de datos esté disponible y las migraciones aplicadas")
 
 
 if __name__ == "__main__":

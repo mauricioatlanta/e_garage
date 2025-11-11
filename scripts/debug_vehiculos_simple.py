@@ -40,9 +40,7 @@ def main():
     print("=" * 50)
     for empresa in Empresa.objects.all():
         clientes = Cliente.objects.filter(empresa=empresa)
-        print(
-            f"Empresa {empresa.nombre_taller} ({empresa.pais}): {clientes.count()} clientes"
-        )
+        print(f"Empresa {empresa.nombre_taller} ({empresa.pais}): {clientes.count()} clientes")
         for cliente in clientes:
             print(f"  - {cliente.nombre} {cliente.apellido}")
 
@@ -50,9 +48,7 @@ def main():
     print("=" * 50)
     for empresa in Empresa.objects.all():
         vehiculos = Vehiculo.objects.filter(cliente__empresa=empresa)
-        print(
-            f"Empresa {empresa.nombre_taller} ({empresa.pais}): {vehiculos.count()} vehículos"
-        )
+        print(f"Empresa {empresa.nombre_taller} ({empresa.pais}): {vehiculos.count()} vehículos")
         for vehiculo in vehiculos:
             print(
                 f"  - {vehiculo.patente} ({vehiculo.marca} {vehiculo.modelo}) - Cliente: {vehiculo.cliente.nombre}"

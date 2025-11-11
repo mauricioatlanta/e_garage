@@ -19,9 +19,7 @@ def _empresa_activa(request):
 def tecnicos_lista(request):
     empresa = _empresa_activa(request)
     tecnicos = Tecnico.objects.filter(empresa=empresa).order_by("-activo", "nombre")
-    return render(
-        request, "tecnicos/lista.html", {"empresa": empresa, "tecnicos": tecnicos}
-    )
+    return render(request, "tecnicos/lista.html", {"empresa": empresa, "tecnicos": tecnicos})
 
 
 @login_required

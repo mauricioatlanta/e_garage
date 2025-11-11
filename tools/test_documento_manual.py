@@ -81,9 +81,7 @@ try:
     linea_otro = LineaOtroServicio.objects.create(
         documento=doc_cl, nombre="Balanceo", cantidad=1, precio_cliente=Decimal("3000")
     )
-    print(
-        f"✅ Otro servicio: {linea_otro.nombre} - Precio cliente: ${linea_otro.precio_cliente}"
-    )
+    print(f"✅ Otro servicio: {linea_otro.nombre} - Precio cliente: ${linea_otro.precio_cliente}")
 
     # Recalcular totales
     doc_cl.recalcular_totales()
@@ -230,24 +228,16 @@ try:
     # Verificar que los documentos tienen los datos correctos
     print("📋 DOCUMENTO CL:")
     print(f"   Empresa: {doc_cl.empresa.nombre_taller} ({doc_cl.empresa.pais})")
-    print(
-        f"   Cliente: {doc_cl.cliente.nombre} (Empresa: {doc_cl.cliente.empresa.pais})"
-    )
-    print(
-        f"   Vehículo: {doc_cl.vehiculo.patente} (Empresa: {doc_cl.vehiculo.empresa.pais})"
-    )
+    print(f"   Cliente: {doc_cl.cliente.nombre} (Empresa: {doc_cl.cliente.empresa.pais})")
+    print(f"   Vehículo: {doc_cl.vehiculo.patente} (Empresa: {doc_cl.vehiculo.empresa.pais})")
     print(
         f"   Técnico: {doc_cl.tecnico_responsable.nombre} (Empresa: {doc_cl.tecnico_responsable.empresa.pais})"
     )
 
     print("\n📋 DOCUMENTO US:")
     print(f"   Empresa: {doc_us.empresa.nombre_taller} ({doc_us.empresa.pais})")
-    print(
-        f"   Cliente: {doc_us.cliente.nombre} (Empresa: {doc_us.cliente.empresa.pais})"
-    )
-    print(
-        f"   Vehículo: {doc_us.vehiculo.patente} (Empresa: {doc_us.vehiculo.empresa.pais})"
-    )
+    print(f"   Cliente: {doc_us.cliente.nombre} (Empresa: {doc_us.cliente.empresa.pais})")
+    print(f"   Vehículo: {doc_us.vehiculo.patente} (Empresa: {doc_us.vehiculo.empresa.pais})")
     print(
         f"   Técnico: {doc_us.tecnico_responsable.nombre} (Empresa: {doc_us.tecnico_responsable.empresa.pais})"
     )
@@ -292,13 +282,9 @@ try:
     print(f"   Updated at: {doc_us.updated_at}")
 
     # Verificar que los campos están completos
-    cl_audit_ok = all(
-        [doc_cl.created_by, doc_cl.updated_by, doc_cl.created_at, doc_cl.updated_at]
-    )
+    cl_audit_ok = all([doc_cl.created_by, doc_cl.updated_by, doc_cl.created_at, doc_cl.updated_at])
 
-    us_audit_ok = all(
-        [doc_us.created_by, doc_us.updated_by, doc_us.created_at, doc_us.updated_at]
-    )
+    us_audit_ok = all([doc_us.created_by, doc_us.updated_by, doc_us.created_at, doc_us.updated_at])
 
     print("\n✅ AUDITORÍA:")
     print(f"   Documento CL completo: {'✅' if cl_audit_ok else '❌'}")

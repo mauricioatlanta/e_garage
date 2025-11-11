@@ -12,17 +12,13 @@ class CountryAwareLogoutRedirectAdapter:
         if request.user.is_authenticated:
             try:
                 # Buscar en empresa (prioridad más alta)
-                if hasattr(request.user, "empresa") and hasattr(
-                    request.user.empresa, "pais"
-                ):
+                if hasattr(request.user, "empresa") and hasattr(request.user.empresa, "pais"):
                     if request.user.empresa.pais == "US":
                         return redirect(reverse("usa:account_login"))
                     elif request.user.empresa.pais == "CL":
                         return redirect(reverse("chile:account_login"))
                 # Buscar en perfil
-                elif hasattr(request.user, "perfil") and hasattr(
-                    request.user.perfil, "pais"
-                ):
+                elif hasattr(request.user, "perfil") and hasattr(request.user.perfil, "pais"):
                     if request.user.perfil.pais == "US":
                         return redirect(reverse("usa:account_login"))
                     elif request.user.perfil.pais == "CL":

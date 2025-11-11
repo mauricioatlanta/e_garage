@@ -22,9 +22,7 @@ for table in tables:
     print(f"  - {table[0]}")
 
 # Verificar si existe la tabla taller_perfilusuario
-cursor.execute(
-    "SELECT name FROM sqlite_master WHERE type='table' AND name='taller_perfilusuario';"
-)
+cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='taller_perfilusuario';")
 perfil_table = cursor.fetchone()
 
 if perfil_table:

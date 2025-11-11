@@ -62,9 +62,7 @@ class SmartLogger:
         self.payment_logger = logging.getLogger("egarage.payments")
         self.subs_logger = logging.getLogger("egarage.subscriptions")
 
-    def log_login_attempt(
-        self, username, ip_address, user_agent, success=True, reason=None
-    ):
+    def log_login_attempt(self, username, ip_address, user_agent, success=True, reason=None):
         """Log de intentos de login"""
         log_data = {
             "username": username,

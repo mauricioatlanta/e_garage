@@ -13,9 +13,7 @@ class ModelVehiculosTest(TestCase):
         from taller.models.vehiculos import Vehiculo
 
         # Crear empresa y cliente
-        user = User.objects.create_user(
-            username="testuser_vehiculo", password="testpass"
-        )
+        user = User.objects.create_user(username="testuser_vehiculo", password="testpass")
         emp = Empresa.objects.create(nombre_taller="Test SA", pais="CL", user=user)
         cli = Cliente.objects.create(empresa=emp, nombre="Juan", apellido="Pérez")
 
@@ -46,9 +44,7 @@ class ModelVehiculosTest(TestCase):
         from taller.models.empresa import Empresa
         from taller.models.vehiculos import Vehiculo
 
-        user = User.objects.create_user(
-            username="testuser_vehiculo_val", password="testpass"
-        )
+        user = User.objects.create_user(username="testuser_vehiculo_val", password="testpass")
         emp = Empresa.objects.create(nombre_taller="Test SA", pais="CL", user=user)
         cli = Cliente.objects.create(empresa=emp, nombre="Juan", apellido="Pérez")
 
@@ -71,9 +67,7 @@ class ModelVehiculosTest(TestCase):
         from taller.models.empresa import Empresa
         from taller.models.vehiculos import Vehiculo
 
-        user = User.objects.create_user(
-            username="testuser_vehiculo_vin", password="testpass"
-        )
+        user = User.objects.create_user(username="testuser_vehiculo_vin", password="testpass")
         emp = Empresa.objects.create(nombre_taller="Test SA", pais="CL", user=user)
         cli = Cliente.objects.create(empresa=emp, nombre="Juan", apellido="Pérez")
 
@@ -97,9 +91,7 @@ class ModelVehiculosTest(TestCase):
         from taller.models.empresa import Empresa
         from taller.models.vehiculos import Vehiculo
 
-        user = User.objects.create_user(
-            username="testuser_vehiculo_millas", password="testpass"
-        )
+        user = User.objects.create_user(username="testuser_vehiculo_millas", password="testpass")
         emp = Empresa.objects.create(nombre_taller="Test SA", pais="CL", user=user)
         cli = Cliente.objects.create(empresa=emp, nombre="Juan", apellido="Pérez")
 
@@ -123,9 +115,7 @@ class ModelVehiculosTest(TestCase):
         from taller.models.empresa import Empresa
         from taller.models.vehiculos import Vehiculo
 
-        user = User.objects.create_user(
-            username="testuser_vehiculo_rel", password="testpass"
-        )
+        user = User.objects.create_user(username="testuser_vehiculo_rel", password="testpass")
         emp = Empresa.objects.create(nombre_taller="Test SA", pais="CL", user=user)
         cli = Cliente.objects.create(empresa=emp, nombre="Juan", apellido="Pérez")
 

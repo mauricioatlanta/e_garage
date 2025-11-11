@@ -27,9 +27,7 @@ class Command(BaseCommand):
             action="store_true",
             help="Corregir problemas automáticamente cuando sea posible",
         )
-        parser.add_argument(
-            "--verbose", action="store_true", help="Mostrar información detallada"
-        )
+        parser.add_argument("--verbose", action="store_true", help="Mostrar información detallada")
 
     def handle(self, *args, **options):
         self.dry_run = options["dry_run"]
@@ -38,9 +36,7 @@ class Command(BaseCommand):
 
         if not self.dry_run and not self.fix_mode:
             self.stdout.write(
-                self.style.WARNING(
-                    "Especifica --dry-run para ver problemas o --fix para corregir"
-                )
+                self.style.WARNING("Especifica --dry-run para ver problemas o --fix para corregir")
             )
             return
 
@@ -83,26 +79,18 @@ class Command(BaseCommand):
         count = bad_clientes.count()
 
         if count > 0:
-            self.stdout.write(
-                self.style.ERROR(f"❌ {count} clientes sin empresa asignada")
-            )
+            self.stdout.write(self.style.ERROR(f"❌ {count} clientes sin empresa asignada"))
 
             if self.verbose:
                 for cliente in bad_clientes[:10]:  # Mostrar solo primeros 10
-                    self.stdout.write(
-                        f"  - Cliente ID: {cliente.pk}, Nombre: {cliente.nombre}"
-                    )
+                    self.stdout.write(f"  - Cliente ID: {cliente.pk}, Nombre: {cliente.nombre}")
 
             if self.fix_mode:
                 self.stdout.write(
-                    self.style.WARNING(
-                        "❌ No se puede inferir empresa para clientes huérfanos"
-                    )
+                    self.style.WARNING("❌ No se puede inferir empresa para clientes huérfanos")
                 )
         else:
-            self.stdout.write(
-                self.style.SUCCESS("✅ Todos los clientes tienen empresa")
-            )
+            self.stdout.write(self.style.SUCCESS("✅ Todos los clientes tienen empresa"))
 
         # Clientes con emails duplicados entre empresas
         from django.db.models import Count
@@ -154,25 +142,19 @@ class Command(BaseCommand):
                                     f"  ✅ Corregido vehículo {vehiculo.pk} -> empresa {vehiculo.empresa.nombre}"
                                 )
 
-                self.stdout.write(
-                    self.style.SUCCESS(f"✅ Corregidos {fixed} vehículos")
-                )
+                self.stdout.write(self.style.SUCCESS(f"✅ Corregidos {fixed} vehículos"))
         else:
-            self.stdout.write(
-                self.style.SUCCESS("✅ Todos los vehículos tienen empresa")
-            )
+            self.stdout.write(self.style.SUCCESS("✅ Todos los vehículos tienen empresa"))
 
         # Vehículos con empresa diferente a su cliente
-        inconsistent_vehiculos = Vehiculo.objects.filter(
-            ~Q(empresa=F("cliente__empresa"))
-        ).exclude(cliente__empresa__isnull=True)
+        inconsistent_vehiculos = Vehiculo.objects.filter(~Q(empresa=F("cliente__empresa"))).exclude(
+            cliente__empresa__isnull=True
+        )
 
         count = inconsistent_vehiculos.count()
         if count > 0:
             self.stdout.write(
-                self.style.ERROR(
-                    f"❌ {count} vehículos con empresa inconsistente con su cliente"
-                )
+                self.style.ERROR(f"❌ {count} vehículos con empresa inconsistente con su cliente")
             )
 
             if self.fix_mode:
@@ -186,9 +168,7 @@ class Command(BaseCommand):
                             self.stdout.write(f"  ✅ Corregido vehículo {vehiculo.pk}")
 
                 self.stdout.write(
-                    self.style.SUCCESS(
-                        f"✅ Corregidos {fixed} vehículos inconsistentes"
-                    )
+                    self.style.SUCCESS(f"✅ Corregidos {fixed} vehículos inconsistentes")
                 )
         else:
             self.stdout.write(
@@ -219,13 +199,9 @@ class Command(BaseCommand):
                             documento.save()
                             fixed += 1
 
-                self.stdout.write(
-                    self.style.SUCCESS(f"✅ Corregidos {fixed} documentos")
-                )
+                self.stdout.write(self.style.SUCCESS(f"✅ Corregidos {fixed} documentos"))
         else:
-            self.stdout.write(
-                self.style.SUCCESS("✅ Todos los documentos tienen empresa")
-            )
+            self.stdout.write(self.style.SUCCESS("✅ Todos los documentos tienen empresa"))
 
         # Documentos con empresas inconsistentes
         inconsistent_docs = Documento.objects.filter(
@@ -235,9 +211,7 @@ class Command(BaseCommand):
         count = inconsistent_docs.count()
         if count > 0:
             self.stdout.write(
-                self.style.ERROR(
-                    f"❌ {count} documentos con empresa inconsistente con cliente"
-                )
+                self.style.ERROR(f"❌ {count} documentos con empresa inconsistente con cliente")
             )
 
             if self.fix_mode:
@@ -249,9 +223,7 @@ class Command(BaseCommand):
                         fixed += 1
 
                 self.stdout.write(
-                    self.style.SUCCESS(
-                        f"✅ Corregidos {fixed} documentos inconsistentes"
-                    )
+                    self.style.SUCCESS(f"✅ Corregidos {fixed} documentos inconsistentes")
                 )
 
     def audit_repuestos(self, Repuesto):
@@ -265,13 +237,9 @@ class Command(BaseCommand):
             if count > 0:
                 self.stdout.write(self.style.ERROR(f"❌ {count} repuestos sin empresa"))
             else:
-                self.stdout.write(
-                    self.style.SUCCESS("✅ Todos los repuestos tienen empresa")
-                )
+                self.stdout.write(self.style.SUCCESS("✅ Todos los repuestos tienen empresa"))
         else:
-            self.stdout.write(
-                self.style.WARNING("⚠️ Modelo Repuesto no es multi-tenant")
-            )
+            self.stdout.write(self.style.WARNING("⚠️ Modelo Repuesto no es multi-tenant"))
 
     def audit_servicios(self, Servicio):
         """Auditar servicios"""
@@ -284,13 +252,9 @@ class Command(BaseCommand):
             if count > 0:
                 self.stdout.write(self.style.ERROR(f"❌ {count} servicios sin empresa"))
             else:
-                self.stdout.write(
-                    self.style.SUCCESS("✅ Todos los servicios tienen empresa")
-                )
+                self.stdout.write(self.style.SUCCESS("✅ Todos los servicios tienen empresa"))
         else:
-            self.stdout.write(
-                self.style.WARNING("⚠️ Modelo Servicio no es multi-tenant")
-            )
+            self.stdout.write(self.style.WARNING("⚠️ Modelo Servicio no es multi-tenant"))
 
     def audit_lineas_documento(self):
         """Auditar líneas de documentos"""
@@ -305,16 +269,12 @@ class Command(BaseCommand):
 
             # Auditar LineaRepuesto
             if hasattr(LineaRepuesto, "empresa"):
-                bad_lineas = LineaRepuesto.objects.filter(
-                    ~Q(empresa=F("documento__empresa"))
-                )
+                bad_lineas = LineaRepuesto.objects.filter(~Q(empresa=F("documento__empresa")))
                 count = bad_lineas.count()
 
                 if count > 0:
                     self.stdout.write(
-                        self.style.ERROR(
-                            f"❌ {count} líneas de repuesto con empresa inconsistente"
-                        )
+                        self.style.ERROR(f"❌ {count} líneas de repuesto con empresa inconsistente")
                     )
 
                     if self.fix_mode:
@@ -326,27 +286,19 @@ class Command(BaseCommand):
                                 fixed += 1
 
                         self.stdout.write(
-                            self.style.SUCCESS(
-                                f"✅ Corregidas {fixed} líneas de repuesto"
-                            )
+                            self.style.SUCCESS(f"✅ Corregidas {fixed} líneas de repuesto")
                         )
                 else:
-                    self.stdout.write(
-                        self.style.SUCCESS("✅ Líneas de repuesto consistentes")
-                    )
+                    self.stdout.write(self.style.SUCCESS("✅ Líneas de repuesto consistentes"))
 
             # Auditar LineaServicio
             if hasattr(LineaServicio, "empresa"):
-                bad_lineas = LineaServicio.objects.filter(
-                    ~Q(empresa=F("documento__empresa"))
-                )
+                bad_lineas = LineaServicio.objects.filter(~Q(empresa=F("documento__empresa")))
                 count = bad_lineas.count()
 
                 if count > 0:
                     self.stdout.write(
-                        self.style.ERROR(
-                            f"❌ {count} líneas de servicio con empresa inconsistente"
-                        )
+                        self.style.ERROR(f"❌ {count} líneas de servicio con empresa inconsistente")
                     )
 
                     if self.fix_mode:
@@ -358,16 +310,10 @@ class Command(BaseCommand):
                                 fixed += 1
 
                         self.stdout.write(
-                            self.style.SUCCESS(
-                                f"✅ Corregidas {fixed} líneas de servicio"
-                            )
+                            self.style.SUCCESS(f"✅ Corregidas {fixed} líneas de servicio")
                         )
                 else:
-                    self.stdout.write(
-                        self.style.SUCCESS("✅ Líneas de servicio consistentes")
-                    )
+                    self.stdout.write(self.style.SUCCESS("✅ Líneas de servicio consistentes"))
 
         except ImportError:
-            self.stdout.write(
-                self.style.WARNING("⚠️ No se pudieron importar modelos de líneas")
-            )
+            self.stdout.write(self.style.WARNING("⚠️ No se pudieron importar modelos de líneas"))

@@ -20,9 +20,7 @@ class RepuestoAutocomplete(autocomplete.Select2QuerySetView):
         qs = Repuesto.objects.filter(empresa=empresa)
 
         if self.q:
-            qs = qs.filter(
-                Q(part_number__icontains=self.q) | Q(nombre__icontains=self.q)
-            )
+            qs = qs.filter(Q(part_number__icontains=self.q) | Q(nombre__icontains=self.q))
         return qs.order_by("nombre")
 
 

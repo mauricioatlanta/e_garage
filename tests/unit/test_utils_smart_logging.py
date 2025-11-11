@@ -12,9 +12,7 @@ def test_smart_logging_handlers_and_formatters():
     for name in dir(mod):
         fn = getattr(mod, name)
         if callable(fn) and (
-            "formatter" in name.lower()
-            or "handler" in name.lower()
-            or "setup" in name.lower()
+            "formatter" in name.lower() or "handler" in name.lower() or "setup" in name.lower()
         ):
             try:
                 obj = fn()

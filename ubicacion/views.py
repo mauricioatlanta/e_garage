@@ -13,9 +13,7 @@ def registro_ubicacion(request):
             ciudad_nombre = form.cleaned_data["ciudad"]
             zip_code = form.cleaned_data["zip_code"]
             # Buscar ciudad sin importar mayúsculas/minúsculas
-            ciudad = Ciudad.objects.filter(
-                nombre__iexact=ciudad_nombre, estado=estado
-            ).first()
+            ciudad = Ciudad.objects.filter(nombre__iexact=ciudad_nombre, estado=estado).first()
             if ciudad:
                 zip_code = ciudad.zip_code  # ya existe, usamos su zip
             else:

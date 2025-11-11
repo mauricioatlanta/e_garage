@@ -79,9 +79,7 @@ class Command(BaseCommand):
 
         # --- Proceso de carga ---
         for country, lang, label_key in [("CL", "es", "es"), ("US", "en", "en")]:
-            self.stdout.write(
-                self.style.NOTICE(f"Poblando servicios para {country} ({lang})")
-            )
+            self.stdout.write(self.style.NOTICE(f"Poblando servicios para {country} ({lang})"))
             # Categorías principales
             for cat in categorias:
                 cat_obj, _ = CategoriaServicio.objects.get_or_create(

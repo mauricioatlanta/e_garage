@@ -9,9 +9,7 @@ from taller.mixins import CountryLangTemplateMixin
 from taller.models.repuesto import Repuesto
 
 
-class RepuestoListView(
-    CountryLangTemplateMixin, LoginRequiredMixin, TenantViewMixin, ListView
-):
+class RepuestoListView(CountryLangTemplateMixin, LoginRequiredMixin, TenantViewMixin, ListView):
     model = Repuesto
     select_related_fields = ("categoria",)
     paginate_by = 50

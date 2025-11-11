@@ -28,9 +28,7 @@ class USLocalizationView(TemplateView):
             {
                 "estados": Estado.objects.all()[:10],  # Primeros 10 estados
                 "marcas_usa": MarcaVehiculo.objects.filter(pais_origen="USA")[:5],
-                "marcas_japonesas": MarcaVehiculo.objects.filter(pais_origen="Japan")[
-                    :5
-                ],
+                "marcas_japonesas": MarcaVehiculo.objects.filter(pais_origen="Japan")[:5],
                 "servicios_bilingue": USServiceTranslator.get_servicios_bilingue()[:8],
                 "current_language": get_language(),
                 "available_languages": settings.LANGUAGES,
@@ -54,9 +52,7 @@ class USLocalizationView(TemplateView):
 
 def api_estados_usa(request):
     """API para obtener estados de EE.UU."""
-    estados = Estado.objects.all().values(
-        "id", "nombre", "codigo", "sales_tax", "timezone"
-    )
+    estados = Estado.objects.all().values("id", "nombre", "codigo", "sales_tax", "timezone")
     return JsonResponse({"estados": list(estados)})
 
 
@@ -96,9 +92,7 @@ def api_modelos_por_marca(request, marca_id):
             )
             modelos_con_anos.append(modelo)
 
-        return JsonResponse(
-            {"modelos": modelos_con_anos, "total": len(modelos_con_anos)}
-        )
+        return JsonResponse({"modelos": modelos_con_anos, "total": len(modelos_con_anos)})
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=400)
 
@@ -116,9 +110,7 @@ def api_calcular_impuestos_usa(request):
         # Formatear como USD
         return JsonResponse(
             {
-                "subtotal_formatted": USDCurrencyMixin.format_usd(
-                    resultado["subtotal"]
-                ),
+                "subtotal_formatted": USDCurrencyMixin.format_usd(resultado["subtotal"]),
                 "tax_formatted": USDCurrencyMixin.format_usd(resultado["tax"]),
                 "total_formatted": USDCurrencyMixin.format_usd(resultado["total"]),
                 "tax_rate": float(resultado["tax_rate"]),
@@ -179,9 +171,9 @@ def demo_atlanta_personalization(request):
     context = {
         "ciudad": atlanta,
         "timezone_local": "America/New_York",  # Eastern Time
-        "marcas_populares_atlanta": MarcaVehiculo.objects.filter(
-            pais_origen__in=["USA", "Japan"]
-        )[:8],
+        "marcas_populares_atlanta": MarcaVehiculo.objects.filter(pais_origen__in=["USA", "Japan"])[
+            :8
+        ],
         "servicios_atlanta": [
             {"es": "Inspección de emisiones", "en": "Emissions Testing"},
             {"es": "Servicio de A/C (verano)", "en": "A/C Service (Summer)"},

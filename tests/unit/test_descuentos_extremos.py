@@ -43,12 +43,8 @@ def test_descuento_0_porciento_servicios():
     User = get_user_model()
     user = User.objects.create_user(username="test_descuento_0", password="test")
 
-    empresa = Empresa.objects.create(
-        user=user, nombre_taller="Test Descuento 0", pais="CL"
-    )
-    cliente = Cliente.objects.create(
-        empresa=empresa, nombre="Test Client", tax_id="1-9"
-    )
+    empresa = Empresa.objects.create(user=user, nombre_taller="Test Descuento 0", pais="CL")
+    cliente = Cliente.objects.create(empresa=empresa, nombre="Test Client", tax_id="1-9")
     vehiculo = Vehiculo.objects.create(
         empresa=empresa,
         cliente=cliente,
@@ -91,9 +87,7 @@ def test_descuento_0_porciento_servicios():
         linea = LineaServicio.objects.filter(documento=documento).first()
 
         # Verify discount is 0%
-        assert linea.descuento == Decimal(
-            "0.00"
-        ), f"Discount should be 0%, got {linea.descuento}"
+        assert linea.descuento == Decimal("0.00"), f"Discount should be 0%, got {linea.descuento}"
 
         # Verify totals are calculated correctly (no discount effect)
         expected_subtotal = Decimal("2000.00")  # 2 * 1000.00
@@ -121,12 +115,8 @@ def test_descuento_100_porciento_servicios():
     User = get_user_model()
     user = User.objects.create_user(username="test_descuento_100", password="test")
 
-    empresa = Empresa.objects.create(
-        user=user, nombre_taller="Test Descuento 100", pais="CL"
-    )
-    cliente = Cliente.objects.create(
-        empresa=empresa, nombre="Test Client", tax_id="1-9"
-    )
+    empresa = Empresa.objects.create(user=user, nombre_taller="Test Descuento 100", pais="CL")
+    cliente = Cliente.objects.create(empresa=empresa, nombre="Test Client", tax_id="1-9")
     vehiculo = Vehiculo.objects.create(
         empresa=empresa,
         cliente=cliente,
@@ -197,12 +187,8 @@ def test_descuento_0_porciento_repuestos():
     User = get_user_model()
     user = User.objects.create_user(username="test_descuento_rep_0", password="test")
 
-    empresa = Empresa.objects.create(
-        user=user, nombre_taller="Test Descuento Rep 0", pais="CL"
-    )
-    cliente = Cliente.objects.create(
-        empresa=empresa, nombre="Test Client", tax_id="1-9"
-    )
+    empresa = Empresa.objects.create(user=user, nombre_taller="Test Descuento Rep 0", pais="CL")
+    cliente = Cliente.objects.create(empresa=empresa, nombre="Test Client", tax_id="1-9")
     vehiculo = Vehiculo.objects.create(
         empresa=empresa,
         cliente=cliente,
@@ -246,9 +232,7 @@ def test_descuento_0_porciento_repuestos():
         linea = LineaRepuesto.objects.filter(documento=documento).first()
 
         # Verify discount is 0%
-        assert linea.descuento == Decimal(
-            "0.00"
-        ), f"Discount should be 0%, got {linea.descuento}"
+        assert linea.descuento == Decimal("0.00"), f"Discount should be 0%, got {linea.descuento}"
 
         # Verify totals are calculated correctly (no discount effect)
         expected_subtotal = Decimal("1500.00")  # 3 * 500.00
@@ -276,12 +260,8 @@ def test_descuento_100_porciento_repuestos():
     User = get_user_model()
     user = User.objects.create_user(username="test_descuento_rep_100", password="test")
 
-    empresa = Empresa.objects.create(
-        user=user, nombre_taller="Test Descuento Rep 100", pais="CL"
-    )
-    cliente = Cliente.objects.create(
-        empresa=empresa, nombre="Test Client", tax_id="1-9"
-    )
+    empresa = Empresa.objects.create(user=user, nombre_taller="Test Descuento Rep 100", pais="CL")
+    cliente = Cliente.objects.create(empresa=empresa, nombre="Test Client", tax_id="1-9")
     vehiculo = Vehiculo.objects.create(
         empresa=empresa,
         cliente=cliente,
@@ -353,12 +333,8 @@ def test_descuentos_mixtos_servicios_repuestos():
     User = get_user_model()
     user = User.objects.create_user(username="test_descuentos_mixtos", password="test")
 
-    empresa = Empresa.objects.create(
-        user=user, nombre_taller="Test Descuentos Mixtos", pais="CL"
-    )
-    cliente = Cliente.objects.create(
-        empresa=empresa, nombre="Test Client", tax_id="1-9"
-    )
+    empresa = Empresa.objects.create(user=user, nombre_taller="Test Descuentos Mixtos", pais="CL")
+    cliente = Cliente.objects.create(empresa=empresa, nombre="Test Client", tax_id="1-9")
     vehiculo = Vehiculo.objects.create(
         empresa=empresa,
         cliente=cliente,
@@ -453,12 +429,8 @@ def test_descuento_50_porciento_verificacion_calculos():
     User = get_user_model()
     user = User.objects.create_user(username="test_descuento_50", password="test")
 
-    empresa = Empresa.objects.create(
-        user=user, nombre_taller="Test Descuento 50", pais="CL"
-    )
-    cliente = Cliente.objects.create(
-        empresa=empresa, nombre="Test Client", tax_id="1-9"
-    )
+    empresa = Empresa.objects.create(user=user, nombre_taller="Test Descuento 50", pais="CL")
+    cliente = Cliente.objects.create(empresa=empresa, nombre="Test Client", tax_id="1-9")
     vehiculo = Vehiculo.objects.create(
         empresa=empresa,
         cliente=cliente,
@@ -501,9 +473,7 @@ def test_descuento_50_porciento_verificacion_calculos():
         linea = LineaServicio.objects.filter(documento=documento).first()
 
         # Verify discount is 50%
-        assert linea.descuento == Decimal(
-            "50.00"
-        ), f"Discount should be 50%, got {linea.descuento}"
+        assert linea.descuento == Decimal("50.00"), f"Discount should be 50%, got {linea.descuento}"
 
         # Verify neto servicios is 50% of original (2 * 1000 * 0.5 = 1000)
         expected_neto = Decimal("1000.00")

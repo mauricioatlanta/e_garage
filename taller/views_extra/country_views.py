@@ -115,14 +115,10 @@ def dashboard_usa_view(request):
         ayer = hoy - timedelta(days=1)
 
         # Documentos de hoy
-        documentos_hoy = Documento.objects.filter(
-            empresa=empresa, fecha_emision=hoy
-        ).count()
+        documentos_hoy = Documento.objects.filter(empresa=empresa, fecha_emision=hoy).count()
 
         # Documentos de ayer para calcular delta
-        documentos_ayer = Documento.objects.filter(
-            empresa=empresa, fecha_emision=ayer
-        ).count()
+        documentos_ayer = Documento.objects.filter(empresa=empresa, fecha_emision=ayer).count()
 
         # Calcular delta (porcentaje de cambio)
         if documentos_ayer > 0:
@@ -163,9 +159,7 @@ def dashboard_usa_view(request):
             "page_title": "eGarage USA - Space Command Center",
             "is_usa_market": True,
         }
-        return render(
-            request, "taller/us/es/dashboard/centro_operaciones_espacial.html", context
-        )
+        return render(request, "taller/us/es/dashboard/centro_operaciones_espacial.html", context)
 
     # Si no está autenticado, mostrar landing page
     from django.shortcuts import render

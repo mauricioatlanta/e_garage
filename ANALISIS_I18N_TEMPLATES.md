@@ -482,3 +482,4 @@ Get-ChildItem -Path "templates\taller\common" -Filter "*.html" -Recurse |
 ---
 
 **Fin del análisis i18n**
+

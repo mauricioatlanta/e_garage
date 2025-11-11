@@ -59,9 +59,7 @@ def demo_inconsistencias():
     vehiculo_test.save()
 
     print(f"   Vehículo {vehiculo_test.id} ({vehiculo_test.patente})")
-    print(
-        f"   Cliente: {vehiculo_test.cliente} (empresa: {vehiculo_test.cliente.empresa})"
-    )
+    print(f"   Cliente: {vehiculo_test.cliente} (empresa: {vehiculo_test.cliente.empresa})")
     print(f"   Vehículo empresa: {vehiculo_test.empresa}")
     print("   ⚠️ INCONSISTENCIA CREADA: cliente.empresa ≠ vehiculo.empresa")
 

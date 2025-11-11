@@ -41,9 +41,7 @@ def main():
         print(f"✓ Empresas encontradas por usuario_id: {empresas_legacy.count()}")
 
         for empresa in empresas_legacy:
-            print(
-                f"  - Empresa (legacy): {empresa.nombre_taller} (País: {empresa.pais})"
-            )
+            print(f"  - Empresa (legacy): {empresa.nombre_taller} (País: {empresa.pais})")
             empresa.pais = "US"
             empresa.save()
             print(f"    → Cambiado a: {empresa.pais}")
@@ -62,9 +60,7 @@ def main():
                 )
 
                 # Forzar actualización SQL
-                cursor.execute(
-                    "UPDATE taller_empresa SET pais = 'US' WHERE id = %s", [row[0]]
-                )
+                cursor.execute("UPDATE taller_empresa SET pais = 'US' WHERE id = %s", [row[0]])
                 print("    → SQL UPDATE aplicado")
 
         print("\n✅ Cambios aplicados con SQL directo")

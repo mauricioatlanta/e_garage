@@ -1193,9 +1193,7 @@ for nombre_marca, modelos in marcas_y_modelos.items():
     if creada:
         contador_marcas += 1
     for nombre_modelo in modelos:
-        modelo_obj, creado = Modelo.objects.get_or_create(
-            nombre=nombre_modelo, marca=marca_obj
-        )
+        modelo_obj, creado = Modelo.objects.get_or_create(nombre=nombre_modelo, marca=marca_obj)
         if creado:
             contador_modelos += 1
 print(f"✅ Creadas {contador_marcas} marcas y {contador_modelos} modelos.")

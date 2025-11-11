@@ -44,12 +44,8 @@ print(f"🏢 Empresa: {empresa.nombre_taller}")
 marca_toyota, _ = Marca.objects.get_or_create(nombre="Toyota")
 marca_nissan, _ = Marca.objects.get_or_create(nombre="Nissan")
 
-modelo_corolla, _ = Modelo.objects.get_or_create(
-    nombre="Corolla", defaults={"marca": marca_toyota}
-)
-modelo_sentra, _ = Modelo.objects.get_or_create(
-    nombre="Sentra", defaults={"marca": marca_nissan}
-)
+modelo_corolla, _ = Modelo.objects.get_or_create(nombre="Corolla", defaults={"marca": marca_toyota})
+modelo_sentra, _ = Modelo.objects.get_or_create(nombre="Sentra", defaults={"marca": marca_nissan})
 
 # Crear clientes
 cliente1, _ = Cliente.objects.get_or_create(
@@ -144,9 +140,7 @@ for i, fecha in enumerate(fechas, 1):
                     },
                 )
             except Exception:
-                LineaServicio.objects.create(
-                    documento=doc, nombre=nombre, precio_unitario=precio
-                )
+                LineaServicio.objects.create(documento=doc, nombre=nombre, precio_unitario=precio)
 
         # Agregar repuestos
         repuestos = [
@@ -157,9 +151,7 @@ for i, fecha in enumerate(fechas, 1):
             ("Bujías NGK", 4500, "BU-005", 4),
         ]
 
-        for k, (nombre, precio, codigo, cantidad) in enumerate(
-            repuestos[:3]
-        ):  # Solo 3 repuestos
+        for k, (nombre, precio, codigo, cantidad) in enumerate(repuestos[:3]):  # Solo 3 repuestos
             try:
                 repuesto, _ = LineaRepuesto.objects.get_or_create(
                     documento=doc,

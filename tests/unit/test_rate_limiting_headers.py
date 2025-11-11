@@ -36,12 +36,8 @@ def test_rate_limit_incluye_retry_after(client):
                 "Retry-After" in resp.headers or "Retry-after" in resp.headers
             ), f"429 response debe incluir Retry-After header: {resp.headers}"
             # El header debe tener un valor numérico
-            retry_after = resp.headers.get("Retry-After") or resp.headers.get(
-                "Retry-after"
-            )
-            assert (
-                retry_after.isdigit()
-            ), f"Retry-After debe ser numérico: {retry_after}"
+            retry_after = resp.headers.get("Retry-After") or resp.headers.get("Retry-after")
+            assert retry_after.isdigit(), f"Retry-After debe ser numérico: {retry_after}"
         else:
             # Otros códigos de respuesta deben ser válidos
             assert resp.status_code in (
@@ -78,17 +74,13 @@ def test_rate_limit_headers_consistency(client):
                 ), f"429 en {endpoint} debe incluir Retry-After"
 
                 # Verificar que el header tiene formato correcto
-                retry_after = resp.headers.get("Retry-After") or resp.headers.get(
-                    "Retry-after"
-                )
+                retry_after = resp.headers.get("Retry-After") or resp.headers.get("Retry-after")
                 assert retry_after, f"Retry-After no puede estar vacío en {endpoint}"
 
                 # Debe ser un número positivo
                 try:
                     retry_seconds = int(retry_after)
-                    assert (
-                        retry_seconds > 0
-                    ), f"Retry-After debe ser positivo: {retry_seconds}"
+                    assert retry_seconds > 0, f"Retry-After debe ser positivo: {retry_seconds}"
                 except ValueError:
                     pytest.fail(f"Retry-After debe ser numérico: {retry_after}")
         except Exception:
@@ -131,9 +123,7 @@ def test_rate_limit_multiple_requests_headers(client):
             ), "429 response debe incluir Retry-After"
 
             # Verificar que el header es consistente
-            retry_after = resp.headers.get("Retry-After") or resp.headers.get(
-                "Retry-after"
-            )
+            retry_after = resp.headers.get("Retry-After") or resp.headers.get("Retry-after")
             assert retry_after, "Retry-After no puede estar vacío"
 
             # Debe ser un número razonable (entre 1 y 3600 segundos)
@@ -189,18 +179,14 @@ def test_rate_limit_headers_with_different_methods(client):
                 ), f"429 con {method} debe incluir Retry-After"
 
                 # Verificar formato del header
-                retry_after = resp.headers.get("Retry-After") or resp.headers.get(
-                    "Retry-after"
-                )
+                retry_after = resp.headers.get("Retry-After") or resp.headers.get("Retry-after")
                 assert retry_after, f"Retry-After no puede estar vacío con {method}"
 
                 # Debe ser numérico
                 try:
                     int(retry_after)
                 except ValueError:
-                    pytest.fail(
-                        f"Retry-After debe ser numérico con {method}: {retry_after}"
-                    )
+                    pytest.fail(f"Retry-After debe ser numérico con {method}: {retry_after}")
         except Exception:
             # Tolerar errores de endpoints que no existen o no soportan el método
             continue
@@ -225,9 +211,7 @@ def test_rate_limit_headers_stability(client):
         try:
             resp = client.get(url)
             if resp.status_code == 429:
-                retry_after = resp.headers.get("Retry-After") or resp.headers.get(
-                    "Retry-after"
-                )
+                retry_after = resp.headers.get("Retry-After") or resp.headers.get("Retry-after")
                 if retry_after:
                     retry_after_values.append(int(retry_after))
         except Exception:

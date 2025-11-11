@@ -522,3 +522,4 @@ Si encuentras problemas después de la reorganización:
 **Fecha de reorganización:** 27 de Octubre, 2025
 **Proyecto:** eGarage - Sistema de Gestión de Talleres Automotrices
 **Versión:** 1.0
+

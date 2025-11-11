@@ -156,12 +156,8 @@ class DocumentoFormOld(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         if self.empresa:
-            self.fields["cliente"].queryset = Cliente.objects.filter(
-                empresa=self.empresa
-            )
-            self.fields["vehiculo"].queryset = Vehiculo.objects.filter(
-                empresa=self.empresa
-            )
+            self.fields["cliente"].queryset = Cliente.objects.filter(empresa=self.empresa)
+            self.fields["vehiculo"].queryset = Vehiculo.objects.filter(empresa=self.empresa)
 
             # Configurar valores por defecto para USA
             if hasattr(self.empresa, "pais") and self.empresa.pais == "US":

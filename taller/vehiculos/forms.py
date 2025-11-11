@@ -34,9 +34,9 @@ class VehiculoForm(forms.ModelForm):
 
         # Filtrar clientes por empresa
         if "cliente" in self.fields and empresa:
-            self.fields["cliente"].queryset = Cliente.objects.filter(
-                empresa=empresa
-            ).order_by("nombre", "apellido")
+            self.fields["cliente"].queryset = Cliente.objects.filter(empresa=empresa).order_by(
+                "nombre", "apellido"
+            )
 
         # Configurar campo color
         self._configurar_color(pais)
@@ -227,9 +227,9 @@ class VehiculoForm(forms.ModelForm):
 
             if modelo_actual:
                 # Cargar motores del modelo
-                motores_modelo = MotorVehiculo.objects.filter(
-                    modelos=modelo_actual
-                ).order_by("nombre")
+                motores_modelo = MotorVehiculo.objects.filter(modelos=modelo_actual).order_by(
+                    "nombre"
+                )
                 motores_choices = [("", "---------")]
                 for motor in motores_modelo:
                     motores_choices.append((str(motor.pk), motor.nombre))
@@ -239,9 +239,7 @@ class VehiculoForm(forms.ModelForm):
                 self.fields["motor"].widget.choices = motores_choices
 
                 # Cargar cajas del modelo
-                cajas_modelo = CajaVehiculo.objects.filter(
-                    modelos=modelo_actual
-                ).order_by("nombre")
+                cajas_modelo = CajaVehiculo.objects.filter(modelos=modelo_actual).order_by("nombre")
                 cajas_choices = [("", "---------")]
                 for caja in cajas_modelo:
                     cajas_choices.append((str(caja.pk), caja.nombre))
@@ -303,9 +301,7 @@ class VehiculoForm(forms.ModelForm):
         if marca and modelo:
             if hasattr(modelo, "marca_id") and hasattr(marca, "id"):
                 if modelo.marca_id != marca.id:
-                    self.add_error(
-                        "modelo", "El modelo no pertenece a la marca seleccionada"
-                    )
+                    self.add_error("modelo", "El modelo no pertenece a la marca seleccionada")
 
         # Validaciones básicas de presencia (ambos países)
         if not marca:
@@ -364,9 +360,7 @@ class VehiculoForm(forms.ModelForm):
                 # Si marca es instancia, comparar IDs
                 marca_id = marca.id if hasattr(marca, "id") else None
                 if marca_id and hasattr(obj, "marca_id") and obj.marca_id != marca_id:
-                    raise forms.ValidationError(
-                        "El modelo no pertenece a la marca seleccionada"
-                    )
+                    raise forms.ValidationError("El modelo no pertenece a la marca seleccionada")
 
             return obj
         except (ValueError, TypeError):
@@ -414,9 +408,7 @@ class VehiculoForm(forms.ModelForm):
         modelo = self.cleaned_data.get("modelo")
         if modelo and hasattr(motor_obj, "modelos"):
             if not motor_obj.modelos.filter(pk=modelo.pk).exists():
-                self.add_error(
-                    "motor", "El motor no corresponde al modelo seleccionado"
-                )
+                self.add_error("motor", "El motor no corresponde al modelo seleccionado")
         return motor_obj
 
     def clean_caja(self):
@@ -456,11 +448,7 @@ class VehiculoForm(forms.ModelForm):
         modelo = self.cleaned_data.get("modelo")
 
         # Color
-        if (
-            getattr(self, "_color_nuevo", False)
-            and request
-            and request.POST.get("nuevo_color")
-        ):
+        if getattr(self, "_color_nuevo", False) and request and request.POST.get("nuevo_color"):
             kwargs = {"nombre": request.POST["nuevo_color"]}
             if hasattr(ColorVehiculo, "country"):
                 kwargs["country"] = pais
@@ -470,11 +458,7 @@ class VehiculoForm(forms.ModelForm):
             vehiculo.color = color_obj
 
         # Motor
-        if (
-            getattr(self, "_motor_nuevo", False)
-            and request
-            and request.POST.get("nuevo_motor")
-        ):
+        if getattr(self, "_motor_nuevo", False) and request and request.POST.get("nuevo_motor"):
             kwargs = {"nombre": request.POST["nuevo_motor"]}
             if hasattr(MotorVehiculo, "country"):
                 kwargs["country"] = pais
@@ -486,11 +470,7 @@ class VehiculoForm(forms.ModelForm):
                 motor_obj.modelos.add(modelo)
 
         # Caja
-        if (
-            getattr(self, "_caja_nuevo", False)
-            and request
-            and request.POST.get("nuevo_caja")
-        ):
+        if getattr(self, "_caja_nuevo", False) and request and request.POST.get("nuevo_caja"):
             kwargs = {"nombre": request.POST["nuevo_caja"]}
             if hasattr(CajaVehiculo, "country"):
                 kwargs["country"] = pais

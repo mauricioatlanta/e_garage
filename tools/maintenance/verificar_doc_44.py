@@ -18,9 +18,7 @@ def verificar_documento_44():
         print(f"=== DOCUMENTO ID: {doc.id} ===")
         print(f"Número: {doc.numero_documento}")
         print(f"Cliente: {doc.cliente.nombre} {doc.cliente.apellido}")
-        print(
-            f"Vehículo: {doc.vehiculo.patente} - {doc.vehiculo.marca} {doc.vehiculo.modelo}"
-        )
+        print(f"Vehículo: {doc.vehiculo.patente} - {doc.vehiculo.marca} {doc.vehiculo.modelo}")
         print(
             f"Kilometraje del vehículo: {getattr(doc.vehiculo, 'millas', 'No especificado')} millas/km"
         )

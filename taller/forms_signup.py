@@ -8,18 +8,14 @@ class SignupChileForm(forms.Form):
     email = forms.EmailField(label="Correo electrónico")
     username = forms.CharField(label="Nombre de usuario")
     password1 = forms.CharField(label="Contraseña", widget=forms.PasswordInput)
-    password2 = forms.CharField(
-        label="Repite tu contraseña", widget=forms.PasswordInput
-    )
+    password2 = forms.CharField(label="Repite tu contraseña", widget=forms.PasswordInput)
     region = forms.ChoiceField(label="Región", choices=[], required=True)
     ciudad = forms.ChoiceField(label="Ciudad", choices=[], required=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["region"].choices = [(r, r) for r in get_regiones("CL")]
-        region = self.data.get("region") or (
-            self.initial.get("region") if self.initial else None
-        )
+        region = self.data.get("region") or (self.initial.get("region") if self.initial else None)
         if region:
             self.fields["ciudad"].choices = [(c, c) for c in get_ciudades("CL", region)]
         else:
@@ -40,9 +36,7 @@ class SignupUSAForm(forms.Form):
         # Obtener queryset de estados
         estados = Estado.objects.all().order_by("nombre")
         self.fields["state"].choices = [(e.pk, e.nombre) for e in estados]
-        state_id = self.data.get("state") or (
-            self.initial.get("state") if self.initial else None
-        )
+        state_id = self.data.get("state") or (self.initial.get("state") if self.initial else None)
         if state_id:
             ciudades = Ciudad.objects.filter(estado_id=state_id).order_by("nombre")
             choices = [(c.pk, c.nombre) for c in ciudades]

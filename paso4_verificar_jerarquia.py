@@ -85,31 +85,23 @@ def verificar_dependencias_jerarquicas():
         toyota = Marca.objects.filter(nombre="Toyota").first()
         if toyota:
             modelos_toyota = Modelo.objects.filter(marca=toyota)[:3]
-            print(
-                f"✅ Toyota encontrada con {modelos_toyota.count()} modelos (mostrando 3):"
-            )
+            print(f"✅ Toyota encontrada con {modelos_toyota.count()} modelos (mostrando 3):")
 
             for modelo in modelos_toyota:
                 motores = MotorVehiculo.objects.filter(modelo=modelo).count()
                 cajas = CajaVehiculo.objects.filter(modelo=modelo).count()
-                print(
-                    f"   📱 {modelo.nombre} ({modelo.pais}): {motores} motores, {cajas} cajas"
-                )
+                print(f"   📱 {modelo.nombre} ({modelo.pais}): {motores} motores, {cajas} cajas")
 
         # Verificar Honda
         honda = Marca.objects.filter(nombre="Honda").first()
         if honda:
             modelos_honda = Modelo.objects.filter(marca=honda)[:2]
-            print(
-                f"\n✅ Honda encontrada con {modelos_honda.count()} modelos (mostrando 2):"
-            )
+            print(f"\n✅ Honda encontrada con {modelos_honda.count()} modelos (mostrando 2):")
 
             for modelo in modelos_honda:
                 motores = MotorVehiculo.objects.filter(modelo=modelo).count()
                 cajas = CajaVehiculo.objects.filter(modelo=modelo).count()
-                print(
-                    f"   📱 {modelo.nombre} ({modelo.pais}): {motores} motores, {cajas} cajas"
-                )
+                print(f"   📱 {modelo.nombre} ({modelo.pais}): {motores} motores, {cajas} cajas")
 
         print("\n✅ Dependencias jerárquicas verificadas correctamente")
         return True
@@ -171,9 +163,7 @@ def generar_ejemplo_uso():
 
     print("\n🌐 **URLs de Testing:**")
     print(f"- /ajax/load-modelos/?marca_id={toyota.id if toyota else 1}")
-    print(
-        f"- /ajax/load-motores-cajas/?modelo_id={modelo.id if toyota and modelo else 1}"
-    )
+    print(f"- /ajax/load-motores-cajas/?modelo_id={modelo.id if toyota and modelo else 1}")
 
 
 def main():
@@ -203,9 +193,7 @@ def main():
         print("🔄 Sistema listo para formularios jerárquicos")
         print("\n📋 **SIGUIENTE PASO:**")
         print("1. Incluir el JavaScript en tu template de vehículos")
-        print(
-            "2. Asegurar que los IDs de campos sean: id_marca, id_modelo, id_motor, id_caja"
-        )
+        print("2. Asegurar que los IDs de campos sean: id_marca, id_modelo, id_motor, id_caja")
         print("3. Probar la funcionalidad en el navegador")
     else:
         print("\n⚠️  **HAY PROBLEMAS QUE REVISAR**")

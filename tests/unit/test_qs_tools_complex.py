@@ -60,9 +60,7 @@ def test_qs_tools_repeated_keys_and_utf8():
             # If we get here, the template rendered without crashing
             assert isinstance(result, str), "Template should return string"
             # Should not contain error indicators
-            assert (
-                "error" not in result.lower()
-            ), f"Template should not contain errors: {result}"
+            assert "error" not in result.lower(), f"Template should not contain errors: {result}"
             assert (
                 "exception" not in result.lower()
             ), f"Template should not contain exceptions: {result}"
@@ -103,9 +101,7 @@ def test_qs_tools_with_request_context():
             result = Template(template_src).render(Context(ctx))
             assert isinstance(result, str), "Template should return string"
             # Should not crash with complex querystrings
-            assert (
-                "error" not in result.lower()
-            ), f"Template should not contain errors: {result}"
+            assert "error" not in result.lower(), f"Template should not contain errors: {result}"
         except Exception:
             # Tolerate any errors - we're testing robustness
             continue
@@ -140,9 +136,7 @@ def test_qs_tools_edge_cases():
         for template_src in template_candidates:
             try:
                 result = Template(template_src).render(Context(ctx))
-                assert isinstance(
-                    result, str
-                ), f"Template should return string for '{qs}'"
+                assert isinstance(result, str), f"Template should return string for '{qs}'"
             except Exception:
                 # Tolerate any errors - we're testing robustness
                 continue

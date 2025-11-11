@@ -8,8 +8,6 @@ from decimal import Decimal
 from django.core.exceptions import ValidationError
 from django.db import models
 
-from taller.servicios.models import Servicio
-
 from .utils_monedas import money_quantize
 
 
@@ -19,25 +17,17 @@ class ValidacionConsistencia:
     @staticmethod
     def assert_same_country(a, b, mensaje="Objetos pertenecen a países diferentes"):
         """Validar que dos objetos tengan el mismo country"""
-        country_a = getattr(
-            a, "country", getattr(getattr(a, "empresa", None), "pais", None)
-        )
-        country_b = getattr(
-            b, "country", getattr(getattr(b, "empresa", None), "pais", None)
-        )
+        country_a = getattr(a, "country", getattr(getattr(a, "empresa", None), "pais", None))
+        country_b = getattr(b, "country", getattr(getattr(b, "empresa", None), "pais", None))
 
         if country_a != country_b:
             raise ValidationError(f"{mensaje} ({country_a} != {country_b})")
 
     @staticmethod
-    def assert_correct_tipo(
-        servicio, tipo_esperado, mensaje="Tipo de servicio incorrecto"
-    ):
+    def assert_correct_tipo(servicio, tipo_esperado, mensaje="Tipo de servicio incorrecto"):
         """Validar que un servicio tenga el tipo correcto"""
         if servicio.tipo != tipo_esperado:
-            raise ValidationError(
-                f"{mensaje}. Esperado: {tipo_esperado}, Actual: {servicio.tipo}"
-            )
+            raise ValidationError(f"{mensaje}. Esperado: {tipo_esperado}, Actual: {servicio.tipo}")
 
 
 class LineaServicio(models.Model):
@@ -47,13 +37,26 @@ class LineaServicio(models.Model):
         "taller.Documento", on_delete=models.CASCADE, related_name="lineas_servicio"
     )
     servicio = models.ForeignKey(
-        Servicio,
+        "taller.Servicio",  # ✅ String reference (legacy, app taller.servicios)
         on_delete=models.PROTECT,
         null=True,
         blank=True,
-        help_text="Servicio interno del taller",
+        help_text="[LEGACY] Servicio interno del taller (modelo antiguo)",
     )
-    nombre = models.CharField(max_length=255, help_text="Nombre del servicio")
+
+    # === NUEVO: FK opcional a catálogo con I18N ===
+    service = models.ForeignKey(
+        "taller.Service",  # ✅ String reference (actualmente en taller, mover a servicios en Release 2.0)
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="lineas",
+        help_text="Servicio del catálogo con I18N (usar en lugar de 'servicio')",
+    )
+
+    nombre = models.CharField(
+        max_length=255, help_text="Nombre del servicio (congelado al emitir documento)"
+    )
     cantidad = models.PositiveIntegerField(default=1)
     precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
     from decimal import Decimal
@@ -140,16 +143,14 @@ class LineaOtroServicio(models.Model):
     # )
     # Campos manuales (legacy support)
     servicio = models.ForeignKey(
-        Servicio,
+        "taller.Servicio",  # ✅ String reference (legacy, en taller.servicios)
         on_delete=models.PROTECT,
         null=True,
         blank=True,
         help_text="Servicio legacy (para compatibilidad)",
     )
     nombre = models.CharField(max_length=255, help_text="Nombre del servicio externo")
-    empresa_externa = models.CharField(
-        max_length=255, help_text="Empresa que realiza el servicio"
-    )
+    empresa_externa = models.CharField(max_length=255, help_text="Empresa que realiza el servicio")
     cantidad = models.PositiveIntegerField(default=1)
     costo_interno = models.DecimalField(
         max_digits=10, decimal_places=2, help_text="Costo pagado a la empresa externa"
@@ -171,9 +172,7 @@ class LineaOtroServicio(models.Model):
         """Validaciones de consistencia para LineaOtroServicio"""
         # Validar que al menos un servicio esté configurado o campos manuales
         if not self.servicio and not self.nombre:
-            raise ValidationError(
-                "Debe especificar un servicio o un nombre de servicio"
-            )
+            raise ValidationError("Debe especificar un servicio o un nombre de servicio")
 
         # Validar country consistency si hay servicio legacy
         if hasattr(self, "documento") and self.documento and self.servicio:
@@ -186,9 +185,7 @@ class LineaOtroServicio(models.Model):
         # Validar precios lógicos
         if self.costo_interno and self.precio_cliente:
             if self.precio_cliente < self.costo_interno:
-                raise ValidationError(
-                    "El precio al cliente no puede ser menor al costo interno"
-                )
+                raise ValidationError("El precio al cliente no puede ser menor al costo interno")
 
     def save(self, *args, **kwargs):
         """Llamar validaciones antes de guardar"""
@@ -209,9 +206,7 @@ class LineaOtroServicio(models.Model):
     def margen_porcentaje(self):
         """Calcular margen en porcentaje"""
         if self.precio_cliente > 0:
-            return (
-                (self.precio_cliente - self.costo_interno) / self.precio_cliente
-            ) * 100
+            return ((self.precio_cliente - self.costo_interno) / self.precio_cliente) * 100
         return 0
 
     class Meta:
@@ -240,10 +235,23 @@ class LineaRepuesto(models.Model):
         on_delete=models.PROTECT,
         null=True,
         blank=True,
-        help_text="Repuesto del catálogo",
+        help_text="[LEGACY] Repuesto del catálogo antiguo",
     )
+
+    # === NUEVO: FK opcional a catálogo con I18N ===
+    part = models.ForeignKey(
+        "taller.Part",  # ✅ String reference (actualmente en taller, mover a repuestos en Release 2.0)
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="lineas",
+        help_text="Repuesto del catálogo con I18N (usar en lugar de 'repuesto')",
+    )
+
     codigo = models.CharField(max_length=100, help_text="Código del repuesto")
-    nombre = models.CharField(max_length=255, help_text="Nombre del repuesto")
+    nombre = models.CharField(
+        max_length=255, help_text="Nombre del repuesto (congelado al emitir documento)"
+    )
     cantidad = models.PositiveIntegerField(default=1)
     precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
     from decimal import Decimal

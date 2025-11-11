@@ -62,8 +62,7 @@ def test_us_localization_functions():
 
     # Test format_address
     assert (
-        format_address("123 Main St", "Anytown", "CA", "12345")
-        == "123 Main St, Anytown, CA 12345"
+        format_address("123 Main St", "Anytown", "CA", "12345") == "123 Main St, Anytown, CA 12345"
     )
     assert format_address("", "", "", "") == ", ,  "
     assert format_address(None, None, None, None) == "None, None, None None"

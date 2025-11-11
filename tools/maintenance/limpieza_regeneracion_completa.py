@@ -689,9 +689,7 @@ def generar_archivo_informe(usuarios_creados, datos_creados):
 **👥 Clientes:**
 """
             for cliente in datos["clientes"]:
-                contenido += (
-                    f"- {cliente.nombre} ({cliente.rut}) - {cliente.telefono}\n"
-                )
+                contenido += f"- {cliente.nombre} ({cliente.rut}) - {cliente.telefono}\n"
 
             contenido += """
 **🚗 Vehículos:**
@@ -771,9 +769,7 @@ def generar_archivo_informe(usuarios_creados, datos_creados):
             f.write(contenido)
 
         print_success("📄 Archivo creado: pruebas_suscripciones_creadas.md")
-        print_info(
-            f"📁 Ubicación: {os.path.abspath('pruebas_suscripciones_creadas.md')}"
-        )
+        print_info(f"📁 Ubicación: {os.path.abspath('pruebas_suscripciones_creadas.md')}")
 
     except Exception as e:
         print_error(f"Error creando archivo: {e}")
@@ -944,9 +940,7 @@ def main():
 
         print("\n📋 PRÓXIMOS PASOS:")
         print("1. 📄 Revisar archivo: pruebas_suscripciones_creadas.md")
-        print(
-            "2. 🌐 Probar login: https://atlantareciclajes.pythonanywhere.com/accounts/login/"
-        )
+        print("2. 🌐 Probar login: https://atlantareciclajes.pythonanywhere.com/accounts/login/")
         print("3. 🔍 Verificar datos: /admin/test/info/ (como admin)")
         print("4. 📊 Probar analytics: /analytics/admin/dashboard/")
 

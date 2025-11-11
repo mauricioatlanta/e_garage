@@ -137,9 +137,7 @@ class GlobalTemplateMigrator:
                         template_filename = Path(template_name).name
 
                         for target_dir in target_dirs:
-                            target_path = (
-                                self.base_path / target_dir / template_filename
-                            )
+                            target_path = self.base_path / target_dir / template_filename
                             target_path.parent.mkdir(parents=True, exist_ok=True)
 
                             if not target_path.exists():
@@ -195,9 +193,7 @@ return TemplateResponse(request, template_name, context)
                         canonical_name = f"{category_name}/{Path(template_name).name}"
 
                         f.write(f"### {item['file']}\n")
-                        f.write(
-                            f"**Template**: `{template_name}` → `{canonical_name}`\n\n"
-                        )
+                        f.write(f"**Template**: `{template_name}` → `{canonical_name}`\n\n")
                         f.write("```python\n")
                         f.write(
                             migration_template.format(
@@ -235,9 +231,7 @@ return TemplateResponse(request, template_name, context)
                 for old_template, new_template in critical_migrations.items():
                     if f"'{old_template}'" in content or f'"{old_template}"' in content:
                         # Reemplazar el render call
-                        old_pattern = (
-                            rf"render\(request,\s*['\"{old_template}\"'],\s*([^)]+)\)"
-                        )
+                        old_pattern = rf"render\(request,\s*['\"{old_template}\"'],\s*([^)]+)\)"
                         new_code = f"""# Usar template resolution
     from taller.utils.templates import select_country_lang_template
     from django.utils.translation import get_language

@@ -46,9 +46,7 @@ R_OTROS = [
 def get_or_create_us_company():
     emp = Empresa.objects.filter(country="US").order_by("id").first()
     if not emp:
-        emp = Empresa.objects.create(
-            nombre="USA Test Garage", country="US", moneda="USD"
-        )
+        emp = Empresa.objects.create(nombre="USA Test Garage", country="US", moneda="USD")
     return emp
 
 
@@ -72,9 +70,7 @@ def get_or_create_basics(emp):
     # Necesitamos obtener marca y modelo existentes o crear básicos
     from taller.models import Marca, Modelo
 
-    marca, _ = Marca.objects.get_or_create(
-        empresa=emp, nombre="Toyota", defaults={"activo": True}
-    )
+    marca, _ = Marca.objects.get_or_create(empresa=emp, nombre="Toyota", defaults={"activo": True})
     modelo, _ = Modelo.objects.get_or_create(
         marca=marca, nombre="Corolla", defaults={"activo": True}
     )
@@ -100,9 +96,7 @@ def recalc_totals(doc):
         rep_sub += lr.cantidad * lr.precio_unitario * (Decimal("1") - d)
     serv_sub = sum(
         [
-            ls.cantidad
-            * ls.precio_unitario
-            * (Decimal("1") - (ls.descuento or 0) / Decimal("100"))
+            ls.cantidad * ls.precio_unitario * (Decimal("1") - (ls.descuento or 0) / Decimal("100"))
             for ls in doc.lineas_servicio.all()
         ],
         Decimal("0"),
@@ -149,9 +143,7 @@ class Command(BaseCommand):
             default=10,
             help="Cantidad de documentos nuevos a crear",
         )
-        parser.add_argument(
-            "--hard", action="store_true", help="Borrar TODO para esa empresa"
-        )
+        parser.add_argument("--hard", action="store_true", help="Borrar TODO para esa empresa")
         parser.add_argument(
             "--country",
             type=str,
@@ -162,19 +154,13 @@ class Command(BaseCommand):
     @transaction.atomic
     def handle(self, *args, **opts):
         country = opts["country"].upper()
-        emp = (
-            Empresa.objects.filter(nombre=opts["empresa"]).first()
-            if opts["empresa"]
-            else None
-        )
+        emp = Empresa.objects.filter(nombre=opts["empresa"]).first() if opts["empresa"] else None
         if not emp:
             emp = (
                 get_or_create_us_company()
                 if country == "US"
                 else Empresa.objects.filter(country="CL").first()
-                or Empresa.objects.create(
-                    nombre="Chile Demo", country="CL", moneda="CLP"
-                )
+                or Empresa.objects.create(nombre="Chile Demo", country="CL", moneda="CLP")
             )
 
         seed_parts(emp)

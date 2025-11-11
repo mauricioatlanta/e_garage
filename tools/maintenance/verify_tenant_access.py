@@ -20,9 +20,7 @@ print("=== VERIFICACIÓN DE RELACIONES ===")
 user = User.objects.get(username="admin")
 print(f"Usuario: {user.username}")
 print(f"Empresa del usuario: {user.empresa}")
-print(
-    f"País de la empresa del usuario: {user.empresa.pais if user.empresa else 'None'}"
-)
+print(f"País de la empresa del usuario: {user.empresa.pais if user.empresa else 'None'}")
 
 # Cliente 1
 cliente = Cliente.objects.get(id=1)

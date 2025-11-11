@@ -5,9 +5,7 @@ from taller.models.marcas_usa import MarcaVehiculo
 
 class MarcaVehiculoUSA_Autocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
-        qs = MarcaVehiculo.objects.filter(pais_origen="USA", activa=True).order_by(
-            "nombre"
-        )
+        qs = MarcaVehiculo.objects.filter(pais_origen="USA", activa=True).order_by("nombre")
         if self.q:
             qs = qs.filter(nombre__icontains=self.q)
         else:

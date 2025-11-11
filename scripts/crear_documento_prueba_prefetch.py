@@ -150,9 +150,7 @@ def probar_vista_ver_documento(documento):
         precio_serv = serv.precio_unitario
         descuento_serv = serv.descuento
         subtotal = precio_serv * (1 - descuento_serv / 100)
-        print(
-            f"   - {serv.nombre}: ${precio_serv} (desc: {descuento_serv}%) = ${subtotal}"
-        )
+        print(f"   - {serv.nombre}: ${precio_serv} (desc: {descuento_serv}%) = ${subtotal}")
 
     print(f"🏢 Otros servicios encontrados: {otros_servicios.count()}")
     for otro in otros_servicios:
@@ -161,8 +159,7 @@ def probar_vista_ver_documento(documento):
 
     # Calcular totales como en la vista
     subtotal_repuestos = sum(
-        rep.precio_unitario * rep.cantidad * (1 - rep.descuento / 100)
-        for rep in repuestos
+        rep.precio_unitario * rep.cantidad * (1 - rep.descuento / 100) for rep in repuestos
     )
     subtotal_servicios = sum(
         serv.precio_unitario * (1 - serv.descuento / 100) for serv in servicios

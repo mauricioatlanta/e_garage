@@ -51,9 +51,7 @@ def main():
         # Verificar formulario
         form_kwargs = view.get_form_kwargs()
         if "empresa" in form_kwargs:
-            print(
-                f"✅ Empresa pasada al formulario: {form_kwargs['empresa'].nombre_taller}"
-            )
+            print(f"✅ Empresa pasada al formulario: {form_kwargs['empresa'].nombre_taller}")
         else:
             print("❌ Empresa NO pasada al formulario")
 

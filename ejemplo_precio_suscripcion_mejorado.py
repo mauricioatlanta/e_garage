@@ -197,12 +197,8 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description="Demo de mejoras en PrecioSuscripcion")
-    parser.add_argument(
-        "--create-demo", action="store_true", help="Crear datos de demostración"
-    )
-    parser.add_argument(
-        "--demo-only", action="store_true", help="Solo ejecutar demostración"
-    )
+    parser.add_argument("--create-demo", action="store_true", help="Crear datos de demostración")
+    parser.add_argument("--demo-only", action="store_true", help="Solo ejecutar demostración")
 
     args = parser.parse_args()
 

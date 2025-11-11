@@ -25,12 +25,8 @@ def verificar_vistas_corregidas():
     try:
         # Probar la consulta exacta que usamos en las vistas
         documento = (
-            Documento.objects.select_related(
-                "cliente", "vehiculo", "tecnico_responsable"
-            )
-            .prefetch_related(
-                "lineas_repuesto", "lineas_servicio", "lineas_otro_servicio"
-            )
+            Documento.objects.select_related("cliente", "vehiculo", "tecnico_responsable")
+            .prefetch_related("lineas_repuesto", "lineas_servicio", "lineas_otro_servicio")
             .first()
         )
 
@@ -57,9 +53,7 @@ def verificar_vistas_corregidas():
                 print(f"   📄 ID: {doc_prueba.id}")
                 print(f"   📄 Número: {doc_prueba.numero_documento}")
                 print(f"   📦 Repuestos: {doc_prueba.lineas_repuesto.count()}")
-                print(
-                    f"   🔗 URL para probar: /us/documentos/nuevo-ver/{doc_prueba.id}/"
-                )
+                print(f"   🔗 URL para probar: /us/documentos/nuevo-ver/{doc_prueba.id}/")
             else:
                 print("\n⚠️  No se encontró el documento de prueba 888888")
 

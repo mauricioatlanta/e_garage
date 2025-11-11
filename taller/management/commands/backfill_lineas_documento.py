@@ -17,12 +17,8 @@ class Command(BaseCommand):
     help = "Reconstruye líneas de documentos legacy desde documento.detalles. Soporta --dry-run."
 
     def add_arguments(self, parser):
-        parser.add_argument(
-            "--ids", nargs="*", type=int, help="IDs de documentos a procesar"
-        )
-        parser.add_argument(
-            "--dry-run", action="store_true", help="No escribir cambios"
-        )
+        parser.add_argument("--ids", nargs="*", type=int, help="IDs de documentos a procesar")
+        parser.add_argument("--dry-run", action="store_true", help="No escribir cambios")
 
     def handle(self, *args, **opts):
         ids = opts.get("ids")
@@ -68,25 +64,15 @@ class Command(BaseCommand):
 
             try:
                 detalles = (
-                    detalles_raw
-                    if isinstance(detalles_raw, dict)
-                    else json.loads(detalles_raw)
+                    detalles_raw if isinstance(detalles_raw, dict) else json.loads(detalles_raw)
                 )
             except Exception as e:
-                self.stdout.write(
-                    self.style.ERROR(f"[ERR] Doc {doc.id} JSON inválido: {e}")
-                )
+                self.stdout.write(self.style.ERROR(f"[ERR] Doc {doc.id} JSON inválido: {e}"))
                 continue
 
-            repuestos = detalles.get("repuestos", []) or detalles.get(
-                "lineas_repuesto", []
-            )
-            servicios = detalles.get("servicios", []) or detalles.get(
-                "lineas_servicio", []
-            )
-            otros = detalles.get("otros", []) or detalles.get(
-                "lineas_otro_servicio", []
-            )
+            repuestos = detalles.get("repuestos", []) or detalles.get("lineas_repuesto", [])
+            servicios = detalles.get("servicios", []) or detalles.get("lineas_servicio", [])
+            otros = detalles.get("otros", []) or detalles.get("lineas_otro_servicio", [])
 
             if opts["dry_run"]:
                 self.stdout.write(
@@ -103,18 +89,14 @@ class Command(BaseCommand):
                 for r in repuestos:
                     rep_id = r.get("id")
                     if not rep_id and r.get("part_number"):
-                        rep = Repuesto.objects.filter(
-                            part_number__iexact=r["part_number"]
-                        ).first()
+                        rep = Repuesto.objects.filter(part_number__iexact=r["part_number"]).first()
                         rep_id = rep.id if rep else None
                     LineaRepuesto.objects.create(
                         documento=doc,
                         repuesto_id=rep_id,
                         nombre=r.get("nombre") or r.get("descripcion", ""),
                         cantidad=Decimal(str(r.get("cantidad", 1))),
-                        precio_unitario=Decimal(
-                            str(r.get("precio", r.get("precio_unitario", 0)))
-                        ),
+                        precio_unitario=Decimal(str(r.get("precio", r.get("precio_unitario", 0)))),
                         descuento=Decimal(str(r.get("descuento", 0))),
                     )
                 # Servicios
@@ -124,9 +106,7 @@ class Command(BaseCommand):
                         codigo=s.get("codigo", ""),
                         nombre=s.get("nombre") or s.get("descripcion", ""),
                         cantidad=Decimal(str(s.get("cantidad", 1))),
-                        precio_unitario=Decimal(
-                            str(s.get("precio", s.get("precio_unitario", 0)))
-                        ),
+                        precio_unitario=Decimal(str(s.get("precio", s.get("precio_unitario", 0)))),
                         descuento=Decimal(str(s.get("descuento", 0))),
                     )
                 # Otros

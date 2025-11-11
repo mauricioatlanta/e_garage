@@ -64,9 +64,7 @@ def configuracion(request):
             direccion = request.POST.get("direccion", "").strip()
             if len(nombre) < 2:
                 messages.error(request, "Nombre de técnico demasiado corto.")
-            elif Tecnico.objects.filter(
-                empresa=empresa, nombre__iexact=nombre
-            ).exists():
+            elif Tecnico.objects.filter(empresa=empresa, nombre__iexact=nombre).exists():
                 messages.error(request, f'Ya existe un técnico llamado "{nombre}".')
             else:
                 Tecnico.objects.create(
@@ -87,9 +85,7 @@ def configuracion(request):
                     f'Técnico "{tec.nombre}" ahora está {"activo" if tec.activo else "inactivo"}.',
                 )
             else:
-                messages.error(
-                    request, "Técnico no encontrado o no pertenece a tu empresa."
-                )
+                messages.error(request, "Técnico no encontrado o no pertenece a tu empresa.")
 
     # Técnicos asociados (si el modelo existe)
     tecnicos = []

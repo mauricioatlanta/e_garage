@@ -38,8 +38,6 @@ print("\n=== CONCLUSIÓN ===")
 print("✅ JavaScript agregado al template crear_documento.html")
 print("✅ API api_vehiculos_cliente existe con filtrado de empresa")
 print("✅ endpoint obtener_vehiculos_por_cliente corregido con filtrado")
-print(
-    "\n🎯 SOLUCIÓN IMPLEMENTADA: Al seleccionar un cliente en la creación de documento,"
-)
+print("\n🎯 SOLUCIÓN IMPLEMENTADA: Al seleccionar un cliente en la creación de documento,")
 print("   ahora se cargarán automáticamente solo los vehículos de ese cliente,")
 print("   filtrados por la empresa del usuario autenticado.")

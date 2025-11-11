@@ -56,16 +56,12 @@ def main():
         print("\n--- DATOS DE MUESTRA ---")
         clientes_muestra = Cliente.objects.all()[:5]
         for cliente in clientes_muestra:
-            empresa_nombre = (
-                cliente.empresa.nombre if cliente.empresa else "SIN EMPRESA"
-            )
+            empresa_nombre = cliente.empresa.nombre if cliente.empresa else "SIN EMPRESA"
             print(f"Cliente: {cliente.nombre} - Empresa: {empresa_nombre}")
 
         vehiculos_muestra = Vehiculo.objects.all()[:5]
         for vehiculo in vehiculos_muestra:
-            empresa_nombre = (
-                vehiculo.empresa.nombre if vehiculo.empresa else "SIN EMPRESA"
-            )
+            empresa_nombre = vehiculo.empresa.nombre if vehiculo.empresa else "SIN EMPRESA"
             cliente_empresa = (
                 vehiculo.cliente.empresa.nombre
                 if vehiculo.cliente and vehiculo.cliente.empresa

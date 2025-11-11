@@ -58,19 +58,13 @@ def probar_servicios_externos():
     print("\n✅ VERIFICACIÓN EXITOSA!")
     print("📊 Servicios externos configurados y listos para usar en documentos")
     print("🔧 Modelo LineaOtroServicio actualizado con soporte para ServicioExterno")
-    print(
-        "💰 Los servicios externos pueden ser agregados a documentos con precios configurados"
-    )
+    print("💰 Los servicios externos pueden ser agregados a documentos con precios configurados")
 
     # Lista de servicios disponibles
     print("\n🏢 SERVICIOS EXTERNOS DISPONIBLES:")
     for i, servicio in enumerate(servicios_externos, 1):
         ganancia_pct = (
-            (
-                (servicio.precio_cliente - servicio.costo_taller)
-                / servicio.costo_taller
-                * 100
-            )
+            ((servicio.precio_cliente - servicio.costo_taller) / servicio.costo_taller * 100)
             if servicio.costo_taller > 0
             else 0
         )

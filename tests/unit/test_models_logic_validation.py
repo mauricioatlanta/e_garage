@@ -39,9 +39,7 @@ def test_empresa_model_logic():
 
     # Test with different countries (create new user to avoid unique constraint)
     user_us = User.objects.create_user(username="test_empresa_us", password="test")
-    empresa_us = Empresa.objects.create(
-        user=user_us, nombre_taller="US Taller", pais="US"
-    )
+    empresa_us = Empresa.objects.create(user=user_us, nombre_taller="US Taller", pais="US")
     assert empresa_us.pais == "US"
 
 
@@ -64,9 +62,7 @@ def test_lineas_documento_logic():
 
     # Create required objects
     empresa = Empresa.objects.create(user=user, nombre_taller="Test", pais="CL")
-    cliente = Cliente.objects.create(
-        empresa=empresa, nombre="Test Client", tax_id="1-9"
-    )
+    cliente = Cliente.objects.create(empresa=empresa, nombre="Test Client", tax_id="1-9")
     vehiculo = Vehiculo.objects.create(
         empresa=empresa,
         cliente=cliente,
@@ -94,9 +90,7 @@ def test_lineas_documento_logic():
         ),  # decimal quantity
     ]
 
-    for i, (cantidad, precio_unitario, descuento, expected_subtotal) in enumerate(
-        test_cases
-    ):
+    for i, (cantidad, precio_unitario, descuento, expected_subtotal) in enumerate(test_cases):
         linea = LineaServicio.objects.create(
             documento=documento,
             nombre=f"Test Service {i}",
@@ -140,9 +134,7 @@ def test_lineas_documento_logic():
             assert isinstance(
                 linea.subtotal, (int, float, Decimal)
             ), f"subtotal should be numeric, got {type(linea.subtotal)}"
-            assert (
-                linea.subtotal >= 0
-            ), f"subtotal should be non-negative, got {linea.subtotal}"
+            assert linea.subtotal >= 0, f"subtotal should be non-negative, got {linea.subtotal}"
 
         # Test clean method if it exists
         try:
@@ -175,9 +167,7 @@ def test_documento_validation_logic():
 
     # Create required objects
     empresa = Empresa.objects.create(user=user, nombre_taller="Test", pais="CL")
-    cliente = Cliente.objects.create(
-        empresa=empresa, nombre="Test Client", tax_id="1-9"
-    )
+    cliente = Cliente.objects.create(empresa=empresa, nombre="Test Client", tax_id="1-9")
     vehiculo = Vehiculo.objects.create(
         empresa=empresa,
         cliente=cliente,
@@ -230,9 +220,7 @@ def test_model_str_methods():
     assert len(str(empresa)) > 0
 
     # Test Cliente __str__
-    cliente = Cliente.objects.create(
-        empresa=empresa, nombre="Test Client", tax_id="1-9"
-    )
+    cliente = Cliente.objects.create(empresa=empresa, nombre="Test Client", tax_id="1-9")
     assert str(cliente) is not None
     assert len(str(cliente)) > 0
 

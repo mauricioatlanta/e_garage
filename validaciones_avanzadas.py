@@ -66,9 +66,7 @@ class ValidadorAvanzado:
 
             # Verificar que servicios estén correctamente filtrados por país
             servicios_por_pais = (
-                Servicio.objects.values("country")
-                .annotate(count=Count("id"))
-                .order_by("country")
+                Servicio.objects.values("country").annotate(count=Count("id")).order_by("country")
             )
 
             detalles_paises = ", ".join(
@@ -81,9 +79,7 @@ class ValidadorAvanzado:
             )
 
         except Exception as e:
-            self.log_resultado(
-                "Lógica Multiempresa", "FAIL", f"Error en validación: {str(e)}"
-            )
+            self.log_resultado("Lógica Multiempresa", "FAIL", f"Error en validación: {str(e)}")
 
     def validar_9_performance_consultas(self):
         """Validar performance de consultas críticas"""
@@ -117,9 +113,7 @@ class ValidadorAvanzado:
 
         # Test 2: Consulta de documentos multiempresa
         start_time = time.time()
-        docs_empresa = Documento.objects.select_related(
-            "empresa", "cliente", "vehiculo"
-        )[:50]
+        docs_empresa = Documento.objects.select_related("empresa", "cliente", "vehiculo")[:50]
         list(docs_empresa)  # Forzar evaluación
         tiempo_docs = time.time() - start_time
 
@@ -233,9 +227,7 @@ class ValidadorAvanzado:
 
             for modelo, count in counts.items():
                 if count > 0:
-                    self.log_resultado(
-                        f"Volumen {modelo}", "PASS", f"{count} registros"
-                    )
+                    self.log_resultado(f"Volumen {modelo}", "PASS", f"{count} registros")
                 else:
                     self.log_resultado(
                         f"Volumen {modelo}", "WARNING", f"Sin datos: {count} registros"
@@ -277,9 +269,7 @@ class ValidadorAvanzado:
             self.validar_12_escalabilidad_datos()
 
         except Exception as e:
-            self.log_resultado(
-                "VALIDACIONES AVANZADAS", "FAIL", f"Error crítico: {str(e)}"
-            )
+            self.log_resultado("VALIDACIONES AVANZADAS", "FAIL", f"Error crítico: {str(e)}")
             traceback.print_exc()
 
         self.generar_reporte_avanzado()

@@ -13,9 +13,7 @@ from taller.models.perfil_usuario import PerfilUsuario
 from taller.models.tecnico import Tecnico
 
 
-def log_auditoria_documento(
-    usuario, empresa, accion, documento=None, descripcion="", request=None
-):
+def log_auditoria_documento(usuario, empresa, accion, documento=None, descripcion="", request=None):
     """Helper para crear logs de auditoría específicos de documentos"""
     LogAuditoria.log_accion(
         usuario=usuario,
@@ -137,9 +135,7 @@ def crear_documento(request):
                     datos_despues["servicios"] = servicios_creados
 
                 except json.JSONDecodeError as e:
-                    messages.error(
-                        request, f"Error procesando items del documento: {e}"
-                    )
+                    messages.error(request, f"Error procesando items del documento: {e}")
 
                     # Log del error
                     log_auditoria_documento(
@@ -165,15 +161,11 @@ def crear_documento(request):
                 request=request,
             )
 
-            messages.success(
-                request, f"Documento {documento.numero_documento} creado exitosamente"
-            )
+            messages.success(request, f"Documento {documento.numero_documento} creado exitosamente")
             return redirect("documentos:lista_documentos")
         else:
             # Log de errores de validación
-            errores = "; ".join(
-                [f"{campo}: {error}" for campo, error in form.errors.items()]
-            )
+            errores = "; ".join([f"{campo}: {error}" for campo, error in form.errors.items()])
             log_auditoria_documento(
                 usuario=request.user,
                 empresa=None,
@@ -282,12 +274,8 @@ def editar_documento(request, documento_id):
                 "tipo_documento": documento.tipo_documento,
                 "fecha": str(documento.fecha),
                 "observaciones": documento.observaciones,
-                "repuestos": list(
-                    LineaRepuesto.objects.filter(documento=documento).values()
-                ),
-                "servicios": list(
-                    LineaServicio.objects.filter(documento=documento).values()
-                ),
+                "repuestos": list(LineaRepuesto.objects.filter(documento=documento).values()),
+                "servicios": list(LineaServicio.objects.filter(documento=documento).values()),
             }
 
             # Log de auditoría con cambios
@@ -363,9 +351,7 @@ def detalle_documento(request, documento_id):
         request=request,
     )
 
-    return render(
-        request, "taller/documentos/detalle_documento.html", {"documento": documento}
-    )
+    return render(request, "taller/documentos/detalle_documento.html", {"documento": documento})
 
 
 @login_required
@@ -389,12 +375,8 @@ def eliminar_documento(request, documento_id):
             "tipo_documento": documento.tipo_documento,
             "fecha": str(documento.fecha),
             "cliente": str(documento.cliente) if documento.cliente else None,
-            "repuestos_count": LineaRepuesto.objects.filter(
-                documento=documento
-            ).count(),
-            "servicios_count": LineaServicio.objects.filter(
-                documento=documento
-            ).count(),
+            "repuestos_count": LineaRepuesto.objects.filter(documento=documento).count(),
+            "servicios_count": LineaServicio.objects.filter(documento=documento).count(),
         }
 
         numero_doc = documento.numero_documento
@@ -412,6 +394,4 @@ def eliminar_documento(request, documento_id):
         messages.success(request, f"Documento {numero_doc} eliminado exitosamente")
         return redirect("documentos:lista_documentos")
 
-    return render(
-        request, "taller/documentos/confirmar_eliminar.html", {"documento": documento}
-    )
+    return render(request, "taller/documentos/confirmar_eliminar.html", {"documento": documento})

@@ -66,9 +66,7 @@ def main():
         print("\n📊 RESUMEN:")
         print(f"  Colores creados: {colores_creados}")
         print(f"  Colores existentes: {colores_existentes}")
-        print(
-            f"  Total colores CL: {ColorVehiculo.objects.filter(country='CL').count()}"
-        )
+        print(f"  Total colores CL: {ColorVehiculo.objects.filter(country='CL').count()}")
 
         # Verificar algunos colores en inglés que podríamos marcar como US
         colores_inglés = [

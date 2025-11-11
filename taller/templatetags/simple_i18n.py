@@ -52,11 +52,7 @@ def precio_pais(context, precio):
     Formatea el precio según el país del usuario
     """
     request = context.get("request")
-    if (
-        not request
-        or not hasattr(request, "user")
-        or not hasattr(request.user, "empresa")
-    ):
+    if not request or not hasattr(request, "user") or not hasattr(request.user, "empresa"):
         return f"${precio:,.0f}"
 
     empresa = request.user.empresa
@@ -73,11 +69,7 @@ def simbolo_moneda(context):
     Retorna el símbolo de moneda según el país del usuario
     """
     request = context.get("request")
-    if (
-        not request
-        or not hasattr(request, "user")
-        or not hasattr(request.user, "empresa")
-    ):
+    if not request or not hasattr(request, "user") or not hasattr(request.user, "empresa"):
         return "$"
 
     return request.user.empresa.simbolo_moneda

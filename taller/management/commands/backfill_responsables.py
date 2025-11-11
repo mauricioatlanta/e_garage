@@ -23,9 +23,7 @@ class Command(BaseCommand):
         dry_run = options["dry_run"]
 
         if dry_run:
-            self.stdout.write(
-                self.style.WARNING("🔍 MODO DRY-RUN - No se realizarán cambios")
-            )
+            self.stdout.write(self.style.WARNING("🔍 MODO DRY-RUN - No se realizarán cambios"))
 
         # Procesar LineaServicio
         qs_servicio = LineaServicio.objects.filter(
@@ -75,13 +73,9 @@ class Command(BaseCommand):
                 f"{updated_otro} líneas de otro servicio"
             )
         )
-        self.stdout.write(
-            self.style.SUCCESS(f"📊 Total: {total_updated} líneas procesadas")
-        )
+        self.stdout.write(self.style.SUCCESS(f"📊 Total: {total_updated} líneas procesadas"))
 
         if dry_run:
             self.stdout.write(
-                self.style.WARNING(
-                    "💡 Para ejecutar los cambios reales, ejecuta sin --dry-run"
-                )
+                self.style.WARNING("💡 Para ejecutar los cambios reales, ejecuta sin --dry-run")
             )

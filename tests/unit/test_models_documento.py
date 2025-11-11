@@ -30,9 +30,7 @@ class DocumentoModelTest(TestCase):
         )
 
         # Crear cliente
-        self.cliente = Cliente.objects.create(
-            empresa=self.empresa, nombre="Cliente Test"
-        )
+        self.cliente = Cliente.objects.create(empresa=self.empresa, nombre="Cliente Test")
 
         # Crear vehículo
         self.vehiculo = Vehiculo.objects.create(
@@ -45,9 +43,7 @@ class DocumentoModelTest(TestCase):
         )
 
         # Crear técnico
-        self.tecnico = Tecnico.objects.create(
-            empresa=self.empresa, nombre="Técnico Test"
-        )
+        self.tecnico = Tecnico.objects.create(empresa=self.empresa, nombre="Técnico Test")
 
     def test_documento_creation(self):
         """Test creación básica de documento"""
@@ -113,9 +109,7 @@ class DocumentoModelTest(TestCase):
         with self.assertRaises(ValidationError) as cm:
             doc.full_clean()
 
-        self.assertIn(
-            "El campo millas solo puede usarse en documentos de USA", str(cm.exception)
-        )
+        self.assertIn("El campo millas solo puede usarse en documentos de USA", str(cm.exception))
 
     def test_documento_clean_validation_millas_usa_ok(self):
         """Test que millas funciona correctamente en USA"""
@@ -163,9 +157,7 @@ class DocumentoModelTest(TestCase):
 
     def test_tipo_documento_property(self):
         """Test propiedad tipo_documento"""
-        doc = Documento.objects.create(
-            empresa=self.empresa, cliente=self.cliente, tipo="FAC"
-        )
+        doc = Documento.objects.create(empresa=self.empresa, cliente=self.cliente, tipo="FAC")
 
         self.assertEqual(doc.tipo_documento, "FAC")
 
@@ -185,27 +177,21 @@ class DocumentoModelTest(TestCase):
 
     def test_total_repuestos_empty(self):
         """Test método total_repuestos sin líneas"""
-        doc = Documento.objects.create(
-            empresa=self.empresa, cliente=self.cliente, tipo="OT"
-        )
+        doc = Documento.objects.create(empresa=self.empresa, cliente=self.cliente, tipo="OT")
 
         # Sin líneas de repuesto, debería retornar 0
         self.assertEqual(doc.total_repuestos(), 0)
 
     def test_total_servicios_empty(self):
         """Test método total_servicios sin líneas"""
-        doc = Documento.objects.create(
-            empresa=self.empresa, cliente=self.cliente, tipo="OT"
-        )
+        doc = Documento.objects.create(empresa=self.empresa, cliente=self.cliente, tipo="OT")
 
         # Sin líneas de servicio, debería retornar 0
         self.assertEqual(doc.total_servicios(), 0)
 
     def test_total_otros_servicios_empty(self):
         """Test método total_otros_servicios sin líneas"""
-        doc = Documento.objects.create(
-            empresa=self.empresa, cliente=self.cliente, tipo="OT"
-        )
+        doc = Documento.objects.create(empresa=self.empresa, cliente=self.cliente, tipo="OT")
 
         # Sin líneas de otros servicios, debería retornar 0
         self.assertEqual(doc.total_otros_servicios(), 0)
@@ -225,9 +211,7 @@ class DocumentoModelTest(TestCase):
 
     def test_total_general(self):
         """Test método total_general"""
-        doc = Documento.objects.create(
-            empresa=self.empresa, cliente=self.cliente, tipo="OT"
-        )
+        doc = Documento.objects.create(empresa=self.empresa, cliente=self.cliente, tipo="OT")
 
         # Sin líneas, total debería ser 0
         self.assertEqual(doc.total_general(), 0)
@@ -253,9 +237,7 @@ class DocumentoModelTest(TestCase):
 
     def test_properties_retrocompatibles(self):
         """Test propiedades retrocompatibles"""
-        doc = Documento.objects.create(
-            empresa=self.empresa, cliente=self.cliente, tipo="OT"
-        )
+        doc = Documento.objects.create(empresa=self.empresa, cliente=self.cliente, tipo="OT")
 
         # Estas propiedades deberían retornar los related managers
         self.assertEqual(doc.repuestos, doc.lineas_repuesto)

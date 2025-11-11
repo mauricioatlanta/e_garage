@@ -13,9 +13,7 @@ class _EmpresaMixin:
         return qs.filter(empresa=empresa) if empresa else qs.none()
 
 
-class ClientesAutocomplete(
-    LoginRequiredMixin, _EmpresaMixin, autocomplete.Select2QuerySetView
-):
+class ClientesAutocomplete(LoginRequiredMixin, _EmpresaMixin, autocomplete.Select2QuerySetView):
     """Devuelve clientes del tenant; busca por nombre, rut/ein, email, teléfono."""
 
     def get_queryset(self):

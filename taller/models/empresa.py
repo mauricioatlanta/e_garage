@@ -50,9 +50,7 @@ class Empresa(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="empresa")
     nombre_taller = models.CharField(max_length=100, default="Mi Taller")
-    empresa = models.CharField(
-        max_length=100, blank=True, help_text="Razón social o compañía"
-    )
+    empresa = models.CharField(max_length=100, blank=True, help_text="Razón social o compañía")
 
     pais = models.CharField(
         max_length=2,
@@ -80,9 +78,7 @@ class Empresa(models.Model):
     suscripcion_activa = models.BooleanField(default=True)
 
     ultimo_pago = models.DateTimeField(null=True, blank=True)
-    valor_mensual = models.DecimalField(
-        max_digits=10, decimal_places=2, default=Decimal("0.00")
-    )
+    valor_mensual = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"))
     moneda = models.CharField(max_length=3, choices=MONEDA_CHOICES, default="CLP")
 
     notificacion_5_dias = models.BooleanField(default=False)
@@ -153,9 +149,7 @@ class Empresa(models.Model):
 
     @property
     def debe_bloquear(self):
-        return (timezone.now() > self.fecha_expiracion) and (
-            not self.suscripcion_activa
-        )
+        return (timezone.now() > self.fecha_expiracion) and (not self.suscripcion_activa)
 
     @property
     def estado_suscripcion(self):
@@ -179,9 +173,7 @@ class Empresa(models.Model):
 
     def extender_suscripcion(self, dias=30):
         base = (
-            self.fecha_fin
-            if self.fecha_fin and self.fecha_fin > timezone.now()
-            else timezone.now()
+            self.fecha_fin if self.fecha_fin and self.fecha_fin > timezone.now() else timezone.now()
         )
         self.fecha_fin = base + timedelta(days=dias)
         self.suscripcion_activa = True
@@ -239,9 +231,7 @@ class Empresa(models.Model):
     def get_mensaje_alerta(self):
         dias = self.dias_restantes
         if dias <= 0:
-            return (
-                "Tu suscripción ha vencido. Renueva para continuar usando el sistema."
-            )
+            return "Tu suscripción ha vencido. Renueva para continuar usando el sistema."
         if dias == 1:
             return "⚠️ Tu suscripción vence mañana. ¡Renueva ahora!"
         if dias <= 5:
@@ -252,10 +242,6 @@ class Empresa(models.Model):
         verbose_name = "Empresa"
         verbose_name_plural = "Empresas"
         constraints = [
-            CheckConstraint(
-                check=Q(dias_prueba__gte=0), name="empresa_dias_prueba_gte_0"
-            ),
-            CheckConstraint(
-                check=Q(valor_mensual__gte=0), name="empresa_valor_mensual_gte_0"
-            ),
+            CheckConstraint(check=Q(dias_prueba__gte=0), name="empresa_dias_prueba_gte_0"),
+            CheckConstraint(check=Q(valor_mensual__gte=0), name="empresa_valor_mensual_gte_0"),
         ]

@@ -67,9 +67,7 @@ class ProcesadorNotificaciones:
             self.estadisticas["notificaciones_enviadas"] = total_enviadas
 
             if total_enviadas > 0:
-                self.log_sistema(
-                    f"✅ {total_enviadas} notificaciones enviadas desde cola"
-                )
+                self.log_sistema(f"✅ {total_enviadas} notificaciones enviadas desde cola")
             else:
                 self.log_sistema("📭 No hay notificaciones pendientes para enviar")
 
@@ -152,9 +150,7 @@ class ProcesadorNotificaciones:
 
             # Notificaciones de las últimas 24 horas
             hace_24h = datetime.now() - timedelta(hours=24)
-            notif_24h = NotificacionEnviada.objects.filter(
-                created_at__gte=hace_24h
-            ).count()
+            notif_24h = NotificacionEnviada.objects.filter(created_at__gte=hace_24h).count()
 
             # Tipos de notificación más usados
             from django.db.models import Count
@@ -215,13 +211,9 @@ class ProcesadorNotificaciones:
             )
 
             if notificaciones:
-                self.log_sistema(
-                    f"✅ Prueba exitosa: {len(notificaciones)} notificaciones creadas"
-                )
+                self.log_sistema(f"✅ Prueba exitosa: {len(notificaciones)} notificaciones creadas")
                 for notif in notificaciones:
-                    self.log_sistema(
-                        f"   - {notif.tipo_notificacion.nombre}: {notif.estado}"
-                    )
+                    self.log_sistema(f"   - {notif.tipo_notificacion.nombre}: {notif.estado}")
             else:
                 self.log_sistema("⚠️  No se crearon notificaciones de prueba", "WARNING")
 

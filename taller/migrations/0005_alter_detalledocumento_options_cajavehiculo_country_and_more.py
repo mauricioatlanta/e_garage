@@ -140,15 +140,11 @@ class Migration(migrations.Migration):
         ),
         migrations.AddIndex(
             model_name="cajavehiculo",
-            index=models.Index(
-                fields=["country", "nombre"], name="taller_caja_country_a3676a_idx"
-            ),
+            index=models.Index(fields=["country", "nombre"], name="taller_caja_country_a3676a_idx"),
         ),
         migrations.AddIndex(
             model_name="colorvehiculo",
-            index=models.Index(
-                fields=["country", "nombre"], name="taller_colo_country_10c7a9_idx"
-            ),
+            index=models.Index(fields=["country", "nombre"], name="taller_colo_country_10c7a9_idx"),
         ),
         migrations.AddIndex(
             model_name="detalledocumento",
@@ -158,9 +154,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddIndex(
             model_name="motorvehiculo",
-            index=models.Index(
-                fields=["country", "nombre"], name="taller_moto_country_9036cb_idx"
-            ),
+            index=models.Index(fields=["country", "nombre"], name="taller_moto_country_9036cb_idx"),
         ),
         migrations.AddConstraint(
             model_name="cajavehiculo",

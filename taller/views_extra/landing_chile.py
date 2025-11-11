@@ -4,9 +4,7 @@ from django.views.generic import TemplateView
 
 
 class LandingChileView(TemplateView):
-    template_name = (
-        "us/en/landing_usa.html"  # Usar el mismo template pero con traducciones
-    )
+    template_name = "us/en/landing_usa.html"  # Usar el mismo template pero con traducciones
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

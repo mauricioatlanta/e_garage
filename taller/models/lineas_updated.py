@@ -50,9 +50,7 @@ class LineaOtroServicio(models.Model):
     nombre = models.CharField(max_length=255)
     empresa_externa = models.CharField(max_length=255, blank=True, null=True)
     cantidad = models.DecimalField(max_digits=10, decimal_places=2, default=1)
-    costo_interno = models.DecimalField(
-        max_digits=12, decimal_places=2, default=0
-    )  # costo a ti
+    costo_interno = models.DecimalField(max_digits=12, decimal_places=2, default=0)  # costo a ti
     precio_cliente = models.DecimalField(
         max_digits=12, decimal_places=2, default=0
     )  # cobrado al cliente
@@ -68,7 +66,5 @@ class LineaOtroServicio(models.Model):
         self.subtotal = money_quantize(Decimal(bruto_cliente), pais)
         # Ganancia visible en reportes
         bruto_costo = (self.cantidad or 0) * (self.costo_interno or 0)
-        self.ganancia = money_quantize(
-            Decimal(bruto_cliente) - Decimal(bruto_costo), pais
-        )
+        self.ganancia = money_quantize(Decimal(bruto_cliente) - Decimal(bruto_costo), pais)
         super().save(*args, **kwargs)

@@ -7,9 +7,7 @@ print("Columnas actuales:", columns)
 
 if "country" not in columns:
     print("Agregando campo country...")
-    cursor.execute(
-        "ALTER TABLE taller_colorvehiculo ADD COLUMN country VARCHAR(2) DEFAULT 'CL';"
-    )
+    cursor.execute("ALTER TABLE taller_colorvehiculo ADD COLUMN country VARCHAR(2) DEFAULT 'CL';")
     print("Campo agregado exitosamente")
 else:
     print("Campo country ya existe")

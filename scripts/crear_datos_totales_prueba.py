@@ -102,9 +102,7 @@ try:
     print(f"   Total General: ${documento.total_general()}")
 
     print("\n🎯 Datos de prueba creados exitosamente!")
-    print(
-        f"   El documento {documento.numero} ahora debería mostrar totales en la vista"
-    )
+    print(f"   El documento {documento.numero} ahora debería mostrar totales en la vista")
 
 except Exception as e:
     print(f"❌ Error: {e}")

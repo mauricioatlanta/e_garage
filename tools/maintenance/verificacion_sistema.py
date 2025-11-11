@@ -56,9 +56,7 @@ print()
 print("3️⃣ ESTADO POR EMPRESA:")
 for empresa in Empresa.objects.all():
     docs = Documento.objects.filter(empresa=empresa)
-    repuestos_total = RepuestoDocumento.objects.filter(
-        documento__empresa=empresa
-    ).count()
+    repuestos_total = RepuestoDocumento.objects.filter(documento__empresa=empresa).count()
     servicios_total = LineaServicio.objects.filter(documento__empresa=empresa).count()
 
     print(f"   🏢 {empresa.nombre_taller}:")
@@ -93,9 +91,7 @@ for doc in docs_recientes:
         if (repuestos > 0 and servicios > 0)
         else "⚠️" if (repuestos > 0 or servicios > 0) else "❌"
     )
-    print(
-        f"   {estado} Doc {doc.pk}: {doc.numero_documento} ({doc.empresa.nombre_taller})"
-    )
+    print(f"   {estado} Doc {doc.pk}: {doc.numero_documento} ({doc.empresa.nombre_taller})")
 
 print()
 print("✅ VERIFICACIÓN COMPLETADA")
@@ -103,9 +99,7 @@ print("✅ VERIFICACIÓN COMPLETADA")
 # Generar resumen en archivo
 resumen_path = os.path.join(os.getcwd(), "verificacion_sistema.txt")
 with open(resumen_path, "w", encoding="utf-8") as f:
-    f.write(
-        f"Verificación Sistema E-Garage - {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}\n"
-    )
+    f.write(f"Verificación Sistema E-Garage - {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}\n")
     f.write("=" * 60 + "\n\n")
     f.write(f"Empresas: {total_empresas}\n")
     f.write(f"Usuarios: {total_usuarios}\n")

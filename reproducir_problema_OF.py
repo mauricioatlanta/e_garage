@@ -106,9 +106,7 @@ def crear_documento_con_repuesto_OF():
         )
         return False
 
-    print(
-        f"✅ Datos: Cliente={cliente.id}, Técnico={tecnico.id}, Vehículo={vehiculo.id}"
-    )
+    print(f"✅ Datos: Cliente={cliente.id}, Técnico={tecnico.id}, Vehículo={vehiculo.id}")
 
     # GET crear documento para obtener CSRF
     crear_url = "http://127.0.0.1:8000/cl/documentos/nuevo/"
@@ -281,15 +279,11 @@ def crear_documento_con_repuesto_OF():
     print("\n🔍 ANÁLISIS DEL PROBLEMA:")
     if cnt_rep == 0:
         print("❌ PROBLEMA: CNT rep = 0 → La línea NO se guardó en la base de datos")
-        print(
-            "   Causa probable: POST no lleva datos correctos O la vista no los procesa"
-        )
+        print("   Causa probable: POST no lleva datos correctos O la vista no los procesa")
     elif cnt_rep > 0:
         print(f"✅ Líneas en BD: {cnt_rep}")
         print("❌ PROBLEMA: Líneas existen en BD pero NO se muestran en la vista")
-        print(
-            "   Causa probable: Template/vista de detalle no consulta o muestra las líneas"
-        )
+        print("   Causa probable: Template/vista de detalle no consulta o muestra las líneas")
         print(f"   Líneas encontradas: {list_rep}")
 
     return cnt_rep > 0

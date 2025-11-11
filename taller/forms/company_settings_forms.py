@@ -79,9 +79,7 @@ class CompanySettingsForm(forms.ModelForm):
 
     phone = forms.CharField(
         required=False,
-        widget=forms.TextInput(
-            attrs={"class": "form-control", "placeholder": "+56 9 1234 5678"}
-        ),
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "+56 9 1234 5678"}),
     )
 
     email = forms.EmailField(
@@ -100,9 +98,7 @@ class CompanySettingsForm(forms.ModelForm):
 
     tax_id = forms.CharField(
         required=False,
-        widget=forms.TextInput(
-            attrs={"class": "form-control", "placeholder": "12.345.678-9"}
-        ),
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "12.345.678-9"}),
         help_text="RUT, NIT o número de identificación fiscal",
     )
 
@@ -226,9 +222,7 @@ class CompanySettingsForm(forms.ModelForm):
             width, height = img.size
 
             if width > 1000 or height > 1000:
-                raise forms.ValidationError(
-                    "El logo debe ser menor a 1000x1000 píxeles"
-                )
+                raise forms.ValidationError("El logo debe ser menor a 1000x1000 píxeles")
 
             if width < 100 or height < 100:
                 raise forms.ValidationError("El logo debe ser mayor a 100x100 píxeles")
@@ -305,9 +299,7 @@ class LogoUploadForm(forms.Form):
                 width, height = img.size
 
                 if width > 1000 or height > 1000:
-                    raise forms.ValidationError(
-                        "El logo debe ser menor a 1000x1000 píxeles"
-                    )
+                    raise forms.ValidationError("El logo debe ser menor a 1000x1000 píxeles")
 
             except Exception:
                 raise forms.ValidationError("El archivo no es una imagen válida")
@@ -341,9 +333,7 @@ class CompanyProfileForm(forms.ModelForm):
                     "placeholder": "Su eslogan aquí (opcional)",
                 }
             ),
-            "logo": forms.FileInput(
-                attrs={"class": "form-control", "accept": "image/*"}
-            ),
+            "logo": forms.FileInput(attrs={"class": "form-control", "accept": "image/*"}),
             "address": forms.Textarea(
                 attrs={
                     "class": "form-control",
@@ -399,9 +389,7 @@ class FinancialSettingsForm(forms.ModelForm):
                     "placeholder": "19.00",
                 }
             ),
-            "apply_tax_by_default": forms.CheckboxInput(
-                attrs={"class": "form-check-input"}
-            ),
+            "apply_tax_by_default": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -432,9 +420,7 @@ class ThemeSettingsForm(forms.ModelForm):
                     "title": "Seleccionar color secundario",
                 }
             ),
-            "separate_by_technician": forms.CheckboxInput(
-                attrs={"class": "form-check-input"}
-            ),
+            "separate_by_technician": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -449,9 +435,7 @@ class BrandingPreviewForm(forms.Form):
 
     company_name = forms.CharField(
         max_length=255,
-        widget=forms.TextInput(
-            attrs={"class": "form-control", "oninput": "updatePreview()"}
-        ),
+        widget=forms.TextInput(attrs={"class": "form-control", "oninput": "updatePreview()"}),
     )
 
     primary_color = forms.CharField(

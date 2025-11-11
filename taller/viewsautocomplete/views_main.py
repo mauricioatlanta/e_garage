@@ -21,9 +21,7 @@ def lista_clientes(request):
         clientes = Cliente.objects.none()
 
     if q:
-        clientes = clientes.filter(nombre__icontains=q) | clientes.filter(
-            apellido__icontains=q
-        )
+        clientes = clientes.filter(nombre__icontains=q) | clientes.filter(apellido__icontains=q)
 
     paginator = Paginator(clientes, 10)
     page_number = request.GET.get("page")
@@ -149,9 +147,7 @@ def api_ciudades(request):
     region_id = request.GET.get("region_id")
     ciudades = []
     if region_id:
-        ciudades_qs = TallerCiudad.objects.filter(region_id=region_id).order_by(
-            "nombre"
-        )
+        ciudades_qs = TallerCiudad.objects.filter(region_id=region_id).order_by("nombre")
     # Atributos id y nombre existen en el modelo; comentario para linters dinámicos
     ciudades = [{"id": c.id, "nombre": c.nombre} for c in ciudades_qs]  # noqa: B009
     return JsonResponse({"ciudades": ciudades})

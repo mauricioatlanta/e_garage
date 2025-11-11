@@ -109,9 +109,7 @@ def validar_dashboard_espacial():
 if __name__ == "__main__":
     if validar_dashboard_espacial():
         print("\n🎯 VALIDACIÓN EXITOSA - Dashboard espacial listo para usar")
-        print(
-            "💡 Accede a http://127.0.0.1:8000/cl/ con las credenciales mauricio1/taller123"
-        )
+        print("💡 Accede a http://127.0.0.1:8000/cl/ con las credenciales mauricio1/taller123")
     else:
         print("\n❌ VALIDACIÓN FALLIDA - Revisar configuración")
         sys.exit(1)

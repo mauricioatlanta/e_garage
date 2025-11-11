@@ -51,9 +51,7 @@ def registro(request):
         # Evita duplicados por email
         existing_user = User.objects.filter(email__iexact=email).first()
         if existing_user and Empresa.objects.filter(user=existing_user).exists():
-            return render(
-                request, "suscripcion/usuario_existente.html", {"email": email}
-            )
+            return render(request, "suscripcion/usuario_existente.html", {"email": email})
 
         # Validar prueba gratuita (si corresponde)
         if tipo_registro == "trial":
@@ -140,9 +138,7 @@ def registro(request):
             )
             cuenta_bancaria = cuentas.get(pais, "[configurar]")
 
-            soporte_email = getattr(
-                settings, "EGARAGE_SUPPORT_EMAIL", "subscription@egarage.cl"
-            )
+            soporte_email = getattr(settings, "EGARAGE_SUPPORT_EMAIL", "subscription@egarage.cl")
 
             send_mail(
                 "Instrucciones de Pago - eGarage",
@@ -176,9 +172,7 @@ def activar(request):
     username = request.session.get("usuario_activacion")
     if request.method == "GET":
         # Si no hay sesión, igual muestra el form de activación
-        return render(
-            request, "suscripcion/activar_codigo.html", {"prefill_username": username}
-        )
+        return render(request, "suscripcion/activar_codigo.html", {"prefill_username": username})
 
     # POST
     email = _normaliza_email(request.POST.get("email"))

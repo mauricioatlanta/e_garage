@@ -38,7 +38,7 @@ class ColorCliente(models.Model):
         unique_together = [["nombre", "country"]]
 
     def __str__(self):
-        return f"{self.nombre} ({self.get_country_display()})"
+        return self.nombre
 
     @classmethod
     def get_colores_para_pais(cls, country="CL"):

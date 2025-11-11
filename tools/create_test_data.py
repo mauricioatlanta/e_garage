@@ -24,9 +24,7 @@ try:
         print("OK: Tecnico CL creado")
 
     # Crear marca si no existe
-    marca_cl, created = Marca.objects.get_or_create(
-        nombre="Toyota", country="CL", defaults={}
-    )
+    marca_cl, created = Marca.objects.get_or_create(nombre="Toyota", country="CL", defaults={})
     if created:
         print("OK: Marca CL creada")
 
@@ -68,9 +66,7 @@ try:
         print("OK: Tecnico US creado")
 
     # Crear marca si no existe
-    marca_us, created = Marca.objects.get_or_create(
-        nombre="Ford", country="US", defaults={}
-    )
+    marca_us, created = Marca.objects.get_or_create(nombre="Ford", country="US", defaults={})
     if created:
         print("OK: Marca US creada")
 

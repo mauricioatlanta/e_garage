@@ -86,9 +86,7 @@ class Command(BaseCommand):
                         fail_silently=True,
                     )
 
-                    self.stdout.write(
-                        self.style.WARNING(f"⚠️ Desactivada: {empresa.nombre_taller}")
-                    )
+                    self.stdout.write(self.style.WARNING(f"⚠️ Desactivada: {empresa.nombre_taller}"))
 
                 desactivadas += 1
 
@@ -107,9 +105,7 @@ class Command(BaseCommand):
 
         if dry_run:
             self.stdout.write(
-                self.style.WARNING(
-                    "\n⚠️  Modo DRY-RUN: No se desactivaron suscripciones"
-                )
+                self.style.WARNING("\n⚠️  Modo DRY-RUN: No se desactivaron suscripciones")
             )
         else:
             self.stdout.write(self.style.SUCCESS("\n✅ Verificación completada"))

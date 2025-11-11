@@ -24,6 +24,18 @@ from taller.servicios.models import (
 
 from .models import ConfiguracionEmpresa
 
+# Importar admins de catálogo I18N (se auto-registran con @admin.register)
+try:
+    from taller.admin.catalogo_admin import *  # noqa: F401, F403
+except ImportError:
+    pass  # Admin de catálogo no disponible aún
+
+# Importar admin de servicios externos (se auto-registra con @admin.register)
+try:
+    from taller.admin.servicios_externos_admin import *  # noqa: F401, F403
+except ImportError:
+    pass  # Admin de servicios externos no disponible aún
+
 
 class MyAdminSite(AdminSite):
     site_header = "Panel de Administración de eGarage"
@@ -120,9 +132,7 @@ class EmpresaAdmin(admin.ModelAdmin):
     def dias_restantes_display(self, obj):
         dias = obj.dias_restantes
         if dias <= 0:
-            return format_html(
-                '<span style="color: red; font-weight: bold;">VENCIDO</span>'
-            )
+            return format_html('<span style="color: red; font-weight: bold;">VENCIDO</span>')
         elif dias <= 5:
             return format_html(
                 '<span style="color: orange; font-weight: bold;">{} días</span>', dias
@@ -502,9 +512,7 @@ class PrecioSuscripcionAdmin(admin.ModelAdmin):
     def caracteristicas_preview(self, obj):
         caracteristicas = obj.caracteristicas_list()
         if len(caracteristicas) > 3:
-            return (
-                f"{', '.join(caracteristicas[:3])}... (+{len(caracteristicas)-3} más)"
-            )
+            return f"{', '.join(caracteristicas[:3])}... (+{len(caracteristicas)-3} más)"
         return ", ".join(caracteristicas)
 
     actions = ["duplicar_para_otro_pais"]
@@ -542,9 +550,7 @@ class PrecioSuscripcionAdmin(admin.ModelAdmin):
                     "multisucursal": precio.multisucursal,
                 },
             )
-        self.message_user(
-            request, f"Duplicados {len(queryset)} precios para el otro país."
-        )
+        self.message_user(request, f"Duplicados {len(queryset)} precios para el otro país.")
 
 
 @admin.register(CatalogoModeloAuto, site=admin_site)
@@ -590,9 +596,7 @@ class CatalogoModeloAutoAdmin(admin.ModelAdmin):
 
         stats = (
             CatalogoModeloAuto.objects.values("marca")
-            .annotate(
-                total=Count("id"), activos=Count("id", filter=models.Q(activo=True))
-            )
+            .annotate(total=Count("id"), activos=Count("id", filter=models.Q(activo=True)))
             .order_by("-total")[:10]
         )
 

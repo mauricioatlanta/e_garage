@@ -410,9 +410,7 @@ try:
         if isinstance(data_us, dict) and data_us:
             CATALOGOS_CIUDADES["US"] = data_us
         else:
-            _notificar_error_json_usa(
-                "Advertencia: El JSON de USA está vacío o malformado."
-            )
+            _notificar_error_json_usa("Advertencia: El JSON de USA está vacío o malformado.")
             CATALOGOS_CIUDADES["US"] = {}
 except Exception as e:
     _notificar_error_json_usa(f"Error cargando estados_ciudades_usa.json: {e}")

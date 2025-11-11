@@ -219,9 +219,7 @@ class FixturesRealesGenerator:
         ]
 
         for cat_data in categorias_cl:
-            categoria = CategoriaServicio.objects.create(
-                country="CL", code=cat_data["code"]
-            )
+            categoria = CategoriaServicio.objects.create(country="CL", code=cat_data["code"])
 
             # Nombres en español
             CategoriaServicioName.objects.create(
@@ -406,9 +404,7 @@ class FixturesRealesGenerator:
         ]
 
         for cat_data in categorias_us:
-            categoria = CategoriaServicio.objects.create(
-                country="US", code=cat_data["code"]
-            )
+            categoria = CategoriaServicio.objects.create(country="US", code=cat_data["code"])
 
             # Nombres en inglés (principal)
             CategoriaServicioName.objects.create(
@@ -623,9 +619,7 @@ class FixturesRealesGenerator:
                     marca=marca, nombre=modelo_nombre, country="CL"
                 ).first()
                 if not modelo:
-                    modelo = Modelo.objects.create(
-                        marca=marca, nombre=modelo_nombre, country="CL"
-                    )
+                    modelo = Modelo.objects.create(marca=marca, nombre=modelo_nombre, country="CL")
                     print(f"         ✅ Modelo: {modelo_nombre}")
 
         # Crear marcas y modelos para USA
@@ -643,9 +637,7 @@ class FixturesRealesGenerator:
                     marca=marca, nombre=modelo_nombre, country="US"
                 ).first()
                 if not modelo:
-                    modelo = Modelo.objects.create(
-                        marca=marca, nombre=modelo_nombre, country="US"
-                    )
+                    modelo = Modelo.objects.create(marca=marca, nombre=modelo_nombre, country="US")
                     print(f"         ✅ Modelo: {modelo_nombre}")
 
         total_marcas_cl = len(marcas_modelos_cl)
@@ -808,9 +800,7 @@ class FixturesRealesGenerator:
                     f"   ✅ {cliente.nombre} {cliente.apellido} ({len(cliente_data['vehiculos'])} vehículos)"
                 )
 
-            print(
-                f"   📊 Empresa: {empresa.nombre_taller} - {len(clientes_cl)} clientes"
-            )
+            print(f"   📊 Empresa: {empresa.nombre_taller} - {len(clientes_cl)} clientes")
 
         print(f"   📊 Total clientes CL: {len(clientes_cl) * len(empresas_cl)}\n")
 
@@ -959,9 +949,7 @@ class FixturesRealesGenerator:
                     f"   ✅ {cliente.nombre} {cliente.apellido} ({len(cliente_data['vehiculos'])} vehicles)"
                 )
 
-            print(
-                f"   📊 Company: {empresa.nombre_taller} - {len(clientes_us)} clients"
-            )
+            print(f"   📊 Company: {empresa.nombre_taller} - {len(clientes_us)} clients")
 
         print(f"   📊 Total clients US: {len(clientes_us) * len(empresas_us)}\n")
 
@@ -1024,12 +1012,8 @@ class FixturesRealesGenerator:
         # Estadísticas por país
         empresas_cl = Empresa.objects.filter(pais="CL").count()
         empresas_us = Empresa.objects.filter(pais="US").count()
-        servicios_cl = Servicio.objects.filter(
-            country="CL", code__contains="demo_"
-        ).count()
-        servicios_us = Servicio.objects.filter(
-            country="US", code__contains="demo_"
-        ).count()
+        servicios_cl = Servicio.objects.filter(country="CL", code__contains="demo_").count()
+        servicios_us = Servicio.objects.filter(country="US", code__contains="demo_").count()
 
         print("\n🇨🇱 CHILE:")
         print(f"   Empresas: {empresas_cl}")

@@ -93,9 +93,7 @@ def crear_datos_prueba():
     marca_toyota, _ = Marca.objects.get_or_create(nombre="Toyota")
     marca_ford, _ = Marca.objects.get_or_create(nombre="Ford")
 
-    modelo_corolla, _ = Modelo.objects.get_or_create(
-        nombre="Corolla", marca=marca_toyota
-    )
+    modelo_corolla, _ = Modelo.objects.get_or_create(nombre="Corolla", marca=marca_toyota)
     modelo_f150, _ = Modelo.objects.get_or_create(nombre="F-150", marca=marca_ford)
 
     # 4. Crear clientes
@@ -114,9 +112,7 @@ def crear_datos_prueba():
         },
     )
     if created:
-        print(
-            f"✅ Cliente Chile creado: {cliente_chile.nombre} {cliente_chile.apellido}"
-        )
+        print(f"✅ Cliente Chile creado: {cliente_chile.nombre} {cliente_chile.apellido}")
 
     # Cliente USA
     cliente_usa, created = Cliente.objects.get_or_create(
@@ -179,9 +175,7 @@ def crear_datos_prueba():
     print("   1. Inicia sesión con admin_chile para ver la interfaz en español")
     print("   2. Inicia sesión con admin_usa para ver la interfaz en inglés")
     print("   3. También puedes cambiar idioma manualmente usando el selector")
-    print(
-        "\n🌍 El sistema detectará automáticamente el idioma según el país de la empresa:"
-    )
+    print("\n🌍 El sistema detectará automáticamente el idioma según el país de la empresa:")
     print("   - Empresas con país 'CL' → Español")
     print("   - Empresas con país 'US' → English")
 

@@ -110,9 +110,7 @@ proximos = RecordatorioMantenimiento.objects.filter(
 print(f"Recordatorios próximos (7 días): {proximos.count()}")
 for recordatorio in proximos[:5]:
     dias = (recordatorio.fecha_programada - timezone.now().date()).days
-    print(
-        f"  - {recordatorio.cliente.nombre}: En {dias} días ({recordatorio.fecha_programada})"
-    )
+    print(f"  - {recordatorio.cliente.nombre}: En {dias} días ({recordatorio.fecha_programada})")
 
 print()
 print("🎯 === RECOMENDACIONES ===")

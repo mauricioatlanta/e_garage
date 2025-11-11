@@ -2,9 +2,7 @@ from django.template import TemplateDoesNotExist
 from django.template.loader import get_template
 
 
-def select_country_lang_template(
-    base_path: str, country: str, lang: str, fallback_lang="es"
-):
+def select_country_lang_template(base_path: str, country: str, lang: str, fallback_lang="es"):
     """
     Selecciona template basado en país e idioma con fallbacks.
 

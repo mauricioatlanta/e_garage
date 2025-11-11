@@ -25,9 +25,7 @@ from taller.utils.export_utils import (
 @login_required_default
 def exportar_documento_pdf(request, documento_id):
     """Exporta un documento específico a PDF"""
-    documento = get_object_or_404(
-        Documento, id=documento_id, empresa=empresa_actual(request)
-    )
+    documento = get_object_or_404(Documento, id=documento_id, empresa=empresa_actual(request))
 
     try:
         exporter = DocumentoPDFExporter(documento)
@@ -49,9 +47,7 @@ def exportar_documento_pdf(request, documento_id):
 @login_required_default
 def enviar_documento_email(request, documento_id):
     """Envía un documento por email"""
-    documento = get_object_or_404(
-        Documento, id=documento_id, empresa=empresa_actual(request)
-    )
+    documento = get_object_or_404(Documento, id=documento_id, empresa=empresa_actual(request))
 
     if request.method == "POST":
         email_destinatario = request.POST.get("email")
@@ -69,12 +65,8 @@ def enviar_documento_email(request, documento_id):
             )
 
             if resultado:
-                messages.success(
-                    request, f"Documento enviado exitosamente a {email_destinatario}"
-                )
-                return JsonResponse(
-                    {"success": True, "message": "Email enviado correctamente"}
-                )
+                messages.success(request, f"Documento enviado exitosamente a {email_destinatario}")
+                return JsonResponse({"success": True, "message": "Email enviado correctamente"})
             else:
                 return JsonResponse({"error": "Error al enviar email"}, status=500)
 
@@ -92,9 +84,7 @@ def enviar_documento_email(request, documento_id):
 @login_required_default
 def generar_link_whatsapp(request, documento_id):
     """Genera link de WhatsApp para enviar documento"""
-    documento = get_object_or_404(
-        Documento, id=documento_id, empresa=empresa_actual(request)
-    )
+    documento = get_object_or_404(Documento, id=documento_id, empresa=empresa_actual(request))
 
     telefono = request.GET.get("telefono") or documento.cliente.telefono
 
@@ -176,9 +166,7 @@ def exportar_rentabilidad_excel(request):
 @require_http_methods(["POST"])
 def vista_previa_documento(request, documento_id):
     """Genera vista previa del documento en formato JSON"""
-    documento = get_object_or_404(
-        Documento, id=documento_id, empresa=empresa_actual(request)
-    )
+    documento = get_object_or_404(Documento, id=documento_id, empresa=empresa_actual(request))
 
     try:
         # Calcular totales
@@ -238,9 +226,7 @@ def vista_previa_documento(request, documento_id):
 @login_required_default
 def opciones_entrega_documento(request, documento_id):
     """Muestra opciones de entrega para un documento"""
-    documento = get_object_or_404(
-        Documento, id=documento_id, empresa=empresa_actual(request)
-    )
+    documento = get_object_or_404(Documento, id=documento_id, empresa=empresa_actual(request))
 
     context = {
         "documento": documento,
@@ -248,15 +234,9 @@ def opciones_entrega_documento(request, documento_id):
         "empresa": documento.empresa,
         "tiene_email": bool(documento.cliente.email),
         "tiene_telefono": bool(documento.cliente.telefono),
-        "pdf_url": reverse(
-            "exportar_documento_pdf", kwargs={"documento_id": documento.id}
-        ),
-        "email_url": reverse(
-            "enviar_documento_email", kwargs={"documento_id": documento.id}
-        ),
-        "whatsapp_url": reverse(
-            "generar_link_whatsapp", kwargs={"documento_id": documento.id}
-        ),
+        "pdf_url": reverse("exportar_documento_pdf", kwargs={"documento_id": documento.id}),
+        "email_url": reverse("enviar_documento_email", kwargs={"documento_id": documento.id}),
+        "whatsapp_url": reverse("generar_link_whatsapp", kwargs={"documento_id": documento.id}),
     }
 
     return render(request, "taller/documentos/opciones_entrega.html", context)

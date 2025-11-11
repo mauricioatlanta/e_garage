@@ -54,6 +54,9 @@ def obtener_ciudades(request):
     Vista inteligente que devuelve ciudades según el país del usuario:
     - Para usuarios de Chile: ciudades de regiones chilenas
     - Para usuarios de USA: ciudades de estados de USA
+    - Para usuarios de Brasil: cidades de estados brasileiros
+    - Para usuarios de Venezuela: ciudades de estados venezolanos
+    - Para usuarios de Perú: ciudades de departamentos peruanos
     """
     # Detectar país del usuario
     pais_usuario = "CL"  # Por defecto Chile
@@ -61,21 +64,23 @@ def obtener_ciudades(request):
         if hasattr(request.user, "empresa") and hasattr(request.user.empresa, "pais"):
             pais_usuario = request.user.empresa.pais
 
-    if pais_usuario == "US":
-        # Usuario de USA: devolver ciudades de estados de USA
+    if pais_usuario in ["US", "BR", "VE", "PE"]:
+        # Usuarios de USA, Brasil, Venezuela, Perú: usar modelo Estado/Ciudad unificado
         estado_id = request.GET.get("estado_id")
         if not estado_id:
             return JsonResponse([], safe=False)
-        ciudades = Ciudad.objects.filter(estado_id=estado_id).values("id", "nombre")
+
+        # Filtrar ciudades por estado
+        ciudades = Ciudad.objects.filter(estado_id=estado_id, estado__pais=pais_usuario).values(
+            "id", "nombre"
+        )
         return JsonResponse(list(ciudades), safe=False)
     else:
-        # Usuario de Chile: devolver ciudades de regiones chilenas
+        # Usuario de Chile: devolver ciudades de regiones chilenas (modelo antiguo)
         region_id = request.GET.get("region_id")
         if not region_id:
             return JsonResponse([], safe=False)
-        ciudades = TallerCiudad.objects.filter(region_id=region_id).values(
-            "id", "nombre"
-        )
+        ciudades = TallerCiudad.objects.filter(region_id=region_id).values("id", "nombre")
         return JsonResponse(list(ciudades), safe=False)
 
 
@@ -159,24 +164,16 @@ def cliente_delete(request, pk=None, cliente_id=None):
     if request.method == "POST":
         try:
             cliente.delete()
-            messages.success(
-                request, f"Cliente {cliente.nombre} eliminado exitosamente."
-            )
+            messages.success(request, f"Cliente {cliente.nombre} eliminado exitosamente.")
             return redirect("chile:taller:clientes:lista_clientes")
         except ProtectedError as e:
             # Obtener los objetos protegidos
             protected_objects = e.args[1]
-            documentos = [
-                obj
-                for obj in protected_objects
-                if obj.__class__.__name__ == "Documento"
-            ]
+            documentos = [obj for obj in protected_objects if obj.__class__.__name__ == "Documento"]
 
             # Crear mensaje de error informativo
             if documentos:
-                doc_ids = [
-                    str(doc.id) for doc in documentos[:5]
-                ]  # Mostrar máximo 5 IDs
+                doc_ids = [str(doc.id) for doc in documentos[:5]]  # Mostrar máximo 5 IDs
                 mensaje = f"No se puede eliminar el cliente {cliente.nombre} porque tiene {len(documentos)} documento(s) asociado(s)"
                 if len(documentos) <= 5:
                     mensaje += f": {', '.join(doc_ids)}"
@@ -193,18 +190,14 @@ def cliente_delete(request, pk=None, cliente_id=None):
                 {"cliente": cliente},
             )
         except Exception as e:
-            messages.error(
-                request, f"Error inesperado al eliminar el cliente: {str(e)}"
-            )
+            messages.error(request, f"Error inesperado al eliminar el cliente: {str(e)}")
             return render(
                 request,
                 "taller/clientes/confirmar_eliminacion.html",
                 {"cliente": cliente},
             )
 
-    return render(
-        request, "taller/clientes/confirmar_eliminacion.html", {"cliente": cliente}
-    )
+    return render(request, "taller/clientes/confirmar_eliminacion.html", {"cliente": cliente})
 
 
 def clientes_stats(request):
@@ -275,9 +268,7 @@ def agregar_ciudad_usa(request):
 
         # Verificar si la ciudad ya existe en ese estado
         if Ciudad.objects.filter(nombre__iexact=nombre_ciudad, estado=estado).exists():
-            return JsonResponse(
-                {"success": False, "error": "City already exists in this state"}
-            )
+            return JsonResponse({"success": False, "error": "City already exists in this state"})
 
         # Crear la nueva ciudad
         nueva_ciudad = Ciudad.objects.create(nombre=nombre_ciudad, estado=estado)
@@ -315,9 +306,7 @@ def agregar_ciudad(request):
         region_id = data.get("region_id")
 
         if not nombre_ciudad:
-            return JsonResponse(
-                {"success": False, "error": "Nombre de ciudad requerido"}
-            )
+            return JsonResponse({"success": False, "error": "Nombre de ciudad requerido"})
 
         if not region_id:
             return JsonResponse({"success": False, "error": "Región requerida"})
@@ -335,9 +324,7 @@ def agregar_ciudad(request):
                 return JsonResponse({"success": False, "error": "Estado no encontrado"})
 
             # Verificar si la ciudad ya existe
-            if Ciudad.objects.filter(
-                estado=estado, nombre__iexact=nombre_ciudad
-            ).exists():
+            if Ciudad.objects.filter(estado=estado, nombre__iexact=nombre_ciudad).exists():
                 return JsonResponse(
                     {"success": False, "error": "La ciudad ya existe en este estado"}
                 )
@@ -355,17 +342,13 @@ def agregar_ciudad(request):
                 return JsonResponse({"success": False, "error": "Región no encontrada"})
 
             # Verificar si la ciudad ya existe
-            if TallerCiudad.objects.filter(
-                region=region, nombre__iexact=nombre_ciudad
-            ).exists():
+            if TallerCiudad.objects.filter(region=region, nombre__iexact=nombre_ciudad).exists():
                 return JsonResponse(
                     {"success": False, "error": "La ciudad ya existe en esta región"}
                 )
 
             # Crear nueva ciudad
-            nueva_ciudad = TallerCiudad.objects.create(
-                region=region, nombre=nombre_ciudad
-            )
+            nueva_ciudad = TallerCiudad.objects.create(region=region, nombre=nombre_ciudad)
 
         return JsonResponse(
             {

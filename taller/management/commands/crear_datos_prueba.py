@@ -42,9 +42,7 @@ class Command(BaseCommand):
         )
 
         if created:
-            self.stdout.write(
-                self.style.SUCCESS(f"✅ Empresa creada: {empresa.nombre_taller}")
-            )
+            self.stdout.write(self.style.SUCCESS(f"✅ Empresa creada: {empresa.nombre_taller}"))
         else:
             self.stdout.write(f"ℹ️ Empresa ya existe: {empresa.nombre_taller}")
 
@@ -54,9 +52,7 @@ class Command(BaseCommand):
         )
 
         if created:
-            self.stdout.write(
-                self.style.SUCCESS(f"✅ Perfil creado para: {user.username}")
-            )
+            self.stdout.write(self.style.SUCCESS(f"✅ Perfil creado para: {user.username}"))
         else:
             self.stdout.write(f"ℹ️ Perfil ya existe para: {user.username}")
 
@@ -85,16 +81,12 @@ class Command(BaseCommand):
                 status = "✅ ACTIVO" if mecanico.activo else "❌ INACTIVO"
                 self.stdout.write(f"{status} Mecánico ya existe: {mecanico.nombre}")
 
-        self.stdout.write(
-            self.style.SUCCESS("\n🎉 Datos de prueba creados exitosamente!")
-        )
+        self.stdout.write(self.style.SUCCESS("\n🎉 Datos de prueba creados exitosamente!"))
         self.stdout.write("\n📝 Para probar:")
         self.stdout.write(
             f"1. Ve a http://127.0.0.1:8000/admin/ (usuario: {user.username}, password: admin123)"
         )
-        self.stdout.write(
-            "2. Ve a http://127.0.0.1:8000/configuracion/ para configuración"
-        )
+        self.stdout.write("2. Ve a http://127.0.0.1:8000/configuracion/ para configuración")
         self.stdout.write(
             "3. Ve a http://127.0.0.1:8000/configuracion/mecanicos/ para gestionar mecánicos"
         )

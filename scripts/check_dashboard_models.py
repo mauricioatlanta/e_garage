@@ -55,9 +55,7 @@ except:
 print()
 print("🏢 EMPRESAS REGISTRADAS:")
 for empresa in Empresa.objects.all()[:10]:
-    print(
-        f"- {empresa.nombre_taller} ({empresa.pais}) - Usuario: {empresa.user.username}"
-    )
+    print(f"- {empresa.nombre_taller} ({empresa.pais}) - Usuario: {empresa.user.username}")
 
 print()
 print("📈 DATOS PARA DASHBOARD (últimos 5 documentos):")
@@ -71,9 +69,7 @@ print("⚙️ SERVICIOS MÁS POPULARES:")
 from django.db.models import Count
 
 servicios_top = (
-    LineaServicio.objects.values("nombre")
-    .annotate(total=Count("id"))
-    .order_by("-total")[:5]
+    LineaServicio.objects.values("nombre").annotate(total=Count("id")).order_by("-total")[:5]
 )
 
 for servicio in servicios_top:
@@ -81,11 +77,9 @@ for servicio in servicios_top:
 
 print()
 print("🔧 TÉCNICOS MÁS ACTIVOS:")
-tecnicos_activos = Tecnico.objects.annotate(docs_count=Count("documentos")).order_by(
-    "-docs_count"
-)[:5]
+tecnicos_activos = Tecnico.objects.annotate(docs_count=Count("documentos")).order_by("-docs_count")[
+    :5
+]
 
 for tecnico in tecnicos_activos:
-    print(
-        f"- {tecnico.nombre} ({tecnico.empresa.nombre_taller}): {tecnico.docs_count} documentos"
-    )
+    print(f"- {tecnico.nombre} ({tecnico.empresa.nombre_taller}): {tecnico.docs_count} documentos")

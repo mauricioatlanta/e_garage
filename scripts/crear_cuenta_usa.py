@@ -262,12 +262,8 @@ def crear_cuenta_usa_completa():
                     num_servicios = random.randint(1, 3)
                     servicios_elegidos = random.sample(servicios, num_servicios)
                     for servicio in servicios_elegidos:
-                        precio_base = (
-                            servicio.precio_base or 5000
-                        )  # Precios más altos para USA
-                        precio = max(
-                            1000, int(precio_base) + random.randint(-1000, 3000)
-                        )
+                        precio_base = servicio.precio_base or 5000  # Precios más altos para USA
+                        precio = max(1000, int(precio_base) + random.randint(-1000, 3000))
 
                         ServicioDocumento.objects.create(
                             empresa=empresa_usa,
@@ -319,15 +315,11 @@ def crear_cuenta_usa_completa():
     # Estadísticas finales
     print(f"\n📊 Final Statistics for '{empresa_usa.nombre_taller}':")
     for tipo in tipos_documento:
-        count = Documento.objects.filter(
-            tipo_documento=tipo, empresa=empresa_usa
-        ).count()
+        count = Documento.objects.filter(tipo_documento=tipo, empresa=empresa_usa).count()
         print(f"  - {tipo}: {count}")
 
     print("\n📈 Total USA Data:")
-    print(
-        f"  - Total documents: {Documento.objects.filter(empresa=empresa_usa).count()}"
-    )
+    print(f"  - Total documents: {Documento.objects.filter(empresa=empresa_usa).count()}")
     print(
         f"  - Total parts in docs: {RepuestoDocumento.objects.filter(documento__empresa=empresa_usa).count()}"
     )
@@ -337,14 +329,10 @@ def crear_cuenta_usa_completa():
     print(
         f"  - Total other services: {OtroServicioDocumento.objects.filter(documento__empresa=empresa_usa).count()}"
     )
-    print(
-        f"  - Total parts available: {Repuesto.objects.filter(empresa=empresa_usa).count()}"
-    )
+    print(f"  - Total parts available: {Repuesto.objects.filter(empresa=empresa_usa).count()}")
     print(f"  - Total customers: {Cliente.objects.filter(empresa=empresa_usa).count()}")
     print(f"  - Total vehicles: {Vehiculo.objects.filter(empresa=empresa_usa).count()}")
-    print(
-        f"  - Total technicians: {Tecnico.objects.filter(empresa=empresa_usa).count()}"
-    )
+    print(f"  - Total technicians: {Tecnico.objects.filter(empresa=empresa_usa).count()}")
 
 
 if __name__ == "__main__":

@@ -24,25 +24,17 @@ class ValidacionConsistencia:
     @staticmethod
     def assert_same_country(a, b, mensaje="Objetos pertenecen a países diferentes"):
         """Validar que dos objetos tengan el mismo country"""
-        country_a = getattr(
-            a, "country", getattr(getattr(a, "empresa", None), "pais", None)
-        )
-        country_b = getattr(
-            b, "country", getattr(getattr(b, "empresa", None), "pais", None)
-        )
+        country_a = getattr(a, "country", getattr(getattr(a, "empresa", None), "pais", None))
+        country_b = getattr(b, "country", getattr(getattr(b, "empresa", None), "pais", None))
 
         if country_a != country_b:
             raise ValidationError(f"{mensaje} ({country_a} != {country_b})")
 
     @staticmethod
-    def assert_correct_tipo(
-        servicio, tipo_esperado, mensaje="Tipo de servicio incorrecto"
-    ):
+    def assert_correct_tipo(servicio, tipo_esperado, mensaje="Tipo de servicio incorrecto"):
         """Validar que un servicio tenga el tipo correcto"""
         if servicio.tipo != tipo_esperado:
-            raise ValidationError(
-                f"{mensaje}. Esperado: {tipo_esperado}, Actual: {servicio.tipo}"
-            )
+            raise ValidationError(f"{mensaje}. Esperado: {tipo_esperado}, Actual: {servicio.tipo}")
 
 
 def implementar_validaciones_documento():
@@ -390,9 +382,7 @@ class Migration(migrations.Migration):
 """
 
     # Escribir la migración
-    with open(
-        "taller/migrations/0008_validaciones_constraints.py", "w", encoding="utf-8"
-    ) as f:
+    with open("taller/migrations/0008_validaciones_constraints.py", "w", encoding="utf-8") as f:
         f.write(migration_content)
 
     print("   ✅ Migración de constraints creada: 0008_validaciones_constraints.py")

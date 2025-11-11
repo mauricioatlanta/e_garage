@@ -124,9 +124,7 @@ def ajax_motores(request):
         empresa, pais = _scope(request)
 
         try:
-            modelo = Modelo.objects.select_related("marca").get(
-                pk=modelo_id, country=pais
-            )
+            modelo = Modelo.objects.select_related("marca").get(pk=modelo_id, country=pais)
             # Si Modelo tiene empresa:
             # if hasattr(Modelo, "empresa") and empresa and modelo.empresa_id != empresa.id:
             #     return _bad_request("El modelo no pertenece a tu empresa")
@@ -167,9 +165,7 @@ def ajax_cajas(request):
         empresa, pais = _scope(request)
 
         try:
-            modelo = Modelo.objects.select_related("marca").get(
-                pk=modelo_id, country=pais
-            )
+            modelo = Modelo.objects.select_related("marca").get(pk=modelo_id, country=pais)
             # if hasattr(Modelo, "empresa") and empresa and modelo.empresa_id != empresa.id:
             #     return _bad_request("El modelo no pertenece a tu empresa")
         except ObjectDoesNotExist:
@@ -208,9 +204,7 @@ def ajax_motores_cajas(request):
         empresa, pais = _scope(request)
 
         try:
-            modelo = Modelo.objects.select_related("marca").get(
-                pk=modelo_id, country=pais
-            )
+            modelo = Modelo.objects.select_related("marca").get(pk=modelo_id, country=pais)
             # if hasattr(Modelo, "empresa") and empresa and modelo.empresa_id != empresa.id:
             #     return _bad_request("El modelo no pertenece a tu empresa")
         except ObjectDoesNotExist:

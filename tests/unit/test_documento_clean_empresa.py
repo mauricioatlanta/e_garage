@@ -20,9 +20,7 @@ def test_documento_clean_empresa_consistente():
     us = Empresa.objects.create(nombre_taller="Empresa US", pais="US", moneda="USD")
 
     # Crear objetos para CL
-    cli_cl = Cliente.objects.create(
-        empresa=cl, nombre="Juan CL", rut_ein="12.345.678-9"
-    )
+    cli_cl = Cliente.objects.create(empresa=cl, nombre="Juan CL", rut_ein="12.345.678-9")
     veh_cl = Vehiculo.objects.create(
         empresa=cl,
         cliente=cli_cl,
@@ -118,9 +116,7 @@ def test_documento_clean_empresa_multiples_errores():
     us = Empresa.objects.create(nombre_taller="Empresa US", pais="US", moneda="USD")
 
     # Crear objetos para CL
-    cli_cl = Cliente.objects.create(
-        empresa=cl, nombre="Juan CL", rut_ein="12.345.678-9"
-    )
+    cli_cl = Cliente.objects.create(empresa=cl, nombre="Juan CL", rut_ein="12.345.678-9")
     veh_cl = Vehiculo.objects.create(
         empresa=cl,
         cliente=cli_cl,
@@ -170,9 +166,7 @@ def test_documento_clean_empresa_campos_opcionales():
     cl = Empresa.objects.create(nombre_taller="Empresa CL", pais="CL", moneda="CLP")
 
     # Crear objetos
-    cli_cl = Cliente.objects.create(
-        empresa=cl, nombre="Juan CL", rut_ein="12.345.678-9"
-    )
+    cli_cl = Cliente.objects.create(empresa=cl, nombre="Juan CL", rut_ein="12.345.678-9")
     veh_cl = Vehiculo.objects.create(
         empresa=cl,
         cliente=cli_cl,

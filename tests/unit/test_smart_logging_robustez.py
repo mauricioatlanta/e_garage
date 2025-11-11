@@ -71,9 +71,7 @@ class TestSmartLoggingRobustez(TestCase):
                         payment_method="test",
                         reference=obj,  # Reference serializable
                     )
-                    self.assertTrue(
-                        True, f"Handled serializable object: {type(obj).__name__}"
-                    )
+                    self.assertTrue(True, f"Handled serializable object: {type(obj).__name__}")
                 except Exception as e:
                     self.fail(
                         f"log_payment_received crashed with serializable {type(obj).__name__}: {e}"
@@ -138,9 +136,7 @@ class TestSmartLoggingRobustez(TestCase):
         ]
 
         for old_status, new_status, reason in edge_cases:
-            with self.subTest(
-                old=type(old_status).__name__, new=type(new_status).__name__
-            ):
+            with self.subTest(old=type(old_status).__name__, new=type(new_status).__name__):
                 try:
                     self.smart_logger.log_subscription_change(
                         empresa_id=123,
@@ -215,9 +211,7 @@ class TestSmartLoggingRobustez(TestCase):
             "HTTP_USER_AGENT": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
         }
         ua = get_user_agent(request)
-        self.assertEqual(
-            ua, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-        )
+        self.assertEqual(ua, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
 
         # Test sin User-Agent
         request.META = {}
@@ -271,9 +265,7 @@ class TestSmartLoggingRobustez(TestCase):
                         success=True,
                         reason=special_string,
                     )
-                    self.assertTrue(
-                        True, f"Handled special string: {special_string[:20]}"
-                    )
+                    self.assertTrue(True, f"Handled special string: {special_string[:20]}")
                 except Exception as e:
                     self.fail(f"log_login_attempt crashed with special string: {e}")
 

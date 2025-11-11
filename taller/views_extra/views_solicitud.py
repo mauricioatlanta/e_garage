@@ -13,9 +13,7 @@ def listar_solicitudes(request):
         solicitudes = Solicitud.objects.all()
     else:
         solicitudes = Solicitud.objects.filter(empresa=perfil.empresa)
-    return render(
-        request, "solicitudes/listar_solicitudes.html", {"solicitudes": solicitudes}
-    )
+    return render(request, "solicitudes/listar_solicitudes.html", {"solicitudes": solicitudes})
 
 
 @login_required
@@ -39,9 +37,5 @@ def detalle_solicitud(request, solicitud_id):
     if perfil.es_superadmin:
         solicitud = get_object_or_404(Solicitud, id=solicitud_id)
     else:
-        solicitud = get_object_or_404(
-            Solicitud, id=solicitud_id, empresa=perfil.empresa
-        )
-    return render(
-        request, "solicitudes/detalle_solicitud.html", {"solicitud": solicitud}
-    )
+        solicitud = get_object_or_404(Solicitud, id=solicitud_id, empresa=perfil.empresa)
+    return render(request, "solicitudes/detalle_solicitud.html", {"solicitud": solicitud})

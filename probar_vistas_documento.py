@@ -83,9 +83,7 @@ def probar_vistas_documento():
         getattr(r, "precio_unitario", 0) * getattr(r, "cantidad", 1) for r in repuestos
     )
     subtotal_servicios = sum(getattr(s, "precio_unitario", 0) for s in servicios)
-    subtotal_otros_servicios = sum(
-        getattr(o, "precio_cliente", 0) for o in otros_servicios
-    )
+    subtotal_otros_servicios = sum(getattr(o, "precio_cliente", 0) for o in otros_servicios)
 
     subtotal = subtotal_repuestos + subtotal_servicios + subtotal_otros_servicios
     iva = subtotal * 0.19

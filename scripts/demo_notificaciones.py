@@ -50,9 +50,7 @@ def notificar_documento_creado(sender, instance, created, **kwargs):
     """Signal que se ejecuta cuando se crea un documento"""
     if created:
         try:
-            tipo_notif = TipoNotificacion.objects.filter(
-                evento="DOCUMENTO_CREADO"
-            ).first()
+            tipo_notif = TipoNotificacion.objects.filter(evento="DOCUMENTO_CREADO").first()
 
             if not tipo_notif:
                 print("⚠️  No se encontró tipo de notificación DOCUMENTO_CREADO")
@@ -62,27 +60,21 @@ def notificar_documento_creado(sender, instance, created, **kwargs):
                 tipo_notificacion=tipo_notif,
                 empresa=instance.empresa,
                 destinatario_email=(
-                    instance.cliente.email
-                    if instance.cliente and instance.cliente.email
-                    else ""
+                    instance.cliente.email if instance.cliente and instance.cliente.email else ""
                 ),
                 destinatario_telefono=(
                     instance.cliente.telefono
                     if instance.cliente and instance.cliente.telefono
                     else ""
                 ),
-                destinatario_nombre=(
-                    instance.cliente.nombre if instance.cliente else "Cliente"
-                ),
+                destinatario_nombre=(instance.cliente.nombre if instance.cliente else "Cliente"),
                 asunto=f"Documento {instance.numero_documento} creado",
                 mensaje=f"Se ha creado el documento {instance.numero_documento} para {instance.cliente.nombre if instance.cliente else 'Cliente'}",
                 documento=instance,
                 cliente=instance.cliente,
             )
 
-            print(
-                f"✅ NOTIFICACIÓN AUTOMÁTICA: Creada para documento {instance.numero_documento}"
-            )
+            print(f"✅ NOTIFICACIÓN AUTOMÁTICA: Creada para documento {instance.numero_documento}")
 
         except Exception as e:
             print(f"❌ Error creando notificación: {e}")
@@ -132,9 +124,7 @@ notificaciones_nuevas = NotificacionEnviada.objects.filter(
     created_at__gte=timezone.now() - timedelta(minutes=1)
 ).order_by("-created_at")
 
-print(
-    f"📬 Notificaciones generadas en el último minuto: {notificaciones_nuevas.count()}"
-)
+print(f"📬 Notificaciones generadas en el último minuto: {notificaciones_nuevas.count()}")
 for notif in notificaciones_nuevas:
     print(f"   📧 {notif.tipo_notificacion.nombre}")
     print(f"      Para: {notif.destinatario_nombre}")
@@ -186,9 +176,7 @@ print(
 print("\n⚙️  CONFIGURACIONES:")
 for config in ConfiguracionNotificacion.objects.all()[:3]:
     smtp_status = "✅ Configurado" if config.email_usuario else "❌ Sin configurar"
-    whatsapp_status = (
-        "✅ Configurado" if config.whatsapp_api_token else "❌ Sin configurar"
-    )
+    whatsapp_status = "✅ Configurado" if config.whatsapp_api_token else "❌ Sin configurar"
     print(f"   🏢 {config.empresa.nombre_taller}:")
     print(f"      Email: {smtp_status}")
     print(f"      WhatsApp: {whatsapp_status}")

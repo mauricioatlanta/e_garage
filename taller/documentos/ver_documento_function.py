@@ -41,9 +41,7 @@ def ver_documento(request, documento_id):
     lineas_otro_servicio = documento.lineas_otro_servicio.all()
 
     # Para compatibilidad con templates existentes, combinar todas las líneas
-    detalles = (
-        list(lineas_repuesto) + list(lineas_servicio) + list(lineas_otro_servicio)
-    )
+    detalles = list(lineas_repuesto) + list(lineas_servicio) + list(lineas_otro_servicio)
 
     return render(
         request,

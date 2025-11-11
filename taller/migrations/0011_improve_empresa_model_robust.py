@@ -14,16 +14,12 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="empresa",
             name="email",
-            field=models.EmailField(
-                blank=True, help_text="Email de contacto", max_length=100
-            ),
+            field=models.EmailField(blank=True, help_text="Email de contacto", max_length=100),
         ),
         migrations.AlterField(
             model_name="empresa",
             name="empresa",
-            field=models.CharField(
-                blank=True, help_text="Razón social o compañía", max_length=100
-            ),
+            field=models.CharField(blank=True, help_text="Razón social o compañía", max_length=100),
         ),
         migrations.AlterField(
             model_name="empresa",

@@ -41,9 +41,7 @@ def agregar_lineas_simple():
                 defaults={
                     "cantidad": 1,
                     "precio_unitario": (
-                        Decimal("50000")
-                        if doc.empresa.pais == "CL"
-                        else Decimal("89.99")
+                        Decimal("50000") if doc.empresa.pais == "CL" else Decimal("89.99")
                     ),
                     "descuento": Decimal("0.00"),
                     "observaciones": "Servicio de cambio de aceite completo",
@@ -62,9 +60,7 @@ def agregar_lineas_simple():
                 defaults={
                     "cantidad": 1,
                     "precio_unitario": (
-                        Decimal("8500")
-                        if doc.empresa.pais == "CL"
-                        else Decimal("24.99")
+                        Decimal("8500") if doc.empresa.pais == "CL" else Decimal("24.99")
                     ),
                     "descuento": Decimal("0.00"),
                     "observaciones": "Filtro de aceite original",

@@ -120,10 +120,7 @@ def verificar_sistema_trial():
 
         from django.conf import settings
 
-        if (
-            "taller.middleware.trial_middleware.TrialAccessMiddleware"
-            in settings.MIDDLEWARE
-        ):
+        if "taller.middleware.trial_middleware.TrialAccessMiddleware" in settings.MIDDLEWARE:
             print("✅ Middleware activado en settings")
         else:
             print("ℹ️ Middleware disponible pero no activado (normal para desarrollo)")

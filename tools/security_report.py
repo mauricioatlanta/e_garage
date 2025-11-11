@@ -89,9 +89,7 @@ def main():
                     if vuln.get("aliases"):
                         f.write(f"  - CVE: {', '.join(vuln['aliases'])}\n")
                     if vuln.get("fix_versions"):
-                        f.write(
-                            f"  - Versión segura: {', '.join(vuln['fix_versions'])}\n"
-                        )
+                        f.write(f"  - Versión segura: {', '.join(vuln['fix_versions'])}\n")
                     f.write(f"  - {vuln.get('description', 'Sin descripción')}\n\n")
 
     print(f"\n📄 Resumen guardado en: {summary_file}")

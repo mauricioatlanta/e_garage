@@ -47,17 +47,11 @@ class CategoriaServicioName(models.Model):
         ("en", "English"),
     ]
 
-    categoria = models.ForeignKey(
-        CategoriaServicio, on_delete=models.CASCADE, related_name="names"
-    )
+    categoria = models.ForeignKey(CategoriaServicio, on_delete=models.CASCADE, related_name="names")
     language = models.CharField(max_length=2, choices=LANGUAGE_CHOICES)
     label = models.CharField(max_length=100, help_text="Nombre canónico en este idioma")
-    aliases = models.JSONField(
-        default=list, blank=True, help_text="Lista de sinónimos/slang"
-    )
-    is_default = models.BooleanField(
-        default=False, help_text="Nombre principal para este idioma"
-    )
+    aliases = models.JSONField(default=list, blank=True, help_text="Lista de sinónimos/slang")
+    is_default = models.BooleanField(default=False, help_text="Nombre principal para este idioma")
 
     class Meta:
         unique_together = [["categoria", "language", "is_default"]]
@@ -117,16 +111,10 @@ class SubcategoriaServicioName(models.Model):
     subcategoria = models.ForeignKey(
         SubcategoriaServicio, on_delete=models.CASCADE, related_name="names"
     )
-    language = models.CharField(
-        max_length=2, choices=CategoriaServicioName.LANGUAGE_CHOICES
-    )
+    language = models.CharField(max_length=2, choices=CategoriaServicioName.LANGUAGE_CHOICES)
     label = models.CharField(max_length=100, help_text="Nombre canónico en este idioma")
-    aliases = models.JSONField(
-        default=list, blank=True, help_text="Lista de sinónimos/slang"
-    )
-    is_default = models.BooleanField(
-        default=False, help_text="Nombre principal para este idioma"
-    )
+    aliases = models.JSONField(default=list, blank=True, help_text="Lista de sinónimos/slang")
+    is_default = models.BooleanField(default=False, help_text="Nombre principal para este idioma")
 
     class Meta:
         unique_together = [["subcategoria", "language", "is_default"]]
@@ -145,9 +133,7 @@ from core.models import TenantScoped
 
 class Servicio(TenantScoped):
     nombre = models.CharField(max_length=160, db_index=True)
-    categoria = models.ForeignKey(
-        "CategoriaServicio", on_delete=models.PROTECT, db_index=True
-    )
+    categoria = models.ForeignKey("CategoriaServicio", on_delete=models.PROTECT, db_index=True)
     subcategoria = models.ForeignKey(
         "SubcategoriaServicio",
         on_delete=models.PROTECT,
@@ -176,19 +162,11 @@ class Servicio(TenantScoped):
 class ServicioName(models.Model):
     """Nombres localizados para servicios"""
 
-    servicio = models.ForeignKey(
-        Servicio, on_delete=models.CASCADE, related_name="names"
-    )
-    language = models.CharField(
-        max_length=2, choices=CategoriaServicioName.LANGUAGE_CHOICES
-    )
+    servicio = models.ForeignKey(Servicio, on_delete=models.CASCADE, related_name="names")
+    language = models.CharField(max_length=2, choices=CategoriaServicioName.LANGUAGE_CHOICES)
     label = models.CharField(max_length=100, help_text="Nombre canónico en este idioma")
-    aliases = models.JSONField(
-        default=list, blank=True, help_text="Lista de sinónimos/slang"
-    )
-    is_default = models.BooleanField(
-        default=False, help_text="Nombre principal para este idioma"
-    )
+    aliases = models.JSONField(default=list, blank=True, help_text="Lista de sinónimos/slang")
+    is_default = models.BooleanField(default=False, help_text="Nombre principal para este idioma")
 
     class Meta:
         unique_together = [["servicio", "language", "is_default"]]
@@ -208,9 +186,7 @@ class ServicioExterno(TenantScoped):
     empresa_externa = models.CharField(
         max_length=255, help_text="Nombre de la empresa que realiza el servicio"
     )
-    categoria = models.ForeignKey(
-        "CategoriaServicio", on_delete=models.PROTECT, db_index=True
-    )
+    categoria = models.ForeignKey("CategoriaServicio", on_delete=models.PROTECT, db_index=True)
     subcategoria = models.ForeignKey(
         "SubcategoriaServicio",
         on_delete=models.PROTECT,
@@ -232,15 +208,11 @@ class ServicioExterno(TenantScoped):
     )
 
     # Información adicional
-    descripcion = models.TextField(
-        blank=True, null=True, help_text="Descripción del servicio"
-    )
+    descripcion = models.TextField(blank=True, null=True, help_text="Descripción del servicio")
     tiempo_estimado = models.CharField(
         max_length=100, blank=True, null=True, help_text="Tiempo estimado del servicio"
     )
-    activo = models.BooleanField(
-        default=True, help_text="Si el servicio está disponible"
-    )
+    activo = models.BooleanField(default=True, help_text="Si el servicio está disponible")
 
     class Meta(TenantScoped.Meta):
         indexes = [

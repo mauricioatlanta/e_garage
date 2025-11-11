@@ -25,9 +25,7 @@ def _json_ok(data, status=200):
 def _to_dec(x, default="0"):
     """Convierte a Decimal con manejo de errores"""
     try:
-        return (Decimal(str(x)) if x is not None else Decimal(default)).quantize(
-            Decimal("0.01")
-        )
+        return (Decimal(str(x)) if x is not None else Decimal(default)).quantize(Decimal("0.01"))
     except Exception:
         return Decimal(default)
 
@@ -73,9 +71,7 @@ def api_repuesto_por_codigo(request):
     data = {"id": None}
     if code:
         try:
-            r = Repuesto.objects.get(
-                empresa=request.user.empresa, part_number__iexact=code
-            )
+            r = Repuesto.objects.get(empresa=request.user.empresa, part_number__iexact=code)
             data = {
                 "id": r.id,
                 "nombre": r.nombre,
@@ -144,11 +140,7 @@ def _tax_rate_for_empresa(emp) -> Decimal:
                     continue
                 if val >= 0:
                     return (val / Decimal("100")) if val > 1 else val
-    return (
-        Decimal("0.19")
-        if (getattr(emp, "pais", "") or "").upper() == "CL"
-        else Decimal("0.00")
-    )
+    return Decimal("0.19") if (getattr(emp, "pais", "") or "").upper() == "CL" else Decimal("0.00")
 
 
 # === Creación de documento ===
@@ -307,9 +299,7 @@ def api_create(request):
         )
         lr_fields = {f.name for f in LineaRepuesto._meta.fields}
         if "codigo" in lr_fields:
-            lr_kwargs["codigo"] = (
-                d.get("codigo") or f"REP-{doc.id}-{d['nombre'][:8]}"
-            ).upper()
+            lr_kwargs["codigo"] = (d.get("codigo") or f"REP-{doc.id}-{d['nombre'][:8]}").upper()
         lr_kwargs.update(_responsable_kwargs(LineaRepuesto, tecnico_obj))
         LineaRepuesto.objects.create(**lr_kwargs)
         subtotal_rep += (precio * cantidad) - descuento

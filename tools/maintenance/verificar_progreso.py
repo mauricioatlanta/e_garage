@@ -31,9 +31,7 @@ def verificar_progreso():
                 # Buscar .objects.get() sin filtro empresa
                 objects_get = len(re.findall(r"objects\.get\([^)]+\)", contenido))
                 lineas_get = re.findall(r".*objects\.get\([^)]+\).*", contenido)
-                get_sin_empresa = sum(
-                    1 for linea in lineas_get if "empresa" not in linea
-                )
+                get_sin_empresa = sum(1 for linea in lineas_get if "empresa" not in linea)
 
                 print(f"\n{archivo}:")
                 print(f"  - .objects.all(): {objects_all}")
@@ -50,9 +48,7 @@ def verificar_progreso():
     print("\n=== RESUMEN ===")
     print(f"Total .objects.all() sin filtros: {total_objects_all}")
     print(f"Total .objects.get() sin empresa: {total_get_sin_empresa}")
-    print(
-        f"Vulnerabilidades criticas restantes: {total_objects_all + total_get_sin_empresa}"
-    )
+    print(f"Vulnerabilidades criticas restantes: {total_objects_all + total_get_sin_empresa}")
 
     if total_objects_all + total_get_sin_empresa < 30:
         print("✅ ¡Excelente progreso! Quedan menos de 30 vulnerabilidades criticas")

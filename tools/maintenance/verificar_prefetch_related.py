@@ -34,14 +34,10 @@ def verificar_prefetch_related():
     print("\n1. Buscando documentos con líneas...")
     for documento in Documento.objects.all()[:10]:
         lineas_repuesto = (
-            documento.lineas_repuesto.count()
-            if hasattr(documento, "lineas_repuesto")
-            else 0
+            documento.lineas_repuesto.count() if hasattr(documento, "lineas_repuesto") else 0
         )
         lineas_servicio = (
-            documento.lineas_servicio.count()
-            if hasattr(documento, "lineas_servicio")
-            else 0
+            documento.lineas_servicio.count() if hasattr(documento, "lineas_servicio") else 0
         )
         lineas_otro = (
             documento.lineas_otro_servicio.count()
@@ -121,9 +117,7 @@ def verificar_prefetch_related():
         print("   ⚠️  No se detectó mejora en queries")
 
     # Verificar contenido de las líneas
-    print(
-        f"\n7. Contenido de las líneas (Documento #{documento_test.numero_documento}):"
-    )
+    print(f"\n7. Contenido de las líneas (Documento #{documento_test.numero_documento}):")
 
     for i, repuesto in enumerate(repuestos_con_prefetch[:3]):
         precio = getattr(repuesto, "precio_unitario", 0)
@@ -155,9 +149,7 @@ def verificar_campos_requeridos():
 
     # Verificar LineaRepuesto
     repuestos_sin_codigo = LineaRepuesto.objects.filter(codigo__isnull=True).count()
-    repuestos_sin_descuento = LineaRepuesto.objects.filter(
-        descuento__isnull=True
-    ).count()
+    repuestos_sin_descuento = LineaRepuesto.objects.filter(descuento__isnull=True).count()
 
     print("📋 LineaRepuesto:")
     print(f"   - Total: {LineaRepuesto.objects.count()}")
@@ -166,9 +158,7 @@ def verificar_campos_requeridos():
 
     # Verificar LineaServicio
     servicios_sin_codigo = LineaServicio.objects.filter(codigo__isnull=True).count()
-    servicios_sin_descuento = LineaServicio.objects.filter(
-        descuento__isnull=True
-    ).count()
+    servicios_sin_descuento = LineaServicio.objects.filter(descuento__isnull=True).count()
 
     print("📋 LineaServicio:")
     print(f"   - Total: {LineaServicio.objects.count()}")

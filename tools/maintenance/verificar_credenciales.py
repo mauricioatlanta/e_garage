@@ -49,16 +49,12 @@ for user in User.objects.all():
     # Buscar suscripción
     try:
         suscripcion = user.suscripcion
-        suscripcion_info = (
-            f"{suscripcion.plan} - {'Activa' if suscripcion.activa else 'Inactiva'}"
-        )
+        suscripcion_info = f"{suscripcion.plan} - {'Activa' if suscripcion.activa else 'Inactiva'}"
     except:
         suscripcion_info = "Sin suscripción"
 
     estado_user = (
-        "👑 Admin"
-        if user.is_superuser
-        else ("👤 Staff" if user.is_staff else "👥 Usuario")
+        "👑 Admin" if user.is_superuser else ("👤 Staff" if user.is_staff else "👥 Usuario")
     )
 
     print(f"{user.username:<15} | {user.email:<25} | {estado_user} | {empresa_info}")

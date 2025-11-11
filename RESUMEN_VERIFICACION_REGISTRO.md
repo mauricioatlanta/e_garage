@@ -401,3 +401,4 @@ Pero el sistema **YA FUNCIONA CORRECTAMENTE** tal como lo pediste.
 **Respuesta corta**: Sí, está correcto. USA tiene inglés con opción a español, Chile tiene solo español.
 
 ¿Necesitas algo más? 😊
+

@@ -207,12 +207,8 @@ for region_nombre, ciudades in ciudades_por_region.items():
     region = TallerRegion.objects.filter(nombre=region_nombre).first()
     if region:
         for ciudad_nombre in ciudades:
-            obj, created = TallerCiudad.objects.get_or_create(
-                nombre=ciudad_nombre, region=region
-            )
-            print(
-                f"{'Creada' if created else 'Existente'}: {ciudad_nombre} en {region_nombre}"
-            )
+            obj, created = TallerCiudad.objects.get_or_create(nombre=ciudad_nombre, region=region)
+            print(f"{'Creada' if created else 'Existente'}: {ciudad_nombre} en {region_nombre}")
 # -*- coding: utf-8 -*-
 from taller.models.region_ciudad import TallerCiudad, TallerRegion
 
@@ -239,9 +235,5 @@ for region_nombre, ciudades in ciudades_por_region.items():
     region = TallerRegion.objects.filter(nombre=region_nombre).first()
     if region:
         for ciudad_nombre in ciudades:
-            obj, created = TallerCiudad.objects.get_or_create(
-                nombre=ciudad_nombre, region=region
-            )
-            print(
-                f"{'Creada' if created else 'Existente'}: {ciudad_nombre} en {region_nombre}"
-            )
+            obj, created = TallerCiudad.objects.get_or_create(nombre=ciudad_nombre, region=region)
+            print(f"{'Creada' if created else 'Existente'}: {ciudad_nombre} en {region_nombre}")

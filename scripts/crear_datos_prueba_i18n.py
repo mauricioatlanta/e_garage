@@ -122,9 +122,7 @@ def crear_datos_prueba():
     marca_toyota, _ = Marca.objects.get_or_create(nombre="Toyota")
     marca_ford, _ = Marca.objects.get_or_create(nombre="Ford")
 
-    modelo_corolla, _ = Modelo.objects.get_or_create(
-        nombre="Corolla", marca=marca_toyota
-    )
+    modelo_corolla, _ = Modelo.objects.get_or_create(nombre="Corolla", marca=marca_toyota)
     modelo_f150, _ = Modelo.objects.get_or_create(nombre="F-150", marca=marca_ford)
 
     # 6. Crear clientes
@@ -143,9 +141,7 @@ def crear_datos_prueba():
         },
     )
     if created:
-        print(
-            f"✅ Cliente Chile creado: {cliente_chile.nombre} {cliente_chile.apellido}"
-        )
+        print(f"✅ Cliente Chile creado: {cliente_chile.nombre} {cliente_chile.apellido}")
 
     # Cliente USA
     cliente_usa, created = Cliente.objects.get_or_create(

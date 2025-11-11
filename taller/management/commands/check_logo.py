@@ -21,9 +21,7 @@ class Command(BaseCommand):
         empresas = Empresa.objects.all()
 
         if not empresas.exists():
-            self.stdout.write(
-                self.style.WARNING("\n⚠️  No hay empresas registradas en el sistema.")
-            )
+            self.stdout.write(self.style.WARNING("\n⚠️  No hay empresas registradas en el sistema."))
         else:
             self.stdout.write(f"\n📊 Total de empresas: {empresas.count()}\n")
 
@@ -36,25 +34,17 @@ class Command(BaseCommand):
 
                 # Verificar logo en Empresa
                 if empresa.logo:
-                    self.stdout.write(
-                        self.style.SUCCESS(f"✅ Logo en Empresa: {empresa.logo.url}")
-                    )
+                    self.stdout.write(self.style.SUCCESS(f"✅ Logo en Empresa: {empresa.logo.url}"))
                     self.stdout.write(f"   Ruta del archivo: {empresa.logo.path}")
                     # Verificar si el archivo existe
                     if os.path.exists(empresa.logo.path):
-                        self.stdout.write(
-                            self.style.SUCCESS("   ✅ Archivo existe físicamente")
-                        )
+                        self.stdout.write(self.style.SUCCESS("   ✅ Archivo existe físicamente"))
                         file_size = os.path.getsize(empresa.logo.path) / 1024  # KB
                         self.stdout.write(f"   📦 Tamaño: {file_size:.2f} KB")
                     else:
-                        self.stdout.write(
-                            self.style.ERROR("   ❌ Archivo NO existe físicamente")
-                        )
+                        self.stdout.write(self.style.ERROR("   ❌ Archivo NO existe físicamente"))
                 else:
-                    self.stdout.write(
-                        self.style.ERROR("❌ Logo en Empresa: NO CONFIGURADO")
-                    )
+                    self.stdout.write(self.style.ERROR("❌ Logo en Empresa: NO CONFIGURADO"))
 
                 # Verificar ConfiguracionEmpresa
                 try:
@@ -78,14 +68,10 @@ class Command(BaseCommand):
                             )
                     else:
                         self.stdout.write(
-                            self.style.WARNING(
-                                "❌ Logo en ConfiguracionEmpresa: NO CONFIGURADO"
-                            )
+                            self.style.WARNING("❌ Logo en ConfiguracionEmpresa: NO CONFIGURADO")
                         )
                 except ConfiguracionEmpresa.DoesNotExist:
-                    self.stdout.write(
-                        self.style.WARNING("⚠️  ConfiguracionEmpresa: NO EXISTE")
-                    )
+                    self.stdout.write(self.style.WARNING("⚠️  ConfiguracionEmpresa: NO EXISTE"))
 
                 # Verificar caché
                 cache_key = f"company_branding_{empresa.user.id}"
@@ -105,9 +91,7 @@ class Command(BaseCommand):
                     self.stdout.write("\n📦 Caché: NO HAY DATOS EN CACHÉ")
 
         self.stdout.write("\n" + "=" * 80)
-        self.stdout.write(
-            self.style.SUCCESS("🔄 LIMPIANDO CACHÉ DE TODAS LAS EMPRESAS...")
-        )
+        self.stdout.write(self.style.SUCCESS("🔄 LIMPIANDO CACHÉ DE TODAS LAS EMPRESAS..."))
         self.stdout.write("=" * 80)
 
         for empresa in empresas:
@@ -123,15 +107,9 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS("✅ DIAGNÓSTICO COMPLETADO"))
         self.stdout.write("=" * 80)
         self.stdout.write("\n💡 RECOMENDACIONES:")
-        self.stdout.write(
-            "   1. Si el logo NO está configurado, ve a Settings y sube un logo"
-        )
-        self.stdout.write(
-            "   2. Si el archivo NO existe físicamente, vuelve a subir el logo"
-        )
-        self.stdout.write(
-            "   3. Después de subir el logo, recarga la página del dashboard"
-        )
+        self.stdout.write("   1. Si el logo NO está configurado, ve a Settings y sube un logo")
+        self.stdout.write("   2. Si el archivo NO existe físicamente, vuelve a subir el logo")
+        self.stdout.write("   3. Después de subir el logo, recarga la página del dashboard")
         self.stdout.write(
             "   4. El caché ha sido limpiado, los cambios deberían verse inmediatamente"
         )

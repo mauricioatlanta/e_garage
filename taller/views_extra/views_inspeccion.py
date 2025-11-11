@@ -13,9 +13,7 @@ def listar_inspecciones(request):
         inspecciones = Inspeccion.objects.all()
     else:
         inspecciones = Inspeccion.objects.filter(empresa=perfil.empresa)
-    return render(
-        request, "inspecciones/listar_inspecciones.html", {"inspecciones": inspecciones}
-    )
+    return render(request, "inspecciones/listar_inspecciones.html", {"inspecciones": inspecciones})
 
 
 @login_required
@@ -39,9 +37,5 @@ def detalle_inspeccion(request, inspeccion_id):
     if perfil.es_superadmin:
         inspeccion = get_object_or_404(Inspeccion, id=inspeccion_id)
     else:
-        inspeccion = get_object_or_404(
-            Inspeccion, id=inspeccion_id, empresa=perfil.empresa
-        )
-    return render(
-        request, "inspecciones/detalle_inspeccion.html", {"inspeccion": inspeccion}
-    )
+        inspeccion = get_object_or_404(Inspeccion, id=inspeccion_id, empresa=perfil.empresa)
+    return render(request, "inspecciones/detalle_inspeccion.html", {"inspeccion": inspeccion})

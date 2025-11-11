@@ -206,3 +206,4 @@ http://127.0.0.1:8000/us/pricing/
 **Archivo modificado:** 2 archivos
 **Idioma:** 100% inglés para USA ✅
 **Estado:** Corregido y listo 🎉
+

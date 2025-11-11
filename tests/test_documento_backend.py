@@ -32,13 +32,9 @@ class TestDocumentoBackend(TestCase):
     def setUp(self):
         """Configuración inicial para todos los tests"""
         # Usuarios
-        self.user_cl = User.objects.create_user(
-            username="tester_cl", password="testpass123"
-        )
+        self.user_cl = User.objects.create_user(username="tester_cl", password="testpass123")
 
-        self.user_us = User.objects.create_user(
-            username="tester_us", password="testpass123"
-        )
+        self.user_us = User.objects.create_user(username="tester_us", password="testpass123")
 
         # Empresa CL (Chile)
         self.empresa_cl = Empresa.objects.create(
@@ -50,13 +46,9 @@ class TestDocumentoBackend(TestCase):
             user=self.user_us, nombre_taller="DemoUS", pais="US", moneda="USD"
         )
 
-        self.tecnico_cl = Tecnico.objects.create(
-            empresa=self.empresa_cl, nombre="Juan Tech CL"
-        )
+        self.tecnico_cl = Tecnico.objects.create(empresa=self.empresa_cl, nombre="Juan Tech CL")
 
-        self.tecnico_us = Tecnico.objects.create(
-            empresa=self.empresa_us, nombre="John Tech US"
-        )
+        self.tecnico_us = Tecnico.objects.create(empresa=self.empresa_us, nombre="John Tech US")
 
         # Marcas
         self.marca_toyota = Marca.objects.create(nombre="Toyota", country="CL")
@@ -64,9 +56,7 @@ class TestDocumentoBackend(TestCase):
         self.marca_ford = Marca.objects.create(nombre="Ford", country="US")
 
         # Cliente y vehículo para Chile
-        self.cliente_cl = Cliente.objects.create(
-            empresa=self.empresa_cl, nombre="Cliente A"
-        )
+        self.cliente_cl = Cliente.objects.create(empresa=self.empresa_cl, nombre="Cliente A")
 
         self.vehiculo_cl = Vehiculo.objects.create(
             empresa=self.empresa_cl,
@@ -77,9 +67,7 @@ class TestDocumentoBackend(TestCase):
         )
 
         # Cliente y vehículo para Estados Unidos
-        self.cliente_us = Cliente.objects.create(
-            empresa=self.empresa_us, nombre="Customer B"
-        )
+        self.cliente_us = Cliente.objects.create(empresa=self.empresa_us, nombre="Customer B")
 
         self.vehiculo_us = Vehiculo.objects.create(
             empresa=self.empresa_us,
@@ -133,9 +121,7 @@ class TestDocumentoBackend(TestCase):
         self.assertEqual(doc.total_servicios, Decimal("5000"))  # 1 * 5000
         self.assertEqual(doc.total_otros, Decimal("3000"))  # 1 * 3000
         self.assertEqual(doc.iva, Decimal("3800"))  # 19% de 20000
-        self.assertEqual(
-            doc.total_general, Decimal("31800")
-        )  # 20000 + 5000 + 3000 + 3800
+        self.assertEqual(doc.total_general, Decimal("31800"))  # 20000 + 5000 + 3000 + 3800
 
     def test_totales_usa_sin_iva(self):
         """Test: Verificar cálculos de totales en Estados Unidos sin IVA"""
@@ -412,9 +398,7 @@ class TestDocumentoEdgeCases(TestCase):
     """Tests para casos límite y edge cases"""
 
     def setUp(self):
-        self.user = User.objects.create_user(
-            username="testuser", password="testpass123"
-        )
+        self.user = User.objects.create_user(username="testuser", password="testpass123")
 
         self.empresa_cl = Empresa.objects.create(
             user=self.user, nombre_taller="TestCL", pais="CL", moneda="CLP"
@@ -423,13 +407,9 @@ class TestDocumentoEdgeCases(TestCase):
         # Marca
         self.marca_test = Marca.objects.create(nombre="Test", country="CL")
 
-        self.tecnico = Tecnico.objects.create(
-            empresa=self.empresa_cl, nombre="Test Tech"
-        )
+        self.tecnico = Tecnico.objects.create(empresa=self.empresa_cl, nombre="Test Tech")
 
-        self.cliente = Cliente.objects.create(
-            empresa=self.empresa_cl, nombre="Test Client"
-        )
+        self.cliente = Cliente.objects.create(empresa=self.empresa_cl, nombre="Test Client")
 
         self.vehiculo = Vehiculo.objects.create(
             empresa=self.empresa_cl,

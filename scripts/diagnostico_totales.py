@@ -55,9 +55,7 @@ def main():
             precio_unitario=Decimal("50000"),
             descuento=Decimal("0"),
         )
-        print(
-            f"✅ Servicio creado: {linea_serv.nombre} - Subtotal: {linea_serv.subtotal}"
-        )
+        print(f"✅ Servicio creado: {linea_serv.nombre} - Subtotal: {linea_serv.subtotal}")
 
         # Crear línea de repuesto
         linea_rep = LineaRepuesto.objects.create(
@@ -68,9 +66,7 @@ def main():
             precio_unitario=Decimal("15000"),
             descuento=Decimal("0"),
         )
-        print(
-            f"✅ Repuesto creado: {linea_rep.nombre} - Subtotal: {linea_rep.subtotal}"
-        )
+        print(f"✅ Repuesto creado: {linea_rep.nombre} - Subtotal: {linea_rep.subtotal}")
 
     # 5. Probar métodos de totales
     print("\n💰 Probando cálculos de totales:")
@@ -101,9 +97,7 @@ def main():
         )
 
     for linea in doc.lineas_servicio.all():
-        print(
-            f"   🛠️ {linea.nombre}: {linea.cantidad} x {linea.precio_unitario} = {linea.subtotal}"
-        )
+        print(f"   🛠️ {linea.nombre}: {linea.cantidad} x {linea.precio_unitario} = {linea.subtotal}")
 
     print("\n✅ Diagnóstico completado!")
 

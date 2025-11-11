@@ -1,0 +1,439 @@
+{% extends 'base.html' %}
+{% load static widget_tweaks i18n %}
+
+{% block title %}{% trans "Configuración de Empresa" %}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/configuracion_futurista.css' %}">
+<style>
+  .address-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-top: 2rem;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
+  
+  .address-title {
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 1.3rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+  }
+  
+  .address-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .address-field {
+    margin-bottom: 0;
+  }
+  
+  .address-label {
+    color: #ffffff;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+  
+  .address-input,
+  .address-select {
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.95);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: #1a202c;
+    padding: 0.75rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+  }
+  
+  .address-input:focus,
+  .address-select:focus {
+    background-color: #ffffff;
+    border-color: #fbbf24;
+    box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.2);
+    outline: none;
+  }
+  
+  .address-help {
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 0.85rem;
+    margin-top: 0.3rem;
+  }
+  
+  .tax-id-section {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-top: 2rem;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
+  
+  .tax-id-dynamic-label {
+    font-weight: 700;
+    color: #fef3c7;
+    font-size: 1.1rem;
+  }
+  
+  .country-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    font-size: 0.9rem;
+    margin-left: 0.5rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="futuristic-bg"></div>
+<div class="max-w-6xl mx-auto futuristic-form">
+  <h1 class="futuristic-title">
+    <i class="fas fa-building"></i> {% trans "Configuración de la Empresa" %}
+  </h1>
+
+  <!-- Sección: Datos de la Empresa -->
+  <div class="config-section mt-6">
+    <h3 class="futuristic-label">
+      <i class="fas fa-briefcase"></i> {% trans "Datos Generales" %}
+    </h3>
+    <form method="post" enctype="multipart/form-data" id="empresaForm" class="space-y-4">
+      {% csrf_token %}
+      <input type="hidden" name="empresa_form" value="1">
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="futuristic-label" for="id_nombre_taller">
+            {% trans "Nombre del Taller" %} <span style="color:#fbbf24;">*</span>
+          </label>
+          {{ empresa_form.nombre_taller|add_class:'futuristic-input'|attr:"required" }}
+        </div>
+        
+        <div>
+          <label class="futuristic-label" for="id_empresa">
+            {% trans "Razón Social" %}
+          </label>
+          {{ empresa_form.empresa|add_class:'futuristic-input' }}
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="futuristic-label" for="id_telefono">
+            {% trans "Teléfono" %}
+          </label>
+          {{ empresa_form.telefono|add_class:'futuristic-input' }}
+        </div>
+        
+        <div>
+          <label class="futuristic-label" for="id_logo">
+            {% trans "Logo" %}
+          </label>
+          {{ empresa_form.logo|add_class:'futuristic-input' }}
+          {% if empresa.logo %}
+            <div class="mt-4">
+              <p class="text-cyan-300 mb-2">{% trans "Logo actual:" %}</p>
+              <img src="{{ empresa.logo.url }}" alt="Logo actual" class="max-w-xs h-auto border-2 border-cyan-400 rounded-lg">
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Sección: Identificación Tributaria -->
+  <div class="tax-id-section">
+    <h3 class="address-title">
+      <i class="fas fa-file-invoice-dollar"></i> {% trans "Identificación Tributaria" %}
+      <span class="country-badge" id="countryBadge">
+        {% if empresa.pais == 'CL' %}🇨🇱 Chile
+        {% elif empresa.pais == 'US' %}🇺🇸 USA
+        {% elif empresa.pais == 'BR' %}🇧🇷 Brasil
+        {% elif empresa.pais == 'PE' %}🇵🇪 Perú
+        {% elif empresa.pais == 'VE' %}🇻🇪 Venezuela
+        {% endif %}
+      </span>
+    </h3>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="address-field">
+        <label class="address-label" for="id_tax_id_type">
+          {% trans "Tipo de Identificador" %}
+        </label>
+        <select id="id_tax_id_type" name="tax_id_type" class="address-select" form="empresaForm">
+          <option value="">-- {% trans "Seleccione" %} --</option>
+          <option value="CL_RUT" {% if empresa.tax_id_type == 'CL_RUT' %}selected{% endif %}>🇨🇱 RUT (Chile)</option>
+          <option value="US_EIN" {% if empresa.tax_id_type == 'US_EIN' %}selected{% endif %}>🇺🇸 EIN (USA)</option>
+          <option value="US_SSN" {% if empresa.tax_id_type == 'US_SSN' %}selected{% endif %}>🇺🇸 SSN (USA)</option>
+          <option value="BR_CPF" {% if empresa.tax_id_type == 'BR_CPF' %}selected{% endif %}>🇧🇷 CPF (Brasil)</option>
+          <option value="BR_CNPJ" {% if empresa.tax_id_type == 'BR_CNPJ' %}selected{% endif %}>🇧🇷 CNPJ (Brasil)</option>
+          <option value="PE_RUC" {% if empresa.tax_id_type == 'PE_RUC' %}selected{% endif %}>🇵🇪 RUC (Perú)</option>
+          <option value="VE_RIF" {% if empresa.tax_id_type == 'VE_RIF' %}selected{% endif %}>🇻🇪 RIF (Venezuela)</option>
+        </select>
+        <div class="address-help">
+          {% trans "Selecciona el tipo de identificador tributario" %}
+        </div>
+      </div>
+      
+      <div class="address-field">
+        <label class="address-label" for="id_tax_id">
+          <span class="tax-id-dynamic-label" id="taxIdDynamicLabel">
+            {% trans "Número de Identificación" %}
+          </span>
+        </label>
+        <input type="text" id="id_tax_id" name="tax_id" class="address-input" 
+               value="{{ empresa.tax_id|default:'' }}" 
+               placeholder="{% trans 'Ingresa el número' %}"
+               form="empresaForm">
+        <div class="address-help" id="taxIdDynamicHelp">
+          {% trans "Ingresa el número de identificación tributaria" %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sección: Dirección Legal -->
+  <div class="address-section">
+    <h3 class="address-title">
+      <i class="fas fa-map-marked-alt"></i> {% trans "Dirección Legal de la Empresa" %}
+    </h3>
+    
+    <!-- Fila 1: País, Estado, Ciudad -->
+    <div class="address-grid">
+      <div class="address-field">
+        <label class="address-label" for="id_company_country">
+          {% trans "País" %} <span style="color:#fbbf24;">*</span>
+        </label>
+        <select id="id_company_country" name="company_country" class="address-select" form="empresaForm" required>
+          <option value="">-- {% trans "Seleccione" %} --</option>
+          <option value="CL" {% if empresa.pais == 'CL' %}selected{% endif %}>🇨🇱 Chile</option>
+          <option value="US" {% if empresa.pais == 'US' %}selected{% endif %}>🇺🇸 USA</option>
+          <option value="BR" {% if empresa.pais == 'BR' %}selected{% endif %}>🇧🇷 Brasil</option>
+          <option value="PE" {% if empresa.pais == 'PE' %}selected{% endif %}>🇵🇪 Perú</option>
+          <option value="VE" {% if empresa.pais == 'VE' %}selected{% endif %}>🇻🇪 Venezuela</option>
+        </select>
+        <div class="address-help">
+          {% trans "País donde opera la empresa" %}
+        </div>
+      </div>
+      
+      <div class="address-field">
+        <label class="address-label" for="id_company_state">
+          <span id="companyStateLabel">{% trans "Estado/Región" %}</span> <span style="color:#fbbf24;">*</span>
+        </label>
+        <select id="id_company_state" name="company_state" class="address-select" form="empresaForm" required>
+          <option value="">-- {% trans "Seleccione país primero" %} --</option>
+        </select>
+        <div class="address-help">
+          {% trans "Estado, región o departamento" %}
+        </div>
+      </div>
+      
+      <div class="address-field">
+        <label class="address-label" for="id_company_city">
+          {% trans "Ciudad" %} <span style="color:#fbbf24;">*</span>
+        </label>
+        <select id="id_company_city" name="company_city" class="address-select" form="empresaForm" required>
+          <option value="">-- {% trans "Seleccione estado primero" %} --</option>
+        </select>
+        <div class="address-help">
+          {% trans "Ciudad donde está ubicada la empresa" %}
+        </div>
+      </div>
+    </div>
+    
+    <!-- Fila 2: Dirección Línea 1 y Código Postal -->
+    <div class="address-grid mt-4">
+      <div class="address-field" style="grid-column: span 2;">
+        <label class="address-label" for="id_company_line1">
+          {% trans "Dirección Línea 1" %} <span style="color:#fbbf24;">*</span>
+        </label>
+        <input type="text" id="id_company_line1" name="company_line1" class="address-input" 
+               placeholder="{% trans 'Calle, número, oficina/local' %}" 
+               form="empresaForm" required>
+        <div class="address-help">
+          {% trans "Dirección principal (calle, número, oficina)" %}
+        </div>
+      </div>
+      
+      <div class="address-field">
+        <label class="address-label" for="id_company_postal_code">
+          {% trans "Código Postal" %}
+        </label>
+        <input type="text" id="id_company_postal_code" name="company_postal_code" class="address-input" 
+               placeholder="{% trans 'Código postal' %}"
+               form="empresaForm">
+        <div class="address-help">
+          {% trans "Código postal (si aplica)" %}
+        </div>
+      </div>
+    </div>
+    
+    <!-- Fila 3: Dirección Línea 2 -->
+    <div class="address-grid mt-4">
+      <div class="address-field" style="grid-column: span 3;">
+        <label class="address-label" for="id_company_line2">
+          {% trans "Dirección Línea 2" %} <span style="color:rgba(255,255,255,0.6);">({% trans "opcional" %})</span>
+        </label>
+        <input type="text" id="id_company_line2" name="company_line2" class="address-input" 
+               placeholder="{% trans 'Piso, depto, edificio, referencias (opcional)' %}"
+               form="empresaForm">
+        <div class="address-help">
+          {% trans "Información adicional de la dirección (opcional)" %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botón Guardar (fuera del form, pero usa form="empresaForm") -->
+  <div class="text-center pt-6">
+    <button class="futuristic-btn" type="submit" form="empresaForm">
+      <i class="fas fa-save"></i> {% trans "Guardar Configuración de Empresa" %}
+    </button>
+  </div>
+
+  <!-- Estado de la Cuenta -->
+  <div class="config-section mt-8">
+    <h3 class="futuristic-label">
+      <i class="fas fa-chart-line"></i> {% trans "Estado de la Cuenta" %}
+    </h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+      <div class="bg-gradient-to-r from-green-500 to-green-600 p-4 rounded-lg">
+        <div class="text-2xl font-bold">{{ empresa.dias_restantes }}</div>
+        <div class="text-sm">{% trans "Días restantes" %}</div>
+      </div>
+      <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-4 rounded-lg">
+        <div class="text-2xl font-bold">{{ empresa.suscripcion_activa|yesno:"Sí,No" }}</div>
+        <div class="text-sm">{% trans "Suscripción" %}</div>
+      </div>
+      <div class="bg-gradient-to-r from-purple-500 to-purple-600 p-4 rounded-lg">
+        <div class="text-2xl font-bold">{{ empresa.fecha_inicio|date:"d/m/Y" }}</div>
+        <div class="text-sm">{% trans "Fecha de inicio" %}</div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script type="module">
+  // Importar locations.js
+  import { bindCountryStateCity } from "{% static 'js/locations.js' %}";
+  
+  // Vincular selects de ubicación para empresa
+  bindCountryStateCity('#id_company_country', '#id_company_state', '#id_company_city');
+  
+  // === ETIQUETAS DINÁMICAS PARA TAX ID ===
+  const TAX_ID_CONFIG = {
+    'CL_RUT': {
+      label: '🇨🇱 RUT',
+      placeholder: '12.345.678-9',
+      help: 'RUT chileno (formato: 12345678-9)'
+    },
+    'US_EIN': {
+      label: '🇺🇸 EIN',
+      placeholder: '12-3456789',
+      help: 'Employer Identification Number (formato: 12-3456789)'
+    },
+    'US_SSN': {
+      label: '🇺🇸 SSN',
+      placeholder: '123-45-6789',
+      help: 'Social Security Number (formato: 123-45-6789)'
+    },
+    'BR_CPF': {
+      label: '🇧🇷 CPF',
+      placeholder: '123.456.789-00',
+      help: 'CPF brasileiro (11 dígitos)'
+    },
+    'BR_CNPJ': {
+      label: '🇧🇷 CNPJ',
+      placeholder: '12.345.678/0001-00',
+      help: 'CNPJ brasileiro (14 dígitos)'
+    },
+    'PE_RUC': {
+      label: '🇵🇪 RUC',
+      placeholder: '20123456789',
+      help: 'RUC peruano (11 dígitos)'
+    },
+    'VE_RIF': {
+      label: '🇻🇪 RIF',
+      placeholder: 'J-12345678-9',
+      help: 'RIF venezolano (formato: J-12345678-9)'
+    }
+  };
+  
+  const taxIdTypeSelect = document.getElementById('id_tax_id_type');
+  const taxIdInput = document.getElementById('id_tax_id');
+  const taxIdLabel = document.getElementById('taxIdDynamicLabel');
+  const taxIdHelp = document.getElementById('taxIdDynamicHelp');
+  
+  if (taxIdTypeSelect && taxIdInput && taxIdLabel && taxIdHelp) {
+    taxIdTypeSelect.addEventListener('change', function() {
+      const selectedType = this.value;
+      const config = TAX_ID_CONFIG[selectedType];
+      
+      if (config) {
+        taxIdLabel.textContent = config.label;
+        taxIdInput.placeholder = config.placeholder;
+        taxIdHelp.textContent = config.help;
+      } else {
+        taxIdLabel.textContent = '{% trans "Número de Identificación" %}';
+        taxIdInput.placeholder = '{% trans "Ingresa el número" %}';
+        taxIdHelp.textContent = '{% trans "Ingresa el número de identificación tributaria" %}';
+      }
+    });
+    
+    // Trigger inicial
+    if (taxIdTypeSelect.value) {
+      taxIdTypeSelect.dispatchEvent(new Event('change'));
+    }
+  }
+  
+  // === ETIQUETAS DINÁMICAS PARA ESTADO SEGÚN PAÍS ===
+  const STATE_LABELS = {
+    'CL': '{% trans "Región" %}',
+    'US': '{% trans "Estado" %}',
+    'BR': '{% trans "Estado" %}',
+    'PE': '{% trans "Departamento" %}',
+    'VE': '{% trans "Estado" %}',
+  };
+  
+  const countrySelect = document.getElementById('id_company_country');
+  const stateLabel = document.getElementById('companyStateLabel');
+  const countryBadge = document.getElementById('countryBadge');
+  
+  if (countrySelect && stateLabel) {
+    countrySelect.addEventListener('change', function() {
+      const country = this.value;
+      stateLabel.textContent = STATE_LABELS[country] || '{% trans "Estado/Región" %}';
+      
+      // Actualizar badge de país
+      if (countryBadge) {
+        const FLAGS = {
+          'CL': '🇨🇱 Chile',
+          'US': '🇺🇸 USA',
+          'BR': '🇧🇷 Brasil',
+          'PE': '🇵🇪 Perú',
+          'VE': '🇻🇪 Venezuela'
+        };
+        countryBadge.textContent = FLAGS[country] || country;
+      }
+    });
+    
+    // Trigger inicial
+    if (countrySelect.value) {
+      countrySelect.dispatchEvent(new Event('change'));
+    }
+  }
+  
+  console.log('✅ Empresa config initialized with locations.js and dynamic labels');
+</script>
+{% endblock %}
+

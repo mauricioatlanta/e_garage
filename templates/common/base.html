@@ -174,11 +174,12 @@
 <!-- Header y navegación unificados (ahora con branding dinámico) -->
 {% if request.path != "/cl/" and request.path != "/us/" %}
 <header class="company-header flex items-center gap-6 p-6">
+  <div style="position:absolute;top:0;left:0;background:blue;color:white;padding:5px;font-size:16px;z-index:999;">🌼 AZUL</div>
 
-  {% if company_logo_url %}
-    {% if '/static/images/' not in company_logo_url %}
-    <img src="{{ company_logo_url }}"
-         alt="{{ company_name|default:'eGarage' }} Logo"
+  {% if company_logo_url or COMPANY_LOGO %}
+    {% if '/static/images/' not in company_logo_url|default:COMPANY_LOGO %}
+    <img src="{{ company_logo_url|default:COMPANY_LOGO }}"
+         alt="{{ company_name|default:COMPANY_NAME|default:'eGarage' }} Logo"
          class="company-logo h-20 w-auto rounded-lg shadow-lg border-2 border-opacity-30"
          style="border-color: {{ primary_color|default:'#00ffff' }}; max-width: 200px; object-fit: contain;">
     {% else %}
@@ -196,10 +197,10 @@
 
   <div class="flex flex-col">
     <h1 class="company-title text-4xl font-bold drop-shadow-lg">
-      {{ company_name|default:"eGarage" }}
+      {{ company_name|default:COMPANY_NAME|default:"eGarage" }}
     </h1>
-    {% if company_tagline %}
-      <span class="text-xl text-gray-300 font-medium mt-1">{{ company_tagline }}</span>
+    {% if company_tagline or COMPANY_TAGLINE %}
+      <span class="text-xl text-gray-300 font-medium mt-1">{{ company_tagline|default:COMPANY_TAGLINE }}</span>
     {% elif request.user.is_authenticated %}
       <span class="text-xl text-gray-300 font-medium mt-1">
         {% if LANGUAGE_CODE == 'es' %}Sistema de Gestión de Talleres{% else %}Workshop Management System{% endif %}
@@ -221,17 +222,6 @@
       {% endif %}
     {% endif %}
 
-    <!-- Selector de idioma - solo para US -->
-    {% if request.country == "US" %}
-    <form action="{% url 'set_language' %}" method="post" class="flex items-center">
-      {% csrf_token %}
-      <input type="hidden" name="next" value="{{ request.get_full_path }}">
-      <select name="language" onchange="this.form.submit()" class="border border-cyan-400 rounded px-2 py-1 text-gray-800 bg-white">
-        <option value="en" {% if request.LANGUAGE_CODE == 'en' %}selected{% endif %}>English</option>
-        <option value="es" {% if request.LANGUAGE_CODE == 'es' %}selected{% endif %}>Español</option>
-      </select>
-    </form>
-    {% endif %}
   </div>
 </header>
 {% endif %}

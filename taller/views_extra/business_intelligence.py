@@ -48,9 +48,7 @@ def dashboard_business_intelligence(request):
 
     # Obtener parámetros de filtro
     if request.GET.get("fecha_inicio"):
-        fecha_inicio = datetime.strptime(
-            request.GET.get("fecha_inicio"), "%Y-%m-%d"
-        ).date()
+        fecha_inicio = datetime.strptime(request.GET.get("fecha_inicio"), "%Y-%m-%d").date()
     if request.GET.get("fecha_fin"):
         fecha_fin = datetime.strptime(request.GET.get("fecha_fin"), "%Y-%m-%d").date()
 
@@ -165,9 +163,7 @@ def get_tecnicos_stats(empresa, fecha_inicio, fecha_fin):
             # Calcular totales
 
             # Agregar repuestos vendidos de forma separada
-            repuestos_queryset = RepuestoDocumento.objects.filter(
-                documento__in=documentos
-            )
+            repuestos_queryset = RepuestoDocumento.objects.filter(documento__in=documentos)
             total_repuestos_cantidad = sum(r.cantidad for r in repuestos_queryset)
             total_repuestos_valor = sum(
                 r.cantidad * getattr(r, "precio_unitario", getattr(r, "precio", 0))
@@ -176,9 +172,7 @@ def get_tecnicos_stats(empresa, fecha_inicio, fecha_fin):
 
             # Agregar servicios realizados
             try:
-                servicios_stats = LineaServicio.objects.filter(
-                    documento__in=documentos
-                ).aggregate(
+                servicios_stats = LineaServicio.objects.filter(documento__in=documentos).aggregate(
                     cantidad=Count("id"),
                     valor=Sum(F("precio_unitario") * F("cantidad")),
                 )
@@ -196,9 +190,7 @@ def get_tecnicos_stats(empresa, fecha_inicio, fecha_fin):
                     "servicios_realizados": servicios_stats["cantidad"] or 0,
                     "ingresos_totales": ingresos_totales,
                     "promedio_por_documento": (
-                        round(ingresos_totales / total_documentos, 2)
-                        if total_documentos > 0
-                        else 0
+                        round(ingresos_totales / total_documentos, 2) if total_documentos > 0 else 0
                     ),
                 }
             )
@@ -215,9 +207,7 @@ def get_resumen_general(empresa, fecha_inicio, fecha_fin):
         empresa=empresa, fecha_emision__range=[fecha_inicio, fecha_fin]
     )
 
-    total_repuestos = RepuestoDocumento.objects.filter(
-        documento__in=documentos
-    ).aggregate(
+    total_repuestos = RepuestoDocumento.objects.filter(documento__in=documentos).aggregate(
         total_cantidad=Sum("cantidad"), valor=Sum(F("cantidad") * F("precio_unitario"))
     )
 
@@ -231,8 +221,7 @@ def get_resumen_general(empresa, fecha_inicio, fecha_fin):
         "valor_repuestos": total_repuestos["valor"] or 0,
         "total_servicios_realizados": total_servicios["total_servicios"] or 0,
         "valor_servicios": total_servicios["valor"] or 0,
-        "ingresos_totales": (total_repuestos["valor"] or 0)
-        + (total_servicios["valor"] or 0),
+        "ingresos_totales": (total_repuestos["valor"] or 0) + (total_servicios["valor"] or 0),
         "promedio_diario": round(
             ((total_repuestos["valor"] or 0) + (total_servicios["valor"] or 0))
             / max((fecha_fin - fecha_inicio).days, 1),
@@ -251,13 +240,9 @@ def api_servicios_ranking(request):
         fecha_inicio = fecha_fin - timedelta(days=30)
 
         if request.GET.get("fecha_inicio"):
-            fecha_inicio = datetime.strptime(
-                request.GET.get("fecha_inicio"), "%Y-%m-%d"
-            ).date()
+            fecha_inicio = datetime.strptime(request.GET.get("fecha_inicio"), "%Y-%m-%d").date()
         if request.GET.get("fecha_fin"):
-            fecha_fin = datetime.strptime(
-                request.GET.get("fecha_fin"), "%Y-%m-%d"
-            ).date()
+            fecha_fin = datetime.strptime(request.GET.get("fecha_fin"), "%Y-%m-%d").date()
 
         datos = get_servicios_ranking(empresa, fecha_inicio, fecha_fin)
         return JsonResponse({"success": True, "data": datos})
@@ -276,13 +261,9 @@ def api_repuestos_utilidad(request):
         fecha_inicio = fecha_fin - timedelta(days=30)
 
         if request.GET.get("fecha_inicio"):
-            fecha_inicio = datetime.strptime(
-                request.GET.get("fecha_inicio"), "%Y-%m-%d"
-            ).date()
+            fecha_inicio = datetime.strptime(request.GET.get("fecha_inicio"), "%Y-%m-%d").date()
         if request.GET.get("fecha_fin"):
-            fecha_fin = datetime.strptime(
-                request.GET.get("fecha_fin"), "%Y-%m-%d"
-            ).date()
+            fecha_fin = datetime.strptime(request.GET.get("fecha_fin"), "%Y-%m-%d").date()
 
         datos = get_repuestos_utilidad(empresa, fecha_inicio, fecha_fin)
         return JsonResponse({"success": True, "data": datos})
@@ -301,13 +282,9 @@ def api_tecnicos_stats(request):
         fecha_inicio = fecha_fin - timedelta(days=30)
 
         if request.GET.get("fecha_inicio"):
-            fecha_inicio = datetime.strptime(
-                request.GET.get("fecha_inicio"), "%Y-%m-%d"
-            ).date()
+            fecha_inicio = datetime.strptime(request.GET.get("fecha_inicio"), "%Y-%m-%d").date()
         if request.GET.get("fecha_fin"):
-            fecha_fin = datetime.strptime(
-                request.GET.get("fecha_fin"), "%Y-%m-%d"
-            ).date()
+            fecha_fin = datetime.strptime(request.GET.get("fecha_fin"), "%Y-%m-%d").date()
 
         datos = get_tecnicos_stats(empresa, fecha_inicio, fecha_fin)
 

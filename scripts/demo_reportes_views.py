@@ -39,9 +39,7 @@ def demo_reportes_por_fecha(request):
     servicios = LineaServicio.objects.filter(
         documento__fecha_emision__range=[desde_date, hasta_date]
     )
-    total_servicios = servicios.aggregate(
-        cantidad=Count("id"), valor_total=Sum("precio_unitario")
-    )
+    total_servicios = servicios.aggregate(cantidad=Count("id"), valor_total=Sum("precio_unitario"))
 
     # Repuestos
     repuestos = RepuestoDocumento.objects.filter(
@@ -70,9 +68,7 @@ def demo_reportes_por_fecha(request):
     )
 
     # Documentos recientes
-    docs_recientes = documentos.select_related("cliente", "vehiculo").order_by(
-        "-fecha"
-    )[:10]
+    docs_recientes = documentos.select_related("cliente", "vehiculo").order_by("-fecha")[:10]
 
     context = {
         "desde": desde_date.strftime("%Y-%m-%d"),

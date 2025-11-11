@@ -9,15 +9,11 @@ class ServicioForm(forms.ModelForm):
     nombre_es = forms.CharField(label="Nombre (Español)", max_length=100)
     nombre_en = forms.CharField(label="Nombre (Inglés)", max_length=100)
     subcategoria = forms.ModelChoiceField(
-        queryset=SubcategoriaServicio.objects.exclude(
-            code__in=["especiales", "emergencias"]
-        ),
+        queryset=SubcategoriaServicio.objects.exclude(code__in=["especiales", "emergencias"]),
         label="Subcategoría",
     )
     country = forms.ChoiceField(choices=CategoriaServicio.COUNTRY_CHOICES, label="País")
-    tipo = forms.ChoiceField(
-        choices=[("interno", "Interno"), ("externo", "Externo")], label="Tipo"
-    )
+    tipo = forms.ChoiceField(choices=[("interno", "Interno"), ("externo", "Externo")], label="Tipo")
 
     class Meta:
         model = Servicio

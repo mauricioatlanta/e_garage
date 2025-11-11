@@ -22,9 +22,7 @@ class CatalogoModeloAuto(models.Model):
 
     # Metadatos para mejor rendimiento y validación
     fecha_creacion = models.DateTimeField(auto_now_add=True)
-    activo = models.BooleanField(
-        default=True, help_text="Si false, no aparece en autocompletado"
-    )
+    activo = models.BooleanField(default=True, help_text="Si false, no aparece en autocompletado")
 
     class Meta:
         verbose_name = "Catálogo Marca-Modelo"

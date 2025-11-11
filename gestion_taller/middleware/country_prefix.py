@@ -25,9 +25,7 @@ class EnforceCountryPrefixMiddleware:
             if request.user.is_authenticated:
                 empresa = get_or_create_empresa(request)
                 expected_prefix = (
-                    "/cl/"
-                    if (getattr(empresa, "pais", "") or "").upper() == "CL"
-                    else "/us/"
+                    "/cl/" if (getattr(empresa, "pais", "") or "").upper() == "CL" else "/us/"
                 )
 
                 path = request.path or "/"

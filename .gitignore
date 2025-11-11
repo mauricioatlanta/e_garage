@@ -15,3 +15,15 @@ db.sqlite3
 
 # Otros
 *.zip
+# Build artifacts / generados
+staticfiles/
+media/
+__pycache__/
+.env
+.venv/
+# Build artifacts / generados
+staticfiles/
+media/
+__pycache__/
+.env
+.venv/

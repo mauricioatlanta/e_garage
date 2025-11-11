@@ -27,13 +27,9 @@ def signup_chile(request):
             elif User.objects.filter(email=email).exists():
                 form.add_error("email", "El correo ya está registrado")
             else:
-                user = User.objects.create_user(
-                    username=username, email=email, password=password1
-                )
+                user = User.objects.create_user(username=username, email=email, password=password1)
                 user.save()
-                PerfilUsuario.objects.create(
-                    user=user, pais="CL", region=region, ciudad=ciudad
-                )
+                PerfilUsuario.objects.create(user=user, pais="CL", region=region, ciudad=ciudad)
                 return render(request, "account/signup_success.html")
     else:
         form = SignupChileForm()
@@ -70,19 +66,13 @@ def signup_usa(request):
                 if (city == "otra" or city == "other") and otra_ciudad:
                     estado_obj = Estado.objects.filter(pk=state).first()
                     if estado_obj:
-                        nueva_ciudad = Ciudad.objects.create(
-                            nombre=otra_ciudad, estado=estado_obj
-                        )
+                        nueva_ciudad = Ciudad.objects.create(nombre=otra_ciudad, estado=estado_obj)
                         ciudad_obj = nueva_ciudad
                     else:
                         ciudad_obj = None
                 else:
-                    ciudad_obj = (
-                        Ciudad.objects.filter(pk=city).first() if city else None
-                    )
-                user = User.objects.create_user(
-                    username=username, email=email, password=password1
-                )
+                    ciudad_obj = Ciudad.objects.filter(pk=city).first() if city else None
+                user = User.objects.create_user(username=username, email=email, password=password1)
                 user.save()
                 PerfilUsuario.objects.create(
                     user=user,

@@ -292,9 +292,7 @@ def crear_tienda_api(request):
 
     # Evitar duplicados por nombre dentro de la empresa
     if Tienda.objects.filter(empresa=empresa, nombre__iexact=nombre).exists():
-        return JsonResponse(
-            {"error": "Ya existe una tienda con ese nombre"}, status=409
-        )
+        return JsonResponse({"error": "Ya existe una tienda con ese nombre"}, status=409)
 
     tienda = Tienda.objects.create(
         nombre=nombre,
@@ -423,11 +421,7 @@ def repuesto_by_code_api(request):
     if not code:
         return JsonResponse({"error": "Código requerido"}, status=400)
 
-    r = (
-        Repuesto.objects.filter(empresa=empresa, part_number__iexact=code)
-        .order_by("-id")
-        .first()
-    )
+    r = Repuesto.objects.filter(empresa=empresa, part_number__iexact=code).order_by("-id").first()
     if not r:
         return JsonResponse({"error": "Repuesto no encontrado"}, status=404)
 
@@ -488,8 +482,7 @@ def buscar_servicios_api(request):
     # Feature-detect con hasattr para evitar except amplio
     if hasattr(Servicio, "categoria"):
         qs = qs.filter(
-            models.Q(nombre__icontains=q)
-            | models.Q(categoria__names__label__icontains=q)
+            models.Q(nombre__icontains=q) | models.Q(categoria__names__label__icontains=q)
         )
     else:
         qs = qs.filter(nombre__icontains=q)
@@ -559,9 +552,7 @@ def ops_metrics_api(request):
 
     docs_today = Documento.objects.filter(empresa=empresa, fecha_emision=hoy).count()
 
-    docs_yesterday = Documento.objects.filter(
-        empresa=empresa, fecha_emision=ayer
-    ).count()
+    docs_yesterday = Documento.objects.filter(empresa=empresa, fecha_emision=ayer).count()
 
     docs_delta = (
         (docs_today - docs_yesterday) / docs_yesterday
@@ -602,3 +593,263 @@ def ops_metrics_api(request):
             "efficiency": round(efficiency, 2),
         }
     )
+
+
+# ==========================================================
+# API para Onboarding: Crear Clientes y Vehículos
+# ==========================================================
+
+
+@login_required
+@require_POST
+def api_crear_cliente_onboarding(request):
+    """
+    API para crear clientes desde el onboarding.
+    POST /us/api/clientes/crear/ o /cl/api/clientes/crear/
+    """
+    import logging
+
+    logger = logging.getLogger(__name__)
+
+    try:
+        logger.info("=" * 60)
+        logger.info("🚀 INICIO - API Crear Cliente Onboarding")
+        logger.info(f"Usuario: {request.user.username}")
+
+        empresa = _get_empresa(request)
+        if not empresa:
+            logger.error("❌ No se encontró empresa para el usuario")
+            return JsonResponse({"success": False, "error": "No empresa found"}, status=400)
+
+        logger.info(f"✅ Empresa encontrada: {empresa.nombre_taller} (ID: {empresa.id})")
+
+        # Obtener datos del formulario
+        nombre = request.POST.get("nombre", "").strip()
+        apellido = request.POST.get("apellido", "").strip()
+        email = request.POST.get("email", "").strip()
+        telefono = request.POST.get("telefono", "").strip()
+        direccion = request.POST.get("direccion", "").strip()
+
+        # Campos USA
+        estado_usa = request.POST.get("estado_usa", "").strip()
+        ciudad_usa = request.POST.get("ciudad_usa", "").strip()
+        zipcode = request.POST.get("zipcode", "").strip()
+
+        logger.info(f"📝 Datos recibidos:")
+        logger.info(f"   Nombre: {nombre}")
+        logger.info(f"   Apellido: {apellido}")
+        logger.info(f"   Email: {email}")
+        logger.info(f"   Teléfono: {telefono}")
+        logger.info(f"   Dirección: {direccion}")
+        logger.info(f"   Estado USA: {estado_usa}")
+        logger.info(f"   Ciudad USA: {ciudad_usa}")
+        logger.info(f"   ZIP Code: {zipcode}")
+
+        # Validaciones
+        if not nombre or not apellido:
+            logger.error("❌ Validación fallida: Nombre o apellido vacío")
+            return JsonResponse(
+                {"success": False, "error": "Nombre y apellido son requeridos"}, status=400
+            )
+
+        if not telefono:
+            logger.error("❌ Validación fallida: Teléfono vacío")
+            return JsonResponse({"success": False, "error": "Teléfono es requerido"}, status=400)
+
+        # Verificar si ya existe un cliente con ese email en la empresa
+        if email:
+            if Cliente.objects.filter(empresa=empresa, email=email).exists():
+                logger.error(f"❌ Ya existe cliente con email: {email}")
+                return JsonResponse(
+                    {"success": False, "error": "Ya existe un cliente con ese email"}, status=400
+                )
+
+        # Verificar qué campos tiene el modelo Cliente
+        campos_disponibles = [f.name for f in Cliente._meta.get_fields()]
+        logger.info(f"📋 Campos disponibles en Cliente: {campos_disponibles}")
+
+        # Preparar datos para crear el cliente - SOLO campos que existen
+        cliente_data = {
+            "empresa": empresa,
+            "nombre": nombre,
+            "apellido": apellido,
+            "telefono": telefono,
+        }
+
+        # Agregar email si existe y no está vacío
+        if email:
+            cliente_data["email"] = email
+
+        # Agregar dirección si existe y no está vacía
+        if direccion:
+            cliente_data["direccion"] = direccion
+
+        # Agregar ZIP code si el campo existe en el modelo
+        if zipcode and "zipcode" in campos_disponibles:
+            cliente_data["zipcode"] = zipcode
+            logger.info(f"   ✅ ZIP Code agregado: {zipcode}")
+        elif zipcode:
+            logger.warning(f"   ⚠️ Campo 'zipcode' no existe en el modelo Cliente")
+
+        # Agregar ciudad_usa si el campo existe en el modelo
+        if ciudad_usa and "ciudad_usa" in campos_disponibles:
+            cliente_data["ciudad_usa"] = ciudad_usa
+            logger.info(f"   ✅ Ciudad USA agregada: {ciudad_usa}")
+        elif ciudad_usa:
+            logger.warning(f"   ⚠️ Campo 'ciudad_usa' no existe en el modelo Cliente")
+            # Intentar agregarlo a dirección como fallback
+            if direccion:
+                cliente_data["direccion"] = f"{direccion}, {ciudad_usa}"
+            else:
+                cliente_data["direccion"] = ciudad_usa
+
+        logger.info(f"📦 Creando cliente con datos finales: {cliente_data}")
+
+        # Crear el cliente
+        cliente = Cliente.objects.create(**cliente_data)
+
+        logger.info(f"✅ Cliente creado exitosamente!")
+        logger.info(f"   ID: {cliente.id}")
+        logger.info(f"   Nombre: {cliente.nombre} {cliente.apellido}")
+        logger.info(f"   Empresa: {cliente.empresa.nombre_taller}")
+
+        # Verificar que se guardó
+        cliente_verificado = Cliente.objects.filter(id=cliente.id, empresa=empresa).first()
+        if cliente_verificado:
+            logger.info(f"✅✅ VERIFICADO: Cliente existe en BD (ID: {cliente_verificado.id})")
+        else:
+            logger.error(f"❌❌ ERROR: Cliente NO se encuentra en BD después de crear!")
+
+        return JsonResponse(
+            {
+                "success": True,
+                "message": f"Cliente creado exitosamente (ID: {cliente.id})",
+                "cliente": {
+                    "id": cliente.id,
+                    "nombre": cliente.nombre,
+                    "apellido": cliente.apellido,
+                    "email": cliente.email,
+                    "telefono": cliente.telefono,
+                },
+            }
+        )
+
+    except Exception as e:
+        import traceback
+
+        logger.error("=" * 60)
+        logger.error("❌❌❌ ERROR AL CREAR CLIENTE ❌❌❌")
+        logger.error(f"Error: {str(e)}")
+        logger.error("Traceback:")
+        traceback.print_exc()
+        logger.error("=" * 60)
+        return JsonResponse({"success": False, "error": str(e)}, status=500)
+
+
+@login_required
+@require_POST
+def api_crear_vehiculo_onboarding(request):
+    """
+    API para crear vehículos desde el onboarding.
+    POST /us/api/vehiculos/crear/ o /cl/api/vehiculos/crear/
+    """
+    try:
+        empresa = _get_empresa(request)
+        if not empresa:
+            return JsonResponse({"success": False, "error": "No empresa found"}, status=400)
+
+        # Obtener datos del formulario
+        cliente_id = request.POST.get("cliente_id")
+        patente = request.POST.get("patente", "").strip().upper()
+        marca_id = request.POST.get("marca_id")
+        modelo_id = request.POST.get("modelo_id")
+        anio = request.POST.get("anio")
+        vin = request.POST.get("vin", "").strip()
+
+        # Validaciones
+        if not cliente_id:
+            return JsonResponse({"success": False, "error": "Cliente es requerido"}, status=400)
+
+        if not patente:
+            return JsonResponse({"success": False, "error": "Patente es requerida"}, status=400)
+
+        if not marca_id or not modelo_id or not anio:
+            return JsonResponse(
+                {"success": False, "error": "Marca, modelo y año son requeridos"}, status=400
+            )
+
+        # Verificar que el cliente existe y pertenece a la empresa
+        try:
+            cliente = Cliente.objects.get(id=cliente_id, empresa=empresa)
+        except Cliente.DoesNotExist:
+            return JsonResponse({"success": False, "error": "Cliente no encontrado"}, status=404)
+
+        # Verificar si ya existe un vehículo con esa patente en la empresa
+        if Vehiculo.objects.filter(empresa=empresa, patente=patente).exists():
+            return JsonResponse(
+                {"success": False, "error": "Ya existe un vehículo con esa patente"}, status=400
+            )
+
+        # Crear el vehículo
+        from taller.models.marca import Marca
+        from taller.models.modelo import Modelo
+
+        vehiculo = Vehiculo.objects.create(
+            empresa=empresa,
+            cliente=cliente,
+            patente=patente,
+            marca_id=marca_id,
+            modelo_id=modelo_id,
+            anio=int(anio),
+            vin=vin or None,
+        )
+
+        return JsonResponse(
+            {
+                "success": True,
+                "message": "Vehículo creado exitosamente",
+                "vehiculo": {
+                    "id": vehiculo.id,
+                    "patente": vehiculo.patente,
+                    "marca": vehiculo.marca.nombre if vehiculo.marca else "",
+                    "modelo": vehiculo.modelo.nombre if vehiculo.modelo else "",
+                    "anio": vehiculo.anio,
+                },
+            }
+        )
+
+    except Exception as e:
+        return JsonResponse({"success": False, "error": str(e)}, status=500)
+
+
+@login_required
+@require_GET
+def api_listar_clientes(request):
+    """
+    API para listar clientes de la empresa.
+    GET /us/api/clientes/ o /cl/api/clientes/
+    """
+    try:
+        empresa = _get_empresa(request)
+        if not empresa:
+            return JsonResponse([], safe=False)
+
+        # Obtener todos los clientes de la empresa
+        clientes = Cliente.objects.filter(empresa=empresa).order_by("nombre", "apellido")
+
+        # Formatear la respuesta
+        data = [
+            {
+                "id": c.id,
+                "nombre": c.nombre,
+                "apellido": c.apellido,
+                "email": c.email or "",
+                "telefono": c.telefono or "",
+            }
+            for c in clientes
+        ]
+
+        return JsonResponse(data, safe=False)
+
+    except Exception as e:
+        return JsonResponse([], safe=False)

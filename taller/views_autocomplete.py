@@ -121,9 +121,7 @@ class VehiculoAutocomplete(autocomplete.Select2QuerySetView):
         if not empresa:
             return Vehiculo.objects.none()
 
-        qs = Vehiculo.objects.select_related("cliente", "marca", "modelo").filter(
-            empresa=empresa
-        )
+        qs = Vehiculo.objects.select_related("cliente", "marca", "modelo").filter(empresa=empresa)
 
         # Soporta forward de DAL y querystring plano
         cliente_id = self.forwarded.get("cliente") or self.request.GET.get("cliente")
@@ -219,15 +217,11 @@ class RepuestoAutocomplete(autocomplete.Select2QuerySetView):
         qs = Repuesto.objects.filter(empresa=empresa)
 
         if self.q:
-            qs = qs.filter(
-                Q(part_number__icontains=self.q) | Q(nombre__icontains=self.q)
-            )
+            qs = qs.filter(Q(part_number__icontains=self.q) | Q(nombre__icontains=self.q))
         return qs.order_by("nombre")
 
     def get_result_label(self, result):
-        precio = getattr(result, "precio_venta", None) or getattr(
-            result, "precio", None
-        )
+        precio = getattr(result, "precio_venta", None) or getattr(result, "precio", None)
         if precio:
             return f"{result.part_number} - {result.nombre} (${precio})"
         return f"{result.part_number} - {result.nombre}"

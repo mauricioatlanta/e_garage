@@ -86,9 +86,7 @@ class TestNamespacesPorPais(TestCase):
 
         # No debe haber intersección entre namespaces
         intersection = set(namespaces_cl) & set(namespaces_us)
-        self.assertEqual(
-            len(intersection), 0, f"Conflicto de namespaces: {intersection}"
-        )
+        self.assertEqual(len(intersection), 0, f"Conflicto de namespaces: {intersection}")
 
     def test_urls_especificas_por_pais(self):
         """Verifica que las URLs específicas de cada país funcionan correctamente"""
@@ -126,9 +124,7 @@ class TestNamespacesPorPais(TestCase):
         )
 
         # Test básico del templatetag
-        template = Template(
-            "{% load country_url %}{% country_url 'clientes:lista_clientes' %}"
-        )
+        template = Template("{% load country_url %}{% country_url 'clientes:lista_clientes' %}")
         result = template.render(context)
         self.assertIn("/cl/", result)
 

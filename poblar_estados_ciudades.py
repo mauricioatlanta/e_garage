@@ -690,9 +690,7 @@ def poblar_estados_ciudades():
     # Crear estados
     estado_objs = {}
     for e in estados:
-        obj, created = Estado.objects.get_or_create(
-            nombre=e["nombre"], codigo=e["codigo"]
-        )
+        obj, created = Estado.objects.get_or_create(nombre=e["nombre"], codigo=e["codigo"])
         estado_objs[e["nombre"]] = obj
     # Crear ciudades
     for estado_nombre, ciudades in ciudades_por_estado.items():

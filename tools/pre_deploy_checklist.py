@@ -374,9 +374,7 @@ USE_TZ = True
 LANGUAGE_CODE = "es-cl"
 """
 
-    with open(
-        "gestion_taller/settings/production_template.py", "w", encoding="utf-8"
-    ) as f:
+    with open("gestion_taller/settings/production_template.py", "w", encoding="utf-8") as f:
         f.write(production_settings)
 
     print("✅ Archivo de configuración de producción generado:")

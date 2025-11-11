@@ -8,7 +8,6 @@ from decimal import Decimal
 
 import pandas as pd
 from openpyxl.styles import Alignment, Font, PatternFill
-from weasyprint import CSS, HTML
 
 from django.conf import settings
 from django.http import HttpResponse
@@ -69,80 +68,89 @@ class DocumentoPDFExporter:
         # Renderizar HTML
         html_string = template.render(context)
 
-        # Generar PDF con WeasyPrint
-        html = HTML(string=html_string)
-        css = CSS(
-            string="""
-            @page {
-                size: A4;
-                margin: 1cm;
-                @bottom-center {
-                    content: "Página " counter(page) " de " counter(pages);
+        # Generar PDF con WeasyPrint (importar de forma perezosa)
+        try:
+            from weasyprint import CSS, HTML
+
+            html = HTML(string=html_string)
+            css = CSS(
+                string="""
+                @page {
+                    size: A4;
+                    margin: 1cm;
+                    @bottom-center {
+                        content: "Página " counter(page) " de " counter(pages);
+                    }
                 }
-            }
-            body {
-                font-family: Arial, sans-serif;
-                font-size: 12px;
-                line-height: 1.4;
-            }
-            .header {
-                text-align: center;
-                margin-bottom: 20px;
-                border-bottom: 2px solid #007bff;
-                padding-bottom: 10px;
-            }
-            .logo {
-                max-height: 80px;
-                margin-bottom: 10px;
-            }
-            .info-section {
-                margin-bottom: 15px;
-            }
-            .table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-bottom: 15px;
-            }
-            .table th, .table td {
-                border: 1px solid #ddd;
-                padding: 8px;
-                text-align: left;
-            }
-            .table th {
-                background-color: #f8f9fa;
-                font-weight: bold;
-            }
-            .totals {
-                float: right;
-                width: 300px;
-                margin-top: 20px;
-            }
-            .totals table {
-                width: 100%;
-            }
-            .footer {
-                margin-top: 50px;
-                text-align: center;
-                border-top: 1px solid #ddd;
-                padding-top: 10px;
-                font-size: 10px;
-                color: #666;
-            }
-        """
-        )
+                body {
+                    font-family: Arial, sans-serif;
+                    font-size: 12px;
+                    line-height: 1.4;
+                }
+                .header {
+                    text-align: center;
+                    margin-bottom: 20px;
+                    border-bottom: 2px solid #007bff;
+                    padding-bottom: 10px;
+                }
+                .logo {
+                    max-height: 80px;
+                    margin-bottom: 10px;
+                }
+                .info-section {
+                    margin-bottom: 15px;
+                }
+                .table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-bottom: 15px;
+                }
+                .table th, .table td {
+                    border: 1px solid #ddd;
+                    padding: 8px;
+                    text-align: left;
+                }
+                .table th {
+                    background-color: #f8f9fa;
+                    font-weight: bold;
+                }
+                .totals {
+                    float: right;
+                    width: 300px;
+                    margin-top: 20px;
+                }
+                .totals table {
+                    width: 100%;
+                }
+                .footer {
+                    margin-top: 50px;
+                    text-align: center;
+                    border-top: 1px solid #ddd;
+                    padding-top: 10px;
+                    font-size: 10px;
+                    color: #666;
+                }
+            """
+            )
 
-        pdf_file = html.write_pdf(stylesheets=[css])
-
-        return pdf_file
+            pdf_file = html.write_pdf(stylesheets=[css])
+            return pdf_file
+        except Exception as e:  # pragma: no cover - optional dependency
+            # Dejar que el llamador decida cómo manejar la ausencia de weasyprint
+            raise ImportError(f"WeasyPrint no está disponible: {e}")
 
     def generar_response_pdf(self):
         """Genera una respuesta HTTP con el PDF"""
-        pdf_file = self.generar_pdf()
+        try:
+            pdf_file = self.generar_pdf()
+        except ImportError as e:
+            # Devolver un 500 informativo para evitar que el servidor explote en startup
+            return HttpResponse(
+                f"PDF generation not available: {e}", status=500, content_type="text/plain"
+            )
 
         response = HttpResponse(pdf_file, content_type="application/pdf")
-        filename = (
-            f"{self.documento.tipo_documento}_{self.documento.numero_documento}.pdf"
-        )
+        filename = f"{self.documento.tipo_documento}_{self.documento.numero_documento}.pdf"
         response["Content-Disposition"] = f'attachment; filename="{filename}"'
 
         return response
@@ -163,18 +171,14 @@ class ReportesExcelExporter:
         # Filtrar documentos
         documentos = Documento.objects.filter(empresa=self.empresa)
         if self.fecha_inicio and self.fecha_fin:
-            documentos = documentos.filter(
-                fecha__range=[self.fecha_inicio, self.fecha_fin]
-            )
+            documentos = documentos.filter(fecha__range=[self.fecha_inicio, self.fecha_fin])
 
         # Crear DataFrame
         data = []
         for doc in documentos:
             total_repuestos = sum(r.total for r in doc.repuestos.all())
             total_servicios = sum(s.precio for s in doc.servicios.all())
-            total_otros_servicios = sum(
-                os.precio_cliente for os in doc.otros_servicios.all()
-            )
+            total_otros_servicios = sum(os.precio_cliente for os in doc.otros_servicios.all())
             costos_externos = sum(os.costo_interno for os in doc.otros_servicios.all())
             ganancia_externa = sum(os.ganancia for os in doc.otros_servicios.all())
 
@@ -221,9 +225,7 @@ class ReportesExcelExporter:
 
             # Estilos
             header_font = Font(bold=True, color="FFFFFF")
-            header_fill = PatternFill(
-                start_color="007bff", end_color="007bff", fill_type="solid"
-            )
+            header_fill = PatternFill(start_color="007bff", end_color="007bff", fill_type="solid")
 
             # Aplicar estilos a headers
             for cell in worksheet[1]:
@@ -274,9 +276,7 @@ class WhatsAppSender:
 
         # Crear mensaje
         if archivo_url:
-            mensaje_completo = (
-                f"{mensaje}\n\nPuedes descargar tu documento aquí: {archivo_url}"
-            )
+            mensaje_completo = f"{mensaje}\n\nPuedes descargar tu documento aquí: {archivo_url}"
         else:
             mensaje_completo = mensaje
 
@@ -301,7 +301,9 @@ class EmailSender:
             pdf_content = exporter.generar_pdf()
 
         # Preparar email
-        subject = f"{documento.tipo_documento} #{documento.numero_documento} - {documento.empresa.nombre}"
+        subject = (
+            f"{documento.tipo_documento} #{documento.numero_documento} - {documento.empresa.nombre}"
+        )
 
         # Renderizar template del email
         email_context = {
@@ -310,12 +312,8 @@ class EmailSender:
             "empresa": documento.empresa,
         }
 
-        html_message = render_to_string(
-            "taller/emails/documento_email.html", email_context
-        )
-        text_message = render_to_string(
-            "taller/emails/documento_email.txt", email_context
-        )
+        html_message = render_to_string("taller/emails/documento_email.html", email_context)
+        text_message = render_to_string("taller/emails/documento_email.txt", email_context)
 
         # Crear email
         email = EmailMessage(

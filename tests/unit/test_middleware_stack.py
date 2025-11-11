@@ -111,9 +111,7 @@ class MiddlewareStackTest(TestCase):
         from taller.models.empresa import Empresa
 
         # Crear usuario y empresa
-        user = User.objects.create_user(
-            username="testuser_middleware", password="testpass"
-        )
+        user = User.objects.create_user(username="testuser_middleware", password="testpass")
         emp = Empresa.objects.create(nombre_taller="Test Garage", pais="CL", user=user)
 
         with override_settings(
@@ -136,9 +134,7 @@ class MiddlewareStackTest(TestCase):
         from taller.models.empresa import Empresa
 
         # Crear usuario y empresa
-        user = User.objects.create_user(
-            username="testuser_session", password="testpass"
-        )
+        user = User.objects.create_user(username="testuser_session", password="testpass")
         emp = Empresa.objects.create(nombre_taller="Test Garage", pais="CL", user=user)
 
         with override_settings(

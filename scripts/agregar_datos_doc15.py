@@ -19,9 +19,7 @@ def agregar_datos_documento_15():
 
     try:
         documento = Documento.objects.get(id=15)
-        print(
-            f"📋 Documento encontrado: {documento.tipo_documento} #{documento.numero_documento}"
-        )
+        print(f"📋 Documento encontrado: {documento.tipo_documento} #{documento.numero_documento}")
 
         # Agregar técnico
         tecnico, _ = Tecnico.objects.get_or_create(nombre="Juan Pérez")
@@ -75,10 +73,7 @@ def agregar_datos_documento_15():
         servicios = LineaServicio.objects.filter(documento=documento)
 
         total_repuestos = sum(
-            (
-                getattr(r, "precio_unitario", getattr(r, "precio", 0))
-                * getattr(r, "cantidad", 1)
-            )
+            (getattr(r, "precio_unitario", getattr(r, "precio", 0)) * getattr(r, "cantidad", 1))
             for r in repuestos
         )
         total_servicios = sum(
@@ -91,9 +86,7 @@ def agregar_datos_documento_15():
         print(f"   Servicios: ${total_servicios}")
         print(f"   TOTAL: ${total_general}")
 
-        print(
-            "\n🔗 URL para probar edición: http://127.0.0.1:8000/documentos/editar/15/"
-        )
+        print("\n🔗 URL para probar edición: http://127.0.0.1:8000/documentos/editar/15/")
 
         return True
 

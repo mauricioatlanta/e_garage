@@ -18,12 +18,8 @@ def test_documento_empresa_consistente_en_fks():
     User = get_user_model()
 
     # Crear usuarios reales
-    user1 = User.objects.create_user(
-        username="user1", email="user1@test.com", password="testpass"
-    )
-    user2 = User.objects.create_user(
-        username="user2", email="user2@test.com", password="testpass"
-    )
+    user1 = User.objects.create_user(username="user1", email="user1@test.com", password="testpass")
+    user2 = User.objects.create_user(username="user2", email="user2@test.com", password="testpass")
 
     emp1 = Empresa.objects.create(
         nombre_taller="A",
@@ -75,9 +71,7 @@ def test_documento_empresa_consistente_en_fks():
     cliente1 = Cliente.objects.create(empresa=emp1, nombre="Cliente Test 1")
 
     # Documento en CL
-    doc = Documento(
-        empresa=emp1, tipo="FAC", fecha_emision="2025-01-01", cliente=cliente1
-    )
+    doc = Documento(empresa=emp1, tipo="FAC", fecha_emision="2025-01-01", cliente=cliente1)
 
     # Si Documento tiene FK cliente/vehiculo, creamos uno de empresa distinta para forzar inconsistencia
     Vehiculo = None
@@ -91,9 +85,7 @@ def test_documento_empresa_consistente_en_fks():
     doc.cliente = cliente2
 
     if Vehiculo and "vehiculo" in _fields(Documento):
-        v = Vehiculo.objects.create(
-            empresa=emp2, cliente=cliente2, patente="ZZZ999", anio=2020
-        )
+        v = Vehiculo.objects.create(empresa=emp2, cliente=cliente2, patente="ZZZ999", anio=2020)
         doc.vehiculo = v
 
     # Si el modelo Documento no tiene validación de consistencia, el test pasa sin error
@@ -116,9 +108,7 @@ def test_herencia_responsable_a_lineas_si_flag_off():
     User = get_user_model()
 
     # Crear usuario real
-    user = User.objects.create_user(
-        username="user3", email="user3@test.com", password="testpass"
-    )
+    user = User.objects.create_user(username="user3", email="user3@test.com", password="testpass")
 
     Tecnico = None
     try:

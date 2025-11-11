@@ -45,9 +45,7 @@ def crear_datos_prueba():
         print("❌ No hay usuarios en el sistema")
         return
 
-    empresa, _ = Empresa.objects.get_or_create(
-        defaults={"nombre_taller": "Taller Demo"}
-    )
+    empresa, _ = Empresa.objects.get_or_create(defaults={"nombre_taller": "Taller Demo"})
     print(f"✅ Empresa: {empresa.nombre_taller}")
 
     # Técnicos
@@ -225,9 +223,7 @@ def crear_datos_prueba():
                         servicios, random.randint(1, min(3, len(servicios)))
                     ):
                         precio_base = getattr(servicio, "precio_base", None) or 25000
-                        precio = max(
-                            5000, int(precio_base) + random.randint(-5000, 15000)
-                        )
+                        precio = max(5000, int(precio_base) + random.randint(-5000, 15000))
                         LineaServicio.objects.create(
                             empresa=empresa,
                             documento=documento,

@@ -150,9 +150,7 @@ def payment_cancel(request):
     """
     Usuario canceló el pago
     """
-    messages.warning(
-        request, "Pago cancelado. Puedes intentar nuevamente cuando lo desees."
-    )
+    messages.warning(request, "Pago cancelado. Puedes intentar nuevamente cuando lo desees.")
 
     if request.user.empresa.pais == "US":
         return redirect("/us/en/dashboard/")

@@ -59,9 +59,6 @@ class ConfiguracionEmpresaForm(forms.ModelForm):
             return logo
         if logo.size > MAX_LOGO_MB * 1024 * 1024:
             raise ValidationError(f"El logo no puede exceder {MAX_LOGO_MB}MB.")
-        if (
-            hasattr(logo, "content_type")
-            and logo.content_type not in ALLOWED_IMAGE_MIMES
-        ):
+        if hasattr(logo, "content_type") and logo.content_type not in ALLOWED_IMAGE_MIMES:
             raise ValidationError("Formato de imagen no soportado.")
         return logo

@@ -21,9 +21,7 @@ except Exception:  # pragma: no cover - si no existen modelos USA
     MarcaVehiculoUSA = ModeloVehiculoUSA = CatalogoModeloAuto = None
 
 
-class VehiculoListView(
-    CountryLangTemplateMixin, LoginRequiredMixin, TenantViewMixin, ListView
-):
+class VehiculoListView(CountryLangTemplateMixin, LoginRequiredMixin, TenantViewMixin, ListView):
     model = Vehiculo
     base_template_name = "vehiculos/vehiculo_list.html"  # Usar template autoritativo
     select_related_fields = ("cliente",)
@@ -81,9 +79,7 @@ class VehiculoCreateView(LoginRequiredMixin, TenantViewMixin, CreateView):
         form = super().get_form(form_class)
 
         # Detectar país y agregar campos USA si es necesario
-        empresa = getattr(
-            self.request, "empresa", getattr(self.request.user, "empresa", None)
-        )
+        empresa = getattr(self.request, "empresa", getattr(self.request.user, "empresa", None))
         country = getattr(empresa, "pais", "CL") if empresa else "CL"
 
         if str(country).strip().upper() == "US":
@@ -101,9 +97,7 @@ class VehiculoCreateView(LoginRequiredMixin, TenantViewMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        empresa = getattr(
-            self.request, "empresa", getattr(self.request.user, "empresa", None)
-        )
+        empresa = getattr(self.request, "empresa", getattr(self.request.user, "empresa", None))
         raw_country = getattr(empresa, "pais", None) or "CL"
         country = str(raw_country).strip().upper()
 
@@ -136,9 +130,7 @@ class VehiculoCreateView(LoginRequiredMixin, TenantViewMixin, CreateView):
         ctx["clientes"] = Cliente.objects.filter(empresa=empresa)[
             :500
         ]  # BLINDAJE: Filtrado por empresa
-        ctx["colores"] = ColorVehiculo.get_colores_para_pais(
-            country
-        )  # CORREGIDO: Colores por país
+        ctx["colores"] = ColorVehiculo.get_colores_para_pais(country)  # CORREGIDO: Colores por país
         if country == "US":
             # Usar nuestro catálogo importado para USA
             if CatalogoModeloAuto:
@@ -158,9 +150,7 @@ class VehiculoCreateView(LoginRequiredMixin, TenantViewMixin, CreateView):
                 )
         else:
             ctx["marcas"] = (
-                Marca.objects.filter(country="CL")
-                .only("id", "nombre")
-                .order_by("nombre")
+                Marca.objects.filter(country="CL").only("id", "nombre").order_by("nombre")
             )
         return ctx
 
@@ -181,23 +171,15 @@ class VehiculoUpdateView(LoginRequiredMixin, TenantViewMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        empresa = getattr(
-            self.request, "empresa", getattr(self.request.user, "empresa", None)
-        )
+        empresa = getattr(self.request, "empresa", getattr(self.request.user, "empresa", None))
         country = getattr(empresa, "pais", "CL") if empresa else "CL"
         ctx["country"] = country
         ctx["clientes"] = (
-            Cliente.objects.filter(empresa=empresa)[:500]
-            if empresa
-            else Cliente.objects.none()
+            Cliente.objects.filter(empresa=empresa)[:500] if empresa else Cliente.objects.none()
         )  # BLINDAJE: Filtrado por empresa
-        ctx["colores"] = ColorVehiculo.get_colores_para_pais(
-            country
-        )  # CORREGIDO: Colores por país
+        ctx["colores"] = ColorVehiculo.get_colores_para_pais(country)  # CORREGIDO: Colores por país
         if country == "US" and MarcaVehiculoUSA:
-            ctx["marcas_usa"] = MarcaVehiculoUSA.objects.filter(activa=True).order_by(
-                "nombre"
-            )
+            ctx["marcas_usa"] = MarcaVehiculoUSA.objects.filter(activa=True).order_by("nombre")
             ctx["modelos_usa"] = (
                 ModeloVehiculoUSA.objects.filter(activo=True).order_by("nombre")
                 if ModeloVehiculoUSA

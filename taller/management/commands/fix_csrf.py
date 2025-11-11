@@ -24,17 +24,13 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        self.stdout.write(
-            self.style.SUCCESS("🔧 Iniciando limpieza de CSRF y sesiones...")
-        )
+        self.stdout.write(self.style.SUCCESS("🔧 Iniciando limpieza de CSRF y sesiones..."))
 
         # 1. Limpiar todas las sesiones
         self.stdout.write("📝 Limpiando sesiones...")
         try:
             sessions_deleted, _ = Session.objects.all().delete()
-            self.stdout.write(
-                self.style.SUCCESS(f"  ✅ Sesiones eliminadas: {sessions_deleted}")
-            )
+            self.stdout.write(self.style.SUCCESS(f"  ✅ Sesiones eliminadas: {sessions_deleted}"))
         except Exception as e:
             self.stdout.write(self.style.ERROR(f"  ❌ Error limpiando sesiones: {e}"))
 
@@ -70,9 +66,7 @@ class Command(BaseCommand):
         if csrf_middleware in settings.MIDDLEWARE:
             self.stdout.write(self.style.SUCCESS(f"  ✅ {csrf_middleware} está activo"))
         else:
-            self.stdout.write(
-                self.style.ERROR(f"  ❌ {csrf_middleware} NO está en MIDDLEWARE")
-            )
+            self.stdout.write(self.style.ERROR(f"  ❌ {csrf_middleware} NO está en MIDDLEWARE"))
 
         # 5. Recomendaciones
         self.stdout.write("")
@@ -87,13 +81,9 @@ class Command(BaseCommand):
             self.stdout.write(self.style.WARNING("🐛 Para DEBUG=True:"))
             self.stdout.write("  - Verifica que estés usando http://127.0.0.1:8000")
             self.stdout.write("  - No uses https:// en desarrollo")
-            self.stdout.write(
-                "  - Asegúrate de que CSRF_TRUSTED_ORIGINS incluya tu URL"
-            )
+            self.stdout.write("  - Asegúrate de que CSRF_TRUSTED_ORIGINS incluya tu URL")
 
         self.stdout.write("")
         self.stdout.write(
-            self.style.SUCCESS(
-                "✅ Limpieza completada. Reinicia el servidor y prueba nuevamente."
-            )
+            self.style.SUCCESS("✅ Limpieza completada. Reinicia el servidor y prueba nuevamente.")
         )

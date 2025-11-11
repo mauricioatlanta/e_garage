@@ -14,9 +14,7 @@ class Command(BaseCommand):
         self.stdout.write("🔧 Arreglando CSRF_TRUSTED_ORIGINS...")
 
         # Mostrar configuración actual
-        self.stdout.write(
-            f"📝 CSRF_TRUSTED_ORIGINS actual: {settings.CSRF_TRUSTED_ORIGINS}"
-        )
+        self.stdout.write(f"📝 CSRF_TRUSTED_ORIGINS actual: {settings.CSRF_TRUSTED_ORIGINS}")
         self.stdout.write(f"📝 DEBUG: {settings.DEBUG}")
 
         # Modificar directamente las configuraciones
@@ -43,8 +41,6 @@ class Command(BaseCommand):
             )
 
         # Verificar que se aplicó
-        self.stdout.write(
-            f"🔍 CSRF_TRUSTED_ORIGINS después: {settings.CSRF_TRUSTED_ORIGINS}"
-        )
+        self.stdout.write(f"🔍 CSRF_TRUSTED_ORIGINS después: {settings.CSRF_TRUSTED_ORIGINS}")
 
         self.stdout.write("✅ Configuración aplicada. Ahora puedes probar el login.")

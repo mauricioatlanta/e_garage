@@ -86,9 +86,7 @@ def verificar_taller2():
                         print(f"        - Repuesto: {rep.nombre} (${rep.precio:,.0f})")
                 if servicios.exists():
                     for serv in servicios[:3]:
-                        print(
-                            f"        - Servicio: {serv.nombre} (${serv.precio:,.0f})"
-                        )
+                        print(f"        - Servicio: {serv.nombre} (${serv.precio:,.0f})")
                 print()
 
         # 4. Verificar último documento con problemas

@@ -57,6 +57,4 @@ if __name__ == "__main__":
 
     print("\n" + "=" * 50)
     print("🎯 Verificación completada")
-    print(
-        "✅ Si todos los endpoints muestran 200 o 302, el sistema funciona correctamente"
-    )
+    print("✅ Si todos los endpoints muestran 200 o 302, el sistema funciona correctamente")

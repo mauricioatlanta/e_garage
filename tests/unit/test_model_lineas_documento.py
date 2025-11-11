@@ -42,9 +42,7 @@ class ModelLineasDocumentoTest(TestCase):
         from taller.models.empresa import Empresa
         from taller.models.lineas_documento import LineaServicio
 
-        user = User.objects.create_user(
-            username="testuser_servicio", password="testpass"
-        )
+        user = User.objects.create_user(username="testuser_servicio", password="testpass")
         emp = Empresa.objects.create(nombre_taller="Test SA", pais="CL", user=user)
         cli = Cliente.objects.create(empresa=emp, nombre="Cliente Test")
         doc = Documento.objects.create(
@@ -122,9 +120,7 @@ class ModelLineasDocumentoTest(TestCase):
         from taller.models.empresa import Empresa
         from taller.models.lineas_documento import LineaServicio
 
-        user = User.objects.create_user(
-            username="testuser_str_serv", password="testpass"
-        )
+        user = User.objects.create_user(username="testuser_str_serv", password="testpass")
         emp = Empresa.objects.create(nombre_taller="Test SA", pais="CL", user=user)
         cli = Cliente.objects.create(empresa=emp, nombre="Cliente Test")
         doc = Documento.objects.create(

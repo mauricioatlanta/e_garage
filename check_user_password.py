@@ -32,9 +32,7 @@ try:
             print(f"❌ Contraseña incorrecta: {password}")
 
     # Si ninguna contraseña funciona, crear una nueva
-    if not any(
-        authenticate(username="testuser_usa", password=p) for p in passwords_to_try
-    ):
+    if not any(authenticate(username="testuser_usa", password=p) for p in passwords_to_try):
         print("\n=== CREANDO NUEVA CONTRASEÑA ===")
         user.set_password("testpass123")
         user.save()

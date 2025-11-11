@@ -7,9 +7,7 @@ def bienvenida_usa(request):
     # El usuario puede cambiar idioma con el selector
 
     # Debug: ver TODO lo que hay en la sesión
-    print(
-        f"[DEBUG] bienvenida_usa - TODAS las claves de sesión: {list(request.session.keys())}"
-    )
+    print(f"[DEBUG] bienvenida_usa - TODAS las claves de sesión: {list(request.session.keys())}")
     print(f"[DEBUG] bienvenida_usa - Sesión completa: {dict(request.session)}")
 
     # Detectar idioma preferido del usuario

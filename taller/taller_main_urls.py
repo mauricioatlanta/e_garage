@@ -104,9 +104,7 @@ urlpatterns = [
         name="ajax-vehiculos-por-cliente",
     ),
     path("dashboard/", dashboard, name="dashboard"),
-    path(
-        "centro-operaciones/", dashboard_centro_operaciones, name="centro_operaciones"
-    ),
+    path("centro-operaciones/", dashboard_centro_operaciones, name="centro_operaciones"),
     path(
         "centro-operaciones-espacial/",
         dashboard_centro_operaciones_espacial,
@@ -117,9 +115,7 @@ urlpatterns = [
     path("suscripcion-bloqueada/", suscripcion_bloqueada, name="suscripcion_bloqueada"),
     path("debug-autocomplete/", debug_cliente_autocomplete, name="debug_autocomplete"),
     path("configuracion/", configuracion_empresa, name="configuracion"),
-    path(
-        "configuracion/tecnicos/", configuracion_tecnicos, name="configuracion_tecnicos"
-    ),
+    path("configuracion/tecnicos/", configuracion_tecnicos, name="configuracion_tecnicos"),
     # === CONFIGURACIÓN DE EMPRESA Y BRANDING ===
     path("settings/", company_settings_view, name="company_settings"),
     # Comentado temporalmente - módulo no existe
@@ -147,9 +143,7 @@ urlpatterns = [
     #     name="test_service_search",
     # ),
     # Módulos del sistema
-    path(
-        "clientes/", include(("taller.clientes.urls", "clientes"), namespace="clientes")
-    ),
+    path("clientes/", include(("taller.clientes.urls", "clientes"), namespace="clientes")),
     path(
         "vehiculos/",
         include(("taller.vehiculos.urls", "vehiculos"), namespace="vehiculos"),
@@ -162,12 +156,8 @@ urlpatterns = [
         "repuestos/",
         include(("taller.repuestos.urls", "repuestos"), namespace="repuestos"),
     ),
-    path(
-        "reportes/", include(("taller.reportes.urls", "reportes"), namespace="reportes")
-    ),
-    path(
-        "tecnicos/", include(("taller.tecnicos.urls", "tecnicos"), namespace="tecnicos")
-    ),
+    path("reportes/", include(("taller.reportes.urls", "reportes"), namespace="reportes")),
+    path("tecnicos/", include(("taller.tecnicos.urls", "tecnicos"), namespace="tecnicos")),
     path(
         "business-intelligence/",
         include("taller.business_intelligence_urls", namespace="business_intelligence"),
@@ -233,9 +223,7 @@ us_patterns = [
         api_calcular_impuestos_usa,
         name="api_calcular_impuestos",
     ),
-    path(
-        "api/traducir-servicios/", api_traducir_servicios, name="api_traducir_servicios"
-    ),
+    path("api/traducir-servicios/", api_traducir_servicios, name="api_traducir_servicios"),
     # APIs del catálogo de vehículos
     path("api/catalogo/marcas/", api_marcas, name="api_catalogo_marcas"),
     path("api/catalogo/modelos/", api_modelos, name="api_catalogo_modelos"),

@@ -42,9 +42,7 @@ def test_force_english_usa_middleware_smoke():
             ), f"Invalid response for {description}"
         except Exception as e:
             # If it crashes, that's a bug we want to catch
-            pytest.fail(
-                f"force_english_usa middleware crashed on {accept_language}: {e}"
-            )
+            pytest.fail(f"force_english_usa middleware crashed on {accept_language}: {e}")
 
 
 @pytest.mark.django_db
@@ -130,9 +128,7 @@ def test_language_middleware_with_user_context():
                 ), f"Invalid response from {middleware_name} for {description}"
         except Exception as e:
             # If it crashes, that's a bug we want to catch
-            pytest.fail(
-                f"Language middleware crashed on {accept_language} with user: {e}"
-            )
+            pytest.fail(f"Language middleware crashed on {accept_language} with user: {e}")
 
 
 @pytest.mark.django_db

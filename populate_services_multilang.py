@@ -30,9 +30,7 @@ def create_categories_and_services():
     print("🏗️ Creando categorías de servicios...")
 
     # === CATEGORÍAS PARA CHILE ===
-    cat_motor_cl = CategoriaServicio.objects.create(
-        country="CL", code="motor_transmission"
-    )
+    cat_motor_cl = CategoriaServicio.objects.create(country="CL", code="motor_transmission")
     CategoriaServicioName.objects.create(
         categoria=cat_motor_cl,
         language="es",
@@ -48,9 +46,7 @@ def create_categories_and_services():
         is_default=True,
     )
 
-    cat_frenos_cl = CategoriaServicio.objects.create(
-        country="CL", code="brakes_suspension"
-    )
+    cat_frenos_cl = CategoriaServicio.objects.create(country="CL", code="brakes_suspension")
     CategoriaServicioName.objects.create(
         categoria=cat_frenos_cl,
         language="es",
@@ -67,9 +63,7 @@ def create_categories_and_services():
     )
 
     # === CATEGORÍAS PARA USA ===
-    cat_motor_us = CategoriaServicio.objects.create(
-        country="US", code="engine_transmission"
-    )
+    cat_motor_us = CategoriaServicio.objects.create(country="US", code="engine_transmission")
     CategoriaServicioName.objects.create(
         categoria=cat_motor_us,
         language="en",
@@ -240,12 +234,8 @@ def create_categories_and_services():
     print("\n📊 RESUMEN DE DATOS CREADOS:")
     print(f"  Categorías CL: {CategoriaServicio.objects.filter(country='CL').count()}")
     print(f"  Categorías US: {CategoriaServicio.objects.filter(country='US').count()}")
-    print(
-        f"  Subcategorías CL: {SubcategoriaServicio.objects.filter(country='CL').count()}"
-    )
-    print(
-        f"  Subcategorías US: {SubcategoriaServicio.objects.filter(country='US').count()}"
-    )
+    print(f"  Subcategorías CL: {SubcategoriaServicio.objects.filter(country='CL').count()}")
+    print(f"  Subcategorías US: {SubcategoriaServicio.objects.filter(country='US').count()}")
     print(f"  Servicios CL: {Servicio.objects.filter(country='CL').count()}")
     print(f"  Servicios US: {Servicio.objects.filter(country='US').count()}")
     print(f"  Nombres de servicios: {ServicioName.objects.count()}")

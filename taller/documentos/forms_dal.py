@@ -25,9 +25,7 @@ class DocumentoFormDAL(forms.ModelForm):
             ),
             "vehiculo": autocomplete.ModelSelect2(
                 url="",  # Se establecerá dinámicamente
-                forward=[
-                    "cliente"
-                ],  # <- Clave: filtra el listado por el cliente seleccionado
+                forward=["cliente"],  # <- Clave: filtra el listado por el cliente seleccionado
                 attrs={"data-placeholder": "Buscar vehículo del cliente..."},
             ),
             "tecnico_responsable": autocomplete.ModelSelect2(
@@ -43,12 +41,8 @@ class DocumentoFormDAL(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         # Configurar URLs de autocompletado dinámicamente
-        self.fields["cliente"].widget.url = get_autocomplete_url(
-            self.country, "cliente"
-        )
-        self.fields["vehiculo"].widget.url = get_autocomplete_url(
-            self.country, "vehiculo"
-        )
+        self.fields["cliente"].widget.url = get_autocomplete_url(self.country, "cliente")
+        self.fields["vehiculo"].widget.url = get_autocomplete_url(self.country, "vehiculo")
         self.fields["tecnico_responsable"].widget.url = get_autocomplete_url(
             self.country, "tecnico"
         )

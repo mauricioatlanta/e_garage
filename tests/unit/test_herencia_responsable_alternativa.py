@@ -45,12 +45,8 @@ def test_herencia_documento_con_tecnico_linea_sin_tecnico():
     User = get_user_model()
     user = User.objects.create_user(username="test_herencia_alt1", password="test")
 
-    empresa = Empresa.objects.create(
-        user=user, nombre_taller="Test Herencia Alt1", pais="CL"
-    )
-    cliente = Cliente.objects.create(
-        empresa=empresa, nombre="Test Client", tax_id="1-9"
-    )
+    empresa = Empresa.objects.create(user=user, nombre_taller="Test Herencia Alt1", pais="CL")
+    cliente = Cliente.objects.create(empresa=empresa, nombre="Test Client", tax_id="1-9")
     vehiculo = Vehiculo.objects.create(
         empresa=empresa,
         cliente=cliente,
@@ -59,9 +55,7 @@ def test_herencia_documento_con_tecnico_linea_sin_tecnico():
         modelo_texto="Model",
         anio=2024,
     )
-    tecnico_doc = Tecnico.objects.create(
-        empresa=empresa, nombre="Tecnico Doc", activo=True
-    )
+    tecnico_doc = Tecnico.objects.create(empresa=empresa, nombre="Tecnico Doc", activo=True)
 
     c = Client()
     c.force_login(user)
@@ -125,12 +119,8 @@ def test_herencia_documento_con_tecnico_linea_con_tecnico_diferente():
     User = get_user_model()
     user = User.objects.create_user(username="test_herencia_alt2", password="test")
 
-    empresa = Empresa.objects.create(
-        user=user, nombre_taller="Test Herencia Alt2", pais="CL"
-    )
-    cliente = Cliente.objects.create(
-        empresa=empresa, nombre="Test Client", tax_id="1-9"
-    )
+    empresa = Empresa.objects.create(user=user, nombre_taller="Test Herencia Alt2", pais="CL")
+    cliente = Cliente.objects.create(empresa=empresa, nombre="Test Client", tax_id="1-9")
     vehiculo = Vehiculo.objects.create(
         empresa=empresa,
         cliente=cliente,
@@ -139,12 +129,8 @@ def test_herencia_documento_con_tecnico_linea_con_tecnico_diferente():
         modelo_texto="Model",
         anio=2024,
     )
-    tecnico_doc = Tecnico.objects.create(
-        empresa=empresa, nombre="Tecnico Doc", activo=True
-    )
-    tecnico_linea = Tecnico.objects.create(
-        empresa=empresa, nombre="Tecnico Linea", activo=True
-    )
+    tecnico_doc = Tecnico.objects.create(empresa=empresa, nombre="Tecnico Doc", activo=True)
+    tecnico_linea = Tecnico.objects.create(empresa=empresa, nombre="Tecnico Linea", activo=True)
 
     c = Client()
     c.force_login(user)
@@ -208,12 +194,8 @@ def test_herencia_documento_sin_tecnico_linea_con_tecnico():
     User = get_user_model()
     user = User.objects.create_user(username="test_herencia_alt3", password="test")
 
-    empresa = Empresa.objects.create(
-        user=user, nombre_taller="Test Herencia Alt3", pais="CL"
-    )
-    cliente = Cliente.objects.create(
-        empresa=empresa, nombre="Test Client", tax_id="1-9"
-    )
+    empresa = Empresa.objects.create(user=user, nombre_taller="Test Herencia Alt3", pais="CL")
+    cliente = Cliente.objects.create(empresa=empresa, nombre="Test Client", tax_id="1-9")
     vehiculo = Vehiculo.objects.create(
         empresa=empresa,
         cliente=cliente,
@@ -222,9 +204,7 @@ def test_herencia_documento_sin_tecnico_linea_con_tecnico():
         modelo_texto="Model",
         anio=2024,
     )
-    tecnico_linea = Tecnico.objects.create(
-        empresa=empresa, nombre="Tecnico Linea", activo=True
-    )
+    tecnico_linea = Tecnico.objects.create(empresa=empresa, nombre="Tecnico Linea", activo=True)
 
     c = Client()
     c.force_login(user)
@@ -262,9 +242,7 @@ def test_herencia_documento_sin_tecnico_linea_con_tecnico():
         linea = LineaServicio.objects.filter(documento=documento).first()
 
         # Document should have no tecnico
-        assert (
-            documento.tecnico_responsable is None
-        ), "Document should have no tecnico_responsable"
+        assert documento.tecnico_responsable is None, "Document should have no tecnico_responsable"
 
         # Line should have its own tecnico
         assert (
@@ -288,12 +266,8 @@ def test_herencia_mixta_multiple_lineas():
     User = get_user_model()
     user = User.objects.create_user(username="test_herencia_mixta", password="test")
 
-    empresa = Empresa.objects.create(
-        user=user, nombre_taller="Test Herencia Mixta", pais="CL"
-    )
-    cliente = Cliente.objects.create(
-        empresa=empresa, nombre="Test Client", tax_id="1-9"
-    )
+    empresa = Empresa.objects.create(user=user, nombre_taller="Test Herencia Mixta", pais="CL")
+    cliente = Cliente.objects.create(empresa=empresa, nombre="Test Client", tax_id="1-9")
     vehiculo = Vehiculo.objects.create(
         empresa=empresa,
         cliente=cliente,
@@ -302,15 +276,9 @@ def test_herencia_mixta_multiple_lineas():
         modelo_texto="Model",
         anio=2024,
     )
-    tecnico_doc = Tecnico.objects.create(
-        empresa=empresa, nombre="Tecnico Doc", activo=True
-    )
-    tecnico_linea1 = Tecnico.objects.create(
-        empresa=empresa, nombre="Tecnico Linea1", activo=True
-    )
-    tecnico_linea2 = Tecnico.objects.create(
-        empresa=empresa, nombre="Tecnico Linea2", activo=True
-    )
+    tecnico_doc = Tecnico.objects.create(empresa=empresa, nombre="Tecnico Doc", activo=True)
+    tecnico_linea1 = Tecnico.objects.create(empresa=empresa, nombre="Tecnico Linea1", activo=True)
+    tecnico_linea2 = Tecnico.objects.create(empresa=empresa, nombre="Tecnico Linea2", activo=True)
 
     c = Client()
     c.force_login(user)
@@ -377,12 +345,8 @@ def test_herencia_mixta_multiple_lineas():
         ), "Document should have its tecnico_responsable"
 
         # Get all lines
-        lineas_servicio = LineaServicio.objects.filter(documento=documento).order_by(
-            "id"
-        )
-        lineas_repuesto = LineaRepuesto.objects.filter(documento=documento).order_by(
-            "id"
-        )
+        lineas_servicio = LineaServicio.objects.filter(documento=documento).order_by("id")
+        lineas_repuesto = LineaRepuesto.objects.filter(documento=documento).order_by("id")
 
         # First service line should inherit from document
         assert (

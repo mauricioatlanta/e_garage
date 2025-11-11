@@ -13,9 +13,7 @@ class TallerRegion(models.Model):
 
 class TallerCiudad(models.Model):
     nombre = models.CharField(max_length=100)
-    region = models.ForeignKey(
-        TallerRegion, on_delete=models.CASCADE, related_name="ciudades"
-    )
+    region = models.ForeignKey(TallerRegion, on_delete=models.CASCADE, related_name="ciudades")
 
     class Meta:
         db_table = "taller_ciudad"

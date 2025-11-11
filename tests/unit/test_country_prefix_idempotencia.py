@@ -13,6 +13,4 @@ def test_cl_no_redirige_y_us_si(client):
     r2 = client.get("/us/documentos/api/create/?next=/us/vehiculos/")
     assert r2.status_code in (302, 405)
     if r2.status_code == 302:
-        assert r2.headers["Location"].endswith(
-            "/cl/documentos/api/create/?next=/us/vehiculos/"
-        )
+        assert r2.headers["Location"].endswith("/cl/documentos/api/create/?next=/us/vehiculos/")

@@ -13,9 +13,7 @@ def api_servicios_por_categoria(request):
     """
     servicios_data = []
 
-    for categoria in CategoriaServicio.objects.all().prefetch_related(
-        "subcategorias__servicios"
-    ):
+    for categoria in CategoriaServicio.objects.all().prefetch_related("subcategorias__servicios"):
         categoria_data = {
             "id": categoria.pk,
             "nombre": categoria.get_label("es"),

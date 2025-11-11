@@ -38,9 +38,7 @@ def test_moneda_edge_cases():
             assert isinstance(
                 result, expected_type
             ), f"Failed for {description}: expected {expected_type}, got {type(result)}"
-            assert (
-                result is not None
-            ), f"Failed for {description}: result should not be None"
+            assert result is not None, f"Failed for {description}: result should not be None"
             # Should not raise exception
         except Exception as e:
             pytest.fail(
@@ -126,15 +124,11 @@ def test_qs_tools_edge_cases():
         try:
             if operation == "filter" and "qs_filter" in locals():
                 result = qs_filter(qs_input, "test")
-                assert (
-                    result is not None
-                ), f"qs_filter result should not be None for {description}"
+                assert result is not None, f"qs_filter result should not be None for {description}"
 
             if operation == "exclude" and "qs_exclude" in locals():
                 result = qs_exclude(qs_input, "test")
-                assert (
-                    result is not None
-                ), f"qs_exclude result should not be None for {description}"
+                assert result is not None, f"qs_exclude result should not be None for {description}"
 
         except Exception as e:
             pytest.fail(
@@ -171,9 +165,7 @@ def test_simple_i18n_edge_cases():
             # Test translate if it exists
             if "translate" in locals():
                 result = translate(text_input, locale_input)
-                assert (
-                    result is not None
-                ), f"translate result should not be None for {description}"
+                assert result is not None, f"translate result should not be None for {description}"
 
             # Test format_locale if it exists
             if "format_locale" in locals():
@@ -266,27 +258,19 @@ def test_math_filters_edge_cases():
         try:
             if operation == "add" and "add" in locals():
                 result = add(a, b)
-                assert (
-                    result is not None
-                ), f"add result should not be None for {description}"
+                assert result is not None, f"add result should not be None for {description}"
 
             if operation == "subtract" and "subtract" in locals():
                 result = subtract(a, b)
-                assert (
-                    result is not None
-                ), f"subtract result should not be None for {description}"
+                assert result is not None, f"subtract result should not be None for {description}"
 
             if operation == "multiply" and "multiply" in locals():
                 result = multiply(a, b)
-                assert (
-                    result is not None
-                ), f"multiply result should not be None for {description}"
+                assert result is not None, f"multiply result should not be None for {description}"
 
             if operation == "divide" and "divide" in locals():
                 result = divide(a, b)
-                assert (
-                    result is not None
-                ), f"divide result should not be None for {description}"
+                assert result is not None, f"divide result should not be None for {description}"
 
         except Exception as e:
             # Division by zero might be expected to raise an exception

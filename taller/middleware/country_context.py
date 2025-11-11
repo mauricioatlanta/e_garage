@@ -115,9 +115,7 @@ class CountryContextMiddleware(MiddlewareMixin):
         request._country_source = (
             "url"
             if url_country
-            else (
-                "subdomain" if subd_country else ("user" if user_country else "default")
-            )
+            else ("subdomain" if subd_country else ("user" if user_country else "default"))
         )
 
         # ----- Conflicto URL vs empresa -----
@@ -142,16 +140,12 @@ class CountryContextMiddleware(MiddlewareMixin):
             canonical = COUNTRY_PREFIX[LEGACY_TO_COUNTRY[url_prefix]]
             # Evitar bucles: si ya estamos en la ruta canónica, no hacer nada
             if not path.startswith(canonical + "/") and path != canonical:
-                new_url = self._swap_prefix(
-                    path, from_prefix=url_prefix, to_prefix=canonical
-                )
+                new_url = self._swap_prefix(path, from_prefix=url_prefix, to_prefix=canonical)
                 if request.GET:
                     new_url += "?" + request.GET.urlencode()
 
                 if getattr(settings, "DEBUG", False):
-                    print(
-                        f"🔄 Canonical Redirect: {path} → {new_url} ({url_prefix} → {canonical})"
-                    )
+                    print(f"🔄 Canonical Redirect: {path} → {new_url} ({url_prefix} → {canonical})")
 
                 # 301 (permanente) para SEO
                 resp = HttpResponseRedirect(new_url)
@@ -160,9 +154,7 @@ class CountryContextMiddleware(MiddlewareMixin):
 
         # Debug temporal
         if getattr(settings, "DEBUG", False):
-            print(
-                f"🌍 CountryContext: {country} (source: {request._country_source}, path: {path})"
-            )
+            print(f"🌍 CountryContext: {country} (source: {request._country_source}, path: {path})")
 
         return None
 
@@ -255,9 +247,7 @@ class CountryContextMiddleware(MiddlewareMixin):
     # Helpers de Redirección
     # =========================
 
-    def _redirect_conflict(
-        self, request, from_country: str, to_country: str, code: int = 302
-    ):
+    def _redirect_conflict(self, request, from_country: str, to_country: str, code: int = 302):
         """
         Maneja conflictos entre país de URL y país de empresa.
 
@@ -380,9 +370,7 @@ class LanguageContextMiddleware(MiddlewareMixin):
             return None
 
         try:
-            if hasattr(request.user, "perfil") and hasattr(
-                request.user.perfil, "idioma_preferido"
-            ):
+            if hasattr(request.user, "perfil") and hasattr(request.user.perfil, "idioma_preferido"):
                 return request.user.perfil.idioma_preferido
         except AttributeError:
             pass

@@ -9,12 +9,10 @@ def redondear(valor):
 
 def totales_chile(lineas_repuesto, lineas_servicio):
     subtotal_rep = (
-        sum((lr.cantidad * lr.precio_unitario - lr.descuento) for lr in lineas_repuesto)
-        or 0
+        sum((lr.cantidad * lr.precio_unitario - lr.descuento) for lr in lineas_repuesto) or 0
     )
     subtotal_ser = (
-        sum((ls.cantidad * ls.precio_unitario - ls.descuento) for ls in lineas_servicio)
-        or 0
+        sum((ls.cantidad * ls.precio_unitario - ls.descuento) for ls in lineas_servicio) or 0
     )
 
     subtotal_rep = Decimal(subtotal_rep)

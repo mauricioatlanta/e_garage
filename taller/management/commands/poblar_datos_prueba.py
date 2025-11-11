@@ -35,14 +35,10 @@ class Command(BaseCommand):
         ciudad, _ = TallerCiudad.objects.get_or_create(nombre="Miami", region=region)
 
         # Buscar o crear tienda
-        tienda, _ = Tienda.objects.get_or_create(
-            empresa=empresa, nombre="Tienda Central"
-        )
+        tienda, _ = Tienda.objects.get_or_create(empresa=empresa, nombre="Tienda Central")
 
         # Buscar o crear técnico
-        tecnico, _ = Tecnico.objects.get_or_create(
-            empresa=empresa, nombre="John Mechanic"
-        )
+        tecnico, _ = Tecnico.objects.get_or_create(empresa=empresa, nombre="John Mechanic")
 
         # Buscar o crear repuestos base
         repuestos = []
@@ -96,9 +92,7 @@ class Command(BaseCommand):
         from taller.models.modelo import Modelo
 
         marca, _ = Marca.objects.get_or_create(nombre="Ford", country="US")
-        modelo, _ = Modelo.objects.get_or_create(
-            nombre="Focus", marca=marca, country="US"
-        )
+        modelo, _ = Modelo.objects.get_or_create(nombre="Focus", marca=marca, country="US")
         autos = {}
         for idx, cliente in enumerate(clientes):
             autos[cliente.id] = []
@@ -158,6 +152,4 @@ class Command(BaseCommand):
                         costo_interno=30,
                         precio_cliente=50,
                     )
-        self.stdout.write(
-            self.style.SUCCESS("Datos de prueba generados correctamente.")
-        )
+        self.stdout.write(self.style.SUCCESS("Datos de prueba generados correctamente."))

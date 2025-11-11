@@ -55,9 +55,7 @@ def dashboard_realtime_metrics(request):
         nuevos_trials = TrialRegistro.objects.filter(fecha_inicio__date=hoy).count()
 
         # Actividad última hora (usuarios que hicieron login)
-        actividad_reciente = Usuario.objects.filter(
-            last_login__gte=hace_una_hora
-        ).count()
+        actividad_reciente = Usuario.objects.filter(last_login__gte=hace_una_hora).count()
 
         # Alertas urgentes (suscripciones que expiran en menos de 3 días)
         alertas_urgentes = Empresa.objects.filter(
@@ -109,9 +107,7 @@ def dashboard_predictive_analytics(request):
 
         for i in range(6):
             inicio_mes = (timezone.now() - timedelta(days=30 * i)).replace(day=1)
-            fin_mes = (inicio_mes + timedelta(days=31)).replace(day=1) - timedelta(
-                days=1
-            )
+            fin_mes = (inicio_mes + timedelta(days=31)).replace(day=1) - timedelta(days=1)
 
             suscriptores_mes = Empresa.objects.filter(
                 fecha_registro__date__range=[inicio_mes.date(), fin_mes.date()],
@@ -127,11 +123,7 @@ def dashboard_predictive_analytics(request):
             tendencia = (datos_historicos[-1] - datos_historicos[-3]) / 2
             prediccion = max(0, int(promedio_ultimos_3 + tendencia))
         else:
-            prediccion = (
-                sum(datos_historicos) // len(datos_historicos)
-                if datos_historicos
-                else 0
-            )
+            prediccion = sum(datos_historicos) // len(datos_historicos) if datos_historicos else 0
 
         # Calcular porcentaje de crecimiento
         if len(datos_historicos) >= 2:
@@ -160,9 +152,7 @@ def dashboard_predictive_analytics(request):
             insights.append("Tendencia negativa. Revisar estrategias de retención.")
 
         if prediccion > datos_historicos[-1] * 1.2:
-            insights.append(
-                "Se proyecta un mes excepcional. Preparar campañas de bienvenida."
-            )
+            insights.append("Se proyecta un mes excepcional. Preparar campañas de bienvenida.")
 
         if not insights:
             insights.append("Crecimiento estable. Mantener estrategias actuales.")
@@ -305,9 +295,7 @@ def dashboard_alertas_avanzadas(request):
         for empresa in empresas_por_vencer:
             dias_restantes = (empresa.fecha_expiracion - hoy).days
             gravedad = (
-                "critica"
-                if dias_restantes <= 2
-                else "alta" if dias_restantes <= 5 else "media"
+                "critica" if dias_restantes <= 2 else "alta" if dias_restantes <= 5 else "media"
             )
 
             alertas.append(
@@ -425,9 +413,7 @@ def dashboard_user_behavior(request):
         # Tasa de actividad
         total_usuarios = usuarios_activos + usuarios_inactivos
         tasa_actividad = (
-            round((usuarios_activos / total_usuarios * 100), 1)
-            if total_usuarios > 0
-            else 0
+            round((usuarios_activos / total_usuarios * 100), 1) if total_usuarios > 0 else 0
         )
 
         # Top usuarios más activos (últimos 30 días)
@@ -444,17 +430,13 @@ def dashboard_user_behavior(request):
                     "usuario": f"{usuario.first_name} {usuario.last_name}".strip()
                     or usuario.username,
                     "email": usuario.email,
-                    "empresa": (
-                        usuario.empresa.nombre if usuario.empresa else "Sin empresa"
-                    ),
+                    "empresa": (usuario.empresa.nombre if usuario.empresa else "Sin empresa"),
                     "ultimo_login": (
                         usuario.last_login.strftime("%d/%m/%Y %H:%M")
                         if usuario.last_login
                         else "Nunca"
                     ),
-                    "plan": (
-                        usuario.empresa.plan_suscripcion if usuario.empresa else "N/A"
-                    ),
+                    "plan": (usuario.empresa.plan_suscripcion if usuario.empresa else "N/A"),
                 }
             )
 
@@ -563,9 +545,7 @@ def dashboard_stats_general(request):
 
         # Ingresos (simulado basado en planes)
         ingresos_estimados = (
-            ComprobantePago.objects.filter(estado="aprobado").aggregate(
-                total=Sum("monto")
-            )["total"]
+            ComprobantePago.objects.filter(estado="aprobado").aggregate(total=Sum("monto"))["total"]
             or 0
         )
 
@@ -587,9 +567,7 @@ def dashboard_stats_general(request):
                     else 0
                 ),
                 "activacion": (
-                    round((empresas_activas / total_empresas * 100), 1)
-                    if total_empresas > 0
-                    else 0
+                    round((empresas_activas / total_empresas * 100), 1) if total_empresas > 0 else 0
                 ),
             },
             "crecimiento": {
