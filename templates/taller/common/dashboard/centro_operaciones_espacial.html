@@ -1,5 +1,5 @@
-{% load country_url %}
 {% extends 'base.html' %}
+{% load country_url %}
 {% load static %}
 {% load i18n %}
 
@@ -602,6 +602,23 @@ body {
 {% block content %}
 <div class="max-w-7xl mx-auto p-6">
 
+    <!-- 🎯 Cabecera corporativa -->
+    <div class="space-container mb-10 p-6 flex flex-col lg:flex-row items-center gap-6">
+        {% if company_logo_url %}
+        <div class="p-4 rounded-2xl border border-cyan-400 bg-white/5 backdrop-blur">
+            <img src="{{ company_logo_url }}" alt="{{ company_name|default:empresa.nombre_taller }}" class="h-20 w-auto object-contain">
+        </div>
+        {% endif %}
+        <div class="text-center lg:text-left">
+            <div class="text-xs uppercase tracking-[0.5em] text-cyan-300">🛰️ {% trans "Centro de Operaciones" %}</div>
+            <h1 class="text-3xl md:text-4xl font-black text-white mt-2">
+                {{ company_name|default:empresa.nombre_taller }}
+            </h1>
+            <p class="text-cyan-200 mt-1 text-lg">
+                {{ company_tagline|default:empresa.lema|default:_("Control total para tu flota estelar") }}
+            </p>
+        </div>
+    </div>
 
     <!-- 🚀 Panel de Comandos -->
     <div class="space-container p-6">

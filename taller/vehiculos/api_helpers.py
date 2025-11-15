@@ -71,7 +71,7 @@ def get_user_scope(request):
     Obtiene empresa y país del usuario autenticado.
 
     Returns:
-        tuple: (empresa, pais) donde pais es "CL" o "US"
+        tuple: (empresa, pais) donde pais es "CL", "US" o "MX"
 
     Uso:
         empresa, pais = get_user_scope(request)
@@ -82,7 +82,7 @@ def get_user_scope(request):
     empresa = getattr(request.user, "empresa", None)
     raw_pais = getattr(empresa, "pais", None) or getattr(request, "country", None) or "CL"
     pais = str(raw_pais).strip().upper()
-    pais = pais if pais in ("CL", "US") else "CL"
+    pais = pais if pais in ("CL", "US", "MX") else "CL"
     return empresa, pais
 
 

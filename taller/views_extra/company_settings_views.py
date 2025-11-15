@@ -12,6 +12,7 @@ from taller.forms.company_settings_forms import (
 from taller.models import Tecnico
 from taller.models.company_settings import CompanySettings
 from taller.utils.empresa import get_or_create_empresa  # tu helper
+from taller.utils.pais_utils import get_configuracion_pais
 
 
 @login_required(login_url=None)  # usa tu LOGIN_URL global
@@ -23,13 +24,14 @@ def company_settings_view(request):
         config = CompanySettings.objects.get(user=request.user)
     except CompanySettings.DoesNotExist:
         # Crear configuración nueva si no existe
+        country_config = get_configuracion_pais(empresa)
         config = CompanySettings.objects.create(
             user=request.user,
             company_name=empresa.nombre_taller or "Mi Empresa",
             tagline="",
             primary_color="#0d6efd",
             secondary_color="#6c757d",
-            currency="CLP" if empresa.pais == "CL" else "USD",
+            currency=country_config.get("moneda", "CLP"),
         )
 
     if request.method == "POST":
@@ -49,18 +51,18 @@ def company_settings_view(request):
                         empresa=empresa,
                         activo=True,
                     )
-                    # Mensaje en español para Chile, inglés para USA
-                    if empresa.pais == "CL":
+                    is_spanish = empresa.pais in {"CL", "MX", "PE", "VE", "BR"}
+                    if is_spanish:
                         messages.success(request, f"✅ Técnico '{nombre}' creado exitosamente.")
                     else:
                         messages.success(request, f"✅ Technician '{nombre}' created successfully.")
                 except Exception as e:
-                    if empresa.pais == "CL":
+                    if is_spanish:
                         messages.error(request, f"❌ Error al crear técnico: {str(e)}")
                     else:
                         messages.error(request, f"❌ Error creating technician: {str(e)}")
             else:
-                if empresa.pais == "CL":
+                if empresa.pais in {"CL", "MX", "PE", "VE", "BR"}:
                     messages.error(request, "❌ El nombre del técnico es obligatorio.")
                 else:
                     messages.error(request, "❌ Technician name is required.")
@@ -75,8 +77,8 @@ def company_settings_view(request):
                 tecnico.activo = not tecnico.activo
                 tecnico.save()
 
-                # Mensaje en español para Chile, inglés para USA
-                if empresa.pais == "CL":
+                is_spanish = empresa.pais in {"CL", "MX", "PE", "VE", "BR"}
+                if is_spanish:
                     estado = "activado" if tecnico.activo else "desactivado"
                     messages.success(
                         request, f"✅ Técnico '{tecnico.nombre}' {estado} exitosamente."
@@ -88,12 +90,12 @@ def company_settings_view(request):
                         f"✅ Technician '{tecnico.nombre}' {estado} successfully.",
                     )
             except Tecnico.DoesNotExist:
-                if empresa.pais == "CL":
+                if empresa.pais in {"CL", "MX", "PE", "VE", "BR"}:
                     messages.error(request, "❌ Técnico no encontrado.")
                 else:
                     messages.error(request, "❌ Technician not found.")
             except Exception as e:
-                if empresa.pais == "CL":
+                if empresa.pais in {"CL", "MX", "PE", "VE", "BR"}:
                     messages.error(request, f"❌ Error al actualizar técnico: {str(e)}")
                 else:
                     messages.error(request, f"❌ Error updating technician: {str(e)}")
@@ -126,7 +128,7 @@ def company_settings_view(request):
 
                     # Mensaje específico si se subió logo
                     if section == "profile" and "logo" in request.FILES:
-                        if empresa.pais == "CL":
+                        if empresa.pais in {"CL", "MX", "PE", "VE", "BR"}:
                             messages.success(
                                 request,
                                 "✅ ¡Logo subido exitosamente! Su logo ahora aparecerá en todas las páginas. Refresque las páginas abiertas para verlo.",
@@ -137,7 +139,7 @@ def company_settings_view(request):
                                 "✅ Logo uploaded successfully! Your logo will now appear across all pages. Refresh any open pages to see it.",
                             )
                     else:
-                        if empresa.pais == "CL":
+                        if empresa.pais in {"CL", "MX", "PE", "VE", "BR"}:
                             section_names = {
                                 "profile": "Perfil",
                                 "financial": "Financiera",
@@ -155,7 +157,7 @@ def company_settings_view(request):
                             )
                     return redirect(request.path)
                 except Exception as e:
-                    if empresa.pais == "CL":
+                    if empresa.pais in {"CL", "MX", "PE", "VE", "BR"}:
                         messages.error(request, f"❌ Error al guardar la configuración: {str(e)}")
                     else:
                         messages.error(request, f"❌ Error saving configuration: {str(e)}")
@@ -166,7 +168,7 @@ def company_settings_view(request):
                     for error in errors:
                         error_messages.append(f"{field}: {error}")
 
-                if empresa.pais == "CL":
+                if empresa.pais in {"CL", "MX", "PE", "VE", "BR"}:
                     messages.error(
                         request,
                         f"❌ Por favor revise los campos del formulario: {'; '.join(error_messages)}",
@@ -183,7 +185,7 @@ def company_settings_view(request):
     tecnicos = Tecnico.objects.filter(empresa=empresa).order_by("nombre")
 
     # Seleccionar el template apropiado según el país
-    if empresa.pais == "CL":
+    if empresa.pais in {"CL", "MX", "PE", "VE", "BR"}:
         template_name = "settings/company_settings_es.html"
     else:
         template_name = "settings/company_settings.html"

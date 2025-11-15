@@ -36,6 +36,7 @@ class CustomerForm(forms.ModelForm):
         choices=(
             ("CL", "Chile"),
             ("US", "USA"),
+            ("MX", "México"),
             ("BR", "Brasil"),
             ("PE", "Perú"),
             ("VE", "Venezuela"),
@@ -143,6 +144,7 @@ class CustomerForm(forms.ModelForm):
             tax_id_defaults = {
                 "CL": "CL_RUT",
                 "US": "US_EIN",
+                "MX": "MX_RFC",
                 "BR": "BR_CPF",
                 "PE": "PE_RUC",
                 "VE": "VE_RIF",
@@ -230,6 +232,7 @@ class CustomerAddressForm(forms.ModelForm):
         choices=(
             ("CL", "Chile"),
             ("US", "USA"),
+            ("MX", "México"),
             ("BR", "Brasil"),
             ("PE", "Perú"),
             ("VE", "Venezuela"),

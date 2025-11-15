@@ -238,3 +238,5 @@ Todo cambio pasa por Git, y tienes historial completo de todo.
 **Autor**: Tu equipo de desarrollo
 **Versión**: 1.0
 
+
+

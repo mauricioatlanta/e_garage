@@ -3,7 +3,7 @@ import re
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.files.storage import default_storage
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 from taller.models.empresa import Empresa
 from taller.models.perfil_usuario import PerfilUsuario
@@ -114,26 +114,16 @@ def configuracion_tecnicos(request):
         messages.info(request, "✅ Se ha creado un perfil básico para tu usuario.")
 
     if request.method == "POST":
-        if "action" in request.POST and request.POST["action"] == "add":
-            nombre = request.POST.get("nombre", "").strip()
-            apellido = request.POST.get("apellido", "").strip()
-            email = request.POST.get("email", "").strip()
+        if request.POST.get("action") == "add" or "crear_tecnico" in request.POST:
+            nombre_completo = request.POST.get("nombre", "").strip()
             telefono = request.POST.get("telefono", "").strip()
-            especialidad = request.POST.get("especialidad", "").strip()
-
-            # Combinar nombre y apellido
-            nombre_completo = f"{nombre} {apellido}".strip()
+            direccion = request.POST.get("direccion", "").strip()
 
             # Validar campos obligatorios
-            if not nombre or len(nombre.strip()) < 2:
+            if not nombre_completo or len(nombre_completo) < 2:
                 messages.error(
                     request,
                     "❌ El nombre del técnico debe tener al menos 2 caracteres.",
-                )
-            elif not apellido or len(apellido.strip()) < 2:
-                messages.error(
-                    request,
-                    "❌ El apellido del técnico debe tener al menos 2 caracteres.",
                 )
             elif not telefono or len(telefono.strip()) < 8:
                 messages.error(
@@ -155,7 +145,7 @@ def configuracion_tecnicos(request):
                     empresa=empresa,
                     nombre=nombre_completo,
                     telefono=telefono,
-                    direccion=especialidad,  # Usar especialidad como dirección
+                    direccion=direccion,
                     activo=True,
                 )
                 messages.success(request, f'✅ Técnico "{nombre_completo}" agregado exitosamente.')

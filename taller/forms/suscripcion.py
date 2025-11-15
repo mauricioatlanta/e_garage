@@ -20,7 +20,7 @@ class FormularioRegistro(forms.ModelForm):
         label="Plan",
     )
     pais = forms.ChoiceField(
-        choices=[("US", "United States"), ("CL", "Chile")],
+        choices=[("US", "United States"), ("CL", "Chile"), ("MX", "México")],
         initial="US",
         label="Country",
         help_text="Select your country to configure currency and regional settings",
@@ -46,6 +46,8 @@ class FormularioRegistro(forms.ModelForm):
                 data["pais"] = "US"
             elif "/cl/" in request.path:
                 data["pais"] = "CL"
+            elif "/mx/" in request.path:
+                data["pais"] = "MX"
             args = (data,) + args[1:]
 
         super().__init__(*args, **kwargs)
@@ -60,6 +62,9 @@ class FormularioRegistro(forms.ModelForm):
                 # Chile - forzar país a CL
                 self.fields["pais"].initial = "CL"
                 self.fields["pais"].widget = forms.HiddenInput()  # Ocultar el campo
+            elif "/mx/" in request.path:
+                self.fields["pais"].initial = "MX"
+                self.fields["pais"].widget = forms.HiddenInput()
 
         # El campo username se maneja completamente en el método save()
 

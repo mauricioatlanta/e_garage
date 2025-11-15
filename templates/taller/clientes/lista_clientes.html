@@ -99,6 +99,86 @@ input[type="text"]::placeholder {
   font-size: 14px;
 }
 
+.search-btn {
+  background: linear-gradient(135deg, #22d3ee 0%, #38bdf8 50%, #0ea5e9 100%);
+  color: #f8fafc;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  padding: 0.55rem 1.9rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(34, 211, 238, 0.65);
+  text-transform: uppercase;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  box-shadow: 0 12px 30px rgba(14, 165, 233, 0.35);
+}
+
+.search-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 38px rgba(14, 165, 233, 0.45);
+  filter: brightness(1.05);
+}
+
+.search-btn:active {
+  transform: translateY(0px);
+  box-shadow: 0 10px 24px rgba(14, 165, 233, 0.35);
+  filter: brightness(1);
+}
+
+.action-pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.45);
+}
+
+.action-pill span:first-child {
+  font-size: 0.95rem;
+}
+
+.action-pill.view {
+  background: linear-gradient(135deg, #22d3ee 0%, #0ea5e9 100%);
+  color: #f8fafc;
+  border-color: rgba(56, 189, 248, 0.7);
+  box-shadow: 0 12px 26px rgba(34, 211, 238, 0.45);
+}
+
+.action-pill.edit {
+  background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+  color: #ecfdf5;
+  border-color: rgba(74, 222, 128, 0.65);
+  box-shadow: 0 12px 26px rgba(16, 185, 129, 0.45);
+}
+
+.action-pill.delete {
+  background: linear-gradient(135deg, #fb7185 0%, #f43f5e 100%);
+  color: #f8fafc;
+  border-color: rgba(248, 113, 113, 0.7);
+  box-shadow: 0 12px 26px rgba(244, 63, 94, 0.45);
+}
+
+.action-pill:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.05);
+}
+
+.action-pill.delete:hover {
+  filter: brightness(1.1);
+}
+
+.action-pill:focus-visible {
+  outline: 2px solid #38bdf8;
+  outline-offset: 2px;
+}
+
 /* Estilos para el mosaico de clientes */
 .clientes-mosaico {
   display: grid;
@@ -482,31 +562,20 @@ input[type="text"]::placeholder {
         <div class="p-3 border-t border-gray-700/30 flex-shrink-0">
           <div class="flex justify-between space-x-1">
             {% country_url 'clientes:ver_cliente' cliente.id as url_ver %}
-            <a href="{{ url_ver }}"
-               class="flex-1 group/btn relative px-2 py-1.5 rounded-md bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border border-cyan-400/40 text-cyan-300 hover:from-cyan-500/30 hover:to-blue-500/30 hover:text-cyan-200 transition-all duration-200 text-xs font-medium text-center">
-              <span class="relative z-10 flex items-center justify-center space-x-1">
-                <span>👁️</span>
-                <span>Ver</span>
-              </span>
-              <div class="absolute inset-0 rounded-md bg-gradient-to-r from-cyan-600 to-blue-600 opacity-0 group-hover/btn:opacity-20 transition-opacity"></div>
+            <a href="{{ url_ver }}" class="flex-1 action-pill view">
+              <span>👁️</span>
+              <span>Ver</span>
             </a>
             {% country_url 'clientes:editar_cliente' cliente.id as url_editar %}
-            <a href="{{ url_editar }}"
-               class="flex-1 group/btn relative px-2 py-1.5 rounded-md bg-gradient-to-r from-emerald-600/20 to-green-600/20 border border-emerald-400/40 text-emerald-300 hover:from-emerald-500/30 hover:to-green-500/30 hover:text-emerald-200 transition-all duration-200 text-xs font-medium text-center">
-              <span class="relative z-10 flex items-center justify-center space-x-1">
-                <span>⚙️</span>
-                <span>Editar</span>
-              </span>
-              <div class="absolute inset-0 rounded-md bg-gradient-to-r from-emerald-600 to-green-600 opacity-0 group-hover/btn:opacity-20 transition-opacity"></div>
+            <a href="{{ url_editar }}" class="flex-1 action-pill edit">
+              <span>⚙️</span>
+              <span>Editar</span>
             </a>
             {% country_url 'clientes:eliminar_cliente' cliente.id as url_eliminar %}
             <button onclick="confirmarEliminacion({{ cliente.pk }}, '{{ cliente.nombre|escapejs }} {{ cliente.apellido|escapejs }}', '{{ url_eliminar }}')"
-                    class="flex-1 group/btn relative px-2 py-1.5 rounded-md bg-gradient-to-r from-red-600/20 to-pink-600/20 border border-red-400/40 text-red-300 hover:from-red-500/30 hover:to-pink-500/30 hover:text-red-200 transition-all duration-200 text-xs font-medium text-center">
-              <span class="relative z-10 flex items-center justify-center space-x-1">
-                <span>🗑️</span>
-                <span>Eliminar</span>
-              </span>
-              <div class="absolute inset-0 rounded-md bg-gradient-to-r from-red-600 to-pink-600 opacity-0 group-hover/btn:opacity-20 transition-opacity"></div>
+                    class="flex-1 action-pill delete" type="button">
+              <span>🗑️</span>
+              <span>Eliminar</span>
             </button>
           </div>
         </div>

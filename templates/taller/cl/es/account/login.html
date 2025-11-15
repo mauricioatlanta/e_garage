@@ -90,7 +90,7 @@ body {
     backdrop-filter: blur(30px);
     border-radius: 2rem;
     border: 2px solid rgba(0, 230, 255, 0.3);
-    box-shadow:
+    box-shadow: 
         0 20px 60px rgba(0, 230, 255, 0.2),
         inset 0 1px 0 rgba(255, 255, 255, 0.1);
     padding: 3rem 2.5rem;
@@ -134,11 +134,11 @@ body {
 }
 
 @keyframes pulse-glow {
-    0%, 100% {
+    0%, 100% { 
         filter: drop-shadow(0 0 30px rgba(0, 230, 255, 0.8));
         transform: scale(1);
     }
-    50% {
+    50% { 
         filter: drop-shadow(0 0 40px rgba(0, 230, 255, 1));
         transform: scale(1.02);
     }
@@ -382,11 +382,11 @@ body {
     .glass-card {
         padding: 2rem 1.5rem;
     }
-
+    
     .logo {
         height: 80px;
     }
-
+    
     .back-button {
         top: 1rem;
         left: 1rem;
@@ -428,12 +428,22 @@ body {
             </div>
             <div class="welcome-text">{% trans "Welcome back to" %}</div>
             <div class="subtitle-text font-futuristic">{% trans "Professional Automotive Management System" %}</div>
-
+            
             {% if request.country == 'CL' %}
             <div class="country-badge font-futuristic">🇨🇱 CHILE</div>
             {% elif request.country == 'US' %}
             <div class="country-badge font-futuristic">🇺🇸 UNITED STATES</div>
             {% endif %}
+            
+            <!-- Selector de País -->
+            <div class="mt-4 flex justify-center gap-2">
+                <a href="/accounts/login/?country=CL" class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all {% if request.country == 'CL' %}bg-cyan-500/20 border-2 border-cyan-400 text-cyan-300{% else %}bg-gray-800/50 border border-gray-600 text-gray-400 hover:border-gray-400{% endif %}">
+                    <span>🇨🇱</span> Chile
+                </a>
+                <a href="/accounts/login/?country=US" class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all {% if request.country == 'US' %}bg-blue-500/20 border-2 border-blue-400 text-blue-300{% else %}bg-gray-800/50 border border-gray-600 text-gray-400 hover:border-gray-400{% endif %}">
+                    <span>🇺🇸</span> USA
+                </a>
+            </div>
         </div>
 
         <!-- Mensajes de error generales -->
@@ -541,7 +551,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const card = document.querySelector('.glass-card');
     card.style.opacity = '0';
     card.style.transform = 'translateY(30px)';
-
+    
     setTimeout(() => {
         card.style.transition = 'all 0.8s ease-out';
         card.style.opacity = '1';

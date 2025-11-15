@@ -36,6 +36,8 @@ def logout_redirect_view(request):
             or "usa" in request.GET.get("country", "")
         ):
             country = "US"
+        elif path.startswith("/mx") or "mx" in request.GET.get("country", ""):
+            country = "MX"
 
     # PRIORIDAD 3: Detectar país por sesión
     if not country:
@@ -44,12 +46,16 @@ def logout_redirect_view(request):
             country = "US"
         elif session_country == "cl" or session_country == "chile":
             country = "CL"
+        elif session_country == "mx" or session_country == "mexico":
+            country = "MX"
 
     # Redirigir según el país detectado
     if country == "US":
         return redirect(reverse("usa:account_login"))
     elif country == "CL":
         return redirect(reverse("chile:account_login"))
+    elif country == "MX":
+        return redirect(reverse("mexico:account_login"))
     else:
         # FALLBACK: Redirigir a Chile por defecto
         return redirect(reverse("chile:account_login"))

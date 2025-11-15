@@ -10,12 +10,12 @@ def _resolve_country_from_request(request):
     # 1) middleware: request.empresa.pais
     empresa = getattr(request, "empresa", None)
     pais = getattr(empresa, "pais", None)
-    if pais in ("CL", "US"):
+    if pais in ("CL", "US", "MX"):
         return pais
     # 2) perfil: request.user.empresa.pais
     user_emp = getattr(getattr(request, "user", None), "empresa", None)
     pais = getattr(user_emp, "pais", None)
-    if pais in ("CL", "US"):
+    if pais in ("CL", "US", "MX"):
         return pais
     # 3) prefijo URL (seguro ante rutas /us/ o /cl/)
     path = (request.path or "").lower()
@@ -23,6 +23,8 @@ def _resolve_country_from_request(request):
         return "US"
     if path.startswith("/cl/"):
         return "CL"
+    if path.startswith("/mx/"):
+        return "MX"
     return None
 
 
@@ -34,7 +36,7 @@ class MarcaAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         if not self.request.user.is_authenticated:
             return Marca.objects.none()
-        if self.country not in ("CL", "US"):
+        if self.country not in ("CL", "US", "MX"):
             return Marca.objects.none()
         qs = Marca.objects.filter(country=self.country)
         if self.q:
@@ -50,7 +52,7 @@ class ModeloAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         if not self.request.user.is_authenticated:
             return Modelo.objects.none()
-        if self.country not in ("CL", "US"):
+        if self.country not in ("CL", "US", "MX"):
             return Modelo.objects.none()
         qs = Modelo.objects.filter(country=self.country)
 

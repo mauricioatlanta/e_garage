@@ -2,19 +2,58 @@
 Utilidades para manejo de países y localización
 """
 
+MEXICO_ESTADOS = [
+    ("AG", "Aguascalientes"),
+    ("BC", "Baja California"),
+    ("BS", "Baja California Sur"),
+    ("CM", "Campeche"),
+    ("CO", "Coahuila"),
+    ("CL", "Colima"),
+    ("CS", "Chiapas"),
+    ("CH", "Chihuahua"),
+    ("CX", "Ciudad de México"),
+    ("DG", "Durango"),
+    ("GT", "Guanajuato"),
+    ("GR", "Guerrero"),
+    ("HG", "Hidalgo"),
+    ("JA", "Jalisco"),
+    ("ME", "Estado de México"),
+    ("MI", "Michoacán"),
+    ("MO", "Morelos"),
+    ("NA", "Nayarit"),
+    ("NL", "Nuevo León"),
+    ("OA", "Oaxaca"),
+    ("PU", "Puebla"),
+    ("QE", "Querétaro"),
+    ("QR", "Quintana Roo"),
+    ("SL", "San Luis Potosí"),
+    ("SI", "Sinaloa"),
+    ("SO", "Sonora"),
+    ("TB", "Tabasco"),
+    ("TM", "Tamaulipas"),
+    ("TL", "Tlaxcala"),
+    ("VE", "Veracruz"),
+    ("YU", "Yucatán"),
+    ("ZA", "Zacatecas"),
+]
+
 
 def get_marcas_por_pais(user):
     """
     Retorna las marcas de vehículos según el país del usuario
     """
-    if hasattr(user, "empresa") and user.empresa.pais == "US":
+    pais = getattr(getattr(user, "empresa", None), "pais", None)
+    if pais == "US":
         from taller.models.marcas_usa import MarcaVehiculo
 
         return MarcaVehiculo.objects.filter(pais_origen="USA", activa=True)
-    else:
-        from taller.models.marca import Marca
 
-        return Marca.objects.all()
+    from taller.models.marca import Marca
+
+    if pais == "MX":
+        return Marca.objects.filter(country__in=["MX", "CL"]).order_by("nombre")
+
+    return Marca.objects.filter(country__in=["CL", "MX"]).order_by("nombre")
 
 
 def get_configuracion_pais(empresa):
@@ -31,6 +70,17 @@ def get_configuracion_pais(empresa):
             "zona_horaria_default": "America/New_York",
             "validacion_patente": r"^[A-Z0-9]{2,7}$",  # Formato USA más flexible
             "impuesto_default": 0.08,  # 8% promedio sales tax USA
+        }
+    if empresa.pais == "MX":
+        return {
+            "moneda": "MXN",
+            "simbolo_moneda": "$",
+            "decimales": 2,
+            "idioma_default": "es",
+            "formato_fecha": "%d/%m/%Y",
+            "zona_horaria_default": "America/Mexico_City",
+            "validacion_patente": r"^[A-Z]{3}\d{3,4}$",  # Formato general México
+            "impuesto_default": 0.16,  # IVA México 16%
         }
     else:  # Chile
         return {
@@ -61,7 +111,8 @@ def get_modelos_por_marca_y_pais(marca_id, user):
     """
     Retorna modelos filtrados por marca y país del usuario
     """
-    if hasattr(user, "empresa") and user.empresa.pais == "US":
+    pais = getattr(getattr(user, "empresa", None), "pais", "CL")
+    if pais == "US":
         # Para USA, usar el sistema de MarcaVehiculo (si existe ModeloVehiculo)
         try:
             from taller.models.marcas_usa import ModeloVehiculo
@@ -72,11 +123,13 @@ def get_modelos_por_marca_y_pais(marca_id, user):
             from taller.models.modelo import Modelo
 
             return Modelo.objects.filter(marca_id=marca_id)
-    else:
-        # Para Chile, usar el sistema tradicional
-        from taller.models.modelo import Modelo
+    # Para Chile, México y otros, usar el sistema tradicional
+    from taller.models.modelo import Modelo
 
-        return Modelo.objects.filter(marca_id=marca_id)
+    filtros = {"marca_id": marca_id}
+    if pais in ("CL", "MX"):
+        filtros["country"] = pais
+    return Modelo.objects.filter(**filtros)
 
 
 def validar_patente_por_pais(patente, pais):
@@ -88,6 +141,9 @@ def validar_patente_por_pais(patente, pais):
     if pais == "US":
         # USA: formatos variados por estado, más flexible
         return bool(re.match(r"^[A-Z0-9]{2,8}$", patente.upper()))
+    if pais == "MX":
+        # México: AAA1234 o AAA123
+        return bool(re.match(r"^[A-Z]{3}\d{3,4}$", patente.upper()))
     else:
         # Chile: formato AA1234 o ABCD12
         return bool(re.match(r"^[A-Z]{2,4}\d{2,4}$", patente.upper()))
@@ -151,6 +207,9 @@ def get_regiones_por_pais(pais):
             ("WI", "Wisconsin"),
             ("WY", "Wyoming"),
         ]
+    if pais == "MX":
+        return MEXICO_ESTADOS
+
     else:
         # Regiones de Chile
         from taller.models.region_ciudad import TallerRegion
@@ -164,11 +223,17 @@ def validar_telefono_por_pais(telefono, pais):
     """
     import re
 
+    normalizado = telefono.replace(" ", "").replace("-", "")
+
     if pais == "US":
         # USA: (123) 456-7890 o 123-456-7890 o 1234567890
         patron = r"^(\+1[-.\s]?)?\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}$"
         return bool(re.match(patron, telefono))
+    if pais == "MX":
+        # México: +52 55 1234 5678 o 5512345678
+        patron = r"^(\+52)?\d{10}$"
+        return bool(re.match(patron, normalizado))
     else:
         # Chile: +56912345678 o 912345678 o 22345678
         patron = r"^(\+56)?[0-9]{8,9}$"
-        return bool(re.match(patron, telefono.replace(" ", "").replace("-", "")))
+        return bool(re.match(patron, normalizado))

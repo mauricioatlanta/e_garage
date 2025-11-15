@@ -13,6 +13,7 @@ class CustomSignupForm(UserCreationForm):
     COUNTRY_CHOICES = [
         ("CL", "🇨🇱 Chile"),
         ("US", "🇺🇸 United States"),
+        ("MX", "🇲🇽 México"),
     ]
 
     country = forms.ChoiceField(

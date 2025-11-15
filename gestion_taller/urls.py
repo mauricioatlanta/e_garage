@@ -151,24 +151,33 @@ urlpatterns = [
     # Wrappers country-aware para login y signup
     path("cl/accounts/login/", redirect_qs("/accounts/login/")),
     path("us/accounts/login/", redirect_qs("/accounts/login/")),
+    path("mx/accounts/login/", redirect_qs("/accounts/login/")),
     path("cl/accounts/signup/", redirect_qs("/accounts/signup/")),
     path("us/accounts/signup/", redirect_qs("/accounts/signup/")),
+    path("mx/accounts/signup/", redirect_qs("/accounts/signup/")),
     # Redirects amigables para login
     path("cl/login/", redirect_qs("/cl/accounts/login/")),
     path("cl/es/login/", redirect_qs("/cl/accounts/login/")),
     path("us/login/", redirect_qs("/us/accounts/login/")),
+    path("mx/login/", redirect_qs("/mx/accounts/login/")),
     # Logout
     path("cl/accounts/logout/", redirect_qs("/accounts/logout/")),
     path("us/accounts/logout/", redirect_qs("/accounts/logout/")),
+    path("mx/accounts/logout/", redirect_qs("/accounts/logout/")),
     # Password reset (solicitud + enviado + confirm + completo)
     path("cl/accounts/password/reset/", redirect_qs("/accounts/password/reset/")),
     path("us/accounts/password/reset/", redirect_qs("/accounts/password/reset/")),
+    path("mx/accounts/password/reset/", redirect_qs("/accounts/password/reset/")),
     path(
         "cl/accounts/password/reset/done/",
         redirect_qs("/accounts/password/reset/done/"),
     ),
     path(
         "us/accounts/password/reset/done/",
+        redirect_qs("/accounts/password/reset/done/"),
+    ),
+    path(
+        "mx/accounts/password/reset/done/",
         redirect_qs("/accounts/password/reset/done/"),
     ),
     path(
@@ -180,6 +189,10 @@ urlpatterns = [
         redirect_qs("/accounts/password/reset/key/{uidb36}/{key}/"),
     ),
     path(
+        "mx/accounts/password/reset/key/<uidb36>/<key>/",
+        redirect_qs("/accounts/password/reset/key/{uidb36}/{key}/"),
+    ),
+    path(
         "cl/accounts/password/reset/key/done/",
         redirect_qs("/accounts/password/reset/key/done/"),
     ),
@@ -187,15 +200,24 @@ urlpatterns = [
         "us/accounts/password/reset/key/done/",
         redirect_qs("/accounts/password/reset/key/done/"),
     ),
+    path(
+        "mx/accounts/password/reset/key/done/",
+        redirect_qs("/accounts/password/reset/key/done/"),
+    ),
     # Password change
     path("cl/accounts/password/change/", redirect_qs("/accounts/password/change/")),
     path("us/accounts/password/change/", redirect_qs("/accounts/password/change/")),
+    path("mx/accounts/password/change/", redirect_qs("/accounts/password/change/")),
     path(
         "cl/accounts/password/change/done/",
         redirect_qs("/accounts/password/change/done/"),
     ),
     path(
         "us/accounts/password/change/done/",
+        redirect_qs("/accounts/password/change/done/"),
+    ),
+    path(
+        "mx/accounts/password/change/done/",
         redirect_qs("/accounts/password/change/done/"),
     ),
     path("i18n/", include("django.conf.urls.i18n")),  # Selector de idioma
@@ -253,6 +275,15 @@ urlpatterns = [
     path(
         "pe/es/",
         include(("taller.urls_extra.peru", "peru"), namespace="peru_es"),
+    ),
+    # 🇲🇽 México - Español
+    path(
+        "mx/",
+        include(("taller.urls_extra.mexico", "mexico"), namespace="mexico"),
+    ),
+    path(
+        "mx/es/",
+        include(("taller.urls_extra.mexico", "mexico"), namespace="mexico_es"),
     ),
     # Chile - Specific routes before general redirect
     path(
@@ -315,6 +346,11 @@ urlpatterns = [
         "cl/configuracion/",
         RedirectView.as_view(url="/cl/es/configuracion/", permanent=False),
         name="cl_configuracion_redirect",
+    ),
+    path(
+        "cl/configuracion/tecnicos/",
+        RedirectView.as_view(url="/cl/es/configuracion/tecnicos/", permanent=False),
+        name="cl_configuracion_tecnicos_redirect",
     ),
     path(
         "cl/centro-operaciones-espacial/",

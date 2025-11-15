@@ -4,7 +4,6 @@ from django import forms
 from django.forms.widgets import Select
 
 from taller.models.clientes import Cliente
-from taller.models.color_cliente import ColorCliente
 from taller.models.region_ciudad import TallerCiudad, TallerRegion
 from taller.models.ubicacion import Ciudad as CiudadUSA
 from taller.models.ubicacion import Estado as EstadoUSA
@@ -65,38 +64,20 @@ class ClienteForm(forms.ModelForm):
         queryset=EstadoUSA.objects.all(),
         required=False,
         widget=forms.Select(attrs={"id": "id_estado_usa", "class": "form-control"}),
-        empty_label="Select State / Estado / Departamento",
+        empty_label="Seleccione estado o departamento",
         label="Estado/Departamento",
     )
     ciudad_usa = forms.ModelChoiceField(
         queryset=CiudadUSA.objects.none(),
         required=False,
         widget=forms.Select(attrs={"id": "id_ciudad_usa", "class": "form-control"}),
-        empty_label="Select City / Ciudad / Cidade",
-        label="Ciudad/Cidade",
+        empty_label="Seleccione ciudad",
+        label="Ciudad",
     )
     zipcode = forms.CharField(
         required=False,
-        widget=forms.TextInput(
-            attrs={"class": "form-control", "placeholder": "Zipcode / CEP / Código Postal"}
-        ),
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Código postal"}),
         label="Código Postal",
-    )
-
-    # Campo para color de identificación con autocomplete
-    color = forms.ModelChoiceField(
-        queryset=ColorCliente.objects.all(),
-        required=False,
-        widget=forms.Select(
-            attrs={
-                "id": "id_color",
-                "class": "form-control",
-                "data-placeholder": "Seleccione Color",
-                "data-allow-clear": "true",
-                "data-minimum-input-length": 0,
-            }
-        ),
-        help_text="Color para identificar al cliente/subscriptor",
     )
 
     class Meta:
@@ -112,7 +93,6 @@ class ClienteForm(forms.ModelForm):
             "ciudad_usa",
             "zipcode",
             "email",
-            "color",
         ]
         widgets = {
             "nombre": forms.TextInput(attrs={"class": "form-control", "placeholder": "Nombre"}),
@@ -138,15 +118,6 @@ class ClienteForm(forms.ModelForm):
         else:
             self.pais = "CL"  # Default a Chile
 
-        # Debug logging
-        print(f"[DEBUG] [ClienteForm] empresa: {self.empresa}")
-        if self.empresa:
-            print(
-                f"[DEBUG] [ClienteForm] empresa.pais: {getattr(self.empresa, 'pais', 'NO_HAY_PAIS')}"
-            )
-        else:
-            print("[DEBUG] [ClienteForm] NO HAY EMPRESA")
-
         # Chile: región/ciudad
         if "region" in self.data and self.data.get("region") not in [None, ""]:
             try:
@@ -161,9 +132,16 @@ class ClienteForm(forms.ModelForm):
         else:
             self.fields["ciudad"].queryset = TallerCiudad.objects.none()
 
+        self.fields["ciudad"].widget.attrs["data-selected"] = (
+            self.data.get("ciudad")
+            or (getattr(self.instance, "ciudad_id", None) if self.instance.pk else None)
+            or ""
+        )
+
         # USA, Brasil, Venezuela, Perú: estado/ciudad/zipcode (usando modelo unificado)
         # Filtrar estados por país de la empresa
-        if self.pais in ["US", "BR", "VE", "PE"]:
+        estados_con_pais = ["US", "BR", "VE", "PE", "MX"]
+        if self.pais in estados_con_pais:
             self.fields["estado_usa"].queryset = EstadoUSA.objects.filter(pais=self.pais).order_by(
                 "nombre"
             )
@@ -184,51 +162,55 @@ class ClienteForm(forms.ModelForm):
         else:
             self.fields["ciudad_usa"].queryset = CiudadUSA.objects.none()
 
-        # Exponer el país como atributo público para el template
-        pais = None
-        if self.empresa:
-            pais = self.empresa.pais
-        elif self.instance.pk and hasattr(self.instance, "empresa") and self.instance.empresa:
-            pais = self.instance.empresa.pais
-        self.pais = pais
+        self.fields["ciudad_usa"].widget.attrs["data-selected"] = (
+            self.data.get("ciudad_usa")
+            or (getattr(self.instance, "ciudad_usa_id", None) if self.instance.pk else None)
+            or ""
+        )
 
-        print(f"[DEBUG] [ClienteForm] pais detectado: {self.pais}")
-
-        # Configurar colores según el país
-        if self.pais:
-            colores_disponibles = ColorCliente.get_colores_para_pais(self.pais)
-            self.fields["color"].queryset = colores_disponibles
-            print(
-                f"[DEBUG] [ClienteForm] Colores disponibles para {self.pais}: {colores_disponibles.count()}"
-            )
-        else:
-            # Fallback: mostrar todos los colores activos
-            self.fields["color"].queryset = ColorCliente.objects.filter(activo=True)
+        if not hasattr(self, "pais"):
+            pais = None
+            if self.empresa:
+                pais = self.empresa.pais
+            elif self.instance.pk and hasattr(self.instance, "empresa") and self.instance.empresa:
+                pais = self.instance.empresa.pais
+            self.pais = pais
 
         # Ocultar campos según el país
-        if self.pais in ["US", "BR", "VE", "PE"]:
+        if self.pais in estados_con_pais:
             # Países que usan modelo unificado Estado/Ciudad
             print(f"[DEBUG] [ClienteForm] Configurando campos para {self.pais} (Estado/Ciudad)")
             self.fields["region"].widget = forms.HiddenInput()
             self.fields["ciudad"].widget = forms.HiddenInput()
 
-            # Personalizar labels según país
-            if self.pais == "US":
-                self.fields["estado_usa"].label = "State"
-                self.fields["ciudad_usa"].label = "City"
-                self.fields["zipcode"].label = "Zipcode"
-            elif self.pais == "BR":
-                self.fields["estado_usa"].label = "Estado"
-                self.fields["ciudad_usa"].label = "Cidade"
-                self.fields["zipcode"].label = "CEP"
-            elif self.pais == "VE":
-                self.fields["estado_usa"].label = "Estado"
-                self.fields["ciudad_usa"].label = "Ciudad"
-                self.fields["zipcode"].label = "Código Postal"
-            elif self.pais == "PE":
-                self.fields["estado_usa"].label = "Departamento"
-                self.fields["ciudad_usa"].label = "Ciudad"
-                self.fields["zipcode"].label = "Código Postal"
+            etiqueta_estado = {
+                "US": "Estado",
+                "BR": "Estado",
+                "VE": "Estado",
+                "PE": "Departamento",
+                "MX": "Estado",
+            }.get(self.pais, "Estado")
+
+            etiqueta_ciudad = {
+                "BR": "Cidade",
+            }.get(self.pais, "Ciudad")
+
+            etiqueta_codigo = {
+                "US": "Código Postal",
+                "BR": "Código Postal",
+                "VE": "Código Postal",
+                "PE": "Código Postal",
+                "MX": "Código Postal",
+            }.get(self.pais, "Código Postal")
+
+            self.fields["estado_usa"].label = etiqueta_estado
+            self.fields["estado_usa"].empty_label = f"Seleccione {etiqueta_estado.lower()}"
+
+            self.fields["ciudad_usa"].label = etiqueta_ciudad
+            self.fields["ciudad_usa"].empty_label = f"Seleccione {etiqueta_ciudad.lower()}"
+
+            self.fields["zipcode"].label = etiqueta_codigo
+            self.fields["zipcode"].widget.attrs["placeholder"] = etiqueta_codigo
         else:
             # Chile usa modelo legacy Region/Ciudad
             print("[DEBUG] [ClienteForm] Configurando campos para Chile (Region/Ciudad)")
@@ -239,7 +221,6 @@ class ClienteForm(forms.ModelForm):
     def save(self, commit=True):
         obj = super().save(commit=False)
 
-        # BLINDAJE MULTI-TENANT: SIEMPRE asignar empresa
         if self.empresa and not obj.empresa_id:
             obj.empresa = self.empresa
 

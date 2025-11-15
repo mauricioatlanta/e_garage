@@ -3,10 +3,12 @@ Vistas de documentos migradas para usar CountryLangTemplateMixin
 Esto reemplaza las vistas FBV que están en views.py con plantillas hardcodeadas
 """
 
-from decimal import Decimal
+import re
+from decimal import Decimal, InvalidOperation
 
+from django import forms
 from django.contrib.auth.decorators import login_required
-from django.urls import reverse
+from django.urls import NoReverseMatch, reverse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.generic import (
@@ -17,9 +19,228 @@ from django.views.generic import (
     UpdateView,
 )
 
+from django.db.models import (
+    Case,
+    Count,
+    DecimalField,
+    ExpressionWrapper,
+    F,
+    Sum,
+    Value,
+    When,
+)
+from django.db.models.functions import Coalesce
+
 from taller.forms.documento_form import DocumentoForm
 from taller.mixins import CountryLangTemplateMixin
 from taller.models import Documento, Tecnico
+from taller.models.clientes import Cliente
+from taller.models.vehiculos import Vehiculo
+from taller.models.repuesto import Repuesto
+from taller.servicios.models import Servicio, ServicioExterno
+
+
+LANGUAGE_BY_COUNTRY = {
+    "CL": "es",
+    "MX": "es",
+    "VE": "es",
+    "PE": "es",
+    "US": "en",
+    "BR": "pt",
+}
+
+
+def _reverse_with_request(request, view_name, kwargs=None):
+    """
+    Resuelve URLs respetando los namespaces activos para que la redirección
+    mantenga el prefijo país/idioma (por ejemplo, /cl/es/ vs /cl/).
+    """
+
+    if kwargs is None:
+        kwargs = {}
+
+    resolver_match = getattr(request, "resolver_match", None)
+    namespaces = list(getattr(resolver_match, "namespaces", [])) if resolver_match else []
+    tried = []
+
+    # 1) Intentar con la pila exacta de namespaces (desde más específico a menos)
+    for depth in range(len(namespaces), -1, -1):
+        ns = namespaces[:depth]
+        full_name = ":".join(ns + [view_name]) if ns else view_name
+        if full_name in tried:
+            continue
+        tried.append(full_name)
+        try:
+            return reverse(full_name, kwargs=kwargs)
+        except NoReverseMatch:
+            continue
+
+    # 2) Intentar con namespaces conocidos de fallback
+    fallback_names = [
+        f"documentos_cl_es:{view_name}",
+        f"documentos_us_en:{view_name}",
+        f"documentos:{view_name}",
+        f"chile:documentos:{view_name}",
+        f"usa:documentos:{view_name}",
+        view_name,
+    ]
+
+    for name in fallback_names:
+        if name in tried:
+            continue
+        tried.append(name)
+        try:
+            return reverse(name, kwargs=kwargs)
+        except NoReverseMatch:
+            continue
+
+    # 3) Como último recurso, relanzar la excepción con todo el contexto
+    raise NoReverseMatch(
+        f"No se pudo resolver '{view_name}' para namespaces {namespaces}. Intentos: {tried}"
+    )
+
+
+def _normalize_numeric_string(value):
+    if value in (None, "", "None"):
+        return ""
+    if isinstance(value, (int, float, Decimal)):
+        return str(value)
+    text = str(value).strip()
+    if not text:
+        return ""
+    text = text.replace(" ", "")
+    comma = text.rfind(",")
+    dot = text.rfind(".")
+    if comma > -1 and dot > -1:
+        if comma > dot:
+            text = text.replace(".", "").replace(",", ".")
+        else:
+            text = text.replace(",", "")
+    elif comma > -1:
+        text = text.replace(".", "").replace(",", ".")
+    else:
+        if text.count(".") > 1:
+            last = text.rfind(".")
+            text = text[:last].replace(".", "") + "." + text[last + 1 :]
+        else:
+            text = text.replace(",", "")
+    return text
+
+
+def _to_decimal(value, default=Decimal("0")):
+    if isinstance(value, Decimal):
+        return value
+    normalized = _normalize_numeric_string(value)
+    if not normalized:
+        return default
+    try:
+        return Decimal(normalized)
+    except (InvalidOperation, ValueError):
+        return default
+
+
+def _to_int(value, default=1):
+    try:
+        return max(1, int(_to_decimal(value, Decimal(default))))
+    except (ValueError, TypeError):
+        return default
+
+
+def _parse_prefixed_items(post_data, prefix, fields):
+    pattern = re.compile(
+        rf"^{re.escape(prefix)}-(\d+)-({ '|'.join(re.escape(f) for f in fields) })$"
+    )
+    items = {}
+    for key in post_data.keys():
+        match = pattern.match(key)
+        if not match:
+            continue
+        index = int(match.group(1))
+        field = match.group(2)
+        items.setdefault(index, {})[field] = post_data.get(key)
+    ordered = []
+    for index in sorted(items.keys()):
+        ordered.append(items[index])
+    return ordered
+
+
+class DocumentoLineItemsMixin:
+    REPUESTO_FIELDS = ("codigo", "nombre", "cantidad", "precio_unitario", "precio_compra")
+    SERVICIO_FIELDS = ("nombre", "cantidad", "precio_unitario")
+    OTRO_FIELDS = ("proveedor", "descripcion", "costo_interno", "precio_cliente")
+
+    def procesar_items_dinamicos(self, documento, clear_existing=False):
+        from taller.models.lineas_documento import (
+            LineaOtroServicio,
+            LineaRepuesto,
+            LineaServicio,
+        )
+
+        if clear_existing:
+            documento.lineas_repuesto.all().delete()
+            documento.lineas_servicio.all().delete()
+            documento.lineas_otro_servicio.all().delete()
+
+        repuestos = _parse_prefixed_items(self.request.POST, "rep", self.REPUESTO_FIELDS)
+        for data in repuestos:
+            codigo = (data.get("codigo") or "").strip()
+            nombre = (data.get("nombre") or "").strip()
+            if not (codigo or nombre):
+                continue
+            cantidad = _to_int(data.get("cantidad"), default=1)
+            precio_unitario = _to_decimal(data.get("precio_unitario"), Decimal("0"))
+            linea = LineaRepuesto(
+                documento=documento,
+                codigo=codigo or nombre,
+                nombre=nombre or codigo,
+                cantidad=cantidad,
+                precio_unitario=precio_unitario,
+            )
+            linea.save()
+
+        servicios = _parse_prefixed_items(self.request.POST, "serv", self.SERVICIO_FIELDS)
+        for data in servicios:
+            nombre = (data.get("nombre") or "").strip()
+            if not nombre:
+                continue
+            cantidad = _to_int(data.get("cantidad"), default=1)
+            precio_unitario = _to_decimal(data.get("precio_unitario"), Decimal("0"))
+            linea = LineaServicio(
+                documento=documento,
+                nombre=nombre,
+                cantidad=cantidad,
+                precio_unitario=precio_unitario,
+            )
+            linea.save()
+
+        otros = _parse_prefixed_items(self.request.POST, "otr", self.OTRO_FIELDS)
+        for data in otros:
+            descripcion = (data.get("descripcion") or "").strip()
+            proveedor = (data.get("proveedor") or "").strip()
+            costo_interno = _to_decimal(data.get("costo_interno"), Decimal("0"))
+            precio_cliente = _to_decimal(data.get("precio_cliente"), Decimal("0"))
+            has_values = any(
+                [
+                    descripcion,
+                    proveedor,
+                    costo_interno != 0,
+                    precio_cliente != 0,
+                ]
+            )
+            if not has_values:
+                continue
+            linea = LineaOtroServicio(
+                documento=documento,
+                nombre=descripcion or proveedor or "Servicio externo",
+                empresa_externa=proveedor or "",
+                costo_interno=costo_interno,
+                precio_cliente=precio_cliente,
+                cantidad=1,
+            )
+            linea.save()
+
+        if hasattr(documento, "recalcular_totales"):
+            documento.recalcular_totales(save=True)
 
 
 @method_decorator(login_required, name="dispatch")
@@ -46,7 +267,7 @@ class DocumentoListView(CountryLangTemplateMixin, ListView):
         """Filtrar documentos por empresa del usuario"""
         try:
             empresa = self.request.user.empresa
-            qs = (
+            base_queryset = (
                 Documento.objects.filter(empresa=empresa)
                 .select_related("cliente", "vehiculo", "tecnico_responsable")
                 .prefetch_related(
@@ -54,11 +275,77 @@ class DocumentoListView(CountryLangTemplateMixin, ListView):
                     "lineas_servicio__servicio",
                     "lineas_otro_servicio",
                 )
-                .order_by("-fecha_emision", "-id")
             )
 
-            # Los totales ahora se calculan automáticamente en el modelo
-            # No necesitamos anotaciones ya que tenemos campos reales
+            decimal_zero = Value(
+                Decimal("0"),
+                output_field=DecimalField(max_digits=14, decimal_places=2),
+            )
+
+            qs = (
+                base_queryset.annotate(
+                    rep_sum=Coalesce(
+                        Sum(
+                            ExpressionWrapper(
+                                F("lineas_repuesto__cantidad")
+                                * F("lineas_repuesto__precio_unitario"),
+                                output_field=DecimalField(max_digits=14, decimal_places=2),
+                            )
+                        ),
+                        decimal_zero,
+                    ),
+                    serv_sum=Coalesce(
+                        Sum(
+                            ExpressionWrapper(
+                                F("lineas_servicio__cantidad")
+                                * F("lineas_servicio__precio_unitario"),
+                                output_field=DecimalField(max_digits=14, decimal_places=2),
+                            )
+                        ),
+                        decimal_zero,
+                    ),
+                    otros_sum=Coalesce(
+                        Sum(
+                            ExpressionWrapper(
+                                F("lineas_otro_servicio__cantidad")
+                                * F("lineas_otro_servicio__precio_cliente"),
+                                output_field=DecimalField(max_digits=14, decimal_places=2),
+                            )
+                        ),
+                        decimal_zero,
+                    ),
+                    servicios_count=Count("lineas_servicio", distinct=True),
+                )
+                .annotate(
+                    iva_calc=Case(
+                        When(
+                            empresa__pais__iexact="CL",
+                            then=ExpressionWrapper(
+                                F("rep_sum")
+                                * Value(
+                                    Decimal("0.19"),
+                                    output_field=DecimalField(max_digits=5, decimal_places=2),
+                                ),
+                                output_field=DecimalField(max_digits=14, decimal_places=2),
+                            ),
+                        ),
+                        default=decimal_zero,
+                        output_field=DecimalField(max_digits=14, decimal_places=2),
+                    ),
+                )
+                .annotate(
+                    total_display=Coalesce(
+                        "legacy_total_general",
+                        "total",
+                        ExpressionWrapper(
+                            F("rep_sum") + F("serv_sum") + F("otros_sum") + F("iva_calc"),
+                            output_field=DecimalField(max_digits=14, decimal_places=2),
+                        ),
+                        decimal_zero,
+                    )
+                )
+                .order_by("-fecha_emision", "-id")
+            )
 
             return qs
         except AttributeError:
@@ -78,7 +365,7 @@ class DocumentoListView(CountryLangTemplateMixin, ListView):
 
 
 @method_decorator(login_required, name="dispatch")
-class DocumentoCreateView(CountryLangTemplateMixin, CreateView):
+class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, CreateView):
     """Vista para crear documentos"""
 
     model = Documento
@@ -92,12 +379,34 @@ class DocumentoCreateView(CountryLangTemplateMixin, CreateView):
         # Cargar mecánicos activos del taller
         mecanicos = Tecnico.objects.filter(empresa=empresa, activo=True)
 
+        path = (self.request.path or "").lower()
+        path_country = "CL"
+        if path.startswith("/us/"):
+            path_country = "US"
+        elif path.startswith("/mx/"):
+            path_country = "MX"
+        elif path.startswith("/pe/"):
+            path_country = "PE"
+        elif path.startswith("/ve/"):
+            path_country = "VE"
+        elif path.startswith("/br/"):
+            path_country = "BR"
+
+        company_country = (
+            getattr(self.request, "company_country", None)
+            or getattr(empresa, "pais", None)
+            or path_country
+        )
+
+        country_code = str(company_country).upper() if company_country else "CL"
+        language = LANGUAGE_BY_COUNTRY.get(country_code, "es")
+
         context.update(
             {
                 "mecanicos": mecanicos,
                 "tecnicos": mecanicos,  # Alias para compatibilidad con templates
                 "es_edicion": False,
-                "company_country": getattr(self.request, "company_country", None),
+                "company_country": company_country,
                 "today": timezone.now().date(),  # Agregar fecha actual
                 "template_name": self.get_template_names()[0],
                 "pais_emoji": "🇺🇸" if self.request.path.startswith("/us/") else "🇨🇱",
@@ -111,6 +420,124 @@ class DocumentoCreateView(CountryLangTemplateMixin, CreateView):
                 "debug": True,  # Habilitar debug en template
             }
         )
+
+        clientes_prefetch = []
+        vehiculos_prefetch = []
+        repuestos_prefetch = []
+        servicios_prefetch = []
+        otros_servicios_prefetch = []
+
+        if empresa:
+            clientes_qs = (
+                Cliente.objects.filter(empresa=empresa)
+                .order_by("nombre", "apellido")
+                .only("id", "nombre", "apellido", "email", "telefono")
+            )
+            for cliente in clientes_qs[:50]:
+                clientes_prefetch.append(
+                    {
+                        "id": cliente.id,
+                        "nombre": str(cliente),
+                        "nombre_completo": str(cliente),
+                        "email": cliente.email or "",
+                        "telefono": cliente.telefono or "",
+                    }
+                )
+
+            vehiculos_qs = (
+                Vehiculo.objects.filter(empresa=empresa)
+                .select_related("cliente", "marca", "modelo")
+                .only("id", "cliente_id", "patente", "vin", "anio", "marca", "modelo")
+            )
+            for vehiculo in vehiculos_qs[:50]:
+                label = vehiculo.display_label()
+                vehiculos_prefetch.append(
+                    {
+                        "id": vehiculo.id,
+                        "cliente_id": vehiculo.cliente_id,
+                        "label": label,
+                        "text": label,
+                    }
+                )
+
+            repuestos_qs = (
+                Repuesto.objects.filter(empresa=empresa)
+                .order_by("nombre")
+                .only("id", "part_number", "nombre", "precio_compra", "precio_venta")
+            )
+            for repuesto in repuestos_qs[:50]:
+                repuestos_prefetch.append(
+                    {
+                        "id": repuesto.id,
+                        "codigo": repuesto.part_number or "",
+                        "nombre": repuesto.nombre,
+                        "precio_compra": float(repuesto.precio_compra or Decimal("0")),
+                        "precio_venta": float(repuesto.precio_venta or Decimal("0")),
+                        "precio_venta_sugerido": float(repuesto.precio_venta or Decimal("0")),
+                    }
+                )
+
+            servicios_qs = (
+                Servicio.objects.filter(empresa=empresa, names__language=language)
+                .select_related("categoria", "subcategoria")
+                .prefetch_related("names", "categoria__names", "subcategoria__names")
+                .distinct()
+            )
+            for servicio in servicios_qs[:50]:
+                servicios_prefetch.append(
+                    {
+                        "id": servicio.id,
+                        "nombre": servicio.get_label(language),
+                        "categoria": (
+                            servicio.categoria.get_label(language) if servicio.categoria else ""
+                        ),
+                        "categoria_code": servicio.categoria.code if servicio.categoria else "",
+                        "subcategoria": (
+                            servicio.subcategoria.get_label(language)
+                            if servicio.subcategoria
+                            else ""
+                        ),
+                        "subcategoria_code": (
+                            servicio.subcategoria.code if servicio.subcategoria else ""
+                        ),
+                        "precio": 0.0,
+                        "precio_sugerido": 0.0,
+                        "precio_cliente": 0.0,
+                    }
+                )
+
+            otros_qs = (
+                ServicioExterno.objects.filter(empresa=empresa, activo=True)
+                .select_related("categoria", "subcategoria")
+                .prefetch_related("categoria__names", "subcategoria__names")
+            )
+            for externo in otros_qs[:50]:
+                otros_servicios_prefetch.append(
+                    {
+                        "id": externo.id,
+                        "nombre": externo.nombre,
+                        "empresa": externo.empresa_externa,
+                        "empresa_ext": externo.empresa_externa,
+                        "categoria": (
+                            externo.categoria.get_label(language) if externo.categoria else ""
+                        ),
+                        "subcategoria": (
+                            externo.subcategoria.get_label(language) if externo.subcategoria else ""
+                        ),
+                        "precio_taller": float(externo.costo_taller or Decimal("0")),
+                        "precio_cliente": float(externo.precio_cliente or Decimal("0")),
+                    }
+                )
+
+        context.update(
+            {
+                "clientes_prefetch": clientes_prefetch,
+                "vehiculos_prefetch": vehiculos_prefetch,
+                "repuestos_prefetch": repuestos_prefetch,
+                "servicios_prefetch": servicios_prefetch,
+                "otros_servicios_prefetch": otros_servicios_prefetch,
+            }
+        )
         return context
 
     def get_form_kwargs(self):
@@ -122,11 +549,8 @@ class DocumentoCreateView(CountryLangTemplateMixin, CreateView):
         return kwargs
 
     def get_success_url(self):
-        """Redirigir a la lista de documentos después de crear uno exitosamente"""
-        if self.request.path.startswith("/us/"):
-            return reverse("documentos_us_en:lista_documentos")
-        else:
-            return reverse("documentos_cl_es:lista_documentos")
+        """Redirigir a la lista de documentos respetando el prefijo país/idioma."""
+        return _reverse_with_request(self.request, "lista_documentos")
 
     def form_valid(self, form):
         print("[DEBUG DocumentoCreateView] form_valid llamado")
@@ -146,7 +570,7 @@ class DocumentoCreateView(CountryLangTemplateMixin, CreateView):
         response = super().form_valid(form)
 
         # Procesar items dinámicos después de guardar
-        self.procesar_items_dinamicos(form)
+        self.procesar_items_dinamicos(form.instance, clear_existing=True)
 
         # Agregar mensaje de éxito
         from django.contrib import messages
@@ -163,65 +587,6 @@ class DocumentoCreateView(CountryLangTemplateMixin, CreateView):
         print(f"[DEBUG DocumentoCreateView] Errores: {form.errors}")
         print(f"[DEBUG DocumentoCreateView] Datos POST: {self.request.POST}")
         return super().form_invalid(form)
-
-    def procesar_items_dinamicos(self, form):
-        """Procesa los campos dinámicos de repuestos, servicios y otros servicios"""
-        documento = form.instance
-
-        # Procesar repuestos dinámicos
-        self.procesar_repuestos_dinamicos(documento)
-
-        # Procesar servicios dinámicos
-        self.procesar_servicios_dinamicos(documento)
-
-    def procesar_repuestos_dinamicos(self, documento):
-        """Procesa los repuestos agregados dinámicamente"""
-        from taller.models.lineas_documento import LineaRepuesto
-
-        # Obtener datos del POST
-        codigos = self.request.POST.getlist("rep-0-codigo")
-        nombres = self.request.POST.getlist("rep-0-nombre")
-        cantidades = self.request.POST.getlist("rep-0-cantidad")
-        precios = self.request.POST.getlist("rep-0-precio_unitario")
-
-        print(f"[DEBUG] Procesando repuestos: {len(codigos)} elementos")
-
-        for i, codigo in enumerate(codigos):
-            if codigo and nombres[i] and cantidades[i] and precios[i]:
-                try:
-                    LineaRepuesto.objects.create(
-                        documento=documento,
-                        codigo=codigo,
-                        nombre=nombres[i],
-                        cantidad=int(cantidades[i]),
-                        precio_unitario=float(precios[i]),
-                    )
-                    print(f"[DEBUG] Repuesto creado: {codigo} - {nombres[i]}")
-                except Exception as e:
-                    print(f"[DEBUG] Error creando repuesto: {e}")
-
-    def procesar_servicios_dinamicos(self, documento):
-        """Procesa los servicios agregados dinámicamente"""
-        from taller.models.lineas_documento import LineaServicio
-
-        # Obtener datos del POST
-        nombres = self.request.POST.getlist("serv-0-nombre")
-        precios = self.request.POST.getlist("serv-0-precio_unitario")
-
-        print(f"[DEBUG] Procesando servicios: {len(nombres)} elementos")
-
-        for i, nombre in enumerate(nombres):
-            if nombre and precios[i]:
-                try:
-                    LineaServicio.objects.create(
-                        documento=documento,
-                        nombre=nombre,
-                        precio_unitario=float(precios[i]),
-                        cantidad=1,
-                    )
-                    print(f"[DEBUG] Servicio creado: {nombre}")
-                except Exception as e:
-                    print(f"[DEBUG] Error creando servicio: {e}")
 
     def render_to_response(self, context, **response_kwargs):
         """Renderizar usando el template correcto"""
@@ -294,7 +659,7 @@ class DocumentoDetailView(CountryLangTemplateMixin, DetailView):
 
 
 @method_decorator(login_required, name="dispatch")
-class DocumentoUpdateView(CountryLangTemplateMixin, UpdateView):
+class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, UpdateView):
     """Vista para editar documentos"""
 
     model = Documento
@@ -357,6 +722,28 @@ class DocumentoUpdateView(CountryLangTemplateMixin, UpdateView):
         # Cargar mecánicos activos del taller
         mecanicos = Tecnico.objects.filter(empresa=empresa, activo=True)
 
+        path = (self.request.path or "").lower()
+        path_country = "CL"
+        if path.startswith("/us/"):
+            path_country = "US"
+        elif path.startswith("/mx/"):
+            path_country = "MX"
+        elif path.startswith("/pe/"):
+            path_country = "PE"
+        elif path.startswith("/ve/"):
+            path_country = "VE"
+        elif path.startswith("/br/"):
+            path_country = "BR"
+
+        company_country = (
+            getattr(self.request, "company_country", None)
+            or getattr(empresa, "pais", None)
+            or path_country
+        )
+
+        cliente = getattr(documento, "cliente", None)
+        vehiculo = getattr(documento, "vehiculo", None)
+
         context.update(
             {
                 "documento": documento,
@@ -372,16 +759,92 @@ class DocumentoUpdateView(CountryLangTemplateMixin, UpdateView):
                 "mecanicos": mecanicos,
                 "tecnicos": mecanicos,  # Alias para compatibilidad con templates
                 "es_edicion": True,
+                "company_country": company_country,
+                "cliente_info": {
+                    "id": getattr(cliente, "id", ""),
+                    "nombre": str(cliente) if cliente else "",
+                    "email": getattr(cliente, "email", "") if cliente else "",
+                    "telefono": getattr(cliente, "telefono", "") if cliente else "",
+                },
+                "vehiculo_inicial_id": getattr(vehiculo, "id", "") or "",
             }
         )
         return context
 
     def get_success_url(self):
-        """Redirigir a la vista del documento después de editarlo exitosamente"""
-        return reverse("documentos_cl_es:ver_documento", kwargs={"pk": self.object.pk})
+        """Redirigir a la vista del documento después de editarlo exitosamente."""
+        return _reverse_with_request(self.request, "ver_documento", kwargs={"pk": self.object.pk})
+
+    def get_form_kwargs(self):
+        """Inyectar empresa/usuario en el formulario para aislar datos del tenant"""
+        kwargs = super().get_form_kwargs()
+
+        empresa_usuario = getattr(self.request.user, "empresa", None)
+        empresa_documento = getattr(self.object, "empresa", None)
+        empresa = empresa_documento or empresa_usuario
+
+        kwargs["user"] = self.request.user
+        kwargs["empresa"] = empresa
+
+        if empresa and getattr(empresa, "pais", None):
+            country = (empresa.pais or "CL").upper()
+        else:
+            country = "US" if self.request.path.startswith("/us/") else "CL"
+        kwargs["country"] = country
+
+        return kwargs
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        empresa = getattr(self.request.user, "empresa", None)
+        cliente = getattr(form.instance, "cliente", None)
+
+        if empresa and cliente:
+            vehiculos_qs = (
+                Vehiculo.objects.filter(empresa=empresa, cliente=cliente)
+                .select_related("marca", "modelo")
+                .order_by("patente", "vin", "id")
+            )
+            form.fields["vehiculo"].queryset = vehiculos_qs
+
+            # Renderizar como select clásico para mostrar todas las opciones disponibles
+            choices = [("", "---------")]
+            for vehiculo in vehiculos_qs:
+                if hasattr(vehiculo, "display_label"):
+                    label = vehiculo.display_label()
+                else:
+                    partes = [
+                        getattr(getattr(vehiculo, "marca", None), "nombre", ""),
+                        getattr(getattr(vehiculo, "modelo", None), "nombre", ""),
+                        getattr(vehiculo, "patente", "") or getattr(vehiculo, "placa", ""),
+                    ]
+                    label = " - ".join([p for p in partes if p]) or f"Vehículo #{vehiculo.pk}"
+                choices.append((vehiculo.pk, label))
+
+            attrs = {
+                "class": "form-select w-full",
+                "data-source": "form",
+                "data-initial-vehicle": getattr(form.instance.vehiculo, "id", "") or "",
+            }
+            form.fields["vehiculo"].widget = forms.Select(attrs=attrs)
+            form.fields["vehiculo"].widget.choices = choices
+
+        return form
 
     def render_to_response(self, context, **response_kwargs):
         return self.render_country_lang(self.request, context)
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        self.procesar_items_dinamicos(self.object, clear_existing=True)
+
+        from django.contrib import messages
+
+        messages.success(
+            self.request,
+            f"Documento {self.object.numero_documento} actualizado correctamente.",
+        )
+        return response
 
 
 @method_decorator(login_required, name="dispatch")

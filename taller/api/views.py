@@ -1,5 +1,6 @@
 import json
 from datetime import timedelta
+from decimal import Decimal, InvalidOperation
 
 from django.apps import apps
 from django.conf import settings
@@ -464,6 +465,69 @@ def buscar_repuestos_api(request):
         for r in paginated["queryset"]
     ]
     return JsonResponse({"results": data, "pagination": paginated["pagination"]})
+
+
+@login_required
+@require_POST
+def crear_repuesto_api(request):
+    empresa = _get_empresa(request)
+    if not empresa:
+        return JsonResponse({"success": False, "error": "Usuario sin empresa"}, status=400)
+
+    try:
+        payload = json.loads(request.body.decode("utf-8"))
+    except json.JSONDecodeError:
+        return JsonResponse({"success": False, "error": "JSON inválido"}, status=400)
+
+    part_number = (payload.get("part_number") or "").strip()
+    nombre = (payload.get("nombre") or "").strip()
+    proveedor = (payload.get("proveedor") or "").strip()
+
+    if not part_number:
+        return JsonResponse({"success": False, "error": "Número de parte requerido"}, status=400)
+
+    repuesto = (
+        Repuesto.objects.filter(empresa=empresa, part_number__iexact=part_number)
+        .order_by("-id")
+        .first()
+    )
+    created = False
+
+    if repuesto is None:
+        if not nombre:
+            return JsonResponse(
+                {"success": False, "error": "Nombre del repuesto requerido"}, status=400
+            )
+        repuesto = Repuesto(empresa=empresa, part_number=part_number, nombre=nombre)
+        created = True
+
+    if created:
+        precio_compra = payload.get("precio_compra")
+        precio_venta = payload.get("precio_venta")
+        if precio_compra is not None:
+            try:
+                repuesto.precio_compra = Decimal(str(precio_compra))
+            except (TypeError, ValueError, InvalidOperation):
+                repuesto.precio_compra = Decimal("0.00")
+        if precio_venta is not None:
+            try:
+                repuesto.precio_venta = Decimal(str(precio_venta))
+            except (TypeError, ValueError, InvalidOperation):
+                repuesto.precio_venta = Decimal("0.00")
+        if proveedor:
+            repuesto.proveedor = proveedor
+        repuesto.save()
+
+    data = {
+        "id": repuesto.pk,
+        "codigo": repuesto.part_number or part_number,
+        "nombre": repuesto.nombre or nombre,
+        "precio_compra": float(repuesto.precio_compra or 0),
+        "precio_venta": float(repuesto.precio_venta or 0),
+        "proveedor": repuesto.proveedor or proveedor,
+    }
+
+    return JsonResponse({"success": True, "created": created, "repuesto": data})
 
 
 @login_required

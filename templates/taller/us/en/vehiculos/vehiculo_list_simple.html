@@ -46,7 +46,7 @@
                     </div>
                     <div class="relative group">
                         <div class="absolute -inset-1 rounded-lg bg-gradient-to-r from-emerald-500 via-lime-500 to-green-500 opacity-30 blur group-hover:opacity-50 transition-opacity"></div>
-                        <a href="{% url 'taller:vehiculos:crear_vehiculo' %}" class="glass-btn position-relative">
+                        <a href="{% country_url 'vehiculos:crear_vehiculo' %}" class="glass-btn position-relative">
                             <i class="fas fa-plus me-2"></i>
                             {% trans "Add Vehicle" %}
                         </a>
@@ -98,8 +98,8 @@
             <div style="font-size: 8px; color: #ffd700; margin-top: 2px;">{{ vehiculo.cliente.nombre }} {{ vehiculo.cliente.apellido }}</div>
             {% endif %}
             <div style="margin-top: 5px;">
-                <a href="{% url 'taller:vehiculos:ver_vehiculo' vehiculo.id %}" style="color: #00ced1; margin: 0 2px;">👁️</a>
-                <a href="{% url 'taller:vehiculos:editar_vehiculo' vehiculo.id %}" style="color: #ffd700; margin: 0 2px;">✏️</a>
+                <a href="{% country_url 'vehiculos:ver_vehiculo' vehiculo.id %}" style="color: #00ced1; margin: 0 2px;">👁️</a>
+                <a href="{% country_url 'vehiculos:editar_vehiculo' vehiculo.id %}" style="color: #ffd700; margin: 0 2px;">✏️</a>
                 <button onclick="eliminarVehiculoSimple({{ vehiculo.id }}, '{{ vehiculo.patente }}')" style="color: #ff4444; margin: 0 2px; background: none; border: none; cursor: pointer;">🗑️</button>
             </div>
         </div>
@@ -112,7 +112,7 @@
                     </div>
                     <h3 class="empty-title text-white">{% trans "No vehicles found" %}</h3>
                     <p class="empty-description text-gray-300">{% trans "Get started by adding your first vehicle to the system." %}</p>
-                    <a href="{% url 'taller:vehiculos:crear_vehiculo' %}" class="glass-btn mt-3">
+                    <a href="{% country_url 'vehiculos:crear_vehiculo' %}" class="glass-btn mt-3">
                         <i class="fas fa-plus me-2"></i>
                         {% trans "Add Vehicle" %}
                     </a>
@@ -836,7 +836,7 @@ window.eliminarVehiculoSimple = function(id, patente) {
         // Crear un formulario temporal para enviar la petición DELETE
         const form = document.createElement('form');
         form.method = 'POST';
-        form.action = `{% url 'taller:vehiculos:eliminar_vehiculo' 0 %}`.replace('0', id);
+        form.action = `{% country_url 'vehiculos:eliminar_vehiculo' 0 %}`.replace('0', id);
 
         // Agregar token CSRF
         const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
@@ -865,7 +865,7 @@ window.eliminarVehiculo = function() {
 
     const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-    fetch(`{% url 'taller:vehiculos:eliminar_vehiculo' 0 %}`.replace('0', window.vehiculoAEliminar), {
+    fetch(`{% country_url 'vehiculos:eliminar_vehiculo' 0 %}`.replace('0', window.vehiculoAEliminar), {
         method: 'POST',
         headers: {
             'X-CSRFToken': csrfToken,

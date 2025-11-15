@@ -16,6 +16,7 @@ class CountryMiddleware(MiddlewareMixin):
     COUNTRY_MAP = {
         "es": "CL",  # Español -> Chile
         "en": "US",  # Inglés -> Estados Unidos
+        "mx": "MX",  # Español México -> México
     }
 
     DEFAULT_COUNTRY = "CL"

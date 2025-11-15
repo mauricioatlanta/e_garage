@@ -6,11 +6,20 @@ from collections import defaultdict
 from datetime import date, datetime, timedelta
 from decimal import Decimal
 
-from django.db.models import Count, DecimalField, ExpressionWrapper, F, FloatField, Sum
+from django.db.models import (
+    Count,
+    DecimalField,
+    ExpressionWrapper,
+    F,
+    FloatField,
+    Sum,
+    Value,
+)
 from django.db.models.functions import Coalesce
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.utils import timezone
+from django.utils.dateparse import parse_date
 
 from taller.auth.decorators import login_required_default
 from taller.models import Documento
@@ -131,7 +140,12 @@ def reporte_repuestos(request):
         .values("codigo", "nombre")
         .annotate(
             cantidad_total=Sum("cantidad"),
-            ingresos=Sum(ExpressionWrapper(F("cantidad") * F("precio"), output_field=FloatField())),
+            ingresos=Sum(
+                ExpressionWrapper(
+                    F("cantidad") * F("precio_unitario"),
+                    output_field=FloatField(),
+                )
+            ),
         )
         .order_by("-cantidad_total", "-documento__fecha_emision")
     )
@@ -141,21 +155,50 @@ def reporte_repuestos(request):
     # Márgenes solo si existen los campos en el modelo Repuesto
 
     repuestos_qs = Repuesto.objects.filter(empresa=empresa)
+    total_precio_compra = Decimal("0.00")
+    total_precio_venta = Decimal("0.00")
+    ganancia_total = Decimal("0.00")
+
     if hasattr(Repuesto, "precio_compra") and hasattr(Repuesto, "precio_venta"):
+        totales_globales = repuestos_qs.aggregate(
+            total_precio_compra=Coalesce(
+                Sum("precio_compra"),
+                Value(Decimal("0.00")),
+                output_field=DecimalField(max_digits=14, decimal_places=2),
+            ),
+            total_precio_venta=Coalesce(
+                Sum("precio_venta"),
+                Value(Decimal("0.00")),
+                output_field=DecimalField(max_digits=14, decimal_places=2),
+            ),
+        )
+        total_precio_compra = totales_globales["total_precio_compra"]
+        total_precio_venta = totales_globales["total_precio_venta"]
+        ganancia_total = total_precio_venta - total_precio_compra
+
         top_margen = list(
             repuestos_qs.annotate(
-                total=Coalesce(Sum("lineas_repuesto__cantidad"), 0),
-                ingresos=Coalesce(
-                    Sum(
-                        ExpressionWrapper(
-                            F("lineas_repuesto__cantidad") * F("lineas_repuesto__precio_unitario"),
-                            output_field=FloatField(),
-                        )
+                total=Coalesce(
+                    ExpressionWrapper(
+                        Sum("linearepuesto__cantidad"),
+                        output_field=FloatField(),
                     ),
-                    0,
+                    Value(0.0, output_field=FloatField()),
+                ),
+                ingresos=Coalesce(
+                    ExpressionWrapper(
+                        Sum(
+                            ExpressionWrapper(
+                                F("linearepuesto__cantidad") * F("linearepuesto__precio_unitario"),
+                                output_field=FloatField(),
+                            )
+                        ),
+                        output_field=FloatField(),
+                    ),
+                    Value(0.0, output_field=FloatField()),
                 ),
                 margen=ExpressionWrapper(
-                    (F("precio_venta") - F("precio_compra")) / F("precio_compra") * 100,
+                    (F("precio_venta") - F("precio_compra")) / F("precio_compra") * Value(100.0),
                     output_field=FloatField(),
                 ),
             )
@@ -168,11 +211,16 @@ def reporte_repuestos(request):
 
     # Repuestos con bajo stock - FILTRADO POR EMPRESA
     bajo_stock = Repuesto.objects.filter(
-        stock__lte=5,
+        cantidad_stock__lte=5,
         empresa=empresa,  # 🔒 FILTRO EMPRESA
-    ).values("part_number", "nombre", "stock")
+    ).values("part_number", "nombre", "cantidad_stock")
     bajo_stock = [
-        {"codigo": r["part_number"], "nombre": r["nombre"], "stock": r["stock"]} for r in bajo_stock
+        {
+            "codigo": r["part_number"],
+            "nombre": r["nombre"],
+            "stock": r["cantidad_stock"],
+        }
+        for r in bajo_stock
     ]
 
     # Histórico de ventas mensuales - FILTRADO POR EMPRESA
@@ -211,6 +259,9 @@ def reporte_repuestos(request):
         "bajo_stock": bajo_stock,
         "ventas_mensuales": {"labels": labels, "data": data},
         "nunca_vendidos": nunca_vendidos,
+        "total_precio_compra": total_precio_compra,
+        "total_precio_venta": total_precio_venta,
+        "ganancia_total": ganancia_total,
     }
     return render(request, "taller/reportes/reporte_repuestos.html", context)
 
@@ -220,10 +271,24 @@ def reporte_servicios(request):
     # 🔒 FILTRO CRÍTICO POR EMPRESA
     empresa = get_or_create_empresa(request)
 
+    tipos_facturacion = ["FAC", "BOL"]
+
+    today = date.today()
+    fecha_desde_str = request.GET.get("fecha_desde")
+    fecha_hasta_str = request.GET.get("fecha_hasta")
+    fecha_desde = parse_date(fecha_desde_str) if fecha_desde_str else today - timedelta(days=30)
+    fecha_hasta = parse_date(fecha_hasta_str) if fecha_hasta_str else today
+    if fecha_desde > fecha_hasta:
+        fecha_desde, fecha_hasta = fecha_hasta, fecha_desde
+
     # Panel de facturación - FILTRADO POR EMPRESA
+    lineas_base = LineaServicio.objects.filter(
+        documento__empresa=empresa, documento__tipo__in=tipos_facturacion
+    )
+
     # Total
     facturacion_total = (
-        LineaServicio.objects.filter(documento__empresa=empresa).aggregate(
+        lineas_base.aggregate(
             total=Sum(
                 ExpressionWrapper(F("precio_unitario") * F("cantidad"), output_field=DecimalField())
             )
@@ -235,9 +300,7 @@ def reporte_servicios(request):
     hoy = date.today()
     hace_6_meses = hoy - timedelta(days=180)
     facturacion_periodo_qs = (
-        LineaServicio.objects.filter(
-            documento__fecha_emision__gte=hace_6_meses, documento__empresa=empresa
-        )
+        lineas_base.filter(documento__fecha_emision__gte=hace_6_meses)
         .annotate(
             total_calculado=ExpressionWrapper(
                 F("precio_unitario") * F("cantidad"), output_field=DecimalField()
@@ -258,8 +321,7 @@ def reporte_servicios(request):
 
     # Por servicio - FILTRADO POR EMPRESA
     facturacion_servicio = list(
-        LineaServicio.objects.filter(documento__empresa=empresa)
-        .annotate(
+        lineas_base.annotate(
             total_calculado=ExpressionWrapper(
                 F("precio_unitario") * F("cantidad"), output_field=DecimalField()
             )
@@ -273,8 +335,7 @@ def reporte_servicios(request):
 
     # Por cliente - FILTRADO POR EMPRESA
     facturacion_cliente_qs = (
-        LineaServicio.objects.filter(documento__empresa=empresa)
-        .annotate(
+        lineas_base.annotate(
             total_calculado=ExpressionWrapper(
                 F("precio_unitario") * F("cantidad"), output_field=DecimalField()
             )
@@ -302,8 +363,7 @@ def reporte_servicios(request):
 
     # Top 10 servicios más vendidos - FILTRADO POR EMPRESA
     top_servicios = (
-        LineaServicio.objects.filter(documento__empresa=empresa)
-        .annotate(
+        lineas_base.annotate(
             total_calculado=ExpressionWrapper(
                 F("precio_unitario") * F("cantidad"), output_field=DecimalField()
             )
@@ -315,8 +375,7 @@ def reporte_servicios(request):
 
     # Servicios con mayor facturación - FILTRADO POR EMPRESA
     top_facturacion = (
-        LineaServicio.objects.filter(documento__empresa=empresa)
-        .annotate(
+        lineas_base.annotate(
             total_calculado=ExpressionWrapper(
                 F("precio_unitario") * F("cantidad"), output_field=DecimalField()
             )
@@ -328,8 +387,7 @@ def reporte_servicios(request):
 
     # Histórico de servicios mensuales - FILTRADO POR EMPRESA
     servicios_mes = (
-        LineaServicio.objects.filter(documento__empresa=empresa)
-        .annotate(
+        lineas_base.annotate(
             total_calculado=ExpressionWrapper(
                 F("precio_unitario") * F("cantidad"), output_field=DecimalField()
             ),
@@ -356,7 +414,7 @@ def reporte_servicios(request):
     # Rankings de vehículos atendidos
 
     # Solo documentos con servicios realizados
-    doc_ids = LineaServicio.objects.values_list("documento_id", flat=True)
+    doc_ids = lineas_base.values_list("documento_id", flat=True)
     vehiculos = Vehiculo.objects.filter(documentos__id__in=doc_ids).distinct()
     # Ranking de modelos
     ranking_modelos = (
@@ -401,7 +459,10 @@ def reporte_servicios(request):
     hace_3_meses = hoy - timedelta(days=90)
     # Clientes activos: con más documentos en los últimos 6 meses
     clientes_activos = list(
-        Cliente.objects.filter(documentos__fecha_emision__gte=hoy - timedelta(days=180))
+        Cliente.objects.filter(
+            documentos__fecha_emision__gte=hoy - timedelta(days=180),
+            documentos__tipo__in=tipos_facturacion,
+        )
         .annotate(cantidad=Count("documentos"))
         .order_by("-cantidad")
         .values("nombre", "apellido", "cantidad")[:10]
@@ -410,7 +471,9 @@ def reporte_servicios(request):
         c["nombre"] = (c["nombre"] or "") + (" " + c["apellido"] if c["apellido"] else "")
     # Clientes nuevos: creados en los últimos 3 meses
     clientes_nuevos = list(
-        Cliente.objects.filter(documentos__fecha_emision__gte=hace_3_meses)
+        Cliente.objects.filter(
+            documentos__fecha_emision__gte=hace_3_meses, documentos__tipo__in=tipos_facturacion
+        )
         .annotate(fecha_alta=F("documentos__fecha_emision"))
         .order_by("-fecha_alta")
         .values("nombre", "apellido", "fecha_alta")
@@ -420,7 +483,8 @@ def reporte_servicios(request):
         c["nombre"] = (c["nombre"] or "") + (" " + c["apellido"] if c["apellido"] else "")
     # Clientes históricos: con más documentos en total
     clientes_historicos = list(
-        Cliente.objects.annotate(cantidad=Count("documentos"))
+        Cliente.objects.filter(documentos__tipo__in=tipos_facturacion)
+        .annotate(cantidad=Count("documentos"))
         .order_by("-cantidad")
         .values("nombre", "apellido", "cantidad")[:10]
     )
@@ -428,7 +492,10 @@ def reporte_servicios(request):
         c["nombre"] = (c["nombre"] or "") + (" " + c["apellido"] if c["apellido"] else "")
     # Clientes recurrentes: más de 1 documento en el último año
     clientes_recurrentes = list(
-        Cliente.objects.filter(documentos__fecha_emision__gte=hoy - timedelta(days=365))
+        Cliente.objects.filter(
+            documentos__fecha_emision__gte=hoy - timedelta(days=365),
+            documentos__tipo__in=tipos_facturacion,
+        )
         .annotate(cantidad=Count("documentos"))
         .filter(cantidad__gt=1)
         .order_by("-cantidad")
@@ -464,6 +531,40 @@ def reporte_servicios(request):
             + (t["vehiculo__patente"] or "-")
             + ")"
         )
+
+    lineas_filtradas = lineas_base.filter(
+        documento__fecha_emision__range=[fecha_desde, fecha_hasta]
+    )
+    total_periodo_servicios = lineas_filtradas.aggregate(
+        total=Sum(
+            ExpressionWrapper(
+                F("precio_unitario") * F("cantidad"),
+                output_field=DecimalField(max_digits=14, decimal_places=2),
+            )
+        )
+    )["total"] or Decimal("0.00")
+
+    documentos_periodo = (
+        Documento.objects.filter(
+            empresa=empresa,
+            tipo__in=tipos_facturacion,
+            fecha_emision__range=[fecha_desde, fecha_hasta],
+        )
+        .annotate(
+            total_servicios=Coalesce(
+                Sum(
+                    ExpressionWrapper(
+                        F("lineas_servicio__cantidad") * F("lineas_servicio__precio_unitario"),
+                        output_field=DecimalField(max_digits=14, decimal_places=2),
+                    )
+                ),
+                Value(Decimal("0.00"), output_field=DecimalField(max_digits=14, decimal_places=2)),
+            )
+        )
+        .filter(total_servicios__gt=0)
+        .select_related("cliente", "tecnico_responsable")
+        .order_by("-fecha_emision")
+    )
     context = {
         "top_servicios": top_servicios,
         "top_facturacion": top_facturacion,
@@ -482,6 +583,10 @@ def reporte_servicios(request):
         "facturacion_servicio": facturacion_servicio,
         "facturacion_cliente": facturacion_cliente,
         "turnos_proximos": turnos_proximos,
+        "fecha_desde": fecha_desde,
+        "fecha_hasta": fecha_hasta,
+        "total_periodo_servicios": total_periodo_servicios,
+        "documentos_periodo": documentos_periodo,
     }
     return render(request, "taller/reportes/reporte_servicios.html", context)
 
@@ -619,6 +724,7 @@ def dashboard_inteligencia_operativa(request):
     clientes_inactivos = (
         Cliente.objects.filter(
             documentos__fecha_emision__lt=hace_60_dias,
+            documentos__tipo__in=tipos_facturacion,
             empresa=empresa,  # 🔒 FILTRO EMPRESA
         )
         .distinct()

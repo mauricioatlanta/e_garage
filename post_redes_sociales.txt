@@ -38,3 +38,5 @@ No me siento orgulloso de este resultado. Sólo quiero ser transparente sobre mi
 P.D.: Si alguien sabe cómo resolver el misterio de Django sirviendo templates cacheados a pesar de DEBUG=True, toda la documentación dice que el cache debería estar desactivado, y múltiples reinicios del servidor... por favor ilumínenme en los comentarios.
 
 
+
+

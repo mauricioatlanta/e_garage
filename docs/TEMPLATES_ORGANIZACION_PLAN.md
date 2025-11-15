@@ -374,3 +374,5 @@ Según las mejores prácticas de Django:
 **Fecha:** 27 de Octubre, 2025
 **Proyecto:** eGarage - Gestión de Talleres
 
+
+

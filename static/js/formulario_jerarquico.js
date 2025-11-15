@@ -23,6 +23,35 @@ $(function () {
   const $motor = $("#id_motor");
   const $caja = $("#id_caja");
 
+  const endpointsTag = document.getElementById("vehiculos-endpoints");
+  const endpoints = endpointsTag ? endpointsTag.dataset || {} : {};
+
+  function getDatasetValue(...keys) {
+    for (const key of keys) {
+      if (key && endpoints[key]) {
+        return endpoints[key];
+      }
+    }
+    return undefined;
+  }
+
+  function detectBasePrefix() {
+    const path = window.location.pathname || "";
+    if (path.includes("/us/en/")) return "/us/en/vehiculos/";
+    if (path.startsWith("/us/")) return "/us/vehiculos/";
+    if (path.includes("/cl/es/")) return "/cl/es/vehiculos/";
+    if (path.startsWith("/cl/")) return "/cl/es/vehiculos/";
+    if (path.includes("/mx/")) return "/mx/vehiculos/";
+    if (path.includes("/compat/")) return "/cl/es/vehiculos/";
+    return "/cl/es/vehiculos/";
+  }
+
+  const basePrefix = detectBasePrefix();
+
+  const modelosUrl = getDatasetValue("epModelos", "modelosUrl") || `${basePrefix}ajax/modelos-por-marca-anio/`;
+  const motoresUrl = getDatasetValue("epMotores", "motoresUrl") || `${basePrefix}ajax/motores-por-modelo/`;
+  const cajasUrl = getDatasetValue("epCajas", "cajasUrl") || `${basePrefix}ajax/cajas-por-modelo/`;
+
   // Cuando cambia marca o año → cargar modelos
   $marca.add($anio).on("change", function () {
     const marcaId = $marca.val();
@@ -33,13 +62,18 @@ $(function () {
       clearAndDisable($caja, "Selecciona un modelo primero");
       return;
     }
-    // Construir URL basada en la ruta actual
-    const baseUrl = window.location.pathname.includes('/us/') ? '/us/vehiculos/ajax/modelos-por-marca-anio/' : '/cl/vehiculos/ajax/modelos-por-marca-anio/';
-
-    $.getJSON(baseUrl, { marca_id: marcaId, anio: year }, function (data) {
+    $.getJSON(modelosUrl, { marca_id: marcaId, anio: year }, function (data) {
+      console.log("📦 Respuesta modelos:", data);
       $modelo.empty().append($("<option>").val("").text("Seleccione un modelo"));
-      $.each(data.results || data, function (_, item) {
-        $modelo.append($("<option>").val(item.id).text(item.text || item.nombre));
+      const modelos = Array.isArray(data)
+        ? data
+        : Array.isArray(data.results)
+          ? data.results
+          : [];
+      console.log("📋 Modelos normalizados:", modelos.length);
+      $.each(modelos, function (_, item) {
+        const text = item.text || item.nombre || item.label || item.value || "";
+        $modelo.append($("<option>").val(item.id).text(text));
       });
       enable($modelo);
     });
@@ -54,15 +88,19 @@ $(function () {
       return;
     }
 
-    // Construir URLs basadas en la ruta actual
-    const motoresUrl = window.location.pathname.includes('/us/') ? '/us/vehiculos/ajax/motores-por-modelo/' : '/cl/vehiculos/ajax/motores-por-modelo/';
-    const cajasUrl = window.location.pathname.includes('/us/') ? '/us/vehiculos/ajax/cajas-por-modelo/' : '/cl/vehiculos/ajax/cajas-por-modelo/';
-
     // Motores
     $.getJSON(motoresUrl, { modelo_id: modeloId }, function (data) {
       $motor.empty().append($("<option>").val("").text("Seleccione un motor"));
-      $.each(data.results || data, function (_, item) {
-        $motor.append($("<option>").val(item.id).text(item.text || item.nombre));
+      const motores = Array.isArray(data)
+        ? data
+        : Array.isArray(data.results)
+          ? data.results
+          : Array.isArray(data.motores)
+            ? data.motores
+            : [];
+      $.each(motores, function (_, item) {
+        const text = item.text || item.nombre || item.label || item.value || "";
+        $motor.append($("<option>").val(item.id).text(text));
       });
       $motor.append($("<option>").val(NEW_SENTINEL).text("➕ Agregar nuevo motor..."));
       enable($motor);
@@ -71,8 +109,16 @@ $(function () {
     // Cajas
     $.getJSON(cajasUrl, { modelo_id: modeloId }, function (data) {
       $caja.empty().append($("<option>").val("").text("Seleccione una caja"));
-      $.each(data.results || data, function (_, item) {
-        $caja.append($("<option>").val(item.id).text(item.text || item.nombre));
+      const cajas = Array.isArray(data)
+        ? data
+        : Array.isArray(data.results)
+          ? data.results
+          : Array.isArray(data.cajas)
+            ? data.cajas
+            : [];
+      $.each(cajas, function (_, item) {
+        const text = item.text || item.nombre || item.label || item.value || "";
+        $caja.append($("<option>").val(item.id).text(text));
       });
       $caja.append($("<option>").val(NEW_SENTINEL).text("➕ Agregar nueva caja..."));
       enable($caja);

@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load country_url %}
 {% load i18n static %}
+{% load money %}
 
 {% block content %}
 {% csrf_token %}
@@ -185,7 +186,7 @@
         <div class="stat-label">Total Parts</div>
       </div>
       <div class="stat-card">
-        <div class="stat-number">${{ total_value|default:"0.00" }}</div>
+        <div class="stat-number">{{ total_value|money_by_country:country }}</div>
         <div class="stat-label">Total Value</div>
       </div>
       <div class="stat-card">
@@ -242,7 +243,7 @@
         {% endif %}
 
         <div class="flex justify-between items-center mt-4">
-          <div class="part-price">${{ repuesto.precio_venta|default:"0.00" }}</div>
+          <div class="part-price">{{ repuesto.precio_venta|money_by_country:country }}</div>
           <div class="text-sm text-gray-400">
             Stock: {{ repuesto.cantidad_stock|default:"0" }}
           </div>

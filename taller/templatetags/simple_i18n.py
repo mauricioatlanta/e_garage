@@ -59,6 +59,8 @@ def precio_pais(context, precio):
 
     if empresa.pais == "US":
         return f"${precio:,.2f} USD"
+    if empresa.pais == "MX":
+        return f"${precio:,.2f} MXN"
     else:
         return f"${precio:,.0f} CLP"
 
@@ -89,3 +91,11 @@ def es_chile(user):
     Verifica si el usuario es de Chile
     """
     return hasattr(user, "empresa") and user.empresa.pais == "CL"
+
+
+@register.filter
+def es_mexico(user):
+    """
+    Verifica si el usuario es de México
+    """
+    return hasattr(user, "empresa") and user.empresa.pais == "MX"

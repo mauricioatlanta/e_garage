@@ -24,7 +24,7 @@ class ColorVehiculo(models.Model):
     country = models.CharField(
         max_length=2,
         default="CL",
-        choices=[("CL", "Chile"), ("US", "Estados Unidos")],
+        choices=[("CL", "Chile"), ("US", "Estados Unidos"), ("MX", "México")],
         db_index=True,
         verbose_name="País",
     )
@@ -105,6 +105,20 @@ class ColorVehiculo(models.Model):
                 "Purple",
                 "Orange",
             ],
+            "MX": [
+                "Blanco",
+                "Negro",
+                "Rojo",
+                "Azul",
+                "Verde",
+                "Amarillo",
+                "Gris",
+                "Plateado",
+                "Dorado",
+                "Café",
+                "Morado",
+                "Naranja",
+            ],
         }.get(country, [])
 
         created = []
@@ -140,7 +154,7 @@ class MotorVehiculo(models.Model):
     country = models.CharField(
         max_length=2,
         default="CL",
-        choices=[("CL", "Chile"), ("US", "Estados Unidos")],
+        choices=[("CL", "Chile"), ("US", "Estados Unidos"), ("MX", "México")],
         db_index=True,
         verbose_name="País",
     )
@@ -193,7 +207,7 @@ class CajaVehiculo(models.Model):
     country = models.CharField(
         max_length=2,
         default="CL",
-        choices=[("CL", "Chile"), ("US", "Estados Unidos")],
+        choices=[("CL", "Chile"), ("US", "Estados Unidos"), ("MX", "México")],
         db_index=True,
         verbose_name="País",
     )

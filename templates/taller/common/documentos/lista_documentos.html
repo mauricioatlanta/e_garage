@@ -2,6 +2,7 @@
 {% load static %}
 {% load humanize %}
 {% load country_url %}
+{% load money %}
 
 <!-- 🔴 DEBUG: COMMON DOCUMENTS LIST TEMPLATE LOADED -->
 <div style="position: fixed; top: 60px; left: 10px; width: 200px; height: 80px; background-color: #ff0000; z-index: 9999; border: 3px solid #000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 10px; padding: 5px;">
@@ -363,7 +364,7 @@ body {
             <div class="document-card">
                 <div class="document-header">
                     <div class="document-title">
-                        📄 {{ documento.tipo_documento|default:"Documento" }} #{{ documento.id }}
+                        📄 {{ documento.tipo_documento|default:"Documento" }} #{{ documento.numero|default:documento.id }}
                     </div>
                     <div class="document-status status-{{ documento.estado|default:'pendiente' }}">
                         {{ documento.estado|default:"Pendiente"|title }}
@@ -373,27 +374,61 @@ body {
                 <div class="document-info">
                     <div class="info-item">
                         <div class="info-label">Cliente</div>
-                        <div class="info-value">{{ documento.cliente.nombre|default:"Sin cliente" }} {{ documento.cliente.apellido|default:"" }}</div>
+                        <div class="info-value">
+                            {% if documento.cliente %}
+                                {{ documento.cliente.nombre|default_if_none:"" }} {{ documento.cliente.apellido|default_if_none:"" }}
+                            {% else %}
+                                Sin cliente
+                            {% endif %}
+                        </div>
                     </div>
                     <div class="info-item">
                         <div class="info-label">Vehículo</div>
-                        <div class="info-value">{{ documento.vehiculo.patente|default:"Sin vehículo" }}</div>
+                        <div class="info-value">
+                            {% if documento.vehiculo %}
+                                {{ documento.vehiculo.display_label|default:documento.vehiculo.patente|default:"Sin vehículo" }}
+                            {% else %}
+                                Sin vehículo
+                            {% endif %}
+                        </div>
                     </div>
                     <div class="info-item">
                         <div class="info-label">Fecha Creación</div>
-                        <div class="info-value">{{ documento.fecha_creacion|date:"d/m/Y H:i"|default:"N/A" }}</div>
+                        <div class="info-value">{{ documento.created_at|date:"d/m/Y H:i"|default:"N/A" }}</div>
                     </div>
                     <div class="info-item">
                         <div class="info-label">Total</div>
-                        <div class="info-value">{{ moneda }}{{ documento.total|floatformat:0|intcomma|default:"0" }}</div>
+                        <div class="info-value">{{ documento.total|money_by_country:country }}</div>
                     </div>
                     <div class="info-item">
-                        <div class="info-label">Técnico</div>
-                        <div class="info-value">{{ documento.tecnico.nombre|default:"Sin asignar" }}</div>
+                        <div class="info-label">Repuestos</div>
+                        <div class="info-value">{{ documento.neto_repuestos|money_by_country:country }}</div>
                     </div>
                     <div class="info-item">
                         <div class="info-label">Servicios</div>
-                        <div class="info-value">{{ documento.servicios.count|default:"0" }} servicios</div>
+                        <div class="info-value">{{ documento.neto_servicios|money_by_country:country }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Otros Servicios</div>
+                        <div class="info-value">{{ documento.neto_otros_servicios|money_by_country:country }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">IVA / Impuestos</div>
+                        <div class="info-value">{{ documento.tax_amount|money_by_country:country }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Técnico</div>
+                        <div class="info-value">
+                            {% if documento.tecnico_responsable %}
+                                {{ documento.tecnico_responsable.nombre|default:"Sin asignar" }}
+                            {% else %}
+                                Sin asignar
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Servicios</div>
+                        <div class="info-value">{{ documento.servicios_count|default:"0" }} servicios</div>
                     </div>
                 </div>
 

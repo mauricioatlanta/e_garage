@@ -2,6 +2,7 @@ import json
 import logging
 from datetime import datetime
 from decimal import Decimal
+import re
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -708,7 +709,7 @@ def api_buscar_servicios_internos(request):
 @csrf_exempt
 def api_obtener_numero_documento(request):
     # Obtener el país desde la URL
-    country = _country_from_request(request)
+    _country_from_request(request)  # Solo para logging y side-effects existentes
     """API para obtener el próximo número de documento según el tipo"""
     if request.method != "GET":
         return JsonResponse({"error": "Método no permitido"}, status=405)
@@ -759,20 +760,43 @@ def api_obtener_numero_documento(request):
             tipo_documento.upper(), tipo_documento.upper()
         )
 
-        # Buscar el último número para este tipo de documento en esta empresa
-        ultimo_doc = (
-            Documento.objects.filter(
-                empresa=empresa,
-                tipo=tipo_documento,  # Usar el tipo original para la consulta DB
-            )
-            .order_by("-numero")
-            .first()
-        )
+        def _parse_sequence(value):
+            if value in (None, ""):
+                return None
+            if isinstance(value, int):
+                return value
+            try:
+                text = str(value)
+            except Exception:
+                return None
 
-        if ultimo_doc and ultimo_doc.numero:
-            proximo_numero = ultimo_doc.numero + 1
-        else:
-            proximo_numero = 1
+            # Intentar extraer los dígitos finales (soporta formatos como OT-001)
+            match = re.search(r"(\\d+)$", text)
+            if match:
+                try:
+                    return int(match.group(1))
+                except ValueError:
+                    pass
+
+            try:
+                return int(text)
+            except (TypeError, ValueError):
+                return None
+
+        # Calcular la secuencia más alta existente para este tipo en la empresa
+        secuencia_maxima = 0
+        numeros_existentes = (
+            Documento.objects.filter(empresa=empresa, tipo=tipo_documento)
+            .exclude(numero__isnull=True)
+            .exclude(numero__exact="")
+            .values_list("numero", flat=True)
+        )
+        for numero in numeros_existentes.iterator():
+            seq = _parse_sequence(numero)
+            if seq and seq > secuencia_maxima:
+                secuencia_maxima = seq
+
+        proximo_numero = (secuencia_maxima or 0) + 1
 
         # Generar el número formateado según el país y tipo
         if empresa.pais == "US":

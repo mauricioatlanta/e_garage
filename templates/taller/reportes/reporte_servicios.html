@@ -296,6 +296,49 @@
         letter-spacing: 1px;
     }
 
+    .periodo-filters {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .periodo-input {
+        width: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        border: 1px solid rgba(0, 255, 136, 0.3);
+        border-radius: 12px;
+        padding: 10px 14px;
+        color: white;
+        font-family: 'Orbitron', monospace;
+    }
+
+    .resumen-periodo {
+        background: rgba(0, 0, 0, 0.7);
+        border: 1px solid rgba(0, 255, 136, 0.3);
+        border-radius: 15px;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .resumen-label {
+        color: rgba(255, 255, 255, 0.7);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.9rem;
+        margin-bottom: 8px;
+    }
+
+    .resumen-value {
+        font-size: 2.2rem;
+        font-weight: 900;
+    }
+
+    .resumen-value.positivo {
+        color: var(--ai-primary);
+        text-shadow: 0 0 15px rgba(0, 255, 136, 0.6);
+    }
+
     .ai-list {
         list-style: none;
         padding: 0;
@@ -348,6 +391,76 @@
         <button class="enfoque-btn" data-enfoque="vehiculos">🚗 Vehículos Atendidos</button>
         <button class="enfoque-btn" data-enfoque="clientes">👤 Análisis de Clientes</button>
         <button class="enfoque-btn" data-enfoque="agenda">📅 Agenda y Turnos</button>
+    </div>
+
+    <!-- Panel Filtro por período -->
+    <div class="enfoque-panel servicios-periodo-panel">
+        <h2 class="text-2xl font-bold text-center text-white mb-4">🔍 Servicios por período</h2>
+        <form method="get" class="periodo-filters">
+            <div>
+                <label for="fecha_desde" class="text-sm text-cyan-200 block mb-1">Fecha desde</label>
+                <input type="date" id="fecha_desde" name="fecha_desde"
+                       value="{{ fecha_desde|date:'Y-m-d' }}"
+                       class="periodo-input">
+            </div>
+            <div>
+                <label for="fecha_hasta" class="text-sm text-cyan-200 block mb-1">Fecha hasta</label>
+                <input type="date" id="fecha_hasta" name="fecha_hasta"
+                       value="{{ fecha_hasta|date:'Y-m-d' }}"
+                       class="periodo-input">
+            </div>
+            <div class="flex items-end">
+                <button type="submit" class="enfoque-btn active">Filtrar</button>
+            </div>
+        </form>
+
+        <div class="resumen-periodo">
+            <p class="resumen-label">Total generado en el período</p>
+            <p class="resumen-value positivo">${{ total_periodo_servicios|floatformat:0|intcomma }}</p>
+        </div>
+
+        <div class="overflow-x-auto mt-6">
+            <table class="w-full text-sm futuristic-table">
+                <thead>
+                    <tr>
+                        <th>Documento</th>
+                        <th>Fecha</th>
+                        <th>Cliente</th>
+                        <th>Técnico</th>
+                        <th>Total Servicios</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for doc in documentos_periodo %}
+                    <tr>
+                        <td>{{ doc.numero|default:doc.id }}</td>
+                        <td>{{ doc.fecha_emision|date:"d/m/Y" }}</td>
+                        <td>
+                            {% if doc.cliente %}
+                                {{ doc.cliente.nombre }} {{ doc.cliente.apellido }}
+                            {% else %}
+                                Sin cliente
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if doc.tecnico_responsable %}
+                                {{ doc.tecnico_responsable.nombre }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>${{ doc.total_servicios|floatformat:0|intcomma }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-cyan-200">
+                            No se encontraron servicios en el período seleccionado.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <!-- Panel Facturación Total -->

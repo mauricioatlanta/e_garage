@@ -41,7 +41,7 @@ def _resolve_country_from_request(request):
     # 1) empresa en request
     emp = _get_empresa(request)
     pais = getattr(emp, "pais", None)
-    if pais in ("CL", "US"):
+    if pais in ("CL", "US", "MX"):
         return pais
 
     # 2) prefijo URL
@@ -50,6 +50,8 @@ def _resolve_country_from_request(request):
         return "CL"
     if path.startswith("/us/"):
         return "US"
+    if path.startswith("/mx/"):
+        return "MX"
     return None
 
 
@@ -164,7 +166,7 @@ class MarcaAutocomplete(autocomplete.Select2QuerySetView):
             return Marca.objects.none()
 
         country = _resolve_country_from_request(self.request)
-        if country not in ("CL", "US"):
+        if country not in ("CL", "US", "MX"):
             return Marca.objects.none()
 
         qs = Marca.objects.filter(country=country)
@@ -179,7 +181,7 @@ class ModeloAutocomplete(autocomplete.Select2QuerySetView):
             return Modelo.objects.none()
 
         country = _resolve_country_from_request(self.request)
-        if country not in ("CL", "US"):
+        if country not in ("CL", "US", "MX"):
             return Modelo.objects.none()
 
         qs = Modelo.objects.select_related("marca").filter(country=country)

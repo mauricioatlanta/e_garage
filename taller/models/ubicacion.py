@@ -35,6 +35,7 @@ class Estado(models.Model):
             ("CL", "Chile"),  # ISO 3166-1: CL
             ("US", "Estados Unidos"),  # ISO 3166-1: US
             ("BR", "Brasil"),  # ISO 3166-1: BR
+            ("MX", "México"),  # ISO 3166-1: MX
             ("PE", "Perú"),  # ISO 3166-1: PE
             ("VE", "Venezuela"),  # ISO 3166-1: VE
         ],

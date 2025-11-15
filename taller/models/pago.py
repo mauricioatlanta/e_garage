@@ -81,10 +81,14 @@ class PagoPendiente(models.Model):
         # 📧 ENVIAR EMAIL DE CONFIRMACIÓN
         try:
             # Determinar idioma según país
-            language = "es" if self.empresa.pais == "CL" else "en"
+            language = "es" if self.empresa.pais in {"CL", "MX"} else "en"
 
             # Determinar moneda
-            moneda = "CLP" if self.empresa.pais == "CL" else "USD"
+            moneda = (
+                "CLP"
+                if self.empresa.pais == "CL"
+                else "MXN" if self.empresa.pais == "MX" else "USD"
+            )
 
             # Asunto según idioma
             if language == "en":

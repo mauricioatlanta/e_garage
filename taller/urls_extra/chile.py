@@ -22,7 +22,6 @@ logger.debug("CARGANDO taller/urls_extra/chile.py")
 from django.http import HttpResponseRedirect
 
 from taller.taller_views import dashboard_suscripciones
-from taller.views_extra.ajax import buscar_clientes, vehiculos_por_cliente
 from taller.views_extra.company_settings_views import company_settings_view
 from taller.views_extra.country_views import test_chile_view
 from taller.views_extra.dashboard_empresa import (
@@ -142,13 +141,8 @@ urlpatterns = [
     ),
     # === APIs ===
     path("api/", include(("taller.api.urls", "api"), namespace="api")),
-    # === AJAX ENDPOINTS ESPECÍFICOS PARA CHILE ===
-    path("ajax/clientes/buscar/", buscar_clientes, name="cl_ajax_buscar_clientes"),
-    path(
-        "ajax/vehiculos-por-cliente/",
-        vehiculos_por_cliente,
-        name="cl_ajax_vehiculos_por_cliente",
-    ),
+    # === AJAX ENDPOINTS ===
+    path("ajax/", include(("taller.ajax.urls", "ajax"), namespace="ajax")),
     # === MÓDULOS PRINCIPALES ===
     # Incluir URLs principales de taller (clientes, vehiculos, repuestos, etc.)
     path("", include(("taller.urls", "taller"), namespace="taller")),

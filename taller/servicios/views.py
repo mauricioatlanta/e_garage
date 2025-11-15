@@ -1,11 +1,46 @@
+from collections import defaultdict
+
 from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.utils.translation import get_language
+from django.views.decorators.http import require_POST
+
+from django.contrib.auth.decorators import login_required
+from django.utils.text import slugify
+import json
 
 from taller.utils.templates import select_country_lang_template
 
-from .models import CategoriaServicio, Servicio, ServicioExterno, SubcategoriaServicio
+from .models import (
+    CategoriaServicio,
+    CategoriaServicioName,
+    Servicio,
+    ServicioExterno,
+    SubcategoriaServicio,
+    SubcategoriaServicioName,
+)
+
+SERVICIO_TYPE_LABELS = {
+    "es": {
+        "interno": "Interno",
+        "externo": "Externo",
+        "servicio interno": "Interno",
+        "servicio externo": "Externo",
+    },
+    "en": {
+        "interno": "In-shop",
+        "externo": "Outsourced",
+        "internal": "In-shop",
+        "external": "Outsourced",
+    },
+    "pt": {
+        "interno": "Interno",
+        "externo": "Externo",
+        "serviço interno": "Interno",
+        "serviço externo": "Externo",
+    },
+}
 
 
 # Menú principal de servicios con diseño moderno
@@ -14,42 +49,87 @@ def servicios_menu(request):
     empresa = getattr(request.user, "empresa", None)
 
     # Obtener país e idioma del request
-    country_code = empresa.pais if empresa else "CL"
+    country_code = _detectar_pais(request)
     lang = get_language() or "es"
+    language = COUNTRY_LANGUAGE_MAP.get(country_code, (lang or "es")[:2])
 
     # Obtener servicios con filtros básicos
-    servicios = Servicio.objects.filter(empresa=empresa) if empresa else Servicio.objects.none()
+    if empresa:
+        servicios = Servicio.objects.filter(empresa=empresa)
+        if not servicios.exists():
+            servicios = Servicio.objects.all()
+    else:
+        servicios = Servicio.objects.all()
 
-    # Filtrar categorías por país
-    categorias = CategoriaServicio.objects.filter(country=country_code).prefetch_related("names")
-    subcategorias = SubcategoriaServicio.objects.filter(country=country_code).prefetch_related(
-        "names"
+    servicios_qs = (
+        servicios.select_related("categoria", "subcategoria")
+        .prefetch_related("names", "categoria__names", "subcategoria__names")
+        .order_by("nombre")
     )
+    if language:
+        servicios_qs = servicios_qs.filter(names__language=language).distinct()
+    servicios_list = list(servicios_qs)
 
-    # Agrupar servicios por categoría para mejor organización
-    servicios_por_categoria = {}
+    for servicio in servicios_list:
+        servicio.nombre_localizado = servicio.get_label(language)
+        servicio.categoria_label = (
+            servicio.categoria.get_label(language) if servicio.categoria else ""
+        )
+        servicio.subcategoria_label = (
+            servicio.subcategoria.get_label(language) if servicio.subcategoria else ""
+        )
+        raw_tipo = (getattr(servicio, "tipo", "") or "").strip().lower()
+        servicio.tipo_label = SERVICIO_TYPE_LABELS.get(language, {}).get(
+            raw_tipo, raw_tipo.title() if raw_tipo else ""
+        )
+
+    categorias = list(
+        CategoriaServicio.objects.filter(
+            country=country_code,
+            names__language=language,
+            names__is_default=True,
+        )
+        .prefetch_related("names")
+        .order_by("code")
+        .distinct()
+    )
     for categoria in categorias:
-        servicios_cat = servicios.filter(categoria=categoria).select_related("subcategoria")
-        if servicios_cat.exists():
-            servicios_por_categoria[categoria] = servicios_cat
+        categoria.label_localizado = categoria.get_label(language)
 
-    # Estadísticas para el dashboard
+    subcategorias = list(
+        SubcategoriaServicio.objects.filter(
+            country=country_code,
+            names__language=language,
+            names__is_default=True,
+        )
+        .prefetch_related("names")
+        .order_by("code")
+        .distinct()
+    )
+    for subcategoria in subcategorias:
+        subcategoria.label_localizado = subcategoria.get_label(language)
+
+    servicios_por_categoria = defaultdict(list)
+    for servicio in servicios_list:
+        if servicio.categoria:
+            servicios_por_categoria[servicio.categoria].append(servicio)
+
     stats = {
-        "total_servicios": servicios.count(),
-        "total_categorias": categorias.count(),
-        "total_subcategorias": subcategorias.count(),
-        "categorias_con_servicios": len(servicios_por_categoria),
+        "total_servicios": len(servicios_list),
+        "total_categorias": len(categorias),
+        "total_subcategorias": len(subcategorias),
+        "categorias_con_servicios": sum(1 for items in servicios_por_categoria.values() if items),
     }
 
     context = {
-        "servicios": servicios[:50],  # Limitar para performance inicial
+        "servicios": servicios_list[:50],  # Limitar para performance inicial
         "servicios_por_categoria": servicios_por_categoria,
         "categorias": categorias,
         "subcategorias": subcategorias,
         "stats": stats,
         "empresa": empresa,
         "country_code": country_code,
-        "language": lang,
+        "language": language,
     }
 
     # Para usuarios de USA, usar template específico
@@ -64,35 +144,60 @@ def servicios_menu(request):
 
 # API para búsqueda en tiempo real
 def buscar_servicios_api(request):
-    query = request.GET.get("q", "").strip()
-    categoria_id = request.GET.get("categoria", "")
+    query = (request.GET.get("q") or "").strip()
+    categoria_code = request.GET.get("categoria") or ""
+    subcategoria_code = request.GET.get("subcategoria") or ""
 
     # Obtener empresa del usuario
     empresa = getattr(request.user, "empresa", None)
 
-    servicios = Servicio.objects.filter(empresa=empresa) if empresa else Servicio.objects.none()
+    if empresa:
+        servicios = Servicio.objects.filter(empresa=empresa)
+        if not servicios.exists():
+            servicios = Servicio.objects.all()
+    else:
+        servicios = Servicio.objects.all()
+
+    country = _detectar_pais(request)
+    language = COUNTRY_LANGUAGE_MAP.get(country, "es")
 
     # Aplicar filtros de búsqueda
     if query:
         servicios = servicios.filter(
-            Q(nombre__icontains=query)
-            | Q(categoria__names__label__icontains=query)
-            | Q(subcategoria__names__label__icontains=query)
+            Q(names__label__icontains=query, names__language=language)
+            | Q(categoria__names__label__icontains=query, categoria__names__language=language)
+            | Q(subcategoria__names__label__icontains=query, subcategoria__names__language=language)
         ).distinct()
 
-    if categoria_id:
-        servicios = servicios.filter(categoria_id=categoria_id)
+    if categoria_code:
+        servicios = servicios.filter(categoria__code=categoria_code)
+
+    if subcategoria_code:
+        servicios = servicios.filter(subcategoria__code=subcategoria_code)
 
     # Preparar datos para JSON
     data = []
+    servicios = servicios.select_related("categoria", "subcategoria").prefetch_related(
+        "names", "categoria__names", "subcategoria__names"
+    )
+    servicios = servicios.filter(names__language=language).distinct()
     for servicio in servicios[:20]:  # Limitar resultados
+        nombre_localizado = servicio.get_label(language)
         data.append(
             {
                 "pk": servicio.pk,
-                "nombre": servicio.nombre,
-                "categoria": (servicio.categoria.get_label() if servicio.categoria else ""),
+                "nombre": nombre_localizado,
+                "categoria": servicio.categoria.get_label(language) if servicio.categoria else "",
+                "categoria_id": servicio.categoria_id,
+                "categoria_code": servicio.categoria.code if servicio.categoria else "",
                 "subcategoria": (
-                    servicio.subcategoria.get_label() if servicio.subcategoria else ""
+                    servicio.subcategoria.get_label(language) if servicio.subcategoria else ""
+                ),
+                "subcategoria_id": servicio.subcategoria_id,
+                "subcategoria_code": servicio.subcategoria.code if servicio.subcategoria else "",
+                "tipo": SERVICIO_TYPE_LABELS.get(language, {}).get(
+                    (getattr(servicio, "tipo", "") or "").strip().lower(),
+                    (getattr(servicio, "tipo", "") or "").strip().title(),
                 ),
             }
         )
@@ -105,57 +210,400 @@ def buscar_servicios_api(request):
     )
 
 
+# =================== Endpoints de creación rápida ===================
+COUNTRY_LANGUAGE_MAP = {
+    "CL": "es",
+    "MX": "es",
+    "VE": "es",
+    "PE": "es",
+    "US": "en",
+    "BR": "pt",
+}
+
+OTHER_LABELS = {
+    "CL": {
+        "title": "Otros servicios",
+        "subtitle": "Servicios gestionados con empresas externas de confianza.",
+        "button_add": "Registrar servicio externo",
+        "search_placeholder": "Buscar por servicio o proveedor externo...",
+        "stats_total": "Servicios externos registrados",
+        "stats_providers": "Empresas externas activas",
+        "card_service": "Servicio",
+        "card_company": "Proveedor externo",
+        "card_cost": "Costo al taller",
+        "card_price": "Precio al cliente",
+        "counter_single": "1 servicio encontrado",
+        "counter_plural": "{n} servicios encontrados",
+        "empty_title": "Sin servicios externos",
+        "empty_message": "Registra tus servicios tercerizados para mantener el control del taller.",
+    },
+    "MX": {
+        "title": "Otros servicios",
+        "subtitle": "Trabajos gestionados con proveedores externos de confianza.",
+        "button_add": "Registrar servicio externo",
+        "search_placeholder": "Busca por servicio o empresa proveedora...",
+        "stats_total": "Servicios externos registrados",
+        "stats_providers": "Proveedores externos activos",
+        "card_service": "Servicio",
+        "card_company": "Empresa proveedora",
+        "card_cost": "Costo al taller",
+        "card_price": "Precio al cliente",
+        "counter_single": "1 servicio encontrado",
+        "counter_plural": "{n} servicios encontrados",
+        "empty_title": "Sin servicios externos",
+        "empty_message": "Agrega los servicios tercerizados para tenerlos controlados.",
+    },
+    "PE": {
+        "title": "Otros servicios",
+        "subtitle": "Servicios realizados por empresas externas aliadas.",
+        "button_add": "Registrar servicio externo",
+        "search_placeholder": "Buscar por servicio o proveedor externo...",
+        "stats_total": "Servicios externos registrados",
+        "stats_providers": "Empresas externas activas",
+        "card_service": "Servicio",
+        "card_company": "Proveedor externo",
+        "card_cost": "Costo al taller",
+        "card_price": "Precio al cliente",
+        "counter_single": "1 servicio encontrado",
+        "counter_plural": "{n} servicios encontrados",
+        "empty_title": "Sin servicios externos",
+        "empty_message": "Registra tus servicios tercerizados para mantener el control.",
+    },
+    "VE": {
+        "title": "Otros servicios",
+        "subtitle": "Trabajos coordinados con aliados externos.",
+        "button_add": "Registrar servicio externo",
+        "search_placeholder": "Buscar por servicio o proveedor externo...",
+        "stats_total": "Servicios externos registrados",
+        "stats_providers": "Aliados externos activos",
+        "card_service": "Servicio",
+        "card_company": "Proveedor externo",
+        "card_cost": "Costo al taller",
+        "card_price": "Precio al cliente",
+        "counter_single": "1 servicio encontrado",
+        "counter_plural": "{n} servicios encontrados",
+        "empty_title": "Sin servicios externos",
+        "empty_message": "Comienza registrando los servicios prestados por terceros.",
+    },
+    "US": {
+        "title": "External services",
+        "subtitle": "Jobs handled by trusted third-party vendors.",
+        "button_add": "Register external service",
+        "search_placeholder": "Search by service or vendor...",
+        "stats_total": "External services on record",
+        "stats_providers": "Active partner vendors",
+        "card_service": "Service",
+        "card_company": "Vendor",
+        "card_cost": "Cost to shop",
+        "card_price": "Price to customer",
+        "counter_single": "1 service found",
+        "counter_plural": "{n} services found",
+        "empty_title": "No external services yet",
+        "empty_message": "Log outsourced work to keep your workshop fully tracked.",
+    },
+    "BR": {
+        "title": "Serviços externos",
+        "subtitle": "Serviços executados por empresas parceiras confiáveis.",
+        "button_add": "Cadastrar serviço externo",
+        "search_placeholder": "Buscar por serviço ou empresa parceira...",
+        "stats_total": "Serviços externos cadastrados",
+        "stats_providers": "Empresas parceiras ativas",
+        "card_service": "Serviço",
+        "card_company": "Empresa parceira",
+        "card_cost": "Custo para a oficina",
+        "card_price": "Preço para o cliente",
+        "counter_single": "1 serviço encontrado",
+        "counter_plural": "{n} serviços encontrados",
+        "empty_title": "Sem serviços externos",
+        "empty_message": "Cadastre os serviços terceirizados para manter o controle da oficina.",
+    },
+}
+
+CURRENCY_SETTINGS = {
+    "CL": {"code": "CLP", "locale": "es-CL", "symbol": "$"},
+    "MX": {"code": "MXN", "locale": "es-MX", "symbol": "$"},
+    "PE": {"code": "PEN", "locale": "es-PE", "symbol": "S/"},
+    "VE": {"code": "VES", "locale": "es-VE", "symbol": "Bs."},
+    "US": {"code": "USD", "locale": "en-US", "symbol": "$"},
+    "BR": {"code": "BRL", "locale": "pt-BR", "symbol": "R$"},
+}
+
+
+def _detectar_pais(request):
+    empresa = getattr(request.user, "empresa", None)
+    if empresa and getattr(empresa, "pais", None):
+        return empresa.pais.strip().upper()
+    path = request.path.lower()
+    if path.startswith("/us/"):
+        return "US"
+    if path.startswith("/br/"):
+        return "BR"
+    if path.startswith("/mx/"):
+        return "MX"
+    if path.startswith("/ve/"):
+        return "VE"
+    if path.startswith("/pe/"):
+        return "PE"
+    return "CL"
+
+
+def _generar_code(nombre, existente_qs):
+    base = slugify(nombre) or "categoria"
+    code = base.upper().replace("-", "_")
+    candidate = code
+    idx = 1
+    while existente_qs.filter(code=candidate).exists():
+        candidate = f"{code}_{idx}"
+        idx += 1
+    return candidate
+
+
+@login_required
+@require_POST
+def crear_categoria_api(request):
+    try:
+        payload = json.loads(request.body.decode("utf-8"))
+    except json.JSONDecodeError:
+        return JsonResponse({"success": False, "error": "Datos inválidos"}, status=400)
+
+    nombre = (payload.get("nombre") or "").strip()
+    aliases = payload.get("aliases") or []
+
+    if not nombre:
+        return JsonResponse({"success": False, "error": "El nombre es obligatorio"}, status=400)
+
+    country = _detectar_pais(request)
+    language = COUNTRY_LANGUAGE_MAP.get(country, "es")
+
+    qs = CategoriaServicio.objects.filter(country=country)
+    code = _generar_code(nombre, qs)
+
+    categoria, created = CategoriaServicio.objects.get_or_create(
+        country=country,
+        code=code,
+    )
+
+    CategoriaServicioName.objects.update_or_create(
+        categoria=categoria,
+        language=language,
+        is_default=True,
+        defaults={
+            "label": nombre,
+            "aliases": aliases if isinstance(aliases, list) else [aliases],
+        },
+    )
+
+    return JsonResponse(
+        {
+            "success": True,
+            "categoria": {
+                "id": categoria.id,
+                "code": categoria.code,
+                "label": nombre,
+                "country": categoria.country,
+            },
+            "created": created,
+        }
+    )
+
+
+@login_required
+@require_POST
+def crear_subcategoria_api(request):
+    try:
+        payload = json.loads(request.body.decode("utf-8"))
+    except json.JSONDecodeError:
+        return JsonResponse({"success": False, "error": "Datos inválidos"}, status=400)
+
+    categoria_id = payload.get("categoria_id")
+    nombre = (payload.get("nombre") or "").strip()
+    aliases = payload.get("aliases") or []
+
+    if not categoria_id or not nombre:
+        return JsonResponse(
+            {"success": False, "error": "Debe seleccionar categoria y nombre"}, status=400
+        )
+
+    try:
+        categoria = CategoriaServicio.objects.get(pk=categoria_id)
+    except CategoriaServicio.DoesNotExist:
+        return JsonResponse({"success": False, "error": "Categoría no encontrada"}, status=404)
+
+    country = categoria.country
+    language = COUNTRY_LANGUAGE_MAP.get(country, "es")
+
+    qs = SubcategoriaServicio.objects.filter(categoria=categoria)
+    code = _generar_code(nombre, qs)
+
+    subcategoria, created = SubcategoriaServicio.objects.get_or_create(
+        categoria=categoria,
+        code=code,
+        defaults={"country": country},
+    )
+    subcategoria.country = country
+    subcategoria.save(update_fields=["country"])
+
+    SubcategoriaServicioName.objects.update_or_create(
+        subcategoria=subcategoria,
+        language=language,
+        is_default=True,
+        defaults={
+            "label": nombre,
+            "aliases": aliases if isinstance(aliases, list) else [aliases],
+        },
+    )
+
+    return JsonResponse(
+        {
+            "success": True,
+            "subcategoria": {
+                "id": subcategoria.id,
+                "code": subcategoria.code,
+                "label": nombre,
+                "categoria_id": categoria.id,
+            },
+            "created": created,
+        }
+    )
+
+
+@login_required
+def buscar_otros_servicios_api(request):
+    empresa = getattr(request.user, "empresa", None)
+    if not empresa:
+        return JsonResponse({"otros_servicios": [], "total": 0})
+
+    country = _detectar_pais(request)
+    language = COUNTRY_LANGUAGE_MAP.get(country, "es")
+
+    if empresa:
+        otros_servicios = (
+            ServicioExterno.objects.filter(empresa=empresa)
+            .select_related("categoria", "subcategoria")
+            .order_by("nombre")
+        )
+        if not otros_servicios.exists():
+            otros_servicios = (
+                ServicioExterno.objects.all()
+                .select_related("categoria", "subcategoria")
+                .order_by("nombre")
+            )
+    else:
+        otros_servicios = (
+            ServicioExterno.objects.all()
+            .select_related("categoria", "subcategoria")
+            .order_by("nombre")
+        )
+
+    query = (request.GET.get("q") or "").strip()
+    if query:
+        otros_servicios = otros_servicios.filter(
+            Q(nombre__icontains=query) | Q(empresa_externa__icontains=query)
+        )
+
+    categoria_code = request.GET.get("categoria") or ""
+    if categoria_code:
+        otros_servicios = otros_servicios.filter(categoria__code=categoria_code)
+
+    subcategoria_code = request.GET.get("subcategoria") or ""
+    if subcategoria_code:
+        otros_servicios = otros_servicios.filter(subcategoria__code=subcategoria_code)
+
+    data = []
+    for servicio in otros_servicios[:20]:
+        data.append(
+            {
+                "pk": servicio.pk,
+                "nombre": servicio.nombre,
+                "empresa_externa": servicio.empresa_externa,
+                "categoria": servicio.categoria.get_label(language) if servicio.categoria else "",
+                "categoria_id": servicio.categoria_id,
+                "categoria_code": servicio.categoria.code if servicio.categoria else "",
+                "subcategoria": (
+                    servicio.subcategoria.get_label(language) if servicio.subcategoria else ""
+                ),
+                "subcategoria_id": servicio.subcategoria_id,
+                "subcategoria_code": servicio.subcategoria.code if servicio.subcategoria else "",
+                "costo_taller": str(servicio.costo_taller),
+                "precio_cliente": str(servicio.precio_cliente),
+            }
+        )
+
+    return JsonResponse({"otros_servicios": data, "total": otros_servicios.count()})
+
+
 # Menú de otros servicios (placeholder)
+@login_required
 def otros_servicios_menu(request):
     """Vista para el menú de otros servicios (servicios externos) con búsqueda inteligente"""
 
-    # Determinar el país basándose en la URL
-    country_code = "US" if request.path.startswith("/us/") else "CL"
-
-    # Obtener empresa del usuario
     empresa = getattr(request.user, "empresa", None)
+    country_code = _detectar_pais(request)
+    language = COUNTRY_LANGUAGE_MAP.get(country_code, "es")
+    labels = OTHER_LABELS.get(country_code, OTHER_LABELS["CL"])
+    currency_settings = CURRENCY_SETTINGS.get(country_code, CURRENCY_SETTINGS["CL"])
+
     if empresa:
-        # Obtener servicios externos de la empresa
-        otros_servicios = ServicioExterno.objects.filter(
-            empresa=empresa, activo=True
-        ).select_related("categoria", "subcategoria")
+        otros_qs = (
+            ServicioExterno.objects.filter(empresa=empresa)
+            .select_related("categoria", "subcategoria")
+            .order_by("nombre")
+        )
     else:
-        otros_servicios = ServicioExterno.objects.none()
+        otros_qs = ServicioExterno.objects.none()
 
-    # Obtener categorías y subcategorías para el formulario
-    categorias = CategoriaServicio.objects.filter(country=country_code)
-    subcategorias = SubcategoriaServicio.objects.filter(country=country_code)
+    categorias = (
+        CategoriaServicio.objects.filter(country=country_code)
+        .prefetch_related("names")
+        .order_by("code")
+    )
+    subcategorias = (
+        SubcategoriaServicio.objects.filter(country=country_code)
+        .prefetch_related("names")
+        .order_by("code")
+    )
 
-    # Estadísticas
     stats = {
-        "total_otros_servicios": otros_servicios.count(),
-        "total_categorias": otros_servicios.values("categoria").distinct().count(),
-        "total_subcategorias": otros_servicios.values("subcategoria").distinct().count(),
-        "total_empresas_externas": otros_servicios.values("empresa_externa").distinct().count(),
+        "total_servicios": otros_qs.count(),
+        "total_proveedores": otros_qs.values("empresa_externa").distinct().count(),
+        "total_categorias": categorias.count(),
     }
 
-    # Obtener país e idioma del request
-    empresa = getattr(request.user, "empresa", None)
-    country_code = empresa.pais if empresa else "CL"
-
-    # Override country detection based on URL path for USA routes
-    if request.path.startswith("/us/"):
-        country_code = "US"
-        lang = "en"
-    else:
-        lang = get_language() or "es"
+    otros_servicios = list(otros_qs[:50])
+    otros_servicios_data = []
+    for servicio in otros_servicios:
+        otros_servicios_data.append(
+            {
+                "pk": servicio.pk,
+                "nombre": servicio.nombre,
+                "empresa_externa": servicio.empresa_externa or "",
+                "categoria": servicio.categoria.get_label(language) if servicio.categoria else "",
+                "categoria_id": servicio.categoria_id,
+                "categoria_code": servicio.categoria.code if servicio.categoria else "",
+                "subcategoria": (
+                    servicio.subcategoria.get_label(language) if servicio.subcategoria else ""
+                ),
+                "subcategoria_id": servicio.subcategoria_id,
+                "subcategoria_code": servicio.subcategoria.code if servicio.subcategoria else "",
+                "costo_taller": str(servicio.costo_taller),
+                "precio_cliente": str(servicio.precio_cliente),
+            }
+        )
 
     context = {
-        "otros_servicios": otros_servicios,
+        "otros_servicios": otros_servicios_data,
         "categorias": categorias,
         "subcategorias": subcategorias,
         "stats": stats,
+        "labels": labels,
         "country": country_code,
+        "language": language,
+        "currency_settings": currency_settings,
         "empresa": empresa,
     }
 
     template_name = select_country_lang_template(
-        "servicios/otros_servicios_menu.html", country_code, lang
+        "servicios/otros_servicios_menu.html", country_code, language
     )
     return render(request, template_name, context)
 

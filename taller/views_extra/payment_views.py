@@ -45,6 +45,42 @@ def payment_chile(request):
 
 
 @login_required
+def payment_mexico(request):
+    """
+    Página de pago para México - Transferencia Bancaria
+    """
+    plan = request.GET.get("plan", "mensual")
+
+    precios = {
+        "mensual": {"valor": 399, "dias": 30, "nombre": "Mensual"},
+        "semestral": {"valor": 2199, "dias": 180, "nombre": "Semestral"},
+        "anual": {"valor": 3990, "dias": 365, "nombre": "Anual"},
+    }
+
+    plan_info = precios.get(plan, precios["mensual"])
+
+    datos_banco = {
+        "banco": "BBVA México",
+        "tipo_cuenta": "Cuenta CLABE",
+        "titular": "eGarage México S.A. de C.V.",
+        "clabe": "000000000000000000",  # Actualizar con CLABE real
+        "numero_cuenta": "00000000000",  # Actualizar con cuenta real
+        "email_confirmacion": "pagos-mx@egarage.app",
+    }
+
+    context = {
+        "empresa": request.user.empresa,
+        "plan": plan,
+        "plan_info": plan_info,
+        "datos_banco": datos_banco,
+        "monto_pagar": plan_info["valor"],
+        "referencia": f"eGarage-MX-{request.user.empresa.id}-{plan}",
+    }
+
+    return render(request, "suscripcion/pago_mexico.html", context)
+
+
+@login_required
 def payment_usa(request):
     """
     Página de pago para USA - PayPal
@@ -117,6 +153,8 @@ def subir_comprobante(request):
 
             if empresa.pais == "CL":
                 return redirect("/cl/es/dashboard/")
+            elif empresa.pais == "MX":
+                return redirect("/mx/es/dashboard/")
             else:
                 return redirect("/us/en/dashboard/")
 
@@ -141,6 +179,8 @@ def payment_success(request):
 
     if request.user.empresa.pais == "US":
         return redirect("/us/en/dashboard/")
+    elif request.user.empresa.pais == "MX":
+        return redirect("/mx/es/dashboard/")
     else:
         return redirect("/cl/es/dashboard/")
 
@@ -154,5 +194,7 @@ def payment_cancel(request):
 
     if request.user.empresa.pais == "US":
         return redirect("/us/en/dashboard/")
+    elif request.user.empresa.pais == "MX":
+        return redirect("/mx/es/dashboard/")
     else:
         return redirect("/cl/es/dashboard/")

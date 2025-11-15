@@ -130,6 +130,11 @@ class DocumentoDetailView(
 
         # Líneas de repuesto
         lineas_rep = doc.lineas_repuesto.all()
+        lineas_serv = doc.lineas_servicio.all()
+        lineas_otros = doc.lineas_otro_servicio.all()
+        ctx["lineas_repuesto"] = lineas_rep
+        ctx["lineas_servicio"] = lineas_serv
+        ctx["lineas_otro_servicio"] = lineas_otros
         print(f"[DEBUG DocumentoDetailView] Líneas de repuesto: {lineas_rep.count()}")
         for lr in lineas_rep:
             print(f"  - {lr.codigo}: {lr.nombre} (x{lr.cantidad} @ ${lr.precio_unitario})")
@@ -147,9 +152,9 @@ class DocumentoDetailView(
             or 0
         )
 
-        sum_serv = doc.lineas_servicio.aggregate(total=Sum("precio_unitario"))["total"] or 0
+        sum_serv = lineas_serv.aggregate(total=Sum("precio_unitario"))["total"] or 0
 
-        sum_otros = doc.lineas_otro_servicio.aggregate(total=Sum("precio_cliente"))["total"] or 0
+        sum_otros = lineas_otros.aggregate(total=Sum("precio_cliente"))["total"] or 0
 
         subtotal = (sum_rep or 0) + (sum_serv or 0) + (sum_otros or 0)
 
@@ -165,7 +170,7 @@ class DocumentoDetailView(
 
         # Datos detallados para el template
         repuestos = []
-        for lr in doc.lineas_repuesto.all().select_related("repuesto"):
+        for lr in lineas_rep.select_related("repuesto"):
             repuestos.append(
                 {
                     "codigo": lr.codigo
@@ -184,7 +189,7 @@ class DocumentoDetailView(
             print(f"  - {r}")
 
         servicios = []
-        for ls in doc.lineas_servicio.all().select_related("servicio"):
+        for ls in lineas_serv.select_related("servicio"):
             servicios.append(
                 {
                     "nombre": ls.nombre,
@@ -193,7 +198,7 @@ class DocumentoDetailView(
             )
 
         otros = []
-        for lo in doc.lineas_otro_servicio.all():
+        for lo in lineas_otros:
             otros.append(
                 {
                     "nombre_servicio": lo.nombre,
@@ -213,6 +218,7 @@ class DocumentoDetailView(
                 "subtotal_repuestos": sum_rep,
                 "subtotal_servicios": sum_serv,
                 "subtotal_otros": sum_otros,
+                "subtotal_otros_servicios": sum_otros,
                 "subtotal": subtotal,
                 "iva": tax,
                 "total": total,

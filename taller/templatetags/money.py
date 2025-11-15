@@ -24,8 +24,17 @@ def money_clp(value):
 
 @register.filter
 def money_by_country(value, country="CL"):
-    if country == "CL":
+    country_code = str(country or "CL").strip().upper()
+    if country_code == "CL":
         return money_clp(value)
-    # fallback USD 2 decimales
+
     n = _to_decimal(value)
-    return f"${n:,.2f}"
+    symbol_map = {
+        "US": "$",
+        "MX": "$",
+        "VE": "Bs. ",
+        "PE": "S/ ",
+        "BR": "R$ ",
+    }
+    symbol = symbol_map.get(country_code, "$")
+    return f"{symbol}{n:,.2f}"

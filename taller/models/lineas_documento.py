@@ -97,11 +97,7 @@ class LineaServicio(models.Model):
             pass
 
     def save(self, *args, **kwargs):
-        """Calcular subtotal y llamar validaciones antes de guardar"""
-        pais = getattr(getattr(self.documento, "empresa", None), "pais", "CL")
-        bruto = (self.cantidad or 0) * (self.precio_unitario or 0)
-        neto = Decimal(bruto) - Decimal(self.descuento or 0)
-        self.subtotal = money_quantize(neto if neto > 0 else Decimal("0"), pais)
+        """Calcular subtotal (solo lectura) y llamar validaciones antes de guardar"""
         self.full_clean()
         return super().save(*args, **kwargs)
 

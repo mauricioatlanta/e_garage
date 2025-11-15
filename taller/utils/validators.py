@@ -14,6 +14,23 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 
+def _alias_tax_id_type(tipo: str) -> str:
+    """Normaliza los identificadores de tipo de tax ID para reutilizar validadores."""
+    if not tipo:
+        return ""
+    mapping = {
+        "CL_RUT": "RUT_CL",
+        "US_EIN": "EIN",
+        "US_SSN": "SSN",
+        "BR_CPF": "CPF",
+        "BR_CNPJ": "CNPJ",
+        "PE_RUC": "RUC",
+        "VE_RIF": "RIF",
+        "MX_RFC": "RFC_MX",
+    }
+    return mapping.get(tipo, tipo)
+
+
 # ============================================================================
 # VALIDADORES DE TAX ID POR PAÍS
 # ============================================================================
@@ -50,21 +67,23 @@ def normalizar_tax_id(tax_id, tipo):
     tax_id = str(tax_id).strip().upper()
     tax_id_limpio = re.sub(r"[.\s,]", "", tax_id)
 
+    tipo_normalizado = _alias_tax_id_type(tipo)
+
     # Normalización específica por tipo
-    if tipo == "RUT_CL":
+    if tipo_normalizado == "RUT_CL":
         # RUT Chile: 12345678-9 (sin puntos, con guion)
         tax_id_limpio = re.sub(r"[-]", "", tax_id_limpio)  # Remover guiones existentes
         if len(tax_id_limpio) >= 2:
             # Agregar guion antes del dígito verificador
             tax_id_limpio = f"{tax_id_limpio[:-1]}-{tax_id_limpio[-1]}"
 
-    elif tipo == "EIN":
+    elif tipo_normalizado == "EIN":
         # EIN USA: 12-3456789 (formato XX-XXXXXXX)
         tax_id_limpio = re.sub(r"[-]", "", tax_id_limpio)
         if len(tax_id_limpio) == 9:
             tax_id_limpio = f"{tax_id_limpio[:2]}-{tax_id_limpio[2:]}"
 
-    elif tipo == "SSN":
+    elif tipo_normalizado == "SSN":
         # SSN USA: 123-45-6789 (formato XXX-XX-XXXX)
         tax_id_limpio = re.sub(r"[-]", "", tax_id_limpio)
         if len(tax_id_limpio) == 9:
@@ -268,6 +287,24 @@ def validar_rif_venezuela(rif):
         )
 
 
+def validar_rfc_mexico(rfc):
+    """
+    Validar RFC mexicano.
+
+    Formato:
+      - Personas físicas: 4 letras + 6 dígitos (fecha) + 3 alfanuméricos
+      - Personas morales: 3 letras + 6 dígitos + 3 alfanuméricos
+    """
+    if not rfc:
+        return
+
+    rfc = str(rfc).strip().upper()
+    rfc = re.sub(r"[-\s]", "", rfc)
+
+    if not re.match(r"^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$", rfc):
+        raise ValidationError(_("RFC debe tener formato válido: AAAAYYMMDDXXX o AAAYYMMDDXXX"))
+
+
 def validar_ein_usa(ein):
     """
     Validar EIN estadounidense (Employer Identification Number).
@@ -367,23 +404,26 @@ def validar_tax_id(tax_id, tax_id_type):
         return ""
 
     # Normalizar primero
-    tax_id_normalizado = normalizar_tax_id(tax_id, tax_id_type)
+    tipo = _alias_tax_id_type(tax_id_type)
+    tax_id_normalizado = normalizar_tax_id(tax_id, tipo)
 
     # Validar según tipo
-    if tax_id_type == "RUT_CL":
+    if tipo == "RUT_CL":
         validar_rut_chile(tax_id_normalizado)
-    elif tax_id_type == "CPF":
+    elif tipo == "CPF":
         validar_cpf_brasil(tax_id_normalizado)
-    elif tax_id_type == "CNPJ":
+    elif tipo == "CNPJ":
         validar_cnpj_brasil(tax_id_normalizado)
-    elif tax_id_type == "RUC":
+    elif tipo == "RUC":
         validar_ruc_peru(tax_id_normalizado)
-    elif tax_id_type == "RIF":
+    elif tipo == "RIF":
         validar_rif_venezuela(tax_id_normalizado)
-    elif tax_id_type == "EIN":
+    elif tipo == "EIN":
         validar_ein_usa(tax_id_normalizado)
-    elif tax_id_type == "SSN":
+    elif tipo == "SSN":
         validar_ssn_usa(tax_id_normalizado)
+    elif tipo == "RFC_MX":
+        validar_rfc_mexico(tax_id_normalizado)
 
     return tax_id_normalizado
 

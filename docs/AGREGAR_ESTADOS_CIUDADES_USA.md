@@ -293,3 +293,5 @@ Error: Cannot read property 'value' of null
 **Versión:** 2.1.0
 **Estado:** ✅ COMPLETADO
 
+
+

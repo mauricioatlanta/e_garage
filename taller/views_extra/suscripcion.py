@@ -25,7 +25,12 @@ def suscripcion_bloqueada(request):
 
 def _activation_url(request, pais: str) -> str:
     # Construye URL con dominio real
-    path = "/us/activar-trial/" if pais == "US" else "/cl/es/activar-trial/"
+    if pais == "US":
+        path = "/us/activar-trial/"
+    elif pais == "MX":
+        path = "/mx/es/activar-trial/"
+    else:
+        path = "/cl/es/activar-trial/"
     return request.build_absolute_uri(path)
 
 
@@ -121,9 +126,9 @@ def registro(request):
                 settings,
                 "EGARAGE_PLAN_AMOUNTS",
                 {
-                    "mensual": {"US": "$20.00 USD", "CL": "$20.000 CLP"},
-                    "semestral": {"US": "$110.00 USD", "CL": "$110.000 CLP"},
-                    "anual": {"US": "$200.00 USD", "CL": "$200.000 CLP"},
+                    "mensual": {"US": "$20.00 USD", "CL": "$20.000 CLP", "MX": "$399 MXN"},
+                    "semestral": {"US": "$110.00 USD", "CL": "$110.000 CLP", "MX": "$2,199 MXN"},
+                    "anual": {"US": "$200.00 USD", "CL": "$200.000 CLP", "MX": "$3,990 MXN"},
                 },
             )
             monto = montos.get(plan, {}).get(pais, "Consultar precio")
@@ -134,6 +139,7 @@ def registro(request):
                 {
                     "US": "Cuenta bancaria USA - [configurar]",
                     "CL": "Cuenta bancaria Chile - [configurar]",
+                    "MX": "Cuenta bancaria México - [configurar]",
                 },
             )
             cuenta_bancaria = cuentas.get(pais, "[configurar]")

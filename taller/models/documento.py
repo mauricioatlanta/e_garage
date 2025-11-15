@@ -71,12 +71,37 @@ class Documento(AuditMixin, models.Model):
     tax_amount = models.DecimalField(max_digits=14, decimal_places=2, default=Decimal("0.00"))
     total = models.DecimalField(max_digits=14, decimal_places=2, default=Decimal("0.00"))
 
-    # Campos de totales con nombres estándar para compatibilidad con frontend
-    total_repuestos = models.DecimalField(max_digits=14, decimal_places=2, default=0)
-    total_servicios = models.DecimalField(max_digits=14, decimal_places=2, default=0)
-    total_otros = models.DecimalField(max_digits=14, decimal_places=2, default=0)
-    iva = models.DecimalField(max_digits=14, decimal_places=2, default=0)
-    total_general = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    # Columnas legacy para compatibilidad con bases antiguas / frontend
+    legacy_total_repuestos = models.DecimalField(
+        db_column="total_repuestos",
+        max_digits=14,
+        decimal_places=2,
+        default=Decimal("0.00"),
+    )
+    legacy_total_servicios = models.DecimalField(
+        db_column="total_servicios",
+        max_digits=14,
+        decimal_places=2,
+        default=Decimal("0.00"),
+    )
+    legacy_total_otros = models.DecimalField(
+        db_column="total_otros",
+        max_digits=14,
+        decimal_places=2,
+        default=Decimal("0.00"),
+    )
+    legacy_iva = models.DecimalField(
+        db_column="iva",
+        max_digits=14,
+        decimal_places=2,
+        default=Decimal("0.00"),
+    )
+    legacy_total_general = models.DecimalField(
+        db_column="total_general",
+        max_digits=14,
+        decimal_places=2,
+        default=Decimal("0.00"),
+    )
 
     # Opcional: estado de pago
     payment_status = models.CharField(max_length=20, blank=True, default="pending")
@@ -431,16 +456,16 @@ class Documento(AuditMixin, models.Model):
             self.country = self.empresa.pais
 
         # Inicializar campos de totales si no tienen valor
-        if not hasattr(self, "total_repuestos") or self.total_repuestos is None:
-            self.total_repuestos = Decimal("0")
-        if not hasattr(self, "total_servicios") or self.total_servicios is None:
-            self.total_servicios = Decimal("0")
-        if not hasattr(self, "total_otros") or self.total_otros is None:
-            self.total_otros = Decimal("0")
-        if not hasattr(self, "iva") or self.iva is None:
-            self.iva = Decimal("0")
-        if not hasattr(self, "total_general") or self.total_general is None:
-            self.total_general = Decimal("0")
+        if self.legacy_total_repuestos is None:
+            self.legacy_total_repuestos = Decimal("0")
+        if self.legacy_total_servicios is None:
+            self.legacy_total_servicios = Decimal("0")
+        if self.legacy_total_otros is None:
+            self.legacy_total_otros = Decimal("0")
+        if self.legacy_iva is None:
+            self.legacy_iva = Decimal("0")
+        if self.legacy_total_general is None:
+            self.legacy_total_general = Decimal("0")
         if not hasattr(self, "payment_status") or not self.payment_status:
             self.payment_status = "pending"
 
@@ -468,27 +493,6 @@ class Documento(AuditMixin, models.Model):
     def incluir_iva(self):
         return self.tax_rate_applied > 0
 
-    # Métodos de compatibilidad (usando los nuevos campos calculados)
-    def total_repuestos(self):
-        """Compatibilidad: retorna neto_repuestos"""
-        return self.neto_repuestos or Decimal("0")
-
-    def total_servicios(self):
-        """Compatibilidad: retorna neto_servicios"""
-        return self.neto_servicios or Decimal("0")
-
-    def total_otros_servicios(self):
-        """Compatibilidad: retorna neto_otros_servicios"""
-        return self.neto_otros_servicios or Decimal("0")
-
-    def iva(self):
-        """Compatibilidad: retorna tax_amount"""
-        return self.tax_amount or Decimal("0")
-
-    def total_general(self):
-        """Compatibilidad: retorna total"""
-        return self.total or Decimal("0")
-
     @transaction.atomic
     def recalcular_totales(self, save=True):
         """
@@ -514,9 +518,14 @@ class Documento(AuditMixin, models.Model):
             output_field=DecimalField(max_digits=14, decimal_places=2),
         )
 
-        rep = self.lineas_repuesto.aggregate(total=Coalesce(Sum(rep_expr), Value(0)))["total"]
-        srv = self.lineas_servicio.aggregate(total=Coalesce(Sum(serv_expr), Value(0)))["total"]
-        otr = self.lineas_otro_servicio.aggregate(total=Coalesce(Sum(otros_expr), Value(0)))[
+        zero_decimal = Value(
+            Decimal("0"),
+            output_field=DecimalField(max_digits=14, decimal_places=2),
+        )
+
+        rep = self.lineas_repuesto.aggregate(total=Coalesce(Sum(rep_expr), zero_decimal))["total"]
+        srv = self.lineas_servicio.aggregate(total=Coalesce(Sum(serv_expr), zero_decimal))["total"]
+        otr = self.lineas_otro_servicio.aggregate(total=Coalesce(Sum(otros_expr), zero_decimal))[
             "total"
         ]
 
@@ -529,30 +538,47 @@ class Documento(AuditMixin, models.Model):
 
         total = rep + srv + otr + iva_val
 
-        # Redondeo por país
-        self.total_repuestos = money_quantize(rep, pais)
-        self.total_servicios = money_quantize(srv, pais)
-        self.total_otros = money_quantize(otr, pais)
-        self.iva = money_quantize(iva_val, pais)
-        self.total_general = money_quantize(total, pais)
+        neto_rep_q = money_quantize(rep, pais)
+        neto_srv_q = money_quantize(srv, pais)
+        neto_otr_q = money_quantize(otr, pais)
+        iva_q = money_quantize(iva_val, pais)
+        total_q = money_quantize(total, pais)
+
+        self.neto_repuestos = neto_rep_q
+        self.neto_servicios = neto_srv_q
+        self.neto_otros_servicios = neto_otr_q
+        self.tax_amount = iva_q
+        self.total = total_q
+
+        # Mantener columnas legacy sincronizadas
+        self.legacy_total_repuestos = neto_rep_q
+        self.legacy_total_servicios = neto_srv_q
+        self.legacy_total_otros = neto_otr_q
+        self.legacy_iva = iva_q
+        self.legacy_total_general = total_q
 
         if save:
-            self.save(
-                update_fields=[
-                    "total_repuestos",
-                    "total_servicios",
-                    "total_otros",
-                    "iva",
-                    "total_general",
-                ]
-            )
+            update_fields = [
+                "neto_repuestos",
+                "neto_servicios",
+                "neto_otros_servicios",
+                "tax_amount",
+                "total",
+                "legacy_total_repuestos",
+                "legacy_total_servicios",
+                "legacy_total_otros",
+                "legacy_iva",
+                "legacy_total_general",
+            ]
+
+            self.save(update_fields=update_fields)
 
         return {
-            "repuestos": self.total_repuestos,
-            "servicios": self.total_servicios,
-            "otros": self.total_otros,
-            "iva": self.iva,
-            "total": self.total_general,
+            "repuestos": self.neto_repuestos,
+            "servicios": self.neto_servicios,
+            "otros": self.neto_otros_servicios,
+            "iva": self.tax_amount,
+            "total": self.total,
         }
 
     @classmethod
@@ -578,6 +604,57 @@ class Documento(AuditMixin, models.Model):
     @property
     def otros_servicios(self):
         return self.lineas_otro_servicio
+
+    # Propiedades de compatibilidad con el frontend antiguo
+    @property
+    def total_repuestos(self):
+        return self.legacy_total_repuestos or Decimal("0")
+
+    @total_repuestos.setter
+    def total_repuestos(self, value):
+        val = Decimal(value or 0)
+        self.legacy_total_repuestos = val
+        self.neto_repuestos = val
+
+    @property
+    def total_servicios(self):
+        return self.legacy_total_servicios or Decimal("0")
+
+    @total_servicios.setter
+    def total_servicios(self, value):
+        val = Decimal(value or 0)
+        self.legacy_total_servicios = val
+        self.neto_servicios = val
+
+    @property
+    def total_otros(self):
+        return self.legacy_total_otros or Decimal("0")
+
+    @total_otros.setter
+    def total_otros(self, value):
+        val = Decimal(value or 0)
+        self.legacy_total_otros = val
+        self.neto_otros_servicios = val
+
+    @property
+    def iva(self):
+        return self.legacy_iva or Decimal("0")
+
+    @iva.setter
+    def iva(self, value):
+        val = Decimal(value or 0)
+        self.legacy_iva = val
+        self.tax_amount = val
+
+    @property
+    def total_general(self):
+        return self.legacy_total_general or Decimal("0")
+
+    @total_general.setter
+    def total_general(self, value):
+        val = Decimal(value or 0)
+        self.legacy_total_general = val
+        self.total = val
 
     class Meta:
         app_label = "taller"

@@ -2,7 +2,6 @@ from django.urls import include, path
 
 from taller import ajax_views
 from taller.taller_views import dashboard_suscripciones
-from taller.views_extra.ajax import buscar_clientes, vehiculos_por_cliente
 from taller.views_extra.bienvenida_usa import bienvenida_usa
 from taller.views_extra.company_settings_views import company_settings_view
 from taller.views_extra.dashboard_empresa import (
@@ -83,12 +82,8 @@ urlpatterns = [
         ajax_views.load_motores_cajas,
         name="ajax_load_motores_cajas",
     ),
-    path("ajax/clientes/buscar/", buscar_clientes, name="us_ajax_buscar_clientes"),
-    path(
-        "ajax/vehiculos-por-cliente/",
-        vehiculos_por_cliente,
-        name="us_ajax_vehiculos_por_cliente",
-    ),
+    # AJAX endpoints compartidos (clientes, vehículos, marcas, modelos, etc.)
+    path("ajax/", include(("taller.ajax.urls", "ajax"), namespace="ajax")),
     # 6) APIs
     path("api/", include(("taller.api.urls", "api"), namespace="api")),
     # 6.1) Autocomplete y creadores rápidos (verifica que no se dupliquen en taller.urls)

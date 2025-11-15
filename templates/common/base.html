@@ -211,7 +211,7 @@
   <div class="ml-auto flex items-center gap-4">
     <!-- Botón Settings -->
     {% if request.user.is_authenticated and request.user.is_staff and request.path != "/cl/" and request.path != "/us/" %}
-      {% country_url 'settings:ver_configuracion' as settings_url %}
+      {% country_url 'company_settings' as settings_url %}
       {% if settings_url %}
         <a href="{{ settings_url }}"
            class="flex items-center gap-2 px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition"
@@ -262,7 +262,7 @@
         <span>{% if LANGUAGE_CODE == 'es' %}DOCUMENTOS{% else %}DOCUMENTS{% endif %}</span>
       </a>
 
-      <a href="{% country_url 'centro_operaciones_espacial' %}" class="nav-btn-neon">
+      <a href="{% country_url 'centro_operaciones' %}" class="nav-btn-neon">
         <span class="nav-icon-sm">🚀</span>
         <span>{% if LANGUAGE_CODE == 'es' %}CENTRO{% else %}CENTER{% endif %}</span>
       </a>
@@ -343,11 +343,8 @@
 
     // Función global para confirmar eliminación
     function confirmarEliminacion(nombreCliente) {
-        const isSpanish = document.documentElement.lang === 'es';
-        const message = isSpanish
-            ? `⚠️ ¿Está seguro de que desea eliminar al cliente "${nombreCliente}"?\n\nEsta acción NO se puede deshacer.\n\nHaga clic en "Aceptar" para eliminar o "Cancelar" para mantener el cliente.`
-            : `⚠️ Are you sure you want to delete the client "${nombreCliente}"?\n\nThis action CANNOT be undone.\n\nClick "OK" to delete or "Cancel" to keep the client.`;
-        return confirm(message);
+      const mensaje = `⚠️ ¿Está seguro de que desea eliminar al cliente "${nombreCliente}"?\n\nEsta acción NO se puede deshacer.\n\nHaga clic en "Aceptar" para eliminar o "Cancelar" para mantener el cliente.`;
+      return confirm(mensaje);
     }
 </script>
 

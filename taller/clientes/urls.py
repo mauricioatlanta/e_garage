@@ -5,6 +5,8 @@ from .ajax_views import ajax_crear_ciudad_usa, ajax_crear_estado_usa
 from .views import (
     agregar_ciudad,
     agregar_ciudad_usa,
+    agregar_estado,
+    agregar_region,
     ajax_buscar_clientes,
     cliente_delete,
     clientes_stats,
@@ -32,6 +34,8 @@ urlpatterns = [
     path("ajax/ciudades_usa/", obtener_ciudades_usa, name="obtener_ciudades_usa"),
     path("ajax/agregar_ciudad/", agregar_ciudad, name="agregar_ciudad"),
     path("ajax/agregar_ciudad_usa/", agregar_ciudad_usa, name="agregar_ciudad_usa"),
+    path("ajax/agregar_region/", agregar_region, name="agregar_region"),
+    path("ajax/agregar_estado/", agregar_estado, name="agregar_estado"),
     # Nuevas vistas AJAX para crear estado y ciudad dinámicamente
     path("ajax/crear_estado_usa/", ajax_crear_estado_usa, name="ajax_crear_estado_usa"),
     path("ajax/crear_ciudad_usa/", ajax_crear_ciudad_usa, name="ajax_crear_ciudad_usa"),

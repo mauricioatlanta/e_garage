@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load humanize %}
+{% load money %}
 
 <!-- 🟢 CRUZ VERDE - TEMPLATE VER DOCUMENTO NUEVO -->
 <div style="position: fixed; top: 10px; left: 10px; width: 50px; height: 50px; background-color: #00ff00; z-index: 9999; border: 3px solid #000; display: flex; align-items: center; justify-content: center; color: black; font-weight: bold; font-size: 12px;">VER</div>
@@ -101,7 +102,8 @@
     </div>
 
     <!-- Repuestos -->
-    {% if repuestos %}
+    {% with rep_list=lineas_repuesto|default:repuestos %}
+    {% if rep_list %}
     <div class="bg-gray-800/50 backdrop-blur-lg rounded-xl border border-cyan-400/30 p-6 mb-6">
       <h3 class="text-xl font-semibold text-cyan-200 mb-4 flex items-center">
         🔧 Repuestos
@@ -118,14 +120,16 @@
             </tr>
           </thead>
           <tbody>
-            {% for repuesto in repuestos %}
+            {% for repuesto in rep_list %}
             <tr class="border-b border-gray-600/30">
               <td class="py-3 px-4 font-mono text-cyan-300">{{ repuesto.codigo|default:"N/A" }}</td>
               <td class="py-3 px-4">{{ repuesto.nombre|default:"N/A" }}</td>
               <td class="py-3 px-4 text-right">{{ repuesto.cantidad }}</td>
-              <td class="py-3 px-4 text-right">${{ repuesto.precio_unitario|floatformat:0|intcomma }}</td>
+              <td class="py-3 px-4 text-right">
+                {{ repuesto.precio_unitario|default_if_none:0|money_by_country:documento.country }}
+              </td>
               <td class="py-3 px-4 text-right font-semibold text-green-400">
-                ${{ repuesto.subtotal|floatformat:0|intcomma }}
+                {{ repuesto.subtotal|default_if_none:0|money_by_country:documento.country }}
               </td>
             </tr>
             {% endfor %}
@@ -134,9 +138,11 @@
       </div>
     </div>
     {% endif %}
+    {% endwith %}
 
     <!-- Servicios -->
-    {% if servicios %}
+{% with serv_list=lineas_servicio|default:servicios %}
+{% if serv_list %}
     <div class="bg-gray-800/50 backdrop-blur-lg rounded-xl border border-cyan-400/30 p-6 mb-6">
       <h3 class="text-xl font-semibold text-cyan-200 mb-4 flex items-center">
         ⚙️ Servicios
@@ -150,11 +156,11 @@
             </tr>
           </thead>
           <tbody>
-            {% for servicio in servicios %}
+            {% for servicio in serv_list %}
             <tr class="border-b border-gray-600/30">
               <td class="py-3 px-4">{{ servicio.nombre|default:"N/A" }}</td>
               <td class="py-3 px-4 text-right font-semibold text-green-400">
-                ${{ servicio.subtotal|floatformat:0|intcomma }}
+                {{ servicio.subtotal|default_if_none:0|money_by_country:documento.country }}
               </td>
             </tr>
             {% endfor %}
@@ -163,9 +169,11 @@
       </div>
     </div>
     {% endif %}
+    {% endwith %}
 
     <!-- Otros Servicios -->
-    {% if lineas_otro_servicio %}
+{% with otros_list=lineas_otro_servicio|default:otros_servicios %}
+{% if otros_list %}
     <div class="bg-gray-800/50 backdrop-blur-lg rounded-xl border border-cyan-400/30 p-6 mb-6">
       <h3 class="text-xl font-semibold text-cyan-200 mb-4 flex items-center">
         🛠️ Otros Servicios
@@ -180,12 +188,12 @@
             </tr>
           </thead>
           <tbody>
-            {% for otro in lineas_otro_servicio %}
+            {% for otro in otros_list %}
             <tr class="border-b border-gray-600/30">
               <td class="py-3 px-4">{{ otro.nombre_servicio|default:"N/A" }}</td>
               <td class="py-3 px-4">{{ otro.empresa_externa|default:"N/A" }}</td>
               <td class="py-3 px-4 text-right font-semibold text-green-400">
-                ${{ otro.precio_cliente|floatformat:0|intcomma }}
+                {{ otro.precio_cliente|default_if_none:0|money_by_country:documento.country }}
               </td>
             </tr>
             {% endfor %}
@@ -194,6 +202,7 @@
       </div>
     </div>
     {% endif %}
+    {% endwith %}
 
     <!-- Resumen de totales -->
     <div class="bg-gray-800/50 backdrop-blur-lg rounded-xl border border-cyan-400/30 p-6 mb-6">
@@ -204,31 +213,31 @@
         <div class="text-center">
           <p class="text-gray-400 text-sm">Subtotal Repuestos</p>
           <p class="text-xl font-semibold text-cyan-300">
-            ${{ subtotal_repuestos|floatformat:0|intcomma }}
+            {{ subtotal_repuestos|default_if_none:0|money_by_country:documento.country }}
           </p>
         </div>
         <div class="text-center">
           <p class="text-gray-400 text-sm">Subtotal Servicios</p>
           <p class="text-xl font-semibold text-cyan-300">
-            ${{ subtotal_servicios|floatformat:0|intcomma }}
+            {{ subtotal_servicios|default_if_none:0|money_by_country:documento.country }}
           </p>
         </div>
         <div class="text-center">
           <p class="text-gray-400 text-sm">Otros Servicios</p>
           <p class="text-xl font-semibold text-cyan-300">
-            ${{ subtotal_otros_servicios|floatformat:0|intcomma }}
+            {{ subtotal_otros_servicios|default_if_none:0|money_by_country:documento.country }}
           </p>
         </div>
         <div class="text-center">
           <p class="text-gray-400 text-sm">IVA (19%)</p>
           <p class="text-xl font-semibold text-yellow-400">
-            ${{ iva|floatformat:0|intcomma }}
+            {{ iva|default_if_none:0|money_by_country:documento.country }}
           </p>
         </div>
         <div class="text-center">
           <p class="text-gray-400 text-sm">Total</p>
           <p class="text-2xl font-bold text-green-400">
-            ${{ total|floatformat:0|intcomma }}
+            {{ total|default_if_none:0|money_by_country:documento.country }}
           </p>
         </div>
       </div>

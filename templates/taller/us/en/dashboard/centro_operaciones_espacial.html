@@ -1,13 +1,23 @@
-{% extends "base.html" %}
 {% load country_url %}
 {% load static %}
 {% load i18n %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ empresa.nombre_taller }} - Command Center</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+  <link rel="stylesheet" href="{% static 'css/output.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 
-{% block title %}{{ empresa.nombre_taller }} - Command Center{% endblock %}
-
-{% block extra_css %}
 <style>
+.company-header{background:linear-gradient(135deg,#1f2937 0%,#374151 50%,#1f2937 100%);border-bottom:4px solid #0d6efd;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+.company-title{color:#0d6efd;text-shadow:0 0 20px #0d6efd;filter:drop-shadow(0 4px 8px rgba(0,0,0,.3))}
+.company-logo{max-height:80px;max-width:200px;object-fit:contain}
 /* 🚀 Space Station Style for USA Dashboard */
 :root {
     --space-blue: #00d4ff;
@@ -598,9 +608,43 @@ body {
     }
 }
 </style>
-{% endblock %}
 
-{% block content %}
+</style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+<!-- Header con logo y lema -->
+<header class="company-header flex items-center gap-6 p-6">
+  {% if company_logo_url or COMPANY_LOGO %}
+    <img src="{{ company_logo_url|default:COMPANY_LOGO }}" alt="{{ company_name|default:COMPANY_NAME }} Logo" class="company-logo h-20 w-auto rounded-lg shadow-lg">
+  {% else %}
+    <div class="company-logo h-20 w-20 rounded-lg flex items-center justify-center shadow-lg" style="background: linear-gradient(135deg, #0d6efd80, #0d6efd40);">
+      <span class="text-3xl font-bold text-white">🏢</span>
+    </div>
+  {% endif %}
+  
+  <div class="flex flex-col">
+    <h1 class="company-title text-4xl font-bold">{{ company_name|default:COMPANY_NAME|default:"Angel Auto Center" }}</h1>
+    <span class="text-xl text-gray-300 font-medium mt-1">{{ company_tagline|default:COMPANY_TAGLINE|default:"best services" }}</span>
+  </div>
+</header>
+
+<!-- Navigation horizontal -->
+<nav id="main-navigation" class="sticky top-0 z-40 px-6 py-4" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.98)); backdrop-filter: blur(20px); border-bottom: 2px solid rgba(0, 230, 255, 0.3); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); overflow-x: auto; white-space: nowrap;">
+  <div class="flex gap-3 items-center justify-start">
+    <a href="/us/clientes/" class="nav-btn-neon"><span class="nav-icon-sm">👥</span><span>CLIENTS</span></a>
+    <a href="/us/vehiculos/" class="nav-btn-neon"><span class="nav-icon-sm">🚗</span><span>VEHICLES</span></a>
+    <a href="/us/servicios/" class="nav-btn-neon"><span class="nav-icon-sm">🛠️</span><span>SERVICES</span></a>
+    <a href="/us/repuestos/" class="nav-btn-neon"><span class="nav-icon-sm">🔧</span><span>PARTS</span></a>
+    <a href="/us/documentos/" class="nav-btn-neon"><span class="nav-icon-sm">📄</span><span>DOCUMENTS</span></a>
+    <a href="/us/centro-operaciones-espacial/" class="nav-btn-neon"><span class="nav-icon-sm">🚀</span><span>CENTER</span></a>
+    <a href="/us/reportes/" class="nav-btn-neon"><span class="nav-icon-sm">📊</span><span>REPORTS</span></a>
+    <a href="/us/en/settings/" class="nav-btn-neon"><span class="nav-icon-sm">⚙️</span><span>SETTINGS</span></a>
+    <a href="/accounts/logout/" class="nav-btn-neon"><span class="nav-icon-sm">🚪</span><span>LOGOUT</span></a>
+  </div>
+</nav>
+
+<main class="flex-1">
 <div class="max-w-7xl mx-auto p-6">
 
     <!-- 🚀 Mission Command Panel -->

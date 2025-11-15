@@ -15,7 +15,20 @@
 {% block documento_content %}
 
 <!-- 🔴🔴🔴🔴🔴 CRUZ ROJA EN EL FORMULARIO 🔴🔴🔴🔴🔴 -->
-<form method="post" id="document-form" class="max-w-7xl mx-auto">
+<form method="post"
+      id="document-form"
+      class="max-w-7xl mx-auto"
+      data-mode="edit"
+      data-initial-client="{{ cliente_info.id }}"
+      data-initial-client-name="{{ cliente_info.nombre|default_if_none:''|escape }}"
+      data-initial-client-email="{{ cliente_info.email|default_if_none:''|escape }}"
+      data-initial-client-phone="{{ cliente_info.telefono|default_if_none:''|escape }}"
+      data-initial-vehicle="{{ vehiculo_inicial_id|default:'' }}"
+      data-url-numero-documento="{% country_url 'documentos:api_obtener_numero_documento' %}"
+      data-url-repuesto-by-code="{% country_url 'repuestos:api_repuesto_por_codigo' %}"
+      data-url-repuesto-search="{% country_url 'documentos:api_buscar_repuestos' %}"
+      data-url-servicio-search="{% country_url 'servicios:buscar_servicios_api' %}"
+      data-url-otro-servicio-search="{% country_url 'servicios:buscar_otros_servicios_api' %}">
 <!-- 🔴🔴🔴🔴🔴 CRUZ ROJA EN EL FORMULARIO 🔴🔴🔴🔴🔴 -->
   {% csrf_token %}
 
@@ -117,32 +130,6 @@
     <!-- Campo oculto de respaldo para cliente -->
     <input type="hidden" id="cliente_backup" name="cliente_backup" value="{{ object.cliente.id }}">
 
-    <!-- Información del cliente seleccionado -->
-    <div id="cliente-info" class="cliente-info-section" style="display: none;">
-      <h4>📋 Customer Information</h4>
-      <div class="cliente-info-grid">
-        <div class="cliente-info-field">
-          <label for="id_cliente_nombre">First Name</label>
-          <input type="text" id="id_cliente_nombre" name="cliente_nombre" readonly>
-        </div>
-        <div class="cliente-info-field">
-          <label for="id_cliente_apellido">Last Name</label>
-          <input type="text" id="id_cliente_apellido" name="cliente_apellido" readonly>
-        </div>
-        <div class="cliente-info-field">
-          <label for="id_cliente_email">Email</label>
-          <input type="email" id="id_cliente_email" name="cliente_email" readonly>
-        </div>
-        <div class="cliente-info-field">
-          <label for="id_cliente_telefono">Phone</label>
-          <input type="text" id="id_cliente_telefono" name="cliente_telefono" readonly>
-        </div>
-        <div class="cliente-info-field" style="grid-column: 1 / -1;">
-          <label for="id_cliente_direccion">Address</label>
-          <input type="text" id="id_cliente_direccion" name="cliente_direccion" readonly>
-        </div>
-      </div>
-    </div>
   </div>
 
   <!-- Vehículo -->
@@ -199,12 +186,19 @@
 
   <!-- Repuestos -->
   <div class="bg-gray-800/50 backdrop-blur-lg rounded-xl border border-cyan-400/30 p-6 mb-6">
-    <h3 class="text-xl font-semibold text-cyan-200 mb-4 flex items-center">
-      🔧 {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Spare Parts{% else %}Repuestos{% endif %}
-      <button type="button" id="btn-add-repuesto" class="ml-4 px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-sm">
+    <div class="flex flex-wrap items-center gap-4 mb-4">
+      <h3 class="text-xl font-semibold text-cyan-200 flex items-center">
+        🔧 {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Spare Parts{% else %}Repuestos{% endif %}
+      </h3>
+      <button type="button" id="btn-add-repuesto" class="px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-sm">
         ➕ {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Add{% else %}Agregar{% endif %}
       </button>
-    </h3>
+      <label class="flex items-center text-cyan-200 text-sm gap-2 ml-auto">
+        <input type="checkbox" id="id_apply_vat_repuestos" class="form-check-input"
+               {% if object.apply_vat %}checked{% endif %}>
+        <span>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Apply VAT (19%){% else %}Aplicar IVA (19%){% endif %}</span>
+      </label>
+    </div>
 
     <table class="w-full">
       <thead>
@@ -212,6 +206,7 @@
           <th class="text-left py-2">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Part Number{% else %}Código{% endif %}</th>
           <th class="text-left py-2">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Name{% else %}Descripción{% endif %}</th>
           <th class="text-center py-2">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Qty{% else %}Cantidad{% endif %}</th>
+          <th class="text-right py-2">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Purchase Price{% else %}Precio Compra{% endif %}</th>
           <th class="text-right py-2">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Unit Price{% else %}Precio Unit.{% endif %}</th>
           <th class="text-right py-2">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Subtotal{% else %}Subtotal{% endif %}</th>
           <th class="text-center py-2">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Action{% else %}Acción{% endif %}</th>
@@ -237,6 +232,11 @@
             <input type="number" name="rep-{{ forloop.counter0 }}-cantidad" value="{{ repuesto.cantidad }}"
                    min="1" class="futurista-input w-20 text-right"
                    data-role="qty">
+          </td>
+          <td>
+            <input type="number" name="rep-{{ forloop.counter0 }}-precio_compra" value="{{ repuesto.precio_compra|floatformat:0 }}"
+                   min="0" class="futurista-input w-28 text-right"
+                   data-role="price-cost">
           </td>
           <td>
             <input type="number" name="rep-{{ forloop.counter0 }}-precio_unitario" value="{{ repuesto.precio_unitario|floatformat:0 }}"
@@ -269,7 +269,6 @@
       <thead>
         <tr class="text-cyan-200 text-sm border-b border-gray-600">
           <th class="text-left py-2">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Service{% else %}Servicio{% endif %}</th>
-          <th class="text-center py-2">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Qty{% else %}Cantidad{% endif %}</th>
           <th class="text-right py-2">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Price{% else %}Precio{% endif %}</th>
           <th class="text-right py-2">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Subtotal{% else %}Subtotal{% endif %}</th>
           <th class="text-center py-2">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Action{% else %}Acción{% endif %}</th>
@@ -284,11 +283,7 @@
                    placeholder="{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Service{% else %}Servicio{% endif %}"
                    class="futurista-input w-full"
                    data-role="name">
-          </td>
-          <td>
-            <input type="number" name="serv-{{ forloop.counter0 }}-cantidad" value="{{ servicio.cantidad|default:1 }}"
-                   min="1" class="futurista-input w-20 text-right"
-                   data-role="qty">
+            <input type="hidden" name="serv-{{ forloop.counter0 }}-cantidad" value="{{ servicio.cantidad|default:1 }}">
           </td>
           <td>
             <input type="number" name="serv-{{ forloop.counter0 }}-precio_unitario" value="{{ servicio.precio_unitario|floatformat:0 }}"
@@ -444,9 +439,9 @@
 <script>
 // Variables globales - usando EG_COUNTRY para evitar conflictos
 const COUNTRY = '{{ object.country|default:"CL" }}';
-let repuestoCounter = {{ repuestos|length }};
-let servicioCounter = {{ servicios|length }};
-let otroCounter = 0;
+let repuestoCounter = Number('{{ repuestos|length|default:"0" }}') || 0;
+let servicioCounter = Number('{{ servicios|length|default:"0" }}') || 0;
+let otroCounter = Number('{{ otros_servicios|length|default:"0" }}') || 0;
 
 // Inicializar valores al cargar la página
 function inicializarTotales() {
@@ -603,6 +598,22 @@ function debugAutocomplete() {
   console.log('✅ Autocomplete debug completed');
 }
 
+const FORM_ELEMENT = document.getElementById('document-form');
+const FORM_MODE = FORM_ELEMENT?.dataset.mode || 'create';
+const INITIAL_CLIENT_ID = FORM_ELEMENT?.dataset.initialClient || '';
+const INITIAL_CLIENT_DATA = {
+  nombre: FORM_ELEMENT?.dataset.initialClientName || '',
+  email: FORM_ELEMENT?.dataset.initialClientEmail || '',
+  telefono: FORM_ELEMENT?.dataset.initialClientPhone || '',
+};
+const INITIAL_VEHICLE_ID = FORM_ELEMENT?.dataset.initialVehicle || '';
+const INITIAL_VEHICLE_OPTIONS = (() => {
+  const sel = document.getElementById('id_vehiculo');
+  return sel ? sel.innerHTML : '';
+})();
+
+window.__EG_INITIAL_CLIENT_ID = INITIAL_CLIENT_ID;
+
 // Función para cargar vehículos por cliente
 async function cargarVehiculosPorCliente(clienteId) {
   const selVeh = document.getElementById('id_vehiculo');
@@ -614,15 +625,26 @@ async function cargarVehiculosPorCliente(clienteId) {
     return;
   }
 
-  // Determinar la URL del endpoint según el país
-  const isUS = window.location.pathname.startsWith('/us/');
-  const baseUrl = isUS ? '/us/api/vehiculos/' : '/cl/api/vehiculos/';
-  const apiURL = `${baseUrl}${encodeURIComponent(clienteId)}/`;
+  if (FORM_MODE === 'edit' && clienteId === INITIAL_CLIENT_ID) {
+    if (INITIAL_VEHICLE_OPTIONS) {
+      selVeh.innerHTML = INITIAL_VEHICLE_OPTIONS;
+    }
+    if (INITIAL_VEHICLE_ID) {
+      selVeh.value = INITIAL_VEHICLE_ID;
+    }
+    selVeh.dataset.source = 'form';
+    return;
+  }
 
   const loadingText = (window.COUNTRY === 'US') ? '-- Loading vehicles... --' : '-- Cargando vehículos... --';
   selVeh.innerHTML = `<option value="">${loadingText}</option>`;
 
   try {
+    const baseEndpoint =
+      (window.EG && window.EG.endpoints && window.EG.endpoints.vehiculosPorCliente)
+        || ((window.__EG_PREFIX__ || '') + "ajax/vehiculos-por-cliente/");
+    const apiURL = `${baseEndpoint}?cliente_id=${encodeURIComponent(clienteId)}`;
+
     console.log('🚗 Fetch vehicles @', apiURL);
     const response = await fetch(apiURL, {
       headers: {
@@ -681,55 +703,43 @@ async function cargarInfoCliente(clienteId) {
     return;
   }
 
-  // Determinar la URL del endpoint según el país
-  const isUS = window.location.pathname.startsWith('/us/');
-  const baseUrl = isUS ? '/us/api/clientes/' : '/cl/api/clientes/';
-  const apiURL = `${baseUrl}${encodeURIComponent(clienteId)}/`;
-
-  try {
-    console.log('👤 Fetch client info @', apiURL);
-    const response = await fetch(apiURL, {
-      headers: {
-        'X-Requested-With': 'XMLHttpRequest'
-      },
-      credentials: 'same-origin'
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    // Actualizar información del cliente
+  if (FORM_MODE === 'edit' && clienteId === INITIAL_CLIENT_ID) {
     const clienteNombre = document.getElementById('cliente-nombre');
     const clienteEmail = document.getElementById('cliente-email');
     const clienteTelefono = document.getElementById('cliente-telefono');
+    const clienteInfoBox = document.getElementById('cliente-info');
 
-    if (clienteNombre) {
-      clienteNombre.textContent = `${data.nombre || ''} ${data.apellido || ''}`.trim();
-    }
-    if (clienteEmail) {
-      clienteEmail.textContent = data.email || 'No email';
-    }
-    if (clienteTelefono) {
-      clienteTelefono.textContent = data.telefono || 'No phone';
-    }
+    if (clienteNombre) clienteNombre.textContent = INITIAL_CLIENT_DATA.nombre || '';
+    if (clienteEmail) clienteEmail.textContent = INITIAL_CLIENT_DATA.email || 'No email';
+    if (clienteTelefono) clienteTelefono.textContent = INITIAL_CLIENT_DATA.telefono || 'No phone';
+    if (clienteInfoBox) clienteInfoBox.style.display = '';
+    return;
+  }
 
-    console.log('✅ Client info loaded:', data);
-  } catch (error) {
-    console.error('❌ Error loading client info:', error);
+  const clienteNombre = document.getElementById('cliente-nombre');
+  const clienteEmail = document.getElementById('cliente-email');
+  const clienteTelefono = document.getElementById('cliente-telefono');
+  const clienteInfoBox = document.getElementById('cliente-info');
 
-    // Fallback: usar información del select option
-    const selectCliente = document.getElementById('id_cliente');
-    const selectedOption = selectCliente?.options[selectCliente.selectedIndex];
+  const clientesPrefetch = (window.PREFETCH && Array.isArray(window.PREFETCH.clientes))
+    ? window.PREFETCH.clientes
+    : [];
+  const selectCliente = document.getElementById('id_cliente');
+  const selectedOption = selectCliente?.options[selectCliente.selectedIndex];
 
-    if (selectedOption && selectedOption.textContent) {
-      const clienteNombre = document.getElementById('cliente-nombre');
-      if (clienteNombre) {
-        clienteNombre.textContent = selectedOption.textContent;
-      }
-    }
+  const match = clientesPrefetch.find(c => String(c.id) === String(clienteId));
+
+  if (match) {
+    if (clienteNombre) clienteNombre.textContent = match.nombre_completo || match.nombre || '';
+    if (clienteEmail) clienteEmail.textContent = match.email || 'No email';
+    if (clienteTelefono) clienteTelefono.textContent = match.telefono || 'No phone';
+    if (clienteInfoBox) clienteInfoBox.style.display = '';
+    return;
+  }
+
+  if (selectedOption && selectedOption.textContent) {
+    if (clienteNombre) clienteNombre.textContent = selectedOption.textContent;
+    if (clienteInfoBox) clienteInfoBox.style.display = '';
   }
 }
 
@@ -773,14 +783,6 @@ document.addEventListener('DOMContentLoaded', function() {
     switchPagado.addEventListener('change', actualizarBadgePago);
   }
 
-  // 4. Configurar botón "Add Other"
-  const addOtroBtn = document.getElementById('add-otro');
-  if (addOtroBtn) {
-    addOtroBtn.addEventListener('click', function() {
-      agregarOtroServicio();
-    });
-  }
-
   console.log('✅ Documento form inicializado correctamente');
 });
 
@@ -797,6 +799,217 @@ function actualizarBadgePago() {
     : (checkbox.checked ? '✅ Pagado' : '❌ No Pagado');
 }
 
+
+// ====================================================================
+// === PARCHE: agregar filas dinámicas + normalizar existentes ========
+// ====================================================================
+
+(function(){
+  // ====== FIX 0: número de documento en <input> ======
+  const numeroField = document.getElementById('id_numero_documento');
+  if (numeroField && numeroField.tagName === 'INPUT' && typeof window.inicializarGeneracionNumero === 'function') {
+    const originalInit = window.inicializarGeneracionNumero;
+    window.inicializarGeneracionNumero = function patchedInit(){
+      originalInit();
+      const tipoEl = document.getElementById('id_tipo');
+      if (!tipoEl) return;
+      const isUS = location.pathname.startsWith('/us/');
+      const endpointUrl = (window.EG?.endpoints?.numeroDocumento)
+        || (isUS ? '/us/documentos/api/obtener-numero-documento/' : '/cl/documentos/api/obtener-numero-documento/');
+      async function updateNumber(tipo){
+        try{
+          const resp = await fetch(`${endpointUrl}?tipo=${encodeURIComponent(tipo)}`);
+          if(!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const data = await resp.json();
+          if (data?.numero){
+            numeroField.value = data.numero;
+            document.getElementById('numero_documento')?.setAttribute('value', data.numero);
+            document.getElementById('numero_documento_db')?.setAttribute('value', data.numero);
+          }
+        }catch(_err){
+          numeroField.value = 'Error';
+        }
+      }
+      if (tipoEl.value) updateNumber(tipoEl.value);
+      tipoEl.addEventListener('change', ()=> updateNumber(tipoEl.value));
+    };
+  }
+
+  // ====== Helpers ======
+  const fmtMoney = (value)=> '$' + Math.round(value || 0).toLocaleString();
+
+  function ensureHiddenSubtotal(row, prefix){
+    let hidden = row.querySelector(`input.${prefix}-subtotal`);
+    if (!hidden){
+      hidden = document.createElement('input');
+      hidden.type = 'hidden';
+      hidden.className = `${prefix}-subtotal`;
+      hidden.value = '0';
+      row.appendChild(hidden);
+    }
+    return hidden;
+  }
+
+  function bindRow(prefix, row){
+    const qty    = row.querySelector('[data-role="qty"]');
+    const price  = row.querySelector('[data-role="price"]');
+    const costo  = row.querySelector('[data-role="price-internal"]');
+    const precioCliente = row.querySelector('[data-role="price-customer"]');
+    const spanSubtotal  = row.querySelector('[data-role="subtotal"]');
+    const hidden = ensureHiddenSubtotal(row, prefix);
+
+    function compute(){
+      const q = parseFloat(qty?.value || 1) || 1;
+      let unit = 0;
+      if (prefix === 'otr'){
+        unit = parseFloat(precioCliente?.value || 0) || 0;
+      } else {
+        unit = parseFloat(price?.value || 0) || 0;
+      }
+      const subtotal = Math.max(0, Math.round(q * unit));
+      hidden.value = subtotal;
+      if (spanSubtotal) spanSubtotal.textContent = fmtMoney(subtotal);
+      if (typeof window.recalcTotales === 'function') window.recalcTotales();
+    }
+
+    qty?.addEventListener('input', compute);
+    price?.addEventListener('input', compute);
+    costo?.addEventListener('input', compute);
+    precioCliente?.addEventListener('input', compute);
+    compute();
+  }
+
+  function bindRemoval(row){
+    row.querySelector('[data-action="remove-line"]')?.addEventListener('click', ()=>{
+      row.remove();
+      if (typeof window.recalcTotales === 'function') window.recalcTotales();
+    });
+  }
+
+  function normalizeExistingRows(){
+    document.querySelectorAll('#repuestos-body tr[data-type="repuesto"]').forEach(row=>{
+      bindRow('rep', row);
+      bindRemoval(row);
+    });
+    document.querySelectorAll('#servicios-body tr[data-type="servicio"]').forEach(row=>{
+      bindRow('serv', row);
+      bindRemoval(row);
+    });
+    document.querySelectorAll('#otros-body tr[data-type="otro"]').forEach(row=>{
+      bindRow('otr', row);
+      bindRemoval(row);
+    });
+  }
+
+  function cloneTemplate(id){
+    const tpl = document.getElementById(id);
+    if (!tpl) {
+      console.error('❌ Falta template', id);
+      return null;
+    }
+    return tpl.content.firstElementChild.cloneNode(true);
+  }
+
+  function focusFirstInput(row, selector){
+    if (!row) return;
+    const target = row.querySelector(selector || 'input, textarea, select');
+    if (!target || typeof target.focus !== 'function') return;
+    requestAnimationFrame(()=>target.focus());
+  }
+
+  window.addRepuestoRow = function addRepuestoRow(){
+    const body = document.getElementById('repuestos-body');
+    const row = cloneTemplate('tpl-repuesto-row');
+    if (!body || !row) return null;
+    const index = (window.__repIndex = (window.__repIndex ?? 0) + 1);
+    row.querySelector('[name="repuesto_part_number"]')?.setAttribute('name', `rep-${index}-codigo`);
+    row.querySelector('[name="repuesto_nombre"]')?.setAttribute('name', `rep-${index}-nombre`);
+    row.querySelector('[name="repuesto_cantidad"]')?.setAttribute('name', `rep-${index}-cantidad`);
+    row.querySelector('[name="repuesto_precio_compra"]')?.setAttribute('name', `rep-${index}-precio_compra`);
+    row.querySelector('[name="repuesto_precio"]')?.setAttribute('name', `rep-${index}-precio_unitario`);
+    body.appendChild(row);
+    bindRow('rep', row);
+    bindRemoval(row);
+    focusFirstInput(row, '[data-role="part-number"]');
+    return row;
+  };
+
+  window.addServicioRow = function addServicioRow(){
+    const body = document.getElementById('servicios-body');
+    const row = cloneTemplate('tpl-servicio-row');
+    if (!body || !row) return null;
+    const index = (window.__servIndex = (window.__servIndex ?? 0) + 1);
+    row.querySelector('[name="servicio_nombre"]')?.setAttribute('name', `serv-${index}-nombre`);
+    row.querySelector('[name="servicio_cantidad"]')?.setAttribute('name', `serv-${index}-cantidad`);
+    row.querySelector('[name="servicio_precio"]')?.setAttribute('name', `serv-${index}-precio_unitario`);
+    body.appendChild(row);
+    bindRow('serv', row);
+    bindRemoval(row);
+    focusFirstInput(row, '[data-role="name"]');
+    return row;
+  };
+
+  window.addOtroRow = function addOtroRow(){
+    const body = document.getElementById('otros-body');
+    const row = cloneTemplate('tpl-otro-row');
+    if (!body || !row) return null;
+    const index = (window.__otrIndex = (window.__otrIndex ?? 0) + 1);
+    row.querySelector('[name="otro_proveedor"]')?.setAttribute('name', `otr-${index}-proveedor`);
+    row.querySelector('[name="otro_descripcion"]')?.setAttribute('name', `otr-${index}-descripcion`);
+    row.querySelector('[name="otro_costo_interno"]')?.setAttribute('name', `otr-${index}-costo_interno`);
+    row.querySelector('[name="otro_precio_cliente"]')?.setAttribute('name', `otr-${index}-precio_cliente`);
+    body.appendChild(row);
+    bindRow('otr', row);
+    bindRemoval(row);
+    const totalForms = document.getElementById('id_otr-TOTAL_FORMS');
+    if (totalForms) totalForms.value = window.__otrIndex;
+    focusFirstInput(row, '[data-role="provider"]');
+    return row;
+  };
+
+  window.addOtroServicio = function(){ window.addOtroRow(); };
+
+  function initVatToggles(){
+    const master = document.getElementById('id_apply_vat');
+    const exclude = document.getElementById('id_exclude_vat');
+    const parts = document.getElementById('id_apply_vat_repuestos');
+
+    const syncFromMaster = ()=>{
+      if (parts && master) parts.checked = master.checked;
+    };
+
+    const handlePartsChange = ()=>{
+      if (!parts) return;
+      if (master) master.checked = parts.checked;
+      if (exclude) exclude.checked = !parts.checked;
+      window.recalcTotales?.();
+    };
+
+    master?.addEventListener('change', ()=>{
+      syncFromMaster();
+      window.recalcTotales?.();
+    });
+
+    exclude?.addEventListener('change', ()=>{
+      if (!exclude) return;
+      const state = !exclude.checked;
+      if (master) master.checked = state;
+      syncFromMaster();
+      window.recalcTotales?.();
+    });
+
+    parts?.addEventListener('change', handlePartsChange);
+    syncFromMaster();
+  }
+
+  document.addEventListener('DOMContentLoaded', ()=>{
+    normalizeExistingRows();
+    document.getElementById('btn-add-repuesto')?.addEventListener('click', (ev)=>{ ev.preventDefault(); window.addRepuestoRow(); });
+    document.getElementById('btn-add-servicio')?.addEventListener('click', (ev)=>{ ev.preventDefault(); window.addServicioRow(); });
+    document.getElementById('btn-add-otro-servicio')?.addEventListener('click', (ev)=>{ ev.preventDefault(); window.addOtroRow(); });
+    initVatToggles();
+  });
+})();
 // También ejecutar con un pequeño delay por si acaso
 setTimeout(inicializarTotales, 100);
 setTimeout(inicializarGeneracionNumero, 100);
@@ -810,9 +1023,15 @@ window.recalcTotales = function() {
   const serv = sumValues('.serv-subtotal');
   const otros = sumValues('.otr-subtotal');
 
-  // Calcular IVA (19% para Chile)
+  const vatToggle = document.getElementById('id_apply_vat');
+  const vatToggleParts = document.getElementById('id_apply_vat_repuestos');
+  const shouldApplyVat =
+    (vatToggleParts ? vatToggleParts.checked : undefined) ??
+    (vatToggle ? vatToggle.checked : undefined) ??
+    (COUNTRY === 'CL');
+
   let iva = 0;
-  if (COUNTRY === 'CL') {
+  if (shouldApplyVat && COUNTRY === 'CL') {
     iva = Math.round((rep + serv + otros) * 0.19);
   }
 
@@ -1089,9 +1308,34 @@ document.addEventListener('DOMContentLoaded', function() {
   }, 500);
 });
 
-// Función para formatear números como moneda
+// Función para formatear números como moneda (dependiente del país)
+const MONEY_FORMAT_CACHE = {};
+const MONEY_FORMAT_CONFIG = {
+  CL: { locale: 'es-CL', symbol: '$', min: 0, max: 0, space: false },
+  US: { locale: 'en-US', symbol: '$', min: 2, max: 2, space: false },
+  MX: { locale: 'es-MX', symbol: '$', min: 2, max: 2, space: false },
+  PE: { locale: 'es-PE', symbol: 'S/', min: 2, max: 2, space: true },
+  VE: { locale: 'es-VE', symbol: 'Bs.', min: 2, max: 2, space: true },
+  BR: { locale: 'pt-BR', symbol: 'R$', min: 2, max: 2, space: true },
+};
+
 function money(amount) {
-  return '$' + Math.round(amount).toLocaleString();
+  const raw = Number(amount) || 0;
+  const country = (typeof COUNTRY === 'string' && COUNTRY) ? COUNTRY.toUpperCase()
+    : (document.querySelector('#totales,[data-country]')?.dataset.country || 'CL').toUpperCase();
+  const cfg = MONEY_FORMAT_CONFIG[country] || MONEY_FORMAT_CONFIG.US;
+  const cacheKey = `${cfg.locale}-${cfg.min}-${cfg.max}`;
+  let formatter = MONEY_FORMAT_CACHE[cacheKey];
+  if (!formatter) {
+    formatter = new Intl.NumberFormat(cfg.locale, {
+      minimumFractionDigits: cfg.min,
+      maximumFractionDigits: cfg.max,
+    });
+    MONEY_FORMAT_CACHE[cacheKey] = formatter;
+  }
+  const value = cfg.min === 0 && cfg.max === 0 ? Math.round(raw) : raw;
+  const formatted = formatter.format(value).replace(/\u00A0/g, ' ');
+  return cfg.space ? `${cfg.symbol} ${formatted}` : `${cfg.symbol}${formatted}`;
 }
 
 // Función para sumar valores de una clase
@@ -1231,6 +1475,446 @@ function debugDALForward() {
 // Inicializar cuando el DOM esté listo - MOVIDO A DOMContentLoaded CONSOLIDADO
 </script>
 
+<script>
+(function(){
+  const form = document.getElementById('document-form');
+  if (!form) return;
+
+  const ready = (fn) => {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', fn, { once: true });
+    } else {
+      fn();
+    }
+  };
+
+  const debounce = (fn, delay = 220) => {
+    let timer;
+    return (...args) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => fn(...args), delay);
+    };
+  };
+
+const parseAmount = (value) => {
+  if (value === null || value === undefined) return 0;
+  if (typeof value === 'number') return value;
+  let str = String(value).trim();
+  if (!str) return 0;
+  str = str.replace(/[^0-9,.\-]/g, '');
+
+  const lastComma = str.lastIndexOf(',');
+  const lastDot = str.lastIndexOf('.');
+
+  if (lastComma > -1 && lastDot > -1) {
+    if (lastComma > lastDot) {
+      str = str.replace(/\./g, '').replace(',', '.');
+    } else {
+      str = str.replace(/,/g, '');
+    }
+  } else if (lastComma > -1) {
+    str = str.replace(/\./g, '').replace(',', '.');
+  } else if (lastDot > -1) {
+    const decimals = str.length - lastDot - 1;
+    if (decimals > 2) {
+      str = str.replace(/\./g, '');
+    }
+  }
+
+  const num = parseFloat(str);
+  return Number.isFinite(num) ? num : 0;
+};
+
+  const formatAmount = (value) => {
+    const fn = typeof window.money === 'function'
+      ? window.money
+      : ((v) => '$' + Math.round(v || 0).toLocaleString());
+    return fn(value || 0);
+  };
+
+  const ensureHidden = (row, cls) => {
+    let hidden = row.querySelector(`input.${cls}`);
+    if (!hidden) {
+      hidden = document.createElement('input');
+      hidden.type = 'hidden';
+      hidden.className = cls;
+      hidden.value = '0';
+      row.appendChild(hidden);
+    }
+    return hidden;
+  };
+
+  const buildDropdown = (input) => {
+    if (!input) return null;
+    const wrapper = input.parentElement;
+    if (!wrapper) return null;
+    if (!wrapper.style.position) wrapper.style.position = 'relative';
+    wrapper.style.overflow = 'visible';
+    wrapper.style.zIndex = '200';
+
+    const container = wrapper.closest('.segment');
+    if (container) {
+      container.style.overflow = 'visible';
+      if (!container.style.zIndex) container.style.zIndex = '150';
+    }
+
+    let dd = wrapper.querySelector('.eg-dd');
+    if (!dd) {
+      dd = document.createElement('div');
+      dd.className = 'eg-dd absolute w-full max-h-72 overflow-auto rounded-lg border border-cyan-400 bg-gray-900/95 shadow-xl hidden';
+      dd.style.zIndex = '250';
+      wrapper.appendChild(dd);
+    }
+    return dd;
+  };
+
+  const showDropdown = (dd, html) => {
+    if (!dd) return;
+    dd.innerHTML = html;
+    dd.classList.remove('hidden');
+  };
+
+  const hideDropdown = (dd) => {
+    if (!dd) return;
+    dd.classList.add('hidden');
+  };
+
+  const endpoints = Object.assign({}, window.EG?.endpoints || {});
+  const ds = form.dataset || {};
+  if (ds.urlNumeroDocumento) endpoints.numeroDocumento = ds.urlNumeroDocumento;
+  if (ds.urlRepuestoByCode) endpoints.repuestoPorCodigo = ds.urlRepuestoByCode;
+  if (ds.urlRepuestoSearch) endpoints.repuestoBuscar = ds.urlRepuestoSearch;
+  if (ds.urlServicioSearch) endpoints.servicioBuscar = ds.urlServicioSearch;
+  if (ds.urlOtroServicioSearch) endpoints.otroServicioBuscar = ds.urlOtroServicioSearch;
+  window.EG = window.EG || {};
+  window.EG.endpoints = Object.assign({}, window.EG.endpoints || {}, endpoints);
+
+  const fetchJSON = async (url) => {
+    const resp = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    return resp.json();
+  };
+
+  const normalizeRepuestos = (data) => {
+    if (!data) return [];
+    if (Array.isArray(data)) return data;
+    if (Array.isArray(data.results)) return data.results;
+    if (Array.isArray(data.repuestos)) return data.repuestos;
+    if (data.results && typeof data.results === 'object') return [data.results];
+    if (data.repuesto) return [data.repuesto];
+    if (data.codigo || data.part_number || data.nombre) return [data];
+    return [];
+  };
+
+  const normalizeServicios = (data) => {
+    if (!data) return [];
+    if (Array.isArray(data)) return data;
+    if (Array.isArray(data.results)) return data.results;
+    if (Array.isArray(data.servicios)) return data.servicios;
+    return [];
+  };
+
+  const normalizeOtrosServicios = (data) => {
+    if (!data) return [];
+    if (Array.isArray(data)) return data;
+    if (Array.isArray(data.results)) return data.results;
+    if (Array.isArray(data.otros_servicios)) return data.otros_servicios;
+    return [];
+  };
+
+  const fillRepuestoRow = (row, item) => {
+    if (!row || !item) return;
+    const codeEl = row.querySelector('[data-role="part-number"]');
+    const nameEl = row.querySelector('[data-role="name"]');
+    const qtyEl = row.querySelector('[data-role="qty"]');
+    const costEl = row.querySelector('[data-role="price-cost"]');
+    const priceEl = row.querySelector('[data-role="price"]');
+    const subtotalEl = row.querySelector('[data-role="subtotal"]');
+    const hidden = ensureHidden(row, 'rep-subtotal');
+
+    const code = item.codigo || item.part_number || item.sku || item.text || '';
+    const name = item.nombre || item.text || '';
+    const cost = parseAmount(item.precio_compra ?? item.costo ?? item.precio_costo);
+    const price = parseAmount(item.precio_venta ?? item.precio_sugerido ?? item.precio ?? item.valor);
+
+    if (codeEl && code) codeEl.value = code;
+    if (nameEl && name) nameEl.value = name;
+    if (costEl && Number.isFinite(cost)) costEl.value = cost;
+    if (priceEl && Number.isFinite(price)) priceEl.value = price;
+    if (qtyEl && !qtyEl.value) qtyEl.value = item.cantidad || 1;
+
+    const subtotal = Math.max(0, Math.round((parseAmount(qtyEl?.value) || 1) * (parseAmount(priceEl?.value) || 0)));
+    hidden.value = subtotal;
+    if (subtotalEl) subtotalEl.textContent = formatAmount(subtotal);
+    if (typeof window.recalcTotales === 'function') window.recalcTotales();
+  };
+
+  const fillServicioRow = (row, item) => {
+    if (!row || !item) return;
+    const nameEl = row.querySelector('[data-role="name"]');
+    const qtyEl = row.querySelector('[data-role="qty"]');
+    const priceEl = row.querySelector('[data-role="price"]');
+    const subtotalEl = row.querySelector('[data-role="subtotal"]');
+    const hidden = ensureHidden(row, 'serv-subtotal');
+
+    if (nameEl && item.nombre) nameEl.value = item.nombre;
+    if (qtyEl && !qtyEl.value) qtyEl.value = item.cantidad || 1;
+    const price = parseAmount(item.precio ?? item.precio_sugerido ?? item.valor);
+    if (priceEl && Number.isFinite(price)) priceEl.value = price;
+
+    const subtotal = Math.max(0, Math.round((parseAmount(qtyEl?.value) || 1) * (parseAmount(priceEl?.value) || 0)));
+    hidden.value = subtotal;
+    if (subtotalEl) subtotalEl.textContent = formatAmount(subtotal);
+    if (typeof window.recalcTotales === 'function') window.recalcTotales();
+  };
+
+  const fillOtroRow = (row, item) => {
+    if (!row || !item) return;
+    const provEl = row.querySelector('[data-role="provider"]');
+    const descEl = row.querySelector('[data-role="desc"]');
+    const costoEl = row.querySelector('[data-role="price-internal"]');
+    const clienteEl = row.querySelector('[data-role="price-customer"]');
+    const subtotalEl = row.querySelector('[data-role="subtotal"]');
+    const hidden = ensureHidden(row, 'otr-subtotal');
+
+    if (provEl) provEl.value = item.empresa_externa || item.proveedor || item.proveedor_tipico || provEl.value || '';
+    if (descEl) descEl.value = item.descripcion || item.nombre || descEl.value || '';
+    const costo = parseAmount(item.costo_taller ?? item.precio_taller ?? item.costo ?? item.precio_costo);
+    if (costoEl && Number.isFinite(costo)) costoEl.value = costo;
+    const precioCliente = parseAmount(item.precio_cliente ?? item.precio ?? item.valor);
+    if (clienteEl && Number.isFinite(precioCliente)) clienteEl.value = precioCliente;
+
+    const subtotal = Math.max(0, Math.round(parseAmount(clienteEl?.value) || 0));
+    hidden.value = subtotal;
+    if (subtotalEl) subtotalEl.textContent = formatAmount(subtotal);
+    if (typeof window.recalcTotales === 'function') window.recalcTotales();
+  };
+
+  const wireRepuestoRow = (row) => {
+    if (!row || row.dataset.egLiveSearchRep === '1') return;
+    row.dataset.egLiveSearchRep = '1';
+    const codeEl = row.querySelector('[data-role="part-number"]');
+    const nameEl = row.querySelector('[data-role="name"]');
+
+    const buildOption = (item, primary, secondary) => `
+      <div class="p-2 cursor-pointer hover:bg-gray-700 border-b border-gray-800">
+        <div class="font-semibold text-cyan-200">${primary}</div>
+        <div class="text-sm text-gray-300">${secondary}</div>
+        <div class="text-green-400">${formatAmount(parseAmount(item.precio_venta ?? item.precio ?? item.precio_sugerido))}</div>
+      </div>`;
+
+    if (codeEl && endpoints.repuestoBuscar) {
+      const dd = buildDropdown(codeEl);
+      const onInput = debounce(async () => {
+        const query = (codeEl.value || '').trim();
+        if (query.length < 1) {
+          hideDropdown(dd);
+          return;
+        }
+        try {
+          let items = [];
+          if (endpoints.repuestoPorCodigo) {
+            const data = await fetchJSON(`${endpoints.repuestoPorCodigo}?codigo=${encodeURIComponent(query)}`);
+            items = normalizeRepuestos(data);
+          }
+          if (!items.length) {
+            const data = await fetchJSON(`${endpoints.repuestoBuscar}?q=${encodeURIComponent(query)}`);
+            items = normalizeRepuestos(data);
+          }
+          if (!items.length) {
+            hideDropdown(dd);
+            return;
+          }
+          showDropdown(dd, items.slice(0, 12).map(item => buildOption(item, item.codigo || item.part_number || '', item.nombre || '')).join(''));
+          Array.from(dd.children).forEach((el, idx) => {
+            el.addEventListener('click', () => {
+              fillRepuestoRow(row, items[idx]);
+              hideDropdown(dd);
+            });
+          });
+        } catch (err) {
+          console.warn('Repuesto live search error', err);
+          hideDropdown(dd);
+        }
+      }, 220);
+      codeEl.addEventListener('input', onInput);
+      if (dd && !dd.egCloseHandler) {
+        dd.egCloseHandler = (ev) => {
+          if (!dd.contains(ev.target) && ev.target !== codeEl) hideDropdown(dd);
+        };
+        document.addEventListener('click', dd.egCloseHandler);
+      }
+    }
+
+    if (nameEl && endpoints.repuestoBuscar) {
+      const dd = buildDropdown(nameEl);
+      const onInput = debounce(async () => {
+        const query = (nameEl.value || '').trim();
+        if (query.length < 2) {
+          hideDropdown(dd);
+          return;
+        }
+        try {
+          const data = await fetchJSON(`${endpoints.repuestoBuscar}?q=${encodeURIComponent(query)}`);
+          const items = normalizeRepuestos(data);
+          if (!items.length) {
+            hideDropdown(dd);
+            return;
+          }
+          showDropdown(dd, items.slice(0, 12).map(item => buildOption(item, item.nombre || '', item.codigo || item.part_number || '')).join(''));
+          Array.from(dd.children).forEach((el, idx) => {
+            el.addEventListener('click', () => {
+              fillRepuestoRow(row, items[idx]);
+              hideDropdown(dd);
+            });
+          });
+        } catch (err) {
+          console.warn('Repuesto live search error', err);
+          hideDropdown(dd);
+        }
+      }, 220);
+      nameEl.addEventListener('input', onInput);
+      if (dd && !dd.egCloseHandler) {
+        dd.egCloseHandler = (ev) => {
+          if (!dd.contains(ev.target) && ev.target !== nameEl) hideDropdown(dd);
+        };
+        document.addEventListener('click', dd.egCloseHandler);
+      }
+    }
+  };
+
+  const wireServicioRow = (row) => {
+    if (!row || row.dataset.egLiveSearchServ === '1') return;
+    row.dataset.egLiveSearchServ = '1';
+    const nameEl = row.querySelector('[data-role="name"]');
+    if (!nameEl || !endpoints.servicioBuscar) return;
+    const dd = buildDropdown(nameEl);
+    const onInput = debounce(async () => {
+      const query = (nameEl.value || '').trim();
+      if (query.length < 2) {
+        hideDropdown(dd);
+        return;
+      }
+      try {
+        const data = await fetchJSON(`${endpoints.servicioBuscar}?q=${encodeURIComponent(query)}`);
+        const items = normalizeServicios(data);
+        if (!items.length) {
+          hideDropdown(dd);
+          return;
+        }
+        showDropdown(dd, items.slice(0, 12).map(item => `
+          <div class="p-2 cursor-pointer hover:bg-gray-700 border-b border-gray-800">
+            <div class="font-semibold text-cyan-200">${item.nombre || ''}</div>
+            <div class="text-green-400">${formatAmount(parseAmount(item.precio ?? item.precio_sugerido))}</div>
+            <div class="text-xs text-gray-400">${item.categoria || ''}</div>
+          </div>`).join(''));
+        Array.from(dd.children).forEach((el, idx) => {
+          el.addEventListener('click', () => {
+            fillServicioRow(row, items[idx]);
+            hideDropdown(dd);
+          });
+        });
+      } catch (err) {
+        console.warn('Servicio live search error', err);
+        hideDropdown(dd);
+      }
+    }, 220);
+    nameEl.addEventListener('input', onInput);
+    if (dd && !dd.egCloseHandler) {
+      dd.egCloseHandler = (ev) => {
+        if (!dd.contains(ev.target) && ev.target !== nameEl) hideDropdown(dd);
+      };
+      document.addEventListener('click', dd.egCloseHandler);
+    }
+  };
+
+  const wireOtroRow = (row) => {
+    if (!row || row.dataset.egLiveSearchOtro === '1') return;
+    row.dataset.egLiveSearchOtro = '1';
+    const descEl = row.querySelector('[data-role="desc"]') || row.querySelector('[data-role="provider"]');
+    if (!descEl || !endpoints.otroServicioBuscar) return;
+    const dd = buildDropdown(descEl);
+    const onInput = debounce(async () => {
+      const query = (descEl.value || '').trim();
+      if (query.length < 2) {
+        hideDropdown(dd);
+        return;
+      }
+      try {
+        const data = await fetchJSON(`${endpoints.otroServicioBuscar}?q=${encodeURIComponent(query)}`);
+        const items = normalizeOtrosServicios(data);
+        if (!items.length) {
+          hideDropdown(dd);
+          return;
+        }
+        showDropdown(dd, items.slice(0, 12).map(item => `
+          <div class="p-2 cursor-pointer hover:bg-gray-700 border-b border-gray-800">
+            <div class="font-semibold text-cyan-200">${item.nombre || item.descripcion || ''}</div>
+            <div class="text-sm text-gray-300">${item.empresa_externa || item.proveedor || item.proveedor_tipico || ''}</div>
+            <div class="text-green-400">${formatAmount(parseAmount(item.precio_cliente ?? item.precio ?? item.valor))}</div>
+          </div>`).join(''));
+        Array.from(dd.children).forEach((el, idx) => {
+          el.addEventListener('click', () => {
+            fillOtroRow(row, items[idx]);
+            hideDropdown(dd);
+          });
+        });
+      } catch (err) {
+        console.warn('Otros servicios live search error', err);
+        hideDropdown(dd);
+      }
+    }, 220);
+    descEl.addEventListener('input', onInput);
+    if (dd && !dd.egCloseHandler) {
+      dd.egCloseHandler = (ev) => {
+        if (!dd.contains(ev.target) && ev.target !== descEl) hideDropdown(dd);
+      };
+      document.addEventListener('click', dd.egCloseHandler);
+    }
+  };
+
+  const wireExistingRows = () => {
+    document.querySelectorAll('#repuestos-body tr[data-type="repuesto"]').forEach(wireRepuestoRow);
+    document.querySelectorAll('#servicios-body tr[data-type="servicio"]').forEach(wireServicioRow);
+    document.querySelectorAll('#otros-body tr[data-type="otro"]').forEach(wireOtroRow);
+  };
+
+  ready(() => {
+    wireExistingRows();
+  });
+
+  const originalAddRepuesto = window.addRepuestoRow;
+  if (typeof originalAddRepuesto === 'function') {
+    window.addRepuestoRow = function patchedAddRepuestoRow() {
+      const row = originalAddRepuesto.apply(this, arguments);
+      const target = row || document.querySelector('#repuestos-body tr:last-child');
+      if (target) wireRepuestoRow(target);
+      return row;
+    };
+  }
+
+  const originalAddServicio = window.addServicioRow;
+  if (typeof originalAddServicio === 'function') {
+    window.addServicioRow = function patchedAddServicioRow() {
+      const row = originalAddServicio.apply(this, arguments);
+      const target = row || document.querySelector('#servicios-body tr:last-child');
+      if (target) wireServicioRow(target);
+      return row;
+    };
+  }
+
+  const originalAddOtro = window.addOtroRow;
+  if (typeof originalAddOtro === 'function') {
+    window.addOtroRow = function patchedAddOtroRow() {
+      const row = originalAddOtro.apply(this, arguments);
+      const target = row || document.querySelector('#otros-body tr:last-child');
+      if (target) wireOtroRow(target);
+      return row;
+    };
+  }
+})();
+</script>
+
 {% block extra_head %}
   {{ block.super }}
   {{ form.media }}
@@ -1249,6 +1933,9 @@ function debugDALForward() {
     vehiculosPorCliente: window.__EG_PREFIX__ + "ajax/vehiculos-por-cliente/",
     numeroDocumento: window.__EG_PREFIX__ + "documentos/api/obtener-numero-documento/",
     repuestoPorCodigo: window.__EG_PREFIX__ + "repuestos/api/repuesto-por-codigo/",
+    repuestoBuscar: window.__EG_PREFIX__ + "documentos/api/buscar-repuestos/",
+    servicioBuscar: window.__EG_PREFIX__ + "servicios/api/buscar/",
+    otroServicioBuscar: window.__EG_PREFIX__ + "servicios/api/otros/buscar/",
   };
 
   for (const [k,v] of Object.entries(window.EG.endpoints)) {
@@ -1257,6 +1944,9 @@ function debugDALForward() {
       if (k === 'vehiculosPorCliente') window.EG.endpoints[k] = window.__EG_PREFIX__ + "ajax/vehiculos-por-cliente/";
       if (k === 'numeroDocumento')     window.EG.endpoints[k] = window.__EG_PREFIX__ + "documentos/api/obtener-numero-documento/";
       if (k === 'repuestoPorCodigo')   window.EG.endpoints[k] = window.__EG_PREFIX__ + "repuestos/api/repuesto-por-codigo/";
+      if (k === 'repuestoBuscar')      window.EG.endpoints[k] = window.__EG_PREFIX__ + "documentos/api/buscar-repuestos/";
+      if (k === 'servicioBuscar')      window.EG.endpoints[k] = window.__EG_PREFIX__ + "servicios/api/buscar/";
+      if (k === 'otroServicioBuscar')  window.EG.endpoints[k] = window.__EG_PREFIX__ + "servicios/api/otros/buscar/";
     }
   }
 
@@ -1294,6 +1984,12 @@ function debugDALForward() {
              data-role="qty">
     </td>
     <td>
+      <input type="number" name="repuesto_precio_compra"
+             min="0" value="0"
+             class="futurista-input w-28 text-right"
+             data-role="price-cost">
+    </td>
+    <td>
       <input type="number" name="repuesto_precio"
              min="0" value="0"
              class="futurista-input w-28 text-right"
@@ -1316,12 +2012,7 @@ function debugDALForward() {
              placeholder="{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Service{% else %}Servicio{% endif %}"
              class="futurista-input w-full"
              data-role="name">
-    </td>
-    <td>
-      <input type="number" name="servicio_cantidad"
-             min="1" value="1"
-             class="futurista-input w-20 text-right"
-             data-role="qty">
+      <input type="hidden" name="servicio_cantidad" value="1">
     </td>
     <td>
       <input type="number" name="servicio_precio"

@@ -46,7 +46,7 @@ class VehiculoForm(forms.ModelForm):
             self.fields["anio"].label = "Year"
             self._configurar_campos_usa()
         else:
-            self._configurar_campos_chile()
+            self._configurar_campos_latam(pais)
 
     def _configurar_color(self, pais):
         """Configurar campo color basado en el país y empresa"""
@@ -146,14 +146,14 @@ class VehiculoForm(forms.ModelForm):
         # Configurar valores iniciales si estamos editando
         self._configurar_valores_iniciales_usa()
 
-    def _configurar_campos_chile(self):
-        """Configurar campos específicos para usuarios de Chile"""
+    def _configurar_campos_latam(self, pais):
+        """Configurar campos específicos para usuarios de países Latinoamericanos (CL, MX, etc.)"""
         from taller.models.marca import Marca
 
         empresa = getattr(self.user, "empresa", None)
 
-        # Campo marca para Chile
-        marcas = Marca.objects.filter(country="CL")
+        # Campo marca por país
+        marcas = Marca.objects.filter(country=pais)
         # Si Marca tiene empresa:
         # if hasattr(Marca, "empresa") and empresa:
         #     marcas = marcas.filter(empresa=empresa)
@@ -172,15 +172,46 @@ class VehiculoForm(forms.ModelForm):
             ),
         )
 
-        # Campo modelo para Chile
-        self.fields["modelo"] = forms.ChoiceField(
-            choices=[("", "---------")],
+        # Campo modelo para país (se carga dinámicamente via JavaScript)
+        # ✅ Usar CharField con widget Select para evitar validación de queryset estático
+        self.fields["modelo"] = forms.CharField(
             required=True,
             label="Modelo",
             widget=forms.Select(
+                choices=[("", "Selecciona marca y año primero")],
                 attrs={
                     "class": "w-full px-4 py-2 rounded-xl bg-black/70 text-cyan-200 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400"
-                }
+                },
+            ),
+        )
+
+        # Campos motor y caja (se cargan dinámicamente via JavaScript)
+        # ✅ Usar CharField con widget Select para evitar validación de choices dinámicas
+        self.fields["motor"] = forms.CharField(
+            required=False,
+            label="Motor",
+            widget=forms.Select(
+                choices=[
+                    ("", "Selecciona un modelo primero"),
+                    (NEW_SENTINEL, "➕ Agregar nuevo motor..."),
+                ],
+                attrs={
+                    "class": "w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400"
+                },
+            ),
+        )
+
+        self.fields["caja"] = forms.CharField(
+            required=False,
+            label="Transmisión",
+            widget=forms.Select(
+                choices=[
+                    ("", "Selecciona un modelo primero"),
+                    (NEW_SENTINEL, "➕ Agregar nueva transmisión..."),
+                ],
+                attrs={
+                    "class": "w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400"
+                },
             ),
         )
 
@@ -318,7 +349,7 @@ class VehiculoForm(forms.ModelForm):
         val = self.cleaned_data.get("marca")
 
         # En USA, marca ya es instancia (ModelChoiceField)
-        if pais != "CL":
+        if pais == "US":
             return val
 
         # En Chile, convertir ID a instancia
@@ -328,10 +359,10 @@ class VehiculoForm(forms.ModelForm):
         from taller.models.marca import Marca
 
         try:
-            obj = Marca.objects.get(pk=val, country="CL")
+            obj = Marca.objects.get(pk=val, country=pais)
             return obj
         except Marca.DoesNotExist:
-            raise forms.ValidationError("Marca no válida para Chile")
+            raise forms.ValidationError(f"Marca no válida para {pais}")
 
     def clean_modelo(self):
         """Convertir ID de modelo a instancia (para USA y Chile)"""

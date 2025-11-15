@@ -9,6 +9,7 @@ class Marca(models.Model):
         choices=[
             ("CL", "Chile"),
             ("US", "Estados Unidos"),
+            ("MX", "México"),
         ],
         verbose_name="País",
     )

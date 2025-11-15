@@ -345,6 +345,7 @@ from django.views.decorators.http import require_GET
 from taller.documentos.forms import DocumentoForm
 from taller.documentos.models import DetalleDocumento
 from taller.models.documento import Documento
+from taller.utils.export_utils import DocumentoPDFExporter
 
 
 @login_required
@@ -1095,106 +1096,25 @@ def numero_documento_auto(request):
     return JsonResponse({"numero": numero})
 
 
+@login_required
 def exportar_documento_pdf(request, documento_id):
-    # Obtener el país desde la URL
-    country = _country_from_request(request)
+    """
+    Exporta un documento en PDF usando el nuevo template futurista y
+    la utilería centralizada DocumentoPDFExporter.
+    """
+    empresa = getattr(request.user, "empresa", None)
+    queryset = Documento.objects.all()
+    if empresa is not None:
+        queryset = queryset.filter(empresa=empresa)
 
-    doc = get_object_or_404(Documento, id=documento_id)
-
-    # Calcular totales
-    total_repuestos = sum(r.precio_unitario * r.cantidad for r in doc.lineas_repuesto.all())
-    total_servicios = sum(s.precio_unitario * s.cantidad for s in doc.lineas_servicio.all())
-    total_otros_servicios = sum(os.precio_cliente for os in doc.lineas_otro_servicio.all())
-
-    subtotal = total_repuestos + total_servicios + total_otros_servicios
-    # Forzar IVA al 19% para Chile
-    iva = subtotal * Decimal("0.19")
-    total_general = subtotal + iva
-
-    # Obtener información de la empresa desde ConfiguracionEmpresa
-    from taller.models import ConfiguracionEmpresa
+    documento = get_object_or_404(queryset, id=documento_id)
 
     try:
-        config_empresa = ConfiguracionEmpresa.objects.get(empresa=doc.empresa)
-        company_info = {
-            "COMPANY_ADDRESS": config_empresa.direccion,
-            "COMPANY_PHONE": config_empresa.telefono,
-            "COMPANY_EMAIL": config_empresa.email_contacto,
-            "COMPANY_WEBSITE": config_empresa.sitio_web,
-        }
-    except ConfiguracionEmpresa.DoesNotExist:
-        config_empresa = None
-        company_info = {
-            "COMPANY_ADDRESS": "",
-            "COMPANY_PHONE": "",
-            "COMPANY_EMAIL": "",
-            "COMPANY_WEBSITE": "",
-        }
-
-    # Crear contexto con todos los valores necesarios
-    context = {
-        "documento": doc,
-        "empresa": doc.empresa,  # Agregar empresa al contexto
-        "config_empresa": config_empresa,  # Agregar config_empresa al contexto
-        "total_repuestos": total_repuestos,
-        "total_servicios": total_servicios,
-        "total_otros_servicios": total_otros_servicios,
-        "subtotal": subtotal,
-        "iva": iva,
-        "total_general": total_general,
-        "country": country,
-        **company_info,  # Incluir información de la empresa
-    }
-
-    # Agregar logo en base64 si existe configuración
-    if config_empresa:
-        # Agregar logo en base64 para el PDF
-        if config_empresa.logo:
-            import base64
-            import os
-
-            from django.conf import settings
-
-            try:
-                logo_path = os.path.join(settings.MEDIA_ROOT, config_empresa.logo.name)
-                with open(logo_path, "rb") as logo_file:
-                    logo_data = base64.b64encode(logo_file.read()).decode("utf-8")
-                    # Determinar el tipo de imagen por la extensión
-                    ext = os.path.splitext(logo_path)[1].lower()
-                    if ext == ".png":
-                        mime_type = "image/png"
-                    elif ext in [".jpg", ".jpeg"]:
-                        mime_type = "image/jpeg"
-                    elif ext == ".gif":
-                        mime_type = "image/gif"
-                    else:
-                        mime_type = "image/png"  # fallback
-
-                    context["logo_base64"] = f"data:{mime_type};base64,{logo_data}"
-            except Exception as e:
-                print(f"Error cargando logo: {e}")
-                context["logo_base64"] = None
-        else:
-            context["logo_base64"] = None
-    else:
-        context["logo_base64"] = None
-
-    template = get_template("taller/pdf/documento.html")
-    html = template.render(context)
-
-    response = HttpResponse(content_type="application/pdf")
-    # Importar xhtml2pdf de forma perezosa y manejar errores de importación
-    try:
-        from xhtml2pdf import pisa
-    except Exception as e:
-        # No queremos que la app no arranque si faltan dependencias opcionales.
-        # Responder de forma informativa cuando se intente generar el PDF.
-        err_msg = f"PDF generation not available (xhtml2pdf import failed): {e}"
-        print(err_msg)
+        exporter = DocumentoPDFExporter(documento, request=request)
+        return exporter.generar_response_pdf()
+    except ImportError as exc:
+        err_msg = f"PDF generation not available: {exc}"
         return HttpResponse(err_msg, status=500, content_type="text/plain")
-
-    pisa.CreatePDF(html, dest=response)
-    return response
 
 
 def enviar_por_whatsapp(request, documento_id):

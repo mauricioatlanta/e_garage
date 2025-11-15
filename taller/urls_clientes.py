@@ -115,4 +115,14 @@ urlpatterns = [
         getattr(v, "agregar_ciudad_usa", pick("X", "agregar_ciudad_usa")),
         name="agregar_ciudad_usa",
     ),
+    path(
+        "api/agregar-region/",
+        getattr(v, "agregar_region", pick("X", "agregar_region")),
+        name="agregar_region",
+    ),
+    path(
+        "api/agregar-estado/",
+        getattr(v, "agregar_estado", pick("X", "agregar_estado")),
+        name="agregar_estado",
+    ),
 ]

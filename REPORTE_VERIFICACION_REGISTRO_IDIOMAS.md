@@ -332,3 +332,5 @@ MIDDLEWARE = [
 
 > **Nota**: Este reporte se generó automáticamente. Para más detalles, consulta el script `test_registro_idiomas.py`.
 
+
+

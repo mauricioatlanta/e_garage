@@ -108,11 +108,16 @@ class ConfiguracionEmpresa(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return (
-            f"Config {self.empresa_id} – {self.nombre_publico or self.empresa.nombre}"
-            if getattr(self, "empresa", None)
-            else "Configuración sin empresa"
+        if not getattr(self, "empresa", None):
+            return "Configuración sin empresa"
+
+        nombre_empresa = (
+            self.nombre_publico
+            or getattr(self.empresa, "nombre_taller", "")
+            or getattr(self.empresa, "empresa", "")
+            or "sin nombre"
         )
+        return f"Config {self.empresa_id} – {nombre_empresa}"
 
     class Meta:
         verbose_name = "Configuración de Empresa"

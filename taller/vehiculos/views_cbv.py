@@ -111,7 +111,7 @@ class VehiculoCreateView(LoginRequiredMixin, TenantViewMixin, CreateView):
             )
             country = "US"
 
-        if country not in ("CL", "US"):
+        if country not in ("CL", "US", "MX"):
             log.warning(
                 "[VehiculoCreateView] country desconocido '%s' normalizado a 'CL' (usuario=%s, empresa=%s)",
                 country,
@@ -150,7 +150,7 @@ class VehiculoCreateView(LoginRequiredMixin, TenantViewMixin, CreateView):
                 )
         else:
             ctx["marcas"] = (
-                Marca.objects.filter(country="CL").only("id", "nombre").order_by("nombre")
+                Marca.objects.filter(country=country).only("id", "nombre").order_by("nombre")
             )
         return ctx
 
@@ -186,6 +186,6 @@ class VehiculoUpdateView(LoginRequiredMixin, TenantViewMixin, UpdateView):
                 else []
             )
         else:
-            ctx["marcas"] = Marca.objects.filter(country="CL").order_by("nombre")
+            ctx["marcas"] = Marca.objects.filter(country=country).order_by("nombre")
         ctx["modo"] = "editar"
         return ctx

@@ -3,11 +3,13 @@ from django.utils import translation
 ALLOWED_BY_COUNTRY = {
     "US": ("en", "es"),  # USA puede en/es
     "CL": ("es",),  # Chile solo es
+    "MX": ("es",),  # México español
 }
 
 DEFAULT_BY_COUNTRY = {
     "US": "en",
     "CL": "es",
+    "MX": "es",
 }
 
 # Django i18n usa esta clave por defecto
@@ -43,6 +45,8 @@ class LanguagePolicyMiddleware:
                     pais = "US"
                 elif request.path.startswith("/cl/"):
                     pais = "CL"
+                elif request.path.startswith("/mx/"):
+                    pais = "MX"
 
             # SOLUCIÓN SIMPLE: Solo para USA, respetar preferencia de sesión
             if pais == "US":

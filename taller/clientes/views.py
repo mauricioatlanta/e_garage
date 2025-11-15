@@ -1,4 +1,7 @@
 # Búsqueda AJAX de clientes por nombre, apellido, email o teléfono
+import json
+import logging
+
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.db import models
@@ -42,10 +45,17 @@ def ajax_buscar_clientes(request):
     return JsonResponse(data, safe=False)
 
 
-import logging
+from taller.models.region_ciudad import TallerCiudad, TallerRegion
+from taller.models.ubicacion import Ciudad as CiudadUSA
+from taller.models.ubicacion import Estado as EstadoUSA
 
-from taller.models.region_ciudad import TallerCiudad
-from taller.models.ubicacion import Ciudad
+DEFAULT_ESTADO_TIMEZONES = {
+    "US": "America/New_York",
+    "BR": "America/Sao_Paulo",
+    "VE": "America/Caracas",
+    "PE": "America/Lima",
+    "MX": "America/Mexico_City",
+}
 
 
 # Vista unificada que detecta automáticamente el país del usuario
@@ -64,14 +74,14 @@ def obtener_ciudades(request):
         if hasattr(request.user, "empresa") and hasattr(request.user.empresa, "pais"):
             pais_usuario = request.user.empresa.pais
 
-    if pais_usuario in ["US", "BR", "VE", "PE"]:
+    if pais_usuario in ["US", "BR", "VE", "PE", "MX"]:
         # Usuarios de USA, Brasil, Venezuela, Perú: usar modelo Estado/Ciudad unificado
         estado_id = request.GET.get("estado_id")
         if not estado_id:
             return JsonResponse([], safe=False)
 
         # Filtrar ciudades por estado
-        ciudades = Ciudad.objects.filter(estado_id=estado_id, estado__pais=pais_usuario).values(
+        ciudades = CiudadUSA.objects.filter(estado_id=estado_id, estado__pais=pais_usuario).values(
             "id", "nombre"
         )
         return JsonResponse(list(ciudades), safe=False)
@@ -92,7 +102,7 @@ def obtener_ciudades_usa(request):
     estado_id = request.GET.get("estado_id")
     if not estado_id:
         return JsonResponse([], safe=False)
-    ciudades = Ciudad.objects.filter(estado_id=estado_id).values("id", "nombre")
+    ciudades = CiudadUSA.objects.filter(estado_id=estado_id).values("id", "nombre")
     return JsonResponse(list(ciudades), safe=False)
 
 
@@ -229,8 +239,6 @@ def clientes_stats(request):
     return JsonResponse({"labels": labels, "counts": counts})
 
 
-import json
-
 from django.views.decorators.http import require_http_methods
 
 
@@ -267,11 +275,11 @@ def agregar_ciudad_usa(request):
             return JsonResponse({"success": False, "error": "State not found"})
 
         # Verificar si la ciudad ya existe en ese estado
-        if Ciudad.objects.filter(nombre__iexact=nombre_ciudad, estado=estado).exists():
+        if CiudadUSA.objects.filter(nombre__iexact=nombre_ciudad, estado=estado).exists():
             return JsonResponse({"success": False, "error": "City already exists in this state"})
 
         # Crear la nueva ciudad
-        nueva_ciudad = Ciudad.objects.create(nombre=nombre_ciudad, estado=estado)
+        nueva_ciudad = CiudadUSA.objects.create(nombre=nombre_ciudad, estado=estado)
 
         return JsonResponse(
             {
@@ -314,26 +322,26 @@ def agregar_ciudad(request):
         # Detectar país del usuario para usar el modelo correcto
         pais_usuario = empresa.pais if hasattr(empresa, "pais") else "CL"
 
-        if pais_usuario == "US":
-            # Para usuarios de USA: crear ciudad en Estado
+        if pais_usuario in ["US", "BR", "VE", "PE", "MX"]:
             from taller.models.ubicacion import Ciudad, Estado
 
+            estado_id = data.get("estado_id") or region_id
+            if not estado_id:
+                return JsonResponse({"success": False, "error": "Estado requerido"})
+
             try:
-                estado = Estado.objects.get(id=region_id)
+                estado = Estado.objects.get(id=estado_id, pais=pais_usuario)
             except Estado.DoesNotExist:
                 return JsonResponse({"success": False, "error": "Estado no encontrado"})
 
-            # Verificar si la ciudad ya existe
-            if Ciudad.objects.filter(estado=estado, nombre__iexact=nombre_ciudad).exists():
+            if CiudadUSA.objects.filter(estado=estado, nombre__iexact=nombre_ciudad).exists():
                 return JsonResponse(
                     {"success": False, "error": "La ciudad ya existe en este estado"}
                 )
 
-            # Crear nueva ciudad
-            nueva_ciudad = Ciudad.objects.create(estado=estado, nombre=nombre_ciudad)
+            nueva_ciudad = CiudadUSA.objects.create(estado=estado, nombre=nombre_ciudad)
 
-        else:
-            # Para usuarios de Chile: crear ciudad en TallerRegion
+        elif pais_usuario == "CL":
             from taller.models.region_ciudad import TallerCiudad, TallerRegion
 
             try:
@@ -341,14 +349,15 @@ def agregar_ciudad(request):
             except TallerRegion.DoesNotExist:
                 return JsonResponse({"success": False, "error": "Región no encontrada"})
 
-            # Verificar si la ciudad ya existe
             if TallerCiudad.objects.filter(region=region, nombre__iexact=nombre_ciudad).exists():
                 return JsonResponse(
                     {"success": False, "error": "La ciudad ya existe en esta región"}
                 )
 
-            # Crear nueva ciudad
             nueva_ciudad = TallerCiudad.objects.create(region=region, nombre=nombre_ciudad)
+
+        else:
+            return JsonResponse({"success": False, "error": "País no soportado"})
 
         return JsonResponse(
             {
@@ -361,3 +370,104 @@ def agregar_ciudad(request):
         return JsonResponse({"success": False, "error": "Datos JSON inválidos"})
     except Exception as e:
         return JsonResponse({"success": False, "error": f"Error interno: {str(e)}"})
+
+
+@require_http_methods(["POST"])
+def agregar_region(request):
+    """Crea dinámicamente una región para Chile."""
+
+    if not request.user.is_authenticated:
+        return JsonResponse({"success": False, "error": "Usuario no autenticado"}, status=401)
+
+    empresa = getattr(request.user, "empresa", None)
+    if not empresa or getattr(empresa, "pais", "CL") != "CL":
+        return JsonResponse({"success": False, "error": "Solo disponible para Chile"}, status=400)
+
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"success": False, "error": "Datos JSON inválidos"}, status=400)
+
+    nombre_region = (data.get("nombre") or "").strip()
+    if not nombre_region:
+        return JsonResponse({"success": False, "error": "Nombre de región requerido"}, status=400)
+
+    from taller.models.region_ciudad import TallerRegion
+
+    if TallerRegion.objects.filter(nombre__iexact=nombre_region).exists():
+        return JsonResponse({"success": False, "error": "La región ya existe"}, status=400)
+
+    region = TallerRegion.objects.create(nombre=nombre_region)
+    return JsonResponse({"success": True, "region": {"id": region.id, "nombre": region.nombre}})
+
+
+@require_http_methods(["POST"])
+def agregar_estado(request):
+    """Permite crear estados/provincias para países soportados."""
+
+    if not request.user.is_authenticated:
+        return JsonResponse({"success": False, "error": "Usuario no autenticado"}, status=401)
+
+    empresa = getattr(request.user, "empresa", None)
+    pais = getattr(empresa, "pais", None)
+    if not empresa or not pais:
+        return JsonResponse({"success": False, "error": "Empresa sin país configurado"}, status=400)
+
+    if pais not in ["US", "BR", "VE", "PE", "MX"]:
+        return JsonResponse(
+            {"success": False, "error": "El país no admite creación dinámica de estados"},
+            status=400,
+        )
+
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"success": False, "error": "Datos JSON inválidos"}, status=400)
+
+    nombre_estado = (data.get("nombre") or "").strip()
+    codigo_estado = (data.get("codigo") or "").strip().upper()
+
+    if not nombre_estado:
+        return JsonResponse({"success": False, "error": "Nombre del estado requerido"}, status=400)
+
+    if not codigo_estado:
+        codigo_estado = "".join(fragmento[:2] for fragmento in nombre_estado.split()).upper()
+        if not codigo_estado:
+            codigo_estado = nombre_estado[:5].upper()
+
+    from taller.models.ubicacion import Estado
+
+    if Estado.objects.filter(pais=pais, nombre__iexact=nombre_estado).exists():
+        return JsonResponse({"success": False, "error": "El estado ya existe"}, status=400)
+
+    if Estado.objects.filter(pais=pais, codigo__iexact=codigo_estado).exists():
+        return JsonResponse(
+            {"success": False, "error": "El código de estado ya está en uso"}, status=400
+        )
+
+    timezone = (
+        data.get("timezone")
+        or getattr(empresa, "zona_horaria", None)
+        or DEFAULT_ESTADO_TIMEZONES.get(pais, "UTC")
+    )
+
+    estado = Estado.objects.create(
+        nombre=nombre_estado,
+        codigo=codigo_estado,
+        pais=pais,
+        timezone=timezone,
+    )
+
+    return JsonResponse(
+        {
+            "success": True,
+            "estado": {
+                "id": estado.id,
+                "nombre": estado.nombre,
+                "codigo": estado.codigo,
+            },
+        }
+    )
+
+
+from django.views.decorators.http import require_http_methods

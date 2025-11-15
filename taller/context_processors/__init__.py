@@ -61,7 +61,7 @@ def company_branding(request):
     brand = {
         "logo_url": getattr(settings, "DEFAULT_BRAND_LOGO_URL", None),
         "name": getattr(settings, "DEFAULT_BRAND_NAME", "eGarage"),
-        "tagline": getattr(settings, "DEFAULT_BRAND_TAGLINE", "Mission Control for your Workshop"),
+        "tagline": getattr(settings, "DEFAULT_BRAND_TAGLINE", "Control total para tu taller"),
         "country": getattr(settings, "DEFAULT_BRAND_COUNTRY", "cl"),
         "currency": getattr(settings, "DEFAULT_BRAND_CURRENCY", "CLP"),
         "primary_color": getattr(settings, "DEFAULT_BRAND_PRIMARY_COLOR", "#0d6efd"),
@@ -109,23 +109,22 @@ def company_branding(request):
             pass
 
         # 2. SEGUNDA PRIORIDAD: ConfiguracionEmpresa (si no hay CompanySettings)
-        if not brand["logo_url"]:
-            try:
-                conf = ConfiguracionEmpresa.objects.get(empresa=empresa)
-                if conf.logo:
-                    brand["logo_url"] = conf.logo.url
-                if hasattr(conf, "nombre_publico") and conf.nombre_publico:
-                    brand["name"] = conf.nombre_publico
-                if hasattr(conf, "tagline") and conf.tagline:
-                    brand["tagline"] = conf.tagline
-                if hasattr(conf, "brand_color") and conf.brand_color:
-                    brand["primary_color"] = conf.brand_color
-                if hasattr(conf, "moneda") and conf.moneda:
-                    brand["currency"] = conf.moneda
-                if hasattr(conf, "pais") and conf.pais:
-                    brand["country"] = conf.pais
-            except ConfiguracionEmpresa.DoesNotExist:
-                pass
+        try:
+            conf = ConfiguracionEmpresa.objects.get(empresa=empresa)
+            if conf.logo and not brand["logo_url"]:
+                brand["logo_url"] = conf.logo.url
+            if hasattr(conf, "nombre_publico") and conf.nombre_publico:
+                brand["name"] = conf.nombre_publico
+            if hasattr(conf, "tagline") and conf.tagline:
+                brand["tagline"] = conf.tagline
+            if hasattr(conf, "brand_color") and conf.brand_color:
+                brand["primary_color"] = conf.brand_color
+            if hasattr(conf, "moneda") and conf.moneda:
+                brand["currency"] = conf.moneda
+            if hasattr(conf, "pais") and conf.pais:
+                brand["country"] = conf.pais
+        except ConfiguracionEmpresa.DoesNotExist:
+            pass
 
         # 3. TERCERA PRIORIDAD: Empresa directamente (fallback)
         if not brand["logo_url"] and hasattr(empresa, "logo") and empresa.logo:
@@ -138,7 +137,7 @@ def company_branding(request):
             brand["currency"] = empresa.moneda
 
     # Retornar objeto BRAND + variables de compatibilidad
-    return {
+    result = {
         "BRAND": brand,
         # Backwards compatibility
         "company_name": brand["name"],
@@ -150,6 +149,10 @@ def company_branding(request):
         "company_country": brand["country"],
         "company_currency": brand["currency"],
     }
+    print(
+        f"[COMPANY_BRANDING] Retornando: company_tagline='{result.get('company_tagline')}', company_logo_url='{result.get('company_logo_url')}'"
+    )
+    return result
 
 
 def company_country(request):

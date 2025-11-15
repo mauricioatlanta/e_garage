@@ -395,3 +395,5 @@ La reorganización de templates ha sido completada exitosamente. El proyecto aho
 **Proyecto:** eGarage - Sistema de Gestión de Talleres
 **Versión del documento:** 1.0
 
+
+

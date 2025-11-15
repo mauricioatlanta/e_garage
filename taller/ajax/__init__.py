@@ -1,0 +1,1 @@
+"""AJAX endpoints package."""

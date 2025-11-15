@@ -1,0 +1,5 @@
+country=CL, apply_vat=True
+repuesto ac1040 precio=9500.00 qty=5 subtotal=47500.0000
+repuesto fa precio=10000.00 qty=1 subtotal=10000.0000
+servicio Cambio de Aceite Convencional precio=0.00 qty=1 subtotal=0.0000
+otro al gruas precio=40000.00 qty=1 subtotal=40000.00

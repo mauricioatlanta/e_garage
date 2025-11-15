@@ -17,12 +17,16 @@ class CountryAwareLogoutRedirectAdapter:
                         return redirect(reverse("usa:account_login"))
                     elif request.user.empresa.pais == "CL":
                         return redirect(reverse("chile:account_login"))
+                    elif request.user.empresa.pais == "MX":
+                        return redirect(reverse("mexico:account_login"))
                 # Buscar en perfil
                 elif hasattr(request.user, "perfil") and hasattr(request.user.perfil, "pais"):
                     if request.user.perfil.pais == "US":
                         return redirect(reverse("usa:account_login"))
                     elif request.user.perfil.pais == "CL":
                         return redirect(reverse("chile:account_login"))
+                    elif request.user.perfil.pais == "MX":
+                        return redirect(reverse("mexico:account_login"))
             except Exception:
                 pass
 
@@ -37,6 +41,8 @@ class CountryAwareLogoutRedirectAdapter:
             or "usa" in request.GET.get("country", "")
         ):
             return redirect(reverse("usa:account_login"))
+        if path.startswith("/mx") or "mx" in request.GET.get("country", ""):
+            return redirect(reverse("mexico:account_login"))
 
         # PRIORIDAD 3: Detectar país por sesión
         country = request.session.get("country")
@@ -44,6 +50,8 @@ class CountryAwareLogoutRedirectAdapter:
             return redirect(reverse("usa:account_login"))
         elif country == "cl" or country == "chile":
             return redirect(reverse("chile:account_login"))
+        elif country == "mx" or country == "mexico":
+            return redirect(reverse("mexico:account_login"))
 
         # FALLBACK: Redirigir a Chile por defecto
         return redirect(reverse("chile:account_login"))

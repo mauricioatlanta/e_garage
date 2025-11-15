@@ -7,6 +7,10 @@ class CategoriaServicio(models.Model):
     COUNTRY_CHOICES = [
         ("CL", "Chile"),
         ("US", "Estados Unidos"),
+        ("MX", "México"),
+        ("VE", "Venezuela"),
+        ("PE", "Perú"),
+        ("BR", "Brasil"),
     ]
 
     country = models.CharField(max_length=2, choices=COUNTRY_CHOICES, default="CL")
@@ -45,6 +49,7 @@ class CategoriaServicioName(models.Model):
     LANGUAGE_CHOICES = [
         ("es", "Español"),
         ("en", "English"),
+        ("pt", "Português"),
     ]
 
     categoria = models.ForeignKey(CategoriaServicio, on_delete=models.CASCADE, related_name="names")
@@ -157,6 +162,22 @@ class Servicio(TenantScoped):
 
     def __str__(self):
         return f"{self.nombre} ({self.categoria})"
+
+    def get_label(self, language="es"):
+        """
+        Obtiene el nombre localizado del servicio.
+        Fallbacks:
+          1. Nombre marcado como is_default para el idioma solicitado.
+          2. Primer nombre disponible en ese idioma.
+          3. Nombre crudo almacenado en el modelo.
+        """
+        try:
+            return self.names.get(language=language, is_default=True).label
+        except ServicioName.DoesNotExist:
+            alt = self.names.filter(language=language).first()
+            if alt:
+                return alt.label
+        return self.nombre
 
 
 class ServicioName(models.Model):

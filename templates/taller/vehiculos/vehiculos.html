@@ -33,7 +33,8 @@ body {
 #tsparticles {
   position: fixed;
   inset: 0;
-  z-index: 0;
+  z-index: -5;
+  pointer-events: none;
 }
 .cuadro {
   position: relative;
@@ -53,6 +54,12 @@ input[type="text"] {
 }
 input[type="text"]::placeholder {
   color: #b2f5ea;
+}
+#tsparticles {
+  position: fixed;
+  inset: 0;
+  z-index: -5;
+  pointer-events: none;
 }
 .translucent-card {
   background: rgba(0,0,0,0.6) !important;
@@ -119,7 +126,7 @@ input[type="text"]::placeholder {
 {% block content %}
 <div class="max-w-6xl mx-auto cuadro">
   {# Determinar URL de crear vehículo #}
-  {% url 'taller:vehiculos:crear_vehiculo' as url_crear_vehiculo %}
+  {% country_url 'vehiculos:crear_vehiculo' as url_crear_vehiculo %}
 
   <div class="flex justify-between items-center mb-4">
     <div class="flex items-center gap-3">
@@ -144,9 +151,9 @@ input[type="text"]::placeholder {
   <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3" id="grid-vehiculos">
     {% for vehiculo in vehiculos %}
       {# Generar URLs #}
-      {% url 'taller:vehiculos:ver_vehiculo' vehiculo.id as url_ver_vehiculo %}
-      {% url 'taller:vehiculos:editar_vehiculo' vehiculo.id as url_editar_vehiculo %}
-      {% url 'taller:vehiculos:eliminar_vehiculo' vehiculo.id as url_eliminar_vehiculo %}
+      {% country_url 'vehiculos:ver_vehiculo' vehiculo.id as url_ver_vehiculo %}
+      {% country_url 'vehiculos:editar_vehiculo' vehiculo.id as url_editar_vehiculo %}
+      {% country_url 'vehiculos:eliminar_vehiculo' vehiculo.id as url_eliminar_vehiculo %}
 
     <div class="vehiculo-card translucent-card hover:scale-105 transition-transform duration-300 cursor-pointer"
          data-patente="{{ vehiculo.patente|lower }}"

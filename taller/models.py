@@ -12,6 +12,7 @@ class Marca(models.Model):
     PAISES = (
         ("CL", "Chile"),
         ("US", "Estados Unidos"),
+        ("MX", "México"),
         ("AR", "Argentina"),
         ("BR", "Brasil"),
         ("PE", "Perú"),

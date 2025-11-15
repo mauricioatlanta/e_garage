@@ -77,6 +77,7 @@ class SignupCompleteForm(forms.Form):
             ("", "--- Selecciona tu país ---"),
             ("CL", "🇨🇱 Chile"),
             ("US", "🇺🇸 United States"),
+            ("MX", "🇲🇽 México"),
         ],
         label="País",
         required=True,
@@ -173,6 +174,12 @@ class SignupCompleteForm(forms.Form):
             cleaned = "".join(filter(str.isdigit, telefono))
             if len(cleaned) != 10:
                 raise ValidationError("Teléfono USA debe tener 10 dígitos: (555) 123-4567")
+        elif pais == "MX":
+            cleaned = "".join(filter(str.isdigit, telefono))
+            if cleaned.startswith("52") and len(cleaned) == 12:
+                cleaned = cleaned[2:]
+            if len(cleaned) != 10:
+                raise ValidationError("Teléfono México debe tener 10 dígitos (ej: 55 1234 5678)")
 
         return telefono
 

@@ -15,6 +15,7 @@ from django.contrib.auth.decorators import login_required
 from django.db import models, transaction
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import NoReverseMatch, reverse
 from django.views.decorators.http import require_GET, require_POST
 
 log = logging.getLogger(__name__)
@@ -39,6 +40,26 @@ try:
 except ImportError:
     CatalogoModeloAuto = None
 
+COUNTRY_NAMESPACES = {
+    "CL": "chile",
+    "US": "usa",
+    "MX": "mexico",
+    "VE": "venezuela",
+    "PE": "peru",
+    "BR": "brasil",
+}
+
+VEHICLE_TEMPLATES = {
+    "crear": {
+        "CL": "taller/cl/es/vehiculos/crear.html",
+        "US": "taller/us/en/vehiculos/crear_vehiculo.html",
+    },
+}
+
+DEFAULT_VEHICLE_TEMPLATES = {
+    "crear": "taller/vehiculos/crear_vehiculo.html",
+}
+
 
 # ---------------------------
 # Utilidades
@@ -60,9 +81,24 @@ def _get_country(request, default="CL"):
             raw = "US"
         elif p.startswith("/cl/"):
             raw = "CL"
+        elif p.startswith("/mx/"):
+            raw = "MX"
 
     c = str(raw or default).strip().upper()
-    return "US" if c in ("US", "USA") else "CL"
+    if c in ("US", "USA"):
+        return "US"
+    if c in ("MX", "MEX"):
+        return "MX"
+    return "CL"
+
+
+def _country_namespace(country: str) -> str:
+    return COUNTRY_NAMESPACES.get(country.upper(), "chile")
+
+
+def _vehicle_template(view_key: str, country: str) -> str:
+    per_country = VEHICLE_TEMPLATES.get(view_key, {})
+    return per_country.get(country.upper(), DEFAULT_VEHICLE_TEMPLATES.get(view_key))
 
 
 def has_field(model_cls, field_name: str) -> bool:
@@ -94,7 +130,7 @@ def _safe_redirect(request, *candidates):
                     ordered.append(name)
                 else:
                     ordered.insert(1 if ordered else 0, name)
-            else:  # CL
+            else:  # CL / MX (comparten layout base en español)
                 if "chile:" in name:
                     ordered.insert(0, name)
                 elif "usa:" in name:
@@ -118,12 +154,50 @@ def _safe_redirect(request, *candidates):
         return redirect("/")  # último recurso
 
 
+def _compat_canonical_redirect(request, view_subpath: str, country: str | None = None):
+    """
+    Redirige rutas legacy /compat/... a la versión country-aware oficial.
+
+    view_subpath ejemplo: "vehiculos:crear_vehiculo"
+    """
+    if not request.path.startswith("/compat/"):
+        return None
+
+    country = country or _get_country(request)
+    ns_map = {
+        "US": "usa",
+        "MX": "mexico",
+        "VE": "venezuela",
+        "PE": "peru",
+        "BR": "brasil",
+        "CL": "chile",
+    }
+    candidates = []
+    ns = ns_map.get(country)
+    if ns:
+        candidates.append(f"{ns}:taller:{view_subpath}")
+    # Fallback a Chile por defecto
+    candidates.append(f"chile:taller:{view_subpath}")
+    candidates.append(f"taller:{view_subpath}")
+
+    for name in candidates:
+        try:
+            return redirect(reverse(name))
+        except NoReverseMatch:
+            continue
+    return None
+
+
 # ---------------------------
 # Vistas principales
 # ---------------------------
 @login_required
 def lista_vehiculos(request):
     """Lista vehículos de la empresa del usuario."""
+    compat_redirect = _compat_canonical_redirect(request, "vehiculos:lista_vehiculos")
+    if compat_redirect:
+        return compat_redirect
+
     empresa = getattr(request.user, "empresa", None)
     if not empresa:
         messages.error(request, "Usuario sin empresa asignada")
@@ -147,6 +221,10 @@ def lista_vehiculos(request):
 @login_required
 def crear_vehiculo(request):
     """Crear vehículo con reglas CL/US y multi-tenant."""
+    compat_redirect = _compat_canonical_redirect(request, "vehiculos:crear_vehiculo")
+    if compat_redirect:
+        return compat_redirect
+
     empresa = getattr(request.user, "empresa", None)
     country = _get_country(request)
 
@@ -190,12 +268,17 @@ def crear_vehiculo(request):
         "empresa": empresa,
     }
 
-    return render(request, "taller/vehiculos/crear_vehiculo.html", ctx)
+    template_name = _vehicle_template("crear", country)
+    return render(request, template_name, ctx)
 
 
 @login_required
 def ver_vehiculo(request, vehiculo_id):
     """Ver detalles de un vehículo."""
+    compat_redirect = _compat_canonical_redirect(request, "vehiculos:ver_vehiculo")
+    if compat_redirect:
+        return compat_redirect
+
     empresa = getattr(request.user, "empresa", None)
     vehiculo = get_object_or_404(Vehiculo, id=vehiculo_id, empresa=empresa)
 
@@ -205,6 +288,10 @@ def ver_vehiculo(request, vehiculo_id):
 @login_required
 def editar_vehiculo(request, vehiculo_id):
     """Editar un vehículo existente."""
+    compat_redirect = _compat_canonical_redirect(request, "vehiculos:editar_vehiculo")
+    if compat_redirect:
+        return compat_redirect
+
     empresa = getattr(request.user, "empresa", None)
     vehiculo = get_object_or_404(Vehiculo, id=vehiculo_id, empresa=empresa)
 
@@ -244,6 +331,10 @@ def editar_vehiculo(request, vehiculo_id):
 @login_required
 def eliminar_vehiculo(request, vehiculo_id):
     """Eliminar un vehículo."""
+    compat_redirect = _compat_canonical_redirect(request, "vehiculos:eliminar_vehiculo")
+    if compat_redirect:
+        return compat_redirect
+
     empresa = getattr(request.user, "empresa", None)
     vehiculo = get_object_or_404(Vehiculo, id=vehiculo_id, empresa=empresa)
 

@@ -28,7 +28,7 @@ def exportar_documento_pdf(request, documento_id):
     documento = get_object_or_404(Documento, id=documento_id, empresa=empresa_actual(request))
 
     try:
-        exporter = DocumentoPDFExporter(documento)
+        exporter = DocumentoPDFExporter(documento, request=request)
         response = exporter.generar_response_pdf()
 
         # Log de exportación (opcional)

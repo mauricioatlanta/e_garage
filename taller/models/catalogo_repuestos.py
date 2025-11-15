@@ -32,6 +32,7 @@ class TaxPolicy(models.Model):
         choices=[
             ("CL", "Chile"),
             ("US", "USA"),
+            ("MX", "México"),
             ("BR", "Brasil"),
             ("PE", "Perú"),
             ("VE", "Venezuela"),

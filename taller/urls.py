@@ -61,7 +61,7 @@ urlpatterns = [
     # Rutas principales de taller (dashboard, settings, etc.)
     # path('', include('taller.taller_main_urls')),  # Eliminado para evitar conflicto de namespace
     # Puedes agregar aquí otras rutas globales si es necesario
-    path("ajax/", include("taller.ajax_urls")),
+    path("ajax/", include(("taller.ajax.urls", "ajax"), namespace="ajax")),
     # Company settings
     path("settings/", company_settings_view, name="company_settings"),
     # URLs de autocomplete para los formularios (movidas a URLs específicas de país)

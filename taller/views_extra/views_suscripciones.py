@@ -110,6 +110,8 @@ def precios(request):
         pais_usuario = "VE"
     elif request.path.startswith("/pe/"):
         pais_usuario = "PE"
+    elif request.path.startswith("/mx/"):
+        pais_usuario = "MX"
     # Override si el usuario está autenticado
     elif request.user.is_authenticated and hasattr(request.user, "empresa"):
         pais_usuario = request.user.empresa.pais
@@ -326,6 +328,49 @@ def precios(request):
                     "ahorro": "33%",
                 },
             }
+        elif pais_usuario == "MX":
+            planes = {
+                "prueba": {
+                    "nombre": "Prueba 30 días",
+                    "precio": 0,
+                    "moneda": "MXN",
+                    "caracteristicas": [
+                        "Acceso completo por 30 días",
+                        "Soporte de onboarding y migración básica",
+                        "Plantillas de órdenes, compras y facturas CFDI",
+                    ],
+                },
+                "mensual": {
+                    "nombre": "Operación Mensual",
+                    "precio": 360,
+                    "moneda": "MXN",
+                    "caracteristicas": [
+                        "Usuarios ilimitados y roles por área",
+                        "Inventario, compras y cotizaciones sincronizadas",
+                        "Dashboards de productividad y ventas",
+                    ],
+                },
+                "cinco_meses": {
+                    "nombre": "Plan 5 Meses",
+                    "precio": 1800,
+                    "moneda": "MXN",
+                    "caracteristicas": [
+                        "Vigencia continua de 5 meses",
+                        "Capacitación remota para equipos de piso y mostrador",
+                        "Reportes comparativos por sucursal o línea de negocio",
+                    ],
+                },
+                "anual": {
+                    "nombre": "Plan Anual",
+                    "precio": 3600,
+                    "moneda": "MXN",
+                    "caracteristicas": [
+                        "Vigencia anual con soporte priority extendido",
+                        "Auditoría trimestral de procesos e inventario",
+                        "Planes de crecimiento para nuevas sedes y servicios",
+                    ],
+                },
+            }
         else:
             # Precios Chile en pesos
             # Características IGUALES para todos los planes
@@ -410,6 +455,8 @@ def precios(request):
         whatsapp_contacto = (
             "https://wa.me/51987654321?text=Hola, quiero información sobre los planes de eGarage"
         )
+    elif pais_usuario == "MX":
+        whatsapp_contacto = "https://wa.me/525512345678?text=Hola, quiero información sobre los planes de eGarage México"
 
     # Símbolos de moneda por país
     simbolos_moneda = {
@@ -418,6 +465,7 @@ def precios(request):
         "BR": "R$",
         "VE": "Bs.",
         "PE": "S/",
+        "MX": "$",
     }
 
     context = {
@@ -430,6 +478,7 @@ def precios(request):
         "es_brasil": pais_usuario == "BR",
         "es_venezuela": pais_usuario == "VE",
         "es_peru": pais_usuario == "PE",
+        "es_mexico": pais_usuario == "MX",
     }
 
     return render(request, "suspension/precios.html", context)

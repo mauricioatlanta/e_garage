@@ -289,7 +289,7 @@ def dashboard_centro_operaciones(request):
     context = {
         # Información de empresa
         "empresa": empresa,
-        "pais_emoji": "🇨🇱" if empresa.pais == "CL" else "🇺🇸",
+        "pais_emoji": {"CL": "🇨🇱", "US": "🇺🇸", "MX": "🇲🇽"}.get(empresa.pais, "🌎"),
         "moneda": empresa.simbolo_moneda,
         # KPIs principales
         "documentos_hoy": documentos_hoy,

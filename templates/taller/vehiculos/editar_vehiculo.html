@@ -25,7 +25,7 @@
     <div class="max-w-4xl mx-auto">
       <form id="form-editar-vehiculo"
             method="post"
-            action="{% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{{ vehiculo.id }}/editar/{% else %}/cl/vehiculos/{{ vehiculo.id }}/editar/{% endif %}"
+            action="{% country_url 'vehiculos:editar_vehiculo' vehiculo.id %}"
             class="space-y-6">
         {% csrf_token %}
 
@@ -190,7 +190,7 @@
 
         <!-- Botones de acción -->
         <div class="flex flex-col sm:flex-row gap-4 pt-6">
-          <a href="{% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{% else %}/cl/vehiculos/{% endif %}"
+          <a href="{% country_url 'vehiculos:lista_vehiculos' %}"
              class="group flex-1 relative inline-flex items-center justify-center space-x-2 px-8 py-4 rounded-xl bg-gradient-to-r from-gray-600 via-gray-700 to-gray-800 hover:from-gray-500 hover:via-gray-600 hover:to-gray-700 text-white font-bold shadow-lg shadow-gray-800/40 transition-all duration-300 border border-gray-400/40">
             <span class="text-lg">⟲</span>
             <span>{% trans "Cancelar" %}</span>

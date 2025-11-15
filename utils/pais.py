@@ -384,6 +384,45 @@ CATALOGOS_CIUDADES = {
             "Antártica",
         ],
     },
+    "MX": {
+        "Aguascalientes": ["Aguascalientes", "Calvillo", "Jesús María"],
+        "Baja California": ["Tijuana", "Mexicali", "Ensenada"],
+        "Baja California Sur": ["La Paz", "Cabo San Lucas", "San José del Cabo"],
+        "Campeche": ["Campeche", "Ciudad del Carmen", "Champotón"],
+        "Coahuila": ["Saltillo", "Torreón", "Piedras Negras"],
+        "Colima": ["Colima", "Manzanillo", "Tecomán"],
+        "Chiapas": ["Tuxtla Gutiérrez", "San Cristóbal de las Casas", "Tapachula"],
+        "Chihuahua": ["Chihuahua", "Ciudad Juárez", "Delicias"],
+        "Ciudad de México": [
+            "Coyoacán",
+            "Cuauhtémoc",
+            "Miguel Hidalgo",
+            "Tlalpan",
+        ],
+        "Durango": ["Durango", "Gómez Palacio", "Lerdo"],
+        "Guanajuato": ["León", "Guanajuato", "Irapuato"],
+        "Guerrero": ["Acapulco", "Chilpancingo", "Iguala"],
+        "Hidalgo": ["Pachuca", "Tulancingo", "Tula de Allende"],
+        "Jalisco": ["Guadalajara", "Zapopan", "Puerto Vallarta"],
+        "Estado de México": ["Toluca", "Ecatepec", "Naucalpan"],
+        "Michoacán": ["Morelia", "Uruapan", "Lázaro Cárdenas"],
+        "Morelos": ["Cuernavaca", "Cuautla", "Jiutepec"],
+        "Nayarit": ["Tepic", "Bahía de Banderas", "Compostela"],
+        "Nuevo León": ["Monterrey", "San Nicolás", "San Pedro Garza García"],
+        "Oaxaca": ["Oaxaca de Juárez", "Juchitán", "Salina Cruz"],
+        "Puebla": ["Puebla", "San Andrés Cholula", "Tehuacán"],
+        "Querétaro": ["Querétaro", "Corregidora", "San Juan del Río"],
+        "Quintana Roo": ["Cancún", "Playa del Carmen", "Chetumal"],
+        "San Luis Potosí": ["San Luis Potosí", "Soledad de Graciano Sánchez", "Ciudad Valles"],
+        "Sinaloa": ["Culiacán", "Mazatlán", "Los Mochis"],
+        "Sonora": ["Hermosillo", "Ciudad Obregón", "Nogales"],
+        "Tabasco": ["Villahermosa", "Cárdenas", "Comalcalco"],
+        "Tamaulipas": ["Tampico", "Ciudad Victoria", "Reynosa"],
+        "Tlaxcala": ["Tlaxcala", "Apizaco", "Huamantla"],
+        "Veracruz": ["Veracruz", "Xalapa", "Coatzacoalcos"],
+        "Yucatán": ["Mérida", "Valladolid", "Tizimín"],
+        "Zacatecas": ["Zacatecas", "Fresnillo", "Jerez"],
+    },
     "US": None,  # Se cargará dinámicamente
 }
 
@@ -431,6 +470,7 @@ def _ordenar_estados_us(ciudades_us):
 CATALOGOS_REGIONES = {
     "CL": list(CATALOGOS_CIUDADES["CL"].keys()),
     "US": _ordenar_estados_us(CATALOGOS_CIUDADES["US"]),
+    "MX": list(CATALOGOS_CIUDADES["MX"].keys()),
 }
 
 CATALOGOS_SERVICIOS = {
@@ -448,11 +488,19 @@ CATALOGOS_SERVICIOS = {
         "State Inspection",
         "Battery Replacement",
     ],
+    "MX": [
+        "Servicio general",
+        "Cambio de aceite",
+        "Afinación",
+        "Frenos",
+        "Suspensión",
+    ],
 }
 
 CATALOGOS_TIPOS_AUTO = {
     "CL": ["Sedán", "Hatchback", "SUV", "Camioneta", "Furgón"],
     "US": ["Sedan", "SUV", "Pickup Truck", "Van", "Convertible"],
+    "MX": ["Sedán", "SUV", "Pickup", "Hatchback", "Camioneta"],
 }
 
 
@@ -468,6 +516,17 @@ def get_configuracion_pais(empresa):
             "zona_horaria_default": "America/New_York",
             "validacion_patente": r"^[A-Z0-9]{2,7}$",
             "impuesto_default": 0.08,
+        }
+    if empresa.pais == "MX":
+        return {
+            "moneda": "MXN",
+            "simbolo_moneda": "$",
+            "decimales": 2,
+            "idioma_default": "es",
+            "formato_fecha": "%d/%m/%Y",
+            "zona_horaria_default": "America/Mexico_City",
+            "validacion_patente": r"^[A-Z]{3}\d{3,4}$",
+            "impuesto_default": 0.16,
         }
     else:
         return {
@@ -528,6 +587,8 @@ def validar_patente_por_pais(patente, pais):
 
     if pais == "US":
         return bool(re.match(r"^[A-Z0-9]{2,8}$", patente.upper()))
+    if pais == "MX":
+        return bool(re.match(r"^[A-Z]{3}\d{3,4}$", patente.upper()))
     else:
         return bool(re.match(r"^[A-Z]{2,4}\d{2,4}$", patente.upper()))
 
@@ -538,6 +599,9 @@ def validar_telefono_por_pais(telefono, pais):
     if pais == "US":
         patron = r"^(\+1[-.\s]?)?\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}$"
         return bool(re.match(patron, telefono))
+    if pais == "MX":
+        patron = r"^(\+52)?\d{10}$"
+        return bool(re.match(patron, telefono.replace(" ", "").replace("-", "")))
     else:
         patron = r"^(\+56)?[0-9]{8,9}$"
         return bool(re.match(patron, telefono.replace(" ", "").replace("-", "")))

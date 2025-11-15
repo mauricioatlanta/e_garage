@@ -115,6 +115,7 @@ class Cliente(AuditModelMixin, TenantScoped):
         ("BR_CNPJ", "CNPJ (Brasil - Empresa)"),
         ("PE_RUC", "RUC (Perú)"),
         ("VE_RIF", "RIF (Venezuela)"),
+        ("MX_RFC", "RFC (México)"),
     )
 
     tax_id_type = models.CharField(
@@ -130,7 +131,7 @@ class Cliente(AuditModelMixin, TenantScoped):
         default="",
         db_index=True,
         verbose_name="Identificador Tributario",
-        help_text="RUT/EIN/SSN/CPF/CNPJ/RUC/RIF según el tipo seleccionado",
+        help_text="RUT/EIN/SSN/CPF/CNPJ/RUC/RIF/RFC según el tipo seleccionado",
     )
 
     # Campo para identificación por color

@@ -11,6 +11,7 @@ class ColorCliente(models.Model):
         choices=[
             ("CL", "Chile"),
             ("US", "Estados Unidos"),
+            ("MX", "México"),
         ],
         verbose_name="País",
         null=True,
@@ -115,6 +116,37 @@ class ColorCliente(models.Model):
                 country="US", nombre__in=colores_english_names, activo=True
             ).order_by("orden", "nombre")
 
+        elif country == "MX":
+            colores_mex = [
+                ("Blanco", "#ffffff"),
+                ("Negro", "#000000"),
+                ("Rojo", "#ff0000"),
+                ("Azul", "#0000ff"),
+                ("Verde", "#00ff00"),
+                ("Amarillo", "#ffff00"),
+                ("Gris", "#808080"),
+                ("Plateado", "#c0c0c0"),
+                ("Dorado", "#ffd700"),
+                ("Café", "#8b4513"),
+                ("Morado", "#800080"),
+                ("Naranja", "#ffa500"),
+                ("Rosa", "#ffc0cb"),
+                ("Turquesa", "#40e0d0"),
+                ("Beige", "#f5f5dc"),
+            ]
+
+            for i, (color_nombre, color_codigo) in enumerate(colores_mex):
+                cls.objects.get_or_create(
+                    nombre=color_nombre,
+                    country="MX",
+                    defaults={"codigo_color": color_codigo, "orden": i, "activo": True},
+                )
+
+            colores_mex_names = [color[0] for color in colores_mex]
+            return cls.objects.filter(
+                country="MX", nombre__in=colores_mex_names, activo=True
+            ).order_by("orden", "nombre")
+
         # Fallback: retornar todos los colores activos
         return cls.objects.filter(activo=True).order_by("country", "orden", "nombre")
 
@@ -125,6 +157,8 @@ class ColorCliente(models.Model):
         cls.get_colores_para_pais("CL")
         # Crear colores para USA
         cls.get_colores_para_pais("US")
+        # Crear colores para México
+        cls.get_colores_para_pais("MX")
 
     def get_css_class(self):
         """Retorna una clase CSS para el color"""

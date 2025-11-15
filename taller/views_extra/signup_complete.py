@@ -11,6 +11,7 @@ from django.utils.translation import activate
 
 from taller.forms.signup_complete import SignupCompleteForm
 from taller.models.empresa import Empresa
+from taller.utils.pais_utils import get_configuracion_pais
 
 
 def signup_complete(request):
@@ -31,8 +32,12 @@ def signup_complete(request):
         activate("es")  # Español para Chile
         initial_country = "CL"
         language_code = "es"
+    elif from_country == "mx":
+        activate("es")  # Español para México
+        initial_country = "MX"
+        language_code = "es"
     else:
-        activate("en")  # Inglés para USA
+        activate("en")  # Inglés por defecto (USA)
         initial_country = "US"
         language_code = "en"
 
@@ -66,29 +71,41 @@ def signup_complete(request):
                     plan_config = {
                         "trial": {
                             "dias": 30,
-                            "valor_cl": Decimal("0.00"),
-                            "valor_us": Decimal("0.00"),
+                            "valores": {
+                                "CL": Decimal("0.00"),
+                                "US": Decimal("0.00"),
+                                "MX": Decimal("0.00"),
+                            },
                             "suscripcion_activa": True,  # Trial activo inmediatamente
                             "plan_nombre": "trial",
                         },
                         "mensual": {
                             "dias": 30,
-                            "valor_cl": Decimal("10000.00"),  # $10,000 CLP
-                            "valor_us": Decimal("20.00"),  # $20 USD
+                            "valores": {
+                                "CL": Decimal("10000.00"),  # $10,000 CLP
+                                "US": Decimal("20.00"),  # $20 USD
+                                "MX": Decimal("399.00"),  # $399 MXN
+                            },
                             "suscripcion_activa": False,  # Debe pagar primero
                             "plan_nombre": "basic",
                         },
                         "semestral": {
                             "dias": 180,
-                            "valor_cl": Decimal("55000.00"),  # $55,000 CLP
-                            "valor_us": Decimal("110.00"),  # $110 USD
+                            "valores": {
+                                "CL": Decimal("55000.00"),  # $55,000 CLP
+                                "US": Decimal("110.00"),  # $110 USD
+                                "MX": Decimal("2199.00"),  # $2,199 MXN
+                            },
                             "suscripcion_activa": False,
                             "plan_nombre": "premium",
                         },
                         "anual": {
                             "dias": 365,
-                            "valor_cl": Decimal("100000.00"),  # $100,000 CLP
-                            "valor_us": Decimal("200.00"),  # $200 USD
+                            "valores": {
+                                "CL": Decimal("100000.00"),  # $100,000 CLP
+                                "US": Decimal("200.00"),  # $200 USD
+                                "MX": Decimal("3990.00"),  # $3,990 MXN
+                            },
                             "suscripcion_activa": False,
                             "plan_nombre": "enterprise",
                         },
@@ -97,7 +114,10 @@ def signup_complete(request):
                     config = plan_config[plan]
 
                     # Determinar valor según país
-                    valor_mensual = config["valor_cl"] if pais == "CL" else config["valor_us"]
+                    valores_por_pais = config["valores"]
+                    valor_mensual = valores_por_pais.get(pais, valores_por_pais.get("CL"))
+
+                    pais_config = get_configuracion_pais(type("TmpEmpresa", (), {"pais": pais})())
 
                     # 🔥 PASO 3: CREAR EMPRESA (SUSCRIPTOR)
                     empresa = Empresa.objects.create(
@@ -107,8 +127,8 @@ def signup_complete(request):
                         telefono=telefono,
                         # Configuración por país (auto-asignado)
                         pais=pais,
-                        moneda="CLP" if pais == "CL" else "USD",
-                        zona_horaria=("America/Santiago" if pais == "CL" else "America/New_York"),
+                        moneda=pais_config["moneda"],
+                        zona_horaria=pais_config["zona_horaria_default"],
                         # Configuración del plan
                         plan=config["plan_nombre"],
                         dias_prueba=config["dias"],
@@ -132,15 +152,24 @@ def signup_complete(request):
                     request.session.save()
 
                     # 🔥 PASO 5: MENSAJE DE BIENVENIDA
+                    is_spanish = pais in {"CL", "MX"}
                     if plan == "trial":
                         messages.success(
                             request,
-                            f"¡Bienvenido {nombre}! Tu prueba gratuita de 30 días ha comenzado.",
+                            (
+                                f"¡Bienvenido {nombre}! Tu prueba gratuita de 30 días ha comenzado."
+                                if is_spanish
+                                else f"Welcome {nombre}! Your 30-day free trial has started."
+                            ),
                         )
                     else:
                         messages.info(
                             request,
-                            f"Cuenta creada. Completa el pago para activar tu plan {plan}.",
+                            (
+                                f"Cuenta creada. Completa el pago para activar tu plan {plan}."
+                                if is_spanish
+                                else f"Account created. Complete your payment to activate the {plan} plan."
+                            ),
                         )
 
                     # 🔥 PASO 6: REDIRIGIR SEGÚN PAÍS Y PLAN
@@ -148,6 +177,8 @@ def signup_complete(request):
                         # Trial: acceso inmediato al dashboard
                         if pais == "CL":
                             return redirect("/cl/es/dashboard/")
+                        elif pais == "MX":
+                            return redirect("/mx/es/dashboard/")
                         else:
                             return redirect("/us/en/dashboard/")
                     else:
@@ -155,6 +186,10 @@ def signup_complete(request):
                         if pais == "CL":
                             return redirect(
                                 f"/cl/es/suscripcion/pago/?plan={plan}&amount={valor_mensual}"
+                            )
+                        elif pais == "MX":
+                            return redirect(
+                                f"/mx/es/suscripcion/pago/?plan={plan}&amount={valor_mensual}"
                             )
                         else:
                             return redirect(
@@ -172,7 +207,7 @@ def signup_complete(request):
     # Precios para mostrar en el template
     context = {
         "form": form,
-        "from_country": from_country,  # 'cl' o 'us'
+        "from_country": from_country,  # 'cl', 'us' o 'mx'
         "language_code": language_code,  # 'es' o 'en'
         "precios": {
             "CL": {
@@ -184,6 +219,11 @@ def signup_complete(request):
                 "mensual": {"valor": "20", "periodo": "month"},
                 "semestral": {"valor": "110", "periodo": "6 months", "ahorro": "8%"},
                 "anual": {"valor": "200", "periodo": "year", "ahorro": "17%"},
+            },
+            "MX": {
+                "mensual": {"valor": "399", "periodo": "mes"},
+                "semestral": {"valor": "2,199", "periodo": "6 meses", "ahorro": "8%"},
+                "anual": {"valor": "3,990", "periodo": "año", "ahorro": "17%"},
             },
         },
     }

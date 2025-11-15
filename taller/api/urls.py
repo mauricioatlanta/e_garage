@@ -17,6 +17,7 @@ urlpatterns = [
     ),
     path("repuestos/by-code", views.repuesto_by_code_api, name="repuesto_by_code_api"),
     path("repuestos/", views.buscar_repuestos_api, name="buscar_repuestos_api"),
+    path("repuestos/crear/", views.crear_repuesto_api, name="crear_repuesto_api"),
     path("servicios/", views.buscar_servicios_api, name="buscar_servicios_api"),
     path(
         "otros-servicios/",

@@ -46,7 +46,9 @@ class CompanySettings(models.Model):
         null=True,
         blank=True,
         validators=[
-            FileExtensionValidator(allowed_extensions=["png", "jpg", "jpeg", "svg", "webp"]),
+            FileExtensionValidator(
+                allowed_extensions=["png", "jpg", "jpeg", "svg", "webp", "jfif"]
+            ),
             validate_logo_size,
         ],
         verbose_name="Logo de la empresa",

@@ -9,43 +9,193 @@ from decimal import Decimal
 import pandas as pd
 from openpyxl.styles import Alignment, Font, PatternFill
 
+from django.apps import apps
 from django.conf import settings
 from django.http import HttpResponse
 from django.template.loader import get_template
+
+from taller.context_processors.company_branding_unified import company_branding
+from taller.context_processors.company_header import company_header
+from taller.models.company_settings import CompanySettings
 
 
 class DocumentoPDFExporter:
     """Clase para exportar documentos a PDF con formato profesional"""
 
-    def __init__(self, documento):
+    def __init__(self, documento, request=None):
         self.documento = documento
+        self.request = request
+
+    def _get_empresa_config(self):
+        """
+        Obtiene la empresa y su configuración respetando los distintos nombres
+        y módulos donde pueda estar declarada ConfiguracionEmpresa.
+        """
+
+        empresa = getattr(self.documento, "empresa", None)
+        if not empresa:
+            return None, None
+
+        config_empresa = None
+
+        # Primero probar atributos comunes en el modelo Empresa
+        posibles_attrs = (
+            "config",
+            "configuracion",
+            "configuracion_empresa",
+            "settings",
+            "ajustes",
+        )
+        for attr in posibles_attrs:
+            conf = getattr(empresa, attr, None)
+            if conf:
+                config_empresa = conf
+                break
+
+        # Fallback: buscar el modelo via apps registry
+        if config_empresa is None:
+            try:
+                ConfiguracionEmpresa = apps.get_model("taller", "ConfiguracionEmpresa")
+            except LookupError:
+                ConfiguracionEmpresa = None
+
+            if ConfiguracionEmpresa is not None:
+                config_empresa = ConfiguracionEmpresa.objects.filter(empresa=empresa).first()
+
+        return empresa, config_empresa
 
     def generar_pdf(self):
         """Genera un PDF del documento completo"""
         # Template HTML para el PDF
         template = get_template("taller/documentos/pdf_template.html")
 
-        # Obtener configuración de empresa
-        config_empresa = None
-        try:
-            config_empresa = self.documento.empresa.config
-        except:
-            pass
+        empresa, config_empresa = self._get_empresa_config()
+
+        branding_ctx = company_branding(self.request) if self.request else {}
+        header_ctx = company_header(self.request) if self.request else {}
+
+        company_settings = None
+        request_user = getattr(self.request, "user", None) if self.request else None
+        if request_user and request_user.is_authenticated:
+            try:
+                company_settings = CompanySettings.objects.get(user=request_user)
+            except CompanySettings.DoesNotExist:
+                pass
+        if not company_settings and empresa and getattr(empresa, "user", None):
+            try:
+                company_settings = CompanySettings.objects.get(user=empresa.user)
+            except CompanySettings.DoesNotExist:
+                pass
+
+        def _safe_logo_url(obj):
+            logo_field = getattr(obj, "logo", None)
+            if not logo_field:
+                return ""
+            url = getattr(logo_field, "url", "")
+            return url or ""
+
+        empresa_logo_url = _safe_logo_url(empresa) if empresa else ""
+        config_logo_url = _safe_logo_url(config_empresa) if config_empresa else ""
+        empresa_tagline = getattr(empresa, "lema", "") if empresa else ""
+        config_tagline = getattr(config_empresa, "tagline", "") if config_empresa else ""
+        settings_tagline = getattr(company_settings, "tagline", "") if company_settings else ""
+
+        company_name = (
+            (company_settings.company_name if company_settings else "")
+            or branding_ctx.get("company_name")
+            or (config_empresa.nombre_publico if config_empresa else "")
+            or (getattr(empresa, "nombre_taller", "") if empresa else "")
+            or (getattr(empresa, "empresa", "") if empresa else "")
+            or "Taller sin nombre"
+        )
+
+        company_address = (
+            header_ctx.get("COMPANY_ADDRESS")
+            or (company_settings.address if company_settings else "")
+            or (config_empresa.direccion if config_empresa else "")
+            or (
+                str(config_empresa.legal_address)
+                if config_empresa and config_empresa.legal_address
+                else ""
+            )
+            or (getattr(empresa, "direccion", "") if empresa else "")
+            or ""
+        )
+
+        company_phone = (
+            header_ctx.get("COMPANY_PHONE")
+            or (company_settings.phone if company_settings else "")
+            or (config_empresa.telefono if config_empresa else "")
+            or (getattr(empresa, "telefono", "") if empresa else "")
+            or ""
+        )
+
+        company_email = (
+            header_ctx.get("COMPANY_EMAIL")
+            or (company_settings.email if company_settings else "")
+            or (config_empresa.email_contacto if config_empresa else "")
+            or (getattr(empresa, "email", "") if empresa else "")
+            or ""
+        )
+
+        company_site = (
+            header_ctx.get("COMPANY_WEBSITE")
+            or header_ctx.get("COMPANY_SITE")
+            or (company_settings.website if company_settings else "")
+            or (config_empresa.sitio_web if config_empresa else "")
+            or (getattr(empresa, "sitio_web", "") if empresa else "")
+            or ""
+        )
+
+        # Prefetch line items once to avoid multiple queries
+        repuestos_qs = list(self.documento.repuestos.all())
+        servicios_qs = list(self.documento.servicios.all())
+        otros_servicios_qs = list(self.documento.otros_servicios.all())
+
+        total_repuestos = sum((getattr(r, "subtotal", None) or Decimal("0")) for r in repuestos_qs)
+        total_servicios = sum((getattr(s, "subtotal", None) or Decimal("0")) for s in servicios_qs)
+        total_otros_servicios = sum(
+            (getattr(os, "subtotal", None) or Decimal("0")) for os in otros_servicios_qs
+        )
 
         # Contexto con todos los datos del documento
         context = {
             "documento": self.documento,
-            "repuestos": self.documento.repuestos.all(),
-            "servicios": self.documento.servicios.all(),
-            "otros_servicios": self.documento.otros_servicios.all(),
-            "total_repuestos": sum(r.total for r in self.documento.repuestos.all()),
-            "total_servicios": sum(s.precio for s in self.documento.servicios.all()),
-            "total_otros_servicios": sum(
-                os.precio_cliente for os in self.documento.otros_servicios.all()
-            ),
+            "repuestos": repuestos_qs,
+            "servicios": servicios_qs,
+            "otros_servicios": otros_servicios_qs,
+            "total_repuestos": total_repuestos,
+            "total_servicios": total_servicios,
+            "total_otros_servicios": total_otros_servicios,
             "fecha_generacion": datetime.now(),
-            "empresa": self.documento.empresa,
+            "empresa": empresa,
             "config_empresa": config_empresa,  # Agregar configuración de empresa
+            "empresa_logo_url": empresa_logo_url,
+            "config_logo_url": config_logo_url,
+            "empresa_tagline": empresa_tagline,
+            "config_tagline": config_tagline or settings_tagline,
+            "company_tagline": branding_ctx.get("company_tagline")
+            or settings_tagline
+            or config_tagline
+            or empresa_tagline,
+            "company_name": company_name,
+            "company_address": company_address,
+            "company_phone": company_phone,
+            "company_email": company_email,
+            "company_site": company_site,
+            "COMPANY_NAME": company_name,
+            "COMPANY_TAGLINE": branding_ctx.get("company_tagline")
+            or settings_tagline
+            or config_tagline
+            or empresa_tagline,
+            "company_website": company_site,
+            "company_address": company_address,
+            "company_phone": company_phone,
+            "company_email": company_email,
+            "COMPANY_ADDRESS": company_address,
+            "COMPANY_PHONE": company_phone,
+            "COMPANY_EMAIL": company_email,
+            "COMPANY_WEBSITE": company_site,
         }
 
         # Calcular totales
@@ -66,74 +216,23 @@ class DocumentoPDFExporter:
         )
 
         # Renderizar HTML
-        html_string = template.render(context)
+        base_url = None
+        if self.request is not None:
+            html_string = template.render(context, request=self.request)
+            try:
+                base_url = self.request.build_absolute_uri("/")
+            except Exception:
+                base_url = None
+        else:
+            html_string = template.render(context)
+            base_url = str(getattr(settings, "BASE_DIR", "")) or None
 
         # Generar PDF con WeasyPrint (importar de forma perezosa)
         try:
-            from weasyprint import CSS, HTML
+            from weasyprint import HTML
 
-            html = HTML(string=html_string)
-            css = CSS(
-                string="""
-                @page {
-                    size: A4;
-                    margin: 1cm;
-                    @bottom-center {
-                        content: "Página " counter(page) " de " counter(pages);
-                    }
-                }
-                body {
-                    font-family: Arial, sans-serif;
-                    font-size: 12px;
-                    line-height: 1.4;
-                }
-                .header {
-                    text-align: center;
-                    margin-bottom: 20px;
-                    border-bottom: 2px solid #007bff;
-                    padding-bottom: 10px;
-                }
-                .logo {
-                    max-height: 80px;
-                    margin-bottom: 10px;
-                }
-                .info-section {
-                    margin-bottom: 15px;
-                }
-                .table {
-                    width: 100%;
-                    border-collapse: collapse;
-                    margin-bottom: 15px;
-                }
-                .table th, .table td {
-                    border: 1px solid #ddd;
-                    padding: 8px;
-                    text-align: left;
-                }
-                .table th {
-                    background-color: #f8f9fa;
-                    font-weight: bold;
-                }
-                .totals {
-                    float: right;
-                    width: 300px;
-                    margin-top: 20px;
-                }
-                .totals table {
-                    width: 100%;
-                }
-                .footer {
-                    margin-top: 50px;
-                    text-align: center;
-                    border-top: 1px solid #ddd;
-                    padding-top: 10px;
-                    font-size: 10px;
-                    color: #666;
-                }
-            """
-            )
-
-            pdf_file = html.write_pdf(stylesheets=[css])
+            html = HTML(string=html_string, base_url=base_url)
+            pdf_file = html.write_pdf()
             return pdf_file
         except Exception as e:  # pragma: no cover - optional dependency
             # Dejar que el llamador decida cómo manejar la ausencia de weasyprint
@@ -151,7 +250,14 @@ class DocumentoPDFExporter:
 
         response = HttpResponse(pdf_file, content_type="application/pdf")
         filename = f"{self.documento.tipo_documento}_{self.documento.numero_documento}.pdf"
-        response["Content-Disposition"] = f'attachment; filename="{filename}"'
+
+        disposition = "inline"
+        if self.request:
+            download_flag = self.request.GET.get("download")
+            if download_flag in ("1", "true", "True", "yes"):
+                disposition = "attachment"
+
+        response["Content-Disposition"] = f'{disposition}; filename="{filename}"'
 
         return response
 

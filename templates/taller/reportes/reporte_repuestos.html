@@ -105,6 +105,31 @@
       {% endfor %}
     </ul>
   </div>
+
+  <div class="resumen-economico mt-12">
+    <h2 class="text-2xl font-bold text-center text-white mb-6">📊 Resumen Económico Global</h2>
+    <div class="resumen-grid">
+      <div class="resumen-card">
+        <p class="resumen-label">Total Precio Compra</p>
+        <p class="resumen-value negativo">${{ total_precio_compra|floatformat:0|intcomma }}</p>
+      </div>
+      <div class="resumen-card">
+        <p class="resumen-label">Total Precio Venta</p>
+        <p class="resumen-value positivo">${{ total_precio_venta|floatformat:0|intcomma }}</p>
+      </div>
+      <div class="resumen-card">
+        <p class="resumen-label">Ganancia / Pérdida</p>
+        <p class="resumen-value">
+          {% if ganancia_total >= 0 %}
+            <span class="text-green-300">▲ ${{ ganancia_total|floatformat:0|intcomma }}</span>
+          {% else %}
+            <span class="text-red-400">▼ ${{ ganancia_total|floatformat:0|intcomma }}</span>
+          {% endif %}
+        </p>
+        <small class="text-xs text-cyan-200 block mt-2">(Precio Venta - Precio Compra)</small>
+      </div>
+    </div>
+  </div>
 </div>
 <style>
   .enfoque-btn {
@@ -291,6 +316,46 @@
     background-clip: text;
     -webkit-text-fill-color: transparent;
     animation: ai-gradient 3s ease infinite;
+  }
+
+  /* Forzar nombre de la empresa en blanco */
+  .company-title {
+    color: #ffffff !important;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.8), 0 0 40px rgba(0, 255, 255, 0.3);
+  }
+
+  .resumen-economico {
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 0 40px rgba(0, 255, 255, 0.2);
+  }
+  .resumen-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+  }
+  .resumen-card {
+    background: rgba(10, 10, 30, 0.9);
+    border: 1px solid rgba(0, 255, 255, 0.2);
+    border-radius: 16px;
+    padding: 18px;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
+  }
+  .resumen-label {
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    color: #94a3b8;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .resumen-value {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #ffffff;
+    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   }
 
   @keyframes ai-gradient {

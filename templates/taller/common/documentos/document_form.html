@@ -141,15 +141,21 @@ input:disabled, select:disabled, textarea:disabled {
 </style>
 
 {% block documento_title %}
+{% with active_country=company_country|default:'' %}
+{% with is_cl=active_country|default:''|upper %}
 <div class="flex justify-between items-center mb-4">
+  {% if is_cl == 'CL' %}
+  <h1 class="documento-title mb-0">📝 Crear documento</h1>
+  {% else %}
   <h1 class="documento-title mb-0">📝 {% trans "Create Document" %}</h1>
+  {% endif %}
   
   <div class="flex items-center gap-4">
     <!-- Language Selector -->
     <form id="language-form-doc" action="/i18n/setlang/" method="post" class="inline">
       {% csrf_token %}
       <input type="hidden" name="next" value="{{ request.get_full_path }}">
-      <input type="hidden" name="language" id="language-input-doc" value="en">
+      <input type="hidden" name="language" id="language-input-doc" value="{% if is_cl == 'CL' %}es{% else %}{{ LANGUAGE_CODE|default:'en' }}{% endif %}">
       <div class="flex items-center gap-2 bg-black/40 px-3 py-2 rounded-lg border border-cyan-400/50" style="box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);">
         <button type="button" onclick="submitLanguageDoc('en')" id="lang-en-doc" 
                 class="px-3 py-1 rounded-md text-sm font-bold transition-all duration-300 {% if LANGUAGE_CODE == 'en' %}bg-gradient-to-r from-cyan-500 to-blue-500 text-white{% else %}text-gray-400 hover:text-cyan-300{% endif %}"
@@ -166,10 +172,12 @@ input:disabled, select:disabled, textarea:disabled {
     
     <label class="flex items-center text-cyan-200 font-semibold">
       <input type="checkbox" id="id_pagado" name="pagado" class="mr-2 form-control">
-      {% trans "Document paid" %}
+      {% if is_cl == 'CL' %}Documento pagado{% else %}{% trans "Document paid" %}{% endif %}
     </label>
   </div>
 </div>
+{% endwith %}
+{% endwith %}
 
 <script>
 function submitLanguageDoc(lang) {
@@ -180,13 +188,18 @@ function submitLanguageDoc(lang) {
 {% endblock %}
 
 {% block documento_content %}
+{% with active_country=company_country|default:'' %}
+{% with is_cl=active_country|default:''|upper %}
         <form method="post" id="document-form" class="max-w-7xl mx-auto"
+              data-mode="{% if es_edicion %}edit{% else %}create{% endif %}"
               data-url-next-number="{% country_url 'documentos:api_obtener_numero_documento' %}"
-              data-url-client-search="{% country_url 'us_ajax_buscar_clientes' app_namespace='direct' %}"
-              data-url-vehiculos-by-cli="{% country_url 'us_ajax_vehiculos_por_cliente' app_namespace='direct' %}"
+              data-url-client-search="{% country_url 'ajax:buscar_clientes' %}"
+              data-url-vehiculos-by-cli="{% country_url 'ajax:vehiculos_por_cliente' %}"
               data-url-repuesto-by-code="{% country_url 'api:repuesto_by_code_api' %}"
-              data-url-service-search="{% country_url 'api:buscar_servicios_api' %}"
-              data-url-outsourced-services="{% country_url 'api:buscar_otros_servicios_api' %}">
+              data-url-repuesto-search="{% country_url 'api:buscar_repuestos_api' %}"
+              data-url-repuesto-create="{% country_url 'api:crear_repuesto_api' %}"
+              data-url-service-search="{% country_url 'servicios:buscar_servicios_api' %}"
+              data-url-outsourced-services="{% country_url 'servicios:buscar_otros_servicios_api' %}">
           {% csrf_token %}
 
   <!-- System messages -->
@@ -214,38 +227,43 @@ function submitLanguageDoc(lang) {
 
       <!-- Columna 1: FECHA primero + TIPO + NÚMERO -->
       <div class="space-y-4">
-                <label for="id_fecha_emision" class="block text-cyan-200 font-semibold">{% trans "Issue Date" %}</label>
+                <label for="id_fecha_emision" class="block text-cyan-200 font-semibold">{% if is_cl == 'CL' %}Fecha de emisión{% else %}{% trans "Issue Date" %}{% endif %}</label>
                 <input id="id_fecha_emision" type="date" name="fecha_emision" class="form-control w-full"
-                       value="{{ form.fecha_emision.value|default:None|default_if_none:''|date:'Y-m-d' }}">
+                       value="{{ form.fecha_emision.value|default_if_none:''|date:'Y-m-d' }}">
 
-        <label for="id_tipo" class="block text-cyan-200 font-semibold">{% trans "Document Type" %}</label>
+        <label for="id_tipo" class="block text-cyan-200 font-semibold">{% if is_cl == 'CL' %}Tipo de documento{% else %}{% trans "Document Type" %}{% endif %}</label>
         <select id="id_tipo" name="tipo" class="form-select w-full">
-          <option value="OT">{% trans "Work Order" %}</option>
-          <option value="FAC">{% trans "Invoice/Receipt" %}</option>
-          <option value="PRES">{% trans "Estimate" %}</option>
+          <option value="OT">{% if is_cl == 'CL' %}Orden de trabajo{% else %}{% trans "Work Order" %}{% endif %}</option>
+          <option value="FAC">{% if is_cl == 'CL' %}Factura / Boleta{% else %}{% trans "Invoice/Receipt" %}{% endif %}</option>
+          <option value="PRES">{% if is_cl == 'CL' %}Presupuesto{% else %}{% trans "Estimate" %}{% endif %}</option>
         </select>
 
-        <label class="block text-cyan-200 font-semibold">{% trans "Number" %}</label>
+        <label class="block text-cyan-200 font-semibold">{% if is_cl == 'CL' %}Número{% else %}{% trans "Number" %}{% endif %}</label>
         <div class="form-control w-full bg-gray-800 text-cyan-300 font-mono text-center py-3" id="id_numero">
-          {% trans "Will be generated automatically" %}
+          {% if is_cl == 'CL' %}Se generará automáticamente{% else %}{% trans "Will be generated automatically" %}{% endif %}
         </div>
       </div>
 
       <!-- Columna 2: Cliente/Vehículo -->
       <div class="space-y-4">
-        <div class="flex justify-between items-center">
-          <label class="block text-cyan-200 font-semibold">{% trans "Client" %}</label>
+        <div class="flex items-center justify-between">
+          <label class="block text-cyan-200 font-semibold">{% if is_cl == 'CL' %}Cliente{% else %}{% trans "Client" %}{% endif %}</label>
           <button type="button" onclick="openClienteModal()" class="px-3 py-1 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white font-bold rounded-lg text-sm transition-all">
-            ➕ {% trans "New" %}
+            {% if is_cl == 'CL' %}➕ Nuevo{% else %}➕ {% trans "New" %}{% endif %}
           </button>
         </div>
         <div class="relative">
-          <input type="text" id="cliente-busqueda" class="form-control w-full" placeholder="{% trans 'Type to search clients...' %}" autocomplete="off">
+          <input type="text" id="cliente-busqueda" class="form-control w-full"
+                 placeholder="{% if is_cl == 'CL' %}Escribe para buscar clientes…{% else %}{% trans 'Type to search clients...' %}{% endif %}"
+                 autocomplete="off"
+                 oninput="window.handleClienteInput?.(this.value)"
+                 onfocus="window.handleClienteFocus?.(this.value)"
+                 onkeydown="return window.handleClienteKeydown?.(event)">
           <div id="cliente-resultados" class="absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
         </div>
 
         <select id="id_cliente" name="cliente" class="form-select w-full hidden">
-          <option value="">{% trans "Select client..." %}</option>
+          <option value="">{% if is_cl == 'CL' %}Selecciona cliente…{% else %}{% trans "Select client..." %}{% endif %}</option>
         </select>
 
         <!-- Selected client information -->
@@ -257,48 +275,48 @@ function submitLanguageDoc(lang) {
           </div>
         </div>
 
-        <div class="flex justify-between items-center">
-          <label for="id_vehiculo" class="block text-cyan-200 font-semibold">{% trans "Vehicle" %}</label>
+        <div class="flex items-center justify-between">
+          <label for="id_vehiculo" class="block text-cyan-200 font-semibold">{% if is_cl == 'CL' %}Vehículo{% else %}{% trans "Vehicle" %}{% endif %}</label>
           <button type="button" onclick="openVehiculoModal()" class="px-3 py-1 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold rounded-lg text-sm transition-all">
-            🚗 {% trans "New" %}
+            {% if is_cl == 'CL' %}🚗 Nuevo{% else %}🚗 {% trans "New" %}{% endif %}
           </button>
         </div>
         <select id="id_vehiculo" name="vehiculo" class="form-select w-full">
-          <option value="">{% trans "Select client first..." %}</option>
+          <option value="">{% if is_cl == 'CL' %}Selecciona cliente primero…{% else %}{% trans "Select client first..." %}{% endif %}</option>
         </select>
       </div>
 
       <!-- Columna 3: Técnico + Payment Status + Kilometraje -->
       <div class="space-y-4">
-        <label for="id_tecnico_responsable" class="block text-cyan-200 font-semibold">{% trans "Responsible Technician" %}</label>
+        <label for="id_tecnico_responsable" class="block text-cyan-200 font-semibold">{% if is_cl == 'CL' %}Técnico responsable{% else %}{% trans "Responsible Technician" %}{% endif %}</label>
         <select name="tecnico_responsable" id="id_tecnico_responsable" class="form-select w-full">
-          <option value="">{% trans "Select technician..." %}</option>
+          <option value="">{% if is_cl == 'CL' %}Selecciona técnico…{% else %}{% trans "Select technician..." %}{% endif %}</option>
           {% for t in tecnicos %}
             <option value="{{ t.id }}">{{ t.nombre }}</option>
           {% endfor %}
         </select>
 
-        <label for="id_payment_status" class="block text-cyan-200 font-semibold">{% trans "Payment Status" %}</label>
+        <label for="id_payment_status" class="block text-cyan-200 font-semibold">{% if is_cl == 'CL' %}Estado de pago{% else %}{% trans "Payment Status" %}{% endif %}</label>
         <select id="id_payment_status" name="payment_status" class="form-select w-full">
-          <option value="pending">{% trans "Pending" %}</option>
-          <option value="paid">{% trans "Paid" %}</option>
-          <option value="partial">{% trans "Partial" %}</option>
-          <option value="canceled">{% trans "Canceled" %}</option>
+          <option value="pending">{% if is_cl == 'CL' %}Pendiente{% else %}{% trans "Pending" %}{% endif %}</option>
+          <option value="paid">{% if is_cl == 'CL' %}Pagado{% else %}{% trans "Paid" %}{% endif %}</option>
+          <option value="partial">{% if is_cl == 'CL' %}Parcial{% else %}{% trans "Partial" %}{% endif %}</option>
+          <option value="canceled">{% if is_cl == 'CL' %}Anulado{% else %}{% trans "Canceled" %}{% endif %}</option>
         </select>
 
-        <label for="id_kilometraje" class="block text-cyan-200 font-semibold">{% trans "Mileage" %}</label>
-        <input id="id_kilometraje" type="number" name="kilometraje" min="0" class="form-control w-full" placeholder="0">
+        <label for="id_kilometraje" class="block text-cyan-200 font-semibold">{% if is_cl == 'CL' %}Kilometraje{% else %}{% trans "Mileage" %}{% endif %}</label>
+        <input id="id_kilometraje" type="number" name="kilometraje" min="0" class="form-control w-full" placeholder="{% if is_cl == 'CL' %}0{% else %}0{% endif %}">
       </div>
     </div>
 
     <!-- Dynamic sections -->
     <div class="space-y-6">
       <div class="seccion-card">
-        <h3 class="seccion-title">🔧 {% trans "Parts & Services" %}</h3>
-        <div class="flex gap-4 mb-4">
-          <button type="button" id="add-repuesto" class="btn-secondary">+ {% trans "Add Part" %}</button>
-          <button type="button" id="add-servicio" class="btn-secondary">+ {% trans "Add Service" %}</button>
-          <button type="button" id="add-otro" class="btn-secondary">+ {% trans "Add Other Service" %}</button>
+        <h3 class="seccion-title">{% if is_cl == 'CL' %}🔧 Repuestos y servicios{% else %}🔧 {% trans "Parts & Services" %}{% endif %}</h3>
+        <div class="flex flex-wrap gap-4 mb-6">
+          <button type="button" id="add-repuesto" class="btn-secondary" onclick="addRepuestoRow()">{% if is_cl == 'CL' %}+ Agregar repuesto{% else %}+ {% trans "Add Part" %}{% endif %}</button>
+          <button type="button" id="add-servicio" class="btn-secondary" onclick="addServicioRow()">{% if is_cl == 'CL' %}+ Agregar servicio{% else %}+ {% trans "Add Service" %}{% endif %}</button>
+          <button type="button" id="add-otro" class="btn-secondary" onclick="addOtroRow()">{% if is_cl == 'CL' %}+ Agregar servicio externo{% else %}+ {% trans "Add Other Service" %}{% endif %}</button>
         </div>
 
         <!-- Parts container -->
@@ -318,57 +336,60 @@ function submitLanguageDoc(lang) {
       </div>
 
       <!-- Observations -->
-      <div class="seccion-card">
-        <label for="id_observaciones" class="block text-cyan-200 font-semibold mb-2">{% trans "Observations" %}</label>
-        <textarea id="id_observaciones" name="observaciones" class="form-control w-full h-32"
-          placeholder="{% trans 'Optional observations - Can be left empty if no additional information...' %}"
-        ></textarea>
+      <div class="observaciones-card">
+        <label for="id_observaciones" class="block text-cyan-200 font-semibold mb-2">{% if is_cl == 'CL' %}Observaciones{% else %}{% trans "Observations" %}{% endif %}</label>
+        <textarea id="id_observaciones" name="observaciones" rows="4" class="form-control w-full" placeholder="{% if is_cl == 'CL' %}Observaciones opcionales — puedes dejar este campo vacío si no hay información adicional.{% else %}{% trans "Optional observations - Can be left empty if no additional information..." %}{% endif %}">{{ form.observaciones.value|default_if_none:'' }}</textarea>
       </div>
     </div>
 
     <!-- Totals -->
     <div class="totales-section">
-      <h3 class="text-2xl font-bold text-cyan-300 mb-4">💰 {% trans "Totals" %}</h3>
+      <h3 class="text-2xl font-bold text-cyan-300 mb-4">{% if is_cl == 'CL' %}💰 Totales{% else %}💰 {% trans "Totals" %}{% endif %}</h3>
 
       <!-- VAT checkbox next to totals -->
       <div class="mb-4">
         <label for="id_apply_vat" class="flex items-center text-cyan-200">
           <input type="checkbox" id="id_apply_vat" name="apply_vat" checked class="mr-2 form-control">
-          {% trans "Apply tax" %}
+          {% if is_cl == 'CL' %}Aplicar impuesto{% else %}{% trans "Apply tax" %}{% endif %}
         </label>
       </div>
 
       <div class="space-y-2">
         <div class="totales-row">
-          <span class="text-cyan-300">{% trans "Parts Subtotal" %}:</span>
+          <span class="text-cyan-300">{% if is_cl == 'CL' %}Subtotal repuestos{% else %}{% trans "Parts Subtotal" %}{% endif %}:</span>
           <span id="t_repuestos" class="text-cyan-300 font-bold">$0</span>
         </div>
         <div class="totales-row">
-          <span class="text-cyan-300">{% trans "Services Subtotal" %}:</span>
+          <span class="text-cyan-300">{% if is_cl == 'CL' %}Subtotal servicios{% else %}{% trans "Services Subtotal" %}{% endif %}:</span>
           <span id="t_servicios" class="text-cyan-300 font-bold">$0</span>
         </div>
         <div class="totales-row">
-          <span class="text-cyan-300">{% trans "Other Services Subtotal" %}:</span>
+          <span class="text-cyan-300">{% if is_cl == 'CL' %}Subtotal servicios externos{% else %}{% trans "Other Services Subtotal" %}{% endif %}:</span>
           <span id="t_otros" class="text-cyan-300 font-bold">$0</span>
         </div>
         <div class="totales-row items-center">
           <label class="flex items-center text-cyan-300 cursor-pointer">
             <input type="checkbox" id="include_tax" checked class="mr-2 cursor-pointer">
-            <span>{% trans "Include Tax" %} (IVA):</span>
+            <span>{% if is_cl == 'CL' %}Incluir IVA{% else %}{% trans "Include Tax" %}{% endif %} (IVA):</span>
           </label>
           <span id="t_iva" class="text-cyan-300 font-bold">$0</span>
         </div>
         <div class="totales-row totales-total">
-          <span class="text-cyan-300 font-bold text-lg">{% trans "Total" %}:</span>
+          <span class="text-cyan-300 font-bold text-lg">{% if is_cl == 'CL' %}Total general{% else %}{% trans "Total" %}{% endif %}:</span>
           <span id="t_total" class="text-cyan-300 font-bold text-xl">$0</span>
         </div>
       </div>
     </div>
 
     <!-- Action buttons -->
-    <div class="flex justify-between items-center mt-8">
-      <a href="/us/en/documentos/" class="btn-secondary">← {% trans "Back" %}</a>
-      <button type="submit" class="btn-primary">💾 {% trans "Save Document" %}</button>
+    <div class="flex flex-wrap justify-between items-center gap-4 mt-8">
+      <div class="flex items-center gap-3">
+        <a href="{% country_url 'documentos:lista_documentos' %}" class="btn-secondary">{% if is_cl == 'CL' %}← Volver{% else %}← {% trans "Back" %}{% endif %}</a>
+        <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="btn-secondary">
+          {% if is_cl == 'CL' %}🌐 Ir a otros servicios{% else %}🌐 {% trans "Go to Other Services" %}{% endif %}
+        </a>
+      </div>
+      <button type="submit" class="btn-primary">{% if is_cl == 'CL' %}💾 Guardar documento{% else %}💾 {% trans "Save Document" %}{% endif %}</button>
     </div>
   </div>
 
@@ -378,11 +399,25 @@ function submitLanguageDoc(lang) {
   <input type="hidden" name="otros_json" id="id_otros_json">
 </form>
 
+{{ clientes_prefetch|json_script:"prefetchClientes" }}
+{{ vehiculos_prefetch|json_script:"prefetchVehiculos" }}
+{{ repuestos_prefetch|json_script:"prefetchRepuestos" }}
+{{ servicios_prefetch|json_script:"prefetchServicios" }}
+{{ otros_servicios_prefetch|json_script:"prefetchOtrosServicios" }}
+
+{% endwith %}
+{% endwith %}
+{% endblock documento_content %}
+
+{% block extra_js %}
+{{ block.super }}
 <script>
-(function(){
+function initDocumentFormScript(){
   // Evita doble inicialización
-  if (window.EG && window.EG._docFormInit) return;
-  window.EG = window.EG || {};
+  if (window.EG && window.EG._docFormInit) {
+    return;
+  }
+  const EG = (window.EG = window.EG || {});
   EG._docFormInit = true;
 
   // === CSRF ===
@@ -411,7 +446,10 @@ function submitLanguageDoc(lang) {
 
   // === CONFIG: no pisa si ya existe ===
   EG.cfg = EG.cfg || {};
-  EG.cfg.country = EG.cfg.country || 'US';
+  if (!EG.cfg.country) {
+    const path = (location.pathname || '').toLowerCase();
+    EG.cfg.country = path.startsWith('/cl/') ? 'CL' : (path.startsWith('/us/') ? 'US' : 'CL');
+  }
   (function(){
     // Leer endpoints desde data-* attributes del formulario
     const FORM = document.getElementById('document-form');
@@ -420,19 +458,22 @@ function submitLanguageDoc(lang) {
       EG.cfg.URL_CLIENT_SEARCH      = EG.cfg.URL_CLIENT_SEARCH      || FORM.dataset.urlClientSearch;
       EG.cfg.URL_VEHICULOS_BY_CLI   = EG.cfg.URL_VEHICULOS_BY_CLI   || FORM.dataset.urlVehiculosByCli;
       EG.cfg.URL_REPUESTO_BY_CODE   = EG.cfg.URL_REPUESTO_BY_CODE   || FORM.dataset.urlRepuestoByCode;
+      EG.cfg.URL_REPUESTO_SEARCH   = EG.cfg.URL_REPUESTO_SEARCH   || FORM.dataset.urlRepuestoSearch;
+      EG.cfg.URL_REPUESTO_CREATE   = EG.cfg.URL_REPUESTO_CREATE   || FORM.dataset.urlRepuestoCreate;
       EG.cfg.URL_SERVICE_SEARCH     = EG.cfg.URL_SERVICE_SEARCH     || FORM.dataset.urlServiceSearch;
       EG.cfg.URL_OUTSOURCED_SERVICES= EG.cfg.URL_OUTSOURCED_SERVICES|| FORM.dataset.urlOutsourcedServices;
     }
     // Fallback a path-based si no hay data-* (legacy)
-    if (!EG.cfg.URL_NEXT_NUMBER) {
-      const p = location.pathname;
+    if (!EG.cfg.URL_NEXT_NUMBER && FORM) {
+      const p = location.pathname || '';
       const base = p.startsWith('/us/') ? '/us' : (p.startsWith('/cl/') ? '/cl' : '');
-      EG.cfg.URL_NEXT_NUMBER      = form.dataset.urlNextNumber || `${base}/documentos/api/obtener-numero-documento/`;
-      EG.cfg.URL_CLIENT_SEARCH    = form.dataset.urlClientSearch || `${base}/ajax/clientes/buscar/`;
-      EG.cfg.URL_VEHICULOS_BY_CLI = form.dataset.urlVehiculosByCli || `${base}/ajax/vehiculos-por-cliente/`;
-      EG.cfg.URL_REPUESTO_BY_CODE = form.dataset.urlRepuestoByCode || `${base}/api/repuestos/by-code`;
-      EG.cfg.URL_SERVICE_SEARCH   = form.dataset.urlServiceSearch || `${base}/api/servicios/`;
-      EG.cfg.URL_OUTSOURCED_SERVICES = form.dataset.urlOutsourcedServices || `${base}/api/otros-servicios/`;
+      EG.cfg.URL_NEXT_NUMBER      = FORM.dataset.urlNextNumber || `${base}/documentos/api/obtener-numero-documento/`;
+      EG.cfg.URL_CLIENT_SEARCH    = FORM.dataset.urlClientSearch || `${base}/ajax/clientes/buscar/`;
+      EG.cfg.URL_VEHICULOS_BY_CLI = FORM.dataset.urlVehiculosByCli || `${base}/ajax/vehiculos-por-cliente/`;
+      EG.cfg.URL_REPUESTO_BY_CODE = FORM.dataset.urlRepuestoByCode || `${base}/api/repuestos/by-code`;
+      EG.cfg.URL_REPUESTO_SEARCH = FORM.dataset.urlRepuestoSearch || `${base}/api/repuestos/`;
+      EG.cfg.URL_SERVICE_SEARCH   = FORM.dataset.urlServiceSearch || `${base}/api/servicios/`;
+      EG.cfg.URL_OUTSOURCED_SERVICES = FORM.dataset.urlOutsourcedServices || `${base}/api/otros-servicios/`;
     }
     // Sales tax configurable (ej.: desde CompanySettings)
     EG.cfg.salesTax = typeof EG.cfg.salesTax === 'number' ? EG.cfg.salesTax : 0.08;
@@ -440,15 +481,65 @@ function submitLanguageDoc(lang) {
 
   // Exponer seguro
   window.EG = EG;
-})();
 
 // ===============
 // CONFIG ENDPOINTS - Evitar redeclaración
 // ===============
 window.EG = window.EG || {};
 EG.cfg = EG.cfg || {};
-EG.COUNTRY = EG.COUNTRY || (EG.cfg.country || 'US');
-const COUNTRY_REF = EG.COUNTRY; // usa COUNTRY_REF en lugar de COUNTRY
+if (!EG.cfg.country) {
+  const path = (location.pathname || '').toLowerCase();
+  EG.cfg.country = path.startsWith('/cl/') ? 'CL' : (path.startsWith('/us/') ? 'US' : 'CL');
+}
+EG.COUNTRY = EG.COUNTRY || (EG.cfg.country || 'CL');
+const COUNTRY_REF = (EG.COUNTRY || 'CL').toUpperCase(); // usa COUNTRY_REF en lugar de COUNTRY
+
+// ==== PREFETCH & HELPERS ====
+(function(){
+  function safeJSON(id) {
+    try {
+      const el = document.getElementById(id);
+      return el ? JSON.parse(el.textContent) : [];
+    } catch (err) {
+      console.warn('⚠️ PREFETCH inválido para', id, err);
+      return [];
+    }
+  }
+
+  const global = window;
+  global.PREFETCH = global.PREFETCH || {
+    clientes:  safeJSON('prefetchClientes'),
+    vehiculos: safeJSON('prefetchVehiculos'),
+    repuestos: safeJSON('prefetchRepuestos'),
+    servicios: safeJSON('prefetchServicios'),
+    otros:     safeJSON('prefetchOtrosServicios'),
+  };
+
+  if (typeof global.filterPrefetchItems !== 'function') {
+    global.filterPrefetchItems = function(list, fields, query, limit = 15) {
+      if (!Array.isArray(list) || !fields?.length) return [];
+      const normalize = (value) => (value ?? '')
+        .toString()
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/\p{Diacritic}/gu, '');
+      const needle = normalize(query);
+      if (!needle) return [];
+
+      const results = [];
+      for (const item of list) {
+        for (const field of fields) {
+          if (normalize(item?.[field]).includes(needle)) {
+            results.push(item);
+            break;
+          }
+        }
+        if (results.length >= limit) break;
+      }
+      return results;
+    };
+  }
+})();
 
 // ===============
 // I18N DICCIONARIO
@@ -475,10 +566,58 @@ const I18N = {
   subtotal: "{% trans 'Subtotal' %}",
   service: "{% trans 'Service' %}",
   type_to_search_services: "{% trans 'Type to search services...' %}",
-  client_price: "{% trans 'Client Price' %}",
-  shop_price: "{% trans 'Shop Price' %}",
+  type_to_search_parts: "{% trans 'Type to search parts...' %}",
+  type_to_search_external: "{% trans 'Type to search external services...' %}",
+  no_parts: "{% trans 'No parts found' %}",
+  no_external_services: "{% trans 'No external services found' %}",
   external_company: "{% trans 'External Company' %}",
+  create_part: "{% trans 'Create Part' %}",
+  part_number_required: "{% trans 'Part number is required' %}",
+  part_name_required: "{% trans 'Part name is required' %}",
+  part_created: "{% trans 'Part created successfully' %}",
+  part_exists: "{% trans 'Existing part loaded' %}",
+  save: "{% trans 'Save' %}",
+  cancel: "{% trans 'Cancel' %}",
 };
+
+if (COUNTRY_REF === 'CL') {
+  Object.assign(I18N, {
+    no_clients: "Sin clientes encontrados",
+    loading_vehicles: "Cargando vehículos…",
+    no_vehicles: "Sin vehículos registrados",
+    select_vehicle: "Selecciona vehículo…",
+    server_error: "Error del servidor",
+    error_loading_vehicles: "Error cargando vehículos",
+    no_parts: "Sin repuestos coincidentes",
+    no_external_services: "Sin servicios externos",
+    select_service: "Selecciona servicio…",
+    issue_date_required: "La fecha de emisión es obligatoria",
+    document_type_required: "El tipo de documento es obligatorio",
+    client_required: "Debes seleccionar un cliente",
+    vehicle_required: "Debes seleccionar un vehículo",
+    code: "Código",
+    name: "Nombre",
+    qty: "Cant.",
+    cost_price: "Precio compra",
+    sale_price: "Precio venta",
+    discount_pct: "% desc",
+    subtotal: "Subtotal",
+    service: "Servicio",
+    type_to_search_services: "Escribe para buscar servicios…",
+    type_to_search_parts: "Escribe para buscar repuestos…",
+    type_to_search_external: "Escribe para buscar servicios externos…",
+    client_price: "Precio al cliente",
+    shop_price: "Costo al taller",
+    external_company: "Empresa externa",
+    create_part: "Crear repuesto",
+    part_number_required: "El código del repuesto es obligatorio",
+    part_name_required: "El nombre del repuesto es obligatorio",
+    part_created: "Repuesto creado correctamente",
+    part_exists: "Repuesto existente seleccionado",
+    save: "Guardar",
+    cancel: "Cancelar",
+  });
+}
 
 // ===============
 // HELPERS
@@ -499,9 +638,60 @@ function setText(selOrEl, txt) {
   if (el) el.textContent = txt;
 }
 
-function moneyUSD(n){ return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:2}).format(Number(n)||0); }
-function moneyCLP(n){ return new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP'}).format(Math.round(Number(n)||0)); }
-function money(n){ return COUNTRY_REF==='US' ? moneyUSD(n) : moneyCLP(n); }
+const MONEY_FORMATS = {
+  US: { locale: 'en-US', currency: 'USD', min: 2, max: 2 },
+  CL: { locale: 'es-CL', currency: 'CLP', min: 0, max: 0 },
+  MX: { locale: 'es-MX', currency: 'MXN', min: 2, max: 2 },
+  PE: { locale: 'es-PE', currency: 'PEN', min: 2, max: 2 },
+  VE: { locale: 'es-VE', currency: 'VES', min: 2, max: 2 },
+  BR: { locale: 'pt-BR', currency: 'BRL', min: 2, max: 2 },
+};
+
+function buildMoneyFormatter(country){
+  const cfg = MONEY_FORMATS[country] || MONEY_FORMATS.CL;
+  return new Intl.NumberFormat(cfg.locale, {
+    style: 'currency',
+    currency: cfg.currency,
+    minimumFractionDigits: cfg.min ?? 2,
+    maximumFractionDigits: cfg.max ?? 2,
+  });
+}
+
+function formatNumberInput(value){
+  const num = Number(value);
+  if (!Number.isFinite(num)) return '';
+  const digits = MONEY_FORMATS[COUNTRY_REF]?.max ?? 2;
+  return num.toFixed(digits);
+}
+
+function parseNumericInput(value){
+  if (value === undefined || value === null) return 0;
+  const num = Number(value.toString().replace(/[^0-9.-]/g, ''));
+  return Number.isFinite(num) ? num : 0;
+}
+
+function buildEndpoint(url){
+  if (!url) return '';
+  if (/^https?:\/\//i.test(url)) return url;
+  if (url.startsWith('/')) return url;
+  const path = window.location.pathname || '/';
+  const parts = path.split('/').filter(Boolean);
+  if (!parts.length) {
+    return `/${url.replace(/^\//, '')}`;
+  }
+  const countrySegment = parts[0];
+  return `/${countrySegment}/${url.replace(/^\//, '')}`;
+}
+
+let MONEY_FORMATTER = buildMoneyFormatter(COUNTRY_REF);
+
+function money(n){
+  if (!MONEY_FORMATTER) {
+    MONEY_FORMATTER = buildMoneyFormatter(COUNTRY_REF);
+  }
+  const value = Number(n) || 0;
+  return MONEY_FORMATTER.format(value);
+}
 
 // ===============
 // THEME + NÚMERO
@@ -540,25 +730,34 @@ async function updateDocumentNumber(){
 // ===============
 // CLIENTE + VEHÍCULOS
 // ===============
-const clienteBusqueda   = $('#cliente-busqueda');   // ✅ coincide con tu HTML
-const clienteResultados = $('#cliente-resultados'); // ✅ coincide con tu HTML
-const clienteSelect     = $('#id_cliente');         // hidden select (lo mantenemos como state)
-const clienteInfoBox    = $('#cliente-info');
-const cliNombre = $('#cliente-nombre');
-const cliEmail  = $('#cliente-email');
-const cliFono   = $('#cliente-telefono');
-
-const vehiculoSelect = $('#id_vehiculo');
-
+let clienteBusqueda, clienteResultados, clienteSelect, clienteInfoBox, cliNombre, cliEmail, cliFono, vehiculoSelect;
 let searchTimer = null;
 
+function getClienteElements(){
+  if (!clienteBusqueda) clienteBusqueda = document.getElementById('cliente-busqueda');
+  if (!clienteResultados) clienteResultados = document.getElementById('cliente-resultados');
+  if (!clienteSelect) clienteSelect = document.getElementById('id_cliente');
+  if (!clienteInfoBox) clienteInfoBox = document.getElementById('cliente-info');
+  if (!cliNombre) cliNombre = document.getElementById('cliente-nombre');
+  if (!cliEmail) cliEmail = document.getElementById('cliente-email');
+  if (!cliFono) cliFono = document.getElementById('cliente-telefono');
+  if (!vehiculoSelect) vehiculoSelect = document.getElementById('id_vehiculo');
+}
+
 async function buscarClientes(q){
+          getClienteElements();
           if (!q || q.length < 2){
-            clienteResultados.classList.add('hidden');
+            if (clienteResultados) clienteResultados.classList.add('hidden');
             return;
           }
+          if (!clienteResultados) return;
+          const localMatches = filterPrefetchItems(PREFETCH.clientes, ['nombre', 'nombre_completo', 'email', 'telefono'], q, 15);
+          if (localMatches.length){
+            renderResultadosClientes(localMatches);
+          }
           try{
-            const r = await EG.fetch(`${EG.cfg.URL_CLIENT_SEARCH}?q=${encodeURIComponent(q)}`);
+            const url = buildEndpoint(EG.cfg.URL_CLIENT_SEARCH || '/ajax/clientes/buscar/');
+            const r = await EG.fetch(`${url}?q=${encodeURIComponent(q)}`);
             if(!r.ok) throw new Error(`HTTP ${r.status}`);
             const data = await r.json();
             const items = Array.isArray(data) ? data : (data.results || data.items || []);
@@ -571,6 +770,8 @@ async function buscarClientes(q){
         }
 
 function renderResultadosClientes(lista){
+  getClienteElements();
+  if (!clienteResultados) return;
   clienteResultados.innerHTML = '';
   if (!lista.length){
     const empty = document.createElement('div');
@@ -618,8 +819,9 @@ function renderResultadosClientes(lista){
 }
 
 async function seleccionarCliente({id, nombre, email, telefono}){
-  clienteResultados.classList.add('hidden');
-  clienteBusqueda.value = nombre;
+  getClienteElements();
+  if (clienteResultados) clienteResultados.classList.add('hidden');
+  if (clienteBusqueda) clienteBusqueda.value = nombre;
   if (clienteSelect){ // mantener el valor para POST si backend lo requiere
     clienteSelect.innerHTML = `<option value="${id}" selected>${nombre}</option>`;
     clienteSelect.classList.add('hidden');
@@ -627,21 +829,41 @@ async function seleccionarCliente({id, nombre, email, telefono}){
   if (cliNombre) cliNombre.textContent = nombre;
   if (cliEmail)  cliEmail.textContent  = email || '—';
   if (cliFono)   cliFono.textContent   = telefono || '—';
-  clienteInfoBox?.classList.remove('hidden');
+  if (clienteInfoBox) clienteInfoBox.classList.remove('hidden');
   await cargarVehiculosPorCliente(id);
 }
 
 async function cargarVehiculosPorCliente(clienteId){
+  getClienteElements();
           if (!vehiculoSelect) return;
+
+  const alreadyHasOptions = vehiculoSelect.options && vehiculoSelect.options.length > 1;
+  if (alreadyHasOptions && vehiculoSelect.dataset.source === 'form') {
+    return;
+  }
+
           vehiculoSelect.disabled = true;
           vehiculoSelect.innerHTML = `<option value="">${I18N.loading_vehicles}</option>`;
-          try{
-            const r = await EG.fetch(`${EG.cfg.URL_VEHICULOS_BY_CLI}?cliente_id=${encodeURIComponent(clienteId)}`);
+
+  const localMatches = PREFETCH.vehiculos.filter((v)=> String(v.cliente_id) === String(clienteId));
+  if (localMatches.length){
+    const options = localMatches.map((v)=> `<option value="${v.id}">${v.label || v.text || ''}</option>`).join('');
+    vehiculoSelect.innerHTML = `<option value="">${I18N.select_vehicle}</option>${options}`;
+    vehiculoSelect.dataset.source = 'prefetch';
+  }
+
+  try{
+    const urlRaw = EG.cfg.URL_VEHICULOS_BY_CLI || '/ajax/vehiculos-por-cliente/';
+    const url = buildEndpoint(urlRaw);
+    const r = await EG.fetch(`${url}?cliente_id=${encodeURIComponent(clienteId)}`);
             if(!r.ok) throw new Error(`HTTP ${r.status}`);
             const data = await r.json();
             const items = Array.isArray(data) ? data : (data.results || data.items || []);
             if (!items.length){
+      if (!localMatches.length){
               vehiculoSelect.innerHTML = `<option value="">${I18N.no_vehicles}</option>`;
+        vehiculoSelect.dataset.source = 'empty';
+      }
             } else {
               const options = items.map(v => {
                 const id = v.id ?? v.pk;
@@ -649,10 +871,14 @@ async function cargarVehiculosPorCliente(clienteId){
                 return `<option value="${id}">${label}</option>`;
               }).join('');
               vehiculoSelect.innerHTML = `<option value="">${I18N.select_vehicle}</option>${options}`;
+      vehiculoSelect.dataset.source = 'fetch';
             }
           }catch(err){
             console.error('❌ vehiculos-por-cliente:', err);
+    if (!localMatches.length){
             vehiculoSelect.innerHTML = `<option value="">${I18N.error_loading_vehicles}</option>`;
+      vehiculoSelect.dataset.source = 'error';
+    }
           }finally{
             vehiculoSelect.disabled = false;
           }
@@ -706,16 +932,25 @@ if (includeTaxCheckbox) {
 // FILAS DINÁMICAS
 // ===============
 // IDs de botones en tu HTML: #add-repuesto, #add-servicio, #add-otro
-$('#add-repuesto')?.addEventListener('click', addRepuestoRow);
-$('#add-servicio')?.addEventListener('click', addServicioRow);
-$('#add-otro')?.addEventListener('click', addOtroRow);
+// Los event listeners se registran en DOMContentLoaded
 
-function addRepuestoRow(){
-  const container = $('#repuestos-container');
+window.addRepuestoRow = function addRepuestoRow(){
+  const container = document.getElementById('repuestos-container');
+  if (!container) {
+    console.error('❌ Contenedor de repuestos no encontrado');
+    return;
+  }
   const row = document.createElement('div');
   row.className = 'dynamic-element';
   row.innerHTML = `
     <div class="flex flex-wrap gap-4 items-end">
+      <div class="flex-1 min-w-64 relative">
+        <label class="block text-cyan-200 text-sm mb-1">${I18N.name}</label>
+        <input type="text" class="rep-search form-control w-full" placeholder="${I18N.type_to_search_parts}" autocomplete="off">
+        <div class="rep-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
+        <input type="hidden" class="rep-id">
+        <button type="button" class="rep-create-btn absolute top-2 right-2 px-2 py-1 rounded-md bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 text-white text-xs font-semibold border border-purple-300/40 shadow-sm transition-all">➕</button>
+      </div>
       <div class="w-32">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.code}</label>
         <input type="text" class="rep-codigo form-control w-full" placeholder="${I18N.code}">
@@ -728,9 +963,9 @@ function addRepuestoRow(){
         <label class="block text-cyan-200 text-sm mb-1">${I18N.qty}</label>
         <input type="number" class="rep-cantidad form-control w-full" min="1" max="999" value="1">
       </div>
-      <div class="w-24 hidden cost-price-container">
+      <div class="w-24 cost-price-container">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.cost_price}</label>
-        <input type="text" class="rep-precio-compra form-control w-full" readonly placeholder="$0">
+        <input type="text" class="rep-precio-compra form-control w-full" placeholder="$0">
       </div>
       <div class="w-24">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.sale_price}</label>
@@ -751,59 +986,207 @@ function addRepuestoRow(){
     </div>`;
   container.appendChild(row);
   setupRepuestoRow(row);
+  return row;
 }
 
 function setupRepuestoRow(row){
-  const inpCode = $('.rep-codigo', row);
-  const inpName = $('.rep-nombre', row);
-  const inpPC   = $('.rep-precio-compra', row);
-  const inpPV   = $('.rep-precio-venta', row);
-  const qEl     = $('.rep-cantidad', row);
-  const sub     = $('.rep-subtotal', row);
-  const view    = $('.rep-subtotal-view', row);
+  const searchInput = $('.rep-search', row);
+  const drop        = row.querySelector('.rep-dropdown');
+  const idHidden    = $('.rep-id', row);
+  const inpCode     = $('.rep-codigo', row);
+  const inpName     = $('.rep-nombre', row);
+  const inpPC       = $('.rep-precio-compra', row);
+  const inpPV       = $('.rep-precio-venta', row);
+  const qEl         = $('.rep-cantidad', row);
+  const sub         = $('.rep-subtotal', row);
+  const view        = $('.rep-subtotal-view', row);
+
+  let timer = null;
+
+  const btnCreate = row.querySelector('.rep-create-btn');
+  btnCreate?.addEventListener('click', ()=>{
+    currentRepuestoRow = row;
+    const searchValue = (searchInput?.value || '').split('•')[0].trim();
+    const data = {
+      part_number: inpCode?.value?.trim() || searchValue,
+      nombre: inpName?.value?.trim() || '',
+      precio_compra: inpPC?.value || '',
+      precio_venta: inpPV?.value || '',
+    };
+    openRepuestoModal(data);
+  });
 
           async function fetchByCode(code){
             if (!code) return;
-            try{
+    try {
               const r = await EG.fetch(`${EG.cfg.URL_REPUESTO_BY_CODE}?code=${encodeURIComponent(code)}`);
-              if(!r.ok) return;
+      if (!r.ok) return;
               const data = await r.json();
-              if (data && data.nombre){
-                if (inpName) inpName.value = data.nombre || '';
-                if (inpPV)   inpPV.value   = data.precio_venta_sugerido || '';
-                if (inpPC)   inpPC.value   = data.precio_compra || '';
+      applyPartData({
+        id: data.id || '',
+        codigo: data.codigo || code,
+        nombre: data.nombre || '',
+        precio_venta: data.precio_venta_sugerido || data.precio_venta || '',
+        precio_compra: data.precio_compra || '',
+      });
+    } catch (err) {
+      console.error('rep fetchByCode', err);
+    }
+  }
+
+  function applyPartData(item){
+    if (!item) return;
+    if (idHidden) idHidden.value = item.id || '';
+    if (inpCode) inpCode.value = item.codigo || '';
+    if (inpName) inpName.value = item.nombre || '';
+    if (inpPV && item.precio_venta !== undefined && item.precio_venta !== null) {
+      inpPV.value = formatNumberInput(item.precio_venta);
+    }
+    if (inpPC && item.precio_compra !== undefined && item.precio_compra !== null) {
+      inpPC.value = formatNumberInput(item.precio_compra);
+    }
+    if (searchInput) {
+      const labelParts = [];
+      if (item.codigo) labelParts.push(item.codigo);
+      if (item.nombre) labelParts.push(item.nombre);
+      searchInput.value = labelParts.join(' • ') || '';
+    }
                 recalc();
               }
-            }catch(err){ console.error('rep fetchByCode', err); }
+
+  async function searchRepuestos(q){
+    if (!drop) return;
+    if (!q || q.length < 2){
+      drop.classList.add('hidden');
+      return;
+    }
+
+    const localMatches = filterPrefetchItems(PREFETCH.repuestos, ['codigo', 'nombre'], q, 15);
+    if (localMatches.length){
+      renderResultadosRepuestos(localMatches);
+    }
+
+    try {
+      const url = EG.cfg.URL_REPUESTO_SEARCH || '/cl/api/repuestos/';
+      const r = await EG.fetch(`${url}?q=${encodeURIComponent(q)}`);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const data = await r.json();
+      const items = await (Array.isArray(data) ? data : (data.results || data.items || []));
+      if (items.length) renderResultadosRepuestos(items);
+    }catch(err){
+      console.error('❌ buscarRepuestos', err);
+      if (!localMatches.length) {
+        drop.innerHTML = `<div class=\"p-3 text-red-300\">${I18N.server_error}</div>`;
+        drop.classList.remove('hidden');
+      }
+    }
+  }
+
+  function renderResultadosRepuestos(lista){
+    if (!drop) return;
+    drop.innerHTML = '';
+    if (!lista.length){
+      drop.innerHTML = `<div class="p-3 text-gray-300">${I18N.no_parts}</div>`;
+      drop.classList.remove('hidden');
+      return;
+    }
+    const frag = document.createDocumentFragment();
+    lista.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'srv-item px-3 py-2 hover:bg-cyan-700 cursor-pointer border-b border-cyan-600 last:border-b-0';
+      div.setAttribute('role', 'option');
+      const codigo = item.codigo || item.code || '';
+      const nombre = item.nombre || item.text || '';
+      const precioVenta = Number(item.precio_venta_sugerido ?? item.precio_venta ?? item.precio ?? 0);
+      const precioCompra = Number(item.precio_compra ?? item.costo ?? 0);
+      div.dataset.id = item.id || '';
+      div.dataset.codigo = codigo;
+      div.dataset.nombre = nombre;
+      div.dataset.precio = precioVenta;
+      div.dataset.cost = precioCompra;
+      div.innerHTML = `
+        <div class="text-cyan-200 font-semibold text-sm truncate">${codigo ? `${codigo} • ${nombre}` : nombre}</div>
+        <div class="text-xs text-gray-300">${money(precioVenta)}</div>`;
+      frag.appendChild(div);
+    });
+    drop.appendChild(frag);
+    drop.setAttribute('role', 'listbox');
+    drop.classList.remove('hidden');
+  }
+
+  function seleccionarRepuesto(el){
+    if (!el) return;
+    applyPartData({
+      id: el.dataset.id,
+      codigo: el.dataset.codigo,
+      nombre: el.dataset.nombre,
+      precio_venta: parseNumericInput(el.dataset.precio),
+      precio_compra: parseNumericInput(el.dataset.cost),
+    });
+    drop?.classList.add('hidden');
           }
 
           function recalc(){
             const q = Number(qEl?.value || 0);
-            const p = Number((inpPV?.value || '0').toString().replace(/[^0-9.-]/g,'')) || 0;
-            const d = Number(($('.rep-descuento', row)?.value || 0)) || 0; // %
+    const p = parseNumericInput(inpPV?.value || 0);
+    const d = Number(($('.rep-descuento', row)?.value || 0)) || 0;
             const subtotal = q * p * (1 - (d/100));
-            console.log(`Repuesto calc: q=${q}, p=${p}, d=${d}%, subtotal=${subtotal}`);
             if (sub)  sub.value = subtotal;
             if (view) view.textContent = money(subtotal);
             recalcTotales();
           }
+
+  searchInput?.addEventListener('input', (e)=>{
+    clearTimeout(timer);
+    const value = e.target.value.trim();
+    timer = setTimeout(()=> searchRepuestos(value), 250);
+  });
+
+  searchInput?.addEventListener('focus', ()=>{
+    if (searchInput.value.trim().length >= 2) {
+      searchRepuestos(searchInput.value.trim());
+    }
+  });
 
   inpCode?.addEventListener('change', ()=> fetchByCode(inpCode.value.trim()));
   qEl?.addEventListener('input', recalc);
   inpPV?.addEventListener('input', recalc);
   $('.rep-descuento', row)?.addEventListener('input', recalc);
 
-  // Toggle cost price visibility on sale price click
-  inpPV?.addEventListener('click', (e) => {
-    const costContainer = row.querySelector('.cost-price-container');
-    if (costContainer) {
-      costContainer.classList.toggle('hidden');
+  drop?.addEventListener('click', (e)=>{
+    const item = e.target.closest('.srv-item');
+    if (!item) return;
+    seleccionarRepuesto(item);
+  });
+
+  drop?.addEventListener('keydown', (e)=>{
+    const item = e.target.closest('[role="option"]');
+    if (!item) return;
+    if (e.key === 'Enter') {
+      seleccionarRepuesto(item);
     }
   });
+
+  document.addEventListener('click', (e)=>{
+    if (!row.contains(e.target)) {
+      drop?.classList.add('hidden');
+    }
+  });
+
+  inpPV?.addEventListener('click', ()=>{
+    const costContainer = row.querySelector('.cost-price-container');
+    if (costContainer) costContainer.classList.toggle('hidden');
+  });
+
+  row.__applyPartData = applyPartData;
 }
 
-function addServicioRow(){
-  const container = $('#servicios-container');
+window.addServicioRow = function addServicioRow(){
+  const container = document.getElementById('servicios-container');
+  if (!container) {
+    console.error('❌ Contenedor de servicios no encontrado');
+    return;
+  }
   const row = document.createElement('div');
   row.className = 'dynamic-element';
   row.innerHTML = `
@@ -832,6 +1215,7 @@ function addServicioRow(){
     </div>`;
   container.appendChild(row);
   setupServicioRow(row);
+  return row;
 }
 
 function setupServicioRow(row){
@@ -854,7 +1238,9 @@ function setupServicioRow(row){
               const r = await EG.fetch(url);
               if (!r.ok) throw new Error(`HTTP ${r.status}`);
               const data = await r.json();
-              const items = Array.isArray(data) ? data : (data.results || []);
+              const items = Array.isArray(data)
+                ? data
+                : (data.servicios || data.results || []);
               renderResultados(items);
             }catch(err){
               console.error('servicios buscar:', err);
@@ -869,14 +1255,16 @@ function setupServicioRow(row){
       drop.classList.remove('hidden');
       return;
     }
-    drop.innerHTML = lista.map(s => `
+    drop.innerHTML = lista.map(s => {
+      const precioBase = Number(s.precio_cliente ?? s.precio_sugerido ?? s.precio ?? 0);
+      return `
       <div class="srv-item p-3 hover:bg-cyan-700 cursor-pointer border-b border-cyan-600 last:border-b-0"
-           role="option" tabindex="0" data-id="${s.id}" data-precio="${s.precio_sugerido || 0}" data-text="${s.nombre}">
+           role="option" tabindex="0" data-id="${s.id}" data-precio="${precioBase}" data-text="${s.nombre}">
         <div class="font-semibold text-cyan-200">${s.nombre}</div>
-        ${s.categoria ? `<div class="text-xs text-gray-300 opacity-80">Category: ${s.categoria}</div>` : ``}
-        ${typeof s.precio === 'number' ? `<div class="text-xs text-gray-300 opacity-80">Base: ${money(s.precio)}</div>` : ``}
+        ${s.categoria ? `<div class="text-xs text-gray-300 opacity-80">${COUNTRY_REF === 'CL' ? 'Categoría' : 'Category'}: ${s.categoria}</div>` : ``}
+        ${precioBase ? `<div class="text-xs text-gray-300 opacity-80">${COUNTRY_REF === 'CL' ? 'Tarifa base' : 'Base'}: ${money(precioBase)}</div>` : ``}
       </div>
-    `).join('');
+    `}).join('');
     drop.setAttribute('role', 'listbox');
     drop.classList.remove('hidden');
   }
@@ -932,30 +1320,39 @@ function setupServicioRow(row){
   });
 
   pEl?.addEventListener('input', recalc);
+
+  row.__applyServicioData = function(item){
+    if (!item) return;
+    if (idHid) idHid.value = item.id || '';
+    if (input) input.value = item.nombre || item.text || '';
+    if (pEl && item.precio_cliente !== undefined && item.precio_cliente !== null) {
+      pEl.value = formatNumberInput(item.precio_cliente);
+    } else if (pEl && item.precio !== undefined && item.precio !== null) {
+      pEl.value = formatNumberInput(item.precio);
+    }
+    recalc();
+  };
 }
 
-function addOtroRow(){
-  const container = $('#otros-container');
+window.addOtroRow = function addOtroRow(){
+  const container = document.getElementById('otros-container');
+  if (!container) {
+    console.error('❌ Contenedor de otros servicios no encontrado');
+    return;
+  }
   const row = document.createElement('div');
   row.className = 'dynamic-element';
   row.innerHTML = `
     <div class="flex flex-wrap gap-4 items-end">
-      <div class="flex-1 min-w-48">
+      <div class="flex-1 min-w-60 relative">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.service}</label>
-        <select class="otr-servicio form-select w-full">
-          <option value="">${I18N.select_service}</option>
-          <option value="1">Tire Change</option>
-          <option value="2">AC Service</option>
-          <option value="3">Transmission Service</option>
-        </select>
+        <input type="text" class="otr-search form-control w-full" placeholder="${I18N.type_to_search_external}" autocomplete="off">
+        <div class="otr-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
+        <input type="hidden" class="otr-servicio-id">
       </div>
       <div class="flex-1 min-w-48">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.external_company}</label>
         <input type="text" class="otr-empresa form-control w-full">
-      </div>
-      <div class="w-24">
-        <label class="block text-cyan-200 text-sm mb-1">${I18N.qty}</label>
-        <input type="number" class="otr-cantidad form-control w-full" min="1" value="1">
       </div>
       <div class="w-32">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.shop_price}</label>
@@ -976,23 +1373,147 @@ function addOtroRow(){
     </div>`;
   container.appendChild(row);
   setupOtroRow(row);
+  return row;
 }
 
 function setupOtroRow(row){
-  const qEl  = $('.otr-cantidad', row);
-  const pEl  = $('.otr-precio', row);
-  const sub  = $('.otr-subtotal', row);
-  const view = $('.otr-subtotal-view', row);
+  const searchInput = $('.otr-search', row);
+  const drop        = row.querySelector('.otr-dropdown');
+  const idHidden    = $('.otr-servicio-id', row);
+  const empresaEl   = $('.otr-empresa', row);
+  const precioTallerEl = $('.otr-precio-taller', row);
+  const precioEl    = $('.otr-precio', row);
+  const sub         = $('.otr-subtotal', row);
+  const view        = $('.otr-subtotal-view', row);
+
+  let timer = null;
+
   function recalc(){
-    const q = Number(qEl?.value || 1);
-    const p = Number((pEl?.value || '0').toString().replace(/[^0-9.-]/g,''));
-    const subtotal = q * (isNaN(p)?0:p);
+    const subtotal = parseNumericInput(precioEl?.value || 0);
     if (sub)  sub.value = subtotal;
     if (view) view.textContent = money(subtotal);
     recalcTotales();
   }
-  qEl?.addEventListener('input', recalc);
-  pEl?.addEventListener('input', recalc);
+
+  function aplicarDatos(item){
+  if (!item) return;
+    if (idHidden) idHidden.value = item.id || '';
+    if (searchInput) searchInput.value = item.nombre || '';
+    if (empresaEl && (item.empresa || item.empresa_ext)) {
+      empresaEl.value = item.empresa || item.empresa_ext;
+    }
+    if (precioTallerEl && item.precio_taller !== undefined && item.precio_taller !== null) {
+      precioTallerEl.value = formatNumberInput(item.precio_taller);
+    }
+    if (precioEl && item.precio_cliente !== undefined && item.precio_cliente !== null) {
+      precioEl.value = formatNumberInput(item.precio_cliente);
+    }
+    recalc();
+  }
+
+  async function searchOtrosServicios(q){
+    if (!drop) return;
+    if (!q || q.length < 2){
+      drop.classList.add('hidden');
+    return;
+  }
+  
+    const localMatches = filterPrefetchItems(PREFETCH.otros, ['nombre', 'empresa', 'empresa_ext'], q, 15);
+    if (localMatches.length){
+      renderResultadosOtros(localMatches);
+    }
+
+    try {
+      const url = EG.cfg.URL_OUTSOURCED_SERVICES || '/cl/api/otros-servicios/';
+      const r = await EG.fetch(`${url}?q=${encodeURIComponent(q)}`);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const data = await r.json();
+      const items = await (Array.isArray(data) ? data : (data.otros_servicios || data.results || []));
+      if (items.length) renderResultadosOtros(items);
+    } catch (err) {
+      console.error('❌ buscarOtrosServicios', err);
+      if (!localMatches.length) {
+        drop.innerHTML = `<div class=\"p-3 text-red-300\">${I18N.server_error}</div>`;
+        drop.classList.remove('hidden');
+      }
+    }
+  }
+
+  function renderResultadosOtros(lista){
+    drop.innerHTML = '';
+    if (!lista.length){
+      drop.innerHTML = `<div class="p-3 text-gray-300">${I18N.no_external_services}</div>`;
+      drop.classList.remove('hidden');
+    return;
+  }
+    const frag = document.createDocumentFragment();
+    lista.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'srv-item px-3 py-2 hover:bg-cyan-700 cursor-pointer border-b border-cyan-600 last:border-b-0';
+      div.setAttribute('role', 'option');
+      div.dataset.id = item.pk || item.id || '';
+      div.dataset.nombre = item.nombre || item.text || '';
+      div.dataset.empresa = item.empresa_externa || item.empresa || '';
+      const precioCliente = Number(item.precio_cliente ?? item.precio ?? 0);
+      const precioTaller = Number(item.costo_taller ?? item.precio_taller ?? 0);
+      div.dataset.precioCliente = precioCliente;
+      div.dataset.precioTaller = precioTaller;
+      div.innerHTML = `
+        <div class="text-cyan-200 font-semibold text-sm truncate">${div.dataset.nombre}</div>
+        <div class="text-xs text-gray-300">${div.dataset.empresa || ''}</div>
+        <div class="text-xs text-gray-500">${money(precioCliente)}</div>`;
+      frag.appendChild(div);
+    });
+    drop.appendChild(frag);
+    drop.setAttribute('role', 'listbox');
+    drop.classList.remove('hidden');
+  }
+
+  function seleccionarOtro(servicio){
+    if (!servicio) return;
+    aplicarDatos({
+      id: servicio.dataset.id,
+      nombre: servicio.dataset.nombre,
+      empresa: servicio.dataset.empresa,
+      empresa_ext: servicio.dataset.empresa,
+      precio_cliente: parseNumericInput(servicio.dataset.precioCliente),
+      precio_taller: parseNumericInput(servicio.dataset.precioTaller),
+    });
+    drop.classList.add('hidden');
+  }
+
+  searchInput?.addEventListener('input', (e)=>{
+    clearTimeout(timer);
+    const value = e.target.value.trim();
+    timer = setTimeout(()=> searchOtrosServicios(value), 250);
+  });
+
+  searchInput?.addEventListener('focus', ()=>{
+    if (searchInput.value.trim().length >= 2) {
+      searchOtrosServicios(searchInput.value.trim());
+    }
+  });
+
+  drop?.addEventListener('click', (e)=>{
+    const item = e.target.closest('.srv-item');
+  if (!item) return;
+    seleccionarOtro(item);
+  });
+
+  drop?.addEventListener('keydown', (e)=>{
+  const item = e.target.closest('[role="option"]');
+  if (!item) return;
+    if (e.key === 'Enter') seleccionarOtro(item);
+  });
+
+  document.addEventListener('click', (e)=>{
+    if (!row.contains(e.target)) drop?.classList.add('hidden');
+  });
+
+  precioEl?.addEventListener('input', recalc);
+  precioTallerEl?.addEventListener('input', recalc);
+
+  row.__applyOtroData = aplicarDatos;
 }
 
 // ===============
@@ -1000,55 +1521,8 @@ function setupOtroRow(row){
 // ===============
 selTipo?.addEventListener('change', () => { applyTheme(selTipo.value); updateDocumentNumber(); });
 
-        clienteBusqueda?.addEventListener('input', (e)=>{
-          clearTimeout(searchTimer);
-          searchTimer = setTimeout(()=> buscarClientes(e.target.value.trim()), 250);
-        });
-        clienteBusqueda?.addEventListener('focus', ()=>{
-          if (clienteBusqueda.value.trim().length >= 2) buscarClientes(clienteBusqueda.value.trim());
-        });
-        clienteBusqueda?.addEventListener('keydown', (e)=>{
-          if (e.key === 'Enter') {
-            const first = clienteResultados?.querySelector('.cliente-item');
-            if (first) {
-              e.preventDefault();
-              seleccionarCliente({
-                id: first.dataset.id,
-                nombre: first.dataset.nombre,
-                email: first.dataset.email,
-                telefono: first.dataset.telefono
-              });
-            }
-          }
-        });
-document.addEventListener('click', (e)=>{
-  if (!clienteBusqueda?.contains(e.target) && !clienteResultados?.contains(e.target)){
-    clienteResultados?.classList.add('hidden');
-  }
-});
-clienteResultados?.addEventListener('click', (e)=>{
-  const item = e.target.closest('.cliente-item');
-  if (!item) return;
-  seleccionarCliente({
-    id: item.dataset.id,
-    nombre: item.dataset.nombre,
-    email: item.dataset.email,
-    telefono: item.dataset.telefono
-  });
-});
-
-clienteResultados?.addEventListener('keydown', (e)=>{
-  const item = e.target.closest('[role="option"]');
-  if (!item) return;
-  if (e.key === 'Enter') {
-    seleccionarCliente({
-      id: item.dataset.id,
-      nombre: item.dataset.nombre,
-      email: item.dataset.email,
-      telefono: item.dataset.telefono
-    });
-  }
-});
+        // Event listeners de búsqueda de clientes se mueven a DOMContentLoaded
+// Event listeners de click en resultados se mueven a initDocumentForm
 
 // INIT
 // Serializar filas dinámicas antes de enviar
@@ -1056,23 +1530,23 @@ function serializeRows(){
   console.log('🔍 Serializando filas dinámicas...');
 
   const rep = $$('#repuestos-container .dynamic-element').map(row=>({
-    codigo:   $('.rep-codigo', row)?.value?.trim() || '',
-    nombre:   $('.rep-nombre', row)?.value?.trim() || '',
-    cantidad: Number($('.rep-cantidad', row)?.value || 0),
-    precio:   Number(($('.rep-precio-venta', row)?.value||'').replace(/[^\d.-]/g,''))||0,
-    descuento:Number($('.rep-descuento', row)?.value || 0),
+    id:        $('.rep-id', row)?.value?.trim() || '',
+    codigo:    $('.rep-codigo', row)?.value?.trim() || '',
+    nombre:    $('.rep-nombre', row)?.value?.trim() || '',
+    cantidad:  Number($('.rep-cantidad', row)?.value || 0),
+    precio:    parseNumericInput($('.rep-precio-venta', row)?.value || 0),
+    descuento: Number($('.rep-descuento', row)?.value || 0),
   }));
-  // 👇 SIN cantidad: solo id y precio
   const serv = $$('#servicios-container .dynamic-element').map(row=>({
     servicio_id: $('.srv-id', row)?.value || '',
-    precio:      Number(($('.serv-precio', row)?.value||'').replace(/[^\d.-]/g,''))||0,
+    precio:      parseNumericInput($('.serv-precio', row)?.value || 0),
   }));
   const otros = $$('#otros-container .dynamic-element').map(row=>({
-    servicio_id:   $('.otr-servicio', row)?.value || '',
+    servicio_id:   $('.otr-servicio-id', row)?.value || '',
+    nombre:        $('.otr-search', row)?.value?.trim() || '',
     empresa_ext:   $('.otr-empresa', row)?.value?.trim() || '',
-    cantidad:      Number($('.otr-cantidad', row)?.value || 1),
-    precio_taller: Number(($('.otr-precio-taller', row)?.value||'').replace(/[^\d.-]/g,''))||0,
-    precio:        Number(($('.otr-precio', row)?.value||'').replace(/[^\d.-]/g,''))||0,
+    precio_taller: parseNumericInput($('.otr-precio-taller', row)?.value || 0),
+    precio:        parseNumericInput($('.otr-precio', row)?.value || 0),
   }));
 
   console.log('📦 Repuestos encontrados:', rep.length, rep);
@@ -1083,1083 +1557,138 @@ function serializeRows(){
   $('#id_servicios_json').value = JSON.stringify(serv);
   $('#id_otros_json').value     = JSON.stringify(otros);
 
-  console.log('💾 JSON guardado:');
-  console.log('  - repuestos_json:', $('#id_repuestos_json').value);
-  console.log('  - servicios_json:', $('#id_servicios_json').value);
-  console.log('  - otros_json:', $('#id_otros_json').value);
+  console.log('💾 JSON guardado');
 }
 
-// Sincronizar checkbox "Document paid" con Payment Status
-document.querySelector('#id_pagado')?.addEventListener('change', (e)=>{
-  const sel = document.querySelector('#id_payment_status');
-  if (!sel) return;
-  if (e.target.checked && sel.value !== 'paid') sel.value = 'paid';
-  if (!e.target.checked && sel.value === 'paid') sel.value = 'pending';
-});
-
-// Recalcular totales cuando cambie el checkbox "Apply tax"
-document.querySelector('#id_apply_vat')?.addEventListener('change', (e)=>{
-  recalcTotales();
-});
-
-// Serializar antes de enviar
-document.querySelector('#document-form')?.addEventListener('submit', (e)=>{
-  const form = document.querySelector('#document-form');
-  if (form.dataset.submitting === '1') {
-    e.preventDefault();
-    return;
-  }
-
-  // Limpiar errores anteriores
-  $$('.text-red-300.eg-hint').forEach(n=>n.remove());
-
-  const required = [
-    ['#id_fecha_emision', I18N.issue_date_required],
-    ['#id_tipo', I18N.document_type_required],
-    ['#id_cliente', I18N.client_required],
-    ['#id_vehiculo', I18N.vehicle_required],
-  ];
-  let ok = true;
-  for (const [sel, msg] of required){
-    const el = document.querySelector(sel);
-    const val = (el?.value || '').trim();
-    if (!val){
-      ok = false;
-      showFieldError(el, msg);
-    } else {
-      el?.classList.remove('ring-2','ring-red-500');
-    }
-  }
-  if (!ok){
-    e.preventDefault();
-    return;
-  }
+function submitDocumentForm(){
+  const form = document.getElementById('document-form');
+  if (!form) return;
   serializeRows();
-  form.dataset.submitting = '1';
-  form.querySelector('[type="submit"]')?.setAttribute('disabled','disabled');
-});
-
-        document.addEventListener('DOMContentLoaded', async ()=>{
-          applyTheme(selTipo?.value || 'OT');
-          updateDocumentNumber();
-          recalcTotales();
-
-          // Establecer fecha por defecto si está vacía
-          const fechaInput = document.getElementById('id_fecha_emision');
-          if (fechaInput && !fechaInput.value) {
-            const today = new Date().toISOString().slice(0,10);
-            fechaInput.value = today;
-          }
-
-          // Sincronizar estado inicial de pagado ↔ payment_status
-          const chk = document.querySelector('#id_pagado');
-          const sel = document.querySelector('#id_payment_status');
-          if (chk && sel) {
-            chk.checked = (sel.value === 'paid');
-          }
-
-  // Cargar otros servicios dinámicamente
-  const selects = $$('.otr-servicio');
-  if (selects.length && EG.cfg.URL_OUTSOURCED_SERVICES){
-    try{
-      const r = await EG.fetch(EG.cfg.URL_OUTSOURCED_SERVICES);
-      if (!r.ok) throw 0;
-      const data = await r.json(); // [{id, nombre, proveedor_tipico}]
-      const opts = [`<option value="">${I18N.select_service}</option>`]
-        .concat(data.results.map(s=>`<option value="${s.id}">${s.nombre}</option>`)).join('');
-      selects.forEach(s=> s.innerHTML = opts);
-    }catch(e){
-      console.warn('Outsourced services load failed');
-    }
-  }
-});
-
-// ==================== ALMACENAMIENTO TEMPORAL ====================
-// Almacenamiento temporal de nuevos estados y ciudades personalizados
-let customStates = [];
-let customCitiesByState = {};
-
-// ==================== MODAL FUNCTIONS ====================
-function openClienteModal() {
-  document.getElementById('clienteModal').classList.remove('hidden');
-  document.getElementById('form-crear-cliente').reset();
-  document.getElementById('cliente-error-message').classList.add('hidden');
-  document.getElementById('cliente-success-message').classList.add('hidden');
-  
-  // Cargar estados si estamos en USA
-  const country = window.location.pathname.startsWith('/cl/') ? 'cl' : 'us';
-  if (country === 'us') {
-    console.log('Opening client modal for USA'); // Debug
-    loadEstadosUSA();
-    
-    // Registrar listeners después de un pequeño delay para asegurar que el DOM está listo
-    setTimeout(() => {
-      setupClienteEstadoListener();
-      setupClienteCiudadListener();
-    }, 100);
-  }
+  form.submit();
 }
 
-function closeClienteModal() {
-  document.getElementById('clienteModal').classList.add('hidden');
-}
+  serializeRows();
 
-// Lista hardcodeada de estados de USA como fallback
-const USA_STATES = [
-  {id: 'AL', nombre: 'Alabama'}, {id: 'AK', nombre: 'Alaska'}, {id: 'AZ', nombre: 'Arizona'},
-  {id: 'AR', nombre: 'Arkansas'}, {id: 'CA', nombre: 'California'}, {id: 'CO', nombre: 'Colorado'},
-  {id: 'CT', nombre: 'Connecticut'}, {id: 'DE', nombre: 'Delaware'}, {id: 'FL', nombre: 'Florida'},
-  {id: 'GA', nombre: 'Georgia'}, {id: 'HI', nombre: 'Hawaii'}, {id: 'ID', nombre: 'Idaho'},
-  {id: 'IL', nombre: 'Illinois'}, {id: 'IN', nombre: 'Indiana'}, {id: 'IA', nombre: 'Iowa'},
-  {id: 'KS', nombre: 'Kansas'}, {id: 'KY', nombre: 'Kentucky'}, {id: 'LA', nombre: 'Louisiana'},
-  {id: 'ME', nombre: 'Maine'}, {id: 'MD', nombre: 'Maryland'}, {id: 'MA', nombre: 'Massachusetts'},
-  {id: 'MI', nombre: 'Michigan'}, {id: 'MN', nombre: 'Minnesota'}, {id: 'MS', nombre: 'Mississippi'},
-  {id: 'MO', nombre: 'Missouri'}, {id: 'MT', nombre: 'Montana'}, {id: 'NE', nombre: 'Nebraska'},
-  {id: 'NV', nombre: 'Nevada'}, {id: 'NH', nombre: 'New Hampshire'}, {id: 'NJ', nombre: 'New Jersey'},
-  {id: 'NM', nombre: 'New Mexico'}, {id: 'NY', nombre: 'New York'}, {id: 'NC', nombre: 'North Carolina'},
-  {id: 'ND', nombre: 'North Dakota'}, {id: 'OH', nombre: 'Ohio'}, {id: 'OK', nombre: 'Oklahoma'},
-  {id: 'OR', nombre: 'Oregon'}, {id: 'PA', nombre: 'Pennsylvania'}, {id: 'RI', nombre: 'Rhode Island'},
-  {id: 'SC', nombre: 'South Carolina'}, {id: 'SD', nombre: 'South Dakota'}, {id: 'TN', nombre: 'Tennessee'},
-  {id: 'TX', nombre: 'Texas'}, {id: 'UT', nombre: 'Utah'}, {id: 'VT', nombre: 'Vermont'},
-  {id: 'VA', nombre: 'Virginia'}, {id: 'WA', nombre: 'Washington'}, {id: 'WV', nombre: 'West Virginia'},
-  {id: 'WI', nombre: 'Wisconsin'}, {id: 'WY', nombre: 'Wyoming'}
-];
+  function setupClienteSearchHandlers(){
+    getClienteElements();
 
-// Cargar estados de USA
-function loadEstadosUSA() {
-  const select = document.getElementById('cliente-estado');
-  if (!select) {
-    console.error('Estado select element not found');
+    window.handleClienteInput = function(value){
+      getClienteElements();
+      const query = (value ?? clienteBusqueda?.value ?? '').trim();
+      clearTimeout(searchTimer);
+      if (query.length < 2){
+        clienteResultados?.classList.add('hidden');
     return;
   }
-  
-  console.log('Fetching estados from: /us/api/estados/'); // Debug
-  
-  fetch('/us/api/estados/')
-    .then(response => {
-      console.log('Estados response status:', response.status); // Debug
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return response.json();
-    })
-    .then(data => {
-      console.log('Estados data received:', data); // Debug
-      
-      // La API retorna {estados: [...]}
-      const estados = data.estados || data || [];
-      
-      if (!Array.isArray(estados)) {
-        console.error('Estados is not an array:', estados);
-        throw new Error('Invalid data format');
-      }
-      
-      select.innerHTML = '<option value="">Seleccione estado...</option>';
-      
-      if (estados.length === 0) {
-        console.warn('No states in database, using hardcoded list');
-        // Usar lista hardcodeada si la BD está vacía
-        USA_STATES.forEach(estado => {
-          const option = document.createElement('option');
-          option.value = estado.id;
-          option.textContent = estado.nombre;
-          select.appendChild(option);
-        });
-        console.log(`✅ Loaded ${USA_STATES.length} states (hardcoded)`);
-      } else {
-        estados.forEach(estado => {
-          const option = document.createElement('option');
-          option.value = estado.id;
-          option.textContent = estado.nombre;
-          select.appendChild(option);
-        });
-        console.log(`✅ Successfully loaded ${estados.length} states from database`);
-      }
-      
-      // Agregar estados personalizados si existen
-      customStates.forEach(estado => {
-        const option = document.createElement('option');
-        option.value = estado.id;
-        option.textContent = estado.nombre + ' ✨';
-        option.style.color = '#10b981';
-        option.style.fontWeight = 'bold';
-        select.appendChild(option);
-      });
-      
-      // Agregar opción para nuevo estado
-      const newOption = document.createElement('option');
-      newOption.value = '__nuevo_estado__';
-      newOption.textContent = '➕ Agregar nuevo estado...';
-      newOption.style.color = '#10b981';
-      newOption.style.fontWeight = 'bold';
-      select.appendChild(newOption);
-    })
-    .catch(error => {
-      console.error('❌ Error loading states from API, using hardcoded list:', error);
-      // Fallback a lista hardcodeada si la API falla
-      select.innerHTML = '<option value="">Seleccione estado...</option>';
-      USA_STATES.forEach(estado => {
-        const option = document.createElement('option');
-        option.value = estado.id;
-        option.textContent = estado.nombre;
-        select.appendChild(option);
-      });
-      
-      // Agregar estados personalizados si existen
-      customStates.forEach(estado => {
-        const option = document.createElement('option');
-        option.value = estado.id;
-        option.textContent = estado.nombre + ' (personalizado)';
-        select.appendChild(option);
-      });
-      
-      // Agregar opción para nuevo estado
-      const newOption = document.createElement('option');
-      newOption.value = '__nuevo_estado__';
-      newOption.textContent = '➕ Agregar nuevo estado...';
-      newOption.style.color = '#10b981';
-      newOption.style.fontWeight = 'bold';
-      select.appendChild(newOption);
-      
-      console.log(`✅ Loaded ${USA_STATES.length} states (hardcoded fallback)`);
-    });
-}
+      searchTimer = setTimeout(()=> buscarClientes(query), 200);
+    };
 
-// Función para cargar ciudades cuando se selecciona un estado
-function loadCiudadesUSA(estadoId) {
-  const ciudadSelect = document.getElementById('cliente-ciudad');
-  
-  if (!ciudadSelect) {
-    console.error('Ciudad select element not found');
-    return;
-  }
-  
-  if (!estadoId) {
-    ciudadSelect.innerHTML = '<option value="">Seleccione estado primero...</option>';
-    return;
-  }
-  
-  console.log('Loading cities for state:', estadoId); // Debug
-  
-  // Ciudades principales por estado (hardcoded como fallback)
-  const CITIES_BY_STATE = {
-    'CA': ['Los Angeles', 'San Francisco', 'San Diego', 'San Jose', 'Sacramento', 'Fresno', 'Oakland'],
-    'TX': ['Houston', 'Dallas', 'Austin', 'San Antonio', 'Fort Worth', 'El Paso'],
-    'FL': ['Miami', 'Tampa', 'Orlando', 'Jacksonville', 'Fort Lauderdale'],
-    'NY': ['New York', 'Buffalo', 'Rochester', 'Syracuse', 'Albany'],
-    'GA': ['Atlanta', 'Augusta', 'Columbus', 'Savannah', 'Athens', 'Sandy Springs'],
-    'IL': ['Chicago', 'Aurora', 'Naperville', 'Joliet', 'Rockford'],
-    'PA': ['Philadelphia', 'Pittsburgh', 'Allentown', 'Erie', 'Reading'],
-    'AZ': ['Phoenix', 'Tucson', 'Mesa', 'Chandler', 'Scottsdale'],
-    'WA': ['Seattle', 'Spokane', 'Tacoma', 'Vancouver', 'Bellevue'],
-    'MA': ['Boston', 'Worcester', 'Springfield', 'Cambridge', 'Lowell'],
-    'MI': ['Detroit', 'Grand Rapids', 'Warren', 'Sterling Heights', 'Ann Arbor'],
-    'NC': ['Charlotte', 'Raleigh', 'Greensboro', 'Durham', 'Winston-Salem'],
-    'NJ': ['Newark', 'Jersey City', 'Paterson', 'Elizabeth', 'Edison'],
-    'VA': ['Virginia Beach', 'Norfolk', 'Chesapeake', 'Richmond', 'Newport News'],
-    'OH': ['Columbus', 'Cleveland', 'Cincinnati', 'Toledo', 'Akron'],
-    'TN': ['Memphis', 'Nashville', 'Knoxville', 'Chattanooga', 'Clarksville'],
-    'IN': ['Indianapolis', 'Fort Wayne', 'Evansville', 'South Bend', 'Carmel'],
-    'MO': ['Kansas City', 'St. Louis', 'Springfield', 'Columbia', 'Independence'],
-    'MD': ['Baltimore', 'Frederick', 'Rockville', 'Gaithersburg', 'Bowie'],
-    'CO': ['Denver', 'Colorado Springs', 'Aurora', 'Fort Collins', 'Lakewood'],
-    'MN': ['Minneapolis', 'St. Paul', 'Rochester', 'Duluth', 'Bloomington'],
-    'SC': ['Charleston', 'Columbia', 'North Charleston', 'Mount Pleasant', 'Rock Hill'],
-    'AL': ['Birmingham', 'Montgomery', 'Mobile', 'Huntsville', 'Tuscaloosa'],
-    'LA': ['New Orleans', 'Baton Rouge', 'Shreveport', 'Lafayette', 'Lake Charles']
-  };
-  
-  // Intentar cargar desde API primero
-  fetch(`/us/api/ciudades/${estadoId}/`)
-    .then(response => {
-      console.log('Cities response status:', response.status);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+    window.handleClienteFocus = function(value){
+      getClienteElements();
+      const query = (value ?? clienteBusqueda?.value ?? '').trim();
+      if (query.length >= 2) buscarClientes(query);
+    };
+
+    window.handleClienteKeydown = function(event){
+      getClienteElements();
+      const query = clienteBusqueda?.value?.trim() || '';
+      if (event.key === 'ArrowDown' && query.length >= 2 && (clienteResultados?.classList.contains('hidden') ?? true)){
+        event.preventDefault();
+        buscarClientes(query);
+        return false;
       }
-      return response.json();
-    })
-    .then(data => {
-      console.log('Cities data received:', data);
-      
-      const ciudades = data.ciudades || data || [];
-      
-      ciudadSelect.innerHTML = '<option value="">Seleccione ciudad...</option>';
-      
-      if (ciudades.length === 0) {
-        // Usar lista hardcodeada si no hay datos en BD
-        const citiesForState = CITIES_BY_STATE[estadoId] || [];
-        if (citiesForState.length > 0) {
-          console.log(`Using hardcoded cities for ${estadoId}`);
-          citiesForState.forEach(cityName => {
-            const option = document.createElement('option');
-            option.value = cityName;
-            option.textContent = cityName;
-            ciudadSelect.appendChild(option);
+
+      if (!clienteResultados || clienteResultados.classList.contains('hidden')){
+        return true;
+      }
+
+      const items = Array.from(clienteResultados.querySelectorAll('.cliente-item'));
+      if (!items.length) return true;
+
+      const active = document.activeElement;
+      const currentIndex = items.findIndex(el => el === active);
+
+      if (event.key === 'ArrowDown'){
+        event.preventDefault();
+        const nextIndex = currentIndex >= 0 ? (currentIndex + 1) % items.length : 0;
+        items[nextIndex].focus();
+        return false;
+      }
+
+      if (event.key === 'ArrowUp'){
+        event.preventDefault();
+        const prevIndex = currentIndex >= 0 ? (currentIndex - 1 + items.length) % items.length : items.length - 1;
+        items[prevIndex].focus();
+        return false;
+      }
+
+      if (event.key === 'Enter'){
+        event.preventDefault();
+        const target = active?.classList.contains('cliente-item') ? active : items[0];
+        if (target){
+          seleccionarCliente({
+            id: target.dataset.id,
+            nombre: target.dataset.nombre,
+            email: target.dataset.email,
+            telefono: target.dataset.telefono,
           });
-          console.log(`✅ Loaded ${citiesForState.length} cities (hardcoded)`);
-        } else {
-          ciudadSelect.innerHTML += '<option value="" disabled>No hay ciudades disponibles</option>';
-          console.warn('No cities found for state:', estadoId);
+          clienteBusqueda?.focus();
         }
-      } else {
-        ciudades.forEach(ciudad => {
-          const option = document.createElement('option');
-          option.value = ciudad.id;
-          option.textContent = ciudad.nombre;
-          ciudadSelect.appendChild(option);
-        });
-        console.log(`✅ Loaded ${ciudades.length} cities from database`);
+        return false;
       }
-      
-      // Agregar ciudades personalizadas para este estado
-      const customCities = customCitiesByState[estadoId] || [];
-      customCities.forEach(ciudad => {
-        const option = document.createElement('option');
-        option.value = ciudad;
-        option.textContent = ciudad + ' ✨';
-        option.style.color = '#10b981';
-        option.style.fontWeight = 'bold';
-        ciudadSelect.appendChild(option);
-      });
-      
-      // Agregar opción para nueva ciudad
-      const newCityOption = document.createElement('option');
-      newCityOption.value = '__nueva_ciudad__';
-      newCityOption.textContent = '➕ Agregar nueva ciudad...';
-      newCityOption.style.color = '#10b981';
-      newCityOption.style.fontWeight = 'bold';
-      ciudadSelect.appendChild(newCityOption);
-    })
-    .catch(error => {
-      console.error('❌ Error loading cities from API, using hardcoded list:', error);
-      
-      // Fallback a lista hardcodeada
-      const citiesForState = CITIES_BY_STATE[estadoId] || [];
-      ciudadSelect.innerHTML = '<option value="">Seleccione ciudad...</option>';
-      
-      if (citiesForState.length > 0) {
-        citiesForState.forEach(cityName => {
-          const option = document.createElement('option');
-          option.value = cityName;
-          option.textContent = cityName;
-          ciudadSelect.appendChild(option);
-        });
-        console.log(`✅ Loaded ${citiesForState.length} cities (hardcoded fallback)`);
-      } else {
-        ciudadSelect.innerHTML += '<option value="" disabled>No hay ciudades para este estado</option>';
+
+      if (event.key === 'Escape'){
+        event.preventDefault();
+        clienteResultados.classList.add('hidden');
+        clienteBusqueda?.focus();
+        return false;
       }
-      
-      // Agregar ciudades personalizadas para este estado
-      const customCities = customCitiesByState[estadoId] || [];
-      customCities.forEach(ciudad => {
-        const option = document.createElement('option');
-        option.value = ciudad;
-        option.textContent = ciudad + ' ✨';
-        option.style.color = '#10b981';
-        option.style.fontWeight = 'bold';
-        ciudadSelect.appendChild(option);
+
+      return true;
+    };
+
+    clienteResultados?.addEventListener('click', (event)=>{
+      const item = event.target.closest('.cliente-item');
+      if (!item) return;
+      seleccionarCliente({
+        id: item.dataset.id,
+        nombre: item.dataset.nombre,
+        email: item.dataset.email,
+        telefono: item.dataset.telefono,
       });
-      
-      // Agregar opción para nueva ciudad
-      const newCityOption = document.createElement('option');
-      newCityOption.value = '__nueva_ciudad__';
-      newCityOption.textContent = '➕ Agregar nueva ciudad...';
-      newCityOption.style.color = '#10b981';
-      newCityOption.style.fontWeight = 'bold';
-      ciudadSelect.appendChild(newCityOption);
+      clienteBusqueda?.focus();
     });
-}
 
-// Listener para detectar nueva ciudad
-function setupClienteCiudadListener() {
-  const ciudadSelect = document.getElementById('cliente-ciudad');
-  if (ciudadSelect && !ciudadSelect.dataset.listenerAdded) {
-    ciudadSelect.addEventListener('change', function() {
-      if (this.value === '__nueva_ciudad__') {
-        mostrarInputNuevaCiudad();
-      } else {
-        ocultarInputNuevaCiudad();
-      }
+    clienteResultados?.addEventListener('keydown', (event)=>{
+      if (event.key !== 'Enter') return;
+      const item = event.target.closest('.cliente-item');
+      if (!item) return;
+      event.preventDefault();
+      seleccionarCliente({
+        id: item.dataset.id,
+        nombre: item.dataset.nombre,
+        email: item.dataset.email,
+        telefono: item.dataset.telefono,
+      });
+      clienteBusqueda?.focus();
     });
-    ciudadSelect.dataset.listenerAdded = 'true';
   }
+
+  setupClienteSearchHandlers();
+  applyTheme(selTipo?.value || 'OT');
+  updateDocumentNumber();
+  serializeRows();
+
+  clienteBusqueda?.addEventListener('input', (event)=> window.handleClienteInput(event.target.value));
+  clienteBusqueda?.addEventListener('focus', (event)=> window.handleClienteFocus(event.target.value));
+  clienteBusqueda?.addEventListener('keydown', (event)=> window.handleClienteKeydown(event));
+  console.log('📄 Document form inicializado', EG.cfg);
 }
 
-// Mostrar input para agregar nueva ciudad
-function mostrarInputNuevaCiudad() {
-  const input = document.getElementById('nueva-ciudad-input');
-  
-  if (input) {
-    input.classList.remove('hidden');
-    input.focus();
-    
-    // Event listener para guardar la nueva ciudad
-    if (!input.dataset.listenerAdded) {
-      input.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          const nuevaCiudad = this.value.trim();
-          if (nuevaCiudad) {
-            agregarNuevaCiudad(nuevaCiudad);
-          }
-        }
-      });
-      
-      input.addEventListener('blur', function() {
-        const nuevaCiudad = this.value.trim();
-        if (nuevaCiudad) {
-          agregarNuevaCiudad(nuevaCiudad);
-        } else {
-          ocultarInputNuevaCiudad();
-        }
-      });
-      
-      input.dataset.listenerAdded = 'true';
-    }
-  }
-}
-
-function ocultarInputNuevaCiudad() {
-  const input = document.getElementById('nueva-ciudad-input');
-  if (input) {
-    input.classList.add('hidden');
-    input.value = '';
-  }
-}
-
-function agregarNuevaCiudad(nombre) {
-  const select = document.getElementById('cliente-ciudad');
-  const input = document.getElementById('nueva-ciudad-input');
-  const estadoSelect = document.getElementById('cliente-estado');
-  const estadoId = estadoSelect.value;
-  
-  // Inicializar array para este estado si no existe
-  if (!customCitiesByState[estadoId]) {
-    customCitiesByState[estadoId] = [];
-  }
-  
-  // Agregar a la lista de ciudades personalizadas
-  customCitiesByState[estadoId].push(nombre);
-  
-  // Buscar la opción "Agregar nueva..."
-  const optionNueva = Array.from(select.options).find(opt => opt.value === '__nueva_ciudad__');
-  
-  // Crear nueva opción antes de "Agregar nueva..."
-  const newOption = document.createElement('option');
-  newOption.value = nombre;
-  newOption.textContent = nombre + ' ✨';
-  newOption.style.color = '#10b981';
-  newOption.style.fontWeight = 'bold';
-  
-  if (optionNueva) {
-    select.insertBefore(newOption, optionNueva);
-  } else {
-    select.appendChild(newOption);
-  }
-  
-  // Seleccionar la nueva ciudad
-  select.value = nombre;
-  
-  // Ocultar input y limpiar
-  input.classList.add('hidden');
-  input.value = '';
-  
-  console.log(`✅ Nueva ciudad agregada: ${nombre} para estado ${estadoId}`);
-}
-
-// Listener para cargar ciudades cuando se selecciona un estado
-function setupClienteEstadoListener() {
-  const estadoSelect = document.getElementById('cliente-estado');
-  if (estadoSelect && !estadoSelect.dataset.listenerAdded) {
-    estadoSelect.addEventListener('change', function() {
-      console.log('State changed to:', this.value);
-      
-      // Verificar si se seleccionó "Agregar nuevo estado"
-      if (this.value === '__nuevo_estado__') {
-        mostrarInputNuevoEstado();
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initDocumentFormScript);
       } else {
-        ocultarInputNuevoEstado();
-        loadCiudadesUSA(this.value);
-      }
-    });
-    estadoSelect.dataset.listenerAdded = 'true';
-    console.log('✅ Estado listener registered');
-  }
+  initDocumentFormScript();
 }
-
-// Mostrar input para agregar nuevo estado
-function mostrarInputNuevoEstado() {
-  const input = document.getElementById('nuevo-estado-input');
-  const select = document.getElementById('cliente-estado');
-  
-  if (input) {
-    input.classList.remove('hidden');
-    input.focus();
-    
-    // Event listener para guardar el nuevo estado
-    if (!input.dataset.listenerAdded) {
-      input.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          const nuevoEstado = this.value.trim();
-          if (nuevoEstado) {
-            agregarNuevoEstado(nuevoEstado);
-          }
-        }
-      });
-      
-      input.addEventListener('blur', function() {
-        const nuevoEstado = this.value.trim();
-        if (nuevoEstado) {
-          agregarNuevoEstado(nuevoEstado);
-        } else {
-          ocultarInputNuevoEstado();
-        }
-      });
-      
-      input.dataset.listenerAdded = 'true';
-    }
-  }
-}
-
-function ocultarInputNuevoEstado() {
-  const input = document.getElementById('nuevo-estado-input');
-  if (input) {
-    input.classList.add('hidden');
-    input.value = '';
-  }
-}
-
-function agregarNuevoEstado(nombre) {
-  const select = document.getElementById('cliente-estado');
-  const input = document.getElementById('nuevo-estado-input');
-  
-  // Generar ID único
-  const nuevoId = 'CUSTOM_' + nombre.toUpperCase().substring(0, 2) + '_' + Date.now();
-  
-  // Agregar a la lista de estados personalizados
-  customStates.push({id: nuevoId, nombre: nombre});
-  
-  // Buscar la opción "Agregar nuevo..."
-  const optionNuevo = Array.from(select.options).find(opt => opt.value === '__nuevo_estado__');
-  
-  // Crear nueva opción antes de "Agregar nuevo..."
-  const newOption = document.createElement('option');
-  newOption.value = nuevoId;
-  newOption.textContent = nombre + ' ✨';
-  newOption.style.color = '#10b981';
-  newOption.style.fontWeight = 'bold';
-  
-  if (optionNuevo) {
-    select.insertBefore(newOption, optionNuevo);
-  } else {
-    select.appendChild(newOption);
-  }
-  
-  // Seleccionar el nuevo estado
-  select.value = nuevoId;
-  
-  // Ocultar input y limpiar
-  input.classList.add('hidden');
-  input.value = '';
-  
-  console.log(`✅ Nuevo estado agregado: ${nombre}`);
-  
-  // Limpiar dropdown de ciudades
-  const ciudadSelect = document.getElementById('cliente-ciudad');
-  if (ciudadSelect) {
-    ciudadSelect.innerHTML = '<option value="">Seleccione ciudad...</option><option value="__nueva_ciudad__" style="color: #10b981; font-weight: bold;">➕ Agregar nueva ciudad...</option>';
-  }
-}
-
-function openVehiculoModal() {
-  document.getElementById('vehiculoModal').classList.remove('hidden');
-  document.getElementById('form-crear-vehiculo').reset();
-  document.getElementById('vehiculo-error-message').classList.add('hidden');
-  document.getElementById('vehiculo-success-message').classList.add('hidden');
-  loadClientesModal();
-  loadMarcasModal();
-  populateYearsModal();
-}
-
-function closeVehiculoModal() {
-  document.getElementById('vehiculoModal').classList.add('hidden');
-}
-
-// Make functions globally available
-window.openClienteModal = openClienteModal;
-window.closeClienteModal = closeClienteModal;
-window.openVehiculoModal = openVehiculoModal;
-window.closeVehiculoModal = closeVehiculoModal;
-
-// ==================== CLIENTE MODAL FORM ====================
-document.getElementById('form-crear-cliente')?.addEventListener('submit', function(e) {
-  e.preventDefault();
-  
-  console.log('=' .repeat(60));
-  console.log('🚀 SUBMIT FORMULARIO CLIENTE');
-  
-  const formData = new FormData(this);
-  const errorDiv = document.getElementById('cliente-error-message');
-  const successDiv = document.getElementById('cliente-success-message');
-  
-  // Log de datos que se están enviando
-  console.log('📦 Datos a enviar:');
-  for (let [key, value] of formData.entries()) {
-    console.log(`   ${key}: ${value}`);
-  }
-  
-  errorDiv.classList.add('hidden');
-  successDiv.classList.add('hidden');
-  
-  // Detect country from URL
-  const country = window.location.pathname.startsWith('/cl/') ? 'cl' : 'us';
-  const url = `/${country}/api/clientes/crear/`;
-  
-  console.log(`📡 Enviando POST a: ${url}`);
-  
-  fetch(url, {
-    method: 'POST',
-    body: formData,
-    headers: {
-      'X-CSRFToken': formData.get('csrfmiddlewaretoken')
-    }
-  })
-  .then(response => {
-    console.log(`📥 Response status: ${response.status}`);
-    return response.json();
-  })
-  .then(data => {
-    console.log('📨 Respuesta completa de la API:', data);
-    
-    if (data.success) {
-      console.log('✅ SUCCESS: Cliente creado con ID:', data.cliente.id);
-      successDiv.textContent = data.message || 'Cliente creado exitosamente!';
-      successDiv.classList.remove('hidden');
-      
-      setTimeout(() => {
-        console.log('🔄 Cerrando modal y seleccionando cliente...');
-        closeClienteModal();
-        
-        // Seleccionar el cliente recién creado en el formulario principal
-        const clienteData = {
-          id: data.cliente.id,
-          nombre: `${data.cliente.nombre} ${data.cliente.apellido}`,
-          email: data.cliente.email || '',
-          telefono: data.cliente.telefono || ''
-        };
-        
-        console.log('🔄 Seleccionando cliente recién creado:', clienteData);
-        
-        // Usar la función existente de selección de cliente
-        if (typeof seleccionarCliente === 'function') {
-          seleccionarCliente(clienteData);
-          console.log('✅ Cliente seleccionado usando seleccionarCliente()');
-        } else {
-          // Fallback manual
-          const clienteBusqueda = document.getElementById('cliente-busqueda');
-          const clienteSelect = document.getElementById('id_cliente');
-          const clienteInfoBox = document.getElementById('cliente-info');
-          const cliNombre = document.getElementById('cliente-nombre');
-          const cliEmail = document.getElementById('cliente-email');
-          const cliFono = document.getElementById('cliente-telefono');
-          
-          if (clienteBusqueda) {
-            clienteBusqueda.value = clienteData.nombre;
-          }
-          
-          if (clienteSelect) {
-            clienteSelect.innerHTML = `<option value="${clienteData.id}" selected>${clienteData.nombre}</option>`;
-          }
-          
-          if (cliNombre) cliNombre.textContent = clienteData.nombre;
-          if (cliEmail) cliEmail.textContent = clienteData.email || '—';
-          if (cliFono) cliFono.textContent = clienteData.telefono || '—';
-          if (clienteInfoBox) clienteInfoBox.classList.remove('hidden');
-          
-          // Cargar vehículos del cliente
-          if (typeof cargarVehiculosPorCliente === 'function') {
-            cargarVehiculosPorCliente(clienteData.id);
-          }
-          
-          console.log('✅ Cliente seleccionado usando fallback manual');
-        }
-      }, 800);
-    } else {
-      console.error('❌ ERROR en respuesta:', data.error);
-      errorDiv.textContent = data.error || 'Error al crear cliente';
-      errorDiv.classList.remove('hidden');
-    }
-  })
-  .catch(error => {
-    console.error('❌❌ CATCH ERROR:', error);
-    errorDiv.textContent = 'Error de conexión. Por favor intente nuevamente.';
-    errorDiv.classList.remove('hidden');
-  });
-});
-
-console.log('✅ Event listener para form-crear-cliente registrado');
-
-// ==================== VEHICULO MODAL FUNCTIONS ====================
-function populateYearsModal() {
-  const currentYear = new Date().getFullYear();
-  const yearSelect = document.getElementById('vehiculo-anio');
-  if (!yearSelect) return;
-  yearSelect.innerHTML = '<option value="">Seleccione año...</option>';
-  
-  for (let year = currentYear + 1; year >= 1970; year--) {
-    const option = document.createElement('option');
-    option.value = year;
-    option.textContent = year;
-    yearSelect.appendChild(option);
-  }
-  
-  // Registrar event listeners después de cargar los años
-  setupVehiculoListeners();
-}
-
-function loadClientesModal() {
-  const country = window.location.pathname.startsWith('/cl/') ? 'cl' : 'us';
-  const url = `/${country}/api/clientes/`;
-  console.log(`📡 Cargando clientes desde: ${url}`);
-  fetch(url)
-    .then(response => response.json())
-    .then(data => {
-      const select = document.getElementById('vehiculo-cliente-select');
-      if (!select) return;
-      select.innerHTML = '<option value="">Seleccione un cliente...</option>';
-      
-      data.forEach(cliente => {
-        const option = document.createElement('option');
-        option.value = cliente.id;
-        option.textContent = `${cliente.nombre} ${cliente.apellido}`;
-        select.appendChild(option);
-      });
-    })
-    .catch(error => console.error('Error loading clients:', error));
-}
-
-function loadMarcasModal() {
-  const country = window.location.pathname.startsWith('/cl/') ? 'cl' : 'us';
-  const url = `/${country}/vehiculos/api/marcas/`;
-  console.log(`📡 Cargando marcas desde: ${url}`);
-  fetch(url)
-    .then(response => response.json())
-    .then(data => {
-      const select = document.getElementById('vehiculo-marca');
-      if (!select) return;
-      select.innerHTML = '<option value="">Seleccione marca...</option>';
-      
-      data.forEach(marca => {
-        const option = document.createElement('option');
-        option.value = marca.id;
-        option.textContent = marca.nombre;
-        select.appendChild(option);
-      });
-      
-      // Registrar event listeners después de cargar las marcas
-      setupVehiculoListeners();
-    })
-    .catch(error => console.error('Error loading brands:', error));
-}
-
-// Setup event listeners for vehiculo modal
-function setupVehiculoListeners() {
-  const marcaSelect = document.getElementById('vehiculo-marca');
-  const anioSelect = document.getElementById('vehiculo-anio');
-  
-  if (marcaSelect && !marcaSelect.dataset.listenerAdded) {
-    marcaSelect.addEventListener('change', loadModelosModal);
-    marcaSelect.dataset.listenerAdded = 'true';
-  }
-  
-  if (anioSelect && !anioSelect.dataset.listenerAdded) {
-    anioSelect.addEventListener('change', loadModelosModal);
-    anioSelect.dataset.listenerAdded = 'true';
-  }
-}
-
-function loadModelosModal() {
-  const marcaId = document.getElementById('vehiculo-marca')?.value;
-  const anio = document.getElementById('vehiculo-anio')?.value;
-  const modeloSelect = document.getElementById('vehiculo-modelo');
-  
-  console.log('loadModelosModal called:', {marcaId, anio}); // Debug
-  
-  if (!modeloSelect) {
-    console.error('Modelo select not found');
-    return;
-  }
-  
-  modeloSelect.innerHTML = '<option value="">Seleccione modelo...</option>';
-  
-  if (!marcaId || !anio) {
-    console.log('Missing marca or anio');
-    return;
-  }
-  
-  const country = window.location.pathname.startsWith('/cl/') ? 'cl' : 'us';
-  const url = `/${country}/vehiculos/ajax/modelos-por-marca-anio/?marca_id=${marcaId}&anio=${anio}`;
-  
-  console.log('📡 Cargando modelos desde:', url);
-  
-  fetch(url)
-    .then(response => {
-      console.log('Response status:', response.status); // Debug
-      return response.json();
-    })
-    .then(data => {
-      console.log('Models data received:', data); // Debug
-      
-      if (data.success && data.modelos && data.modelos.length > 0) {
-        data.modelos.forEach(modelo => {
-          const option = document.createElement('option');
-          option.value = modelo.id;
-          option.textContent = modelo.nombre;
-          modeloSelect.appendChild(option);
-        });
-        console.log(`Loaded ${data.modelos.length} models`);
-      } else {
-        console.warn('No models found or invalid response');
-        modeloSelect.innerHTML += '<option value="" disabled>No hay modelos disponibles</option>';
-      }
-    })
-    .catch(error => {
-      console.error('Error loading models:', error);
-      modeloSelect.innerHTML += '<option value="" disabled>Error al cargar modelos</option>';
-    });
-}
-
-document.getElementById('form-crear-vehiculo')?.addEventListener('submit', function(e) {
-  e.preventDefault();
-  
-  const formData = new FormData(this);
-  const errorDiv = document.getElementById('vehiculo-error-message');
-  const successDiv = document.getElementById('vehiculo-success-message');
-  
-  errorDiv.classList.add('hidden');
-  successDiv.classList.add('hidden');
-  
-  const country = window.location.pathname.startsWith('/cl/') ? 'cl' : 'us';
-  const url = `/${country}/api/vehiculos/crear/`;
-  
-  console.log(`📡 Enviando vehículo a: ${url}`);
-  
-  fetch(url, {
-    method: 'POST',
-    body: formData,
-    headers: {
-      'X-CSRFToken': formData.get('csrfmiddlewaretoken')
-    }
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.success) {
-      successDiv.textContent = data.message || 'Vehículo creado exitosamente!';
-      successDiv.classList.remove('hidden');
-      
-      setTimeout(() => {
-        closeVehiculoModal();
-        // Trigger vehicle reload for the client if selected
-        const clienteId = document.getElementById('id_cliente').value;
-        if (clienteId) {
-          EG.onClienteChange();
-        }
-      }, 1500);
-    } else {
-      errorDiv.textContent = data.error || 'Error al crear vehículo';
-      errorDiv.classList.remove('hidden');
-    }
-  })
-  .catch(error => {
-    console.error('Error:', error);
-    errorDiv.textContent = 'Error de conexión. Por favor intente nuevamente.';
-    errorDiv.classList.remove('hidden');
-  });
-});
-
-// Close modals when clicking outside
-document.getElementById('clienteModal')?.addEventListener('click', function(e) {
-  if (e.target === this) closeClienteModal();
-});
-
-document.getElementById('vehiculoModal')?.addEventListener('click', function(e) {
-  if (e.target === this) closeVehiculoModal();
-});
-
 </script>
-
-<!-- Modal para Crear Cliente -->
-<div id="clienteModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-  <div class="max-w-2xl w-full p-8 relative" style="background: linear-gradient(135deg, rgba(34, 211, 238, 0.1) 0%, rgba(96, 165, 250, 0.05) 100%); backdrop-filter: blur(25px); border-radius: 1.5rem; border: 1px solid rgba(34, 211, 238, 0.3); box-shadow: 0 8px 32px rgba(34, 211, 238, 0.15);">
-    <button onclick="closeClienteModal()" class="absolute top-4 right-4 text-cyan-400 hover:text-cyan-300 text-2xl">
-      ✕
-    </button>
-    <h3 class="text-2xl font-bold text-cyan-400 mb-6">
-      ➕ {% trans "Add New Client" %}
-    </h3>
-    
-    <style>
-    /* Estilos específicos para inputs del modal - TEXTO BLANCO SIEMPRE */
-    #clienteModal input,
-    #clienteModal select,
-    #clienteModal textarea,
-    #vehiculoModal input,
-    #vehiculoModal select,
-    #vehiculoModal textarea {
-      color: #ffffff !important;
-      -webkit-text-fill-color: #ffffff !important;
-      caret-color: #00f2fe !important;
-    }
-    
-    /* Asegurar que el autofill también sea blanco */
-    #clienteModal input:-webkit-autofill,
-    #clienteModal select:-webkit-autofill,
-    #vehiculoModal input:-webkit-autofill,
-    #vehiculoModal select:-webkit-autofill {
-      -webkit-text-fill-color: #ffffff !important;
-      -webkit-box-shadow: 0 0 0px 1000px rgba(5, 5, 20, 0.98) inset !important;
-      box-shadow: 0 0 0px 1000px rgba(5, 5, 20, 0.98) inset !important;
-      color: #ffffff !important;
-    }
-    </style>
-    
-    <form id="form-crear-cliente" class="space-y-4">
-      {% csrf_token %}
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium text-cyan-300 mb-2">{% trans "First Name" %} *</label>
-          <input type="text" name="nombre" required class="form-control w-full">
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-cyan-300 mb-2">{% trans "Last Name" %} *</label>
-          <input type="text" name="apellido" required class="form-control w-full">
-        </div>
-      </div>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium text-cyan-300 mb-2">{% trans "Email" %}</label>
-          <input type="email" name="email" class="form-control w-full">
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-cyan-300 mb-2">{% trans "Phone" %} *</label>
-          <input type="tel" name="telefono" required class="form-control w-full">
-        </div>
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium text-cyan-300 mb-2">{% trans "Address" %}</label>
-        <input type="text" name="direccion" class="form-control w-full">
-      </div>
-
-      <!-- Campos específicos de USA -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="cliente-usa-fields">
-        <div>
-          <label class="block text-sm font-medium text-cyan-300 mb-2">{% trans "State" %}</label>
-          <select name="estado_usa" id="cliente-estado" class="form-control w-full">
-            <option value="">{% trans "Select state..." %}</option>
-          </select>
-          <!-- Input para nuevo estado (oculto por defecto) -->
-          <input type="text" id="nuevo-estado-input" placeholder="Escriba nuevo estado..." 
-                 class="form-control w-full mt-2 hidden">
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-cyan-300 mb-2">{% trans "City" %}</label>
-          <select name="ciudad_usa" id="cliente-ciudad" class="form-control w-full">
-            <option value="">{% trans "Select state first..." %}</option>
-          </select>
-          <!-- Input para nueva ciudad (oculto por defecto) -->
-          <input type="text" id="nueva-ciudad-input" placeholder="Escriba nueva ciudad..." 
-                 class="form-control w-full mt-2 hidden">
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-cyan-300 mb-2">{% trans "ZIP Code" %}</label>
-          <input type="text" name="zipcode" class="form-control w-full" placeholder="12345">
-        </div>
-      </div>
-      
-      <div id="cliente-error-message" class="hidden text-red-400 text-sm p-3 bg-red-900/20 rounded-lg"></div>
-      <div id="cliente-success-message" class="hidden text-green-400 text-sm p-3 bg-green-900/20 rounded-lg"></div>
-      
-      <div class="flex gap-3 pt-4">
-        <button type="button" onclick="closeClienteModal()" class="flex-1 px-6 py-3 rounded-lg bg-gray-600 hover:bg-gray-700 text-white font-medium transition">
-          {% trans "Cancel" %}
-        </button>
-        <button type="submit" class="flex-1 px-6 py-3 rounded-lg bg-gradient-to-r from-emerald-600 to-green-600 text-white font-bold transition">
-          ✓ {% trans "Create Client" %}
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<!-- Modal para Crear Vehículo -->
-<div id="vehiculoModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-  <div class="max-w-2xl w-full p-8 relative max-h-[90vh] overflow-y-auto" style="background: linear-gradient(135deg, rgba(34, 211, 238, 0.1) 0%, rgba(96, 165, 250, 0.05) 100%); backdrop-filter: blur(25px); border-radius: 1.5rem; border: 1px solid rgba(34, 211, 238, 0.3); box-shadow: 0 8px 32px rgba(34, 211, 238, 0.15);">
-    <button onclick="closeVehiculoModal()" class="absolute top-4 right-4 text-cyan-400 hover:text-cyan-300 text-2xl">
-      ✕
-    </button>
-    <h3 class="text-2xl font-bold text-cyan-400 mb-6">
-      🚗 {% trans "Add New Vehicle" %}
-    </h3>
-    
-    <form id="form-crear-vehiculo" class="space-y-4">
-      {% csrf_token %}
-      
-      <div>
-        <label class="block text-sm font-medium text-cyan-300 mb-2">{% trans "Client" %} *</label>
-        <select name="cliente_id" id="vehiculo-cliente-select" required class="form-control w-full">
-          <option value="">{% trans "Select a client..." %}</option>
-        </select>
-      </div>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium text-cyan-300 mb-2">{% trans "Year" %} *</label>
-          <select name="anio" id="vehiculo-anio" required class="form-control w-full">
-            <option value="">{% trans "Select year..." %}</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-cyan-300 mb-2">{% trans "License Plate" %} *</label>
-          <input type="text" name="patente" required class="form-control w-full">
-        </div>
-      </div>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium text-cyan-300 mb-2">{% trans "Brand" %} *</label>
-          <select name="marca_id" id="vehiculo-marca" required class="form-control w-full">
-            <option value="">{% trans "Select brand..." %}</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-cyan-300 mb-2">{% trans "Model" %} *</label>
-          <select name="modelo_id" id="vehiculo-modelo" required class="form-control w-full">
-            <option value="">{% trans "Select model..." %}</option>
-          </select>
-        </div>
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium text-cyan-300 mb-2">VIN</label>
-        <input type="text" name="vin" class="form-control w-full">
-      </div>
-      
-      <div id="vehiculo-error-message" class="hidden text-red-400 text-sm p-3 bg-red-900/20 rounded-lg"></div>
-      <div id="vehiculo-success-message" class="hidden text-green-400 text-sm p-3 bg-green-900/20 rounded-lg"></div>
-      
-      <div class="flex gap-3 pt-4">
-        <button type="button" onclick="closeVehiculoModal()" class="flex-1 px-6 py-3 rounded-lg bg-gray-600 hover:bg-gray-700 text-white font-medium transition">
-          {% trans "Cancel" %}
-        </button>
-        <button type="submit" class="flex-1 px-6 py-3 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-bold transition">
-          ✓ {% trans "Create Vehicle" %}
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
-
-{% endblock %}
+{% endblock extra_js %}

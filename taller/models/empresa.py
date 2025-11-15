@@ -22,8 +22,12 @@ class Empresa(models.Model):
         ("enterprise", "Plan Empresarial"),
     ]
 
-    PAIS_CHOICES = [("CL", "Chile"), ("US", "United States")]
-    MONEDA_CHOICES = [("CLP", "CLP"), ("USD", "USD")]
+    PAIS_CHOICES = [
+        ("CL", "Chile"),
+        ("US", "United States"),
+        ("MX", "México"),
+    ]
+    MONEDA_CHOICES = [("CLP", "CLP"), ("USD", "USD"), ("MXN", "MXN")]
 
     TIMEZONE_CHOICES = [
         ("America/New_York", "Eastern Time (ET)"),
@@ -34,6 +38,11 @@ class Empresa(models.Model):
         ("Pacific/Honolulu", "Hawaii Time (HT)"),
         ("America/Phoenix", "Arizona Time (MST)"),
         ("America/Santiago", "Chile Time (CLT)"),
+        ("America/Mexico_City", "Central Mexico Time (CST)"),
+        ("America/Monterrey", "Norte Mexico Time"),
+        ("America/Tijuana", "Pacific Mexico Time"),
+        ("America/Cancun", "Quintana Roo Time"),
+        ("America/Mazatlan", "Pacific Mexico Time (MX)"),
     ]
 
     # Whitelists por país (evita pisar configuraciones válidas del usuario)
@@ -47,6 +56,13 @@ class Empresa(models.Model):
         "America/Phoenix",
     }
     CL_TZS = {"America/Santiago"}
+    MX_TZS = {
+        "America/Mexico_City",
+        "America/Cancun",
+        "America/Monterrey",
+        "America/Tijuana",
+        "America/Mazatlan",
+    }
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="empresa")
     nombre_taller = models.CharField(max_length=100, default="Mi Taller")
@@ -102,14 +118,22 @@ class Empresa(models.Model):
             self.moneda = "USD"
         elif self.pais == "CL" and self.moneda != "CLP":
             self.moneda = "CLP"
+        elif self.pais == "MX" and self.moneda != "MXN":
+            self.moneda = "MXN"
 
         # Normaliza zona horaria solo si es inválida para el país o está vacía
         if self.pais == "US":
             if not self.zona_horaria or self.zona_horaria not in self.US_TZS:
                 self.zona_horaria = "America/New_York"
-        else:  # CL
+        elif self.pais == "CL":
             if not self.zona_horaria or self.zona_horaria not in self.CL_TZS:
                 self.zona_horaria = "America/Santiago"
+        elif self.pais == "MX":
+            if not self.zona_horaria or self.zona_horaria not in self.MX_TZS:
+                self.zona_horaria = "America/Mexico_City"
+        else:
+            if not self.zona_horaria:
+                self.zona_horaria = "UTC"
 
         super().save(*args, **kwargs)
 
@@ -122,6 +146,10 @@ class Empresa(models.Model):
         return self.pais == "CL"
 
     @property
+    def es_mexico(self):
+        return self.pais == "MX"
+
+    @property
     def simbolo_moneda(self):
         # Para UI local: "$"; para documentos externos, usa self.moneda para prefijo
         return "$"
@@ -131,7 +159,7 @@ class Empresa(models.Model):
         return {
             "simbolo": self.simbolo_moneda,
             "codigo": self.moneda,
-            "decimales": 2 if self.es_usa else 0,
+            "decimales": 2 if self.pais in ("US", "MX") else 0,
         }
 
     @property

@@ -102,6 +102,7 @@ class ClienteCreateView(CountryLangTemplateMixin, LoginRequiredMixin, TenantView
         if empresa and hasattr(empresa, "pais"):
             pais = empresa.pais
         context["pais_usuario"] = pais
+        context["usa_estado_ciudad"] = pais in {"US", "BR", "VE", "PE", "MX"}
 
         # Agregar colores disponibles al contexto
         from taller.models.color_cliente import ColorCliente
@@ -149,6 +150,7 @@ class ClienteUpdateView(CountryLangTemplateMixin, LoginRequiredMixin, TenantView
         if empresa and hasattr(empresa, "pais"):
             pais = empresa.pais
         context["pais_usuario"] = pais
+        context["usa_estado_ciudad"] = pais in {"US", "BR", "VE", "PE", "MX"}
 
         # Agregar colores disponibles al contexto
         from taller.models.color_cliente import ColorCliente

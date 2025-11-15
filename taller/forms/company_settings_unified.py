@@ -34,6 +34,7 @@ class CompanySettingsForm(forms.ModelForm):
         choices=(
             ("CL", "Chile"),
             ("US", "USA"),
+            ("MX", "México"),
             ("BR", "Brasil"),
             ("PE", "Perú"),
             ("VE", "Venezuela"),

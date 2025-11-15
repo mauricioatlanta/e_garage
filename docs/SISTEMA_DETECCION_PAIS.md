@@ -692,3 +692,5 @@ print(f"Usuarios Chile: {chile_users.count()}")
 **Sistema:** Multi-país con detección automática ✅
 **Países soportados:** USA 🇺🇸 y Chile 🇨🇱
 
+
+

@@ -28,12 +28,33 @@ def company_branding(request):
             settings, "DEFAULT_BRAND_LOGO_URL", "/static/branding/egarage_logo.svg"
         ),
         "name": getattr(settings, "DEFAULT_BRAND_NAME", "eGarage"),
-        "tagline": getattr(settings, "DEFAULT_BRAND_TAGLINE", "Mission Control for your Workshop"),
+        "tagline": getattr(settings, "DEFAULT_BRAND_TAGLINE", "Control total para tu taller"),
         "country": getattr(settings, "DEFAULT_BRAND_COUNTRY", "cl"),
         "currency": getattr(settings, "DEFAULT_BRAND_CURRENCY", "CLP"),
     }
 
     if empresa:
+        # Usar logo directamente de la empresa si existe
+        if hasattr(empresa, "logo") and empresa.logo:
+            try:
+                brand["logo_url"] = empresa.logo.url
+            except Exception:
+                pass
+
+        # Usar nombre_taller (no "nombre")
+        brand["name"] = getattr(empresa, "nombre_taller", brand["name"]) or brand["name"]
+
+        # Si tiene tagline/lema en la empresa
+        if hasattr(empresa, "tagline") and empresa.tagline:
+            brand["tagline"] = empresa.tagline
+        elif hasattr(empresa, "lema") and empresa.lema:
+            brand["tagline"] = empresa.lema
+
+        # País y moneda de la empresa
+        brand["country"] = getattr(empresa, "pais", brand["country"]) or brand["country"]
+        brand["currency"] = getattr(empresa, "moneda", brand["currency"]) or brand["currency"]
+
+        # Verificar también en ConfiguracionEmpresa si existe
         conf = ConfiguracionEmpresa.objects.filter(empresa=empresa).first()
         if conf:
             if getattr(conf, "logo", None):
@@ -41,10 +62,6 @@ def company_branding(request):
                     brand["logo_url"] = conf.logo.url
                 except Exception:
                     pass
-            brand["name"] = getattr(empresa, "nombre", brand["name"]) or brand["name"]
-            # si guardas lema/tagline en ConfiguracionEmpresa, descomenta:
-            # brand["tagline"] = getattr(conf, "lema", brand["tagline"]) or brand["tagline"]
-            # si guardas país/moneda en settings de empresa:
             brand["country"] = getattr(conf, "pais", brand["country"]) or brand["country"]
             brand["currency"] = getattr(conf, "moneda", brand["currency"]) or brand["currency"]
 

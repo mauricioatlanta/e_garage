@@ -30,7 +30,7 @@ def company_branding(request):
             settings, "DEFAULT_BRAND_LOGO_URL", "/static/branding/egarage_logo.svg"
         ),
         "name": getattr(settings, "DEFAULT_BRAND_NAME", "eGarage"),
-        "tagline": getattr(settings, "DEFAULT_BRAND_TAGLINE", "Mission Control for your Workshop"),
+        "tagline": getattr(settings, "DEFAULT_BRAND_TAGLINE", "Control total para tu taller"),
         "country": getattr(settings, "DEFAULT_BRAND_COUNTRY", "cl"),
         "currency": getattr(settings, "DEFAULT_BRAND_CURRENCY", "CLP"),
         "primary_color": getattr(settings, "DEFAULT_BRAND_PRIMARY_COLOR", "#0d6efd"),
@@ -39,6 +39,16 @@ def company_branding(request):
 
     if empresa:
         conf = ConfiguracionEmpresa.objects.filter(empresa=empresa).first()
+
+        # Nombre y datos generales siempre deben reflejar la empresa real,
+        # aunque no exista registro en ConfiguracionEmpresa.
+        brand["name"] = getattr(empresa, "nombre_taller", brand["name"]) or brand["name"]
+
+        if hasattr(empresa, "pais") and empresa.pais:
+            brand["country"] = empresa.pais
+        if hasattr(empresa, "moneda") and empresa.moneda:
+            brand["currency"] = empresa.moneda
+
         if conf:
             # Logo
             if getattr(conf, "logo", None):
@@ -47,36 +57,30 @@ def company_branding(request):
                 except Exception:
                     pass
 
-            # Nombre de la empresa
-            brand["name"] = getattr(empresa, "nombre_taller", brand["name"]) or brand["name"]
-
-            # Tagline/lema (si existe en ConfiguracionEmpresa)
-            if hasattr(conf, "lema") and conf.lema:
+            # Tagline/lema (si existe)
+            if getattr(conf, "lema", None):
                 brand["tagline"] = conf.lema
-            elif hasattr(conf, "tagline") and conf.tagline:
+            elif getattr(conf, "tagline", None):
                 brand["tagline"] = conf.tagline
 
-            # País y moneda
-            if hasattr(conf, "pais"):
-                brand["country"] = getattr(conf, "pais", brand["country"]) or brand["country"]
-            elif hasattr(empresa, "pais"):
-                brand["country"] = getattr(empresa, "pais", brand["country"]) or brand["country"]
-
-            if hasattr(conf, "moneda"):
-                brand["currency"] = getattr(conf, "moneda", brand["currency"]) or brand["currency"]
-            elif hasattr(empresa, "moneda"):
-                brand["currency"] = (
-                    getattr(empresa, "moneda", brand["currency"]) or brand["currency"]
-                )
+            # País y moneda (sobrescriben si están configurados)
+            if getattr(conf, "pais", None):
+                brand["country"] = conf.pais
+            if getattr(conf, "moneda", None):
+                brand["currency"] = conf.moneda
 
             # Colores de marca
-            if hasattr(conf, "brand_color") and conf.brand_color:
+            if getattr(conf, "brand_color", None):
                 brand["primary_color"] = conf.brand_color
-            elif hasattr(conf, "color_primario") and conf.color_primario:
+            elif getattr(conf, "color_primario", None):
                 brand["primary_color"] = conf.color_primario
 
-            if hasattr(conf, "color_secundario") and conf.color_secundario:
+            if getattr(conf, "color_secundario", None):
                 brand["secondary_color"] = conf.color_secundario
+        else:
+            # Sin configuración explícita, intentar usar lema del modelo Empresa
+            if getattr(empresa, "lema", None):
+                brand["tagline"] = empresa.lema
 
     # Backwards compatibility: también exponer las variables individuales
     return {
