@@ -1,0 +1,87 @@
+═══════════════════════════════════════════════════════════════
+  COMANDO SOLUCIÓN DIRECTA - REEMPLAZA LÍNEAS ESPECÍFICAS
+═══════════════════════════════════════════════════════════════
+
+Este comando reemplaza directamente las líneas problemáticas
+con el código correcto:
+
+───────────────────────────────────────────────────────────────
+cd /home/atlantareciclajes/apps/egarage/current && python3 << 'PYEOF'
+import os
+
+file_path = "taller/documentos/views.py"
+
+with open(file_path, 'r', encoding='utf-8') as f:
+    lines = f.readlines()
+
+# Backup
+with open(f"{file_path}.backup_directo", 'w', encoding='utf-8') as f:
+    f.writelines(lines)
+
+# Buscar inicio (mensaje = f""")
+start_idx = None
+for i, line in enumerate(lines):
+    if 'mensaje = f"""' in line and i >= 1190:
+        start_idx = i
+        break
+
+# Buscar fin (return JsonResponse)
+end_idx = None
+for i in range(start_idx + 10, min(len(lines), start_idx + 40)):
+    if 'return JsonResponse' in lines[i]:
+        end_idx = i
+        break
+
+if start_idx is None or end_idx is None:
+    print(f"⚠️  No encontrado: start={start_idx}, end={end_idx}")
+    exit(1)
+
+# Obtener indentación
+indent = len(lines[start_idx]) - len(lines[start_idx].lstrip())
+indent_str = ' ' * indent
+
+# Código correcto
+correct_lines = [
+    indent_str + 'mensaje = f"""Hola {documento.cliente.nombre},\n',
+    indent_str + '\n',
+    indent_str + 'Adjunto encontrará el documento del taller.\n',
+    indent_str + '\n',
+    indent_str + '📄 {documento.get_tipo_display()} #{documento.numero_documento}\n',
+    indent_str + '🏢 {documento.empresa.nombre_taller}\n',
+    indent_str + '📅 Fecha: {documento.fecha_emision.strftime(\'%d/%m/%Y\')}\n',
+    indent_str + '💰 Total: ${documento.total_general():,.0f}\n',
+    indent_str + '\n',
+    indent_str + 'Para ver el documento completo, visite:\n',
+    indent_str + '{request.build_absolute_uri(f\'/cl/documentos/{documento.id}/\')}\n',
+    indent_str + '\n',
+    indent_str + '¡Gracias por confiar en nuestros servicios!"""\n',
+    indent_str + '\n',
+    indent_str + '    # Crear URL de WhatsApp\n',
+    indent_str + '    # Nota: No se pueden usar backslashes directamente en expresiones f-string\n',
+    indent_str + '    mensaje_encoded = mensaje.replace(" ", "%20").replace("\\n", "%0A")\n',
+    indent_str + '    url_whatsapp = f"https://wa.me/{telefono}?text={mensaje_encoded}"\n',
+    indent_str + '\n',
+    indent_str + '    return JsonResponse(\n',
+    indent_str + '        {\n',
+    indent_str + '            "success": True,\n',
+    indent_str + '            "url_whatsapp": url_whatsapp,\n',
+    indent_str + '            "telefono": telefono,\n',
+    indent_str + '            "mensaje": mensaje,\n',
+    indent_str + '        }\n',
+    indent_str + '    )\n',
+]
+
+# Reemplazar
+new_lines = lines[:start_idx] + correct_lines + lines[end_idx+1:]
+
+with open(file_path, 'w', encoding='utf-8') as f:
+    f.writelines(new_lines)
+
+# Verificar
+compile(''.join(new_lines), file_path, 'exec')
+print("✅ Sintaxis válida")
+
+PYEOF
+touch /var/www/www_egarage_cl_wsgi.py && echo "✅ Servidor reiniciado"
+───────────────────────────────────────────────────────────────
+
