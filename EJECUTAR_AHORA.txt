@@ -1,0 +1,46 @@
+═══════════════════════════════════════════════════════════════
+  EJECUTA ESTO AHORA EN EL SERVIDOR
+═══════════════════════════════════════════════════════════════
+
+OPCIÓN 1: Script Python (RECOMENDADO)
+───────────────────────────────────────────────────────────────
+cd /home/atlantareciclajes/apps/egarage/current && \
+python3 << 'PYEOF'
+import os
+file_path = "taller/documentos/views.py"
+if os.path.exists(file_path):
+    with open(file_path, 'r') as f:
+        content = f.read()
+    lines = content.split('\n')
+    new_lines = [l for l in lines if not (l.strip().startswith('<<<<<<<') or l.strip() == '=======' or l.strip().startswith('>>>>>>>'))]
+    with open(file_path, 'w') as f:
+        f.write('\n'.join(new_lines))
+    print("✅ Conflictos eliminados")
+    import py_compile
+    py_compile.compile(file_path, doraise=True)
+    print("✅ Sintaxis válida")
+else:
+    print("❌ Archivo no encontrado")
+PYEOF
+touch /var/www/www_egarage_cl_wsgi.py && echo "✅ Servidor reiniciado"
+───────────────────────────────────────────────────────────────
+
+OPCIÓN 2: Comando sed directo
+───────────────────────────────────────────────────────────────
+cd /home/atlantareciclajes/apps/egarage/current && \
+sed -i '/^<<<<<<</d; /^=======$/d; /^>>>>>>>/d' taller/documentos/views.py && \
+python3 -m py_compile taller/documentos/views.py && \
+touch /var/www/www_egarage_cl_wsgi.py && \
+echo "✅ Listo"
+───────────────────────────────────────────────────────────────
+
+OPCIÓN 3: Restaurar desde Git
+───────────────────────────────────────────────────────────────
+cd /home/atlantareciclajes/apps/egarage/current && \
+git fetch origin main && \
+git checkout origin/main -- taller/documentos/views.py && \
+python3 -m py_compile taller/documentos/views.py && \
+touch /var/www/www_egarage_cl_wsgi.py && \
+echo "✅ Restaurado desde Git"
+───────────────────────────────────────────────────────────────
+
