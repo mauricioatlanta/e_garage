@@ -39,7 +39,7 @@
     .border-primary{border-color:var(--company-primary)!important}
     .company-logo{max-height:80px;max-width:200px;object-fit:contain}
     .company-header{background:linear-gradient(135deg,#1f2937 0%,#374151 50%,#1f2937 100%);border-bottom:4px solid var(--company-primary);box-shadow:0 10px 30px rgba(0,0,0,.3)}
-    .company-title{color:var(--company-primary);text-shadow:0 0 20px var(--company-primary),0 0 40px var(--company-primary);filter:drop-shadow(0 4px 8px rgba(0,0,0,.3))}
+    .company-title{color:#ffffff !important;text-shadow:0 0 10px rgba(255,255,255,0.5);filter:drop-shadow(0 4px 8px rgba(0,0,0,.3))}
   </style>
 
   {# --- Font Awesome --- #}
@@ -78,11 +78,6 @@
       <img src="{{ company_logo_url }}" alt="{{ company_name }} Logo"
            class="company-logo h-20 w-auto rounded-lg shadow-lg border-2 border-opacity-30"
            style="border-color: {{ company_color|default:'#00ffff' }};">
-    {% else %}
-      <div class="company-logo h-20 w-20 rounded-lg flex items-center justify-center shadow-lg border-2 border-opacity-30"
-           style="background: linear-gradient(135deg, {{ company_color|default:'#00ffff' }}80, {{ company_color|default:'#00ffff' }}40); border-color: {{ company_color|default:'#00ffff' }};">
-        <span class="text-3xl font-bold text-white">🏢</span>
-      </div>
     {% endif %}
 
     <div class="flex flex-col">
