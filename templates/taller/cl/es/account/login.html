@@ -426,24 +426,86 @@ body {
             <div class="logo-container">
                 <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage" class="logo">
             </div>
-            <div class="welcome-text">{% trans "Welcome back to" %}</div>
-            <div class="subtitle-text font-futuristic">{% trans "Professional Automotive Management System" %}</div>
-            
-            {% if request.country == 'CL' %}
-            <div class="country-badge font-futuristic">🇨🇱 CHILE</div>
-            {% elif request.country == 'US' %}
-            <div class="country-badge font-futuristic">🇺🇸 UNITED STATES</div>
+            {% comment %}Detectar país del usuario o desde URL{% endcomment %}
+            {% if request.user.is_authenticated and request.user.empresa %}
+                {% with detected_country=request.user.empresa.pais %}
+                    {% if detected_country == 'CL' %}
+                        <div class="country-badge font-futuristic">🇨🇱 CHILE</div>
+                    {% elif detected_country == 'US' %}
+                        <div class="country-badge font-futuristic">🇺🇸 UNITED STATES</div>
+                    {% elif detected_country == 'MX' %}
+                        <div class="country-badge font-futuristic">🇲🇽 MÉXICO</div>
+                    {% elif detected_country == 'CO' %}
+                        <div class="country-badge font-futuristic">🇨🇴 COLOMBIA</div>
+                    {% elif detected_country == 'EC' %}
+                        <div class="country-badge font-futuristic">🇪🇨 ECUADOR</div>
+                    {% elif detected_country == 'PE' %}
+                        <div class="country-badge font-futuristic">🇵🇪 PERÚ</div>
+                    {% elif detected_country == 'VE' %}
+                        <div class="country-badge font-futuristic">🇻🇪 VENEZUELA</div>
+                    {% elif detected_country == 'BR' %}
+                        <div class="country-badge font-futuristic">🇧🇷 BRASIL</div>
+                    {% endif %}
+                {% endwith %}
+            {% elif request.GET.country == 'CO' %}
+                <div class="country-badge font-futuristic">🇨🇴 COLOMBIA</div>
+            {% elif request.GET.country == 'EC' %}
+                <div class="country-badge font-futuristic">🇪🇨 ECUADOR</div>
+            {% elif request.GET.country == 'MX' %}
+                <div class="country-badge font-futuristic">🇲🇽 MÉXICO</div>
+            {% elif request.GET.country == 'US' %}
+                <div class="country-badge font-futuristic">🇺🇸 UNITED STATES</div>
+            {% elif request.GET.country == 'CL' %}
+                <div class="country-badge font-futuristic">🇨🇱 CHILE</div>
+            {% elif request.GET.country == 'PE' %}
+                <div class="country-badge font-futuristic">🇵🇪 PERÚ</div>
+            {% elif request.GET.country == 'VE' %}
+                <div class="country-badge font-futuristic">🇻🇪 VENEZUELA</div>
+            {% elif request.GET.country == 'BR' %}
+                <div class="country-badge font-futuristic">🇧🇷 BRASIL</div>
+            {% elif request.country %}
+                {% if request.country == 'CL' %}
+                    <div class="country-badge font-futuristic">🇨🇱 CHILE</div>
+                {% elif request.country == 'US' %}
+                    <div class="country-badge font-futuristic">🇺🇸 UNITED STATES</div>
+                {% elif request.country == 'MX' %}
+                    <div class="country-badge font-futuristic">🇲🇽 MÉXICO</div>
+                {% elif request.country == 'CO' %}
+                    <div class="country-badge font-futuristic">🇨🇴 COLOMBIA</div>
+                {% elif request.country == 'EC' %}
+                    <div class="country-badge font-futuristic">🇪🇨 ECUADOR</div>
+                {% elif request.country == 'PE' %}
+                    <div class="country-badge font-futuristic">🇵🇪 PERÚ</div>
+                {% elif request.country == 'VE' %}
+                    <div class="country-badge font-futuristic">🇻🇪 VENEZUELA</div>
+                {% elif request.country == 'BR' %}
+                    <div class="country-badge font-futuristic">🇧🇷 BRASIL</div>
+                {% endif %}
+            {% elif request.path|slice:":4" == '/co/' %}
+                <div class="country-badge font-futuristic">🇨🇴 COLOMBIA</div>
+            {% elif request.path|slice:":4" == '/ec/' %}
+                <div class="country-badge font-futuristic">🇪🇨 ECUADOR</div>
+            {% elif request.path|slice:":4" == '/us/' %}
+                <div class="country-badge font-futuristic">🇺🇸 UNITED STATES</div>
+            {% elif request.path|slice:":4" == '/cl/' %}
+                <div class="country-badge font-futuristic">🇨🇱 CHILE</div>
+            {% elif request.path|slice:":4" == '/mx/' %}
+                <div class="country-badge font-futuristic">🇲🇽 MÉXICO</div>
+            {% elif request.path|slice:":4" == '/pe/' %}
+                <div class="country-badge font-futuristic">🇵🇪 PERÚ</div>
+            {% elif request.path|slice:":4" == '/ve/' %}
+                <div class="country-badge font-futuristic">🇻🇪 VENEZUELA</div>
+            {% elif request.path|slice:":4" == '/br/' %}
+                <div class="country-badge font-futuristic">🇧🇷 BRASIL</div>
+            {% elif request.GET.country == 'CO' %}
+                <div class="country-badge font-futuristic">🇨🇴 COLOMBIA</div>
+            {% elif request.GET.country == 'EC' %}
+                <div class="country-badge font-futuristic">🇪🇨 ECUADOR</div>
+            {% elif request.GET.country == 'US' %}
+                <div class="country-badge font-futuristic">🇺🇸 UNITED STATES</div>
+            {% elif request.GET.country == 'CL' %}
+                <div class="country-badge font-futuristic">🇨🇱 CHILE</div>
             {% endif %}
-            
-            <!-- Selector de País -->
-            <div class="mt-4 flex justify-center gap-2">
-                <a href="/accounts/login/?country=CL" class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all {% if request.country == 'CL' %}bg-cyan-500/20 border-2 border-cyan-400 text-cyan-300{% else %}bg-gray-800/50 border border-gray-600 text-gray-400 hover:border-gray-400{% endif %}">
-                    <span>🇨🇱</span> Chile
-                </a>
-                <a href="/accounts/login/?country=US" class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all {% if request.country == 'US' %}bg-blue-500/20 border-2 border-blue-400 text-blue-300{% else %}bg-gray-800/50 border border-gray-600 text-gray-400 hover:border-gray-400{% endif %}">
-                    <span>🇺🇸</span> USA
-                </a>
-            </div>
         </div>
 
         <!-- Mensajes de error generales -->
@@ -460,12 +522,14 @@ body {
         </div>
         {% endif %}
 
-        <!-- Mensajes de éxito -->
+        <!-- Mensajes de éxito (filtrados) -->
         {% if messages %}
             {% for message in messages %}
-                <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
-                    {{ message }}
-                </div>
+                {% if "Successfully signed in" not in message|stringformat:"s" and "You have signed out" not in message|stringformat:"s" and "Professional Automotive Management System" not in message|stringformat:"s" %}
+                    <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endif %}
             {% endfor %}
         {% endif %}
 

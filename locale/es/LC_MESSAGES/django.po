@@ -154,3 +154,159 @@ msgstr "Soporte bilingüe y migración rápida. Ideal para talleres que crecen."
 
 msgid "The free trial convinced us. Now everything is digital and customers notice."
 msgstr "La prueba gratis nos convenció. Hoy todo es digital y los clientes lo notan."
+
+msgid "Command Center"
+msgstr "Centro de Comando"
+
+msgid "TACTICAL INTELLIGENCE"
+msgstr "INTELIGENCIA TÁCTICA"
+
+msgid "COMMAND CENTER"
+msgstr "CENTRO DE COMANDO"
+
+msgid "REPORTS"
+msgstr "REPORTES"
+
+msgid "ADVANCED AI"
+msgstr "IA AVANZADA"
+
+msgid "BUSINESS INTEL"
+msgstr "INTELIGENCIA DE NEGOCIOS"
+
+msgid "Unified strategic analysis"
+msgstr "Análisis estratégico unificado"
+
+msgid "Predictive operational AI"
+msgstr "IA operativa predictiva"
+
+msgid "Total strategic control"
+msgstr "Control estratégico total"
+
+msgid "TECHNICAL PERSONNEL"
+msgstr "PERSONAL TÉCNICO"
+
+msgid "Individual analysis"
+msgstr "Análisis individual"
+
+msgid "DOC ENGINE"
+msgstr "MOTOR DE DOCUMENTOS"
+
+msgid "Digital Workflow"
+msgstr "Flujo de Trabajo Digital"
+
+msgid "AI document management"
+msgstr "Gestión de documentos con IA"
+
+msgid "CLIENT MATRIX"
+msgstr "MATRIZ DE CLIENTES"
+
+msgid "360° Database"
+msgstr "Base de Datos 360°"
+
+msgid "Relational ecosystem"
+msgstr "Ecosistema relacional"
+
+msgid "FLEET CMD"
+msgstr "COMANDO DE FLOTA"
+
+msgid "Vehicle Control"
+msgstr "Control de Vehículos"
+
+msgid "Smart vehicle system"
+msgstr "Sistema inteligente de vehículos"
+
+msgid "PARTS"
+msgstr "REPUESTOS"
+
+msgid "Parts Management"
+msgstr "Gestión de Repuestos"
+
+msgid "Parts inventory"
+msgstr "Inventario de repuestos"
+
+msgid "SERVICE CORE"
+msgstr "NÚCLEO DE SERVICIOS"
+
+msgid "Service Center"
+msgstr "Centro de Servicios"
+
+msgid "Service management"
+msgstr "Gestión de servicios"
+
+msgid "SYSTEM CORE"
+msgstr "NÚCLEO DEL SISTEMA"
+
+msgid "Settings Center"
+msgstr "Centro de Configuración"
+
+msgid "Advanced configuration"
+msgstr "Configuración avanzada"
+
+msgid "USA TEMPLATE - FIXED URL"
+msgstr "PLANTILLA USA - URL CORREGIDA"
+
+msgid "SMART MOSAIC - WINDOWS STYLE"
+msgstr "MOSAICO INTELIGENTE - ESTILO WINDOWS"
+
+msgid "OPERATIONAL INCOME"
+msgstr "INGRESOS OPERACIONALES"
+
+msgid "TOP SERVICES"
+msgstr "SERVICIOS PRINCIPALES"
+
+msgid "DOCS TODAY"
+msgstr "DOCUMENTOS HOY"
+
+msgid "Today's documents"
+msgstr "Documentos de hoy"
+
+msgid "CUSTOMERS"
+msgstr "CLIENTES"
+
+msgid "Current week"
+msgstr "Semana actual"
+
+msgid "TECHNICIAN PRODUCTIVITY"
+msgstr "PRODUCTIVIDAD DE TÉCNICOS"
+
+msgid "OPERATIONAL METRICS"
+msgstr "MÉTRICAS OPERACIONALES"
+
+msgid "Today's revenue"
+msgstr "Ingresos de hoy"
+
+msgid "Orders in Process"
+msgstr "Órdenes en Proceso"
+
+msgid "EFFICIENCY METRICS"
+msgstr "MÉTRICAS DE EFICIENCIA"
+
+msgid "Projected Revenue"
+msgstr "Ingresos Proyectados"
+
+msgid "SERVICES"
+msgstr "SERVICIOS"
+
+msgid "VEHICLES"
+msgstr "VEHÍCULOS"
+
+msgid "SETTINGS"
+msgstr "CONFIGURACIÓN"
+
+msgid "CENTER"
+msgstr "CENTRO"
+
+msgid "CLIENTS"
+msgstr "CLIENTES"
+
+msgid "DOCUMENTS"
+msgstr "DOCUMENTOS"
+
+msgid "LOGOUT"
+msgstr "CERRAR SESIÓN"
+
+msgid "AJUSTES"
+msgstr "CONFIGURACIÓN"
+
+msgid "SALIR"
+msgstr "CERRAR SESIÓN"

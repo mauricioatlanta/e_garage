@@ -15,6 +15,9 @@ db.sqlite3
 
 # Otros
 *.zip
+
+# Archivos .txt.py que no son Python válidos
+*.txt.py
 # Build artifacts / generados
 staticfiles/
 media/
