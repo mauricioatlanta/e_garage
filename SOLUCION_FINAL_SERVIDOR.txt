@@ -1,0 +1,31 @@
+═══════════════════════════════════════════════════════════════
+  SOLUCIÓN FINAL PARA EL SERVIDOR
+═══════════════════════════════════════════════════════════════
+
+El archivo tiene dos problemas:
+1. ✅ Marcadores de conflicto (ya eliminados)
+2. ❌ Error de f-string con backslash en línea 1229
+
+SOLUCIÓN: Restaurar el archivo completo desde Git
+───────────────────────────────────────────────────────────────
+
+Ejecuta este comando COMPLETO en el servidor:
+
+cd /home/atlantareciclajes/apps/egarage/current && \
+git fetch origin main && \
+git checkout origin/main -- taller/documentos/views.py && \
+python3 -m py_compile taller/documentos/views.py && \
+touch /var/www/www_egarage_cl_wsgi.py && \
+echo "✅ Archivo restaurado desde origin/main"
+
+───────────────────────────────────────────────────────────────
+
+Este comando:
+1. Obtiene la última versión desde Git remoto
+2. Restaura el archivo completo desde origin/main (versión correcta)
+3. Verifica la sintaxis Python
+4. Reinicia el servidor WSGI
+
+El archivo local está correcto, así que restaurar desde origin/main
+debería resolver ambos problemas (conflictos y f-string).
+
