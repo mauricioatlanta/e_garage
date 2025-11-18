@@ -145,15 +145,24 @@ MIDDLEWARE = [
 ]
 
 # Agregar AccountMiddleware de allauth si existe (requerido en algunas versiones)
+# Verificar si el módulo existe sin importarlo (para evitar AppRegistryNotReady)
 try:
-    import importlib
+    import allauth
+    import os
 
-    importlib.import_module("allauth.account.middleware")
-    MIDDLEWARE.insert(
-        MIDDLEWARE.index("django.contrib.auth.middleware.AuthenticationMiddleware") + 1,
-        "allauth.account.middleware.AccountMiddleware",
-    )
-except (ImportError, ValueError):
+    allauth_path = os.path.dirname(allauth.__file__)
+    middleware_file = os.path.join(allauth_path, "account", "middleware.py")
+    # Verificar que el archivo existe Y que tiene la clase AccountMiddleware
+    if os.path.exists(middleware_file):
+        # Leer el archivo para verificar que contiene AccountMiddleware
+        with open(middleware_file, "r", encoding="utf-8") as f:
+            content = f.read()
+            if "class AccountMiddleware" in content:
+                MIDDLEWARE.insert(
+                    MIDDLEWARE.index("django.contrib.auth.middleware.AuthenticationMiddleware") + 1,
+                    "allauth.account.middleware.AccountMiddleware",
+                )
+except (ImportError, AttributeError, ValueError, OSError, FileNotFoundError):
     pass
 
 # ---------- URLs / WSGI ----------
