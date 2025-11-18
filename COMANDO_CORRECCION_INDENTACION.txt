@@ -1,0 +1,82 @@
+═══════════════════════════════════════════════════════════════
+  COMANDO PARA CORREGIR INDENTACIÓN
+═══════════════════════════════════════════════════════════════
+
+Este comando corrige la indentación y elimina líneas duplicadas:
+
+───────────────────────────────────────────────────────────────
+cd /home/atlantareciclajes/apps/egarage/current && \
+cp taller/documentos/views.py taller/documentos/views.py.backup && \
+python3 << 'PYEOF'
+file_path = "taller/documentos/views.py"
+
+with open(file_path, 'r', encoding='utf-8') as f:
+    lines = f.readlines()
+
+# Backup
+with open(f"{file_path}.backup_indent", 'w', encoding='utf-8') as f:
+    f.writelines(lines)
+
+# Encontrar línea con "¡Gracias por confiar en nuestros servicios!"""
+insert_after = None
+for i, line in enumerate(lines):
+    if '¡Gracias por confiar en nuestros servicios!"""' in line:
+        insert_after = i
+        break
+
+if insert_after is None:
+    print("❌ No se encontró la línea de cierre del f-string")
+    exit(1)
+
+# Obtener indentación
+indent = len(lines[insert_after]) - len(lines[insert_after].lstrip())
+indent_str = ' ' * indent
+
+# Buscar y eliminar líneas problemáticas
+lines_to_remove = []
+for i in range(insert_after + 1, min(len(lines), insert_after + 20)):
+    line = lines[i]
+    if ('mensaje_encoded = mensaje.replace' in line or 
+        'url_whatsapp = f"https://wa.me/' in line or
+        'url_whatsapp = (' in line):
+        lines_to_remove.append(i)
+
+# Eliminar en orden inverso
+for i in reversed(lines_to_remove):
+    del lines[i]
+
+# Verificar si ya existe código correcto
+has_correct = False
+for i in range(insert_after + 1, min(len(lines), insert_after + 10)):
+    if 'mensaje_encoded = mensaje.replace(" ", "%20")' in lines[i]:
+        has_correct = True
+        break
+
+# Insertar código correcto si no existe
+if not has_correct:
+    correct_code = [
+        '\n',
+        indent_str + '# Crear URL de WhatsApp\n',
+        indent_str + '# Nota: No se pueden usar backslashes directamente en expresiones f-string\n',
+        indent_str + 'mensaje_encoded = mensaje.replace(" ", "%20").replace("\\n", "%0A")\n',
+        indent_str + 'url_whatsapp = f"https://wa.me/{telefono}?text={mensaje_encoded}"\n',
+        '\n',
+    ]
+    new_lines = lines[:insert_after+1] + correct_code + lines[insert_after+1:]
+else:
+    new_lines = lines
+
+# Escribir
+with open(file_path, 'w', encoding='utf-8') as f:
+    f.writelines(new_lines)
+
+# Verificar sintaxis
+compile(''.join(new_lines), file_path, 'exec')
+print("✅ Sintaxis válida")
+
+PYEOF
+python3 -m py_compile taller/documentos/views.py && \
+touch /var/www/www_egarage_cl_wsgi.py && \
+echo "✅ Servidor reiniciado"
+───────────────────────────────────────────────────────────────
+
