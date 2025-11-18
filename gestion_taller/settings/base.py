@@ -60,6 +60,9 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     # 6. Autenticación
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    # 6.5. AccountMiddleware de allauth (requerido en algunas versiones)
+    # En el servidor donde no existe, Django fallará al cargarlo y se debe eliminar manualmente
+    "allauth.account.middleware.AccountMiddleware",
     # 7. Mensajes (después de autenticación)
     "django.contrib.messages.middleware.MessageMiddleware",
     # 8. Clickjacking (después de mensajes)
@@ -73,6 +76,9 @@ MIDDLEWARE = [
     # "taller.middleware.fix_language_middleware.FixLanguageMiddleware",  # DESHABILITADO - Causa bucles infinitos
     "taller.middleware.verificar_suscripcion.VerificarSuscripcionMiddleware",
 ]
+
+# AccountMiddleware está agregado directamente arriba en MIDDLEWARE
+# Si no existe en el servidor, se debe comentar o eliminar esa línea manualmente
 
 # Configuración de URLs
 ROOT_URLCONF = "gestion_taller.urls"

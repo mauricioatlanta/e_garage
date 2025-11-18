@@ -45,6 +45,10 @@ def redirect_to_home(request):
                     return redirect("/cl/")
                 elif request.user.empresa.pais == "US":
                     return redirect("/us/")
+                elif request.user.empresa.pais == "CO":
+                    return redirect("/co/")
+                elif request.user.empresa.pais == "EC":
+                    return redirect("/ec/")
         except Exception:
             pass
 
@@ -54,6 +58,10 @@ def redirect_to_home(request):
             return redirect("/cl/")
         elif request.country == "US":
             return redirect("/us/")
+        elif request.country == "CO":
+            return redirect("/co/")
+        elif request.country == "EC":
+            return redirect("/ec/")
 
     # Fallback: redirigir a Chile por defecto (cambiar de USA a CL)
     return redirect("/cl/")
@@ -99,6 +107,10 @@ def country_aware_clientes_redirect(request):
                     return redirect("/us/clientes/")
                 elif request.user.empresa.pais == "CL":
                     return redirect("/cl/es/clientes/")
+                elif request.user.empresa.pais == "CO":
+                    return redirect("/co/es/clientes/")
+                elif request.user.empresa.pais == "EC":
+                    return redirect("/ec/es/clientes/")
         except Exception:
             pass
 
@@ -151,7 +163,7 @@ urlpatterns = [
     # Wrappers country-aware para login y signup
     path("cl/accounts/login/", redirect_qs("/accounts/login/")),
     path("us/accounts/login/", redirect_qs("/accounts/login/")),
-    path("mx/accounts/login/", redirect_qs("/accounts/login/")),
+    path("mx/accounts/login/", redirect_qs("/accounts/login/?country=MX")),
     path("cl/accounts/signup/", redirect_qs("/accounts/signup/")),
     path("us/accounts/signup/", redirect_qs("/accounts/signup/")),
     path("mx/accounts/signup/", redirect_qs("/accounts/signup/")),
@@ -159,7 +171,7 @@ urlpatterns = [
     path("cl/login/", redirect_qs("/cl/accounts/login/")),
     path("cl/es/login/", redirect_qs("/cl/accounts/login/")),
     path("us/login/", redirect_qs("/us/accounts/login/")),
-    path("mx/login/", redirect_qs("/mx/accounts/login/")),
+    path("mx/login/", redirect_qs("/accounts/login/?country=MX")),
     # Logout
     path("cl/accounts/logout/", redirect_qs("/accounts/logout/")),
     path("us/accounts/logout/", redirect_qs("/accounts/logout/")),
@@ -284,6 +296,24 @@ urlpatterns = [
     path(
         "mx/es/",
         include(("taller.urls_extra.mexico", "mexico"), namespace="mexico_es"),
+    ),
+    # 🇨🇴 Colombia - Español
+    path(
+        "co/",
+        include(("taller.urls_extra.colombia", "colombia"), namespace="colombia"),
+    ),
+    path(
+        "co/es/",
+        include(("taller.urls_extra.colombia", "colombia"), namespace="colombia_es"),
+    ),
+    # 🇪🇨 Ecuador - Español
+    path(
+        "ec/",
+        include(("taller.urls_extra.ecuador", "ecuador"), namespace="ecuador"),
+    ),
+    path(
+        "ec/es/",
+        include(("taller.urls_extra.ecuador", "ecuador"), namespace="ecuador_es"),
     ),
     # Chile - Specific routes before general redirect
     path(

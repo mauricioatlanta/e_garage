@@ -10,7 +10,7 @@ from taller.models.perfil_usuario import PerfilUsuario
 from taller.models.tecnico import Tecnico
 
 
-@login_required
+@login_required(login_url=None)  # Usa LOGIN_URL global
 def configuracion_empresa(request):
     """
     Vista principal de configuración del taller
@@ -93,7 +93,7 @@ def configuracion_empresa(request):
     return render(request, "taller/configuracion/empresa_simple.html", context)
 
 
-@login_required
+@login_required(login_url=None)  # Usa LOGIN_URL global
 def configuracion_tecnicos(request):
     """
     Vista para gestionar los técnicos del taller
@@ -211,18 +211,22 @@ def configuracion_tecnicos(request):
             # Validar campos obligatorios
             if not tecnico:
                 messages.error(request, "❌ Técnico no encontrado.")
+                return redirect("configuracion_tecnicos")
             elif not nuevo_nombre or len(nuevo_nombre) < 2:
                 messages.error(request, "❌ El nombre debe tener al menos 2 caracteres.")
+                return redirect("configuracion_tecnicos")
             elif not nuevo_telefono or len(nuevo_telefono.strip()) < 8:
                 messages.error(
                     request,
                     "❌ El teléfono es obligatorio y debe tener al menos 8 caracteres.",
                 )
+                return redirect("configuracion_tecnicos")
             elif not re.match(r"^[\d\s\-\+\(\)]+$", nuevo_telefono):
                 messages.error(
                     request,
                     "❌ Formato de teléfono inválido. Solo números, espacios, guiones, + y paréntesis.",
                 )
+                return redirect("configuracion_tecnicos")
             elif (
                 Tecnico.objects.filter(empresa=empresa, nombre__iexact=nuevo_nombre)
                 .exclude(id=tecnico_id)
@@ -232,6 +236,7 @@ def configuracion_tecnicos(request):
                     request,
                     f'❌ Ya existe otro técnico con el nombre "{nuevo_nombre}".',
                 )
+                return redirect("configuracion_tecnicos")
             else:
                 nombre_anterior = tecnico.nombre
                 tecnico.nombre = nuevo_nombre
@@ -273,12 +278,10 @@ def configuracion_tecnicos(request):
                     messages.success(request, f'🗑️ Técnico "{nombre}" eliminado completamente.')
 
         # Redirección dinámica basada en el país del usuario
-        from django.shortcuts import redirect
-
         if hasattr(request.user, "empresa") and request.user.empresa.pais == "US":
-            return redirect("/us/configuracion/tecnicos/")
+            return redirect("usa:configuracion_tecnicos")
         else:
-            return redirect("/cl/configuracion/tecnicos/")
+            return redirect("configuracion_tecnicos")
 
     # Obtener técnicos ordenados: primero los activos, luego por nombre
     tecnicos = Tecnico.objects.filter(empresa=empresa).order_by("-activo", "nombre")

@@ -466,6 +466,8 @@ body {
                             <span class="price-br" style="display:none;">R$ 100</span>
                             <span class="price-ve" style="display:none;">Bs. 730</span>
                             <span class="price-pe" style="display:none;">S/ 70</span>
+                            <span class="price-co" style="display:none;">$80.000</span>
+                            <span class="price-ec" style="display:none;">$20</span>
                         </div>
                         <div class="plan-period">
                             <span class="period-cl">/ mes</span>
@@ -473,6 +475,8 @@ body {
                             <span class="period-br" style="display:none;">/ mês</span>
                             <span class="period-ve" style="display:none;">/ mes</span>
                             <span class="period-pe" style="display:none;">/ mes</span>
+                            <span class="period-co" style="display:none;">COP / mes</span>
+                            <span class="period-ec" style="display:none;">USD / mes</span>
                         </div>
                         <ul class="plan-features">
                             <li>{% trans "Unlimited users" %}</li>
@@ -490,6 +494,8 @@ body {
                             <span class="price-br" style="display:none;">R$ 500</span>
                             <span class="price-ve" style="display:none;">Bs. 3,650</span>
                             <span class="price-pe" style="display:none;">S/ 350</span>
+                            <span class="price-co" style="display:none;">$440.000</span>
+                            <span class="price-ec" style="display:none;">$110</span>
                         </div>
                         <div class="plan-period">
                             <span class="period-cl">/ 6 meses</span>
@@ -497,6 +503,8 @@ body {
                             <span class="period-br" style="display:none;">/ 6 meses</span>
                             <span class="period-ve" style="display:none;">/ 6 meses</span>
                             <span class="period-pe" style="display:none;">/ 6 meses</span>
+                            <span class="period-co" style="display:none;">COP / 6 meses</span>
+                            <span class="period-ec" style="display:none;">USD / 6 meses</span>
                         </div>
                         <div class="plan-savings">{% trans "Save" %} 17%</div>
                         <ul class="plan-features">
@@ -515,6 +523,8 @@ body {
                             <span class="price-br" style="display:none;">R$ 1.000</span>
                             <span class="price-ve" style="display:none;">Bs. 7,300</span>
                             <span class="price-pe" style="display:none;">S/ 700</span>
+                            <span class="price-co" style="display:none;">$800.000</span>
+                            <span class="price-ec" style="display:none;">$200</span>
                         </div>
                         <div class="plan-period">
                             <span class="period-cl">/ año</span>
@@ -522,6 +532,8 @@ body {
                             <span class="period-br" style="display:none;">/ ano</span>
                             <span class="period-ve" style="display:none;">/ año</span>
                             <span class="period-pe" style="display:none;">/ año</span>
+                            <span class="period-co" style="display:none;">COP / año</span>
+                            <span class="period-ec" style="display:none;">USD / año</span>
                         </div>
                         <div class="plan-savings">{% trans "Save" %} 33%</div>
                         <ul class="plan-features">
@@ -610,31 +622,46 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Actualizar precios según país
 function updatePlanPrices(country) {
-    const showCL = country === 'CL';
-    const showUS = country === 'US';
-    const showBR = country === 'BR';
-    const showVE = country === 'VE';
-
-    document.querySelectorAll('.price-cl, .period-cl').forEach(el => {
-        el.style.display = showCL ? 'inline' : 'none';
+    // Ocultar todos los precios primero
+    document.querySelectorAll('.price-cl, .period-cl, .price-us, .period-us, .price-br, .period-br, .price-ve, .period-ve, .price-pe, .period-pe, .price-co, .period-co, .price-ec, .period-ec').forEach(el => {
+        el.style.display = 'none';
     });
 
-    document.querySelectorAll('.price-us, .period-us').forEach(el => {
-        el.style.display = showUS ? 'inline' : 'none';
-    });
-
-    document.querySelectorAll('.price-br, .period-br').forEach(el => {
-        el.style.display = showBR ? 'inline' : 'none';
-    });
-
-    document.querySelectorAll('.price-ve, .period-ve').forEach(el => {
-        el.style.display = showVE ? 'inline' : 'none';
-    });
-
-    const showPE = country === 'PE';
-    document.querySelectorAll('.price-pe, .period-pe').forEach(el => {
-        el.style.display = showPE ? 'inline' : 'none';
-    });
+    // Mostrar precios según el país seleccionado
+    if (country === 'CL') {
+        document.querySelectorAll('.price-cl, .period-cl').forEach(el => {
+            el.style.display = 'inline';
+        });
+    } else if (country === 'US') {
+        document.querySelectorAll('.price-us, .period-us').forEach(el => {
+            el.style.display = 'inline';
+        });
+    } else if (country === 'BR') {
+        document.querySelectorAll('.price-br, .period-br').forEach(el => {
+            el.style.display = 'inline';
+        });
+    } else if (country === 'VE') {
+        document.querySelectorAll('.price-ve, .period-ve').forEach(el => {
+            el.style.display = 'inline';
+        });
+    } else if (country === 'PE') {
+        document.querySelectorAll('.price-pe, .period-pe').forEach(el => {
+            el.style.display = 'inline';
+        });
+    } else if (country === 'CO') {
+        document.querySelectorAll('.price-co, .period-co').forEach(el => {
+            el.style.display = 'inline';
+        });
+    } else if (country === 'EC') {
+        document.querySelectorAll('.price-ec, .period-ec').forEach(el => {
+            el.style.display = 'inline';
+        });
+    } else if (country === 'MX') {
+        // México usa USD por ahora
+        document.querySelectorAll('.price-us, .period-us').forEach(el => {
+            el.style.display = 'inline';
+        });
+    }
 }
 
 // Seleccionar plan
@@ -672,7 +699,12 @@ window.addEventListener('load', function() {
     
     // Detectar país desde la URL
     const path = window.location.pathname;
-    if (path.includes('/ve/')) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const countryParam = urlParams.get('country');
+    
+    if (countryParam) {
+        updatePlanPrices(countryParam.toUpperCase());
+    } else if (path.includes('/ve/')) {
         updatePlanPrices('VE');
     } else if (path.includes('/br/')) {
         updatePlanPrices('BR');
@@ -682,6 +714,12 @@ window.addEventListener('load', function() {
         updatePlanPrices('US');
     } else if (path.includes('/cl/')) {
         updatePlanPrices('CL');
+    } else if (path.includes('/co/')) {
+        updatePlanPrices('CO');
+    } else if (path.includes('/ec/')) {
+        updatePlanPrices('EC');
+    } else if (path.includes('/mx/')) {
+        updatePlanPrices('MX');
     }
 });
 </script>

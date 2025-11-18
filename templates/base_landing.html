@@ -57,12 +57,49 @@
             <h1 class="text-2xl font-bold text-blue-300 tracking-widest">E-Garage</h1>
         </div>
         <div class="flex items-center gap-4">
-            <a href="/accounts/login/" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-2 rounded-xl transition shadow">
-                Iniciar Sesión
-            </a>
-            <a href="/registro/" class="bg-green-600 hover:bg-green-500 text-white font-bold px-6 py-2 rounded-xl transition shadow">
-                Registrarse
-            </a>
+            {% if request.path|slice:":4" == '/mx/' %}
+                <a href="/mx/login/" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-2 rounded-xl transition shadow">
+                    Iniciar Sesión
+                </a>
+                <a href="/mx/signup/" class="bg-green-600 hover:bg-green-500 text-white font-bold px-6 py-2 rounded-xl transition shadow">
+                    Registrarse
+                </a>
+            {% elif request.path|slice:":4" == '/co/' %}
+                <a href="/accounts/login/?country=CO" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-2 rounded-xl transition shadow">
+                    Iniciar Sesión
+                </a>
+                <a href="/accounts/signup/?country=CO" class="bg-green-600 hover:bg-green-500 text-white font-bold px-6 py-2 rounded-xl transition shadow">
+                    Registrarse
+                </a>
+            {% elif request.path|slice:":4" == '/ec/' %}
+                <a href="/accounts/login/?country=EC" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-2 rounded-xl transition shadow">
+                    Iniciar Sesión
+                </a>
+                <a href="/accounts/signup/?country=EC" class="bg-green-600 hover:bg-green-500 text-white font-bold px-6 py-2 rounded-xl transition shadow">
+                    Registrarse
+                </a>
+            {% elif request.path|slice:":4" == '/us/' %}
+                <a href="/accounts/login/?country=US" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-2 rounded-xl transition shadow">
+                    Iniciar Sesión
+                </a>
+                <a href="/accounts/signup/?country=US" class="bg-green-600 hover:bg-green-500 text-white font-bold px-6 py-2 rounded-xl transition shadow">
+                    Registrarse
+                </a>
+            {% elif request.path|slice:":4" == '/cl/' %}
+                <a href="/accounts/login/?country=CL" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-2 rounded-xl transition shadow">
+                    Iniciar Sesión
+                </a>
+                <a href="/accounts/signup/?country=CL" class="bg-green-600 hover:bg-green-500 text-white font-bold px-6 py-2 rounded-xl transition shadow">
+                    Registrarse
+                </a>
+            {% else %}
+                <a href="/accounts/login/" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-2 rounded-xl transition shadow">
+                    Iniciar Sesión
+                </a>
+                <a href="/registro/" class="bg-green-600 hover:bg-green-500 text-white font-bold px-6 py-2 rounded-xl transition shadow">
+                    Registrarse
+                </a>
+            {% endif %}
         </div>
     </header>
 

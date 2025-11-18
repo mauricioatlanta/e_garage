@@ -75,9 +75,14 @@ class SignupCompleteForm(forms.Form):
     pais = forms.ChoiceField(
         choices=[
             ("", "--- Selecciona tu país ---"),
+            ("BR", "🇧🇷 Brasil"),
             ("CL", "🇨🇱 Chile"),
-            ("US", "🇺🇸 United States"),
+            ("CO", "🇨🇴 Colombia"),
+            ("EC", "🇪🇨 Ecuador"),
             ("MX", "🇲🇽 México"),
+            ("PE", "🇵🇪 Perú"),
+            ("US", "🇺🇸 United States"),
+            ("VE", "🇻🇪 Venezuela"),
         ],
         label="País",
         required=True,
@@ -180,6 +185,24 @@ class SignupCompleteForm(forms.Form):
                 cleaned = cleaned[2:]
             if len(cleaned) != 10:
                 raise ValidationError("Teléfono México debe tener 10 dígitos (ej: 55 1234 5678)")
+        elif pais == "CO":
+            # Colombia: debe tener 10 dígitos (celular) o 7 dígitos (fijo)
+            cleaned = "".join(filter(str.isdigit, telefono))
+            if cleaned.startswith("57") and len(cleaned) == 12:
+                cleaned = cleaned[2:]  # Quitar código de país
+            if len(cleaned) != 10 and len(cleaned) != 7:
+                raise ValidationError(
+                    "Teléfono colombiano debe tener 10 dígitos (celular) o 7 dígitos (fijo)"
+                )
+        elif pais == "EC":
+            # Ecuador: debe tener 9 dígitos (celular) o 7 dígitos (fijo)
+            cleaned = "".join(filter(str.isdigit, telefono))
+            if cleaned.startswith("593") and (len(cleaned) == 12 or len(cleaned) == 10):
+                cleaned = cleaned[3:]  # Quitar código de país
+            if len(cleaned) != 9 and len(cleaned) != 7:
+                raise ValidationError(
+                    "Teléfono ecuatoriano debe tener 9 dígitos (celular) o 7 dígitos (fijo)"
+                )
 
         return telefono
 

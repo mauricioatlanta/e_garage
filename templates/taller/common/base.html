@@ -46,58 +46,195 @@
       margin-top: 2px;
       letter-spacing: 1px;
     }
-    .nav-btn-neon {
+    /* Estilo cinematográfico futurista para botones de navegación */
+    .nav-button-standard {
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      padding: 0.6rem 1.2rem;
-      background: rgba(0, 0, 0, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.8);
+      padding: 0.65rem 1.3rem;
+      background: linear-gradient(135deg, rgba(5, 15, 30, 0.95) 0%, rgba(10, 20, 35, 0.95) 100%);
+      border: 1px solid rgba(0, 212, 255, 0.3);
       border-radius: 8px;
       text-decoration: none;
-      color: #ffffff;
-      font-weight: 700;
-      font-size: 0.85rem;
-      letter-spacing: 1px;
+      color: #b0e0ff;
+      font-weight: 600;
+      font-size: 0.875rem;
+      letter-spacing: 0.05em;
       text-transform: uppercase;
-      transition: all 0.3s ease;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
-      overflow: hidden;
+      overflow: visible;
       white-space: nowrap;
-      box-shadow:
-          0 0 10px rgba(255, 255, 255, 0.3),
-          0 0 20px rgba(255, 255, 255, 0.1),
-          inset 0 0 5px rgba(255, 255, 255, 0.1);
-      animation: neon-glow 2s infinite alternate;
+      isolation: isolate;
     }
-    .nav-btn-neon:hover {
-      transform: translateY(-2px);
-      border-color: #ffffff;
-      color: #ffffff;
-      background: rgba(255, 255, 255, 0.1);
-      box-shadow:
-          0 0 15px rgba(255, 255, 255, 0.6),
-          0 0 30px rgba(255, 255, 255, 0.4),
-          0 0 45px rgba(255, 255, 255, 0.2),
-          inset 0 0 10px rgba(255, 255, 255, 0.2);
+
+    /* Borde eléctrico azul calipso que se mueve alrededor */
+    .nav-button-standard::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, 
+        transparent 30%, 
+        rgba(0, 212, 255, 0.8) 50%, 
+        transparent 70%);
+      border-radius: 10px;
+      z-index: -1;
+      opacity: 0.6;
+      animation: electric-border 3s linear infinite;
+      background-size: 200% 200%;
     }
-    @keyframes neon-glow {
+
+    /* Efecto de brillo que se desplaza sobre el botón */
+    .nav-button-standard::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(0, 212, 255, 0.15) 30%,
+        rgba(0, 255, 255, 0.25) 50%,
+        rgba(0, 212, 255, 0.15) 70%,
+        transparent 100%);
+      border-radius: 8px;
+      animation: shine-sweep 4s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes electric-border {
       0% {
-        box-shadow:
-            0 0 10px rgba(255, 255, 255, 0.3),
-            0 0 20px rgba(255, 255, 255, 0.1),
-            inset 0 0 5px rgba(255, 255, 255, 0.1);
+        background-position: 0% 0%;
+        opacity: 0.6;
+      }
+      25% {
+        background-position: 100% 0%;
+        opacity: 0.8;
+      }
+      50% {
+        background-position: 100% 100%;
+        opacity: 0.6;
+      }
+      75% {
+        background-position: 0% 100%;
+        opacity: 0.8;
       }
       100% {
-        box-shadow:
-            0 0 15px rgba(255, 255, 255, 0.5),
-            0 0 30px rgba(255, 255, 255, 0.3),
-            inset 0 0 8px rgba(255, 255, 255, 0.15);
+        background-position: 0% 0%;
+        opacity: 0.6;
       }
     }
-    .nav-btn-neon .nav-icon-sm {
+
+    @keyframes shine-sweep {
+      0% {
+        left: -100%;
+        opacity: 0;
+      }
+      50% {
+        opacity: 1;
+      }
+      100% {
+        left: 100%;
+        opacity: 0;
+      }
+    }
+
+    .nav-button-standard:hover {
+      transform: translateY(-2px);
+      border-color: rgba(0, 212, 255, 0.8);
+      color: #ffffff;
+      background: linear-gradient(135deg, rgba(10, 25, 45, 0.98) 0%, rgba(15, 35, 55, 0.98) 100%);
+      box-shadow:
+        0 0 20px rgba(0, 212, 255, 0.4),
+        0 0 40px rgba(0, 212, 255, 0.3),
+        0 0 60px rgba(0, 212, 255, 0.2),
+        inset 0 1px 0 rgba(0, 255, 255, 0.3);
+    }
+
+    .nav-button-standard:hover::before {
+      opacity: 1;
+      animation-duration: 1.5s;
+    }
+
+    .nav-button-standard:hover::after {
+      animation-duration: 2s;
+    }
+
+    .nav-button-standard:active {
+      transform: translateY(0);
+    }
+
+    .nav-button-standard .nav-icon {
       font-size: 1rem;
-      filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.5));
+      filter: drop-shadow(0 0 3px rgba(0, 212, 255, 0.6));
+      transition: filter 0.3s ease;
+      position: relative;
+      z-index: 1;
+    }
+
+    .nav-button-standard:hover .nav-icon {
+      filter: drop-shadow(0 0 6px rgba(0, 255, 255, 1));
+    }
+
+    .nav-button-standard span:last-child {
+      position: relative;
+      z-index: 1;
+      text-shadow: 0 0 8px rgba(0, 212, 255, 0.5);
+    }
+
+    .nav-button-standard:hover span:last-child {
+      text-shadow: 0 0 12px rgba(0, 255, 255, 0.8);
+    }
+
+    /* Estilo para botón de salir (rojo eléctrico) */
+    .nav-button-standard.logout-btn {
+      border-color: rgba(239, 68, 68, 0.3);
+      color: #ffb3b3;
+    }
+
+    .nav-button-standard.logout-btn::before {
+      background: linear-gradient(45deg, 
+        transparent 30%, 
+        rgba(239, 68, 68, 0.8) 50%, 
+        transparent 70%);
+    }
+
+    .nav-button-standard.logout-btn::after {
+      background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(239, 68, 68, 0.15) 30%,
+        rgba(255, 100, 100, 0.25) 50%,
+        rgba(239, 68, 68, 0.15) 70%,
+        transparent 100%);
+    }
+
+    .nav-button-standard.logout-btn:hover {
+      border-color: rgba(239, 68, 68, 0.8);
+      box-shadow:
+        0 0 20px rgba(239, 68, 68, 0.4),
+        0 0 40px rgba(239, 68, 68, 0.3),
+        0 0 60px rgba(239, 68, 68, 0.2),
+        inset 0 1px 0 rgba(255, 150, 150, 0.3);
+    }
+
+    .nav-button-standard.logout-btn .nav-icon {
+      filter: drop-shadow(0 0 3px rgba(239, 68, 68, 0.6));
+    }
+
+    .nav-button-standard.logout-btn:hover .nav-icon {
+      filter: drop-shadow(0 0 6px rgba(255, 100, 100, 1));
+    }
+
+    .nav-button-standard.logout-btn span:last-child {
+      text-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+    }
+
+    .nav-button-standard.logout-btn:hover span:last-child {
+      text-shadow: 0 0 12px rgba(255, 100, 100, 0.8);
     }
     .main-navigation {
       display: flex;
@@ -114,33 +251,80 @@
 </head>
 <body class="bg-dark text-light">
   <header class="company-header py-4 mb-3">
-    <div class="container d-flex align-items-center gap-4">
-      {% if company_logo_url %}
-        <img src="{{ company_logo_url }}" alt="Logo" class="company-logo">
-      {% endif %}
-      <div>
-        <div class="company-title">{{ company_name|default:"eGarage" }}</div>
-        {% if company_tagline %}
-          <div class="company-tagline">{{ company_tagline }}</div>
+    <div class="container d-flex align-items-center justify-content-between gap-4">
+      <div class="d-flex align-items-center gap-4">
+        {% if company_logo_url %}
+          <img src="{{ company_logo_url }}" alt="Logo" class="company-logo">
         {% endif %}
+        <div>
+          <div class="company-title">{{ company_name|default:"eGarage" }}</div>
+          {% if company_tagline %}
+            <div class="company-tagline">{{ company_tagline }}</div>
+          {% endif %}
+        </div>
+      </div>
+      <div class="d-flex align-items-center">
+        {% include 'taller/includes/lang_switcher_cinematic.html' %}
       </div>
     </div>
   </header>
   <nav class="main-navigation">
-    <a href="{% country_url 'clientes:lista_clientes' %}" class="nav-btn-neon"><span class="nav-icon-sm">👥</span> <span>{% trans "Clientes" %}</span></a>
-    <a href="{% country_url 'vehiculos:lista_vehiculos' %}" class="nav-btn-neon"><span class="nav-icon-sm">🚗</span> <span>{% trans "Vehículos" %}</span></a>
-    <a href="{% country_url 'servicios:servicios_menu' %}" class="nav-btn-neon"><span class="nav-icon-sm">🛠️</span> <span>{% trans "Servicios" %}</span></a>
-    <a href="{% country_url 'repuestos:lista_repuestos' %}" class="nav-btn-neon"><span class="nav-icon-sm">🔧</span> <span>{% trans "Repuestos" %}</span></a>
-    <a href="{% country_url 'documentos:lista_documentos' %}" class="nav-btn-neon"><span class="nav-icon-sm">📄</span> <span>{% trans "Documentos" %}</span></a>
-    <a href="{% country_url 'centro_operaciones' %}" class="nav-btn-neon"><span class="nav-icon-sm">🚀</span> <span>{% trans "Centro" %}</span></a>
-    <a href="{% country_url 'reportes:reportes_dashboard' %}" class="nav-btn-neon"><span class="nav-icon-sm">📊</span> <span>{% trans "Reportes" %}</span></a>
-    <a href="{% country_url 'company_settings' %}" class="nav-btn-neon"><span class="nav-icon-sm">⚙️</span> <span>{% trans "Config" %}</span></a>
+    <!-- Botones de navegación principal - ORDEN ALFABÉTICO -->
+    {% country_url 'company_settings' as ajustes_url %}
+    {% if ajustes_url %}
+    <a href="{{ ajustes_url }}" class="nav-button-standard">
+      <span class="nav-icon">⚙️</span>
+      <span>{% trans "Ajustes" %}</span>
+    </a>
+    {% endif %}
+
+    <a href="{% country_url 'centro_operaciones' %}" class="nav-button-standard">
+      <span class="nav-icon">🚀</span>
+      <span>{% trans "Centro" %}</span>
+    </a>
+
+    <a href="{% country_url 'clientes:lista_clientes' %}" class="nav-button-standard">
+      <span class="nav-icon">👥</span>
+      <span>{% trans "Clientes" %}</span>
+    </a>
+
+    <a href="{% country_url 'documentos:lista_documentos' %}" class="nav-button-standard">
+      <span class="nav-icon">📄</span>
+      <span>{% trans "Documentos" %}</span>
+    </a>
+
+    <a href="{% if request.path|slice:':3' == '/cl' %}/cl/es/servicios/otros-servicios/{% elif request.path|slice:':3' == '/us' %}/us/en/servicios/otros-servicios/{% else %}/cl/es/servicios/otros-servicios/{% endif %}" class="nav-button-standard">
+      <span class="nav-icon">⭐</span>
+      <span>{% trans "Extra" %}</span>
+    </a>
+
+    <a href="{% country_url 'repuestos:lista_repuestos' %}" class="nav-button-standard">
+      <span class="nav-icon">🔧</span>
+      <span>{% trans "Repuestos" %}</span>
+    </a>
+
+    <a href="{% country_url 'reportes:reportes_dashboard' %}" class="nav-button-standard">
+      <span class="nav-icon">📊</span>
+      <span>{% trans "Reportes" %}</span>
+    </a>
+
     <form action="{% url 'account_logout' %}" method="post" style="display: inline;">
       {% csrf_token %}
-      <button type="submit" class="nav-btn-neon" style="cursor: pointer; background: rgba(0, 0, 0, 0.6);">
-        <span class="nav-icon-sm">🚪</span> <span>{% trans "Salir" %}</span>
+      <button type="submit" class="nav-button-standard logout-btn" style="cursor: pointer;">
+        <span class="nav-icon">🚪</span>
+        <span>{% trans "Salir" %}</span>
       </button>
     </form>
+
+    <a href="{% country_url 'servicios:servicios_menu' %}" class="nav-button-standard">
+      <span class="nav-icon">🛠️</span>
+      <span>{% trans "Servicios" %}</span>
+    </a>
+
+    <a href="{% country_url 'vehiculos:lista_vehiculos' %}" class="nav-button-standard">
+      <span class="nav-icon">🚗</span>
+      <span>{% trans "Vehículos" %}</span>
+    </a>
   </nav>
   <main class="container mb-5">
     {% block content %}{% endblock %}

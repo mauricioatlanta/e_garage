@@ -4,12 +4,16 @@ ALLOWED_BY_COUNTRY = {
     "US": ("en", "es"),  # USA puede en/es
     "CL": ("es",),  # Chile solo es
     "MX": ("es",),  # México español
+    "CO": ("es",),  # Colombia español
+    "EC": ("es",),  # Ecuador español
 }
 
 DEFAULT_BY_COUNTRY = {
     "US": "en",
     "CL": "es",
     "MX": "es",
+    "CO": "es",
+    "EC": "es",
 }
 
 # Django i18n usa esta clave por defecto
@@ -47,19 +51,33 @@ class LanguagePolicyMiddleware:
                     pais = "CL"
                 elif request.path.startswith("/mx/"):
                     pais = "MX"
+                elif request.path.startswith("/co/"):
+                    pais = "CO"
+                elif request.path.startswith("/ec/"):
+                    pais = "EC"
 
             # SOLUCIÓN SIMPLE: Solo para USA, respetar preferencia de sesión
             if pais == "US":
+                # Leer idioma de la sesión (LocaleMiddleware ya lo estableció)
                 session_lang = request.session.get(DJANGO_LANGUAGE_SESSION_KEY)
-                print(f"[DEBUG] USA - Idioma en sesión: {session_lang}")
 
                 # Si hay idioma en sesión y es válido para USA, usarlo
                 if session_lang in ["en", "es"]:
                     lang = session_lang
                     print(f"[DEBUG] USA - Usando idioma de sesión: {lang}")
                 else:
-                    lang = "en"  # Default para USA
-                    print(f"[DEBUG] USA - Sin preferencia, usando default: {lang}")
+                    # Verificar si hay idioma en cookie (LocaleMiddleware lo puede leer)
+                    cookie_lang = request.COOKIES.get("django_language")
+                    if cookie_lang in ["en", "es"]:
+                        lang = cookie_lang
+                        # Guardar en sesión para consistencia
+                        request.session[DJANGO_LANGUAGE_SESSION_KEY] = lang
+                        print(
+                            f"[DEBUG] USA - Usando idioma de cookie y guardando en sesión: {lang}"
+                        )
+                    else:
+                        lang = "en"  # Default para USA
+                        print(f"[DEBUG] USA - Sin preferencia, usando default: {lang}")
             else:
                 # Para otros países, usar default
                 lang = DEFAULT_BY_COUNTRY.get(pais, "es")

@@ -26,20 +26,43 @@ class CountryAwareLoginView(LoginView):
         next_url = request.GET.get("next", "") or ""
         country_param = (request.GET.get("country", "") or "").upper()
 
+        # Detectar desde next URL
         if next_url.startswith("/us/"):
             return "US"
         if next_url.startswith("/cl/"):
             return "CL"
         if next_url.startswith("/mx/"):
             return "MX"
+        if next_url.startswith("/co/"):
+            return "CO"
+        if next_url.startswith("/ec/"):
+            return "EC"
+        if next_url.startswith("/pe/"):
+            return "PE"
+        if next_url.startswith("/ve/"):
+            return "VE"
+        if next_url.startswith("/br/"):
+            return "BR"
 
+        # Detectar desde parámetro country (prioridad alta)
         if country_param in ["US", "USA"]:
             return "US"
         if country_param in ["CL", "CHILE"]:
             return "CL"
         if country_param in ["MX", "MEXICO"]:
             return "MX"
+        if country_param in ["CO", "COLOMBIA"]:
+            return "CO"
+        if country_param in ["EC", "ECUADOR"]:
+            return "EC"
+        if country_param in ["PE", "PERU", "PERÚ"]:
+            return "PE"
+        if country_param in ["VE", "VENEZUELA"]:
+            return "VE"
+        if country_param in ["BR", "BRASIL", "BRAZIL"]:
+            return "BR"
 
+        # Detectar desde sesión guardada
         saved = (request.session.get("preferred_country") or "").upper()
         if saved in ["US", "USA"]:
             return "US"
@@ -47,7 +70,18 @@ class CountryAwareLoginView(LoginView):
             return "CL"
         if saved in ["MX", "MEXICO"]:
             return "MX"
+        if saved in ["CO", "COLOMBIA"]:
+            return "CO"
+        if saved in ["EC", "ECUADOR"]:
+            return "EC"
+        if saved in ["PE", "PERU", "PERÚ"]:
+            return "PE"
+        if saved in ["VE", "VENEZUELA"]:
+            return "VE"
+        if saved in ["BR", "BRASIL", "BRAZIL"]:
+            return "BR"
 
+        # Detectar desde referer
         referer = request.headers.get("referer", "")
         if "/us/" in referer or "/usa/" in referer:
             return "US"
@@ -55,7 +89,18 @@ class CountryAwareLoginView(LoginView):
             return "CL"
         if "/mx/" in referer or "/mexico/" in referer:
             return "MX"
+        if "/co/" in referer or "/colombia/" in referer:
+            return "CO"
+        if "/ec/" in referer or "/ecuador/" in referer:
+            return "EC"
+        if "/pe/" in referer or "/peru/" in referer or "/perú/" in referer:
+            return "PE"
+        if "/ve/" in referer or "/venezuela/" in referer:
+            return "VE"
+        if "/br/" in referer or "/brasil/" in referer or "/brazil/" in referer:
+            return "BR"
 
+        # Detectar desde usuario autenticado
         if request.user.is_authenticated:
             empresa_country = getattr(getattr(request.user, "empresa", None), "pais", None)
             if empresa_country:
@@ -64,6 +109,7 @@ class CountryAwareLoginView(LoginView):
             if perfil_country:
                 return perfil_country.upper()
 
+        # Detectar desde path
         path = (request.path or "").lower()
         if path.startswith("/us/") or path == "/us":
             return "US"
@@ -71,6 +117,16 @@ class CountryAwareLoginView(LoginView):
             return "MX"
         if path.startswith("/cl/") or path == "/cl":
             return "CL"
+        if path.startswith("/co/") or path == "/co":
+            return "CO"
+        if path.startswith("/ec/") or path == "/ec":
+            return "EC"
+        if path.startswith("/pe/") or path == "/pe":
+            return "PE"
+        if path.startswith("/ve/") or path == "/ve":
+            return "VE"
+        if path.startswith("/br/") or path == "/br":
+            return "BR"
 
         return "CL"
 

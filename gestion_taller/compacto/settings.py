@@ -144,6 +144,27 @@ MIDDLEWARE = [
     # "taller.middleware.trial_middleware.TrialAccessMiddleware",
 ]
 
+# Agregar AccountMiddleware de allauth si existe y es requerido
+try:
+    import os
+    import sys
+
+    for path in sys.path:
+        allauth_middleware_path = os.path.join(path, "allauth", "account", "middleware.py")
+        if os.path.exists(allauth_middleware_path):
+            with open(allauth_middleware_path, "r", encoding="utf-8") as f:
+                content = f.read()
+                if "class AccountMiddleware" in content:
+                    auth_index = MIDDLEWARE.index(
+                        "django.contrib.auth.middleware.AuthenticationMiddleware"
+                    )
+                    MIDDLEWARE.insert(
+                        auth_index + 1, "allauth.account.middleware.AccountMiddleware"
+                    )
+                    break
+except Exception:
+    pass
+
 # ---------- URLs / WSGI ----------
 ROOT_URLCONF = "gestion_taller.urls"
 WSGI_APPLICATION = "gestion_taller.wsgi.application"

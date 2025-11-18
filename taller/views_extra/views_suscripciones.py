@@ -112,6 +112,10 @@ def precios(request):
         pais_usuario = "PE"
     elif request.path.startswith("/mx/"):
         pais_usuario = "MX"
+    elif request.path.startswith("/co/"):
+        pais_usuario = "CO"
+    elif request.path.startswith("/ec/"):
+        pais_usuario = "EC"
     # Override si el usuario está autenticado
     elif request.user.is_authenticated and hasattr(request.user, "empresa"):
         pais_usuario = request.user.empresa.pais

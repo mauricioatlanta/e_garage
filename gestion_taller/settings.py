@@ -132,6 +132,9 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    # AccountMiddleware de allauth (requerido en algunas versiones)
+    # En el servidor donde no existe, Django fallará al cargarlo y se debe eliminar manualmente
+    "allauth.account.middleware.AccountMiddleware",
     # País/empresa (provee request.empresa / request.empresa.pais)
     "taller.middleware.empresa_middleware.EmpresaMiddleware",
     "taller.middleware.simple_country_redirect.SimpleCountryRedirectMiddleware",
@@ -143,6 +146,9 @@ MIDDLEWARE = [
     "taller.middleware.verificar_suscripcion.VerificarSuscripcionMiddleware",
     # "taller.middleware.trial_middleware.TrialAccessMiddleware",
 ]
+
+# AccountMiddleware está agregado directamente arriba
+# Si no existe en el servidor, se debe comentar o eliminar esa línea manualmente
 
 # ---------- URLs / WSGI ----------
 ROOT_URLCONF = "gestion_taller.urls"

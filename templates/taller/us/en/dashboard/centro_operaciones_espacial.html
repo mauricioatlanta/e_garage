@@ -2,10 +2,10 @@
 {% load static %}
 {% load i18n %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ request.LANGUAGE_CODE|default:'en' }}">
 <head>
   <meta charset="UTF-8">
-  <title>{{ empresa.nombre_taller }} - Command Center</title>
+  <title>{{ empresa.nombre_taller }} - {% trans "Command Center" %}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
   <link rel="stylesheet" href="{% static 'css/output.css' %}">
@@ -607,40 +607,328 @@ body {
         grid-row: span 1;
     }
 }
-</style>
 
+/* Estilo cinematográfico futurista para botones de navegación */
+.nav-button-standard {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.3rem;
+  background: linear-gradient(135deg, rgba(5, 15, 30, 0.95) 0%, rgba(10, 20, 35, 0.95) 100%);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  border-radius: 8px;
+  text-decoration: none;
+  color: #b0e0ff;
+  font-weight: 600;
+  font-size: 0.875rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: visible;
+  white-space: nowrap;
+  isolation: isolate;
+}
+
+/* Borde eléctrico azul calipso que se mueve alrededor */
+.nav-button-standard::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, 
+    transparent 30%, 
+    rgba(0, 212, 255, 0.8) 50%, 
+    transparent 70%);
+  border-radius: 10px;
+  z-index: -1;
+  opacity: 0.6;
+  animation: electric-border 3s linear infinite;
+  background-size: 200% 200%;
+}
+
+/* Efecto de brillo que se desplaza sobre el botón */
+.nav-button-standard::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(0, 212, 255, 0.15) 30%,
+    rgba(0, 255, 255, 0.25) 50%,
+    rgba(0, 212, 255, 0.15) 70%,
+    transparent 100%);
+  border-radius: 8px;
+  animation: shine-sweep 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes electric-border {
+  0% {
+    background-position: 0% 0%;
+    opacity: 0.6;
+  }
+  25% {
+    background-position: 100% 0%;
+    opacity: 0.8;
+  }
+  50% {
+    background-position: 100% 100%;
+    opacity: 0.6;
+  }
+  75% {
+    background-position: 0% 100%;
+    opacity: 0.8;
+  }
+  100% {
+    background-position: 0% 0%;
+    opacity: 0.6;
+  }
+}
+
+@keyframes shine-sweep {
+  0% {
+    left: -100%;
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    left: 100%;
+    opacity: 0;
+  }
+}
+
+.nav-button-standard:hover {
+  transform: translateY(-2px);
+  border-color: rgba(0, 212, 255, 0.8);
+  color: #ffffff;
+  background: linear-gradient(135deg, rgba(10, 25, 45, 0.98) 0%, rgba(15, 35, 55, 0.98) 100%);
+  box-shadow:
+    0 0 20px rgba(0, 212, 255, 0.4),
+    0 0 40px rgba(0, 212, 255, 0.3),
+    0 0 60px rgba(0, 212, 255, 0.2),
+    inset 0 1px 0 rgba(0, 255, 255, 0.3);
+}
+
+.nav-button-standard:hover::before {
+  opacity: 1;
+  animation-duration: 1.5s;
+}
+
+.nav-button-standard:hover::after {
+  animation-duration: 2s;
+}
+
+.nav-button-standard:active {
+  transform: translateY(0);
+}
+
+.nav-button-standard .nav-icon {
+  font-size: 1rem;
+  filter: drop-shadow(0 0 3px rgba(0, 212, 255, 0.6));
+  transition: filter 0.3s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.nav-button-standard:hover .nav-icon {
+  filter: drop-shadow(0 0 6px rgba(0, 255, 255, 1));
+}
+
+.nav-button-standard span:last-child {
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 0 8px rgba(0, 212, 255, 0.5);
+}
+
+.nav-button-standard:hover span:last-child {
+  text-shadow: 0 0 12px rgba(0, 255, 255, 0.8);
+}
+
+/* Estilo para botón de salir (rojo eléctrico) */
+.nav-button-standard.logout-btn {
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #ffb3b3;
+}
+
+.nav-button-standard.logout-btn::before {
+  background: linear-gradient(45deg, 
+    transparent 30%, 
+    rgba(239, 68, 68, 0.8) 50%, 
+    transparent 70%);
+}
+
+.nav-button-standard.logout-btn::after {
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(239, 68, 68, 0.15) 30%,
+    rgba(255, 100, 100, 0.25) 50%,
+    rgba(239, 68, 68, 0.15) 70%,
+    transparent 100%);
+}
+
+.nav-button-standard.logout-btn:hover {
+  border-color: rgba(239, 68, 68, 0.8);
+  box-shadow:
+    0 0 20px rgba(239, 68, 68, 0.4),
+    0 0 40px rgba(239, 68, 68, 0.3),
+    0 0 60px rgba(239, 68, 68, 0.2),
+    inset 0 1px 0 rgba(255, 150, 150, 0.3);
+}
+
+.nav-button-standard.logout-btn .nav-icon {
+  filter: drop-shadow(0 0 3px rgba(239, 68, 68, 0.6));
+}
+
+.nav-button-standard.logout-btn:hover .nav-icon {
+  filter: drop-shadow(0 0 6px rgba(255, 100, 100, 1));
+}
+
+.nav-button-standard.logout-btn span:last-child {
+  text-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+}
+
+.nav-button-standard.logout-btn:hover span:last-child {
+  text-shadow: 0 0 12px rgba(255, 100, 100, 0.8);
+}
+
+    /* Estilos para elementos del template fusionado */
+    .ranking-item {
+        background: rgba(0, 212, 255, 0.05);
+        border: 1px solid rgba(0, 255, 255, 0.2);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 0.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+
+    .ranking-item:hover {
+        border-color: var(--space-green);
+        background: rgba(0, 255, 136, 0.1);
+        transform: translateX(5px);
+    }
+
+    .status-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    .status-active {
+        background: var(--space-green);
+        color: #000;
+        box-shadow: 0 0 10px var(--space-green);
+    }
+
+    .status-pending {
+        background: var(--space-gold);
+        color: #000;
+        box-shadow: 0 0 10px var(--space-gold);
+    }
+
+    .status-warning {
+        background: var(--space-red);
+        color: #fff;
+        box-shadow: 0 0 10px var(--space-red);
+    }
+
+    .alert-card {
+        background: rgba(255, 59, 59, 0.1);
+        border-left: 4px solid var(--space-red);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .alert-card:hover {
+        border-left-color: var(--space-gold);
+        box-shadow: 0 4px 16px rgba(255, 59, 59, 0.2);
+        transform: translateX(5px);
+    }
+
+    .space-y-3 > * + * {
+        margin-top: 0.75rem;
+    }
 </style>
 </head>
 <body class="min-h-screen flex flex-col">
 
 <!-- Header con logo y lema -->
-<header class="company-header flex items-center gap-6 p-6">
-  {% if company_logo_url or COMPANY_LOGO %}
-    <img src="{{ company_logo_url|default:COMPANY_LOGO }}" alt="{{ company_name|default:COMPANY_NAME }} Logo" class="company-logo h-20 w-auto rounded-lg shadow-lg">
-  {% else %}
-    <div class="company-logo h-20 w-20 rounded-lg flex items-center justify-center shadow-lg" style="background: linear-gradient(135deg, #0d6efd80, #0d6efd40);">
-      <span class="text-3xl font-bold text-white">🏢</span>
+<header class="company-header flex items-center justify-between gap-6 p-6">
+  <div class="flex items-center gap-6">
+    {% if company_logo_url or COMPANY_LOGO %}
+      <img src="{{ company_logo_url|default:COMPANY_LOGO }}" alt="{{ company_name|default:COMPANY_NAME }} Logo" class="company-logo h-20 w-auto rounded-lg shadow-lg">
+    {% else %}
+      <div class="company-logo h-20 w-20 rounded-lg flex items-center justify-center shadow-lg" style="background: linear-gradient(135deg, #0d6efd80, #0d6efd40);">
+        <span class="text-3xl font-bold text-white">🏢</span>
+      </div>
+    {% endif %}
+    
+    <div class="flex flex-col">
+      <h1 class="company-title text-4xl font-bold">{{ company_name|default:COMPANY_NAME|default:"Angel Auto Center" }}</h1>
+      <span class="text-xl text-gray-300 font-medium mt-1">{{ company_tagline|default:COMPANY_TAGLINE|default:"best services" }}</span>
     </div>
-  {% endif %}
-  
-  <div class="flex flex-col">
-    <h1 class="company-title text-4xl font-bold">{{ company_name|default:COMPANY_NAME|default:"Angel Auto Center" }}</h1>
-    <span class="text-xl text-gray-300 font-medium mt-1">{{ company_tagline|default:COMPANY_TAGLINE|default:"best services" }}</span>
   </div>
+  
+  <!-- Selector de idioma -->
+  {% include 'taller/includes/lang_switcher_cinematic.html' %}
 </header>
 
-<!-- Navigation horizontal -->
+<!-- Navigation horizontal - ORDEN ALFABÉTICO -->
 <nav id="main-navigation" class="sticky top-0 z-40 px-6 py-4" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.98)); backdrop-filter: blur(20px); border-bottom: 2px solid rgba(0, 230, 255, 0.3); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); overflow-x: auto; white-space: nowrap;">
-  <div class="flex gap-3 items-center justify-start">
-    <a href="/us/clientes/" class="nav-btn-neon"><span class="nav-icon-sm">👥</span><span>CLIENTS</span></a>
-    <a href="/us/vehiculos/" class="nav-btn-neon"><span class="nav-icon-sm">🚗</span><span>VEHICLES</span></a>
-    <a href="/us/servicios/" class="nav-btn-neon"><span class="nav-icon-sm">🛠️</span><span>SERVICES</span></a>
-    <a href="/us/repuestos/" class="nav-btn-neon"><span class="nav-icon-sm">🔧</span><span>PARTS</span></a>
-    <a href="/us/documentos/" class="nav-btn-neon"><span class="nav-icon-sm">📄</span><span>DOCUMENTS</span></a>
-    <a href="/us/centro-operaciones-espacial/" class="nav-btn-neon"><span class="nav-icon-sm">🚀</span><span>CENTER</span></a>
-    <a href="/us/reportes/" class="nav-btn-neon"><span class="nav-icon-sm">📊</span><span>REPORTS</span></a>
-    <a href="/us/en/settings/" class="nav-btn-neon"><span class="nav-icon-sm">⚙️</span><span>SETTINGS</span></a>
-    <a href="/accounts/logout/" class="nav-btn-neon"><span class="nav-icon-sm">🚪</span><span>LOGOUT</span></a>
+  <div class="flex gap-3 items-center justify-center" style="white-space: nowrap; min-width: max-content;">
+    <a href="/us/en/settings/" class="nav-button-standard">
+      <span class="nav-icon">⚙️</span>
+      <span>{% trans "SETTINGS" %}</span>
+    </a>
+    <a href="/us/centro-operaciones-espacial/" class="nav-button-standard">
+      <span class="nav-icon">🚀</span>
+      <span>{% trans "CENTER" %}</span>
+    </a>
+    <a href="/us/clientes/" class="nav-button-standard">
+      <span class="nav-icon">👥</span>
+      <span>{% trans "CLIENTS" %}</span>
+    </a>
+    <a href="/us/documentos/" class="nav-button-standard">
+      <span class="nav-icon">📄</span>
+      <span>{% trans "DOCUMENTS" %}</span>
+    </a>
+    <a href="/us/repuestos/" class="nav-button-standard">
+      <span class="nav-icon">🔧</span>
+      <span>{% trans "PARTS" %}</span>
+    </a>
+    <a href="/us/reportes/" class="nav-button-standard">
+      <span class="nav-icon">📊</span>
+      <span>{% trans "REPORTS" %}</span>
+    </a>
+    <form action="/accounts/logout/" method="post" style="display: inline;">
+      {% csrf_token %}
+      <button type="submit" class="nav-button-standard logout-btn" style="cursor: pointer;">
+        <span class="nav-icon">🚪</span>
+        <span>{% trans "LOGOUT" %}</span>
+      </button>
+    </form>
+    <a href="/us/servicios/" class="nav-button-standard">
+      <span class="nav-icon">🛠️</span>
+      <span>{% trans "SERVICES" %}</span>
+    </a>
+    <a href="/us/vehiculos/" class="nav-button-standard">
+      <span class="nav-icon">🚗</span>
+      <span>{% trans "VEHICLES" %}</span>
+    </a>
   </div>
 </nav>
 
@@ -663,25 +951,25 @@ body {
                     <div class="unified-pulse"></div>
                 </div>
                 <div class="unified-title">
-                    <div class="main-title">TACTICAL INTELLIGENCE</div>
-                    <div class="sub-title">COMMAND CENTER</div>
+                    <div class="main-title">{% trans "TACTICAL INTELLIGENCE" %}</div>
+                    <div class="sub-title">{% trans "COMMAND CENTER" %}</div>
                 </div>
                 <div class="unified-features">
-                    <span class="feature-tag">📊 REPORTS</span>
-                    <span class="feature-tag">🚀 ADVANCED AI</span>
-                    <span class="feature-tag">💼 BUSINESS INTEL</span>
+                    <span class="feature-tag">📊 {% trans "REPORTS" %}</span>
+                    <span class="feature-tag">🚀 {% trans "ADVANCED AI" %}</span>
+                    <span class="feature-tag">💼 {% trans "BUSINESS INTEL" %}</span>
                 </div>
                 <div class="unified-description">
-                    <div class="desc-line">• Unified strategic analysis</div>
-                    <div class="desc-line">• Predictive operational AI</div>
-                    <div class="desc-line">• Total strategic control</div>
+                    <div class="desc-line">• {% trans "Unified strategic analysis" %}</div>
+                    <div class="desc-line">• {% trans "Predictive operational AI" %}</div>
+                    <div class="desc-line">• {% trans "Total strategic control" %}</div>
                 </div>
             </a>
 
             <a href="/us/reportes/" class="command-panel">
                 <div class="text-3xl mb-2">👨‍🔧</div>
-                <div class="font-semibold console-text">TECHNICAL PERSONNEL</div>
-                <div class="text-sm text-gray-400 console-text">Individual analysis</div>
+                <div class="font-semibold console-text">{% trans "TECHNICAL PERSONNEL" %}</div>
+                <div class="text-sm text-gray-400 console-text">{% trans "Individual analysis" %}</div>
             </a>
 
             <a href="/us/documentos/" class="command-panel modern-panel">
@@ -689,9 +977,9 @@ body {
                     <div class="main-icon">📄</div>
                     <div class="secondary-icon">🚀</div>
                 </div>
-                <div class="modern-title">DOC ENGINE</div>
-                <div class="modern-subtitle">Digital Workflow</div>
-                <div class="modern-description">AI document management</div>
+                <div class="modern-title">{% trans "DOC ENGINE" %}</div>
+                <div class="modern-subtitle">{% trans "Digital Workflow" %}</div>
+                <div class="modern-description">{% trans "AI document management" %}</div>
             </a>
 
             <a href="/us/clientes/" class="command-panel modern-panel">
@@ -699,9 +987,9 @@ body {
                     <div class="main-icon">🌐</div>
                     <div class="secondary-icon">💫</div>
                 </div>
-                <div class="modern-title">CLIENT MATRIX</div>
-                <div class="modern-subtitle">360° Database</div>
-                <div class="modern-description">Relational ecosystem</div>
+                <div class="modern-title">{% trans "CLIENT MATRIX" %}</div>
+                <div class="modern-subtitle">{% trans "360° Database" %}</div>
+                <div class="modern-description">{% trans "Relational ecosystem" %}</div>
             </a>
 
             <a href="/us/vehiculos/" class="command-panel modern-panel">
@@ -709,9 +997,9 @@ body {
                     <div class="main-icon">🚗</div>
                     <div class="secondary-icon">⚡</div>
                 </div>
-                <div class="modern-title">FLEET CMD</div>
-                <div class="modern-subtitle">Vehicle Control</div>
-                <div class="modern-description">Smart vehicle system</div>
+                <div class="modern-title">{% trans "FLEET CMD" %}</div>
+                <div class="modern-subtitle">{% trans "Vehicle Control" %}</div>
+                <div class="modern-description">{% trans "Smart vehicle system" %}</div>
             </a>
 
             <a href="/us/repuestos/" class="command-panel modern-panel">
@@ -719,9 +1007,9 @@ body {
                     <div class="main-icon">🔧</div>
                     <div class="secondary-icon">⚡</div>
                 </div>
-                <div class="modern-title">PARTS</div>
-                <div class="modern-subtitle">Parts Management</div>
-                <div class="modern-description">Parts inventory</div>
+                <div class="modern-title">{% trans "PARTS" %}</div>
+                <div class="modern-subtitle">{% trans "Parts Management" %}</div>
+                <div class="modern-description">{% trans "Parts inventory" %}</div>
             </a>
 
             <a href="/us/servicios/" class="command-panel modern-panel">
@@ -729,9 +1017,9 @@ body {
                     <div class="main-icon">🛠️</div>
                     <div class="secondary-icon">💫</div>
                 </div>
-                <div class="modern-title">SERVICE CORE</div>
-                <div class="modern-subtitle">Service Center</div>
-                <div class="modern-description">Service management</div>
+                <div class="modern-title">{% trans "SERVICE CORE" %}</div>
+                <div class="modern-subtitle">{% trans "Service Center" %}</div>
+                <div class="modern-description">{% trans "Service management" %}</div>
             </a>
 
 
@@ -740,17 +1028,17 @@ body {
                     <div class="main-icon">⚙️</div>
                     <div class="secondary-icon">💎</div>
                 </div>
-                <div class="modern-title">SYSTEM CORE</div>
-                <div class="modern-subtitle">Settings Center</div>
-                <div class="modern-description">Advanced configuration</div>
-                <div style="color: #ff0000; font-weight: bold; font-size: 12px; margin-top: 5px;">USA TEMPLATE - FIXED URL</div>
+                <div class="modern-title">{% trans "SYSTEM CORE" %}</div>
+                <div class="modern-subtitle">{% trans "Settings Center" %}</div>
+                <div class="modern-description">{% trans "Advanced configuration" %}</div>
+                <div style="color: #ff0000; font-weight: bold; font-size: 12px; margin-top: 5px;">{% trans "USA TEMPLATE - FIXED URL" %}</div>
             </a>
         </div>
     </div>
 
     <!-- 📊 Windows Mosaic - Smart Dashboard -->
     <div class="space-container p-6 mt-6">
-        <h3 class="text-xl font-bold text-cyan-400 mb-4 console-text">📊 SMART MOSAIC - WINDOWS STYLE</h3>
+        <h3 class="text-xl font-bold text-cyan-400 mb-4 console-text">📊 {% trans "SMART MOSAIC - WINDOWS STYLE" %}</h3>
 
         <!-- Windows-style grid -->
         <div class="windows-grid">
@@ -758,7 +1046,7 @@ body {
             <!-- Large Tile - Main Chart -->
             <div class="windows-tile tile-large">
                 <div class="tile-header">
-                    <span class="tile-title">💹 OPERATIONAL INCOME</span>
+                    <span class="tile-title">💹 {% trans "OPERATIONAL INCOME" %}</span>
                     <span class="tile-live">●</span>
                 </div>
                 <div class="tile-content">
@@ -769,7 +1057,7 @@ body {
             <!-- Medium Tile - Services -->
             <div class="windows-tile tile-medium">
                 <div class="tile-header">
-                    <span class="tile-title">⚙️ TOP SERVICES</span>
+                    <span class="tile-title">⚙️ {% trans "TOP SERVICES" %}</span>
                     <span class="tile-live">●</span>
                 </div>
                 <div class="tile-content">
@@ -780,29 +1068,29 @@ body {
             <!-- Small Tile - Metrics -->
             <div class="windows-tile tile-small">
                 <div class="tile-header">
-                    <span class="tile-title">📈 DOCS TODAY</span>
+                    <span class="tile-title">📈 {% trans "DOCS TODAY" %}</span>
                 </div>
                 <div class="tile-content metric-tile">
-                    <div class="metric-big">{{ documentos_hoy|default:"24" }}</div>
-                    <div class="metric-small">+15% vs yesterday</div>
+                    <div class="metric-big">{{ documentos_hoy|default:"0" }}</div>
+                    <div class="metric-small">{% trans "Today's documents" %}</div>
                 </div>
             </div>
 
             <!-- Small Tile - Customers -->
             <div class="windows-tile tile-small">
                 <div class="tile-header">
-                    <span class="tile-title">👥 CUSTOMERS</span>
+                    <span class="tile-title">👥 {% trans "CUSTOMERS" %}</span>
                 </div>
                 <div class="tile-content metric-tile">
-                    <div class="metric-big">{{ clientes_atendidos_semana|default:"87" }}</div>
-                    <div class="metric-small">Current week</div>
+                    <div class="metric-big">{{ clientes_atendidos_semana|default:"0" }}</div>
+                    <div class="metric-small">{% trans "Current week" %}</div>
                 </div>
             </div>
 
             <!-- Medium Tile - Technicians -->
             <div class="windows-tile tile-medium">
                 <div class="tile-header">
-                    <span class="tile-title">👨‍🔧 TECHNICIAN PRODUCTIVITY</span>
+                    <span class="tile-title">👨‍🔧 {% trans "TECHNICIAN PRODUCTIVITY" %}</span>
                     <span class="tile-live">●</span>
                 </div>
                 <div class="tile-content">
@@ -816,8 +1104,8 @@ body {
                     <span class="tile-title">🎯 EFFICIENCY</span>
                 </div>
                 <div class="tile-content metric-tile">
-                    <div class="metric-big">94%</div>
-                    <div class="metric-small">Conversion</div>
+                    <div class="metric-big">{{ eficiencia_conversion|floatformat:1|default:"0" }}%</div>
+                    <div class="metric-small">Conversion Rate</div>
                 </div>
             </div>
 
@@ -835,10 +1123,188 @@ body {
         </div>
     </div>
 
-</div>
-{% endblock %}
+    <!-- 📊 KPIs Adicionales del Template Normal -->
+    <div class="space-container p-6 mt-6">
+        <h3 class="text-xl font-bold text-cyan-400 mb-4 console-text">📊 {% trans "OPERATIONAL METRICS" %}</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div class="windows-tile tile-small">
+                <div class="tile-header">
+                    <span class="tile-title">📄 DOCS WEEK</span>
+                </div>
+                <div class="tile-content metric-tile">
+                    <div class="metric-big">{{ documentos_semana|default:"0" }}</div>
+                    <div class="metric-small">Last 7 days</div>
+                </div>
+            </div>
 
-{% block extra_js %}
+            <div class="windows-tile tile-small">
+                <div class="tile-header">
+                    <span class="tile-title">💰 SALES TODAY</span>
+                </div>
+                <div class="tile-content metric-tile">
+                    <div class="metric-big">{{ moneda }}{{ facturacion_servicios_hoy|floatformat:0|default:"0" }}</div>
+                    <div class="metric-small">{% trans "Today's revenue" %}</div>
+                </div>
+            </div>
+
+            <div class="windows-tile tile-small">
+                <div class="tile-header">
+                    <span class="tile-title">💵 MONTH SALES</span>
+                </div>
+                <div class="tile-content metric-tile">
+                    <div class="metric-big">{{ moneda }}{{ facturacion_mes_total|floatformat:0|default:"0" }}</div>
+                    <div class="metric-small">This month</div>
+                </div>
+            </div>
+
+            <div class="windows-tile tile-small">
+                <div class="tile-header">
+                    <span class="tile-title">👥 ACTIVE CLIENTS</span>
+                </div>
+                <div class="tile-content metric-tile">
+                    <div class="metric-big">{{ clientes_activos|default:"0" }}</div>
+                    <div class="metric-small">Total clients</div>
+                </div>
+            </div>
+
+            <div class="windows-tile tile-small">
+                <div class="tile-header">
+                    <span class="tile-title">🆕 NEW CLIENTS</span>
+                </div>
+                <div class="tile-content metric-tile">
+                    <div class="metric-big">{{ clientes_nuevos_mes|default:"0" }}</div>
+                    <div class="metric-small">This month</div>
+                </div>
+            </div>
+
+            <div class="windows-tile tile-small">
+                <div class="tile-header">
+                    <span class="tile-title">👨‍🔧 TECHNICIANS</span>
+                </div>
+                <div class="tile-content metric-tile">
+                    <div class="metric-big">{{ tecnicos_activos|default:"0" }}</div>
+                    <div class="metric-small">Active</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 📈 Estado Operativo -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+        <!-- Estado de Documentos -->
+        <div class="space-container p-6">
+            <h3 class="text-lg font-bold text-cyan-400 mb-4 console-text">📋 DOCUMENT STATUS</h3>
+            <div class="space-y-3">
+                <div class="flex justify-between items-center">
+                    <span class="text-sm">Pending Quotes</span>
+                    <span class="status-badge status-pending">{{ presupuestos_pendientes|default:"0" }}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-sm">{% trans "Orders in Process" %}</span>
+                    <span class="status-badge status-active">{{ ordenes_en_proceso|default:"0" }}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-sm">Month Invoices</span>
+                    <span class="status-badge status-active">{{ facturas_mes|default:"0" }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Métricas de Eficiencia -->
+        <div class="space-container p-6">
+            <h3 class="text-lg font-bold text-cyan-400 mb-4 console-text">🎯 {% trans "EFFICIENCY METRICS" %}</h3>
+            <div class="space-y-3">
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-cyan-400">{{ moneda }}{{ ticket_promedio|floatformat:0|default:"0" }}</div>
+                    <div class="text-sm text-gray-400">Average Ticket</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-green-400">{{ eficiencia_conversion|floatformat:1|default:"0" }}%</div>
+                    <div class="text-sm text-gray-400">Conversion Rate</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-purple-400">{{ marcas_atendidas|default:"0" }}</div>
+                    <div class="text-sm text-gray-400">Brands Served</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Proyecciones IA -->
+        <div class="space-container p-6">
+            <h3 class="text-lg font-bold text-cyan-400 mb-4 console-text">🤖 AI PROJECTIONS</h3>
+            <div class="space-y-3">
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-gold-400">{{ proyeccion_docs_mes|default:"0" }}</div>
+                    <div class="text-sm text-gray-400">Projected Docs/Month</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-green-400">{{ moneda }}{{ proyeccion_facturacion|floatformat:0|default:"0" }}</div>
+                    <div class="text-sm text-gray-400">{% trans "Projected Revenue" %}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔧 Rankings y Tops -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+        <!-- Top Servicios -->
+        <div class="space-container p-6">
+            <h3 class="text-lg font-bold text-cyan-400 mb-4 console-text">⚙️ {% trans "TOP SERVICES" %}</h3>
+            {% for servicio in servicios_top %}
+            <div class="ranking-item mb-3">
+                <div>
+                    <div class="font-semibold text-sm">{{ servicio.nombre }}</div>
+                    <div class="text-xs text-gray-400">{% blocktrans with cantidad=servicio.cantidad %}{{ cantidad }} services{% endblocktrans %}</div>
+                </div>
+                <div class="text-right">
+                    <div class="text-lg font-bold text-cyan-400">{{ servicio.cantidad }}x</div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-center text-gray-400 py-4 text-sm">No service data</div>
+            {% endfor %}
+        </div>
+
+        <!-- Top Técnicos -->
+        <div class="space-container p-6">
+            <h3 class="text-lg font-bold text-cyan-400 mb-4 console-text">👨‍🔧 TOP TECHNICIANS</h3>
+            {% for tecnico in tecnicos_productivos %}
+            <div class="ranking-item mb-3">
+                <div>
+                    <div class="font-semibold text-sm">{{ tecnico.tecnico.nombre|default:"Unknown" }}</div>
+                    <div class="text-xs text-gray-400">{{ tecnico.docs_realizados }} documents</div>
+                </div>
+                <div class="text-right">
+                    <div class="text-lg font-bold text-green-400">{{ moneda }}{{ tecnico.ingresos_generados|floatformat:0|default:"0" }}</div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-center text-gray-400 py-4 text-sm">No technician data</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- ⚠️ Alertas y Oportunidades -->
+    {% if alertas %}
+    <div class="space-container p-6 mt-6">
+        <h3 class="text-lg font-bold text-cyan-400 mb-4 console-text">⚠️ ALERTS & OPPORTUNITIES</h3>
+        {% for alerta in alertas %}
+        <div class="alert-card mb-3">
+            <div class="flex items-start justify-between">
+                <div>
+                    <div class="font-semibold text-{{ alerta.tipo }}-400 text-sm">{{ alerta.titulo }}</div>
+                    <div class="text-xs text-gray-400">{{ alerta.descripcion }}</div>
+                </div>
+                <div class="text-sm text-cyan-400">{{ alerta.accion }}</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+</div>
+</main>
+
 <!-- JavaScript for space effects -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
@@ -1054,4 +1520,5 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-{% endblock %}
+</body>
+</html>

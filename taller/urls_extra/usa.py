@@ -5,7 +5,6 @@ from taller.taller_views import dashboard_suscripciones
 from taller.views_extra.bienvenida_usa import bienvenida_usa
 from taller.views_extra.company_settings_views import company_settings_view
 from taller.views_extra.dashboard_empresa import (
-    dashboard_centro_operaciones,
     dashboard_centro_operaciones_espacial,
 )
 from taller.views_extra.futuristic_company_settings_views import (
@@ -45,7 +44,12 @@ urlpatterns = [
     path("", bienvenida_usa, name="home"),
     path("dashboard/", dashboard, name="dashboard"),  # si existe en taller, este gana por orden
     path("en/dashboard/", dashboard, name="dashboard_en_redirect"),
-    path("centro-operaciones/", dashboard_centro_operaciones, name="centro_operaciones"),
+    # Redirigir centro-operaciones a la versión espacial fusionada
+    path(
+        "centro-operaciones/",
+        dashboard_centro_operaciones_espacial,
+        name="centro_operaciones",
+    ),
     path(
         "centro-operaciones-espacial/",
         dashboard_centro_operaciones_espacial,
@@ -58,7 +62,7 @@ urlpatterns = [
     path("settings/", company_settings_view, name="company_settings"),
     path(
         "en/settings/",
-        futuristic_company_settings_view,
+        company_settings_view,  # Usar la misma vista que /us/settings/
         name="futuristic_company_settings",
     ),
     # 3) Auth Allauth para USA (nombres globales a propósito)
