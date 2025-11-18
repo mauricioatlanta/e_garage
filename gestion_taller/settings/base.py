@@ -64,8 +64,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     # 8. Clickjacking (después de mensajes)
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    # 9. Allauth (después de autenticación)
-    "allauth.account.middleware.AccountMiddleware",
+    # 9. Allauth (después de autenticación) - Agregado dinámicamente si existe
     # 10. Middlewares personalizados (orden específico)
     # "taller.middleware.country_url_migration.CountryURLRedirectMiddleware",  # DESHABILITADO - Causa bucles infinitos
     "taller.middleware.empresa_middleware.EmpresaMiddleware",
@@ -74,6 +73,20 @@ MIDDLEWARE = [
     # "taller.middleware.fix_language_middleware.FixLanguageMiddleware",  # DESHABILITADO - Causa bucles infinitos
     "taller.middleware.verificar_suscripcion.VerificarSuscripcionMiddleware",
 ]
+
+# Agregar AccountMiddleware de allauth si existe (requerido en algunas versiones)
+try:
+    import importlib
+
+    importlib.import_module("allauth.account.middleware")
+    # Si la importación funciona, agregar el middleware después de AuthenticationMiddleware
+    MIDDLEWARE.insert(
+        MIDDLEWARE.index("django.contrib.auth.middleware.AuthenticationMiddleware") + 1,
+        "allauth.account.middleware.AccountMiddleware",
+    )
+except (ImportError, ValueError):
+    # El middleware no existe en esta versión de django-allauth, continuar sin él
+    pass
 
 # Configuración de URLs
 ROOT_URLCONF = "gestion_taller.urls"

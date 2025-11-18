@@ -132,7 +132,6 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "allauth.account.middleware.AccountMiddleware",
     # País/empresa (provee request.empresa / request.empresa.pais)
     "taller.middleware.empresa_middleware.EmpresaMiddleware",
     "taller.middleware.simple_country_redirect.SimpleCountryRedirectMiddleware",
@@ -144,6 +143,18 @@ MIDDLEWARE = [
     "taller.middleware.verificar_suscripcion.VerificarSuscripcionMiddleware",
     # "taller.middleware.trial_middleware.TrialAccessMiddleware",
 ]
+
+# Agregar AccountMiddleware de allauth si existe (requerido en algunas versiones)
+try:
+    import importlib
+
+    importlib.import_module("allauth.account.middleware")
+    MIDDLEWARE.insert(
+        MIDDLEWARE.index("django.contrib.auth.middleware.AuthenticationMiddleware") + 1,
+        "allauth.account.middleware.AccountMiddleware",
+    )
+except (ImportError, ValueError):
+    pass
 
 # ---------- URLs / WSGI ----------
 ROOT_URLCONF = "gestion_taller.urls"

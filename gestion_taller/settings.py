@@ -132,8 +132,6 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
-    # AccountMiddleware de allauth (requerido en django-allauth 65.9.0+)
-    "allauth.account.middleware.AccountMiddleware",
     # País/empresa (provee request.empresa / request.empresa.pais)
     "taller.middleware.empresa_middleware.EmpresaMiddleware",
     "taller.middleware.simple_country_redirect.SimpleCountryRedirectMiddleware",
@@ -145,6 +143,21 @@ MIDDLEWARE = [
     "taller.middleware.verificar_suscripcion.VerificarSuscripcionMiddleware",
     # "taller.middleware.trial_middleware.TrialAccessMiddleware",
 ]
+
+# Agregar AccountMiddleware de allauth si existe (requerido en algunas versiones)
+# Intentar importar dinámicamente después de que Django esté configurado
+try:
+    import importlib
+
+    importlib.import_module("allauth.account.middleware")
+    # Si la importación funciona, agregar el middleware
+    MIDDLEWARE.insert(
+        MIDDLEWARE.index("django.contrib.auth.middleware.AuthenticationMiddleware") + 1,
+        "allauth.account.middleware.AccountMiddleware",
+    )
+except (ImportError, ValueError):
+    # El middleware no existe en esta versión de django-allauth, continuar sin él
+    pass
 
 # ---------- URLs / WSGI ----------
 ROOT_URLCONF = "gestion_taller.urls"
