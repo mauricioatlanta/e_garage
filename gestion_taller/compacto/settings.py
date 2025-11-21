@@ -132,8 +132,6 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
-    # AccountMiddleware de allauth (requerido en versiones recientes)
-    # "allauth.account.middleware.AccountMiddleware",  # COMENTADO: No disponible en la versión de allauth del servidor
     # País/empresa (provee request.empresa / request.empresa.pais)
     "taller.middleware.empresa_middleware.EmpresaMiddleware",
     "taller.middleware.simple_country_redirect.SimpleCountryRedirectMiddleware",
@@ -145,6 +143,39 @@ MIDDLEWARE = [
     "taller.middleware.verificar_suscripcion.VerificarSuscripcionMiddleware",
     # "taller.middleware.trial_middleware.TrialAccessMiddleware",
 ]
+
+# AccountMiddleware de allauth: agregar dinámicamente si existe
+# Esto resuelve el problema de versiones de allauth que requieren el middleware
+# pero donde el middleware no está disponible
+try:
+    from allauth.account.middleware import AccountMiddleware
+    # El middleware existe, agregarlo después de AuthenticationMiddleware
+    auth_middleware_index = MIDDLEWARE.index("django.contrib.auth.middleware.AuthenticationMiddleware")
+    MIDDLEWARE.insert(auth_middleware_index + 1, "allauth.account.middleware.AccountMiddleware")
+except ImportError:
+    # El middleware no existe, pero allauth puede requerirlo
+    # Intentar desactivar la verificación si es posible
+    try:
+        import allauth.account.apps
+        # Monkey patch para desactivar la verificación del middleware (solo una vez)
+        if not hasattr(allauth.account.apps.AccountConfig.ready, '_patched_for_middleware'):
+            original_ready = allauth.account.apps.AccountConfig.ready
+            
+            def patched_ready(self):
+                # Verificar si el middleware está en MIDDLEWARE antes de lanzar error
+                try:
+                    from allauth.account.middleware import AccountMiddleware
+                    # Si el middleware existe, usar la verificación original
+                    return original_ready(self)
+                except ImportError:
+                    # El middleware no existe, omitir la verificación
+                    pass
+            
+            patched_ready._patched_for_middleware = True
+            allauth.account.apps.AccountConfig.ready = patched_ready
+    except Exception:
+        # Si falla el monkey patch, continuar sin el middleware
+        pass
 
 # ---------- URLs / WSGI ----------
 ROOT_URLCONF = "gestion_taller.urls"

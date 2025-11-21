@@ -1,21 +1,29 @@
-# 🔧 Solución: Error `ModuleNotFoundError: No module named 'allauth.account.middleware'`
+# 🔧 Solución: Error `ImproperlyConfigured: allauth.account.middleware.AccountMiddleware must be added to settings.MIDDLEWARE`
 
 ## Problema
 
-El servidor está intentando cargar `allauth.account.middleware.AccountMiddleware` que no existe en la versión instalada de `django-allauth` en PythonAnywhere.
+El servidor tiene una versión de django-allauth que **requiere** el middleware `AccountMiddleware`, pero cuando Django intenta importarlo, no existe o no está disponible.
 
 **Error:**
 ```
-ModuleNotFoundError: No module named 'allauth.account.middleware'
+django.core.exceptions.ImproperlyConfigured: allauth.account.middleware.AccountMiddleware must be added to settings.MIDDLEWARE
 ```
 
 ## Solución
 
-El middleware `AccountMiddleware` fue introducido en django-allauth 0.65.0+. Si el servidor tiene una versión anterior, este middleware no existe y debe ser eliminado o comentado.
+Se implementó una solución dinámica que:
+1. Intenta importar el middleware `AccountMiddleware`
+2. Si existe, lo agrega automáticamente al `MIDDLEWARE`
+3. Si no existe pero allauth lo requiere, aplica un monkey patch para desactivar la verificación
 
-### Opción 1: Hacer pull de los cambios (RECOMENDADO)
+## Solución Implementada
 
-Los archivos de settings ya han sido corregidos en el repositorio. Solo necesitas hacer pull:
+Los archivos de settings ahora incluyen código dinámico que:
+- Detecta automáticamente si el middleware `AccountMiddleware` existe
+- Lo agrega al `MIDDLEWARE` si está disponible
+- Aplica un monkey patch para desactivar la verificación si no existe pero allauth lo requiere
+
+### Hacer pull de los cambios (RECOMENDADO)
 
 ```bash
 cd ~/apps/egarage/current
@@ -30,38 +38,6 @@ git stash
 git pull origin main
 
 # 4. Reinicia la aplicación web en PythonAnywhere
-```
-
-### Opción 2: Corregir manualmente en el servidor
-
-Si no puedes hacer pull, puedes comentar la línea manualmente:
-
-```bash
-cd ~/apps/egarage/current
-
-# Editar los archivos de settings
-nano gestion_taller/settings.py
-# Buscar: "allauth.account.middleware.AccountMiddleware"
-# Comentar: # "allauth.account.middleware.AccountMiddleware",  # COMENTADO: No disponible
-
-nano gestion_taller/settings/base.py
-# Buscar: "allauth.account.middleware.AccountMiddleware"
-# Comentar: # "allauth.account.middleware.AccountMiddleware",  # COMENTADO: No disponible
-
-nano gestion_taller/compacto/settings.py
-# Buscar: "allauth.account.middleware.AccountMiddleware"
-# Comentar: # "allauth.account.middleware.AccountMiddleware",  # COMENTADO: No disponible
-```
-
-### Opción 3: Usar sed para comentar automáticamente
-
-```bash
-cd ~/apps/egarage/current
-
-# Comentar en todos los archivos de settings
-sed -i 's/"allauth.account.middleware.AccountMiddleware",/# "allauth.account.middleware.AccountMiddleware",  # COMENTADO: No disponible/' gestion_taller/settings.py
-sed -i 's/"allauth.account.middleware.AccountMiddleware",/# "allauth.account.middleware.AccountMiddleware",  # COMENTADO: No disponible/' gestion_taller/settings/base.py
-sed -i 's/"allauth.account.middleware.AccountMiddleware",/# "allauth.account.middleware.AccountMiddleware",  # COMENTADO: No disponible/' gestion_taller/compacto/settings.py
 ```
 
 ## Después de corregir
