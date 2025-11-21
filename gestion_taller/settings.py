@@ -1,7 +1,13 @@
 import os
+import logging
 from pathlib import Path
 
 from django.core.management.utils import get_random_secret_key
+from dotenv import load_dotenv
+
+# ---------- Cargar Variables de Entorno ----------
+# Carga .env desde el directorio raíz del proyecto
+load_dotenv()
 
 # ---------- Paths ----------
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -118,14 +124,10 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
 }
 
-# ---------- Static / WhiteNoise (opcional si no usas CDN) ----------
-# if env_bool("DJANGO_WHITENOISE", not DEBUG):
-#     MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
-#     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-
 # ---------- Middleware (reorden menor sugerido) ----------
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # ✅ WhiteNoise para archivos estáticos (después de SecurityMiddleware)
     "django.contrib.sessions.middleware.SessionMiddleware",
     # LocaleMiddleware debe ir DESPUÉS de SessionMiddleware
     "django.middleware.locale.LocaleMiddleware",
@@ -134,7 +136,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     # AccountMiddleware de allauth (requerido en algunas versiones)
     # En el servidor donde no existe, Django fallará al cargarlo y se debe eliminar manualmente
-    "allauth.account.middleware.AccountMiddleware",
+    # "allauth.account.middleware.AccountMiddleware",  # COMENTADO: No disponible en la versión de allauth del servidor
     # País/empresa (provee request.empresa / request.empresa.pais)
     "taller.middleware.empresa_middleware.EmpresaMiddleware",
     "taller.middleware.simple_country_redirect.SimpleCountryRedirectMiddleware",
@@ -185,12 +187,46 @@ if os.getenv("DATABASE_URL"):
 
     DATABASES = {"default": dj_database_url.parse(os.getenv("DATABASE_URL"), conn_max_age=600)}
 else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
+    # Detectar tipo de base de datos desde variables de entorno
+    DB_ENGINE = os.getenv("DB_ENGINE", "sqlite3")
+
+    if DB_ENGINE == "mysql":
+        # MySQL con utf8mb4 para soportar emojis y caracteres especiales
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.mysql",
+                "NAME": os.getenv("DB_NAME", "egarage"),
+                "USER": os.getenv("DB_USER", "root"),
+                "PASSWORD": os.getenv("DB_PASSWORD", ""),
+                "HOST": os.getenv("DB_HOST", "localhost"),
+                "PORT": os.getenv("DB_PORT", "3306"),
+                "OPTIONS": {
+                    "charset": "utf8mb4",
+                    "init_command": "SET sql_mode='STRICT_TRANS_TABLES', character_set_connection=utf8mb4, collation_connection=utf8mb4_unicode_ci",
+                    "sql_mode": "STRICT_TRANS_TABLES",
+                },
+            }
         }
-    }
+    elif DB_ENGINE == "postgresql":
+        # PostgreSQL
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.postgresql",
+                "NAME": os.getenv("DB_NAME", "egarage"),
+                "USER": os.getenv("DB_USER", "postgres"),
+                "PASSWORD": os.getenv("DB_PASSWORD", ""),
+                "HOST": os.getenv("DB_HOST", "localhost"),
+                "PORT": os.getenv("DB_PORT", "5432"),
+            }
+        }
+    else:
+        # SQLite (por defecto en desarrollo)
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.sqlite3",
+                "NAME": BASE_DIR / "db.sqlite3",
+            }
+        }
 
 # ---------- i18n / l10n ----------
 LANGUAGE_CODE = "es"  # fallback global
@@ -204,6 +240,17 @@ USE_TZ = True
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = Path(os.getenv("STATIC_ROOT", str(BASE_DIR / "staticfiles")))
+
+# ✅ WhiteNoise: Configuración para producción
+# Habilitar compresión y caching a largo plazo en producción
+if not DEBUG:
+    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+    # WhiteNoise comprime archivos automáticamente y agrega headers de cache
+    WHITENOISE_USE_FINDERS = True  # Usar finders de Django para desarrollo
+    WHITENOISE_AUTOREFRESH = False  # En producción, no refrescar automáticamente
+else:
+    # En desarrollo, usar storage normal
+    STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = Path(os.getenv("MEDIA_ROOT", str(BASE_DIR / "media")))
@@ -233,15 +280,75 @@ EMAIL_USE_SSL = env_bool("EMAIL_USE_SSL", True)
 EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS", False)
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "subscription@egarage.cl")
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "eGarage <subscription@egarage.cl>")
+# Timeout para conexiones SMTP (30 segundos por defecto para evitar timeouts)
+EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", "30"))
 
-# En dev, evita KeyError; en prod exige la var.
+# ⚠️ IMPORTANTE: EMAIL_PASSWORD debe estar en .env (NUNCA hardcodeado)
 _email_pwd = os.getenv("EMAIL_PASSWORD")
 if _email_pwd:
     EMAIL_HOST_PASSWORD = _email_pwd
 elif DEBUG:
-    EMAIL_HOST_PASSWORD = "laila2013-"  # Nueva contraseña ASCII
+    # Solo en desarrollo, permitir que falle silenciosamente
+    EMAIL_HOST_PASSWORD = os.getenv("EMAIL_PASSWORD", "")
+    if not EMAIL_HOST_PASSWORD:
+        import logging
+
+        logger = logging.getLogger(__name__)
+        logger.warning("EMAIL_PASSWORD not set - email functionality will not work")
 else:
-    raise RuntimeError("EMAIL_PASSWORD must be set in production")
+    # En producción, EMAIL_PASSWORD es obligatorio
+    raise RuntimeError("EMAIL_PASSWORD must be set in production (check .env file)")
+
+# ---------- Sentry (Monitoreo de Errores) ----------
+# ⚠️ IMPORTANTE: Configurar SENTRY_DSN en .env para recibir notificaciones de errores
+# Sentry solo se inicializa en producción (cuando DEBUG=False) para evitar ruido en desarrollo
+SENTRY_DSN = os.getenv("SENTRY_DSN")
+if SENTRY_DSN and not DEBUG:
+    try:
+        import sentry_sdk
+        from sentry_sdk.integrations.django import DjangoIntegration
+        from sentry_sdk.integrations.logging import LoggingIntegration
+
+        # Configuración de Sentry
+        sentry_logging = LoggingIntegration(
+            level=logging.INFO,  # Capturar info y superior
+            event_level=logging.ERROR,  # Enviar solo errores a Sentry
+        )
+
+        sentry_sdk.init(
+            dsn=SENTRY_DSN,
+            integrations=[
+                DjangoIntegration(
+                    transaction_style="url",
+                    middleware_spans=True,
+                    signals_spans=True,
+                    cache_spans=True,
+                ),
+                sentry_logging,
+            ],
+            # Performance monitoring (10% de requests para no saturar)
+            traces_sample_rate=0.1,
+            # Enviar información personal identificable (PII) - usar con cuidado
+            send_default_pii=False,  # No enviar emails/username por defecto
+            # Configuración de entorno
+            environment="production" if not DEBUG else "development",
+            # Release tracking (útil para ver qué versión causó el error)
+            release=os.getenv("SENTRY_RELEASE", "egarage@unknown"),
+            # Antes de enviar error, puedes filtrar información sensible
+            before_send=lambda event, hint: event,
+        )
+        logger = logging.getLogger(__name__)
+        logger.info("✅ Sentry initialized successfully")
+    except ImportError:
+        # Si sentry-sdk no está instalado, continuar sin errores
+        logger = logging.getLogger(__name__)
+        logger.warning(
+            "⚠️ Sentry DSN configured but sentry-sdk not installed. Run: pip install sentry-sdk"
+        )
+    except Exception as e:
+        # Si hay error al inicializar Sentry, continuar sin errores
+        logger = logging.getLogger(__name__)
+        logger.error(f"❌ Failed to initialize Sentry: {e}")
 
 # ---------- Logging básico ----------
 LOGGING = {

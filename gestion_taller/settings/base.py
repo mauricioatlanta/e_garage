@@ -62,7 +62,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     # 6.5. AccountMiddleware de allauth (requerido en algunas versiones)
     # En el servidor donde no existe, Django fallará al cargarlo y se debe eliminar manualmente
-    "allauth.account.middleware.AccountMiddleware",
+    # "allauth.account.middleware.AccountMiddleware",  # COMENTADO: No disponible en la versión de allauth del servidor
     # 7. Mensajes (después de autenticación)
     "django.contrib.messages.middleware.MessageMiddleware",
     # 8. Clickjacking (después de mensajes)

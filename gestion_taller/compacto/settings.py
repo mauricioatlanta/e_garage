@@ -132,6 +132,8 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    # AccountMiddleware de allauth (requerido en versiones recientes)
+    # "allauth.account.middleware.AccountMiddleware",  # COMENTADO: No disponible en la versión de allauth del servidor
     # País/empresa (provee request.empresa / request.empresa.pais)
     "taller.middleware.empresa_middleware.EmpresaMiddleware",
     "taller.middleware.simple_country_redirect.SimpleCountryRedirectMiddleware",
@@ -143,27 +145,6 @@ MIDDLEWARE = [
     "taller.middleware.verificar_suscripcion.VerificarSuscripcionMiddleware",
     # "taller.middleware.trial_middleware.TrialAccessMiddleware",
 ]
-
-# Agregar AccountMiddleware de allauth si existe y es requerido
-try:
-    import os
-    import sys
-
-    for path in sys.path:
-        allauth_middleware_path = os.path.join(path, "allauth", "account", "middleware.py")
-        if os.path.exists(allauth_middleware_path):
-            with open(allauth_middleware_path, "r", encoding="utf-8") as f:
-                content = f.read()
-                if "class AccountMiddleware" in content:
-                    auth_index = MIDDLEWARE.index(
-                        "django.contrib.auth.middleware.AuthenticationMiddleware"
-                    )
-                    MIDDLEWARE.insert(
-                        auth_index + 1, "allauth.account.middleware.AccountMiddleware"
-                    )
-                    break
-except Exception:
-    pass
 
 # ---------- URLs / WSGI ----------
 ROOT_URLCONF = "gestion_taller.urls"
