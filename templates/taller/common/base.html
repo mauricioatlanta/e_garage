@@ -324,65 +324,69 @@
         </div>
       </div>
       <div class="d-flex align-items-center">
-        {% include 'taller/includes/lang_switcher_cinematic.html' %}
+        <!-- Selector de idioma: Solo mostrar para USA, no para Chile -->
+        {% if request.path|slice:':3' != '/cl' %}
+          {% include 'taller/includes/lang_switcher_cinematic.html' %}
+        {% endif %}
       </div>
     </div>
   </header>
   <nav class="main-navigation">
+    {# Para Chile (/cl/): siempre español. Para otros países: según LANGUAGE_CODE #}
     <!-- Botones de navegación principal - ORDEN ALFABÉTICO -->
     {% country_url 'company_settings' as ajustes_url %}
     {% if ajustes_url %}
     <a href="{{ ajustes_url }}" class="nav-button-standard">
       <span class="nav-icon">⚙️</span>
-      <span>{% trans "Ajustes" %}</span>
+      <span>{% if request.path|slice:':3' == '/cl' or LANGUAGE_CODE == 'es' %}Ajustes{% else %}Settings{% endif %}</span>
     </a>
     {% endif %}
 
     <a href="{% country_url 'centro_operaciones' %}" class="nav-button-standard">
       <span class="nav-icon">🚀</span>
-      <span>{% trans "Centro" %}</span>
+      <span>{% if request.path|slice:':3' == '/cl' or LANGUAGE_CODE == 'es' %}Centro{% else %}Center{% endif %}</span>
     </a>
 
     <a href="{% country_url 'clientes:lista_clientes' %}" class="nav-button-standard">
       <span class="nav-icon">👥</span>
-      <span>{% trans "Clientes" %}</span>
+      <span>{% if request.path|slice:':3' == '/cl' or LANGUAGE_CODE == 'es' %}Clientes{% else %}Clients{% endif %}</span>
     </a>
 
     <a href="{% country_url 'documentos:lista_documentos' %}" class="nav-button-standard">
       <span class="nav-icon">📄</span>
-      <span>{% trans "Documentos" %}</span>
+      <span>{% if request.path|slice:':3' == '/cl' or LANGUAGE_CODE == 'es' %}Documentos{% else %}Documents{% endif %}</span>
     </a>
 
     <a href="{% if request.path|slice:':3' == '/cl' %}/cl/es/servicios/otros-servicios/{% elif request.path|slice:':3' == '/us' %}/us/en/servicios/otros-servicios/{% else %}/cl/es/servicios/otros-servicios/{% endif %}" class="nav-button-standard">
       <span class="nav-icon">⭐</span>
-      <span>{% trans "Extra" %}</span>
+      <span>Extra</span>
     </a>
 
     <a href="{% country_url 'repuestos:lista_repuestos' %}" class="nav-button-standard">
       <span class="nav-icon">🔧</span>
-      <span>{% trans "Repuestos" %}</span>
+      <span>{% if request.path|slice:':3' == '/cl' or LANGUAGE_CODE == 'es' %}Repuestos{% else %}Parts{% endif %}</span>
     </a>
 
     <a href="{% country_url 'reportes:reportes_dashboard' %}" class="nav-button-standard">
       <span class="nav-icon">📊</span>
-      <span>{% trans "Reportes" %}</span>
+      <span>{% if request.path|slice:':3' == '/cl' or LANGUAGE_CODE == 'es' %}Reportes{% else %}Reports{% endif %}</span>
     </a>
 
     <a href="{% country_url 'servicios:servicios_menu' %}" class="nav-button-standard">
       <span class="nav-icon">🛠️</span>
-      <span>{% trans "Servicios" %}</span>
+      <span>{% if request.path|slice:':3' == '/cl' or LANGUAGE_CODE == 'es' %}Servicios{% else %}Services{% endif %}</span>
     </a>
 
     <a href="{% country_url 'vehiculos:lista_vehiculos' %}" class="nav-button-standard">
       <span class="nav-icon">🚗</span>
-      <span>{% trans "Vehículos" %}</span>
+      <span>{% if request.path|slice:':3' == '/cl' or LANGUAGE_CODE == 'es' %}Vehículos{% else %}Vehicles{% endif %}</span>
     </a>
 
     <form action="{% url 'account_logout' %}" method="post" style="display: inline;">
       {% csrf_token %}
       <button type="submit" class="nav-button-standard logout-btn" style="cursor: pointer;">
         <span class="nav-icon">🚪</span>
-        <span>{% trans "Salir" %}</span>
+        <span>{% if request.path|slice:':3' == '/cl' or LANGUAGE_CODE == 'es' %}Salir{% else %}Logout{% endif %}</span>
       </button>
     </form>
 
