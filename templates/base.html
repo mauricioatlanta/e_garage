@@ -365,37 +365,37 @@
   {% if request.path != '/accounts/login/' %}
   <div id="main-navigation" class="flex flex-col items-center justify-center mt-4 gap-3">
     {% if request.user.is_authenticated %}
-      {# Para Chile (/cl/): siempre español. Para otros países: según LANGUAGE_CODE #}
+      {# Para Chile: siempre español. Para USA: inglés. Si no es /us/, es Chile #}
       <!-- Fila 1: AJUSTES, CENTRO, CLIENTES, DOCUMENTOS, EXTRA -->
       <div class="flex items-center justify-center gap-3 flex-wrap max-w-7xl w-full px-4">
         <!-- AJUSTES -->
         <a href="/cl/es/settings/" class="nav-button-standard">
           <span class="nav-icon">⚙️</span>
-          <span>{% if request.path|slice:':3' == '/cl' or LANGUAGE_CODE == 'es' %}AJUSTES{% else %}SETTINGS{% endif %}</span>
+          <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}SETTINGS{% else %}AJUSTES{% endif %}</span>
         </a>
 
         <!-- CENTRO -->
         <a href="{% country_url 'centro_operaciones' %}" class="nav-button-standard">
           <span class="nav-icon">🚀</span>
-          <span>{% if request.path|slice:':3' == '/cl' or LANGUAGE_CODE == 'es' %}CENTRO{% else %}CENTER{% endif %}</span>
+          <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}CENTER{% else %}CENTRO{% endif %}</span>
         </a>
 
         <!-- CLIENTES -->
         <a href="{% country_url 'clientes:lista_clientes' %}" class="nav-button-standard">
           <span class="nav-icon">👥</span>
-          <span>{% if request.path|slice:':3' == '/cl' or LANGUAGE_CODE == 'es' %}CLIENTES{% else %}CLIENTS{% endif %}</span>
+          <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}CLIENTS{% else %}CLIENTES{% endif %}</span>
         </a>
 
         <!-- DOCUMENTOS -->
         <a href="{% country_url 'documentos:lista_documentos' %}" class="nav-button-standard">
           <span class="nav-icon">📄</span>
-          <span>{% if request.path|slice:':3' == '/cl' or LANGUAGE_CODE == 'es' %}DOCUMENTOS{% else %}DOCUMENTS{% endif %}</span>
+          <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}DOCUMENTS{% else %}DOCUMENTOS{% endif %}</span>
         </a>
 
         <!-- EXTRA -->
-        <a href="{% if request.path|slice:':3' == '/cl' %}/cl/es/servicios/otros-servicios/{% elif request.path|slice:':3' == '/us' %}/us/en/servicios/otros-servicios/{% else %}/cl/es/servicios/otros-servicios/{% endif %}" class="nav-button-standard">
+        <a href="{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}/us/en/servicios/otros-servicios/{% else %}/cl/es/servicios/otros-servicios/{% endif %}" class="nav-button-standard">
           <span class="nav-icon">⭐</span>
-          <span>{% if LANGUAGE_CODE == 'es' %}EXTRA{% else %}EXTRA{% endif %}</span>
+          <span>EXTRA</span>
         </a>
       </div>
 
@@ -404,19 +404,19 @@
         <!-- REPUESTOS -->
         <a href="{% country_url 'repuestos:lista_repuestos' %}" class="nav-button-standard">
           <span class="nav-icon">🔧</span>
-          <span>{% if request.path|slice:':3' == '/cl' or LANGUAGE_CODE == 'es' %}REPUESTOS{% else %}PARTS{% endif %}</span>
+          <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}PARTS{% else %}REPUESTOS{% endif %}</span>
         </a>
 
         <!-- REPORTES -->
         <a href="{% country_url 'reportes:reportes_dashboard' %}" class="nav-button-standard">
           <span class="nav-icon">📊</span>
-          <span>{% if request.path|slice:':3' == '/cl' or LANGUAGE_CODE == 'es' %}REPORTES{% else %}REPORTS{% endif %}</span>
+          <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}REPORTS{% else %}REPORTES{% endif %}</span>
         </a>
 
         <!-- SERVICIOS -->
         <a href="{% country_url 'servicios:servicios_menu' %}" class="nav-button-standard">
           <span class="nav-icon">🛠️</span>
-          <span>{% if request.path|slice:':3' == '/cl' or LANGUAGE_CODE == 'es' %}SERVICIOS{% else %}SERVICES{% endif %}</span>
+          <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}SERVICES{% else %}SERVICIOS{% endif %}</span>
         </a>
 
         <!-- VEHÍCULOS -->
@@ -424,12 +424,12 @@
         {% if vehiculos_url %}
         <a href="{{ vehiculos_url }}" class="nav-button-standard">
           <span class="nav-icon">🚗</span>
-          <span>{% if request.path|slice:':3' == '/cl' or LANGUAGE_CODE == 'es' %}VEHÍCULOS{% else %}VEHICLES{% endif %}</span>
+          <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}VEHICLES{% else %}VEHÍCULOS{% endif %}</span>
         </a>
         {% else %}
         <a href="{% country_url 'vehiculos:lista_vehiculos' %}" class="nav-button-standard">
           <span class="nav-icon">🚗</span>
-          <span>{% if request.path|slice:':3' == '/cl' or LANGUAGE_CODE == 'es' %}VEHÍCULOS{% else %}VEHICLES{% endif %}</span>
+          <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}VEHICLES{% else %}VEHÍCULOS{% endif %}</span>
         </a>
         {% endif %}
 
@@ -438,7 +438,7 @@
           {% csrf_token %}
           <button type="submit" class="nav-button-standard logout-btn" style="cursor: pointer;">
             <span class="nav-icon">🚪</span>
-            <span>{% if request.path|slice:':3' == '/cl' or LANGUAGE_CODE == 'es' %}SALIR{% else %}LOGOUT{% endif %}</span>
+            <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}LOGOUT{% else %}SALIR{% endif %}</span>
           </button>
         </form>
       </div>
