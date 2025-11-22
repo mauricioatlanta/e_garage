@@ -77,35 +77,36 @@ MIDDLEWARE = [
 # AccountMiddleware de allauth: agregar dinámicamente si existe
 # Esto resuelve el problema de versiones de allauth que requieren el middleware
 # pero donde el middleware no está disponible
-try:
-    from allauth.account.middleware import AccountMiddleware
-    # El middleware existe, agregarlo después de AuthenticationMiddleware
-    auth_middleware_index = MIDDLEWARE.index("django.contrib.auth.middleware.AuthenticationMiddleware")
-    MIDDLEWARE.insert(auth_middleware_index + 1, "allauth.account.middleware.AccountMiddleware")
-except ImportError:
-    # El middleware no existe, pero allauth puede requerirlo
-    # Intentar desactivar la verificación si es posible
+# Usamos importlib para verificar sin importar directamente (evita AppRegistryNotReady)
+import importlib.util
+
+
+def check_middleware_exists(module_path):
+    """Verifica si un módulo existe sin importarlo"""
     try:
-        import allauth.account.apps
-        # Monkey patch para desactivar la verificación del middleware (solo una vez)
-        if not hasattr(allauth.account.apps.AccountConfig.ready, '_patched_for_middleware'):
-            original_ready = allauth.account.apps.AccountConfig.ready
-            
-            def patched_ready(self):
-                # Verificar si el middleware está en MIDDLEWARE antes de lanzar error
-                try:
-                    from allauth.account.middleware import AccountMiddleware
-                    # Si el middleware existe, usar la verificación original
-                    return original_ready(self)
-                except ImportError:
-                    # El middleware no existe, omitir la verificación
-                    pass
-            
-            patched_ready._patched_for_middleware = True
-            allauth.account.apps.AccountConfig.ready = patched_ready
-    except Exception:
-        # Si falla el monkey patch, continuar sin el middleware
-        pass
+        spec = importlib.util.find_spec(module_path)
+        return spec is not None
+    except (ImportError, ValueError, AttributeError):
+        return False
+
+
+# Verificar si el middleware existe sin importarlo (evita AppRegistryNotReady)
+if check_middleware_exists("allauth.account.middleware"):
+    # El middleware existe, agregarlo después de AuthenticationMiddleware
+    # Usamos el string del middleware, Django lo importará cuando sea necesario
+    try:
+        auth_middleware_index = MIDDLEWARE.index(
+            "django.contrib.auth.middleware.AuthenticationMiddleware"
+        )
+        MIDDLEWARE.insert(auth_middleware_index + 1, "allauth.account.middleware.AccountMiddleware")
+    except (ValueError, IndexError):
+        # Si no encontramos el middleware de autenticación, agregar al final
+        MIDDLEWARE.append("allauth.account.middleware.AccountMiddleware")
+else:
+    # El middleware no existe, pero allauth puede requerirlo
+    # Intentar desactivar la verificación si es posible (después de que Django esté listo)
+    # Esto se hace en el método ready() de la app, no aquí
+    pass
 
 # Configuración de URLs
 ROOT_URLCONF = "gestion_taller.urls"

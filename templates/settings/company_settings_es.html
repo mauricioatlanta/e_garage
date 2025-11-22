@@ -664,8 +664,37 @@
       grid-template-columns: 1fr;
     }
 
+    /* Quick Actions: Distribuir en dos filas en móviles */
     .quick-actions {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.8rem;
+    }
+
+    .action-btn {
+      padding: 1.5rem 1rem;
+    }
+
+    .action-icon {
+      font-size: 2rem;
+    }
+
+    .action-title {
+      font-size: 1rem;
+    }
+
+    .action-desc {
+      font-size: 0.8rem;
+    }
+
+    /* En pantallas muy pequeñas, una columna pero mantener estructura */
+    @media (max-width: 480px) {
+      .quick-actions {
+        grid-template-columns: 1fr;
+      }
+
+      .action-btn {
+        padding: 1.2rem 0.8rem;
+      }
     }
   }
 
@@ -1219,6 +1248,8 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 {% endblock %}
+
+
 
 
 

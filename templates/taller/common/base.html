@@ -245,6 +245,66 @@
       flex-wrap: wrap;
       padding: 0.5rem 0;
     }
+
+    /* Responsive: Asegurar que los botones se mantengan en dos filas en móviles */
+    @media (max-width: 768px) {
+      .nav-button-standard {
+        padding: 0.5rem 0.7rem;
+        font-size: 0.7rem;
+        gap: 0.3rem;
+        min-width: 0;
+        flex: 1 1 auto;
+      }
+
+      .nav-button-standard .nav-icon {
+        font-size: 0.8rem;
+      }
+
+      /* Reorganizar navegación en dos filas usando grid */
+      .main-navigation {
+        display: grid !important;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 0.5rem;
+        padding: 0.5rem;
+      }
+
+      /* En pantallas pequeñas, ajustar a menos columnas pero mantener en 2 filas */
+      @media (max-width: 480px) {
+        .main-navigation {
+          grid-template-columns: repeat(3, 1fr);
+        }
+
+        .nav-button-standard {
+          padding: 0.4rem 0.5rem;
+          font-size: 0.65rem;
+        }
+
+        .nav-button-standard span:last-child {
+          display: none; /* Ocultar texto en móviles muy pequeños, solo mostrar icono */
+        }
+
+        .nav-button-standard .nav-icon {
+          font-size: 1rem;
+        }
+      }
+
+      /* En pantallas medianas, ajustar distribución */
+      @media (min-width: 481px) and (max-width: 640px) {
+        .main-navigation {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+
+      /* Asegurar que la sección de administración también se ajuste */
+      .main-navigation > div {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+        padding-top: 0.5rem;
+      }
+    }
   </style>
   {% block extra_head %}{% endblock %}
   {% block extra_css %}{% endblock %}
@@ -308,14 +368,6 @@
       <span>{% trans "Reportes" %}</span>
     </a>
 
-    <form action="{% url 'account_logout' %}" method="post" style="display: inline;">
-      {% csrf_token %}
-      <button type="submit" class="nav-button-standard logout-btn" style="cursor: pointer;">
-        <span class="nav-icon">🚪</span>
-        <span>{% trans "Salir" %}</span>
-      </button>
-    </form>
-
     <a href="{% country_url 'servicios:servicios_menu' %}" class="nav-button-standard">
       <span class="nav-icon">🛠️</span>
       <span>{% trans "Servicios" %}</span>
@@ -325,6 +377,42 @@
       <span class="nav-icon">🚗</span>
       <span>{% trans "Vehículos" %}</span>
     </a>
+
+    <form action="{% url 'account_logout' %}" method="post" style="display: inline;">
+      {% csrf_token %}
+      <button type="submit" class="nav-button-standard logout-btn" style="cursor: pointer;">
+        <span class="nav-icon">🚪</span>
+        <span>{% trans "Salir" %}</span>
+      </button>
+    </form>
+
+    {% load role_tags %}
+    <!-- SECCIÓN ADMINISTRACIÓN -->
+    {% if request.user|has_role:'Owner' or request.user|has_role:'Admin' %}
+    <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(156, 163, 175, 0.3);">
+      <h3 style="padding: 0 0.75rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(156, 163, 175, 0.8); margin-bottom: 0.5rem;">
+        Administración
+      </h3>
+      
+      <!-- Gestión de Equipo: Visible para Owner y Admin -->
+      {% if request.user|has_role:'Owner' or request.user|has_role:'Admin' %}
+      <a href="{% url 'team:team_list' %}" 
+         class="nav-button-standard {% if 'equipo' in request.path %}bg-gray-100 text-gray-900{% endif %}">
+        <span class="nav-icon">👥</span>
+        <span>Equipo</span>
+      </a>
+      {% endif %}
+
+      <!-- Configuración: Solo Owner -->
+      {% if request.user|has_role:'Owner' %}
+      <a href="{% url 'taller:configuracion' %}" 
+         class="nav-button-standard">
+        <span class="nav-icon">⚙️</span>
+        <span>{% trans "Configuración" %}</span>
+      </a>
+      {% endif %}
+    </div>
+    {% endif %}
   </nav>
   <main class="container mb-5">
     {% block content %}{% endblock %}
