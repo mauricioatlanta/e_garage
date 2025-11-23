@@ -7,7 +7,14 @@
   <meta charset="UTF-8">
   <title>{% block title %}{{ company_name|default:"eGarage" }}{% endblock %}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
+  
+  {# --- PWA Configuration --- #}
+  <meta name="theme-color" content="#0d6efd">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="eGarage">
+  <link rel="manifest" href="{% static 'manifest.json' %}">
+  <link rel="apple-touch-icon" href="{% static 'images/egarage_default_logo.png' %}">
 
   {# --- Catálogo i18n --- #}
   <script src="{% url 'javascript-catalog' %}"></script>
@@ -61,6 +68,7 @@
       overflow: visible;
       white-space: nowrap;
       isolation: isolate;
+      box-shadow: 0 2px 8px rgba(0, 212, 255, 0.2);
     }
 
     /* Borde eléctrico azul calipso que se mueve alrededor */
@@ -175,13 +183,16 @@
       filter: drop-shadow(0 0 6px rgba(0, 255, 255, 1));
     }
 
-    .nav-button-standard span:last-child {
+    .nav-button-standard span:last-child,
+    .nav-button-standard .nav-text {
       position: relative;
       z-index: 1;
       text-shadow: 0 0 8px rgba(0, 212, 255, 0.5);
+      display: inline-block;
     }
 
-    .nav-button-standard:hover span:last-child {
+    .nav-button-standard:hover span:last-child,
+    .nav-button-standard:hover .nav-text {
       text-shadow: 0 0 12px rgba(0, 255, 255, 0.8);
     }
 
@@ -240,10 +251,30 @@
         gap: 0.3rem;
         min-width: 0;
         flex: 1 1 auto;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+      }
+
+      .nav-button-standard span:last-child,
+      .nav-button-standard .nav-text {
+        display: block !important; /* Asegurar que el texto siempre sea visible en móviles */
+        font-weight: 700 !important;
+        font-size: 0.7rem !important;
+        color: #b0e0ff !important;
+        text-shadow: 0 0 4px rgba(0, 212, 255, 0.8) !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        white-space: normal !important;
+        text-align: center !important;
+        line-height: 1.2 !important;
+        margin-top: 0.2rem !important;
       }
 
       .nav-button-standard .nav-icon {
-        font-size: 0.8rem;
+        font-size: 1.2rem !important;
+        display: block !important;
+        margin-bottom: 0.2rem !important;
       }
 
       /* Asegurar que cada fila use grid para distribución uniforme */
@@ -277,16 +308,42 @@
         }
 
         .nav-button-standard {
-          padding: 0.4rem 0.5rem;
-          font-size: 0.65rem;
+          padding: 0.5rem 0.4rem;
+          font-size: 0.6rem;
+          flex-direction: column;
+          gap: 0.2rem;
+          min-height: 65px;
+          justify-content: center;
+          align-items: center;
+          background: linear-gradient(135deg, rgba(5, 15, 30, 0.98) 0%, rgba(10, 20, 35, 0.98) 100%) !important;
+          border: 1.5px solid rgba(0, 212, 255, 0.5) !important;
+          box-shadow: 0 2px 10px rgba(0, 212, 255, 0.3) !important;
         }
 
-        .nav-button-standard span:last-child {
-          display: none; /* Ocultar texto en móviles muy pequeños, solo mostrar icono */
+        .nav-button-standard span:last-child,
+        .nav-button-standard .nav-text {
+          display: block !important; /* Mostrar texto en móviles para mejor identificación */
+          font-size: 0.7rem !important;
+          line-height: 1.3 !important;
+          text-align: center !important;
+          word-break: break-word !important;
+          max-width: 100% !important;
+          font-weight: 700 !important;
+          color: #b0e0ff !important;
+          text-shadow: 0 0 6px rgba(0, 212, 255, 1) !important;
+          opacity: 1 !important;
+          visibility: visible !important;
+          position: relative !important;
+          z-index: 10 !important;
+          white-space: normal !important;
+          margin-top: 0.2rem !important;
         }
 
         .nav-button-standard .nav-icon {
-          font-size: 1rem;
+          font-size: 1.3rem !important;
+          margin-bottom: 0.2rem !important;
+          filter: drop-shadow(0 0 6px rgba(0, 212, 255, 1)) !important;
+          opacity: 1 !important;
         }
       }
 
@@ -299,6 +356,138 @@
         #main-navigation .flex.flex-col > div:last-child {
           grid-template-columns: repeat(2, 1fr);
         }
+
+        .nav-button-standard {
+          padding: 0.5rem 0.5rem;
+          font-size: 0.65rem;
+          flex-direction: column;
+          gap: 0.25rem;
+          min-height: 65px;
+          justify-content: center;
+          align-items: center;
+        }
+
+        .nav-button-standard span:last-child,
+        .nav-button-standard .nav-text {
+          display: block !important;
+          font-size: 0.7rem !important;
+          line-height: 1.2 !important;
+          text-align: center !important;
+          font-weight: 700 !important;
+          color: #b0e0ff !important;
+          text-shadow: 0 0 4px rgba(0, 212, 255, 0.8) !important;
+          opacity: 1 !important;
+          visibility: visible !important;
+          white-space: normal !important;
+          margin-top: 0.2rem !important;
+        }
+
+        .nav-button-standard .nav-icon {
+          font-size: 1.3rem;
+          filter: drop-shadow(0 0 4px rgba(0, 212, 255, 0.8));
+        }
+      }
+    }
+
+    /* FORZAR VISIBILIDAD EN MÓVILES - ESTILO FINAL CON MÁXIMA PRIORIDAD */
+    @media (max-width: 768px) {
+      .nav-button-standard {
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-height: 70px !important;
+      }
+
+      .nav-button-standard span:last-child,
+      .nav-button-standard .nav-text {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        font-size: 0.7rem !important;
+        font-weight: 700 !important;
+        color: #b0e0ff !important;
+        text-shadow: 0 0 8px rgba(0, 212, 255, 1), 0 0 4px rgba(255, 255, 255, 0.5) !important;
+        line-height: 1.3 !important;
+        text-align: center !important;
+        white-space: normal !important;
+        word-break: break-word !important;
+        margin-top: 0.3rem !important;
+      }
+      
+      .nav-button-standard .nav-icon {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        font-size: 1.4rem !important;
+        margin-bottom: 0.3rem !important;
+      }
+    }
+
+    /* ESTILO ULTRA-ESPECÍFICO PARA MÓVILES - MÁXIMA PRIORIDAD */
+    @media screen and (max-width: 768px) {
+      #main-navigation .nav-button-standard {
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-height: 75px !important;
+        padding: 0.6rem 0.4rem !important;
+        gap: 0.3rem !important;
+      }
+
+      #main-navigation .nav-button-standard span:not(.nav-icon),
+      #main-navigation .nav-button-standard .nav-text {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        font-size: 0.75rem !important;
+        font-weight: 700 !important;
+        color: #b0e0ff !important;
+        text-shadow: 0 0 12px rgba(0, 212, 255, 1), 0 0 6px rgba(255, 255, 255, 0.6) !important;
+        line-height: 1.4 !important;
+        text-align: center !important;
+        margin-top: 0.3rem !important;
+        white-space: normal !important;
+        word-break: break-word !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        position: relative !important;
+        z-index: 10 !important;
+      }
+
+      #main-navigation .nav-button-standard .nav-icon {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        font-size: 1.5rem !important;
+        margin-bottom: 0.3rem !important;
+        filter: drop-shadow(0 0 8px rgba(0, 212, 255, 1)) !important;
+      }
+    }
+
+    /* FORZAR EN TODOS LOS DISPOSITIVOS MÓVILES - INCLUSO TABLETS */
+    @media screen and (max-width: 1024px) {
+      .nav-button-standard {
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+      }
+
+      .nav-button-standard .nav-text,
+      .nav-button-standard span:not(.nav-icon) {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        font-size: 0.75rem !important;
+        font-weight: 700 !important;
+        color: #b0e0ff !important;
+        text-align: center !important;
+        white-space: normal !important;
+        margin-top: 0.3rem !important;
+      }
+
+      .nav-button-standard .nav-icon {
+        display: block !important;
+        margin-bottom: 0.3rem !important;
       }
     }
   </style>
@@ -371,31 +560,31 @@
         <!-- AJUSTES -->
         <a href="/cl/es/settings/" class="nav-button-standard">
           <span class="nav-icon">⚙️</span>
-          <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}SETTINGS{% else %}AJUSTES{% endif %}</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}SETTINGS{% else %}AJUSTES{% endif %}</span>
         </a>
 
         <!-- CENTRO -->
         <a href="{% country_url 'centro_operaciones' %}" class="nav-button-standard">
           <span class="nav-icon">🚀</span>
-          <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}CENTER{% else %}CENTRO{% endif %}</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}CENTER{% else %}CENTRO{% endif %}</span>
         </a>
 
         <!-- CLIENTES -->
         <a href="{% country_url 'clientes:lista_clientes' %}" class="nav-button-standard">
           <span class="nav-icon">👥</span>
-          <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}CLIENTS{% else %}CLIENTES{% endif %}</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}CLIENTS{% else %}CLIENTES{% endif %}</span>
         </a>
 
         <!-- DOCUMENTOS -->
         <a href="{% country_url 'documentos:lista_documentos' %}" class="nav-button-standard">
           <span class="nav-icon">📄</span>
-          <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}DOCUMENTS{% else %}DOCUMENTOS{% endif %}</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}DOCUMENTS{% else %}DOCUMENTOS{% endif %}</span>
         </a>
 
         <!-- EXTRA -->
         <a href="{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}/us/en/servicios/otros-servicios/{% else %}/cl/es/servicios/otros-servicios/{% endif %}" class="nav-button-standard">
           <span class="nav-icon">⭐</span>
-          <span>EXTRA</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">EXTRA</span>
         </a>
       </div>
 
@@ -404,19 +593,19 @@
         <!-- REPUESTOS -->
         <a href="{% country_url 'repuestos:lista_repuestos' %}" class="nav-button-standard">
           <span class="nav-icon">🔧</span>
-          <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}PARTS{% else %}REPUESTOS{% endif %}</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}PARTS{% else %}REPUESTOS{% endif %}</span>
         </a>
 
         <!-- REPORTES -->
         <a href="{% country_url 'reportes:reportes_dashboard' %}" class="nav-button-standard">
           <span class="nav-icon">📊</span>
-          <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}REPORTS{% else %}REPORTES{% endif %}</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}REPORTS{% else %}REPORTES{% endif %}</span>
         </a>
 
         <!-- SERVICIOS -->
         <a href="{% country_url 'servicios:servicios_menu' %}" class="nav-button-standard">
           <span class="nav-icon">🛠️</span>
-          <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}SERVICES{% else %}SERVICIOS{% endif %}</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}SERVICES{% else %}SERVICIOS{% endif %}</span>
         </a>
 
         <!-- VEHÍCULOS -->
@@ -424,12 +613,12 @@
         {% if vehiculos_url %}
         <a href="{{ vehiculos_url }}" class="nav-button-standard">
           <span class="nav-icon">🚗</span>
-          <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}VEHICLES{% else %}VEHÍCULOS{% endif %}</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}VEHICLES{% else %}VEHÍCULOS{% endif %}</span>
         </a>
         {% else %}
         <a href="{% country_url 'vehiculos:lista_vehiculos' %}" class="nav-button-standard">
           <span class="nav-icon">🚗</span>
-          <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}VEHICLES{% else %}VEHÍCULOS{% endif %}</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}VEHICLES{% else %}VEHÍCULOS{% endif %}</span>
         </a>
         {% endif %}
 
@@ -438,7 +627,7 @@
           {% csrf_token %}
           <button type="submit" class="nav-button-standard logout-btn" style="cursor: pointer;">
             <span class="nav-icon">🚪</span>
-            <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}LOGOUT{% else %}SALIR{% endif %}</span>
+            <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}LOGOUT{% else %}SALIR{% endif %}</span>
           </button>
         </form>
       </div>
@@ -505,6 +694,38 @@
     function confirmarEliminacion(nombreCliente){
       const message=`⚠️ ¿Está seguro de eliminar a "${nombreCliente}"?\n\nEsta acción NO se puede deshacer.`;
       return confirm(message);
+    }
+
+    // Service Worker Registration para PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('{% static "service-worker.js" %}')
+          .then(function(registration) {
+            console.log('✅ Service Worker registrado exitosamente:', registration.scope);
+            
+            // Verificar actualizaciones cada hora
+            setInterval(function() {
+              registration.update();
+            }, 3600000); // 1 hora
+            
+            // Escuchar actualizaciones del service worker
+            registration.addEventListener('updatefound', function() {
+              const newWorker = registration.installing;
+              newWorker.addEventListener('statechange', function() {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  // Hay una nueva versión disponible
+                  if (confirm('🎉 Nueva versión de eGarage disponible. ¿Deseas actualizar ahora?')) {
+                    newWorker.postMessage({ type: 'SKIP_WAITING' });
+                    window.location.reload();
+                  }
+                }
+              });
+            });
+          })
+          .catch(function(error) {
+            console.warn('⚠️ Error al registrar Service Worker:', error);
+          });
+      });
     }
   </script>
 </body>
