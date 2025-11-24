@@ -1,0 +1,717 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% load country_url %}
+
+{% block extra_head %}
+<link href="/static/css/estilo_futurista.css" rel="stylesheet">
+<link href="/static/css/galaxy_theme.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  tsParticles.load("tsparticles", {
+    fullScreen: { enable: false },
+    background: { color: { value: "transparent" } },
+    particles: {
+      number: { value: 100 },
+      color: { value: "#00ffff" },
+      size: { value: 2 },
+      move: { enable: true, speed: 0.7 },
+      links: { enable: true, color: "#00e6d0", opacity: 0.3 }
+    }
+  });
+});
+</script>
+<style>
+body {
+  background: linear-gradient(120deg, #0f2027 0%, #2c5364 100%) fixed;
+  min-height: 100vh;
+}
+#tsparticles {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+}
+.cuadro {
+  position: relative;
+  z-index: 2;
+}
+.cuadro, .cuadro *, .form-card, .form-card * {
+  color: #fff !important;
+}
+.form-card {
+  background: rgba(0,0,0,0.6) !important;
+  color: #fff !important;
+  padding: 24px;
+  margin-bottom: 20px;
+  backdrop-filter: blur(8px) saturate(120%);
+  -webkit-backdrop-filter: blur(8px) saturate(120%);
+  border: 1.5px solid rgba(0,230,208,0.12);
+  border-radius: 8px;
+}
+.form-group {
+  margin-bottom: 20px;
+}
+.form-group label {
+  display: block;
+  font-weight: 600;
+  color: #00e6d0 !important;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+.form-control, select, input {
+  width: 100%;
+  padding: 12px;
+  background: rgba(0,230,208,0.1) !important;
+  border: 1px solid rgba(0,230,208,0.3) !important;
+  border-radius: 6px;
+  color: #fff !important;
+  font-size: 16px;
+}
+.form-control:focus, select:focus, input:focus {
+  outline: none;
+  border-color: #00e6d0 !important;
+  background: rgba(0,230,208,0.15) !important;
+  box-shadow: 0 0 0 2px rgba(0,230,208,0.2);
+}
+.btn-futuristic {
+  background: linear-gradient(45deg, #00e6d0, #00b3a0);
+  border: none;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-block;
+  margin-right: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.btn-futuristic:hover {
+  background: linear-gradient(45deg, #00b3a0, #008a7a);
+  color: white;
+  text-decoration: none;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0,230,208,0.3);
+}
+.btn-secondary {
+  background: linear-gradient(45deg, #6c757d, #545b62);
+}
+.btn-secondary:hover {
+  background: linear-gradient(45deg, #545b62, #495057);
+}
+.font-orbitron {
+  font-family: 'Orbitron', 'Arial', sans-serif;
+}
+</style>
+{% endblock %}
+
+{% block fondo_extra %}
+<div id="tsparticles" class="fixed inset-0 -z-10"></div>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto cuadro">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold font-orbitron">Editar Vehículo</h1>
+    <a href="{% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{% else %}/cl/vehiculos/{% endif %}"
+       class="btn-futuristic btn-secondary">← Volver a la lista</a>
+  </div>
+
+  <div class="form-card">
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <div class="form-group">
+          <label for="{{ form.patente.id_for_label }}">Patente</label>
+          {{ form.patente }}
+          {% if form.patente.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.patente.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.vin.id_for_label }}">VIN</label>
+          {{ form.vin }}
+          {% if form.vin.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.vin.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.anio.id_for_label }}">Año</label>
+          {{ form.anio }}
+          {% if form.anio.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.anio.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.millas.id_for_label }}">Millas/Kilometraje</label>
+          {{ form.millas }}
+          {% if form.millas.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.millas.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.cliente.id_for_label }}">Cliente</label>
+          {{ form.cliente }}
+          {% if form.cliente.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.cliente.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.marca.id_for_label }}">Marca</label>
+          {{ form.marca }}
+          {% if form.marca.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.marca.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.modelo.id_for_label }}">Modelo</label>
+          {{ form.modelo }}
+          {% if form.modelo.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.modelo.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.color.id_for_label }}">Color</label>
+          {{ form.color }}
+          {% if form.color.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.color.errors.0 }}</div>
+          {% endif %}
+          <!-- Campo para nuevo color (oculto por defecto) -->
+          <div id="color-nuevo-container" style="display: none;" class="mt-2">
+            <input type="text"
+                   name="color_nuevo"
+                   id="color_nuevo"
+                   placeholder="Ingresa el nombre del nuevo color"
+                   class="form-control"
+                   style="background: rgba(0,230,208,0.1) !important; border: 1px solid rgba(0,230,208,0.3) !important; color: #fff !important;">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.motor.id_for_label }}">Motor</label>
+          {{ form.motor }}
+          {% if form.motor.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.motor.errors.0 }}</div>
+          {% endif %}
+          <!-- Campo para nuevo motor (oculto por defecto) -->
+          <div id="motor-nuevo-container" style="display: none;" class="mt-2">
+            <input type="text"
+                   name="motor_nuevo"
+                   id="motor_nuevo"
+                   placeholder="Ingresa el nombre del nuevo motor"
+                   class="form-control"
+                   style="background: rgba(0,230,208,0.1) !important; border: 1px solid rgba(0,230,208,0.3) !important; color: #fff !important;">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.caja.id_for_label }}">Caja/Transmisión</label>
+          {{ form.caja }}
+          {% if form.caja.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.caja.errors.0 }}</div>
+          {% endif %}
+          <!-- Campo para nueva caja (oculto por defecto) -->
+          <div id="caja-nueva-container" style="display: none;" class="mt-2">
+            <input type="text"
+                   name="caja_nuevo"
+                   id="caja_nuevo"
+                   placeholder="Ingresa el nombre de la nueva caja/transmisión"
+                   class="form-control"
+                   style="background: rgba(0,230,208,0.1) !important; border: 1px solid rgba(0,230,208,0.3) !important; color: #fff !important;">
+          </div>
+        </div>
+
+      </div>
+
+
+      <div class="flex gap-3 mt-8 pt-6 border-t border-gray-600">
+        <button type="submit" class="btn-futuristic">
+          💾 Guardar cambios
+        </button>
+
+        {% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{{ object.id }}/{% else %}/cl/vehiculos/{{ object.id }}/{% endif %} as url_ver_vehiculo
+        <a href="{{ url_ver_vehiculo|default:'#' }}"
+           class="btn-futuristic btn-secondary">
+          ❌ Cancelar
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Definir countryPrefix basado en la URL actual
+    const countryPrefix = (function() {
+        const path = window.location.pathname;
+        if (path.startsWith('/us/')) return '/us/';
+        if (path.startsWith('/cl/')) return '/cl/';
+        if (path.startsWith('/mx/')) return '/mx/';
+        return '/cl/'; // Default
+    })();
+
+    // URLs para endpoints AJAX
+    const urlAgregarMotor = "{% country_url 'vehiculos:ajax_agregar_motor' %}";
+    const urlAgregarCaja = "{% country_url 'vehiculos:ajax_agregar_caja' %}";
+    const urlModelosPorMarca = "{% country_url 'vehiculos:ajax_modelos_por_marca' %}";
+    const urlMotoresPorModelo = "{% country_url 'vehiculos:ajax_motores_por_modelo' %}";
+    const urlCajasPorModelo = "{% country_url 'vehiculos:ajax_cajas_por_modelo' %}";
+
+    const marcaSelect = document.getElementById('id_marca');
+    const modeloSelect = document.getElementById('id_modelo');
+
+    if (marcaSelect && modeloSelect) {
+        // Función para cargar modelos por marca
+        function cargarModelos(marcaId, modeloSeleccionado = null) {
+            // Limpiar opciones del modelo
+            modeloSelect.innerHTML = '<option value="">---------</option>';
+
+            if (marcaId) {
+                // Mostrar loading
+                const loadingOption = document.createElement('option');
+                loadingOption.value = '';
+                loadingOption.textContent = 'Cargando modelos...';
+                modeloSelect.appendChild(loadingOption);
+
+                // Hacer petición AJAX para obtener modelos de la marca
+                fetch(`${urlModelosPorMarca}?marca_id=${marcaId}`)
+                    .then(response => {
+                        console.log('Response status:', response.status);
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Modelos data:', data);
+                        // Limpiar opciones
+                        modeloSelect.innerHTML = '<option value="">---------</option>';
+
+                        // data es un array de objetos {id, nombre}
+                        if (Array.isArray(data)) {
+                            data.forEach(modelo => {
+                                const option = document.createElement('option');
+                                option.value = modelo.id;
+                                option.textContent = modelo.nombre;
+
+                                // Seleccionar el modelo si coincide
+                                if (modeloSeleccionado && modelo.id == modeloSeleccionado) {
+                                    option.selected = true;
+                                }
+
+                                modeloSelect.appendChild(option);
+                            });
+                        } else {
+                            console.error('Data is not an array:', data);
+                            modeloSelect.innerHTML = '<option value="">Error: formato de datos incorrecto</option>';
+                        }
+
+                        // Si hay un modelo seleccionado, cargar sus motores y cajas
+                        if (modeloSeleccionado) {
+                            const motorSelect = document.getElementById('id_motor');
+                            const cajaSelect = document.getElementById('id_caja');
+                            const motorActual = motorSelect ? motorSelect.value : null;
+                            const cajaActual = cajaSelect ? cajaSelect.value : null;
+                            cargarMotoresYCajas(modeloSeleccionado, motorActual, cajaActual);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error al cargar modelos:', error);
+                        modeloSelect.innerHTML = '<option value="">Error al cargar</option>';
+                    });
+            }
+        }
+
+        // Función para cargar motores y cajas por modelo
+        function cargarMotoresYCajas(modeloId, motorSeleccionado = null, cajaSeleccionada = null) {
+            const motorSelect = document.getElementById('id_motor');
+            const cajaSelect = document.getElementById('id_caja');
+
+            if (!motorSelect || !cajaSelect) return;
+
+            // Obtener valores actuales si no se proporcionan
+            if (!motorSeleccionado) motorSeleccionado = motorSelect.value;
+            if (!cajaSeleccionada) cajaSeleccionada = cajaSelect.value;
+
+            // Limpiar y mostrar loading en motores
+            motorSelect.innerHTML = '<option value="">Cargando motores...</option>';
+            cajaSelect.innerHTML = '<option value="">Cargando cajas...</option>';
+
+            // Cargar motores
+            fetch(`${urlMotoresPorModelo}?modelo_id=${modeloId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    motorSelect.innerHTML = '<option value="">---------</option>';
+                    
+                    // Usar data.motores directamente
+                    if (data.motores && Array.isArray(data.motores)) {
+                        data.motores.forEach(motor => {
+                            const option = document.createElement('option');
+                            option.value = motor.id;
+                            option.textContent = motor.nombre;
+
+                            // Seleccionar el motor si coincide
+                            if (motorSeleccionado && motor.id == motorSeleccionado) {
+                                option.selected = true;
+                            }
+
+                            motorSelect.appendChild(option);
+                        });
+                    }
+                    
+                    // Agregar opción para crear nuevo motor
+                    const nuevoOption = document.createElement('option');
+                    nuevoOption.value = '__nuevo__';
+                    nuevoOption.textContent = '➕ Agregar nuevo motor...';
+                    motorSelect.appendChild(nuevoOption);
+
+                    // Si el valor seleccionado es __nuevo__, seleccionarlo
+                    if (motorSeleccionado === '__nuevo__') {
+                        motorSelect.value = '__nuevo__';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al cargar motores:', error);
+                    motorSelect.innerHTML = '<option value="">Error al cargar motores</option>';
+                });
+
+            // Cargar cajas
+            fetch(`${urlCajasPorModelo}?modelo_id=${modeloId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    cajaSelect.innerHTML = '<option value="">---------</option>';
+                    
+                    // Usar data.cajas directamente
+                    if (data.cajas && Array.isArray(data.cajas)) {
+                        data.cajas.forEach(caja => {
+                            const option = document.createElement('option');
+                            option.value = caja.id;
+                            option.textContent = caja.nombre;
+
+                            // Seleccionar la caja si coincide
+                            if (cajaSeleccionada && caja.id == cajaSeleccionada) {
+                                option.selected = true;
+                            }
+
+                            cajaSelect.appendChild(option);
+                        });
+                    }
+                    
+                    // Agregar opción para crear nueva caja
+                    const nuevoOption = document.createElement('option');
+                    nuevoOption.value = '__nuevo__';
+                    nuevoOption.textContent = '➕ Agregar nueva caja...';
+                    cajaSelect.appendChild(nuevoOption);
+
+                    // Si el valor seleccionado es __nuevo__, seleccionarlo
+                    if (cajaSeleccionada === '__nuevo__') {
+                        cajaSelect.value = '__nuevo__';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al cargar cajas:', error);
+                    cajaSelect.innerHTML = '<option value="">Error al cargar cajas</option>';
+                });
+        }
+
+        // Event listener para cambio de marca
+        marcaSelect.addEventListener('change', function() {
+            cargarModelos(this.value);
+            // Limpiar motores y cajas cuando cambia la marca
+            const motorSelect = document.getElementById('id_motor');
+            const cajaSelect = document.getElementById('id_caja');
+            if (motorSelect) motorSelect.innerHTML = '<option value="">Selecciona un modelo primero</option>';
+            if (cajaSelect) cajaSelect.innerHTML = '<option value="">Selecciona un modelo primero</option>';
+        });
+
+        // Event listener para cambio de modelo
+        modeloSelect.addEventListener('change', function() {
+            if (this.value) {
+                cargarMotoresYCajas(this.value);
+            } else {
+                // Limpiar motores y cajas si no hay modelo seleccionado
+                const motorSelect = document.getElementById('id_motor');
+                const cajaSelect = document.getElementById('id_caja');
+                if (motorSelect) motorSelect.innerHTML = '<option value="">Selecciona un modelo primero</option>';
+                if (cajaSelect) cajaSelect.innerHTML = '<option value="">Selecciona un modelo primero</option>';
+            }
+        });
+
+        // Cargar modelos iniciales si ya hay una marca seleccionada
+        if (marcaSelect.value) {
+            cargarModelos(marcaSelect.value, modeloSelect.value);
+        }
+
+        // Cargar motores y cajas iniciales si ya hay un modelo seleccionado
+        if (modeloSelect.value) {
+            cargarMotoresYCajas(modeloSelect.value);
+        }
+    }
+
+    // Manejar campo de color
+    const colorSelect = document.getElementById('id_color');
+    const colorNuevoContainer = document.getElementById('color-nuevo-container');
+    const colorNuevoInput = document.getElementById('color_nuevo');
+
+    if (colorSelect && colorNuevoContainer && colorNuevoInput) {
+        colorSelect.addEventListener('change', function() {
+            if (this.value === '__nuevo__') {
+                colorNuevoContainer.style.display = 'block';
+                colorNuevoInput.required = true;
+                colorNuevoInput.focus();
+            } else {
+                colorNuevoContainer.style.display = 'none';
+                colorNuevoInput.required = false;
+                colorNuevoInput.value = '';
+            }
+        });
+
+        // Verificar estado inicial
+        if (colorSelect.value === '__nuevo__') {
+            colorNuevoContainer.style.display = 'block';
+            colorNuevoInput.required = true;
+        }
+    }
+
+    // Manejar campo de motor
+    const motorSelect = document.getElementById('id_motor');
+    const motorNuevoContainer = document.getElementById('motor-nuevo-container');
+    const motorNuevoInput = document.getElementById('motor_nuevo');
+
+    if (motorSelect && motorNuevoContainer && motorNuevoInput) {
+        motorSelect.addEventListener('change', function() {
+            if (this.value === '__nuevo__') {
+                motorNuevoContainer.style.display = 'block';
+                motorNuevoInput.required = true;
+                motorNuevoInput.focus();
+            } else {
+                motorNuevoContainer.style.display = 'none';
+                motorNuevoInput.required = false;
+                motorNuevoInput.value = '';
+            }
+        });
+
+        // Función para crear nuevo motor vía AJAX
+        function crearNuevoMotor(nombreMotor) {
+            const modeloId = modeloSelect.value;
+            if (!modeloId) {
+                alert('Por favor selecciona un modelo primero');
+                return;
+            }
+
+            if (!nombreMotor || nombreMotor.trim() === '') {
+                alert('Por favor ingresa un nombre para el motor');
+                return;
+            }
+
+            // Mostrar loading
+            motorNuevoInput.disabled = true;
+            motorNuevoInput.placeholder = 'Creando motor...';
+
+            // Obtener CSRF token
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            // Crear motor vía AJAX
+            fetch(urlAgregarMotor, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify({
+                    nombre: nombreMotor.trim(),
+                    modelo_id: modeloId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                motorNuevoInput.disabled = false;
+                motorNuevoInput.placeholder = 'Ingresa el nombre del nuevo motor';
+
+                if (data.success) {
+                    // Agregar el nuevo motor al dropdown
+                    const option = document.createElement('option');
+                    option.value = data.motor.id;
+                    option.textContent = data.motor.nombre;
+                    option.selected = true;
+
+                    // Remover la opción "__nuevo__" y agregar el nuevo motor antes de ella
+                    const nuevoOption = motorSelect.querySelector('option[value="__nuevo__"]');
+                    if (nuevoOption) {
+                        motorSelect.insertBefore(option, nuevoOption);
+                    } else {
+                        motorSelect.appendChild(option);
+                    }
+
+                    // Ocultar el campo de texto y limpiarlo
+                    motorNuevoContainer.style.display = 'none';
+                    motorNuevoInput.value = '';
+                    motorNuevoInput.required = false;
+
+                    // Seleccionar el nuevo motor
+                    motorSelect.value = data.motor.id;
+                } else {
+                    alert('Error al crear el motor: ' + (data.error || 'Error desconocido'));
+                }
+            })
+            .catch(error => {
+                console.error('Error al crear motor:', error);
+                motorNuevoInput.disabled = false;
+                motorNuevoInput.placeholder = 'Ingresa el nombre del nuevo motor';
+                alert('Error al crear el motor. Por favor intenta nuevamente.');
+            });
+        }
+
+        // Crear motor cuando el usuario presiona Enter o pierde el foco
+        motorNuevoInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                crearNuevoMotor(this.value);
+            }
+        });
+
+        motorNuevoInput.addEventListener('blur', function() {
+            if (this.value.trim() !== '') {
+                crearNuevoMotor(this.value);
+            }
+        });
+
+        // Verificar estado inicial
+        if (motorSelect.value === '__nuevo__') {
+            motorNuevoContainer.style.display = 'block';
+            motorNuevoInput.required = true;
+        }
+    }
+
+    // Manejar campo de caja
+    const cajaSelect = document.getElementById('id_caja');
+    const cajaNuevaContainer = document.getElementById('caja-nueva-container');
+    const cajaNuevoInput = document.getElementById('caja_nuevo');
+
+    if (cajaSelect && cajaNuevaContainer && cajaNuevoInput) {
+        cajaSelect.addEventListener('change', function() {
+            if (this.value === '__nuevo__') {
+                cajaNuevaContainer.style.display = 'block';
+                cajaNuevoInput.required = true;
+                cajaNuevoInput.focus();
+            } else {
+                cajaNuevaContainer.style.display = 'none';
+                cajaNuevoInput.required = false;
+                cajaNuevoInput.value = '';
+            }
+        });
+
+        // Función para crear nueva caja vía AJAX
+        function crearNuevaCaja(nombreCaja) {
+            const modeloId = modeloSelect.value;
+            if (!modeloId) {
+                alert('Por favor selecciona un modelo primero');
+                return;
+            }
+
+            if (!nombreCaja || nombreCaja.trim() === '') {
+                alert('Por favor ingresa un nombre para la caja');
+                return;
+            }
+
+            // Mostrar loading
+            cajaNuevoInput.disabled = true;
+            cajaNuevoInput.placeholder = 'Creando caja...';
+
+            // Obtener CSRF token
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            // Crear caja vía AJAX
+            fetch(urlAgregarCaja, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify({
+                    nombre: nombreCaja.trim(),
+                    modelo_id: modeloId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                cajaNuevoInput.disabled = false;
+                cajaNuevoInput.placeholder = 'Ingresa el nombre de la nueva caja/transmisión';
+
+                if (data.success) {
+                    // Agregar la nueva caja al dropdown
+                    const option = document.createElement('option');
+                    option.value = data.caja.id;
+                    option.textContent = data.caja.nombre;
+                    option.selected = true;
+
+                    // Remover la opción "__nuevo__" y agregar la nueva caja antes de ella
+                    const nuevoOption = cajaSelect.querySelector('option[value="__nuevo__"]');
+                    if (nuevoOption) {
+                        cajaSelect.insertBefore(option, nuevoOption);
+                    } else {
+                        cajaSelect.appendChild(option);
+                    }
+
+                    // Ocultar el campo de texto y limpiarlo
+                    cajaNuevaContainer.style.display = 'none';
+                    cajaNuevoInput.value = '';
+                    cajaNuevoInput.required = false;
+
+                    // Seleccionar la nueva caja
+                    cajaSelect.value = data.caja.id;
+                } else {
+                    alert('Error al crear la caja: ' + (data.error || 'Error desconocido'));
+                }
+            })
+            .catch(error => {
+                console.error('Error al crear caja:', error);
+                cajaNuevoInput.disabled = false;
+                cajaNuevoInput.placeholder = 'Ingresa el nombre de la nueva caja/transmisión';
+                alert('Error al crear la caja. Por favor intenta nuevamente.');
+            });
+        }
+
+        // Crear caja cuando el usuario presiona Enter o pierde el foco
+        cajaNuevoInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                crearNuevaCaja(this.value);
+            }
+        });
+
+        cajaNuevoInput.addEventListener('blur', function() {
+            if (this.value.trim() !== '') {
+                crearNuevaCaja(this.value);
+            }
+        });
+
+        // Verificar estado inicial
+        if (cajaSelect.value === '__nuevo__') {
+            cajaNuevaContainer.style.display = 'block';
+            cajaNuevoInput.required = true;
+        }
+    }
+});
+</script>
+
+{% endblock %}
