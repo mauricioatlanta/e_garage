@@ -1,0 +1,114 @@
+===========================================
+LIMPIEZA DE CACHÉ Y RECARGA
+===========================================
+
+Template actualizado: ✓ (50KB)
+
+PASOS FINALES:
+--------------
+
+cd /home/atlantareciclajes/apps/egarage/current
+workon venv_egarage310
+
+# 1. Limpiar caché de Python
+find . -type d -name "__pycache__" -exec rm -r {} + 2>/dev/null
+find . -name "*.pyc" -delete
+
+# 2. Limpiar caché de Django (si existe)
+python manage.py shell << 'PYTHON'
+from django.core.cache import cache
+try:
+    cache.clear()
+    print("✓ Caché de Django limpiada")
+except Exception as e:
+    print(f"⚠️  No se pudo limpiar caché: {e}")
+exit()
+PYTHON
+
+# 3. Verificar que el template es el correcto
+head -20 templates/us/en/vehiculos/crear_vehiculo.html
+# Debe mostrar el contenido completo, no solo {% extends %}
+
+# 4. Verificar que el template se puede cargar
+python manage.py shell << 'PYTHON'
+from django.template.loader import get_template
+try:
+    template = get_template('us/en/vehiculos/crear_vehiculo.html')
+    print(f"✓ Template encontrado: {template.origin}")
+    print(f"✓ Template cargado correctamente")
+except Exception as e:
+    print(f"✗ Error cargando template: {e}")
+exit()
+PYTHON
+
+# 5. RECARGAR APLICACIÓN
+# Ir al dashboard de PythonAnywhere:
+# https://www.pythonanywhere.com/user/atlantareciclajes/
+# Pestaña: "Web"
+# Clic en: "Reload atlantareciclajes.pythonanywhere.com"
+
+# 6. Probar en navegador (limpiar caché del navegador también)
+# https://www.egarage.cl/us/vehiculos/crear/
+# Debe mostrar el formulario completo con estilos futuristas
+
+===========================================
+VERIFICACIÓN ADICIONAL:
+===========================================
+
+# Verificar que la vista encuentra el template correcto
+python manage.py shell << 'PYTHON'
+from taller.vehiculos.views_fbv import _vehicle_template
+template = _vehicle_template("crear", "US")
+print(f"Template esperado por la vista: {template}")
+
+# Verificar que existe
+import os
+from django.conf import settings
+template_paths = []
+for dir in settings.TEMPLATES[0]['DIRS']:
+    full_path = os.path.join(dir, template)
+    template_paths.append(full_path)
+    if os.path.exists(full_path):
+        print(f"✓ Template encontrado en: {full_path}")
+        print(f"  Tamaño: {os.path.getsize(full_path)} bytes")
+    else:
+        print(f"✗ Template NO encontrado en: {full_path}")
+
+# También verificar en apps
+for app in settings.INSTALLED_APPS:
+    if app.startswith('taller'):
+        app_path = __import__(app).__path__[0]
+        app_template = os.path.join(app_path, 'templates', template)
+        if os.path.exists(app_template):
+            print(f"✓ Template encontrado en app: {app_template}")
+            print(f"  Tamaño: {os.path.getsize(app_template)} bytes")
+exit()
+PYTHON
+
+===========================================
+SI AÚN MUESTRA LOGIN:
+===========================================
+
+# Verificar autenticación del usuario
+python manage.py shell << 'PYTHON'
+from django.contrib.auth.models import User
+try:
+    user = User.objects.get(username='testuser_usa')
+    print(f"✓ Usuario: {user.username}")
+    print(f"  Activo: {user.is_active}")
+    print(f"  Staff: {user.is_staff}")
+    if hasattr(user, 'empresa'):
+        print(f"  Empresa: {user.empresa.nombre_taller}")
+        print(f"  País: {user.empresa.pais}")
+    else:
+        print("  ⚠️  Usuario NO tiene empresa asignada")
+except User.DoesNotExist:
+    print("✗ Usuario testuser_usa NO existe")
+exit()
+PYTHON
+
+# Ver logs de errores en el dashboard
+# Web → Error log
+
+===========================================
+

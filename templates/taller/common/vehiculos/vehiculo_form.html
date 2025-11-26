@@ -241,8 +241,8 @@ body {
           💾 Guardar cambios
         </button>
 
-        {% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{{ object.id }}/{% else %}/cl/vehiculos/{{ object.id }}/{% endif %} as url_ver_vehiculo
-        <a href="{{ url_ver_vehiculo|default:'#' }}"
+        {% country_url 'vehiculos:lista_vehiculos' as url_lista_vehiculos %}
+        <a href="{% if url_lista_vehiculos %}{{ url_lista_vehiculos }}{% else %}{% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{% else %}/cl/vehiculos/{% endif %}{% endif %}"
            class="btn-futuristic btn-secondary">
           ❌ Cancelar
         </a>
@@ -252,29 +252,75 @@ body {
 </div>
 
 <script>
+// Definir countryPrefix globalmente para que esté disponible en todo el scope
+const countryPrefix = (function() {
+    const path = window.location.pathname;
+    if (path.startsWith('/us/')) return '/us/';
+    if (path.startsWith('/cl/')) return '/cl/';
+    if (path.startsWith('/mx/')) return '/mx/';
+    return '/cl/'; // Default
+})();
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Definir countryPrefix basado en la URL actual
-    const countryPrefix = (function() {
-        const path = window.location.pathname;
-        if (path.startsWith('/us/')) return '/us/';
-        if (path.startsWith('/cl/')) return '/cl/';
-        if (path.startsWith('/mx/')) return '/mx/';
-        return '/cl/'; // Default
-    })();
 
     // URLs para endpoints AJAX
     const urlAgregarMotor = "{% country_url 'vehiculos:ajax_agregar_motor' %}";
     const urlAgregarCaja = "{% country_url 'vehiculos:ajax_agregar_caja' %}";
     const urlModelosPorMarca = "{% country_url 'vehiculos:ajax_modelos_por_marca' %}";
+    const urlModelosPorMarcaApi = "{% country_url 'vehiculos:modelos_por_marca_api' %}";
     const urlMotoresPorModelo = "{% country_url 'vehiculos:ajax_motores_por_modelo' %}";
     const urlCajasPorModelo = "{% country_url 'vehiculos:ajax_cajas_por_modelo' %}";
+    const urlMarcas = "{% country_url 'vehiculos:api_marcas' %}";
 
     const marcaSelect = document.getElementById('id_marca');
     const modeloSelect = document.getElementById('id_modelo');
+    const anioSelect = document.getElementById('id_anio');
+
+    // Función para cargar marcas vía AJAX si el campo está vacío
+    function cargarMarcas() {
+        if (!marcaSelect) return;
+        
+        // Verificar si el campo tiene opciones (más allá de la opción vacía)
+        const hasOptions = marcaSelect.options.length > 1 || 
+                          (marcaSelect.options.length === 1 && marcaSelect.options[0].value !== '');
+        
+        if (!hasOptions) {
+            console.log('Campo marca vacío, cargando marcas vía AJAX...');
+            marcaSelect.innerHTML = '<option value="">Cargando marcas...</option>';
+            
+            fetch(urlMarcas)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    marcaSelect.innerHTML = '<option value="">---------</option>';
+                    
+                    if (Array.isArray(data) && data.length > 0) {
+                        data.forEach(marca => {
+                            const option = document.createElement('option');
+                            option.value = marca.id;
+                            option.textContent = marca.nombre;
+                            marcaSelect.appendChild(option);
+                        });
+                        console.log(`Marcas cargadas: ${data.length}`);
+                    } else {
+                        console.warn('No se encontraron marcas');
+                        marcaSelect.innerHTML = '<option value="">No hay marcas disponibles</option>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al cargar marcas:', error);
+                    marcaSelect.innerHTML = '<option value="">Error al cargar marcas</option>';
+                });
+        }
+    }
 
     if (marcaSelect && modeloSelect) {
-        // Función para cargar modelos por marca
-        function cargarModelos(marcaId, modeloSeleccionado = null) {
+        // Función para cargar modelos por marca y año
+        function cargarModelos(marcaId, anio = null, modeloSeleccionado = null) {
             // Limpiar opciones del modelo
             modeloSelect.innerHTML = '<option value="">---------</option>';
 
@@ -285,10 +331,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 loadingOption.textContent = 'Cargando modelos...';
                 modeloSelect.appendChild(loadingOption);
 
-                // Hacer petición AJAX para obtener modelos de la marca
-                fetch(`${urlModelosPorMarca}?marca_id=${marcaId}`)
+                // Construir URL con parámetros
+                let url = `${urlModelosPorMarcaApi}?marca_id=${marcaId}`;
+                if (anio) {
+                    url += `&anio=${anio}`;
+                }
+
+                // Hacer petición AJAX para obtener modelos de la marca (y año si está disponible)
+                fetch(url)
                     .then(response => {
                         console.log('Response status:', response.status);
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
                         return response.json();
                     })
                     .then(data => {
@@ -298,18 +353,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
                         // data es un array de objetos {id, nombre}
                         if (Array.isArray(data)) {
-                            data.forEach(modelo => {
-                                const option = document.createElement('option');
-                                option.value = modelo.id;
-                                option.textContent = modelo.nombre;
+                            if (data.length === 0) {
+                                modeloSelect.innerHTML = '<option value="">No hay modelos disponibles</option>';
+                            } else {
+                                data.forEach(modelo => {
+                                    const option = document.createElement('option');
+                                    option.value = modelo.id;
+                                    option.textContent = modelo.nombre;
 
-                                // Seleccionar el modelo si coincide
-                                if (modeloSeleccionado && modelo.id == modeloSeleccionado) {
-                                    option.selected = true;
-                                }
+                                    // Seleccionar el modelo si coincide
+                                    if (modeloSeleccionado && modelo.id == modeloSeleccionado) {
+                                        option.selected = true;
+                                    }
 
-                                modeloSelect.appendChild(option);
-                            });
+                                    modeloSelect.appendChild(option);
+                                });
+                            }
                         } else {
                             console.error('Data is not an array:', data);
                             modeloSelect.innerHTML = '<option value="">Error: formato de datos incorrecto</option>';
@@ -433,15 +492,41 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
         }
 
-        // Event listener para cambio de marca
-        marcaSelect.addEventListener('change', function() {
-            cargarModelos(this.value);
-            // Limpiar motores y cajas cuando cambia la marca
+        // Función para obtener año actual
+        function obtenerAnio() {
+            if (anioSelect && anioSelect.value) {
+                return anioSelect.value;
+            }
+            return null;
+        }
+
+        // Función para recargar modelos cuando cambia marca o año
+        function recargarModelos() {
+            const marcaId = marcaSelect.value;
+            const anio = obtenerAnio();
+            const modeloActual = modeloSelect.value;
+            cargarModelos(marcaId, anio, modeloActual);
+            
+            // Limpiar motores y cajas cuando cambia la marca o año
             const motorSelect = document.getElementById('id_motor');
             const cajaSelect = document.getElementById('id_caja');
             if (motorSelect) motorSelect.innerHTML = '<option value="">Selecciona un modelo primero</option>';
             if (cajaSelect) cajaSelect.innerHTML = '<option value="">Selecciona un modelo primero</option>';
+        }
+
+        // Event listener para cambio de marca
+        marcaSelect.addEventListener('change', function() {
+            recargarModelos();
         });
+
+        // Event listener para cambio de año
+        if (anioSelect) {
+            anioSelect.addEventListener('change', function() {
+                if (marcaSelect.value) {
+                    recargarModelos();
+                }
+            });
+        }
 
         // Event listener para cambio de modelo
         modeloSelect.addEventListener('change', function() {
@@ -456,15 +541,22 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
+        // Cargar marcas al inicio si están vacías
+        cargarMarcas();
+
         // Cargar modelos iniciales si ya hay una marca seleccionada
         if (marcaSelect.value) {
-            cargarModelos(marcaSelect.value, modeloSelect.value);
+            const anio = obtenerAnio();
+            cargarModelos(marcaSelect.value, anio, modeloSelect.value);
         }
 
         // Cargar motores y cajas iniciales si ya hay un modelo seleccionado
         if (modeloSelect.value) {
             cargarMotoresYCajas(modeloSelect.value);
         }
+    } else {
+        // Si no se encontraron los campos, intentar cargar marcas de todos modos
+        cargarMarcas();
     }
 
     // Manejar campo de color
@@ -711,7 +803,134 @@ document.addEventListener('DOMContentLoaded', function() {
             cajaNuevoInput.required = true;
         }
     }
+
+    // ✅ Establecer valores iniciales de motor y caja después de que Select2 se inicialice
+    // Esto es necesario cuando se está editando un vehículo y los campos usan Select2
+    {% if vehiculo %}
+    (function() {
+        var intentos = 0;
+        var maxIntentos = 30; // Intentar durante 3 segundos (30 * 100ms)
+        
+        function establecerValoresIniciales() {
+            intentos++;
+            
+            // Verificar que jQuery esté disponible
+            if (typeof $ === 'undefined') {
+                if (intentos < maxIntentos) {
+                    setTimeout(establecerValoresIniciales, 100);
+                }
+                return;
+            }
+            
+            var motorSelect = $('#id_motor');
+            var cajaSelect = $('#id_caja');
+            var motorListo = false;
+            var cajaLista = false;
+            
+            // Motor inicial
+            {% if vehiculo.motor_id and vehiculo.motor %}
+            var motorId = '{{ vehiculo.motor_id }}';
+            var motorNombre = '{{ vehiculo.motor.nombre|escapejs }}';
+            if (motorSelect.length && motorId) {
+                // Verificar si Select2 está inicializado
+                if (motorSelect.hasClass('select2-hidden-accessible')) {
+                    // Para Select2 con autocomplete, necesitamos agregar la opción si no existe
+                    if (motorSelect.find('option[value="' + motorId + '"]').length === 0) {
+                        var newOption = new Option(motorNombre, motorId, true, true);
+                        motorSelect.append(newOption);
+                    }
+                    // Establecer el valor usando Select2 API
+                    motorSelect.val(motorId);
+                    motorSelect.trigger('change.select2');
+                    // Verificar que el valor se estableció correctamente
+                    if (motorSelect.val() == motorId) {
+                        console.log('✅ Motor inicial establecido:', motorId, motorNombre);
+                        motorListo = true;
+                    } else {
+                        // Si no se estableció, intentar de nuevo
+                        motorListo = false;
+                    }
+                } else {
+                    // Si no es Select2, establecer el valor directamente
+                    motorSelect.val(motorId);
+                    if (motorSelect.val() == motorId) {
+                        console.log('✅ Motor inicial establecido (sin Select2):', motorId);
+                        motorListo = true;
+                    } else {
+                        motorListo = false;
+                    }
+                }
+            } else {
+                motorListo = true; // No hay motor que establecer
+            }
+            {% else %}
+            motorListo = true; // No hay motor que establecer
+            {% endif %}
+            
+            // Caja inicial
+            {% if vehiculo.caja_id and vehiculo.caja %}
+            var cajaId = '{{ vehiculo.caja_id }}';
+            var cajaNombre = '{{ vehiculo.caja.nombre|escapejs }}';
+            if (cajaSelect.length && cajaId) {
+                // Verificar si Select2 está inicializado
+                if (cajaSelect.hasClass('select2-hidden-accessible')) {
+                    // Para Select2 con autocomplete, necesitamos agregar la opción si no existe
+                    if (cajaSelect.find('option[value="' + cajaId + '"]').length === 0) {
+                        var newOption = new Option(cajaNombre, cajaId, true, true);
+                        cajaSelect.append(newOption);
+                    }
+                    // Establecer el valor usando Select2 API
+                    cajaSelect.val(cajaId);
+                    cajaSelect.trigger('change.select2');
+                    // Verificar que el valor se estableció correctamente
+                    if (cajaSelect.val() == cajaId) {
+                        console.log('✅ Caja inicial establecida:', cajaId, cajaNombre);
+                        cajaLista = true;
+                    } else {
+                        // Si no se estableció, intentar de nuevo
+                        cajaLista = false;
+                    }
+                } else {
+                    // Si no es Select2, establecer el valor directamente
+                    cajaSelect.val(cajaId);
+                    if (cajaSelect.val() == cajaId) {
+                        console.log('✅ Caja inicial establecida (sin Select2):', cajaId);
+                        cajaLista = true;
+                    } else {
+                        cajaLista = false;
+                    }
+                }
+            } else {
+                cajaLista = true; // No hay caja que establecer
+            }
+            {% else %}
+            cajaLista = true; // No hay caja que establecer
+            {% endif %}
+            
+            // Si ambos están listos o hemos alcanzado el máximo de intentos, detener
+            if (motorListo && cajaLista) {
+                console.log('✅ Valores iniciales de motor y caja establecidos correctamente');
+                return;
+            }
+            
+            // Si aún no están listos y no hemos alcanzado el máximo, intentar de nuevo
+            if (intentos < maxIntentos) {
+                setTimeout(establecerValoresIniciales, 100);
+            } else {
+                console.warn('⚠️ No se pudieron establecer todos los valores iniciales después de ' + maxIntentos + ' intentos');
+            }
+        }
+        
+        // Iniciar después de un pequeño delay para permitir que form.media se cargue
+        setTimeout(establecerValoresIniciales, 500);
+    })();
+    {% endif %}
 });
 </script>
+
+{# Cargar form.media para inicializar Select2/DAL #}
+{% if form.media %}
+{{ form.media }}
+{% endif %}
 
 {% endblock %}

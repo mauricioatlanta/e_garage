@@ -1,23 +1,51 @@
 {% load country_url %}
+{% load money %}
 {% for repuesto in repuestos %}
-<tr class="hover:bg-cyan-900/20">
-  <td class="px-6 py-4 whitespace-nowrap text-sm text-white">{{ repuesto.part_number|default:"-" }}</td>
-  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">{{ repuesto.nombre }}</td>
-  <td class="px-6 py-4 whitespace-nowrap text-sm text-white">{{ repuesto.categoria|default:"-" }}</td>
-  <td class="px-6 py-4 whitespace-nowrap text-sm text-white">${{ repuesto.precio_compra }}</td>
-  <td class="px-6 py-4 whitespace-nowrap text-sm text-white">${{ repuesto.precio_venta }}</td>
-  <td class="px-6 py-4 whitespace-nowrap text-sm text-white">{{ repuesto.cantidad_stock }}</td>
-  <td class="px-6 py-4 whitespace-nowrap text-sm text-white">{{ repuesto.proveedor|default:"-" }}</td>
-  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-    <a href="{% country_url 'repuestos:ver_repuesto' repuesto.pk  %}" class="text-cyan-400 hover:text-cyan-300 mr-3">Ver</a>
-    <a href="{% country_url 'repuestos:editar_repuesto' repuesto.pk  %}" class="text-green-400 hover:text-green-300">Editar</a>
-  </td>
-</tr>
+<div class="part-card" data-part-number="{{ repuesto.part_number }}"
+     data-part-name="{{ repuesto.nombre }}"
+     data-category="{{ repuesto.categoria.nombre|default:'' }}">
+
+  <div class="flex justify-between items-start mb-3">
+    <div class="part-code">{{ repuesto.part_number|default:"N/A" }}</div>
+    <div class="flex gap-2">
+      <a href="{% country_url 'repuestos:editar_repuesto' repuesto.pk %}"
+         class="text-cyan-400 hover:text-cyan-300 transition-colors">
+        ✏️
+      </a>
+      <button onclick="deletePart({{ repuesto.pk }}, '{{ repuesto.nombre|escapejs }}')"
+              class="text-red-400 hover:text-red-300 transition-colors">
+        🗑️
+      </button>
+    </div>
+  </div>
+
+  <div class="part-name">{{ repuesto.nombre }}</div>
+
+  {% if repuesto.categoria %}
+  <div class="text-sm text-gray-400 mb-2">
+    Category: {{ repuesto.categoria.nombre }}
+  </div>
+  {% endif %}
+
+  <div class="flex justify-between items-center mt-4">
+    <div class="part-price">{{ repuesto.precio_venta|money_by_country:country }}</div>
+    <div class="text-sm text-gray-400">
+      Stock: {{ repuesto.cantidad_stock|default:"0" }}
+    </div>
+  </div>
+
+  {% if repuesto.proveedor %}
+  <div class="text-xs text-gray-500 mt-2">
+    Supplier: {{ repuesto.proveedor }}
+  </div>
+  {% endif %}
+</div>
 {% empty %}
-<tr>
-  <td colspan="8" class="px-6 py-8 text-center text-gray-400">
-    <i class="fas fa-search text-gray-500 text-3xl mb-3 block"></i>
-    No se encontraron repuestos con esos criterios.
-  </td>
-</tr>
+<div class="col-span-full text-center py-12">
+  <div class="text-6xl mb-4">🔧</div>
+  <h3 class="text-xl font-bold text-white mb-2">No Parts Found</h3>
+  <p class="text-gray-400 mb-4">No parts match your search criteria</p>
+</div>
 {% endfor %}
+
+

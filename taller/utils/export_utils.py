@@ -148,9 +148,9 @@ class DocumentoPDFExporter:
         )
 
         # Prefetch line items once to avoid multiple queries
-        repuestos_qs = list(self.documento.repuestos.all())
-        servicios_qs = list(self.documento.servicios.all())
-        otros_servicios_qs = list(self.documento.otros_servicios.all())
+        repuestos_qs = list(self.documento.lineas_repuesto.all())
+        servicios_qs = list(self.documento.lineas_servicio.all())
+        otros_servicios_qs = list(self.documento.lineas_otro_servicio.all())
 
         total_repuestos = sum((getattr(r, "subtotal", None) or Decimal("0")) for r in repuestos_qs)
         total_servicios = sum((getattr(s, "subtotal", None) or Decimal("0")) for s in servicios_qs)

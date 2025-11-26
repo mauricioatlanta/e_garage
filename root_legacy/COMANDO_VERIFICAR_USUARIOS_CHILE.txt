@@ -1,0 +1,84 @@
+═══════════════════════════════════════════════════════════════
+COMANDO PARA VERIFICAR USUARIOS DE PRUEBA DE CHILE
+═══════════════════════════════════════════════════════════════
+
+Primero, verifica qué usuarios existen:
+
+cd /home/atlantareciclajes/apps/egarage/current && \
+python3 << 'PYEOF'
+import os
+import django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings')
+django.setup()
+
+from django.contrib.auth.models import User
+
+usuarios = ['test_chile', 'test_chile_pago', 'testuser_cl', 'testuser_chile']
+print("🔍 Usuarios de prueba de Chile:")
+for u in usuarios:
+    try:
+        user = User.objects.get(username=u)
+        print(f"✅ {u} - Email: {user.email} - Activo: {user.is_active}")
+    except:
+        print(f"❌ {u} - No existe")
+PYEOF
+
+═══════════════════════════════════════════════════════════════
+COMANDO PARA CREAR USUARIO DE PRUEBA
+═══════════════════════════════════════════════════════════════
+
+Si no existe ningún usuario, créalo:
+
+cd /home/atlantareciclajes/apps/egarage/current && \
+python3 << 'PYEOF'
+import os
+import django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings')
+django.setup()
+
+from django.contrib.auth.models import User
+from taller.models import Empresa, TrialRegistro
+from django.utils import timezone
+from datetime import timedelta
+from django.db import transaction
+
+username = 'test_chile'
+email = 'test_chile@egarage.cl'
+password = 'test1234'
+
+with transaction.atomic():
+    if User.objects.filter(username=username).exists():
+        user = User.objects.get(username=username)
+        user.set_password(password)
+        user.is_active = True
+        user.save()
+        print(f"✅ Contraseña reseteada para {username}")
+    else:
+        user = User.objects.create_user(username=username, email=email, password=password, is_active=True)
+        print(f"✅ Usuario creado: {username}")
+    
+    # Crear empresa si no existe
+    try:
+        empresa = user.empresa
+    except:
+        empresa = Empresa.objects.create(
+            usuario=user,
+            nombre='eGarage Chile Test',
+            email=email,
+            pais='CL',
+            plan_suscripcion='gratuito',
+            fecha_inicio=timezone.now().date(),
+            fecha_expiracion=timezone.now().date() + timedelta(days=30),
+            suscripcion_activa=True,
+            estado='trial'
+        )
+    
+    print()
+    print("🔑 CREDENCIALES:")
+    print(f"Usuario: {username}")
+    print(f"Contraseña: {password}")
+    print(f"Email: {email}")
+PYEOF
+
+═══════════════════════════════════════════════════════════════
+

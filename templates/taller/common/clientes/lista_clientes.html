@@ -1,144 +1,398 @@
-{% extends 'base.html' %}
+{% extends 'layouts/base_egarage_panel.html' %}
 {% load i18n %}
 {% load country_url %}
-{% block title %}Clientes · eGarage{% endblock %}
-{% block content %}
-<div class="relative mx-auto max-w-7xl px-6 mt-10">
-  <div class="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-    <div class="absolute -top-32 -left-20 w-96 h-96 bg-gradient-to-tr from-cyan-500 via-fuchsia-500 to-lime-400 opacity-20 blur-3xl rounded-full animate-pulse"></div>
-    <div class="absolute bottom-0 right-0 w-[34rem] h-[34rem] bg-gradient-to-tr from-fuchsia-500 via-cyan-400 to-emerald-400 opacity-10 blur-3xl rounded-full animate-spin-slow"></div>
-  </div>
-  <div class="flex flex-col md:flex-row md:items-center gap-6 mb-10">
-    <div>
-      <div class="flex items-center gap-3 mb-2">
-        <h1 class="text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-cyan-300 via-lime-300 to-fuchsia-400 drop-shadow">Gestión de Clientes</h1>
-        {% include "components/country_badge.html" %}
-      </div>
-      <p class="mt-2 text-gray-400 max-w-2xl text-sm md:text-base">Listado inteligente con búsqueda dinámica, paginación y acciones rápidas.</p>
-    </div>
-    <div class="md:ml-auto flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-      <form method="get" class="flex-1 relative group">
-        <input type="search" name="q" value="{{ request.GET.q }}" placeholder="Buscar por nombre o apellido..." class="w-full bg-[#0f172a] border border-cyan-500/40 focus:border-cyan-400/70 rounded-xl px-5 py-3 text-cyan-100 placeholder-gray-500 shadow-lg focus:ring-2 focus:ring-cyan-400/40 transition outline-none font-mono" />
-        <button type="submit" class="absolute top-1/2 -translate-y-1/2 right-3 text-cyan-300 hover:text-lime-300 transition"><i class="fas fa-search"></i></button>
-      </form>
-      <a href="{% country_url 'clientes:crear_cliente' %}" class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 via-lime-500 to-fuchsia-500 text-[#0d1117] font-bold shadow-lg hover:shadow-cyan-500/40 text-sm md:text-base tracking-wide hover:scale-[1.03] transition active:scale-95"><span>➕</span><span>Nuevo Cliente</span></a>
-    </div>
-  </div>
-  <div class="relative rounded-3xl border border-cyan-400/20 bg-gradient-to-br from-[#0d1117] via-[#0f172a] to-[#111827] shadow-2xl overflow-hidden">
-    <div class="overflow-x-auto scrollbar-thin scrollbar-thumb-cyan-700/50 scrollbar-track-transparent">
-      <table class="w-full text-left text-sm md:text-base">
-        <thead class="bg-[#0e1a2b] text-cyan-300/90 uppercase text-xs tracking-wider font-semibold">
-          <tr>
-            <th class="px-5 py-4">ID</th>
-            <th class="px-5 py-4">{% trans "Name" %}</th>
-            <th class="px-5 py-4 hidden md:table-cell">{% trans "Email" %}</th>
-            <th class="px-5 py-4 hidden md:table-cell">{% trans "Phone" %}</th>
-            <th class="px-5 py-4 hidden xl:table-cell">{% trans "City" %}</th>
-            <th class="px-5 py-4">{% trans "Actions" %}</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-cyan-900/40">
-          {% for cliente in cliente_list %}
-            <tr class="hover:bg-cyan-500/10 transition group">
-              <td class="px-5 py-4 font-mono text-cyan-300">#{{ cliente.pk }}</td>
-              <td class="px-5 py-4">
-                <div class="flex flex-col">
-                  <span class="font-semibold text-cyan-100 group-hover:text-lime-200 transition">{{ cliente.nombre }} {{ cliente.apellido }}</span>
-                  <span class="md:hidden text-xs text-gray-400">{{ cliente.email }}</span>
-                </div>
-              </td>
-              <td class="px-5 py-4 hidden md:table-cell text-gray-300">{{ cliente.email|default:'—' }}</td>
-              <td class="px-5 py-4 hidden md:table-cell text-gray-300">{{ cliente.telefono|default:'—' }}</td>
-              <td class="px-5 py-4 hidden xl:table-cell text-gray-300">
-                {% if cliente.empresa.pais == 'US' %}
-                  {% if cliente.ciudad_usa %}{{ cliente.ciudad_usa }}, {{ cliente.estado_usa }}{% else %}—{% endif %}
-                {% else %}
-                  {% if cliente.ciudad %}{{ cliente.ciudad.nombre }}{% else %}—{% endif %}
-                {% endif %}
-              </td>
-              <td class="px-5 py-4">
-                <div class="flex items-center gap-3">
-                  <a href="{% country_url 'clientes:ver_cliente' cliente.pk %}" class="text-cyan-300 hover:text-lime-300 transition" title="{% trans 'View' %}">
-                    <i class="fas fa-eye"></i>
-                  </a>
-                  <a href="{% country_url 'clientes:editar_cliente' cliente.pk %}" class="text-cyan-300 hover:text-lime-300 transition" title="{% trans 'Edit' %}">
-                    <i class="fas fa-edit"></i>
-                  </a>
-                  <a href="{% country_url 'clientes:eliminar_cliente' cliente_id=cliente.pk %}" class="text-red-400 hover:text-red-300 transition" title="{% trans 'Delete' %}" >
-                    <i class="fas fa-trash"></i>
-                  </a>
-                </div>
-              </td>
-            </tr>
-          {% empty %}
-            <tr>
-              <td colspan="6" class="px-5 py-12 text-center text-gray-400">No hay clientes registrados</td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+{% load static %}
 
-    <!-- Paginación -->
-    {% if page_obj.has_other_pages %}
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 px-6 py-5 bg-[#0e1a2b]/60 border-t border-cyan-900/40">
-      <div class="text-xs text-gray-400 font-mono">
-        {% blocktrans with start=page_obj.start_index end=page_obj.end_index total=page_obj.paginator.count %}Showing {{ start }} - {{ end }} of {{ total }} records{% endblocktrans %}
-      </div>
-      <div class="flex items-center gap-2">
-        {% if page_obj.has_previous %}
-          <a href="?q={{ request.GET.q }}&page=1" class="px-3 py-1 rounded-lg bg-[#132034] text-cyan-300 hover:bg-cyan-600/20 transition text-xs">««</a>
-          <a href="?q={{ request.GET.q }}&page={{ page_obj.previous_page_number }}" class="px-3 py-1 rounded-lg bg-[#132034] text-cyan-300 hover:bg-cyan-600/20 transition text-xs">«</a>
-        {% else %}
-          <span class="px-3 py-1 rounded-lg bg-[#101a29] text-gray-600 text-xs">««</span>
-          <span class="px-3 py-1 rounded-lg bg-[#101a29] text-gray-600 text-xs">«</span>
-        {% endif %}
+{% block page_title %}{% trans "CLIENTS" %}{% endblock %}
+{% block page_subtitle %}{% trans "Client management system" %}{% endblock %}
+{% block page_icon %}👥{% endblock %}
 
-        <span class="px-4 py-1 rounded-lg bg-cyan-600/20 text-cyan-200 font-semibold tracking-wider text-xs">
-          {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
-        </span>
+{% block main_actions %}
+<a href="{% country_url 'clientes:crear_cliente' %}"
+   class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-600 via-lime-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white text-sm font-semibold border border-emerald-400/40 shadow-lg shadow-emerald-900/40 transition-all">
+  <span>➕</span>
+  <span>{% trans "NEW ENTRY" %}</span>
+</a>
+{% endblock %}
 
-        {% if page_obj.has_next %}
-          <a href="?q={{ request.GET.q }}&page={{ page_obj.next_page_number }}" class="px-3 py-1 rounded-lg bg-[#132034] text-cyan-300 hover:bg-cyan-600/20 transition text-xs">»</a>
-          <a href="?q={{ request.GET.q }}&page={{ page_obj.paginator.num_pages }}" class="px-3 py-1 rounded-lg bg-[#132034] text-cyan-300 hover:bg-cyan-600/20 transition text-xs">»»</a>
-        {% else %}
-          <span class="px-3 py-1 rounded-lg bg-[#101a29] text-gray-600 text-xs">»</span>
-          <span class="px-3 py-1 rounded-lg bg-[#101a29] text-gray-600 text-xs">»»</span>
-        {% endif %}
+{% block search_bar %}
+<div class="space-y-3">
+  <div class="relative group">
+    <div class="absolute -inset-0.5 rounded-lg bg-gradient-to-r from-cyan-600 via-fuchsia-600 to-lime-600 opacity-40 blur group-hover:opacity-60 transition-opacity"></div>
+    <div class="relative flex items-center gap-3 rounded-lg border border-cyan-500/30 bg-black/40 backdrop-blur-sm px-3 py-2">
+      <div class="relative flex-1">
+        <form method="get" id="search-form" data-search-url="{% country_url 'ajax:buscar_clientes' %}">
+          <input type="search" name="q" id="search-input" value="{{ request.GET.q }}" 
+                 placeholder="{% trans 'Search clients...' %}"
+                 class="w-full pl-10 pr-4 py-3 bg-black/30 text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-400/50 text-sm rounded-lg border border-cyan-400/20" autocomplete="off" />
+          <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-cyan-400">🔍</div>
+        </form>
+        <div id="search-results" class="hidden absolute top-full left-0 right-0 mt-2 bg-black/95 border border-cyan-400/30 rounded-lg max-h-96 overflow-y-auto z-50 shadow-xl"></div>
       </div>
     </div>
-    {% endif %}
   </div>
 </div>
+{% endblock %}
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+{% block page_extra_css %}
 <style>
-@keyframes spin-slow {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-.animate-spin-slow {
-  animation: spin-slow 30s linear infinite;
-}
-.scrollbar-thin::-webkit-scrollbar {
-  height: 10px;
-  width: 10px;
-}
-.scrollbar-thin::-webkit-scrollbar-track {
-  background: transparent;
-}
-.scrollbar-thin::-webkit-scrollbar-thumb {
-  background: #164159;
-  border-radius: 6px;
-}
-.scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background: #1d5a79;
-}
-</style>
+/* --- TYPOGRAPHY & HEADERS --- */
+.font-hud { font-family: 'Orbitron', sans-serif; }
+.font-tech { font-family: 'Rajdhani', sans-serif; }
+.font-code { font-family: 'Share Tech Mono', monospace; }
 
+/* --- TABLE --- */
+.cyber-table-container {
+    background: rgba(10, 20, 40, 0.6);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(0, 243, 255, 0.2);
+    border-top: 2px solid rgba(0, 243, 255, 1);
+    position: relative;
+    border-radius: 6px;
+}
+
+table { width: 100%; border-collapse: separate; border-spacing: 0; }
+
+thead th {
+    background: rgba(0, 10, 20, 0.8);
+    color: rgba(0, 243, 255, 1);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 18px 24px;
+    text-align: left;
+    border-bottom: 1px solid rgba(0, 243, 255, 0.3);
+}
+
+tbody td {
+    padding: 16px 24px;
+    vertical-align: middle;
+    color: #e0e6ed;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 500;
+    font-size: 1.05rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+tbody tr:hover {
+    background: rgba(0, 243, 255, 0.05);
+}
+
+.data-id { color: rgba(188, 19, 254, 1); font-family: 'Share Tech Mono', monospace; }
+.data-primary { color: #fff; font-weight: 700; font-size: 1.1rem; }
+.data-sub { color: #94a3b8; font-size: 0.9rem; }
+
+/* --- SEARCH RESULTS --- */
+.search-result-item {
+    padding: 12px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    cursor: pointer;
+    transition: 0.2s;
+}
+.search-result-item:hover {
+    background: rgba(0, 243, 255, 0.1);
+    padding-left: 25px;
+    border-left: 3px solid rgba(0, 243, 255, 1);
+}
+
+/* --- BUTTONS --- */
+.btn-icon-only {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #94a3b8;
+    border-radius: 4px;
+    transition: 0.2s;
+    background: rgba(0,0,0,0.4);
+}
+.btn-icon-only:hover {
+    color: #fff;
+    border-color: rgba(0, 243, 255, 1);
+    box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+}
+.btn-delete:hover {
+    color: #ff2a6d;
+    border-color: #ff2a6d;
+    box-shadow: 0 0 10px rgba(255, 42, 109, 0.3);
+}
+
+/* --- PAGINATION --- */
+.pagination-wrapper {
+    padding: 15px 20px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.page-btn {
+    width: 30px; height: 30px;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #94a3b8;
+    font-family: 'Share Tech Mono';
+    font-size: 12px;
+    transition: 0.2s;
+    border-radius: 4px;
+}
+.page-btn:hover:not(.disabled) {
+    border-color: rgba(0, 243, 255, 1);
+    color: rgba(0, 243, 255, 1);
+}
+.page-current { background: rgba(0, 243, 255, 1); color: #000; font-weight: bold; border-color: rgba(0, 243, 255, 1); }
+</style>
+{% endblock %}
+
+{% block panel_content %}
+<!-- Desktop: Tabla -->
+<div class="hidden md:block cyber-table-container shadow-2xl">
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead>
+                <tr>
+                    <th width="80">ID</th>
+                    <th>{% trans "Entity Profile" %}</th>
+                    <th class="hidden md:table-cell">{% trans "Contact Node" %}</th>
+                    <th class="hidden md:table-cell">{% trans "Comm. Link" %}</th>
+                    <th class="hidden xl:table-cell">{% trans "Location" %}</th>
+                    <th class="text-right pr-8">{% trans "Operations" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cliente in cliente_list %}
+                <tr class="group">
+                    <td class="font-code data-id pl-6">#{{ cliente.pk }}</td>
+                    <td>
+                        <div class="flex flex-col">
+                            <span class="data-primary">{{ cliente.nombre }} {{ cliente.apellido }}</span>
+                            <span class="md:hidden data-sub mt-1 font-code text-cyan-500">{{ cliente.email }}</span>
+                        </div>
+                    </td>
+                    <td class="hidden md:table-cell">
+                        <span class="data-sub">{{ cliente.email|default:'<span class="opacity-30">N/A</span>' }}</span>
+                    </td>
+                    <td class="hidden md:table-cell font-code text-sm text-cyan-100/70">
+                        {{ cliente.telefono|default:'<span class="opacity-30">---</span>' }}
+                    </td>
+                    <td class="hidden xl:table-cell">
+                        <div class="flex items-center gap-2 text-gray-300">
+                            <i class="fas fa-map-marker-alt text-cyan-500/50 text-xs"></i>
+                            {% if cliente.empresa.pais == 'US' %}
+                                {% if cliente.ciudad_usa %}{{ cliente.ciudad_usa }}, {{ cliente.estado_usa }}{% else %}<span class="opacity-30">UNKNOWN</span>{% endif %}
+                            {% else %}
+                                {% if cliente.ciudad %}{{ cliente.ciudad.nombre }}{% else %}<span class="opacity-30">UNKNOWN</span>{% endif %}
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td class="text-right pr-4 sm:pr-6">
+                        <div class="flex items-center justify-end gap-2 sm:gap-2 action-group">
+                            <a href="{% country_url 'clientes:ver_cliente' cliente.pk %}" class="btn-icon-only w-10 h-10 sm:w-8 sm:h-8 flex items-center justify-center" title="{% trans 'Inspect' %}">
+                                <i class="fas fa-eye text-sm sm:text-xs"></i>
+                            </a>
+                            <a href="{% country_url 'clientes:editar_cliente' cliente.pk %}" class="btn-icon-only w-10 h-10 sm:w-8 sm:h-8 flex items-center justify-center" title="{% trans 'Modify' %}">
+                                <i class="fas fa-pen text-sm sm:text-xs"></i>
+                            </a>
+                            <a href="{% country_url 'clientes:eliminar_cliente' cliente_id=cliente.pk %}" 
+                               class="btn-icon-only btn-delete w-10 h-10 sm:w-8 sm:h-8 flex items-center justify-center" 
+                               title="{% trans 'Purge' %}" 
+                               onclick="return confirmarEliminacion('{{ cliente.nombre }} {{ cliente.apellido }}')">
+                                <i class="fas fa-trash-alt text-sm sm:text-xs"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center py-16">
+                        <div class="text-center py-12 sm:py-16 px-4">
+                            <div class="text-6xl mb-4 opacity-50">👥</div>
+                            <h3 class="text-xl sm:text-2xl font-semibold text-gray-300 mb-2">
+                                {% trans "No clients found" %}
+                            </h3>
+                            <p class="text-sm sm:text-base text-gray-500 mb-6 max-w-md mx-auto">
+                                {% trans "Create your first client to start managing your customer database." %}
+                            </p>
+                            <a href="{% country_url 'clientes:crear_cliente' %}" class="inline-flex items-center justify-center px-4 py-3 text-sm sm:text-base font-semibold rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white shadow-lg hover:shadow-xl transition-all">
+                                ➕ {% trans "Create First Client" %}
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    {% if page_obj.has_other_pages %}
+    <div class="pagination-wrapper">
+        <div class="text-xs font-code text-cyan-500/60 hidden sm:block">
+            {% blocktrans with start=page_obj.start_index end=page_obj.end_index total=page_obj.paginator.count %}DISPLAYING {{ start }}-{{ end }} / {{ total }} UNITS{% endblocktrans %}
+        </div>
+        <div class="flex gap-1">
+            {% if page_obj.has_previous %}
+                <a href="?q={{ request.GET.q }}&page={{ page_obj.previous_page_number }}" class="page-btn"><i class="fas fa-angle-left"></i></a>
+            {% endif %}
+            <span class="page-btn page-current">{{ page_obj.number }}</span>
+            {% if page_obj.has_next %}
+                <a href="?q={{ request.GET.q }}&page={{ page_obj.next_page_number }}" class="page-btn"><i class="fas fa-angle-right"></i></a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Móvil: Cards -->
+<div class="md:hidden space-y-3">
+    {% for cliente in cliente_list %}
+    <div class="card-glow rounded-lg border border-gray-700/50 bg-black/40 backdrop-blur-sm p-4">
+        <div class="flex items-start justify-between mb-3">
+            <div class="flex-1">
+                <h3 class="text-base sm:text-lg font-semibold text-white mb-1">
+                    {{ cliente.nombre }} {{ cliente.apellido }}
+                </h3>
+                <p class="text-xs text-gray-400 font-mono">#{{ cliente.pk }}</p>
+            </div>
+        </div>
+        <div class="space-y-2 mb-3">
+            <div class="flex items-center gap-2 text-sm text-gray-300">
+                <i class="fas fa-envelope text-cyan-400 text-xs"></i>
+                <span>{{ cliente.email|default:"Sin email" }}</span>
+            </div>
+            {% if cliente.telefono %}
+            <div class="flex items-center gap-2 text-sm text-gray-300">
+                <i class="fas fa-phone text-cyan-400 text-xs"></i>
+                <span>{{ cliente.telefono }}</span>
+            </div>
+            {% endif %}
+            {% if cliente.ciudad or cliente.ciudad_usa %}
+            <div class="flex items-center gap-2 text-sm text-gray-300">
+                <i class="fas fa-map-marker-alt text-cyan-400 text-xs"></i>
+                <span>
+                    {% if cliente.empresa.pais == 'US' %}
+                        {% if cliente.ciudad_usa %}{{ cliente.ciudad_usa }}, {{ cliente.estado_usa }}{% endif %}
+                    {% else %}
+                        {% if cliente.ciudad %}{{ cliente.ciudad.nombre }}{% endif %}
+                    {% endif %}
+                </span>
+            </div>
+            {% endif %}
+        </div>
+        <div class="flex items-center gap-2 pt-3 border-t border-gray-700/50">
+            <a href="{% country_url 'clientes:ver_cliente' cliente.pk %}" class="flex-1 text-center py-2 px-3 text-sm font-semibold rounded-lg bg-black/60 hover:bg-gray-800/60 border border-cyan-400/30 text-cyan-300 hover:text-white transition-all">
+                👁️ {% trans "View" %}
+            </a>
+            <a href="{% country_url 'clientes:editar_cliente' cliente.pk %}" class="flex-1 text-center py-2 px-3 text-sm font-semibold rounded-lg bg-black/60 hover:bg-gray-800/60 border border-cyan-400/30 text-cyan-300 hover:text-white transition-all">
+                ✏️ {% trans "Edit" %}
+            </a>
+            <a href="{% country_url 'clientes:eliminar_cliente' cliente_id=cliente.pk %}" 
+               onclick="return confirmarEliminacion('{{ cliente.nombre }} {{ cliente.apellido }}')"
+               class="flex-1 text-center py-2 px-3 text-sm font-semibold rounded-lg bg-red-900/30 hover:bg-red-800/40 border border-red-600/50 text-red-200 hover:text-red-100 transition-all">
+                🗑️ {% trans "Delete" %}
+            </a>
+        </div>
+    </div>
+    {% empty %}
+    <div class="text-center py-12 sm:py-16 px-4">
+        <div class="text-6xl mb-4 opacity-50">👥</div>
+        <h3 class="text-xl sm:text-2xl font-semibold text-gray-300 mb-2">
+            {% trans "No clients found" %}
+        </h3>
+        <p class="text-sm sm:text-base text-gray-500 mb-6 max-w-md mx-auto">
+            {% trans "Create your first client to start managing your customer database." %}
+        </p>
+        <a href="{% country_url 'clientes:crear_cliente' %}" class="inline-flex items-center justify-center px-4 py-3 text-sm sm:text-base font-semibold rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white shadow-lg hover:shadow-xl transition-all">
+            ➕ {% trans "Create First Client" %}
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block page_extra_js %}
 <script>
 function confirmarEliminacion(nombre) {
-  return confirm('{% trans "Are you sure you want to delete the client" %} "' + nombre + '"? {% trans "This action cannot be undone." %}');
+    return confirm(`⚠️ {% trans "SYSTEM ALERT: PURGE PROTOCOL" %}\n\n{% trans "Target" %}: ${nombre}\n\n{% trans "Confirm permanent deletion?" %}`);
 }
+
+(function() {
+    const elements = {
+        input: document.getElementById('search-input'),
+        results: document.getElementById('search-results'),
+        form: document.getElementById('search-form')
+    };
+
+    if (!elements.input || !elements.form) return;
+
+    const SEARCH_URL = elements.form.dataset.searchUrl;
+    let debounceTimer;
+
+    async function performSearch(query) {
+        if (!SEARCH_URL) {
+            console.error('❌ Search URL not found');
+            return;
+        }
+
+        try {
+            const response = await fetch(`${SEARCH_URL}?q=${encodeURIComponent(query)}`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            
+            if (!response.ok) throw new Error('Network error');
+            
+            const data = await response.json();
+            const results = Array.isArray(data) ? data : (data.results || data.clientes || []);
+            renderResults(results);
+
+        } catch (error) {
+            console.error('Search error:', error);
+            elements.results.innerHTML = '<div class="p-4 text-red-400 text-center font-code text-sm">CONNECTION ERROR</div>';
+        }
+    }
+
+    function renderResults(results) {
+        if (results.length === 0) {
+            elements.results.innerHTML = '<div class="p-4 text-gray-500 text-center italic">{% trans "No records found" %}.</div>';
+            elements.results.classList.remove('hidden');
+            return;
+        }
+
+        const html = results.map(item => `
+            <div class="search-result-item" onclick="window.location.href='${location.pathname.replace('clientes/', '')}clientes/ver/${item.pk || item.id}/'">
+                <div class="font-bold text-white text-sm">${item.nombre} ${item.apellido || ''}</div>
+                <div class="text-xs text-cyan-500/70 font-code mt-1 flex gap-3">
+                    ${item.email ? `<span><i class="fas fa-envelope"></i> ${item.email}</span>` : ''}
+                    ${item.telefono ? `<span><i class="fas fa-phone"></i> ${item.telefono}</span>` : ''}
+                </div>
+            </div>
+        `).join('');
+
+        elements.results.innerHTML = html;
+        elements.results.classList.remove('hidden');
+    }
+
+    elements.input.addEventListener('input', (e) => {
+        const query = e.target.value.trim();
+        clearTimeout(debounceTimer);
+        
+        if (query.length < 2) {
+            elements.results.classList.add('hidden');
+            return;
+        }
+
+        elements.results.classList.remove('hidden');
+        elements.results.innerHTML = '<div class="p-4 text-cyan-400 text-center font-code text-xs animate-pulse">{% trans "SEARCHING DATABASE..." %}</div>';
+
+        debounceTimer = setTimeout(() => performSearch(query), 400);
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!elements.form.contains(e.target)) {
+            elements.results.classList.add('hidden');
+        }
+    });
+})();
 </script>
 {% endblock %}

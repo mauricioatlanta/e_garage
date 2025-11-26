@@ -1,0 +1,79 @@
+===========================================
+SOLUCIÓN CORREGIDA: Crear columna service_id
+===========================================
+
+PROBLEMA:
+---------
+OperationalError: no such column: taller_lineaservicio.service_id
+
+SOLUCIÓN (Ejecutar en el servidor):
+-----------------------------------
+
+cd /home/atlantareciclajes/apps/egarage/current
+workon venv_egarage310
+
+# Agregar la columna service_id a la tabla
+python manage.py dbshell << 'SQL'
+ALTER TABLE taller_lineaservicio 
+ADD COLUMN service_id INTEGER NULL;
+CREATE INDEX IF NOT EXISTS taller_lineaservicio_service_id_idx 
+ON taller_lineaservicio(service_id);
+.quit
+SQL
+
+# Verificar que se creó (comando corregido)
+python manage.py dbshell << EOF
+.schema taller_lineaservicio
+.quit
+EOF
+
+# O verificar de otra manera
+python manage.py dbshell << EOF
+PRAGMA table_info(taller_lineaservicio);
+.quit
+EOF
+
+===========================================
+VERIFICACIÓN ALTERNATIVA:
+===========================================
+
+# Verificar usando Python
+python manage.py shell << 'PYTHON'
+from django.db import connection
+cursor = connection.cursor()
+cursor.execute("PRAGMA table_info(taller_lineaservicio)")
+columns = cursor.fetchall()
+for col in columns:
+    if 'service' in col[1].lower():
+        print(f"✓ Columna encontrada: {col[1]} (tipo: {col[2]})")
+exit()
+PYTHON
+
+# O verificar directamente si existe
+python manage.py shell << 'PYTHON'
+from django.db import connection
+cursor = connection.cursor()
+cursor.execute("SELECT sql FROM sqlite_master WHERE type='table' AND name='taller_lineaservicio'")
+result = cursor.fetchone()
+if result and 'service_id' in result[0]:
+    print("✓ Columna service_id existe")
+else:
+    print("✗ Columna service_id NO existe")
+exit()
+PYTHON
+
+===========================================
+SI EL COMANDO ALTER TABLE FALLA:
+===========================================
+
+# Verificar primero si la columna ya existe
+python manage.py dbshell << EOF
+SELECT name FROM pragma_table_info('taller_lineaservicio') WHERE name='service_id';
+.quit
+EOF
+
+# Si no devuelve nada, entonces la columna no existe y puedes crearla
+# Si devuelve 'service_id', entonces ya existe y el problema es otro
+
+===========================================
+

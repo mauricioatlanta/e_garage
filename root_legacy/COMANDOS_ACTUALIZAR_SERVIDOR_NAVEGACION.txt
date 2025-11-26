@@ -1,0 +1,137 @@
+===============================================================
+🚀 COMANDOS PARA ACTUALIZAR SERVIDOR - NAVEGACIÓN EN ESPAÑOL
+===============================================================
+Instrucciones para aplicar los cambios de botones en español para Chile
+===============================================================
+
+## 📋 PASO 1: CONECTARSE AL SERVIDOR
+1. Ir a: https://www.pythonanywhere.com/
+2. Iniciar sesión con tu cuenta
+3. Ir a la pestaña "Consoles" (Consolas)
+4. Abrir una consola Bash
+
+## 🔄 PASO 2: ACTUALIZAR CÓDIGO DESDE GIT
+
+Ejecutar estos comandos en la consola:
+
+```bash
+# 1. Ir al directorio del proyecto
+cd ~/e_garage
+
+# 2. Activar el entorno virtual (si usas uno)
+workon venv_egarage
+# O si no tienes virtualenv:
+# source venv/bin/activate
+
+# 3. Actualizar código desde GitHub
+git pull origin main
+
+# 4. Verificar que los cambios se descargaron
+git log --oneline -5
+```
+
+## ✅ PASO 3: VERIFICAR Y APLICAR CAMBIOS
+
+```bash
+# Verificar que los archivos se actualizaron
+ls -la templates/common/base.html
+ls -la templates/base.html
+ls -la templates/taller/common/base.html
+
+# Verificar configuración Django
+python manage.py check
+
+# Si hay migraciones pendientes (solo si es necesario)
+python manage.py migrate --fake-initial
+python manage.py migrate
+
+# Recopilar archivos estáticos (si hay cambios en CSS/JS)
+python manage.py collectstatic --noinput
+```
+
+## 🔄 PASO 4: REINICIAR LA APLICACIÓN
+
+### Opción A: Desde el Dashboard (MÁS FÁCIL)
+1. Ir a la pestaña "Web" en PythonAnywhere
+2. Buscar tu aplicación web
+3. Hacer clic en el botón "Reload" (Recargar)
+4. Esperar confirmación "reloaded successfully"
+
+### Opción B: Desde la Consola
+```bash
+# Tocar el archivo WSGI para forzar recarga
+touch /var/www/atlantareciclajes_pythonanywhere_com_wsgi.py
+# O si tu archivo WSGI tiene otro nombre, ajustar la ruta
+```
+
+## ✅ PASO 5: VERIFICAR QUE FUNCIONA
+
+1. Abrir en el navegador: https://e-garage-atlantareciclajes.pythonanywhere.com/
+2. Iniciar sesión como suscriptor de Chile
+3. Verificar que los botones de navegación están en ESPAÑOL:
+   - ✅ AJUSTES (no SETTINGS)
+   - ✅ CENTRO (no CENTER)
+   - ✅ CLIENTES (no CLIENTS)
+   - ✅ DOCUMENTOS (no DOCUMENTS)
+   - ✅ REPUESTOS (no PARTS)
+   - ✅ REPORTES (no REPORTS)
+   - ✅ SERVICIOS (no SERVICES)
+   - ✅ VEHÍCULOS (no VEHICLES)
+   - ✅ SALIR (no LOGOUT)
+
+4. Verificar que NO aparece el selector de idioma para Chile
+
+## 🆘 SI HAY PROBLEMAS
+
+### Error: "git: command not found"
+```bash
+# Verificar que git está instalado
+which git
+# Si no está, instalar:
+pip install gitpython
+```
+
+### Error: "workon: command not found"
+```bash
+# Activar virtualenv manualmente
+source ~/.virtualenvs/venv_egarage/bin/activate
+# O si está en otro lugar:
+source venv/bin/activate
+```
+
+### Error: "Permission denied"
+```bash
+# Verificar permisos
+ls -la ~/e_garage
+# Si es necesario, ajustar:
+chmod -R 755 ~/e_garage
+```
+
+### Los cambios no se ven
+1. Limpiar caché del navegador (Ctrl+Shift+R o Cmd+Shift+R)
+2. Verificar que el archivo se actualizó: `cat templates/common/base.html | grep "request.path|slice"`
+3. Verificar logs: `tail -f ~/e_garage/django.log`
+
+## 📝 COMANDOS RÁPIDOS (COPIA Y PEGA TODO)
+
+```bash
+cd ~/e_garage && workon venv_egarage && git pull origin main && python manage.py check && python manage.py collectstatic --noinput && echo "✅ Cambios aplicados. Ahora recarga la app desde el dashboard Web → Reload"
+```
+
+## 🔄 ACTUALIZACIÓN REALIZADA
+
+Los cambios ya están en GitHub. Los botones ahora:
+- ✅ Detectan si es Chile (cualquier ruta que NO sea /us/)
+- ✅ Muestran español 100% para Chile
+- ✅ Muestran inglés solo para USA (/us/)
+- ✅ Oculto selector de idioma para Chile
+
+**Archivos actualizados:**
+- templates/common/base.html
+- templates/base.html
+- templates/taller/common/base.html
+
+===============================================================
+✅ LISTO: Después de estos pasos, los botones estarán en español
+===============================================================
+

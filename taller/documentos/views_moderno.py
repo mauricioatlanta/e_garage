@@ -546,24 +546,19 @@ def procesar_documento_moderno(request, empresa):
             [los.precio_cliente * los.cantidad for los in documento.lineas_otro_servicio.all()]
         )
 
-        # Calcular IVA según el país y configuración
+        # ✅ Calcular IVA usando función centralizada (reemplaza múltiples if/else)
         tax_amount = Decimal("0.00")
         tax_rate_applied = Decimal("0.00")
 
         if incluir_impuesto:
-            if empresa.pais == "CL":
-                # IVA 19% en Chile, solo sobre repuestos
-                iva_rate = Decimal("19.00")
-                tax_amount = (rep_subtotal * iva_rate / Decimal("100")).quantize(Decimal("0.01"))
-                tax_rate_applied = iva_rate
-            elif empresa.pais == "US":
-                # Tax sobre todo en USA
-                tax_rate_usa = Decimal("8.50")  # Ajustable según configuración
-                total_gravable = rep_subtotal + serv_subtotal + otro_subtotal
-                tax_amount = (total_gravable * tax_rate_usa / Decimal("100")).quantize(
-                    Decimal("0.01")
-                )
-                tax_rate_applied = tax_rate_usa
+            from taller.impuestos.engine import calcular_impuesto, get_tax_rate_simple
+
+            # Usar función centralizada para calcular impuesto sobre repuestos
+            tax_amount = calcular_impuesto(rep_subtotal, empresa, applies_to="parts")
+
+            # Obtener la tasa aplicada como porcentaje (para persistir en tax_rate_applied)
+            tax_rate_decimal = get_tax_rate_simple(empresa, applies_to="parts")
+            tax_rate_applied = tax_rate_decimal * Decimal("100")  # Convertir a porcentaje
 
         total = (rep_subtotal + serv_subtotal + otro_subtotal + tax_amount).quantize(
             Decimal("0.01")
@@ -937,25 +932,30 @@ def documento_form(request, pk=None):
             )["s"] or Decimal("0")
 
             # ------------------------
-            # Impuestos por país
-            #   CL: IVA 19% SOLO sobre repuestos
-            #   US: Sales tax opcional (checkbox) sobre repuestos + servicios (si aplica)
+            # ✅ Impuestos usando función centralizada
+            # Tax/IVA SOLO sobre repuestos en todos los países
             # ------------------------
-            if company_country == "CL":
-                tax_base = neto_rep
-                tax_rate = Decimal("0.19")
-            else:
-                apply_sales_tax = bool(request.POST.get("apply_sales_tax"))
-                rate = _to_decimal_pct((request.POST.get("sales_tax_rate") or "").strip())
-                # fallback si no se envía tasa: conserva o 0
-                tax_rate = (
-                    rate
-                    if (rate is not None and rate >= 0)
-                    else (doc.tax_rate_applied or Decimal("0"))
-                )
-                tax_base = (neto_rep + neto_serv) if apply_sales_tax else Decimal("0")
+            apply_sales_tax = bool(
+                request.POST.get("apply_sales_tax")
+                or request.POST.get("apply_vat")
+                or request.POST.get("include_tax")
+            )
+            tax_base = neto_rep if apply_sales_tax else Decimal("0")
 
-            tax_amount = (tax_base * tax_rate).quantize(Decimal("0.01"))
+            from taller.impuestos.engine import calcular_impuesto, get_tax_rate_simple
+
+            # Si hay tasa personalizada en POST, usarla; si no, usar configuración del tenant
+            rate = _to_decimal_pct((request.POST.get("sales_tax_rate") or "").strip())
+            if rate is not None and rate >= 0:
+                # Usar tasa personalizada enviada en formulario
+                tax_rate_decimal = rate / Decimal("100") if rate > 1 else rate
+                tax_amount = (tax_base * tax_rate_decimal).quantize(Decimal("0.01"))
+                tax_rate = rate if rate > 1 else rate * Decimal("100")
+            else:
+                # Usar función centralizada para obtener tasa del tenant
+                tax_amount = calcular_impuesto(tax_base, empresa, applies_to="parts")
+                tax_rate_decimal = get_tax_rate_simple(empresa, applies_to="parts")
+                tax_rate = tax_rate_decimal * Decimal("100")  # Convertir a porcentaje
             total = (neto_rep + neto_serv + neto_otros + tax_amount).quantize(Decimal("0.01"))
 
             # Persistir totales
@@ -1018,13 +1018,35 @@ def documento_form(request, pk=None):
         # NO redirigir; render con errores visibles
         messages.error(request, "Corrige los errores del formulario.")
 
-        # URLs para navegación
+        # URLs para navegación - Generar URL con prefijo de país correcto
         from django.urls import NoReverseMatch, reverse
 
         try:
-            settings_url = reverse("taller:company_settings")
+            # Detectar país desde el path del request
+            if request.path.startswith("/us/"):
+                # Para USA, usar namespace usa:company_settings
+                settings_url = reverse("usa:company_settings")
+            elif request.path.startswith("/cl/"):
+                # Para Chile, intentar chile:company_settings primero, luego fallback
+                try:
+                    settings_url = reverse("chile:company_settings")
+                except NoReverseMatch:
+                    settings_url = reverse("taller:company_settings")
+            else:
+                # Fallback: construir URL basada en el path o usar default
+                settings_url = reverse("taller:company_settings")
         except NoReverseMatch:
-            settings_url = ""
+            # Fallback final: construir URL manualmente basada en el path
+            if request.path.startswith("/us/"):
+                settings_url = "/us/settings/"
+            else:
+                settings_url = "/cl/es/settings/"
+        except Exception as e:
+            # Fallback de emergencia
+            if request.path.startswith("/us/"):
+                settings_url = "/us/settings/"
+            else:
+                settings_url = "/cl/es/settings/"
 
         # Usar template resolution en lugar de template hardcodeado
     from django.template.response import TemplateResponse
@@ -1055,13 +1077,35 @@ def documento_form(request, pk=None):
     # GET
     form = DocumentoForm(instance=documento, user=request.user)
 
-    # URLs para navegación
+    # URLs para navegación - Generar URL con prefijo de país correcto
     from django.urls import NoReverseMatch, reverse
 
     try:
-        settings_url = reverse("taller:company_settings")
+        # Detectar país desde el path del request
+        if request.path.startswith("/us/"):
+            # Para USA, usar namespace usa:company_settings
+            settings_url = reverse("usa:company_settings")
+        elif request.path.startswith("/cl/"):
+            # Para Chile, intentar chile:company_settings primero, luego fallback
+            try:
+                settings_url = reverse("chile:company_settings")
+            except NoReverseMatch:
+                settings_url = reverse("taller:company_settings")
+        else:
+            # Fallback: construir URL basada en el path o usar default
+            settings_url = reverse("taller:company_settings")
     except NoReverseMatch:
-        settings_url = ""
+        # Fallback final: construir URL manualmente basada en el path
+        if request.path.startswith("/us/"):
+            settings_url = "/us/settings/"
+        else:
+            settings_url = "/cl/es/settings/"
+    except Exception as e:
+        # Fallback de emergencia
+        if request.path.startswith("/us/"):
+            settings_url = "/us/settings/"
+        else:
+            settings_url = "/cl/es/settings/"
 
     # Usar template resolution en lugar de template hardcodeado
     from django.template.response import TemplateResponse

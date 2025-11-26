@@ -1,0 +1,13 @@
+<!doctype html><html><body>
+<script>
+(function(){
+  try{
+    window.opener && window.opener.postMessage(
+      { source:"eg-create", kind:"{{ kind }}", id:{{ obj.id }}, text:"{{ obj.nombre|escapejs }}" },
+      "*"
+    );
+  }catch(e){}
+  window.close();
+})();
+</script>
+</body></html>

@@ -1,4 +1,4 @@
-from urllib.parse import urlencode
+﻿from urllib.parse import urlencode
 
 from django.conf import settings
 from django.conf.urls.static import static
@@ -9,19 +9,10 @@ from django.views.generic import RedirectView, TemplateView
 from django.views.i18n import JavaScriptCatalog  # 👈 Para catálogo JS
 
 from taller.views.country_aware_auth import country_aware_login
-from taller.views_extra.admin_payment_views import aprobar_pago, rechazar_pago
 from taller.views_extra.lang_switch import set_language_us
 from taller.views_extra.login_redirector import login_redirector
 from taller.views_extra.logout_redirect_view import logout_redirect_view
-from taller.views_extra.payment_views import (
-    payment_cancel,
-    payment_chile,
-    payment_success,
-    payment_usa,
-    subir_comprobante,
-)
-from taller.views_extra.paypal_webhook import paypal_webhook
-from taller.views_extra.signup_complete import signup_complete
+from taller.views_health import health_check, health_simple
 
 # Importar vista de suscripción bloqueada
 from taller.views_extra.suscripcion import registro, suscripcion_bloqueada
@@ -29,7 +20,6 @@ from taller.views_extra.suscripcion import registro, suscripcion_bloqueada
 # Importar vistas de trial
 from taller.views_extra.views_trial import registro_trial
 from taller.views_extra.views_trial_activate import activar_trial
-from taller.views_health import health_check, health_simple
 
 # gestion_taller/urls.py — archivo raíz de URLs con migración a países
 
@@ -45,10 +35,6 @@ def redirect_to_home(request):
                     return redirect("/cl/")
                 elif request.user.empresa.pais == "US":
                     return redirect("/us/")
-                elif request.user.empresa.pais == "CO":
-                    return redirect("/co/")
-                elif request.user.empresa.pais == "EC":
-                    return redirect("/ec/")
         except Exception:
             pass
 
@@ -58,10 +44,6 @@ def redirect_to_home(request):
             return redirect("/cl/")
         elif request.country == "US":
             return redirect("/us/")
-        elif request.country == "CO":
-            return redirect("/co/")
-        elif request.country == "EC":
-            return redirect("/ec/")
 
     # Fallback: redirigir a Chile por defecto (cambiar de USA a CL)
     return redirect("/cl/")
@@ -107,10 +89,6 @@ def country_aware_clientes_redirect(request):
                     return redirect("/us/clientes/")
                 elif request.user.empresa.pais == "CL":
                     return redirect("/cl/es/clientes/")
-                elif request.user.empresa.pais == "CO":
-                    return redirect("/co/es/clientes/")
-                elif request.user.empresa.pais == "EC":
-                    return redirect("/ec/es/clientes/")
         except Exception:
             pass
 
@@ -120,8 +98,8 @@ def country_aware_clientes_redirect(request):
 
 urlpatterns = [
     path("clientes/", include(("taller.urls_clientes", "clientes"), namespace="clientes")),
-    # Página de inicio - Selector de país
-    path("", TemplateView.as_view(template_name="public/selector_pais.html"), name="home"),
+    # Página de inicio - Selección de país
+    path("", TemplateView.as_view(template_name="landing/seleccionar_pais.html"), name="home"),
     path("admin/", admin.site.urls),
     # Health check para monitoreo
     path("health/", health_check, name="health_check"),
@@ -132,8 +110,6 @@ urlpatterns = [
         lambda request: __import__("verificar_docs_view").verificar_documentos(request),
         name="verificar_docs",
     ),
-    # URLs de i18n
-    path("i18n/", include("taller.views.i18n.urls")),
     # URLs de Trial - Sistema de 30 días
     path("registro-trial/", registro_trial, name="registro_trial"),
     path("activar-trial/", activar_trial, name="activar_trial"),
@@ -151,45 +127,34 @@ urlpatterns = [
     # Páginas de bienvenida por país
     path(
         "bienvenida/cl/",
-        TemplateView.as_view(template_name="public/landing_chile_completa.html"),
+        TemplateView.as_view(template_name="taller/bienvenida_chile.html"),
         name="bienvenida_chile",
     ),
     # Login personalizado con contexto de país
     path("accounts/login/", country_aware_login, name="account_login"),
-    # Signup personalizado con selección de país y plan
-    path("accounts/signup/", signup_complete, name="account_signup"),
-    # Allauth para el resto de funcionalidades (excluyendo signup)
+    # Allauth para el resto de funcionalidades
     path("accounts/", include("allauth.urls")),
     # Wrappers country-aware para login y signup
     path("cl/accounts/login/", redirect_qs("/accounts/login/")),
     path("us/accounts/login/", redirect_qs("/accounts/login/")),
-    path("mx/accounts/login/", redirect_qs("/accounts/login/?country=MX")),
     path("cl/accounts/signup/", redirect_qs("/accounts/signup/")),
     path("us/accounts/signup/", redirect_qs("/accounts/signup/")),
-    path("mx/accounts/signup/", redirect_qs("/accounts/signup/")),
     # Redirects amigables para login
     path("cl/login/", redirect_qs("/cl/accounts/login/")),
     path("cl/es/login/", redirect_qs("/cl/accounts/login/")),
     path("us/login/", redirect_qs("/us/accounts/login/")),
-    path("mx/login/", redirect_qs("/accounts/login/?country=MX")),
     # Logout
     path("cl/accounts/logout/", redirect_qs("/accounts/logout/")),
     path("us/accounts/logout/", redirect_qs("/accounts/logout/")),
-    path("mx/accounts/logout/", redirect_qs("/accounts/logout/")),
     # Password reset (solicitud + enviado + confirm + completo)
     path("cl/accounts/password/reset/", redirect_qs("/accounts/password/reset/")),
     path("us/accounts/password/reset/", redirect_qs("/accounts/password/reset/")),
-    path("mx/accounts/password/reset/", redirect_qs("/accounts/password/reset/")),
     path(
         "cl/accounts/password/reset/done/",
         redirect_qs("/accounts/password/reset/done/"),
     ),
     path(
         "us/accounts/password/reset/done/",
-        redirect_qs("/accounts/password/reset/done/"),
-    ),
-    path(
-        "mx/accounts/password/reset/done/",
         redirect_qs("/accounts/password/reset/done/"),
     ),
     path(
@@ -201,10 +166,6 @@ urlpatterns = [
         redirect_qs("/accounts/password/reset/key/{uidb36}/{key}/"),
     ),
     path(
-        "mx/accounts/password/reset/key/<uidb36>/<key>/",
-        redirect_qs("/accounts/password/reset/key/{uidb36}/{key}/"),
-    ),
-    path(
         "cl/accounts/password/reset/key/done/",
         redirect_qs("/accounts/password/reset/key/done/"),
     ),
@@ -212,24 +173,15 @@ urlpatterns = [
         "us/accounts/password/reset/key/done/",
         redirect_qs("/accounts/password/reset/key/done/"),
     ),
-    path(
-        "mx/accounts/password/reset/key/done/",
-        redirect_qs("/accounts/password/reset/key/done/"),
-    ),
     # Password change
     path("cl/accounts/password/change/", redirect_qs("/accounts/password/change/")),
     path("us/accounts/password/change/", redirect_qs("/accounts/password/change/")),
-    path("mx/accounts/password/change/", redirect_qs("/accounts/password/change/")),
     path(
         "cl/accounts/password/change/done/",
         redirect_qs("/accounts/password/change/done/"),
     ),
     path(
         "us/accounts/password/change/done/",
-        redirect_qs("/accounts/password/change/done/"),
-    ),
-    path(
-        "mx/accounts/password/change/done/",
         redirect_qs("/accounts/password/change/done/"),
     ),
     path("i18n/", include("django.conf.urls.i18n")),  # Selector de idioma
@@ -243,6 +195,11 @@ urlpatterns = [
         TemplateView.as_view(template_name="changelog.html"),
         name="changelog",
     ),
+    path(
+        "legal/",
+        TemplateView.as_view(template_name="legal.html"),
+        name="legal",
+    ),
     # 🇺🇸 USA - Unificado (inglés y español)
     path(
         "us/",
@@ -253,67 +210,45 @@ urlpatterns = [
         "us/en/",
         include(("taller.urls_extra.usa", "usa"), namespace="usa_en"),
     ),
+    # 🇺🇸 USA - Español específico
+    path(
+        "us/es/",
+        include(("taller.urls_extra.usa", "usa"), namespace="usa_es"),
+    ),
     # 🇨🇱 Chile - Español
     path(
         "cl/es/",
         include(("taller.urls_extra.chile", "chile"), namespace="chile"),
     ),
-    # 🇧🇷 Brasil - Português
-    path(
-        "br/",
-        include(("taller.urls_extra.brasil", "brasil"), namespace="brasil"),
-    ),
-    # 🇧🇷 Brasil - Português específico
-    path(
-        "br/pt/",
-        include(("taller.urls_extra.brasil", "brasil"), namespace="brasil_pt"),
-    ),
-    # 🇻🇪 Venezuela - Español
-    path(
-        "ve/",
-        include(("taller.urls_extra.venezuela", "venezuela"), namespace="venezuela"),
-    ),
-    # 🇻🇪 Venezuela - Español específico
-    path(
-        "ve/es/",
-        include(("taller.urls_extra.venezuela", "venezuela"), namespace="venezuela_es"),
-    ),
     # 🇵🇪 Perú - Español
     path(
-        "pe/",
-        include(("taller.urls_extra.peru", "peru"), namespace="peru"),
-    ),
-    # 🇵🇪 Perú - Español específico
-    path(
         "pe/es/",
-        include(("taller.urls_extra.peru", "peru"), namespace="peru_es"),
-    ),
-    # 🇲🇽 México - Español
-    path(
-        "mx/",
-        include(("taller.urls_extra.mexico", "mexico"), namespace="mexico"),
-    ),
-    path(
-        "mx/es/",
-        include(("taller.urls_extra.mexico", "mexico"), namespace="mexico_es"),
+        include(("taller.urls_extra.peru", "peru"), namespace="peru"),
     ),
     # 🇨🇴 Colombia - Español
     path(
-        "co/",
-        include(("taller.urls_extra.colombia", "colombia"), namespace="colombia"),
-    ),
-    path(
         "co/es/",
-        include(("taller.urls_extra.colombia", "colombia"), namespace="colombia_es"),
+        include(("taller.urls_extra.colombia", "colombia"), namespace="colombia"),
     ),
     # 🇪🇨 Ecuador - Español
     path(
-        "ec/",
+        "ec/es/",
         include(("taller.urls_extra.ecuador", "ecuador"), namespace="ecuador"),
     ),
+    # 🇻🇪 Venezuela - Español
     path(
-        "ec/es/",
-        include(("taller.urls_extra.ecuador", "ecuador"), namespace="ecuador_es"),
+        "ve/es/",
+        include(("taller.urls_extra.venezuela", "venezuela"), namespace="venezuela"),
+    ),
+    # 🇲🇽 México - Español
+    path(
+        "mx/es/",
+        include(("taller.urls_extra.mexico", "mexico"), namespace="mexico"),
+    ),
+    # 🇧🇷 Brasil - Español (puede cambiar a pt-br en el futuro)
+    path(
+        "br/es/",
+        include(("taller.urls_extra.brasil", "brasil"), namespace="brasil"),
     ),
     # Chile - Specific routes before general redirect
     path(
@@ -378,11 +313,6 @@ urlpatterns = [
         name="cl_configuracion_redirect",
     ),
     path(
-        "cl/configuracion/tecnicos/",
-        RedirectView.as_view(url="/cl/es/configuracion/tecnicos/", permanent=False),
-        name="cl_configuracion_tecnicos_redirect",
-    ),
-    path(
         "cl/centro-operaciones-espacial/",
         RedirectView.as_view(url="/cl/es/centro-operaciones-espacial/", permanent=False),
         name="cl_centro_operaciones_redirect",
@@ -390,7 +320,7 @@ urlpatterns = [
     # Página de bienvenida para Chile - /cl/ directamente
     path(
         "cl/",
-        TemplateView.as_view(template_name="public/landing_chile_completa.html"),
+        TemplateView.as_view(template_name="landing_inicio.html"),
         name="cl_home_welcome",
     ),
     # Redirect cl/ to cl/es/ preserving the rest of the path - DESHABILITADO - Causa bucles infinitos
@@ -414,8 +344,6 @@ urlpatterns = [
     ),
     # APIs globales (sin prefijo de país)
     path("api/v1/", include("taller.api.urls")),
-    # API unificada de ubicaciones (multi-país)
-    path("api/", include(("taller.ubicacion.urls", "ubicacion_api"), namespace="ubicacion_api")),
     # Redirección de documentos sin país a Chile por defecto
     path(
         "documentos/",
@@ -425,6 +353,17 @@ urlpatterns = [
     # Redirecciones de compatibilidad para URLs antiguas con patrón duplicado
     path("cl/documentos/cl/", RedirectView.as_view(url="/cl/documentos/", permanent=True)),
     path("us/documentos/us/", RedirectView.as_view(url="/us/documentos/", permanent=True)),
+    # Redirect de /cl/es/documentos/ a /cl/documentos/ (consistencia con otras rutas)
+    path(
+        "cl/es/documentos/",
+        RedirectView.as_view(url="/cl/documentos/", permanent=False),
+        name="cl_es_documentos_redirect",
+    ),
+    path(
+        "cl/es/documentos/<path:path>",
+        RedirectView.as_view(url="/cl/documentos/%(path)s", permanent=False),
+        name="cl_es_documentos_path_redirect",
+    ),
     # URLs con prefijo de país específico - NAMESPACES ÚNICOS
     path(
         "cl/documentos/",
@@ -491,20 +430,10 @@ urlpatterns = [
         RedirectView.as_view(url="/us/configuracion/", permanent=False),
         name="usa_taller_settings_redirect",
     ),
+    # Diagnóstico temporal (REMOVER EN PRODUCCIÓN)
+    # path("debug/branding/", include("taller.views_extra.debug_urls")),  # ❌ Desactivado - módulo no existe
     # Suscripción bloqueada - disponible globalmente
     path("suscripcion-bloqueada/", suscripcion_bloqueada, name="suscripcion_bloqueada"),
-    # === SISTEMA DE PAGOS ===
-    # Páginas de pago por país
-    path("cl/es/suscripcion/pago/", payment_chile, name="pago_chile"),
-    path("us/en/subscription/payment/", payment_usa, name="payment_usa"),
-    path("subir-comprobante/", subir_comprobante, name="subir_comprobante"),
-    path("us/en/payment/success/", payment_success, name="payment_success"),
-    path("us/en/payment/cancel/", payment_cancel, name="payment_cancel"),
-    # Admin - Aprobar/Rechazar pagos
-    path("admin/aprobar-pago/<int:pago_id>/", aprobar_pago, name="aprobar_pago"),
-    path("admin/rechazar-pago/<int:pago_id>/", rechazar_pago, name="rechazar_pago"),
-    # === WEBHOOK DE PAYPAL ===
-    path("webhooks/paypal/", paypal_webhook, name="paypal_webhook"),
     # === REDIRECCIONES PARA ENDPOINTS AJAX HARDCODEADOS ===
     # Plan B: redirecciones suaves para cualquier hardcode viejo
     path(

@@ -4,10 +4,27 @@ app_name = "servicios"
 from django.urls import path
 
 from . import views
+from . import api_servicios_moderno
 
 urlpatterns = [
     path("", views.servicios_menu, name="servicios_menu"),
     path("api/buscar/", views.buscar_servicios_api, name="buscar_servicios_api"),
+    # Nuevos endpoints modernos
+    path(
+        "api/servicios/buscar/",
+        api_servicios_moderno.api_buscar_servicios,
+        name="api_servicios_buscar",
+    ),
+    path(
+        "api/servicios/crear_rapido/",
+        api_servicios_moderno.api_crear_servicio_rapido,
+        name="api_servicios_crear_rapido",
+    ),
+    path(
+        "api/categorias-subcategorias/",
+        api_servicios_moderno.api_categorias_subcategorias,
+        name="api_categorias_subcategorias",
+    ),
     path("api/otros/buscar/", views.buscar_otros_servicios_api, name="buscar_otros_servicios_api"),
     path("api/categorias/crear/", views.crear_categoria_api, name="crear_categoria_api"),
     path("api/subcategorias/crear/", views.crear_subcategoria_api, name="crear_subcategoria_api"),

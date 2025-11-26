@@ -26,6 +26,13 @@ class ColorSelectWidget(Select):
         return option
 
 
+class CiudadChoiceField(forms.ModelChoiceField):
+    """Campo personalizado que muestra solo el nombre de la ciudad sin el estado"""
+
+    def label_from_instance(self, obj):
+        return obj.nombre
+
+
 class ClienteForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
@@ -67,7 +74,7 @@ class ClienteForm(forms.ModelForm):
         empty_label="Seleccione estado o departamento",
         label="Estado/Departamento",
     )
-    ciudad_usa = forms.ModelChoiceField(
+    ciudad_usa = CiudadChoiceField(
         queryset=CiudadUSA.objects.none(),
         required=False,
         widget=forms.Select(attrs={"id": "id_ciudad_usa", "class": "form-control"}),

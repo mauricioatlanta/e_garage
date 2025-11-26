@@ -7,6 +7,21 @@
 {% block content %}
 {% csrf_token %}
 
+<!-- Header with Add Service Button -->
+<div class="mb-6">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold space-text mb-2">Automotive Services</h1>
+            <p class="space-text-muted text-sm">Manage your workshop services catalog</p>
+        </div>
+        <a href="{% country_url 'servicios:crear_servicio' %}" 
+           class="space-button bg-gradient-to-r from-cyan-500 to-lime-500 hover:from-cyan-600 hover:to-lime-600 text-white font-semibold px-6 py-3 rounded-lg shadow-lg transform hover:scale-105 transition-all duration-300 flex items-center gap-2">
+            <span class="text-xl">➕</span>
+            <span>Add New Service</span>
+        </a>
+    </div>
+</div>
+
 <!-- Search Section -->
 <div class="mb-4">
     <div class="space-glow">
@@ -32,14 +47,14 @@
         <select id="categoriaFilter" class="space-input">
             <option value="">All Categories</option>
             {% for categoria in categorias %}
-            <option value="{{ categoria.code }}">{{ categoria.get_label }}</option>
+            <option value="{{ categoria.code }}">{{ categoria.label_localizado|default:categoria.get_label }}</option>
             {% endfor %}
         </select>
 
         <select id="subcategoriaFilter" class="space-input">
             <option value="">All Subcategories</option>
             {% for subcategoria in subcategorias %}
-            <option value="{{ subcategoria.code }}">{{ subcategoria.get_label }}</option>
+            <option value="{{ subcategoria.code }}">{{ subcategoria.label_localizado|default:subcategoria.get_label }}</option>
             {% endfor %}
         </select>
     </div>
@@ -56,8 +71,8 @@
                     <span class="text-white text-sm font-bold">{{ categoria.code|slice:":2" }}</span>
                 </div>
                 <div>
-                    <h2 class="text-xl font-bold space-text">{{ categoria.get_label }}</h2>
-                    <p class="text-sm space-text-muted">{{ servicios_cat.count }} services available</p>
+                    <h2 class="text-xl font-bold space-text">{{ categoria.label_localizado|default:categoria.get_label }}</h2>
+                    <p class="text-sm space-text-muted">{{ servicios_cat|length }} services available</p>
                 </div>
             </div>
 
@@ -65,9 +80,9 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 mb-6">
                 {% for servicio in servicios_cat %}
                 <div class="group relative space-card p-4 transform hover:scale-105 transition-all duration-300 cursor-pointer"
-                     data-name="{{ servicio.nombre|default:'' }}"
-                     data-categoria="{{ servicio.categoria.get_label|default:'' }}"
-                     data-subcategoria="{{ servicio.subcategoria.get_label|default:'' }}"
+                     data-name="{{ servicio.nombre_localizado|default:servicio.nombre|default:'' }}"
+                     data-categoria="{{ servicio.categoria_label|default:servicio.categoria.get_label|default:'' }}"
+                     data-subcategoria="{{ servicio.subcategoria_label|default:servicio.subcategoria.get_label|default:'' }}"
                      data-categoria-code="{{ servicio.categoria.code|default:'' }}"
                      data-subcategoria-code="{{ servicio.subcategoria.code|default:'' }}"
                      onclick="window.location.href='{% country_url 'servicios:editar_servicio' servicio.id %}'">
@@ -82,16 +97,16 @@
                                onclick="event.stopPropagation()">
                                 ✏️
                             </a>
-                            <button onclick="event.stopPropagation(); confirmarEliminacion({{ servicio.id }}, '{{ servicio.nombre }}')"
+                            <button onclick="event.stopPropagation(); confirmarEliminacion({{ servicio.id }}, '{{ servicio.nombre_localizado|default:servicio.nombre|escapejs }}')"
                                     class="text-xs space-text hover:text-red-400 transition-colors">
                                 🗑️
                             </button>
                         </div>
                     </div>
 
-                    <h3 class="space-title text-sm font-bold mb-1">{{ servicio.nombre }}</h3>
+                    <h3 class="space-title text-sm font-bold mb-1">{{ servicio.nombre_localizado|default:servicio.nombre }}</h3>
                     {% if servicio.subcategoria %}
-                    <p class="space-text-muted text-xs">{{ servicio.subcategoria.get_label }}</p>
+                    <p class="space-text-muted text-xs">{{ servicio.subcategoria_label|default:servicio.subcategoria.get_label }}</p>
                     {% endif %}
                 </div>
                 {% endfor %}
@@ -282,3 +297,5 @@ window.eliminarServicio = function() {
 };
 </script>
 {% endblock %}
+
+

@@ -83,11 +83,17 @@ class Command(BaseCommand):
         estados_objs = []
         for estado_nombre in data.keys():
             codigo_estado = state_codes.get(estado_nombre, estado_nombre[:2].upper())
+            # Usar get_or_create con pais y codigo para evitar duplicados
             estado, created = Estado.objects.get_or_create(
-                nombre=estado_nombre, defaults={"codigo": codigo_estado}
+                pais="US", codigo=codigo_estado, defaults={"nombre": estado_nombre}
             )
             if created:
                 estados_creados += 1
+            else:
+                # Si el estado ya existe pero no tiene el nombre correcto, actualizarlo
+                if estado.nombre != estado_nombre:
+                    estado.nombre = estado_nombre
+                    estado.save()
 
         # Crear ciudades si no existen
         estados_dict = {e.nombre: e for e in Estado.objects.all()}

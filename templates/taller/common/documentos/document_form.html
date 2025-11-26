@@ -22,12 +22,12 @@
   letter-spacing: 0.3px !important;
 }
 
-/* Focus state - MUY VISIBLE */
+/* Focus state - MUY VISIBLE + Accesible */
 .form-control:focus, .form-select:focus, input[type="text"]:focus, input[type="number"]:focus, input[type="date"]:focus, input[type="email"]:focus, input[type="tel"]:focus, textarea:focus, select:focus {
   background-color: rgba(10, 10, 30, 1) !important;
   border-color: #00ffff !important;
   border-width: 3px !important;
-  box-shadow: 0 0 20px rgba(0, 255, 255, 0.8), inset 0 2px 6px rgba(0, 0, 0, 0.5) !important;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.8), inset 0 2px 6px rgba(0, 0, 0, 0.5), 0 0 0 3px rgba(0, 255, 255, 0.2) !important;
   outline: none !important;
   color: #ffffff !important;
   transform: scale(1.01) !important;
@@ -138,42 +138,88 @@ input:disabled, select:disabled, textarea:disabled {
   cursor: not-allowed !important;
   opacity: 0.7 !important;
 }
+
+/* Estilos mejorados para la sección de totales */
+.totales-section {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+}
+
+.totales-section .grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .totales-section .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.totales-section .bg-black\/40 {
+  transition: all 0.3s ease;
+}
+
+.totales-section .bg-black\/40:hover {
+  border-color: rgba(0, 242, 254, 0.6) !important;
+  box-shadow: 0 0 15px rgba(0, 242, 254, 0.3) !important;
+  transform: translateY(-2px);
+}
+
+.totales-section .bg-gradient-to-r {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(0, 242, 254, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(0, 242, 254, 0.6);
+  }
+}
 </style>
 
 {% block documento_title %}
 {% with active_country=company_country|default:'' %}
 {% with is_cl=active_country|default:''|upper %}
-<div class="flex justify-between items-center mb-4">
-  {% if is_cl == 'CL' %}
-  <h1 class="documento-title mb-0">📝 Crear documento</h1>
-  {% else %}
-  <h1 class="documento-title mb-0">📝 {% trans "Create Document" %}</h1>
-  {% endif %}
-  
-  <div class="flex items-center gap-4">
-    <!-- Language Selector -->
-    <form id="language-form-doc" action="/i18n/setlang/" method="post" class="inline">
-      {% csrf_token %}
-      <input type="hidden" name="next" value="{{ request.get_full_path }}">
-      <input type="hidden" name="language" id="language-input-doc" value="{% if is_cl == 'CL' %}es{% else %}{{ LANGUAGE_CODE|default:'en' }}{% endif %}">
-      <div class="flex items-center gap-2 bg-black/40 px-3 py-2 rounded-lg border border-cyan-400/50" style="box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);">
-        <button type="button" onclick="submitLanguageDoc('en')" id="lang-en-doc" 
-                class="px-3 py-1 rounded-md text-sm font-bold transition-all duration-300 {% if LANGUAGE_CODE == 'en' %}bg-gradient-to-r from-cyan-500 to-blue-500 text-white{% else %}text-gray-400 hover:text-cyan-300{% endif %}"
-                style="{% if LANGUAGE_CODE == 'en' %}box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);{% endif %}">
-          🇺🇸 EN
-        </button>
-        <button type="button" onclick="submitLanguageDoc('es')" id="lang-es-doc" 
-                class="px-3 py-1 rounded-md text-sm font-bold transition-all duration-300 {% if LANGUAGE_CODE == 'es' %}bg-gradient-to-r from-cyan-500 to-blue-500 text-white{% else %}text-gray-400 hover:text-cyan-300{% endif %}"
-                style="{% if LANGUAGE_CODE == 'es' %}box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);{% endif %}">
-          🇪🇸 ES
-        </button>
-      </div>
-    </form>
-    
-    <label class="flex items-center text-cyan-200 font-semibold">
-      <input type="checkbox" id="id_pagado" name="pagado" class="mr-2 form-control">
-      {% if is_cl == 'CL' %}Documento pagado{% else %}{% trans "Document paid" %}{% endif %}
-    </label>
+<!-- Header de Página - Design System -->
+<div class="mb-6 sm:mb-8 px-4 sm:px-6">
+  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+    <div class="flex-1">
+      <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-2">
+        📝 {% if is_cl == 'CL' %}Crear documento{% else %}{% trans "Create Document" %}{% endif %}
+      </h1>
+      <p class="text-sm sm:text-base text-slate-300">
+        {% if is_cl == 'CL' %}Crea un nuevo documento para el taller{% else %}{% trans "Create a new document for the workshop" %}{% endif %}
+      </p>
+    </div>
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+      <!-- Language Selector -->
+      <form id="language-form-doc" action="/i18n/setlang/" method="post" class="inline">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <input type="hidden" name="language" id="language-input-doc" value="{% if is_cl == 'CL' %}es{% else %}{{ LANGUAGE_CODE|default:'en' }}{% endif %}">
+        <div class="flex items-center gap-2 bg-black/40 px-3 py-2 rounded-lg border border-cyan-400/50" style="box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);">
+          <button type="button" onclick="submitLanguageDoc('en')" id="lang-en-doc"
+                  class="px-3 py-1 rounded-md text-sm font-bold transition-all duration-300 {% if LANGUAGE_CODE == 'en' %}bg-gradient-to-r from-cyan-500 to-blue-500 text-white{% else %}text-gray-400 hover:text-cyan-300{% endif %}"
+                  {% if LANGUAGE_CODE == 'en' %}style="box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);"{% endif %}>
+            🇺🇸 EN
+          </button>
+          <button type="button" onclick="submitLanguageDoc('es')" id="lang-es-doc"
+                  class="px-3 py-1 rounded-md text-sm font-bold transition-all duration-300 {% if LANGUAGE_CODE == 'es' %}bg-gradient-to-r from-cyan-500 to-blue-500 text-white{% else %}text-gray-400 hover:text-cyan-300{% endif %}"
+                  {% if LANGUAGE_CODE == 'es' %}style="box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);"{% endif %}>
+            🇪🇸 ES
+          </button>
+        </div>
+      </form>
+      
+      <label class="flex items-center text-cyan-200 font-semibold text-sm sm:text-base px-3 py-2 rounded-lg bg-slate-800/40 border border-slate-600/50 cursor-pointer hover:bg-slate-700/40 transition-all">
+        <input type="checkbox" id="id_pagado" name="pagado" class="mr-2 form-control focus:outline-none focus:ring-2 focus:ring-cyan-400/60">
+        {% if is_cl == 'CL' %}Documento pagado{% else %}{% trans "Document paid" %}{% endif %}
+      </label>
+    </div>
   </div>
 </div>
 {% endwith %}
@@ -193,8 +239,8 @@ function submitLanguageDoc(lang) {
         <form method="post" id="document-form" class="max-w-7xl mx-auto"
               data-mode="{% if es_edicion %}edit{% else %}create{% endif %}"
               data-url-next-number="{% country_url 'documentos:api_obtener_numero_documento' %}"
-              data-url-client-search="{% country_url 'ajax:buscar_clientes' %}"
-              data-url-vehiculos-by-cli="{% country_url 'ajax:vehiculos_por_cliente' %}"
+              data-url-client-search="{% country_url 'ajax:buscar_clientes' app_namespace='' %}"
+              data-url-vehiculos-by-cli="{% country_url 'ajax:vehiculos_por_cliente' app_namespace='' %}"
               data-url-repuesto-by-code="{% country_url 'api:repuesto_by_code_api' %}"
               data-url-repuesto-search="{% country_url 'api:buscar_repuestos_api' %}"
               data-url-repuesto-create="{% country_url 'api:crear_repuesto_api' %}"
@@ -202,53 +248,69 @@ function submitLanguageDoc(lang) {
               data-url-outsourced-services="{% country_url 'servicios:buscar_otros_servicios_api' %}">
           {% csrf_token %}
 
-  <!-- System messages -->
+  <!-- System messages - Design System -->
   {% if messages %}
     {% for message in messages %}
-      <div class="alert {{ message.tags }} bg-{% if message.tags == 'error' %}red{% elif message.tags == 'success' %}green{% else %}blue{% endif %}-900/50 border border-{% if message.tags == 'error' %}red{% elif message.tags == 'success' %}green{% else %}blue{% endif %}-400 rounded-xl p-4 mb-6">
-        <div class="text-{% if message.tags == 'error' %}red{% elif message.tags == 'success' %}green{% else %}blue{% endif %}-200 font-semibold">{{ message }}</div>
+      {% if message.tags == 'success' %}
+      <div class="bg-green-900/30 border border-green-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
+        <span class="text-2xl flex-shrink-0">✅</span>
+        <p class="text-sm sm:text-base text-green-200 flex-1">{{ message }}</p>
       </div>
+      {% elif message.tags == 'error' %}
+      <div class="bg-red-900/30 border border-red-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
+        <span class="text-2xl flex-shrink-0">❌</span>
+        <p class="text-sm sm:text-base text-red-200 flex-1">{{ message }}</p>
+      </div>
+      {% else %}
+      <div class="bg-blue-900/30 border border-blue-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
+        <span class="text-2xl flex-shrink-0">ℹ️</span>
+        <p class="text-sm sm:text-base text-blue-200 flex-1">{{ message }}</p>
+      </div>
+      {% endif %}
     {% endfor %}
   {% endif %}
 
-  <!-- Validation errors -->
+  <!-- Validation errors - Design System -->
   {% if form.errors %}
-    <div class="bg-red-900/50 border border-red-400 rounded-xl p-4 mb-6">
-      <div class="text-red-200 font-semibold mb-2">Validation errors:</div>
-      {{ form.errors }}
+    <div class="bg-red-900/30 border border-red-500/50 rounded-xl p-4 mb-4 flex items-start gap-3">
+      <span class="text-2xl flex-shrink-0">❌</span>
+      <div class="flex-1">
+        <p class="text-sm sm:text-base text-red-200 font-semibold mb-1">{% if is_cl == 'CL' %}Errores de validación{% else %}{% trans "Validation errors" %}{% endif %}:</p>
+        <div class="text-sm text-red-300">{{ form.errors }}</div>
+      </div>
     </div>
   {% endif %}
 
   <!-- Document shell with dynamic theme -->
-  <div id="doc-shell" class="rounded-3xl p-6 theme-ot border-2">
+  <div id="doc-shell" class="rounded-2xl p-4 sm:p-6 theme-ot border-2 shadow-lg">
 
     <!-- Document header -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
 
       <!-- Columna 1: FECHA primero + TIPO + NÚMERO -->
-      <div class="space-y-4">
-                <label for="id_fecha_emision" class="block text-cyan-200 font-semibold">{% if is_cl == 'CL' %}Fecha de emisión{% else %}{% trans "Issue Date" %}{% endif %}</label>
-                <input id="id_fecha_emision" type="date" name="fecha_emision" class="form-control w-full"
+      <div class="space-y-3 sm:space-y-4">
+                <label for="id_fecha_emision" class="block text-cyan-200 font-semibold text-sm sm:text-base">{% if is_cl == 'CL' %}Fecha de emisión{% else %}{% trans "Issue Date" %}{% endif %}</label>
+                <input id="id_fecha_emision" type="date" name="fecha_emision" class="form-control w-full text-base"
                        value="{{ form.fecha_emision.value|default_if_none:''|date:'Y-m-d' }}">
 
-        <label for="id_tipo" class="block text-cyan-200 font-semibold">{% if is_cl == 'CL' %}Tipo de documento{% else %}{% trans "Document Type" %}{% endif %}</label>
-        <select id="id_tipo" name="tipo" class="form-select w-full">
+        <label for="id_tipo" class="block text-cyan-200 font-semibold text-sm sm:text-base">{% if is_cl == 'CL' %}Tipo de documento{% else %}{% trans "Document Type" %}{% endif %}</label>
+        <select id="id_tipo" name="tipo" class="form-select w-full text-base">
           <option value="OT">{% if is_cl == 'CL' %}Orden de trabajo{% else %}{% trans "Work Order" %}{% endif %}</option>
           <option value="FAC">{% if is_cl == 'CL' %}Factura / Boleta{% else %}{% trans "Invoice/Receipt" %}{% endif %}</option>
           <option value="PRES">{% if is_cl == 'CL' %}Presupuesto{% else %}{% trans "Estimate" %}{% endif %}</option>
         </select>
 
-        <label class="block text-cyan-200 font-semibold">{% if is_cl == 'CL' %}Número{% else %}{% trans "Number" %}{% endif %}</label>
-        <div class="form-control w-full bg-gray-800 text-cyan-300 font-mono text-center py-3" id="id_numero">
+        <label class="block text-cyan-200 font-semibold text-sm sm:text-base">{% if is_cl == 'CL' %}Número{% else %}{% trans "Number" %}{% endif %}</label>
+        <div class="form-control w-full bg-gray-800 text-cyan-300 font-mono text-center py-2 sm:py-3 text-sm sm:text-base" id="id_numero">
           {% if is_cl == 'CL' %}Se generará automáticamente{% else %}{% trans "Will be generated automatically" %}{% endif %}
         </div>
       </div>
 
       <!-- Columna 2: Cliente/Vehículo -->
-      <div class="space-y-4">
-        <div class="flex items-center justify-between">
-          <label class="block text-cyan-200 font-semibold">{% if is_cl == 'CL' %}Cliente{% else %}{% trans "Client" %}{% endif %}</label>
-          <button type="button" onclick="openClienteModal()" class="px-3 py-1 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white font-bold rounded-lg text-sm transition-all">
+      <div class="space-y-3 sm:space-y-4">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
+          <label class="block text-cyan-200 font-semibold text-sm sm:text-base">{% if is_cl == 'CL' %}Cliente{% else %}{% trans "Client" %}{% endif %}</label>
+          <button type="button" onclick="openClienteModal()" class="px-4 py-2 sm:px-3 sm:py-1 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white font-bold rounded-lg text-sm sm:text-xs transition-all w-full sm:w-auto">
             {% if is_cl == 'CL' %}➕ Nuevo{% else %}➕ {% trans "New" %}{% endif %}
           </button>
         </div>
@@ -275,121 +337,171 @@ function submitLanguageDoc(lang) {
           </div>
         </div>
 
-        <div class="flex items-center justify-between">
-          <label for="id_vehiculo" class="block text-cyan-200 font-semibold">{% if is_cl == 'CL' %}Vehículo{% else %}{% trans "Vehicle" %}{% endif %}</label>
-          <button type="button" onclick="openVehiculoModal()" class="px-3 py-1 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold rounded-lg text-sm transition-all">
+        {% if ui_config.show_vehicle %}
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
+          <label for="id_vehiculo" class="block text-cyan-200 font-semibold text-sm sm:text-base">{% if is_cl == 'CL' %}Vehículo{% else %}{% trans "Vehicle" %}{% endif %}</label>
+          <button type="button" onclick="openVehiculoModal()" class="px-4 py-2 sm:px-3 sm:py-1 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold rounded-lg text-sm sm:text-xs transition-all w-full sm:w-auto">
             {% if is_cl == 'CL' %}🚗 Nuevo{% else %}🚗 {% trans "New" %}{% endif %}
           </button>
         </div>
         <select id="id_vehiculo" name="vehiculo" class="form-select w-full">
           <option value="">{% if is_cl == 'CL' %}Selecciona cliente primero…{% else %}{% trans "Select client first..." %}{% endif %}</option>
         </select>
+        {% endif %}
       </div>
 
       <!-- Columna 3: Técnico + Payment Status + Kilometraje -->
-      <div class="space-y-4">
-        <label for="id_tecnico_responsable" class="block text-cyan-200 font-semibold">{% if is_cl == 'CL' %}Técnico responsable{% else %}{% trans "Responsible Technician" %}{% endif %}</label>
-        <select name="tecnico_responsable" id="id_tecnico_responsable" class="form-select w-full">
-          <option value="">{% if is_cl == 'CL' %}Selecciona técnico…{% else %}{% trans "Select technician..." %}{% endif %}</option>
+      <div class="space-y-3 sm:space-y-4">
+        {% with current_label=responsable_label|default:form.tecnico_responsable.label %}
+        <label for="id_tecnico_responsable" class="block text-cyan-200 font-semibold text-sm sm:text-base">
+          {{ current_label }}
+        </label>
+        <select name="tecnico_responsable" id="id_tecnico_responsable" class="form-select w-full text-base">
+          <option value="">{% if is_cl == 'CL' %}Selecciona…{% else %}{% trans "Select..." %}{% endif %}</option>
           {% for t in tecnicos %}
             <option value="{{ t.id }}">{{ t.nombre }}</option>
           {% endfor %}
         </select>
+        {% endwith %}
 
-        <label for="id_payment_status" class="block text-cyan-200 font-semibold">{% if is_cl == 'CL' %}Estado de pago{% else %}{% trans "Payment Status" %}{% endif %}</label>
-        <select id="id_payment_status" name="payment_status" class="form-select w-full">
+        <label for="id_payment_status" class="block text-cyan-200 font-semibold text-sm sm:text-base">{% if is_cl == 'CL' %}Estado de pago{% else %}{% trans "Payment Status" %}{% endif %}</label>
+        <select id="id_payment_status" name="payment_status" class="form-select w-full text-base">
           <option value="pending">{% if is_cl == 'CL' %}Pendiente{% else %}{% trans "Pending" %}{% endif %}</option>
           <option value="paid">{% if is_cl == 'CL' %}Pagado{% else %}{% trans "Paid" %}{% endif %}</option>
           <option value="partial">{% if is_cl == 'CL' %}Parcial{% else %}{% trans "Partial" %}{% endif %}</option>
           <option value="canceled">{% if is_cl == 'CL' %}Anulado{% else %}{% trans "Canceled" %}{% endif %}</option>
         </select>
 
-        <label for="id_kilometraje" class="block text-cyan-200 font-semibold">{% if is_cl == 'CL' %}Kilometraje{% else %}{% trans "Mileage" %}{% endif %}</label>
-        <input id="id_kilometraje" type="number" name="kilometraje" min="0" class="form-control w-full" placeholder="{% if is_cl == 'CL' %}0{% else %}0{% endif %}">
+        {% if ui_config.show_kilometraje %}
+        <label for="id_kilometraje" class="block text-cyan-200 font-semibold text-sm sm:text-base">{% if is_cl == 'CL' %}Kilometraje{% else %}{% trans "Mileage" %}{% endif %}</label>
+        <input id="id_kilometraje" type="number" name="kilometraje" min="0" class="form-control w-full text-base" placeholder="{% if is_cl == 'CL' %}0{% else %}0{% endif %}">
+        {% endif %}
       </div>
     </div>
 
     <!-- Dynamic sections -->
-    <div class="space-y-6">
-      <div class="seccion-card">
-        <h3 class="seccion-title">{% if is_cl == 'CL' %}🔧 Repuestos y servicios{% else %}🔧 {% trans "Parts & Services" %}{% endif %}</h3>
-        <div class="flex flex-wrap gap-4 mb-6">
-          <button type="button" id="add-repuesto" class="btn-secondary" onclick="addRepuestoRow()">{% if is_cl == 'CL' %}+ Agregar repuesto{% else %}+ {% trans "Add Part" %}{% endif %}</button>
-          <button type="button" id="add-servicio" class="btn-secondary" onclick="addServicioRow()">{% if is_cl == 'CL' %}+ Agregar servicio{% else %}+ {% trans "Add Service" %}{% endif %}</button>
-          <button type="button" id="add-otro" class="btn-secondary" onclick="addOtroRow()">{% if is_cl == 'CL' %}+ Agregar servicio externo{% else %}+ {% trans "Add Other Service" %}{% endif %}</button>
+    <div class="space-y-4 sm:space-y-6">
+      <div class="seccion-card bg-slate-900/60 border border-slate-700/80 rounded-2xl p-4 sm:p-6 shadow-lg">
+        <h3 class="text-lg sm:text-xl font-semibold text-cyan-300 mb-4 flex items-center gap-2">{% if is_cl == 'CL' %}🔧 Repuestos y servicios{% else %}🔧 {% trans "Parts & Services" %}{% endif %}</h3>
+        <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6">
+          {% if ui_config.show_repuestos %}
+          <button type="button" id="add-repuesto" class="btn-secondary py-2 px-4 text-sm sm:text-base w-full sm:w-auto" onclick="addRepuestoRow()">{% if is_cl == 'CL' %}+ Agregar repuesto{% else %}+ {% trans "Add Part" %}{% endif %}</button>
+          {% endif %}
+          {% if ui_config.show_services %}
+          <button type="button" id="add-servicio" class="btn-secondary py-2 px-4 text-sm sm:text-base w-full sm:w-auto" onclick="addServicioRow()">{% if is_cl == 'CL' %}+ Agregar servicio{% else %}+ {% trans "Add Service" %}{% endif %}</button>
+          {% endif %}
+          {% if ui_config.show_otros_servicios %}
+          <button type="button" id="add-otro" class="btn-secondary py-2 px-4 text-sm sm:text-base w-full sm:w-auto" onclick="addOtroRow()">{% if is_cl == 'CL' %}+ Agregar servicio externo{% else %}+ {% trans "Add Other Service" %}{% endif %}</button>
+          {% endif %}
         </div>
 
         <!-- Parts container -->
+        {% if ui_config.show_repuestos %}
         <div id="repuestos-container" class="space-y-4">
           <!-- Dynamic parts will be added here -->
         </div>
+        {% endif %}
 
         <!-- Services container -->
+        {% if ui_config.show_services %}
         <div id="servicios-container" class="space-y-4">
           <!-- Dynamic services will be added here -->
         </div>
+        {% endif %}
 
         <!-- Other services container -->
+        {% if ui_config.show_otros_servicios %}
         <div id="otros-container" class="space-y-4">
           <!-- Dynamic other services will be added here -->
         </div>
+        {% endif %}
       </div>
 
       <!-- Observations -->
-      <div class="observaciones-card">
-        <label for="id_observaciones" class="block text-cyan-200 font-semibold mb-2">{% if is_cl == 'CL' %}Observaciones{% else %}{% trans "Observations" %}{% endif %}</label>
-        <textarea id="id_observaciones" name="observaciones" rows="4" class="form-control w-full" placeholder="{% if is_cl == 'CL' %}Observaciones opcionales — puedes dejar este campo vacío si no hay información adicional.{% else %}{% trans "Optional observations - Can be left empty if no additional information..." %}{% endif %}">{{ form.observaciones.value|default_if_none:'' }}</textarea>
+      <div class="observaciones-card bg-slate-900/60 border border-slate-700/80 rounded-2xl p-4 sm:p-6 shadow-lg">
+        <label for="id_observaciones" class="block text-cyan-200 font-semibold text-sm sm:text-base mb-3">{% if is_cl == 'CL' %}Observaciones{% else %}{% trans "Observations" %}{% endif %}</label>
+        <textarea id="id_observaciones" name="observaciones" rows="4" class="form-control w-full text-base focus:outline-none focus:ring-2 focus:ring-cyan-400/60 focus:ring-offset-2 focus:ring-offset-slate-900" placeholder="{% if is_cl == 'CL' %}Observaciones opcionales — puedes dejar este campo vacío si no hay información adicional.{% else %}{% trans "Optional observations - Can be left empty if no additional information..." %}{% endif %}">{{ form.observaciones.value|default_if_none:'' }}</textarea>
       </div>
     </div>
 
-    <!-- Totals -->
-    <div class="totales-section">
-      <h3 class="text-2xl font-bold text-cyan-300 mb-4">{% if is_cl == 'CL' %}💰 Totales{% else %}💰 {% trans "Totals" %}{% endif %}</h3>
-
-      <!-- VAT checkbox next to totals -->
-      <div class="mb-4">
-        <label for="id_apply_vat" class="flex items-center text-cyan-200">
-          <input type="checkbox" id="id_apply_vat" name="apply_vat" checked class="mr-2 form-control">
-          {% if is_cl == 'CL' %}Aplicar impuesto{% else %}{% trans "Apply tax" %}{% endif %}
-        </label>
-      </div>
-
-      <div class="space-y-2">
-        <div class="totales-row">
-          <span class="text-cyan-300">{% if is_cl == 'CL' %}Subtotal repuestos{% else %}{% trans "Parts Subtotal" %}{% endif %}:</span>
-          <span id="t_repuestos" class="text-cyan-300 font-bold">$0</span>
-        </div>
-        <div class="totales-row">
-          <span class="text-cyan-300">{% if is_cl == 'CL' %}Subtotal servicios{% else %}{% trans "Services Subtotal" %}{% endif %}:</span>
-          <span id="t_servicios" class="text-cyan-300 font-bold">$0</span>
-        </div>
-        <div class="totales-row">
-          <span class="text-cyan-300">{% if is_cl == 'CL' %}Subtotal servicios externos{% else %}{% trans "Other Services Subtotal" %}{% endif %}:</span>
-          <span id="t_otros" class="text-cyan-300 font-bold">$0</span>
-        </div>
-        <div class="totales-row items-center">
-          <label class="flex items-center text-cyan-300 cursor-pointer">
-            <input type="checkbox" id="include_tax" checked class="mr-2 cursor-pointer">
-            <span>{% if is_cl == 'CL' %}Incluir IVA{% else %}{% trans "Include Tax" %}{% endif %} (IVA):</span>
+    <!-- Totals Section - Mejorada y reorganizada -->
+    <div class="totales-section mt-6 sm:mt-8 pt-4 sm:pt-6 border-t-2 border-cyan-500/30">
+      <div class="bg-gradient-to-r from-cyan-900/30 to-blue-900/30 rounded-2xl p-4 sm:p-6 border border-cyan-400/50 shadow-lg">
+        <h3 class="text-xl sm:text-2xl font-bold text-cyan-300 mb-4 sm:mb-6 text-center">
+          {% if is_cl == 'CL' %}💰 Resumen de Totales{% else %}💰 {% trans "Totals Summary" %}{% endif %}
+        </h3>
+        
+        <!-- VAT checkbox -->
+        <div class="mb-6 flex justify-center">
+          <label for="id_apply_vat" class="flex items-center text-cyan-200 bg-cyan-900/40 px-4 py-2 rounded-lg border border-cyan-400/50 cursor-pointer hover:bg-cyan-900/60 transition-all">
+            <input type="checkbox" id="id_apply_vat" name="apply_vat" checked class="mr-2 w-5 h-5 accent-cyan-400 cursor-pointer">
+            <span class="font-semibold">{% if is_cl == 'CL' %}Aplicar impuesto{% else %}{% trans "Apply tax" %}{% endif %}</span>
           </label>
-          <span id="t_iva" class="text-cyan-300 font-bold">$0</span>
         </div>
-        <div class="totales-row totales-total">
-          <span class="text-cyan-300 font-bold text-lg">{% if is_cl == 'CL' %}Total general{% else %}{% trans "Total" %}{% endif %}:</span>
-          <span id="t_total" class="text-cyan-300 font-bold text-xl">$0</span>
+
+        <!-- Totals Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <!-- Parts Subtotal -->
+          {% if ui_config.show_repuestos %}
+          <div class="bg-black/40 rounded-lg p-4 border border-cyan-400/30">
+            <div class="flex justify-between items-center">
+              <span class="text-cyan-200 text-sm font-semibold">{% if is_cl == 'CL' %}Subtotal Repuestos{% else %}{% trans "Parts Subtotal" %}{% endif %}</span>
+              <span id="t_repuestos" class="text-cyan-300 font-bold text-lg">$0</span>
+            </div>
+          </div>
+          {% endif %}
+          
+          <!-- Services Subtotal -->
+          {% if ui_config.show_services %}
+          <div class="bg-black/40 rounded-lg p-4 border border-cyan-400/30">
+            <div class="flex justify-between items-center">
+              <span class="text-cyan-200 text-sm font-semibold">{% if is_cl == 'CL' %}Subtotal Servicios{% else %}{% trans "Services Subtotal" %}{% endif %}</span>
+              <span id="t_servicios" class="text-cyan-300 font-bold text-lg">$0</span>
+            </div>
+          </div>
+          {% endif %}
+          
+          <!-- Other Services Subtotal -->
+          {% if ui_config.show_otros_servicios %}
+          <div class="bg-black/40 rounded-lg p-4 border border-cyan-400/30">
+            <div class="flex justify-between items-center">
+              <span class="text-cyan-200 text-sm font-semibold">{% if is_cl == 'CL' %}Subtotal Servicios Externos{% else %}{% trans "Other Services Subtotal" %}{% endif %}</span>
+              <span id="t_otros" class="text-cyan-300 font-bold text-lg">$0</span>
+            </div>
+          </div>
+          {% endif %}
+          
+          <!-- Tax -->
+          <div class="bg-black/40 rounded-lg p-4 border border-cyan-400/30">
+            <div class="flex justify-between items-center">
+              <label class="flex items-center text-cyan-200 text-sm font-semibold cursor-pointer">
+                <input type="checkbox" id="include_tax" checked class="mr-2 w-4 h-4 accent-cyan-400 cursor-pointer">
+                <span>{% if is_cl == 'CL' %}IVA{% else %}{% trans "Tax" %}{% endif %}</span>
+              </label>
+              <span id="t_iva" class="text-cyan-300 font-bold text-lg">$0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grand Total -->
+        <div class="bg-gradient-to-r from-cyan-600/30 to-blue-600/30 rounded-lg p-5 border-2 border-cyan-400 shadow-xl">
+          <div class="flex justify-between items-center">
+            <span class="text-white font-bold text-xl">{% if is_cl == 'CL' %}Total General{% else %}{% trans "Grand Total" %}{% endif %}</span>
+            <span id="t_total" class="text-white font-bold text-2xl">$0</span>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Action buttons -->
-    <div class="flex flex-wrap justify-between items-center gap-4 mt-8">
-      <div class="flex items-center gap-3">
-        <a href="{% country_url 'documentos:lista_documentos' %}" class="btn-secondary">{% if is_cl == 'CL' %}← Volver{% else %}← {% trans "Back" %}{% endif %}</a>
-        <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="btn-secondary">
+    <!-- Action buttons - Design System -->
+    <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 sm:gap-4 mt-6 sm:mt-8">
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+        <a href="{% country_url 'documentos:lista_documentos' %}" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-3 text-sm sm:text-base font-semibold rounded-xl bg-slate-800/60 hover:bg-slate-700/60 border border-slate-600/50 text-slate-200 hover:text-white transition-all focus:outline-none focus:ring-2 focus:ring-slate-400/60 focus:ring-offset-2 focus:ring-offset-slate-900 text-center">{% if is_cl == 'CL' %}← Volver{% else %}← {% trans "Back" %}{% endif %}</a>
+        <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-3 text-sm sm:text-base font-semibold rounded-xl bg-slate-800/60 hover:bg-slate-700/60 border border-slate-600/50 text-slate-200 hover:text-white transition-all focus:outline-none focus:ring-2 focus:ring-slate-400/60 focus:ring-offset-2 focus:ring-offset-slate-900 text-center">
           {% if is_cl == 'CL' %}🌐 Ir a otros servicios{% else %}🌐 {% trans "Go to Other Services" %}{% endif %}
         </a>
       </div>
-      <button type="submit" class="btn-primary">{% if is_cl == 'CL' %}💾 Guardar documento{% else %}💾 {% trans "Save Document" %}{% endif %}</button>
+      <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-3 text-sm sm:text-base font-semibold rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white shadow-lg hover:shadow-xl transition-all focus:outline-none focus:ring-2 focus:ring-cyan-400/60 focus:ring-offset-2 focus:ring-offset-slate-900">{% if is_cl == 'CL' %}💾 Guardar documento{% else %}💾 {% trans "Save Document" %}{% endif %}</button>
     </div>
   </div>
 
@@ -819,6 +931,8 @@ function renderResultadosClientes(lista){
 }
 
 async function seleccionarCliente({id, nombre, email, telefono}){
+  console.log(`👤 Cliente seleccionado: ${nombre} (ID: ${id})`);
+  
   getClienteElements();
   if (clienteResultados) clienteResultados.classList.add('hidden');
   if (clienteBusqueda) clienteBusqueda.value = nombre;
@@ -830,59 +944,92 @@ async function seleccionarCliente({id, nombre, email, telefono}){
   if (cliEmail)  cliEmail.textContent  = email || '—';
   if (cliFono)   cliFono.textContent   = telefono || '—';
   if (clienteInfoBox) clienteInfoBox.classList.remove('hidden');
+  
+  // ⚡ IMPORTANTE: Cargar vehículos del cliente seleccionado
+  console.log(`🔄 Iniciando carga de vehículos para cliente ${id}...`);
   await cargarVehiculosPorCliente(id);
 }
 
 async function cargarVehiculosPorCliente(clienteId){
   getClienteElements();
-          if (!vehiculoSelect) return;
-
-  const alreadyHasOptions = vehiculoSelect.options && vehiculoSelect.options.length > 1;
-  if (alreadyHasOptions && vehiculoSelect.dataset.source === 'form') {
+  if (!vehiculoSelect) {
+    console.warn('⚠️ Elemento #id_vehiculo no encontrado');
     return;
   }
 
-          vehiculoSelect.disabled = true;
-          vehiculoSelect.innerHTML = `<option value="">${I18N.loading_vehicles}</option>`;
-
-  const localMatches = PREFETCH.vehiculos.filter((v)=> String(v.cliente_id) === String(clienteId));
-  if (localMatches.length){
-    const options = localMatches.map((v)=> `<option value="${v.id}">${v.label || v.text || ''}</option>`).join('');
-    vehiculoSelect.innerHTML = `<option value="">${I18N.select_vehicle}</option>${options}`;
-    vehiculoSelect.dataset.source = 'prefetch';
+  if (!clienteId) {
+    console.warn('⚠️ No se proporcionó clienteId');
+    vehiculoSelect.innerHTML = `<option value="">${I18N.select_vehicle}</option>`;
+    return;
   }
 
+  console.log(`🚗 Cargando vehículos para cliente ID: ${clienteId}`);
+
+  const alreadyHasOptions = vehiculoSelect.options && vehiculoSelect.options.length > 1;
+  if (alreadyHasOptions && vehiculoSelect.dataset.source === 'form') {
+    console.log('ℹ️ Ya tiene opciones desde el formulario, omitiendo carga');
+    return;
+  }
+
+  vehiculoSelect.disabled = true;
+  vehiculoSelect.innerHTML = `<option value="">${I18N.loading_vehicles || 'Cargando vehículos...'}</option>`;
+
+  // Intentar primero con prefetch local (más rápido)
+  const localMatches = (PREFETCH?.vehiculos || []).filter((v)=> String(v.cliente_id) === String(clienteId));
+  if (localMatches.length){
+    console.log(`✅ Encontrados ${localMatches.length} vehículos en prefetch`);
+    const options = localMatches.map((v)=> `<option value="${v.id}">${v.label || v.text || ''}</option>`).join('');
+    vehiculoSelect.innerHTML = `<option value="">${I18N.select_vehicle || 'Selecciona vehículo...'}</option>${options}`;
+    vehiculoSelect.dataset.source = 'prefetch';
+    vehiculoSelect.disabled = false;
+    return; // Salir temprano si encontramos en prefetch
+  }
+
+  // Si no hay en prefetch, hacer petición AJAX
   try{
     const urlRaw = EG.cfg.URL_VEHICULOS_BY_CLI || '/ajax/vehiculos-por-cliente/';
     const url = buildEndpoint(urlRaw);
-    const r = await EG.fetch(`${url}?cliente_id=${encodeURIComponent(clienteId)}`);
-            if(!r.ok) throw new Error(`HTTP ${r.status}`);
-            const data = await r.json();
-            const items = Array.isArray(data) ? data : (data.results || data.items || []);
-            if (!items.length){
-      if (!localMatches.length){
-              vehiculoSelect.innerHTML = `<option value="">${I18N.no_vehicles}</option>`;
-        vehiculoSelect.dataset.source = 'empty';
-      }
-            } else {
-              const options = items.map(v => {
-                const id = v.id ?? v.pk;
-                const label = v.text || v.label || `Vehicle #${id}`;
-                return `<option value="${id}">${label}</option>`;
-              }).join('');
-              vehiculoSelect.innerHTML = `<option value="">${I18N.select_vehicle}</option>${options}`;
-      vehiculoSelect.dataset.source = 'fetch';
-            }
-          }catch(err){
-            console.error('❌ vehiculos-por-cliente:', err);
-    if (!localMatches.length){
-            vehiculoSelect.innerHTML = `<option value="">${I18N.error_loading_vehicles}</option>`;
-      vehiculoSelect.dataset.source = 'error';
+    const fullUrl = `${url}?cliente_id=${encodeURIComponent(clienteId)}`;
+    
+    console.log(`📡 Llamando a: ${fullUrl}`);
+    
+    const r = await EG.fetch(fullUrl);
+    
+    if(!r.ok) {
+      const errorText = await r.text();
+      console.error(`❌ HTTP ${r.status}:`, errorText);
+      throw new Error(`HTTP ${r.status}: ${errorText}`);
     }
-          }finally{
-            vehiculoSelect.disabled = false;
-          }
-        }
+    
+    const data = await r.json();
+    console.log('📦 Respuesta recibida:', data);
+    
+    const items = Array.isArray(data) ? data : (data.results || data.items || []);
+    console.log(`📋 Procesando ${items.length} vehículos`);
+    
+    if (!items.length){
+      console.log('ℹ️ No se encontraron vehículos');
+      vehiculoSelect.innerHTML = `<option value="">${I18N.no_vehicles || 'No hay vehículos'}</option>`;
+      vehiculoSelect.dataset.source = 'empty';
+    } else {
+      const options = items.map(v => {
+        const id = v.id ?? v.pk;
+        const label = v.text || v.label || v.patente || `Vehicle #${id}`;
+        return `<option value="${id}">${label}</option>`;
+      }).join('');
+      vehiculoSelect.innerHTML = `<option value="">${I18N.select_vehicle || 'Selecciona vehículo...'}</option>${options}`;
+      vehiculoSelect.dataset.source = 'fetch';
+      console.log(`✅ ${items.length} vehículos cargados exitosamente`);
+    }
+  }catch(err){
+    console.error('❌ Error cargando vehículos:', err);
+    console.error('Stack:', err.stack);
+    vehiculoSelect.innerHTML = `<option value="">${I18N.error_loading_vehicles || 'Error al cargar vehículos'}</option>`;
+    vehiculoSelect.dataset.source = 'error';
+  }finally{
+    vehiculoSelect.disabled = false;
+  }
+}
 
 // ===============
 // TOTALES
@@ -911,7 +1058,11 @@ function recalcTotales(){
             tax = ivaOn ? rep * 0.19 : 0; // IVA 19% sólo repuestos
           } else if (COUNTRY_REF==='US') {
             const rate = Number(EG.cfg.salesTax ?? 0);
-            tax = ivaOn ? (rep + serv) * rate : 0;
+            tax = ivaOn ? rep * rate : 0; // Tax sólo sobre repuestos
+          } else {
+            // Para otros países, también solo sobre repuestos
+            const rate = Number(EG.cfg.salesTax ?? 0);
+            tax = ivaOn ? rep * rate : 0;
           }
 
           setText('#t_repuestos', money(rep));
@@ -943,45 +1094,48 @@ window.addRepuestoRow = function addRepuestoRow(){
   const row = document.createElement('div');
   row.className = 'dynamic-element';
   row.innerHTML = `
-    <div class="flex flex-wrap gap-4 items-end">
-      <div class="flex-1 min-w-64 relative">
+    <div class="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4 items-stretch sm:items-end border border-cyan-400/30 rounded-lg p-3 sm:p-4 bg-black/20">
+      <div class="flex-1 w-full sm:min-w-64 relative">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.name}</label>
-        <input type="text" class="rep-search form-control w-full" placeholder="${I18N.type_to_search_parts}" autocomplete="off">
+        <input type="text" class="rep-search form-control w-full text-base" placeholder="${I18N.type_to_search_parts}" autocomplete="off">
         <div class="rep-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
         <input type="hidden" class="rep-id">
-        <button type="button" class="rep-create-btn absolute top-2 right-2 px-2 py-1 rounded-md bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 text-white text-xs font-semibold border border-purple-300/40 shadow-sm transition-all">➕</button>
+        <button type="button" class="rep-create-btn absolute top-8 sm:top-8 right-2 px-3 py-2 rounded-md bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 text-white text-xs sm:text-sm font-semibold border border-purple-300/40 shadow-sm transition-all">➕</button>
       </div>
-      <div class="w-32">
+      <div class="w-full sm:w-32">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.code}</label>
-        <input type="text" class="rep-codigo form-control w-full" placeholder="${I18N.code}">
+        <input type="text" class="rep-codigo form-control w-full text-base" placeholder="${I18N.code}">
       </div>
-      <div class="flex-1 min-w-64">
+      <div class="flex-1 w-full sm:min-w-64">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.name}</label>
-        <input type="text" class="rep-nombre form-control w-full" readonly>
+        <input type="text" class="rep-nombre form-control w-full text-base" readonly>
       </div>
-      <div class="w-20">
+      <div class="w-full sm:w-20">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.qty}</label>
-        <input type="number" class="rep-cantidad form-control w-full" min="1" max="999" value="1">
+        <input type="number" class="rep-cantidad form-control w-full text-base" min="1" max="999" value="1">
       </div>
-      <div class="w-24 cost-price-container">
+      <div class="w-full sm:w-24 cost-price-container hidden">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.cost_price}</label>
-        <input type="text" class="rep-precio-compra form-control w-full" placeholder="$0">
+        <input type="text" class="rep-precio-compra form-control w-full text-base" placeholder="$0">
       </div>
-      <div class="w-24">
-        <label class="block text-cyan-200 text-sm mb-1">${I18N.sale_price}</label>
-        <input type="text" class="rep-precio-venta form-control w-full" placeholder="$0" title="Click to show cost price">
+      <div class="w-full sm:w-24">
+        <label class="block text-cyan-200 text-sm mb-1 flex items-center gap-1">
+          <span>${I18N.sale_price}</span>
+          <button type="button" class="toggle-cost-price-btn text-cyan-400 hover:text-cyan-200 text-xs ml-1" title="${COUNTRY_REF === 'CL' ? 'Mostrar/ocultar precio de compra' : 'Show/hide cost price'}" style="cursor: pointer; background: none; border: none; padding: 2px;">👁️</button>
+        </label>
+        <input type="text" class="rep-precio-venta form-control w-full text-base" placeholder="$0">
       </div>
-      <div class="w-20">
+      <div class="w-full sm:w-20">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.discount_pct}</label>
-        <input type="number" class="rep-descuento form-control w-full" min="0" max="100" value="0">
+        <input type="number" class="rep-descuento form-control w-full text-base" min="0" max="100" value="0">
       </div>
-      <div class="w-32">
+      <div class="w-full sm:w-32">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.subtotal}</label>
         <input type="hidden" class="rep-subtotal" value="0">
-        <div class="rep-subtotal-view subtotal-field w-full text-right font-bold form-control">$0</div>
+        <div class="rep-subtotal-view subtotal-field w-full text-right font-bold form-control text-base">$0</div>
       </div>
-      <div class="w-16">
-        <button type="button" class="btn-secondary w-full" onclick="this.closest('.dynamic-element').remove(); window.recalcTotales();">✕</button>
+      <div class="w-full sm:w-16">
+        <button type="button" class="btn-secondary w-full py-2 px-4 text-sm sm:text-base" onclick="this.closest('.dynamic-element').remove(); window.recalcTotales();">✕</button>
       </div>
     </div>`;
   container.appendChild(row);
@@ -1173,9 +1327,21 @@ function setupRepuestoRow(row){
     }
   });
 
-  inpPV?.addEventListener('click', ()=>{
+  // Botón para mostrar/ocultar precio de compra
+  const toggleCostBtn = row.querySelector('.toggle-cost-price-btn');
+  toggleCostBtn?.addEventListener('click', (e)=>{
+    e.preventDefault();
+    e.stopPropagation();
     const costContainer = row.querySelector('.cost-price-container');
-    if (costContainer) costContainer.classList.toggle('hidden');
+    if (costContainer) {
+      costContainer.classList.toggle('hidden');
+      // Cambiar el icono según si está visible o no
+      if (costContainer.classList.contains('hidden')) {
+        toggleCostBtn.textContent = '👁️';
+      } else {
+        toggleCostBtn.textContent = '🙈';
+      }
+    }
   });
 
   row.__applyPartData = applyPartData;
@@ -1190,27 +1356,27 @@ window.addServicioRow = function addServicioRow(){
   const row = document.createElement('div');
   row.className = 'dynamic-element';
   row.innerHTML = `
-    <div class="flex flex-wrap gap-4 items-end">
-      <div class="flex-1 min-w-60 relative">
+    <div class="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4 items-stretch sm:items-end border border-cyan-400/30 rounded-lg p-3 sm:p-4 bg-black/20">
+      <div class="flex-1 w-full sm:min-w-60 relative">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.service}</label>
-        <input type="text" class="srv-input form-control w-full" placeholder="${I18N.type_to_search_services}" autocomplete="off">
+        <input type="text" class="srv-input form-control w-full text-base" placeholder="${I18N.type_to_search_services}" autocomplete="off">
         <div class="srv-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
         <input type="hidden" class="srv-id">
       </div>
 
-      <div class="w-40">
+      <div class="w-full sm:w-40">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.client_price}</label>
-        <input type="text" class="serv-precio form-control w-full" placeholder="$0">
+        <input type="text" class="serv-precio form-control w-full text-base" placeholder="$0">
       </div>
 
-      <div class="w-40">
+      <div class="w-full sm:w-40">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.subtotal}</label>
         <input type="hidden" class="serv-subtotal" value="0">
-        <div class="serv-subtotal-view subtotal-field w-full text-right font-bold form-control">$0</div>
+        <div class="serv-subtotal-view subtotal-field w-full text-right font-bold form-control text-base">$0</div>
       </div>
 
-      <div class="w-16">
-        <button type="button" class="btn-secondary w-full" onclick="this.closest('.dynamic-element').remove(); window.recalcTotales();">✕</button>
+      <div class="w-full sm:w-16">
+        <button type="button" class="btn-secondary w-full py-2 px-4 text-sm sm:text-base" onclick="this.closest('.dynamic-element').remove(); window.recalcTotales();">✕</button>
       </div>
     </div>`;
   container.appendChild(row);
@@ -1233,6 +1399,13 @@ function setupServicioRow(row){
               drop.classList.add('hidden');
               return;
             }
+            
+            // Primero buscar en el prefetch local (más rápido)
+            let localMatches = filterPrefetchItems(PREFETCH.servicios, ['nombre', 'categoria', 'subcategoria'], q, 15);
+            if (localMatches.length){
+              renderResultados(localMatches);
+            }
+            
             try{
               const url = `${EG.cfg.URL_SERVICE_SEARCH}?q=${encodeURIComponent(q)}`;
               const r = await EG.fetch(url);
@@ -1241,11 +1414,18 @@ function setupServicioRow(row){
               const items = Array.isArray(data)
                 ? data
                 : (data.servicios || data.results || []);
-              renderResultados(items);
+              // Normalizar items: convertir 'pk' a 'id' si es necesario
+              const normalizedItems = items.map(item => ({
+                ...item,
+                id: item.id || item.pk || '',
+              }));
+              if (normalizedItems.length) renderResultados(normalizedItems);
             }catch(err){
               console.error('servicios buscar:', err);
-              drop.innerHTML = `<div class="p-3 text-red-400">${I18N.server_error}</div>`;
-              drop.classList.remove('hidden');
+              if (!localMatches || !localMatches.length) {
+                drop.innerHTML = `<div class="p-3 text-red-400">${I18N.server_error}</div>`;
+                drop.classList.remove('hidden');
+              }
             }
           }
 
@@ -1256,11 +1436,13 @@ function setupServicioRow(row){
       return;
     }
     drop.innerHTML = lista.map(s => {
+      // Normalizar id (puede venir como 'id' o 'pk')
+      const servicioId = s.id || s.pk || '';
       const precioBase = Number(s.precio_cliente ?? s.precio_sugerido ?? s.precio ?? 0);
       return `
       <div class="srv-item p-3 hover:bg-cyan-700 cursor-pointer border-b border-cyan-600 last:border-b-0"
-           role="option" tabindex="0" data-id="${s.id}" data-precio="${precioBase}" data-text="${s.nombre}">
-        <div class="font-semibold text-cyan-200">${s.nombre}</div>
+           role="option" tabindex="0" data-id="${servicioId}" data-precio="${precioBase}" data-text="${s.nombre || ''}">
+        <div class="font-semibold text-cyan-200">${s.nombre || ''}</div>
         ${s.categoria ? `<div class="text-xs text-gray-300 opacity-80">${COUNTRY_REF === 'CL' ? 'Categoría' : 'Category'}: ${s.categoria}</div>` : ``}
         ${precioBase ? `<div class="text-xs text-gray-300 opacity-80">${COUNTRY_REF === 'CL' ? 'Tarifa base' : 'Base'}: ${money(precioBase)}</div>` : ``}
       </div>
@@ -1343,32 +1525,32 @@ window.addOtroRow = function addOtroRow(){
   const row = document.createElement('div');
   row.className = 'dynamic-element';
   row.innerHTML = `
-    <div class="flex flex-wrap gap-4 items-end">
-      <div class="flex-1 min-w-60 relative">
+    <div class="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4 items-stretch sm:items-end border border-cyan-400/30 rounded-lg p-3 sm:p-4 bg-black/20">
+      <div class="flex-1 w-full sm:min-w-60 relative">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.service}</label>
-        <input type="text" class="otr-search form-control w-full" placeholder="${I18N.type_to_search_external}" autocomplete="off">
+        <input type="text" class="otr-search form-control w-full text-base" placeholder="${I18N.type_to_search_external}" autocomplete="off">
         <div class="otr-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
         <input type="hidden" class="otr-servicio-id">
       </div>
-      <div class="flex-1 min-w-48">
+      <div class="flex-1 w-full sm:min-w-48">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.external_company}</label>
-        <input type="text" class="otr-empresa form-control w-full">
+        <input type="text" class="otr-empresa form-control w-full text-base">
       </div>
-      <div class="w-32">
+      <div class="w-full sm:w-32">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.shop_price}</label>
-        <input type="text" class="otr-precio-taller form-control w-full" placeholder="$0">
+        <input type="text" class="otr-precio-taller form-control w-full text-base" placeholder="$0">
       </div>
-      <div class="w-32">
+      <div class="w-full sm:w-32">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.client_price}</label>
-        <input type="text" class="otr-precio form-control w-full" placeholder="$0">
+        <input type="text" class="otr-precio form-control w-full text-base" placeholder="$0">
       </div>
-      <div class="w-32">
+      <div class="w-full sm:w-32">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.subtotal}</label>
         <input type="hidden" class="otr-subtotal" value="0">
-        <div class="otr-subtotal-view subtotal-field w-full text-right font-bold form-control">$0</div>
+        <div class="otr-subtotal-view subtotal-field w-full text-right font-bold form-control text-base">$0</div>
       </div>
-      <div class="w-16">
-        <button type="button" class="btn-secondary w-full" onclick="this.closest('.dynamic-element').remove(); window.recalcTotales();">✕</button>
+      <div class="w-full sm:w-16">
+        <button type="button" class="btn-secondary w-full py-2 px-4 text-sm sm:text-base" onclick="this.closest('.dynamic-element').remove(); window.recalcTotales();">✕</button>
       </div>
     </div>`;
   container.appendChild(row);

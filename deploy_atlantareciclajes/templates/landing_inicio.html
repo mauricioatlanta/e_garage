@@ -1,0 +1,69 @@
+{% load static %}
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% trans "eGarage - Automatiza tu taller" %}</title>
+  <link rel="stylesheet" href="{% static 'css/tailwind.output.css' %}" />
+  <style>
+    body {
+      background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+      color: #ffffff;
+      font-family: 'Inter', 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .landing-container {
+      text-align: center;
+      padding: 2rem;
+      max-width: 800px;
+    }
+    .logo {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 2rem;
+      border-radius: 50%;
+      border: 2px solid #00e6ff;
+      box-shadow: 0 0 24px 1px #00e6ff;
+    }
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      color: #00e6ff;
+      text-shadow: 0 0 20px rgba(0, 230, 255, 0.5);
+    }
+    p {
+      font-size: 1.25rem;
+      margin-bottom: 2rem;
+      color: #cccccc;
+    }
+    .btn {
+      display: inline-block;
+      padding: 1rem 2rem;
+      background: linear-gradient(135deg, #00e6ff 0%, #0099cc 100%);
+      color: #000;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: bold;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(0, 230, 255, 0.4);
+    }
+  </style>
+</head>
+<body>
+  <div class="landing-container">
+    <img src="{% static 'img/TallerPro_logo.png' %}" alt="eGarage Logo" class="logo" />
+    <h1>{% trans "Bienvenido a eGarage" %}</h1>
+    <p>{% trans "Automatiza tu taller mecánico con la mejor herramienta de gestión" %}</p>
+    <a href="/cl/es/" class="btn">{% trans "Ingresar" %}</a>
+  </div>
+</body>
+</html>
+

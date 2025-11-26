@@ -310,3 +310,87 @@ msgstr "CONFIGURACIÓN"
 
 msgid "SALIR"
 msgstr "CERRAR SESIÓN"
+
+msgid "EXTRA"
+msgstr "EXTRA"
+
+msgid "MISSION COMMAND PANEL"
+msgstr "PANEL DE COMANDO DE MISIÓN"
+
+msgid "EFFICIENCY"
+msgstr "EFICIENCIA"
+
+msgid "SYSTEM"
+msgstr "SISTEMA"
+
+msgid "ONLINE"
+msgstr "EN LÍNEA"
+
+msgid "All modules"
+msgstr "Todos los módulos"
+
+msgid "Conversion Rate"
+msgstr "Tasa de Conversión"
+
+msgid "DOCS WEEK"
+msgstr "DOCS SEMANA"
+
+msgid "Last 7 days"
+msgstr "Últimos 7 días"
+
+msgid "SALES TODAY"
+msgstr "VENTAS HOY"
+
+msgid "MONTH SALES"
+msgstr "VENTAS DEL MES"
+
+msgid "This month"
+msgstr "Este mes"
+
+msgid "ACTIVE CLIENTS"
+msgstr "CLIENTES ACTIVOS"
+
+msgid "Total clients"
+msgstr "Total de clientes"
+
+msgid "NEW CLIENTS"
+msgstr "NUEVOS CLIENTES"
+
+msgid "TECHNICIANS"
+msgstr "TÉCNICOS"
+
+msgid "Active"
+msgstr "Activos"
+
+msgid "DOCUMENT STATUS"
+msgstr "ESTADO DE DOCUMENTOS"
+
+msgid "Pending Quotes"
+msgstr "Presupuestos Pendientes"
+
+msgid "Month Invoices"
+msgstr "Facturas del Mes"
+
+msgid "Average Ticket"
+msgstr "Ticket Promedio"
+
+msgid "Brands Served"
+msgstr "Marcas Atendidas"
+
+msgid "AI PROJECTIONS"
+msgstr "PROYECCIONES IA"
+
+msgid "Projected Docs/Month"
+msgstr "Docs Proyectados/Mes"
+
+msgid "No service data"
+msgstr "Sin datos de servicios"
+
+msgid "TOP TECHNICIANS"
+msgstr "TOP TÉCNICOS"
+
+msgid "No technician data"
+msgstr "Sin datos de técnicos"
+
+msgid "ALERTS & OPPORTUNITIES"
+msgstr "ALERTAS Y OPORTUNIDADES"

@@ -1,0 +1,87 @@
+═══════════════════════════════════════════════════════════════
+COMANDO PARA HACER TEMPLATE COMPLETAMENTE INDEPENDIENTE
+═══════════════════════════════════════════════════════════════
+
+Este comando asegura que el template NO extienda ninguna base
+y esté completamente aislado del CSS global:
+
+cd /home/atlantareciclajes/apps/egarage/current && \
+cp templates/public/selector_pais.html templates/public/selector_pais.html.backup_independiente_$(date +%Y%m%d_%H%M%S) && \
+python3 << 'PYEOF'
+import re
+
+file_path = "templates/public/selector_pais.html"
+
+# Leer archivo actual
+with open(file_path, 'r', encoding='utf-8') as f:
+    content = f.read()
+
+# Verificar si tiene {% extends %}
+if '{% extends' in content:
+    print("⚠️  Template está extendiendo una base, eliminando...")
+    # Eliminar líneas con extends y blocks
+    lines = content.splitlines(keepends=True)
+    new_lines = []
+    skip_until_endblock = False
+    
+    for line in lines:
+        if '{% extends' in line:
+            continue
+        if '{% block' in line:
+            skip_until_endblock = True
+            continue
+        if '{% endblock' in line:
+            skip_until_endblock = False
+            continue
+        if not skip_until_endblock:
+            new_lines.append(line)
+    
+    content = ''.join(new_lines)
+    print("✅ Líneas de extends/blocks eliminadas")
+
+# Verificar que tenga estructura HTML completa
+if '<!DOCTYPE html>' not in content:
+    print("⚠️  No tiene DOCTYPE, agregando estructura completa...")
+    # Esto no debería pasar, pero por si acaso
+    content = '<!DOCTYPE html>\n' + content
+
+# Asegurar que tenga reset CSS completo al inicio del style
+if '<style>' in content:
+    style_start = content.find('<style>')
+    style_content_start = style_start + 7
+    
+    # Verificar si ya tiene reset completo
+    reset_css = """    /* Reset completo para aislar de CSS global */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    
+    """
+    
+    # Si no tiene el reset completo, agregarlo
+    if 'html, body {' not in content[style_content_start:style_content_start+200]:
+        content = content[:style_content_start] + reset_css + content[style_content_start:]
+        print("✅ Reset CSS completo agregado")
+
+# Escribir archivo corregido
+with open(file_path, 'w', encoding='utf-8') as f:
+    f.write(content)
+
+print("✅ Template hecho independiente y aislado")
+PYEOF
+
+touch /var/www/www_egarage_cl_wsgi.py && \
+echo "✅ Servidor reiniciado"
+
+═══════════════════════════════════════════════════════════════
+

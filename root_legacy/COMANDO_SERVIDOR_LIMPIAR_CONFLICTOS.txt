@@ -1,0 +1,13 @@
+COMANDOS PARA EJECUTAR EN EL SERVIDOR:
+
+# Opción 1: Comando directo (más rápido)
+cd /home/atlantareciclajes/apps/egarage/current && sed -i '/^<<<<<<</d; /^=======$/d; /^>>>>>>>/d' taller/documentos/views.py && python3 -m py_compile taller/documentos/views.py && touch /var/www/www_egarage_cl_wsgi.py && echo "✅ Conflictos limpiados y servidor reiniciado"
+
+# Opción 2: Si el comando anterior falla, restaurar desde Git
+cd /home/atlantareciclajes/apps/egarage/current && git checkout HEAD -- taller/documentos/views.py && touch /var/www/www_egarage_cl_wsgi.py && echo "✅ Archivo restaurado desde Git y servidor reiniciado"
+
+# Opción 3: Usar el script completo
+cd /home/atlantareciclajes/apps/egarage/current && bash limpiar_conflictos_servidor.sh
+
+
+

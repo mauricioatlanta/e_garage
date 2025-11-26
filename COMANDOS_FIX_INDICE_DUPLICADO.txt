@@ -1,0 +1,33 @@
+===========================================
+SOLUCIÓN RÁPIDA: Índice duplicado
+===========================================
+
+EJECUTAR EN EL SERVIDOR:
+-------------------------
+
+cd /home/atlantareciclajes/apps/egarage/current
+workon venv_egarage310
+
+# Marcar migración 0007 como aplicada (el índice ya existe)
+python manage.py migrate taller 0007_add_vehiculo_empresa_cliente_index --fake
+
+# Continuar con migraciones restantes
+python manage.py migrate
+
+# Verificar
+python manage.py check
+python manage.py showmigrations taller | tail -10
+
+===========================================
+SI HAY MÁS ERRORES SIMILARES:
+===========================================
+
+# Marcar todas las migraciones hasta la última que falla como aplicadas
+# (ajustar el número según el error)
+python manage.py migrate taller 0010 --fake
+
+# Continuar
+python manage.py migrate
+
+===========================================
+

@@ -24,17 +24,23 @@ def money_clp(value):
 
 @register.filter
 def money_by_country(value, country="CL"):
+    """
+    Formatea moneda según país usando configuración centralizada.
+
+    Args:
+        value: Monto a formatear
+        country: Código de país (ISO 3166-1 alpha-2)
+
+    Returns:
+        str: Monto formateado según reglas del país
+    """
+    from taller.utils.country_config import format_currency
+
     country_code = str(country or "CL").strip().upper()
+
+    # Caso especial para CL (sin decimales)
     if country_code == "CL":
         return money_clp(value)
 
-    n = _to_decimal(value)
-    symbol_map = {
-        "US": "$",
-        "MX": "$",
-        "VE": "Bs. ",
-        "PE": "S/ ",
-        "BR": "R$ ",
-    }
-    symbol = symbol_map.get(country_code, "$")
-    return f"{symbol}{n:,.2f}"
+    # Usar configuración centralizada para otros países
+    return format_currency(value, country_code, include_symbol=True)

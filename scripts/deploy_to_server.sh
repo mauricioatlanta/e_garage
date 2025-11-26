@@ -154,6 +154,29 @@ cd releases/$RELEASE
 git clone --depth=1 GIT_REPO_PLACEHOLDER .
 print_success "Código clonado"
 
+# 2.5. Configurar permisos (CRÍTICO para evitar PermissionError)
+print_step "2.5. Configurando permisos de archivos..."
+# Archivos: 644 (rw-r--r--)
+find . -type f -exec chmod 644 {} \;
+# Directorios: 755 (rwxr-xr-x)
+find . -type d -exec chmod 755 {} \;
+# Scripts Python ejecutables: 755
+find . -name "*.py" -exec chmod 755 {} \;
+chmod 755 manage.py
+# Asegurar que templates son legibles (globales y de apps)
+if [ -d "templates" ]; then
+    find templates -type f -exec chmod 644 {} \;
+    find templates -type d -exec chmod 755 {} \;
+fi
+# Templates de apps (taller/templates/, etc.)
+for app_dir in */templates; do
+    if [ -d "$app_dir" ]; then
+        find "$app_dir" -type f -exec chmod 644 {} \;
+        find "$app_dir" -type d -exec chmod 755 {} \;
+    fi
+done
+print_success "Permisos configurados"
+
 # 3. Activar venv e instalar dependencias
 print_step "3. Instalando dependencias..."
 source ~/.virtualenvs/VENV_NAME_PLACEHOLDER/bin/activate
@@ -274,6 +297,8 @@ echo "  cd /home/atlantareciclajes/apps/egarage"
 echo "  ln -sfn releases/RELEASE_ANTERIOR current"
 echo "  touch $WSGI_FILE"
 echo ""
+
+
 
 
 

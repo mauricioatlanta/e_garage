@@ -1,0 +1,74 @@
+═══════════════════════════════════════════════════════════════
+  CORREGIR LÍNEA 1229 - COMANDO ESPECÍFICO
+═══════════════════════════════════════════════════════════════
+
+Ejecuta este comando COMPLETO en el servidor:
+
+───────────────────────────────────────────────────────────────
+cd /home/atlantareciclajes/apps/egarage/current && python3 << 'PYEOF'
+import os
+import re
+
+file_path = "taller/documentos/views.py"
+
+with open(file_path, 'r', encoding='utf-8') as f:
+    lines = f.readlines()
+
+# Crear backup
+with open(f"{file_path}.backup_final", 'w', encoding='utf-8') as f:
+    f.writelines(lines)
+
+print("📋 Buscando línea problemática...")
+
+# Buscar alrededor de línea 1229
+target_idx = None
+for i in range(1225, min(len(lines), 1235)):
+    line = lines[i]
+    if 'wa.me' in line and 'f"' in line and 'mensaje' in line and ('replace' in line or '\\n' in line):
+        target_idx = i
+        print(f"✅ Línea problemática encontrada: {i+1}")
+        print(f"   {line.strip()[:80]}")
+        break
+
+if target_idx is None:
+    print("⚠️  No encontrada en rango, buscando en todo el archivo...")
+    for i, line in enumerate(lines):
+        if 'wa.me' in line and 'f"' in line and 'mensaje' in line and ('replace' in line or '\\n' in line):
+            print(f"   Línea {i+1}: {line.strip()[:80]}")
+            target_idx = i
+            break
+
+if target_idx is None:
+    print("❌ No se encontró la línea problemática")
+    exit(1)
+
+# Obtener indentación y variable
+problem_line = lines[target_idx]
+indent = len(problem_line) - len(problem_line.lstrip())
+telefono_match = re.search(r'\{([^}]+)\}', problem_line)
+telefono_var = telefono_match.group(1) if telefono_match else 'telefono'
+
+# Reemplazar línea
+new_lines = lines[:target_idx] + [
+    ' ' * indent + '# Crear URL de WhatsApp\n',
+    ' ' * indent + '# Nota: No se pueden usar backslashes directamente en expresiones f-string\n',
+    ' ' * indent + 'mensaje_encoded = mensaje.replace(" ", "%20").replace("\\n", "%0A")\n',
+    ' ' * indent + f'url_whatsapp = f"https://wa.me/{{{telefono_var}}}?text={{mensaje_encoded}}"\\n'
+] + lines[target_idx + 1:]
+
+# Escribir archivo
+with open(file_path, 'w', encoding='utf-8') as f:
+    f.writelines(new_lines)
+
+# Verificar sintaxis
+with open(file_path, 'r', encoding='utf-8') as f:
+    content = f.read()
+compile(content, file_path, 'exec')
+print("✅ Sintaxis válida")
+
+PYEOF
+touch /var/www/www_egarage_cl_wsgi.py && echo "✅ Servidor reiniciado"
+───────────────────────────────────────────────────────────────
+
+
+

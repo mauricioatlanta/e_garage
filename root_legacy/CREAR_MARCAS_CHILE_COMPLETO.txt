@@ -1,0 +1,60 @@
+═══════════════════════════════════════════════════════════════
+COMANDO PARA CREAR MARCAS DE VEHÍCULOS PARA CHILE
+═══════════════════════════════════════════════════════════════
+
+Ejecuta este comando en el servidor para crear marcas comunes de Chile:
+
+cd /home/atlantareciclajes/apps/egarage/current && \
+python3 << 'PYEOF'
+import os
+import django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings')
+django.setup()
+
+from taller.models.marca import Marca
+
+# Marcas comunes en Chile
+marcas_chile = [
+    "Toyota", "Chevrolet", "Ford", "Nissan", "Hyundai",
+    "Kia", "Mazda", "Suzuki", "Mitsubishi", "Honda",
+    "Volkswagen", "Renault", "Peugeot", "Citroën", "Fiat",
+    "Subaru", "Isuzu", "Great Wall", "Chery", "JAC",
+    "BYD", "Geely", "BMW", "Mercedes-Benz", "Audi",
+    "Volvo", "Land Rover", "Jeep", "Dodge", "Chrysler",
+    "Yamaha", "Kawasaki", "Harley-Davidson", "Ducati",
+    "Piaggio", "Bajaj", "Hero", "TVS", "Royal Enfield",
+    "Triumph", "Husqvarna", "KTM", "Aprilia", "Moto Guzzi",
+    "Benelli", "CFMoto", "Loncin", "Zongshen", "Lifan",
+]
+
+print("🚗 Creando marcas de vehículos para Chile...\n")
+print("=" * 70)
+
+creadas = 0
+existentes = 0
+
+for nombre in marcas_chile:
+    marca, created = Marca.objects.get_or_create(
+        nombre=nombre,
+        country='CL',
+        defaults={'nombre': nombre, 'country': 'CL'}
+    )
+    if created:
+        print(f"✅ Creada: {nombre}")
+        creadas += 1
+    else:
+        print(f"ℹ️  Existente: {nombre}")
+        existentes += 1
+
+print()
+print("=" * 70)
+print(f"📊 Resumen:")
+print(f"   ✅ Marcas creadas: {creadas}")
+print(f"   ℹ️  Marcas existentes: {existentes}")
+print(f"   📈 Total marcas Chile: {Marca.objects.filter(country='CL').count()}")
+print("=" * 70)
+print("\n✅ Proceso completado")
+PYEOF
+
+═══════════════════════════════════════════════════════════════
+

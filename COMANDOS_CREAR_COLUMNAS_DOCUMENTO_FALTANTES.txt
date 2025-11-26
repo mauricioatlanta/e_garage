@@ -1,0 +1,78 @@
+===========================================
+SOLUCIÓN: Columnas faltantes en taller_documento
+===========================================
+
+PROBLEMA:
+---------
+OperationalError: no such column: taller_documento.total_general
+
+La migración 0036 agregó varios campos legacy pero no se crearon.
+
+SOLUCIÓN (Ejecutar en el servidor):
+-----------------------------------
+
+cd /home/atlantareciclajes/apps/egarage/current
+workon venv_egarage310
+
+# Verificar qué columnas faltan
+python manage.py dbshell << EOF
+PRAGMA table_info(taller_documento);
+.quit
+EOF
+
+# Crear todas las columnas que debería agregar la migración 0036
+python manage.py dbshell << 'SQL'
+-- legacy_total_general (db_column="total_general")
+ALTER TABLE taller_documento 
+ADD COLUMN total_general decimal(14,2) NOT NULL DEFAULT 0.00;
+
+-- legacy_iva (db_column="iva") - verificar si ya existe
+-- Si no existe, agregarlo:
+-- ALTER TABLE taller_documento 
+-- ADD COLUMN iva decimal(14,2) NOT NULL DEFAULT 0.00;
+
+-- legacy_total_repuestos (db_column="total_repuestos")
+ALTER TABLE taller_documento 
+ADD COLUMN total_repuestos decimal(14,2) NOT NULL DEFAULT 0.00;
+
+-- legacy_total_servicios (db_column="total_servicios")
+ALTER TABLE taller_documento 
+ADD COLUMN total_servicios decimal(14,2) NOT NULL DEFAULT 0.00;
+
+-- legacy_total_otros ya debería existir (fue renombrado)
+.quit
+SQL
+
+# Si alguna columna ya existe, SQLite dará error "duplicate column"
+# Eso está bien, significa que ya existe
+
+# Verificar que se crearon
+python manage.py dbshell << EOF
+SELECT name FROM pragma_table_info('taller_documento') 
+WHERE name IN ('total_general', 'total_repuestos', 'total_servicios', 'iva', 'total_otros');
+.quit
+EOF
+
+===========================================
+VERIFICACIÓN:
+===========================================
+
+# Ver todas las columnas de la tabla
+python manage.py dbshell << EOF
+PRAGMA table_info(taller_documento);
+.quit
+EOF
+
+# Probar el sitio
+# https://www.egarage.cl/us/documentos/
+# Debe cargar sin errores
+
+===========================================
+SI HAY ERRORES DE "duplicate column":
+===========================================
+
+# Eso significa que la columna ya existe, está bien
+# Continuar con las siguientes columnas
+
+===========================================
+

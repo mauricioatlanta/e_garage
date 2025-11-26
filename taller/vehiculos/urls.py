@@ -26,7 +26,11 @@ Notas:
 from django.urls import path
 
 from taller.vehiculos import views_fbv as views
-from taller.vehiculos.autocomplete_views import ClienteAutocomplete
+from taller.vehiculos.autocomplete_views import (
+    CajaAutocomplete,
+    ClienteAutocomplete,
+    MotorAutocomplete,
+)
 
 app_name = "vehiculos"
 
@@ -63,6 +67,18 @@ urlpatterns = [
         ClienteAutocomplete.as_view(),
         name="cliente_autocomplete",
     ),
+    # Autocompletado de motores (DAL Select2Tag - permite crear nuevos)
+    path(
+        "autocomplete/motor/",
+        MotorAutocomplete.as_view(),
+        name="motor-autocomplete",
+    ),
+    # Autocompletado de cajas (DAL Select2Tag - permite crear nuevas)
+    path(
+        "autocomplete/caja/",
+        CajaAutocomplete.as_view(),
+        name="caja-autocomplete",
+    ),
     # Colores disponibles para el país del usuario
     path("api/colores/", views.api_colores, name="api_colores"),
     # Modelos USA desde catálogo (legacy - mantener solo si DAL lo usa)
@@ -84,6 +100,12 @@ urlpatterns = [
         "ajax/modelos-por-marca-anio/",
         views.ajax_modelos_por_marca_anio,
         name="ajax_modelos_por_marca_anio",
+    ),
+    # API para modelos por marca y año (formato JSON simple)
+    path(
+        "api/modelos-por-marca/",
+        views.modelos_por_marca_api,
+        name="modelos_por_marca_api",
     ),
     # Motores filtrados por modelo
     path(
@@ -126,6 +148,12 @@ urlpatterns = [
         "ajax/agregar-caja/",
         views.ajax_agregar_caja,
         name="ajax_agregar_caja",
+    ),
+    # Agregar nuevo color
+    path(
+        "ajax/agregar-color/",
+        views.ajax_agregar_color,
+        name="ajax_agregar_color",
     ),
 ]
 

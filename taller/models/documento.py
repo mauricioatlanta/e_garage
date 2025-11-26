@@ -171,19 +171,29 @@ class Documento(AuditMixin, models.Model):
     )
 
     # --------- Helpers internos ---------
-    def vat_percent(self) -> int:
-        """IVA por país (regla del proyecto)"""
-        return 19 if getattr(self.empresa, "pais", "CL") == "CL" else 0
+    def vat_percent(self) -> float:
+        """
+        Tasa de impuesto por país usando configuración centralizada.
+
+        Returns:
+            float: Tasa de impuesto (ej: 19.0 para 19%)
+        """
+        from taller.utils.country_config import get_config_from_documento
+
+        config = get_config_from_documento(self)
+        return config["tax_rate"]
 
     def _decimals(self):
         """
-        Decimales por país/moneda: US -> 2, CL -> 0 (según regla eGarage).
+        Decimales por país/moneda usando configuración centralizada.
+
+        Returns:
+            int: Número de decimales (0 o 2)
         """
-        try:
-            pais = (self.empresa.pais or "CL").upper()
-        except Exception:
-            pais = "CL"
-        return 2 if pais == "US" else 0
+        from taller.utils.country_config import get_config_from_documento
+
+        config = get_config_from_documento(self)
+        return config["decimals"]
 
     def _q(self, value, decs=None):
         """
@@ -219,12 +229,11 @@ class Documento(AuditMixin, models.Model):
         except (ImportError, AttributeError, Exception):
             pass
 
-        # Valores por defecto por país
-        try:
-            pais = (self.empresa.pais or "CL").upper()
-        except Exception:
-            pais = "CL"
-        return Decimal("19.0") if pais == "CL" else Decimal("0.0")
+        # Valores por defecto por país usando configuración centralizada
+        from taller.utils.country_config import get_config_from_documento
+
+        config = get_config_from_documento(self)
+        return Decimal(str(config["tax_rate"]))
 
     def _sum_repuesto(self):
         # Calcula cantidad*precio_unitario - descuento línea
@@ -271,8 +280,9 @@ class Documento(AuditMixin, models.Model):
     def recompute_totals(self, persist=False):
         """
         Recalcula netos, impuesto y total conforme reglas:
-        - CL: IVA 19% SOLO sobre repuestos
-        - US: por defecto 0% (usa tax_rate_applied si viene)
+        - El tax/IVA se aplica SOLO sobre repuestos en todos los países
+        - Si apply_vat=True: aplica el tax_rate_applied sobre repuestos
+        - Si apply_vat=False: no aplica impuesto
         """
         rep = self._sum_repuesto()
         srv = self._sum_servicio()
@@ -288,21 +298,19 @@ class Documento(AuditMixin, models.Model):
 
         # Tasa
         rate = self._resolve_tax_rate()  # ej. 19.0 o 0.0
-        # Base imponible por país
-        try:
-            pais = (self.empresa.pais or "CL").upper()
-        except Exception:
-            pais = "CL"
+        # Base imponible por país usando configuración centralizada
+        from taller.utils.country_config import get_config_from_documento
 
-        if pais == "CL":
-            tax_base = rep  # IVA solo a repuestos
-        else:  # US - usar apply_vat para determinar base imponible
-            # Si apply_vat=True, aplicar impuesto a repuestos + servicios
-            # Si apply_vat=False, no aplicar impuesto
-            if getattr(self, "apply_vat", True):
-                tax_base = rep + srv  # Repuestos + servicios
-            else:
-                tax_base = Decimal("0")  # Sin impuesto
+        config = get_config_from_documento(self)
+        pais = getattr(self.empresa, "pais", "CL").upper()
+
+        # Regla: Tax/IVA SOLO sobre repuestos en todos los países
+        # Si apply_vat=True, aplicar impuesto solo a repuestos
+        # Si apply_vat=False, no aplicar impuesto
+        if getattr(self, "apply_vat", True):
+            tax_base = rep  # Tax solo a repuestos (no servicios)
+        else:
+            tax_base = Decimal("0")  # Sin impuesto
 
         tax_amount = tax_base * rate / Decimal("100.0")
         tax_amount = self._q(tax_amount)
@@ -451,7 +459,11 @@ class Documento(AuditMixin, models.Model):
         """Override save para generar número automáticamente y recalcular totales"""
         # Asegura moneda/país por empresa si los tienes en el modelo de Documento
         if not getattr(self, "moneda", None) and getattr(self, "empresa", None):
-            self.moneda = "USD" if self.empresa.pais == "US" else "CLP"
+            # Asignar moneda según país usando configuración centralizada
+            from taller.utils.country_config import get_config_from_empresa
+
+            config = get_config_from_empresa(self.empresa)
+            self.moneda = config["currency"]
         if not getattr(self, "country", None) and getattr(self, "empresa", None):
             self.country = self.empresa.pais
 
@@ -533,8 +545,11 @@ class Documento(AuditMixin, models.Model):
         srv = Decimal(srv or 0)
         otr = Decimal(otr or 0)
 
-        iva_pct = self.vat_percent()
-        iva_val = (rep * Decimal(iva_pct)) / Decimal(100)
+        # ✅ Usar función centralizada de cálculo de impuestos
+        from taller.impuestos.engine import calcular_impuesto
+
+        # Calcular impuesto solo sobre repuestos (según convención del proyecto)
+        iva_val = calcular_impuesto(rep, self.empresa, applies_to="parts")
 
         total = rep + srv + otr + iva_val
 

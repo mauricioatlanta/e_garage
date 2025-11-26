@@ -1,0 +1,154 @@
+========================================
+DIAGNÓSTICO Y CORRECCIÓN DE testuser_usa
+========================================
+
+EJECUTAR EN EL SERVIDOR:
+------------------------
+
+1. Conectarse al servidor:
+ssh atlantareciclajes@ssh.pythonanywhere.com
+
+2. Ir al directorio del proyecto:
+cd /home/atlantareciclajes/apps/egarage/current
+
+3. Activar virtualenv:
+source ~/.virtualenvs/venv_egarage310/bin/activate
+
+4. Diagnosticar el problema:
+python manage.py diagnosticar_autenticacion --usuario testuser_usa
+
+5. Si hay problemas, intentar corregir automáticamente:
+python manage.py diagnosticar_autenticacion --usuario testuser_usa --fix
+
+6. Verificar todos los usuarios:
+python manage.py listar_usuarios_credenciales
+
+
+VERIFICACIÓN MANUAL EN SHELL:
+------------------------------
+
+Si los comandos no funcionan, ejecutar manualmente:
+
+python manage.py shell
+
+# Luego copiar y pegar esto:
+
+from django.contrib.auth import get_user_model, authenticate
+from django.db import transaction
+from datetime import datetime, timedelta
+
+User = get_user_model()
+
+# Verificar si existe
+try:
+    user = User.objects.get(username='testuser_usa')
+    print(f"✅ Usuario encontrado: {user.username}")
+    print(f"   Email: {user.email}")
+    print(f"   Activo: {user.is_active}")
+    
+    # Verificar contraseña
+    password = "TestUSA2025!"
+    password_correcta = user.check_password(password)
+    print(f"   Contraseña correcta: {'✅ Sí' if password_correcta else '❌ No'}")
+    
+    # Si no es correcta, resetear
+    if not password_correcta:
+        print("   🔧 Reseteando contraseña...")
+        user.set_password(password)
+        user.is_active = True
+        user.save()
+        print("   ✅ Contraseña reseteada")
+    
+    # Verificar autenticación
+    auth_user = authenticate(username='testuser_usa', password=password)
+    print(f"   Autenticación: {'✅ EXITOSA' if auth_user else '❌ FALLIDA'}")
+    
+    # Verificar empresa
+    try:
+        empresa = user.empresa
+        print(f"   ✅ Empresa: {empresa.nombre_taller}, País: {empresa.pais}")
+    except:
+        print("   ❌ Sin empresa")
+        from taller.models import Empresa
+        empresa = Empresa.objects.create(
+            user=user,
+            nombre_taller="Taller de testuser_usa",
+            pais="US",
+            telefono="+15551234567"
+        )
+        print(f"   ✅ Empresa creada: {empresa.nombre_taller}")
+    
+    # Verificar suscripción
+    try:
+        suscripcion = user.suscripcion
+        print(f"   ✅ Suscripción: {suscripcion.tipo}, Activa: {suscripcion.activa}")
+    except:
+        print("   ❌ Sin suscripción")
+        from taller.models import Suscripcion
+        suscripcion = Suscripcion.objects.create(
+            user=user,
+            tipo="trial",
+            activa=True,
+            fecha_inicio=datetime.now().date(),
+            fecha_fin=(datetime.now() + timedelta(days=30)).date()
+        )
+        print(f"   ✅ Suscripción creada hasta {suscripcion.fecha_fin}")
+
+except User.DoesNotExist:
+    print("❌ Usuario 'testuser_usa' NO existe")
+    print("   Creando usuario...")
+    
+    user = User.objects.create_user(
+        username='testuser_usa',
+        email='testuser@usa-garage.com',
+        password='TestUSA2025!',
+        is_active=True
+    )
+    
+    from taller.models import Empresa, Suscripcion
+    
+    empresa = Empresa.objects.create(
+        user=user,
+        nombre_taller="Taller de testuser_usa",
+        pais="US",
+        telefono="+15551234567"
+    )
+    
+    suscripcion = Suscripcion.objects.create(
+        user=user,
+        tipo="trial",
+        activa=True,
+        fecha_inicio=datetime.now().date(),
+        fecha_fin=(datetime.now() + timedelta(days=30)).date()
+    )
+    
+    print("✅ Usuario creado exitosamente")
+    print(f"   Usuario: testuser_usa")
+    print(f"   Contraseña: TestUSA2025!")
+    print(f"   Empresa: {empresa.nombre_taller}")
+    print(f"   Suscripción: {suscripcion.tipo}")
+
+
+BUSCAR TODOS LOS USUARIOS:
+---------------------------
+
+Para ver todos los usuarios del sistema:
+
+python manage.py listar_usuarios_credenciales
+
+Para buscar usuarios similares:
+
+python manage.py listar_usuarios_credenciales --usuario usa
+
+Para filtrar por país:
+
+python manage.py listar_usuarios_credenciales --pais US
+
+
+VERIFICAR OTROS USUARIOS DE PRUEBA:
+------------------------------------
+
+python manage.py diagnosticar_autenticacion --usuario test_usa --fix
+python manage.py diagnosticar_autenticacion --usuario test_chile --fix
+python manage.py diagnosticar_autenticacion --usuario admin_usa --fix
+

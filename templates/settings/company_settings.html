@@ -1,1253 +1,1201 @@
-{% extends "common/base.html" %}
-{% load static %}
-{% load country_url %}
+{% extends "base.html" %}
+{% load static i18n %}
 
-{% block title %}⚙️ SYSTEM CONFIGURATION{% endblock %}
+{% block title %}⚙️ Settings Center - eGarage{% endblock %}
 
 {% block extra_css %}
 <style>
-  /* Futuristic Cyberpunk Theme */
-  :root {
-    --primary-cyan: #00ffff;
-    --secondary-purple: #8b5cf6;
-    --accent-green: #00ff88;
-    --warning-orange: #ff6b35;
-    --danger-red: #ff3366;
-    --dark-bg: #0a0a0f;
-    --darker-bg: #050508;
-    --card-bg: rgba(15, 15, 25, 0.8);
-    --border-glow: rgba(0, 255, 255, 0.3);
-    --text-primary: #ffffff;
-    --text-secondary: #cccccc;
-    --field-bg: #000000;
-    --field-text: #ffffff;
-  }
-
-  /* Futuristic Font */
-  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
-
-  body {
-    background: linear-gradient(135deg, var(--dark-bg) 0%, var(--darker-bg) 100%);
-    color: var(--text-primary);
-    font-family: 'Rajdhani', 'Orbitron', 'Segoe UI', sans-serif;
-    font-weight: 400;
-    overflow-x: hidden;
-  }
-
-  /* Animated Background */
-  body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background:
-      radial-gradient(circle at 20% 80%, rgba(0, 255, 255, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 40% 40%, rgba(0, 255, 136, 0.05) 0%, transparent 50%);
-    animation: backgroundPulse 8s ease-in-out infinite;
-    z-index: -1;
-  }
-
-  @keyframes backgroundPulse {
-    0%, 100% { opacity: 0.3; }
-    50% { opacity: 0.6; }
-  }
-
-  /* Main Container */
-  .cyber-container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 2rem;
-    position: relative;
-  }
-
-  /* Header Section */
-  .cyber-header {
-    text-align: center;
-    margin-bottom: 3rem;
-    position: relative;
-  }
-
-  .cyber-title {
-    font-family: 'Orbitron', 'Rajdhani', monospace;
-    font-size: 3rem;
-    font-weight: 900;
-    background: linear-gradient(45deg, var(--primary-cyan), var(--secondary-purple), var(--accent-green));
-    background-size: 300% 300%;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    animation: gradientShift 3s ease-in-out infinite;
-    text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
-    margin-bottom: 1rem;
-    letter-spacing: 3px;
-  }
-
-  @keyframes gradientShift {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-  }
-
-  .cyber-subtitle {
-    font-family: 'Rajdhani', 'Orbitron', sans-serif;
-    font-size: 1.2rem;
-    color: var(--text-secondary);
-    font-weight: 500;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
-  }
-
-  /* Status Panel */
-  .status-panel {
-    background: rgba(15, 15, 25, 0.9);
-    border: 2px solid rgba(0, 255, 255, 0.4);
-    border-radius: 15px;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-    backdrop-filter: blur(15px);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 255, 255, 0.1);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .status-panel::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--primary-cyan), transparent);
-    animation: scanLine 3s linear infinite;
-  }
-
-  @keyframes scanLine {
-    0% { left: -100%; }
-    100% { left: 100%; }
-  }
-
-  .status-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-  }
-
-  .status-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.8rem;
-    background: rgba(0, 255, 255, 0.15);
-    border-radius: 10px;
-    border: 1px solid rgba(0, 255, 255, 0.4);
-    box-shadow: 0 4px 15px rgba(0, 255, 255, 0.1);
-    transition: all 0.3s ease;
-  }
-
-  .status-item:hover {
-    background: rgba(0, 255, 255, 0.2);
-    border-color: rgba(0, 255, 255, 0.6);
-    transform: translateY(-2px);
-  }
-
-  .status-icon {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: var(--accent-green);
-    animation: pulse 2s infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-  }
-
-  /* Configuration Cards */
-  .config-card {
-    background: rgba(15, 15, 25, 0.9);
-    border: 2px solid rgba(0, 255, 255, 0.3);
-    border-radius: 20px;
-    padding: 2rem;
-    margin-bottom: 2rem;
-    backdrop-filter: blur(20px);
-    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(0, 255, 255, 0.1);
-    position: relative;
-    transition: all 0.3s ease;
-  }
-
-  .config-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 50px rgba(0, 255, 255, 0.2);
-    border-color: var(--primary-cyan);
-  }
-
-  .config-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--primary-cyan), var(--secondary-purple), var(--accent-green));
-    border-radius: 20px 20px 0 0;
-  }
-
-  .card-header {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 2rem;
-  }
-
-  .card-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, var(--primary-cyan), var(--secondary-purple));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    color: white;
-    box-shadow: 0 4px 15px rgba(0, 255, 255, 0.3);
-  }
-
-  .card-title {
-    font-family: 'Orbitron', 'Rajdhani', monospace;
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin: 0;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-    letter-spacing: 1px;
-  }
-
-  .card-subtitle {
-    font-family: 'Rajdhani', 'Orbitron', sans-serif;
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-    margin: 0;
-    font-weight: 400;
-    letter-spacing: 0.5px;
-  }
-
-  /* Form Elements */
-  .form-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-  }
-
-  .form-group {
-    position: relative;
-  }
-
-  .form-label {
-    display: block;
-    font-family: 'Orbitron', 'Rajdhani', monospace;
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: var(--primary-cyan);
-    margin-bottom: 0.5rem;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    text-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
-    filter: drop-shadow(0 0 8px rgba(0, 255, 255, 0.3));
-  }
-
-  .form-control, .form-select {
-    width: 100%;
-    padding: 1rem;
-    background: var(--field-bg) !important;
-    border: 2px solid rgba(0, 255, 255, 0.6);
-    border-radius: 10px;
-    color: var(--field-text) !important;
-    font-family: 'Orbitron', 'Rajdhani', monospace;
-    font-size: 1rem;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5), inset 0 1px 3px rgba(255, 255, 255, 0.1);
-    text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
-  }
-
-  .form-control:focus, .form-select:focus {
-    outline: none;
-    border-color: var(--primary-cyan);
-    box-shadow: 0 0 25px rgba(0, 255, 255, 0.8), 0 4px 20px rgba(0, 0, 0, 0.6), inset 0 1px 3px rgba(255, 255, 255, 0.2);
-    background: var(--field-bg) !important;
-    color: var(--field-text) !important;
-    transform: translateY(-2px);
-  }
-
-  .form-control::placeholder {
-    color: rgba(255, 255, 255, 0.6) !important;
-    font-family: 'Orbitron', 'Rajdhani', monospace;
-    font-weight: 400;
-    text-shadow: 0 0 3px rgba(255, 255, 255, 0.2);
-  }
-
-  .form-control:hover, .form-select:hover {
-    border-color: rgba(0, 255, 255, 0.8);
-    background: var(--field-bg) !important;
-    color: var(--field-text) !important;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), 0 0 15px rgba(0, 255, 255, 0.3), inset 0 1px 3px rgba(255, 255, 255, 0.15);
-  }
-
-  /* Logo Section */
-  .logo-section {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-    padding: 1.5rem;
-    background: rgba(0, 255, 255, 0.05);
-    border: 1px solid rgba(0, 255, 255, 0.2);
-    border-radius: 15px;
-    margin-bottom: 1rem;
-  }
-
-  .current-logo {
-    width: 120px;
-    height: 120px;
-    border-radius: 15px;
-    border: 2px solid var(--primary-cyan);
-    object-fit: cover;
-    box-shadow: 0 8px 25px rgba(0, 255, 255, 0.3);
-  }
-
-  .logo-info {
-    flex: 1;
-  }
-
-  .logo-info h4 {
-    color: var(--text-primary);
-    margin-bottom: 0.5rem;
-  }
-
-  .logo-info p {
-    color: var(--text-secondary);
-    margin: 0;
-  }
-
-  /* Buttons - Futuristic with Glowing Borders */
-  .cyber-btn {
-    background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(15, 15, 30, 0.9));
-    color: white;
-    border: 2px solid rgba(255, 255, 255, 0.8);
-    padding: 1rem 2.5rem;
-    border-radius: 12px;
-    font-family: 'Orbitron', 'Rajdhani', monospace;
-    font-size: 1rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    position: relative;
-    overflow: hidden;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-    box-shadow:
-      0 0 15px rgba(255, 255, 255, 0.3),
-      0 0 30px rgba(0, 255, 255, 0.2),
-      0 4px 15px rgba(0, 0, 0, 0.5),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    animation: border-glow 2s ease-in-out infinite;
-  }
-
-  /* Animated glowing border */
-  @keyframes border-glow {
-    0%, 100% {
-      box-shadow:
-        0 0 15px rgba(255, 255, 255, 0.3),
-        0 0 30px rgba(0, 255, 255, 0.2),
-        0 4px 15px rgba(0, 0, 0, 0.5),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.8);
-    }
-    50% {
-      box-shadow:
-        0 0 25px rgba(255, 255, 255, 0.5),
-        0 0 50px rgba(0, 255, 255, 0.4),
-        0 0 75px rgba(138, 92, 246, 0.2),
-        0 4px 20px rgba(0, 0, 0, 0.5),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
-      border-color: rgba(0, 255, 255, 1);
-    }
-  }
-
-  /* Scanning light effect */
-  .cyber-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg,
-      transparent,
-      rgba(255, 255, 255, 0.3),
-      rgba(0, 255, 255, 0.3),
-      transparent);
-    animation: scan-sweep 3s ease-in-out infinite;
-  }
-
-  @keyframes scan-sweep {
-    0% { left: -100%; }
-    50% { left: 100%; }
-    100% { left: 100%; }
-  }
-
-  /* Particle effect on hover */
-  .cyber-btn::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.3);
-    transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
-  }
-
-  .cyber-btn:hover::after {
-    width: 300px;
-    height: 300px;
-    opacity: 0;
-  }
-
-  .cyber-btn:hover {
-    transform: translateY(-4px) scale(1.03);
-    border-color: #ffffff;
-    background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(138, 92, 246, 0.2));
-    box-shadow:
-      0 0 30px rgba(255, 255, 255, 0.6),
-      0 0 60px rgba(0, 255, 255, 0.5),
-      0 0 90px rgba(138, 92, 246, 0.3),
-      0 8px 30px rgba(0, 0, 0, 0.6),
-      inset 0 1px 0 rgba(255, 255, 255, 0.3);
-  }
-
-  .cyber-btn:active {
-    transform: translateY(-2px) scale(1.01);
-  }
-
-  /* Quick Actions */
-  .quick-actions {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1rem;
-    margin-top: 2rem;
-  }
-
-  .action-btn {
-    background: linear-gradient(135deg, rgba(0, 0, 0, 0.7), rgba(15, 15, 30, 0.8));
-    border: 2px solid rgba(255, 255, 255, 0.6);
-    border-radius: 16px;
-    padding: 2rem 1.5rem;
-    text-align: center;
-    text-decoration: none;
-    color: var(--text-primary);
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    position: relative;
-    overflow: hidden;
-    cursor: pointer;
-    box-shadow:
-      0 0 15px rgba(255, 255, 255, 0.2),
-      0 0 30px rgba(0, 255, 255, 0.15),
-      0 8px 25px rgba(0, 0, 0, 0.4),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    animation: action-border-glow 3s ease-in-out infinite;
-  }
-
-  /* Glowing border animation for action buttons */
-  @keyframes action-border-glow {
-    0%, 100% {
-      box-shadow:
-        0 0 15px rgba(255, 255, 255, 0.2),
-        0 0 30px rgba(0, 255, 255, 0.15),
-        0 8px 25px rgba(0, 0, 0, 0.4),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.6);
-    }
-    33% {
-      box-shadow:
-        0 0 20px rgba(0, 255, 255, 0.4),
-        0 0 40px rgba(0, 255, 255, 0.3),
-        0 0 60px rgba(0, 255, 255, 0.15),
-        0 8px 30px rgba(0, 0, 0, 0.4),
-        inset 0 1px 0 rgba(0, 255, 255, 0.2);
-      border-color: rgba(0, 255, 255, 0.9);
-    }
-    66% {
-      box-shadow:
-        0 0 20px rgba(138, 92, 246, 0.4),
-        0 0 40px rgba(138, 92, 246, 0.3),
-        0 0 60px rgba(138, 92, 246, 0.15),
-        0 8px 30px rgba(0, 0, 0, 0.4),
-        inset 0 1px 0 rgba(138, 92, 246, 0.2);
-      border-color: rgba(138, 92, 246, 0.9);
-    }
-  }
-
-  /* Gradient overlay */
-  .action-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg,
-      rgba(0, 255, 255, 0.1) 0%,
-      rgba(138, 92, 246, 0.1) 50%,
-      rgba(0, 255, 136, 0.1) 100%);
-    opacity: 0;
-    transition: opacity 0.4s ease;
-  }
-
-  .action-btn:hover::before {
-    opacity: 1;
-  }
-
-  /* Scanning line effect */
-  .action-btn::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, #ffffff, transparent);
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
-    animation: action-scan 4s linear infinite;
-  }
-
-  @keyframes action-scan {
-    0% { left: -100%; top: 0; }
-    25% { left: 100%; top: 0; }
-    26% { left: 100%; top: 100%; }
-    50% { left: -100%; top: 100%; }
-    51% { left: -100%; top: 50%; }
-    75% { left: 100%; top: 50%; }
-    76% { left: 100%; top: 0; }
-    100% { left: -100%; top: 0; }
-  }
-
-  .action-btn:hover {
-    transform: translateY(-8px) scale(1.05) rotateX(5deg);
-    border-color: #ffffff;
-    box-shadow:
-      0 0 25px rgba(255, 255, 255, 0.5),
-      0 0 50px rgba(0, 255, 255, 0.4),
-      0 0 75px rgba(138, 92, 246, 0.2),
-      0 12px 40px rgba(0, 0, 0, 0.5),
-      inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  }
-
-  .action-icon {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-    display: block;
-    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.5));
-    animation: icon-pulse 2s ease-in-out infinite;
-    position: relative;
-    z-index: 10;
-  }
-
-  @keyframes icon-pulse {
-    0%, 100% {
-      filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.5));
-      transform: scale(1);
-    }
-    50% {
-      filter: drop-shadow(0 0 25px rgba(0, 255, 255, 0.8));
-      transform: scale(1.1);
-    }
-  }
-
-  .action-btn:hover .action-icon {
-    animation: icon-spin-glow 1s ease-in-out;
-    filter: drop-shadow(0 0 30px rgba(255, 255, 255, 1));
-  }
-
-  @keyframes icon-spin-glow {
-    0% { transform: scale(1) rotate(0deg); }
-    50% { transform: scale(1.2) rotate(180deg); }
-    100% { transform: scale(1.1) rotate(360deg); }
-  }
-
-  .action-title {
-    font-family: 'Orbitron', 'Rajdhani', monospace;
-    font-size: 1.1rem;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-    letter-spacing: 1.5px;
-    text-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
-    position: relative;
-    z-index: 10;
-    color: var(--primary-cyan);
-  }
-
-  .action-btn:hover .action-title {
-    text-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
-    color: #ffffff;
-  }
-
-  .action-desc {
-    font-family: 'Rajdhani', 'Orbitron', sans-serif;
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-    font-weight: 400;
-    letter-spacing: 0.5px;
-    position: relative;
-    z-index: 10;
-    line-height: 1.4;
-  }
-
-  .action-btn:hover .action-desc {
-    color: rgba(255, 255, 255, 0.9);
-  }
-
-  /* Messages */
-  .alert {
-    padding: 1rem 1.5rem;
-    border-radius: 10px;
-    margin-bottom: 1rem;
-    border: 1px solid;
-    backdrop-filter: blur(10px);
-  }
-
-  .alert-success {
-    background: rgba(0, 255, 136, 0.2);
-    border-color: var(--accent-green);
-    color: var(--accent-green);
-    box-shadow: 0 4px 15px rgba(0, 255, 136, 0.2);
-    text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
-  }
-
-  .alert-error {
-    background: rgba(255, 51, 102, 0.2);
-    border-color: var(--danger-red);
-    color: var(--danger-red);
-    box-shadow: 0 4px 15px rgba(255, 51, 102, 0.2);
-    text-shadow: 0 0 10px rgba(255, 51, 102, 0.3);
-  }
-
-  .alert-info {
-    background: rgba(0, 255, 255, 0.2);
-    border-color: var(--primary-cyan);
-    color: var(--primary-cyan);
-    box-shadow: 0 4px 15px rgba(0, 255, 255, 0.2);
-    text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
-  }
-
-  /* Responsive */
-  @media (max-width: 768px) {
-    .cyber-container {
-      padding: 1rem;
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
+    
+    :root {
+        --neon-cyan: #00ffff;
+        --neon-purple: #b026ff;
+        --neon-pink: #ff00ff;
+        --dark-bg: #0a0e27;
+        --dark-card: #151932;
+        --dark-border: #1e2447;
+        --text-primary: #ffffff;
+        --text-secondary: #a0aec0;
+        --accent-glow: rgba(0, 255, 255, 0.3);
     }
 
-    .cyber-title {
-      font-size: 2rem;
+    * {
+        box-sizing: border-box;
     }
 
-    .form-grid {
-      grid-template-columns: 1fr;
+    body {
+        background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0f1629 100%);
+        background-attachment: fixed;
+        font-family: 'Rajdhani', sans-serif;
+        color: var(--text-primary);
+        min-height: 100vh;
+        position: relative;
+        overflow-x: hidden;
     }
 
-    /* Quick Actions: Distribuir en dos filas en móviles */
-    .quick-actions {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 0.8rem;
+    /* Animated background grid */
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: 
+            linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
+        background-size: 50px 50px;
+        pointer-events: none;
+        z-index: 0;
+        animation: gridMove 20s linear infinite;
     }
 
-    .action-btn {
-      padding: 1.5rem 1rem;
+    @keyframes gridMove {
+        0% { transform: translate(0, 0); }
+        100% { transform: translate(50px, 50px); }
     }
 
-    .action-icon {
-      font-size: 2rem;
+    /* Floating particles effect */
+    .particles {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1;
+        overflow: hidden;
     }
 
-    .action-title {
-      font-size: 1rem;
+    .particle {
+        position: absolute;
+        width: 2px;
+        height: 2px;
+        background: var(--neon-cyan);
+        border-radius: 50%;
+        box-shadow: 0 0 6px var(--neon-cyan);
+        animation: float 15s infinite;
+        opacity: 0.6;
     }
 
-    .action-desc {
-      font-size: 0.8rem;
+    @keyframes float {
+        0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
+        10% { opacity: 0.6; }
+        90% { opacity: 0.6; }
+        100% { transform: translateY(-100vh) translateX(100vw); opacity: 0; }
     }
 
-    /* En pantallas muy pequeñas, una columna pero mantener estructura */
-    @media (max-width: 480px) {
-      .quick-actions {
-        grid-template-columns: 1fr;
-      }
-
-      .action-btn {
-        padding: 1.2rem 0.8rem;
-      }
+    .settings-container {
+        max-width: 1600px;
+        margin: 0 auto;
+        padding: 2rem;
+        position: relative;
+        z-index: 10;
     }
-  }
 
-  /* Loading Animation */
-  .loading {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    border: 3px solid rgba(0, 255, 255, 0.3);
-    border-radius: 50%;
-    border-top-color: var(--primary-cyan);
-    animation: spin 1s ease-in-out infinite;
-  }
-
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
-
-  /* Force black background for all form elements */
-  input[type="text"],
-  input[type="email"],
-  input[type="tel"],
-  input[type="url"],
-  input[type="number"],
-  input[type="file"],
-  textarea,
-  select {
-    background: #000000 !important;
-    color: #ffffff !important;
-    font-family: 'Orbitron', 'Rajdhani', monospace !important;
-    font-weight: 500 !important;
-    border: 2px solid rgba(0, 255, 255, 0.6) !important;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5), inset 0 1px 3px rgba(255, 255, 255, 0.1) !important;
-    text-shadow: 0 0 5px rgba(255, 255, 255, 0.3) !important;
-  }
-
-  input[type="text"]:focus,
-  input[type="email"]:focus,
-  input[type="tel"]:focus,
-  input[type="url"]:focus,
-  input[type="number"]:focus,
-  input[type="file"]:focus,
-  textarea:focus,
-  select:focus {
-    background: #000000 !important;
-    color: #ffffff !important;
-    border-color: #00ffff !important;
-    box-shadow: 0 0 25px rgba(0, 255, 255, 0.8), 0 4px 20px rgba(0, 0, 0, 0.6), inset 0 1px 3px rgba(255, 255, 255, 0.2) !important;
-  }
-
-  input[type="text"]::placeholder,
-  input[type="email"]::placeholder,
-  input[type="tel"]::placeholder,
-  input[type="url"]::placeholder,
-  input[type="number"]::placeholder,
-  textarea::placeholder {
-    color: rgba(255, 255, 255, 0.6) !important;
-    font-family: 'Orbitron', 'Rajdhani', monospace !important;
-    text-shadow: 0 0 3px rgba(255, 255, 255, 0.2) !important;
-  }
-
-  /* Sparkle particles on buttons */
-  .cyber-btn .sparkle,
-  .action-btn .sparkle {
-    position: absolute;
-    width: 3px;
-    height: 3px;
-    background: #ffffff;
-    border-radius: 50%;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
-    pointer-events: none;
-    animation: sparkle-float 3s ease-in-out infinite;
-  }
-
-  @keyframes sparkle-float {
-    0%, 100% {
-      opacity: 0;
-      transform: translateY(0) scale(0);
+    /* Futuristic Header */
+    .settings-header {
+        background: linear-gradient(135deg, rgba(0, 255, 255, 0.1) 0%, rgba(176, 38, 255, 0.1) 100%);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(0, 255, 255, 0.3);
+        border-radius: 20px;
+        padding: 3rem;
+        margin-bottom: 2rem;
+        box-shadow: 
+            0 8px 32px rgba(0, 0, 0, 0.3),
+            0 0 40px rgba(0, 255, 255, 0.1),
+            inset 0 0 60px rgba(176, 38, 255, 0.05);
+        position: relative;
+        overflow: hidden;
+        animation: pulseGlow 3s ease-in-out infinite;
     }
-    10% {
-      opacity: 1;
-      transform: translateY(-5px) scale(1);
-    }
-    90% {
-      opacity: 1;
-      transform: translateY(-30px) scale(0.5);
-    }
-    100% {
-      opacity: 0;
-      transform: translateY(-35px) scale(0);
-    }
-  }
 
-  /* Corner glows on cards */
-  .config-card::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    width: 100px;
-    height: 100px;
-    background: radial-gradient(circle, rgba(0, 255, 255, 0.3) 0%, transparent 70%);
-    border-radius: 0 0 20px 0;
-    opacity: 0;
-    transition: opacity 0.4s ease;
-  }
-
-  .config-card:hover::after {
-    opacity: 1;
-  }
-
-  /* Pulsing glow for status icons */
-  @keyframes status-glow {
-    0%, 100% {
-      box-shadow: 0 0 10px var(--accent-green);
+    .settings-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(0, 255, 255, 0.1) 0%, transparent 70%);
+        animation: rotate 20s linear infinite;
     }
-    50% {
-      box-shadow: 0 0 20px var(--accent-green), 0 0 30px rgba(0, 255, 136, 0.5);
-    }
-  }
 
-  .status-icon {
-    animation: pulse 2s infinite, status-glow 2s infinite;
-  }
+    @keyframes rotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    @keyframes pulseGlow {
+        0%, 100% { box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 255, 255, 0.1), inset 0 0 60px rgba(176, 38, 255, 0.05); }
+        50% { box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 60px rgba(0, 255, 255, 0.2), inset 0 0 80px rgba(176, 38, 255, 0.1); }
+    }
+
+    .settings-header h1 {
+        margin: 0;
+        font-size: 3rem;
+        font-weight: 900;
+        font-family: 'Orbitron', sans-serif;
+        background: linear-gradient(135deg, #00ffff 0%, #b026ff 50%, #ff00ff 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+        position: relative;
+        z-index: 2;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+
+    .settings-header p {
+        margin: 1rem 0 0 0;
+        color: var(--text-secondary);
+        font-size: 1.2rem;
+        font-weight: 400;
+        position: relative;
+        z-index: 2;
+    }
+
+    /* Navigation Tabs - Futuristic Style */
+    .settings-nav {
+        background: rgba(21, 25, 50, 0.6);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(0, 255, 255, 0.2);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .settings-nav .nav-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        border: none;
+    }
+
+    .settings-nav .nav-link {
+        color: var(--text-secondary);
+        font-weight: 600;
+        font-size: 1rem;
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        transition: all 0.3s ease;
+        margin: 0;
+        border: 1px solid transparent;
+        background: rgba(0, 255, 255, 0.05);
+        position: relative;
+        overflow: hidden;
+        font-family: 'Rajdhani', sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .settings-nav .nav-link::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .settings-nav .nav-link:hover::before {
+        left: 100%;
+    }
+
+    .settings-nav .nav-link:hover {
+        background: rgba(0, 255, 255, 0.1);
+        border-color: rgba(0, 255, 255, 0.3);
+        color: var(--neon-cyan);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 255, 255, 0.2);
+    }
+
+    .settings-nav .nav-link.active {
+        background: linear-gradient(135deg, rgba(0, 255, 255, 0.2) 0%, rgba(176, 38, 255, 0.2) 100%);
+        border: 1px solid var(--neon-cyan);
+        color: var(--text-primary);
+        box-shadow: 
+            0 0 20px rgba(0, 255, 255, 0.4),
+            inset 0 0 20px rgba(176, 38, 255, 0.2);
+    }
+
+    .settings-nav .nav-link i {
+        margin-right: 0.5rem;
+        font-size: 1.1rem;
+    }
+
+    /* Form Sections - Glassmorphism */
+    .form-section {
+        background: rgba(21, 25, 50, 0.7);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(0, 255, 255, 0.2);
+        border-radius: 20px;
+        padding: 2.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 
+            0 8px 32px rgba(0, 0, 0, 0.3),
+            0 0 0 1px rgba(0, 255, 255, 0.1);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .form-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple), var(--neon-pink));
+        opacity: 0.6;
+    }
+
+    .form-section:hover {
+        border-color: rgba(0, 255, 255, 0.4);
+        box-shadow: 
+            0 12px 40px rgba(0, 0, 0, 0.4),
+            0 0 30px rgba(0, 255, 255, 0.2);
+        transform: translateY(-2px);
+    }
+
+    .form-section h4 {
+        color: var(--neon-cyan);
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        font-weight: 700;
+        font-size: 1.5rem;
+        font-family: 'Orbitron', sans-serif;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid rgba(0, 255, 255, 0.2);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .form-section h4 i {
+        font-size: 1.8rem;
+        background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.5));
+    }
+
+    /* Form Controls - Futuristic Inputs */
+    .form-label {
+        color: var(--text-primary);
+        font-weight: 600;
+        font-size: 1rem;
+        margin-bottom: 0.75rem;
+        display: block;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-family: 'Rajdhani', sans-serif;
+    }
+
+    .form-control,
+    .form-select {
+        background: rgba(10, 14, 39, 0.6);
+        border: 1px solid rgba(0, 255, 255, 0.3);
+        border-radius: 10px;
+        padding: 0.875rem 1.25rem;
+        color: var(--text-primary);
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        font-family: 'Rajdhani', sans-serif;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        background: rgba(10, 14, 39, 0.8);
+        border-color: var(--neon-cyan);
+        box-shadow: 
+            0 0 0 0.2rem rgba(0, 255, 255, 0.25),
+            0 0 20px rgba(0, 255, 255, 0.3);
+        outline: none;
+        color: var(--text-primary);
+    }
+
+    .form-control::placeholder {
+        color: rgba(160, 174, 192, 0.5);
+    }
+
+    .form-control-color {
+        width: 100%;
+        height: 60px;
+        border-radius: 10px;
+        cursor: pointer;
+        border: 2px solid rgba(0, 255, 255, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .form-control-color:hover {
+        border-color: var(--neon-cyan);
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+        transform: scale(1.05);
+    }
+
+    /* Logo Preview - Futuristic */
+    .logo-preview {
+        max-width: 400px;
+        max-height: 200px;
+        border: 2px dashed rgba(0, 255, 255, 0.4);
+        border-radius: 15px;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        background: rgba(10, 14, 39, 0.4);
+        margin-bottom: 1rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .logo-preview::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, transparent, rgba(0, 255, 255, 0.1), transparent);
+        animation: shine 3s infinite;
+    }
+
+    @keyframes shine {
+        0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+        100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+    }
+
+    .logo-preview:hover {
+        border-color: var(--neon-cyan);
+        background: rgba(0, 255, 255, 0.1);
+        box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+        transform: scale(1.02);
+    }
+
+    .logo-preview img {
+        max-width: 100%;
+        max-height: 150px;
+        object-fit: contain;
+        filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.5));
+    }
+
+    /* Buttons - Neon Style */
+    .btn-save,
+    .btn-primary {
+        background: linear-gradient(135deg, rgba(0, 255, 255, 0.2) 0%, rgba(176, 38, 255, 0.2) 100%);
+        border: 2px solid var(--neon-cyan);
+        color: var(--text-primary);
+        padding: 1rem 2.5rem;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-family: 'Rajdhani', sans-serif;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+    }
+
+    .btn-save::before,
+    .btn-primary::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .btn-save:hover::before,
+    .btn-primary:hover::before {
+        left: 100%;
+    }
+
+    .btn-save:hover,
+    .btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 
+            0 8px 30px rgba(0, 255, 255, 0.5),
+            0 0 40px rgba(176, 38, 255, 0.4);
+        border-color: var(--neon-purple);
+        background: linear-gradient(135deg, rgba(0, 255, 255, 0.3) 0%, rgba(176, 38, 255, 0.3) 100%);
+    }
+
+    .btn-secondary {
+        background: rgba(160, 174, 192, 0.1);
+        border: 2px solid rgba(160, 174, 192, 0.3);
+        color: var(--text-secondary);
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+        background: rgba(160, 174, 192, 0.2);
+        border-color: rgba(160, 174, 192, 0.5);
+        color: var(--text-primary);
+        transform: translateY(-2px);
+    }
+
+    /* Employees Section */
+    .tecnicos-section {
+        background: rgba(21, 25, 50, 0.7);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(0, 255, 255, 0.2);
+        border-radius: 20px;
+        padding: 2.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .form-tecnico {
+        background: rgba(10, 14, 39, 0.5);
+        border: 2px dashed rgba(0, 255, 255, 0.3);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-tecnico:hover {
+        border-color: var(--neon-cyan);
+        background: rgba(0, 255, 255, 0.05);
+        box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+    }
+
+    .form-tecnico h5 {
+        color: var(--neon-cyan);
+        margin-bottom: 1.5rem;
+        font-weight: 700;
+        font-family: 'Orbitron', sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .tecnico-card {
+        background: rgba(10, 14, 39, 0.6);
+        border: 1px solid rgba(0, 255, 255, 0.2);
+        border-radius: 15px;
+        padding: 1.5rem 2rem;
+        margin-bottom: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .tecnico-card::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: linear-gradient(180deg, var(--neon-cyan), var(--neon-purple));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .tecnico-card:hover::before {
+        opacity: 1;
+    }
+
+    .tecnico-card:hover {
+        border-color: rgba(0, 255, 255, 0.5);
+        box-shadow: 0 4px 20px rgba(0, 255, 255, 0.3);
+        transform: translateX(5px);
+        background: rgba(10, 14, 39, 0.8);
+    }
+
+    .tecnico-card.inactive {
+        opacity: 0.5;
+        background: rgba(10, 14, 39, 0.3);
+    }
+
+    .tecnico-info h5 {
+        margin: 0;
+        color: var(--text-primary);
+        font-weight: 700;
+        font-size: 1.2rem;
+        font-family: 'Rajdhani', sans-serif;
+    }
+
+    .tecnico-info p {
+        margin: 0.5rem 0 0 0;
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+    }
+
+    .tecnico-info i {
+        color: var(--neon-cyan);
+        margin-right: 0.5rem;
+    }
+
+    .badge-status {
+        padding: 0.5rem 1.25rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-family: 'Rajdhani', sans-serif;
+    }
+
+    .badge-active {
+        background: rgba(0, 255, 255, 0.2);
+        color: var(--neon-cyan);
+        border: 1px solid var(--neon-cyan);
+        box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+    }
+
+    .badge-inactive {
+        background: rgba(160, 174, 192, 0.2);
+        color: var(--text-secondary);
+        border: 1px solid rgba(160, 174, 192, 0.3);
+    }
+
+    .btn-sm {
+        padding: 0.5rem 1.25rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .btn-warning {
+        background: rgba(255, 193, 7, 0.2);
+        border: 1px solid rgba(255, 193, 7, 0.5);
+        color: #ffc107;
+    }
+
+    .btn-warning:hover {
+        background: rgba(255, 193, 7, 0.3);
+        border-color: #ffc107;
+        box-shadow: 0 0 20px rgba(255, 193, 7, 0.4);
+    }
+
+    .btn-success {
+        background: rgba(40, 167, 69, 0.2);
+        border: 1px solid rgba(40, 167, 69, 0.5);
+        color: #28a745;
+    }
+
+    .btn-success:hover {
+        background: rgba(40, 167, 69, 0.3);
+        border-color: #28a745;
+        box-shadow: 0 0 20px rgba(40, 167, 69, 0.4);
+    }
+
+    /* Alerts */
+    .alert-settings {
+        border-radius: 15px;
+        border: 1px solid;
+        padding: 1.25rem 1.5rem;
+        backdrop-filter: blur(10px);
+        font-weight: 600;
+    }
+
+    .alert-success {
+        background: rgba(40, 167, 69, 0.2);
+        border-color: rgba(40, 167, 69, 0.5);
+        color: #28a745;
+        box-shadow: 0 0 20px rgba(40, 167, 69, 0.2);
+    }
+
+    .alert-error,
+    .alert-danger {
+        background: rgba(220, 53, 69, 0.2);
+        border-color: rgba(220, 53, 69, 0.5);
+        color: #dc3545;
+        box-shadow: 0 0 20px rgba(220, 53, 69, 0.2);
+    }
+
+    .alert-info {
+        background: rgba(0, 255, 255, 0.1);
+        border-color: rgba(0, 255, 255, 0.3);
+        color: var(--neon-cyan);
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+    }
+
+    /* Form Check */
+    .form-check-input {
+        width: 1.5rem;
+        height: 1.5rem;
+        background: rgba(10, 14, 39, 0.6);
+        border: 2px solid rgba(0, 255, 255, 0.3);
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .form-check-input:checked {
+        background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+        border-color: var(--neon-cyan);
+        box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+    }
+
+    .form-check-label {
+        color: var(--text-primary);
+        font-weight: 600;
+        margin-left: 0.5rem;
+        font-family: 'Rajdhani', sans-serif;
+    }
+
+    /* Stats Display */
+    .stats-display {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .stat-card {
+        flex: 1;
+        min-width: 200px;
+        background: rgba(21, 25, 50, 0.6);
+        border: 1px solid rgba(0, 255, 255, 0.2);
+        border-radius: 15px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        border-color: var(--neon-cyan);
+        box-shadow: 0 0 25px rgba(0, 255, 255, 0.3);
+        transform: translateY(-5px);
+    }
+
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: 900;
+        font-family: 'Orbitron', sans-serif;
+        background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: var(--text-secondary);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.9rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .settings-header h1 {
+            font-size: 2rem;
+        }
+
+        .settings-nav .nav-link {
+            font-size: 0.9rem;
+            padding: 0.75rem 1rem;
+        }
+
+        .form-section {
+            padding: 1.5rem;
+        }
+
+        .tecnico-card {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .settings-container {
+            padding: 1rem;
+        }
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+        width: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: rgba(10, 14, 39, 0.5);
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, var(--neon-cyan), var(--neon-purple));
+        border-radius: 5px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(180deg, var(--neon-purple), var(--neon-pink));
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="cyber-container">
-  <!-- Header -->
-  <div class="cyber-header">
-    <h1 class="cyber-title">⚙️ SYSTEM CONFIGURATION</h1>
-    <p class="cyber-subtitle">Advanced Company Settings & Control Panel</p>
-  </div>
+<!-- Floating Particles -->
+<div class="particles" id="particles"></div>
 
-  <!-- Status Panel -->
-  <div class="status-panel">
-    <div class="status-grid">
-      <div class="status-item">
-        <div class="status-icon"></div>
-        <span>System Online</span>
-      </div>
-      <div class="status-item">
-        <div class="status-icon"></div>
-        <span>Company ID: {{ empresa.id }}</span>
-      </div>
-      <div class="status-item">
-        <div class="status-icon"></div>
-        <span>Configuration Active</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Messages -->
-  {% if messages %}
-    {% for message in messages %}
-      <div class="alert alert-{{ message.tags|default:'info' }}">
-        {{ message }}
-      </div>
-    {% endfor %}
-  {% endif %}
-
-  <!-- Company Profile Configuration -->
-  <div class="config-card">
-    <div class="card-header">
-      <div class="card-icon">🏢</div>
-      <div>
-        <h2 class="card-title">Company Profile</h2>
-        <p class="card-subtitle">Configure your company information and branding</p>
-      </div>
+<div class="settings-container">
+    <!-- Futuristic Header -->
+    <div class="settings-header">
+        <h1>
+            <i class="fas fa-cog"></i>
+            Settings Center
+        </h1>
+        <p>Advanced control panel to customize your company</p>
     </div>
 
-    <form method="post" enctype="multipart/form-data">
-      {% csrf_token %}
-      <input type="hidden" name="section" value="profile">
-
-      <div class="form-grid">
-        <div class="form-group">
-          <label class="form-label">{{ form.company_name.label }}</label>
-          {{ form.company_name }}
-          {% if form.company_name.errors %}
-            <div class="alert alert-error">{{ form.company_name.errors.0 }}</div>
-          {% endif %}
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">{{ form.tagline.label }}</label>
-          {{ form.tagline }}
-          {% if form.tagline.errors %}
-            <div class="alert alert-error">{{ form.tagline.errors.0 }}</div>
-          {% endif %}
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">{{ form.logo.label }}</label>
-        <div class="logo-section" style="border: 2px solid rgba(0, 255, 255, 0.4); box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);">
-          {% if config.logo %}
-            <img src="{{ config.logo.url }}" alt="Current Logo" class="current-logo" id="logo-preview" style="border: 2px solid #00ffff; box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);">
-            <div class="logo-info">
-              <h4 style="color: #00ffff; text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);">✅ Current Logo</h4>
-              <p style="color: #00ff88;">{{ config.logo.name }}</p>
-              <p style="color: #ffffff; margin-top: 0.5rem; font-size: 0.85rem;">
-                💡 This logo appears on all pages in the header
-              </p>
+    <!-- Messages -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-settings alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {% if message.tags == 'success' %}
+                    <i class="fas fa-check-circle me-2"></i>
+                {% else %}
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                {% endif %}
+                {{ message }}
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
             </div>
-          {% else %}
-            <div class="logo-info">
-              <h4 style="color: #ff6b35; text-shadow: 0 0 10px rgba(255, 107, 53, 0.5);">⚠️ No Logo Set</h4>
-              <p>Upload a logo to enhance your brand identity across all pages</p>
-              <div style="margin-top: 1rem; padding: 1rem; background: rgba(0, 255, 255, 0.1); border-radius: 8px; border: 1px solid rgba(0, 255, 255, 0.3);">
-                <p style="color: #00ffff; font-size: 0.9rem; margin: 0;">
-                  ✨ Upload ANY size - It will be auto-resized to fit perfectly!
-                </p>
-                <p style="color: #00ff88; font-size: 0.85rem; margin-top: 0.5rem;">
-                  📌 Formats: PNG, JPG, JPEG, SVG, WEBP (max 10MB)
-                </p>
-              </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Navigation Tabs -->
+    <div class="settings-nav">
+        <ul class="nav nav-pills" id="settingsTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="profile-tab" data-bs-toggle="pill" data-bs-target="#profile" type="button" role="tab">
+                    <i class="fas fa-building"></i>Company Information
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="tax-tab" data-bs-toggle="pill" data-bs-target="#tax" type="button" role="tab">
+                    <i class="fas fa-receipt"></i>Taxes & Finance
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="theme-tab" data-bs-toggle="pill" data-bs-target="#theme" type="button" role="tab">
+                    <i class="fas fa-palette"></i>Theme & Colors
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="tecnicos-tab" data-bs-toggle="pill" data-bs-target="#tecnicos" type="button" role="tab">
+                    <i class="fas fa-users"></i>Employee Management
+                </button>
+            </li>
+        </ul>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" id="settingsForm">
+        {% csrf_token %}
+        <input type="hidden" name="section" id="sectionInput" value="profile">
+
+        <div class="tab-content" id="settingsTabsContent">
+            <!-- Tab: Company Information -->
+            <div class="tab-pane fade show active" id="profile" role="tabpanel">
+                <!-- Name and Tagline -->
+                <div class="form-section">
+                    <h4>
+                        <i class="fas fa-tag"></i>
+                        Company Identity
+                    </h4>
+
+                    <div class="row">
+                        <div class="col-md-8 mb-4">
+                            <label class="form-label">Company Name *</label>
+                            <input type="text" name="company_name" id="id_company_name" class="form-control" value="{{ config.company_name|default:'' }}" placeholder="Enter your company name" required>
+                            <small class="form-text text-muted" style="color: var(--text-secondary);">This name will appear instead of "eGarage" throughout the platform</small>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <label class="form-label">Tagline / Slogan</label>
+                            <input type="text" name="tagline" id="id_tagline" class="form-control" value="{{ config.tagline|default:'' }}" placeholder="Your tagline here">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Logo -->
+                <div class="form-section">
+                    <h4>
+                        <i class="fas fa-image"></i>
+                        Company Logo
+                    </h4>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label">Logo</label>
+                            <div class="logo-preview" onclick="document.getElementById('id_logo').click()">
+                                {% if config.logo %}
+                                    <img src="{{ config.logo.url }}" alt="Current logo" id="logoPreview">
+                                {% else %}
+                                    <div id="logoPreview">
+                                        <i class="fas fa-upload fa-3x" style="color: var(--neon-cyan); margin-bottom: 1rem;"></i>
+                                        <p style="color: var(--text-secondary); margin: 0;">Click to upload logo</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <input type="file" name="logo" id="id_logo" accept="image/*" style="display: none;" onchange="previewLogo(this)">
+                            <small class="form-text text-muted" style="color: var(--text-secondary);">Formats: PNG, JPG, JPEG, SVG, WEBP (max. 2MB)</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Information -->
+                <div class="form-section">
+                    <h4>
+                        <i class="fas fa-phone"></i>
+                        Contact Information
+                    </h4>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Phone</label>
+                            <input type="text" name="phone" id="id_phone" class="form-control" value="{{ config.phone|default:'' }}" placeholder="+1 555 123 4567">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="email" id="id_email" class="form-control" value="{{ config.email|default:'' }}" placeholder="contact@yourcompany.com">
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label">Website</label>
+                            <input type="url" name="website" id="id_website" class="form-control" value="{{ config.website|default:'' }}" placeholder="https://www.yourcompany.com">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Address -->
+                <div class="form-section">
+                    <h4>
+                        <i class="fas fa-map-marker-alt"></i>
+                        Address
+                    </h4>
+
+                    <div class="mb-3">
+                        <label class="form-label">Full Address</label>
+                        <textarea name="address" id="id_address" class="form-control" rows="3" placeholder="Enter the complete address of your shop">{{ config.address|default:'' }}</textarea>
+                    </div>
+                </div>
+
+                <!-- Fiscal Information -->
+                <div class="form-section">
+                    <h4>
+                        <i class="fas fa-id-card"></i>
+                        Fiscal Information
+                    </h4>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Tax ID / EIN</label>
+                            <input type="text" name="tax_id" id="id_tax_id" class="form-control" value="{{ config.tax_id|default:'' }}" placeholder="12-3456789">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Business License</label>
+                            <input type="text" name="business_license" id="id_business_license" class="form-control" value="{{ config.business_license|default:'' }}" placeholder="Business license or registration">
+                        </div>
+                    </div>
+                </div>
             </div>
-          {% endif %}
-        </div>
-        {{ form.logo }}
-        {% if form.logo.errors %}
-          <div class="alert alert-error">{{ form.logo.errors.0 }}</div>
-        {% endif %}
-        <p style="color: #b0c4de; font-size: 0.85rem; margin-top: 0.5rem; font-family: 'Courier New', monospace;">
-          💡 After uploading, the logo will appear in the header of ALL pages automatically. Large images will be auto-resized.
-        </p>
-      </div>
 
-      <div class="form-grid">
-        <div class="form-group">
-          <label class="form-label">{{ form.address.label }}</label>
-          {{ form.address }}
-          {% if form.address.errors %}
-            <div class="alert alert-error">{{ form.address.errors.0 }}</div>
-          {% endif %}
+            <!-- Tab: Taxes & Finance -->
+            <div class="tab-pane fade" id="tax" role="tabpanel">
+                <div class="form-section">
+                    <h4>
+                        <i class="fas fa-receipt"></i>
+                        Tax Configuration
+                    </h4>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Currency</label>
+                            <select name="currency" id="id_currency" class="form-select">
+                                <option value="CLP" {% if config.currency == 'CLP' %}selected{% endif %}>Chilean Peso (CLP)</option>
+                                <option value="USD" {% if config.currency == 'USD' %}selected{% endif %}>US Dollar (USD)</option>
+                                <option value="EUR" {% if config.currency == 'EUR' %}selected{% endif %}>Euro (EUR)</option>
+                                <option value="MXN" {% if config.currency == 'MXN' %}selected{% endif %}>Mexican Peso (MXN)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Tax Rate (%)</label>
+                            <input type="number" name="tax_rate" id="id_tax_rate" class="form-control" step="0.01" min="0" max="100" value="{{ config.tax_rate|default:19.00 }}" placeholder="19.00">
+                            <small class="form-text text-muted" style="color: var(--text-secondary);">E.g: 19.00 for Chile, 0.00 for USA</small>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="form-check mt-4">
+                                <input type="checkbox" name="apply_tax_by_default" id="id_apply_tax_by_default" class="form-check-input" {% if config.apply_tax_by_default %}checked{% endif %}>
+                                <label class="form-check-label" for="id_apply_tax_by_default">
+                                    Apply tax by default
+                                </label>
+                            </div>
+                            <small class="form-text text-muted" style="color: var(--text-secondary);">Automatically apply tax to new documents</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Theme & Colors -->
+            <div class="tab-pane fade" id="theme" role="tabpanel">
+                <div class="form-section">
+                    <h4>
+                        <i class="fas fa-palette"></i>
+                        Color Customization
+                    </h4>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label">Primary Color</label>
+                            <input type="color" name="primary_color" id="id_primary_color" class="form-control form-control-color" value="{{ config.primary_color|default:'#0d6efd' }}">
+                            <small class="form-text text-muted" style="color: var(--text-secondary);">Main theme color</small>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label">Secondary Color</label>
+                            <input type="color" name="secondary_color" id="id_secondary_color" class="form-control form-control-color" value="{{ config.secondary_color|default:'#6c757d' }}">
+                            <small class="form-text text-muted" style="color: var(--text-secondary);">Secondary theme color</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h4>
+                        <i class="fas fa-cog"></i>
+                        Additional Settings
+                    </h4>
+
+                    <div class="form-check mb-3">
+                        <input type="checkbox" name="separate_by_technician" id="id_separate_by_technician" class="form-check-input" {% if config.separate_by_technician %}checked{% endif %}>
+                        <label class="form-check-label" for="id_separate_by_technician">
+                            Separate reports by technician
+                        </label>
+                        <small class="form-text text-muted d-block" style="color: var(--text-secondary);">Show reports separated by technician</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Employees -->
+            <div class="tab-pane fade" id="tecnicos" role="tabpanel">
+                <div class="tecnicos-section">
+                    <h4>
+                        <i class="fas fa-users"></i>
+                        Employee Management
+                    </h4>
+
+                    <!-- Stats -->
+                    {% if tecnicos %}
+                    <div class="stats-display mb-4">
+                        <div class="stat-card">
+                            <div class="stat-value">{{ tecnicos|length }}</div>
+                            <div class="stat-label">Total Employees</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">{{ tecnicos|length|add:"-1"|add:"1" }}</div>
+                            <div class="stat-label">Active Employees</div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Form to create employee -->
+                    <div class="form-tecnico">
+                        <h5>
+                            <i class="fas fa-user-plus me-2"></i>
+                            Add New Employee
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Full Name *</label>
+                                <input type="text" name="nombre" id="id_tecnico_nombre" class="form-control" placeholder="Employee name" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Phone</label>
+                                <input type="text" name="telefono" id="id_tecnico_telefono" class="form-control" placeholder="+1 555 123 4567">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Address</label>
+                                <input type="text" name="direccion" id="id_tecnico_direccion" class="form-control" placeholder="Employee address">
+                            </div>
+                        </div>
+                        <button type="submit" name="crear_tecnico" class="btn btn-save">
+                            <i class="fas fa-plus me-2"></i>Add Employee
+                        </button>
+                    </div>
+
+                    <!-- Employee List -->
+                    {% if tecnicos %}
+                        <h5 class="mb-3" style="color: var(--neon-cyan); font-family: 'Orbitron', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">
+                            <i class="fas fa-list me-2"></i>
+                            Registered Employees ({{ tecnicos|length }})
+                        </h5>
+                        {% for tecnico in tecnicos %}
+                            <div class="tecnico-card {% if not tecnico.activo %}inactive{% endif %}">
+                                <div class="tecnico-info">
+                                    <h5>{{ tecnico.nombre }}</h5>
+                                    {% if tecnico.telefono %}
+                                        <p><i class="fas fa-phone"></i>{{ tecnico.telefono }}</p>
+                                    {% endif %}
+                                    {% if tecnico.direccion %}
+                                        <p><i class="fas fa-map-marker-alt"></i>{{ tecnico.direccion }}</p>
+                                    {% endif %}
+                                </div>
+                                <div class="tecnico-status">
+                                    <span class="badge-status {% if tecnico.activo %}badge-active{% else %}badge-inactive{% endif %}">
+                                        {% if tecnico.activo %}
+                                            <i class="fas fa-check-circle me-1"></i>Active
+                                        {% else %}
+                                            <i class="fas fa-times-circle me-1"></i>Inactive
+                                        {% endif %}
+                                    </span>
+                                    <form method="post" style="display: inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="toggle_tecnico" value="{{ tecnico.id }}">
+                                        <button type="submit" class="btn btn-sm {% if tecnico.activo %}btn-warning{% else %}btn-success{% endif %}">
+                                            {% if tecnico.activo %}
+                                                <i class="fas fa-ban me-1"></i>Deactivate
+                                            {% else %}
+                                                <i class="fas fa-check me-1"></i>Activate
+                                            {% endif %}
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            No employees registered. Add one using the form above.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">{{ form.phone.label }}</label>
-          {{ form.phone }}
-          {% if form.phone.errors %}
-            <div class="alert alert-error">{{ form.phone.errors.0 }}</div>
-          {% endif %}
+        <!-- Action Buttons -->
+        <div class="form-section">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <div>
+                    <button type="submit" class="btn btn-save" id="saveBtn">
+                        <i class="fas fa-save me-2"></i>Save Settings
+                    </button>
+                    <a href="{% url 'taller:dashboard' %}" class="btn btn-secondary ms-2">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </a>
+                </div>
+                <div style="color: var(--text-secondary);">
+                    <small>
+                        <i class="fas fa-clock me-1"></i>
+                        Last updated: {{ config.updated_at|date:"m/d/Y H:i" }}
+                    </small>
+                </div>
+            </div>
         </div>
-      </div>
-
-      <div class="form-grid">
-        <div class="form-group">
-          <label class="form-label">{{ form.email.label }}</label>
-          {{ form.email }}
-          {% if form.email.errors %}
-            <div class="alert alert-error">{{ form.email.errors.0 }}</div>
-          {% endif %}
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">{{ form.website.label }}</label>
-          {{ form.website }}
-          {% if form.website.errors %}
-            <div class="alert alert-error">{{ form.website.errors.0 }}</div>
-          {% endif %}
-        </div>
-      </div>
-
-      <button type="submit" class="cyber-btn">
-        <span class="loading"></span>
-        💾 Update Profile
-      </button>
     </form>
-  </div>
-
-  <!-- Financial Configuration -->
-  <div class="config-card">
-    <div class="card-header">
-      <div class="card-icon">💰</div>
-      <div>
-        <h2 class="card-title">Financial Settings</h2>
-        <p class="card-subtitle">Configure currency, tax rates, and financial parameters</p>
-      </div>
-    </div>
-
-    <form method="post">
-      {% csrf_token %}
-      <input type="hidden" name="section" value="financial">
-
-      <div class="form-grid">
-        <div class="form-group">
-          <label class="form-label">{{ form.currency.label }}</label>
-          {{ form.currency }}
-          {% if form.currency.errors %}
-            <div class="alert alert-error">{{ form.currency.errors.0 }}</div>
-          {% endif %}
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">{{ form.tax_rate.label }}</label>
-          {{ form.tax_rate }}
-          {% if form.tax_rate.errors %}
-            <div class="alert alert-error">{{ form.tax_rate.errors.0 }}</div>
-          {% endif %}
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">
-          {{ form.apply_tax_by_default }}
-          Apply Tax by Default
-        </label>
-        {% if form.apply_tax_by_default.errors %}
-          <div class="alert alert-error">{{ form.apply_tax_by_default.errors.0 }}</div>
-        {% endif %}
-      </div>
-
-      {% if not request.path|slice:':3' == '/us' %}
-      <div class="alert alert-info">
-        <strong>Note:</strong> In Chile use 19.00; in USA use 0.00 or local sales tax.
-      </div>
-      {% endif %}
-
-      <button type="submit" class="cyber-btn">
-        <span class="loading"></span>
-        💱 Update Financial
-      </button>
-    </form>
-  </div>
-
-  <!-- Visual Theme Configuration -->
-  <div class="config-card">
-    <div class="card-header">
-      <div class="card-icon">🎨</div>
-      <div>
-        <h2 class="card-title">Visual Theme</h2>
-        <p class="card-subtitle">Customize your brand colors and visual preferences</p>
-      </div>
-    </div>
-
-    <form method="post">
-      {% csrf_token %}
-      <input type="hidden" name="section" value="theme">
-
-      <div class="form-grid">
-        <div class="form-group">
-          <label class="form-label">{{ form.primary_color.label }}</label>
-          {{ form.primary_color }}
-          {% if form.primary_color.errors %}
-            <div class="alert alert-error">{{ form.primary_color.errors.0 }}</div>
-          {% endif %}
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">{{ form.secondary_color.label }}</label>
-          {{ form.secondary_color }}
-          {% if form.secondary_color.errors %}
-            <div class="alert alert-error">{{ form.secondary_color.errors.0 }}</div>
-          {% endif %}
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">
-          {{ form.separate_by_technician }}
-          Separate by Technician
-        </label>
-        {% if form.separate_by_technician.errors %}
-          <div class="alert alert-error">{{ form.separate_by_technician.errors.0 }}</div>
-        {% endif %}
-      </div>
-      </div>
-
-      <button type="submit" class="cyber-btn">
-        <span class="loading"></span>
-        🎨 Update Theme
-      </button>
-    </form>
-  </div>
-
-  <!-- Quick Actions -->
-  <div class="config-card">
-    <div class="card-header">
-      <div class="card-icon">⚡</div>
-      <div>
-        <h2 class="card-title">Quick Actions</h2>
-        <p class="card-subtitle">Access frequently used system functions</p>
-      </div>
-    </div>
-
-    <div class="quick-actions">
-      <a href="{% country_url 'configuracion_tecnicos' app_namespace='direct' %}" class="action-btn">
-        <span class="action-icon">👨‍🔧</span>
-        <div class="action-title">Manage Technicians</div>
-        <div class="action-desc">Configure technician profiles and permissions</div>
-      </a>
-
-      <a href="{% country_url 'centro_operaciones' app_namespace='direct' %}" class="action-btn">
-        <span class="action-icon">🛰️</span>
-        <div class="action-title">Space Center</div>
-        <div class="action-desc">Access the main operations dashboard</div>
-      </a>
-
-      <a href="/cl/documentos/" class="action-btn">
-        <span class="action-icon">📄</span>
-        <div class="action-title">Documents</div>
-        <div class="action-desc">Manage invoices and service records</div>
-      </a>
-
-      <button type="button" onclick="location.reload()" class="action-btn">
-        <span class="action-icon">🔄</span>
-        <div class="action-title">Refresh System</div>
-        <div class="action-desc">Reload configuration and clear cache</div>
-      </button>
-    </div>
-  </div>
 </div>
+{% endblock %}
 
+{% block extra_js %}
 <script>
-// Add futuristic interactive effects
 document.addEventListener('DOMContentLoaded', function() {
-  // Animate cards on scroll
-  const cards = document.querySelectorAll('.config-card');
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.style.opacity = '1';
-        entry.target.style.transform = 'translateY(0)';
-      }
-    });
-  });
+    // Create floating particles
+    const particlesContainer = document.getElementById('particles');
+    const particleCount = 50;
+    
+    for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.top = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 15 + 's';
+        particle.style.animationDuration = (10 + Math.random() * 10) + 's';
+        particlesContainer.appendChild(particle);
+    }
 
-  cards.forEach((card, index) => {
-    card.style.opacity = '0';
-    card.style.transform = 'translateY(20px)';
-    card.style.transition = `all 0.6s ease ${index * 0.1}s`;
-    observer.observe(card);
-  });
-
-  // Add loading effect to buttons
-  const buttons = document.querySelectorAll('.cyber-btn');
-  buttons.forEach(button => {
-    button.addEventListener('click', function() {
-      const loading = this.querySelector('.loading');
-      if (loading) {
-        loading.style.display = 'inline-block';
-        this.style.opacity = '0.7';
-      }
-    });
-  });
-
-  // Create sparkle particles on button hover
-  function createSparkle(button) {
-    const sparkle = document.createElement('div');
-    sparkle.className = 'sparkle';
-
-    // Random position within button
-    const rect = button.getBoundingClientRect();
-    const x = Math.random() * rect.width;
-    const y = Math.random() * rect.height;
-
-    sparkle.style.left = x + 'px';
-    sparkle.style.top = y + 'px';
-    sparkle.style.animationDelay = Math.random() * 2 + 's';
-
-    button.appendChild(sparkle);
-
-    // Remove after animation
-    setTimeout(() => {
-      sparkle.remove();
-    }, 3000);
-  }
-
-  // Add sparkle effect to all buttons
-  const allButtons = document.querySelectorAll('.cyber-btn, .action-btn');
-  allButtons.forEach(button => {
-    button.addEventListener('mouseenter', function() {
-      // Create multiple sparkles
-      for (let i = 0; i < 3; i++) {
-        setTimeout(() => createSparkle(this), i * 300);
-      }
-    });
-  });
-
-  // Add hover sound effect (optional - visual feedback)
-  allButtons.forEach(button => {
-    button.addEventListener('mouseenter', function() {
-      this.style.transition = 'all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+    // Update section input when tab changes
+    const tabs = document.querySelectorAll('[data-bs-toggle="pill"]');
+    const sectionMapping = {
+        'profile': 'profile',
+        'tax': 'financial',
+        'theme': 'theme',
+        'tecnicos': 'profile'
+    };
+    
+    tabs.forEach(tab => {
+        tab.addEventListener('shown.bs.tab', function(e) {
+            const targetId = e.target.getAttribute('data-bs-target').replace('#', '');
+            const section = sectionMapping[targetId] || 'profile';
+            document.getElementById('sectionInput').value = section;
+        });
     });
 
-    button.addEventListener('mouseleave', function() {
-      this.style.transition = 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+    // Logo preview
+    function previewLogo(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('logoPreview');
+                preview.innerHTML = '<img src="' + e.target.result + '" alt="Logo preview">';
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    // Make previewLogo global
+    window.previewLogo = previewLogo;
+
+    // Real-time color updates
+    const primaryColor = document.getElementById('id_primary_color');
+    const secondaryColor = document.getElementById('id_secondary_color');
+    
+    if (primaryColor) {
+        primaryColor.addEventListener('change', function() {
+            document.documentElement.style.setProperty('--bs-primary', this.value);
+        });
+    }
+    
+    if (secondaryColor) {
+        secondaryColor.addEventListener('change', function() {
+            document.documentElement.style.setProperty('--bs-secondary', this.value);
+        });
+    }
+
+    // Update section before form submit
+    const form = document.getElementById('settingsForm');
+    form.addEventListener('submit', function(e) {
+        if (e.submitter && (e.submitter.name === 'crear_tecnico' || e.submitter.closest('form') && e.submitter.closest('form').querySelector('[name="toggle_tecnico"]'))) {
+            return;
+        }
+        
+        const activeTab = document.querySelector('.nav-link.active');
+        if (activeTab) {
+            const targetId = activeTab.getAttribute('data-bs-target').replace('#', '');
+            const section = sectionMapping[targetId] || 'profile';
+            document.getElementById('sectionInput').value = section;
+        }
     });
-  });
 
-  // Pulsing effect for action icons
-  const actionIcons = document.querySelectorAll('.action-icon');
-  actionIcons.forEach(icon => {
-    setInterval(() => {
-      icon.style.animation = 'none';
-      setTimeout(() => {
-        icon.style.animation = 'icon-pulse 2s ease-in-out infinite';
-      }, 10);
-    }, 4000);
-  });
-
-  // Preview del logo antes de subir
-  const logoInput = document.querySelector('input[type="file"][name="logo"]');
-  if (logoInput) {
-    logoInput.addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-          // Buscar la imagen de preview
-          let preview = document.getElementById('logo-preview');
-
-          if (!preview) {
-            // Si no existe, crear una nueva
-            const logoSection = document.querySelector('.logo-section');
-            preview = document.createElement('img');
-            preview.id = 'logo-preview';
-            preview.className = 'current-logo';
-            preview.style.border = '2px solid #00ffff';
-            preview.style.boxShadow = '0 0 15px rgba(0, 255, 255, 0.5)';
-            logoSection.insertBefore(preview, logoSection.firstChild);
-
-            // Actualizar el texto
-            const logoInfo = logoSection.querySelector('.logo-info');
-            if (logoInfo) {
-              logoInfo.innerHTML = `
-                <h4 style="color: #00ffff; text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);">📸 Preview</h4>
-                <p style="color: #00ff88;">${file.name}</p>
-                <p style="color: #ffd700; margin-top: 0.5rem; font-size: 0.85rem; animation: pulse 2s infinite;">
-                  ⚠️ Click "💾 UPDATE PROFILE" to save this logo
-                </p>
-              `;
+    // Add smooth scroll behavior
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
             }
-          }
-
-          preview.src = event.target.result;
-
-          // Añadir efecto de aparición
-          preview.style.opacity = '0';
-          preview.style.transform = 'scale(0.8)';
-          preview.style.transition = 'all 0.5s ease';
-          setTimeout(() => {
-            preview.style.opacity = '1';
-            preview.style.transform = 'scale(1)';
-          }, 50);
-        };
-        reader.readAsDataURL(file);
-      }
+        });
     });
-  }
 });
 </script>
 {% endblock %}

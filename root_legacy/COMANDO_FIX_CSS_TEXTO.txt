@@ -1,0 +1,102 @@
+═══════════════════════════════════════════════════════════════
+COMANDO PARA CORREGIR CSS RENDERIZADO COMO TEXTO
+═══════════════════════════════════════════════════════════════
+
+El problema es que el CSS aparece como texto en la página en lugar de aplicarse.
+Esto generalmente se debe a:
+1. Etiqueta </style> faltante o mal ubicada
+2. CSS fuera de las etiquetas <style>
+3. Problemas de encoding
+
+Ejecuta este comando en el servidor:
+
+cd /home/atlantareciclajes/apps/egarage/current && \
+python3 << 'PYEOF'
+import sys
+
+file_path = "templates/public/selector_pais.html"
+
+with open(file_path, 'r', encoding='utf-8') as f:
+    content = f.read()
+    lines = content.splitlines(keepends=True)
+
+# Verificar y corregir estructura
+in_style = False
+style_start_idx = None
+style_end_idx = None
+
+for i, line in enumerate(lines):
+    if '<style>' in line or '<style ' in line:
+        in_style = True
+        style_start_idx = i
+    if '</style>' in line:
+        in_style = False
+        style_end_idx = i
+        break
+
+# Si no hay cierre de style, agregarlo antes de </head>
+if style_start_idx is not None and style_end_idx is None:
+    print("⚠️  No se encontró </style>, agregando...")
+    for i, line in enumerate(lines):
+        if '</head>' in line:
+            lines.insert(i, '  </style>\n')
+            break
+
+# Verificar que no haya CSS fuera de style
+# Si hay CSS fuera, moverlo dentro
+if style_start_idx is not None and style_end_idx is not None:
+    # Verificar si hay CSS después de </style> pero antes de </head>
+    css_outside = False
+    for i in range(style_end_idx + 1, len(lines)):
+        if '</head>' in lines[i]:
+            break
+        if '{' in lines[i] and '}' in lines[i] and 'style' not in lines[i].lower():
+            css_outside = True
+            print(f"⚠️  CSS encontrado fuera de <style> en línea {i+1}")
+            break
+    
+    if css_outside:
+        print("🔧 Reconstruyendo estructura...")
+        # Reconstruir el archivo correctamente
+        new_lines = []
+        in_style_tag = False
+        
+        for i, line in enumerate(lines):
+            if '<style>' in line or '<style ' in line:
+                in_style_tag = True
+                new_lines.append(line)
+            elif '</style>' in line:
+                in_style_tag = False
+                new_lines.append(line)
+            elif '</head>' in line and in_style_tag:
+                # Cerrar style antes de head
+                new_lines.append('  </style>\n')
+                new_lines.append(line)
+                in_style_tag = False
+            else:
+                new_lines.append(line)
+        
+        lines = new_lines
+
+# Escribir archivo corregido
+with open(file_path, 'w', encoding='utf-8') as f:
+    f.writelines(lines)
+
+print("✅ Archivo corregido")
+PYEOF
+
+touch /var/www/www_egarage_cl_wsgi.py && \
+echo "✅ Servidor reiniciado"
+
+═══════════════════════════════════════════════════════════════
+
+Versión más simple - solo verificar y mostrar problemas:
+
+cd /home/atlantareciclajes/apps/egarage/current && \
+grep -n "</style>" templates/public/selector_pais.html && \
+grep -n "<style" templates/public/selector_pais.html && \
+echo "✅ Etiquetas style encontradas" || \
+echo "❌ Problema con etiquetas style"
+
+═══════════════════════════════════════════════════════════════
+

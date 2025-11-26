@@ -1,4 +1,4 @@
-from djangodamelalistadearchttp import Http404
+from django.http import Http404
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -48,11 +48,35 @@ class DocumentoFormView(CountryLangTemplateMixin, LoginRequiredMixin, CreateView
         # Obtener country code
         company_country = getattr(empresa, "pais", "CL") if empresa else "CL"
 
-        # URLs para navegación
+        # URLs para navegación - Generar URL con prefijo de país correcto
+        from django.urls import NoReverseMatch
+
         try:
-            settings_url = reverse("taller:company_settings")
-        except:
-            settings_url = ""
+            # Detectar país desde el path del request
+            if self.request.path.startswith("/us/"):
+                # Para USA, usar namespace usa:company_settings
+                settings_url = reverse("usa:company_settings")
+            elif self.request.path.startswith("/cl/"):
+                # Para Chile, intentar chile:company_settings primero, luego fallback
+                try:
+                    settings_url = reverse("chile:company_settings")
+                except NoReverseMatch:
+                    settings_url = reverse("taller:company_settings")
+            else:
+                # Fallback: usar default
+                settings_url = reverse("taller:company_settings")
+        except NoReverseMatch:
+            # Fallback: construir URL manualmente basada en el path
+            if self.request.path.startswith("/us/"):
+                settings_url = "/us/settings/"
+            else:
+                settings_url = "/cl/es/settings/"
+        except Exception:
+            # Fallback de emergencia
+            if self.request.path.startswith("/us/"):
+                settings_url = "/us/settings/"
+            else:
+                settings_url = "/cl/es/settings/"
 
         context.update(
             {
@@ -122,11 +146,35 @@ class DocumentoUpdateView(CountryLangTemplateMixin, LoginRequiredMixin, UpdateVi
         # Obtener country code
         company_country = getattr(empresa, "pais", "CL") if empresa else "CL"
 
-        # URLs para navegación
+        # URLs para navegación - Generar URL con prefijo de país correcto
+        from django.urls import NoReverseMatch
+
         try:
-            settings_url = reverse("taller:company_settings")
-        except:
-            settings_url = ""
+            # Detectar país desde el path del request
+            if self.request.path.startswith("/us/"):
+                # Para USA, usar namespace usa:company_settings
+                settings_url = reverse("usa:company_settings")
+            elif self.request.path.startswith("/cl/"):
+                # Para Chile, intentar chile:company_settings primero, luego fallback
+                try:
+                    settings_url = reverse("chile:company_settings")
+                except NoReverseMatch:
+                    settings_url = reverse("taller:company_settings")
+            else:
+                # Fallback: usar default
+                settings_url = reverse("taller:company_settings")
+        except NoReverseMatch:
+            # Fallback: construir URL manualmente basada en el path
+            if self.request.path.startswith("/us/"):
+                settings_url = "/us/settings/"
+            else:
+                settings_url = "/cl/es/settings/"
+        except Exception:
+            # Fallback de emergencia
+            if self.request.path.startswith("/us/"):
+                settings_url = "/us/settings/"
+            else:
+                settings_url = "/cl/es/settings/"
 
         context.update(
             {

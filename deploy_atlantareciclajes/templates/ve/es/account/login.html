@@ -1,0 +1,392 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}Iniciar Sesión - eGarage Venezuela{% endblock %}
+
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: linear-gradient(135deg, #000814 0%, #001428 50%, #000814 100%);
+    font-family: 'Exo 2', sans-serif;
+    color: #ffffff;
+    min-height: 100vh;
+    overflow-x: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.font-futuristic {
+    font-family: 'Orbitron', monospace;
+    letter-spacing: 0.05em;
+}
+
+/* Grid animado de fondo */
+.tech-grid {
+    background-image:
+        linear-gradient(rgba(255, 204, 0, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 204, 0, 0.08) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: grid-move 20s linear infinite;
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+}
+
+@keyframes grid-move {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(50px, 50px); }
+}
+
+/* Login container */
+.login-container {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 500px;
+    padding: 20px;
+}
+
+/* Glass morphism card */
+.glass-card {
+    background: linear-gradient(135deg, rgba(255, 204, 0, 0.12) 0%, rgba(0, 36, 125, 0.08) 100%);
+    backdrop-filter: blur(30px);
+    border-radius: 2rem;
+    border: 2px solid rgba(255, 204, 0, 0.4);
+    box-shadow:
+        0 20px 60px rgba(255, 204, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    padding: 3rem 2.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.glass-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        rgba(255, 204, 0, 0.1) 60deg,
+        transparent 120deg
+    );
+    animation: shimmer 4s linear infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.login-content {
+    position: relative;
+    z-index: 1;
+}
+
+/* Logo y header */
+.logo-section {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.logo {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1rem;
+    filter: drop-shadow(0 0 20px rgba(255, 204, 0, 0.6));
+}
+
+.brand-title {
+    font-size: 2rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, #FFCC00 0%, #CF142B 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 30px rgba(255, 204, 0, 0.3);
+}
+
+.subtitle {
+    color: #94a3b8;
+    font-size: 0.9rem;
+}
+
+.login-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #FFCC00;
+    margin-bottom: 2rem;
+    text-align: center;
+    text-shadow: 0 0 15px rgba(255, 204, 0, 0.4);
+}
+
+/* Formulario */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #FFCC00;
+    margin-bottom: 0.5rem;
+}
+
+.form-input {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1rem;
+    color: #ffffff;
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid rgba(255, 204, 0, 0.3);
+    border-radius: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #FFCC00;
+    background: rgba(0, 0, 0, 0.7);
+    box-shadow: 0 0 20px rgba(255, 204, 0, 0.3);
+}
+
+.form-input::placeholder {
+    color: #64748b;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.checkbox-container input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: #FFCC00;
+    cursor: pointer;
+}
+
+.checkbox-label {
+    color: #94a3b8;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.login-button {
+    width: 100%;
+    padding: 1.2rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #000000;
+    background: linear-gradient(135deg, #FFCC00 0%, #CF142B 100%);
+    border: none;
+    border-radius: 0.75rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 25px rgba(255, 204, 0, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.login-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 40px rgba(255, 204, 0, 0.8);
+}
+
+.forgot-password {
+    text-align: center;
+    margin-top: 1rem;
+}
+
+.forgot-password a {
+    color: #FFCC00;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.forgot-password a:hover {
+    text-shadow: 0 0 10px rgba(255, 204, 0, 0.8);
+}
+
+.divider {
+    margin: 2rem 0;
+    text-align: center;
+    position: relative;
+}
+
+.divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: rgba(255, 204, 0, 0.2);
+}
+
+.divider span {
+    background: rgba(0, 0, 0, 0.8);
+    padding: 0 1rem;
+    position: relative;
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+.signup-link {
+    text-align: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 204, 0, 0.2);
+}
+
+.signup-link-text {
+    color: #94a3b8;
+    font-size: 0.9rem;
+}
+
+.signup-link a {
+    color: #FFCC00;
+    text-decoration: none;
+    font-weight: 600;
+    margin-left: 0.3rem;
+}
+
+.signup-link a:hover {
+    text-shadow: 0 0 10px rgba(255, 204, 0, 0.8);
+}
+
+.error-message {
+    background: rgba(207, 20, 43, 0.2);
+    border: 1px solid rgba(207, 20, 43, 0.5);
+    color: #CF142B;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 640px) {
+    .glass-card {
+        padding: 2rem 1.5rem;
+    }
+    .brand-title {
+        font-size: 1.5rem;
+    }
+    .login-title {
+        font-size: 1.5rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="tech-grid"></div>
+
+<div class="login-container">
+    <div class="glass-card">
+        <div class="login-content">
+            <!-- Logo y título -->
+            <div class="logo-section">
+                <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage Logo" class="logo">
+                <h1 class="brand-title font-futuristic">eGarage Venezuela 🇻🇪</h1>
+                <p class="subtitle">Gestión Profesional para Talleres</p>
+            </div>
+
+            <h2 class="login-title font-futuristic">Iniciar Sesión</h2>
+
+            <!-- Errores -->
+            {% if form.non_field_errors %}
+            <div class="error-message">
+                {{ form.non_field_errors }}
+            </div>
+            {% endif %}
+
+            <!-- Formulario -->
+            <form method="POST" action="{% url 'venezuela:account_login' %}">
+                {% csrf_token %}
+
+                <!-- Email o Usuario -->
+                <div class="form-group">
+                    <label class="form-label">Usuario o Correo Electrónico</label>
+                    {{ form.login|add_class:"form-input" }}
+                    {% if form.login.errors %}
+                    <div class="error-message">{{ form.login.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <!-- Contraseña -->
+                <div class="form-group">
+                    <label class="form-label">Contraseña</label>
+                    {{ form.password|add_class:"form-input" }}
+                    {% if form.password.errors %}
+                    <div class="error-message">{{ form.password.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <!-- Remember me -->
+                <div class="checkbox-container">
+                    {{ form.remember|add_class:"form-checkbox" }}
+                    <label for="id_remember" class="checkbox-label">
+                        Mantener sesión iniciada
+                    </label>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="login-button font-futuristic">
+                    🔐 Iniciar Sesión
+                </button>
+
+                <!-- Forgot Password -->
+                <div class="forgot-password">
+                    <a href="/ve/accounts/password/reset/">¿Olvidaste tu contraseña?</a>
+                </div>
+            </form>
+
+            <!-- Divider -->
+            <div class="divider">
+                <span>o</span>
+            </div>
+
+            <!-- Signup Link -->
+            <div class="signup-link">
+                <span class="signup-link-text">¿No tienes cuenta?</span>
+                <a href="/ve/signup/">Regístrate gratis</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Agregar partículas animadas
+const particlesContainer = document.createElement('div');
+particlesContainer.className = 'particles';
+document.body.appendChild(particlesContainer);
+
+for (let i = 0; i < 20; i++) {
+    const particle = document.createElement('div');
+    particle.className = 'particle';
+    particle.style.left = `${Math.random() * 100}%`;
+    particle.style.animationDelay = `${Math.random() * 10}s`;
+    particle.style.animationDuration = `${10 + Math.random() * 10}s`;
+    particlesContainer.appendChild(particle);
+}
+</script>
+{% endblock %}
+

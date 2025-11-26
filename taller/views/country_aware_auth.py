@@ -7,7 +7,7 @@ class CountryAwareLoginView(LoginView):
     Implementación de LoginView que detecta el país/idioma antes de delegar en allauth.
     """
 
-    template_name = "taller/cl/es/account/login.html"
+    template_name = "cl/es/account/login.html"
 
     def dispatch(self, request, *args, **kwargs):
         self._apply_country_context(request)
@@ -139,16 +139,16 @@ class CountryAwareLoginView(LoginView):
 
         if country == "US":
             if lang == "es":
-                return ["taller/cl/es/account/login.html"]
-            return ["taller/us/en/account/login.html"]
+                return ["cl/es/account/login.html"]
+            return ["us/en/account/login.html"]
         if country == "MX":
             if lang == "en":
-                return ["taller/us/en/account/login.html"]
+                return ["us/en/account/login.html"]
             return ["taller/mx/es/account/login.html"]
 
         if lang == "en":
-            return ["taller/us/en/account/login.html"]
-        return ["taller/cl/es/account/login.html"]
+            return ["us/en/account/login.html"]
+        return ["cl/es/account/login.html"]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

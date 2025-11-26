@@ -1,0 +1,73 @@
+#!/bin/bash
+# Script para cargar ciudades de US desde el JSON
+
+cd /home/atlantareciclajes/apps/egarage/current && \
+python3 << 'PYEOF'
+import os
+import django
+import json
+from pathlib import Path
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings')
+django.setup()
+
+from taller.models.ubicacion import Estado, Ciudad
+
+print("🔍 Cargando ciudades de US desde JSON...\n")
+
+# Ruta al archivo JSON
+json_path = Path('utils/estados_ciudades_usa.json')
+
+if not json_path.exists():
+    print(f"❌ Error: No se encontró el archivo {json_path}")
+    exit(1)
+
+# Leer el JSON
+with open(json_path, 'r', encoding='utf-8') as f:
+    datos = json.load(f)
+
+print(f"📊 Estados encontrados en JSON: {len(datos)}\n")
+
+total_ciudades_creadas = 0
+total_ciudades_existentes = 0
+
+for nombre_estado, ciudades_lista in datos.items():
+    # Buscar el estado por nombre
+    try:
+        estado = Estado.objects.get(pais='US', nombre=nombre_estado)
+        print(f"✅ Estado encontrado: {nombre_estado} ({estado.codigo})")
+    except Estado.DoesNotExist:
+        print(f"⚠️  Estado no encontrado: {nombre_estado} - Saltando...")
+        continue
+    except Estado.MultipleObjectsReturned:
+        print(f"⚠️  Múltiples estados encontrados para: {nombre_estado} - Usando el primero")
+        estado = Estado.objects.filter(pais='US', nombre=nombre_estado).first()
+    
+    ciudades_creadas = 0
+    ciudades_existentes = 0
+    
+    for nombre_ciudad in ciudades_lista:
+        ciudad, created = Ciudad.objects.get_or_create(
+            estado=estado,
+            nombre=nombre_ciudad,
+            defaults={}
+        )
+        if created:
+            ciudades_creadas += 1
+            total_ciudades_creadas += 1
+        else:
+            ciudades_existentes += 1
+            total_ciudades_existentes += 1
+    
+    print(f"   📍 Ciudades: {ciudades_creadas} creadas, {ciudades_existentes} ya existían")
+    print()
+
+print(f"\n✅ Resumen:")
+print(f"   📊 Total ciudades creadas: {total_ciudades_creadas}")
+print(f"   📊 Total ciudades ya existentes: {total_ciudades_existentes}")
+print(f"   📊 Total ciudades US en BD: {Ciudad.objects.filter(estado__pais='US').count()}")
+
+PYEOF
+
+echo "✅ Carga de ciudades completada"
+

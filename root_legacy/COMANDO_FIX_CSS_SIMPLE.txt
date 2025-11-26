@@ -1,0 +1,92 @@
+═══════════════════════════════════════════════════════════════
+COMANDO SIMPLE PARA CORREGIR CSS SIN ETIQUETA <style>
+═══════════════════════════════════════════════════════════════
+
+Ejecuta este comando en el servidor:
+
+cd /home/atlantareciclajes/apps/egarage/current && \
+cp templates/public/selector_pais.html templates/public/selector_pais.html.backup && \
+python3 << 'PYEOF'
+import re
+
+file_path = "templates/public/selector_pais.html"
+
+with open(file_path, 'r', encoding='utf-8') as f:
+    lines = f.readlines()
+
+# Buscar CSS suelto (patrón: selector{propiedades})
+css_pattern = re.compile(r'^[a-zA-Z0-9_#\.\-\s]+\{[^}]+\}')
+
+# Buscar dónde está el CSS suelto
+css_start = None
+for i, line in enumerate(lines):
+    stripped = line.strip()
+    # Si es CSS y no está dentro de <style>
+    if css_pattern.search(stripped) and '<style' not in line and '</style>' not in line and stripped:
+        if css_start is None:
+            css_start = i
+        break
+
+if css_start is not None:
+    print(f"⚠️  CSS encontrado fuera de <style> en línea {css_start+1}")
+    
+    # Buscar </head> para insertar <style> antes
+    head_close_idx = None
+    for i, line in enumerate(lines):
+        if '</head>' in line:
+            head_close_idx = i
+            break
+    
+    if head_close_idx:
+        # Envolver el CSS en <style>
+        # Primero, encontrar todas las líneas de CSS consecutivas
+        css_lines = []
+        for i in range(css_start, len(lines)):
+            stripped = lines[i].strip()
+            if css_pattern.search(stripped) or (stripped and '{' in stripped and '}' in stripped):
+                css_lines.append(lines[i])
+            else:
+                break
+        
+        if css_lines:
+            # Eliminar las líneas de CSS sueltas
+            new_lines = lines[:css_start] + lines[css_start+len(css_lines):]
+            
+            # Insertar <style> y </style> con el CSS en el head
+            style_block = ['  <style>\n'] + css_lines + ['  </style>\n']
+            
+            # Insertar antes de </head>
+            final_lines = new_lines[:head_close_idx] + style_block + new_lines[head_close_idx:]
+            
+            with open(file_path, 'w', encoding='utf-8') as f:
+                f.writelines(final_lines)
+            
+            print(f"✅ {len(css_lines)} líneas de CSS envueltas en <style>")
+        else:
+            print("⚠️  No se pudieron identificar las líneas de CSS")
+    else:
+        print("❌ No se encontró </head>")
+else:
+    print("✅ No se encontró CSS fuera de etiquetas <style>")
+    
+    # Verificar que exista <style>
+    content = ''.join(lines)
+    if '<style>' not in content and '<style ' not in content:
+        print("⚠️  No se encontró etiqueta <style>")
+        # Buscar </head> y agregar <style> básico
+        for i, line in enumerate(lines):
+            if '</head>' in line:
+                lines.insert(i, '  <style>\n  </style>\n')
+                with open(file_path, 'w', encoding='utf-8') as f:
+                    f.writelines(lines)
+                print("✅ Etiqueta <style> básica agregada")
+                break
+    else:
+        print("✅ Estructura correcta")
+PYEOF
+
+touch /var/www/www_egarage_cl_wsgi.py && \
+echo "✅ Servidor reiniciado"
+
+═══════════════════════════════════════════════════════════════
+

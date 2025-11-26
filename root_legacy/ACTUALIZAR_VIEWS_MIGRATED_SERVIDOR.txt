@@ -1,0 +1,63 @@
+═══════════════════════════════════════════════════════════════
+ACTUALIZAR views_migrated.py EN EL SERVIDOR
+═══════════════════════════════════════════════════════════════
+
+Ejecuta este comando para corregir el uso de F() en Coalesce:
+
+cd /home/atlantareciclajes/apps/egarage/current && \
+python3 << 'PYEOF'
+import re
+
+file_path = 'taller/documentos/views_migrated.py'
+
+print(f"📝 Actualizando {file_path}...\n")
+
+# Leer el archivo
+with open(file_path, 'r', encoding='utf-8') as f:
+    content = f.read()
+
+# Buscar y reemplazar el Coalesce problemático
+old_pattern = r'\.annotate\(\s*total_display=Coalesce\(\s*"legacy_total_general",\s*"total",'
+new_replacement = r'.annotate(\n                    total_display=Coalesce(\n                        F("legacy_total_general"),'
+
+# Reemplazar
+if '"legacy_total_general"' in content and '"total",' in content:
+    # Reemplazo más específico
+    content = re.sub(
+        r'(\.annotate\(\s*total_display=Coalesce\(\s*)"legacy_total_general"(\s*,\s*)"total"(\s*,)',
+        r'\1F("legacy_total_general")\2',
+        content,
+        flags=re.MULTILINE
+    )
+    print("✅ Reemplazo realizado")
+else:
+    print("ℹ️  El patrón no se encontró (puede que ya esté corregido)")
+
+# Verificar que F está importado
+if 'from django.db.models import' in content and 'F,' in content:
+    print("✅ F() ya está importado")
+elif 'from django.db.models import' in content:
+    # Agregar F a los imports
+    content = re.sub(
+        r'(from django\.db\.models import \([^)]+)',
+        r'\1\n    F,',
+        content
+    )
+    print("✅ F() agregado a los imports")
+else:
+    print("⚠️  No se encontró el bloque de imports de django.db.models")
+
+# Guardar el archivo
+with open(file_path, 'w', encoding='utf-8') as f:
+    f.write(content)
+
+print(f"\n✅ Archivo {file_path} actualizado")
+PYEOF
+
+echo ""
+echo "✅ Archivo actualizado. Reiniciando servidor..."
+touch /var/www/www_egarage_cl_wsgi.py
+echo "✅ Servidor reiniciado"
+
+═══════════════════════════════════════════════════════════════
+

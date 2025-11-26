@@ -25,9 +25,22 @@ def ajax_crear_estado_usa(request):
             {"success": False, "error": "State name and code are required"}, status=400
         )
 
-    # Verificar si ya existe
-    if EstadoUSA.objects.filter(codigo=codigo).exists():
-        estado = EstadoUSA.objects.get(codigo=codigo)
+    # Obtener país del usuario/empresa
+    pais = "US"  # Default
+    if hasattr(request.user, "empresa") and request.user.empresa:
+        pais = request.user.empresa.pais
+    elif hasattr(request, "empresa") and request.empresa:
+        pais = request.empresa.pais
+    elif hasattr(request, "country"):
+        pais = request.country
+    elif request.path.startswith("/us/"):
+        pais = "US"
+    elif request.path.startswith("/cl/"):
+        pais = "CL"
+
+    # Verificar si ya existe (por país y código)
+    if EstadoUSA.objects.filter(pais=pais, codigo=codigo).exists():
+        estado = EstadoUSA.objects.get(pais=pais, codigo=codigo)
         return JsonResponse(
             {
                 "success": True,
@@ -42,7 +55,7 @@ def ajax_crear_estado_usa(request):
 
     # Crear nuevo estado
     try:
-        estado = EstadoUSA.objects.create(nombre=nombre, codigo=codigo)
+        estado = EstadoUSA.objects.create(nombre=nombre, codigo=codigo, pais=pais)
         return JsonResponse(
             {
                 "success": True,

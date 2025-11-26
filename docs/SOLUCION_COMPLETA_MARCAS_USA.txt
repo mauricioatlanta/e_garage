@@ -1,0 +1,82 @@
+# ============================================
+# SOLUCIÓN COMPLETA: Cargar y Verificar Marcas USA
+# ============================================
+
+# PASO 1: Ejecutar diagnóstico para ver qué hay en la BD
+cd ~/apps/egarage/current && python3.10 << 'ENDPYTHON'
+import os
+import django
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings')
+
+try:
+    django.setup()
+except Exception as e:
+    print(f"Warning: {e}")
+
+from taller.models.marca import Marca
+
+print("=" * 70)
+print("DIAGNÓSTICO DE MARCAS")
+print("=" * 70)
+
+# Verificar marcas existentes
+total_us = Marca.objects.filter(country='US').count()
+total_all = Marca.objects.count()
+
+print(f"\n📊 Estado actual:")
+print(f"   Marcas con country='US': {total_us}")
+print(f"   Total marcas (todos países): {total_all}")
+
+if total_us == 0:
+    print("\n⚠️ No hay marcas para US. Cargando marcas...")
+    
+    marcas_usa = [
+        "Acura", "Audi", "BMW", "Buick", "Cadillac", "Chevrolet", "Chrysler", "Dodge",
+        "Ford", "GMC", "Honda", "Hyundai", "Infiniti", "Jeep", "Kia", "Lexus",
+        "Lincoln", "Mazda", "Mercedes-Benz", "Mitsubishi", "Nissan", "Ram", "Subaru",
+        "Toyota", "Volkswagen", "Volvo", "Tesla", "Genesis", "Alfa Romeo", "Jaguar",
+        "Land Rover", "Porsche", "Mini", "Fiat", "Maserati", "Bentley", "Rolls-Royce",
+        "Aston Martin", "McLaren", "Ferrari", "Lamborghini",
+    ]
+    
+    creadas = 0
+    for marca_nombre in marcas_usa:
+        marca, created = Marca.objects.get_or_create(
+            nombre=marca_nombre,
+            country="US",
+            defaults={"nombre": marca_nombre, "country": "US"},
+        )
+        if created:
+            print(f"   ✅ {marca_nombre}")
+            creadas += 1
+    
+    print(f"\n✅ {creadas} marcas creadas")
+    
+    # Verificar después de cargar
+    total_despues = Marca.objects.filter(country='US').count()
+    print(f"📊 Total marcas US después de cargar: {total_despues}")
+    
+    if total_despues > 0:
+        print("\n✅ Marcas cargadas exitosamente. Verificando...")
+        marcas = Marca.objects.filter(country='US').order_by('nombre')[:10]
+        for m in marcas:
+            print(f"   - {m.id}: {m.nombre}")
+    else:
+        print("\n❌ ERROR: Las marcas no se guardaron correctamente")
+        print("   Verifica los logs de Django para más información")
+else:
+    print(f"\n✅ Ya hay {total_us} marcas para US")
+    print("\nPrimeras 10 marcas:")
+    marcas = Marca.objects.filter(country='US').order_by('nombre')[:10]
+    for m in marcas:
+        print(f"   - {m.id}: {m.nombre} (country={m.country})")
+
+print("\n" + "=" * 70)
+ENDPYTHON
+
+# PASO 2: Si el diagnóstico muestra que no hay marcas, ejecutar este script de carga
+# (El script anterior ya incluye la carga, pero puedes ejecutarlo de nuevo si es necesario)
+
+
+

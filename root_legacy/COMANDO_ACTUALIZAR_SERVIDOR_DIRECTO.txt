@@ -1,0 +1,65 @@
+===============================================================
+🚀 COMANDOS PARA ACTUALIZAR SERVIDOR - DIRECTORIO CORRECTO
+===============================================================
+
+## 📍 PASO 1: ENCONTRAR EL DIRECTORIO CORRECTO
+
+Ya estás en: ~/apps/egarage/current
+
+Verifica que estás en el directorio correcto:
+```bash
+pwd
+ls -la | grep manage.py
+```
+
+Si ves manage.py, estás en el lugar correcto.
+
+## 🔄 PASO 2: ACTUALIZAR DESDE GIT
+
+```bash
+# Si estás en ~/apps/egarage/current, ejecuta:
+git pull origin main
+```
+
+## ✅ PASO 3: VERIFICAR Y RECOPILAR ESTÁTICOS
+
+```bash
+# Activar entorno virtual (ajusta el nombre si es diferente)
+workon venv_egarage
+# O si no funciona:
+# source venv/bin/activate
+
+# Verificar configuración
+python manage.py check
+
+# Recopilar estáticos
+python manage.py collectstatic --noinput
+```
+
+## 🔄 PASO 4: REINICIAR APLICACIÓN
+
+Desde el dashboard de PythonAnywhere:
+1. Ir a pestaña "Web"
+2. Buscar tu aplicación
+3. Clic en "Reload"
+
+## 📝 COMANDO COMPLETO (AJUSTADO)
+
+```bash
+# Desde ~/apps/egarage/current
+git pull origin main && python manage.py check && python manage.py collectstatic --noinput && echo "✅ Cambios aplicados. Ahora recarga desde dashboard Web → Reload"
+```
+
+## 🔍 SI EL DIRECTORIO ES DIFERENTE
+
+Si el proyecto está en otro lugar, busca así:
+```bash
+# Buscar manage.py
+find ~ -name "manage.py" -type f 2>/dev/null | head -5
+
+# O buscar directorio e_garage
+find ~ -type d -name "*egarage*" 2>/dev/null | head -5
+```
+
+===============================================================
+

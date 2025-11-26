@@ -1,0 +1,67 @@
+═══════════════════════════════════════════════════════════════
+COMANDO PARA VERIFICAR Y CREAR MARCAS DE CHILE
+═══════════════════════════════════════════════════════════════
+
+Ejecuta este comando en el servidor para verificar y crear marcas:
+
+cd /home/atlantareciclajes/apps/egarage/current && \
+python3 << 'PYEOF'
+import os
+import django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings')
+django.setup()
+
+from taller.models.marca import Marca
+
+print("🔍 Verificando marcas de Chile...\n")
+print("=" * 70)
+
+# Verificar marcas existentes
+marcas_chile = Marca.objects.filter(country='CL')
+print(f"📊 Total de marcas para Chile: {marcas_chile.count()}")
+
+if marcas_chile.count() > 0:
+    print("\n✅ Marcas existentes:")
+    for m in marcas_chile[:20]:  # Mostrar primeras 20
+        print(f"   - {m.id}: {m.nombre}")
+    if marcas_chile.count() > 20:
+        print(f"   ... y {marcas_chile.count() - 20} más")
+else:
+    print("❌ No hay marcas para Chile")
+    print("\n💡 Creando marcas comunes de Chile...\n")
+    
+    marcas_comunes = [
+        "Toyota", "Chevrolet", "Ford", "Nissan", "Hyundai",
+        "Kia", "Mazda", "Suzuki", "Mitsubishi", "Honda",
+        "Volkswagen", "Renault", "Peugeot", "Citroën", "Fiat",
+        "Subaru", "Isuzu", "Great Wall", "Chery", "JAC",
+        "BYD", "Geely", "BMW", "Mercedes-Benz", "Audi",
+        "Volvo", "Land Rover", "Jeep", "Dodge", "Chrysler",
+        "Yamaha", "Kawasaki", "Harley-Davidson", "Ducati",
+    ]
+    
+    creadas = 0
+    for nombre in marcas_comunes:
+        marca, created = Marca.objects.get_or_create(
+            nombre=nombre,
+            country='CL',
+            defaults={'nombre': nombre, 'country': 'CL'}
+        )
+        if created:
+            print(f"✅ Creada: {nombre}")
+            creadas += 1
+        else:
+            print(f"ℹ️  Existente: {nombre}")
+    
+    print()
+    print("=" * 70)
+    print(f"📊 Resumen:")
+    print(f"   ✅ Marcas creadas: {creadas}")
+    print(f"   📈 Total marcas Chile: {Marca.objects.filter(country='CL').count()}")
+    print("=" * 70)
+
+print("\n✅ Proceso completado")
+PYEOF
+
+═══════════════════════════════════════════════════════════════
+

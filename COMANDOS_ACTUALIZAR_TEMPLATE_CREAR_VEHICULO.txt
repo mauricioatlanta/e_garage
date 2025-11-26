@@ -1,0 +1,116 @@
+===========================================
+SOLUCIÓN: Template crear_vehiculo no actualizado
+===========================================
+
+PROBLEMA:
+---------
+/us/vehiculos/crear/ muestra login en lugar del formulario
+Template esperado: us/en/vehiculos/crear_vehiculo.html
+
+DIAGNÓSTICO (Ejecutar en el servidor):
+---------------------------------------
+
+cd /home/atlantareciclajes/apps/egarage/current
+workon venv_egarage310
+
+# 1. Verificar qué template se está usando
+python manage.py shell << 'PYTHON'
+from taller.vehiculos.views_fbv import _vehicle_template
+template = _vehicle_template("crear", "US")
+print(f"Template esperado: {template}")
+exit()
+PYTHON
+
+# 2. Verificar que el template existe
+ls -la templates/us/en/vehiculos/crear_vehiculo.html
+
+# 3. Ver contenido del template (debe mostrar formulario, no login)
+head -50 templates/us/en/vehiculos/crear_vehiculo.html | grep -E "(form|login|crear)"
+
+# 4. Ver fecha de modificación
+stat templates/us/en/vehiculos/crear_vehiculo.html
+
+
+SOLUCIÓN (Si el template está desactualizado):
+-----------------------------------------------
+
+# OPCIÓN 1: Git Pull (RECOMENDADA)
+git pull origin main
+
+# Limpiar caché
+find . -type d -name "__pycache__" -exec rm -r {} + 2>/dev/null
+find . -name "*.pyc" -delete
+
+# Recopilar estáticos
+python manage.py collectstatic --noinput
+
+# Recargar aplicación (en dashboard: Web → Reload)
+
+
+# OPCIÓN 2: Verificar si hay otro template que se esté usando
+# Buscar todos los templates de crear_vehiculo
+find templates -name "*crear_vehiculo*" -type f
+
+# Verificar cuál se está usando realmente
+python manage.py shell << 'PYTHON'
+from django.template.loader import get_template
+try:
+    template = get_template('us/en/vehiculos/crear_vehiculo.html')
+    print(f"✓ Template encontrado: {template.origin}")
+except Exception as e:
+    print(f"✗ Error: {e}")
+    # Intentar con el template alternativo
+    try:
+        template = get_template('taller/us/en/vehiculos/crear_vehiculo.html')
+        print(f"✓ Template alternativo encontrado: {template.origin}")
+    except Exception as e2:
+        print(f"✗ Template alternativo también falla: {e2}")
+exit()
+PYTHON
+
+
+# OPCIÓN 3: Subir archivo específico con FileZilla
+# 1. Conectar FileZilla
+# 2. Navegar a: /home/atlantareciclajes/apps/egarage/current/templates/us/en/vehiculos/
+# 3. Subir: crear_vehiculo.html desde tu PC
+# 4. Recargar aplicación
+
+
+VERIFICACIÓN FINAL:
+-------------------
+
+# 1. Limpiar caché completa
+find . -type d -name "__pycache__" -exec rm -r {} + 2>/dev/null
+find . -name "*.pyc" -delete
+
+# 2. Verificar autenticación del usuario
+python manage.py shell << 'PYTHON'
+from django.contrib.auth.models import User
+user = User.objects.get(username='testuser_usa')
+print(f"Usuario: {user.username}")
+print(f"Activo: {user.is_active}")
+if hasattr(user, 'empresa'):
+    print(f"Empresa: {user.empresa.nombre_taller}")
+    print(f"País: {user.empresa.pais}")
+else:
+    print("⚠️  Usuario NO tiene empresa")
+exit()
+PYTHON
+
+# 3. Recargar aplicación en dashboard
+
+# 4. Probar en navegador (limpiar caché del navegador también)
+# https://www.egarage.cl/us/vehiculos/crear/
+
+===========================================
+SI SIGUE MOSTRANDO LOGIN:
+===========================================
+
+# Verificar logs de errores en el dashboard
+# Web → Error log
+
+# Verificar que la vista se está ejecutando
+# Agregar logging temporal en la vista para ver qué está pasando
+
+===========================================
+

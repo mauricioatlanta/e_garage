@@ -570,24 +570,174 @@ def dashboard_centro_operaciones_espacial(request):
     # 🎯 MÉTRICAS DE EFICIENCIA
     eficiencia_conversion = (facturas_mes / max(presupuestos_mes + facturas_mes, 1)) * 100
 
-    # Branding
-    from taller.models.configuracion import ConfiguracionEmpresa
+    # 📊 DATOS PARA GRÁFICOS (DATOS REALES)
+    import json
+    from calendar import month_abbr
+    
+    # 1. Gráfico de Ingresos Mensuales (últimos 7 meses)
+    ingresos_mensuales_labels = []
+    ingresos_mensuales_data = []
+    for i in range(6, -1, -1):  # Últimos 7 meses (del más antiguo al más reciente)
+        # Calcular el mes retrocediendo correctamente
+        mes_actual = hoy.month
+        año_actual = hoy.year
+        
+        # Retroceder i meses
+        meses_retroceder = i
+        if mes_actual > meses_retroceder:
+            mes_target = mes_actual - meses_retroceder
+            año_target = año_actual
+        else:
+            meses_restantes = meses_retroceder - mes_actual
+            mes_target = 12 - (meses_restantes % 12)
+            if mes_target == 0:
+                mes_target = 12
+            año_target = año_actual - (1 + meses_restantes // 12)
+        
+        inicio_mes = date(año_target, mes_target, 1)
+        if mes_target == 12:
+            fin_mes = date(año_target + 1, 1, 1)
+        else:
+            fin_mes = date(año_target, mes_target + 1, 1)
+        
+        # Calcular facturación del mes (servicios + repuestos)
+        facturacion_mes_srv = total_servicios(
+            LineaServicio.objects.filter(
+                documento__empresa=empresa,
+                documento__tipo="FAC",
+                documento__fecha_emision__gte=inicio_mes,
+                documento__fecha_emision__lt=fin_mes,
+            )
+        ) or Decimal("0")
+        
+        facturacion_mes_rep = total_repuestos(
+            LineaRepuesto.objects.filter(
+                documento__empresa=empresa,
+                documento__tipo="FAC",
+                documento__fecha_emision__gte=inicio_mes,
+                documento__fecha_emision__lt=fin_mes,
+            )
+        ) or Decimal("0")
+        
+        total_mes = float(facturacion_mes_srv + facturacion_mes_rep)
+        ingresos_mensuales_labels.append(month_abbr[inicio_mes.month].upper())
+        ingresos_mensuales_data.append(total_mes)
+    
+    # 2. Gráfico de Servicios (distribución porcentual de los top servicios)
+    servicios_chart_labels = []
+    servicios_chart_data = []
+    servicios_chart_colors = ['#00ffff', '#8a2be2', '#ffd700', '#00ff88', '#ff3b3b']
+    
+    if servicios_top:
+        total_servicios_count = sum(s['cantidad'] for s in servicios_top)
+        for idx, servicio in enumerate(servicios_top[:5]):  # Top 5
+            servicios_chart_labels.append(servicio['nombre'][:20])  # Limitar longitud
+            porcentaje = (servicio['cantidad'] / total_servicios_count * 100) if total_servicios_count > 0 else 0
+            servicios_chart_data.append(round(porcentaje, 1))
+    else:
+        # Si no hay datos, mostrar mensaje vacío
+        servicios_chart_labels = []
+        servicios_chart_data = []
+    
+    # 3. Gráfico de Técnicos Productivos (barras con ingresos generados)
+    tecnicos_chart_labels = []
+    tecnicos_chart_data = []
+    
+    if tecnicos_productivos:
+        for tecnico in tecnicos_productivos[:4]:  # Top 4 técnicos
+            nombre = tecnico['tecnico'].nombre if tecnico['tecnico'] else "Unknown"
+            tecnicos_chart_labels.append(nombre[:15])  # Limitar longitud
+            # Calcular porcentaje de productividad basado en ingresos (normalizado)
+            ingresos = float(tecnico['ingresos_generados'] or 0)
+            # Si hay ingresos, calcular un porcentaje relativo (máximo 100%)
+            if ingresos > 0 and tecnicos_productivos:
+                max_ingresos = max(float(t['ingresos_generados'] or 0) for t in tecnicos_productivos)
+                porcentaje = (ingresos / max_ingresos * 100) if max_ingresos > 0 else 0
+            else:
+                porcentaje = 0
+            tecnicos_chart_data.append(round(porcentaje, 1))
+    else:
+        # Si no hay datos, mostrar mensaje vacío
+        tecnicos_chart_labels = []
+        tecnicos_chart_data = []
+    
+    # Convertir a JSON para pasar al template
+    chart_data_json = json.dumps({
+        'ingresos_mensuales': {
+            'labels': ingresos_mensuales_labels,
+            'data': ingresos_mensuales_data,
+        },
+        'servicios': {
+            'labels': servicios_chart_labels,
+            'data': servicios_chart_data,
+        },
+        'tecnicos': {
+            'labels': tecnicos_chart_labels,
+            'data': tecnicos_chart_data,
+        }
+    })
 
-    conf = ConfiguracionEmpresa.objects.filter(empresa=empresa).first()
-    logo_url = None
-    tagline = None
-    if conf:
-        if getattr(conf, "logo", None):
+    # Branding - Usar la misma lógica que el context processor
+    from django.conf import settings
+    from taller.models.configuracion import ConfiguracionEmpresa
+    from taller.models.company_settings import CompanySettings
+
+    # Inicializar con defaults
+    company_name = getattr(settings, "DEFAULT_BRAND_NAME", "eGarage")
+    logo_url = getattr(settings, "DEFAULT_BRAND_LOGO_URL", None)
+    tagline = getattr(settings, "DEFAULT_BRAND_TAGLINE", None)
+    company_color = getattr(settings, "DEFAULT_BRAND_PRIMARY_COLOR", "#00ffff")
+
+    # 1. PRIORIDAD MÁXIMA: CompanySettings (tabla nueva)
+    try:
+        company_settings = CompanySettings.objects.get(user=request.user)
+        if company_settings.logo:
+            logo_url = company_settings.logo.url
+        if hasattr(company_settings, "company_name") and company_settings.company_name:
+            company_name = company_settings.company_name
+        if hasattr(company_settings, "tagline") and company_settings.tagline:
+            tagline = company_settings.tagline
+        if hasattr(company_settings, "primary_color") and company_settings.primary_color:
+            company_color = company_settings.primary_color
+    except CompanySettings.DoesNotExist:
+        pass
+
+    # 2. SEGUNDA PRIORIDAD: ConfiguracionEmpresa (si no hay CompanySettings)
+    # Solo usar si no se estableció desde CompanySettings
+    try:
+        conf = ConfiguracionEmpresa.objects.get(empresa=empresa)
+        if conf.logo and not logo_url:
             try:
                 logo_url = conf.logo.url
             except Exception:
-                logo_url = None
+                pass
+        # Solo usar nombre_publico si no se estableció desde CompanySettings
+        if hasattr(conf, "nombre_publico") and conf.nombre_publico:
+            if company_name == getattr(settings, "DEFAULT_BRAND_NAME", "eGarage"):
+                company_name = conf.nombre_publico
+        # Solo usar tagline si no se estableció desde CompanySettings
         if hasattr(conf, "tagline") and conf.tagline:
-            tagline = conf.tagline
-    if not logo_url:
-        logo_url = empresa.logo.url if getattr(empresa, "logo", None) else None
+            if not tagline or tagline == getattr(settings, "DEFAULT_BRAND_TAGLINE", None):
+                tagline = conf.tagline
+        # Solo usar brand_color si no se estableció desde CompanySettings
+        if hasattr(conf, "brand_color") and conf.brand_color:
+            if company_color == getattr(settings, "DEFAULT_BRAND_PRIMARY_COLOR", "#00ffff"):
+                company_color = conf.brand_color
+    except ConfiguracionEmpresa.DoesNotExist:
+        pass
+
+    # 3. TERCERA PRIORIDAD: Empresa directamente (fallback)
+    if not logo_url and hasattr(empresa, "logo") and empresa.logo:
+        try:
+            logo_url = empresa.logo.url
+        except Exception:
+            pass
+    if company_name == getattr(settings, "DEFAULT_BRAND_NAME", "eGarage"):
+        company_name = empresa.nombre_taller
     if not tagline:
         tagline = getattr(empresa, "tagline", None)
+    if company_color == getattr(settings, "DEFAULT_BRAND_PRIMARY_COLOR", "#00ffff") and hasattr(empresa, "color_primario") and empresa.color_primario:
+        company_color = empresa.color_primario
 
     context = {
         # Información de empresa
@@ -630,14 +780,14 @@ def dashboard_centro_operaciones_espacial(request):
         # Fechas
         "fecha_hoy": hoy,
         "mes_actual": hoy.strftime("%B %Y"),
-        # Branding
-        "company_name": empresa.nombre_taller,
+        # Branding - usando la misma lógica que el context processor
+        "company_name": company_name,
         "company_logo_url": logo_url,
-        "company_color": (
-            empresa.color_primario if hasattr(empresa, "color_primario") else "#00ffff"
-        ),
+        "company_color": company_color,
         "company_tagline": tagline,
         "es_dashboard_espacial": True,
+        # Datos para gráficos (JSON)
+        "chart_data_json": chart_data_json,
     }
 
     # BRAND object

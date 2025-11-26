@@ -1,0 +1,77 @@
+===========================================
+SOLUCIÓN RÁPIDA: Tabla detalledocumento faltante
+===========================================
+
+PROBLEMA:
+---------
+django.db.utils.OperationalError: no such table: taller_detalledocumento
+
+SOLUCIÓN (Ejecutar en el servidor):
+-----------------------------------
+
+# 1. Ir al directorio del proyecto
+cd /home/atlantareciclajes/apps/egarage/current
+
+# 2. Activar entorno virtual
+workon venv_egarage310
+
+# 3. Verificar qué tablas existen
+python manage.py dbshell << EOF
+.tables | grep taller
+.quit
+EOF
+
+# 4. Obtener SQL para crear la tabla detalledocumento
+python manage.py sqlmigrate taller 0001 | grep -A 100 "CREATE TABLE.*detalledocumento" > /tmp/create_detalle.sql
+
+# 5. Ver el contenido del SQL
+cat /tmp/create_detalle.sql
+
+# 6. Si el SQL está correcto, ejecutarlo manualmente
+python manage.py dbshell
+# (Pegar el SQL del paso 5)
+# .quit
+
+# 7. Marcar migraciones 0001-0004 como aplicadas (fake)
+python manage.py migrate taller 0004 --fake
+
+# 8. Aplicar migraciones desde 0005 en adelante
+python manage.py migrate
+
+# 9. Verificar
+python manage.py check
+python manage.py showmigrations taller | tail -10
+
+===========================================
+SOLUCIÓN ALTERNATIVA (Si la anterior es compleja):
+===========================================
+
+# Revertir todo y aplicar desde cero (CUIDADO: puede perder datos)
+
+# 1. Hacer backup primero
+cp db.sqlite3 db.sqlite3.backup_$(date +%Y%m%d_%H%M%S)
+
+# 2. Desmarcar todas las migraciones de taller
+python manage.py migrate taller zero --fake
+
+# 3. Aplicar todas las migraciones de verdad
+python manage.py migrate taller
+
+# 4. Aplicar el resto
+python manage.py migrate
+
+===========================================
+VERIFICACIÓN:
+===========================================
+
+# Verificar que la tabla existe
+python manage.py dbshell
+.tables | grep detalle
+.schema taller_detalledocumento
+.quit
+
+# Verificar migraciones
+python manage.py showmigrations taller
+
+===========================================
+

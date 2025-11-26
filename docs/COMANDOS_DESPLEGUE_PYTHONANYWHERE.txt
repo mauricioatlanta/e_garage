@@ -1,0 +1,240 @@
+# ============================================
+# COMANDOS PARA DESPLIEGUE EN PYTHONANYWHERE
+# eGarage - Diciembre 2024
+# ============================================
+# INSTRUCCIONES: Copia y pega cada sección según necesites
+# IMPORTANTE: Reemplaza "tu_usuario" con tu usuario de PythonAnywhere
+# IMPORTANTE: Reemplaza "egarage_db" con el nombre de tu base de datos
+# ============================================
+
+# ============================================
+# 1. NAVEGAR AL DIRECTORIO DEL PROYECTO
+# ============================================
+
+cd ~/egarage
+
+
+# ============================================
+# 2. INSTALAR DEPENDENCIAS
+# ============================================
+
+pip3.10 install --user -r requirements.txt
+
+
+# ============================================
+# 3. VERIFICAR QUE PYTHON-DOTENV ESTÁ INSTALADO
+# ============================================
+
+pip3.10 install --user python-dotenv
+
+
+# ============================================
+# 4. CREAR DIRECTORIOS NECESARIOS
+# ============================================
+
+mkdir -p staticfiles
+mkdir -p media
+
+
+# ============================================
+# 5. EJECUTAR MIGRACIONES
+# ============================================
+
+python3.10 manage.py migrate
+
+
+# ============================================
+# 6. RECOLECTAR ARCHIVOS ESTÁTICOS
+# ============================================
+
+python3.10 manage.py collectstatic --noinput
+
+
+# ============================================
+# 7. CREAR SUPERUSUARIO (solo la primera vez)
+# ============================================
+
+python3.10 manage.py createsuperuser
+
+
+# ============================================
+# 8. VERIFICAR CONFIGURACIÓN DE DEPLOYMENT
+# ============================================
+
+python3.10 manage.py check --deploy
+
+
+# ============================================
+# 9. VERIFICAR QUE EL ARCHIVO .env EXISTE
+# ============================================
+
+ls -la .env
+
+
+# ============================================
+# 10. VER LOGS DE ERRORES (si hay problemas)
+# ============================================
+
+tail -f /var/log/tu_usuario.pythonanywhere.com.error.log
+
+
+# ============================================
+# COMANDOS SQL PARA CONFIGURAR BASE DE DATOS
+# Ejecutar en la consola MySQL de PythonAnywhere
+# (Pestaña "Databases" -> "Open MySQL console")
+# ============================================
+
+# Verificar codificación actual de la base de datos
+SHOW CREATE DATABASE tu_usuario$egarage_db;
+
+# Configurar utf8mb4 (si no está configurado)
+ALTER DATABASE tu_usuario$egarage_db CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
+# Verificar que se aplicó
+SHOW CREATE DATABASE tu_usuario$egarage_db;
+
+# Verificar codificación de las tablas después de migraciones
+SELECT TABLE_NAME, TABLE_COLLATION FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'tu_usuario$egarage_db' LIMIT 5;
+
+
+# ============================================
+# COMANDOS DE VERIFICACIÓN POST-DESPLEGUE
+# ============================================
+
+# Verificar que el sitio carga (desde el servidor)
+curl -I https://tu_usuario.pythonanywhere.com
+
+# Verificar headers HTTPS
+curl -I https://tu_usuario.pythonanywhere.com | grep -i "strict-transport-security\|x-frame-options"
+
+
+# ============================================
+# COMANDOS DE TROUBLESHOOTING
+# ============================================
+
+# Si hay error con dotenv, reinstalar
+pip3.10 install --user --upgrade python-dotenv
+
+# Si hay problemas con archivos estáticos, regenerar
+rm -rf staticfiles/*
+python3.10 manage.py collectstatic --noinput
+
+# Si hay problemas con migraciones, ver estado
+python3.10 manage.py showmigrations
+
+# Si necesitas recrear las tablas (CUIDADO: borra datos)
+python3.10 manage.py migrate --run-syncdb
+
+# Ver variables de entorno cargadas (test)
+python3.10 manage.py shell
+# Luego en el shell de Django:
+# from django.conf import settings
+# print(settings.DEBUG)
+# print(settings.ALLOWED_HOSTS)
+# exit()
+
+
+# ============================================
+# ESTRUCTURA DEL ARCHIVO WSGI
+# Copiar y pegar en: /var/www/tu_usuario_pythonanywhere_com_wsgi.py
+# ============================================
+# IMPORTANTE: Editar manualmente desde el panel de PythonAnywhere
+# o usar nano/vim en el servidor:
+# nano /var/www/tu_usuario_pythonanywhere_com_wsgi.py
+# ============================================
+
+import os
+import sys
+from pathlib import Path
+from dotenv import load_dotenv
+
+# Ruta del proyecto (ajusta según tu estructura)
+project_home = '/home/tu_usuario/egarage'
+if project_home not in sys.path:
+    sys.path.insert(0, project_home)
+
+# Cargar variables de entorno ANTES de iniciar Django
+env_path = Path(project_home) / '.env'
+load_dotenv(env_path)
+
+# Configurar Django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings')
+
+from django.core.wsgi import get_wsgi_application
+application = get_wsgi_application()
+
+
+# ============================================
+# ESTRUCTURA DEL ARCHIVO .env
+# Crear en: /home/tu_usuario/egarage/.env
+# ============================================
+# IMPORTANTE: Reemplazar todos los valores con tus datos reales
+# ============================================
+
+# Django Core
+DJANGO_SECRET_KEY=tu-clave-super-secreta-generada
+DJANGO_DEBUG=False
+DJANGO_ALLOWED_HOSTS=tu-dominio.com,www.tu-dominio.com,tu_usuario.pythonanywhere.com
+
+# Base de Datos (MySQL)
+DB_ENGINE=mysql
+DB_NAME=tu_usuario$egarage_db
+DB_USER=tu_usuario
+DB_PASSWORD=tu_password_de_pythonanywhere
+DB_HOST=tu_usuario.mysql.pythonanywhere-services.com
+DB_PORT=3306
+
+# Email (SMTP)
+EMAIL_HOST=srv24.cpanelhost.cl
+EMAIL_PORT=465
+EMAIL_USE_SSL=True
+EMAIL_HOST_USER=subscription@egarage.cl
+EMAIL_HOST_PASSWORD=tu_password_email
+DEFAULT_FROM_EMAIL=eGarage <subscription@egarage.cl>
+
+# HTTPS Forzado
+DJANGO_CSRF_TRUSTED_ORIGINS=https://tu-dominio.com,https://www.tu-dominio.com
+DJANGO_SECURE_SSL_REDIRECT=True
+DJANGO_SESSION_COOKIE_SECURE=True
+DJANGO_CSRF_COOKIE_SECURE=True
+DJANGO_SECURE_HSTS_SECONDS=31536000
+DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS=True
+DJANGO_SECURE_HSTS_PRELOAD=True
+
+# Static Files
+STATIC_ROOT=/home/tu_usuario/egarage/staticfiles
+MEDIA_ROOT=/home/tu_usuario/egarage/media
+
+
+# ============================================
+# SECUENCIA COMPLETA DE DESPLIEGUE
+# Copiar y pegar todo este bloque después de configurar
+# el archivo .env y el WSGI
+# ============================================
+
+cd ~/egarage && \
+pip3.10 install --user -r requirements.txt && \
+pip3.10 install --user python-dotenv && \
+mkdir -p staticfiles media && \
+python3.10 manage.py migrate && \
+python3.10 manage.py collectstatic --noinput && \
+python3.10 manage.py check --deploy
+
+
+# ============================================
+# 11. CARGAR SERVICIOS BÁSICOS (IMPORTANTE)
+# ============================================
+# Ejecutar después de crear empresas para cargar servicios básicos
+
+python3.10 manage.py cargar_servicios_produccion
+
+# Este comando crea:
+# - Categorías y subcategorías para CL y US
+# - Servicios básicos para cada empresa según su país
+# - Asocia servicios a las empresas correspondientes
+
+
+# ============================================
+# FIN DE COMANDOS
+# ============================================
+

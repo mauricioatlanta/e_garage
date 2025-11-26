@@ -994,14 +994,16 @@ select[name="vehiculo"]:hover:not(:focus),
 {% block content %}
 <div class="max-w-7xl mx-auto p-6">
 
-    <!-- 🏢 Cabecera del Documento -->
-    <div class="header-section">
+    <!-- 🏢 Cabecera del Documento - OCULTA -->
+    <!--
+    <div class="header-section" style="display: none;">
         <h1 class="header-title">
             📄 {{ pais_emoji }} {% block documento_header %}{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Document Management{% else %}Gestión de Documento{% endif %}{% endblock %}
         </h1>
         <p class="header-subtitle">{{ empresa.nombre_taller }} - {% block documento_subtitle %}{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Document Form{% else %}Formulario de Documento{% endif %}{% endblock %}</p>
         <p class="header-info">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}User: {{ user.username }}{% else %}Usuario: {{ user.username }}{% endif %} | {{ empresa.get_pais_display }} | {{ fecha_hoy|date:"l, d F Y" }}</p>
     </div>
+    -->
 
     <!-- Mensajes del sistema -->
     {% if messages %}

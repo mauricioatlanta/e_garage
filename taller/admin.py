@@ -611,18 +611,24 @@ class ConfigEmpresaAdmin(admin.ModelAdmin):
     list_display = (
         "empresa",
         "nombre_publico",
+        "rubro_principal",
         "moneda",
         "tasa_impuesto",
         "aplicar_impuesto_por_defecto",
         "dividir_por_tecnico",
     )
-    list_filter = ("moneda", "aplicar_impuesto_por_defecto", "dividir_por_tecnico")
+    list_filter = (
+        "rubro_principal",
+        "moneda",
+        "aplicar_impuesto_por_defecto",
+        "dividir_por_tecnico",
+    )
     search_fields = ("empresa__nombre", "nombre_publico")
 
     fieldsets = (
         (
             "Información Básica",
-            {"fields": ("empresa", "nombre_publico", "tagline", "logo")},
+            {"fields": ("empresa", "nombre_publico", "tagline", "logo", "rubro_principal")},
         ),
         (
             "Información de Contacto",

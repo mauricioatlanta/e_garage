@@ -1,0 +1,120 @@
+═══════════════════════════════════════════════════════════════
+AGREGAR BOTÓN "AJUSTES" CON URL DIRECTA (MÁS CONFIABLE)
+═══════════════════════════════════════════════════════════════
+
+Ejecuta este comando en el servidor:
+
+cd /home/atlantareciclajes/apps/egarage/current && \
+python3 << 'PYEOF'
+import re
+from pathlib import Path
+
+file_path = 'templates/taller/cl/es/dashboard/centro_operaciones.html'
+
+print(f"📝 Actualizando {file_path}...\n")
+
+if not Path(file_path).exists():
+    print(f"❌ Error: {file_path} no existe")
+    exit(1)
+
+with open(file_path, 'r', encoding='utf-8') as f:
+    content = f.read()
+
+# Verificar si ya existe el botón de Ajustes
+if 'Ajustes' in content and 'nav-card' in content:
+    # Buscar y reemplazar cualquier versión del botón de Ajustes
+    patterns = [
+        r'<a href="\{\%\s*country_url\s+[\'"]company_settings[\'"].*?\}\}" class="nav-card">.*?Ajustes.*?</a>',
+        r'<a href="\{\%\s*country_url\s+[\'"]company_settings[\'"].*?\}\}" class="nav-card">.*?Configuración avanzada.*?</a>',
+    ]
+    
+    for pattern in patterns:
+        if re.search(pattern, content, re.DOTALL):
+            # Reemplazar con URL directa
+            new_button = '''            <a href="/cl/es/settings/" class="nav-card">
+                <div class="text-3xl mb-2">🔧</div>
+                <div class="font-semibold">Ajustes</div>
+                <div class="text-sm text-gray-400">Configuración avanzada</div>
+            </a>'''
+            content = re.sub(pattern, new_button, content, flags=re.DOTALL)
+            print("✅ Botón 'Ajustes' actualizado con URL directa")
+            break
+    else:
+        # Si existe pero no coincide con los patrones, buscar manualmente
+        if '/cl/es/settings/' in content:
+            print("ℹ️  El botón 'Ajustes' ya existe con URL directa")
+        else:
+            print("⚠️  El botón existe pero no se pudo actualizar automáticamente")
+else:
+    # No existe, agregarlo después del botón de Configuración
+    print("⚠️  El botón 'Ajustes' no existe. Agregándolo...")
+    
+    # Buscar el botón de Configuración
+    config_pattern = r'(<a href="\{\%\s*country_url\s+\'configuracion\'\s*\%\}" class="nav-card">.*?Ajustes del taller.*?</a>\s*)'
+    
+    new_button = '''            <a href="/cl/es/settings/" class="nav-card">
+                <div class="text-3xl mb-2">🔧</div>
+                <div class="font-semibold">Ajustes</div>
+                <div class="text-sm text-gray-400">Configuración avanzada</div>
+            </a>
+
+            '''
+    
+    if re.search(config_pattern, content, re.DOTALL):
+        content = re.sub(
+            config_pattern,
+            r'\1' + new_button,
+            content,
+            flags=re.DOTALL
+        )
+        print("✅ Botón 'Ajustes' agregado después de 'Configuración'")
+    else:
+        # Buscar el cierre del div de nav-grid
+        if '</div>\n    </div>\n\n    <!-- 📊 Gráfico' in content:
+            content = content.replace(
+                '</div>\n    </div>\n\n    <!-- 📊 Gráfico',
+                new_button + '</div>\n    </div>\n\n    <!-- 📊 Gráfico'
+            )
+            print("✅ Botón 'Ajustes' agregado manualmente antes del gráfico")
+        elif '</div>\n        </div>\n    </div>' in content:
+            # Otro patrón de cierre
+            content = content.replace(
+                '</div>\n        </div>\n    </div>',
+                new_button + '</div>\n        </div>\n    </div>'
+            )
+            print("✅ Botón 'Ajustes' agregado manualmente")
+        else:
+            # Buscar cualquier cierre de div después de Configuración
+            if 'Configuración' in content and 'Ajustes del taller' in content:
+                # Insertar después de la línea que contiene "Ajustes del taller"
+                lines = content.split('\n')
+                for i, line in enumerate(lines):
+                    if 'Ajustes del taller' in line and '</a>' in lines[i+1] if i+1 < len(lines) else False:
+                        # Insertar después de la línea siguiente (el </a>)
+                        insert_pos = i + 2
+                        new_lines = lines[:insert_pos] + [new_button.rstrip()] + lines[insert_pos:]
+                        content = '\n'.join(new_lines)
+                        print("✅ Botón 'Ajustes' agregado después de 'Configuración' (método líneas)")
+                        break
+
+# Guardar el archivo
+with open(file_path, 'w', encoding='utf-8') as f:
+    f.write(content)
+
+print(f"\n✅ Archivo {file_path} actualizado")
+print("\n🔍 Verificación final:")
+if '/cl/es/settings/' in content and 'Ajustes' in content:
+    print("   ✅ Botón 'Ajustes' encontrado con URL /cl/es/settings/")
+else:
+    print("   ⚠️  El botón puede no haberse agregado correctamente")
+PYEOF
+
+echo ""
+echo "🔄 Reiniciando servidor..."
+touch /var/www/www_egarage_cl_wsgi.py
+echo "✅ Servidor reiniciado"
+echo ""
+echo "🎉 ¡Listo! Verifica que el botón 'Ajustes' aparezca en la página"
+
+═══════════════════════════════════════════════════════════════
+

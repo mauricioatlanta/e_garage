@@ -1,0 +1,58 @@
+======================================================================
+INFORMACIÓN DE ACTUALIZACIÓN
+======================================================================
+
+Fecha: 2025-11-23 18:00:55
+Total archivos/carpetas: 45
+
+ARCHIVOS INCLUIDOS:
+----------------------------------------------------------------------
+  • core
+  • gestion_taller/asgi.py
+  • gestion_taller/settings.py
+  • gestion_taller/urls.py
+  • gestion_taller/wsgi.py
+  • manage.py
+  • taller/admin.py
+  • taller/apps.py
+  • taller/backends
+  • taller/context_processors
+  • taller/forms
+  • taller/management
+  • taller/middleware
+  • taller/models
+  • taller/signals.py
+  • taller/urls.py
+  • taller/views.py
+  • taller/views_extra
+  • templates/account
+  • templates/admin_panel
+  • templates/analytics
+  • templates/auth
+  • templates/base.html
+  • templates/br
+  • templates/business_intelligence
+  • templates/cl
+  • templates/co
+  • templates/components
+  • templates/ec
+  • templates/email
+  • templates/emails
+  • templates/errors
+  • templates/landing
+  • templates/landing_inicio.html
+  • templates/mx
+  • templates/pe
+  • templates/portal
+  • templates/registration
+  • templates/settings
+  • templates/suscripcion
+  • templates/suspension
+  • templates/taller
+  • templates/us
+  • templates/ve
+  • ubicacion
+
+ADVERTENCIAS:
+----------------------------------------------------------------------
+  ⚠️  No encontrado: templates/onboarding

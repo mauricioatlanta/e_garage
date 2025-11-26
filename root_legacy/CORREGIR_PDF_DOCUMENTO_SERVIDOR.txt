@@ -1,0 +1,26 @@
+═══════════════════════════════════════════════════════════════
+CORREGIR TEMPLATE PDF - CABECERA COMPACTA Y TOTALES AL PIE
+═══════════════════════════════════════════════════════════════
+
+Cambios realizados:
+1. Reducido tamaño de la cabecera (header más compacto)
+2. Reorganizado totales al pie de la página como factura común
+3. Eliminado texto "Documento generado el..." del footer
+4. Eliminado texto de generación del @bottom-center
+5. Ocultado "Sin sitio web" si no hay sitio web
+6. Mantenido estilo futurista y tecnológico
+
+Ejecuta este comando en el servidor para copiar el archivo actualizado:
+
+cd /home/atlantareciclajes/apps/egarage/current && \
+cp templates/taller/documentos/pdf_template.html templates/taller/documentos/pdf_template.html.backup && \
+echo "✅ Backup creado"
+
+# Luego copia el archivo actualizado desde tu PC local
+# O aplica los cambios manualmente usando el archivo local
+
+touch /var/www/www_egarage_cl_wsgi.py
+echo "✅ Servidor reiniciado"
+
+═══════════════════════════════════════════════════════════════
+

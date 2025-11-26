@@ -1,98 +1,168 @@
 import json
 
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.utils.translation import activate
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods, require_POST
 
-from taller.models.empresa import Empresa
-from taller.models.perfil_usuario import PerfilUsuario
+from taller.config.country_settings import CountrySettings
+from taller.services.registration_service import RegistrationService
+from taller.utils.country_config import get_country_config
 
 
+@csrf_exempt  # Habilitar si recibes POST desde landing pages externas
+@require_http_methods(["GET", "POST"])
 def registro_gratuito(request):
-    """Vista para registro gratuito y automático"""
+    """
+    API Endpoint para registro rápido/gratuito.
+
+    ✅ REFACTORIZADO: Usa RegistrationService unificado con country_config.
+    - Soporte para 8 países automático (CL, US, MX, PE, CO, EC, BR, VE)
+    - Configuración de moneda e impuestos automática según país
+    - Login automático después del registro
+    - Transacciones atómicas (sin usuarios huérfanos)
+    - Soporte API JSON (POST) y Template (GET)
+    """
     # Manejar cambio de idioma
     lang = request.GET.get("lang")
-    if lang in ["es", "en"]:
+    if lang in ["es", "en", "pt-br"]:
         activate(lang)
 
     if request.method == "POST":
         try:
-            data = json.loads(request.body)
-            nombre_taller = data.get("nombre_taller")
-            email = data.get("email")
-            password = data.get("password")
-            nombre_usuario = data.get("nombre_usuario", email.split("@")[0])
-
-            # Validaciones básicas
-            if not all([nombre_taller, email, password]):
-                return JsonResponse(
-                    {"success": False, "error": "Todos los campos son obligatorios"}
-                )
-
-            # Verificar si el email ya existe
-            if User.objects.filter(email=email).exists():
-                return JsonResponse(
-                    {"success": False, "error": "Ya existe una cuenta con este email"}
-                )
-
-            # Crear usuario
-            user = User.objects.create_user(
-                username=email,  # Usamos email como username
-                email=email,
-                password=password,
-                first_name=nombre_usuario,
-            )
-
-            # Crear empresa automáticamente
-            empresa = Empresa.objects.create(
-                user=user,
-                nombre_taller=nombre_taller,
-                email=email,
-                plan="gratuito",  # Plan gratuito ilimitado
-                suscripcion_activa=True,
-            )
-
-            # Crear perfil de usuario
+            # 1. Parsear Datos JSON
             try:
-                perfil = PerfilUsuario.objects.create(
-                    usuario=user, empresa=empresa, tipo_usuario="admin"
+                data = json.loads(request.body)
+            except json.JSONDecodeError:
+                return JsonResponse({"success": False, "error": "JSON inválido"}, status=400)
+
+            # 2. Validaciones de entrada básicas
+            email = data.get("email", "").strip().lower()
+            password = data.get("password")
+            nombre_taller = data.get("nombre_taller", "").strip()
+            nombre_usuario = data.get("nombre_usuario", email.split("@")[0] if email else "Usuario")
+
+            if not all([email, password, nombre_taller]):
+                return JsonResponse(
+                    {
+                        "success": False,
+                        "error": "Faltan campos obligatorios (email, password, nombre_taller)",
+                    },
+                    status=400,
                 )
-            except Exception:
-                # Si no existe el modelo PerfilUsuario, continuamos
-                pass
 
-            # Login automático
-            user = authenticate(username=email, password=password)
-            login(request, user)
+            # 3. Detectar configuración de país
+            # Prioridad: 1. Payload JSON, 2. URL Prefix (si existe middleware), 3. Default CL
+            country_code = (
+                data.get("country")
+                or CountrySettings.get_country_from_url(request.path)
+                or getattr(request, "country_code", None)
+                or "CL"
+            )
+            country_code = country_code.upper()
 
+            # ✅ Usar country_config para obtener configuración completa
+            config = get_country_config(country_code)
+
+            # 4. ⚡ USAR SERVICIO UNIFICADO
+            # Esto garantiza que el usuario gratuito tenga la moneda e impuestos correctos
+            try:
+                result = RegistrationService.register_new_client(
+                    user_data={
+                        "email": email,
+                        "password": password,
+                        "first_name": nombre_usuario,
+                        "username": email,  # Usar email como username
+                    },
+                    company_data={
+                        "nombre_taller": nombre_taller,
+                        "telefono": data.get("telefono", ""),
+                    },
+                    plan_type="gratuito",  # Plan gratuito ilimitado
+                    country=country_code,
+                    skip_email_verification=True,  # ✅ Acceso inmediato (sin código)
+                    assign_role="Owner",
+                    request=request,
+                )
+
+                user = result["user"]
+                empresa = result["empresa"]
+
+                # 5. Login Automático (Opcional, pero recomendado para UX)
+                # Permite redirigir al usuario directo al dashboard sin pedir login de nuevo
+                user = authenticate(username=email, password=password)
+                if user:
+                    login(request, user, backend="django.contrib.auth.backends.ModelBackend")
+
+                # 6. Construir URL de redirección según país
+                dashboard_url = (
+                    CountrySettings.build_url(country_code, "dashboard/", request=request)
+                    or f"/{country_code.lower()}/dashboard/"
+                )
+
+                return JsonResponse(
+                    {
+                        "success": True,
+                        "message": f'Cuenta creada exitosamente en {config.get("name", country_code)}',
+                        "redirect_url": dashboard_url,  # Redirección inteligente
+                        "user_id": user.id,
+                        "empresa_id": empresa.id,
+                        "country": country_code,
+                        "currency": config["currency"],  # Moneda asignada
+                    },
+                    status=201,
+                )
+
+            except ValueError as e:
+                # Captura errores de validación del servicio (ej. "El email ya existe")
+                return JsonResponse({"success": False, "error": str(e)}, status=400)
+
+        except Exception as e:
+            # Loguear error real en servidor
+            import logging
+
+            logger = logging.getLogger(__name__)
+            logger.error(f"[RegistroGratuito] Error crítico: {e}", exc_info=True)
             return JsonResponse(
-                {
-                    "success": True,
-                    "message": "Cuenta creada exitosamente",
-                    "redirect_url": "/bienvenida/",
-                }
+                {"success": False, "error": "Error interno del servidor"}, status=500
             )
 
-        except json.JSONDecodeError:
-            return JsonResponse({"success": False, "error": "Datos inválidos"})
-        except Exception as e:
-            return JsonResponse({"success": False, "error": f"Error interno: {str(e)}"})
+    # GET: Renderizar template según país
+    # Determinar país usando CountrySettings (sin hardcoding)
+    country_code = CountrySettings.get_country_from_url(request.path) or "CL"
 
-    # Determinar el template según el país
-    country = getattr(request, "country", "CL")
+    # ✅ Usar country_config para obtener configuración completa
+    country_config = get_country_config(country_code)
 
-    # También verificar la URL para detectar el país
-    if request.path.startswith("/us/"):
-        country = "US"
+    # Configurar idioma según país
+    lang = country_config.get("lang", "es")
+    activate(lang)
 
-    if country == "US":
-        template = "taller/us/en/onboarding/registro_gratuito.html"
-    else:
-        template = "taller/cl/es/onboarding/registro_gratuito.html"
+    # Template según país e idioma
+    # Soporte para 8 países con templates específicos o fallback
+    template_map = {
+        "US": "taller/us/en/onboarding/registro_gratuito.html",
+        "CL": "taller/cl/es/onboarding/registro_gratuito.html",
+        "MX": "taller/cl/es/onboarding/registro_gratuito.html",  # Usar template de CL como fallback
+        "PE": "taller/cl/es/onboarding/registro_gratuito.html",
+        "CO": "taller/cl/es/onboarding/registro_gratuito.html",
+        "EC": "taller/cl/es/onboarding/registro_gratuito.html",
+        "BR": "taller/cl/es/onboarding/registro_gratuito.html",  # TODO: Crear template en portugués
+        "VE": "taller/cl/es/onboarding/registro_gratuito.html",
+    }
 
-    return render(request, template)
+    template = template_map.get(country_code, "taller/cl/es/onboarding/registro_gratuito.html")
+
+    return render(
+        request,
+        template,
+        {
+            "country_config": country_config,
+            "country_code": country_code,
+        },
+    )
 
 
 def bienvenida_onboarding(request):

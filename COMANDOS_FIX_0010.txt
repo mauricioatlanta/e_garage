@@ -1,0 +1,35 @@
+===========================================
+SOLUCIÓN RÁPIDA: Migración 0010
+===========================================
+
+EJECUTAR EN EL SERVIDOR:
+-------------------------
+
+cd /home/atlantareciclajes/apps/egarage/current
+workon venv_egarage310
+
+# Marcar migración 0010 como aplicada (el constraint no existe)
+python manage.py migrate taller 0010_improve_tecnico_model_multi_tenant --fake
+
+# Continuar con migraciones restantes
+python manage.py migrate
+
+# Verificar
+python manage.py check
+
+===========================================
+SI SIGUE FALLANDO:
+===========================================
+
+# Ver qué migraciones están pendientes
+python manage.py showmigrations taller | grep "\[ \]"
+
+# Marcar todas hasta la última que falla como aplicadas
+# (Ajusta el número según el error)
+python manage.py migrate taller 0020 --fake
+
+# Continuar
+python manage.py migrate
+
+===========================================
+

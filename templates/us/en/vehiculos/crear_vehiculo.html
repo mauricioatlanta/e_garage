@@ -1,0 +1,1201 @@
+{% extends 'layouts/base_egarage_panel.html' %}
+{% load custom_filters %}
+{% load country_url %}
+{% load static %}
+{% load i18n %}
+
+{% block page_title %}{% trans "Create Vehicle" %}{% endblock %}
+{% block page_subtitle %}{% trans "Add a new vehicle to the system" %}{% endblock %}
+{% block page_icon %}🚗{% endblock %}
+
+{% block main_actions %}
+{% country_url 'vehiculos:lista_vehiculos' as url_lista_vehiculos %}
+<a href="{% if url_lista_vehiculos %}{{ url_lista_vehiculos }}{% else %}/us/en/vehiculos/{% endif %}" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-800/60 hover:bg-slate-700/60 border border-slate-600/50 text-slate-200 hover:text-white text-sm font-semibold transition-all">
+  <span>←</span>
+  <span>{% trans "Back to list" %}</span>
+</a>
+{% endblock %}
+
+{% block page_extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+<style>
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes glowPulse {
+  0%, 100% { 
+    box-shadow: 0 0 20px rgba(0, 230, 208, 0.5),
+                0 0 40px rgba(0, 230, 208, 0.3),
+                0 0 60px rgba(0, 230, 208, 0.1);
+  }
+  50% { 
+    box-shadow: 0 0 30px rgba(0, 230, 208, 0.8),
+                0 0 60px rgba(0, 230, 208, 0.5),
+                0 0 90px rgba(0, 230, 208, 0.2);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes borderGlow {
+  0%, 100% {
+    border-color: rgba(0, 230, 208, 0.3);
+    box-shadow: 0 0 10px rgba(0, 230, 208, 0.2);
+  }
+  50% {
+    border-color: rgba(0, 230, 208, 0.6);
+    box-shadow: 0 0 20px rgba(0, 230, 208, 0.4);
+  }
+}
+
+
+.form-card {
+  background: rgba(10, 14, 39, 0.85) !important;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 2px solid rgba(0, 230, 208, 0.2);
+  border-radius: 16px;
+  padding: 32px;
+  margin-bottom: 20px;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+  animation: borderGlow 3s ease-in-out infinite;
+}
+
+.form-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(0, 230, 208, 0.1), 
+    transparent);
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+.form-group {
+  margin-bottom: 24px;
+  position: relative;
+  animation: slideIn 0.6s ease-out backwards;
+}
+
+.form-group:nth-child(1) { animation-delay: 0.1s; }
+.form-group:nth-child(2) { animation-delay: 0.2s; }
+.form-group:nth-child(3) { animation-delay: 0.3s; }
+.form-group:nth-child(4) { animation-delay: 0.4s; }
+.form-group:nth-child(5) { animation-delay: 0.5s; }
+.form-group:nth-child(6) { animation-delay: 0.6s; }
+
+.form-group label {
+  display: block;
+  font-weight: 700;
+  color: #00e6d0 !important;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 10px;
+  font-family: 'Orbitron', sans-serif;
+  text-shadow: 0 0 10px rgba(0, 230, 208, 0.5);
+  position: relative;
+  padding-left: 8px;
+}
+
+.form-group label::before {
+  content: '▶';
+  position: absolute;
+  left: -12px;
+  color: #00e6d0;
+  font-size: 10px;
+  opacity: 0.7;
+}
+
+/* Estilos unificados para todos los campos */
+.form-control, 
+select, 
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="tel"],
+select.form-control {
+  width: 100% !important;
+  padding: 14px 16px !important;
+  background: rgba(0, 0, 0, 0.4) !important;
+  border: 2px solid rgba(0, 230, 208, 0.3) !important;
+  border-radius: 8px !important;
+  color: #fff !important;
+  font-size: 15px !important;
+  font-family: 'Rajdhani', sans-serif !important;
+  font-weight: 500 !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
+}
+
+.form-control:focus, 
+select:focus, 
+input:focus {
+  outline: none !important;
+  border-color: #00e6d0 !important;
+  background: rgba(0, 0, 0, 0.6) !important;
+  box-shadow: 
+    0 0 0 3px rgba(0, 230, 208, 0.2),
+    0 0 20px rgba(0, 230, 208, 0.4),
+    inset 0 0 10px rgba(0, 230, 208, 0.1) !important;
+  transform: translateY(-2px);
+}
+
+/* Estilos para Select2 - unificar con el resto */
+.select2-container--default .select2-selection--single,
+.select2-container--default .select2-selection--multiple {
+  background: rgba(0, 0, 0, 0.4) !important;
+  border: 2px solid rgba(0, 230, 208, 0.3) !important;
+  border-radius: 8px !important;
+  height: auto !important;
+  min-height: 48px !important;
+  padding: 4px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered,
+.select2-container--default .select2-selection--multiple .select2-selection__rendered {
+  color: #fff !important;
+  font-family: 'Rajdhani', sans-serif !important;
+  font-weight: 500 !important;
+  font-size: 15px !important;
+  line-height: 38px !important;
+  padding-left: 8px !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+  height: 46px !important;
+  right: 10px !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow b {
+  border-color: #00e6d0 transparent transparent transparent !important;
+  border-width: 6px 5px 0 5px !important;
+}
+
+.select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow b {
+  border-color: transparent transparent #00e6d0 transparent !important;
+  border-width: 0 5px 6px 5px !important;
+}
+
+.select2-container--default.select2-container--focus .select2-selection--single,
+.select2-container--default.select2-container--focus .select2-selection--multiple {
+  border-color: #00e6d0 !important;
+  background: rgba(0, 0, 0, 0.6) !important;
+  box-shadow: 
+    0 0 0 3px rgba(0, 230, 208, 0.2),
+    0 0 20px rgba(0, 230, 208, 0.4),
+    inset 0 0 10px rgba(0, 230, 208, 0.1) !important;
+}
+
+.select2-dropdown {
+  background: rgba(10, 14, 39, 0.95) !important;
+  border: 2px solid rgba(0, 230, 208, 0.4) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6) !important;
+  backdrop-filter: blur(20px) !important;
+}
+
+.select2-results__option {
+  background: transparent !important;
+  color: #fff !important;
+  font-family: 'Rajdhani', sans-serif !important;
+  font-size: 15px !important;
+  padding: 12px 16px !important;
+  transition: all 0.2s ease !important;
+}
+
+.select2-results__option--highlighted {
+  background: rgba(0, 230, 208, 0.2) !important;
+  color: #00e6d0 !important;
+  text-shadow: 0 0 10px rgba(0, 230, 208, 0.5) !important;
+}
+
+.select2-search--dropdown .select2-search__field {
+  background: rgba(0, 0, 0, 0.4) !important;
+  border: 2px solid rgba(0, 230, 208, 0.3) !important;
+  border-radius: 6px !important;
+  color: #fff !important;
+  font-family: 'Rajdhani', sans-serif !important;
+  padding: 10px !important;
+}
+
+.select2-search--dropdown .select2-search__field:focus {
+  border-color: #00e6d0 !important;
+  box-shadow: 0 0 10px rgba(0, 230, 208, 0.4) !important;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+  background: rgba(0, 230, 208, 0.2) !important;
+  border: 1px solid rgba(0, 230, 208, 0.4) !important;
+  color: #00e6d0 !important;
+  font-family: 'Rajdhani', sans-serif !important;
+  padding: 4px 8px !important;
+  margin: 4px !important;
+  border-radius: 4px !important;
+}
+
+.btn-futuristic {
+  background: linear-gradient(135deg, #00e6d0 0%, #00b3a0 50%, #008a7a 100%);
+  border: 2px solid rgba(0, 230, 208, 0.5);
+  color: white;
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-weight: 700;
+  text-decoration: none;
+  display: inline-block;
+  margin-right: 12px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: 'Orbitron', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 13px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 230, 208, 0.3);
+  animation: glowPulse 2s ease-in-out infinite;
+  pointer-events: auto; /* Asegurar que los enlaces sean clicables */
+  z-index: 1; /* Asegurar que estén por encima de otros elementos */
+}
+
+.btn-futuristic::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+  pointer-events: none; /* Permitir clics a través del pseudo-elemento */
+}
+
+.btn-futuristic:hover::before {
+  left: 100%;
+}
+
+.btn-futuristic:hover {
+  background: linear-gradient(135deg, #00b3a0 0%, #008a7a 50%, #006b5f 100%);
+  color: white;
+  text-decoration: none;
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(0, 230, 208, 0.5);
+  border-color: rgba(0, 230, 208, 0.8);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #6c757d 0%, #545b62 50%, #495057 100%);
+  border: 2px solid rgba(108, 117, 125, 0.5);
+}
+
+.btn-secondary:hover {
+  background: linear-gradient(135deg, #545b62 0%, #495057 50%, #3d4146 100%);
+  border-color: rgba(108, 117, 125, 0.8);
+}
+
+.font-orbitron {
+  font-family: 'Orbitron', 'Arial', sans-serif;
+}
+
+/* Asegurar que los campos ocultos también tengan el estilo correcto */
+#color_nuevo,
+#motor_nuevo,
+#caja_nuevo {
+  background: rgba(0, 0, 0, 0.4) !important;
+  border: 2px solid rgba(0, 230, 208, 0.3) !important;
+  border-radius: 8px !important;
+  color: #fff !important;
+  padding: 14px 16px !important;
+  font-family: 'Rajdhani', sans-serif !important;
+  font-size: 15px !important;
+}
+
+#color_nuevo:focus,
+#motor_nuevo:focus,
+#caja_nuevo:focus {
+  border-color: #00e6d0 !important;
+  background: rgba(0, 0, 0, 0.6) !important;
+  box-shadow: 
+    0 0 0 3px rgba(0, 230, 208, 0.2),
+    0 0 20px rgba(0, 230, 208, 0.4) !important;
+}
+</style>
+{% endblock %}
+
+{% block panel_content %}
+<div class="form-card max-w-4xl mx-auto">
+    <form method="post" id="vehicle-form">
+      {% csrf_token %}
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <div class="form-group">
+          <label for="{{ form.cliente.id_for_label }}">Customer</label>
+          {{ form.cliente }}
+          {% if form.cliente.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.cliente.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.patente.id_for_label }}">License Plate</label>
+          {{ form.patente }}
+          {% if form.patente.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.patente.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.vin.id_for_label }}">VIN</label>
+          {{ form.vin }}
+          {% if form.vin.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.vin.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.anio.id_for_label }}">Year</label>
+          {{ form.anio }}
+          {% if form.anio.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.anio.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.marca.id_for_label }}">Brand</label>
+          {{ form.marca }}
+          {% if form.marca.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.marca.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.modelo.id_for_label }}">Model</label>
+          {{ form.modelo }}
+          {% if form.modelo.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.modelo.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.color.id_for_label }}">Color</label>
+          {{ form.color }}
+          {% if form.color.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.color.errors.0 }}</div>
+          {% endif %}
+          <div id="color-nuevo-container" style="display: none;" class="mt-2">
+            <input type="text"
+                   name="nuevo_color"
+                   id="color_nuevo"
+                   placeholder="Enter new color name"
+                   class="form-control">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.motor.id_for_label }}">Engine</label>
+          <div class="flex gap-2 items-start">
+            <div class="flex-1">{{ form.motor }}</div>
+            <button type="button" 
+                    id="btn-add-motor" 
+                    class="btn-futuristic" 
+                    style="padding: 12px 16px; margin: 0; white-space: nowrap; flex-shrink: 0;"
+                    title="Add new engine">
+              ➕ Add
+            </button>
+          </div>
+          {% if form.motor.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.motor.errors.0 }}</div>
+          {% endif %}
+          <div id="motor-nuevo-container" style="display: none;" class="mt-2">
+            <input type="text"
+                   name="nuevo_motor"
+                   id="motor_nuevo"
+                   placeholder="Enter new engine name"
+                   class="form-control">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.caja.id_for_label }}">Transmission</label>
+          <div class="flex gap-2 items-start">
+            <div class="flex-1">{{ form.caja }}</div>
+            <button type="button" 
+                    id="btn-add-caja" 
+                    class="btn-futuristic" 
+                    style="padding: 12px 16px; margin: 0; white-space: nowrap; flex-shrink: 0;"
+                    title="Add new transmission">
+              ➕ Add
+            </button>
+          </div>
+          {% if form.caja.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.caja.errors.0 }}</div>
+          {% endif %}
+          <div id="caja-nueva-container" style="display: none;" class="mt-2">
+            <input type="text"
+                   name="nuevo_caja"
+                   id="caja_nuevo"
+                   placeholder="Enter new transmission name"
+                   class="form-control">
+          </div>
+        </div>
+
+      </div>
+
+      <div class="flex gap-3 mt-8 pt-6 border-t border-gray-600">
+        <button type="submit" class="btn-futuristic">
+          💾 Create Vehicle
+        </button>
+        {% country_url 'vehiculos:lista_vehiculos' as url_lista_vehiculos %}
+        <a href="{% if url_lista_vehiculos %}{{ url_lista_vehiculos }}{% else %}/us/vehiculos/{% endif %}" class="btn-futuristic btn-secondary">
+          ❌ Cancel
+        </a>
+      </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block page_extra_js %}
+
+<script>
+// Definir countryPrefix globalmente
+const countryPrefix = '/us/';
+
+// Verificar inicialización de Select2 después de que form.media haya cargado
+// form.media carga los scripts de DAL que inicializan Select2 automáticamente
+$(document).ready(function() {
+    // Función para verificar y aplicar estilos a Select2
+    function checkAndStyleSelect2() {
+        // Aplicar estilos a los contenedores de Select2
+        $('.select2-container').each(function() {
+            $(this).css('width', '100%');
+        });
+        
+        // Debug: verificar que el campo cliente esté inicializado
+        const clienteField = $('#id_cliente');
+        if (clienteField.length) {
+            const isInitialized = clienteField.hasClass('select2-hidden-accessible');
+            let autocompleteUrl = clienteField.attr('data-autocomplete-light-url');
+            
+            console.log('✅ Cliente field found');
+            console.log('Select2 initialized:', isInitialized);
+            console.log('Autocomplete URL (original):', autocompleteUrl);
+            console.log('Country prefix:', countryPrefix);
+            
+            // 🔧 FIX: asegurar que la URL del autocomplete tenga el prefijo del país (/us/, /cl/, etc.)
+            if (autocompleteUrl) {
+                const originalUrl = autocompleteUrl;
+                // Si la URL NO empieza con el prefijo de país, lo agregamos
+                if (!autocompleteUrl.startsWith(countryPrefix)) {
+                    // Remover cualquier slash inicial y agregar el prefijo de país
+                    const nuevaUrl = countryPrefix + autocompleteUrl.replace(/^\/+/, '');
+                    console.log('🔧 Corrigiendo URL autocomplete cliente:', originalUrl, '→', nuevaUrl);
+                    clienteField.attr('data-autocomplete-light-url', nuevaUrl);
+                    autocompleteUrl = nuevaUrl; // Actualizar la variable para el resto del código
+                    
+                    // Si ya estaba inicializado, forzamos re-inicialización de DAL
+                    if (clienteField.hasClass('select2-hidden-accessible')) {
+                        console.log('🔄 Re-inicializando DAL para cliente field con nueva URL...');
+                        clienteField.removeClass('select2-hidden-accessible');
+                        // Disparar el evento que DAL escucha
+                        $(document).trigger('autocompleteLightInitialize');
+                    }
+                } else {
+                    console.log('✅ URL del autocomplete ya tiene el prefijo de país correcto');
+                }
+            }
+            
+            console.log('Autocomplete URL (final):', autocompleteUrl);
+            console.log('Field HTML:', clienteField[0].outerHTML.substring(0, 200));
+            
+            // Si Select2 no está inicializado, intentar inicialización manual
+            if (!isInitialized) {
+                console.warn('⚠️ Select2 not initialized for cliente field. Attempting manual initialization...');
+                
+                // Verificar que las dependencias estén disponibles
+                if (typeof $ !== 'undefined' && typeof $.fn.select2 !== 'undefined') {
+                    // Intentar inicialización manual si DAL no lo hizo
+                    if (autocompleteUrl && typeof yl !== 'undefined' && typeof yl.registerFunction === 'function') {
+                        // DAL debería inicializarlo, pero si no, esperar un poco más
+                        console.log('DAL y Select2 disponibles, esperando inicialización automática...');
+                    } else {
+                        console.error('⚠️ Faltan dependencias: Select2 plugin o DAL no disponibles');
+                        console.error('jQuery disponible:', typeof $ !== 'undefined');
+                        console.error('Select2 disponible:', typeof $.fn.select2 !== 'undefined');
+                        console.error('DAL (yl) disponible:', typeof yl !== 'undefined');
+                    }
+                } else {
+                    console.error('⚠️ jQuery o Select2 no están disponibles');
+                }
+            } else if (!autocompleteUrl) {
+                console.warn('⚠️ Cliente field initialized but missing data-autocomplete-light-url attribute');
+            } else {
+                console.log('✅ Cliente field properly initialized with autocomplete');
+            }
+        } else {
+            console.error('❌ Cliente field not found in DOM');
+            console.error('Buscando todos los campos con id que contengan "cliente":', $('[id*="cliente"]').length);
+            console.error('Todos los campos del formulario:', $('form input, form select').map(function() { return this.id || this.name; }).get());
+            // Verificar si el campo está oculto o tiene display:none
+            const hiddenCliente = $('[name="cliente"], [id*="cliente"]');
+            if (hiddenCliente.length) {
+                console.error('Campo cliente encontrado pero oculto:', hiddenCliente);
+                console.error('Estilos del campo:', {
+                    display: hiddenCliente.css('display'),
+                    visibility: hiddenCliente.css('visibility'),
+                    width: hiddenCliente.css('width'),
+                    height: hiddenCliente.css('height')
+                });
+            }
+        }
+        
+        // Verificar y corregir campos de motor y caja
+        const motorField = $('#id_motor');
+        const cajaField = $('#id_caja');
+        
+        // 🔧 FIX: Corregir URL del autocomplete para motor
+        if (motorField.length) {
+            let motorUrl = motorField.attr('data-autocomplete-light-url');
+            console.log('✅ Motor field found, Select2:', motorField.hasClass('select2-hidden-accessible'));
+            console.log('Motor autocomplete URL (original):', motorUrl);
+            
+            if (motorUrl && !motorUrl.startsWith(countryPrefix)) {
+                const nuevaUrlMotor = countryPrefix + motorUrl.replace(/^\/+/, '');
+                console.log('🔧 Corrigiendo URL autocomplete motor:', motorUrl, '→', nuevaUrlMotor);
+                motorField.attr('data-autocomplete-light-url', nuevaUrlMotor);
+                
+                if (motorField.hasClass('select2-hidden-accessible')) {
+                    motorField.removeClass('select2-hidden-accessible');
+                    $(document).trigger('autocompleteLightInitialize');
+                }
+            }
+        }
+        
+        // 🔧 FIX: Corregir URL del autocomplete para caja
+        if (cajaField.length) {
+            let cajaUrl = cajaField.attr('data-autocomplete-light-url');
+            console.log('✅ Caja field found, Select2:', cajaField.hasClass('select2-hidden-accessible'));
+            console.log('Caja autocomplete URL (original):', cajaUrl);
+            
+            if (cajaUrl && !cajaUrl.startsWith(countryPrefix)) {
+                const nuevaUrlCaja = countryPrefix + cajaUrl.replace(/^\/+/, '');
+                console.log('🔧 Corrigiendo URL autocomplete caja:', cajaUrl, '→', nuevaUrlCaja);
+                cajaField.attr('data-autocomplete-light-url', nuevaUrlCaja);
+                
+                if (cajaField.hasClass('select2-hidden-accessible')) {
+                    cajaField.removeClass('select2-hidden-accessible');
+                    $(document).trigger('autocompleteLightInitialize');
+                }
+            }
+        }
+    }
+    
+    // Verificar inmediatamente
+    checkAndStyleSelect2();
+    
+    // Verificaciones adicionales con más tiempo para que form.media cargue
+    setTimeout(checkAndStyleSelect2, 500);
+    setTimeout(checkAndStyleSelect2, 1000);
+    setTimeout(checkAndStyleSelect2, 2000);
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    // URLs para endpoints AJAX
+    const urlAgregarMotor = "{% country_url 'vehiculos:ajax_agregar_motor' %}";
+    const urlAgregarCaja = "{% country_url 'vehiculos:ajax_agregar_caja' %}";
+    const urlModelosPorMarca = "{% country_url 'vehiculos:ajax_modelos_por_marca' %}";
+    const urlModelosPorMarcaApi = "{% country_url 'vehiculos:modelos_por_marca_api' %}";
+    const urlMotoresPorModelo = "{% country_url 'vehiculos:ajax_motores_por_modelo' %}";
+    const urlCajasPorModelo = "{% country_url 'vehiculos:ajax_cajas_por_modelo' %}";
+    const urlMarcas = "{% country_url 'vehiculos:api_marcas' %}";
+
+    const marcaSelect = document.getElementById('id_marca');
+    const modeloSelect = document.getElementById('id_modelo');
+    const anioSelect = document.getElementById('id_anio');
+
+    // Función para cargar modelos por marca y año
+    function cargarModelos(marcaId, anio = null, modeloSeleccionado = null) {
+        if (!modeloSelect) return;
+        
+        modeloSelect.innerHTML = '<option value="">---------</option>';
+
+        if (marcaId) {
+            const loadingOption = document.createElement('option');
+            loadingOption.value = '';
+            loadingOption.textContent = 'Loading models...';
+            modeloSelect.appendChild(loadingOption);
+
+            let url = `${urlModelosPorMarcaApi}?marca_id=${marcaId}`;
+            if (anio) {
+                url += `&anio=${anio}`;
+            }
+
+            console.log('Loading models for marca_id:', marcaId, 'anio:', anio);
+            console.log('URL:', url);
+            
+            fetch(url)
+                .then(response => {
+                    console.log('Response status:', response.status, response.statusText);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Models response:', data);
+                    modeloSelect.innerHTML = '<option value="">---------</option>';
+
+                    if (Array.isArray(data)) {
+                        if (data.length === 0) {
+                            console.warn('No models found for marca_id:', marcaId);
+                            modeloSelect.innerHTML = '<option value="">No models available for this brand</option>';
+                        } else {
+                            console.log(`✅ Found ${data.length} models`);
+                            data.forEach(modelo => {
+                                const option = document.createElement('option');
+                                option.value = modelo.id;
+                                option.textContent = modelo.nombre;
+
+                                if (modeloSeleccionado && modelo.id == modeloSeleccionado) {
+                                    option.selected = true;
+                                }
+
+                                modeloSelect.appendChild(option);
+                            });
+                            
+                            // Si hay un modelo seleccionado, cargar sus motores y cajas
+                            if (modeloSeleccionado) {
+                                cargarMotoresYCajas(modeloSeleccionado);
+                            }
+                        }
+                    } else {
+                        console.error('Data is not an array:', data);
+                        modeloSelect.innerHTML = '<option value="">Error: incorrect data format</option>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading models:', error);
+                    modeloSelect.innerHTML = '<option value="">Error loading models. Check console for details.</option>';
+                });
+        }
+    }
+
+    // Función para cargar motores y cajas por modelo
+    // Nota: Los campos motor y caja son Select2, así que necesitamos trabajar con ellos de manera especial
+    function cargarMotoresYCajas(modeloId, motorSeleccionado = null, cajaSeleccionada = null) {
+        const motorSelect = $('#id_motor');
+        const cajaSelect = $('#id_caja');
+
+        if (!motorSelect.length || !cajaSelect.length) {
+            console.warn('Motor or caja select fields not found');
+            return;
+        }
+
+        // Los campos Select2 se actualizan automáticamente cuando cambia el modelo
+        // porque tienen forward=["modelo"], pero podemos forzar la actualización
+        if (motorSelect.hasClass('select2-hidden-accessible')) {
+            // Si es Select2, disparar el evento change para que se recargue
+            motorSelect.trigger('change');
+        }
+        
+        if (cajaSelect.hasClass('select2-hidden-accessible')) {
+            cajaSelect.trigger('change');
+        }
+
+        // También cargar manualmente para mostrar la opción de agregar nuevo
+        // Cargar motores
+        fetch(`${urlMotoresPorModelo}?modelo_id=${modeloId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Motores loaded:', data);
+                // Los motores se cargan automáticamente por Select2, pero podemos verificar
+                if (data.motores && data.motores.length > 0) {
+                    console.log(`✅ ${data.motores.length} engines available`);
+                } else {
+                    console.log('⚠️ No engines available for this model');
+                }
+            })
+            .catch(error => {
+                console.error('Error loading engines:', error);
+            });
+
+        // Cargar cajas
+        fetch(`${urlCajasPorModelo}?modelo_id=${modeloId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Cajas loaded:', data);
+                if (data.cajas && data.cajas.length > 0) {
+                    console.log(`✅ ${data.cajas.length} transmissions available`);
+                } else {
+                    console.log('⚠️ No transmissions available for this model');
+                }
+            })
+            .catch(error => {
+                console.error('Error loading transmissions:', error);
+            });
+    }
+
+    function obtenerAnio() {
+        if (anioSelect && anioSelect.value) {
+            return anioSelect.value;
+        }
+        return null;
+    }
+
+    function recargarModelos() {
+        if (!marcaSelect || !modeloSelect) return;
+        
+        const marcaId = marcaSelect.value;
+        const anio = obtenerAnio();
+        const modeloActual = modeloSelect.value;
+        cargarModelos(marcaId, anio, modeloActual);
+        
+        // Limpiar campos de motor y caja (son Select2, así que usamos jQuery)
+        const motorSelect = $('#id_motor');
+        const cajaSelect = $('#id_caja');
+        if (motorSelect.length) {
+            if (motorSelect.hasClass('select2-hidden-accessible')) {
+                motorSelect.val(null).trigger('change');
+            } else {
+                motorSelect.val('');
+            }
+        }
+        if (cajaSelect.length) {
+            if (cajaSelect.hasClass('select2-hidden-accessible')) {
+                cajaSelect.val(null).trigger('change');
+            } else {
+                cajaSelect.val('');
+            }
+        }
+    }
+
+    if (marcaSelect) {
+        marcaSelect.addEventListener('change', function() {
+            recargarModelos();
+        });
+    }
+
+    if (anioSelect) {
+        anioSelect.addEventListener('change', function() {
+            if (marcaSelect && marcaSelect.value) {
+                recargarModelos();
+            }
+        });
+    }
+
+    if (modeloSelect) {
+        modeloSelect.addEventListener('change', function() {
+            if (this.value) {
+                cargarMotoresYCajas(this.value);
+            } else {
+                // Limpiar campos de motor y caja
+                const motorSelect = $('#id_motor');
+                const cajaSelect = $('#id_caja');
+                if (motorSelect.length) {
+                    if (motorSelect.hasClass('select2-hidden-accessible')) {
+                        motorSelect.val(null).trigger('change');
+                    } else {
+                        motorSelect.val('');
+                    }
+                }
+                if (cajaSelect.length) {
+                    if (cajaSelect.hasClass('select2-hidden-accessible')) {
+                        cajaSelect.val(null).trigger('change');
+                    } else {
+                        cajaSelect.val('');
+                    }
+                }
+            }
+        });
+    }
+
+    if (marcaSelect && marcaSelect.value) {
+        const anio = obtenerAnio();
+        cargarModelos(marcaSelect.value, anio, modeloSelect ? modeloSelect.value : null);
+    }
+
+    if (modeloSelect && modeloSelect.value) {
+        cargarMotoresYCajas(modeloSelect.value);
+    }
+
+    // Manejar campo de color
+    const colorSelect = document.getElementById('id_color');
+    const colorNuevoContainer = document.getElementById('color-nuevo-container');
+    const colorNuevoInput = document.getElementById('color_nuevo');
+
+    if (colorSelect && colorNuevoContainer && colorNuevoInput) {
+        colorSelect.addEventListener('change', function() {
+            if (this.value === '__nuevo__') {
+                colorNuevoContainer.style.display = 'block';
+                colorNuevoInput.required = true;
+                colorNuevoInput.focus();
+            } else {
+                colorNuevoContainer.style.display = 'none';
+                colorNuevoInput.required = false;
+                colorNuevoInput.value = '';
+            }
+        });
+
+        if (colorSelect.value === '__nuevo__') {
+            colorNuevoContainer.style.display = 'block';
+            colorNuevoInput.required = true;
+        }
+    }
+
+    // Manejar campo de motor (Select2)
+    const motorSelect = $('#id_motor');
+    const motorNuevoContainer = document.getElementById('motor-nuevo-container');
+    const motorNuevoInput = document.getElementById('motor_nuevo');
+    const btnAddMotor = document.getElementById('btn-add-motor');
+
+    if (motorSelect.length && motorNuevoContainer && motorNuevoInput) {
+        // Mostrar campo de texto cuando se hace clic en "Add"
+        if (btnAddMotor) {
+            btnAddMotor.addEventListener('click', function() {
+                if (!modeloSelect || !modeloSelect.value) {
+                    alert('Please select a model first');
+                    return;
+                }
+                motorNuevoContainer.style.display = 'block';
+                motorNuevoInput.required = true;
+                motorNuevoInput.focus();
+                motorNuevoInput.value = '';
+            });
+        }
+
+        function crearNuevoMotor(nombreMotor) {
+            if (!modeloSelect || !modeloSelect.value) {
+                alert('Please select a model first');
+                return;
+            }
+
+            const modeloId = modeloSelect.value;
+            if (!nombreMotor || nombreMotor.trim() === '') {
+                alert('Please enter an engine name');
+                return;
+            }
+
+            motorNuevoInput.disabled = true;
+            motorNuevoInput.placeholder = 'Creating engine...';
+
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            fetch(urlAgregarMotor, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify({
+                    nombre: nombreMotor.trim(),
+                    modelo_id: modeloId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                motorNuevoInput.disabled = false;
+                motorNuevoInput.placeholder = 'Enter new engine name';
+
+                if (data.success) {
+                    // Agregar la nueva opción a Select2
+                    const newOption = new Option(data.motor.nombre, data.motor.id, true, true);
+                    motorSelect.append(newOption).trigger('change');
+
+                    motorNuevoContainer.style.display = 'none';
+                    motorNuevoInput.value = '';
+                    motorNuevoInput.required = false;
+                } else {
+                    alert('Error creating engine: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error creating engine:', error);
+                motorNuevoInput.disabled = false;
+                motorNuevoInput.placeholder = 'Enter new engine name';
+                alert('Error creating engine. Please try again.');
+            });
+        }
+
+        motorNuevoInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                crearNuevoMotor(this.value);
+            }
+        });
+
+        motorNuevoInput.addEventListener('blur', function() {
+            if (this.value.trim() !== '') {
+                crearNuevoMotor(this.value);
+            }
+        });
+    }
+
+    // Manejar campo de caja (Select2)
+    const cajaSelect = $('#id_caja');
+    const cajaNuevaContainer = document.getElementById('caja-nueva-container');
+    const cajaNuevoInput = document.getElementById('caja_nuevo');
+    const btnAddCaja = document.getElementById('btn-add-caja');
+
+    if (cajaSelect.length && cajaNuevaContainer && cajaNuevoInput) {
+        // Mostrar campo de texto cuando se hace clic en "Add"
+        if (btnAddCaja) {
+            btnAddCaja.addEventListener('click', function() {
+                if (!modeloSelect || !modeloSelect.value) {
+                    alert('Please select a model first');
+                    return;
+                }
+                cajaNuevaContainer.style.display = 'block';
+                cajaNuevoInput.required = true;
+                cajaNuevoInput.focus();
+                cajaNuevoInput.value = '';
+            });
+        }
+
+        function crearNuevaCaja(nombreCaja) {
+            if (!modeloSelect || !modeloSelect.value) {
+                alert('Please select a model first');
+                return;
+            }
+
+            const modeloId = modeloSelect.value;
+            if (!nombreCaja || nombreCaja.trim() === '') {
+                alert('Please enter a transmission name');
+                return;
+            }
+
+            cajaNuevoInput.disabled = true;
+            cajaNuevoInput.placeholder = 'Creating transmission...';
+
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            fetch(urlAgregarCaja, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify({
+                    nombre: nombreCaja.trim(),
+                    modelo_id: modeloId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                cajaNuevoInput.disabled = false;
+                cajaNuevoInput.placeholder = 'Enter new transmission name';
+
+                if (data.success) {
+                    // Agregar la nueva opción a Select2
+                    const newOption = new Option(data.caja.nombre, data.caja.id, true, true);
+                    cajaSelect.append(newOption).trigger('change');
+
+                    cajaNuevaContainer.style.display = 'none';
+                    cajaNuevoInput.value = '';
+                    cajaNuevoInput.required = false;
+                } else {
+                    alert('Error creating transmission: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error creating transmission:', error);
+                cajaNuevoInput.disabled = false;
+                cajaNuevoInput.placeholder = 'Enter new transmission name';
+                alert('Error creating transmission. Please try again.');
+            });
+        }
+
+        cajaNuevoInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                crearNuevaCaja(this.value);
+            }
+        });
+
+        cajaNuevoInput.addEventListener('blur', function() {
+            if (this.value.trim() !== '') {
+                crearNuevaCaja(this.value);
+            }
+        });
+    }
+});
+</script>
+
+
+{# form.media es CRÍTICO para que DAL inicialice Select2 correctamente #}
+{# Cargamos form.media completo (CSS + JS) para asegurar que todo esté disponible #}
+{# Los scripts base de DAL ya están en base.html, form.media puede duplicarlos #}
+{# Solución: Prevenir doble registro pero permitir inicialización correcta #}
+<script>
+// Proteger contra doble registro ANTES de que form.media se cargue
+(function() {
+    // Esperar a que yl esté disponible
+    function setupProtection() {
+        if (typeof yl === 'undefined' || typeof yl.registerFunction !== 'function') {
+            // Reintentar después
+            setTimeout(setupProtection, 50);
+            return;
+        }
+        
+        // Si ya está protegido, no hacer nada
+        if (yl.registerFunction._protected) {
+            return;
+        }
+        
+        // Guardar función original
+        const originalRegister = yl.registerFunction;
+        const registeredFunctions = new Set();
+        
+        // Función protegida que previene duplicados pero permite inicialización
+        yl.registerFunction = function(name, func) {
+            if (registeredFunctions.has(name)) {
+                // Ya registrado: retornar false silenciosamente
+                return false;
+            }
+            registeredFunctions.add(name);
+            return originalRegister.call(this, name, func);
+        };
+        
+        yl.registerFunction._protected = true;
+        yl.registerFunction._original = originalRegister;
+    }
+    
+    // Iniciar protección
+    setupProtection();
+})();
+</script>
+{{ form.media }}
+
+{# Asegurar que los botones de navegación funcionen correctamente #}
+<script>
+// Asegurar que los enlaces de navegación sean clicables
+$(document).ready(function() {
+    // Verificar que los enlaces tengan href y sean clicables
+    $('.btn-futuristic[href]').each(function() {
+        var $link = $(this);
+        var href = $link.attr('href');
+        
+        // Asegurar que el enlace tenga un href válido
+        if (!href || href === '#' || href === '') {
+            console.warn('⚠️ Enlace sin href válido:', $link.text().trim());
+        } else {
+            // Asegurar que el clic funcione
+            $link.on('click', function(e) {
+                // Si el href es válido, permitir la navegación
+                if (href && href !== '#' && href !== '') {
+                    // No prevenir el comportamiento por defecto
+                    console.log('🔗 Navegando a:', href);
+                }
+            });
+        }
+    });
+});
+</script>
+
+{# Forzar inicialización de DAL después de que form.media se cargue #}
+<script>
+// Esperar a que form.media cargue y forzar inicialización de DAL si es necesario
+(function() {
+    function initializeDAL() {
+        // Verificar que DAL y Select2 estén disponibles
+        if (typeof yl === 'undefined' || typeof yl.autocomplete === 'undefined') {
+            console.log('[DAL] Esperando que DAL se cargue...');
+            setTimeout(initializeDAL, 100);
+            return;
+        }
+        
+        // Verificar que Select2 esté disponible
+        if (typeof $ === 'undefined' || typeof $.fn.select2 === 'undefined') {
+            console.log('[DAL] Esperando que Select2 se cargue...');
+            setTimeout(initializeDAL, 100);
+            return;
+        }
+        
+        // Buscar campos con data-autocomplete-light-url que no estén inicializados
+        const fields = document.querySelectorAll('[data-autocomplete-light-url]');
+        let initialized = 0;
+        let skipped = 0;
+        
+        fields.forEach(function(field) {
+            const $field = $(field);
+            
+            // Si ya está inicializado, saltarlo
+            if ($field.hasClass('select2-hidden-accessible')) {
+                skipped++;
+                return;
+            }
+            
+            // Intentar inicialización manual
+            try {
+                // DAL debería inicializarlo automáticamente, pero si no, intentar manualmente
+                // Primero verificar si autocomplete.init ya se ejecutó
+                if (typeof yl.autocomplete.init === 'function') {
+                    console.log('[DAL] Ejecutando inicialización automática de DAL...');
+                    // Trigger evento que DAL escucha
+                    $(document).trigger('autocompleteLightInitialize');
+                }
+                
+                initialized++;
+            } catch (e) {
+                console.error('[DAL] Error al inicializar campo:', e);
+            }
+        });
+        
+        if (initialized > 0 || skipped > 0) {
+            console.log(`[DAL] Verificación completa: ${skipped} ya inicializados, ${initialized} pendientes`);
+        }
+    }
+    
+    // Iniciar después de que el DOM y los scripts estén listos
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(initializeDAL, 500);
+        });
+    } else {
+        setTimeout(initializeDAL, 500);
+    }
+    
+    // También intentar después de más tiempo por si form.media carga de forma asíncrona
+    setTimeout(initializeDAL, 1000);
+    setTimeout(initializeDAL, 2000);
+})();
+</script>
+{{ form.media }}
+{% endblock %}

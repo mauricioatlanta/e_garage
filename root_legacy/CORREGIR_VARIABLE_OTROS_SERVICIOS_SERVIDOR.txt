@@ -1,0 +1,50 @@
+═══════════════════════════════════════════════════════════════
+CORREGIR VARIABLE otros_servicios FALTANTE EN CONTEXTO
+═══════════════════════════════════════════════════════════════
+
+El template está buscando la variable `otros_servicios` como fallback,
+pero la vista no la está pasando en el contexto.
+
+Ejecuta este comando en el servidor:
+
+cd /home/atlantareciclajes/apps/egarage/current && \
+python3 << 'PYEOF'
+from pathlib import Path
+
+file_path = 'taller/documentos/views_migrated.py'
+
+print(f"📝 Corrigiendo {file_path}...\n")
+
+if not Path(file_path).exists():
+    print(f"❌ Error: {file_path} no existe")
+    exit(1)
+
+with open(file_path, 'r', encoding='utf-8') as f:
+    content = f.read()
+
+# Buscar el contexto.update y agregar otros_servicios
+if '"otros_servicios": otros_servicios' not in content:
+    # Buscar la línea con "servicios": servicios,  # Mantener compatibilidad
+    pattern = r'("servicios": servicios,  # Mantener compatibilidad)'
+    replacement = r'''\1
+                "otros_servicios": otros_servicios,  # Mantener compatibilidad'''
+    content = content.replace(
+        '"servicios": servicios,  # Mantener compatibilidad',
+        '"servicios": servicios,  # Mantener compatibilidad\n                "otros_servicios": otros_servicios,  # Mantener compatibilidad'
+    )
+    print("✅ Variable otros_servicios agregada al contexto")
+else:
+    print("ℹ️  La variable otros_servicios ya existe en el contexto")
+
+# Guardar
+with open(file_path, 'w', encoding='utf-8') as f:
+    f.write(content)
+
+print(f"\n✅ Archivo {file_path} actualizado")
+PYEOF
+
+touch /var/www/www_egarage_cl_wsgi.py
+echo "✅ Servidor reiniciado"
+
+═══════════════════════════════════════════════════════════════
+

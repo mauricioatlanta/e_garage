@@ -1,0 +1,312 @@
+═══════════════════════════════════════════════════════════════
+SCRIPT PARA CREAR SERVICIOS DE EJEMPLO PARA CHILE
+═══════════════════════════════════════════════════════════════
+
+Este script crea servicios de ejemplo para todas las empresas de Chile:
+
+cd /home/atlantareciclajes/apps/egarage/current && \
+python3 << 'PYEOF'
+import os
+import django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings')
+django.setup()
+
+from taller.models import Empresa
+from taller.servicios.models import (
+    CategoriaServicio,
+    Servicio,
+    ServicioName,
+    SubcategoriaServicio,
+)
+
+print("=" * 70)
+print("🔧 CREANDO SERVICIOS DE EJEMPLO PARA CHILE")
+print("=" * 70)
+
+# Obtener todas las empresas de Chile
+empresas = Empresa.objects.filter(pais='CL')
+print(f"\n🏢 Empresas encontradas en Chile: {empresas.count()}")
+
+if empresas.count() == 0:
+    print("⚠️  No hay empresas de Chile. Creando servicios sin empresa...")
+    empresas = [None]  # Crear servicios sin empresa (puede fallar si TenantScoped lo requiere)
+else:
+    for emp in empresas:
+        print(f"   - {emp.nombre if hasattr(emp, 'nombre') else str(emp)}")
+
+# Servicios de ejemplo por subcategoría
+servicios_por_subcategoria = {
+    "diagnostico": [
+        "Diagnóstico computarizado OBD-II",
+        "Lectura de códigos de error",
+        "Diagnóstico de motor completo"
+    ],
+    "aceite_filtros": [
+        "Cambio de aceite de motor",
+        "Cambio de filtro de aceite",
+        "Cambio de filtro de aire",
+        "Cambio de filtro de combustible",
+        "Cambio de filtro de cabina"
+    ],
+    "inyeccion": [
+        "Limpieza de inyectores",
+        "Calibración de inyectores",
+        "Reparación de bomba de combustible"
+    ],
+    "refrigeracion": [
+        "Cambio de termostato",
+        "Reparación de radiador",
+        "Cambio de bomba de agua",
+        "Carga de refrigerante"
+    ],
+    "escape": [
+        "Reparación de mofle",
+        "Cambio de catalizador",
+        "Reparación de tubo de escape"
+    ],
+    "pastillas_discos": [
+        "Cambio de pastillas de freno delanteras",
+        "Cambio de pastillas de freno traseras",
+        "Rectificado de discos",
+        "Cambio de discos de freno"
+    ],
+    "tambores_zapatas": [
+        "Cambio de zapatas de freno",
+        "Rectificado de tambores",
+        "Cambio de tambores"
+    ],
+    "liquido_frenos": [
+        "Purga de sistema de frenos",
+        "Cambio de líquido de frenos",
+        "Sangrado de frenos"
+    ],
+    "abs": [
+        "Diagnóstico de sistema ABS",
+        "Reparación de sensores ABS",
+        "Reparación de módulo ABS"
+    ],
+    "embrague": [
+        "Cambio de kit de embrague",
+        "Ajuste de embrague",
+        "Reparación de embrague"
+    ],
+    "caja_mecanica": [
+        "Reparación de caja manual",
+        "Cambio de aceite de caja",
+        "Reparación de sincronizados"
+    ],
+    "caja_automatica": [
+        "Cambio de aceite de transmisión automática",
+        "Reparación de transmisión automática",
+        "Servicio de transmisión automática"
+    ],
+    "diferencial": [
+        "Cambio de aceite de diferencial",
+        "Reparación de diferencial",
+        "Cambio de homocinéticas"
+    ],
+    "amortiguadores": [
+        "Cambio de amortiguadores delanteros",
+        "Cambio de amortiguadores traseros",
+        "Revisión de amortiguadores"
+    ],
+    "direccion": [
+        "Alineación de dirección",
+        "Cambio de terminales de dirección",
+        "Reparación de cremallera"
+    ],
+    "alineacion": [
+        "Alineación y balanceo completo",
+        "Alineación de ruedas",
+        "Balanceo de ruedas"
+    ],
+    "brazos_suspension": [
+        "Cambio de brazos de suspensión",
+        "Cambio de bujes",
+        "Cambio de rótulas"
+    ],
+    "bateria": [
+        "Cambio de batería",
+        "Carga de batería",
+        "Revisión de sistema de carga"
+    ],
+    "arranque": [
+        "Reparación de motor de arranque",
+        "Cambio de motor de arranque",
+        "Limpieza de motor de arranque"
+    ],
+    "luces": [
+        "Cambio de focos delanteros",
+        "Cambio de focos traseros",
+        "Instalación de luces LED"
+    ],
+    "accesorios": [
+        "Instalación de alarma",
+        "Instalación de GPS",
+        "Instalación de cierre centralizado"
+    ],
+    "carga_gas": [
+        "Carga de gas R134a",
+        "Carga de gas R1234yf",
+        "Recarga de aire acondicionado"
+    ],
+    "compresor": [
+        "Cambio de compresor de aire",
+        "Reparación de compresor",
+        "Cambio de condensador"
+    ],
+    "filtros_ac": [
+        "Cambio de filtro de cabina",
+        "Limpieza de sistema de aire",
+        "Desinfección de aire acondicionado"
+    ],
+    "pintura_completa": [
+        "Pintura completa del vehículo",
+        "Repintado completo",
+        "Pintura con horno"
+    ],
+    "pintura_parcial": [
+        "Pintura de capó",
+        "Pintura de puerta",
+        "Retoque de pintura"
+    ],
+    "desabolladura": [
+        "Desabolladura de panel",
+        "Enderezado de chasis",
+        "Reparación de golpes"
+    ],
+    "pulido": [
+        "Pulido completo",
+        "Encerado profesional",
+        "Abrillantado"
+    ],
+    "parabrisas": [
+        "Cambio de parabrisas",
+        "Reparación de parabrisas",
+        "Instalación de parabrisas"
+    ],
+    "vidrios_laterales": [
+        "Cambio de vidrio lateral",
+        "Reparación de alzavidrios",
+        "Instalación de vidrio"
+    ],
+    "polarizado": [
+        "Polarizado de ventanas",
+        "Instalación de lámina",
+        "Polarizado completo"
+    ],
+    "reparacion_vidrios": [
+        "Reparación de trizadura",
+        "Reparación con resina",
+        "Sellado de vidrio"
+    ],
+    "montaje": [
+        "Montaje de neumáticos",
+        "Desmontaje de neumáticos",
+        "Cambio de neumáticos"
+    ],
+    "balanceo": [
+        "Balanceo de ruedas",
+        "Balanceo computarizado",
+        "Equilibrado de neumáticos"
+    ],
+    "reparacion": [
+        "Reparación de neumático",
+        "Parche de neumático",
+        "Vulcanizado"
+    ],
+    "llantas": [
+        "Reparación de llanta",
+        "Cambio de llanta",
+        "Pulido de llanta"
+    ],
+    "revision_completa": [
+        "Revisión técnica completa",
+        "Chequeo general",
+        "Inspección completa"
+    ],
+    "liquidos": [
+        "Cambio de refrigerante",
+        "Cambio de líquido de frenos",
+        "Cambio de aceite hidráulico"
+    ],
+    "correas": [
+        "Cambio de correa de distribución",
+        "Cambio de correa de accesorios",
+        "Ajuste de correas"
+    ],
+    "filtros": [
+        "Cambio de filtro de aire",
+        "Cambio de filtro de combustible",
+        "Cambio de todos los filtros"
+    ]
+}
+
+total_servicios_creados = 0
+total_servicios_existentes = 0
+
+# Obtener todas las subcategorías de Chile
+subcategorias = SubcategoriaServicio.objects.filter(country='CL').select_related('categoria')
+
+print(f"\n📋 Subcategorías encontradas: {subcategorias.count()}")
+
+for empresa in empresas:
+    print(f"\n{'=' * 70}")
+    if empresa:
+        print(f"🏢 Procesando empresa: {empresa.nombre if hasattr(empresa, 'nombre') else str(empresa)}")
+    else:
+        print(f"🏢 Procesando sin empresa (puede fallar)")
+    
+    for subcategoria in subcategorias:
+        servicios_lista = servicios_por_subcategoria.get(subcategoria.code, [])
+        
+        if not servicios_lista:
+            continue
+        
+        for servicio_nombre in servicios_lista:
+            try:
+                servicio, created = Servicio.objects.get_or_create(
+                    empresa=empresa,
+                    nombre=servicio_nombre,
+                    categoria=subcategoria.categoria,
+                    subcategoria=subcategoria,
+                    defaults={
+                        'empresa': empresa,
+                        'nombre': servicio_nombre,
+                        'categoria': subcategoria.categoria,
+                        'subcategoria': subcategoria
+                    }
+                )
+                
+                if created:
+                    # Crear nombre en español
+                    ServicioName.objects.get_or_create(
+                        servicio=servicio,
+                        language='es',
+                        is_default=True,
+                        defaults={
+                            'label': servicio_nombre,
+                            'aliases': []
+                        }
+                    )
+                    total_servicios_creados += 1
+                    print(f"   ✅ Servicio creado: {servicio_nombre}")
+                else:
+                    total_servicios_existentes += 1
+                    
+            except Exception as e:
+                print(f"   ❌ Error creando servicio '{servicio_nombre}': {e}")
+                continue
+
+print("\n" + "=" * 70)
+print("✅ RESUMEN FINAL")
+print("=" * 70)
+print(f"   ✅ Servicios creados: {total_servicios_creados}")
+print(f"   ℹ️  Servicios existentes: {total_servicios_existentes}")
+print(f"   📈 Total servicios en BD: {Servicio.objects.count()}")
+print("=" * 70)
+print("\n✅ Proceso completado. Recarga la página para ver los servicios.")
+PYEOF
+
+═══════════════════════════════════════════════════════════════
+

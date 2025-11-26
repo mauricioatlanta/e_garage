@@ -1,0 +1,162 @@
+==========================================
+COMANDOS PARA EJECUTAR EN EL SERVIDOR
+==========================================
+
+Opción 1: Ejecutar script completo en shell de Django
+-------------------------------------------------------
+python manage.py shell < verificar_testuser_usa_directo.py
+
+
+Opción 2: Ejecutar línea por línea en shell interactivo
+-------------------------------------------------------
+python manage.py shell
+
+Luego copiar y pegar estos comandos uno por uno:
+
+# 1. Importar modelos
+from django.contrib.auth import get_user_model
+from datetime import datetime, timedelta
+from django.db import transaction
+from taller.models import Empresa, Suscripcion
+
+User = get_user_model()
+
+# 2. Definir credenciales
+username = "testuser_usa"
+password = "TestUSA2025!"
+email = "testuser@usa-garage.com"
+
+# 3. Verificar/crear usuario
+try:
+    user = User.objects.get(username=username)
+    print(f"✅ Usuario encontrado: {user.username}")
+except User.DoesNotExist:
+    user = User.objects.create_user(
+        username=username,
+        email=email,
+        password=password,
+        is_active=True
+    )
+    print(f"✅ Usuario creado: {user.username}")
+
+# 4. Resetear contraseña
+user.set_password(password)
+user.is_active = True
+user.save()
+print(f"✅ Contraseña reseteada")
+
+# 5. Verificar contraseña
+if user.check_password(password):
+    print("✅ Contraseña verificada correctamente")
+else:
+    print("❌ ERROR: Contraseña no funciona")
+
+# 6. Verificar/crear empresa
+try:
+    empresa = user.empresa
+    print(f"✅ Empresa: {empresa.nombre_taller}")
+    if empresa.pais != "US":
+        empresa.pais = "US"
+        empresa.save()
+except AttributeError:
+    empresa = Empresa.objects.create(
+        user=user,
+        nombre_taller="Taller de testuser_usa",
+        pais="US",
+        telefono="+15551234567"
+    )
+    print(f"✅ Empresa creada: {empresa.nombre_taller}")
+
+# 7. Verificar/crear suscripción
+try:
+    suscripcion = user.suscripcion
+    if not suscripcion.activa or (suscripcion.fecha_fin and suscripcion.fecha_fin < datetime.now().date()):
+        suscripcion.activa = False
+        suscripcion.save()
+        suscripcion = Suscripcion.objects.create(
+            user=user,
+            tipo="trial",
+            activa=True,
+            fecha_inicio=datetime.now().date(),
+            fecha_fin=(datetime.now() + timedelta(days=30)).date()
+        )
+        print("✅ Nueva suscripción creada")
+    else:
+        print(f"✅ Suscripción activa hasta {suscripcion.fecha_fin}")
+except AttributeError:
+    suscripcion = Suscripcion.objects.create(
+        user=user,
+        tipo="trial",
+        activa=True,
+        fecha_inicio=datetime.now().date(),
+        fecha_fin=(datetime.now() + timedelta(days=30)).date()
+    )
+    print("✅ Suscripción creada")
+
+# 8. Verificación final
+final_user = User.objects.get(username=username)
+if final_user.check_password(password):
+    print("\n" + "="*50)
+    print("✅ TODO CORRECTO")
+    print("="*50)
+    print(f"Usuario: {username}")
+    print(f"Contraseña: {password}")
+    print("URL: https://www.egarage.cl/us/accounts/login/")
+else:
+    print("\n❌ ERROR: Verificar manualmente")
+
+
+Opción 3: Usar el comando de Django (si el archivo está en el servidor)
+-------------------------------------------------------------------------
+python manage.py fix_testuser_usa
+
+
+Opción 4: Verificar usuario existente (diagnóstico)
+----------------------------------------------------
+python manage.py shell
+
+# En el shell:
+from django.contrib.auth import get_user_model
+User = get_user_model()
+
+try:
+    user = User.objects.get(username="testuser_usa")
+    print(f"Usuario: {user.username}")
+    print(f"Email: {user.email}")
+    print(f"Activo: {user.is_active}")
+    print(f"Staff: {user.is_staff}")
+    print(f"Último login: {user.last_login}")
+    print(f"Fecha registro: {user.date_joined}")
+    
+    # Probar contraseña
+    from django.contrib.auth import authenticate
+    auth_user = authenticate(username="testuser_usa", password="TestUSA2025!")
+    if auth_user:
+        print("✅ Autenticación exitosa")
+    else:
+        print("❌ Autenticación fallida")
+        # Resetear contraseña
+        user.set_password("TestUSA2025!")
+        user.is_active = True
+        user.save()
+        print("✅ Contraseña reseteada")
+        
+        # Verificar de nuevo
+        auth_user = authenticate(username="testuser_usa", password="TestUSA2025!")
+        if auth_user:
+            print("✅ Ahora la autenticación funciona")
+        else:
+            print("❌ ERROR: Aún no funciona")
+except User.DoesNotExist:
+    print("❌ Usuario no existe")
+
+
+==========================================
+NOTAS IMPORTANTES
+==========================================
+
+1. Asegúrate de estar en el directorio correcto del proyecto
+2. Activa el entorno virtual si es necesario
+3. Si hay errores, revisa los logs del servidor
+4. Puede que necesites verificar también los middlewares de autenticación
+

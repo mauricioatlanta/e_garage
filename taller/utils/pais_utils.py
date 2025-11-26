@@ -58,41 +58,46 @@ def get_marcas_por_pais(user):
 
 def get_configuracion_pais(empresa):
     """
-    Retorna configuración específica según el país de la empresa
+    Retorna configuración específica según el país de la empresa.
+
+    Usa configuración centralizada de country_config.py.
+
+    Args:
+        empresa: Instancia de modelo Empresa
+
+    Returns:
+        dict: Configuración completa del país
     """
-    if empresa.pais == "US":
-        return {
-            "moneda": "USD",
-            "simbolo_moneda": "$",
-            "decimales": 2,
-            "idioma_default": "en",
-            "formato_fecha": "%m/%d/%Y",
-            "zona_horaria_default": "America/New_York",
-            "validacion_patente": r"^[A-Z0-9]{2,7}$",  # Formato USA más flexible
-            "impuesto_default": 0.08,  # 8% promedio sales tax USA
-        }
-    if empresa.pais == "MX":
-        return {
-            "moneda": "MXN",
-            "simbolo_moneda": "$",
-            "decimales": 2,
-            "idioma_default": "es",
-            "formato_fecha": "%d/%m/%Y",
-            "zona_horaria_default": "America/Mexico_City",
-            "validacion_patente": r"^[A-Z]{3}\d{3,4}$",  # Formato general México
-            "impuesto_default": 0.16,  # IVA México 16%
-        }
-    else:  # Chile
-        return {
-            "moneda": "CLP",
-            "simbolo_moneda": "$",
-            "decimales": 0,
-            "idioma_default": "es",
-            "formato_fecha": "%d/%m/%Y",
-            "zona_horaria_default": "America/Santiago",
-            "validacion_patente": r"^[A-Z]{2}\d{4}$",  # Formato Chile: AA1234
-            "impuesto_default": 0.19,  # 19% IVA Chile
-        }
+    from taller.utils.country_config import get_config_from_empresa
+
+    config = get_config_from_empresa(empresa)
+    pais = getattr(empresa, "pais", "CL")
+
+    # Validaciones de patente por país (mantener lógica específica)
+    validacion_patente_map = {
+        "US": r"^[A-Z0-9]{2,7}$",  # Formato USA más flexible
+        "MX": r"^[A-Z]{3}\d{3,4}$",  # Formato general México
+        "CL": r"^[A-Z]{2}\d{4}$",  # Formato Chile: AA1234
+        "PE": r"^[A-Z]{3}\d{3}$",  # Formato Perú: ABC123
+        "CO": r"^[A-Z]{3}\d{3}[A-Z]?$",  # Formato Colombia
+        "EC": r"^[A-Z]{3}\d{4}$",  # Formato Ecuador
+        "BR": r"^[A-Z]{3}\d{4}$",  # Formato Brasil
+        "VE": r"^[A-Z]{3}\d{3}$",  # Formato Venezuela
+    }
+
+    # Construir respuesta con configuración centralizada
+    result = {
+        "moneda": config["currency"],
+        "simbolo_moneda": config["currency_symbol"],
+        "decimales": config["decimals"],
+        "idioma_default": config["lang"],
+        "formato_fecha": config["date_format"],
+        "zona_horaria_default": config["timezone"],
+        "validacion_patente": validacion_patente_map.get(pais, r"^[A-Z]{2,4}\d{2,4}$"),
+        "impuesto_default": config["tax_rate"] / 100.0,  # Convertir de porcentaje a decimal
+    }
+
+    return result
 
 
 def formatear_precio(precio, empresa):

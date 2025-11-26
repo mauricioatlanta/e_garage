@@ -1,0 +1,45 @@
+# ============================================
+# COMANDO PARA CARGAR SERVICIOS EN EL SERVIDOR
+# PythonAnywhere - eGarage
+# ============================================
+
+# PASO 1: Encontrar la ubicación del proyecto
+find ~ -name "manage.py" -type f 2>/dev/null
+
+# PASO 2: Navegar a la release activa
+# Si tienes múltiples releases, usa una de estas opciones:
+
+# Opción A: Si hay un symlink 'current'
+cd ~/apps/egarage/current
+
+# Opción B: Si no hay symlink, usa la release más reciente
+cd ~/apps/egarage/releases/2025-11-17_1615_eg
+
+# Opción C: Verificar desde la configuración Web
+# Ve a la pestaña "Web" en PythonAnywhere y revisa la ruta del "Source code"
+
+# PASO 3: Verificar que estás en el lugar correcto
+ls -la manage.py
+pwd
+
+# PASO 4: Ejecutar el comando de carga de servicios
+python3.10 manage.py cargar_servicios_produccion
+
+# PASO 5: Verificar que se cargaron correctamente
+python3.10 manage.py shell
+# En el shell de Django:
+# from taller.servicios.models import Servicio
+# print(f"Total servicios: {Servicio.objects.count()}")
+# exit()
+
+# PASO 6: Reiniciar la aplicación web
+# Ve a la pestaña "Web" y haz clic en "Reload" o "Restart"
+
+# ============================================
+# NOTAS IMPORTANTES
+# ============================================
+# - El comando crea servicios solo para empresas que ya existen
+# - Los servicios se crean según el país de cada empresa (CL o US)
+# - El comando es idempotente: puedes ejecutarlo múltiples veces sin duplicar datos
+# - Si hay errores, revisa los logs en la pestaña "Web" -> "Error log"
+

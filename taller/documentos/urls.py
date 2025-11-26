@@ -3,12 +3,15 @@ from django.urls import path
 # from .api import lista_debug  # Función no existe
 from . import api, api_servicios, views
 from . import views_moderno as views_moderno
+from . import views_inventory  # ✅ Vistas de inventario (emitir, anular)
+from . import views_pdf  # ✅ Vistas de PDF y WhatsApp
 from .redirect_views import redirect_documento_crear, redirect_documento_editar
 from .views_cbv import DocumentoDetailView
 from .views_migrated import DocumentoCreateView, DocumentoDeleteView
 from .views_migrated import DocumentoDetailView as MigratedDetailView
 from .views_migrated import DocumentoListView
 from .views_migrated import DocumentoUpdateView as MigratedUpdateView
+from .api_repuestos import buscar_repuestos_api  # ✅ API de autocomplete para Alpine.js
 
 # Comentado temporalmente - módulo no existe
 # sys.path.append(
@@ -59,6 +62,12 @@ urlpatterns = [
         "api/buscar-repuestos/",
         views_moderno.api_buscar_repuestos,
         name="api_buscar_repuestos",
+    ),
+    # ✅ API de autocomplete para Alpine.js (devuelve array simple)
+    path(
+        "api/repuestos/buscar/",
+        buscar_repuestos_api,
+        name="api_repuestos_buscar",
     ),
     path(
         "api/buscar-servicios/",
@@ -111,6 +120,28 @@ urlpatterns = [
     path("api/create/", api.api_create, name="api_create"),
     # Autocompletado de clientes
     path("autocomplete/cliente/", views.autocomplete_cliente, name="autocomplete_cliente"),
+    # Gestión de inventario (emitir, anular, validar stock)
+    path("emitir/<int:documento_id>/", views_inventory.emitir_documento, name="emitir_documento"),
+    path("anular/<int:documento_id>/", views_inventory.anular_documento, name="anular_documento"),
+    path(
+        "validar-stock/<int:documento_id>/",
+        views_inventory.validar_stock_documento,
+        name="validar_stock_documento",
+    ),
+    # Generación y descarga de PDFs
+    path("<int:pk>/pdf/", views_pdf.descargar_pdf_documento, name="descargar_pdf"),
+    path(
+        "<int:pk>/pdf/descargar/",
+        views_pdf.descargar_pdf_documento,
+        name="descargar_pdf_attachment",
+    ),
+    # Envío por WhatsApp
+    path("<int:pk>/whatsapp/", views_pdf.enviar_por_whatsapp, name="enviar_whatsapp"),
+    path(
+        "<int:pk>/whatsapp/enlace/",
+        views_pdf.generar_enlace_whatsapp,
+        name="generar_enlace_whatsapp",
+    ),
     # Endpoint de diagnóstico
     # path("lista-debug/", lista_debug, name="lista_debug"),  # Función no existe
 ]

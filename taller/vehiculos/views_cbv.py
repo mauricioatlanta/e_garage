@@ -71,8 +71,9 @@ class VehiculoCreateView(LoginRequiredMixin, TenantViewMixin, CreateView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        # Pasar el usuario para que el formulario adapte campos (Chile vs USA)
+        # Pasar el usuario y request para que el formulario adapte campos (Chile vs USA)
         kwargs["user"] = self.request.user
+        kwargs["request"] = self.request
         return kwargs
 
     def get_form(self, form_class=None):
@@ -163,6 +164,7 @@ class VehiculoUpdateView(LoginRequiredMixin, TenantViewMixin, UpdateView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["user"] = self.request.user
+        kwargs["request"] = self.request
         return kwargs
 
     def form_valid(self, form):

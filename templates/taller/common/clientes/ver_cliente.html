@@ -162,11 +162,6 @@
         {% endif %}
 
         <div class="p-4 rounded-xl bg-black/30 border border-cyan-900/40 backdrop-blur">
-          <p class="text-xs uppercase tracking-wider text-gray-400">{% if request.path|slice:':3' == '/us' %}Company{% else %}Empresa{% endif %}</p>
-          <p class="mt-1 text-lg font-medium text-gray-200">{{ cliente.empresa.nombre_taller }}</p>
-        </div>
-
-        <div class="p-4 rounded-xl bg-black/30 border border-cyan-900/40 backdrop-blur">
           <p class="text-xs uppercase tracking-wider text-gray-400">{% if request.path|slice:':3' == '/us' %}Created{% else %}Creado{% endif %}</p>
           <p class="mt-1 text-lg font-medium text-gray-200">{{ cliente.created_at|date:"M d, Y" }}</p>
         </div>

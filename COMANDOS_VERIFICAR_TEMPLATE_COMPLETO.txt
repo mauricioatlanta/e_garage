@@ -1,0 +1,102 @@
+===========================================
+SOLUCIÓN: Template crear_vehiculo incompleto
+===========================================
+
+PROBLEMA:
+---------
+Template en servidor: 252 bytes (solo extiende otro template)
+Template esperado: taller/us/en/vehiculos/crear_vehiculo.html
+Template en local: 1397 líneas (completo)
+
+DIAGNÓSTICO (Ejecutar en el servidor):
+---------------------------------------
+
+cd /home/atlantareciclajes/apps/egarage/current
+workon venv_egarage310
+
+# 1. Verificar qué template se está usando
+python manage.py shell << 'PYTHON'
+from taller.vehiculos.views_fbv import _vehicle_template
+template = _vehicle_template("crear", "US")
+print(f"Template esperado: {template}")
+exit()
+PYTHON
+
+# 2. Verificar si existe el template en la ruta esperada
+ls -la templates/taller/us/en/vehiculos/crear_vehiculo.html
+
+# 3. Verificar el template actual (el pequeño)
+cat templates/us/en/vehiculos/crear_vehiculo.html
+
+# 4. Verificar si existe el template base que extiende
+ls -la templates/taller/common/vehiculos/vehiculo_form.html
+
+# 5. Verificar configuración de TEMPLATES en settings
+python manage.py shell << 'PYTHON'
+from django.conf import settings
+for dir in settings.TEMPLATES[0]['DIRS']:
+    print(f"Template dir: {dir}")
+for app in settings.INSTALLED_APPS:
+    print(f"App: {app}")
+exit()
+PYTHON
+
+
+SOLUCIÓN (Subir template completo):
+-----------------------------------
+
+# OPCIÓN 1: Subir con FileZilla (RECOMENDADA)
+# 1. Conectar FileZilla al servidor
+# 2. Navegar a: /home/atlantareciclajes/apps/egarage/current/templates/us/en/vehiculos/
+# 3. Subir: crear_vehiculo.html desde tu PC (el archivo completo de 1397 líneas)
+# 4. Verificar que se subió correctamente:
+ls -lh templates/us/en/vehiculos/crear_vehiculo.html
+# Debe mostrar un tamaño mucho mayor (al menos 50KB)
+
+# OPCIÓN 2: Crear el template completo manualmente
+# (Solo si no puedes usar FileZilla)
+# Copiar el contenido completo del template desde local
+
+
+VERIFICACIÓN:
+-------------
+
+# 1. Verificar tamaño del archivo (debe ser > 50KB)
+ls -lh templates/us/en/vehiculos/crear_vehiculo.html
+
+# 2. Verificar primeras líneas (debe tener el formulario completo)
+head -50 templates/us/en/vehiculos/crear_vehiculo.html
+
+# 3. Verificar que no solo extiende otro template
+grep -c "{% extends" templates/us/en/vehiculos/crear_vehiculo.html
+# Si solo tiene 1 línea con {% extends, está incompleto
+
+# 4. Limpiar caché
+find . -type d -name "__pycache__" -exec rm -r {} + 2>/dev/null
+find . -name "*.pyc" -delete
+
+# 5. Recargar aplicación (en dashboard)
+
+# 6. Probar en navegador
+# https://www.egarage.cl/us/vehiculos/crear/
+# Debe mostrar el formulario completo, no login
+
+===========================================
+NOTA IMPORTANTE:
+===========================================
+
+El template en el servidor solo tiene:
+```
+{% extends "taller/common/vehiculos/vehiculo_form.html" %}
+```
+
+Pero el template completo en local tiene TODO el formulario con:
+- Estilos CSS
+- JavaScript para Select2
+- Formulario completo con todos los campos
+- Indicadores visuales (🌸 ⭐)
+
+Necesitas subir el template COMPLETO desde local.
+
+===========================================
+

@@ -1,0 +1,86 @@
+═══════════════════════════════════════════════════════════════
+  COMANDO DEFINITIVO PARA CORREGIR F-STRING
+═══════════════════════════════════════════════════════════════
+
+Este comando busca el FIN del f-string multilinea y reemplaza
+la línea problemática DESPUÉS de él, no dentro:
+
+───────────────────────────────────────────────────────────────
+cd /home/atlantareciclajes/apps/egarage/current && python3 << 'PYEOF'
+import os
+import re
+
+file_path = "taller/documentos/views.py"
+
+with open(file_path, 'r', encoding='utf-8') as f:
+    lines = f.readlines()
+
+# Crear backup
+with open(f"{file_path}.backup_definitivo", 'w', encoding='utf-8') as f:
+    f.writelines(lines)
+
+# Encontrar dónde TERMINA el f-string multilinea (línea con """)
+multiline_end = None
+for i in range(1210, min(len(lines), 1220)):
+    if '"""' in lines[i]:
+        multiline_end = i
+        print(f"✅ Fin de f-string multilinea en línea {i+1}")
+        break
+
+# Buscar línea problemática DESPUÉS del f-string
+target_idx = None
+start = multiline_end + 1 if multiline_end else 1215
+for i in range(start, min(len(lines), 1235)):
+    line = lines[i]
+    if ('wa.me' in line and 'f"' in line and 'mensaje' in line and 
+        ('replace' in line or '\\n' in line)):
+        target_idx = i
+        print(f"✅ Línea problemática encontrada: {i+1}")
+        break
+
+if target_idx is None:
+    print("⚠️  No encontrada, mostrando líneas 1210-1235:")
+    for i in range(1210, min(len(lines), 1235)):
+        print(f"   {i+1}: {lines[i].strip()[:100]}")
+    exit(1)
+
+# Verificar que estamos FUERA del f-string
+# Si hay """ antes de target_idx y número impar, estamos dentro
+text_before = ''.join(lines[:target_idx])
+if text_before.count('"""') % 2 == 1:
+    # Estamos dentro, buscar el cierre
+    print("⚠️  Detectado dentro de string, buscando cierre...")
+    for i in range(target_idx - 1, max(0, target_idx - 20), -1):
+        if '"""' in lines[i]:
+            target_idx = i + 1
+            print(f"✅ Corregido: insertar después de línea {i+1}")
+            break
+
+# Obtener indentación y telefono
+line = lines[target_idx]
+indent = len(line) - len(line.lstrip())
+telefono_match = re.search(r'\{([^}]+)\}', line)
+telefono_var = telefono_match.group(1) if telefono_match else 'telefono'
+
+# Reemplazar
+new_lines = lines[:target_idx] + [
+    ' ' * indent + '# Crear URL de WhatsApp\n',
+    ' ' * indent + '# Nota: No se pueden usar backslashes directamente en expresiones f-string\n',
+    ' ' * indent + 'mensaje_encoded = mensaje.replace(" ", "%20").replace("\\n", "%0A")\n',
+    ' ' * indent + f'url_whatsapp = f"https://wa.me/{{{telefono_var}}}?text={{mensaje_encoded}}"\\n'
+] + lines[target_idx + 1:]
+
+# Escribir
+with open(file_path, 'w', encoding='utf-8') as f:
+    f.writelines(new_lines)
+
+# Verificar sintaxis
+compile(''.join(new_lines), file_path, 'exec')
+print("✅ Sintaxis válida")
+
+PYEOF
+touch /var/www/www_egarage_cl_wsgi.py && echo "✅ Servidor reiniciado"
+───────────────────────────────────────────────────────────────
+
+
+

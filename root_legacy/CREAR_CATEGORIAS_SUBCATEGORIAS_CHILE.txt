@@ -1,0 +1,378 @@
+═══════════════════════════════════════════════════════════════
+COMANDO PARA CREAR CATEGORÍAS Y SUBCATEGORÍAS DE SERVICIOS PARA CHILE
+═══════════════════════════════════════════════════════════════
+
+Ejecuta este comando en el servidor para crear categorías y subcategorías:
+
+cd /home/atlantareciclajes/apps/egarage/current && \
+python3 << 'PYEOF'
+import os
+import django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings')
+django.setup()
+
+from taller.servicios.models import (
+    CategoriaServicio,
+    CategoriaServicioName,
+    SubcategoriaServicio,
+    SubcategoriaServicioName,
+)
+
+# Definición de categorías y subcategorías para Chile
+categorias_data = [
+    {
+        "code": "motor",
+        "label": "Sistema de Motor",
+        "aliases": ["motor", "máquina", "propulsión"],
+        "subcategorias": [
+            {
+                "code": "diagnostico",
+                "label": "Diagnóstico Computarizado",
+                "aliases": ["scanner", "obd", "diagnóstico", "códigos de error"]
+            },
+            {
+                "code": "aceite_filtros",
+                "label": "Aceite y Filtros",
+                "aliases": ["cambio de aceite", "filtros", "mantenimiento básico"]
+            },
+            {
+                "code": "inyeccion",
+                "label": "Sistema de Inyección",
+                "aliases": ["inyectores", "bomba de combustible", "common rail"]
+            },
+            {
+                "code": "refrigeracion",
+                "label": "Sistema de Refrigeración",
+                "aliases": ["radiador", "termostato", "bomba de agua", "refrigerante"]
+            },
+            {
+                "code": "escape",
+                "label": "Sistema de Escape",
+                "aliases": ["mofle", "catalizador", "silenciador", "tubo de escape"]
+            }
+        ]
+    },
+    {
+        "code": "frenos",
+        "label": "Sistema de Frenos",
+        "aliases": ["frenos", "frenado", "pastillas", "discos"],
+        "subcategorias": [
+            {
+                "code": "pastillas_discos",
+                "label": "Pastillas y Discos",
+                "aliases": ["pastillas de freno", "discos de freno", "balatas"]
+            },
+            {
+                "code": "tambores_zapatas",
+                "label": "Tambores y Zapatas",
+                "aliases": ["tambores", "zapatas", "frenos traseros"]
+            },
+            {
+                "code": "liquido_frenos",
+                "label": "Líquido de Frenos",
+                "aliases": ["purga de frenos", "sangrado", "líquido hidráulico"]
+            },
+            {
+                "code": "abs",
+                "label": "Sistema ABS",
+                "aliases": ["abs", "antilock", "sensores abs"]
+            }
+        ]
+    },
+    {
+        "code": "transmision",
+        "label": "Transmisión y Embrague",
+        "aliases": ["transmisión", "caja de cambios", "embrague", "clutch"],
+        "subcategorias": [
+            {
+                "code": "embrague",
+                "label": "Embrague",
+                "aliases": ["clutch", "kit de embrague", "disco de embrague"]
+            },
+            {
+                "code": "caja_mecanica",
+                "label": "Caja Mecánica",
+                "aliases": ["caja manual", "transmisión manual", "sincronizados"]
+            },
+            {
+                "code": "caja_automatica",
+                "label": "Caja Automática",
+                "aliases": ["transmisión automática", "atf", "convertidor de par"]
+            },
+            {
+                "code": "diferencial",
+                "label": "Diferencial y Cardán",
+                "aliases": ["diferencial", "cardán", "homocinéticas", "crucetas"]
+            }
+        ]
+    },
+    {
+        "code": "suspension",
+        "label": "Suspensión y Dirección",
+        "aliases": ["suspensión", "amortiguadores", "dirección", "alineación"],
+        "subcategorias": [
+            {
+                "code": "amortiguadores",
+                "label": "Amortiguadores",
+                "aliases": ["amortiguadores", "shocks", "suspensión"]
+            },
+            {
+                "code": "direccion",
+                "label": "Dirección",
+                "aliases": ["dirección", "cremallera", "terminales", "axiales"]
+            },
+            {
+                "code": "alineacion",
+                "label": "Alineación y Balanceo",
+                "aliases": ["alineación", "balanceo", "geometría", "convergencia"]
+            },
+            {
+                "code": "brazos_suspension",
+                "label": "Brazos y Componentes",
+                "aliases": ["brazos", "trapecios", "bujes", "rótulas"]
+            }
+        ]
+    },
+    {
+        "code": "electrico",
+        "label": "Sistema Eléctrico",
+        "aliases": ["eléctrico", "electricidad", "batería", "alternador"],
+        "subcategorias": [
+            {
+                "code": "bateria",
+                "label": "Batería y Carga",
+                "aliases": ["batería", "alternador", "regulador", "carga"]
+            },
+            {
+                "code": "arranque",
+                "label": "Sistema de Arranque",
+                "aliases": ["motor de arranque", "starter", "solenoide"]
+            },
+            {
+                "code": "luces",
+                "label": "Sistema de Iluminación",
+                "aliases": ["luces", "focos", "led", "xenón", "halógenas"]
+            },
+            {
+                "code": "accesorios",
+                "label": "Accesorios Eléctricos",
+                "aliases": ["alarma", "cierre centralizado", "gps", "cámara"]
+            }
+        ]
+    },
+    {
+        "code": "aire_acondicionado",
+        "label": "Aire Acondicionado",
+        "aliases": ["aire acondicionado", "climatización", "ac", "refrigeración"],
+        "subcategorias": [
+            {
+                "code": "carga_gas",
+                "label": "Carga de Gas",
+                "aliases": ["carga de gas", "recarga", "r134a", "r1234yf"]
+            },
+            {
+                "code": "compresor",
+                "label": "Compresor y Componentes",
+                "aliases": ["compresor", "condensador", "evaporador"]
+            },
+            {
+                "code": "filtros_ac",
+                "label": "Filtros y Limpieza",
+                "aliases": ["filtro de cabina", "limpieza", "desinfección"]
+            }
+        ]
+    },
+    {
+        "code": "pintura",
+        "label": "Pintura y Desabolladura",
+        "aliases": ["pintura", "desabolladura", "pulido", "cerámico"],
+        "subcategorias": [
+            {
+                "code": "pintura_completa",
+                "label": "Pintura Completa",
+                "aliases": ["pintura completa", "pintura total", "repintado"]
+            },
+            {
+                "code": "pintura_parcial",
+                "label": "Pintura Parcial",
+                "aliases": ["pintura parcial", "retoque", "panel"]
+            },
+            {
+                "code": "desabolladura",
+                "label": "Desabolladura",
+                "aliases": ["desabolladura", "enderezado", "golpes"]
+            },
+            {
+                "code": "pulido",
+                "label": "Pulido y Encerado",
+                "aliases": ["pulido", "encerado", "abrillantado", "cerámico"]
+            }
+        ]
+    },
+    {
+        "code": "vidrios",
+        "label": "Vidrios y Cristales",
+        "aliases": ["vidrios", "cristales", "parabrisas", "polarizado"],
+        "subcategorias": [
+            {
+                "code": "parabrisas",
+                "label": "Parabrisas",
+                "aliases": ["parabrisas", "luneta", "cristal delantero"]
+            },
+            {
+                "code": "vidrios_laterales",
+                "label": "Vidrios Laterales",
+                "aliases": ["vidrios laterales", "ventanas", "alzavidrios"]
+            },
+            {
+                "code": "polarizado",
+                "label": "Polarizado",
+                "aliases": ["polarizado", "tintado", "lámina"]
+            },
+            {
+                "code": "reparacion_vidrios",
+                "label": "Reparación de Vidrios",
+                "aliases": ["reparación", "trizaduras", "resina"]
+            }
+        ]
+    },
+    {
+        "code": "neumaticos",
+        "label": "Neumáticos y Llantas",
+        "aliases": ["neumáticos", "llantas", "ruedas", "gomas"],
+        "subcategorias": [
+            {
+                "code": "montaje",
+                "label": "Montaje y Desmontaje",
+                "aliases": ["montaje", "desmontaje", "cambio de neumáticos"]
+            },
+            {
+                "code": "balanceo",
+                "label": "Balanceo",
+                "aliases": ["balanceo", "equilibrado", "pesos"]
+            },
+            {
+                "code": "reparacion",
+                "label": "Reparación de Neumáticos",
+                "aliases": ["reparación", "parche", "vulcanizado"]
+            },
+            {
+                "code": "llantas",
+                "label": "Llantas",
+                "aliases": ["llantas", "rin", "aleación", "acero"]
+            }
+        ]
+    },
+    {
+        "code": "mantenimiento",
+        "label": "Mantenimiento Preventivo",
+        "aliases": ["mantenimiento", "revisión", "chequeo", "servicio"],
+        "subcategorias": [
+            {
+                "code": "revision_completa",
+                "label": "Revisión Completa",
+                "aliases": ["revisión completa", "chequeo general", "inspección"]
+            },
+            {
+                "code": "liquidos",
+                "label": "Líquidos y Fluidos",
+                "aliases": ["líquidos", "fluidos", "refrigerante", "aceite"]
+            },
+            {
+                "code": "correas",
+                "label": "Correas y Cadena",
+                "aliases": ["correas", "cadena de distribución", "tensores"]
+            },
+            {
+                "code": "filtros",
+                "label": "Filtros",
+                "aliases": ["filtros", "filtro de aire", "filtro de combustible"]
+            }
+        ]
+    }
+]
+
+print("🔧 Creando categorías y subcategorías de servicios para Chile...\n")
+print("=" * 70)
+
+total_categorias_creadas = 0
+total_categorias_existentes = 0
+total_subcategorias_creadas = 0
+total_subcategorias_existentes = 0
+
+for cat_data in categorias_data:
+    # Crear categoría
+    categoria, cat_created = CategoriaServicio.objects.get_or_create(
+        country='CL',
+        code=cat_data['code'],
+        defaults={'country': 'CL', 'code': cat_data['code']}
+    )
+    
+    if cat_created:
+        print(f"\n✅ Categoría creada: {cat_data['label']}")
+        total_categorias_creadas += 1
+    else:
+        print(f"\nℹ️  Categoría existente: {cat_data['label']}")
+        total_categorias_existentes += 1
+    
+    # Crear o actualizar nombre en español
+    # Primero eliminar cualquier nombre existente que no sea default
+    CategoriaServicioName.objects.filter(categoria=categoria, language='es', is_default=False).delete()
+    
+    # Crear o actualizar el nombre default
+    nombre_cat, nombre_created = CategoriaServicioName.objects.update_or_create(
+        categoria=categoria,
+        language='es',
+        is_default=True,
+        defaults={
+            'label': cat_data['label'],
+            'aliases': cat_data.get('aliases', [])
+        }
+    )
+    
+    # Crear subcategorías
+    for sub_data in cat_data.get('subcategorias', []):
+        subcategoria, sub_created = SubcategoriaServicio.objects.get_or_create(
+            categoria=categoria,
+            country='CL',
+            code=sub_data['code'],
+            defaults={'categoria': categoria, 'country': 'CL', 'code': sub_data['code']}
+        )
+        
+        if sub_created:
+            print(f"   ✅ Subcategoría creada: {sub_data['label']}")
+            total_subcategorias_creadas += 1
+        else:
+            total_subcategorias_existentes += 1
+        
+        # Crear o actualizar nombre en español
+        # Primero eliminar cualquier nombre existente que no sea default
+        SubcategoriaServicioName.objects.filter(subcategoria=subcategoria, language='es', is_default=False).delete()
+        
+        # Crear o actualizar el nombre default
+        nombre_sub, nombre_sub_created = SubcategoriaServicioName.objects.update_or_create(
+            subcategoria=subcategoria,
+            language='es',
+            is_default=True,
+            defaults={
+                'label': sub_data['label'],
+                'aliases': sub_data.get('aliases', [])
+            }
+        )
+
+print()
+print("=" * 70)
+print(f"📊 Resumen:")
+print(f"   ✅ Categorías creadas: {total_categorias_creadas}")
+print(f"   ℹ️  Categorías existentes: {total_categorias_existentes}")
+print(f"   ✅ Subcategorías creadas: {total_subcategorias_creadas}")
+print(f"   ℹ️  Subcategorías existentes: {total_subcategorias_existentes}")
+print()
+print(f"   📈 Total categorías Chile: {CategoriaServicio.objects.filter(country='CL').count()}")
+print(f"   📈 Total subcategorías Chile: {SubcategoriaServicio.objects.filter(country='CL').count()}")
+print("=" * 70)
+print("\n✅ Proceso completado")
+PYEOF
+
+═══════════════════════════════════════════════════════════════
+

@@ -1,0 +1,106 @@
+═══════════════════════════════════════════════════════════════
+  SOLUCIÓN DIRECTA CON SED - ELIMINA E INSERTA LÍNEAS
+═══════════════════════════════════════════════════════════════
+
+Este comando usa sed para eliminar las líneas problemáticas
+y luego inserta el código correcto DESPUÉS del f-string:
+
+───────────────────────────────────────────────────────────────
+cd /home/atlantareciclajes/apps/egarage/current && \
+cp taller/documentos/views.py taller/documentos/views.py.backup_sed && \
+python3 << 'PYEOF'
+import re
+
+file_path = "taller/documentos/views.py"
+
+with open(file_path, 'r', encoding='utf-8') as f:
+    content = f.read()
+
+# Buscar el f-string multilinea completo y el código después
+# Patrón: f-string termina con """ y luego viene el código de WhatsApp
+pattern = r'(mensaje = f""".*?""")\s*\n\s*# Crear URL de WhatsApp.*?(return JsonResponse.*?\))'
+
+# Código correcto
+replacement = r'''mensaje = f"""Hola {documento.cliente.nombre},
+
+Adjunto encontrará el documento del taller.
+
+📄 {documento.get_tipo_display()} #{documento.numero_documento}
+🏢 {documento.empresa.nombre_taller}
+📅 Fecha: {documento.fecha_emision.strftime('%d/%m/%Y')}
+💰 Total: ${documento.total_general():,.0f}
+
+Para ver el documento completo, visite:
+{request.build_absolute_uri(f'/cl/documentos/{documento.id}/')}
+
+¡Gracias por confiar en nuestros servicios!"""
+
+    # Crear URL de WhatsApp
+    # Nota: No se pueden usar backslashes directamente en expresiones f-string
+    mensaje_encoded = mensaje.replace(" ", "%20").replace("\\n", "%0A")
+    url_whatsapp = f"https://wa.me/{telefono}?text={mensaje_encoded}"
+
+    return JsonResponse(
+        {
+            "success": True,
+            "url_whatsapp": url_whatsapp,
+            "telefono": telefono,
+            "mensaje": mensaje,
+        }
+    )'''
+
+# Reemplazar
+new_content = re.sub(pattern, replacement, content, flags=re.DOTALL)
+
+if new_content == content:
+    print("⚠️  No se encontró el patrón")
+    print("   Intentando búsqueda alternativa...")
+    # Buscar solo la parte problemática
+    problem_pattern = r'(mensaje_encoded = mensaje\.replace.*?url_whatsapp = f"https://wa\.me/.*?")'
+    alt_replacement = '''# Crear URL de WhatsApp
+    # Nota: No se pueden usar backslashes directamente en expresiones f-string
+    mensaje_encoded = mensaje.replace(" ", "%20").replace("\\n", "%0A")
+    url_whatsapp = f"https://wa.me/{telefono}?text={mensaje_encoded}"'''
+    new_content = re.sub(problem_pattern, alt_replacement, content, flags=re.DOTALL)
+    
+    if new_content == content:
+        print("❌ No se pudo encontrar el patrón")
+        exit(1)
+
+with open(file_path, 'w', encoding='utf-8') as f:
+    f.write(new_content)
+
+# Verificar sintaxis
+try:
+    compile(new_content, file_path, 'exec')
+    print("✅ Sintaxis válida")
+except SyntaxError as e:
+    print(f"❌ Error de sintaxis: {e}")
+    print(f"   Línea {e.lineno}")
+    exit(1)
+
+PYEOF
+python3 -m py_compile taller/documentos/views.py && \
+touch /var/www/www_egarage_cl_wsgi.py && \
+echo "✅ Servidor reiniciado"
+───────────────────────────────────────────────────────────────
+
+ALTERNATIVA MÁS SIMPLE - REEMPLAZA LÍNEA POR LÍNEA:
+
+───────────────────────────────────────────────────────────────
+cd /home/atlantareciclajes/apps/egarage/current && \
+cp taller/documentos/views.py taller/documentos/views.py.backup && \
+sed -i '1230d' taller/documentos/views.py && \
+sed -i '1229d' taller/documentos/views.py && \
+sed -i '/¡Gracias por confiar en nuestros servicios!"""/a\
+\
+    # Crear URL de WhatsApp\
+    # Nota: No se pueden usar backslashes directamente en expresiones f-string\
+    mensaje_encoded = mensaje.replace(" ", "%20").replace("\\n", "%0A")\
+    url_whatsapp = f"https://wa.me/{telefono}?text={mensaje_encoded}"' taller/documentos/views.py && \
+python3 -m py_compile taller/documentos/views.py && \
+touch /var/www/www_egarage_cl_wsgi.py
+───────────────────────────────────────────────────────────────
+
+
+

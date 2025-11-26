@@ -1,0 +1,115 @@
+# ============================================================
+# 🔄 COMANDOS PARA ACTUALIZAR DEPENDENCIAS EN EL SERVIDOR
+# eGarage - Actualización Post-Resolución de Conflictos
+# ============================================================
+# IMPORTANTE: Ejecutar estos comandos en el terminal de PythonAnywhere
+# IMPORTANTE: Reemplaza "tu_usuario" con tu usuario de PythonAnywhere
+# ============================================================
+
+# ============================================================
+# 1. NAVEGAR AL DIRECTORIO DEL PROYECTO
+# ============================================================
+
+cd ~/egarage
+
+# ============================================================
+# 2. ACTUALIZAR DEPENDENCIAS (RESUELVE CONFLICTOS)
+# ============================================================
+# Esto actualizará numpy, cryptography, scipy, statsmodels, lifelines
+# y selenium a versiones compatibles
+
+pip3.10 install --user --upgrade -r requirements.txt
+
+# O si usas requirements_pythonanywhere.txt:
+# pip3.10 install --user --upgrade -r requirements_pythonanywhere.txt
+
+# ============================================================
+# 3. VERIFICAR QUE NO HAY CONFLICTOS
+# ============================================================
+
+pip3.10 check
+
+# Debe mostrar: "No broken requirements found."
+
+# ============================================================
+# 4. ACTUALIZAR PAQUETES ESPECÍFICOS (si el paso 2 no los actualizó)
+# ============================================================
+
+# Actualizar paquetes que causaban conflictos
+pip3.10 install --user --upgrade \
+    "numpy>=2.0.0" \
+    "cryptography>=41.0.5,<44.0.0" \
+    "scipy>=1.14.0" \
+    "statsmodels>=0.14.0" \
+    "lifelines>=0.29.0" \
+    "selenium>=4.38.0"
+
+# ============================================================
+# 5. VERIFICAR VERSIONES INSTALADAS
+# ============================================================
+
+pip3.10 list | grep -E "numpy|cryptography|scipy|statsmodels|lifelines|selenium"
+
+# Debe mostrar versiones compatibles:
+# - numpy 2.x.x
+# - cryptography 43.x.x (no 44.x.x)
+# - scipy 1.16.x (no 1.10.x)
+# - statsmodels 0.14.x
+# - lifelines 0.30.x (no 0.28.x)
+# - selenium 4.38.x (no 4.33.x)
+
+# ============================================================
+# 6. REINICIAR LA WEB APP (IMPORTANTE)
+# ============================================================
+# Después de actualizar dependencias, siempre reinicia la web app
+# Ve a la pestaña "Web" en PythonAnywhere y haz clic en "Reload"
+
+# O desde el terminal (si tienes acceso):
+# touch /var/www/tu_usuario_pythonanywhere_com_wsgi.py
+
+# ============================================================
+# 7. VERIFICAR QUE EL SITIO FUNCIONA
+# ============================================================
+
+# Ver logs de errores (si hay problemas)
+tail -f /var/log/tu_usuario.pythonanywhere.com.error.log
+
+# ============================================================
+# COMANDO COMPLETO EN UNA LÍNEA (copiar y pegar)
+# ============================================================
+
+cd ~/egarage && \
+pip3.10 install --user --upgrade -r requirements.txt && \
+pip3.10 install --user --upgrade "numpy>=2.0.0" "cryptography>=41.0.5,<44.0.0" "scipy>=1.14.0" "statsmodels>=0.14.0" "lifelines>=0.29.0" "selenium>=4.38.0" && \
+pip3.10 check
+
+# ============================================================
+# TROUBLESHOOTING
+# ============================================================
+
+# Si hay error "No module named 'numpy'" después de actualizar:
+pip3.10 install --user --force-reinstall numpy
+
+# Si hay error con cryptography:
+pip3.10 install --user --force-reinstall "cryptography>=41.0.5,<44.0.0"
+
+# Si el sitio da error 500 después de actualizar:
+# 1. Verifica logs: tail -f /var/log/tu_usuario.pythonanywhere.com.error.log
+# 2. Verifica que todas las dependencias estén instaladas: pip3.10 list
+# 3. Reinicia la web app desde el panel de PythonAnywhere
+
+# ============================================================
+# VERIFICACIÓN FINAL
+# ============================================================
+
+# Ejecutar este comando para verificar que todo está bien:
+python3.10 manage.py check --deploy
+
+# Debe mostrar: "System check identified no issues (0 silenced)."
+
+# ============================================================
+# FIN DE COMANDOS
+# ============================================================
+
+
+

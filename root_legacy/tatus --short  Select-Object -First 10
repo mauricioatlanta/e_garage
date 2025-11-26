@@ -1,0 +1,3 @@
+[33md749a5ba[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m Add: Script para corregir indentación y eliminar líneas duplicadas
+[33m092fd1c4[m Add: Solución directa que reemplaza líneas específicas del bloque problemático
+[33m99511439[m Add: Script para restaurar views.py desde Git como solución definitiva

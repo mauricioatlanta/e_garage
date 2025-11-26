@@ -38,6 +38,7 @@ from taller.models.clientes import Cliente
 from taller.models.vehiculos import Vehiculo
 from taller.models.repuesto import Repuesto
 from taller.servicios.models import Servicio, ServicioExterno
+from taller.auth.decorators_role import RoleRequiredMixin
 
 
 LANGUAGE_BY_COUNTRY = {
@@ -335,8 +336,7 @@ class DocumentoListView(CountryLangTemplateMixin, ListView):
                 )
                 .annotate(
                     total_display=Coalesce(
-                        "legacy_total_general",
-                        "total",
+                        F("legacy_total_general"),
                         ExpressionWrapper(
                             F("rep_sum") + F("serv_sum") + F("otros_sum") + F("iva_calc"),
                             output_field=DecimalField(max_digits=14, decimal_places=2),
@@ -355,8 +355,19 @@ class DocumentoListView(CountryLangTemplateMixin, ListView):
         context = super().get_context_data(**kwargs)
         context["country"] = getattr(self.request.user.empresa, "pais", "cl").lower()
 
-        # Los totales ya están calculados automáticamente en el modelo
-        # No necesitamos calcularlos manualmente aquí
+        # Asignar los valores calculados a las propiedades que el template espera
+        for documento in context.get("documentos", []):
+            # Usar los valores calculados en las anotaciones
+            if hasattr(documento, "rep_sum"):
+                documento.neto_repuestos = documento.rep_sum or Decimal("0")
+            if hasattr(documento, "serv_sum"):
+                documento.neto_servicios = documento.serv_sum or Decimal("0")
+            if hasattr(documento, "otros_sum"):
+                documento.neto_otros_servicios = documento.otros_sum or Decimal("0")
+            if hasattr(documento, "iva_calc"):
+                documento.tax_amount = documento.iva_calc or Decimal("0")
+            if hasattr(documento, "total_display"):
+                documento.total = documento.total_display or Decimal("0")
 
         return context
 
@@ -610,15 +621,23 @@ class DocumentoDetailView(CountryLangTemplateMixin, DetailView):
         documento = self.object
 
         # Obtener líneas del documento
-        repuestos = documento.lineas_repuesto.all().select_related("repuesto")
-        servicios = documento.lineas_servicio.all().select_related("servicio")
-        otros_servicios = documento.lineas_otro_servicio.all()
+        repuestos = list(documento.lineas_repuesto.all().select_related("repuesto", "part"))
+        servicios = list(documento.lineas_servicio.all().select_related("servicio", "service"))
+        otros_servicios = list(documento.lineas_otro_servicio.all())
 
-        # Calcular subtotales
-        subtotal_repuestos = sum(linea.precio_unitario * linea.cantidad for linea in repuestos)
-        subtotal_servicios = sum(linea.precio_unitario * linea.cantidad for linea in servicios)
+        # Calcular subtotales usando las propiedades subtotal de los modelos
+        # Esto incluye descuentos y cantidades correctamente
+        subtotal_repuestos = sum(
+            Decimal(str(linea.subtotal)) if hasattr(linea, "subtotal") else Decimal("0.00")
+            for linea in repuestos
+        )
+        subtotal_servicios = sum(
+            Decimal(str(linea.subtotal)) if hasattr(linea, "subtotal") else Decimal("0.00")
+            for linea in servicios
+        )
         subtotal_otros_servicios = sum(
-            getattr(otro, "precio_cliente", Decimal("0.00")) for otro in otros_servicios
+            Decimal(str(otro.subtotal)) if hasattr(otro, "subtotal") else Decimal("0.00")
+            for otro in otros_servicios
         )
 
         # Debug logging
@@ -644,6 +663,7 @@ class DocumentoDetailView(CountryLangTemplateMixin, DetailView):
                 "lineas_otro_servicio": otros_servicios,
                 "repuestos": repuestos,  # Mantener compatibilidad
                 "servicios": servicios,  # Mantener compatibilidad
+                "otros_servicios": otros_servicios,  # Mantener compatibilidad
                 "subtotal_repuestos": subtotal_repuestos,
                 "subtotal_servicios": subtotal_servicios,
                 "subtotal_otros_servicios": subtotal_otros_servicios,
@@ -664,38 +684,74 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Upd
 
     model = Documento
     form_class = DocumentoForm
-    base_template_name = "documentos/document_edit.html"
-
-    def get_template_names(self):
-        """Sistema robusto de fallback para templates de edición de documentos"""
-        from django.template import TemplateDoesNotExist
-        from django.template.loader import select_template
-        from django.utils.translation import get_language
-
-        # País/idioma desde empresa y request
-        empresa = getattr(self.request.user, "empresa", None)
-        country = (getattr(empresa, "pais", "CL") or "CL").strip().lower()  # cl/us
-        lang = (get_language() or "es").strip().lower()  # es/en
-
-        candidates = [
-            f"taller/{country}/{lang}/documentos/document_edit.html",
-            f"taller/{country}/{lang}/documentos/editar_documento.html",
-            "taller/common/documentos/document_edit.html",  # el que pide la vista
-            "taller/common/documentos/editar_documento_nuevo.html",  # template funcional actual
-            "taller/documentos/editar_documento_nuevo.html",  # fallback legacy
-        ]
-
-        # Devuelve el primero que exista
-        try:
-            t = select_template(candidates)
-            return [t.template.name]
-        except TemplateDoesNotExist as e:
-            e.args = (", ".join(candidates),)
-            raise
+    base_template_name = "documentos/document_form.html"  # Usar el mismo template que CreateView
 
     def get_queryset(self):
         """Asegurar que solo se editen documentos de la empresa"""
-        return Documento.objects.filter(empresa=self.request.user.empresa)
+        if not self.request.user.is_authenticated:
+            return Documento.objects.none()
+        
+        # Obtener empresa de forma robusta
+        empresa = getattr(self.request.user, "empresa", None)
+        if not empresa:
+            # Intentar obtener empresa desde el middleware
+            empresa = getattr(self.request, "empresa", None)
+        
+        if not empresa:
+            return Documento.objects.none()
+        
+        # Filtrar por empresa sin prefetch que pueda fallar
+        # El prefetch se hará después en get_context_data si es necesario
+        return Documento.objects.filter(empresa=empresa)
+
+    def get_object(self, queryset=None):
+        """Obtener el documento con mejor manejo de errores"""
+        from django.shortcuts import get_object_or_404
+        
+        if queryset is None:
+            queryset = self.get_queryset()
+        
+        pk = self.kwargs.get("pk")
+        
+        # Obtener empresa para verificación
+        empresa_user = getattr(self.request.user, "empresa", None) or getattr(self.request, "empresa", None)
+        
+        # Intentar obtener del queryset filtrado
+        try:
+            documento = queryset.get(pk=pk)
+            return documento
+        except Documento.DoesNotExist:
+            # Si no está en el queryset, verificar si existe y pertenece a la empresa
+            if empresa_user:
+                try:
+                    documento = Documento.objects.get(pk=pk, empresa=empresa_user)
+                    # Si llegamos aquí, el documento existe y pertenece a la empresa
+                    # pero no está en el queryset - puede ser un problema de cache o evaluación
+                    return documento
+                except Documento.DoesNotExist:
+                    # Verificar si existe pero pertenece a otra empresa
+                    try:
+                        documento = Documento.objects.get(pk=pk)
+                        from django.contrib import messages
+                        messages.error(
+                            self.request,
+                            f"El documento #{pk} no pertenece a tu empresa."
+                        )
+                    except Documento.DoesNotExist:
+                        from django.contrib import messages
+                        messages.error(
+                            self.request,
+                            f"El documento #{pk} no existe."
+                        )
+            else:
+                from django.contrib import messages
+                messages.error(
+                    self.request,
+                    "No tienes una empresa asociada."
+                )
+            
+            from django.http import Http404
+            raise Http404(f"No se encontró el documento #{pk}")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -847,16 +903,26 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Upd
         return response
 
 
+from taller.auth.decorators_role import RoleRequiredMixin
+
+
 @method_decorator(login_required, name="dispatch")
-class DocumentoDeleteView(CountryLangTemplateMixin, DeleteView):
-    """Vista para eliminar documentos"""
+class DocumentoDeleteView(CountryLangTemplateMixin, RoleRequiredMixin, DeleteView):
+    """
+    Vista para eliminar documentos.
+
+    🔒 SOLO Owner y Admin pueden eliminar documentos.
+    Un técnico o vendedor no debería poder borrar evidencia (facturas/OTs).
+    """
 
     model = Documento
     base_template_name = "documentos/confirmar_eliminar.html"
     success_url = "/documentos/"
+    allowed_roles = ["Owner", "Admin"]
+    permission_denied_message = "Solo el dueño y administradores pueden eliminar documentos."
 
     def get_queryset(self):
-        """Asegurar que solo se eliminen documentos de la empresa"""
+        """🔒 MULTI-TENANT: Asegurar que solo se eliminen documentos de la empresa"""
         return Documento.objects.filter(empresa=self.request.user.empresa)
 
     def render_to_response(self, context, **response_kwargs):

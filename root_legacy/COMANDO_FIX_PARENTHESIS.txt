@@ -1,0 +1,77 @@
+═══════════════════════════════════════════════════════════════
+COMANDO PARA CORREGIR ERROR "unmatched ')'" EN EL SERVIDOR
+═══════════════════════════════════════════════════════════════
+
+Ejecuta este comando completo en el servidor:
+
+cd /home/atlantareciclajes/apps/egarage/current && \
+cp taller/documentos/views.py taller/documentos/views.py.backup_paren && \
+python3 << 'PYEOF'
+import sys
+
+file_path = "taller/documentos/views.py"
+
+with open(file_path, 'r', encoding='utf-8') as f:
+    lines = f.readlines()
+
+# Buscar return JsonResponse
+return_idx = None
+for i, line in enumerate(lines):
+    if 'return JsonResponse(' in line:
+        return_idx = i
+        break
+
+if return_idx is None:
+    print("❌ No se encontró return JsonResponse")
+    sys.exit(1)
+
+print(f"📍 return JsonResponse en línea {return_idx + 1}")
+
+# Encontrar fin del bloque actual
+block_end = return_idx + 1
+paren_count = 1
+brace_count = 0
+
+for i in range(return_idx + 1, min(return_idx + 20, len(lines))):
+    line = lines[i]
+    paren_count += line.count('(') - line.count(')')
+    brace_count += line.count('{') - line.count('}')
+    if paren_count == 0 and brace_count == 0:
+        block_end = i
+        break
+
+print(f"📍 Fin del bloque en línea {block_end + 1}")
+
+# Bloque correcto
+correct_block = [
+    '    return JsonResponse(\n',
+    '        {\n',
+    '            "success": True,\n',
+    '            "url_whatsapp": url_whatsapp,\n',
+    '            "telefono": telefono,\n',
+    '            "mensaje": mensaje,\n',
+    '        }\n',
+    '    )\n'
+]
+
+# Reemplazar
+new_lines = lines[:return_idx] + correct_block + lines[block_end + 1:]
+
+# Verificar sintaxis
+try:
+    code = ''.join(new_lines)
+    compile(code, file_path, 'exec')
+    print("✅ Sintaxis válida")
+except SyntaxError as e:
+    print(f"❌ Error línea {e.lineno}: {e.msg}")
+    sys.exit(1)
+
+# Escribir
+with open(file_path, 'w', encoding='utf-8') as f:
+    f.writelines(new_lines)
+
+print("✅ Archivo corregido")
+PYEOF
+
+═══════════════════════════════════════════════════════════════
+

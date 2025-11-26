@@ -1,0 +1,30 @@
+═══════════════════════════════════════════════════════════════
+COMANDO PARA LIMPIAR CONFLICTOS EN LA PÁGINA (TEMPLATES/CSS)
+═══════════════════════════════════════════════════════════════
+
+Ejecuta este comando en el servidor:
+
+cd /home/atlantareciclajes/apps/egarage/current && \
+find . -type f \( -name "*.html" -o -name "*.css" -o -name "*.js" \) \
+    -exec grep -l "^<<<<<<<\|^=======\|^>>>>>>>" {} \; 2>/dev/null | \
+    while read file; do
+        echo "🔧 Limpiando: $file"
+        cp "$file" "$file.backup_$(date +%Y%m%d_%H%M%S)"
+        sed -i '/^<<<<<<</d; /^=======$/d; /^>>>>>>>/d' "$file"
+        sed -i '/<<<<<<</d; /=======/d; />>>>>>>/d' "$file"
+    done && \
+touch /var/www/www_egarage_cl_wsgi.py && \
+echo "✅ Conflictos limpiados y servidor reiniciado"
+
+═══════════════════════════════════════════════════════════════
+
+Versión más simple (solo elimina marcadores):
+
+cd /home/atlantareciclajes/apps/egarage/current && \
+find templates static -type f \( -name "*.html" -o -name "*.css" \) \
+    -exec sed -i '/^<<<<<<</d; /^=======$/d; /^>>>>>>>/d; /<<<<<<</d; /=======/d; />>>>>>>/d' {} \; && \
+touch /var/www/www_egarage_cl_wsgi.py && \
+echo "✅ Listo"
+
+═══════════════════════════════════════════════════════════════
+

@@ -1213,7 +1213,7 @@ Para ver el documento completo, visite:
 
     # Crear URL de WhatsApp
     # Nota: No se pueden usar backslashes directamente en expresiones f-string
-    mensaje_encoded = mensaje.replace(' ', '%20').replace('\n', '%0A')
+    mensaje_encoded = mensaje.replace(" ", "%20").replace("\n", "%0A")
     url_whatsapp = f"https://wa.me/{telefono}?text={mensaje_encoded}"
 
     return JsonResponse(

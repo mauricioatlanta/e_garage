@@ -1,0 +1,1144 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% load i18n %}
+
+{% block extra_head %}
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<link rel="stylesheet" href="{% static 'css/force_black_text.css' %}?v=20250928">
+<script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js" crossorigin="anonymous"></script>
+<script src="{% static 'js/login_effects.js' %}" defer></script>
+<!-- Script inline comentado - ahora se usa login_effects.js -->
+<!--
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  // Configuración futurista de partículas
+  tsParticles.load("tsparticles", {
+    fullScreen: { enable: false },
+    background: { color: { value: "transparent" } },
+    particles: {
+      number: { value: 120 },
+      color: {
+        value: ["#00ff88", "#00d4ff", "#8844ff", "#ff4488", "#ffaa00"]
+      },
+      shape: {
+        type: ["circle", "triangle", "polygon"],
+        polygon: { sides: 6 }
+      },
+      size: {
+        value: { min: 0.5, max: 3 },
+        animation: {
+          enable: true,
+          speed: 2,
+          minimumValue: 0.3
+        }
+      },
+      move: {
+        enable: true,
+        speed: { min: 0.1, max: 1.5 },
+        direction: "none",
+        outModes: { default: "bounce" }
+      },
+      opacity: {
+        value: { min: 0.1, max: 0.8 },
+        animation: {
+          enable: true,
+          speed: 1
+        }
+      },
+      links: {
+        enable: true,
+        distance: 100,
+        color: "#00ff88",
+        opacity: 0.2,
+        width: 1
+      }
+    },
+    interactivity: {
+      events: {
+        onHover: {
+          enable: true,
+          mode: "repulse"
+        }
+      },
+      modes: {
+        repulse: {
+          distance: 80,
+          duration: 0.4
+        }
+      }
+    }
+  });
+
+  // Efecto de scan lines cyberpunk
+  const scanlines = document.createElement('div');
+  scanlines.className = 'cyberpunk-scanlines';
+  document.body.appendChild(scanlines);
+
+  // Efecto de glitch en el logo
+  setInterval(() => {
+    const logo = document.querySelector('.egarage-logo');
+    if (logo && Math.random() < 0.1) {
+      logo.classList.add('glitch-effect');
+      setTimeout(() => logo.classList.remove('glitch-effect'), 200);
+    }
+  }, 3000);
+
+  // Efecto matrix rain
+  const canvas = document.createElement('canvas');
+  canvas.className = 'matrix-canvas';
+  document.body.appendChild(canvas);
+  const ctx = canvas.getContext('2d');
+
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890@#$%^&*()';
+  const lettersArray = letters.split('');
+  const fontSize = 14;
+  const columns = canvas.width / fontSize;
+  const drops = [];
+
+  for(let x = 0; x < columns; x++) {
+    drops[x] = 1;
+  }
+
+  function drawMatrix() {
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = '#00ff88';
+    ctx.font = fontSize + 'px monospace';
+
+    for(let i = 0; i < drops.length; i++) {
+      const text = lettersArray[Math.floor(Math.random() * lettersArray.length)];
+      ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+      if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+        drops[i] = 0;
+      }
+      drops[i]++;
+    }
+  }
+
+  setInterval(drawMatrix, 50);
+});
+</script>
+-->
+{% endblock %}
+
+{% block fondo_extra %}
+<div id="tsparticles" class="fixed inset-0 -z-10"></div>
+<div class="cyberpunk-bg"></div>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center px-4 cyberpunk-login-container">
+  <!-- Holographic Frame Container -->
+  <div class="holographic-frame">
+    <div class="hologram-card">
+
+      <!-- Logo eGarage como obra de arte futurista -->
+      <div class="logo-masterpiece">
+        <div class="logo-hologram">
+          <!-- Logo principal con efectos holográficos -->
+          <div class="egarage-logo-container">
+            <img src="{% static 'img/TallerPro_logo.png' %}" alt="E-Garage Logo" class="egarage-logo">
+            <div class="logo-aura"></div>
+            <div class="logo-rings">
+              <div class="ring ring-1"></div>
+              <div class="ring ring-2"></div>
+              <div class="ring ring-3"></div>
+            </div>
+          </div>
+
+          <!-- Texto eGarage con efectos matrix -->
+          <div class="logo-text-container">
+            <h1 class="egarage-title">
+              <span class="letter-e">E</span>
+              <span class="hyphen">-</span>
+              <span class="garage-text">GARAGE</span>
+            </h1>
+            <div class="subtitle-tech">AUTOMOTIVE WORKSHOP MANAGEMENT</div>
+            <div class="version-badge">Professional</div>
+          </div>
+
+          <!-- Bandera holográfica según el país -->
+          {% with ctry=request.current_country|default:request.user.empresa.pais|default:"CL"|lower %}
+          <div class="country-hologram">
+            {% if ctry == 'chile' or ctry == 'cl' %}
+            <div class="flag-hologram chile-flag">🇨🇱</div>
+            {% elif ctry == 'usa' or ctry == 'us' %}
+            <div class="flag-hologram usa-flag">🇺🇸</div>
+            {% endif %}
+          </div>
+          {% endwith %}
+        </div>
+      </div>
+
+      <!-- Título de login -->
+      <h2 class="cyber-title">
+        <span class="cyber-bracket">[</span>
+        {% trans "LOGIN TO YOUR ACCOUNT" %}
+        <span class="cyber-bracket">]</span>
+      </h2>
+
+      <!-- Debug info con estilo cyberpunk -->
+      {% if debug %}
+      <div class="debug-panel">
+        <div class="debug-line">COUNTRY: {{ country|default:'UNKNOWN' }}</div>
+        <div class="debug-line">REDIRECT: {{ request.GET.next|default:'ROOT' }}</div>
+      </div>
+      {% endif %}
+
+      <!-- Formulario de login futurista -->
+      <form class="cyber-form" method="POST" action="{% url 'account_login' %}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.GET.next }}">
+        {{ form.non_field_errors }}
+
+        <!-- Neural Input Fields -->
+        <div class="neural-field-group">
+          <!-- Campo de Usuario/Email -->
+          <div class="neural-field">
+            <label class="neural-label" for="id_login">
+              <span class="label-icon">👤</span>
+                  {% trans "USERNAME OR EMAIL" %}
+            </label>
+            <div class="input-container">
+              {{ form.login|add_class:"neural-input" }}
+              <div class="input-underline"></div>
+              <div class="input-focus-effect"></div>
+            </div>
+            {% if form.login.errors %}
+              <div class="neural-error" aria-live="polite">
+                {% for error in form.login.errors %}{{ error }}{% endfor %}
+              </div>
+            {% endif %}
+          </div>
+
+          <!-- Campo de Contraseña -->
+          <div class="neural-field">
+            <label class="neural-label" for="id_password">
+              <span class="label-icon">🔐</span>
+                  {% trans "PASSWORD" %}
+            </label>
+            <div class="input-container">
+              {{ form.password|add_class:"neural-input" }}
+              <div class="input-underline"></div>
+              <div class="input-focus-effect"></div>
+            </div>
+            {% if form.password.errors %}
+              <div class="neural-error" aria-live="polite">
+                {% for error in form.password.errors %}{{ error }}{% endfor %}
+              </div>
+            {% endif %}
+          </div>
+
+          <!-- Campo Remember Me -->
+          {% if form.remember %}
+          <div class="neural-checkbox">
+            <label class="checkbox-container">
+              {{ form.remember|add_class:"neural-check" }}
+              <span class="checkmark"></span>
+              <span class="checkbox-label">{{ form.remember.label }}</span>
+            </label>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Botón de login -->
+        <button type="submit" class="neural-access-btn">
+          <span class="btn-text">{% trans "LOGIN" %}</span>
+          <div class="btn-scanner"></div>
+          <div class="btn-particles"></div>
+        </button>
+      </form>
+
+      <!-- Enlaces adicionales -->
+      <div class="cyber-links">
+        <a class="cyber-link" href="{% url 'account_reset_password' %}">
+          <span class="link-icon">🔧</span>
+              {% trans "FORGOT PASSWORD?" %}
+        </a>
+      </div>
+
+      <!-- Registro -->
+      <div class="cyber-register">
+        {% trans "Don't have an account?" %}
+        <a class="register-link" href="/signup/">
+            {% trans "SIGN UP" %}
+        </a>
+      </div>
+
+      <!-- Botones de idioma para USA -->
+      {% if '/us/' in request.path %}
+      <div class="language-matrix">
+        <a href="?lang=es" class="lang-chip esp-chip">🇪🇸 ESP</a>
+        <a href="?lang=en" class="lang-chip eng-chip">🇺🇸 ENG</a>
+      </div>
+      {% endif %}
+
+      <!-- Créditos -->
+      <div class="neural-credits">
+        <div class="credits-header">POWERED BY</div>
+        <div class="credits-company">E-GARAGE™</div>
+        <div class="credits-links">
+          <a href="mailto:support@egarage.com" class="credit-link">
+            📧 SUPPORT
+          </a>
+          <a href="https://www.egarage.com" class="credit-link">
+            🌐 WEBSITE
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Reset y base */
+body {
+    margin: 0;
+    padding: 0;
+    background: #000;
+    font-family: 'Courier New', monospace;
+    overflow-x: hidden;
+}
+
+/* Fondo cyberpunk */
+.cyberpunk-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+        radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(120, 255, 198, 0.2) 0%, transparent 50%),
+        linear-gradient(180deg, #000 0%, #0a0a0a 50%, #000 100%);
+    z-index: -2;
+}
+
+.matrix-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.1;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.cyberpunk-scanlines {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 255, 136, 0.03) 2px,
+            rgba(0, 255, 136, 0.03) 4px
+        );
+    z-index: 1;
+    pointer-events: none;
+    animation: scanlines 0.1s linear infinite;
+}
+
+@keyframes scanlines {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(4px); }
+}
+
+/* Container principal */
+.cyberpunk-login-container {
+    position: relative;
+    z-index: 10;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+/* Frame holográfico */
+.holographic-frame {
+    position: relative;
+    perspective: 1000px;
+}
+
+.hologram-card {
+    background:
+        linear-gradient(135deg,
+            rgba(0, 255, 136, 0.1) 0%,
+            rgba(0, 212, 255, 0.05) 25%,
+            rgba(136, 68, 255, 0.05) 50%,
+            rgba(255, 68, 136, 0.05) 75%,
+            rgba(0, 255, 136, 0.1) 100%
+        );
+    border: 2px solid rgba(0, 255, 136, 0.5);
+    border-radius: 20px;
+    padding: 3rem;
+    width: 100%;
+    max-width: 480px;
+    backdrop-filter: blur(20px) saturate(150%);
+    box-shadow:
+        0 0 50px rgba(0, 255, 136, 0.3),
+        inset 0 0 50px rgba(0, 255, 136, 0.05),
+        0 0 100px rgba(0, 212, 255, 0.2);
+    position: relative;
+    overflow: hidden;
+    animation: hologram-float 6s ease-in-out infinite;
+}
+
+@keyframes hologram-float {
+    0%, 100% { transform: translateY(0) rotateX(0); }
+    50% { transform: translateY(-10px) rotateX(2deg); }
+}
+
+.hologram-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(0, 255, 136, 0.2),
+        transparent
+    );
+    animation: hologram-sweep 4s infinite;
+}
+
+@keyframes hologram-sweep {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+/* Logo masterpiece - Updated 2025-09-28 22:45 */
+.logo-masterpiece {
+    text-align: center;
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.logo-hologram {
+    position: relative;
+    display: inline-block;
+}
+
+.egarage-logo-container {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 1rem;
+}
+
+/* Logo size fixed - 120px instead of 250px - 2025-09-28 22:45 */
+.egarage-logo {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 3px solid rgba(0, 255, 136, 0.8);
+    padding: 12px;
+    background:
+        radial-gradient(circle,
+            rgba(0, 255, 136, 0.1) 0%,
+            rgba(0, 0, 0, 0.8) 70%
+        );
+    filter:
+        drop-shadow(0 0 20px rgba(0, 255, 136, 0.8))
+        drop-shadow(0 0 40px rgba(0, 212, 255, 0.4));
+    animation: logo-pulse 3s ease-in-out infinite;
+    transition: all 0.3s ease;
+}
+
+.egarage-logo:hover {
+    transform: scale(1.1);
+    filter:
+        drop-shadow(0 0 30px rgba(0, 255, 136, 1))
+        drop-shadow(0 0 60px rgba(0, 212, 255, 0.6));
+}
+
+@keyframes logo-pulse {
+    0%, 100% {
+        box-shadow:
+            0 0 20px rgba(0, 255, 136, 0.8),
+            0 0 40px rgba(0, 212, 255, 0.4);
+    }
+    50% {
+        box-shadow:
+            0 0 40px rgba(0, 255, 136, 1),
+            0 0 80px rgba(0, 212, 255, 0.6);
+    }
+}
+
+.logo-aura {
+    position: absolute;
+    top: -15px;
+    left: -15px;
+    right: -15px;
+    bottom: -15px;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle,
+            rgba(0, 255, 136, 0.2) 0%,
+            transparent 70%
+        );
+    animation: aura-pulse 4s ease-in-out infinite;
+}
+
+@keyframes aura-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.2); opacity: 1; }
+}
+
+.logo-rings {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.ring {
+    position: absolute;
+    border: 1px solid rgba(0, 255, 136, 0.3);
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.ring-1 {
+    width: 340px;
+    height: 340px;
+    animation: ring-rotate-1 10s linear infinite;
+}
+
+.ring-2 {
+    width: 380px;
+    height: 380px;
+    animation: ring-rotate-2 15s linear infinite reverse;
+}
+
+.ring-3 {
+    width: 420px;
+    height: 420px;
+    animation: ring-rotate-3 20s linear infinite;
+}
+
+@keyframes ring-rotate-1 {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@keyframes ring-rotate-2 {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@keyframes ring-rotate-3 {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Efecto glitch */
+.glitch-effect {
+    animation: glitch 0.2s ease-in-out;
+}
+
+@keyframes glitch {
+    0% { transform: translate(0); }
+    20% { transform: translate(-2px, 2px); }
+    40% { transform: translate(-2px, -2px); }
+    60% { transform: translate(2px, 2px); }
+    80% { transform: translate(2px, -2px); }
+    100% { transform: translate(0); }
+}
+
+/* Texto del logo */
+.logo-text-container {
+    margin-top: 1rem;
+}
+
+.egarage-title {
+    font-size: 4rem;
+    font-weight: 900;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 10px;
+    margin: 0;
+    background: linear-gradient(45deg,
+        #00ff88,
+        #00d4ff,
+        #8844ff,
+        #ff4488
+    );
+    background-size: 400% 400%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradient-text 3s ease infinite;
+    text-shadow: 0 0 30px rgba(0, 255, 136, 0.8);
+}
+
+@keyframes gradient-text {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.letter-e {
+    display: inline-block;
+    animation: letter-bounce-1 2s ease-in-out infinite;
+}
+
+.hyphen {
+    display: inline-block;
+    animation: letter-bounce-2 2s ease-in-out infinite 0.1s;
+}
+
+.garage-text {
+    display: inline-block;
+    animation: letter-bounce-3 2s ease-in-out infinite 0.2s;
+}
+
+@keyframes letter-bounce-1 {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+@keyframes letter-bounce-2 {
+    0%, 100% { transform: translateY(0) rotateZ(0deg); }
+    50% { transform: translateY(-3px) rotateZ(180deg); }
+}
+
+@keyframes letter-bounce-3 {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+.subtitle-tech {
+    font-size: 0.9rem;
+    color: rgba(0, 255, 136, 0.8);
+    font-weight: 300;
+    letter-spacing: 3px;
+    margin-top: 0.5rem;
+    animation: subtitle-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes subtitle-glow {
+    from { text-shadow: 0 0 10px rgba(0, 255, 136, 0.5); }
+    to { text-shadow: 0 0 20px rgba(0, 255, 136, 0.8); }
+}
+
+.version-badge {
+    display: inline-block;
+    background: rgba(136, 68, 255, 0.2);
+    border: 1px solid rgba(136, 68, 255, 0.8);
+    color: rgba(136, 68, 255, 1);
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    margin-top: 0.8rem;
+    animation: badge-pulse 3s ease-in-out infinite;
+}
+
+@keyframes badge-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+/* Bandera holográfica */
+.country-hologram {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+}
+
+.flag-hologram {
+    font-size: 2rem;
+    animation: flag-wave 3s ease-in-out infinite;
+    filter: drop-shadow(0 0 10px rgba(0, 255, 136, 0.5));
+}
+
+@keyframes flag-wave {
+    0%, 100% { transform: rotate(-5deg); }
+    50% { transform: rotate(5deg); }
+}
+
+/* Título cyber */
+.cyber-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+    color: #00ff88;
+    margin-bottom: 2rem;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 2px;
+    animation: title-flicker 4s ease-in-out infinite;
+}
+
+@keyframes title-flicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+    51% { opacity: 1; }
+    52% { opacity: 0.8; }
+    53% { opacity: 1; }
+}
+
+.cyber-bracket {
+    color: #00d4ff;
+    font-weight: 900;
+    animation: bracket-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes bracket-glow {
+    from { text-shadow: 0 0 5px #00d4ff; }
+    to { text-shadow: 0 0 15px #00d4ff; }
+}
+
+/* Panel debug */
+.debug-panel {
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px solid rgba(255, 68, 136, 0.5);
+    border-radius: 5px;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    font-size: 0.7rem;
+    font-family: 'Courier New', monospace;
+}
+
+.debug-line {
+    color: #ff4488;
+    margin: 0.2rem 0;
+}
+
+/* Formulario neural */
+.cyber-form {
+    width: 100%;
+}
+
+.neural-field-group {
+    margin-bottom: 2rem;
+}
+
+.neural-field {
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.neural-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #00ff88;
+    font-size: 0.9rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 1px;
+}
+
+.label-icon {
+    font-size: 1.2rem;
+    animation: icon-pulse 2s ease-in-out infinite;
+}
+
+@keyframes icon-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.input-container {
+    position: relative;
+}
+
+.neural-input {
+    width: 100% !important;
+    background: rgba(0, 0, 0, 0.8) !important;
+    border: 2px solid rgba(0, 255, 136, 0.3) !important;
+    border-radius: 10px !important;
+    padding: 1rem !important;
+    color: #fff !important;
+    font-family: 'Courier New', monospace !important;
+    font-size: 1rem !important;
+    transition: all 0.3s ease !important;
+    box-shadow: inset 0 0 20px rgba(0, 255, 136, 0.1) !important;
+}
+
+.neural-input:focus {
+    border-color: #00ff88 !important;
+    box-shadow:
+        inset 0 0 20px rgba(0, 255, 136, 0.2),
+        0 0 20px rgba(0, 255, 136, 0.5) !important;
+    outline: none !important;
+}
+
+.neural-input::placeholder {
+    color: rgba(0, 255, 136, 0.5) !important;
+    font-family: 'Courier New', monospace !important;
+}
+
+.input-underline {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #00ff88, #00d4ff);
+    transition: width 0.3s ease;
+}
+
+.neural-input:focus + .input-underline {
+    width: 100%;
+}
+
+.input-focus-effect {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 10px;
+    background: rgba(0, 255, 136, 0.05);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.neural-input:focus + .input-underline + .input-focus-effect {
+    opacity: 1;
+}
+
+.neural-error {
+    color: #ff4488;
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+    font-family: 'Courier New', monospace;
+}
+
+/* Checkbox neural */
+.neural-checkbox {
+    margin: 1rem 0;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #00ff88;
+    font-family: 'Courier New', monospace;
+}
+
+.neural-check {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(0, 255, 136, 0.5);
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.8);
+    margin-right: 0.8rem;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.neural-check:checked {
+    background: rgba(0, 255, 136, 0.2);
+    border-color: #00ff88;
+}
+
+.neural-check:checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #00ff88;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+/* Botón de acceso neural */
+.neural-access-btn {
+    width: 100%;
+    background: linear-gradient(45deg,
+        rgba(0, 255, 136, 0.1),
+        rgba(0, 212, 255, 0.1)
+    );
+    border: 2px solid #00ff88;
+    border-radius: 15px;
+    padding: 1.2rem;
+    color: #00ff88;
+    font-family: 'Courier New', monospace;
+    font-size: 1.1rem;
+    font-weight: bold;
+    letter-spacing: 2px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    margin: 2rem 0;
+    text-transform: uppercase;
+}
+
+.neural-access-btn:hover {
+    background: linear-gradient(45deg,
+        rgba(0, 255, 136, 0.2),
+        rgba(0, 212, 255, 0.2)
+    );
+    box-shadow:
+        0 0 30px rgba(0, 255, 136, 0.5),
+        inset 0 0 30px rgba(0, 255, 136, 0.1);
+    transform: translateY(-2px);
+}
+
+.btn-text {
+    position: relative;
+    z-index: 2;
+}
+
+.btn-scanner {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(0, 255, 136, 0.3),
+        transparent
+    );
+    animation: btn-scan 3s infinite;
+}
+
+@keyframes btn-scan {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+.btn-particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+        radial-gradient(circle at 20% 20%, rgba(0, 255, 136, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(0, 212, 255, 0.3) 0%, transparent 50%);
+    opacity: 0;
+    animation: btn-particles 4s ease-in-out infinite;
+}
+
+@keyframes btn-particles {
+    0%, 100% { opacity: 0; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.05); }
+}
+
+/* Enlaces cyber */
+.cyber-links {
+    text-align: center;
+    margin: 1.5rem 0;
+}
+
+.cyber-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #00d4ff;
+    text-decoration: none;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+
+.cyber-link:hover {
+    background: rgba(0, 212, 255, 0.1);
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+    text-decoration: none;
+    color: #00d4ff;
+}
+
+.link-icon {
+    animation: icon-rotate 3s linear infinite;
+}
+
+@keyframes icon-rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Registro */
+.cyber-register {
+    text-align: center;
+    margin: 2rem 0;
+    color: rgba(0, 255, 136, 0.7);
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+}
+
+.register-link {
+    color: #00ff88;
+    text-decoration: none;
+    font-weight: bold;
+    margin-left: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.register-link:hover {
+    text-shadow: 0 0 10px #00ff88;
+    text-decoration: none;
+    color: #00ff88;
+}
+
+/* Matriz de idiomas */
+.language-matrix {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.lang-chip {
+    padding: 0.5rem 1rem;
+    border: 1px solid rgba(0, 255, 136, 0.5);
+    border-radius: 20px;
+    color: #00ff88;
+    text-decoration: none;
+    font-family: 'Courier New', monospace;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.lang-chip:hover {
+    background: rgba(0, 255, 136, 0.1);
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+    text-decoration: none;
+    color: #00ff88;
+}
+
+/* Créditos neurales */
+.neural-credits {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(0, 255, 136, 0.3);
+    text-align: center;
+}
+
+.credits-header {
+    font-size: 0.7rem;
+    color: rgba(0, 255, 136, 0.5);
+    font-family: 'Courier New', monospace;
+    letter-spacing: 2px;
+    margin-bottom: 0.5rem;
+}
+
+.credits-company {
+    font-size: 1rem;
+    color: #00ff88;
+    font-weight: bold;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+    animation: company-glow 3s ease-in-out infinite alternate;
+}
+
+@keyframes company-glow {
+    from { text-shadow: 0 0 10px rgba(0, 255, 136, 0.5); }
+    to { text-shadow: 0 0 20px rgba(0, 255, 136, 0.8); }
+}
+
+.credits-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.credit-link {
+    color: #00d4ff;
+    text-decoration: none;
+    font-family: 'Courier New', monospace;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+    padding: 0.3rem 0.8rem;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 212, 255, 0.2);
+}
+
+.credit-link:hover {
+    background: rgba(0, 212, 255, 0.1);
+    text-shadow: 0 0 10px #00d4ff;
+    text-decoration: none;
+    color: #00d4ff;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hologram-card {
+        padding: 2rem;
+        margin: 1rem;
+    }
+
+    .egarage-logo {
+        width: 200px;
+        height: 200px;
+    }
+
+    .egarage-title {
+        font-size: 2.5rem;
+        letter-spacing: 5px;
+    }
+
+    .neural-access-btn {
+        font-size: 1rem;
+    }
+
+    .credits-links {
+        flex-direction: column;
+    }
+}
+
+/* Sobrescribir force_black_text.css */
+.hologram-card *,
+.hologram-card label,
+.hologram-card h1,
+.hologram-card h2,
+.hologram-card h3,
+.hologram-card form label,
+.hologram-card input,
+.hologram-card select,
+.hologram-card textarea {
+    color: inherit !important;
+}
+
+/* Prefers reduced motion - desactivar animaciones para usuarios que lo prefieren */
+@media (prefers-reduced-motion: reduce) {
+  .matrix-canvas,
+  #tsparticles,
+  .logo-rings,
+  .cyberpunk-scanlines,
+  .egarage-logo,
+  .subtitle-tech,
+  .version-badge,
+  .cyber-title,
+  .btn-scanner,
+  .btn-particles {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+</style>
+{% endblock %}

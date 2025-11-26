@@ -6,10 +6,19 @@ register = template.Library()
 
 def _country_ns_from_path(path: str) -> str:
     """
-    Devuelve 'usa' o 'chile' según el prefijo de la ruta actual
+    Devuelve el namespace del país según el prefijo de la ruta actual.
+    Considera el segmento de idioma si está presente.
     """
-    if path.startswith("/us/") or path == "/us":
+    if path.startswith("/us/en/") or path == "/us/en":
+        return "usa_en"
+    elif path.startswith("/us/es/") or path == "/us/es":
+        return "usa_es"
+    elif path.startswith("/us/") or path == "/us":
         return "usa"
+    elif path.startswith("/cl/es/") or path == "/cl/es":
+        return "chile"
+    elif path.startswith("/cl/") or path == "/cl":
+        return "chile"
     return "chile"
 
 
@@ -34,8 +43,13 @@ def country_url(context, view_path, *args, app_namespace="taller", **kwargs):
 
     # view_path puede ser "clientes:lista_clientes" o "lista_clientes"
     if ":" in view_path:
-        # Si ya tiene namespace (ej: vehiculos:lista_vehiculos), agregar el país y taller
-        full_name = f"{country_ns}:{app_namespace}:{view_path}"
+        # Si ya tiene namespace (ej: vehiculos:lista_vehiculos), agregar el país y app_namespace
+        if app_namespace == "direct" or app_namespace == "":
+            # Para URLs definidas directamente en el namespace del país (ej: usa:ajax:vehiculos_por_cliente)
+            full_name = f"{country_ns}:{view_path}"
+        else:
+            # URLs definidas en sub-namespaces (ej: usa:taller:documentos:lista)
+            full_name = f"{country_ns}:{app_namespace}:{view_path}"
     else:
         # Sin subnamespace
         if app_namespace == "direct":

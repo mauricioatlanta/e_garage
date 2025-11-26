@@ -1,0 +1,198 @@
+# ============================================
+# SIMULAR LA VISTA servicios_menu EXACTAMENTE
+# Ejecutar en el servidor para ver qué está pasando
+# ============================================
+
+cd ~/apps/egarage/current && python3.10 << 'ENDPYTHON'
+import os
+import django
+from collections import defaultdict
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings')
+
+try:
+    django.setup()
+except Exception as e:
+    print(f"Warning: {e}")
+
+from taller.models import Empresa
+from taller.servicios.models import (
+    CategoriaServicio, CategoriaServicioName,
+    Servicio, ServicioName,
+    SubcategoriaServicio, SubcategoriaServicioName,
+)
+
+# Simular la función _detectar_pais
+def _detectar_pais_sim(path):
+    if path.startswith("/us/"):
+        return "US"
+    if path.startswith("/br/"):
+        return "BR"
+    if path.startswith("/mx/"):
+        return "MX"
+    if path.startswith("/ve/"):
+        return "VE"
+    if path.startswith("/pe/"):
+        return "PE"
+    return "CL"
+
+COUNTRY_LANGUAGE_MAP = {
+    "CL": "es",
+    "MX": "es",
+    "VE": "es",
+    "PE": "es",
+    "US": "en",
+    "BR": "pt",
+}
+
+print("=" * 70)
+print("SIMULANDO VISTA servicios_menu PARA /us/servicios/")
+print("=" * 70)
+
+# Simular request
+path = "/us/servicios/"
+country_code = _detectar_pais_sim(path)
+lang = "en"
+language = COUNTRY_LANGUAGE_MAP.get(country_code, "es")
+
+print(f"\n📋 PARÁMETROS DETECTADOS:")
+print(f"   Path: {path}")
+print(f"   País: {country_code}")
+print(f"   Idioma: {language}")
+
+# Simular usuario sin empresa (como anónimo)
+empresa = None
+print(f"   Empresa: {empresa}")
+
+# PASO 1: Filtrar servicios por país
+print(f"\n🔍 PASO 1: Filtrar servicios por país")
+servicios = Servicio.objects.filter(categoria__country=country_code)
+print(f"   Servicios con categoría {country_code}: {servicios.count()}")
+
+# PASO 2: Aplicar filtros de empresa (no hay empresa, así que no cambia)
+if empresa:
+    servicios_empresa = servicios.filter(empresa=empresa)
+    if servicios_empresa.exists():
+        servicios = servicios_empresa
+        print(f"   Servicios filtrados por empresa: {servicios.count()}")
+else:
+    print(f"   Sin empresa, usando todos los servicios del país")
+
+# PASO 3: Aplicar select_related y prefetch_related
+servicios_qs = (
+    servicios.select_related("categoria", "subcategoria")
+    .prefetch_related("names", "categoria__names", "subcategoria__names")
+    .order_by("nombre")
+)
+print(f"   QuerySet optimizado creado")
+
+# PASO 4: Filtrar por idioma
+if language:
+    servicios_qs = servicios_qs.filter(names__language=language).distinct()
+    print(f"   Filtrado por idioma '{language}': {servicios_qs.count()} servicios")
+
+servicios_list = list(servicios_qs)
+print(f"   Servicios convertidos a lista: {len(servicios_list)}")
+
+# PASO 5: Agregar atributos localizados
+print(f"\n🏷️ PASO 5: Agregar nombres localizados")
+for servicio in servicios_list[:3]:  # Mostrar primeros 3
+    servicio.nombre_localizado = servicio.get_label(language)
+    servicio.categoria_label = (
+        servicio.categoria.get_label(language) if servicio.categoria else ""
+    )
+    servicio.subcategoria_label = (
+        servicio.subcategoria.get_label(language) if servicio.subcategoria else ""
+    )
+    print(f"   - {servicio.nombre}")
+    print(f"     Nombre localizado: {servicio.nombre_localizado}")
+    print(f"     Categoría: {servicio.categoria_label}")
+    print(f"     Subcategoría: {servicio.subcategoria_label}")
+
+# PASO 6: Obtener categorías
+print(f"\n📂 PASO 6: Obtener categorías")
+categorias_qs = CategoriaServicio.objects.filter(
+    country=country_code
+).prefetch_related("names").order_by("code").distinct()
+
+categorias = []
+for categoria in categorias_qs:
+    nombre = categoria.get_label(language)
+    if nombre and nombre != categoria.code:
+        categoria.label_localizado = nombre
+        categorias.append(categoria)
+        print(f"   ✅ {categoria.code}: {nombre}")
+    else:
+        print(f"   ❌ {categoria.code}: SIN NOMBRE VÁLIDO (nombre={nombre})")
+
+print(f"   Total categorías válidas: {len(categorias)}")
+
+# PASO 7: Obtener subcategorías
+print(f"\n📁 PASO 7: Obtener subcategorías")
+subcategorias_qs = SubcategoriaServicio.objects.filter(
+    country=country_code
+).prefetch_related("names").order_by("code").distinct()
+
+subcategorias = []
+for subcategoria in subcategorias_qs:
+    nombre = subcategoria.get_label(language)
+    if nombre and nombre != subcategoria.code:
+        subcategoria.label_localizado = nombre
+        subcategorias.append(subcategoria)
+
+print(f"   Total subcategorías válidas: {len(subcategorias)}")
+
+# PASO 8: Agrupar servicios por categoría
+print(f"\n📊 PASO 8: Agrupar servicios por categoría")
+servicios_por_categoria = defaultdict(list)
+for servicio in servicios_list:
+    if servicio.categoria and servicio.categoria.country == country_code:
+        servicios_por_categoria[servicio.categoria].append(servicio)
+
+print(f"   Categorías con servicios: {len(servicios_por_categoria)}")
+for cat, servs in servicios_por_categoria.items():
+    nombre_cat = cat.get_label(language)
+    print(f"   - {cat.code} ({nombre_cat}): {len(servs)} servicios")
+
+# PASO 9: Stats
+stats = {
+    "total_servicios": len(servicios_list),
+    "total_categorias": len(categorias),
+    "total_subcategorias": len(subcategorias),
+    "categorias_con_servicios": sum(1 for items in servicios_por_categoria.values() if items),
+}
+
+print(f"\n📈 ESTADÍSTICAS:")
+print(f"   Total servicios: {stats['total_servicios']}")
+print(f"   Total categorías: {stats['total_categorias']}")
+print(f"   Total subcategorías: {stats['total_subcategorias']}")
+print(f"   Categorías con servicios: {stats['categorias_con_servicios']}")
+
+# PASO 10: Verificar qué se pasaría al template
+print(f"\n🎯 CONTEXTO PARA EL TEMPLATE:")
+print(f"   servicios: {len(servicios_list[:50])} (limitado a 50)")
+print(f"   servicios_por_categoria: {len(servicios_por_categoria)} categorías")
+print(f"   categorias: {len(categorias)}")
+print(f"   subcategorias: {len(subcategorias)}")
+
+if len(servicios_por_categoria) == 0:
+    print(f"\n❌ PROBLEMA ENCONTRADO: servicios_por_categoria está VACÍO")
+    print(f"   Esto hará que el template muestre 'No Services Found'")
+    print(f"\n🔍 DIAGNÓSTICO:")
+    print(f"   - Servicios en lista: {len(servicios_list)}")
+    print(f"   - Categorías válidas: {len(categorias)}")
+    if len(servicios_list) > 0 and len(categorias) > 0:
+        print(f"   ⚠️ Hay servicios y categorías, pero no se están agrupando")
+        print(f"   Verificando por qué...")
+        for servicio in servicios_list[:5]:
+            print(f"     Servicio: {servicio.nombre}")
+            print(f"       Categoría: {servicio.categoria.code if servicio.categoria else 'N/A'}")
+            print(f"       País categoría: {servicio.categoria.country if servicio.categoria else 'N/A'}")
+            print(f"       Coincide con country_code ({country_code}): {servicio.categoria.country == country_code if servicio.categoria else False}")
+else:
+    print(f"\n✅ servicios_por_categoria tiene {len(servicios_por_categoria)} categorías")
+    print(f"   Los servicios DEBERÍAN aparecer en el template")
+
+print(f"\n✅ SIMULACIÓN COMPLETADA")
+ENDPYTHON
+

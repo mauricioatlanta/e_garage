@@ -1,0 +1,77 @@
+═══════════════════════════════════════════════════════════════
+COMANDO PARA VERIFICAR CATEGORÍAS Y SUBCATEGORÍAS DE SERVICIOS
+═══════════════════════════════════════════════════════════════
+
+Ejecuta este comando en el servidor para verificar:
+
+cd /home/atlantareciclajes/apps/egarage/current && \
+python3 << 'PYEOF'
+import os
+import django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings')
+django.setup()
+
+from taller.servicios.models import (
+    CategoriaServicio,
+    CategoriaServicioName,
+    SubcategoriaServicio,
+    SubcategoriaServicioName,
+)
+
+print("🔍 Verificando categorías y subcategorías de servicios para Chile...\n")
+print("=" * 70)
+
+# Verificar categorías
+categorias = CategoriaServicio.objects.filter(country='CL')
+print(f"\n📂 Categorías totales (country='CL'): {categorias.count()}")
+
+for cat in categorias:
+    print(f"\n  Categoría: {cat.code}")
+    nombres = CategoriaServicioName.objects.filter(categoria=cat)
+    print(f"    Nombres: {nombres.count()}")
+    for nombre in nombres:
+        print(f"      - {nombre.label} ({nombre.language}) - is_default: {nombre.is_default}")
+
+# Verificar subcategorías
+subcategorias = SubcategoriaServicio.objects.filter(country='CL')
+print(f"\n\n🧩 Subcategorías totales (country='CL'): {subcategorias.count()}")
+
+for sub in subcategorias[:10]:  # Mostrar solo las primeras 10
+    print(f"\n  Subcategoría: {sub.code} (Categoría: {sub.categoria.code})")
+    nombres = SubcategoriaServicioName.objects.filter(subcategoria=sub)
+    print(f"    Nombres: {nombres.count()}")
+    for nombre in nombres:
+        print(f"      - {nombre.label} ({nombre.language}) - is_default: {nombre.is_default}")
+
+# Verificar filtro usado por la vista
+print("\n\n" + "=" * 70)
+print("🔍 Verificando filtro usado por la vista (language='es', is_default=True):")
+print("=" * 70)
+
+categorias_filtradas = CategoriaServicio.objects.filter(
+    country='CL',
+    names__language='es',
+    names__is_default=True
+).distinct()
+
+print(f"\n📂 Categorías que pasan el filtro: {categorias_filtradas.count()}")
+for cat in categorias_filtradas:
+    nombre = cat.get_label('es')
+    print(f"  ✅ {cat.code}: {nombre}")
+
+subcategorias_filtradas = SubcategoriaServicio.objects.filter(
+    country='CL',
+    names__language='es',
+    names__is_default=True
+).distinct()
+
+print(f"\n🧩 Subcategorías que pasan el filtro: {subcategorias_filtradas.count()}")
+for sub in subcategorias_filtradas[:10]:
+    nombre = sub.get_label('es')
+    print(f"  ✅ {sub.code}: {nombre} (Categoría: {sub.categoria.code})")
+
+print("\n" + "=" * 70)
+PYEOF
+
+═══════════════════════════════════════════════════════════════
+

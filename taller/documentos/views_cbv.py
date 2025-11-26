@@ -264,10 +264,11 @@ class DocumentoCreateView(
         # Procesar items dinámicos después de guardar
         self.procesar_items_dinamicos(form)
 
-        messages.success(
-            self.request,
-            f"✅ Documento {self.object.tipo}-{self.object.numero} creado exitosamente",
-        )
+        # Mensaje de éxito eliminado según solicitud del usuario
+        # messages.success(
+        #     self.request,
+        #     f"✅ Documento {self.object.tipo}-{self.object.numero} creado exitosamente",
+        # )
         return response
 
     def procesar_items_dinamicos(self, form):

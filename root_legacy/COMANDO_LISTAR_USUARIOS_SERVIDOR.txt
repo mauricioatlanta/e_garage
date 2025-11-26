@@ -1,0 +1,83 @@
+========================================
+COMANDOS PARA LISTAR TODOS LOS USUARIOS
+========================================
+
+OPCIÓN 1: Usar comando de Django (Recomendado)
+-----------------------------------------------
+
+Conectarse al servidor:
+ssh atlantareciclajes@ssh.pythonanywhere.com
+
+Ejecutar:
+cd /home/atlantareciclajes/apps/egarage/current
+source ~/.virtualenvs/venv_egarage310/bin/activate
+python manage.py listar_usuarios_credenciales
+
+Para buscar usuario específico:
+python manage.py listar_usuarios_credenciales --usuario testuser_usa
+
+Para filtrar por país:
+python manage.py listar_usuarios_credenciales --pais US
+
+Para resetear testuser_usa:
+python manage.py listar_usuarios_credenciales --reset-testuser-usa
+
+
+OPCIÓN 2: Ejecutar script directamente en shell
+------------------------------------------------
+
+Conectarse al servidor y ejecutar:
+cd /home/atlantareciclajes/apps/egarage/current
+source ~/.virtualenvs/venv_egarage310/bin/activate
+python manage.py shell
+
+Luego copiar y pegar el contenido de verificar_todos_usuarios.py
+
+
+OPCIÓN 3: Ejecutar script completo
+-----------------------------------
+
+Copiar verificar_todos_usuarios.py al servidor y ejecutar:
+python manage.py shell < verificar_todos_usuarios.py
+
+
+VERIFICACIÓN ESPECÍFICA DE testuser_usa
+----------------------------------------
+
+Si el usuario testuser_usa sigue sin funcionar:
+
+1. Verificar que existe:
+python manage.py listar_usuarios_credenciales --usuario testuser_usa
+
+2. Resetear contraseña:
+python manage.py listar_usuarios_credenciales --reset-testuser-usa
+
+3. O ejecutar comando de fix completo:
+python manage.py fix_testuser_usa
+
+4. Verificar autenticación manualmente:
+python manage.py shell
+
+# En el shell:
+from django.contrib.auth import get_user_model, authenticate
+User = get_user_model()
+
+user = User.objects.get(username='testuser_usa')
+print(f"Usuario existe: {user.username}")
+print(f"Activo: {user.is_active}")
+print(f"Contraseña correcta: {user.check_password('TestUSA2025!')}")
+
+auth_user = authenticate(username='testuser_usa', password='TestUSA2025!')
+print(f"Autenticación: {'✅ EXITOSA' if auth_user else '❌ FALLIDA'}")
+
+
+VERIFICAR TODOS LOS USUARIOS DE PRUEBA
+---------------------------------------
+
+El script mostrará:
+- Todos los usuarios organizados por país
+- Credenciales conocidas y si funcionan
+- Estado de empresas y suscripciones
+- Usuarios sin empresa
+- Información detallada de usuarios de prueba
+

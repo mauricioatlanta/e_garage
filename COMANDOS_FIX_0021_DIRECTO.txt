@@ -1,0 +1,38 @@
+===========================================
+SOLUCIÓN DIRECTA: Migración 0021
+===========================================
+
+EJECUTAR EN EL SERVIDOR:
+-------------------------
+
+cd /home/atlantareciclajes/apps/egarage/current
+workon venv_egarage310
+
+# Marcar migración 0021 como aplicada (usando solo el número)
+python manage.py migrate taller 0021 --fake
+
+# Continuar con migraciones restantes
+python manage.py migrate
+
+# Verificar
+python manage.py check
+
+# Ver estado de migraciones
+python manage.py showmigrations taller | tail -15
+
+===========================================
+SI SIGUE FALLANDO:
+===========================================
+
+# Ver qué migraciones están pendientes
+python manage.py showmigrations taller | grep "\[ \]"
+
+# Marcar la siguiente que falle también
+# Ejemplo: si falla 0022
+python manage.py migrate taller 0022 --fake
+python manage.py migrate
+
+# Repetir hasta que todas se apliquen
+
+===========================================
+

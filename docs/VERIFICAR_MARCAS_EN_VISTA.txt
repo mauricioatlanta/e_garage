@@ -1,0 +1,116 @@
+# ============================================
+# VERIFICAR MARCAS EN LA VISTA (Simular request)
+# ============================================
+
+cd ~/apps/egarage/current && python3.10 << 'ENDPYTHON'
+import os
+import django
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings')
+
+try:
+    django.setup()
+except Exception as e:
+    print(f"Warning: {e}")
+
+from taller.models.marca import Marca
+from taller.vehiculos.forms import VehiculoForm
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+print("=" * 70)
+print("VERIFICACIÓN DE MARCAS EN VISTA")
+print("=" * 70)
+
+# 1. Verificar marcas en BD
+print("\n1️⃣ Verificando marcas en BD...")
+marcas_bd = list(Marca.objects.filter(country='US').order_by('nombre'))
+print(f"   Total marcas US en BD: {len(marcas_bd)}")
+
+if marcas_bd:
+    print(f"   Primeras 5: {[m.nombre for m in marcas_bd[:5]]}")
+else:
+    print("   ⚠️ No hay marcas para US en BD")
+    print("   Ejecuta el script de carga de marcas primero")
+
+# 2. Simular creación de formulario
+print("\n2️⃣ Simulando creación de formulario...")
+try:
+    # Buscar un usuario de US
+    usuario_us = User.objects.filter(username__icontains='usa').first()
+    if not usuario_us:
+        usuario_us = User.objects.first()
+    
+    if usuario_us:
+        print(f"   Usando usuario: {usuario_us.username}")
+        
+        # Crear un request simulado
+        class MockRequest:
+            path = "/us/vehiculos/crear/"
+            user = usuario_us
+        
+        request = MockRequest()
+        
+        # Crear formulario
+        form = VehiculoForm(user=usuario_us, request=request)
+        
+        print(f"   ✅ Formulario creado")
+        
+        # Verificar campo marca
+        if "marca" in form.fields:
+            marca_field = form.fields["marca"]
+            print(f"   ✅ Campo 'marca' existe en formulario")
+            print(f"   Tipo: {type(marca_field).__name__}")
+            
+            if hasattr(marca_field, "choices"):
+                choices_list = list(marca_field.choices)
+                print(f"   Choices: {len(choices_list)} opciones")
+                if len(choices_list) > 1:
+                    print(f"   Primeras 5 choices: {choices_list[:5]}")
+                else:
+                    print(f"   ⚠️ Solo tiene {len(choices_list)} opción(es)")
+            elif hasattr(marca_field, "queryset"):
+                queryset_count = marca_field.queryset.count()
+                print(f"   Queryset: {queryset_count} marcas")
+                if queryset_count > 0:
+                    print(f"   Primeras 5: {[str(m) for m in marca_field.queryset[:5]]}")
+                else:
+                    print(f"   ⚠️ Queryset está vacío")
+            else:
+                print(f"   ⚠️ Campo no tiene choices ni queryset")
+        else:
+            print(f"   ❌ Campo 'marca' NO existe en formulario")
+    else:
+        print("   ⚠️ No se encontró usuario para probar")
+        
+except Exception as e:
+    print(f"   ❌ Error: {e}")
+    import traceback
+    traceback.print_exc()
+
+# 3. Verificar qué pasaría en la vista
+print("\n3️⃣ Simulando lógica de la vista...")
+try:
+    country = "US"
+    marcas_bd = list(Marca.objects.filter(country=country).order_by("nombre"))
+    
+    if marcas_bd:
+        marca_choices = [("", "Select a brand")] + [(str(m.pk), m.nombre) for m in marcas_bd]
+        print(f"   ✅ marca_choices creado: {len(marca_choices)} opciones")
+        print(f"   Primeras 5: {marca_choices[:5]}")
+    else:
+        print(f"   ⚠️ No se pueden crear marca_choices (no hay marcas en BD)")
+        
+except Exception as e:
+    print(f"   ❌ Error: {e}")
+    import traceback
+    traceback.print_exc()
+
+print("\n" + "=" * 70)
+print("FIN DE VERIFICACIÓN")
+print("=" * 70)
+ENDPYTHON
+
+
+

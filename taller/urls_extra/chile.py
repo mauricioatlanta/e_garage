@@ -34,14 +34,15 @@ from taller.views_extra.views_configuracion import (
     configuracion_tecnicos,
 )
 from taller.views_extra.views_trial_activate import activar_trial
+from taller.documentos import views_country_aware as views_documentos
 
 # from taller.views_extra.crear_motor_caja import crear_motor, crear_caja, crear_color  # ❌ Desactivado - usando views_create_parts
 
 app_name = "chile"
 
 urlpatterns = [
-    # Vista de inicio para /cl/es/ - redirige a la página de bienvenida
-    path("", lambda request: HttpResponseRedirect("/cl/egarage/"), name="chile_home"),
+    # Vista de inicio para /cl/es/ - redirige a la página principal de Chile
+    path("", lambda request: HttpResponseRedirect("/cl/"), name="chile_home"),
     # URLs principales de taller (configuración, settings, etc.)
     # Incluir las rutas específicas que necesitamos
     path("dashboard/", dashboard, name="dashboard"),
@@ -64,6 +65,12 @@ urlpatterns = [
         "egarage/",
         TemplateView.as_view(template_name="onboarding/bienvenida_chile.html"),
         name="bienvenida_chile",
+    ),
+    # Página de bienvenida alternativa (ruta estándar)
+    path(
+        "bienvenida/",
+        TemplateView.as_view(template_name="cl/es/onboarding/bienvenida.html"),
+        name="bienvenida_chile_alt",
     ),
     # Login para suscriptores de Chile (redirige al login global, pero aquí puedes poner una vista personalizada si lo deseas)
     path(
@@ -114,6 +121,30 @@ urlpatterns = [
     path(
         "documentos/",
         include(("taller.documentos.urls", "documentos"), namespace="documentos"),
+    ),
+    # =========================
+    # Documentos Chile (vistas genéricas country-aware)
+    # =========================
+    # Lista de documentos Chile
+    path(
+        "documentos/lista/",
+        views_documentos.documentos_listar,
+        {"country_code": "cl", "lang_code": "es"},
+        name="lista_documentos_cl",
+    ),
+    # Crear documento Chile
+    path(
+        "documentos/nuevo/",
+        views_documentos.documento_crear,
+        {"country_code": "cl", "lang_code": "es"},
+        name="crear_documento_cl",
+    ),
+    # Editar documento Chile
+    path(
+        "documentos/<int:pk>/editar/",
+        views_documentos.documento_editar,
+        {"country_code": "cl", "lang_code": "es"},
+        name="editar_documento_cl",
     ),
     path(
         "repuestos/",

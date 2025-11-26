@@ -213,3 +213,70 @@ def get_tax_info(empresa, ship_to_city: Optional[Ciudad] = None, applies_to: str
 
 # Import necesario para Q lookups
 from django.db import models
+
+
+def calcular_impuesto(base: Decimal, empresa, applies_to: str = "parts") -> Decimal:
+    """
+    Función centralizada para calcular impuesto sobre una base según configuración del tenant.
+
+    Esta es la función principal que debe usarse en todo el código para calcular impuestos,
+    reemplazando las múltiples instancias de if/else dispersas.
+
+    Args:
+        base: Base imponible (Decimal o número)
+        empresa: Instancia de Empresa (tenant)
+        applies_to: 'parts' (repuestos) o 'services' (servicios)
+
+    Returns:
+        Decimal: Monto del impuesto calculado
+
+    Ejemplo:
+        >>> from decimal import Decimal
+        >>> base = Decimal("1000.00")
+        >>> impuesto = calcular_impuesto(base, empresa_chile, 'parts')
+        >>> print(impuesto)  # Decimal('190.00') para IVA 19%
+
+    Uso recomendado:
+        En lugar de:
+            if empresa.pais == "CL":
+                tax = base * Decimal("0.19")
+            elif empresa.pais == "US":
+                tax = Decimal("0.00")
+
+        Usar:
+            tax = calcular_impuesto(base, empresa, 'parts')
+    """
+    if base is None:
+        base = Decimal("0.00")
+
+    if not isinstance(base, Decimal):
+        base = Decimal(str(base))
+
+    # Obtener tasa usando la función existente
+    rate, _ = resolve_tax_rate(empresa, ship_to_city=None, applies_to=applies_to)
+
+    # Calcular impuesto
+    impuesto = base * rate
+
+    return impuesto.quantize(Decimal("0.01"))
+
+
+def get_tax_rate_simple(empresa, applies_to: str = "parts") -> Decimal:
+    """
+    Obtiene la tasa de impuesto como decimal (0.19 para 19%) de forma simple.
+
+    Esta es una función helper que retorna solo la tasa sin información adicional.
+
+    Args:
+        empresa: Instancia de Empresa
+        applies_to: 'parts' o 'services'
+
+    Returns:
+        Decimal: Tasa de impuesto (ej: Decimal('0.19') para 19%)
+
+    Ejemplo:
+        >>> tasa = get_tax_rate_simple(empresa_chile, 'parts')
+        >>> print(tasa)  # Decimal('0.19')
+    """
+    rate, _ = resolve_tax_rate(empresa, ship_to_city=None, applies_to=applies_to)
+    return rate

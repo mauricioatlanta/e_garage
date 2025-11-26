@@ -1,0 +1,68 @@
+# ============================================
+# DIAGNÓSTICO: Verificar usuario y empresa
+# Ejecutar en el servidor
+# ============================================
+
+cd ~/apps/egarage/current && python3.10 << 'ENDPYTHON'
+import os
+import django
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings')
+
+try:
+    django.setup()
+except Exception as e:
+    print(f"Warning: {e}")
+
+from django.contrib.auth.models import User
+from taller.models import Empresa
+from taller.servicios.models import Servicio
+
+print("=" * 60)
+print("DIAGNÓSTICO: USUARIOS Y EMPRESAS")
+print("=" * 60)
+
+# 1. Verificar usuarios y sus empresas
+usuarios = User.objects.all()
+print(f"\n👤 Usuarios encontrados: {usuarios.count()}")
+for user in usuarios:
+    try:
+        empresa = user.empresa
+        nombre_emp = empresa.nombre_taller or empresa.empresa or f"Empresa {empresa.id}"
+        servicios_count = Servicio.objects.filter(empresa=empresa).count()
+        print(f"   - {user.username} ({user.email})")
+        print(f"     Empresa: {nombre_emp} (País: {empresa.pais}, ID: {empresa.id})")
+        print(f"     Servicios: {servicios_count}")
+    except AttributeError:
+        print(f"   - {user.username} ({user.email})")
+        print(f"     ⚠️ SIN EMPRESA ASOCIADA")
+
+# 2. Verificar servicios por empresa
+print(f"\n🏢 SERVICIOS POR EMPRESA:")
+empresas = Empresa.objects.all()
+for emp in empresas:
+    nombre_emp = emp.nombre_taller or emp.empresa or f"Empresa {emp.id}"
+    servicios_us = Servicio.objects.filter(
+        empresa=emp,
+        categoria__country='US',
+        names__language='en',
+        names__is_default=True
+    ).distinct()
+    print(f"   - {nombre_emp} ({emp.pais}): {servicios_us.count()} servicios US")
+
+# 3. Verificar servicios US sin filtro de empresa
+servicios_us_todos = Servicio.objects.filter(
+    categoria__country='US',
+    names__language='en',
+    names__is_default=True
+).distinct()
+print(f"\n📊 Total servicios US (sin filtro empresa): {servicios_us_todos.count()}")
+
+# 4. Verificar si hay usuarios sin empresa
+usuarios_sin_empresa = [u for u in usuarios if not hasattr(u, 'empresa')]
+if usuarios_sin_empresa:
+    print(f"\n⚠️ Usuarios sin empresa: {len(usuarios_sin_empresa)}")
+    for user in usuarios_sin_empresa:
+        print(f"   - {user.username} ({user.email})")
+ENDPYTHON
+

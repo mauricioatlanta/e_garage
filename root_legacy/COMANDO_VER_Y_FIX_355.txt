@@ -1,0 +1,114 @@
+═══════════════════════════════════════════════════════════════
+COMANDO PARA VER Y CORREGIR LÍNEA 355
+═══════════════════════════════════════════════════════════════
+
+Primero, veamos qué hay exactamente en esa línea:
+
+cd /home/atlantareciclajes/apps/egarage/current && \
+sed -n '350,365p' gestion_taller/urls.py
+
+Luego ejecuta este comando para corregirlo:
+
+cd /home/atlantareciclajes/apps/egarage/current && \
+cp gestion_taller/urls.py gestion_taller/urls.py.backup_ver355_$(date +%Y%m%d_%H%M%S) && \
+python3 << 'PYEOF'
+file_path = "gestion_taller/urls.py"
+
+with open(file_path, 'r', encoding='utf-8') as f:
+    lines = f.readlines()
+
+# Mostrar el path() completo
+print("📋 Path() alrededor de línea 355:")
+for i in range(349, min(365, len(lines))):
+    marker = ">>>" if i == 354 else "   "
+    print(f"{marker} {i+1:3d}: {lines[i].rstrip()}")
+
+# Buscar el path() que incluye línea 355
+# Buscar hacia atrás para encontrar el inicio
+path_start = 349
+while path_start > 0 and 'path(' not in lines[path_start]:
+    path_start -= 1
+
+if path_start >= 0 and 'path(' in lines[path_start]:
+    # Leer el path completo
+    path_lines = []
+    paren_count = 0
+    for j in range(path_start, min(path_start + 15, len(lines))):
+        path_lines.append(lines[j])
+        paren_count += lines[j].count('(') - lines[j].count(')')
+        if '),' in lines[j] and paren_count == 0:
+            break
+    
+    path_str = ''.join(path_lines)
+    print(f"\n📋 Path completo (líneas {path_start+1}-{j+1}):")
+    print(path_str)
+    
+    # El error indica que hay un argumento de función donde debería haber kwargs
+    # Buscar: path("url", view, algo_extra, name="name")
+    import re
+    
+    # Contar argumentos antes de name=
+    if 'name=' in path_str:
+        before_name = path_str.split('name=')[0]
+        # Contar comas (debería haber máximo 2: url, view)
+        parts = [p.strip() for p in before_name.split(',') if p.strip()]
+        print(f"\n📊 Argumentos antes de name=: {len(parts)}")
+        for idx, part in enumerate(parts):
+            print(f"   {idx+1}. {part[:60]}")
+        
+        if len(parts) > 2:
+            print(f"\n⚠️  Demasiados argumentos ({len(parts)}), debería ser 2 (url, view)")
+            # Eliminar argumentos extra (mantener solo url y view)
+            # Reconstruir el path correctamente
+            url_part = parts[0] if len(parts) > 0 else ''
+            view_part = parts[1] if len(parts) > 1 else ''
+            
+            # Reconstruir el path
+            indent = len(lines[path_start]) - len(lines[path_start].lstrip())
+            new_path_lines = [
+                ' ' * indent + 'path(\n',
+                ' ' * indent + f'    {url_part},\n',
+                ' ' * indent + f'    {view_part},\n'
+            ]
+            
+            # Agregar name= y cierre
+            name_line = [l for l in path_lines if 'name=' in l]
+            if name_line:
+                new_path_lines.append(' ' * indent + '    ' + name_line[0].split('name=')[0].split(',')[-1].strip() + 'name=' + name_line[0].split('name=')[1])
+            else:
+                # Buscar name= en las líneas originales
+                for line in path_lines:
+                    if 'name=' in line:
+                        new_path_lines.append(line)
+                        break
+            
+            # Agregar cierre
+            new_path_lines.append(' ' * indent + '),\n')
+            
+            # Reemplazar en el archivo
+            new_lines = lines[:path_start] + new_path_lines + lines[j+1:]
+            
+            with open(file_path, 'w', encoding='utf-8') as f:
+                f.writelines(new_lines)
+            
+            print("✅ Path corregido")
+        else:
+            print("✅ Número de argumentos correcto")
+    else:
+        print("⚠️  No se encontró name= en el path")
+
+# Verificar sintaxis
+import ast
+try:
+    with open(file_path, 'r', encoding='utf-8') as f:
+        ast.parse(f.read())
+    print("\n✅ Sintaxis correcta")
+except Exception as e:
+    print(f"\n❌ Error: {e}")
+PYEOF
+
+touch /var/www/www_egarage_cl_wsgi.py && \
+echo "✅ Servidor reiniciado"
+
+═══════════════════════════════════════════════════════════════
+

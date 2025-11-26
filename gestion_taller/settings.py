@@ -151,28 +151,33 @@ MIDDLEWARE = [
 # pero donde el middleware no está disponible
 try:
     from allauth.account.middleware import AccountMiddleware
+
     # El middleware existe, agregarlo después de AuthenticationMiddleware
-    auth_middleware_index = MIDDLEWARE.index("django.contrib.auth.middleware.AuthenticationMiddleware")
+    auth_middleware_index = MIDDLEWARE.index(
+        "django.contrib.auth.middleware.AuthenticationMiddleware"
+    )
     MIDDLEWARE.insert(auth_middleware_index + 1, "allauth.account.middleware.AccountMiddleware")
 except ImportError:
     # El middleware no existe, pero allauth puede requerirlo
     # Intentar desactivar la verificación si es posible
     try:
         import allauth.account.apps
+
         # Monkey patch para desactivar la verificación del middleware (solo una vez)
-        if not hasattr(allauth.account.apps.AccountConfig.ready, '_patched_for_middleware'):
+        if not hasattr(allauth.account.apps.AccountConfig.ready, "_patched_for_middleware"):
             original_ready = allauth.account.apps.AccountConfig.ready
-            
+
             def patched_ready(self):
                 # Verificar si el middleware está en MIDDLEWARE antes de lanzar error
                 try:
                     from allauth.account.middleware import AccountMiddleware
+
                     # Si el middleware existe, usar la verificación original
                     return original_ready(self)
                 except ImportError:
                     # El middleware no existe, omitir la verificación
                     pass
-            
+
             patched_ready._patched_for_middleware = True
             allauth.account.apps.AccountConfig.ready = patched_ready
     except Exception:
@@ -203,57 +208,19 @@ TEMPLATES = [
                 "taller.context_processors.company_context",
                 "taller.context_processors.company_branding",
                 "taller.context_processors.company_header",
+                "taller.context_processors.country_config.country_context",
             ],
         },
     },
 ]
 
 # ---------- DB ----------
-if os.getenv("DATABASE_URL"):
-    import dj_database_url
-
-    DATABASES = {"default": dj_database_url.parse(os.getenv("DATABASE_URL"), conn_max_age=600)}
-else:
-    # Detectar tipo de base de datos desde variables de entorno
-    DB_ENGINE = os.getenv("DB_ENGINE", "sqlite3")
-
-    if DB_ENGINE == "mysql":
-        # MySQL con utf8mb4 para soportar emojis y caracteres especiales
-        DATABASES = {
-            "default": {
-                "ENGINE": "django.db.backends.mysql",
-                "NAME": os.getenv("DB_NAME", "egarage"),
-                "USER": os.getenv("DB_USER", "root"),
-                "PASSWORD": os.getenv("DB_PASSWORD", ""),
-                "HOST": os.getenv("DB_HOST", "localhost"),
-                "PORT": os.getenv("DB_PORT", "3306"),
-                "OPTIONS": {
-                    "charset": "utf8mb4",
-                    "init_command": "SET sql_mode='STRICT_TRANS_TABLES', character_set_connection=utf8mb4, collation_connection=utf8mb4_unicode_ci",
-                    "sql_mode": "STRICT_TRANS_TABLES",
-                },
-            }
-        }
-    elif DB_ENGINE == "postgresql":
-        # PostgreSQL
-        DATABASES = {
-            "default": {
-                "ENGINE": "django.db.backends.postgresql",
-                "NAME": os.getenv("DB_NAME", "egarage"),
-                "USER": os.getenv("DB_USER", "postgres"),
-                "PASSWORD": os.getenv("DB_PASSWORD", ""),
-                "HOST": os.getenv("DB_HOST", "localhost"),
-                "PORT": os.getenv("DB_PORT", "5432"),
-            }
-        }
-    else:
-        # SQLite (por defecto en desarrollo)
-        DATABASES = {
-            "default": {
-                "ENGINE": "django.db.backends.sqlite3",
-                "NAME": BASE_DIR / "db.sqlite3",
-            }
-        }
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": "/home/atlantareciclajes/apps/egarage/shared/db/db.sqlite3",
+    }
+}
 
 # ---------- i18n / l10n ----------
 LANGUAGE_CODE = "es"  # fallback global
@@ -398,18 +365,47 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 
 # ---------- CSRF trusted desde ALLOWED_HOSTS si no se define explícito ----------
 if len(CSRF_TRUSTED_ORIGINS) == 0:
+    # Siempre agregar egarage.cl (producción) incluso si DEBUG=True
+    production_origins = [
+        "https://egarage.cl",
+        "https://www.egarage.cl",
+        "http://egarage.cl",  # Por si acaso hay redirección HTTP
+        "http://www.egarage.cl",
+    ]
+
+    # Agregar también desde ALLOWED_HOSTS si no es "*"
+    allowed_origins = [
+        f"https://{h}"
+        for h in ALLOWED_HOSTS
+        if h not in {"*", "localhost", "127.0.0.1"} and not h.startswith(".")
+    ]
+    # También agregar versión HTTP por si acaso
+    allowed_origins_http = [
+        f"http://{h}"
+        for h in ALLOWED_HOSTS
+        if h not in {"*", "localhost", "127.0.0.1"} and not h.startswith(".")
+    ]
+
     if DEBUG:
-        # En desarrollo, agregar localhost y 127.0.0.1
-        CSRF_TRUSTED_ORIGINS = [
-            "http://127.0.0.1:8000",
-            "http://localhost:8000",
-            "http://127.0.0.1:3000",
-            "http://localhost:3000",
-        ]
+        # En desarrollo, agregar localhost y 127.0.0.1 además de producción
+        CSRF_TRUSTED_ORIGINS = list(
+            set(
+                production_origins
+                + allowed_origins
+                + allowed_origins_http
+                + [
+                    "http://127.0.0.1:8000",
+                    "http://localhost:8000",
+                    "http://127.0.0.1:3000",
+                    "http://localhost:3000",
+                ]
+            )
+        )
     else:
-        CSRF_TRUSTED_ORIGINS = [
-            f"https://{h}" for h in ALLOWED_HOSTS if h not in {"*", "localhost", "127.0.0.1"}
-        ]
+        # En producción, solo dominios de producción
+        CSRF_TRUSTED_ORIGINS = list(
+            set(production_origins + allowed_origins + allowed_origins_http)
+        )
 
 # ---------- Branding Defaults ----------
 # Fallbacks amables para cuando no hay empresa configurada

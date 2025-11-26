@@ -87,6 +87,13 @@ class DocumentoForm(forms.ModelForm):
         self.empresa = kwargs.pop("empresa", None)
         self.country = kwargs.pop("country", "CL")
 
+        # Si no se pasó empresa, intentar obtenerla del usuario
+        if not self.empresa and self.user:
+            try:
+                self.empresa = getattr(self.user, "empresa", None)
+            except Exception:
+                pass
+
         super().__init__(*args, **kwargs)
 
         # Configurar URLs de autocompletado dinámicamente
@@ -112,13 +119,27 @@ class DocumentoForm(forms.ModelForm):
         self._configure_required_fields()
 
     def _configure_labels_by_country(self):
-        """Configura labels dinámicos según el país"""
+        """Configura labels dinámicos según el país y rubro de la empresa"""
+        # Obtener configuración de la empresa para determinar rubro
+        responsable_label = "Técnico Responsable"  # Default
+        if self.empresa:
+            try:
+                config = getattr(self.empresa, "config", None)
+                if config:
+                    responsable_label = config.get_responsable_label(self.country)
+            except Exception:
+                pass  # Si no hay config, usar default
+
         if self.country == "US":
             labels = {
                 "tipo": "Document Type",
                 "cliente": "Customer",
                 "vehiculo": "Vehicle",
-                "tecnico_responsable": "Assigned Technician",
+                "tecnico_responsable": (
+                    responsable_label
+                    if responsable_label != "Técnico Responsable"
+                    else "Assigned Technician"
+                ),
                 "kilometraje": "Mileage",
                 "millas": "Miles",
                 "observaciones": "Notes",
@@ -135,7 +156,7 @@ class DocumentoForm(forms.ModelForm):
                 "tipo": "Tipo de Documento",
                 "cliente": "Cliente",
                 "vehiculo": "Vehículo",
-                "tecnico_responsable": "Técnico Responsable",
+                "tecnico_responsable": responsable_label,
                 "kilometraje": "Kilometraje",
                 "millas": "Millas",
                 "observaciones": "Observaciones",

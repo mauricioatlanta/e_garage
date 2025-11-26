@@ -44,7 +44,7 @@
       border-color: color-mix(in srgb, var(--company-primary) 85%, black)!important;
     }
     .border-primary{border-color:var(--company-primary)!important}
-    .company-logo{max-height:80px;max-width:200px;object-fit:contain}
+    .company-logo{max-height:160px;max-width:400px;object-fit:contain}
     .company-header{background:linear-gradient(135deg,#1f2937 0%,#374151 50%,#1f2937 100%);border-bottom:4px solid var(--company-primary);box-shadow:0 10px 30px rgba(0,0,0,.3)}
     .company-title{color:#ffffff !important;text-shadow:0 0 10px rgba(255,255,255,0.5);filter:drop-shadow(0 4px 8px rgba(0,0,0,.3))}
 
@@ -523,25 +523,25 @@
 
   {# --- Header --- #}
   {% if request.path != '/accounts/login/' %}
-  <header class="company-header flex items-center justify-between gap-6 p-6">
-    <div class="flex items-center gap-6">
+  <header class="company-header flex flex-col sm:flex-row items-center sm:justify-between gap-3 sm:gap-6 p-3 sm:p-6">
+    <div class="flex items-center gap-3 sm:gap-6 w-full sm:w-auto justify-center sm:justify-start">
       {% if company_logo_url %}
         <img src="{{ company_logo_url }}" alt="{{ company_name }} Logo"
-             class="company-logo h-20 w-auto rounded-lg shadow-lg border-2 border-opacity-30"
+             class="company-logo h-24 sm:h-32 md:h-40 w-auto rounded-lg shadow-lg border-2 border-opacity-30"
              style="border-color: {{ company_color|default:'#00ffff' }};">
       {% endif %}
 
       <div class="flex flex-col">
-        <h1 class="company-title text-4xl font-bold drop-shadow-lg">{{ company_name|default:"eGarage" }}</h1>
+        <h1 class="company-title text-2xl sm:text-3xl md:text-4xl font-bold drop-shadow-lg">{{ company_name|default:"eGarage" }}</h1>
         {% if company_tagline %}
-          <span class="text-xl text-gray-300 font-medium mt-1">{{ company_tagline }}</span>
+          <span class="text-base sm:text-lg md:text-xl text-gray-300 font-medium mt-1">{{ company_tagline }}</span>
         {% elif request.user.is_authenticated %}
-          <span class="text-xl text-gray-300 font-medium mt-1">Bienvenido</span>
+          <span class="text-base sm:text-lg md:text-xl text-gray-300 font-medium mt-1">Bienvenido</span>
         {% endif %}
       </div>
     </div>
 
-    <div class="ml-auto flex items-center gap-3">
+    <div class="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-center sm:justify-end">
       <!-- Selector de idioma: Solo mostrar para USA, no para Chile -->
       {% if request.path|slice:':3' != '/cl' %}
         {% include 'taller/includes/lang_switcher_cinematic.html' %}
@@ -558,31 +558,31 @@
       <!-- Fila 1: AJUSTES, CENTRO, CLIENTES, DOCUMENTOS, EXTRA -->
       <div class="flex items-center justify-center gap-3 flex-wrap max-w-7xl w-full px-4">
         <!-- AJUSTES -->
-        <a href="/cl/es/settings/" class="nav-button-standard">
+        <a href="{% country_url 'company_settings' %}" class="nav-button-standard">
           <span class="nav-icon">⚙️</span>
-          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}SETTINGS{% else %}AJUSTES{% endif %}</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}AJUSTES{% else %}SETTINGS{% endif %}</span>
         </a>
 
         <!-- CENTRO -->
         <a href="{% country_url 'centro_operaciones' %}" class="nav-button-standard">
           <span class="nav-icon">🚀</span>
-          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}CENTER{% else %}CENTRO{% endif %}</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}CENTRO{% else %}CENTER{% endif %}</span>
         </a>
 
         <!-- CLIENTES -->
         <a href="{% country_url 'clientes:lista_clientes' %}" class="nav-button-standard">
           <span class="nav-icon">👥</span>
-          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}CLIENTS{% else %}CLIENTES{% endif %}</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}CLIENTES{% else %}CLIENTS{% endif %}</span>
         </a>
 
         <!-- DOCUMENTOS -->
         <a href="{% country_url 'documentos:lista_documentos' %}" class="nav-button-standard">
           <span class="nav-icon">📄</span>
-          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}DOCUMENTS{% else %}DOCUMENTOS{% endif %}</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}DOCUMENTOS{% else %}DOCUMENTS{% endif %}</span>
         </a>
 
         <!-- EXTRA -->
-        <a href="{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}/us/en/servicios/otros-servicios/{% else %}/cl/es/servicios/otros-servicios/{% endif %}" class="nav-button-standard">
+        <a href="{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}/us/{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}es{% else %}en{% endif %}/servicios/otros-servicios/{% else %}/cl/es/servicios/otros-servicios/{% endif %}" class="nav-button-standard">
           <span class="nav-icon">⭐</span>
           <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">EXTRA</span>
         </a>
@@ -593,19 +593,19 @@
         <!-- REPUESTOS -->
         <a href="{% country_url 'repuestos:lista_repuestos' %}" class="nav-button-standard">
           <span class="nav-icon">🔧</span>
-          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}PARTS{% else %}REPUESTOS{% endif %}</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}REPUESTOS{% else %}PARTS{% endif %}</span>
         </a>
 
         <!-- REPORTES -->
         <a href="{% country_url 'reportes:reportes_dashboard' %}" class="nav-button-standard">
           <span class="nav-icon">📊</span>
-          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}REPORTS{% else %}REPORTES{% endif %}</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}REPORTES{% else %}REPORTS{% endif %}</span>
         </a>
 
         <!-- SERVICIOS -->
         <a href="{% country_url 'servicios:servicios_menu' %}" class="nav-button-standard">
           <span class="nav-icon">🛠️</span>
-          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}SERVICES{% else %}SERVICIOS{% endif %}</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}SERVICIOS{% else %}SERVICES{% endif %}</span>
         </a>
 
         <!-- VEHÍCULOS -->
@@ -613,12 +613,12 @@
         {% if vehiculos_url %}
         <a href="{{ vehiculos_url }}" class="nav-button-standard">
           <span class="nav-icon">🚗</span>
-          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}VEHICLES{% else %}VEHÍCULOS{% endif %}</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}VEHÍCULOS{% else %}VEHICLES{% endif %}</span>
         </a>
         {% else %}
         <a href="{% country_url 'vehiculos:lista_vehiculos' %}" class="nav-button-standard">
           <span class="nav-icon">🚗</span>
-          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}VEHICLES{% else %}VEHÍCULOS{% endif %}</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}VEHÍCULOS{% else %}VEHICLES{% endif %}</span>
         </a>
         {% endif %}
 
@@ -627,7 +627,7 @@
           {% csrf_token %}
           <button type="submit" class="nav-button-standard logout-btn" style="cursor: pointer;">
             <span class="nav-icon">🚪</span>
-            <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}LOGOUT{% else %}SALIR{% endif %}</span>
+            <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}SALIR{% else %}LOGOUT{% endif %}</span>
           </button>
         </form>
       </div>

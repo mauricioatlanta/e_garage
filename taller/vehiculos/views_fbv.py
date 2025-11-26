@@ -15,7 +15,10 @@ from django.contrib.auth.decorators import login_required
 from django.db import models, transaction
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.template.loader import select_template
+from django.template.response import TemplateResponse
 from django.urls import NoReverseMatch, reverse
+from django.utils.translation import get_language
 from django.views.decorators.http import require_GET, require_POST
 
 log = logging.getLogger(__name__)
@@ -51,8 +54,8 @@ COUNTRY_NAMESPACES = {
 
 VEHICLE_TEMPLATES = {
     "crear": {
-        "CL": "taller/cl/es/vehiculos/crear.html",
-        "US": "taller/us/en/vehiculos/crear_vehiculo.html",
+        "CL": "cl/es/vehiculos/crear.html",
+        "US": "us/en/vehiculos/crear_vehiculo.html",
     },
 }
 
@@ -64,6 +67,55 @@ DEFAULT_VEHICLE_TEMPLATES = {
 # ---------------------------
 # Utilidades
 # ---------------------------
+def _get_country_from_path(path: str) -> tuple[str, str]:
+    """
+    Extrae country_code y lang_code desde la URL path.
+    
+    Returns:
+        tuple: (country_code, lang_code) ej: ("cl", "es"), ("us", "en")
+    """
+    path_lower = path.lower()
+    
+    # Mapeo de prefijos a (country, lang)
+    country_map = {
+        "/cl/es/": ("cl", "es"),
+        "/us/en/": ("us", "en"),
+        "/us/es/": ("us", "es"),
+        "/pe/es/": ("pe", "es"),
+        "/co/es/": ("co", "es"),
+        "/ec/es/": ("ec", "es"),
+        "/ve/es/": ("ve", "es"),
+        "/mx/es/": ("mx", "es"),
+        "/br/es/": ("br", "es"),
+    }
+    
+    # Buscar prefijo más largo primero
+    for prefix, (country, lang) in sorted(country_map.items(), key=lambda x: -len(x[0])):
+        if path_lower.startswith(prefix):
+            return country, lang
+    
+    # Fallback: detectar país desde path
+    if path_lower.startswith("/us/"):
+        return "us", "en"
+    elif path_lower.startswith("/cl/"):
+        return "cl", "es"
+    elif path_lower.startswith("/mx/"):
+        return "mx", "es"
+    elif path_lower.startswith("/pe/"):
+        return "pe", "es"
+    elif path_lower.startswith("/co/"):
+        return "co", "es"
+    elif path_lower.startswith("/ec/"):
+        return "ec", "es"
+    elif path_lower.startswith("/ve/"):
+        return "ve", "es"
+    elif path_lower.startswith("/br/"):
+        return "br", "es"
+    
+    # Default
+    return "cl", "es"
+
+
 def _get_country(request, default="CL"):
     """Detección robusta de país con fallback por path y normalización."""
     # 1) user.empresa.pais
@@ -93,12 +145,26 @@ def _get_country(request, default="CL"):
 
 
 def _country_namespace(country: str) -> str:
-    return COUNTRY_NAMESPACES.get(country.upper(), "chile")
+    """Obtiene el namespace de URL según el país, normalizando códigos de país."""
+    country = (country or "CL").upper()
+
+    # Normalizar alias antiguos
+    if country == "USA":
+        country = "US"
+
+    return COUNTRY_NAMESPACES.get(country, "chile")
 
 
 def _vehicle_template(view_key: str, country: str) -> str:
+    """Obtiene el template según la acción y el país, normalizando códigos de país."""
+    country = (country or "CL").upper()
+
+    # Normalizar alias antiguos
+    if country == "USA":
+        country = "US"
+
     per_country = VEHICLE_TEMPLATES.get(view_key, {})
-    return per_country.get(country.upper(), DEFAULT_VEHICLE_TEMPLATES.get(view_key))
+    return per_country.get(country, DEFAULT_VEHICLE_TEMPLATES.get(view_key))
 
 
 def has_field(model_cls, field_name: str) -> bool:
@@ -209,13 +275,21 @@ def lista_vehiculos(request):
         .order_by("-id")
     )
 
-    # Usar template específico según la URL (no el país de la empresa)
-    if request.path.startswith("/us/"):
-        template = "taller/us/en/vehiculos/lista_vehiculos.html"
-    else:
-        template = "taller/vehiculos/vehiculos.html"
+    # Detectar país e idioma desde la URL
+    country, lang = _get_country_from_path(request.path)
+    
+    # Usar select_template con fallback a common
+    template_obj = select_template(
+        [
+            f"{country}/{lang}/vehiculos/lista_vehiculos.html",
+            "taller/common/vehiculos/vehiculo_list.html",
+        ]
+    )
 
-    return render(request, template, {"vehiculos": vehiculos})
+    return render(request, template_obj.template.name, {
+        "vehiculos": vehiculos,
+        "empresa": empresa,
+    })
 
 
 @login_required
@@ -233,7 +307,7 @@ def crear_vehiculo(request):
         return redirect("/")
 
     if request.method == "POST":
-        form = VehiculoForm(request.POST, user=request.user)
+        form = VehiculoForm(request.POST, user=request.user, request=request)
 
         if form.is_valid():
             try:
@@ -255,11 +329,24 @@ def crear_vehiculo(request):
                     )
             except Exception as e:
                 log.error(f"Error creando vehículo: {e}")
-                messages.error(request, f"Error al crear vehículo: {str(e)}")
+                # Detectar error de VIN duplicado
+                error_str = str(e).lower()
+                if "unique constraint" in error_str and "vin" in error_str:
+                    messages.error(
+                        request,
+                        "Ya existe un vehículo con este VIN en tu empresa. Por favor, verifica el VIN o edita el vehículo existente.",
+                    )
+                elif "unique constraint" in error_str and "patente" in error_str:
+                    messages.error(
+                        request,
+                        "Ya existe un vehículo con esta patente en tu empresa. Por favor, verifica la patente o edita el vehículo existente.",
+                    )
+                else:
+                    messages.error(request, f"Error al crear vehículo: {str(e)}")
         else:
             messages.error(request, "Por favor corrige los errores en el formulario")
     else:
-        form = VehiculoForm(user=request.user)
+        form = VehiculoForm(user=request.user, request=request)
 
     # Contexto para el template
     ctx = {
@@ -282,7 +369,19 @@ def ver_vehiculo(request, vehiculo_id):
     empresa = getattr(request.user, "empresa", None)
     vehiculo = get_object_or_404(Vehiculo, id=vehiculo_id, empresa=empresa)
 
-    return render(request, "taller/vehiculos/vehiculo_detail.html", {"vehiculo": vehiculo})
+    # Usar template resolution en lugar de template hardcodeado
+    from taller.utils.templates import select_country_lang_template
+
+    country = _get_country(request, "CL")
+    lang = get_language() or "es"
+
+    template_name = select_country_lang_template(
+        "vehiculos/vehiculo_detail.html",
+        country,
+        lang,
+    )
+
+    return TemplateResponse(request, template_name, {"vehiculo": vehiculo})
 
 
 @login_required
@@ -296,7 +395,7 @@ def editar_vehiculo(request, vehiculo_id):
     vehiculo = get_object_or_404(Vehiculo, id=vehiculo_id, empresa=empresa)
 
     if request.method == "POST":
-        form = VehiculoForm(request.POST, instance=vehiculo, user=request.user)
+        form = VehiculoForm(request.POST, instance=vehiculo, user=request.user, request=request)
 
         if form.is_valid():
             try:
@@ -319,11 +418,23 @@ def editar_vehiculo(request, vehiculo_id):
         else:
             messages.error(request, "Por favor corrige los errores en el formulario")
     else:
-        form = VehiculoForm(instance=vehiculo, user=request.user)
+        form = VehiculoForm(instance=vehiculo, user=request.user, request=request)
+
+    # Usar template resolution en lugar de template hardcodeado
+    from taller.utils.templates import select_country_lang_template
+
+    country = _get_country(request, "CL")
+    lang = get_language() or "es"
+
+    template_name = select_country_lang_template(
+        "vehiculos/editar_vehiculo.html",
+        country,
+        lang,
+    )
 
     return render(
         request,
-        "taller/vehiculos/editar_vehiculo.html",
+        template_name,
         {"form": form, "vehiculo": vehiculo},
     )
 
@@ -455,6 +566,140 @@ def ajax_modelos_por_marca(request):
         .values("id", "nombre")
     )
     return JsonResponse(list(modelos), safe=False)
+
+
+@require_GET
+@login_required
+def modelos_por_marca_api(request):
+    """
+    API endpoint para obtener modelos filtrados por marca_id y año (opcional).
+    Formato de respuesta JSON: [{"id": 1, "nombre": "Modelo 1"}, ...]
+    """
+    marca_id = request.GET.get("marca_id") or request.GET.get("marca")
+    anio_str = request.GET.get("anio")
+
+    if not marca_id:
+        log.warning(f"[modelos_por_marca_api] No se proporcionó marca_id")
+        return JsonResponse([], safe=False)
+
+    try:
+        marca_id = int(marca_id)
+    except (ValueError, TypeError):
+        log.error(f"[modelos_por_marca_api] marca_id inválido: {marca_id}")
+        return JsonResponse([], safe=False)
+
+    country = _get_country(request)
+    log.info(
+        f"[modelos_por_marca_api] Buscando modelos para marca_id={marca_id}, country={country}, anio={anio_str}"
+    )
+
+    # Verificar que la marca existe
+    try:
+        marca = Marca.objects.get(pk=marca_id)
+        marca_country = getattr(marca, "country", None)
+        log.info(
+            f"[modelos_por_marca_api] Marca encontrada: {marca.nombre} (country={marca_country})"
+        )
+    except Marca.DoesNotExist:
+        log.warning(f"[modelos_por_marca_api] Marca con id={marca_id} no existe")
+        return JsonResponse([], safe=False)
+
+    # Estrategia de búsqueda: usar el country de la marca si está disponible,
+    # de lo contrario usar el country detectado del request
+    # Esto es importante porque los modelos deben tener el mismo country que su marca
+    search_country = marca_country if marca_country else country
+
+    # Si el country de la marca no coincide con el detectado, loguear advertencia
+    if marca_country and marca_country != country:
+        log.warning(
+            f"[modelos_por_marca_api] Country mismatch: request={country}, marca={marca_country}. Usando country de la marca: {marca_country}"
+        )
+
+    # Query base: filtrar por país (de la marca) y marca
+    qs = Modelo.objects.filter(country=search_country, marca_id=marca_id)
+
+    # Log de conteo antes de filtrar por año
+    total_before_anio = qs.count()
+    log.info(
+        f"[modelos_por_marca_api] Modelos encontrados antes de filtrar por año: {total_before_anio} (country={search_country})"
+    )
+
+    # Si no hay modelos con el country de la marca, intentar sin filtrar por country como fallback
+    # (Solo para logging/información, no usamos el fallback para mantener consistencia de datos)
+    if total_before_anio == 0:
+        log.warning(
+            f"[modelos_por_marca_api] No se encontraron modelos con country={search_country}. Verificando otros countries..."
+        )
+        qs_fallback = Modelo.objects.filter(marca_id=marca_id)
+        total_fallback = qs_fallback.count()
+        log.info(
+            f"[modelos_por_marca_api] Modelos encontrados sin filtrar por country: {total_fallback}"
+        )
+
+        if total_fallback > 0:
+            # Mostrar qué countries tienen modelos para esta marca
+            paises_con_modelos = qs_fallback.values_list("country", flat=True).distinct()
+            log.warning(
+                f"[modelos_por_marca_api] ⚠️ Modelos encontrados pero con countries diferentes: {list(paises_con_modelos)}"
+            )
+            log.warning(
+                f"[modelos_por_marca_api] 💡 Los modelos deben tener country={search_country} para aparecer. Ejecuta: python manage.py cargar_modelos_usa"
+            )
+            # Opcional: Usar fallback temporalmente si no hay modelos con el country correcto
+            # Descomentar la siguiente línea si quieres mostrar modelos de otros countries temporalmente
+            # qs = qs_fallback
+        else:
+            log.warning(
+                f"[modelos_por_marca_api] No hay modelos para esta marca en ningún country. Ejecuta: python manage.py cargar_modelos_usa"
+            )
+
+    # Filtrar por año si se proporciona y el modelo tiene campo 'anio'
+    if anio_str:
+        try:
+            anio = int(anio_str)
+            # Si el modelo tiene campo 'anio', filtrar por él
+            if has_field(Modelo, "anio"):
+                qs = qs.filter(anio=anio)
+                log.info(f"[modelos_por_marca_api] Filtrado por anio={anio} (campo directo)")
+            # Si tiene rango (anio_desde/anio_hasta), ajustar aquí
+            elif has_field(Modelo, "anio_desde") and has_field(Modelo, "anio_hasta"):
+                qs = qs.filter(anio_desde__lte=anio, anio_hasta__gte=anio)
+                log.info(
+                    f"[modelos_por_marca_api] Filtrado por anio={anio} (rango anio_desde/anio_hasta)"
+                )
+        except (ValueError, TypeError):
+            log.warning(f"[modelos_por_marca_api] Año inválido: {anio_str}")
+            pass  # Ignorar si el año no es válido
+
+    # Contar resultados finales
+    total_final = qs.count()
+    log.info(f"[modelos_por_marca_api] Total modelos después de filtros: {total_final}")
+
+    # Si no hay modelos, verificar si hay modelos sin filtrar por país
+    if total_final == 0:
+        modelos_sin_country = Modelo.objects.filter(marca_id=marca_id).count()
+        log.warning(
+            f"[modelos_por_marca_api] No se encontraron modelos con country={search_country}. Total modelos sin filtrar por país: {modelos_sin_country}"
+        )
+
+        # Si hay modelos pero con otro país, sugerir en el log
+        if modelos_sin_country > 0:
+            paises_disponibles = (
+                Modelo.objects.filter(marca_id=marca_id)
+                .values_list("country", flat=True)
+                .distinct()
+            )
+            log.warning(
+                f"[modelos_por_marca_api] ⚠️ Países disponibles para esta marca: {list(paises_disponibles)}"
+            )
+            log.warning(
+                f"[modelos_por_marca_api] 💡 Los modelos deben tener country={search_country} para aparecer. Considera actualizar los modelos existentes o crear nuevos."
+            )
+
+    # Formato de respuesta: lista de objetos con id y nombre
+    data = [{"id": m.pk, "nombre": str(m)} for m in qs.order_by("nombre")[:200]]
+    log.info(f"[modelos_por_marca_api] Retornando {len(data)} modelos")
+    return JsonResponse(data, safe=False)
 
 
 @require_GET
@@ -795,4 +1040,45 @@ def ajax_agregar_caja(request):
         )
     except Exception as e:
         log.error(f"Error agregando caja: {e}")
+        return JsonResponse({"success": False, "error": str(e)}, status=500)
+
+
+@require_POST
+@login_required
+def ajax_agregar_color(request):
+    """Agregar nuevo color via AJAX."""
+    try:
+        data = json.loads(request.body)
+        nombre = data.get("nombre", "").strip()
+        if not nombre:
+            return JsonResponse({"success": False, "error": "Nombre requerido"}, status=400)
+
+        country = _get_country(request)
+        empresa = getattr(request.user, "empresa", None)
+
+        # Evitar duplicados por case
+        try:
+            color = ColorVehiculo.objects.get(country=country, nombre__iexact=nombre)
+            created = False
+        except ColorVehiculo.DoesNotExist:
+            color = ColorVehiculo.objects.create(country=country, nombre=nombre)
+            created = True
+
+        return JsonResponse(
+            {
+                "success": True,
+                "color": {"id": str(color.pk), "nombre": color.nombre},
+                "created": created,
+            }
+        )
+    except Exception as e:
+        empresa = getattr(request.user, "empresa", None)
+        log.error(
+            "Error agregando color: %s",
+            e,
+            extra={
+                "user_id": request.user.id,
+                "empresa_id": getattr(empresa, "id", None),
+            },
+        )
         return JsonResponse({"success": False, "error": str(e)}, status=500)

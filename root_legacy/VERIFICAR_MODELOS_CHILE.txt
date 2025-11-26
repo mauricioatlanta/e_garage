@@ -1,0 +1,46 @@
+═══════════════════════════════════════════════════════════════
+COMANDO PARA VERIFICAR MODELOS DE CHILE
+═══════════════════════════════════════════════════════════════
+
+Ejecuta este comando en el servidor para verificar modelos:
+
+cd /home/atlantareciclajes/apps/egarage/current && \
+python3 << 'PYEOF'
+import os
+import django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings')
+django.setup()
+
+from taller.models.marca import Marca
+from taller.models.modelo import Modelo
+
+print("🔍 Verificando modelos de Chile...\n")
+print("=" * 70)
+
+# Verificar marcas
+marcas_chile = Marca.objects.filter(country='CL')
+print(f"📊 Total de marcas: {marcas_chile.count()}")
+
+# Verificar modelos
+modelos_chile = Modelo.objects.filter(country='CL')
+print(f"📊 Total de modelos: {modelos_chile.count()}")
+
+if modelos_chile.count() > 0:
+    print("\n✅ Modelos por marca:")
+    for marca in marcas_chile[:10]:
+        modelos_marca = modelos_chile.filter(marca=marca)
+        if modelos_marca.count() > 0:
+            print(f"\n🚗 {marca.nombre} ({modelos_marca.count()} modelos):")
+            for m in modelos_marca[:5]:
+                print(f"   - {m.nombre}")
+            if modelos_marca.count() > 5:
+                print(f"   ... y {modelos_marca.count() - 5} más")
+else:
+    print("\n❌ No hay modelos para Chile")
+    print("💡 Necesitas crear modelos para las marcas")
+
+print("\n" + "=" * 70)
+PYEOF
+
+═══════════════════════════════════════════════════════════════
+

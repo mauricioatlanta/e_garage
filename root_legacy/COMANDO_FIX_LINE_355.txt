@@ -1,0 +1,88 @@
+═══════════════════════════════════════════════════════════════
+COMANDO PARA CORREGIR ERROR EN LÍNEA 355
+═══════════════════════════════════════════════════════════════
+
+El error "kwargs argument must be a dict, but got function" indica que
+hay un path() con argumentos en orden incorrecto.
+
+Ejecuta este comando:
+
+cd /home/atlantareciclajes/apps/egarage/current && \
+cp gestion_taller/urls.py gestion_taller/urls.py.backup_line355_$(date +%Y%m%d_%H%M%S) && \
+python3 << 'PYEOF'
+file_path = "gestion_taller/urls.py"
+
+with open(file_path, 'r', encoding='utf-8') as f:
+    lines = f.readlines()
+
+# Mostrar líneas problemáticas
+print("📋 Líneas 350-365:")
+for i in range(349, min(365, len(lines))):
+    marker = ">>>" if i == 354 else "   "
+    print(f"{marker} {i+1:3d}: {lines[i].rstrip()}")
+
+# Buscar el path() problemático en línea 355
+# El formato correcto es: path("url", view, name="name")
+# El formato incorrecto sería: path("url", view, otra_funcion, name="name")
+
+new_lines = []
+i = 0
+
+while i < len(lines):
+    if 'path(' in lines[i] and 350 <= i+1 <= 365:
+        # Leer el path completo
+        path_start = i
+        path_lines = []
+        paren_count = 0
+        
+        for j in range(i, min(i+10, len(lines))):
+            path_lines.append(lines[j])
+            paren_count += lines[j].count('(') - lines[j].count(')')
+            if '),' in lines[j] and paren_count == 0:
+                break
+        
+        path_str = ''.join(path_lines)
+        
+        # Buscar problema: algo entre view y name=
+        import re
+        # Si hay algo después de as_view() o include() y antes de name=
+        # que no sea solo espacios o comas
+        match = re.search(r'(as_view\([^)]+\)|include\([^)]+\))\s*,\s*([^,)]+)\s*,\s*name=', path_str)
+        
+        if match:
+            print(f"⚠️  Problema en línea {i+1}: argumento extra '{match.group(2)}'")
+            # Eliminar el argumento extra
+            fixed = re.sub(
+                r'(as_view\([^)]+\)|include\([^)]+\))\s*,\s*[^,)]+\s*,\s*(?=name=)',
+                r'\1, ',
+                path_str
+            )
+            fixed_lines = fixed.splitlines(keepends=True)
+            new_lines.extend(fixed_lines)
+            i = j + 1
+        else:
+            new_lines.extend(path_lines)
+            i = j + 1
+    else:
+        new_lines.append(lines[i])
+        i += 1
+
+# Escribir archivo corregido
+with open(file_path, 'w', encoding='utf-8') as f:
+    f.writelines(new_lines)
+
+# Verificar sintaxis
+import ast
+try:
+    with open(file_path, 'r', encoding='utf-8') as f:
+        ast.parse(f.read())
+    print("✅ Sintaxis correcta")
+except Exception as e:
+    print(f"⚠️  Error: {e}")
+PYEOF
+
+touch /var/www/www_egarage_cl_wsgi.py && \
+echo "✅ Servidor reiniciado"
+
+═══════════════════════════════════════════════════════════════
+

@@ -27,6 +27,60 @@
     <div class="scan-lines"></div>
 </div>
 
+<!-- Header with Add Button -->
+<div class="mb-6">
+    <div class="glass-card p-4">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+                <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-emerald-300 via-lime-300 to-green-400">
+                    {% trans "Vehicle Fleet" %}
+                </h1>
+                <p class="text-gray-400 text-xs mt-0.5">{% trans "Manage your vehicle fleet" %}</p>
+            </div>
+            {% country_url 'vehiculos:crear_vehiculo' as url_crear_vehiculo %}
+            {% if not url_crear_vehiculo %}
+                {% url 'vehiculos:crear_vehiculo' as url_crear_vehiculo %}
+            {% endif %}
+            {% if not url_crear_vehiculo %}
+                {% url 'usa:vehiculos:crear_vehiculo' as url_crear_vehiculo %}
+            {% endif %}
+            <a href="{% if url_crear_vehiculo %}{{ url_crear_vehiculo }}{% else %}/us/vehiculos/crear/{% endif %}"
+               id="add-vehicle-btn"
+               class="inline-flex items-center justify-center space-x-2 px-4 py-3 sm:px-6 rounded-xl bg-gradient-to-r from-emerald-600 to-green-600 border-2 border-emerald-400 text-white font-bold hover:from-emerald-500 hover:to-green-500 hover:shadow-lg hover:shadow-emerald-500/50 transition-all duration-300 transform hover:scale-105 w-full sm:w-auto min-w-[200px] text-base sm:text-base"
+               style="display: flex !important; visibility: visible !important; opacity: 1 !important;"
+               aria-label="{% trans 'Add new vehicle' %}">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                <span class="text-base font-bold">{% trans "Add Vehicle" %}</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+/* FORZAR VISIBILIDAD DEL BOTÓN EN MÓVILES */
+@media screen and (max-width: 768px) {
+    #add-vehicle-btn {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        width: 100% !important;
+        margin-top: 1rem !important;
+        padding: 0.75rem 1rem !important;
+        font-size: 1rem !important;
+        z-index: 100 !important;
+        position: relative !important;
+    }
+    
+    #add-vehicle-btn span {
+        display: inline-block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+}
+</style>
+
 <!-- Search and Filter Section -->
 <div class="mb-8">
     <div class="glass-card p-6">
@@ -177,6 +231,23 @@
             </div>
             <h3 class="empty-title">{% trans "No vehicles found" %}</h3>
             <p class="empty-description">{% trans "Get started by adding your first vehicle to the system." %}</p>
+            {% country_url 'vehiculos:crear_vehiculo' as url_crear_vehiculo_empty %}
+            {% if not url_crear_vehiculo_empty %}
+                {% url 'vehiculos:crear_vehiculo' as url_crear_vehiculo_empty %}
+            {% endif %}
+            {% if not url_crear_vehiculo_empty %}
+                {% url 'usa:vehiculos:crear_vehiculo' as url_crear_vehiculo_empty %}
+            {% endif %}
+            <a href="{% if url_crear_vehiculo_empty %}{{ url_crear_vehiculo_empty }}{% else %}/us/vehiculos/crear/{% endif %}"
+               id="add-vehicle-btn-empty"
+               class="mt-6 inline-flex items-center justify-center space-x-2 px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-green-600 border-2 border-emerald-400 text-white font-bold hover:from-emerald-500 hover:to-green-500 hover:shadow-lg hover:shadow-emerald-500/50 transition-all duration-300 transform hover:scale-105 w-full sm:w-auto min-w-[220px] text-base mx-auto"
+               style="display: flex !important; visibility: visible !important; opacity: 1 !important;"
+               aria-label="{% trans 'Add your first vehicle' %}">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                <span class="text-base font-bold">{% trans "Add First Vehicle" %}</span>
+            </a>
         </div>
     </div>
     {% endfor %}
@@ -798,9 +869,37 @@ window.testNavigation = function() {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('=== VEHICLES PAGE DEBUG ===');
     console.log('Request Path:', '{{ request.path }}');
-    console.log('Add Vehicle URL:', '{% country_url "vehiculos:crear_vehiculo" %}');
+    
+    // Intentar múltiples formas de obtener el botón
+    let addBtn = document.getElementById('add-vehicle-btn');
+    
+    // Si no se encuentra, intentar buscar por otros métodos
+    if (!addBtn) {
+        addBtn = document.querySelector('a[href*="crear"]');
+        if (addBtn && addBtn.textContent.includes('Add Vehicle')) {
+            addBtn.id = 'add-vehicle-btn';
+            console.log('✅ Botón encontrado y ID asignado');
+        }
+    }
+    
+    if (addBtn) {
+        console.log('Add Vehicle URL:', addBtn.href);
+    } else {
+        console.warn('⚠️ Botón no encontrado, intentando crear uno...');
+        // Crear el botón si no existe
+        const header = document.querySelector('.glass-card .flex.items-center.justify-between, .glass-card .d-flex.justify-content-between');
+        if (header) {
+            const newBtn = document.createElement('a');
+            newBtn.id = 'add-vehicle-btn';
+            newBtn.href = '/us/vehiculos/crear/';
+            newBtn.className = 'inline-flex items-center space-x-2 px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-green-600 border border-emerald-400/50 text-white font-semibold hover:from-emerald-500 hover:to-green-500 hover:shadow-lg hover:shadow-emerald-500/50 transition-all duration-300 transform hover:scale-105';
+            newBtn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg><span>Add Vehicle</span>';
+            header.appendChild(newBtn);
+            addBtn = newBtn;
+            console.log('✅ Botón creado dinámicamente');
+        }
+    }
 
-    const addBtn = document.getElementById('add-vehicle-btn');
     if (addBtn) {
         console.log('Add Vehicle Button found:', addBtn);
         console.log('Add Vehicle Button href:', addBtn.href);

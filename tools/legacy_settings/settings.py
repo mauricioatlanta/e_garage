@@ -56,6 +56,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "allauth.account.middleware.AccountMiddleware",  # Requerido por django-allauth
     "gestion_taller.middleware.country_prefix.EnforceCountryPrefixMiddleware",  # 🚀 BISTURÍ: Corrección automática de prefijo
     "taller.middleware.verificar_suscripcion.VerificarSuscripcionMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",

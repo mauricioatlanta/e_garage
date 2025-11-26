@@ -1,0 +1,81 @@
+═══════════════════════════════════════════════════════════════
+COMANDO PARA CREAR REGIONES Y CIUDADES DE CHILE
+═══════════════════════════════════════════════════════════════
+
+Ejecuta este comando en el servidor para crear regiones y ciudades principales:
+
+cd /home/atlantareciclajes/apps/egarage/current && \
+python3 << 'PYEOF'
+import os
+import django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings')
+django.setup()
+
+from taller.models.region_ciudad import TallerRegion, TallerCiudad
+
+# Regiones y ciudades principales de Chile
+regiones_ciudades = {
+    "Arica y Parinacota": ["Arica", "Putre", "Camarones"],
+    "Tarapacá": ["Iquique", "Alto Hospicio", "Pozo Almonte"],
+    "Antofagasta": ["Antofagasta", "Calama", "Mejillones", "Tocopilla"],
+    "Atacama": ["Copiapó", "Vallenar", "Caldera", "Chañaral"],
+    "Coquimbo": ["La Serena", "Coquimbo", "Ovalle", "Illapel"],
+    "Valparaíso": ["Valparaíso", "Viña del Mar", "Quillota", "San Antonio", "Los Andes"],
+    "Metropolitana de Santiago": ["Santiago", "Puente Alto", "Maipú", "San Bernardo", "Las Condes", "Providencia"],
+    "Libertador General Bernardo O'Higgins": ["Rancagua", "San Fernando", "Pichilemu", "Santa Cruz"],
+    "Maule": ["Talca", "Curicó", "Linares", "Constitución"],
+    "Ñuble": ["Chillán", "San Carlos", "Bulnes", "Yungay"],
+    "Biobío": ["Concepción", "Los Ángeles", "Coronel", "Talcahuano", "Chillán Viejo"],
+    "La Araucanía": ["Temuco", "Villarrica", "Angol", "Pucón"],
+    "Los Ríos": ["Valdivia", "La Unión", "Río Bueno", "Panguipulli"],
+    "Los Lagos": ["Puerto Montt", "Osorno", "Castro", "Puerto Varas", "Ancud"],
+    "Aysén del General Carlos Ibáñez del Campo": ["Coyhaique", "Puerto Aysén", "Puerto Chacabuco", "Cisnes"],
+    "Magallanes y de la Antártica Chilena": ["Punta Arenas", "Puerto Natales", "Porvenir", "Puerto Williams"],
+}
+
+print("🔧 Creando regiones y ciudades de Chile...\n")
+print("=" * 70)
+
+regiones_creadas = 0
+ciudades_creadas = 0
+regiones_existentes = 0
+ciudades_existentes = 0
+
+for nombre_region, ciudades in regiones_ciudades.items():
+    # Crear o obtener región
+    region, region_creada = TallerRegion.objects.get_or_create(nombre=nombre_region)
+    if region_creada:
+        print(f"\n✅ Región creada: {nombre_region}")
+        regiones_creadas += 1
+    else:
+        print(f"\nℹ️  Región existente: {nombre_region}")
+        regiones_existentes += 1
+    
+    # Crear ciudades para esta región
+    for ciudad_nombre in ciudades:
+        ciudad, ciudad_creada = TallerCiudad.objects.get_or_create(
+            nombre=ciudad_nombre,
+            region=region
+        )
+        if ciudad_creada:
+            print(f"   ✅ Ciudad creada: {ciudad_nombre}")
+            ciudades_creadas += 1
+        else:
+            ciudades_existentes += 1
+
+print()
+print("=" * 70)
+print(f"📊 Resumen:")
+print(f"   ✅ Regiones creadas: {regiones_creadas}")
+print(f"   ℹ️  Regiones existentes: {regiones_existentes}")
+print(f"   ✅ Ciudades creadas: {ciudades_creadas}")
+print(f"   ℹ️  Ciudades existentes: {ciudades_existentes}")
+print()
+print(f"   📈 Total regiones: {TallerRegion.objects.count()}")
+print(f"   📈 Total ciudades: {TallerCiudad.objects.count()}")
+print("=" * 70)
+print("\n✅ Proceso completado")
+PYEOF
+
+═══════════════════════════════════════════════════════════════
+

@@ -3,42 +3,34 @@ eGarage - Sistema de Gestión de Talleres Automotrices
 Version Management
 """
 
-__version__ = "2.1.0"
-__version_info__ = (2, 1, 0)
-__release_date__ = "2025-11-08"
+__version__ = "2.1.1"
+__version_info__ = (2, 1, 1)
+__release_date__ = "2025-11-25"
 
 # Changelog de esta versión
 CHANGELOG = """
-Version 2.1.0 (2025-11-08)
+Version 2.1.1 (2025-11-25)
 ==========================
 
-🎨 Sistema de Branding Unificado
----------------------------------
-✅ Context processor con objeto BRAND centralizado
-✅ Logo del suscriptor visible en todas las páginas
-✅ Prioridad: CompanySettings → ConfiguracionEmpresa → Empresa
-✅ Template include reusable para headers
-✅ Variables CSS dinámicas basadas en branding
+🧹 Limpieza y Organización
+---------------------------
+✅ Eliminación de archivos temporales y documentación obsoleta
+✅ Reorganización de estructura de templates
+✅ Limpieza de archivos .py generados automáticamente
+✅ Consolidación de scripts de despliegue
 
-📄 Mejoras en Documentos
--------------------------
-✅ Campo "numero" ahora se autogenera automáticamente
-✅ No es obligatorio en el formulario
-✅ URL api_next_number agregada para compatibilidad
-✅ Validaciones mejoradas
-
-🔧 Fixes y Optimizaciones
+🔧 Mejoras y Correcciones
 --------------------------
-✅ Eliminadas referencias rotas a debug_urls
-✅ Caché de branding mejorado
-✅ Compatibilidad backwards con código existente
-✅ Sistema de fallbacks robusto
+✅ Actualización de configuración de producción
+✅ Mejoras en formularios de clientes y vehiculos
+✅ Optimización de vistas y templates
+✅ Correcciones en manejo de documentos
 
-🌐 Soporte Multi-idioma
-------------------------
-✅ Templates compatibles con ES/EN
-✅ Centro de Operaciones Espacial (USA) optimizado
-✅ Dashboard unificado Chile/USA
+📦 Preparación para Despliegue
+--------------------------------
+✅ Scripts de actualización mejorados
+✅ Documentación de despliegue actualizada
+✅ Preparación para actualización en servidor PythonAnywhere
 """
 
 

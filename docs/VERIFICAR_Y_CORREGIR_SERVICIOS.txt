@@ -1,0 +1,220 @@
+# ============================================
+# SCRIPT PARA VERIFICAR Y CORREGIR SERVICIOS
+# Ejecutar en el servidor PythonAnywhere
+# ============================================
+
+cd ~/apps/egarage/current && python3.10 << 'ENDPYTHON'
+import os
+import django
+from django.db import transaction
+from django.db.utils import IntegrityError
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings')
+
+try:
+    django.setup()
+except Exception as e:
+    print(f"Warning: {e}")
+
+from taller.models import Empresa
+from taller.servicios.models import (
+    CategoriaServicio, CategoriaServicioName,
+    Servicio, ServicioName,
+    SubcategoriaServicio, SubcategoriaServicioName,
+)
+
+print("=" * 60)
+print("DIAGNÓSTICO DE SERVICIOS")
+print("=" * 60)
+
+# 1. Verificar empresas
+empresas = Empresa.objects.all()
+print(f"\n📋 Empresas encontradas: {empresas.count()}")
+for emp in empresas:
+    nombre = emp.nombre_taller or emp.empresa or f"Empresa {emp.id}"
+    print(f"   - {nombre} (País: {emp.pais}, ID: {emp.id})")
+
+# 2. Verificar categorías US
+categorias_us = CategoriaServicio.objects.filter(country='US')
+print(f"\n📂 Categorías US: {categorias_us.count()}")
+for cat in categorias_us:
+    nombres = cat.names.filter(language='en', is_default=True)
+    print(f"   - {cat.code}: {nombres.first().label if nombres.exists() else 'SIN NOMBRE'}")
+
+# 3. Verificar servicios US
+servicios_us = Servicio.objects.filter(categoria__country='US')
+print(f"\n🔧 Servicios con categoría US: {servicios_us.count()}")
+
+# 4. Verificar servicios por empresa US
+empresas_us = empresas.filter(pais='US')
+print(f"\n🏢 Empresas US: {empresas_us.count()}")
+for emp in empresas_us:
+    servicios_emp = Servicio.objects.filter(empresa=emp)
+    nombre = emp.nombre_taller or emp.empresa or f"Empresa {emp.id}"
+    print(f"   - {nombre}: {servicios_emp.count()} servicios")
+    for serv in servicios_emp[:3]:
+        nombres_en = serv.names.filter(language='en', is_default=True)
+        print(f"     • {serv.nombre} (EN: {nombres_en.first().label if nombres_en.exists() else 'SIN NOMBRE EN'})")
+
+# 5. Verificar servicios con nombres en inglés
+servicios_con_en = Servicio.objects.filter(
+    categoria__country='US',
+    names__language='en',
+    names__is_default=True
+).distinct()
+print(f"\n✅ Servicios US con nombre EN: {servicios_con_en.count()}")
+
+print("\n" + "=" * 60)
+print("CORRECCIÓN DE SERVICIOS")
+print("=" * 60)
+
+# Crear servicios si no existen
+categorias = [
+    {
+        'code': 'motor',
+        'es': 'Sistema de Motor',
+        'en': 'Engine System',
+        'subcategorias': [
+            {
+                'code': 'diagnostico',
+                'es': 'Diagnóstico computarizado de motor',
+                'en': 'Engine Computer Diagnostics',
+                'servicios': [
+                    {'es': 'Diagnóstico computarizado de motor (OBD-II / fabricante)', 'en': 'OBD-II/Manufacturer Engine Scan'},
+                    {'es': 'Lectura y borrado de códigos de error', 'en': 'Read and Clear Error Codes'},
+                ],
+            },
+            {
+                'code': 'aceite',
+                'es': 'Cambio de aceite y filtros',
+                'en': 'Oil & Filter Change',
+                'servicios': [
+                    {'es': 'Cambio de aceite de motor y filtros (aceite, aire, combustible, habitáculo)', 'en': 'Engine Oil & Filter Change (oil, air, fuel, cabin)'},
+                    {'es': 'Cambio de aceite sintético', 'en': 'Synthetic Oil Change'},
+                ],
+            },
+        ],
+    },
+    {
+        'code': 'frenos',
+        'es': 'Sistema de Frenos',
+        'en': 'Brake System',
+        'subcategorias': [
+            {
+                'code': 'revision',
+                'es': 'Revisión de frenos',
+                'en': 'Brake Inspection',
+                'servicios': [
+                    {'es': 'Revisión completa del sistema de frenos', 'en': 'Complete Brake System Inspection'},
+                ],
+            },
+            {
+                'code': 'reparacion',
+                'es': 'Reparación de frenos',
+                'en': 'Brake Repair',
+                'servicios': [
+                    {'es': 'Cambio de pastillas de freno', 'en': 'Brake Pad Replacement'},
+                    {'es': 'Cambio de discos de freno', 'en': 'Brake Rotor Replacement'},
+                    {'es': 'Cambio de líquido de frenos', 'en': 'Brake Fluid Replacement'},
+                ],
+            },
+        ],
+    },
+]
+
+servicios_creados = 0
+servicios_actualizados = 0
+
+with transaction.atomic():
+    for country, lang, label_key in [('US', 'en', 'en')]:
+        print(f'\n🌍 Procesando servicios para {country} ({lang})')
+        
+        empresas_pais = empresas.filter(pais=country)
+        if not empresas_pais.exists():
+            print(f"   ⚠️ No hay empresas con país {country}")
+            continue
+        
+        for cat in categorias:
+            cat_obj, _ = CategoriaServicio.objects.get_or_create(country=country, code=cat['code'])
+            CategoriaServicioName.objects.get_or_create(
+                categoria=cat_obj, language=lang, is_default=True,
+                defaults={'label': cat[label_key]}
+            )
+            
+            for sub in cat['subcategorias']:
+                sub_obj, _ = SubcategoriaServicio.objects.get_or_create(
+                    categoria=cat_obj, code=sub['code'], country=country
+                )
+                SubcategoriaServicioName.objects.get_or_create(
+                    subcategoria=sub_obj, language=lang, is_default=True,
+                    defaults={'label': sub[label_key]}
+                )
+                
+                for serv in sub['servicios']:
+                    for empresa in empresas_pais:
+                        # Buscar servicio existente
+                        try:
+                            servicio = Servicio.objects.get(
+                                empresa=empresa,
+                                categoria=cat_obj,
+                                nombre=serv[label_key]
+                            )
+                            # Actualizar subcategoría si es necesario
+                            if servicio.subcategoria != sub_obj:
+                                servicio.subcategoria = sub_obj
+                                servicio.save()
+                            servicios_actualizados += 1
+                        except Servicio.DoesNotExist:
+                            # Crear nuevo servicio
+                            try:
+                                servicio = Servicio.objects.create(
+                                    empresa=empresa,
+                                    categoria=cat_obj,
+                                    subcategoria=sub_obj,
+                                    nombre=serv[label_key]
+                                )
+                                servicios_creados += 1
+                                print(f"   ✅ Creado: {serv[label_key]}")
+                            except IntegrityError:
+                                # Si hay error, intentar obtenerlo
+                                try:
+                                    servicio = Servicio.objects.get(
+                                        empresa=empresa,
+                                        categoria=cat_obj,
+                                        nombre=serv[label_key]
+                                    )
+                                    servicios_actualizados += 1
+                                except:
+                                    continue
+                        
+                        # Asegurar que tiene nombre en inglés
+                        ServicioName.objects.get_or_create(
+                            servicio=servicio,
+                            language=lang,
+                            is_default=True,
+                            defaults={'label': serv[label_key]}
+                        )
+
+print(f'\n✅ ¡Proceso completado!')
+print(f'📊 Servicios creados: {servicios_creados}')
+print(f'📊 Servicios actualizados: {servicios_actualizados}')
+
+# Verificación final
+servicios_finales = Servicio.objects.filter(
+    categoria__country='US',
+    names__language='en',
+    names__is_default=True
+).distinct()
+print(f'📊 Total servicios US con nombre EN: {servicios_finales.count()}')
+
+for emp in empresas.filter(pais='US'):
+    servicios_emp = Servicio.objects.filter(
+        empresa=emp,
+        categoria__country='US',
+        names__language='en',
+        names__is_default=True
+    ).distinct()
+    nombre = emp.nombre_taller or emp.empresa or f"Empresa {emp.id}"
+    print(f'   - {nombre}: {servicios_emp.count()} servicios')
+ENDPYTHON
+

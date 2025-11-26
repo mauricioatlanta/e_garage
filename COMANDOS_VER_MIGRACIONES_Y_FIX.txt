@@ -1,0 +1,55 @@
+===========================================
+SOLUCIÓN: Ver migraciones y marcar 0021
+===========================================
+
+EJECUTAR EN EL SERVIDOR:
+-------------------------
+
+cd /home/atlantareciclajes/apps/egarage/current
+workon venv_egarage310
+
+# 1. Ver todas las migraciones disponibles (excluyendo __init__.py)
+ls -1 taller/migrations/0*.py | sort -V | tail -5
+
+# O mejor, ver el número de la última migración
+ls -1 taller/migrations/0*.py | grep -v __init__ | sort -V | tail -1 | sed 's/.*\([0-9]\{4\}\).*/\1/'
+
+# 2. Ver qué migraciones están aplicadas
+python manage.py showmigrations taller | tail -20
+
+# 3. Marcar migración 0021 como aplicada (la tabla ya existe)
+python manage.py migrate taller 0021_alter_companysettings_logo_pagopendiente --fake
+
+# 4. Ver cuál es la última migración disponible
+python manage.py showmigrations taller | grep "\[ \]" | tail -1
+
+# 5. Si hay más migraciones, marcar todas hasta la última como aplicadas
+# Primero, obtener el número de la última migración
+LAST_MIG=$(ls -1 taller/migrations/0*.py | grep -v __init__ | sort -V | tail -1 | sed 's/.*\/\([0-9]\{4\}\)_.*/\1/')
+echo "Última migración: $LAST_MIG"
+
+# Marcar todas hasta esa como aplicadas
+python manage.py migrate taller $LAST_MIG --fake
+
+# 6. Aplicar solo las nuevas
+python manage.py migrate
+
+# 7. Verificar
+python manage.py check
+python manage.py showmigrations taller
+
+===========================================
+SOLUCIÓN DIRECTA (Más simple):
+===========================================
+
+# Marcar 0021 específicamente
+python manage.py migrate taller 0021 --fake
+
+# Intentar aplicar el resto
+python manage.py migrate
+
+# Si falla otra migración, marcar esa también
+# Repetir hasta que todas se apliquen
+
+===========================================
+

@@ -1,0 +1,110 @@
+# ============================================
+# DIAGNÓSTICO: Verificar por qué no cargan las marcas
+# ============================================
+
+cd ~/apps/egarage/current && python3.10 << 'ENDPYTHON'
+import os
+import django
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings')
+
+try:
+    django.setup()
+except Exception as e:
+    print(f"Warning: {e}")
+
+from taller.models.marca import Marca
+
+print("=" * 70)
+print("DIAGNÓSTICO DE MARCAS PARA USA")
+print("=" * 70)
+
+# 1. Verificar si hay marcas en la BD
+print("\n1️⃣ Verificando marcas en la base de datos...")
+total_marcas_us = Marca.objects.filter(country='US').count()
+print(f"   Total marcas con country='US': {total_marcas_us}")
+
+if total_marcas_us > 0:
+    print(f"\n   Primeras 10 marcas:")
+    marcas = Marca.objects.filter(country='US').order_by('nombre')[:10]
+    for m in marcas:
+        print(f"   - {m.id}: {m.nombre} (country={m.country})")
+else:
+    print("   ⚠️ NO HAY MARCAS en la BD para US")
+    print("   Necesitas ejecutar el script de carga de marcas")
+
+# 2. Verificar todas las marcas (sin filtro de país)
+print("\n2️⃣ Verificando todas las marcas en la BD...")
+total_marcas = Marca.objects.count()
+print(f"   Total marcas (todos los países): {total_marcas}")
+
+if total_marcas > 0:
+    print(f"\n   Distribución por país:")
+    from django.db.models import Count
+    por_pais = Marca.objects.values('country').annotate(total=Count('id')).order_by('country')
+    for item in por_pais:
+        print(f"   - {item['country']}: {item['total']} marcas")
+
+# 3. Verificar estructura del modelo
+print("\n3️⃣ Verificando estructura del modelo Marca...")
+try:
+    campo_country = Marca._meta.get_field('country')
+    print(f"   ✅ Campo 'country' existe: {campo_country}")
+    print(f"   Tipo: {type(campo_country)}")
+    print(f"   Choices disponibles: {campo_country.choices}")
+except Exception as e:
+    print(f"   ❌ Error al verificar campo country: {e}")
+
+# 4. Intentar crear una marca de prueba
+print("\n4️⃣ Intentando crear marca de prueba...")
+try:
+    marca_test, created = Marca.objects.get_or_create(
+        nombre="TEST_BRAND_USA",
+        country="US",
+        defaults={"nombre": "TEST_BRAND_USA", "country": "US"}
+    )
+    if created:
+        print(f"   ✅ Marca de prueba creada: {marca_test.id} - {marca_test.nombre}")
+        # Eliminarla después
+        marca_test.delete()
+        print(f"   🗑️ Marca de prueba eliminada")
+    else:
+        print(f"   📍 Marca de prueba ya existía: {marca_test.id} - {marca_test.nombre}")
+        marca_test.delete()
+        print(f"   🗑️ Marca de prueba eliminada")
+except Exception as e:
+    print(f"   ❌ Error al crear marca de prueba: {e}")
+    import traceback
+    traceback.print_exc()
+
+# 5. Verificar consulta específica
+print("\n5️⃣ Verificando consulta específica...")
+try:
+    marcas_us = list(Marca.objects.filter(country="US").order_by("nombre"))
+    print(f"   Marcas encontradas: {len(marcas_us)}")
+    if marcas_us:
+        print(f"   Primeras 5:")
+        for m in marcas_us[:5]:
+            print(f"     - ID: {m.id}, Nombre: '{m.nombre}', Country: '{m.country}'")
+    else:
+        print("   ⚠️ No se encontraron marcas con country='US'")
+        
+        # Intentar buscar sin filtro de país
+        print("\n   Buscando marcas sin filtro de país...")
+        todas = list(Marca.objects.all()[:10])
+        if todas:
+            print(f"   Encontradas {len(todas)} marcas (sin filtro):")
+            for m in todas:
+                print(f"     - ID: {m.id}, Nombre: '{m.nombre}', Country: '{m.country}'")
+except Exception as e:
+    print(f"   ❌ Error en consulta: {e}")
+    import traceback
+    traceback.print_exc()
+
+print("\n" + "=" * 70)
+print("FIN DEL DIAGNÓSTICO")
+print("=" * 70)
+ENDPYTHON
+
+
+

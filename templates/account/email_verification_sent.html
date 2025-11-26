@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% load static i18n country_url %}
+{% block title %}{% trans "Registro exitoso" %} | eGarage{% endblock %}
+
+{% block content %}
+<div class="relative min-h-screen flex items-center justify-center overflow-hidden">
+  <canvas id="particles-bg" class="fixed inset-0 w-full h-full z-0"></canvas>
+  <div class="relative z-10 w-full max-w-md">
+    <div class="bg-gradient-to-br from-[#0d1117cc] via-[#1a2233cc] to-[#0d1117cc] rounded-2xl shadow-2xl p-10 border-2 border-cyan-400/40 backdrop-blur-xl">
+      <div class="flex flex-col items-center mb-6">
+        <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage Logo" class="h-16 mb-3 drop-shadow-lg animate-pulse" style="filter: drop-shadow(0 0 20px rgba(34, 211, 238, 0.8));">
+        <h1 class="text-3xl md:text-4xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-fuchsia-400 to-yellow-300 mb-2 tracking-tight futuristic-glow">
+          <span class="lang-en" style="display: none;">Registration successful!</span>
+          <span class="lang-es">¡Registro exitoso!</span>
+        </h1>
+      </div>
+      <div class="text-cyan-100 text-center text-lg mb-4">
+        <p class="mb-4">
+          <span class="lang-en" style="display: none;">Please check your email to activate your account.</span>
+          <span class="lang-es">Por favor, revisa tu correo electrónico para activar tu cuenta.</span>
+        </p>
+        <p class="text-sm text-cyan-300">
+          <span class="lang-en" style="display: none;">If you don't see the email, check your spam folder or request a new confirmation link.</span>
+          <span class="lang-es">Si no ves el correo, revisa tu carpeta de spam o solicita un nuevo enlace de confirmación.</span>
+        </p>
+      </div>
+      <div class="flex flex-col gap-3 mt-6">
+        <a href="/accounts/login/" class="block text-center px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold rounded-lg transition-all shadow-lg hover:shadow-cyan-500/50">
+          <span class="lang-en" style="display: none;">Go to sign in</span>
+          <span class="lang-es">Ir a iniciar sesión</span>
+        </a>
+        <a href="/accounts/email/" class="block text-center px-6 py-3 bg-gray-700 hover:bg-gray-600 text-cyan-300 font-medium rounded-lg transition-all">
+          <span class="lang-en" style="display: none;">Resend confirmation email</span>
+          <span class="lang-es">Reenviar correo de confirmación</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+<style>
+  .futuristic-glow {
+    text-shadow: 0 0 24px #00ffe7, 0 0 8px #00ffe7, 0 0 2px #fff;
+    letter-spacing: 2px;
+  }
+</style>
+<script>
+// Animación de puntos tipo "espacio futurista"
+const canvas = document.getElementById('particles-bg');
+if (canvas) {
+  const ctx = canvas.getContext('2d');
+  let w = window.innerWidth;
+  let h = window.innerHeight;
+  canvas.width = w;
+  canvas.height = h;
+  let particles = Array.from({length: 80}, () => ({
+    x: Math.random() * w,
+    y: Math.random() * h,
+    r: Math.random() * 2.2 + 1.2,
+    dx: (Math.random() - 0.5) * 0.7,
+    dy: (Math.random() - 0.5) * 0.7,
+    c: `hsl(${Math.random()*360}, 100%, 70%)`
+  }));
+  function draw() {
+    ctx.clearRect(0, 0, w, h);
+    for (let p of particles) {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, 2 * Math.PI);
+      ctx.fillStyle = p.c;
+      ctx.shadowColor = p.c;
+      ctx.shadowBlur = 12;
+      ctx.fill();
+    }
+  }
+  function update() {
+    for (let p of particles) {
+      p.x += p.dx;
+      p.y += p.dy;
+      if (p.x < 0 || p.x > w) p.dx *= -1;
+      if (p.y < 0 || p.y > h) p.dy *= -1;
+    }
+  }
+  function animate() {
+    draw();
+    update();
+    requestAnimationFrame(animate);
+  }
+  animate();
+  window.addEventListener('resize', () => {
+    w = window.innerWidth;
+    h = window.innerHeight;
+    canvas.width = w;
+    canvas.height = h;
+  });
+}
+
+// Detectar idioma y mostrar/ocultar elementos
+document.addEventListener('DOMContentLoaded', function() {
+  const currentLang = '{{ LANGUAGE_CODE|default:"es" }}';
+  const lang = currentLang === 'en' ? 'en' : 'es';
+  
+  document.querySelectorAll('.lang-en, .lang-es').forEach(function(element) {
+    element.style.display = 'none';
+  });
+  
+  document.querySelectorAll('.lang-' + lang).forEach(function(element) {
+    const parent = element.parentElement;
+    const isInlineContext = parent && (
+      parent.tagName === 'A' || 
+      parent.tagName === 'BUTTON' || 
+      parent.tagName === 'SPAN' ||
+      parent.classList.contains('inline') ||
+      parent.style.display === 'inline' ||
+      parent.style.display === 'inline-block'
+    );
+    element.style.display = isInlineContext ? 'inline' : 'block';
+  });
+});
+</script>
+{% endblock %}
+

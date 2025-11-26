@@ -1,0 +1,71 @@
+===========================================
+Actualizar Versión a 2.1.1 en el Servidor
+===========================================
+
+OPCIÓN 1: Actualizar archivo directamente en el servidor
+---------------------------------------------------------
+
+cd /home/atlantareciclajes/apps/egarage/current
+workon venv_egarage310
+
+# Editar el archivo de versión
+nano taller/version.py
+
+# Cambiar estas líneas:
+# __version__ = "2.1.0"  →  __version__ = "2.1.1"
+# __version_info__ = (2, 1, 0)  →  __version_info__ = (2, 1, 1)
+# __release_date__ = "2025-11-08"  →  __release_date__ = "2025-11-25"
+
+# Guardar: Ctrl+O, Enter
+# Salir: Ctrl+X
+
+# Verificar
+python manage.py shell -c "from taller.version import get_version; print(get_version())"
+# Debe mostrar: 2.1.1
+
+
+OPCIÓN 2: Hacer pull desde Git (si los cambios están en GitHub)
+---------------------------------------------------------------
+
+cd /home/atlantareciclajes/apps/egarage/current
+workon venv_egarage310
+
+# Obtener últimos cambios
+git pull origin main
+
+# Verificar versión
+python manage.py shell -c "from taller.version import get_version; print(get_version())"
+
+
+OPCIÓN 3: Usar sed para actualizar automáticamente
+----------------------------------------------------
+
+cd /home/atlantareciclajes/apps/egarage/current
+
+# Actualizar versión
+sed -i 's/__version__ = "2.1.0"/__version__ = "2.1.1"/' taller/version.py
+sed -i 's/__version_info__ = (2, 1, 0)/__version_info__ = (2, 1, 1)/' taller/version.py
+sed -i 's/__release_date__ = "2025-11-08"/__release_date__ = "2025-11-25"/' taller/version.py
+
+# Verificar
+python manage.py shell -c "from taller.version import get_version; print(get_version())"
+
+===========================================
+VERIFICACIÓN:
+===========================================
+
+# Ver versión completa
+python manage.py shell << 'EOF'
+from taller.version import get_version, get_version_info
+print("Versión:", get_version())
+info = get_version_info()
+print("Fecha:", info['release_date'])
+exit()
+EOF
+
+# Debe mostrar:
+# Versión: 2.1.1
+# Fecha: 2025-11-25
+
+===========================================
+

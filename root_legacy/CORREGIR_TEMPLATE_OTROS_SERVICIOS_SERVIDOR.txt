@@ -1,0 +1,45 @@
+═══════════════════════════════════════════════════════════════
+CORREGIR TEMPLATE DE OTROS SERVICIOS - CAMPO nombre_servicio
+═══════════════════════════════════════════════════════════════
+
+El template está usando `otro.nombre_servicio` pero el modelo tiene `otro.nombre`.
+
+Ejecuta este comando en el servidor:
+
+cd /home/atlantareciclajes/apps/egarage/current && \
+python3 << 'PYEOF'
+from pathlib import Path
+
+file_path = 'templates/taller/common/documentos/ver_documento_nuevo.html'
+
+print(f"📝 Corrigiendo {file_path}...\n")
+
+if not Path(file_path).exists():
+    print(f"❌ Error: {file_path} no existe")
+    exit(1)
+
+with open(file_path, 'r', encoding='utf-8') as f:
+    content = f.read()
+
+# Reemplazar nombre_servicio por nombre
+if 'otro.nombre_servicio' in content:
+    content = content.replace(
+        'otro.nombre_servicio',
+        'otro.nombre'
+    )
+    print("✅ Campo nombre_servicio corregido a nombre")
+else:
+    print("ℹ️  El campo ya está correcto o no se encontró")
+
+# Guardar
+with open(file_path, 'w', encoding='utf-8') as f:
+    f.write(content)
+
+print(f"\n✅ Archivo {file_path} actualizado")
+PYEOF
+
+touch /var/www/www_egarage_cl_wsgi.py
+echo "✅ Servidor reiniciado"
+
+═══════════════════════════════════════════════════════════════
+

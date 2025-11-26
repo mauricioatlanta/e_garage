@@ -1,0 +1,103 @@
+═══════════════════════════════════════════════════════════════
+COMANDO SIMPLE PARA CORREGIR LÍNEA 379
+═══════════════════════════════════════════════════════════════
+
+Primero, veamos qué hay en esa línea:
+
+cd /home/atlantareciclajes/apps/egarage/current && \
+sed -n '375,385p' gestion_taller/urls.py
+
+Luego, ejecuta este comando para corregirlo:
+
+cd /home/atlantareciclajes/apps/egarage/current && \
+cp gestion_taller/urls.py gestion_taller/urls.py.backup_379_$(date +%Y%m%d_%H%M%S) && \
+python3 << 'PYEOF'
+file_path = "gestion_taller/urls.py"
+
+with open(file_path, 'r', encoding='utf-8') as f:
+    lines = f.readlines()
+
+# Mostrar líneas problemáticas
+print("📋 Líneas 375-385:")
+for i in range(374, min(385, len(lines))):
+    marker = ">>>" if i == 378 else "   "
+    print(f"{marker} {i+1:3d}: {lines[i].rstrip()}")
+
+# El error sugiere que hay un argumento posicional después de uno keyword
+# Buscar y corregir
+new_lines = []
+skip_next = False
+
+for i, line in enumerate(lines):
+    if skip_next:
+        skip_next = False
+        continue
+    
+    # Si estamos en la zona problemática (líneas 375-385)
+    if 374 <= i <= 384:
+        # Si hay una línea con solo ")," y la anterior también tiene "),"
+        if line.strip() == '),' and i > 0 and '),' in lines[i-1]:
+            print(f"⚠️  Eliminando línea {i+1} duplicada")
+            continue
+        
+        # Si hay un path() mal formado
+        if 'path(' in line:
+            # Leer el path completo
+            path_lines = [line]
+            j = i + 1
+            paren_count = line.count('(') - line.count(')')
+            
+            while j < len(lines) and paren_count > 0 and j < i + 8:
+                path_lines.append(lines[j])
+                paren_count += lines[j].count('(') - lines[j].count(')')
+                if '),' in lines[j] and paren_count == 0:
+                    break
+                j += 1
+            
+            # Verificar el path
+            path_str = ''.join(path_lines)
+            
+            # Si hay múltiples "),"
+            if path_str.count('),') > 1:
+                print(f"⚠️  Path() con múltiples cierres en línea {i+1}")
+                # Mantener solo hasta el primer cierre
+                first_close = path_str.find('),')
+                if first_close > 0:
+                    # Dividir en líneas hasta el primer cierre
+                    temp_str = path_str[:first_close+2]
+                    temp_lines = temp_str.splitlines(keepends=True)
+                    new_lines.extend(temp_lines)
+                    i = j
+                    continue
+            
+            new_lines.extend(path_lines)
+            i = j
+            continue
+    
+    new_lines.append(line)
+
+# Escribir archivo corregido
+with open(file_path, 'w', encoding='utf-8') as f:
+    f.writelines(new_lines)
+
+# Verificar sintaxis
+import ast
+try:
+    with open(file_path, 'r', encoding='utf-8') as f:
+        ast.parse(f.read())
+    print("✅ Sintaxis correcta")
+except SyntaxError as e:
+    print(f"❌ Error en línea {e.lineno}: {e.msg}")
+    # Mostrar más contexto
+    with open(file_path, 'r', encoding='utf-8') as f:
+        error_lines = f.readlines()
+    for i in range(max(0, e.lineno-3), min(len(error_lines), e.lineno+2)):
+        marker = ">>>" if i == e.lineno-1 else "   "
+        print(f"{marker} {i+1:3d}: {error_lines[i].rstrip()}")
+PYEOF
+
+touch /var/www/www_egarage_cl_wsgi.py && \
+echo "✅ Servidor reiniciado"
+
+═══════════════════════════════════════════════════════════════
+

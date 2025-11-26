@@ -1,0 +1,293 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payment - eGarage USA{% endblock %}
+
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    padding: 40px 20px;
+}
+
+.payment-container {
+    max-width: 600px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    padding: 40px;
+}
+
+.payment-header {
+    text-align: center;
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.payment-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a202c;
+    margin-bottom: 8px;
+}
+
+.payment-subtitle {
+    color: #718096;
+    font-size: 14px;
+}
+
+.plan-info {
+    background: linear-gradient(135deg, #667eea15, #764ba215);
+    border: 2px solid #667eea;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 32px;
+    text-align: center;
+}
+
+.plan-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: #667eea;
+    margin-bottom: 8px;
+}
+
+.plan-price {
+    font-size: 48px;
+    font-weight: 900;
+    color: #1a202c;
+    margin-bottom: 4px;
+}
+
+.plan-period {
+    color: #718096;
+    font-size: 14px;
+    margin-bottom: 16px;
+}
+
+.plan-features {
+    list-style: none;
+    padding: 0;
+    text-align: left;
+    margin-top: 16px;
+}
+
+.plan-features li {
+    color: #4a5568;
+    margin-bottom: 8px;
+    padding-left: 24px;
+    position: relative;
+}
+
+.plan-features li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #10b981;
+    font-weight: 700;
+}
+
+.payment-methods {
+    margin-bottom: 32px;
+}
+
+.method-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a202c;
+    margin-bottom: 16px;
+}
+
+.paypal-section {
+    background: #f7fafc;
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+}
+
+.paypal-logo {
+    width: 120px;
+    margin-bottom: 16px;
+}
+
+.paypal-info {
+    color: #4a5568;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.paypal-button {
+    background: #0070ba;
+    color: white;
+    padding: 16px 40px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    width: 100%;
+}
+
+.paypal-button:hover {
+    background: #005ea6;
+    transform: translateY(-2px);
+}
+
+.security-badge {
+    text-align: center;
+    padding: 16px;
+    background: #ecfdf5;
+    border-radius: 10px;
+    margin-bottom: 24px;
+}
+
+.security-badge svg {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.security-text {
+    color: #065f46;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.back-link {
+    text-align: center;
+    margin-top: 24px;
+}
+
+.back-link a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.reference-box {
+    background: #fffbeb;
+    border: 2px solid #fbbf24;
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 24px;
+}
+
+.reference-title {
+    font-weight: 700;
+    color: #92400e;
+    margin-bottom: 8px;
+}
+
+.reference-code {
+    font-size: 18px;
+    font-weight: 900;
+    color: #92400e;
+    font-family: 'Courier New', monospace;
+    background: white;
+    padding: 12px;
+    border-radius: 8px;
+    display: inline-block;
+    margin-top: 8px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="payment-container">
+    <div class="payment-header">
+        <div class="payment-title">💳 Complete Your Subscription</div>
+        <div class="payment-subtitle">{{ empresa.nombre_taller }} - 🇺🇸 USA</div>
+    </div>
+
+    <!-- Plan Info -->
+    <div class="plan-info">
+        <div class="plan-name">{{ plan_info.nombre }} Plan</div>
+        <div class="plan-price">${{ plan_info.valor }} USD</div>
+        <div class="plan-period">{{ plan_info.dias }} days of access</div>
+
+        <ul class="plan-features">
+            <li>Unlimited users and vehicles</li>
+            <li>Complete access to all modules</li>
+            <li>Email support</li>
+            <li>Cancel anytime</li>
+        </ul>
+    </div>
+
+    <!-- Security Badge -->
+    <div class="security-badge">
+        <span class="security-text">
+            🔒 Secure payment powered by PayPal
+        </span>
+    </div>
+
+    <!-- Reference -->
+    <div class="reference-box">
+        <div class="reference-title">📝 Payment Reference</div>
+        <div style="font-size: 13px; color: #78350f; margin-bottom: 8px;">
+            Include this reference in your PayPal payment:
+        </div>
+        <div class="reference-code">{{ reference }}</div>
+    </div>
+
+    <!-- PayPal Section -->
+    <div class="payment-methods">
+        <div class="method-title">Payment Method</div>
+
+        <div class="paypal-section">
+            <svg viewBox="0 0 24 24" style="width: 100px; height: 40px; margin-bottom: 16px;">
+                <path fill="#003087" d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.607-.541c-.013.076-.026.175-.041.254-.93 4.778-4.005 7.201-9.138 7.201h-2.19a.563.563 0 0 0-.556.479l-1.187 7.527h-.506l-.506 3.207a.641.641 0 0 0 .633.74h4.55a.869.869 0 0 0 .852-.736l.035-.177.68-4.287.044-.243a.87.87 0 0 1 .852-.736h.537c3.694 0 6.587-1.495 7.433-5.82.354-1.806.171-3.318-.785-4.388z"></path>
+                <path fill="#009cde" d="M21.222 6.917a6.742 6.742 0 0 0-.607-.541c-.013.076-.026.175-.041.254-.93 4.778-4.005 7.201-9.138 7.201h-2.19a.563.563 0 0 0-.556.479l-1.187 7.527h-.506l-.506 3.207a.641.641 0 0 0 .633.74h4.55a.869.869 0 0 0 .852-.736l.035-.177.68-4.287.044-.243a.87.87 0 0 1 .852-.736h.537c3.694 0 6.587-1.495 7.433-5.82.354-1.806.171-3.318-.785-4.388z"></path>
+            </svg>
+
+            <div class="paypal-info">
+                Send payment to: <strong>{{ paypal_config.business_email }}</strong>
+            </div>
+
+            <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
+                <input type="hidden" name="cmd" value="_xclick">
+                <input type="hidden" name="business" value="{{ paypal_config.business_email }}">
+                <input type="hidden" name="item_name" value="{{ paypal_config.item_name }}">
+                <input type="hidden" name="item_number" value="{{ paypal_config.item_number }}">
+                <input type="hidden" name="amount" value="{{ amount }}">
+                <input type="hidden" name="currency_code" value="{{ paypal_config.currency }}">
+                <input type="hidden" name="return" value="{{ paypal_config.return_url }}">
+                <input type="hidden" name="cancel_return" value="{{ paypal_config.cancel_url }}">
+                <input type="hidden" name="notify_url" value="{{ paypal_config.notify_url }}">
+                <input type="hidden" name="custom" value="{{ reference }}">
+
+                <button type="submit" class="paypal-button">
+                    Pay with PayPal
+                </button>
+            </form>
+
+            <div style="margin-top: 16px; font-size: 12px; color: #64748b;">
+                You will be redirected to PayPal to complete the payment
+            </div>
+        </div>
+    </div>
+
+    <!-- Alternative: Manual Payment -->
+    <div style="text-align: center; margin: 24px 0; color: #94a3b8;">
+        <div style="border-top: 1px solid #e2e8f0; margin-bottom: 16px;"></div>
+        <div style="font-size: 13px;">
+            Or send payment directly to PayPal account:
+            <strong style="color: #1a202c;">{{ paypal_config.business_email }}</strong>
+        </div>
+        <div style="font-size: 12px; margin-top: 8px;">
+            Include reference: <strong>{{ reference }}</strong>
+        </div>
+    </div>
+
+    <!-- Back Link -->
+    <div class="back-link">
+        <a href="/us/en/dashboard/">← Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %}

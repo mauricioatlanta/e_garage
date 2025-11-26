@@ -1,20 +1,15 @@
-{% extends 'base.html' %}
+{% extends 'layouts/base_egarage_panel.html' %}
 {% load static %}
 {% load humanize %}
 {% load country_url %}
 {% load money %}
+{% load i18n %}
 
-<!-- 🔴 DEBUG: COMMON DOCUMENTS LIST TEMPLATE LOADED -->
-<div style="position: fixed; top: 60px; left: 10px; width: 200px; height: 80px; background-color: #ff0000; z-index: 9999; border: 3px solid #000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 10px; padding: 5px;">
-  <div>🔴 COMMON DOCS LIST</div>
-  <div>Template loaded</div>
-  <div>Path: {{ request.path }}</div>
-  <div>Lang: {{ LANGUAGE_CODE }}</div>
-</div>
+{% block page_title %}{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Document Management{% else %}Gestión de Documentos{% endif %}{% endblock %}
+{% block page_subtitle %}{{ empresa.nombre_taller }} - {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Workshop Document List{% else %}Lista de Documentos del Taller{% endif %}{% endblock %}
+{% block page_icon %}📄{% endblock %}
 
-{% block title %}{{ empresa.nombre_taller }} - {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Document List{% else %}Lista de Documentos{% endif %}{% endblock %}
-
-{% block extra_css %}
+{% block page_extra_css %}
 <style>
 /* 🎨 Estilo futurista para lista de documentos */
 :root {
@@ -27,12 +22,6 @@
     --dark-bg: #0a0a0a;
     --card-bg: rgba(16, 20, 24, 0.95);
     --glass-bg: rgba(255, 255, 255, 0.05);
-}
-
-body {
-    background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
-    color: #ffffff;
-    font-family: 'Inter', 'Segoe UI', sans-serif;
 }
 
 .cyber-container {
@@ -166,54 +155,35 @@ body {
 
 .section-title {
     color: var(--cyber-blue);
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: bold;
-    margin-bottom: 2rem;
-    text-shadow: 0 0 10px var(--cyber-blue);
-    text-align: center;
-}
-
-.header-section {
-    background: var(--card-bg);
-    border: 1px solid var(--cyber-blue);
-    border-radius: 15px;
-    padding: 2rem;
-    margin-bottom: 2rem;
-    text-align: center;
-}
-
-.header-title {
-    font-size: 2.5rem;
-    font-weight: bold;
-    color: var(--cyber-blue);
-    margin-bottom: 0.5rem;
-    text-shadow: 0 0 15px var(--cyber-blue);
-}
-
-.header-subtitle {
-    color: #b0b8c1;
-    font-size: 1.1rem;
     margin-bottom: 1rem;
-}
-
-.header-info {
-    color: #888;
-    font-size: 0.9rem;
+    text-shadow: 0 0 10px var(--cyber-blue);
 }
 
 .create-button {
     background: linear-gradient(45deg, var(--cyber-green), var(--cyber-blue));
     border: none;
     border-radius: 25px;
-    padding: 12px 24px;
+    padding: 14px 28px;
     color: #000;
     font-weight: bold;
+    font-size: 1rem;
     text-decoration: none;
     display: inline-block;
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
     margin-bottom: 2rem;
+    width: 100%;
+    max-width: 400px;
+}
+@media (min-width: 640px) {
+    .create-button {
+        width: auto;
+        padding: 12px 24px;
+        font-size: 0.9rem;
+    }
 }
 
 .create-button:hover {
@@ -300,26 +270,36 @@ body {
 </style>
 {% endblock %}
 
-{% block content %}
-<div class="max-w-7xl mx-auto p-6">
+{% block main_actions %}
+<a href="{% country_url 'documentos:crear_documento' %}"
+   class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-600 via-lime-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white text-sm font-semibold border border-emerald-400/40 shadow-lg shadow-emerald-900/40 transition-all">
+  <span>➕</span>
+  <span>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Create New Document{% else %}Crear Nuevo Documento{% endif %}</span>
+</a>
+{% endblock %}
 
-    <!-- 🏢 Cabecera de Documentos -->
-    <div class="header-section">
-        <h1 class="header-title">
-            📄 {{ pais_emoji }} {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Document Management{% else %}Gestión de Documentos{% endif %}
-        </h1>
-        <p class="header-subtitle">{{ empresa.nombre_taller }} - {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Workshop Document List{% else %}Lista de Documentos del Taller{% endif %}</p>
-        <p class="header-info">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}User{% else %}Usuario{% endif %}: {{ user.username }} | {{ empresa.get_pais_display }} | {{ fecha_hoy|date:"l, d F Y" }}</p>
+{% block page_stats %}
+<div class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs text-gray-400">
+    <div class="flex items-center gap-2">
+        <span class="text-cyan-300">📄</span>
+        <span>{{ documentos.count|default:"0" }} {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Total Documents{% else %}Total Documentos{% endif %}</span>
     </div>
-
-    <!-- ➕ Botón Crear Documento -->
-    <div class="text-center">
-        <a href="{% country_url 'documentos:crear_documento' %}" class="create-button">
-            ➕ {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Create New Document{% else %}Crear Nuevo Documento{% endif %}
-        </a>
+    <div class="flex items-center gap-2">
+        <span class="text-orange-300">⏳</span>
+        <span>{{ documentos_pendientes|default:"0" }} {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Pending{% else %}Pendientes{% endif %}</span>
     </div>
+    <div class="flex items-center gap-2">
+        <span class="text-blue-300">⚙️</span>
+        <span>{{ documentos_proceso|default:"0" }} {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}In Progress{% else %}En Proceso{% endif %}</span>
+    </div>
+    <div class="flex items-center gap-2">
+        <span class="text-green-300">✅</span>
+        <span>{{ documentos_completados|default:"0" }} {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Completed{% else %}Completados{% endif %}</span>
+    </div>
+</div>
+{% endblock %}
 
-    <!-- 🔍 Filtros -->
+{% block search_bar %}
     <div class="filters-section">
         <h3 class="section-title" style="font-size: 1.5rem; margin-bottom: 1rem;">🔍 {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Search Filters{% else %}Filtros de Búsqueda{% endif %}</h3>
         <div class="filter-grid">
@@ -354,130 +334,79 @@ body {
             </div>
         </div>
     </div>
+{% endblock %}
 
-    <!-- 📋 Lista de Documentos -->
-    <div class="cyber-container p-6">
-        <h2 class="section-title">📋 {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Workshop Documents{% else %}Documentos del Taller{% endif %}</h2>
-
-        {% if documentos %}
+{% block panel_content %}
+    {% if documentos %}
+        <div class="space-y-4">
             {% for documento in documentos %}
-            <div class="document-card">
-                <div class="document-header">
-                    <div class="document-title">
-                        📄 {{ documento.tipo_documento|default:"Documento" }} #{{ documento.numero|default:documento.id }}
+            <div class="document-card bg-slate-900/60 border border-slate-700/80 rounded-xl p-4 sm:p-5 shadow-md hover:shadow-lg transition-all">
+                <div class="flex items-start justify-between mb-3">
+                    <div class="flex-1">
+                        <h3 class="text-base sm:text-lg font-semibold text-white mb-1">
+                            📄 {{ documento.tipo_documento|default:"Documento" }} #{{ documento.numero|default:documento.id }}
+                        </h3>
                     </div>
-                    <div class="document-status status-{{ documento.estado|default:'pendiente' }}">
+                    <span class="document-status status-{{ documento.estado|default:'pendiente' }} text-xs sm:text-sm px-2 py-1 rounded-full font-semibold">
                         {{ documento.estado|default:"Pendiente"|title }}
-                    </div>
+                    </span>
                 </div>
 
-                <div class="document-info">
-                    <div class="info-item">
-                        <div class="info-label">Cliente</div>
-                        <div class="info-value">
+                <div class="space-y-2 mb-3">
+                    <div class="flex items-center gap-2 text-sm text-slate-300">
+                        <i class="fas fa-user text-cyan-400 text-xs"></i>
+                        <span>
                             {% if documento.cliente %}
                                 {{ documento.cliente.nombre|default_if_none:"" }} {{ documento.cliente.apellido|default_if_none:"" }}
                             {% else %}
                                 Sin cliente
                             {% endif %}
-                        </div>
+                        </span>
                     </div>
-                    <div class="info-item">
-                        <div class="info-label">Vehículo</div>
-                        <div class="info-value">
-                            {% if documento.vehiculo %}
-                                {{ documento.vehiculo.display_label|default:documento.vehiculo.patente|default:"Sin vehículo" }}
-                            {% else %}
-                                Sin vehículo
-                            {% endif %}
-                        </div>
+                    {% if documento.vehiculo %}
+                    <div class="flex items-center gap-2 text-sm text-slate-300">
+                        <i class="fas fa-car text-cyan-400 text-xs"></i>
+                        <span>{{ documento.vehiculo.display_label|default:documento.vehiculo.patente|default:"Sin vehículo" }}</span>
                     </div>
-                    <div class="info-item">
-                        <div class="info-label">Fecha Creación</div>
-                        <div class="info-value">{{ documento.created_at|date:"d/m/Y H:i"|default:"N/A" }}</div>
+                    {% endif %}
+                    <div class="flex items-center gap-2 text-sm text-slate-300">
+                        <i class="fas fa-calendar text-cyan-400 text-xs"></i>
+                        <span>{{ documento.created_at|date:"d/m/Y H:i"|default:"N/A" }}</span>
                     </div>
-                    <div class="info-item">
-                        <div class="info-label">Total</div>
-                        <div class="info-value">{{ documento.total|money_by_country:country }}</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">Repuestos</div>
-                        <div class="info-value">{{ documento.neto_repuestos|money_by_country:country }}</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">Servicios</div>
-                        <div class="info-value">{{ documento.neto_servicios|money_by_country:country }}</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">Otros Servicios</div>
-                        <div class="info-value">{{ documento.neto_otros_servicios|money_by_country:country }}</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">IVA / Impuestos</div>
-                        <div class="info-value">{{ documento.tax_amount|money_by_country:country }}</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">Técnico</div>
-                        <div class="info-value">
-                            {% if documento.tecnico_responsable %}
-                                {{ documento.tecnico_responsable.nombre|default:"Sin asignar" }}
-                            {% else %}
-                                Sin asignar
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">Servicios</div>
-                        <div class="info-value">{{ documento.servicios_count|default:"0" }} servicios</div>
+                    <div class="flex items-center justify-between pt-2 border-t border-slate-700/50">
+                        <span class="text-xs text-slate-400">Total:</span>
+                        <span class="text-base sm:text-lg font-bold text-cyan-300">{{ documento.total|money_by_country:country }}</span>
                     </div>
                 </div>
 
-                <div class="document-actions">
-                    <a href="{% country_url 'documentos:ver_documento' documento.id %}" class="action-button">👁️ {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}View{% else %}Ver{% endif %}</a>
-                    <a href="{% country_url 'documentos:documento_editar' documento.id %}" class="action-button secondary">✏️ {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Edit{% else %}Editar{% endif %}</a>
-                    <a href="{% country_url 'documentos:exportar_documento_pdf' documento.id %}" class="action-button secondary">📄 PDF</a>
-                    <a href="#" class="action-button secondary" onclick="enviarWhatsApp({{ documento.id }}, '{{ documento.cliente.telefono|default:"" }}', '{{ documento.cliente.nombre|default:"" }} {{ documento.cliente.apellido|default:"" }}')">📱 WhatsApp</a>
-                    <a href="{% country_url 'documentos:eliminar_documento' documento.id %}" class="action-button danger">🗑️ {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Delete{% else %}Eliminar{% endif %}</a>
+                <div class="flex items-center gap-2 pt-3 border-t border-slate-700/50 flex-wrap">
+                    <a href="{% country_url 'documentos:ver_documento' documento.id %}" class="flex-1 sm:flex-initial text-center py-2 px-3 text-sm font-semibold rounded-lg bg-slate-800/60 hover:bg-slate-700/60 border border-slate-600/50 text-slate-200 hover:text-white transition-all focus:outline-none focus:ring-2 focus:ring-slate-400/60 min-w-[100px]">👁️ {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}View{% else %}Ver{% endif %}</a>
+                    <a href="{% country_url 'documentos:documento_editar' documento.id %}" class="flex-1 sm:flex-initial text-center py-2 px-3 text-sm font-semibold rounded-lg bg-slate-800/60 hover:bg-slate-700/60 border border-slate-600/50 text-slate-200 hover:text-white transition-all focus:outline-none focus:ring-2 focus:ring-slate-400/60 min-w-[100px]">✏️ {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Edit{% else %}Editar{% endif %}</a>
+                    <a href="{% country_url 'documentos:exportar_documento_pdf' documento.id %}" class="flex-1 sm:flex-initial text-center py-2 px-3 text-sm font-semibold rounded-lg bg-slate-800/60 hover:bg-slate-700/60 border border-slate-600/50 text-slate-200 hover:text-white transition-all focus:outline-none focus:ring-2 focus:ring-slate-400/60 min-w-[80px]">📄 PDF</a>
+                    <a href="#" class="flex-1 sm:flex-initial text-center py-2 px-3 text-sm font-semibold rounded-lg bg-slate-800/60 hover:bg-slate-700/60 border border-slate-600/50 text-slate-200 hover:text-white transition-all focus:outline-none focus:ring-2 focus:ring-slate-400/60 min-w-[100px]" onclick="enviarWhatsApp({{ documento.id }}, '{{ documento.cliente.telefono|default:"" }}', '{{ documento.cliente.nombre|default:"" }} {{ documento.cliente.apellido|default:"" }}')">📱 WhatsApp</a>
+                    <a href="{% country_url 'documentos:eliminar_documento' documento.id %}" class="flex-1 sm:flex-initial text-center py-2 px-3 text-sm font-semibold rounded-lg bg-red-900/30 hover:bg-red-800/40 border border-red-600/50 text-red-200 hover:text-red-100 transition-all focus:outline-none focus:ring-2 focus:ring-red-400/60 min-w-[100px]">🗑️ {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Delete{% else %}Eliminar{% endif %}</a>
                 </div>
             </div>
             {% endfor %}
-        {% else %}
-            <div class="empty-state">
-                <div class="empty-icon">📄</div>
-                <div class="empty-title">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}No documents{% else %}No hay documentos{% endif %}</div>
-                <div class="empty-description">
-                    {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}No documents have been created in the system yet.<br>Create your first document to start managing the workshop.{% else %}Aún no se han creado documentos en el sistema.<br>Crea tu primer documento para comenzar a gestionar el taller.{% endif %}
-                </div>
-                <a href="{% country_url 'documentos:crear_documento' %}" class="create-button">
+        </div>
+    {% else %}
+            <!-- Empty State - Design System -->
+            <div class="text-center py-12 sm:py-16 px-4">
+                <div class="text-6xl mb-4 opacity-50">📄</div>
+                <h3 class="text-xl sm:text-2xl font-semibold text-slate-200 mb-2">
+                    {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}No documents{% else %}No hay documentos{% endif %}
+                </h3>
+                <p class="text-sm sm:text-base text-slate-400 mb-6 max-w-md mx-auto">
+                    {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}No documents have been created in the system yet. Create your first document to start managing the workshop.{% else %}Aún no se han creado documentos en el sistema. Crea tu primer documento para comenzar a gestionar el taller.{% endif %}
+                </p>
+                <a href="{% country_url 'documentos:crear_documento' %}" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-3 text-sm sm:text-base font-semibold rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white shadow-lg hover:shadow-xl transition-all focus:outline-none focus:ring-2 focus:ring-cyan-400/60 focus:ring-offset-2 focus:ring-offset-slate-900">
                     ➕ {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Create First Document{% else %}Crear Primer Documento{% endif %}
                 </a>
             </div>
-        {% endif %}
-    </div>
+    {% endif %}
+{% endblock %}
 
-    <!-- 📊 Estadísticas Rápidas -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-6">
-        <div class="cyber-container p-6 text-center">
-            <div class="text-3xl font-bold text-cyan-400">{{ documentos.count|default:"0" }}</div>
-            <div class="text-sm text-gray-400">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Total Documents{% else %}Total Documentos{% endif %}</div>
-        </div>
-        <div class="cyber-container p-6 text-center">
-            <div class="text-3xl font-bold text-orange-400">{{ documentos_pendientes|default:"0" }}</div>
-            <div class="text-sm text-gray-400">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Pending{% else %}Pendientes{% endif %}</div>
-        </div>
-        <div class="cyber-container p-6 text-center">
-            <div class="text-3xl font-bold text-blue-400">{{ documentos_proceso|default:"0" }}</div>
-            <div class="text-sm text-gray-400">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}In Progress{% else %}En Proceso{% endif %}</div>
-        </div>
-        <div class="cyber-container p-6 text-center">
-            <div class="text-3xl font-bold text-green-400">{{ documentos_completados|default:"0" }}</div>
-            <div class="text-sm text-gray-400">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Completed{% else %}Completados{% endif %}</div>
-        </div>
-    </div>
-
-</div>
-
-<!-- JavaScript para funcionalidades -->
+{% block page_extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
 
@@ -493,21 +422,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Efecto de typing en el título
-    const title = document.querySelector('.header-title');
-    if (title) {
-        const text = title.textContent;
-        title.textContent = '';
-        let i = 0;
-        const typeWriter = () => {
-            if (i < text.length) {
-                title.textContent += text.charAt(i);
-                i++;
-                setTimeout(typeWriter, 100);
-            }
-        };
-        setTimeout(typeWriter, 500);
-    }
 
     // Funcionalidad de filtros
     const filterInputs = document.querySelectorAll('.filter-input');
@@ -518,28 +432,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Animación de contadores
-    function animateCounters() {
-        const counters = document.querySelectorAll('.text-3xl');
-        counters.forEach(counter => {
-            const target = parseInt(counter.textContent.replace(/[^\d]/g, ''));
-            if (target > 0) {
-                let current = 0;
-                const increment = target / 30;
-                const timer = setInterval(() => {
-                    current += increment;
-                    if (current >= target) {
-                        current = target;
-                        clearInterval(timer);
-                    }
-                    counter.textContent = counter.textContent.replace(/\d+/, Math.floor(current));
-                }, 50);
-            }
-        });
-    }
-
-    // Ejecutar animaciones
-    animateCounters();
 });
 
 // Función para enviar documento por WhatsApp

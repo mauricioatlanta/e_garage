@@ -1,0 +1,103 @@
+═══════════════════════════════════════════════════════════════
+SCRIPT DIRECTO PARA AGREGAR COLUMNA total_general
+═══════════════════════════════════════════════════════════════
+
+Ejecuta este comando en el servidor:
+
+cd /home/atlantareciclajes/apps/egarage/current && \
+python3 << 'PYEOF'
+import os
+import django
+import sqlite3
+from pathlib import Path
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings')
+django.setup()
+
+from django.conf import settings
+
+# Obtener la ruta de la base de datos
+db_path = str(settings.DATABASES['default']['NAME'])
+print(f"📁 Base de datos: {db_path}\n")
+
+# Verificar si el archivo existe
+if not Path(db_path).exists():
+    print(f"❌ Error: La base de datos no existe en {db_path}")
+    exit(1)
+
+# Conectar a SQLite
+conn = sqlite3.connect(db_path)
+cursor = conn.cursor()
+
+print("🔍 Verificando columnas de taller_documento...\n")
+
+# Obtener todas las columnas
+cursor.execute("PRAGMA table_info(taller_documento)")
+columns_info = cursor.fetchall()
+existing_columns = {row[1]: row[2] for row in columns_info}
+
+print(f"📊 Columnas existentes: {len(existing_columns)}")
+for col_name in sorted(existing_columns.keys()):
+    print(f"   - {col_name} ({existing_columns[col_name]})")
+
+print()
+
+# Columnas que necesitamos según la migración 0036
+required_columns = {
+    'total_general': 'DECIMAL(14, 2) DEFAULT 0.00',
+    'total_repuestos': 'DECIMAL(14, 2) DEFAULT 0.00',
+    'total_servicios': 'DECIMAL(14, 2) DEFAULT 0.00',
+    'iva': 'DECIMAL(14, 2) DEFAULT 0.00',
+}
+
+added_count = 0
+
+for col_name, col_def in required_columns.items():
+    if col_name in existing_columns:
+        print(f"✅ {col_name}: ya existe")
+    else:
+        print(f"⚠️  {col_name}: NO existe. Agregando...")
+        try:
+            # SQLite no soporta DECIMAL directamente, usamos NUMERIC
+            sql_type = col_def.replace('DECIMAL', 'NUMERIC')
+            cursor.execute(f"""
+                ALTER TABLE taller_documento 
+                ADD COLUMN {col_name} {sql_type}
+            """)
+            conn.commit()
+            print(f"   ✅ {col_name} agregada exitosamente")
+            added_count += 1
+        except sqlite3.Error as e:
+            print(f"   ❌ Error agregando {col_name}: {e}")
+            conn.rollback()
+
+# Verificar nuevamente
+if added_count > 0:
+    print("\n🔍 Verificación final...")
+    cursor.execute("PRAGMA table_info(taller_documento)")
+    columns_info = cursor.fetchall()
+    final_columns = {row[1]: row[2] for row in columns_info}
+    
+    for col_name in required_columns.keys():
+        if col_name in final_columns:
+            print(f"✅ {col_name}: confirmada")
+        else:
+            print(f"❌ {col_name}: AÚN NO EXISTE")
+
+conn.close()
+
+print(f"\n{'='*60}")
+if added_count > 0:
+    print(f"✅ {added_count} columna(s) agregada(s) exitosamente")
+else:
+    print("ℹ️  Todas las columnas ya existen")
+print("="*60)
+PYEOF
+
+echo ""
+echo "✅ Script ejecutado. Reiniciando servidor..."
+touch /var/www/www_egarage_cl_wsgi.py
+echo "✅ Servidor reiniciado"
+
+═══════════════════════════════════════════════════════════════
+

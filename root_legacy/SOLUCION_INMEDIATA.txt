@@ -1,0 +1,36 @@
+═══════════════════════════════════════════════════════════════
+  SOLUCIÓN INMEDIATA PARA EL SERVIDOR
+═══════════════════════════════════════════════════════════════
+
+El archivo taller/documentos/views.py en el servidor tiene marcadores 
+de conflicto que deben eliminarse.
+
+EJECUTA ESTE COMANDO COMPLETO EN EL SERVIDOR:
+
+───────────────────────────────────────────────────────────────
+cd /home/atlantareciclajes/apps/egarage/current && \
+git fetch origin main && \
+git checkout origin/main -- taller/documentos/views.py && \
+python3 -m py_compile taller/documentos/views.py && \
+touch /var/www/www_egarage_cl_wsgi.py && \
+echo "✅ Archivo restaurado desde origin/main"
+───────────────────────────────────────────────────────────────
+
+Este comando:
+1. Obtiene la última versión desde Git (fetch)
+2. Restaura el archivo desde origin/main (versión remota correcta)
+3. Verifica la sintaxis Python
+4. Reinicia el servidor WSGI
+
+Si el comando anterior no funciona, prueba este alternativo:
+
+───────────────────────────────────────────────────────────────
+cd /home/atlantareciclajes/apps/egarage/current && \
+sed -i '/^<<<<<<</d; /^=======$/d; /^>>>>>>>/d' taller/documentos/views.py && \
+python3 -m py_compile taller/documentos/views.py && \
+touch /var/www/www_egarage_cl_wsgi.py && \
+echo "✅ Conflictos eliminados"
+───────────────────────────────────────────────────────────────
+
+
+

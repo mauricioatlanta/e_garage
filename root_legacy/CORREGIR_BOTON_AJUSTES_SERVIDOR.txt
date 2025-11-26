@@ -1,0 +1,77 @@
+═══════════════════════════════════════════════════════════════
+CORREGIR BOTÓN "AJUSTES" CON NAMESPACE CORRECTO
+═══════════════════════════════════════════════════════════════
+
+Ejecuta este comando en el servidor:
+
+cd /home/atlantareciclajes/apps/egarage/current && \
+python3 << 'PYEOF'
+import re
+from pathlib import Path
+
+file_path = 'templates/taller/cl/es/dashboard/centro_operaciones.html'
+
+print(f"📝 Corrigiendo {file_path}...\n")
+
+if not Path(file_path).exists():
+    print(f"❌ Error: {file_path} no existe")
+    exit(1)
+
+with open(file_path, 'r', encoding='utf-8') as f:
+    content = f.read()
+
+# Buscar y corregir el botón de Ajustes
+# Opción 1: Si existe pero sin app_namespace='direct'
+if "country_url 'company_settings'" in content and "app_namespace='direct'" not in content:
+    content = content.replace(
+        "{% country_url 'company_settings' %}",
+        "{% country_url 'company_settings' app_namespace='direct' %}"
+    )
+    print("✅ Corregido: agregado app_namespace='direct'")
+elif "country_url 'company_settings' app_namespace='direct'" in content:
+    print("ℹ️  El botón ya tiene el namespace correcto")
+else:
+    # Si no existe el botón, agregarlo
+    config_pattern = r'(<a href="\{\%\s*country_url\s+\'configuracion\'\s*\%\}" class="nav-card">.*?Ajustes del taller.*?</a>\s*)'
+    
+    new_button = '''            <a href="{% country_url 'company_settings' app_namespace='direct' %}" class="nav-card">
+                <div class="text-3xl mb-2">🔧</div>
+                <div class="font-semibold">Ajustes</div>
+                <div class="text-sm text-gray-400">Configuración avanzada</div>
+            </a>
+
+            '''
+    
+    if re.search(config_pattern, content, re.DOTALL):
+        content = re.sub(
+            config_pattern,
+            r'\1' + new_button,
+            content,
+            flags=re.DOTALL
+        )
+        print("✅ Botón 'Ajustes' agregado con namespace correcto")
+    else:
+        # Buscar el cierre del div de nav-grid
+        if '</div>\n    </div>\n\n    <!-- 📊 Gráfico' in content:
+            content = content.replace(
+                '</div>\n    </div>\n\n    <!-- 📊 Gráfico',
+                new_button + '</div>\n    </div>\n\n    <!-- 📊 Gráfico'
+            )
+            print("✅ Botón 'Ajustes' agregado manualmente")
+
+# Guardar el archivo
+with open(file_path, 'w', encoding='utf-8') as f:
+    f.write(content)
+
+print(f"\n✅ Archivo {file_path} actualizado")
+PYEOF
+
+echo ""
+echo "🔄 Reiniciando servidor..."
+touch /var/www/www_egarage_cl_wsgi.py
+echo "✅ Servidor reiniciado"
+echo ""
+echo "🎉 ¡Listo! El botón 'Ajustes' debería aparecer correctamente"
+
+═══════════════════════════════════════════════════════════════
+

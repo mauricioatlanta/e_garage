@@ -1,0 +1,58 @@
+===========================================
+ELIMINAR FLOR ROSA Y ESTRELLA VERDE
+===========================================
+
+PROBLEMA:
+---------
+El template tiene indicadores visuales (🌸 y ⭐) que deben eliminarse
+
+SOLUCIÓN:
+---------
+
+cd /home/atlantareciclajes/apps/egarage/current
+workon venv_egarage310
+
+# 1. Eliminar los divs de la flor y estrella (líneas 493-542)
+# Usar sed para eliminar desde "<!-- FLOR INDICADORA" hasta antes de "<div class="max-w-4xl"
+sed -i '/<!-- FLOR INDICADORA/,/<\/div>/d' taller/templates/taller/us/en/vehiculos/crear_vehiculo.html
+
+# 2. Eliminar las animaciones CSS florPulse y starPulse
+sed -i '/@keyframes florPulse/,/^}$/d' taller/templates/taller/us/en/vehiculos/crear_vehiculo.html
+sed -i '/@keyframes starPulse/,/^}$/d' taller/templates/taller/us/en/vehiculos/crear_vehiculo.html
+
+# 3. Verificar que se eliminaron
+grep -n "🌸\|⭐\|florPulse\|starPulse\|FLOR INDICADORA\|ESTRELLA INDICADORA" \
+   taller/templates/taller/us/en/vehiculos/crear_vehiculo.html
+# No debe mostrar nada
+
+# 4. Limpiar caché
+find . -type d -name "__pycache__" -exec rm -r {} + 2>/dev/null
+find . -name "*.pyc" -delete
+
+===========================================
+VERIFICACIÓN:
+===========================================
+
+# Verificar que el template se puede renderizar
+python manage.py shell << 'PYTHON'
+from django.template.loader import get_template
+try:
+    template = get_template('taller/us/en/vehiculos/crear_vehiculo.html')
+    print("✓ Template se puede cargar")
+    
+    # Verificar que no contiene los indicadores
+    import os
+    template_path = str(template.origin)
+    with open(template_path, 'r', encoding='utf-8') as f:
+        content = f.read()
+        if '🌸' in content or '⭐' in content:
+            print("✗ Aún contiene los indicadores")
+        else:
+            print("✓ Indicadores eliminados correctamente")
+except Exception as e:
+    print(f"✗ Error: {e}")
+exit()
+PYTHON
+
+===========================================
+

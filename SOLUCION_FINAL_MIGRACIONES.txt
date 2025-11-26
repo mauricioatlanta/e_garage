@@ -1,0 +1,69 @@
+===========================================
+SOLUCIÓN FINAL: Múltiples migraciones con problemas
+===========================================
+
+PROBLEMA:
+---------
+Varias migraciones fallan porque elementos ya existen:
+- 0001: tabla categoriaservicio
+- 0005: tabla detalledocumento (faltante)
+- 0007: índice taller_vehi_empresa_c1d9c5_idx
+- 0009: constraint uq_empresa_vin_present
+- 0010: constraint que no existe
+- 0021: tabla taller_pagopendiente
+- (Puede haber más)
+
+ESTRATEGIA RECOMENDADA:
+-----------------------
+
+# 1. Ver cuántas migraciones hay en total
+python manage.py showmigrations taller | wc -l
+
+# 2. Ver cuáles están pendientes
+python manage.py showmigrations taller | grep "\[ \]"
+
+# 3. Marcar todas las migraciones hasta la última como aplicadas (fake)
+#    Ajusta el número según la última migración que veas
+python manage.py migrate taller 0042 --fake
+
+# 4. Aplicar solo las nuevas migraciones que puedan existir
+python manage.py migrate
+
+# 5. Verificar
+python manage.py check
+python manage.py showmigrations taller
+
+===========================================
+SOLUCIÓN MANUAL PASO A PASO:
+===========================================
+
+cd /home/atlantareciclajes/apps/egarage/current
+workon venv_egarage310
+
+# Marcar 0021
+python manage.py migrate taller 0021 --fake
+
+# Intentar aplicar el resto
+python manage.py migrate
+
+# Si falla otra, marcar esa también
+# Repetir hasta que todas se apliquen
+
+===========================================
+VERIFICACIÓN FINAL:
+===========================================
+
+# Ver estado de todas las migraciones
+python manage.py showmigrations taller
+
+# Verificar que no hay errores
+python manage.py check
+
+# Verificar versión
+python manage.py version
+
+# Verificar que el sitio funciona
+# (En el navegador, probar acceso al sitio)
+
+===========================================
+

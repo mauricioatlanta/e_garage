@@ -5,7 +5,7 @@ Vistas para el módulo de inteligencia de negocio
 from datetime import datetime, timedelta
 
 from django.contrib.auth.decorators import login_required
-from django.db.models import Avg, Count, F, Sum
+from django.db.models import Avg, Count, ExpressionWrapper, F, FloatField, Sum
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils import timezone
@@ -86,7 +86,12 @@ def get_servicios_ranking(empresa, fecha_inicio, fecha_fin):
 
 
 def get_repuestos_utilidad(empresa, fecha_inicio, fecha_fin):
-    """Calcula la utilidad neta por repuesto"""
+    """
+    Calcula la utilidad neta por repuesto.
+
+    ✅ OPTIMIZADO: Todo el cálculo se realiza en la base de datos usando F Expressions
+    y ExpressionWrapper, mejorando significativamente el rendimiento.
+    """
     repuestos_vendidos = (
         RepuestoDocumento.objects.filter(
             documento__empresa=empresa,
@@ -103,31 +108,41 @@ def get_repuestos_utilidad(empresa, fecha_inicio, fecha_fin):
         .annotate(
             cantidad_vendida=Sum("cantidad"),
             ingresos_totales=Sum(F("cantidad") * F("precio_unitario")),
+            # ✅ NUEVO: Calcular costo total en DB
+            costo_total=Sum(
+                ExpressionWrapper(
+                    F("cantidad") * F("repuesto__precio_compra"), output_field=FloatField()
+                )
+            ),
+            # ✅ NUEVO: Calcular utilidad bruta en DB
+            utilidad_bruta=ExpressionWrapper(
+                Sum(F("cantidad") * F("precio_unitario"))
+                - Sum(F("cantidad") * F("repuesto__precio_compra")),
+                output_field=FloatField(),
+            ),
         )
     )
 
+    # Convertir a lista y calcular margen (el margen requiere división que puede causar problemas en DB si ingresos es 0)
     utilidades = []
     for repuesto in repuestos_vendidos:
-        precio_venta = repuesto["repuesto__precio_venta"]
-        precio_compra = repuesto["repuesto__precio_compra"]
-        cantidad = repuesto["cantidad_vendida"]
-        ingresos = repuesto["ingresos_totales"]
+        ingresos = repuesto["ingresos_totales"] or 0
+        utilidad_bruta = repuesto["utilidad_bruta"] or 0
 
-        costo_total = precio_compra * cantidad
-        utilidad_bruta = ingresos - costo_total
+        # Solo el margen se calcula en Python porque requiere manejo de división por cero
         margen_utilidad = (utilidad_bruta / ingresos * 100) if ingresos > 0 else 0
 
         utilidades.append(
             {
                 "nombre": repuesto["repuesto__nombre"],
                 "part_number": repuesto["repuesto__part_number"],
-                "cantidad_vendida": cantidad,
-                "ingresos_totales": ingresos,
-                "costo_total": costo_total,
-                "utilidad_bruta": utilidad_bruta,
+                "cantidad_vendida": repuesto["cantidad_vendida"],
+                "ingresos_totales": round(ingresos, 2),
+                "costo_total": round(repuesto["costo_total"] or 0, 2),
+                "utilidad_bruta": round(utilidad_bruta, 2),
                 "margen_utilidad": round(margen_utilidad, 2),
-                "precio_venta": precio_venta,
-                "precio_compra": precio_compra,
+                "precio_venta": repuesto["repuesto__precio_venta"],
+                "precio_compra": repuesto["repuesto__precio_compra"],
             }
         )
 

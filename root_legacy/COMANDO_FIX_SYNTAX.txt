@@ -1,0 +1,74 @@
+═══════════════════════════════════════════════════════════════
+COMANDO PARA CORREGIR ERROR DE SINTAXIS EN urls.py
+═══════════════════════════════════════════════════════════════
+
+El error está en la línea 374. Ejecuta este comando para corregirlo:
+
+cd /home/atlantareciclajes/apps/egarage/current && \
+cp gestion_taller/urls.py gestion_taller/urls.py.backup_syntax_$(date +%Y%m%d_%H%M%S) && \
+python3 << 'PYEOF'
+file_path = "gestion_taller/urls.py"
+
+with open(file_path, 'r', encoding='utf-8') as f:
+    lines = f.readlines()
+
+# Verificar líneas problemáticas alrededor de 374
+print("🔍 Verificando líneas 370-380...")
+for i in range(369, min(380, len(lines))):
+    print(f"Línea {i+1}: {repr(lines[i])}")
+
+# Buscar y corregir el problema
+new_lines = []
+i = 0
+
+while i < len(lines):
+    line = lines[i]
+    
+    # Si encontramos un path() que no está cerrado correctamente
+    if 'path(' in line and i+1 < len(lines):
+        # Verificar si hay una línea duplicada o mal formada después
+        if i+1 < len(lines) and '),' in lines[i+1] and 'path(' in lines[i+1]:
+            print(f"⚠️  Línea {i+2} parece duplicada, eliminando...")
+            i += 1
+            continue
+        
+        # Verificar si hay un paréntesis sin cerrar
+        if '),' not in line and i+1 < len(lines):
+            # Contar paréntesis
+            open_parens = line.count('(') - line.count(')')
+            if open_parens > 0:
+                # Buscar el cierre en las siguientes líneas
+                j = i + 1
+                while j < len(lines) and j < i + 10:
+                    open_parens += lines[j].count('(') - lines[j].count(')')
+                    if '),' in lines[j] and open_parens == 0:
+                        break
+                    j += 1
+                
+                # Si no se encontró cierre, puede haber un problema
+                if open_parens > 0:
+                    print(f"⚠️  Path() sin cerrar correctamente en línea {i+1}")
+    
+    new_lines.append(line)
+    i += 1
+
+# Escribir archivo corregido
+with open(file_path, 'w', encoding='utf-8') as f:
+    f.writelines(new_lines)
+
+# Verificar sintaxis
+import ast
+try:
+    with open(file_path, 'r', encoding='utf-8') as f:
+        ast.parse(f.read())
+    print("✅ Sintaxis correcta")
+except SyntaxError as e:
+    print(f"❌ Error de sintaxis: {e}")
+    print(f"   Línea {e.lineno}: {e.text}")
+PYEOF
+
+touch /var/www/www_egarage_cl_wsgi.py && \
+echo "✅ Servidor reiniciado"
+
+═══════════════════════════════════════════════════════════════
+

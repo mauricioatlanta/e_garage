@@ -1,0 +1,114 @@
+{% comment %}
+Ejemplo de menú sidebar con control de acceso basado en roles (RBAC)
+
+Para usar, incluye este archivo en tu base.html o sidebar principal:
+{% include 'taller/dashboard/_menu_sidebar_example.html' %}
+{% endcomment %}
+
+{% load role_tags %}
+
+<nav class="sidebar">
+    <!-- Menú para todos los usuarios logueados -->
+    <div class="menu-section">
+        <h3 class="menu-title">Operaciones</h3>
+        <ul class="menu-list">
+            <li>
+                <a href="{% url 'documentos:lista_documentos' %}">
+                    📄 Documentos
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'clientes:lista_clientes' %}">
+                    👥 Clientes
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'vehiculos:lista_vehiculos' %}">
+                    🚗 Vehículos
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Menú solo para Vendedores o superior -->
+    {% if request.user|is_vendedor %}
+    <div class="menu-section">
+        <h3 class="menu-title">Ventas</h3>
+        <ul class="menu-list">
+            <li>
+                <a href="{% url 'documentos:documento_crear' %}">
+                    ➕ Nuevo Documento
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'repuestos:lista_repuestos' %}">
+                    🧩 Repuestos
+                </a>
+            </li>
+        </ul>
+    </div>
+    {% endif %}
+
+    <!-- Menú solo para Staff (Owner/Admin) -->
+    {% if request.user|is_staff_member %}
+    <div class="menu-section">
+        <h3 class="menu-title">Administración</h3>
+        <ul class="menu-list">
+            <li>
+                <a href="{% url 'taller:dashboard_bi' %}" class="menu-item-important">
+                    📊 Inteligencia de Negocios
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'taller:centro_operaciones' %}">
+                    🏢 Centro de Operaciones
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'reportes:reportes_dashboard' %}">
+                    📈 Reportes
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'repuestos:lista_repuestos' %}">
+                    📦 Inventario
+                </a>
+            </li>
+        </ul>
+    </div>
+    {% endif %}
+
+    <!-- Menú solo para Owner -->
+    {% if request.user|is_owner %}
+    <div class="menu-section">
+        <h3 class="menu-title">Configuración</h3>
+        <ul class="menu-list">
+            <li>
+                <a href="{% url 'taller:company_settings' %}">
+                    ⚙️ Configuración de Empresa
+                </a>
+            </li>
+            <li>
+                <a href="/admin/auth/user/">
+                    👥 Gestión de Usuarios
+                </a>
+            </li>
+        </ul>
+    </div>
+    {% endif %}
+
+    <!-- Menú para Técnicos -->
+    {% if request.user|is_tecnico %}
+    <div class="menu-section">
+        <h3 class="menu-title">Mis Trabajos</h3>
+        <ul class="menu-list">
+            <li>
+                <a href="{% url 'documentos:lista_documentos' %}?tecnico={{ request.user.id }}">
+                    🔧 Mis Órdenes de Trabajo
+                </a>
+            </li>
+        </ul>
+    </div>
+    {% endif %}
+</nav>
+

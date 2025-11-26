@@ -1,4 +1,5 @@
 from django.urls import include, path
+from django.views.generic import TemplateView
 
 from taller import ajax_views
 from taller.taller_views import dashboard_suscripciones
@@ -17,6 +18,7 @@ from taller.views_extra.views_configuracion import (
 )
 from taller.views_extra.views_suscripciones import precios
 from taller.views_extra.views_trial_activate import activar_trial
+from taller.documentos import views_country_aware as views_documentos
 
 # from taller.views_extra.crear_motor_caja import crear_motor, crear_caja, crear_color  # ❌ Desactivado - usando views_create_parts
 
@@ -42,8 +44,21 @@ def usa_signup_view(request):
 urlpatterns = [
     # 1) Home y páginas específicas USA
     path("", bienvenida_usa, name="home"),
+    # Página de bienvenida USA ES
+    path(
+        "es/bienvenida/",
+        TemplateView.as_view(template_name="us/es/onboarding/bienvenida.html"),
+        name="bienvenida_usa_es",
+    ),
+    # Página de bienvenida USA EN
+    path(
+        "en/bienvenida/",
+        TemplateView.as_view(template_name="us/en/onboarding/bienvenida.html"),
+        name="bienvenida_usa_en",
+    ),
     path("dashboard/", dashboard, name="dashboard"),  # si existe en taller, este gana por orden
     path("en/dashboard/", dashboard, name="dashboard_en_redirect"),
+    path("es/dashboard/", dashboard, name="dashboard_es_redirect"),
     # Redirigir centro-operaciones a la versión espacial fusionada
     path(
         "centro-operaciones/",
@@ -54,6 +69,17 @@ urlpatterns = [
         "centro-operaciones-espacial/",
         dashboard_centro_operaciones_espacial,
         name="centro_operaciones_espacial",
+    ),
+    # Rutas con prefijo de idioma para compatibilidad
+    path(
+        "es/centro-operaciones/",
+        dashboard_centro_operaciones_espacial,
+        name="centro_operaciones_es",
+    ),
+    path(
+        "es/centro-operaciones-espacial/",
+        dashboard_centro_operaciones_espacial,
+        name="centro_operaciones_espacial_es",
     ),
     path("admin/dashboard/", dashboard_suscripciones, name="dashboard_suscripciones"),
     # 2) Configuración
@@ -110,6 +136,30 @@ urlpatterns = [
     path(
         "documentos/",
         include(("taller.documentos.urls", "documentos"), namespace="documentos"),
+    ),
+    # =========================
+    # Documentos USA EN (vistas genéricas country-aware)
+    # =========================
+    # Lista de documentos USA EN
+    path(
+        "en/documentos/",
+        views_documentos.documentos_listar,
+        {"country_code": "us", "lang_code": "en"},
+        name="lista_documentos_us",
+    ),
+    # Crear documento USA EN
+    path(
+        "en/documentos/new/",
+        views_documentos.documento_crear,
+        {"country_code": "us", "lang_code": "en"},
+        name="crear_documento_us",
+    ),
+    # Editar documento USA EN
+    path(
+        "en/documentos/<int:pk>/edit/",
+        views_documentos.documento_editar,
+        {"country_code": "us", "lang_code": "en"},
+        name="editar_documento_us",
     ),
     path(
         "repuestos/",

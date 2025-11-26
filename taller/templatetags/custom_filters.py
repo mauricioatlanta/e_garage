@@ -84,29 +84,25 @@ def add_thousands_separator(value):
 @register.filter
 def currency_format(value, country_code="US"):
     """
-    Formatea valores monetarios según el país:
-    - US: $2,000.25
-    - CL: $2.000 (sin decimales)
+    Formatea valores monetarios según el país usando configuración centralizada.
+
+    Soporta todos los países: US, CL, MX, PE, CO, EC, BR, VE
+
+    Args:
+        value: Monto a formatear
+        country_code: Código de país (ISO 3166-1 alpha-2)
+
+    Returns:
+        str: Monto formateado según reglas del país
     """
+    from taller.utils.country_config import format_currency
+
     if value is None:
         return "$0"
 
     try:
-        # Convertir a Decimal si no lo es
-        from decimal import Decimal
-
-        if isinstance(value, str):
-            value = Decimal(value)
-        elif not isinstance(value, Decimal):
-            value = Decimal(str(value))
-
-        if country_code == "US":
-            # Formato US: $2,000.25
-            return f"${value:,.2f}"
-        else:
-            # Formato CL: $2.000 (sin decimales)
-            return f"${value:,.0f}".replace(",", ".")
-    except (ValueError, TypeError):
+        return format_currency(value, country_code, include_symbol=True)
+    except (ValueError, TypeError, Exception):
         return "$0"
 
 

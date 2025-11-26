@@ -104,9 +104,21 @@ def buscar_repuestos_ajax(request):
         # Ordenar por nombre
         repuestos = repuestos.order_by("nombre")[:50]  # Limitar a 50 resultados
 
+        # Obtener país para el contexto del template
+        country = "CL"  # default
+        if empresa and hasattr(empresa, "pais") and empresa.pais:
+            country = empresa.pais
+        elif hasattr(request, "country") and request.country:
+            country = request.country
+        elif request.path.startswith("/us/"):
+            country = "US"
+        elif request.path.startswith("/cl/"):
+            country = "CL"
+
         # Renderizar template parcial
         html = render_to_string(
-            "taller/repuestos/tabla_repuestos_ajax.html", {"repuestos": repuestos}
+            "taller/repuestos/tabla_repuestos_ajax.html",
+            {"repuestos": repuestos, "country": country, "request": request},
         )
 
         result = {"html": html, "total": repuestos.count()}

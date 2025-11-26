@@ -1,0 +1,75 @@
+===========================================
+SOLUCIÓN: Índice ya existe (taller_vehi_empresa_c1d9c5_idx)
+===========================================
+
+PROBLEMA:
+---------
+django.db.utils.OperationalError: index taller_vehi_empresa_c1d9c5_idx already exists
+
+SOLUCIÓN (Ejecutar en el servidor):
+-----------------------------------
+
+cd /home/atlantareciclajes/apps/egarage/current
+workon venv_egarage310
+
+# OPCIÓN 1: Marcar migración 0007 como aplicada (fake) - RECOMENDADA
+# --------------------------------------------------------------------
+
+python manage.py migrate taller 0007_add_vehiculo_empresa_cliente_index --fake
+
+# Continuar con migraciones restantes
+python manage.py migrate
+
+# Verificar
+python manage.py check
+
+
+# OPCIÓN 2: Eliminar el índice y volver a crearlo
+# -------------------------------------------------
+
+# Verificar que el índice existe
+python manage.py dbshell << EOF
+SELECT name FROM sqlite_master WHERE type='index' AND name='taller_vehi_empresa_c1d9c5_idx';
+.quit
+EOF
+
+# Si existe, eliminarlo
+python manage.py dbshell << EOF
+DROP INDEX IF EXISTS taller_vehi_empresa_c1d9c5_idx;
+.quit
+EOF
+
+# Aplicar la migración normalmente
+python manage.py migrate
+
+
+# OPCIÓN 3: Marcar varias migraciones como aplicadas de una vez
+# ---------------------------------------------------------------
+
+# Si hay más índices o elementos que ya existen, marcar hasta 0007 como fake
+python manage.py migrate taller 0007 --fake
+
+# Continuar con el resto
+python manage.py migrate
+
+===========================================
+VERIFICACIÓN:
+===========================================
+
+# Ver índices de la tabla vehiculo
+python manage.py dbshell << EOF
+SELECT name FROM sqlite_master 
+WHERE type='index' 
+AND tbl_name='taller_vehiculo'
+AND name LIKE '%empresa%';
+.quit
+EOF
+
+# Ver estado de migraciones
+python manage.py showmigrations taller | tail -15
+
+# Verificar que no hay errores
+python manage.py check
+
+===========================================
+

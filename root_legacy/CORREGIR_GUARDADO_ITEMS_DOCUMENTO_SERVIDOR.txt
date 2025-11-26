@@ -1,0 +1,184 @@
+═══════════════════════════════════════════════════════════════
+CORREGIR GUARDADO DE REPUESTOS, SERVICIOS Y OTROS SERVICIOS
+═══════════════════════════════════════════════════════════════
+
+El problema es que los nombres de los campos del formulario no coinciden
+con lo que espera el backend. He corregido el template local para agregar
+campos ocultos que se sincronizan con los campos visibles.
+
+CAMBIOS REALIZADOS EN EL TEMPLATE:
+
+1. **Servicios**: Agregado campo oculto `serv-{index}-nombre` y `serv-{index}-cantidad`
+2. **Otros Servicios**: Agregado campos ocultos:
+   - `otr-{index}-descripcion`
+   - `otr-{index}-proveedor` (sincronizado con empresa_externa)
+   - `otr-{index}-costo_interno` (sincronizado con precio_taller)
+
+3. **JavaScript**: Actualizado para sincronizar campos ocultos cuando:
+   - Se selecciona un servicio (actualiza nombre/descripcion)
+   - Se cambia empresa_externa (actualiza proveedor)
+   - Se cambia precio_taller (actualiza costo_interno)
+
+═══════════════════════════════════════════════════════════════
+
+OPCIÓN 1: Actualizar el template en el servidor (RECOMENDADO)
+
+Copia el archivo actualizado desde tu PC local:
+templates/taller/cl/es/documentos/crear_documento.html
+
+O si usas Git:
+cd /home/atlantareciclajes/apps/egarage/current && \
+git pull origin main
+
+═══════════════════════════════════════════════════════════════
+
+OPCIÓN 2: Script para agregar campos ocultos en el servidor
+
+cd /home/atlantareciclajes/apps/egarage/current && \
+python3 << 'PYEOF'
+import re
+from pathlib import Path
+
+file_path = 'templates/taller/cl/es/documentos/crear_documento.html'
+
+print(f"📝 Actualizando {file_path}...\n")
+
+if not Path(file_path).exists():
+    print(f"❌ Error: {file_path} no existe")
+    exit(1)
+
+with open(file_path, 'r', encoding='utf-8') as f:
+    content = f.read()
+
+changes = []
+
+# 1. Agregar campos ocultos para servicios
+if 'serv-nombre-hidden' not in content:
+    # Buscar el input de servicio-search y agregar campos ocultos después
+    pattern = r'(<input type="hidden" name="serv-\$\{currentCount\}-servicio" class="serv-servicio-id" value="">)'
+    replacement = r'''\1
+        <input type="hidden" name="serv-${currentCount}-nombre" class="serv-nombre-hidden" value="">
+        <input type="hidden" name="serv-${currentCount}-cantidad" class="serv-cantidad-hidden" value="1">'''
+    content = re.sub(pattern, replacement, content)
+    changes.append("✅ Campos ocultos agregados para servicios")
+
+# 2. Agregar campos ocultos para otros servicios
+if 'otr-descripcion-hidden' not in content:
+    # Buscar el input de servicio-search de otros y agregar campos ocultos
+    pattern = r'(<input type="hidden" name="otr-\$\{currentCount\}-servicio" class="otr-servicio-id" value="">)'
+    replacement = r'''\1
+        <input type="hidden" name="otr-${currentCount}-descripcion" class="otr-descripcion-hidden" value="">'''
+    content = re.sub(pattern, replacement, content)
+    changes.append("✅ Campo oculto descripcion agregado para otros servicios")
+
+# 3. Agregar campo oculto proveedor
+if 'otr-proveedor-hidden' not in content:
+    pattern = r'(<input type="text" name="otr-\$\{currentCount\}-empresa_externa" class="form-control[^"]*">)'
+    replacement = r'''\1
+        <input type="hidden" name="otr-${currentCount}-proveedor" class="otr-proveedor-hidden" value="">'''
+    content = re.sub(pattern, replacement, content)
+    changes.append("✅ Campo oculto proveedor agregado")
+
+# 4. Agregar campo oculto costo_interno y corregir nombre de precio_taller
+if 'otr-costo-interno-hidden' not in content:
+    # Buscar precio_taller y agregar campo oculto
+    pattern = r'(<input type="text"[^>]*name="precio_taller"[^>]*class="otr-precio-taller"[^>]*>)'
+    replacement = r'''\1
+        <input type="hidden" name="otr-${currentCount}-costo_interno" class="otr-costo-interno-hidden" value="0">'''
+    content = re.sub(pattern, replacement, content)
+    # También cambiar el name de precio_taller para que no tenga name (solo visual)
+    content = re.sub(r'name="precio_taller"', 'name=""', content)
+    changes.append("✅ Campo oculto costo_interno agregado y precio_taller corregido")
+
+# 5. Actualizar función seleccionarServicio para servicios
+if 'serv-nombre-hidden' in content and 'nombreHidden.value = nombre' not in content:
+    pattern = r'(if \(idEl\) idEl\.value = servicioId;)'
+    replacement = r'''\1
+    // Actualizar campo oculto nombre para el backend
+    const nombreHidden = row.querySelector('.serv-nombre-hidden');
+    if (nombreHidden) nombreHidden.value = nombre || '';'''
+    content = re.sub(pattern, replacement, content, count=1)
+    changes.append("✅ Función seleccionarServicio actualizada para servicios")
+
+# 6. Actualizar función seleccionarServicio para otros servicios
+if 'otr-descripcion-hidden' in content:
+    # Buscar la función seleccionarServicio en wireOtroRow
+    pattern = r'(if \(idEl\) idEl\.value = servicioId;\s+if \(pEl\) \{)'
+    replacement = r'''\1
+    // Actualizar campos ocultos para el backend
+    const descripcionHidden = row.querySelector('.otr-descripcion-hidden');
+    if (descripcionHidden) descripcionHidden.value = nombre || '';
+    const proveedorHidden = row.querySelector('.otr-proveedor-hidden');
+    const empresaExterna = row.querySelector('[name*="empresa_externa"]');
+    if (proveedorHidden) {
+      if (empresaExterna && empresaExterna.value) {
+        proveedorHidden.value = empresaExterna.value;
+      } else if (nombre) {
+        proveedorHidden.value = nombre;
+      }
+    }
+    '''
+    content = re.sub(pattern, replacement, content, count=1)
+    changes.append("✅ Función seleccionarServicio actualizada para otros servicios")
+
+# 7. Agregar event listeners para sincronizar campos
+if 'Sincronizar campos ocultos' not in content:
+    # Buscar el final de wireOtroRow antes de recalc()
+    pattern = r'(pEl\?\.addEventListener\(''input'', recalc\);\s+// Ocultar resultados)'
+    replacement = r'''pEl?.addEventListener('input', recalc);
+
+  // Sincronizar campos ocultos con campos visibles
+  const empresaExterna = row.querySelector('[name*="empresa_externa"]');
+  const proveedorHidden = row.querySelector('.otr-proveedor-hidden');
+  const precioTaller = row.querySelector('.otr-precio-taller');
+  const costoInternoHidden = row.querySelector('.otr-costo-interno-hidden');
+  const descripcionHidden = row.querySelector('.otr-descripcion-hidden');
+
+  // Sincronizar empresa_externa -> proveedor
+  if (empresaExterna && proveedorHidden) {
+    empresaExterna.addEventListener('input', (e) => {
+      proveedorHidden.value = e.target.value || '';
+    });
+    empresaExterna.addEventListener('change', (e) => {
+      proveedorHidden.value = e.target.value || '';
+    });
+  }
+
+  // Sincronizar precio_taller -> costo_interno
+  if (precioTaller && costoInternoHidden) {
+    precioTaller.addEventListener('input', (e) => {
+      const valor = numRaw(e.target.value);
+      costoInternoHidden.value = valor || '0';
+    });
+    precioTaller.addEventListener('change', (e) => {
+      const valor = numRaw(e.target.value);
+      costoInternoHidden.value = valor || '0';
+    });
+  }
+
+  // Sincronizar servicio-search -> descripcion (si se escribe manualmente)
+  if (searchEl && descripcionHidden) {
+    searchEl.addEventListener('input', (e) => {
+      if (!idEl || !idEl.value) {
+        descripcionHidden.value = e.target.value || '';
+      }
+    });
+  }
+
+  // Ocultar resultados'''
+    content = re.sub(pattern, replacement, content, count=1)
+    changes.append("✅ Event listeners agregados para sincronizar campos")
+
+# Guardar
+with open(file_path, 'w', encoding='utf-8') as f:
+    f.write(content)
+
+print("\n".join(changes))
+print(f"\n✅ Archivo {file_path} actualizado")
+PYEOF
+
+touch /var/www/www_egarage_cl_wsgi.py
+echo "✅ Servidor reiniciado"
+
+═══════════════════════════════════════════════════════════════
+

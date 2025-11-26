@@ -1,0 +1,76 @@
+===========================================
+SOLUCIÓN: Constraint que no existe (0010)
+===========================================
+
+PROBLEMA:
+---------
+ValueError: Found wrong number (0) of constraints for taller_tecnico(empresa_id, nombre)
+
+La migración 0010 intenta eliminar un constraint unique_together que no existe.
+
+SOLUCIÓN (Ejecutar en el servidor):
+-----------------------------------
+
+cd /home/atlantareciclajes/apps/egarage/current
+workon venv_egarage310
+
+# OPCIÓN 1: Marcar migración 0010 como aplicada (fake) - RECOMENDADA
+# --------------------------------------------------------------------
+
+python manage.py migrate taller 0010_improve_tecnico_model_multi_tenant --fake
+
+# Continuar con migraciones restantes
+python manage.py migrate
+
+# Verificar
+python manage.py check
+
+
+# OPCIÓN 2: Crear el constraint temporalmente y luego aplicar
+# -----------------------------------------------------------
+
+# 1. Verificar si existe el constraint
+python manage.py dbshell << EOF
+SELECT sql FROM sqlite_master 
+WHERE type='index' 
+AND tbl_name='taller_tecnico'
+AND sql LIKE '%empresa%nombre%';
+.quit
+EOF
+
+# 2. Si no existe, crear un constraint temporal (opcional)
+# (Solo si la opción 1 no funciona)
+
+# 3. Aplicar la migración normalmente
+python manage.py migrate
+
+
+# OPCIÓN 3: Marcar varias migraciones de una vez
+# -----------------------------------------------
+
+# Si hay más problemas similares, marcar hasta una migración más reciente
+python manage.py migrate taller 0015 --fake  # Ajusta el número
+
+# Continuar
+python manage.py migrate
+
+===========================================
+VERIFICACIÓN:
+===========================================
+
+# Ver constraints/índices de la tabla tecnico
+python manage.py dbshell << EOF
+SELECT name, sql FROM sqlite_master 
+WHERE type='index' 
+AND tbl_name='taller_tecnico';
+.quit
+EOF
+
+# Ver estado de migraciones
+python manage.py showmigrations taller | tail -15
+
+# Verificar que no hay errores
+python manage.py check
+
+===========================================
+

@@ -67,6 +67,7 @@ MIDDLEWARE = [
     # 9. Allauth (después de autenticación) - Agregado dinámicamente si existe
     # 10. Middlewares personalizados (orden específico)
     # "taller.middleware.country_url_migration.CountryURLRedirectMiddleware",  # DESHABILITADO - Causa bucles infinitos
+    # "taller.middleware.force_home_test.ForceHomeTestMiddleware",  # DESHABILITADO - Ya verificamos que funciona
     "taller.middleware.empresa_middleware.EmpresaMiddleware",
     # "gestion_taller.middleware.country_prefix.EnforceCountryPrefixMiddleware",  # DESHABILITADO - Causa bucles infinitos
     # "taller.middleware.country_context.CountryContextMiddleware",  # DESHABILITADO - Causa bucles infinitos con /es/
