@@ -836,64 +836,102 @@
       });
     }
     
-    // PREVENIR SCROLL AUTOMÁTICO EN MÓVILES
+    // PREVENIR SCROLL AUTOMÁTICO EN MÓVILES - SOLUCIÓN DEFINITIVA
     (function() {
       // Detectar si es móvil
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
       
       if (isMobile) {
-        let userScrolling = false;
-        let scrollTimeout = null;
-        let lastScrollTop = 0;
+        let isUserInteraction = false;
+        let scrollLock = false;
+        let lastKnownScroll = 0;
         
-        // Detectar cuando el usuario está haciendo scroll manualmente
-        window.addEventListener('scroll', function() {
-          userScrolling = true;
-          lastScrollTop = window.pageYOffset;
-          clearTimeout(scrollTimeout);
-          scrollTimeout = setTimeout(function() {
-            userScrolling = false;
-          }, 150);
-        }, { passive: true });
-        
-        // Prevenir scroll automático al cargar la página
-        let initialScrollPosition = window.pageYOffset || document.documentElement.scrollTop;
-        window.addEventListener('load', function() {
-          // Solo prevenir scroll si no hay hash en la URL
-          if (!window.location.hash && initialScrollPosition === 0) {
-            window.scrollTo(0, 0);
-            // Prevenir cualquier scroll automático después de la carga (solo si no es scroll del usuario)
-            setTimeout(function() {
-              if (!userScrolling && window.pageYOffset !== initialScrollPosition) {
-                window.scrollTo(0, initialScrollPosition);
-              }
-            }, 50);
+        // Bloquear scroll automático inmediatamente
+        (function() {
+          lastKnownScroll = window.pageYOffset || document.documentElement.scrollTop || 0;
+          if (lastKnownScroll === 0) {
+            scrollLock = true;
           }
+        })();
+        
+        // Detectar interacción del usuario
+        ['touchstart', 'touchmove', 'touchend', 'scroll', 'wheel'].forEach(function(event) {
+          document.addEventListener(event, function() {
+            isUserInteraction = true;
+            scrollLock = false;
+            lastKnownScroll = window.pageYOffset || document.documentElement.scrollTop || 0;
+            setTimeout(function() {
+              isUserInteraction = false;
+              // Re-activar bloqueo solo si estamos en la parte superior
+              if (lastKnownScroll === 0) {
+                scrollLock = true;
+              }
+            }, 500);
+          }, { passive: true });
         });
         
-        // Prevenir scroll automático cuando se enfoca un input (solo si no es scroll del usuario)
+        // Prevenir scroll automático en cualquier momento
+        function preventAutoScroll() {
+          if (scrollLock && !isUserInteraction && !window.location.hash) {
+            const currentScroll = window.pageYOffset || document.documentElement.scrollTop || 0;
+            if (currentScroll !== 0 && Math.abs(currentScroll) > 5) {
+              window.scrollTo(0, 0);
+              document.documentElement.scrollTop = 0;
+              document.body.scrollTop = 0;
+            }
+          }
+        }
+        
+        // Ejecutar prevención periódicamente
+        setInterval(preventAutoScroll, 50);
+        
+        // Prevenir en eventos clave
+        ['DOMContentLoaded', 'load'].forEach(function(event) {
+          window.addEventListener(event, function() {
+            if (!window.location.hash) {
+              scrollLock = true;
+              setTimeout(function() {
+                preventAutoScroll();
+              }, 0);
+            }
+          }, { once: true });
+        });
+        
+        // Prevenir scroll cuando se enfoca un input
         document.addEventListener('focusin', function(e) {
           if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
-            if (!userScrolling) {
-              // Guardar posición de scroll actual
-              const scrollY = window.pageYOffset;
-              
-              // Prevenir scroll automático después del focus
-              setTimeout(function() {
-                if (!userScrolling && Math.abs(window.pageYOffset - scrollY) > 5) {
-                  window.scrollTo(0, scrollY);
-                }
-              }, 10);
-            }
+            const scrollBefore = window.pageYOffset || document.documentElement.scrollTop || 0;
+            setTimeout(function() {
+              const scrollAfter = window.pageYOffset || document.documentElement.scrollTop || 0;
+              if (!isUserInteraction && Math.abs(scrollAfter - scrollBefore) > 3) {
+                window.scrollTo(0, scrollBefore);
+                document.documentElement.scrollTop = scrollBefore;
+                document.body.scrollTop = scrollBefore;
+              }
+            }, 0);
           }
         }, true);
         
-        // Prevenir scroll automático en DOMContentLoaded (antes de que se renderice todo)
-        document.addEventListener('DOMContentLoaded', function() {
-          if (!window.location.hash) {
-            window.scrollTo(0, 0);
+        // Prevenir scroll en cambios del DOM (solo si no hay interacción del usuario)
+        let domChangeTimeout = null;
+        const observer = new MutationObserver(function() {
+          if (!isUserInteraction && scrollLock) {
+            clearTimeout(domChangeTimeout);
+            domChangeTimeout = setTimeout(function() {
+              preventAutoScroll();
+            }, 100);
           }
         });
+        
+        // Observar cambios después de un delay
+        setTimeout(function() {
+          if (document.body) {
+            observer.observe(document.body, {
+              childList: true,
+              subtree: false
+            });
+          }
+        }, 500);
       }
     })();
   </script>
