@@ -6,7 +6,7 @@
 <head>
   <meta charset="UTF-8">
   <title>{% block title %}{{ company_name|default:"eGarage" }}{% endblock %}</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5.0, user-scalable=yes">
   
   {# --- PWA Configuration --- #}
   <meta name="theme-color" content="#0d6efd">
@@ -30,6 +30,29 @@
 
   {# --- Branding variables --- #}
   <style>
+    /* Prevenir scroll automático en móviles - SOLUCIÓN SIMPLIFICADA */
+    html {
+      scroll-behavior: auto;
+    }
+    
+    /* Configuración básica para móviles sin interferir con scroll natural */
+    @media (max-width: 768px) {
+      html, body {
+        -webkit-overflow-scrolling: touch;
+        position: relative;
+        min-height: 100vh;
+        height: auto;
+        overflow-x: hidden;
+        /* Permitir scroll vertical natural */
+        touch-action: pan-y;
+      }
+      
+      /* Solo prevenir scroll automático en inputs cuando sea necesario */
+      input:focus, textarea:focus, select:focus {
+        scroll-margin: 0;
+        scroll-padding: 0;
+      }
+    }
     :root{
       --company-primary: {{ company_color|default:"#0d6efd" }};
       --company-secondary: {{ secondary_color|default:"#6c757d" }};
@@ -45,7 +68,13 @@
     }
     .border-primary{border-color:var(--company-primary)!important}
     .company-logo{max-height:80px;max-width:200px;object-fit:contain}
-    .company-header{background:linear-gradient(135deg,#1f2937 0%,#374151 50%,#1f2937 100%);border-bottom:4px solid var(--company-primary);box-shadow:0 10px 30px rgba(0,0,0,.3)}
+    .company-header{
+      background:linear-gradient(135deg,#1f2937 0%,#374151 50%,#1f2937 100%);
+      border-bottom:4px solid var(--company-primary);
+      box-shadow:0 10px 30px rgba(0,0,0,.3);
+      position:relative;
+      z-index:50;
+    }
     .company-title{color:#ffffff !important;text-shadow:0 0 10px rgba(255,255,255,0.5);filter:drop-shadow(0 4px 8px rgba(0,0,0,.3))}
 
     /* Estilo cinematográfico futurista para botones de navegación */
@@ -479,9 +508,14 @@
   <header class="company-header flex items-center justify-between gap-6 p-6">
     <div class="flex items-center gap-6">
       {% if company_logo_url %}
-        <img src="{{ company_logo_url }}" alt="{{ company_name }} Logo"
+        <img src="{{ company_logo_url }}" alt="{{ company_name|default:'eGarage' }} Logo"
              class="company-logo h-20 w-auto rounded-lg shadow-lg border-2 border-opacity-30"
-             style="border-color: {{ company_color|default:'#00ffff' }};">
+             style="border-color: {{ company_color|default:'#00ffff' }};"
+             onerror="this.onerror=null; this.src='{% static 'img/egarage_logo.png' %}';">
+      {% else %}
+        <img src="{% static 'img/egarage_logo.png' %}" alt="{{ company_name|default:'eGarage' }} Logo"
+             class="company-logo h-20 w-auto rounded-lg shadow-lg border-2 border-opacity-30"
+             style="border-color: {{ company_color|default:'#00ffff' }}; filter: drop-shadow(0 0 8px rgba(0, 245, 255, 0.6));">
       {% endif %}
 
       <div class="flex flex-col">
@@ -650,6 +684,9 @@
     }
 
     // Service Worker Registration para PWA
+    // TEMPORALMENTE DESHABILITADO para diagnosticar problemas de scroll
+    // Si el problema de scroll se resuelve sin el Service Worker, podemos reactivarlo después
+    /*
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() {
         navigator.serviceWorker.register('{% static "service-worker.js" %}')
@@ -678,6 +715,18 @@
           .catch(function(error) {
             console.warn('⚠️ Error al registrar Service Worker:', error);
           });
+      });
+    }
+    */
+    
+    // Desregistrar Service Workers existentes para diagnosticar
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function(registrations) {
+        for(let registration of registrations) {
+          registration.unregister().then(function() {
+            console.log('Service Worker desregistrado para diagnóstico');
+          });
+        }
       });
     }
   </script>
