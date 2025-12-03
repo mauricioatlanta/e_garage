@@ -30,3 +30,13 @@ media/
 __pycache__/
 .env
 .venv/
+
+# Carpetas de despliegue y updates locales
+deploy_atlantareciclajes/
+egarage_update_clientes_template/
+egarage_update_fixes/
+egarage_update_otros_servicios/
+
+# Scripts solo locales
+start_mobile.*
+WSGI_CORRECTO_PYTHONANYWHERE.py
