@@ -1,7 +1,7 @@
-{% extends 'base.html' %}
-{% load i18n %}
+{% extends 'taller/common/base.html' %}
 {% load country_url %}
-{% block title %}Gestión de Clientes - {{ empresa.nombre_taller }}{% endblock %}
+{% load i18n %}
+{% block title %}Clientes · eGarage{% endblock %}
 {% block content %}
 <div class="relative mx-auto max-w-7xl px-6 mt-10">
   <div class="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
@@ -17,9 +17,21 @@
       <p class="mt-2 text-gray-400 max-w-2xl text-sm md:text-base">Listado inteligente con búsqueda dinámica, paginación y acciones rápidas.</p>
     </div>
     <div class="md:ml-auto flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-      <form method="get" class="flex-1 relative group">
-        <input type="search" name="q" value="{{ request.GET.q }}" placeholder="Buscar por nombre o apellido..." class="w-full bg-[#0f172a] border border-cyan-500/40 focus:border-cyan-400/70 rounded-xl px-5 py-3 text-cyan-100 placeholder-gray-500 shadow-lg focus:ring-2 focus:ring-cyan-400/40 transition outline-none font-mono" />
-        <button type="submit" class="absolute top-1/2 -translate-y-1/2 right-3 text-cyan-300 hover:text-lime-300 transition"><i class="fas fa-search"></i></button>
+      <form method="get" class="flex-1 relative group" id="search-form">
+        <div class="relative w-full">
+          <input 
+            type="text" 
+            name="q" 
+            id="search-input"
+            value="{{ request.GET.q }}" 
+            placeholder="Buscar por nombre, apellido, email o teléfono..." 
+            autocomplete="off"
+            class="w-full bg-[#0f172a] border border-cyan-500/40 focus:border-cyan-400/70 rounded-xl px-5 py-3 text-white placeholder-gray-400 shadow-lg focus:ring-2 focus:ring-cyan-400/40 transition outline-none font-mono" 
+            style="background-color: #0f172a !important; color: #ffffff !important; border-color: rgba(6, 182, 212, 0.4) !important;"
+          />
+          <button type="submit" id="search-btn" class="absolute top-1/2 -translate-y-1/2 right-3 text-cyan-300 hover:text-lime-300 transition"><i class="fas fa-search"></i></button>
+          <div id="search-results" class="hidden absolute z-50 w-full mt-2 bg-[#0f172a] border border-cyan-500/40 rounded-xl shadow-2xl max-h-96 overflow-y-auto"></div>
+        </div>
       </form>
       <a href="{% country_url 'clientes:crear_cliente' %}" class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 via-lime-500 to-fuchsia-500 text-[#0d1117] font-bold shadow-lg hover:shadow-cyan-500/40 text-sm md:text-base tracking-wide hover:scale-[1.03] transition active:scale-95"><span>➕</span><span>Nuevo Cliente</span></a>
     </div>
@@ -30,11 +42,11 @@
         <thead class="bg-[#0e1a2b] uppercase text-xs tracking-wider font-semibold">
           <tr>
             <th class="px-5 py-4" style="color: #00f3ff !important; text-shadow: 0 0 20px rgba(0, 243, 255, 1), 0 0 40px rgba(0, 243, 255, 0.8), 0 0 60px rgba(0, 243, 255, 0.6);">ID</th>
-            <th class="px-5 py-4" style="color: #00f3ff !important; text-shadow: 0 0 20px rgba(0, 243, 255, 1), 0 0 40px rgba(0, 243, 255, 0.8), 0 0 60px rgba(0, 243, 255, 0.6);">{% trans "Name" %}</th>
-            <th class="px-5 py-4 hidden md:table-cell" style="color: #00f3ff !important; text-shadow: 0 0 20px rgba(0, 243, 255, 1), 0 0 40px rgba(0, 243, 255, 0.8), 0 0 60px rgba(0, 243, 255, 0.6);">{% trans "Email" %}</th>
-            <th class="px-5 py-4 hidden md:table-cell" style="color: #00f3ff !important; text-shadow: 0 0 20px rgba(0, 243, 255, 1), 0 0 40px rgba(0, 243, 255, 0.8), 0 0 60px rgba(0, 243, 255, 0.6);">{% trans "Phone" %}</th>
-            <th class="px-5 py-4 hidden xl:table-cell" style="color: #00f3ff !important; text-shadow: 0 0 20px rgba(0, 243, 255, 1), 0 0 40px rgba(0, 243, 255, 0.8), 0 0 60px rgba(0, 243, 255, 0.6);">{% trans "City" %}</th>
-            <th class="px-5 py-4" style="color: #00f3ff !important; text-shadow: 0 0 20px rgba(0, 243, 255, 1), 0 0 40px rgba(0, 243, 255, 0.8), 0 0 60px rgba(0, 243, 255, 0.6);">{% trans "Actions" %}</th>
+            <th class="px-5 py-4" style="color: #00f3ff !important; text-shadow: 0 0 20px rgba(0, 243, 255, 1), 0 0 40px rgba(0, 243, 255, 0.8), 0 0 60px rgba(0, 243, 255, 0.6);">Nombre</th>
+            <th class="px-5 py-4 hidden md:table-cell" style="color: #00f3ff !important; text-shadow: 0 0 20px rgba(0, 243, 255, 1), 0 0 40px rgba(0, 243, 255, 0.8), 0 0 60px rgba(0, 243, 255, 0.6);">Email</th>
+            <th class="px-5 py-4 hidden md:table-cell" style="color: #00f3ff !important; text-shadow: 0 0 20px rgba(0, 243, 255, 1), 0 0 40px rgba(0, 243, 255, 0.8), 0 0 60px rgba(0, 243, 255, 0.6);">Teléfono</th>
+            <th class="px-5 py-4 hidden xl:table-cell" style="color: #00f3ff !important; text-shadow: 0 0 20px rgba(0, 243, 255, 1), 0 0 40px rgba(0, 243, 255, 0.8), 0 0 60px rgba(0, 243, 255, 0.6);">Ciudad</th>
+            <th class="px-5 py-4" style="color: #00f3ff !important; text-shadow: 0 0 20px rgba(0, 243, 255, 1), 0 0 40px rgba(0, 243, 255, 0.8), 0 0 60px rgba(0, 243, 255, 0.6);">Acciones</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-cyan-900/40">
@@ -49,30 +61,27 @@
               </td>
               <td class="px-5 py-4 hidden md:table-cell text-gray-300">{{ cliente.email|default:'—' }}</td>
               <td class="px-5 py-4 hidden md:table-cell text-gray-300">{{ cliente.telefono|default:'—' }}</td>
-              <td class="px-5 py-4 hidden xl:table-cell text-gray-300">
-                {% if cliente.empresa.pais == 'US' %}
-                  {% if cliente.ciudad_usa %}{{ cliente.ciudad_usa }}, {{ cliente.estado_usa }}{% else %}—{% endif %}
-                {% else %}
-                  {% if cliente.ciudad %}{{ cliente.ciudad.nombre }}{% else %}—{% endif %}
-                {% endif %}
-              </td>
+              <td class="px-5 py-4 hidden xl:table-cell text-gray-300">{% if cliente.ciudad %}{{ cliente.ciudad.nombre }}{% else %}—{% endif %}</td>
               <td class="px-5 py-4">
-                <div class="flex items-center gap-3">
-                  <a href="{% country_url 'clientes:ver_cliente' cliente.pk %}" class="text-cyan-300 hover:text-lime-300 transition" title="{% trans 'View' %}">
+                <div class="flex items-center gap-2 md:gap-3 flex-wrap">
+                  <a href="{% country_url 'clientes:ver_cliente' cliente.pk  %}" class="inline-flex items-center gap-1 text-cyan-300 hover:text-lime-300 transition px-3 py-2 md:p-0 rounded-lg hover:bg-cyan-500/20" title="Ver" style="font-size: 1.3rem;">
                     <i class="fas fa-eye"></i>
+                    <span class="md:hidden text-xs font-bold" style="color: #00ffff !important; text-shadow: 0 0 8px rgba(0, 255, 255, 0.9) !important;">VER</span>
                   </a>
-                  <a href="{% country_url 'clientes:editar_cliente' cliente.pk %}" class="text-cyan-300 hover:text-lime-300 transition" title="{% trans 'Edit' %}">
+                  <a href="{% country_url 'clientes:editar_cliente' cliente.pk  %}" class="inline-flex items-center gap-1 text-cyan-300 hover:text-lime-300 transition px-3 py-2 md:p-0 rounded-lg hover:bg-cyan-500/20" title="Editar" style="font-size: 1.3rem;">
                     <i class="fas fa-edit"></i>
+                    <span class="md:hidden text-xs font-bold" style="color: #00ffff !important; text-shadow: 0 0 8px rgba(0, 255, 255, 0.9) !important;">EDITAR</span>
                   </a>
-                  <a href="{% country_url 'clientes:eliminar_cliente' cliente_id=cliente.pk %}" class="text-red-400 hover:text-red-300 transition" title="{% trans 'Delete' %}" >
+                  <a href="{% country_url 'clientes:eliminar_cliente' cliente_id=cliente.pk  %}" class="inline-flex items-center gap-1 text-red-400 hover:text-red-300 transition px-3 py-2 md:p-0 rounded-lg hover:bg-red-500/20" title="Eliminar" style="font-size: 1.3rem;">
                     <i class="fas fa-trash"></i>
+                    <span class="md:hidden text-xs font-bold" style="color: #ff6666 !important; text-shadow: 0 0 8px rgba(255, 100, 100, 0.9) !important;">BORRAR</span>
                   </a>
                 </div>
               </td>
             </tr>
           {% empty %}
             <tr>
-              <td colspan="6" class="px-5 py-12 text-center text-gray-400">No hay clientes registrados</td>
+              <td colspan="6" class="px-5 py-12 text-center text-gray-400">No hay clientes registrados.</td>
             </tr>
           {% endfor %}
         </tbody>
@@ -80,10 +89,10 @@
     </div>
 
     <!-- Paginación -->
-    {% if page_obj.has_other_pages %}
+    {% if is_paginated %}
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 px-6 py-5 bg-[#0e1a2b]/60 border-t border-cyan-900/40">
       <div class="text-xs text-gray-400 font-mono">
-        {% blocktrans with start=page_obj.start_index end=page_obj.end_index total=page_obj.paginator.count %}Showing {{ start }} - {{ end }} of {{ total }} records{% endblocktrans %}
+        Mostrando {{ page_obj.start_index }} - {{ page_obj.end_index }} de {{ page_obj.paginator.count }} registros
       </div>
       <div class="flex items-center gap-2">
         {% if page_obj.has_previous %}
@@ -134,11 +143,213 @@
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
   background: #1d5a79;
 }
+
+/* Search results dropdown styling */
+#search-results {
+  scrollbar-width: thin;
+  scrollbar-color: #164159 transparent;
+}
+
+#search-results::-webkit-scrollbar {
+  width: 8px;
+}
+
+#search-results::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#search-results::-webkit-scrollbar-thumb {
+  background: #164159;
+  border-radius: 4px;
+}
+
+#search-results::-webkit-scrollbar-thumb:hover {
+  background: #1d5a79;
+}
+
+/* Forzar títulos de la tabla a color neón cyan - Sobrescribir CSS global */
+table thead th,
+thead th,
+th[class*="px-5"] {
+  color: #00f3ff !important;
+  text-shadow: 0 0 20px rgba(0, 243, 255, 1), 
+               0 0 40px rgba(0, 243, 255, 0.8), 
+               0 0 60px rgba(0, 243, 255, 0.6) !important;
+}
+
+/* Sobrescribir cualquier CSS global que fuerce color en thead */
+.bg-\[#0e1a2b\] th,
+table thead.bg-\[#0e1a2b\] th,
+table thead th,
+thead tr th {
+  color: #00f3ff !important;
+  text-shadow: 0 0 20px rgba(0, 243, 255, 1), 
+               0 0 40px rgba(0, 243, 255, 0.8), 
+               0 0 60px rgba(0, 243, 255, 0.6) !important;
+}
+
+/* Asegurar que todos los th dentro del thead sean neón cyan */
+table thead th[class*="py-4"] {
+  color: #00f3ff !important;
+  text-shadow: 0 0 20px rgba(0, 243, 255, 1), 
+               0 0 40px rgba(0, 243, 255, 0.8), 
+               0 0 60px rgba(0, 243, 255, 0.6) !important;
+}
+
+/* Forzar estilo correcto del input de búsqueda - sobrescribir cualquier CSS global */
+#search-input {
+  background-color: #0f172a !important;
+  color: #ffffff !important;
+  border-color: rgba(6, 182, 212, 0.4) !important;
+}
+
+#search-input::placeholder {
+  color: #9ca3af !important;
+  opacity: 1 !important;
+}
+
+#search-input:focus {
+  background-color: #0f172a !important;
+  color: #ffffff !important;
+  border-color: rgba(6, 182, 212, 0.7) !important;
+  outline: none !important;
+}
 </style>
 
 <script>
 function confirmarEliminacion(nombre) {
-  return confirm('{% trans "Are you sure you want to delete the client" %} "' + nombre + '"? {% trans "This action cannot be undone." %}');
+  return confirm('¿Estás seguro de que deseas eliminar al cliente "' + nombre + '"? Esta acción no se puede deshacer.');
 }
+
+// Real-time search functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const searchInput = document.getElementById('search-input');
+  const searchResults = document.getElementById('search-results');
+  const searchBtn = document.getElementById('search-btn');
+  const searchForm = document.getElementById('search-form');
+  let searchTimeout;
+
+  if (!searchInput || !searchResults) return;
+
+  // Real-time search as user types
+  searchInput.addEventListener('input', function() {
+    const query = this.value.trim();
+
+    // Clear previous timeout
+    clearTimeout(searchTimeout);
+
+    if (query.length < 2) {
+      searchResults.classList.add('hidden');
+      searchResults.innerHTML = '';
+      return;
+    }
+
+    // Debounce search requests (300ms delay)
+    searchTimeout = setTimeout(() => {
+      performSearch(query);
+    }, 300);
+  });
+
+  // Search button click
+  searchBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+    const query = searchInput.value.trim();
+    if (query) {
+      // Redirect to filtered results
+      window.location.href = '?q=' + encodeURIComponent(query);
+    }
+  });
+
+  // Enter key in search input
+  searchInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const query = this.value.trim();
+      if (query) {
+        window.location.href = '?q=' + encodeURIComponent(query);
+      }
+    }
+  });
+
+  // Hide results when clicking outside
+  document.addEventListener('click', function(e) {
+    if (!searchInput.contains(e.target) && !searchResults.contains(e.target) && !searchBtn.contains(e.target)) {
+      searchResults.classList.add('hidden');
+    }
+  });
+
+  function performSearch(query) {
+    // Show loading state
+    searchResults.classList.remove('hidden');
+    searchResults.innerHTML = '<div class="p-4 text-center text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i>Buscando...</div>';
+
+    // Construir URL relativa desde el path actual
+    const currentPath = window.location.pathname;
+    // Remover trailing slash y construir la URL AJAX
+    const basePath = currentPath.replace(/\/$/, ''); // Quitar trailing slash si existe
+    const searchUrl = basePath + '/ajax/buscar/?q=' + encodeURIComponent(query);
+    
+    console.log('🔍 Buscando en:', searchUrl);
+    console.log('📍 Path actual:', currentPath);
+    
+    fetch(searchUrl, {
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'Accept': 'application/json'
+      },
+      credentials: 'same-origin'
+    })
+      .then(response => {
+        console.log('📡 Respuesta recibida:', response.status, response.statusText);
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('✅ Datos recibidos:', data);
+        displaySearchResults(data);
+      })
+      .catch(error => {
+        console.error('❌ Error en búsqueda:', error);
+        console.error('❌ URL intentada:', searchUrl);
+        searchResults.innerHTML = '<div class="p-4 text-center text-red-400"><i class="fas fa-exclamation-triangle mr-2"></i>Error al buscar clientes. Ver consola para más detalles.</div>';
+      });
+  }
+
+  function displaySearchResults(clientes) {
+    if (!clientes || clientes.length === 0) {
+      searchResults.innerHTML = '<div class="p-4 text-center text-gray-400">No se encontraron clientes</div>';
+      return;
+    }
+
+    // Get base URL pattern from Django template
+    const baseUrl = '{% country_url "clientes:ver_cliente" 999999 %}'.replace('999999', '');
+    
+    let html = '';
+    clientes.forEach(function(cliente) {
+      const nombreCompleto = (cliente.nombre || '') + ' ' + (cliente.apellido || '');
+      const email = cliente.email || '';
+      const telefono = cliente.telefono || '';
+      const clienteUrl = baseUrl + cliente.id + '/';
+      
+      html += `
+        <a href="${clienteUrl}" 
+           class="block px-4 py-3 hover:bg-cyan-500/10 transition border-b border-cyan-900/40 last:border-b-0">
+          <div class="flex items-center justify-between">
+            <div class="flex-1">
+              <div class="font-semibold text-cyan-100">${nombreCompleto.trim() || 'Sin nombre'}</div>
+              ${email ? '<div class="text-sm text-gray-400 mt-1">' + email + '</div>' : ''}
+              ${telefono ? '<div class="text-xs text-gray-500 mt-1">' + telefono + '</div>' : ''}
+            </div>
+            <i class="fas fa-chevron-right text-cyan-400/50 ml-2"></i>
+          </div>
+        </a>
+      `;
+    });
+
+    searchResults.innerHTML = html;
+  }
+});
 </script>
 {% endblock %}

@@ -681,11 +681,11 @@
       {% endif %}
 
       <div class="flex flex-col">
-        <h1 class="company-title text-2xl sm:text-3xl md:text-4xl font-bold drop-shadow-lg">{{ company_name|default:"eGarage" }}</h1>
+        <h1 class="company-title text-2xl sm:text-3xl md:text-4xl font-bold drop-shadow-lg" style="color: #ffffff !important; text-shadow: 0 0 20px rgba(0, 255, 255, 0.8), 0 0 40px rgba(0, 212, 255, 0.6), 0 4px 8px rgba(0, 0, 0, 0.8) !important;">{{ company_name|default:"eGarage" }}</h1>
         {% if company_tagline %}
-          <span class="text-base sm:text-lg md:text-xl text-gray-300 font-medium mt-1">{{ company_tagline }}</span>
+          <span class="text-base sm:text-lg md:text-xl font-medium mt-1" style="color: #b3e5fc !important; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6) !important;">{{ company_tagline }}</span>
         {% elif request.user.is_authenticated %}
-          <span class="text-base sm:text-lg md:text-xl text-gray-300 font-medium mt-1">Bienvenido</span>
+          <span class="text-base sm:text-lg md:text-xl font-medium mt-1" style="color: #b3e5fc !important; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6) !important;">Bienvenido</span>
         {% endif %}
       </div>
     </div>
