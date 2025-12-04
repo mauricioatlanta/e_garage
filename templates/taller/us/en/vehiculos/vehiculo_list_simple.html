@@ -717,6 +717,45 @@
         padding: 8px 16px;
         font-size: 12px;
     }
+    
+    /* ===== FIX: DESACTIVAR ANIMACIONES EN MÓVILES PARA PREVENIR SCROLL AUTOMÁTICO ===== */
+    /* Desactivar partículas flotantes */
+    .particle {
+        display: none !important;
+    }
+    
+    /* Desactivar grid animado */
+    .bg-grid-pattern {
+        animation: none !important;
+    }
+    
+    /* Desactivar scan lines */
+    .scan-lines {
+        animation: none !important;
+        display: none !important;
+    }
+    
+    /* Desactivar animaciones de borde que causan repaint */
+    .vehicle-card::before {
+        animation: none !important;
+    }
+    
+    .card-glow {
+        animation: none !important;
+    }
+    
+    /* Simplificar efectos hover para reducir repaints */
+    .vehicle-card:hover {
+        transform: none !important;
+    }
+    
+    .action-btn::before {
+        display: none !important;
+    }
+    
+    .action-btn:hover {
+        transform: none !important;
+    }
 }
 
 @media (min-width: 1400px) {
