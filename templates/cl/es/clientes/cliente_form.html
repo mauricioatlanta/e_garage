@@ -326,48 +326,85 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// AJAX para cargar ciudades según país del usuario
+// AJAX para cargar ciudades al seleccionar región (Chile)
 document.addEventListener('DOMContentLoaded', function() {
-    // Obtener el país del usuario desde el contexto de Django
-    const userCountry = '{{ request.user.empresa.pais|default:"CL" }}';
     const regionSelect = document.getElementById('id_region');
     const ciudadSelect = document.getElementById('id_ciudad');
 
     if (regionSelect && ciudadSelect) {
+        console.log('[Chile] Inicializando carga de ciudades por región');
+        
         regionSelect.addEventListener('change', function() {
             const regionId = this.value;
+            console.log('[Chile] Región seleccionada:', regionId);
 
             // Limpiar opciones de ciudad
             ciudadSelect.innerHTML = '<option value="">---------</option>';
 
             if (regionId) {
-                // Construir URL según el país del usuario
-                let url;
-                if (userCountry === 'US') {
-                    // Para USA: usar estado_id
-                    url = `/taller/clientes/ajax/ciudades/?estado_id=${regionId}`;
-                    console.log('Loading USA cities for state:', regionId);
-                } else {
-                    // Para Chile: usar region_id
-                    url = `/taller/clientes/ajax/ciudades/?region_id=${regionId}`;
-                    console.log('Loading Chile cities for region:', regionId);
-                }
+                // Mostrar estado de carga
+                ciudadSelect.disabled = true;
+                ciudadSelect.innerHTML = '<option value="">Cargando ciudades...</option>';
 
-                fetch(url)
-                    .then(response => response.json())
-                    .then(data => {
-                        data.forEach(ciudad => {
-                            const option = document.createElement('option');
-                            option.value = ciudad.id;
-                            option.textContent = ciudad.nombre;
-                            ciudadSelect.appendChild(option);
-                        });
-                    })
-                    .catch(error => {
-                        console.error('Error loading cities:', error);
+                // URL para Chile con region_id
+                const url = `/cl/es/clientes/ajax/ciudades/?region_id=${regionId}`;
+                console.log('[Chile] Cargando ciudades desde:', url);
+
+                fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'same-origin'
+                })
+                .then(response => {
+                    console.log('[Chile] Respuesta recibida:', response.status);
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('[Chile] Ciudades recibidas:', data);
+                    
+                    // Habilitar select
+                    ciudadSelect.disabled = false;
+                    ciudadSelect.innerHTML = '<option value="">Selecciona una ciudad</option>';
+
+                    // Verificar si data es array o tiene propiedad .ciudades
+                    const ciudades = Array.isArray(data) ? data : (data.ciudades || []);
+
+                    if (ciudades.length === 0) {
+                        ciudadSelect.innerHTML = '<option value="">No hay ciudades disponibles</option>';
+                        console.warn('[Chile] No se encontraron ciudades para región:', regionId);
+                        return;
+                    }
+
+                    // Agregar las ciudades
+                    ciudades.forEach(ciudad => {
+                        const option = document.createElement('option');
+                        option.value = ciudad.id;
+                        option.textContent = ciudad.nombre;
+                        ciudadSelect.appendChild(option);
                     });
+
+                    console.log(`[Chile] ${ciudades.length} ciudades cargadas exitosamente`);
+                })
+                .catch(error => {
+                    console.error('[Chile] Error al cargar ciudades:', error);
+                    ciudadSelect.disabled = false;
+                    ciudadSelect.innerHTML = '<option value="">Error al cargar ciudades</option>';
+                    alert('Error al cargar las ciudades. Por favor, intenta de nuevo o recarga la página.');
+                });
+            } else {
+                ciudadSelect.disabled = true;
             }
         });
+        
+        console.log('[Chile] Handler de región→ciudad configurado');
+    } else {
+        console.warn('[Chile] No se encontraron los selectores de región o ciudad');
     }
 });
 </script>
