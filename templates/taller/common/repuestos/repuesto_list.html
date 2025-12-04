@@ -333,7 +333,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function performSearch(query) {
         if (!partsContainer) return;
         
-        partsContainer.innerHTML = '<div class="col-span-full text-center py-12"><div class="text-cyan-400 text-xl">{% if LANGUAGE_CODE == "en" or request.path|slice:\':3\' == "/us" %}Searching...{% else %}Buscando...{% endif %}</div></div>';
+        partsContainer.innerHTML = '<div class="col-span-full text-center py-12"><div class="text-cyan-400 text-xl">{% if LANGUAGE_CODE == "en" or request.path|slice:":3" == "/us" %}Searching...{% else %}Buscando...{% endif %}</div></div>';
         
         fetch(searchAjaxUrl, {
             method: 'POST',
@@ -359,7 +359,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            partsContainer.innerHTML = data.html || '<div class="col-span-full text-center py-12"><div class="text-6xl mb-4">🔧</div><h3 class="text-xl font-bold text-white mb-2">{% if LANGUAGE_CODE == "en" or request.path|slice:\':3\' == "/us" %}No Parts Found{% else %}No hay repuestos{% endif %}</h3></div>';
+            partsContainer.innerHTML = data.html || '<div class="col-span-full text-center py-12"><div class="text-6xl mb-4">🔧</div><h3 class="text-xl font-bold text-white mb-2">{% if LANGUAGE_CODE == "en" or request.path|slice:":3" == "/us" %}No Parts Found{% else %}No hay repuestos{% endif %}</h3></div>';
             
             const url = new URL(window.location);
             if (query.trim()) {
