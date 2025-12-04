@@ -1,7 +1,7 @@
 // Service Worker para eGarage PWA
-// Versión: 1.0.0
-const CACHE_NAME = 'egarage-v1.0.0';
-const RUNTIME_CACHE = 'egarage-runtime-v1.0.0';
+// Versión: 2.0.0 - Actualización con nuevos iconos futuristas
+const CACHE_NAME = 'egarage-v2.0.0';
+const RUNTIME_CACHE = 'egarage-runtime-v2.0.0';
 
 // Archivos estáticos críticos para cachear
 const STATIC_CACHE_URLS = [
@@ -12,6 +12,9 @@ const STATIC_CACHE_URLS = [
   '/static/js/starfield.js',
   '/static/images/egarage_default_logo.png',
   '/static/images/egarage_default_logo.svg',
+  '/static/images/egarage_icon_192x192.png',
+  '/static/images/egarage_icon_512x512.png',
+  '/static/manifest.json',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css',
   'https://code.jquery.com/jquery-3.6.4.min.js'
 ];
@@ -163,6 +166,7 @@ self.addEventListener('message', (event) => {
     );
   }
 });
+
 
 
 

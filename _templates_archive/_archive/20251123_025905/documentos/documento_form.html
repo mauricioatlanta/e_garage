@@ -1,0 +1,1165 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load country_url %}
+
+<!-- Endpoints country-aware (sin hardcode) -->
+<script>
+  // Prefijo robusto desde la URL actual (/cl/es/ o /us/en/)
+  window.__EG_PREFIX__ = (function(){
+    const m = location.pathname.match(/^\/(cl|us)(?:\/(es|en))?\//i);
+    const country = (m?.[1] || 'cl').toLowerCase();
+    const lang    = (m?.[2] || 'es').toLowerCase();
+    return `/${country}/${lang}/`;
+  })();
+
+  // Endpoints country-aware (Django los genera con el tag country_url)
+  window.EG = window.EG || {};
+  window.EG.endpoints = {
+    buscarClientes: "{% country_url 'taller:ajax_buscar_clientes' %}" || window.__EG_PREFIX__ + "ajax/clientes/buscar/",
+    vehiculosPorCliente: "{% country_url 'taller:ajax_vehiculos_por_cliente' %}" || window.__EG_PREFIX__ + "ajax/vehiculos-por-cliente/",
+    numeroDocumento: "{% country_url 'taller:api_obtener_numero_documento' %}" || window.__EG_PREFIX__ + "documentos/api/obtener-numero-documento/",
+    repuestoPorCodigo: "{% country_url 'taller:api_repuesto_por_codigo' %}" || window.__EG_PREFIX__ + "repuestos/api/repuesto-por-codigo/",
+  };
+
+  console.log('🔍 EG endpoints generados:', window.EG.endpoints);
+
+  // Parche: si por alguna razón faltara el tag, caemos a prefijo inferido
+  for (const [k,v] of Object.entries(window.EG.endpoints)) {
+    if (!v || v === 'None') {
+      if (k === 'buscarClientes')     window.EG.endpoints[k] = window.__EG_PREFIX__ + "ajax/clientes/buscar/";
+      if (k === 'vehiculosPorCliente')window.EG.endpoints[k] = window.__EG_PREFIX__ + "ajax/vehiculos-por-cliente/";
+      if (k === 'numeroDocumento')    window.EG.endpoints[k] = window.__EG_PREFIX__ + "documentos/api/obtener-numero-documento/";
+      if (k === 'repuestoPorCodigo')  window.EG.endpoints[k] = window.__EG_PREFIX__ + "repuestos/api/repuesto-por-codigo/";
+    }
+  }
+
+  // Parche DAL: corrige /autocomplete/cliente → /cl/es/autocomplete/cliente
+  (function(){
+    if (!window.jQuery) return;
+    $.ajaxPrefilter(function (options) {
+      if (/^\/?autocomplete\/cliente\/?(\?|$)/i.test(options.url)) {
+        options.url = options.url.replace(/^\/?autocomplete\/cliente\/?/i, window.__EG_PREFIX__ + 'autocomplete/cliente/');
+        console.log('🔁 Reescrito DAL →', options.url);
+      }
+    });
+  })();
+</script>
+
+{% block title %}
+<!-- DEBUG: LANGUAGE_CODE={{ LANGUAGE_CODE }}, request.path={{ request.path }} -->
+{% if es_edicion %}
+{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Editing: {{ documento.tipo }} #{{ documento.numero_documento }}{% else %}Editando: {{ documento.tipo }} #{{ documento.numero_documento }}{% endif %}
+{% else %}
+{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}New Document{% else %}Nuevo Documento{% endif %}
+{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/documento_form.css' %}">
+<script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
+<style>
+    /* Fondo futurista con partículas */
+    body {
+        background: linear-gradient(135deg, #0f2027 0%, #203a43 20%, #2c5364 100%);
+        min-height: 100vh;
+        position: relative;
+    }
+
+    #tsparticles {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+    }
+
+    .container-fluid {
+        max-width: 1400px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .form-section {
+        background: linear-gradient(135deg, rgba(24,30,40,0.85) 0%, rgba(0,230,255,0.1) 100%);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 12px 48px 0 rgba(0,230,255,0.3), 0 0 0 2px #00e6ff44;
+        border: 2px solid rgba(0,230,255,0.4);
+        backdrop-filter: blur(16px) saturate(150%);
+        -webkit-backdrop-filter: blur(16px) saturate(150%);
+        position: relative;
+        overflow: hidden;
+        color: #ffffff;
+        transition: all 0.3s ease;
+    }
+
+    .form-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(0,230,255,0.1), transparent);
+        animation: shimmer 4s infinite;
+    }
+
+    @keyframes shimmer {
+        0% { left: -100%; }
+        100% { left: 100%; }
+    }
+
+    .form-section:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 60px 0 rgba(0,230,255,0.4);
+    }
+
+    .form-section h3 {
+        color: #00e6ff;
+        margin-bottom: 1.5rem;
+        font-size: 1.3rem;
+        font-weight: 700;
+        text-shadow: 0 0 20px #00e6ffaa;
+        border-bottom: 2px solid #00e6ff;
+        padding-bottom: 0.8rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, rgba(24,30,40,0.95) 0%, rgba(0,230,255,0.2) 100%);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 15px 60px 0 rgba(0,230,255,0.4), 0 0 0 3px #00e6ff55;
+        border: 3px solid rgba(0,230,255,0.5);
+        backdrop-filter: blur(20px) saturate(180%);
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .page-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(0,230,255,0.2), transparent);
+        animation: shimmer 3s infinite;
+    }
+
+    .page-header h1 {
+        color: #00e6ff;
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 0 30px #00e6ffcc, 0 0 60px #00e6ff66;
+        background: linear-gradient(45deg, #00e6ff, #ffffff, #00e6ff);
+        background-size: 200% 200%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: textGlow 3s ease-in-out infinite alternate;
+        letter-spacing: 2px;
+    }
+
+    @keyframes textGlow {
+        0% {
+            background-position: 0% 50%;
+            text-shadow: 0 0 20px #00e6ffaa, 0 0 40px #00e6ff44;
+        }
+        100% {
+            background-position: 100% 50%;
+            text-shadow: 0 0 30px #00e6ffcc, 0 0 60px #00e6ff66;
+        }
+    }
+
+    .badge-pagado {
+        font-size: 0.9rem;
+        padding: 0.6rem 1.2rem;
+        border-radius: 25px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border: 2px solid;
+    }
+
+    .badge-no-pagado {
+        background: linear-gradient(45deg, #ff416c, #ff4757);
+        color: white;
+        border-color: #ff4757;
+        box-shadow: 0 4px 15px rgba(255, 65, 108, 0.4);
+    }
+
+    .badge-pagado-si {
+        background: linear-gradient(45deg, #00d2ff, #3a7bd5);
+        color: white;
+        border-color: #00d2ff;
+        box-shadow: 0 4px 15px rgba(0, 210, 255, 0.4);
+    }
+
+    .form-control, .form-select {
+        background: rgba(0,20,30,0.8) !important;
+        border: 2px solid #00e6ff44 !important;
+        border-radius: 10px !important;
+        padding: 0.8rem !important;
+        color: #ffffff !important;
+        transition: all 0.3s ease !important;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #00e6ff !important;
+        box-shadow: 0 0 20px rgba(0,230,255,0.5) !important;
+        outline: none !important;
+        background: rgba(0,30,45,0.9) !important;
+    }
+
+    .form-control::placeholder {
+        color: #66ccdd !important;
+    }
+
+    .form-label {
+        color: #00e6ff !important;
+        font-weight: 600 !important;
+        margin-bottom: 0.8rem !important;
+        text-shadow: 0 0 10px #00e6ff66;
+    }
+
+    .btn-primary {
+        background: linear-gradient(45deg, #00e6ff, #0099cc) !important;
+        border: none !important;
+        border-radius: 12px !important;
+        padding: 0.8rem 2.5rem !important;
+        font-weight: 700 !important;
+        font-size: 1.1rem !important;
+        text-transform: uppercase !important;
+        letter-spacing: 1px !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 6px 20px rgba(0,230,255,0.4) !important;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(45deg, #0099cc, #00e6ff) !important;
+        transform: translateY(-3px) !important;
+        box-shadow: 0 10px 30px rgba(0,230,255,0.6) !important;
+    }
+
+    .btn-secondary {
+        background: linear-gradient(45deg, #667eea, #764ba2) !important;
+        border: none !important;
+        border-radius: 12px !important;
+        padding: 0.6rem 1.5rem !important;
+        font-weight: 600 !important;
+        color: white !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4) !important;
+    }
+
+    .btn-secondary:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6) !important;
+    }
+
+    .btn-danger {
+        background: linear-gradient(45deg, #ff416c, #ff4757) !important;
+        border: none !important;
+        border-radius: 12px !important;
+        padding: 0.6rem 1.5rem !important;
+        font-weight: 600 !important;
+        color: white !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 4px 15px rgba(255, 65, 108, 0.4) !important;
+    }
+
+    .btn-danger:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 8px 25px rgba(255, 65, 108, 0.6) !important;
+    }
+
+    .table-responsive {
+        background: rgba(0,20,30,0.6);
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid #00e6ff44;
+        backdrop-filter: blur(10px);
+    }
+
+    .table {
+        margin-bottom: 0;
+        color: #ffffff;
+    }
+
+    .table th {
+        background: linear-gradient(135deg, rgba(0,230,255,0.3), rgba(0,150,200,0.3));
+        border: none;
+        font-weight: 700;
+        color: #00e6ff !important;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.9rem;
+        padding: 1rem;
+    }
+
+    .table td {
+        vertical-align: middle;
+        border-color: #00e6ff22;
+        padding: 1rem;
+        background: rgba(0,20,30,0.4);
+    }
+
+    .table tbody tr:hover {
+        background: rgba(0,230,255,0.1);
+    }
+
+    .total-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);
+        border: 2px solid rgba(118, 75, 162, 0.5);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .total-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+        animation: shimmer 5s infinite;
+    }
+
+    .total-card h4 {
+        font-size: 1.5rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        text-shadow: 0 0 20px rgba(255,255,255,0.5);
+    }
+
+    .total-amount {
+        font-size: 2.5rem;
+        font-weight: 900;
+        text-shadow: 0 0 30px rgba(255,255,255,0.7);
+        margin: 0;
+    }
+
+    .total-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+        padding: 0.25rem 0;
+    }
+
+    .total-row.final {
+        border-top: 2px solid rgba(255,255,255,0.3);
+        padding-top: 0.75rem;
+        margin-top: 0.75rem;
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+
+    /* Efectos para inputs de búsqueda */
+    .search-container {
+        position: relative;
+    }
+
+    .search-container::after {
+        content: '🔍';
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.2rem;
+        opacity: 0.7;
+    }
+
+    /* Animación para elementos que aparecen */
+    .fade-in {
+        animation: fadeIn 0.5s ease-in;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Estilos para USA específicos */
+    .usa-flag::before {
+        content: '🇺🇸';
+        margin-right: 0.5rem;
+        font-size: 1.2rem;
+    }
+</style>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  // Configuración de partículas futuristas
+  tsParticles.load("tsparticles", {
+    fullScreen: { enable: false },
+    background: { color: { value: "transparent" } },
+    particles: {
+      number: { value: 120 },
+      color: { value: ["#00ffff", "#00e6ff", "#0099cc", "#ffffff"] },
+      size: {
+        value: { min: 1, max: 3 },
+        animation: {
+          enable: true,
+          speed: 2,
+          minimumValue: 0.5
+        }
+      },
+      move: {
+        enable: true,
+        speed: { min: 0.3, max: 1.2 },
+        direction: "none",
+        outModes: { default: "out" }
+      },
+      links: {
+        enable: true,
+        color: "#00e6d0",
+        opacity: 0.2,
+        distance: 150,
+        width: 1
+      },
+      opacity: {
+        value: { min: 0.3, max: 0.8 },
+        animation: {
+          enable: true,
+          speed: 1,
+          minimumValue: 0.1
+        }
+      }
+    },
+    interactivity: {
+      events: {
+        onHover: {
+          enable: true,
+          mode: "repulse"
+        },
+        onClick: {
+          enable: true,
+          mode: "push"
+        }
+      },
+      modes: {
+        repulse: {
+          distance: 100,
+          duration: 0.4
+        },
+        push: {
+          quantity: 4
+        }
+      }
+    }
+  });
+
+  // Añadir clase fade-in a elementos que aparecen
+  const sections = document.querySelectorAll('.form-section');
+  sections.forEach((section, index) => {
+    setTimeout(() => {
+      section.classList.add('fade-in');
+    }, index * 100);
+  });
+});
+</script>
+{% endblock %}
+
+{% block extra_head %}
+{{ form.media }}
+{% endblock %}
+
+{% block fondo_extra %}
+<div id="tsparticles" class="fixed inset-0 -z-10"></div>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- Header -->
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <!-- DEBUG: LANGUAGE_CODE={{ LANGUAGE_CODE }}, request.path={{ request.path }}, country={{ country }} -->
+                <div style="background: #ffff00; color: #000; padding: 5px; margin: 5px; border-radius: 3px; font-size: 12px;">
+                    DEBUG: LANGUAGE_CODE={{ LANGUAGE_CODE }}, request.path={{ request.path }}, country={{ country }}
+                </div>
+                {% if es_edicion %}
+                    <h1 class="mb-2">
+                        <i class="fas fa-edit"></i>
+                        ✏️ {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Editing: {{ documento.tipo }} #{{ documento.numero_documento }}{% else %}Editando: {{ documento.tipo }} #{{ documento.numero_documento }}{% endif %}
+                    </h1>
+                    <p style="color: #00ccee; margin: 0;">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Modify document information{% else %}Modificar información del documento{% endif %}</p>
+                {% else %}
+                    <h1 class="mb-2">
+                        <i class="fas fa-plus-circle"></i>
+                        ➕ {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}New Document{% else %}Nuevo Documento{% endif %}
+                    </h1>
+                    <p style="color: #00ccee; margin: 0;">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Complete the document information{% else %}Complete la información del documento{% endif %}</p>
+                {% endif %}
+            </div>
+            <div class="d-flex align-items-center gap-3">
+            {% if es_edicion %}
+                <span id="badge-pago" class="badge badge-pagado {% if documento.pagado %}badge-pagado-si{% else %}badge-no-pagado{% endif %}">
+                    {% if documento.pagado %}{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}✅ Paid{% else %}✅ Pagado{% endif %}{% else %}{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}❌ Not Paid{% else %}❌ No Pagado{% endif %}{% endif %}
+                </span>
+            {% endif %}
+            <a href="{% country_url 'documentos:lista_documentos' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Back{% else %}Volver{% endif %}
+            </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mensajes -->
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Formulario -->
+    <form method="post" id="documentoForm">
+        {% csrf_token %}
+
+        <div class="row">
+            <!-- Información del Documento -->
+            <div class="col-lg-6">
+                <div class="form-section">
+                    <h3><i class="fas fa-file-alt text-primary"></i> {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Document Information{% else %}Información del Documento{% endif %}</h3>
+
+                    <div class="form-group">
+                        <label class="form-label">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Document Type{% else %}{{ form.tipo.label }}{% endif %}</label>
+                        {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}
+                        <select name="tipo" class="form-select" id="id_tipo">
+                            <option value="OT">🔧 Work Order</option>
+                            <option value="PRES">📋 Estimate</option>
+                            <option value="REC">🧾 Receipt/Invoice</option>
+                        </select>
+                        {% else %}
+                        {{ form.tipo }}
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Document Number{% else %}{{ form.numero.label }}{% endif %}</label>
+                        {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}
+                        <input type="text" name="numero" class="form-control" readonly>
+                        {% else %}
+                        {{ form.numero }}
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Date{% else %}{{ form.fecha_emision.label }}{% endif %}</label>
+                        {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}
+                        <input type="date" name="fecha_emision" class="form-control">
+                        {% else %}
+                        {{ form.fecha_emision }}
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Payment Status{% else %}{{ form.pagado.label }}{% endif %}</label>
+                        <div class="form-check form-switch">
+                            {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}
+                            <input type="checkbox" name="pagado" class="form-check-input" id="switchPagado">
+                            <label class="form-check-label" for="switchPagado">
+                                Document Paid
+                            </label>
+                            {% else %}
+                            {{ form.pagado }}
+                            <label class="form-check-label" for="switchPagado">
+                                Documento Pagado
+                            </label>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información del Cliente -->
+            <div class="col-lg-6">
+                <div class="form-section">
+                    <h3><i class="fas fa-user text-primary"></i> {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Customer and Vehicle{% else %}Cliente y Vehículo{% endif %}</h3>
+
+                    <div class="form-group">
+                        <label class="form-label">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Customer{% else %}{{ form.cliente.label }}{% endif %}</label>
+                        {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}
+                        <select name="cliente" class="form-select" id="id_cliente">
+                            <option value="">Select customer first...</option>
+                        </select>
+                        {% else %}
+                        {{ form.cliente }}
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Vehicle{% else %}{{ form.vehiculo.label }}{% endif %}</label>
+                        {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}
+                        <select name="vehiculo" class="form-select" id="id_vehiculo">
+                            <option value="">Select customer first...</option>
+                        </select>
+                        {% else %}
+                        {{ form.vehiculo }}
+                        {% endif %}
+                    </div>
+
+                    {% if country == 'US' %}
+                    <div class="form-group">
+                        <label class="form-label">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Mileage{% else %}{{ form.kilometraje.label }}{% endif %}</label>
+                        {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}
+                        <input type="number" name="kilometraje" class="form-input input-number" step="1" min="0" placeholder="0">
+                        {% else %}
+                        {{ form.kilometraje }}
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    <div class="form-group">
+                        <label class="form-label">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Assigned Technician{% else %}{{ form.tecnico_responsable.label }}{% endif %}</label>
+                        {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}
+                        <select name="tecnico_responsable" class="form-select">
+                            <option value="">Select technician...</option>
+                        </select>
+                        {% else %}
+                        {{ form.tecnico_responsable }}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Observaciones -->
+        <div class="form-section">
+            <h3><i class="fas fa-comment-alt text-primary"></i> {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Observations{% else %}Observaciones{% endif %}</h3>
+            <div class="form-group">
+                <label class="form-label">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Observations{% else %}{{ form.observaciones.label }}{% endif %}</label>
+                {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}
+                <textarea name="observaciones" class="form-control" rows="4" placeholder="Additional notes - Can be left empty if no additional information..."></textarea>
+                {% else %}
+                {{ form.observaciones }}
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Tablas de Items -->
+        <div class="row">
+            <div class="col-12">
+                <!-- Repuestos -->
+                <div class="form-section">
+                    <h3><i class="fas fa-cogs text-primary"></i> {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Parts{% else %}Repuestos{% endif %}</h3>
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="tabla-repuestos">
+                            <thead>
+                                <tr>
+                                    <th>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Code{% else %}Código{% endif %}</th>
+                                    <th>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Description{% else %}Descripción{% endif %}</th>
+                                    <th>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Quantity{% else %}Cantidad{% endif %}</th>
+                                    <th>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Unit Price{% else %}Precio Unit.{% endif %}</th>
+                                    <th>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Discount %{% else %}Descuento %{% endif %}</th>
+                                    <th>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Subtotal{% else %}Subtotal{% endif %}</th>
+                                    <th>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Actions{% else %}Acciones{% endif %}</th>
+                                </tr>
+                            </thead>
+                            <tbody id="repuestos-tbody">
+                                <!-- Filas se cargan con JS -->
+                            </tbody>
+                        </table>
+                        <button type="button" class="btn btn-success btn-sm" onclick="agregarRepuesto()">
+                            <i class="fas fa-plus"></i> {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Add Part{% else %}Agregar Repuesto{% endif %}
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Servicios -->
+                <div class="form-section">
+                    <h3><i class="fas fa-wrench text-primary"></i> {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Services{% else %}Servicios{% endif %}</h3>
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="tabla-servicios">
+                            <thead>
+                                <tr>
+                                    <th>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Code{% else %}Código{% endif %}</th>
+                                    <th>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Description{% else %}Descripción{% endif %}</th>
+                                    <th>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Quantity{% else %}Cantidad{% endif %}</th>
+                                    <th>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Unit Price{% else %}Precio Unit.{% endif %}</th>
+                                    <th>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Discount %{% else %}Descuento %{% endif %}</th>
+                                    <th>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Subtotal{% else %}Subtotal{% endif %}</th>
+                                    <th>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Actions{% else %}Acciones{% endif %}</th>
+                                </tr>
+                            </thead>
+                            <tbody id="servicios-tbody">
+                                <!-- Filas se cargan con JS -->
+                            </tbody>
+                        </table>
+                        <button type="button" class="btn btn-success btn-sm" onclick="agregarServicio()">
+                            <i class="fas fa-plus"></i> {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Add Service{% else %}Agregar Servicio{% endif %}
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Otros Servicios -->
+                <div class="form-section">
+                    <h3><i class="fas fa-external-link-alt text-primary"></i> {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}External Services{% else %}Servicios Externos{% endif %}</h3>
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="tabla-otros">
+                            <thead>
+                                <tr>
+                                    <th>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Service{% else %}Servicio{% endif %}</th>
+                                    <th>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}External Company{% else %}Empresa Externa{% endif %}</th>
+                                    <th>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Quantity{% else %}Cantidad{% endif %}</th>
+                                    <th>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Internal Cost{% else %}Costo Interno{% endif %}</th>
+                                    <th>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Customer Price{% else %}Precio Cliente{% endif %}</th>
+                                    <th>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Actions{% else %}Acciones{% endif %}</th>
+                                </tr>
+                            </thead>
+                            <tbody id="otros-tbody">
+                                <!-- Filas se cargan con JS -->
+                            </tbody>
+                        </table>
+                        <button type="button" class="btn btn-success btn-sm" onclick="agregarOtroServicio()">
+                            <i class="fas fa-plus"></i> {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Add External Service{% else %}Agregar Servicio Externo{% endif %}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resumen de Totales -->
+        <div class="row">
+            <div class="col-lg-8"></div>
+            <div class="col-lg-4">
+                <div class="total-card">
+                    <h4 class="mb-3"><i class="fas fa-calculator"></i> {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Receipt/Invoice Summary{% else %}Resumen de Recibos/Boletas{% endif %}</h4>
+
+                    <div class="total-row">
+                        <span>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Parts Subtotal:{% else %}Subtotal Repuestos:{% endif %}</span>
+                        <span id="subtotal-repuestos">$0.00</span>
+                    </div>
+
+                    <div class="total-row">
+                        <span>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Services Subtotal:{% else %}Subtotal Servicios:{% endif %}</span>
+                        <span id="subtotal-servicios">$0.00</span>
+                    </div>
+
+                    <div class="total-row">
+                        <span>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}External Subtotal:{% else %}Subtotal Externos:{% endif %}</span>
+                        <span id="subtotal-otros">$0.00</span>
+                    </div>
+
+                    {% if country == 'US' %}
+                    <div class="total-row">
+                        <span>
+                            <input type="checkbox" id="aplicar-tax" onchange="recalcularTotales()">
+                            Sales Tax:
+                        </span>
+                        <span id="tax-amount">$0.00</span>
+                    </div>
+                    {% else %}
+                    <div class="total-row">
+                        <span>IVA (19%):</span>
+                        <span id="iva-amount">$0.00</span>
+                    </div>
+                    {% endif %}
+
+                    <div class="total-row final">
+                        <span>TOTAL:</span>
+                        <span id="total-final">$0.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary btn-lg me-2">
+                <i class="fas fa-save"></i>
+                {% if es_edicion %}{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Save Changes{% else %}Guardar Cambios{% endif %}{% else %}{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Create Document{% else %}Crear Documento{% endif %}{% endif %}
+            </button>
+            <a href="{% country_url 'documentos:lista_documentos' %}" class="btn btn-secondary btn-lg">
+                <i class="fas fa-times"></i> {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Cancel{% else %}Cancelar{% endif %}
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- Bootstrap de datos para JS -->
+<script id="bootstrap-lineas" type="application/json">
+{{ lineas_json|safe }}
+</script>
+
+<script>
+// Variables globales
+window.ES_EDICION = {{ es_edicion|yesno:"true,false" }};
+window.COUNTRY = "{{ country|upper }}";
+
+// Datos de líneas cargadas
+let lineasData = JSON.parse(document.getElementById('bootstrap-lineas').textContent);
+
+// Inicializar
+document.addEventListener('DOMContentLoaded', function() {
+    if (window.ES_EDICION) {
+        cargarLineasExistentes();
+    }
+    recalcularTotales();
+});
+
+function actualizarBadgePago() {
+    const checkbox = document.getElementById('switchPagado');
+    const badge = document.getElementById('badge-pago');
+
+    if (badge) {
+        if (checkbox.checked) {
+            badge.className = 'badge badge-pagado badge-pagado-si';
+            badge.textContent = window.COUNTRY === 'US' ? '✅ Paid' : '✅ Pagado';
+        } else {
+            badge.className = 'badge badge-pagado badge-no-pagado';
+            badge.textContent = window.COUNTRY === 'US' ? '❌ Not Paid' : '❌ No Pagado';
+        }
+    }
+}
+
+function cargarLineasExistentes() {
+    // Cargar repuestos
+    lineasData.repuestos.forEach(repuesto => {
+        agregarRepuesto(repuesto);
+    });
+
+    // Cargar servicios
+    lineasData.servicios.forEach(servicio => {
+        agregarServicio(servicio);
+    });
+
+    // Cargar otros servicios
+    lineasData.otros.forEach(otro => {
+        agregarOtroServicio(otro);
+    });
+}
+
+function agregarRepuesto(data = null) {
+    const tbody = document.getElementById('repuestos-tbody');
+    const row = tbody.insertRow();
+    const index = tbody.children.length - 1;
+
+    row.innerHTML = `
+        <td>
+            <input type="hidden" name="lineas_repuesto[repuesto_id][]" value="${data?.repuesto_id || ''}">
+            <input type="text" class="form-control" name="lineas_repuesto[codigo][]"
+                   value="${data?.codigo || ''}" placeholder="Code">
+        </td>
+        <td>
+            <input type="text" class="form-control" name="lineas_repuesto[nombre][]"
+                   value="${data?.nombre || ''}" placeholder="Description" required>
+        </td>
+        <td>
+            <input type="number" class="form-control" name="lineas_repuesto[cantidad][]"
+                   value="${data?.cantidad || '1'}" min="1" step="1" onchange="recalcularTotales()">
+        </td>
+        <td>
+            <input type="number" class="form-control" name="lineas_repuesto[precio][]"
+                   value="${data?.precio || '0'}" min="0" step="0.01" onchange="recalcularTotales()">
+        </td>
+        <td>
+            <input type="number" class="form-control" name="lineas_repuesto[descuento][]"
+                   value="${data?.descuento || '0'}" min="0" max="100" step="0.01" onchange="recalcularTotales()">
+        </td>
+        <td>
+            <span class="subtotal-repuesto">$0.00</span>
+        </td>
+        <td>
+            <button type="button" class="btn btn-danger btn-sm" onclick="eliminarFila(this)">
+                <i class="fas fa-trash"></i>
+            </button>
+        </td>
+    `;
+
+    recalcularTotales();
+}
+
+function agregarServicio(data = null) {
+    const tbody = document.getElementById('servicios-tbody');
+    const row = tbody.insertRow();
+
+    row.innerHTML = `
+        <td>
+            <input type="hidden" name="lineas_servicio[servicio_id][]" value="${data?.servicio_id || ''}">
+            <input type="text" class="form-control" name="lineas_servicio[codigo][]"
+                   value="${data?.codigo || ''}" placeholder="Code">
+        </td>
+        <td>
+            <input type="text" class="form-control" name="lineas_servicio[descripcion][]"
+                   value="${data?.descripcion || ''}" placeholder="Description" required>
+        </td>
+        <td>
+            <input type="number" class="form-control" name="lineas_servicio[cantidad][]"
+                   value="${data?.cantidad || '1'}" min="1" step="1" onchange="recalcularTotales()">
+        </td>
+        <td>
+            <input type="number" class="form-control" name="lineas_servicio[precio][]"
+                   value="${data?.precio || '0'}" min="0" step="0.01" onchange="recalcularTotales()">
+        </td>
+        <td>
+            <input type="number" class="form-control" name="lineas_servicio[descuento][]"
+                   value="${data?.descuento || '0'}" min="0" max="100" step="0.01" onchange="recalcularTotales()">
+        </td>
+        <td>
+            <span class="subtotal-servicio">$0.00</span>
+        </td>
+        <td>
+            <button type="button" class="btn btn-danger btn-sm" onclick="eliminarFila(this)">
+                <i class="fas fa-trash"></i>
+            </button>
+        </td>
+    `;
+
+    recalcularTotales();
+}
+
+function agregarOtroServicio(data = null) {
+    const tbody = document.getElementById('otros-tbody');
+    const row = tbody.insertRow();
+
+    row.innerHTML = `
+        <td>
+            <input type="text" class="form-control" name="lineas_otro[servicio][]"
+                   value="${data?.servicio || ''}" placeholder="Service" required>
+        </td>
+        <td>
+            <input type="text" class="form-control" name="lineas_otro[empresa_externa][]"
+                   value="${data?.empresa_externa || ''}" placeholder="Company">
+        </td>
+        <td>
+            <input type="number" class="form-control" name="lineas_otro[cantidad][]"
+                   value="${data?.cantidad || '1'}" min="1" step="1" onchange="recalcularTotales()">
+        </td>
+        <td>
+            <input type="number" class="form-control" name="lineas_otro[costo_interno][]"
+                   value="${data?.costo_interno || '0'}" min="0" step="0.01">
+        </td>
+        <td>
+            <input type="number" class="form-control" name="lineas_otro[precio_cliente][]"
+                   value="${data?.precio_cliente || '0'}" min="0" step="0.01" onchange="recalcularTotales()">
+        </td>
+        <td>
+            <button type="button" class="btn btn-danger btn-sm" onclick="eliminarFila(this)">
+                <i class="fas fa-trash"></i>
+            </button>
+        </td>
+    `;
+
+    recalcularTotales();
+}
+
+function eliminarFila(button) {
+    button.closest('tr').remove();
+    recalcularTotales();
+}
+
+function recalcularTotales() {
+    let subtotalRepuestos = 0;
+    let subtotalServicios = 0;
+    let subtotalOtros = 0;
+
+    // Calcular repuestos
+    document.querySelectorAll('#repuestos-tbody tr').forEach(row => {
+        const cantidad = parseFloat(row.querySelector('[name="lineas_repuesto[cantidad][]"]').value) || 0;
+        const precio = parseFloat(row.querySelector('[name="lineas_repuesto[precio][]"]').value) || 0;
+        const descuento = parseFloat(row.querySelector('[name="lineas_repuesto[descuento][]"]').value) || 0;
+
+        const subtotal = cantidad * precio * (1 - descuento / 100);
+        subtotalRepuestos += subtotal;
+
+        row.querySelector('.subtotal-repuesto').textContent = `$${subtotal.toFixed(2)}`;
+    });
+
+    // Calcular servicios
+    document.querySelectorAll('#servicios-tbody tr').forEach(row => {
+        const cantidad = parseFloat(row.querySelector('[name="lineas_servicio[cantidad][]"]').value) || 0;
+        const precio = parseFloat(row.querySelector('[name="lineas_servicio[precio][]"]').value) || 0;
+        const descuento = parseFloat(row.querySelector('[name="lineas_servicio[descuento][]"]').value) || 0;
+
+        const subtotal = cantidad * precio * (1 - descuento / 100);
+        subtotalServicios += subtotal;
+
+        row.querySelector('.subtotal-servicio').textContent = `$${subtotal.toFixed(2)}`;
+    });
+
+    // Calcular otros servicios
+    document.querySelectorAll('#otros-tbody tr').forEach(row => {
+        const cantidad = parseFloat(row.querySelector('[name="lineas_otro[cantidad][]"]').value) || 0;
+        const precio = parseFloat(row.querySelector('[name="lineas_otro[precio_cliente][]"]').value) || 0;
+
+        const subtotal = cantidad * precio;
+        subtotalOtros += subtotal;
+    });
+
+    // Calcular impuestos
+    let impuesto = 0;
+    if (window.COUNTRY === 'US') {
+        const aplicarTax = document.getElementById('aplicar-tax')?.checked || false;
+        if (aplicarTax) {
+            impuesto = (subtotalRepuestos + subtotalServicios + subtotalOtros) * 0.08; // 8% sales tax
+        }
+        if (document.getElementById('tax-amount')) {
+            document.getElementById('tax-amount').textContent = `$${impuesto.toFixed(2)}`;
+        }
+    } else {
+        // IVA 19% solo sobre repuestos en Chile
+        impuesto = subtotalRepuestos * 0.19;
+        if (document.getElementById('iva-amount')) {
+            document.getElementById('iva-amount').textContent = `$${impuesto.toFixed(2)}`;
+        }
+    }
+
+    // Actualizar totales en la UI
+    if (document.getElementById('subtotal-repuestos')) {
+        document.getElementById('subtotal-repuestos').textContent = `$${subtotalRepuestos.toFixed(2)}`;
+    }
+    if (document.getElementById('subtotal-servicios')) {
+        document.getElementById('subtotal-servicios').textContent = `$${subtotalServicios.toFixed(2)}`;
+    }
+    if (document.getElementById('subtotal-otros')) {
+        document.getElementById('subtotal-otros').textContent = `$${subtotalOtros.toFixed(2)}`;
+    }
+
+    const total = subtotalRepuestos + subtotalServicios + subtotalOtros + impuesto;
+    if (document.getElementById('total-final')) {
+        document.getElementById('total-final').textContent = `$${total.toFixed(2)}`;
+    }
+}
+
+// Usa SIEMPRE los endpoints absolutos del include
+const urlBuscarClientes = window.EG.endpoints.buscarClientes;
+const urlVeh            = window.EG.endpoints.vehiculosPorCliente;
+const urlNextNumber     = window.EG.endpoints.numeroDocumento;
+const urlRep            = window.EG.endpoints.repuestoPorCodigo;
+
+console.log('🔌 URLs:', { urlBuscarClientes, urlVeh, urlNextNumber, urlRep });
+
+// 1) Buscador de clientes (debounce + tolerante a formatos)
+async function buscarClientes(query) {
+  const resultados = document.getElementById('cliente-resultados');
+  if (!query || query.trim().length < 2) {
+    resultados?.classList.add('hidden');
+    return;
+  }
+  const url = `${urlBuscarClientes}?q=${encodeURIComponent(query.trim())}`;
+  console.log('🔍 Searching customers:', { query, url });
+
+  try {
+    const resp = await fetch(url, {
+      headers: { 'X-Requested-With': 'XMLHttpRequest' },
+      credentials: 'same-origin'
+    });
+
+    if (!resp.ok) {
+      console.error('❌ HTTP Error buscarClientes:', resp.status, resp.statusText, url);
+      resultados.innerHTML = '<div class="p-3 text-red-400">❌ Server Error</div>';
+      resultados.classList.remove('hidden');
+      return;
+    }
+
+    const data = await resp.json().catch(() => null);
+    let clientes = [];
+    if (Array.isArray(data)) clientes = data;
+    else if (data?.results)  clientes = data.results;
+    else if (data?.items)    clientes = data.items;
+
+    mostrarResultadosClientes(clientes || []);
+  } catch (err) {
+    console.error('❌ Network Error buscarClientes:', err);
+    resultados.innerHTML = '<div class="p-3 text-red-400">❌ Connection Error</div>';
+    resultados.classList.remove('hidden');
+  }
+}
+
+// 2) Selección de cliente → carga de vehículos (acepta cliente_id o cliente)
+async function cargarVehiculosPorCliente(clienteId) {
+  const selVeh = document.getElementById('id_vehiculo');
+  if (!selVeh || !clienteId) {
+    if (selVeh) selVeh.innerHTML = '<option value="">Select customer first...</option>';
+    return;
+  }
+
+  // Intento con cliente_id y fallback a cliente
+  const tries = [
+    `${urlVeh}?cliente_id=${encodeURIComponent(clienteId)}`,
+    `${urlVeh}?cliente=${encodeURIComponent(clienteId)}`,
+  ];
+
+  selVeh.innerHTML = '<option value="">-- Loading vehicles... --</option>';
+
+  for (const apiURL of tries) {
+    try {
+      console.log('🚗 Fetch vehicles @', apiURL);
+      const r = await fetch(apiURL, { headers:{'X-Requested-With':'XMLHttpRequest'}, credentials:'same-origin' });
+      if (!r.ok) continue;
+      const data  = await r.json();
+      const items = Array.isArray(data) ? data : (data.results || []);
+      if (!Array.isArray(items)) continue;
+
+      if (!items.length) {
+        selVeh.innerHTML = '<option value="">-- No vehicles registered --</option>';
+        return;
+      }
+
+      selVeh.innerHTML = '<option value="">Select vehicle...</option>' +
+        items.map(v => {
+          const label = v.text || [v.patente, v.marca, v.modelo].filter(Boolean).join(' ') || `Vehicle #${v.id}`;
+          return `<option value="${v.id}">${label}</option>`;
+        }).join('');
+      return; // listo
+    } catch (e) {
+      console.warn('⚠️ Attempt failed @', apiURL, e);
+    }
+  }
+
+  selVeh.innerHTML = '<option value="">-- Error loading vehicles --</option>';
+}
+
+// 3) Numeración de documento con endpoint correcto
+async function updateDocumentNumber(tipo) {
+  if (!tipo) return;
+
+  try {
+    const response = await fetch(`${urlNextNumber}?tipo=${encodeURIComponent(tipo)}`, {
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data.numero) {
+        document.getElementById('id_numero').value = data.numero;
+      }
+    }
+  } catch (error) {
+    console.error('Error getting document number:', error);
+  }
+}
+
+// Event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    const selectCliente = document.getElementById('id_cliente');
+    if (selectCliente) {
+        selectCliente.addEventListener('change', function() {
+            const clienteId = this.value;
+            console.log('👤 Customer selected:', clienteId);
+            cargarVehiculosPorCliente(clienteId);
+        });
+    }
+
+    const selectTipo = document.getElementById('id_tipo');
+    if (selectTipo) {
+        selectTipo.addEventListener('change', function() {
+            updateDocumentNumber(this.value);
+        });
+    }
+});
+</script>
+{% endblock %}

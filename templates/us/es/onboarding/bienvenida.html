@@ -349,19 +349,19 @@
 <body class="min-h-screen flex flex-col justify-between">
   <!-- Header con Login/Registro -->
   <header class="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-sm border-b border-cyan-400/30">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-      <!-- Logo -->
-      <div class="flex items-center gap-3">
-        <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage" class="w-8 h-8" style="filter: drop-shadow(0 0 10px rgba(34, 211, 238, 0.8));">
-        <span class="text-cyan-400 font-futuristic font-bold text-lg">eGarage</span>
-      </div>
-
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-end">
       <!-- Navegación -->
-      <nav class="hidden md:flex items-center gap-6">
-        <a href="#pricing" class="text-cyan-300 hover:text-cyan-400 transition-colors font-tech">
+      <nav class="hidden md:flex items-center gap-3">
+        <a href="#pricing" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-800/50 border border-sky-400/30 text-sky-400 hover:bg-slate-700/70 hover:border-sky-400/60 hover:text-sky-300 transition-all duration-300 font-semibold text-sm backdrop-blur-sm hover:shadow-lg hover:shadow-sky-400/20 hover:-translate-y-0.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
           <span class="lang-en" style="display: none;">Pricing</span><span class="lang-es">Precios</span>
         </a>
-        <a href="#virtues" class="text-cyan-300 hover:text-cyan-400 transition-colors font-tech">
+        <a href="#virtues" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-800/50 border border-emerald-400/30 text-emerald-400 hover:bg-slate-700/70 hover:border-emerald-400/60 hover:text-emerald-300 transition-all duration-300 font-semibold text-sm backdrop-blur-sm hover:shadow-lg hover:shadow-emerald-400/20 hover:-translate-y-0.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+          </svg>
           <span class="lang-en" style="display: none;">Features</span><span class="lang-es">Características</span>
         </a>
       </nav>

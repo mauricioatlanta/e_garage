@@ -1,0 +1,632 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+<!-- Inyectamos Alpine.js (idealmente mover al base.html) -->
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    
+    <!-- 
+       x-data inicia el estado de Alpine. 
+       Inyectamos variables de Django (país, tasa) directamente al JS inicial 
+    -->
+    <div x-data="documentoForm({
+            country: '{{ request.user.empresa.pais|default:'CL' }}',
+            taxRate: {{ tasa_impuesto|default:19 }},
+            initialRepuestos: {{ repuestos_json|default:'[]'|safe }},
+            initialServicios: {{ servicios_json|default:'[]'|safe }}
+         })"
+         class="space-y-8">
+
+        <div class="border-b border-gray-200 pb-5">
+            <h3 class="text-2xl font-bold leading-6 text-gray-900">
+                {% trans "Nuevo Documento" %} <span x-text="country === 'CL' ? '(Chile)' : '(USA)'" class="text-sm text-gray-500 font-normal"></span>
+            </h3>
+        </div>
+
+        <!-- FORMULARIO DJANGO (Para cabeceras: Cliente, Vehículo, etc) -->
+        <form id="main-form" method="post" action=".">
+            {% csrf_token %}
+            
+            <!-- Inputs ocultos que sincronizan Alpine -> Django -->
+            <input type="hidden" name="repuestos_data" :value="JSON.stringify(repuestos)">
+            <input type="hidden" name="servicios_data" :value="JSON.stringify(servicios)">
+            
+            <!-- Renderizado de campos estándar de Django (Cliente, Vehículo, etc.) -->
+            <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2 mb-8">
+                <!-- Cliente -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        {% trans "Cliente" %} <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.cliente|add_class:"w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" }}
+                    {% if form.cliente.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.cliente.errors }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Vehículo -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        {% trans "Vehículo" %}
+                    </label>
+                    {{ form.vehiculo|add_class:"w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" }}
+                    {% if form.vehiculo.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.vehiculo.errors }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Tipo de Documento -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        {% trans "Tipo de Documento" %} <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.tipo|add_class:"w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" }}
+                    {% if form.tipo.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.tipo.errors }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Fecha de Emisión -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        {% trans "Fecha de Emisión" %} <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.fecha_emision|add_class:"w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" }}
+                    {% if form.fecha_emision.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.fecha_emision.errors }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Técnico Responsable -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        {% trans "Técnico Responsable" %}
+                    </label>
+                    {{ form.tecnico_responsable|add_class:"w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" }}
+                    {% if form.tecnico_responsable.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.tecnico_responsable.errors }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Descuento General -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        {% trans "Descuento General" %} (%)
+                    </label>
+                    <input 
+                        type="number" 
+                        x-model.number="descuentoGeneral"
+                        name="descuento"
+                        min="0"
+                        max="100"
+                        step="0.01"
+                        class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        placeholder="0.00">
+                </div>
+            </div>
+
+            <!-- SECCIÓN REPUESTOS -->
+            <div class="bg-white shadow sm:rounded-lg overflow-hidden mb-6">
+                <div class="px-4 py-5 sm:px-6 flex justify-between items-center bg-gray-50">
+                    <h3 class="text-lg font-medium text-gray-900">{% trans "Repuestos" %}</h3>
+                    <button type="button" @click="agregarRepuesto()" class="text-sm text-indigo-600 hover:text-indigo-900 font-medium">+ {% trans "Agregar Línea" %}</button>
+                </div>
+                <div class="border-t border-gray-200">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{% trans "Código" %}</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{% trans "Descripción" %}</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{% trans "Cant." %}</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{% trans "Precio Unit." %}</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{% trans "Desc %" %}</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{% trans "Total" %}</th>
+                                <th class="px-6 py-3"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <template x-for="(item, index) in repuestos" :key="item.id">
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <input 
+                                            type="text" 
+                                            x-model="item.codigo"
+                                            class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" 
+                                            placeholder="{% trans 'Código' %}">
+                                    </td>
+                                    <!-- Celda de búsqueda con Autocomplete -->
+                                    <td class="px-6 py-4 relative" x-data="repuestoAutocomplete(item)">
+                                        
+                                        <!-- Input de búsqueda -->
+                                        <input 
+                                            type="text" 
+                                            x-model="query"
+                                            @input="item.nombre = query; search()" 
+                                            @keydown.escape="isOpen = false"
+                                            @keydown.arrow-down.prevent="highlightedIndex = (highlightedIndex + 1) % results.length"
+                                            @keydown.arrow-up.prevent="highlightedIndex = (highlightedIndex - 1 + results.length) % results.length"
+                                            @keydown.enter.prevent="if(isOpen && highlightedIndex >= 0) select(results[highlightedIndex])"
+                                            @blur="close()"
+                                            @focus="if(query.length >= 2) search()"
+                                            class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" 
+                                            placeholder="{% trans 'Buscar repuesto...' %}"
+                                            autocomplete="off"
+                                        >
+
+                                        <!-- Dropdown de resultados -->
+                                        <div 
+                                            x-show="isOpen" 
+                                            x-transition:enter="transition ease-out duration-100"
+                                            x-transition:enter-start="transform opacity-0 scale-95"
+                                            x-transition:enter-end="transform opacity-100 scale-100"
+                                            x-transition:leave="transition ease-in duration-75"
+                                            x-transition:leave-start="transform opacity-100 scale-100"
+                                            x-transition:leave-end="transform opacity-0 scale-95"
+                                            class="absolute z-50 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm left-0"
+                                            style="display: none;"
+                                            @click.away="isOpen = false"
+                                        >
+                                            <template x-if="results.length === 0 && query.length >= 2">
+                                                <div class="px-4 py-2 text-sm text-gray-500">
+                                                    {% trans "No se encontraron repuestos" %}
+                                                </div>
+                                            </template>
+                                            <ul class="divide-y divide-gray-100" x-show="results.length > 0">
+                                                <template x-for="(result, index) in results" :key="result.id">
+                                                    <li 
+                                                        @click="select(result)"
+                                                        @mouseenter="highlightedIndex = index"
+                                                        :class="{ 'bg-indigo-600 text-white': index === highlightedIndex, 'text-gray-900': index !== highlightedIndex }"
+                                                        class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-indigo-50"
+                                                    >
+                                                        <div class="flex justify-between items-start">
+                                                            <div class="flex-1 min-w-0">
+                                                                <span x-text="result.nombre" class="font-medium block truncate"></span>
+                                                                <span 
+                                                                    x-text="result.codigo || 'Sin código'" 
+                                                                    :class="{ 'text-indigo-200': index === highlightedIndex, 'text-gray-400': index !== highlightedIndex }" 
+                                                                    class="text-xs block mt-0.5"
+                                                                ></span>
+                                                            </div>
+                                                            <div class="flex flex-col items-end ml-2">
+                                                                <span 
+                                                                    x-text="formatPrice(result.precio)" 
+                                                                    :class="{ 'text-indigo-200': index === highlightedIndex, 'text-gray-900': index !== highlightedIndex }"
+                                                                    class="font-semibold text-sm"
+                                                                ></span>
+                                                                <span 
+                                                                    x-show="result.stock <= 0" 
+                                                                    class="text-xs text-red-500 font-bold mt-1"
+                                                                >
+                                                                    {% trans "Sin Stock" %}
+                                                                </span>
+                                                                <span 
+                                                                    x-show="result.stock > 0" 
+                                                                    :class="{ 'text-indigo-200': index === highlightedIndex, 'text-gray-500': index !== highlightedIndex }"
+                                                                    class="text-xs mt-0.5"
+                                                                >
+                                                                    <span x-text="result.stock"></span> {% trans "en stock" %}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                </template>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <input 
+                                            type="number" 
+                                            x-model.number="item.cantidad" 
+                                            min="1" 
+                                            class="w-20 text-right border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <input 
+                                            type="number" 
+                                            x-model.number="item.precio" 
+                                            step="0.01" 
+                                            min="0"
+                                            class="w-32 text-right border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <input 
+                                            type="number" 
+                                            x-model.number="item.descuento" 
+                                            min="0" 
+                                            max="100" 
+                                            step="0.01"
+                                            class="w-20 text-right border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium text-gray-900">
+                                        <span x-text="formatMoney(calcularLinea(item))"></span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right">
+                                        <button 
+                                            type="button" 
+                                            @click="eliminarRepuesto(index)" 
+                                            class="text-red-600 hover:text-red-900"
+                                            :disabled="repuestos.length === 1">
+                                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </template>
+                            <!-- Mensaje si no hay datos -->
+                            <tr x-show="repuestos.length === 0">
+                                <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">{% trans "No hay repuestos agregados." %}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- SECCIÓN SERVICIOS (Similar a repuestos) -->
+            <div class="bg-white shadow sm:rounded-lg overflow-hidden mb-6">
+                 <div class="px-4 py-5 sm:px-6 flex justify-between items-center bg-gray-50">
+                    <h3 class="text-lg font-medium text-gray-900">{% trans "Servicios (Mano de Obra)" %}</h3>
+                    <button type="button" @click="agregarServicio()" class="text-sm text-indigo-600 hover:text-indigo-900 font-medium">+ {% trans "Agregar Servicio" %}</button>
+                </div>
+                <div class="border-t border-gray-200">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{% trans "Descripción" %}</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{% trans "Cant." %}</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{% trans "Precio Unit." %}</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{% trans "Desc %" %}</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{% trans "Total" %}</th>
+                                <th class="px-6 py-3"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                             <template x-for="(item, index) in servicios" :key="item.id">
+                                <tr>
+                                    <td class="px-6 py-4 w-1/2">
+                                        <input 
+                                            type="text" 
+                                            x-model="item.nombre" 
+                                            class="w-full border-gray-300 rounded-md shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500" 
+                                            placeholder="{% trans 'Descripción del servicio' %}">
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <input 
+                                            type="number" 
+                                            x-model.number="item.cantidad" 
+                                            min="1"
+                                            class="w-20 text-right border-gray-300 rounded-md shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500">
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <input 
+                                            type="number" 
+                                            x-model.number="item.precio" 
+                                            step="0.01" 
+                                            min="0"
+                                            class="w-32 text-right border-gray-300 rounded-md shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500">
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <input 
+                                            type="number" 
+                                            x-model.number="item.descuento" 
+                                            min="0"
+                                            max="100"
+                                            step="0.01"
+                                            class="w-20 text-right border-gray-300 rounded-md shadow-sm sm:text-sm focus:ring-indigo-500 focus:border-indigo-500">
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium text-gray-900">
+                                        <span x-text="formatMoney(calcularLinea(item))"></span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right">
+                                        <button 
+                                            type="button" 
+                                            @click="eliminarServicio(index)" 
+                                            class="text-red-600 hover:text-red-900">
+                                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </template>
+                            <!-- Mensaje si no hay datos -->
+                            <tr x-show="servicios.length === 0">
+                                <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">{% trans "No hay servicios agregados." %}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TOTALES (La magia reactiva) -->
+            <div class="flex justify-end">
+                <div class="w-full md:w-1/3 bg-gray-50 p-6 rounded-lg shadow">
+                    <dl class="space-y-3">
+                        <div class="flex justify-between text-sm text-gray-600">
+                            <dt>{% trans "Neto Repuestos" %}</dt>
+                            <dd x-text="formatMoney(netoRepuestos)" class="font-medium"></dd>
+                        </div>
+                        <div class="flex justify-between text-sm text-gray-600">
+                            <dt>{% trans "Neto Servicios" %}</dt>
+                            <dd x-text="formatMoney(netoServicios)" class="font-medium"></dd>
+                        </div>
+                        
+                        <div class="border-t border-gray-200 pt-3 flex justify-between text-sm text-gray-600">
+                            <dt>{% trans "Descuento General" %}</dt>
+                            <dd x-text="formatMoney(descuentoGeneral * (netoRepuestos + netoServicios) / 100)" class="font-medium"></dd>
+                        </div>
+                        
+                        <div class="border-t border-gray-200 pt-3 flex justify-between text-sm text-gray-600">
+                            <dt>{% trans "Impuesto" %} (<span x-text="taxRate"></span>%)</dt>
+                            <dd x-text="formatMoney(montoImpuesto)" class="font-medium"></dd>
+                        </div>
+                        
+                        <div class="border-t border-gray-200 pt-3 flex justify-between text-xl font-bold text-gray-900">
+                            <dt>{% trans "Total" %}</dt>
+                            <dd x-text="formatMoney(totalGeneral)" class="text-indigo-600"></dd>
+                        </div>
+                    </dl>
+                    
+                    <div class="mt-6">
+                        <button 
+                            type="submit" 
+                            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            {% trans "Guardar Documento" %}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<script>
+    function documentoForm(config) {
+        return {
+            country: config.country, // 'CL' o 'US'
+            taxRate: config.taxRate, // 19.0 o variable
+            
+            // Arrays de datos
+            repuestos: config.initialRepuestos.length ? config.initialRepuestos : [],
+            servicios: config.initialServicios.length ? config.initialServicios : [],
+            
+            // Descuento general (aplicado al subtotal)
+            descuentoGeneral: 0,
+
+            // --- Lógica de Negocio ---
+
+            init() {
+                // Agregar primera línea vacía si no hay datos
+                if (this.repuestos.length === 0) {
+                    this.agregarRepuesto();
+                }
+                if (this.servicios.length === 0) {
+                    // Opcional: agregar primera línea de servicio
+                    // this.agregarServicio();
+                }
+            },
+
+            agregarRepuesto() {
+                this.repuestos.push({ 
+                    id: Date.now(), 
+                    codigo: '', 
+                    nombre: '', 
+                    cantidad: 1, 
+                    precio: 0, 
+                    descuento: 0 
+                });
+            },
+            
+            eliminarRepuesto(index) {
+                if (this.repuestos.length > 1) {
+                    this.repuestos.splice(index, 1);
+                }
+            },
+            
+            agregarServicio() {
+                this.servicios.push({ 
+                    id: Date.now() + 1, 
+                    nombre: '', 
+                    cantidad: 1, 
+                    precio: 0, 
+                    descuento: 0 
+                });
+            },
+            
+            eliminarServicio(index) {
+                this.servicios.splice(index, 1);
+            },
+
+            // Calcula total de una línea (Qty * Precio * (1 - Desc%))
+            calcularLinea(item) {
+                const cantidad = parseFloat(item.cantidad) || 0;
+                const precio = parseFloat(item.precio) || 0;
+                const descuento = parseFloat(item.descuento) || 0;
+                
+                const subtotal = cantidad * precio;
+                const descuentoValor = subtotal * (descuento / 100);
+                return Math.max(0, subtotal - descuentoValor);
+            },
+
+
+            // --- Computed Properties (Simuladas como Getters) ---
+            
+            get netoRepuestos() {
+                return this.repuestos.reduce((sum, item) => sum + this.calcularLinea(item), 0);
+            },
+            
+            get netoServicios() {
+                return this.servicios.reduce((sum, item) => sum + this.calcularLinea(item), 0);
+            },
+            
+            get montoImpuesto() {
+                // REGLA DE NEGOCIO DE EGARAGE:
+                // CL: Impuesto solo sobre repuestos.
+                // US: Impuesto sobre repuestos + servicios (si apply_vat).
+                
+                let baseImponible = 0;
+                
+                if (this.country === 'CL') {
+                    // Chile: IVA 19% solo sobre repuestos
+                    baseImponible = this.netoRepuestos; 
+                } else {
+                    // USA: Impuesto sobre repuestos + servicios (simplificado para el ejemplo)
+                    // En producción, verificar apply_vat desde el documento
+                    baseImponible = this.netoRepuestos + this.netoServicios; 
+                }
+                
+                return baseImponible * (this.taxRate / 100);
+            },
+            
+            get totalGeneral() {
+                // Subtotal sin descuento ni impuestos
+                const subtotalSinDescuento = this.netoRepuestos + this.netoServicios;
+                
+                // Descuento general aplicado al subtotal
+                const descuentoValor = subtotalSinDescuento * (this.descuentoGeneral / 100);
+                
+                // Subtotal con descuento
+                const subtotalConDescuento = subtotalSinDescuento - descuentoValor;
+                
+                // Total = Subtotal con descuento + Impuesto
+                return subtotalConDescuento + this.montoImpuesto;
+            },
+
+            // --- Helpers ---
+            
+            formatMoney(value) {
+                // Configuración dinámica según país
+                const currency = this.country === 'CL' ? 'CLP' : 'USD';
+                const locale = this.country === 'CL' ? 'es-CL' : 'en-US';
+                const decimals = this.country === 'CL' ? 0 : 2; // CL: 0 decimales, US: 2 decimales
+
+                return new Intl.NumberFormat(locale, {
+                    style: 'currency',
+                    currency: currency,
+                    minimumFractionDigits: decimals,
+                    maximumFractionDigits: decimals
+                }).format(value || 0);
+            }
+        }
+    }
+
+    /**
+     * Componente Alpine.js para autocomplete de repuestos
+     * Reutilizable dentro de cada fila de la tabla
+     */
+    function repuestoAutocomplete(item) {
+        return {
+            query: item.nombre || '',
+            results: [],
+            isOpen: false,
+            highlightedIndex: -1,
+            item: item, // Referencia al item padre (para actualizar datos)
+            debounceTimer: null,
+
+            init() {
+                // Si la línea ya tiene nombre (modo edición), ponerlo en el input
+                if (this.item.nombre) {
+                    this.query = this.item.nombre;
+                }
+                
+                // Watcher: Si cambia el item.nombre desde fuera, actualizar input
+                this.$watch('item.nombre', (value) => {
+                    if (value !== this.query) {
+                        this.query = value || '';
+                    }
+                });
+            },
+
+            search() {
+                // Limpiar timer anterior
+                if (this.debounceTimer) {
+                    clearTimeout(this.debounceTimer);
+                }
+
+                // Si la query es muy corta, no buscar
+                if (this.query.length < 2) {
+                    this.results = [];
+                    this.isOpen = false;
+                    return;
+                }
+
+                // Debounce: esperar 300ms antes de buscar
+                this.debounceTimer = setTimeout(() => {
+                    this._performSearch();
+                }, 300);
+            },
+
+            async _performSearch() {
+                try {
+                    // Obtener URL base desde Django
+                    const apiUrl = '{% url "documentos:api_repuestos_buscar" %}';
+                    const url = `${apiUrl}?q=${encodeURIComponent(this.query)}`;
+                    
+                    const response = await fetch(url, {
+                        method: 'GET',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                        credentials: 'same-origin',
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    
+                    // La API devuelve un array directo
+                    this.results = Array.isArray(data) ? data : [];
+                    this.isOpen = this.results.length > 0;
+                    this.highlightedIndex = -1;
+                } catch (error) {
+                    console.error('Error buscando repuestos:', error);
+                    this.results = [];
+                    this.isOpen = false;
+                }
+            },
+
+            select(result) {
+                // 1. Actualizar datos visuales
+                this.query = result.nombre;
+                
+                // 2. Actualizar el objeto 'item' de la fila padre
+                // Alpine usa proxies, así que esto actualiza la tabla y los totales automáticamente
+                this.item.repuesto_id = result.id; // ✅ Vinculación con inventario
+                this.item.codigo = result.codigo || '';
+                this.item.nombre = result.nombre;
+                this.item.precio = result.precio; // ✅ Precio automático
+                
+                // 3. Cerrar dropdown
+                this.isOpen = false;
+                this.results = [];
+            },
+            
+            close() {
+                // Pequeño delay para permitir el click en la lista
+                setTimeout(() => {
+                    this.isOpen = false;
+                }, 200);
+            },
+
+            formatPrice(value) {
+                // Formatear precio según el país del documento padre
+                // Necesitamos acceder al país del documento, pero por simplicidad usamos el formato estándar
+                const num = parseFloat(value) || 0;
+                return new Intl.NumberFormat('es-CL', {
+                    style: 'currency',
+                    currency: 'CLP',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                }).format(num);
+            }
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,115 @@
+═══════════════════════════════════════════════════════════════
+    ✅ EJECUTA ESTOS COMANDOS EN SSH AHORA ✅
+═══════════════════════════════════════════════════════════════
+
+
+📋 COPIA Y PEGA ESTOS COMANDOS UNO POR UNO:
+───────────────────────────────────────────────────────────────
+
+cd ~/e_garage
+
+───────────────────────────────────────────────────────────────
+
+git pull origin main
+
+───────────────────────────────────────────────────────────────
+
+touch /var/www/atlantareciclajes_pythonanywhere_com_wsgi.py
+
+───────────────────────────────────────────────────────────────
+
+echo "✅ Actualización completada!"
+
+───────────────────────────────────────────────────────────────
+
+
+⏱️ ESPERA 30 SEGUNDOS DESPUÉS DEL RELOAD
+───────────────────────────────────────────────────────────────
+Cuenta: 1... 2... 3... ... 30
+
+
+📱 LUEGO ABRE EN TU CELULAR:
+───────────────────────────────────────────────────────────────
+https://www.egarage.cl/us/clientes/
+
+
+🎨 BUSCA UNA CRUZ DE COLOR:
+───────────────────────────────────────────────────────────────
+
+┌─────────────────────────────────────┐
+│ ┏━━━━━┓                             │  ← Arriba IZQUIERDA
+│ ┃ 🔵  ┃  CONTENIDO                  │     o
+│ ┗━━━━━┛                             │
+│                           ┏━━━━━┓   │  ← Arriba DERECHA
+│                           ┃ 🟢  ┃   │
+│                           ┗━━━━━┛   │
+└─────────────────────────────────────┘
+
+
+¿QUÉ COLOR VES?
+───────────────────────────────────────────────────────────────
+
+🟢 VERDE (derecha) → COMMON template
+   Ubicación: templates/taller/common/clientes/lista_clientes.html
+   Este YA tiene el rediseño completo ✅
+
+🔵 AZUL (izquierda) → US/EN template
+   Ubicación: templates/us/en/clientes/lista_clientes.html
+   Este extiende de COMMON ✅
+
+🔴 ROJO (izquierda) → US/ES template
+   Ubicación: templates/us/es/clientes/lista_clientes.html
+   Este extiende de COMMON ✅
+
+🟡 AMARILLO (izquierda) → CL/ES template
+   Ubicación: templates/cl/es/clientes/lista_clientes.html
+   Este extiende de COMMON ✅
+
+🟠 NARANJA → Colombia
+🟣 MORADO → México
+🟤 CAFÉ → Perú
+⚫ NEGRO (borde verde) → Ecuador
+🔶 NARANJA OSCURO → Venezuela
+💚 VERDE OSCURO → Brasil ES
+💙 AZUL CLARO → Brasil PT
+
+
+═══════════════════════════════════════════════════════════════
+          IMPORTANTE: TODOS HEREDAN DEL COMMON
+═══════════════════════════════════════════════════════════════
+
+Todos los templates de países hacen:
+{% extends "taller/common/clientes/lista_clientes.html" %}
+
+Esto significa que:
+✅ El template COMMON tiene TODO el código del rediseño
+✅ Los templates de países solo agregan la cruz de color
+✅ Si ves CUALQUIER cruz, significa que el servidor se actualizó
+
+
+═══════════════════════════════════════════════════════════════
+                    DESPUÉS DE VER LA CRUZ
+═══════════════════════════════════════════════════════════════
+
+Si ves CUALQUIER cruz de color:
+✅ Los archivos SÍ se actualizaron en el servidor
+✅ El problema es CACHÉ del navegador
+
+SOLUCIÓN:
+1. Limpia caché del celular
+2. Cierra el navegador completamente
+3. Abre el navegador de nuevo
+4. Carga la página
+
+Si NO ves ninguna cruz:
+❌ Los archivos NO se actualizaron
+❌ El git pull no funcionó
+
+SOLUCIÓN:
+1. Vuelve a ejecutar: git pull origin main
+2. Verifica que diga "Updated" o "Fast-forward"
+3. Reload de nuevo
+
+
+═══════════════════════════════════════════════════════════════
+

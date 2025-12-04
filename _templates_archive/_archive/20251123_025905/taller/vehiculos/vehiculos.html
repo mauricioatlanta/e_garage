@@ -1,0 +1,225 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% load country_url %}
+
+{% block extra_head %}
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<link href="/static/css/estilo_futurista.css?v=2" rel="stylesheet">
+<link href="/static/css/galaxy_theme.css?v=2" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  tsParticles.load("tsparticles", {
+    fullScreen: { enable: false },
+    background: { color: { value: "transparent" } },
+    particles: {
+      number: { value: 60 },
+      color: { value: "#00ffff" },
+      size: { value: 2 },
+      move: { enable: true, speed: 0.5 },
+      links: { enable: true, color: "#00e6d0", opacity: 0.3 }
+    }
+  });
+});
+</script>
+<style>
+body {
+  background: linear-gradient(120deg, #0f2027 0%, #2c5364 100%) fixed;
+  min-height: 100vh;
+}
+#tsparticles {
+  position: fixed;
+  inset: 0;
+  z-index: -5;
+  pointer-events: none;
+}
+.cuadro {
+  position: relative;
+  z-index: 2;
+  color: #fff;
+}
+.cuadro a {
+  color: inherit;
+}
+.cuadro table, .cuadro th, .cuadro td {
+  color: #fff;
+}
+input[type="text"] {
+  background: #222;
+  color: #fff;
+  border: 1px solid #4fd1c5;
+}
+input[type="text"]::placeholder {
+  color: #b2f5ea;
+}
+#tsparticles {
+  position: fixed;
+  inset: 0;
+  z-index: -5;
+  pointer-events: none;
+}
+.translucent-card {
+  background: rgba(0,0,0,0.6) !important;
+  color: #fff !important;
+  padding: 8px;
+  margin-bottom: 0;
+  backdrop-filter: blur(8px) saturate(120%);
+  -webkit-backdrop-filter: blur(8px) saturate(120%);
+  border: 1.5px solid rgba(0,230,208,0.12);
+  border-radius: 8px;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.font-orbitron {
+  font-family: 'Orbitron', 'Arial', sans-serif;
+}
+/* Estilo de mosaicos futuristas */
+.vehiculo-card {
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 230, 208, 0.1);
+  transition: all 0.3s ease;
+}
+
+.vehiculo-card:hover {
+  box-shadow: 0 8px 25px rgba(0, 230, 208, 0.3);
+  border-color: rgba(0, 230, 208, 0.4);
+}
+
+.vehiculo-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0, 230, 208, 0.1), transparent);
+  transition: left 0.5s;
+}
+
+.vehiculo-card:hover::before {
+  left: 100%;
+}
+
+/* Efecto de tablero de ajedrez alternando colores */
+.vehiculo-card:nth-child(odd) {
+  background: rgba(0,0,0,0.7) !important;
+  border-color: rgba(0, 230, 208, 0.2);
+}
+
+.vehiculo-card:nth-child(even) {
+  background: rgba(15, 32, 39, 0.7) !important;
+  border-color: rgba(0, 255, 255, 0.2);
+}
+</style>
+{% endblock %}
+
+{% block fondo_extra %}
+<div id="tsparticles" class="fixed inset-0 -z-10"></div>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto cuadro">
+  {# Determinar URL de crear vehículo #}
+  {% country_url 'vehiculos:crear_vehiculo' as url_crear_vehiculo %}
+
+  <div class="flex justify-between items-center mb-4">
+    <div class="flex items-center gap-3">
+      <h1 class="text-2xl font-bold">Vehículos Registrados</h1>
+      {% include "components/country_badge.html" %}
+    </div>
+    <a class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow"
+       href="{{ url_crear_vehiculo }}"
+       aria-label="Agregar nuevo vehículo">+ Agregar Vehículo</a>
+  </div>
+
+  <div class="mb-4">
+    <input class="w-full rounded px-4 py-2 text-black" id="busqueda-vehiculo" placeholder="Buscar vehículo por patente, modelo, VIN o marca..." type="text"/>
+  </div>
+
+  {% if debug %}
+  <!-- CRUZ ROJA DE DEPURACIÓN -->
+  <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; font-size: 100px; color: red; text-shadow: 0 0 20px red;">❌</div>
+  {% endif %}
+
+  <!-- Grid de mosaicos futuristas -->
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3" id="grid-vehiculos">
+    {% for vehiculo in vehiculos %}
+      {# Generar URLs #}
+      {% country_url 'vehiculos:ver_vehiculo' vehiculo.id as url_ver_vehiculo %}
+      {% country_url 'vehiculos:editar_vehiculo' vehiculo.id as url_editar_vehiculo %}
+      {% country_url 'vehiculos:eliminar_vehiculo' vehiculo.id as url_eliminar_vehiculo %}
+
+    <div class="vehiculo-card translucent-card hover:scale-105 transition-transform duration-300 cursor-pointer"
+         data-patente="{{ vehiculo.patente|lower }}"
+         data-marca="{{ vehiculo.marca|sin_pais|lower }}"
+         data-modelo="{{ vehiculo.modelo|lower }}"
+         data-cliente="{{ vehiculo.cliente.nombre|lower }} {{ vehiculo.cliente.apellido|lower }}"
+         onclick="window.location.href='{{ url_ver_vehiculo }}'">
+      <div class="text-center">
+        <div class="text-xs font-bold text-cyan-400 mb-1">{{ vehiculo.patente }}</div>
+        <div class="text-xs text-white mb-1">{{ vehiculo.marca|sin_pais }}</div>
+        <div class="text-xs text-gray-300 mb-1">{{ vehiculo.modelo }}</div>
+        <div class="text-xs text-yellow-400 mb-2">{{ vehiculo.anio }}</div>
+        <div class="text-xs text-gray-400 mb-2">{{ vehiculo.cliente.nombre }} {{ vehiculo.cliente.apellido }}</div>
+        <div class="flex justify-center space-x-1" onclick="event.stopPropagation();">
+          <a class="text-blue-400 hover:text-blue-300 text-xs"
+             href="{{ url_ver_vehiculo }}"
+             title="Ver vehículo"
+             aria-label="Ver vehículo {{ vehiculo.patente }}">👁️</a>
+          <a class="text-yellow-400 hover:text-yellow-300 text-xs"
+             href="{{ url_editar_vehiculo }}"
+             title="Editar vehículo"
+             aria-label="Editar vehículo {{ vehiculo.patente }}">✏️</a>
+          <a class="text-red-400 hover:text-red-300 text-xs"
+             href="{{ url_eliminar_vehiculo }}"
+             title="Eliminar vehículo"
+             aria-label="Eliminar vehículo {{ vehiculo.patente }}">🗑️</a>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-span-full text-center text-gray-500 py-8">Sin vehículos</div>
+    {% endfor %}
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const input = document.getElementById('busqueda-vehiculo');
+    const tarjetas = document.querySelectorAll('.vehiculo-card');
+
+    // Función debounce para optimizar rendimiento
+    const debounce = (fn, ms = 150) => {
+      let timeoutId;
+      return function(...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => fn.apply(this, args), ms);
+      };
+    };
+
+    // Función de filtrado
+    const filtrar = function() {
+      const filtro = input.value.toLowerCase().trim();
+      tarjetas.forEach(tarjeta => {
+        const patente = tarjeta.dataset.patente || '';
+        const marca = tarjeta.dataset.marca || '';
+        const modelo = tarjeta.dataset.modelo || '';
+        const cliente = tarjeta.dataset.cliente || '';
+
+        const textoCompleto = `${patente} ${marca} ${modelo} ${cliente}`;
+
+        tarjeta.style.display = textoCompleto.includes(filtro) ? 'flex' : 'none';
+      });
+    };
+
+    // Aplicar debounce al evento input
+    input.addEventListener('input', debounce(filtrar, 150));
+  });
+</script>
+{% endblock %}

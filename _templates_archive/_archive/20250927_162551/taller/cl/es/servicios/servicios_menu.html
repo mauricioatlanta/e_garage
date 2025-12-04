@@ -1,0 +1,701 @@
+{% extends "base.html" %}
+{% load static i18n widget_tweaks %}
+
+{% block extra_css %}
+<style>
+  .tech-gradient { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+  .service-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); transition: all 0.3s ease; }
+  .service-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1); }
+  .category-header { background: linear-gradient(45deg, #00d4ff, #0099cc); color: white; border-radius: 15px; padding: 20px; margin-bottom: 30px; text-align: center; }
+  .service-item { background: white; border-radius: 10px; padding: 15px; margin-bottom: 10px; border-left: 4px solid #00d4ff; transition: all 0.3s ease; }
+  .service-item:hover { background: #f8f9fa; transform: translateX(5px); }
+  .add-service-btn { background: linear-gradient(45deg, #28a745, #20c997); border: none; color: white; padding: 10px 20px; border-radius: 25px; transition: all 0.3s ease; }
+  .add-service-btn:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3); }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header con logo y navegación -->
+<div class="tech-gradient text-white py-6 mb-8">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="flex justify-between items-center">
+      <div class="flex items-center space-x-4">
+        {% if user.empresa.logo %}
+          <img src="{{ user.empresa.logo.url }}" alt="{{ user.empresa.nombre_taller }}" class="h-16 w-auto">
+        {% else %}
+          <div class="h-16 w-16 bg-white rounded-lg flex items-center justify-center">
+            <i class="fas fa-wrench text-2xl text-blue-600"></i>
+          </div>
+        {% endif %}
+        <div>
+          <h1 class="text-3xl font-bold">{{ user.empresa.nombre_taller }}</h1>
+          <p class="text-blue-100">Catálogo de Servicios Automotrices</p>
+        </div>
+      </div>
+      <nav class="flex space-x-4">
+        <a href="{% url 'chile:taller:vehiculos:lista_vehiculos' %}" class="px-4 py-2 bg-white bg-opacity-20 rounded-lg hover:bg-opacity-30 transition">
+          <i class="fas fa-car mr-2"></i>Vehículos
+        </a>
+        <a href="{% url 'chile:taller:clientes:lista_clientes' %}" class="px-4 py-2 bg-white bg-opacity-20 rounded-lg hover:bg-opacity-30 transition">
+          <i class="fas fa-users mr-2"></i>Clientes
+        </a>
+        <a href="{% url 'chile:taller:documentos:lista_documentos' %}" class="px-4 py-2 bg-white bg-opacity-20 rounded-lg hover:bg-opacity-30 transition">
+          <i class="fas fa-file-invoice mr-2"></i>Documentos
+        </a>
+      </nav>
+    </div>
+  </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-4 pb-12">
+  <!-- Búsqueda -->
+  <div class="mb-8">
+    <div class="relative max-w-2xl mx-auto">
+      <input type="text" id="search-services" placeholder="🔍 Buscar servicios..."
+             class="w-full px-6 py-4 text-lg border-2 border-gray-300 rounded-full focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none">
+      <button id="add-custom-service" class="absolute right-3 top-1/2 transform -translate-y-1/2 px-6 py-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition">
+        <i class="fas fa-plus mr-2"></i>Agregar
+      </button>
+    </div>
+  </div>
+
+  <!-- Categorías de Servicios -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+    <!-- Mecánica General -->
+    <div class="service-card rounded-2xl p-6">
+      <div class="category-header">
+        <i class="fas fa-tools text-4xl mb-3"></i>
+        <h2 class="text-2xl font-bold">🔧 Mecánica General</h2>
+        <p class="text-blue-100">Servicios de mantenimiento y reparación</p>
+      </div>
+      <div class="space-y-2" id="mecanica-services">
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-oil-can text-blue-500 mr-2"></i>Cambio de aceite y filtros</span>
+            <button class="add-service-btn" onclick="addService('Cambio de aceite y filtros', 'mecanica')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-cogs text-blue-500 mr-2"></i>Revisión de motor</span>
+            <button class="add-service-btn" onclick="addService('Revisión de motor', 'mecanica')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-wrench text-blue-500 mr-2"></i>Reparación de transmisión</span>
+            <button class="add-service-btn" onclick="addService('Reparación de transmisión', 'mecanica')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-bolt text-blue-500 mr-2"></i>Diagnóstico computarizado</span>
+            <button class="add-service-btn" onclick="addService('Diagnóstico computarizado', 'mecanica')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-tools text-blue-500 mr-2"></i>Reparación de frenos</span>
+            <button class="add-service-btn" onclick="addService('Reparación de frenos', 'mecanica')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-cogs text-blue-500 mr-2"></i>Cambio de embrague</span>
+            <button class="add-service-btn" onclick="addService('Cambio de embrague', 'mecanica')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-cog text-blue-500 mr-2"></i>Reparación de dirección</span>
+            <button class="add-service-btn" onclick="addService('Reparación de dirección', 'mecanica')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-wrench text-blue-500 mr-2"></i>Reparación de suspensión</span>
+            <button class="add-service-btn" onclick="addService('Reparación de suspensión', 'mecanica')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Electricidad -->
+    <div class="service-card rounded-2xl p-6">
+      <div class="category-header">
+        <i class="fas fa-bolt text-4xl mb-3"></i>
+        <h2 class="text-2xl font-bold">⚡ Electricidad</h2>
+        <p class="text-blue-100">Sistema eléctrico y electrónico</p>
+      </div>
+      <div class="space-y-2" id="electricidad-services">
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-battery-full text-yellow-500 mr-2"></i>Reparación de alternador</span>
+            <button class="add-service-btn" onclick="addService('Reparación de alternador', 'electricidad')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-car-battery text-yellow-500 mr-2"></i>Cambio de batería</span>
+            <button class="add-service-btn" onclick="addService('Cambio de batería', 'electricidad')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-lightbulb text-yellow-500 mr-2"></i>Reparación de luces</span>
+            <button class="add-service-btn" onclick="addService('Reparación de luces', 'electricidad')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-plug text-yellow-500 mr-2"></i>Reparación de arranque</span>
+            <button class="add-service-btn" onclick="addService('Reparación de arranque', 'electricidad')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-microchip text-yellow-500 mr-2"></i>Reparación de ECU</span>
+            <button class="add-service-btn" onclick="addService('Reparación de ECU', 'electricidad')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-wifi text-yellow-500 mr-2"></i>Instalación de alarmas</span>
+            <button class="add-service-btn" onclick="addService('Instalación de alarmas', 'electricidad')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-bluetooth text-yellow-500 mr-2"></i>Instalación de estéreo</span>
+            <button class="add-service-btn" onclick="addService('Instalación de estéreo', 'electricidad')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-satellite-dish text-yellow-500 mr-2"></i>Instalación de GPS</span>
+            <button class="add-service-btn" onclick="addService('Instalación de GPS', 'electricidad')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hojalatería -->
+    <div class="service-card rounded-2xl p-6">
+      <div class="category-header">
+        <i class="fas fa-hammer text-4xl mb-3"></i>
+        <h2 class="text-2xl font-bold">🔨 Hojalatería</h2>
+        <p class="text-blue-100">Reparación de carrocería y chasis</p>
+      </div>
+      <div class="space-y-2" id="hojalateria-services">
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-car-crash text-red-500 mr-2"></i>Reparación de golpes</span>
+            <button class="add-service-btn" onclick="addService('Reparación de golpes', 'hojalateria')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-shield-alt text-red-500 mr-2"></i>Enderezado de chasis</span>
+            <button class="add-service-btn" onclick="addService('Enderezado de chasis', 'hojalateria')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-tools text-red-500 mr-2"></i>Soldadura de carrocería</span>
+            <button class="add-service-btn" onclick="addService('Soldadura de carrocería', 'hojalateria')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-exchange-alt text-red-500 mr-2"></i>Cambio de paneles</span>
+            <button class="add-service-btn" onclick="addService('Cambio de paneles', 'hojalateria')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-hammer text-red-500 mr-2"></i>Reparación de guardafangos</span>
+            <button class="add-service-btn" onclick="addService('Reparación de guardafangos', 'hojalateria')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-car text-red-500 mr-2"></i>Reparación de puertas</span>
+            <button class="add-service-btn" onclick="addService('Reparación de puertas', 'hojalateria')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-tools text-red-500 mr-2"></i>Reparación de capó</span>
+            <button class="add-service-btn" onclick="addService('Reparación de capó', 'hojalateria')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-wrench text-red-500 mr-2"></i>Reparación de maletero</span>
+            <button class="add-service-btn" onclick="addService('Reparación de maletero', 'hojalateria')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pintura -->
+    <div class="service-card rounded-2xl p-6">
+      <div class="category-header">
+        <i class="fas fa-paint-brush text-4xl mb-3"></i>
+        <h2 class="text-2xl font-bold">🎨 Pintura</h2>
+        <p class="text-blue-100">Acabados y restauración</p>
+      </div>
+      <div class="space-y-2" id="pintura-services">
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-spray-can text-purple-500 mr-2"></i>Pintura completa</span>
+            <button class="add-service-btn" onclick="addService('Pintura completa', 'pintura')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-paint-roller text-purple-500 mr-2"></i>Retoque de pintura</span>
+            <button class="add-service-btn" onclick="addService('Retoque de pintura', 'pintura')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-shield-alt text-purple-500 mr-2"></i>Protección anticorrosiva</span>
+            <button class="add-service-btn" onclick="addService('Protección anticorrosiva', 'pintura')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-star text-purple-500 mr-2"></i>Pulido y encerado</span>
+            <button class="add-service-btn" onclick="addService('Pulido y encerado', 'pintura')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-palette text-purple-500 mr-2"></i>Vinilado</span>
+            <button class="add-service-btn" onclick="addService('Vinilado', 'pintura')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-magic text-purple-500 mr-2"></i>Detallado completo</span>
+            <button class="add-service-btn" onclick="addService('Detallado completo', 'pintura')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-spray-can text-purple-500 mr-2"></i>Pintura por partes</span>
+            <button class="add-service-btn" onclick="addService('Pintura por partes', 'pintura')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-paint-brush text-purple-500 mr-2"></i>Barnizado</span>
+            <button class="add-service-btn" onclick="addService('Barnizado', 'pintura')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Neumáticos -->
+    <div class="service-card rounded-2xl p-6">
+      <div class="category-header">
+        <i class="fas fa-circle text-4xl mb-3"></i>
+        <h2 class="text-2xl font-bold">⭕ Neumáticos</h2>
+        <p class="text-blue-100">Llantas y ruedas</p>
+      </div>
+      <div class="space-y-2" id="neumaticos-services">
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-sync-alt text-green-500 mr-2"></i>Rotación de neumáticos</span>
+            <button class="add-service-btn" onclick="addService('Rotación de neumáticos', 'neumaticos')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-balance-scale text-green-500 mr-2"></i>Balanceo de ruedas</span>
+            <button class="add-service-btn" onclick="addService('Balanceo de ruedas', 'neumaticos')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-tools text-green-500 mr-2"></i>Alineación</span>
+            <button class="add-service-btn" onclick="addService('Alineación', 'neumaticos')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-wrench text-green-500 mr-2"></i>Reparación de pinchazos</span>
+            <button class="add-service-btn" onclick="addService('Reparación de pinchazos', 'neumaticos')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-cog text-green-500 mr-2"></i>Montaje de neumáticos</span>
+            <button class="add-service-btn" onclick="addService('Montaje de neumáticos', 'neumaticos')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-tire text-green-500 mr-2"></i>Cambio de válvulas</span>
+            <button class="add-service-btn" onclick="addService('Cambio de válvulas', 'neumaticos')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-wrench text-green-500 mr-2"></i>Reparación de llantas</span>
+            <button class="add-service-btn" onclick="addService('Reparación de llantas', 'neumaticos')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-tools text-green-500 mr-2"></i>Cambio de neumáticos</span>
+            <button class="add-service-btn" onclick="addService('Cambio de neumáticos', 'neumaticos')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Enfriamiento -->
+    <div class="service-card rounded-2xl p-6">
+      <div class="category-header">
+        <i class="fas fa-thermometer-half text-4xl mb-3"></i>
+        <h2 class="text-2xl font-bold">🌡️ Enfriamiento</h2>
+        <p class="text-blue-100">Sistema de refrigeración</p>
+      </div>
+      <div class="space-y-2" id="enfriamiento-services">
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-tint text-blue-500 mr-2"></i>Cambio de refrigerante</span>
+            <button class="add-service-btn" onclick="addService('Cambio de refrigerante', 'enfriamiento')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-fan text-blue-500 mr-2"></i>Reparación de radiador</span>
+            <button class="add-service-btn" onclick="addService('Reparación de radiador', 'enfriamiento')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-cogs text-blue-500 mr-2"></i>Cambio de termostato</span>
+            <button class="add-service-btn" onclick="addService('Cambio de termostato', 'enfriamiento')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-wrench text-blue-500 mr-2"></i>Reparación de bomba de agua</span>
+            <button class="add-service-btn" onclick="addService('Reparación de bomba de agua', 'enfriamiento')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-thermometer-full text-blue-500 mr-2"></i>Cambio de sensor de temperatura</span>
+            <button class="add-service-btn" onclick="addService('Cambio de sensor de temperatura', 'enfriamiento')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-wind text-blue-500 mr-2"></i>Limpieza de sistema de enfriamiento</span>
+            <button class="add-service-btn" onclick="addService('Limpieza de sistema de enfriamiento', 'enfriamiento')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-tools text-blue-500 mr-2"></i>Reparación de ventilador</span>
+            <button class="add-service-btn" onclick="addService('Reparación de ventilador', 'enfriamiento')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-wrench text-blue-500 mr-2"></i>Cambio de mangueras</span>
+            <button class="add-service-btn" onclick="addService('Cambio de mangueras', 'enfriamiento')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Aire Acondicionado -->
+    <div class="service-card rounded-2xl p-6">
+      <div class="category-header">
+        <i class="fas fa-snowflake text-4xl mb-3"></i>
+        <h2 class="text-2xl font-bold">❄️ Aire Acondicionado</h2>
+        <p class="text-blue-100">Climatización vehicular</p>
+      </div>
+      <div class="space-y-2" id="aire-services">
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-wind text-cyan-500 mr-2"></i>Recarga de gas</span>
+            <button class="add-service-btn" onclick="addService('Recarga de gas', 'aire')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-filter text-cyan-500 mr-2"></i>Cambio de filtros</span>
+            <button class="add-service-btn" onclick="addService('Cambio de filtros A/C', 'aire')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-tools text-cyan-500 mr-2"></i>Reparación de compresor</span>
+            <button class="add-service-btn" onclick="addService('Reparación de compresor', 'aire')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-wrench text-cyan-500 mr-2"></i>Limpieza del sistema</span>
+            <button class="add-service-btn" onclick="addService('Limpieza del sistema A/C', 'aire')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-thermometer text-cyan-500 mr-2"></i>Reparación de evaporador</span>
+            <button class="add-service-btn" onclick="addService('Reparación de evaporador', 'aire')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-cogs text-cyan-500 mr-2"></i>Instalación de A/C</span>
+            <button class="add-service-btn" onclick="addService('Instalación de A/C', 'aire')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-wrench text-cyan-500 mr-2"></i>Reparación de condensador</span>
+            <button class="add-service-btn" onclick="addService('Reparación de condensador', 'aire')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="service-item">
+          <div class="flex justify-between items-center">
+            <span><i class="fas fa-tools text-cyan-500 mr-2"></i>Cambio de válvulas A/C</span>
+            <button class="add-service-btn" onclick="addService('Cambio de válvulas A/C', 'aire')">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Modal para agregar servicio personalizado -->
+  <div id="custom-service-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+      <div class="bg-white rounded-2xl p-8 max-w-md w-full">
+        <h3 class="text-2xl font-bold mb-6 text-gray-800">Agregar Servicio Personalizado</h3>
+        <form id="custom-service-form">
+          {% csrf_token %}
+          <div class="mb-4">
+            <label class="block text-gray-700 font-semibold mb-2">Nombre del Servicio</label>
+            <input type="text" id="service-name" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none" placeholder="Ej: Reparación de turbo">
+          </div>
+          <div class="mb-6">
+            <label class="block text-gray-700 font-semibold mb-2">Categoría</label>
+            <select id="service-category" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none">
+              <option value="mecanica">Mecánica General</option>
+              <option value="electricidad">Electricidad</option>
+              <option value="hojalateria">Hojalatería</option>
+              <option value="pintura">Pintura</option>
+              <option value="neumaticos">Neumáticos</option>
+              <option value="enfriamiento">Enfriamiento</option>
+              <option value="aire">Aire Acondicionado</option>
+            </select>
+          </div>
+          <div class="flex justify-end space-x-4">
+            <button type="button" onclick="closeModal()" class="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition">
+              Cancelar
+            </button>
+            <button type="submit" class="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
+              <i class="fas fa-plus mr-2"></i>Agregar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// Funciones JavaScript
+function addService(serviceName, category) {
+  // Aquí puedes implementar la lógica para agregar el servicio
+  alert(`Servicio agregado: ${serviceName} en categoría ${category}`);
+}
+
+function openModal() {
+  document.getElementById('custom-service-modal').classList.remove('hidden');
+}
+
+function closeModal() {
+  document.getElementById('custom-service-modal').classList.add('hidden');
+}
+
+// Event listeners
+document.getElementById('add-custom-service').addEventListener('click', openModal);
+
+document.getElementById('custom-service-form').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const serviceName = document.getElementById('service-name').value;
+  const category = document.getElementById('service-category').value;
+
+  if (serviceName.trim()) {
+    addService(serviceName, category);
+    closeModal();
+    document.getElementById('custom-service-form').reset();
+  }
+});
+
+// Búsqueda en tiempo real
+document.getElementById('search-services').addEventListener('input', function(e) {
+  const searchTerm = e.target.value.toLowerCase();
+  const serviceItems = document.querySelectorAll('.service-item');
+
+  serviceItems.forEach(item => {
+    const serviceText = item.textContent.toLowerCase();
+    if (serviceText.includes(searchTerm)) {
+      item.style.display = 'block';
+    } else {
+      item.style.display = 'none';
+    }
+  });
+});
+
+// Animaciones y efectos visuales
+document.addEventListener('DOMContentLoaded', function() {
+  // Animar entrada de las tarjetas
+  const cards = document.querySelectorAll('.service-card');
+  cards.forEach((card, index) => {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(20px)';
+    setTimeout(() => {
+      card.style.transition = 'all 0.6s ease';
+      card.style.opacity = '1';
+      card.style.transform = 'translateY(0)';
+    }, index * 100);
+  });
+
+  // Efecto de hover en botones
+  const buttons = document.querySelectorAll('.add-service-btn');
+  buttons.forEach(button => {
+    button.addEventListener('mouseenter', function() {
+      this.style.transform = 'scale(1.1)';
+    });
+    button.addEventListener('mouseleave', function() {
+      this.style.transform = 'scale(1)';
+    });
+  });
+});
+</script>
+{% endblock %}

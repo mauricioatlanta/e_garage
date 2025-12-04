@@ -163,3 +163,4 @@ utilidad_bruta = ingresos - costo_total  # ❌ Python
 
 
 
+

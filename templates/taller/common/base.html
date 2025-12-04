@@ -7,6 +7,18 @@
   <meta charset="UTF-8">
   <title>{% block title %}eGarage{% endblock %}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  {# --- PWA Configuration --- #}
+  <meta name="theme-color" content="#0a0e27">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="eGarage">
+  <link rel="manifest" href="{% static 'manifest.json' %}">
+  <link rel="apple-touch-icon" href="{% static 'images/egarage_icon_192x192.png' %}">
+  <link rel="icon" type="image/png" sizes="192x192" href="{% static 'images/egarage_icon_192x192.png' %}">
+  <link rel="icon" type="image/png" sizes="512x512" href="{% static 'images/egarage_icon_512x512.png' %}">
+  <link rel="icon" type="image/svg+xml" href="{% static 'images/egarage_default_logo.svg' %}">
+  
   <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
   <link rel="stylesheet" href="{% static 'css/output.css' %}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" referrerpolicy="no-referrer" />

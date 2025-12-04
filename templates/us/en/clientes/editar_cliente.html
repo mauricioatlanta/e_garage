@@ -5,27 +5,6 @@
 {% load i18n %}
 
 {% block extra_head %}
-<!-- 🟡 CRUZ AMARILLA - Template: us/en/clientes/editar_cliente.html -->
-<style>
-.debug-marker {
-  position: fixed;
-  top: 10px;
-  right: 10px;
-  z-index: 99999;
-  background: rgba(255, 255, 0, 0.9);
-  color: black;
-  padding: 10px 15px;
-  border-radius: 5px;
-  font-family: monospace;
-  font-weight: bold;
-  font-size: 14px;
-  box-shadow: 0 0 20px rgba(255, 255, 0, 0.8);
-  border: 3px solid #ffff00;
-}
-.debug-marker::before {
-  content: '🟡 CRUZ AMARILLA - us/en/editar_cliente.html';
-}
-</style>
 <link href="/static/css/estilo_futurista.css" rel="stylesheet">
 <link href="/static/css/galaxy_theme.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -785,7 +764,6 @@ h1::after {
 
 {% block fondo_extra %}
 <div id="tsparticles" class="fixed inset-0 -z-10"></div>
-<div class="debug-marker"></div>
 {% endblock %}
 
 {% block content %}

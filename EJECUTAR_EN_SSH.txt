@@ -1,0 +1,170 @@
+═══════════════════════════════════════════════════════════════
+    🚀 EJECUTAR SCRIPT EN SSH - MÉTODO MÁS FÁCIL 🚀
+═══════════════════════════════════════════════════════════════
+
+
+✅ OPCIÓN 1: Copiar y Pegar el Script Directamente
+═══════════════════════════════════════════════════════════════
+
+En tu terminal SSH de PythonAnywhere, ejecuta ESTE comando:
+
+bash <(cat << 'EOF'
+#!/bin/bash
+cd /home/atlantareciclajes/e_garage
+cp templates/taller/common/clientes/lista_clientes.html templates/taller/common/clientes/lista_clientes.html.backup_$(date +%Y%m%d_%H%M%S)
+curl -o templates/taller/common/clientes/lista_clientes.html https://raw.githubusercontent.com/mauricioatlanta/e_garage/main/templates/taller/common/clientes/lista_clientes.html
+touch /var/www/atlantareciclajes_pythonanywhere_com_wsgi.py
+echo "✅ Actualización completada!"
+EOF
+)
+
+───────────────────────────────────────────────────────────────
+
+
+✅ OPCIÓN 2: Crear Archivo Manualmente
+═══════════════════════════════════════════════════════════════
+
+PASO 1: Crear el script
+───────────────────────────────────────────────────────────────
+En tu terminal SSH, ejecuta:
+
+nano ~/update_clientes.sh
+
+───────────────────────────────────────────────────────────────
+
+
+PASO 2: Pegar el contenido
+───────────────────────────────────────────────────────────────
+El archivo update_clientes.sh está en tu PC local.
+Ábrelo y copia TODO el contenido.
+
+En nano (terminal SSH):
+1. Click derecho > Pegar
+   O
+2. Shift+Insert
+
+Debe pegarse todo el script.
+───────────────────────────────────────────────────────────────
+
+
+PASO 3: Guardar y salir
+───────────────────────────────────────────────────────────────
+1. Presiona: Ctrl + O  (guardar)
+2. Presiona: Enter      (confirmar nombre)
+3. Presiona: Ctrl + X  (salir)
+───────────────────────────────────────────────────────────────
+
+
+PASO 4: Hacer ejecutable
+───────────────────────────────────────────────────────────────
+chmod +x ~/update_clientes.sh
+───────────────────────────────────────────────────────────────
+
+
+PASO 5: Ejecutar
+───────────────────────────────────────────────────────────────
+bash ~/update_clientes.sh
+───────────────────────────────────────────────────────────────
+
+
+═══════════════════════════════════════════════════════════════
+✅ OPCIÓN 3: Usar Interfaz Web (MÁS FÁCIL)
+═══════════════════════════════════════════════════════════════
+
+Esta es la MÁS FÁCIL. No necesitas SSH.
+
+
+PASO 1: Copiar el archivo de tu PC
+───────────────────────────────────────────────────────────────
+En PowerShell (tu PC):
+
+Get-Content "E:\projecto\e_garage\templates\taller\common\clientes\lista_clientes.html" -Raw | Set-Clipboard
+
+───────────────────────────────────────────────────────────────
+
+
+PASO 2: Ir a PythonAnywhere Files
+───────────────────────────────────────────────────────────────
+Abre en navegador:
+https://www.pythonanywhere.com/user/atlantareciclajes/files/
+
+Click en:
+e_garage > templates > taller > common > clientes > lista_clientes.html
+───────────────────────────────────────────────────────────────
+
+
+PASO 3: Pegar el contenido
+───────────────────────────────────────────────────────────────
+1. Ctrl+A  (seleccionar todo)
+2. Ctrl+V  (pegar el nuevo contenido)
+3. Click en "Save"
+───────────────────────────────────────────────────────────────
+
+
+PASO 4: Reload
+───────────────────────────────────────────────────────────────
+Ve a:
+https://www.pythonanywhere.com/user/atlantareciclajes/webapps/
+
+Click en botón verde: "Reload"
+───────────────────────────────────────────────────────────────
+
+
+═══════════════════════════════════════════════════════════════
+                VERIFICACIÓN CON CRUZ VERDE 🟢
+═══════════════════════════════════════════════════════════════
+
+Después de actualizar, abre en tu celular:
+https://www.egarage.cl/us/clientes/
+
+
+¿Ves un cuadro verde con ✅ en la esquina superior derecha?
+
+┌────────────────────────────────────┐
+│                      ┏━━━━━━━┓    │  ← Aquí
+│                      ┃ 🟢    ┃    │
+│                      ┃  ✅   ┃    │
+│                      ┗━━━━━━━┛    │
+│                                    │
+└────────────────────────────────────┘
+
+
+🟢 SI LA VES:
+   → ✅ Archivo actualizado correctamente
+   → Solo limpia caché del celular
+   → Los cambios aparecerán
+
+❌ NO LA VES:
+   → ❌ Archivo NO se actualizó
+   → Vuelve a ejecutar el script
+   → O usa la Opción 3 (interfaz web)
+
+
+═══════════════════════════════════════════════════════════════
+             RECOMENDACIÓN: USA LA OPCIÓN 3
+═══════════════════════════════════════════════════════════════
+
+La OPCIÓN 3 (interfaz web) es:
+✅ Más fácil
+✅ Más rápida
+✅ Menos propensa a errores
+✅ No requiere conocimientos de terminal
+
+
+═══════════════════════════════════════════════════════════════
+              RESUMEN ULTRA-RÁPIDO
+═══════════════════════════════════════════════════════════════
+
+Opción 3 (Interfaz Web):
+1. Copiar archivo en PC (comando PowerShell)
+2. Ir a PythonAnywhere Files
+3. Pegar archivo
+4. Save
+5. Reload
+6. ¡Listo!
+
+Tiempo: 3 minutos
+
+
+═══════════════════════════════════════════════════════════════
+

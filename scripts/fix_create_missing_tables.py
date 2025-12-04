@@ -42,7 +42,7 @@ def get_tables_from_migration(migration_name):
     """Obtiene las tablas que debería crear una migración"""
     loader = MigrationLoader(connection)
     migration = loader.get_migration_by_prefix("taller", migration_name)
-    
+
     tables = []
     for operation in migration.operations:
         if hasattr(operation, "name"):
@@ -58,7 +58,7 @@ def get_tables_from_migration(migration_name):
 def main():
     print("🔍 Verificando tablas de la migración 0001...")
     print("")
-    
+
     # Tablas que debería crear la migración 0001
     expected_tables = [
         "taller_categoriaservicio",
@@ -71,10 +71,10 @@ def main():
         "taller_repuesto",
         # Agregar más según sea necesario
     ]
-    
+
     missing_tables = []
     existing_tables = []
-    
+
     print("📊 Estado de las tablas:")
     for table in expected_tables:
         exists = table_exists(table)
@@ -84,49 +84,49 @@ def main():
         else:
             missing_tables.append(table)
             print(f"  ❌ {table} - FALTANTE")
-    
+
     print("")
-    
+
     if not missing_tables:
         print("✅ Todas las tablas existen. No hay nada que crear.")
         return 0
-    
+
     print(f"⚠️  Faltan {len(missing_tables)} tablas:")
     for table in missing_tables:
         print(f"   - {table}")
-    
+
     print("")
     response = input("¿Deseas crear las tablas faltantes usando sqlmigrate? (s/n): ")
-    
+
     if response.lower() != "s":
         print("❌ Operación cancelada.")
         return 1
-    
+
     print("")
     print("🔧 Obteniendo SQL de la migración 0001...")
-    
+
     # Obtener SQL de la migración
     try:
         from io import StringIO
         from django.core.management import call_command
-        
+
         output = StringIO()
         call_command("sqlmigrate", "taller", "0001_initial_migration", stdout=output)
         sql_content = output.getvalue()
-        
+
         print("📝 SQL obtenido. Buscando CREATE TABLE para tablas faltantes...")
         print("")
-        
+
         # Para cada tabla faltante, intentar extraer su CREATE TABLE
         for table in missing_tables:
             model_name = table.replace("taller_", "")
             print(f"🔍 Buscando CREATE TABLE para {table}...")
-            
+
             # Buscar en el SQL el CREATE TABLE correspondiente
             lines = sql_content.split("\n")
             in_create = False
             create_sql = []
-            
+
             for line in lines:
                 if f'CREATE TABLE "{table}"' in line or f"CREATE TABLE `{table}`" in line:
                     in_create = True
@@ -135,7 +135,7 @@ def main():
                     create_sql.append(line)
                     if ";" in line:
                         break
-            
+
             if create_sql:
                 sql_statement = "\n".join(create_sql)
                 print(f"✅ SQL encontrado para {table}")
@@ -145,7 +145,7 @@ def main():
                 print(sql_statement)
                 print("-" * 60)
                 print("")
-                
+
                 # Preguntar si ejecutar
                 execute = input(f"¿Ejecutar este SQL para crear {table}? (s/n): ")
                 if execute.lower() == "s":
@@ -159,20 +159,19 @@ def main():
             else:
                 print(f"⚠️  No se encontró CREATE TABLE para {table}")
                 print("   Necesitarás crearla manualmente o aplicar la migración completa")
-        
+
         print("")
         print("📝 Siguiente paso:")
         print("   Después de crear las tablas, ejecuta:")
         print("   python manage.py migrate taller 0004 --fake")
         print("   python manage.py migrate")
-        
+
     except Exception as e:
         print(f"❌ Error al obtener SQL: {e}")
         return 1
-    
+
     return 0
 
 
 if __name__ == "__main__":
     sys.exit(main())
-

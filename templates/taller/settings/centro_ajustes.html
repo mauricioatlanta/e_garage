@@ -1,0 +1,279 @@
+{% extends "base.html" %}
+{% load static i18n country_url %}
+
+{% block title %}⚙️ Centro de Ajustes - eGarage{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Asegurar que el body y el contenido tengan colores visibles */
+    body {
+        background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0f1629 100%) !important;
+        background-attachment: fixed;
+        color: #ffffff !important;
+    }
+
+    .settings-wrapper {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 1.5rem 1rem 2.5rem;
+        color: #ffffff !important;
+        position: relative;
+        z-index: 1;
+    }
+
+    .settings-header {
+        margin-bottom: 1.5rem;
+        text-align: left;
+    }
+
+    .settings-header h1 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        color: #ffffff !important;
+    }
+
+    .settings-header p {
+        opacity: 0.8;
+        font-size: 0.95rem;
+        color: #e0e0e0 !important;
+    }
+
+    .settings-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+        gap: 1rem;
+    }
+
+    .settings-card {
+        border-radius: 0.75rem;
+        padding: 1rem 1rem 1.2rem;
+        background: rgba(10, 14, 39, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        backdrop-filter: blur(10px);
+        color: #ffffff !important;
+    }
+
+    .settings-card h2 {
+        font-size: 1.05rem;
+        margin: 0 0 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        color: #ffffff !important;
+    }
+
+    .settings-card p {
+        font-size: 0.9rem;
+        opacity: 0.8;
+        margin: 0 0 0.8rem;
+        color: #e0e0e0 !important;
+    }
+
+    .settings-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        opacity: 0.7;
+        margin-bottom: 0.4rem;
+        color: #b0b0b0 !important;
+    }
+
+    .settings-tag span {
+        color: #b0b0b0 !important;
+    }
+
+    .settings-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.88rem;
+        padding: 0.45rem 0.9rem;
+        border-radius: 999px;
+        border: 1px solid rgba(0, 255, 255, 0.4);
+        text-decoration: none;
+        cursor: pointer;
+        transition: transform 0.15s ease, box-shadow 0.15s ease,
+                    border-color 0.15s ease, background 0.15s ease;
+        color: #00ffff !important;
+        background: rgba(0, 255, 255, 0.1);
+    }
+
+    .settings-link span {
+        font-size: 1rem;
+        color: #00ffff !important;
+    }
+
+    .settings-link:hover {
+        transform: translateY(-1px);
+        border-color: rgba(0, 255, 255, 0.8);
+        box-shadow: 0 0 12px rgba(0, 255, 255, 0.35);
+        background: rgba(0, 0, 0, 0.25);
+    }
+
+    @media (max-width: 600px) {
+        body {
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0f1629 100%) !important;
+            color: #ffffff !important;
+        }
+
+        .settings-wrapper {
+            padding-inline: 0.75rem;
+            color: #ffffff !important;
+        }
+
+        .settings-header h1 {
+            font-size: 1.4rem;
+            color: #ffffff !important;
+        }
+
+        .settings-header p {
+            color: #e0e0e0 !important;
+        }
+
+        .settings-card {
+            color: #ffffff !important;
+            background: rgba(10, 14, 39, 0.95) !important;
+        }
+
+        .settings-card h2 {
+            color: #ffffff !important;
+        }
+
+        .settings-card p {
+            color: #e0e0e0 !important;
+        }
+
+        .settings-link {
+            color: #00ffff !important;
+        }
+
+        .settings-link span {
+            color: #00ffff !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="settings-wrapper">
+    <header class="settings-header">
+        <h1>⚙️ Centro de Ajustes</h1>
+        <p>
+            Elige qué parte de tu eGarage quieres configurar.  
+            Aquí solo ves las secciones principales; cada botón te lleva a su formulario específico.
+        </p>
+    </header>
+
+    <section class="settings-grid">
+
+        {# ─── Empresa / Perfil público ─── #}
+        <article class="settings-card">
+            <div class="settings-tag">
+                <span>Empresa &amp; Marca</span>
+            </div>
+            <h2>🏢 Perfil de la empresa</h2>
+            <p>
+                Nombre público, eslogan, logo, datos de contacto y dirección legal.
+            </p>
+            {% country_url 'configuracion' app_namespace='direct' as url_config_empresa %}
+            <a href="{{ url_config_empresa|default:'#' }}" class="settings-link">
+                <span>Ir a configuración</span>
+                <span>↗</span>
+            </a>
+        </article>
+
+        {# ─── Precios / Moneda / Impuestos ─── #}
+        <article class="settings-card">
+            <div class="settings-tag">
+                <span>Finanzas</span>
+            </div>
+            <h2>💰 Precios &amp; moneda</h2>
+            <p>
+                Moneda por país, formato de precios, IVA / tax y políticas básicas de cobro.
+            </p>
+            {# Nota: Si tienes una URL específica para precios, reemplaza esta línea #}
+            {% url 'taller:company_settings' as url_settings %}
+            <a href="{{ url_settings }}#financial" class="settings-link">
+                <span>Configurar precios</span>
+                <span>↗</span>
+            </a>
+        </article>
+
+        {# ─── Técnicos / Equipo ─── #}
+        <article class="settings-card">
+            <div class="settings-tag">
+                <span>Equipo</span>
+            </div>
+            <h2>👨‍🔧 Técnicos &amp; usuarios internos</h2>
+            <p>
+                Alta y baja de técnicos, roles internos y parámetros básicos de desempeño.
+            </p>
+            {% country_url 'configuracion_tecnicos' app_namespace='direct' as url_config_tecnicos %}
+            <a href="{{ url_config_tecnicos|default:'#' }}" class="settings-link">
+                <span>Gestionar equipo</span>
+                <span>↗</span>
+            </a>
+        </article>
+
+        {# ─── Documentos / PDFs ─── #}
+        <article class="settings-card">
+            <div class="settings-tag">
+                <span>Documentos</span>
+            </div>
+            <h2>📄 Formatos de documentos</h2>
+            <p>
+                Encabezados, pies de página y estilos de cotizaciones, OTs y facturas internas.
+            </p>
+            {# Nota: Si tienes una URL específica para configuración de documentos, reemplaza esta línea #}
+            {% url 'taller:company_settings' as url_settings %}
+            <a href="{{ url_settings }}#theme" class="settings-link">
+                <span>Ajustar formatos</span>
+                <span>↗</span>
+            </a>
+        </article>
+
+        {# ─── Suscripción / Facturación eGarage ─── #}
+        <article class="settings-card">
+            <div class="settings-tag">
+                <span>Suscripción</span>
+            </div>
+            <h2>🌐 Plan &amp; suscripción eGarage</h2>
+            <p>
+                Información de tu plan actual, ciclo de cobro y estado de la suscripción.
+            </p>
+            {# Nota: Ajusta esta URL según tu configuración de suscripciones #}
+            {% if request.path|slice:":4" == "/cl/" %}
+                <a href="/cl/es/suscripcion/pago/" class="settings-link">
+            {% elif request.path|slice:":4" == "/us/" %}
+                <a href="/us/en/pricing/" class="settings-link">
+            {% else %}
+                <a href="#" class="settings-link">
+            {% endif %}
+                <span>Ver mi plan</span>
+                <span>↗</span>
+            </a>
+        </article>
+
+        {# ─── Seguridad / Accesos ─── #}
+        <article class="settings-card">
+            <div class="settings-tag">
+                <span>Seguridad</span>
+            </div>
+            <h2>🛡️ Accesos &amp; seguridad</h2>
+            <p>
+                Contraseñas, recuperación de acceso y reglas básicas de seguridad de cuenta.
+            </p>
+            <a href="{% url 'account_change_password' %}" class="settings-link">
+                <span>Gestionar seguridad</span>
+                <span>↗</span>
+            </a>
+        </article>
+
+    </section>
+</div>
+{% endblock %}
+

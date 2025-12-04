@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="min-h-screen bg-black text-white py-20 px-4 relative">
+<video autoplay="" class="absolute inset-0 w-full h-full object-cover z-0" loop="" muted="">
+<source src="{% static 'videos/fondo_autotech.mp4' %}" type="video/mp4"/>
+</video>
+<div class="absolute inset-0 bg-black bg-opacity-80 z-10"></div>
+<div class="relative z-20 max-w-xl mx-auto translucent-card/90 text-black backdrop-blur-md p-10 rounded-xl shadow-xl">
+<h1 class="text-3xl font-bold mb-6">✏️ Editar Servicio</h1>
+<form class="space-y-6" method="post">
+      {% csrf_token %}
+
+      <div>
+<label class="block font-semibold mb-1">Nombre del Servicio</label>
+        {{ form.nombre|add_class:"w-full p-2 rounded translucent-card text-black shadow" }}
+      </div>
+<div>
+<label class="block font-semibold mb-1">Subcategoría</label>
+        {{ form.subcategoria|add_class:"w-full p-2 rounded translucent-card text-black shadow" }}
+      </div>
+<div class="flex justify-end">
+<button class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded shadow btn-futuristic" type="submit">
+          💾 Guardar Cambios
+        </button>
+</div>
+</form>
+</div>
+</div>
+{% endblock %}

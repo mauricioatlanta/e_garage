@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+{% load country_url %}
+{% load i18n %}
+{% block title %}Clientes · eGarage{% endblock %}
+{% block content %}
+<div class="relative mx-auto max-w-7xl px-6 mt-10">
+  <div class="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+    <div class="absolute -top-32 -left-20 w-96 h-96 bg-gradient-to-tr from-cyan-500 via-fuchsia-500 to-lime-400 opacity-20 blur-3xl rounded-full animate-pulse"></div>
+    <div class="absolute bottom-0 right-0 w-[34rem] h-[34rem] bg-gradient-to-tr from-fuchsia-500 via-cyan-400 to-emerald-400 opacity-10 blur-3xl rounded-full animate-spin-slow"></div>
+  </div>
+  <div class="flex flex-col md:flex-row md:items-center gap-6 mb-10">
+    <div>
+      <div class="flex items-center gap-3 mb-2">
+        <h1 class="text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-cyan-300 via-lime-300 to-fuchsia-400 drop-shadow">Gestión de Clientes</h1>
+        {% include "components/country_badge.html" %}
+      </div>
+      <p class="mt-2 text-gray-400 max-w-2xl text-sm md:text-base">Listado inteligente con búsqueda dinámica, paginación y acciones rápidas.</p>
+    </div>
+    <div class="md:ml-auto flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+      <div class="flex-1 relative group">
+        <input type="text" id="search-input" name="q" value="{{ request.GET.q }}" placeholder="Buscar por nombre o apellido..." class="w-full bg-[#0f172a] border border-cyan-500/40 focus:border-cyan-400/70 rounded-xl px-5 py-3 text-white placeholder-gray-400 shadow-lg focus:ring-2 focus:ring-cyan-400/40 transition outline-none" style="color: white !important; background-color: #0f172a !important;" />
+        <button type="button" id="search-btn" class="absolute top-1/2 -translate-y-1/2 right-3 text-cyan-300 hover:text-lime-300 transition"><i class="fas fa-search"></i></button>
+        <div id="search-results" class="absolute top-full left-0 right-0 mt-1 bg-[#0f172a] border border-cyan-500/40 rounded-xl shadow-lg z-50 hidden max-h-60 overflow-y-auto"></div>
+      </div>
+      <a href="{% country_url 'clientes:crear_cliente' %}" class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 via-lime-500 to-fuchsia-500 text-[#0d1117] font-bold shadow-lg hover:shadow-cyan-500/40 text-sm md:text-base tracking-wide hover:scale-[1.03] transition active:scale-95"><span>➕</span><span>Nuevo Cliente</span></a>
+    </div>
+  </div>
+  <div class="relative rounded-3xl border border-cyan-400/20 bg-gradient-to-br from-[#0d1117] via-[#0f172a] to-[#111827] shadow-2xl overflow-hidden">
+    <div class="overflow-x-auto scrollbar-thin scrollbar-thumb-cyan-700/50 scrollbar-track-transparent">
+      <table class="w-full text-left text-sm md:text-base">
+        <thead class="bg-[#0e1a2b] text-cyan-300/90 uppercase text-xs tracking-wider font-semibold">
+          <tr>
+            <th class="px-5 py-4">ID</th>
+            <th class="px-5 py-4">Nombre</th>
+            <th class="px-5 py-4 hidden md:table-cell">Email</th>
+            <th class="px-5 py-4 hidden md:table-cell">Teléfono</th>
+            <th class="px-5 py-4 hidden xl:table-cell">Ciudad</th>
+            <th class="px-5 py-4">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-cyan-900/40" id="clientes-tbody">
+          {% for cliente in cliente_list %}
+            <tr class="hover:bg-cyan-500/10 transition group cliente-row" data-cliente-name="{{ cliente.nombre|lower }} {{ cliente.apellido|lower }}" data-cliente-email="{{ cliente.email|lower }}" data-cliente-telefono="{{ cliente.telefono }}">
+              <td class="px-5 py-4 font-mono text-cyan-300">#{{ cliente.pk }}</td>
+              <td class="px-5 py-4">
+                <div class="flex flex-col">
+                  <span class="font-semibold text-cyan-100 group-hover:text-lime-200 transition">{{ cliente.nombre }} {{ cliente.apellido }}</span>
+                  <span class="md:hidden text-xs text-gray-400">{{ cliente.email }}</span>
+                </div>
+              </td>
+              <td class="px-5 py-4 hidden md:table-cell text-gray-300">{{ cliente.email|default:'—' }}</td>
+              <td class="px-5 py-4 hidden md:table-cell text-gray-300">{{ cliente.telefono|default:'—' }}</td>
+              <td class="px-5 py-4 hidden xl:table-cell text-gray-300">{% if cliente.ciudad %}{{ cliente.ciudad.nombre }}{% else %}—{% endif %}</td>
+              <td class="px-5 py-4">
+                <div class="flex items-center gap-3">
+                  <a href="{% url 'chile:taller:clientes:ver_cliente' cliente.pk %}" class="text-cyan-300 hover:text-lime-300 transition" title="Ver">
+                    <i class="fas fa-eye"></i>
+                  </a>
+                  <a href="{% url 'chile:taller:clientes:editar_cliente' cliente.pk %}" class="text-cyan-300 hover:text-lime-300 transition" title="Editar">
+                    <i class="fas fa-edit"></i>
+                  </a>
+                  <a href="{% url 'chile:taller:clientes:eliminar_cliente' cliente.pk %}" class="text-red-400 hover:text-red-300 transition" title="Eliminar">
+                    <i class="fas fa-trash"></i>
+                  </a>
+                </div>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="6" class="px-5 py-12 text-center text-gray-400">No hay clientes registrados.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Paginación -->
+    {% if is_paginated %}
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 px-6 py-5 bg-[#0e1a2b]/60 border-t border-cyan-900/40">
+      <div class="text-xs text-gray-400 font-mono">
+        Mostrando {{ page_obj.start_index }} - {{ page_obj.end_index }} de {{ page_obj.paginator.count }} registros
+      </div>
+      <div class="flex items-center gap-2">
+        {% if page_obj.has_previous %}
+          <a href="?q={{ request.GET.q }}&page=1" class="px-3 py-1 rounded-lg bg-[#132034] text-cyan-300 hover:bg-cyan-600/20 transition text-xs">««</a>
+          <a href="?q={{ request.GET.q }}&page={{ page_obj.previous_page_number }}" class="px-3 py-1 rounded-lg bg-[#132034] text-cyan-300 hover:bg-cyan-600/20 transition text-xs">«</a>
+        {% else %}
+          <span class="px-3 py-1 rounded-lg bg-[#101a29] text-gray-600 text-xs">««</span>
+          <span class="px-3 py-1 rounded-lg bg-[#101a29] text-gray-600 text-xs">«</span>
+        {% endif %}
+
+        <span class="px-4 py-1 rounded-lg bg-cyan-600/20 text-cyan-200 font-semibold tracking-wider text-xs">
+          {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+        </span>
+
+        {% if page_obj.has_next %}
+          <a href="?q={{ request.GET.q }}&page={{ page_obj.next_page_number }}" class="px-3 py-1 rounded-lg bg-[#132034] text-cyan-300 hover:bg-cyan-600/20 transition text-xs">»</a>
+          <a href="?q={{ request.GET.q }}&page={{ page_obj.paginator.num_pages }}" class="px-3 py-1 rounded-lg bg-[#132034] text-cyan-300 hover:bg-cyan-600/20 transition text-xs">»»</a>
+        {% else %}
+          <span class="px-3 py-1 rounded-lg bg-[#101a29] text-gray-600 text-xs">»</span>
+          <span class="px-3 py-1 rounded-lg bg-[#101a29] text-gray-600 text-xs">»»</span>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+<style>
+@keyframes spin-slow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.animate-spin-slow {
+  animation: spin-slow 30s linear infinite;
+}
+.scrollbar-thin::-webkit-scrollbar {
+  height: 10px;
+  width: 10px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #164159;
+  border-radius: 6px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #1d5a79;
+}
+</style>
+
+<script>
+
+// Real-time search functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const searchInput = document.getElementById('search-input');
+  const searchResults = document.getElementById('search-results');
+  const searchBtn = document.getElementById('search-btn');
+  let searchTimeout;
+
+  if (!searchInput) return;
+
+  // Real-time search as user types
+  searchInput.addEventListener('input', function() {
+    const query = this.value.trim();
+
+    // Clear previous timeout
+    clearTimeout(searchTimeout);
+
+    if (query.length < 2) {
+      searchResults.classList.add('hidden');
+      return;
+    }
+
+    // Debounce search requests
+    searchTimeout = setTimeout(() => {
+      performSearch(query);
+    }, 300);
+  });
+
+  // Search button click
+  searchBtn.addEventListener('click', function() {
+    const query = searchInput.value.trim();
+    if (query) {
+      // Redirect to filtered results
+      window.location.href = '?q=' + encodeURIComponent(query);
+    }
+  });
+
+  // Enter key in search input
+  searchInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const query = this.value.trim();
+      if (query) {
+        window.location.href = '?q=' + encodeURIComponent(query);
+      }
+    }
+  });
+
+  // Hide results when clicking outside
+  document.addEventListener('click', function(e) {
+    if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+      searchResults.classList.add('hidden');
+    }
+  });
+
+  function performSearch(query) {
+    fetch(`{% country_url 'clientes:ajax_buscar_clientes' %}?q=${encodeURIComponent(query)}`)
+      .then(response => response.json())
+      .then(data => {
+        displaySearchResults(data);
+      })
+      .catch(error => {
+        console.error('Error en búsqueda:', error);
+        searchResults.classList.add('hidden');
+      });
+  }
+
+  function displaySearchResults(clientes) {
+    if (clientes.length === 0) {
+      searchResults.innerHTML = '<div class="p-3 text-gray-400 text-center">No se encontraron clientes</div>';
+    } else {
+      searchResults.innerHTML = clientes.map(cliente => `
+        <div class="p-3 hover:bg-cyan-500/10 cursor-pointer border-b border-cyan-900/20 last:border-b-0" onclick="selectCliente(${cliente.id})">
+          <div class="font-semibold text-cyan-100">${cliente.nombre} ${cliente.apellido}</div>
+          <div class="text-sm text-gray-400">${cliente.email || 'Sin email'}</div>
+          <div class="text-xs text-gray-500">${cliente.telefono || 'Sin teléfono'}</div>
+        </div>
+      `).join('');
+    }
+    searchResults.classList.remove('hidden');
+  }
+
+  function selectCliente(clienteId) {
+    // Redirect to client detail page
+    window.location.href = `{% url 'chile:taller:clientes:ver_cliente' 0 %}`.replace('0', clienteId);
+  }
+});
+
+</script>
+{% endblock %}

@@ -38,6 +38,8 @@ class Estado(models.Model):
             ("MX", "México"),  # ISO 3166-1: MX
             ("PE", "Perú"),  # ISO 3166-1: PE
             ("VE", "Venezuela"),  # ISO 3166-1: VE
+            ("CO", "Colombia"),  # ISO 3166-1: CO
+            ("EC", "Ecuador"),  # ISO 3166-1: EC
         ],
         help_text="Código de país ISO 3166-1 alpha-2",
     )

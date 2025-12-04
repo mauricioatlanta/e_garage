@@ -54,7 +54,14 @@ class ClienteForm(forms.ModelForm):
     region = forms.ModelChoiceField(
         queryset=TallerRegion.objects.all(),
         required=False,
-        widget=forms.Select(attrs={"id": "id_region", "class": "form-control"}),
+        widget=forms.Select(
+            attrs={
+                "id": "id_region",
+                "class": "form-control",
+                "data-ciudades-url": "/taller/clientes/ajax/ciudades/",
+                "data-param-name": "region_id",
+            }
+        ),
         empty_label="Seleccione Región",
     )
     ciudad = forms.ModelChoiceField(
@@ -70,7 +77,14 @@ class ClienteForm(forms.ModelForm):
     estado_usa = forms.ModelChoiceField(
         queryset=EstadoUSA.objects.all(),
         required=False,
-        widget=forms.Select(attrs={"id": "id_estado_usa", "class": "form-control"}),
+        widget=forms.Select(
+            attrs={
+                "id": "id_estado_usa",
+                "class": "form-control",
+                "data-ciudades-url": "/taller/clientes/ajax/ciudades_usa/",
+                "data-param-name": "estado_id",
+            }
+        ),
         empty_label="Seleccione estado o departamento",
         label="Estado/Departamento",
     )
@@ -145,9 +159,9 @@ class ClienteForm(forms.ModelForm):
             or ""
         )
 
-        # USA, Brasil, Venezuela, Perú: estado/ciudad/zipcode (usando modelo unificado)
+        # USA, Brasil, Venezuela, Perú, Colombia, Ecuador: estado/ciudad/zipcode (usando modelo unificado)
         # Filtrar estados por país de la empresa
-        estados_con_pais = ["US", "BR", "VE", "PE", "MX"]
+        estados_con_pais = ["US", "BR", "VE", "PE", "MX", "CO", "EC"]
         if self.pais in estados_con_pais:
             self.fields["estado_usa"].queryset = EstadoUSA.objects.filter(pais=self.pais).order_by(
                 "nombre"

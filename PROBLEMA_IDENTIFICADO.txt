@@ -1,0 +1,116 @@
+═══════════════════════════════════════════════════════════════
+        🔍 PROBLEMA IDENTIFICADO - LEE ESTO 🔍
+═══════════════════════════════════════════════════════════════
+
+
+❌ ESTÁS VIENDO LOCALHOST, NO EL SERVIDOR
+───────────────────────────────────────────────────────────────
+
+Vi tu captura de pantalla.
+La URL dice: http://127.0.0.1:8000/us/clientes/
+
+Esto es tu servidor LOCAL de desarrollo, NO el servidor de producción.
+
+Las cruces de colores están en GitHub, pero:
+✓ Tu servidor de producción NO las tiene todavía (si no hiciste git pull)
+✓ Tu localhost NUNCA las tendrá (a menos que hagas git pull local)
+
+
+SOLUCIÓN:
+───────────────────────────────────────────────────────────────
+
+1️⃣ ACTUALIZA EL SERVIDOR DE PRODUCCIÓN
+
+En SSH (PythonAnywhere), ejecuta:
+
+cd ~/e_garage
+git pull origin main
+touch /var/www/atlantareciclajes_pythonanywhere_com_wsgi.py
+
+
+2️⃣ ABRE EL SERVIDOR DE PRODUCCIÓN EN TU CELULAR
+
+NO abras: http://127.0.0.1:8000
+SÍ abre: https://atlantareciclajes.pythonanywhere.com/us/clientes/
+      O: https://www.egarage.cl/us/clientes/
+
+
+═══════════════════════════════════════════════════════════════
+          PROBLEMA DEL NOMBRE SIN CONTRASTE
+═══════════════════════════════════════════════════════════════
+
+En la imagen veo: "als auto repair" en gris claro
+Problema: Poco contraste con el fondo oscuro
+
+
+CAUSA:
+───────────────────────────────────────────────────────────────
+La clase .company-title tiene:
+color: #ffffff  (blanco)
+text-shadow: 0 0 10px rgba(255,255,255,0.5)
+
+Pero parece que algún otro estilo lo está sobrescribiendo.
+
+
+SOLUCIÓN RÁPIDA:
+───────────────────────────────────────────────────────────────
+
+Voy a crear un fix que FUERCE el color blanco con !important
+
+
+═══════════════════════════════════════════════════════════════
+                  PASOS A SEGUIR AHORA
+═══════════════════════════════════════════════════════════════
+
+PASO 1: Ejecutar git pull en el servidor
+───────────────────────────────────────────────────────────────
+En SSH:
+cd ~/e_garage
+git pull origin main
+touch /var/www/atlantareciclajes_pythonanywhere_com_wsgi.py
+
+
+PASO 2: Esperar 30 segundos
+───────────────────────────────────────────────────────────────
+Cuenta: 1, 2, 3, ... 30
+
+
+PASO 3: Abrir en celular el SERVIDOR, no localhost
+───────────────────────────────────────────────────────────────
+https://atlantareciclajes.pythonanywhere.com/us/clientes/
+
+NO:
+http://127.0.0.1:8000/us/clientes/  ← Este es localhost
+
+
+PASO 4: Buscar la cruz de color
+───────────────────────────────────────────────────────────────
+Debe aparecer en la esquina superior izquierda:
+
+🔵 AZUL = US/EN
+🔴 ROJO = US/ES
+
+
+═══════════════════════════════════════════════════════════════
+              VERIFICACIÓN DE URL
+═══════════════════════════════════════════════════════════════
+
+LOCALHOST (tu PC):
+✓ http://127.0.0.1:8000/          ← Desarrollo local
+✓ http://localhost:8000/
+
+PRODUCCIÓN (PythonAnywhere):
+✓ https://atlantareciclajes.pythonanywhere.com/
+✓ https://www.egarage.cl/
+
+
+PARA VER LAS CRUCES:
+───────────────────────────────────────────────────────────────
+Debes abrir: https://atlantareciclajes.pythonanywhere.com/us/clientes/
+           o https://www.egarage.cl/us/clientes/
+
+NO abras: http://127.0.0.1:8000/us/clientes/
+
+
+═══════════════════════════════════════════════════════════════
+

@@ -36,7 +36,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         dry_run = options.get("dry_run", False)
-        pais_filter = options.get("pais", "").upper()
+        pais_filter = (options.get("pais") or "").upper()
 
         if dry_run:
             self.stdout.write(self.style.WARNING("[DRY RUN] Simulación - no se guardarán cambios"))

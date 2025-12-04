@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">  <!-- Activar modo oscuro con class="dark" -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DocumentoForm - Modo Oscuro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Incluir estilos del tema -->
+    {% include "taller/documentos/_document_theme.html" %}
+    {% include "taller/documentos/_document_theme_dark.html" %}
+
+    <style>
+        body { background: #0f172a; } /* slate-900 */
+        .container { background: transparent; }
+    </style>
+</head>
+<body class="bg-slate-900 text-white">
+    <div class="container mx-auto p-4">
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold mb-2">DocumentoForm - Modo Oscuro</h1>
+            <p class="text-slate-300">Ejemplo con tema dinámico en modo oscuro</p>
+        </div>
+
+        <!-- Ejemplo de shell dinámico -->
+        <div id="doc-shell" class="doc-shell theme-ot">
+            <div class="flex items-center justify-between mb-4">
+                <div class="space-x-2">
+                    <span id="doc-chip" class="doc-chip chip-ot">🔧 OT</span>
+                    <span class="text-xs text-slate-400">#123</span>
+                </div>
+                <div class="text-xs text-slate-400">
+                    Mi Empresa • CLP
+                </div>
+            </div>
+
+            <!-- Controles de ejemplo -->
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-slate-200">Tipo de Documento</label>
+                    <select id="id_tipo" class="w-full p-2 rounded border border-slate-600 bg-slate-800 text-white">
+                        <option value="OT">🔧 Orden de Trabajo</option>
+                        <option value="PRES">📋 Presupuesto</option>
+                        <option value="REC">🧾 Recibo</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2 text-slate-200">Cliente</label>
+                        <input type="text" class="w-full p-2 rounded border border-slate-600 bg-slate-800 text-white" placeholder="Buscar cliente...">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2 text-slate-200">Vehículo</label>
+                        <input type="text" class="w-full p-2 rounded border border-slate-600 bg-slate-800 text-white" placeholder="Buscar vehículo...">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-slate-200">Observaciones</label>
+                    <textarea class="w-full p-2 rounded border border-slate-600 bg-slate-800 text-white h-20" placeholder="Observaciones del documento..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información sobre activación -->
+        <div class="mt-8 p-4 bg-slate-800 rounded-lg border border-slate-600">
+            <h3 class="text-lg font-semibold mb-2">Activar Modo Oscuro</h3>
+            <div class="space-y-2 text-sm text-slate-300">
+                <p><strong>Opción 1:</strong> Agregar <code class="bg-slate-700 px-1 rounded">class="dark"</code> al elemento <code>&lt;html&gt;</code></p>
+                <p><strong>Opción 2:</strong> Agregar <code class="bg-slate-700 px-1 rounded">data-theme="dark"</code> al elemento <code>&lt;body&gt;</code></p>
+                <p><strong>CSS incluido:</strong> Los estilos se activan automáticamente con cualquiera de las dos opciones</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tema dinámico del documento
+        (function () {
+            const shell = document.getElementById('doc-shell');
+            const chip  = document.getElementById('doc-chip');
+            const tipo  = document.getElementById('id_tipo');
+
+            // Mapas de clases por tipo
+            const shellThemes = {
+                'OT':   ['theme-ot'],
+                'PRES': ['theme-pres'],
+                'REC':  ['theme-rec'],
+            };
+            const chipThemes = {
+                'OT':   { classes: ['chip-ot'],   label: '🔧 OT' },
+                'PRES': { classes: ['chip-pres'], label: '📋 PRES' },
+                'REC':  { classes: ['chip-rec'],  label: '🧾 REC' },
+            };
+
+            function resetShellThemes() {
+                shell.classList.remove('theme-ot', 'theme-pres', 'theme-rec');
+            }
+            function resetChipThemes() {
+                chip.classList.remove('chip-ot', 'chip-pres', 'chip-rec');
+            }
+
+            function applyTheme(value) {
+                const v = (value || 'OT').toUpperCase();
+                resetShellThemes();
+                resetChipThemes();
+                (shellThemes[v] || shellThemes['OT']).forEach(c => shell.classList.add(c));
+                const conf = chipThemes[v] || chipThemes['OT'];
+                conf.classes.forEach(c => chip.classList.add(c));
+                chip.textContent = conf.label;
+            }
+
+            // Inicializa
+            applyTheme('OT');
+
+            // Reacciona a cambios del select
+            tipo.addEventListener('change', function (e) {
+                applyTheme(e.target.value);
+            });
+        })();
+    </script>
+</body>
+</html>

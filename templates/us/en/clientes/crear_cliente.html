@@ -5,30 +5,6 @@
 {% load i18n %}
 
 {% block extra_head %}
-<!-- 🔴 CRUZ ROJA - Template: templates/us/en/clientes/crear_cliente.html -->
-<style>
-.debug-marker-red {
-  position: fixed;
-  top: 10px;
-  right: 10px;
-  z-index: 99999;
-  background: rgba(255, 0, 0, 0.9);
-  color: white;
-  padding: 15px 20px;
-  border-radius: 8px;
-  font-family: monospace;
-  font-weight: bold;
-  font-size: 16px;
-  box-shadow: 0 0 30px rgba(255, 0, 0, 1);
-  border: 4px solid #ff0000;
-  text-align: center;
-}
-.debug-marker-red::before {
-  content: '🔴 CRUZ ROJA\A templates/us/en/clientes/crear_cliente.html';
-  white-space: pre;
-}
-</style>
-<div class="debug-marker-red"></div>
 <link href="/static/css/estilo_futurista.css" rel="stylesheet">
 <link href="/static/css/galaxy_theme.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -748,7 +724,7 @@ h1 {
           <div class="field-with-button" style="display: flex !important; gap: 12px !important; align-items: flex-end !important; width: 100% !important; visibility: visible !important; opacity: 1 !important;">
             <div style="flex: 1;">
               <label for="{{ form.estado_usa.id_for_label }}">STATE</label>
-              {{ form.estado_usa }}
+              {{ form.estado_usa|add_attr:"onchange:egLoadCiudadesUSA(this.value)" }}
               {% if form.estado_usa.errors %}
                 <div class="errorlist">{{ form.estado_usa.errors.0 }}</div>
               {% endif %}
@@ -816,7 +792,7 @@ h1 {
     </div>
     <div class="modal-footer">
       <button class="btn-modal btn-modal-secondary" onclick="closeStateModal()">CANCEL</button>
-      <button class="btn-modal btn-modal-primary" onclick="createState()">CREATE STATE</button>
+      <button class="btn-modal btn-modal-primary" onclick="createState(event)">CREATE STATE</button>
     </div>
   </div>
 </div>
@@ -844,86 +820,20 @@ h1 {
     </div>
     <div class="modal-footer">
       <button class="btn-modal btn-modal-secondary" onclick="closeCityModal()">CANCEL</button>
-      <button class="btn-modal btn-modal-primary" onclick="createCity()">CREATE CITY</button>
+      <button class="btn-modal btn-modal-primary" onclick="createCity(event)">CREATE CITY</button>
     </div>
   </div>
 </div>
 
+<!-- =============================================== -->
+<!-- SCRIPT PARA MODALES (Add State / Add City)    -->
+<!-- Con protección null-safe en todos los accesos -->
+<!-- =============================================== -->
+
 <script>
-// JavaScript para cargar ciudades cuando se selecciona un estado
-document.addEventListener('DOMContentLoaded', function() {
-    const estadoSelect = document.getElementById('id_estado_usa');
-    const ciudadSelect = document.getElementById('id_ciudad_usa');
-    
-    console.log('🔍 Estado select encontrado:', estadoSelect);
-    console.log('🔍 Ciudad select encontrado:', ciudadSelect);
-    
-    // Verificar que ambos elementos existan
-    if (!estadoSelect) {
-        console.error('❌ No se encontró el elemento id_estado_usa');
-        return;
-    }
-    
-    if (!ciudadSelect) {
-        console.error('❌ No se encontró el elemento id_ciudad_usa');
-        return;
-    }
-    
-    // URL del endpoint para obtener ciudades
-    const urlObtenerCiudades = '{% country_url "clientes:obtener_ciudades_usa" %}';
-    console.log('🔗 URL para obtener ciudades:', urlObtenerCiudades);
-    
-    // Cargar estados en el modal de ciudad
-    loadStatesIntoCityModal();
-    
-    estadoSelect.addEventListener('change', function() {
-        const estadoId = this.value;
-        console.log('📌 Estado seleccionado:', estadoId);
-        
-        if (estadoId) {
-            ciudadSelect.innerHTML = '<option value="">Loading cities...</option>';
-            ciudadSelect.disabled = true;
-            
-            const url = `${urlObtenerCiudades}?estado_id=${estadoId}`;
-            console.log('🌐 Haciendo fetch a:', url);
-            
-            fetch(url)
-                .then(response => {
-                    console.log('📥 Respuesta recibida:', response.status, response.statusText);
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('✅ Datos recibidos:', data);
-                    ciudadSelect.innerHTML = '<option value="">Select City</option>';
-                    ciudadSelect.disabled = false;
-                    
-                    if (Array.isArray(data) && data.length > 0) {
-                        data.forEach(ciudad => {
-                            const option = document.createElement('option');
-                            option.value = ciudad.id;
-                            option.textContent = ciudad.nombre;
-                            ciudadSelect.appendChild(option);
-                        });
-                        console.log(`✅ ${data.length} ciudades cargadas`);
-                    } else {
-                        ciudadSelect.innerHTML = '<option value="">No cities available</option>';
-                        console.warn('⚠️ No se encontraron ciudades para este estado');
-                    }
-                })
-                .catch(error => {
-                    console.error('❌ Error loading cities:', error);
-                    ciudadSelect.innerHTML = '<option value="">Error loading cities</option>';
-                    ciudadSelect.disabled = false;
-                });
-        } else {
-            ciudadSelect.innerHTML = '<option value="">Select State first</option>';
-            ciudadSelect.disabled = false;
-        }
-    });
-});
+// ===============================================
+// FUNCIONES PARA MODALES - NULL-SAFE
+// ===============================================
 
 function loadStatesIntoCityModal() {
     const estadoSelect = document.getElementById('id_estado_usa');
@@ -942,37 +852,54 @@ function loadStatesIntoCityModal() {
     }
 }
 
-// Modal Functions
 function openStateModal() {
-    document.getElementById('stateModal').classList.add('active');
-    document.getElementById('newStateName').value = '';
-    document.getElementById('newStateCode').value = '';
-    document.getElementById('stateErrorMessage').style.display = 'none';
-    document.getElementById('stateSuccessMessage').style.display = 'none';
+    const modal = document.getElementById('stateModal');
+    const nameField = document.getElementById('newStateName');
+    const codeField = document.getElementById('newStateCode');
+    const errorMsg = document.getElementById('stateErrorMessage');
+    const successMsg = document.getElementById('stateSuccessMessage');
+    
+    if (!modal) return;
+    
+    modal.classList.add('active');
+    if (nameField) nameField.value = '';
+    if (codeField) codeField.value = '';
+    if (errorMsg) errorMsg.style.display = 'none';
+    if (successMsg) successMsg.style.display = 'none';
 }
 
 function closeStateModal() {
-    document.getElementById('stateModal').classList.remove('active');
+    const modal = document.getElementById('stateModal');
+    if (modal) modal.classList.remove('active');
 }
 
 function openCityModal() {
     const estadoSelect = document.getElementById('id_estado_usa');
+    const modal = document.getElementById('cityModal');
+    const nameField = document.getElementById('newCityName');
+    const stateField = document.getElementById('newCityState');
+    const errorMsg = document.getElementById('cityErrorMessage');
+    const successMsg = document.getElementById('citySuccessMessage');
+    
     if (!estadoSelect || !estadoSelect.value) {
         alert('Please select a state first before adding a city.');
-        estadoSelect?.focus();
+        if (estadoSelect) estadoSelect.focus();
         return;
     }
     
+    if (!modal) return;
+    
     loadStatesIntoCityModal();
-    document.getElementById('cityModal').classList.add('active');
-    document.getElementById('newCityName').value = '';
-    document.getElementById('newCityState').value = estadoSelect.value;
-    document.getElementById('cityErrorMessage').style.display = 'none';
-    document.getElementById('citySuccessMessage').style.display = 'none';
+    modal.classList.add('active');
+    if (nameField) nameField.value = '';
+    if (stateField) stateField.value = estadoSelect.value;
+    if (errorMsg) errorMsg.style.display = 'none';
+    if (successMsg) successMsg.style.display = 'none';
 }
 
 function closeCityModal() {
-    document.getElementById('cityModal').classList.remove('active');
+    const modal = document.getElementById('cityModal');
+    if (modal) modal.classList.remove('active');
 }
 
 // Close modals on overlay click
@@ -988,31 +915,48 @@ document.getElementById('cityModal')?.addEventListener('click', function(e) {
     }
 });
 
-// Create State
-function createState() {
-    const name = document.getElementById('newStateName').value.trim();
-    const code = document.getElementById('newStateCode').value.trim().toUpperCase();
+// ===============================================
+// FUNCIONES DE CREACIÓN - NULL-SAFE
+// ===============================================
+
+function createState(ev) {
+    const nameField = document.getElementById('newStateName');
+    const codeField = document.getElementById('newStateCode');
     const errorDiv = document.getElementById('stateErrorMessage');
     const successDiv = document.getElementById('stateSuccessMessage');
-    const createBtn = event.target;
+    const createBtn = ev ? ev.target : null;
     
-    errorDiv.style.display = 'none';
-    successDiv.style.display = 'none';
+    if (!nameField || !codeField) {
+        console.error('Campos de estado no encontrados');
+        return;
+    }
+    
+    const name = nameField.value.trim();
+    const code = codeField.value.trim().toUpperCase();
+    
+    if (errorDiv) errorDiv.style.display = 'none';
+    if (successDiv) successDiv.style.display = 'none';
     
     if (!name || !code) {
-        errorDiv.textContent = 'State name and code are required.';
-        errorDiv.style.display = 'block';
+        if (errorDiv) {
+            errorDiv.textContent = 'State name and code are required.';
+            errorDiv.style.display = 'block';
+        }
         return;
     }
     
     if (code.length > 10) {
-        errorDiv.textContent = 'State code must be 10 characters or less.';
-        errorDiv.style.display = 'block';
+        if (errorDiv) {
+            errorDiv.textContent = 'State code must be 10 characters or less.';
+            errorDiv.style.display = 'block';
+        }
         return;
     }
     
-    createBtn.classList.add('loading');
-    createBtn.disabled = true;
+    if (createBtn) {
+        createBtn.classList.add('loading');
+        createBtn.disabled = true;
+    }
     
     const formData = new FormData();
     formData.append('nombre', name);
@@ -1066,12 +1010,20 @@ function createState() {
 }
 
 // Create City
-function createCity() {
-    const name = document.getElementById('newCityName').value.trim();
-    const stateId = document.getElementById('newCityState').value;
+function createCity(ev) {
+    const nameField = document.getElementById('newCityName');
+    const stateField = document.getElementById('newCityState');
     const errorDiv = document.getElementById('cityErrorMessage');
     const successDiv = document.getElementById('citySuccessMessage');
-    const createBtn = event.target;
+    const createBtn = ev ? ev.target : null;
+    
+    if (!nameField || !stateField) {
+        console.error('Campos de ciudad no encontrados');
+        return;
+    }
+    
+    const name = nameField.value.trim();
+    const stateId = stateField.value;
     
     errorDiv.style.display = 'none';
     successDiv.style.display = 'none';
@@ -1220,4 +1172,122 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 100);
 });
 </script>
+
+<!-- =============================================== -->
+<!-- SCRIPT INLINE PARA ESTADO → CIUDAD USA        -->
+<!-- Compatible con PC y móviles - VERSIÓN REFORZADA -->
+<!-- =============================================== -->
+<script>
+(function() {
+    'use strict';
+
+    function initEstadoCiudadUSA() {
+        const estadoSelect = document.getElementById('id_estado_usa');
+        const ciudadSelect = document.getElementById('id_ciudad_usa');
+
+        if (!estadoSelect || !ciudadSelect) {
+            console.log('[Estado→Ciudad USA] Selectores no encontrados');
+            return;
+        }
+
+        console.log('✅ [Estado→Ciudad USA] Inicializando...');
+
+        // URL del endpoint - directamente desde Django
+        const baseUrl = '{% country_url "clientes:obtener_ciudades_usa" %}';
+        console.log('🔗 URL del endpoint:', baseUrl);
+
+        function setCiudadesOptions(options, placeholder) {
+            ciudadSelect.innerHTML = '';
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = placeholder || 'Selecciona ciudad';
+            ciudadSelect.appendChild(defaultOption);
+
+            if (options && options.length > 0) {
+                options.forEach(function(ciudad) {
+                    const opt = document.createElement('option');
+                    opt.value = ciudad.id;
+                    opt.textContent = ciudad.nombre;
+                    ciudadSelect.appendChild(opt);
+                });
+                ciudadSelect.disabled = false;
+            } else {
+                ciudadSelect.disabled = true;
+            }
+        }
+
+        function loadCiudades(estadoId) {
+            if (!estadoId) {
+                setCiudadesOptions([], 'Selecciona un estado primero');
+                return;
+            }
+
+            console.log('🔄 [Estado→Ciudad USA] Cargando ciudades para estado:', estadoId);
+            setCiudadesOptions([], 'Cargando ciudades...');
+
+            const url = baseUrl + '?estado_id=' + encodeURIComponent(estadoId);
+            console.log('🌐 URL completa:', url);
+
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                },
+                credentials: 'same-origin'
+            })
+            .then(function(response) {
+                console.log('📥 Respuesta:', response.status, response.statusText);
+                if (!response.ok) {
+                    throw new Error('Error HTTP ' + response.status);
+                }
+                return response.json();
+            })
+            .then(function(data) {
+                console.log('✅ Ciudades recibidas:', data);
+                const ciudades = data.ciudades || data;
+                
+                if (Array.isArray(ciudades) && ciudades.length > 0) {
+                    console.log('✅ [Estado→Ciudad USA]', ciudades.length, 'ciudades cargadas');
+                    setCiudadesOptions(ciudades, 'Selecciona ciudad');
+                } else {
+                    console.warn('⚠️ [Estado→Ciudad USA] No hay ciudades');
+                    setCiudadesOptions([], 'No hay ciudades disponibles');
+                }
+            })
+            .catch(function(error) {
+                console.error('❌ [Estado→Ciudad USA] Error:', error);
+                setCiudadesOptions([], 'Error al cargar ciudades');
+                alert('No se pudieron cargar las ciudades. Intenta recargar la página.');
+            });
+        }
+
+        // Listener principal - funciona en PC y móviles
+        estadoSelect.addEventListener('change', function(e) {
+            loadCiudades(e.target.value);
+        });
+
+        // Exponer función global como fallback (para usarla desde HTML)
+        window.egLoadCiudadesUSA = loadCiudades;
+
+        // Estado inicial
+        if (estadoSelect.value) {
+            console.log('🔄 [Estado→Ciudad USA] Estado pre-seleccionado');
+            loadCiudades(estadoSelect.value);
+        } else {
+            setCiudadesOptions([], 'Selecciona un estado primero');
+        }
+
+        console.log('✅ [Estado→Ciudad USA] Handler configurado');
+    }
+
+    // Asegurar que se ejecute tanto en PC como en móvil
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initEstadoCiudadUSA);
+    } else {
+        initEstadoCiudadUSA();
+    }
+})();
+</script>
+
 {% endblock %}

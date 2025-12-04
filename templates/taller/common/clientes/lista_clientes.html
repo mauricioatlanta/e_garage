@@ -3,6 +3,9 @@
 {% load country_url %}
 {% load static %}
 
+<!-- 🟢 CRUZ VERDE DE VERIFICACIÓN - SI VES ESTO, EL ARCHIVO SE ACTUALIZÓ -->
+<div style="position: fixed; top: 10px; right: 10px; width: 60px; height: 60px; background-color: #00ff00; z-index: 99999; border: 4px solid #000; display: flex; align-items: center; justify-content: center; font-size: 40px; border-radius: 8px; box-shadow: 0 0 20px rgba(0, 255, 0, 0.8);">✅</div>
+
 {% block page_title %}{% trans "CLIENTS" %}{% endblock %}
 {% block page_subtitle %}{% trans "Client management system" %}{% endblock %}
 {% block page_icon %}👥{% endblock %}
@@ -36,62 +39,16 @@
 
 {% block page_extra_css %}
 <style>
-/* --- MOBILE OPTIMIZATIONS - ULTRA ESPECÍFICO --- */
-@media screen and (max-width: 768px) {
-    /* Forzar visibilidad del texto con máxima especificidad */
-    body .md\:hidden .flex-wrap a span,
-    body .space-y-3 .flex-wrap a span,
-    body .border-t.flex-wrap a span,
-    body div.flex-wrap a span.font-semibold,
-    body .flex-wrap a span:not(.text-lg),
-    body .flex-wrap > a > span {
-        display: inline !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-        position: relative !important;
-        width: auto !important;
-        height: auto !important;
-        font-size: 0.95rem !important;
-        font-weight: 800 !important;
-        color: #00ffff !important;
-        text-shadow: 0 0 12px rgba(0, 255, 255, 0.9), 0 2px 4px rgba(0, 0, 0, 1) !important;
-        letter-spacing: 0.5px !important;
-        text-transform: uppercase !important;
-        line-height: 1.3 !important;
-        margin-left: 0.3rem !important;
-    }
-    
-    /* Asegurar que los botones tengan espacio */
-    body .flex-wrap a {
-        min-height: 48px !important;
-        padding: 0.85rem 1.1rem !important;
-        display: inline-flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        flex-wrap: nowrap !important;
-        gap: 0.4rem !important;
-    }
-    
-    /* Iconos también visibles y más grandes */
-    body .flex-wrap a .text-lg,
-    body .flex-wrap a span.text-lg {
-        display: inline !important;
-        font-size: 1.4rem !important;
-        filter: drop-shadow(0 0 8px rgba(0, 255, 255, 0.6)) !important;
-    }
-}
-
-/* Específico para móviles pequeños */
-@media screen and (max-width: 480px) {
-    body .flex-wrap a {
-        min-width: 110px !important;
-        font-size: 0.9rem !important;
-    }
-    
-    body .flex-wrap a span:not(.text-lg) {
-        font-size: 0.85rem !important;
-        font-weight: 900 !important;
-    }
+/* 🎨 DISEÑO FUTURISTA Y TECNOLÓGICO - OPTIMIZADO PARA MÓVIL */
+:root {
+    --cyber-blue: #00ffff;
+    --cyber-green: #00ff88;
+    --cyber-purple: #bc13fe;
+    --cyber-red: #ff2a6d;
+    --cyber-gold: #ffd700;
+    --dark-bg: #0a0a0a;
+    --card-bg: rgba(16, 20, 24, 0.95);
+    --glass-bg: rgba(255, 255, 255, 0.05);
 }
 
 /* --- TYPOGRAPHY & HEADERS --- */
@@ -99,108 +56,539 @@
 .font-tech { font-family: 'Rajdhani', sans-serif; }
 .font-code { font-family: 'Share Tech Mono', monospace; }
 
-/* --- TABLE --- */
+/* --- TABLE DESKTOP --- */
 .cyber-table-container {
-    background: rgba(10, 20, 40, 0.6);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(0, 243, 255, 0.2);
-    border-top: 2px solid rgba(0, 243, 255, 1);
-    position: relative;
-    border-radius: 6px;
+    background: var(--card-bg);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(0, 243, 255, 0.3);
+    border-top: 3px solid var(--cyber-blue);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 255, 255, 0.15);
+    overflow: hidden;
 }
 
-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+table { 
+    width: 100%; 
+    border-collapse: separate; 
+    border-spacing: 0; 
+}
 
 thead th {
-    background: rgba(0, 10, 20, 0.8);
-    color: rgba(0, 243, 255, 1);
+    background: rgba(0, 10, 20, 0.95);
+    color: var(--cyber-blue);
     font-family: 'Orbitron', sans-serif;
     font-size: 0.75rem;
-    letter-spacing: 2px;
+    letter-spacing: 2.5px;
     text-transform: uppercase;
-    padding: 18px 24px;
+    padding: 20px 24px;
     text-align: left;
-    border-bottom: 1px solid rgba(0, 243, 255, 0.3);
+    border-bottom: 2px solid rgba(0, 243, 255, 0.4);
+    text-shadow: 0 0 10px rgba(0, 243, 255, 0.6);
 }
 
 tbody td {
-    padding: 16px 24px;
+    padding: 18px 24px;
     vertical-align: middle;
-    color: #e0e6ed;
+    color: #e8f0f7;
     font-family: 'Rajdhani', sans-serif;
     font-weight: 500;
     font-size: 1.05rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.3s ease;
+}
+
+tbody tr {
+    transition: all 0.3s ease;
+    position: relative;
 }
 
 tbody tr:hover {
-    background: rgba(0, 243, 255, 0.05);
+    background: rgba(0, 243, 255, 0.08);
+    box-shadow: inset 0 0 20px rgba(0, 243, 255, 0.1);
 }
 
-.data-id { color: rgba(188, 19, 254, 1); font-family: 'Share Tech Mono', monospace; }
-.data-primary { color: #fff; font-weight: 700; font-size: 1.1rem; }
-.data-sub { color: #94a3b8; font-size: 0.9rem; }
+tbody tr::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--cyber-blue);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+tbody tr:hover::before {
+    opacity: 1;
+}
+
+.data-id { 
+    color: var(--cyber-purple); 
+    font-family: 'Share Tech Mono', monospace; 
+    font-weight: 700;
+    text-shadow: 0 0 8px rgba(188, 19, 254, 0.5);
+}
+
+.data-primary { 
+    color: #fff; 
+    font-weight: 700; 
+    font-size: 1.15rem;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+}
+
+.data-sub { 
+    color: #94a3b8; 
+    font-size: 0.9rem; 
+}
+
+/* --- MOBILE CARDS - DISEÑO FUTURISTA --- */
+.client-card-futuristic {
+    background: linear-gradient(145deg, var(--card-bg), rgba(0, 50, 80, 0.3));
+    border: 1px solid rgba(0, 243, 255, 0.3);
+    border-radius: 16px;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 
+        0 4px 16px rgba(0, 0, 0, 0.4),
+        0 0 40px rgba(0, 243, 255, 0.05);
+}
+
+.client-card-futuristic::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, 
+        transparent 30%, 
+        rgba(0, 212, 255, 0.4) 50%, 
+        transparent 70%);
+    border-radius: 16px;
+    z-index: -1;
+    opacity: 0;
+    animation: border-glow 3s linear infinite;
+    background-size: 200% 200%;
+}
+
+.client-card-futuristic:hover::before {
+    opacity: 1;
+}
+
+.client-card-futuristic:hover {
+    transform: translateY(-4px);
+    border-color: rgba(0, 243, 255, 0.6);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.5),
+        0 0 60px rgba(0, 243, 255, 0.15),
+        inset 0 1px 0 rgba(0, 255, 255, 0.2);
+}
+
+@keyframes border-glow {
+    0% { background-position: 0% 0%; }
+    50% { background-position: 100% 100%; }
+    100% { background-position: 0% 0%; }
+}
+
+.client-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.client-card-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    margin-bottom: 0.25rem;
+}
+
+.client-card-id {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--cyber-purple);
+    text-shadow: 0 0 8px rgba(188, 19, 254, 0.6);
+}
+
+.client-card-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    border: 1px solid rgba(0, 243, 255, 0.1);
+}
+
+.client-card-info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+    color: #c5d4e3;
+}
+
+.client-card-info-icon {
+    color: var(--cyber-blue);
+    font-size: 0.9rem;
+    filter: drop-shadow(0 0 4px rgba(0, 243, 255, 0.6));
+    min-width: 16px;
+}
+
+/* --- BOTONES MÓVILES FUTURISTAS --- */
+.client-actions {
+    display: flex !important;
+    gap: 0.5rem !important;
+    padding-top: 1rem !important;
+    border-top: 1px solid rgba(0, 243, 255, 0.2) !important;
+}
+
+.btn-futuristic {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.4rem !important;
+    padding: 0.85rem 0.5rem !important;
+    background: linear-gradient(135deg, rgba(5, 15, 30, 0.95) 0%, rgba(10, 25, 45, 0.95) 100%) !important;
+    border: 1px solid rgba(0, 212, 255, 0.4) !important;
+    border-radius: 10px !important;
+    text-decoration: none !important;
+    color: #b0e0ff !important;
+    font-family: 'Orbitron', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 0.75rem !important;
+    letter-spacing: 0.5px !important;
+    text-transform: uppercase !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative !important;
+    overflow: hidden !important;
+    box-shadow: 0 2px 8px rgba(0, 212, 255, 0.2) !important;
+    min-height: 70px !important;
+}
+
+.btn-futuristic::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(0, 212, 255, 0.2) 50%,
+        transparent 100%);
+    transition: left 0.5s ease;
+}
+
+.btn-futuristic:hover::before {
+    left: 100%;
+}
+
+.btn-futuristic:hover {
+    transform: translateY(-2px);
+    border-color: rgba(0, 212, 255, 0.8);
+    color: #ffffff;
+    background: linear-gradient(135deg, rgba(10, 25, 45, 0.98) 0%, rgba(15, 35, 55, 0.98) 100%);
+    box-shadow:
+        0 0 20px rgba(0, 212, 255, 0.4),
+        0 0 40px rgba(0, 212, 255, 0.2),
+        inset 0 1px 0 rgba(0, 255, 255, 0.3);
+}
+
+.btn-futuristic:active {
+    transform: translateY(0);
+}
+
+.btn-futuristic-icon {
+    font-size: 1.6rem !important;
+    filter: drop-shadow(0 0 6px rgba(0, 212, 255, 0.7)) !important;
+    transition: filter 0.3s ease !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.btn-futuristic:hover .btn-futuristic-icon {
+    filter: drop-shadow(0 0 10px rgba(0, 255, 255, 1)) !important;
+}
+
+.btn-futuristic-text {
+    font-size: 0.8rem !important;
+    text-shadow: 0 0 8px rgba(0, 212, 255, 0.5) !important;
+    letter-spacing: 1px !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    color: #00ffff !important;
+}
+
+.btn-futuristic:hover .btn-futuristic-text {
+    text-shadow: 0 0 12px rgba(0, 255, 255, 0.8) !important;
+}
+
+/* Botón DELETE con tema rojo */
+.btn-futuristic-delete {
+    border-color: rgba(239, 68, 68, 0.4);
+    color: #ffb3b3;
+}
+
+.btn-futuristic-delete::before {
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(239, 68, 68, 0.2) 50%,
+        transparent 100%);
+}
+
+.btn-futuristic-delete:hover {
+    border-color: rgba(239, 68, 68, 0.8);
+    background: linear-gradient(135deg, rgba(30, 10, 15, 0.98) 0%, rgba(45, 15, 20, 0.98) 100%);
+    box-shadow:
+        0 0 20px rgba(239, 68, 68, 0.4),
+        0 0 40px rgba(239, 68, 68, 0.2),
+        inset 0 1px 0 rgba(255, 150, 150, 0.3);
+}
+
+.btn-futuristic-delete .btn-futuristic-icon {
+    filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.7));
+}
+
+.btn-futuristic-delete:hover .btn-futuristic-icon {
+    filter: drop-shadow(0 0 10px rgba(255, 100, 100, 1));
+}
 
 /* --- SEARCH RESULTS --- */
 .search-result-item {
-    padding: 12px 20px;
+    padding: 14px 20px;
     border-bottom: 1px solid rgba(255,255,255,0.05);
     cursor: pointer;
-    transition: 0.2s;
-}
-.search-result-item:hover {
-    background: rgba(0, 243, 255, 0.1);
-    padding-left: 25px;
-    border-left: 3px solid rgba(0, 243, 255, 1);
+    transition: all 0.3s ease;
+    position: relative;
 }
 
-/* --- BUTTONS --- */
+.search-result-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 0;
+    background: var(--cyber-blue);
+    transition: width 0.3s ease;
+}
+
+.search-result-item:hover {
+    background: rgba(0, 243, 255, 0.1);
+    padding-left: 28px;
+}
+
+.search-result-item:hover::before {
+    width: 4px;
+}
+
+/* --- BUTTONS DESKTOP --- */
 .btn-icon-only {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid rgba(255,255,255,0.2);
+    border: 1px solid rgba(0, 243, 255, 0.3);
     color: #94a3b8;
-    border-radius: 4px;
-    transition: 0.2s;
-    background: rgba(0,0,0,0.4);
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    background: rgba(0, 10, 20, 0.6);
+    position: relative;
+    overflow: hidden;
 }
+
+.btn-icon-only::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(45deg, transparent, rgba(0, 243, 255, 0.2), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.btn-icon-only:hover::before {
+    opacity: 1;
+}
+
 .btn-icon-only:hover {
     color: #fff;
-    border-color: rgba(0, 243, 255, 1);
-    box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+    border-color: var(--cyber-blue);
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+    transform: translateY(-2px);
 }
+
 .btn-delete:hover {
-    color: #ff2a6d;
-    border-color: #ff2a6d;
-    box-shadow: 0 0 10px rgba(255, 42, 109, 0.3);
+    color: var(--cyber-red);
+    border-color: var(--cyber-red);
+    box-shadow: 0 0 15px rgba(255, 42, 109, 0.4);
 }
 
 /* --- PAGINATION --- */
 .pagination-wrapper {
-    padding: 15px 20px;
-    border-top: 1px solid rgba(255,255,255,0.05);
+    padding: 20px;
+    border-top: 1px solid rgba(0, 243, 255, 0.2);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    background: rgba(0, 5, 10, 0.5);
 }
+
 .page-btn {
-    width: 30px; height: 30px;
-    display: flex; align-items: center; justify-content: center;
-    border: 1px solid rgba(255,255,255,0.1);
+    width: 36px; 
+    height: 36px;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    border: 1px solid rgba(0, 243, 255, 0.3);
     color: #94a3b8;
     font-family: 'Share Tech Mono';
-    font-size: 12px;
-    transition: 0.2s;
-    border-radius: 4px;
+    font-size: 13px;
+    transition: all 0.3s ease;
+    border-radius: 6px;
+    background: rgba(0, 10, 20, 0.6);
 }
+
 .page-btn:hover:not(.disabled) {
-    border-color: rgba(0, 243, 255, 1);
-    color: rgba(0, 243, 255, 1);
+    border-color: var(--cyber-blue);
+    color: var(--cyber-blue);
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+    transform: translateY(-2px);
 }
-.page-current { background: rgba(0, 243, 255, 1); color: #000; font-weight: bold; border-color: rgba(0, 243, 255, 1); }
+
+.page-current { 
+    background: var(--cyber-blue); 
+    color: #000; 
+    font-weight: bold; 
+    border-color: var(--cyber-blue);
+    box-shadow: 0 0 20px rgba(0, 243, 255, 0.5);
+}
+
+/* --- RESPONSIVE OPTIMIZATIONS --- */
+@media screen and (max-width: 768px) {
+    .client-card-futuristic {
+        padding: 1.25rem !important;
+    }
+    
+    .client-card-title {
+        font-size: 1rem !important;
+    }
+    
+    .btn-futuristic {
+        min-height: 75px !important;
+        padding: 0.9rem 0.6rem !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    
+    .btn-futuristic-icon {
+        font-size: 1.8rem !important;
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+    
+    .btn-futuristic-text {
+        font-size: 0.85rem !important;
+        letter-spacing: 1.2px !important;
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        color: #00ffff !important;
+        text-shadow: 0 0 10px rgba(0, 255, 255, 0.8) !important;
+    }
+    
+    /* FORZAR VISIBILIDAD EN TODOS LOS BOTONES DE ACCIÓN */
+    .client-actions {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+    
+    .client-actions .btn-futuristic {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+    
+    .client-actions .btn-futuristic-icon,
+    .client-actions .btn-futuristic-text {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .client-card-futuristic {
+        padding: 1rem !important;
+    }
+    
+    .btn-futuristic {
+        min-height: 70px !important;
+        font-size: 0.7rem !important;
+        flex-direction: column !important;
+    }
+    
+    .btn-futuristic-icon {
+        font-size: 1.6rem !important;
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+    
+    .btn-futuristic-text {
+        font-size: 0.75rem !important;
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        color: #00ffff !important;
+        text-shadow: 0 0 10px rgba(0, 255, 255, 1) !important;
+    }
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.empty-state-icon {
+    font-size: 5rem;
+    opacity: 0.4;
+    filter: drop-shadow(0 0 20px rgba(0, 243, 255, 0.3));
+    margin-bottom: 1.5rem;
+}
+
+.empty-state-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #e8f0f7;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+.empty-state-text {
+    color: #94a3b8;
+    margin-bottom: 2rem;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
 </style>
 {% endblock %}
 
@@ -303,70 +691,72 @@ tbody tr:hover {
     {% endif %}
 </div>
 
-<!-- Móvil: Cards -->
-<div class="md:hidden space-y-3">
+<!-- Móvil: Cards Futuristas -->
+<div class="md:hidden space-y-4">
     {% for cliente in cliente_list %}
-    <div class="card-glow rounded-lg border border-gray-700/50 bg-black/40 backdrop-blur-sm p-4">
-        <div class="flex items-start justify-between mb-3">
+    <div class="client-card-futuristic">
+        <div class="client-card-header">
             <div class="flex-1">
-                <h3 class="text-base sm:text-lg font-semibold text-white mb-1">
+                <h3 class="client-card-title">
                     {{ cliente.nombre }} {{ cliente.apellido }}
                 </h3>
-                <p class="text-xs text-gray-400 font-mono">#{{ cliente.pk }}</p>
+                <p class="client-card-id">#{{ cliente.pk }}</p>
             </div>
         </div>
-        <div class="space-y-2 mb-3">
-            <div class="flex items-center gap-2 text-sm text-gray-300">
-                <i class="fas fa-envelope text-cyan-400 text-xs"></i>
+        
+        <div class="client-card-info">
+            <div class="client-card-info-item">
+                <i class="fas fa-envelope client-card-info-icon"></i>
                 <span>{{ cliente.email|default:"Sin email" }}</span>
             </div>
             {% if cliente.telefono %}
-            <div class="flex items-center gap-2 text-sm text-gray-300">
-                <i class="fas fa-phone text-cyan-400 text-xs"></i>
+            <div class="client-card-info-item">
+                <i class="fas fa-phone client-card-info-icon"></i>
                 <span>{{ cliente.telefono }}</span>
             </div>
             {% endif %}
             {% if cliente.ciudad or cliente.ciudad_usa %}
-            <div class="flex items-center gap-2 text-sm text-gray-300">
-                <i class="fas fa-map-marker-alt text-cyan-400 text-xs"></i>
+            <div class="client-card-info-item">
+                <i class="fas fa-map-marker-alt client-card-info-icon"></i>
                 <span>
                     {% if cliente.empresa.pais == 'US' %}
-                        {% if cliente.ciudad_usa %}{{ cliente.ciudad_usa }}, {{ cliente.estado_usa }}{% endif %}
+                        {% if cliente.ciudad_usa %}{{ cliente.ciudad_usa }}, {{ cliente.estado_usa }}{% else %}UNKNOWN{% endif %}
                     {% else %}
-                        {% if cliente.ciudad %}{{ cliente.ciudad.nombre }}{% endif %}
+                        {% if cliente.ciudad %}{{ cliente.ciudad.nombre }}{% else %}UNKNOWN{% endif %}
                     {% endif %}
                 </span>
             </div>
             {% endif %}
         </div>
-        <div class="flex items-center gap-2 pt-3 border-t border-gray-700/50 flex-wrap">
-            <a href="{% country_url 'clientes:ver_cliente' cliente.pk %}" class="flex-1 sm:flex-initial text-center py-2.5 px-4 text-base font-bold rounded-lg bg-slate-800/60 hover:bg-slate-700/60 border border-cyan-400/50 text-cyan-200 hover:text-white transition-all focus:outline-none focus:ring-2 focus:ring-cyan-400/60 min-w-[100px] shadow-sm hover:shadow-cyan-400/20" style="display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 0.4rem !important;">
-                <span class="text-lg" style="display: inline !important; font-size: 1.4rem !important;">👁️</span>
-                <span class="font-semibold btn-text-mobile" style="display: inline !important; visibility: visible !important; opacity: 1 !important; font-size: 0.9rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0, 255, 255, 0.9) !important;">{% trans "View" %}</span>
+        
+        <div class="client-actions">
+            <a href="{% country_url 'clientes:ver_cliente' cliente.pk %}" class="btn-futuristic">
+                <span class="btn-futuristic-icon">👁️</span>
+                <span class="btn-futuristic-text">{% trans "View" %}</span>
             </a>
-            <a href="{% country_url 'clientes:editar_cliente' cliente.pk %}" class="flex-1 sm:flex-initial text-center py-2.5 px-4 text-base font-bold rounded-lg bg-slate-800/60 hover:bg-slate-700/60 border border-cyan-400/50 text-cyan-200 hover:text-white transition-all focus:outline-none focus:ring-2 focus:ring-cyan-400/60 min-w-[100px] shadow-sm hover:shadow-cyan-400/20" style="display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 0.4rem !important;">
-                <span class="text-lg" style="display: inline !important; font-size: 1.4rem !important;">✏️</span>
-                <span class="font-semibold btn-text-mobile" style="display: inline !important; visibility: visible !important; opacity: 1 !important; font-size: 0.9rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0, 255, 255, 0.9) !important;">{% trans "Edit" %}</span>
+            <a href="{% country_url 'clientes:editar_cliente' cliente.pk %}" class="btn-futuristic">
+                <span class="btn-futuristic-icon">✏️</span>
+                <span class="btn-futuristic-text">{% trans "Edit" %}</span>
             </a>
             <a href="{% country_url 'clientes:eliminar_cliente' cliente_id=cliente.pk %}" 
                onclick="return confirmarEliminacion('{{ cliente.nombre }} {{ cliente.apellido }}')"
-               class="flex-1 sm:flex-initial text-center py-2.5 px-4 text-base font-bold rounded-lg bg-red-900/40 hover:bg-red-800/50 border border-red-500/60 text-red-200 hover:text-red-100 transition-all focus:outline-none focus:ring-2 focus:ring-red-400/60 min-w-[100px] shadow-sm hover:shadow-red-500/20" style="display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 0.4rem !important;">
-                <span class="text-lg" style="display: inline !important; font-size: 1.4rem !important;">🗑️</span>
-                <span class="font-semibold btn-text-mobile" style="display: inline !important; visibility: visible !important; opacity: 1 !important; font-size: 0.9rem !important; font-weight: 900 !important; color: #ff6b6b !important; text-shadow: 0 0 12px rgba(255, 107, 107, 0.9) !important;">{% trans "Delete" %}</span>
+               class="btn-futuristic btn-futuristic-delete">
+                <span class="btn-futuristic-icon">🗑️</span>
+                <span class="btn-futuristic-text">{% trans "Delete" %}</span>
             </a>
         </div>
     </div>
     {% empty %}
-    <div class="text-center py-12 sm:py-16 px-4">
-        <div class="text-6xl mb-4 opacity-50">👥</div>
-        <h3 class="text-xl sm:text-2xl font-semibold text-gray-300 mb-2">
+    <div class="empty-state">
+        <div class="empty-state-icon">👥</div>
+        <h3 class="empty-state-title">
             {% trans "No clients found" %}
         </h3>
-        <p class="text-sm sm:text-base text-gray-500 mb-6 max-w-md mx-auto">
+        <p class="empty-state-text">
             {% trans "Create your first client to start managing your customer database." %}
         </p>
-        <a href="{% country_url 'clientes:crear_cliente' %}" class="inline-flex items-center justify-center gap-2 px-6 py-4 text-base sm:text-lg font-extrabold rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white shadow-lg hover:shadow-xl transition-all">
-            <span class="text-xl">➕</span>
+        <a href="{% country_url 'clientes:crear_cliente' %}" class="inline-flex items-center justify-center gap-3 px-8 py-4 text-lg font-extrabold rounded-xl bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 hover:from-cyan-400 hover:via-blue-400 hover:to-purple-400 text-white shadow-xl hover:shadow-2xl transition-all border border-cyan-400/50" style="font-family: 'Orbitron', sans-serif;">
+            <span class="text-2xl">➕</span>
             <span>{% trans "Create First Client" %}</span>
         </a>
     </div>

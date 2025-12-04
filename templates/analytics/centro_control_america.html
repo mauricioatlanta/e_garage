@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌎 Centro de Control – América | eGarage Admin</title>
+    
+    <!-- Fuentes futuristas -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- ECharts para el mapa -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+    
+    <style>
+        :root {
+            --neon-cyan: #00f5ff;
+            --neon-pink: #ff00ff;
+            --neon-green: #00ff88;
+            --neon-blue: #0066ff;
+            --neon-purple: #b347d9;
+            --dark-bg: #0a0a0f;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Exo 2', sans-serif;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 200, 255, 0.2) 0%, transparent 50%),
+                linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Estrellas de fondo */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.5), transparent),
+                radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.3), transparent),
+                radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.6), transparent);
+            background-size: 200px 100px;
+            background-repeat: repeat;
+            animation: twinkle 8s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .orbitron {
+            font-family: 'Orbitron', monospace;
+        }
+
+        /* Header compacto */
+        .header-compact {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 2px solid var(--neon-cyan);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            box-shadow: 0 4px 20px rgba(0, 245, 255, 0.2);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-text {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.5rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, var(--neon-cyan), var(--neon-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(0, 245, 255, 0.5);
+        }
+
+        .header-title {
+            font-size: 1.2rem;
+            color: var(--neon-cyan);
+            font-weight: 600;
+        }
+
+        .filters-container {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            color: #fff;
+            font-family: 'Exo 2', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-select:hover {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 10px rgba(0, 245, 255, 0.3);
+        }
+
+        /* Contenedor principal */
+        .main-container {
+            position: relative;
+            z-index: 1;
+            padding: 2rem;
+            max-width: 1920px;
+            margin: 0 auto;
+        }
+
+        /* KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .kpi-card {
+            background: linear-gradient(135deg, var(--glass-bg) 0%, rgba(0, 245, 255, 0.1) 100%);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .kpi-card:hover::before {
+            left: 100%;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            border-color: var(--neon-green);
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.3);
+        }
+
+        .kpi-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-number {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, var(--neon-cyan), var(--neon-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0.5rem 0;
+        }
+
+        .kpi-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Mapa interactivo */
+        .map-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(0, 245, 255, 0.3);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .map-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+            animation: scan-line 3s infinite;
+        }
+
+        @keyframes scan-line {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        #map-americas {
+            width: 100%;
+            height: 600px;
+            min-height: 500px;
+        }
+
+        /* Panel lateral de ranking */
+        .ranking-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(0, 245, 255, 0.3);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .ranking-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.3rem;
+            color: var(--neon-cyan);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .ranking-list {
+            list-style: none;
+        }
+
+        .ranking-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .ranking-item:hover {
+            background: rgba(0, 245, 255, 0.1);
+            border-color: var(--neon-cyan);
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0, 245, 255, 0.2);
+        }
+
+        .ranking-item-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .country-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .country-stats {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .btn-ver-detalle {
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.2), rgba(0, 255, 136, 0.2));
+            border: 1px solid var(--neon-cyan);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            color: #fff;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn-ver-detalle:hover {
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.4), rgba(0, 255, 136, 0.4));
+            box-shadow: 0 0 15px rgba(0, 245, 255, 0.5);
+        }
+
+        /* Grid layout */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Loading state */
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--neon-cyan);
+        }
+
+        .spinner {
+            border: 3px solid rgba(0, 245, 255, 0.3);
+            border-top: 3px solid var(--neon-cyan);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Tooltip personalizado para el mapa */
+        .map-tooltip {
+            background: rgba(10, 10, 15, 0.95);
+            border: 1px solid var(--neon-cyan);
+            border-radius: 8px;
+            padding: 0.75rem;
+            color: #fff;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header compacto -->
+    <header class="header-compact">
+        <div class="header-left">
+            <div class="logo-text">eGarage</div>
+            <div class="header-title">Centro de Control – América</div>
+        </div>
+        <div class="filters-container">
+            <select id="dateRange" class="filter-select">
+                <option value="30">Últimos 30 días</option>
+                <option value="90">Últimos 90 días</option>
+                <option value="365">Últimos 12 meses</option>
+            </select>
+            <select id="planFilter" class="filter-select">
+                <option value="all">Todos los planes</option>
+                <option value="trial">Prueba Gratuita</option>
+                <option value="basic">Plan Básico</option>
+                <option value="premium">Plan Premium</option>
+                <option value="enterprise">Plan Empresarial</option>
+            </select>
+        </div>
+    </header>
+
+    <!-- Contenedor principal -->
+    <div class="main-container">
+        <!-- KPIs globales -->
+        <div class="kpi-grid" id="kpiGrid">
+            <div class="kpi-card">
+                <div class="kpi-icon">👥</div>
+                <div class="kpi-number" id="kpiActivos">-</div>
+                <div class="kpi-label">Suscriptores Activos</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon">🌎</div>
+                <div class="kpi-number" id="kpiPaises">-</div>
+                <div class="kpi-label">Países Activos</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon">💰</div>
+                <div class="kpi-number" id="kpiMRR">-</div>
+                <div class="kpi-label">MRR Total</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon">📈</div>
+                <div class="kpi-number" id="kpiNuevos">-</div>
+                <div class="kpi-label">Nuevos (30 días)</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon">🔁</div>
+                <div class="kpi-number" id="kpiRetencion">-</div>
+                <div class="kpi-label">Retención</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon">🛠</div>
+                <div class="kpi-number" id="kpiRubro">-</div>
+                <div class="kpi-label">Rubro Principal</div>
+            </div>
+        </div>
+
+        <!-- Grid: Mapa + Ranking -->
+        <div class="dashboard-grid">
+            <!-- Mapa interactivo -->
+            <div class="map-container">
+                <div id="map-americas"></div>
+            </div>
+
+            <!-- Panel de ranking -->
+            <div class="ranking-panel">
+                <h2 class="ranking-title">Ranking de Países</h2>
+                <div id="rankingList" class="loading">
+                    <div class="spinner"></div>
+                    <p>Cargando ranking...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let mapChart = null;
+        let currentDays = 30;
+        let currentPlan = 'all';
+
+        // Inicializar dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            loadGlobalKPIs();
+            loadCountryRanking();
+            initMap();
+            
+            // Event listeners para filtros
+            const dateRange = document.getElementById('dateRange');
+            if (dateRange) {
+              dateRange.addEventListener('change', function() {
+                currentDays = parseInt(this.value);
+                loadGlobalKPIs();
+                loadCountryRanking();
+                loadMapData();
+              });
+            }
+            
+            const planFilter = document.getElementById('planFilter');
+            if (planFilter) {
+              planFilter.addEventListener('change', function() {
+                currentPlan = this.value;
+                loadMapData();
+              });
+            }
+        });
+
+        // Cargar KPIs globales
+        async function loadGlobalKPIs() {
+            try {
+                const response = await fetch(`/analytics/admin/api/global-kpis/?days=${currentDays}`);
+                const data = await response.json();
+                
+                document.getElementById('kpiActivos').textContent = data.suscriptores_activos.toLocaleString();
+                document.getElementById('kpiPaises').textContent = data.paises_activos;
+                document.getElementById('kpiMRR').textContent = formatCurrency(data.mrr_total);
+                document.getElementById('kpiNuevos').textContent = data.nuevos_periodo;
+                document.getElementById('kpiRetencion').textContent = data.tasa_retencion.toFixed(1) + '%';
+                
+                if (data.rubro_mas_frecuente) {
+                    document.getElementById('kpiRubro').textContent = 
+                        data.rubro_mas_frecuente.nombre + ' ' + 
+                        data.rubro_mas_frecuente.porcentaje.toFixed(0) + '%';
+                } else {
+                    document.getElementById('kpiRubro').textContent = 'N/A';
+                }
+            } catch (error) {
+                console.error('Error cargando KPIs:', error);
+            }
+        }
+
+        // Cargar ranking de países
+        async function loadCountryRanking() {
+            try {
+                const response = await fetch(`/analytics/admin/api/country-ranking/?days=${currentDays}`);
+                const data = await response.json();
+                
+                const rankingList = document.getElementById('rankingList');
+                rankingList.innerHTML = '';
+                
+                if (data.ranking && data.ranking.length > 0) {
+                    data.ranking.forEach((country, index) => {
+                        const item = document.createElement('div');
+                        item.className = 'ranking-item';
+                        item.innerHTML = `
+                            <div class="ranking-item-header">
+                                <div>
+                                    <span class="country-name">${country.flag} ${country.country_name}</span>
+                                </div>
+                                <div class="country-stats">${country.activos} activos</div>
+                            </div>
+                            <div class="country-stats">
+                                Nuevos: ${country.nuevos} | MRR: ${formatCurrency(country.mrr)}
+                            </div>
+                            <div style="margin-top: 0.5rem;">
+                                <a href="/analytics/admin/region/${country.country.toLowerCase()}/" 
+                                   class="btn-ver-detalle">Ver más detalles →</a>
+                            </div>
+                        `;
+                        rankingList.appendChild(item);
+                    });
+                } else {
+                    rankingList.innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.7);">No hay datos disponibles</p>';
+                }
+            } catch (error) {
+                console.error('Error cargando ranking:', error);
+                document.getElementById('rankingList').innerHTML = 
+                    '<p style="text-align: center; color: #ff4444;">Error cargando ranking</p>';
+            }
+        }
+
+        // Inicializar mapa
+        function initMap() {
+            const mapDiv = document.getElementById('map-americas');
+            mapChart = echarts.init(mapDiv);
+            
+            // Para simplificar, usaremos un enfoque con scatter plot o gráfico de barras por país
+            // ya que ECharts requiere GeoJSON específico para mapas personalizados
+            // Alternativamente, podemos usar un mapa del mundo y filtrar solo América
+            
+            // Configuración inicial - usando gráfico de barras horizontal como alternativa visual
+            mapChart.setOption({
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    },
+                    backgroundColor: 'rgba(10, 10, 15, 0.95)',
+                    borderColor: '#00f5ff',
+                    borderWidth: 1,
+                    textStyle: {
+                        color: '#fff',
+                        fontSize: 12
+                    }
+                },
+                grid: {
+                    left: '15%',
+                    right: '10%',
+                    top: '10%',
+                    bottom: '10%'
+                },
+                xAxis: {
+                    type: 'value',
+                    axisLabel: {
+                        color: '#fff'
+                    },
+                    axisLine: {
+                        lineStyle: {
+                            color: 'rgba(255, 255, 255, 0.3)'
+                        }
+                    },
+                    splitLine: {
+                        lineStyle: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    }
+                },
+                yAxis: {
+                    type: 'category',
+                    data: [],
+                    axisLabel: {
+                        color: '#fff',
+                        fontSize: 12
+                    },
+                    axisLine: {
+                        lineStyle: {
+                            color: 'rgba(255, 255, 255, 0.3)'
+                        }
+                    }
+                },
+                series: [{
+                    name: 'Suscriptores Activos',
+                    type: 'bar',
+                    data: [],
+                    itemStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+                            { offset: 0, color: '#00ff8822' },
+                            { offset: 0.5, color: '#00ff8888' },
+                            { offset: 1, color: '#00ff88ff' }
+                        ]),
+                        borderColor: '#00ff88',
+                        borderWidth: 1
+                    },
+                    emphasis: {
+                        itemStyle: {
+                            color: '#00f5ff',
+                            borderColor: '#00ff88',
+                            borderWidth: 2
+                        }
+                    },
+                    label: {
+                        show: true,
+                        position: 'right',
+                        color: '#fff',
+                        fontSize: 11
+                    }
+                }]
+            });
+
+            // Cargar datos del mapa
+            loadMapData();
+            
+            // Click en barra
+            mapChart.on('click', function(params) {
+                if (params.data && params.data.countryCode) {
+                    window.location.href = `/analytics/admin/region/${params.data.countryCode.toLowerCase()}/`;
+                }
+            });
+        }
+
+        // Cargar datos del mapa
+        async function loadMapData() {
+            try {
+                const url = `/analytics/admin/api/subscribers-by-country/?days=${currentDays}&plan=${currentPlan}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                // Mapear datos para ECharts (gráfico de barras)
+                const countryFlags = {
+                    'CL': '🇨🇱',
+                    'US': '🇺🇸',
+                    'MX': '🇲🇽'
+                };
+                
+                const countries = data.results.map(item => {
+                    const flag = countryFlags[item.country] || '🌎';
+                    return `${flag} ${item.country_name}`;
+                });
+                
+                const barData = data.results.map(item => ({
+                    value: item.activos,
+                    countryCode: item.country,
+                    en_prueba: item.en_prueba,
+                    mrr: item.mrr_estimado,
+                    countryName: item.country_name
+                }));
+                
+                // Actualizar gráfico
+                mapChart.setOption({
+                    yAxis: {
+                        data: countries
+                    },
+                    series: [{
+                        data: barData
+                    }]
+                });
+            } catch (error) {
+                console.error('Error cargando datos del mapa:', error);
+            }
+        }
+
+        // Formatear moneda
+        function formatCurrency(value) {
+            if (value >= 1000000) {
+                return '$' + (value / 1000000).toFixed(1) + 'M';
+            } else if (value >= 1000) {
+                return '$' + (value / 1000).toFixed(1) + 'K';
+            }
+            return '$' + value.toFixed(0);
+        }
+
+        // Nota: Para un mapa geográfico real, necesitarías:
+        // 1. Cargar un GeoJSON de las Américas
+        // 2. Registrar el mapa: echarts.registerMap('americas', geoJsonData)
+        // 3. Usar type: 'map' en la serie
+        // Por ahora usamos un gráfico de barras horizontal como visualización alternativa
+    </script>
+</body>
+</html>
+

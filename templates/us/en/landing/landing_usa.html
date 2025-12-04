@@ -76,30 +76,29 @@
 {% block content %}
 <!-- Navegación personalizada -->
 <nav class="eg-nav py-4 px-6">
-  <div class="max-w-7xl mx-auto flex justify-between items-center">
-    <div class="flex items-center gap-4">
-      <div class="relative">
-        <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage Logo" class="h-10 w-auto">
-        <div class="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-green-400/20 rounded-full blur-xl scale-110"></div>
-      </div>
-      <div>
-        <span class="text-xl font-bold bg-gradient-to-r from-sky-400 to-emerald-400 bg-clip-text text-transparent">
-          eGarage
-        </span>
-        <div class="text-xs text-slate-400 font-medium">
-          🇺🇸 United States
-        </div>
-      </div>
-    </div>
-
-    <div class="flex items-center gap-4">
-      <a href="#pricing" class="hidden md:inline-block text-slate-300 hover:text-white px-4 py-2 rounded-lg transition">
+  <div class="max-w-7xl mx-auto flex justify-end items-center">
+    <div class="flex items-center gap-3">
+      <!-- Pricing Button -->
+      <a href="#pricing" class="hidden md:inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-800/50 border border-sky-400/30 text-sky-400 hover:bg-slate-700/70 hover:border-sky-400/60 hover:text-sky-300 transition-all duration-300 font-semibold text-sm backdrop-blur-sm hover:shadow-lg hover:shadow-sky-400/20 hover:-translate-y-0.5">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
         Pricing
       </a>
-      <a href="#features" class="hidden md:inline-block text-slate-300 hover:text-white px-4 py-2 rounded-lg transition">
+      
+      <!-- Features Button -->
+      <a href="#features" class="hidden md:inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-800/50 border border-emerald-400/30 text-emerald-400 hover:bg-slate-700/70 hover:border-emerald-400/60 hover:text-emerald-300 transition-all duration-300 font-semibold text-sm backdrop-blur-sm hover:shadow-lg hover:shadow-emerald-400/20 hover:-translate-y-0.5">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+        </svg>
         Features
       </a>
-      <a href="/accounts/login/?country=US" class="bg-gradient-to-r from-emerald-500 to-sky-500 hover:from-emerald-400 hover:to-sky-400 text-white px-6 py-2 rounded-xl font-semibold transition eg-glow-button">
+      
+      <!-- Login Button - More prominent -->
+      <a href="/accounts/login/?country=US" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 via-sky-500 to-indigo-500 hover:from-emerald-400 hover:via-sky-400 hover:to-indigo-400 text-white font-bold text-sm transition-all duration-300 shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-sky-500/40 hover:-translate-y-0.5 hover:scale-105">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+        </svg>
         Sign In
       </a>
     </div>
