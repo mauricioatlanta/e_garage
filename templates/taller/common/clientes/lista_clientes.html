@@ -36,26 +36,61 @@
 
 {% block page_extra_css %}
 <style>
-/* --- MOBILE OPTIMIZATIONS --- */
-@media (max-width: 768px) {
-    /* Ensure text is always visible on mobile */
-    .flex-wrap a span {
+/* --- MOBILE OPTIMIZATIONS - ULTRA ESPECÍFICO --- */
+@media screen and (max-width: 768px) {
+    /* Forzar visibilidad del texto con máxima especificidad */
+    body .md\:hidden .flex-wrap a span,
+    body .space-y-3 .flex-wrap a span,
+    body .border-t.flex-wrap a span,
+    body div.flex-wrap a span.font-semibold,
+    body .flex-wrap a span:not(.text-lg),
+    body .flex-wrap > a > span {
         display: inline !important;
-        font-size: 0.875rem !important;
-        font-weight: 700 !important;
-        color: #a5f3fc !important;
-        text-shadow: 0 0 8px rgba(165, 243, 252, 0.6) !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        position: relative !important;
+        width: auto !important;
+        height: auto !important;
+        font-size: 0.95rem !important;
+        font-weight: 800 !important;
+        color: #00ffff !important;
+        text-shadow: 0 0 12px rgba(0, 255, 255, 0.9), 0 2px 4px rgba(0, 0, 0, 1) !important;
+        letter-spacing: 0.5px !important;
+        text-transform: uppercase !important;
+        line-height: 1.3 !important;
+        margin-left: 0.3rem !important;
     }
     
-    /* Larger tap targets */
-    .flex-wrap a {
-        min-height: 44px !important;
-        padding: 0.75rem 1rem !important;
+    /* Asegurar que los botones tengan espacio */
+    body .flex-wrap a {
+        min-height: 48px !important;
+        padding: 0.85rem 1.1rem !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        flex-wrap: nowrap !important;
+        gap: 0.4rem !important;
     }
     
-    /* Icon size */
-    .flex-wrap a .text-lg {
-        font-size: 1.25rem !important;
+    /* Iconos también visibles y más grandes */
+    body .flex-wrap a .text-lg,
+    body .flex-wrap a span.text-lg {
+        display: inline !important;
+        font-size: 1.4rem !important;
+        filter: drop-shadow(0 0 8px rgba(0, 255, 255, 0.6)) !important;
+    }
+}
+
+/* Específico para móviles pequeños */
+@media screen and (max-width: 480px) {
+    body .flex-wrap a {
+        min-width: 110px !important;
+        font-size: 0.9rem !important;
+    }
+    
+    body .flex-wrap a span:not(.text-lg) {
+        font-size: 0.85rem !important;
+        font-weight: 900 !important;
     }
 }
 
@@ -305,16 +340,19 @@ tbody tr:hover {
             {% endif %}
         </div>
         <div class="flex items-center gap-2 pt-3 border-t border-gray-700/50 flex-wrap">
-            <a href="{% country_url 'clientes:ver_cliente' cliente.pk %}" class="flex-1 sm:flex-initial text-center py-2.5 px-4 text-base font-bold rounded-lg bg-slate-800/60 hover:bg-slate-700/60 border border-cyan-400/50 text-cyan-200 hover:text-white transition-all focus:outline-none focus:ring-2 focus:ring-cyan-400/60 min-w-[100px] shadow-sm hover:shadow-cyan-400/20">
-                <span class="text-lg">👁️</span> <span class="font-semibold">{% trans "View" %}</span>
+            <a href="{% country_url 'clientes:ver_cliente' cliente.pk %}" class="flex-1 sm:flex-initial text-center py-2.5 px-4 text-base font-bold rounded-lg bg-slate-800/60 hover:bg-slate-700/60 border border-cyan-400/50 text-cyan-200 hover:text-white transition-all focus:outline-none focus:ring-2 focus:ring-cyan-400/60 min-w-[100px] shadow-sm hover:shadow-cyan-400/20" style="display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 0.4rem !important;">
+                <span class="text-lg" style="display: inline !important; font-size: 1.4rem !important;">👁️</span>
+                <span class="font-semibold btn-text-mobile" style="display: inline !important; visibility: visible !important; opacity: 1 !important; font-size: 0.9rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0, 255, 255, 0.9) !important;">{% trans "View" %}</span>
             </a>
-            <a href="{% country_url 'clientes:editar_cliente' cliente.pk %}" class="flex-1 sm:flex-initial text-center py-2.5 px-4 text-base font-bold rounded-lg bg-slate-800/60 hover:bg-slate-700/60 border border-cyan-400/50 text-cyan-200 hover:text-white transition-all focus:outline-none focus:ring-2 focus:ring-cyan-400/60 min-w-[100px] shadow-sm hover:shadow-cyan-400/20">
-                <span class="text-lg">✏️</span> <span class="font-semibold">{% trans "Edit" %}</span>
+            <a href="{% country_url 'clientes:editar_cliente' cliente.pk %}" class="flex-1 sm:flex-initial text-center py-2.5 px-4 text-base font-bold rounded-lg bg-slate-800/60 hover:bg-slate-700/60 border border-cyan-400/50 text-cyan-200 hover:text-white transition-all focus:outline-none focus:ring-2 focus:ring-cyan-400/60 min-w-[100px] shadow-sm hover:shadow-cyan-400/20" style="display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 0.4rem !important;">
+                <span class="text-lg" style="display: inline !important; font-size: 1.4rem !important;">✏️</span>
+                <span class="font-semibold btn-text-mobile" style="display: inline !important; visibility: visible !important; opacity: 1 !important; font-size: 0.9rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0, 255, 255, 0.9) !important;">{% trans "Edit" %}</span>
             </a>
             <a href="{% country_url 'clientes:eliminar_cliente' cliente_id=cliente.pk %}" 
                onclick="return confirmarEliminacion('{{ cliente.nombre }} {{ cliente.apellido }}')"
-               class="flex-1 sm:flex-initial text-center py-2.5 px-4 text-base font-bold rounded-lg bg-red-900/40 hover:bg-red-800/50 border border-red-500/60 text-red-200 hover:text-red-100 transition-all focus:outline-none focus:ring-2 focus:ring-red-400/60 min-w-[100px] shadow-sm hover:shadow-red-500/20">
-                <span class="text-lg">🗑️</span> <span class="font-semibold">{% trans "Delete" %}</span>
+               class="flex-1 sm:flex-initial text-center py-2.5 px-4 text-base font-bold rounded-lg bg-red-900/40 hover:bg-red-800/50 border border-red-500/60 text-red-200 hover:text-red-100 transition-all focus:outline-none focus:ring-2 focus:ring-red-400/60 min-w-[100px] shadow-sm hover:shadow-red-500/20" style="display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 0.4rem !important;">
+                <span class="text-lg" style="display: inline !important; font-size: 1.4rem !important;">🗑️</span>
+                <span class="font-semibold btn-text-mobile" style="display: inline !important; visibility: visible !important; opacity: 1 !important; font-size: 0.9rem !important; font-weight: 900 !important; color: #ff6b6b !important; text-shadow: 0 0 12px rgba(255, 107, 107, 0.9) !important;">{% trans "Delete" %}</span>
             </a>
         </div>
     </div>
