@@ -12,6 +12,127 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" referrerpolicy="no-referrer" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  
+  {# --- ANTI-SCROLL AUTOMÁTICO PARA MÓVILES --- #}
+  <script>
+  (function() {
+    // Detectar si es móvil
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+    
+    if (!isMobile) {
+      console.log('✅ Desktop detectado - sin restricciones de scroll');
+      return; // En desktop, no aplicar restricciones
+    }
+
+    console.log('📱 Móvil detectado - activando protección anti-scroll automático');
+
+    // Flag para detectar interacción real del usuario
+    let isUserInteraction = false;
+    let scrollLock = false;
+    let initialScrollPos = 0;
+
+    // Marcar interacción del usuario en eventos táctiles y de mouse
+    ['touchstart', 'touchmove', 'mousedown', 'wheel', 'scroll'].forEach(function(event) {
+      document.addEventListener(event, function() {
+        isUserInteraction = true;
+        setTimeout(function() { isUserInteraction = false; }, 100);
+      }, { passive: true, capture: true });
+    });
+
+    // Función para restaurar posición de scroll
+    function preventAutoScroll() {
+      if (scrollLock && !isUserInteraction) {
+        window.scrollTo(0, initialScrollPos);
+        document.documentElement.scrollTop = initialScrollPos;
+        document.body.scrollTop = initialScrollPos;
+      }
+    }
+
+    // Interceptar window.scrollTo
+    const origScrollTo = window.scrollTo;
+    window.scrollTo = function(x, y) {
+      if (isMobile && !isUserInteraction && scrollLock) {
+        console.log('🚫 Bloqueado: scrollTo(' + x + ',' + y + ') sin interacción del usuario');
+        return; // Bloquear scroll automático
+      }
+      return origScrollTo.call(window, x, y);
+    };
+
+    // Interceptar scrollIntoView
+    const origScrollIntoView = Element.prototype.scrollIntoView;
+    Element.prototype.scrollIntoView = function() {
+      if (isMobile && !isUserInteraction && scrollLock) {
+        console.log('🚫 Bloqueado: scrollIntoView en', this.tagName, this.id || this.className);
+        return; // Bloquear scrollIntoView automático
+      }
+      return origScrollIntoView.apply(this, arguments);
+    };
+
+    // Interceptar window.scroll
+    const origScroll = window.scroll;
+    window.scroll = function(x, y) {
+      if (isMobile && !isUserInteraction && scrollLock) {
+        console.log('🚫 Bloqueado: scroll(' + x + ',' + y + ') sin interacción del usuario');
+        return;
+      }
+      return origScroll.call(window, x, y);
+    };
+
+    // Modificar focus para no hacer scroll en móviles
+    const origFocus = HTMLElement.prototype.focus;
+    HTMLElement.prototype.focus = function(options) {
+      if (isMobile) {
+        // En móviles, focus sin scroll
+        const newOptions = Object.assign({}, options, { preventScroll: true });
+        return origFocus.call(this, newOptions);
+      }
+      return origFocus.call(this, options);
+    };
+
+    // Activar protección al cargar la página
+    document.addEventListener('DOMContentLoaded', function() {
+      initialScrollPos = window.pageYOffset || document.documentElement.scrollTop || 0;
+      scrollLock = true;
+      
+      // Mantener lock por 3 segundos después de carga
+      setTimeout(function() {
+        scrollLock = false;
+        console.log('✅ Protección anti-scroll desactivada - página cargada');
+      }, 3000);
+
+      // Prevenir scroll en focus de inputs
+      document.addEventListener('focusin', function(e) {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+          if (!isUserInteraction) {
+            const scrollBefore = window.pageYOffset || document.documentElement.scrollTop || 0;
+            setTimeout(function() {
+              const scrollAfter = window.pageYOffset || document.documentElement.scrollTop || 0;
+              if (Math.abs(scrollAfter - scrollBefore) > 3) {
+                window.scrollTo(0, scrollBefore);
+                document.documentElement.scrollTop = scrollBefore;
+                document.body.scrollTop = scrollBefore;
+              }
+            }, 0);
+          }
+        }
+      }, true);
+    });
+
+    // Prevenir scroll al abrir/cerrar teclado virtual
+    let lastHeight = window.innerHeight;
+    window.addEventListener('resize', function() {
+      const currentHeight = window.innerHeight;
+      if (Math.abs(currentHeight - lastHeight) > 100) {
+        // Cambio grande = probablemente teclado virtual
+        setTimeout(preventAutoScroll, 50);
+      }
+      lastHeight = currentHeight;
+    });
+
+    console.log('✅ Protección anti-scroll activada para móvil');
+  })();
+  </script>
+  
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
   <style>
     :root {
@@ -400,7 +521,7 @@
       
       <!-- Gestión de Equipo: Visible para Owner y Admin -->
       {% if request.user|has_role:'Owner' or request.user|has_role:'Admin' %}
-      <a href="{% url 'team:team_list' %}" 
+      <a href="{% url 'taller:team:team_list' %}" 
          class="nav-button-standard {% if 'equipo' in request.path %}bg-gray-100 text-gray-900{% endif %}">
         <span class="nav-icon">👥</span>
         <span>Equipo</span>

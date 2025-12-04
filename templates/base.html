@@ -243,38 +243,46 @@
       text-shadow: 0 0 12px rgba(255, 100, 100, 0.8);
     }
 
-    /* Responsive: Asegurar que los botones se mantengan en dos filas en móviles */
+    /* Responsive: Botones con TEXTO TECNOLÓGICO en móviles */
     @media (max-width: 768px) {
       .nav-button-standard {
-        padding: 0.5rem 0.7rem;
-        font-size: 0.7rem;
-        gap: 0.3rem;
+        padding: 0.6rem 0.4rem;
+        font-size: 0.65rem;
+        gap: 0.2rem;
         min-width: 0;
         flex: 1 1 auto;
         flex-direction: column !important;
         align-items: center !important;
         justify-content: center !important;
+        min-height: 70px;
       }
 
       .nav-button-standard span:last-child,
       .nav-button-standard .nav-text {
-        display: block !important; /* Asegurar que el texto siempre sea visible en móviles */
-        font-weight: 700 !important;
-        font-size: 0.7rem !important;
-        color: #b0e0ff !important;
-        text-shadow: 0 0 4px rgba(0, 212, 255, 0.8) !important;
+        display: block !important;
+        font-family: 'Orbitron', 'Arial', monospace !important; /* Fuente tecnológica */
+        font-weight: 800 !important; /* Más bold */
+        font-size: 0.75rem !important; /* Más grande */
+        color: #00ffff !important; /* Color cyan brillante */
+        text-shadow: 
+          0 0 8px rgba(0, 255, 255, 0.9),
+          0 0 15px rgba(0, 212, 255, 0.6),
+          0 2px 4px rgba(0, 0, 0, 0.8) !important; /* Glow más fuerte */
         opacity: 1 !important;
         visibility: visible !important;
-        white-space: normal !important;
+        white-space: nowrap !important; /* Una sola línea */
         text-align: center !important;
-        line-height: 1.2 !important;
-        margin-top: 0.2rem !important;
+        line-height: 1.3 !important;
+        margin-top: 0.25rem !important;
+        letter-spacing: 0.5px !important; /* Espaciado tecnológico */
+        text-transform: uppercase !important;
       }
 
       .nav-button-standard .nav-icon {
-        font-size: 1.2rem !important;
+        font-size: 1.4rem !important; /* Iconos un poco más grandes */
         display: block !important;
-        margin-bottom: 0.2rem !important;
+        margin-bottom: 0.15rem !important;
+        filter: drop-shadow(0 0 6px rgba(0, 212, 255, 0.8)) !important;
       }
 
       /* Asegurar que cada fila use grid para distribución uniforme */
@@ -389,13 +397,13 @@
       }
     }
 
-    /* FORZAR VISIBILIDAD EN MÓVILES - ESTILO FINAL CON MÁXIMA PRIORIDAD */
+    /* FORZAR TEXTO TECNOLÓGICO EN MÓVILES - MÁXIMA PRIORIDAD */
     @media (max-width: 768px) {
       .nav-button-standard {
         flex-direction: column !important;
         align-items: center !important;
         justify-content: center !important;
-        min-height: 70px !important;
+        min-height: 75px !important;
       }
 
       .nav-button-standard span:last-child,
@@ -403,34 +411,41 @@
         display: block !important;
         visibility: visible !important;
         opacity: 1 !important;
-        font-size: 0.7rem !important;
-        font-weight: 700 !important;
-        color: #b0e0ff !important;
-        text-shadow: 0 0 8px rgba(0, 212, 255, 1), 0 0 4px rgba(255, 255, 255, 0.5) !important;
+        font-family: 'Orbitron', 'Arial Black', monospace !important;
+        font-size: 0.8rem !important;
+        font-weight: 900 !important;
+        color: #00ffff !important;
+        text-shadow: 
+          0 0 10px rgba(0, 255, 255, 1),
+          0 0 20px rgba(0, 212, 255, 0.8),
+          0 2px 5px rgba(0, 0, 0, 1) !important;
         line-height: 1.3 !important;
         text-align: center !important;
-        white-space: normal !important;
-        word-break: break-word !important;
+        white-space: nowrap !important;
+        word-break: normal !important;
         margin-top: 0.3rem !important;
+        letter-spacing: 1px !important;
+        text-transform: uppercase !important;
       }
       
       .nav-button-standard .nav-icon {
         display: block !important;
         visibility: visible !important;
         opacity: 1 !important;
-        font-size: 1.4rem !important;
+        font-size: 1.5rem !important;
         margin-bottom: 0.3rem !important;
+        filter: drop-shadow(0 0 8px rgba(0, 255, 255, 0.9)) !important;
       }
     }
 
-    /* ESTILO ULTRA-ESPECÍFICO PARA MÓVILES - MÁXIMA PRIORIDAD */
+    /* ESTILO TECNOLÓGICO ULTRA-ESPECÍFICO - MÁXIMA PRIORIDAD */
     @media screen and (max-width: 768px) {
       #main-navigation .nav-button-standard {
         flex-direction: column !important;
         align-items: center !important;
         justify-content: center !important;
-        min-height: 75px !important;
-        padding: 0.6rem 0.4rem !important;
+        min-height: 80px !important;
+        padding: 0.7rem 0.5rem !important;
         gap: 0.3rem !important;
       }
 
@@ -439,32 +454,38 @@
         display: block !important;
         visibility: visible !important;
         opacity: 1 !important;
-        font-size: 0.75rem !important;
-        font-weight: 700 !important;
-        color: #b0e0ff !important;
-        text-shadow: 0 0 12px rgba(0, 212, 255, 1), 0 0 6px rgba(255, 255, 255, 0.6) !important;
+        font-family: 'Orbitron', 'Arial Black', monospace !important;
+        font-size: 0.85rem !important;
+        font-weight: 900 !important;
+        color: #00ffff !important;
+        text-shadow: 
+          0 0 12px rgba(0, 255, 255, 1),
+          0 0 24px rgba(0, 212, 255, 0.9),
+          0 3px 6px rgba(0, 0, 0, 1) !important;
         line-height: 1.4 !important;
         text-align: center !important;
-        margin-top: 0.3rem !important;
-        white-space: normal !important;
-        word-break: break-word !important;
+        margin-top: 0.35rem !important;
+        white-space: nowrap !important;
+        word-break: normal !important;
         max-width: 100% !important;
         width: 100% !important;
         position: relative !important;
         z-index: 10 !important;
+        letter-spacing: 1.2px !important;
+        text-transform: uppercase !important;
       }
 
       #main-navigation .nav-button-standard .nav-icon {
         display: block !important;
         visibility: visible !important;
         opacity: 1 !important;
-        font-size: 1.5rem !important;
-        margin-bottom: 0.3rem !important;
-        filter: drop-shadow(0 0 8px rgba(0, 212, 255, 1)) !important;
+        font-size: 1.6rem !important;
+        margin-bottom: 0.35rem !important;
+        filter: drop-shadow(0 0 10px rgba(0, 255, 255, 1)) !important;
       }
     }
 
-    /* FORZAR EN TODOS LOS DISPOSITIVOS MÓVILES - INCLUSO TABLETS */
+    /* TEXTO TECNOLÓGICO EN TODOS LOS MÓVILES Y TABLETS */
     @media screen and (max-width: 1024px) {
       .nav-button-standard {
         flex-direction: column !important;
@@ -477,23 +498,151 @@
         display: block !important;
         visibility: visible !important;
         opacity: 1 !important;
-        font-size: 0.75rem !important;
-        font-weight: 700 !important;
-        color: #b0e0ff !important;
+        font-family: 'Orbitron', 'Arial Black', monospace !important;
+        font-size: 0.85rem !important;
+        font-weight: 900 !important;
+        color: #00ffff !important;
+        text-shadow: 
+          0 0 12px rgba(0, 255, 255, 1),
+          0 0 20px rgba(0, 212, 255, 0.8),
+          0 2px 5px rgba(0, 0, 0, 1) !important;
         text-align: center !important;
-        white-space: normal !important;
+        white-space: nowrap !important;
         margin-top: 0.3rem !important;
+        letter-spacing: 1px !important;
+        text-transform: uppercase !important;
       }
 
       .nav-button-standard .nav-icon {
         display: block !important;
         margin-bottom: 0.3rem !important;
+        filter: drop-shadow(0 0 8px rgba(0, 255, 255, 0.9)) !important;
       }
     }
   </style>
 
   {# --- Font Awesome --- #}
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" referrerpolicy="no-referrer" />
+
+  {# --- ANTI-SCROLL AUTOMÁTICO PARA MÓVILES --- #}
+  <script>
+  (function() {
+    // Detectar si es móvil
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+    
+    if (!isMobile) {
+      console.log('✅ Desktop detectado - sin restricciones de scroll');
+      return; // En desktop, no aplicar restricciones
+    }
+
+    console.log('📱 Móvil detectado - activando protección anti-scroll automático');
+
+    // Flag para detectar interacción real del usuario
+    let isUserInteraction = false;
+    let scrollLock = false;
+    let initialScrollPos = 0;
+
+    // Marcar interacción del usuario en eventos táctiles y de mouse
+    ['touchstart', 'touchmove', 'mousedown', 'wheel', 'scroll'].forEach(function(event) {
+      document.addEventListener(event, function() {
+        isUserInteraction = true;
+        setTimeout(function() { isUserInteraction = false; }, 100);
+      }, { passive: true, capture: true });
+    });
+
+    // Función para restaurar posición de scroll
+    function preventAutoScroll() {
+      if (scrollLock && !isUserInteraction) {
+        window.scrollTo(0, initialScrollPos);
+        document.documentElement.scrollTop = initialScrollPos;
+        document.body.scrollTop = initialScrollPos;
+      }
+    }
+
+    // Interceptar window.scrollTo
+    const origScrollTo = window.scrollTo;
+    window.scrollTo = function(x, y) {
+      if (isMobile && !isUserInteraction && scrollLock) {
+        console.log('🚫 Bloqueado: scrollTo(' + x + ',' + y + ') sin interacción del usuario');
+        return; // Bloquear scroll automático
+      }
+      return origScrollTo.call(window, x, y);
+    };
+
+    // Interceptar scrollIntoView
+    const origScrollIntoView = Element.prototype.scrollIntoView;
+    Element.prototype.scrollIntoView = function() {
+      if (isMobile && !isUserInteraction && scrollLock) {
+        console.log('🚫 Bloqueado: scrollIntoView en', this.tagName, this.id || this.className);
+        return; // Bloquear scrollIntoView automático
+      }
+      return origScrollIntoView.apply(this, arguments);
+    };
+
+    // Interceptar window.scroll
+    const origScroll = window.scroll;
+    window.scroll = function(x, y) {
+      if (isMobile && !isUserInteraction && scrollLock) {
+        console.log('🚫 Bloqueado: scroll(' + x + ',' + y + ') sin interacción del usuario');
+        return;
+      }
+      return origScroll.call(window, x, y);
+    };
+
+    // Modificar focus para no hacer scroll en móviles
+    const origFocus = HTMLElement.prototype.focus;
+    HTMLElement.prototype.focus = function(options) {
+      if (isMobile) {
+        // En móviles, focus sin scroll
+        const newOptions = Object.assign({}, options, { preventScroll: true });
+        return origFocus.call(this, newOptions);
+      }
+      return origFocus.call(this, options);
+    };
+
+    // Activar protección al cargar la página
+    document.addEventListener('DOMContentLoaded', function() {
+      initialScrollPos = window.pageYOffset || document.documentElement.scrollTop || 0;
+      scrollLock = true;
+      
+      // Mantener lock por 3 segundos después de carga
+      setTimeout(function() {
+        scrollLock = false;
+        console.log('✅ Protección anti-scroll desactivada - página cargada');
+      }, 3000);
+
+      // Prevenir scroll en focus de inputs
+      document.addEventListener('focusin', function(e) {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+          if (!isUserInteraction) {
+            const scrollBefore = window.pageYOffset || document.documentElement.scrollTop || 0;
+            setTimeout(function() {
+              const scrollAfter = window.pageYOffset || document.documentElement.scrollTop || 0;
+              if (Math.abs(scrollAfter - scrollBefore) > 3) {
+                window.scrollTo(0, scrollBefore);
+                document.documentElement.scrollTop = scrollBefore;
+                document.body.scrollTop = scrollBefore;
+              }
+            }, 0);
+          }
+        }
+      }, true);
+    });
+
+    // Prevenir scroll al abrir/cerrar teclado virtual
+    let lastHeight = window.innerHeight;
+    window.addEventListener('resize', function() {
+      const currentHeight = window.innerHeight;
+      if (Math.abs(currentHeight - lastHeight) > 100) {
+        // Cambio grande = probablemente teclado virtual
+        setTimeout(preventAutoScroll, 50);
+      }
+      lastHeight = currentHeight;
+    });
+
+    console.log('✅ Protección anti-scroll activada para móvil');
+  })();
+  </script>
 
   {# --- jQuery / DAL --- #}
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
@@ -559,32 +708,32 @@
       <div class="flex items-center justify-center gap-3 flex-wrap max-w-7xl w-full px-4">
         <!-- AJUSTES -->
         <a href="{% country_url 'company_settings' %}" class="nav-button-standard">
-          <span class="nav-icon">⚙️</span>
-          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}AJUSTES{% else %}SETTINGS{% endif %}</span>
+          <span class="nav-icon" style="font-size: 1.5rem; margin-bottom: 0.3rem;">⚙️</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}AJUSTES{% else %}SETTINGS{% endif %}</span>
         </a>
 
         <!-- CENTRO -->
         <a href="{% country_url 'centro_operaciones' %}" class="nav-button-standard">
-          <span class="nav-icon">🚀</span>
-          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}CENTRO{% else %}CENTER{% endif %}</span>
+          <span class="nav-icon" style="font-size: 1.5rem; margin-bottom: 0.3rem;">🚀</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}CENTRO{% else %}CENTER{% endif %}</span>
         </a>
 
         <!-- CLIENTES -->
         <a href="{% country_url 'clientes:lista_clientes' %}" class="nav-button-standard">
-          <span class="nav-icon">👥</span>
-          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}CLIENTES{% else %}CLIENTS{% endif %}</span>
+          <span class="nav-icon" style="font-size: 1.5rem; margin-bottom: 0.3rem;">👥</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}CLIENTES{% else %}CLIENTS{% endif %}</span>
         </a>
 
         <!-- DOCUMENTOS -->
         <a href="{% country_url 'documentos:lista_documentos' %}" class="nav-button-standard">
-          <span class="nav-icon">📄</span>
-          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}DOCUMENTOS{% else %}DOCUMENTS{% endif %}</span>
+          <span class="nav-icon" style="font-size: 1.5rem; margin-bottom: 0.3rem;">📄</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}DOCUMENTOS{% else %}DOCUMENTS{% endif %}</span>
         </a>
 
         <!-- EXTRA -->
         <a href="{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}/us/{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}es{% else %}en{% endif %}/servicios/otros-servicios/{% else %}/cl/es/servicios/otros-servicios/{% endif %}" class="nav-button-standard">
-          <span class="nav-icon">⭐</span>
-          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">EXTRA</span>
+          <span class="nav-icon" style="font-size: 1.5rem; margin-bottom: 0.3rem;">⭐</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">EXTRA</span>
         </a>
       </div>
 
@@ -592,33 +741,33 @@
       <div class="flex items-center justify-center gap-3 flex-wrap max-w-7xl w-full px-4">
         <!-- REPUESTOS -->
         <a href="{% country_url 'repuestos:lista_repuestos' %}" class="nav-button-standard">
-          <span class="nav-icon">🔧</span>
-          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}REPUESTOS{% else %}PARTS{% endif %}</span>
+          <span class="nav-icon" style="font-size: 1.5rem; margin-bottom: 0.3rem;">🔧</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}REPUESTOS{% else %}PARTS{% endif %}</span>
         </a>
 
         <!-- REPORTES -->
         <a href="{% country_url 'reportes:reportes_dashboard' %}" class="nav-button-standard">
-          <span class="nav-icon">📊</span>
-          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}REPORTES{% else %}REPORTS{% endif %}</span>
+          <span class="nav-icon" style="font-size: 1.5rem; margin-bottom: 0.3rem;">📊</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}REPORTES{% else %}REPORTS{% endif %}</span>
         </a>
 
         <!-- SERVICIOS -->
         <a href="{% country_url 'servicios:servicios_menu' %}" class="nav-button-standard">
-          <span class="nav-icon">🛠️</span>
-          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}SERVICIOS{% else %}SERVICES{% endif %}</span>
+          <span class="nav-icon" style="font-size: 1.5rem; margin-bottom: 0.3rem;">🛠️</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}SERVICIOS{% else %}SERVICES{% endif %}</span>
         </a>
 
         <!-- VEHÍCULOS -->
         {% country_url 'vehiculos:lista_vehiculos' as vehiculos_url %}
         {% if vehiculos_url %}
         <a href="{{ vehiculos_url }}" class="nav-button-standard">
-          <span class="nav-icon">🚗</span>
-          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}VEHÍCULOS{% else %}VEHICLES{% endif %}</span>
+          <span class="nav-icon" style="font-size: 1.5rem; margin-bottom: 0.3rem;">🚗</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}VEHÍCULOS{% else %}VEHICLES{% endif %}</span>
         </a>
         {% else %}
         <a href="{% country_url 'vehiculos:lista_vehiculos' %}" class="nav-button-standard">
-          <span class="nav-icon">🚗</span>
-          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}VEHÍCULOS{% else %}VEHICLES{% endif %}</span>
+          <span class="nav-icon" style="font-size: 1.5rem; margin-bottom: 0.3rem;">🚗</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}VEHÍCULOS{% else %}VEHICLES{% endif %}</span>
         </a>
         {% endif %}
 
@@ -626,8 +775,8 @@
         <form action="{% url 'account_logout' %}" method="post" class="inline-block">
           {% csrf_token %}
           <button type="submit" class="nav-button-standard logout-btn" style="cursor: pointer;">
-            <span class="nav-icon">🚪</span>
-            <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}SALIR{% else %}LOGOUT{% endif %}</span>
+            <span class="nav-icon" style="font-size: 1.5rem; margin-bottom: 0.3rem;">🚪</span>
+            <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}SALIR{% else %}LOGOUT{% endif %}</span>
           </button>
         </form>
       </div>
@@ -674,9 +823,10 @@
 
   {# --- JS extra + Starfield JS si aplica --- #}
   {% block extra_js %}{% endblock %}
-  {% if enable_space_bg|default:1 and enable_space_bg != 2 %}
+  {# TEMP: desactivar starfield para probar scroll en móviles #}
+  {# {% if enable_space_bg|default:1 and enable_space_bg != 2 %}
     <script src="{% static 'js/starfield.js' %}"></script>
-  {% endif %}
+  {% endif %} #}
 
   <script>
     // CSRF helper
