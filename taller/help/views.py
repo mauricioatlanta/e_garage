@@ -98,6 +98,3 @@ def help_buscar(request):
     }
 
     return render(request, "help/buscar.html", context)
-
-
-

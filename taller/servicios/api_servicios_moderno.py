@@ -393,6 +393,3 @@ def api_categorias_subcategorias(request):
             "categorias": categorias_data,
         }
     )
-
-
-

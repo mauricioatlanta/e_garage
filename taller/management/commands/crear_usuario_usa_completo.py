@@ -147,6 +147,3 @@ class Command(BaseCommand):
         self.stdout.write(f"   Login USA: http://127.0.0.1:8000/us/accounts/login/")
         self.stdout.write(f"   Dashboard USA: http://127.0.0.1:8000/us/")
         self.stdout.write("=" * 80)
-
-
-

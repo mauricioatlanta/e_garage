@@ -1,0 +1,67 @@
+{
+  "tabla": "ubicacion_address",
+  "columnas": [
+    "id",
+    "line1",
+    "line2",
+    "postal_code",
+    "latitude",
+    "longitude",
+    "created_at",
+    "updated_at",
+    "city_id",
+    "company_id"
+  ],
+  "tipos": [
+    "INTEGER",
+    "varchar(160)",
+    "varchar(160)",
+    "varchar(20)",
+    "decimal",
+    "decimal",
+    "datetime",
+    "datetime",
+    "bigint",
+    "bigint"
+  ],
+  "filas": [
+    {
+      "id": 1,
+      "line1": "del manzano 3058",
+      "line2": "",
+      "postal_code": "303333",
+      "latitude": null,
+      "longitude": null,
+      "created_at": "2025-12-04 16:46:54.869744",
+      "updated_at": "2025-12-04 16:46:54.869847",
+      "city_id": 108,
+      "company_id": 1
+    },
+    {
+      "id": 2,
+      "line1": "ASHBURN LN 2773",
+      "line2": "",
+      "postal_code": "30341",
+      "latitude": null,
+      "longitude": null,
+      "created_at": "2025-12-04 16:46:54.979277",
+      "updated_at": "2025-12-04 16:46:54.979301",
+      "city_id": 91,
+      "company_id": 1
+    },
+    {
+      "id": 3,
+      "line1": "av principal 1111",
+      "line2": "",
+      "postal_code": "30000",
+      "latitude": null,
+      "longitude": null,
+      "created_at": "2025-12-04 16:46:55.073525",
+      "updated_at": "2025-12-04 16:46:55.073552",
+      "city_id": 118,
+      "company_id": 1
+    }
+  ],
+  "total_registros": 3,
+  "timestamp": "2025-12-06T01:10:45.151073"
+}

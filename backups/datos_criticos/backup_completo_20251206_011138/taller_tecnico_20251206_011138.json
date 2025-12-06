@@ -1,0 +1,84 @@
+{
+  "tabla": "taller_tecnico",
+  "columnas": [
+    "id",
+    "nombre",
+    "telefono",
+    "direccion",
+    "fecha_creacion",
+    "fecha_modificacion",
+    "empresa_id",
+    "rol",
+    "activo"
+  ],
+  "tipos": [
+    "INTEGER",
+    "varchar(100)",
+    "varchar(20)",
+    "TEXT",
+    "datetime",
+    "datetime",
+    "bigint",
+    "varchar(12)",
+    "bool"
+  ],
+  "filas": [
+    {
+      "id": 1,
+      "nombre": "chompi",
+      "telefono": "",
+      "direccion": "",
+      "fecha_creacion": "2025-11-25 02:44:56.200406",
+      "fecha_modificacion": "2025-11-25 02:44:56.200429",
+      "empresa_id": 1,
+      "rol": "MIXTO",
+      "activo": 1
+    },
+    {
+      "id": 2,
+      "nombre": "tararira",
+      "telefono": "",
+      "direccion": "",
+      "fecha_creacion": "2025-11-25 02:45:08.498795",
+      "fecha_modificacion": "2025-11-25 02:45:08.498816",
+      "empresa_id": 1,
+      "rol": "MIXTO",
+      "activo": 1
+    },
+    {
+      "id": 3,
+      "nombre": "victor",
+      "telefono": "",
+      "direccion": "",
+      "fecha_creacion": "2025-11-26 13:42:47.918639",
+      "fecha_modificacion": "2025-11-26 13:42:47.918659",
+      "empresa_id": 2,
+      "rol": "MIXTO",
+      "activo": 1
+    },
+    {
+      "id": 4,
+      "nombre": "edgardo",
+      "telefono": "",
+      "direccion": "",
+      "fecha_creacion": "2025-11-26 13:43:03.984949",
+      "fecha_modificacion": "2025-11-26 13:43:03.984970",
+      "empresa_id": 2,
+      "rol": "MIXTO",
+      "activo": 1
+    },
+    {
+      "id": 5,
+      "nombre": "Técnico Principal",
+      "telefono": null,
+      "direccion": null,
+      "fecha_creacion": "2025-12-06 00:26:47.151396",
+      "fecha_modificacion": "2025-12-06 00:26:47.151437",
+      "empresa_id": 2,
+      "rol": "MIXTO",
+      "activo": 1
+    }
+  ],
+  "total_registros": 5,
+  "timestamp": "2025-12-06T01:11:38.371221"
+}

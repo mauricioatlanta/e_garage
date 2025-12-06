@@ -1,0 +1,52 @@
+════════════════════════════════════════════════════════════════
+  COMANDOS PARA COPIAR Y PEGAR - UNO POR UNO
+════════════════════════════════════════════════════════════════
+
+IMPORTANTE: Copia y pega UN SOLO comando a la vez, espera a que termine,
+y luego copia el siguiente.
+
+─────────────────────────────────────────────────────────────────
+COMANDO 1: Verificar que estás en el directorio correcto
+─────────────────────────────────────────────────────────────────
+
+cd E:\projecto\e_garage
+
+
+─────────────────────────────────────────────────────────────────
+COMANDO 2: Ver qué archivos cambiaron
+─────────────────────────────────────────────────────────────────
+
+git status
+
+
+─────────────────────────────────────────────────────────────────
+COMANDO 3: Agregar los archivos modificados al staging
+─────────────────────────────────────────────────────────────────
+
+git add taller/models/tecnico.py taller/configuracion/rubros_logic.py taller/documentos/views_country_aware.py
+
+
+─────────────────────────────────────────────────────────────────
+COMANDO 4: Verificar que los archivos se agregaron correctamente
+─────────────────────────────────────────────────────────────────
+
+git status
+
+
+─────────────────────────────────────────────────────────────────
+COMANDO 5: Hacer commit de los cambios
+─────────────────────────────────────────────────────────────────
+
+git commit -m "refactor: Cambiar campo rol de Tecnico de TextChoices a ROL_CHOICES"
+
+
+─────────────────────────────────────────────────────────────────
+COMANDO 6: Subir cambios a Git (push)
+─────────────────────────────────────────────────────────────────
+
+git push origin main
+
+
+════════════════════════════════════════════════════════════════
+
+

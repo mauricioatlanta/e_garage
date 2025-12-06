@@ -1,0 +1,8641 @@
+{
+  "tabla": "taller_modelo",
+  "columnas": [
+    "id",
+    "nombre",
+    "country",
+    "marca_id"
+  ],
+  "tipos": [
+    "INTEGER",
+    "varchar(50)",
+    "varchar(2)",
+    "bigint"
+  ],
+  "filas": [
+    {
+      "id": 1,
+      "nombre": "F-150",
+      "country": "US",
+      "marca_id": 9
+    },
+    {
+      "id": 2,
+      "nombre": "F-250",
+      "country": "US",
+      "marca_id": 9
+    },
+    {
+      "id": 3,
+      "nombre": "F-350",
+      "country": "US",
+      "marca_id": 9
+    },
+    {
+      "id": 4,
+      "nombre": "Mustang",
+      "country": "US",
+      "marca_id": 9
+    },
+    {
+      "id": 5,
+      "nombre": "Explorer",
+      "country": "US",
+      "marca_id": 9
+    },
+    {
+      "id": 6,
+      "nombre": "Escape",
+      "country": "US",
+      "marca_id": 9
+    },
+    {
+      "id": 7,
+      "nombre": "Edge",
+      "country": "US",
+      "marca_id": 9
+    },
+    {
+      "id": 8,
+      "nombre": "Expedition",
+      "country": "US",
+      "marca_id": 9
+    },
+    {
+      "id": 9,
+      "nombre": "Ranger",
+      "country": "US",
+      "marca_id": 9
+    },
+    {
+      "id": 10,
+      "nombre": "Bronco",
+      "country": "US",
+      "marca_id": 9
+    },
+    {
+      "id": 11,
+      "nombre": "Focus",
+      "country": "US",
+      "marca_id": 9
+    },
+    {
+      "id": 12,
+      "nombre": "Fusion",
+      "country": "US",
+      "marca_id": 9
+    },
+    {
+      "id": 13,
+      "nombre": "Taurus",
+      "country": "US",
+      "marca_id": 9
+    },
+    {
+      "id": 14,
+      "nombre": "Silverado",
+      "country": "US",
+      "marca_id": 6
+    },
+    {
+      "id": 15,
+      "nombre": "Tahoe",
+      "country": "US",
+      "marca_id": 6
+    },
+    {
+      "id": 16,
+      "nombre": "Suburban",
+      "country": "US",
+      "marca_id": 6
+    },
+    {
+      "id": 17,
+      "nombre": "Equinox",
+      "country": "US",
+      "marca_id": 6
+    },
+    {
+      "id": 18,
+      "nombre": "Traverse",
+      "country": "US",
+      "marca_id": 6
+    },
+    {
+      "id": 19,
+      "nombre": "Malibu",
+      "country": "US",
+      "marca_id": 6
+    },
+    {
+      "id": 20,
+      "nombre": "Camaro",
+      "country": "US",
+      "marca_id": 6
+    },
+    {
+      "id": 21,
+      "nombre": "Corvette",
+      "country": "US",
+      "marca_id": 6
+    },
+    {
+      "id": 22,
+      "nombre": "Cruze",
+      "country": "US",
+      "marca_id": 6
+    },
+    {
+      "id": 23,
+      "nombre": "Impala",
+      "country": "US",
+      "marca_id": 6
+    },
+    {
+      "id": 24,
+      "nombre": "Blazer",
+      "country": "US",
+      "marca_id": 6
+    },
+    {
+      "id": 25,
+      "nombre": "Trailblazer",
+      "country": "US",
+      "marca_id": 6
+    },
+    {
+      "id": 26,
+      "nombre": "Camry",
+      "country": "US",
+      "marca_id": 24
+    },
+    {
+      "id": 27,
+      "nombre": "Corolla",
+      "country": "US",
+      "marca_id": 24
+    },
+    {
+      "id": 28,
+      "nombre": "RAV4",
+      "country": "US",
+      "marca_id": 24
+    },
+    {
+      "id": 29,
+      "nombre": "Highlander",
+      "country": "US",
+      "marca_id": 24
+    },
+    {
+      "id": 30,
+      "nombre": "Tacoma",
+      "country": "US",
+      "marca_id": 24
+    },
+    {
+      "id": 31,
+      "nombre": "Tundra",
+      "country": "US",
+      "marca_id": 24
+    },
+    {
+      "id": 32,
+      "nombre": "4Runner",
+      "country": "US",
+      "marca_id": 24
+    },
+    {
+      "id": 33,
+      "nombre": "Prius",
+      "country": "US",
+      "marca_id": 24
+    },
+    {
+      "id": 34,
+      "nombre": "Sienna",
+      "country": "US",
+      "marca_id": 24
+    },
+    {
+      "id": 35,
+      "nombre": "Sequoia",
+      "country": "US",
+      "marca_id": 24
+    },
+    {
+      "id": 36,
+      "nombre": "Land Cruiser",
+      "country": "US",
+      "marca_id": 24
+    },
+    {
+      "id": 37,
+      "nombre": "Avalon",
+      "country": "US",
+      "marca_id": 24
+    },
+    {
+      "id": 38,
+      "nombre": "Civic",
+      "country": "US",
+      "marca_id": 11
+    },
+    {
+      "id": 39,
+      "nombre": "Accord",
+      "country": "US",
+      "marca_id": 11
+    },
+    {
+      "id": 40,
+      "nombre": "CR-V",
+      "country": "US",
+      "marca_id": 11
+    },
+    {
+      "id": 41,
+      "nombre": "Pilot",
+      "country": "US",
+      "marca_id": 11
+    },
+    {
+      "id": 42,
+      "nombre": "Odyssey",
+      "country": "US",
+      "marca_id": 11
+    },
+    {
+      "id": 43,
+      "nombre": "Ridgeline",
+      "country": "US",
+      "marca_id": 11
+    },
+    {
+      "id": 44,
+      "nombre": "Passport",
+      "country": "US",
+      "marca_id": 11
+    },
+    {
+      "id": 45,
+      "nombre": "HR-V",
+      "country": "US",
+      "marca_id": 11
+    },
+    {
+      "id": 46,
+      "nombre": "Insight",
+      "country": "US",
+      "marca_id": 11
+    },
+    {
+      "id": 47,
+      "nombre": "Fit",
+      "country": "US",
+      "marca_id": 11
+    },
+    {
+      "id": 48,
+      "nombre": "Altima",
+      "country": "US",
+      "marca_id": 21
+    },
+    {
+      "id": 49,
+      "nombre": "Sentra",
+      "country": "US",
+      "marca_id": 21
+    },
+    {
+      "id": 50,
+      "nombre": "Rogue",
+      "country": "US",
+      "marca_id": 21
+    },
+    {
+      "id": 51,
+      "nombre": "Pathfinder",
+      "country": "US",
+      "marca_id": 21
+    },
+    {
+      "id": 52,
+      "nombre": "Armada",
+      "country": "US",
+      "marca_id": 21
+    },
+    {
+      "id": 53,
+      "nombre": "Frontier",
+      "country": "US",
+      "marca_id": 21
+    },
+    {
+      "id": 54,
+      "nombre": "Titan",
+      "country": "US",
+      "marca_id": 21
+    },
+    {
+      "id": 55,
+      "nombre": "Murano",
+      "country": "US",
+      "marca_id": 21
+    },
+    {
+      "id": 56,
+      "nombre": "Maxima",
+      "country": "US",
+      "marca_id": 21
+    },
+    {
+      "id": 57,
+      "nombre": "Versa",
+      "country": "US",
+      "marca_id": 21
+    },
+    {
+      "id": 58,
+      "nombre": "Ram 1500",
+      "country": "US",
+      "marca_id": 8
+    },
+    {
+      "id": 59,
+      "nombre": "Ram 2500",
+      "country": "US",
+      "marca_id": 8
+    },
+    {
+      "id": 60,
+      "nombre": "Ram 3500",
+      "country": "US",
+      "marca_id": 8
+    },
+    {
+      "id": 61,
+      "nombre": "Charger",
+      "country": "US",
+      "marca_id": 8
+    },
+    {
+      "id": 62,
+      "nombre": "Challenger",
+      "country": "US",
+      "marca_id": 8
+    },
+    {
+      "id": 63,
+      "nombre": "Durango",
+      "country": "US",
+      "marca_id": 8
+    },
+    {
+      "id": 64,
+      "nombre": "Journey",
+      "country": "US",
+      "marca_id": 8
+    },
+    {
+      "id": 65,
+      "nombre": "Grand Caravan",
+      "country": "US",
+      "marca_id": 8
+    },
+    {
+      "id": 66,
+      "nombre": "Wrangler",
+      "country": "US",
+      "marca_id": 14
+    },
+    {
+      "id": 67,
+      "nombre": "Grand Cherokee",
+      "country": "US",
+      "marca_id": 14
+    },
+    {
+      "id": 68,
+      "nombre": "Cherokee",
+      "country": "US",
+      "marca_id": 14
+    },
+    {
+      "id": 69,
+      "nombre": "Compass",
+      "country": "US",
+      "marca_id": 14
+    },
+    {
+      "id": 70,
+      "nombre": "Renegade",
+      "country": "US",
+      "marca_id": 14
+    },
+    {
+      "id": 71,
+      "nombre": "Gladiator",
+      "country": "US",
+      "marca_id": 14
+    },
+    {
+      "id": 72,
+      "nombre": "Wagoneer",
+      "country": "US",
+      "marca_id": 14
+    },
+    {
+      "id": 73,
+      "nombre": "Grand Wagoneer",
+      "country": "US",
+      "marca_id": 14
+    },
+    {
+      "id": 74,
+      "nombre": "Sierra 1500",
+      "country": "US",
+      "marca_id": 10
+    },
+    {
+      "id": 75,
+      "nombre": "Sierra 2500",
+      "country": "US",
+      "marca_id": 10
+    },
+    {
+      "id": 76,
+      "nombre": "Sierra 3500",
+      "country": "US",
+      "marca_id": 10
+    },
+    {
+      "id": 77,
+      "nombre": "Yukon",
+      "country": "US",
+      "marca_id": 10
+    },
+    {
+      "id": 78,
+      "nombre": "Yukon XL",
+      "country": "US",
+      "marca_id": 10
+    },
+    {
+      "id": 79,
+      "nombre": "Acadia",
+      "country": "US",
+      "marca_id": 10
+    },
+    {
+      "id": 80,
+      "nombre": "Terrain",
+      "country": "US",
+      "marca_id": 10
+    },
+    {
+      "id": 81,
+      "nombre": "Canyon",
+      "country": "US",
+      "marca_id": 10
+    },
+    {
+      "id": 82,
+      "nombre": "1500",
+      "country": "US",
+      "marca_id": 22
+    },
+    {
+      "id": 83,
+      "nombre": "2500",
+      "country": "US",
+      "marca_id": 22
+    },
+    {
+      "id": 84,
+      "nombre": "3500",
+      "country": "US",
+      "marca_id": 22
+    },
+    {
+      "id": 85,
+      "nombre": "4500",
+      "country": "US",
+      "marca_id": 22
+    },
+    {
+      "id": 86,
+      "nombre": "5500",
+      "country": "US",
+      "marca_id": 22
+    },
+    {
+      "id": 87,
+      "nombre": "ProMaster",
+      "country": "US",
+      "marca_id": 22
+    },
+    {
+      "id": 88,
+      "nombre": "ProMaster City",
+      "country": "US",
+      "marca_id": 22
+    },
+    {
+      "id": 89,
+      "nombre": "Outback",
+      "country": "US",
+      "marca_id": 23
+    },
+    {
+      "id": 90,
+      "nombre": "Forester",
+      "country": "US",
+      "marca_id": 23
+    },
+    {
+      "id": 91,
+      "nombre": "Crosstrek",
+      "country": "US",
+      "marca_id": 23
+    },
+    {
+      "id": 92,
+      "nombre": "Ascent",
+      "country": "US",
+      "marca_id": 23
+    },
+    {
+      "id": 93,
+      "nombre": "Legacy",
+      "country": "US",
+      "marca_id": 23
+    },
+    {
+      "id": 94,
+      "nombre": "Impreza",
+      "country": "US",
+      "marca_id": 23
+    },
+    {
+      "id": 95,
+      "nombre": "WRX",
+      "country": "US",
+      "marca_id": 23
+    },
+    {
+      "id": 96,
+      "nombre": "BRZ",
+      "country": "US",
+      "marca_id": 23
+    },
+    {
+      "id": 97,
+      "nombre": "CX-5",
+      "country": "US",
+      "marca_id": 18
+    },
+    {
+      "id": 98,
+      "nombre": "CX-9",
+      "country": "US",
+      "marca_id": 18
+    },
+    {
+      "id": 99,
+      "nombre": "CX-30",
+      "country": "US",
+      "marca_id": 18
+    },
+    {
+      "id": 100,
+      "nombre": "Mazda3",
+      "country": "US",
+      "marca_id": 18
+    },
+    {
+      "id": 101,
+      "nombre": "Mazda6",
+      "country": "US",
+      "marca_id": 18
+    },
+    {
+      "id": 102,
+      "nombre": "MX-5 Miata",
+      "country": "US",
+      "marca_id": 18
+    },
+    {
+      "id": 103,
+      "nombre": "CX-50",
+      "country": "US",
+      "marca_id": 18
+    },
+    {
+      "id": 104,
+      "nombre": "Elantra",
+      "country": "US",
+      "marca_id": 12
+    },
+    {
+      "id": 105,
+      "nombre": "Sonata",
+      "country": "US",
+      "marca_id": 12
+    },
+    {
+      "id": 106,
+      "nombre": "Tucson",
+      "country": "US",
+      "marca_id": 12
+    },
+    {
+      "id": 107,
+      "nombre": "Santa Fe",
+      "country": "US",
+      "marca_id": 12
+    },
+    {
+      "id": 108,
+      "nombre": "Palisade",
+      "country": "US",
+      "marca_id": 12
+    },
+    {
+      "id": 109,
+      "nombre": "Kona",
+      "country": "US",
+      "marca_id": 12
+    },
+    {
+      "id": 110,
+      "nombre": "Venue",
+      "country": "US",
+      "marca_id": 12
+    },
+    {
+      "id": 111,
+      "nombre": "Ioniq",
+      "country": "US",
+      "marca_id": 12
+    },
+    {
+      "id": 112,
+      "nombre": "Forte",
+      "country": "US",
+      "marca_id": 15
+    },
+    {
+      "id": 113,
+      "nombre": "Optima",
+      "country": "US",
+      "marca_id": 15
+    },
+    {
+      "id": 114,
+      "nombre": "Sorento",
+      "country": "US",
+      "marca_id": 15
+    },
+    {
+      "id": 115,
+      "nombre": "Sportage",
+      "country": "US",
+      "marca_id": 15
+    },
+    {
+      "id": 116,
+      "nombre": "Telluride",
+      "country": "US",
+      "marca_id": 15
+    },
+    {
+      "id": 117,
+      "nombre": "Soul",
+      "country": "US",
+      "marca_id": 15
+    },
+    {
+      "id": 118,
+      "nombre": "Rio",
+      "country": "US",
+      "marca_id": 15
+    },
+    {
+      "id": 119,
+      "nombre": "Stinger",
+      "country": "US",
+      "marca_id": 15
+    },
+    {
+      "id": 120,
+      "nombre": "Jetta",
+      "country": "US",
+      "marca_id": 25
+    },
+    {
+      "id": 121,
+      "nombre": "Passat",
+      "country": "US",
+      "marca_id": 25
+    },
+    {
+      "id": 122,
+      "nombre": "Atlas",
+      "country": "US",
+      "marca_id": 25
+    },
+    {
+      "id": 123,
+      "nombre": "Tiguan",
+      "country": "US",
+      "marca_id": 25
+    },
+    {
+      "id": 124,
+      "nombre": "Golf",
+      "country": "US",
+      "marca_id": 25
+    },
+    {
+      "id": 125,
+      "nombre": "Arteon",
+      "country": "US",
+      "marca_id": 25
+    },
+    {
+      "id": 126,
+      "nombre": "ID.4",
+      "country": "US",
+      "marca_id": 25
+    },
+    {
+      "id": 127,
+      "nombre": "3 Series",
+      "country": "US",
+      "marca_id": 3
+    },
+    {
+      "id": 128,
+      "nombre": "5 Series",
+      "country": "US",
+      "marca_id": 3
+    },
+    {
+      "id": 129,
+      "nombre": "X3",
+      "country": "US",
+      "marca_id": 3
+    },
+    {
+      "id": 130,
+      "nombre": "X5",
+      "country": "US",
+      "marca_id": 3
+    },
+    {
+      "id": 131,
+      "nombre": "X1",
+      "country": "US",
+      "marca_id": 3
+    },
+    {
+      "id": 132,
+      "nombre": "X7",
+      "country": "US",
+      "marca_id": 3
+    },
+    {
+      "id": 133,
+      "nombre": "7 Series",
+      "country": "US",
+      "marca_id": 3
+    },
+    {
+      "id": 134,
+      "nombre": "M3",
+      "country": "US",
+      "marca_id": 3
+    },
+    {
+      "id": 135,
+      "nombre": "M5",
+      "country": "US",
+      "marca_id": 3
+    },
+    {
+      "id": 136,
+      "nombre": "C-Class",
+      "country": "US",
+      "marca_id": 19
+    },
+    {
+      "id": 137,
+      "nombre": "E-Class",
+      "country": "US",
+      "marca_id": 19
+    },
+    {
+      "id": 138,
+      "nombre": "S-Class",
+      "country": "US",
+      "marca_id": 19
+    },
+    {
+      "id": 139,
+      "nombre": "GLC",
+      "country": "US",
+      "marca_id": 19
+    },
+    {
+      "id": 140,
+      "nombre": "GLE",
+      "country": "US",
+      "marca_id": 19
+    },
+    {
+      "id": 141,
+      "nombre": "GLS",
+      "country": "US",
+      "marca_id": 19
+    },
+    {
+      "id": 142,
+      "nombre": "A-Class",
+      "country": "US",
+      "marca_id": 19
+    },
+    {
+      "id": 143,
+      "nombre": "CLA",
+      "country": "US",
+      "marca_id": 19
+    },
+    {
+      "id": 144,
+      "nombre": "A4",
+      "country": "US",
+      "marca_id": 2
+    },
+    {
+      "id": 145,
+      "nombre": "A6",
+      "country": "US",
+      "marca_id": 2
+    },
+    {
+      "id": 146,
+      "nombre": "Q5",
+      "country": "US",
+      "marca_id": 2
+    },
+    {
+      "id": 147,
+      "nombre": "Q7",
+      "country": "US",
+      "marca_id": 2
+    },
+    {
+      "id": 148,
+      "nombre": "A3",
+      "country": "US",
+      "marca_id": 2
+    },
+    {
+      "id": 149,
+      "nombre": "Q3",
+      "country": "US",
+      "marca_id": 2
+    },
+    {
+      "id": 150,
+      "nombre": "e-tron",
+      "country": "US",
+      "marca_id": 2
+    },
+    {
+      "id": 151,
+      "nombre": "A5",
+      "country": "US",
+      "marca_id": 2
+    },
+    {
+      "id": 152,
+      "nombre": "RX",
+      "country": "US",
+      "marca_id": 16
+    },
+    {
+      "id": 153,
+      "nombre": "NX",
+      "country": "US",
+      "marca_id": 16
+    },
+    {
+      "id": 154,
+      "nombre": "ES",
+      "country": "US",
+      "marca_id": 16
+    },
+    {
+      "id": 155,
+      "nombre": "GX",
+      "country": "US",
+      "marca_id": 16
+    },
+    {
+      "id": 156,
+      "nombre": "LX",
+      "country": "US",
+      "marca_id": 16
+    },
+    {
+      "id": 157,
+      "nombre": "IS",
+      "country": "US",
+      "marca_id": 16
+    },
+    {
+      "id": 158,
+      "nombre": "LS",
+      "country": "US",
+      "marca_id": 16
+    },
+    {
+      "id": 159,
+      "nombre": "UX",
+      "country": "US",
+      "marca_id": 16
+    },
+    {
+      "id": 160,
+      "nombre": "MDX",
+      "country": "US",
+      "marca_id": 1
+    },
+    {
+      "id": 161,
+      "nombre": "RDX",
+      "country": "US",
+      "marca_id": 1
+    },
+    {
+      "id": 162,
+      "nombre": "TLX",
+      "country": "US",
+      "marca_id": 1
+    },
+    {
+      "id": 163,
+      "nombre": "ILX",
+      "country": "US",
+      "marca_id": 1
+    },
+    {
+      "id": 164,
+      "nombre": "NSX",
+      "country": "US",
+      "marca_id": 1
+    },
+    {
+      "id": 165,
+      "nombre": "Integra",
+      "country": "US",
+      "marca_id": 1
+    },
+    {
+      "id": 166,
+      "nombre": "Q50",
+      "country": "US",
+      "marca_id": 13
+    },
+    {
+      "id": 167,
+      "nombre": "Q60",
+      "country": "US",
+      "marca_id": 13
+    },
+    {
+      "id": 168,
+      "nombre": "QX50",
+      "country": "US",
+      "marca_id": 13
+    },
+    {
+      "id": 169,
+      "nombre": "QX60",
+      "country": "US",
+      "marca_id": 13
+    },
+    {
+      "id": 170,
+      "nombre": "QX80",
+      "country": "US",
+      "marca_id": 13
+    },
+    {
+      "id": 171,
+      "nombre": "QX55",
+      "country": "US",
+      "marca_id": 13
+    },
+    {
+      "id": 172,
+      "nombre": "Escalade",
+      "country": "US",
+      "marca_id": 5
+    },
+    {
+      "id": 173,
+      "nombre": "XT5",
+      "country": "US",
+      "marca_id": 5
+    },
+    {
+      "id": 174,
+      "nombre": "XT6",
+      "country": "US",
+      "marca_id": 5
+    },
+    {
+      "id": 175,
+      "nombre": "CT5",
+      "country": "US",
+      "marca_id": 5
+    },
+    {
+      "id": 176,
+      "nombre": "CT4",
+      "country": "US",
+      "marca_id": 5
+    },
+    {
+      "id": 177,
+      "nombre": "Lyriq",
+      "country": "US",
+      "marca_id": 5
+    },
+    {
+      "id": 178,
+      "nombre": "Navigator",
+      "country": "US",
+      "marca_id": 17
+    },
+    {
+      "id": 179,
+      "nombre": "Aviator",
+      "country": "US",
+      "marca_id": 17
+    },
+    {
+      "id": 180,
+      "nombre": "Corsair",
+      "country": "US",
+      "marca_id": 17
+    },
+    {
+      "id": 181,
+      "nombre": "Nautilus",
+      "country": "US",
+      "marca_id": 17
+    },
+    {
+      "id": 182,
+      "nombre": "Continental",
+      "country": "US",
+      "marca_id": 17
+    },
+    {
+      "id": 183,
+      "nombre": "Encore",
+      "country": "US",
+      "marca_id": 4
+    },
+    {
+      "id": 184,
+      "nombre": "Envision",
+      "country": "US",
+      "marca_id": 4
+    },
+    {
+      "id": 185,
+      "nombre": "Enclave",
+      "country": "US",
+      "marca_id": 4
+    },
+    {
+      "id": 186,
+      "nombre": "Regal",
+      "country": "US",
+      "marca_id": 4
+    },
+    {
+      "id": 187,
+      "nombre": "Pacifica",
+      "country": "US",
+      "marca_id": 7
+    },
+    {
+      "id": 188,
+      "nombre": "300",
+      "country": "US",
+      "marca_id": 7
+    },
+    {
+      "id": 189,
+      "nombre": "Voyager",
+      "country": "US",
+      "marca_id": 7
+    },
+    {
+      "id": 190,
+      "nombre": "Model 3",
+      "country": "US",
+      "marca_id": 27
+    },
+    {
+      "id": 191,
+      "nombre": "Model Y",
+      "country": "US",
+      "marca_id": 27
+    },
+    {
+      "id": 192,
+      "nombre": "Model S",
+      "country": "US",
+      "marca_id": 27
+    },
+    {
+      "id": 193,
+      "nombre": "Model X",
+      "country": "US",
+      "marca_id": 27
+    },
+    {
+      "id": 194,
+      "nombre": "Cybertruck",
+      "country": "US",
+      "marca_id": 27
+    },
+    {
+      "id": 195,
+      "nombre": "XC60",
+      "country": "US",
+      "marca_id": 26
+    },
+    {
+      "id": 196,
+      "nombre": "XC90",
+      "country": "US",
+      "marca_id": 26
+    },
+    {
+      "id": 197,
+      "nombre": "S60",
+      "country": "US",
+      "marca_id": 26
+    },
+    {
+      "id": 198,
+      "nombre": "S90",
+      "country": "US",
+      "marca_id": 26
+    },
+    {
+      "id": 199,
+      "nombre": "XC40",
+      "country": "US",
+      "marca_id": 26
+    },
+    {
+      "id": 200,
+      "nombre": "V60",
+      "country": "US",
+      "marca_id": 26
+    },
+    {
+      "id": 201,
+      "nombre": "G70",
+      "country": "US",
+      "marca_id": 28
+    },
+    {
+      "id": 202,
+      "nombre": "G80",
+      "country": "US",
+      "marca_id": 28
+    },
+    {
+      "id": 203,
+      "nombre": "G90",
+      "country": "US",
+      "marca_id": 28
+    },
+    {
+      "id": 204,
+      "nombre": "GV70",
+      "country": "US",
+      "marca_id": 28
+    },
+    {
+      "id": 205,
+      "nombre": "GV80",
+      "country": "US",
+      "marca_id": 28
+    },
+    {
+      "id": 206,
+      "nombre": "911",
+      "country": "US",
+      "marca_id": 32
+    },
+    {
+      "id": 207,
+      "nombre": "Cayenne",
+      "country": "US",
+      "marca_id": 32
+    },
+    {
+      "id": 208,
+      "nombre": "Macan",
+      "country": "US",
+      "marca_id": 32
+    },
+    {
+      "id": 209,
+      "nombre": "Panamera",
+      "country": "US",
+      "marca_id": 32
+    },
+    {
+      "id": 210,
+      "nombre": "Taycan",
+      "country": "US",
+      "marca_id": 32
+    },
+    {
+      "id": 211,
+      "nombre": "F-Pace",
+      "country": "US",
+      "marca_id": 30
+    },
+    {
+      "id": 212,
+      "nombre": "E-Pace",
+      "country": "US",
+      "marca_id": 30
+    },
+    {
+      "id": 213,
+      "nombre": "XF",
+      "country": "US",
+      "marca_id": 30
+    },
+    {
+      "id": 214,
+      "nombre": "XE",
+      "country": "US",
+      "marca_id": 30
+    },
+    {
+      "id": 215,
+      "nombre": "F-Type",
+      "country": "US",
+      "marca_id": 30
+    },
+    {
+      "id": 216,
+      "nombre": "Range Rover",
+      "country": "US",
+      "marca_id": 31
+    },
+    {
+      "id": 217,
+      "nombre": "Range Rover Sport",
+      "country": "US",
+      "marca_id": 31
+    },
+    {
+      "id": 218,
+      "nombre": "Discovery",
+      "country": "US",
+      "marca_id": 31
+    },
+    {
+      "id": 219,
+      "nombre": "Defender",
+      "country": "US",
+      "marca_id": 31
+    },
+    {
+      "id": 220,
+      "nombre": "Evoque",
+      "country": "US",
+      "marca_id": 31
+    },
+    {
+      "id": 221,
+      "nombre": "Giulia",
+      "country": "US",
+      "marca_id": 29
+    },
+    {
+      "id": 222,
+      "nombre": "Stelvio",
+      "country": "US",
+      "marca_id": 29
+    },
+    {
+      "id": 223,
+      "nombre": "Tonale",
+      "country": "US",
+      "marca_id": 29
+    },
+    {
+      "id": 224,
+      "nombre": "Outlander",
+      "country": "US",
+      "marca_id": 20
+    },
+    {
+      "id": 225,
+      "nombre": "Eclipse Cross",
+      "country": "US",
+      "marca_id": 20
+    },
+    {
+      "id": 226,
+      "nombre": "Outlander Sport",
+      "country": "US",
+      "marca_id": 20
+    },
+    {
+      "id": 227,
+      "nombre": "Mirage",
+      "country": "US",
+      "marca_id": 20
+    },
+    {
+      "id": 228,
+      "nombre": "Cooper",
+      "country": "US",
+      "marca_id": 33
+    },
+    {
+      "id": 229,
+      "nombre": "Countryman",
+      "country": "US",
+      "marca_id": 33
+    },
+    {
+      "id": 230,
+      "nombre": "Clubman",
+      "country": "US",
+      "marca_id": 33
+    },
+    {
+      "id": 231,
+      "nombre": "500",
+      "country": "US",
+      "marca_id": 34
+    },
+    {
+      "id": 232,
+      "nombre": "500X",
+      "country": "US",
+      "marca_id": 34
+    },
+    {
+      "id": 233,
+      "nombre": "500L",
+      "country": "US",
+      "marca_id": 34
+    },
+    {
+      "id": 234,
+      "nombre": "Ghibli",
+      "country": "US",
+      "marca_id": 35
+    },
+    {
+      "id": 235,
+      "nombre": "Levante",
+      "country": "US",
+      "marca_id": 35
+    },
+    {
+      "id": 236,
+      "nombre": "Quattroporte",
+      "country": "US",
+      "marca_id": 35
+    },
+    {
+      "id": 237,
+      "nombre": "Continental",
+      "country": "US",
+      "marca_id": 36
+    },
+    {
+      "id": 238,
+      "nombre": "Bentayga",
+      "country": "US",
+      "marca_id": 36
+    },
+    {
+      "id": 239,
+      "nombre": "Flying Spur",
+      "country": "US",
+      "marca_id": 36
+    },
+    {
+      "id": 240,
+      "nombre": "Ghost",
+      "country": "US",
+      "marca_id": 37
+    },
+    {
+      "id": 241,
+      "nombre": "Phantom",
+      "country": "US",
+      "marca_id": 37
+    },
+    {
+      "id": 242,
+      "nombre": "Cullinan",
+      "country": "US",
+      "marca_id": 37
+    },
+    {
+      "id": 243,
+      "nombre": "Wraith",
+      "country": "US",
+      "marca_id": 37
+    },
+    {
+      "id": 244,
+      "nombre": "DB11",
+      "country": "US",
+      "marca_id": 38
+    },
+    {
+      "id": 245,
+      "nombre": "Vantage",
+      "country": "US",
+      "marca_id": 38
+    },
+    {
+      "id": 246,
+      "nombre": "DBX",
+      "country": "US",
+      "marca_id": 38
+    },
+    {
+      "id": 247,
+      "nombre": "720S",
+      "country": "US",
+      "marca_id": 39
+    },
+    {
+      "id": 248,
+      "nombre": "570S",
+      "country": "US",
+      "marca_id": 39
+    },
+    {
+      "id": 249,
+      "nombre": "Artura",
+      "country": "US",
+      "marca_id": 39
+    },
+    {
+      "id": 250,
+      "nombre": "488",
+      "country": "US",
+      "marca_id": 40
+    },
+    {
+      "id": 251,
+      "nombre": "F8",
+      "country": "US",
+      "marca_id": 40
+    },
+    {
+      "id": 252,
+      "nombre": "Roma",
+      "country": "US",
+      "marca_id": 40
+    },
+    {
+      "id": 253,
+      "nombre": "SF90",
+      "country": "US",
+      "marca_id": 40
+    },
+    {
+      "id": 254,
+      "nombre": "Huracán",
+      "country": "US",
+      "marca_id": 41
+    },
+    {
+      "id": 255,
+      "nombre": "Aventador",
+      "country": "US",
+      "marca_id": 41
+    },
+    {
+      "id": 256,
+      "nombre": "Urus",
+      "country": "US",
+      "marca_id": 41
+    },
+    {
+      "id": 557,
+      "nombre": "A3",
+      "country": "CL",
+      "marca_id": 42
+    },
+    {
+      "id": 558,
+      "nombre": "A4",
+      "country": "CL",
+      "marca_id": 42
+    },
+    {
+      "id": 559,
+      "nombre": "A6",
+      "country": "CL",
+      "marca_id": 42
+    },
+    {
+      "id": 560,
+      "nombre": "Q2",
+      "country": "CL",
+      "marca_id": 42
+    },
+    {
+      "id": 561,
+      "nombre": "Q3",
+      "country": "CL",
+      "marca_id": 42
+    },
+    {
+      "id": 562,
+      "nombre": "Q5",
+      "country": "CL",
+      "marca_id": 42
+    },
+    {
+      "id": 563,
+      "nombre": "Q7",
+      "country": "CL",
+      "marca_id": 42
+    },
+    {
+      "id": 564,
+      "nombre": "Q8",
+      "country": "CL",
+      "marca_id": 42
+    },
+    {
+      "id": 565,
+      "nombre": "TT",
+      "country": "CL",
+      "marca_id": 42
+    },
+    {
+      "id": 566,
+      "nombre": "e-tron",
+      "country": "CL",
+      "marca_id": 42
+    },
+    {
+      "id": 567,
+      "nombre": "Dolphin",
+      "country": "CL",
+      "marca_id": 43
+    },
+    {
+      "id": 568,
+      "nombre": "Seal",
+      "country": "CL",
+      "marca_id": 43
+    },
+    {
+      "id": 569,
+      "nombre": "Yuan Plus (Atto 3)",
+      "country": "CL",
+      "marca_id": 43
+    },
+    {
+      "id": 570,
+      "nombre": "Tang",
+      "country": "CL",
+      "marca_id": 43
+    },
+    {
+      "id": 571,
+      "nombre": "Song",
+      "country": "CL",
+      "marca_id": 43
+    },
+    {
+      "id": 572,
+      "nombre": "Han",
+      "country": "CL",
+      "marca_id": 43
+    },
+    {
+      "id": 573,
+      "nombre": "Qin",
+      "country": "CL",
+      "marca_id": 43
+    },
+    {
+      "id": 574,
+      "nombre": "e6",
+      "country": "CL",
+      "marca_id": 43
+    },
+    {
+      "id": 575,
+      "nombre": "Dolphin Mini",
+      "country": "CL",
+      "marca_id": 43
+    },
+    {
+      "id": 576,
+      "nombre": "Yuan",
+      "country": "CL",
+      "marca_id": 43
+    },
+    {
+      "id": 577,
+      "nombre": "Alsvin",
+      "country": "CL",
+      "marca_id": 44
+    },
+    {
+      "id": 578,
+      "nombre": "CS15",
+      "country": "CL",
+      "marca_id": 44
+    },
+    {
+      "id": 579,
+      "nombre": "CS35",
+      "country": "CL",
+      "marca_id": 44
+    },
+    {
+      "id": 580,
+      "nombre": "CS55",
+      "country": "CL",
+      "marca_id": 44
+    },
+    {
+      "id": 581,
+      "nombre": "CS75",
+      "country": "CL",
+      "marca_id": 44
+    },
+    {
+      "id": 582,
+      "nombre": "UNI-T",
+      "country": "CL",
+      "marca_id": 44
+    },
+    {
+      "id": 583,
+      "nombre": "UNI-K",
+      "country": "CL",
+      "marca_id": 44
+    },
+    {
+      "id": 584,
+      "nombre": "Hunter",
+      "country": "CL",
+      "marca_id": 44
+    },
+    {
+      "id": 585,
+      "nombre": "Kaicene F70",
+      "country": "CL",
+      "marca_id": 44
+    },
+    {
+      "id": 586,
+      "nombre": "Star Truck",
+      "country": "CL",
+      "marca_id": 44
+    },
+    {
+      "id": 587,
+      "nombre": "Tiggo 2",
+      "country": "CL",
+      "marca_id": 45
+    },
+    {
+      "id": 588,
+      "nombre": "Tiggo 3",
+      "country": "CL",
+      "marca_id": 45
+    },
+    {
+      "id": 589,
+      "nombre": "Tiggo 4",
+      "country": "CL",
+      "marca_id": 45
+    },
+    {
+      "id": 590,
+      "nombre": "Tiggo 7",
+      "country": "CL",
+      "marca_id": 45
+    },
+    {
+      "id": 591,
+      "nombre": "Tiggo 8",
+      "country": "CL",
+      "marca_id": 45
+    },
+    {
+      "id": 592,
+      "nombre": "Arrizo 3",
+      "country": "CL",
+      "marca_id": 45
+    },
+    {
+      "id": 593,
+      "nombre": "Arrizo 5",
+      "country": "CL",
+      "marca_id": 45
+    },
+    {
+      "id": 594,
+      "nombre": "Arrizo 7",
+      "country": "CL",
+      "marca_id": 45
+    },
+    {
+      "id": 595,
+      "nombre": "QQ",
+      "country": "CL",
+      "marca_id": 45
+    },
+    {
+      "id": 596,
+      "nombre": "Fulwin",
+      "country": "CL",
+      "marca_id": 45
+    },
+    {
+      "id": 597,
+      "nombre": "Sail",
+      "country": "CL",
+      "marca_id": 46
+    },
+    {
+      "id": 598,
+      "nombre": "Aveo",
+      "country": "CL",
+      "marca_id": 46
+    },
+    {
+      "id": 599,
+      "nombre": "Spark",
+      "country": "CL",
+      "marca_id": 46
+    },
+    {
+      "id": 600,
+      "nombre": "Onix",
+      "country": "CL",
+      "marca_id": 46
+    },
+    {
+      "id": 601,
+      "nombre": "Cruze",
+      "country": "CL",
+      "marca_id": 46
+    },
+    {
+      "id": 602,
+      "nombre": "Tracker",
+      "country": "CL",
+      "marca_id": 46
+    },
+    {
+      "id": 603,
+      "nombre": "Captiva",
+      "country": "CL",
+      "marca_id": 46
+    },
+    {
+      "id": 604,
+      "nombre": "Trailblazer",
+      "country": "CL",
+      "marca_id": 46
+    },
+    {
+      "id": 605,
+      "nombre": "Colorado",
+      "country": "CL",
+      "marca_id": 46
+    },
+    {
+      "id": 606,
+      "nombre": "Silverado",
+      "country": "CL",
+      "marca_id": 46
+    },
+    {
+      "id": 607,
+      "nombre": "C3",
+      "country": "CL",
+      "marca_id": 47
+    },
+    {
+      "id": 608,
+      "nombre": "C4",
+      "country": "CL",
+      "marca_id": 47
+    },
+    {
+      "id": 609,
+      "nombre": "C5",
+      "country": "CL",
+      "marca_id": 47
+    },
+    {
+      "id": 610,
+      "nombre": "C-Elysée",
+      "country": "CL",
+      "marca_id": 47
+    },
+    {
+      "id": 611,
+      "nombre": "Berlingo",
+      "country": "CL",
+      "marca_id": 47
+    },
+    {
+      "id": 612,
+      "nombre": "Jumper",
+      "country": "CL",
+      "marca_id": 47
+    },
+    {
+      "id": 613,
+      "nombre": "Jumpy",
+      "country": "CL",
+      "marca_id": 47
+    },
+    {
+      "id": 614,
+      "nombre": "DS3",
+      "country": "CL",
+      "marca_id": 47
+    },
+    {
+      "id": 615,
+      "nombre": "DS4",
+      "country": "CL",
+      "marca_id": 47
+    },
+    {
+      "id": 616,
+      "nombre": "Picasso",
+      "country": "CL",
+      "marca_id": 47
+    },
+    {
+      "id": 617,
+      "nombre": "Charade",
+      "country": "CL",
+      "marca_id": 48
+    },
+    {
+      "id": 618,
+      "nombre": "Cuore",
+      "country": "CL",
+      "marca_id": 48
+    },
+    {
+      "id": 619,
+      "nombre": "Terios",
+      "country": "CL",
+      "marca_id": 48
+    },
+    {
+      "id": 620,
+      "nombre": "Rocky",
+      "country": "CL",
+      "marca_id": 48
+    },
+    {
+      "id": 621,
+      "nombre": "Sirion",
+      "country": "CL",
+      "marca_id": 48
+    },
+    {
+      "id": 622,
+      "nombre": "Feroza",
+      "country": "CL",
+      "marca_id": 48
+    },
+    {
+      "id": 623,
+      "nombre": "Applause",
+      "country": "CL",
+      "marca_id": 48
+    },
+    {
+      "id": 624,
+      "nombre": "Hijet",
+      "country": "CL",
+      "marca_id": 48
+    },
+    {
+      "id": 625,
+      "nombre": "Move",
+      "country": "CL",
+      "marca_id": 48
+    },
+    {
+      "id": 626,
+      "nombre": "Mira",
+      "country": "CL",
+      "marca_id": 48
+    },
+    {
+      "id": 627,
+      "nombre": "Uno",
+      "country": "CL",
+      "marca_id": 49
+    },
+    {
+      "id": 628,
+      "nombre": "Palio",
+      "country": "CL",
+      "marca_id": 49
+    },
+    {
+      "id": 629,
+      "nombre": "Siena",
+      "country": "CL",
+      "marca_id": 49
+    },
+    {
+      "id": 630,
+      "nombre": "Punto",
+      "country": "CL",
+      "marca_id": 49
+    },
+    {
+      "id": 631,
+      "nombre": "500",
+      "country": "CL",
+      "marca_id": 49
+    },
+    {
+      "id": 632,
+      "nombre": "Panda",
+      "country": "CL",
+      "marca_id": 49
+    },
+    {
+      "id": 633,
+      "nombre": "Cronos",
+      "country": "CL",
+      "marca_id": 49
+    },
+    {
+      "id": 634,
+      "nombre": "Strada",
+      "country": "CL",
+      "marca_id": 49
+    },
+    {
+      "id": 635,
+      "nombre": "Toro",
+      "country": "CL",
+      "marca_id": 49
+    },
+    {
+      "id": 636,
+      "nombre": "Fiorino",
+      "country": "CL",
+      "marca_id": 49
+    },
+    {
+      "id": 637,
+      "nombre": "Escort",
+      "country": "CL",
+      "marca_id": 50
+    },
+    {
+      "id": 638,
+      "nombre": "Focus",
+      "country": "CL",
+      "marca_id": 50
+    },
+    {
+      "id": 639,
+      "nombre": "Fiesta",
+      "country": "CL",
+      "marca_id": 50
+    },
+    {
+      "id": 640,
+      "nombre": "Ka",
+      "country": "CL",
+      "marca_id": 50
+    },
+    {
+      "id": 641,
+      "nombre": "Mustang",
+      "country": "CL",
+      "marca_id": 50
+    },
+    {
+      "id": 642,
+      "nombre": "Ecosport",
+      "country": "CL",
+      "marca_id": 50
+    },
+    {
+      "id": 643,
+      "nombre": "Explorer",
+      "country": "CL",
+      "marca_id": 50
+    },
+    {
+      "id": 644,
+      "nombre": "Edge",
+      "country": "CL",
+      "marca_id": 50
+    },
+    {
+      "id": 645,
+      "nombre": "Ranger",
+      "country": "CL",
+      "marca_id": 50
+    },
+    {
+      "id": 646,
+      "nombre": "F-150",
+      "country": "CL",
+      "marca_id": 50
+    },
+    {
+      "id": 647,
+      "nombre": "Wingle 5",
+      "country": "CL",
+      "marca_id": 51
+    },
+    {
+      "id": 648,
+      "nombre": "Wingle 7",
+      "country": "CL",
+      "marca_id": 51
+    },
+    {
+      "id": 649,
+      "nombre": "Poer",
+      "country": "CL",
+      "marca_id": 51
+    },
+    {
+      "id": 650,
+      "nombre": "C30",
+      "country": "CL",
+      "marca_id": 51
+    },
+    {
+      "id": 651,
+      "nombre": "C50",
+      "country": "CL",
+      "marca_id": 51
+    },
+    {
+      "id": 652,
+      "nombre": "Haval H1",
+      "country": "CL",
+      "marca_id": 51
+    },
+    {
+      "id": 653,
+      "nombre": "Haval H2",
+      "country": "CL",
+      "marca_id": 51
+    },
+    {
+      "id": 654,
+      "nombre": "Haval H6",
+      "country": "CL",
+      "marca_id": 51
+    },
+    {
+      "id": 655,
+      "nombre": "Hover",
+      "country": "CL",
+      "marca_id": 51
+    },
+    {
+      "id": 656,
+      "nombre": "Steed",
+      "country": "CL",
+      "marca_id": 51
+    },
+    {
+      "id": 657,
+      "nombre": "Civic",
+      "country": "CL",
+      "marca_id": 52
+    },
+    {
+      "id": 658,
+      "nombre": "Accord",
+      "country": "CL",
+      "marca_id": 52
+    },
+    {
+      "id": 659,
+      "nombre": "Fit",
+      "country": "CL",
+      "marca_id": 52
+    },
+    {
+      "id": 660,
+      "nombre": "City",
+      "country": "CL",
+      "marca_id": 52
+    },
+    {
+      "id": 661,
+      "nombre": "CR-V",
+      "country": "CL",
+      "marca_id": 52
+    },
+    {
+      "id": 662,
+      "nombre": "HR-V",
+      "country": "CL",
+      "marca_id": 52
+    },
+    {
+      "id": 663,
+      "nombre": "Pilot",
+      "country": "CL",
+      "marca_id": 52
+    },
+    {
+      "id": 664,
+      "nombre": "Odyssey",
+      "country": "CL",
+      "marca_id": 52
+    },
+    {
+      "id": 665,
+      "nombre": "Ridgeline",
+      "country": "CL",
+      "marca_id": 52
+    },
+    {
+      "id": 666,
+      "nombre": "WR-V",
+      "country": "CL",
+      "marca_id": 52
+    },
+    {
+      "id": 667,
+      "nombre": "Accent",
+      "country": "CL",
+      "marca_id": 53
+    },
+    {
+      "id": 668,
+      "nombre": "Elantra",
+      "country": "CL",
+      "marca_id": 53
+    },
+    {
+      "id": 669,
+      "nombre": "Sonata",
+      "country": "CL",
+      "marca_id": 53
+    },
+    {
+      "id": 670,
+      "nombre": "i10",
+      "country": "CL",
+      "marca_id": 53
+    },
+    {
+      "id": 671,
+      "nombre": "i20",
+      "country": "CL",
+      "marca_id": 53
+    },
+    {
+      "id": 672,
+      "nombre": "i30",
+      "country": "CL",
+      "marca_id": 53
+    },
+    {
+      "id": 673,
+      "nombre": "Tucson",
+      "country": "CL",
+      "marca_id": 53
+    },
+    {
+      "id": 674,
+      "nombre": "Santa Fe",
+      "country": "CL",
+      "marca_id": 53
+    },
+    {
+      "id": 675,
+      "nombre": "Creta",
+      "country": "CL",
+      "marca_id": 53
+    },
+    {
+      "id": 676,
+      "nombre": "Venue",
+      "country": "CL",
+      "marca_id": 53
+    },
+    {
+      "id": 677,
+      "nombre": "Trooper",
+      "country": "CL",
+      "marca_id": 54
+    },
+    {
+      "id": 678,
+      "nombre": "Rodeo",
+      "country": "CL",
+      "marca_id": 54
+    },
+    {
+      "id": 679,
+      "nombre": "D-Max",
+      "country": "CL",
+      "marca_id": 54
+    },
+    {
+      "id": 680,
+      "nombre": "MU-X",
+      "country": "CL",
+      "marca_id": 54
+    },
+    {
+      "id": 681,
+      "nombre": "KB",
+      "country": "CL",
+      "marca_id": 54
+    },
+    {
+      "id": 682,
+      "nombre": "Faster",
+      "country": "CL",
+      "marca_id": 54
+    },
+    {
+      "id": 683,
+      "nombre": "Gemini",
+      "country": "CL",
+      "marca_id": 54
+    },
+    {
+      "id": 684,
+      "nombre": "Hombre",
+      "country": "CL",
+      "marca_id": 54
+    },
+    {
+      "id": 685,
+      "nombre": "VehiCROSS",
+      "country": "CL",
+      "marca_id": 54
+    },
+    {
+      "id": 686,
+      "nombre": "Stylus",
+      "country": "CL",
+      "marca_id": 54
+    },
+    {
+      "id": 687,
+      "nombre": "T6",
+      "country": "CL",
+      "marca_id": 55
+    },
+    {
+      "id": 688,
+      "nombre": "T8",
+      "country": "CL",
+      "marca_id": 55
+    },
+    {
+      "id": 689,
+      "nombre": "Sunray",
+      "country": "CL",
+      "marca_id": 55
+    },
+    {
+      "id": 690,
+      "nombre": "Refine",
+      "country": "CL",
+      "marca_id": 55
+    },
+    {
+      "id": 691,
+      "nombre": "S2",
+      "country": "CL",
+      "marca_id": 55
+    },
+    {
+      "id": 692,
+      "nombre": "S3",
+      "country": "CL",
+      "marca_id": 55
+    },
+    {
+      "id": 693,
+      "nombre": "S5",
+      "country": "CL",
+      "marca_id": 55
+    },
+    {
+      "id": 694,
+      "nombre": "J3",
+      "country": "CL",
+      "marca_id": 55
+    },
+    {
+      "id": 695,
+      "nombre": "J5",
+      "country": "CL",
+      "marca_id": 55
+    },
+    {
+      "id": 696,
+      "nombre": "JS4",
+      "country": "CL",
+      "marca_id": 55
+    },
+    {
+      "id": 697,
+      "nombre": "Wrangler",
+      "country": "CL",
+      "marca_id": 56
+    },
+    {
+      "id": 698,
+      "nombre": "Cherokee",
+      "country": "CL",
+      "marca_id": 56
+    },
+    {
+      "id": 699,
+      "nombre": "Grand Cherokee",
+      "country": "CL",
+      "marca_id": 56
+    },
+    {
+      "id": 700,
+      "nombre": "Compass",
+      "country": "CL",
+      "marca_id": 56
+    },
+    {
+      "id": 701,
+      "nombre": "Renegade",
+      "country": "CL",
+      "marca_id": 56
+    },
+    {
+      "id": 702,
+      "nombre": "Patriot",
+      "country": "CL",
+      "marca_id": 56
+    },
+    {
+      "id": 703,
+      "nombre": "Gladiator",
+      "country": "CL",
+      "marca_id": 56
+    },
+    {
+      "id": 704,
+      "nombre": "Wagoneer",
+      "country": "CL",
+      "marca_id": 56
+    },
+    {
+      "id": 705,
+      "nombre": "Liberty",
+      "country": "CL",
+      "marca_id": 56
+    },
+    {
+      "id": 706,
+      "nombre": "Commander",
+      "country": "CL",
+      "marca_id": 56
+    },
+    {
+      "id": 707,
+      "nombre": "Rio",
+      "country": "CL",
+      "marca_id": 57
+    },
+    {
+      "id": 708,
+      "nombre": "Cerato",
+      "country": "CL",
+      "marca_id": 57
+    },
+    {
+      "id": 709,
+      "nombre": "Optima",
+      "country": "CL",
+      "marca_id": 57
+    },
+    {
+      "id": 710,
+      "nombre": "Picanto",
+      "country": "CL",
+      "marca_id": 57
+    },
+    {
+      "id": 711,
+      "nombre": "Morning",
+      "country": "CL",
+      "marca_id": 57
+    },
+    {
+      "id": 712,
+      "nombre": "Soul",
+      "country": "CL",
+      "marca_id": 57
+    },
+    {
+      "id": 713,
+      "nombre": "Sportage",
+      "country": "CL",
+      "marca_id": 57
+    },
+    {
+      "id": 714,
+      "nombre": "Sorento",
+      "country": "CL",
+      "marca_id": 57
+    },
+    {
+      "id": 715,
+      "nombre": "Carens",
+      "country": "CL",
+      "marca_id": 57
+    },
+    {
+      "id": 716,
+      "nombre": "Carnival",
+      "country": "CL",
+      "marca_id": 57
+    },
+    {
+      "id": 717,
+      "nombre": "Scorpio",
+      "country": "CL",
+      "marca_id": 58
+    },
+    {
+      "id": 718,
+      "nombre": "Bolero",
+      "country": "CL",
+      "marca_id": 58
+    },
+    {
+      "id": 719,
+      "nombre": "Pik Up",
+      "country": "CL",
+      "marca_id": 58
+    },
+    {
+      "id": 720,
+      "nombre": "Thar",
+      "country": "CL",
+      "marca_id": 58
+    },
+    {
+      "id": 721,
+      "nombre": "XUV300",
+      "country": "CL",
+      "marca_id": 58
+    },
+    {
+      "id": 722,
+      "nombre": "XUV500",
+      "country": "CL",
+      "marca_id": 58
+    },
+    {
+      "id": 723,
+      "nombre": "XUV700",
+      "country": "CL",
+      "marca_id": 58
+    },
+    {
+      "id": 724,
+      "nombre": "KUV100",
+      "country": "CL",
+      "marca_id": 58
+    },
+    {
+      "id": 725,
+      "nombre": "Marazzo",
+      "country": "CL",
+      "marca_id": 58
+    },
+    {
+      "id": 726,
+      "nombre": "Quanto",
+      "country": "CL",
+      "marca_id": 58
+    },
+    {
+      "id": 727,
+      "nombre": "2",
+      "country": "CL",
+      "marca_id": 59
+    },
+    {
+      "id": 728,
+      "nombre": "3",
+      "country": "CL",
+      "marca_id": 59
+    },
+    {
+      "id": 729,
+      "nombre": "6",
+      "country": "CL",
+      "marca_id": 59
+    },
+    {
+      "id": 730,
+      "nombre": "CX-3",
+      "country": "CL",
+      "marca_id": 59
+    },
+    {
+      "id": 731,
+      "nombre": "CX-30",
+      "country": "CL",
+      "marca_id": 59
+    },
+    {
+      "id": 732,
+      "nombre": "CX-5",
+      "country": "CL",
+      "marca_id": 59
+    },
+    {
+      "id": 733,
+      "nombre": "CX-7",
+      "country": "CL",
+      "marca_id": 59
+    },
+    {
+      "id": 734,
+      "nombre": "CX-9",
+      "country": "CL",
+      "marca_id": 59
+    },
+    {
+      "id": 735,
+      "nombre": "BT-50",
+      "country": "CL",
+      "marca_id": 59
+    },
+    {
+      "id": 736,
+      "nombre": "RX-8",
+      "country": "CL",
+      "marca_id": 59
+    },
+    {
+      "id": 737,
+      "nombre": "Clase A",
+      "country": "CL",
+      "marca_id": 60
+    },
+    {
+      "id": 738,
+      "nombre": "Clase B",
+      "country": "CL",
+      "marca_id": 60
+    },
+    {
+      "id": 739,
+      "nombre": "Clase C",
+      "country": "CL",
+      "marca_id": 60
+    },
+    {
+      "id": 740,
+      "nombre": "Clase E",
+      "country": "CL",
+      "marca_id": 60
+    },
+    {
+      "id": 741,
+      "nombre": "Clase S",
+      "country": "CL",
+      "marca_id": 60
+    },
+    {
+      "id": 742,
+      "nombre": "CLA",
+      "country": "CL",
+      "marca_id": 60
+    },
+    {
+      "id": 743,
+      "nombre": "GLA",
+      "country": "CL",
+      "marca_id": 60
+    },
+    {
+      "id": 744,
+      "nombre": "GLC",
+      "country": "CL",
+      "marca_id": 60
+    },
+    {
+      "id": 745,
+      "nombre": "GLE",
+      "country": "CL",
+      "marca_id": 60
+    },
+    {
+      "id": 746,
+      "nombre": "Sprinter",
+      "country": "CL",
+      "marca_id": 60
+    },
+    {
+      "id": 747,
+      "nombre": "MG3",
+      "country": "CL",
+      "marca_id": 61
+    },
+    {
+      "id": 748,
+      "nombre": "MG5",
+      "country": "CL",
+      "marca_id": 61
+    },
+    {
+      "id": 749,
+      "nombre": "MG6",
+      "country": "CL",
+      "marca_id": 61
+    },
+    {
+      "id": 750,
+      "nombre": "MG GT",
+      "country": "CL",
+      "marca_id": 61
+    },
+    {
+      "id": 751,
+      "nombre": "ZS",
+      "country": "CL",
+      "marca_id": 61
+    },
+    {
+      "id": 752,
+      "nombre": "HS",
+      "country": "CL",
+      "marca_id": 61
+    },
+    {
+      "id": 753,
+      "nombre": "RX5",
+      "country": "CL",
+      "marca_id": 61
+    },
+    {
+      "id": 754,
+      "nombre": "Marvel R",
+      "country": "CL",
+      "marca_id": 61
+    },
+    {
+      "id": 755,
+      "nombre": "Hector",
+      "country": "CL",
+      "marca_id": 61
+    },
+    {
+      "id": 756,
+      "nombre": "One",
+      "country": "CL",
+      "marca_id": 61
+    },
+    {
+      "id": 757,
+      "nombre": "Lancer",
+      "country": "CL",
+      "marca_id": 62
+    },
+    {
+      "id": 758,
+      "nombre": "Galant",
+      "country": "CL",
+      "marca_id": 62
+    },
+    {
+      "id": 759,
+      "nombre": "Mirage",
+      "country": "CL",
+      "marca_id": 62
+    },
+    {
+      "id": 760,
+      "nombre": "Eclipse",
+      "country": "CL",
+      "marca_id": 62
+    },
+    {
+      "id": 761,
+      "nombre": "Outlander",
+      "country": "CL",
+      "marca_id": 62
+    },
+    {
+      "id": 762,
+      "nombre": "ASX",
+      "country": "CL",
+      "marca_id": 62
+    },
+    {
+      "id": 763,
+      "nombre": "Montero",
+      "country": "CL",
+      "marca_id": 62
+    },
+    {
+      "id": 764,
+      "nombre": "Montero Sport",
+      "country": "CL",
+      "marca_id": 62
+    },
+    {
+      "id": 765,
+      "nombre": "L200",
+      "country": "CL",
+      "marca_id": 62
+    },
+    {
+      "id": 766,
+      "nombre": "Xpander",
+      "country": "CL",
+      "marca_id": 62
+    },
+    {
+      "id": 767,
+      "nombre": "Sunny",
+      "country": "CL",
+      "marca_id": 63
+    },
+    {
+      "id": 768,
+      "nombre": "Sentra",
+      "country": "CL",
+      "marca_id": 63
+    },
+    {
+      "id": 769,
+      "nombre": "Versa",
+      "country": "CL",
+      "marca_id": 63
+    },
+    {
+      "id": 770,
+      "nombre": "Tiida",
+      "country": "CL",
+      "marca_id": 63
+    },
+    {
+      "id": 771,
+      "nombre": "Almera",
+      "country": "CL",
+      "marca_id": 63
+    },
+    {
+      "id": 772,
+      "nombre": "March",
+      "country": "CL",
+      "marca_id": 63
+    },
+    {
+      "id": 773,
+      "nombre": "Altima",
+      "country": "CL",
+      "marca_id": 63
+    },
+    {
+      "id": 774,
+      "nombre": "X-Trail",
+      "country": "CL",
+      "marca_id": 63
+    },
+    {
+      "id": 775,
+      "nombre": "Pathfinder",
+      "country": "CL",
+      "marca_id": 63
+    },
+    {
+      "id": 776,
+      "nombre": "Navara",
+      "country": "CL",
+      "marca_id": 63
+    },
+    {
+      "id": 777,
+      "nombre": "Corsa",
+      "country": "CL",
+      "marca_id": 64
+    },
+    {
+      "id": 778,
+      "nombre": "Astra",
+      "country": "CL",
+      "marca_id": 64
+    },
+    {
+      "id": 779,
+      "nombre": "Vectra",
+      "country": "CL",
+      "marca_id": 64
+    },
+    {
+      "id": 780,
+      "nombre": "Kadett",
+      "country": "CL",
+      "marca_id": 64
+    },
+    {
+      "id": 781,
+      "nombre": "Mokka",
+      "country": "CL",
+      "marca_id": 64
+    },
+    {
+      "id": 782,
+      "nombre": "Insignia",
+      "country": "CL",
+      "marca_id": 64
+    },
+    {
+      "id": 783,
+      "nombre": "Meriva",
+      "country": "CL",
+      "marca_id": 64
+    },
+    {
+      "id": 784,
+      "nombre": "Zafira",
+      "country": "CL",
+      "marca_id": 64
+    },
+    {
+      "id": 785,
+      "nombre": "Combo",
+      "country": "CL",
+      "marca_id": 64
+    },
+    {
+      "id": 786,
+      "nombre": "Antara",
+      "country": "CL",
+      "marca_id": 64
+    },
+    {
+      "id": 787,
+      "nombre": "206",
+      "country": "CL",
+      "marca_id": 65
+    },
+    {
+      "id": 788,
+      "nombre": "207",
+      "country": "CL",
+      "marca_id": 65
+    },
+    {
+      "id": 789,
+      "nombre": "208",
+      "country": "CL",
+      "marca_id": 65
+    },
+    {
+      "id": 790,
+      "nombre": "301",
+      "country": "CL",
+      "marca_id": 65
+    },
+    {
+      "id": 791,
+      "nombre": "306",
+      "country": "CL",
+      "marca_id": 65
+    },
+    {
+      "id": 792,
+      "nombre": "307",
+      "country": "CL",
+      "marca_id": 65
+    },
+    {
+      "id": 793,
+      "nombre": "308",
+      "country": "CL",
+      "marca_id": 65
+    },
+    {
+      "id": 794,
+      "nombre": "405",
+      "country": "CL",
+      "marca_id": 65
+    },
+    {
+      "id": 795,
+      "nombre": "406",
+      "country": "CL",
+      "marca_id": 65
+    },
+    {
+      "id": 796,
+      "nombre": "508",
+      "country": "CL",
+      "marca_id": 65
+    },
+    {
+      "id": 797,
+      "nombre": "4",
+      "country": "CL",
+      "marca_id": 66
+    },
+    {
+      "id": 798,
+      "nombre": "5",
+      "country": "CL",
+      "marca_id": 66
+    },
+    {
+      "id": 799,
+      "nombre": "9",
+      "country": "CL",
+      "marca_id": 66
+    },
+    {
+      "id": 800,
+      "nombre": "11",
+      "country": "CL",
+      "marca_id": 66
+    },
+    {
+      "id": 801,
+      "nombre": "19",
+      "country": "CL",
+      "marca_id": 66
+    },
+    {
+      "id": 802,
+      "nombre": "Clio",
+      "country": "CL",
+      "marca_id": 66
+    },
+    {
+      "id": 803,
+      "nombre": "Mégane",
+      "country": "CL",
+      "marca_id": 66
+    },
+    {
+      "id": 804,
+      "nombre": "Symbol",
+      "country": "CL",
+      "marca_id": 66
+    },
+    {
+      "id": 805,
+      "nombre": "Koleos",
+      "country": "CL",
+      "marca_id": 66
+    },
+    {
+      "id": 806,
+      "nombre": "Duster",
+      "country": "CL",
+      "marca_id": 66
+    },
+    {
+      "id": 807,
+      "nombre": "Korando",
+      "country": "CL",
+      "marca_id": 67
+    },
+    {
+      "id": 808,
+      "nombre": "Musso",
+      "country": "CL",
+      "marca_id": 67
+    },
+    {
+      "id": 809,
+      "nombre": "Actyon",
+      "country": "CL",
+      "marca_id": 67
+    },
+    {
+      "id": 810,
+      "nombre": "Rexton",
+      "country": "CL",
+      "marca_id": 67
+    },
+    {
+      "id": 811,
+      "nombre": "Tivoli",
+      "country": "CL",
+      "marca_id": 67
+    },
+    {
+      "id": 812,
+      "nombre": "XLV",
+      "country": "CL",
+      "marca_id": 67
+    },
+    {
+      "id": 813,
+      "nombre": "Kyron",
+      "country": "CL",
+      "marca_id": 67
+    },
+    {
+      "id": 814,
+      "nombre": "Chairman",
+      "country": "CL",
+      "marca_id": 67
+    },
+    {
+      "id": 815,
+      "nombre": "Stavic",
+      "country": "CL",
+      "marca_id": 67
+    },
+    {
+      "id": 816,
+      "nombre": "Torres",
+      "country": "CL",
+      "marca_id": 67
+    },
+    {
+      "id": 817,
+      "nombre": "Leone",
+      "country": "CL",
+      "marca_id": 68
+    },
+    {
+      "id": 818,
+      "nombre": "Justy",
+      "country": "CL",
+      "marca_id": 68
+    },
+    {
+      "id": 819,
+      "nombre": "Impreza",
+      "country": "CL",
+      "marca_id": 68
+    },
+    {
+      "id": 820,
+      "nombre": "Legacy",
+      "country": "CL",
+      "marca_id": 68
+    },
+    {
+      "id": 821,
+      "nombre": "Forester",
+      "country": "CL",
+      "marca_id": 68
+    },
+    {
+      "id": 822,
+      "nombre": "Outback",
+      "country": "CL",
+      "marca_id": 68
+    },
+    {
+      "id": 823,
+      "nombre": "XV",
+      "country": "CL",
+      "marca_id": 68
+    },
+    {
+      "id": 824,
+      "nombre": "WRX",
+      "country": "CL",
+      "marca_id": 68
+    },
+    {
+      "id": 825,
+      "nombre": "Baja",
+      "country": "CL",
+      "marca_id": 68
+    },
+    {
+      "id": 826,
+      "nombre": "BRZ",
+      "country": "CL",
+      "marca_id": 68
+    },
+    {
+      "id": 827,
+      "nombre": "Alto",
+      "country": "CL",
+      "marca_id": 69
+    },
+    {
+      "id": 828,
+      "nombre": "Celerio",
+      "country": "CL",
+      "marca_id": 69
+    },
+    {
+      "id": 829,
+      "nombre": "Baleno",
+      "country": "CL",
+      "marca_id": 69
+    },
+    {
+      "id": 830,
+      "nombre": "Swift",
+      "country": "CL",
+      "marca_id": 69
+    },
+    {
+      "id": 831,
+      "nombre": "Dzire",
+      "country": "CL",
+      "marca_id": 69
+    },
+    {
+      "id": 832,
+      "nombre": "Jimny",
+      "country": "CL",
+      "marca_id": 69
+    },
+    {
+      "id": 833,
+      "nombre": "Vitara",
+      "country": "CL",
+      "marca_id": 69
+    },
+    {
+      "id": 834,
+      "nombre": "Grand Vitara",
+      "country": "CL",
+      "marca_id": 69
+    },
+    {
+      "id": 835,
+      "nombre": "S-Cross",
+      "country": "CL",
+      "marca_id": 69
+    },
+    {
+      "id": 836,
+      "nombre": "Ertiga",
+      "country": "CL",
+      "marca_id": 69
+    },
+    {
+      "id": 837,
+      "nombre": "Corolla",
+      "country": "CL",
+      "marca_id": 70
+    },
+    {
+      "id": 838,
+      "nombre": "Yaris",
+      "country": "CL",
+      "marca_id": 70
+    },
+    {
+      "id": 839,
+      "nombre": "Starlet",
+      "country": "CL",
+      "marca_id": 70
+    },
+    {
+      "id": 840,
+      "nombre": "Camry",
+      "country": "CL",
+      "marca_id": 70
+    },
+    {
+      "id": 841,
+      "nombre": "Avensis",
+      "country": "CL",
+      "marca_id": 70
+    },
+    {
+      "id": 842,
+      "nombre": "Hilux",
+      "country": "CL",
+      "marca_id": 70
+    },
+    {
+      "id": 843,
+      "nombre": "4Runner",
+      "country": "CL",
+      "marca_id": 70
+    },
+    {
+      "id": 844,
+      "nombre": "RAV4",
+      "country": "CL",
+      "marca_id": 70
+    },
+    {
+      "id": 845,
+      "nombre": "Prado",
+      "country": "CL",
+      "marca_id": 70
+    },
+    {
+      "id": 846,
+      "nombre": "Land Cruiser",
+      "country": "CL",
+      "marca_id": 70
+    },
+    {
+      "id": 847,
+      "nombre": "Gol",
+      "country": "CL",
+      "marca_id": 71
+    },
+    {
+      "id": 848,
+      "nombre": "Voyage",
+      "country": "CL",
+      "marca_id": 71
+    },
+    {
+      "id": 849,
+      "nombre": "Polo",
+      "country": "CL",
+      "marca_id": 71
+    },
+    {
+      "id": 850,
+      "nombre": "Virtus",
+      "country": "CL",
+      "marca_id": 71
+    },
+    {
+      "id": 851,
+      "nombre": "Golf",
+      "country": "CL",
+      "marca_id": 71
+    },
+    {
+      "id": 852,
+      "nombre": "Bora",
+      "country": "CL",
+      "marca_id": 71
+    },
+    {
+      "id": 853,
+      "nombre": "Passat",
+      "country": "CL",
+      "marca_id": 71
+    },
+    {
+      "id": 854,
+      "nombre": "Tiguan",
+      "country": "CL",
+      "marca_id": 71
+    },
+    {
+      "id": 855,
+      "nombre": "Touareg",
+      "country": "CL",
+      "marca_id": 71
+    },
+    {
+      "id": 856,
+      "nombre": "Amarok",
+      "country": "CL",
+      "marca_id": 71
+    },
+    {
+      "id": 857,
+      "nombre": "Prius",
+      "country": "CL",
+      "marca_id": 70
+    },
+    {
+      "id": 858,
+      "nombre": "Highlander",
+      "country": "CL",
+      "marca_id": 70
+    },
+    {
+      "id": 859,
+      "nombre": "Tacoma",
+      "country": "CL",
+      "marca_id": 70
+    },
+    {
+      "id": 860,
+      "nombre": "Sienna",
+      "country": "CL",
+      "marca_id": 70
+    },
+    {
+      "id": 861,
+      "nombre": "Tundra",
+      "country": "CL",
+      "marca_id": 70
+    },
+    {
+      "id": 862,
+      "nombre": "Sequoia",
+      "country": "CL",
+      "marca_id": 70
+    },
+    {
+      "id": 863,
+      "nombre": "C-HR",
+      "country": "CL",
+      "marca_id": 70
+    },
+    {
+      "id": 864,
+      "nombre": "Avalon",
+      "country": "CL",
+      "marca_id": 70
+    },
+    {
+      "id": 865,
+      "nombre": "Supra",
+      "country": "CL",
+      "marca_id": 70
+    },
+    {
+      "id": 866,
+      "nombre": "GR86",
+      "country": "CL",
+      "marca_id": 70
+    },
+    {
+      "id": 867,
+      "nombre": "bZ4X",
+      "country": "CL",
+      "marca_id": 70
+    },
+    {
+      "id": 868,
+      "nombre": "Prisma",
+      "country": "CL",
+      "marca_id": 46
+    },
+    {
+      "id": 869,
+      "nombre": "Malibu",
+      "country": "CL",
+      "marca_id": 46
+    },
+    {
+      "id": 870,
+      "nombre": "Equinox",
+      "country": "CL",
+      "marca_id": 46
+    },
+    {
+      "id": 871,
+      "nombre": "Traverse",
+      "country": "CL",
+      "marca_id": 46
+    },
+    {
+      "id": 872,
+      "nombre": "Tahoe",
+      "country": "CL",
+      "marca_id": 46
+    },
+    {
+      "id": 873,
+      "nombre": "Blazer",
+      "country": "CL",
+      "marca_id": 46
+    },
+    {
+      "id": 874,
+      "nombre": "Fusion",
+      "country": "CL",
+      "marca_id": 50
+    },
+    {
+      "id": 875,
+      "nombre": "Escape",
+      "country": "CL",
+      "marca_id": 50
+    },
+    {
+      "id": 876,
+      "nombre": "Bronco",
+      "country": "CL",
+      "marca_id": 50
+    },
+    {
+      "id": 877,
+      "nombre": "Maverick",
+      "country": "CL",
+      "marca_id": 50
+    },
+    {
+      "id": 878,
+      "nombre": "Expedition",
+      "country": "CL",
+      "marca_id": 50
+    },
+    {
+      "id": 879,
+      "nombre": "Maxima",
+      "country": "CL",
+      "marca_id": 63
+    },
+    {
+      "id": 880,
+      "nombre": "Kicks",
+      "country": "CL",
+      "marca_id": 63
+    },
+    {
+      "id": 881,
+      "nombre": "Rogue",
+      "country": "CL",
+      "marca_id": 63
+    },
+    {
+      "id": 882,
+      "nombre": "Armada",
+      "country": "CL",
+      "marca_id": 63
+    },
+    {
+      "id": 883,
+      "nombre": "Frontier",
+      "country": "CL",
+      "marca_id": 63
+    },
+    {
+      "id": 884,
+      "nombre": "Titan",
+      "country": "CL",
+      "marca_id": 63
+    },
+    {
+      "id": 885,
+      "nombre": "Murano",
+      "country": "CL",
+      "marca_id": 63
+    },
+    {
+      "id": 886,
+      "nombre": "Juke",
+      "country": "CL",
+      "marca_id": 63
+    },
+    {
+      "id": 887,
+      "nombre": "Palisade",
+      "country": "CL",
+      "marca_id": 53
+    },
+    {
+      "id": 888,
+      "nombre": "Kona",
+      "country": "CL",
+      "marca_id": 53
+    },
+    {
+      "id": 889,
+      "nombre": "Ioniq",
+      "country": "CL",
+      "marca_id": 53
+    },
+    {
+      "id": 890,
+      "nombre": "IONIQ 5",
+      "country": "CL",
+      "marca_id": 53
+    },
+    {
+      "id": 891,
+      "nombre": "IONIQ 6",
+      "country": "CL",
+      "marca_id": 53
+    },
+    {
+      "id": 892,
+      "nombre": "Forte",
+      "country": "CL",
+      "marca_id": 57
+    },
+    {
+      "id": 893,
+      "nombre": "Telluride",
+      "country": "CL",
+      "marca_id": 57
+    },
+    {
+      "id": 894,
+      "nombre": "Seltos",
+      "country": "CL",
+      "marca_id": 57
+    },
+    {
+      "id": 895,
+      "nombre": "Niro",
+      "country": "CL",
+      "marca_id": 57
+    },
+    {
+      "id": 896,
+      "nombre": "EV6",
+      "country": "CL",
+      "marca_id": 57
+    },
+    {
+      "id": 897,
+      "nombre": "Mazda2",
+      "country": "CL",
+      "marca_id": 59
+    },
+    {
+      "id": 898,
+      "nombre": "Mazda3",
+      "country": "CL",
+      "marca_id": 59
+    },
+    {
+      "id": 899,
+      "nombre": "Mazda6",
+      "country": "CL",
+      "marca_id": 59
+    },
+    {
+      "id": 900,
+      "nombre": "MX-5",
+      "country": "CL",
+      "marca_id": 59
+    },
+    {
+      "id": 901,
+      "nombre": "SX4",
+      "country": "CL",
+      "marca_id": 69
+    },
+    {
+      "id": 902,
+      "nombre": "XL7",
+      "country": "CL",
+      "marca_id": 69
+    },
+    {
+      "id": 903,
+      "nombre": "Pajero",
+      "country": "CL",
+      "marca_id": 62
+    },
+    {
+      "id": 904,
+      "nombre": "Eclipse Cross",
+      "country": "CL",
+      "marca_id": 62
+    },
+    {
+      "id": 905,
+      "nombre": "Passport",
+      "country": "CL",
+      "marca_id": 52
+    },
+    {
+      "id": 906,
+      "nombre": "Vento",
+      "country": "CL",
+      "marca_id": 71
+    },
+    {
+      "id": 907,
+      "nombre": "Jetta",
+      "country": "CL",
+      "marca_id": 71
+    },
+    {
+      "id": 908,
+      "nombre": "T-Cross",
+      "country": "CL",
+      "marca_id": 71
+    },
+    {
+      "id": 909,
+      "nombre": "Nivus",
+      "country": "CL",
+      "marca_id": 71
+    },
+    {
+      "id": 910,
+      "nombre": "Taos",
+      "country": "CL",
+      "marca_id": 71
+    },
+    {
+      "id": 911,
+      "nombre": "Kwid",
+      "country": "CL",
+      "marca_id": 66
+    },
+    {
+      "id": 912,
+      "nombre": "Sandero",
+      "country": "CL",
+      "marca_id": 66
+    },
+    {
+      "id": 913,
+      "nombre": "Logan",
+      "country": "CL",
+      "marca_id": 66
+    },
+    {
+      "id": 914,
+      "nombre": "Captur",
+      "country": "CL",
+      "marca_id": 66
+    },
+    {
+      "id": 915,
+      "nombre": "Oroch",
+      "country": "CL",
+      "marca_id": 66
+    },
+    {
+      "id": 916,
+      "nombre": "408",
+      "country": "CL",
+      "marca_id": 65
+    },
+    {
+      "id": 917,
+      "nombre": "2008",
+      "country": "CL",
+      "marca_id": 65
+    },
+    {
+      "id": 918,
+      "nombre": "3008",
+      "country": "CL",
+      "marca_id": 65
+    },
+    {
+      "id": 919,
+      "nombre": "5008",
+      "country": "CL",
+      "marca_id": 65
+    },
+    {
+      "id": 920,
+      "nombre": "Partner",
+      "country": "CL",
+      "marca_id": 65
+    },
+    {
+      "id": 921,
+      "nombre": "C4 Cactus",
+      "country": "CL",
+      "marca_id": 47
+    },
+    {
+      "id": 922,
+      "nombre": "C4 Picasso",
+      "country": "CL",
+      "marca_id": 47
+    },
+    {
+      "id": 923,
+      "nombre": "Ducato",
+      "country": "CL",
+      "marca_id": 49
+    },
+    {
+      "id": 924,
+      "nombre": "Argo",
+      "country": "CL",
+      "marca_id": 49
+    },
+    {
+      "id": 925,
+      "nombre": "Ascent",
+      "country": "CL",
+      "marca_id": 68
+    },
+    {
+      "id": 926,
+      "nombre": "NPR",
+      "country": "CL",
+      "marca_id": 54
+    },
+    {
+      "id": 927,
+      "nombre": "NQR",
+      "country": "CL",
+      "marca_id": 54
+    },
+    {
+      "id": 928,
+      "nombre": "Serie 1",
+      "country": "CL",
+      "marca_id": 72
+    },
+    {
+      "id": 929,
+      "nombre": "Serie 2",
+      "country": "CL",
+      "marca_id": 72
+    },
+    {
+      "id": 930,
+      "nombre": "Serie 3",
+      "country": "CL",
+      "marca_id": 72
+    },
+    {
+      "id": 931,
+      "nombre": "Serie 4",
+      "country": "CL",
+      "marca_id": 72
+    },
+    {
+      "id": 932,
+      "nombre": "Serie 5",
+      "country": "CL",
+      "marca_id": 72
+    },
+    {
+      "id": 933,
+      "nombre": "Serie 7",
+      "country": "CL",
+      "marca_id": 72
+    },
+    {
+      "id": 934,
+      "nombre": "X1",
+      "country": "CL",
+      "marca_id": 72
+    },
+    {
+      "id": 935,
+      "nombre": "X2",
+      "country": "CL",
+      "marca_id": 72
+    },
+    {
+      "id": 936,
+      "nombre": "X3",
+      "country": "CL",
+      "marca_id": 72
+    },
+    {
+      "id": 937,
+      "nombre": "X4",
+      "country": "CL",
+      "marca_id": 72
+    },
+    {
+      "id": 938,
+      "nombre": "X5",
+      "country": "CL",
+      "marca_id": 72
+    },
+    {
+      "id": 939,
+      "nombre": "X6",
+      "country": "CL",
+      "marca_id": 72
+    },
+    {
+      "id": 940,
+      "nombre": "X7",
+      "country": "CL",
+      "marca_id": 72
+    },
+    {
+      "id": 941,
+      "nombre": "Z4",
+      "country": "CL",
+      "marca_id": 72
+    },
+    {
+      "id": 942,
+      "nombre": "iX",
+      "country": "CL",
+      "marca_id": 72
+    },
+    {
+      "id": 943,
+      "nombre": "i4",
+      "country": "CL",
+      "marca_id": 72
+    },
+    {
+      "id": 944,
+      "nombre": "GLB",
+      "country": "CL",
+      "marca_id": 60
+    },
+    {
+      "id": 945,
+      "nombre": "GLS",
+      "country": "CL",
+      "marca_id": 60
+    },
+    {
+      "id": 946,
+      "nombre": "G-Class",
+      "country": "CL",
+      "marca_id": 60
+    },
+    {
+      "id": 947,
+      "nombre": "AMG GT",
+      "country": "CL",
+      "marca_id": 60
+    },
+    {
+      "id": 948,
+      "nombre": "A1",
+      "country": "CL",
+      "marca_id": 42
+    },
+    {
+      "id": 949,
+      "nombre": "A5",
+      "country": "CL",
+      "marca_id": 42
+    },
+    {
+      "id": 950,
+      "nombre": "A7",
+      "country": "CL",
+      "marca_id": 42
+    },
+    {
+      "id": 951,
+      "nombre": "A8",
+      "country": "CL",
+      "marca_id": 42
+    },
+    {
+      "id": 952,
+      "nombre": "e-tron GT",
+      "country": "CL",
+      "marca_id": 42
+    },
+    {
+      "id": 953,
+      "nombre": "Spark",
+      "country": "CO",
+      "marca_id": 73
+    },
+    {
+      "id": 954,
+      "nombre": "Sail",
+      "country": "CO",
+      "marca_id": 73
+    },
+    {
+      "id": 955,
+      "nombre": "Onix",
+      "country": "CO",
+      "marca_id": 73
+    },
+    {
+      "id": 956,
+      "nombre": "Prisma",
+      "country": "CO",
+      "marca_id": 73
+    },
+    {
+      "id": 957,
+      "nombre": "Cruze",
+      "country": "CO",
+      "marca_id": 73
+    },
+    {
+      "id": 958,
+      "nombre": "Malibu",
+      "country": "CO",
+      "marca_id": 73
+    },
+    {
+      "id": 959,
+      "nombre": "Equinox",
+      "country": "CO",
+      "marca_id": 73
+    },
+    {
+      "id": 960,
+      "nombre": "Traverse",
+      "country": "CO",
+      "marca_id": 73
+    },
+    {
+      "id": 961,
+      "nombre": "Tahoe",
+      "country": "CO",
+      "marca_id": 73
+    },
+    {
+      "id": 962,
+      "nombre": "Silverado",
+      "country": "CO",
+      "marca_id": 73
+    },
+    {
+      "id": 963,
+      "nombre": "Colorado",
+      "country": "CO",
+      "marca_id": 73
+    },
+    {
+      "id": 964,
+      "nombre": "Tracker",
+      "country": "CO",
+      "marca_id": 73
+    },
+    {
+      "id": 965,
+      "nombre": "Blazer",
+      "country": "CO",
+      "marca_id": 73
+    },
+    {
+      "id": 966,
+      "nombre": "Aveo",
+      "country": "CO",
+      "marca_id": 73
+    },
+    {
+      "id": 967,
+      "nombre": "Optra",
+      "country": "CO",
+      "marca_id": 73
+    },
+    {
+      "id": 968,
+      "nombre": "Corsa",
+      "country": "CO",
+      "marca_id": 73
+    },
+    {
+      "id": 969,
+      "nombre": "Meriva",
+      "country": "CO",
+      "marca_id": 73
+    },
+    {
+      "id": 970,
+      "nombre": "Zafira",
+      "country": "CO",
+      "marca_id": 73
+    },
+    {
+      "id": 971,
+      "nombre": "Kwid",
+      "country": "CO",
+      "marca_id": 74
+    },
+    {
+      "id": 972,
+      "nombre": "Sandero",
+      "country": "CO",
+      "marca_id": 74
+    },
+    {
+      "id": 973,
+      "nombre": "Logan",
+      "country": "CO",
+      "marca_id": 74
+    },
+    {
+      "id": 974,
+      "nombre": "Duster",
+      "country": "CO",
+      "marca_id": 74
+    },
+    {
+      "id": 975,
+      "nombre": "Captur",
+      "country": "CO",
+      "marca_id": 74
+    },
+    {
+      "id": 976,
+      "nombre": "Koleos",
+      "country": "CO",
+      "marca_id": 74
+    },
+    {
+      "id": 977,
+      "nombre": "Oroch",
+      "country": "CO",
+      "marca_id": 74
+    },
+    {
+      "id": 978,
+      "nombre": "Symbol",
+      "country": "CO",
+      "marca_id": 74
+    },
+    {
+      "id": 979,
+      "nombre": "Fluence",
+      "country": "CO",
+      "marca_id": 74
+    },
+    {
+      "id": 980,
+      "nombre": "Megane",
+      "country": "CO",
+      "marca_id": 74
+    },
+    {
+      "id": 981,
+      "nombre": "Scenic",
+      "country": "CO",
+      "marca_id": 74
+    },
+    {
+      "id": 982,
+      "nombre": "Versa",
+      "country": "CO",
+      "marca_id": 75
+    },
+    {
+      "id": 983,
+      "nombre": "Sentra",
+      "country": "CO",
+      "marca_id": 75
+    },
+    {
+      "id": 984,
+      "nombre": "Altima",
+      "country": "CO",
+      "marca_id": 75
+    },
+    {
+      "id": 985,
+      "nombre": "Kicks",
+      "country": "CO",
+      "marca_id": 75
+    },
+    {
+      "id": 986,
+      "nombre": "Rogue",
+      "country": "CO",
+      "marca_id": 75
+    },
+    {
+      "id": 987,
+      "nombre": "Pathfinder",
+      "country": "CO",
+      "marca_id": 75
+    },
+    {
+      "id": 988,
+      "nombre": "Frontier",
+      "country": "CO",
+      "marca_id": 75
+    },
+    {
+      "id": 989,
+      "nombre": "X-Trail",
+      "country": "CO",
+      "marca_id": 75
+    },
+    {
+      "id": 990,
+      "nombre": "Murano",
+      "country": "CO",
+      "marca_id": 75
+    },
+    {
+      "id": 991,
+      "nombre": "Juke",
+      "country": "CO",
+      "marca_id": 75
+    },
+    {
+      "id": 992,
+      "nombre": "March",
+      "country": "CO",
+      "marca_id": 75
+    },
+    {
+      "id": 993,
+      "nombre": "Mazda2",
+      "country": "CO",
+      "marca_id": 76
+    },
+    {
+      "id": 994,
+      "nombre": "Mazda3",
+      "country": "CO",
+      "marca_id": 76
+    },
+    {
+      "id": 995,
+      "nombre": "Mazda6",
+      "country": "CO",
+      "marca_id": 76
+    },
+    {
+      "id": 996,
+      "nombre": "CX-3",
+      "country": "CO",
+      "marca_id": 76
+    },
+    {
+      "id": 997,
+      "nombre": "CX-5",
+      "country": "CO",
+      "marca_id": 76
+    },
+    {
+      "id": 998,
+      "nombre": "CX-9",
+      "country": "CO",
+      "marca_id": 76
+    },
+    {
+      "id": 999,
+      "nombre": "CX-30",
+      "country": "CO",
+      "marca_id": 76
+    },
+    {
+      "id": 1000,
+      "nombre": "BT-50",
+      "country": "CO",
+      "marca_id": 76
+    },
+    {
+      "id": 1001,
+      "nombre": "Corolla",
+      "country": "CO",
+      "marca_id": 77
+    },
+    {
+      "id": 1002,
+      "nombre": "Camry",
+      "country": "CO",
+      "marca_id": 77
+    },
+    {
+      "id": 1003,
+      "nombre": "RAV4",
+      "country": "CO",
+      "marca_id": 77
+    },
+    {
+      "id": 1004,
+      "nombre": "Hilux",
+      "country": "CO",
+      "marca_id": 77
+    },
+    {
+      "id": 1005,
+      "nombre": "Land Cruiser",
+      "country": "CO",
+      "marca_id": 77
+    },
+    {
+      "id": 1006,
+      "nombre": "Yaris",
+      "country": "CO",
+      "marca_id": 77
+    },
+    {
+      "id": 1007,
+      "nombre": "Prius",
+      "country": "CO",
+      "marca_id": 77
+    },
+    {
+      "id": 1008,
+      "nombre": "Highlander",
+      "country": "CO",
+      "marca_id": 77
+    },
+    {
+      "id": 1009,
+      "nombre": "Tacoma",
+      "country": "CO",
+      "marca_id": 77
+    },
+    {
+      "id": 1010,
+      "nombre": "4Runner",
+      "country": "CO",
+      "marca_id": 77
+    },
+    {
+      "id": 1011,
+      "nombre": "Sienna",
+      "country": "CO",
+      "marca_id": 77
+    },
+    {
+      "id": 1012,
+      "nombre": "Tundra",
+      "country": "CO",
+      "marca_id": 77
+    },
+    {
+      "id": 1013,
+      "nombre": "Accent",
+      "country": "CO",
+      "marca_id": 78
+    },
+    {
+      "id": 1014,
+      "nombre": "Elantra",
+      "country": "CO",
+      "marca_id": 78
+    },
+    {
+      "id": 1015,
+      "nombre": "Sonata",
+      "country": "CO",
+      "marca_id": 78
+    },
+    {
+      "id": 1016,
+      "nombre": "Tucson",
+      "country": "CO",
+      "marca_id": 78
+    },
+    {
+      "id": 1017,
+      "nombre": "Santa Fe",
+      "country": "CO",
+      "marca_id": 78
+    },
+    {
+      "id": 1018,
+      "nombre": "Palisade",
+      "country": "CO",
+      "marca_id": 78
+    },
+    {
+      "id": 1019,
+      "nombre": "Kona",
+      "country": "CO",
+      "marca_id": 78
+    },
+    {
+      "id": 1020,
+      "nombre": "Venue",
+      "country": "CO",
+      "marca_id": 78
+    },
+    {
+      "id": 1021,
+      "nombre": "i10",
+      "country": "CO",
+      "marca_id": 78
+    },
+    {
+      "id": 1022,
+      "nombre": "i20",
+      "country": "CO",
+      "marca_id": 78
+    },
+    {
+      "id": 1023,
+      "nombre": "i30",
+      "country": "CO",
+      "marca_id": 78
+    },
+    {
+      "id": 1024,
+      "nombre": "Rio",
+      "country": "CO",
+      "marca_id": 79
+    },
+    {
+      "id": 1025,
+      "nombre": "Forte",
+      "country": "CO",
+      "marca_id": 79
+    },
+    {
+      "id": 1026,
+      "nombre": "Optima",
+      "country": "CO",
+      "marca_id": 79
+    },
+    {
+      "id": 1027,
+      "nombre": "Sorento",
+      "country": "CO",
+      "marca_id": 79
+    },
+    {
+      "id": 1028,
+      "nombre": "Sportage",
+      "country": "CO",
+      "marca_id": 79
+    },
+    {
+      "id": 1029,
+      "nombre": "Telluride",
+      "country": "CO",
+      "marca_id": 79
+    },
+    {
+      "id": 1030,
+      "nombre": "Seltos",
+      "country": "CO",
+      "marca_id": 79
+    },
+    {
+      "id": 1031,
+      "nombre": "Soul",
+      "country": "CO",
+      "marca_id": 79
+    },
+    {
+      "id": 1032,
+      "nombre": "Picanto",
+      "country": "CO",
+      "marca_id": 79
+    },
+    {
+      "id": 1033,
+      "nombre": "Swift",
+      "country": "CO",
+      "marca_id": 80
+    },
+    {
+      "id": 1034,
+      "nombre": "SX4",
+      "country": "CO",
+      "marca_id": 80
+    },
+    {
+      "id": 1035,
+      "nombre": "Vitara",
+      "country": "CO",
+      "marca_id": 80
+    },
+    {
+      "id": 1036,
+      "nombre": "Grand Vitara",
+      "country": "CO",
+      "marca_id": 80
+    },
+    {
+      "id": 1037,
+      "nombre": "S-Cross",
+      "country": "CO",
+      "marca_id": 80
+    },
+    {
+      "id": 1038,
+      "nombre": "Jimny",
+      "country": "CO",
+      "marca_id": 80
+    },
+    {
+      "id": 1039,
+      "nombre": "Lancer",
+      "country": "CO",
+      "marca_id": 81
+    },
+    {
+      "id": 1040,
+      "nombre": "Outlander",
+      "country": "CO",
+      "marca_id": 81
+    },
+    {
+      "id": 1041,
+      "nombre": "Montero",
+      "country": "CO",
+      "marca_id": 81
+    },
+    {
+      "id": 1042,
+      "nombre": "Pajero",
+      "country": "CO",
+      "marca_id": 81
+    },
+    {
+      "id": 1043,
+      "nombre": "Eclipse Cross",
+      "country": "CO",
+      "marca_id": 81
+    },
+    {
+      "id": 1044,
+      "nombre": "ASX",
+      "country": "CO",
+      "marca_id": 81
+    },
+    {
+      "id": 1045,
+      "nombre": "L200",
+      "country": "CO",
+      "marca_id": 81
+    },
+    {
+      "id": 1046,
+      "nombre": "Fit",
+      "country": "CO",
+      "marca_id": 82
+    },
+    {
+      "id": 1047,
+      "nombre": "Civic",
+      "country": "CO",
+      "marca_id": 82
+    },
+    {
+      "id": 1048,
+      "nombre": "Accord",
+      "country": "CO",
+      "marca_id": 82
+    },
+    {
+      "id": 1049,
+      "nombre": "CR-V",
+      "country": "CO",
+      "marca_id": 82
+    },
+    {
+      "id": 1050,
+      "nombre": "Pilot",
+      "country": "CO",
+      "marca_id": 82
+    },
+    {
+      "id": 1051,
+      "nombre": "HR-V",
+      "country": "CO",
+      "marca_id": 82
+    },
+    {
+      "id": 1052,
+      "nombre": "Passport",
+      "country": "CO",
+      "marca_id": 82
+    },
+    {
+      "id": 1053,
+      "nombre": "Polo",
+      "country": "CO",
+      "marca_id": 83
+    },
+    {
+      "id": 1054,
+      "nombre": "Gol",
+      "country": "CO",
+      "marca_id": 83
+    },
+    {
+      "id": 1055,
+      "nombre": "Vento",
+      "country": "CO",
+      "marca_id": 83
+    },
+    {
+      "id": 1056,
+      "nombre": "Jetta",
+      "country": "CO",
+      "marca_id": 83
+    },
+    {
+      "id": 1057,
+      "nombre": "Passat",
+      "country": "CO",
+      "marca_id": 83
+    },
+    {
+      "id": 1058,
+      "nombre": "Tiguan",
+      "country": "CO",
+      "marca_id": 83
+    },
+    {
+      "id": 1059,
+      "nombre": "Touareg",
+      "country": "CO",
+      "marca_id": 83
+    },
+    {
+      "id": 1060,
+      "nombre": "Amarok",
+      "country": "CO",
+      "marca_id": 83
+    },
+    {
+      "id": 1061,
+      "nombre": "T-Cross",
+      "country": "CO",
+      "marca_id": 83
+    },
+    {
+      "id": 1062,
+      "nombre": "Nivus",
+      "country": "CO",
+      "marca_id": 83
+    },
+    {
+      "id": 1063,
+      "nombre": "Fiesta",
+      "country": "CO",
+      "marca_id": 84
+    },
+    {
+      "id": 1064,
+      "nombre": "Focus",
+      "country": "CO",
+      "marca_id": 84
+    },
+    {
+      "id": 1065,
+      "nombre": "Fusion",
+      "country": "CO",
+      "marca_id": 84
+    },
+    {
+      "id": 1066,
+      "nombre": "Escape",
+      "country": "CO",
+      "marca_id": 84
+    },
+    {
+      "id": 1067,
+      "nombre": "Explorer",
+      "country": "CO",
+      "marca_id": 84
+    },
+    {
+      "id": 1068,
+      "nombre": "Edge",
+      "country": "CO",
+      "marca_id": 84
+    },
+    {
+      "id": 1069,
+      "nombre": "Ranger",
+      "country": "CO",
+      "marca_id": 84
+    },
+    {
+      "id": 1070,
+      "nombre": "F-150",
+      "country": "CO",
+      "marca_id": 84
+    },
+    {
+      "id": 1071,
+      "nombre": "Bronco",
+      "country": "CO",
+      "marca_id": 84
+    },
+    {
+      "id": 1072,
+      "nombre": "Serie 1",
+      "country": "CO",
+      "marca_id": 85
+    },
+    {
+      "id": 1073,
+      "nombre": "Serie 2",
+      "country": "CO",
+      "marca_id": 85
+    },
+    {
+      "id": 1074,
+      "nombre": "Serie 3",
+      "country": "CO",
+      "marca_id": 85
+    },
+    {
+      "id": 1075,
+      "nombre": "Serie 4",
+      "country": "CO",
+      "marca_id": 85
+    },
+    {
+      "id": 1076,
+      "nombre": "Serie 5",
+      "country": "CO",
+      "marca_id": 85
+    },
+    {
+      "id": 1077,
+      "nombre": "Serie 7",
+      "country": "CO",
+      "marca_id": 85
+    },
+    {
+      "id": 1078,
+      "nombre": "X1",
+      "country": "CO",
+      "marca_id": 85
+    },
+    {
+      "id": 1079,
+      "nombre": "X2",
+      "country": "CO",
+      "marca_id": 85
+    },
+    {
+      "id": 1080,
+      "nombre": "X3",
+      "country": "CO",
+      "marca_id": 85
+    },
+    {
+      "id": 1081,
+      "nombre": "X4",
+      "country": "CO",
+      "marca_id": 85
+    },
+    {
+      "id": 1082,
+      "nombre": "X5",
+      "country": "CO",
+      "marca_id": 85
+    },
+    {
+      "id": 1083,
+      "nombre": "X6",
+      "country": "CO",
+      "marca_id": 85
+    },
+    {
+      "id": 1084,
+      "nombre": "X7",
+      "country": "CO",
+      "marca_id": 85
+    },
+    {
+      "id": 1085,
+      "nombre": "Clase A",
+      "country": "CO",
+      "marca_id": 86
+    },
+    {
+      "id": 1086,
+      "nombre": "Clase B",
+      "country": "CO",
+      "marca_id": 86
+    },
+    {
+      "id": 1087,
+      "nombre": "Clase C",
+      "country": "CO",
+      "marca_id": 86
+    },
+    {
+      "id": 1088,
+      "nombre": "Clase E",
+      "country": "CO",
+      "marca_id": 86
+    },
+    {
+      "id": 1089,
+      "nombre": "Clase S",
+      "country": "CO",
+      "marca_id": 86
+    },
+    {
+      "id": 1090,
+      "nombre": "GLA",
+      "country": "CO",
+      "marca_id": 86
+    },
+    {
+      "id": 1091,
+      "nombre": "GLB",
+      "country": "CO",
+      "marca_id": 86
+    },
+    {
+      "id": 1092,
+      "nombre": "GLC",
+      "country": "CO",
+      "marca_id": 86
+    },
+    {
+      "id": 1093,
+      "nombre": "GLE",
+      "country": "CO",
+      "marca_id": 86
+    },
+    {
+      "id": 1094,
+      "nombre": "GLS",
+      "country": "CO",
+      "marca_id": 86
+    },
+    {
+      "id": 1095,
+      "nombre": "G-Class",
+      "country": "CO",
+      "marca_id": 86
+    },
+    {
+      "id": 1096,
+      "nombre": "A1",
+      "country": "CO",
+      "marca_id": 87
+    },
+    {
+      "id": 1097,
+      "nombre": "A3",
+      "country": "CO",
+      "marca_id": 87
+    },
+    {
+      "id": 1098,
+      "nombre": "A4",
+      "country": "CO",
+      "marca_id": 87
+    },
+    {
+      "id": 1099,
+      "nombre": "A5",
+      "country": "CO",
+      "marca_id": 87
+    },
+    {
+      "id": 1100,
+      "nombre": "A6",
+      "country": "CO",
+      "marca_id": 87
+    },
+    {
+      "id": 1101,
+      "nombre": "A7",
+      "country": "CO",
+      "marca_id": 87
+    },
+    {
+      "id": 1102,
+      "nombre": "A8",
+      "country": "CO",
+      "marca_id": 87
+    },
+    {
+      "id": 1103,
+      "nombre": "Q2",
+      "country": "CO",
+      "marca_id": 87
+    },
+    {
+      "id": 1104,
+      "nombre": "Q3",
+      "country": "CO",
+      "marca_id": 87
+    },
+    {
+      "id": 1105,
+      "nombre": "Q5",
+      "country": "CO",
+      "marca_id": 87
+    },
+    {
+      "id": 1106,
+      "nombre": "Q7",
+      "country": "CO",
+      "marca_id": 87
+    },
+    {
+      "id": 1107,
+      "nombre": "Q8",
+      "country": "CO",
+      "marca_id": 87
+    },
+    {
+      "id": 1108,
+      "nombre": "Corolla",
+      "country": "PE",
+      "marca_id": 88
+    },
+    {
+      "id": 1109,
+      "nombre": "Camry",
+      "country": "PE",
+      "marca_id": 88
+    },
+    {
+      "id": 1110,
+      "nombre": "RAV4",
+      "country": "PE",
+      "marca_id": 88
+    },
+    {
+      "id": 1111,
+      "nombre": "Hilux",
+      "country": "PE",
+      "marca_id": 88
+    },
+    {
+      "id": 1112,
+      "nombre": "Land Cruiser",
+      "country": "PE",
+      "marca_id": 88
+    },
+    {
+      "id": 1113,
+      "nombre": "Yaris",
+      "country": "PE",
+      "marca_id": 88
+    },
+    {
+      "id": 1114,
+      "nombre": "Prius",
+      "country": "PE",
+      "marca_id": 88
+    },
+    {
+      "id": 1115,
+      "nombre": "Highlander",
+      "country": "PE",
+      "marca_id": 88
+    },
+    {
+      "id": 1116,
+      "nombre": "Tacoma",
+      "country": "PE",
+      "marca_id": 88
+    },
+    {
+      "id": 1117,
+      "nombre": "4Runner",
+      "country": "PE",
+      "marca_id": 88
+    },
+    {
+      "id": 1118,
+      "nombre": "Sienna",
+      "country": "PE",
+      "marca_id": 88
+    },
+    {
+      "id": 1119,
+      "nombre": "Tundra",
+      "country": "PE",
+      "marca_id": 88
+    },
+    {
+      "id": 1120,
+      "nombre": "Sequoia",
+      "country": "PE",
+      "marca_id": 88
+    },
+    {
+      "id": 1121,
+      "nombre": "Versa",
+      "country": "PE",
+      "marca_id": 89
+    },
+    {
+      "id": 1122,
+      "nombre": "Sentra",
+      "country": "PE",
+      "marca_id": 89
+    },
+    {
+      "id": 1123,
+      "nombre": "Altima",
+      "country": "PE",
+      "marca_id": 89
+    },
+    {
+      "id": 1124,
+      "nombre": "Kicks",
+      "country": "PE",
+      "marca_id": 89
+    },
+    {
+      "id": 1125,
+      "nombre": "Rogue",
+      "country": "PE",
+      "marca_id": 89
+    },
+    {
+      "id": 1126,
+      "nombre": "Pathfinder",
+      "country": "PE",
+      "marca_id": 89
+    },
+    {
+      "id": 1127,
+      "nombre": "Frontier",
+      "country": "PE",
+      "marca_id": 89
+    },
+    {
+      "id": 1128,
+      "nombre": "X-Trail",
+      "country": "PE",
+      "marca_id": 89
+    },
+    {
+      "id": 1129,
+      "nombre": "Murano",
+      "country": "PE",
+      "marca_id": 89
+    },
+    {
+      "id": 1130,
+      "nombre": "Juke",
+      "country": "PE",
+      "marca_id": 89
+    },
+    {
+      "id": 1131,
+      "nombre": "March",
+      "country": "PE",
+      "marca_id": 89
+    },
+    {
+      "id": 1132,
+      "nombre": "Spark",
+      "country": "PE",
+      "marca_id": 90
+    },
+    {
+      "id": 1133,
+      "nombre": "Sail",
+      "country": "PE",
+      "marca_id": 90
+    },
+    {
+      "id": 1134,
+      "nombre": "Onix",
+      "country": "PE",
+      "marca_id": 90
+    },
+    {
+      "id": 1135,
+      "nombre": "Prisma",
+      "country": "PE",
+      "marca_id": 90
+    },
+    {
+      "id": 1136,
+      "nombre": "Cruze",
+      "country": "PE",
+      "marca_id": 90
+    },
+    {
+      "id": 1137,
+      "nombre": "Malibu",
+      "country": "PE",
+      "marca_id": 90
+    },
+    {
+      "id": 1138,
+      "nombre": "Equinox",
+      "country": "PE",
+      "marca_id": 90
+    },
+    {
+      "id": 1139,
+      "nombre": "Traverse",
+      "country": "PE",
+      "marca_id": 90
+    },
+    {
+      "id": 1140,
+      "nombre": "Tahoe",
+      "country": "PE",
+      "marca_id": 90
+    },
+    {
+      "id": 1141,
+      "nombre": "Silverado",
+      "country": "PE",
+      "marca_id": 90
+    },
+    {
+      "id": 1142,
+      "nombre": "Colorado",
+      "country": "PE",
+      "marca_id": 90
+    },
+    {
+      "id": 1143,
+      "nombre": "Tracker",
+      "country": "PE",
+      "marca_id": 90
+    },
+    {
+      "id": 1144,
+      "nombre": "Blazer",
+      "country": "PE",
+      "marca_id": 90
+    },
+    {
+      "id": 1145,
+      "nombre": "Accent",
+      "country": "PE",
+      "marca_id": 91
+    },
+    {
+      "id": 1146,
+      "nombre": "Elantra",
+      "country": "PE",
+      "marca_id": 91
+    },
+    {
+      "id": 1147,
+      "nombre": "Sonata",
+      "country": "PE",
+      "marca_id": 91
+    },
+    {
+      "id": 1148,
+      "nombre": "Tucson",
+      "country": "PE",
+      "marca_id": 91
+    },
+    {
+      "id": 1149,
+      "nombre": "Santa Fe",
+      "country": "PE",
+      "marca_id": 91
+    },
+    {
+      "id": 1150,
+      "nombre": "Palisade",
+      "country": "PE",
+      "marca_id": 91
+    },
+    {
+      "id": 1151,
+      "nombre": "Kona",
+      "country": "PE",
+      "marca_id": 91
+    },
+    {
+      "id": 1152,
+      "nombre": "Venue",
+      "country": "PE",
+      "marca_id": 91
+    },
+    {
+      "id": 1153,
+      "nombre": "i10",
+      "country": "PE",
+      "marca_id": 91
+    },
+    {
+      "id": 1154,
+      "nombre": "i20",
+      "country": "PE",
+      "marca_id": 91
+    },
+    {
+      "id": 1155,
+      "nombre": "Rio",
+      "country": "PE",
+      "marca_id": 92
+    },
+    {
+      "id": 1156,
+      "nombre": "Forte",
+      "country": "PE",
+      "marca_id": 92
+    },
+    {
+      "id": 1157,
+      "nombre": "Optima",
+      "country": "PE",
+      "marca_id": 92
+    },
+    {
+      "id": 1158,
+      "nombre": "Sorento",
+      "country": "PE",
+      "marca_id": 92
+    },
+    {
+      "id": 1159,
+      "nombre": "Sportage",
+      "country": "PE",
+      "marca_id": 92
+    },
+    {
+      "id": 1160,
+      "nombre": "Telluride",
+      "country": "PE",
+      "marca_id": 92
+    },
+    {
+      "id": 1161,
+      "nombre": "Seltos",
+      "country": "PE",
+      "marca_id": 92
+    },
+    {
+      "id": 1162,
+      "nombre": "Soul",
+      "country": "PE",
+      "marca_id": 92
+    },
+    {
+      "id": 1163,
+      "nombre": "Picanto",
+      "country": "PE",
+      "marca_id": 92
+    },
+    {
+      "id": 1164,
+      "nombre": "Mazda2",
+      "country": "PE",
+      "marca_id": 93
+    },
+    {
+      "id": 1165,
+      "nombre": "Mazda3",
+      "country": "PE",
+      "marca_id": 93
+    },
+    {
+      "id": 1166,
+      "nombre": "Mazda6",
+      "country": "PE",
+      "marca_id": 93
+    },
+    {
+      "id": 1167,
+      "nombre": "CX-3",
+      "country": "PE",
+      "marca_id": 93
+    },
+    {
+      "id": 1168,
+      "nombre": "CX-5",
+      "country": "PE",
+      "marca_id": 93
+    },
+    {
+      "id": 1169,
+      "nombre": "CX-9",
+      "country": "PE",
+      "marca_id": 93
+    },
+    {
+      "id": 1170,
+      "nombre": "CX-30",
+      "country": "PE",
+      "marca_id": 93
+    },
+    {
+      "id": 1171,
+      "nombre": "BT-50",
+      "country": "PE",
+      "marca_id": 93
+    },
+    {
+      "id": 1172,
+      "nombre": "Swift",
+      "country": "PE",
+      "marca_id": 94
+    },
+    {
+      "id": 1173,
+      "nombre": "SX4",
+      "country": "PE",
+      "marca_id": 94
+    },
+    {
+      "id": 1174,
+      "nombre": "Vitara",
+      "country": "PE",
+      "marca_id": 94
+    },
+    {
+      "id": 1175,
+      "nombre": "Grand Vitara",
+      "country": "PE",
+      "marca_id": 94
+    },
+    {
+      "id": 1176,
+      "nombre": "S-Cross",
+      "country": "PE",
+      "marca_id": 94
+    },
+    {
+      "id": 1177,
+      "nombre": "Jimny",
+      "country": "PE",
+      "marca_id": 94
+    },
+    {
+      "id": 1178,
+      "nombre": "Lancer",
+      "country": "PE",
+      "marca_id": 95
+    },
+    {
+      "id": 1179,
+      "nombre": "Outlander",
+      "country": "PE",
+      "marca_id": 95
+    },
+    {
+      "id": 1180,
+      "nombre": "Montero",
+      "country": "PE",
+      "marca_id": 95
+    },
+    {
+      "id": 1181,
+      "nombre": "Pajero",
+      "country": "PE",
+      "marca_id": 95
+    },
+    {
+      "id": 1182,
+      "nombre": "Eclipse Cross",
+      "country": "PE",
+      "marca_id": 95
+    },
+    {
+      "id": 1183,
+      "nombre": "ASX",
+      "country": "PE",
+      "marca_id": 95
+    },
+    {
+      "id": 1184,
+      "nombre": "L200",
+      "country": "PE",
+      "marca_id": 95
+    },
+    {
+      "id": 1185,
+      "nombre": "Fit",
+      "country": "PE",
+      "marca_id": 96
+    },
+    {
+      "id": 1186,
+      "nombre": "Civic",
+      "country": "PE",
+      "marca_id": 96
+    },
+    {
+      "id": 1187,
+      "nombre": "Accord",
+      "country": "PE",
+      "marca_id": 96
+    },
+    {
+      "id": 1188,
+      "nombre": "CR-V",
+      "country": "PE",
+      "marca_id": 96
+    },
+    {
+      "id": 1189,
+      "nombre": "Pilot",
+      "country": "PE",
+      "marca_id": 96
+    },
+    {
+      "id": 1190,
+      "nombre": "HR-V",
+      "country": "PE",
+      "marca_id": 96
+    },
+    {
+      "id": 1191,
+      "nombre": "Passport",
+      "country": "PE",
+      "marca_id": 96
+    },
+    {
+      "id": 1192,
+      "nombre": "Polo",
+      "country": "PE",
+      "marca_id": 97
+    },
+    {
+      "id": 1193,
+      "nombre": "Gol",
+      "country": "PE",
+      "marca_id": 97
+    },
+    {
+      "id": 1194,
+      "nombre": "Vento",
+      "country": "PE",
+      "marca_id": 97
+    },
+    {
+      "id": 1195,
+      "nombre": "Jetta",
+      "country": "PE",
+      "marca_id": 97
+    },
+    {
+      "id": 1196,
+      "nombre": "Passat",
+      "country": "PE",
+      "marca_id": 97
+    },
+    {
+      "id": 1197,
+      "nombre": "Tiguan",
+      "country": "PE",
+      "marca_id": 97
+    },
+    {
+      "id": 1198,
+      "nombre": "Touareg",
+      "country": "PE",
+      "marca_id": 97
+    },
+    {
+      "id": 1199,
+      "nombre": "Amarok",
+      "country": "PE",
+      "marca_id": 97
+    },
+    {
+      "id": 1200,
+      "nombre": "T-Cross",
+      "country": "PE",
+      "marca_id": 97
+    },
+    {
+      "id": 1201,
+      "nombre": "Nivus",
+      "country": "PE",
+      "marca_id": 97
+    },
+    {
+      "id": 1202,
+      "nombre": "Kwid",
+      "country": "PE",
+      "marca_id": 98
+    },
+    {
+      "id": 1203,
+      "nombre": "Sandero",
+      "country": "PE",
+      "marca_id": 98
+    },
+    {
+      "id": 1204,
+      "nombre": "Logan",
+      "country": "PE",
+      "marca_id": 98
+    },
+    {
+      "id": 1205,
+      "nombre": "Duster",
+      "country": "PE",
+      "marca_id": 98
+    },
+    {
+      "id": 1206,
+      "nombre": "Captur",
+      "country": "PE",
+      "marca_id": 98
+    },
+    {
+      "id": 1207,
+      "nombre": "Koleos",
+      "country": "PE",
+      "marca_id": 98
+    },
+    {
+      "id": 1208,
+      "nombre": "Oroch",
+      "country": "PE",
+      "marca_id": 98
+    },
+    {
+      "id": 1209,
+      "nombre": "208",
+      "country": "PE",
+      "marca_id": 99
+    },
+    {
+      "id": 1210,
+      "nombre": "301",
+      "country": "PE",
+      "marca_id": 99
+    },
+    {
+      "id": 1211,
+      "nombre": "308",
+      "country": "PE",
+      "marca_id": 99
+    },
+    {
+      "id": 1212,
+      "nombre": "408",
+      "country": "PE",
+      "marca_id": 99
+    },
+    {
+      "id": 1213,
+      "nombre": "2008",
+      "country": "PE",
+      "marca_id": 99
+    },
+    {
+      "id": 1214,
+      "nombre": "3008",
+      "country": "PE",
+      "marca_id": 99
+    },
+    {
+      "id": 1215,
+      "nombre": "5008",
+      "country": "PE",
+      "marca_id": 99
+    },
+    {
+      "id": 1216,
+      "nombre": "Partner",
+      "country": "PE",
+      "marca_id": 99
+    },
+    {
+      "id": 1217,
+      "nombre": "Uno",
+      "country": "PE",
+      "marca_id": 100
+    },
+    {
+      "id": 1218,
+      "nombre": "Palio",
+      "country": "PE",
+      "marca_id": 100
+    },
+    {
+      "id": 1219,
+      "nombre": "Siena",
+      "country": "PE",
+      "marca_id": 100
+    },
+    {
+      "id": 1220,
+      "nombre": "Strada",
+      "country": "PE",
+      "marca_id": 100
+    },
+    {
+      "id": 1221,
+      "nombre": "Toro",
+      "country": "PE",
+      "marca_id": 100
+    },
+    {
+      "id": 1222,
+      "nombre": "Ducato",
+      "country": "PE",
+      "marca_id": 100
+    },
+    {
+      "id": 1223,
+      "nombre": "500",
+      "country": "PE",
+      "marca_id": 100
+    },
+    {
+      "id": 1224,
+      "nombre": "Argo",
+      "country": "PE",
+      "marca_id": 100
+    },
+    {
+      "id": 1225,
+      "nombre": "Serie 1",
+      "country": "PE",
+      "marca_id": 101
+    },
+    {
+      "id": 1226,
+      "nombre": "Serie 2",
+      "country": "PE",
+      "marca_id": 101
+    },
+    {
+      "id": 1227,
+      "nombre": "Serie 3",
+      "country": "PE",
+      "marca_id": 101
+    },
+    {
+      "id": 1228,
+      "nombre": "Serie 4",
+      "country": "PE",
+      "marca_id": 101
+    },
+    {
+      "id": 1229,
+      "nombre": "Serie 5",
+      "country": "PE",
+      "marca_id": 101
+    },
+    {
+      "id": 1230,
+      "nombre": "Serie 7",
+      "country": "PE",
+      "marca_id": 101
+    },
+    {
+      "id": 1231,
+      "nombre": "X1",
+      "country": "PE",
+      "marca_id": 101
+    },
+    {
+      "id": 1232,
+      "nombre": "X2",
+      "country": "PE",
+      "marca_id": 101
+    },
+    {
+      "id": 1233,
+      "nombre": "X3",
+      "country": "PE",
+      "marca_id": 101
+    },
+    {
+      "id": 1234,
+      "nombre": "X4",
+      "country": "PE",
+      "marca_id": 101
+    },
+    {
+      "id": 1235,
+      "nombre": "X5",
+      "country": "PE",
+      "marca_id": 101
+    },
+    {
+      "id": 1236,
+      "nombre": "X6",
+      "country": "PE",
+      "marca_id": 101
+    },
+    {
+      "id": 1237,
+      "nombre": "X7",
+      "country": "PE",
+      "marca_id": 101
+    },
+    {
+      "id": 1238,
+      "nombre": "Clase A",
+      "country": "PE",
+      "marca_id": 102
+    },
+    {
+      "id": 1239,
+      "nombre": "Clase B",
+      "country": "PE",
+      "marca_id": 102
+    },
+    {
+      "id": 1240,
+      "nombre": "Clase C",
+      "country": "PE",
+      "marca_id": 102
+    },
+    {
+      "id": 1241,
+      "nombre": "Clase E",
+      "country": "PE",
+      "marca_id": 102
+    },
+    {
+      "id": 1242,
+      "nombre": "Clase S",
+      "country": "PE",
+      "marca_id": 102
+    },
+    {
+      "id": 1243,
+      "nombre": "GLA",
+      "country": "PE",
+      "marca_id": 102
+    },
+    {
+      "id": 1244,
+      "nombre": "GLB",
+      "country": "PE",
+      "marca_id": 102
+    },
+    {
+      "id": 1245,
+      "nombre": "GLC",
+      "country": "PE",
+      "marca_id": 102
+    },
+    {
+      "id": 1246,
+      "nombre": "GLE",
+      "country": "PE",
+      "marca_id": 102
+    },
+    {
+      "id": 1247,
+      "nombre": "GLS",
+      "country": "PE",
+      "marca_id": 102
+    },
+    {
+      "id": 1248,
+      "nombre": "G-Class",
+      "country": "PE",
+      "marca_id": 102
+    },
+    {
+      "id": 1249,
+      "nombre": "A1",
+      "country": "PE",
+      "marca_id": 103
+    },
+    {
+      "id": 1250,
+      "nombre": "A3",
+      "country": "PE",
+      "marca_id": 103
+    },
+    {
+      "id": 1251,
+      "nombre": "A4",
+      "country": "PE",
+      "marca_id": 103
+    },
+    {
+      "id": 1252,
+      "nombre": "A5",
+      "country": "PE",
+      "marca_id": 103
+    },
+    {
+      "id": 1253,
+      "nombre": "A6",
+      "country": "PE",
+      "marca_id": 103
+    },
+    {
+      "id": 1254,
+      "nombre": "A7",
+      "country": "PE",
+      "marca_id": 103
+    },
+    {
+      "id": 1255,
+      "nombre": "A8",
+      "country": "PE",
+      "marca_id": 103
+    },
+    {
+      "id": 1256,
+      "nombre": "Q2",
+      "country": "PE",
+      "marca_id": 103
+    },
+    {
+      "id": 1257,
+      "nombre": "Q3",
+      "country": "PE",
+      "marca_id": 103
+    },
+    {
+      "id": 1258,
+      "nombre": "Q5",
+      "country": "PE",
+      "marca_id": 103
+    },
+    {
+      "id": 1259,
+      "nombre": "Q7",
+      "country": "PE",
+      "marca_id": 103
+    },
+    {
+      "id": 1260,
+      "nombre": "Q8",
+      "country": "PE",
+      "marca_id": 103
+    },
+    {
+      "id": 1261,
+      "nombre": "Fiesta",
+      "country": "PE",
+      "marca_id": 104
+    },
+    {
+      "id": 1262,
+      "nombre": "Focus",
+      "country": "PE",
+      "marca_id": 104
+    },
+    {
+      "id": 1263,
+      "nombre": "Fusion",
+      "country": "PE",
+      "marca_id": 104
+    },
+    {
+      "id": 1264,
+      "nombre": "Escape",
+      "country": "PE",
+      "marca_id": 104
+    },
+    {
+      "id": 1265,
+      "nombre": "Explorer",
+      "country": "PE",
+      "marca_id": 104
+    },
+    {
+      "id": 1266,
+      "nombre": "Edge",
+      "country": "PE",
+      "marca_id": 104
+    },
+    {
+      "id": 1267,
+      "nombre": "Ranger",
+      "country": "PE",
+      "marca_id": 104
+    },
+    {
+      "id": 1268,
+      "nombre": "F-150",
+      "country": "PE",
+      "marca_id": 104
+    },
+    {
+      "id": 1269,
+      "nombre": "Bronco",
+      "country": "PE",
+      "marca_id": 104
+    },
+    {
+      "id": 1270,
+      "nombre": "D-Max",
+      "country": "PE",
+      "marca_id": 105
+    },
+    {
+      "id": 1271,
+      "nombre": "MU-X",
+      "country": "PE",
+      "marca_id": 105
+    },
+    {
+      "id": 1272,
+      "nombre": "NPR",
+      "country": "PE",
+      "marca_id": 105
+    },
+    {
+      "id": 1273,
+      "nombre": "NQR",
+      "country": "PE",
+      "marca_id": 105
+    },
+    {
+      "id": 1274,
+      "nombre": "Spark",
+      "country": "EC",
+      "marca_id": 106
+    },
+    {
+      "id": 1275,
+      "nombre": "Sail",
+      "country": "EC",
+      "marca_id": 106
+    },
+    {
+      "id": 1276,
+      "nombre": "Onix",
+      "country": "EC",
+      "marca_id": 106
+    },
+    {
+      "id": 1277,
+      "nombre": "Prisma",
+      "country": "EC",
+      "marca_id": 106
+    },
+    {
+      "id": 1278,
+      "nombre": "Cruze",
+      "country": "EC",
+      "marca_id": 106
+    },
+    {
+      "id": 1279,
+      "nombre": "Malibu",
+      "country": "EC",
+      "marca_id": 106
+    },
+    {
+      "id": 1280,
+      "nombre": "Equinox",
+      "country": "EC",
+      "marca_id": 106
+    },
+    {
+      "id": 1281,
+      "nombre": "Traverse",
+      "country": "EC",
+      "marca_id": 106
+    },
+    {
+      "id": 1282,
+      "nombre": "Tahoe",
+      "country": "EC",
+      "marca_id": 106
+    },
+    {
+      "id": 1283,
+      "nombre": "Silverado",
+      "country": "EC",
+      "marca_id": 106
+    },
+    {
+      "id": 1284,
+      "nombre": "Colorado",
+      "country": "EC",
+      "marca_id": 106
+    },
+    {
+      "id": 1285,
+      "nombre": "Tracker",
+      "country": "EC",
+      "marca_id": 106
+    },
+    {
+      "id": 1286,
+      "nombre": "Blazer",
+      "country": "EC",
+      "marca_id": 106
+    },
+    {
+      "id": 1287,
+      "nombre": "Corolla",
+      "country": "EC",
+      "marca_id": 107
+    },
+    {
+      "id": 1288,
+      "nombre": "Camry",
+      "country": "EC",
+      "marca_id": 107
+    },
+    {
+      "id": 1289,
+      "nombre": "RAV4",
+      "country": "EC",
+      "marca_id": 107
+    },
+    {
+      "id": 1290,
+      "nombre": "Hilux",
+      "country": "EC",
+      "marca_id": 107
+    },
+    {
+      "id": 1291,
+      "nombre": "Land Cruiser",
+      "country": "EC",
+      "marca_id": 107
+    },
+    {
+      "id": 1292,
+      "nombre": "Yaris",
+      "country": "EC",
+      "marca_id": 107
+    },
+    {
+      "id": 1293,
+      "nombre": "Prius",
+      "country": "EC",
+      "marca_id": 107
+    },
+    {
+      "id": 1294,
+      "nombre": "Highlander",
+      "country": "EC",
+      "marca_id": 107
+    },
+    {
+      "id": 1295,
+      "nombre": "Tacoma",
+      "country": "EC",
+      "marca_id": 107
+    },
+    {
+      "id": 1296,
+      "nombre": "4Runner",
+      "country": "EC",
+      "marca_id": 107
+    },
+    {
+      "id": 1297,
+      "nombre": "Sienna",
+      "country": "EC",
+      "marca_id": 107
+    },
+    {
+      "id": 1298,
+      "nombre": "Tundra",
+      "country": "EC",
+      "marca_id": 107
+    },
+    {
+      "id": 1299,
+      "nombre": "Versa",
+      "country": "EC",
+      "marca_id": 108
+    },
+    {
+      "id": 1300,
+      "nombre": "Sentra",
+      "country": "EC",
+      "marca_id": 108
+    },
+    {
+      "id": 1301,
+      "nombre": "Altima",
+      "country": "EC",
+      "marca_id": 108
+    },
+    {
+      "id": 1302,
+      "nombre": "Kicks",
+      "country": "EC",
+      "marca_id": 108
+    },
+    {
+      "id": 1303,
+      "nombre": "Rogue",
+      "country": "EC",
+      "marca_id": 108
+    },
+    {
+      "id": 1304,
+      "nombre": "Pathfinder",
+      "country": "EC",
+      "marca_id": 108
+    },
+    {
+      "id": 1305,
+      "nombre": "Frontier",
+      "country": "EC",
+      "marca_id": 108
+    },
+    {
+      "id": 1306,
+      "nombre": "X-Trail",
+      "country": "EC",
+      "marca_id": 108
+    },
+    {
+      "id": 1307,
+      "nombre": "Murano",
+      "country": "EC",
+      "marca_id": 108
+    },
+    {
+      "id": 1308,
+      "nombre": "Juke",
+      "country": "EC",
+      "marca_id": 108
+    },
+    {
+      "id": 1309,
+      "nombre": "March",
+      "country": "EC",
+      "marca_id": 108
+    },
+    {
+      "id": 1310,
+      "nombre": "Accent",
+      "country": "EC",
+      "marca_id": 109
+    },
+    {
+      "id": 1311,
+      "nombre": "Elantra",
+      "country": "EC",
+      "marca_id": 109
+    },
+    {
+      "id": 1312,
+      "nombre": "Sonata",
+      "country": "EC",
+      "marca_id": 109
+    },
+    {
+      "id": 1313,
+      "nombre": "Tucson",
+      "country": "EC",
+      "marca_id": 109
+    },
+    {
+      "id": 1314,
+      "nombre": "Santa Fe",
+      "country": "EC",
+      "marca_id": 109
+    },
+    {
+      "id": 1315,
+      "nombre": "Palisade",
+      "country": "EC",
+      "marca_id": 109
+    },
+    {
+      "id": 1316,
+      "nombre": "Kona",
+      "country": "EC",
+      "marca_id": 109
+    },
+    {
+      "id": 1317,
+      "nombre": "Venue",
+      "country": "EC",
+      "marca_id": 109
+    },
+    {
+      "id": 1318,
+      "nombre": "i10",
+      "country": "EC",
+      "marca_id": 109
+    },
+    {
+      "id": 1319,
+      "nombre": "i20",
+      "country": "EC",
+      "marca_id": 109
+    },
+    {
+      "id": 1320,
+      "nombre": "Rio",
+      "country": "EC",
+      "marca_id": 110
+    },
+    {
+      "id": 1321,
+      "nombre": "Forte",
+      "country": "EC",
+      "marca_id": 110
+    },
+    {
+      "id": 1322,
+      "nombre": "Optima",
+      "country": "EC",
+      "marca_id": 110
+    },
+    {
+      "id": 1323,
+      "nombre": "Sorento",
+      "country": "EC",
+      "marca_id": 110
+    },
+    {
+      "id": 1324,
+      "nombre": "Sportage",
+      "country": "EC",
+      "marca_id": 110
+    },
+    {
+      "id": 1325,
+      "nombre": "Telluride",
+      "country": "EC",
+      "marca_id": 110
+    },
+    {
+      "id": 1326,
+      "nombre": "Seltos",
+      "country": "EC",
+      "marca_id": 110
+    },
+    {
+      "id": 1327,
+      "nombre": "Soul",
+      "country": "EC",
+      "marca_id": 110
+    },
+    {
+      "id": 1328,
+      "nombre": "Picanto",
+      "country": "EC",
+      "marca_id": 110
+    },
+    {
+      "id": 1329,
+      "nombre": "Mazda2",
+      "country": "EC",
+      "marca_id": 111
+    },
+    {
+      "id": 1330,
+      "nombre": "Mazda3",
+      "country": "EC",
+      "marca_id": 111
+    },
+    {
+      "id": 1331,
+      "nombre": "Mazda6",
+      "country": "EC",
+      "marca_id": 111
+    },
+    {
+      "id": 1332,
+      "nombre": "CX-3",
+      "country": "EC",
+      "marca_id": 111
+    },
+    {
+      "id": 1333,
+      "nombre": "CX-5",
+      "country": "EC",
+      "marca_id": 111
+    },
+    {
+      "id": 1334,
+      "nombre": "CX-9",
+      "country": "EC",
+      "marca_id": 111
+    },
+    {
+      "id": 1335,
+      "nombre": "CX-30",
+      "country": "EC",
+      "marca_id": 111
+    },
+    {
+      "id": 1336,
+      "nombre": "BT-50",
+      "country": "EC",
+      "marca_id": 111
+    },
+    {
+      "id": 1337,
+      "nombre": "Swift",
+      "country": "EC",
+      "marca_id": 112
+    },
+    {
+      "id": 1338,
+      "nombre": "SX4",
+      "country": "EC",
+      "marca_id": 112
+    },
+    {
+      "id": 1339,
+      "nombre": "Vitara",
+      "country": "EC",
+      "marca_id": 112
+    },
+    {
+      "id": 1340,
+      "nombre": "Grand Vitara",
+      "country": "EC",
+      "marca_id": 112
+    },
+    {
+      "id": 1341,
+      "nombre": "S-Cross",
+      "country": "EC",
+      "marca_id": 112
+    },
+    {
+      "id": 1342,
+      "nombre": "Jimny",
+      "country": "EC",
+      "marca_id": 112
+    },
+    {
+      "id": 1343,
+      "nombre": "Lancer",
+      "country": "EC",
+      "marca_id": 113
+    },
+    {
+      "id": 1344,
+      "nombre": "Outlander",
+      "country": "EC",
+      "marca_id": 113
+    },
+    {
+      "id": 1345,
+      "nombre": "Montero",
+      "country": "EC",
+      "marca_id": 113
+    },
+    {
+      "id": 1346,
+      "nombre": "Pajero",
+      "country": "EC",
+      "marca_id": 113
+    },
+    {
+      "id": 1347,
+      "nombre": "Eclipse Cross",
+      "country": "EC",
+      "marca_id": 113
+    },
+    {
+      "id": 1348,
+      "nombre": "ASX",
+      "country": "EC",
+      "marca_id": 113
+    },
+    {
+      "id": 1349,
+      "nombre": "L200",
+      "country": "EC",
+      "marca_id": 113
+    },
+    {
+      "id": 1350,
+      "nombre": "Fit",
+      "country": "EC",
+      "marca_id": 114
+    },
+    {
+      "id": 1351,
+      "nombre": "Civic",
+      "country": "EC",
+      "marca_id": 114
+    },
+    {
+      "id": 1352,
+      "nombre": "Accord",
+      "country": "EC",
+      "marca_id": 114
+    },
+    {
+      "id": 1353,
+      "nombre": "CR-V",
+      "country": "EC",
+      "marca_id": 114
+    },
+    {
+      "id": 1354,
+      "nombre": "Pilot",
+      "country": "EC",
+      "marca_id": 114
+    },
+    {
+      "id": 1355,
+      "nombre": "HR-V",
+      "country": "EC",
+      "marca_id": 114
+    },
+    {
+      "id": 1356,
+      "nombre": "Passport",
+      "country": "EC",
+      "marca_id": 114
+    },
+    {
+      "id": 1357,
+      "nombre": "Polo",
+      "country": "EC",
+      "marca_id": 115
+    },
+    {
+      "id": 1358,
+      "nombre": "Gol",
+      "country": "EC",
+      "marca_id": 115
+    },
+    {
+      "id": 1359,
+      "nombre": "Vento",
+      "country": "EC",
+      "marca_id": 115
+    },
+    {
+      "id": 1360,
+      "nombre": "Jetta",
+      "country": "EC",
+      "marca_id": 115
+    },
+    {
+      "id": 1361,
+      "nombre": "Passat",
+      "country": "EC",
+      "marca_id": 115
+    },
+    {
+      "id": 1362,
+      "nombre": "Tiguan",
+      "country": "EC",
+      "marca_id": 115
+    },
+    {
+      "id": 1363,
+      "nombre": "Touareg",
+      "country": "EC",
+      "marca_id": 115
+    },
+    {
+      "id": 1364,
+      "nombre": "Amarok",
+      "country": "EC",
+      "marca_id": 115
+    },
+    {
+      "id": 1365,
+      "nombre": "T-Cross",
+      "country": "EC",
+      "marca_id": 115
+    },
+    {
+      "id": 1366,
+      "nombre": "Nivus",
+      "country": "EC",
+      "marca_id": 115
+    },
+    {
+      "id": 1367,
+      "nombre": "Kwid",
+      "country": "EC",
+      "marca_id": 116
+    },
+    {
+      "id": 1368,
+      "nombre": "Sandero",
+      "country": "EC",
+      "marca_id": 116
+    },
+    {
+      "id": 1369,
+      "nombre": "Logan",
+      "country": "EC",
+      "marca_id": 116
+    },
+    {
+      "id": 1370,
+      "nombre": "Duster",
+      "country": "EC",
+      "marca_id": 116
+    },
+    {
+      "id": 1371,
+      "nombre": "Captur",
+      "country": "EC",
+      "marca_id": 116
+    },
+    {
+      "id": 1372,
+      "nombre": "Koleos",
+      "country": "EC",
+      "marca_id": 116
+    },
+    {
+      "id": 1373,
+      "nombre": "Oroch",
+      "country": "EC",
+      "marca_id": 116
+    },
+    {
+      "id": 1374,
+      "nombre": "Fiesta",
+      "country": "EC",
+      "marca_id": 117
+    },
+    {
+      "id": 1375,
+      "nombre": "Focus",
+      "country": "EC",
+      "marca_id": 117
+    },
+    {
+      "id": 1376,
+      "nombre": "Fusion",
+      "country": "EC",
+      "marca_id": 117
+    },
+    {
+      "id": 1377,
+      "nombre": "Escape",
+      "country": "EC",
+      "marca_id": 117
+    },
+    {
+      "id": 1378,
+      "nombre": "Explorer",
+      "country": "EC",
+      "marca_id": 117
+    },
+    {
+      "id": 1379,
+      "nombre": "Edge",
+      "country": "EC",
+      "marca_id": 117
+    },
+    {
+      "id": 1380,
+      "nombre": "Ranger",
+      "country": "EC",
+      "marca_id": 117
+    },
+    {
+      "id": 1381,
+      "nombre": "F-150",
+      "country": "EC",
+      "marca_id": 117
+    },
+    {
+      "id": 1382,
+      "nombre": "Bronco",
+      "country": "EC",
+      "marca_id": 117
+    },
+    {
+      "id": 1383,
+      "nombre": "Serie 1",
+      "country": "EC",
+      "marca_id": 118
+    },
+    {
+      "id": 1384,
+      "nombre": "Serie 2",
+      "country": "EC",
+      "marca_id": 118
+    },
+    {
+      "id": 1385,
+      "nombre": "Serie 3",
+      "country": "EC",
+      "marca_id": 118
+    },
+    {
+      "id": 1386,
+      "nombre": "Serie 4",
+      "country": "EC",
+      "marca_id": 118
+    },
+    {
+      "id": 1387,
+      "nombre": "Serie 5",
+      "country": "EC",
+      "marca_id": 118
+    },
+    {
+      "id": 1388,
+      "nombre": "Serie 7",
+      "country": "EC",
+      "marca_id": 118
+    },
+    {
+      "id": 1389,
+      "nombre": "X1",
+      "country": "EC",
+      "marca_id": 118
+    },
+    {
+      "id": 1390,
+      "nombre": "X2",
+      "country": "EC",
+      "marca_id": 118
+    },
+    {
+      "id": 1391,
+      "nombre": "X3",
+      "country": "EC",
+      "marca_id": 118
+    },
+    {
+      "id": 1392,
+      "nombre": "X4",
+      "country": "EC",
+      "marca_id": 118
+    },
+    {
+      "id": 1393,
+      "nombre": "X5",
+      "country": "EC",
+      "marca_id": 118
+    },
+    {
+      "id": 1394,
+      "nombre": "X6",
+      "country": "EC",
+      "marca_id": 118
+    },
+    {
+      "id": 1395,
+      "nombre": "X7",
+      "country": "EC",
+      "marca_id": 118
+    },
+    {
+      "id": 1396,
+      "nombre": "Clase A",
+      "country": "EC",
+      "marca_id": 119
+    },
+    {
+      "id": 1397,
+      "nombre": "Clase B",
+      "country": "EC",
+      "marca_id": 119
+    },
+    {
+      "id": 1398,
+      "nombre": "Clase C",
+      "country": "EC",
+      "marca_id": 119
+    },
+    {
+      "id": 1399,
+      "nombre": "Clase E",
+      "country": "EC",
+      "marca_id": 119
+    },
+    {
+      "id": 1400,
+      "nombre": "Clase S",
+      "country": "EC",
+      "marca_id": 119
+    },
+    {
+      "id": 1401,
+      "nombre": "GLA",
+      "country": "EC",
+      "marca_id": 119
+    },
+    {
+      "id": 1402,
+      "nombre": "GLB",
+      "country": "EC",
+      "marca_id": 119
+    },
+    {
+      "id": 1403,
+      "nombre": "GLC",
+      "country": "EC",
+      "marca_id": 119
+    },
+    {
+      "id": 1404,
+      "nombre": "GLE",
+      "country": "EC",
+      "marca_id": 119
+    },
+    {
+      "id": 1405,
+      "nombre": "GLS",
+      "country": "EC",
+      "marca_id": 119
+    },
+    {
+      "id": 1406,
+      "nombre": "G-Class",
+      "country": "EC",
+      "marca_id": 119
+    },
+    {
+      "id": 1407,
+      "nombre": "A1",
+      "country": "EC",
+      "marca_id": 120
+    },
+    {
+      "id": 1408,
+      "nombre": "A3",
+      "country": "EC",
+      "marca_id": 120
+    },
+    {
+      "id": 1409,
+      "nombre": "A4",
+      "country": "EC",
+      "marca_id": 120
+    },
+    {
+      "id": 1410,
+      "nombre": "A5",
+      "country": "EC",
+      "marca_id": 120
+    },
+    {
+      "id": 1411,
+      "nombre": "A6",
+      "country": "EC",
+      "marca_id": 120
+    },
+    {
+      "id": 1412,
+      "nombre": "A7",
+      "country": "EC",
+      "marca_id": 120
+    },
+    {
+      "id": 1413,
+      "nombre": "A8",
+      "country": "EC",
+      "marca_id": 120
+    },
+    {
+      "id": 1414,
+      "nombre": "Q2",
+      "country": "EC",
+      "marca_id": 120
+    },
+    {
+      "id": 1415,
+      "nombre": "Q3",
+      "country": "EC",
+      "marca_id": 120
+    },
+    {
+      "id": 1416,
+      "nombre": "Q5",
+      "country": "EC",
+      "marca_id": 120
+    },
+    {
+      "id": 1417,
+      "nombre": "Q7",
+      "country": "EC",
+      "marca_id": 120
+    },
+    {
+      "id": 1418,
+      "nombre": "Q8",
+      "country": "EC",
+      "marca_id": 120
+    },
+    {
+      "id": 1419,
+      "nombre": "Gol",
+      "country": "BR",
+      "marca_id": 121
+    },
+    {
+      "id": 1420,
+      "nombre": "Polo",
+      "country": "BR",
+      "marca_id": 121
+    },
+    {
+      "id": 1421,
+      "nombre": "Virtus",
+      "country": "BR",
+      "marca_id": 121
+    },
+    {
+      "id": 1422,
+      "nombre": "Jetta",
+      "country": "BR",
+      "marca_id": 121
+    },
+    {
+      "id": 1423,
+      "nombre": "Passat",
+      "country": "BR",
+      "marca_id": 121
+    },
+    {
+      "id": 1424,
+      "nombre": "Tiguan",
+      "country": "BR",
+      "marca_id": 121
+    },
+    {
+      "id": 1425,
+      "nombre": "Touareg",
+      "country": "BR",
+      "marca_id": 121
+    },
+    {
+      "id": 1426,
+      "nombre": "Amarok",
+      "country": "BR",
+      "marca_id": 121
+    },
+    {
+      "id": 1427,
+      "nombre": "T-Cross",
+      "country": "BR",
+      "marca_id": 121
+    },
+    {
+      "id": 1428,
+      "nombre": "Nivus",
+      "country": "BR",
+      "marca_id": 121
+    },
+    {
+      "id": 1429,
+      "nombre": "Saveiro",
+      "country": "BR",
+      "marca_id": 121
+    },
+    {
+      "id": 1430,
+      "nombre": "Kombi",
+      "country": "BR",
+      "marca_id": 121
+    },
+    {
+      "id": 1431,
+      "nombre": "Fox",
+      "country": "BR",
+      "marca_id": 121
+    },
+    {
+      "id": 1432,
+      "nombre": "Up!",
+      "country": "BR",
+      "marca_id": 121
+    },
+    {
+      "id": 1433,
+      "nombre": "Uno",
+      "country": "BR",
+      "marca_id": 122
+    },
+    {
+      "id": 1434,
+      "nombre": "Palio",
+      "country": "BR",
+      "marca_id": 122
+    },
+    {
+      "id": 1435,
+      "nombre": "Siena",
+      "country": "BR",
+      "marca_id": 122
+    },
+    {
+      "id": 1436,
+      "nombre": "Strada",
+      "country": "BR",
+      "marca_id": 122
+    },
+    {
+      "id": 1437,
+      "nombre": "Toro",
+      "country": "BR",
+      "marca_id": 122
+    },
+    {
+      "id": 1438,
+      "nombre": "Ducato",
+      "country": "BR",
+      "marca_id": 122
+    },
+    {
+      "id": 1439,
+      "nombre": "500",
+      "country": "BR",
+      "marca_id": 122
+    },
+    {
+      "id": 1440,
+      "nombre": "Argo",
+      "country": "BR",
+      "marca_id": 122
+    },
+    {
+      "id": 1441,
+      "nombre": "Mobi",
+      "country": "BR",
+      "marca_id": 122
+    },
+    {
+      "id": 1442,
+      "nombre": "Cronos",
+      "country": "BR",
+      "marca_id": 122
+    },
+    {
+      "id": 1443,
+      "nombre": "Fiorino",
+      "country": "BR",
+      "marca_id": 122
+    },
+    {
+      "id": 1444,
+      "nombre": "Doblo",
+      "country": "BR",
+      "marca_id": 122
+    },
+    {
+      "id": 1445,
+      "nombre": "Bravo",
+      "country": "BR",
+      "marca_id": 122
+    },
+    {
+      "id": 1446,
+      "nombre": "Linea",
+      "country": "BR",
+      "marca_id": 122
+    },
+    {
+      "id": 1447,
+      "nombre": "Onix",
+      "country": "BR",
+      "marca_id": 123
+    },
+    {
+      "id": 1448,
+      "nombre": "Prisma",
+      "country": "BR",
+      "marca_id": 123
+    },
+    {
+      "id": 1449,
+      "nombre": "Cruze",
+      "country": "BR",
+      "marca_id": 123
+    },
+    {
+      "id": 1450,
+      "nombre": "Malibu",
+      "country": "BR",
+      "marca_id": 123
+    },
+    {
+      "id": 1451,
+      "nombre": "Equinox",
+      "country": "BR",
+      "marca_id": 123
+    },
+    {
+      "id": 1452,
+      "nombre": "Traverse",
+      "country": "BR",
+      "marca_id": 123
+    },
+    {
+      "id": 1453,
+      "nombre": "Silverado",
+      "country": "BR",
+      "marca_id": 123
+    },
+    {
+      "id": 1454,
+      "nombre": "Colorado",
+      "country": "BR",
+      "marca_id": 123
+    },
+    {
+      "id": 1455,
+      "nombre": "Tracker",
+      "country": "BR",
+      "marca_id": 123
+    },
+    {
+      "id": 1456,
+      "nombre": "Blazer",
+      "country": "BR",
+      "marca_id": 123
+    },
+    {
+      "id": 1457,
+      "nombre": "Spin",
+      "country": "BR",
+      "marca_id": 123
+    },
+    {
+      "id": 1458,
+      "nombre": "Montana",
+      "country": "BR",
+      "marca_id": 123
+    },
+    {
+      "id": 1459,
+      "nombre": "S10",
+      "country": "BR",
+      "marca_id": 123
+    },
+    {
+      "id": 1460,
+      "nombre": "Celta",
+      "country": "BR",
+      "marca_id": 123
+    },
+    {
+      "id": 1461,
+      "nombre": "Corsa",
+      "country": "BR",
+      "marca_id": 123
+    },
+    {
+      "id": 1462,
+      "nombre": "Meriva",
+      "country": "BR",
+      "marca_id": 123
+    },
+    {
+      "id": 1463,
+      "nombre": "Zafira",
+      "country": "BR",
+      "marca_id": 123
+    },
+    {
+      "id": 1464,
+      "nombre": "Ka",
+      "country": "BR",
+      "marca_id": 124
+    },
+    {
+      "id": 1465,
+      "nombre": "Fiesta",
+      "country": "BR",
+      "marca_id": 124
+    },
+    {
+      "id": 1466,
+      "nombre": "Focus",
+      "country": "BR",
+      "marca_id": 124
+    },
+    {
+      "id": 1467,
+      "nombre": "Fusion",
+      "country": "BR",
+      "marca_id": 124
+    },
+    {
+      "id": 1468,
+      "nombre": "EcoSport",
+      "country": "BR",
+      "marca_id": 124
+    },
+    {
+      "id": 1469,
+      "nombre": "Edge",
+      "country": "BR",
+      "marca_id": 124
+    },
+    {
+      "id": 1470,
+      "nombre": "Ranger",
+      "country": "BR",
+      "marca_id": 124
+    },
+    {
+      "id": 1471,
+      "nombre": "F-150",
+      "country": "BR",
+      "marca_id": 124
+    },
+    {
+      "id": 1472,
+      "nombre": "Bronco",
+      "country": "BR",
+      "marca_id": 124
+    },
+    {
+      "id": 1473,
+      "nombre": "Territory",
+      "country": "BR",
+      "marca_id": 124
+    },
+    {
+      "id": 1474,
+      "nombre": "Maverick",
+      "country": "BR",
+      "marca_id": 124
+    },
+    {
+      "id": 1475,
+      "nombre": "Corolla",
+      "country": "BR",
+      "marca_id": 125
+    },
+    {
+      "id": 1476,
+      "nombre": "Camry",
+      "country": "BR",
+      "marca_id": 125
+    },
+    {
+      "id": 1477,
+      "nombre": "RAV4",
+      "country": "BR",
+      "marca_id": 125
+    },
+    {
+      "id": 1478,
+      "nombre": "Hilux",
+      "country": "BR",
+      "marca_id": 125
+    },
+    {
+      "id": 1479,
+      "nombre": "Land Cruiser",
+      "country": "BR",
+      "marca_id": 125
+    },
+    {
+      "id": 1480,
+      "nombre": "Yaris",
+      "country": "BR",
+      "marca_id": 125
+    },
+    {
+      "id": 1481,
+      "nombre": "Prius",
+      "country": "BR",
+      "marca_id": 125
+    },
+    {
+      "id": 1482,
+      "nombre": "Highlander",
+      "country": "BR",
+      "marca_id": 125
+    },
+    {
+      "id": 1483,
+      "nombre": "Tacoma",
+      "country": "BR",
+      "marca_id": 125
+    },
+    {
+      "id": 1484,
+      "nombre": "4Runner",
+      "country": "BR",
+      "marca_id": 125
+    },
+    {
+      "id": 1485,
+      "nombre": "Sienna",
+      "country": "BR",
+      "marca_id": 125
+    },
+    {
+      "id": 1486,
+      "nombre": "Tundra",
+      "country": "BR",
+      "marca_id": 125
+    },
+    {
+      "id": 1487,
+      "nombre": "SW4",
+      "country": "BR",
+      "marca_id": 125
+    },
+    {
+      "id": 1488,
+      "nombre": "Kwid",
+      "country": "BR",
+      "marca_id": 126
+    },
+    {
+      "id": 1489,
+      "nombre": "Sandero",
+      "country": "BR",
+      "marca_id": 126
+    },
+    {
+      "id": 1490,
+      "nombre": "Logan",
+      "country": "BR",
+      "marca_id": 126
+    },
+    {
+      "id": 1491,
+      "nombre": "Duster",
+      "country": "BR",
+      "marca_id": 126
+    },
+    {
+      "id": 1492,
+      "nombre": "Captur",
+      "country": "BR",
+      "marca_id": 126
+    },
+    {
+      "id": 1493,
+      "nombre": "Koleos",
+      "country": "BR",
+      "marca_id": 126
+    },
+    {
+      "id": 1494,
+      "nombre": "Oroch",
+      "country": "BR",
+      "marca_id": 126
+    },
+    {
+      "id": 1495,
+      "nombre": "Fluence",
+      "country": "BR",
+      "marca_id": 126
+    },
+    {
+      "id": 1496,
+      "nombre": "Megane",
+      "country": "BR",
+      "marca_id": 126
+    },
+    {
+      "id": 1497,
+      "nombre": "Scenic",
+      "country": "BR",
+      "marca_id": 126
+    },
+    {
+      "id": 1498,
+      "nombre": "Kangoo",
+      "country": "BR",
+      "marca_id": 126
+    },
+    {
+      "id": 1499,
+      "nombre": "HB20",
+      "country": "BR",
+      "marca_id": 127
+    },
+    {
+      "id": 1500,
+      "nombre": "HB20S",
+      "country": "BR",
+      "marca_id": 127
+    },
+    {
+      "id": 1501,
+      "nombre": "HB20X",
+      "country": "BR",
+      "marca_id": 127
+    },
+    {
+      "id": 1502,
+      "nombre": "Creta",
+      "country": "BR",
+      "marca_id": 127
+    },
+    {
+      "id": 1503,
+      "nombre": "Tucson",
+      "country": "BR",
+      "marca_id": 127
+    },
+    {
+      "id": 1504,
+      "nombre": "Santa Fe",
+      "country": "BR",
+      "marca_id": 127
+    },
+    {
+      "id": 1505,
+      "nombre": "Palisade",
+      "country": "BR",
+      "marca_id": 127
+    },
+    {
+      "id": 1506,
+      "nombre": "iX35",
+      "country": "BR",
+      "marca_id": 127
+    },
+    {
+      "id": 1507,
+      "nombre": "Azera",
+      "country": "BR",
+      "marca_id": 127
+    },
+    {
+      "id": 1508,
+      "nombre": "Elantra",
+      "country": "BR",
+      "marca_id": 127
+    },
+    {
+      "id": 1509,
+      "nombre": "Sonata",
+      "country": "BR",
+      "marca_id": 127
+    },
+    {
+      "id": 1510,
+      "nombre": "Fit",
+      "country": "BR",
+      "marca_id": 128
+    },
+    {
+      "id": 1511,
+      "nombre": "City",
+      "country": "BR",
+      "marca_id": 128
+    },
+    {
+      "id": 1512,
+      "nombre": "Civic",
+      "country": "BR",
+      "marca_id": 128
+    },
+    {
+      "id": 1513,
+      "nombre": "Accord",
+      "country": "BR",
+      "marca_id": 128
+    },
+    {
+      "id": 1514,
+      "nombre": "CR-V",
+      "country": "BR",
+      "marca_id": 128
+    },
+    {
+      "id": 1515,
+      "nombre": "HR-V",
+      "country": "BR",
+      "marca_id": 128
+    },
+    {
+      "id": 1516,
+      "nombre": "WR-V",
+      "country": "BR",
+      "marca_id": 128
+    },
+    {
+      "id": 1517,
+      "nombre": "Versa",
+      "country": "BR",
+      "marca_id": 129
+    },
+    {
+      "id": 1518,
+      "nombre": "Sentra",
+      "country": "BR",
+      "marca_id": 129
+    },
+    {
+      "id": 1519,
+      "nombre": "Kicks",
+      "country": "BR",
+      "marca_id": 129
+    },
+    {
+      "id": 1520,
+      "nombre": "Rogue",
+      "country": "BR",
+      "marca_id": 129
+    },
+    {
+      "id": 1521,
+      "nombre": "Frontier",
+      "country": "BR",
+      "marca_id": 129
+    },
+    {
+      "id": 1522,
+      "nombre": "X-Trail",
+      "country": "BR",
+      "marca_id": 129
+    },
+    {
+      "id": 1523,
+      "nombre": "March",
+      "country": "BR",
+      "marca_id": 129
+    },
+    {
+      "id": 1524,
+      "nombre": "Renegade",
+      "country": "BR",
+      "marca_id": 130
+    },
+    {
+      "id": 1525,
+      "nombre": "Compass",
+      "country": "BR",
+      "marca_id": 130
+    },
+    {
+      "id": 1526,
+      "nombre": "Commander",
+      "country": "BR",
+      "marca_id": 130
+    },
+    {
+      "id": 1527,
+      "nombre": "Grand Cherokee",
+      "country": "BR",
+      "marca_id": 130
+    },
+    {
+      "id": 1528,
+      "nombre": "Wrangler",
+      "country": "BR",
+      "marca_id": 130
+    },
+    {
+      "id": 1529,
+      "nombre": "208",
+      "country": "BR",
+      "marca_id": 131
+    },
+    {
+      "id": 1530,
+      "nombre": "2008",
+      "country": "BR",
+      "marca_id": 131
+    },
+    {
+      "id": 1531,
+      "nombre": "3008",
+      "country": "BR",
+      "marca_id": 131
+    },
+    {
+      "id": 1532,
+      "nombre": "5008",
+      "country": "BR",
+      "marca_id": 131
+    },
+    {
+      "id": 1533,
+      "nombre": "Partner",
+      "country": "BR",
+      "marca_id": 131
+    },
+    {
+      "id": 1534,
+      "nombre": "Expert",
+      "country": "BR",
+      "marca_id": 131
+    },
+    {
+      "id": 1535,
+      "nombre": "C3",
+      "country": "BR",
+      "marca_id": 132
+    },
+    {
+      "id": 1536,
+      "nombre": "C4",
+      "country": "BR",
+      "marca_id": 132
+    },
+    {
+      "id": 1537,
+      "nombre": "C4 Cactus",
+      "country": "BR",
+      "marca_id": 132
+    },
+    {
+      "id": 1538,
+      "nombre": "C4 Picasso",
+      "country": "BR",
+      "marca_id": 132
+    },
+    {
+      "id": 1539,
+      "nombre": "Berlingo",
+      "country": "BR",
+      "marca_id": 132
+    },
+    {
+      "id": 1540,
+      "nombre": "Jumper",
+      "country": "BR",
+      "marca_id": 132
+    },
+    {
+      "id": 1541,
+      "nombre": "Serie 1",
+      "country": "BR",
+      "marca_id": 133
+    },
+    {
+      "id": 1542,
+      "nombre": "Serie 2",
+      "country": "BR",
+      "marca_id": 133
+    },
+    {
+      "id": 1543,
+      "nombre": "Serie 3",
+      "country": "BR",
+      "marca_id": 133
+    },
+    {
+      "id": 1544,
+      "nombre": "Serie 4",
+      "country": "BR",
+      "marca_id": 133
+    },
+    {
+      "id": 1545,
+      "nombre": "Serie 5",
+      "country": "BR",
+      "marca_id": 133
+    },
+    {
+      "id": 1546,
+      "nombre": "Serie 7",
+      "country": "BR",
+      "marca_id": 133
+    },
+    {
+      "id": 1547,
+      "nombre": "X1",
+      "country": "BR",
+      "marca_id": 133
+    },
+    {
+      "id": 1548,
+      "nombre": "X2",
+      "country": "BR",
+      "marca_id": 133
+    },
+    {
+      "id": 1549,
+      "nombre": "X3",
+      "country": "BR",
+      "marca_id": 133
+    },
+    {
+      "id": 1550,
+      "nombre": "X4",
+      "country": "BR",
+      "marca_id": 133
+    },
+    {
+      "id": 1551,
+      "nombre": "X5",
+      "country": "BR",
+      "marca_id": 133
+    },
+    {
+      "id": 1552,
+      "nombre": "X6",
+      "country": "BR",
+      "marca_id": 133
+    },
+    {
+      "id": 1553,
+      "nombre": "X7",
+      "country": "BR",
+      "marca_id": 133
+    },
+    {
+      "id": 1554,
+      "nombre": "Clase A",
+      "country": "BR",
+      "marca_id": 134
+    },
+    {
+      "id": 1555,
+      "nombre": "Clase B",
+      "country": "BR",
+      "marca_id": 134
+    },
+    {
+      "id": 1556,
+      "nombre": "Clase C",
+      "country": "BR",
+      "marca_id": 134
+    },
+    {
+      "id": 1557,
+      "nombre": "Clase E",
+      "country": "BR",
+      "marca_id": 134
+    },
+    {
+      "id": 1558,
+      "nombre": "Clase S",
+      "country": "BR",
+      "marca_id": 134
+    },
+    {
+      "id": 1559,
+      "nombre": "GLA",
+      "country": "BR",
+      "marca_id": 134
+    },
+    {
+      "id": 1560,
+      "nombre": "GLB",
+      "country": "BR",
+      "marca_id": 134
+    },
+    {
+      "id": 1561,
+      "nombre": "GLC",
+      "country": "BR",
+      "marca_id": 134
+    },
+    {
+      "id": 1562,
+      "nombre": "GLE",
+      "country": "BR",
+      "marca_id": 134
+    },
+    {
+      "id": 1563,
+      "nombre": "GLS",
+      "country": "BR",
+      "marca_id": 134
+    },
+    {
+      "id": 1564,
+      "nombre": "G-Class",
+      "country": "BR",
+      "marca_id": 134
+    },
+    {
+      "id": 1565,
+      "nombre": "Sprinter",
+      "country": "BR",
+      "marca_id": 134
+    },
+    {
+      "id": 1566,
+      "nombre": "A1",
+      "country": "BR",
+      "marca_id": 135
+    },
+    {
+      "id": 1567,
+      "nombre": "A3",
+      "country": "BR",
+      "marca_id": 135
+    },
+    {
+      "id": 1568,
+      "nombre": "A4",
+      "country": "BR",
+      "marca_id": 135
+    },
+    {
+      "id": 1569,
+      "nombre": "A5",
+      "country": "BR",
+      "marca_id": 135
+    },
+    {
+      "id": 1570,
+      "nombre": "A6",
+      "country": "BR",
+      "marca_id": 135
+    },
+    {
+      "id": 1571,
+      "nombre": "A7",
+      "country": "BR",
+      "marca_id": 135
+    },
+    {
+      "id": 1572,
+      "nombre": "A8",
+      "country": "BR",
+      "marca_id": 135
+    },
+    {
+      "id": 1573,
+      "nombre": "Q2",
+      "country": "BR",
+      "marca_id": 135
+    },
+    {
+      "id": 1574,
+      "nombre": "Q3",
+      "country": "BR",
+      "marca_id": 135
+    },
+    {
+      "id": 1575,
+      "nombre": "Q5",
+      "country": "BR",
+      "marca_id": 135
+    },
+    {
+      "id": 1576,
+      "nombre": "Q7",
+      "country": "BR",
+      "marca_id": 135
+    },
+    {
+      "id": 1577,
+      "nombre": "Q8",
+      "country": "BR",
+      "marca_id": 135
+    },
+    {
+      "id": 1578,
+      "nombre": "Spark",
+      "country": "VE",
+      "marca_id": 136
+    },
+    {
+      "id": 1579,
+      "nombre": "Sail",
+      "country": "VE",
+      "marca_id": 136
+    },
+    {
+      "id": 1580,
+      "nombre": "Onix",
+      "country": "VE",
+      "marca_id": 136
+    },
+    {
+      "id": 1581,
+      "nombre": "Prisma",
+      "country": "VE",
+      "marca_id": 136
+    },
+    {
+      "id": 1582,
+      "nombre": "Cruze",
+      "country": "VE",
+      "marca_id": 136
+    },
+    {
+      "id": 1583,
+      "nombre": "Malibu",
+      "country": "VE",
+      "marca_id": 136
+    },
+    {
+      "id": 1584,
+      "nombre": "Equinox",
+      "country": "VE",
+      "marca_id": 136
+    },
+    {
+      "id": 1585,
+      "nombre": "Traverse",
+      "country": "VE",
+      "marca_id": 136
+    },
+    {
+      "id": 1586,
+      "nombre": "Tahoe",
+      "country": "VE",
+      "marca_id": 136
+    },
+    {
+      "id": 1587,
+      "nombre": "Silverado",
+      "country": "VE",
+      "marca_id": 136
+    },
+    {
+      "id": 1588,
+      "nombre": "Colorado",
+      "country": "VE",
+      "marca_id": 136
+    },
+    {
+      "id": 1589,
+      "nombre": "Tracker",
+      "country": "VE",
+      "marca_id": 136
+    },
+    {
+      "id": 1590,
+      "nombre": "Blazer",
+      "country": "VE",
+      "marca_id": 136
+    },
+    {
+      "id": 1591,
+      "nombre": "Aveo",
+      "country": "VE",
+      "marca_id": 136
+    },
+    {
+      "id": 1592,
+      "nombre": "Optra",
+      "country": "VE",
+      "marca_id": 136
+    },
+    {
+      "id": 1593,
+      "nombre": "Corsa",
+      "country": "VE",
+      "marca_id": 136
+    },
+    {
+      "id": 1594,
+      "nombre": "Meriva",
+      "country": "VE",
+      "marca_id": 136
+    },
+    {
+      "id": 1595,
+      "nombre": "Zafira",
+      "country": "VE",
+      "marca_id": 136
+    },
+    {
+      "id": 1596,
+      "nombre": "Cavalier",
+      "country": "VE",
+      "marca_id": 136
+    },
+    {
+      "id": 1597,
+      "nombre": "Fiesta",
+      "country": "VE",
+      "marca_id": 137
+    },
+    {
+      "id": 1598,
+      "nombre": "Focus",
+      "country": "VE",
+      "marca_id": 137
+    },
+    {
+      "id": 1599,
+      "nombre": "Fusion",
+      "country": "VE",
+      "marca_id": 137
+    },
+    {
+      "id": 1600,
+      "nombre": "Escape",
+      "country": "VE",
+      "marca_id": 137
+    },
+    {
+      "id": 1601,
+      "nombre": "Explorer",
+      "country": "VE",
+      "marca_id": 137
+    },
+    {
+      "id": 1602,
+      "nombre": "Edge",
+      "country": "VE",
+      "marca_id": 137
+    },
+    {
+      "id": 1603,
+      "nombre": "Ranger",
+      "country": "VE",
+      "marca_id": 137
+    },
+    {
+      "id": 1604,
+      "nombre": "F-150",
+      "country": "VE",
+      "marca_id": 137
+    },
+    {
+      "id": 1605,
+      "nombre": "Bronco",
+      "country": "VE",
+      "marca_id": 137
+    },
+    {
+      "id": 1606,
+      "nombre": "EcoSport",
+      "country": "VE",
+      "marca_id": 137
+    },
+    {
+      "id": 1607,
+      "nombre": "Corolla",
+      "country": "VE",
+      "marca_id": 138
+    },
+    {
+      "id": 1608,
+      "nombre": "Camry",
+      "country": "VE",
+      "marca_id": 138
+    },
+    {
+      "id": 1609,
+      "nombre": "RAV4",
+      "country": "VE",
+      "marca_id": 138
+    },
+    {
+      "id": 1610,
+      "nombre": "Hilux",
+      "country": "VE",
+      "marca_id": 138
+    },
+    {
+      "id": 1611,
+      "nombre": "Land Cruiser",
+      "country": "VE",
+      "marca_id": 138
+    },
+    {
+      "id": 1612,
+      "nombre": "Yaris",
+      "country": "VE",
+      "marca_id": 138
+    },
+    {
+      "id": 1613,
+      "nombre": "Prius",
+      "country": "VE",
+      "marca_id": 138
+    },
+    {
+      "id": 1614,
+      "nombre": "Highlander",
+      "country": "VE",
+      "marca_id": 138
+    },
+    {
+      "id": 1615,
+      "nombre": "Tacoma",
+      "country": "VE",
+      "marca_id": 138
+    },
+    {
+      "id": 1616,
+      "nombre": "4Runner",
+      "country": "VE",
+      "marca_id": 138
+    },
+    {
+      "id": 1617,
+      "nombre": "Sienna",
+      "country": "VE",
+      "marca_id": 138
+    },
+    {
+      "id": 1618,
+      "nombre": "Tundra",
+      "country": "VE",
+      "marca_id": 138
+    },
+    {
+      "id": 1619,
+      "nombre": "Versa",
+      "country": "VE",
+      "marca_id": 139
+    },
+    {
+      "id": 1620,
+      "nombre": "Sentra",
+      "country": "VE",
+      "marca_id": 139
+    },
+    {
+      "id": 1621,
+      "nombre": "Altima",
+      "country": "VE",
+      "marca_id": 139
+    },
+    {
+      "id": 1622,
+      "nombre": "Kicks",
+      "country": "VE",
+      "marca_id": 139
+    },
+    {
+      "id": 1623,
+      "nombre": "Rogue",
+      "country": "VE",
+      "marca_id": 139
+    },
+    {
+      "id": 1624,
+      "nombre": "Pathfinder",
+      "country": "VE",
+      "marca_id": 139
+    },
+    {
+      "id": 1625,
+      "nombre": "Frontier",
+      "country": "VE",
+      "marca_id": 139
+    },
+    {
+      "id": 1626,
+      "nombre": "X-Trail",
+      "country": "VE",
+      "marca_id": 139
+    },
+    {
+      "id": 1627,
+      "nombre": "Murano",
+      "country": "VE",
+      "marca_id": 139
+    },
+    {
+      "id": 1628,
+      "nombre": "Juke",
+      "country": "VE",
+      "marca_id": 139
+    },
+    {
+      "id": 1629,
+      "nombre": "March",
+      "country": "VE",
+      "marca_id": 139
+    },
+    {
+      "id": 1630,
+      "nombre": "Accent",
+      "country": "VE",
+      "marca_id": 140
+    },
+    {
+      "id": 1631,
+      "nombre": "Elantra",
+      "country": "VE",
+      "marca_id": 140
+    },
+    {
+      "id": 1632,
+      "nombre": "Sonata",
+      "country": "VE",
+      "marca_id": 140
+    },
+    {
+      "id": 1633,
+      "nombre": "Tucson",
+      "country": "VE",
+      "marca_id": 140
+    },
+    {
+      "id": 1634,
+      "nombre": "Santa Fe",
+      "country": "VE",
+      "marca_id": 140
+    },
+    {
+      "id": 1635,
+      "nombre": "Palisade",
+      "country": "VE",
+      "marca_id": 140
+    },
+    {
+      "id": 1636,
+      "nombre": "Kona",
+      "country": "VE",
+      "marca_id": 140
+    },
+    {
+      "id": 1637,
+      "nombre": "Venue",
+      "country": "VE",
+      "marca_id": 140
+    },
+    {
+      "id": 1638,
+      "nombre": "i10",
+      "country": "VE",
+      "marca_id": 140
+    },
+    {
+      "id": 1639,
+      "nombre": "i20",
+      "country": "VE",
+      "marca_id": 140
+    },
+    {
+      "id": 1640,
+      "nombre": "Rio",
+      "country": "VE",
+      "marca_id": 141
+    },
+    {
+      "id": 1641,
+      "nombre": "Forte",
+      "country": "VE",
+      "marca_id": 141
+    },
+    {
+      "id": 1642,
+      "nombre": "Optima",
+      "country": "VE",
+      "marca_id": 141
+    },
+    {
+      "id": 1643,
+      "nombre": "Sorento",
+      "country": "VE",
+      "marca_id": 141
+    },
+    {
+      "id": 1644,
+      "nombre": "Sportage",
+      "country": "VE",
+      "marca_id": 141
+    },
+    {
+      "id": 1645,
+      "nombre": "Telluride",
+      "country": "VE",
+      "marca_id": 141
+    },
+    {
+      "id": 1646,
+      "nombre": "Seltos",
+      "country": "VE",
+      "marca_id": 141
+    },
+    {
+      "id": 1647,
+      "nombre": "Soul",
+      "country": "VE",
+      "marca_id": 141
+    },
+    {
+      "id": 1648,
+      "nombre": "Picanto",
+      "country": "VE",
+      "marca_id": 141
+    },
+    {
+      "id": 1649,
+      "nombre": "Mazda2",
+      "country": "VE",
+      "marca_id": 142
+    },
+    {
+      "id": 1650,
+      "nombre": "Mazda3",
+      "country": "VE",
+      "marca_id": 142
+    },
+    {
+      "id": 1651,
+      "nombre": "Mazda6",
+      "country": "VE",
+      "marca_id": 142
+    },
+    {
+      "id": 1652,
+      "nombre": "CX-3",
+      "country": "VE",
+      "marca_id": 142
+    },
+    {
+      "id": 1653,
+      "nombre": "CX-5",
+      "country": "VE",
+      "marca_id": 142
+    },
+    {
+      "id": 1654,
+      "nombre": "CX-9",
+      "country": "VE",
+      "marca_id": 142
+    },
+    {
+      "id": 1655,
+      "nombre": "CX-30",
+      "country": "VE",
+      "marca_id": 142
+    },
+    {
+      "id": 1656,
+      "nombre": "BT-50",
+      "country": "VE",
+      "marca_id": 142
+    },
+    {
+      "id": 1657,
+      "nombre": "Swift",
+      "country": "VE",
+      "marca_id": 143
+    },
+    {
+      "id": 1658,
+      "nombre": "SX4",
+      "country": "VE",
+      "marca_id": 143
+    },
+    {
+      "id": 1659,
+      "nombre": "Vitara",
+      "country": "VE",
+      "marca_id": 143
+    },
+    {
+      "id": 1660,
+      "nombre": "Grand Vitara",
+      "country": "VE",
+      "marca_id": 143
+    },
+    {
+      "id": 1661,
+      "nombre": "S-Cross",
+      "country": "VE",
+      "marca_id": 143
+    },
+    {
+      "id": 1662,
+      "nombre": "Jimny",
+      "country": "VE",
+      "marca_id": 143
+    },
+    {
+      "id": 1663,
+      "nombre": "Lancer",
+      "country": "VE",
+      "marca_id": 144
+    },
+    {
+      "id": 1664,
+      "nombre": "Outlander",
+      "country": "VE",
+      "marca_id": 144
+    },
+    {
+      "id": 1665,
+      "nombre": "Montero",
+      "country": "VE",
+      "marca_id": 144
+    },
+    {
+      "id": 1666,
+      "nombre": "Pajero",
+      "country": "VE",
+      "marca_id": 144
+    },
+    {
+      "id": 1667,
+      "nombre": "Eclipse Cross",
+      "country": "VE",
+      "marca_id": 144
+    },
+    {
+      "id": 1668,
+      "nombre": "ASX",
+      "country": "VE",
+      "marca_id": 144
+    },
+    {
+      "id": 1669,
+      "nombre": "L200",
+      "country": "VE",
+      "marca_id": 144
+    },
+    {
+      "id": 1670,
+      "nombre": "Fit",
+      "country": "VE",
+      "marca_id": 145
+    },
+    {
+      "id": 1671,
+      "nombre": "Civic",
+      "country": "VE",
+      "marca_id": 145
+    },
+    {
+      "id": 1672,
+      "nombre": "Accord",
+      "country": "VE",
+      "marca_id": 145
+    },
+    {
+      "id": 1673,
+      "nombre": "CR-V",
+      "country": "VE",
+      "marca_id": 145
+    },
+    {
+      "id": 1674,
+      "nombre": "Pilot",
+      "country": "VE",
+      "marca_id": 145
+    },
+    {
+      "id": 1675,
+      "nombre": "HR-V",
+      "country": "VE",
+      "marca_id": 145
+    },
+    {
+      "id": 1676,
+      "nombre": "Passport",
+      "country": "VE",
+      "marca_id": 145
+    },
+    {
+      "id": 1677,
+      "nombre": "Polo",
+      "country": "VE",
+      "marca_id": 146
+    },
+    {
+      "id": 1678,
+      "nombre": "Gol",
+      "country": "VE",
+      "marca_id": 146
+    },
+    {
+      "id": 1679,
+      "nombre": "Vento",
+      "country": "VE",
+      "marca_id": 146
+    },
+    {
+      "id": 1680,
+      "nombre": "Jetta",
+      "country": "VE",
+      "marca_id": 146
+    },
+    {
+      "id": 1681,
+      "nombre": "Passat",
+      "country": "VE",
+      "marca_id": 146
+    },
+    {
+      "id": 1682,
+      "nombre": "Tiguan",
+      "country": "VE",
+      "marca_id": 146
+    },
+    {
+      "id": 1683,
+      "nombre": "Touareg",
+      "country": "VE",
+      "marca_id": 146
+    },
+    {
+      "id": 1684,
+      "nombre": "Amarok",
+      "country": "VE",
+      "marca_id": 146
+    },
+    {
+      "id": 1685,
+      "nombre": "T-Cross",
+      "country": "VE",
+      "marca_id": 146
+    },
+    {
+      "id": 1686,
+      "nombre": "Nivus",
+      "country": "VE",
+      "marca_id": 146
+    },
+    {
+      "id": 1687,
+      "nombre": "Kwid",
+      "country": "VE",
+      "marca_id": 147
+    },
+    {
+      "id": 1688,
+      "nombre": "Sandero",
+      "country": "VE",
+      "marca_id": 147
+    },
+    {
+      "id": 1689,
+      "nombre": "Logan",
+      "country": "VE",
+      "marca_id": 147
+    },
+    {
+      "id": 1690,
+      "nombre": "Duster",
+      "country": "VE",
+      "marca_id": 147
+    },
+    {
+      "id": 1691,
+      "nombre": "Captur",
+      "country": "VE",
+      "marca_id": 147
+    },
+    {
+      "id": 1692,
+      "nombre": "Koleos",
+      "country": "VE",
+      "marca_id": 147
+    },
+    {
+      "id": 1693,
+      "nombre": "Oroch",
+      "country": "VE",
+      "marca_id": 147
+    },
+    {
+      "id": 1694,
+      "nombre": "208",
+      "country": "VE",
+      "marca_id": 148
+    },
+    {
+      "id": 1695,
+      "nombre": "301",
+      "country": "VE",
+      "marca_id": 148
+    },
+    {
+      "id": 1696,
+      "nombre": "308",
+      "country": "VE",
+      "marca_id": 148
+    },
+    {
+      "id": 1697,
+      "nombre": "408",
+      "country": "VE",
+      "marca_id": 148
+    },
+    {
+      "id": 1698,
+      "nombre": "2008",
+      "country": "VE",
+      "marca_id": 148
+    },
+    {
+      "id": 1699,
+      "nombre": "3008",
+      "country": "VE",
+      "marca_id": 148
+    },
+    {
+      "id": 1700,
+      "nombre": "5008",
+      "country": "VE",
+      "marca_id": 148
+    },
+    {
+      "id": 1701,
+      "nombre": "Partner",
+      "country": "VE",
+      "marca_id": 148
+    },
+    {
+      "id": 1702,
+      "nombre": "Serie 1",
+      "country": "VE",
+      "marca_id": 149
+    },
+    {
+      "id": 1703,
+      "nombre": "Serie 2",
+      "country": "VE",
+      "marca_id": 149
+    },
+    {
+      "id": 1704,
+      "nombre": "Serie 3",
+      "country": "VE",
+      "marca_id": 149
+    },
+    {
+      "id": 1705,
+      "nombre": "Serie 4",
+      "country": "VE",
+      "marca_id": 149
+    },
+    {
+      "id": 1706,
+      "nombre": "Serie 5",
+      "country": "VE",
+      "marca_id": 149
+    },
+    {
+      "id": 1707,
+      "nombre": "Serie 7",
+      "country": "VE",
+      "marca_id": 149
+    },
+    {
+      "id": 1708,
+      "nombre": "X1",
+      "country": "VE",
+      "marca_id": 149
+    },
+    {
+      "id": 1709,
+      "nombre": "X2",
+      "country": "VE",
+      "marca_id": 149
+    },
+    {
+      "id": 1710,
+      "nombre": "X3",
+      "country": "VE",
+      "marca_id": 149
+    },
+    {
+      "id": 1711,
+      "nombre": "X4",
+      "country": "VE",
+      "marca_id": 149
+    },
+    {
+      "id": 1712,
+      "nombre": "X5",
+      "country": "VE",
+      "marca_id": 149
+    },
+    {
+      "id": 1713,
+      "nombre": "X6",
+      "country": "VE",
+      "marca_id": 149
+    },
+    {
+      "id": 1714,
+      "nombre": "X7",
+      "country": "VE",
+      "marca_id": 149
+    },
+    {
+      "id": 1715,
+      "nombre": "Clase A",
+      "country": "VE",
+      "marca_id": 150
+    },
+    {
+      "id": 1716,
+      "nombre": "Clase B",
+      "country": "VE",
+      "marca_id": 150
+    },
+    {
+      "id": 1717,
+      "nombre": "Clase C",
+      "country": "VE",
+      "marca_id": 150
+    },
+    {
+      "id": 1718,
+      "nombre": "Clase E",
+      "country": "VE",
+      "marca_id": 150
+    },
+    {
+      "id": 1719,
+      "nombre": "Clase S",
+      "country": "VE",
+      "marca_id": 150
+    },
+    {
+      "id": 1720,
+      "nombre": "GLA",
+      "country": "VE",
+      "marca_id": 150
+    },
+    {
+      "id": 1721,
+      "nombre": "GLB",
+      "country": "VE",
+      "marca_id": 150
+    },
+    {
+      "id": 1722,
+      "nombre": "GLC",
+      "country": "VE",
+      "marca_id": 150
+    },
+    {
+      "id": 1723,
+      "nombre": "GLE",
+      "country": "VE",
+      "marca_id": 150
+    },
+    {
+      "id": 1724,
+      "nombre": "GLS",
+      "country": "VE",
+      "marca_id": 150
+    },
+    {
+      "id": 1725,
+      "nombre": "G-Class",
+      "country": "VE",
+      "marca_id": 150
+    },
+    {
+      "id": 1726,
+      "nombre": "A1",
+      "country": "VE",
+      "marca_id": 151
+    },
+    {
+      "id": 1727,
+      "nombre": "A3",
+      "country": "VE",
+      "marca_id": 151
+    },
+    {
+      "id": 1728,
+      "nombre": "A4",
+      "country": "VE",
+      "marca_id": 151
+    },
+    {
+      "id": 1729,
+      "nombre": "A5",
+      "country": "VE",
+      "marca_id": 151
+    },
+    {
+      "id": 1730,
+      "nombre": "A6",
+      "country": "VE",
+      "marca_id": 151
+    },
+    {
+      "id": 1731,
+      "nombre": "A7",
+      "country": "VE",
+      "marca_id": 151
+    },
+    {
+      "id": 1732,
+      "nombre": "A8",
+      "country": "VE",
+      "marca_id": 151
+    },
+    {
+      "id": 1733,
+      "nombre": "Q2",
+      "country": "VE",
+      "marca_id": 151
+    },
+    {
+      "id": 1734,
+      "nombre": "Q3",
+      "country": "VE",
+      "marca_id": 151
+    },
+    {
+      "id": 1735,
+      "nombre": "Q5",
+      "country": "VE",
+      "marca_id": 151
+    },
+    {
+      "id": 1736,
+      "nombre": "Q7",
+      "country": "VE",
+      "marca_id": 151
+    },
+    {
+      "id": 1737,
+      "nombre": "Q8",
+      "country": "VE",
+      "marca_id": 151
+    }
+  ],
+  "total_registros": 1437,
+  "timestamp": "2025-12-06T01:11:38.384719"
+}

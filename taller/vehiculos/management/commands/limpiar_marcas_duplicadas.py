@@ -81,6 +81,3 @@ class Command(BaseCommand):
             self.stdout.write(
                 self.style.SUCCESS(f"✅ Eliminadas {len(marcas_a_eliminar)} marca(s) duplicada(s)")
             )
-
-
-

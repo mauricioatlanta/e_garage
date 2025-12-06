@@ -144,6 +144,3 @@ class Command(BaseCommand):
                 "\n💡 Tip: Now you can add services to these categories using the 'Add New Service' button."
             )
         )
-
-
-

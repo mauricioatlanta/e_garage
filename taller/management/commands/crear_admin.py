@@ -81,6 +81,3 @@ class Command(BaseCommand):
         self.stdout.write(f"\n🌐 URL DE ACCESO:")
         self.stdout.write(f"   Admin Django: http://127.0.0.1:8000/admin/")
         self.stdout.write("=" * 80)
-
-
-

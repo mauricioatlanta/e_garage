@@ -209,6 +209,3 @@ if __name__ == "__main__":
     print("\n" + "=" * 60)
     print("🔄 No olvides limpiar el caché del navegador para ver los cambios")
     print("=" * 60)
-
-
-

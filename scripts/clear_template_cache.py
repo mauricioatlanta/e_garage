@@ -31,6 +31,3 @@ print("1. Reinicia el servidor Django (Ctrl+C y vuelve a ejecutar 'python manage
 print("2. En el navegador, presiona Ctrl+Shift+R (o Cmd+Shift+R en Mac) para hacer hard refresh")
 print("3. O abre las herramientas de desarrollador (F12) y desactiva el caché temporalmente")
 print("\n✅ Listo! Los cambios deberían verse ahora.")
-
-
-

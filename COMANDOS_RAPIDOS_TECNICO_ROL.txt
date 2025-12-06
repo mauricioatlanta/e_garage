@@ -1,0 +1,60 @@
+════════════════════════════════════════════════════════════════
+  COMANDOS RÁPIDOS - Actualización Campo ROL Tecnico
+════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────┐
+│  [EN TU PC] - PowerShell                                    │
+└─────────────────────────────────────────────────────────────┘
+
+# 1. Navegar al proyecto
+cd E:\projecto\e_garage
+
+# 2. Verificar cambios
+git status
+
+# 3. Agregar archivos
+git add taller/models/tecnico.py taller/configuracion/rubros_logic.py taller/documentos/views_country_aware.py
+
+# 4. Hacer commit
+git commit -m "refactor: Cambiar campo rol de Tecnico de TextChoices a ROL_CHOICES"
+
+# 5. Subir a Git
+git push origin main
+
+
+┌─────────────────────────────────────────────────────────────┐
+│  [EN EL SERVIDOR] - Bash (SSH o Consola PythonAnywhere)    │
+└─────────────────────────────────────────────────────────────┘
+
+# 1. Ir al proyecto
+cd /home/atlantareciclajes/apps/egarage/current
+
+# 2. Activar entorno virtual
+workon venv_egarage310
+
+# 3. Actualizar código desde Git
+git pull origin main
+
+# 4. Verificar que todo está bien
+python manage.py check
+
+# 5. Verificar que ROL_CHOICES está correcto
+python manage.py shell -c "from taller.models import Tecnico; print('ROL_CHOICES:', Tecnico.ROL_CHOICES)"
+
+
+┌─────────────────────────────────────────────────────────────┐
+│  REINICIAR APLICACIÓN                                       │
+└─────────────────────────────────────────────────────────────┘
+
+[OPCIÓN 1 - PythonAnywhere Dashboard]
+1. Ve a https://www.pythonanywhere.com
+2. Pestaña "Web"
+3. Clic en "Reload"
+
+[OPCIÓN 2 - Desde Consola]
+touch /var/www/atlantareciclajes_pythonanywhere_com_wsgi.py
+
+
+════════════════════════════════════════════════════════════════
+
+
